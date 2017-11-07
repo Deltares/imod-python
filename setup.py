@@ -11,7 +11,7 @@ setup(
     version='0.1',
     description='Work with iMOD MODFLOW models',
     long_description=long_description,
-    url='https://github.com/visr/imodio',
+    url='https://gitlab.com/visr/imod-python',
     author='Martijn Visser',
     author_email='mgvisser@gmail.com',
     license='MIT',
