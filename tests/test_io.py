@@ -1,6 +1,6 @@
 import os
 import unittest
-import imod.io
+import imod
 import numpy as np
 # import xarray as xr
 # import pandas as pd

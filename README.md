@@ -3,7 +3,7 @@ Work with [iMOD](http://oss.deltares.nl/web/imod) MODFLOW models.
 ## Getting started
 In absence of actual documentation, here are some of the functions:
 ```python
-import imod.io
+import imod
 
 arr, meta = imod.io.readidf('ibound.idf')
 imod.io.writeidf('ibound-out.idf', arr, meta)
