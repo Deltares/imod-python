@@ -19,6 +19,7 @@ class TestIDF(unittest.TestCase):
         except FileNotFoundError:
             pass
 
+    # TODO update tests after DataArray rewrite
     def test_idf(self):
         imod.io.writeidf(self.idf, self.arr, self.meta)
         self.assertTrue(os.path.isfile(self.idf))

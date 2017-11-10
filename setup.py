@@ -21,6 +21,7 @@ setup(
         'numpy',
         'xarray',
         'pandas',
+        'dask',
     ],
     classifiers=[
         # https://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -32,5 +33,4 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
     ],
-    zip_safe=False,
 )
