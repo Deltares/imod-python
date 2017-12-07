@@ -8,6 +8,7 @@ import dask.array
 from glob import glob
 from datetime import datetime
 import os
+import re
 
 
 # TODO, check this implementation with the format specification in the iMOD manual
@@ -150,7 +151,8 @@ def parse_filename(path):
     except ValueError:
         pass  # no time in dict
     # layer is always last
-    if parts[-1].lower().startswith('l'):
+    p = re.compile('^l\d+$', re.IGNORECASE)
+    if p.match(parts[-1]):
         d['layer'] = int(parts[-1][1:])
     return d
 
