@@ -145,6 +145,8 @@ def parse_filename(path):
     name = parts[0]
     d = OrderedDict()
     d['name'] = name
+    if len(parts) == 1:
+        return d
     try:
         # TODO try pandas parse date?
         d['time'] = np.datetime64(datetime.strptime(parts[1], '%Y%m%d%H%M%S'))
@@ -222,7 +224,10 @@ def loadarray(globpath):
         raise FileNotFoundError('Could not find any files matching {}'.format(globpath))
     elif n == 1:
         return idf_xarray(paths[0])
+    loadarray_list(paths)
 
+
+def loadarray_list(paths):
     # create a DataArray from every IDF
     das = [idf_xarray(path) for path in paths]
 
@@ -256,17 +261,43 @@ def loadarray(globpath):
             das.sort(key=lambda da: da.time)
             da = xr.concat(das, dim='time')
         else:
-            raise AssertionError('Can only concatenate over layers and/or time')
+            assert(len(das) == 1)
+            da = das[0]
 
     return da
 
 
-# TODO implement
-def loadset():
-    # find all different parameters
-    # load each parameter into a single dataarray using loadarray
-    # combine the dataarrays into a dataset
-    pass
+def loadset(globpath):
+    # recursively find all files, use ** in globpath to indicate where
+    # e.g. globpath = 'model/**/*.idf'
+    paths = glob(globpath, recursive=True)
+    n = len(paths)
+    if n == 0:
+        raise FileNotFoundError('Could not find any files matching {}'.format(globpath))
+    # group the DataArrays together using their name
+    # note that directory names are ignored, and in case of duplicates, the last one wins
+    names = [parse_filename(path)['name'] for path in paths]
+    unique_names = list(np.unique(names))
+    d = OrderedDict()
+    for n in unique_names:
+        d[n] = []  # prepare empty lists to append to
+    for p, n in zip(paths, names):
+        d[n].append(p)
+
+    # load each group into a DataArray
+    das = [loadarray_list(v) for v in d.values()]
+
+    # store each DataArray under it's own name in an OrderedDict
+    dd = OrderedDict()
+    for da in das:
+        dd[da.name] = da
+    # Initially I wanted to return a xarray Dataset here,
+    # but then realised that it is not always aligned, and therefore not possible, see
+    # https://github.com/pydata/xarray/issues/1471#issuecomment-313719395
+    # It is not aligned when some parameters only have a non empty subset of a dimension,
+    # such as L2 + L3. This dict provides a similar interface anyway. If a Dataset is constructed
+    # from unaligned DataArrays it will make copies of the memmap, which we don't want.
+    return dd
 
 
 # xarray: if your data is unstructured or one-dimensional, stick with pandas
