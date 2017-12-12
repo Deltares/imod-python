@@ -41,8 +41,11 @@ def readidfheader(path):
         f.read(4)  # xmax
         f.read(4)  # ymin
         ymax = unpack('f', f.read(4))[0]
-        f.read(4)  # minimum data value present
-        f.read(4)  # maximum data value present
+        # note that dmin and dmax are currently not kept up to date
+        # generally ok, they are only used for legends in iMOD
+        # but would be nice if we could find a nice way to do this
+        f.read(4)  # dmin, minimum data value present
+        f.read(4)  # dmax, maximum data value present
         nodata = unpack('f', f.read(4))[0]
         attrs['nodata'] = nodata
         # only equidistant IDF currently supported
