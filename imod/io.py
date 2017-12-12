@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.ma as ma
+import rasterio
 from struct import unpack, pack
 from collections import OrderedDict
 import pandas as pd
@@ -94,50 +95,66 @@ def idf_memmap(path):
         return a, attrs
 
 
-# TODO rewrite after big DataArray rewrite
-def checkattrs(attrs):
-    required_keys = ('xmin', 'xmax', 'ymin', 'ymax',
-                     'nodata', 'dx', 'dy')
-    for key in required_keys:
-        if key not in attrs:
-            raise ValueError('attrs dict needs to contain {}'.format(key))
+# write DataArrays to IDF
+def writeidf(dirpath, a):
+    d = {}
+    if a.name is None:
+        raise ValueError("DataArray name cannot be None")
+    else:
+        d['name'] = a.name
+    os.makedirs(dirpath, exist_ok=True)
+    if 'time' in a.coords:
+        # TODO implement (not much different than layer)
+        raise NotImplementedError("Writing time dependent IDFs not yet implemented")
+    if 'layer' in a.coords:
+        if 'layer' in a.dims:
+            for layer, a2d in a.groupby('layer'):
+                d['layer'] = layer
+                path = os.path.join(dirpath, compose_filename(d))
+                writeidf_xy(path, a2d)
+        else:
+            d['layer'] = int(a.coords['layer'])
+            path = os.path.join(dirpath, compose_filename(d))
+            writeidf_xy(path, a)
+    else:
+        path = os.path.join(dirpath, compose_filename(d))
+        writeidf_xy(path, a)
 
 
-# TODO rewrite after big DataArray rewrite
-def writeidf(path, a, attrs):
-    checkattrs(attrs)  # do basic checks before opening the file
+def writeidf_xy(path, a):
+    assert(a.dims == ('y', 'x'))
     with open(path, 'wb') as f:
         f.write(pack('i', 1271))  # Lahey RecordLength Ident.
-        nrow, ncol = a.shape
-        nodata = attrs['nodata']
-        itb = attrs.get('itb', False)
+        nrow = a.y.size
+        ncol = a.x.size
+        nodata = np.nan
+        attrs = a.attrs
+        itb = attrs.get('top', False) and attrs.get('bot', False)
         f.write(pack('i', ncol))
         f.write(pack('i', nrow))
-        f.write(pack('f', attrs['xmin']))
-        f.write(pack('f', attrs['xmax']))
-        f.write(pack('f', attrs['ymin']))
-        f.write(pack('f', attrs['ymax']))
-        f.write(pack('f', a.min()))  # dmin
-        f.write(pack('f', a.max()))  # dmax
+        # the attribute is simply a 9 tuple
+        transform = rasterio.Affine(*attrs['transform'][:6])
+        xmin, ymin, xmax, ymax = rasterio.transform.array_bounds(nrow, ncol, transform)
+        f.write(pack('f', xmin))
+        f.write(pack('f', xmax))
+        f.write(pack('f', ymin))
+        f.write(pack('f', ymax))
+        f.write(pack('f', float(a.min())))  # dmin
+        f.write(pack('f', float(a.max())))  # dmax
         f.write(pack('f', nodata))
         f.write(pack('?', False))  # ieq
         f.write(pack('?', itb))
         f.write(pack('?', False))  # ivf
         f.write(pack('x'))  # not used
-        f.write(pack('f', attrs['dx']))
-        f.write(pack('f', attrs['dy']))
+        f.write(pack('f', attrs['res'][0]))
+        f.write(pack('f', attrs['res'][1]))
         if itb:
             f.write(pack('f', attrs['top']))
             f.write(pack('f', attrs['bot']))
         # convert to a ndarray of float32
-        # TODO convert np.nan in ndarray to nodata as well
-        if isinstance(a, ma.MaskedArray):
-            a = a.filled(nodata)
-        elif isinstance(a, xr.DataArray):
-            a = a.fillna(nodata).values
         if a.dtype != np.float32:
             a = a.astype(np.float32)
-        a.tofile(f)
+        a.values.tofile(f)
 
 
 def parse_filename(path):
@@ -160,6 +177,24 @@ def parse_filename(path):
     if p.match(parts[-1]):
         d['layer'] = int(parts[-1][1:])
     return d
+
+
+def compose_filename(d):
+    haslayer = 'layer' in d
+    hastime = 'time' in d
+    if hastime:
+        d['timestr'] = d['time'].strftime('%Y%m%d%H%M%S')
+    if haslayer:
+        if hastime:
+            s = '{name}_{timestr}_l{layer}.idf'.format(**d)
+        else:
+            s = '{name}_l{layer}.idf'.format(**d)
+    else:
+        if hastime:
+            s = '{name}_{timestr}.idf'.format(**d)
+        else:
+            s = '{name}.idf'.format(**d)
+    return s
 
 
 def idf_dask(path, chunks=None):
