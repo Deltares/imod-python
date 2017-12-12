@@ -227,7 +227,7 @@ def loadarray(globpath):
         raise FileNotFoundError('Could not find any files matching {}'.format(globpath))
     elif n == 1:
         return idf_xarray(paths[0])
-    loadarray_list(paths)
+    return loadarray_list(paths)
 
 
 def loadarray_list(paths):
