@@ -60,6 +60,7 @@ def readidfheader(path):
         # res is always positive, this seems to be the rasterio behavior
         attrs['res'] = (cellwidth, cellheight)
         # xarray converts affine to tuple, so we follow that
+        # TODO change after https://github.com/pydata/xarray/pull/1712 is merged
         attrs['transform'] = (cellwidth, 0.0, xmin, 0.0, -cellheight, ymax)
         if itb:
             attrs['top'] = unpack('f', f.read(4))[0]
@@ -108,9 +109,10 @@ def writeidf(dirpath, a):
         raise NotImplementedError("Writing time dependent IDFs not yet implemented")
     if 'layer' in a.coords:
         if 'layer' in a.dims:
+            ndigits = len(str(int(a.layer.max())))
             for layer, a2d in a.groupby('layer'):
                 d['layer'] = layer
-                path = os.path.join(dirpath, compose_filename(d))
+                path = os.path.join(dirpath, compose_filename(d, ndigits=ndigits))
                 writeidf_xy(path, a2d)
         else:
             d['layer'] = int(a.coords['layer'])
@@ -179,16 +181,17 @@ def parse_filename(path):
     return d
 
 
-def compose_filename(d):
+def compose_filename(d, ndigits=1):
     haslayer = 'layer' in d
     hastime = 'time' in d
     if hastime:
         d['timestr'] = d['time'].strftime('%Y%m%d%H%M%S')
     if haslayer:
+        d['layerstr'] = str(d['layer']).zfill(ndigits)
         if hastime:
-            s = '{name}_{timestr}_l{layer}.idf'.format(**d)
+            s = '{name}_{timestr}_l{layerstr}.idf'.format(**d)
         else:
-            s = '{name}_l{layer}.idf'.format(**d)
+            s = '{name}_l{layerstr}.idf'.format(**d)
     else:
         if hastime:
             s = '{name}_{timestr}.idf'.format(**d)
