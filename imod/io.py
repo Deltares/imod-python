@@ -79,13 +79,15 @@ def setnodataheader(path, nodata):
         f.write(pack('f', nodata))
 
 
-def idf_memmap(path):
+def idf_pre_data_read(path):
     # currently asserts ieq = ivf = 0, and comments are not read
     attrs = readidfheader(path)
     setnodataheader(path, np.nan)
     headersize = attrs.pop('headersize')
-    nrow, ncol = attrs['nrow'], attrs['ncol']
-    a = np.memmap(path, np.float32, 'r+', headersize, (nrow, ncol))
+    return attrs, headersize
+
+
+def idf_to_nan(a, attrs):
     # always convert nodata values to NaN, this is how xarray deals with it
     nodata = attrs.pop('nodata')
     if np.isnan(nodata):
@@ -94,6 +96,20 @@ def idf_memmap(path):
         isnodata = np.isclose(a, nodata)
         a[isnodata] = np.nan
         return a, attrs
+
+
+def idf_memmap(path):
+    attrs, headersize, idf_pre_data_read(path)
+    a = np.memmap(path, np.float32, 'r+', headersize, (attrs['nrow'], attrs['ncol']))
+    return idf_to_nan(a, attrs)
+
+
+def idf_memory(path):
+    attrs, headersize, idf_pre_data_read(path)
+    with open(path, 'rb') as f:
+        f.seek(headersize)
+        a = np.fromfile(f, np.float32, nrow * ncol)
+    return idf_to_nan(a, attrs)
 
 
 # write DataArrays to IDF
@@ -198,8 +214,11 @@ def compose_filename(d):
     return s
 
 
-def idf_dask(path, chunks=None):
-    a, attrs = idf_memmap(path)
+def idf_dask(path, chunks=None, memmap=True):
+    if memmap:
+        a, attrs = idf_memmap(path)
+    else:
+        a, attrs = idf_memory(path)
     # grab the whole array as one chunk
     if chunks is None:
         chunks = a.shape
@@ -249,26 +268,26 @@ def idf_xarray_kwargs(path, attrs):
     return d
 
 
-def idf_xarray(path, chunks=None):
-    x, attrs = idf_dask(path, chunks=chunks)
+def idf_xarray(path, chunks=None, memmap=True):
+    x, attrs = idf_dask(path, chunks=chunks, memmap=memmap)
     kwargs = idf_xarray_kwargs(path, attrs)
     return xr.DataArray(x, **kwargs)
 
 
 # load IDFs for multiple times and/or layers into one DataArray
-def loadarray(globpath):
+def loadarray(globpath, chunks=None, memmap=True):
     paths = glob(globpath)
     n = len(paths)
     if n == 0:
         raise FileNotFoundError('Could not find any files matching {}'.format(globpath))
     elif n == 1:
-        return idf_xarray(paths[0])
+        return idf_xarray(paths[0], chunks=chunks, memmap=memmap)
     return loadarray_list(paths)
 
 
-def loadarray_list(paths):
+def loadarray_list(paths, chunks=None, memmap=True):
     # create a DataArray from every IDF
-    das = [idf_xarray(path) for path in paths]
+    das = [idf_xarray(path, chunks=chunks, memmap=memmap) for path in paths]
 
     # combine the different DataArrays into one DataArray with added dimensions
 
@@ -306,7 +325,7 @@ def loadarray_list(paths):
     return da
 
 
-def loadset(globpath):
+def loadset(globpath, chunks=None, memmap=True):
     # recursively find all files, use ** in globpath to indicate where
     # e.g. globpath = 'model/**/*.idf'
     paths = glob(globpath, recursive=True)
@@ -324,7 +343,7 @@ def loadset(globpath):
         d[n].append(p)
 
     # load each group into a DataArray
-    das = [loadarray_list(v) for v in d.values()]
+    das = [loadarray_list(v, chunks=chunks, memmap=memmap) for v in d.values()]
 
     # store each DataArray under it's own name in an OrderedDict
     dd = OrderedDict()
