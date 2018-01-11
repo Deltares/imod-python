@@ -99,16 +99,16 @@ def idf_to_nan(a, attrs):
 
 
 def idf_memmap(path):
-    attrs, headersize, idf_pre_data_read(path)
+    attrs, headersize = idf_pre_data_read(path)
     a = np.memmap(path, np.float32, 'r+', headersize, (attrs['nrow'], attrs['ncol']))
     return idf_to_nan(a, attrs)
 
 
 def idf_memory(path):
-    attrs, headersize, idf_pre_data_read(path)
+    attrs, headersize = idf_pre_data_read(path)
     with open(path, 'rb') as f:
         f.seek(headersize)
-        a = np.fromfile(f, np.float32, nrow * ncol)
+        a = np.reshape(np.fromfile(f, np.float32, attrs['nrow'] * attrs['ncol']), (attrs['nrow'], attrs['ncol']))
     return idf_to_nan(a, attrs)
 
 
