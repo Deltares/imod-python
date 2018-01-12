@@ -2,16 +2,28 @@ import os
 import unittest
 import imod
 import numpy as np
-# import xarray as xr
-# import pandas as pd
+from collections import OrderedDict
+import xarray as xr
+import pandas as pd
 
 
 class TestIDF(unittest.TestCase):
     def setUp(self):
         self.idf = 'test.idf'
-        self.arr = np.ones((3, 4), dtype=np.float32)
-        self.meta = {'xmin': 0.0, 'xmax': 4.0, 'ymin': 0.0, 'ymax': 3.0,
-                     'nodata': -9999.0, 'dx': 1.0, 'dy': 1.0}
+        arr = np.ones((3, 4), dtype=np.float32)
+        cellwidth = 1.0
+        cellheight = cellwidth
+        xmin = 0.0
+        ymax = 3.0
+        attrs = OrderedDict()
+        attrs['res'] = (cellwidth, cellheight)
+        attrs['transform'] = (cellwidth, 0.0, xmin, 0.0, -cellheight, ymax)
+        kwargs = {
+            'name': 'test',
+            'dims': ('y', 'x'),  # only two dimensions in a single IDF
+            'attrs': attrs,
+        }
+        self.da = xr.DataArray(arr, **kwargs)
 
     def tearDown(self):
         try:
@@ -19,21 +31,13 @@ class TestIDF(unittest.TestCase):
         except FileNotFoundError:
             pass
 
-    # TODO update tests after DataArray rewrite
     def test_idf(self):
-        imod.io.writeidf(self.idf, self.arr, self.meta)
+        imod.io.writeidf('.', self.da)
         self.assertTrue(os.path.isfile(self.idf))
-        d = imod.io.readidf(self.idf, nodata=None, header_only=True)
-        self.assertIsInstance(d, dict)
-        # check if the returned dict is a superset of self.meta
-        self.assertTrue(all(item in d.items() for item in self.meta.items()))
-        self.assertIn(('itb', False), d.items())
-        self.assertIn(('nrow', 3), d.items())
-        self.assertIn(('ncol', 4), d.items())
-        a, d = imod.io.readidf(self.idf, nodata=None, header_only=False)
-        self.assertIsInstance(a, np.ndarray)
-        a, d = imod.io.readidf(self.idf, nodata='mask', header_only=False)
-        self.assertIsInstance(a, np.ma.MaskedArray)
+        # set memmap to False to avoid tearDown PermissionError
+        da2 = imod.io.loadarray(self.idf, memmap=False)
+        self.assertIsInstance(da2, xr.DataArray)
+        self.assertTrue((self.da == da2).all())
 
 
 if __name__ == '__main__':
