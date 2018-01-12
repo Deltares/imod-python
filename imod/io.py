@@ -82,7 +82,6 @@ def setnodataheader(path, nodata):
 def idf_pre_data_read(path):
     # currently asserts ieq = ivf = 0, and comments are not read
     attrs = readidfheader(path)
-    setnodataheader(path, np.nan)
     headersize = attrs.pop('headersize')
     return attrs, headersize
 
@@ -101,6 +100,7 @@ def idf_to_nan(a, attrs):
 def idf_memmap(path):
     attrs, headersize = idf_pre_data_read(path)
     a = np.memmap(path, np.float32, 'r+', headersize, (attrs['nrow'], attrs['ncol']))
+    setnodataheader(path, np.nan)
     return idf_to_nan(a, attrs)
 
 
