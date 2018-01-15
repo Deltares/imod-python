@@ -17,6 +17,7 @@ setup(
     license='MIT',
     packages=['imod'],
     test_suite='tests',
+    python_requires='>=3',
     install_requires=[
         'numpy',
         'xarray',
@@ -33,4 +34,5 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
     ],
+    keywords='imod modflow groundwater modeling',
 )
