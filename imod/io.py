@@ -394,8 +394,8 @@ def write_rasterio(path, da, driver=None, nodata=-9999):
             raise ValueError('Unknown extension {}, specifiy driver'.format(ext))
     # prevent rasterio warnings
     if driver == 'AAIGrid':
-        profile.pop('res')
-        profile.pop('is_tiled')
+        profile.pop('res', None)
+        profile.pop('is_tiled', None)
     # transform will be affine object in next xarray
     profile['transform'] = profile['transform'][:6]
     profile['driver'] = driver
