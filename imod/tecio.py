@@ -13,7 +13,7 @@ def read_techeader(path):
         line1 = f.readline()    
         line1_parts = [part.strip() for part in line1.replace('"','').split(',')]
         nvars      = len(line1_parts) - 3
-        d['data_vars']  = {var: None for var in line1_parts[3:3+nvars]}
+        d['data_vars']  = OrderedDict((var, None) for var in line1_parts[3:3+nvars])
         
         line2 = f.readline()
         line2 =  "".join(line2.split())
@@ -41,7 +41,7 @@ def determine_ntimes(nlines, count):
     while predicted_nlines != nlines:
         if i > 100:
             raise RuntimeError("Could not find number of timesteps! \
-                                Check whether the TECPLOT file is well-formed.")
+                               Check whether the TECPLOT file is well-formed.")
         ntimes += -1
         predicted_nlines = ntimes*(count+2) + 1
         i += 1
