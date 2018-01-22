@@ -39,8 +39,9 @@ def determine_ntimes(nlines, count):
     predicted_nlines = ntimes*(count+2) + 1
     i = 0
     while predicted_nlines != nlines:
-        if i > 1000:
-            break
+        if i > 100:
+            raise RuntimeError("Could not find number of timesteps! \
+                                Check whether the TECPLOT file is well-formed.")
         ntimes += -1
         predicted_nlines = ntimes*(count+2) + 1
         i += 1
@@ -110,7 +111,7 @@ def load_tecfile(path, variables=None, times=None):
     tec_kwargs = read_techeader(path)  
     line_offset, line_idx = index_lines(path)
     nlines = len(line_offset)
-    nlines_timestep  = functools.reduce(lambda x,y: x*y, [len(v) for v in tec_kwargs['coords'].values()])
+    nlines_timestep  = functools.reduce(lambda x,y: x*y, [v for v in tec_kwargs['attrs'].values()])
     ntimes = determine_ntimes(nlines, nlines_timestep)
      
     if variables is None:
