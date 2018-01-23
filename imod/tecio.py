@@ -92,10 +92,11 @@ def load_tecfile(path, variables=None, times=None):
         path to .TEC file
     variables: list or tuple; optional
         Which variables to load into the xarray dataset, e.g:
-        ['HEAD', 'CONC', 'VX', 'VY', 'VZ'].
+        ['HEAD', 'CONC', 'VX', 'VY', 'VZ']. Defaults to all variables.
     times: integer, list, or slice; optional
         Which timesteps to load. The TECPLOT file starts
         numbering at 0.0, and the numbers function solely as index.
+        Defaults to all timesteps.
 
     Examples
     --------
@@ -114,7 +115,7 @@ def load_tecfile(path, variables=None, times=None):
     Or for every tenth timestep:
     >>> ds = load_tecfile(path, ['VX'], times=slice(None, None, 10))
 
-    See also documentation for `slice()`.
+    See also the documentation for `slice()`.
     """
     tec_kwargs = read_techeader(path)
     line_offset, line_idx = index_lines(path)
