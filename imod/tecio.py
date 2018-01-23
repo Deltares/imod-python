@@ -12,7 +12,7 @@ def read_techeader(path):
         coords = OrderedDict()
 
         line1 = f.readline()
-        line1_parts = [part.strip()
+        line1_parts = [part.strip().lower()
                        for part in line1.replace('"', '').split(',')]
         nvars = len(line1_parts) - 3
         d['data_vars'] = OrderedDict((var, None)
@@ -92,7 +92,7 @@ def load_tecfile(path, variables=None, times=None):
         path to .TEC file
     variables: list or tuple; optional
         Which variables to load into the xarray dataset, e.g:
-        ['HEAD', 'CONC', 'VX', 'VY', 'VZ']. Defaults to all variables.
+        ['head', 'conc', 'vx', 'vy', 'vz']. Defaults to all variables.
     times: integer, list, or slice; optional
         Which timesteps to load. The TECPLOT file starts
         numbering at 0.0, and the numbers function solely as index.
@@ -103,17 +103,17 @@ def load_tecfile(path, variables=None, times=None):
     Load contents into an xarray dataset:
     >>> ds = load_tecfile(path)
 
-    Load only HEAD and CONC data:
-    >>> ds = load_tecfile(path, ['HEAD','CONC'])
+    Load only head and conc data:
+    >>> ds = load_tecfile(path, ['head','conc'])
 
-    Load only VX data for the first and last timestep:
-    >>> ds = load_tecfile(path, ['VX'], times=[0,-1])
+    Load only vx data for the first and last timestep:
+    >>> ds = load_tecfile(path, ['vx'], times=[0,-1])
 
     For the first 20 timesteps, once every four steps:
-    >>> ds = load_tecfile(path, ['VX'], times=slice(0, 20, 4))
+    >>> ds = load_tecfile(path, ['vx'], times=slice(0, 20, 4))
 
     Or for every tenth timestep:
-    >>> ds = load_tecfile(path, ['VX'], times=slice(None, None, 10))
+    >>> ds = load_tecfile(path, ['vx'], times=slice(None, None, 10))
 
     See also the documentation for `slice()`.
     """
@@ -126,6 +126,8 @@ def load_tecfile(path, variables=None, times=None):
 
     if variables is None:
         variables = tec_kwargs['data_vars'].keys()
+    else:
+        variables = [var.lower() for var in variables]
 
     dss = []
 
