@@ -40,17 +40,12 @@ def get_time(line):
 
 
 def determine_ntimes(nlines, count):
-    ntimes = int(nlines / count)
-    predicted_nlines = ntimes * (count + 2) + 1
-    i = 0
-    while predicted_nlines != nlines:
-        if i > 100:
-            raise RuntimeError("Could not find number of timesteps! "
+    ntimes = (nlines - 1) / (count + 2)
+    if ntimes.is_integer():
+        return int(ntimes)
+    else:
+        raise RuntimeError("Could not find number of timesteps! "
                                "Check whether the TECPLOT file is well-formed.")
-        ntimes += -1
-        predicted_nlines = ntimes * (count + 2) + 1
-        i += 1
-    return ntimes
 
 
 def index_lines(path):
