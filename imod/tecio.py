@@ -20,9 +20,9 @@ def read_techeader(path):
 
         line2 = f.readline()
         line2 = "".join(line2.split())  # remove all whitespace
-        nlay = int(re.findall("K=\d*", line2)[0].split('=')[-1])
-        nrow = int(re.findall("J=\d*", line2)[0].split('=')[-1])
-        ncol = int(re.findall("I=\d*", line2)[0].split('=')[-1])
+        nlay = int(re.findall("K=\d+", line2)[0].split('=')[-1])
+        nrow = int(re.findall("J=\d+", line2)[0].split('=')[-1])
+        ncol = int(re.findall("I=\d+", line2)[0].split('=')[-1])
         coords['k_lay'] = np.arange(nlay)
         coords['j_y'] = np.arange(nrow)
         coords['i_x'] = np.arange(ncol)
