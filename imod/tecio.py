@@ -19,7 +19,7 @@ def read_techeader(path):
                                      for var in line1_parts[3:3 + nvars])
 
         line2 = f.readline()
-        line2 = "".join(line2.split())
+        line2 = "".join(line2.split())  # remove all whitespace
         nlay = int(re.findall("K=\d*", line2)[0].split('=')[-1])
         nrow = int(re.findall("J=\d*", line2)[0].split('=')[-1])
         ncol = int(re.findall("I=\d*", line2)[0].split('=')[-1])
@@ -35,7 +35,7 @@ def read_techeader(path):
 
 
 def get_time(line):
-    line = "".join(line.split())
+    line = "".join(line.split())  # remove all whitespace
     return np.float32(re.findall("ZONET=\"\d*.\d*", line)[0].split('="')[-1])
 
 
