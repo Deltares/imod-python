@@ -23,9 +23,9 @@ def read_techeader(path):
         nlay = int(re.findall("K=\d+", line2)[0].split('=')[-1])
         nrow = int(re.findall("J=\d+", line2)[0].split('=')[-1])
         ncol = int(re.findall("I=\d+", line2)[0].split('=')[-1])
-        coords['k_lay'] = np.arange(nlay)
-        coords['j_y'] = np.arange(nrow)
-        coords['i_x'] = np.arange(ncol)
+        coords['layer'] = np.arange(nlay)
+        coords['row'] = np.arange(nrow)
+        coords['column'] = np.arange(ncol)
         attrs['nlay'] = nlay
         attrs['nrow'] = nrow
         attrs['ncol'] = ncol
@@ -73,7 +73,7 @@ def arr_to_dataset(arr, variables, time, **kwargs):
     for i, var in enumerate(list(kwargs['data_vars'].keys())):
         if var in variables:
             data = arr[:, i + 3].reshape(nlay, nrow, ncol)
-            kwargs['data_vars'][var] = (('k_lay', 'j_y', 'i_x'), data)
+            kwargs['data_vars'][var] = (('layer', 'row', 'column'), data)
         else:
             kwargs['data_vars'].pop(var)
     return xr.Dataset(**kwargs)
@@ -83,8 +83,8 @@ def load_tecfile(path, variables=None, times=None):
     """
     Loads the data from a TECPLOT file (.TEC), as outputted by iMODSEAWAT,
     into an xarray Dataset. The TECPLOT file provides no coordinate values,
-    exclusively indices. The dataset is returned with dimensions: k_lay for
-    layer index, j_y for row index, and i_x for column index, time.
+    exclusively indices. The dataset is returned with dimensions: layer, row,
+    column, time.
 
     Parameters
     ----------
