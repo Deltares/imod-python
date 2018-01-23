@@ -3,7 +3,7 @@ from collections import OrderedDict
 import xarray as xr
 import re
 import functools
-
+import pandas as pd
 
 def read_techeader(path):
     with open(path) as f:
@@ -62,12 +62,12 @@ def index_lines(path):
     return line_offset, line_idx
 
 
-def arr_to_dataset(arr, variables, time, **kwargs):
+def arr_to_dataset(df, variables, time, **kwargs):
     nlay, nrow, ncol = [v for v in kwargs['attrs'].values()]
     kwargs['coords']['time'] = time
     for i, var in enumerate(list(kwargs['data_vars'].keys())):
         if var in variables:
-            data = arr[:, i + 3].reshape(nlay, nrow, ncol)
+            data = df[var].values.reshape(nlay, nrow, ncol)
             kwargs['data_vars'][var] = (('layer', 'row', 'column'), data)
         else:
             kwargs['data_vars'].pop(var)
@@ -120,9 +120,10 @@ def load_tecfile(path, variables=None, times=None):
     ntimes = determine_ntimes(nlines, nlines_timestep)
 
     if variables is None:
-        variables = tec_kwargs['data_vars'].keys()
+        variables = list(tec_kwargs['data_vars'].keys())
     else:
         variables = [var.lower() for var in variables]
+    timestep_header = ['X', 'Y', 'Z'] + list(tec_kwargs['data_vars'].keys())
 
     dss = []
 
@@ -137,11 +138,8 @@ def load_tecfile(path, variables=None, times=None):
     with open(path) as f:
         for start in start_lines:
             f.seek(line_idx[start])
-            end = start + nlines_timestep
             time = get_time(f.readline())
-            count = line_offset[end] - line_offset[start + 1]
-            lines = f.readlines(count)
-            arr = np.loadtxt(lines, np.float32, delimiter=',')
-            dss.append(arr_to_dataset(arr, variables, time, **tec_kwargs))
+            df = pd.read_csv(path, skiprows=start+1, nrows=nlines_timestep, names=timestep_header)
+            dss.append(arr_to_dataset(df, variables, time, **tec_kwargs))
 
     return xr.concat(dss, dim='time')
