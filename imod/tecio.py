@@ -51,7 +51,7 @@ def determine_ntimes(nlines, count):
 
 def _vars_as_list(argument):
     if type(argument) in [list,tuple]:
-        return list(argument)
+        return argument
     elif type(argument) is str:
         return [argument]
     else:
@@ -59,28 +59,21 @@ def _vars_as_list(argument):
                            "strings.")
 
 
-def _times_as_list(argument):
-    if type(argument) in [list,tuple]:
+def _startlines_as_list(argument):
+    if type(argument) is np.ndarray:
         return list(argument)
-    elif type(argument) is int:
+    elif type(argument) is np.int32:
         return [argument]
-    else:
-        raise RuntimeError("Invalid argument: accepts only lists, tuples, and" 
-                           "integers.")
 
 
 def index_lines(path):
-    line_offset = []
     line_idx = []
-    offset = 0
     idx = 0
     with open(path) as f:
         for line in f:
-            line_offset.append(offset)
             line_idx.append(idx)
-            offset += len(line)
             idx += len(line) + 1
-    return line_offset, line_idx
+    return line_idx
 
 
 def df_to_dataset(df, time, **kwargs):
@@ -132,8 +125,8 @@ def load_tecfile(path, variables=None, times=None):
     """
     tec_kwargs = read_techeader(path)
     var_cols = range(3,3+tec_kwargs['attrs'].pop('nvars'))
-    line_offset, line_idx = index_lines(path)
-    nlines = len(line_offset)
+    line_idx = index_lines(path)
+    nlines = len(line_idx)
     nlines_timestep = functools.reduce(
         lambda x, y: x * y, [v for v in tec_kwargs['attrs'].values()])
     ntimes = determine_ntimes(nlines, nlines_timestep)
@@ -151,11 +144,11 @@ def load_tecfile(path, variables=None, times=None):
             
     timestep_header = variables
 
-    start_lines = [(t * (nlines_timestep + 2) + 1) for t in range(ntimes)]
+    start_lines = np.asarray([(t * (nlines_timestep + 2) + 1) for t in range(ntimes)])
     if times is None:
         pass
     else:
-        start_lines = _times_as_list(start_lines[times])
+        start_lines = _startlines_as_list(start_lines[times])
 		
     dss = []
     with open(path) as f:
