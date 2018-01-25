@@ -29,6 +29,7 @@ def read_techeader(path):
         attrs['nlay'] = nlay
         attrs['nrow'] = nrow
         attrs['ncol'] = ncol
+        attrs['nvars'] = nvars
         d['coords'] = coords
         d['attrs'] = attrs
         return d
@@ -40,12 +41,32 @@ def get_time(line):
 
 
 def determine_ntimes(nlines, count):
-    ntimes = (nlines - 1) / (count + 2)
+    ntimes = (nlines - 1.0) / (count + 2.0)
     if ntimes.is_integer():
         return int(ntimes)
     else:
         raise RuntimeError("Could not find number of timesteps! "
                                "Check whether the TECPLOT file is well-formed.")
+
+
+def _vars_as_list(argument):
+    if type(argument) in [list,tuple]:
+        return list(argument)
+    elif type(argument) is str:
+        return [argument]
+    else:
+        raise RuntimeError("Invalid argument: accepts only lists, tuples, and" 
+                           "strings.")
+
+
+def _times_as_list(argument):
+    if type(argument) in [list,tuple]:
+        return list(argument)
+    elif type(argument) is int:
+        return [argument]
+    else:
+        raise RuntimeError("Invalid argument: accepts only lists, tuples, and" 
+                           "integers.")
 
 
 def index_lines(path):
@@ -62,15 +83,12 @@ def index_lines(path):
     return line_offset, line_idx
 
 
-def arr_to_dataset(df, variables, time, **kwargs):
+def df_to_dataset(df, time, **kwargs):
     nlay, nrow, ncol = [v for v in kwargs['attrs'].values()]
     kwargs['coords']['time'] = time
-    for i, var in enumerate(list(kwargs['data_vars'].keys())):
-        if var in variables:
-            data = df[var].values.reshape(nlay, nrow, ncol)
-            kwargs['data_vars'][var] = (('layer', 'row', 'column'), data)
-        else:
-            kwargs['data_vars'].pop(var)
+    for var in df:
+        data = df[var].values.reshape(nlay, nrow, ncol)
+        kwargs['data_vars'][var] = (('layer', 'row', 'column'), data)
     return xr.Dataset(**kwargs)
 
 
@@ -85,7 +103,7 @@ def load_tecfile(path, variables=None, times=None):
     ----------
     path: string
         path to .TEC file
-    variables: list or tuple; optional
+    variables: string, list, or tuple; optional
         Which variables to load into the xarray dataset, e.g:
         ['head', 'conc', 'vx', 'vy', 'vz']. Defaults to all variables.
     times: integer, list, or slice; optional
@@ -102,44 +120,47 @@ def load_tecfile(path, variables=None, times=None):
     >>> ds = load_tecfile(path, ['head','conc'])
 
     Load only vx data for the first and last timestep:
-    >>> ds = load_tecfile(path, ['vx'], times=[0,-1])
+    >>> ds = load_tecfile(path, 'vx', times=[0,-1])
 
     For the first 20 timesteps, once every four steps:
-    >>> ds = load_tecfile(path, ['vx'], times=slice(0, 20, 4))
+    >>> ds = load_tecfile(path, 'vx', times=slice(0, 20, 4))
 
     Or for every tenth timestep:
-    >>> ds = load_tecfile(path, ['vx'], times=slice(None, None, 10))
+    >>> ds = load_tecfile(path, 'vx', times=slice(None, None, 10))
 
     See also the documentation for `slice()`.
     """
     tec_kwargs = read_techeader(path)
+    var_cols = range(3,3+tec_kwargs['attrs'].pop('nvars'))
     line_offset, line_idx = index_lines(path)
     nlines = len(line_offset)
     nlines_timestep = functools.reduce(
         lambda x, y: x * y, [v for v in tec_kwargs['attrs'].values()])
     ntimes = determine_ntimes(nlines, nlines_timestep)
-
+		
     if variables is None:
         variables = list(tec_kwargs['data_vars'].keys())
     else:
+        variables = _vars_as_list(variables)
         variables = [var.lower() for var in variables]
-    timestep_header = ['X', 'Y', 'Z'] + list(tec_kwargs['data_vars'].keys())
-
-    dss = []
+        var_cols = [col_num for (col_num, var) in zip(var_cols, tec_kwargs['data_vars'].keys()) if var in variables]
+        for var in tec_kwargs['data_vars'].keys():
+            if var not in variables: tec_kwargs['data_vars'].pop(var)
+            
+    timestep_header = variables
 
     start_lines = [(t * (nlines_timestep + 2) + 1) for t in range(ntimes)]
     if times is None:
         pass
     else:
-        lst = []
-        lst.append(start_lines[times])  # always returns a list
-        start_lines = lst  # also with only one element
-
+        start_lines = _times_as_list(start_lines[times])
+		
+    dss = []
     with open(path) as f:
         for start in start_lines:
             f.seek(line_idx[start])
             time = get_time(f.readline())
-            df = pd.read_csv(path, skiprows=start+1, nrows=nlines_timestep, names=timestep_header)
-            dss.append(arr_to_dataset(df, variables, time, **tec_kwargs))
+            df = pd.read_csv(f, nrows=nlines_timestep, names=timestep_header, usecols=var_cols)
+            dss.append(df_to_dataset(df, time, **tec_kwargs))
 
     return xr.concat(dss, dim='time')
