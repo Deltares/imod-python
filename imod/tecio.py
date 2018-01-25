@@ -143,8 +143,10 @@ def load_tecfile(path, variables=None, times=None):
     else:
         variables = _vars_as_list(variables)
         variables = [var.lower() for var in variables]
-        var_cols = [col_num for (col_num, var) in zip(var_cols, tec_kwargs['data_vars'].keys()) if var in variables]
-        for var in tec_kwargs['data_vars'].keys():
+        var_cols = [col_num for (col_num, var) in 
+                    zip(var_cols, tec_kwargs['data_vars'].keys()) 
+                    if var in variables]
+        for var in list(tec_kwargs['data_vars'].keys()):
             if var not in variables: tec_kwargs['data_vars'].pop(var)
             
     timestep_header = variables
