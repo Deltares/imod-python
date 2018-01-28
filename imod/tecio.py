@@ -142,8 +142,6 @@ def load_tecfile(path, variables=None, times=None):
         for var in list(tec_kwargs['data_vars'].keys()):
             if var not in variables: tec_kwargs['data_vars'].pop(var)
             
-    timestep_header = variables
-
     start_lines = np.asarray([(t * (nlines_timestep + 2) + 1) for t in range(ntimes)])
     if times is None:
         pass
@@ -155,7 +153,7 @@ def load_tecfile(path, variables=None, times=None):
         for start in start_lines:
             f.seek(line_idx[start])
             time = get_time(f.readline())
-            df = pd.read_csv(f, nrows=nlines_timestep, names=timestep_header, usecols=var_cols)
+            df = pd.read_csv(f, nrows=nlines_timestep, names=variables, usecols=var_cols)
             dss.append(df_to_dataset(df, time, **tec_kwargs))
 
     return xr.concat(dss, dim='time')
