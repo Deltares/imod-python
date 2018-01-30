@@ -12,26 +12,6 @@ import os
 import re
 
 
-# TODO, check this implementation with the format specification in the iMOD manual
-def readipf(path):
-    with open(path) as f:
-        nrow = int(f.readline().strip())
-        ncol = int(f.readline().strip())
-        colnames = [f.readline().strip() for _ in range(ncol)]
-        _ = f.readline()  # links to other files not handled
-        df = pd.read_csv(f, header=None, names=colnames, nrows=nrow)
-    return df
-
-
-def writeipf(path, df):
-    nrecords, nfields = df.shape
-    with open(path, 'w') as f:
-        f.write('{}\n{}\n'.format(nrecords, nfields))
-        [f.write('{}\n'.format(colname)) for colname in list(df)]
-        f.write('0,TXT\n')
-        df.to_csv(f, index=False, header=False)
-
-
 def readidfheader(path):
     attrs = parse_filename(path)
     with open(path, 'rb') as f:
@@ -99,7 +79,8 @@ def idf_to_nan(a, attrs):
 
 def idf_memmap(path):
     attrs, headersize = idf_pre_data_read(path)
-    a = np.memmap(path, np.float32, 'r+', headersize, (attrs['nrow'], attrs['ncol']))
+    a = np.memmap(path, np.float32, 'r+', headersize,
+                  (attrs['nrow'], attrs['ncol']))
     setnodataheader(path, np.nan)
     return idf_to_nan(a, attrs)
 
@@ -108,7 +89,8 @@ def idf_memory(path):
     attrs, headersize = idf_pre_data_read(path)
     with open(path, 'rb') as f:
         f.seek(headersize)
-        a = np.reshape(np.fromfile(f, np.float32, attrs['nrow'] * attrs['ncol']), (attrs['nrow'], attrs['ncol']))
+        a = np.reshape(np.fromfile(
+            f, np.float32, attrs['nrow'] * attrs['ncol']), (attrs['nrow'], attrs['ncol']))
     return idf_to_nan(a, attrs)
 
 
@@ -122,7 +104,8 @@ def writeidf(dirpath, a):
     os.makedirs(dirpath, exist_ok=True)
     if 'time' in a.coords:
         # TODO implement (not much different than layer)
-        raise NotImplementedError("Writing time dependent IDFs not yet implemented")
+        raise NotImplementedError(
+            "Writing time dependent IDFs not yet implemented")
     if 'layer' in a.coords:
         if 'layer' in a.dims:
             for layer, a2d in a.groupby('layer'):
@@ -151,7 +134,8 @@ def writeidf_xy(path, a):
         f.write(pack('i', nrow))
         # the attribute is simply a 9 tuple
         transform = rasterio.Affine(*attrs['transform'][:6])
-        xmin, ymin, xmax, ymax = rasterio.transform.array_bounds(nrow, ncol, transform)
+        xmin, ymin, xmax, ymax = rasterio.transform.array_bounds(
+            nrow, ncol, transform)
         f.write(pack('f', xmin))
         f.write(pack('f', xmax))
         f.write(pack('f', ymin))
@@ -279,7 +263,8 @@ def loadarray(globpath, chunks=None, memmap=True):
     paths = glob(globpath)
     n = len(paths)
     if n == 0:
-        raise FileNotFoundError('Could not find any files matching {}'.format(globpath))
+        raise FileNotFoundError(
+            'Could not find any files matching {}'.format(globpath))
     elif n == 1:
         return idf_xarray(paths[0], chunks=chunks, memmap=memmap)
     return loadarray_list(paths)
@@ -331,7 +316,8 @@ def loadset(globpath, chunks=None, memmap=True):
     paths = glob(globpath, recursive=True)
     n = len(paths)
     if n == 0:
-        raise FileNotFoundError('Could not find any files matching {}'.format(globpath))
+        raise FileNotFoundError(
+            'Could not find any files matching {}'.format(globpath))
     # group the DataArrays together using their name
     # note that directory names are ignored, and in case of duplicates, the last one wins
     names = [parse_filename(path)['name'] for path in paths]
@@ -358,23 +344,7 @@ def loadset(globpath, chunks=None, memmap=True):
     return dd
 
 
-# xarray: if your data is unstructured or one-dimensional, stick with pandas
-# pandas.Panel is deprecated, use MultiIndex DataFrame or xarray
-def loadipf(globpath):
-    paths = glob(globpath)
-
-    dfs = []
-    for path in paths:
-        layer = parse_filename(path)['layer']
-        df = readipf(path)
-        df['layer'] = layer
-        dfs.append(df)
-
-    bigdf = pd.concat(dfs, ignore_index=True)
-    return bigdf
-
 # TODO perhaps unify write_rasterio and writeidf into a single function?
-
 def write_rasterio(path, da, driver=None, nodata=-9999):
     """Write DataArray to GDAL supported geospatial rasters using rasterio"""
     # Not directly related to iMOD, but provides a missing link, together
@@ -391,7 +361,8 @@ def write_rasterio(path, da, driver=None, nodata=-9999):
         elif ext == '.asc':
             driver = 'AAIGrid'
         else:
-            raise ValueError('Unknown extension {}, specifiy driver'.format(ext))
+            raise ValueError(
+                'Unknown extension {}, specifiy driver'.format(ext))
     # prevent rasterio warnings
     if driver == 'AAIGrid':
         profile.pop('res', None)
