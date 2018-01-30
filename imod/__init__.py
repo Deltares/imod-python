@@ -1,2 +1,2 @@
-from imod import io
-from imod import tecio
+from imod import idf
+from imod import tec
