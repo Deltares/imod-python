@@ -243,13 +243,18 @@ def loadset(globpath, chunks=None, memmap=True):
 
 
 # write DataArrays to IDF
-def save(dirpath, a):
-    d = {'extension': 'idf'}
+def save(path, a):
+    d = util.decompose(path)
+    d['extension'] = 'idf'
+    dirpath = d['directory']
+    if dirpath != '':  # would give a FileNotFoundError
+        os.makedirs(dirpath, exist_ok=True)
+
+    # TODO decide to use name from DataArray or path?
     if a.name is None:
         raise ValueError("DataArray name cannot be None")
     else:
         d['name'] = a.name
-    os.makedirs(dirpath, exist_ok=True)
     if 'time' in a.coords:
         # TODO implement (not much different than layer)
         raise NotImplementedError(
@@ -258,15 +263,15 @@ def save(dirpath, a):
         if 'layer' in a.dims:
             for layer, a2d in a.groupby('layer'):
                 d['layer'] = layer
-                path = os.path.join(dirpath, util.compose(d))
-                write(path, a2d)
+                fn = util.compose(d)
+                write(fn, a2d)
         else:
             d['layer'] = int(a.coords['layer'])
-            path = os.path.join(dirpath, util.compose(d))
-            write(path, a)
+            fn = util.compose(d)
+            write(fn, a)
     else:
-        path = os.path.join(dirpath, util.compose(d))
-        write(path, a)
+        fn = util.compose(d)
+        write(fn, a)
 
 
 def write(path, a):

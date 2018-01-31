@@ -7,10 +7,13 @@ from collections import OrderedDict
 def decompose(path):
     """Parse a filename, returning a dict of the parts,
     following the iMOD conventions"""
-    noext = os.path.splitext(path)[0]
-    parts = os.path.basename(noext).split('_')
+    noext, ext = os.path.splitext(path)
+    dirpath, filename = os.path.split(noext)
+    parts = filename.split('_')
     name = parts[0]
     d = OrderedDict()
+    d['extension'] = ext
+    d['directory'] = dirpath
     d['name'] = name
     if len(parts) == 1:
         return d
@@ -42,4 +45,7 @@ def compose(d):
             s = '{name}_{timestr}.{extension}'.format(**d)
         else:
             s = '{name}.{extension}'.format(**d)
-    return s
+    if 'directory' in d:
+        return os.path.join(d['directory'], s)
+    else:
+        return s

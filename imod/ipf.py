@@ -43,15 +43,18 @@ def write(path, df):
         df.to_csv(f, index=False, header=False)
 
 
-def save(dirpath, df, name):
-    os.makedirs(dirpath, exist_ok=True)
-    d = {'name': name, 'extension': 'ipf'}
+def save(path, df):
+    d = util.decompose(path)
+    d['extension'] = 'ipf'
+    dirpath = d['directory']
+    if dirpath != '':  # would give a FileNotFoundError
+        os.makedirs(d['directory'], exist_ok=True)
 
     if 'layer' in df.columns:
         for layer, group in df.groupby('layer'):
             d['layer'] = layer
             fn = util.compose(d)
-            write(os.path.join(dirpath, fn), df)
+            write(fn, df)
     else:
         fn = util.compose(d)
-        write(os.path.join(dirpath, fn), df)
+        write(fn, df)

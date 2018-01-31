@@ -45,7 +45,7 @@ class TestIPF(unittest.TestCase):
         self.assertTrue(len(df) == 2)
         self.assertTrue(df.iloc[0, 2] == -32.3)
         self.assertTrue(df.iloc[1, 3] == 'Den Bosch')
-        ipf.save('.', df, 'test-out')
+        ipf.save('test-out', df)
         # cannot do exact comparison since quoting is slightly different
         # manual says: The different data for each field should be delimited by
         # a single (or more) space(s), or a comma.
