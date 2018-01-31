@@ -251,11 +251,6 @@ def save(path, a):
     if dirpath != '':  # would give a FileNotFoundError
         os.makedirs(dirpath, exist_ok=True)
 
-    # TODO decide to use name from DataArray or path?
-    if a.name is None:
-        raise ValueError("DataArray name cannot be None")
-    else:
-        d['name'] = a.name
     if 'time' in a.coords:
         # TODO implement (not much different than layer)
         raise NotImplementedError(
