@@ -40,7 +40,7 @@ def readidfheader(path):
         # res is always positive, this seems to be the rasterio behavior
         attrs['res'] = (cellwidth, cellheight)
         # xarray converts affine to tuple, so we follow that
-        # TODO change after https://github.com/pydata/xarray/pull/1712 is merged
+        # TODO change after https://github.com/pydata/xarray/pull/1712 is released
         attrs['transform'] = (cellwidth, 0.0, xmin, 0.0, -cellheight, ymax)
         if itb:
             attrs['top'] = unpack('f', f.read(4))[0]

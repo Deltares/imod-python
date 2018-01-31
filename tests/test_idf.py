@@ -32,10 +32,10 @@ class TestIDF(unittest.TestCase):
             pass
 
     def test_idf(self):
-        imod.io.writeidf('.', self.da)
+        imod.idf.writeidf('.', self.da)
         self.assertTrue(os.path.isfile(self.idf))
         # set memmap to False to avoid tearDown PermissionError
-        da2 = imod.io.loadarray(self.idf, memmap=False)
+        da2 = imod.idf.loadarray(self.idf, memmap=False)
         self.assertIsInstance(da2, xr.DataArray)
         self.assertTrue((self.da == da2).all())
 
