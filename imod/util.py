@@ -12,6 +12,7 @@ def decompose(path):
     dirpath, filename = os.path.split(noext)
     parts = filename.split('_')
     name = parts[0]
+    assert name != '', ValueError("Name cannot be empty")
     d = OrderedDict()
     d['extension'] = ext
     d['directory'] = dirpath
