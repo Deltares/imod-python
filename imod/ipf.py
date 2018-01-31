@@ -31,6 +31,8 @@ def load(path):
         dfs.append(df)
 
     bigdf = pd.concat(dfs, ignore_index=True)
+    # concat sorts the columns, restore original order, see pandas issue 4588
+    bigdf = bigdf.reindex(dfs[0].columns, axis=1)
     return bigdf
 
 
@@ -54,7 +56,7 @@ def save(path, df):
         for layer, group in df.groupby('layer'):
             d['layer'] = layer
             fn = util.compose(d)
-            write(fn, df)
+            write(fn, group)
     else:
         fn = util.compose(d)
         write(fn, df)
