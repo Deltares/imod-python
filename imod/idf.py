@@ -8,6 +8,7 @@ import xarray as xr
 from dask import array
 from glob import glob
 from datetime import datetime
+import imod
 from imod import util
 
 
@@ -95,7 +96,7 @@ def read(path):
 
 def dask(path, chunks=None, memmap=True):
     if memmap:
-        a, attrs = memmap(path)
+        a, attrs = imod.idf.memmap(path)
     else:
         a, attrs = read(path)
     # grab the whole array as one chunk
