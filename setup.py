@@ -17,7 +17,7 @@ setup(
     license='MIT',
     packages=['imod'],
     test_suite='tests',
-    python_requires='>=3',
+    python_requires='>=3.4',
     install_requires=[
         'numpy',
         'xarray',
