@@ -1,10 +1,7 @@
 from setuptools import setup
 
-try:
-    import pypandoc
-    long_description = pypandoc.convert('README.md', 'rst')
-except ImportError:
-    long_description = ''
+with open('README.rst') as f:
+    long_description = f.read()
 
 setup(
     name='imod',
