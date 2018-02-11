@@ -5,24 +5,19 @@ In absence of actual documentation, here are some of the functions:
 ```python
 import imod
 
-df = imod.io.readipf('wells.ipf')
-imod.io.writeipf(df, 'wells-out.ipf')
+df = imod.ipf.load('wells.ipf')
+imod.ipf.save('wells-out.ipf', df)
 
 # get all calculated heads in a xarray DataArray
 # with dimensions time, layer, y, x
-da = imod.io.loadarray('path/to/results/head_*.idf')
-
-# The aim is to couple iMOD data files and xarray more tightly
-# such that we can lazily import an entire model into an xarray
-# Dataset, do calculations/aggregations/modifications on the
-# Dataset, and write everything back to the iMOD data files.
+da = imod.idf.load('path/to/results/head_*.idf')
 ```
 
 ## Notes
 
 - The iMOD 4.1 release will crash on loading NaN nodata values. In earlier and later releases this is not an issue.
 
-## Implementation of `loadarray`
+## Implementation of `imod.idf.load`
 
 1. Do a `glob` search on all files matching the input path, e.g. `head_*.idf`
 2. For each IDF:

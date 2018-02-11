@@ -1,6 +1,6 @@
 import os
 import unittest
-import imod
+from imod import idf
 import numpy as np
 from collections import OrderedDict
 import xarray as xr
@@ -9,7 +9,7 @@ import pandas as pd
 
 class TestIDF(unittest.TestCase):
     def setUp(self):
-        self.idf = 'test.idf'
+        self.path = 'test.idf'
         arr = np.ones((3, 4), dtype=np.float32)
         cellwidth = 1.0
         cellheight = cellwidth
@@ -27,15 +27,16 @@ class TestIDF(unittest.TestCase):
 
     def tearDown(self):
         try:
-            os.remove(self.idf)
+            os.remove(self.path)
         except FileNotFoundError:
             pass
 
-    def test_idf(self):
-        imod.io.writeidf('.', self.da)
-        self.assertTrue(os.path.isfile(self.idf))
+    def test_saveload(self):
+        idf.save('.', self.da)
+        self.assertTrue(os.path.isfile(self.path))
         # set memmap to False to avoid tearDown PermissionError
-        da2 = imod.io.loadarray(self.idf, memmap=False)
+        # TODO look into finalizing properly to avoid this?
+        da2 = idf.load(self.path, memmap=False)
         self.assertIsInstance(da2, xr.DataArray)
         self.assertTrue((self.da == da2).all())
 
