@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 
 def decompose(path):
-    """Parse a filename, returning a dict of the parts,
+    """Parse a path, returning a dict of the parts,
     following the iMOD conventions"""
     noext, ext = os.path.splitext(path)
     dirpath, filename = os.path.split(noext)
@@ -32,6 +32,8 @@ def decompose(path):
 
 
 def compose(d):
+    """From a dict of parts, construct a filename,
+    following the iMOD conventions"""
     extension = d['extension']
     haslayer = 'layer' in d
     hastime = 'time' in d

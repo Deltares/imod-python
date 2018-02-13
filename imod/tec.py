@@ -7,6 +7,7 @@ import pandas as pd
 
 
 def header(path):
+    """Get the Tecplot ASCII header as a dictionary"""
     with open(path) as f:
         d = {}
         attrs = OrderedDict()
@@ -47,7 +48,7 @@ def _ntimes(nlines, count):
         return int(ntimes)
     else:
         raise RuntimeError("Could not find number of timesteps!"
-                           "Check whether the TECPLOT file is well-formed.")
+                           "Check whether the Tecplot file is well-formed.")
 
 
 def _vars_as_list(argument):
@@ -89,21 +90,22 @@ def _dataset(df, time, **kwargs):
 
 
 def load(path, variables=None, times=None):
-    """
-    Loads the data from a TECPLOT file (.TEC), as outputted by iMODSEAWAT,
-    into an xarray Dataset. The TECPLOT file provides no coordinate values,
+    """Load a Tecplot ASCII data file to an xarray Dataset.
+
+    Loads the data from a Tecplot ASCII file (.TEC or .DAT), as outputted by iMODSEAWAT,
+    into an xarray Dataset. The Tecplot file provides no coordinate values,
     exclusively indices. The dataset is returned with dimensions: layer, row,
     column, time.
 
     Parameters
     ----------
-    path: string
+    path: str
         path to .TEC file
-    variables: string, list, or tuple; optional
+    variables: str, list, or tuple; optional
         Which variables to load into the xarray dataset, e.g:
         ['head', 'conc', 'vx', 'vy', 'vz']. Defaults to all variables.
     times: integer, list, or slice; optional
-        Which timesteps to load. The TECPLOT file starts
+        Which timesteps to load. The Tecplot file starts
         numbering at 0.0, and the numbers function solely as index.
         Defaults to all timesteps.
 
@@ -126,6 +128,8 @@ def load(path, variables=None, times=None):
 
     See also the documentation for `slice()`.
     """
+    # For a description of the Tecplot ASCII file format see:
+    # ftp://ftp.tecplot.com/pub/doc/tecplot/360/dataformat.pdf
     tec_kwargs = header(path)
     var_cols = range(3, 3 + tec_kwargs['attrs'].pop('nvars'))
     # get a byte location for the start of every line
