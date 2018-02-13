@@ -3,7 +3,7 @@ import rasterio
 import numpy as np
 
 
-def write(path, da, driver=None, nodata=-9999):
+def write(path, da, driver=None, nodata=np.nan):
     """Write DataArray to GDAL supported geospatial rasters using rasterio
     
     Parameters
@@ -18,7 +18,7 @@ def write(path, da, driver=None, nodata=-9999):
         By default tries to guess from the file extension.
     nodata: float
         Nodata value to use. Should be convertible to the DataArray and GDAL dtype.
-        Default value is -9999
+        Default value is np.nan
     """
     # Not directly related to iMOD, but provides a missing link, together
     # with xarray.open_rasterio.
@@ -51,6 +51,8 @@ def write(path, da, driver=None, nodata=-9999):
     profile['dtype'] = da.dtype
     profile['nodata'] = nodata
     if (nodata is None) or np.isnan(nodata):
+        # NaN is the default missing value in xarray
+        # None is different in that the raster won't have a nodata value
         dafilled = da
     else:
         dafilled = da.fillna(nodata)
