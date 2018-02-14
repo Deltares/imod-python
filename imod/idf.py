@@ -110,6 +110,9 @@ def _dataarray_kwargs(path, attrs):
     """Construct xarray coordinates from
     IDF filename and attrs dict"""
     attrs.update(util.decompose(path))
+    # from decompose, but not needed in attrs
+    attrs.pop('directory')
+    attrs.pop('extension')
     name = attrs.pop('name')  # avoid storing information twice
     d = {
         'name': name,
