@@ -82,7 +82,7 @@ def _to_nan(a, attrs):
         return a, attrs
 
 
-def memmap(path, mode):
+def memmap(path):
     """Make a memory map of a single IDF file
     
     Use idf.read if you don't want to modify the nodata values of the IDF,
