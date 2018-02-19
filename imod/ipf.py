@@ -6,6 +6,7 @@ from imod import util
 
 # TODO, check this implementation with the format specification in the iMOD manual
 def read(path):
+    """Read an IPF file to a pandas.DataFrame"""
     with open(path) as f:
         nrow = int(f.readline().strip())
         ncol = int(f.readline().strip())
@@ -16,6 +17,10 @@ def read(path):
 
 
 def load(path):
+    """Load one or more IPF files to a single pandas.DataFrame
+    
+    The different IPF files can be from different model layers,
+    but otherwise have to have identical columns"""
     paths = glob(path)
     n = len(paths)
     if n == 0:
@@ -37,6 +42,7 @@ def load(path):
 
 
 def write(path, df):
+    """Write a pandas.DataFrame to an IPF file"""
     nrecords, nfields = df.shape
     with open(path, 'w') as f:
         f.write('{}\n{}\n'.format(nrecords, nfields))
@@ -46,6 +52,7 @@ def write(path, df):
 
 
 def save(path, df):
+    """Save a pandas.DataFrame to one or more IPF files, split per layer"""
     d = util.decompose(path)
     d['extension'] = 'ipf'
     dirpath = d['directory']
