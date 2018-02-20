@@ -40,6 +40,7 @@ def compose(d):
     if hastime:
         d['timestr'] = d['time'].strftime('%Y%m%d%H%M%S')
     if haslayer:
+        d['layer'] = int(d['layer'])
         if hastime:
             s = '{name}_{timestr}_l{layer}.{extension}'.format(**d)
         else:
