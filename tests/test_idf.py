@@ -32,7 +32,7 @@ class TestIDF(unittest.TestCase):
             pass
 
     def test_saveload(self):
-        idf.save('.', self.da)
+        idf.save(self.path, self.da)
         self.assertTrue(os.path.isfile(self.path))
         # set memmap to False to avoid tearDown PermissionError
         # TODO look into finalizing properly to avoid this?
