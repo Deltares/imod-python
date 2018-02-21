@@ -25,7 +25,7 @@ def decompose(path):
     except ValueError:
         pass  # no time in dict
     # layer is always last
-    p = re.compile('^l\d+$', re.IGNORECASE)
+    p = re.compile(r'^l\d+$', re.IGNORECASE)
     if p.match(parts[-1]):
         d['layer'] = int(parts[-1][1:])
     return d

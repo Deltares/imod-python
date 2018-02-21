@@ -22,9 +22,9 @@ def header(path):
 
         line2 = f.readline()
         line2 = "".join(line2.split())  # remove all whitespace
-        nlay = int(re.findall("K=\d+", line2)[0].split('=')[-1])
-        nrow = int(re.findall("J=\d+", line2)[0].split('=')[-1])
-        ncol = int(re.findall("I=\d+", line2)[0].split('=')[-1])
+        nlay = int(re.findall(r"K=\d+", line2)[0].split('=')[-1])
+        nrow = int(re.findall(r"J=\d+", line2)[0].split('=')[-1])
+        ncol = int(re.findall(r"I=\d+", line2)[0].split('=')[-1])
         coords['layer'] = np.arange(nlay)
         coords['row'] = np.arange(nrow)
         coords['column'] = np.arange(ncol)
@@ -39,7 +39,7 @@ def header(path):
 
 def _get_time(line):
     line = "".join(line.split())  # remove all whitespace
-    return np.float32(re.findall("ZONET=\"\d*.\d*", line)[0].split('="')[-1])
+    return np.float32(re.findall(r'ZONET="\d*.\d*', line)[0].split('="')[-1])
 
 
 def _ntimes(nlines, count):
