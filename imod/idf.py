@@ -383,6 +383,34 @@ def loadset(globpath, chunks=None, memmap=True):
 
 # write DataArrays to IDF
 def save(path, a):
+    """Write a xarray.DataArray to one or more IDF files
+
+    If the DataArray only has `y` and `x` dimensions, a single IDF file is
+    written, like the `imod.idf.write` function. This function is more general
+    and also supports `time` and `layer` dimensions. It will split these up,
+    give them their own filename according to the conventions in
+    `imod.util.compose`, and write them each
+
+    Parameters
+    ----------
+    path : str
+        Path to the IDF file to be written. This function decides on the
+        actual filename(s) using conventions, so it only takes the directory and
+        name from this parameter. 
+    a : xarray.DataArray
+        DataArray to be written. It needs to have exactly a.dims == ('y', 'x'),
+        and several required keys in a.attrs: 'transform', 'res'.
+
+    Example
+    -------
+    Consider a DataArray `da` that has dimensions 'layer', 'y' and 'x', with the
+    'layer' dimension consisting of layer 1 and 2::
+
+        save('path/to/head', da)
+
+    This writes the following two IDF files: 'path/to/head_l1.idf' and
+    'path/to/head_l2.idf'.
+    """
     d = util.decompose(path)
     d['extension'] = 'idf'
     dirpath = d['directory']
@@ -409,6 +437,16 @@ def save(path, a):
 
 
 def write(path, a):
+    """Write a 2D xarray.DataArray to a IDF file
+
+    Parameters
+    ----------
+    path : str
+        Path to the IDF file to be written
+    a : xarray.DataArray
+        DataArray to be written. It needs to have exactly a.dims == ('y', 'x'),
+        and several required keys in a.attrs: 'transform', 'res'.
+    """
     assert(a.dims == ('y', 'x'))
     with open(path, 'wb') as f:
         f.write(pack('i', 1271))  # Lahey RecordLength Ident.
