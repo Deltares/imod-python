@@ -1,8 +1,9 @@
-import os
 import csv
 import pandas as pd
-from glob import glob
 from imod import util
+from glob import glob
+from pathlib import Path
+
 
 # TODO, check this implementation with the format specification in the iMOD manual
 def read(path):
@@ -21,7 +22,11 @@ def load(path):
     
     The different IPF files can be from different model layers,
     but otherwise have to have identical columns"""
-    paths = glob(path)
+    # convert since for Path.glob non-relative patterns are unsupported
+    if isinstance(path, Path):
+        path = str(path)
+
+    paths = [Path(p) for p in glob(path)]
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(
@@ -54,10 +59,8 @@ def write(path, df):
 def save(path, df):
     """Save a pandas.DataFrame to one or more IPF files, split per layer"""
     d = util.decompose(path)
-    d['extension'] = 'ipf'
-    dirpath = d['directory']
-    if dirpath != '':  # would give a FileNotFoundError
-        os.makedirs(d['directory'], exist_ok=True)
+    d['extension'] = '.ipf'
+    d['directory'].mkdir(exist_ok=True, parents=True)
 
     if 'layer' in df.columns:
         for layer, group in df.groupby('layer'):
