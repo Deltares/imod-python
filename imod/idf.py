@@ -294,10 +294,10 @@ def _load_list(paths, chunks=None, memmap=True):
     haslayer = 'layer' in da0.coords
     hastime = 'time' in da0.coords
     if haslayer:
-        nlayer = np.unique([da.layer.values for da in das]).size
+        nlayer = np.unique([da.coords['layer'].values for da in das]).size
         if hastime:
-            ntime = np.unique([da.time.values for da in das]).size
-            das.sort(key=lambda da: (da.time, da.layer))
+            ntime = np.unique([da.coords['time'].values for da in das]).size
+            das.sort(key=lambda da: (da.coords['time'], da.coords['layer']))
             # first create the layer dimension for each time
             das_layer = []
             s, e = 0, nlayer
@@ -308,11 +308,11 @@ def _load_list(paths, chunks=None, memmap=True):
             # then add the time dimension on top of that
             da = xr.concat(das_layer, dim='time')
         else:
-            das.sort(key=lambda da: da.layer)
+            das.sort(key=lambda da: da.coords['layer'])
             da = xr.concat(das, dim='layer')
     else:
         if hastime:
-            das.sort(key=lambda da: da.time)
+            das.sort(key=lambda da: da.coords['time'])
             da = xr.concat(das, dim='time')
         else:
             assert(len(das) == 1)
