@@ -106,7 +106,11 @@ def memmap(path):
     attrs, headersize = _pre_data_read(path)
     a = np.memmap(path, np.float32, 'r+', headersize,
                   (attrs['nrow'], attrs['ncol']))
-    setnodataheader(path, np.nan)
+
+    # only change the header if needed
+    if not np.isnan(attrs['nodata']):
+        setnodataheader(path, np.nan)
+
     return _to_nan(a, attrs)
 
 
