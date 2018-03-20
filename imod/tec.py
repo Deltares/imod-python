@@ -99,7 +99,7 @@ def load(path, variables=None, times=None):
 
     Parameters
     ----------
-    path: str
+    path: str or Path
         path to .TEC file
     variables: str, list, or tuple; optional
         Which variables to load into the xarray dataset, e.g:
@@ -172,4 +172,3 @@ def load(path, variables=None, times=None):
             dss.append(_dataset(df, time, **tec_kwargs))
 
     return xr.concat(dss, dim='time')
-    

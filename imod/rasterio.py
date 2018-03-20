@@ -1,6 +1,6 @@
-import os
 import rasterio
 import numpy as np
+from pathlib import Path
 
 
 def write(path, da, driver=None, nodata=np.nan):
@@ -8,7 +8,7 @@ def write(path, da, driver=None, nodata=np.nan):
     
     Parameters
     ----------
-    path: str
+    path: str or Path
         path to the output raster
     da: xarray DataArray
         The DataArray to be written. Should have only x and y dimensions.
@@ -26,9 +26,11 @@ def write(path, da, driver=None, nodata=np.nan):
     # the xarray rasterio connection matures, see for instance:
     # https://github.com/pydata/xarray/issues/1736
     # https://github.com/pydata/xarray/pull/1712
+    if isinstance(path, str):
+        path = Path(path)
     profile = da.attrs.copy()
     if driver is None:
-        ext = os.path.splitext(path)[1].lower()
+        ext = path.suffix.lower()
         if ext in ('.tif', '.tiff'):
             driver = 'GTiff'
         elif ext == '.asc':

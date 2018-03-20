@@ -1,4 +1,3 @@
-import os
 import numpy as np
 import rasterio
 from struct import unpack, pack
@@ -7,6 +6,7 @@ import pandas as pd
 import xarray as xr
 from dask import array
 from glob import glob
+from pathlib import Path
 from datetime import datetime
 import imod
 from imod import util
@@ -90,7 +90,7 @@ def memmap(path):
 
     Parameters
     ----------
-    path : str
+    path : str or Path
         Path to the IDF file to be memory mapped
     
     Returns
@@ -104,7 +104,7 @@ def memmap(path):
         A dict with all metadata.
     """
     attrs, headersize = _pre_data_read(path)
-    a = np.memmap(path, np.float32, 'r+', headersize,
+    a = np.memmap(str(path), np.float32, 'r+', headersize,
                   (attrs['nrow'], attrs['ncol']))
 
     # only change the header if needed
@@ -121,7 +121,7 @@ def read(path):
 
     Parameters
     ----------
-    path : str
+    path : str or Path
         Path to the IDF file to be read
     
     Returns
@@ -146,7 +146,7 @@ def dask(path, chunks=None, memmap=True):
     
     Parameters
     ----------
-    path : str
+    path : str or Path
         Path to the IDF file to be read
     chunks : int or tuple of int, optional
         How to chunk the array. By default it creates only 1 chunk.
@@ -166,7 +166,7 @@ def dask(path, chunks=None, memmap=True):
     if memmap:
         a, attrs = imod.idf.memmap(path)
     else:
-        a, attrs = read(path)
+        a, attrs = imod.idf.read(path)
     # grab the whole array as one chunk
     if chunks is None:
         chunks = a.shape
@@ -226,7 +226,7 @@ def dataarray(path, chunks=None, memmap=True):
 
     Parameters
     ----------
-    path : str
+    path : str or Path
         Path to the IDF file to be read
     chunks : int or tuple of int, optional
         How to chunk the array. By default it creates only 1 chunk.
@@ -252,7 +252,7 @@ def load(path, chunks=None, memmap=True):
     
     Parameters
     ----------
-    path : str or list
+    path : str, Path or list
         This can be a single file, 'head_l1.idf', a glob pattern expansion,
         'head_l*.idf', or a list of files, ['head_l1.idf', 'head_l2.idf'].
         Note that each file needs to be of the same name (part before the 
@@ -273,7 +273,10 @@ def load(path, chunks=None, memmap=True):
     """
     if isinstance(path, list):
         return _load_list(path, chunks=chunks, memmap=memmap)
-    paths = glob(path)
+    elif isinstance(path, Path):
+        path = str(path)
+
+    paths = [Path(p) for p in glob(path)]
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(
@@ -334,7 +337,7 @@ def loadset(globpath, chunks=None, memmap=True):
 
     Parameters
     ----------
-    globpath : str
+    globpath : str or Path
         A glob pattern expansion such as 'model/**/*.idf', which recursively
         finds all IDF files under the model directory. Note that files with
         the same name (part before the first underscore) wil be combined into
@@ -352,9 +355,13 @@ def loadset(globpath, chunks=None, memmap=True):
         All metadata needed for writing the file to IDF or other formats
         using imod.rasterio are included in the xarray.DataArray.attrs.
     """
-    # recursively find all files, use ** in globpath to indicate where
-    # e.g. globpath = 'model/**/*.idf'
-    paths = glob(globpath, recursive=True)
+    # convert since for Path.glob non-relative patterns are unsupported
+    if isinstance(globpath, Path):
+        globpath = str(globpath)
+
+    paths = [Path(p) for p in glob(globpath, recursive=True)]
+
+
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(
@@ -397,7 +404,7 @@ def save(path, a):
 
     Parameters
     ----------
-    path : str
+    path : str or Path
         Path to the IDF file to be written. This function decides on the
         actual filename(s) using conventions, so it only takes the directory and
         name from this parameter. 
@@ -416,10 +423,8 @@ def save(path, a):
     'path/to/head_l2.idf'.
     """
     d = util.decompose(path)
-    d['extension'] = 'idf'
-    dirpath = d['directory']
-    if dirpath != '':  # would give a FileNotFoundError
-        os.makedirs(dirpath, exist_ok=True)
+    d['extension'] = '.idf'
+    d['directory'].mkdir(exist_ok=True, parents=True)
 
     if 'time' in a.coords:
         # TODO implement (not much different than layer)
@@ -445,7 +450,7 @@ def write(path, a):
 
     Parameters
     ----------
-    path : str
+    path : str or Path
         Path to the IDF file to be written
     a : xarray.DataArray
         DataArray to be written. It needs to have exactly a.dims == ('y', 'x'),

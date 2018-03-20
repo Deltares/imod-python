@@ -5,6 +5,7 @@ import numpy as np
 from collections import OrderedDict
 import xarray as xr
 import pandas as pd
+from pathlib import Path
 
 
 class TestIDF(unittest.TestCase):

@@ -1,21 +1,22 @@
-import os
 import re
 from datetime import datetime
 import numpy as np
 from collections import OrderedDict
+from pathlib import Path
 
 
 def decompose(path):
     """Parse a path, returning a dict of the parts,
     following the iMOD conventions"""
-    noext, ext = os.path.splitext(path)
-    dirpath, filename = os.path.split(noext)
-    parts = filename.split('_')
+    if isinstance(path, str):
+        path = Path(path)
+
+    parts = path.stem.split('_')
     name = parts[0]
     assert name != '', ValueError("Name cannot be empty")
     d = OrderedDict()
-    d['extension'] = ext
-    d['directory'] = dirpath
+    d['extension'] = path.suffix
+    d['directory'] = path.parent
     d['name'] = name
     if len(parts) == 1:
         return d
@@ -34,7 +35,6 @@ def decompose(path):
 def compose(d):
     """From a dict of parts, construct a filename,
     following the iMOD conventions"""
-    extension = d['extension']
     haslayer = 'layer' in d
     hastime = 'time' in d
     if hastime:
@@ -42,15 +42,15 @@ def compose(d):
     if haslayer:
         d['layer'] = int(d['layer'])
         if hastime:
-            s = '{name}_{timestr}_l{layer}.{extension}'.format(**d)
+            s = '{name}_{timestr}_l{layer}{extension}'.format(**d)
         else:
-            s = '{name}_l{layer}.{extension}'.format(**d)
+            s = '{name}_l{layer}{extension}'.format(**d)
     else:
         if hastime:
-            s = '{name}_{timestr}.{extension}'.format(**d)
+            s = '{name}_{timestr}{extension}'.format(**d)
         else:
-            s = '{name}.{extension}'.format(**d)
+            s = '{name}{extension}'.format(**d)
     if 'directory' in d:
-        return os.path.join(d['directory'], s)
+        return d['directory'].joinpath(s)
     else:
         return s
