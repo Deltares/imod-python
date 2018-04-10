@@ -1,0 +1,9 @@
+numpy
+xarray>=0.10
+pandas
+dask
+rasterio>=1.0a12
+
+# development specific requirements
+sphinx
+twine

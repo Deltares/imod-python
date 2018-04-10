@@ -1,0 +1,14 @@
+name: imod
+
+channels:
+  - conda-forge
+  - defaults
+  - conda-forge/label/dev
+
+dependencies:
+  - python>=3.6
+  - numpy
+  - xarray>=0.10
+  - pandas
+  - dask
+  - rasterio>=1.0a12
