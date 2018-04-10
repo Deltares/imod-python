@@ -141,7 +141,7 @@ def read(path):
     return _to_nan(a, attrs)
 
 
-def dask(path, chunks=None, memmap=True):
+def dask(path, chunks=None, memmap=False):
     """Read a single IDF file to a dask.array
     
     Parameters
@@ -218,7 +218,7 @@ def _dataarray_kwargs(path, attrs):
     return d
 
 
-def dataarray(path, chunks=None, memmap=True):
+def dataarray(path, chunks=None, memmap=False):
     """Read a single IDF file to a xarray.DataArray
     
     The function imod.idf.load is more general and can load multiple layers
@@ -247,7 +247,7 @@ def dataarray(path, chunks=None, memmap=True):
 
 
 # load IDFs for multiple times and/or layers into one DataArray
-def load(path, chunks=None, memmap=True):
+def load(path, chunks=None, memmap=False):
     """Read a parameter (one or more IDFs) to a xarray.DataArray
     
     Parameters
@@ -286,7 +286,7 @@ def load(path, chunks=None, memmap=True):
     return _load_list(paths, chunks=chunks, memmap=memmap)
 
 
-def _load_list(paths, chunks=None, memmap=True):
+def _load_list(paths, chunks=None, memmap=False):
     """Combine a list of paths to IDFs to a single xarray.DataArray"""
     # first load every IDF into a separate DataArray
     das = [dataarray(path, chunks=chunks, memmap=memmap) for path in paths]
@@ -328,7 +328,7 @@ def _load_list(paths, chunks=None, memmap=True):
     return da
 
 
-def loadset(globpath, chunks=None, memmap=True):
+def loadset(globpath, chunks=None, memmap=False):
     """Read a set of parameters to a dict of xarray.DataArray
     
     Compared to imod.idf.load, this function lets you read multiple parameters
@@ -338,7 +338,7 @@ def loadset(globpath, chunks=None, memmap=True):
     Parameters
     ----------
     globpath : str or Path
-        A glob pattern expansion such as 'model/**/*.idf', which recursively
+        A glob pattern expansion such as `'model/**/*.idf'`, which recursively
         finds all IDF files under the model directory. Note that files with
         the same name (part before the first underscore) wil be combined into
         a single xarray.DataArray.
