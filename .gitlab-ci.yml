@@ -3,7 +3,7 @@ image: continuumio/miniconda3:latest
 before_script:
   - apt-get update -q -y
   - apt-get install -y build-essential
-  - conda env create -f environment.yaml
+  - conda env create -f environment.yml
   - source activate imod
   - pip install -e .
 
