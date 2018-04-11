@@ -42,10 +42,10 @@ Implementation of ``imod.idf.load``
 8. Combine the indivual ``DataArray``\ s into one, adding ``time`` and
    ``layer`` dimensions as necessary.
 
-With the current design, I’m not sure what the added benefit of using
+With the current design, I'm not sure what the added benefit of using
 dask arrays is, and whether it should be removed. One possible benefit
 is that it is only possible to write to the ``DataArray`` after calling
-``.load()`` on it first, which in this case still doesn’t load it into
+``.load()`` on it first, which in this case still doesn't load it into
 memory.
 
 We can also still explore using the ``c`` *copy on write* mode of
@@ -54,5 +54,5 @@ We can also still explore using the ``c`` *copy on write* mode of
 Comment by xarray author Stephan Hoyer about using ``np.memmap`` on
 `GitHub <https://github.com/dask/dask/issues/1562#issuecomment-248681863>`__:
 
-    If it’s already on disk in a memory-mappable format, it’s very hard
+    If it's already on disk in a memory-mappable format, it's very hard
     to imagine beating np.memmap.
