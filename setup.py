@@ -5,7 +5,7 @@ with open('README.rst') as f:
 
 setup(
     name='imod',
-    version='0.1',
+    version='0.2.0',
     description='Work with iMOD MODFLOW models',
     long_description=long_description,
     url='https://gitlab.com/visr/imod-python',

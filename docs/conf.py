@@ -19,14 +19,14 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'imod'
-copyright = '2018, Author'
-author = 'Author'
+project = 'imod-python'
+copyright = '2018, Martijn Visser'
+author = 'Martijn Visser'
 
 # The short X.Y version
-version = ''
+version = '0.2'
 # The full version, including alpha/beta/rc tags
-release = ''
+release = '0.2.0'
 
 
 # -- General configuration ---------------------------------------------------

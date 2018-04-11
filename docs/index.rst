@@ -3,16 +3,35 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to imod's documentation!
-================================
+iMOD-Python documentation
+=========================
+
+Work with `iMOD <http://oss.deltares.nl/web/imod>`__ MODFLOW models in
+Python.
+
+Documentation: https://visr.gitlab.io/imod-python/
+
+Source code: https://gitlab.com/visr/imod-python
 
 .. toctree::
    :maxdepth: 4
    :caption: Contents:
 
    imod
-   modules
 
+Getting started
+===============
+
+.. code:: python
+
+    import imod
+
+    df = imod.ipf.load('wells.ipf')
+    imod.ipf.save('wells-out.ipf', df)
+
+    # get all calculated heads in a xarray DataArray
+    # with dimensions time, layer, y, x
+    da = imod.idf.load('path/to/results/head_*.idf')
 
 Indices and tables
 ==================
