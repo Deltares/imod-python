@@ -16,7 +16,7 @@ tests:
 
 pages:
   script:
-  - conda install sphinx
+  - conda install sphinx sphinx_rtd_theme
   - cd docs
   - make html
   - cd ..
