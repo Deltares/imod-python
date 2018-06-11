@@ -40,7 +40,7 @@ def load(path):
             df['layer'] = layer
         dfs.append(df)
 
-    bigdf = pd.concat(dfs, ignore_index=True)
+    bigdf = pd.concat(dfs, ignore_index=True, sort=False)
     # concat sorts the columns, restore original order, see pandas issue 4588
     bigdf = bigdf.reindex(dfs[0].columns, axis=1)
     return bigdf
