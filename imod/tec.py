@@ -14,26 +14,26 @@ def header(path):
         coords = OrderedDict()
 
         line1 = f.readline()
-        line1_parts = [part.strip().lower()
-                       for part in line1.replace('"', '').split(',')]
+        line1_parts = [
+            part.strip().lower() for part in line1.replace('"', "").split(",")
+        ]
         nvars = len(line1_parts) - 3
-        d['data_vars'] = OrderedDict((var, None)
-                                     for var in line1_parts[3:3 + nvars])
+        d["data_vars"] = OrderedDict((var, None) for var in line1_parts[3 : 3 + nvars])
 
         line2 = f.readline()
         line2 = "".join(line2.split())  # remove all whitespace
-        nlay = int(re.findall(r"K=\d+", line2)[0].split('=')[-1])
-        nrow = int(re.findall(r"J=\d+", line2)[0].split('=')[-1])
-        ncol = int(re.findall(r"I=\d+", line2)[0].split('=')[-1])
-        coords['layer'] = np.arange(nlay)
-        coords['row'] = np.arange(nrow)
-        coords['column'] = np.arange(ncol)
-        attrs['nlay'] = nlay
-        attrs['nrow'] = nrow
-        attrs['ncol'] = ncol
-        attrs['nvars'] = nvars
-        d['coords'] = coords
-        d['attrs'] = attrs
+        nlay = int(re.findall(r"K=\d+", line2)[0].split("=")[-1])
+        nrow = int(re.findall(r"J=\d+", line2)[0].split("=")[-1])
+        ncol = int(re.findall(r"I=\d+", line2)[0].split("=")[-1])
+        coords["layer"] = np.arange(nlay)
+        coords["row"] = np.arange(nrow)
+        coords["column"] = np.arange(ncol)
+        attrs["nlay"] = nlay
+        attrs["nrow"] = nrow
+        attrs["ncol"] = ncol
+        attrs["nvars"] = nvars
+        d["coords"] = coords
+        d["attrs"] = attrs
         return d
 
 
@@ -47,8 +47,10 @@ def _ntimes(nlines, count):
     if ntimes.is_integer():
         return int(ntimes)
     else:
-        raise RuntimeError("Could not find number of timesteps!"
-                           "Check whether the Tecplot file is well-formed.")
+        raise RuntimeError(
+            "Could not find number of timesteps!"
+            "Check whether the Tecplot file is well-formed."
+        )
 
 
 def _vars_as_list(argument):
@@ -58,8 +60,9 @@ def _vars_as_list(argument):
     elif type(argument) is str:
         return [argument]
     else:
-        raise RuntimeError("Invalid argument: accepts only lists, tuples, and"
-                           "strings.")
+        raise RuntimeError(
+            "Invalid argument: accepts only lists, tuples, and" "strings."
+        )
 
 
 def _startlines_as_list(argument):
@@ -81,11 +84,11 @@ def _index_lines(path):
 
 
 def _dataset(df, time, **kwargs):
-    nlay, nrow, ncol = [v for v in kwargs['attrs'].values()]
-    kwargs['coords']['time'] = time
+    nlay, nrow, ncol = [v for v in kwargs["attrs"].values()]
+    kwargs["coords"]["time"] = time
     for var in df:
         data = df[var].values.reshape(nlay, nrow, ncol)
-        kwargs['data_vars'][var] = (('layer', 'row', 'column'), data)
+        kwargs["data_vars"][var] = (("layer", "row", "column"), data)
     return xr.Dataset(**kwargs)
 
 
@@ -131,32 +134,34 @@ def load(path, variables=None, times=None):
     # For a description of the Tecplot ASCII file format see:
     # ftp://ftp.tecplot.com/pub/doc/tecplot/360/dataformat.pdf
     tec_kwargs = header(path)
-    var_cols = range(3, 3 + tec_kwargs['attrs'].pop('nvars'))
+    var_cols = range(3, 3 + tec_kwargs["attrs"].pop("nvars"))
     # get a byte location for the start of every line
-    # so that we can jump to locations in the file 
+    # so that we can jump to locations in the file
     # and skip timesteps
     line_idx = _index_lines(path)
     nlines = len(line_idx)
     nlines_timestep = functools.reduce(
-        lambda x, y: x * y, [v for v in tec_kwargs['attrs'].values()])
+        lambda x, y: x * y, [v for v in tec_kwargs["attrs"].values()]
+    )
     ntimes = _ntimes(nlines, nlines_timestep)
 
     if variables is None:
-        variables = list(tec_kwargs['data_vars'].keys())
+        variables = list(tec_kwargs["data_vars"].keys())
     else:
         variables = _vars_as_list(variables)
         variables = [var.lower() for var in variables]
-        var_cols = [col_num for (col_num, var) in
-                    zip(var_cols, tec_kwargs['data_vars'].keys())
-                    if var in variables]
-        for var in list(tec_kwargs['data_vars'].keys()):
+        var_cols = [
+            col_num
+            for (col_num, var) in zip(var_cols, tec_kwargs["data_vars"].keys())
+            if var in variables
+        ]
+        for var in list(tec_kwargs["data_vars"].keys()):
             if var not in variables:
-                tec_kwargs['data_vars'].pop(var)
+                tec_kwargs["data_vars"].pop(var)
 
     # generates a list of line numbers which indicate the start
     # of a new timestep
-    start_lines = np.asarray([(t * (nlines_timestep + 2) + 1)
-                              for t in range(ntimes)])
+    start_lines = np.asarray([(t * (nlines_timestep + 2) + 1) for t in range(ntimes)])
     if times is None:
         pass
     else:
@@ -167,8 +172,9 @@ def load(path, variables=None, times=None):
         for start in start_lines:
             f.seek(line_idx[start])
             time = _get_time(f.readline())
-            df = pd.read_csv(f, nrows=nlines_timestep,
-                             names=variables, usecols=var_cols)
+            df = pd.read_csv(
+                f, nrows=nlines_timestep, names=variables, usecols=var_cols
+            )
             dss.append(_dataset(df, time, **tec_kwargs))
 
-    return xr.concat(dss, dim='time')
+    return xr.concat(dss, dim="time")

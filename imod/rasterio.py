@@ -31,27 +31,26 @@ def write(path, da, driver=None, nodata=np.nan):
     profile = da.attrs.copy()
     if driver is None:
         ext = path.suffix.lower()
-        if ext in ('.tif', '.tiff'):
-            driver = 'GTiff'
-        elif ext == '.asc':
-            driver = 'AAIGrid'
-        elif ext == '.map':
-            driver = 'PCRaster'
+        if ext in (".tif", ".tiff"):
+            driver = "GTiff"
+        elif ext == ".asc":
+            driver = "AAIGrid"
+        elif ext == ".map":
+            driver = "PCRaster"
         else:
-            raise ValueError(
-                'Unknown extension {}, specifiy driver'.format(ext))
+            raise ValueError("Unknown extension {}, specifiy driver".format(ext))
     # prevent rasterio warnings
-    if driver == 'AAIGrid':
-        profile.pop('res', None)
-        profile.pop('is_tiled', None)
+    if driver == "AAIGrid":
+        profile.pop("res", None)
+        profile.pop("is_tiled", None)
     # transform will be affine object in next xarray
-    profile['transform'] = profile['transform'][:6]
-    profile['driver'] = driver
-    profile['height'] = da.y.size
-    profile['width'] = da.x.size
-    profile['count'] = 1
-    profile['dtype'] = da.dtype
-    profile['nodata'] = nodata
+    profile["transform"] = profile["transform"][:6]
+    profile["driver"] = driver
+    profile["height"] = da.y.size
+    profile["width"] = da.x.size
+    profile["count"] = 1
+    profile["dtype"] = da.dtype
+    profile["nodata"] = nodata
     if (nodata is None) or np.isnan(nodata):
         # NaN is the default missing value in xarray
         # None is different in that the raster won't have a nodata value
@@ -59,5 +58,5 @@ def write(path, da, driver=None, nodata=np.nan):
     else:
         dafilled = da.fillna(nodata)
     with rasterio.Env():
-        with rasterio.open(path, 'w', **profile) as ds:
+        with rasterio.open(path, "w", **profile) as ds:
             ds.write(dafilled.values, 1)

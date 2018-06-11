@@ -15,57 +15,57 @@ from imod import util
 def header(path):
     """Read the IDF header information into a dictionary"""
     attrs = util.decompose(path)
-    with open(path, 'rb') as f:
-        assert unpack('i', f.read(4))[0] == 1271  # Lahey RecordLength Ident.
-        ncol = unpack('i', f.read(4))[0]
-        nrow = unpack('i', f.read(4))[0]
-        xmin = unpack('f', f.read(4))[0]
+    with open(path, "rb") as f:
+        assert unpack("i", f.read(4))[0] == 1271  # Lahey RecordLength Ident.
+        ncol = unpack("i", f.read(4))[0]
+        nrow = unpack("i", f.read(4))[0]
+        xmin = unpack("f", f.read(4))[0]
         f.read(4)  # xmax
         f.read(4)  # ymin
-        ymax = unpack('f', f.read(4))[0]
+        ymax = unpack("f", f.read(4))[0]
         # note that dmin and dmax are currently not kept up to date
         # generally ok, they are only used for legends in iMOD
         # but would be nice if we could find a nice way to do this
         f.read(4)  # dmin, minimum data value present
         f.read(4)  # dmax, maximum data value present
-        nodata = unpack('f', f.read(4))[0]
-        attrs['nodata'] = nodata
+        nodata = unpack("f", f.read(4))[0]
+        attrs["nodata"] = nodata
         # only equidistant IDF currently supported
-        assert not unpack('?', f.read(1))[0]  # ieq Bool
-        itb = unpack('?', f.read(1))[0]
+        assert not unpack("?", f.read(1))[0]  # ieq Bool
+        itb = unpack("?", f.read(1))[0]
         # no usage of vectors currently supported
-        assert not unpack('?', f.read(1))[0]  # ivf Bool
+        assert not unpack("?", f.read(1))[0]  # ivf Bool
         f.read(1)  # not used
-        cellwidth = unpack('f', f.read(4))[0]
-        cellheight = unpack('f', f.read(4))[0]
+        cellwidth = unpack("f", f.read(4))[0]
+        cellheight = unpack("f", f.read(4))[0]
         # res is always positive, this seems to be the rasterio behavior
-        attrs['res'] = (cellwidth, cellheight)
+        attrs["res"] = (cellwidth, cellheight)
         # xarray converts affine to tuple, so we follow that
         # TODO change after https://github.com/pydata/xarray/pull/1712 is released
-        attrs['transform'] = (cellwidth, 0.0, xmin, 0.0, -cellheight, ymax)
+        attrs["transform"] = (cellwidth, 0.0, xmin, 0.0, -cellheight, ymax)
         if itb:
-            attrs['top'] = unpack('f', f.read(4))[0]
-            attrs['bot'] = unpack('f', f.read(4))[0]
+            attrs["top"] = unpack("f", f.read(4))[0]
+            attrs["bot"] = unpack("f", f.read(4))[0]
 
         # These are derived, remove after using them downstream
-        attrs['headersize'] = f.tell()
-        attrs['ncol'] = ncol
-        attrs['nrow'] = nrow
+        attrs["headersize"] = f.tell()
+        attrs["ncol"] = ncol
+        attrs["nrow"] = nrow
     return attrs
 
 
 def setnodataheader(path, nodata):
     """Change the nodata value in the IDF header"""
-    with open(path, 'r+b') as f:
+    with open(path, "r+b") as f:
         f.seek(36)  # go to nodata position
-        f.write(pack('f', nodata))
+        f.write(pack("f", nodata))
 
 
 def _pre_data_read(path):
     # shared code for idf.read and idf.memmap
     # currently asserts ieq = ivf = 0, and comments are not read
     attrs = header(path)
-    headersize = attrs.pop('headersize')
+    headersize = attrs.pop("headersize")
     return attrs, headersize
 
 
@@ -73,7 +73,7 @@ def _to_nan(a, attrs):
     """Change all nodata values in the array to NaN"""
     # it needs to be NaN for xarray to deal with it properly
     # no need to store the nodata value if it is always NaN
-    nodata = attrs.pop('nodata')
+    nodata = attrs.pop("nodata")
     if np.isnan(nodata):
         return a, attrs
     else:
@@ -104,11 +104,12 @@ def memmap(path):
         A dict with all metadata.
     """
     attrs, headersize = _pre_data_read(path)
-    a = np.memmap(str(path), np.float32, 'r+', headersize,
-                  (attrs['nrow'], attrs['ncol']))
+    a = np.memmap(
+        str(path), np.float32, "r+", headersize, (attrs["nrow"], attrs["ncol"])
+    )
 
     # only change the header if needed
-    if not np.isnan(attrs['nodata']):
+    if not np.isnan(attrs["nodata"]):
         setnodataheader(path, np.nan)
 
     return _to_nan(a, attrs)
@@ -134,10 +135,12 @@ def read(path):
         A dict with all metadata.
     """
     attrs, headersize = _pre_data_read(path)
-    with open(path, 'rb') as f:
+    with open(path, "rb") as f:
         f.seek(headersize)
-        a = np.reshape(np.fromfile(
-            f, np.float32, attrs['nrow'] * attrs['ncol']), (attrs['nrow'], attrs['ncol']))
+        a = np.reshape(
+            np.fromfile(f, np.float32, attrs["nrow"] * attrs["ncol"]),
+            (attrs["nrow"], attrs["ncol"]),
+        )
     return _to_nan(a, attrs)
 
 
@@ -178,42 +181,42 @@ def _dataarray_kwargs(path, attrs):
     """Construct xarray coordinates from IDF filename and attrs dict"""
     attrs.update(util.decompose(path))
     # from decompose, but not needed in attrs
-    attrs.pop('directory')
-    attrs.pop('extension')
-    name = attrs.pop('name')  # avoid storing information twice
+    attrs.pop("directory")
+    attrs.pop("extension")
+    name = attrs.pop("name")  # avoid storing information twice
     d = {
-        'name': name,
-        'dims': ('y', 'x'),  # only two dimensions in a single IDF
-        'attrs': attrs,
+        "name": name,
+        "dims": ("y", "x"),  # only two dimensions in a single IDF
+        "attrs": attrs,
     }
 
     # add the available coordinates
     coords = OrderedDict()
 
     # dimension coordinates
-    nrow = attrs.pop('nrow')
-    ncol = attrs.pop('ncol')
-    dx = attrs['transform'][0]  # always positive
-    xmin = attrs['transform'][2]
-    dy = attrs['transform'][4]  # always negative
-    ymax = attrs['transform'][5]
+    nrow = attrs.pop("nrow")
+    ncol = attrs.pop("ncol")
+    dx = attrs["transform"][0]  # always positive
+    xmin = attrs["transform"][2]
+    dy = attrs["transform"][4]  # always negative
+    ymax = attrs["transform"][5]
     xmax = xmin + ncol * dx
     ymin = ymax + nrow * dy
     xcoords = np.arange(xmin + dx / 2.0, xmax, dx)
     ycoords = np.arange(ymax + dy / 2.0, ymin, dy)
-    coords['y'] = ycoords
-    coords['x'] = xcoords
+    coords["y"] = ycoords
+    coords["x"] = xcoords
 
     # these will become dimension coordinates when combining IDFs
-    layer = attrs.pop('layer', None)
+    layer = attrs.pop("layer", None)
     if layer is not None:
-        coords['layer'] = layer
+        coords["layer"] = layer
 
-    time = attrs.pop('time', None)
+    time = attrs.pop("time", None)
     if time is not None:
-        coords['time'] = time
+        coords["time"] = time
 
-    d['coords'] = coords
+    d["coords"] = coords
 
     return d
 
@@ -279,8 +282,7 @@ def load(path, chunks=None, memmap=False):
     paths = [Path(p) for p in glob(path)]
     n = len(paths)
     if n == 0:
-        raise FileNotFoundError(
-            'Could not find any files matching {}'.format(path))
+        raise FileNotFoundError("Could not find any files matching {}".format(path))
     elif n == 1:
         return dataarray(paths[0], chunks=chunks, memmap=memmap)
     return _load_list(paths, chunks=chunks, memmap=memmap)
@@ -291,38 +293,39 @@ def _load_list(paths, chunks=None, memmap=False):
     # first load every IDF into a separate DataArray
     das = [dataarray(path, chunks=chunks, memmap=memmap) for path in paths]
     assert all(
-        da.name == das[0].name for da in das), "DataArrays to be combined need to have the same name"
+        da.name == das[0].name for da in das
+    ), "DataArrays to be combined need to have the same name"
 
     # combine the different DataArrays into one DataArray with added dimensions
     # xarray currently does not seem to be able to automatically combine the
     # different coords into new dimensions, so we do it manually instead
     # unfortunately that means we only support adding the 'layer' and 'time' dimensions
     da0 = das[0]  # this should apply to all the same
-    haslayer = 'layer' in da0.coords
-    hastime = 'time' in da0.coords
+    haslayer = "layer" in da0.coords
+    hastime = "time" in da0.coords
     if haslayer:
-        nlayer = np.unique([da.coords['layer'].values for da in das]).size
+        nlayer = np.unique([da.coords["layer"].values for da in das]).size
         if hastime:
-            ntime = np.unique([da.coords['time'].values for da in das]).size
-            das.sort(key=lambda da: (da.coords['time'], da.coords['layer']))
+            ntime = np.unique([da.coords["time"].values for da in das]).size
+            das.sort(key=lambda da: (da.coords["time"], da.coords["layer"]))
             # first create the layer dimension for each time
             das_layer = []
             s, e = 0, nlayer
             for i in range(ntime):
-                das_layer.append(xr.concat(das[s:e], dim='layer'))
+                das_layer.append(xr.concat(das[s:e], dim="layer"))
                 s = e
                 e = s + nlayer
             # then add the time dimension on top of that
-            da = xr.concat(das_layer, dim='time')
+            da = xr.concat(das_layer, dim="time")
         else:
-            das.sort(key=lambda da: da.coords['layer'])
-            da = xr.concat(das, dim='layer')
+            das.sort(key=lambda da: da.coords["layer"])
+            da = xr.concat(das, dim="layer")
     else:
         if hastime:
-            das.sort(key=lambda da: da.coords['time'])
-            da = xr.concat(das, dim='time')
+            das.sort(key=lambda da: da.coords["time"])
+            da = xr.concat(das, dim="time")
         else:
-            assert(len(das) == 1)
+            assert len(das) == 1
             da = das[0]
 
     return da
@@ -361,14 +364,12 @@ def loadset(globpath, chunks=None, memmap=False):
 
     paths = [Path(p) for p in glob(globpath, recursive=True)]
 
-
     n = len(paths)
     if n == 0:
-        raise FileNotFoundError(
-            'Could not find any files matching {}'.format(globpath))
+        raise FileNotFoundError("Could not find any files matching {}".format(globpath))
     # group the DataArrays together using their name
     # note that directory names are ignored, and in case of duplicates, the last one wins
-    names = [util.decompose(path)['name'] for path in paths]
+    names = [util.decompose(path)["name"] for path in paths]
     unique_names = list(np.unique(names))
     d = OrderedDict()
     for n in unique_names:
@@ -423,21 +424,20 @@ def save(path, a):
     'path/to/head_l2.idf'.
     """
     d = util.decompose(path)
-    d['extension'] = '.idf'
-    d['directory'].mkdir(exist_ok=True, parents=True)
+    d["extension"] = ".idf"
+    d["directory"].mkdir(exist_ok=True, parents=True)
 
-    if 'time' in a.coords:
+    if "time" in a.coords:
         # TODO implement (not much different than layer)
-        raise NotImplementedError(
-            "Writing time dependent IDFs not yet implemented")
-    if 'layer' in a.coords:
-        if 'layer' in a.dims:
-            for layer, a2d in a.groupby('layer'):
-                d['layer'] = layer
+        raise NotImplementedError("Writing time dependent IDFs not yet implemented")
+    if "layer" in a.coords:
+        if "layer" in a.dims:
+            for layer, a2d in a.groupby("layer"):
+                d["layer"] = layer
                 fn = util.compose(d)
                 write(fn, a2d)
         else:
-            d['layer'] = int(a.coords['layer'])
+            d["layer"] = int(a.coords["layer"])
             fn = util.compose(d)
             write(fn, a)
     else:
@@ -456,36 +456,35 @@ def write(path, a):
         DataArray to be written. It needs to have exactly a.dims == ('y', 'x'),
         and several required keys in a.attrs: 'transform', 'res'.
     """
-    assert(a.dims == ('y', 'x'))
-    with open(path, 'wb') as f:
-        f.write(pack('i', 1271))  # Lahey RecordLength Ident.
+    assert a.dims == ("y", "x")
+    with open(path, "wb") as f:
+        f.write(pack("i", 1271))  # Lahey RecordLength Ident.
         nrow = a.y.size
         ncol = a.x.size
         nodata = np.nan
         attrs = a.attrs
-        itb = attrs.get('top', False) and attrs.get('bot', False)
-        f.write(pack('i', ncol))
-        f.write(pack('i', nrow))
+        itb = attrs.get("top", False) and attrs.get("bot", False)
+        f.write(pack("i", ncol))
+        f.write(pack("i", nrow))
         # the attribute is simply a 9 tuple
-        transform = rasterio.Affine(*attrs['transform'][:6])
-        xmin, ymin, xmax, ymax = rasterio.transform.array_bounds(
-            nrow, ncol, transform)
-        f.write(pack('f', xmin))
-        f.write(pack('f', xmax))
-        f.write(pack('f', ymin))
-        f.write(pack('f', ymax))
-        f.write(pack('f', float(a.min())))  # dmin
-        f.write(pack('f', float(a.max())))  # dmax
-        f.write(pack('f', nodata))
-        f.write(pack('?', False))  # ieq
-        f.write(pack('?', itb))
-        f.write(pack('?', False))  # ivf
-        f.write(pack('x'))  # not used
-        f.write(pack('f', attrs['res'][0]))
-        f.write(pack('f', attrs['res'][1]))
+        transform = rasterio.Affine(*attrs["transform"][:6])
+        xmin, ymin, xmax, ymax = rasterio.transform.array_bounds(nrow, ncol, transform)
+        f.write(pack("f", xmin))
+        f.write(pack("f", xmax))
+        f.write(pack("f", ymin))
+        f.write(pack("f", ymax))
+        f.write(pack("f", float(a.min())))  # dmin
+        f.write(pack("f", float(a.max())))  # dmax
+        f.write(pack("f", nodata))
+        f.write(pack("?", False))  # ieq
+        f.write(pack("?", itb))
+        f.write(pack("?", False))  # ivf
+        f.write(pack("x"))  # not used
+        f.write(pack("f", attrs["res"][0]))
+        f.write(pack("f", attrs["res"][1]))
         if itb:
-            f.write(pack('f', attrs['top']))
-            f.write(pack('f', attrs['bot']))
+            f.write(pack("f", attrs["top"]))
+            f.write(pack("f", attrs["bot"]))
         # convert to a numpy.ndarray of float32
         if a.dtype != np.float32:
             a = a.astype(np.float32)
