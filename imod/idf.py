@@ -1,5 +1,6 @@
 import numpy as np
-import rasterio
+from rasterio import Affine as rasterio_Affine
+from rasterio import transform as rasterio_transform
 from struct import unpack, pack
 from collections import OrderedDict
 import pandas as pd
@@ -468,8 +469,8 @@ def write(path, a):
         f.write(pack("i", ncol))
         f.write(pack("i", nrow))
         # the attribute is simply a 9 tuple
-        transform = rasterio.Affine(*attrs["transform"][:6])
-        xmin, ymin, xmax, ymax = rasterio.transform.array_bounds(nrow, ncol, transform)
+        transform = rasterio_Affine(*attrs["transform"][:6])
+        xmin, ymin, xmax, ymax = rasterio_transform.array_bounds(nrow, ncol, transform)
         f.write(pack("f", xmin))
         f.write(pack("f", xmax))
         f.write(pack("f", ymin))
