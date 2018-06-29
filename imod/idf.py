@@ -463,7 +463,8 @@ def write(path, a):
         ncol = a.x.size
         nodata = np.nan
         attrs = a.attrs
-        itb = attrs.get("top", False) and attrs.get("bot", False)
+        itb = (isinstance(attrs.get("top", False), (int, float)) and 
+               isinstance(attrs.get("bot", False), (int, float)))
         f.write(pack("i", ncol))
         f.write(pack("i", nrow))
         # the attribute is simply a 9 tuple
