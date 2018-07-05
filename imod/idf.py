@@ -102,6 +102,10 @@ def _get_reference(a):
 
 
 def transform(a):
+    """
+    Extract the spatial reference information from the DataArray coordinates,
+    into an Affine.affine object for writing to rasterio supported formats.
+    """
     dx, xmin, xmax, dy, ymin, ymax = _get_reference(a)
     return Affine(dx, 0.0, xmin, 0.0, dy, ymax)
 
@@ -434,8 +438,7 @@ def save(path, a):
         actual filename(s) using conventions, so it only takes the directory and
         name from this parameter. 
     a : xarray.DataArray
-        DataArray to be written. It needs to have exactly a.dims == ('y', 'x'),
-        and several required keys in a.attrs: 'transform', 'res'.
+        DataArray to be written. It needs to have exactly a.dims == ('y', 'x').
 
     Example
     -------
