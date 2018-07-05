@@ -9,6 +9,6 @@ dependencies:
   - python>=3.6
   - numpy
   - xarray>=0.10
-  - pandas
+  - pandas=0.23.0
   - dask
   - rasterio>=1.0a12
