@@ -1,6 +1,4 @@
 import numpy as np
-from rasterio.transform import Affine as rasterio_Affine
-from rasterio.transform import array_bounds
 from struct import unpack, pack
 from collections import OrderedDict
 import pandas as pd
@@ -9,6 +7,7 @@ from dask import array
 from glob import glob
 from pathlib import Path
 from datetime import datetime
+from affine import Affine
 import imod
 from imod import util
 
@@ -81,6 +80,30 @@ def _to_nan(a, attrs):
         isnodata = np.isclose(a, nodata)
         a[isnodata] = np.nan
         return a, attrs
+
+
+def _get_reference(a):
+    """Extract spatial reference from DataArray coordinates."""
+    x = a.x.values
+    y = a.y.values
+    ncol = x.size
+    nrow = y.size
+    dxs = np.diff(x)
+    dys = np.diff(y)
+    dx = dxs[0]
+    dy = dys[0]
+    assert np.allclose(dxs, dx, atol=1.e-8), "DataArray has to be equidistant along x." 
+    assert np.allclose(dys, dy, atol=1.e-8), "DataArray has to be equidistant along y." 
+    xmin = x.min() - 0.5 * abs(dx) # as xarray used midpoint coordinates
+    ymax = y.max() + 0.5 * abs(dy)
+    xmax = xmin + ncol * abs(dx)
+    ymin = ymax - nrow * abs(dy)
+    return dx, xmin, xmax, dy, ymin, ymax
+
+
+def transform(a):
+    dx, xmin, xmax, dy, ymin, ymax = _get_reference(a)
+    return Affine(dx, 0.0, xmin, 0.0, dy, ymax)
 
 
 def memmap(path):
@@ -454,8 +477,7 @@ def write(path, a):
     path : str or Path
         Path to the IDF file to be written
     a : xarray.DataArray
-        DataArray to be written. It needs to have exactly a.dims == ('y', 'x'),
-        and several required keys in a.attrs: 'transform', 'res'.
+        DataArray to be written. It needs to have exactly a.dims == ('y', 'x').
     """
     assert a.dims == ("y", "x")
     with open(path, "wb") as f:
@@ -468,9 +490,15 @@ def write(path, a):
                isinstance(attrs.get("bot", None), (int, float)))
         f.write(pack("i", ncol))
         f.write(pack("i", nrow))
-        # the attribute is simply a 9 tuple
-        transform = rasterio_Affine(*attrs["transform"][:6])
-        xmin, ymin, xmax, ymax = array_bounds(nrow, ncol, transform)
+        # IDF supports only incrementing x, and decrementing y 
+        dx, xmin, xmax, dy, ymin, ymax = _get_reference(a)
+        if dy > 0.0:
+            a.values = np.flip(a.values, axis=0)
+        if dx < 0.0:
+            a.values = np.flip(a.values, axis=1)
+        dx = abs(dx)
+        dy = abs(dy)
+
         f.write(pack("f", xmin))
         f.write(pack("f", xmax))
         f.write(pack("f", ymin))
@@ -482,8 +510,8 @@ def write(path, a):
         f.write(pack("?", itb))
         f.write(pack("?", False))  # ivf
         f.write(pack("x"))  # not used
-        f.write(pack("f", attrs["res"][0]))
-        f.write(pack("f", attrs["res"][1]))
+        f.write(pack("f", dx))
+        f.write(pack("f", dy))
         if itb:
             f.write(pack("f", attrs["top"]))
             f.write(pack("f", attrs["bot"]))
