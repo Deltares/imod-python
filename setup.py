@@ -8,7 +8,7 @@ setup(
     version="0.2.0",
     description="Work with iMOD MODFLOW models",
     long_description=long_description,
-    url="https://gitlab.com/visr/imod-python",
+    url="https://gitlab.com/deltares/imod-python",
     author="Martijn Visser",
     author_email="mgvisser@gmail.com",
     license="MIT",
