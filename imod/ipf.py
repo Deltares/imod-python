@@ -1,4 +1,3 @@
-import csv
 import pandas as pd
 from imod import util
 from glob import glob
@@ -52,7 +51,9 @@ def write(path, df):
         f.write("{}\n{}\n".format(nrecords, nfields))
         [f.write("{}\n".format(colname)) for colname in df.columns]
         f.write("0,TXT\n")
-        df.to_csv(f, index=False, header=False)
+    # workaround pandas issue by closing the file first, see
+    # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
+    df.to_csv(path, index=False, header=False, mode="a")
 
 
 def save(path, df):
