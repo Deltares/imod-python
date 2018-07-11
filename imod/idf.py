@@ -454,22 +454,29 @@ def save(path, a):
     d["extension"] = ".idf"
     d["directory"].mkdir(exist_ok=True, parents=True)
 
-    if "time" in a.coords:
-        # TODO implement (not much different than layer)
-        raise NotImplementedError("Writing time dependent IDFs not yet implemented")
-    if "layer" in a.coords:
-        if "layer" in a.dims:
-            for layer, a2d in a.groupby("layer"):
-                d["layer"] = layer
-                fn = util.compose(d)
-                write(fn, a2d)
-        else:
-            d["layer"] = int(a.coords["layer"])
-            fn = util.compose(d)
-            write(fn, a)
-    else:
+    # handle the case where they are not a dim but are a coord
+    # i.e. you only have one layer but you did a.assign_coords(layer=1)
+    # in this case we do want _l1 in the IDF file name
+    check_coords = ["layer", "time"]
+    for coord in check_coords:
+        if (coord in a.coords) and not (coord in a.dims):
+            d[coord] = a.coords[coord].item()
+
+    # stack all non idf dims into one new idf dimension,
+    # over which we can then iterate to write all individual idfs
+    extradims = _extra_dims(a)
+    stacked = a.stack(idf=extradims)
+
+    for coordvals, a_yx in list(stacked.groupby("idf")):
+        # set the right layer/timestep/etc in the dict to make the filename
+        d.update(dict(zip(extradims, coordvals)))
         fn = util.compose(d)
-        write(fn, a)
+        write(fn, a_yx)
+
+
+def _extra_dims(a):
+    dims = filter(lambda dim : dim not in ("y", "x"), a.dims)
+    return list(dims)
 
 
 def write(path, a):
