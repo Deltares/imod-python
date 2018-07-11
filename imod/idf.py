@@ -465,13 +465,17 @@ def save(path, a):
     # stack all non idf dims into one new idf dimension,
     # over which we can then iterate to write all individual idfs
     extradims = _extra_dims(a)
-    stacked = a.stack(idf=extradims)
-
-    for coordvals, a_yx in list(stacked.groupby("idf")):
-        # set the right layer/timestep/etc in the dict to make the filename
-        d.update(dict(zip(extradims, coordvals)))
+    if extradims:
+        stacked = a.stack(idf=extradims)
+        for coordvals, a_yx in list(stacked.groupby("idf")):
+            # set the right layer/timestep/etc in the dict to make the filename
+            d.update(dict(zip(extradims, coordvals)))
+            fn = util.compose(d)
+            write(fn, a_yx)
+    else:
+        # no extra dims, only one IDF
         fn = util.compose(d)
-        write(fn, a_yx)
+        write(fn, a)
 
 
 def _extra_dims(a):
