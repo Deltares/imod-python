@@ -3,6 +3,7 @@ from datetime import datetime
 import numpy as np
 from collections import OrderedDict
 from pathlib import Path
+from affine import Affine
 
 
 def decompose(path):
@@ -54,3 +55,52 @@ def compose(d):
         return d["directory"].joinpath(s)
     else:
         return s
+
+
+def spatial_reference(a):
+    """
+    Extracts spatial reference from DataArray.
+
+    Parameters
+    ----------
+    a : xarray.DataArray
+
+    Returns
+    --------------
+    tuple 
+        (dx, xmin, xmax, dy, ymin, ymax)
+
+    """
+    x = a.x.values
+    y = a.y.values
+    ncol = x.size
+    nrow = y.size
+    dxs = np.diff(x)
+    dys = np.diff(y)
+    dx = dxs[0]
+    dy = dys[0]
+    assert np.allclose(dxs, dx, atol=1.e-8), "DataArray has to be equidistant along x." 
+    assert np.allclose(dys, dy, atol=1.e-8), "DataArray has to be equidistant along y." 
+    xmin = x.min() - 0.5 * abs(dx) # as xarray used midpoint coordinates
+    ymax = y.max() + 0.5 * abs(dy)
+    xmax = xmin + ncol * abs(dx)
+    ymin = ymax - nrow * abs(dy)
+    return dx, xmin, xmax, dy, ymin, ymax
+
+
+def transform(a):
+    """
+    Extract the spatial reference information from the DataArray coordinates,
+    into an affine.Affine object for writing to e.g. rasterio supported formats.
+
+    Parameters
+    ----------
+    a : xarray.DataArray
+
+    Returns
+    -------
+    affine.Affine
+
+    """
+    dx, xmin, _, dy, _, ymax = spatial_reference(a)
+    return Affine(dx, 0.0, xmin, 0.0, dy, ymax)
