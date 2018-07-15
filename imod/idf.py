@@ -92,9 +92,9 @@ def _get_reference(a):
     dys = np.diff(y)
     dx = dxs[0]
     dy = dys[0]
-    assert np.allclose(dxs, dx, atol=1.e-8), "DataArray has to be equidistant along x." 
-    assert np.allclose(dys, dy, atol=1.e-8), "DataArray has to be equidistant along y." 
-    xmin = x.min() - 0.5 * abs(dx) # as xarray used midpoint coordinates
+    assert np.allclose(dxs, dx, atol=1.e-8), "DataArray has to be equidistant along x."
+    assert np.allclose(dys, dy, atol=1.e-8), "DataArray has to be equidistant along y."
+    xmin = x.min() - 0.5 * abs(dx)  # as xarray used midpoint coordinates
     ymax = y.max() + 0.5 * abs(dy)
     xmax = xmin + ncol * abs(dx)
     ymin = ymax - nrow * abs(dy)
@@ -479,7 +479,7 @@ def save(path, a):
 
 
 def _extra_dims(a):
-    dims = filter(lambda dim : dim not in ("y", "x"), a.dims)
+    dims = filter(lambda dim: dim not in ("y", "x"), a.dims)
     return list(dims)
 
 
@@ -500,11 +500,12 @@ def write(path, a):
         ncol = a.x.size
         nodata = np.nan
         attrs = a.attrs
-        itb = (isinstance(attrs.get("top", None), (int, float)) and 
-               isinstance(attrs.get("bot", None), (int, float)))
+        itb = isinstance(attrs.get("top", None), (int, float)) and isinstance(
+            attrs.get("bot", None), (int, float)
+        )
         f.write(pack("i", ncol))
         f.write(pack("i", nrow))
-        # IDF supports only incrementing x, and decrementing y 
+        # IDF supports only incrementing x, and decrementing y
         dx, xmin, xmax, dy, ymin, ymax = _get_reference(a)
         if dy > 0.0:
             a.values = np.flip(a.values, axis=0)
