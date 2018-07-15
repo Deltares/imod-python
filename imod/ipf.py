@@ -2,17 +2,69 @@ import pandas as pd
 from imod import util
 from glob import glob
 from pathlib import Path
+from collections import OrderedDict
+import numpy as np
 
-
-# TODO, check this implementation with the format specification in the iMOD manual
+# the simple CSV format IPF cannot be read like this, it is best to use pandas.read_csv
 def read(path):
     """Read an IPF file to a pandas.DataFrame"""
     with open(path) as f:
         nrow = int(f.readline().strip())
         ncol = int(f.readline().strip())
         colnames = [f.readline().strip().strip("'").strip('"') for _ in range(ncol)]
-        _ = f.readline()  # links to other files not handled
-        df = pd.read_csv(f, header=None, names=colnames, nrows=nrow)
+        indexcol, ext = map(str.strip, f.readline().split(","))
+        indexcol = int(indexcol) - 1  # convert to 0-based index
+        if indexcol > 0:
+            df = pd.read_csv(f, header=None, names=colnames, nrows=nrow)
+            s = df.iloc[:, indexcol]
+            for filename in s:
+                # TODO should we resolve relative paths to the working dir or the IPF?
+                # now it is relative to the working dir
+                path_assoc = filename + "." + ext
+                df_assoc = read_associated(path_assoc)
+                # TODO work out how to join
+        else:
+            df = pd.read_csv(f, header=None, names=colnames, nrows=nrow)
+    return df
+
+
+# TODO check if this also supports space separators like the iMOD manual 9.7.1
+# TODO allow passing kwargs to pandas.read_csv, like delim_whitespace=True
+# TODO check if it can infer the datetime formats
+def read_associated(path):
+    """Read a file that is associated from an IPF file"""
+    with open(path) as f:
+        nrow = int(f.readline().strip())
+        ncol, itype = map(int, map(str.strip, f.readline().split(",")))
+        na_values = OrderedDict()
+        for _ in range(ncol):
+            # TODO need to use csv parsing to handle "name, unit", -
+            colname, nodata = map(str.strip, f.readline().split(","))
+            colname = colname.strip("'").strip('"')
+            na_values[colname] = [nodata, "-"]  # - seems common enough to ignore
+        colnames = list(na_values.keys())
+        itype_kwargs = {}
+        if itype == 1:
+            # check if first column is time in in [yyyymmdd] or [yyyymmddhhmmss]
+            itype_kwargs["parse_dates"] = True  # this parses the index
+        elif itype in (2, 3):
+            # enforce first column is a float
+            itype_kwargs["dtype"] = {colnames[0]: np.float64}
+        elif itype == 4:
+            # enforce first 3 columns are float
+            itype_kwargs["dtype"] = {
+                colnames[0]: np.float64,
+                colnames[1]: np.float64,
+                colnames[2]: np.float64,
+            }
+        df = pd.read_csv(
+            f,
+            header=None,
+            names=colnames,
+            nrows=nrow,
+            na_values=na_values,
+            **itype_kwargs
+        )
     return df
 
 
