@@ -15,7 +15,16 @@ setup(
     packages=["imod"],
     test_suite="tests",
     python_requires=">=3.6",
-    install_requires=["numpy", "xarray", "pandas", "dask", "affine"],
+    install_requires=[
+        "numpy",
+        "xarray>=0.10",
+        "pandas",
+        "dask",
+        "cytoolz",  # optional dask dependency we need
+        "toolz",  # optional dask dependency we need
+        "affine",
+    ],
+    extras_require={"dev": ["pytest", "sphinx", "sphinx_rtd_theme"], "optional": ["rasterio>=1"]},
     classifiers=[
         # https://pypi.python.org/pypi?%3Aaction=list_classifiers
         "Development Status :: 3 - Alpha",
