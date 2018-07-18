@@ -1,12 +1,13 @@
-image: continuumio/miniconda3:latest
+image: python:3.6
+
+cache:
+  paths:
+    - .pip
 
 before_script:
-  - apt-get update -q -y
-  - apt-get install -y build-essential
-  - conda update -n base conda
-  - conda env create -f environment.yml
-  - source activate imod
-  - pip install -e .
+  - mkdir -p .pip
+  - pip install -U pip
+  - pip --cache-dir=.pip install -e .[dev,optional]
 
 tests:
   script:
@@ -16,7 +17,6 @@ tests:
 
 pages:
   script:
-  - conda install sphinx sphinx_rtd_theme
   - cd docs
   - make html
   - cd ..
