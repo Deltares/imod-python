@@ -11,7 +11,7 @@ before_script:
 tests:
   script:
     - cd tests
-    - python -m unittest -v
+    - python -m pytest --verbose
     - cd ..
 
 pages:
