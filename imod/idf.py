@@ -7,7 +7,6 @@ from dask import array
 from glob import glob
 from pathlib import Path
 from datetime import datetime
-from affine import Affine
 import imod
 from imod import util
 
@@ -80,34 +79,6 @@ def _to_nan(a, attrs):
         isnodata = np.isclose(a, nodata)
         a[isnodata] = np.nan
         return a, attrs
-
-
-def _get_reference(a):
-    """Extract spatial reference from DataArray coordinates."""
-    x = a.x.values
-    y = a.y.values
-    ncol = x.size
-    nrow = y.size
-    dxs = np.diff(x)
-    dys = np.diff(y)
-    dx = dxs[0]
-    dy = dys[0]
-    assert np.allclose(dxs, dx, atol=1.e-8), "DataArray has to be equidistant along x."
-    assert np.allclose(dys, dy, atol=1.e-8), "DataArray has to be equidistant along y."
-    xmin = x.min() - 0.5 * abs(dx)  # as xarray used midpoint coordinates
-    ymax = y.max() + 0.5 * abs(dy)
-    xmax = xmin + ncol * abs(dx)
-    ymin = ymax - nrow * abs(dy)
-    return dx, xmin, xmax, dy, ymin, ymax
-
-
-def transform(a):
-    """
-    Extract the spatial reference information from the DataArray coordinates,
-    into an Affine.affine object for writing to rasterio supported formats.
-    """
-    dx, xmin, xmax, dy, ymin, ymax = _get_reference(a)
-    return Affine(dx, 0.0, xmin, 0.0, dy, ymax)
 
 
 def memmap(path):
@@ -505,8 +476,8 @@ def write(path, a):
         )
         f.write(pack("i", ncol))
         f.write(pack("i", nrow))
-        # IDF supports only incrementing x, and decrementing y
-        dx, xmin, xmax, dy, ymin, ymax = _get_reference(a)
+        # IDF supports only incrementing x, and decrementing y 
+        dx, xmin, xmax, dy, ymin, ymax = util.spatial_reference(a)
         if dy > 0.0:
             a.values = np.flip(a.values, axis=0)
         if dx < 0.0:
