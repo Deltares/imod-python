@@ -200,13 +200,13 @@ def write_assoc(path, df, itype=1, nodata=np.nan):
     df.to_csv(path, index=False, header=False, mode="a", date_format="%Y%m%d%H%M%S")
 
 
-def write(path, df, indexcolumn=0):
+def write(path, df, indexcolumn=0, assoc_ext="txt"):
     """Write a pandas.DataFrame to an IPF file"""
     nrecords, nfields = df.shape
     with open(path, "w") as f:
         f.write("{}\n{}\n".format(nrecords, nfields))
         [f.write("{}\n".format(colname)) for colname in df.columns]
-        f.write("{},TXT\n".format(indexcolumn))
+        f.write("{},{}\n".format(indexcolumn, assoc_ext))
     # workaround pandas issue by closing the file first, see
     # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
     df.to_csv(path, index=False, header=False, mode="a")
@@ -253,7 +253,7 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata):
         agg_kwargs = OrderedDict([("x", "first"), ("y", "first"), ("id", "first")])
         agg_kwargs.update(ipf_columns)
         agg_df = grouped.agg(agg_kwargs)
-        write(path, agg_df, 3)
+        write(path, agg_df, 3, assoc_ext)
 
 
 def save(path, df, itype=None, assoc_ext="txt", nodata=np.nan):
