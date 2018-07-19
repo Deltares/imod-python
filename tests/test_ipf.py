@@ -1,8 +1,5 @@
 import os
-import shutil
-import unittest
 import pytest
-import filecmp
 from imod import ipf
 import numpy as np
 from collections import OrderedDict

@@ -1,5 +1,5 @@
 import pandas as pd
-import re
+import csv
 import numpy as np
 from collections import OrderedDict
 from glob import glob
@@ -23,8 +23,10 @@ def read(path, kwargs={}, assoc_kwargs={}):
         line = f.readline()
         # TODO: are space and comma the only allowed separators?
         try:
-            indexcol, ext = map(str.strip, line.split(","))
-        except ValueError:
+            # csv.reader parse one line
+            # this catches commas in quotes
+            indexcol, ext = map(str.strip, next(csv.reader([line])))
+        except ValueError:  # then try whitespace delimited
             indexcol, ext = map(str.strip, line.split())
 
         indexcol = int(indexcol)
@@ -66,8 +68,10 @@ def read_associated(path, kwargs={}):
         nrow = int(f.readline().strip())
         line = f.readline()
         try:
-            ncol, itype = map(int, map(str.strip, line.split(",")))
-        except ValueError:
+            # csv.reader parse one line
+            # this catches commas in quotes
+            ncol, itype = map(int, map(str.strip, next(csv.reader([line]))))
+        except ValueError:  # then try whitespace delimited
             ncol, itype = map(int, map(str.strip, line.split()))
         na_values = OrderedDict()
 
