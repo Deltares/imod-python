@@ -271,6 +271,7 @@ def test_save__assoc_itype1():
     assert Path("B2.txt").exists()
     df2 = ipf.load("save.ipf")
     df = df.sort_values(by="x")
+    df2.index = df.index
     df2 = df2.sort_values(by="x")
     pd.testing.assert_frame_equal(df, df2, check_like=True)
 
@@ -298,6 +299,7 @@ def test_save__assoc_itype2_():
     df2 = ipf.load("save.ipf")
     df = df.sort_values(by="x")
     df2 = df2.sort_values(by="x")
+    df2.index = df.index
     pd.testing.assert_frame_equal(df, df2, check_like=True)
 
     remove("save.ipf")
@@ -338,6 +340,7 @@ def test_save__assoc_itype1__layers():
     df2 = ipf.load("save_l*.ipf")
     df = df.sort_values(by="x")
     df2 = df2.sort_values(by="x")
+    df2.index = df.index
     pd.testing.assert_frame_equal(df, df2, check_like=True)
 
     remove("save_l1.ipf")
