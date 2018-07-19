@@ -11,10 +11,11 @@ import pandas as pd
 from pathlib import Path
 from glob import glob
 
+
 def remove(globpath):
     paths = glob(globpath)
     for p in paths:
-        try: 
+        try:
             os.remove(p)
         except FileNotFoundError:
             pass
@@ -64,7 +65,7 @@ def write_assoc_ipf(request):
             "X\n"
             "Y\n"
             "ID\n"
-            "3{delim}TXT\n"
+            "3{delim}txt\n"
             "100.0{delim}435.0{delim}A1000\n"
             "553.0{delim}143.0{delim}B2000\n"
         )
@@ -200,6 +201,7 @@ def test_write_assoc_itype1():
 
     remove("A1.txt")
 
+
 def test_write_assoc_itype2():
     df = pd.DataFrame.from_dict(
         {
@@ -268,6 +270,8 @@ def test_save__assoc_itype1():
     assert Path("A1.txt").exists()
     assert Path("B2.txt").exists()
     df2 = ipf.load("save.ipf")
+    df = df.sort_values(by="x")
+    df2 = df2.sort_values(by="x")
     pd.testing.assert_frame_equal(df, df2, check_like=True)
 
     remove("save.ipf")
@@ -292,8 +296,8 @@ def test_save__assoc_itype2_():
     assert Path("A1.txt").exists()
     assert Path("B2.txt").exists()
     df2 = ipf.load("save.ipf")
-    print(df)
-    print(df2)
+    df = df.sort_values(by="x")
+    df2 = df2.sort_values(by="x")
     pd.testing.assert_frame_equal(df, df2, check_like=True)
 
     remove("save.ipf")
@@ -332,6 +336,8 @@ def test_save__assoc_itype1__layers():
     assert Path("C3.txt").exists()
     assert Path("D4.txt").exists()
     df2 = ipf.load("save_l*.ipf")
+    df = df.sort_values(by="x")
+    df2 = df2.sort_values(by="x")
     pd.testing.assert_frame_equal(df, df2, check_like=True)
 
     remove("save_l1.ipf")
