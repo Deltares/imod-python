@@ -9,13 +9,15 @@ from collections import OrderedDict
 import xarray as xr
 import pandas as pd
 from pathlib import Path
+from glob import glob
 
-
-def remove(path):
-    try:
-        os.remove(path)
-    except FileNotFoundError:
-        pass
+def remove(globpath):
+    paths = glob(globpath)
+    for p in paths:
+        try: 
+            os.remove(p)
+        except FileNotFoundError:
+            pass
 
 
 @pytest.fixture(scope="module")
@@ -44,10 +46,7 @@ def write_basic_ipf(request):
     # Use global list to add to a list of paths
     # that were generated during testing?
     def teardown():
-        try:
-            shutil.rmtree("test_ipf_dir")
-        except:
-            pass
+        remove("*.ipf")
 
     request.addfinalizer(teardown)
     return _write_basic_ipf
@@ -87,17 +86,15 @@ def write_assoc_ipf(request):
             f.write(assoc_string)
 
     def teardown():
-        try:
-            shutil.rmtree("test_ipf_dir")
-        except:
-            pass
+        remove("*.ipf")
+        remove("*.txt")
 
     request.addfinalizer(teardown)
     return _write_assoc_ipf
 
 
 def test_load__comma(write_basic_ipf):
-    path = "test_ipf_dir/basic_comma.ipf"
+    path = "basic_comma.ipf"
     write_basic_ipf(path, ",")
     df = ipf.load(path)
     assert isinstance(df, pd.DataFrame)
@@ -108,7 +105,7 @@ def test_load__comma(write_basic_ipf):
 
 
 def test_load__space(write_basic_ipf):
-    path = "test_ipf_dir/basic_space.ipf"
+    path = "basic_space.ipf"
     write_basic_ipf(path, " ")
     df = ipf.load(path, {"delim_whitespace": True})
     assert isinstance(df, pd.DataFrame)
@@ -119,7 +116,7 @@ def test_load__space(write_basic_ipf):
 
 
 def test_load_associated__comma_comma(write_assoc_ipf):
-    path = "test_ipf_dir/assoc.ipf"
+    path = "assoc.ipf"
     write_assoc_ipf(path, ",", ",")
     df = ipf.load(path)
 
@@ -135,7 +132,7 @@ def test_load_associated__comma_comma(write_assoc_ipf):
 
 
 def test_load_associated__comma_space(write_assoc_ipf):
-    path = "test_ipf_dir/assoc.ipf"
+    path = "assoc.ipf"
     write_assoc_ipf(path, ",", " ")
     df = ipf.load(path, assoc_kwargs={"delim_whitespace": True})
 
@@ -151,7 +148,7 @@ def test_load_associated__comma_space(write_assoc_ipf):
 
 
 def test_load_associated__space_space(write_assoc_ipf):
-    path = "test_ipf_dir/assoc.ipf"
+    path = "assoc.ipf"
     write_assoc_ipf(path, " ", " ")
     df = ipf.load(
         path, kwargs={"delim_whitespace": True}, assoc_kwargs={"delim_whitespace": True}
@@ -169,7 +166,7 @@ def test_load_associated__space_space(write_assoc_ipf):
 
 
 def test_load_associated__space_comma(write_assoc_ipf):
-    path = "test_ipf_dir/assoc.ipf"
+    path = "assoc.ipf"
     write_assoc_ipf(path, " ", ",")
     df = ipf.load(path, kwargs={"delim_whitespace": True})
 
@@ -203,7 +200,6 @@ def test_write_assoc_itype1():
 
     remove("A1.txt")
 
-
 def test_write_assoc_itype2():
     df = pd.DataFrame.from_dict(
         {
@@ -228,7 +224,7 @@ def test_write():
         {
             "X": [100.0, 553.0],
             "Y": [435.0, 143.0],
-            "Z": [-32.3, -7.3],
+            "/": [-32.3, -7.3],
             "City of Holland": ["Amsterdam", "Den Bosch"],
         }
     )
