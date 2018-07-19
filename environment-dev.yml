@@ -11,3 +11,6 @@ dependencies:
   - pandas
   - dask
   - rasterio>=1
+  - pytest
+  - sphinx
+  - sphinx_rtd_theme
