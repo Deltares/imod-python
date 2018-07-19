@@ -56,9 +56,6 @@ def read_associated(path, kwargs={}):
     # TODO: passing on pandas.read_csv kwargs maybe not be enough?
     # since txt's don't have to be consistent within a single ipf ...
 
-    # avoid kwargs mutation
-    assoc_kwargs = kwargs.copy()
-
     # deal with e.g. incorrect capitalization
     if isinstance(path, str):
         path = Path(path)
@@ -85,7 +82,7 @@ def read_associated(path, kwargs={}):
         # Normally, this ought to work:
         # metadata = pd.read_csv(f, header=None, nrows=ncol).values
         # TODO: replace when bugfix is released
-        metadata = pd.read_csv(StringIO(lines), header=None, nrows=ncol, **assoc_kwargs)
+        metadata = pd.read_csv(StringIO(lines), header=None, nrows=ncol, **kwargs)
         # header description possibly includes nodata
         usecols = np.arange(ncol)[pd.notnull(metadata[0])]
         metadata = metadata.iloc[usecols, :]
@@ -110,7 +107,7 @@ def read_associated(path, kwargs={}):
                 colnames[2]: np.float64,
             }
 
-        assoc_kwargs.update(itype_kwargs)
+        itype_kwargs.update(kwargs)
 
         df = pd.read_csv(
             f,
@@ -119,7 +116,7 @@ def read_associated(path, kwargs={}):
             usecols=usecols,
             nrows=nrow,
             na_values=na_values,
-            **assoc_kwargs
+            **itype_kwargs
         )
     return df
 
@@ -181,7 +178,7 @@ def _coerce_itype(itype):
 def write_assoc(path, df, itype=1, nodata=np.nan):
     # TODO: default nodata value?
     itype = _coerce_itype(itype)
-    required_columns = {1: ["time"], 2: ["top"], 3: ["top"], 4: ["x", "y", "z"]}
+    required_columns = {1: ["time"], 2: ["top"], 3: ["top"], 4: ["x_offset", "y_offset", "z"]}
 
     # Ensure columns are in the right order for the itype
     colnames = [s.lower() for s in list(df)]
@@ -237,12 +234,8 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata):
         assert (
             grouped["y"].apply(_is_single_value).all()
         ), "column y contains more than one value per id"
-        if "layer" in colnames:
-            assert (
-                grouped["layer"].apply(_is_single_value).all()
-            ), "column layer contains more than one value per id"
-        # get columns that have only one value within a group, to save them in ipf also
 
+        # get columns that have only one value within a group, to save them in ipf also
         ipf_columns = [
             (colname, "first")
             for colname in colnames
