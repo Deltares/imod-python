@@ -450,7 +450,7 @@ def save(path, a):
 
 
 def _extra_dims(a):
-    dims = filter(lambda dim : dim not in ("y", "x"), a.dims)
+    dims = filter(lambda dim: dim not in ("y", "x"), a.dims)
     return list(dims)
 
 
@@ -471,8 +471,9 @@ def write(path, a):
         ncol = a.x.size
         nodata = np.nan
         attrs = a.attrs
-        itb = (isinstance(attrs.get("top", None), (int, float)) and 
-               isinstance(attrs.get("bot", None), (int, float)))
+        itb = isinstance(attrs.get("top", None), (int, float)) and isinstance(
+            attrs.get("bot", None), (int, float)
+        )
         f.write(pack("i", ncol))
         f.write(pack("i", nrow))
         # IDF supports only incrementing x, and decrementing y 
