@@ -5,7 +5,7 @@ with open("README.rst") as f:
 
 setup(
     name="imod",
-    version="0.2.0",
+    version="0.3.0",
     description="Work with iMOD MODFLOW models",
     long_description=long_description,
     url="https://gitlab.com/deltares/imod-python",
@@ -24,7 +24,10 @@ setup(
         "toolz",  # optional dask dependency we need
         "affine",
     ],
-    extras_require={"dev": ["pytest", "sphinx", "sphinx_rtd_theme"], "optional": ["rasterio>=1"]},
+    extras_require={
+        "dev": ["pytest", "sphinx", "sphinx_rtd_theme"],
+        "optional": ["rasterio>=1"],
+    },
     classifiers=[
         # https://pypi.python.org/pypi?%3Aaction=list_classifiers
         "Development Status :: 3 - Alpha",
