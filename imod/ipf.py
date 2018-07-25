@@ -21,7 +21,6 @@ def read(path, kwargs={}, assoc_kwargs={}):
         ncol = int(f.readline().strip())
         colnames = [f.readline().strip().strip("'").strip('"') for _ in range(ncol)]
         line = f.readline()
-        # TODO: are space and comma the only allowed separators?
         try:
             # csv.reader parse one line
             # this catches commas in quotes
@@ -35,8 +34,11 @@ def read(path, kwargs={}, assoc_kwargs={}):
             dfs = []
             for row in df.itertuples():
                 filename = row[indexcol]
-                # associate paths are relative to "mother" ipf
+                # associate paths are relative to the ipf
                 path_assoc = path.parent.joinpath(filename + "." + ext)
+                # Note that these kwargs handle all associated files, which might differ
+                # within an IPF. If this happens we could consider supporting a dict
+                # or function that maps assoc filenames to different kwargs.
                 df_assoc = read_associated(path_assoc, assoc_kwargs)
 
                 for name, value in zip(colnames, row[1:]):  # ignores df.index in row
@@ -49,12 +51,8 @@ def read(path, kwargs={}, assoc_kwargs={}):
     return df
 
 
-# TODO check if this also supports space separators like the iMOD manual 9.7.1
-# TODO check if it can infer the datetime formats
 def read_associated(path, kwargs={}):
     """Read a file that is associated from an IPF file"""
-    # TODO: passing on pandas.read_csv kwargs maybe not be enough?
-    # since txt's don't have to be consistent within a single ipf ...
 
     # deal with e.g. incorrect capitalization
     if isinstance(path, str):
@@ -88,12 +86,12 @@ def read_associated(path, kwargs={}):
         metadata = metadata.iloc[usecols, :]
 
         for colname, nodata in metadata.values:
-            na_values[colname] = [nodata, "-"]  # - seems common enough to ignore
+            na_values[colname] = [nodata, "-"]  # "-" seems common enough to ignore
 
         colnames = list(na_values.keys())
         itype_kwargs = {}
         if itype == 1:  # Timevariant information: timeseries
-            # check if first column is time in in [yyyymmdd] or [yyyymmddhhmmss]
+            # check if first column is time in [yyyymmdd] or [yyyymmddhhmmss]
             itype_kwargs["parse_dates"] = [0]  # this parses the first column
             itype_kwargs["infer_datetime_format"] = True
         elif itype in (2, 3):  # 1D borehole or Cone Penetration
@@ -125,14 +123,7 @@ def load(path, kwargs={}, assoc_kwargs={}):
     """Load one or more IPF files to a single pandas.DataFrame
     
     The different IPF files can be from different model layers,
-    but otherwise have to have identical columns"""
-    # TODO: there's no real necessity to force identical columns?
-    # pd.concatenate will just stuff everything together, with a lot of columns
-    # the user can then just correct.
-    # Because the IPF format mostly relies on column order, there is an
-    # extreme lack of consistency for ipf column names. Not supporting
-    # heterogeneous column names limits functionality regarding existing
-    # IPFs very strongly.
+    and don't need to all have identical columns"""
 
     # convert since for Path.glob non-relative patterns are unsupported
     if isinstance(path, Path):
@@ -151,11 +142,7 @@ def load(path, kwargs={}, assoc_kwargs={}):
             df["layer"] = layer
         dfs.append(df)
 
-    bigdf = pd.concat(dfs, ignore_index=True, sort=False)
-    # concat sorts the columns, restore original order, see pandas issue 4588
-    # TODO: Decide why reindex? This throws out columns of other dataframes that may
-    # not be present in the first dataframe. See todo comment above.
-    # bigdf = bigdf.reindex(dfs[0].columns, axis=1)
+    bigdf = pd.concat(dfs, ignore_index=True, sort=False)  # this sorts in pandas < 0.23
     return bigdf
 
 
@@ -176,9 +163,14 @@ def _coerce_itype(itype):
 
 
 def write_assoc(path, df, itype=1, nodata=np.nan):
-    # TODO: default nodata value?
+    # TODO: change default nodata value? see #11
     itype = _coerce_itype(itype)
-    required_columns = {1: ["time"], 2: ["top"], 3: ["top"], 4: ["x_offset", "y_offset", "z"]}
+    required_columns = {
+        1: ["time"],
+        2: ["top"],
+        3: ["top"],
+        4: ["x_offset", "y_offset", "z"],
+    }
 
     # Ensure columns are in the right order for the itype
     colnames = [s.lower() for s in list(df)]
