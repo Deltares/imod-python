@@ -169,11 +169,11 @@ def write_assoc(path, df, itype=1, nodata=np.nan):
         1: ["time"],
         2: ["top"],
         3: ["top"],
-        4: ["x_offset", "y_offset", "z"],
+        4: ["x_offset", "y_offset", "top"],
     }
 
     # Ensure columns are in the right order for the itype
-    colnames = [s.lower() for s in list(df)]
+    colnames = list(df)
     columnorder = []
     for colname in required_columns[itype]:
         assert colname in df.columns, "given itype requires column {}".format(colname)
@@ -214,7 +214,7 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata):
         write(path, df)
     else:
         itype = _coerce_itype(itype)
-        colnames = [s.lower() for s in list(df)]
+        colnames = list(df)
         for refname in ["x", "y", "id"]:
             assert refname in colnames, "given itype requires column {}".format(refname)
             colnames.remove(refname)
@@ -227,7 +227,7 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata):
             grouped["y"].apply(_is_single_value).all()
         ), "column y contains more than one value per id"
 
-        # get columns that have only one value within a group, to save them in ipf also
+        # get columns that have only one value within a group, to save them in ipf
         ipf_columns = [
             (colname, "first")
             for colname in colnames
@@ -236,7 +236,9 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata):
 
         for idcode, group in grouped:
             assoc_path = path.parent.joinpath(idcode + "." + assoc_ext)
-            write_assoc(assoc_path, group, itype, nodata)
+            selection = [colname for colname in colnames if colname not in ipf_columns]
+            out_df = group[selection]
+            write_assoc(assoc_path, out_df, itype, nodata)
 
         # ensures right order for x, y, id; so that also indexcolumn == 3
         agg_kwargs = OrderedDict([("x", "first"), ("y", "first"), ("id", "first")])
