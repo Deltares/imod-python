@@ -21,11 +21,16 @@ def decompose(path):
     d["name"] = name
     if len(parts) == 1:
         return d
+
+    # Try to get time from idf name, iMODFLOW can output two datetime formats
     try:
-        # TODO try pandas parse date?
         d["time"] = np.datetime64(datetime.strptime(parts[1], "%Y%m%d%H%M%S"))
     except ValueError:
-        pass  # no time in dict
+        try:
+            d["time"] = np.datetime64(datetime.strptime(parts[1], "%Y%m%d"))
+        except ValueError:
+            pass  # no time in dict
+
     # layer is always last
     p = re.compile(r"^l\d+$", re.IGNORECASE)
     if p.match(parts[-1]):
