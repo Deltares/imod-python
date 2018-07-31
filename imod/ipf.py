@@ -183,8 +183,12 @@ def write_assoc(path, df, itype=1, nodata=np.nan):
 
     nrecords, nfields = df.shape
     with open(path, "w") as f:
-        f.write("{}\n{},{}\n".format(nrecords, nfields, itype))
-        [f.write("{},{}\n".format(colname, nodata)) for colname in columnorder]
+        f.write("{}\n{},{}\n".format(nrecords, nfields, itype))        
+        for colname in columnorder:
+            if "," in colname:
+                colname='"'+colname+'"'
+            f.write("{},{}\n".format(colname, nodata))
+#        [f.write("{},{}\n".format(colname, nodata)) for colname in columnorder]
     # workaround pandas issue by closing the file first, see
     # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
 
@@ -198,7 +202,10 @@ def write(path, df, indexcolumn=0, assoc_ext="txt"):
     nrecords, nfields = df.shape
     with open(path, "w") as f:
         f.write("{}\n{}\n".format(nrecords, nfields))
-        [f.write("{}\n".format(colname)) for colname in df.columns]
+        for colname in df.columns:
+            if "," in colname:
+                colname='"'+colname+'"'
+            f.write("{}\n".format(colname))
         f.write("{},{}\n".format(indexcolumn, assoc_ext))
     # workaround pandas issue by closing the file first, see
     # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
