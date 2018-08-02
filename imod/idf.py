@@ -310,7 +310,7 @@ def _load_list(paths, chunks=None, memmap=False):
             # first create the layer dimension for each time
             das_layer = []
             s, e = 0, nlayer
-            for i in range(ntime):
+            for _ in range(ntime):
                 das_layer.append(xr.concat(das[s:e], dim="layer"))
                 s = e
                 e = s + nlayer
@@ -393,7 +393,7 @@ def loadset(globpath, chunks=None, memmap=False):
 
 
 # write DataArrays to IDF
-def save(path, a):
+def save(path, a, nodata=1.e20):
     """Write a xarray.DataArray to one or more IDF files
 
     If the DataArray only has `y` and `x` dimensions, a single IDF file is
@@ -454,7 +454,7 @@ def _extra_dims(a):
     return list(dims)
 
 
-def write(path, a):
+def write(path, a, nodata=1.e20):
     """Write a 2D xarray.DataArray to a IDF file
 
     Parameters
@@ -469,7 +469,6 @@ def write(path, a):
         f.write(pack("i", 1271))  # Lahey RecordLength Ident.
         nrow = a.y.size
         ncol = a.x.size
-        nodata = np.nan
         attrs = a.attrs
         itb = isinstance(attrs.get("top", None), (int, float)) and isinstance(
             attrs.get("bot", None), (int, float)
@@ -504,4 +503,5 @@ def write(path, a):
         # convert to a numpy.ndarray of float32
         if a.dtype != np.float32:
             a = a.astype(np.float32)
+        a = a.fillna(nodata)
         a.values.tofile(f)

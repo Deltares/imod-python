@@ -162,7 +162,7 @@ def _coerce_itype(itype):
     return itype
 
 
-def write_assoc(path, df, itype=1, nodata=np.nan):
+def write_assoc(path, df, itype=1, nodata=1.e20):
     # TODO: change default nodata value? see #11
     itype = _coerce_itype(itype)
     required_columns = {
@@ -188,7 +188,6 @@ def write_assoc(path, df, itype=1, nodata=np.nan):
             if "," in colname:
                 colname='"'+colname+'"'
             f.write("{},{}\n".format(colname, nodata))
-#        [f.write("{},{}\n".format(colname, nodata)) for colname in columnorder]
     # workaround pandas issue by closing the file first, see
     # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
 
@@ -216,7 +215,7 @@ def _is_single_value(group):
     return len(pd.unique(group)) == 1
 
 
-def _compose_ipf(path, df, itype, assoc_ext, nodata):
+def _compose_ipf(path, df, itype, assoc_ext, nodata=1.e20):
     if itype is None:
         write(path, df)
     else:
@@ -254,7 +253,7 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata):
         write(path, agg_df, 3, assoc_ext)
 
 
-def save(path, df, itype=None, assoc_ext="txt", nodata=np.nan):
+def save(path, df, itype=None, assoc_ext="txt", nodata=1.e20):
     """Save a pandas.DataFrame to one or more IPF files, split per layer"""
     d = util.decompose(path)
     d["extension"] = ".ipf"
