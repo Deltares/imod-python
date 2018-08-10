@@ -26,7 +26,7 @@ def read(path, kwargs={}, assoc_kwargs={}):
             # this catches commas in quotes
             indexcol, ext = map(str.strip, next(csv.reader([line])))
         except ValueError:  # then try whitespace delimited
-            indexcol, ext = map(str.strip, line.split())
+            indexcol, ext = map(str.strip, next(csv.reader([line], delimiter=" ")))
 
         indexcol = int(indexcol)
         if indexcol > 1:
@@ -67,7 +67,9 @@ def read_associated(path, kwargs={}):
             # this catches commas in quotes
             ncol, itype = map(int, map(str.strip, next(csv.reader([line]))))
         except ValueError:  # then try whitespace delimited
-            ncol, itype = map(int, map(str.strip, line.split()))
+            ncol, itype = map(
+                int, map(str.strip, next(csv.reader([line], delimiter=" ")))
+            )
         na_values = OrderedDict()
 
         # use pandas for csv parsing: stuff like commas within quotes
@@ -94,9 +96,12 @@ def read_associated(path, kwargs={}):
             # check if first column is time in [yyyymmdd] or [yyyymmddhhmmss]
             itype_kwargs["parse_dates"] = [0]  # this parses the first column
             itype_kwargs["infer_datetime_format"] = True
-        elif itype in (2, 3):  # 1D borehole or Cone Penetration
+        elif itype == 2:  # 1D borehole
             # enforce first column is a float
             itype_kwargs["dtype"] = {colnames[0]: np.float64}
+        elif itype == 3:  # cpt
+            # all columns must be numeric
+            itype_kwargs["dtype"] = {colname: np.float64 for colname in colnames}
         elif itype == 4:  # 3D borehole
             # enforce first 3 columns are float
             itype_kwargs["dtype"] = {
@@ -183,10 +188,10 @@ def write_assoc(path, df, itype=1, nodata=1.e20):
 
     nrecords, nfields = df.shape
     with open(path, "w") as f:
-        f.write("{}\n{},{}\n".format(nrecords, nfields, itype))        
+        f.write("{}\n{},{}\n".format(nrecords, nfields, itype))
         for colname in columnorder:
             if "," in colname:
-                colname='"'+colname+'"'
+                colname = '"' + colname + '"'
             f.write("{},{}\n".format(colname, nodata))
     # workaround pandas issue by closing the file first, see
     # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
@@ -203,7 +208,7 @@ def write(path, df, indexcolumn=0, assoc_ext="txt"):
         f.write("{}\n{}\n".format(nrecords, nfields))
         for colname in df.columns:
             if "," in colname:
-                colname='"'+colname+'"'
+                colname = '"' + colname + '"'
             f.write("{}\n".format(colname))
         f.write("{},{}\n".format(indexcolumn, assoc_ext))
     # workaround pandas issue by closing the file first, see
