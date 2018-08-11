@@ -193,7 +193,7 @@ def test_reproject_resample(write_tif):
     write_tif("basic.tif", epsg=28992)
     da = xr.open_rasterio("basic.tif").squeeze("band")
 
-    dst_crs = "+init=EPSG:32631"
+    dst_crs = {"init":"EPSG:32631"}
     data = np.empty((10, 16))
     coords = {
         "y": np.linspace(5313578.75, 5313574.25, 10),
@@ -227,7 +227,7 @@ def test_reproject_resample(write_tif):
 def test_reproject_rotation__via_kwargs(write_tif):
     """Reprojection from EPSG:28992 to EPSG:32631, by specifying kwarg"""
     write_tif("rotated.tif", epsg=28992, rotation_angle=45.0)
-    dst_crs = "+init=EPSG:32631"
+    dst_crs = {"init":"EPSG:32631"}
     da = xr.open_rasterio("rotated.tif").squeeze("band")
     src_transform = Affine.rotation(45.0)
     newda = imod.rasterio.resample(
