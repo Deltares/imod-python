@@ -115,18 +115,23 @@ def load(path, variables=None, times=None):
     Examples
     --------
     Load contents into an xarray dataset:
+
     >>> ds = load(path)
 
     Load only head and conc data:
+
     >>> ds = load(path, ['head','conc'])
 
     Load only vx data for the first and last timestep:
+
     >>> ds = load(path, 'vx', times=[0,-1])
 
     For the first 20 timesteps, once every four steps:
+
     >>> ds = load(path, 'vx', times=slice(0, 20, 4))
 
     Or for every tenth timestep:
+    
     >>> ds = load(path, 'vx', times=slice(None, None, 10))
 
     See also the documentation for `slice()`.
