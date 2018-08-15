@@ -106,9 +106,9 @@ def resample(
     * To only reproject: provide only `src_crs` and `src_crs`.
     * To reproject and resample to a specific domain: provide `src_crs`, `src_crs`, and `like`.
     
-    Note: when only `like` is provided, Cartesian (projected) coordinates are assumed for resampling. 
+    Note: when only `like` is provided, Cartesian (projected) coordinates are assumed for resampling.
     In case of non-Cartesian coordinates, specify `src_crs` and `dst_crs` for correct resampling.
-    	
+
     Parameters
     ----------
     source: xarray DataArray
@@ -202,30 +202,21 @@ def resample(
         src_crs = rasterio.crs.CRS.from_string(source.attrs["crs"])
         reproject_kwargs["src_nodata"] = source.attrs["nodatavals"][0]
 
-    resampling_methods = {
-        "nearest": Resampling.nearest,
-        "bilinear": Resampling.bilinear,
-        "cubic": Resampling.cubic,
-        "cubic_spline": Resampling.cubic_spline,
-        "lanczos": Resampling.lanczos,
-        "average": Resampling.average,
-        "mode": Resampling.mode,
-        "gauss": Resampling.gauss,
-        "max": Resampling.max,
-        "min": Resampling.min,
-        "med ": Resampling.med,
-        "q1": Resampling.q1,
-        "q3": Resampling.q3,
-    }
+    resampling_methods = {e.name: e for e in Resampling}
 
-    try:
-        resampling_method = resampling_methods[method]
-    except KeyError as e:
-        raise ValueError(
-            "Invalid resampling method. Available methods are: {}".format(
-                resampling_methods.keys()
-            )
-        ) from e
+    if isinstance(method, str):
+        try:
+            resampling_method = resampling_methods[method]
+        except KeyError as e:
+            raise ValueError(
+                "Invalid resampling method. Available methods are: {}".format(
+                    resampling_methods.keys()
+                )
+            ) from e
+    elif isinstance(method, Resampling):
+        resampling_method = method
+    else:
+        raise TypeError("method must be a string or rasterio.warp.Resampling")
 
     # Givens: source, like, method. No reprojection necessary.
     if src_crs is None and dst_crs is None:
@@ -233,7 +224,7 @@ def resample(
             raise ValueError(
                 "If crs information is not provided, `like` must be provided."
             )
-        if method == "nearest":
+        if resampling_method == Resampling.nearest:
             # this can be handled with xarray
             return source.reindex_like(like, method="nearest")
         else:
