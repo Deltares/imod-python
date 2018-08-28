@@ -80,21 +80,30 @@ def spatial_reference(a):
     y = a.y.values
     ncol = x.size
     nrow = y.size
-    dxs = np.diff(x)
-    dys = np.diff(y)
-    dx = dxs[0]
-    dy = dys[0]
+    
+    # TODO: decide on decent criterium for what equidistant means
+    # make use of floating point epsilon? E.g:
+    # https://github.com/ioam/holoviews/issues/1869#issuecomment-353115449
+    if ncol == 1:
+        dx = 1.0
+    else:
+        dxs = np.diff(x)
+        dx = dxs[0]
+        atolx = abs(1.0e-6 * dx)
+        assert np.allclose(dxs, dx, atolx), "DataArray has to be equidistant along x."
+
+    if nrow == 1:
+        dy = 1.0
+    else:
+        dys = np.diff(y)
+        dy = dys[0]
+        atoly = abs(1.0e-6 * dy)
+        assert np.allclose(dys, dy, atoly), "DataArray has to be equidistant along y."
+        
     xmin = x.min() - 0.5 * abs(dx) # as xarray used midpoint coordinates
     ymax = y.max() + 0.5 * abs(dy)
     xmax = xmin + ncol * abs(dx)
     ymin = ymax - nrow * abs(dy)
-    # TODO: decide on decent criterium for what equidistant means
-    # make use of floating point epsilon? E.g:
-    # https://github.com/ioam/holoviews/issues/1869#issuecomment-353115449
-    atolx = abs(1.0e-6 * dx)
-    atoly = abs(1.0e-6 * dy)
-    assert np.allclose(dxs, dx, atolx), "DataArray has to be equidistant along x."
-    assert np.allclose(dys, dy, atoly), "DataArray has to be equidistant along y."
     return dx, xmin, xmax, dy, ymin, ymax
 
 
