@@ -431,7 +431,13 @@ def save(path, a, nodata=1.e20):
     check_coords = ["layer", "time"]
     for coord in check_coords:
         if (coord in a.coords) and not (coord in a.dims):
-            d[coord] = a.coords[coord].item()
+            if coord == "time":
+                # .item() gives an integer, we need a pd.Timestamp or datetime.datetime
+                dt64 = a.coords[coord].values
+                val = pd.Timestamp(dt64)
+            else:
+                val = a.coords[coord].item()
+            d[coord] = val
 
     # stack all non idf dims into one new idf dimension,
     # over which we can then iterate to write all individual idfs
