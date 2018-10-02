@@ -246,7 +246,8 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.e20):
         ]
 
         for idcode, group in grouped:
-            assoc_path = path.parent.joinpath(idcode + "." + assoc_ext)
+            assoc_path = path.parent.joinpath(str(idcode) + "." + str(assoc_ext))
+            assoc_path.parent.mkdir(parents=True, exist_ok=True)
             selection = [colname for colname in colnames if colname not in ipf_columns]
             out_df = group[selection]
             write_assoc(assoc_path, out_df, itype, nodata)
