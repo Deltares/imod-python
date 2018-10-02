@@ -190,7 +190,7 @@ def write_assoc(path, df, itype=1, nodata=1.e20):
     with open(path, "w") as f:
         f.write("{}\n{},{}\n".format(nrecords, nfields, itype))
         for colname in columnorder:
-            if "," in colname:
+            if "," in colname or " " in colname:
                 colname = '"' + colname + '"'
             f.write("{},{}\n".format(colname, nodata))
     # workaround pandas issue by closing the file first, see
@@ -207,7 +207,7 @@ def write(path, df, indexcolumn=0, assoc_ext="txt"):
     with open(path, "w") as f:
         f.write("{}\n{}\n".format(nrecords, nfields))
         for colname in df.columns:
-            if "," in colname:
+            if "," in colname or " " in colname:
                 colname = '"' + colname + '"'
             f.write("{}\n".format(colname))
         f.write("{},{}\n".format(indexcolumn, assoc_ext))
