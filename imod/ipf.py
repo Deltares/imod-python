@@ -198,7 +198,7 @@ def write_assoc(path, df, itype=1, nodata=1.e20):
 
     df = df.fillna(nodata)
     df = df[columnorder]
-    df.to_csv(path, index=False, header=False, mode="a", date_format="%Y%m%d%H%M%S")
+    df.to_csv(path, index=False, header=False, mode="a", date_format="%Y%m%d%H%M%S", quoting=csv.QUOTE_NONE)
 
 
 def write(path, df, indexcolumn=0, assoc_ext="txt"):
@@ -213,7 +213,7 @@ def write(path, df, indexcolumn=0, assoc_ext="txt"):
         f.write("{},{}\n".format(indexcolumn, assoc_ext))
     # workaround pandas issue by closing the file first, see
     # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
-    df.to_csv(path, index=False, header=False, mode="a")
+    df.to_csv(path, index=False, header=False, mode="a", quoting=csv.QUOTE_NONE)
 
 
 def _is_single_value(group):
@@ -256,6 +256,8 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.e20):
         agg_kwargs = OrderedDict([("x", "first"), ("y", "first"), ("id", "first")])
         agg_kwargs.update(ipf_columns)
         agg_df = grouped.agg(agg_kwargs)
+        # Quote so spaces don't mess up paths
+        agg_df["id"] = '"' + agg_df["id"] + '"'
         write(path, agg_df, 3, assoc_ext)
 
 
