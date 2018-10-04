@@ -226,7 +226,9 @@ def resample(
             )
         if resampling_method == Resampling.nearest:
             # this can be handled with xarray
-            return source.reindex_like(like, method="nearest")
+            # xarray 0.10.9 needs .compute()
+            # see https://github.com/pydata/xarray/issues/2454
+            return source.compute().reindex_like(like, method="nearest")
         else:
             # if no crs is defined, assume it should remain the same
             # in this case use UTM30, ESPG:32630, as a dummy value for GDAL
