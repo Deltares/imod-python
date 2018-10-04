@@ -1,4 +1,5 @@
 include README.rst
+include CHANGELOG.md
 include LICENSE
 include versioneer.py
 include imod/_version.py
