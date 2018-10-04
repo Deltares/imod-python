@@ -80,7 +80,7 @@ def spatial_reference(a):
     y = a.y.values
     ncol = x.size
     nrow = y.size
-    
+
     # TODO: decide on decent criterium for what equidistant means
     # make use of floating point epsilon? E.g:
     # https://github.com/ioam/holoviews/issues/1869#issuecomment-353115449

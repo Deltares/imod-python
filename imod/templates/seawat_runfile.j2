@@ -1,0 +1,235 @@
+{#
+# TODO:
+# For scalar values, the wildcards (e.g. "?") are quite useful. To keep the implementation general 
+# we could implement "?" as the layer or period key when a scalar is defined rather than a DataArray.
+# That way, a user can easily override the results of get_runfile, and replace the default for value 
+# for e.g. nstp by an OrderedDict containing the appropriate labels as keys.
+# Similarly, it's even possible to do "1:10" as a period or layer label! (since it doesn't get run
+# through the data extraction part of DataArrays)
+#}
+[gen]
+    modelname = {{modelname}}                          
+    writehelp = {{writehelp}} 
+    result_dir = {{modelname}} 
+    packages = dis, bas6, oc, lpf, pcg, btn, adv, gcg, vdf, dsp, ssm,{{" pksf," if pksf}} {{stress_periods.keys()|join(", ")}} 
+    coord_xll = {{xmin}}
+    coord_yll = {{ymin}}
+    {%- set date = time_discretisation.keys()|first %}
+    start_year = {{date[:4]}}
+    start_month = {{date[4:6]}}
+    start_day = {{date[6:8]}}
+    runtype = SEAWAT
+
+[dis]
+    nlay = {{nlay}}
+    nrow = {{nrow}}
+    ncol = {{ncol}}
+    delc_r? = {{dy}}
+    delr_c? = {{dx}}
+    top = {{packages["top"]["value"][1]}}
+    {%- for layer, path in packages["bot"]["value"].items() %}
+    botm_l{{layer}} = {{path}}
+    {%- endfor %}
+    nper = {{nper}}
+    {%- for period_duration in time_discretisation.values() %}
+    {%- set time_index = loop.index %}
+    perlen_p{{time_index}} = {{period_duration}}
+    {%- endfor %}
+    nstp_p? = {{nstp}}
+    sstr_p? = {{sstr}}
+    laycbd_l? = {{laycbd}}
+
+[bas6]
+    {%- for layer, path in packages["bnd"]["value"].items() %}
+    ibound_l{{layer}} = {{path}}
+    {%- endfor %}
+    hnoflo = {{hnoflo}}
+    {%- for layer, path in packages["shd"]["value"].items() %}
+    strt_l{{layer}} = {{path}}
+    {%- endfor %}
+
+[oc]
+    savehead_p?_l? = {{savehead}}   
+    saveconclayer_p?_l? = {{saveconclayer}}
+    savebudget_p?_l? = {{savebudget}}    
+    saveheadtec_p?_l? = {{saveheadtec}}   
+    saveconctec_p?_l? = {{saveconctec}} 
+    savevxtec_p?_l? = {{savevxtec}}    
+    savevytec_p?_l? = {{savevytec}}    
+    savevztec_p?_l? = {{savevztec}}
+
+[lpf]
+    ilpfcb = {{ilpfcb}}
+    hdry = {{hdry}}
+    nplpf = {{nplpf}}
+    laytyp_l? = {{laytyp}}
+    layavg_l? = {{layavg}} 
+    layvka_l? = {{layvka}}
+    chani_l? = {{chani}} 
+    {%- for layer, path in packages["khv"]["value"].items() %}
+    hk_l{{layer}} = {{path}}
+    {%- endfor -%}
+    {%- for layer, path in packages["kva"]["value"].items() %}
+    vka_l{{layer}} = {{path}}
+    {%- endfor -%}
+    {%- for layer, path in packages["sto"]["value"].items() %}
+    ss_l{{layer}} = {{path}}
+    {%- endfor %}
+
+[pcg]
+    mxiter = {{mxiter}}
+    iter1 = {{iter1}}
+    hclose = {{hclose}}
+    rclose = {{rclose}}
+    relax = {{relax}}
+    nbpol = {{nbpol}}
+    iprpcg = {{iprpcg}}
+    mutpcg  = {{mutpcg}}
+{% if pksf -%}
+[pksf]
+    mxiter = {{mxiterpks}}
+    innerit = {{inneritpks}} 
+    hclosepks = {{hclosepks}} 
+    rclosepks = {{rclosepks}}
+    npc = {{npc}} 
+    partopt = {{partopt}}
+    pressakey = {{pressakey}}
+{%- endif %}
+[btn]
+    ncomp = {{ncomp}}
+    {%- for layer, path in packages["thickness"]["value"].items() %}
+    dz_l{{layer}} = {{path}}
+    {%- endfor %}
+    {%- for layer, path in packages["icbund"]["value"].items() %}
+    icbund_l{{layer}} = {{path}}
+    {%- endfor %}
+    {%- for layer, path in packages["por"]["value"].items() %}
+    prsity_l{{layer}} = {{path}}
+    {%- endfor %}
+    {%- for layer, path in packages["sconc"]["value"].items() %}
+    sconc_l{{layer}} = {{path}}
+    {%- endfor %}    
+    cinact = {{cinact}}                          
+    thkmin = {{thkmin}}                          
+    nprs = {{nprs}}                             
+    ifmtcn = {{ifmtcn}}                             
+    chkmas = {{chkmas}}                          
+    nprmas = {{nprmas}}                            
+    nprobs = {{nprobs}}                             
+    tsmult_p? = {{tsmult}}                            
+    dt0_p? = {{dt0}}                            
+    mxstrn_p? = {{mxstrn}}                         
+    ttsmult_p? = {{ttsmult}}                            
+    ttsmax_p? = {{ttsmax}} 
+    
+[adv]
+    mixelm = {{mixelm}}        
+    percel = {{percel}}        
+    mxpart = {{mxpart}}  
+    itrack = {{itrack}}         
+    wd = {{wd}}           
+    dceps = {{dceps}}     
+    nplane = {{nplane}}         
+    npl = {{npl}}            
+    nph = {{nph}}            
+    npmin = {{npmin}}          
+    npmax = {{npmax}}         
+    interp = {{interp}}         
+    nlsink = {{nlsink}}         
+    npsink = {{npsink}}         
+    dchmoc = {{dchmoc}} 
+
+[gcg] 
+    mxiter = {{mt3d_mxiter}}
+    iter1 = {{mt3d_iter1}} 
+    isolve = {{mt3d_isolve}}
+
+[vdf]
+    mtdnconc = {{mtdnconc}} 
+    mfnadvfd = {{mfnadvfd}} 
+    nswtcpl = {{nswtcpl}} 
+    iwtable = {{iwtable}} 
+    densemin = {{densemin}}
+    densemax = {{densemax}} 
+    denseref = {{denseref}} 
+    denseslp = {{denseslp}} 
+
+[dsp]
+{%- for key, field in packages["dsp"].items() %}
+    {%- for layer, path in field.items() %}
+    {{key}}_l{{layer}} = {{path}}
+    {%- endfor %}
+    trpt_l? = {{trpt}}
+    trpv_l? = {{trpv}}
+    dmcoef_l? = {{dmcoef}}
+{%- endfor %}
+{% for package_name, package in stress_periods.items() %}
+[{{package_name}}]
+    {%- if package_name == "drn" %}
+    mxactd = {{mxactd}}
+    idrncb = {{idrncb}}
+    mdrnsys = {{stress_periods["drn"]["bot"].keys()|length}}
+    {%- set names = ["elevation", "cond"] %}
+    {%- endif %}
+    {%- if package_name == "chd" %}
+    mxactc = {{mxactc}}
+    mchdsys = {{stress_periods["chd"]["shead"].keys()|length}}
+    {%- set names = ["shead", "ehead"] %}
+    {%- endif %}
+    {%- if package_name == "ghb" %}
+    mxactb = {{mxactb}}
+    ighbcb = {{ighbcb}}
+    mghbsys = {{stress_periods["ghb"]["head"].keys()|length}}
+    {%- set names = ["bhead", "cond", "ghbssmdens"] %}
+    {%- endif %}
+    {%- if package_name == "riv" %}
+    mxactr = {{mxactr}}
+    irivcb = {{irivcb}}
+    mrivsys = {{stress_periods["riv"]["stage"].keys()|length}}
+    {%- set names = ["stage", "cond", "rbot", "rivssmdens"] %}
+    {%- endif %}
+    {%- if package_name == "rch" %}
+    nrchop = {{nrchop}}
+    irchcb = {{irchcb}}
+    {%- set names = ["rech"] %}
+    {%- endif %}
+    {%- if package_name == "wel" %}
+    mxactw = {{mxactw}}
+    iwelcb = {{iwelcb}}
+    mwelsys = {{stress_periods["wel"]["rate"].keys()|length}} 
+    {%- set names = ["wel"] %}
+    {%- endif %}
+    {%- for field in package.values() %}
+        {%- if not loop.last %}
+            {%- set field_index = loop.index0 %}
+            {%- set name = names[field_index] %}
+            {%- for period_name in time_discretisation.keys() %}
+                {%- set time_index = loop.index0 %}
+                {%- for system in field.values() %}
+                    {%- set system_index = loop.index %}
+                    {%- for layer, paths in system.items() %}
+    {{name}}_p{{time_index + 1}}_s{{system_index}}_l{{layer}} = {{paths[time_index]}}
+                    {%- endfor %}
+                {%- endfor %}
+            {%- endfor %}
+        {%- endif -%}
+    {%- endfor %}
+{% endfor %}
+[ssm]
+    mxss = {{mxss}}
+    {%- for key in stress_periods.keys() %}
+        {%- for period_name in time_discretisation.keys() %}
+            {%- set time_index = loop.index0 %}
+            {%- for system in stress_periods[key]["conc"].values() %}
+                {%- set system_index = loop.index %}
+                {%- for layer, paths in system.items() %}
+    c{{key}}_t{{system_index}}_p{{time_index + 1}}_l{{layer}} = {{paths[time_index]}}
+                {%- endfor %}
+            {%- endfor %}
+        {%- endfor %}
+    {%- endfor %}
+{#
+# TODO: species label are ignored right now, only ordering is taken into account.
+# Is is necessary to specify all species concentrations for all source/sink terms 
+# when multiple species are involved?
+#}

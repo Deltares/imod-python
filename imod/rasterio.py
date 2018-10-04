@@ -69,7 +69,7 @@ def write(path, da, driver=None, nodata=np.nan):
 
 def _reproject_dst(source, src_crs, dst_crs, src_transform):
     """
-    Prepares destination DataArray and DataArray for projection.
+    Prepares destination transform Affine and DataArray for projection.
     """
     src_height, src_width = source.y.size, source.x.size
     bounds = rasterio.transform.array_bounds(src_height, src_width, src_transform)
@@ -106,16 +106,18 @@ def resample(
     * To only reproject: provide only `src_crs` and `src_crs`.
     * To reproject and resample to a specific domain: provide `src_crs`, `src_crs`, and `like`.
     
-    Note: when only `like` is provided, Cartesian (projected) coordinates are assumed for resampling.
-    In case of non-Cartesian coordinates, specify `src_crs` and `dst_crs` for correct resampling.
+    Note: when only `like` is provided, Cartesian (projected) coordinates are a
+    ssumed for resampling. In case of non-Cartesian coordinates, specify 
+    `src_crs` and `dst_crs` for correct resampling.
 
     Parameters
     ----------
     source: xarray DataArray
-        The DataArray to be resampled and/or reprojected. Must contain dimensions `y` and `x`.
+        The DataArray to be resampled and/or reprojected. Must contain dimensions
+        `y` and `x`.
     like: xarray DataArray
-        Example DataArray that shows what the resampled result should look like in terms of coordinates.
-        Must contain dimensions `y` and `x`.
+        Example DataArray that shows what the resampled result should look like 
+        in terms of coordinates. Must contain dimensions `y` and `x`.
     src_crs: string, dict, rasterio.crs.CRS
         Coordinate system of `source`. Options:
 

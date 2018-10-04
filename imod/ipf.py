@@ -168,7 +168,6 @@ def _coerce_itype(itype):
 
 
 def write_assoc(path, df, itype=1, nodata=1.e20):
-    # TODO: change default nodata value? see #11
     itype = _coerce_itype(itype)
     required_columns = {
         1: ["time"],
@@ -227,7 +226,7 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.e20):
         itype = _coerce_itype(itype)
         colnames = list(df)
         for refname in ["x", "y", "id"]:
-            assert refname in colnames, "given itype requires column {}".format(refname)
+            assert refname in colnames, 'given itype requires column "{}"'.format(refname)
             colnames.remove(refname)
 
         grouped = df.groupby("id")

@@ -1,0 +1,45 @@
+{{modelname}}
+{{nlay}},{{nlay}},{{nper}},{{sdate}},{{nscl}},{{iconchk}},{{iipf}},{{iarmwp}}
+{{nmult}},{{idebug}},{{iexport}},{{iposwel}},{{iscen}}
+{{outer}},{{inner}},{{hclose}},{{qclose}},{{relax}}
+{{xmin}},{{ymin}},{{xmax}},{{ymax}},{{cellsize}},{{buffer}}
+ACTIVE MODULES
+{%- for package_name in packages.keys() %}
+    {%- if package_name in output.keys() %}
+1,{{output[package_name]|length}}, {{output[package_name]|join(",")}} ({{package_name}})
+    {%- else %}
+1,0, ({{package_name}})
+    {%- endif %}
+{%- endfor %}
+{%- for package_name in stress_periods.keys() %}
+    {%- if package_name in output.keys() %}
+1,{{output[package_name]|length}}, {{output[package_name]|join(",")}} ({{package_name}})
+    {%- else %}
+1,0, ({{package_name}})
+    {%- endif %}
+{%- endfor %}
+{{packages["bnd"]["value"][1]}}
+MODULES FOR EACH LAYER
+{%- for package_name, package_data in packages.items() %}
+{{package_data.values()|first|length}}, ({{package_name}})
+{%-     for field in package_data.values() %}
+{%-         for layer, path in field.items() %}
+{{layer}}, 1.0, 0.0, {{path}}
+{%-         endfor %}
+{%-     endfor %}
+{%- endfor %}
+PACKAGES FOR EACH LAYER AND STRESS-PERIOD
+{%- for period_name, period_duration in time_discretisation.items() %}
+{%- set time_index = loop.index0 %}
+{{loop.index}},{{period_duration}},{{period_name}},-1
+{%-     for package_name, package_data in stress_periods.items() %}
+{{(package_data.values()|first).values()|first|length * package_data.values()|first|length}}, ({{package_name}}) 
+{%-         for field in package_data.values() %}
+{%-             for system in field.values() %}
+{%-                 for layer, paths in system.items() %}
+{{layer}}, 1.0, 0.0, {{paths[time_index]}}
+{%-                 endfor %}
+{%-             endfor %}
+{%-         endfor %}
+{%-     endfor %}
+{%- endfor %}
