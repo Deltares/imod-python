@@ -1,11 +1,13 @@
 from setuptools import setup
+import versioneer
 
 with open("README.rst") as f:
     long_description = f.read()
 
 setup(
     name="imod",
-    version="0.3.0",
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     description="Work with iMOD MODFLOW models",
     long_description=long_description,
     url="https://gitlab.com/deltares/imod-python",
