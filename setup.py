@@ -25,9 +25,10 @@ setup(
         "cytoolz",  # optional dask dependency we need
         "toolz",  # optional dask dependency we need
         "affine",
+        "Jinja2",
     ],
     extras_require={
-        "dev": ["pytest", "sphinx", "sphinx_rtd_theme"],
+        "dev": ["pytest", "sphinx", "sphinx_rtd_theme", "nbstripout"],
         "optional": ["rasterio>=1"],
     },
     classifiers=[

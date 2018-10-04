@@ -4,6 +4,14 @@ imod package
 Submodules
 ----------
 
+imod module
+---------------
+
+.. automodule:: imod.__init__
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 imod.idf module
 ---------------
 
@@ -24,6 +32,14 @@ imod.rasterio module
 --------------------
 
 .. automodule:: imod.rasterio
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+imod.run module
+--------------------
+
+.. automodule:: imod.run
     :members:
     :undoc-members:
     :show-inheritance:

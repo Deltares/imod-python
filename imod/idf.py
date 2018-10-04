@@ -481,7 +481,7 @@ def write(path, a, nodata=1.e20):
         )
         f.write(pack("i", ncol))
         f.write(pack("i", nrow))
-        # IDF supports only incrementing x, and decrementing y 
+        # IDF supports only incrementing x, and decrementing y
         dx, xmin, xmax, dy, ymin, ymax = util.spatial_reference(a)
         if dy > 0.0:
             a.values = np.flip(a.values, axis=0)
