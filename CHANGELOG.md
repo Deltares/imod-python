@@ -16,4 +16,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - IPF column names are no longer lower cased
 ### Added
 - Support timestamps in filenames without hour/minute/second indication
+- Support creating iMODFLOW runfiles & models from a set of DataArrays and DataFrames, see `examples/iMODSEAWAT_HenryCase.ipynb`
 - `imod.rasterio.resample` function that uses rasterio to resample DataArrays
