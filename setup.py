@@ -15,6 +15,8 @@ setup(
     author_email="mgvisser@gmail.com",
     license="MIT",
     packages=["imod"],
+    package_dir={"imod": "imod"},
+    package_data={"imod": ["templates/*.j2"]},
     test_suite="tests",
     python_requires=">=3.6",
     install_requires=[
