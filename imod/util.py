@@ -19,17 +19,18 @@ def decompose(path):
     d["extension"] = path.suffix
     d["directory"] = path.parent
     d["name"] = name
-    if len(parts) == 1:
-        return d
 
     # Try to get time from idf name, iMODFLOW can output two datetime formats
-    try:
-        d["time"] = np.datetime64(datetime.strptime(parts[1], "%Y%m%d%H%M%S"))
-    except ValueError:
+    for s in parts:
         try:
-            d["time"] = np.datetime64(datetime.strptime(parts[1], "%Y%m%d"))
+            d["time"] = np.datetime64(datetime.strptime(s, "%Y%m%d%H%M%S"))
+            break
         except ValueError:
-            pass  # no time in dict
+            try:
+                d["time"] = np.datetime64(datetime.strptime(s, "%Y%m%d"))
+                break
+            except ValueError:
+                pass  # no time in dict
 
     # layer is always last
     p = re.compile(r"^l\d+$", re.IGNORECASE)
