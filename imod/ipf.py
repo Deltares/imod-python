@@ -1,17 +1,36 @@
-import pandas as pd
 import csv
-import numpy as np
 from collections import OrderedDict
 from glob import glob
 from io import StringIO
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
 from imod import util
+
 
 # Maybe look at dask dataframes, if we run into very large tabular datasets:
 # http://dask.pydata.org/en/latest/examples/dataframe-csv.html
 # the simple CSV format IPF cannot be read like this, it is best to use pandas.read_csv
 def read(path, kwargs={}, assoc_kwargs={}):
-    """Read an IPF file to a pandas.DataFrame"""
+    """
+    Load one IPF file to a single pandas.DataFrame, including associated (TXT) files.
+
+    Parameters
+    ----------
+    path: pathlib.Path or str
+        globpath for IPF files to load.
+    kwargs : dict
+        Dictionary containing the `pandas.read_csv()` keyword arguments for the
+        IPF files (e.g. `whitespace_delimited: True`)
+    assoc_kwargs: dict
+        Dictionary containing the `pandas.read_csv()` keyword arguments for the
+        associated (TXT) files (e.g. `whitespace_delimited: True`)
+
+    Returns
+    -------
+    pandas.DataFrame
+    """
 
     if isinstance(path, str):
         path = Path(path)
@@ -52,7 +71,21 @@ def read(path, kwargs={}, assoc_kwargs={}):
 
 
 def read_associated(path, kwargs={}):
-    """Read a file that is associated from an IPF file"""
+    """
+    Read an IPF associated file (TXT).
+
+    Parameters
+    ----------
+    path : pathlib.Path or str
+        Path to associated file.
+    kwargs : dict
+        Dictionary containing the `pandas.read_csv()` keyword arguments for the
+        associated (TXT) file (e.g. `whitespace_delimited: True`)
+
+    Returns
+    -------
+    pandas.DataFrame
+    """
 
     # deal with e.g. incorrect capitalization
     if isinstance(path, str):
@@ -119,16 +152,34 @@ def read_associated(path, kwargs={}):
             usecols=usecols,
             nrows=nrow,
             na_values=na_values,
-            **itype_kwargs
+            **itype_kwargs,
         )
     return df
 
 
 def load(path, kwargs={}, assoc_kwargs={}):
-    """Load one or more IPF files to a single pandas.DataFrame
-    
+    """
+    Load one or more IPF files to a single pandas.DataFrame, including associated
+    (TXT) files.
+
     The different IPF files can be from different model layers,
-    and don't need to all have identical columns"""
+    and column names may differ between them.
+
+    Parameters
+    ----------
+    path: pathlib.Path or str
+        globpath for IPF files to load.
+    kwargs : dict
+        Dictionary containing the `pandas.read_csv()` keyword arguments for the
+        IPF files (e.g. `whitespace_delimited: True`)
+    assoc_kwargs: dict
+        Dictionary containing the `pandas.read_csv()` keyword arguments for the
+        associated (TXT) files (e.g. `whitespace_delimited: True`)
+
+    Returns
+    -------
+    pandas.DataFrame
+    """
 
     # convert since for Path.glob non-relative patterns are unsupported
     if isinstance(path, Path):
@@ -152,6 +203,7 @@ def load(path, kwargs={}, assoc_kwargs={}):
 
 
 def _coerce_itype(itype):
+    """Changes string itype to int"""
     if itype in [None, 1, 2, 3, 4]:
         pass
     elif itype.lower() == "timeseries":
@@ -181,6 +233,33 @@ def _lower(colnames):
 
 
 def write_assoc(path, df, itype=1, nodata=1.e20):
+    """
+    Writes a single IPF associated (TXT) file.
+
+    Parameters
+    ----------
+    path : pathlib.Path or str
+        Path for the written associated file.
+    df : pandas.DataFrame
+        DataFrame containing the data to write.
+    itype : int or str
+        IPF type.
+        Possible values, either integer or string:
+            1 : "timeseries"
+            2 : "borehole1d"
+            3 : "cpt"
+            4 : "borehole3d"
+    nodata : float
+        The value given to nodata values. These are generally NaN (Not-a-Number)
+        in pandas, but this leads to errors in iMOD(FLOW) for IDFs.
+        Defaults to value of 1.0e20 instead.
+
+    Returns
+    -------
+    None
+        Writes a file.
+    """
+
     itype = _coerce_itype(itype)
     required_columns = {
         1: ["time"],
@@ -211,11 +290,40 @@ def write_assoc(path, df, itype=1, nodata=1.e20):
 
     df = df.fillna(nodata)
     df = df[columnorder]
-    df.to_csv(path, index=False, header=False, mode="a", date_format="%Y%m%d%H%M%S", quoting=csv.QUOTE_NONE)
+    df.to_csv(
+        path,
+        index=False,
+        header=False,
+        mode="a",
+        date_format="%Y%m%d%H%M%S",
+        quoting=csv.QUOTE_NONE,
+    )
 
 
 def write(path, df, indexcolumn=0, assoc_ext="txt"):
-    """Write a pandas.DataFrame to an IPF file"""
+    """
+    Writes a single IPF file.
+
+    Parameters
+    ----------
+    path : pathlib.Path or str
+        path of the written IPF file.
+        Any associated files are written relative to this path, based on the ID
+        column.
+    df : pandas.DataFrame
+        DataFrame containing the data to write.
+    indexcolumn : integer
+        number of the column containg the paths to the associated (TXT) files.
+        Defaults to a value of 0 (no associated files).
+    assoc_ext : str
+        Extension of the associated files. Defaults to "txt".
+
+    Returns
+    -------
+    None
+        Writes a file.
+    """
+
     nrecords, nfields = df.shape
     with open(path, "w") as f:
         f.write(f"{nrecords}\n{nfields}\n")
@@ -234,6 +342,38 @@ def _is_single_value(group):
 
 
 def _compose_ipf(path, df, itype, assoc_ext, nodata=1.e20):
+    """
+    When itype is not None, breaks down the pandas DataFrame into its IPF part
+    and its associated TXT files, creating the IPF data structure.
+
+    Parameters
+    ----------
+    path : pathlib.Path or str
+        path of the written IPF file.
+        Any associated files are written relative to this path, based on the ID
+        column.
+    df : pandas.DataFrame
+        DataFrame containing the data to write.
+    itype : int or str or None
+        If `None` no associated files are written.
+        Other possible values, either integer or string:
+        
+        * `1` or `"timeseries"`
+        * `2` or `"borehole1d"`
+        * `3` or `"cpt"`
+        * `4` or `"borehole3d"`
+    assoc_ext : str
+        Extension of the associated files. Normally ".txt".
+    nodata : float
+        The value given to nodata values. These are generally NaN (Not-a-Number)
+        in pandas, but this leads to errors in iMOD(FLOW) for IDFs.
+        Defaults to value of 1.0e20 instead.
+
+    Returns
+    -------
+    None
+        Writes files.
+    """
     if itype is None:
         write(path, df)
     else:
@@ -275,12 +415,50 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.e20):
 
 
 def save(path, df, itype=None, assoc_ext="txt", nodata=1.e20):
-    """Save a pandas.DataFrame to one or more IPF files, split per layer"""
+    """
+    Saves the contents of a pandas DataFrame to one or more IPF files, and
+    associated (TXT) files.
+
+    Can write multiple IPF files if one of the columns is named "layer".
+    In turn, multiple associated (TXT) files may written for each of these IPF
+    files.
+
+    Parameters
+    ----------
+    path : pathlib.Path or str
+        path of the written IPF file.
+        Any associated files are written relative to this path, based on the ID
+        column.
+    df : pandas.DataFrame
+        DataFrame containing the data to write.
+    itype : int or str or None
+        IPF type. Defaults to `None`, in which case no associated files are
+        created. Possible other values, either integer or string:
+        
+        * `1` or `"timeseries"`
+        * `2` or `"borehole1d"`
+        * `3` or `"cpt"`
+        * `4` or `"borehole3d"`
+    assoc_ext : str
+        Extension of the associated files. Defaults to "txt".
+    nodata : float
+        The value given to nodata values. These are generally NaN (Not-a-Number)
+        in pandas, but this leads to errors in iMOD(FLOW) for IDFs.
+        Defaults to value of 1.0e20 instead.
+
+    Returns
+    -------
+    None
+        Writes files.
+    """
+
     d = util.decompose(path)
     d["extension"] = ".ipf"
     d["directory"].mkdir(exist_ok=True, parents=True)
 
-    if "layer" in df.columns:
+    colnames = _lower(list(df))
+    df.columns = colnames
+    if "layer" in colnames:
         for layer, group in df.groupby("layer"):
             d["layer"] = layer
             fn = util.compose(d)

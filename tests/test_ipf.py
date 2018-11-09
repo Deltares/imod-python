@@ -244,7 +244,7 @@ def test_lower_dataframe_colnames__ValueError():
     """Non-unique column names after lowering"""
     colnames = ["X", "y", "ID", "id"]
     with pytest.raises(ValueError):
-        out = ipf._lower(colnames)
+        ipf._lower(colnames)
 
 
 def test_is_single_value():
