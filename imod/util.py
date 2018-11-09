@@ -63,6 +63,15 @@ def compose(d):
         return s
 
 
+def _delta(x, coordname):
+    dxs = np.diff(x)
+    dx = dxs[0]
+    atolx = abs(1.0e-6 * dx)
+    if not np.allclose(dxs, dx, atolx):
+        raise ValueError(f"DataArray has to be equidistant along {coordname}.")
+    return dx
+
+
 def spatial_reference(a):
     """
     Extracts spatial reference from DataArray.
@@ -85,22 +94,16 @@ def spatial_reference(a):
     # TODO: decide on decent criterium for what equidistant means
     # make use of floating point epsilon? E.g:
     # https://github.com/ioam/holoviews/issues/1869#issuecomment-353115449
+    # TODO: this is basically a work-around for iMOFLOW allowing only
+    # square gridcells, ideally 1D IDF have a width of 1.0 (?)
     if ncol == 1:
-        dx = 1.0
+        dx = dy = _delta(y, "y")
+    elif nrow == 1:
+        dy = dx = _delta(x, "x")
     else:
-        dxs = np.diff(x)
-        dx = dxs[0]
-        atolx = abs(1.0e-6 * dx)
-        assert np.allclose(dxs, dx, atolx), "DataArray has to be equidistant along x."
+        dx = _delta(x, "x")
+        dy = _delta(y, "y")
 
-    if nrow == 1:
-        dy = 1.0
-    else:
-        dys = np.diff(y)
-        dy = dys[0]
-        atoly = abs(1.0e-6 * dy)
-        assert np.allclose(dys, dy, atoly), "DataArray has to be equidistant along y."
-        
     xmin = x.min() - 0.5 * abs(dx) # as xarray used midpoint coordinates
     ymax = y.max() + 0.5 * abs(dy)
     xmax = xmin + ncol * abs(dx)
