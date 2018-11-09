@@ -137,7 +137,7 @@ def load(path, kwargs={}, assoc_kwargs={}):
     paths = [Path(p) for p in glob(path)]
     n = len(paths)
     if n == 0:
-        raise FileNotFoundError("Could not find any files matching {}".format(path))
+        raise FileNotFoundError(f"Could not find any files matching {path}")
 
     dfs = []
     for p in paths:
@@ -167,6 +167,19 @@ def _coerce_itype(itype):
     return itype
 
 
+def _lower(colnames):
+    """Lowers colnames, checking for uniqueness"""
+    lowered_colnames = [s.lower() for s in colnames]
+    if len(set(lowered_colnames)) != len(colnames):
+        seen = set()
+        for name in lowered_colnames:
+            if name in seen:
+                raise ValueError(f'Column name "{name}" is not unique, after lowering.')
+            else:
+                seen.add(name)
+    return lowered_colnames
+
+
 def write_assoc(path, df, itype=1, nodata=1.e20):
     itype = _coerce_itype(itype)
     required_columns = {
@@ -177,21 +190,22 @@ def write_assoc(path, df, itype=1, nodata=1.e20):
     }
 
     # Ensure columns are in the right order for the itype
-    colnames = list(df)
+    colnames = _lower(list(df))
+    df.columns = colnames
     columnorder = []
     for colname in required_columns[itype]:
-        assert colname in df.columns, "given itype requires column {}".format(colname)
+        assert colname in colnames, f'given itype requires column "{colname}"'
         colnames.remove(colname)
         columnorder.append(colname)
     columnorder += colnames
 
     nrecords, nfields = df.shape
     with open(path, "w") as f:
-        f.write("{}\n{},{}\n".format(nrecords, nfields, itype))
+        f.write(f"{nrecords}\n{nfields},{itype}\n")
         for colname in columnorder:
             if "," in colname or " " in colname:
                 colname = '"' + colname + '"'
-            f.write("{},{}\n".format(colname, nodata))
+            f.write(f"{colname},{nodata}\n")
     # workaround pandas issue by closing the file first, see
     # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
 
@@ -204,12 +218,12 @@ def write(path, df, indexcolumn=0, assoc_ext="txt"):
     """Write a pandas.DataFrame to an IPF file"""
     nrecords, nfields = df.shape
     with open(path, "w") as f:
-        f.write("{}\n{}\n".format(nrecords, nfields))
+        f.write(f"{nrecords}\n{nfields}\n")
         for colname in df.columns:
             if "," in colname or " " in colname:
                 colname = '"' + colname + '"'
-            f.write("{}\n".format(colname))
-        f.write("{},{}\n".format(indexcolumn, assoc_ext))
+            f.write(f"{colname}\n")
+        f.write(f"{indexcolumn},{assoc_ext}\n")
     # workaround pandas issue by closing the file first, see
     # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
     df.to_csv(path, index=False, header=False, mode="a", quoting=csv.QUOTE_NONE)
@@ -224,9 +238,10 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.e20):
         write(path, df)
     else:
         itype = _coerce_itype(itype)
-        colnames = list(df)
+        colnames = _lower(list(df))
+        df.columns = colnames
         for refname in ["x", "y", "id"]:
-            assert refname in colnames, 'given itype requires column "{}"'.format(refname)
+            assert refname in colnames, f'given itype requires column "{refname}"'
             colnames.remove(refname)
 
         grouped = df.groupby("id")
@@ -236,7 +251,6 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.e20):
         assert (
             grouped["y"].apply(_is_single_value).all()
         ), "column y contains more than one value per id"
-
         # get columns that have only one value within a group, to save them in ipf
         ipf_columns = [
             (colname, "first")

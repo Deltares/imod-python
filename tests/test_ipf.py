@@ -234,6 +234,19 @@ def test_write():
     remove("basic.ipf")
 
 
+def test_lower_dataframe_colnames():
+    colnames = ["X", "y", "iD"]
+    out = ipf._lower(colnames)
+    assert out == ["x", "y", "id"]
+
+
+def test_lower_dataframe_colnames__ValueError():
+    """Non-unique column names after lowering"""
+    colnames = ["X", "y", "ID", "id"]
+    with pytest.raises(ValueError):
+        out = ipf._lower(colnames)
+
+
 def test_is_single_value():
     df = pd.DataFrame(
         {
@@ -280,9 +293,9 @@ def test_save__assoc_itype1():
 def test_save__assoc_itype2_():
     df = pd.DataFrame.from_dict(
         {
-            "x": [1, 1, 2, 2],
-            "y": [3, 3, 4, 4],
-            "id": ["A1", "A1", "B2", "B2"],
+            "X": [1, 1, 2, 2],
+            "Y": [3, 3, 4, 4],
+            "ID": ["A1", "A1", "B2", "B2"],
             "litho": ["z", np.nan, "k", np.nan],
             "top": [0.0, -0.5, -0.3, -0.8],
             "location": ["loc1", "loc1", "loc2", "loc2"],
