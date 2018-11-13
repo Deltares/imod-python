@@ -97,6 +97,9 @@ venv.bak/
 .spyderproject
 .spyproject
 
+# VScode
+.vscode
+
 # PyCharm
 .idea
 
