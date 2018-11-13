@@ -19,19 +19,8 @@ Source code: https://gitlab.com/deltares/imod-python
 
    imod
 
-Getting started
-===============
-
-.. code:: python
-
-    import imod
-
-    df = imod.ipf.load('wells.ipf')
-    imod.ipf.save('wells-out.ipf', df)
-
-    # get all calculated heads in a xarray DataArray
-    # with dimensions time, layer, y, x
-    da = imod.idf.load('path/to/results/head_*.idf')
+.. include:: ../README.rst
+  :start-after: inclusion-marker
 
 Indices and tables
 ==================

@@ -5,15 +5,16 @@ Documentation: https://deltares.gitlab.io/imod-python/
 
 Source code: https://gitlab.com/deltares/imod-python
 
+.. inclusion-marker
+
 Getting started
 ===============
-
-In absence of actual documentation, here are some of the functions:
 
 .. code:: python
 
     import imod
 
+    # read and write IPF files to pandas DataFrame
     df = imod.ipf.load('wells.ipf')
     imod.ipf.save('wells-out.ipf', df)
 
@@ -21,38 +22,35 @@ In absence of actual documentation, here are some of the functions:
     # with dimensions time, layer, y, x
     da = imod.idf.load('path/to/results/head_*.idf')
 
-Notes
-=====
+Introduction
+============
 
--  The iMOD 4.1 release will crash on loading NaN nodata values. In
-   earlier and later releases this is not an issue.
+The imod Python package is an addition to iMOD and iMODFLOW, intended to facilitate
+working with groundwater models from Python. It does this by supporting reading and
+writing of the different iMOD file formats to existing objects often used in Python
+data processing.
 
-Implementation of ``imod.idf.load``
-===================================
+IDF - iMOD Data Format
+----------------------
+IDF is the binary raster format of iMOD. One file contains a X and Y 2 dimensional grid.
+Using a set of file name conventions more dimensions such as ``time`` and ``layer`` are
+added, for example: ``head_20181113_l3.idf`` for layer 3 and timestamp ``2018-11-13``.
+This package maps IDF files to and from the N dimensional labeled arrays of
+`xarray.DataArray <http://xarray.pydata.org/en/stable/data-structures.html#dataarray>`__,
+using :meth:`imod.idf.load` and :meth:`imod.idf.save`, or, to read multiple parameters
+at the same time, :meth:`imod.idf.loadset`.
 
-1. Do a ``glob`` search on all files matching the input path, e.g.
-   ``head_*.idf``
-2. For each IDF:
-3. Gather all metadata from filename and IDF header
-4. Load IDF array with ``np.memmap`` in ``r+`` mode.
-5. Set nodata to ``np.nan`` (changes input file, done to be compatible
-   with xarray)
-6. Load ``np.memmap`` into a ``dask.array``
-7. Combine metadata and ``dask.array`` into an ``xarray.DataArray``
-8. Combine the indivual ``DataArray``\ s into one, adding ``time`` and
-   ``layer`` dimensions as necessary.
+For more information on how to work with ``xarray.DataArray`` objects, we refer to the
+xarray documentation. Note that converting GIS raster formats to IDF is supported
+through `xarray.open_rasterio <http://xarray.pydata.org/en/stable/generated/xarray.open_rasterio.html#xarray.open_rasterio>`__,
+followed by :meth:`imod.idf.save`.
 
-With the current design, I'm not sure what the added benefit of using
-dask arrays is, and whether it should be removed. One possible benefit
-is that it is only possible to write to the ``DataArray`` after calling
-``.load()`` on it first, which in this case still doesn't load it into
-memory.
-
-We can also still explore using the ``c`` *copy on write* mode of
-``numpy.memmap``.
-
-Comment by xarray author Stephan Hoyer about using ``np.memmap`` on
-`GitHub <https://github.com/dask/dask/issues/1562#issuecomment-248681863>`__:
-
-    If it's already on disk in a memory-mappable format, it's very hard
-    to imagine beating np.memmap.
+IPF - iMOD Point File
+---------------------
+IPF files are text files used for storing tabular point data such as timeseries and
+borehole measurements. In the imod Python package these files are read in as
+`pandas.DataFrame <https://pandas.pydata.org/pandas-docs/stable/>`__. Pandas is a
+popular package that makes analysis and processing of tabular data easy, and provides
+many input and output options, which in turn enables us to convert for instance
+existing CSV or Excel files to IPF files. The primary functions for reading and writing
+IPF files are :meth:`imod.ipf.load` and :meth:`imod.ipf.save`.
