@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.2] - 2018-11-13
+### Fixed
+- Lower column names when writing IPF files
+### Changed
+- Forces dx = dy when nrow or ncol == 1, so iMODFLOW can run 2D models
+
 ## [0.4.1] - 2018-11-07
 ### Fixed
 - Include templates as package data for pip install
