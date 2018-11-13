@@ -245,10 +245,11 @@ def write_assoc(path, df, itype=1, nodata=1.e20):
     itype : int or str
         IPF type.
         Possible values, either integer or string:
-            1 : "timeseries"
-            2 : "borehole1d"
-            3 : "cpt"
-            4 : "borehole3d"
+
+        1 : "timeseries"
+        2 : "borehole1d"
+        3 : "cpt"
+        4 : "borehole3d"
     nodata : float
         The value given to nodata values. These are generally NaN (Not-a-Number)
         in pandas, but this leads to errors in iMOD(FLOW) for IDFs.

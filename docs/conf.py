@@ -14,6 +14,7 @@
 #
 # import os
 # import sys
+import imod
 # sys.path.insert(0, 'd:\code\py\imod\imod')
 
 
@@ -24,9 +25,9 @@ copyright = "2018, Martijn Visser"
 author = "Martijn Visser"
 
 # The short X.Y version
-version = "0.3"
+version = imod.__version__
 # The full version, including alpha/beta/rc tags
-release = "0.3.0"
+release = imod.__version__
 
 
 # -- General configuration ---------------------------------------------------
