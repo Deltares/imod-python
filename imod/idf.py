@@ -1,13 +1,14 @@
-import numpy as np
-from struct import unpack, pack
 from collections import OrderedDict
-import pandas as pd
-import xarray as xr
-from dask import array
+from datetime import datetime
 from glob import glob
 from pathlib import Path
-from datetime import datetime
+from struct import pack, unpack
+
 import imod
+import numpy as np
+import pandas as pd
+import xarray as xr
+from dask import array, delayed
 from imod import util
 
 
@@ -60,28 +61,19 @@ def setnodataheader(path, nodata):
         f.write(pack("f", nodata))
 
 
-def _pre_data_read(path):
-    # shared code for idf.read and idf.memmap
-    # currently asserts ieq = ivf = 0, and comments are not read
-    attrs = header(path)
-    headersize = attrs.pop("headersize")
-    return attrs, headersize
-
-
-def _to_nan(a, attrs):
+def _to_nan(a, nodata):
     """Change all nodata values in the array to NaN"""
     # it needs to be NaN for xarray to deal with it properly
     # no need to store the nodata value if it is always NaN
-    nodata = attrs.pop("nodata")
     if np.isnan(nodata):
-        return a, attrs
+        return a
     else:
         isnodata = np.isclose(a, nodata)
         a[isnodata] = np.nan
-        return a, attrs
+        return a
 
 
-def memmap(path):
+def memmap(path, headersize, nrow, ncol, nodata):
     """Make a memory map of a single IDF file
     
     Use idf.read if you don't want to modify the nodata values of the IDF,
@@ -102,19 +94,19 @@ def memmap(path):
     dict
         A dict with all metadata.
     """
-    attrs, headersize = _pre_data_read(path)
     a = np.memmap(
-        str(path), np.float32, "r+", headersize, (attrs["nrow"], attrs["ncol"])
+        str(path), np.float32, "r+", headersize, (nrow, ncol)
     )
 
     # only change the header if needed
-    if not np.isnan(attrs["nodata"]):
+    if not np.isnan(nodata):
         setnodataheader(path, np.nan)
 
-    return _to_nan(a, attrs)
+    return _to_nan(a, nodata)
 
 
-def read(path):
+@delayed
+def read(path, headersize, nrow, ncol, nodata):
     """Read a single IDF file to a numpy.ndarray
     
     Compared to idf.memmap, this does not modify the IDF.
@@ -133,14 +125,13 @@ def read(path):
     dict
         A dict with all metadata.
     """
-    attrs, headersize = _pre_data_read(path)
     with open(path, "rb") as f:
         f.seek(headersize)
         a = np.reshape(
-            np.fromfile(f, np.float32, attrs["nrow"] * attrs["ncol"]),
-            (attrs["nrow"], attrs["ncol"]),
+                np.fromfile(f, np.float32, nrow * ncol),
+                (nrow, ncol),
         )
-    return _to_nan(a, attrs)
+    return _to_nan(a, nodata)
 
 
 def dask(path, chunks=None, memmap=False):
@@ -165,14 +156,23 @@ def dask(path, chunks=None, memmap=False):
     dict
         A dict with all metadata.
     """
+    attrs = header(path)
+    # If we don't unpack, it seems we run into trouble with the dask array later
+    # on, probably because attrs isn't immutable. This works fine instead.
+    headersize = attrs.pop("headersize")
+    nrow = attrs["nrow"]
+    ncol = attrs["ncol"]
+    nodata = attrs.pop("nodata")
     if memmap:
-        a, attrs = imod.idf.memmap(path)
+        a = imod.idf.memmap(path, headersize, nrow, ncol, nodata)
+        x = array.from_array(a, chunks=chunks)
     else:
-        a, attrs = imod.idf.read(path)
+        a = imod.idf.read(path, headersize, nrow, ncol, nodata)
+        x = array.from_delayed(a, shape=(nrow, ncol), dtype=np.float32)
+        # TODO: investigate how to do chunks here
     # grab the whole array as one chunk
     if chunks is None:
         chunks = a.shape
-    x = array.from_array(a, chunks=chunks)
     return x, attrs
 
 
