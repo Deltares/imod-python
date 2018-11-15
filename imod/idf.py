@@ -134,15 +134,13 @@ def read(path, headersize, nrow, ncol, nodata):
     return _to_nan(a, nodata)
 
 
-def dask(path, chunks=None, memmap=False):
+def dask(path, memmap=False):
     """Read a single IDF file to a dask.array
     
     Parameters
     ----------
     path : str or Path
         Path to the IDF file to be read
-    chunks : int or tuple of int, optional
-        How to chunk the array. By default it creates only 1 chunk.
     memmap : bool, optional
         Whether to use a memory map to the file, or an in memory
         copy. Default is to use a memory map.
@@ -165,14 +163,10 @@ def dask(path, chunks=None, memmap=False):
     nodata = attrs.pop("nodata")
     if memmap:
         a = imod.idf.memmap(path, headersize, nrow, ncol, nodata)
-        x = array.from_array(a, chunks=chunks)
+        x = array.from_array(a, chunks=(nrow, ncol))
     else:
         a = imod.idf.read(path, headersize, nrow, ncol, nodata)
         x = array.from_delayed(a, shape=(nrow, ncol), dtype=np.float32)
-        # TODO: investigate how to do chunks here
-    # grab the whole array as one chunk
-    if chunks is None:
-        chunks = a.shape
     return x, attrs
 
 
@@ -220,7 +214,7 @@ def _dataarray_kwargs(path, attrs):
     return d
 
 
-def dataarray(path, chunks=None, memmap=False):
+def dataarray(path, memmap=False):
     """Read a single IDF file to a xarray.DataArray
     
     The function imod.idf.load is more general and can load multiple layers
@@ -230,8 +224,6 @@ def dataarray(path, chunks=None, memmap=False):
     ----------
     path : str or Path
         Path to the IDF file to be read
-    chunks : int or tuple of int, optional
-        How to chunk the array. By default it creates only 1 chunk.
     memmap : bool, optional
         Whether to use a memory map to the file, or an in memory
         copy. Default is to use a memory map.
@@ -243,13 +235,13 @@ def dataarray(path, chunks=None, memmap=False):
         All metadata needed for writing the file to IDF or other formats
         using imod.rasterio are included in the xarray.DataArray.attrs.
     """
-    x, attrs = dask(path, chunks=chunks, memmap=memmap)
+    x, attrs = dask(path, memmap=memmap)
     kwargs = _dataarray_kwargs(path, attrs)
     return xr.DataArray(x, **kwargs)
 
 
 # load IDFs for multiple times and/or layers into one DataArray
-def load(path, chunks=None, memmap=False):
+def load(path, memmap=False):
     """Read a parameter (one or more IDFs) to a xarray.DataArray
     
     Parameters
@@ -260,8 +252,6 @@ def load(path, chunks=None, memmap=False):
         Note that each file needs to be of the same name (part before the 
         first underscore) but have a different layer and/or timestamp,
         such that they can be combined in a single xarray.DataArray.
-    chunks : int or tuple of int, optional
-        How to chunk the array. By default it creates only 1 chunk.
     memmap : bool, optional
         Whether to use a memory map to the file, or an in memory
         copy. Default is to use a memory map.
@@ -274,7 +264,7 @@ def load(path, chunks=None, memmap=False):
         using imod.rasterio are included in the xarray.DataArray.attrs.
     """
     if isinstance(path, list):
-        return _load_list(path, chunks=chunks, memmap=memmap)
+        return _load_list(path, memmap=memmap)
     elif isinstance(path, Path):
         path = str(path)
 
@@ -283,14 +273,14 @@ def load(path, chunks=None, memmap=False):
     if n == 0:
         raise FileNotFoundError("Could not find any files matching {}".format(path))
     elif n == 1:
-        return dataarray(paths[0], chunks=chunks, memmap=memmap)
-    return _load_list(paths, chunks=chunks, memmap=memmap)
+        return dataarray(paths[0], memmap=memmap)
+    return _load_list(paths, memmap=memmap)
 
 
-def _load_list(paths, chunks=None, memmap=False):
+def _load_list(paths, memmap=False):
     """Combine a list of paths to IDFs to a single xarray.DataArray"""
     # first load every IDF into a separate DataArray
-    das = [dataarray(path, chunks=chunks, memmap=memmap) for path in paths]
+    das = [dataarray(path, memmap=memmap) for path in paths]
     assert all(
         da.name == das[0].name for da in das
     ), "DataArrays to be combined need to have the same name"
@@ -330,7 +320,7 @@ def _load_list(paths, chunks=None, memmap=False):
     return da
 
 
-def loadset(globpath, chunks=None, memmap=False):
+def loadset(globpath, memmap=False):
     """Read a set of parameters to a dict of xarray.DataArray
     
     Compared to imod.idf.load, this function lets you read multiple parameters
@@ -344,8 +334,6 @@ def loadset(globpath, chunks=None, memmap=False):
         finds all IDF files under the model directory. Note that files with
         the same name (part before the first underscore) wil be combined into
         a single xarray.DataArray.
-    chunks : int or tuple of int, optional
-        How to chunk the array. By default it creates only 1 chunk.
     memmap : bool, optional
         Whether to use a memory map to the file, or an in memory
         copy. Default is to use a memory map.
@@ -377,7 +365,7 @@ def loadset(globpath, chunks=None, memmap=False):
         d[n].append(p)
 
     # load each group into a DataArray
-    das = [_load_list(v, chunks=chunks, memmap=memmap) for v in d.values()]
+    das = [_load_list(v, memmap=memmap) for v in d.values()]
 
     # store each DataArray under it's own name in an OrderedDict
     dd = OrderedDict()
