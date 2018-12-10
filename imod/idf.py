@@ -163,7 +163,7 @@ def read(path):
     nrow = attrs["nrow"]
     ncol = attrs["ncol"]
     nodata = attrs.pop("nodata")
-    return _read(path, headersize, nrow, ncol, nodata)
+    return _read(path, headersize, nrow, ncol, nodata), attrs
 
 
 def dask(path, memmap=False):
