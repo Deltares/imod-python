@@ -1,8 +1,10 @@
 import re
-from datetime import datetime
-import numpy as np
 from collections import OrderedDict
+from datetime import datetime
 from pathlib import Path
+
+import cftime
+import numpy as np
 from affine import Affine
 
 
@@ -23,11 +25,13 @@ def decompose(path):
     # Try to get time from idf name, iMODFLOW can output two datetime formats
     for s in parts:
         try:
-            d["time"] = np.datetime64(datetime.strptime(s, "%Y%m%d%H%M%S"))
+            dt = datetime.strptime(s, "%Y%m%d%H%M%S")
+            d["time"] = cftime.DatetimeProlepticGregorian(*dt.timetuple()[:6])
             break
         except ValueError:
             try:
-                d["time"] = np.datetime64(datetime.strptime(s, "%Y%m%d"))
+                dt = datetime.strptime(s, "%Y%m%d")
+                d["time"] = cftime.DatetimeProlepticGregorian(*dt.timetuple()[:6])
                 break
             except ValueError:
                 pass  # no time in dict
