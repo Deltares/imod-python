@@ -74,8 +74,9 @@ def _to_nan(a, nodata):
 
 
 def memmap(path, headersize, nrow, ncol, nodata):
-    """Make a memory map of a single IDF file
-    
+    """
+    Make a memory map of a single IDF file
+
     Use idf.read if you don't want to modify the nodata values of the IDF,
     or if you want to have an in memory numpy.ndarray.
 
@@ -83,7 +84,7 @@ def memmap(path, headersize, nrow, ncol, nodata):
     ----------
     path : str or Path
         Path to the IDF file to be memory mapped
-    
+
     Returns
     -------
     numpy.memmap
@@ -94,9 +95,7 @@ def memmap(path, headersize, nrow, ncol, nodata):
     dict
         A dict with all metadata.
     """
-    a = np.memmap(
-        str(path), np.float32, "r+", headersize, (nrow, ncol)
-    )
+    a = np.memmap(str(path), np.float32, "r+", headersize, (nrow, ncol))
 
     # only change the header if needed
     if not np.isnan(nodata):
@@ -106,8 +105,9 @@ def memmap(path, headersize, nrow, ncol, nodata):
 
 
 def _read(path, headersize, nrow, ncol, nodata):
-    """Read a single IDF file to a numpy.ndarray
-    
+    """
+    Read a single IDF file to a numpy.ndarray
+
     Compared to idf.memmap, this does not modify the IDF.
 
     Parameters
@@ -119,7 +119,7 @@ def _read(path, headersize, nrow, ncol, nodata):
     nrow : int
     ncol : int
     nodata : np.float32
-    
+
     Returns
     -------
     numpy.ndarray
@@ -131,23 +131,21 @@ def _read(path, headersize, nrow, ncol, nodata):
     """
     with open(path, "rb") as f:
         f.seek(headersize)
-        a = np.reshape(
-                np.fromfile(f, np.float32, nrow * ncol),
-                (nrow, ncol),
-        )
+        a = np.reshape(np.fromfile(f, np.float32, nrow * ncol), (nrow, ncol))
     return _to_nan(a, nodata)
 
 
 def read(path):
-    """Read a single IDF file to a numpy.ndarray
-    
+    """
+    Read a single IDF file to a numpy.ndarray
+
     Compared to idf.memmap, this does not modify the IDF.
 
     Parameters
     ----------
     path : str or Path
         Path to the IDF file to be read
-    
+
     Returns
     -------
     numpy.ndarray
@@ -167,8 +165,9 @@ def read(path):
 
 
 def dask(path, memmap=False):
-    """Read a single IDF file to a dask.array
-    
+    """
+    Read a single IDF file to a dask.array
+
     Parameters
     ----------
     path : str or Path
@@ -176,7 +175,7 @@ def dask(path, memmap=False):
     memmap : bool, optional
         Whether to use a memory map to the file, or an in memory
         copy. Default is to use an in memory copy.
-    
+
     Returns
     -------
     dask.array
@@ -186,6 +185,7 @@ def dask(path, memmap=False):
     dict
         A dict with all metadata.
     """
+
     attrs = header(path)
     # If we don't unpack, it seems we run into trouble with the dask array later
     # on, probably because attrs isn't immutable. This works fine instead.
@@ -248,8 +248,9 @@ def _dataarray_kwargs(path, attrs):
 
 
 def dataarray(path, memmap=False):
-    """Read a single IDF file to a xarray.DataArray
-    
+    """
+    Read a single IDF file to a xarray.DataArray
+
     The function imod.idf.load is more general and can load multiple layers
     and/or timestamps at once.
 
@@ -260,7 +261,7 @@ def dataarray(path, memmap=False):
     memmap : bool, optional
         Whether to use a memory map to the file, or an in memory
         copy. Default is to use a memory map.
-    
+
     Returns
     -------
     xarray.DataArray
@@ -275,20 +276,21 @@ def dataarray(path, memmap=False):
 
 # load IDFs for multiple times and/or layers into one DataArray
 def load(path, memmap=False):
-    """Read a parameter (one or more IDFs) to a xarray.DataArray
-    
+    """
+    Read a parameter (one or more IDFs) to a xarray.DataArray
+
     Parameters
     ----------
     path : str, Path or list
         This can be a single file, 'head_l1.idf', a glob pattern expansion,
         'head_l*.idf', or a list of files, ['head_l1.idf', 'head_l2.idf'].
-        Note that each file needs to be of the same name (part before the 
+        Note that each file needs to be of the same name (part before the
         first underscore) but have a different layer and/or timestamp,
         such that they can be combined in a single xarray.DataArray.
     memmap : bool, optional
         Whether to use a memory map to the file, or an in memory
         copy. Default is to use a memory map.
-    
+
     Returns
     -------
     xarray.DataArray
@@ -354,8 +356,9 @@ def _load_list(paths, memmap=False):
 
 
 def loadset(globpath, memmap=False):
-    """Read a set of parameters to a dict of xarray.DataArray
-    
+    """
+    Read a set of parameters to a dict of xarray.DataArray
+
     Compared to imod.idf.load, this function lets you read multiple parameters
     at once, which will each be a separate entry in an OrderedDict, with as key
     the parameter name, and as value the xarray.DataArray.
@@ -370,7 +373,7 @@ def loadset(globpath, memmap=False):
     memmap : bool, optional
         Whether to use a memory map to the file, or an in memory
         copy. Default is to use a memory map.
-    
+
     Returns
     -------
     OrderedDict
@@ -415,7 +418,8 @@ def loadset(globpath, memmap=False):
 
 # write DataArrays to IDF
 def save(path, a, nodata=1.e20):
-    """Write a xarray.DataArray to one or more IDF files
+    """
+    Write a xarray.DataArray to one or more IDF files
 
     If the DataArray only has `y` and `x` dimensions, a single IDF file is
     written, like the `imod.idf.write` function. This function is more general
@@ -428,7 +432,7 @@ def save(path, a, nodata=1.e20):
     path : str or Path
         Path to the IDF file to be written. This function decides on the
         actual filename(s) using conventions, so it only takes the directory and
-        name from this parameter. 
+        name from this parameter.
     a : xarray.DataArray
         DataArray to be written. It needs to have exactly a.dims == ('y', 'x').
 
@@ -482,7 +486,8 @@ def _extra_dims(a):
 
 
 def write(path, a, nodata=1.e20):
-    """Write a 2D xarray.DataArray to a IDF file
+    """
+    Write a 2D xarray.DataArray to a IDF file
 
     Parameters
     ----------
