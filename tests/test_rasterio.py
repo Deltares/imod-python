@@ -25,9 +25,9 @@ def write_tif(request):
 
         profile = dict()
         profile["crs"] = rasterio.crs.CRS.from_epsg(epsg)
-        profile["transform"] = Affine.translation(20.0, 30.0)
+        profile["transform"] = Affine(1.0, 0.0, 20.0, 0.0, -1.0, 30.0)
         if rotation_angle:
-            profile["transform"] = Affine.rotation(rotation_angle)
+            profile["transform"] *= Affine.rotation(rotation_angle)
         profile["driver"] = "GTiff"
         profile["height"] = nrow
         profile["width"] = ncol
@@ -53,7 +53,7 @@ def test_basic_resample__nearest(write_tif):
         dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial_reference(da)
         data = np.empty((10, 16))
         coords = {
-            "y": np.linspace(ymin + 0.25 * dy, ymax - 0.25 * dy, 10),
+            "y": np.linspace(ymax - 0.25 * dy, ymin + 0.25 * dy, 10),
             "x": np.linspace(xmin + 0.25 * dx, xmax - 0.25 * dx, 16),
         }
         dims = ("y", "x")
@@ -88,7 +88,7 @@ def test_basic_resample__bilinear(write_tif):
         dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial_reference(da)
         data = np.empty((10, 16))
         coords = {
-            "y": np.linspace(ymin + 0.25 * dy, ymax - 0.25 * dy, 10),
+            "y": np.linspace(ymax - 0.25 * dy, ymin + 0.25 * dy, 10),
             "x": np.linspace(xmin + 0.25 * dx, xmax - 0.25 * dx, 16),
         }
         dims = ("y", "x")
@@ -195,7 +195,7 @@ def test_reproject_resample(write_tif):
         dst_crs = {"init":"EPSG:32631"}
         data = np.empty((10, 16))
         coords = {
-            "y": np.linspace(5313578.75, 5313574.25, 10),
+            "y": np.linspace(5313572.75, 5313568.25, 10),
             "x": np.linspace(523420.25, 523427.75, 16),
         }
         dims = ("y", "x")
@@ -228,12 +228,12 @@ def test_reproject_rotation__via_kwargs(write_tif):
     write_tif("rotated.tif", epsg=28992, rotation_angle=45.0)
     dst_crs = {"init":"EPSG:32631"}
     da = xr.open_rasterio("rotated.tif").squeeze("band")
-    src_transform = Affine.rotation(45.0)
+    src_transform = Affine.scale(1.0, -1.0) * Affine.rotation(45.0)
     newda = imod.rasterio.resample(
         da,
         src_crs={"init": "EPSG:28992"},
         dst_crs=dst_crs,
-        reproject_kwargs={"src_transform": src_transform},
+        src_transform=src_transform,
     )
 
     with rasterio.open("rotated.tif") as src:

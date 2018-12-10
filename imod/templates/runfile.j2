@@ -18,13 +18,13 @@ ACTIVE MODULES
 1,0, ({{package_name}})
     {%- endif %}
 {%- endfor %}
-{{packages["bnd"]["value"][1]}}
+"{{packages["bnd"]["value"][1]}}"
 MODULES FOR EACH LAYER
 {%- for package_name, package_data in packages.items() %}
 {{package_data.values()|first|length}}, ({{package_name}})
 {%-     for field in package_data.values() %}
 {%-         for layer, path in field.items() %}
-{{layer}}, 1.0, 0.0, {{path}}
+{{layer}}, 1.0, 0.0, "{{path}}"
 {%-         endfor %}
 {%-     endfor %}
 {%- endfor %}
@@ -37,7 +37,7 @@ PACKAGES FOR EACH LAYER AND STRESS-PERIOD
 {%-         for field in package_data.values() %}
 {%-             for system in field.values() %}
 {%-                 for layer, paths in system.items() %}
-{{layer}}, 1.0, 0.0, {{paths[time_index]}}
+{{layer}}, 1.0, 0.0, "{{paths[time_index]}}"
 {%-                 endfor %}
 {%-             endfor %}
 {%-         endfor %}

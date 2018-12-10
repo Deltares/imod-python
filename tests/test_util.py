@@ -1,57 +1,79 @@
 import os
-import unittest
 from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
 
+import cftime
 import numpy as np
-
 from imod import util
 
 
-class TestUtil(unittest.TestCase):
-    def test_compose(self):
-        d = {
-            "name": "head",
-            "directory": Path("path", "to"),
-            "extension": ".idf",
-            "layer": 5,
-            "time": datetime(2018, 2, 22, 9, 6, 57),
-        }
-        path = util.compose(d)
-        self.assertIsInstance(path, Path)
-        targetpath = Path(d["directory"], "head_20180222090657_l5.idf")
-        self.assertEqual(path, targetpath)
-
-    def test_decompose(self):
-        d = util.decompose("path/to/head_20180222090657_l5.idf")
-        refd = OrderedDict(
-            [
-                ("extension", ".idf"),
-                ("directory", Path("path", "to")),
-                ("name", "head"),
-                ("time", np.datetime64('2018-02-22T09:06:57.000000')),
-                ("layer", 5),
-            ]
-        )
-        self.assertIsInstance(d, OrderedDict)
-        self.assertEqual(d, refd)
-
-    def test_decompose_dateonly(self):
-        d = util.decompose("20180222090657.idf")
-        print(d)
-        refd = OrderedDict(
-            [
-                ("extension", ".idf"),
-                ("directory", Path(".")),
-                ("name", "20180222090657"),
-                ("time", np.datetime64('2018-02-22T09:06:57.000000')),
-            ]
-        )
-        self.assertIsInstance(d, OrderedDict)
-        self.assertEqual(d, refd)
+def test_compose():
+    d = {
+        "name": "head",
+        "directory": Path("path", "to"),
+        "extension": ".idf",
+        "layer": 5,
+        "time": cftime.DatetimeProlepticGregorian(2018, 2, 22, 9, 6, 57),
+    }
+    path = util.compose(d)
+    assert isinstance(path, Path)
+    targetpath = Path(d["directory"], "head_20180222090657_l5.idf")
+    assert path == targetpath
 
 
+def test_decompose():
+    d = util.decompose("path/to/head_20180222090657_l5.idf")
+    refd = OrderedDict(
+        [
+            ("extension", ".idf"),
+            ("directory", Path("path", "to")),
+            ("name", "head"),
+            ("time", cftime.DatetimeProlepticGregorian(2018, 2, 22, 9, 6, 57)),
+            ("layer", 5),
+        ]
+    )
+    assert isinstance(d, OrderedDict)
+    assert d == refd
 
-if __name__ == "__main__":
-    unittest.main()
+
+def test_decompose_dateonly():
+    d = util.decompose("20180222090657.idf")
+    refd = OrderedDict(
+        [
+            ("extension", ".idf"),
+            ("directory", Path(".")),
+            ("name", "20180222090657"),
+            ("time", cftime.DatetimeProlepticGregorian(2018, 2, 22, 9, 6, 57)),
+        ]
+    )
+    assert isinstance(d, OrderedDict)
+    assert d == refd
+
+
+def test_compose_year9999():
+    d = {
+        "name": "head",
+        "directory": Path("path", "to"),
+        "extension": ".idf",
+        "layer": 5,
+        "time": cftime.DatetimeProlepticGregorian(9999, 2, 22, 9, 6, 57),
+    }
+    path = util.compose(d)
+    assert isinstance(path, Path)
+    targetpath = Path(d["directory"], "head_99990222090657_l5.idf")
+    assert path == targetpath
+
+
+def test_decompose_dateonly_year9999():
+    d = util.decompose("99990222090657.idf")
+    refd = OrderedDict(
+        [
+            ("extension", ".idf"),
+            ("directory", Path(".")),
+            ("name", "99990222090657"),
+            ("time", cftime.DatetimeProlepticGregorian(9999, 2, 22, 9, 6, 57)),
+        ]
+    )
+    assert isinstance(d, OrderedDict)
+    assert d == refd

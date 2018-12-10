@@ -82,7 +82,7 @@ def _reproject_dst(source, src_crs, dst_crs, src_transform):
         * dst_transform
     )
     dst = xr.DataArray(
-        data=np.empty((dst_height, dst_width), source.dtype),
+        data=np.zeros((dst_height, dst_width), source.dtype),
         coords={"y": y[:, 0], "x": x[0, :]},
         dims=("y", "x"),
     )
@@ -96,7 +96,8 @@ def resample(
     dst_crs=None,
     method="nearest",
     use_src_attrs=False,
-    reproject_kwargs={},
+    src_nodata=np.nan,
+    **reproject_kwargs,
 ):
     """
     Reprojects and/or resamples a 2D xarray DataArray to a 
@@ -150,7 +151,7 @@ def resample(
         * med (50th percentile)
         * q1 (25th percentile)
         * q3 (75th percentile)
-    reproject_kwargs: dict
+    reproject_kwargs: dict, optional
         keyword arguments for `rasterio.warp.reproject()`.
 
     Returns
@@ -165,9 +166,10 @@ def resample(
     >>> c = imod.rasterio.resample(source=a, like=b)
     
     Resample a DataArray to a new cellsize of 100.0, by creating a `like` DataArray first:
+    (Note that dy must be negative, as is usual for geospatial grids.)
     
     >>> dims = ("y", "x")
-    >>> coords = {"y": np.arange(100_000.0, 200_000.0, 100.0), "x": np.arange(0.0, 100_000.0, 100.0)}
+    >>> coords = {"y": np.arange(200_000.0, 100_000.0, -100.0), "x": np.arange(0.0, 100_000.0, 100.0)}
     >>> b = xr.DataArray(data=np.empty((200, 100)), coords=coords, dims=dims)
     >>> c = imod.rasterio.resample(source=a, like=b)
 
@@ -202,7 +204,7 @@ def resample(
         ), "resample does not support dimensions other than `x` and `y` for `like`."
     if use_src_attrs:  # only provided when reproject is necessary
         src_crs = rasterio.crs.CRS.from_string(source.attrs["crs"])
-        reproject_kwargs["src_nodata"] = source.attrs["nodatavals"][0]
+        src_nodata = source.attrs["nodatavals"][0]
 
     resampling_methods = {e.name: e for e in Resampling}
 
@@ -261,6 +263,11 @@ def resample(
             "At least `like`, or crs information for source and destination must be provided."
         )
 
+    assert src_transform[0] > 0, "dx of 'source' must be positive"
+    assert src_transform[4] < 0, "dy of 'source' must be negative"
+    assert dst_transform[0] > 0, "dx of 'like' must be positive"
+    assert dst_transform[4] < 0, "dy of 'like' must be negative"
+
     rasterio.warp.reproject(
         source.values,
         dst.values,
@@ -269,6 +276,7 @@ def resample(
         src_crs=src_crs,
         dst_crs=dst_crs,
         resampling=resampling_method,
+        src_nodata=src_nodata,
         **reproject_kwargs,
     )
 
