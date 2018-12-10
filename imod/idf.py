@@ -1,13 +1,14 @@
-import numpy as np
-from struct import unpack, pack
 from collections import OrderedDict
-import pandas as pd
-import xarray as xr
-from dask import array
+from datetime import datetime
 from glob import glob
 from pathlib import Path
-from datetime import datetime
+from struct import pack, unpack
+
 import imod
+import numpy as np
+import pandas as pd
+import xarray as xr
+from dask import array, delayed
 from imod import util
 
 
@@ -60,30 +61,22 @@ def setnodataheader(path, nodata):
         f.write(pack("f", nodata))
 
 
-def _pre_data_read(path):
-    # shared code for idf.read and idf.memmap
-    # currently asserts ieq = ivf = 0, and comments are not read
-    attrs = header(path)
-    headersize = attrs.pop("headersize")
-    return attrs, headersize
-
-
-def _to_nan(a, attrs):
+def _to_nan(a, nodata):
     """Change all nodata values in the array to NaN"""
     # it needs to be NaN for xarray to deal with it properly
     # no need to store the nodata value if it is always NaN
-    nodata = attrs.pop("nodata")
     if np.isnan(nodata):
-        return a, attrs
+        return a
     else:
         isnodata = np.isclose(a, nodata)
         a[isnodata] = np.nan
-        return a, attrs
+        return a
 
 
-def memmap(path):
-    """Make a memory map of a single IDF file
-    
+def memmap(path, headersize, nrow, ncol, nodata):
+    """
+    Make a memory map of a single IDF file
+
     Use idf.read if you don't want to modify the nodata values of the IDF,
     or if you want to have an in memory numpy.ndarray.
 
@@ -91,7 +84,7 @@ def memmap(path):
     ----------
     path : str or Path
         Path to the IDF file to be memory mapped
-    
+
     Returns
     -------
     numpy.memmap
@@ -102,28 +95,31 @@ def memmap(path):
     dict
         A dict with all metadata.
     """
-    attrs, headersize = _pre_data_read(path)
-    a = np.memmap(
-        str(path), np.float32, "r+", headersize, (attrs["nrow"], attrs["ncol"])
-    )
+    a = np.memmap(str(path), np.float32, "r+", headersize, (nrow, ncol))
 
     # only change the header if needed
-    if not np.isnan(attrs["nodata"]):
+    if not np.isnan(nodata):
         setnodataheader(path, np.nan)
 
-    return _to_nan(a, attrs)
+    return _to_nan(a, nodata)
 
 
-def read(path):
-    """Read a single IDF file to a numpy.ndarray
-    
+def _read(path, headersize, nrow, ncol, nodata):
+    """
+    Read a single IDF file to a numpy.ndarray
+
     Compared to idf.memmap, this does not modify the IDF.
 
     Parameters
     ----------
     path : str or Path
         Path to the IDF file to be read
-    
+    headersize : int
+        byte size of header
+    nrow : int
+    ncol : int
+    nodata : np.float32
+
     Returns
     -------
     numpy.ndarray
@@ -133,29 +129,53 @@ def read(path):
     dict
         A dict with all metadata.
     """
-    attrs, headersize = _pre_data_read(path)
     with open(path, "rb") as f:
         f.seek(headersize)
-        a = np.reshape(
-            np.fromfile(f, np.float32, attrs["nrow"] * attrs["ncol"]),
-            (attrs["nrow"], attrs["ncol"]),
-        )
-    return _to_nan(a, attrs)
+        a = np.reshape(np.fromfile(f, np.float32, nrow * ncol), (nrow, ncol))
+    return _to_nan(a, nodata)
 
 
-def dask(path, chunks=None, memmap=False):
-    """Read a single IDF file to a dask.array
-    
+def read(path):
+    """
+    Read a single IDF file to a numpy.ndarray
+
+    Compared to idf.memmap, this does not modify the IDF.
+
     Parameters
     ----------
     path : str or Path
         Path to the IDF file to be read
-    chunks : int or tuple of int, optional
-        How to chunk the array. By default it creates only 1 chunk.
+
+    Returns
+    -------
+    numpy.ndarray
+        A float32 numpy.ndarray with shape (nrow, ncol) of the values
+        in the IDF file. On opening all nodata values are changed
+        to NaN in the numpy.ndarray.
+    dict
+        A dict with all metadata.
+    """
+
+    attrs = header(path)
+    headersize = attrs.pop("headersize")
+    nrow = attrs["nrow"]
+    ncol = attrs["ncol"]
+    nodata = attrs.pop("nodata")
+    return _read(path, headersize, nrow, ncol, nodata), attrs
+
+
+def dask(path, memmap=False):
+    """
+    Read a single IDF file to a dask.array
+
+    Parameters
+    ----------
+    path : str or Path
+        Path to the IDF file to be read
     memmap : bool, optional
         Whether to use a memory map to the file, or an in memory
-        copy. Default is to use a memory map.
-    
+        copy. Default is to use an in memory copy.
+
     Returns
     -------
     dask.array
@@ -165,14 +185,21 @@ def dask(path, chunks=None, memmap=False):
     dict
         A dict with all metadata.
     """
+
+    attrs = header(path)
+    # If we don't unpack, it seems we run into trouble with the dask array later
+    # on, probably because attrs isn't immutable. This works fine instead.
+    headersize = attrs.pop("headersize")
+    nrow = attrs["nrow"]
+    ncol = attrs["ncol"]
+    nodata = attrs.pop("nodata")
     if memmap:
-        a, attrs = imod.idf.memmap(path)
+        a = imod.idf.memmap(path, headersize, nrow, ncol, nodata)
+        x = array.from_array(a, chunks=(nrow, ncol))
     else:
-        a, attrs = imod.idf.read(path)
-    # grab the whole array as one chunk
-    if chunks is None:
-        chunks = a.shape
-    x = array.from_array(a, chunks=chunks)
+        # dask.delayed requires currying
+        a = delayed(imod.idf._read)(path, headersize, nrow, ncol, nodata)
+        x = array.from_delayed(a, shape=(nrow, ncol), dtype=np.float32)
     return x, attrs
 
 
@@ -220,9 +247,10 @@ def _dataarray_kwargs(path, attrs):
     return d
 
 
-def dataarray(path, chunks=None, memmap=False):
-    """Read a single IDF file to a xarray.DataArray
-    
+def dataarray(path, memmap=False):
+    """
+    Read a single IDF file to a xarray.DataArray
+
     The function imod.idf.load is more general and can load multiple layers
     and/or timestamps at once.
 
@@ -230,12 +258,10 @@ def dataarray(path, chunks=None, memmap=False):
     ----------
     path : str or Path
         Path to the IDF file to be read
-    chunks : int or tuple of int, optional
-        How to chunk the array. By default it creates only 1 chunk.
     memmap : bool, optional
         Whether to use a memory map to the file, or an in memory
         copy. Default is to use a memory map.
-    
+
     Returns
     -------
     xarray.DataArray
@@ -243,29 +269,28 @@ def dataarray(path, chunks=None, memmap=False):
         All metadata needed for writing the file to IDF or other formats
         using imod.rasterio are included in the xarray.DataArray.attrs.
     """
-    x, attrs = dask(path, chunks=chunks, memmap=memmap)
+    x, attrs = dask(path, memmap=memmap)
     kwargs = _dataarray_kwargs(path, attrs)
     return xr.DataArray(x, **kwargs)
 
 
 # load IDFs for multiple times and/or layers into one DataArray
-def load(path, chunks=None, memmap=False):
-    """Read a parameter (one or more IDFs) to a xarray.DataArray
-    
+def load(path, memmap=False):
+    """
+    Read a parameter (one or more IDFs) to a xarray.DataArray
+
     Parameters
     ----------
     path : str, Path or list
         This can be a single file, 'head_l1.idf', a glob pattern expansion,
         'head_l*.idf', or a list of files, ['head_l1.idf', 'head_l2.idf'].
-        Note that each file needs to be of the same name (part before the 
+        Note that each file needs to be of the same name (part before the
         first underscore) but have a different layer and/or timestamp,
         such that they can be combined in a single xarray.DataArray.
-    chunks : int or tuple of int, optional
-        How to chunk the array. By default it creates only 1 chunk.
     memmap : bool, optional
         Whether to use a memory map to the file, or an in memory
         copy. Default is to use a memory map.
-    
+
     Returns
     -------
     xarray.DataArray
@@ -274,7 +299,7 @@ def load(path, chunks=None, memmap=False):
         using imod.rasterio are included in the xarray.DataArray.attrs.
     """
     if isinstance(path, list):
-        return _load_list(path, chunks=chunks, memmap=memmap)
+        return _load_list(path, memmap=memmap)
     elif isinstance(path, Path):
         path = str(path)
 
@@ -283,14 +308,14 @@ def load(path, chunks=None, memmap=False):
     if n == 0:
         raise FileNotFoundError("Could not find any files matching {}".format(path))
     elif n == 1:
-        return dataarray(paths[0], chunks=chunks, memmap=memmap)
-    return _load_list(paths, chunks=chunks, memmap=memmap)
+        return dataarray(paths[0], memmap=memmap)
+    return _load_list(paths, memmap=memmap)
 
 
-def _load_list(paths, chunks=None, memmap=False):
+def _load_list(paths, memmap=False):
     """Combine a list of paths to IDFs to a single xarray.DataArray"""
     # first load every IDF into a separate DataArray
-    das = [dataarray(path, chunks=chunks, memmap=memmap) for path in paths]
+    das = [dataarray(path, memmap=memmap) for path in paths]
     assert all(
         da.name == das[0].name for da in das
     ), "DataArrays to be combined need to have the same name"
@@ -330,9 +355,10 @@ def _load_list(paths, chunks=None, memmap=False):
     return da
 
 
-def loadset(globpath, chunks=None, memmap=False):
-    """Read a set of parameters to a dict of xarray.DataArray
-    
+def loadset(globpath, memmap=False):
+    """
+    Read a set of parameters to a dict of xarray.DataArray
+
     Compared to imod.idf.load, this function lets you read multiple parameters
     at once, which will each be a separate entry in an OrderedDict, with as key
     the parameter name, and as value the xarray.DataArray.
@@ -344,12 +370,10 @@ def loadset(globpath, chunks=None, memmap=False):
         finds all IDF files under the model directory. Note that files with
         the same name (part before the first underscore) wil be combined into
         a single xarray.DataArray.
-    chunks : int or tuple of int, optional
-        How to chunk the array. By default it creates only 1 chunk.
     memmap : bool, optional
         Whether to use a memory map to the file, or an in memory
         copy. Default is to use a memory map.
-    
+
     Returns
     -------
     OrderedDict
@@ -377,7 +401,7 @@ def loadset(globpath, chunks=None, memmap=False):
         d[n].append(p)
 
     # load each group into a DataArray
-    das = [_load_list(v, chunks=chunks, memmap=memmap) for v in d.values()]
+    das = [_load_list(v, memmap=memmap) for v in d.values()]
 
     # store each DataArray under it's own name in an OrderedDict
     dd = OrderedDict()
@@ -394,7 +418,8 @@ def loadset(globpath, chunks=None, memmap=False):
 
 # write DataArrays to IDF
 def save(path, a, nodata=1.e20):
-    """Write a xarray.DataArray to one or more IDF files
+    """
+    Write a xarray.DataArray to one or more IDF files
 
     If the DataArray only has `y` and `x` dimensions, a single IDF file is
     written, like the `imod.idf.write` function. This function is more general
@@ -407,7 +432,7 @@ def save(path, a, nodata=1.e20):
     path : str or Path
         Path to the IDF file to be written. This function decides on the
         actual filename(s) using conventions, so it only takes the directory and
-        name from this parameter. 
+        name from this parameter.
     a : xarray.DataArray
         DataArray to be written. It needs to have exactly a.dims == ('y', 'x').
 
@@ -461,7 +486,8 @@ def _extra_dims(a):
 
 
 def write(path, a, nodata=1.e20):
-    """Write a 2D xarray.DataArray to a IDF file
+    """
+    Write a 2D xarray.DataArray to a IDF file
 
     Parameters
     ----------
