@@ -105,8 +105,7 @@ def memmap(path, headersize, nrow, ncol, nodata):
     return _to_nan(a, nodata)
 
 
-@delayed
-def read(path, headersize, nrow, ncol, nodata):
+def _read(path, headersize, nrow, ncol, nodata):
     """Read a single IDF file to a numpy.ndarray
     
     Compared to idf.memmap, this does not modify the IDF.
@@ -115,6 +114,11 @@ def read(path, headersize, nrow, ncol, nodata):
     ----------
     path : str or Path
         Path to the IDF file to be read
+    headersize : int
+        byte size of header
+    nrow : int
+    ncol : int
+    nodata : np.float32
     
     Returns
     -------
@@ -134,6 +138,34 @@ def read(path, headersize, nrow, ncol, nodata):
     return _to_nan(a, nodata)
 
 
+def read(path):
+    """Read a single IDF file to a numpy.ndarray
+    
+    Compared to idf.memmap, this does not modify the IDF.
+
+    Parameters
+    ----------
+    path : str or Path
+        Path to the IDF file to be read
+    
+    Returns
+    -------
+    numpy.ndarray
+        A float32 numpy.ndarray with shape (nrow, ncol) of the values
+        in the IDF file. On opening all nodata values are changed
+        to NaN in the numpy.ndarray.
+    dict
+        A dict with all metadata.
+    """
+
+    attrs = header(path)
+    headersize = attrs.pop("headersize")
+    nrow = attrs["nrow"]
+    ncol = attrs["ncol"]
+    nodata = attrs.pop("nodata")
+    return _read(path, headersize, nrow, ncol, nodata)
+
+
 def dask(path, memmap=False):
     """Read a single IDF file to a dask.array
     
@@ -143,7 +175,7 @@ def dask(path, memmap=False):
         Path to the IDF file to be read
     memmap : bool, optional
         Whether to use a memory map to the file, or an in memory
-        copy. Default is to use a memory map.
+        copy. Default is to use an in memory copy.
     
     Returns
     -------
@@ -165,7 +197,8 @@ def dask(path, memmap=False):
         a = imod.idf.memmap(path, headersize, nrow, ncol, nodata)
         x = array.from_array(a, chunks=(nrow, ncol))
     else:
-        a = imod.idf.read(path, headersize, nrow, ncol, nodata)
+        # dask.delayed requires currying
+        a = delayed(imod.idf._read)(path, headersize, nrow, ncol, nodata)
         x = array.from_delayed(a, shape=(nrow, ncol), dtype=np.float32)
     return x, attrs
 
