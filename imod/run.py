@@ -393,7 +393,10 @@ def _parse(key, stress_period_schema):
 
     order = stress_period_schema[name].get("order", False)
     if order:
-        field = parts.pop(0)
+        try:
+            field = parts.pop(0)
+        except IndexError as e:
+            raise ValueError(f"A field is missing for {key}. Required fields are: {','.join(order)}") from e
         assert (
             field in order
         ), "{} is not a field of {}. Possible values are: {}".format(
