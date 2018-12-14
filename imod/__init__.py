@@ -1,13 +1,13 @@
 from pathlib import Path
 
+import numpy as np
+
 # without these this usage wouldn't work:
 # import imod
 # imod.idf.*
-from imod import idf
-from imod import ipf
-from imod import tec
-from imod import util
-from imod import run
+from imod import idf, ipf, run, tec, util
+
+from ._version import get_versions
 
 # since this is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
@@ -16,21 +16,20 @@ try:
 except ImportError:
     pass
 
-from ._version import get_versions
-__version__ = get_versions()['version']
+__version__ = get_versions()["version"]
 del get_versions
 
 
 def write(path, model, name=None, runfile_parameters=None):
     """
-    Writes an iMODFLOW model, including runfile, as specified by `model` into 
+    Writes an iMODFLOW model, including runfile, as specified by `model` into
     directory `path`.
 
     Directory `path` is created if it does not already exist.
 
     When `runfile_parameters` is specified, its values are used to fill in the
-    runfile instead of those generated automatically from the 
-    data in `model`. This is necessary when the default runfile parameters do 
+    runfile instead of those generated automatically from the
+    data in `model`. This is necessary when the default runfile parameters do
     not suffice, but you do not want to change the runfile after it is written.
 
     **Note**: every `xarray.DataArray` in `model` must have layer coordinates specified;
@@ -48,14 +47,14 @@ def write(path, model, name=None, runfile_parameters=None):
     runfile_parameters : dict
         Dictionary containing the runfile parameters. Defaults to None,
         in which case runfile_parameters is generated from data in `model`.
-    
+
     Returns
     -------
     None
 
     Examples
     --------
-    Write the model data in dictionary `a` as iMODFLOW model files, to directory 
+    Write the model data in dictionary `a` as iMODFLOW model files, to directory
     "example_dir":
 
     >>> imod.write(path="example_dir", model=a)
@@ -67,7 +66,7 @@ def write(path, model, name=None, runfile_parameters=None):
     >>> runfile_parameters["hclose"] = 0.00001
     >>> imod.write(path="example_dir", model=a, runfile_parameters=runfile_parameters)
 
-    """ 
+    """
     if isinstance(path, str):
         path = Path(path)
     path.mkdir(exist_ok=True, parents=True)
@@ -102,16 +101,40 @@ def write(path, model, name=None, runfile_parameters=None):
             idf.save(package_path, data)
 
 
+def _uniques(da):
+    uniques = np.unique(da)
+    return uniques[~np.isnan(uniques)]
+
+
+def _all_single(a):
+    return all([len(v) == 1 for v in a])
+
+
+def _top_bot_dicts(model):
+    top = model["top"]
+    bot = model["bot"]
+    layers = model["bnd"].coords["layer"].values
+    unique_top = [_uniques(top.sel(layer=layer)) for layer in layers]
+    unique_bot = [_uniques(bot.sel(layer=layer)) for layer in layers]
+    # Check if there's a single valid value
+    if _all_single(unique_top) and _all_single(unique_bot):
+        d_tops = {layer: t[0] for layer, t in zip(layers, unique_top)}
+        d_bots = {layer: b[0] for layer, b in zip(layers, unique_bot)}
+        return d_tops, d_bots
+    else:
+        return None, None
+
+
 def seawat_write(path, model, name=None, runfile_parameters=None):
     """
-    Writes an iMODSEAWAT model, including runfile, as specified by `model` into 
+    Writes an iMODSEAWAT model, including runfile, as specified by `model` into
     directory `path`.
 
     Directory `path` is created if it does not already exist.
 
     When `runfile_parameters` is specified, its values are used to fill in the
-    runfile instead of those generated automatically from the 
-    data in `model`. This is necessary when the default runfile parameters do 
+    runfile instead of those generated automatically from the
+    data in `model`. This is necessary when the default runfile parameters do
     not suffice, but you do not want to change the runfile after it is written.
 
     **Note**: every `xarray.DataArray` in `model` must have layer coordinates specified;
@@ -129,14 +152,14 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
     runfile_parameters : dict
         Dictionary containing the runfile parameters. Defaults to None,
         in which case runfile_parameters is generated from data in `model`.
-    
+
     Returns
     -------
     None
 
     Examples
     --------
-    Write the model data in dictionary `a` as iMODFLOW model files, to directory 
+    Write the model data in dictionary `a` as iMODFLOW model files, to directory
     "example_dir":
 
     >>> imod.write(path="example_dir", model=a)
@@ -148,10 +171,10 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
     >>> runfile_parameters["hclose"] = 0.00001
     >>> imod.seawat_write(path="example_dir", model=a, runfile_parameters=runfile_parameters)
 
-    """ 
+    """
     # TODO: does this really belong here?
     import pandas as pd
-    
+
     if isinstance(path, str):
         path = Path(path)
     path.mkdir(exist_ok=True, parents=True)
@@ -167,6 +190,10 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
     runfile_path = path.joinpath("{}.run".format(name))
     run.seawat_write_runfile(runfile_path, runfile_parameters)
 
+    # Get data to write idf top and bot attributes  if possible: 
+    # when dz is constant over x, y.
+    d_tops, d_bots = _top_bot_dicts(model)
+
     for key, data in model.items():
         # Get rid of time dimension
         # It might be present to force a transient run of otherwise steady-state
@@ -174,7 +201,13 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
         if key == "bnd":
             if "time" in data.dims:
                 data = data.isel(time=0).drop("time")
-        
+
+        # Select the appropriate tops and bottoms for the present layers
+        if d_tops is not None:
+            layers = data.coords["layer"].values
+            data.attrs["top"] = [d_tops[layer] for layer in layers]
+            data.attrs["bot"] = [d_bots[layer] for layer in layers]
+
         name = key.split("-")[0]
         package_path = path.joinpath(name).joinpath(key)
         if name == "wel" and isinstance(data, pd.DataFrame):
