@@ -422,9 +422,10 @@ def _top_bot_dicts(a):
     bot = np.atleast_1d(a.attrs["bot"]).astype(np.float64)
     assert top.shape == bot.shape, '"top" and "bot" attrs should have the same shape'
     if "layer" in a.coords:
-        assert top.shape == a.coords["layer"].shape
-        d_top = {laynum: t for laynum, t in zip(a.coords["layer"].values, top)}
-        d_bot = {laynum: b for laynum, b in zip(a.coords["layer"].values, bot)}
+        layers = np.atleast_1d(a.coords["layer"].values)
+        assert top.shape == layers.shape
+        d_top = {laynum: t for laynum, t in zip(layers, top)}
+        d_bot = {laynum: b for laynum, b in zip(layers, bot)}
     else:
         assert top.shape == (1,), ('if "layer" is not a coordinate, "top"'
         ' and "bot" attrs should hold only one value')

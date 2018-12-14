@@ -212,7 +212,7 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
                 ipf.save(package_path, data)
         else:
             if d_tops is not None:
-                layers = data.coords["layer"].values
+                layers = np.atleast_1d(data.coords["layer"].values)
                 data.attrs["top"] = [d_tops[layer] for layer in layers]
                 data.attrs["bot"] = [d_bots[layer] for layer in layers]
             idf.save(package_path, data)
