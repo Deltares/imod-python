@@ -203,11 +203,6 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
                 data = data.isel(time=0).drop("time")
 
         # Select the appropriate tops and bottoms for the present layers
-        if d_tops is not None:
-            layers = data.coords["layer"].values
-            data.attrs["top"] = [d_tops[layer] for layer in layers]
-            data.attrs["bot"] = [d_bots[layer] for layer in layers]
-
         name = key.split("-")[0]
         package_path = path.joinpath(name).joinpath(key)
         if name == "wel" and isinstance(data, pd.DataFrame):
@@ -216,4 +211,8 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
             else:
                 ipf.save(package_path, data)
         else:
+            if d_tops is not None:
+                layers = data.coords["layer"].values
+                data.attrs["top"] = [d_tops[layer] for layer in layers]
+                data.attrs["bot"] = [d_bots[layer] for layer in layers]
             idf.save(package_path, data)
