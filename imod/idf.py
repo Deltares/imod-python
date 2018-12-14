@@ -416,6 +416,23 @@ def loadset(globpath, memmap=False):
     return dd
 
 
+def _top_bot_dict(a):
+    """Returns a dictionary with the top and bottom per layer"""
+    top = np.atleast_1d(a.attrs["top"]).astype(np.float64)
+    bot = np.atleast_1d(a.attrs["bot"]).astype(np.float64)
+    assert top.shape == bot.shape, '"top" and "bot" attrs should have the same shape'
+    if "layer" in a.coords:
+        assert top.shape == a.coords["layer"].shape
+        d_top = {laynum: t for laynum, t in zip(a.coords["layer"].values, top)}
+        d_bot = {laynum: b for laynum, b in zip(a.coords["layer"].values, bot)}
+    else:
+        assert top.shape == (1,), ('if "layer" is not a coordinate, "top"'
+        ' and "bot" attrs should hold only one value')
+        d_top = {1: top[0]}
+        d_bot = {1: bot[0]}
+    return d_top, d_bot
+
+
 # write DataArrays to IDF
 def save(path, a, nodata=1.e20):
     """
@@ -464,6 +481,12 @@ def save(path, a, nodata=1.e20):
                 val = a.coords[coord].item()
             d[coord] = val
 
+    # Allow tops and bottoms to be written for voxel like IDFs.
+    has_topbot = False
+    if "top" in a.attrs and "bot" in a.attrs:
+        has_topbot = True
+        d_top, d_bot = _top_bot_dict(a)
+
     # stack all non idf dims into one new idf dimension,
     # over which we can then iterate to write all individual idfs
     extradims = _extra_dims(a)
@@ -473,6 +496,10 @@ def save(path, a, nodata=1.e20):
             # set the right layer/timestep/etc in the dict to make the filename
             d.update(dict(zip(extradims, coordvals)))
             fn = util.compose(d)
+            if has_topbot:
+                layer = d.get("layer", 1)
+                a_yx.attrs["top"] = d_top[layer]
+                a_yx.attrs["bot"] = d_bot[layer]
             write(fn, a_yx)
     else:
         # no extra dims, only one IDF
