@@ -428,8 +428,8 @@ def _top_bot_dicts(a):
     else:
         assert top.shape == (1,), ('if "layer" is not a coordinate, "top"'
         ' and "bot" attrs should hold only one value')
-        d_top = {1: top[0]}
-        d_bot = {1: bot[0]}
+        d_top = {"no_layer": top[0]}
+        d_bot = {"no_layer": bot[0]}
     return d_top, d_bot
 
 
@@ -497,7 +497,7 @@ def save(path, a, nodata=1.e20):
             d.update(dict(zip(extradims, coordvals)))
             fn = util.compose(d)
             if has_topbot:
-                layer = d.get("layer", 1)
+                layer = d.get("layer", "no_layer")
                 a_yx.attrs["top"] = d_top[layer]
                 a_yx.attrs["bot"] = d_bot[layer]
             write(fn, a_yx)
