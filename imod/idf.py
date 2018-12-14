@@ -416,7 +416,7 @@ def loadset(globpath, memmap=False):
     return dd
 
 
-def _top_bot_dict(a):
+def _top_bot_dicts(a):
     """Returns a dictionary with the top and bottom per layer"""
     top = np.atleast_1d(a.attrs["top"]).astype(np.float64)
     bot = np.atleast_1d(a.attrs["bot"]).astype(np.float64)
@@ -485,7 +485,7 @@ def save(path, a, nodata=1.e20):
     has_topbot = False
     if "top" in a.attrs and "bot" in a.attrs:
         has_topbot = True
-        d_top, d_bot = _top_bot_dict(a)
+        d_top, d_bot = _top_bot_dicts(a)
 
     # stack all non idf dims into one new idf dimension,
     # over which we can then iterate to write all individual idfs
