@@ -67,6 +67,10 @@ many input and output options, which in turn enables us to convert for instance
 existing CSV or Excel files to IPF files. The primary functions for reading and writing
 IPF files are :meth:`imod.ipf.load` and :meth:`imod.ipf.save`.
 
+Authors
+=======
+This Python package was written primarily by Martijn Visser and Huite Bootsma at Deltares.
+
 Indices and tables
 ==================
 

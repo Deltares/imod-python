@@ -52,3 +52,7 @@ popular package that makes analysis and processing of tabular data easy, and pro
 many input and output options, which in turn enables us to convert for instance
 existing CSV or Excel files to IPF files. The primary functions for reading and writing
 IPF files are ``imod.ipf.load`` and ``imod.ipf.save``.
+
+Authors
+=======
+This Python package was written primarily by Martijn Visser and Huite Bootsma at Deltares.

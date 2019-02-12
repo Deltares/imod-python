@@ -12,7 +12,7 @@ setup(
     long_description=long_description,
     url="https://gitlab.com/deltares/imod-python",
     author="Martijn Visser",
-    author_email="mgvisser@gmail.com",
+    author_email="martijn.visser@deltares.nl",
     license="MIT",
     packages=["imod"],
     package_dir={"imod": "imod"},
