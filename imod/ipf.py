@@ -232,7 +232,7 @@ def _lower(colnames):
     return lowered_colnames
 
 
-def write_assoc(path, df, itype=1, nodata=1.e20):
+def write_assoc(path, df, itype=1, nodata=1.0e20):
     """
     Writes a single IPF associated (TXT) file.
 
@@ -342,7 +342,7 @@ def _is_single_value(group):
     return len(pd.unique(group)) == 1
 
 
-def _compose_ipf(path, df, itype, assoc_ext, nodata=1.e20):
+def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20):
     """
     When itype is not None, breaks down the pandas DataFrame into its IPF part
     and its associated TXT files, creating the IPF data structure.
@@ -415,7 +415,7 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.e20):
         write(path, agg_df, 3, assoc_ext)
 
 
-def save(path, df, itype=None, assoc_ext="txt", nodata=1.e20):
+def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20):
     """
     Saves the contents of a pandas DataFrame to one or more IPF files, and
     associated (TXT) files.

@@ -80,13 +80,16 @@ def spatial_reference(a):
     """
     Extracts spatial reference from DataArray.
 
+    If the DataArray coordinates are nonequidistant, dx and dy will be returned
+    as 1D ndarray instead of float.
+
     Parameters
     ----------
     a : xarray.DataArray
 
     Returns
     --------------
-    tuple 
+    tuple
         (dx, xmin, xmax, dy, ymin, ymax)
 
     """
@@ -95,23 +98,46 @@ def spatial_reference(a):
     ncol = x.size
     nrow = y.size
 
-    # TODO: decide on decent criterium for what equidistant means
-    # make use of floating point epsilon? E.g:
-    # https://github.com/ioam/holoviews/issues/1869#issuecomment-353115449
-    # TODO: this is basically a work-around for iMOFLOW allowing only
-    # square gridcells, ideally 1D IDF have a width of 1.0 (?)
-    if ncol == 1:
-        dx = dy = _delta(y, "y")
-    elif nrow == 1:
-        dy = dx = _delta(x, "x")
-    else:
-        dx = _delta(x, "x")
-        dy = _delta(y, "y")
+    # Possibly non-equidistant
+    if ("dx" in a.coords) and ("dy" in a.coords):
+        dx = a.coords["dx"]
+        dy = a.coords["dy"]
+        if (dx.shape == x.shape) and (dx.size != 1):
+            dx = dx.values
+            xmin = float(x.min()) - 0.5 * abs(dx[0])
+            xmax = float(x.max()) + 0.5 * abs(dx[-1])
+        else:
+            dx = float(dx)
+            xmin = float(x.min()) - 0.5 * abs(dx)
+            xmax = float(x.max()) + 0.5 * abs(dx)
+        if (dy.shape == y.shape) and (dy.size != 1):
+            dy = dy.values
+            ymin = float(y.min()) - 0.5 * abs(dy[-1])
+            ymax = float(y.max()) + 0.5 * abs(dy[0])
+        else:
+            dy = float(dy)
+            ymin = float(y.min()) - 0.5 * abs(dy)
+            ymax = float(y.max()) + 0.5 * abs(dy)
+    else:  # Equidistant
+        # TODO: decide on decent criterium for what equidistant means
+        # make use of floating point epsilon? E.g:
+        # https://github.com/ioam/holoviews/issues/1869#issuecomment-353115449
+        # TODO: this is basically a work-around for iMODFLOW allowing only
+        # square gridcells, ideally 1D IDF have a width of 1.0 (?)
+        if ncol == 1:
+            dx = dy = _delta(y, "y")
+        elif nrow == 1:
+            dy = dx = _delta(x, "x")
+        else:
+            dx = _delta(x, "x")
+            dy = _delta(y, "y")
 
-    xmin = x.min() - 0.5 * abs(dx) # as xarray used midpoint coordinates
-    ymax = y.max() + 0.5 * abs(dy)
-    xmax = xmin + ncol * abs(dx)
-    ymin = ymax - nrow * abs(dy)
+        # as xarray used midpoint coordinates
+        xmin = float(x.min()) - 0.5 * abs(dx)
+        xmax = float(x.max()) + 0.5 * abs(dx)
+        ymin = float(y.min()) - 0.5 * abs(dy)
+        ymax = float(y.max()) + 0.5 * abs(dy)
+
     return dx, xmin, xmax, dy, ymin, ymax
 
 
@@ -130,4 +156,8 @@ def transform(a):
 
     """
     dx, xmin, _, dy, _, ymax = spatial_reference(a)
+    if dx < 0.0:
+        raise ValueError("dx must be positive")
+    if dy > 0.0:
+        raise ValueError("dy must be negative")
     return Affine(dx, 0.0, xmin, 0.0, dy, ymax)
