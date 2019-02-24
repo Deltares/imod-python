@@ -10,7 +10,7 @@ setup(
     cmdclass=versioneer.get_cmdclass(),
     description="Work with iMOD MODFLOW models",
     long_description=long_description,
-    url="https://gitlab.com/deltares/imod-python",
+    url="https://gitlab.com/deltares/imod/imod-python",
     author="Martijn Visser",
     author_email="martijn.visser@deltares.nl",
     license="MIT",

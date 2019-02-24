@@ -1,9 +1,9 @@
 Work with `iMOD <http://oss.deltares.nl/web/imod>`__ MODFLOW models in
 Python.
 
-Documentation: https://deltares.gitlab.io/imod-python/
+Documentation: https://deltares.gitlab.io/imod/imod-python/
 
-Source code: https://gitlab.com/deltares/imod-python
+Source code: https://gitlab.com/deltares/imod/imod-python
 
 Getting started
 ===============
