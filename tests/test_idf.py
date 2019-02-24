@@ -75,8 +75,8 @@ def test_lazy():
 
     This does the job of testing whether that function is part the graph.
     """
-    a, attrs = idf.dask("test.idf")
-    assert "function _read" in str(next(a.dask.items())[1][0])
+    a, _ = idf.dask("test.idf")
+    assert "_read" in str(next(a.dask.items())[1])
 
 
 def test_save_topbot__single_layer(test_da):
