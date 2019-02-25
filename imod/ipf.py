@@ -99,10 +99,15 @@ def read_associated(path, kwargs={}):
             # csv.reader parse one line
             # this catches commas in quotes
             ncol, itype = map(int, map(str.strip, next(csv.reader([line]))))
-        except ValueError:  # then try whitespace delimited
-            ncol, itype = map(
-                int, map(str.strip, next(csv.reader([line], delimiter=" ")))
-            )
+        # itype can be implicit, in which case it's a timeseries
+        except ValueError:  
+            try:
+                ncol = int(line.strip()) 
+                itype = 1
+            except ValueError:  # then try whitespace delimited
+                ncol, itype = map(
+                    int, map(str.strip, next(csv.reader([line], delimiter=" ")))
+                )
         na_values = OrderedDict()
 
         # use pandas for csv parsing: stuff like commas within quotes

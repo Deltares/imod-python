@@ -91,6 +91,29 @@ def write_assoc_ipf(request):
     return _write_assoc_ipf
 
 
+def test_read_associated__itype1implicit():
+    path = "A1000.txt"
+    delim = ","
+    assoc_string = (
+        "2\n"
+        "2\n"
+        "time{delim}-999.0\n"
+        "level{delim}-999.0\n"
+        "20180101000000{delim}1.0\n"
+        "20180102000000{delim}-999.0\n"
+    )
+    with open(path, "w") as f:
+        f.write(assoc_string.format(delim=delim))
+    df = ipf.read_associated(path)
+    assert df.shape == (2,2)
+
+    delim = " "
+    with open(path, "w") as f:
+        f.write(assoc_string.format(delim=delim))
+    df = ipf.read_associated(path, {"delim_whitespace": True})
+    assert df.shape == (2,2)
+
+
 def test_load__comma(write_basic_ipf):
     path = "basic_comma.ipf"
     write_basic_ipf(path, ",")
@@ -114,7 +137,7 @@ def test_load__space(write_basic_ipf):
 
 
 def test_load_associated__comma_comma(write_assoc_ipf):
-    path = "assoc.ipf"
+    path = "assoc.txt"
     write_assoc_ipf(path, ",", ",")
     df = ipf.load(path)
 
