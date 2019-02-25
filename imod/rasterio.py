@@ -5,7 +5,7 @@ import affine
 from rasterio.warp import Resampling
 from pathlib import Path
 from glob import glob
-from imod import util
+from imod import idf, util
 
 
 def write(path, da, driver=None, nodata=np.nan):
@@ -43,11 +43,16 @@ def write(path, da, driver=None, nodata=np.nan):
         elif ext == ".map":
             driver = "PCRaster"
         else:
-            raise ValueError("Unknown extension {}, specifiy driver".format(ext))
+            raise ValueError(f"Unknown extension {ext}, specifiy driver")
     # prevent rasterio warnings
     if driver == "AAIGrid":
         profile.pop("res", None)
         profile.pop("is_tiled", None)
+    extradims = idf._extra_dims(da)
+    # TODO only equidistant IDFs are compatible with GDAL / rasterio
+    # TODO try squeezing extradims here, such that 1 layer, 1 time, etc. is acccepted
+    if extradims:
+        raise ValueError(f"Only x and y dimensions supported, found {da.dims}")
     # transform will be affine object in next xarray
     profile["transform"] = util.transform(da)
     profile["driver"] = driver
