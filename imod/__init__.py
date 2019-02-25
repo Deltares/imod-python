@@ -190,7 +190,7 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
     runfile_path = path.joinpath("{}.run".format(name))
     run.seawat_write_runfile(runfile_path, runfile_parameters)
 
-    # Get data to write idf top and bot attributes  if possible: 
+    # Get data to write idf top and bot attributes  if possible:
     # when dz is constant over x, y.
     d_tops, d_bots = _top_bot_dicts(model)
 

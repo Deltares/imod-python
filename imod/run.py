@@ -146,8 +146,8 @@ seawat_default_runfile = OrderedDict(
         ("nprmas", 10),
         ("nprobs", 1),
         ("tsmult", 1.0),
-        ("dt0", 0.),
-        ("mxstrn", 10_000.0),
+        ("dt0", 0.0),
+        ("mxstrn", 10000.0),
         ("ttsmult", 1.0),
         ("ttsmax", 0.0),
         # adv
@@ -243,7 +243,7 @@ def _check_input(model, seawat=False):
             assert isinstance(
                 value, xr.DataArray
             ), "{} must be an xarray DataArray.".format(key)
-        
+
         consumed_model[key.lower()] = value
 
     return consumed_model
@@ -287,8 +287,10 @@ def _data_bounds(model, seawat=False):
         range(1, len(layers) + 1)
     ), "bnd layers must start at 1 and be consecutive."
     # Should we support multiple cellsizes within one model? Since imod just resamples
-    dx, bnd_xmin, bnd_xmax, dy, bnd_ymin, bnd_ymax = util.spatial_reference(model["bnd"])
-    
+    dx, bnd_xmin, bnd_xmax, dy, bnd_ymin, bnd_ymax = util.spatial_reference(
+        model["bnd"]
+    )
+
     times = set()  # use a set to only allow unique values
     tvals = None
     for key, data in model.items():
@@ -322,9 +324,7 @@ def _data_bounds(model, seawat=False):
             else:
                 assert (
                     int(layer) in layers  # should fail on NaNs, 0, negative
-                ), "{} : layer {} falls outside of bnd".format(
-                    key, layer
-                )
+                ), "{} : layer {} falls outside of bnd".format(key, layer)
 
         assert xmin >= bnd_xmin, "{}: xmin falls outside of bnd.".format(key)
         assert xmax <= bnd_xmax, "{}: xmax falls outside of bnd.".format(key)
@@ -396,7 +396,9 @@ def _parse(key, stress_period_schema):
         try:
             field = parts.pop(0)
         except IndexError as e:
-            raise ValueError(f"A field is missing for {key}. Required fields are: {','.join(order)}") from e
+            raise ValueError(
+                f"A field is missing for {key}. Required fields are: {','.join(order)}"
+            ) from e
         assert (
             field in order
         ), "{} is not a field of {}. Possible values are: {}".format(
@@ -412,7 +414,9 @@ def _parse(key, stress_period_schema):
     else:  # if systems are not supported, parts list should be empty by now.
         assert len(parts) == 0, "{} does not support systems.".format(name)
 
-    assert len(parts) == 0, "Parts: {} cannot be parsed as part of {} package.".format(str(parts), name)
+    assert len(parts) == 0, "Parts: {} cannot be parsed as part of {} package.".format(
+        str(parts), name
+    )
 
     return d
 
@@ -548,7 +552,7 @@ def _get_wel(item, times, directory):
 
     if not times:  # steady state case
         times = [0]
-    
+
     df = item["data"]
     key = item["key"]
 
@@ -587,8 +591,8 @@ def _get_system(item, times, directory):
         Dictionary containing the generated paths (IDF) for a single system. 
     """
     # TODO: Currently all packages, except for WEL, have to be defined in the
-    # first stress period (and when no time is assigned, it is assumed constant 
-    # for all stress periods); because a forward fill occurs for the periods. 
+    # first stress period (and when no time is assigned, it is assumed constant
+    # for all stress periods); because a forward fill occurs for the periods.
     # What does iMODFLOW/iMODSEAWAT support?
     # Is it allowed to add a package in a later stress period?
     # Is it allowed to add an additional system in a later stress period?

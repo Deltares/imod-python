@@ -34,12 +34,25 @@ def make_test_model(request):
         dims2d_t = ("y", "x", "time")
         dims3d = ("y", "x", "layer")
 
-        coords2d = {"y": np.arange(nrow), "x": np.arange(ncol)}
-        coords2d_t = {"y": np.arange(nrow), "x": np.arange(ncol), "time": times}
+        coords2d = {
+            "y": np.linspace(nrow - 1, 0, num=nrow),
+            "x": np.arange(ncol),
+            "dx": 1.0,
+            "dy": -1.0,
+        }
+        coords2d_t = {
+            "y": np.linspace(nrow - 1, 0, num=nrow),
+            "x": np.arange(ncol),
+            "time": times,
+            "dx": 1.0,
+            "dy": -1.0,
+        }
         coords3d = {
-            "y": np.arange(nrow),
+            "y": np.linspace(nrow - 1, 0, num=nrow),
             "x": np.arange(ncol),
             "layer": np.arange(nlayer) + 1,
+            "dx": 1.0,
+            "dy": -1.0,
         }
 
         da2d = xr.DataArray(data2d, coords2d, dims2d)
@@ -93,9 +106,11 @@ def make_test_model(request):
 def test_check_input():
     m = OrderedDict()
     m["bnd"] = xr.DataArray(
-        np.random.rand(4, 3), coords={"y": range(4), "x": range(3)}, dims=("y", "x")
+        np.random.rand(4, 3),
+        coords={"y": range(3, -1, -1), "x": range(3), "dx": 1.0, "dy": -1.0},
+        dims=("y", "x"),
     )
-    m["wel"] = pd.DataFrame({"x": [0, 2], "y": [1, 2], "q": [2000., 3000.]})
+    m["wel"] = pd.DataFrame({"x": [0, 2], "y": [1, 2], "q": [2000.0, 3000.0]})
     out = run._check_input(m)
     assert len(m) == len(out)
 
@@ -103,9 +118,11 @@ def test_check_input():
 def test_check_input__error():
     m = OrderedDict()
     m["wel"] = xr.DataArray(
-        np.random.rand(4, 3), coords={"y": range(4), "x": range(3)}, dims=("y", "x")
+        np.random.rand(4, 3),
+        coords={"y": range(3, -1, -1), "x": range(3), "dx": 1.0, "dy": -1.0},
+        dims=("y", "x"),
     )
-    m["bnd"] = pd.DataFrame({"x": [0, 2], "y": [1, 2], "q": [2000., 3000.]})
+    m["bnd"] = pd.DataFrame({"x": [0, 2], "y": [1, 2], "q": [2000.0, 3000.0]})
     with pytest.raises(AssertionError):
         run._check_input(m)
 
@@ -201,9 +218,11 @@ def test_get_package():
     data = np.random.rand(nrow, ncol, nlayer)
     dims = ("y", "x", "layer")
     coords = {
-        "y": np.arange(nrow),
+        "y": np.linspace(nrow - 1, 0, num=nrow),
         "x": np.arange(ncol),
         "layer": np.arange(nlayer) + 1,
+        "dx": 1.0,
+        "dy": -1.0,
     }
     da = xr.DataArray(data=data, coords=coords, dims=dims)
     package = {"ani-angle": da, "ani-factor": da}
@@ -218,9 +237,11 @@ def test_get_package__error():
     data = np.random.rand(nrow, ncol, nlayer)
     dims = ("y", "x", "layer")
     coords = {
-        "y": np.arange(nrow),
+        "y": np.linspace(nrow - 1, 0, num=nrow),
         "x": np.arange(ncol),
         "layer": np.arange(nlayer) + 1,
+        "dx": 1.0,
+        "dy": -1.0,
     }
     da = xr.DataArray(data=data, coords=coords, dims=dims)
     package = {"ani-angle": da}
@@ -235,10 +256,12 @@ def test_get_period():
     dims = ("y", "x", "layer", "time")
     times = list(map(pd.to_datetime, ["2012-01-01", "2013-01-01", "2014-01-01"]))
     coords = {
-        "y": np.arange(nrow),
+        "y": np.linspace(nrow - 1, 0, num=nrow),
         "x": np.arange(ncol),
         "layer": np.arange(nlayer) + 1,
         "time": times,
+        "dx": 1.0,
+        "dy": -1.0,
     }
     da = xr.DataArray(data=data, coords=coords, dims=dims)
     package = {"riv-stage": da, "riv-cond": da, "riv-bot": da, "riv-inff": da}
@@ -467,12 +490,25 @@ def test_write__basic_seawat(make_test_model):
     dims2d_t = ("y", "x", "time")
     dims3d = ("y", "x", "layer")
 
-    coords2d = {"y": np.arange(nrow), "x": np.arange(ncol)}
-    coords2d_t = {"y": np.arange(nrow), "x": np.arange(ncol), "time": times}
+    coords2d = {
+        "y": np.linspace(nrow - 1, 0, num=nrow),
+        "x": np.arange(ncol),
+        "dx": 1.0,
+        "dy": -1.0,
+    }
+    coords2d_t = {
+        "y": np.linspace(nrow - 1, 0, num=nrow),
+        "x": np.arange(ncol),
+        "time": times,
+        "dx": 1.0,
+        "dy": -1.0,
+    }
     coords3d = {
-        "y": np.arange(nrow),
+        "y": np.linspace(nrow - 1, 0, num=nrow),
         "x": np.arange(ncol),
         "layer": np.arange(nlayer) + 1,
+        "dx": 1.0,
+        "dy": -1.0,
     }
 
     da2d = xr.DataArray(data2d, coords2d, dims2d)

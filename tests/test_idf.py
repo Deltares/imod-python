@@ -11,19 +11,13 @@ from imod import idf
 
 @pytest.fixture(scope="module")
 def test_da(request):
-    arr = np.ones((3, 4), dtype=np.float32)
-    cellwidth = 1.0
-    cellheight = cellwidth
-    xmin = 0.0
-    ymax = 3.0
-    attrs = OrderedDict()
-    attrs["res"] = (cellwidth, cellheight)
-    attrs["transform"] = (cellwidth, 0.0, xmin, 0.0, -cellheight, ymax)
-    kwargs = {
-        "name": "test",
-        "dims": ("y", "x"),  # only two dimensions in a single IDF
-        "attrs": attrs,
-    }
+    nrow, ncol = 3, 4
+    dx, dy = 1.0, -1.0
+    xmin, xmax = 0.0, 4.0
+    ymin, ymax = 0.0, 3.0
+    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
+    data = np.ones((nrow, ncol), dtype=np.float32)
 
     def remove():
         try:
@@ -32,21 +26,19 @@ def test_da(request):
             pass
 
     request.addfinalizer(remove)
-    return xr.DataArray(arr, **kwargs)
+    return xr.DataArray(data, **kwargs)
 
 
 @pytest.fixture(scope="module")
 def test_layerda(request):
-    nlay = 5
-    nrow = 3
-    ncol = 4
-    data = np.ones((nlay, nrow, ncol))
-    dims = ("layer", "y", "x")
-    coords = {
-        "layer": np.arange(nlay) + 1,
-        "y": np.arange(nrow, 0.0, -1.0) - 0.5,
-        "x": np.arange(ncol) + 0.5,
-    }
+    nlay, nrow, ncol = 5, 3, 4
+    dx, dy = 1.0, -1.0
+    xmin, xmax = 0.0, 4.0
+    ymin, ymax = 0.0, 3.0
+    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords["layer"] = np.arange(nlay) + 1
+    kwargs = {"name": "layer", "coords": coords, "dims": ("layer", "y", "x")}
+    data = np.ones((nlay, nrow, ncol), dtype=np.float32)
 
     def remove():
         paths = glob("layer_l[0-9].idf")
@@ -57,7 +49,53 @@ def test_layerda(request):
                 pass
 
     request.addfinalizer(remove)
-    return xr.DataArray(data, coords, dims)
+    return xr.DataArray(data, **kwargs)
+
+
+@pytest.fixture(scope="module")
+def test_da_nonequidistant(request):
+    nrow, ncol = 3, 4
+    dx = np.array([0.9, 1.1, 0.8, 1.2])
+    dy = np.array([-1.3, -0.7, -1.0])
+    xmin, xmax = 0.0, 4.0
+    ymin, ymax = 0.0, 3.0
+    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    kwargs = {"name": "nonequidistant", "coords": coords, "dims": ("y", "x")}
+    data = np.ones((nrow, ncol), dtype=np.float32)
+
+    def remove():
+        try:
+            os.remove("nonequidistant.idf")
+        except FileNotFoundError:
+            pass
+
+    request.addfinalizer(remove)
+    return xr.DataArray(data, **kwargs)
+
+
+def test_xycoords_equidistant():
+    dx, dy = 1.0, -1.0
+    xmin, xmax = 0.0, 4.0
+    ymin, ymax = 0.0, 3.0
+    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    assert np.allclose(coords["x"], np.arange(xmin + dx / 2.0, xmax, dx))
+    assert np.allclose(coords["y"], np.arange(ymax + dy / 2.0, ymin, dy))
+    assert coords["dx"] == dx
+    assert coords["dy"] == dy
+
+
+def test_xycoords_nonequidistant():
+    dx = np.array([0.9, 1.1, 0.8, 1.2])
+    dy = np.array([-1.3, -0.7, -1.0])
+    xmin, xmax = 0.0, 4.0
+    ymin, ymax = 0.0, 3.0
+    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    assert np.allclose(coords["x"], np.array([0.45, 1.45, 2.4, 3.4]))
+    assert np.allclose(coords["y"], np.array([2.35, 1.35, 0.5]))
+    assert coords["dx"][0] == "x"
+    assert np.allclose(coords["dx"][1], dx)
+    assert coords["dy"][0] == "y"
+    assert np.allclose(coords["dy"][1], dy)
 
 
 def test_saveload(test_da):
@@ -65,7 +103,18 @@ def test_saveload(test_da):
     assert Path("test.idf").exists()
     da = idf.load("test.idf")
     assert isinstance(da, xr.DataArray)
-    assert (test_da == da).all()
+    assert da.identical(test_da)
+
+
+def test_saveload__nonequidistant(test_da_nonequidistant):
+    idf.save("nonequidistant.idf", test_da_nonequidistant)
+    assert Path("nonequidistant.idf").exists()
+    da = idf.load("nonequidistant.idf")
+    assert isinstance(da, xr.DataArray)
+    assert np.array_equal(da, test_da_nonequidistant)
+    # since the coordinates are created in float64 and stored in float32,
+    # we lose some precision, which we have to allow for here
+    xr.testing.assert_allclose(da, test_da_nonequidistant)
 
 
 def test_lazy():
