@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - IPF support implicit `itype`, defaults to timeseries
+- Significant performance increase in `imod.idf.load` due to several optimizations
 
 ## [0.4.3] - 2018-11-13
 ### Fixed
