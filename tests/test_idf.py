@@ -104,6 +104,8 @@ def test_saveload(test_da):
     da = idf.load("test.idf")
     assert isinstance(da, xr.DataArray)
     assert da.identical(test_da)
+    with pytest.warns(FutureWarning):
+        idf.load("test.idf", memmap=True)
 
 
 def test_saveload__nonequidistant(test_da_nonequidistant):

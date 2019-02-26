@@ -1,4 +1,5 @@
 import itertools
+import warnings
 from collections import OrderedDict
 from datetime import datetime
 from glob import glob
@@ -177,42 +178,9 @@ def _to_nan(a, nodata):
         return a
 
 
-def memmap(path, headersize, nrow, ncol, nodata):
-    """
-    Make a memory map of a single IDF file
-
-    Use idf.read if you don't want to modify the nodata values of the IDF,
-    or if you want to have an in memory numpy.ndarray.
-
-    Parameters
-    ----------
-    path : str or Path
-        Path to the IDF file to be memory mapped
-
-    Returns
-    -------
-    numpy.memmap
-        A float32 memory map with shape (nrow, ncol) of the data block
-        of the IDF file. It is opened in 'r+' read and write mode, and
-        on opening all nodata values are changed to NaN in both the
-        header and data block.
-    dict
-        A dict with all metadata.
-    """
-    a = np.memmap(str(path), np.float32, "r+", headersize, (nrow, ncol))
-
-    # only change the header if needed
-    if not np.isnan(nodata):
-        setnodataheader(path, np.nan)
-
-    return _to_nan(a, nodata)
-
-
 def _read(path, headersize, nrow, ncol, nodata):
     """
     Read a single IDF file to a numpy.ndarray
-
-    Compared to idf.memmap, this does not modify the IDF.
 
     Parameters
     ----------
@@ -230,8 +198,6 @@ def _read(path, headersize, nrow, ncol, nodata):
         A float32 numpy.ndarray with shape (nrow, ncol) of the values
         in the IDF file. On opening all nodata values are changed
         to NaN in the numpy.ndarray.
-    dict
-        A dict with all metadata.
     """
     with open(path, "rb") as f:
         f.seek(headersize)
@@ -242,8 +208,6 @@ def _read(path, headersize, nrow, ncol, nodata):
 def read(path):
     """
     Read a single IDF file to a numpy.ndarray
-
-    Compared to idf.memmap, this does not modify the IDF.
 
     Parameters
     ----------
@@ -276,9 +240,6 @@ def dask(path, memmap=False, attrs=None):
     ----------
     path : str or Path
         Path to the IDF file to be read
-    memmap : bool, optional
-        Whether to use a memory map to the file, or an in memory
-        copy. Default is to use an in memory copy.
     attrs : dict, optional
         A dict as returned by imod.idf.header, this function is called if not supplied.
         Used to minimize unneeded filesystem calls.
@@ -293,6 +254,9 @@ def dask(path, memmap=False, attrs=None):
         A dict with all metadata.
     """
 
+    if memmap:
+        warnings.warn("memmap option is removed", FutureWarning)
+
     if attrs is None:
         attrs = header(path)
     # If we don't unpack, it seems we run into trouble with the dask array later
@@ -301,13 +265,9 @@ def dask(path, memmap=False, attrs=None):
     nrow = attrs["nrow"]
     ncol = attrs["ncol"]
     nodata = attrs.pop("nodata")
-    if memmap:
-        a = imod.idf.memmap(path, headersize, nrow, ncol, nodata)
-        x = array.from_array(a, chunks=(nrow, ncol))
-    else:
-        # dask.delayed requires currying
-        a = delayed(imod.idf._read)(path, headersize, nrow, ncol, nodata)
-        x = array.from_delayed(a, shape=(nrow, ncol), dtype=np.float32)
+    # dask.delayed requires currying
+    a = delayed(imod.idf._read)(path, headersize, nrow, ncol, nodata)
+    x = array.from_delayed(a, shape=(nrow, ncol), dtype=np.float32)
     return x, attrs
 
 
@@ -333,8 +293,10 @@ def dataarray(path, memmap=False):
         All metadata needed for writing the file to IDF or other formats
         using imod.rasterio are included in the xarray.DataArray.attrs.
     """
-    # TODO deprecate this function?
-    return _load([path], memmap=memmap)
+    warnings.warn(
+        "imod.idf.dataarray is deprecated, use imod.idf.load instead", FutureWarning
+    )
+    return _load([path])
 
 
 # load IDFs for multiple times and/or layers into one DataArray
@@ -350,9 +312,6 @@ def load(path, memmap=False):
         Note that each file needs to be of the same name (part before the
         first underscore) but have a different layer and/or timestamp,
         such that they can be combined in a single xarray.DataArray.
-    memmap : bool, optional
-        Whether to use a memory map to the file, or an in memory
-        copy. Default is to use a memory map.
 
     Returns
     -------
@@ -361,8 +320,11 @@ def load(path, memmap=False):
         All metadata needed for writing the file to IDF or other formats
         using imod.rasterio are included in the xarray.DataArray.attrs.
     """
+    if memmap:
+        warnings.warn("memmap option is removed", FutureWarning)
+
     if isinstance(path, list):
-        return _load(path, memmap=memmap)
+        return _load(path)
     elif isinstance(path, Path):
         path = str(path)
 
@@ -370,12 +332,11 @@ def load(path, memmap=False):
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
-    return _load(paths, memmap=memmap)
+    return _load(paths)
 
 
-def _load(paths, memmap=False):
+def _load(paths):
     """Combine a list of paths to IDFs to a single xarray.DataArray"""
-    # TODO support memmap?
     # this function also works for single IDFs
 
     headers_unsorted = [imod.idf.header(p) for p in paths]
@@ -404,7 +365,7 @@ def _load(paths, memmap=False):
         coords["time"] = np.unique(times)
         dims.insert(0, "time")
 
-    # see if we can avoid calling imod.idf.header here, which takes almost half the time
+    # avoid calling imod.idf.header again here with attrs keyword
     dask_arrays = [
         imod.idf.dask(path, attrs=attrs)[0] for (path, attrs) in zip(paths, headers)
     ]
@@ -445,9 +406,6 @@ def loadset(globpath, memmap=False):
         finds all IDF files under the model directory. Note that files with
         the same name (part before the first underscore) wil be combined into
         a single xarray.DataArray.
-    memmap : bool, optional
-        Whether to use a memory map to the file, or an in memory
-        copy. Default is to use a memory map.
 
     Returns
     -------
@@ -456,6 +414,9 @@ def loadset(globpath, memmap=False):
         All metadata needed for writing the file to IDF or other formats
         using imod.rasterio are included in the xarray.DataArray.attrs.
     """
+    if memmap:
+        warnings.warn("memmap option is removed", FutureWarning)
+
     # convert since for Path.glob non-relative patterns are unsupported
     if isinstance(globpath, Path):
         globpath = str(globpath)
@@ -476,7 +437,7 @@ def loadset(globpath, memmap=False):
         d[n].append(p)
 
     # load each group into a DataArray
-    das = [_load(v, memmap=memmap) for v in d.values()]
+    das = [_load(v) for v in d.values()]
 
     # store each DataArray under it's own name in an OrderedDict
     dd = OrderedDict()
@@ -487,7 +448,7 @@ def loadset(globpath, memmap=False):
     # https://github.com/pydata/xarray/issues/1471#issuecomment-313719395
     # It is not aligned when some parameters only have a non empty subset of a dimension,
     # such as L2 + L3. This dict provides a similar interface anyway. If a Dataset is constructed
-    # from unaligned DataArrays it will make copies of the memmap, which we don't want.
+    # from unaligned DataArrays it will make copies of the data, which we don't want.
     return dd
 
 
