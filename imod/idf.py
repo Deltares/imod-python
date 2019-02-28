@@ -129,14 +129,15 @@ def _sort_time_layer(header):
 
 
 def _has_dim(seq):
-    """Check if a either 0 or all None are allowed
+    """Check if either 0 or all None are present
 
     Returns
     -------
     True if no None in seq, False if all None, error otherwise
     """
-    if None in seq:
-        if all(x is None for x in seq):
+    nones = [x is None for x in seq]
+    if any(nones):
+        if all(nones):
             return False
         else:
             raise ValueError("Either 0 or all None allowed")
