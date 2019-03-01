@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 import xarray as xr
+import cftime
 from imod import idf
 
 
@@ -171,3 +172,11 @@ def test_save_topbot__errors(test_layerda):
     da.attrs["bot"] = [0, 1, 3]
     with pytest.raises(AssertionError):
         idf.save("layer", da)
+
+
+def test_has_dim():
+    t = cftime.DatetimeProlepticGregorian(2019, 2, 28)
+    assert idf._has_dim([t, 2, 3])
+    assert not idf._has_dim([None, None, None])
+    with pytest.raises(ValueError):
+        idf._has_dim([t, 2, None])

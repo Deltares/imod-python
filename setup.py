@@ -22,7 +22,7 @@ setup(
     install_requires=[
         "numpy",
         "xarray>=0.11",
-        "cftime",
+        "cftime>=1",
         "pandas",
         "dask",
         "cytoolz",  # optional dask dependency we need
