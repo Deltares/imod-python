@@ -339,10 +339,14 @@ def load(path, memmap=False):
 def _load(paths):
     """Combine a list of paths to IDFs to a single xarray.DataArray"""
     # this function also works for single IDFs
-
+    
+    # Sort paths and headers by time then layer
+    paths = [util.decompose(path) for path in paths]
+    p =sorted(paths, key = _sort_time_layer)
+    paths = [util.compose(path) for path in p]
     headers_unsorted = [imod.idf.header(p) for p in paths]
-    # sort headers by time then layer
     headers = sorted(headers_unsorted, key=_sort_time_layer)
+    
     times = [c.get("time", None) for c in headers]
     layers = [c.get("layer", None) for c in headers]
     bounds = [(h["xmin"], h["xmax"], h["ymin"], h["ymax"]) for h in headers]
