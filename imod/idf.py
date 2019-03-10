@@ -297,11 +297,11 @@ def dataarray(path, memmap=False):
     warnings.warn(
         "imod.idf.dataarray is deprecated, use imod.idf.load instead", FutureWarning
     )
-    return _load([path])
+    return _load([path, False])
 
 
 # load IDFs for multiple times and/or layers into one DataArray
-def load(path, memmap=False):
+def load(path, memmap=False, use_cftime=False):
     """
     Read a parameter (one or more IDFs) to a xarray.DataArray
 
@@ -313,6 +313,14 @@ def load(path, memmap=False):
         Note that each file needs to be of the same name (part before the
         first underscore) but have a different layer and/or timestamp,
         such that they can be combined in a single xarray.DataArray.
+    use_cftime : bool, optional
+        Use `cftime.DatetimeProlepticGregorian` instead of `np.datetime64[ns]`
+        for the time axis.
+
+        Dates are normally encoded as `np.datetime64[ns]`; however, if dates
+        fall before 1678 or after 2261, they are automatically encoded as
+        `cftime.DatetimeProlepticGregorian` objects rather than
+        `np.datetime64[ns]`.
 
     Returns
     -------
@@ -325,7 +333,7 @@ def load(path, memmap=False):
         warnings.warn("memmap option is removed", FutureWarning)
 
     if isinstance(path, list):
-        return _load(path)
+        return _load(path, use_cftime)
     elif isinstance(path, Path):
         path = str(path)
 
@@ -333,10 +341,10 @@ def load(path, memmap=False):
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
-    return _load(paths)
+    return _load(paths, use_cftime)
 
 
-def _load(paths):
+def _load(paths, use_cftime):
     """Combine a list of paths to IDFs to a single xarray.DataArray"""
     # this function also works for single IDFs
 
@@ -363,6 +371,7 @@ def _load(paths):
         coords["layer"] = np.unique(layers)
         dims.insert(0, "layer")
     if hastime:
+        times = util._convert_datetimes(times, use_cftime)
         coords["time"] = np.unique(times)
         dims.insert(0, "time")
 
@@ -392,7 +401,7 @@ def _load(paths):
     return xr.DataArray(dask_array, coords, dims, name=names[0])
 
 
-def loadset(globpath, memmap=False):
+def loadset(globpath, memmap=False, use_cftime=False):
     """
     Read a set of parameters to a dict of xarray.DataArray
 
@@ -407,6 +416,14 @@ def loadset(globpath, memmap=False):
         finds all IDF files under the model directory. Note that files with
         the same name (part before the first underscore) wil be combined into
         a single xarray.DataArray.
+    use_cftime : bool, optional
+        Use `cftime.DatetimeProlepticGregorian` instead of `np.datetime64[ns]`
+        for the time axis.
+
+        Dates are normally encoded as `np.datetime64[ns]`; however, if dates
+        fall before 1679 or after 2262, they are automatically encoded as
+        `cftime.DatetimeProlepticGregorian` objects rather than
+        `np.datetime64[ns]`.
 
     Returns
     -------
@@ -438,7 +455,7 @@ def loadset(globpath, memmap=False):
         d[n].append(p)
 
     # load each group into a DataArray
-    das = [_load(v) for v in d.values()]
+    das = [_load(v, use_cftime) for v in d.values()]
 
     # store each DataArray under it's own name in an OrderedDict
     dd = OrderedDict()

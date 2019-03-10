@@ -4,10 +4,20 @@ from collections import OrderedDict
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 import cftime
 from imod import idf
+
+
+def globremove(globpath):
+    paths = glob(globpath)
+    for path in paths:
+        try:
+            os.remove(path)
+        except FileNotFoundError:
+            pass
 
 
 @pytest.fixture(scope="module")
@@ -21,10 +31,47 @@ def test_da(request):
     data = np.ones((nrow, ncol), dtype=np.float32)
 
     def remove():
-        try:
-            os.remove("test.idf")
-        except FileNotFoundError:
-            pass
+        globremove("test.idf")
+
+    request.addfinalizer(remove)
+    return xr.DataArray(data, **kwargs)
+
+
+@pytest.fixture(scope="module")
+def test_nptimeda(request):
+    nrow, ncol = 3, 4
+    dx, dy = 1.0, -1.0
+    xmin, xmax = 0.0, 4.0
+    ymin, ymax = 0.0, 3.0
+    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords["time"] = pd.date_range("2000-01-01", "2000-01-10", freq="D").values
+    ntime = len(coords["time"])
+    kwargs = {"name": "testnptime", "coords": coords, "dims": ("time", "y", "x")}
+    data = np.ones((ntime, nrow, ncol), dtype=np.float32)
+
+    def remove():
+        globremove("testnptime*.idf")
+
+    request.addfinalizer(remove)
+    return xr.DataArray(data, **kwargs)
+
+
+@pytest.fixture(scope="module")
+def test_cftimeda(request):
+    nrow, ncol = 3, 4
+    dx, dy = 1.0, -1.0
+    xmin, xmax = 0.0, 4.0
+    ymin, ymax = 0.0, 3.0
+    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords["time"] = [
+        cftime.DatetimeProlepticGregorian(y, 1, 1) for y in range(1000, 10_000, 1000)
+    ]
+    ntime = len(coords["time"])
+    kwargs = {"name": "testcftime", "coords": coords, "dims": ("time", "y", "x")}
+    data = np.ones((ntime, nrow, ncol), dtype=np.float32)
+
+    def remove():
+        globremove("testcftime*.idf")
 
     request.addfinalizer(remove)
     return xr.DataArray(data, **kwargs)
@@ -107,6 +154,31 @@ def test_saveload(test_da):
     assert da.identical(test_da)
     with pytest.warns(FutureWarning):
         idf.load("test.idf", memmap=True)
+
+
+def test_saveload__nptime(test_nptimeda):
+    idf.save("testnptime", test_nptimeda)
+    da = idf.load("testnptime*.idf")
+    assert isinstance(da, xr.DataArray)
+    assert da.identical(test_nptimeda)
+
+
+def test_saveload__cftime_withinbounds(test_nptimeda):
+    cftimes = []
+    for time in test_nptimeda.time.values:
+        dt = pd.Timestamp(time).to_pydatetime()
+        cftimes.append(cftime.DatetimeProlepticGregorian(*dt.timetuple()[:6]))
+    da = idf.load("testnptime*.idf", use_cftime=True)
+    assert isinstance(da, xr.DataArray)
+    assert all(np.array(cftimes) == da.time.values)
+
+
+def test_saveload__cftime_outofbounds(test_cftimeda):
+    idf.save("testcftime", test_cftimeda)
+    with pytest.warns(UserWarning):
+        da = idf.load("testcftime*.idf")
+    assert isinstance(da, xr.DataArray)
+    assert da.identical(test_cftimeda)
 
 
 def test_saveload__nonequidistant(test_da_nonequidistant):

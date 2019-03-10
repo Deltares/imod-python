@@ -2,6 +2,7 @@ import re
 from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
+import warnings
 
 import cftime
 import numpy as np
@@ -25,13 +26,11 @@ def decompose(path):
     # Try to get time from idf name, iMODFLOW can output two datetime formats
     for s in parts:
         try:
-            dt = datetime.strptime(s, "%Y%m%d%H%M%S")
-            d["time"] = cftime.DatetimeProlepticGregorian(*dt.timetuple()[:6])
+            d["time"] = datetime.strptime(s, "%Y%m%d%H%M%S")
             break
         except ValueError:
             try:
-                dt = datetime.strptime(s, "%Y%m%d")
-                d["time"] = cftime.DatetimeProlepticGregorian(*dt.timetuple()[:6])
+                d["time"] = datetime.strptime(s, "%Y%m%d")
                 break
             except ValueError:
                 pass  # no time in dict
@@ -41,6 +40,41 @@ def decompose(path):
     if p.match(parts[-1]):
         d["layer"] = int(parts[-1][1:])
     return d
+
+
+def _convert_datetimes(times, use_cftime):
+    """
+    Return times as np.datetime64[ns] or cftime.DatetimeProlepticGregorian
+    depending on whether the dates fall within the inclusive bounds of 
+    np.datetime64[ns]: [1678-01-01 AD, 2261-12-31 AD].
+
+    Alternatively, always returns as cftime.DatetimeProlepticGregorian if
+    `use_cf_time` is True.
+    """
+    out_of_bounds = False
+    if use_cftime:
+        converted = [
+            cftime.DatetimeProlepticGregorian(*time.timetuple()[:6]) for time in times
+        ]
+    else:
+        for time in times:
+            year = time.year
+            if year < 1678 or year > 2261:
+                out_of_bounds = True
+                break
+
+        if out_of_bounds:
+            warnings.warn(
+                "Dates are outside of np.datetime64[ns] timespan."
+                "Converting to cftime.DatetimeProlepticGregorian."
+            )
+            converted = [
+                cftime.DatetimeProlepticGregorian(*time.timetuple()[:6]) for time in times
+            ]
+        else:
+            converted = [np.datetime64(time, "ns") for time in times]
+
+    return converted
 
 
 def compose(d):
