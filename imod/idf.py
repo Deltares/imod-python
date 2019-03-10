@@ -557,11 +557,11 @@ def save(path, a, nodata=1.0e20):
                 layer = d.get("layer", "no_layer")
                 a_yx.attrs["top"] = d_top[layer]
                 a_yx.attrs["bot"] = d_bot[layer]
-            write(fn, a_yx)
+            write(fn, a_yx, nodata)
     else:
         # no extra dims, only one IDF
         fn = util.compose(d)
-        write(fn, a)
+        write(fn, a, nodata)
 
 
 def _extra_dims(a):
