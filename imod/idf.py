@@ -18,7 +18,9 @@ def header(path):
     """Read the IDF header information into a dictionary"""
     attrs = util.decompose(path)
     with open(path, "rb") as f:
-        assert unpack("i", f.read(4))[0] == 1271  # Lahey RecordLength Ident.
+        reclen_id = unpack("i", f.read(4))[0]  # Lahey RecordLength Ident.
+        if reclen_id != 1271:
+            raise ValueError(f"Not a supported IDF file: {path}")
         ncol = unpack("i", f.read(4))[0]
         nrow = unpack("i", f.read(4))[0]
         attrs["xmin"] = unpack("f", f.read(4))[0]
@@ -67,10 +69,10 @@ def setnodataheader(path, nodata):
         f.write(pack("f", nodata))
 
 
-def _all_equal(seq):
+def _all_equal(seq, elem):
     """Raise an error if not all elements of a list are equal"""
     if not seq.count(seq[0]) == len(seq):
-        raise ValueError("All elements must be equal")
+        raise ValueError(f"All {elem} must be the same, found: {set(seq)}")
 
 
 def _check_cellsizes(cellsizes):
@@ -349,18 +351,19 @@ def _load(paths, use_cftime):
     # this function also works for single IDFs
 
     headers_unsorted = [imod.idf.header(p) for p in paths]
+    names_unsorted = [h["name"] for h in headers_unsorted]
+    _all_equal(names_unsorted, "names")
+
     # sort headers by time then layer
     headers = sorted(headers_unsorted, key=_sort_time_layer)
     times = [c.get("time", None) for c in headers]
     layers = [c.get("layer", None) for c in headers]
     bounds = [(h["xmin"], h["xmax"], h["ymin"], h["ymax"]) for h in headers]
-    names = [h["name"] for h in headers]
     cellsizes = [(h["dx"], h["dy"]) for h in headers]
 
     hastime = _has_dim(times)
     haslayer = _has_dim(layers)
-    _all_equal(bounds)
-    _all_equal(names)
+    _all_equal(bounds, "bounding boxes")
     _check_cellsizes(cellsizes)
 
     # create coordinates
@@ -398,7 +401,7 @@ def _load(paths, use_cftime):
     else:
         dask_array = dask_arrays[0]
 
-    return xr.DataArray(dask_array, coords, dims, name=names[0])
+    return xr.DataArray(dask_array, coords, dims, name=names_unsorted[0])
 
 
 def loadset(globpath, memmap=False, use_cftime=False):
