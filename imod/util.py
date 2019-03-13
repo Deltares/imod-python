@@ -6,6 +6,7 @@ import warnings
 
 import cftime
 import numpy as np
+import xarray as xr
 from affine import Affine
 
 
@@ -64,17 +65,16 @@ def _convert_datetimes(times, use_cftime):
                 break
 
         if out_of_bounds:
-            warnings.warn(
-                "Dates are outside of np.datetime64[ns] timespan."
-                "Converting to cftime.DatetimeProlepticGregorian."
-            )
+            use_cftime = True
+            msg = "Dates are outside of np.datetime64[ns] timespan. Converting to cftime.DatetimeProlepticGregorian."
+            warnings.warn(msg)
             converted = [
                 cftime.DatetimeProlepticGregorian(*time.timetuple()[:6]) for time in times
             ]
         else:
             converted = [np.datetime64(time, "ns") for time in times]
 
-    return converted
+    return converted, use_cftime
 
 
 def compose(d):

@@ -377,8 +377,11 @@ def _load(paths, use_cftime):
         coords["layer"] = np.unique(layers)
         dims.insert(0, "layer")
     if hastime:
-        times = util._convert_datetimes(times, use_cftime)
-        coords["time"] = np.unique(times)
+        times, use_cftime = util._convert_datetimes(times, use_cftime)
+        if use_cftime:
+            coords["time"] = xr.CFTimeIndex(np.unique(times))
+        else:
+            coords["time"] = np.unique(times)
         dims.insert(0, "time")
 
     # avoid calling imod.idf.header again here with attrs keyword
