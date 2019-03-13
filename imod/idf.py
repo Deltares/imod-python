@@ -354,8 +354,11 @@ def _load(paths, use_cftime):
     names_unsorted = [h["name"] for h in headers_unsorted]
     _all_equal(names_unsorted, "names")
 
-    # sort headers by time then layer
-    headers = sorted(headers_unsorted, key=_sort_time_layer)
+    # sort headers and paths by time then layer
+    zipped = zip(headers_unsorted, paths)
+    zipped_sorted = sorted(zipped, key = lambda pair: _sort_time_layer(pair[0]))
+    headers, paths = map(list, zip(*zipped_sorted))
+
     times = [c.get("time", None) for c in headers]
     layers = [c.get("layer", None) for c in headers]
     bounds = [(h["xmin"], h["xmax"], h["ymin"], h["ymax"]) for h in headers]

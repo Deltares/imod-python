@@ -101,6 +101,34 @@ def test_layerda(request):
 
 
 @pytest.fixture(scope="module")
+def test_timelayerda(request):
+    ntime, nlay, nrow, ncol = 3, 5, 3, 4
+    dx, dy = 1.0, -1.0
+    xmin, xmax = 0.0, 4.0
+    ymin, ymax = 0.0, 3.0
+    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords["layer"] = np.arange(nlay) + 8
+    coords["time"] = pd.date_range("2000-01-01", "2002-01-01", freq="YS").values
+
+    kwargs = {"name": "timelayer", "coords": coords, "dims": ("time", "layer", "y", "x")}
+    data = np.ones((ntime, nlay, nrow, ncol), dtype=np.float32)
+    for i in range(ntime):
+        for j, layer in enumerate(range(8, 8 + nlay)):
+            data[i, j, ...] = layer * (i + 1)
+
+    def remove():
+        paths = glob("timelayer*.idf")
+        for p in paths:
+            try:
+                os.remove(p)
+            except FileNotFoundError:
+                pass
+
+    request.addfinalizer(remove)
+    return xr.DataArray(data, **kwargs)
+
+
+@pytest.fixture(scope="module")
 def test_da_nonequidistant(request):
     nrow, ncol = 3, 4
     dx = np.array([0.9, 1.1, 0.8, 1.2])
@@ -179,6 +207,19 @@ def test_saveload__cftime_outofbounds(test_cftimeda):
         da = idf.load("testcftime*.idf")
     assert isinstance(da, xr.DataArray)
     assert da.identical(test_cftimeda)
+
+
+def test_saveload_sorting_headers_paths(test_timelayerda):
+    idf.save("timelayer", test_timelayerda)
+    loaded = idf.load("timelayer_*.idf").isel(x=0, y=0).values.ravel()
+    assert np.allclose(np.sort(loaded), loaded)
+
+
+def test_saveload_timelayer(test_timelayerda):
+    idf.save("timelayer", test_timelayerda)
+    da = idf.load("timelayer_*.idf")
+    assert isinstance(da, xr.DataArray)
+    assert da.identical(test_timelayerda)
 
 
 def test_saveload__nonequidistant(test_da_nonequidistant):
