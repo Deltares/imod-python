@@ -306,7 +306,7 @@ def write_assoc(path, df, itype=1, nodata=1.0e20):
     )
 
 
-def write(path, df, indexcolumn=0, assoc_ext="txt"):
+def write(path, df, indexcolumn=0, assoc_ext="txt", nodata=1.0e20):
     """
     Writes a single IPF file.
 
@@ -329,7 +329,7 @@ def write(path, df, indexcolumn=0, assoc_ext="txt"):
     None
         Writes a file.
     """
-
+    df = df.fillna(nodata)
     nrecords, nfields = df.shape
     with open(path, "w") as f:
         f.write(f"{nrecords}\n{nfields}\n")
@@ -381,7 +381,7 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20):
         Writes files.
     """
     if itype is None:
-        write(path, df)
+        write(path, df, nodata=nodata)
     else:
         itype = _coerce_itype(itype)
         colnames = _lower(list(df))
@@ -417,7 +417,7 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20):
         agg_df = grouped.agg(agg_kwargs)
         # Quote so spaces don't mess up paths
         agg_df["id"] = '"' + agg_df["id"] + '"'
-        write(path, agg_df, 3, assoc_ext)
+        write(path, agg_df, 3, assoc_ext, nodata=nodata)
 
 
 def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20):

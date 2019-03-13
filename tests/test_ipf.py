@@ -91,6 +91,34 @@ def write_assoc_ipf(request):
     return _write_assoc_ipf
 
 
+@pytest.fixture(scope="module")
+def nodata_ipf(request):
+    df = pd.DataFrame()
+    df["id"] = np.arange(3)
+    df["nodatacolumn"] = np.nan
+    df["thirdcolumn"] = "dummy"
+    ipf.write("nodata.ipf", df)
+
+    def teardown():
+        remove("nodata.ipf")
+    
+    request.addfinalizer(teardown)
+
+
+@pytest.fixture(scope="module")
+def nodata_assoc(request):
+    df = pd.DataFrame()
+    df["id"] = np.arange(3)
+    df["time"] = pd.date_range("2000-01-01", "2000-01-03")
+    df["nodatacolumn"] = np.nan
+    ipf.write_assoc("nodata.txt", df, itype="timeseries")
+
+    def teardown():
+        remove("nodata.txt")
+    
+    request.addfinalizer(teardown)
+
+
 def test_read_associated__itype1implicit():
     path = "A1000.txt"
     delim = ","
@@ -382,3 +410,23 @@ def test_save__assoc_itype1__layers():
     remove("B2.txt")
     remove("C3.txt")
     remove("D4.txt")
+
+
+def test_save__missing(nodata_ipf):
+    """
+    iMOD does not accept ",," for nodata. These should be filled in by a nodata
+    values.
+    """
+    with open("nodata.ipf") as f:
+        content = f.read()
+    assert ",," not in content
+
+
+def test_save__assoc_missing(nodata_assoc):
+    """
+    iMOD does not accept ",," for nodata. These should be filled in by a nodata
+    values.
+    """
+    with open("nodata.txt") as f:
+        content = f.read()
+    assert ",," not in content
