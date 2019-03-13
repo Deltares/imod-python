@@ -508,7 +508,7 @@ def save(path, a, nodata=1.0e20):
     written, like the `imod.idf.write` function. This function is more general
     and also supports `time` and `layer` dimensions. It will split these up,
     give them their own filename according to the conventions in
-    `imod.util.compose`, and write them each
+    `imod.util.compose`, and write them each.
 
     Parameters
     ----------
@@ -517,7 +517,12 @@ def save(path, a, nodata=1.0e20):
         actual filename(s) using conventions, so it only takes the directory and
         name from this parameter.
     a : xarray.DataArray
-        DataArray to be written. It needs to have exactly a.dims == ('y', 'x').
+        DataArray to be written. It needs to have dimensions ('y', 'x'), and 
+        optionally `layer` and `time`.
+    nodata : float, optional
+        Nodata value in the saved IDF files. Xarray uses nan values to represent
+        nodata, but these tend to work unreliably in iMOD(FLOW).
+        Defaults to a value of 1.0e20.
 
     Example
     -------
@@ -588,6 +593,11 @@ def write(path, a, nodata=1.0e20):
         Path to the IDF file to be written
     a : xarray.DataArray
         DataArray to be written. It needs to have exactly a.dims == ('y', 'x').
+    nodata : float, optional
+        Nodata value in the saved IDF files. Xarray uses nan values to represent
+        nodata, but these tend to work unreliably in iMOD(FLOW).
+        Defaults to a value of 1.0e20.
+
     """
     assert a.dims == ("y", "x")
     with open(path, "wb") as f:
