@@ -153,11 +153,11 @@ def _xycoords(bounds, cellsizes):
     dx, dy = cellsizes
     coords = OrderedDict()
     # from cell size to x and y coordinates
-    if isinstance(dx, float):  # equidistant
+    if isinstance(dx, (int, float)):  # equidistant
         coords["x"] = np.arange(xmin + dx / 2.0, xmax, dx)
         coords["y"] = np.arange(ymax + dy / 2.0, ymin, dy)
-        coords["dx"] = dx
-        coords["dy"] = dy
+        coords["dx"] = float(dx)
+        coords["dy"] = float(dy)
     else:  # nonequidistant
         # even though IDF may store them as float32, we always convert them to float64
         dx = dx.astype(np.float64)

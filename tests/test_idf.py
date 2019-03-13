@@ -38,6 +38,23 @@ def test_da(request):
 
 
 @pytest.fixture(scope="module")
+def test_da__nodxdy(request):
+    nrow, ncol = 3, 4
+    dx, dy = 1.0, -1.0
+    xmin, xmax = 0.0, 4.0
+    ymin, ymax = 0.0, 3.0
+    coords = {"y": np.arange(ymax, ymin, dy), "x": np.arange(xmin, xmax)}
+    kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
+    data = np.ones((nrow, ncol), dtype=np.float32)
+
+    def remove():
+        globremove("testnodxdy.idf")
+
+    request.addfinalizer(remove)
+    return xr.DataArray(data, **kwargs)
+
+
+@pytest.fixture(scope="module")
 def test_nptimeda(request):
     nrow, ncol = 3, 4
     dx, dy = 1.0, -1.0
@@ -182,6 +199,14 @@ def test_saveload(test_da):
     assert da.identical(test_da)
     with pytest.warns(FutureWarning):
         idf.load("test.idf", memmap=True)
+
+
+def test_save__int32coords(test_da__nodxdy):
+    test_da = test_da__nodxdy
+    test_da.x.values = test_da.x.values.astype(np.int32)
+    test_da.y.values = test_da.y.values.astype(np.int32)
+    idf.save("testnodxdy.idf", test_da)
+    assert Path("testnodxdy.idf").exists()
 
 
 def test_saveload__nptime(test_nptimeda):

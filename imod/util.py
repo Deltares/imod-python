@@ -102,7 +102,7 @@ def compose(d):
 
 
 def _delta(x, coordname):
-    dxs = np.diff(x)
+    dxs = np.diff(x.astype(np.float64))
     dx = dxs[0]
     atolx = abs(1.0e-6 * dx)
     if not np.allclose(dxs, dx, atolx):
@@ -137,7 +137,7 @@ def spatial_reference(a):
         dx = a.coords["dx"]
         dy = a.coords["dy"]
         if (dx.shape == x.shape) and (dx.size != 1):
-            dx = dx.values
+            dx = dx.values.astype(np.float64)
             xmin = float(x.min()) - 0.5 * abs(dx[0])
             xmax = float(x.max()) + 0.5 * abs(dx[-1])
         else:
@@ -145,7 +145,7 @@ def spatial_reference(a):
             xmin = float(x.min()) - 0.5 * abs(dx)
             xmax = float(x.max()) + 0.5 * abs(dx)
         if (dy.shape == y.shape) and (dy.size != 1):
-            dy = dy.values
+            dy = dy.values.astype(np.float64)
             ymin = float(y.min()) - 0.5 * abs(dy[-1])
             ymax = float(y.max()) + 0.5 * abs(dy[0])
         else:
