@@ -142,10 +142,10 @@ def test_read_associated__itype1implicit():
     assert df.shape == (2,2)
 
 
-def test_load__comma(write_basic_ipf):
+def test_read__comma(write_basic_ipf):
     path = "basic_comma.ipf"
     write_basic_ipf(path, ",")
-    df = ipf.load(path)
+    df = ipf.read(path)
     assert isinstance(df, pd.DataFrame)
     assert list(df) == ["X", "Y", "Z", "City of Holland"]
     assert len(df) == 2
@@ -153,10 +153,10 @@ def test_load__comma(write_basic_ipf):
     assert df.iloc[1, 3] == "Den Bosch"
 
 
-def test_load__space(write_basic_ipf):
+def test_read__space(write_basic_ipf):
     path = "basic_space.ipf"
     write_basic_ipf(path, " ")
-    df = ipf.load(path, {"delim_whitespace": True})
+    df = ipf.read(path, {"delim_whitespace": True})
     assert isinstance(df, pd.DataFrame)
     assert list(df) == ["X", "Y", "Z", "City of Holland"]
     assert len(df) == 2
@@ -164,10 +164,10 @@ def test_load__space(write_basic_ipf):
     assert df.iloc[1, 3] == "Den Bosch"
 
 
-def test_load_associated__comma_comma(write_assoc_ipf):
+def test_read_associated__comma_comma(write_assoc_ipf):
     path = "assoc.txt"
     write_assoc_ipf(path, ",", ",")
-    df = ipf.load(path)
+    df = ipf.read(path)
 
     nrecords, nfields = df.shape
     assert isinstance(df, pd.DataFrame)
@@ -180,10 +180,10 @@ def test_load_associated__comma_comma(write_assoc_ipf):
     assert pd.isnull(df["level"].iloc[3])
 
 
-def test_load_associated__comma_space(write_assoc_ipf):
+def test_read_associated__comma_space(write_assoc_ipf):
     path = "assoc.ipf"
     write_assoc_ipf(path, ",", " ")
-    df = ipf.load(path, assoc_kwargs={"delim_whitespace": True})
+    df = ipf.read(path, assoc_kwargs={"delim_whitespace": True})
 
     nrecords, nfields = df.shape
     assert isinstance(df, pd.DataFrame)
@@ -196,10 +196,10 @@ def test_load_associated__comma_space(write_assoc_ipf):
     assert pd.isnull(df["level"].iloc[3])
 
 
-def test_load_associated__space_space(write_assoc_ipf):
+def test_read_associated__space_space(write_assoc_ipf):
     path = "assoc.ipf"
     write_assoc_ipf(path, " ", " ")
-    df = ipf.load(
+    df = ipf.read(
         path, kwargs={"delim_whitespace": True}, assoc_kwargs={"delim_whitespace": True}
     )
 
@@ -214,10 +214,10 @@ def test_load_associated__space_space(write_assoc_ipf):
     assert pd.isnull(df["level"].iloc[3])
 
 
-def test_load_associated__space_comma(write_assoc_ipf):
+def test_read_associated__space_comma(write_assoc_ipf):
     path = "assoc.ipf"
     write_assoc_ipf(path, " ", ",")
-    df = ipf.load(path, kwargs={"delim_whitespace": True})
+    df = ipf.read(path, kwargs={"delim_whitespace": True})
 
     nrecords, nfields = df.shape
     assert isinstance(df, pd.DataFrame)
@@ -330,7 +330,7 @@ def test_save__assoc_itype1():
     assert Path("save.ipf").exists()
     assert Path("A1.txt").exists()
     assert Path("B2.txt").exists()
-    df2 = ipf.load("save.ipf")
+    df2 = ipf.read("save.ipf")
     df = df.sort_values(by="x")
     df2.index = df.index
     df2 = df2.sort_values(by="x")
@@ -357,7 +357,7 @@ def test_save__assoc_itype2_():
     assert Path("save.ipf").exists()
     assert Path("A1.txt").exists()
     assert Path("B2.txt").exists()
-    df2 = ipf.load("save.ipf")
+    df2 = ipf.read("save.ipf")
     df = df.sort_values(by="x")
     df2 = df2.sort_values(by="x")
     df2.index = df.index
@@ -398,7 +398,7 @@ def test_save__assoc_itype1__layers():
     assert Path("B2.txt").exists()
     assert Path("C3.txt").exists()
     assert Path("D4.txt").exists()
-    df2 = ipf.load("save_l*.ipf")
+    df2 = ipf.read("save_l*.ipf")
     df = df.sort_values(by="x")
     df2 = df2.sort_values(by="x")
     df2.index = df.index

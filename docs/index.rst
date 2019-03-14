@@ -27,12 +27,12 @@ Getting started
    import imod
 
    # read and write IPF files to pandas DataFrame
-   df = imod.ipf.load('wells.ipf')
+   df = imod.ipf.read('wells.ipf')
    imod.ipf.save('wells-out.ipf', df)
 
    # get all calculated heads in a xarray DataArray
    # with dimensions time, layer, y, x
-   da = imod.idf.load('path/to/results/head_*.idf')
+   da = imod.idf.open('path/to/results/head_*.idf')
 
 Introduction
 ============
@@ -49,8 +49,8 @@ Using a set of file name conventions more dimensions such as ``time`` and ``laye
 added, for example: ``head_20181113_l3.idf`` for layer 3 and timestamp ``2018-11-13``.
 This package maps IDF files to and from the N dimensional labeled arrays of
 `xarray.DataArray <http://xarray.pydata.org/en/stable/data-structures.html#dataarray>`__,
-using :meth:`imod.idf.load` and :meth:`imod.idf.save`, or, to read multiple parameters
-at the same time, :meth:`imod.idf.loadset`.
+using :meth:`imod.idf.open` and :meth:`imod.idf.save`, or, to read multiple parameters
+at the same time, :meth:`imod.idf.openset`.
 
 For more information on how to work with ``xarray.DataArray`` objects, we refer to the
 xarray documentation. Note that converting GIS raster formats to IDF is supported
@@ -65,7 +65,7 @@ borehole measurements. In the imod Python package these files are read in as
 popular package that makes analysis and processing of tabular data easy, and provides
 many input and output options, which in turn enables us to convert for instance
 existing CSV or Excel files to IPF files. The primary functions for reading and writing
-IPF files are :meth:`imod.ipf.load` and :meth:`imod.ipf.save`.
+IPF files are :meth:`imod.ipf.read` and :meth:`imod.ipf.save`.
 
 Authors
 =======
