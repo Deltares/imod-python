@@ -191,14 +191,14 @@ def test_xycoords_nonequidistant():
     assert np.allclose(coords["dy"][1], dy)
 
 
-def test_saveload(test_da):
+def test_saveopen(test_da):
     idf.save("test.idf", test_da)
     assert Path("test.idf").exists()
-    da = idf.load("test.idf")
+    da = idf.open("test.idf")
     assert isinstance(da, xr.DataArray)
     assert da.identical(test_da)
     with pytest.warns(FutureWarning):
-        idf.load("test.idf", memmap=True)
+        idf.open("test.idf", memmap=True)
 
 
 def test_save__int32coords(test_da__nodxdy):
@@ -209,48 +209,48 @@ def test_save__int32coords(test_da__nodxdy):
     assert Path("testnodxdy.idf").exists()
 
 
-def test_saveload__nptime(test_nptimeda):
+def test_saveopen__nptime(test_nptimeda):
     idf.save("testnptime", test_nptimeda)
-    da = idf.load("testnptime*.idf")
+    da = idf.open("testnptime*.idf")
     assert isinstance(da, xr.DataArray)
     assert da.identical(test_nptimeda)
 
 
-def test_saveload__cftime_withinbounds(test_nptimeda):
+def test_saveopen__cftime_withinbounds(test_nptimeda):
     cftimes = []
     for time in test_nptimeda.time.values:
         dt = pd.Timestamp(time).to_pydatetime()
         cftimes.append(cftime.DatetimeProlepticGregorian(*dt.timetuple()[:6]))
-    da = idf.load("testnptime*.idf", use_cftime=True)
+    da = idf.open("testnptime*.idf", use_cftime=True)
     assert isinstance(da, xr.DataArray)
     assert all(np.array(cftimes) == da.time.values)
 
 
-def test_saveload__cftime_outofbounds(test_cftimeda):
+def test_saveopen__cftime_outofbounds(test_cftimeda):
     idf.save("testcftime", test_cftimeda)
     with pytest.warns(UserWarning):
-        da = idf.load("testcftime*.idf")
+        da = idf.open("testcftime*.idf")
     assert isinstance(da, xr.DataArray)
     assert da.identical(test_cftimeda)
 
 
-def test_saveload_sorting_headers_paths(test_timelayerda):
+def test_saveopen_sorting_headers_paths(test_timelayerda):
     idf.save("timelayer", test_timelayerda)
-    loaded = idf.load("timelayer_*.idf").isel(x=0, y=0).values.ravel()
+    loaded = idf.open("timelayer_*.idf").isel(x=0, y=0).values.ravel()
     assert np.allclose(np.sort(loaded), loaded)
 
 
-def test_saveload_timelayer(test_timelayerda):
+def test_saveopen_timelayer(test_timelayerda):
     idf.save("timelayer", test_timelayerda)
-    da = idf.load("timelayer_*.idf")
+    da = idf.open("timelayer_*.idf")
     assert isinstance(da, xr.DataArray)
     assert da.identical(test_timelayerda)
 
 
-def test_saveload__nonequidistant(test_da_nonequidistant):
+def test_saveopen__nonequidistant(test_da_nonequidistant):
     idf.save("nonequidistant.idf", test_da_nonequidistant)
     assert Path("nonequidistant.idf").exists()
-    da = idf.load("nonequidistant.idf")
+    da = idf.open("nonequidistant.idf")
     assert isinstance(da, xr.DataArray)
     assert np.array_equal(da, test_da_nonequidistant)
     # since the coordinates are created in float64 and stored in float32,

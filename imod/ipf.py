@@ -12,14 +12,14 @@ from imod import util
 # Maybe look at dask dataframes, if we run into very large tabular datasets:
 # http://dask.pydata.org/en/latest/examples/dataframe-csv.html
 # the simple CSV format IPF cannot be read like this, it is best to use pandas.read_csv
-def read(path, kwargs={}, assoc_kwargs={}):
+def _read(path, kwargs={}, assoc_kwargs={}):
     """
-    Load one IPF file to a single pandas.DataFrame, including associated (TXT) files.
+    Read one IPF file to a single pandas.DataFrame, including associated (TXT) files.
 
     Parameters
     ----------
     path: pathlib.Path or str
-        globpath for IPF files to load.
+        globpath for IPF files to read.
     kwargs : dict
         Dictionary containing the `pandas.read_csv()` keyword arguments for the
         IPF files (e.g. `whitespace_delimited: True`)
@@ -173,8 +173,14 @@ def read_associated(path, kwargs={}):
 
 
 def load(path, kwargs={}, assoc_kwargs={}):
+    "load is deprecated. Use read instead."
+    warnings.warn("load is deprecated, use imod.ipf.read instead.", FutureWarning)
+    return read(path, kwargs, assoc_kwargs)
+
+
+def read(path, kwargs={}, assoc_kwargs={}):
     """
-    Load one or more IPF files to a single pandas.DataFrame, including associated
+    Read one or more IPF files to a single pandas.DataFrame, including associated
     (TXT) files.
 
     The different IPF files can be from different model layers,
@@ -204,16 +210,18 @@ def load(path, kwargs={}, assoc_kwargs={}):
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
+    elif n == 1:
+        bigdf = _read(paths[0], kwargs, assoc_kwargs)
+    else:
+        dfs = []
+        for p in paths:
+            layer = util.decompose(p).get("layer")
+            df = _read(p, kwargs, assoc_kwargs)
+            if layer is not None:
+                df["layer"] = layer
+            dfs.append(df)
+        bigdf = pd.concat(dfs, ignore_index=True, sort=False)  # this sorts in pandas < 0.23
 
-    dfs = []
-    for p in paths:
-        layer = util.decompose(p).get("layer")
-        df = read(p, kwargs, assoc_kwargs)
-        if layer is not None:
-            df["layer"] = layer
-        dfs.append(df)
-
-    bigdf = pd.concat(dfs, ignore_index=True, sort=False)  # this sorts in pandas < 0.23
     return bigdf
 
 
