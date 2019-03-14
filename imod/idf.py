@@ -14,10 +14,14 @@ from dask import array, delayed
 from imod import util
 
 
+# Make sure we can still use the built-in function...
+f_open = open
+
+
 def header(path):
     """Read the IDF header information into a dictionary"""
     attrs = util.decompose(path)
-    with open(path, "rb") as f:
+    with f_open(path, "rb") as f:
         reclen_id = unpack("i", f.read(4))[0]  # Lahey RecordLength Ident.
         if reclen_id != 1271:
             raise ValueError(f"Not a supported IDF file: {path}")
@@ -64,7 +68,7 @@ def header(path):
 
 def setnodataheader(path, nodata):
     """Change the nodata value in the IDF header"""
-    with open(path, "r+b") as f:
+    with f_open(path, "r+b") as f:
         f.seek(36)  # go to nodata position
         f.write(pack("f", nodata))
 
@@ -202,7 +206,7 @@ def _read(path, headersize, nrow, ncol, nodata):
         in the IDF file. On opening all nodata values are changed
         to NaN in the numpy.ndarray.
     """
-    with open(path, "rb") as f:
+    with f_open(path, "rb") as f:
         f.seek(headersize)
         a = np.reshape(np.fromfile(f, np.float32, nrow * ncol), (nrow, ncol))
     return _to_nan(a, nodata)
@@ -278,7 +282,7 @@ def dataarray(path, memmap=False):
     """
     Read a single IDF file to a xarray.DataArray
 
-    The function imod.idf.load is more general and can load multiple layers
+    The function imod.idf.open is more general and can load multiple layers
     and/or timestamps at once.
 
     Parameters
@@ -297,15 +301,28 @@ def dataarray(path, memmap=False):
         using imod.rasterio are included in the xarray.DataArray.attrs.
     """
     warnings.warn(
-        "imod.idf.dataarray is deprecated, use imod.idf.load instead", FutureWarning
+        "imod.idf.dataarray is deprecated, use imod.idf.open instead", FutureWarning
     )
     return _load([path, False])
 
 
-# load IDFs for multiple times and/or layers into one DataArray
 def load(path, memmap=False, use_cftime=False):
     """
-    Read a parameter (one or more IDFs) to a xarray.DataArray
+    load is deprecated. Check the documentation for `imod.idf.open` instead.
+    """
+    warnings.warn("load is deprecated, use imod.idf.open instead.", FutureWarning)
+    return open(path, memmap, use_cftime)
+
+
+# Open IDFs for multiple times and/or layers into one DataArray
+def open(path, memmap=False, use_cftime=False):
+    """
+    Open one or more IDF files as an xarray.DataArray.
+
+    In accordance with xarray's design, `open` loads the data of IDF files
+    lazily. This means the data of the IDFs are not loaded into memory until the
+    data is needed. This allows for easier handling of large datasets, and
+    more efficient computations.
 
     Parameters
     ----------
@@ -356,7 +373,7 @@ def _load(paths, use_cftime):
 
     # sort headers and paths by time then layer
     zipped = zip(headers_unsorted, paths)
-    zipped_sorted = sorted(zipped, key = lambda pair: _sort_time_layer(pair[0]))
+    zipped_sorted = sorted(zipped, key=lambda pair: _sort_time_layer(pair[0]))
     headers, paths = map(list, zip(*zipped_sorted))
 
     times = [c.get("time", None) for c in headers]
@@ -410,11 +427,11 @@ def _load(paths, use_cftime):
     return xr.DataArray(dask_array, coords, dims, name=names_unsorted[0])
 
 
-def loadset(globpath, memmap=False, use_cftime=False):
+def open_set(globpath, memmap=False, use_cftime=False):
     """
-    Read a set of parameters to a dict of xarray.DataArray
+    Open a set of parameters to a dict of xarray.DataArray
 
-    Compared to imod.idf.load, this function lets you read multiple parameters
+    Compared to imod.idf.open, this function lets you open multiple parameters
     at once, which will each be a separate entry in an OrderedDict, with as key
     the parameter name, and as value the xarray.DataArray.
 
@@ -600,7 +617,7 @@ def write(path, a, nodata=1.0e20):
 
     """
     assert a.dims == ("y", "x")
-    with open(path, "wb") as f:
+    with f_open(path, "wb") as f:
         f.write(pack("i", 1271))  # Lahey RecordLength Ident.
         nrow = a.y.size
         ncol = a.x.size
