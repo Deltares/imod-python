@@ -100,9 +100,9 @@ def read_associated(path, kwargs={}):
             # this catches commas in quotes
             ncol, itype = map(int, map(str.strip, next(csv.reader([line]))))
         # itype can be implicit, in which case it's a timeseries
-        except ValueError:  
+        except ValueError:
             try:
-                ncol = int(line.strip()) 
+                ncol = int(line.strip())
                 itype = 1
             except ValueError:  # then try whitespace delimited
                 ncol, itype = map(
@@ -132,8 +132,7 @@ def read_associated(path, kwargs={}):
         itype_kwargs = {}
         if itype == 1:  # Timevariant information: timeseries
             # check if first column is time in [yyyymmdd] or [yyyymmddhhmmss]
-            itype_kwargs["parse_dates"] = [0]  # this parses the first column
-            itype_kwargs["infer_datetime_format"] = True
+            itype_kwargs["dtype"] = {colnames[0]: str}
         elif itype == 2:  # 1D borehole
             # enforce first column is a float
             itype_kwargs["dtype"] = {colnames[0]: np.float64}
@@ -159,6 +158,17 @@ def read_associated(path, kwargs={}):
             na_values=na_values,
             **itype_kwargs,
         )
+
+        if itype == 1:
+            len_date = len(df["time"].iloc[0])
+            if len_date == 14:
+                df["time"] = pd.to_datetime(df["time"], format="%Y%m%d%H%M%S")
+            elif len_date == 8:
+                df["time"] = pd.to_datetime(df["time"], format="%Y%m%d")
+            else:
+                raise ValueError(
+                    f"{path.name}: datetime format must be yyyymmddhhmmss or yyyymmdd"
+                )
     return df
 
 
