@@ -93,9 +93,16 @@ def _dataset(df, time, **kwargs):
 
 
 def load(path, variables=None, times=None):
-    """Load a Tecplot ASCII data file to an xarray Dataset.
+    "Load is deprecated. Use read instead."
+    warnings.warn("imod.tec.load is deprecated. Use imod.tec.read instead.", FutureWarning)
+    return read(path, variables, times)
 
-    Loads the data from a Tecplot ASCII file (.TEC or .DAT), as outputted by iMODSEAWAT,
+
+def read(path, variables=None, times=None):
+    """
+    Read a Tecplot ASCII data file to an xarray Dataset.
+
+    Reads the data from a Tecplot ASCII file (.TEC or .DAT), as outputted by iMODSEAWAT,
     into an xarray Dataset. The Tecplot file provides no coordinate values,
     exclusively indices. The dataset is returned with dimensions: layer, row,
     column, time.
@@ -105,34 +112,34 @@ def load(path, variables=None, times=None):
     path: str or Path
         path to .TEC file
     variables: str, list, or tuple; optional
-        Which variables to load into the xarray dataset, e.g:
+        Which variables to read into the xarray dataset, e.g:
         ['head', 'conc', 'vx', 'vy', 'vz']. Defaults to all variables.
     times: integer, list, or slice; optional
-        Which timesteps to load. The Tecplot file starts
+        Which timesteps to read. The Tecplot file starts
         numbering at 0.0, and the numbers function solely as index.
         Defaults to all timesteps.
 
     Examples
     --------
-    Load contents into an xarray dataset:
+    read contents into an xarray dataset:
 
-    >>> ds = load(path)
+    >>> ds = imod.tec.read(path)
 
-    Load only head and conc data:
+    read only head and conc data:
 
-    >>> ds = load(path, ['head','conc'])
+    >>> ds = imod.tec.read(path, ['head','conc'])
 
-    Load only vx data for the first and last timestep:
+    read only vx data for the first and last timestep:
 
-    >>> ds = load(path, 'vx', times=[0,-1])
+    >>> ds = imod.tec.read(path, 'vx', times=[0,-1])
 
     For the first 20 timesteps, once every four steps:
 
-    >>> ds = load(path, 'vx', times=slice(0, 20, 4))
+    >>> ds = imod.tec.read(path, 'vx', times=slice(0, 20, 4))
 
     Or for every tenth timestep:
     
-    >>> ds = load(path, 'vx', times=slice(None, None, 10))
+    >>> ds = imod.tec.read(path, 'vx', times=slice(None, None, 10))
 
     See also the documentation for `slice()`.
     """

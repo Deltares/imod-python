@@ -427,13 +427,14 @@ def _load(paths, use_cftime):
     return xr.DataArray(dask_array, coords, dims, name=names_unsorted[0])
 
 
-def open_set(globpath, memmap=False, use_cftime=False):
+def open_dataset(globpath, memmap=False, use_cftime=False):
     """
-    Open a set of parameters to a dict of xarray.DataArray
+    Open a set of IDFs to a dict of xarray.DataArrays.
 
     Compared to imod.idf.open, this function lets you open multiple parameters
-    at once, which will each be a separate entry in an OrderedDict, with as key
-    the parameter name, and as value the xarray.DataArray.
+    at once (for example kh values and starting heads of a model), which will
+    each be a separate entry in an OrderedDict, with as key the parameter name,
+    and as value the xarray.DataArray.
 
     Parameters
     ----------

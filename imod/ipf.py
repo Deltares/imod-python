@@ -19,7 +19,7 @@ def _read(path, kwargs={}, assoc_kwargs={}):
     Parameters
     ----------
     path: pathlib.Path or str
-        globpath for IPF files to load.
+        globpath for IPF files to read.
     kwargs : dict
         Dictionary containing the `pandas.read_csv()` keyword arguments for the
         IPF files (e.g. `whitespace_delimited: True`)
