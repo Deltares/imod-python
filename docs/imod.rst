@@ -1,9 +1,6 @@
 imod package
 ============
 
-Submodules
-----------
-
 imod module
 ---------------
 
@@ -11,6 +8,9 @@ imod module
     :members:
     :undoc-members:
     :show-inheritance:
+
+Submodules
+----------
 
 imod.idf module
 ---------------
