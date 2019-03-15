@@ -18,6 +18,7 @@ imod.idf module
 .. automodule:: imod.idf
     :members:
     :undoc-members:
+    :exclude-members: dask, dataarray, header, setnodataheader
     :show-inheritance:
 
 imod.ipf module
