@@ -198,15 +198,15 @@ def resample(
     >>> c = imod.rasterio.resample(source=rotated, dst_crs="+init=EPSG:28992", reproject_kwargs={"src_transform":affine.Affine(...)})
     >>> c = imod.rasterio.resample(source=rotated, dst_crs="+init=EPSG:28992", use_src_attrs=True)
     """
-    assert source.dims == (
-        "y",
-        "x",
-    ), "resample does not support dimensions other than `x` and `y` for `source`."
+    if not source.dims == ("y", "x"):
+        raise ValueError(
+            "resample does not support dimensions other than `x` and `y` for `source`."
+        )
     if like is not None:
-        assert like.dims == (
-            "y",
-            "x",
-        ), "resample does not support dimensions other than `x` and `y` for `like`."
+        if not like.dims == ("y", "x"):
+            raise ValueError(
+                "resample does not support dimensions other than `x` and `y` for `like`."
+            )
     if use_src_attrs:  # only provided when reproject is necessary
         src_crs = rasterio.crs.CRS.from_string(source.attrs["crs"])
         src_nodata = source.attrs["nodatavals"][0]
@@ -268,10 +268,14 @@ def resample(
             "At least `like`, or crs information for source and destination must be provided."
         )
 
-    assert src_transform[0] > 0, "dx of 'source' must be positive"
-    assert src_transform[4] < 0, "dy of 'source' must be negative"
-    assert dst_transform[0] > 0, "dx of 'like' must be positive"
-    assert dst_transform[4] < 0, "dy of 'like' must be negative"
+    if not src_transform[0] > 0:
+        raise ValueError("dx of 'source' must be positive")
+    if not src_transform[4] < 0:
+        raise ValueError("dy of 'source' must be negative")
+    if not dst_transform[0] > 0:
+        raise ValueError("dx of 'like' must be positive")
+    if not dst_transform[4] < 0:
+        raise ValueError("dy of 'like' must be negative")
 
     rasterio.warp.reproject(
         source.values,

@@ -18,7 +18,8 @@ def decompose(path):
 
     parts = path.stem.split("_")
     name = parts[0]
-    assert name != "", ValueError("Name cannot be empty")
+    if name == "":
+        raise ValueError("DataArray name cannot be empty")
     d = OrderedDict()
     d["extension"] = path.suffix
     d["directory"] = path.parent
@@ -69,7 +70,8 @@ def _convert_datetimes(times, use_cftime):
             msg = "Dates are outside of np.datetime64[ns] timespan. Converting to cftime.DatetimeProlepticGregorian."
             warnings.warn(msg)
             converted = [
-                cftime.DatetimeProlepticGregorian(*time.timetuple()[:6]) for time in times
+                cftime.DatetimeProlepticGregorian(*time.timetuple()[:6])
+                for time in times
             ]
         else:
             converted = [np.datetime64(time, "ns") for time in times]

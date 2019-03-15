@@ -501,17 +501,20 @@ def _top_bot_dicts(a):
     """Returns a dictionary with the top and bottom per layer"""
     top = np.atleast_1d(a.attrs["top"]).astype(np.float64)
     bot = np.atleast_1d(a.attrs["bot"]).astype(np.float64)
-    assert top.shape == bot.shape, '"top" and "bot" attrs should have the same shape'
+    if not top.shape == bot.shape:
+        raise ValueError('"top" and "bot" attrs should have the same shape')
     if "layer" in a.coords:
         layers = np.atleast_1d(a.coords["layer"].values)
-        assert top.shape == layers.shape
+        if not top.shape == layers.shape:
+            raise ValueError('"top" attr shape does not match shape of layer dimension')
         d_top = {laynum: t for laynum, t in zip(layers, top)}
         d_bot = {laynum: b for laynum, b in zip(layers, bot)}
     else:
-        assert top.shape == (1,), (
-            'if "layer" is not a coordinate, "top"'
-            ' and "bot" attrs should hold only one value'
-        )
+        if not top.shape == (1,):
+            raise ValueError(
+                'if "layer" is not a coordinate, "top"'
+                ' and "bot" attrs should hold only one value'
+            )
         d_top = {"no_layer": top[0]}
         d_bot = {"no_layer": bot[0]}
     return d_top, d_bot
@@ -552,6 +555,8 @@ def save(path, a, nodata=1.0e20):
     This writes the following two IDF files: 'path/to/head_l1.idf' and
     'path/to/head_l2.idf'.
     """
+    if not isinstance(a, xr.DataArray):
+        raise TypeError("Data to save must be an xarray.DataArray")
     d = util.decompose(path)
     d["extension"] = ".idf"
     d["directory"].mkdir(exist_ok=True, parents=True)
@@ -617,7 +622,11 @@ def write(path, a, nodata=1.0e20):
         Defaults to a value of 1.0e20.
 
     """
-    assert a.dims == ("y", "x")
+    if not isinstance(a, xr.DataArray):
+        raise TypeError("Data to write must be an xarray.DataArray")
+    if not a.dims == ("y", "x"):
+        raise ValueError("Dimensions must be exactly ('y', 'x').")
+
     with f_open(path, "wb") as f:
         f.write(pack("i", 1271))  # Lahey RecordLength Ident.
         nrow = a.y.size

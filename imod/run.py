@@ -227,22 +227,20 @@ def _check_input(model, seawat=False):
     """
     # TODO: needs a better name?
 
-    assert isinstance(model, OrderedDict), "model must be an OrderedDict."
+    if not isinstance(model, OrderedDict):
+        raise TypeError("model must be an OrderedDict.")
     consumed_model = OrderedDict()
 
     for key, value in model.items():
         if key.split("-")[0].lower() == "wel" and not seawat:
-            assert isinstance(
-                value, pd.DataFrame
-            ), "wel package must be a pandas dataframe."
+            if not isinstance(value, pd.DataFrame):
+                raise TypeError("wel package must be a pandas dataframe.")
         elif seawat and key.lower() == "wel-rate":
-            assert isinstance(
-                value, pd.DataFrame
-            ), "wel-rate must be a pandas dataframe."
+            if not isinstance(value, pd.DataFrame):
+                raise TypeError("wel-rate must be a pandas dataframe.")
         else:
-            assert isinstance(
-                value, xr.DataArray
-            ), "{} must be an xarray DataArray.".format(key)
+            if not isinstance(value, xr.DataArray):
+                raise TypeError("{} must be an xarray DataArray.".format(key))
 
         consumed_model[key.lower()] = value
 
@@ -298,7 +296,6 @@ def _data_bounds(model, seawat=False):
         # http://vita.had.co.nz/papers/tidy-data.pdf
         if isinstance(data, pd.DataFrame):
             if "time" in data.columns:
-                # TODO: assert time is cftime
                 tvals = data["time"].values
             else:
                 tvals = None
@@ -310,7 +307,6 @@ def _data_bounds(model, seawat=False):
 
         else:  # then it should be a DataArray
             if "time" in data.coords:
-                # TODO: assert time is cftime
                 tvals = data["time"].values
             else:
                 tvals = None
@@ -322,14 +318,17 @@ def _data_bounds(model, seawat=False):
             if int(layer) == -1 and not seawat:
                 pass
             else:
-                assert (
-                    int(layer) in layers  # should fail on NaNs, 0, negative
-                ), "{} : layer {} falls outside of bnd".format(key, layer)
+                if not (int(layer) in layers):  # should fail on NaNs, 0, negative
+                    raise ValueError(f"{key} : layer {layer} falls outside of bnd")
 
-        assert xmin >= bnd_xmin, "{}: xmin falls outside of bnd.".format(key)
-        assert xmax <= bnd_xmax, "{}: xmax falls outside of bnd.".format(key)
-        assert ymin >= bnd_ymin, "{}: ymin falls outside of bnd.".format(key)
-        assert ymax <= bnd_ymax, "{}: ymax falls outside of bnd.".format(key)
+        if not xmin >= bnd_xmin:
+            raise ValueError("{}: xmin falls outside of bnd.".format(key))
+        if not xmax <= bnd_xmax:
+            raise ValueError("{}: xmax falls outside of bnd.".format(key))
+        if not ymin >= bnd_ymin:
+            raise ValueError("{}: ymin falls outside of bnd.".format(key))
+        if not ymax <= bnd_ymax:
+            raise ValueError("{}: ymax falls outside of bnd.".format(key))
 
         if tvals is not None:
             try:
@@ -399,11 +398,12 @@ def _parse(key, stress_period_schema):
             raise ValueError(
                 f"A field is missing for {key}. Required fields are: {','.join(order)}"
             ) from e
-        assert (
-            field in order
-        ), "{} is not a field of {}. Possible values are: {}".format(
-            field, name, ",".join(order)
-        )
+        if not field in order:
+            raise ValueError(
+                "{} is not a field of {}. Possible values are: {}".format(
+                    field, name, ",".join(order)
+                )
+            )
         d["field"] = field
 
     if stress_period_schema[name]["systems"]:
@@ -412,11 +412,13 @@ def _parse(key, stress_period_schema):
         except IndexError:
             pass
     else:  # if systems are not supported, parts list should be empty by now.
-        assert len(parts) == 0, "{} does not support systems.".format(name)
+        if not len(parts) == 0:
+            raise ValueError("{} does not support systems.".format(name))
 
-    assert len(parts) == 0, "Parts: {} cannot be parsed as part of {} package.".format(
-        str(parts), name
-    )
+    if not len(parts) == 0:
+        raise RuntimeError(
+            "Parts: {} cannot be parsed as part of {} package.".format(str(parts), name)
+        )
 
     return d
 
@@ -781,11 +783,12 @@ def get_runfile(model, directory):
                 "Package {}: invalid name, or package is not supported.".format(name)
             )
     # check if entire model is consumed
-    assert (
-        len(consumed_model) == 0
-    ), "Model could not be completely written due to keys:{} ".format(
-        list(consumed_model.keys())
-    )
+    if not len(consumed_model) == 0:
+        raise RuntimeError(
+            "Model could not be completely written due to keys:{} ".format(
+                list(consumed_model.keys())
+            )
+        )
 
     runfile_parameters["packages"] = packages
     runfile_parameters["stress_periods"] = stress_periods
@@ -894,11 +897,12 @@ def seawat_get_runfile(model, directory):
                 "Package {}: invalid name, or package is not supported.".format(name)
             )
     # check if entire model is consumed
-    assert (
-        len(consumed_model) == 0
-    ), "Model could not be completely written due to keys:{} ".format(
-        list(consumed_model.keys())
-    )
+    if not len(consumed_model) == 0:
+        raise RuntimeError(
+            "Model could not be completely written due to keys:{} ".format(
+                list(consumed_model.keys())
+            )
+        )
 
     runfile_parameters["packages"] = packages
     runfile_parameters["stress_periods"] = stress_periods

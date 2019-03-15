@@ -220,7 +220,9 @@ def read(path, kwargs={}, assoc_kwargs={}):
             if layer is not None:
                 df["layer"] = layer
             dfs.append(df)
-        bigdf = pd.concat(dfs, ignore_index=True, sort=False)  # this sorts in pandas < 0.23
+        bigdf = pd.concat(
+            dfs, ignore_index=True, sort=False
+        )  # this sorts in pandas < 0.23
 
     return bigdf
 
@@ -297,7 +299,8 @@ def write_assoc(path, df, itype=1, nodata=1.0e20):
     df.columns = colnames
     columnorder = []
     for colname in required_columns[itype]:
-        assert colname in colnames, f'given itype requires column "{colname}"'
+        if not colname in colnames:
+            raise ValueError(f'given itype requires column "{colname}"')
         colnames.remove(colname)
         columnorder.append(colname)
     columnorder += colnames
@@ -405,16 +408,15 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20):
         colnames = _lower(list(df))
         df.columns = colnames
         for refname in ["x", "y", "id"]:
-            assert refname in colnames, f'given itype requires column "{refname}"'
+            if not refname in colnames:
+                raise ValueError(f'given itype requires column "{refname}"')
             colnames.remove(refname)
 
         grouped = df.groupby("id")
-        assert (
-            grouped["x"].apply(_is_single_value).all()
-        ), "column x contains more than one value per id"
-        assert (
-            grouped["y"].apply(_is_single_value).all()
-        ), "column y contains more than one value per id"
+        if not grouped["x"].apply(_is_single_value).all():
+            raise ValueError("column x contains more than one value per id")
+        if not grouped["y"].apply(_is_single_value).all():
+            raise ValueError("column y contains more than one value per id")
         # get columns that have only one value within a group, to save them in ipf
         ipf_columns = [
             (colname, "first")

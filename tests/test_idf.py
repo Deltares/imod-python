@@ -296,11 +296,11 @@ def test_save_topbot__errors(test_layerda):
     da = test_layerda
     da.attrs["top"] = 1
     da.attrs["bot"] = 0
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         idf.save("layer", da)
     da.attrs["top"] = [1, 2]
     da.attrs["bot"] = [0, 1]
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         idf.save("layer", da)
     da.attrs["top"] = ["a", "b"]
     da.attrs["bot"] = ["c", "d"]
@@ -308,7 +308,7 @@ def test_save_topbot__errors(test_layerda):
         idf.save("layer", da)
     da.attrs["top"] = [1, 2]
     da.attrs["bot"] = [0, 1, 3]
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         idf.save("layer", da)
 
 

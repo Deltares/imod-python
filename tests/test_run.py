@@ -123,7 +123,7 @@ def test_check_input__error():
         dims=("y", "x"),
     )
     m["bnd"] = pd.DataFrame({"x": [0, 2], "y": [1, 2], "q": [2000.0, 3000.0]})
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         run._check_input(m)
 
 
@@ -170,22 +170,22 @@ def test_parse__welsystems():
 def test_parse__errors():
     # package without systems
     key = "rch-sys1"
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         run._parse(key, run.stress_period_schema)
 
     # misnamed field
     key = "riv-head"
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         run._parse(key, run.stress_period_schema)
 
     # mixup of field and system name
     key = "riv-sys1-stage"
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         run._parse(key, run.stress_period_schema)
 
     # one descriptor too much
     key = "riv-stage-sys1-v2"
-    with pytest.raises(AssertionError):
+    with pytest.raises(RuntimeError):
         run._parse(key, run.stress_period_schema)
 
 
