@@ -7,7 +7,7 @@ Submodules
 imod module
 ---------------
 
-.. automodule:: imod.__init__
+.. automodule:: imod
     :members:
     :undoc-members:
     :show-inheritance:
@@ -61,11 +61,3 @@ imod.util module
     :undoc-members:
     :show-inheritance:
 
-
-Module contents
----------------
-
-.. automodule:: imod
-    :members:
-    :undoc-members:
-    :show-inheritance:
