@@ -50,7 +50,7 @@ added, for example: ``head_20181113_l3.idf`` for layer 3 and timestamp ``2018-11
 This package maps IDF files to and from the N dimensional labeled arrays of
 `xarray.DataArray <http://xarray.pydata.org/en/stable/data-structures.html#dataarray>`__,
 using :meth:`imod.idf.open` and :meth:`imod.idf.save`, or, to read multiple parameters
-at the same time, :meth:`imod.idf.openset`.
+at the same time, :meth:`imod.idf.open_dataset`.
 
 For more information on how to work with ``xarray.DataArray`` objects, we refer to the
 xarray documentation. Note that converting GIS raster formats to IDF is supported
