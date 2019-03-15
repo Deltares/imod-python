@@ -66,13 +66,6 @@ def header(path):
     return attrs
 
 
-def setnodataheader(path, nodata):
-    """Change the nodata value in the IDF header"""
-    with f_open(path, "r+b") as f:
-        f.seek(36)  # go to nodata position
-        f.write(pack("f", nodata))
-
-
 def _all_equal(seq, elem):
     """Raise an error if not all elements of a list are equal"""
     if not seq.count(seq[0]) == len(seq):
@@ -240,6 +233,10 @@ def read(path):
 
 
 def dask(path, memmap=False, attrs=None):
+    warnings.warn("idf.dask is deprecated. Use idf._dask instead.")
+    return _dask(path, memmap, attrs)
+
+def _dask(path, memmap=False, attrs=None):
     """
     Read a single IDF file to a dask.array
 
@@ -403,7 +400,7 @@ def _load(paths, use_cftime):
 
     # avoid calling imod.idf.header again here with attrs keyword
     dask_arrays = [
-        imod.idf.dask(path, attrs=attrs)[0] for (path, attrs) in zip(paths, headers)
+        imod.idf._dask(path, attrs=attrs)[0] for (path, attrs) in zip(paths, headers)
     ]
 
     if hastime and haslayer:

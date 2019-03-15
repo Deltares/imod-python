@@ -265,7 +265,7 @@ def test_lazy():
 
     This does the job of testing whether that function is part the graph.
     """
-    a, _ = idf.dask("test.idf")
+    a, _ = idf._dask("test.idf")
     assert "_read" in str(next(a.dask.items())[1])
 
 
