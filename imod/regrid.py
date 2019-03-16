@@ -93,11 +93,11 @@ def _weights_1d(src_x, dst_x):
             if inds_len > max_len:
                 max_len = inds_len
 
-    return max_len, dst_inds, src_inds, weights
+    return max_len, (dst_inds, src_inds, weights)
 
 
 @numba.njit
-def _regrid_3d(src, dst, src_coords, dst_coords, method):
+def _regrid_1d(src, dst, values, weights, inds_weights, method):
     """
     numba compiled function to regrid in three dimensions
 
@@ -109,17 +109,86 @@ def _regrid_3d(src, dst, src_coords, dst_coords, method):
     dst_coords : tuple of np.arrays of edges
     method : numba.njit'ed function
     """
-    src_z, src_y, src_x = src_coords
-    dst_z, dst_y, dst_x = dst_coords
+    kk, blocks_ix, blocks_weights_x = inds_weights[0]
 
-    max_len_z, ii, blocks_iz, blocks_weights_z = _weights_1d(src_z, dst_z)
-    max_len_y, jj, blocks_iy, blocks_weights_y = _weights_1d(src_y, dst_y)
-    max_len_x, kk, blocks_ix, blocks_weights_x = _weights_1d(src_x, dst_x)
+    # i, j, k are indices of dst array
+    # block_i contains indices of src array
+    # block_w contains weights of src array
+    for k, block_ix, block_wx in zip(kk, blocks_ix, blocks_weights_x):
+        # Add the values and weights per cell in multi-dim block
+        count = 0
+        for ix, wx in zip(block_ix, block_wx):
+            values[count] = src[ix]
+            weights[count] = wx
+            count += 1
 
-    # pre-allocate storage
-    alloc_len = max_len_z * max_len_y * max_len_x
-    values = np.zeros(alloc_len)
-    weights = np.zeros(alloc_len)
+        # aggregate
+        dst[k] = method(values[:count], weights[:count])
+
+        # reset storage
+        values[:count] = 0
+        weights[:count] = 0
+
+    return dst
+
+
+@numba.njit
+def _regrid_2d(src, dst, values, weights, inds_weights, method):
+    """
+    numba compiled function to regrid in three dimensions
+
+    Parameters
+    ----------
+    src : np.array
+    dst : np.array
+    src_coords : tuple of np.arrays of edges
+    dst_coords : tuple of np.arrays of edges
+    method : numba.njit'ed function
+    """
+    inds_weights_y, inds_weights_x = inds_weights
+    jj, blocks_iy, blocks_weights_y = inds_weights_y
+    kk, blocks_ix, blocks_weights_x = inds_weights_x
+
+    # i, j, k are indices of dst array
+    # block_i contains indices of src array
+    # block_w contains weights of src array
+    for j, block_iy, block_wy in zip(jj, blocks_iy, blocks_weights_y):
+        for k, block_ix, block_wx in zip(kk, blocks_ix, blocks_weights_x):
+            # Add the values and weights per cell in multi-dim block
+            count = 0
+            for iy, wy in zip(block_iy, block_wy):
+                for ix, wx in zip(block_ix, block_wx):
+                    values[count] = src[iy, ix]
+                    weights[count] = wy * wx
+                    count += 1
+
+            # aggregate
+            dst[j, k] = method(values[:count], weights[:count])
+
+            # reset storage
+            values[:count] = 0
+            weights[:count] = 0
+
+    return dst
+
+
+@numba.njit
+def _regrid_3d(src, dst, values, weights, inds_weights, method):
+    """
+    numba compiled function to regrid in three dimensions
+
+    Parameters
+    ----------
+    src : np.array
+    dst : np.array
+    src_coords : tuple of np.arrays of edges
+    dst_coords : tuple of np.arrays of edges
+    method : numba.njit'ed function
+    """
+    inds_weights_z, inds_weights_y, inds_weights_x = inds_weights
+    ii, blocks_iz, blocks_weights_z = inds_weights_z
+    jj, blocks_iy, blocks_weights_y = inds_weights_y
+    kk, blocks_ix, blocks_weights_x = inds_weights_x
 
     # i, j, k are indices of dst array
     # block_i contains indices of src array
@@ -146,7 +215,61 @@ def _regrid_3d(src, dst, src_coords, dst_coords, method):
     return dst
 
 
-def _make_regridder(method):
+@numba.njit
+def _iter_regrid(iter_src, iter_dst, n_iter, alloc_len, regrid_function, inds_weights):
+    # Pre-allocate temporary storage arrays
+    values = np.zeros(alloc_len)
+    weights = np.zeros(alloc_len)
+
+    for i in range(n_iter):
+        iter_dst[i, ...] = regrid_function(
+            iter_src[i, ...], iter_dst[i, ...], values, weights, inds_weights
+        )
+    return iter_dst
+
+
+def _nd_regrid(src, dst, src_coords, dst_coords, ndim_regrid, regrid_function):
+
+    # Determine weights for every regrid dimension, and alloc_len,
+    # the maximum number of src cells that may end up in a single dst cell
+    inds_weights = []
+    alloc_len = 1
+    for src_x, dst_x in zip(src_coords, dst_coords):
+        s, i_w = _weights_1d(src_x, dst_x)
+        inds_weights.append(i_w)
+        alloc_len *= s
+
+    # If ndim > ndim_regrid, the non regridding dimension are combined into
+    # a single dimension, so we can use a single loop, irrespective of the
+    # total number of dimensions.
+    # (The alternative is pre-writing N for-loops for every N dimension we
+    # intend to support.)
+    # If ndims == ndim_regrid, all dimensions will be used in regridding
+    # in that case no looping over other dimensions is required and we add
+    # a dummy dimension here so there's something to iterate over.
+
+    src_shape = src.shape
+    dst_shape = dst.shape
+    ndim = len(src_shape)
+
+    if ndim == ndim_regrid:
+        n_iter = 1
+    else:
+        n_iter = int(np.product(src_shape[:-ndim_regrid]))
+
+    src_itershape = (n_iter, *src_shape[-ndim_regrid:])
+    dst_itershape = (n_iter, *dst_shape[-ndim_regrid:])
+    iter_src = np.reshape(src, src_itershape)
+    iter_dst = np.reshape(dst, dst_itershape)
+
+    iter_dst = _iter_regrid(
+        iter_src, iter_dst, n_iter, alloc_len, regrid_function, inds_weights
+    )
+
+    return iter_dst.reshape(dst_shape)
+
+
+def _make_regrid(method, ndim_regrid):
     """
     Closure avoids numba overhead
     https://numba.pydata.org/numba-doc/dev/user/faq.html#can-i-pass-a-function-as-an-argument-to-a-jitted-function
@@ -154,10 +277,27 @@ def _make_regridder(method):
     jit_method = numba.njit(method)
 
     @numba.njit
-    def regridder(src, dst, src_coords, dst_coords):
-        return _regrid_3d(src, dst, src_coords, dst_coords, method=jit_method)
+    def jit_regrid_1d(src, dst, values, weights, inds_weights):
+        return _regrid_1d(src, dst, values, weights, inds_weights, method=jit_method)
+    
+    @numba.njit
+    def jit_regrid_2d(src, dst, values, weights, inds_weights):
+        return _regrid_2d(src, dst, values, weights, inds_weights, method=jit_method)
+    
+    @numba.njit
+    def jit_regrid_3d(src, dst, values, weights, inds_weights):
+        return _regrid_3d(src, dst, values, weights, inds_weights, method=jit_method)
+    
+    if ndim_regrid == 1:
+        jit_regrid = jit_regrid_1d
+    elif ndim_regrid == 2:
+        jit_regrid = jit_regrid_2d
+    elif ndim_regrid == 3:
+        jit_regrid = jit_regrid_3d
+    else:
+        raise NotImplementedError("cannot regrid over more than three dimensions")
 
-    return regridder
+    return jit_regrid
 
 
 def regrid(source, like, method):
@@ -171,10 +311,9 @@ def regrid(source, like, method):
     src_coords = [coord.values for coord in source["coords"]]
     dst_coords = [coord.values for coord in like["coords"]]
 
-    aggregate = make_aggregate(method)
+    regrid_func = _make_regrid(method)
 
-    dst = _regrid_3d(src, dst, src_coords, dst_coords, method_jit)
-
+    dst = regrid_func(src, dst, src_coords, dst_coords)
     # if src is 3d, regrid is 2d, then apply per layer
 
 
