@@ -92,7 +92,7 @@ def _weights_1d(src_x, dst_x):
             inds_len = len(_inds)
             if inds_len > max_len:
                 max_len = inds_len
-
+    
     return max_len, (dst_inds, src_inds, weights)
 
 
@@ -216,11 +216,10 @@ def _regrid_3d(src, dst, values, weights, inds_weights, method):
 
 
 @numba.njit
-def _iter_regrid(iter_src, iter_dst, n_iter, alloc_len, regrid_function, inds_weights):
+def _iter_regrid(iter_src, iter_dst, n_iter, alloc_len, inds_weights, regrid_function):
     # Pre-allocate temporary storage arrays
     values = np.zeros(alloc_len)
     weights = np.zeros(alloc_len)
-
     for i in range(n_iter):
         iter_dst[i, ...] = regrid_function(
             iter_src[i, ...], iter_dst[i, ...], values, weights, inds_weights
@@ -228,7 +227,46 @@ def _iter_regrid(iter_src, iter_dst, n_iter, alloc_len, regrid_function, inds_we
     return iter_dst
 
 
-def _nd_regrid(src, dst, src_coords, dst_coords, ndim_regrid, regrid_function):
+def _make_regrid(method, ndim_regrid):
+    """
+    Closure avoids numba overhead
+    https://numba.pydata.org/numba-doc/dev/user/faq.html#can-i-pass-a-function-as-an-argument-to-a-jitted-function
+    """
+    
+    # First, compile external method
+    jit_method = numba.njit(method)
+    
+    # Second, compile a specific aggregation function using the compiled external method
+    @numba.njit
+    def jit_regrid_1d(src, dst, values, weights, inds_weights):
+        return _regrid_1d(src, dst, values, weights, inds_weights, method=jit_method)
+
+    @numba.njit
+    def jit_regrid_2d(src, dst, values, weights, inds_weights):
+        return _regrid_2d(src, dst, values, weights, inds_weights, method=jit_method)
+
+    @numba.njit
+    def jit_regrid_3d(src, dst, values, weights, inds_weights):
+        return _regrid_3d(src, dst, values, weights, inds_weights, method=jit_method)
+
+    if ndim_regrid == 1:
+        jit_regrid = jit_regrid_1d
+    elif ndim_regrid == 2:
+        jit_regrid = jit_regrid_2d
+    elif ndim_regrid == 3:
+        jit_regrid = jit_regrid_3d
+    else:
+        raise NotImplementedError("cannot regrid over more than three dimensions")
+
+    # Finally, compile the iterating regrid method with the specific aggregation function
+    @numba.njit
+    def iter_regrid(iter_src, iter_dst, n_iter, values, weights, inds_weights):
+        return _iter_regrid(iter_src, iter_dst, n_iter, values, weights, inds_weights, regrid_function=jit_regrid)
+        
+    return jit_regrid
+
+
+def _nd_regrid(src, dst, src_coords, dst_coords, ndim_regrid, iter_regrid):
 
     # Determine weights for every regrid dimension, and alloc_len,
     # the maximum number of src cells that may end up in a single dst cell
@@ -236,6 +274,8 @@ def _nd_regrid(src, dst, src_coords, dst_coords, ndim_regrid, regrid_function):
     alloc_len = 1
     for src_x, dst_x in zip(src_coords, dst_coords):
         s, i_w = _weights_1d(src_x, dst_x)
+        # Convert to tuples so numba doesn't crash
+        i_w = tuple(tuple(elem) for elem in i_w)
         inds_weights.append(i_w)
         alloc_len *= s
 
@@ -261,44 +301,13 @@ def _nd_regrid(src, dst, src_coords, dst_coords, ndim_regrid, regrid_function):
     dst_itershape = (n_iter, *dst_shape[-ndim_regrid:])
     iter_src = np.reshape(src, src_itershape)
     iter_dst = np.reshape(dst, dst_itershape)
-
-    iter_dst = _iter_regrid(
-        iter_src, iter_dst, n_iter, alloc_len, regrid_function, inds_weights
+    
+    iter_dst = iter_regrid(
+        iter_src, iter_dst, n_iter, alloc_len, inds_weights
     )
 
-    return iter_dst.reshape(dst_shape)
-
-
-def _make_regrid(method, ndim_regrid):
-    """
-    Closure avoids numba overhead
-    https://numba.pydata.org/numba-doc/dev/user/faq.html#can-i-pass-a-function-as-an-argument-to-a-jitted-function
-    """
-    jit_method = numba.njit(method)
-
-    @numba.njit
-    def jit_regrid_1d(src, dst, values, weights, inds_weights):
-        return _regrid_1d(src, dst, values, weights, inds_weights, method=jit_method)
+    return iter_dst.reshape(dst_shape)    
     
-    @numba.njit
-    def jit_regrid_2d(src, dst, values, weights, inds_weights):
-        return _regrid_2d(src, dst, values, weights, inds_weights, method=jit_method)
-    
-    @numba.njit
-    def jit_regrid_3d(src, dst, values, weights, inds_weights):
-        return _regrid_3d(src, dst, values, weights, inds_weights, method=jit_method)
-    
-    if ndim_regrid == 1:
-        jit_regrid = jit_regrid_1d
-    elif ndim_regrid == 2:
-        jit_regrid = jit_regrid_2d
-    elif ndim_regrid == 3:
-        jit_regrid = jit_regrid_3d
-    else:
-        raise NotImplementedError("cannot regrid over more than three dimensions")
-
-    return jit_regrid
-
 
 def regrid(source, like, method):
     """
@@ -311,10 +320,8 @@ def regrid(source, like, method):
     src_coords = [coord.values for coord in source["coords"]]
     dst_coords = [coord.values for coord in like["coords"]]
 
-    regrid_func = _make_regrid(method)
-
-    dst = regrid_func(src, dst, src_coords, dst_coords)
-    # if src is 3d, regrid is 2d, then apply per layer
+    iter_regrid = _make_regrid(method, ndim_regrid)
+    dst = _nd_regrid(src, dst, src_coords, dst_coords, ndim_regrid, iter_regrid)
 
 
 def mean(values, weights):
