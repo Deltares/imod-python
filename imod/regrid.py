@@ -93,7 +93,24 @@ def _weights_1d(src_x, dst_x):
             if inds_len > max_len:
                 max_len = inds_len
 
-    return max_len, (dst_inds, src_inds, weights)
+    # Convert all output to numpy arrays
+    # numba does NOT like arrays or lists in tuples
+    # Compilation time goes through the roof
+    nrow = len(dst_inds)
+    ncol = max_len
+    np_dst_inds = np.array(dst_inds)
+    
+    np_src_inds = np.full((nrow, ncol), -1)
+    for i in range(nrow):
+        for j, ind in enumerate(src_inds[i]):
+            np_src_inds[i, j] = ind
+
+    np_weights = np.full((nrow, ncol), 0.0)
+    for i in range(nrow):
+        for j, ind in enumerate(weights[i]):
+            np_weights[i, j] = ind
+    
+    return max_len, (np_dst_inds, np_src_inds, np_weights)
 
 
 @numba.njit(cache=True)
@@ -113,10 +130,14 @@ def _regrid_1d(src, dst, values, weights, method, *inds_weights):
     # i, j, k are indices of dst array
     # block_i contains indices of src array
     # block_w contains weights of src array
-    for k, block_ix, block_wx in zip(kk, blocks_ix, blocks_weights_x):
+    for countk, k in enumerate(kk):
+        block_ix = blocks_ix[countk]
+        block_wx = blocks_weights_x[countk]
         # Add the values and weights per cell in multi-dim block
         count = 0
         for ix, wx in zip(block_ix, block_wx):
+            if ix < 0:
+                break
             values[count] = src[ix]
             weights[count] = wx
             count += 1
@@ -149,12 +170,20 @@ def _regrid_2d(src, dst, values, weights, method, *inds_weights):
     # i, j, k are indices of dst array
     # block_i contains indices of src array
     # block_w contains weights of src array
-    for j, block_iy, block_wy in zip(jj, blocks_iy, blocks_weights_y):
-        for k, block_ix, block_wx in zip(kk, blocks_ix, blocks_weights_x):
+    for countj, j in enumerate(jj):
+        block_iy = blocks_iy[countj]
+        block_wy = blocks_weights_y[countj]
+        for countk, k in enumerate(kk):
+            block_ix = blocks_ix[countk]
+            block_wx = blocks_weights_x[countk]
             # Add the values and weights per cell in multi-dim block
             count = 0
             for iy, wy in zip(block_iy, block_wy):
+                if iy < 0:
+                    break
                 for ix, wx in zip(block_ix, block_wx):
+                    if ix < 0:
+                        break
                     values[count] = src[iy, ix]
                     weights[count] = wy * wx
                     count += 1
@@ -163,8 +192,8 @@ def _regrid_2d(src, dst, values, weights, method, *inds_weights):
             dst[j, k] = method(values[:count], weights[:count])
 
             # reset storage
-            values[:count] = 0
-            weights[:count] = 0
+            values[:count] = 0.0
+            weights[:count] = 0.0
 
     return dst
 
@@ -189,14 +218,26 @@ def _regrid_3d(src, dst, values, weights, method, *inds_weights):
     # i, j, k are indices of dst array
     # block_i contains indices of src array
     # block_w contains weights of src array
-    for i, block_iz, block_wz in zip(ii, blocks_iz, blocks_weights_z):
-        for j, block_iy, block_wy in zip(jj, blocks_iy, blocks_weights_y):
-            for k, block_ix, block_wx in zip(kk, blocks_ix, blocks_weights_x):
+    for counti, i in enumerate(ii):
+        block_iz = blocks_iz[counti]
+        block_wz = blocks_weights_z[counti]
+        for countj, j in enumerate(jj):
+            block_iy = blocks_iy[countj]
+            block_wy = blocks_weights_y[countj]
+            for countk, k in enumerate(kk):
+                block_ix = blocks_ix[countk]
+                block_wx = blocks_weights_x[countk]
                 # Add the values and weights per cell in multi-dim block
                 count = 0
                 for iz, wz in zip(block_iz, block_wz):
+                    if iz < 0:
+                        break
                     for iy, wy in zip(block_iy, block_wy):
+                        if iy < 0:
+                            break
                         for ix, wx in zip(block_ix, block_wx):
+                            if ix < 0:
+                                break
                             values[count] = src[iz, iy, ix]
                             weights[count] = wz * wy * wx
                             count += 1
@@ -205,8 +246,8 @@ def _regrid_3d(src, dst, values, weights, method, *inds_weights):
                 dst[i, j, k] = method(values[:count], weights[:count])
 
                 # reset storage
-                values[:count] = 0
-                weights[:count] = 0
+                values[:count] = 0.0
+                weights[:count] = 0.0
 
     return dst
 
@@ -345,7 +386,7 @@ def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid):
         s, i_w = _weights_1d(_src_x, _dst_x)
         # Convert to tuples so numba doesn't crash
         for elem in i_w:
-            inds_weights.append(tuple(elem))
+            inds_weights.append(elem)
         alloc_len *= s
 
     iter_src, iter_dst = _reshape(src, dst, ndim_regrid)
@@ -531,6 +572,10 @@ def regrid(source, like, method, fill_value=np.nan):
 
     # Create tailor made regridding function: take method and ndims into account
     # and call it
+    # TODO: use SciPy linear grid interpolator for linear interpolation
+    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.RegularGridInterpolator.html#scipy.interpolate.RegularGridInterpolator
+    # Check speed of operation with gridtools numba function
+    # Scipy has advantage of also supporting arbitrary dimensions
     ndim_regrid = len(regrid_dims)
     iter_regrid = _make_regrid(method, ndim_regrid)
     dst.values = _nd_regrid(

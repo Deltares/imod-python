@@ -39,35 +39,49 @@ def test_overlap():
 
 
 def test_starts():
+    @numba.njit
+    def get_starts(src_x, dst_x):
+        result = []
+        for i, j in regrid._starts(src_x, dst_x):
+            result.append((i, j))
+        return result
+
     # Complete range
     src_x = np.arange(0., 11., 1.)
     dst_x = np.arange(0., 11., 2.5)
     # Returns tuples with (src_ind, dst_ind)
-    assert list(regrid._starts(src_x, dst_x)) == [(0, 0), (1, 2), (2, 5), (3, 7)]
+    # List comprehension gives PicklingError
+    result = get_starts(src_x, dst_x)
+    assert result == [(0, 0), (1, 2), (2, 5), (3, 7)]
 
     # Partial dst
     dst_x = np.arange(5., 11., 2.5)
-    assert list(regrid._starts(src_x, dst_x)) == [(0, 5), (1, 7)]
+    result = get_starts(src_x, dst_x)
+    assert result == [(0, 5), (1, 7)]
 
     # Partial src
     src_x = np.arange(5., 11., 1.)
     dst_x = np.arange(0., 11., 2.5)
-    assert list(regrid._starts(src_x, dst_x)) == [(0, 0), (1, 0), (2, 0), (3, 2)]
+    result = get_starts(src_x, dst_x)
+    assert result == [(0, 0), (1, 0), (2, 0), (3, 2)]
 
     # Irregular grid
     src_x = np.array([0., 2.5, 7.5, 10.0])
     dst_x = np.array([0., 5., 10.])
-    assert list(regrid._starts(src_x, dst_x)) == [(0, 0), (1, 1)]
+    result = get_starts(src_x, dst_x)
+    assert result == [(0, 0), (1, 1)]
 
     # Negative coords
     src_x = np.arange(-20., -9., 1.)
     dst_x = np.arange(-20., -9., 2.5)
-    assert list(regrid._starts(src_x, dst_x)) == [(0, 0), (1, 2), (2, 5), (3, 7)]
+    result = get_starts(src_x, dst_x)
+    assert result == [(0, 0), (1, 2), (2, 5), (3, 7)]
 
     # Mixed coords
     src_x = np.arange(-5., 6., 1.)
     dst_x = np.arange(-5., 6., 2.5)
-    assert list(regrid._starts(src_x, dst_x)) == [(0, 0), (1, 2), (2, 5), (3, 7)]
+    result = get_starts(src_x, dst_x)
+    assert result == [(0, 0), (1, 2), (2, 5), (3, 7)]
 
 
 def test_weights():
@@ -75,27 +89,27 @@ def test_weights():
     dst_x = np.arange(0., 11., 2.5)
     max_len, (dst_inds, src_inds, weights) = regrid._weights_1d(src_x, dst_x)
     assert max_len == 3
-    assert dst_inds == [0, 1, 2, 3]
-    assert src_inds == [[0, 1, 2], [2, 3, 4], [5, 6, 7], [7, 8, 9]]
-    assert weights == [[1., 1., 0.5], [0.5, 1., 1.], [1., 1., 0.5], [0.5, 1., 1.]]
+    assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
+    assert np.allclose(src_inds, np.array([[0, 1, 2], [2, 3, 4], [5, 6, 7], [7, 8, 9]]))
+    assert np.allclose(weights, np.array([[1., 1., 0.5], [0.5, 1., 1.], [1., 1., 0.5], [0.5, 1., 1.]]))
 
     # Irregular grid
     src_x = np.array([0., 2.5, 7.5, 10.0])
     dst_x = np.array([0., 5., 10.])
     max_len, (dst_inds, src_inds, weights) = regrid._weights_1d(src_x, dst_x)
     assert max_len == 2
-    assert dst_inds == [0, 1]
-    assert src_inds == [[0, 1], [1, 2]]
-    assert weights == [[2.5, 2.5], [2.5, 2.5]]
+    assert np.allclose(dst_inds, np.array([0, 1]))
+    assert np.allclose(src_inds, np.array([[0, 1], [1, 2]]))
+    assert np.allclose(weights, np.array([[2.5, 2.5], [2.5, 2.5]]))
 
     # Mixed coords
     src_x = np.arange(-5., 6., 1.)
     dst_x = np.arange(-5., 6., 2.5)
     max_len, (dst_inds, src_inds, weights) = regrid._weights_1d(src_x, dst_x)
     assert max_len == 3
-    assert dst_inds == [0, 1, 2, 3]
-    assert src_inds == [[0, 1, 2], [2, 3, 4], [5, 6, 7], [7, 8, 9]]
-    assert weights == [[1., 1., 0.5], [0.5, 1., 1.], [1., 1., 0.5], [0.5, 1., 1.]]
+    assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
+    assert np.allclose(src_inds, np.array([[0, 1, 2], [2, 3, 4], [5, 6, 7], [7, 8, 9]]))
+    assert np.allclose(weights, np.array([[1., 1., 0.5], [0.5, 1., 1.], [1., 1., 0.5], [0.5, 1., 1.]]))
 
 
 def test_reshape():
