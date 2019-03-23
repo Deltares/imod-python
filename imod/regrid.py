@@ -92,7 +92,7 @@ def _weights_1d(src_x, dst_x):
             inds_len = len(_inds)
             if inds_len > max_len:
                 max_len = inds_len
-    
+
     return max_len, (dst_inds, src_inds, weights)
 
 
@@ -216,7 +216,8 @@ def _regrid_3d(src, dst, values, weights, inds_weights, method):
 
 
 @numba.njit
-def _iter_regrid(iter_src, iter_dst, n_iter, alloc_len, inds_weights, regrid_function):
+def _iter_regrid(iter_src, iter_dst, alloc_len, inds_weights, regrid_function):
+    n_iter = iter_src.shape[0]
     # Pre-allocate temporary storage arrays
     values = np.zeros(alloc_len)
     weights = np.zeros(alloc_len)
@@ -227,16 +228,13 @@ def _iter_regrid(iter_src, iter_dst, n_iter, alloc_len, inds_weights, regrid_fun
     return iter_dst
 
 
-def _make_regrid(method, ndim_regrid):
+def _jit_regrid(jit_method, ndim_regrid):
     """
+    Compile a specific aggregation function using the compiled external method
     Closure avoids numba overhead
     https://numba.pydata.org/numba-doc/dev/user/faq.html#can-i-pass-a-function-as-an-argument-to-a-jitted-function
     """
-    
-    # First, compile external method
-    jit_method = numba.njit(method)
-    
-    # Second, compile a specific aggregation function using the compiled external method
+
     @numba.njit
     def jit_regrid_1d(src, dst, values, weights, inds_weights):
         return _regrid_1d(src, dst, values, weights, inds_weights, method=jit_method)
@@ -258,36 +256,44 @@ def _make_regrid(method, ndim_regrid):
     else:
         raise NotImplementedError("cannot regrid over more than three dimensions")
 
-    # Finally, compile the iterating regrid method with the specific aggregation function
-    @numba.njit
-    def iter_regrid(iter_src, iter_dst, n_iter, values, weights, inds_weights):
-        return _iter_regrid(iter_src, iter_dst, n_iter, values, weights, inds_weights, regrid_function=jit_regrid)
-        
     return jit_regrid
 
 
-def _nd_regrid(src, dst, src_coords, dst_coords, ndim_regrid, iter_regrid):
+def _make_regrid(method, ndim_regrid):
+    """
+    Closure avoids numba overhead
+    https://numba.pydata.org/numba-doc/dev/user/faq.html#can-i-pass-a-function-as-an-argument-to-a-jitted-function
+    """
 
-    # Determine weights for every regrid dimension, and alloc_len,
-    # the maximum number of src cells that may end up in a single dst cell
-    inds_weights = []
-    alloc_len = 1
-    for src_x, dst_x in zip(src_coords, dst_coords):
-        s, i_w = _weights_1d(src_x, dst_x)
-        # Convert to tuples so numba doesn't crash
-        i_w = tuple(tuple(elem) for elem in i_w)
-        inds_weights.append(i_w)
-        alloc_len *= s
+    # First, compile external method
+    jit_method = numba.njit(method)
+    jit_regrid = _jit_regrid(jit_method, ndim_regrid)
 
-    # If ndim > ndim_regrid, the non regridding dimension are combined into
-    # a single dimension, so we can use a single loop, irrespective of the
-    # total number of dimensions.
-    # (The alternative is pre-writing N for-loops for every N dimension we
-    # intend to support.)
-    # If ndims == ndim_regrid, all dimensions will be used in regridding
-    # in that case no looping over other dimensions is required and we add
-    # a dummy dimension here so there's something to iterate over.
+    # Finally, compile the iterating regrid method with the specific aggregation function
+    @numba.njit
+    def iter_regrid(iter_src, iter_dst, alloc_len, inds_weights):
+        return _iter_regrid(
+            iter_src,
+            iter_dst,
+            alloc_len,
+            inds_weights,
+            regrid_function=jit_regrid,
+        )
 
+    return iter_regrid
+
+
+def _reshape(src, dst, ndim_regrid):
+    """
+    If ndim > ndim_regrid, the non regridding dimension are combined into
+    a single dimension, so we can use a single loop, irrespective of the
+    total number of dimensions.
+    (The alternative is pre-writing N for-loops for every N dimension we
+    intend to support.)
+    If ndims == ndim_regrid, all dimensions will be used in regridding
+    in that case no looping over other dimensions is required and we add
+    a dummy dimension here so there's something to iterate over.
+    """
     src_shape = src.shape
     dst_shape = dst.shape
     ndim = len(src_shape)
@@ -299,29 +305,209 @@ def _nd_regrid(src, dst, src_coords, dst_coords, ndim_regrid, iter_regrid):
 
     src_itershape = (n_iter, *src_shape[-ndim_regrid:])
     dst_itershape = (n_iter, *dst_shape[-ndim_regrid:])
+
     iter_src = np.reshape(src, src_itershape)
     iter_dst = np.reshape(dst, dst_itershape)
-    
-    iter_dst = iter_regrid(
-        iter_src, iter_dst, n_iter, alloc_len, inds_weights
-    )
 
-    return iter_dst.reshape(dst_shape)    
-    
+    return iter_src, iter_dst
 
-def regrid(source, like, method):
+
+def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid):
+    """
+    Regrids an ndarray up to maximum 3 dimensions.
+    Dimensionality of regridding is determined by the the length of src_coords
+    (== len(dst_coords)), which has to match with the provide iter_regrid
+    function.
+
+    Parameters
+    ----------
+    src : np.array
+    dst : np.array
+    src_coords : tuple of np.array
+    dst_coords : tuple of np.array
+    iter_regrid : function, numba compiled
+    """
+    assert len(src.shape) == len(dst.shape)
+    assert len(src_coords) == len(dst_coords)
+    ndim_regrid = len(src_coords)
+
+    # Determine weights for every regrid dimension, and alloc_len,
+    # the maximum number of src cells that may end up in a single dst cell
+    inds_weights = []
+    alloc_len = 1
+    for src_x, dst_x in zip(src_coords, dst_coords):
+        s, i_w = _weights_1d(src_x, dst_x)
+        # Convert to tuples so numba doesn't crash
+        i_w = tuple(tuple(elem) for elem in i_w)
+        inds_weights.append(i_w)
+        alloc_len *= s
+    inds_weights = tuple(inds_weights)
+
+    iter_src, iter_dst = _reshape(src, dst, ndim_regrid)
+    iter_dst = iter_regrid(iter_src, iter_dst, alloc_len, inds_weights)
+
+    return iter_dst.reshape(dst.shape)
+
+
+def _match_dims(src, like):
+    """
+    Parameters
+    ----------
+    source : xr.DataArray
+        The source DataArray to be regridded
+    like : xr.DataArray
+        Example DataArray that shows what the resampled result should look like
+        in terms of coordinates. `source` is regridded along dimensions of `like`
+        that have the same name, but have different values.
+
+    Returns
+    -------
+    matching_dims, regrid_dims, add_dims : tuple of lists
+        matching_dims: dimensions along which the coordinates match exactly
+        regrid_dims: dimensions along which source will be regridded
+        add_dims: dimensions that are not present in like
+
+    """
+    # TODO: deal with different extent?
+    # Do another check if not identical
+    # Check if subset or superset?
+    matching_dims = []
+    regrid_dims = []
+    add_dims = []
+    for dim in src.dims():
+        try:
+            if src[dim].identical(like[dim]):
+                matching_dims.append(dim)
+            else:
+                regrid_dims.append(dim)
+        except KeyError:
+            add_dims.append(dim)
+
+    ndim_regrid = len(regrid_dims)
+    # Check number of dimension to regrid
+    if ndim_regrid == 0:
+        return src
+    if ndim_regrid > 3:
+        raise NotImplementedError("cannot regrid over more than three dimensions")
+
+    return matching_dims, regrid_dims, add_dims
+
+
+def _slice_src(src, like, matching_dims):
+    """
+    Make sure src matches dst in dims that do not have to be regridded
+    """
+
+    for dim in matching_dims:
+        x0 = like[dim][0]  # start of slice
+        x1 = like[dim][-1]  # end of slice
+        src = src.sel(dim=slice(x0, x1))
+    return src
+
+
+def _dst_coords(src, like, dims_from_src, dims_from_like):
+    """
+    Gather destination coordinates
+    """
+
+    dst_da_coords = {}
+    dst_shape = []
+    for dim in dims_from_src:
+        dst_da_coords[dim] = src[dim].values
+        dst_shape.append(src[dim].size)
+    for dim in dims_from_like:
+        dst_da_coords[dim] = like[dim].values
+        dst_shape.append(like[dim].size)
+
+    return dst_da_coords, dst_shape
+
+
+def regrid(source, like, method, fill_value=np.nan):
     """
     Regridding for axis aligned coordinates
     Does both upscaling and downscaling (downsampling and upsampling, respectively)
     Equidistant and non-equidistant
     Custom aggregation methods can be defined
 
-    """
-    src_coords = [coord.values for coord in source["coords"]]
-    dst_coords = [coord.values for coord in like["coords"]]
+    Can regrid along 3 dimensions at a time.
 
+    Parameters
+    ----------
+    source : xr.DataArray
+        The source DataArray to be regridded
+    like : xr.DataArray
+        Example DataArray that shows what the resampled result should look like
+        in terms of coordinates. `source` is regridded along dimensions of `like`
+        that have the same name, but have different values.
+    method : str, function
+        The regridding method, for example mean, max, min.
+        if str, one of default methods provided.
+        if function, the function must take as arguments exactly (values, weights)
+    fill_value : float64, optional
+        Default value is np.nan
+
+    Returns
+    -------
+    regridded : xr.DataArray
+        `source` regridded along dimensions present in `like` with different
+        values.
+
+    Examples
+    --------
+    """
+    # Don't mutate source; src stands for source, dst for destination
+    src = source.copy()
+
+    # Find coordinates that already match, and those that have to be regridded,
+    # and those that exist in source but not in like (left untouched)
+    matching_dims, regrid_dims, add_dims = _match_dims(src, like)
+
+    # Make sure src matches dst in dims that do not have to be regridded
+    src = _slice_src(src, like, matching_dims)
+
+    # Order dimensions in the right way:
+    # dimensions that are regridded end up at the end for efficient iteration
+    dst_dims = (*add_dims, *matching_dims, *regrid_dims)
+    dims_from_src = (*add_dims, *matching_dims)
+    dims_from_like = tuple(regrid_dims)
+
+    # Gather destination coordinates
+    dst_da_coords, dst_shape = _dst_coords(src, like, dims_from_src, dims_from_like)
+
+    # TODO: Check dimensionality of coordinates
+    # 2-d coordinates should raise a ValueError
+    # TODO: Check possibility to make gridding lazy
+    # iter_regrid provides an opportunity for this, but the chunks need to be
+    # defined somewhat intelligently: for 1d regridding for example the iter
+    # loop is "hot" enough that numba compilation makes sense
+
+    # Allocate dst
+    # TODO: allocate lazy --> dask.array.full
+    dst = xr.DataArray(
+        data=np.full(dst_shape, fill_value), coords=dst_da_coords, dims=dst_dims
+    )
+    dst_coords_regrid = [dst[dim].values for dim in regrid_dims]
+    src_coords_regrid = [src[dim].values for dim in regrid_dims]
+    # Transpose src so that dims to regrid are last
+    src = src.tranpose(*dst_dims)
+
+    # Create tailor made regridding function: take method and ndims into account
+    # and call it
+    ndim_regrid = len(regrid_dims)
     iter_regrid = _make_regrid(method, ndim_regrid)
-    dst = _nd_regrid(src, dst, src_coords, dst_coords, ndim_regrid, iter_regrid)
+    dst.values = _nd_regrid(
+        src.values,
+        dst.values,
+        src_coords_regrid,
+        dst_coords_regrid,
+        ndim_regrid,
+        iter_regrid,
+    )
+
+    # Tranpose back to desired shape
+    dst = dst.transpose(*source.dims)
+
+    return dst
 
 
 def mean(values, weights):
