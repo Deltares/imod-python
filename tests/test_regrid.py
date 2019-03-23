@@ -3,6 +3,7 @@ import numpy as np
 import pytest
 import xarray as xr
 from imod import regrid
+from imod import idf
 
 
 def first(values, weights):
@@ -196,6 +197,25 @@ def test_iter_regrid__1d():
     assert np.allclose(dst, compare)
 
 
+def test_strictly_increasing():
+    src_x = np.arange(5.0)
+    dst_x = np.arange(5.0)
+    _src_x, _dst_x = regrid._strictly_increasing(src_x, dst_x)
+    assert np.allclose(src_x, _src_x)
+    assert np.allclose(dst_x, _dst_x)
+
+    src_x = np.arange(5.0, 0.0, -1.0)
+    dst_x = np.arange(5.0, 0.0, -1.0)
+    _src_x, _dst_x = regrid._strictly_increasing(src_x, dst_x)
+    assert np.allclose(src_x[::-1], _src_x)
+    assert np.allclose(dst_x[::-1], _dst_x)
+
+    src_x = np.arange(5.0, 0.0, -1.0)
+    dst_x = np.arange(5.0)
+    with pytest.raises(ValueError):
+        _src_x, _dst_x = regrid._strictly_increasing(src_x, dst_x)
+
+
 def test_nd_regrid__1d():
     # 1D regrid over 3D array
     src_coords = (np.array([0., 1., 2., 3., 4., 5.]),)
@@ -284,3 +304,97 @@ def test_nd_regrid__4d3d__first():
     compare = np.zeros((3, 2, 2, 2))
     compare[..., :] = [10.0, 30.0]
     assert np.allclose(dst, compare)
+
+
+def test_regrid_coord():
+    # Regular
+    da = xr.DataArray((np.zeros(4)), {"x": np.arange(4.0) + 0.5}, ("x",))
+    regridx = regrid._coord(da, "x")
+    assert np.allclose(regridx, np.arange(5.0))
+
+    # Negative x
+    da = xr.DataArray((np.zeros(4)), {"x": np.arange(-4.0, 0.0, 1.0) + 0.5}, ("x",))
+    regridx = regrid._coord(da, "x")
+    assert np.allclose(regridx, np.arange(-4.0, 1.0, 1.0))
+
+    # Negative dx
+    da = xr.DataArray((np.zeros(4)), {"x": np.arange(0.0, -4.0, -1.0) - 0.5}, ("x",))
+    regridx = regrid._coord(da, "x")
+    assert np.allclose(regridx, np.arange(0.0, -5.0, -1.0))
+
+    # Non-equidistant, postive dx, negative dy
+    nrow, ncol = 3, 4
+    dx = np.array([0.9, 1.1, 0.8, 1.2])
+    dy = np.array([-1.3, -0.7, -1.0])
+    xmin, xmax = 0.0, 4.0
+    ymin, ymax = 0.0, 3.0
+    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    kwargs = {"name": "nonequidistant", "coords": coords, "dims": ("y", "x")}
+    data = np.ones((nrow, ncol), dtype=np.float32)
+    da = xr.DataArray(data, **kwargs)
+
+    regridx = regrid._coord(da, "x")
+    regridy = regrid._coord(da, "y")
+    assert float(regridx.min()) == xmin
+    assert float(regridx.max()) == xmax
+    assert float(regridy.min()) == ymin
+    assert float(regridy.max()) == ymax
+    assert np.allclose(np.diff(regridx), dx)
+    assert np.allclose(np.diff(regridy), dy)
+
+
+def test_regrid_mean2d():
+    values = np.array([[0.6, 0.2, 3.4], [1.4, 1.6, 1.0], [4.0, 2.8, 3.0]])
+    src_x = np.arange(3.0) + 0.5
+    coords = {"y": src_x, "x": src_x}
+    dims = ("y", "x")
+    source = xr.DataArray(values, coords, dims)
+    dst_x = np.arange(0.0, 3.0, 1.5) + 0.75
+    likecoords = {"y": dst_x, "x": dst_x}
+    like = xr.DataArray(np.empty((2, 2)), likecoords, dims)
+
+    out = regrid.regrid(source, like, method=weightedmean)
+    compare = np.array(
+        [
+            [
+                (0.6 + 0.5 * 0.2 + 0.5 * 1.4 + 0.25 * 1.6) / (1.0 + 0.5 + 0.5 + 0.25),
+                (3.4 + 0.5 * 0.2 + 0.5 * 1.0 + 0.25 * 1.6) / (1.0 + 0.5 + 0.5 + 0.25),
+            ],
+            [
+                (4.0 + 0.5 * 1.4 + 0.5 * 2.8 + 0.25 * 1.6) / (1.0 + 0.5 + 0.5 + 0.25),
+                (3.0 + 0.5 * 1.0 + 0.5 * 2.8 + 0.25 * 1.6) / (1.0 + 0.5 + 0.5 + 0.25),
+            ],
+        ]
+    )
+    assert np.allclose(out.values, compare)
+
+
+def test_regrid_mean2d_over3darray():
+    values = np.array([[0.6, 0.2, 3.4], [1.4, 1.6, 1.0], [4.0, 2.8, 3.0]])
+    values = np.stack((values for _ in range(5)))
+    src_x = np.arange(3.0) + 0.5
+    src_z = np.arange(5.0)
+    coords = {"z": src_z, "y": src_x, "x": src_x}
+    dims = ("z", "y", "x")
+    source = xr.DataArray(values, coords, dims)
+    dst_x = np.arange(0.0, 3.0, 1.5) + 0.75
+    likecoords = {"z": src_z, "y": dst_x, "x": dst_x}
+    like = xr.DataArray(np.empty((5, 2, 2)), likecoords, dims)
+
+    out = regrid.regrid(source, like, method=weightedmean)
+    compare_values = np.array(
+        [
+            [
+                (0.6 + 0.5 * 0.2 + 0.5 * 1.4 + 0.25 * 1.6) / (1.0 + 0.5 + 0.5 + 0.25),
+                (3.4 + 0.5 * 0.2 + 0.5 * 1.0 + 0.25 * 1.6) / (1.0 + 0.5 + 0.5 + 0.25),
+            ],
+            [
+                (4.0 + 0.5 * 1.4 + 0.5 * 2.8 + 0.25 * 1.6) / (1.0 + 0.5 + 0.5 + 0.25),
+                (3.0 + 0.5 * 1.0 + 0.5 * 2.8 + 0.25 * 1.6) / (1.0 + 0.5 + 0.5 + 0.25),
+            ],
+        ]
+    )
+    compare = np.empty((5, 2, 2))
+    compare[:, ...] = compare_values
+
+    assert np.allclose(out.values, compare)

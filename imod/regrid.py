@@ -3,12 +3,12 @@ import numpy as np
 import xarray as xr
 
 
-@numba.njit
+@numba.njit(cache=True)
 def _overlap(a, b):
     return max(0, min(a[1], b[1]) - max(a[0], b[0]))
 
 
-@numba.njit
+@numba.njit(cache=True)
 def _starts(src_x, dst_x):
     """
     Calculate regridding weights for a single dimension
@@ -34,7 +34,7 @@ def _starts(src_x, dst_x):
         i += 1
 
 
-@numba.njit
+@numba.njit(cache=True)
 def _weights_1d(src_x, dst_x):
     """
     Calculate regridding weights and indices for a single dimension
@@ -96,7 +96,7 @@ def _weights_1d(src_x, dst_x):
     return max_len, (dst_inds, src_inds, weights)
 
 
-@numba.njit
+@numba.njit(cache=True)
 def _regrid_1d(src, dst, values, weights, method, *inds_weights):
     """
     numba compiled function to regrid in three dimensions
@@ -131,7 +131,7 @@ def _regrid_1d(src, dst, values, weights, method, *inds_weights):
     return dst
 
 
-@numba.njit
+@numba.njit(cache=True)
 def _regrid_2d(src, dst, values, weights, method, *inds_weights):
     """
     numba compiled function to regrid in three dimensions
@@ -169,7 +169,7 @@ def _regrid_2d(src, dst, values, weights, method, *inds_weights):
     return dst
 
 
-@numba.njit
+@numba.njit(cache=True)
 def _regrid_3d(src, dst, values, weights, method, *inds_weights):
     """
     numba compiled function to regrid in three dimensions
@@ -211,7 +211,7 @@ def _regrid_3d(src, dst, values, weights, method, *inds_weights):
     return dst
 
 
-@numba.njit
+@numba.njit(cache=True)
 def _iter_regrid(iter_src, iter_dst, alloc_len, regrid_function, *inds_weights):
     n_iter = iter_src.shape[0]
     # Pre-allocate temporary storage arrays
@@ -231,15 +231,15 @@ def _jit_regrid(jit_method, ndim_regrid):
     https://numba.pydata.org/numba-doc/dev/user/faq.html#can-i-pass-a-function-as-an-argument-to-a-jitted-function
     """
 
-    @numba.njit
+    @numba.njit(cache=True)
     def jit_regrid_1d(src, dst, values, weights, *inds_weights):
         return _regrid_1d(src, dst, values, weights, jit_method, *inds_weights)
 
-    @numba.njit
+    @numba.njit(cache=True)
     def jit_regrid_2d(src, dst, values, weights, *inds_weights):
         return _regrid_2d(src, dst, values, weights, jit_method, *inds_weights)
 
-    @numba.njit
+    @numba.njit(cache=True)
     def jit_regrid_3d(src, dst, values, weights, *inds_weights):
         return _regrid_3d(src, dst, values, weights, jit_method, *inds_weights)
 
@@ -262,11 +262,11 @@ def _make_regrid(method, ndim_regrid):
     """
 
     # First, compile external method
-    jit_method = numba.njit(method)
+    jit_method = numba.njit(method, cache=True)
     jit_regrid = _jit_regrid(jit_method, ndim_regrid)
 
     # Finally, compile the iterating regrid method with the specific aggregation function
-    @numba.njit
+    @numba.njit(cache=True)
     def iter_regrid(iter_src, iter_dst, alloc_len, *inds_weights):
         return _iter_regrid(iter_src, iter_dst, alloc_len, jit_regrid, *inds_weights)
 
@@ -302,6 +302,21 @@ def _reshape(src, dst, ndim_regrid):
     return iter_src, iter_dst
 
 
+def _strictly_increasing(src_x, dst_x):
+    """
+    Make sure coordinate values always increase so the _starts function above
+    works properly.
+    """
+    src_dx0 = src_x[1] - src_x[0]
+    dst_dx0 = dst_x[1] - dst_x[0]
+    if (src_dx0 > 0.0) ^ (dst_dx0 > 0.0):
+        raise ValueError("source and like coordinates not in the same direction")
+    if src_dx0 < 0.0:
+        return src_x[::-1], dst_x[::-1]
+    else:
+        return src_x, dst_x
+
+
 def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid):
     """
     Regrids an ndarray up to maximum 3 dimensions.
@@ -326,7 +341,8 @@ def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid):
     inds_weights = []
     alloc_len = 1
     for src_x, dst_x in zip(src_coords, dst_coords):
-        s, i_w = _weights_1d(src_x, dst_x)
+        _src_x, _dst_x = _strictly_increasing(src_x, dst_x)
+        s, i_w = _weights_1d(_src_x, _dst_x)
         # Convert to tuples so numba doesn't crash
         for elem in i_w:
             inds_weights.append(tuple(elem))
@@ -363,7 +379,7 @@ def _match_dims(src, like):
     matching_dims = []
     regrid_dims = []
     add_dims = []
-    for dim in src.dims():
+    for dim in src.dims:
         try:
             if src[dim].identical(like[dim]):
                 matching_dims.append(dim)
@@ -387,11 +403,12 @@ def _slice_src(src, like, matching_dims):
     Make sure src matches dst in dims that do not have to be regridded
     """
 
+    slices = {}
     for dim in matching_dims:
         x0 = like[dim][0]  # start of slice
         x1 = like[dim][-1]  # end of slice
-        src = src.sel(dim=slice(x0, x1))
-    return src
+        slices[dim] = slice(x0, x1)
+    return src.sel(slices).compute()
 
 
 def _dst_coords(src, like, dims_from_src, dims_from_like):
@@ -409,6 +426,37 @@ def _dst_coords(src, like, dims_from_src, dims_from_like):
         dst_shape.append(like[dim].size)
 
     return dst_da_coords, dst_shape
+
+
+def _check_monotonic(dxs, dim):
+    # use xor to check if one or the other
+    if not ((dxs > 0.0).all() ^ (dxs < 0.0).all()):
+        raise ValueError(f"{dim} is not only increasing or only decreasing")
+
+
+def _coord(da, dim):
+    delta_dim = "d" + dim  # e.g. dx, dy, dz, etc.
+    if delta_dim in da.coords:  # non-equidistant
+        dxs = da[delta_dim]
+        _check_monotonic(dxs, dim)
+        x0 = float(da[dim][0]) - 0.5 * float(dxs[0])
+        x1 = float(da[dim][-1]) + 0.5 * float(dxs[-1])
+        x = np.cumsum(dxs.values) + x0
+        x = np.insert(x, 0, x0)
+    else:  # equidistant
+        dxs = np.diff(da[dim])
+        _check_monotonic(dxs, dim)
+        dx = dxs[0]
+        atolx = abs(1.0e-6 * dx)
+        if not np.allclose(dxs, dx, atolx):
+            raise ValueError(
+                f"DataArray has to be equidistant along {coordname}, or cellsizes must be provided as a coordinate."
+            )
+        x0 = float(da[dim][0]) - 0.5 * dx
+        # increase by 1.5 since np.arange is not inclusive of end:
+        x1 = float(da[dim][-1]) + 1.5 * dx
+        x = np.arange(x0, x1, dx)
+    return x
 
 
 def regrid(source, like, method, fill_value=np.nan):
@@ -475,22 +523,18 @@ def regrid(source, like, method, fill_value=np.nan):
     dst = xr.DataArray(
         data=np.full(dst_shape, fill_value), coords=dst_da_coords, dims=dst_dims
     )
-    dst_coords_regrid = [dst[dim].values for dim in regrid_dims]
-    src_coords_regrid = [src[dim].values for dim in regrid_dims]
+    # TODO: check that axes are aligned
+    dst_coords_regrid = [_coord(dst, dim) for dim in regrid_dims]
+    src_coords_regrid = [_coord(src, dim) for dim in regrid_dims]
     # Transpose src so that dims to regrid are last
-    src = src.tranpose(*dst_dims)
+    src = src.transpose(*dst_dims)
 
     # Create tailor made regridding function: take method and ndims into account
     # and call it
     ndim_regrid = len(regrid_dims)
     iter_regrid = _make_regrid(method, ndim_regrid)
     dst.values = _nd_regrid(
-        src.values,
-        dst.values,
-        src_coords_regrid,
-        dst_coords_regrid,
-        ndim_regrid,
-        iter_regrid,
+        src.values, dst.values, src_coords_regrid, dst_coords_regrid, iter_regrid
     )
 
     # Tranpose back to desired shape
