@@ -385,7 +385,7 @@ def test_regrid_mean2d():
 
 def test_regrid_mean2d_over3darray():
     values = np.array([[0.6, 0.2, 3.4], [1.4, 1.6, 1.0], [4.0, 2.8, 3.0]])
-    values = np.stack((values for _ in range(5)))
+    values = np.stack([values for _ in range(5)])
     src_x = np.arange(3.0) + 0.5
     src_z = np.arange(5.0)
     coords = {"z": src_z, "y": src_x, "x": src_x}

@@ -252,7 +252,7 @@ def _regrid_3d(src, dst, values, weights, method, *inds_weights):
     return dst
 
 
-@numba.njit(cache=True)
+@numba.njit
 def _iter_regrid(iter_src, iter_dst, alloc_len, regrid_function, *inds_weights):
     n_iter = iter_src.shape[0]
     # Pre-allocate temporary storage arrays
@@ -272,15 +272,15 @@ def _jit_regrid(jit_method, ndim_regrid):
     https://numba.pydata.org/numba-doc/dev/user/faq.html#can-i-pass-a-function-as-an-argument-to-a-jitted-function
     """
 
-    @numba.njit(cache=True)
+    @numba.njit
     def jit_regrid_1d(src, dst, values, weights, *inds_weights):
         return _regrid_1d(src, dst, values, weights, jit_method, *inds_weights)
 
-    @numba.njit(cache=True)
+    @numba.njit
     def jit_regrid_2d(src, dst, values, weights, *inds_weights):
         return _regrid_2d(src, dst, values, weights, jit_method, *inds_weights)
 
-    @numba.njit(cache=True)
+    @numba.njit
     def jit_regrid_3d(src, dst, values, weights, *inds_weights):
         return _regrid_3d(src, dst, values, weights, jit_method, *inds_weights)
 
@@ -491,7 +491,7 @@ def _coord(da, dim):
         atolx = abs(1.0e-6 * dx)
         if not np.allclose(dxs, dx, atolx):
             raise ValueError(
-                f"DataArray has to be equidistant along {coordname}, or cellsizes must be provided as a coordinate."
+                f"DataArray has to be equidistant along {dim}, or cellsizes must be provided as a coordinate."
             )
         x0 = float(da[dim][0]) - 0.5 * dx
         # increase by 1.5 since np.arange is not inclusive of end:
