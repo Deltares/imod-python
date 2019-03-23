@@ -97,7 +97,7 @@ def _weights_1d(src_x, dst_x):
 
 
 @numba.njit
-def _regrid_1d(src, dst, values, weights, inds_weights, method):
+def _regrid_1d(src, dst, values, weights, method, *inds_weights):
     """
     numba compiled function to regrid in three dimensions
 
@@ -109,8 +109,7 @@ def _regrid_1d(src, dst, values, weights, inds_weights, method):
     dst_coords : tuple of np.arrays of edges
     method : numba.njit'ed function
     """
-    kk, blocks_ix, blocks_weights_x = inds_weights[0]
-
+    kk, blocks_ix, blocks_weights_x = inds_weights
     # i, j, k are indices of dst array
     # block_i contains indices of src array
     # block_w contains weights of src array
@@ -133,7 +132,7 @@ def _regrid_1d(src, dst, values, weights, inds_weights, method):
 
 
 @numba.njit
-def _regrid_2d(src, dst, values, weights, inds_weights, method):
+def _regrid_2d(src, dst, values, weights, method, *inds_weights):
     """
     numba compiled function to regrid in three dimensions
 
@@ -145,9 +144,7 @@ def _regrid_2d(src, dst, values, weights, inds_weights, method):
     dst_coords : tuple of np.arrays of edges
     method : numba.njit'ed function
     """
-    inds_weights_y, inds_weights_x = inds_weights
-    jj, blocks_iy, blocks_weights_y = inds_weights_y
-    kk, blocks_ix, blocks_weights_x = inds_weights_x
+    jj, blocks_iy, blocks_weights_y, kk, blocks_ix, blocks_weights_x = inds_weights
 
     # i, j, k are indices of dst array
     # block_i contains indices of src array
@@ -173,7 +170,7 @@ def _regrid_2d(src, dst, values, weights, inds_weights, method):
 
 
 @numba.njit
-def _regrid_3d(src, dst, values, weights, inds_weights, method):
+def _regrid_3d(src, dst, values, weights, method, *inds_weights):
     """
     numba compiled function to regrid in three dimensions
 
@@ -185,10 +182,9 @@ def _regrid_3d(src, dst, values, weights, inds_weights, method):
     dst_coords : tuple of np.arrays of edges
     method : numba.njit'ed function
     """
-    inds_weights_z, inds_weights_y, inds_weights_x = inds_weights
-    ii, blocks_iz, blocks_weights_z = inds_weights_z
-    jj, blocks_iy, blocks_weights_y = inds_weights_y
-    kk, blocks_ix, blocks_weights_x = inds_weights_x
+    ii, blocks_iz, blocks_weights_z, jj, blocks_iy, blocks_weights_y, kk, blocks_ix, blocks_weights_x = (
+        inds_weights
+    )
 
     # i, j, k are indices of dst array
     # block_i contains indices of src array
@@ -216,14 +212,14 @@ def _regrid_3d(src, dst, values, weights, inds_weights, method):
 
 
 @numba.njit
-def _iter_regrid(iter_src, iter_dst, alloc_len, inds_weights, regrid_function):
+def _iter_regrid(iter_src, iter_dst, alloc_len, regrid_function, *inds_weights):
     n_iter = iter_src.shape[0]
     # Pre-allocate temporary storage arrays
     values = np.zeros(alloc_len)
     weights = np.zeros(alloc_len)
     for i in range(n_iter):
         iter_dst[i, ...] = regrid_function(
-            iter_src[i, ...], iter_dst[i, ...], values, weights, inds_weights
+            iter_src[i, ...], iter_dst[i, ...], values, weights, *inds_weights
         )
     return iter_dst
 
@@ -236,16 +232,16 @@ def _jit_regrid(jit_method, ndim_regrid):
     """
 
     @numba.njit
-    def jit_regrid_1d(src, dst, values, weights, inds_weights):
-        return _regrid_1d(src, dst, values, weights, inds_weights, method=jit_method)
+    def jit_regrid_1d(src, dst, values, weights, *inds_weights):
+        return _regrid_1d(src, dst, values, weights, jit_method, *inds_weights)
 
     @numba.njit
-    def jit_regrid_2d(src, dst, values, weights, inds_weights):
-        return _regrid_2d(src, dst, values, weights, inds_weights, method=jit_method)
+    def jit_regrid_2d(src, dst, values, weights, *inds_weights):
+        return _regrid_2d(src, dst, values, weights, jit_method, *inds_weights)
 
     @numba.njit
-    def jit_regrid_3d(src, dst, values, weights, inds_weights):
-        return _regrid_3d(src, dst, values, weights, inds_weights, method=jit_method)
+    def jit_regrid_3d(src, dst, values, weights, *inds_weights):
+        return _regrid_3d(src, dst, values, weights, jit_method, *inds_weights)
 
     if ndim_regrid == 1:
         jit_regrid = jit_regrid_1d
@@ -271,14 +267,8 @@ def _make_regrid(method, ndim_regrid):
 
     # Finally, compile the iterating regrid method with the specific aggregation function
     @numba.njit
-    def iter_regrid(iter_src, iter_dst, alloc_len, inds_weights):
-        return _iter_regrid(
-            iter_src,
-            iter_dst,
-            alloc_len,
-            inds_weights,
-            regrid_function=jit_regrid,
-        )
+    def iter_regrid(iter_src, iter_dst, alloc_len, *inds_weights):
+        return _iter_regrid(iter_src, iter_dst, alloc_len, jit_regrid, *inds_weights)
 
     return iter_regrid
 
@@ -338,13 +328,12 @@ def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid):
     for src_x, dst_x in zip(src_coords, dst_coords):
         s, i_w = _weights_1d(src_x, dst_x)
         # Convert to tuples so numba doesn't crash
-        i_w = tuple(tuple(elem) for elem in i_w)
-        inds_weights.append(i_w)
+        for elem in i_w:
+            inds_weights.append(tuple(elem))
         alloc_len *= s
-    inds_weights = tuple(inds_weights)
 
     iter_src, iter_dst = _reshape(src, dst, ndim_regrid)
-    iter_dst = iter_regrid(iter_src, iter_dst, alloc_len, inds_weights)
+    iter_dst = iter_regrid(iter_src, iter_dst, alloc_len, *inds_weights)
 
     return iter_dst.reshape(dst.shape)
 
