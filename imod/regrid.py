@@ -533,6 +533,10 @@ def regrid(source, like, method, fill_value=np.nan):
     Examples
     --------
     """
+    # Use xarray for nearest, and exit early.
+    if method == "nearest":
+        return source.reindex_like(like, method="nearest")
+
     # Don't mutate source; src stands for source, dst for destination
     src = source.copy()
 
