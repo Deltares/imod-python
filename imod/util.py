@@ -158,12 +158,12 @@ def spatial_reference(a):
         # TODO: decide on decent criterium for what equidistant means
         # make use of floating point epsilon? E.g:
         # https://github.com/ioam/holoviews/issues/1869#issuecomment-353115449
-        # TODO: this is basically a work-around for iMODFLOW allowing only
-        # square gridcells, ideally 1D IDF have a width of 1.0 (?)
         if ncol == 1:
-            dx = dy = _delta(y, "y")
+            dy = _delta(y, "y")
+            dx = -dy
         elif nrow == 1:
-            dy = dx = _delta(x, "x")
+            dx = _delta(x, "x")
+            dy = -dx
         else:
             dx = _delta(x, "x")
             dy = _delta(y, "y")

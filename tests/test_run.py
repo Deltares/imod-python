@@ -370,7 +370,7 @@ def test_write_runfile__steady_state(make_test_model):
         testcontent = f.readlines()
 
     # TODO: think of robust, less dumb test
-    assert len(testcontent) == 39
+    assert len(testcontent) == 38
 
 
 def test_write_runfile__well_steady_state(make_test_model):
@@ -394,7 +394,7 @@ def test_write_runfile__well_steady_state(make_test_model):
         testcontent = f.readlines()
 
     # TODO: think of robust, less dumb test
-    assert len(testcontent) == 42
+    assert len(testcontent) == 41
 
 
 def test_write_runfile__transient(make_test_model):
@@ -409,7 +409,7 @@ def test_write_runfile__transient(make_test_model):
         testcontent = f.readlines()
 
     # TODO: think of robust, less dumb test
-    assert len(testcontent) == 63
+    assert len(testcontent) == 62
 
 
 def test_write_runfile__well_transient(make_test_model):
@@ -442,7 +442,7 @@ def test_write_runfile__well_transient(make_test_model):
         testcontent = f.readlines()
 
     # TODO: think of robust, less dumb test
-    assert len(testcontent) == 72
+    assert len(testcontent) == 71
 
 
 def test_write__transient(make_test_model):

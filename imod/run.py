@@ -44,11 +44,11 @@ default_runfile = OrderedDict(
     [
         ("modelname", "results"),
         ("sdate", 0),
-        ("nscl", 1),
+        ("nscl", 0),
         ("iconchk", 0),
         ("iipf", 0),
         ("iarmwp", 0),
-        ("nmult", 1),
+        ("nmult", 0),
         ("idebug", 0),
         ("iexport", 0),
         ("iposwel", 0),
