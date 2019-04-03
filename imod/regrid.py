@@ -3,6 +3,125 @@ import numpy as np
 import xarray as xr
 
 
+def _linear_inds_weights_1d(src_x, dst_x, xmin, xmax):
+    """
+    Returns indices and weights for linear interpolation along a single dimension.
+    A sentinel value of -1 is added for dst cells that are fully out of bounds.
+
+    Parameters
+    ----------
+    src_x : np.array
+        Location of points on source grid. NOT vertex locations!
+    dst_x : np.array
+        Location of points on destination grid. NOT vertex locations!
+    xmin : float
+        Minimum coordinate value for src
+    xmax : float
+        Maximum coordinate value for src
+    """
+    # From np.searchsorted docstring:
+    # Find the indices into a sorted array a such that, if the corresponding
+    # elements in v were inserted before the indices, the order of a would 
+    # be preserved.
+    i = np.searchsorted(src_x, dst_x) - 1
+    # Out of bounds indices
+    i[i < 0] = 0
+    i[i > src_x.size - 2] = src_x.size - 2
+
+    # -------------------------------------------------------------------------
+    # Visual example: interpolate from src with 2 cells to dst 3 cells 
+    # The period . marks the midpoint of the cell
+    # The pipe | marks the cell edge
+    #
+    #    |_____._____|_____._____|   
+    #    src_x0      src_x1
+    #   
+    #    |___.___|___.___|___.___|
+    #        x0      x1      x2
+    #
+    # Then normalized weight for cell x1: 
+    # weight = (x1 - src_x0) / (src_x1 - src_x0) 
+    # -------------------------------------------------------------------------
+
+    norm_weights = (dst_x - src_x[i]) / (src_x[i + 1] - src_x[i])
+    # deal with out of bounds locations
+    # we place a sentinel value of -1 here 
+    i[dst_x < xmin] = -1
+    i[dst_x > xmax] = -1
+    # In case it's just inside of bounds, use only the value at the boundary
+    norm_weights[norm_weights < 0.0] = 0.0
+    norm_weights[norm_weights > 1.0] = 1.0
+    return i, norm_weights
+
+
+@numba.njit
+def _iter_interpolate(src, dst, inds, weights):
+    """
+    Parameters
+    ----------
+    src : np.array
+        source array, reshaped to a 2d array. Interpolation occurs over the
+        last dimension.
+    dst : np.array
+        destination array, reshaped to a 2d array.
+    inds : np.array
+        indexes, size equal to last dimension of dst
+    weights : np.array
+        normalized weight, size equal to last dimension of dst
+
+    Returns
+    -------
+    dst : np.array
+        destination, contains interpolated values over last dimension
+    """
+    n_iter, _ = src.shape
+    for i in range(n_iter):
+        for j, ind in enumerate(inds):
+            if ind < 0:  # sentinel value: out of bounds
+                continue
+            v0 = src[i, ind]
+            v1 = src[i, ind + 1]
+            dst[i, j] = v0 + weights[j] * (v1 - v0)
+            # See _linear_inds_weights_1d for explanation of weight
+    return dst
+
+
+def _nd_interp(src, inds, weights, fill_value=np.nan):
+    # Make sure we don't mutate source
+    temp = src.copy()
+    dst = temp
+    # Get all the necessary shape information
+    orig_shape = src.shape
+    ndim_regrid = len(inds)
+    new_shape = orig_shape[:-ndim_regrid] + tuple([i.size for i in inds])
+    # Temp shape for bookkeeping, where which axis ends up
+    temp_shape = list(new_shape)
+        
+    for count, (i, w) in enumerate(zip(inds, weights)):
+        if count > 0:
+            # Move interpolated axis to the start
+            # Expose next axis at the end to interpolate
+            temp = np.moveaxis(temp, -1, 0)
+            temp_shape.insert(0, temp_shape.pop(-1))
+
+        # Allocate destination
+        dst = np.full((*temp.shape[:-1], i.size), fill_value)
+        # ndim_regrid for linear interpolation is always one
+        temp, dst = _reshape(temp, dst, ndim_regrid=1)
+        # Interpolate over a single dimension
+        dst = _iter_interpolate(temp, dst, i, w)
+        temp = dst.reshape(orig_shape[:count - 1] + new_shape[count - 1:])
+
+    # Restore to original shape
+    # Doesn't allocate
+    # TODO: maybe call .ascontiguousarray?
+    dst = dst.reshape(temp_shape)
+    for _ in range(count):
+        dst = np.moveaxis(dst, 0, -1)
+
+    return dst
+
+
 @numba.njit(cache=True)
 def _overlap(a, b):
     return max(0, min(a[1], b[1]) - max(a[0], b[0]))
