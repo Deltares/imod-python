@@ -16,3 +16,6 @@ class Model(dict):
     def update(self, *arg, **kwargs):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
+    
+    def render(self):
+        # Create groups for chd, drn, ghb, riv, wel
