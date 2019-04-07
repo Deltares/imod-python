@@ -6,27 +6,14 @@ from imod import util
 
 
 class Package(xr.Dataset):
-    def _compose_values_timelayer(self, key, globaltimes, directory):
-        values = {}
-        da = self[key]
-
-        if "time" in da.coords:
-            # TODO: get working for cftime
-            package_times = [
-                pd.to_datetime(t) for t in np.atleast_1d(da.coords["time"].values)
-            ]
-
-        d = {}
-        for globaltime in globaltimes:
-            if "time" in da.coords:
-                # forward fill
-                time = list(filter(lambda t: t <= globaltime, package_times))[-1]
-                d["time"] = time
-                values[time] = self._compose_values_layer(key, directory, d)
-            else:
-                values["?"] = self._compose_values_layer(key, directory)
-
-        return values
+    def _replace_keyword(self, d, key):
+        keyword = d[key][()]  # Get value from 0d np.array
+        value = self._keywords[key][keyword]
+        d[key] = value
+    
+    def _render(self):
+        d = {k, v.values for k, v in self.data_vars.items()}
+        return self._template.format(d)
 
     def _compose_values_layer(self, key, directory, d={}):
         values = {}
@@ -59,10 +46,30 @@ class Package(xr.Dataset):
 
         return values
 
-    def _replace_keyword(self, d, key):
-        keyword = d[key][()]  # Get value from 0d np.array
-        value = self._keywords[key][keyword]
-        d[key] = value
+
+class BoundaryCondition(Package):
+    def _compose_values_timelayer(self, key, globaltimes, directory):
+        values = {}
+        da = self[key]
+
+        if "time" in da.coords:
+            # TODO: get working for cftime
+            package_times = [
+                pd.to_datetime(t) for t in np.atleast_1d(da.coords["time"].values)
+            ]
+
+        d = {}
+        for globaltime in globaltimes:
+            if "time" in da.coords:
+                # forward fill
+                time = list(filter(lambda t: t <= globaltime, package_times))[-1]
+                d["time"] = time
+                values[time] = self._compose_values_layer(key, directory, d)
+            else:
+                values["?"] = self._compose_values_layer(key, directory)
+
+        return values
+
 
     def _render(self, directory, globaltimes, system_index):
         d = {}

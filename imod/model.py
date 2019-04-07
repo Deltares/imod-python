@@ -1,9 +1,43 @@
 """
 Contains an imod model object
 """
+import jinja2
 
 # This class allows only imod packages as values
 class Model(dict):
+    # These templates end up here since they require global information
+    # from more than one package
+    _gen_template = jinja2.Template(
+    """
+    [gen]
+        modelname = {{modelname}}                          
+        writehelp = {{writehelp}} 
+        result_dir = {{modelname}} 
+        packages = dis, bas6, btn, {{package_list|join(", ")}}
+        coord_xll = {{xmin}}
+        coord_yll = {{ymin}}
+        start_year = {{start_date[:4]}}
+        start_month = {{start_date[4:6]}}
+        start_day = {{start_date[6:8]}}
+        runtype = SEAWAT
+    """
+
+    # Maybe create dis as an object with derived values
+    # Dilemma is how to set number of flow steps, transient / steady-state
+    # bas seems natural location, but not flexible enough?
+    _dis_template = jinja2.Template(
+    """
+        nper = {{nper}}
+        {%- for period_duration in time_discretisation.values() %}
+        {%- set time_index = loop.index %}
+        perlen_p{{time_index}} = {{period_duration}}
+        {%- endfor %}
+        nstp_p? = {{nstp}}
+        sstr_p? = {{sstr}}
+        laycbd_l? = {{laycbd}}
+    """
+    )
+
     def __init__(self, ibound):
         dict.__init__(self)
         self["ibound"] = ibound

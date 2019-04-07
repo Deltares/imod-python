@@ -1,8 +1,10 @@
 import jinja2
-import xarray as xr
+
+from imod.pkg.pkgbase import Package
 
 
-class PreconditionedConjugateGradientSolver(xr.Dataset):
+class PreconditionedConjugateGradientSolver(Package):
+    _pkg_id = "flowsolver"
     _template = """
     [pcg]
     mxiter = {max_iter}
@@ -11,8 +13,8 @@ class PreconditionedConjugateGradientSolver(xr.Dataset):
     hclose = {hclose}
     rclose = {rclose}
     relax = {relax}
-    iprpcg = 
-    mutpcg = 
+    iprpcg = 1
+    mutpcg = 0
     damp = {damp}
     """
 
@@ -34,7 +36,8 @@ class PreconditionedConjugateGradientSolver(xr.Dataset):
             raise ValueError
 
 
-class GeneralizedConjugateGradientSolver(xr.Dataset):
+class GeneralizedConjugateGradientSolver(Package):
+    _pkg_id = "transportsolver"
     _template = """
     [gcg]
     mxiter = {max_iter}
@@ -67,11 +70,6 @@ class GeneralizedConjugateGradientSolver(xr.Dataset):
         self["lump_dispersion"] = lump_dispersion
         self["print_iteration"] = print_iteration
 
-    def _replace_keyword(self, d, key):
-        keyword = d[key][()]  # Get value from 0d np.array
-        value = self._keywords[key][keyword]
-        d[key] = value
-
     def _render(self):
         d = {k: v.values for k, v in self.data_vars.items()}
         self._replace_keyword(d, "preconditioner")
@@ -79,7 +77,8 @@ class GeneralizedConjugateGradientSolver(xr.Dataset):
         return self._template.format(d)
 
 
-class ParallelKrylovFlowSolver(xr.Dataset):
+class ParallelKrylovFlowSolver(Package):
+    _pkg_id = "flowsolver"
     def __init__(
         self,
         max_iter,
@@ -96,7 +95,8 @@ class ParallelKrylovFlowSolver(xr.Dataset):
         super(__class__, self).__init__()
 
 
-class ParallelKrylovTransportSolver(xr.Dataset):
+class ParallelKrylovTransportSolver(Package):
+    _pkg_id = "transportsolver"
     def __init__(
         self,
         max_iter,

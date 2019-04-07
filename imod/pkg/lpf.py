@@ -3,11 +3,11 @@ import numpy as np
 import xarray as xr
 
 from imod import util
-from imod.pkg.pkgbase import Package
+from imod.pkg.pkgbase import BoundaryCondition
 
 
-class LayerPropertyFlow(Package):
-    _pkgname = "lpf"
+class LayerPropertyFlow(BoundaryCondition):
+    _pkg_id = "lpf"
 
     _mapping = (
         ("laytyp", "layer_type"),
@@ -84,4 +84,3 @@ class LayerPropertyFlow(Package):
         d["dicts"] = dicts
 
         return self._template.render(d)
-

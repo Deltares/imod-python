@@ -1,6 +1,6 @@
 import jinja2
 
-from imod.pkg.pkgbase import Package
+from imod.pkg.pkgbase import BoundaryCondition
 
 #class GeneralHeadBoundaryGroup(object):
     # Does a groupby over packages of the same kind when writing
@@ -11,7 +11,8 @@ from imod.pkg.pkgbase import Package
     # Every system is treated independently
 
 
-class GeneralHeadBoundary(Package):
+class GeneralHeadBoundary(BoundaryCondition):
+    _pkg_id = "ghb"
     _mapping = (
         ("bhead", "head"),
         ("cond", "cond"),
@@ -22,9 +23,9 @@ class GeneralHeadBoundary(Package):
     """
        {%- for name, dictname in mapping -%}
             {%- for time, layerdict in dicts[dictname].items() %}
-                {%- set time_index = loop.index0 %}
+                {%- set time_index = loop.index %}
                 {%- for layer, value in layerdict.items() %}
-        {{name}}_p{{time_index + 1}}_s{{system_index}}_l{{layer}} = {{value}}
+        {{name}}_p{{time_index}}_s{{system_index}}_l{{layer}} = {{value}}
                 {%- endfor -%}
             {%- endfor -%}
         {%- endfor -%}

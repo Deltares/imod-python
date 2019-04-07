@@ -1,4 +1,5 @@
-class VariableDensityFlow(xr.Dataset):
+class VariableDensityFlow(Package):
+    _pkg_id = "vdf"
     def __init__(
         self,
         species_dens,
