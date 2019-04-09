@@ -8,6 +8,7 @@ from imod import util
 from imod import idf
 from pathlib import Path
 from collections import OrderedDict
+import cftime
 
 # change into namedtuple?
 package_schema = OrderedDict(
@@ -485,6 +486,20 @@ def _sortby_field(package_data, name, stress_period_schema):
         package_data = sorted_data
     return package_data
 
+def _maybe_to_datetime(time):
+    """
+    Check whether time is cftime object, else convert to datetime64 series.
+    
+    cftime currently has no pd.to_datetime equivalent: a method that accepts a lot of different input types.
+    
+    Parameters
+    ----------
+    time : cftime object or datetime-like scalar
+    """
+    if isinstance(time, cftime.datetime):
+       return(time)
+    else:
+        return(pd.to_datetime(time))
 
 def _time_discretisation(times):
     """
@@ -501,11 +516,11 @@ def _time_discretisation(times):
         OrderedDict with dates as strings for keys,
         stress period duration (in days) as values.
     """
+
+    times = [_maybe_to_datetime(t) for t in times]
+    
     d = OrderedDict()
     for start, end in zip(times[:-1], times[1:]):
-        # TODO: force cftime
-        start = pd.to_datetime(start)
-        end = pd.to_datetime(end)
         period_name = start.strftime("%Y%m%d%H%M%S")
         timedelta = end - start
         duration = timedelta.days + timedelta.seconds / 86400.0
@@ -610,7 +625,7 @@ def _get_system(item, times, directory):
     if "time" in da.coords:
         # TODO: fix when cftime is default xarray
         package_times = [
-            pd.to_datetime(t) for t in np.atleast_1d(da.coords["time"].values)
+            _maybe_to_datetime(t) for t in np.atleast_1d(da.coords["time"].values)
         ]
 
     single_system = OrderedDict()
