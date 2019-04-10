@@ -199,8 +199,8 @@ def test_time_discretisation_cftime():
         assert cftimes[i].strftime("%Y%m%d%H%M%S") == periodname
     
     values = list(d.values())
-    assert(np.isclose(values[0],years_diff[0]))
-    assert(np.isclose(values[1],years_diff[1]))
+    assert(np.isclose(values[0]/365.25,years_diff[0]))
+    assert(np.isclose(values[1]/365.25,years_diff[1]))
     
 def test_time_discretisation():
     dates = ["2012-01-01 12:00", "2012-01-02 00:00", "2012-01-12 00:00"]
