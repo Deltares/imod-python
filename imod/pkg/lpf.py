@@ -2,7 +2,7 @@ import jinja2
 import numpy as np
 import xarray as xr
 
-from imod import util
+from imod.io import util
 from imod.pkg.pkgbase import Package
 
 

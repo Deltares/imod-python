@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod import util
+from imod.io import util
 
 
 class Package(xr.Dataset):

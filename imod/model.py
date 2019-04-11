@@ -22,9 +22,7 @@ class Model(dict):
         runtype = SEAWAT
     """
 
-    # Maybe create dis as an object with derived values
-    # Dilemma is how to set number of flow steps, transient / steady-state
-    # bas seems natural location, but not flexible enough?
+    # Create dis as an object with derived values
     _dis_template = jinja2.Template(
     """
         nper = {{nper}}
@@ -52,4 +50,8 @@ class Model(dict):
             self[k] = v
     
     def render(self):
+        for pkgname, pkg in self.items():
+            if issubclasstype(pkg), imod.pkg.pkgbase.Package):
+                pass
         # Create groups for chd, drn, ghb, riv, wel
+        # super()

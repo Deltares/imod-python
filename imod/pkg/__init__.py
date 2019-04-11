@@ -18,3 +18,4 @@ from .slv import ParallelKrylovFlowSolver
 from .slv import ParallelKrylovTransportSolver
 from .vdf import VariableDensityFlow
 from .wel import Well
+from . import pkgbase
