@@ -4,7 +4,7 @@ from imod.pkg.pkgbase import Package
 
 
 class PreconditionedConjugateGradientSolver(Package):
-    _pkg_id = "flowsolver"
+    _pkg_id = "flow_solver"
     _template = """
     [pcg]
     mxiter = {max_iter}
@@ -37,7 +37,7 @@ class PreconditionedConjugateGradientSolver(Package):
 
 
 class GeneralizedConjugateGradientSolver(Package):
-    _pkg_id = "transportsolver"
+    _pkg_id = "transport_solver"
     _template = """
     [gcg]
     mxiter = {max_iter}
@@ -78,7 +78,7 @@ class GeneralizedConjugateGradientSolver(Package):
 
 
 class ParallelKrylovFlowSolver(Package):
-    _pkg_id = "flowsolver"
+    _pkg_id = "flow_solver"
     def __init__(
         self,
         max_iter,
@@ -96,7 +96,7 @@ class ParallelKrylovFlowSolver(Package):
 
 
 class ParallelKrylovTransportSolver(Package):
-    _pkg_id = "transportsolver"
+    _pkg_id = "transport_solver"
     def __init__(
         self,
         max_iter,

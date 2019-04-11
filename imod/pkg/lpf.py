@@ -3,10 +3,10 @@ import numpy as np
 import xarray as xr
 
 from imod import util
-from imod.pkg.pkgbase import BoundaryCondition
+from imod.pkg.pkgbase import Package
 
 
-class LayerPropertyFlow(BoundaryCondition):
+class LayerPropertyFlow(Package):
     _pkg_id = "lpf"
 
     _mapping = (

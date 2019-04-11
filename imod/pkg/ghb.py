@@ -15,8 +15,8 @@ class GeneralHeadBoundary(BoundaryCondition):
     _pkg_id = "ghb"
     _mapping = (
         ("bhead", "head"),
-        ("cond", "cond"),
-        ("ghbssmdens", "dens"),
+        ("cond", "conductance"),
+        ("ghbssmdens", "density"),
     )
 
     _template = jinja2.Template(
@@ -31,9 +31,9 @@ class GeneralHeadBoundary(BoundaryCondition):
         {%- endfor -%}
     """
     )
-    def __init__(self, head, cond, conc, dens):
+    def __init__(self, head, conductance, concentration, density):
         super(__class__, self).__init__()
         self["head"] = head
-        self["cond"] = cond
-        self["conc"] = conc
-        self["dens"] = dens
+        self["conductance"] = conductance
+        self["concentration"] = concentration
+        self["density"] = density

@@ -12,7 +12,7 @@ class Package(xr.Dataset):
         d[key] = value
     
     def _render(self):
-        d = {k, v.values for k, v in self.data_vars.items()}
+        d = {k: v.values for k, v in self.data_vars.items()}
         return self._template.format(d)
 
     def _compose_values_layer(self, key, directory, d={}):
@@ -62,6 +62,7 @@ class BoundaryCondition(Package):
         for globaltime in globaltimes:
             if "time" in da.coords:
                 # forward fill
+                # TODO: do smart forward fill using the colon notation
                 time = list(filter(lambda t: t <= globaltime, package_times))[-1]
                 d["time"] = time
                 values[time] = self._compose_values_layer(key, directory, d)

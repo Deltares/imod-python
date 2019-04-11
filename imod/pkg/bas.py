@@ -3,7 +3,7 @@ import jinja2
 from imod.pkg.pkgbase import Package
 
 
-class Basic(Package):
+class BasicFlow(Package):
     _pkg_id = "bas"
     _template = jinja2.Template(
     """
@@ -11,11 +11,12 @@ class Basic(Package):
         {%- for layer, value in ibound.items() %}
         ibound_l{{layer}} = {{value}}
         {%- endfor -%}
-        hnoflo = {{head_inactive}}
-        {%- for layer, value in shead.items() %}
+        hnoflo = {{inactive_head}}
+        {%- for layer, value in starting_head.items() %}
         strt_l{{layer}} = {{value}}
         {%- endfor -%}
     """
+    )
 
     # Non-time dependent part of dis
     # Can be inferred from ibound
@@ -34,31 +35,37 @@ class Basic(Package):
     """
     )
 
-    )
     def __init__(
         self,
         ibound,
         top,
-        bot,
-        shead,
-        head_inactive=1.0e30,
+        bottom,
+        starting_head,
+        inactive_head=1.0e30,
         confining_bed_below=0
     ):
+        _check_ibound(ibound)
         super(__class__, self).__init__()
         self["ibound"] = ibound
         self["top"] = top
-        self["bot"] = bot
-        self["shead"] = shead
-        self["head_inactive"] = head_inactive
+        self["bottom"] = bottom
+        self["starting_head"] = starting_head
+        self["inactive_head"] = inactive_head
         self["confining_bed_below"] = confining_bed_below
         # TODO: create dx, dy if they don't exist
+
+    def _check_ibound(ibound):
+        if not isinstance(xr.DataArray):
+            raise ValueError
+        if not len(ibound.shape) == 3:
+            raise ValueError
     
-    def _render(self):
+    def _render_bas(self):
         d = {}
         d["mapping"] = self._mapping
 
         dicts = {}
-        for varname in ("ibound", "shead"):
+        for varname in ("ibound", "starting_head"):
             dicts[varname] = self._compose_values_layer(varname, directory)
         d["dicts"] = dicts
 
@@ -67,7 +74,7 @@ class Basic(Package):
     def _render_dis(self):
         d = {}
 
-        for varname in ("top", "bot"):
+        for varname in ("top", "bottom"):
             d[varname] = self._compose_values_layer(varname, directory)
 
         d["nlay"], d["nrow"], d["ncol"] = self.shape 

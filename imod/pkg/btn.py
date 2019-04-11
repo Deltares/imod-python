@@ -4,6 +4,8 @@ from imod.pkg.pkgbase import Package
 
 
 class BasicTransport(Package):
+    _pkg_id = "btn"
+
     _mapping = (
         ("icbund", "icbund"),
         ("sconc", "sconc"),
@@ -14,29 +16,12 @@ class BasicTransport(Package):
 
     def __init__(
         icbund,
-        sconc,
-        porosity,
-        n_species=1
+        starting_concentration,
+        porosity=0.3,
+        n_species=1,
         conc_inactive=1.0e30,
         minimum_active_thickness=0.01,
-        ifmtcn,
-        ifmtnp,
-        ifmtrf,
-        ifmtdp,
-        savunc,
-        timprs,
-        nprobs,
-        obs,
-        chkmas,
-        nprmas,
-        nstep,
-        tsmult,
-        tslength,
-        dt0,
-        mxstrn,
-        ttsmult,  # belongs to FiniteDifferenceAdvection
-        ttsmax,  # belongs to FiniteDifferenceAdvection
     ):
-    super(__class__, self).__init__()
+        super(__class__, self).__init__()
 
 
