@@ -426,7 +426,7 @@ def _make_regrid(method, ndim_regrid):
     jit_regrid = _jit_regrid(jit_method, ndim_regrid)
 
     # Finally, compile the iterating regrid method with the specific aggregation function
-    @numba.njit(cache=True)
+    @numba.njit
     def iter_regrid(iter_src, iter_dst, alloc_len, *inds_weights):
         return _iter_regrid(iter_src, iter_dst, alloc_len, jit_regrid, *inds_weights)
 
