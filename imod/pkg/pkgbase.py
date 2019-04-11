@@ -13,7 +13,7 @@ class Package(xr.Dataset):
     
     def _render(self):
         d = {k: v.values for k, v in self.data_vars.items()}
-        return self._template.format(d)
+        return self._template.format(**d)
 
     def _compose_values_layer(self, key, directory, d={}):
         values = {}
