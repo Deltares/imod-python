@@ -2,9 +2,11 @@ import numba
 import numpy as np
 import pytest
 import xarray as xr
-from imod import regrid
-from imod import idf
+import sys
+import imod.pre.regrid
+from imod.io import idf
 
+regrid_module = sys.modules["imod.pre.regrid"]
 
 def first(values, weights):
     return values[0]
@@ -32,17 +34,17 @@ def weightedmean(values, weights):
 
 
 def test_overlap():
-    assert regrid._overlap((0., 1.), (0., 2.)) == 1.
-    assert regrid._overlap((-1., 1.), (0., 2.)) == 1.
-    assert regrid._overlap((-1., 3.), (0., 2.)) == 2.
-    assert regrid._overlap((-1., 3.), (-2., 2.)) == 3.
+    assert regrid_module._overlap((0., 1.), (0., 2.)) == 1.
+    assert regrid_module._overlap((-1., 1.), (0., 2.)) == 1.
+    assert regrid_module._overlap((-1., 3.), (0., 2.)) == 2.
+    assert regrid_module._overlap((-1., 3.), (-2., 2.)) == 3.
 
 
 def test_starts():
     @numba.njit
     def get_starts(src_x, dst_x):
         result = []
-        for i, j in regrid._starts(src_x, dst_x):
+        for i, j in regrid_module._starts(src_x, dst_x):
             result.append((i, j))
         return result
 
@@ -87,7 +89,7 @@ def test_starts():
 def test_weights():
     src_x = np.arange(0., 11., 1.)
     dst_x = np.arange(0., 11., 2.5)
-    max_len, (dst_inds, src_inds, weights) = regrid._weights_1d(src_x, dst_x)
+    max_len, (dst_inds, src_inds, weights) = regrid_module._weights_1d(src_x, dst_x)
     assert max_len == 3
     assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
     assert np.allclose(src_inds, np.array([[0, 1, 2], [2, 3, 4], [5, 6, 7], [7, 8, 9]]))
@@ -96,7 +98,7 @@ def test_weights():
     # Irregular grid
     src_x = np.array([0., 2.5, 7.5, 10.0])
     dst_x = np.array([0., 5., 10.])
-    max_len, (dst_inds, src_inds, weights) = regrid._weights_1d(src_x, dst_x)
+    max_len, (dst_inds, src_inds, weights) = regrid_module._weights_1d(src_x, dst_x)
     assert max_len == 2
     assert np.allclose(dst_inds, np.array([0, 1]))
     assert np.allclose(src_inds, np.array([[0, 1], [1, 2]]))
@@ -105,7 +107,7 @@ def test_weights():
     # Mixed coords
     src_x = np.arange(-5., 6., 1.)
     dst_x = np.arange(-5., 6., 2.5)
-    max_len, (dst_inds, src_inds, weights) = regrid._weights_1d(src_x, dst_x)
+    max_len, (dst_inds, src_inds, weights) = regrid_module._weights_1d(src_x, dst_x)
     assert max_len == 3
     assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
     assert np.allclose(src_inds, np.array([[0, 1, 2], [2, 3, 4], [5, 6, 7], [7, 8, 9]]))
@@ -115,25 +117,25 @@ def test_weights():
 def test_reshape():
     src = np.zeros((3, 5))
     dst = np.zeros((3, 2))
-    iter_src, iter_dst = regrid._reshape(src, dst, ndim_regrid=1)
+    iter_src, iter_dst = regrid_module._reshape(src, dst, ndim_regrid=1)
     assert iter_src.shape == (3, 5)
     assert iter_dst.shape == (3, 2)
 
     src = np.zeros((2, 4, 3, 5))
     dst = np.zeros((2, 4, 3, 2))
-    iter_src, iter_dst = regrid._reshape(src, dst, ndim_regrid=1)
+    iter_src, iter_dst = regrid_module._reshape(src, dst, ndim_regrid=1)
     assert iter_src.shape == (24, 5)
     assert iter_dst.shape == (24, 2)
 
     src = np.zeros((3, 5))
     dst = np.zeros((3, 2))
-    iter_src, iter_dst = regrid._reshape(src, dst, ndim_regrid=2)
+    iter_src, iter_dst = regrid_module._reshape(src, dst, ndim_regrid=2)
     assert iter_src.shape == (1, 3, 5)
     assert iter_dst.shape == (1, 3, 2)
 
     src = np.zeros((2, 4, 3, 5))
     dst = np.zeros((2, 4, 3, 2))
-    iter_src, iter_dst = regrid._reshape(src, dst, ndim_regrid=3)
+    iter_src, iter_dst = regrid_module._reshape(src, dst, ndim_regrid=3)
     assert iter_src.shape == (2, 4, 3, 5)
     assert iter_dst.shape == (2, 4, 3, 2)
 
@@ -141,17 +143,17 @@ def test_reshape():
 def test_make_regrid():
     # Cannot really test functionality, since it's compiled by numba at runtime
     # This just checks whether it's ingested okay
-    func = regrid._jit_regrid(mean, 1)
+    func = regrid_module._jit_regrid(mean, 1)
     # assert isinstance(func, numba.targets.registry.CPUDispatcher)
 
-    func = regrid._make_regrid(mean, 1)
+    func = regrid_module._make_regrid(mean, 1)
     # assert isinstance(func, numba.targets.registry.CPUDispatcher)
 
 
 def test_regrid_1d():
     src_x = np.array([0., 1., 2., 3., 4., 5.])
     dst_x = np.array([0.0, 2.5, 5.0])
-    alloc_len, i_w = regrid._weights_1d(src_x, dst_x)
+    alloc_len, i_w = regrid_module._weights_1d(src_x, dst_x)
     inds_weights = [tuple(elem) for elem in i_w]
     values = np.zeros(alloc_len)
     weights = np.zeros(alloc_len)
@@ -159,17 +161,17 @@ def test_regrid_1d():
     dst = np.array([0.0, 0.0])
 
     # Regrid method 1
-    first_regrid = regrid._jit_regrid(numba.njit(first), 1)
+    first_regrid = regrid_module._jit_regrid(numba.njit(first), 1)
     dst = first_regrid(src, dst, values, weights, *inds_weights)
     assert np.allclose(dst, np.array([10.0, 30.0]))
 
     # Regrid method 2
-    mean_regrid = regrid._jit_regrid(numba.njit(mean), 1)
+    mean_regrid = regrid_module._jit_regrid(numba.njit(mean), 1)
     dst = mean_regrid(src, dst, values, weights, *inds_weights)
     assert np.allclose(dst, np.array([(10. + 20. + 30.) / 3., (30. + 40. + 50.) / 3.]))
 
     # Regrid method 3
-    wmean_regrid = regrid._jit_regrid(numba.njit(weightedmean), 1)
+    wmean_regrid = regrid_module._jit_regrid(numba.njit(weightedmean), 1)
     dst = wmean_regrid(src, dst, values, weights, *inds_weights)
     assert np.allclose(
         dst, np.array([(10. + 20. + 0.5 * 30.) / 2.5, (30. * 0.5 + 40. + 50.) / 2.5])
@@ -180,22 +182,22 @@ def test_iter_regrid__1d():
     ndim_regrid = 1
     src_x = np.array([0., 1., 2., 3., 4., 5.])
     dst_x = np.array([0.0, 2.5, 5.0])
-    alloc_len, i_w = regrid._weights_1d(src_x, dst_x)
+    alloc_len, i_w = regrid_module._weights_1d(src_x, dst_x)
     inds_weights = [tuple(elem) for elem in i_w]
 
     # 1D regrid over 1D array
     src = np.array([10., 20.0, 30.0, 40.0, 50.0])
     dst = np.zeros(2)
-    iter_regrid = regrid._make_regrid(first, ndim_regrid)
-    iter_src, iter_dst = regrid._reshape(src, dst, ndim_regrid)
+    iter_regrid = regrid_module._make_regrid(first, ndim_regrid)
+    iter_src, iter_dst = regrid_module._reshape(src, dst, ndim_regrid)
     iter_dst = iter_regrid(iter_src, iter_dst, alloc_len, *inds_weights)
     assert np.allclose(dst, np.array([10.0, 30.0]))
 
     # 1D regrid over 2D array
     src = np.array([[10., 20.0, 30.0, 40.0, 50.0] for _ in range(3)])
     dst = np.zeros((3, 2))
-    iter_regrid = regrid._make_regrid(first, ndim_regrid)
-    iter_src, iter_dst = regrid._reshape(src, dst, ndim_regrid)
+    iter_regrid = regrid_module._make_regrid(first, ndim_regrid)
+    iter_src, iter_dst = regrid_module._reshape(src, dst, ndim_regrid)
     iter_dst = iter_regrid(iter_src, iter_dst, alloc_len, *inds_weights)
     assert np.allclose(dst, np.array([[10.0, 30.0], [10.0, 30.0], [10.0, 30.0]]))
 
@@ -203,8 +205,8 @@ def test_iter_regrid__1d():
     src = np.zeros((4, 3, 5))
     src[..., :] = [10., 20.0, 30.0, 40.0, 50.0]
     dst = np.zeros((4, 3, 2))
-    iter_regrid = regrid._make_regrid(first, ndim_regrid)
-    iter_src, iter_dst = regrid._reshape(src, dst, ndim_regrid)
+    iter_regrid = regrid_module._make_regrid(first, ndim_regrid)
+    iter_src, iter_dst = regrid_module._reshape(src, dst, ndim_regrid)
     iter_dst = iter_regrid(iter_src, iter_dst, alloc_len, *inds_weights)
     compare = np.zeros((4, 3, 2))
     compare[..., :] = [10.0, 30.0]
@@ -214,20 +216,20 @@ def test_iter_regrid__1d():
 def test_strictly_increasing():
     src_x = np.arange(5.0)
     dst_x = np.arange(5.0)
-    _src_x, _dst_x = regrid._strictly_increasing(src_x, dst_x)
+    _src_x, _dst_x = regrid_module._strictly_increasing(src_x, dst_x)
     assert np.allclose(src_x, _src_x)
     assert np.allclose(dst_x, _dst_x)
 
     src_x = np.arange(5.0, 0.0, -1.0)
     dst_x = np.arange(5.0, 0.0, -1.0)
-    _src_x, _dst_x = regrid._strictly_increasing(src_x, dst_x)
+    _src_x, _dst_x = regrid_module._strictly_increasing(src_x, dst_x)
     assert np.allclose(src_x[::-1], _src_x)
     assert np.allclose(dst_x[::-1], _dst_x)
 
     src_x = np.arange(5.0, 0.0, -1.0)
     dst_x = np.arange(5.0)
     with pytest.raises(ValueError):
-        _src_x, _dst_x = regrid._strictly_increasing(src_x, dst_x)
+        _src_x, _dst_x = regrid_module._strictly_increasing(src_x, dst_x)
 
 
 def test_nd_regrid__1d():
@@ -238,9 +240,9 @@ def test_nd_regrid__1d():
     src = np.zeros((4, 3, 5))
     src[..., :] = [10., 20.0, 30.0, 40.0, 50.0]
     dst = np.zeros((4, 3, 2))
-    iter_regrid = regrid._make_regrid(first, ndim_regrid)
+    iter_regrid = regrid_module._make_regrid(first, ndim_regrid)
 
-    dst = regrid._nd_regrid(src, dst, src_coords, dst_coords, iter_regrid)
+    dst = regrid_module._nd_regrid(src, dst, src_coords, dst_coords, iter_regrid)
     compare = np.zeros((4, 3, 2))
     compare[..., :] = [10.0, 30.0]
     assert np.allclose(dst, compare)
@@ -257,9 +259,9 @@ def test_nd_regrid__2d__first():
     src = np.zeros((4, 5, 5))
     src[..., :] = [10., 20.0, 30.0, 40.0, 50.0]
     dst = np.zeros((4, 2, 2))
-    iter_regrid = regrid._make_regrid(first, ndim_regrid)
+    iter_regrid = regrid_module._make_regrid(first, ndim_regrid)
 
-    dst = regrid._nd_regrid(src, dst, src_coords, dst_coords, iter_regrid)
+    dst = regrid_module._nd_regrid(src, dst, src_coords, dst_coords, iter_regrid)
     compare = np.zeros((4, 2, 2))
     compare[..., :] = [10.0, 30.0]
     assert np.allclose(dst, compare)
@@ -276,9 +278,9 @@ def test_nd_regrid__2d__mean():
     src = np.zeros((4, 5, 5))
     src[..., :] = [10., 20.0, 30.0, 40.0, 50.0]
     dst = np.zeros((4, 2, 2))
-    iter_regrid = regrid._make_regrid(mean, ndim_regrid)
+    iter_regrid = regrid_module._make_regrid(mean, ndim_regrid)
 
-    dst = regrid._nd_regrid(src, dst, src_coords, dst_coords, iter_regrid)
+    dst = regrid_module._nd_regrid(src, dst, src_coords, dst_coords, iter_regrid)
     compare = np.zeros((4, 2, 2))
     compare[..., :] = [20.0, 40.0]
     assert np.allclose(dst, compare)
@@ -294,9 +296,9 @@ def test_nd_regrid__3d__first():
     src = np.zeros((5, 5, 5))
     src[..., :] = [10., 20.0, 30.0, 40.0, 50.0]
     dst = np.zeros((2, 2, 2))
-    iter_regrid = regrid._make_regrid(first, ndim_regrid)
+    iter_regrid = regrid_module._make_regrid(first, ndim_regrid)
 
-    dst = regrid._nd_regrid(src, dst, src_coords, dst_coords, iter_regrid)
+    dst = regrid_module._nd_regrid(src, dst, src_coords, dst_coords, iter_regrid)
     compare = np.zeros((2, 2, 2))
     compare[..., :] = [10.0, 30.0]
     assert np.allclose(dst, compare)
@@ -312,9 +314,9 @@ def test_nd_regrid__4d3d__first():
     src = np.zeros((3, 5, 5, 5))
     src[..., :] = [10., 20.0, 30.0, 40.0, 50.0]
     dst = np.zeros((3, 2, 2, 2))
-    iter_regrid = regrid._make_regrid(first, ndim_regrid)
+    iter_regrid = regrid_module._make_regrid(first, ndim_regrid)
 
-    dst = regrid._nd_regrid(src, dst, src_coords, dst_coords, iter_regrid)
+    dst = regrid_module._nd_regrid(src, dst, src_coords, dst_coords, iter_regrid)
     compare = np.zeros((3, 2, 2, 2))
     compare[..., :] = [10.0, 30.0]
     assert np.allclose(dst, compare)
@@ -323,17 +325,17 @@ def test_nd_regrid__4d3d__first():
 def test_regrid_coord():
     # Regular
     da = xr.DataArray((np.zeros(4)), {"x": np.arange(4.0) + 0.5}, ("x",))
-    regridx = regrid._coord(da, "x")
+    regridx = regrid_module._coord(da, "x")
     assert np.allclose(regridx, np.arange(5.0))
 
     # Negative x
     da = xr.DataArray((np.zeros(4)), {"x": np.arange(-4.0, 0.0, 1.0) + 0.5}, ("x",))
-    regridx = regrid._coord(da, "x")
+    regridx = regrid_module._coord(da, "x")
     assert np.allclose(regridx, np.arange(-4.0, 1.0, 1.0))
 
     # Negative dx
     da = xr.DataArray((np.zeros(4)), {"x": np.arange(0.0, -4.0, -1.0) - 0.5}, ("x",))
-    regridx = regrid._coord(da, "x")
+    regridx = regrid_module._coord(da, "x")
     assert np.allclose(regridx, np.arange(0.0, -5.0, -1.0))
 
     # Non-equidistant, postive dx, negative dy
@@ -347,8 +349,8 @@ def test_regrid_coord():
     data = np.ones((nrow, ncol), dtype=np.float32)
     da = xr.DataArray(data, **kwargs)
 
-    regridx = regrid._coord(da, "x")
-    regridy = regrid._coord(da, "y")
+    regridx = regrid_module._coord(da, "x")
+    regridy = regrid_module._coord(da, "y")
     assert float(regridx.min()) == xmin
     assert float(regridx.max()) == xmax
     assert float(regridy.min()) == ymin
@@ -367,7 +369,7 @@ def test_regrid_mean2d():
     likecoords = {"y": dst_x, "x": dst_x}
     like = xr.DataArray(np.empty((2, 2)), likecoords, dims)
 
-    out = regrid.regrid(source, like, method=weightedmean)
+    out = regrid_module.regrid(source, like, method=weightedmean)
     compare = np.array(
         [
             [
@@ -395,7 +397,7 @@ def test_regrid_mean2d_over3darray():
     likecoords = {"z": src_z, "y": dst_x, "x": dst_x}
     like = xr.DataArray(np.empty((5, 2, 2)), likecoords, dims)
 
-    out = regrid.regrid(source, like, method=weightedmean)
+    out = regrid_module.regrid(source, like, method=weightedmean)
     compare_values = np.array(
         [
             [
