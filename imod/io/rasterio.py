@@ -5,7 +5,7 @@ import affine
 from rasterio.warp import Resampling
 from pathlib import Path
 from glob import glob
-from imod import idf, util
+from imod.io import idf, util
 
 
 def write(path, da, driver=None, nodata=np.nan):
@@ -168,7 +168,7 @@ def resample(
     --------
     Resample a DataArray `a` to a new cellsize, using an existing DataArray `b`:
     
-    >>> c = imod.rasterio.resample(source=a, like=b)
+    >>> c = imod.io.rasterio.resample(source=a, like=b)
     
     Resample a DataArray to a new cellsize of 100.0, by creating a `like` DataArray first:
     (Note that dy must be negative, as is usual for geospatial grids.)
@@ -176,27 +176,27 @@ def resample(
     >>> dims = ("y", "x")
     >>> coords = {"y": np.arange(200_000.0, 100_000.0, -100.0), "x": np.arange(0.0, 100_000.0, 100.0)}
     >>> b = xr.DataArray(data=np.empty((200, 100)), coords=coords, dims=dims)
-    >>> c = imod.rasterio.resample(source=a, like=b)
+    >>> c = imod.io.rasterio.resample(source=a, like=b)
 
     Reproject a DataArray from one coordinate system (WGS84, EPSG:4326) to another (UTM30N, EPSG:32630):
 
-    >>> c = imod.rasterio.resample(source=a, src_crs="+init=EPSG:4326", dst_crs="+init=EPSG:32630")
+    >>> c = imod.io.rasterio.resample(source=a, src_crs="+init=EPSG:4326", dst_crs="+init=EPSG:32630")
 
     Get the reprojected DataArray in the desired shape and coordinates by providing `like`:
 
-    >>> c = imod.rasterio.resample(source=a, like=b, src_crs="+init=EPSG:4326", dst_crs="+init=EPSG:32630")
+    >>> c = imod.io.rasterio.resample(source=a, like=b, src_crs="+init=EPSG:4326", dst_crs="+init=EPSG:32630")
 
     Open a single band raster, and reproject to RD new coordinate system (EPSG:28992), without explicitly specifying `src_crs`.
     `src_crs` is taken from `a.attrs`, so the raster file has to include coordinate system metadata for this to work.
 
     >>> a = xr.open_rasterio("example.tif").squeeze("band")
-    >>> c = imod.rasterio.resample(source=a, use_src_attrs=True, dst_crs="+init=EPSG:28992")
+    >>> c = imod.io.rasterio.resample(source=a, use_src_attrs=True, dst_crs="+init=EPSG:28992")
 
     In case of a rotated `source`, provide `src_transform` directly or `use_src_attrs=True` to rely on generated attributes:
 
     >>> rotated = xr.open_rasterio("rotated_example.tif").squeeze("band")
-    >>> c = imod.rasterio.resample(source=rotated, dst_crs="+init=EPSG:28992", reproject_kwargs={"src_transform":affine.Affine(...)})
-    >>> c = imod.rasterio.resample(source=rotated, dst_crs="+init=EPSG:28992", use_src_attrs=True)
+    >>> c = imod.io.rasterio.resample(source=rotated, dst_crs="+init=EPSG:28992", reproject_kwargs={"src_transform":affine.Affine(...)})
+    >>> c = imod.io.rasterio.resample(source=rotated, dst_crs="+init=EPSG:28992", use_src_attrs=True)
     """
     if not source.dims == ("y", "x"):
         raise ValueError(

@@ -1,6 +1,6 @@
 import os
 import pytest
-from imod import ipf
+from imod.io import ipf
 import numpy as np
 from collections import OrderedDict
 import xarray as xr

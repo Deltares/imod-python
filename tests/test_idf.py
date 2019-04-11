@@ -8,7 +8,7 @@ import pandas as pd
 import pytest
 import xarray as xr
 import cftime
-from imod import idf
+from imod.io import idf
 
 
 def globremove(globpath):
@@ -261,7 +261,7 @@ def test_saveopen__nonequidistant(test_da_nonequidistant):
 def test_lazy():
     """
     Reading should be lazily executed. That means it has to be part of the dask
-    graph. Specifcally, the delayed function is imod.idf._read.
+    graph. Specifcally, the delayed function is imod.io.idf._read.
 
     This does the job of testing whether that function is part the graph.
     """

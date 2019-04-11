@@ -4,8 +4,8 @@ import pandas as pd
 import numpy as np
 import itertools
 import jinja2
-from imod import util
-from imod import idf
+from imod.io import util
+from imod.io import idf
 from pathlib import Path
 from collections import OrderedDict
 import cftime
@@ -818,8 +818,8 @@ def get_runfile(model, directory):
 
 
 def _jinja2_template(fname):
-    """Loads and returns a template from imod package files."""
-    loader = jinja2.PackageLoader("imod", "templates")
+    """Loads and returns a template from imod.io package files."""
+    loader = jinja2.PackageLoader("imod.io", "templates")
     env = jinja2.Environment(loader=loader)
     return env.get_template(fname)
 
