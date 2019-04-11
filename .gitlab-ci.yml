@@ -8,6 +8,9 @@ before_script:
   - mkdir -p .pip
   - pip install -U pip
   - pip --cache-dir=.pip install -e .[dev,optional]
+  # switch to release when possible, see
+  # https://github.com/Robpol86/sphinxcontrib-versioning/issues/59
+  - pip install git+https://github.com/HTenkanen/sphinxcontrib-versioning
 
 tests:
   script:
@@ -20,6 +23,7 @@ pages:
   - cd docs
   - make html
   - cd ..
+  - sphinx-versioning build docs docs/_build/html
   - mv docs/_build/html/ public/
   artifacts:
     paths:

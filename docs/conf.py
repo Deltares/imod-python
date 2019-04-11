@@ -14,6 +14,7 @@
 #
 # import os
 # import sys
+import re
 import imod
 
 # sys.path.insert(0, 'd:\code\py\imod\imod')
@@ -30,6 +31,12 @@ version = imod.__version__
 # The full version, including alpha/beta/rc tags
 release = imod.__version__
 
+# Settings for sphinxcontrib-versioning
+# https://robpol86.github.io/sphinxcontrib-versioning/settings.html
+# For now only build selected branches, no tags
+scv_root_ref = "release"
+scv_whitelist_branches = ("release", "master", "develop")
+scv_whitelist_tags = (re.compile("a^"),)
 
 # -- General configuration ---------------------------------------------------
 
