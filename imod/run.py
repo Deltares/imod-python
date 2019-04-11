@@ -497,9 +497,9 @@ def _maybe_to_datetime(time):
     time : cftime object or datetime-like scalar
     """
     if isinstance(time, cftime.datetime):
-       return(time)
+       return time
     else:
-        return(pd.to_datetime(time))
+        return pd.to_datetime(time)
 
 def _time_discretisation(times):
     """
