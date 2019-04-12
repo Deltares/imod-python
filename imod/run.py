@@ -33,9 +33,9 @@ package_schema = OrderedDict(
 stress_period_schema = OrderedDict(
     [
         ("wel", {"systems": True}),
-        ("drn", {"systems": True, "order": ("cond", "bot")}),
-        ("riv", {"systems": True, "order": ("cond", "stage", "bot", "inff")}),
-        ("ghb", {"systems": True, "order": ("cond", "head")}),
+        ("drn", {"systems": True, "order": ("bot",  "cond")}),
+        ("riv", {"systems": True, "order": ("stage","cond", "bot", "inff")}),
+        ("ghb", {"systems": True, "order": ("head", "cond")}),
         ("rch", {"systems": False}),
         ("chd", {"systems": False}),
     ]
@@ -83,12 +83,12 @@ seawat_package_schema = OrderedDict(
 
 seawat_period_schema = OrderedDict(
     [
-        ("wel", {"systems": True, "order": ("rate", "conc")}),
-        ("drn", {"systems": True, "order": ("cond", "bot", "conc")}),
-        ("riv", {"systems": True, "order": ("cond", "stage", "bot", "dens", "conc")}),
-        ("ghb", {"systems": True, "order": ("cond", "head", "dens", "conc")}),
-        ("rch", {"systems": True, "order": ("rate", "conc")}),
-        ("chd", {"systems": True, "order": ("head", "conc")}),
+        ("wel", {"systems": True, "order": ("rate",  "conc")}),
+        ("drn", {"systems": True, "order": ("bot",   "cond", "conc")}),
+        ("riv", {"systems": True, "order": ("stage", "cond", "bot", "dens", "conc")}),
+        ("ghb", {"systems": True, "order": ("head",  "cond", "dens", "conc")}),
+        ("rch", {"systems": True, "order": ("rate",  "conc")}),
+        ("chd", {"systems": True, "order": ("head",  "conc")}),
     ]
 )
 
