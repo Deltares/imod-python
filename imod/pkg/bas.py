@@ -59,6 +59,9 @@ class BasicFlow(Package):
             raise ValueError
 
     def _render_bas(self, directory):
+        """
+        Renders part of runfile that ends up under [bas] section.
+        """
         d = {}
         for varname in ("ibound", "starting_head"):
             d[varname] = self._compose_values_layer(varname, directory)
@@ -67,6 +70,14 @@ class BasicFlow(Package):
         return self._template.render(d)
 
     def _compose_top(self, directory):
+        """
+        Composes paths to file, or gets the appropriate scalar value for
+        a top of model domain.
+
+        Parameters
+        ----------
+        directory : str
+        """
         da = self["top"]
         if "x" in da.coords and "y" in da.coords:
             if not len(da.shape) == 2:
@@ -83,6 +94,9 @@ class BasicFlow(Package):
         return value
 
     def _render_dis(self, directory):
+        """
+        Renders part of runfile that ends up under [dis] section.
+        """
         d = {}
         d["top"] = self._compose_top(directory)
         d["bottom"] = self._compose_values_layer("bottom", directory)
@@ -96,6 +110,10 @@ class BasicFlow(Package):
     def thickness(self):
         """
         Computes layer thickness from top and bottom data.
+
+        Returns
+        -------
+        thickness : xr.DataArray
         """
         th = xr.concat(
             [

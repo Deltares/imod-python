@@ -45,6 +45,22 @@ class BasicTransport(Package):
         self["minimum_active_thickness"] = minimum_active_thickness
 
     def _render_notime(self, directory, layer_type, thickness):
+        """
+        Renders part of [btn] section that does not depend on time,
+        and can be inferred without checking the BoundaryConditions.
+
+        Parameters
+        ----------
+        directory : str
+        layer_type : xr.DataArray
+            Taken from LayerPropertyFlow
+        thickness : xr.DataArray
+            Taken from BasicFlow
+
+        Returns
+        -------
+        rendered : str
+        """
         d = {}
         dicts = {}
         d["mapping"] = self._mapping

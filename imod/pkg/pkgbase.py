@@ -8,11 +8,31 @@ from imod.io import util
 
 class Package(xr.Dataset):
     def _replace_keyword(self, d, key):
+        """
+        Method to replace a keyword value by the corresponding integer value
+        that SEAWAT accepts.
+        Dict `d` is updated in place.
+
+        Parameters
+        ----------
+        d : dict
+            Updated in place.
+        key : str
+            key of value in dict `d` to replace.
+        """
         keyword = d[key][()]  # Get value from 0d np.array
         value = self._keywords[key][keyword]
         d[key] = value
     
     def _render(self):
+        """
+        Rendering method for simple keyword packages (vdf, pcg).
+
+        Returns
+        -------
+        rendered : str
+            The rendered runfile part for a single boundary condition system.
+        """
         d = {k: v.values for k, v in self.data_vars.items()}
         if hasattr(self, "_keywords"):
             for key in self._keywords.keys():
@@ -20,6 +40,32 @@ class Package(xr.Dataset):
         return self._template.format(**d)
 
     def _compose_values_layer(self, key, directory, d={}, da=None):
+        """
+        Composes paths to files, or gets the appropriate scalar value for
+        a single variable in a dataset.
+
+        Parameters
+        ----------
+        key : str
+            variable name of the DataArray
+        directory : str
+            Path to working directory, where files will be written.
+            Necessary to generate the paths for the runfile.
+        d : dict, optional
+            Partially filled in dictionary with the parts of the filename.
+            Used for transient data.
+        da : xr.DataArray, optional
+            In some cases fetching the DataArray by key is not desired.
+            It can be passed directly via this optional argument.
+
+        Returns
+        -------
+        values : dict
+            Dictionary containing the {layer number: path
+            to file}. Alternatively: {layer number: scalar
+            value}.
+            The layer number may be a wildcard (e.g. '?').
+        """
         values = {}
         if da is None:
             da = self[key]
@@ -64,6 +110,38 @@ class BoundaryCondition(Package):
     )
 
     def _compose_values_timelayer(self, key, globaltimes, directory, da=None):
+        """
+        Composes paths to files, or gets the appropriate scalar value for
+        a single variable in a dataset.
+
+        Parameters
+        ----------
+        key : str
+            variable name of the DataArray
+        globaltimes : list, np.array
+            Holds the global times, i.e. the combined unique times of
+            every boundary condition that are used to define the stress
+            periods.
+            The times of the BoundaryCondition do not have to match all
+            the global times. When a globaltime is not present in the 
+            BoundaryCondition, the value of the first previous available time is
+            filled in. The effective result is a forward fill in time.
+        directory : str
+            Path to working directory, where files will be written.
+            Necessary to generate the paths for the runfile.
+        da : xr.DataArray, optional
+            In some cases fetching the DataArray by key is not desired.
+            It can be passed directly via this optional argument.
+
+        Returns
+        -------
+        values : dict
+            Dictionary containing the {stress period number: {layer number: path
+            to file}}. Alternatively: {stress period number: {layer number: scalar
+            value}}.
+            The stress period number and layer number may be wildcards (e.g. '?').
+        """
+
         values = {}
 
         if da is None:
@@ -89,8 +167,47 @@ class BoundaryCondition(Package):
 
         return values
 
+    def _max_active_n(self, varname):
+        """
+        Determine the maximum active number of cells that are active
+        during a stress period.
+
+        Parameters
+        ----------
+        varname : str
+            name of the variable to use to calculate the maximum number of
+            active cells. Generally conductance.
+        """
+        if "time" in self[varname].coords:
+            nmax = int(self[varname].groupby("time").count().max())
+        else:
+            nmax = int(self[varname].count())
+        return nmax
+
 
     def _render(self, directory, globaltimes, system_index):
+        """
+        Parameters
+        ----------
+        directory : str
+            Path to working directory, where files will be written.
+            Necessary to generate the paths for the runfile.
+        globaltimes : list, np.array
+            Holds the global times, i.e. the combined unique times of
+            every boundary condition that are used to define the stress
+            periods.
+        system_index : int
+            Drainage, River, and GeneralHeadBoundary support multiple systems.
+            This is the number that ends up in the runfile for a given
+            BoundaryCondition object.
+            Note that MT3DMS does not fully support multiple systems, and only
+            the first system can act as source of species.
+        
+        Returns
+        -------
+        rendered : str
+            The rendered runfile part for a single boundary condition system.
+        """
         d = {}
         d["mapping"] = self._mapping
         d["system_index"] = system_index
