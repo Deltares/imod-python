@@ -21,17 +21,15 @@ class LayerPropertyFlow(Package):
     )
 
     _template = jinja2.Template(
-    """
-    [lpf]
-        ilpfcb = {{save_budget}}
-        hdry = {{head_dry}}
-        layvka_l? = 0
-        {%- for name, dictname in mapping -%}
-            {%- for layer, value in dicts[dictname].items() %}
-        {{name}}_l{{layer}} = {{value}}
-            {%- endfor -%}
-        {%- endfor -%}
-    """
+    "[lpf]\n"
+    "    ilpfcb = {{save_budget}}\n"
+    "    hdry = {{head_dry}}\n"
+    "    layvka_l? = 0\n"
+    "    {%- for name, dictname in mapping -%}\n"
+    "        {%- for layer, value in dicts[dictname].items() %}\n"
+    "    {{name}}_l{{layer}} = {{value}}\n"
+    "        {%- endfor -%}\n"
+    "    {%- endfor -%}\n"
     )
 
     _keywords = {
@@ -43,7 +41,7 @@ class LayerPropertyFlow(Package):
         self,
         k_horizontal,
         k_vertical,
-        horizontal_anistropy,
+        horizontal_anisotropy,
         interblock,
         layer_type,
         specific_storage,
@@ -57,7 +55,7 @@ class LayerPropertyFlow(Package):
         super(__class__, self).__init__()
         self["k_horizontal"] = k_horizontal
         self["k_vertical"] = k_vertical
-        self["horizontal_anisotropy"] = horizontal_anistropy
+        self["horizontal_anisotropy"] = horizontal_anisotropy
         self["interblock"] = interblock
         self["layer_type"] = layer_type
         self["specific_storage"] = specific_storage

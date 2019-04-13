@@ -50,15 +50,13 @@ class AdvectionTVD(Package):
     """
     _pkg_id = "adv"
 
-    _template = """
-    [adv]
-        wd = {weighting_factor}
-        mixelm = -1
-        percel = {courant}
-    """
+    _template = (
+    "[adv]\n"
+    "    mixelm = -1\n"
+    "    percel = {courant}\n"
+    )
 
-    def __init__(self, courant, weighting_factor):
+    def __init__(self, courant):
         super(__class__, self).__init__()
         self["courant"] = courant
-        self["weighting_factor"] = weighting_factor
     

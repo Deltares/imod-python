@@ -19,18 +19,6 @@ class GeneralHeadBoundary(BoundaryCondition):
         ("ghbssmdens", "density"),
     )
 
-    _template = jinja2.Template(
-    """
-       {%- for name, dictname in mapping -%}
-            {%- for time, layerdict in dicts[dictname].items() %}
-                {%- set time_index = loop.index %}
-                {%- for layer, value in layerdict.items() %}
-        {{name}}_p{{time_index}}_s{{system_index}}_l{{layer}} = {{value}}
-                {%- endfor -%}
-            {%- endfor -%}
-        {%- endfor -%}
-    """
-    )
     def __init__(self, head, conductance, concentration, density):
         super(__class__, self).__init__()
         self["head"] = head

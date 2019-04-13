@@ -1,3 +1,4 @@
+import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -13,11 +14,15 @@ class Package(xr.Dataset):
     
     def _render(self):
         d = {k: v.values for k, v in self.data_vars.items()}
+        if hasattr(self, "_keywords"):
+            for key in self._keywords.keys():
+                self._replace_keyword(d, key)
         return self._template.format(**d)
 
-    def _compose_values_layer(self, key, directory, d={}):
+    def _compose_values_layer(self, key, directory, d={}, da=None):
         values = {}
-        da = self[key]
+        if da is None:
+            da = self[key]
         d.update({
             "directory": directory,
             "name": key,
@@ -48,9 +53,21 @@ class Package(xr.Dataset):
 
 
 class BoundaryCondition(Package):
-    def _compose_values_timelayer(self, key, globaltimes, directory):
+    _template = jinja2.Template(
+    "    {%- for name, dictname in mapping -%}"
+    "        {%- for time, timedict in dicts[dictname].items() -%}"
+    "            {%- for layer, value in timedict.items() %}\n"
+    "    {{name}}_p{{time}}_s{{system_index}}_l{{layer}} = {{value}}\n"
+    "            {%- endfor -%}\n"
+    "        {%- endfor -%}"
+    "    {%- endfor -%}"
+    )
+
+    def _compose_values_timelayer(self, key, globaltimes, directory, da=None):
         values = {}
-        da = self[key]
+
+        if da is None:
+            da = self[key]
 
         if "time" in da.coords:
             # TODO: get working for cftime
@@ -59,13 +76,14 @@ class BoundaryCondition(Package):
             ]
 
         d = {}
-        for globaltime in globaltimes:
+        for timestep, globaltime in enumerate(globaltimes):
             if "time" in da.coords:
                 # forward fill
                 # TODO: do smart forward fill using the colon notation
                 time = list(filter(lambda t: t <= globaltime, package_times))[-1]
                 d["time"] = time
-                values[time] = self._compose_values_layer(key, directory, d)
+                # Offset 0 counting in Python, add one
+                values[timestep + 1] = self._compose_values_layer(key, directory, d)
             else:
                 values["?"] = self._compose_values_layer(key, directory)
 
