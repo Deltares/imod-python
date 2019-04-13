@@ -2,7 +2,6 @@ import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
-
 from imod.io import util
 
 
@@ -20,6 +19,7 @@ class Package(xr.Dataset):
     The `_keywords` attribute is a dictionary that's used to replace
     keyword argument by integer arguments for SEAWAT.
     """
+
     def _replace_keyword(self, d, key):
         """
         Method to replace a readable keyword value by the corresponding cryptic
@@ -37,7 +37,7 @@ class Package(xr.Dataset):
         keyword = d[key][()]  # Get value from 0d np.array
         value = self._keywords[key][keyword]
         d[key] = value
-    
+
     def _render(self):
         """
         Rendering method for simple keyword packages (vdf, pcg).
@@ -83,11 +83,7 @@ class Package(xr.Dataset):
         values = {}
         if da is None:
             da = self[key]
-        d.update({
-            "directory": directory,
-            "name": key,
-            "extension": ".idf",
-        })
+        d.update({"directory": directory, "name": key, "extension": ".idf"})
 
         # Scalar value or not?
         # If it's a scalar value we can immediately write
@@ -123,14 +119,25 @@ class BoundaryCondition(Package):
     * river
     * drainage
     """
+
     _template = jinja2.Template(
-    "    {%- for name, dictname in mapping -%}"
-    "        {%- for time, timedict in dicts[dictname].items() -%}"
-    "            {%- for layer, value in timedict.items() %}\n"
-    "    {{name}}_p{{time}}_s{{system_index}}_l{{layer}} = {{value}}\n"
-    "            {%- endfor -%}\n"
-    "        {%- endfor -%}"
-    "    {%- endfor -%}"
+        "    {%- for name, dictname in mapping -%}"
+        "        {%- for time, timedict in dicts[dictname].items() -%}"
+        "            {%- for layer, value in timedict.items() %}\n"
+        "    {{name}}_p{{time}}_s{{system_index}}_l{{layer}} = {{value}}\n"
+        "            {%- endfor -%}\n"
+        "        {%- endfor -%}"
+        "    {%- endfor -%}"
+    )
+
+    _ssm_template = jinja2.Template(
+        "{%- for species, timedict in concentration %}"
+        "    {%- for time, layerdict in timedict %}"
+        "       {%- for layer, value in timedict %}"
+        "    c{{pkg_id}}_t{{species}}_p{{time}}_{{layer}} = {{value}}\n"
+        "        {%- endfor -%}"
+        "    {%- endfor -%}"
+        "{%- endfor -%}"
     )
 
     def _compose_values_timelayer(self, key, globaltimes, directory, da=None):
@@ -207,7 +214,10 @@ class BoundaryCondition(Package):
         else:
             nmax = int(self[varname].count())
         return nmax
-
+        # TODO: save this as attribute so it doesn't have to be recomputed for SSM?
+        # Maybe call in __init__, then.
+        # or just call it before render
+        # and always make sure to call SSM render afterwards
 
     def _render(self, directory, globaltimes, system_index):
         """
@@ -238,8 +248,41 @@ class BoundaryCondition(Package):
         dicts = {}
 
         for varname in self.data_vars.keys():
-            dicts[varname] = self._compose_values_timelayer(varname, globaltimes, directory)
+            dicts[varname] = self._compose_values_timelayer(
+                varname, globaltimes, directory
+            )
 
         d["dicts"] = dicts
 
         return self._template.render(d)
+
+    def _ssm_render(self, directory, globaltimes):
+        """
+        Parameters
+        ----------
+        directory : str
+            Path to working directory, where files will be written.
+            Necessary to generate the paths for the runfile.
+        globaltimes : list, np.array
+            Holds the global times, i.e. the combined unique times of
+            every boundary condition that are used to define the stress
+            periods.
+        
+        Returns
+        -------
+        rendered : str
+            The rendered runfile SSM part for a single boundary condition system.
+        """
+
+        d = {}
+        d["pkg_id"] = self._pkg_id
+        if "species" in self["concentration"].coords:
+            concentration = {}
+            for i, species in enumerate(self["concentration"]["species"].values):
+                concentration[i + 1] = self._compose_values_timelayer(
+                    self["concentration"].sel(species=species)
+                )
+        else:
+            concentration = {1: self._compose_values_timelayer(self["concentration"])}
+        d["concentration"] = concentration
+        self._ssm_template.render(d)
