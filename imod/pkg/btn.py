@@ -64,19 +64,24 @@ class BasicTransport(Package):
         d = {}
         dicts = {}
         d["mapping"] = self._mapping
+        # Starting concentration also includes a species, and can't be written
+        # in the same way as the other variables; _T? in the runfile
         d["starting_concentration"] = self._compose_values_layer(
             "starting_concentration", directory
         )
-        
+
+        # Collect which entries are complex (multi-dim)
         data_vars = [t[1] for t in self._mapping]
         for varname in self.data_vars.keys():
             if varname == "starting_concentration":
-                continue
-            if varname in data_vars:
+                continue  # skip it, as mentioned above
+            if varname in data_vars:  # multi-dim entry
                 dicts[varname] = self._compose_values_layer(varname, directory)
-            else:
+            else:  # simple entry, just get the scalar value
                 d[varname] = self[varname].values
 
+        # Add these from the outside, thickness from BasicFlow
+        # layer_type from LayerPropertyFlow
         dicts["thickness"] = self._compose_values_layer(
             "thickness", directory, da=thickness
         )

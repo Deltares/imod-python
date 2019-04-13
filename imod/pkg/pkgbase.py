@@ -7,10 +7,24 @@ from imod.io import util
 
 
 class Package(xr.Dataset):
+    """
+    Base package for the different SEAWAT packages.
+    Every package contains a `_pkg_id` for identification.
+    Used to check for duplicate entries, or to group multiple systems together
+    (riv, ghb, drn).
+
+    The `_template` attribute is the template for a section of the runfile.
+    This is filled in based on the metadata from the DataArrays that are within
+    the Package.
+
+    The `_keywords` attribute is a dictionary that's used to replace
+    keyword argument by integer arguments for SEAWAT.
+    """
     def _replace_keyword(self, d, key):
         """
-        Method to replace a keyword value by the corresponding integer value
-        that SEAWAT accepts.
+        Method to replace a readable keyword value by the corresponding cryptic
+        integer value that SEAWAT demands.
+
         Dict `d` is updated in place.
 
         Parameters
@@ -75,7 +89,9 @@ class Package(xr.Dataset):
             "extension": ".idf",
         })
 
-        # Scalar value
+        # Scalar value or not?
+        # If it's a scalar value we can immediately write
+        # otherwise, we have to write a file path
         if "y" not in da.coords and "x" not in da.coords:
             idf = False
         else:
@@ -99,6 +115,14 @@ class Package(xr.Dataset):
 
 
 class BoundaryCondition(Package):
+    """
+    Base package for (transient) boundary conditions:
+    * recharge
+    * general head boundary
+    * constant head
+    * river
+    * drainage
+    """
     _template = jinja2.Template(
     "    {%- for name, dictname in mapping -%}"
     "        {%- for time, timedict in dicts[dictname].items() -%}"
