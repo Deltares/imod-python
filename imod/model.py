@@ -60,21 +60,20 @@ def _time_discretisation(times):
 
 # This class allows only imod packages as values
 class Model(UserDict):
-    def __init__(self, ibound):
-        dict.__init__(self)
-        self["ibound"] = ibound
-
-    def __setitem__(self, key, value):
-        # TODO: raise ValueError on setting certain duplicates
-        # e.g. two solvers
-        if not hasattr(value, "_pkg_id"):
-            raise ValueError("not a package")
-        dict.__setitem__(self, key, value)
-
-    def update(self, *arg, **kwargs):
-        for k, v in dict(*args, **kwargs).items():
-            self[k] = v
-
+    pass
+#    def __setitem__(self, key, value):
+#        # TODO: raise ValueError on setting certain duplicates
+#        # e.g. two solvers
+#        if key == "modelname":
+#            pass
+#        elif not hasattr(value, "_pkg_id"):
+#            raise ValueError("The value to set is not an imod package")
+#        dict.__setitem__(self, key, value)
+#
+#    def update(self, *args, **kwargs):
+#        for k, v in dict(*args, **kwargs).items():
+#            self[k] = v
+#
 
 class SeawatModel(Model):
     """
@@ -96,16 +95,16 @@ class SeawatModel(Model):
         "    modelname = {{modelname}}\n"
         "    writehelp = {{writehelp}}\n"
         "    result_dir = {{modelname}}\n"
-        "    packages = {{package_set|join(",
-        ")}}\n"
+        "    packages = {{package_set|join(',')}}\n"
         "    coord_xll = {{xmin}}\n"
         "    coord_yll = {{ymin}}\n"
         "    start_year = {{start_date[:4]}}\n"
         "    start_month = {{start_date[4:6]}}\n"
-        "    start_day = {{start_date[6:8]}}\n",
+        "    start_day = {{start_date[6:8]}}\n"
     )
 
     def __init__(self, modelname):
+        super(__class__, self).__init__()
         self["modelname"] = modelname
 
     def _group(self):
@@ -297,7 +296,7 @@ class SeawatModel(Model):
     def write(self):
         # TODO: just write to an arbitrary directory
         runfile_content = self.render()
-        runfilepath = f"{self["modelname"]}.run"
+        runfilepath = self["modelname"] + ".run"
         # Write the runfile
         with open(runfilepath, "w") as f:
             f.write(runfile_content)
