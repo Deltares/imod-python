@@ -198,7 +198,7 @@ class BoundaryCondition(Package):
 
         return values
 
-    def _max_active_n(self, varname):
+    def _max_active_n(self, varname="conductance"):
         """
         Determine the maximum active number of cells that are active
         during a stress period.

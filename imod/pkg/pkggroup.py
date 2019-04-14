@@ -12,11 +12,12 @@ class PackageGroup(UserDict):
     * wel
     """
     def __init__(self, **kwargs):
+        UserDict.__init__(self)
         for k, v in kwargs.items():
             self[k] = v
-        self.first_key = self.first_package()
+        self.key_order()
 
-    def first_package(self):
+    def key_order(self):
         """
         Order packages so that the one with with concentration is first.
         Check whether concentration for only one system has been defined.
@@ -31,7 +32,8 @@ class PackageGroup(UserDict):
                 order.append(k)
         if n_system_concentrations > 1:
             raise ValueError("Only one system with concentrations allowed per package")
-        return order[0]
+        self.first_key = order[0]
+        self.key_order = order
 
     def max_n_sinkssources(self):
         # TODO: check if this is necessary
@@ -48,10 +50,10 @@ class PackageGroup(UserDict):
     def render(self, directory, globaltimes):
         d = {}
         d["n_systems"] = len(self.keys())
-        d["nmax_active"] = sum([v._max_active_n() for v in self.values()])
+        d["n_max_active"] = sum([v._max_active_n() for v in self.values()])
         d["save_budget"] = any([v["save_budget"] for v in self.values()])
 
-        content = [self._template.render(d)]
+        content = [self._template.format(**d)]
         for i, key in enumerate(self.key_order):
             system_index = i + 1
             content.append(
@@ -63,7 +65,7 @@ class PackageGroup(UserDict):
             )
         return "".join(content)
 
-    def ssm_render(self, directory, globaltimes):
+    def render_ssm(self, directory, globaltimes):
         # Only render for the first system, that has concentrations defined.
         key = self.first_key
         return self[key]._ssm_render(directory, globaltimes)
@@ -78,7 +80,7 @@ class DrainageGroup(PackageGroup):
         "[ghb]\n"
         "    mdrnsys = {n_systems}\n"
         "    mxactd = {n_max_active}\n"
-        "    idrncb = {save_budget}\n"
+        "    idrncb = {save_budget}"
     )
 
 
@@ -87,7 +89,7 @@ class GeneralHeadBoundaryGroup(PackageGroup):
         "[ghb]\n"
         "    mghbsys = {n_systems}\n"
         "    mxactb = {n_max_active}\n"
-        "    ighbcb = {save_budget}\n"
+        "    ighbcb = {save_budget}"
     )
 
 
@@ -96,10 +98,11 @@ class RiverGroup(PackageGroup):
         "[riv]\n"
         "    mrivsys = {n_systems}\n"
         "    mxactr = {n_max_active}\n"
-        "    irivcb = {save_budget}\n"
+        "    irivcb = {save_budget}"
     )
 
 
+# dict might be easier than Enumerator...
 class PackageGroups(Enum):
     chd = ConstantHeadGroup
     drn = DrainageGroup
