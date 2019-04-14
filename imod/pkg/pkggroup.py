@@ -3,6 +3,14 @@ from enum import Enum
 
 
 class PackageGroup(UserDict):
+    """
+    Groups for packes that support multiple systems:
+    * chd
+    * drn
+    * ghb
+    * riv
+    * wel
+    """
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             self[k] = v
@@ -61,21 +69,9 @@ class PackageGroup(UserDict):
         return self[key]._ssm_render(directory, globaltimes)
 
 
-class RiverGroup(PackageGroup):
-    _template = (
-        "[riv]\n"
-        "    mrivsys = {n_systems}\n"
-        "    mxactr = {n_max_active}\n"
-        "    irivcb = {save_budget}\n"
-    )
+class ConstantHeadGroup(PackageGroup):
+    _template = "[chd]\n" "    mchdsys = {n_systems}\n" "    mxactc = {n_max_active}\n"
 
-class GeneralHeadBoundaryGroup(PackageGroup):
-    _template = (
-        "[ghb]\n"
-        "    mghbsys = {n_systems}\n"
-        "    mxactb = {n_max_active}\n"
-        "    ighbcb = {save_budget}\n"
-    )
 
 class DrainageGroup(PackageGroup):
     _template = (
@@ -85,7 +81,27 @@ class DrainageGroup(PackageGroup):
         "    idrncb = {save_budget}\n"
     )
 
+
+class GeneralHeadBoundaryGroup(PackageGroup):
+    _template = (
+        "[ghb]\n"
+        "    mghbsys = {n_systems}\n"
+        "    mxactb = {n_max_active}\n"
+        "    ighbcb = {save_budget}\n"
+    )
+
+
+class RiverGroup(PackageGroup):
+    _template = (
+        "[riv]\n"
+        "    mrivsys = {n_systems}\n"
+        "    mxactr = {n_max_active}\n"
+        "    irivcb = {save_budget}\n"
+    )
+
+
 class PackageGroups(Enum):
+    chd = ConstantHeadGroup
     drn = DrainageGroup
     ghb = GeneralHeadBoundaryGroup
     riv = RiverGroup

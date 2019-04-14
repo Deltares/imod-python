@@ -19,9 +19,11 @@ class GeneralHeadBoundary(BoundaryCondition):
         ("ghbssmdens", "density"),
     )
 
-    def __init__(self, head, conductance, concentration, density):
+    def __init__(self, head, conductance, concentration=None, density=None):
         super(__class__, self).__init__()
         self["head"] = head
         self["conductance"] = conductance
-        self["concentration"] = concentration
-        self["density"] = density
+        if concentration is not None:
+            self["concentration"] = concentration
+        if density is not None:
+            self["density"] = density

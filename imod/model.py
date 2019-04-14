@@ -47,7 +47,7 @@ def _time_discretisation(times):
         stress period duration (in days) as values.
     """
 
-    times = [_maybe_to_datetime(t) for t in times]
+    times = [_to_datetime(t) for t in times]
 
     d = OrderedDict()
     for start, end in zip(times[:-1], times[1:]):
@@ -152,6 +152,10 @@ class SeawatModel(Model):
         )
 
     def _get_pkgkey(self, pkg_id):
+        """
+        Get package key that belongs to a certain pkg_id, since the keys are
+        user specified.
+        """
         key = [pkgname for pkgname, pkg in self.items() if pkg._pkg_id == pkg_id]
         nkey = len(key)
         if nkey > 1:

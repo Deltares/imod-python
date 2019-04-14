@@ -243,7 +243,8 @@ class BoundaryCondition(Package):
             The rendered runfile part for a single boundary condition system.
         """
         d = {}
-        d["mapping"] = self._mapping
+        mapping = tuple([(k, v) for k, v in self._mapping if v in self.data_vars])
+        d["mapping"] = mapping
         d["system_index"] = system_index
         dicts = {}
 

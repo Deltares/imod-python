@@ -32,7 +32,7 @@ def test_thickness(basicflow):
     assert np.allclose(thickness, compare)
 
 
-def test_render_bas(basicflow):
+def test_render(basicflow):
     bas = basicflow
     directory = Path(".")
 
@@ -46,7 +46,7 @@ def test_render_bas(basicflow):
         "    strt_l2 = starting_head_l2.idf\n"
         "    strt_l3 = starting_head_l3.idf"
     )
-    assert bas._render_bas(directory) == compare
+    assert bas._render(directory) == compare
 
 
 def test_render_dis__scalartopbot(basicflow):
