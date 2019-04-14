@@ -39,6 +39,7 @@ class TimeDiscretization(Package):
     def __init__(time, n_timesteps, transient, timestep_multiplier, transport_timestep_multiplier, transport_initial_timestep):
         self.super(__class__, self).__init__()
         self["time"] = time
+        self["timestep_duration"] = timestep_duration
         self["n_timesteps"] = n_timesteps
         self["flow_transient"] = transient
         self["flow_timestep_multiplier"] = timestep_multiplier

@@ -1,8 +1,9 @@
 from collections import UserDict
+from enum import Enum
 
 
 class PackageGroup(UserDict):
-    def __init__(**kwargs):
+    def __init__(self, **kwargs):
         for k, v in kwargs.items():
             self[k] = v
         self.first_key = self.first_package()
@@ -83,3 +84,8 @@ class DrainageGroup(PackageGroup):
         "    mxactd = {n_max_active}\n"
         "    idrncb = {save_budget}\n"
     )
+
+class PackageGroups(Enum):
+    drn = DrainageGroup
+    ghb = GeneralHeadBoundaryGroup
+    riv = RiverGroup
