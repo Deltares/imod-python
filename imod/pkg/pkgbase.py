@@ -109,6 +109,27 @@ class Package(xr.Dataset):
 
         return values
 
+    def _compose_values_time(self, key, globaltimes):
+        da = self[key]
+        values = {}
+
+        if "time" in da.coords:
+            # TODO: get working for cftime
+            package_times = [
+                pd.to_datetime(t) for t in np.atleast_1d(da.coords["time"].values)
+            ]
+
+        for timestep, globaltime in enumerate(globaltimes):
+            if "time" in da.coords:
+                # forward fill
+                # TODO: do smart forward fill using the colon notation
+                time = list(filter(lambda t: t <= globaltime, package_times))[-1]
+                # Offset 0 counting in Python, add one
+                values[timestep + 1] = da.isel(time=timestep).values[()]
+            else:
+                values["?"] = da.values[()]
+
+        return values
 
 class BoundaryCondition(Package):
     """

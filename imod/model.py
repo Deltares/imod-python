@@ -194,7 +194,7 @@ class SeawatModel(Model):
         baskey = self._get_pkgkey("bas")
         diskey = self._get_pkgkey("dis")
         bascontent = self[baskey]._render_dis(directory=directory)
-        discontent = self[diskey]._render_dis(directory=directory)
+        discontent = self[diskey]._render(directory=directory)
         return bascontent + discontent
 
     def _render_groups(self, directory, globaltimes):
