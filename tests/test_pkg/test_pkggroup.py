@@ -67,3 +67,28 @@ def test_render(ghb_group):
         "    cond_p?_s3_l3 = conductance_l3.idf"
     )
     assert group.render(directory, globaltimes=["?"]) == compare
+
+
+def test_render_error__concentration_twice(ghb_group):
+    layer = np.arange(1, 4)
+    y = np.arange(4.5, 0.0, -1.0)
+    x = np.arange(0.5, 5.0, 1.0)
+    head = xr.DataArray(
+        np.full((3, 5, 5), 1.0),
+        coords={"layer": layer, "y": y, "x": x, "dx": 1.0, "dy": -1.0},
+        dims=("layer", "y", "x"),
+    )
+
+    headboundary = GeneralHeadBoundary(
+        head=head,
+        conductance=head.copy(),
+        concentration=head.copy(),
+        density=head.copy(),
+        save_budget=False,
+    )
+    ghb1 = headboundary
+    ghb2 = headboundary.copy()
+    d = {"primary": ghb1, "secondary": ghb2}
+
+    with pytest.raises(ValueError):
+        ghb_group = GeneralHeadBoundaryGroup(**d)
