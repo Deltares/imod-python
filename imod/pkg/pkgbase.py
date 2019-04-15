@@ -75,10 +75,9 @@ class Package(xr.Dataset):
         Returns
         -------
         values : dict
-            Dictionary containing the {layer number: path
-            to file}. Alternatively: {layer number: scalar
-            value}.
-            The layer number may be a wildcard (e.g. '?').
+            Dictionary containing the {layer number: path to file}.
+            Alternatively: {layer number: scalar value}. The layer number may be
+            a wildcard (e.g. '?').
         """
         values = {}
         if da is None:

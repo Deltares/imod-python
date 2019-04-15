@@ -107,3 +107,10 @@ def basicmodel(request):
 
 def test_group(basicmodel):
     m = basicmodel
+    g = m._group()
+    # Contains only GHB group
+    assert len(g) == 1
+    # GHB group contains only one value
+    assert len(g[0]) == 1
+    assert list(g[0].keys())[0] == "ghb" 
+

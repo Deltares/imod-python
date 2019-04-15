@@ -64,16 +64,14 @@ class Model(UserDict):
 #    def __setitem__(self, key, value):
 #        # TODO: raise ValueError on setting certain duplicates
 #        # e.g. two solvers
-#        if key == "modelname":
-#            pass
-#        elif not hasattr(value, "_pkg_id"):
+#        if not hasattr(value, "_pkg_id"):
 #            raise ValueError("The value to set is not an imod package")
 #        dict.__setitem__(self, key, value)
 #
 #    def update(self, *args, **kwargs):
 #        for k, v in dict(*args, **kwargs).items():
 #            self[k] = v
-#
+
 
 class SeawatModel(Model):
     """
@@ -105,7 +103,7 @@ class SeawatModel(Model):
 
     def __init__(self, modelname):
         super(__class__, self).__init__()
-        self["modelname"] = modelname
+        self.modelname = modelname
 
     def _group(self):
         """
@@ -125,7 +123,7 @@ class SeawatModel(Model):
                     has_group.update(pkg_id)
 
         package_groups = []
-        for pkg_id, group in groups:
+        for pkg_id, group in groups.items():
             # Create PackageGroup for every package
             # RiverGroup for rivers, DrainageGroup for drainage, etc.
             package_groups.append(self._PACKAGE_GROUPS[pkg_id].value(**group))
@@ -251,7 +249,7 @@ class SeawatModel(Model):
         """
         diskey = self._get_pkgkey("dis")
         globaltimes = self[diskey]["time"].values
-        directory = self["modelname"]
+        directory = self.modelname
 
         modflowcontent, ssmcontent = self._render_groups(
             directory=directory, globaltimes=globaltimes
@@ -260,7 +258,7 @@ class SeawatModel(Model):
         content = []
         content.append(
             self._render_gen(
-                modelname=self["modelname"],
+                modelname=self.modelname,
                 globaltimes=globaltimes,
                 writehelp=writehelp,
             )
@@ -296,7 +294,7 @@ class SeawatModel(Model):
     def write(self):
         # TODO: just write to an arbitrary directory
         runfile_content = self.render()
-        runfilepath = self["modelname"] + ".run"
+        runfilepath = f"{self.modelname}.run"
         # Write the runfile
         with open(runfilepath, "w") as f:
             f.write(runfile_content)
