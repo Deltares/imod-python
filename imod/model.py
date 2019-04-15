@@ -190,7 +190,7 @@ class SeawatModel(Model):
         d["start_date"] = start_date
         return self._gen_template.render(d)
 
-    def _render(self, key, directory, globaltimes):
+    def _render_pkg(self, key, directory, globaltimes):
         """
         Rendering method for straightforward packages
         """
@@ -198,7 +198,7 @@ class SeawatModel(Model):
         if key is None:
             # Maybe do enum look for full package name?
             raise ValueError(f"No {key} package provided.")
-        return self[key].render(directory=directory, globaltimes=globaltimes)
+        return self[key]._render(directory=directory, globaltimes=globaltimes)
 
     def _render_dis(self, directory):
         baskey = self._get_pkgkey("bas")
@@ -209,17 +209,12 @@ class SeawatModel(Model):
 
     def _render_groups(self, directory, globaltimes):
         package_groups = self._group()
-        content = [
-            group.render(directory, globaltimes) for group in package_groups.values()
-        ]
-        ssm_content = [
-            group.render_ssm(directory, globaltimes)
-            for group in package_groups.values()
-        ]
+        content = "".join([group.render(directory, globaltimes) for group in package_groups])
+        ssm_content = "".join([
+            group.render_ssm(directory, globaltimes) for group in package_groups
+        ])
         # TODO: do this in a single pass, combined with _n_max_active for modflow part?
-        n_sinkssources = sum(
-            [group.max_n_sinkssources() for group in package_groups.values()]
-        )
+        n_sinkssources = sum([group.max_n_sinkssources() for group in package_groups])
         ssm_content = f"[ssm]\n    mxss = {n_sinkssources}\n" + ssm_content
         return content, ssm_content
 
@@ -278,7 +273,7 @@ class SeawatModel(Model):
         # Modflow
         for key in ("bas", "oc", "lpf", "rch"):
             content.append(
-                self._render(key=key, directory=directory, globaltimes=globaltimes)
+                self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
             )
         content.append(modflowcontent)
         content.append(self._render_flowsolver())
@@ -286,7 +281,7 @@ class SeawatModel(Model):
         # MT3D and Seawat
         content.append(self._render_btn())
         for key in ("vdf", "adv", "dsp"):
-            self._render(key=key, directory=directory, globaltimes=globaltimes)
+            self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
         content.append(ssmcontent)
         content.append(self._render_transportsolver())
 

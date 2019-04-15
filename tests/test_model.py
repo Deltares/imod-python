@@ -146,8 +146,87 @@ def test_render_gen(basicmodel):
         "    start_month = 01\n"
         "    start_day = 01"
     )
-    with open("compare.txt", "w") as f:
-        f.write(compare)
-    with open("render.txt", "w") as f:
-        f.write(m._render_gen(modelname=modelname, globaltimes=globaltimes))
     assert m._render_gen(modelname=modelname, globaltimes=globaltimes) == compare
+
+
+def test_render_pgk__gcg(basicmodel):
+    m = basicmodel
+    m.time_discretization(endtime="2000-01-06")
+    diskey = m._get_pkgkey("dis")
+    globaltimes = m[diskey]["time"].values
+    modelname = m.modelname
+    directory = Path(".")
+
+    compare = (
+    "[gcg]\n"
+    "    mxiter = 150\n"
+    "    iter1 = 30\n"
+    "    isolve = 3\n"
+    "    ncrs = 0\n"
+    "    cclose = 1e-06\n"
+    "    iprgcg = 0\n"
+    )
+    assert m._render_pkg("gcg", directory=directory, globaltimes=globaltimes) == compare
+
+
+def test_render_pgk__rch(basicmodel):
+    m = basicmodel
+    m.time_discretization(endtime="2000-01-06")
+    diskey = m._get_pkgkey("dis")
+    globaltimes = m[diskey]["time"].values
+    modelname = m.modelname
+    directory = Path(".")
+
+    compare = (
+        "[rch]\n"
+        "    nrchop = 3\n"
+        "    irchcb = 0\n"
+        "    rech_p1 = rate_20000101000000.idf\n"
+        "    rech_p2 = rate_20000102000000.idf\n"
+        "    rech_p3 = rate_20000103000000.idf\n"
+        "    rech_p4 = rate_20000104000000.idf\n"
+        "    rech_p5 = rate_20000105000000.idf"
+    )
+    assert m._render_pkg("rch", directory=directory, globaltimes=globaltimes) == compare
+
+
+def test_render_groups__ghb(basicmodel):
+    m = basicmodel
+    m.time_discretization(endtime="2000-01-06")
+    diskey = m._get_pkgkey("dis")
+    globaltimes = m[diskey]["time"].values
+    modelname = m.modelname
+    directory = Path(".")
+
+    compare = (
+        "[ghb]\n"
+        "    mghbsys = 1\n"
+        "    mxactb = 75\n"
+        "    ighbcb = False\n"
+        "    bhead_p?_s1_l1 = head_l1.idf\n"
+        "    bhead_p?_s1_l2 = head_l2.idf\n"
+        "    bhead_p?_s1_l3 = head_l3.idf\n"
+        "    cond_p?_s1_l1 = conductance_l1.idf\n"
+        "    cond_p?_s1_l2 = conductance_l2.idf\n"
+        "    cond_p?_s1_l3 = conductance_l3.idf\n"
+        "    ghbssmdens_p?_s1_l1 = density_l1.idf\n"
+        "    ghbssmdens_p?_s1_l2 = density_l2.idf\n"
+        "    ghbssmdens_p?_s1_l3 = density_l3.idf"
+    )
+
+    #TODO: fix stupid newline in the middle
+    # check jinja2 documentation
+    ssm_compare = (
+        "[ssm]\n"
+        "    mxss = 75\n"
+        "\n"
+        "    cghb_t1_p?_l1 = concentration_l1.idf\n"
+        "    cghb_t1_p?_l2 = concentration_l2.idf\n"
+        "    cghb_t1_p?_l3 = concentration_l3.idf"
+    )
+    content, ssm_content = m._render_groups(directory=directory, globaltimes=globaltimes)
+
+    print(ssm_content)
+    print(ssm_compare)
+    assert content == compare
+    assert ssm_content == ssm_compare

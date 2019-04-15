@@ -130,6 +130,7 @@ class Package(xr.Dataset):
 
         return values
 
+
 class BoundaryCondition(Package):
     """
     Base package for (transient) boundary conditions:
@@ -151,10 +152,10 @@ class BoundaryCondition(Package):
     )
 
     _ssm_template = jinja2.Template(
-        "{%- for species, timedict in concentration %}"
-        "    {%- for time, layerdict in timedict %}"
-        "       {%- for layer, value in timedict %}"
-        "    c{{pkg_id}}_t{{species}}_p{{time}}_{{layer}} = {{value}}\n"
+        "{%- for species, timedict in concentration.items() -%}"
+        "    {%- for time, layerdict in timedict.items() -%}"
+        "       {%- for layer, value in layerdict.items() %}\n"
+        "    c{{pkg_id}}_t{{species}}_p{{time}}_l{{layer}} = {{value}}\n"
         "        {%- endfor -%}"
         "    {%- endfor -%}"
         "{%- endfor -%}"
@@ -218,7 +219,7 @@ class BoundaryCondition(Package):
 
         return values
 
-    def _max_active_n(self, varname="conductance"):
+    def _max_active_n(self, varname):
         """
         Determine the maximum active number of cells that are active
         during a stress period.
@@ -301,9 +302,19 @@ class BoundaryCondition(Package):
             concentration = {}
             for i, species in enumerate(self["concentration"]["species"].values):
                 concentration[i + 1] = self._compose_values_timelayer(
-                    self["concentration"].sel(species=species)
+                    key="concentration",
+                    da=self["concentration"].sel(species=species),
+                    globaltimes=globaltimes,
+                    directory=directory,
                 )
         else:
-            concentration = {1: self._compose_values_timelayer(self["concentration"])}
+            concentration = {
+                1: self._compose_values_timelayer(
+                    key="concentration",
+                    da=self["concentration"],
+                    globaltimes=globaltimes,
+                    directory=directory,
+                )
+            }
         d["concentration"] = concentration
-        self._ssm_template.render(d)
+        return self._ssm_template.render(d)

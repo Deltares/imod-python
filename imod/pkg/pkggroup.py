@@ -39,18 +39,20 @@ class PackageGroup(UserDict):
         # TODO: check if this is necessary
         # with sinks, are system 2 and higher also a sink?
         # If that's the case, active_max_n is sufficient for every package
-        key = self.first_key
-        ds = self[key]
-        if "time" in ds[varname].coords:
-            nmax = int(ds[varname].groupby("time").count().max())
-        else:
-            nmax = int(ds[varname].count())
-        return nmax
+        #key = self.first_key
+        #ds = self[key]
+        
+        #if "time" in ds[varname].coords:
+        #    nmax = int(ds[varname].groupby("time").count().max())
+        #else:
+        #    nmax = int(ds[varname].count())
+        return self.n_max_active
 
     def render(self, directory, globaltimes):
         d = {}
         d["n_systems"] = len(self.keys())
-        d["n_max_active"] = sum([v._max_active_n() for v in self.values()])
+        self.n_max_active = sum([v._max_active_n(self._cellcount_varname) for v in self.values()])
+        d["n_max_active"] = self.n_max_active
         d["save_budget"] = any([v["save_budget"] for v in self.values()])
 
         content = [self._template.format(**d)]
@@ -72,10 +74,12 @@ class PackageGroup(UserDict):
 
 
 class ConstantHeadGroup(PackageGroup):
+    _cellcount_varname = "head"
     _template = "[chd]\n" "    mchdsys = {n_systems}\n" "    mxactc = {n_max_active}\n"
 
 
 class DrainageGroup(PackageGroup):
+    _cellcount_varname = "conductance"
     _template = (
         "[ghb]\n"
         "    mdrnsys = {n_systems}\n"
@@ -85,6 +89,7 @@ class DrainageGroup(PackageGroup):
 
 
 class GeneralHeadBoundaryGroup(PackageGroup):
+    _cellcount_varname = "conductance"
     _template = (
         "[ghb]\n"
         "    mghbsys = {n_systems}\n"
@@ -94,6 +99,7 @@ class GeneralHeadBoundaryGroup(PackageGroup):
 
 
 class RiverGroup(PackageGroup):
+    _cellcount_varname = "conductance"
     _template = (
         "[riv]\n"
         "    mrivsys = {n_systems}\n"
