@@ -100,9 +100,15 @@ def basicmodel(request):
         preconditioner="mic",
         lump_dispersion=True,
     )
-    m["occ"] = imod.pkg.OutputControl(save_head_idf=True, save_concentration_idf=True)
+    m["oc"] = imod.pkg.OutputControl(save_head_idf=True, save_concentration_idf=True)
 
     return m
+
+
+def test_get_pkgkey(basicmodel):
+    m = basicmodel
+    for key, package in m.items():
+        assert key == package._pkg_id
 
 
 def test_group(basicmodel):
@@ -114,3 +120,34 @@ def test_group(basicmodel):
     assert len(g[0]) == 1
     assert list(g[0].keys())[0] == "ghb" 
 
+
+def test_timediscretization(basicmodel):
+    m = basicmodel
+    m.time_discretization(endtime="2000-01-06")
+    assert np.allclose(m["time_discretization"]["timestep_duration"].values, np.full(5, 1.0))
+
+
+def test_render_gen(basicmodel):
+    m = basicmodel
+    m.time_discretization(endtime="2000-01-06")
+    diskey = m._get_pkgkey("dis")
+    globaltimes = m[diskey]["time"].values
+    modelname = m.modelname
+
+    compare = (
+        "[gen]\n"
+        "    modelname = test_model\n"
+        "    writehelp = False\n"
+        "    result_dir = test_model\n"
+        "    packages = adv, bas, btn, dis, dsp, gcg, ghb, lpf, oc, pcg, rch, vdf\n"
+        "    coord_xll = 0.0\n"
+        "    coord_yll = 0.0\n"
+        "    start_year = 2000\n"
+        "    start_month = 01\n"
+        "    start_day = 01"
+    )
+    with open("compare.txt", "w") as f:
+        f.write(compare)
+    with open("render.txt", "w") as f:
+        f.write(m._render_gen(modelname=modelname, globaltimes=globaltimes))
+    assert m._render_gen(modelname=modelname, globaltimes=globaltimes) == compare

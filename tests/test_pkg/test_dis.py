@@ -11,7 +11,6 @@ def discret(request):
     timestep_duration = xr.DataArray(np.full(5, 1.0), coords={"time": datetimes}, dims=("time",))
  
     dis = TimeDiscretization(
-        time=datetimes,
         timestep_duration=timestep_duration,
         n_timesteps=xr.full_like(timestep_duration, 1, dtype=np.int),
         transient=xr.full_like(timestep_duration, True),

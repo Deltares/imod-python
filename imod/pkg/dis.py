@@ -9,7 +9,7 @@ class TimeDiscretization(Package):
         ("perlen", "timestep_duration"),
         ("nstp", "n_timesteps"),
         ("sstr", "transient"),
-        ("tsmult", "timestep_multiplier")
+        ("tsmult", "timestep_multiplier"),
     )
 
     # TODO: check what's necessary
@@ -35,17 +35,15 @@ class TimeDiscretization(Package):
 
     def __init__(
         self,
-        time,
         timestep_duration,
-        n_timesteps,
-        transient,
-        timestep_multiplier,
-        max_n_transport_timestep,
+        n_timesteps=1,
+        transient=True,
+        timestep_multiplier=1.0,
+        max_n_transport_timestep=50_000,
         transport_timestep_multiplier=None,
         transport_initial_timestep=0,
     ):
         super(__class__, self).__init__()
-        self["time"] = time
         self["timestep_duration"] = timestep_duration
         self["n_timesteps"] = n_timesteps
         self["transient"] = transient

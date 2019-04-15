@@ -3,7 +3,7 @@ import jinja2
 from imod.pkg.pkgbase import Package
 
 class OutputControl(Package):
-    _pkg_id = "occ"
+    _pkg_id = "oc"
     _template = (
     "[oc]\n"
     "    savehead_p?_l? = {save_head_idf}\n"

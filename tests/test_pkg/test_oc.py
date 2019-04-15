@@ -2,7 +2,7 @@ from imod.pkg import OutputControl
 
 
 def test_render():
-    occ = OutputControl()
+    oc = OutputControl()
 
     compare = (
     "[oc]\n"
@@ -19,4 +19,4 @@ def test_render():
     "    savevelovtk_p?_l? = False\n"
     )
 
-    assert occ._render() == compare
+    assert oc._render() == compare

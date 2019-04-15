@@ -3,6 +3,7 @@ Contains an imodseawat model object
 """
 from collections import UserDict
 
+import cftime
 import imod.pkg
 import jinja2
 from imod.io import util
@@ -12,6 +13,9 @@ from imod.pkg.pkggroup import (
     PackageGroups,
     RiverGroup,
 )
+import numpy as np
+import pandas as pd
+import xarray as xr
 
 
 def _to_datetime(time):
@@ -31,9 +35,9 @@ def _to_datetime(time):
         return pd.to_datetime(time)
 
 
-def _time_discretisation(times):
+def _timestep_duration(times):
     """
-    Generates dictionary containing stress period time discretisation data.
+    Generates dictionary containing stress period time discretization data.
 
     Parameters
     ----------
@@ -46,21 +50,21 @@ def _time_discretisation(times):
         OrderedDict with dates as strings for keys,
         stress period duration (in days) as values.
     """
+    times = sorted([_to_datetime(t) for t in times])
 
-    times = [_to_datetime(t) for t in times]
-
-    d = OrderedDict()
+    timestep_duration = []
     for start, end in zip(times[:-1], times[1:]):
-        period_name = start.strftime("%Y%m%d%H%M%S")
         timedelta = end - start
         duration = timedelta.days + timedelta.seconds / 86400.0
-        d[period_name] = duration
-    return d
+        timestep_duration.append(duration)
+    return times, timestep_duration
 
 
 # This class allows only imod packages as values
 class Model(UserDict):
     pass
+
+
 #    def __setitem__(self, key, value):
 #        # TODO: raise ValueError on setting certain duplicates
 #        # e.g. two solvers
@@ -93,7 +97,7 @@ class SeawatModel(Model):
         "    modelname = {{modelname}}\n"
         "    writehelp = {{writehelp}}\n"
         "    result_dir = {{modelname}}\n"
-        "    packages = {{package_set|join(',')}}\n"
+        "    packages = {{package_set|join(', ')}}\n"
         "    coord_xll = {{xmin}}\n"
         "    coord_yll = {{ymin}}\n"
         "    start_year = {{start_date[:4]}}\n"
@@ -105,10 +109,24 @@ class SeawatModel(Model):
         super(__class__, self).__init__()
         self.modelname = modelname
 
+    def _get_pkgkey(self, pkg_id):
+        """
+        Get package key that belongs to a certain pkg_id, since the keys are
+        user specified.
+        """
+        key = [pkgname for pkgname, pkg in self.items() if pkg._pkg_id == pkg_id]
+        nkey = len(key)
+        if nkey > 1:
+            raise ValueError(f"Multiple instances of {key} detected")
+        elif nkey == 1:
+            return key[0]
+        else:
+            return None
+
     def _group(self):
         """
-        Group multiple systems of a single package
-        E.g. all river or drainage sub-systems
+        Group multiple systems of a single package E.g. all river or drainage
+        sub-systems
         """
         groups = {}
         has_group = set()
@@ -130,7 +148,7 @@ class SeawatModel(Model):
 
         return package_groups
 
-    def time_discretisation(self, endtime):
+    def time_discretization(self, endtime):
         """
         Collect all unique times
         """
@@ -140,41 +158,36 @@ class SeawatModel(Model):
             if "time" in ds.coords:
                 times.update(ds.coords["time"].values)
         # TODO: check that endtime is later than all other times.
-        times.update(endtime)
-        duration = _time_discretisation(times)
+        times.update((endtime,))
+        times, duration = _timestep_duration(times)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
-        self["time_discretization"] = imod.pkg.TimeDiscretization(
-            time=times, timestep_duration=duration
+        timestep_duration = xr.DataArray(
+            duration, coords={"time": np.array(times)[:-1]}, dims=("time",)
         )
-
-    def _get_pkgkey(self, pkg_id):
-        """
-        Get package key that belongs to a certain pkg_id, since the keys are
-        user specified.
-        """
-        key = [pkgname for pkgname, pkg in self.items() if pkg._pkg_id == pkg_id]
-        nkey = len(key)
-        if nkey > 1:
-            raise ValueError(f"Multiple instances of {key} detected")
-        elif nkey == 1:
-            return key[0]
-        else:
-            return None
+        self["time_discretization"] = imod.pkg.TimeDiscretization(
+            timestep_duration=timestep_duration
+        )
 
     def _render_gen(self, modelname, globaltimes, writehelp=False):
         package_set = set([pkg._pkg_id for pkg in self.values()])
+        package_set.update(("btn",))
+        package_set = sorted(package_set)
         baskey = self._get_pkgkey("bas")
         bas = self[baskey]
         _, xmin, xmax, _, ymin, ymax = util.spatial_reference(bas["ibound"])
+        start_date = _to_datetime(globaltimes[0]).strftime("%Y%m%d%H%M%S")
+
         d = {}
+        d["modelname"] = modelname
+        d["writehelp"] = writehelp
+        d["result_dir"] = modelname
         d["xmin"] = xmin
         d["xmax"] = xmax
         d["ymin"] = ymin
         d["ymax"] = ymax
         d["package_set"] = package_set
-        d["start_date"] = globaltimes.keys()[0]
-        d["writehelp"] = writehelp
+        d["start_date"] = start_date
         return self._gen_template.render(d)
 
     def _render(self, key, directory, globaltimes):
@@ -258,14 +271,12 @@ class SeawatModel(Model):
         content = []
         content.append(
             self._render_gen(
-                modelname=self.modelname,
-                globaltimes=globaltimes,
-                writehelp=writehelp,
+                modelname=self.modelname, globaltimes=globaltimes, writehelp=writehelp
             )
         )
         content.append(self._render_dis())
         # Modflow
-        for key in ("bas", "occ", "lpf", "rch"):
+        for key in ("bas", "oc", "lpf", "rch"):
             content.append(
                 self._render(key=key, directory=directory, globaltimes=globaltimes)
             )
