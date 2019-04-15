@@ -80,6 +80,10 @@ class AdvectionTVD(Package):
     """
     Total Variation Diminishing formulation, ULTIMATE
     -1
+
+    Attributes
+    ----------
+    courant : float
     """
 
     _pkg_id = "adv"
