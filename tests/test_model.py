@@ -118,13 +118,15 @@ def test_group(basicmodel):
     assert len(g) == 1
     # GHB group contains only one value
     assert len(g[0]) == 1
-    assert list(g[0].keys())[0] == "ghb" 
+    assert list(g[0].keys())[0] == "ghb"
 
 
 def test_timediscretization(basicmodel):
     m = basicmodel
     m.time_discretization(endtime="2000-01-06")
-    assert np.allclose(m["time_discretization"]["timestep_duration"].values, np.full(5, 1.0))
+    assert np.allclose(
+        m["time_discretization"]["timestep_duration"].values, np.full(5, 1.0)
+    )
 
 
 def test_render_gen(basicmodel):
@@ -158,13 +160,13 @@ def test_render_pgk__gcg(basicmodel):
     directory = Path(".")
 
     compare = (
-    "[gcg]\n"
-    "    mxiter = 150\n"
-    "    iter1 = 30\n"
-    "    isolve = 3\n"
-    "    ncrs = 0\n"
-    "    cclose = 1e-06\n"
-    "    iprgcg = 0\n"
+        "[gcg]\n"
+        "    mxiter = 150\n"
+        "    iter1 = 30\n"
+        "    isolve = 3\n"
+        "    ncrs = 0\n"
+        "    cclose = 1e-06\n"
+        "    iprgcg = 0\n"
     )
     assert m._render_pkg("gcg", directory=directory, globaltimes=globaltimes) == compare
 
@@ -214,7 +216,7 @@ def test_render_groups__ghb(basicmodel):
         "    ghbssmdens_p?_s1_l3 = density_l3.idf"
     )
 
-    #TODO: fix stupid newline in the middle
+    # TODO: fix stupid newline in the middle
     # check jinja2 documentation
     ssm_compare = (
         "[ssm]\n"
@@ -224,9 +226,44 @@ def test_render_groups__ghb(basicmodel):
         "    cghb_t1_p?_l2 = concentration_l2.idf\n"
         "    cghb_t1_p?_l3 = concentration_l3.idf"
     )
-    content, ssm_content = m._render_groups(directory=directory, globaltimes=globaltimes)
+    content, ssm_content = m._render_groups(
+        directory=directory, globaltimes=globaltimes
+    )
 
     print(ssm_content)
     print(ssm_compare)
     assert content == compare
     assert ssm_content == ssm_compare
+
+
+def test_render_flowsolver(basicmodel):
+    m = basicmodel
+
+    compare = (
+        "[pcg]\n"
+        "    mxiter = 150\n"
+        "    iter1 = 30\n"
+        "    npcond = 1\n"
+        "    hclose = 0.0001\n"
+        "    rclose = 1000.0\n"
+        "    relax = 0.98\n"
+        "    iprpcg = 1\n"
+        "    mutpcg = 0\n"
+        "    damp = 1.0\n"
+    )
+    assert m._render_flowsolver() == compare
+
+
+def test_render_transportsolver(basicmodel):
+    m = basicmodel
+
+    compare = (
+        "[gcg]\n"
+        "    mxiter = 150\n"
+        "    iter1 = 30\n"
+        "    isolve = 3\n"
+        "    ncrs = 0\n"
+        "    cclose = 1e-06\n"
+        "    iprgcg = 0\n"
+    )
+    assert m._render_transportsolver() == compare

@@ -235,12 +235,12 @@ class SeawatModel(Model):
         diskey = self._get_pkgkey("dis")
         if btnkey is None:
             raise ValueError("No BasicTransport package provided.")
-        btncontent = self[btnkey]._render(directory)
-        discontent = self[diskey]._render_btn()
-        return btncontent + discontent
+        btn_content = self[btnkey]._render(directory)
+        dis_content = self[diskey]._render_btn()
+        return btn_content + dis_content
 
     def _render_transportsolver(self):
-        gcgkey = self._get_pkgkey("pcg")
+        gcgkey = self._get_pkgkey("gcg")
         pkstkey = self._get_pkgkey("pksf")
         if gcgkey and pkstkey:
             raise ValueError("gcg and pkst solver both provided. Provide only one.")
