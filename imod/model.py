@@ -2,6 +2,7 @@
 Contains an imodseawat model object
 """
 from collections import UserDict
+from pathlib import Path
 
 import cftime
 import imod.pkg
@@ -200,19 +201,21 @@ class SeawatModel(Model):
             raise ValueError(f"No {key} package provided.")
         return self[key]._render(directory=directory, globaltimes=globaltimes)
 
-    def _render_dis(self, directory):
+    def _render_dis(self, directory, globaltimes):
         baskey = self._get_pkgkey("bas")
         diskey = self._get_pkgkey("dis")
-        bascontent = self[baskey]._render_dis(directory=directory)
-        discontent = self[diskey]._render(directory=directory)
-        return bascontent + discontent
+        bas_content = self[baskey]._render_dis(directory=directory)
+        dis_content = self[diskey]._render(globaltimes=globaltimes)
+        return bas_content + dis_content
 
     def _render_groups(self, directory, globaltimes):
         package_groups = self._group()
-        content = "".join([group.render(directory, globaltimes) for group in package_groups])
-        ssm_content = "".join([
-            group.render_ssm(directory, globaltimes) for group in package_groups
-        ])
+        content = "".join(
+            [group.render(directory, globaltimes) for group in package_groups]
+        )
+        ssm_content = "".join(
+            [group.render_ssm(directory, globaltimes) for group in package_groups]
+        )
         # TODO: do this in a single pass, combined with _n_max_active for modflow part?
         n_sinkssources = sum([group.max_n_sinkssources() for group in package_groups])
         ssm_content = f"[ssm]\n    mxss = {n_sinkssources}\n" + ssm_content
@@ -230,13 +233,16 @@ class SeawatModel(Model):
         else:
             return self[pksfkey]._render()
 
-    def _render_btn(self, directory):
+    def _render_btn(self, directory, globaltimes):
+        baskey = self._get_pkgkey("bas")
         btnkey = self._get_pkgkey("btn")
         diskey = self._get_pkgkey("dis")
+        thickness = self[baskey].thickness()
+
         if btnkey is None:
             raise ValueError("No BasicTransport package provided.")
-        btn_content = self[btnkey]._render(directory)
-        dis_content = self[diskey]._render_btn()
+        btn_content = self[btnkey]._render(directory=directory, thickness=thickness)
+        dis_content = self[diskey]._render_btn(globaltimes=globaltimes)
         return btn_content + dis_content
 
     def _render_transportsolver(self):
@@ -257,7 +263,7 @@ class SeawatModel(Model):
         """
         diskey = self._get_pkgkey("dis")
         globaltimes = self[diskey]["time"].values
-        directory = self.modelname
+        directory = Path(self.modelname)
 
         modflowcontent, ssmcontent = self._render_groups(
             directory=directory, globaltimes=globaltimes
@@ -269,7 +275,7 @@ class SeawatModel(Model):
                 modelname=self.modelname, globaltimes=globaltimes, writehelp=writehelp
             )
         )
-        content.append(self._render_dis())
+        content.append(self._render_dis(directory=directory, globaltimes=globaltimes))
         # Modflow
         for key in ("bas", "oc", "lpf", "rch"):
             content.append(
@@ -279,13 +285,13 @@ class SeawatModel(Model):
         content.append(self._render_flowsolver())
 
         # MT3D and Seawat
-        content.append(self._render_btn())
+        content.append(self._render_btn(directory=directory, globaltimes=globaltimes))
         for key in ("vdf", "adv", "dsp"):
             self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
         content.append(ssmcontent)
         content.append(self._render_transportsolver())
 
-        return "".join(content)
+        return "\n".join(content)
 
     def save(self, directory):
         for ds in self.values():

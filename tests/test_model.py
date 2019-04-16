@@ -25,6 +25,8 @@ def basicmodel(request):
     bot = xr.DataArray(
         np.arange(20.0, -10.0, -10.0), coords={"layer": layer}, dims=("layer",)
     )
+    # BTN
+    icbund = ibound.copy()
 
     # LPF
     k_horizontal = ibound.copy()
@@ -73,6 +75,13 @@ def basicmodel(request):
     )
     m["pcg"] = imod.pkg.PreconditionedConjugateGradientSolver(
         max_iter=150, inner_iter=30, hclose=0.0001, rclose=1000.0, relax=0.98, damp=1.0
+    )
+    m["btn"] =  imod.pkg.BasicTransport(icbund=icbund,
+        starting_concentration=icbund.copy(),
+        porosity=icbund.copy(),
+        n_species=1,
+        inactive_concentration=1.0e30,
+        minimum_active_thickness=0.01,
     )
     m["adv"] = imod.pkg.AdvectionTVD(courant=1.0)
     m["dsp"] = imod.pkg.Dispersion(
@@ -192,6 +201,37 @@ def test_render_pgk__rch(basicmodel):
     assert m._render_pkg("rch", directory=directory, globaltimes=globaltimes) == compare
 
 
+def test_render_dis(basicmodel):
+    m = basicmodel
+    m.time_discretization(endtime="2000-01-06")
+    diskey = m._get_pkgkey("dis")
+    globaltimes = m[diskey]["time"].values
+    modelname = m.modelname
+    directory = Path(".")
+
+    compare = (
+        "[dis]\n"
+        "    nlay = 3\n"
+        "    nrow = 5\n"
+        "    ncol = 5\n"
+        "    delc_r? = 1.0\n"
+        "    delr_c? = 1.0\n"
+        "    top = 30.0\n"
+        "    botm_l1 = 20.0\n"
+        "    botm_l2 = 10.0\n"
+        "    botm_l3 = 0.0\n"
+        "    perlen_p1 = 1.0\n"
+        "    perlen_p2 = 1.0\n"
+        "    perlen_p3 = 1.0\n"
+        "    perlen_p4 = 1.0\n"
+        "    perlen_p5 = 1.0\n"
+        "    nstp_p? = 1\n"
+        "    sstr_p? = tr\n"
+        "    tsmult_p? = 1.0"
+    )
+    assert m._render_dis(directory=directory, globaltimes=globaltimes) == compare
+
+
 def test_render_groups__ghb(basicmodel):
     m = basicmodel
     m.time_discretization(endtime="2000-01-06")
@@ -230,8 +270,6 @@ def test_render_groups__ghb(basicmodel):
         directory=directory, globaltimes=globaltimes
     )
 
-    print(ssm_content)
-    print(ssm_compare)
     assert content == compare
     assert ssm_content == ssm_compare
 
@@ -254,6 +292,38 @@ def test_render_flowsolver(basicmodel):
     assert m._render_flowsolver() == compare
 
 
+def test_render_btn(basicmodel):
+    m = basicmodel
+    m.time_discretization(endtime="2000-01-06")
+    diskey = m._get_pkgkey("dis")
+    globaltimes = m[diskey]["time"].values
+    directory = Path(".")
+
+    compare = (
+    "[btn]\n"
+    "    thkmin = 0.01\n"
+    "    cinact = 1e+30\n"
+    "    sconc_t1_l1 = starting_concentration_l1.idf\n"
+    "    sconc_t1_l2 = starting_concentration_l2.idf\n"
+    "    sconc_t1_l3 = starting_concentration_l3.idf\n"
+    "    icbund_l1 = icbund_l1.idf\n"
+    "    icbund_l2 = icbund_l2.idf\n"
+    "    icbund_l3 = icbund_l3.idf\n"
+    "    dz_l1 = 10.0\n"
+    "    dz_l2 = 10.0\n"
+    "    dz_l3 = 10.0\n"
+    "    prsity_l1 = 0.3\n"
+    "    prsity_l2 = 0.3\n"
+    "    prsity_l3 = 0.3\n"
+    "    laycon_l1 = 1\n"
+    "    laycon_l2 = 0\n"
+    "    laycon_l3 = 0\n"
+    "    dt0_p? = 0\n"
+    "    ttsmult_p? = 1.0\n"
+    "    mxstrn_p? = 10"
+    )
+    assert m._render_btn(directory=directory, globaltimes=globaltimes)
+
 def test_render_transportsolver(basicmodel):
     m = basicmodel
 
@@ -267,3 +337,10 @@ def test_render_transportsolver(basicmodel):
         "    iprgcg = 0\n"
     )
     assert m._render_transportsolver() == compare
+
+
+def test_render(basicmodel):
+    m = basicmodel
+    m.time_discretization(endtime="2000-01-06")
+
+    s = m.render()

@@ -47,17 +47,14 @@ def test_btn_render_arrays(basictransport):
     "    dz_l3 = 10.0\n"
     "    prsity_l1 = 0.3\n"
     "    prsity_l2 = 0.3\n"
-    "    prsity_l3 = 0.3\n"
-    "    laycon_l1 = 1\n"
-    "    laycon_l2 = 0\n"
-    "    laycon_l3 = 0"
+    "    prsity_l3 = 0.3"
     )
 
     layer = np.arange(1, 4)
     layer_type = xr.DataArray(np.array([1, 0, 0]), {"layer": layer}, dims=("layer",))
     thickness = xr.DataArray(np.full(3, 10.0), {"layer": layer}, dims=("layer",))
 
-    assert btn._render_notime(directory, layer_type=layer_type, thickness=thickness) == compare
+    assert btn._render(directory, thickness=thickness) == compare
 
 
 def test_btn_render_constants(basictransport):
@@ -80,8 +77,7 @@ def test_btn_render_constants(basictransport):
     "    dz_l1 = 10.0\n"
     "    dz_l2 = 10.0\n"
     "    dz_l3 = 10.0\n"
-    "    prsity_l? = 0.3\n"
-    "    laycon_l? = 1"
+    "    prsity_l? = 0.3"
     )
 
-    assert btn._render_notime(directory, layer_type=layer_type, thickness=thickness) == compare
+    assert btn._render(directory, thickness=thickness) == compare

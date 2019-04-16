@@ -10,7 +10,6 @@ class BasicTransport(Package):
         ("icbund", "icbund"),
         ("dz", "thickness"),
         ("prsity", "porosity"),
-        ("laycon", "layer_type"),
     )
 
     _template = jinja2.Template(
@@ -44,7 +43,7 @@ class BasicTransport(Package):
         self["inactive_concentration"] = inactive_concentration
         self["minimum_active_thickness"] = minimum_active_thickness
 
-    def _render_notime(self, directory, layer_type, thickness):
+    def _render(self, directory, thickness):
         """
         Renders part of [btn] section that does not depend on time,
         and can be inferred without checking the BoundaryConditions.
@@ -84,9 +83,6 @@ class BasicTransport(Package):
         # layer_type from LayerPropertyFlow
         dicts["thickness"] = self._compose_values_layer(
             "thickness", directory, da=thickness
-        )
-        dicts["layer_type"] = self._compose_values_layer(
-            "layer_type", directory, da=layer_type
         )
         d["dicts"] = dicts
         return self._template.render(d)

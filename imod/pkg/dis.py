@@ -63,9 +63,9 @@ class TimeDiscretization(Package):
             if varname == "transient":
                 for k, v in dicts[varname].items():
                     if v == 1:
-                        dicts[varname][k] = "TR"
+                        dicts[varname][k] = "tr"
                     else:
-                        dicts[varname][k] = "SS"
+                        dicts[varname][k] = "ss"
         d["dicts"] = dicts
         return self._dis_template.render(d)
 
