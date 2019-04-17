@@ -1,11 +1,9 @@
 import pathlib
-from glob import glob
 
 import affine
 import numpy as np
 import rasterio
 import xarray as xr
-from rasterio.warp import Resampling
 
 from imod.io import idf, util
 

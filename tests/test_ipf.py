@@ -1,7 +1,7 @@
+import collections
+import glob
 import os
 import pathlib
-import collections
-from glob import glob
 
 import numpy as np
 import pandas as pd
@@ -12,7 +12,7 @@ from imod.io import ipf
 
 
 def remove(globpath):
-    paths = glob(globpath)
+    paths = glob.glob(globpath)
     for p in paths:
         try:
             os.remove(p)

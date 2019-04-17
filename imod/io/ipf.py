@@ -1,8 +1,8 @@
-import csv
-import pathlib
 import collections
-from glob import glob
-from io import StringIO
+import csv
+import glob
+import io
+import pathlib
 
 import numpy as np
 import pandas as pd
@@ -121,7 +121,7 @@ def read_associated(path, kwargs={}):
         # Normally, this ought to work:
         # metadata = pd.read_csv(f, header=None, nrows=ncol).values
         # TODO: replace when bugfix is released
-        metadata = pd.read_csv(StringIO(lines), header=None, nrows=ncol, **kwargs)
+        metadata = pd.read_csv(io.StringIO(lines), header=None, nrows=ncol, **kwargs)
         # header description possibly includes nodata
         usecols = np.arange(ncol)[pd.notnull(metadata[0])]
         metadata = metadata.iloc[usecols, :]
@@ -207,7 +207,7 @@ def read(path, kwargs={}, assoc_kwargs={}):
     if isinstance(path, pathlib.Path):
         path = str(path)
 
-    paths = [pathlib.Path(p) for p in glob(path)]
+    paths = [pathlib.Path(p) for p in glob.glob(path)]
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")

@@ -1,9 +1,11 @@
-import numpy as np
 import collections
-import xarray as xr
-import re
 import functools
+import re
+import warnings
+
+import numpy as np
 import pandas as pd
+import xarray as xr
 
 
 def header(path):

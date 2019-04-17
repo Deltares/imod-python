@@ -1,8 +1,8 @@
 """
 Contains an imodseawat model object
 """
+import collections
 import pathlib
-from collections import UserDict
 
 import cftime
 import jinja2
@@ -63,7 +63,7 @@ def _timestep_duration(times):
 
 
 # This class allows only imod packages as values
-class Model(UserDict):
+class Model(collections.UserDict):
     pass
 
 

@@ -1,13 +1,13 @@
+import collections
+import datetime
 import pathlib
 import re
 import warnings
-import collections
-from datetime import datetime
 
+import affine
 import cftime
 import numpy as np
 import xarray as xr
-from affine import Affine
 
 
 def decompose(path):
@@ -28,11 +28,11 @@ def decompose(path):
     # Try to get time from idf name, iMODFLOW can output two datetime formats
     for s in parts:
         try:
-            d["time"] = datetime.strptime(s, "%Y%m%d%H%M%S")
+            d["time"] = datetime.datetime.strptime(s, "%Y%m%d%H%M%S")
             break
         except ValueError:
             try:
-                d["time"] = datetime.strptime(s, "%Y%m%d")
+                d["time"] = datetime.datetime.strptime(s, "%Y%m%d")
                 break
             except ValueError:
                 pass  # no time in dict
@@ -196,4 +196,4 @@ def transform(a):
         raise ValueError("dx must be positive")
     if dy > 0.0:
         raise ValueError("dy must be negative")
-    return Affine(dx, 0.0, xmin, 0.0, dy, ymax)
+    return affine.Affine(dx, 0.0, xmin, 0.0, dy, ymax)

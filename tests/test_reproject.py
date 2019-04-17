@@ -1,15 +1,18 @@
-import pytest
+import glob
 import os
-import imod
-import rasterio
+
+import affine
 import numpy as np
+import pytest
+import rasterio
+import rasterio.warp
 import xarray as xr
-from affine import Affine
-from glob import glob
+
+import imod
 
 
 def remove(globpath):
-    for p in glob(globpath):
+    for p in glob.glob(globpath):
         try:
             os.remove(p)
         except FileNotFoundError:
@@ -25,9 +28,9 @@ def write_tif(request):
 
         profile = dict()
         profile["crs"] = rasterio.crs.CRS.from_epsg(epsg)
-        profile["transform"] = Affine(1.0, 0.0, 20.0, 0.0, -1.0, 30.0)
+        profile["transform"] = affine.Affine(1.0, 0.0, 20.0, 0.0, -1.0, 30.0)
         if rotation_angle:
-            profile["transform"] *= Affine.rotation(rotation_angle)
+            profile["transform"] *= affine.Affine.rotation(rotation_angle)
         profile["driver"] = "GTiff"
         profile["height"] = nrow
         profile["width"] = ncol
@@ -65,7 +68,7 @@ def test_basic_resample__nearest(write_tif):
         arr = src.read()
         aff = src.transform
         crs = src.crs
-        newaff = Affine(aff.a / 2.0, aff.b, aff.c, aff.d, aff.e / 2.0, aff.f)
+        newaff = affine.Affine(aff.a / 2.0, aff.b, aff.c, aff.d, aff.e / 2.0, aff.f)
 
     rasterio.warp.reproject(
         arr,
@@ -74,7 +77,7 @@ def test_basic_resample__nearest(write_tif):
         dst_transform=newaff,
         src_crs=crs,
         dst_crs=crs,
-        resampling=rasterio.warp.Resampling.nearest,
+        resampling=rasterio.enums.Resampling.nearest,
     )
 
     np.allclose(newda.values, newarr)
@@ -100,7 +103,7 @@ def test_basic_resample__bilinear(write_tif):
         arr = src.read()
         aff = src.transform
         crs = src.crs
-        newaff = Affine(aff.a / 2.0, aff.b, aff.c, aff.d, aff.e / 2.0, aff.f)
+        newaff = affine.Affine(aff.a / 2.0, aff.b, aff.c, aff.d, aff.e / 2.0, aff.f)
 
     rasterio.warp.reproject(
         arr,
@@ -109,7 +112,7 @@ def test_basic_resample__bilinear(write_tif):
         dst_transform=newaff,
         src_crs=crs,
         dst_crs=crs,
-        resampling=rasterio.warp.Resampling.bilinear,
+        resampling=rasterio.enums.Resampling.bilinear,
     )
 
     np.allclose(newda.values, newarr)
@@ -144,7 +147,7 @@ def test_basic_reproject(write_tif):
         dst_transform=dst_transform,
         src_crs=src_crs,
         dst_crs=dst_crs,
-        resampling=rasterio.warp.Resampling.nearest,
+        resampling=rasterio.enums.Resampling.nearest,
     )
 
     np.allclose(newda.values, newarr)
@@ -179,7 +182,7 @@ def test_reproject__use_src_attrs(write_tif):
         dst_transform=dst_transform,
         src_crs=src_crs,
         dst_crs=dst_crs,
-        resampling=rasterio.warp.Resampling.nearest,
+        resampling=rasterio.enums.Resampling.nearest,
     )
 
     np.allclose(newda.values, newarr)
@@ -207,7 +210,7 @@ def test_reproject_resample(write_tif):
         src_transform = src.transform
         src_crs = src.crs
 
-    dst_transform = Affine(0.50, 0.0, 523420.25, 0.0, -0.50, 5313578.75)
+    dst_transform = affine.Affine(0.50, 0.0, 523420.25, 0.0, -0.50, 5313578.75)
     newarr = np.empty((10, 16))
     rasterio.warp.reproject(
         arr,
@@ -216,7 +219,7 @@ def test_reproject_resample(write_tif):
         dst_transform=dst_transform,
         src_crs=src_crs,
         dst_crs=dst_crs,
-        resampling=rasterio.warp.Resampling.nearest,
+        resampling=rasterio.enums.Resampling.nearest,
     )
 
     assert ~np.isnan(newda.values).all()
@@ -228,7 +231,7 @@ def test_reproject_rotation__via_kwargs(write_tif):
     write_tif("rotated.tif", epsg=28992, rotation_angle=45.0)
     dst_crs = {"init": "EPSG:32631"}
     da = xr.open_rasterio("rotated.tif").squeeze("band")
-    src_transform = Affine.scale(1.0, -1.0) * Affine.rotation(45.0)
+    src_transform = affine.Affine.scale(1.0, -1.0) * affine.Affine.rotation(45.0)
     newda = imod.pre.reproject(
         da, src_crs={"init": "EPSG:28992"}, dst_crs=dst_crs, src_transform=src_transform
     )
@@ -255,7 +258,7 @@ def test_reproject_rotation__via_kwargs(write_tif):
         dst_transform=dst_transform,
         src_crs=src_crs,
         dst_crs=dst_crs,
-        resampling=rasterio.warp.Resampling.nearest,
+        resampling=rasterio.enums.Resampling.nearest,
     )
 
     np.allclose(newda.values, newarr)
@@ -290,7 +293,7 @@ def test_reproject_rotation__use_src_attrs(write_tif):
         dst_transform=dst_transform,
         src_crs=src_crs,
         dst_crs=dst_crs,
-        resampling=rasterio.warp.Resampling.nearest,
+        resampling=rasterio.enums.Resampling.nearest,
     )
 
     np.allclose(newda.values, newarr)

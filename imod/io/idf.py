@@ -1,18 +1,17 @@
-import itertools
-import warnings
 import collections
-from datetime import datetime
-from glob import glob
+import glob
+import itertools
 import pathlib
-from struct import pack, unpack
+import struct
+import warnings
 
-import imod
+import dask
 import numpy as np
 import pandas as pd
 import xarray as xr
-from dask import array, delayed
-from imod.io import util
 
+import imod
+from imod.io import util
 
 # Make sure we can still use the built-in function...
 f_open = open
@@ -22,35 +21,35 @@ def header(path):
     """Read the IDF header information into a dictionary"""
     attrs = util.decompose(path)
     with f_open(path, "rb") as f:
-        reclen_id = unpack("i", f.read(4))[0]  # Lahey RecordLength Ident.
+        reclen_id = struct.unpack("i", f.read(4))[0]  # Lahey RecordLength Ident.
         if reclen_id != 1271:
             raise ValueError(f"Not a supported IDF file: {path}")
-        ncol = unpack("i", f.read(4))[0]
-        nrow = unpack("i", f.read(4))[0]
-        attrs["xmin"] = unpack("f", f.read(4))[0]
-        attrs["xmax"] = unpack("f", f.read(4))[0]
-        attrs["ymin"] = unpack("f", f.read(4))[0]
-        attrs["ymax"] = unpack("f", f.read(4))[0]
+        ncol = struct.unpack("i", f.read(4))[0]
+        nrow = struct.unpack("i", f.read(4))[0]
+        attrs["xmin"] = struct.unpack("f", f.read(4))[0]
+        attrs["xmax"] = struct.unpack("f", f.read(4))[0]
+        attrs["ymin"] = struct.unpack("f", f.read(4))[0]
+        attrs["ymax"] = struct.unpack("f", f.read(4))[0]
         # dmin and dmax are recomputed during writing
         f.read(4)  # dmin, minimum data value present
         f.read(4)  # dmax, maximum data value present
-        nodata = unpack("f", f.read(4))[0]
+        nodata = struct.unpack("f", f.read(4))[0]
         attrs["nodata"] = nodata
         # flip definition here such that True means equidistant
         # equidistant IDFs
-        ieq = not unpack("?", f.read(1))[0]
-        itb = unpack("?", f.read(1))[0]
+        ieq = not struct.unpack("?", f.read(1))[0]
+        itb = struct.unpack("?", f.read(1))[0]
         f.read(2)  # not used
 
         if ieq:
             # dx and dy are stored positively in the IDF
             # dy is made negative here to be consistent with the nonequidistant case
-            attrs["dx"] = unpack("f", f.read(4))[0]
-            attrs["dy"] = -unpack("f", f.read(4))[0]
+            attrs["dx"] = struct.unpack("f", f.read(4))[0]
+            attrs["dy"] = -struct.unpack("f", f.read(4))[0]
 
         if itb:
-            attrs["top"] = unpack("f", f.read(4))[0]
-            attrs["bot"] = unpack("f", f.read(4))[0]
+            attrs["top"] = struct.unpack("f", f.read(4))[0]
+            attrs["bot"] = struct.unpack("f", f.read(4))[0]
 
         if not ieq:
             # dx and dy are stored positive in the IDF, but since the difference between
@@ -232,11 +231,6 @@ def read(path):
     return _read(path, headersize, nrow, ncol, nodata), attrs
 
 
-def dask(path, memmap=False, attrs=None):
-    warnings.warn("idf.dask is deprecated. Use idf._dask instead.")
-    return _dask(path, memmap, attrs)
-
-
 def _dask(path, memmap=False, attrs=None):
     """
     Read a single IDF file to a dask.array
@@ -271,8 +265,8 @@ def _dask(path, memmap=False, attrs=None):
     ncol = attrs["ncol"]
     nodata = attrs.pop("nodata")
     # dask.delayed requires currying
-    a = delayed(imod.io.idf._read)(path, headersize, nrow, ncol, nodata)
-    x = array.from_delayed(a, shape=(nrow, ncol), dtype=np.float32)
+    a = dask.delayed(imod.io.idf._read)(path, headersize, nrow, ncol, nodata)
+    x = dask.array.from_delayed(a, shape=(nrow, ncol), dtype=np.float32)
     return x, attrs
 
 
@@ -302,7 +296,7 @@ def dataarray(path, memmap=False):
         "imod.io.idf.dataarray is deprecated, use imod.io.idf.open instead",
         FutureWarning,
     )
-    return _load([path, False])
+    return _load([path], False)
 
 
 def load(path, memmap=False, use_cftime=False):
@@ -355,7 +349,7 @@ def open(path, memmap=False, use_cftime=False):
     elif isinstance(path, pathlib.Path):
         path = str(path)
 
-    paths = [pathlib.Path(p) for p in glob(path)]
+    paths = [pathlib.Path(p) for p in glob.glob(path)]
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
@@ -414,12 +408,12 @@ def _load(paths, use_cftime):
             # a list of dask arrays belonging to a single timestep (all layers)
             dask_list = [t[0] for t in g]
             # stack with dask, adding a new dimension to the front
-            dask_timestep = array.stack(dask_list, axis=0)
+            dask_timestep = dask.array.stack(dask_list, axis=0)
             dask_timesteps.append(dask_timestep)
 
-        dask_array = array.stack(dask_timesteps, axis=0)
+        dask_array = dask.array.stack(dask_timesteps, axis=0)
     elif hastime or haslayer:
-        dask_array = array.stack(dask_arrays, axis=0)
+        dask_array = dask.array.stack(dask_arrays, axis=0)
     else:
         dask_array = dask_arrays[0]
 
@@ -465,7 +459,7 @@ def open_dataset(globpath, memmap=False, use_cftime=False):
     if isinstance(globpath, pathlib.Path):
         globpath = str(globpath)
 
-    paths = [pathlib.Path(p) for p in glob(globpath, recursive=True)]
+    paths = [pathlib.Path(p) for p in glob.glob(globpath, recursive=True)]
 
     n = len(paths)
     if n == 0:
@@ -627,15 +621,15 @@ def write(path, a, nodata=1.0e20):
         raise ValueError("Dimensions must be exactly ('y', 'x').")
 
     with f_open(path, "wb") as f:
-        f.write(pack("i", 1271))  # Lahey RecordLength Ident.
+        f.write(struct.pack("i", 1271))  # Lahey RecordLength Ident.
         nrow = a.y.size
         ncol = a.x.size
         attrs = a.attrs
         itb = isinstance(attrs.get("top", None), (int, float)) and isinstance(
             attrs.get("bot", None), (int, float)
         )
-        f.write(pack("i", ncol))
-        f.write(pack("i", nrow))
+        f.write(struct.pack("i", ncol))
+        f.write(struct.pack("i", nrow))
         dx, xmin, xmax, dy, ymin, ymax = util.spatial_reference(a)
         # IDF supports only incrementing x, and decrementing y
         if (np.atleast_1d(dx) < 0.0).all():
@@ -643,29 +637,29 @@ def write(path, a, nodata=1.0e20):
         if (np.atleast_1d(dy) > 0.0).all():
             raise ValueError("dy must be negative")
 
-        f.write(pack("f", xmin))
-        f.write(pack("f", xmax))
-        f.write(pack("f", ymin))
-        f.write(pack("f", ymax))
-        f.write(pack("f", float(a.min())))  # dmin
-        f.write(pack("f", float(a.max())))  # dmax
-        f.write(pack("f", nodata))
+        f.write(struct.pack("f", xmin))
+        f.write(struct.pack("f", xmax))
+        f.write(struct.pack("f", ymin))
+        f.write(struct.pack("f", ymax))
+        f.write(struct.pack("f", float(a.min())))  # dmin
+        f.write(struct.pack("f", float(a.max())))  # dmax
+        f.write(struct.pack("f", nodata))
 
         if isinstance(dx, float) and isinstance(dy, float):
             ieq = True  # equidistant
-            f.write(pack("?", not ieq))  # ieq
+            f.write(struct.pack("?", not ieq))  # ieq
         else:
             ieq = False  # nonequidistant
-            f.write(pack("?", not ieq))  # ieq
+            f.write(struct.pack("?", not ieq))  # ieq
 
-        f.write(pack("?", itb))
-        f.write(pack("xx"))  # not used
+        f.write(struct.pack("?", itb))
+        f.write(struct.pack("xx"))  # not used
         if ieq:
-            f.write(pack("f", dx))
-            f.write(pack("f", -dy))
+            f.write(struct.pack("f", dx))
+            f.write(struct.pack("f", -dy))
         if itb:
-            f.write(pack("f", attrs["top"]))
-            f.write(pack("f", attrs["bot"]))
+            f.write(struct.pack("f", attrs["top"]))
+            f.write(struct.pack("f", attrs["bot"]))
         if not ieq:
             a.coords["dx"].values.astype(np.float32).tofile(f)
             (-a.coords["dy"].values).astype(np.float32).tofile(f)

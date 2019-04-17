@@ -1,7 +1,7 @@
+import collections
+import glob
 import os
 import pathlib
-import collections
-from glob import glob
 
 import cftime
 import numpy as np
@@ -13,7 +13,7 @@ from imod.io import idf
 
 
 def globremove(globpath):
-    paths = glob(globpath)
+    paths = glob.glob(globpath)
     for path in paths:
         try:
             os.remove(path)
@@ -107,7 +107,7 @@ def test_layerda(request):
     data = np.ones((nlay, nrow, ncol), dtype=np.float32)
 
     def remove():
-        paths = glob("layer_l[0-9].idf")
+        paths = glob.glob("layer_l[0-9].idf")
         for p in paths:
             try:
                 os.remove(p)
@@ -139,7 +139,7 @@ def test_timelayerda(request):
             data[i, j, ...] = layer * (i + 1)
 
     def remove():
-        paths = glob("timelayer*.idf")
+        paths = glob.glob("timelayer*.idf")
         for p in paths:
             try:
                 os.remove(p)
