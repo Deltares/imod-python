@@ -43,7 +43,7 @@ class RechargeHighestActive(BoundaryCondition):
         self["concentration"] = concentration
         self["save_budget"] = save_budget
 
-    def _render(self, directory, globaltimes):
+    def _render(self, directory, globaltimes, *args, **kwargs):
         d = {}
         d["mapping"] = self._mapping
 

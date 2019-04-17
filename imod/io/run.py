@@ -708,8 +708,8 @@ def _get_package(package, directory, package_schema):
     if not package:
         return package_data
 
-    for key, da in package.items():
-        name = key.split("-")[0]
+    for fullname, da in package.items():
+        name = fullname.split("-")[0]
         try:
             order = package_schema[name].get("order", ["value"])
         except KeyError as e:
@@ -727,7 +727,7 @@ def _get_package(package, directory, package_schema):
             layer = int(layer)
             d = {
                 "directory": directory,
-                "name": key,
+                "name": fullname,
                 "layer": layer,
                 "extension": ".idf",
             }

@@ -16,9 +16,9 @@ class PackageGroup(collections.UserDict):
         collections.UserDict.__init__(self)
         for k, v in kwargs.items():
             self[k] = v
-        self.key_order()
+        self.reorder_keys()
 
-    def key_order(self):
+    def reorder_keys(self):
         """
         Order packages so that the one with with concentration is first.
         Check whether concentration for only one system has been defined.
