@@ -58,7 +58,7 @@ class BasicFlow(Package):
         if not len(ibound.shape) == 3:
             raise ValueError
 
-    def _render(self, directory):
+    def _render(self, directory, *args, **kwargs):
         """
         Renders part of runfile that ends up under [bas] section.
         """

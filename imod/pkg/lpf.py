@@ -66,7 +66,7 @@ class LayerPropertyFlow(Package):
         self["method_wet"] = method_wet
         self["head_dry"] = head_dry
 
-    def _render(self, directory):
+    def _render(self, directory, *args, **kwargs):
         d = {}
         d["mapping"] = self._mapping
         dicts = {}

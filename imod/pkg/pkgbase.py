@@ -38,7 +38,7 @@ class Package(xr.Dataset):
         value = self._keywords[key][keyword]
         d[key] = value
 
-    def _render(self):
+    def _render(self, *args, **kwargs):
         """
         Rendering method for simple keyword packages (vdf, pcg).
 

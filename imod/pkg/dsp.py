@@ -30,7 +30,7 @@ class Dispersion(Package):
         self["ratio_vertical"] = ratio_vertical
         self["diffusion_coefficient"] = diffusion_coefficient
     
-    def _render(self, directory):
+    def _render(self, directory, *args, **kwargs):
         d = {}
         d["mapping"] = self._mapping
         dicts = {}
