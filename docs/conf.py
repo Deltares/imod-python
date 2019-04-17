@@ -35,7 +35,7 @@ release = imod.__version__
 # https://robpol86.github.io/sphinxcontrib-versioning/settings.html
 # For now only build selected branches, no tags
 scv_root_ref = "release"
-scv_whitelist_branches = ("release", "master", "develop")
+scv_whitelist_branches = ("release", "master")
 scv_whitelist_tags = (re.compile("a^"),)
 
 # -- General configuration ---------------------------------------------------
