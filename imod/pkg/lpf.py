@@ -21,15 +21,15 @@ class LayerPropertyFlow(Package):
     )
 
     _template = jinja2.Template(
-    "[lpf]\n"
-    "    ilpfcb = {{save_budget}}\n"
-    "    hdry = {{head_dry}}\n"
-    "    layvka_l? = 0\n"
-    "    {%- for name, dictname in mapping -%}\n"
-    "        {%- for layer, value in dicts[dictname].items() %}\n"
-    "    {{name}}_l{{layer}} = {{value}}\n"
-    "        {%- endfor -%}\n"
-    "    {%- endfor -%}\n"
+        "[lpf]\n"
+        "    ilpfcb = {{save_budget}}\n"
+        "    hdry = {{head_dry}}\n"
+        "    layvka_l? = 0\n"
+        "    {%- for name, dictname in mapping -%}\n"
+        "        {%- for layer, value in dicts[dictname].items() %}\n"
+        "    {{name}}_l{{layer}} = {{value}}\n"
+        "        {%- endfor -%}\n"
+        "    {%- endfor -%}\n"
     )
 
     _keywords = {

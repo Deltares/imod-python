@@ -79,4 +79,3 @@ class TimeDiscretization(Package):
             dicts[varname] = self._compose_values_time(varname, globaltimes)
         d["dicts"] = dicts
         return self._btn_template.render(d)
-

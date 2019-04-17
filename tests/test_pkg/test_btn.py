@@ -18,7 +18,8 @@ def basictransport(request):
     starting_concentration = xr.full_like(icbund, 0.0)
     porosity = xr.DataArray(np.full(3, 0.3), {"layer": layer}, dims=("layer",))
 
-    btn = BasicTransport(icbund=icbund,
+    btn = BasicTransport(
+        icbund=icbund,
         starting_concentration=starting_concentration,
         porosity=porosity,
         n_species=1,
@@ -33,21 +34,21 @@ def test_btn_render_arrays(basictransport):
     directory = Path(".")
 
     compare = (
-    "[btn]\n"
-    "    thkmin = 0.01\n"
-    "    cinact = 1e+30\n"
-    "    sconc_t1_l1 = starting_concentration_l1.idf\n"
-    "    sconc_t1_l2 = starting_concentration_l2.idf\n"
-    "    sconc_t1_l3 = starting_concentration_l3.idf\n"
-    "    icbund_l1 = icbund_l1.idf\n"
-    "    icbund_l2 = icbund_l2.idf\n"
-    "    icbund_l3 = icbund_l3.idf\n"
-    "    dz_l1 = 10.0\n"
-    "    dz_l2 = 10.0\n"
-    "    dz_l3 = 10.0\n"
-    "    prsity_l1 = 0.3\n"
-    "    prsity_l2 = 0.3\n"
-    "    prsity_l3 = 0.3"
+        "[btn]\n"
+        "    thkmin = 0.01\n"
+        "    cinact = 1e+30\n"
+        "    sconc_t1_l1 = starting_concentration_l1.idf\n"
+        "    sconc_t1_l2 = starting_concentration_l2.idf\n"
+        "    sconc_t1_l3 = starting_concentration_l3.idf\n"
+        "    icbund_l1 = icbund_l1.idf\n"
+        "    icbund_l2 = icbund_l2.idf\n"
+        "    icbund_l3 = icbund_l3.idf\n"
+        "    dz_l1 = 10.0\n"
+        "    dz_l2 = 10.0\n"
+        "    dz_l3 = 10.0\n"
+        "    prsity_l1 = 0.3\n"
+        "    prsity_l2 = 0.3\n"
+        "    prsity_l3 = 0.3"
     )
 
     layer = np.arange(1, 4)
@@ -67,17 +68,17 @@ def test_btn_render_constants(basictransport):
     thickness = xr.DataArray(np.full(3, 10.0), {"layer": layer}, dims=("layer",))
 
     compare = (
-    "[btn]\n"
-    "    thkmin = 0.01\n"
-    "    cinact = 1e+30\n"
-    "    sconc_t1_l? = 0.0\n"
-    "    icbund_l1 = icbund_l1.idf\n"
-    "    icbund_l2 = icbund_l2.idf\n"
-    "    icbund_l3 = icbund_l3.idf\n"
-    "    dz_l1 = 10.0\n"
-    "    dz_l2 = 10.0\n"
-    "    dz_l3 = 10.0\n"
-    "    prsity_l? = 0.3"
+        "[btn]\n"
+        "    thkmin = 0.01\n"
+        "    cinact = 1e+30\n"
+        "    sconc_t1_l? = 0.0\n"
+        "    icbund_l1 = icbund_l1.idf\n"
+        "    icbund_l2 = icbund_l2.idf\n"
+        "    icbund_l3 = icbund_l3.idf\n"
+        "    dz_l1 = 10.0\n"
+        "    dz_l2 = 10.0\n"
+        "    dz_l3 = 10.0\n"
+        "    prsity_l? = 0.3"
     )
 
     assert btn._render(directory, thickness=thickness) == compare

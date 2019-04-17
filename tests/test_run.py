@@ -10,6 +10,7 @@ from collections import OrderedDict
 from pathlib import Path
 import cftime
 
+
 @pytest.fixture(scope="module")
 def make_test_model(request):
     def _make_test_model(transient=False):
@@ -188,20 +189,22 @@ def test_parse__errors():
     with pytest.raises(RuntimeError):
         run._parse(key, run.stress_period_schema)
 
+
 def test_time_discretisation_cftime():
     years = np.array([2000, 5000, 9998])
     years_diff = years[1:] - years[:-1]
     cftimes = [cftime.DatetimeJulian(y, 1, 1) for y in years]
     d = run._time_discretisation(cftimes)
     assert len(d) == 2
-    
+
     for i, periodname in enumerate(d.keys()):
         assert cftimes[i].strftime("%Y%m%d%H%M%S") == periodname
-    
+
     values = list(d.values())
-    assert(np.isclose(values[0]/365.25,years_diff[0]))
-    assert(np.isclose(values[1]/365.25,years_diff[1]))
-    
+    assert np.isclose(values[0] / 365.25, years_diff[0])
+    assert np.isclose(values[1] / 365.25, years_diff[1])
+
+
 def test_time_discretisation():
     dates = ["2012-01-01 12:00", "2012-01-02 00:00", "2012-01-12 00:00"]
     times = [pd.to_datetime(s, format="%Y-%m-%d %H:%M") for s in dates]

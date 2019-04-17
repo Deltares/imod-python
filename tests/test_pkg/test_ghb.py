@@ -18,8 +18,14 @@ def headboundary(request):
         dims=("layer", "y", "x"),
     )
 
-    ghb = GeneralHeadBoundary(head=head, conductance=head.copy(), concentration=head.copy(), density=head.copy())
+    ghb = GeneralHeadBoundary(
+        head=head,
+        conductance=head.copy(),
+        concentration=head.copy(),
+        density=head.copy(),
+    )
     return ghb
+
 
 def test_render(headboundary):
     ghb = headboundary

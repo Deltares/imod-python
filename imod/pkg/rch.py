@@ -5,36 +5,36 @@ from imod.pkg.pkgbase import BoundaryCondition
 
 class RechargeTopLayer(BoundaryCondition):
     _pkg_id = "rch"
+
     def __init__(self, rate, concentration, save_budget=False):
         super(__class__, self).__init__()
 
+
 class RechargeLayers(BoundaryCondition):
     _pkg_id = "rch"
+
     def __init__(self, rate, concentration, save_budget=False):
         super(__class__, self).__init__()
+
 
 class RechargeHighestActive(BoundaryCondition):
     _pkg_id = "rch"
 
-    _mapping = (
-        ("rech", "rate"),
-    )
+    _mapping = (("rech", "rate"),)
 
-    _keywords = {
-        "save_budget": {False: 0, True: 1},
-    }
+    _keywords = {"save_budget": {False: 0, True: 1}}
 
     _template = jinja2.Template(
-    "[rch]\n"
-    "    nrchop = 3\n"
-    "    irchcb = {{save_budget}}\n"
-    "    {%- for name, dictname in mapping -%}"
-    "        {%- for time, timedict in dicts[dictname].items() -%}"
-    "            {%- for layer, value in timedict.items() %}\n"
-    "    {{name}}_p{{time}} = {{value}}\n"
-    "            {%- endfor -%}\n"
-    "        {%- endfor -%}"
-    "    {%- endfor -%}"
+        "[rch]\n"
+        "    nrchop = 3\n"
+        "    irchcb = {{save_budget}}\n"
+        "    {%- for name, dictname in mapping -%}"
+        "        {%- for time, timedict in dicts[dictname].items() -%}"
+        "            {%- for layer, value in timedict.items() %}\n"
+        "    {{name}}_p{{time}} = {{value}}\n"
+        "            {%- endfor -%}\n"
+        "        {%- endfor -%}"
+        "    {%- endfor -%}"
     )
 
     def __init__(self, rate, concentration, save_budget=False):

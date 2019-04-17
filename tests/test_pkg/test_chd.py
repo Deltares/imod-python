@@ -19,6 +19,7 @@ def constanthead(request):
     chd = ConstantHead(head_start=head, head_end=head.copy(), concentration=head.copy())
     return chd
 
+
 def test_render(constanthead):
     chd = constanthead
     directory = Path(".")

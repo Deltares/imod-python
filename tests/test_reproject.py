@@ -120,9 +120,7 @@ def test_basic_reproject(write_tif):
     write_tif("basic.tif", epsg=28992)
     dst_crs = {"init": "EPSG:32631"}
     with xr.open_rasterio("basic.tif").squeeze("band") as da:
-        newda = imod.pre.reproject(
-            da, src_crs={"init": "EPSG:28992"}, dst_crs=dst_crs
-        )
+        newda = imod.pre.reproject(da, src_crs={"init": "EPSG:28992"}, dst_crs=dst_crs)
 
     with rasterio.open("basic.tif") as src:
         arr = src.read()

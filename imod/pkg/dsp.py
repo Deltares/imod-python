@@ -2,6 +2,7 @@ import jinja2
 
 from imod.pkg.pkgbase import Package
 
+
 class Dispersion(Package):
     _pkg_id = "dsp"
 
@@ -29,7 +30,7 @@ class Dispersion(Package):
         self["ratio_horizontal"] = ratio_horizontal
         self["ratio_vertical"] = ratio_vertical
         self["diffusion_coefficient"] = diffusion_coefficient
-    
+
     def _render(self, directory, *args, **kwargs):
         d = {}
         d["mapping"] = self._mapping
@@ -38,5 +39,5 @@ class Dispersion(Package):
         for varname in self.data_vars.keys():
             dicts[varname] = self._compose_values_layer(varname, directory)
         d["dicts"] = dicts
-        
+
         return self._template.render(d)

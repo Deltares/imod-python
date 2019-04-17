@@ -6,24 +6,20 @@ from imod.pkg.pkgbase import Package
 class BasicTransport(Package):
     _pkg_id = "btn"
 
-    _mapping = (
-        ("icbund", "icbund"),
-        ("dz", "thickness"),
-        ("prsity", "porosity"),
-    )
+    _mapping = (("icbund", "icbund"), ("dz", "thickness"), ("prsity", "porosity"))
 
     _template = jinja2.Template(
-    "[btn]\n"
-    "    thkmin = {{minimum_active_thickness}}\n"
-    "    cinact = {{inactive_concentration}}\n"
-    "    {%- for layer, value in starting_concentration.items() %}\n"
-    "    sconc_t1_l{{layer}} = {{value}}\n"
-    "    {%- endfor -%}\n"
-    "    {%- for name, dictname in mapping -%}\n"
-    "        {%- for layer, value in dicts[dictname].items() %}\n"
-    "    {{name}}_l{{layer}} = {{value}}\n"
-    "        {%- endfor -%}\n"
-    "    {%- endfor -%}\n"
+        "[btn]\n"
+        "    thkmin = {{minimum_active_thickness}}\n"
+        "    cinact = {{inactive_concentration}}\n"
+        "    {%- for layer, value in starting_concentration.items() %}\n"
+        "    sconc_t1_l{{layer}} = {{value}}\n"
+        "    {%- endfor -%}\n"
+        "    {%- for name, dictname in mapping -%}\n"
+        "        {%- for layer, value in dicts[dictname].items() %}\n"
+        "    {{name}}_l{{layer}} = {{value}}\n"
+        "        {%- endfor -%}\n"
+        "    {%- endfor -%}\n"
     )
 
     def __init__(
@@ -86,4 +82,3 @@ class BasicTransport(Package):
         )
         d["dicts"] = dicts
         return self._template.render(d)
-

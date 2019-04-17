@@ -21,7 +21,7 @@ def _linear_inds_weights_1d(src_x, dst_x, xmin, xmax):
     """
     # From np.searchsorted docstring:
     # Find the indices into a sorted array a such that, if the corresponding
-    # elements in v were inserted before the indices, the order of a would 
+    # elements in v were inserted before the indices, the order of a would
     # be preserved.
     i = np.searchsorted(src_x, dst_x) - 1
     # Out of bounds indices
@@ -29,23 +29,23 @@ def _linear_inds_weights_1d(src_x, dst_x, xmin, xmax):
     i[i > src_x.size - 2] = src_x.size - 2
 
     # -------------------------------------------------------------------------
-    # Visual example: interpolate from src with 2 cells to dst 3 cells 
+    # Visual example: interpolate from src with 2 cells to dst 3 cells
     # The period . marks the midpoint of the cell
     # The pipe | marks the cell edge
     #
-    #    |_____._____|_____._____|   
+    #    |_____._____|_____._____|
     #    src_x0      src_x1
-    #   
+    #
     #    |___.___|___.___|___.___|
     #        x0      x1      x2
     #
-    # Then normalized weight for cell x1: 
-    # weight = (x1 - src_x0) / (src_x1 - src_x0) 
+    # Then normalized weight for cell x1:
+    # weight = (x1 - src_x0) / (src_x1 - src_x0)
     # -------------------------------------------------------------------------
 
     norm_weights = (dst_x - src_x[i]) / (src_x[i + 1] - src_x[i])
     # deal with out of bounds locations
-    # we place a sentinel value of -1 here 
+    # we place a sentinel value of -1 here
     i[dst_x < xmin] = -1
     i[dst_x > xmax] = -1
     # In case it's just inside of bounds, use only the value at the boundary
@@ -96,7 +96,7 @@ def _nd_interp(src, inds, weights, fill_value=np.nan):
     new_shape = orig_shape[:-ndim_regrid] + tuple([i.size for i in inds])
     # Temp shape for bookkeeping, where which axis ends up
     temp_shape = list(new_shape)
-        
+
     for count, (i, w) in enumerate(zip(inds, weights)):
         if count > 0:
             # Move interpolated axis to the start
@@ -110,7 +110,7 @@ def _nd_interp(src, inds, weights, fill_value=np.nan):
         temp, dst = _reshape(temp, dst, ndim_regrid=1)
         # Interpolate over a single dimension
         dst = _iter_interpolate(temp, dst, i, w)
-        temp = dst.reshape(orig_shape[:count - 1] + new_shape[count - 1:])
+        temp = dst.reshape(orig_shape[: count - 1] + new_shape[count - 1 :])
 
     # Restore to original shape
     # Doesn't allocate
@@ -218,7 +218,7 @@ def _weights_1d(src_x, dst_x):
     nrow = len(dst_inds)
     ncol = max_len
     np_dst_inds = np.array(dst_inds)
-    
+
     np_src_inds = np.full((nrow, ncol), -1)
     for i in range(nrow):
         for j, ind in enumerate(src_inds[i]):
@@ -228,7 +228,7 @@ def _weights_1d(src_x, dst_x):
     for i in range(nrow):
         for j, ind in enumerate(weights[i]):
             np_weights[i, j] = ind
-    
+
     return max_len, (np_dst_inds, np_src_inds, np_weights)
 
 

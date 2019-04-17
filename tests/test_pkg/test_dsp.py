@@ -26,24 +26,25 @@ def dispersion(request):
     )
     return dsp
 
+
 def test_render_idf(dispersion):
     dsp = dispersion
     directory = Path(".")
 
     compare = (
-    "[dsp]\n"
-    "    al_l1 = longitudinal_l1.idf\n"
-    "    al_l2 = longitudinal_l2.idf\n"
-    "    al_l3 = longitudinal_l3.idf\n"
-    "    trpt_l1 = ratio_horizontal_l1.idf\n"
-    "    trpt_l2 = ratio_horizontal_l2.idf\n"
-    "    trpt_l3 = ratio_horizontal_l3.idf\n"
-    "    trpv_l1 = ratio_vertical_l1.idf\n"
-    "    trpv_l2 = ratio_vertical_l2.idf\n"
-    "    trpv_l3 = ratio_vertical_l3.idf\n"
-    "    dmcoef_l1 = diffusion_coefficient_l1.idf\n"
-    "    dmcoef_l2 = diffusion_coefficient_l2.idf\n"
-    "    dmcoef_l3 = diffusion_coefficient_l3.idf"
+        "[dsp]\n"
+        "    al_l1 = longitudinal_l1.idf\n"
+        "    al_l2 = longitudinal_l2.idf\n"
+        "    al_l3 = longitudinal_l3.idf\n"
+        "    trpt_l1 = ratio_horizontal_l1.idf\n"
+        "    trpt_l2 = ratio_horizontal_l2.idf\n"
+        "    trpt_l3 = ratio_horizontal_l3.idf\n"
+        "    trpv_l1 = ratio_vertical_l1.idf\n"
+        "    trpv_l2 = ratio_vertical_l2.idf\n"
+        "    trpv_l3 = ratio_vertical_l3.idf\n"
+        "    dmcoef_l1 = diffusion_coefficient_l1.idf\n"
+        "    dmcoef_l2 = diffusion_coefficient_l2.idf\n"
+        "    dmcoef_l3 = diffusion_coefficient_l3.idf"
     )
 
     assert dsp._render(directory) == compare
@@ -54,11 +55,11 @@ def test_render_constant(dispersion):
     directory = Path(".")
 
     compare = (
-    "[dsp]\n"
-    "    al_l? = 1.0\n"
-    "    trpt_l? = 1.0\n"
-    "    trpv_l? = 1.0\n"
-    "    dmcoef_l? = 1.0"
+        "[dsp]\n"
+        "    al_l? = 1.0\n"
+        "    trpt_l? = 1.0\n"
+        "    trpv_l? = 1.0\n"
+        "    dmcoef_l? = 1.0"
     )
 
     assert dsp._render(directory) == compare
@@ -71,19 +72,19 @@ def test_render_constant_per_layer(dispersion):
     directory = Path(".")
 
     compare = (
-    "[dsp]\n"
-    "    al_l1 = 1.0\n"
-    "    al_l2 = 1.0\n"
-    "    al_l3 = 1.0\n"
-    "    trpt_l1 = 1.0\n"
-    "    trpt_l2 = 1.0\n"
-    "    trpt_l3 = 1.0\n"
-    "    trpv_l1 = 1.0\n"
-    "    trpv_l2 = 1.0\n"
-    "    trpv_l3 = 1.0\n"
-    "    dmcoef_l1 = 1.0\n"
-    "    dmcoef_l2 = 1.0\n"
-    "    dmcoef_l3 = 1.0"
+        "[dsp]\n"
+        "    al_l1 = 1.0\n"
+        "    al_l2 = 1.0\n"
+        "    al_l3 = 1.0\n"
+        "    trpt_l1 = 1.0\n"
+        "    trpt_l2 = 1.0\n"
+        "    trpt_l3 = 1.0\n"
+        "    trpv_l1 = 1.0\n"
+        "    trpv_l2 = 1.0\n"
+        "    trpv_l3 = 1.0\n"
+        "    dmcoef_l1 = 1.0\n"
+        "    dmcoef_l2 = 1.0\n"
+        "    dmcoef_l3 = 1.0"
     )
 
     assert dsp._render(directory) == compare

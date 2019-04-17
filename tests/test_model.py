@@ -76,7 +76,8 @@ def basicmodel(request):
     m["pcg"] = imod.pkg.PreconditionedConjugateGradientSolver(
         max_iter=150, inner_iter=30, hclose=0.0001, rclose=1000.0, relax=0.98, damp=1.0
     )
-    m["btn"] =  imod.pkg.BasicTransport(icbund=icbund,
+    m["btn"] = imod.pkg.BasicTransport(
+        icbund=icbund,
         starting_concentration=icbund.copy(),
         porosity=icbund.copy(),
         n_species=1,
@@ -300,29 +301,30 @@ def test_render_btn(basicmodel):
     directory = Path(".")
 
     compare = (
-    "[btn]\n"
-    "    thkmin = 0.01\n"
-    "    cinact = 1e+30\n"
-    "    sconc_t1_l1 = starting_concentration_l1.idf\n"
-    "    sconc_t1_l2 = starting_concentration_l2.idf\n"
-    "    sconc_t1_l3 = starting_concentration_l3.idf\n"
-    "    icbund_l1 = icbund_l1.idf\n"
-    "    icbund_l2 = icbund_l2.idf\n"
-    "    icbund_l3 = icbund_l3.idf\n"
-    "    dz_l1 = 10.0\n"
-    "    dz_l2 = 10.0\n"
-    "    dz_l3 = 10.0\n"
-    "    prsity_l1 = 0.3\n"
-    "    prsity_l2 = 0.3\n"
-    "    prsity_l3 = 0.3\n"
-    "    laycon_l1 = 1\n"
-    "    laycon_l2 = 0\n"
-    "    laycon_l3 = 0\n"
-    "    dt0_p? = 0\n"
-    "    ttsmult_p? = 1.0\n"
-    "    mxstrn_p? = 10"
+        "[btn]\n"
+        "    thkmin = 0.01\n"
+        "    cinact = 1e+30\n"
+        "    sconc_t1_l1 = starting_concentration_l1.idf\n"
+        "    sconc_t1_l2 = starting_concentration_l2.idf\n"
+        "    sconc_t1_l3 = starting_concentration_l3.idf\n"
+        "    icbund_l1 = icbund_l1.idf\n"
+        "    icbund_l2 = icbund_l2.idf\n"
+        "    icbund_l3 = icbund_l3.idf\n"
+        "    dz_l1 = 10.0\n"
+        "    dz_l2 = 10.0\n"
+        "    dz_l3 = 10.0\n"
+        "    prsity_l1 = 0.3\n"
+        "    prsity_l2 = 0.3\n"
+        "    prsity_l3 = 0.3\n"
+        "    laycon_l1 = 1\n"
+        "    laycon_l2 = 0\n"
+        "    laycon_l3 = 0\n"
+        "    dt0_p? = 0\n"
+        "    ttsmult_p? = 1.0\n"
+        "    mxstrn_p? = 10"
     )
     assert m._render_btn(directory=directory, globaltimes=globaltimes)
+
 
 def test_render_transportsolver(basicmodel):
     m = basicmodel

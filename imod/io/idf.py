@@ -236,6 +236,7 @@ def dask(path, memmap=False, attrs=None):
     warnings.warn("idf.dask is deprecated. Use idf._dask instead.")
     return _dask(path, memmap, attrs)
 
+
 def _dask(path, memmap=False, attrs=None):
     """
     Read a single IDF file to a dask.array
@@ -298,7 +299,8 @@ def dataarray(path, memmap=False):
         using imod.io.rasterio are included in the xarray.DataArray.attrs.
     """
     warnings.warn(
-        "imod.io.idf.dataarray is deprecated, use imod.io.idf.open instead", FutureWarning
+        "imod.io.idf.dataarray is deprecated, use imod.io.idf.open instead",
+        FutureWarning,
     )
     return _load([path, False])
 

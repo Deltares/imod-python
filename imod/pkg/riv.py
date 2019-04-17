@@ -11,7 +11,15 @@ class River(BoundaryCondition):
         ("rivssmdens", "density"),
     )
 
-    def __init__(self, stage, conductance, bottom_elevation, concentration=None, density=None, save_budget=False):
+    def __init__(
+        self,
+        stage,
+        conductance,
+        bottom_elevation,
+        concentration=None,
+        density=None,
+        save_budget=False,
+    ):
         super(__class__, self).__init__()
         self["stage"] = stage
         self["conductance"] = conductance

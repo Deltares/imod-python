@@ -33,8 +33,8 @@ package_schema = OrderedDict(
 stress_period_schema = OrderedDict(
     [
         ("wel", {"systems": True}),
-        ("drn", {"systems": True, "order": ("bot",  "cond")}),
-        ("riv", {"systems": True, "order": ("stage","cond", "bot", "inff")}),
+        ("drn", {"systems": True, "order": ("bot", "cond")}),
+        ("riv", {"systems": True, "order": ("stage", "cond", "bot", "inff")}),
         ("ghb", {"systems": True, "order": ("head", "cond")}),
         ("rch", {"systems": False}),
         ("chd", {"systems": False}),
@@ -83,12 +83,12 @@ seawat_package_schema = OrderedDict(
 
 seawat_period_schema = OrderedDict(
     [
-        ("wel", {"systems": True, "order": ("rate",  "conc")}),
-        ("drn", {"systems": True, "order": ("bot",   "cond", "conc")}),
+        ("wel", {"systems": True, "order": ("rate", "conc")}),
+        ("drn", {"systems": True, "order": ("bot", "cond", "conc")}),
         ("riv", {"systems": True, "order": ("stage", "cond", "bot", "dens", "conc")}),
-        ("ghb", {"systems": True, "order": ("head",  "cond", "dens", "conc")}),
-        ("rch", {"systems": True, "order": ("rate",  "conc")}),
-        ("chd", {"systems": True, "order": ("head",  "conc")}),
+        ("ghb", {"systems": True, "order": ("head", "cond", "dens", "conc")}),
+        ("rch", {"systems": True, "order": ("rate", "conc")}),
+        ("chd", {"systems": True, "order": ("head", "conc")}),
     ]
 )
 
@@ -486,6 +486,7 @@ def _sortby_field(package_data, name, stress_period_schema):
         package_data = sorted_data
     return package_data
 
+
 def _maybe_to_datetime(time):
     """
     Check whether time is cftime object, else convert to datetime64 series.
@@ -497,9 +498,10 @@ def _maybe_to_datetime(time):
     time : cftime object or datetime-like scalar
     """
     if isinstance(time, cftime.datetime):
-       return time
+        return time
     else:
         return pd.to_datetime(time)
+
 
 def _time_discretisation(times):
     """
@@ -518,7 +520,7 @@ def _time_discretisation(times):
     """
 
     times = [_maybe_to_datetime(t) for t in times]
-    
+
     d = OrderedDict()
     for start, end in zip(times[:-1], times[1:]):
         period_name = start.strftime("%Y%m%d%H%M%S")

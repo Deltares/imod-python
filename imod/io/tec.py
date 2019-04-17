@@ -94,7 +94,9 @@ def _dataset(df, time, **kwargs):
 
 def load(path, variables=None, times=None):
     "Load is deprecated. Use read instead."
-    warnings.warn("imod.tec.load is deprecated. Use imod.tec.read instead.", FutureWarning)
+    warnings.warn(
+        "imod.tec.load is deprecated. Use imod.tec.read instead.", FutureWarning
+    )
     return read(path, variables, times)
 
 

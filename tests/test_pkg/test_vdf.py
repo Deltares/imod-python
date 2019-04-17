@@ -16,16 +16,16 @@ def test_render():
     )
 
     compare = (
-    "[vdf]\n"
-    "    mtdnconc = 1\n"
-    "    densemin = 1000.0\n"
-    "    densemax = 1025.0\n"
-    "    denseref = 1000.0\n"
-    "    denseslp = 0.71\n"
-    "    dnscrit = 0.01\n"
-    "    nswtcpl = 1\n"
-    "    iwtable = 0\n"
-    "    mfnadvfd = 2\n"
+        "[vdf]\n"
+        "    mtdnconc = 1\n"
+        "    densemin = 1000.0\n"
+        "    densemax = 1025.0\n"
+        "    denseref = 1000.0\n"
+        "    denseslp = 0.71\n"
+        "    dnscrit = 0.01\n"
+        "    nswtcpl = 1\n"
+        "    iwtable = 0\n"
+        "    mfnadvfd = 2\n"
     )
 
     assert vdf._render() == compare

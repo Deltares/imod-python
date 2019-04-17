@@ -5,16 +5,16 @@ class VariableDensityFlow(Package):
     _pkg_id = "vdf"
 
     _template = (
-    "[vdf]\n"
-    "    mtdnconc = {density_species}\n"
-    "    densemin = {density_min}\n"
-    "    densemax = {density_max}\n"
-    "    denseref = {density_ref}\n"
-    "    denseslp = {density_concentration_slope}\n"
-    "    dnscrit = {density_criterion}\n"
-    "    nswtcpl = {coupling}\n"
-    "    iwtable = {correct_water_table}\n"
-    "    mfnadvfd = {internodal}\n"
+        "[vdf]\n"
+        "    mtdnconc = {density_species}\n"
+        "    densemin = {density_min}\n"
+        "    densemax = {density_max}\n"
+        "    denseref = {density_ref}\n"
+        "    denseslp = {density_concentration_slope}\n"
+        "    dnscrit = {density_criterion}\n"
+        "    nswtcpl = {coupling}\n"
+        "    iwtable = {correct_water_table}\n"
+        "    mfnadvfd = {internodal}\n"
     )
 
     _keywords = {

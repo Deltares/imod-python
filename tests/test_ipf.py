@@ -101,7 +101,7 @@ def nodata_ipf(request):
 
     def teardown():
         remove("nodata.ipf")
-    
+
     request.addfinalizer(teardown)
 
 
@@ -115,7 +115,7 @@ def nodata_assoc(request):
 
     def teardown():
         remove("nodata.txt")
-    
+
     request.addfinalizer(teardown)
 
 
@@ -133,13 +133,13 @@ def test_read_associated__itype1implicit():
     with open(path, "w") as f:
         f.write(assoc_string.format(delim=delim))
     df = ipf.read_associated(path)
-    assert df.shape == (2,2)
+    assert df.shape == (2, 2)
 
     delim = " "
     with open(path, "w") as f:
         f.write(assoc_string.format(delim=delim))
     df = ipf.read_associated(path, {"delim_whitespace": True})
-    assert df.shape == (2,2)
+    assert df.shape == (2, 2)
 
 
 def test_read__comma(write_basic_ipf):

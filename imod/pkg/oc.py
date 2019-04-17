@@ -2,21 +2,22 @@ import jinja2
 
 from imod.pkg.pkgbase import Package
 
+
 class OutputControl(Package):
     _pkg_id = "oc"
     _template = (
-    "[oc]\n"
-    "    savehead_p?_l? = {save_head_idf}\n"
-    "    saveconclayer_p?_l? = {save_concentration_idf}\n"
-    "    savebudget_p?_l? = {save_budget_idf}\n"
-    "    saveheadtec_p?_l? = {save_head_tec}\n"
-    "    saveconctec_p?_l? = {save_concentration_tec}\n"
-    "    savevxtec_p?_l? = {save_budget_tec}\n"
-    "    savevytec_p?_l? = {save_budget_tec}\n"
-    "    savevztec_p?_l? = {save_budget_tec}\n"
-    "    saveheadvtk_p?_l? = {save_head_vtk}\n"
-    "    saveconcvtk_p?_l? = {save_concentration_vtk}\n"
-    "    savevelovtk_p?_l? = {save_budget_vtk}\n"
+        "[oc]\n"
+        "    savehead_p?_l? = {save_head_idf}\n"
+        "    saveconclayer_p?_l? = {save_concentration_idf}\n"
+        "    savebudget_p?_l? = {save_budget_idf}\n"
+        "    saveheadtec_p?_l? = {save_head_tec}\n"
+        "    saveconctec_p?_l? = {save_concentration_tec}\n"
+        "    savevxtec_p?_l? = {save_budget_tec}\n"
+        "    savevytec_p?_l? = {save_budget_tec}\n"
+        "    savevztec_p?_l? = {save_budget_tec}\n"
+        "    saveheadvtk_p?_l? = {save_head_vtk}\n"
+        "    saveconcvtk_p?_l? = {save_concentration_vtk}\n"
+        "    savevelovtk_p?_l? = {save_budget_vtk}\n"
     )
 
     def __init__(

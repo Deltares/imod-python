@@ -127,7 +127,11 @@ def test_timelayerda(request):
     coords["layer"] = np.arange(nlay) + 8
     coords["time"] = pd.date_range("2000-01-01", "2002-01-01", freq="YS").values
 
-    kwargs = {"name": "timelayer", "coords": coords, "dims": ("time", "layer", "y", "x")}
+    kwargs = {
+        "name": "timelayer",
+        "coords": coords,
+        "dims": ("time", "layer", "y", "x"),
+    }
     data = np.ones((ntime, nlay, nrow, ncol), dtype=np.float32)
     for i in range(ntime):
         for j, layer in enumerate(range(8, 8 + nlay)):

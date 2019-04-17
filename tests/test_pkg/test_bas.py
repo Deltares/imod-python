@@ -28,7 +28,7 @@ def basicflow(request):
 def test_thickness(basicflow):
     bas = basicflow
     thickness = bas.thickness().values
-    compare = np.array([10., 10., 10.])
+    compare = np.array([10.0, 10.0, 10.0])
     assert np.allclose(thickness, compare)
 
 
@@ -87,4 +87,3 @@ def test_render_dis__arraytopbot(basicflow):
         "    botm_l3 = bottom_l3.idf"
     )
     assert bas._render_dis(directory) == compare
-
