@@ -1,7 +1,7 @@
 import os
 import pathlib
 import shutil
-from collections import OrderedDict
+import collections
 
 import cftime
 import numpy as np
@@ -71,7 +71,7 @@ def make_test_model(request):
 
         ghb_cond_da = da2d.assign_coords(layer=1)
 
-        modeldata = OrderedDict(
+        modeldata = collections.OrderedDict(
             [
                 ("bnd", da3d),
                 ("shd", da3d),
@@ -107,7 +107,7 @@ def make_test_model(request):
 
 
 def test_check_input():
-    m = OrderedDict()
+    m = collections.OrderedDict()
     m["bnd"] = xr.DataArray(
         np.random.rand(4, 3),
         coords={"y": range(3, -1, -1), "x": range(3), "dx": 1.0, "dy": -1.0},
@@ -119,7 +119,7 @@ def test_check_input():
 
 
 def test_check_input__error():
-    m = OrderedDict()
+    m = collections.OrderedDict()
     m["wel"] = xr.DataArray(
         np.random.rand(4, 3),
         coords={"y": range(3, -1, -1), "x": range(3), "dx": 1.0, "dy": -1.0},
@@ -222,7 +222,7 @@ def test_time_discretisation():
 
 
 def test_pop_package():
-    m = OrderedDict()
+    m = collections.OrderedDict()
     m["bnd"] = None
     m["riv-stage"] = None
     m["riv-cond"] = None
@@ -246,7 +246,7 @@ def test_get_package():
     package = {"ani-angle": da, "ani-factor": da}
     directory = pathlib.Path("dbase")
     d = run._get_package(package, directory, run.package_schema)
-    assert isinstance(d, OrderedDict)
+    assert isinstance(d, collections.OrderedDict)
 
 
 def test_get_package__error():
@@ -286,7 +286,7 @@ def test_get_period():
     directory = pathlib.Path("dbase")
 
     d = run._get_period(package, times, directory, run.stress_period_schema)
-    assert isinstance(d, OrderedDict)
+    assert isinstance(d, collections.OrderedDict)
 
 
 def test_get_runfile__steady_state(make_test_model):
@@ -541,7 +541,7 @@ def test_write__basic_seawat(make_test_model):
     ghb_head_da = da2d_t.assign_coords(layer=1)
     ghb_cond_da = da2d.assign_coords(layer=1)
 
-    model = OrderedDict(
+    model = collections.OrderedDict(
         [
             ("bnd", da3d),
             ("icbund", da3d),

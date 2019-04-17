@@ -1,6 +1,6 @@
 import csv
 import pathlib
-from collections import OrderedDict
+import collections
 from glob import glob
 from io import StringIO
 
@@ -109,7 +109,7 @@ def read_associated(path, kwargs={}):
                 ncol, itype = map(
                     int, map(str.strip, next(csv.reader([line], delimiter=" ")))
                 )
-        na_values = OrderedDict()
+        na_values = collections.OrderedDict()
 
         # use pandas for csv parsing: stuff like commas within quotes
         # this is a workaround for a pandas bug, probable related issue:
@@ -433,7 +433,9 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20):
             write_assoc(assoc_path, out_df, itype, nodata)
 
         # ensures right order for x, y, id; so that also indexcolumn == 3
-        agg_kwargs = OrderedDict([("x", "first"), ("y", "first"), ("id", "first")])
+        agg_kwargs = collections.OrderedDict(
+            [("x", "first"), ("y", "first"), ("id", "first")]
+        )
         agg_kwargs.update(ipf_columns)
         agg_df = grouped.agg(agg_kwargs)
         # Quote so spaces don't mess up paths

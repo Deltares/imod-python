@@ -1,6 +1,6 @@
 import os
 import pathlib
-from collections import OrderedDict
+import collections
 from glob import glob
 
 import numpy as np

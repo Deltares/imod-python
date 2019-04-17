@@ -1,6 +1,6 @@
 import itertools
 import warnings
-from collections import OrderedDict
+import collections
 from datetime import datetime
 from glob import glob
 import pathlib
@@ -148,7 +148,7 @@ def _xycoords(bounds, cellsizes):
     # unpack tuples
     xmin, xmax, ymin, ymax = bounds
     dx, dy = cellsizes
-    coords = OrderedDict()
+    coords = collections.OrderedDict()
     # from cell size to x and y coordinates
     if isinstance(dx, (int, float)):  # equidistant
         coords["x"] = np.arange(xmin + dx / 2.0, xmax, dx)
@@ -430,9 +430,9 @@ def open_dataset(globpath, memmap=False, use_cftime=False):
     """
     Open a set of IDFs to a dict of xarray.DataArrays.
 
-    Compared to imod.io.idf.open, this function lets you open multiple parameters
+    Compared to imod.idf.open, this function lets you open multiple parameters
     at once (for example kh values and starting heads of a model), which will
-    each be a separate entry in an OrderedDict, with as key the parameter name,
+    each be a separate entry in a dictionary, with as key the parameter name,
     and as value the xarray.DataArray.
 
     Parameters
@@ -453,8 +453,8 @@ def open_dataset(globpath, memmap=False, use_cftime=False):
 
     Returns
     -------
-    OrderedDict
-        OrderedDict of str (parameter name) to xarray.DataArray.
+    collections.OrderedDict
+        Dictionary of str (parameter name) to xarray.DataArray.
         All metadata needed for writing the file to IDF or other formats
         using imod.io.rasterio are included in the xarray.DataArray.attrs.
     """
@@ -474,7 +474,7 @@ def open_dataset(globpath, memmap=False, use_cftime=False):
     # note that directory names are ignored, and in case of duplicates, the last one wins
     names = [util.decompose(path)["name"] for path in paths]
     unique_names = list(np.unique(names))
-    d = OrderedDict()
+    d = collections.OrderedDict()
     for n in unique_names:
         d[n] = []  # prepare empty lists to append to
     for p, n in zip(paths, names):
@@ -483,8 +483,8 @@ def open_dataset(globpath, memmap=False, use_cftime=False):
     # load each group into a DataArray
     das = [_load(v, use_cftime) for v in d.values()]
 
-    # store each DataArray under it's own name in an OrderedDict
-    dd = OrderedDict()
+    # store each DataArray under it's own name in a dictionary
+    dd = collections.OrderedDict()
     for da in das:
         dd[da.name] = da
     # Initially I wanted to return a xarray Dataset here,

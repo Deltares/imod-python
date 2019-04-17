@@ -7,11 +7,11 @@ import jinja2
 from imod.io import util
 from imod.io import idf
 import pathlib
-from collections import OrderedDict
+import collections
 import cftime
 
 # change into namedtuple?
-package_schema = OrderedDict(
+package_schema = collections.OrderedDict(
     [
         ("bnd", {}),
         ("shd", {}),
@@ -30,7 +30,7 @@ package_schema = OrderedDict(
     ]
 )
 
-stress_period_schema = OrderedDict(
+stress_period_schema = collections.OrderedDict(
     [
         ("wel", {"systems": True}),
         ("drn", {"systems": True, "order": ("bot", "cond")}),
@@ -41,7 +41,7 @@ stress_period_schema = OrderedDict(
     ]
 )
 
-default_runfile = OrderedDict(
+default_runfile = collections.OrderedDict(
     [
         ("modelname", "results"),
         ("sdate", 0),
@@ -64,7 +64,7 @@ default_runfile = OrderedDict(
     ]
 )
 
-seawat_package_schema = OrderedDict(
+seawat_package_schema = collections.OrderedDict(
     [
         ("bnd", {}),
         ("icbund", {}),
@@ -81,7 +81,7 @@ seawat_package_schema = OrderedDict(
     ]
 )
 
-seawat_period_schema = OrderedDict(
+seawat_period_schema = collections.OrderedDict(
     [
         ("wel", {"systems": True, "order": ("rate", "conc")}),
         ("drn", {"systems": True, "order": ("bot", "cond", "conc")}),
@@ -92,7 +92,7 @@ seawat_period_schema = OrderedDict(
     ]
 )
 
-seawat_default_runfile = OrderedDict(
+seawat_default_runfile = collections.OrderedDict(
     [
         # gen
         ("modelname", "results"),
@@ -210,27 +210,27 @@ seawat_default_runfile = OrderedDict(
 def _check_input(model, seawat=False):
     """
     Tests whether model and content is of appropriate type, generates new 
-    OrderedDict to avoid destroying the model dict, and lowers keys for further 
+    dictionary to avoid destroying the model dictionary, and lowers keys for further 
     processing.
 
     Parameters
     ----------
-    model : OrderedDict
-        The OrderedDict containing the model data.
+    model : collections.OrderedDict
+        The dictionary containing the model data.
     seawat : bool
         Set True if model is seawat model
     
     Returns
     -------
-    consumed_model: OrderedDict
+    consumed_model: collections.OrderedDict
         Copied `model` dict with lower case keys, which will be consumed during
         writing.
     """
     # TODO: needs a better name?
 
-    if not isinstance(model, OrderedDict):
-        raise TypeError("model must be an OrderedDict.")
-    consumed_model = OrderedDict()
+    if not isinstance(model, collections.OrderedDict):
+        raise TypeError("model must be a collections.OrderedDict.")
+    consumed_model = collections.OrderedDict()
 
     for key, value in model.items():
         if key.split("-")[0].lower() == "wel" and not seawat:
@@ -270,8 +270,8 @@ def _data_bounds(model, seawat=False):
 
     Parameters
     ----------
-    model : OrderedDict
-        The OrderedDict containing the model data.
+    model : collections.OrderedDict
+        The dictionary containing the model data.
     seawat : boolean
         Set to `True` if data is for an iMODSEAWAT model.
 
@@ -337,7 +337,7 @@ def _data_bounds(model, seawat=False):
             except TypeError:  # if not an iterable
                 times.add(tvals)
 
-    d = OrderedDict()
+    d = collections.OrderedDict()
     d["nrow"] = model["bnd"].y.size
     d["ncol"] = model["bnd"].x.size
     d["nlay"] = len(layers)
@@ -378,7 +378,7 @@ def _parse(key, stress_period_schema):
     Parameters
     ----------
     key : str
-    stress_period_schema : OrderedDict
+    stress_period_schema : collections.OrderedDict
         Schema against which to validate key
     
     Returns
@@ -434,7 +434,7 @@ def _groupby_field(package, stress_period_schema):
     ----------
     package : dict
 
-    stress_period_schema: OrderedDict
+    stress_period_schema: collections.OrderedDict
         Schema against which to validate 
 
     Returns
@@ -464,7 +464,7 @@ def _sortby_field(package_data, name, stress_period_schema):
         data for a single imodflow package
     name : str
         name of the package
-    stress_period_schema : OrderedDict
+    stress_period_schema : collections.OrderedDict
 
     Returns
     -------
@@ -476,7 +476,7 @@ def _sortby_field(package_data, name, stress_period_schema):
     order = stress_period_schema[name].get("order", False)
 
     if order:
-        sorted_data = OrderedDict()
+        sorted_data = collections.OrderedDict()
         # will also check if names are okay, otherwise raises KeyError
         for field in order:
             try:
@@ -514,14 +514,14 @@ def _time_discretisation(times):
     
     Returns
     -------
-    OrderedDict
-        OrderedDict with dates as strings for keys,
+    collections.OrderedDict
+        Dictionary with dates as strings for keys,
         stress period duration (in days) as values.
     """
 
     times = [_maybe_to_datetime(t) for t in times]
 
-    d = OrderedDict()
+    d = collections.OrderedDict()
     for start, end in zip(times[:-1], times[1:]):
         period_name = start.strftime("%Y%m%d%H%M%S")
         timedelta = end - start
@@ -532,7 +532,7 @@ def _time_discretisation(times):
 
 def _pop_package(model, name):
     """Pops all entries for a single package from a model dict."""
-    package = OrderedDict()
+    package = collections.OrderedDict()
     # select package content on basis of package name
     package_keys = [key for key in model.keys() if key.split("-")[0] == name]
     for key in package_keys:
@@ -551,7 +551,7 @@ def _get_wel(item, times, directory):
 
     Parameters
     ----------
-    item : OrderedDict
+    item : collections.OrderedDict
     times : np.array
         Array containing "global" times: the datetimes collected from all 
         model data objects. The times in the item are a subset.
@@ -560,7 +560,7 @@ def _get_wel(item, times, directory):
 
     Returns
     -------
-    single_system : OrderedDict
+    single_system : collections.OrderedDict
         Dictionary containing the generated paths (IPF) for a single system. 
     """
     # When the time resolution of an associated .txt file is higher than the
@@ -575,7 +575,7 @@ def _get_wel(item, times, directory):
     df = item["data"]
     key = item["key"]
 
-    single_system = OrderedDict()
+    single_system = collections.OrderedDict()
     for layer in np.unique(df["layer"].values):
         layer = int(layer)
         periods = []
@@ -597,7 +597,7 @@ def _get_system(item, times, directory):
 
     Parameters
     ----------
-    item : OrderedDict
+    item : collections.OrderedDict
     times : np.array
         Array containing "global" times: the datetimes collected from all 
         model data objects. The times in the item are a subset.
@@ -606,7 +606,7 @@ def _get_system(item, times, directory):
 
     Returns
     -------
-    single_system : OrderedDict
+    single_system : collections.OrderedDict
         Dictionary containing the generated paths (IDF) for a single system. 
     """
     # TODO: Currently all packages, except for WEL, have to be defined in the
@@ -630,7 +630,7 @@ def _get_system(item, times, directory):
             _maybe_to_datetime(t) for t in np.atleast_1d(da.coords["time"].values)
         ]
 
-    single_system = OrderedDict()
+    single_system = collections.OrderedDict()
     for layer in np.atleast_1d(da.coords["layer"].values):
         layer = int(layer)
         periods = []
@@ -653,27 +653,27 @@ def _get_period(package, times, directory, stress_period_schema):
 
     Parameters
     ----------
-    package : OrderedDict
+    package : collections.OrderedDict
         Data for a single imodflow package
     times : np.array
         Array containing "global" times: the datetimes collected from all 
         model data objects. The times in the item are a subset.
     directory : str
         Directory in which the model will be written.
-    stress_period_schema : OrderedDict
+    stress_period_schema : collections.OrderedDict
         Schema against which to validate package data.
 
     Returns
     -------
-    package_data : OrderedDict
+    package_data : collections.OrderedDict
         Dictionary containing the generated paths (IDF, IPF) for a single package. 
     """
     name = list(package.keys())[0].split("-")[0]
-    package_data = OrderedDict()
+    package_data = collections.OrderedDict()
 
     grouped = _groupby_field(package, stress_period_schema)
     for field, group in grouped:
-        systemdata = OrderedDict()
+        systemdata = collections.OrderedDict()
         for item in group:
             systemname = item.get("system", "default_system")
             if name == "wel" and isinstance(item["data"], pd.DataFrame):
@@ -693,19 +693,19 @@ def _get_package(package, directory, package_schema):
 
     Parameters
     ----------
-    package : OrderedDict
+    package : collections.OrderedDict
         Data for a single imodflow package
     directory : str
         Directory in which the model will be written.
-    package_schema : OrderedDict
+    package_schema : collections.OrderedDict
         Schema against which to validate package data.
 
     Returns
     -------
-    package_data : OrderedDict
+    package_data : collections.OrderedDict
         Dictionary containing the generated paths (IDF, IPF) for a single package. 
     """
-    package_data = OrderedDict()
+    package_data = collections.OrderedDict()
     for key, da in package.items():
         name = key.split("-")[0]
         try:
@@ -737,7 +737,7 @@ def _get_package(package, directory, package_schema):
 
 def get_runfile(model, directory):
     """
-    Generates an OrderedDict containing the values to be filled in in a runfile 
+    Generates an collections.OrderedDict containing the values to be filled in in a runfile 
     template, from the data contained in `model`.
     These values are mainly the paths of the IDFs and IPFs, nested in such a 
     way that it can be easily unpacked when filling in the runfiles; 
@@ -754,7 +754,7 @@ def get_runfile(model, directory):
 
     Parameters
     ----------
-    model: OrderedDict
+    model: collections.OrderedDict
         Dictionary containing the model data.
     directory : str 
         Directory in which the model will be written (and therefore necessary 
@@ -762,8 +762,8 @@ def get_runfile(model, directory):
 
     Returns
     -------
-    parameter_values : OrderedDict
-        OrderedDictionary containing all the values necessary for filling in a 
+    parameter_values : collections.OrderedDict
+        Dictionary containing all the values necessary for filling in a 
         runfile. Nested in such a way that it can be easily unpacked in a 
         template.
     
@@ -780,8 +780,8 @@ def get_runfile(model, directory):
     runfile_parameters = default_runfile.copy()
     runfile_parameters.update(bounds)
 
-    packages = OrderedDict()
-    stress_periods = OrderedDict()
+    packages = collections.OrderedDict()
+    stress_periods = collections.OrderedDict()
 
     package_names = {key.split("-")[0] for key in consumed_model.keys()}
     PACKAGE_CONTENT = tuple(package_schema)
@@ -814,7 +814,9 @@ def get_runfile(model, directory):
     if times:
         runfile_parameters["time_discretisation"] = _time_discretisation(times)
     else:
-        runfile_parameters["time_discretisation"] = OrderedDict([("steady-state", 0)])
+        runfile_parameters["time_discretisation"] = collections.OrderedDict(
+            [("steady-state", 0)]
+        )
 
     return runfile_parameters
 
@@ -835,7 +837,7 @@ def write_runfile(path, runfile_parameters):
     ----------
     path : str
         Path to write runfile contents to.
-    runfile_parameters : OrderedDict
+    runfile_parameters : collections.OrderedDict
         Dictionary used to fill in runfile.
     
     Returns
@@ -851,7 +853,7 @@ def write_runfile(path, runfile_parameters):
 
 def seawat_get_runfile(model, directory):
     """
-    Generates an OrderedDict containing the values to be filled in in a runfile 
+    Generates an collections.OrderedDict containing the values to be filled in in a runfile 
     template, from the data contained in `model`, specifically for an
     IMODSEAWAT model.
 
@@ -870,7 +872,7 @@ def seawat_get_runfile(model, directory):
 
     Parameters
     ----------
-    model: OrderedDict
+    model: collections.OrderedDict
         Dictionary containing the model data.
     directory : str
         Directory in which the model will be written (and therefore necessary 
@@ -878,8 +880,8 @@ def seawat_get_runfile(model, directory):
 
     Returns
     -------
-    parameter_values : OrderedDict
-        OrderedDictionary containing all the values necessary for filling in a 
+    parameter_values : collections.OrderedDict
+        Dictionary containing all the values necessary for filling in a 
         runfile. Nested in such a way that it can be easily unpacked in a 
         template.
     
@@ -894,8 +896,8 @@ def seawat_get_runfile(model, directory):
     runfile_parameters = seawat_default_runfile.copy()
     runfile_parameters.update(bounds)
 
-    packages = OrderedDict()
-    stress_periods = OrderedDict()
+    packages = collections.OrderedDict()
+    stress_periods = collections.OrderedDict()
 
     package_names = {key.split("-")[0] for key in consumed_model.keys()}
     PACKAGE_CONTENT = tuple(seawat_package_schema)
@@ -945,7 +947,7 @@ def seawat_write_runfile(path, runfile_parameters):
     ----------
     path : str
         Path to write runfile contents to.
-    runfile_parameters : OrderedDict
+    runfile_parameters : collections.OrderedDict
         Dictionary used to fill in runfile.
     
     Returns

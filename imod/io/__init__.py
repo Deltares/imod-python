@@ -25,8 +25,8 @@ def write(path, model, name=None, runfile_parameters=None):
     ----------
     path : str
         The directory to write the model to.
-    model : OrderedDict
-        `OrderedDict` containing the package data as `xarray.DataArray` or
+    model : collections.OrderedDict
+        Dictionary containing the package data as `xarray.DataArray` or
         `pandas.DataFrame`.
     name : str
         Name given to the runfile. Defaults to "runfile".
@@ -130,8 +130,8 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
     ----------
     path : str
         The directory to write the model to.
-    model : OrderedDict
-        `OrderedDict` containing the package data as `xarray.DataArray` or
+    model : collections.OrderedDict
+        Dictionary containing the package data as `xarray.DataArray` or
         `pandas.DataFrame`.
     name : str
         Name given to the runfile. Defaults to "runfile".

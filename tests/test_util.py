@@ -1,6 +1,6 @@
 import os
 import pathlib
-from collections import OrderedDict
+import collections
 from datetime import datetime
 
 import cftime
@@ -26,7 +26,7 @@ def test_compose():
 
 def test_decompose():
     d = util.decompose("path/to/head_20180222090657_l5.idf")
-    refd = OrderedDict(
+    refd = collections.OrderedDict(
         [
             ("extension", ".idf"),
             ("directory", pathlib.Path("path", "to")),
@@ -35,13 +35,13 @@ def test_decompose():
             ("layer", 5),
         ]
     )
-    assert isinstance(d, OrderedDict)
+    assert isinstance(d, collections.OrderedDict)
     assert d == refd
 
 
 def test_decompose_dateonly():
     d = util.decompose("20180222090657.idf")
-    refd = OrderedDict(
+    refd = collections.OrderedDict(
         [
             ("extension", ".idf"),
             ("directory", pathlib.Path(".")),
@@ -49,7 +49,7 @@ def test_decompose_dateonly():
             ("time", datetime(2018, 2, 22, 9, 6, 57)),
         ]
     )
-    assert isinstance(d, OrderedDict)
+    assert isinstance(d, collections.OrderedDict)
     assert d == refd
 
 
@@ -69,7 +69,7 @@ def test_compose_year9999():
 
 def test_decompose_dateonly_year9999():
     d = util.decompose("99990222090657.idf")
-    refd = OrderedDict(
+    refd = collections.OrderedDict(
         [
             ("extension", ".idf"),
             ("directory", pathlib.Path(".")),
@@ -77,7 +77,7 @@ def test_decompose_dateonly_year9999():
             ("time", datetime(9999, 2, 22, 9, 6, 57)),
         ]
     )
-    assert isinstance(d, OrderedDict)
+    assert isinstance(d, collections.OrderedDict)
     assert d == refd
 
 

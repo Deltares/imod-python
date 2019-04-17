@@ -1,7 +1,7 @@
 import pathlib
 import re
 import warnings
-from collections import OrderedDict
+import collections
 from datetime import datetime
 
 import cftime
@@ -20,7 +20,7 @@ def decompose(path):
     name = parts[0]
     if name == "":
         raise ValueError("DataArray name cannot be empty")
-    d = OrderedDict()
+    d = collections.OrderedDict()
     d["extension"] = path.suffix
     d["directory"] = path.parent
     d["name"] = name

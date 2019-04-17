@@ -48,8 +48,8 @@ def _timestep_duration(times):
     
     Returns
     -------
-    OrderedDict
-        OrderedDict with dates as strings for keys,
+    collections.OrderedDict
+        Dictionary with dates as strings for keys,
         stress period duration (in days) as values.
     """
     times = sorted([_to_datetime(t) for t in times])

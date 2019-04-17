@@ -1,5 +1,5 @@
 import numpy as np
-from collections import OrderedDict
+import collections
 import xarray as xr
 import re
 import functools
@@ -10,15 +10,17 @@ def header(path):
     """Get the Tecplot ASCII header as a dictionary"""
     with open(path) as f:
         d = {}
-        attrs = OrderedDict()
-        coords = OrderedDict()
+        attrs = collections.OrderedDict()
+        coords = collections.OrderedDict()
 
         line1 = f.readline()
         line1_parts = [
             part.strip().lower() for part in line1.replace('"', "").split(",")
         ]
         nvars = len(line1_parts) - 3
-        d["data_vars"] = OrderedDict((var, None) for var in line1_parts[3 : 3 + nvars])
+        d["data_vars"] = collections.OrderedDict(
+            (var, None) for var in line1_parts[3 : 3 + nvars]
+        )
 
         line2 = f.readline()
         line2 = "".join(line2.split())  # remove all whitespace
