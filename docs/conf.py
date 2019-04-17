@@ -23,7 +23,7 @@ import imod
 # -- Project information -----------------------------------------------------
 
 project = "imod-python"
-copyright = "2018, Martijn Visser"
+copyright = "Deltares"
 author = "Martijn Visser"
 
 # The short X.Y version

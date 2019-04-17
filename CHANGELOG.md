@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2019-04-17
+
+### Added
+- Support nonequidistant models in runfile
+
+### Fixed
+- Time conversion in runfile now also accepts cftime objects
+
 ## [0.6.0] - 2019-03-15
 
 The primary change is that a number of functions have been renamed to better communicate what they do.
