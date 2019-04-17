@@ -1,13 +1,14 @@
-from glob import glob
 import os
+import pathlib
 from collections import OrderedDict
-from pathlib import Path
+from glob import glob
 
+import cftime
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-import cftime
+
 from imod.io import idf
 
 
@@ -197,7 +198,7 @@ def test_xycoords_nonequidistant():
 
 def test_saveopen(test_da):
     idf.save("test.idf", test_da)
-    assert Path("test.idf").exists()
+    assert pathlib.Path("test.idf").exists()
     da = idf.open("test.idf")
     assert isinstance(da, xr.DataArray)
     assert da.identical(test_da)
@@ -210,7 +211,7 @@ def test_save__int32coords(test_da__nodxdy):
     test_da.x.values = test_da.x.values.astype(np.int32)
     test_da.y.values = test_da.y.values.astype(np.int32)
     idf.save("testnodxdy.idf", test_da)
-    assert Path("testnodxdy.idf").exists()
+    assert pathlib.Path("testnodxdy.idf").exists()
 
 
 def test_saveopen__nptime(test_nptimeda):
@@ -253,7 +254,7 @@ def test_saveopen_timelayer(test_timelayerda):
 
 def test_saveopen__nonequidistant(test_da_nonequidistant):
     idf.save("nonequidistant.idf", test_da_nonequidistant)
-    assert Path("nonequidistant.idf").exists()
+    assert pathlib.Path("nonequidistant.idf").exists()
     da = idf.open("nonequidistant.idf")
     assert isinstance(da, xr.DataArray)
     assert np.array_equal(da, test_da_nonequidistant)

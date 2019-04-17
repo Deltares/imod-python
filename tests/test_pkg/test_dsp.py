@@ -1,4 +1,4 @@
-from pathlib import Path
+import pathlib
 
 import numpy as np
 import pytest
@@ -29,7 +29,7 @@ def dispersion(request):
 
 def test_render_idf(dispersion):
     dsp = dispersion
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "[dsp]\n"
@@ -52,7 +52,7 @@ def test_render_idf(dispersion):
 
 def test_render_constant(dispersion):
     dsp = Dispersion(1.0, 1.0, 1.0, 1.0)
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "[dsp]\n"
@@ -69,7 +69,7 @@ def test_render_constant_per_layer(dispersion):
     dsp = dispersion
     # Get rid of x and y, so it's no longer an idf
     dsp = dsp.isel(x=0, y=0).drop(["y", "x", "dx", "dy"])
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "[dsp]\n"

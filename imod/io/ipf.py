@@ -1,11 +1,12 @@
 import csv
+import pathlib
 from collections import OrderedDict
 from glob import glob
 from io import StringIO
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
 from imod.io import util
 
 
@@ -33,7 +34,7 @@ def _read(path, kwargs={}, assoc_kwargs={}):
     """
 
     if isinstance(path, str):
-        path = Path(path)
+        path = pathlib.Path(path)
 
     with open(path) as f:
         nrow = int(f.readline().strip())
@@ -89,7 +90,7 @@ def read_associated(path, kwargs={}):
 
     # deal with e.g. incorrect capitalization
     if isinstance(path, str):
-        path = Path(path)
+        path = pathlib.Path(path)
     path = path.resolve()
 
     with open(path) as f:
@@ -203,10 +204,10 @@ def read(path, kwargs={}, assoc_kwargs={}):
     """
 
     # convert since for Path.glob non-relative patterns are unsupported
-    if isinstance(path, Path):
+    if isinstance(path, pathlib.Path):
         path = str(path)
 
-    paths = [Path(p) for p in glob(path)]
+    paths = [pathlib.Path(p) for p in glob(path)]
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")

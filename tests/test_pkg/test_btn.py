@@ -1,8 +1,10 @@
-from imod.pkg import BasicTransport
+import pathlib
+
+import numpy as np
 import pytest
 import xarray as xr
-import numpy as np
-from pathlib import Path
+
+from imod.pkg import BasicTransport
 
 
 @pytest.fixture(scope="module")
@@ -31,7 +33,7 @@ def basictransport(request):
 
 def test_btn_render_arrays(basictransport):
     btn = basictransport
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "[btn]\n"
@@ -60,7 +62,7 @@ def test_btn_render_arrays(basictransport):
 
 def test_btn_render_constants(basictransport):
     btn = basictransport
-    directory = Path(".")
+    directory = pathlib.Path(".")
     layer = np.arange(1, 4)
     layer_type = xr.DataArray(1)
     btn["starting_concentration"] = 0.0

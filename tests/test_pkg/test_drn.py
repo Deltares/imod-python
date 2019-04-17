@@ -1,9 +1,10 @@
-from pathlib import Path
+import pathlib
 
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+
 from imod.pkg import Drainage
 
 
@@ -25,7 +26,7 @@ def drainage(request):
 
 def test_render(drainage):
     drn = drainage
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "\n"
@@ -42,7 +43,7 @@ def test_render(drainage):
 
 def test_render_with_time(drainage):
     drn = drainage
-    directory = Path(".")
+    directory = pathlib.Path(".")
     elev = drn["elevation"]
     datetimes = pd.date_range("2000-01-01", "2000-01-02")
 

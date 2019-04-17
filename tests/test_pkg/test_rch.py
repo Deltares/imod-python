@@ -1,9 +1,10 @@
-from pathlib import Path
+import pathlib
 
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+
 from imod.pkg import RechargeHighestActive
 
 
@@ -24,7 +25,7 @@ def recharge_ha(request):
 
 def test_render(recharge_ha):
     rch = recharge_ha
-    directory = Path(".")
+    directory = pathlib.Path(".")
     compare = (
         "[rch]\n"
         "    nrchop = 3\n"

@@ -6,7 +6,7 @@ import itertools
 import jinja2
 from imod.io import util
 from imod.io import idf
-from pathlib import Path
+import pathlib
 from collections import OrderedDict
 import cftime
 
@@ -775,7 +775,7 @@ def get_runfile(model, directory):
     times = bounds.pop("times", False)
 
     if isinstance(directory, str):
-        directory = Path(directory)
+        directory = pathlib.Path(directory)
     directory = directory.absolute()  # as iMODFLOW supports only absolute paths
     runfile_parameters = default_runfile.copy()
     runfile_parameters.update(bounds)
@@ -889,7 +889,7 @@ def seawat_get_runfile(model, directory):
     times = bounds.pop("times", False)
 
     if isinstance(directory, str):
-        directory = Path(directory)
+        directory = pathlib.Path(directory)
     directory = directory.absolute()  # as iMODFLOW supports only absolute paths
     runfile_parameters = seawat_default_runfile.copy()
     runfile_parameters.update(bounds)

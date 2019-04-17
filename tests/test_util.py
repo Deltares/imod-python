@@ -1,25 +1,26 @@
 import os
+import pathlib
 from collections import OrderedDict
 from datetime import datetime
-from pathlib import Path
 
 import cftime
 import numpy as np
 import pytest
+
 from imod.io import util
 
 
 def test_compose():
     d = {
         "name": "head",
-        "directory": Path("path", "to"),
+        "directory": pathlib.Path("path", "to"),
         "extension": ".idf",
         "layer": 5,
         "time": datetime(2018, 2, 22, 9, 6, 57),
     }
     path = util.compose(d)
-    assert isinstance(path, Path)
-    targetpath = Path(d["directory"], "head_20180222090657_l5.idf")
+    assert isinstance(path, pathlib.Path)
+    targetpath = pathlib.Path(d["directory"], "head_20180222090657_l5.idf")
     assert path == targetpath
 
 
@@ -28,7 +29,7 @@ def test_decompose():
     refd = OrderedDict(
         [
             ("extension", ".idf"),
-            ("directory", Path("path", "to")),
+            ("directory", pathlib.Path("path", "to")),
             ("name", "head"),
             ("time", datetime(2018, 2, 22, 9, 6, 57)),
             ("layer", 5),
@@ -43,7 +44,7 @@ def test_decompose_dateonly():
     refd = OrderedDict(
         [
             ("extension", ".idf"),
-            ("directory", Path(".")),
+            ("directory", pathlib.Path(".")),
             ("name", "20180222090657"),
             ("time", datetime(2018, 2, 22, 9, 6, 57)),
         ]
@@ -55,14 +56,14 @@ def test_decompose_dateonly():
 def test_compose_year9999():
     d = {
         "name": "head",
-        "directory": Path("path", "to"),
+        "directory": pathlib.Path("path", "to"),
         "extension": ".idf",
         "layer": 5,
         "time": datetime(9999, 2, 22, 9, 6, 57),
     }
     path = util.compose(d)
-    assert isinstance(path, Path)
-    targetpath = Path(d["directory"], "head_99990222090657_l5.idf")
+    assert isinstance(path, pathlib.Path)
+    targetpath = pathlib.Path(d["directory"], "head_99990222090657_l5.idf")
     assert path == targetpath
 
 
@@ -71,7 +72,7 @@ def test_decompose_dateonly_year9999():
     refd = OrderedDict(
         [
             ("extension", ".idf"),
-            ("directory", Path(".")),
+            ("directory", pathlib.Path(".")),
             ("name", "99990222090657"),
             ("time", datetime(9999, 2, 22, 9, 6, 57)),
         ]

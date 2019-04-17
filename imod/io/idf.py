@@ -3,7 +3,7 @@ import warnings
 from collections import OrderedDict
 from datetime import datetime
 from glob import glob
-from pathlib import Path
+import pathlib
 from struct import pack, unpack
 
 import imod
@@ -352,10 +352,10 @@ def open(path, memmap=False, use_cftime=False):
 
     if isinstance(path, list):
         return _load(path, use_cftime)
-    elif isinstance(path, Path):
+    elif isinstance(path, pathlib.Path):
         path = str(path)
 
-    paths = [Path(p) for p in glob(path)]
+    paths = [pathlib.Path(p) for p in glob(path)]
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
@@ -462,10 +462,10 @@ def open_dataset(globpath, memmap=False, use_cftime=False):
         warnings.warn("memmap option is removed", FutureWarning)
 
     # convert since for Path.glob non-relative patterns are unsupported
-    if isinstance(globpath, Path):
+    if isinstance(globpath, pathlib.Path):
         globpath = str(globpath)
 
-    paths = [Path(p) for p in glob(globpath, recursive=True)]
+    paths = [pathlib.Path(p) for p in glob(globpath, recursive=True)]
 
     n = len(paths)
     if n == 0:

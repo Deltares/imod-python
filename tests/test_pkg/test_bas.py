@@ -1,8 +1,10 @@
-from imod.pkg import BasicFlow
-import xarray as xr
+import pathlib
+
 import numpy as np
 import pytest
-from pathlib import Path
+import xarray as xr
+
+from imod.pkg import BasicFlow
 
 
 @pytest.fixture(scope="module")
@@ -34,7 +36,7 @@ def test_thickness(basicflow):
 
 def test_render(basicflow):
     bas = basicflow
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "[bas6]\n"
@@ -51,7 +53,7 @@ def test_render(basicflow):
 
 def test_render_dis__scalartopbot(basicflow):
     bas = basicflow
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "[dis]\n"
@@ -72,7 +74,7 @@ def test_render_dis__arraytopbot(basicflow):
     bas = basicflow
     bas["bottom"] = xr.full_like(bas["ibound"], 10.0)
     bas["top"] = bas["bottom"].isel(layer=0)
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "[dis]\n"

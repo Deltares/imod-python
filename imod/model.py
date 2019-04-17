@@ -1,12 +1,16 @@
 """
 Contains an imodseawat model object
 """
+import pathlib
 from collections import UserDict
-from pathlib import Path
 
 import cftime
-import imod.pkg
 import jinja2
+import numpy as np
+import pandas as pd
+import xarray as xr
+
+import imod.pkg
 from imod.io import util
 from imod.pkg.pkggroup import (
     DrainageGroup,
@@ -14,9 +18,6 @@ from imod.pkg.pkggroup import (
     PackageGroups,
     RiverGroup,
 )
-import numpy as np
-import pandas as pd
-import xarray as xr
 
 
 def _to_datetime(time):
@@ -263,7 +264,7 @@ class SeawatModel(Model):
         """
         diskey = self._get_pkgkey("dis")
         globaltimes = self[diskey]["time"].values
-        directory = Path(self.modelname)
+        directory = pathlib.Path(self.modelname)
 
         modflowcontent, ssmcontent = self._render_groups(
             directory=directory, globaltimes=globaltimes

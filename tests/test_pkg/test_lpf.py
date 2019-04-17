@@ -1,4 +1,4 @@
-from pathlib import Path
+import pathlib
 
 import numpy as np
 import pytest
@@ -38,7 +38,7 @@ def layerpropertyflow(request):
 
 def test_render(layerpropertyflow):
     lpf = layerpropertyflow
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "[lpf]\n"

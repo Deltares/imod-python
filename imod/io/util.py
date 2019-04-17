@@ -1,8 +1,8 @@
+import pathlib
 import re
+import warnings
 from collections import OrderedDict
 from datetime import datetime
-from pathlib import Path
-import warnings
 
 import cftime
 import numpy as np
@@ -14,7 +14,7 @@ def decompose(path):
     """Parse a path, returning a dict of the parts,
     following the iMOD conventions"""
     if isinstance(path, str):
-        path = Path(path)
+        path = pathlib.Path(path)
 
     parts = path.stem.split("_")
     name = parts[0]

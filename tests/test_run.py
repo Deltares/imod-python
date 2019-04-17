@@ -1,14 +1,16 @@
-import pytest
 import os
+import pathlib
 import shutil
+from collections import OrderedDict
+
+import cftime
 import numpy as np
 import pandas as pd
+import pytest
 import xarray as xr
+
 import imod
 from imod.io import run
-from collections import OrderedDict
-from pathlib import Path
-import cftime
 
 
 @pytest.fixture(scope="module")
@@ -242,7 +244,7 @@ def test_get_package():
     }
     da = xr.DataArray(data=data, coords=coords, dims=dims)
     package = {"ani-angle": da, "ani-factor": da}
-    directory = Path("dbase")
+    directory = pathlib.Path("dbase")
     d = run._get_package(package, directory, run.package_schema)
     assert isinstance(d, OrderedDict)
 
@@ -261,7 +263,7 @@ def test_get_package__error():
     }
     da = xr.DataArray(data=data, coords=coords, dims=dims)
     package = {"ani-angle": da}
-    directory = Path("dbase")
+    directory = pathlib.Path("dbase")
     with pytest.raises(KeyError):
         run._get_package(package, directory, run.package_schema)
 
@@ -281,7 +283,7 @@ def test_get_period():
     }
     da = xr.DataArray(data=data, coords=coords, dims=dims)
     package = {"riv-stage": da, "riv-cond": da, "riv-bot": da, "riv-inff": da}
-    directory = Path("dbase")
+    directory = pathlib.Path("dbase")
 
     d = run._get_period(package, times, directory, run.stress_period_schema)
     assert isinstance(d, OrderedDict)
@@ -291,7 +293,7 @@ def test_get_runfile__steady_state(make_test_model):
     test_model = make_test_model(transient=False)
     modeldata = test_model["modeldata"]
     nlayer = test_model["nlayer"]
-    d = run.get_runfile(modeldata, directory=Path("dbase"))
+    d = run.get_runfile(modeldata, directory=pathlib.Path("dbase"))
 
     assert d["nper"] == 1
 
@@ -300,28 +302,30 @@ def test_get_runfile__steady_state(make_test_model):
         for layer in range(1, nlayer + 1):
             assert (
                 package[layer]
-                == Path("dbase/{}/{}_l{}.idf".format(name, name, layer)).absolute()
+                == pathlib.Path(
+                    "dbase/{}/{}_l{}.idf".format(name, name, layer)
+                ).absolute()
             )
 
     assert (
         d["stress_periods"]["rch"]["value"]["default_system"][-1][0]
-        == Path("dbase/rch/rch_l-1.idf").absolute()
+        == pathlib.Path("dbase/rch/rch_l-1.idf").absolute()
     )
     assert (
         d["stress_periods"]["ghb"]["head"]["default_system"][1][0]
-        == Path("dbase/ghb/ghb-head_l1.idf").absolute()
+        == pathlib.Path("dbase/ghb/ghb-head_l1.idf").absolute()
     )
     assert (
         d["stress_periods"]["ghb"]["cond"]["default_system"][1][0]
-        == Path("dbase/ghb/ghb-cond_l1.idf").absolute()
+        == pathlib.Path("dbase/ghb/ghb-cond_l1.idf").absolute()
     )
     assert (
         d["stress_periods"]["ghb"]["head"]["sys2"][1][0]
-        == Path("dbase/ghb/ghb-head-sys2_l1.idf").absolute()
+        == pathlib.Path("dbase/ghb/ghb-head-sys2_l1.idf").absolute()
     )
     assert (
         d["stress_periods"]["ghb"]["cond"]["sys2"][1][0]
-        == Path("dbase/ghb/ghb-cond-sys2_l1.idf").absolute()
+        == pathlib.Path("dbase/ghb/ghb-cond-sys2_l1.idf").absolute()
     )
 
 
@@ -331,7 +335,7 @@ def test_get_runfile__transient(make_test_model):
     times = test_model["times"]
     nlayer = test_model["nlayer"]
     ntime = test_model["ntime"]
-    d = run.get_runfile(modeldata, directory=Path("dbase"))
+    d = run.get_runfile(modeldata, directory=pathlib.Path("dbase"))
 
     assert d["nper"] == ntime - 1
 
@@ -340,29 +344,31 @@ def test_get_runfile__transient(make_test_model):
         for layer in range(1, nlayer + 1):
             assert (
                 package[layer]
-                == Path("dbase/{}/{}_l{}.idf".format(name, name, layer)).absolute()
+                == pathlib.Path(
+                    "dbase/{}/{}_l{}.idf".format(name, name, layer)
+                ).absolute()
             )
 
     for i, time in enumerate(times[:-1]):
         assert (
             d["stress_periods"]["rch"]["value"]["default_system"][-1][i]
-            == Path(
+            == pathlib.Path(
                 "dbase/rch/rch_{}_l-1.idf".format(time.strftime("%Y%m%d%H%M%S"))
             ).absolute()
         )
         assert (
             d["stress_periods"]["ghb"]["head"]["default_system"][1][i]
-            == Path(
+            == pathlib.Path(
                 "dbase/ghb/ghb-head_{}_l1.idf".format(time.strftime("%Y%m%d%H%M%S"))
             ).absolute()
         )
         assert (
             d["stress_periods"]["ghb"]["cond"]["default_system"][1][i]
-            == Path("dbase/ghb/ghb-cond_l1.idf").absolute()
+            == pathlib.Path("dbase/ghb/ghb-cond_l1.idf").absolute()
         )
         assert (
             d["stress_periods"]["ghb"]["head"]["sys2"][1][i]
-            == Path(
+            == pathlib.Path(
                 "dbase/ghb/ghb-head-sys2_{}_l1.idf".format(
                     time.strftime("%Y%m%d%H%M%S")
                 )
@@ -370,14 +376,14 @@ def test_get_runfile__transient(make_test_model):
         )
         assert (
             d["stress_periods"]["ghb"]["cond"]["sys2"][1][i]
-            == Path("dbase/ghb/ghb-cond-sys2_l1.idf").absolute()
+            == pathlib.Path("dbase/ghb/ghb-cond-sys2_l1.idf").absolute()
         )
 
 
 def test_write_runfile__steady_state(make_test_model):
     test_model = make_test_model(transient=False)
     modeldata = test_model["modeldata"]
-    directory = Path(os.getcwd())
+    directory = pathlib.Path(os.getcwd())
     runfile_parameters = run.get_runfile(modeldata, directory)
     path = directory.joinpath("runfile.run")
     run.write_runfile(path, runfile_parameters)
@@ -401,7 +407,7 @@ def test_write_runfile__well_steady_state(make_test_model):
         }
     )
     modeldata["wel"] = weldata
-    directory = Path(os.getcwd())
+    directory = pathlib.Path(os.getcwd())
     runfile_parameters = run.get_runfile(modeldata, directory)
     path = directory.joinpath("runfile.run")
     run.write_runfile(path, runfile_parameters)
@@ -416,7 +422,7 @@ def test_write_runfile__well_steady_state(make_test_model):
 def test_write_runfile__transient(make_test_model):
     test_model = make_test_model(transient=True)
     modeldata = test_model["modeldata"]
-    directory = Path(os.getcwd())
+    directory = pathlib.Path(os.getcwd())
     runfile_parameters = run.get_runfile(modeldata, directory)
     path = directory.joinpath("runfile.run")
     run.write_runfile(path, runfile_parameters)
@@ -449,7 +455,7 @@ def test_write_runfile__well_transient(make_test_model):
         dfs.append(df_t)
 
     modeldata["wel"] = pd.concat(dfs, sort=False)
-    directory = Path(os.getcwd())
+    directory = pathlib.Path(os.getcwd())
     runfile_parameters = run.get_runfile(modeldata, directory)
     path = directory.joinpath("runfile.run")
     run.write_runfile(path, runfile_parameters)
@@ -464,7 +470,7 @@ def test_write_runfile__well_transient(make_test_model):
 def test_write__transient(make_test_model):
     test_model = make_test_model(transient=True)
     modeldata = test_model["modeldata"]
-    directory = Path(os.getcwd())
+    directory = pathlib.Path(os.getcwd())
     path = directory.joinpath("test_write")
     imod.io.write(path, modeldata)
 
@@ -473,7 +479,7 @@ def test_write__transient(make_test_model):
     for name in ["bnd", "shd", "kdw", "vcw"]:
         package = runfile_parameters["packages"][name]["value"]
         for layer in range(1, 1 + nlayer):
-            assert Path(package[layer]).exists()
+            assert pathlib.Path(package[layer]).exists()
 
     for name in ["ghb", "rch"]:
         package = runfile_parameters["stress_periods"][name]
@@ -481,7 +487,7 @@ def test_write__transient(make_test_model):
             for system in field.values():
                 for layer in system.values():
                     for path in layer:  # data of single stress period
-                        assert Path(path).exists()
+                        assert pathlib.Path(path).exists()
 
 
 def test_write__basic_seawat(make_test_model):
@@ -566,15 +572,17 @@ def test_write__basic_seawat(make_test_model):
 
     imod.io.seawat_write("test_write", model)
 
-    runfile_parameters = imod.io.run.seawat_get_runfile(model, Path("test_write"))
+    runfile_parameters = imod.io.run.seawat_get_runfile(
+        model, pathlib.Path("test_write")
+    )
     for name in ["top", "bot", "thickness", "shd", "sconc", "khv", "kva", "sto", "por"]:
         package = runfile_parameters["packages"][name]["value"]
         for layer in range(1, 1 + nlayer):
-            assert Path(package[layer]).exists()
+            assert pathlib.Path(package[layer]).exists()
 
     package = runfile_parameters["packages"]["dsp"]["al"]
     for layer in range(1, 1 + nlayer):
-        assert Path(package[layer]).exists()
+        assert pathlib.Path(package[layer]).exists()
 
     for name in ["ghb", "rch"]:
         package = runfile_parameters["stress_periods"][name]
@@ -582,4 +590,4 @@ def test_write__basic_seawat(make_test_model):
             for system in field.values():
                 for layer in system.values():
                     for path in layer:  # data of single stress period
-                        assert Path(path).exists()
+                        assert pathlib.Path(path).exists()
