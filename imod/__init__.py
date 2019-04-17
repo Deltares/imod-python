@@ -1,8 +1,3 @@
-from imod._version import get_versions
-
-__version__ = get_versions()["version"]
-del get_versions
-
 from imod import io, pre
 from imod.model import SeawatModel
 
@@ -20,3 +15,8 @@ try:
     from imod.io import rasterio
 except ImportError:
     pass
+
+from imod._version import get_versions
+
+__version__ = get_versions()["version"]
+del get_versions

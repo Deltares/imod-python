@@ -1,5 +1,3 @@
-import jinja2
-
 from imod.pkg.pkgbase import BoundaryCondition
 
 # class GeneralHeadBoundaryGroup(object):

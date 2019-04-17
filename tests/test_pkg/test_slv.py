@@ -1,7 +1,5 @@
 from imod.pkg import PreconditionedConjugateGradientSolver
 from imod.pkg import GeneralizedConjugateGradientSolver
-from imod.pkg import ParallelKrylovFlowSolver
-from imod.pkg import ParallelKrylovTransportSolver
 
 
 def test_pcg_render():

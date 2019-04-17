@@ -1,6 +1,5 @@
 import collections
 import datetime
-import os
 import pathlib
 
 import cftime

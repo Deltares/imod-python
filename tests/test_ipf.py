@@ -1,4 +1,3 @@
-import collections
 import glob
 import os
 import pathlib
@@ -6,7 +5,6 @@ import pathlib
 import numpy as np
 import pandas as pd
 import pytest
-import xarray as xr
 
 from imod.io import ipf
 

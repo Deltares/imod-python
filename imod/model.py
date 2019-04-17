@@ -12,12 +12,7 @@ import xarray as xr
 
 import imod.pkg
 from imod.io import util
-from imod.pkg.pkggroup import (
-    DrainageGroup,
-    GeneralHeadBoundaryGroup,
-    PackageGroups,
-    RiverGroup,
-)
+from imod.pkg.pkggroup import PackageGroups
 
 
 def _to_datetime(time):

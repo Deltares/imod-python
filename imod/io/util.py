@@ -7,7 +7,6 @@ import warnings
 import affine
 import cftime
 import numpy as np
-import xarray as xr
 
 
 def decompose(path):

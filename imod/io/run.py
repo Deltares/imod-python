@@ -1,11 +1,9 @@
-import os
 import xarray as xr
 import pandas as pd
 import numpy as np
 import itertools
 import jinja2
 from imod.io import util
-from imod.io import idf
 import pathlib
 import collections
 import cftime
@@ -706,6 +704,10 @@ def _get_package(package, directory, package_schema):
         Dictionary containing the generated paths (IDF, IPF) for a single package. 
     """
     package_data = collections.OrderedDict()
+
+    if not package:
+        return package_data
+
     for key, da in package.items():
         name = key.split("-")[0]
         try:

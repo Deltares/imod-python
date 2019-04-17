@@ -32,8 +32,7 @@ class Dispersion(Package):
         self["diffusion_coefficient"] = diffusion_coefficient
 
     def _render(self, directory, *args, **kwargs):
-        d = {}
-        d["mapping"] = self._mapping
+        d = {"mapping": self._mapping}
         dicts = {}
 
         for varname in self.data_vars.keys():

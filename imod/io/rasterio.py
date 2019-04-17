@@ -1,9 +1,7 @@
 import pathlib
 
-import affine
 import numpy as np
 import rasterio
-import xarray as xr
 
 from imod.io import idf, util
 

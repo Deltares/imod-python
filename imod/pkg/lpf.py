@@ -1,8 +1,5 @@
 import jinja2
-import numpy as np
-import xarray as xr
 
-from imod.io import util
 from imod.pkg.pkgbase import Package
 
 
