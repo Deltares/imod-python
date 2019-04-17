@@ -1,16 +1,16 @@
+import glob
 import os
-import pytest
-from imod.io import ipf
+import pathlib
+
 import numpy as np
-from collections import OrderedDict
-import xarray as xr
 import pandas as pd
-from pathlib import Path
-from glob import glob
+import pytest
+
+from imod.io import ipf
 
 
 def remove(globpath):
-    paths = glob(globpath)
+    paths = glob.glob(globpath)
     for p in paths:
         try:
             os.remove(p)
@@ -24,7 +24,7 @@ def write_basic_ipf(request):
     # factory function seems easiest way to parameterize tests
     def _write_basic_ipf(path, delim):
         if isinstance(path, str):
-            path = Path(path)
+            path = pathlib.Path(path)
         path.parent.mkdir(exist_ok=True, parents=True)
         ipfstring = (
             "2\n"
@@ -54,7 +54,7 @@ def write_basic_ipf(request):
 def write_assoc_ipf(request):
     def _write_assoc_ipf(path, delim, assoc_delim):
         if isinstance(path, str):
-            path = Path(path)
+            path = pathlib.Path(path)
         path.parent.mkdir(exist_ok=True, parents=True)
         ipfstring = (
             "2\n"
@@ -327,9 +327,9 @@ def test_save__assoc_itype1():
     )
 
     ipf.save("save.ipf", df, itype=1, nodata=-999.0)
-    assert Path("save.ipf").exists()
-    assert Path("A1.txt").exists()
-    assert Path("B2.txt").exists()
+    assert pathlib.Path("save.ipf").exists()
+    assert pathlib.Path("A1.txt").exists()
+    assert pathlib.Path("B2.txt").exists()
     df2 = ipf.read("save.ipf")
     df = df.sort_values(by="x")
     df2.index = df.index
@@ -354,9 +354,9 @@ def test_save__assoc_itype2_():
     )
 
     ipf.save("save.ipf", df, itype=2, nodata=-999.0)
-    assert Path("save.ipf").exists()
-    assert Path("A1.txt").exists()
-    assert Path("B2.txt").exists()
+    assert pathlib.Path("save.ipf").exists()
+    assert pathlib.Path("A1.txt").exists()
+    assert pathlib.Path("B2.txt").exists()
     df2 = ipf.read("save.ipf")
     df = df.sort_values(by="x")
     df2 = df2.sort_values(by="x")
@@ -392,12 +392,12 @@ def test_save__assoc_itype1__layers():
     )
 
     ipf.save("save.ipf", df, itype=1, nodata=-999.0)
-    assert Path("save_l1.ipf").exists()
-    assert Path("save_l3.ipf").exists()
-    assert Path("A1.txt").exists()
-    assert Path("B2.txt").exists()
-    assert Path("C3.txt").exists()
-    assert Path("D4.txt").exists()
+    assert pathlib.Path("save_l1.ipf").exists()
+    assert pathlib.Path("save_l3.ipf").exists()
+    assert pathlib.Path("A1.txt").exists()
+    assert pathlib.Path("B2.txt").exists()
+    assert pathlib.Path("C3.txt").exists()
+    assert pathlib.Path("D4.txt").exists()
     df2 = ipf.read("save_l*.ipf")
     df = df.sort_values(by="x")
     df2 = df2.sort_values(by="x")

@@ -1,4 +1,4 @@
-from pathlib import Path
+import pathlib
 
 import numpy as np
 import pytest
@@ -29,7 +29,7 @@ def headboundary(request):
 
 def test_render(headboundary):
     ghb = headboundary
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "\n"

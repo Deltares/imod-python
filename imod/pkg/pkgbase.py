@@ -53,14 +53,14 @@ class Package(xr.Dataset):
                 self._replace_keyword(d, key)
         return self._template.format(**d)
 
-    def _compose_values_layer(self, key, directory, d={}, da=None):
+    def _compose_values_layer(self, varname, directory, d={}, da=None):
         """
         Composes paths to files, or gets the appropriate scalar value for
         a single variable in a dataset.
 
         Parameters
         ----------
-        key : str
+        varname : str
             variable name of the DataArray
         directory : str
             Path to working directory, where files will be written.
@@ -69,7 +69,7 @@ class Package(xr.Dataset):
             Partially filled in dictionary with the parts of the filename.
             Used for transient data.
         da : xr.DataArray, optional
-            In some cases fetching the DataArray by key is not desired.
+            In some cases fetching the DataArray by varname is not desired.
             It can be passed directly via this optional argument.
 
         Returns
@@ -81,8 +81,8 @@ class Package(xr.Dataset):
         """
         values = {}
         if da is None:
-            da = self[key]
-        d.update({"directory": directory, "name": key, "extension": ".idf"})
+            da = self[varname]
+        d.update({"directory": directory, "name": varname, "extension": ".idf"})
 
         # Scalar value or not?
         # If it's a scalar value we can immediately write
@@ -108,8 +108,8 @@ class Package(xr.Dataset):
 
         return values
 
-    def _compose_values_time(self, key, globaltimes):
-        da = self[key]
+    def _compose_values_time(self, varname, globaltimes):
+        da = self[varname]
         values = {}
 
         if "time" in da.coords:
@@ -161,14 +161,14 @@ class BoundaryCondition(Package):
         "{%- endfor -%}"
     )
 
-    def _compose_values_timelayer(self, key, globaltimes, directory, da=None):
+    def _compose_values_timelayer(self, varname, globaltimes, directory, da=None):
         """
         Composes paths to files, or gets the appropriate scalar value for
         a single variable in a dataset.
 
         Parameters
         ----------
-        key : str
+        varname : str
             variable name of the DataArray
         globaltimes : list, np.array
             Holds the global times, i.e. the combined unique times of
@@ -182,7 +182,7 @@ class BoundaryCondition(Package):
             Path to working directory, where files will be written.
             Necessary to generate the paths for the runfile.
         da : xr.DataArray, optional
-            In some cases fetching the DataArray by key is not desired.
+            In some cases fetching the DataArray by varname is not desired.
             It can be passed directly via this optional argument.
 
         Returns
@@ -197,7 +197,7 @@ class BoundaryCondition(Package):
         values = {}
 
         if da is None:
-            da = self[key]
+            da = self[varname]
 
         if "time" in da.coords:
             # TODO: get working for cftime
@@ -213,9 +213,9 @@ class BoundaryCondition(Package):
                 time = list(filter(lambda t: t <= globaltime, package_times))[-1]
                 d["time"] = time
                 # Offset 0 counting in Python, add one
-                values[timestep + 1] = self._compose_values_layer(key, directory, d)
+                values[timestep + 1] = self._compose_values_layer(varname, directory, d)
             else:
-                values["?"] = self._compose_values_layer(key, directory)
+                values["?"] = self._compose_values_layer(varname, directory)
 
         return values
 
@@ -302,7 +302,7 @@ class BoundaryCondition(Package):
             concentration = {}
             for i, species in enumerate(self["concentration"]["species"].values):
                 concentration[i + 1] = self._compose_values_timelayer(
-                    key="concentration",
+                    varname="concentration",
                     da=self["concentration"].sel(species=species),
                     globaltimes=globaltimes,
                     directory=directory,
@@ -310,7 +310,7 @@ class BoundaryCondition(Package):
         else:
             concentration = {
                 1: self._compose_values_timelayer(
-                    key="concentration",
+                    varname="concentration",
                     da=self["concentration"],
                     globaltimes=globaltimes,
                     directory=directory,

@@ -1,8 +1,8 @@
-from collections import UserDict
-from enum import Enum
+import collections
+import enum
 
 
-class PackageGroup(UserDict):
+class PackageGroup(collections.UserDict):
     """
     Groups for packes that support multiple systems:
     * chd
@@ -13,12 +13,12 @@ class PackageGroup(UserDict):
     """
 
     def __init__(self, **kwargs):
-        UserDict.__init__(self)
+        collections.UserDict.__init__(self)
         for k, v in kwargs.items():
             self[k] = v
-        self.key_order()
+        self.reorder_keys()
 
-    def key_order(self):
+    def reorder_keys(self):
         """
         Order packages so that the one with with concentration is first.
         Check whether concentration for only one system has been defined.
@@ -112,7 +112,7 @@ class RiverGroup(PackageGroup):
 
 
 # dict might be easier than Enumerator...
-class PackageGroups(Enum):
+class PackageGroups(enum.Enum):
     chd = ConstantHeadGroup
     drn = DrainageGroup
     ghb = GeneralHeadBoundaryGroup

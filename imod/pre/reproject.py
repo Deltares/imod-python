@@ -1,8 +1,9 @@
-import numpy as np
-import xarray as xr
-import rasterio
 import affine
-from rasterio.warp import Resampling
+import numpy as np
+import rasterio
+import rasterio.warp
+import xarray as xr
+
 from imod.io import util
 
 
@@ -145,7 +146,7 @@ def reproject(
         src_crs = rasterio.crs.CRS.from_string(source.attrs["crs"])
         src_nodata = source.attrs["nodatavals"][0]
 
-    resampling_methods = {e.name: e for e in Resampling}
+    resampling_methods = {e.name: e for e in rasterio.enums.Resampling}
 
     if isinstance(method, str):
         try:
@@ -156,10 +157,10 @@ def reproject(
                     resampling_methods.keys()
                 )
             ) from e
-    elif isinstance(method, Resampling):
+    elif isinstance(method, rasterio.enums.Resampling):
         resampling_method = method
     else:
-        raise TypeError("method must be a string or rasterio.warp.Resampling")
+        raise TypeError("method must be a string or rasterio.enums.Resampling")
 
     # Givens: source, like, method. No reprojection necessary.
     if src_crs is None and dst_crs is None:
@@ -167,7 +168,7 @@ def reproject(
             raise ValueError(
                 "If crs information is not provided, `like` must be provided."
             )
-        if resampling_method == Resampling.nearest:
+        if resampling_method == rasterio.enums.Resampling.nearest:
             # this can be handled with xarray
             # xarray 0.10.9 needs .compute()
             # see https://github.com/pydata/xarray/issues/2454

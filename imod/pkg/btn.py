@@ -47,8 +47,6 @@ class BasicTransport(Package):
         Parameters
         ----------
         directory : str
-        layer_type : xr.DataArray
-            Taken from LayerPropertyFlow
         thickness : xr.DataArray
             Taken from BasicFlow
 

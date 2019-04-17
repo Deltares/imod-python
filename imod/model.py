@@ -1,22 +1,18 @@
 """
 Contains an imodseawat model object
 """
-from collections import UserDict
-from pathlib import Path
+import collections
+import pathlib
 
 import cftime
-import imod.pkg
 import jinja2
-from imod.io import util
-from imod.pkg.pkggroup import (
-    DrainageGroup,
-    GeneralHeadBoundaryGroup,
-    PackageGroups,
-    RiverGroup,
-)
 import numpy as np
 import pandas as pd
 import xarray as xr
+
+import imod.pkg
+from imod.io import util
+from imod.pkg.pkggroup import PackageGroups
 
 
 def _to_datetime(time):
@@ -47,8 +43,8 @@ def _timestep_duration(times):
     
     Returns
     -------
-    OrderedDict
-        OrderedDict with dates as strings for keys,
+    collections.OrderedDict
+        Dictionary with dates as strings for keys,
         stress period duration (in days) as values.
     """
     times = sorted([_to_datetime(t) for t in times])
@@ -62,7 +58,7 @@ def _timestep_duration(times):
 
 
 # This class allows only imod packages as values
-class Model(UserDict):
+class Model(collections.UserDict):
     pass
 
 
@@ -263,7 +259,7 @@ class SeawatModel(Model):
         """
         diskey = self._get_pkgkey("dis")
         globaltimes = self[diskey]["time"].values
-        directory = Path(self.modelname)
+        directory = pathlib.Path(self.modelname)
 
         modflowcontent, ssmcontent = self._render_groups(
             directory=directory, globaltimes=globaltimes

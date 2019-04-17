@@ -1,11 +1,13 @@
+import collections
 import csv
-from collections import OrderedDict
-from glob import glob
-from io import StringIO
-from pathlib import Path
+import glob
+import io
+import pathlib
+import warnings
 
 import numpy as np
 import pandas as pd
+
 from imod.io import util
 
 
@@ -33,7 +35,7 @@ def _read(path, kwargs={}, assoc_kwargs={}):
     """
 
     if isinstance(path, str):
-        path = Path(path)
+        path = pathlib.Path(path)
 
     with open(path) as f:
         nrow = int(f.readline().strip())
@@ -89,7 +91,7 @@ def read_associated(path, kwargs={}):
 
     # deal with e.g. incorrect capitalization
     if isinstance(path, str):
-        path = Path(path)
+        path = pathlib.Path(path)
     path = path.resolve()
 
     with open(path) as f:
@@ -108,7 +110,7 @@ def read_associated(path, kwargs={}):
                 ncol, itype = map(
                     int, map(str.strip, next(csv.reader([line], delimiter=" ")))
                 )
-        na_values = OrderedDict()
+        na_values = collections.OrderedDict()
 
         # use pandas for csv parsing: stuff like commas within quotes
         # this is a workaround for a pandas bug, probable related issue:
@@ -120,7 +122,7 @@ def read_associated(path, kwargs={}):
         # Normally, this ought to work:
         # metadata = pd.read_csv(f, header=None, nrows=ncol).values
         # TODO: replace when bugfix is released
-        metadata = pd.read_csv(StringIO(lines), header=None, nrows=ncol, **kwargs)
+        metadata = pd.read_csv(io.StringIO(lines), header=None, nrows=ncol, **kwargs)
         # header description possibly includes nodata
         usecols = np.arange(ncol)[pd.notnull(metadata[0])]
         metadata = metadata.iloc[usecols, :]
@@ -203,10 +205,10 @@ def read(path, kwargs={}, assoc_kwargs={}):
     """
 
     # convert since for Path.glob non-relative patterns are unsupported
-    if isinstance(path, Path):
+    if isinstance(path, pathlib.Path):
         path = str(path)
 
-    paths = [Path(p) for p in glob(path)]
+    paths = [pathlib.Path(p) for p in glob.glob(path)]
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
@@ -432,7 +434,9 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20):
             write_assoc(assoc_path, out_df, itype, nodata)
 
         # ensures right order for x, y, id; so that also indexcolumn == 3
-        agg_kwargs = OrderedDict([("x", "first"), ("y", "first"), ("id", "first")])
+        agg_kwargs = collections.OrderedDict(
+            [("x", "first"), ("y", "first"), ("id", "first")]
+        )
         agg_kwargs.update(ipf_columns)
         agg_df = grouped.agg(agg_kwargs)
         # Quote so spaces don't mess up paths

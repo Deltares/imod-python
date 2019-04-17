@@ -1,4 +1,4 @@
-from pathlib import Path
+import pathlib
 
 import numpy as np
 import pytest
@@ -37,7 +37,7 @@ def ghb_group(request):
 
 def test_render(ghb_group):
     group = ghb_group
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "[ghb]\n"

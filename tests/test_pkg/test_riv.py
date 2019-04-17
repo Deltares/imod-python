@@ -1,4 +1,4 @@
-from pathlib import Path
+import pathlib
 
 import numpy as np
 import pytest
@@ -30,7 +30,7 @@ def river(request):
 
 def test_render(river):
     riv = river
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "\n"

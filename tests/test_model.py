@@ -1,11 +1,12 @@
-from pathlib import Path
+import pathlib
 
-import imod
-import imod.pkg
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+
+import imod
+import imod.pkg
 
 
 @pytest.fixture(scope="module")
@@ -167,7 +168,7 @@ def test_render_pgk__gcg(basicmodel):
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
     modelname = m.modelname
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "[gcg]\n"
@@ -187,7 +188,7 @@ def test_render_pgk__rch(basicmodel):
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
     modelname = m.modelname
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "[rch]\n"
@@ -208,7 +209,7 @@ def test_render_dis(basicmodel):
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
     modelname = m.modelname
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "[dis]\n"
@@ -239,7 +240,7 @@ def test_render_groups__ghb(basicmodel):
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
     modelname = m.modelname
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "[ghb]\n"
@@ -298,7 +299,7 @@ def test_render_btn(basicmodel):
     m.time_discretization(endtime="2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "[btn]\n"

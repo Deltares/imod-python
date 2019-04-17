@@ -1,10 +1,8 @@
+import pathlib
+
 import numpy as np
-import xarray as xr
 import rasterio
-import affine
-from rasterio.warp import Resampling
-from pathlib import Path
-from glob import glob
+
 from imod.io import idf, util
 
 
@@ -32,7 +30,7 @@ def write(path, da, driver=None, nodata=np.nan):
     # https://github.com/pydata/xarray/issues/1736
     # https://github.com/pydata/xarray/pull/1712
     if isinstance(path, str):
-        path = Path(path)
+        path = pathlib.Path(path)
     profile = da.attrs.copy()
     if driver is None:
         ext = path.suffix.lower()

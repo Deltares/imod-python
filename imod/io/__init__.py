@@ -1,23 +1,9 @@
-from pathlib import Path
+import pathlib
 
 import numpy as np
+import pandas as pd
 
-# without these this usage wouldn't work:
-# import imod
-# imod.io.idf.*
-from imod.io import idf, ipf, run, tec, util
-
-from imod._version import get_versions
-
-# since this is a big dependency that is sometimes hard to install
-# and not always required, we made this an optional dependency
-try:
-    from imod.io import rasterio
-except ImportError:
-    pass
-
-__version__ = get_versions()["version"]
-del get_versions
+import imod
 
 
 def write(path, model, name=None, runfile_parameters=None):
@@ -39,8 +25,8 @@ def write(path, model, name=None, runfile_parameters=None):
     ----------
     path : str
         The directory to write the model to.
-    model : OrderedDict
-        `OrderedDict` containing the package data as `xarray.DataArray` or
+    model : collections.OrderedDict
+        Dictionary containing the package data as `xarray.DataArray` or
         `pandas.DataFrame`.
     name : str
         Name given to the runfile. Defaults to "runfile".
@@ -68,11 +54,11 @@ def write(path, model, name=None, runfile_parameters=None):
 
     """
     if isinstance(path, str):
-        path = Path(path)
+        path = pathlib.Path(path)
     path.mkdir(exist_ok=True, parents=True)
 
     if runfile_parameters is None:
-        runfile_parameters = run.get_runfile(model, path)
+        runfile_parameters = imod.run.get_runfile(model, path)
 
     if name is None:
         name = "runfile"
@@ -80,7 +66,7 @@ def write(path, model, name=None, runfile_parameters=None):
         runfile_parameters["modelname"] = name
 
     runfile_path = path.joinpath("{}.run".format(name))
-    run.write_runfile(runfile_path, runfile_parameters)
+    imod.run.write_runfile(runfile_path, runfile_parameters)
 
     for key, data in model.items():
         # Get rid of time dimension
@@ -94,11 +80,11 @@ def write(path, model, name=None, runfile_parameters=None):
         package_path = path.joinpath(name).joinpath(key)
         if name == "wel":
             if "time" in data.columns:
-                ipf.save(package_path, data, itype="timeseries")
+                imod.ipf.save(package_path, data, itype="timeseries")
             else:
-                ipf.save(package_path, data)
+                imod.ipf.save(package_path, data)
         else:
-            idf.save(package_path, data)
+            imod.idf.save(package_path, data)
 
 
 def _uniques(da):
@@ -144,8 +130,8 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
     ----------
     path : str
         The directory to write the model to.
-    model : OrderedDict
-        `OrderedDict` containing the package data as `xarray.DataArray` or
+    model : collections.OrderedDict
+        Dictionary containing the package data as `xarray.DataArray` or
         `pandas.DataFrame`.
     name : str
         Name given to the runfile. Defaults to "runfile".
@@ -172,15 +158,12 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
     >>> imod.seawat_write(path="example_dir", model=a, runfile_parameters=runfile_parameters)
 
     """
-    # TODO: does this really belong here?
-    import pandas as pd
-
     if isinstance(path, str):
-        path = Path(path)
+        path = pathlib.Path(path)
     path.mkdir(exist_ok=True, parents=True)
 
     if runfile_parameters is None:
-        runfile_parameters = run.seawat_get_runfile(model, path)
+        runfile_parameters = imod.run.seawat_get_runfile(model, path)
 
     if name is None:
         name = "runfile"
@@ -188,7 +171,7 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
         runfile_parameters["modelname"] = name
 
     runfile_path = path.joinpath("{}.run".format(name))
-    run.seawat_write_runfile(runfile_path, runfile_parameters)
+    imod.run.seawat_write_runfile(runfile_path, runfile_parameters)
 
     # Get data to write idf top and bot attributes  if possible:
     # when dz is constant over x, y.
@@ -207,12 +190,12 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
         package_path = path.joinpath(name).joinpath(key)
         if name == "wel" and isinstance(data, pd.DataFrame):
             if "time" in data.columns:
-                ipf.save(package_path, data, itype="timeseries")
+                imod.ipf.save(package_path, data, itype="timeseries")
             else:
-                ipf.save(package_path, data)
+                imod.ipf.save(package_path, data)
         else:
             if d_tops is not None:
                 layers = np.atleast_1d(data.coords["layer"].values)
                 data.attrs["top"] = [d_tops[layer] for layer in layers]
                 data.attrs["bot"] = [d_bots[layer] for layer in layers]
-            idf.save(package_path, data)
+            imod.idf.save(package_path, data)

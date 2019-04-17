@@ -1,7 +1,9 @@
-from pathlib import Path
+import pathlib
+
 import numpy as np
 import pytest
 import xarray as xr
+
 from imod.pkg import ConstantHead
 
 
@@ -22,7 +24,7 @@ def constanthead(request):
 
 def test_render(constanthead):
     chd = constanthead
-    directory = Path(".")
+    directory = pathlib.Path(".")
 
     compare = (
         "\n"
