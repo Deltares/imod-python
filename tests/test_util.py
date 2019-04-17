@@ -6,7 +6,7 @@ from pathlib import Path
 import cftime
 import numpy as np
 import pytest
-from imod import util
+from imod.io import util
 
 
 def test_compose():

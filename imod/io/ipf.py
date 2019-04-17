@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from imod import util
+from imod.io import util
 
 
 # Maybe look at dask dataframes, if we run into very large tabular datasets:

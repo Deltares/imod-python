@@ -20,6 +20,7 @@ setup(
     test_suite="tests",
     python_requires=">=3.6",
     install_requires=[
+        "numba",
         "numpy",
         "xarray>=0.11",
         "cftime>=1",

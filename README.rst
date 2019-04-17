@@ -18,7 +18,7 @@ Getting started
 
     # get all calculated heads in a xarray DataArray
     # with dimensions time, layer, y, x
-    da = imod.idf.open('path/to/results/head_*.idf')
+    da = imod.io.idf.open('path/to/results/head_*.idf')
 
 Introduction
 ============
@@ -35,13 +35,13 @@ Using a set of file name conventions more dimensions such as ``time`` and ``laye
 added, for example: ``head_20181113_l3.idf`` for layer 3 and timestamp ``2018-11-13``.
 This package maps IDF files to and from the N dimensional labeled arrays of
 `xarray.DataArray <http://xarray.pydata.org/en/stable/data-structures.html#dataarray>`__,
-using ``imod.idf.open`` and ``imod.idf.save``, or, to read multiple parameters
-at the same time, ``imod.idf.open_dataset``.
+using ``imod.io.idf.open`` and ``imod.io.idf.save``, or, to read multiple parameters
+at the same time, ``imod.io.idf.open_dataset``.
 
 For more information on how to work with ``xarray.DataArray`` objects, we refer to the
 xarray documentation. Note that converting GIS raster formats to IDF is supported
 through `xarray.open_rasterio <http://xarray.pydata.org/en/stable/generated/xarray.open_rasterio.html#xarray.open_rasterio>`__,
-followed by ``imod.idf.save``.
+followed by ``imod.io.idf.save``.
 
 IPF - iMOD Point File
 ---------------------
