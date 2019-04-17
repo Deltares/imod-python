@@ -6,7 +6,7 @@ class AdvectionFiniteDifference(Package):
     Solve the advection term using the explicit Finite Difference method 
     (MIXELM = 0) with upstream weighting
     
-    Parameters
+    Attributes
     ----------
     courant: real
         Courant number (PERCEL) is the number of cells (or a fraction of a cell)
@@ -19,15 +19,17 @@ class AdvectionFiniteDifference(Package):
         finite-difference, PERCEL is also a stability constraint, which must not
         exceed one and will be automatically reset to one if a value greater
         than one is specified.
-    weighting = "upstream"
+    weighting : {"upstream", "central"}, optional
         Indication of which weighting scheme should be used, set to default
         value "upstream" (NADVFD = 0  or 1)
-    weighting_factor = 0.5
+        Default value is "upstream"
+    weighting_factor: float, optional
         is a concentration weighting factor (WD) between 0.5 and 1. It is used for
         operator splitting in the particle tracking based methods. The value of
         0.5 is generally adequate. The value may be adjusted to achieve better
         mass balance. Generally, it can be increased toward 1.0 as advection
         becomes more dominant.
+        Default value is 0.5.
     """
 
     _pkg_id = "adv"
@@ -43,8 +45,8 @@ class AdvectionMOC(Package):
     """
     Solve the advection term using the Method of Characteristics (MIXELM = 1)
 
-    Parameters:
-    ---------------------
+    Attributes
+    -----------
     courant: real
         Courant number (PERCEL) is the number of cells (or a fraction of a cell)
         advection will be allowed in any direction in one transport step. For
@@ -58,21 +60,23 @@ class AdvectionMOC(Package):
         than one is specified.
     max_nparticles: int
         is the maximum total number of moving particles allowed (MXPART).
-    tracking = "euler" 
+    tracking = {"euler"}, optional 
         indicates which particle tracking algorithm is selected for the
         Eulerian-Lagrangian methods. Here, the first order Euler algorithm is used
         (ITRACK = 1)
-    weighting_factor= 0.5
+    weighting_factor: float, optional
         is a concentration weighting factor (WD) between 0.5 and 1. It is used for
         operator splitting in the particle tracking based methods. The value of
         0.5 is generally adequate. The value may be adjusted to achieve better
         mass balance. Generally, it can be increased toward 1.0 as advection
         becomes more dominant.
-    dconcentration_epsilon = 1.0e-5
+        Default value, 0.5.
+    dconcentration_epsilon = float, optional
         is a small Relative Cell Concentration Gradient below which advective
         transport is considered negligible. A value around 10-5 is generally
         adequate.
-    nplane = 2
+        Default value is 1.0e-5. 
+    nplane = int, optional
         is a flag indicating whether the random or fixed pattern is selected for
         initial placement of moving particles. NPLANE = 0, the random pattern is
         selected for initial placement. Particles are distributed randomly in
@@ -87,7 +91,8 @@ class AdvectionMOC(Package):
         For cross sectional or three-dimensional simulations, NPLANE = 2 is
         normally adequate. Increase NPLANE if more resolution in the vertical
         direction is desired.
-    nparticles_no_advection = 10
+        Default value is 2.
+    nparticles_no_advection = int, optional
         is number of initial particles per cell to be placed at cells where the
         Relative Cell Concentration Gradient is less than or equal to DCEPS.
         Generally, NPL can be set to zero since advection is considered
@@ -95,7 +100,8 @@ class AdvectionMOC(Package):
         or equal to DCEPS. Setting NPL equal to NPH causes a uniform number of
         particles to be placed in every cell over the entire grid (i.e., the
         uniform approach).
-    nparticles_advection = 40
+        Default value is 10.
+    nparticles_advection = int, optional
         is number of initial particles per cell to be placed at cells where the
         Relative Cell Concentration Gradient is greater than DCEPS. The
         selection of NPH depends on the nature of the flow field and also the
@@ -106,18 +112,21 @@ class AdvectionMOC(Package):
         If the random pattern is chosen, NPH particles are randomly distributed
         within the cell block. If the fixed pattern is chosen, NPH is divided by
         NPLANE to yield the number of particles to be placed per vertical plane.
-    cell_min_nparticles = 5
+        Default value is 40.
+    cell_min_nparticles = int, optional
         is the minimum number of particles allowed per cell. If the number of
         particles in a cell at the end of a transport step is fewer than NPMIN,
         new particles are inserted into that cell to maintain a sufficient
         number of particles. NPMIN can be set to zero in relatively uniform flow
         fields, and a number greater than zero in diverging/converging flow
         fields. Generally, a value between zero and four is adequate.
-    cell_max_nparticles = 80
+        Default value is 5.
+    cell_max_nparticles = int, optional
         is the maximum number of particles allowed per cell. If the number of
         particles in a cell exceeds NPMAX, all particles are removed from that
         cell and replaced by a new set of particles equal to NPH to maintain
         mass balance. Generally, NPMAX can be set to approximately twice of NPH.
+        Default value is 80.
     """
 
     _pkg_id = "adv"
@@ -144,7 +153,7 @@ class AdvectionModifiedMOC(Package):
     Courant number (PERCEL) is the number of cells (or a fraction of a
     cell) advection will be allowed in any direction in one transport step.
 
-    Parameters
+    Attributes
     ----------
     courant: real
         Courant number (PERCEL) is the number of cells (or a fraction of a cell)
@@ -192,7 +201,7 @@ class AdvectionHybridMOC(Package):
     Hybrid Method of Characteristics and Modified Method of Characteristics with
     MOC or MMOC automatically and dynamically selected (MIXELM = 3)
 
-    Parameters
+    Attributes
     ----------
     courant: float
         Courant number (PERCEL) is the number of cells (or a fraction of a cell)
@@ -302,7 +311,7 @@ class AdvectionTVD(Package):
     """
     Total Variation Diminishing (TVD) formulation (ULTIMATE, MIXELM = -1)
 
-    Parameters
+    Attributes
     ----------
     courant : float
         Courant number (PERCEL) is the number of cells (or a fraction of a cell)
