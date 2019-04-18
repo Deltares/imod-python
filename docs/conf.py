@@ -186,7 +186,7 @@ epub_exclude_files = ["search.html"]
 # Settings for sphinxcontrib-versioning
 # https://robpol86.github.io/sphinxcontrib-versioning/settings.html
 # For now only build selected branches, no tags
-scv_root_ref = "release"
+scv_root_ref = "master"
 scv_whitelist_branches = ("release", "master")
 scv_whitelist_tags = (re.compile("a^"),)
 
