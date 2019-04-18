@@ -22,14 +22,14 @@ class AdvectionFiniteDifference(Package):
     weighting : {"upstream", "central"}, optional
         Indication of which weighting scheme should be used, set to default
         value "upstream" (NADVFD = 0  or 1)
-        Default value is "upstream"
+        Default value: "upstream"
     weighting_factor: float, optional
         is a concentration weighting factor (WD) between 0.5 and 1. It is used for
         operator splitting in the particle tracking based methods. The value of
         0.5 is generally adequate. The value may be adjusted to achieve better
         mass balance. Generally, it can be increased toward 1.0 as advection
         becomes more dominant.
-        Default value is 0.5.
+        Default value: 0.5.
     """
 
     _pkg_id = "adv"
@@ -60,7 +60,7 @@ class AdvectionMOC(Package):
         than one is specified.
     max_nparticles: int
         is the maximum total number of moving particles allowed (MXPART).
-    tracking = {"euler"}, optional 
+    tracking: {"euler"}, optional 
         indicates which particle tracking algorithm is selected for the
         Eulerian-Lagrangian methods. Here, the first order Euler algorithm is used
         (ITRACK = 1)
@@ -70,13 +70,13 @@ class AdvectionMOC(Package):
         0.5 is generally adequate. The value may be adjusted to achieve better
         mass balance. Generally, it can be increased toward 1.0 as advection
         becomes more dominant.
-        Default value, 0.5.
-    dconcentration_epsilon = float, optional
+        Default value: 0.5.
+    dconcentration_epsilon: float, optional
         is a small Relative Cell Concentration Gradient below which advective
         transport is considered negligible. A value around 10-5 is generally
         adequate.
-        Default value is 1.0e-5. 
-    nplane = int, optional
+        Default value: 1.0e-5. 
+    nplane: int, optional
         is a flag indicating whether the random or fixed pattern is selected for
         initial placement of moving particles. NPLANE = 0, the random pattern is
         selected for initial placement. Particles are distributed randomly in
@@ -91,8 +91,8 @@ class AdvectionMOC(Package):
         For cross sectional or three-dimensional simulations, NPLANE = 2 is
         normally adequate. Increase NPLANE if more resolution in the vertical
         direction is desired.
-        Default value is 2.
-    nparticles_no_advection = int, optional
+        Default value: 2.
+    nparticles_no_advection: int, optional
         is number of initial particles per cell to be placed at cells where the
         Relative Cell Concentration Gradient is less than or equal to DCEPS.
         Generally, NPL can be set to zero since advection is considered
@@ -100,8 +100,8 @@ class AdvectionMOC(Package):
         or equal to DCEPS. Setting NPL equal to NPH causes a uniform number of
         particles to be placed in every cell over the entire grid (i.e., the
         uniform approach).
-        Default value is 10.
-    nparticles_advection = int, optional
+        Default value: 10.
+    nparticles_advection: int, optional
         is number of initial particles per cell to be placed at cells where the
         Relative Cell Concentration Gradient is greater than DCEPS. The
         selection of NPH depends on the nature of the flow field and also the
@@ -112,8 +112,8 @@ class AdvectionMOC(Package):
         If the random pattern is chosen, NPH particles are randomly distributed
         within the cell block. If the fixed pattern is chosen, NPH is divided by
         NPLANE to yield the number of particles to be placed per vertical plane.
-        Default value is 40.
-    cell_min_nparticles = int, optional
+        Default value: 40.
+    cell_min_nparticles: int, optional
         is the minimum number of particles allowed per cell. If the number of
         particles in a cell at the end of a transport step is fewer than NPMIN,
         new particles are inserted into that cell to maintain a sufficient
@@ -121,12 +121,12 @@ class AdvectionMOC(Package):
         fields, and a number greater than zero in diverging/converging flow
         fields. Generally, a value between zero and four is adequate.
         Default value is 5.
-    cell_max_nparticles = int, optional
+    cell_max_nparticles: int, optional
         is the maximum number of particles allowed per cell. If the number of
         particles in a cell exceeds NPMAX, all particles are removed from that
         cell and replaced by a new set of particles equal to NPH to maintain
         mass balance. Generally, NPMAX can be set to approximately twice of NPH.
-        Default value is 80.
+        Default value: 80.
     """
 
     _pkg_id = "adv"
