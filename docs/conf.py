@@ -31,12 +31,6 @@ version = imod.__version__
 # The full version, including alpha/beta/rc tags
 release = imod.__version__
 
-# Settings for sphinxcontrib-versioning
-# https://robpol86.github.io/sphinxcontrib-versioning/settings.html
-# For now only build selected branches, no tags
-scv_root_ref = "release"
-scv_whitelist_branches = ("release", "master")
-scv_whitelist_tags = (re.compile("a^"),)
 
 # -- General configuration ---------------------------------------------------
 
@@ -52,6 +46,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.todo",
     "sphinx.ext.napoleon",
+    "sphinxcontrib.googleanalytics",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -187,6 +182,18 @@ epub_exclude_files = ["search.html"]
 
 
 # -- Extension configuration -------------------------------------------------
+
+# Settings for sphinxcontrib-versioning
+# https://robpol86.github.io/sphinxcontrib-versioning/settings.html
+# For now only build selected branches, no tags
+scv_root_ref = "release"
+scv_whitelist_branches = ("release", "master")
+scv_whitelist_tags = (re.compile("a^"),)
+
+# Settings for sphinxcontrib.googleanalytics
+googleanalytics_id = "UA-138606256-1"
+googleanalytics_enabled = True
+
 
 # -- Options for todo extension ----------------------------------------------
 

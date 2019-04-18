@@ -11,6 +11,7 @@ before_script:
   # switch to release when possible, see
   # https://github.com/Robpol86/sphinxcontrib-versioning/issues/59
   - pip install git+https://github.com/HTenkanen/sphinxcontrib-versioning
+  - pip install git+https://github.com/jelmer/googleanalytics
 
 tests:
   script:
