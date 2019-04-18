@@ -15,7 +15,7 @@ Submodules
 imod.idf module
 ---------------
 
-.. automodule:: imod.idf
+.. automodule:: imod.io.idf
     :members:
     :undoc-members:
     :exclude-members: dask, dataarray
@@ -24,7 +24,7 @@ imod.idf module
 imod.ipf module
 ---------------
 
-.. automodule:: imod.ipf
+.. automodule:: imod.io.ipf
     :members:
     :undoc-members:
     :show-inheritance:
@@ -32,7 +32,7 @@ imod.ipf module
 imod.rasterio module
 --------------------
 
-.. automodule:: imod.rasterio
+.. automodule:: imod.io.rasterio
     :members:
     :undoc-members:
     :show-inheritance:
@@ -40,7 +40,7 @@ imod.rasterio module
 imod.run module
 --------------------
 
-.. automodule:: imod.run
+.. automodule:: imod.io.run
     :members:
     :undoc-members:
     :show-inheritance:
@@ -48,7 +48,7 @@ imod.run module
 imod.tec module
 ---------------
 
-.. automodule:: imod.tec
+.. automodule:: imod.io.tec
     :members:
     :undoc-members:
     :show-inheritance:
@@ -56,7 +56,7 @@ imod.tec module
 imod.util module
 ----------------
 
-.. automodule:: imod.util
+.. automodule:: imod.io.util
     :members:
     :undoc-members:
     :show-inheritance:
