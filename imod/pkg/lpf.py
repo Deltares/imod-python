@@ -67,10 +67,11 @@ class LayerPropertyFlow(Package):
         as many records as needed to enter a value for each layer.
         0 = wetting is inactive
         not 0 = wetting is active
-    interval_wet: int is the iteration interval for attempting to wet cells.
-        Wetting is attempted every interval_wet iteration (IWETIT). If using the
-        PCG solver (Hill, 1990), this applies to outer iterations, not inner
-        iterations. If interval_wet less than or equal to 0, it is changed to 1.
+    interval_wet: int 
+        is the iteration interval for attempting to wet cells. Wetting is
+        attempted every interval_wet iteration (IWETIT). If using the PCG solver
+        (Hill, 1990), this applies to outer iterations, not inner iterations. If
+        interval_wet less than or equal to 0, it is changed to 1.
     method_wet: int
         is a flag that determines which equation is used to define the initial
         head at cells that become wet (IHDWET).
