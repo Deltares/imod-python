@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from imod.pkg import GeneralHeadBoundary
-from imod.pkg.pkggroup import GeneralHeadBoundaryGroup
+from imod.wq import GeneralHeadBoundary
+from imod.wq.pkggroup import GeneralHeadBoundaryGroup
 
 
 @pytest.fixture(scope="module")

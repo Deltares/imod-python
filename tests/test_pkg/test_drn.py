@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-from imod.pkg import Drainage
+from imod.wq import Drainage
 
 
 @pytest.fixture(scope="module")

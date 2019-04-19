@@ -6,7 +6,7 @@ import pytest
 import xarray as xr
 
 import imod
-import imod.pkg
+import imod.wq
 
 
 @pytest.fixture(scope="module")
@@ -47,10 +47,10 @@ def basicmodel(request):
 
     # Fill model
     m = imod.SeawatModel("test_model")
-    m["bas"] = imod.pkg.BasicFlow(
+    m["bas"] = imod.wq.BasicFlow(
         ibound=ibound, top=top, bottom=bot, starting_head=starting_head
     )
-    m["lpf"] = imod.pkg.LayerPropertyFlow(
+    m["lpf"] = imod.wq.LayerPropertyFlow(
         k_horizontal=k_horizontal,
         k_vertical=k_horizontal.copy(),
         horizontal_anisotropy=k_horizontal.copy(),
@@ -64,20 +64,20 @@ def basicmodel(request):
         method_wet="wetfactor",
         head_dry=1.0e20,
     )
-    m["ghb"] = imod.pkg.GeneralHeadBoundary(
+    m["ghb"] = imod.wq.GeneralHeadBoundary(
         head=head,
         conductance=head.copy(),
         concentration=head.copy(),
         density=head.copy(),
         save_budget=False,
     )
-    m["rch"] = imod.pkg.RechargeHighestActive(
+    m["rch"] = imod.wq.RechargeHighestActive(
         rate=rate, concentration=rate.copy(), save_budget=False
     )
-    m["pcg"] = imod.pkg.PreconditionedConjugateGradientSolver(
+    m["pcg"] = imod.wq.PreconditionedConjugateGradientSolver(
         max_iter=150, inner_iter=30, hclose=0.0001, rclose=1000.0, relax=0.98, damp=1.0
     )
-    m["btn"] = imod.pkg.BasicTransport(
+    m["btn"] = imod.wq.BasicTransport(
         icbund=icbund,
         starting_concentration=icbund.copy(),
         porosity=icbund.copy(),
@@ -85,14 +85,14 @@ def basicmodel(request):
         inactive_concentration=1.0e30,
         minimum_active_thickness=0.01,
     )
-    m["adv"] = imod.pkg.AdvectionTVD(courant=1.0)
-    m["dsp"] = imod.pkg.Dispersion(
+    m["adv"] = imod.wq.AdvectionTVD(courant=1.0)
+    m["dsp"] = imod.wq.Dispersion(
         longitudinal=longitudinal,
         ratio_horizontal=longitudinal.copy(),
         ratio_vertical=longitudinal.copy(),
         diffusion_coefficient=longitudinal.copy(),
     )
-    m["vdf"] = imod.pkg.VariableDensityFlow(
+    m["vdf"] = imod.wq.VariableDensityFlow(
         density_species=1,
         density_min=1000.0,
         density_max=1025.0,
@@ -104,14 +104,14 @@ def basicmodel(request):
         coupling=1,
         correct_water_table=False,
     )
-    m["gcg"] = imod.pkg.GeneralizedConjugateGradientSolver(
+    m["gcg"] = imod.wq.GeneralizedConjugateGradientSolver(
         max_iter=150,
         inner_iter=30,
         cclose=1.0e-6,
         preconditioner="mic",
         lump_dispersion=True,
     )
-    m["oc"] = imod.pkg.OutputControl(save_head_idf=True, save_concentration_idf=True)
+    m["oc"] = imod.wq.OutputControl(save_head_idf=True, save_concentration_idf=True)
 
     return m
 

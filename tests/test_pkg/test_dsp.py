@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from imod.pkg import Dispersion
+from imod.wq import Dispersion
 
 
 @pytest.fixture(scope="module")

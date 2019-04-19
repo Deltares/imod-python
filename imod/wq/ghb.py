@@ -1,4 +1,4 @@
-from imod.pkg.pkgbase import BoundaryCondition
+from imod.wq.pkgbase import BoundaryCondition
 
 # class GeneralHeadBoundaryGroup(object):
 # Does a groupby over packages of the same kind when writing

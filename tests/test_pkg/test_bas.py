@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from imod.pkg import BasicFlow
+from imod.wq import BasicFlow
 
 
 @pytest.fixture(scope="module")

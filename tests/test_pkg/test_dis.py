@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-from imod.pkg import TimeDiscretization
+from imod.wq import TimeDiscretization
 
 
 @pytest.fixture(scope="module")

@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from imod.pkg import ConstantHead
+from imod.wq import ConstantHead
 
 
 @pytest.fixture(scope="module")

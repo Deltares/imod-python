@@ -1,4 +1,4 @@
-from imod.pkg import VariableDensityFlow
+from imod.wq import VariableDensityFlow
 
 
 def test_render():

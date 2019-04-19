@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from imod.pkg import LayerPropertyFlow
+from imod.wq import LayerPropertyFlow
 
 
 @pytest.fixture(scope="module")
