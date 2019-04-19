@@ -46,7 +46,7 @@ def basicmodel(request):
     longitudinal = ibound.copy()
 
     # Fill model
-    m = imod.SeawatModel("test_model")
+    m = imod.wq.SeawatModel("test_model")
     m["bas"] = imod.wq.BasicFlow(
         ibound=ibound, top=top, bottom=bot, starting_head=starting_head
     )

@@ -1,6 +1,3 @@
-"""
-Contains an imodseawat model object
-"""
 import collections
 import pathlib
 
@@ -10,10 +7,10 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-import imod.wq
-from imod.io import util
-from imod.wq.pkggroup import PackageGroups
-
+import imod
+import imod.wq.pkggroup
+# import imod.wq
+imod.wq
 
 def _to_datetime(time):
     """
@@ -87,7 +84,7 @@ class SeawatModel(Model):
 
     # These templates end up here since they require global information
     # from more than one package
-    _PACKAGE_GROUPS = PackageGroups
+    _PACKAGE_GROUPS = imod.wq.pkggroup.PackageGroups
 
     _gen_template = jinja2.Template(
         "[gen]\n"
@@ -172,7 +169,7 @@ class SeawatModel(Model):
         package_set = sorted(package_set)
         baskey = self._get_pkgkey("bas")
         bas = self[baskey]
-        _, xmin, xmax, _, ymin, ymax = util.spatial_reference(bas["ibound"])
+        _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(bas["ibound"])
         start_date = _to_datetime(globaltimes[0]).strftime("%Y%m%d%H%M%S")
 
         d = {}
@@ -297,7 +294,7 @@ class SeawatModel(Model):
             else:
                 for name, da in ds.data_vars.items():
                     if "y" in da.coords and "x" in da.coords:
-                        imod.io.idf.save(directory, da)
+                        imod.idf.save(directory, da)
 
     def write(self):
         # TODO: just write to an arbitrary directory

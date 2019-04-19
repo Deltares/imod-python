@@ -1,21 +1,22 @@
-from .adv import AdvectionTVD
-from .bas import BasicFlow
-from .btn import BasicTransport
-from .chd import ConstantHead
-from .dis import TimeDiscretization
-from .drn import Drainage
-from .dsp import Dispersion
-from .ghb import GeneralHeadBoundary
-from .lpf import LayerPropertyFlow
-from .oc import OutputControl
-from .rch import RechargeHighestActive
-from .rch import RechargeLayers
-from .rch import RechargeTopLayer
-from .riv import River
-from .slv import PreconditionedConjugateGradientSolver
-from .slv import GeneralizedConjugateGradientSolver
-from .slv import ParallelKrylovFlowSolver
-from .slv import ParallelKrylovTransportSolver
-from .vdf import VariableDensityFlow
-from .wel import Well
-from . import pkgbase
+# make classes directly available under imod.wq
+from imod.wq.adv import AdvectionTVD
+from imod.wq.bas import BasicFlow
+from imod.wq.btn import BasicTransport
+from imod.wq.chd import ConstantHead
+from imod.wq.dis import TimeDiscretization
+from imod.wq.drn import Drainage
+from imod.wq.dsp import Dispersion
+from imod.wq.ghb import GeneralHeadBoundary
+from imod.wq.lpf import LayerPropertyFlow
+from imod.wq.oc import OutputControl
+#from imod.wq.model import SeawatModel
+from imod.wq.rch import RechargeHighestActive, RechargeLayers, RechargeTopLayer
+from imod.wq.riv import River
+from imod.wq.slv import (
+    PreconditionedConjugateGradientSolver,
+    GeneralizedConjugateGradientSolver,
+    ParallelKrylovFlowSolver,
+    ParallelKrylovTransportSolver,
+)
+from imod.wq.vdf import VariableDensityFlow
+from imod.wq.wel import Well

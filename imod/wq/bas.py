@@ -2,7 +2,7 @@ import jinja2
 import xarray as xr
 
 from imod.wq.pkgbase import Package
-from imod.io import util
+from imod import util
 
 
 class BasicFlow(Package):

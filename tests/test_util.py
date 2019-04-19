@@ -6,7 +6,7 @@ import cftime
 import numpy as np
 import pytest
 
-from imod.io import util
+from imod import util
 
 
 def test_compose():

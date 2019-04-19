@@ -8,7 +8,7 @@ import warnings
 import numpy as np
 import pandas as pd
 
-from imod.io import util
+from imod import util
 
 
 # Maybe look at dask dataframes, if we run into very large tabular datasets:

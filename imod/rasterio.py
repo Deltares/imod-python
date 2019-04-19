@@ -3,7 +3,7 @@ import pathlib
 import numpy as np
 import rasterio
 
-from imod.io import idf, util
+from imod import idf, util
 
 
 def write(path, da, driver=None, nodata=np.nan):

@@ -4,7 +4,7 @@ import rasterio
 import rasterio.warp
 import xarray as xr
 
-from imod.io import util
+from imod import util
 
 
 def _reproject_dst(source, src_crs, dst_crs, src_transform):

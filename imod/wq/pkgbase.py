@@ -2,7 +2,7 @@ import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
-from imod.io import util
+from imod import util
 
 
 class Package(xr.Dataset):
