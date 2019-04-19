@@ -1,6 +1,6 @@
 import jinja2
 
-from imod.pkg.pkgbase import BoundaryCondition
+from imod.wq.pkgbase import BoundaryCondition
 
 
 class RechargeTopLayer(BoundaryCondition):

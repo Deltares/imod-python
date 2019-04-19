@@ -1,5 +1,5 @@
-from imod.pkg import PreconditionedConjugateGradientSolver
-from imod.pkg import GeneralizedConjugateGradientSolver
+from imod.wq import PreconditionedConjugateGradientSolver
+from imod.wq import GeneralizedConjugateGradientSolver
 
 
 def test_pcg_render():

@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-from imod.pkg import RechargeHighestActive
+from imod.wq import RechargeHighestActive
 
 
 @pytest.fixture(scope="module")

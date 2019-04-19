@@ -1,5 +1,5 @@
 import jinja2
-from imod.pkg.pkgbase import Package
+from imod.wq.pkgbase import Package
 
 
 class TimeDiscretization(Package):

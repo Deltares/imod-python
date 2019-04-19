@@ -1,4 +1,4 @@
-from imod.pkg import AdvectionTVD
+from imod.wq import AdvectionTVD
 
 
 def test_render():

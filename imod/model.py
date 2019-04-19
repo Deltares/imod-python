@@ -10,9 +10,9 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-import imod.pkg
+import imod.wq
 from imod.io import util
-from imod.pkg.pkggroup import PackageGroups
+from imod.wq.pkggroup import PackageGroups
 
 
 def _to_datetime(time):
@@ -162,7 +162,7 @@ class SeawatModel(Model):
         timestep_duration = xr.DataArray(
             duration, coords={"time": np.array(times)[:-1]}, dims=("time",)
         )
-        self["time_discretization"] = imod.pkg.TimeDiscretization(
+        self["time_discretization"] = imod.wq.TimeDiscretization(
             timestep_duration=timestep_duration
         )
 
@@ -291,7 +291,7 @@ class SeawatModel(Model):
 
     def save(self, directory):
         for ds in self.values():
-            if isinstance(ds, imod.pkg.Well):
+            if isinstance(ds, imod.wq.Well):
                 # TODO: implement
                 raise NotImplementedError
             else:

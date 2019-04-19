@@ -1,4 +1,4 @@
-from imod.pkg.pkgbase import BoundaryCondition
+from imod.wq.pkgbase import BoundaryCondition
 
 
 class Drainage(BoundaryCondition):

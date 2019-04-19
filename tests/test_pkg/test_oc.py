@@ -1,4 +1,4 @@
-from imod.pkg import OutputControl
+from imod.wq import OutputControl
 
 
 def test_render():

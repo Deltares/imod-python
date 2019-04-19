@@ -1,7 +1,7 @@
 import jinja2
 import xarray as xr
 
-from imod.pkg.pkgbase import Package
+from imod.wq.pkgbase import Package
 from imod.io import util
 
 
