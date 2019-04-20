@@ -8,50 +8,8 @@ import pandas as pd
 import xarray as xr
 
 import imod
-import imod.wq.pkggroup
-# import imod.wq
-imod.wq
-
-def _to_datetime(time):
-    """
-    Check whether time is cftime object, else convert to datetime64 series.
-    
-    cftime currently has no pd.to_datetime equivalent:
-    a method that accepts a lot of different input types.
-    
-    Parameters
-    ----------
-    time : cftime object or datetime-like scalar
-    """
-    if isinstance(time, cftime.datetime):
-        return time
-    else:
-        return pd.to_datetime(time)
-
-
-def _timestep_duration(times):
-    """
-    Generates dictionary containing stress period time discretization data.
-
-    Parameters
-    ----------
-    times : np.array
-        Array containing containing time in a datetime-like format
-    
-    Returns
-    -------
-    collections.OrderedDict
-        Dictionary with dates as strings for keys,
-        stress period duration (in days) as values.
-    """
-    times = sorted([_to_datetime(t) for t in times])
-
-    timestep_duration = []
-    for start, end in zip(times[:-1], times[1:]):
-        timedelta = end - start
-        duration = timedelta.days + timedelta.seconds / 86400.0
-        timestep_duration.append(duration)
-    return times, timestep_duration
+from imod.wq.pkggroup import PackageGroups
+from imod.wq import timeutil
 
 
 # This class allows only imod packages as values
@@ -84,7 +42,7 @@ class SeawatModel(Model):
 
     # These templates end up here since they require global information
     # from more than one package
-    _PACKAGE_GROUPS = imod.wq.pkggroup.PackageGroups
+    _PACKAGE_GROUPS = PackageGroups
 
     _gen_template = jinja2.Template(
         "[gen]\n"
@@ -153,7 +111,7 @@ class SeawatModel(Model):
                 times.update(ds.coords["time"].values)
         # TODO: check that endtime is later than all other times.
         times.update((endtime,))
-        times, duration = _timestep_duration(times)
+        times, duration = timeutil.timestep_duration(times)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
         timestep_duration = xr.DataArray(
@@ -170,7 +128,7 @@ class SeawatModel(Model):
         baskey = self._get_pkgkey("bas")
         bas = self[baskey]
         _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(bas["ibound"])
-        start_date = _to_datetime(globaltimes[0]).strftime("%Y%m%d%H%M%S")
+        start_date = timeutil.to_datetime(globaltimes[0]).strftime("%Y%m%d%H%M%S")
 
         d = {}
         d["modelname"] = modelname
