@@ -194,12 +194,16 @@ def test_render_pgk__rch(basicmodel):
         "[rch]\n"
         "    nrchop = 3\n"
         "    irchcb = 0\n"
-        "    rech_p1 = rate_20000101000000.idf\n"
-        "    rech_p2 = rate_20000102000000.idf\n"
-        "    rech_p3 = rate_20000103000000.idf\n"
-        "    rech_p4 = rate_20000104000000.idf\n"
-        "    rech_p5 = rate_20000105000000.idf"
+       "    rech_p1 = rch\\rate_20000101000000.idf\n"
+       "    rech_p2 = rch\\rate_20000102000000.idf\n"
+       "    rech_p3 = rch\\rate_20000103000000.idf\n"
+       "    rech_p4 = rch\\rate_20000104000000.idf\n"
+       "    rech_p5 = rch\\rate_20000105000000.idf"
     )
+    with open("compare.txt", "w") as f:
+        f.write(compare)
+    with open("render.txt", "w") as f:
+        f.write(m._render_pkg("rch", directory=directory, globaltimes=globaltimes))
     assert m._render_pkg("rch", directory=directory, globaltimes=globaltimes) == compare
 
 
@@ -247,23 +251,23 @@ def test_render_groups__ghb(basicmodel):
         "    mghbsys = 1\n"
         "    mxactb = 75\n"
         "    ighbcb = False\n"
-        "    bhead_p?_s1_l1 = head_l1.idf\n"
-        "    bhead_p?_s1_l2 = head_l2.idf\n"
-        "    bhead_p?_s1_l3 = head_l3.idf\n"
-        "    cond_p?_s1_l1 = conductance_l1.idf\n"
-        "    cond_p?_s1_l2 = conductance_l2.idf\n"
-        "    cond_p?_s1_l3 = conductance_l3.idf\n"
-        "    ghbssmdens_p?_s1_l1 = density_l1.idf\n"
-        "    ghbssmdens_p?_s1_l2 = density_l2.idf\n"
-        "    ghbssmdens_p?_s1_l3 = density_l3.idf"
+        "    bhead_p?_s1_l1 = ghb\\head_l1.idf\n"
+        "    bhead_p?_s1_l2 = ghb\\head_l2.idf\n"
+        "    bhead_p?_s1_l3 = ghb\\head_l3.idf\n"
+        "    cond_p?_s1_l1 = ghb\\conductance_l1.idf\n"
+        "    cond_p?_s1_l2 = ghb\\conductance_l2.idf\n"
+        "    cond_p?_s1_l3 = ghb\\conductance_l3.idf\n"
+        "    ghbssmdens_p?_s1_l1 = ghb\\density_l1.idf\n"
+        "    ghbssmdens_p?_s1_l2 = ghb\\density_l2.idf\n"
+        "    ghbssmdens_p?_s1_l3 = ghb\\density_l3.idf"
     )
 
     ssm_compare = (
         "[ssm]\n"
         "    mxss = 75\n"
-        "    cghb_t1_p?_l1 = concentration_l1.idf\n"
-        "    cghb_t1_p?_l2 = concentration_l2.idf\n"
-        "    cghb_t1_p?_l3 = concentration_l3.idf"
+        "    cghb_t1_p?_l1 = ghb\\concentration_l1.idf\n"
+        "    cghb_t1_p?_l2 = ghb\\concentration_l2.idf\n"
+        "    cghb_t1_p?_l3 = ghb\\concentration_l3.idf"
     )
     content, ssm_content = m._render_groups(
         directory=directory, globaltimes=globaltimes

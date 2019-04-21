@@ -63,7 +63,7 @@ class PackageGroup(collections.UserDict):
             system_index = i + 1
             content.append(
                 self[key]._render(
-                    directory=directory,
+                    directory=directory.joinpath(key),
                     globaltimes=globaltimes,
                     system_index=system_index,
                 )
@@ -73,7 +73,7 @@ class PackageGroup(collections.UserDict):
     def render_ssm(self, directory, globaltimes):
         # Only render for the first system, that has concentrations defined.
         key = self.first_key
-        return self[key]._ssm_render(directory, globaltimes)
+        return self[key]._ssm_render(directory.joinpath(key), globaltimes)
 
 
 class ConstantHeadGroup(PackageGroup):

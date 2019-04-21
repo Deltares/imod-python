@@ -145,16 +145,17 @@ class SeawatModel(Model):
         """
         Rendering method for straightforward packages
         """
-        key = self._get_pkgkey(key)
+        # Get name of pkg, e.g. lookup "recharge" for rch _pkg_id
+        pkgkey = self._get_pkgkey(key)
         if key is None:
             # Maybe do enum look for full package name?
             raise ValueError(f"No {key} package provided.")
-        return self[key]._render(directory=directory, globaltimes=globaltimes)
+        return self[key]._render(directory=directory.joinpath(pkgkey), globaltimes=globaltimes)
 
     def _render_dis(self, directory, globaltimes):
         baskey = self._get_pkgkey("bas")
         diskey = self._get_pkgkey("dis")
-        bas_content = self[baskey]._render_dis(directory=directory)
+        bas_content = self[baskey]._render_dis(directory=directory.joinpath(baskey))
         dis_content = self[diskey]._render(globaltimes=globaltimes)
         return bas_content + dis_content
 
@@ -191,7 +192,7 @@ class SeawatModel(Model):
 
         if btnkey is None:
             raise ValueError("No BasicTransport package provided.")
-        btn_content = self[btnkey]._render(directory=directory, thickness=thickness)
+        btn_content = self[btnkey]._render(directory=directory.joinpath(btnkey), thickness=thickness)
         dis_content = self[diskey]._render_btn(globaltimes=globaltimes)
         return btn_content + dis_content
 
@@ -243,17 +244,6 @@ class SeawatModel(Model):
 
         return "\n\n".join(content)
 
-    def save(self, directory):
-        for ds in self.values():
-            if isinstance(ds, imod.wq.Well):
-                # TODO: implement
-                raise NotImplementedError
-            else:
-                for name, da in ds.data_vars.items():
-                    if "y" in da.coords and "x" in da.coords:
-                        path = pathlib.Path(directory).joinpath(ds._pkg_id).joinpath(name)
-                        imod.idf.save(path, da)
-
     def write(self, directory="."):
         runfile_content = self.render()
         directory = pathlib.Path(directory).joinpath(self.modelname)
@@ -263,4 +253,6 @@ class SeawatModel(Model):
         with open(runfilepath, "w") as f:
             f.write(runfile_content)
         # Write all IDFs and IPFs
-        self.save(directory=directory)
+        for pkgname, pkg in self.items():
+            if "x" in pkg and "y" in pkg:
+                pkg.save(directory=directory.joinpath(pkgname))

@@ -1,7 +1,10 @@
+import pathlib
+
 import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
+import imod
 from imod import util
 from imod.wq import timeutil
 
@@ -130,6 +133,12 @@ class Package(xr.Dataset):
             values["?"] = da.values[()]
 
         return values
+
+    def save(self, directory):
+        for name, da in self.data_vars.items():
+            if "y" in da.coords and "x" in da.coords:
+                path = pathlib.Path(directory).joinpath(name)
+                imod.idf.save(path, da)
 
 
 class BoundaryCondition(Package):
@@ -260,10 +269,8 @@ class BoundaryCondition(Package):
         rendered : str
             The rendered runfile part for a single boundary condition system.
         """
-        d = {}
         mapping = tuple([(k, v) for k, v in self._mapping if v in self.data_vars])
-        d["mapping"] = mapping
-        d["system_index"] = system_index
+        d = {"mapping": mapping, "system_index": system_index}
         dicts = {}
 
         for varname in self.data_vars.keys():
