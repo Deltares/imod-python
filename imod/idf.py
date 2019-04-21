@@ -549,8 +549,14 @@ def save(path, a, nodata=1.0e20):
     """
     if not isinstance(a, xr.DataArray):
         raise TypeError("Data to save must be an xarray.DataArray")
-    d = util.decompose(path)
-    d["extension"] = ".idf"
+    
+    if isinstance(path, str):
+        path = pathlib.Path(path)
+
+    # TODO: implement a more intuitive scheme
+    d = {"extension": ".idf"}
+    d["name"] = path.stem.split("_")[0]
+    d["directory"] = path.parent
     d["directory"].mkdir(exist_ok=True, parents=True)
 
     # handle the case where they are not a dim but are a coord
