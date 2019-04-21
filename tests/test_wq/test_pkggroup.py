@@ -38,34 +38,43 @@ def ghb_group(request):
 def test_render(ghb_group):
     group = ghb_group
     directory = pathlib.Path(".")
+    d = {
+        "ph": pathlib.Path("primary").joinpath("head"),
+        "pc": pathlib.Path("primary").joinpath("conductance"),
+        "pd": pathlib.Path("primary").joinpath("density"),
+        "sh": pathlib.Path("secondary").joinpath("head"),
+        "sc": pathlib.Path("secondary").joinpath("conductance"),
+        "th": pathlib.Path("tertiary").joinpath("head"),
+        "tc": pathlib.Path("tertiary").joinpath("conductance"),
+    }
 
     compare = (
         "[ghb]\n"
         "    mghbsys = 3\n"
         "    mxactb = 225\n"
         "    ighbcb = False\n"
-        "    bhead_p?_s1_l1 = primary\\head_l1.idf\n"
-        "    bhead_p?_s1_l2 = primary\\head_l2.idf\n"
-        "    bhead_p?_s1_l3 = primary\\head_l3.idf\n"
-        "    cond_p?_s1_l1 = primary\\conductance_l1.idf\n"
-        "    cond_p?_s1_l2 = primary\\conductance_l2.idf\n"
-        "    cond_p?_s1_l3 = primary\\conductance_l3.idf\n"
-        "    ghbssmdens_p?_s1_l1 = primary\\density_l1.idf\n"
-        "    ghbssmdens_p?_s1_l2 = primary\\density_l2.idf\n"
-        "    ghbssmdens_p?_s1_l3 = primary\\density_l3.idf\n"
-        "    bhead_p?_s2_l1 = secondary\\head_l1.idf\n"
-        "    bhead_p?_s2_l2 = secondary\\head_l2.idf\n"
-        "    bhead_p?_s2_l3 = secondary\\head_l3.idf\n"
-        "    cond_p?_s2_l1 = secondary\\conductance_l1.idf\n"
-        "    cond_p?_s2_l2 = secondary\\conductance_l2.idf\n"
-        "    cond_p?_s2_l3 = secondary\\conductance_l3.idf\n"
-        "    bhead_p?_s3_l1 = tertiary\\head_l1.idf\n"
-        "    bhead_p?_s3_l2 = tertiary\\head_l2.idf\n"
-        "    bhead_p?_s3_l3 = tertiary\\head_l3.idf\n"
-        "    cond_p?_s3_l1 = tertiary\\conductance_l1.idf\n"
-        "    cond_p?_s3_l2 = tertiary\\conductance_l2.idf\n"
-        "    cond_p?_s3_l3 = tertiary\\conductance_l3.idf"
-    )
+        "    bhead_p?_s1_l1 = {ph}_l1.idf\n"
+        "    bhead_p?_s1_l2 = {ph}_l2.idf\n"
+        "    bhead_p?_s1_l3 = {ph}_l3.idf\n"
+        "    cond_p?_s1_l1 = {pc}_l1.idf\n"
+        "    cond_p?_s1_l2 = {pc}_l2.idf\n"
+        "    cond_p?_s1_l3 = {pc}_l3.idf\n"
+        "    ghbssmdens_p?_s1_l1 = {pd}_l1.idf\n"
+        "    ghbssmdens_p?_s1_l2 = {pd}_l2.idf\n"
+        "    ghbssmdens_p?_s1_l3 = {pd}_l3.idf\n"
+        "    bhead_p?_s2_l1 = {sh}_l1.idf\n"
+        "    bhead_p?_s2_l2 = {sh}_l2.idf\n"
+        "    bhead_p?_s2_l3 = {sh}_l3.idf\n"
+        "    cond_p?_s2_l1 = {sc}_l1.idf\n"
+        "    cond_p?_s2_l2 = {sc}_l2.idf\n"
+        "    cond_p?_s2_l3 = {sc}_l3.idf\n"
+        "    bhead_p?_s3_l1 = {th}_l1.idf\n"
+        "    bhead_p?_s3_l2 = {th}_l2.idf\n"
+        "    bhead_p?_s3_l3 = {th}_l3.idf\n"
+        "    cond_p?_s3_l1 = {tc}_l1.idf\n"
+        "    cond_p?_s3_l2 = {tc}_l2.idf\n"
+        "    cond_p?_s3_l3 = {tc}_l3.idf"
+    ).format(**d)
     assert group.render(directory, globaltimes=["?"]) == compare
 
 

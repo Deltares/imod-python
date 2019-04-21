@@ -193,17 +193,18 @@ def test_render_pgk__rch(basicmodel):
     globaltimes = m[diskey]["time"].values
     modelname = m.modelname
     directory = pathlib.Path(".")
+    path = pathlib.Path("rch").joinpath("rate")
 
     compare = (
         "[rch]\n"
         "    nrchop = 3\n"
         "    irchcb = 0\n"
-        "    rech_p1 = rch\\rate_20000101000000.idf\n"
-        "    rech_p2 = rch\\rate_20000102000000.idf\n"
-        "    rech_p3 = rch\\rate_20000103000000.idf\n"
-        "    rech_p4 = rch\\rate_20000104000000.idf\n"
-        "    rech_p5 = rch\\rate_20000105000000.idf"
-    )
+        "    rech_p1 = {path}_20000101000000.idf\n"
+        "    rech_p2 = {path}_20000102000000.idf\n"
+        "    rech_p3 = {path}_20000103000000.idf\n"
+        "    rech_p4 = {path}_20000104000000.idf\n"
+        "    rech_p5 = {path}_20000105000000.idf"
+    ).format(path=path)
     assert m._render_pkg("rch", directory=directory, globaltimes=globaltimes) == compare
 
 
@@ -251,53 +252,66 @@ def test_render_groups__ghb_riv_wel(basicmodel):
         "    mghbsys = 1\n"
         "    mxactb = 75\n"
         "    ighbcb = False\n"
-        "    bhead_p?_s1_l1 = ghb\\head_l1.idf\n"
-        "    bhead_p?_s1_l2 = ghb\\head_l2.idf\n"
-        "    bhead_p?_s1_l3 = ghb\\head_l3.idf\n"
-        "    cond_p?_s1_l1 = ghb\\conductance_l1.idf\n"
-        "    cond_p?_s1_l2 = ghb\\conductance_l2.idf\n"
-        "    cond_p?_s1_l3 = ghb\\conductance_l3.idf\n"
-        "    ghbssmdens_p?_s1_l1 = ghb\\density_l1.idf\n"
-        "    ghbssmdens_p?_s1_l2 = ghb\\density_l2.idf\n"
-        "    ghbssmdens_p?_s1_l3 = ghb\\density_l3.idf\n"
+        "    bhead_p?_s1_l1 = {gh}_l1.idf\n"
+        "    bhead_p?_s1_l2 = {gh}_l2.idf\n"
+        "    bhead_p?_s1_l3 = {gh}_l3.idf\n"
+        "    cond_p?_s1_l1 = {gc}_l1.idf\n"
+        "    cond_p?_s1_l2 = {gc}_l2.idf\n"
+        "    cond_p?_s1_l3 = {gc}_l3.idf\n"
+        "    ghbssmdens_p?_s1_l1 = {gd}_l1.idf\n"
+        "    ghbssmdens_p?_s1_l2 = {gd}_l2.idf\n"
+        "    ghbssmdens_p?_s1_l3 = {gd}_l3.idf\n"
         "\n"
         "[riv]\n"
         "    mrivsys = 1\n"
         "    mxactr = 75\n"
         "    irivcb = False\n"
-        "    stage_p?_s1_l1 = riv\\stage_l1.idf\n"
-        "    stage_p?_s1_l2 = riv\\stage_l2.idf\n"
-        "    stage_p?_s1_l3 = riv\\stage_l3.idf\n"
-        "    cond_p?_s1_l1 = riv\\conductance_l1.idf\n"
-        "    cond_p?_s1_l2 = riv\\conductance_l2.idf\n"
-        "    cond_p?_s1_l3 = riv\\conductance_l3.idf\n"
-        "    rbot_p?_s1_l1 = riv\\bottom_elevation_l1.idf\n"
-        "    rbot_p?_s1_l2 = riv\\bottom_elevation_l2.idf\n"
-        "    rbot_p?_s1_l3 = riv\\bottom_elevation_l3.idf\n"
-        "    rivssmdens_p?_s1_l1 = riv\\density_l1.idf\n"
-        "    rivssmdens_p?_s1_l2 = riv\\density_l2.idf\n"
-        "    rivssmdens_p?_s1_l3 = riv\\density_l3.idf\n"
+        "    stage_p?_s1_l1 = {rs}_l1.idf\n"
+        "    stage_p?_s1_l2 = {rs}_l2.idf\n"
+        "    stage_p?_s1_l3 = {rs}_l3.idf\n"
+        "    cond_p?_s1_l1 = {rc}_l1.idf\n"
+        "    cond_p?_s1_l2 = {rc}_l2.idf\n"
+        "    cond_p?_s1_l3 = {rc}_l3.idf\n"
+        "    rbot_p?_s1_l1 = {re}_l1.idf\n"
+        "    rbot_p?_s1_l2 = {re}_l2.idf\n"
+        "    rbot_p?_s1_l3 = {re}_l3.idf\n"
+        "    rivssmdens_p?_s1_l1 = {rd}_l1.idf\n"
+        "    rivssmdens_p?_s1_l2 = {rd}_l2.idf\n"
+        "    rivssmdens_p?_s1_l3 = {rd}_l3.idf\n"
         "\n"
         "[wel]\n"
         "    mwelsys = 1\n"
         "    mxactw = 1\n"
         "    iwelcb = False\n"
-        "    wel_p1_s1_l2 = wel\\wel_20000101000000.ipf\n"
-        "    wel_p2_s1_l2 = wel\\wel_20000102000000.ipf\n"
-        "    wel_p3_s1_l2 = wel\\wel_20000103000000.ipf\n"
-        "    wel_p4_s1_l2 = wel\\wel_20000104000000.ipf\n"
-        "    wel_p5_s1_l2 = wel\\wel_20000105000000.ipf"
-    )
+        "    wel_p1_s1_l2 = {welpath}_20000101000000.ipf\n"
+        "    wel_p2_s1_l2 = {welpath}_20000102000000.ipf\n"
+        "    wel_p3_s1_l2 = {welpath}_20000103000000.ipf\n"
+        "    wel_p4_s1_l2 = {welpath}_20000104000000.ipf\n"
+        "    wel_p5_s1_l2 = {welpath}_20000105000000.ipf"
+    ).format(
+        gh = pathlib.Path("ghb").joinpath("head"),
+        gc = pathlib.Path("ghb").joinpath("conductance"),
+        gd = pathlib.Path("ghb").joinpath("density"),
+        rs = pathlib.Path("riv").joinpath("stage"),
+        rc = pathlib.Path("riv").joinpath("conductance"),
+        re = pathlib.Path("riv").joinpath("bottom_elevation"),
+        rd = pathlib.Path("riv").joinpath("density"),
+        welpath = pathlib.Path("wel").joinpath("wel"),
+    )  # Format is necessary because of Windows versus Unix paths
 
     ssm_compare = (
         "[ssm]\n"
         "    mxss = 151\n"
-        "    cghb_t1_p?_l1 = ghb\\concentration_l1.idf\n"
-        "    cghb_t1_p?_l2 = ghb\\concentration_l2.idf\n"
-        "    cghb_t1_p?_l3 = ghb\\concentration_l3.idf\n"
-        "    criv_t1_p?_l1 = riv\\concentration_l1.idf\n"
-        "    criv_t1_p?_l2 = riv\\concentration_l2.idf\n"
-        "    criv_t1_p?_l3 = riv\\concentration_l3.idf"
+        "    cghb_t1_p?_l1 = {gc}_l1.idf\n"
+        "    cghb_t1_p?_l2 = {gc}_l2.idf\n"
+        "    cghb_t1_p?_l3 = {gc}_l3.idf\n"
+        "    criv_t1_p?_l1 = {rc}_l1.idf\n"
+        "    criv_t1_p?_l2 = {rc}_l2.idf\n"
+        "    criv_t1_p?_l3 = {rc}_l3.idf"
+    ).format(
+        gc = pathlib.Path("ghb").joinpath("concentration"),
+        rc = pathlib.Path("riv").joinpath("concentration"),
+
     )
     content, ssm_content = m._render_groups(
         directory=directory, globaltimes=globaltimes
