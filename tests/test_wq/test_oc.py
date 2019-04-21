@@ -16,7 +16,7 @@ def test_render():
         "    savevztec_p?_l? = False\n"
         "    saveheadvtk_p?_l? = False\n"
         "    saveconcvtk_p?_l? = False\n"
-        "    savevelovtk_p?_l? = False\n"
+        "    savevelovtk_p?_l? = False"
     )
 
     assert oc._render() == compare

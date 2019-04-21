@@ -151,7 +151,7 @@ def test_render_gen(basicmodel):
         "[gen]\n"
         "    modelname = test_model\n"
         "    writehelp = False\n"
-        "    result_dir = test_model\n"
+        "    result_dir = results\n"
         "    packages = adv, bas, btn, dis, dsp, gcg, ghb, lpf, oc, pcg, rch, vdf\n"
         "    coord_xll = 0.0\n"
         "    coord_yll = 0.0\n"
@@ -177,7 +177,7 @@ def test_render_pgk__gcg(basicmodel):
         "    isolve = 3\n"
         "    ncrs = 0\n"
         "    cclose = 1e-06\n"
-        "    iprgcg = 0\n"
+        "    iprgcg = 0"
     )
     assert m._render_pkg("gcg", directory=directory, globaltimes=globaltimes) == compare
 
@@ -258,12 +258,9 @@ def test_render_groups__ghb(basicmodel):
         "    ghbssmdens_p?_s1_l3 = density_l3.idf"
     )
 
-    # TODO: fix stupid newline in the middle
-    # check jinja2 documentation
     ssm_compare = (
         "[ssm]\n"
         "    mxss = 75\n"
-        "\n"
         "    cghb_t1_p?_l1 = concentration_l1.idf\n"
         "    cghb_t1_p?_l2 = concentration_l2.idf\n"
         "    cghb_t1_p?_l3 = concentration_l3.idf"
@@ -289,7 +286,7 @@ def test_render_flowsolver(basicmodel):
         "    relax = 0.98\n"
         "    iprpcg = 1\n"
         "    mutpcg = 0\n"
-        "    damp = 1.0\n"
+        "    damp = 1.0"
     )
     assert m._render_flowsolver() == compare
 
@@ -337,7 +334,7 @@ def test_render_transportsolver(basicmodel):
         "    isolve = 3\n"
         "    ncrs = 0\n"
         "    cclose = 1e-06\n"
-        "    iprgcg = 0\n"
+        "    iprgcg = 0"
     )
     assert m._render_transportsolver() == compare
 

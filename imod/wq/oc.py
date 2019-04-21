@@ -15,7 +15,7 @@ class OutputControl(Package):
         "    savevztec_p?_l? = {save_budget_tec}\n"
         "    saveheadvtk_p?_l? = {save_head_vtk}\n"
         "    saveconcvtk_p?_l? = {save_concentration_vtk}\n"
-        "    savevelovtk_p?_l? = {save_budget_vtk}\n"
+        "    savevelovtk_p?_l? = {save_budget_vtk}"
     )
 
     def __init__(

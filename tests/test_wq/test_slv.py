@@ -17,7 +17,7 @@ def test_pcg_render():
         "    relax = 0.98\n"
         "    iprpcg = 1\n"
         "    mutpcg = 0\n"
-        "    damp = 1.0\n"
+        "    damp = 1.0"
     )
 
     assert pcg._render() == compare
@@ -39,7 +39,7 @@ def test_gcg_render():
         "    isolve = 3\n"
         "    ncrs = 0\n"
         "    cclose = 1e-06\n"
-        "    iprgcg = 0\n"
+        "    iprgcg = 0"
     )
 
     assert gcg._render() == compare

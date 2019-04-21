@@ -52,7 +52,7 @@ class PreconditionedConjugateGradientSolver(Package):
         "    relax = {relax}\n"
         "    iprpcg = 1\n"
         "    mutpcg = 0\n"
-        "    damp = {damp}\n"
+        "    damp = {damp}"
     )
 
     def __init__(self, max_iter, inner_iter, rclose, hclose, relax=0.98, damp=1.0):
@@ -112,7 +112,7 @@ class GeneralizedConjugateGradientSolver(Package):
         "    isolve = {preconditioner}\n"
         "    ncrs = {lump_dispersion}\n"
         "    cclose = {cclose}\n"
-        "    iprgcg = 0\n"
+        "    iprgcg = 0"
     )
 
     _keywords = {

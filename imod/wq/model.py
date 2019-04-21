@@ -2,14 +2,13 @@ import collections
 import pathlib
 
 import cftime
+import imod
 import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
-
-import imod
-from imod.wq.pkggroup import PackageGroups
 from imod.wq import timeutil
+from imod.wq.pkggroup import PackageGroups
 
 
 # This class allows only imod packages as values
@@ -48,7 +47,7 @@ class SeawatModel(Model):
         "[gen]\n"
         "    modelname = {{modelname}}\n"
         "    writehelp = {{writehelp}}\n"
-        "    result_dir = {{modelname}}\n"
+        "    result_dir = results\n"
         "    packages = {{package_set|join(', ')}}\n"
         "    coord_xll = {{xmin}}\n"
         "    coord_yll = {{ymin}}\n"
@@ -169,7 +168,7 @@ class SeawatModel(Model):
         )
         # TODO: do this in a single pass, combined with _n_max_active for modflow part?
         n_sinkssources = sum([group.max_n_sinkssources() for group in package_groups])
-        ssm_content = f"[ssm]\n    mxss = {n_sinkssources}\n" + ssm_content
+        ssm_content = f"[ssm]\n    mxss = {n_sinkssources}" + ssm_content
         return content, ssm_content
 
     def _render_flowsolver(self):
@@ -242,7 +241,7 @@ class SeawatModel(Model):
         content.append(ssmcontent)
         content.append(self._render_transportsolver())
 
-        return "\n".join(content)
+        return "\n\n".join(content)
 
     def save(self, directory):
         for ds in self.values():
@@ -252,14 +251,16 @@ class SeawatModel(Model):
             else:
                 for name, da in ds.data_vars.items():
                     if "y" in da.coords and "x" in da.coords:
-                        imod.idf.save(directory, da)
+                        path = pathlib.Path(directory).joinpath(ds._pkg_id).joinpath(name)
+                        imod.idf.save(path, da)
 
-    def write(self):
-        # TODO: just write to an arbitrary directory
+    def write(self, directory="."):
         runfile_content = self.render()
-        runfilepath = f"{self.modelname}.run"
+        directory = pathlib.Path(directory).joinpath(self.modelname)
+        directory.mkdir(exist_ok=True, parents=True)
+        runfilepath = directory.joinpath(f"{self.modelname}.run")
         # Write the runfile
         with open(runfilepath, "w") as f:
             f.write(runfile_content)
         # Write all IDFs and IPFs
-        self.save(self["modelname"])
+        self.save(directory=directory)
