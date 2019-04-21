@@ -200,10 +200,6 @@ def test_render_pgk__rch(basicmodel):
        "    rech_p4 = rch\\rate_20000104000000.idf\n"
        "    rech_p5 = rch\\rate_20000105000000.idf"
     )
-    with open("compare.txt", "w") as f:
-        f.write(compare)
-    with open("render.txt", "w") as f:
-        f.write(m._render_pkg("rch", directory=directory, globaltimes=globaltimes))
     assert m._render_pkg("rch", directory=directory, globaltimes=globaltimes) == compare
 
 
