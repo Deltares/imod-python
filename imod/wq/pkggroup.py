@@ -56,7 +56,7 @@ class PackageGroup(collections.UserDict):
             [v._max_active_n(self._cellcount_varname) for v in self.values()]
         )
         d["n_max_active"] = self.n_max_active
-        d["save_budget"] = any([v["save_budget"] for v in self.values()])
+        d["save_budget"] = any([v.save_budget for v in self.values()])
 
         content = [self._template.format(**d)]
         for i, key in enumerate(self.key_order):
@@ -111,9 +111,20 @@ class RiverGroup(PackageGroup):
     )
 
 
+class WellGroup(PackageGroup):
+    _cellcount_varname = None
+    _template = (
+        "[wel]\n"
+        "    mwelsys = {n_systems}\n"
+        "    mxactw = {n_max_active}\n"
+        "    iwelcb = {save_budget}"
+    )
+
+
 # dict might be easier than Enumerator...
 class PackageGroups(enum.Enum):
     chd = ConstantHeadGroup
     drn = DrainageGroup
     ghb = GeneralHeadBoundaryGroup
     riv = RiverGroup
+    wel = WellGroup

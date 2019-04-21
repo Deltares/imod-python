@@ -10,6 +10,7 @@ from imod.wq import timeutil
 
 class Well(pd.DataFrame):
     _pkg_id = "wel"
+    save_budget = False
 
     _template = jinja2.Template(
         "    {%- for time, timedict in wels.items() -%}"
@@ -22,7 +23,7 @@ class Well(pd.DataFrame):
     # TODO: implement well to concentration IDF and use ssm_template
     # Ignored for now, since wells are nearly always extracting
 
-    def __init__(self, id_name, x, y, rate, layer=None, time=None):
+    def __init__(self, id_name, x, y, rate, layer=None, time=None, save_budget=False):
         super(__class__, self).__init__()
         self["x"] = x
         self["y"] = y
@@ -32,6 +33,15 @@ class Well(pd.DataFrame):
             self["layer"] = layer
         if time is not None:
             self["time"] = time
+        self.save_budget = save_budget
+
+    @property
+    def data_vars(self):
+        return self.columns
+
+    @property
+    def coords(self):
+        return self.columns
 
     def _compose_values_layer(self, directory, time=None):
         values = {}
@@ -63,6 +73,9 @@ class Well(pd.DataFrame):
         d = {"system_index": system_index}
         d["wels"] = self._compose_values_time(directory, globaltimes)
         return self._template.render(d)
+
+    def _ssm_render(self, directory, globaltimes):
+        return ""
 
     def _max_active_n(self, varname):
         return self.groupby("time").size().max()

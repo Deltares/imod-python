@@ -105,9 +105,9 @@ class SeawatModel(Model):
         """
         # TODO: check for cftime, force all to cftime if necessary
         times = set()  # set only allows for unique values
-        for ds in self.values():
-            if "time" in ds.coords:
-                times.update(ds.coords["time"].values)
+        for pkg in self.values():
+            if "time" in pkg.coords:
+                times.update(pkg["time"].values)
         # TODO: check that endtime is later than all other times.
         times.update((endtime,))
         times, duration = timeutil.timestep_duration(times)
@@ -161,7 +161,7 @@ class SeawatModel(Model):
 
     def _render_groups(self, directory, globaltimes):
         package_groups = self._group()
-        content = "".join(
+        content = "\n\n".join(
             [group.render(directory, globaltimes) for group in package_groups]
         )
         ssm_content = "".join(
@@ -254,5 +254,5 @@ class SeawatModel(Model):
             f.write(runfile_content)
         # Write all IDFs and IPFs
         for pkgname, pkg in self.items():
-            if "x" in pkg and "y" in pkg:
+            if "x" in pkg.coords and "y" in pkg.coords:
                 pkg.save(directory=directory.joinpath(pkgname))

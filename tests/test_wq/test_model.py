@@ -42,6 +42,11 @@ def basicmodel(request):
         coords={"time": datetimes, "y": y, "x": x, "dx": 1.0, "dy": -1.0},
         dims=("time", "y", "x"),
     )
+
+    # WEL
+    welly = np.arange(4.5, 0.0, -1.0)
+    wellx = np.arange(0.5, 5.0, 1.0)
+
     # DSP
     longitudinal = ibound.copy()
 
@@ -71,6 +76,15 @@ def basicmodel(request):
         density=head.copy(),
         save_budget=False,
     )
+    m["riv"] = imod.wq.River(
+        stage=head,
+        conductance=head.copy(),
+        bottom_elevation=head.copy(),
+        concentration=head.copy(),
+        density=head.copy(),
+        save_budget=False,
+    )
+    m["wel"] = imod.wq.Well(id_name="well", x=wellx, y=welly, rate=5.0, layer=2, time=datetimes)
     m["rch"] = imod.wq.RechargeHighestActive(
         rate=rate, concentration=rate.copy(), save_budget=False
     )
@@ -122,16 +136,6 @@ def test_get_pkgkey(basicmodel):
         assert key == package._pkg_id
 
 
-def test_group(basicmodel):
-    m = basicmodel
-    g = m._group()
-    # Contains only GHB group
-    assert len(g) == 1
-    # GHB group contains only one value
-    assert len(g[0]) == 1
-    assert list(g[0].keys())[0] == "ghb"
-
-
 def test_timediscretization(basicmodel):
     m = basicmodel
     m.time_discretization(endtime="2000-01-06")
@@ -152,7 +156,7 @@ def test_render_gen(basicmodel):
         "    modelname = test_model\n"
         "    writehelp = False\n"
         "    result_dir = results\n"
-        "    packages = adv, bas, btn, dis, dsp, gcg, ghb, lpf, oc, pcg, rch, vdf\n"
+        "    packages = adv, bas, btn, dis, dsp, gcg, ghb, lpf, oc, pcg, rch, riv, vdf, wel\n"
         "    coord_xll = 0.0\n"
         "    coord_yll = 0.0\n"
         "    start_year = 2000\n"
@@ -194,11 +198,11 @@ def test_render_pgk__rch(basicmodel):
         "[rch]\n"
         "    nrchop = 3\n"
         "    irchcb = 0\n"
-       "    rech_p1 = rch\\rate_20000101000000.idf\n"
-       "    rech_p2 = rch\\rate_20000102000000.idf\n"
-       "    rech_p3 = rch\\rate_20000103000000.idf\n"
-       "    rech_p4 = rch\\rate_20000104000000.idf\n"
-       "    rech_p5 = rch\\rate_20000105000000.idf"
+        "    rech_p1 = rch\\rate_20000101000000.idf\n"
+        "    rech_p2 = rch\\rate_20000102000000.idf\n"
+        "    rech_p3 = rch\\rate_20000103000000.idf\n"
+        "    rech_p4 = rch\\rate_20000104000000.idf\n"
+        "    rech_p5 = rch\\rate_20000105000000.idf"
     )
     assert m._render_pkg("rch", directory=directory, globaltimes=globaltimes) == compare
 
@@ -234,7 +238,7 @@ def test_render_dis(basicmodel):
     assert m._render_dis(directory=directory, globaltimes=globaltimes) == compare
 
 
-def test_render_groups__ghb(basicmodel):
+def test_render_groups__ghb_riv_wel(basicmodel):
     m = basicmodel
     m.time_discretization(endtime="2000-01-06")
     diskey = m._get_pkgkey("dis")
@@ -255,15 +259,45 @@ def test_render_groups__ghb(basicmodel):
         "    cond_p?_s1_l3 = ghb\\conductance_l3.idf\n"
         "    ghbssmdens_p?_s1_l1 = ghb\\density_l1.idf\n"
         "    ghbssmdens_p?_s1_l2 = ghb\\density_l2.idf\n"
-        "    ghbssmdens_p?_s1_l3 = ghb\\density_l3.idf"
+        "    ghbssmdens_p?_s1_l3 = ghb\\density_l3.idf\n"
+        "\n"
+        "[riv]\n"
+        "    mrivsys = 1\n"
+        "    mxactr = 75\n"
+        "    irivcb = False\n"
+        "    stage_p?_s1_l1 = riv\\stage_l1.idf\n"
+        "    stage_p?_s1_l2 = riv\\stage_l2.idf\n"
+        "    stage_p?_s1_l3 = riv\\stage_l3.idf\n"
+        "    cond_p?_s1_l1 = riv\\conductance_l1.idf\n"
+        "    cond_p?_s1_l2 = riv\\conductance_l2.idf\n"
+        "    cond_p?_s1_l3 = riv\\conductance_l3.idf\n"
+        "    rbot_p?_s1_l1 = riv\\bottom_elevation_l1.idf\n"
+        "    rbot_p?_s1_l2 = riv\\bottom_elevation_l2.idf\n"
+        "    rbot_p?_s1_l3 = riv\\bottom_elevation_l3.idf\n"
+        "    rivssmdens_p?_s1_l1 = riv\\density_l1.idf\n"
+        "    rivssmdens_p?_s1_l2 = riv\\density_l2.idf\n"
+        "    rivssmdens_p?_s1_l3 = riv\\density_l3.idf\n"
+        "\n"
+        "[wel]\n"
+        "    mwelsys = 1\n"
+        "    mxactw = 1\n"
+        "    iwelcb = False\n"
+        "    wel_p1_s1_l2 = wel\\wel_20000101000000.ipf\n"
+        "    wel_p2_s1_l2 = wel\\wel_20000102000000.ipf\n"
+        "    wel_p3_s1_l2 = wel\\wel_20000103000000.ipf\n"
+        "    wel_p4_s1_l2 = wel\\wel_20000104000000.ipf\n"
+        "    wel_p5_s1_l2 = wel\\wel_20000105000000.ipf"
     )
 
     ssm_compare = (
         "[ssm]\n"
-        "    mxss = 75\n"
+        "    mxss = 151\n"
         "    cghb_t1_p?_l1 = ghb\\concentration_l1.idf\n"
         "    cghb_t1_p?_l2 = ghb\\concentration_l2.idf\n"
-        "    cghb_t1_p?_l3 = ghb\\concentration_l3.idf"
+        "    cghb_t1_p?_l3 = ghb\\concentration_l3.idf\n"
+        "    criv_t1_p?_l1 = riv\\concentration_l1.idf\n"
+        "    criv_t1_p?_l2 = riv\\concentration_l2.idf\n"
+        "    criv_t1_p?_l3 = riv\\concentration_l3.idf"
     )
     content, ssm_content = m._render_groups(
         directory=directory, globaltimes=globaltimes
