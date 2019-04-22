@@ -111,7 +111,10 @@ class Package(xr.Dataset):
                     d["layer"] = layer
                     values[layer] = util.compose(d)
                 else:
-                    values[layer] = da.sel(layer=layer).values[()]
+                    if "layer" in da.dims:
+                        values[layer] = da.sel(layer=layer).values[()]
+                    else:
+                        values[layer] = da.values[()]
 
         return values
 
@@ -128,6 +131,8 @@ class Package(xr.Dataset):
 
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
             for itime, start_end in enumerate(starts_ends):
+                # TODO: this now fails on a non-dim time too
+                # solution roughly the same as for layer above?
                 values[start_end] = da.isel(time=itime).values[()]
         else:
             values["?"] = da.values[()]
@@ -303,6 +308,9 @@ class BoundaryCondition(Package):
         rendered : str
             The rendered runfile SSM part for a single boundary condition system.
         """
+        
+        if "concentration" not in self:
+            return ""
 
         d = {}
         d["pkg_id"] = self._pkg_id
