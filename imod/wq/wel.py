@@ -102,7 +102,7 @@ class Well(pd.DataFrame):
                 path = util.compose(d)
                 imod.ipf.write(path, outdf)
         else:
-            outdf = layerdf[["x", "y", "rate", "id_name"]]
+            outdf = df[["x", "y", "rate", "id_name"]]
             path = util.compose(d)
             imod.ipf.write(path, outdf)
 

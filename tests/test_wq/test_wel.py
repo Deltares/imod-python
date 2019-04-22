@@ -89,3 +89,21 @@ def test_save(well):
     ]
     for file in files:
         assert pathlib.Path("well").joinpath(file).exists()
+
+
+def test_save__time_nolayer(well):
+    d = {k: v for k, v in well.copy().drop("layer", axis=1).items()}
+    wel = Well(**d)
+    directory = pathlib.Path("well")
+    path = pathlib.Path("well").joinpath("well")
+    wel.save(directory)
+
+    files = [
+        "well_20000101000000.ipf",
+        "well_20000102000000.ipf",
+        "well_20000103000000.ipf",
+        "well_20000104000000.ipf",
+        "well_20000105000000.ipf",
+    ]
+    for file in files:
+        assert pathlib.Path("well").joinpath(file).exists()
