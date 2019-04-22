@@ -156,7 +156,9 @@ class SeawatModel(Model):
                 return ""
             else:
                 raise ValueError(f"No {key} package provided.")
-        return self[pkgkey]._render(directory=directory.joinpath(pkgkey), globaltimes=globaltimes)
+        return self[pkgkey]._render(
+            directory=directory.joinpath(pkgkey), globaltimes=globaltimes
+        )
 
     def _render_dis(self, directory, globaltimes):
         baskey = self._get_pkgkey("bas6")
@@ -175,10 +177,10 @@ class SeawatModel(Model):
         ssm_content = "".join(
             [group.render_ssm(directory, globaltimes) for group in package_groups]
         )
-        # TODO: do this in a single pass, combined with _n_max_active for modflow part?
+
+        # Calculate number of sinks and sources
         n_sinkssources = sum([group.max_n_sinkssources() for group in package_groups])
-        ssm_content = f"[ssm]\n    mxss = {n_sinkssources}" + ssm_content
-        return content, ssm_content
+        return content, ssm_content, n_sinkssources
 
     def _render_flowsolver(self):
         pcgkey = self._get_pkgkey("pcg")
@@ -200,7 +202,9 @@ class SeawatModel(Model):
 
         if btnkey is None:
             raise ValueError("No BasicTransport package provided.")
-        btn_content = self[btnkey]._render(directory=directory.joinpath(btnkey), thickness=thickness)
+        btn_content = self[btnkey]._render(
+            directory=directory.joinpath(btnkey), thickness=thickness
+        )
         dis_content = self[diskey]._render_btn(globaltimes=globaltimes)
         return btn_content + dis_content
 
@@ -216,15 +220,27 @@ class SeawatModel(Model):
         else:
             return self[pkstkey]._render()
 
+    def _btn_rch_sinkssources(self):
+        btnkey = self._get_pkgkey("btn")
+        icbund = self[btnkey]["icbund"]
+        n_extra = icbund.where(icbund == -1).count()
+
+        rchkey = self._get_pkgkey("rch")
+        if rchkey is not None:
+            n_extra += self[rchkey]["rate"].count()
+
+        return int(n_extra)
+
     def render(self, writehelp=False):
         """
         Render the runfile as a string, package by package.
         """
         diskey = self._get_pkgkey("dis")
         globaltimes = self[diskey]["time"].values
-        directory = pathlib.Path(self.modelname)
+        # directory = pathlib.Path(self.modelname)
+        directory = pathlib.Path(".")
 
-        modflowcontent, ssmcontent = self._render_groups(
+        modflowcontent, ssm_content, n_sinkssources = self._render_groups(
             directory=directory, globaltimes=globaltimes
         )
 
@@ -246,8 +262,13 @@ class SeawatModel(Model):
         # MT3D and Seawat
         content.append(self._render_btn(directory=directory, globaltimes=globaltimes))
         for key in ("vdf", "adv", "dsp"):
-            content.append(self._render_pkg(key=key, directory=directory, globaltimes=globaltimes))
-        content.append(ssmcontent)
+            content.append(
+                self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
+            )
+
+        n_sinkssources += self._btn_rch_sinkssources()
+        ssm_content = f"[ssm]\n    mxss = {n_sinkssources}" + ssm_content
+        content.append(ssm_content)
         content.append(self._render_transportsolver())
 
         return "\n\n".join(content)

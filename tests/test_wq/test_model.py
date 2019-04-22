@@ -1,12 +1,11 @@
 import pathlib
 
+import imod
+import imod.wq
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-
-import imod
-import imod.wq
 
 
 @pytest.fixture(scope="module")
@@ -292,19 +291,18 @@ def test_render_groups__ghb_riv_wel(basicmodel):
         "    wel_p4_s1_l? = {welpath}_20000104000000.ipf\n"
         "    wel_p5_s1_l? = {welpath}_20000105000000.ipf"
     ).format(
-        gh = pathlib.Path("ghb").joinpath("head"),
-        gc = pathlib.Path("ghb").joinpath("conductance"),
-        gd = pathlib.Path("ghb").joinpath("density"),
-        rs = pathlib.Path("riv").joinpath("stage"),
-        rc = pathlib.Path("riv").joinpath("conductance"),
-        re = pathlib.Path("riv").joinpath("bottom_elevation"),
-        rd = pathlib.Path("riv").joinpath("density"),
-        welpath = pathlib.Path("wel").joinpath("wel"),
+        gh=pathlib.Path("ghb").joinpath("head"),
+        gc=pathlib.Path("ghb").joinpath("conductance"),
+        gd=pathlib.Path("ghb").joinpath("density"),
+        rs=pathlib.Path("riv").joinpath("stage"),
+        rc=pathlib.Path("riv").joinpath("conductance"),
+        re=pathlib.Path("riv").joinpath("bottom_elevation"),
+        rd=pathlib.Path("riv").joinpath("density"),
+        welpath=pathlib.Path("wel").joinpath("wel"),
     )  # Format is necessary because of Windows versus Unix paths
 
     ssm_compare = (
-        "[ssm]\n"
-        "    mxss = 153\n"
+        "\n"
         "    cghb_t1_p?_l1 = {gc}_l1.idf\n"
         "    cghb_t1_p?_l2 = {gc}_l2.idf\n"
         "    cghb_t1_p?_l3 = {gc}_l3.idf\n"
@@ -312,14 +310,14 @@ def test_render_groups__ghb_riv_wel(basicmodel):
         "    criv_t1_p?_l2 = {rc}_l2.idf\n"
         "    criv_t1_p?_l3 = {rc}_l3.idf"
     ).format(
-        gc = pathlib.Path("ghb").joinpath("concentration"),
-        rc = pathlib.Path("riv").joinpath("concentration"),
-
+        gc=pathlib.Path("ghb").joinpath("concentration"),
+        rc=pathlib.Path("riv").joinpath("concentration"),
     )
-    content, ssm_content = m._render_groups(
+    content, ssm_content, n_sinkssources = m._render_groups(
         directory=directory, globaltimes=globaltimes
     )
 
+    assert n_sinkssources == 153
     assert content == compare
     assert ssm_content == ssm_compare
 
