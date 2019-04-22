@@ -84,7 +84,7 @@ class ConstantHeadGroup(PackageGroup):
 class DrainageGroup(PackageGroup):
     _cellcount_varname = "conductance"
     _template = (
-        "[ghb]\n"
+        "[drn]\n"
         "    mdrnsys = {n_systems}\n"
         "    mxactd = {n_max_active}\n"
         "    idrncb = {save_budget}"
