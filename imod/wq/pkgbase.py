@@ -225,7 +225,7 @@ class BoundaryCondition(Package):
 
         return values
 
-    def _max_active_n(self, varname):
+    def _max_active_n(self, varname, nlayer):
         """
         Determine the maximum active number of cells that are active
         during a stress period.
@@ -235,11 +235,15 @@ class BoundaryCondition(Package):
         varname : str
             name of the variable to use to calculate the maximum number of
             active cells. Generally conductance.
+        nlayer : int
+            number of layers, taken from ibound.
         """
         if "time" in self[varname].coords:
             nmax = int(self[varname].groupby("time").count().max())
         else:
             nmax = int(self[varname].count())
+        if not "layer" in self.coords:  # Then it applies to every layer
+            nmax *= nlayer
         return nmax
         # TODO: save this as attribute so it doesn't have to be recomputed for SSM?
         # Maybe call in __init__, then.

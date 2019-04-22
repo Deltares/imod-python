@@ -84,7 +84,7 @@ def basicmodel(request):
         density=head.copy(),
         save_budget=False,
     )
-    m["wel"] = imod.wq.Well(id_name="well", x=wellx, y=welly, rate=5.0, layer=2, time=datetimes)
+    m["wel"] = imod.wq.Well(id_name="well", x=wellx, y=welly, rate=5.0, time=datetimes)
     m["rch"] = imod.wq.RechargeHighestActive(
         rate=rate, concentration=rate.copy(), save_budget=False
     )
@@ -284,13 +284,13 @@ def test_render_groups__ghb_riv_wel(basicmodel):
         "\n"
         "[wel]\n"
         "    mwelsys = 1\n"
-        "    mxactw = 1\n"
+        "    mxactw = 3\n"
         "    iwelcb = 0\n"
-        "    wel_p1_s1_l2 = {welpath}_20000101000000.ipf\n"
-        "    wel_p2_s1_l2 = {welpath}_20000102000000.ipf\n"
-        "    wel_p3_s1_l2 = {welpath}_20000103000000.ipf\n"
-        "    wel_p4_s1_l2 = {welpath}_20000104000000.ipf\n"
-        "    wel_p5_s1_l2 = {welpath}_20000105000000.ipf"
+        "    wel_p1_s1_l? = {welpath}_20000101000000.ipf\n"
+        "    wel_p2_s1_l? = {welpath}_20000102000000.ipf\n"
+        "    wel_p3_s1_l? = {welpath}_20000103000000.ipf\n"
+        "    wel_p4_s1_l? = {welpath}_20000104000000.ipf\n"
+        "    wel_p5_s1_l? = {welpath}_20000105000000.ipf"
     ).format(
         gh = pathlib.Path("ghb").joinpath("head"),
         gc = pathlib.Path("ghb").joinpath("conductance"),
@@ -304,7 +304,7 @@ def test_render_groups__ghb_riv_wel(basicmodel):
 
     ssm_compare = (
         "[ssm]\n"
-        "    mxss = 151\n"
+        "    mxss = 153\n"
         "    cghb_t1_p?_l1 = {gc}_l1.idf\n"
         "    cghb_t1_p?_l2 = {gc}_l2.idf\n"
         "    cghb_t1_p?_l3 = {gc}_l3.idf\n"

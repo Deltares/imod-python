@@ -49,11 +49,11 @@ class PackageGroup(collections.UserDict):
         #    nmax = int(ds[varname].count())
         return self.n_max_active
 
-    def render(self, directory, globaltimes):
+    def render(self, directory, globaltimes, nlayer):
         d = {}
         d["n_systems"] = len(self.keys())
         self.n_max_active = sum(
-            [v._max_active_n(self._cellcount_varname) for v in self.values()]
+            [v._max_active_n(self._cellcount_varname, nlayer) for v in self.values()]
         )
         d["n_max_active"] = self.n_max_active
         d["save_budget"] = 1 if any([v.save_budget for v in self.values()]) else 0

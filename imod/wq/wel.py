@@ -77,12 +77,14 @@ class Well(pd.DataFrame):
     def _ssm_render(self, directory, globaltimes):
         return ""
 
-    def _max_active_n(self, varname):
+    def _max_active_n(self, varname, nlayer):
         if "time" in self:
-            return self.groupby("time").size().max()
+            nmax = self.groupby("time").size().max()
         else:
-            return self.shape[0]
-        # TODO: figure out max_active_n when whole layer is used (wildcard "?")
+            nmax = self.shape[0]
+        if "layer" not in self:
+            nmax *= nlayer
+        return nmax
 
     @staticmethod
     def _save_layers(df, directory, time=None):

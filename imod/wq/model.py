@@ -166,9 +166,11 @@ class SeawatModel(Model):
         return bas_content + dis_content
 
     def _render_groups(self, directory, globaltimes):
+        baskey = self._get_pkgkey("bas6")
+        nlayer = self[baskey]["ibound"].shape[0]
         package_groups = self._group()
         content = "\n\n".join(
-            [group.render(directory, globaltimes) for group in package_groups]
+            [group.render(directory, globaltimes, nlayer) for group in package_groups]
         )
         ssm_content = "".join(
             [group.render_ssm(directory, globaltimes) for group in package_groups]
