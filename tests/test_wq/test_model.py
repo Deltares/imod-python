@@ -52,7 +52,7 @@ def basicmodel(request):
 
     # Fill model
     m = imod.wq.SeawatModel("test_model")
-    m["bas"] = imod.wq.BasicFlow(
+    m["bas6"] = imod.wq.BasicFlow(
         ibound=ibound, top=top, bottom=bot, starting_head=starting_head
     )
     m["lpf"] = imod.wq.LayerPropertyFlow(
@@ -153,10 +153,11 @@ def test_render_gen(basicmodel):
 
     compare = (
         "[gen]\n"
+        "    runtype = SEAWAT\n"
         "    modelname = test_model\n"
         "    writehelp = False\n"
         "    result_dir = results\n"
-        "    packages = adv, bas, btn, dis, dsp, gcg, ghb, lpf, oc, pcg, rch, riv, vdf, wel\n"
+        "    packages = adv, bas6, btn, dis, dsp, gcg, ghb, lpf, oc, pcg, rch, riv, ssm, vdf, wel\n"
         "    coord_xll = 0.0\n"
         "    coord_yll = 0.0\n"
         "    start_year = 2000\n"
@@ -227,6 +228,8 @@ def test_render_dis(basicmodel):
         "    botm_l1 = 20.0\n"
         "    botm_l2 = 10.0\n"
         "    botm_l3 = 0.0\n"
+        "    laycbd_l? = 0\n"
+        "    nper = 5\n"
         "    perlen_p1 = 1.0\n"
         "    perlen_p2 = 1.0\n"
         "    perlen_p3 = 1.0\n"
@@ -251,7 +254,7 @@ def test_render_groups__ghb_riv_wel(basicmodel):
         "[ghb]\n"
         "    mghbsys = 1\n"
         "    mxactb = 75\n"
-        "    ighbcb = False\n"
+        "    ighbcb = 0\n"
         "    bhead_p?_s1_l1 = {gh}_l1.idf\n"
         "    bhead_p?_s1_l2 = {gh}_l2.idf\n"
         "    bhead_p?_s1_l3 = {gh}_l3.idf\n"
@@ -265,7 +268,7 @@ def test_render_groups__ghb_riv_wel(basicmodel):
         "[riv]\n"
         "    mrivsys = 1\n"
         "    mxactr = 75\n"
-        "    irivcb = False\n"
+        "    irivcb = 0\n"
         "    stage_p?_s1_l1 = {rs}_l1.idf\n"
         "    stage_p?_s1_l2 = {rs}_l2.idf\n"
         "    stage_p?_s1_l3 = {rs}_l3.idf\n"
@@ -282,7 +285,7 @@ def test_render_groups__ghb_riv_wel(basicmodel):
         "[wel]\n"
         "    mwelsys = 1\n"
         "    mxactw = 1\n"
-        "    iwelcb = False\n"
+        "    iwelcb = 0\n"
         "    wel_p1_s1_l2 = {welpath}_20000101000000.ipf\n"
         "    wel_p2_s1_l2 = {welpath}_20000102000000.ipf\n"
         "    wel_p3_s1_l2 = {welpath}_20000103000000.ipf\n"

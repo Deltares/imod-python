@@ -81,11 +81,11 @@ def test_save(well):
     wel.save(directory)
 
     files = [
-        "well_20000101000000.ipf",
-        "well_20000102000000.ipf",
-        "well_20000103000000.ipf",
-        "well_20000104000000.ipf",
-        "well_20000105000000.ipf",
+        "well_20000101000000_l2.ipf",
+        "well_20000102000000_l2.ipf",
+        "well_20000103000000_l2.ipf",
+        "well_20000104000000_l2.ipf",
+        "well_20000105000000_l2.ipf",
     ]
     for file in files:
         assert pathlib.Path("well").joinpath(file).exists()

@@ -56,7 +56,7 @@ class PackageGroup(collections.UserDict):
             [v._max_active_n(self._cellcount_varname) for v in self.values()]
         )
         d["n_max_active"] = self.n_max_active
-        d["save_budget"] = any([v.save_budget for v in self.values()])
+        d["save_budget"] = 1 if any([v.save_budget for v in self.values()]) else 0
 
         content = [self._template.format(**d)]
         for i, key in enumerate(self.key_order):

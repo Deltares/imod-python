@@ -45,6 +45,7 @@ class SeawatModel(Model):
 
     _gen_template = jinja2.Template(
         "[gen]\n"
+        "    runtype = SEAWAT\n"
         "    modelname = {{modelname}}\n"
         "    writehelp = {{writehelp}}\n"
         "    result_dir = results\n"
@@ -99,7 +100,7 @@ class SeawatModel(Model):
 
         return package_groups
 
-    def time_discretization(self, endtime):
+    def time_discretization(self, endtime, starttime=None):
         """
         Collect all unique times
         """
@@ -110,6 +111,8 @@ class SeawatModel(Model):
                 times.update(pkg["time"].values)
         # TODO: check that endtime is later than all other times.
         times.update((endtime,))
+        if starttime is not None:
+            times.update((starttime,))
         times, duration = timeutil.timestep_duration(times)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
@@ -122,9 +125,9 @@ class SeawatModel(Model):
 
     def _render_gen(self, modelname, globaltimes, writehelp=False):
         package_set = set([pkg._pkg_id for pkg in self.values()])
-        package_set.update(("btn",))
+        package_set.update(("btn", "ssm"))
         package_set = sorted(package_set)
-        baskey = self._get_pkgkey("bas")
+        baskey = self._get_pkgkey("bas6")
         bas = self[baskey]
         _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(bas["ibound"])
         start_date = timeutil.to_datetime(globaltimes[0]).strftime("%Y%m%d%H%M%S")
@@ -147,13 +150,16 @@ class SeawatModel(Model):
         """
         # Get name of pkg, e.g. lookup "recharge" for rch _pkg_id
         pkgkey = self._get_pkgkey(key)
-        if key is None:
+        if pkgkey is None:
             # Maybe do enum look for full package name?
-            raise ValueError(f"No {key} package provided.")
-        return self[key]._render(directory=directory.joinpath(pkgkey), globaltimes=globaltimes)
+            if key == "rch":  # since recharge is optional
+                return ""
+            else:
+                raise ValueError(f"No {key} package provided.")
+        return self[pkgkey]._render(directory=directory.joinpath(pkgkey), globaltimes=globaltimes)
 
     def _render_dis(self, directory, globaltimes):
-        baskey = self._get_pkgkey("bas")
+        baskey = self._get_pkgkey("bas6")
         diskey = self._get_pkgkey("dis")
         bas_content = self[baskey]._render_dis(directory=directory.joinpath(baskey))
         dis_content = self[diskey]._render(globaltimes=globaltimes)
@@ -185,7 +191,7 @@ class SeawatModel(Model):
             return self[pksfkey]._render()
 
     def _render_btn(self, directory, globaltimes):
-        baskey = self._get_pkgkey("bas")
+        baskey = self._get_pkgkey("bas6")
         btnkey = self._get_pkgkey("btn")
         diskey = self._get_pkgkey("dis")
         thickness = self[baskey].thickness()
@@ -228,7 +234,7 @@ class SeawatModel(Model):
         )
         content.append(self._render_dis(directory=directory, globaltimes=globaltimes))
         # Modflow
-        for key in ("bas", "oc", "lpf", "rch"):
+        for key in ("bas6", "oc", "lpf", "rch"):
             content.append(
                 self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
             )
@@ -238,7 +244,7 @@ class SeawatModel(Model):
         # MT3D and Seawat
         content.append(self._render_btn(directory=directory, globaltimes=globaltimes))
         for key in ("vdf", "adv", "dsp"):
-            self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
+            content.append(self._render_pkg(key=key, directory=directory, globaltimes=globaltimes))
         content.append(ssmcontent)
         content.append(self._render_transportsolver())
 

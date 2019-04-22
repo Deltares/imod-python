@@ -52,7 +52,7 @@ def test_render(ghb_group):
         "[ghb]\n"
         "    mghbsys = 3\n"
         "    mxactb = 225\n"
-        "    ighbcb = False\n"
+        "    ighbcb = 0\n"
         "    bhead_p?_s1_l1 = {ph}_l1.idf\n"
         "    bhead_p?_s1_l2 = {ph}_l2.idf\n"
         "    bhead_p?_s1_l3 = {ph}_l3.idf\n"
@@ -101,3 +101,5 @@ def test_render_error__concentration_twice(ghb_group):
 
     with pytest.raises(ValueError):
         ghb_group = GeneralHeadBoundaryGroup(**d)
+
+# TODO add test for Well that has no time, to calculate max_n_active

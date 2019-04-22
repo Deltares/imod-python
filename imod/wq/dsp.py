@@ -23,7 +23,7 @@ class Dispersion(Package):
     )
 
     def __init__(
-        self, longitudinal, ratio_horizontal, ratio_vertical, diffusion_coefficient
+        self, longitudinal, ratio_horizontal=0.1, ratio_vertical=0.1, diffusion_coefficient=1.0e-9
     ):
         super(__class__, self).__init__()
         self["longitudinal"] = longitudinal

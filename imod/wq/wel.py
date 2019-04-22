@@ -78,7 +78,11 @@ class Well(pd.DataFrame):
         return ""
 
     def _max_active_n(self, varname):
-        return self.groupby("time").size().max()
+        if "time" in self:
+            return self.groupby("time").size().max()
+        else:
+            return self.shape[0]
+        # TODO: figure out max_active_n when whole layer is used (wildcard "?")
 
     @staticmethod
     def _save_layers(df, directory, time=None):
@@ -88,10 +92,17 @@ class Well(pd.DataFrame):
         if time is not None:
             d["time"] = time
 
-        # Ensure right order
-        outdf = df[["x", "y", "rate", "id_name"]]
-        path = util.compose(d)
-        imod.ipf.write(path, outdf)
+        if "layer" in df:
+            for layer, layerdf in df.groupby("layer"):
+                d["layer"] = layer
+                # Ensure right order
+                outdf = layerdf[["x", "y", "rate", "id_name"]]
+                path = util.compose(d)
+                imod.ipf.write(path, outdf)
+        else:
+            outdf = layerdf[["x", "y", "rate", "id_name"]]
+            path = util.compose(d)
+            imod.ipf.write(path, outdf)
 
     def save(self, directory):
         if "time" in self:
