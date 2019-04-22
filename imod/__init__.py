@@ -4,11 +4,11 @@ import numpy as np
 import pandas as pd
 
 # submodules
-import imod.idf
-import imod.ipf
-import imod.run
-import imod.tec
-import imod.util
+from imod import idf
+from imod import ipf
+from imod import run
+from imod import tec
+from imod import util
 
 # subpackages
 import imod.pre
