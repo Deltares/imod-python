@@ -22,6 +22,7 @@ setup(
     install_requires=[
         "numba",
         "numpy",
+        "scipy",
         "xarray>=0.11",
         "cftime>=1",
         "pandas",
