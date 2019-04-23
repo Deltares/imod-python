@@ -10,7 +10,11 @@ class LayerPropertyFlow(Package):
 
     Parameters
     ----------
+<<<<<<< HEAD
     k_horizontal: float or array of floats (xarray.DataArray)
+=======
+    k_horizontal: float or array of floats (xarray.DataArray) 
+>>>>>>> docs vdf and some minor adjustments docs lpf
         is the hydraulic conductivity along rows (HK). HK is multiplied by
         horizontal anisotropy (see horizontal_anisotropy) to obtain hydraulic
         conductivity along columns.
