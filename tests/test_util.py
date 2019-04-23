@@ -88,7 +88,7 @@ def test_decompose_pattern_dash():
 
 
 def test_decompose_regexpattern():
-    pattern = re.compile("(?P<name>[\w]+)L(?P<layer>[\d+]*)", re.IGNORECASE)
+    pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)", re.IGNORECASE)
     d = util.decompose("headL11.idf", pattern=pattern)
     refd = {
         "extension": ".idf",

@@ -10,7 +10,7 @@ import numpy as np
 
 
 def decompose(path, pattern=None):
-    """
+    r"""
     Parse a path, returning a dict of the parts, following the iMOD conventions.
 
     Parameters
@@ -43,7 +43,7 @@ def decompose(path, pattern=None):
     Make sure to include the `re.IGNORECASE` flag since all paths are lowered.
 
     >>> import re
-    >>> pattern = re.compile("(?P<name>[\w]+)L(?P<layer>[\d+]*)")
+    >>> pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)")
     >>> decompose("headL11", pattern=pattern)
 
     However, this requires constructing regular expressions, which is generally
@@ -62,8 +62,8 @@ def decompose(path, pattern=None):
             d = pattern.match(stem).groupdict()
         else:
             # Get the variables between curly braces
-            in_curly = re.compile("\{(.*?)\}").findall(pattern)
-            regex_parts = {key: f"(?P<{key}>[\w-]+)" for key in in_curly}
+            in_curly = re.compile(r"{(.*?)}").findall(pattern)
+            regex_parts = {key: f"(?P<{key}>[\\w-]+)" for key in in_curly}
             # Format the regex string, by filling in the variables
             simple_regex = pattern.format(**regex_parts)
             re_pattern = re.compile(simple_regex)
@@ -72,15 +72,15 @@ def decompose(path, pattern=None):
     else:  # Default to "iMOD conventions": {name}_{time}_l{layer}
         has_layer = bool(re.search(r"l\d+$", stem))
         try:  # try for time
-            base_pattern = "(?P<name>[\w-]+)_(?P<time>[\w]+)"
+            base_pattern = r"(?P<name>[\w-]+)_(?P<time>[\w]+)"
             if has_layer:
-                base_pattern += "_l(?P<layer>[\w]+)"
+                base_pattern += r"_l(?P<layer>[\w]+)"
             re_pattern = re.compile(base_pattern)
             d = re_pattern.match(stem).groupdict()
         except AttributeError:  # probably no time
-            base_pattern = "(?P<name>[\w]+)"
+            base_pattern = r"(?P<name>[\w]+)"
             if has_layer:
-                base_pattern += "_l(?P<layer>[\w]+)"
+                base_pattern += r"_l(?P<layer>[\w]+)"
             re_pattern = re.compile(base_pattern)
             d = re_pattern.match(stem).groupdict()
 
