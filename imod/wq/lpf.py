@@ -10,18 +10,18 @@ class LayerPropertyFlow(Package):
 
     Parameters
     ----------
-    k_horizontal: float or array of floats (xarray.DataArray) 
+    k_horizontal: float or array of floats (xarray.DataArray)
         is the hydraulic conductivity along rows (HK). HK is multiplied by
         horizontal anisotropy (see horizontal_anisotropy) to obtain hydraulic
         conductivity along columns.
     k_vertical: float or array of floats (xarray.DataArray)
         is the vertical hydraulic conductivity (VKA).
-    horizontal_anisotropy: float or
-        array of floats (xarray.DataArray) contains a value for each layer that
-        is the horizontal anisotropy (CHANI). Use as many records as needed to
-        enter a value of CHANI for each layer. The horizontal anisotropy is the
-        ratio of the hydraulic conductivity along columns (the Y direction) to
-        the hydraulic conductivity along rows (the X direction).
+    horizontal_anisotropy: float or array of floats (xarray.DataArray)
+        contains a value for each layer that is the horizontal anisotropy
+        (CHANI). Use as many records as needed to enter a value of CHANI for
+        each layer. The horizontal anisotropy is the ratio of the hydraulic
+        conductivity along columns (the Y direction) to the hydraulic
+        conductivity along rows (the X direction).
     interblock: int
         contains a flag for each layer that defines the method of calculating
         interblock transmissivity (LAYAVG). Use as many records needed to enter
@@ -60,8 +60,7 @@ class LayerPropertyFlow(Package):
         between adjacent cells will not be written to any file. The flow terms
         that will be saved are the flows through the right, front, and lower
         cell face. Positive values represent flows toward higher column, row, or
-        layer
-        numbers.
+        layer numbers.
     layer_wet: int
         contains a flag for each layer that indicates if wetting is active. Use
         as many records as needed to enter a value for each layer.
@@ -76,11 +75,11 @@ class LayerPropertyFlow(Package):
         is a flag that determines which equation is used to define the initial
         head at cells that become wet (IHDWET).
         If method_wet = 0, this equation is used:
-        h = BOT + WETFCT (hn - BOT) .
+        h = BOT + WETFCT (hn - BOT).
         (hn is the head in the neighboring cell that is causing the dry cell to
         convert to an active cell.)
         If method_wet is not 0, this equation is used:
-        h = BOT + WETFCT(THRESH) .
+        h = BOT + WETFCT(THRESH).
         WETFCT is a factor that is included in the calculation of the head that
         is initially established at a cell when it is converted from dry to wet
     head_dry: float, optional
