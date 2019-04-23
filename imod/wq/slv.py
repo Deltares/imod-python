@@ -40,6 +40,7 @@ class PreconditionedConjugateGradientSolver(Package):
         does not affect inner iterations; instead, it affects outer iterations.
         Default value: 1.0
     """
+
     _pkg_id = "pcg"
     _template = (
         "[pcg]\n"
@@ -51,7 +52,7 @@ class PreconditionedConjugateGradientSolver(Package):
         "    relax = {relax}\n"
         "    iprpcg = 1\n"
         "    mutpcg = 0\n"
-        "    damp = {damp}\n"
+        "    damp = {damp}"
     )
 
     def __init__(self, max_iter, inner_iter, rclose, hclose, relax=0.98, damp=1.0):
@@ -102,6 +103,7 @@ class GeneralizedConjugateGradientSolver(Package):
         is the convergence criterion in terms of relative concentration; a real
         value between 10-4 and 10-6 is generally adequate.    
     """
+
     _pkg_id = "gcg"
     _template = (
         "[gcg]\n"
@@ -110,7 +112,7 @@ class GeneralizedConjugateGradientSolver(Package):
         "    isolve = {preconditioner}\n"
         "    ncrs = {lump_dispersion}\n"
         "    cclose = {cclose}\n"
-        "    iprgcg = 0\n"
+        "    iprgcg = 0"
     )
 
     _keywords = {
@@ -180,6 +182,7 @@ class ParallelKrylovFlowSolver(Package):
         Default value: False
 
     """
+
     _pkg_id = "pksf"
 
     def __init__(
@@ -235,6 +238,7 @@ class ParallelKrylovTransportSolver(Package):
         Default value: False
 
     """
+
     _pkg_id = "pkst"
 
     def __init__(

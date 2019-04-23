@@ -11,7 +11,7 @@ import pandas as pd
 import xarray as xr
 
 import imod
-from imod.io import util
+from imod import util
 
 # Make sure we can still use the built-in function...
 f_open = open
@@ -240,7 +240,7 @@ def _dask(path, memmap=False, attrs=None):
     path : str or Path
         Path to the IDF file to be read
     attrs : dict, optional
-        A dict as returned by imod.io.idf.header, this function is called if not supplied.
+        A dict as returned by imod.idf.header, this function is called if not supplied.
         Used to minimize unneeded filesystem calls.
 
     Returns
@@ -265,7 +265,7 @@ def _dask(path, memmap=False, attrs=None):
     ncol = attrs["ncol"]
     nodata = attrs.pop("nodata")
     # dask.delayed requires currying
-    a = dask.delayed(imod.io.idf._read)(path, headersize, nrow, ncol, nodata)
+    a = dask.delayed(imod.idf._read)(path, headersize, nrow, ncol, nodata)
     x = dask.array.from_delayed(a, shape=(nrow, ncol), dtype=np.float32)
     return x, attrs
 
@@ -274,7 +274,7 @@ def dataarray(path, memmap=False):
     """
     Read a single IDF file to a xarray.DataArray
 
-    The function imod.io.idf.open is more general and can load multiple layers
+    The function imod.idf.open is more general and can load multiple layers
     and/or timestamps at once.
 
     Parameters
@@ -290,20 +290,19 @@ def dataarray(path, memmap=False):
     xarray.DataArray
         A float32 xarray.DataArray of the values in the IDF file.
         All metadata needed for writing the file to IDF or other formats
-        using imod.io.rasterio are included in the xarray.DataArray.attrs.
+        using imod.rasterio are included in the xarray.DataArray.attrs.
     """
     warnings.warn(
-        "imod.io.idf.dataarray is deprecated, use imod.io.idf.open instead",
-        FutureWarning,
+        "imod.idf.dataarray is deprecated, use imod.idf.open instead", FutureWarning
     )
     return _load([path], False)
 
 
 def load(path, memmap=False, use_cftime=False):
     """
-    load is deprecated. Check the documentation for `imod.io.idf.open` instead.
+    load is deprecated. Check the documentation for `imod.idf.open` instead.
     """
-    warnings.warn("load is deprecated, use imod.io.idf.open instead.", FutureWarning)
+    warnings.warn("load is deprecated, use imod.idf.open instead.", FutureWarning)
     return open(path, memmap, use_cftime)
 
 
@@ -339,7 +338,7 @@ def open(path, memmap=False, use_cftime=False):
     xarray.DataArray
         A float32 xarray.DataArray of the values in the IDF file(s).
         All metadata needed for writing the file to IDF or other formats
-        using imod.io.rasterio are included in the xarray.DataArray.attrs.
+        using imod.rasterio are included in the xarray.DataArray.attrs.
     """
     if memmap:
         warnings.warn("memmap option is removed", FutureWarning)
@@ -360,7 +359,7 @@ def _load(paths, use_cftime):
     """Combine a list of paths to IDFs to a single xarray.DataArray"""
     # this function also works for single IDFs
 
-    headers_unsorted = [imod.io.idf.header(p) for p in paths]
+    headers_unsorted = [imod.idf.header(p) for p in paths]
     names_unsorted = [h["name"] for h in headers_unsorted]
     _all_equal(names_unsorted, "names")
 
@@ -394,9 +393,9 @@ def _load(paths, use_cftime):
             coords["time"] = np.unique(times)
         dims.insert(0, "time")
 
-    # avoid calling imod.io.idf.header again here with attrs keyword
+    # avoid calling imod.idf.header again here with attrs keyword
     dask_arrays = [
-        imod.io.idf._dask(path, attrs=attrs)[0] for (path, attrs) in zip(paths, headers)
+        imod.idf._dask(path, attrs=attrs)[0] for (path, attrs) in zip(paths, headers)
     ]
 
     if hastime and haslayer:
@@ -450,7 +449,7 @@ def open_dataset(globpath, memmap=False, use_cftime=False):
     collections.OrderedDict
         Dictionary of str (parameter name) to xarray.DataArray.
         All metadata needed for writing the file to IDF or other formats
-        using imod.io.rasterio are included in the xarray.DataArray.attrs.
+        using imod.rasterio are included in the xarray.DataArray.attrs.
     """
     if memmap:
         warnings.warn("memmap option is removed", FutureWarning)
@@ -519,10 +518,10 @@ def save(path, a, nodata=1.0e20):
     Write a xarray.DataArray to one or more IDF files
 
     If the DataArray only has `y` and `x` dimensions, a single IDF file is
-    written, like the `imod.io.idf.write` function. This function is more general
+    written, like the `imod.idf.write` function. This function is more general
     and also supports `time` and `layer` dimensions. It will split these up,
     give them their own filename according to the conventions in
-    `imod.io.util.compose`, and write them each.
+    `imod.util.compose`, and write them each.
 
     Parameters
     ----------
@@ -550,8 +549,22 @@ def save(path, a, nodata=1.0e20):
     """
     if not isinstance(a, xr.DataArray):
         raise TypeError("Data to save must be an xarray.DataArray")
-    d = util.decompose(path)
-    d["extension"] = ".idf"
+
+    if isinstance(path, str):
+        path = pathlib.Path(path)
+
+    if path.suffix != "":
+        raise ValueError(
+            "`imod.idf.save` generates time, layer, and file extension for the path."
+            " Use `imod.idf.write` instead to write a single IDF file with a fully"
+            " specified path."
+        )
+
+    # A more flexible schema might be required to support additional variables
+    # such as species, for concentration. The straightforward way is by giving
+    # a format string, e.g.: {name}_{time}_l{layer}
+    # Find the vars in curly braces, and validate with da.coords
+    d = {"extension": ".idf", "name": path.stem, "directory": path.parent}
     d["directory"].mkdir(exist_ok=True, parents=True)
 
     # handle the case where they are not a dim but are a coord

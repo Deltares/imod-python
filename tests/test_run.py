@@ -10,7 +10,7 @@ import pytest
 import xarray as xr
 
 import imod
-from imod.io import run
+from imod import run
 
 
 @pytest.fixture(scope="module")
@@ -472,7 +472,7 @@ def test_write__transient(make_test_model):
     modeldata = test_model["modeldata"]
     directory = pathlib.Path(os.getcwd())
     path = directory.joinpath("test_write")
-    imod.io.write(path, modeldata)
+    imod.write(path, modeldata)
 
     nlayer = test_model["nlayer"]
     runfile_parameters = run.get_runfile(modeldata, path)
@@ -570,11 +570,9 @@ def test_write__basic_seawat(make_test_model):
         ]
     )
 
-    imod.io.seawat_write("test_write", model)
+    imod.seawat_write("test_write", model)
 
-    runfile_parameters = imod.io.run.seawat_get_runfile(
-        model, pathlib.Path("test_write")
-    )
+    runfile_parameters = imod.run.seawat_get_runfile(model, pathlib.Path("test_write"))
     for name in ["top", "bot", "thickness", "shd", "sconc", "khv", "kva", "sto", "por"]:
         package = runfile_parameters["packages"][name]["value"]
         for layer in range(1, 1 + nlayer):

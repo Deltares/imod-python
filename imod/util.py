@@ -9,44 +9,110 @@ import cftime
 import numpy as np
 
 
-def decompose(path):
-    """Parse a path, returning a dict of the parts,
-    following the iMOD conventions"""
+def decompose(path, pattern=None):
+    r"""
+    Parse a path, returning a dict of the parts, following the iMOD conventions.
+
+    Parameters
+   ----------
+    path : str or pathlib.Path
+        path to the file. Upper case is ignored.
+    pattern : str, regex pattern, optional
+
+    Returns
+    -------
+    d : dict
+        Dictionary with name of variable and dimensions
+
+    Examples
+    --------
+    Decompose a path, relying on defaults:
+
+    >>> decompose("head_20010101_l1.idf")
+
+    Do the same, by specifying a format string pattern, excluding extension:
+
+    >>> decompose("head_20010101_l1.idf", pattern="{name}_{time}_l{layer}")
+
+    This supports an arbitrary number of variables:
+
+    >>> decompose("head_20010101_l1.idf", pattern="{name}_{scenario}_{time}_l{layer}")
+
+    The format string pattern will only work on tidy paths, where variables are
+    separated by underscores. You can also pass a compiled regex pattern.
+    Make sure to include the `re.IGNORECASE` flag since all paths are lowered.
+
+    >>> import re
+    >>> pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)")
+    >>> decompose("headL11", pattern=pattern)
+
+    However, this requires constructing regular expressions, which is generally
+    a fiddly process. The website https://regex101.com is a nice help.
+    Alternatively, the most pragmatic solution may be to just rename your files.
+    """
     if isinstance(path, str):
         path = pathlib.Path(path)
+    # We'll ignore upper case
+    stem = path.stem.lower()
 
-    parts = path.stem.split("_")
-    name = parts[0]
-    if name == "":
-        raise ValueError("DataArray name cannot be empty")
-    d = collections.OrderedDict()
+    # maybe Reconsider if allowing "-" is desirable everywhere:
+    # [\w] versus [\w-]
+    if pattern is not None:
+        if isinstance(pattern, re._pattern_type):
+            d = pattern.match(stem).groupdict()
+        else:
+            # Get the variables between curly braces
+            in_curly = re.compile(r"{(.*?)}").findall(pattern)
+            regex_parts = {key: f"(?P<{key}>[\\w-]+)" for key in in_curly}
+            # Format the regex string, by filling in the variables
+            simple_regex = pattern.format(**regex_parts)
+            re_pattern = re.compile(simple_regex)
+            # Use it to get the required variables
+            d = re_pattern.match(stem).groupdict()
+    else:  # Default to "iMOD conventions": {name}_{time}_l{layer}
+        has_layer = bool(re.search(r"l\d+$", stem))
+        try:  # try for time
+            base_pattern = r"(?P<name>[\w-]+)_(?P<time>[\w]+)"
+            if has_layer:
+                base_pattern += r"_l(?P<layer>[\w]+)"
+            re_pattern = re.compile(base_pattern)
+            d = re_pattern.match(stem).groupdict()
+        except AttributeError:  # probably no time
+            base_pattern = r"(?P<name>[\w]+)"
+            if has_layer:
+                base_pattern += r"_l(?P<layer>[\w]+)"
+            re_pattern = re.compile(base_pattern)
+            d = re_pattern.match(stem).groupdict()
+
+    # TODO: figure out what to with user specified variables
+    # basically type inferencing via regex?
+    # if purely numerical \d* -> int or float
+    #    if \d*\.\d* -> float
+    # else: keep as string
+
+    # If name is not provided, generate one from other fields
+    if "name" not in d.keys():
+        d["name"] = "_".join(d.values())
+
+    # String -> type conversion
+    if "layer" in d.keys():
+        d["layer"] = int(d["layer"])
+    if "time" in d.keys():
+        # iMOD supports two datetime formats
+        try:
+            d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d%H%M%S")
+        except ValueError:
+            d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d")
+
     d["extension"] = path.suffix
     d["directory"] = path.parent
-    d["name"] = name
-
-    # Try to get time from idf name, iMODFLOW can output two datetime formats
-    for s in parts:
-        try:
-            d["time"] = datetime.datetime.strptime(s, "%Y%m%d%H%M%S")
-            break
-        except ValueError:
-            try:
-                d["time"] = datetime.datetime.strptime(s, "%Y%m%d")
-                break
-            except ValueError:
-                pass  # no time in dict
-
-    # layer is always last
-    p = re.compile(r"^l\d+$", re.IGNORECASE)
-    if p.match(parts[-1]):
-        d["layer"] = int(parts[-1][1:])
     return d
 
 
 def _convert_datetimes(times, use_cftime):
     """
     Return times as np.datetime64[ns] or cftime.DatetimeProlepticGregorian
-    depending on whether the dates fall within the inclusive bounds of 
+    depending on whether the dates fall within the inclusive bounds of
     np.datetime64[ns]: [1678-01-01 AD, 2261-12-31 AD].
 
     Alternatively, always returns as cftime.DatetimeProlepticGregorian if

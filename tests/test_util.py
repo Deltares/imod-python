@@ -1,12 +1,11 @@
-import collections
 import datetime
 import pathlib
+import re
 
 import cftime
 import numpy as np
 import pytest
-
-from imod.io import util
+from imod import util
 
 
 def test_compose():
@@ -25,30 +24,104 @@ def test_compose():
 
 def test_decompose():
     d = util.decompose("path/to/head_20180222090657_l5.idf")
-    refd = collections.OrderedDict(
-        [
-            ("extension", ".idf"),
-            ("directory", pathlib.Path("path", "to")),
-            ("name", "head"),
-            ("time", datetime.datetime(2018, 2, 22, 9, 6, 57)),
-            ("layer", 5),
-        ]
-    )
-    assert isinstance(d, collections.OrderedDict)
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("path", "to"),
+        "name": "head",
+        "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
+        "layer": 5,
+    }
+    assert isinstance(d, dict)
+    assert d == refd
+
+
+def test_decompose_underscore():
+    d = util.decompose("path/to/starting_head_20180222090657_l5.idf")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("path", "to"),
+        "name": "starting_head",
+        "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
+        "layer": 5,
+    }
+    assert isinstance(d, dict)
+    assert d == refd
+
+
+def test_decompose_dash():
+    d = util.decompose("path/to/starting-head_20180222090657_l5.idf")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("path", "to"),
+        "name": "starting-head",
+        "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
+        "layer": 5,
+    }
+    assert isinstance(d, dict)
+    assert d == refd
+
+
+def test_decompose_pattern_underscore():
+    d = util.decompose("path/to/starting_head_20180222090657_l5.idf", pattern="{name}_{time}_l{layer}")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("path", "to"),
+        "name": "starting_head",
+        "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
+        "layer": 5,
+    }
+    assert isinstance(d, dict)
+    assert d == refd
+
+
+def test_decompose_pattern_dash():
+    d = util.decompose("path/to/starting-head_20180222090657_l5.idf", pattern="{name}_{time}_l{layer}")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("path", "to"),
+        "name": "starting-head",
+        "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
+        "layer": 5,
+    }
+    assert isinstance(d, dict)
+    assert d == refd
+
+
+def test_decompose_regexpattern():
+    pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)", re.IGNORECASE)
+    d = util.decompose("headL11.idf", pattern=pattern)
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("."),
+        "name": "head",
+        "layer": 11,
+    }
+    assert isinstance(d, dict)
     assert d == refd
 
 
 def test_decompose_dateonly():
-    d = util.decompose("20180222090657.idf")
-    refd = collections.OrderedDict(
-        [
-            ("extension", ".idf"),
-            ("directory", pathlib.Path(".")),
-            ("name", "20180222090657"),
-            ("time", datetime.datetime(2018, 2, 22, 9, 6, 57)),
-        ]
-    )
-    assert isinstance(d, collections.OrderedDict)
+    d = util.decompose("20180222090657.idf", pattern="{time}")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("."),
+        "name": "20180222090657",
+        "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
+    }
+    assert isinstance(d, dict)
+    assert d == refd
+
+
+def test_decompose_datelayeronly():
+    d = util.decompose("20180222090657_l7.idf", pattern="{time}_l{layer}")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("."),
+        "name": "20180222090657_7",
+        "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
+        "layer": 7,
+    }
+    assert isinstance(d, dict)
     assert d == refd
 
 
@@ -67,16 +140,14 @@ def test_compose_year9999():
 
 
 def test_decompose_dateonly_year9999():
-    d = util.decompose("99990222090657.idf")
-    refd = collections.OrderedDict(
-        [
-            ("extension", ".idf"),
-            ("directory", pathlib.Path(".")),
-            ("name", "99990222090657"),
-            ("time", datetime.datetime(9999, 2, 22, 9, 6, 57)),
-        ]
-    )
-    assert isinstance(d, collections.OrderedDict)
+    d = util.decompose("99990222090657.idf", pattern="{time}")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("."),
+        "name": "99990222090657",
+        "time": datetime.datetime(9999, 2, 22, 9, 6, 57),
+    }
+    assert isinstance(d, dict)
     assert d == refd
 
 

@@ -30,6 +30,7 @@ def test_render_dis(discret):
 
     compare = (
         "\n"
+        "    nper = 5\n"
         "    perlen_p1 = 1.0\n"
         "    perlen_p2 = 1.0\n"
         "    perlen_p3 = 1.0\n"
@@ -61,6 +62,7 @@ def test_render_dis__notime(discret):
 
     compare = (
         "\n"
+        "    nper = 1\n"
         "    perlen_p? = 1.0\n"
         "    nstp_p? = 1\n"
         "    sstr_p? = tr\n"

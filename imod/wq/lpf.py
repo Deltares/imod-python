@@ -10,43 +10,43 @@ class LayerPropertyFlow(Package):
 
     Parameter
     ---------
-    k_horizontal: float or array of floats (xarray.DataArray) 
+    k_horizontal: float or array of floats (xarray.DataArray)
         is the hydraulic conductivity along rows (HK). HK is multiplied by
         horizontal anisotropy (see horizontal_anisotropy) to obtain hydraulic
-        conductivity along columns. 
-    k_vertical: float or array of floats (xarray.DataArray) 
-        is the vertical hydraulic conductivity (VKA). 
+        conductivity along columns.
+    k_vertical: float or array of floats (xarray.DataArray)
+        is the vertical hydraulic conductivity (VKA).
     horizontal_anisotropy: float or
         array of floats (xarray.DataArray) contains a value for each layer that
         is the horizontal anisotropy (CHANI). Use as many records as needed to
         enter a value of CHANI for each layer. The horizontal anisotropy is the
         ratio of the hydraulic conductivity along columns (the Y direction) to
-        the hydraulic conductivity along rows (the X direction). 
+        the hydraulic conductivity along rows (the X direction).
     interblock: int
         contains a flag for each layer that defines the method of calculating
         interblock transmissivity (LAYAVG). Use as many records needed to enter
-        a value for each layer. 
+        a value for each layer.
         0 = harmonic mean (This is most appropriate for confined and unconfined
         aquifers with abrupt boundaries in transmissivity at the cell boundaries
-        or for confined aquifers with uniform hydraulic conductivity.) 
+        or for confined aquifers with uniform hydraulic conductivity.)
         1 = logarithmic mean (This is most appropriate for confined aquifers
-        with gradually varying transmissivities.) 
+        with gradually varying transmissivities.)
         2 = arithmetic mean of saturated thickness and logarithmic-mean
         hydraulic conductivity.  (This is most appropriate for unconfined
         aquifers with gradually varying transmissivities.)
-    layer_type: int 
+    layer_type: int
         contains a flag for each layer that specifies the layer type (LAYTYP).
-        Use as many records needed to enter a value for each layer. 
+        Use as many records needed to enter a value for each layer.
         0 = confinend
         not 0 = convertible
-    specific_storage: float or array of floats (xarray.DataArray) 
+    specific_storage: float or array of floats (xarray.DataArray)
         is specific storage (SS). Read only for a transient simulation (at least
         one transient stress period). Include only if at least one stress period
-        is transient. 
-    specific_yield: float or array of floats (xarray.DataArray) 
+        is transient.
+    specific_yield: float or array of floats (xarray.DataArray)
         is specific yield (SY). Read only for a transient simulation (at least
         one transient stress period) and if the layer is convertible (layer_type
-        is not 0). Include only if at least one stress period is transient. 
+        is not 0). Include only if at least one stress period is transient.
     save_budget: int
         is a flag and a unit number (ILPFCB).
         If save_budget > 0, it is the unit number to which cell-by-cell flow
@@ -67,7 +67,7 @@ class LayerPropertyFlow(Package):
         as many records as needed to enter a value for each layer.
         0 = wetting is inactive
         not 0 = wetting is active
-    interval_wet: int 
+    interval_wet: int
         is the iteration interval for attempting to wet cells. Wetting is
         attempted every interval_wet iteration (IWETIT). If using the PCG solver
         (Hill, 1990), this applies to outer iterations, not inner iterations. If
@@ -83,7 +83,7 @@ class LayerPropertyFlow(Package):
         h = BOT + WETFCT(THRESH) .
         WETFCT is a factor that is included in the calculation of the head that
         is initially established at a cell when it is converted from dry to wet
-    head_dry: float, optional 
+    head_dry: float, optional
         is the head that is assigned to cells that are converted to dry during a
         simulation (HDRY). Although this value plays no role in the model calculations,
         it is useful as an indicator when looking at the resulting heads that
@@ -92,6 +92,7 @@ class LayerPropertyFlow(Package):
         the start of a model simulation.
         Default value: 1.0e20
     """
+
     _pkg_id = "lpf"
 
     _mapping = (
@@ -126,15 +127,15 @@ class LayerPropertyFlow(Package):
         self,
         k_horizontal,
         k_vertical,
-        horizontal_anisotropy,
-        interblock,
-        layer_type,
-        specific_storage,
-        specific_yield,
-        save_budget,
-        layer_wet,
-        interval_wet,
-        method_wet,
+        horizontal_anisotropy=1.0,
+        interblock=0,
+        layer_type=0,
+        specific_storage=0.0001,
+        specific_yield=0.15,
+        save_budget=False,
+        layer_wet=0,
+        interval_wet=0.001,
+        method_wet="wetfactor",
         head_dry=1.0e20,
     ):
         super(__class__, self).__init__()

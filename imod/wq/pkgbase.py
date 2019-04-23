@@ -1,8 +1,12 @@
+import pathlib
+
 import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
-from imod.io import util
+import imod
+from imod import util
+from imod.wq import timeutil
 
 
 class Package(xr.Dataset):
@@ -53,7 +57,7 @@ class Package(xr.Dataset):
                 self._replace_keyword(d, key)
         return self._template.format(**d)
 
-    def _compose_values_layer(self, varname, directory, d={}, da=None):
+    def _compose_values_layer(self, varname, directory, time=None, da=None):
         """
         Composes paths to files, or gets the appropriate scalar value for
         a single variable in a dataset.
@@ -82,7 +86,10 @@ class Package(xr.Dataset):
         values = {}
         if da is None:
             da = self[varname]
-        d.update({"directory": directory, "name": varname, "extension": ".idf"})
+
+        d = {"directory": directory, "name": varname, "extension": ".idf"}
+        if time is not None:
+            d["time"] = time
 
         # Scalar value or not?
         # If it's a scalar value we can immediately write
@@ -104,7 +111,10 @@ class Package(xr.Dataset):
                     d["layer"] = layer
                     values[layer] = util.compose(d)
                 else:
-                    values[layer] = da.sel(layer=layer).values[()]
+                    if "layer" in da.dims:
+                        values[layer] = da.sel(layer=layer).values[()]
+                    else:
+                        values[layer] = da.values[()]
 
         return values
 
@@ -114,21 +124,26 @@ class Package(xr.Dataset):
 
         if "time" in da.coords:
             # TODO: get working for cftime
-            package_times = [
-                pd.to_datetime(t) for t in np.atleast_1d(da.coords["time"].values)
-            ]
+            package_times = timeutil.to_datetime(
+                np.atleast_1d(da.coords["time"].values)
+            )
+            globaltimes = timeutil.to_datetime(globaltimes)
 
-        for timestep, globaltime in enumerate(globaltimes):
-            if "time" in da.coords:
-                # forward fill
-                # TODO: do smart forward fill using the colon notation
-                time = list(filter(lambda t: t <= globaltime, package_times))[-1]
-                # Offset 0 counting in Python, add one
-                values[timestep + 1] = da.isel(time=timestep).values[()]
-            else:
-                values["?"] = da.values[()]
+            starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
+            for itime, start_end in enumerate(starts_ends):
+                # TODO: this now fails on a non-dim time too
+                # solution roughly the same as for layer above?
+                values[start_end] = da.isel(time=itime).values[()]
+        else:
+            values["?"] = da.values[()]
 
         return values
+
+    def save(self, directory):
+        for name, da in self.data_vars.items():
+            if "y" in da.coords and "x" in da.coords:
+                path = pathlib.Path(directory).joinpath(name)
+                imod.idf.save(path, da)
 
 
 class BoundaryCondition(Package):
@@ -175,7 +190,7 @@ class BoundaryCondition(Package):
             every boundary condition that are used to define the stress
             periods.
             The times of the BoundaryCondition do not have to match all
-            the global times. When a globaltime is not present in the 
+            the global times. When a globaltime is not present in the
             BoundaryCondition, the value of the first previous available time is
             filled in. The effective result is a forward fill in time.
         directory : str
@@ -201,25 +216,21 @@ class BoundaryCondition(Package):
 
         if "time" in da.coords:
             # TODO: get working for cftime
-            package_times = [
-                pd.to_datetime(t) for t in np.atleast_1d(da.coords["time"].values)
-            ]
+            package_times = timeutil.to_datetime(
+                np.atleast_1d(da.coords["time"].values)
+            )
+            globaltimes = timeutil.to_datetime(globaltimes)
+            starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
 
-        d = {}
-        for timestep, globaltime in enumerate(globaltimes):
-            if "time" in da.coords:
-                # forward fill
-                # TODO: do smart forward fill using the colon notation
-                time = list(filter(lambda t: t <= globaltime, package_times))[-1]
-                d["time"] = time
-                # Offset 0 counting in Python, add one
-                values[timestep + 1] = self._compose_values_layer(varname, directory, d)
-            else:
-                values["?"] = self._compose_values_layer(varname, directory)
+            for itime, (time, start_end) in enumerate(zip(package_times, starts_ends)):
+                values[start_end] = self._compose_values_layer(varname, directory, time)
+
+        else:
+            values["?"] = self._compose_values_layer(varname, directory)
 
         return values
 
-    def _max_active_n(self, varname):
+    def _max_active_n(self, varname, nlayer):
         """
         Determine the maximum active number of cells that are active
         during a stress period.
@@ -229,11 +240,15 @@ class BoundaryCondition(Package):
         varname : str
             name of the variable to use to calculate the maximum number of
             active cells. Generally conductance.
+        nlayer : int
+            number of layers, taken from ibound.
         """
         if "time" in self[varname].coords:
             nmax = int(self[varname].groupby("time").count().max())
         else:
             nmax = int(self[varname].count())
+        if not "layer" in self.coords:  # Then it applies to every layer
+            nmax *= nlayer
         return nmax
         # TODO: save this as attribute so it doesn't have to be recomputed for SSM?
         # Maybe call in __init__, then.
@@ -257,16 +272,14 @@ class BoundaryCondition(Package):
             BoundaryCondition object.
             Note that MT3DMS does not fully support multiple systems, and only
             the first system can act as source of species.
-        
+
         Returns
         -------
         rendered : str
             The rendered runfile part for a single boundary condition system.
         """
-        d = {}
         mapping = tuple([(k, v) for k, v in self._mapping if v in self.data_vars])
-        d["mapping"] = mapping
-        d["system_index"] = system_index
+        d = {"mapping": mapping, "system_index": system_index}
         dicts = {}
 
         for varname in self.data_vars.keys():
@@ -289,12 +302,15 @@ class BoundaryCondition(Package):
             Holds the global times, i.e. the combined unique times of
             every boundary condition that are used to define the stress
             periods.
-        
+
         Returns
         -------
         rendered : str
             The rendered runfile SSM part for a single boundary condition system.
         """
+        
+        if "concentration" not in self:
+            return ""
 
         d = {}
         d["pkg_id"] = self._pkg_id

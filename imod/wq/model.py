@@ -1,60 +1,14 @@
-"""
-Contains an imodseawat model object
-"""
 import collections
 import pathlib
 
 import cftime
+import imod
 import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
-
-import imod.wq
-from imod.io import util
+from imod.wq import timeutil
 from imod.wq.pkggroup import PackageGroups
-
-
-def _to_datetime(time):
-    """
-    Check whether time is cftime object, else convert to datetime64 series.
-    
-    cftime currently has no pd.to_datetime equivalent:
-    a method that accepts a lot of different input types.
-    
-    Parameters
-    ----------
-    time : cftime object or datetime-like scalar
-    """
-    if isinstance(time, cftime.datetime):
-        return time
-    else:
-        return pd.to_datetime(time)
-
-
-def _timestep_duration(times):
-    """
-    Generates dictionary containing stress period time discretization data.
-
-    Parameters
-    ----------
-    times : np.array
-        Array containing containing time in a datetime-like format
-    
-    Returns
-    -------
-    collections.OrderedDict
-        Dictionary with dates as strings for keys,
-        stress period duration (in days) as values.
-    """
-    times = sorted([_to_datetime(t) for t in times])
-
-    timestep_duration = []
-    for start, end in zip(times[:-1], times[1:]):
-        timedelta = end - start
-        duration = timedelta.days + timedelta.seconds / 86400.0
-        timestep_duration.append(duration)
-    return times, timestep_duration
 
 
 # This class allows only imod packages as values
@@ -91,9 +45,10 @@ class SeawatModel(Model):
 
     _gen_template = jinja2.Template(
         "[gen]\n"
+        "    runtype = SEAWAT\n"
         "    modelname = {{modelname}}\n"
         "    writehelp = {{writehelp}}\n"
-        "    result_dir = {{modelname}}\n"
+        "    result_dir = results\n"
         "    packages = {{package_set|join(', ')}}\n"
         "    coord_xll = {{xmin}}\n"
         "    coord_yll = {{ymin}}\n"
@@ -145,18 +100,20 @@ class SeawatModel(Model):
 
         return package_groups
 
-    def time_discretization(self, endtime):
+    def time_discretization(self, endtime, starttime=None):
         """
         Collect all unique times
         """
         # TODO: check for cftime, force all to cftime if necessary
         times = set()  # set only allows for unique values
-        for ds in self.values():
-            if "time" in ds.coords:
-                times.update(ds.coords["time"].values)
+        for pkg in self.values():
+            if "time" in pkg.coords:
+                times.update(pkg["time"].values)
         # TODO: check that endtime is later than all other times.
         times.update((endtime,))
-        times, duration = _timestep_duration(times)
+        if starttime is not None:
+            times.update((starttime,))
+        times, duration = timeutil.timestep_duration(times)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
         timestep_duration = xr.DataArray(
@@ -168,12 +125,12 @@ class SeawatModel(Model):
 
     def _render_gen(self, modelname, globaltimes, writehelp=False):
         package_set = set([pkg._pkg_id for pkg in self.values()])
-        package_set.update(("btn",))
+        package_set.update(("btn", "ssm"))
         package_set = sorted(package_set)
-        baskey = self._get_pkgkey("bas")
+        baskey = self._get_pkgkey("bas6")
         bas = self[baskey]
-        _, xmin, xmax, _, ymin, ymax = util.spatial_reference(bas["ibound"])
-        start_date = _to_datetime(globaltimes[0]).strftime("%Y%m%d%H%M%S")
+        _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(bas["ibound"])
+        start_date = timeutil.to_datetime(globaltimes[0]).strftime("%Y%m%d%H%M%S")
 
         d = {}
         d["modelname"] = modelname
@@ -191,31 +148,39 @@ class SeawatModel(Model):
         """
         Rendering method for straightforward packages
         """
-        key = self._get_pkgkey(key)
-        if key is None:
+        # Get name of pkg, e.g. lookup "recharge" for rch _pkg_id
+        pkgkey = self._get_pkgkey(key)
+        if pkgkey is None:
             # Maybe do enum look for full package name?
-            raise ValueError(f"No {key} package provided.")
-        return self[key]._render(directory=directory, globaltimes=globaltimes)
+            if key == "rch":  # since recharge is optional
+                return ""
+            else:
+                raise ValueError(f"No {key} package provided.")
+        return self[pkgkey]._render(
+            directory=directory.joinpath(pkgkey), globaltimes=globaltimes
+        )
 
     def _render_dis(self, directory, globaltimes):
-        baskey = self._get_pkgkey("bas")
+        baskey = self._get_pkgkey("bas6")
         diskey = self._get_pkgkey("dis")
-        bas_content = self[baskey]._render_dis(directory=directory)
+        bas_content = self[baskey]._render_dis(directory=directory.joinpath(baskey))
         dis_content = self[diskey]._render(globaltimes=globaltimes)
         return bas_content + dis_content
 
     def _render_groups(self, directory, globaltimes):
+        baskey = self._get_pkgkey("bas6")
+        nlayer = self[baskey]["ibound"].shape[0]
         package_groups = self._group()
-        content = "".join(
-            [group.render(directory, globaltimes) for group in package_groups]
+        content = "\n\n".join(
+            [group.render(directory, globaltimes, nlayer) for group in package_groups]
         )
         ssm_content = "".join(
             [group.render_ssm(directory, globaltimes) for group in package_groups]
         )
-        # TODO: do this in a single pass, combined with _n_max_active for modflow part?
+
+        # Calculate number of sinks and sources
         n_sinkssources = sum([group.max_n_sinkssources() for group in package_groups])
-        ssm_content = f"[ssm]\n    mxss = {n_sinkssources}\n" + ssm_content
-        return content, ssm_content
+        return content, ssm_content, n_sinkssources
 
     def _render_flowsolver(self):
         pcgkey = self._get_pkgkey("pcg")
@@ -230,14 +195,16 @@ class SeawatModel(Model):
             return self[pksfkey]._render()
 
     def _render_btn(self, directory, globaltimes):
-        baskey = self._get_pkgkey("bas")
+        baskey = self._get_pkgkey("bas6")
         btnkey = self._get_pkgkey("btn")
         diskey = self._get_pkgkey("dis")
         thickness = self[baskey].thickness()
 
         if btnkey is None:
             raise ValueError("No BasicTransport package provided.")
-        btn_content = self[btnkey]._render(directory=directory, thickness=thickness)
+        btn_content = self[btnkey]._render(
+            directory=directory.joinpath(btnkey), thickness=thickness
+        )
         dis_content = self[diskey]._render_btn(globaltimes=globaltimes)
         return btn_content + dis_content
 
@@ -253,15 +220,27 @@ class SeawatModel(Model):
         else:
             return self[pkstkey]._render()
 
+    def _btn_rch_sinkssources(self):
+        btnkey = self._get_pkgkey("btn")
+        icbund = self[btnkey]["icbund"]
+        n_extra = icbund.where(icbund == -1).count()
+
+        rchkey = self._get_pkgkey("rch")
+        if rchkey is not None:
+            n_extra += self[rchkey]["rate"].count()
+
+        return int(n_extra)
+
     def render(self, writehelp=False):
         """
         Render the runfile as a string, package by package.
         """
         diskey = self._get_pkgkey("dis")
         globaltimes = self[diskey]["time"].values
-        directory = pathlib.Path(self.modelname)
+        # directory = pathlib.Path(self.modelname)
+        directory = pathlib.Path(".")
 
-        modflowcontent, ssmcontent = self._render_groups(
+        modflowcontent, ssm_content, n_sinkssources = self._render_groups(
             directory=directory, globaltimes=globaltimes
         )
 
@@ -273,7 +252,7 @@ class SeawatModel(Model):
         )
         content.append(self._render_dis(directory=directory, globaltimes=globaltimes))
         # Modflow
-        for key in ("bas", "oc", "lpf", "rch"):
+        for key in ("bas6", "oc", "lpf", "rch"):
             content.append(
                 self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
             )
@@ -283,28 +262,26 @@ class SeawatModel(Model):
         # MT3D and Seawat
         content.append(self._render_btn(directory=directory, globaltimes=globaltimes))
         for key in ("vdf", "adv", "dsp"):
-            self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
-        content.append(ssmcontent)
+            content.append(
+                self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
+            )
+
+        n_sinkssources += self._btn_rch_sinkssources()
+        ssm_content = f"[ssm]\n    mxss = {n_sinkssources}" + ssm_content
+        content.append(ssm_content)
         content.append(self._render_transportsolver())
 
-        return "\n".join(content)
+        return "\n\n".join(content)
 
-    def save(self, directory):
-        for ds in self.values():
-            if isinstance(ds, imod.wq.Well):
-                # TODO: implement
-                raise NotImplementedError
-            else:
-                for name, da in ds.data_vars.items():
-                    if "y" in da.coords and "x" in da.coords:
-                        imod.io.idf.save(directory, da)
-
-    def write(self):
-        # TODO: just write to an arbitrary directory
+    def write(self, directory="."):
         runfile_content = self.render()
-        runfilepath = f"{self.modelname}.run"
+        directory = pathlib.Path(directory).joinpath(self.modelname)
+        directory.mkdir(exist_ok=True, parents=True)
+        runfilepath = directory.joinpath(f"{self.modelname}.run")
         # Write the runfile
         with open(runfilepath, "w") as f:
             f.write(runfile_content)
         # Write all IDFs and IPFs
-        self.save(self["modelname"])
+        for pkgname, pkg in self.items():
+            if "x" in pkg.coords and "y" in pkg.coords:
+                pkg.save(directory=directory.joinpath(pkgname))

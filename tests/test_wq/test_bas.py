@@ -65,7 +65,8 @@ def test_render_dis__scalartopbot(basicflow):
         "    top = 30.0\n"
         "    botm_l1 = 20.0\n"
         "    botm_l2 = 10.0\n"
-        "    botm_l3 = 0.0"
+        "    botm_l3 = 0.0\n"
+        "    laycbd_l? = 0"
     )
     assert bas._render_dis(directory) == compare
 
@@ -86,6 +87,7 @@ def test_render_dis__arraytopbot(basicflow):
         "    top = top.idf\n"
         "    botm_l1 = bottom_l1.idf\n"
         "    botm_l2 = bottom_l2.idf\n"
-        "    botm_l3 = bottom_l3.idf"
+        "    botm_l3 = bottom_l3.idf\n"
+        "    laycbd_l? = 0"
     )
     assert bas._render_dis(directory) == compare

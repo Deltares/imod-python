@@ -8,6 +8,7 @@ dependencies:
   - python>=3.6
   - numba
   - numpy
+  - scipy
   - xarray>=0.11
   - cftime
   - pandas

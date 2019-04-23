@@ -8,7 +8,7 @@ import warnings
 import numpy as np
 import pandas as pd
 
-from imod.io import util
+from imod import util
 
 
 # Maybe look at dask dataframes, if we run into very large tabular datasets:
@@ -482,8 +482,10 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20):
         Writes files.
     """
 
-    d = util.decompose(path)
-    d["extension"] = ".ipf"
+    if isinstance(path, str):
+        path = pathlib.Path(path)
+
+    d = {"extension": ".ipf", "name": path.stem, "directory": path.parent}
     d["directory"].mkdir(exist_ok=True, parents=True)
 
     colnames = _lower(list(df))

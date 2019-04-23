@@ -24,6 +24,8 @@ class TimeDiscretization(Package):
     )
 
     _dis_template = jinja2.Template(
+        "\n"
+        "    nper = {{n_periods}}\n"
         "    {%- for name, dictname in mapping -%}"
         "        {%- for time, value in dicts[dictname].items() %}\n"
         "    {{name}}_p{{time}} = {{value}}"
@@ -31,7 +33,13 @@ class TimeDiscretization(Package):
         "    {%- endfor -%}"
     )
 
-    _btn_template = _dis_template
+    _btn_template = jinja2.Template(
+        "    {%- for name, dictname in mapping -%}"
+        "        {%- for time, value in dicts[dictname].items() %}\n"
+        "    {{name}}_p{{time}} = {{value}}"
+        "        {%- endfor -%}"
+        "    {%- endfor -%}"
+    )
 
     def __init__(
         self,
@@ -41,7 +49,7 @@ class TimeDiscretization(Package):
         timestep_multiplier=1.0,
         max_n_transport_timestep=50_000,
         transport_timestep_multiplier=None,
-        transport_initial_timestep=0,
+        transport_initial_timestep=0.0,
     ):
         super(__class__, self).__init__()
         self["timestep_duration"] = timestep_duration
@@ -67,6 +75,7 @@ class TimeDiscretization(Package):
                     else:
                         dicts[varname][k] = "ss"
         d["dicts"] = dicts
+        d["n_periods"] = len(globaltimes)
         return self._dis_template.render(d)
 
     def _render_btn(self, globaltimes):

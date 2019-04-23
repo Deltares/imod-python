@@ -26,7 +26,7 @@ class BasicTransport(Package):
         self,
         icbund,
         starting_concentration,
-        porosity=0.3,
+        porosity=0.35,
         n_species=1,
         inactive_concentration=1.0e30,
         minimum_active_thickness=0.01,

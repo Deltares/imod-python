@@ -8,7 +8,7 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-from imod.io import idf
+from imod import idf
 
 
 def globremove(globpath):
@@ -195,8 +195,13 @@ def test_xycoords_nonequidistant():
     assert np.allclose(coords["dy"][1], dy)
 
 
+def test_save__error(test_da):
+    with pytest.raises(ValueError):
+        idf.save("test.idf", test_da)
+
+
 def test_saveopen(test_da):
-    idf.save("test.idf", test_da)
+    idf.save("test", test_da)
     assert pathlib.Path("test.idf").exists()
     da = idf.open("test.idf")
     assert isinstance(da, xr.DataArray)
@@ -209,7 +214,7 @@ def test_save__int32coords(test_da__nodxdy):
     test_da = test_da__nodxdy
     test_da.x.values = test_da.x.values.astype(np.int32)
     test_da.y.values = test_da.y.values.astype(np.int32)
-    idf.save("testnodxdy.idf", test_da)
+    idf.save("testnodxdy", test_da)
     assert pathlib.Path("testnodxdy.idf").exists()
 
 
@@ -252,7 +257,7 @@ def test_saveopen_timelayer(test_timelayerda):
 
 
 def test_saveopen__nonequidistant(test_da_nonequidistant):
-    idf.save("nonequidistant.idf", test_da_nonequidistant)
+    idf.save("nonequidistant", test_da_nonequidistant)
     assert pathlib.Path("nonequidistant.idf").exists()
     da = idf.open("nonequidistant.idf")
     assert isinstance(da, xr.DataArray)
@@ -265,7 +270,7 @@ def test_saveopen__nonequidistant(test_da_nonequidistant):
 def test_lazy():
     """
     Reading should be lazily executed. That means it has to be part of the dask
-    graph. Specifcally, the delayed function is imod.io.idf._read.
+    graph. Specifcally, the delayed function is imod.idf._read.
 
     This does the job of testing whether that function is part the graph.
     """

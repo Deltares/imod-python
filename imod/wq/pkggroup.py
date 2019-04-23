@@ -49,21 +49,21 @@ class PackageGroup(collections.UserDict):
         #    nmax = int(ds[varname].count())
         return self.n_max_active
 
-    def render(self, directory, globaltimes):
+    def render(self, directory, globaltimes, nlayer):
         d = {}
         d["n_systems"] = len(self.keys())
         self.n_max_active = sum(
-            [v._max_active_n(self._cellcount_varname) for v in self.values()]
+            [v._max_active_n(self._cellcount_varname, nlayer) for v in self.values()]
         )
         d["n_max_active"] = self.n_max_active
-        d["save_budget"] = any([v["save_budget"] for v in self.values()])
+        d["save_budget"] = 1 if any([v.save_budget for v in self.values()]) else 0
 
         content = [self._template.format(**d)]
         for i, key in enumerate(self.key_order):
             system_index = i + 1
             content.append(
                 self[key]._render(
-                    directory=directory,
+                    directory=directory.joinpath(key),
                     globaltimes=globaltimes,
                     system_index=system_index,
                 )
@@ -73,7 +73,7 @@ class PackageGroup(collections.UserDict):
     def render_ssm(self, directory, globaltimes):
         # Only render for the first system, that has concentrations defined.
         key = self.first_key
-        return self[key]._ssm_render(directory, globaltimes)
+        return self[key]._ssm_render(directory.joinpath(key), globaltimes)
 
 
 class ConstantHeadGroup(PackageGroup):
@@ -84,7 +84,7 @@ class ConstantHeadGroup(PackageGroup):
 class DrainageGroup(PackageGroup):
     _cellcount_varname = "conductance"
     _template = (
-        "[ghb]\n"
+        "[drn]\n"
         "    mdrnsys = {n_systems}\n"
         "    mxactd = {n_max_active}\n"
         "    idrncb = {save_budget}"
@@ -111,9 +111,20 @@ class RiverGroup(PackageGroup):
     )
 
 
+class WellGroup(PackageGroup):
+    _cellcount_varname = None
+    _template = (
+        "[wel]\n"
+        "    mwelsys = {n_systems}\n"
+        "    mxactw = {n_max_active}\n"
+        "    iwelcb = {save_budget}"
+    )
+
+
 # dict might be easier than Enumerator...
 class PackageGroups(enum.Enum):
     chd = ConstantHeadGroup
     drn = DrainageGroup
     ghb = GeneralHeadBoundaryGroup
     riv = RiverGroup
+    wel = WellGroup

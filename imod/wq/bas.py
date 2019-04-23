@@ -2,11 +2,11 @@ import jinja2
 import xarray as xr
 
 from imod.wq.pkgbase import Package
-from imod.io import util
+from imod import util
 
 
 class BasicFlow(Package):
-    _pkg_id = "bas"
+    _pkg_id = "bas6"
     _template = jinja2.Template(
         "[bas6]\n"
         "    {%- for layer, value in ibound.items() %}\n"
@@ -31,6 +31,7 @@ class BasicFlow(Package):
         "    {%- for layer, value in bottom.items() %}\n"
         "    botm_l{{layer}} = {{value}}\n"
         "    {%- endfor %}\n"
+        "    laycbd_l? = 0"
     )
 
     def __init__(

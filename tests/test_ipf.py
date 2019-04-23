@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from imod.io import ipf
+from imod import ipf
 
 
 def remove(globpath):
