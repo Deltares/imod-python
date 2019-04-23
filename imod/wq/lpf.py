@@ -8,9 +8,9 @@ class LayerPropertyFlow(Package):
     The Layer-Property Flow (LPF) package is used to specify properties
     controlling flow between cells.
 
-    Parameter
-    ---------
-    k_horizontal: float or array of floats (xarray.DataArray)
+    Parameters
+    ----------
+    k_horizontal: float or array of floats (xarray.DataArray) 
         is the hydraulic conductivity along rows (HK). HK is multiplied by
         horizontal anisotropy (see horizontal_anisotropy) to obtain hydraulic
         conductivity along columns.
