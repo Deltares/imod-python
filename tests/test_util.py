@@ -62,7 +62,9 @@ def test_decompose_dash():
 
 
 def test_decompose_pattern_underscore():
-    d = util.decompose("path/to/starting_head_20180222090657_l5.idf", pattern="{name}_{time}_l{layer}")
+    d = util.decompose(
+        "path/to/starting_head_20180222090657_l5.idf", pattern="{name}_{time}_l{layer}"
+    )
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
@@ -75,7 +77,9 @@ def test_decompose_pattern_underscore():
 
 
 def test_decompose_pattern_dash():
-    d = util.decompose("path/to/starting-head_20180222090657_l5.idf", pattern="{name}_{time}_l{layer}")
+    d = util.decompose(
+        "path/to/starting-head_20180222090657_l5.idf", pattern="{name}_{time}_l{layer}"
+    )
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),

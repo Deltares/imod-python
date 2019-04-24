@@ -57,10 +57,7 @@ m["adv"] = imod.wq.AdvectionTVD(courant=1.0)
 m["dsp"] = imod.wq.Dispersion(longitudinal=0.1, diffusion_coefficient=1.0e-9)
 m["vdf"] = imod.wq.VariableDensityFlow(density_concentration_slope=0.71)
 m["wel"] = imod.wq.Well(
-    id_name="well",
-    x=weldata["x"],
-    y=weldata["y"],
-    rate=weldata["q"],
+    id_name="well", x=weldata["x"], y=weldata["y"], rate=weldata["q"]
 )
 m["pcg"] = imod.wq.PreconditionedConjugateGradientSolver(
     max_iter=150, inner_iter=30, hclose=0.0001, rclose=1.0, relax=0.98, damp=1.0

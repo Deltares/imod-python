@@ -99,7 +99,10 @@ def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
     import rasterio.features
 
     if column is not None:
-        shapes = [(geom, value) for geom, value in zip(geodataframe.geometry, geodataframe[column])]
+        shapes = [
+            (geom, value)
+            for geom, value in zip(geodataframe.geometry, geodataframe[column])
+        ]
     else:
         shapes = [geom for geom in geodataframe.geometry]
 

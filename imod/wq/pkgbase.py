@@ -308,7 +308,7 @@ class BoundaryCondition(Package):
         rendered : str
             The rendered runfile SSM part for a single boundary condition system.
         """
-        
+
         if "concentration" not in self:
             return ""
 

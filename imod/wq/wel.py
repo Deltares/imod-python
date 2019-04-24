@@ -112,4 +112,3 @@ class Well(pd.DataFrame):
                 self._save_layers(timedf, directory, time=time)
         else:
             self._save_layers(self, directory)
-

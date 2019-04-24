@@ -72,8 +72,7 @@ def fill_in_k(lithostrat, lithology, lookup_table):
         msg = "\n".join([f"{a}: {b}" for a, b in missing])
         raise ValueError(
             "Parameter values missing for the following combinations of "
-            "lithostratigraphical and lithological units:\n"
-            + msg
+            "lithostratigraphical and lithological units:\n" + msg
         )
     k = xr.full_like(lithostrat, np.nan).astype(np.float64)
     k[...] = _fill_in_k(lithostrat.values, lithology.values, lookup_table)
