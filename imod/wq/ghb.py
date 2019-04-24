@@ -18,15 +18,17 @@ class GeneralHeadBoundary(BoundaryCondition):
     Parameters
     ----------
     head: array of floats (xr.DataArray)
-        head value for the GHB (BHEAD)
+        head value for the GHB (BHEAD).
     conductance: array of floats (xr.DataArray)
         the conductance of the GHB (COND)
     concentration: "None" or array of floats (xr.DataArray), optional
         concentration of the GHB (CGHB), get automatically inserted into the SSM
         package.
         Default is "None".
-    density: "None" or array of floats (xr.DataArray), optional
-        (GHBSSMDENS)
+    density: "None" or float, optional
+        is the density used to convert the point head to the freshwater head
+        (GHBSSMDENS). If not specified, the density is calculated dynamically
+        using the concentration.
         Default is "None".
     save_budget: {True, False}, optional
         is a flag indicating if the budget should be saved (IGHBCB).

@@ -2,6 +2,30 @@ from imod.wq.pkgbase import BoundaryCondition
 
 
 class River(BoundaryCondition):
+    """
+    The River package is used to simulate head-dependent flux boundaries. In the
+    River package if the head in the cell falls below a certain threshold, the
+    flux from the river to the model cell is set to a specified lower bound.
+
+    Parameters
+    ----------
+    stage: array of floats (xr.DataArray)
+        is the head in the river (STAGE).
+    bottom_elevation: array of floats (xr.DataArray)
+        is the bottom of the riverbed (RBOT).
+    conductance: array of floats (xr.DataArray)
+        is the conductance of the river.
+    concentration: "None", float or array of floats (xr.DataArray), optional
+        is the concentration in the river.
+        Default is None.
+    density: "None" or float, optional
+        is the density used to convert the point head to the freshwater head
+        (RIVSSMDENS). If not specified, the density is calculated dynamically
+        using the concentration. Default is None.
+    save_budget: {True, False}, optional
+        is a flag indicating if the budget should be saved (IRIVCB).
+        Default is False.
+    """
     _pkg_id = "riv"
 
     _mapping = (
