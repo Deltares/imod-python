@@ -7,7 +7,7 @@ from imod import util
 
 class BasicFlow(Package):
     """
-    The Basic package is used to specify certain data used in all models. 
+    The Basic package is used to specify certain data used in all models.
     These include:
     1. the locations of acitve, inactive, and specified head in cells,
     2. the head stored in inactive cells, 
