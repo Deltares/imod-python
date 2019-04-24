@@ -14,10 +14,13 @@ def decompose(path, pattern=None):
     Parse a path, returning a dict of the parts, following the iMOD conventions.
 
     Parameters
-   ----------
+    ----------
     path : str or pathlib.Path
-        path to the file. Upper case is ignored.
+        Path to the file. Upper case is ignored.
     pattern : str, regex pattern, optional
+        If the path is not made up of standard paths, and the default decompose
+        does not produce the right result, specify the used pattern here. See
+        the examples below.
 
     Returns
     -------
@@ -26,7 +29,7 @@ def decompose(path, pattern=None):
 
     Examples
     --------
-    Decompose a path, relying on defaults:
+    Decompose a path, relying on default conventions:
 
     >>> decompose("head_20010101_l1.idf")
 
@@ -36,7 +39,7 @@ def decompose(path, pattern=None):
 
     This supports an arbitrary number of variables:
 
-    >>> decompose("head_20010101_l1.idf", pattern="{name}_{scenario}_{time}_l{layer}")
+    >>> decompose("head_slr_20010101_l1.idf", pattern="{name}_{scenario}_{time}_l{layer}")
 
     The format string pattern will only work on tidy paths, where variables are
     separated by underscores. You can also pass a compiled regex pattern.
