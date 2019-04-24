@@ -10,6 +10,29 @@ from imod.wq.pkgbase import BoundaryCondition
 
 
 class GeneralHeadBoundary(BoundaryCondition):
+    """
+    The General-Head Boundary package is used to simulate head-dependent flux
+    boundaries. In the General-Head Boundary package the flux is always
+    proportional to the difference in head.
+
+    Parameters
+    ----------
+    head: array of floats (xr.DataArray)
+        head value for the GHB (BHEAD)
+    conductance: array of floats (xr.DataArray)
+        the conductance of the GHB (COND)
+    concentration: "None" or array of floats (xr.DataArray), optional
+        concentration of the GHB (CGHB), get automatically inserted into the SSM
+        package.
+        Default is "None".
+    density: "None" or array of floats (xr.DataArray), optional
+        (GHBSSMDENS)
+        Default is "None".
+    save_budget: {True, False}, optional
+        is a flag indicating if the budget should be saved (IGHBCB).
+        Default is False.
+    """
+
     _pkg_id = "ghb"
     _mapping = (("bhead", "head"), ("cond", "conductance"), ("ghbssmdens", "density"))
 
