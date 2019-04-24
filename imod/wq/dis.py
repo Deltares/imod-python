@@ -51,7 +51,7 @@ class TimeDiscretization(Package):
         to 1.0 regardless of the user-specified input. Note that for the
         particle tracking based solution options and the 3rd-order TVD scheme,
         transport_timestep_multiplier does not apply. 
-        Default is {"None"}
+        Default is {"None"}.
     transport_initial_timestep: int, optional
         is the user-specified transport stepsize within each time step of the
         flow solution (DT0).
