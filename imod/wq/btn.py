@@ -39,18 +39,24 @@ class BasicTransport(Package):
         the simulation (unit: ML-3) (SCONC). For multispecies simulation, the
         starting concentration must be specified for all species, one species at
         a time.
-    porosity: float
+    porosity: float, optional
         is the “effective” porosity of the porous medium in a single porosity
         system (PRSITY).
-        Default value is 0.3.
-    n_species:
+        Default value is 0.35.
+    n_species: int, optional
+        is the total number of chemical species included in the current
+        simulation (NCOMP). For single-species simulation, set n_species = 1.
         Default value is 1.
-
-    inactive_concentration:
+    inactive_concentration: float, optional
+        is the value for indicating an inactive concentration cell (ICBUND=0)
+        (CINACT). Even if it is not anticipated to have inactive cells in the
+        model, a value for inactive_concentration still must be submitted.
         Default value is 1.0e30
-
-    minimum_active_thickness:
-        Default value is 0.01.
+    minimum_active_thickness: float, optional
+        is the minimum saturated thickness in a cell (THKMIN), expressed as the
+        decimal fraction of the model layer thickness, below which the cell is
+        considered inactive.
+        Default value is 0.01 (i.e., 1% of the model layer thickness).
     """
     _pkg_id = "btn"
 
