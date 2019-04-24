@@ -16,13 +16,13 @@ class Well(pd.DataFrame):
     Parameters
     ----------
     id_name: str or list of str
-        name of the well
+        name of the well(s).
     x: float or list of floats
-        x coordinate of the well.
+        x coordinate of the well(s).
     y: float or list of floats
-        y coordinate of the well.
+        y coordinate of the well(s).
     rate: float or list of floats.
-        pumping rate in the well.
+        pumping rate in the well(s).
     Layer: "None" or int, optional
         layer from which the pumping takes place.
     time: "None" or listlike of np.datetime64, datetime.datetime, pd.Timestamp,

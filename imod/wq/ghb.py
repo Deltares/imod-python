@@ -20,7 +20,7 @@ class GeneralHeadBoundary(BoundaryCondition):
     head: array of floats (xr.DataArray)
         head value for the GHB (BHEAD).
     conductance: array of floats (xr.DataArray)
-        the conductance of the GHB (COND)
+        the conductance of the GHB (COND).
     concentration: "None" or array of floats (xr.DataArray), optional
         concentration of the GHB (CGHB), get automatically inserted into the SSM
         package.

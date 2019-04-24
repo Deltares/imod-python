@@ -19,7 +19,7 @@ class RechargeTopLayer(BoundaryCondition):
         is the concentration of the recharge
     save_budget: {True, False}, optional
         flag indicating if the budget needs to be saved.
-    Default is False.
+        Default is False.
     """
     _pkg_id = "rch"
 
@@ -43,7 +43,7 @@ class RechargeLayers(BoundaryCondition):
         is the concentration of the recharge
     save_budget: {True, False}, optional
         flag indicating if the budget needs to be saved.
-    Default is False.
+        Default is False.
     """
     _pkg_id = "rch"
 
@@ -68,7 +68,7 @@ class RechargeHighestActive(BoundaryCondition):
         is the concentration of the recharge
     save_budget: {True, False}, optional
         flag indicating if the budget needs to be saved.
-    Default is False.
+        Default is False.
     """
     _pkg_id = "rch"
 

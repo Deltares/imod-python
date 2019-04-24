@@ -309,7 +309,7 @@ class AdvectionHybridMOC(Package):
 
 class AdvectionTVD(Package):
     """
-    Total Variation Diminishing (TVD) formulation (ULTIMATE, MIXELM = -1)
+    Total Variation Diminishing (TVD) formulation (ULTIMATE, MIXELM = -1).
 
     Attributes
     ----------

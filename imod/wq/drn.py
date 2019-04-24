@@ -12,7 +12,7 @@ class Drainage(BoundaryCondition):
     elevation: array of floats (xr.DataArray)
         elevation of the drain.
     conductance: array of floats (xr.DataArray)
-        drain conductance. 
+        is the conductance in the drain. 
     save_budget: {True, False}, optional
         A flag that is used to determine if cell-by-cell budget data should be
         saved. If save_budget is True cell-by-cell budget data will be saved.

@@ -28,12 +28,12 @@ class LayerPropertyFlow(Package):
         a value for each layer.
         0 = harmonic mean (This is most appropriate for confined and unconfined
         aquifers with abrupt boundaries in transmissivity at the cell boundaries
-        or for confined aquifers with uniform hydraulic conductivity.)
+        or for confined aquifers with uniform hydraulic conductivity).
         1 = logarithmic mean (This is most appropriate for confined aquifers
-        with gradually varying transmissivities.)
+        with gradually varying transmissivities).
         2 = arithmetic mean of saturated thickness and logarithmic-mean
-        hydraulic conductivity.  (This is most appropriate for unconfined
-        aquifers with gradually varying transmissivities.)
+        hydraulic conductivity. (This is most appropriate for unconfined
+        aquifers with gradually varying transmissivities).
     layer_type: int
         contains a flag for each layer that specifies the layer type (LAYTYP).
         Use as many records needed to enter a value for each layer.
@@ -81,7 +81,7 @@ class LayerPropertyFlow(Package):
         If method_wet is not 0, this equation is used:
         h = BOT + WETFCT(THRESH).
         WETFCT is a factor that is included in the calculation of the head that
-        is initially established at a cell when it is converted from dry to wet
+        is initially established at a cell when it is converted from dry to wet.
     head_dry: float, optional
         is the head that is assigned to cells that are converted to dry during a
         simulation (HDRY). Although this value plays no role in the model calculations,
@@ -89,7 +89,7 @@ class LayerPropertyFlow(Package):
         are output from the model. HDRY is thus similar to HNOFLO in the Basic
         Package, which is the value assigned to cells that are no-flow cells at
         the start of a model simulation.
-        Default value: 1.0e20
+        Default value: 1.0e20.
     """
 
     _pkg_id = "lpf"
