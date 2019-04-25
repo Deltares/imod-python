@@ -163,9 +163,9 @@ class ParallelKrylovFlowSolver(Package):
         problems a value of 0.99, 0.98, or 0.97 will reduce the number of
         iterations required for convergence.
     partition: {"uniform", "rcb"}, optional
-        Partitioning option (PARTOPT). 
-        "uniform" partitions the model domain into equally sized subdomains. 
-        "rcb" (Recursive Coordinate Bisection) uses a 2D pointer grid with weights to partition the model domain. 
+        Partitioning option (PARTOPT). "uniform" partitions the model domain
+        into equally sized subdomains. "rcb" (Recursive Coordinate Bisection)
+        uses a 2D pointer grid with weights to partition the model domain.
         Default value: "uniform"
     solver: {"pcg"}, optional
         Flag indicating the linear solver to be used (ISOLVER).
@@ -181,11 +181,8 @@ class ParallelKrylovFlowSolver(Package):
         Default value: False
     pointer_grid: string, optional
         Path to a 2D pointer grid used when partition = "rcb".
-        
-        Note that even though the iMOD-SEAWAT helpfile states .idf is accepted, it is not.
-        This pointer grid should be a .asc (without a header), with the following format for each row:
-            ("{:8.2f}  " * (len(row)-1) + "{:8.2f}\n").format(*tuple(row.values))
     """
+    # TODO: replace pointer_grid by something less silly
 
     _pkg_id = "pksf"
     _template = (
@@ -209,7 +206,7 @@ class ParallelKrylovFlowSolver(Package):
         "preconditioner": {"ilu": 2},
         "deflate": {False: 0, True: 1},
     }
-    
+
     def __init__(
         self,
         max_iter,
@@ -242,11 +239,16 @@ class ParallelKrylovFlowSolver(Package):
         for arg in to_check:
             if not self[arg] > 0:
                 raise ValueError
-        
-        #Check whether option is actually an available option
+
+        # Check whether option is actually an available option
         for opt_arg in self._keywords.keys():
             if self[opt_arg] not in self._keywords[opt_arg].keys():
-                raise ValueError("Argument for {} not in {}, instead got {}".format(opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]))
+                raise ValueError(
+                    "Argument for {} not in {}, instead got {}".format(
+                        opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]
+                    )
+                )
+
 
 class ParallelKrylovTransportSolver(Package):
     """
@@ -272,9 +274,9 @@ class ParallelKrylovTransportSolver(Package):
         iterations required for convergence.
         Default value: 0.98.
     partition: {"uniform", "rcb"}, optional
-        Partitioning option (PARTOPT).
-        "uniform" partitions the model domain into equally sized subdomains. 
-        "rcb" (Recursive Coordinate Bisection) uses a 2D pointer grid with weights to partition the model domain. 
+        Partitioning option (PARTOPT). "uniform" partitions the model domain
+        into equally sized subdomains. "rcb" (Recursive Coordinate Bisection)
+        uses a 2D pointer grid with weights to partition the model domain.
         Default value: "uniform".
     solver: {"bicgstab", "gmres", "gcr"}, optional
         Flag indicating the linear solver to be used (ISOLVER).
@@ -287,11 +289,8 @@ class ParallelKrylovTransportSolver(Package):
         Default value: False.
     pointer_grid: string, optional
         Path to a 2D pointer grid used when partition = "rcb".
-        
-        Note that even though the iMOD-SEAWAT helpfile states .idf is accepted, it is not.
-        This pointer grid should be a .asc (without a header), with the following format for each row:
-            ("{:8.2f}  " * (len(row)-1) + "{:8.2f}\n").format(*tuple(row.values))
     """
+    # TODO: replace pointer_grid by something less silly
 
     _pkg_id = "pkst"
     _template = (
@@ -311,7 +310,7 @@ class ParallelKrylovTransportSolver(Package):
         "partition": {"uniform": 0, "rcb": 5},
         "solver": {"bicgstab": 2, "gmres": 3, "gcr": 4},
         "preconditioner": {"ilu": 2},
-        }
+    }
 
     def __init__(
         self,
@@ -342,7 +341,11 @@ class ParallelKrylovTransportSolver(Package):
             if not self[arg] > 0:
                 raise ValueError
 
-        #Check whether option is actually an available option        
+        # Check whether option is actually an available option
         for opt_arg in self._keywords.keys():
             if self[opt_arg] not in self._keywords[opt_arg].keys():
-                raise ValueError("Argument for {} not in {}, instead got {}".format(opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]))   
+                raise ValueError(
+                    "Argument for {} not in {}, instead got {}".format(
+                        opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]
+                    )
+                )
