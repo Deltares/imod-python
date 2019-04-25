@@ -3,7 +3,44 @@ import jinja2
 from imod.wq.pkgbase import BoundaryCondition
 
 
-class RechargeTopLayer(BoundaryCondition):
+class Recharge(BoundaryCondition):
+    _pkg_id = "rch"
+
+    _mapping = (("rech", "rate"),)
+
+    _keywords = {"save_budget": {False: 0, True: 1}}
+
+    _template = jinja2.Template(
+        "[rch]\n"
+        "    nrchop = {{recharge_option}}\n"
+        "    irchcb = {{save_budget}}\n"
+        "    {%- for name, dictname in mapping -%}"
+        "        {%- for time, timedict in dicts[dictname].items() -%}"
+        "            {%- for layer, value in timedict.items() %}\n"
+        "    {{name}}_p{{time}} = {{value}}\n"
+        "            {%- endfor -%}\n"
+        "        {%- endfor -%}"
+        "    {%- endfor -%}"
+    )
+
+
+    def _render(self, directory, globaltimes, *args, **kwargs):
+        d = {
+            "mapping": self._mapping,
+            "save_budget": self["save_budget"].values,
+            "recharge_option": self._option,
+        }
+        self._replace_keyword(d, "save_budget")
+
+        dicts = {}
+        for _ , name in self._mapping:
+            dicts[name] = self._compose_values_timelayer(name, globaltimes, directory)
+        d["dicts"] = dicts
+
+        return self._template.render(d)
+
+
+class RechargeTopLayer(Recharge):
     """
     The Recharge package is used to simulate a specified flux distributed over
     the top of the model and specified in units of length/time. Within MODFLOW,
@@ -21,13 +58,16 @@ class RechargeTopLayer(BoundaryCondition):
         flag indicating if the budget needs to be saved.
         Default is False.
     """
-    _pkg_id = "rch"
+
+    _option = 1
 
     def __init__(self, rate, concentration, save_budget=False):
         super(__class__, self).__init__()
+        self["rate"] = rate
+        self["concentration"] = concentration
+        self["save_budget"] = save_budget
 
-
-class RechargeLayers(BoundaryCondition):
+class RechargeLayers(Recharge):
     """
     The Recharge package is used to simulate a specified flux distributed over
     the top of the model and specified in units of length/time. Within MODFLOW,
@@ -39,19 +79,29 @@ class RechargeLayers(BoundaryCondition):
     ----------
     rate: float or array of floats (xr.DataArray)
         is the amount of recharge.
+    recharge_layer: float or array of integers (xr.DataArray)
+        layer number variable that defines the layer in each vertical column
+        where recharge is applied
     concentration: float or array of floats (xr.DataArray)
         is the concentration of the recharge
     save_budget: {True, False}, optional
         flag indicating if the budget needs to be saved.
         Default is False.
     """
-    _pkg_id = "rch"
 
-    def __init__(self, rate, concentration, save_budget=False):
+    _option = 2
+
+    _mapping = (("rech", "rate"), ("irch", "recharge_layer"))
+
+    def __init__(self, rate, recharge_layer, concentration, save_budget=False):
         super(__class__, self).__init__()
+        self["rate"] = rate
+        self["recharge_layer"] = recharge_layer
+        self["concentration"] = concentration
+        self["save_budget"] = save_budget
 
 
-class RechargeHighestActive(BoundaryCondition):
+class RechargeHighestActive(Recharge):
     """
     The Recharge package is used to simulate a specified flux distributed over
     the top of the model and specified in units of length/time. Within MODFLOW,
@@ -70,40 +120,11 @@ class RechargeHighestActive(BoundaryCondition):
         flag indicating if the budget needs to be saved.
         Default is False.
     """
-    _pkg_id = "rch"
 
-    _mapping = (("rech", "rate"),)
-
-    _keywords = {"save_budget": {False: 0, True: 1}}
-
-    _template = jinja2.Template(
-        "[rch]\n"
-        "    nrchop = 3\n"
-        "    irchcb = {{save_budget}}\n"
-        "    {%- for name, dictname in mapping -%}"
-        "        {%- for time, timedict in dicts[dictname].items() -%}"
-        "            {%- for layer, value in timedict.items() %}\n"
-        "    {{name}}_p{{time}} = {{value}}\n"
-        "            {%- endfor -%}\n"
-        "        {%- endfor -%}"
-        "    {%- endfor -%}"
-    )
+    _option = 3
 
     def __init__(self, rate, concentration, save_budget=False):
         super(__class__, self).__init__()
         self["rate"] = rate
         self["concentration"] = concentration
         self["save_budget"] = save_budget
-
-    def _render(self, directory, globaltimes, *args, **kwargs):
-        d = {}
-        d["mapping"] = self._mapping
-
-        d["save_budget"] = self["save_budget"].values
-        self._replace_keyword(d, "save_budget")
-
-        dicts = {}
-        dicts["rate"] = self._compose_values_timelayer("rate", globaltimes, directory)
-        d["dicts"] = dicts
-
-        return self._template.render(d)
