@@ -64,7 +64,7 @@ class VariableDensityFlow(Package):
         first transport step of the simulation, or The last transport step of
         the MODFLOW timestep, or The maximum density change at a cell is greater
         than density_criterion.
-    correct_water_table: {"False", "True"}
+    correct_water_table: {"True", "False"}
         is a flag used to activate the variable-density water-table corrections
         (IWTABLE).
         If correct_water_table = False, the water-table correction will not be
