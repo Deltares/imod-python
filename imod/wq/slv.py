@@ -161,8 +161,10 @@ class ParallelKrylovFlowSolver(Package):
         is the relaxation parameter used. Usually, RELAX = 1.0, but for some
         problems a value of 0.99, 0.98, or 0.97 will reduce the number of
         iterations required for convergence.
-    partition: {"uniform"}, optional
-        Partitioning option (PARTOPT).
+    partition: {"uniform", "rcb"}, optional
+        Partitioning option (PARTOPT). 
+        "uniform" partitions the model domain into equally sized subdomains. 
+        "rcb" (Recursive Coordinate Bisection) uses a 2D pointer grid with weights to partition the model domain. 
         Default value: "uniform"
     solver: {"pcg"}, optional
         Flag indicating the linear solver to be used (ISOLVER).
@@ -176,11 +178,37 @@ class ParallelKrylovFlowSolver(Package):
     debug: {True, False}, optional
         Debug option.
         Default value: False
-
+    pointer_grid: string, optional
+        Path to a 2D pointer grid used when partition = "rcb".
+        
+        Note that even though the iMOD-SEAWAT helpfile states .idf is accepted, it is not.
+        This pointer grid should be a .asc (without a header), with the following format for each row:
+            ("{:8.2f}  " * (len(row)-1) + "{:8.2f}\n").format(*tuple(row.values))
     """
 
     _pkg_id = "pksf"
+    _template = (
+        "[pksf]\n"
+        "    mxiter = {max_iter}\n"
+        "    innerit = {inner_iter}\n"
+        "    hclosepks = {hclose}\n"
+        "    rclosepks = {rclose}\n"
+        "    relax = {relax}\n"
+        "    partopt = {partition}\n"
+        "    isolver = {solver}\n"
+        "    npc = {preconditioner}\n"
+        "    npcdef = {deflate}\n"
+        "    loadpatr = {pointer_grid}\n"
+        "    pressakey = {debug}\n"
+    )
 
+    _keywords = {
+        "partition": {"uniform": 0, "rcb": 5},
+        "solver": {"pcg": 1},
+        "preconditioner": {"ilu": 2},
+        "deflate": {False: 0, True: 1},
+    }
+    
     def __init__(
         self,
         max_iter,
@@ -193,9 +221,31 @@ class ParallelKrylovFlowSolver(Package):
         preconditioner="ilu",
         deflate=False,
         debug=False,
+        pointer_grid=None,
     ):
         super(__class__, self).__init__()
+        self["max_iter"] = max_iter
+        self["inner_iter"] = inner_iter
+        self["hclose"] = hclose
+        self["rclose"] = rclose
+        self["relax"] = relax
+        self["partition"] = partition
+        self["solver"] = solver
+        self["preconditioner"] = preconditioner
+        self["deflate"] = deflate
+        self["debug"] = debug
+        self["pointer_grid"] = pointer_grid
 
+    def _pkgcheck(self):
+        to_check = ["hclose", "rclose", "max_iter", "inner_iter", "relax"]
+        for arg in to_check:
+            if not self[arg] > 0:
+                raise ValueError
+        
+        #Check whether option is actually an available option
+        for opt_arg in self._keywords.keys():
+            if self[opt_arg] not in self._keywords[opt_arg].keys():
+                raise ValueError("Argument for {} not in {}, instead got {}".format(opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]))
 
 class ParallelKrylovTransportSolver(Package):
     """
@@ -220,10 +270,11 @@ class ParallelKrylovTransportSolver(Package):
         problems a value of 0.99, 0.98, or 0.97 will reduce the number of
         iterations required for convergence.
         Default value: 0.98
-    partition: {"uniform"}, optional
-        Partitioning option (PARTOPT).
-        Default value: "uniform"
-    solver: {"bicgstab"}, optional
+    partition: {"uniform", "rcb"}, optional
+        Partitioning option (PARTOPT). 
+        "uniform" partitions the model domain into equally sized subdomains. 
+        "rcb" (Recursive Coordinate Bisection) uses a 2D pointer grid with weights to partition the model domain. 
+    solver: {"bicgstab", "gmres", "gcr"}, optional
         Flag indicating the linear solver to be used (ISOLVER).
         Default value: "bicgstab"
     preconditioner: {"ilu"}, optional
@@ -232,10 +283,33 @@ class ParallelKrylovTransportSolver(Package):
     debug: {True, False}, optional
         Debug option.
         Default value: False
-
+    pointer_grid: string, optional
+        Path to a 2D pointer grid used when partition = "rcb".
+        
+        Note that even though the iMOD-SEAWAT helpfile states .idf is accepted, it is not.
+        This pointer grid should be a .asc (without a header), with the following format for each row:
+            ("{:8.2f}  " * (len(row)-1) + "{:8.2f}\n").format(*tuple(row.values))
     """
 
     _pkg_id = "pkst"
+    _template = (
+        "[pkst]\n"
+        "    mxiter = {max_iter}\n"
+        "    innerit = {inner_iter}\n"
+        "    cclosepks = {cclose}\n"
+        "    relax = {relax}\n"
+        "    partopt = {partition}\n"
+        "    isolver = {solver}\n"
+        "    npc = {preconditioner}\n"
+        "    loadpatr = {pointer_grid}\n"
+        "    pressakey = {debug}\n"
+    )
+
+    _keywords = {
+        "partition": {"uniform": 0, "rcb": 5},
+        "solver": {"bicgstab": 2, "gmres": 3, "gcr": 4},
+        "preconditioner": {"ilu": 2},
+        }
 
     def __init__(
         self,
@@ -247,5 +321,26 @@ class ParallelKrylovTransportSolver(Package):
         solver="bicgstab",
         preconditioner="ilu",
         debug=False,
+        pointer_grid=None,
     ):
         super(__class__, self).__init__()
+        self["max_iter"] = max_iter
+        self["inner_iter"] = inner_iter
+        self["cclose"] = cclose
+        self["relax"] = relax
+        self["partition"] = partition
+        self["solver"] = solver
+        self["preconditioner"] = preconditioner
+        self["debug"] = debug
+        self["pointer_grid"] = pointer_grid
+
+    def _pkgcheck(self):
+        to_check = ["cclose", "max_iter", "inner_iter", "relax"]
+        for arg in to_check:
+            if not self[arg] > 0:
+                raise ValueError
+
+        #Check whether option is actually an available option        
+        for opt_arg in self._keywords.keys():
+            if self[opt_arg] not in self._keywords[opt_arg].keys():
+                raise ValueError("Argument for {} not in {}, instead got {}".format(opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]))   

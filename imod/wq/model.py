@@ -210,7 +210,7 @@ class SeawatModel(Model):
 
     def _render_transportsolver(self):
         gcgkey = self._get_pkgkey("gcg")
-        pkstkey = self._get_pkgkey("pksf")
+        pkstkey = self._get_pkgkey("pkst")
         if gcgkey and pkstkey:
             raise ValueError("gcg and pkst solver both provided. Provide only one.")
         if not gcgkey and not pkstkey:
