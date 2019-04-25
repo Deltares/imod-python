@@ -64,10 +64,6 @@ class PreconditionedConjugateGradientSolver(Package):
         self["relax"] = relax
         self["damp"] = damp
 
-    def _render(self):
-        d = {k: v.values for k, v in self.data_vars.items()}
-        return self._template.format(**d)
-
     def _pkgcheck(self):
         if not self["hclose"] > 0:
             raise ValueError
