@@ -2,6 +2,42 @@ from imod.wq.pkgbase import Package
 
 
 class OutputControl(Package):
+    """
+    The Output Control Option is used to specify if head, drawdown, or budget
+    data should be saved and in which format.
+
+    Parameters
+    ----------
+    save_head_idf: {True, False}, optional
+        Save calculated head values in IDF format.
+        Default value is False.
+    save_concentration_idf: {True, False}, optional
+        Save calculated concentration values in IDF format.
+        Default value is False.
+    save_budget_idf: {True, False}, optional
+        Save calculated budget in IDF format.
+        Default value is False.
+    save_head_tec: {True, False}, optional
+        Save calculated head values in a format compatible with Tecplot.
+        Default value is False.
+    save_concentration_tec: {True, False}, optional
+        Save calculated concentration values in a format compatible with
+        Tecplot.
+        Default value is False.
+    save_budget_tec: {True, False}, optional
+        Save calculated budget in a format compatible with Tecplot.
+        Default value is False.
+    save_head_vtk: {True, False}, optional
+        Save calculated head values in a format compatible with ParaView (VTK).
+        Default value is False.
+    save_concentration_vtk: {True, False}, optional
+        Save calculated concentration values in a format compatible with
+        ParaView (VTK).
+        Default value is False.
+    save_budget_vtk: {True, False}, optional
+        Save calculated budget in a format compatible with ParaView (VTK).
+        Default value is False.
+    """
     _pkg_id = "oc"
     _template = (
         "[oc]\n"

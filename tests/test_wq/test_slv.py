@@ -1,6 +1,7 @@
 from imod.wq import PreconditionedConjugateGradientSolver
 from imod.wq import GeneralizedConjugateGradientSolver
-
+from imod.wq import ParallelKrylovFlowSolver
+from imod.wq import ParallelKrylovTransportSolver
 
 def test_pcg_render():
     pcg = PreconditionedConjugateGradientSolver(
@@ -43,3 +44,57 @@ def test_gcg_render():
     )
 
     assert gcg._render() == compare
+
+def test_pksf_render():
+    pksf = ParallelKrylovFlowSolver(
+            max_iter=10,
+            inner_iter=10,
+            hclose=1.0e-4,
+            rclose=100.0,
+            relax=0.99
+        )
+    
+    compare = (
+                "[pksf]\n"
+                "    mxiter = 10\n"
+                "    innerit = 10\n"
+                "    hclosepks = 0.0001\n"
+                "    rclosepks = 100.0\n"
+                "    relax = 0.99\n"
+                "    partopt = 0\n"
+                "    isolver = 1\n"
+                "    npc = 2\n"
+                "    npcdef = 0\n"
+                "    loadpatr = None\n"
+                "    pressakey = False\n"
+                )
+    
+    assert pksf._render() == compare
+
+def test_pkst_render():
+    pkst = ParallelKrylovTransportSolver(
+            max_iter = 1000, 
+            inner_iter = 30, 
+            cclose=1e-6,
+            relax=0.98,
+            partition="uniform",
+            solver="bicgstab",
+            preconditioner="ilu",
+            debug=False,
+        )
+    
+    compare = (
+            "[pkst]\n"
+            "    mxiter = 1000\n"
+            "    innerit = 30\n"
+            "    cclosepks = 1e-06\n"
+            "    relax = 0.98\n"
+            "    partopt = 0\n"
+            "    isolver = 2\n"
+            "    npc = 2\n"
+            "    loadpatr = None\n"
+            "    pressakey = False\n"
+                )
+    
+    assert pkst._render() == compare
+

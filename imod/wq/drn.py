@@ -2,6 +2,22 @@ from imod.wq.pkgbase import BoundaryCondition
 
 
 class Drainage(BoundaryCondition):
+    """
+    The Drain package is used to simulate head-dependent flux boundaries. In the
+    Drain package if the head in the cell falls below a certain threshold, the
+    flux from the drain to the model cell drops to zero.
+
+    Parameters
+    ----------
+    elevation: array of floats (xr.DataArray)
+        elevation of the drain.
+    conductance: array of floats (xr.DataArray)
+        is the conductance of the drain.
+    save_budget: {True, False}, optional
+        A flag that is used to determine if cell-by-cell budget data should be
+        saved. If save_budget is True cell-by-cell budget data will be saved.
+        Default is False.
+    """
     _pkg_id = "drn"
 
     _mapping = (("elevation", "elevation"), ("cond", "conductance"))

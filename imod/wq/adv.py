@@ -3,9 +3,9 @@ from imod.wq.pkgbase import Package
 
 class AdvectionFiniteDifference(Package):
     """
-    Solve the advection term using the explicit Finite Difference method 
+    Solve the advection term using the explicit Finite Difference method
     (MIXELM = 0) with upstream weighting
-    
+
     Attributes
     ----------
     courant: real
@@ -60,7 +60,7 @@ class AdvectionMOC(Package):
         than one is specified.
     max_nparticles: int
         is the maximum total number of moving particles allowed (MXPART).
-    tracking: {"euler"}, optional 
+    tracking: {"euler"}, optional
         indicates which particle tracking algorithm is selected for the
         Eulerian-Lagrangian methods. Here, the first order Euler algorithm is used
         (ITRACK = 1)
@@ -75,7 +75,7 @@ class AdvectionMOC(Package):
         is a small Relative Cell Concentration Gradient below which advective
         transport is considered negligible. A value around 10-5 is generally
         adequate.
-        Default value: 1.0e-5. 
+        Default value: 1.0e-5.
     nplane: int, optional
         is a flag indicating whether the random or fixed pattern is selected for
         initial placement of moving particles. NPLANE = 0, the random pattern is
@@ -181,7 +181,7 @@ class AdvectionModifiedMOC(Package):
         mass balance. Generally, it can be increased toward 1.0 as advection
         becomes more dominant.
     interp: int
-        indicates the concentration interpolation method to use in the MMOC scheme. 
+        indicates the concentration interpolation method to use in the MMOC scheme.
     nlsink: int
         indicates whether the random or fixed pattern is selected for initial
         placement of particles to approximate sink cells in the MMOC scheme.
@@ -309,7 +309,7 @@ class AdvectionHybridMOC(Package):
 
 class AdvectionTVD(Package):
     """
-    Total Variation Diminishing (TVD) formulation (ULTIMATE, MIXELM = -1)
+    Total Variation Diminishing (TVD) formulation (ULTIMATE, MIXELM = -1).
 
     Attributes
     ----------
