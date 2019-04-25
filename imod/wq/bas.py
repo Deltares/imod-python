@@ -6,6 +6,53 @@ from imod import util
 
 
 class BasicFlow(Package):
+    """
+    The Basic package is used to specify certain data used in all models.
+    These include:
+    1. the locations of acitve, inactive, and specified head in cells,
+    2. the head stored in inactive cells, 
+    3. the initial head in all cells, and
+    4. the top and bottom of the aquifer
+    The number of layers (NLAY) is automatically calculated using the IBOUND.
+    Thickness is calculated using the specified tops en bottoms.
+    The Basic package input file is required in all models.
+
+    Parameters
+    ----------
+    ibound: array of int (xr.DataArray)
+        is the boundary variable. One value is read for every model cell.
+        Values are read a layer at the time.
+        If IBOUND(J,I,K) < 0, cell J,I,K has a constant head.
+        If IBOUND(J,I,K) = 0, cell J,I,K is inactive.
+        If IBOUND(J,I,K) > 0, cell J,I,K is active.
+    top: float or array of floats (xr.DataArray)
+        is the top elevation of layer 1. For the common situation in which the
+        top layer represents a water-table aquifer, it may be reasonable to set
+        Top equal to land-surface elevation.
+    bottom: float or array of floats (xr.DataArray)
+        is the bottom elevation of a model layer or a Quasi-3d confining bed.
+    starting_head: float or array of floats (xr.DataArray)
+        is initial (starting) head—that is, head at the beginning of the
+        simulation (STRT). starting_head must be specified for all simulations,
+        including steady-state simulations. One value is read for every model
+        cell. Usually, these values are read a layer at a time.
+    inactive_head: float, optional
+        is the value of head to be assigned to all inactive (no flow) cells
+        (IBOUND = 0) throughout the simulation (HNOFLO). Because head at
+        inactive cells is unused in model calculations, this does not affect
+        model results but serves to identify inactive cells when head is
+        printed. This value is also used as drawdown at inactive cells if the
+        drawdown option is used. Even if the user does not anticipate having
+        inactive cells, a value for inactive_head must be entered.
+        Default value is 1.0e30.
+    confining_bed_below: int, optional
+        is a flag, with one value for each model layer, that indicates whether
+        or not a layer has a Quasi-3D confining bed below it (LAYCBD). 0
+        indicates no confining bed, and not zero indicates a confining bed.
+        confining_bed_below for the bottom layer must be 0.
+        Default value is 0.
+    """
+
     _pkg_id = "bas6"
     _template = jinja2.Template(
         "[bas6]\n"

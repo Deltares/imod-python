@@ -4,6 +4,35 @@ from imod.wq.pkgbase import Package
 
 
 class Dispersion(Package):
+    """
+    Solves the concentration change due to dispersion explicitly or formulates
+    the coefficient matrix of the dispersion term for the matrix solver.
+
+    Parameters
+    ----------
+    longitudinal: float
+        is the longitudinal dispersivity (AL), for every cell of the model grid
+        (unit: L).
+    ratio_horizontal: float
+        is a 1D real array defining the ratio of the horizontal transverse
+        dispersivity (TRPT), to the longitudinal dispersivity. Each value in the
+        array corresponds to one model layer. Some recent field studies suggest
+        that ratio_horizontal is generally not greater than 0.1.
+    ratio_vertical: float
+        (TRPV) is the ratio of the vertical transverse dispersivity to the
+        longitudinal dispersivity. Each value in the array corresponds to one
+        model layer.
+        Some recent field studies suggest that ratio_vertical is generally not
+        greater than 0.01.
+        Set ratio_vertical equal to ratio_horizontal to use the standard
+        isotropic dispersion model. Otherwise, the modified isotropic dispersion
+        model is used.
+    diffusion_coefficient: float
+        is the effective molecular diffusion coefficient (unit: L2T-1). Set
+        diffusion_coefficient = 0 if the effect of molecular diffusion is
+        considered unimportant. Each value in the array corresponds to one model
+        layer.
+    """
     _pkg_id = "dsp"
 
     _mapping = (
