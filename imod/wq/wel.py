@@ -74,7 +74,7 @@ class Well(pd.DataFrame):
         d["wels"] = self._compose_values_time(directory, globaltimes)
         return self._template.render(d)
 
-    def _ssm_render(self, directory, globaltimes):
+    def _render_ssm(self, directory, globaltimes):
         return ""
 
     def _max_active_n(self, varname, nlayer):

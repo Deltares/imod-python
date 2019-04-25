@@ -220,6 +220,15 @@ class SeawatModel(Model):
         else:
             return self[pkstkey]._render()
 
+    def _render_ssm_rch(self, directory, globaltimes):
+        rchkey = self._get_pkgkey("rch")
+        if rchkey is not None:
+            return self[rchkey]._render_ssm(
+                directory=directory, globaltimes=globaltimes
+            )
+        else:
+            return ""
+
     def _btn_rch_sinkssources(self):
         btnkey = self._get_pkgkey("btn")
         icbund = self[btnkey]["icbund"]
@@ -240,10 +249,6 @@ class SeawatModel(Model):
         # directory = pathlib.Path(self.modelname)
         directory = pathlib.Path(".")
 
-        modflowcontent, ssm_content, n_sinkssources = self._render_groups(
-            directory=directory, globaltimes=globaltimes
-        )
-
         content = []
         content.append(
             self._render_gen(
@@ -256,18 +261,28 @@ class SeawatModel(Model):
             content.append(
                 self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
             )
+
+        # multi-system package group: chd, drn, ghb, riv, wel
+        modflowcontent, ssm_content, n_sinkssources = self._render_groups(
+            directory=directory, globaltimes=globaltimes
+        )
+        # Add recharge to ssm_content
+        ssm_content += self._render_ssm_rch(directory=directory, globaltimes=globaltimes)
+        # Add recharge to sinks and sources
+        n_sinkssources += self._btn_rch_sinkssources()
+
+        # Wrap up modflow part
         content.append(modflowcontent)
         content.append(self._render_flowsolver())
 
-        # MT3D and Seawat
+        # MT3D and Seawat settings
         content.append(self._render_btn(directory=directory, globaltimes=globaltimes))
         for key in ("vdf", "adv", "dsp"):
             content.append(
                 self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
             )
-
-        n_sinkssources += self._btn_rch_sinkssources()
         ssm_content = f"[ssm]\n    mxss = {n_sinkssources}" + ssm_content
+
         content.append(ssm_content)
         content.append(self._render_transportsolver())
 
