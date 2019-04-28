@@ -616,7 +616,8 @@ def _coord(da, dim):
         dxs = np.full(da[dim].size, dx)
 
     _check_monotonic(dxs, dim)
-    x = np.full(dxs.size + 1, da[dim][0])
+    x0 = da[dim][0] - 0.5 * dxs[0]
+    x = np.full(dxs.size + 1, x0)
     x[1:] += np.cumsum(dxs)
     return x
 
@@ -711,6 +712,22 @@ def regrid(source, like, method, fill_value=np.nan):
     dst = dst.transpose(*source.dims)
 
     return dst
+
+
+class BatchRegridder(object):
+    """
+    Object to repeatedly regrid similar objects.
+    Compiles once on first call, can then be repeatedly called without
+    JIT compilation overhead.
+    """
+    def __init__(self, source, like, method):
+        # TODO: collect all the data, as in regrid function above.
+        raise NotImplementedError
+        self._regrid = _make_regrid()
+
+    def regrid(source, fill_value=np.nan):
+        # TODO: check whether input is actually same as in __init__
+        return self._regrid(source, fill_value)
 
 
 def mean(values, weights):
