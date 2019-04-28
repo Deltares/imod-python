@@ -596,16 +596,16 @@ def _check_monotonic(dxs, dim):
 
 def _coord(da, dim):
     delta_dim = "d" + dim  # e.g. dx, dy, dz, etc.
-    if delta_dim in da.coords:  # non-equidistant
-        dxs = da[delta_dim]
-        _check_monotonic(dxs, dim)
-        x0 = float(da[dim][0]) - 0.5 * float(dxs[0])
-        x1 = float(da[dim][-1]) + 0.5 * float(dxs[-1])
-        x = np.cumsum(dxs.values) + x0
-        x = np.insert(x, 0, x0)
-    else:  # equidistant
-        dxs = np.diff(da[dim])
-        _check_monotonic(dxs, dim)
+
+    if delta_dim in da.coords:  # equidistant or non-equidistant
+        dx = da[delta_dim].values
+        if dx.shape == () or dx.shape == (1,):  # scalar -> equidistant
+            dxs = np.full(da[dim].size, dx)
+        else:  # array -> non-equidistant
+            dxs = dx
+
+    else:  # undefined -> equidistant
+        dxs = np.diff(da[dim].values)
         dx = dxs[0]
         atolx = abs(1.0e-6 * dx)
         if not np.allclose(dxs, dx, atolx):
@@ -613,10 +613,11 @@ def _coord(da, dim):
                 f"DataArray has to be equidistant along {dim}, or cellsizes"
                 " must be provided as a coordinate."
             )
-        x0 = float(da[dim][0]) - 0.5 * dx
-        # increase by 1.5 since np.arange is not inclusive of end:
-        x1 = float(da[dim][-1]) + 1.5 * dx
-        x = np.arange(x0, x1, dx)
+        dxs = np.full(da[dim].size, dx)
+
+    _check_monotonic(dxs, dim)
+    x = np.full(dxs.size + 1, da[dim][0])
+    x[1:] += np.cumsum(dxs)
     return x
 
 
@@ -790,9 +791,36 @@ def maximum(values, weights):
 
 
 def mode(values, weights):
-    # Requires numba 0.44 for support of bincount.
-    ind_mode = np.argmax(np.bincount(values))
-    return values[ind_mode]
+    # Area weighted mode
+    # Reuse weights to do counting: no allocations
+    # The alternative is defining a separate frequency array in which to add
+    # the weights. This implementation is less efficient in terms of looping.
+    # With many unique values, it keeps having to loop through a big part of
+    # the weights array... but it would do so with a separate frequency array
+    # as well. There are somewhat more elements to traverse in this case.
+    s = values.size
+    w_sum = 0
+    for i in range(s):
+        v = values[i]
+        w = weights[i]
+        if np.isnan(v):
+            continue
+        w_sum += 1
+        for j in range(i):  # Compare with previously found values
+            if values[j] == v:  # matches previous value
+                weights[j] += w  # increase previous weight
+                break
+
+    if w_sum == 0:  # It skipped everything: only nodata values
+        return np.nan
+    else:  # Find value with highest frequency
+        w_max = 0
+        for i in range(s):
+            w = weights[i]
+            if w > w_max:
+                w_max = w
+                v = values[i]
+        return v
 
 
 def median(values, weights):
