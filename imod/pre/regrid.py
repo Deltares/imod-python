@@ -610,7 +610,8 @@ def _coord(da, dim):
         atolx = abs(1.0e-6 * dx)
         if not np.allclose(dxs, dx, atolx):
             raise ValueError(
-                f"DataArray has to be equidistant along {dim}, or cellsizes must be provided as a coordinate."
+                f"DataArray has to be equidistant along {dim}, or cellsizes"
+                " must be provided as a coordinate."
             )
         x0 = float(da[dim][0]) - 0.5 * dx
         # increase by 1.5 since np.arange is not inclusive of end:
@@ -717,20 +718,31 @@ def mean(values, weights):
     for i in range(values.size):
         v = values[i]
         w = weights[i]
+        if np.isnan(v):
+            continue
         vsum += w * v
         wsum += w
-    return vsum / wsum
+    if vsum == 0:
+        return np.nan
+    else:
+        return vsum / wsum
 
 
 def harmonic_mean(values, weights):
     v_agg = 0.0
     w_sum = 0.0
     for i in range(values.size):
+        v = values[i]
         w = weights[i]
+        if np.isnan(v) or v == 0:
+            continue
         if w > 0:
             w_sum += w
-            v_agg += w / values[i]
-    return w_sum / v_agg
+            v_agg += w / v
+    if v_agg == 0 or w_sum == 0:
+        return np.nan
+    else:
+        return w_sum / v_agg
 
 
 def geometric_mean(values, weights):
@@ -740,33 +752,48 @@ def geometric_mean(values, weights):
     for i in range(values.size):
         w = weights[i]
         v = values[i]
+        if np.isnan(v):
+            continue
         if w > 0:
             v_agg += w * np.log(abs(v))
             w_sum += w
             if v < 0:
                 m += 1
-    return (-1.0) ** m * np.exp((1.0 / w_sum) * v_agg)
+    if w_sum == 0:
+        return np.nan
+    else:
+        return (-1.0) ** m * np.exp((1.0 / w_sum) * v_agg)
 
 
 def sum(values, weights):
     v_sum = 0.0
+    w_sum = 0.0
     for i in range(values.size):
-        v_sum += values[i] * weights[i]
-    return v_sum
+        v = values[i]
+        w = weights[i]
+        if np.isnan(v):
+            continue
+        v_sum += v * w
+        w_sum += w
+    if w_sum == 0:
+        return np.nan
+    else:
+        return v_sum
 
 
 def minimum(values, weights):
-    return np.min(values)
+    return np.nanmin(values)
 
 
 def maximum(values, weights):
-    return np.max(values)
+    return np.nanmax(values)
 
 
 def mode(values, weights):
+    # Requires numba 0.44 for support of bincount.
     ind_mode = np.argmax(np.bincount(values))
     return values[ind_mode]
 
 
 def median(values, weights):
-    return np.percentile(values, 50)
+    return np.nanpercentile(values, 50)
