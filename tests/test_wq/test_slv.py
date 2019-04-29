@@ -97,15 +97,15 @@ def test_pksf_render_rcb():
                 "    hclosepks = 0.0001\n"
                 "    rclosepks = 100.0\n"
                 "    relax = 0.99\n"
-                "    partopt = 0\n"
+                "    partopt = 5\n"
                 "    isolver = 1\n"
                 "    npc = 2\n"
                 "    npcdef = 0\n"
-                "    loadpatr = pksf\load_balance_weight.asc\n"
+                "    loadpatr = load_balance_weight.asc\n"
                 "    pressakey = False\n"
                 )
     
-    assert pksf._render(directory=directory.joinpath("pksf")) == compare    
+    assert pksf._render(directory=directory) == compare    
 
 def test_pkst_render():
     pkst = ParallelKrylovTransportSolver(
@@ -159,11 +159,11 @@ def test_pkst_render_rcb():
             "    innerit = 30\n"
             "    cclosepks = 1e-06\n"
             "    relax = 0.98\n"
-            "    partopt = 0\n"
+            "    partopt = 5\n"
             "    isolver = 2\n"
             "    npc = 2\n"
-            "    loadpatr = pkst\load_balance_weight.asc\n"
+            "    loadpatr = load_balance_weight.asc\n"
             "    pressakey = False\n"
                 )
     
-    assert pkst._render(directory=directory.joinpath("pkst")) == compare
+    assert pkst._render(directory=directory) == compare
