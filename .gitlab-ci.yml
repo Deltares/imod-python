@@ -18,6 +18,7 @@ tests:
     - cd tests
     - python -m pytest --verbose
     - cd ..
+    - black --check . 
 
 pages:
   script:
