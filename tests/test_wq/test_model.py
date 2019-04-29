@@ -128,6 +128,13 @@ def basicmodel(request):
 
     return m
 
+def test_compute_load_balance_weight(basicmodel):
+    m = basicmodel
+    da = m._compute_load_balance_weight()
+    
+    assert(da.ndim == 2)
+    assert(np.all(da==3.0))
+    
 
 def test_get_pkgkey(basicmodel):
     m = basicmodel
