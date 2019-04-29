@@ -3,7 +3,6 @@ import numpy as np
 import pathlib
 import pandas as pd
 from imod import util
-import jinja2
 
 class PreconditionedConjugateGradientSolver(Package):
     """
@@ -193,19 +192,19 @@ class ParallelKrylovFlowSolver(Package):
     """
 
     _pkg_id = "pksf"
-    _template = jinja2.Template(
+    _template = (
         "[pksf]\n"
-        "    mxiter = {{max_iter}}\n"
-        "    innerit = {{inner_iter}}\n"
-        "    hclosepks = {{hclose}}\n"
-        "    rclosepks = {{rclose}}\n"
-        "    relax = {{relax}}\n"
-        "    partopt = {{partition}}\n"
-        "    isolver = {{solver}}\n"
-        "    npc = {{preconditioner}}\n"
-        "    npcdef = {{deflate}}\n"
-        "    loadpatr = {{load_balance_weight}}\n"
-        "    pressakey = {{debug}}\n"
+        "    mxiter = {max_iter}\n"
+        "    innerit = {inner_iter}\n"
+        "    hclosepks = {hclose}\n"
+        "    rclosepks = {rclose}\n"
+        "    relax = {relax}\n"
+        "    partopt = {partition}\n"
+        "    isolver = {solver}\n"
+        "    npc = {preconditioner}\n"
+        "    npcdef = {deflate}\n"
+        "    loadpatr = {load_balance_weight}\n"
+        "    pressakey = {debug}\n"
     )
 
     _keywords = {
@@ -266,7 +265,7 @@ class ParallelKrylovFlowSolver(Package):
         if isinstance(d["load_balance_weight"], (np.ndarray)): #Check for ndarray and not DataArray since we called v.values before.
             d["load_balance_weight"] = util.compose({"directory": directory, "name": "load_balance_weight", "extension": ".asc"})
         
-        return self._template.render(d)
+        return self._template.format(**d)
 
 
     def save(self, directory):
@@ -329,17 +328,17 @@ class ParallelKrylovTransportSolver(Package):
     """
 
     _pkg_id = "pkst"
-    _template = jinja2.Template(
+    _template = (
         "[pkst]\n"
-        "    mxiter = {{max_iter}}\n"
-        "    innerit = {{inner_iter}}\n"
-        "    cclosepks = {{cclose}}\n"
-        "    relax = {{relax}}\n"
-        "    partopt = {{partition}}\n"
-        "    isolver = {{solver}}\n"
-        "    npc = {{preconditioner}}\n"
-        "    loadpatr = {{load_balance_weight}}\n"
-        "    pressakey = {{debug}}\n"
+        "    mxiter = {max_iter}\n"
+        "    innerit = {inner_iter}\n"
+        "    cclosepks = {cclose}\n"
+        "    relax = {relax}\n"
+        "    partopt = {partition}\n"
+        "    isolver = {solver}\n"
+        "    npc = {preconditioner}\n"
+        "    loadpatr = {load_balance_weight}\n"
+        "    pressakey = {debug}\n"
     )
 
     _keywords = {
@@ -395,7 +394,7 @@ class ParallelKrylovTransportSolver(Package):
         if isinstance(d["load_balance_weight"], (np.ndarray)): #Check for ndarray and not DataArray since we called v.values before.
             d["load_balance_weight"] = util.compose({"directory": directory, "name": "load_balance_weight", "extension": ".asc"})
         
-        return self._template.render(d)
+        return self._template.format(**d)
 
     def save(self, directory):
         """Override of parent method to write .asc instead of .idf. Remove this if iMOD-SEAWAT accepts 
