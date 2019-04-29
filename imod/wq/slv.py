@@ -1,5 +1,9 @@
 from imod.wq.pkgbase import Package
-
+import numpy as np
+import pathlib
+import pandas as pd
+from imod import util
+import jinja2
 
 class PreconditionedConjugateGradientSolver(Package):
     """
@@ -178,28 +182,30 @@ class ParallelKrylovFlowSolver(Package):
     debug: {True, False}, optional
         Debug option.
         Default value: False
-    pointer_grid: string, optional
-        Path to a 2D pointer grid used when partition = "rcb".
+    load_balance_weight: {string, da}, optional
+        2D grid with load balance weights, used when partition = "rcb".
+        If None (default), then the module will create a load blance grid by summing IBOUND over layers.
         
         Note that even though the iMOD-SEAWAT helpfile states .idf is accepted, it is not.
-        This pointer grid should be a .asc (without a header), with the following format for each row:
-            ("{:8.2f}  " * (len(row)-1) + "{:8.2f}\n").format(*tuple(row.values))
+        This load balance grid should be a .asc (without a header), with the following format for each row:
+            pd.DataFrame(da.values).to_csv(path, 
+                             sep='\t', header=False, index=False, float_format = "%8.2f")
     """
 
     _pkg_id = "pksf"
-    _template = (
+    _template = jinja2.Template(
         "[pksf]\n"
-        "    mxiter = {max_iter}\n"
-        "    innerit = {inner_iter}\n"
-        "    hclosepks = {hclose}\n"
-        "    rclosepks = {rclose}\n"
-        "    relax = {relax}\n"
-        "    partopt = {partition}\n"
-        "    isolver = {solver}\n"
-        "    npc = {preconditioner}\n"
-        "    npcdef = {deflate}\n"
-        "    loadpatr = {pointer_grid}\n"
-        "    pressakey = {debug}\n"
+        "    mxiter = {{max_iter}}\n"
+        "    innerit = {{inner_iter}}\n"
+        "    hclosepks = {{hclose}}\n"
+        "    rclosepks = {{rclose}}\n"
+        "    relax = {{relax}}\n"
+        "    partopt = {{partition}}\n"
+        "    isolver = {{solver}}\n"
+        "    npc = {{preconditioner}}\n"
+        "    npcdef = {{deflate}}\n"
+        "    loadpatr = {{load_balance_weight}}\n"
+        "    pressakey = {{debug}}\n"
     )
 
     _keywords = {
@@ -221,7 +227,7 @@ class ParallelKrylovFlowSolver(Package):
         preconditioner="ilu",
         deflate=False,
         debug=False,
-        pointer_grid=None,
+        load_balance_weight=None,
     ):
         super(__class__, self).__init__()
         self["max_iter"] = max_iter
@@ -234,7 +240,7 @@ class ParallelKrylovFlowSolver(Package):
         self["preconditioner"] = preconditioner
         self["deflate"] = deflate
         self["debug"] = debug
-        self["pointer_grid"] = pointer_grid
+        self["load_balance_weight"] = load_balance_weight
 
     def _pkgcheck(self):
         to_check = ["hclose", "rclose", "max_iter", "inner_iter", "relax"]
@@ -247,6 +253,35 @@ class ParallelKrylovFlowSolver(Package):
             if self[opt_arg] not in self._keywords[opt_arg].keys():
                 raise ValueError("Argument for {} not in {}, instead got {}".format(opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]))
 
+    def _render(self, directory, *args, **kwargs):
+        """
+        Renders part of runfile that ends up under [pksf] section.
+        """
+        
+        d = {k: v.values for k, v in self.data_vars.items()}
+        if hasattr(self, "_keywords"):
+            for key in self._keywords.keys():
+                self._replace_keyword(d, key)
+        
+        if isinstance(d["load_balance_weight"], (np.ndarray)): #Check for ndarray and not DataArray since we called v.values before.
+            d["load_balance_weight"] = util.compose({"directory": directory, "name": "load_balance_weight", "extension": ".asc"})
+        
+        return self._template.render(d)
+
+
+    def save(self, directory):
+        """Override of parent method to write .asc instead of .idf. Remove this if iMOD-SEAWAT is updated to accept 
+        """
+        for name, da in self.data_vars.items():
+            if "y" in da.coords and "x" in da.coords:
+                if da.ndim > 2:
+                    raise ValueError("load_balance_weight should have no more than 2 dimensions")
+                ext = ".asc"
+                path = pathlib.Path(directory).joinpath(name+ext)
+                path.parent.mkdir(exist_ok=True, parents=True)
+                pd.DataFrame(da.values).to_csv(path, 
+                             sep='\t', header=False, index=False, float_format = "%8.2f")
+                
 class ParallelKrylovTransportSolver(Package):
     """
     The Parallel Krylov Transport Solver is used for parallel solving of the
@@ -283,26 +318,28 @@ class ParallelKrylovTransportSolver(Package):
     debug: {True, False}, optional
         Debug option.
         Default value: False
-    pointer_grid: string, optional
-        Path to a 2D pointer grid used when partition = "rcb".
+    load_balance_weight: {string, da}, optional
+        2D grid with load balance weights, used when partition = "rcb".
+        If None (default), then the module will create a load blance grid by summing IBOUND over layers.
         
         Note that even though the iMOD-SEAWAT helpfile states .idf is accepted, it is not.
-        This pointer grid should be a .asc (without a header), with the following format for each row:
-            ("{:8.2f}  " * (len(row)-1) + "{:8.2f}\n").format(*tuple(row.values))
+        This load balance grid should be a .asc (without a header), with the following format for each row:
+            pd.DataFrame(da.values).to_csv(path, 
+                             sep='\t', header=False, index=False, float_format = "%8.2f")
     """
 
     _pkg_id = "pkst"
-    _template = (
+    _template = jinja2.Template(
         "[pkst]\n"
-        "    mxiter = {max_iter}\n"
-        "    innerit = {inner_iter}\n"
-        "    cclosepks = {cclose}\n"
-        "    relax = {relax}\n"
-        "    partopt = {partition}\n"
-        "    isolver = {solver}\n"
-        "    npc = {preconditioner}\n"
-        "    loadpatr = {pointer_grid}\n"
-        "    pressakey = {debug}\n"
+        "    mxiter = {{max_iter}}\n"
+        "    innerit = {{inner_iter}}\n"
+        "    cclosepks = {{cclose}}\n"
+        "    relax = {{relax}}\n"
+        "    partopt = {{partition}}\n"
+        "    isolver = {{solver}}\n"
+        "    npc = {{preconditioner}}\n"
+        "    loadpatr = {{load_balance_weight}}\n"
+        "    pressakey = {{debug}}\n"
     )
 
     _keywords = {
@@ -321,7 +358,7 @@ class ParallelKrylovTransportSolver(Package):
         solver="bicgstab",
         preconditioner="ilu",
         debug=False,
-        pointer_grid=None,
+        load_balance_weight=None,
     ):
         super(__class__, self).__init__()
         self["max_iter"] = max_iter
@@ -332,7 +369,7 @@ class ParallelKrylovTransportSolver(Package):
         self["solver"] = solver
         self["preconditioner"] = preconditioner
         self["debug"] = debug
-        self["pointer_grid"] = pointer_grid
+        self["load_balance_weight"] = load_balance_weight
 
     def _pkgcheck(self):
         to_check = ["cclose", "max_iter", "inner_iter", "relax"]
@@ -343,4 +380,32 @@ class ParallelKrylovTransportSolver(Package):
         #Check whether option is actually an available option        
         for opt_arg in self._keywords.keys():
             if self[opt_arg] not in self._keywords[opt_arg].keys():
-                raise ValueError("Argument for {} not in {}, instead got {}".format(opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]))   
+                raise ValueError("Argument for {} not in {}, instead got {}".format(opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]))
+
+    def _render(self, directory, *args, **kwargs):
+        """
+        Renders part of runfile that ends up under [pksf] section.
+        """
+        
+        d = {k: v.values for k, v in self.data_vars.items()}
+        if hasattr(self, "_keywords"):
+            for key in self._keywords.keys():
+                self._replace_keyword(d, key)
+        
+        if isinstance(d["load_balance_weight"], (np.ndarray)): #Check for ndarray and not DataArray since we called v.values before.
+            d["load_balance_weight"] = util.compose({"directory": directory, "name": "load_balance_weight", "extension": ".asc"})
+        
+        return self._template.render(d)
+
+    def save(self, directory):
+        """Override of parent method to write .asc instead of .idf. Remove this if iMOD-SEAWAT accepts 
+        """
+        for name, da in self.data_vars.items():
+            if "y" in da.coords and "x" in da.coords:
+                if da.ndim > 2:
+                    raise ValueError("load_balance_weight should have no more than 2 dimensions")
+                ext = ".asc"
+                path = pathlib.Path(directory).joinpath(name+ext)
+                path.parent.mkdir(exist_ok=True, parents=True)
+                pd.DataFrame(da.values).to_csv(path, 
+                             sep='\t', header=False, index=False, float_format = "%8.2f")

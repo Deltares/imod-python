@@ -182,7 +182,13 @@ class SeawatModel(Model):
         n_sinkssources = sum([group.max_n_sinkssources() for group in package_groups])
         return content, ssm_content, n_sinkssources
 
-    def _render_flowsolver(self):
+    def _compute_load_balance_weight(self):
+        """Compute load balancing weights for subdomain partitioning by summing the ibound across layers.
+        """
+        baskey = self._get_pkgkey("bas6")
+        return(self[baskey]["ibound"].sum(dim="layer").astype(float))
+
+    def _render_flowsolver(self, directory):
         pcgkey = self._get_pkgkey("pcg")
         pksfkey = self._get_pkgkey("pksf")
         if pcgkey and pksfkey:
@@ -192,7 +198,13 @@ class SeawatModel(Model):
         if pcgkey:
             return self[pcgkey]._render()
         else:
-            return self[pksfkey]._render()
+            if self[pksfkey]["partition"] == "rcb":
+                #Cannot use pythonic 'is None', since load_balance_weight is a scalar in a dataset.
+                if self[pksfkey]["load_balance_weight"] == None: 
+                    #Function below should return a xr.DataArray with dim (y, x)
+                    self[pksfkey]["load_balance_weight"] = self._compute_load_balance_weight()
+                
+            return self[pksfkey]._render(directory=directory.joinpath(pksfkey))
 
     def _render_btn(self, directory, globaltimes):
         baskey = self._get_pkgkey("bas6")
@@ -208,7 +220,7 @@ class SeawatModel(Model):
         dis_content = self[diskey]._render_btn(globaltimes=globaltimes)
         return btn_content + dis_content
 
-    def _render_transportsolver(self):
+    def _render_transportsolver(self, directory):
         gcgkey = self._get_pkgkey("gcg")
         pkstkey = self._get_pkgkey("pkst")
         if gcgkey and pkstkey:
@@ -218,7 +230,12 @@ class SeawatModel(Model):
         if gcgkey:
             return self[gcgkey]._render()
         else:
-            return self[pkstkey]._render()
+            if self[pkstkey]["partition"] == "rcb":
+                #Cannot use pythonic 'is None', since load_balance_weight is a scalar in a dataset.
+                if self[pkstkey]["load_balance_weight"] == None: 
+                    #Function below should return a xr.DataArray with dim (y, x)
+                    self[pkstkey]["load_balance_weight"] = self._compute_load_balance_weight()
+            return self[pkstkey]._render(directory=directory.joinpath(pkstkey))
 
     def _btn_rch_sinkssources(self):
         btnkey = self._get_pkgkey("btn")
@@ -257,7 +274,7 @@ class SeawatModel(Model):
                 self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
             )
         content.append(modflowcontent)
-        content.append(self._render_flowsolver())
+        content.append(self._render_flowsolver(directory=directory))
 
         # MT3D and Seawat
         content.append(self._render_btn(directory=directory, globaltimes=globaltimes))
@@ -269,7 +286,7 @@ class SeawatModel(Model):
         n_sinkssources += self._btn_rch_sinkssources()
         ssm_content = f"[ssm]\n    mxss = {n_sinkssources}" + ssm_content
         content.append(ssm_content)
-        content.append(self._render_transportsolver())
+        content.append(self._render_transportsolver(directory=directory))
 
         return "\n\n".join(content)
 
