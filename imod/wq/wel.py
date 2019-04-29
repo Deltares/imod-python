@@ -28,7 +28,7 @@ class Well(pd.DataFrame):
     Layer: "None" or int, optional
         layer from which the pumping takes place.
     time: "None" or listlike of np.datetime64, datetime.datetime, pd.Timestamp,
-    cftime.datetime 
+    cftime.datetime
         time during which the pumping takes place. Only need to specify if model
         is transient.
     save_budget: {True, False}, optional

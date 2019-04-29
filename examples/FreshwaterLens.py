@@ -63,7 +63,7 @@ rch_rate.plot()
 rch_conc = xr.full_like(rch_rate, fill_value=0.0)
 
 
-# Finally, we build up the model. The `imod` package uses the names of the packages ("bnd", "shd", etc.) to determine what the data means.
+# Finally, we build the model.
 
 m = imod.wq.SeawatModel("FreshwaterLens")
 m["bas"] = imod.wq.BasicFlow(ibound=bnd, top=150.0, bottom=bot, starting_head=0.0)
