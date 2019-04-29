@@ -105,7 +105,7 @@ def test_pksf_render_rcb():
                 "    pressakey = False\n"
                 )
     
-    assert pksf._render(directory) == compare    
+    assert pksf._render(directory=directory.joinpath("pksf")) == compare    
 
 def test_pkst_render():
     pkst = ParallelKrylovTransportSolver(
@@ -166,4 +166,4 @@ def test_pkst_render_rcb():
             "    pressakey = False\n"
                 )
     
-    assert pkst._render(directory) == compare
+    assert pkst._render(directory=directory.joinpath("pkst")) == compare
