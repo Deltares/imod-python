@@ -391,7 +391,7 @@ class ParallelKrylovTransportSolver(Package):
             for key in self._keywords.keys():
                 self._replace_keyword(d, key)
         
-        if isinstance(d["load_balance_weight"], (np.ndarray)): #Check for ndarray and not DataArray since we called v.values before.
+        if isinstance(d["load_balance_weight"][()], (np.ndarray)): #Check for ndarray and not DataArray since we called v.values before.
             d["load_balance_weight"] = util.compose({"directory": directory, "name": "load_balance_weight", "extension": ".asc"})
         
         return self._template.format(**d)
