@@ -596,26 +596,29 @@ def _check_monotonic(dxs, dim):
 
 def _coord(da, dim):
     delta_dim = "d" + dim  # e.g. dx, dy, dz, etc.
-    if delta_dim in da.coords:  # non-equidistant
-        dxs = da[delta_dim]
-        _check_monotonic(dxs, dim)
-        x0 = float(da[dim][0]) - 0.5 * float(dxs[0])
-        x1 = float(da[dim][-1]) + 0.5 * float(dxs[-1])
-        x = np.cumsum(dxs.values) + x0
-        x = np.insert(x, 0, x0)
-    else:  # equidistant
-        dxs = np.diff(da[dim])
-        _check_monotonic(dxs, dim)
+
+    if delta_dim in da.coords:  # equidistant or non-equidistant
+        dx = da[delta_dim].values
+        if dx.shape == () or dx.shape == (1,):  # scalar -> equidistant
+            dxs = np.full(da[dim].size, dx)
+        else:  # array -> non-equidistant
+            dxs = dx
+
+    else:  # undefined -> equidistant
+        dxs = np.diff(da[dim].values)
         dx = dxs[0]
         atolx = abs(1.0e-6 * dx)
         if not np.allclose(dxs, dx, atolx):
             raise ValueError(
-                f"DataArray has to be equidistant along {dim}, or cellsizes must be provided as a coordinate."
+                f"DataArray has to be equidistant along {dim}, or cellsizes"
+                " must be provided as a coordinate."
             )
-        x0 = float(da[dim][0]) - 0.5 * dx
-        # increase by 1.5 since np.arange is not inclusive of end:
-        x1 = float(da[dim][-1]) + 1.5 * dx
-        x = np.arange(x0, x1, dx)
+        dxs = np.full(da[dim].size, dx)
+
+    _check_monotonic(dxs, dim)
+    x0 = da[dim][0] - 0.5 * dxs[0]
+    x = np.full(dxs.size + 1, x0)
+    x[1:] += np.cumsum(dxs)
     return x
 
 
@@ -711,26 +714,53 @@ def regrid(source, like, method, fill_value=np.nan):
     return dst
 
 
+class BatchRegridder(object):
+    """
+    Object to repeatedly regrid similar objects.
+    Compiles once on first call, can then be repeatedly called without
+    JIT compilation overhead.
+    """
+    def __init__(self, source, like, method):
+        # TODO: collect all the data, as in regrid function above.
+        raise NotImplementedError
+        self._regrid = _make_regrid()
+
+    def regrid(source, fill_value=np.nan):
+        # TODO: check whether input is actually same as in __init__
+        return self._regrid(source, fill_value)
+
+
 def mean(values, weights):
     vsum = 0.0
     wsum = 0.0
     for i in range(values.size):
         v = values[i]
         w = weights[i]
+        if np.isnan(v):
+            continue
         vsum += w * v
         wsum += w
-    return vsum / wsum
+    if vsum == 0:
+        return np.nan
+    else:
+        return vsum / wsum
 
 
 def harmonic_mean(values, weights):
     v_agg = 0.0
     w_sum = 0.0
     for i in range(values.size):
+        v = values[i]
         w = weights[i]
+        if np.isnan(v) or v == 0:
+            continue
         if w > 0:
             w_sum += w
-            v_agg += w / values[i]
-    return w_sum / v_agg
+            v_agg += w / v
+    if v_agg == 0 or w_sum == 0:
+        return np.nan
+    else:
+        return w_sum / v_agg
 
 
 def geometric_mean(values, weights):
@@ -740,33 +770,75 @@ def geometric_mean(values, weights):
     for i in range(values.size):
         w = weights[i]
         v = values[i]
+        if np.isnan(v):
+            continue
         if w > 0:
             v_agg += w * np.log(abs(v))
             w_sum += w
             if v < 0:
                 m += 1
-    return (-1.0) ** m * np.exp((1.0 / w_sum) * v_agg)
+    if w_sum == 0:
+        return np.nan
+    else:
+        return (-1.0) ** m * np.exp((1.0 / w_sum) * v_agg)
 
 
 def sum(values, weights):
     v_sum = 0.0
+    w_sum = 0.0
     for i in range(values.size):
-        v_sum += values[i] * weights[i]
-    return v_sum
+        v = values[i]
+        w = weights[i]
+        if np.isnan(v):
+            continue
+        v_sum += v * w
+        w_sum += w
+    if w_sum == 0:
+        return np.nan
+    else:
+        return v_sum
 
 
 def minimum(values, weights):
-    return np.min(values)
+    return np.nanmin(values)
 
 
 def maximum(values, weights):
-    return np.max(values)
+    return np.nanmax(values)
 
 
 def mode(values, weights):
-    ind_mode = np.argmax(np.bincount(values))
-    return values[ind_mode]
+    # Area weighted mode
+    # Reuse weights to do counting: no allocations
+    # The alternative is defining a separate frequency array in which to add
+    # the weights. This implementation is less efficient in terms of looping.
+    # With many unique values, it keeps having to loop through a big part of
+    # the weights array... but it would do so with a separate frequency array
+    # as well. There are somewhat more elements to traverse in this case.
+    s = values.size
+    w_sum = 0
+    for i in range(s):
+        v = values[i]
+        w = weights[i]
+        if np.isnan(v):
+            continue
+        w_sum += 1
+        for j in range(i):  # Compare with previously found values
+            if values[j] == v:  # matches previous value
+                weights[j] += w  # increase previous weight
+                break
+
+    if w_sum == 0:  # It skipped everything: only nodata values
+        return np.nan
+    else:  # Find value with highest frequency
+        w_max = 0
+        for i in range(s):
+            w = weights[i]
+            if w > w_max:
+                w_max = w
+                v = values[i]
+        return v
 
 
 def median(values, weights):
-    return np.percentile(values, 50)
+    return np.nanpercentile(values, 50)

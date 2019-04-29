@@ -291,7 +291,7 @@ class BoundaryCondition(Package):
 
         return self._template.render(d)
 
-    def _ssm_render(self, directory, globaltimes):
+    def _render_ssm(self, directory, globaltimes):
         """
         Parameters
         ----------

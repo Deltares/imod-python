@@ -359,26 +359,44 @@ def test_render_btn(basicmodel):
         "[btn]\n"
         "    thkmin = 0.01\n"
         "    cinact = 1e+30\n"
-        "    sconc_t1_l1 = starting_concentration_l1.idf\n"
-        "    sconc_t1_l2 = starting_concentration_l2.idf\n"
-        "    sconc_t1_l3 = starting_concentration_l3.idf\n"
-        "    icbund_l1 = icbund_l1.idf\n"
-        "    icbund_l2 = icbund_l2.idf\n"
-        "    icbund_l3 = icbund_l3.idf\n"
+        "    sconc_t1_l1 = {sc}_concentration_l1.idf\n"
+        "    sconc_t1_l2 = {sc}_concentration_l2.idf\n"
+        "    sconc_t1_l3 = {sc}_concentration_l3.idf\n"
+        "    icbund_l1 = {ic}_l1.idf\n"
+        "    icbund_l2 = {ic}_l2.idf\n"
+        "    icbund_l3 = {ic}_l3.idf\n"
         "    dz_l1 = 10.0\n"
         "    dz_l2 = 10.0\n"
         "    dz_l3 = 10.0\n"
-        "    prsity_l1 = 0.3\n"
-        "    prsity_l2 = 0.3\n"
-        "    prsity_l3 = 0.3\n"
-        "    laycon_l1 = 1\n"
-        "    laycon_l2 = 0\n"
-        "    laycon_l3 = 0\n"
-        "    dt0_p? = 0\n"
-        "    ttsmult_p? = 1.0\n"
-        "    mxstrn_p? = 10"
+        "    prsity_l1 = {pr}_l1.idf\n"
+        "    prsity_l2 = {pr}_l2.idf\n"
+        "    prsity_l3 = {pr}_l3.idf\n"
+        "    dt0_p? = 0.0\n"
+        "    mxstrn_p? = 50000"
+    ).format(
+        sc=pathlib.Path("btn").joinpath("starting"),
+        ic=pathlib.Path("btn").joinpath("icbund"),
+        pr=pathlib.Path("btn").joinpath("porosity"),
     )
-    assert m._render_btn(directory=directory, globaltimes=globaltimes)
+    assert m._render_btn(directory=directory, globaltimes=globaltimes) == compare
+
+
+def test_render_ssm_rch(basicmodel):
+    m = basicmodel
+    m.time_discretization(endtime="2000-01-06")
+    diskey = m._get_pkgkey("dis")
+    globaltimes = m[diskey]["time"].values
+    directory = pathlib.Path(".")
+
+    compare = (
+        "\n"
+        "    crch_t1_p1_l? = concentration_20000101000000.idf\n"
+        "    crch_t1_p2_l? = concentration_20000102000000.idf\n"
+        "    crch_t1_p3_l? = concentration_20000103000000.idf\n"
+        "    crch_t1_p4_l? = concentration_20000104000000.idf\n"
+        "    crch_t1_p5_l? = concentration_20000105000000.idf"
+    )
+    assert m._render_ssm_rch(directory=directory, globaltimes=globaltimes) == compare
 
 
 def test_render_transportsolver(basicmodel):

@@ -36,12 +36,12 @@ class PreconditionedConjugateGradientSolver(Package):
         is the relaxation parameter used. Usually, RELAX = 1.0, but for some
         problems a value of 0.99, 0.98, or 0.97 will reduce the number of
         iterations required for convergence.
-        Default value: 0.98
+        Default value: 0.98.
     damp: float, optional
         is the damping factor. It is typically set equal to one, which indicates
         no damping. A value less than 1 and greater than 0 causes damping. DAMP
         does not affect inner iterations; instead, it affects outer iterations.
-        Default value: 1.0
+        Default value: 1.0.
     """
 
     _pkg_id = "pcg"
@@ -100,7 +100,7 @@ class GeneralizedConjugateGradientSolver(Package):
         ncrs = 1: include full dispersion tensor (memory intensive).
     cclose: float
         is the convergence criterion in terms of relative concentration; a real
-        value between 10-4 and 10-6 is generally adequate.    
+        value between 10-4 and 10-6 is generally adequate.
     """
 
     _pkg_id = "gcg"
@@ -143,31 +143,32 @@ class ParallelKrylovFlowSolver(Package):
     Parameters
     ----------
     max_iter: int
-        is the maximum number of outer iterations (MXITER); it should be set to an
-        integer greater than one (1) only when a nonlinear sorption isotherm is
-        included in simulation.
+        is the maximum number of outer iterations (MXITER); it should be set to
+        an integer greater than one (1) only when a nonlinear sorption isotherm
+        is included in simulation.
     inner_iter: int
         is the maximum number of inner iterations (INNERIT); a value of 30-50
         should be adequate for most problems.
     rclose: float
-        is the residual criterion for convergence (RCLOSEPKS), in units of cubic length per
-        time. The units for length and time are the same as established for all
-        model data. When the maximum absolute value of the residual at all nodes
-        during an iteration is less than or equal to RCLOSE, and the criterion
-        for HCLOSE is also satisfied (see below), iteration stops.
+        is the residual criterion for convergence (RCLOSEPKS), in units of cubic
+        length per time. The units for length and time are the same as
+        established for all model data. When the maximum absolute value of the
+        residual at all nodes during an iteration is less than or equal to
+        RCLOSE, and the criterion for HCLOSE is also satisfied (see below),
+        iteration stops.
     hclose: float
-        is the head change criterion for convergence (HCLOSEPKS), in units of length. When
-        the maximum absolute value of head change from all nodes during an
-        iteration is less than or equal to HCLOSE, and the criterion for RCLOSE
-        is also satisfied (see above), iteration stops.    
+        is the head change criterion for convergence (HCLOSEPKS), in units of
+        length. When the maximum absolute value of head change from all nodes
+        during an iteration is less than or equal to HCLOSE, and the criterion
+        for RCLOSE is also satisfied (see above), iteration stops.
     relax: float
         is the relaxation parameter used. Usually, RELAX = 1.0, but for some
         problems a value of 0.99, 0.98, or 0.97 will reduce the number of
         iterations required for convergence.
     partition: {"uniform", "rcb"}, optional
-        Partitioning option (PARTOPT). 
-        "uniform" partitions the model domain into equally sized subdomains. 
-        "rcb" (Recursive Coordinate Bisection) uses a 2D pointer grid with weights to partition the model domain. 
+        Partitioning option (PARTOPT). "uniform" partitions the model domain
+        into equally sized subdomains. "rcb" (Recursive Coordinate Bisection)
+        uses a 2D pointer grid with weights to partition the model domain.
         Default value: "uniform"
     solver: {"pcg"}, optional
         Flag indicating the linear solver to be used (ISOLVER).
@@ -190,6 +191,7 @@ class ParallelKrylovFlowSolver(Package):
             pd.DataFrame(da.values).to_csv(path, 
                              sep='\t', header=False, index=False, float_format = "%8.2f")
     """
+    # TODO: replace pointer_grid by something less silly
 
     _pkg_id = "pksf"
     _template = (
@@ -213,7 +215,7 @@ class ParallelKrylovFlowSolver(Package):
         "preconditioner": {"ilu": 2},
         "deflate": {False: 0, True: 1},
     }
-    
+
     def __init__(
         self,
         max_iter,
@@ -246,11 +248,16 @@ class ParallelKrylovFlowSolver(Package):
         for arg in to_check:
             if not self[arg] > 0:
                 raise ValueError
-        
-        #Check whether option is actually an available option
+
+        # Check whether option is actually an available option
         for opt_arg in self._keywords.keys():
             if self[opt_arg] not in self._keywords[opt_arg].keys():
-                raise ValueError("Argument for {} not in {}, instead got {}".format(opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]))
+                raise ValueError(
+                    "Argument for {} not in {}, instead got {}".format(
+                        opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]
+                    )
+                )
+
 
     def _render(self, directory, *args, **kwargs):
         """
@@ -289,31 +296,32 @@ class ParallelKrylovTransportSolver(Package):
     Parameters
     ----------
     max_iter: int
-        is the maximum number of outer iterations (MXITER); it should be set to an
-        integer greater than one (1) only when a nonlinear sorption isotherm is
-        included in simulation.    
+        is the maximum number of outer iterations (MXITER); it should be set to
+        an integer greater than one (1) only when a nonlinear sorption isotherm
+        is included in simulation.
     inner_iter: int
         is the maximum number of inner iterations (INNERIT); a value of 30-50
         should be adequate for most problems.
     cclose: float, optional
         is the convergence criterion in terms of relative concentration; a real
-        value between 10-4 and 10-6 is generally adequate.    
-        Default value: 1.0e-6
+        value between 10-4 and 10-6 is generally adequate.
+        Default value: 1.0e-6.
     relax: float, optional
         is the relaxation parameter used. Usually, RELAX = 1.0, but for some
         problems a value of 0.99, 0.98, or 0.97 will reduce the number of
         iterations required for convergence.
-        Default value: 0.98
+        Default value: 0.98.
     partition: {"uniform", "rcb"}, optional
-        Partitioning option (PARTOPT). 
-        "uniform" partitions the model domain into equally sized subdomains. 
-        "rcb" (Recursive Coordinate Bisection) uses a 2D pointer grid with weights to partition the model domain. 
+        Partitioning option (PARTOPT). "uniform" partitions the model domain
+        into equally sized subdomains. "rcb" (Recursive Coordinate Bisection)
+        uses a 2D pointer grid with weights to partition the model domain.
+        Default value: "uniform".
     solver: {"bicgstab", "gmres", "gcr"}, optional
         Flag indicating the linear solver to be used (ISOLVER).
         Default value: "bicgstab"
     preconditioner: {"ilu"}, optional
         Flag inicating the preconditioner to be used (NPC).
-        Devault value: "ilu"
+        Devault value: "ilu".
     debug: {True, False}, optional
         Debug option.
         Default value: False
@@ -326,6 +334,7 @@ class ParallelKrylovTransportSolver(Package):
             pd.DataFrame(da.values).to_csv(path, 
                              sep='\t', header=False, index=False, float_format = "%8.2f")
     """
+    # TODO: replace pointer_grid by something less silly
 
     _pkg_id = "pkst"
     _template = (
@@ -345,7 +354,7 @@ class ParallelKrylovTransportSolver(Package):
         "partition": {"uniform": 0, "rcb": 5},
         "solver": {"bicgstab": 2, "gmres": 3, "gcr": 4},
         "preconditioner": {"ilu": 2},
-        }
+    }
 
     def __init__(
         self,
@@ -376,7 +385,7 @@ class ParallelKrylovTransportSolver(Package):
             if not self[arg] > 0:
                 raise ValueError
 
-        #Check whether option is actually an available option        
+        # Check whether option is actually an available option
         for opt_arg in self._keywords.keys():
             if self[opt_arg] not in self._keywords[opt_arg].keys():
                 raise ValueError("Argument for {} not in {}, instead got {}".format(opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]))

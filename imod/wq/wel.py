@@ -9,6 +9,30 @@ from imod.wq import timeutil
 
 
 class Well(pd.DataFrame):
+    """
+    The Well package is used to simulate a specified flux to individual cells
+    and specified in units of length3/time.
+
+    Parameters
+    ----------
+    id_name: str or list of str
+        name of the well(s).
+    x: float or list of floats
+        x coordinate of the well(s).
+    y: float or list of floats
+        y coordinate of the well(s).
+    rate: float or list of floats.
+        pumping rate in the well(s).
+    Layer: "None" or int, optional
+        layer from which the pumping takes place.
+    time: "None" or listlike of np.datetime64, datetime.datetime, pd.Timestamp,
+    cftime.datetime 
+        time during which the pumping takes place. Only need to specify if model
+        is transient.
+    save_budget: {True, False}, optional
+        is a flag indicating if the budget should be saved (IRIVCB).
+        Default is False.
+    """
     _pkg_id = "wel"
     save_budget = False
 
@@ -74,7 +98,7 @@ class Well(pd.DataFrame):
         d["wels"] = self._compose_values_time(directory, globaltimes)
         return self._template.render(d)
 
-    def _ssm_render(self, directory, globaltimes):
+    def _render_ssm(self, directory, globaltimes):
         return ""
 
     def _max_active_n(self, varname, nlayer):

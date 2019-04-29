@@ -5,6 +5,7 @@ from imod.wq import ParallelKrylovTransportSolver
 import xarray as xr
 import pathlib
 
+
 def test_pcg_render():
     pcg = PreconditionedConjugateGradientSolver(
         max_iter=150, inner_iter=30, hclose=0.0001, rclose=1000.0, relax=0.98, damp=1.0
@@ -46,6 +47,7 @@ def test_gcg_render():
     )
 
     assert gcg._render() == compare
+
 
 def test_pksf_render():
     pksf = ParallelKrylovFlowSolver(
@@ -106,6 +108,7 @@ def test_pksf_render_rcb():
                 )
     
     assert pksf._render(directory=directory) == compare    
+
 
 def test_pkst_render():
     pkst = ParallelKrylovTransportSolver(
