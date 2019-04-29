@@ -720,6 +720,7 @@ class BatchRegridder(object):
     Compiles once on first call, can then be repeatedly called without
     JIT compilation overhead.
     """
+
     def __init__(self, source, like, method):
         # TODO: collect all the data, as in regrid function above.
         raise NotImplementedError

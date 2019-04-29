@@ -18,6 +18,7 @@ class Drainage(BoundaryCondition):
         saved. If save_budget is True cell-by-cell budget data will be saved.
         Default is False.
     """
+
     _pkg_id = "drn"
 
     _mapping = (("elevation", "elevation"), ("cond", "conductance"))

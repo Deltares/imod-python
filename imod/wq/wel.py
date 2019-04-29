@@ -33,6 +33,7 @@ class Well(pd.DataFrame):
         is a flag indicating if the budget should be saved (IRIVCB).
         Default is False.
     """
+
     _pkg_id = "wel"
     save_budget = False
 

@@ -58,6 +58,7 @@ class BasicTransport(Package):
         considered inactive.
         Default value is 0.01 (i.e., 1% of the model layer thickness).
     """
+
     _pkg_id = "btn"
 
     _mapping = (("icbund", "icbund"), ("dz", "thickness"), ("prsity", "porosity"))

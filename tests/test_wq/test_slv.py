@@ -96,4 +96,3 @@ def test_pkst_render():
     )
 
     assert pkst._render() == compare
-
