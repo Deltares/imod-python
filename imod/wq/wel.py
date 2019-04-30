@@ -1,11 +1,13 @@
 import pathlib
 
 import jinja2
+import numpy as np
 import pandas as pd
+
 import imod
 from imod import util
-from imod.wq.pkgbase import Package
 from imod.wq import timeutil
+from imod.wq.pkgbase import Package
 
 
 class Well(pd.DataFrame):
@@ -33,6 +35,7 @@ class Well(pd.DataFrame):
         is a flag indicating if the budget should be saved (IRIVCB).
         Default is False.
     """
+
     _pkg_id = "wel"
     save_budget = False
 
@@ -49,7 +52,7 @@ class Well(pd.DataFrame):
 
     def __init__(self, id_name, x, y, rate, layer=None, time=None, save_budget=False):
         super(__class__, self).__init__()
-        self["x"] = x
+        self["x"] = np.atleast_1d(x)
         self["y"] = y
         self["rate"] = rate
         self["id_name"] = id_name
