@@ -33,6 +33,7 @@ class Dispersion(Package):
         considered unimportant. Each value in the array corresponds to one model
         layer.
     """
+
     _pkg_id = "dsp"
 
     _mapping = (

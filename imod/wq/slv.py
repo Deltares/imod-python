@@ -182,6 +182,7 @@ class ParallelKrylovFlowSolver(Package):
     pointer_grid: string, optional
         Path to a 2D pointer grid used when partition = "rcb".
     """
+
     # TODO: replace pointer_grid by something less silly
 
     _pkg_id = "pksf"
@@ -290,6 +291,7 @@ class ParallelKrylovTransportSolver(Package):
     pointer_grid: string, optional
         Path to a 2D pointer grid used when partition = "rcb".
     """
+
     # TODO: replace pointer_grid by something less silly
 
     _pkg_id = "pkst"

@@ -267,7 +267,9 @@ class SeawatModel(Model):
             directory=directory, globaltimes=globaltimes
         )
         # Add recharge to ssm_content
-        ssm_content += self._render_ssm_rch(directory=directory, globaltimes=globaltimes)
+        ssm_content += self._render_ssm_rch(
+            directory=directory, globaltimes=globaltimes
+        )
         # Add recharge to sinks and sources
         n_sinkssources += self._btn_rch_sinkssources()
 
