@@ -151,10 +151,10 @@ def test_make_regrid():
     # Cannot really test functionality, since it's compiled by numba at runtime
     # This just checks whether it's ingested okay
     func = regrid_module._jit_regrid(mean, 1)
-    # assert isinstance(func, numba.targets.registry.CPUDispatcher)
+    assert isinstance(func, numba.targets.registry.CPUDispatcher)
 
     func = regrid_module._make_regrid(mean, 1)
-    # assert isinstance(func, numba.targets.registry.CPUDispatcher)
+    assert isinstance(func, numba.targets.registry.CPUDispatcher)
 
 
 def test_regrid_1d():
@@ -424,3 +424,7 @@ def test_regrid_mean2d_over3darray():
     compare[:, ...] = compare_values
 
     assert np.allclose(out.values, compare)
+
+
+# TODO: test nan values
+# Implement different methods: ignore, or accept
