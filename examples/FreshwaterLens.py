@@ -39,13 +39,13 @@ bot = top1D - dz
 
 # Defining the starting concentrations
 sconc = xr.DataArray(
-    data=np.full((nrow, ncol, nlay), 35.0),
+    data=np.full((nlay, nrow, ncol), 35.0),
     coords={
         "y": [0.5],
         "x": np.arange(0.5 * dx, dx * ncol, dx),
         "layer": np.arange(1, nlay + 1),
     },
-    dims=("y", "x", "layer"),
+    dims=("layer","y", "x"),
 )
 
 sconc[:, 13:27, 0] = 0.0
@@ -54,7 +54,8 @@ sconc.plot(y="layer", yincrease=False)
 # Defining the recharge rates
 rch_rate = xr.DataArray(
     data=np.full((nrow, ncol), 0.0),
-    coords={"y": [0.5], "x": np.arange(0.5 * dx, dx * ncol, dx)},
+    coords={"y": [0.5], 
+            "x": np.arange(0.5 * dx, dx * ncol, dx)},
     dims=("y", "x"),
 )
 rch_rate[:, 13:27] = 0.001
@@ -95,8 +96,9 @@ m.write()
 
 # You can run the model using the comand prompt and the iMOD SEAWAT executable
 
-# Loading in the results and visualising them
+# Results
+
 head = imod.idf.open("FreshwaterLens/results/head/*.idf")
-head.plot()
+head.plot(yincrease=False)
 conc = imod.idf.open("FreshwaterLens/results/conc/*.idf")
-conc.plot(levels=range(0, 35, 5))
+conc.plot(levels=range(0, 35, 5), yincrease=False)
