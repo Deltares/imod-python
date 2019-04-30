@@ -186,7 +186,7 @@ class SeawatModel(Model):
         """Compute load balancing weights for subdomain partitioning by summing the ibound across layers.
         """
         baskey = self._get_pkgkey("bas6")
-        return(self[baskey]["ibound"].sum(dim="layer").astype(float))
+        return self[baskey]["ibound"].sum(dim="layer").astype(float)
 
     def _render_flowsolver(self, directory):
         pcgkey = self._get_pkgkey("pcg")
@@ -199,11 +199,13 @@ class SeawatModel(Model):
             return self[pcgkey]._render()
         else:
             if self[pksfkey]["partition"] == "rcb":
-                #Cannot use pythonic 'is None', since load_balance_weight is a scalar in a dataset.
-                if self[pksfkey]["load_balance_weight"] == None: 
-                    #Function below should return a xr.DataArray with dim (y, x)
-                    self[pksfkey]["load_balance_weight"] = self._compute_load_balance_weight()
-                
+                # Cannot use pythonic 'is None', since load_balance_weight is a scalar in a dataset.
+                if self[pksfkey]["load_balance_weight"] == None:
+                    # Function below should return a xr.DataArray with dim (y, x)
+                    self[pksfkey][
+                        "load_balance_weight"
+                    ] = self._compute_load_balance_weight()
+
             return self[pksfkey]._render(directory=directory.joinpath(pksfkey))
 
     def _render_btn(self, directory, globaltimes):
@@ -231,10 +233,12 @@ class SeawatModel(Model):
             return self[gcgkey]._render()
         else:
             if self[pkstkey]["partition"] == "rcb":
-                #Cannot use pythonic 'is None', since load_balance_weight is a scalar in a dataset.
-                if self[pkstkey]["load_balance_weight"] == None: 
-                    #Function below should return a xr.DataArray with dim (y, x)
-                    self[pkstkey]["load_balance_weight"] = self._compute_load_balance_weight()
+                # Cannot use pythonic 'is None', since load_balance_weight is a scalar in a dataset.
+                if self[pkstkey]["load_balance_weight"] == None:
+                    # Function below should return a xr.DataArray with dim (y, x)
+                    self[pkstkey][
+                        "load_balance_weight"
+                    ] = self._compute_load_balance_weight()
             return self[pkstkey]._render(directory=directory.joinpath(pkstkey))
 
     def _render_ssm_rch(self, directory, globaltimes):
@@ -284,7 +288,9 @@ class SeawatModel(Model):
             directory=directory, globaltimes=globaltimes
         )
         # Add recharge to ssm_content
-        ssm_content += self._render_ssm_rch(directory=directory, globaltimes=globaltimes)
+        ssm_content += self._render_ssm_rch(
+            directory=directory, globaltimes=globaltimes
+        )
         # Add recharge to sinks and sources
         n_sinkssources += self._btn_rch_sinkssources()
 
