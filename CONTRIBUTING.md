@@ -22,7 +22,7 @@ article](https://stackoverflow.com/help/mcve) for an in-depth description.
 ### Version control
 
 We use Git for version control. Git is excellent software, but it might
-take some to wrap your head around it. There are many excellent resources
+take some time to wrap your head around it. There are many excellent resources
 online. Have a look at [the extensive manual
 online](https://git-scm.com/doc), a shorter
 [handbook](https://guides.github.com/introduction/git-handbook/), searchable
