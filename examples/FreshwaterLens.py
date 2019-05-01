@@ -54,7 +54,7 @@ sconc.plot(y="layer", yincrease=False)
 # Defining the recharge rates
 rch_rate = xr.DataArray(
     data=np.full((nrow, ncol), 0.0),
-    coords={"y": [0.5], 
+    coords={"y": [0.5],
             "x": np.arange(0.5 * dx, dx * ncol, dx)},
     dims=("y", "x"),
 )
