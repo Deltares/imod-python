@@ -151,7 +151,7 @@ class ParallelSolver(Package):
         if hasattr(self, "_keywords"):
             for key in self._keywords.keys():
                 self._replace_keyword(d, key)
-        
+
         if self["partition"] == "rcb":
             d["load_balance_weight"] = util.compose(
                 {

@@ -194,9 +194,7 @@ class SeawatModel(Model):
         else:
             baskey = self._get_pkgkey("bas")
             self[pksfkey]._compute_load_balance_weight(self[baskey]["ibound"])
-            return self[pksfkey]._render(
-                directory=directory.joinpath(pksfkey)
-            )
+            return self[pksfkey]._render(directory=directory.joinpath(pksfkey))
 
     def _render_btn(self, directory, globaltimes):
         baskey = self._get_pkgkey("bas6")
@@ -224,9 +222,7 @@ class SeawatModel(Model):
         else:
             baskey = self._get_pkgkey("bas")
             self[pksfkey]._compute_load_balance_weight(self[baskey]["ibound"])
-            return self[pkstkey]._render(
-                directory=directory.joinpath(pkstkey)
-            )
+            return self[pkstkey]._render(directory=directory.joinpath(pkstkey))
 
     def _render_ssm_rch(self, directory, globaltimes):
         rchkey = self._get_pkgkey("rch")
