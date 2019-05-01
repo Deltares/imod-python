@@ -34,7 +34,8 @@ or try this [interactive tutorial](https://learngitbranching.js.org/).
 ### Code style
 We use [Black](https://github.com/ambv/black) for automatic code formatting.
 Like *Black*, we are uncompromising about formatting. Continuous Integration
-**will fail** if your code has not been "blackened".
+**will fail** if running `black .` from within the repository root folder would
+make any formatting changes.
 
 Integration black into your workflow is easy. Find the instructions
 [here](https://github.com/ambv/black#editor-integration). If you're using
