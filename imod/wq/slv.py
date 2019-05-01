@@ -136,7 +136,52 @@ class GeneralizedConjugateGradientSolver(Package):
         self["lump_dispersion"] = lump_dispersion
 
 
-class ParallelKrylovFlowSolver(Package):
+class ParallelSolver(Package):
+    """
+    Base package for the parallel solvers.
+    """
+
+    def _compute_load_balance_weight(self, ibound):
+        if self["partition"] == "rcb":
+            if self["load_balance_weight"].values[()] is None:
+                self["load_balance_weight"] = (ibound != 0).sum("layer").astype(float)
+
+    def _render(self, directory):
+        d = {k: v.values for k, v in self.data_vars.items()}
+        if hasattr(self, "_keywords"):
+            for key in self._keywords.keys():
+                self._replace_keyword(d, key)
+        
+        if self["partition"] == "rcb":
+            d["load_balance_weight"] = util.compose(
+                {
+                    "directory": directory,
+                    "name": "load_balance_weight",
+                    "extension": ".asc",
+                }
+            )
+
+        return self._template.format(**d)
+
+    def save(self, directory):
+        """
+        Overloaded method to write .asc instead of .idf.
+        (This is an idiosyncracy of the parallel iMODwq code.)
+        """
+        # TODO: remove this when iMOD_wq accepts idfs for the load grid.
+        da = self["load_balance_weight"]
+        if not da.dims == ("y", "x"):
+            raise ValueError(
+                "load_balance_weight dimensions must be exactly ('y', 'x')."
+            )
+        path = pathlib.Path(directory).joinpath("load_balance_weight.asc")
+        path.parent.mkdir(exist_ok=True, parents=True)
+        pd.DataFrame(da.values).to_csv(
+            path, sep="\t", header=False, index=False, float_format="%8.2f"
+        )
+
+
+class ParallelKrylovFlowSolver(ParallelSolver):
     """
     The Parallel Krylov Flow Solver is used for parallel solving of the flow
     model.
@@ -183,15 +228,17 @@ class ParallelKrylovFlowSolver(Package):
     debug: {True, False}, optional
         Debug option.
         Default value: False
-    load_balance_weight: {string, da}, optional
-        2D grid with load balance weights, used when partition = "rcb". If None
-        (default), then the module will create a load blance grid by summing IBOUND
-        over layers.
+    load_balance_weight: xarray.DataArray, optional
+        2D grid with load balance weights, used when partition = "rcb"
+        (Recursive Coordinate Bisection). If None (default), then the module
+        will create a load balance grid by summing active cells over layers:
+        `(ibound != 0).sum("layer")`
 
-        Note that even though the iMOD-SEAWAT helpfile states .idf is accepted, it is
-        not. This load balance grid should be a .asc (without a header), with the
-        following format for each row: pd.DataFrame(da.values).to_csv(path, sep='\t',
-        header=False, index=False, float_format = "%8.2f")
+        Note that even though the iMOD-SEAWAT helpfile states .idf is
+        accepted, it is not. This load balance grid should be a .asc file
+        (without a header). Formatting is done as follows:
+        `pd.DataFrame(load_balance_weight.values).to_csv(path, sep='\\t',
+        header=False, index=False, float_format = "%8.2f")`
     """
 
     _pkg_id = "pksf"
@@ -206,7 +253,7 @@ class ParallelKrylovFlowSolver(Package):
         "    isolver = {solver}\n"
         "    npc = {preconditioner}\n"
         "    npcdef = {deflate}\n"
-        "    loadpatr = {load_balance_weight}\n"
+        "    loadptr = {load_balance_weight}\n"
         "    pressakey = {debug}\n"
     )
 
@@ -259,47 +306,8 @@ class ParallelKrylovFlowSolver(Package):
                     )
                 )
 
-    def _render(self, directory, *args, **kwargs):
-        """
-        Renders part of runfile that ends up under [pksf] section.
-        """
 
-        d = {k: v.values for k, v in self.data_vars.items()}
-        if hasattr(self, "_keywords"):
-            for key in self._keywords.keys():
-                self._replace_keyword(d, key)
-
-        if isinstance(
-            d["load_balance_weight"][()], (np.ndarray)
-        ):  # Check for ndarray and not DataArray since we called v.values before.
-            d["load_balance_weight"] = util.compose(
-                {
-                    "directory": directory,
-                    "name": "load_balance_weight",
-                    "extension": ".asc",
-                }
-            )
-
-        return self._template.format(**d)
-
-    def save(self, directory):
-        """Override of parent method to write .asc instead of .idf. Remove this if iMOD-SEAWAT is updated to accept 
-        """
-        for name, da in self.data_vars.items():
-            if "y" in da.coords and "x" in da.coords:
-                if da.ndim > 2:
-                    raise ValueError(
-                        "load_balance_weight should have no more than 2 dimensions"
-                    )
-                ext = ".asc"
-                path = pathlib.Path(directory).joinpath(name + ext)
-                path.parent.mkdir(exist_ok=True, parents=True)
-                pd.DataFrame(da.values).to_csv(
-                    path, sep="\t", header=False, index=False, float_format="%8.2f"
-                )
-
-
-class ParallelKrylovTransportSolver(Package):
+class ParallelKrylovTransportSolver(ParallelSolver):
     """
     The Parallel Krylov Transport Solver is used for parallel solving of the
     transport model.
@@ -336,16 +344,17 @@ class ParallelKrylovTransportSolver(Package):
     debug: {True, False}, optional
         Debug option.
         Default value: False
-    load_balance_weight: {string, da}, optional
-        2D grid with load balance weights, used when partition = "rcb". If
-        None (default), then the module will create a load blance grid by
-        summing IBOUND over layers.
-        
+    load_balance_weight: xarray.DataArray, optional
+        2D grid with load balance weights, used when partition = "rcb"
+        (Recursive Coordinate Bisection). If None (default), then the module
+        will create a load balance grid by summing active cells over layers:
+        `(ibound != 0).sum("layer")`
+
         Note that even though the iMOD-SEAWAT helpfile states .idf is
-        accepted, it is not. This load balance grid should be a .asc (without
-        a header), with the following format for each row:
-        pd.DataFrame(da.values).to_csv(path, sep='\t', header=False,
-        index=False, float_format = "%8.2f")
+        accepted, it is not. This load balance grid should be a .asc file
+        (without a header). Formatting is done as follows:
+        `pd.DataFrame(load_balance_weight.values).to_csv(path, sep='\\t',
+        header=False, index=False, float_format = "%8.2f")`
         """
 
     _pkg_id = "pkst"
@@ -358,7 +367,7 @@ class ParallelKrylovTransportSolver(Package):
         "    partopt = {partition}\n"
         "    isolver = {solver}\n"
         "    npc = {preconditioner}\n"
-        "    loadpatr = {load_balance_weight}\n"
+        "    loadptr = {load_balance_weight}\n"
         "    pressakey = {debug}\n"
     )
 
@@ -405,43 +414,3 @@ class ParallelKrylovTransportSolver(Package):
                         opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]
                     )
                 )
-
-    def _render(self, directory, *args, **kwargs):
-        """
-        Renders part of runfile that ends up under [pksf] section.
-        """
-
-        d = {k: v.values for k, v in self.data_vars.items()}
-        if hasattr(self, "_keywords"):
-            for key in self._keywords.keys():
-                self._replace_keyword(d, key)
-
-        if isinstance(
-            d["load_balance_weight"][()], (np.ndarray)
-        ):  # Check for ndarray and not DataArray since we called v.values before.
-            d["load_balance_weight"] = util.compose(
-                {
-                    "directory": directory,
-                    "name": "load_balance_weight",
-                    "extension": ".asc",
-                }
-            )
-
-        return self._template.format(**d)
-
-    def save(self, directory):
-        """Override of parent method to write .asc instead of .idf. Remove this if iMOD-SEAWAT accepts 
-        """
-        for name, da in self.data_vars.items():
-            if "y" in da.coords and "x" in da.coords:
-                if da.ndim > 2:
-                    raise ValueError(
-                        "load_balance_weight should have no more than 2 dimensions"
-                    )
-                ext = ".asc"
-                path = pathlib.Path(directory).joinpath(name + ext)
-                path.parent.mkdir(exist_ok=True, parents=True)
-                pd.DataFrame(da.values).to_csv(
-                    path, sep="\t", header=False, index=False, float_format="%8.2f"
-                )
-

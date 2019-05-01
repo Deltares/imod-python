@@ -182,12 +182,6 @@ class SeawatModel(Model):
         n_sinkssources = sum([group.max_n_sinkssources() for group in package_groups])
         return content, ssm_content, n_sinkssources
 
-    def _compute_load_balance_weight(self):
-        """Compute load balancing weights for subdomain partitioning by summing the ibound across layers.
-        """
-        baskey = self._get_pkgkey("bas6")
-        return self[baskey]["ibound"].sum(dim="layer").astype(float)
-
     def _render_flowsolver(self, directory):
         pcgkey = self._get_pkgkey("pcg")
         pksfkey = self._get_pkgkey("pksf")
@@ -198,15 +192,11 @@ class SeawatModel(Model):
         if pcgkey:
             return self[pcgkey]._render()
         else:
-            if self[pksfkey]["partition"] == "rcb":
-                # Cannot use pythonic 'is None', since load_balance_weight is a scalar in a dataset.
-                if self[pksfkey]["load_balance_weight"] == None:
-                    # Function below should return a xr.DataArray with dim (y, x)
-                    self[pksfkey][
-                        "load_balance_weight"
-                    ] = self._compute_load_balance_weight()
-
-            return self[pksfkey]._render(directory=directory.joinpath(pksfkey))
+            baskey = self._get_pkgkey("bas")
+            self[pksfkey]._compute_load_balance_weight(self[baskey]["ibound"])
+            return self[pksfkey]._render(
+                directory=directory.joinpath(pksfkey)
+            )
 
     def _render_btn(self, directory, globaltimes):
         baskey = self._get_pkgkey("bas6")
@@ -232,14 +222,11 @@ class SeawatModel(Model):
         if gcgkey:
             return self[gcgkey]._render()
         else:
-            if self[pkstkey]["partition"] == "rcb":
-                # Cannot use pythonic 'is None', since load_balance_weight is a scalar in a dataset.
-                if self[pkstkey]["load_balance_weight"] == None:
-                    # Function below should return a xr.DataArray with dim (y, x)
-                    self[pkstkey][
-                        "load_balance_weight"
-                    ] = self._compute_load_balance_weight()
-            return self[pkstkey]._render(directory=directory.joinpath(pkstkey))
+            baskey = self._get_pkgkey("bas")
+            self[pksfkey]._compute_load_balance_weight(self[baskey]["ibound"])
+            return self[pkstkey]._render(
+                directory=directory.joinpath(pkstkey)
+            )
 
     def _render_ssm_rch(self, directory, globaltimes):
         rchkey = self._get_pkgkey("rch")
