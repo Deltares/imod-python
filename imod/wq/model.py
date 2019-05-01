@@ -182,7 +182,7 @@ class SeawatModel(Model):
         n_sinkssources = sum([group.max_n_sinkssources() for group in package_groups])
         return content, ssm_content, n_sinkssources
 
-    def _render_flowsolver(self):
+    def _render_flowsolver(self, directory):
         pcgkey = self._get_pkgkey("pcg")
         pksfkey = self._get_pkgkey("pksf")
         if pcgkey and pksfkey:
@@ -192,7 +192,9 @@ class SeawatModel(Model):
         if pcgkey:
             return self[pcgkey]._render()
         else:
-            return self[pksfkey]._render()
+            baskey = self._get_pkgkey("bas")
+            self[pksfkey]._compute_load_balance_weight(self[baskey]["ibound"])
+            return self[pksfkey]._render(directory=directory.joinpath(pksfkey))
 
     def _render_btn(self, directory, globaltimes):
         baskey = self._get_pkgkey("bas6")
@@ -208,7 +210,7 @@ class SeawatModel(Model):
         dis_content = self[diskey]._render_btn(globaltimes=globaltimes)
         return btn_content + dis_content
 
-    def _render_transportsolver(self):
+    def _render_transportsolver(self, directory):
         gcgkey = self._get_pkgkey("gcg")
         pkstkey = self._get_pkgkey("pkst")
         if gcgkey and pkstkey:
@@ -218,7 +220,9 @@ class SeawatModel(Model):
         if gcgkey:
             return self[gcgkey]._render()
         else:
-            return self[pkstkey]._render()
+            baskey = self._get_pkgkey("bas")
+            self[pksfkey]._compute_load_balance_weight(self[baskey]["ibound"])
+            return self[pkstkey]._render(directory=directory.joinpath(pkstkey))
 
     def _render_ssm_rch(self, directory, globaltimes):
         rchkey = self._get_pkgkey("rch")
@@ -275,7 +279,7 @@ class SeawatModel(Model):
 
         # Wrap up modflow part
         content.append(modflowcontent)
-        content.append(self._render_flowsolver())
+        content.append(self._render_flowsolver(directory=directory))
 
         # MT3D and Seawat settings
         content.append(self._render_btn(directory=directory, globaltimes=globaltimes))
@@ -286,7 +290,7 @@ class SeawatModel(Model):
         ssm_content = f"[ssm]\n    mxss = {n_sinkssources}" + ssm_content
 
         content.append(ssm_content)
-        content.append(self._render_transportsolver())
+        content.append(self._render_transportsolver(directory=directory))
 
         return "\n\n".join(content)
 

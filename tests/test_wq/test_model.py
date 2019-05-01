@@ -324,6 +324,7 @@ def test_render_groups__ghb_riv_wel(basicmodel):
 
 def test_render_flowsolver(basicmodel):
     m = basicmodel
+    directory = pathlib.Path(".")
 
     compare = (
         "[pcg]\n"
@@ -337,7 +338,7 @@ def test_render_flowsolver(basicmodel):
         "    mutpcg = 0\n"
         "    damp = 1.0"
     )
-    assert m._render_flowsolver() == compare
+    assert m._render_flowsolver(directory) == compare
 
 
 def test_render_btn(basicmodel):
@@ -393,6 +394,7 @@ def test_render_ssm_rch(basicmodel):
 
 def test_render_transportsolver(basicmodel):
     m = basicmodel
+    directory = pathlib.Path(".")
 
     compare = (
         "[gcg]\n"
@@ -403,7 +405,7 @@ def test_render_transportsolver(basicmodel):
         "    cclose = 1e-06\n"
         "    iprgcg = 0"
     )
-    assert m._render_transportsolver() == compare
+    assert m._render_transportsolver(directory) == compare
 
 
 def test_render(basicmodel):
