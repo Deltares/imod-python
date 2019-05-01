@@ -23,7 +23,6 @@ class Recharge(BoundaryCondition):
         "    {%- endfor -%}"
     )
 
-
     def _render(self, directory, globaltimes, *args, **kwargs):
         d = {
             "mapping": self._mapping,
@@ -33,7 +32,7 @@ class Recharge(BoundaryCondition):
         self._replace_keyword(d, "save_budget")
 
         dicts = {}
-        for _ , name in self._mapping:
+        for _, name in self._mapping:
             dicts[name] = self._compose_values_timelayer(name, globaltimes, directory)
         d["dicts"] = dicts
 
@@ -66,6 +65,7 @@ class RechargeTopLayer(Recharge):
         self["rate"] = rate
         self["concentration"] = concentration
         self["save_budget"] = save_budget
+
 
 class RechargeLayers(Recharge):
     """

@@ -79,6 +79,7 @@ class VariableDensityFlow(Package):
         If internodal = "upstream", internodal conductance values used to
         conserve fluid mass are calculated using an upstream-weighted algorithm.
     """
+
     _pkg_id = "vdf"
 
     _template = (

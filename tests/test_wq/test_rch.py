@@ -112,4 +112,3 @@ def test_render__highest_active(recharge_ha):
     )
 
     assert rch._render(directory, globaltimes=rch.time.values) == compare
-

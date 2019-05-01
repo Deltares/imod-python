@@ -17,6 +17,7 @@ class ConstantHead(BoundaryCondition):
         concentrations for the constant heads. It gets automatically written to
         the SSM package.
     """
+
     _pkg_id = "chd"
     _mapping = (("shead", "head_start"), ("ehead", "head_end"))
 

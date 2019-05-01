@@ -38,6 +38,7 @@ class OutputControl(Package):
         Save calculated budget in a format compatible with ParaView (VTK).
         Default value is False.
     """
+
     _pkg_id = "oc"
     _template = (
         "[oc]\n"
