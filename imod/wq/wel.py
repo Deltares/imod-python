@@ -90,7 +90,7 @@ class Well(pd.DataFrame):
             globaltimes = timeutil.to_datetime(globaltimes)
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
 
-            for itime, (time, start_end) in enumerate(zip(package_times, starts_ends)):
+            for time, start_end in zip(package_times, starts_ends):
                 values[start_end] = self._compose_values_layer(directory, time)
         else:
             values["?"] = self._compose_values_layer(directory)
