@@ -192,7 +192,7 @@ class SeawatModel(Model):
         if pcgkey:
             return self[pcgkey]._render()
         else:
-            baskey = self._get_pkgkey("bas")
+            baskey = self._get_pkgkey("bas6")
             self[pksfkey]._compute_load_balance_weight(self[baskey]["ibound"])
             return self[pksfkey]._render(directory=directory.joinpath(pksfkey))
 
@@ -220,7 +220,7 @@ class SeawatModel(Model):
         if gcgkey:
             return self[gcgkey]._render()
         else:
-            baskey = self._get_pkgkey("bas")
+            baskey = self._get_pkgkey("bas6")
             self[pkstkey]._compute_load_balance_weight(self[baskey]["ibound"])
             return self[pkstkey]._render(directory=directory.joinpath(pkstkey))
 
