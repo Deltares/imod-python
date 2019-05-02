@@ -6,7 +6,7 @@ import sys
 
 import imod
 
-regrid_module = sys.modules["imod.pre.regrid"]
+regrid_module = sys.modules["imod.prepare.regrid"]
 
 
 def first(values, weights):
