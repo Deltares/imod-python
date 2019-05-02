@@ -100,20 +100,43 @@ class SeawatModel(Model):
 
         return package_groups
 
+    def _use_cftime(self):
+        """
+        Also checks if datetime types are homogeneous across packages.
+        """
+        types = [type(pkg["time"].values[0]) for pkg in self.values()]
+        if not len(set(types)) == 1:
+            raise ValueError(
+                "Multiple datetime types detected. "
+                "Use either cftime or numpy.datetime64[ns]."
+            )
+        if isinstance(types[0], cftime.datetime):
+            return True
+        elif isinstance(types[0], np.datetime64):
+            return False
+        else:
+            raise ValueError("Use either cftime or numpy.datetime64[ns].")
+
     def time_discretization(self, endtime, starttime=None):
         """
         Collect all unique times
         """
-        # TODO: check for cftime, force all to cftime if necessary
-        times = set()  # set only allows for unique values
+        use_cftime = self._use_cftime()
+
+        times = []
         for pkg in self.values():
             if "time" in pkg.coords:
-                times.update(pkg["time"].values)
+                times.append(pkg["time"].values)
+
         # TODO: check that endtime is later than all other times.
-        times.update((endtime,))
+        times.append(timeutil.to_datetime(endtime, use_cftime))
         if starttime is not None:
-            times.update((starttime,))
-        times, duration = timeutil.timestep_duration(times)
+            times.append(timeutil.to_datetime(starttime, use_cftime))
+
+        # np.unique also sorts
+        times = np.unique(np.hstack(times))
+
+        duration = timeutil.timestep_duration(times, use_cftime)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
         timestep_duration = xr.DataArray(

@@ -123,10 +123,7 @@ class Package(xr.Dataset):
         values = {}
 
         if "time" in da.coords:
-            package_times = [
-                timeutil.to_datetime(t) for t in np.atleast_1d(da.coords["time"].values)
-            ]
-            globaltimes = [timeutil.to_datetime(t) for t in np.atleast_1d(globaltimes)]
+            package_times = da.coords["time"].values
 
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
             for itime, start_end in enumerate(starts_ends):
