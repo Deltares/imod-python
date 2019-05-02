@@ -95,8 +95,6 @@ def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
     rasterized : xarray.DataArray
         Vector data rasterized. Matches shape and coordinates of `like`.
     """
-    import imod
-    import rasterio.features
 
     if column is not None:
         shapes = [

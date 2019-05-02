@@ -622,113 +622,93 @@ def _coord(da, dim):
     return x
 
 
-def regrid(source, like, method, fill_value=np.nan):
+class Regridder(object):
     """
-    Regridding for axis aligned coordinates
-    Does both upscaling and downscaling (downsampling and upsampling, respectively)
-    Equidistant and non-equidistant
-    Custom aggregation methods can be defined
-
-    Can regrid along 3 dimensions at a time.
-
-    Parameters
-    ----------
-    source : xr.DataArray
-        The source DataArray to be regridded
-    like : xr.DataArray
-        Example DataArray that shows what the resampled result should look like
-        in terms of coordinates. `source` is regridded along dimensions of `like`
-        that have the same name, but have different values.
-    method : str, function
-        The regridding method, for example mean, max, min.
-        if str, one of default methods provided.
-        if function, the function must take as arguments exactly (values, weights)
-    fill_value : float64, optional
-        Default value is np.nan
-
-    Returns
-    -------
-    regridded : xr.DataArray
-        `source` regridded along dimensions present in `like` with different
-        values.
-
-    Examples
-    --------
-    """
-    # Use xarray for nearest, and exit early.
-    if method == "nearest":
-        return source.reindex_like(like, method="nearest")
-
-    # Don't mutate source; src stands for source, dst for destination
-    src = source.copy()
-
-    # Find coordinates that already match, and those that have to be regridded,
-    # and those that exist in source but not in like (left untouched)
-    matching_dims, regrid_dims, add_dims = _match_dims(src, like)
-
-    # Make sure src matches dst in dims that do not have to be regridded
-    src = _slice_src(src, like, matching_dims)
-
-    # Order dimensions in the right way:
-    # dimensions that are regridded end up at the end for efficient iteration
-    dst_dims = (*add_dims, *matching_dims, *regrid_dims)
-    dims_from_src = (*add_dims, *matching_dims)
-    dims_from_like = tuple(regrid_dims)
-
-    # Gather destination coordinates
-    dst_da_coords, dst_shape = _dst_coords(src, like, dims_from_src, dims_from_like)
-
-    # TODO: Check dimensionality of coordinates
-    # 2-d coordinates should raise a ValueError
-    # TODO: Check possibility to make gridding lazy
-    # iter_regrid provides an opportunity for this, but the chunks need to be
-    # defined somewhat intelligently: for 1d regridding for example the iter
-    # loop is "hot" enough that numba compilation makes sense
-
-    # Allocate dst
-    # TODO: allocate lazy --> dask.array.full
-    dst = xr.DataArray(
-        data=np.full(dst_shape, fill_value), coords=dst_da_coords, dims=dst_dims
-    )
-    # TODO: check that axes are aligned
-    dst_coords_regrid = [_coord(dst, dim) for dim in regrid_dims]
-    src_coords_regrid = [_coord(src, dim) for dim in regrid_dims]
-    # Transpose src so that dims to regrid are last
-    src = src.transpose(*dst_dims)
-
-    # Create tailor made regridding function: take method and ndims into account
-    # and call it
-    # TODO: use SciPy linear grid interpolator for linear interpolation
-    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.RegularGridInterpolator.html#scipy.interpolate.RegularGridInterpolator
-    # Check speed of operation with gridtools numba function
-    # Scipy has advantage of also supporting arbitrary dimensions
-    ndim_regrid = len(regrid_dims)
-    iter_regrid = _make_regrid(method, ndim_regrid)
-    dst.values = _nd_regrid(
-        src.values, dst.values, src_coords_regrid, dst_coords_regrid, iter_regrid
-    )
-
-    # Tranpose back to desired shape
-    dst = dst.transpose(*source.dims)
-
-    return dst
-
-
-class BatchRegridder(object):
-    """
-    Object to repeatedly regrid similar objects.
-    Compiles once on first call, can then be repeatedly called without
-    JIT compilation overhead.
+    Object to repeatedly regrid similar objects. Compiles once on first call,
+    can then be repeatedly called without JIT compilation overhead.
     """
 
-    def __init__(self, source, like, method):
-        # TODO: collect all the data, as in regrid function above.
-        raise NotImplementedError
-        self._regrid = _make_regrid()
+    def __init__(self, method, ndim_regrid=None):
+        self.method = method
+        self.ndim_regrid = ndim_regrid
+        self._first_call = True
 
-    def regrid(source, fill_value=np.nan):
-        # TODO: check whether input is actually same as in __init__
-        return self._regrid(source, fill_value)
+    def _make_regrid(self):
+        iter_regrid = _make_regrid(self.method, self.ndim_regrid)
+
+        def nd_regrid(src, dst, src_coords_regrid, dst_coords_regrid):
+            return _nd_regrid(
+                src, dst, src_coords_regrid, dst_coords_regrid, iter_regrid
+            )
+
+        self._nd_regrid = nd_regrid
+
+    def regrid(self, source, like, fill_value=np.nan):
+        # TODO: add methods for "conserve" and "linear"
+        # Use xarray for nearest, and exit early.
+        if self.method == "nearest":
+            return source.reindex_like(like, method="nearest")
+
+        # Find coordinates that already match, and those that have to be
+        # regridded, and those that exist in source but not in like (left
+        # untouched)
+        matching_dims, regrid_dims, add_dims = _match_dims(source, like)
+
+        # Create tailor made regridding function: take method and ndims into
+        # account and call it
+        if self._first_call:
+            if self.ndim_regrid is None:
+                self.ndim_regrid = len(regrid_dims)
+            self._make_regrid()
+            self._first_call = False
+        else:
+            if not len(regrid_dims) == self.ndim_regrid:
+                raise ValueError(
+                    "Number of dimensions to regrid does not match: "
+                    f"Regridder.ndim_regrid = {self.ndim_regrid}"
+                )
+
+        # Don't mutate source; src stands for source, dst for destination
+        src = source.copy()
+
+        # Make sure src matches dst in dims that do not have to be regridded
+        src = _slice_src(src, like, matching_dims)
+
+        # Order dimensions in the right way:
+        # dimensions that are regridded end up at the end for efficient iteration
+        dst_dims = (*add_dims, *matching_dims, *regrid_dims)
+        dims_from_src = (*add_dims, *matching_dims)
+        dims_from_like = tuple(regrid_dims)
+
+        # Gather destination coordinates
+        dst_da_coords, dst_shape = _dst_coords(src, like, dims_from_src, dims_from_like)
+
+        # TODO: Check dimensionality of coordinates
+        # 2-d coordinates should raise a ValueError
+        # TODO: Check possibility to make gridding lazy
+        # iter_regrid provides an opportunity for this, but the chunks need to be
+        # defined somewhat intelligently: for 1d regridding for example the iter
+        # loop is "hot" enough that numba compilation makes sense
+
+        # Allocate dst
+        # TODO: allocate lazy --> dask.array.full
+        dst = xr.DataArray(
+            data=np.full(dst_shape, fill_value), coords=dst_da_coords, dims=dst_dims
+        )
+        # TODO: check that axes are aligned
+        dst_coords_regrid = [_coord(dst, dim) for dim in regrid_dims]
+        src_coords_regrid = [_coord(src, dim) for dim in regrid_dims]
+        # Transpose src so that dims to regrid are last
+        src = src.transpose(*dst_dims)
+
+        dst.values = self._nd_regrid(
+            src.values, dst.values, src_coords_regrid, dst_coords_regrid
+        )
+
+        # Tranpose back to desired shape
+        dst = dst.transpose(*source.dims)
+
+        return dst
 
 
 def mean(values, weights):
