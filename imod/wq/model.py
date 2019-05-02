@@ -221,7 +221,7 @@ class SeawatModel(Model):
             return self[gcgkey]._render()
         else:
             baskey = self._get_pkgkey("bas")
-            self[pksfkey]._compute_load_balance_weight(self[baskey]["ibound"])
+            self[pkstkey]._compute_load_balance_weight(self[baskey]["ibound"])
             return self[pkstkey]._render(directory=directory.joinpath(pkstkey))
 
     def _render_ssm_rch(self, directory, globaltimes):
