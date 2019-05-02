@@ -126,6 +126,7 @@ class Package(xr.Dataset):
             package_times = [
                 timeutil.to_datetime(t) for t in np.atleast_1d(da.coords["time"].values)
             ]
+            globaltimes = [timeutil.to_datetime(t) for t in np.atleast_1d(globaltimes)]
 
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
             for itime, start_end in enumerate(starts_ends):
@@ -216,6 +217,7 @@ class BoundaryCondition(Package):
             package_times = [
                 timeutil.to_datetime(t) for t in np.atleast_1d(da.coords["time"].values)
             ]
+            globaltimes = [timeutil.to_datetime(t) for t in np.atleast_1d(globaltimes)]
 
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
 
