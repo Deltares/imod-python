@@ -249,7 +249,9 @@ class SeawatModel(Model):
         Render the runfile as a string, package by package.
         """
         diskey = self._get_pkgkey("dis")
+        
         globaltimes = self[diskey]["time"].values
+        globaltimes = [timeutil.to_datetime(t) for t in np.atleast_1d(globaltimes)]
         # directory = pathlib.Path(self.modelname)
         directory = pathlib.Path(".")
 
