@@ -34,7 +34,14 @@ setup(
     ],
     extras_require={
         # sphinx version requirement due to sphinxcontrib-versioning
-        "dev": ["pytest", "sphinx==1.7.9", "sphinx_rtd_theme", "nbstripout", "black"],
+        "dev": [
+            "pytest",
+            "pytest-cov",
+            "sphinx==1.7.9",
+            "sphinx_rtd_theme",
+            "nbstripout",
+            "black",
+        ],
         "optional": ["rasterio>=1"],
     },
     classifiers=[

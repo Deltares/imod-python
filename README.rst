@@ -1,3 +1,8 @@
+.. |pipeline status| image:: https://gitlab.com/deltares/imod/imod-python/badges/master/pipeline.svg
+   :target: https://gitlab.com/deltares/imod/imod-python/commits/master
+.. |coverage report| image:: https://gitlab.com/deltares/imod/imod-python/badges/master/coverage.svg
+   :target: https://gitlab.com/deltares/imod/imod-python/commits/master
+
 Work with `iMOD <http://oss.deltares.nl/web/imod>`__ MODFLOW models in
 Python.
 
