@@ -211,11 +211,8 @@ class BoundaryCondition(Package):
             da = self[varname]
 
         if "time" in da.coords:
-            package_times = [
-                timeutil.to_datetime(t) for t in np.atleast_1d(da.coords["time"].values)
-            ]
-            globaltimes = [timeutil.to_datetime(t) for t in np.atleast_1d(globaltimes)]
-
+            package_times = da.coords["time"].values
+            
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
 
             for itime, (time, start_end) in enumerate(zip(package_times, starts_ends)):
