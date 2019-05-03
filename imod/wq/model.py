@@ -104,15 +104,17 @@ class SeawatModel(Model):
         """
         Also checks if datetime types are homogeneous across packages.
         """
-        types = [type(pkg["time"].values[0]) for pkg in self.values()]
+        types = [type(pkg["time"].values[0]) for pkg in self.values() if "time" in pkg.coords]
         if not len(set(types)) == 1:
             raise ValueError(
                 "Multiple datetime types detected. "
                 "Use either cftime or numpy.datetime64[ns]."
             )
-        if isinstance(types[0], cftime.datetime):
+#        if isinstance(types[0], cftime.datetime):
+        #Since we compare types and not instances, we use issubclass
+        if issubclass(types[0], cftime.datetime):
             return True
-        elif isinstance(types[0], np.datetime64):
+        elif issubclass(types[0], np.datetime64):
             return False
         else:
             raise ValueError("Use either cftime or numpy.datetime64[ns].")
@@ -153,7 +155,7 @@ class SeawatModel(Model):
         baskey = self._get_pkgkey("bas6")
         bas = self[baskey]
         _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(bas["ibound"])
-        start_date = timeutil.to_datetime(globaltimes[0]).strftime("%Y%m%d%H%M%S")
+        start_date = timeutil.to_datetime(globaltimes[0], use_cftime=False).strftime("%Y%m%d%H%M%S")
 
         d = {}
         d["modelname"] = modelname
