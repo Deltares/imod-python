@@ -578,13 +578,24 @@ def _dst_coords(src, like, dims_from_src, dims_from_like):
 
     dst_da_coords = {}
     dst_shape = []
+    # TODO: do some more checking, more robust handling
+    like_coords = dict(like.coords)
     for dim in dims_from_src:
+        try:
+            like_coords.pop(dim)
+        except KeyError:
+            pass
         dst_da_coords[dim] = src[dim].values
         dst_shape.append(src[dim].size)
     for dim in dims_from_like:
+        try:
+            like_coords.pop(dim)
+        except KeyError:
+            pass
         dst_da_coords[dim] = like[dim].values
         dst_shape.append(like[dim].size)
 
+    dst_da_coords.update(like_coords)
     return dst_da_coords, dst_shape
 
 
