@@ -123,7 +123,7 @@ class SeawatModel(Model):
         """
         Collect all unique times
         """
-        use_cftime = self._use_cftime()
+        self.use_cftime = self._use_cftime()
 
         times = []
         for pkg in self.values():
@@ -131,14 +131,14 @@ class SeawatModel(Model):
                 times.append(pkg["time"].values)
 
         # TODO: check that endtime is later than all other times.
-        times.append(timeutil.to_datetime(endtime, use_cftime))
+        times.append(timeutil.to_datetime(endtime, self.use_cftime))
         if starttime is not None:
-            times.append(timeutil.to_datetime(starttime, use_cftime))
+            times.append(timeutil.to_datetime(starttime, self.use_cftime))
 
         # np.unique also sorts
         times = np.unique(np.hstack(times))
 
-        duration = timeutil.timestep_duration(times, use_cftime)
+        duration = timeutil.timestep_duration(times, self.use_cftime)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
         timestep_duration = xr.DataArray(
@@ -155,7 +155,13 @@ class SeawatModel(Model):
         baskey = self._get_pkgkey("bas6")
         bas = self[baskey]
         _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(bas["ibound"])
-        start_date = timeutil.to_datetime(globaltimes[0], use_cftime=False).strftime("%Y%m%d%H%M%S")
+
+        if not self.use_cftime:
+            start_time = pd.to_datetime(globaltimes[0])
+        else:
+            start_time = globaltimes[0]
+
+        start_date = start_time.strftime("%Y%m%d%H%M%S")
 
         d = {}
         d["modelname"] = modelname
