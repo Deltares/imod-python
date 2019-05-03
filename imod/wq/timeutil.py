@@ -32,7 +32,7 @@ def to_datetime(time, use_cftime):
                 ) from e
 
     if use_cftime:
-        return cftime.DatetimeProlepticGregorian(*time.timetuple[:6])
+        return cftime.DatetimeProlepticGregorian(*time.timetuple()[:6])
     else:
         return np.datetime64(time, unit="ns")
 
