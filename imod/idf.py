@@ -17,9 +17,9 @@ from imod import util
 f_open = open
 
 
-def header(path):
+def header(path, pattern):
     """Read the IDF header information into a dictionary"""
-    attrs = util.decompose(path)
+    attrs = util.decompose(path, pattern)
     with f_open(path, "rb") as f:
         reclen_id = struct.unpack("i", f.read(4))[0]  # Lahey RecordLength Ident.
         if reclen_id != 1271:
@@ -204,7 +204,7 @@ def _read(path, headersize, nrow, ncol, nodata):
     return _to_nan(a, nodata)
 
 
-def read(path):
+def read(path, pattern=None):
     """
     Read a single IDF file to a numpy.ndarray
 
@@ -223,7 +223,7 @@ def read(path):
         A dict with all metadata.
     """
 
-    attrs = header(path)
+    attrs = header(path, pattern)
     headersize = attrs.pop("headersize")
     nrow = attrs.pop("nrow")
     ncol = attrs.pop("ncol")
@@ -231,7 +231,7 @@ def read(path):
     return _read(path, headersize, nrow, ncol, nodata), attrs
 
 
-def _dask(path, memmap=False, attrs=None):
+def _dask(path, memmap=False, attrs=None, pattern=None):
     """
     Read a single IDF file to a dask.array
 
@@ -257,7 +257,7 @@ def _dask(path, memmap=False, attrs=None):
         warnings.warn("memmap option is removed", FutureWarning)
 
     if attrs is None:
-        attrs = header(path)
+        attrs = header(path, pattern)
     # If we don't unpack, it seems we run into trouble with the dask array later
     # on, probably because attrs isn't immutable. This works fine instead.
     headersize = attrs.pop("headersize")
@@ -307,7 +307,7 @@ def load(path, memmap=False, use_cftime=False):
 
 
 # Open IDFs for multiple times and/or layers into one DataArray
-def open(path, memmap=False, use_cftime=False):
+def open(path, memmap=False, use_cftime=False, pattern=None):
     """
     Open one or more IDF files as an xarray.DataArray.
 
@@ -352,14 +352,14 @@ def open(path, memmap=False, use_cftime=False):
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
-    return _load(paths, use_cftime)
+    return _load(paths, use_cftime, pattern)
 
 
-def _load(paths, use_cftime):
+def _load(paths, use_cftime, pattern):
     """Combine a list of paths to IDFs to a single xarray.DataArray"""
     # this function also works for single IDFs
 
-    headers_unsorted = [imod.idf.header(p) for p in paths]
+    headers_unsorted = [imod.idf.header(p, pattern) for p in paths]
     names_unsorted = [h["name"] for h in headers_unsorted]
     _all_equal(names_unsorted, "names")
 
@@ -419,7 +419,7 @@ def _load(paths, use_cftime):
     return xr.DataArray(dask_array, coords, dims, name=names_unsorted[0])
 
 
-def open_dataset(globpath, memmap=False, use_cftime=False):
+def open_dataset(globpath, memmap=False, use_cftime=False, pattern=None):
     """
     Open a set of IDFs to a dict of xarray.DataArrays.
 
@@ -474,7 +474,7 @@ def open_dataset(globpath, memmap=False, use_cftime=False):
         d[n].append(p)
 
     # load each group into a DataArray
-    das = [_load(v, use_cftime) for v in d.values()]
+    das = [_load(v, use_cftime, pattern) for v in d.values()]
 
     # store each DataArray under it's own name in a dictionary
     dd = collections.OrderedDict()
