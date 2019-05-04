@@ -212,6 +212,11 @@ def read(path, pattern=None):
     ----------
     path : str or Path
         Path to the IDF file to be read
+    pattern : str, regex pattern, optional
+        If the filenames do match default naming conventions of
+        {name}_{time}_l{layer}, a custom pattern can be defined here either
+        as a string, or as a compiled regular expression pattern. Please refer
+        to the examples in `imod.idf.open`.
 
     Returns
     -------
@@ -242,6 +247,11 @@ def _dask(path, memmap=False, attrs=None, pattern=None):
     attrs : dict, optional
         A dict as returned by imod.idf.header, this function is called if not supplied.
         Used to minimize unneeded filesystem calls.
+    pattern : str, regex pattern, optional
+        If the filenames do match default naming conventions of
+        {name}_{time}_l{layer}, a custom pattern can be defined here either
+        as a string, or as a compiled regular expression pattern. Please refer
+        to the examples in `imod.idf.open`.
 
     Returns
     -------
@@ -308,7 +318,7 @@ def load(path, memmap=False, use_cftime=False):
 
 # Open IDFs for multiple times and/or layers into one DataArray
 def open(path, memmap=False, use_cftime=False, pattern=None):
-    """
+    r"""
     Open one or more IDF files as an xarray.DataArray.
 
     In accordance with xarray's design, `open` loads the data of IDF files
@@ -332,6 +342,11 @@ def open(path, memmap=False, use_cftime=False, pattern=None):
         fall before 1678 or after 2261, they are automatically encoded as
         `cftime.DatetimeProlepticGregorian` objects rather than
         `np.datetime64[ns]`.
+    pattern : str, regex pattern, optional
+        If the filenames do match default naming conventions of
+        {name}_{time}_l{layer}, a custom pattern can be defined here either
+        as a string, or as a compiled regular expression pattern. See the
+        examples below.
 
     Returns
     -------
@@ -339,6 +354,34 @@ def open(path, memmap=False, use_cftime=False, pattern=None):
         A float32 xarray.DataArray of the values in the IDF file(s).
         All metadata needed for writing the file to IDF or other formats
         using imod.rasterio are included in the xarray.DataArray.attrs.
+
+    Examples
+    --------
+    Open an IDF file, relying on default naming conventions
+
+    >>> head = imod.idf.open("head_20010101_l1.idf")
+
+    Open multiple IDF file, in this case files for the year 2000 for all
+    layers, again relying on default conventions for naming:
+
+    >>> head = imod.idf.open("head_2001*_l*.idf")
+
+    The same, this time explicitly specifying `name`, `time`, and `layer`:
+
+    >>> head = imod.idf.open("head_2001*_l*.idf", pattern="{name}_{time}_l{layer}")
+
+    The format string pattern will only work on tidy paths, where variables are
+    separated by underscores. You can also pass a compiled regex pattern.
+    Make sure to include the `re.IGNORECASE` flag since all paths are lowered.
+
+    >>> import re
+    >>> pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)")
+    >>> head = imod.idf.open("headL11", pattern=pattern)
+
+    However, this requires constructing regular expressions, which is
+    generally a fiddly process. Regex notation is also impossible to
+    remember. The website https://regex101.com is a nice help. Alternatively,
+    the most pragmatic solution may be to just rename your files.
     """
     if memmap:
         warnings.warn("memmap option is removed", FutureWarning)
@@ -443,6 +486,11 @@ def open_dataset(globpath, memmap=False, use_cftime=False, pattern=None):
         fall before 1679 or after 2262, they are automatically encoded as
         `cftime.DatetimeProlepticGregorian` objects rather than
         `np.datetime64[ns]`.
+    pattern : str, regex pattern, optional
+        If the filenames do match default naming conventions of
+        {name}_{time}_l{layer}, a custom pattern can be defined here either
+        as a string, or as a compiled regular expression pattern. Please refer
+        to the examples in `imod.idf.open`.
 
     Returns
     -------
