@@ -2,6 +2,7 @@ import collections
 import glob
 import itertools
 import pathlib
+import re
 import struct
 import warnings
 
@@ -280,7 +281,7 @@ def _dask(path, memmap=False, attrs=None, pattern=None):
     return x, attrs
 
 
-def dataarray(path, memmap=False):
+def dataarray(path, memmap=False, pattern=None):
     """
     Read a single IDF file to a xarray.DataArray
 
@@ -305,7 +306,7 @@ def dataarray(path, memmap=False):
     warnings.warn(
         "imod.idf.dataarray is deprecated, use imod.idf.open instead", FutureWarning
     )
-    return _load([path], False)
+    return _load([path], False, pattern)
 
 
 def load(path, memmap=False, use_cftime=False):
@@ -394,7 +395,7 @@ def open(path, memmap=False, use_cftime=False, pattern=None):
         warnings.warn("memmap option is removed", FutureWarning)
 
     if isinstance(path, list):
-        return _load(path, use_cftime)
+        return _load(path, use_cftime, pattern)
     elif isinstance(path, pathlib.Path):
         path = str(path)
 
@@ -403,6 +404,52 @@ def open(path, memmap=False, use_cftime=False, pattern=None):
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
     return _load(paths, use_cftime, pattern)
+
+
+def open_subdomains(path, use_cftime, pattern=None):
+    """
+    Combine IDF files of multiple subdomains.
+
+    Parameters
+    ----------
+    path : str, Path or list
+    use_cftime : bool, optional
+    pattern : str, regex pattern, optional
+
+    Returns
+    -------
+    xarray.DataArray
+
+    """
+    if isinstance(path, pathlib.Path):
+        path = str(path)
+    paths = glob.glob(path)
+    n = len(paths)
+    if n == 0:
+        raise FileNotFoundError(f"Could not find any files matching {path}")
+
+    subdomain_pattern = re.compile(r"_p(\d{3})", re.IGNORECASE)
+    # There are no real benefits to itertools.groupby in this case, as there's
+    # no benefit to using a (lazy) iterator in this case.
+    grouped = collections.defaultdict(list)
+    for p in paths:
+        number = subdomain_pattern.search(p).group(1)
+        grouped[number].append(pathlib.Path(p))
+
+    # This pattern will ignore the subdomain part
+    if pattern is None:
+        pattern = r"{name}_p\d*_{time}_l{layer}"
+
+    subdomains = [
+        open(pathlist, False, use_cftime=use_cftime, pattern=pattern)
+        for pathlist in grouped.values()
+    ]
+
+    combined = subdomains[0]
+    for subdomain in subdomains[1:]:
+        combined.combine_first(subdomain)
+
+    return combined
 
 
 def _load(paths, use_cftime, pattern):
