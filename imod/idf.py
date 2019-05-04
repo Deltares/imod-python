@@ -216,7 +216,7 @@ def read(path, pattern=None):
         If the filenames do match default naming conventions of
         {name}_{time}_l{layer}, a custom pattern can be defined here either
         as a string, or as a compiled regular expression pattern. Please refer
-        to the examples in `imod.idf.open`.
+        to the examples for `imod.idf.open`.
 
     Returns
     -------
@@ -357,11 +357,18 @@ def open(path, memmap=False, use_cftime=False, pattern=None):
 
     Examples
     --------
-    Open an IDF file, relying on default naming conventions
+    Open an IDF file:
+    >>> da = imod.idf.open("example.idf")
 
+    Open an IDF file, relying on default naming conventions to identify
+    layer:
+    >>> da = imod.idf.open("example_l1.idf")
+
+    Open an IDF file, relying on default naming conventions to identify layer
+    and time:
     >>> head = imod.idf.open("head_20010101_l1.idf")
 
-    Open multiple IDF file, in this case files for the year 2000 for all
+    Open multiple IDF files, in this case files for the year 2001 for all
     layers, again relying on default conventions for naming:
 
     >>> head = imod.idf.open("head_2001*_l*.idf")
@@ -375,7 +382,7 @@ def open(path, memmap=False, use_cftime=False, pattern=None):
     Make sure to include the `re.IGNORECASE` flag since all paths are lowered.
 
     >>> import re
-    >>> pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)")
+    >>> pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)", re.IGNORECASE)
     >>> head = imod.idf.open("headL11", pattern=pattern)
 
     However, this requires constructing regular expressions, which is
@@ -490,7 +497,7 @@ def open_dataset(globpath, memmap=False, use_cftime=False, pattern=None):
         If the filenames do match default naming conventions of
         {name}_{time}_l{layer}, a custom pattern can be defined here either
         as a string, or as a compiled regular expression pattern. Please refer
-        to the examples in `imod.idf.open`.
+        to the examples for `imod.idf.open`.
 
     Returns
     -------
