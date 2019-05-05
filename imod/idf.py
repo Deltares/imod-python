@@ -17,9 +17,9 @@ from imod import util
 f_open = open
 
 
-def header(path):
+def header(path, pattern):
     """Read the IDF header information into a dictionary"""
-    attrs = util.decompose(path)
+    attrs = util.decompose(path, pattern)
     with f_open(path, "rb") as f:
         reclen_id = struct.unpack("i", f.read(4))[0]  # Lahey RecordLength Ident.
         if reclen_id != 1271:
@@ -204,7 +204,7 @@ def _read(path, headersize, nrow, ncol, nodata):
     return _to_nan(a, nodata)
 
 
-def read(path):
+def read(path, pattern=None):
     """
     Read a single IDF file to a numpy.ndarray
 
@@ -212,6 +212,11 @@ def read(path):
     ----------
     path : str or Path
         Path to the IDF file to be read
+    pattern : str, regex pattern, optional
+        If the filenames do match default naming conventions of
+        {name}_{time}_l{layer}, a custom pattern can be defined here either
+        as a string, or as a compiled regular expression pattern. Please refer
+        to the examples for `imod.idf.open`.
 
     Returns
     -------
@@ -223,7 +228,7 @@ def read(path):
         A dict with all metadata.
     """
 
-    attrs = header(path)
+    attrs = header(path, pattern)
     headersize = attrs.pop("headersize")
     nrow = attrs.pop("nrow")
     ncol = attrs.pop("ncol")
@@ -231,7 +236,7 @@ def read(path):
     return _read(path, headersize, nrow, ncol, nodata), attrs
 
 
-def _dask(path, memmap=False, attrs=None):
+def _dask(path, memmap=False, attrs=None, pattern=None):
     """
     Read a single IDF file to a dask.array
 
@@ -242,6 +247,11 @@ def _dask(path, memmap=False, attrs=None):
     attrs : dict, optional
         A dict as returned by imod.idf.header, this function is called if not supplied.
         Used to minimize unneeded filesystem calls.
+    pattern : str, regex pattern, optional
+        If the filenames do match default naming conventions of
+        {name}_{time}_l{layer}, a custom pattern can be defined here either
+        as a string, or as a compiled regular expression pattern. Please refer
+        to the examples in `imod.idf.open`.
 
     Returns
     -------
@@ -257,7 +267,7 @@ def _dask(path, memmap=False, attrs=None):
         warnings.warn("memmap option is removed", FutureWarning)
 
     if attrs is None:
-        attrs = header(path)
+        attrs = header(path, pattern)
     # If we don't unpack, it seems we run into trouble with the dask array later
     # on, probably because attrs isn't immutable. This works fine instead.
     headersize = attrs.pop("headersize")
@@ -307,8 +317,8 @@ def load(path, memmap=False, use_cftime=False):
 
 
 # Open IDFs for multiple times and/or layers into one DataArray
-def open(path, memmap=False, use_cftime=False):
-    """
+def open(path, memmap=False, use_cftime=False, pattern=None):
+    r"""
     Open one or more IDF files as an xarray.DataArray.
 
     In accordance with xarray's design, `open` loads the data of IDF files
@@ -332,6 +342,11 @@ def open(path, memmap=False, use_cftime=False):
         fall before 1678 or after 2261, they are automatically encoded as
         `cftime.DatetimeProlepticGregorian` objects rather than
         `np.datetime64[ns]`.
+    pattern : str, regex pattern, optional
+        If the filenames do match default naming conventions of
+        {name}_{time}_l{layer}, a custom pattern can be defined here either
+        as a string, or as a compiled regular expression pattern. See the
+        examples below.
 
     Returns
     -------
@@ -339,6 +354,41 @@ def open(path, memmap=False, use_cftime=False):
         A float32 xarray.DataArray of the values in the IDF file(s).
         All metadata needed for writing the file to IDF or other formats
         using imod.rasterio are included in the xarray.DataArray.attrs.
+
+    Examples
+    --------
+    Open an IDF file:
+    >>> da = imod.idf.open("example.idf")
+
+    Open an IDF file, relying on default naming conventions to identify
+    layer:
+    >>> da = imod.idf.open("example_l1.idf")
+
+    Open an IDF file, relying on default naming conventions to identify layer
+    and time:
+    >>> head = imod.idf.open("head_20010101_l1.idf")
+
+    Open multiple IDF files, in this case files for the year 2001 for all
+    layers, again relying on default conventions for naming:
+
+    >>> head = imod.idf.open("head_2001*_l*.idf")
+
+    The same, this time explicitly specifying `name`, `time`, and `layer`:
+
+    >>> head = imod.idf.open("head_2001*_l*.idf", pattern="{name}_{time}_l{layer}")
+
+    The format string pattern will only work on tidy paths, where variables are
+    separated by underscores. You can also pass a compiled regex pattern.
+    Make sure to include the `re.IGNORECASE` flag since all paths are lowered.
+
+    >>> import re
+    >>> pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)", re.IGNORECASE)
+    >>> head = imod.idf.open("headL11", pattern=pattern)
+
+    However, this requires constructing regular expressions, which is
+    generally a fiddly process. Regex notation is also impossible to
+    remember. The website https://regex101.com is a nice help. Alternatively,
+    the most pragmatic solution may be to just rename your files.
     """
     if memmap:
         warnings.warn("memmap option is removed", FutureWarning)
@@ -352,14 +402,14 @@ def open(path, memmap=False, use_cftime=False):
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
-    return _load(paths, use_cftime)
+    return _load(paths, use_cftime, pattern)
 
 
-def _load(paths, use_cftime):
+def _load(paths, use_cftime, pattern):
     """Combine a list of paths to IDFs to a single xarray.DataArray"""
     # this function also works for single IDFs
 
-    headers_unsorted = [imod.idf.header(p) for p in paths]
+    headers_unsorted = [imod.idf.header(p, pattern) for p in paths]
     names_unsorted = [h["name"] for h in headers_unsorted]
     _all_equal(names_unsorted, "names")
 
@@ -419,7 +469,7 @@ def _load(paths, use_cftime):
     return xr.DataArray(dask_array, coords, dims, name=names_unsorted[0])
 
 
-def open_dataset(globpath, memmap=False, use_cftime=False):
+def open_dataset(globpath, memmap=False, use_cftime=False, pattern=None):
     """
     Open a set of IDFs to a dict of xarray.DataArrays.
 
@@ -443,6 +493,11 @@ def open_dataset(globpath, memmap=False, use_cftime=False):
         fall before 1679 or after 2262, they are automatically encoded as
         `cftime.DatetimeProlepticGregorian` objects rather than
         `np.datetime64[ns]`.
+    pattern : str, regex pattern, optional
+        If the filenames do match default naming conventions of
+        {name}_{time}_l{layer}, a custom pattern can be defined here either
+        as a string, or as a compiled regular expression pattern. Please refer
+        to the examples for `imod.idf.open`.
 
     Returns
     -------
@@ -474,7 +529,7 @@ def open_dataset(globpath, memmap=False, use_cftime=False):
         d[n].append(p)
 
     # load each group into a DataArray
-    das = [_load(v, use_cftime) for v in d.values()]
+    das = [_load(v, use_cftime, pattern) for v in d.values()]
 
     # store each DataArray under it's own name in a dictionary
     dd = collections.OrderedDict()
