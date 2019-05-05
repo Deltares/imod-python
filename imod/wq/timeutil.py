@@ -48,9 +48,8 @@ def timestep_duration(times, use_cftime):
     
     Returns
     -------
-    collections.OrderedDict
-        Dictionary with dates as strings for keys,
-        stress period duration (in days) as values.
+    duration : 1D numpy array of floats
+        stress period duration in decimal days
     """
     if not use_cftime:
         times = pd.to_datetime(times)
@@ -60,7 +59,7 @@ def timestep_duration(times, use_cftime):
         timedelta = end - start
         duration = timedelta.days + timedelta.seconds / 86400.0
         timestep_duration.append(duration)
-    return timestep_duration
+    return np.array(timestep_duration)
 
 
 def forcing_starts_ends(package_times, globaltimes):
