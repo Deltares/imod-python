@@ -215,7 +215,7 @@ class BoundaryCondition(Package):
 
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
 
-            for itime, (time, start_end) in enumerate(zip(package_times, starts_ends)):
+            for time, start_end in zip(package_times, starts_ends):
                 values[start_end] = self._compose_values_layer(varname, directory, time)
 
         else:
