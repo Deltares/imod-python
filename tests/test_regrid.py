@@ -89,7 +89,7 @@ def test_weights():
     src_x = np.arange(0.0, 11.0, 1.0)
     dst_x = np.arange(0.0, 11.0, 2.5)
     max_len, (dst_inds, src_inds, weights) = imod.prepare.regrid._weights_1d(
-        src_x, dst_x
+        src_x, dst_x, True
     )
     assert max_len == 3
     assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
@@ -103,7 +103,7 @@ def test_weights():
     src_x = np.array([0.0, 2.5, 7.5, 10.0])
     dst_x = np.array([0.0, 5.0, 10.0])
     max_len, (dst_inds, src_inds, weights) = imod.prepare.regrid._weights_1d(
-        src_x, dst_x
+        src_x, dst_x, True
     )
     assert max_len == 2
     assert np.allclose(dst_inds, np.array([0, 1]))
@@ -114,7 +114,7 @@ def test_weights():
     src_x = np.arange(-5.0, 6.0, 1.0)
     dst_x = np.arange(-5.0, 6.0, 2.5)
     max_len, (dst_inds, src_inds, weights) = imod.prepare.regrid._weights_1d(
-        src_x, dst_x
+        src_x, dst_x, True
     )
     assert max_len == 3
     assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
@@ -164,7 +164,7 @@ def test_make_regrid():
 def test_regrid_1d():
     src_x = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
     dst_x = np.array([0.0, 2.5, 5.0])
-    alloc_len, i_w = imod.prepare.regrid._weights_1d(src_x, dst_x)
+    alloc_len, i_w = imod.prepare.regrid._weights_1d(src_x, dst_x, True)
     inds_weights = [tuple(elem) for elem in i_w]
     values = np.zeros(alloc_len)
     weights = np.zeros(alloc_len)
@@ -196,7 +196,7 @@ def test_iter_regrid__1d():
     ndim_regrid = 1
     src_x = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
     dst_x = np.array([0.0, 2.5, 5.0])
-    alloc_len, i_w = imod.prepare.regrid._weights_1d(src_x, dst_x)
+    alloc_len, i_w = imod.prepare.regrid._weights_1d(src_x, dst_x, True)
     inds_weights = [tuple(elem) for elem in i_w]
 
     # 1D regrid over 1D array
@@ -227,23 +227,21 @@ def test_iter_regrid__1d():
     assert np.allclose(dst, compare)
 
 
-def test_strictly_increasing():
+def test_is_increasing():
     src_x = np.arange(5.0)
     dst_x = np.arange(5.0)
-    _src_x, _dst_x = imod.prepare.regrid._strictly_increasing(src_x, dst_x)
-    assert np.allclose(src_x, _src_x)
-    assert np.allclose(dst_x, _dst_x)
+    is_increasing = imod.prepare.regrid._is_increasing(src_x, dst_x)
+    assert is_increasing
 
     src_x = np.arange(5.0, 0.0, -1.0)
     dst_x = np.arange(5.0, 0.0, -1.0)
-    _src_x, _dst_x = imod.prepare.regrid._strictly_increasing(src_x, dst_x)
-    assert np.allclose(src_x[::-1], _src_x)
-    assert np.allclose(dst_x[::-1], _dst_x)
+    is_increasing = imod.prepare.regrid._is_increasing(src_x, dst_x)
+    assert not is_increasing
 
     src_x = np.arange(5.0, 0.0, -1.0)
     dst_x = np.arange(5.0)
     with pytest.raises(ValueError):
-        _src_x, _dst_x = imod.prepare.regrid._strictly_increasing(src_x, dst_x)
+        is_increasing = imod.prepare.regrid._is_increasing(src_x, dst_x)
 
 
 def test_nd_regrid__1d():
@@ -371,6 +369,34 @@ def test_regrid_coord():
     assert float(regridy.max()) == ymax
     assert np.allclose(np.diff(regridx), dx)
     assert np.allclose(np.diff(regridy), dy)
+
+
+def test_regrid_mean1d():
+    values = np.array([1.0, 2.0, 3.0])
+    src_x = np.array([0.5, 1.5, 2.5])
+    dst_x = np.array([0.5, 2.0])
+    coords = {"x": src_x, "dx": ("x", np.array([1.0, 1.0, 1.0]))}
+    like_coords = {"x": dst_x, "dx": ("x", np.array([1.0, 2.0]))}
+    dims = ("x",)
+    source = xr.DataArray(values, coords, dims)
+    like = xr.DataArray(np.empty(2), like_coords, dims)
+    out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+    compare = np.array([1.0, 2.5])
+    assert np.allclose(out.values, compare)
+
+
+def test_regrid_mean1d__dx_negative():
+    values = np.array([1.0, 2.0, 3.0])
+    src_x = np.array([2.5, 1.5, 0.5])
+    dst_x = np.array([2.0, 0.5])
+    coords = {"x": src_x, "dx": ("x", np.array([-1.0, -1.0, -1.0]))}
+    like_coords = {"x": dst_x, "dx": ("x", np.array([-2.0, -1.0]))}
+    dims = ("x",)
+    source = xr.DataArray(values, coords, dims)
+    like = xr.DataArray(np.empty(2), like_coords, dims)
+    out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+    compare = np.array([1.5, 3.0])
+    assert np.allclose(out.values, compare)
 
 
 def test_regrid_mean2d():

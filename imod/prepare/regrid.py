@@ -154,7 +154,7 @@ def _starts(src_x, dst_x):
 
 
 @numba.njit(cache=True)
-def _weights_1d(src_x, dst_x):
+def _weights_1d(src_x, dst_x, is_increasing):
     """
     Calculate regridding weights and indices for a single dimension
 
@@ -181,6 +181,14 @@ def _weights_1d(src_x, dst_x):
     dst_inds = []
     src_inds = []
     weights = []
+
+    # Reverse the coordinate direction locally if coordinate is not
+    # monotonically increasing, so starts and overlap continue to work.
+    # copy() to avoid side-effects
+    if not is_increasing:
+        src_x = src_x.copy() * -1.0
+        dst_x = dst_x.copy() * -1.0
+
     # i is index of dst
     # j is index of src
     for i, j in _starts(src_x, dst_x):
@@ -462,7 +470,7 @@ def _reshape(src, dst, ndim_regrid):
     return iter_src, iter_dst
 
 
-def _strictly_increasing(src_x, dst_x):
+def _is_increasing(src_x, dst_x):
     """
     Make sure coordinate values always increase so the _starts function above
     works properly.
@@ -472,9 +480,9 @@ def _strictly_increasing(src_x, dst_x):
     if (src_dx0 > 0.0) ^ (dst_dx0 > 0.0):
         raise ValueError("source and like coordinates not in the same direction")
     if src_dx0 < 0.0:
-        return src_x[::-1], dst_x[::-1]
+        return False
     else:
-        return src_x, dst_x
+        return True
 
 
 def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid):
@@ -501,12 +509,11 @@ def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid):
     inds_weights = []
     alloc_len = 1
     for src_x, dst_x in zip(src_coords, dst_coords):
-        _src_x, _dst_x = _strictly_increasing(src_x, dst_x)
-        s, i_w = _weights_1d(_src_x, _dst_x)
-        # Convert to tuples so numba doesn't crash
+        is_increasing = _is_increasing(src_x, dst_x)
+        size, i_w = _weights_1d(src_x, dst_x, is_increasing)
         for elem in i_w:
             inds_weights.append(elem)
-        alloc_len *= s
+        alloc_len *= size
 
     iter_src, iter_dst = _reshape(src, dst, ndim_regrid)
     iter_dst = iter_regrid(iter_src, iter_dst, alloc_len, *inds_weights)
