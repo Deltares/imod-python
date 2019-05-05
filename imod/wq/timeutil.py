@@ -1,9 +1,11 @@
+import datetime
+
 import numpy as np
 import pandas as pd
 import cftime
 
 
-def to_datetime(time):
+def to_datetime(time, use_cftime):
     """
     Check whether time is cftime object, else convert to datetime64 series.
     
@@ -14,14 +16,28 @@ def to_datetime(time):
     ----------
     time : cftime object or datetime-like scalar
     """
-    # TODO: deal with CFTimeIndex as well
     if isinstance(time, cftime.datetime):
         return time
+    elif isinstance(time, np.datetime64):
+        return time
+    elif isinstance(time, str):
+        try:  # first try yyyy-mm-dd
+            time = datetime.datetime.strptime(time, "%Y-%m-%d")
+        except ValueError:
+            try:
+                time = datetime.datetime.strptime(time, "%d-%m-%Y")
+            except ValueError as e:
+                raise ValueError(
+                    f"Date {time} does not match format '%Y-%m-%d' or '%d-%m-%Y'"
+                ) from e
+
+    if use_cftime:
+        return cftime.DatetimeProlepticGregorian(*time.timetuple()[:6])
     else:
-        return pd.to_datetime(time)
+        return np.datetime64(time, unit="ns")
 
 
-def timestep_duration(times):
+def timestep_duration(times, use_cftime):
     """
     Generates dictionary containing stress period time discretization data.
 
@@ -32,18 +48,18 @@ def timestep_duration(times):
     
     Returns
     -------
-    collections.OrderedDict
-        Dictionary with dates as strings for keys,
-        stress period duration (in days) as values.
+    duration : 1D numpy array of floats
+        stress period duration in decimal days
     """
-    times = sorted([to_datetime(t) for t in times])
+    if not use_cftime:
+        times = pd.to_datetime(times)
 
     timestep_duration = []
     for start, end in zip(times[:-1], times[1:]):
         timedelta = end - start
         duration = timedelta.days + timedelta.seconds / 86400.0
         timestep_duration.append(duration)
-    return times, timestep_duration
+    return np.array(timestep_duration)
 
 
 def forcing_starts_ends(package_times, globaltimes):

@@ -100,20 +100,47 @@ class SeawatModel(Model):
 
         return package_groups
 
+    def _use_cftime(self):
+        """
+        Also checks if datetime types are homogeneous across packages.
+        """
+        types = [
+            type(pkg["time"].values[0]) for pkg in self.values() if "time" in pkg.coords
+        ]
+        if not len(set(types)) == 1:
+            raise ValueError(
+                "Multiple datetime types detected. "
+                "Use either cftime or numpy.datetime64[ns]."
+            )
+        #        if isinstance(types[0], cftime.datetime):
+        # Since we compare types and not instances, we use issubclass
+        if issubclass(types[0], cftime.datetime):
+            return True
+        elif issubclass(types[0], np.datetime64):
+            return False
+        else:
+            raise ValueError("Use either cftime or numpy.datetime64[ns].")
+
     def time_discretization(self, endtime, starttime=None):
         """
         Collect all unique times
         """
-        # TODO: check for cftime, force all to cftime if necessary
-        times = set()  # set only allows for unique values
+        self.use_cftime = self._use_cftime()
+
+        times = []
         for pkg in self.values():
             if "time" in pkg.coords:
-                times.update(pkg["time"].values)
+                times.append(pkg["time"].values)
+
         # TODO: check that endtime is later than all other times.
-        times.update((endtime,))
+        times.append(timeutil.to_datetime(endtime, self.use_cftime))
         if starttime is not None:
-            times.update((starttime,))
-        times, duration = timeutil.timestep_duration(times)
+            times.append(timeutil.to_datetime(starttime, self.use_cftime))
+
+        # np.unique also sorts
+        times = np.unique(np.hstack(times))
+
+        duration = timeutil.timestep_duration(times, self.use_cftime)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
         timestep_duration = xr.DataArray(
@@ -130,7 +157,13 @@ class SeawatModel(Model):
         baskey = self._get_pkgkey("bas6")
         bas = self[baskey]
         _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(bas["ibound"])
-        start_date = timeutil.to_datetime(globaltimes[0]).strftime("%Y%m%d%H%M%S")
+
+        if not self.use_cftime:
+            start_time = pd.to_datetime(globaltimes[0])
+        else:
+            start_time = globaltimes[0]
+
+        start_date = start_time.strftime("%Y%m%d%H%M%S")
 
         d = {}
         d["modelname"] = modelname
