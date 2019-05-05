@@ -212,7 +212,7 @@ class BoundaryCondition(Package):
 
         if "time" in da.coords:
             package_times = da.coords["time"].values
-            
+
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
 
             for itime, (time, start_end) in enumerate(zip(package_times, starts_ends)):

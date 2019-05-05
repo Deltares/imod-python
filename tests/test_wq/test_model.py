@@ -129,35 +129,38 @@ def basicmodel(request):
 
     return m
 
+
 @pytest.fixture(scope="module")
 def cftime_model(basicmodel):
     m_cf = basicmodel
     ibound = m_cf["bas6"]["ibound"]
-    #We are not going to test for wells for now, 
-    #as cftime is not supported in WEL yet
-    #Also delete all packages that have something to do with time
+    # We are not going to test for wells for now,
+    # as cftime is not supported in WEL yet
+    # Also delete all packages that have something to do with time
     del m_cf["wel"]
     del m_cf["rch"]
     del m_cf["bas6"]
     del m_cf["time_discretization"]
-    
+
     layer = np.arange(1, 4)
     top = 30.0
     bot = xr.DataArray(
         np.arange(20.0, -10.0, -10.0), coords={"layer": layer}, dims=("layer",)
     )
-    
+
     m_cf["bas6"] = imod.wq.BasicFlow(
-        ibound=ibound, top=top, 
-        bottom=bot, starting_head=ibound.copy()
+        ibound=ibound, top=top, bottom=bot, starting_head=ibound.copy()
     )
 
-    times = np.array([
-            cftime.DatetimeProlepticGregorian(i, 1, 1) for i in [2000, 3000, 4000, 5000, 6000]
-            ])
-    da_t = xr.DataArray(np.ones(len(times)), coords={"time" : times}, dims=("time",))
+    times = np.array(
+        [
+            cftime.DatetimeProlepticGregorian(i, 1, 1)
+            for i in [2000, 3000, 4000, 5000, 6000]
+        ]
+    )
+    da_t = xr.DataArray(np.ones(len(times)), coords={"time": times}, dims=("time",))
 
-    #Instead of WEL, we broadcast 
+    # Instead of WEL, we broadcast
     head = ibound * da_t
 
     m_cf["ghb"] = imod.wq.GeneralHeadBoundary(
@@ -168,8 +171,8 @@ def cftime_model(basicmodel):
         save_budget=False,
     )
 
-    return(m_cf)
-    
+    return m_cf
+
 
 def test_get_pkgkey(basicmodel):
     m = basicmodel
@@ -455,6 +458,7 @@ def test_render(basicmodel):
     m.time_discretization(endtime="2000-01-06")
 
     s = m.render()
+
 
 def test_render_cf(cftime_model):
     m_cf = cftime_model

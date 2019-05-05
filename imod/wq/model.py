@@ -104,14 +104,16 @@ class SeawatModel(Model):
         """
         Also checks if datetime types are homogeneous across packages.
         """
-        types = [type(pkg["time"].values[0]) for pkg in self.values() if "time" in pkg.coords]
+        types = [
+            type(pkg["time"].values[0]) for pkg in self.values() if "time" in pkg.coords
+        ]
         if not len(set(types)) == 1:
             raise ValueError(
                 "Multiple datetime types detected. "
                 "Use either cftime or numpy.datetime64[ns]."
             )
-#        if isinstance(types[0], cftime.datetime):
-        #Since we compare types and not instances, we use issubclass
+        #        if isinstance(types[0], cftime.datetime):
+        # Since we compare types and not instances, we use issubclass
         if issubclass(types[0], cftime.datetime):
             return True
         elif issubclass(types[0], np.datetime64):
