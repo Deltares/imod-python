@@ -148,15 +148,18 @@ def _convert_datetimes(times, use_cftime):
 
 
 def compose(d):
-    """From a dict of parts, construct a filename,
-    following the iMOD conventions"""
+    """
+    From a dict of parts, construct a filename, following the iMOD
+    conventions
+    """
     haslayer = "layer" in d
     hastime = "time" in d
     if hastime:
         time = d["time"]
         if isinstance(time, np.datetime64):
-            # The following line is because numpydatetime with ns as unit does not support
-            # converting to datetime. This solution is 20 times faster than using pd.to_datetime()
+            # The following line is because numpydatetime with ns as unit does
+            # not support converting to datetime. This solution is 20 times
+            # faster than using pd.to_datetime()
             d["timestr"] = time.astype("datetime64[D]").item().strftime("%Y%m%d%H%M%S")
         else:
             d["timestr"] = time.strftime("%Y%m%d%H%M%S")
