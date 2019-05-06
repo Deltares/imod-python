@@ -1,8 +1,10 @@
+import os
+import sys
+
 import numba
 import numpy as np
 import pytest
 import xarray as xr
-import sys
 
 import imod
 
@@ -152,13 +154,16 @@ def test_reshape():
 
 
 def test_make_regrid():
-    # Cannot really test functionality, since it's compiled by numba at runtime
-    # This just checks whether it's ingested okay
-    func = imod.prepare.regrid._jit_regrid(mean, 1)
-    assert isinstance(func, numba.targets.registry.CPUDispatcher)
+    if "NUMBA_DISABLE_JIT" in os.environ:
+        pass
+    else:
+        # Cannot really test functionality, since it's compiled by numba at runtime
+        # This just checks whether it's ingested okay
+        func = imod.prepare.regrid._jit_regrid(mean, 1)
+        assert isinstance(func, numba.targets.registry.CPUDispatcher)
 
-    func = imod.prepare.regrid._make_regrid(mean, 1)
-    assert isinstance(func, numba.targets.registry.CPUDispatcher)
+        func = imod.prepare.regrid._make_regrid(mean, 1)
+        assert isinstance(func, numba.targets.registry.CPUDispatcher)
 
 
 def test_regrid_1d():
