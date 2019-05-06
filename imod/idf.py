@@ -449,8 +449,8 @@ def open_subdomains(path, use_cftime, pattern=None):
     for subdomain in subdomains[1:]:
         combined = combined.combine_first(subdomain)
 
-    #Sortby y-coordinate, since combine_first automatically 
-    #sorts all coordinates in ascending order
+    # Sortby y-coordinate, since combine_first automatically
+    # sorts all coordinates in ascending order
     combined = combined.sortby("y", ascending=False)
 
     return combined
