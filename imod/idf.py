@@ -79,14 +79,16 @@ def _check_cellsizes(cellsizes):
     ----------
     cellsizes : list of tuples
         tuples may contain:
-        * two floats
-        * two ndarrays
+        * two floats, dx and dy, for equidistant files
+        * two ndarrays, dx and dy, for nonequidistant files
 
     Returns
     -------
     None
     """
     msg = "Cellsizes of IDFs do not match"
+    if len(cellsizes) == 1:
+        return None
     try:
         if not (cellsizes.count(cellsizes[0]) == len(cellsizes)):
             raise ValueError(msg)
@@ -305,7 +307,7 @@ def dataarray(path, memmap=False):
     warnings.warn(
         "imod.idf.dataarray is deprecated, use imod.idf.open instead", FutureWarning
     )
-    return _load([path], False)
+    return _load([path], False, pattern)
 
 
 def load(path, memmap=False, use_cftime=False):
@@ -394,7 +396,7 @@ def open(path, memmap=False, use_cftime=False, pattern=None):
         warnings.warn("memmap option is removed", FutureWarning)
 
     if isinstance(path, list):
-        return _load(path, use_cftime)
+        return _load(path, use_cftime, pattern)
     elif isinstance(path, pathlib.Path):
         path = str(path)
 

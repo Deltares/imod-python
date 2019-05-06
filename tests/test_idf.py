@@ -200,14 +200,44 @@ def test_save__error(test_da):
         idf.save("test.idf", test_da)
 
 
+def test_to_nan():
+    a = np.array([1.0, 2.000001, np.nan, 4.0])
+    c = idf._to_nan(a, np.nan)
+    assert np.allclose(c, a, equal_nan=True)
+    c = idf._to_nan(a, 2.0)
+    b = np.array([1.0, np.nan, np.nan, 4.0])
+    assert np.allclose(c, b, equal_nan=True)
+
+
 def test_saveopen(test_da):
     idf.save("test", test_da)
     assert pathlib.Path("test.idf").exists()
     da = idf.open("test.idf")
     assert isinstance(da, xr.DataArray)
     assert da.identical(test_da)
+    da = idf.open(pathlib.Path("test.idf"))
+    assert da.identical(test_da)
     with pytest.warns(FutureWarning):
         idf.open("test.idf", memmap=True)
+
+
+def test_saveopen__paths(test_da, tmp_path):
+    print("tmp_path:", tmp_path)
+    idf.save("test", test_da)
+    # open paths as a list of str
+    da = idf.open(["test.idf"])
+    assert da.identical(test_da)
+    # open paths as a list of pathlib.Path
+    da = idf.open([pathlib.Path("test.idf")])
+    assert da.identical(test_da)
+    # open nonexistent path
+    with pytest.raises(FileNotFoundError):
+        idf.open("nonexistent.idf")
+    # open a file that is not an idf
+    with open(tmp_path / "no.idf", "w") as f:
+        f.write("not the IDF header you expect")
+    with pytest.raises(ValueError):
+        idf.open(tmp_path / "no.idf")
 
 
 def test_save__int32coords(test_da__nodxdy):
@@ -327,3 +357,30 @@ def test_has_dim():
     assert not idf._has_dim([None, None, None])
     with pytest.raises(ValueError):
         idf._has_dim([t, 2, None])
+
+
+def test_check_cellsizes():
+    # (h["dx"], h["dy"])
+    a = np.array([1.0, 2.0, 3.0])
+    b = np.array([1.0, 2.000001, 3.0])
+    c = np.array([1.0, 2.1, 3.0])
+    d = np.array([2.0, 2.000001, 2.0])
+    e = np.array([4.0, 5.0, 6.0])
+    # length one always checks out
+    idf._check_cellsizes([(2.0, 3.0)])
+    # floats only
+    idf._check_cellsizes([(2.0, 3.0), (2.0, 3.0)])
+    idf._check_cellsizes([(2.0, 3.0), (2.000001, 3.0)])
+    # ndarrays only
+    idf._check_cellsizes([(a, e), (a, e)])
+    idf._check_cellsizes([(a, e), (b, e)])
+    # mix of floats and ndarrays
+    idf._check_cellsizes([(2.0, d)])
+    with pytest.raises(ValueError):
+        # floats only
+        idf._check_cellsizes([(2.0, 3.0), (2.1, 3.0)])
+        # ndarrays only
+        idf._check_cellsizes([(a, e), (c, e)])
+        # mix of floats and ndarrays
+        idf._check_cellsizes([(2.1, d)])
+
