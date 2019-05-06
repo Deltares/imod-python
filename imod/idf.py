@@ -438,7 +438,7 @@ def open_subdomains(path, use_cftime, pattern=None):
 
     # This pattern will ignore the subdomain part
     if pattern is None:
-        pattern = r"{name}_p\d*_{time}_l{layer}"
+        pattern = r"{name}_{time}_l{layer}_p\d*"
 
     subdomains = [
         open(pathlist, False, use_cftime=use_cftime, pattern=pattern)
@@ -447,9 +447,9 @@ def open_subdomains(path, use_cftime, pattern=None):
 
     combined = subdomains[0]
     for subdomain in subdomains[1:]:
-        combined.combine_first(subdomain)
+        combined = combined.combine_first(subdomain)
 
-    return combined
+    return subdomains
 
 
 def _load(paths, use_cftime, pattern):
