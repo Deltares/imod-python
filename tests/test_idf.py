@@ -424,4 +424,3 @@ def test_check_cellsizes():
         idf._check_cellsizes([(a, e), (c, e)])
         # mix of floats and ndarrays
         idf._check_cellsizes([(2.1, d)])
-
