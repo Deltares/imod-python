@@ -19,7 +19,6 @@ def globremove(globpath):
         except FileNotFoundError:
             pass
 
-
 @pytest.fixture(scope="module")
 def test_da(request):
     nrow, ncol = 3, 4
@@ -169,6 +168,51 @@ def test_da_nonequidistant(request):
     request.addfinalizer(remove)
     return xr.DataArray(data, **kwargs)
 
+
+@pytest.fixture(scope="module")
+def test_da_subdomains(request):
+    nsubdomains = 4.
+    nrow, ncol = 4, 5
+    dx, dy = 1.0, -1.0
+    xmin = 0.0, 3.0, 3.0, 0.0
+    xmax = 5.0, 8.0, 8.0, 5.0
+    ymin = 0.0, 2.0, 0.0, 2.0
+    ymax = 4.0, 6.0, 4.0, 6.0
+    data = np.ones((nrow, ncol), dtype=np.float32)
+
+    kwargs = {
+            "name" : "subdomains",
+            "dims": ("y", "x")
+            }
+    
+    das = []
+    for subd_extent in zip(xmin, xmax, ymin, ymax):    
+        kwargs["coords"] = idf._xycoords(subd_extent, (dx, dy))
+        das.append(xr.DataArray(data, **kwargs))
+    
+    def remove():
+        globremove("subdomains_*.idf")
+    
+    request.addfinalizer(remove)
+    return(das)
+
+
+def test_open_subdomains(test_da_subdomains):
+    subdomains = test_da_subdomains
+    
+    for i, subdomain in enumerate(subdomains):
+        idf.write(f"subdomains_p00{i}.idf", subdomain)
+    
+    da = idf.open_subdomains("subdomains_*", use_cftime=False, 
+                             pattern=r"{name}_p\d*")
+
+    assert(np.all(da == 1.))
+    assert(len(da.x) == 8)
+    assert(len(da.y) == 6)
+    
+    coords = idf._xycoords((0.0, 8.0, 0.0, 6.0), (1.0, -1.0))
+    assert(np.all(da["y"].values == coords["y"]))
+    assert(np.all(da["x"].values == coords["x"]))
 
 def test_xycoords_equidistant():
     dx, dy = 1.0, -1.0
