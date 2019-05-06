@@ -91,6 +91,18 @@ def test_decompose_pattern_dash():
     assert d == refd
 
 
+def test_decompose_steady_state():
+    d = util.decompose("path/to/head_steady-state_l64.idf")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("path", "to"),
+        "name": "head",
+        "layer": 64,
+    }
+    assert isinstance(d, dict)
+    assert d == refd
+
+
 def test_decompose_regexpattern():
     pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)", re.IGNORECASE)
     d = util.decompose("headL11.idf", pattern=pattern)
