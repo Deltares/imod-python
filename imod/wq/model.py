@@ -107,19 +107,22 @@ class SeawatModel(Model):
         types = [
             type(pkg["time"].values[0]) for pkg in self.values() if "time" in pkg.coords
         ]
-        if not len(set(types)) == 1:
-            raise ValueError(
-                "Multiple datetime types detected. "
-                "Use either cftime or numpy.datetime64[ns]."
-            )
-        #        if isinstance(types[0], cftime.datetime):
-        # Since we compare types and not instances, we use issubclass
-        if issubclass(types[0], cftime.datetime):
-            return True
-        elif issubclass(types[0], np.datetime64):
+        # Types will be empty if there's no time dependent input
+        if len(set(types)) == 0:
             return False
-        else:
-            raise ValueError("Use either cftime or numpy.datetime64[ns].")
+        else:  # there is time dependent input
+            if not len(set(types)) == 1:
+                raise ValueError(
+                    "Multiple datetime types detected. "
+                    "Use either cftime or numpy.datetime64[ns]."
+                )
+            # Since we compare types and not instances, we use issubclass
+            if issubclass(types[0], cftime.datetime):
+                return True
+            elif issubclass(types[0], np.datetime64):
+                return False
+            else:
+                raise ValueError("Use either cftime or numpy.datetime64[ns].")
 
     def time_discretization(self, endtime, starttime=None):
         """
