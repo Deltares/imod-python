@@ -438,20 +438,17 @@ def open_subdomains(path, use_cftime, pattern=None):
 
     # This pattern will ignore the subdomain part
     if pattern is None:
-        pattern = r"{name}_{time}_l{layer}_p\d*"
+        pattern = r"{name}_{time}_l{layer}_p\d+"
 
     subdomains = [
         open(pathlist, False, use_cftime=use_cftime, pattern=pattern)
         for pathlist in grouped.values()
     ]
 
-    combined = subdomains[0]
-    for subdomain in subdomains[1:]:
-        combined = combined.combine_first(subdomain)
-
-    # Sortby y-coordinate, since combine_first automatically
-    # sorts all coordinates in ascending order
-    combined = combined.sortby("y", ascending=False)
+    # Sortby y-coordinate, since xarray.merge automatically sorts all
+    # coordinates in ascending order
+    # See issue: https://github.com/pydata/xarray/issues/2947
+    combined = xr.merge(subdomains).sortby("y", ascending=False)
 
     return combined
 

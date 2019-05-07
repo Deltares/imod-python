@@ -43,7 +43,7 @@ def test_da__nodxdy(request):
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = {"y": np.arange(ymax, ymin, dy), "x": np.arange(xmin, xmax)}
+    coords = {"y": np.arange(ymax, ymin, dy), "x": np.arange(xmin, xmax, dx)}
     kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=np.float32)
 
@@ -172,13 +172,12 @@ def test_da_nonequidistant(request):
 
 @pytest.fixture(scope="module")
 def test_da_subdomains(request):
-    nsubdomains = 4.0
-    nrow, ncol = 4, 5
-    dx, dy = 1.0, -1.0
-    xmin = 0.0, 3.0, 3.0, 0.0
-    xmax = 5.0, 8.0, 8.0, 5.0
-    ymin = 0.0, 2.0, 0.0, 2.0
-    ymax = 4.0, 6.0, 4.0, 6.0
+    nrow, ncol = (4, 5)
+    dx, dy = (1.0, -1.0)
+    xmin = (0.0, 3.0, 3.0, 0.0)
+    xmax = (5.0, 8.0, 8.0, 5.0)
+    ymin = (0.0, 2.0, 0.0, 2.0)
+    ymax = (4.0, 6.0, 4.0, 6.0)
     data = np.ones((nrow, ncol), dtype=np.float32)
 
     kwargs = {"name": "subdomains", "dims": ("y", "x")}
