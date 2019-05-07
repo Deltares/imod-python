@@ -80,14 +80,16 @@ def _check_cellsizes(cellsizes):
     ----------
     cellsizes : list of tuples
         tuples may contain:
-        * two floats
-        * two ndarrays
+        * two floats, dx and dy, for equidistant files
+        * two ndarrays, dx and dy, for nonequidistant files
 
     Returns
     -------
     None
     """
     msg = "Cellsizes of IDFs do not match"
+    if len(cellsizes) == 1:
+        return None
     try:
         if not (cellsizes.count(cellsizes[0]) == len(cellsizes)):
             raise ValueError(msg)
