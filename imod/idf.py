@@ -569,7 +569,7 @@ def open_dataset(globpath, memmap=False, use_cftime=False, pattern=None):
         raise FileNotFoundError("Could not find any files matching {}".format(globpath))
     # group the DataArrays together using their name
     # note that directory names are ignored, and in case of duplicates, the last one wins
-    names = [util.decompose(path)["name"] for path in paths]
+    names = [util.decompose(path, pattern)["name"] for path in paths]
     unique_names = list(np.unique(names))
     d = collections.OrderedDict()
     for n in unique_names:
