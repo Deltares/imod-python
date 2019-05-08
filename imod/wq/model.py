@@ -269,10 +269,12 @@ class SeawatModel(Model):
         else:
             return ""
 
-    def _btn_rch_sinkssources(self):
+    def _bas_btn_rch_sinkssources(self):
+        baskey = self._get_pkgkey("bas6")
         btnkey = self._get_pkgkey("btn")
+        ibound = self[baskey]["ibound"]
         icbund = self[btnkey]["icbund"]
-        n_extra = icbund.where(icbund == -1).count()
+        n_extra = ((ibound < 0) | (icbund < 0)).sum()
 
         rchkey = self._get_pkgkey("rch")
         if rchkey is not None:
@@ -311,7 +313,7 @@ class SeawatModel(Model):
             directory=directory, globaltimes=globaltimes
         )
         # Add recharge to sinks and sources
-        n_sinkssources += self._btn_rch_sinkssources()
+        n_sinkssources += self._bas_btn_rch_sinkssources()
 
         # Wrap up modflow part
         content.append(modflowcontent)
