@@ -124,13 +124,13 @@ class SeawatModel(Model):
             else:
                 raise ValueError("Use either cftime or numpy.datetime64[ns].")
 
-    def time_discretization(self, endtime, starttime=None):
+    def time_discretization(self, endtime, starttime=None, *times):
         """
         Collect all unique times
         """
         self.use_cftime = self._use_cftime()
 
-        times = []
+        times = [timeutil.to_datetime(time, self.use_cftime) for time in times]
         for pkg in self.values():
             if "time" in pkg.coords:
                 times.append(pkg["time"].values)
