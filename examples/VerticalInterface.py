@@ -3,24 +3,24 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-#Discretization
+# Discretization
 nrow = 1
 ncol = 80
 nlay = 40
 
-dz = 1.0 #0.0125
-dx = 1.0 #0.0125
+dz = 1.0  # 0.0125
+dx = 1.0  # 0.0125
 dy = -dx
 
 # setup ibound
 bnd = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 1.0),
-    coords = {
+    coords={
         "y": [0.5],
         "x": np.arange(0.5 * dx, dx * ncol, dx),
         "layer": np.arange(1, 1 + nlay),
         "dx": dx,
-        "dy": dy
+        "dy": dy,
     },
     dims=("layer", "y", "x"),
 )
@@ -28,12 +28,13 @@ bnd = xr.DataArray(
 bnd.plot()
 
 # Defining constant heads
-bnd[31,:,-80] = -1
+bnd[31, :, 0] = -1
 bnd.plot(y="layer", yincrease=False)
 
-#Defining tops and bottoms
+# Defining tops and bottoms
 top1D = xr.DataArray(
-    np.arange(nlay * dz, 0.0, -dz), {"layer":np.arange(1, nlay + 1)}, ("layer"))
+    np.arange(nlay * dz, 0.0, -dz), {"layer": np.arange(1, nlay + 1)}, ("layer")
+)
 
 bot = top1D - dz
 top = nlay * dz
@@ -42,21 +43,23 @@ top = nlay * dz
 weldata = pd.DataFrame()
 weldata["x"] = np.full(1, 0.5 * dx)
 weldata["y"] = np.full(1, 0.5)
-weldata["q"] = 0.28512 #positive, so it's an injection well
+weldata["q"] = 0.28512  # positive, so it's an injection well
 
 # Define icbund
 icbund = xr.full_like(bnd, 1)
 
 # Define starting concentrations
 sconc = xr.DataArray(
-    data = np.full((nlay, nrow, ncol), 0.0),
-    coords = {"y": [0.5], 
-              "x": np.arange(0.5 * dx, dx * ncol, dx), 
-              "layer": np.arange(1,nlay+1)},
-    dims = ("layer", "y", "x"),
+    data=np.full((nlay, nrow, ncol), 0.0),
+    coords={
+        "y": [0.5],
+        "x": np.arange(0.5 * dx, dx * ncol, dx),
+        "layer": np.arange(1, nlay + 1),
+    },
+    dims=("layer", "y", "x"),
 )
 
-sconc[:,:,41:80] = 35.0
+sconc[:, :, 41:80] = 35.0
 sconc.plot(y="layer", yincrease=False)
 
 # Finally, we build the model
@@ -71,8 +74,9 @@ m["btn"] = imod.wq.BasicTransport(
 m["adv"] = imod.wq.AdvectionTVD(courant=1.0)
 m["dsp"] = imod.wq.Dispersion(longitudinal=0.0, diffusion_coefficient=0.0)
 m["vdf"] = imod.wq.VariableDensityFlow(density_concentration_slope=0.71)
-m['wel'] = imod.wq.Well(
-    id_name='wel', x=weldata['x'], y=weldata['y'], rate=weldata["q"])
+m["wel"] = imod.wq.Well(
+    id_name="wel", x=weldata["x"], y=weldata["y"], rate=weldata["q"]
+)
 m["pcg"] = imod.wq.PreconditionedConjugateGradientSolver(
     max_iter=150, inner_iter=30, hclose=0.0001, rclose=0.1, relax=0.98, damp=1.0
 )
@@ -94,7 +98,7 @@ m.write()
 
 # Results
 
-#head = imod.idf.open("VerticalInterface/results/head/*.idf")
-#head.plot(yincrease=False)
-#conc = imod.idf.open("VerticalInterface/results/conc/*.idf")
-#conc.plot(levels=range(0, 35, 5), yincrease=False)
+# head = imod.idf.open("VerticalInterface/results/head/*.idf")
+# head.plot(yincrease=False)
+# conc = imod.idf.open("VerticalInterface/results/conc/*.idf")
+# conc.plot(levels=range(0, 35, 5), yincrease=False)
