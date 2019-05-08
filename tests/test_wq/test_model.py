@@ -14,12 +14,13 @@ def basicmodel(request):
 
     # Basic flow
     layer = np.arange(1, 4)
+    z = np.arange(25.0, 0.0, -10.0)
     y = np.arange(4.5, 0.0, -1.0)
     x = np.arange(0.5, 5.0, 1.0)
     ibound = xr.DataArray(
         np.full((3, 5, 5), 1.0),
-        coords={"layer": layer, "y": y, "x": x, "dx": 1.0, "dy": -1.0},
-        dims=("layer", "y", "x"),
+        coords={"z": z, "layer": ("z", layer), "y": y, "x": x, "dx": 1.0, "dy": -1.0},
+        dims=("z", "y", "x"),
     )
     starting_head = xr.full_like(ibound, 0.0)
     top = 30.0

@@ -24,6 +24,12 @@ class Package(xr.Dataset):
     keyword argument by integer arguments for SEAWAT.
     """
 
+    def __setitem__(self, key, value):
+        if isinstance(value, xr.DataArray):
+            if "z" in value.dims:
+                value = value.swap_dims({"z": "layer"})
+        super(__class__, self).__setitem__(key, value)
+
     def _replace_keyword(self, d, key):
         """
         Method to replace a readable keyword value by the corresponding cryptic
