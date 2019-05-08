@@ -93,11 +93,10 @@ m.time_discretization(starttime="1900-01-01T00:00", endtime="2000-01-01T00:00")
 # Now we write the model, including runfile:
 m.write()
 
-# You can run the model using the comand prompt and the iMOD SEAWAT executable
+# You can run the model using the command prompt and the iMOD SEAWAT executable
 
 # Results
-
-head = imod.idf.open("FreshwaterLens/results/head/*.idf")
-head.plot(yincrease=False)
-conc = imod.idf.open("FreshwaterLens/results/conc/*.idf")
-conc.plot(levels=range(0, 35, 5), yincrease=False)
+# head = imod.idf.open("FreshwaterLens/results/head/*.idf")
+# head.plot(yincrease=False)
+# conc = imod.idf.open("FreshwaterLens/results/conc/*.idf")
+# conc.plot(levels=range(0, 35, 5), yincrease=False)

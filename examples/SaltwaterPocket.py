@@ -29,7 +29,7 @@ bnd = xr.DataArray(
 bnd.plot()
 
 # set constant heads
-bnd[21, :, -80] = -1
+bnd[21, :, 0] = -1
 
 # setup tops and bottoms
 
