@@ -116,3 +116,5 @@ venv.bak/
 *.idf
 *.ipf
 *.run
+examples/toth/
+examples/HenryCase/

@@ -86,11 +86,10 @@ class Well(pd.DataFrame):
     def _compose_values_time(self, directory, globaltimes):
         values = {}
         if "time" in self:
-            package_times = timeutil.to_datetime(self["time"].values)
-            globaltimes = timeutil.to_datetime(globaltimes)
-            starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
+            package_times = self["time"].values
 
-            for itime, (time, start_end) in enumerate(zip(package_times, starts_ends)):
+            starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
+            for time, start_end in zip(package_times, starts_ends):
                 values[start_end] = self._compose_values_layer(directory, time)
         else:
             values["?"] = self._compose_values_layer(directory)

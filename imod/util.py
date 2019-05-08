@@ -58,8 +58,6 @@ def decompose(path, pattern=None):
     # We'll ignore upper case
     stem = path.stem.lower()
 
-    # maybe Reconsider if allowing "-" is desirable everywhere:
-    # [\w] versus [\w-]
     if pattern is not None:
         if isinstance(pattern, re._pattern_type):
             d = pattern.match(stem).groupdict()
@@ -73,9 +71,9 @@ def decompose(path, pattern=None):
             # Use it to get the required variables
             d = re_pattern.match(stem).groupdict()
     else:  # Default to "iMOD conventions": {name}_{time}_l{layer}
-        has_layer = bool(re.search(r"l\d+$", stem))
+        has_layer = bool(re.search(r"_l\d+$", stem))
         try:  # try for time
-            base_pattern = r"(?P<name>[\w-]+)_(?P<time>[\w]+)"
+            base_pattern = r"(?P<name>[\w-]+)_(?P<time>[\w-]+)"
             if has_layer:
                 base_pattern += r"_l(?P<layer>[\w]+)"
             re_pattern = re.compile(base_pattern)
@@ -89,7 +87,7 @@ def decompose(path, pattern=None):
 
     # TODO: figure out what to with user specified variables
     # basically type inferencing via regex?
-    # if purely numerical \d* -> int or float
+    # if purely numericdcal \d* -> int or float
     #    if \d*\.\d* -> float
     # else: keep as string
 
@@ -102,10 +100,13 @@ def decompose(path, pattern=None):
         d["layer"] = int(d["layer"])
     if "time" in d.keys():
         # iMOD supports two datetime formats
-        try:
-            d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d%H%M%S")
-        except ValueError:
-            d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d")
+        if d["time"] == "steady-state":
+            d.pop("time")
+        else:
+            try:
+                d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d%H%M%S")
+            except ValueError:
+                d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d")
 
     d["extension"] = path.suffix
     d["directory"] = path.parent
@@ -148,12 +149,22 @@ def _convert_datetimes(times, use_cftime):
 
 
 def compose(d):
-    """From a dict of parts, construct a filename,
-    following the iMOD conventions"""
+    """
+    From a dict of parts, construct a filename, following the iMOD
+    conventions
+    """
     haslayer = "layer" in d
     hastime = "time" in d
     if hastime:
-        d["timestr"] = d["time"].strftime("%Y%m%d%H%M%S")
+        time = d["time"]
+        if isinstance(time, np.datetime64):
+            # The following line is because numpy.datetime64[ns] does not
+            # support converting to datetime, but returns an integer instead.
+            # This solution is 20 times faster than using pd.to_datetime()
+            d["timestr"] = time.astype("datetime64[us]").item().strftime("%Y%m%d%H%M%S")
+        else:
+            d["timestr"] = time.strftime("%Y%m%d%H%M%S")
+
     if haslayer:
         d["layer"] = int(d["layer"])
         if hastime:

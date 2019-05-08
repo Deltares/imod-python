@@ -1,4 +1,8 @@
 from imod.wq.pkgbase import Package
+import numpy as np
+import pathlib
+import pandas as pd
+from imod import util
 
 
 class PreconditionedConjugateGradientSolver(Package):
@@ -132,7 +136,52 @@ class GeneralizedConjugateGradientSolver(Package):
         self["lump_dispersion"] = lump_dispersion
 
 
-class ParallelKrylovFlowSolver(Package):
+class ParallelSolver(Package):
+    """
+    Base package for the parallel solvers.
+    """
+
+    def _compute_load_balance_weight(self, ibound):
+        if self["partition"] == "rcb":
+            if self["load_balance_weight"].values[()] is None:
+                self["load_balance_weight"] = (ibound != 0).sum("layer").astype(float)
+
+    def _render(self, directory):
+        d = {k: v.values for k, v in self.data_vars.items()}
+        if hasattr(self, "_keywords"):
+            for key in self._keywords.keys():
+                self._replace_keyword(d, key)
+
+        if self["partition"] == "rcb":
+            d["load_balance_weight"] = util.compose(
+                {
+                    "directory": directory,
+                    "name": "load_balance_weight",
+                    "extension": ".asc",
+                }
+            )
+
+        return self._template.format(**d)
+
+    def save(self, directory):
+        """
+        Overloaded method to write .asc instead of .idf.
+        (This is an idiosyncracy of the parallel iMODwq code.)
+        """
+        # TODO: remove this when iMOD_wq accepts idfs for the load grid.
+        da = self["load_balance_weight"]
+        if not da.dims == ("y", "x"):
+            raise ValueError(
+                "load_balance_weight dimensions must be exactly ('y', 'x')."
+            )
+        path = pathlib.Path(directory).joinpath("load_balance_weight.asc")
+        path.parent.mkdir(exist_ok=True, parents=True)
+        pd.DataFrame(da.values).to_csv(
+            path, sep="\t", header=False, index=False, float_format="%8.2f"
+        )
+
+
+class ParallelKrylovFlowSolver(ParallelSolver):
     """
     The Parallel Krylov Flow Solver is used for parallel solving of the flow
     model.
@@ -179,11 +228,18 @@ class ParallelKrylovFlowSolver(Package):
     debug: {True, False}, optional
         Debug option.
         Default value: False
-    pointer_grid: string, optional
-        Path to a 2D pointer grid used when partition = "rcb".
-    """
+    load_balance_weight: xarray.DataArray, optional
+        2D grid with load balance weights, used when partition = "rcb"
+        (Recursive Coordinate Bisection). If None (default), then the module
+        will create a load balance grid by summing active cells over layers:
+        `(ibound != 0).sum("layer")`
 
-    # TODO: replace pointer_grid by something less silly
+        Note that even though the iMOD-SEAWAT helpfile states .idf is
+        accepted, it is not. This load balance grid should be a .asc file
+        (without a header). Formatting is done as follows:
+        `pd.DataFrame(load_balance_weight.values).to_csv(path, sep='\\t',
+        header=False, index=False, float_format = "%8.2f")`
+    """
 
     _pkg_id = "pksf"
     _template = (
@@ -197,7 +253,7 @@ class ParallelKrylovFlowSolver(Package):
         "    isolver = {solver}\n"
         "    npc = {preconditioner}\n"
         "    npcdef = {deflate}\n"
-        "    loadpatr = {pointer_grid}\n"
+        "    loadptr = {load_balance_weight}\n"
         "    pressakey = {debug}\n"
     )
 
@@ -220,7 +276,7 @@ class ParallelKrylovFlowSolver(Package):
         preconditioner="ilu",
         deflate=False,
         debug=False,
-        pointer_grid=None,
+        load_balance_weight=None,
     ):
         super(__class__, self).__init__()
         self["max_iter"] = max_iter
@@ -233,7 +289,7 @@ class ParallelKrylovFlowSolver(Package):
         self["preconditioner"] = preconditioner
         self["deflate"] = deflate
         self["debug"] = debug
-        self["pointer_grid"] = pointer_grid
+        self["load_balance_weight"] = load_balance_weight
 
     def _pkgcheck(self):
         to_check = ["hclose", "rclose", "max_iter", "inner_iter", "relax"]
@@ -251,7 +307,7 @@ class ParallelKrylovFlowSolver(Package):
                 )
 
 
-class ParallelKrylovTransportSolver(Package):
+class ParallelKrylovTransportSolver(ParallelSolver):
     """
     The Parallel Krylov Transport Solver is used for parallel solving of the
     transport model.
@@ -287,12 +343,19 @@ class ParallelKrylovTransportSolver(Package):
         Devault value: "ilu".
     debug: {True, False}, optional
         Debug option.
-        Default value: False.
-    pointer_grid: string, optional
-        Path to a 2D pointer grid used when partition = "rcb".
-    """
+        Default value: False
+    load_balance_weight: xarray.DataArray, optional
+        2D grid with load balance weights, used when partition = "rcb"
+        (Recursive Coordinate Bisection). If None (default), then the module
+        will create a load balance grid by summing active cells over layers:
+        `(ibound != 0).sum("layer")`
 
-    # TODO: replace pointer_grid by something less silly
+        Note that even though the iMOD-SEAWAT helpfile states .idf is
+        accepted, it is not. This load balance grid should be a .asc file
+        (without a header). Formatting is done as follows:
+        `pd.DataFrame(load_balance_weight.values).to_csv(path, sep='\\t',
+        header=False, index=False, float_format = "%8.2f")`
+        """
 
     _pkg_id = "pkst"
     _template = (
@@ -304,7 +367,7 @@ class ParallelKrylovTransportSolver(Package):
         "    partopt = {partition}\n"
         "    isolver = {solver}\n"
         "    npc = {preconditioner}\n"
-        "    loadpatr = {pointer_grid}\n"
+        "    loadptr = {load_balance_weight}\n"
         "    pressakey = {debug}\n"
     )
 
@@ -324,7 +387,7 @@ class ParallelKrylovTransportSolver(Package):
         solver="bicgstab",
         preconditioner="ilu",
         debug=False,
-        pointer_grid=None,
+        load_balance_weight=None,
     ):
         super(__class__, self).__init__()
         self["max_iter"] = max_iter
@@ -335,7 +398,7 @@ class ParallelKrylovTransportSolver(Package):
         self["solver"] = solver
         self["preconditioner"] = preconditioner
         self["debug"] = debug
-        self["pointer_grid"] = pointer_grid
+        self["load_balance_weight"] = load_balance_weight
 
     def _pkgcheck(self):
         to_check = ["cclose", "max_iter", "inner_iter", "relax"]

@@ -29,10 +29,10 @@ imod.ipf module
     :undoc-members:
     :show-inheritance:
 
-imod.pre module
+imod.prepare module
 ---------------
 
-.. automodule:: imod.pre
+.. automodule:: imod.prepare
     :members:
     :imported-members:
     :undoc-members:

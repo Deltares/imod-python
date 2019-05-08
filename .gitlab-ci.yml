@@ -16,7 +16,9 @@ before_script:
 tests:
   script:
     - cd tests
-    - python -m pytest --verbose
+    - python -m pytest --verbose test_regrid.py
+    - export NUMBA_DISABLE_JIT=1
+    - python -m pytest --verbose --cov=imod
     - cd ..
     - black --check . 
 

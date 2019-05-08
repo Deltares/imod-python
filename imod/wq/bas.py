@@ -150,8 +150,15 @@ class BasicFlow(Package):
         d["bottom"] = self._compose_values_layer("bottom", directory)
         d["nlay"], d["nrow"], d["ncol"] = self["ibound"].shape
         # TODO: check dx > 0, dy < 0?
-        d["dx"] = abs(float(self.coords["dx"]))
-        d["dy"] = abs(float(self.coords["dy"]))
+        # TODO: add non-equidistant support
+        if "dx" not in self or "dy" not in self:  # assume equidistant
+            dx = util._delta(self["x"], "x")
+            dy = util._delta(self["y"], "y")
+        else:
+            dx = self.coords["dx"]
+            dy = self.coords["dy"]
+        d["dx"] = abs(float(dx))
+        d["dy"] = abs(float(dy))
 
         return self._dis_template.render(d)
 

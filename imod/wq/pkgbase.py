@@ -123,11 +123,7 @@ class Package(xr.Dataset):
         values = {}
 
         if "time" in da.coords:
-            # TODO: get working for cftime
-            package_times = timeutil.to_datetime(
-                np.atleast_1d(da.coords["time"].values)
-            )
-            globaltimes = timeutil.to_datetime(globaltimes)
+            package_times = da.coords["time"].values
 
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
             for itime, start_end in enumerate(starts_ends):
@@ -215,14 +211,11 @@ class BoundaryCondition(Package):
             da = self[varname]
 
         if "time" in da.coords:
-            # TODO: get working for cftime
-            package_times = timeutil.to_datetime(
-                np.atleast_1d(da.coords["time"].values)
-            )
-            globaltimes = timeutil.to_datetime(globaltimes)
+            package_times = da.coords["time"].values
+
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
 
-            for itime, (time, start_end) in enumerate(zip(package_times, starts_ends)):
+            for time, start_end in zip(package_times, starts_ends):
                 values[start_end] = self._compose_values_layer(varname, directory, time)
 
         else:

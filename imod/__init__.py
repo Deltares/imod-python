@@ -11,7 +11,7 @@ from imod import tec
 from imod import util
 
 # subpackages
-import imod.pre
+import imod.prepare
 import imod.wq
 
 # since this is a big dependency that is sometimes hard to install

@@ -14,8 +14,9 @@ This document is loosely based on the [Contributing to xarray guide](https://xar
 You can report bugs on the *Issues*
 [pages](https://gitlab.com/deltares/imod/imod-python/issues). Please include
 a self-contained Python snippet that reproduces the problem. In the majority
-of cases, a Minimal, Complete, and Verifiable Example (MCVE) or Minimum Workin Example (MWE) is the best way
-to communicate the problem and provide insight. Have a look at [this stackoverflow
+of cases, a Minimal, Complete, and Verifiable Example (MCVE) or Minimum
+Working Example (MWE) is the best way to communicate the problem and provide
+insight. Have a look at [this stackoverflow
 article](https://stackoverflow.com/help/mcve) for an in-depth description.
 
 ## Contributing Code
@@ -33,7 +34,8 @@ or try this [interactive tutorial](https://learngitbranching.js.org/).
 ### Code style
 We use [Black](https://github.com/ambv/black) for automatic code formatting.
 Like *Black*, we are uncompromising about formatting. Continuous Integration
-**will fail** if your code has not been "blackened".
+**will fail** if running `black .` from within the repository root folder would
+make any formatting changes.
 
 Integration black into your workflow is easy. Find the instructions
 [here](https://github.com/ambv/black#editor-integration). If you're using
