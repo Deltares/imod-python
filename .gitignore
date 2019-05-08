@@ -116,5 +116,12 @@ venv.bak/
 *.idf
 *.ipf
 *.run
+
+# Examples
 examples/toth/
+examples/Elder/
+examples/FreshwaterLens/
 examples/HenryCase/
+examples/HydroCoin/
+examples/SaltwaterPocket/
+examples/VerticalInterface/
