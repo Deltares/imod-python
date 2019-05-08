@@ -45,7 +45,7 @@ bot = top1D - 1.0
 bnd[:, :, -1] = -1
 
 # Fill model
-m = imod.wq.SeawatModel("henry_case")
+m = imod.wq.SeawatModel("HenryCase")
 m["bas"] = imod.wq.BasicFlow(ibound=bnd, top=50.0, bottom=bot, starting_head=1.0)
 m["lpf"] = imod.wq.LayerPropertyFlow(
     k_horizontal=10.0, k_vertical=10.0, specific_storage=0.0

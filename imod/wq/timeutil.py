@@ -3,6 +3,7 @@ import datetime
 import numpy as np
 import pandas as pd
 import cftime
+import dateutil  # is a dependency of pandas
 
 
 def to_datetime(time, use_cftime):
@@ -21,15 +22,17 @@ def to_datetime(time, use_cftime):
     elif isinstance(time, np.datetime64):
         return time
     elif isinstance(time, str):
-        try:  # first try yyyy-mm-dd
-            time = datetime.datetime.strptime(time, "%Y-%m-%d")
-        except ValueError:
-            try:
-                time = datetime.datetime.strptime(time, "%d-%m-%Y")
-            except ValueError as e:
+        time = dateutil.parser.parse(time)
+        year = time.year
+        if year < 1678 or year > 2261:
+            if not use_cftime:
                 raise ValueError(
-                    f"Date {time} does not match format '%Y-%m-%d' or '%d-%m-%Y'"
-                ) from e
+                    "A datetime is out of bounds for np.datetime64[ns]: "
+                    "before year 1678 or after 2261. You will have to use "
+                    "cftime.datetime and xarray.CFTimeIndex in your model "
+                    "input instead of the default np.datetime64[ns] datetime "
+                    "type."
+                )
 
     if use_cftime:
         return cftime.DatetimeProlepticGregorian(*time.timetuple()[:6])
