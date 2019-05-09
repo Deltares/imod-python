@@ -28,6 +28,8 @@ class Package(xr.Dataset):
         if isinstance(value, xr.DataArray):
             if "z" in value.dims:
                 value = value.swap_dims({"z": "layer"})
+            if "layer" in value.dims:
+                value = value.dropna(dim="layer", how="all")
         super(__class__, self).__setitem__(key, value)
 
     def _replace_keyword(self, d, key):
@@ -145,6 +147,9 @@ class Package(xr.Dataset):
         for name, da in self.data_vars.items():
             if "y" in da.coords and "x" in da.coords:
                 path = pathlib.Path(directory).joinpath(name)
+                if isinstance(da, xr.DataArray):
+                    if "layer" in da.dims:
+                        da = da.dropna(dim="layer", how="all")
                 imod.idf.save(path, da)
 
 
