@@ -617,7 +617,7 @@ def _top_bot_dicts(a):
 
 
 # write DataArrays to IDF
-def save(path, a, nodata=1.0e20):
+def save(path, a, nodata=1.0e20, use_cftime=False):
     """
     Write a xarray.DataArray to one or more IDF files
 
@@ -677,7 +677,7 @@ def save(path, a, nodata=1.0e20):
     check_coords = ["layer", "time"]
     for coord in check_coords:
         if (coord in a.coords) and not (coord in a.dims):
-            if coord == "time":
+            if (coord == "time") & (use_cftime == False):
                 # .item() gives an integer, we need a pd.Timestamp or datetime.datetime
                 dt64 = a.coords[coord].values
                 val = pd.Timestamp(dt64)
