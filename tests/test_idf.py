@@ -314,6 +314,14 @@ def test_saveopen__cftime_outofbounds(test_cftimeda):
     assert da.identical(test_cftimeda)
 
 
+def test_saveopen__cftime_nodim(test_cftimeda):
+    da = test_cftimeda.copy().isel(time=0)
+    da.name = "testcftime-nodim"
+    idf.save("testcftime-nodim", da)
+    loaded = idf.open("testcftime-nodim*.idf").squeeze("time").load()
+    assert da.identical(loaded)
+
+
 def test_saveopen_sorting_headers_paths(test_timelayerda):
     idf.save("timelayer", test_timelayerda)
     loaded = idf.open("timelayer_*.idf").isel(x=0, y=0).values.ravel()
