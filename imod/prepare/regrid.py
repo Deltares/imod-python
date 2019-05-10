@@ -765,9 +765,18 @@ def harmonic_mean(values, weights):
 def geometric_mean(values, weights):
     v_agg = 0.0
     w_sum = 0.0
+
+    # Compute sum to ormalize weights to avoid tiny or huge values in exp
+    normsum = 0.0
+    for i in range(values.size):
+        normsum += weights[i]
+    # Early return if no values
+    if normsum == 0:
+        return np.nan
+
     m = 0
     for i in range(values.size):
-        w = weights[i]
+        w = weights[i] / normsum
         v = values[i]
         if np.isnan(v):
             continue
@@ -776,10 +785,8 @@ def geometric_mean(values, weights):
             w_sum += w
             if v < 0:
                 m += 1
-    if w_sum == 0:
-        return np.nan
-    else:
-        return (-1.0) ** m * np.exp((1.0 / w_sum) * v_agg)
+
+    return (-1.0) ** m * np.exp((1.0 / w_sum) * v_agg)
 
 
 def sum(values, weights):
@@ -790,7 +797,7 @@ def sum(values, weights):
         w = weights[i]
         if np.isnan(v):
             continue
-        v_sum += v * w
+        v_sum += v
         w_sum += w
     if w_sum == 0:
         return np.nan

@@ -1,5 +1,4 @@
 import os
-import sys
 
 import numba
 import numpy as np
@@ -32,6 +31,31 @@ def weightedmean(values, weights):
         vsum += w * v
         wsum += w
     return vsum / wsum
+
+
+def test_area_weighted_methods():
+    values = np.arange(5.0)
+    weights = np.arange(0.0, 50.0, 10.0)
+    values[0] = np.nan
+
+    assert np.allclose(imod.prepare.regrid.mean(values, weights), 3.0)
+    assert np.allclose(imod.prepare.regrid.harmonic_mean(values, weights), 2.5)
+    assert np.allclose(
+        imod.prepare.regrid.geometric_mean(values, weights), 2.780778340631819
+    )
+
+    values[1] = 3.0
+    assert np.allclose(imod.prepare.regrid.mode(values, weights), 3.0)
+
+
+def test_methods():
+    values = np.arange(5.0)
+    weights = np.arange(0.0, 50.0, 10.0)
+    values[0] = np.nan
+    assert np.allclose(imod.prepare.regrid.sum(values, weights), 10.0)
+    assert np.allclose(imod.prepare.regrid.minimum(values, weights), 1.0)
+    assert np.allclose(imod.prepare.regrid.maximum(values, weights), 4.0)
+    assert np.allclose(imod.prepare.regrid.median(values, weights), 2.5)
 
 
 def test_overlap():
