@@ -47,6 +47,13 @@ def test_area_weighted_methods():
     values[1] = 3.0
     assert np.allclose(imod.prepare.regrid.mode(values, weights), 3.0)
 
+    # Check if no issues arise with all nan
+    values[:] = np.nan
+    assert np.isnan(imod.prepare.regrid.mean(values, weights))
+    assert np.isnan(imod.prepare.regrid.harmonic_mean(values, weights))
+    assert np.isnan(imod.prepare.regrid.geometric_mean(values, weights))
+    assert np.isnan(imod.prepare.regrid.mode(values, weights))
+
 
 def test_methods():
     values = np.arange(5.0)
@@ -56,6 +63,13 @@ def test_methods():
     assert np.allclose(imod.prepare.regrid.minimum(values, weights), 1.0)
     assert np.allclose(imod.prepare.regrid.maximum(values, weights), 4.0)
     assert np.allclose(imod.prepare.regrid.median(values, weights), 2.5)
+
+    # Check if no issues arise with all nan
+    values[:] = np.nan
+    assert np.isnan(imod.prepare.regrid.sum(values, weights))
+    assert np.isnan(imod.prepare.regrid.minimum(values, weights))
+    assert np.isnan(imod.prepare.regrid.maximum(values, weights))
+    assert np.isnan(imod.prepare.regrid.median(values, weights))
 
 
 def test_overlap():

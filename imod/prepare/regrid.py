@@ -786,7 +786,10 @@ def geometric_mean(values, weights):
             if v < 0:
                 m += 1
 
-    return (-1.0) ** m * np.exp((1.0 / w_sum) * v_agg)
+    if w_sum == 0:
+        return np.nan
+    else:
+        return (-1.0) ** m * np.exp((1.0 / w_sum) * v_agg)
 
 
 def sum(values, weights):
