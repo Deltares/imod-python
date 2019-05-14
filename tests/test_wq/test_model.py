@@ -133,15 +133,21 @@ def basicmodel(request):
 
 @pytest.fixture(scope="module")
 def cftime_model(basicmodel):
-    m_cf = basicmodel
-    ibound = m_cf["bas6"]["ibound"]
+    m = basicmodel
+    ibound = m["bas6"]["ibound"]
+
+    m_cf = imod.wq.SeawatModel("test_model_cf")
+    m_cf["lpf"] = m["lpf"]
+    m_cf["riv"] = m["riv"]
+    m_cf["pcg"] = m["pcg"]
+    m_cf["btn"] = m["btn"]
+    m_cf["adv"] = m["adv"]
+    m_cf["dsp"] = m["dsp"]
+    m_cf["vdf"] = m["vdf"]
+    m_cf["gcg"] = m["gcg"]
+    m_cf["oc"] = m["oc"]
     # We are not going to test for wells for now,
     # as cftime is not supported in WEL yet
-    # Also delete all packages that have something to do with time
-    del m_cf["wel"]
-    del m_cf["rch"]
-    del m_cf["bas6"]
-    del m_cf["time_discretization"]
 
     layer = np.arange(1, 4)
     top = 30.0
@@ -466,3 +472,24 @@ def test_render_cf(cftime_model):
     m_cf.time_discretization(endtime="2000-01-06")
 
     s = m_cf.render()
+
+
+def test_mxsscount_incongruent_icbund(basicmodel):
+    """
+    MT3D relies on the ICBUND to identify constant concentration cells. Seawat
+    also always has an IBOUND for the flow. In Seawat, the IBOUND will be
+    included to count the number of sources and sinks. I think Seawat will
+    merge the IBOUND into the ICBUND (if IBOUND == -1, then ICBUND will bet set
+    to -1 too).
+
+    This tests makes sure that the IBOUND is also counted in the determination
+    of the number of sinks and sources (MXSS).
+    """
+
+    m = basicmodel
+    m["bas6"]["ibound"][...] = -1.0
+    m["btn"]["icbund"][...] = 0.0
+
+    n_sinkssources = m._bas_btn_rch_sinkssources()
+    print(n_sinkssources)
+    assert n_sinkssources == 100

@@ -274,13 +274,16 @@ class SeawatModel(Model):
         btnkey = self._get_pkgkey("btn")
         ibound = self[baskey]["ibound"]
         icbund = self[btnkey]["icbund"]
-        n_extra = ((ibound < 0) | (icbund < 0)).sum()
+        n_extra = int(((ibound < 0) | (icbund < 0)).sum())
 
         rchkey = self._get_pkgkey("rch")
         if rchkey is not None:
-            n_extra += self[rchkey]["rate"].count()
+            if "time" in self[rchkey].dims:
+                n_extra += int(self[rchkey]["rate"].groupby("time").count().max())
+            else:  # TODO: add test
+                n_extra += int(self[rchkey]["rate"].count())
 
-        return int(n_extra)
+        return n_extra
 
     def render(self, writehelp=False):
         """
