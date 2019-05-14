@@ -132,6 +132,24 @@ def basicmodel(request):
 
 
 @pytest.fixture(scope="module")
+def notime_model(basicmodel):
+    m = basicmodel
+
+    m_notime = imod.wq.SeawatModel("test_model_notime")
+    m_notime["bas6"] = m["bas6"]
+    m_notime["lpf"] = m["lpf"]
+    m_notime["riv"] = m["riv"]
+    m_notime["pcg"] = m["pcg"]
+    m_notime["btn"] = m["btn"]
+    m_notime["adv"] = m["adv"]
+    m_notime["dsp"] = m["dsp"]
+    m_notime["vdf"] = m["vdf"]
+    m_notime["gcg"] = m["gcg"]
+    m_notime["oc"] = m["oc"]
+    return m_notime
+
+
+@pytest.fixture(scope="module")
 def cftime_model(basicmodel):
     m = basicmodel
     ibound = m["bas6"]["ibound"]
@@ -474,6 +492,12 @@ def test_render_cf(cftime_model):
     s = m_cf.render()
 
 
+def test_render_notime(notime_model):
+    m = notime_model
+    m.time_discretization(starttime="2000-01-01", endtime="2000-01-06")
+    s = m.render()
+
+
 def test_mxsscount_incongruent_icbund(basicmodel):
     """
     MT3D relies on the ICBUND to identify constant concentration cells. Seawat
@@ -484,6 +508,8 @@ def test_mxsscount_incongruent_icbund(basicmodel):
 
     This tests makes sure that the IBOUND is also counted in the determination
     of the number of sinks and sources (MXSS).
+
+    This test mutates the basicmodel provided by the fixture!
     """
 
     m = basicmodel
