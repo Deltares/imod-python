@@ -1,5 +1,5 @@
 # make classes directly available under imod.wq
-from imod.wq.adv import AdvectionTVD
+from imod.wq.adv import AdvectionTVD, AdvectionModifiedMOC
 from imod.wq.bas import BasicFlow
 from imod.wq.btn import BasicTransport
 from imod.wq.chd import ConstantHead

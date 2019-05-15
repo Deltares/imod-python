@@ -180,8 +180,6 @@ class AdvectionModifiedMOC(Package):
         0.5 is generally adequate. The value may be adjusted to achieve better
         mass balance. Generally, it can be increased toward 1.0 as advection
         becomes more dominant.
-    interp: int
-        indicates the concentration interpolation method to use in the MMOC scheme.
     nlsink: int
         indicates whether the random or fixed pattern is selected for initial
         placement of particles to approximate sink cells in the MMOC scheme.
@@ -192,8 +190,42 @@ class AdvectionModifiedMOC(Package):
 
     _pkg_id = "adv"
 
-    def __init__(self, courant, tracking, weighting_factor, interp, nlsink, npsink):
+    _template = (
+        "[adv]\n"
+        "    mixelm = 2\n"
+        "    percel = {courant}\n"
+        "    itrack = {tracking}\n"
+        "    wd = {weighting_factor}\n"
+        "    interp = 1\n"
+        "    nplane = {nplane}\n"
+        "    nlsink = {nlsink}\n"
+        "    npsink = {npsink}\n"
+    )
+
+    def __init__(
+        self,
+        courant=1.0,
+        tracking=3,
+        weighting_factor=0.5,
+        nplane=2,
+        nlsink=None,
+        npsink=None,
+    ):
         super(__class__, self).__init__()
+        self["courant"] = courant
+        self["tracking"] = tracking
+        self["weighting_factor"] = weighting_factor
+        self["nplane"] = nplane
+
+        if nlsink is None:
+            self["nlsink"] = nplane
+        else:
+            self["nlsink"] = nlsink
+
+        if npsink is None:
+            self["npsink"] = nplane
+        else:
+            self["npsink"] = npsink
 
 
 class AdvectionHybridMOC(Package):
