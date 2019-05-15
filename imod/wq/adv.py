@@ -166,7 +166,7 @@ class AdvectionModifiedMOC(Package):
         finite-difference, PERCEL is also a stability constraint, which must not
         exceed one and will be automatically reset to one if a value greater
         than one is specified.
-    tracking: int
+    tracking: str, {"euler", "runge-kutta", "hybrid"}
         indicates which particle tracking algorithm is selected for the
         Eulerian-Lagrangian methods. ITRACK = 1, the first-order Euler algorithm is
         used; ITRACK = 2, the fourth-order Runge-Kutta algorithm is used; this
@@ -191,6 +191,8 @@ class AdvectionModifiedMOC(Package):
 
     _pkg_id = "adv"
 
+    _keywords = {"tracking": {"euler": 1, "runge-kutta": 2, "hybrid": 3}}
+
     _template = (
         "[adv]\n"
         "    mixelm = 2\n"
@@ -205,7 +207,7 @@ class AdvectionModifiedMOC(Package):
     def __init__(
         self,
         courant=1.0,
-        tracking=3,
+        tracking="hybrid",
         weighting_factor=0.5,
         sink_particle_placement=0,
         sink_nparticles=15,
