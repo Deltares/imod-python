@@ -180,12 +180,13 @@ class AdvectionModifiedMOC(Package):
         0.5 is generally adequate. The value may be adjusted to achieve better
         mass balance. Generally, it can be increased toward 1.0 as advection
         becomes more dominant.
-    nlsink: int
+    sink_particle_placement: int
         indicates whether the random or fixed pattern is selected for initial
         placement of particles to approximate sink cells in the MMOC scheme.
-    npsink: int
+        (NLSINK)
+    sink_nparticles: int
         is the number of particles used to approximate sink cells in the MMOC
-        scheme.
+        scheme. (NPSINK)
     """
 
     _pkg_id = "adv"
@@ -197,9 +198,8 @@ class AdvectionModifiedMOC(Package):
         "    itrack = {tracking}\n"
         "    wd = {weighting_factor}\n"
         "    interp = 1\n"
-        "    nplane = {nplane}\n"
-        "    nlsink = {nlsink}\n"
-        "    npsink = {npsink}\n"
+        "    nlsink = {sink_particle_placement}\n"
+        "    npsink = {sink_nparticles}\n"
     )
 
     def __init__(
@@ -207,25 +207,16 @@ class AdvectionModifiedMOC(Package):
         courant=1.0,
         tracking=3,
         weighting_factor=0.5,
-        nplane=2,
-        nlsink=None,
-        npsink=None,
+        sink_particle_placement=0,
+        sink_nparticles=15,
     ):
+        # TODO: ask Gu about NPLANE in ModifiedMOC, is nlsink being used as planes?
         super(__class__, self).__init__()
         self["courant"] = courant
         self["tracking"] = tracking
         self["weighting_factor"] = weighting_factor
-        self["nplane"] = nplane
-
-        if nlsink is None:
-            self["nlsink"] = nplane
-        else:
-            self["nlsink"] = nlsink
-
-        if npsink is None:
-            self["npsink"] = nplane
-        else:
-            self["npsink"] = npsink
+        self["sink_particle_placement"] = sink_particle_placement
+        self["sink_nparticles"] = sink_nparticles
 
 
 class AdvectionHybridMOC(Package):

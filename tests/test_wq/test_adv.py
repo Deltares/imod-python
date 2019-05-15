@@ -18,8 +18,7 @@ def test_render__ModifiedMOC():
         "    itrack = 3\n"
         "    wd = 0.5\n"
         "    interp = 1\n"
-        "    nplane = 2\n"
-        "    nlsink = 2\n"
-        "    npsink = 2\n"
+        "    nlsink = 0\n"
+        "    npsink = 15\n"
     )
     assert out == compare
