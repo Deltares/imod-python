@@ -319,7 +319,7 @@ def test_saveopen__cftime_nodim(test_cftimeda):
     da = test_cftimeda.copy().isel(time=0)
     da.name = "testcftime-nodim"
     idf.save("testcftime-nodim", da)
-    loaded = idf.open("testcftime-nodim*.idf").squeeze("time").load()
+    loaded = idf.open("testcftime-nodim*.idf", use_cftime=True).squeeze("time").load()
     assert da.identical(loaded)
 
 
