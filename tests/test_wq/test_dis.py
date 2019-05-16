@@ -76,5 +76,11 @@ def test_render_btn(discret):
     dis = discret.isel(time=0).drop("time")
     globaltimes = ["?"]
 
-    compare = "\n" "    dt0_p? = 0\n" "    ttsmult_p? = 1.0\n" "    mxstrn_p? = 10"
+    compare = (
+        "\n"
+        "    tsmult_p? = 1.0\n"
+        "    dt0_p? = 0\n"
+        "    ttsmult_p? = 1.0\n"
+        "    mxstrn_p? = 10"
+    )
     assert dis._render_btn(globaltimes) == compare

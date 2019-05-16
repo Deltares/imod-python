@@ -434,6 +434,7 @@ def test_render_btn(basicmodel):
         "    prsity_l1 = {pr}_l1.idf\n"
         "    prsity_l2 = {pr}_l2.idf\n"
         "    prsity_l3 = {pr}_l3.idf\n"
+        "    tsmult_p? = 1.0\n"
         "    dt0_p? = 0.0\n"
         "    mxstrn_p? = 50000"
     ).format(
