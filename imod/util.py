@@ -8,6 +8,11 @@ import affine
 import cftime
 import numpy as np
 
+try:
+    Pattern = re._pattern_type
+except AttributeError:
+    Pattern = re.Pattern  # Python 3.7+
+
 
 def decompose(path, pattern=None):
     r"""
@@ -59,7 +64,7 @@ def decompose(path, pattern=None):
     stem = path.stem.lower()
 
     if pattern is not None:
-        if isinstance(pattern, re._pattern_type):
+        if isinstance(pattern, Pattern):
             d = pattern.match(stem).groupdict()
         else:
             # Get the variables between curly braces
