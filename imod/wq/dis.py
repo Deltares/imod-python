@@ -91,7 +91,7 @@ class TimeDiscretization(Package):
     _btn_mapping = (
         #        ("perlen", "duration"), # should not be necessary
         #        ("nstp", "n_timesteps"), # should not be necessary
-        #        ("tsmult", "timestep_multiplier"),
+        ("tsmult", "timestep_multiplier"),
         #        ("tslngh", "timestep_length"),
         ("dt0", "transport_initial_timestep"),
         ("ttsmult", "transport_timestep_multiplier"),
