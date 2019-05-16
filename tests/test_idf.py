@@ -1,3 +1,4 @@
+import contextlib
 import glob
 import os
 import pathlib
@@ -355,6 +356,23 @@ def test_lazy():
     """
     a, _ = idf._dask("test.idf")
     assert "_read" in str(next(a.dask.items())[1])
+
+    # Test whether a change directory doesn't mess up reading a file
+    @contextlib.contextmanager
+    def remember_cwd():
+        """
+        from:
+        https://stackoverflow.com/questions/169070/how-do-i-write-a-decorator-that-restores-the-cwd
+        """
+        curdir = os.getcwd()
+        try:
+            yield
+        finally:
+            os.chdir(curdir)
+
+    with remember_cwd():
+        os.chdir("..")
+        a.compute()
 
 
 def test_save_topbot__single_layer(test_da):

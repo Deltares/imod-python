@@ -266,6 +266,9 @@ def _dask(path, memmap=False, attrs=None, pattern=None):
         A dict with all metadata.
     """
 
+    if isinstance(path, str):
+        path = pathlib.Path(path)
+
     if memmap:
         warnings.warn("memmap option is removed", FutureWarning)
 
@@ -277,8 +280,11 @@ def _dask(path, memmap=False, attrs=None, pattern=None):
     nrow = attrs["nrow"]
     ncol = attrs["ncol"]
     nodata = attrs.pop("nodata")
+    # Dask delayed caches the input arguments. If the working directory changes
+    # before .compute(), the file cannot be found if the path is relative.
+    abspath = path.resolve()
     # dask.delayed requires currying
-    a = dask.delayed(imod.idf._read)(path, headersize, nrow, ncol, nodata)
+    a = dask.delayed(imod.idf._read)(abspath, headersize, nrow, ncol, nodata)
     x = dask.array.from_delayed(a, shape=(nrow, ncol), dtype=np.float32)
     return x, attrs
 
