@@ -82,7 +82,7 @@ class ConstantHeadGroup(PackageGroup):
 
 
 class DrainageGroup(PackageGroup):
-    _cellcount_varname = "conductance"
+    _cellcount_varname = "elevation"
     _template = (
         "[drn]\n"
         "    mdrnsys = {n_systems}\n"
@@ -92,7 +92,7 @@ class DrainageGroup(PackageGroup):
 
 
 class GeneralHeadBoundaryGroup(PackageGroup):
-    _cellcount_varname = "conductance"
+    _cellcount_varname = "head"
     _template = (
         "[ghb]\n"
         "    mghbsys = {n_systems}\n"
@@ -102,7 +102,7 @@ class GeneralHeadBoundaryGroup(PackageGroup):
 
 
 class RiverGroup(PackageGroup):
-    _cellcount_varname = "conductance"
+    _cellcount_varname = "stage"
     _template = (
         "[riv]\n"
         "    mrivsys = {n_systems}\n"
