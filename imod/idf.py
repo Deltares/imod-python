@@ -145,29 +145,6 @@ def _has_dim(seq):
     return True
 
 
-def _xycoords(bounds, cellsizes):
-    """Based on bounds and cellsizes, construct coords with spatial information"""
-    # unpack tuples
-    xmin, xmax, ymin, ymax = bounds
-    dx, dy = cellsizes
-    coords = collections.OrderedDict()
-    # from cell size to x and y coordinates
-    if isinstance(dx, (int, float)):  # equidistant
-        coords["x"] = np.arange(xmin + dx / 2.0, xmax, dx)
-        coords["y"] = np.arange(ymax + dy / 2.0, ymin, dy)
-        coords["dx"] = float(dx)
-        coords["dy"] = float(dy)
-    else:  # nonequidistant
-        # even though IDF may store them as float32, we always convert them to float64
-        dx = dx.astype(np.float64)
-        dy = dy.astype(np.float64)
-        coords["x"] = xmin + np.cumsum(dx) - 0.5 * dx
-        coords["y"] = ymax + np.cumsum(dy) - 0.5 * dy
-        coords["dx"] = ("x", dx)
-        coords["dy"] = ("y", dy)
-    return coords
-
-
 def _to_nan(a, nodata):
     """Change all nodata values in the array to NaN"""
     # it needs to be NaN for xarray to deal with it properly
@@ -485,7 +462,7 @@ def _load(paths, use_cftime, pattern):
     _check_cellsizes(cellsizes)
 
     # create coordinates
-    coords = _xycoords(bounds[0], cellsizes[0])
+    coords = util._xycoords(bounds[0], cellsizes[0])
     dims = ["y", "x"]
     # order matters here due to inserting dims
     if haslayer:

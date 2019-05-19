@@ -10,6 +10,7 @@ import pytest
 import xarray as xr
 
 from imod import idf
+from imod import util
 
 
 def globremove(globpath):
@@ -27,7 +28,7 @@ def test_da(request):
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=np.float32)
 
@@ -61,7 +62,7 @@ def test_nptimeda(request):
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     coords["time"] = pd.date_range("2000-01-01", "2000-01-10", freq="D").values
     ntime = len(coords["time"])
     kwargs = {"name": "testnptime", "coords": coords, "dims": ("time", "y", "x")}
@@ -80,7 +81,7 @@ def test_cftimeda(request):
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     coords["time"] = [
         cftime.DatetimeProlepticGregorian(y, 1, 1) for y in range(1000, 10_000, 1000)
     ]
@@ -101,7 +102,7 @@ def test_layerda(request):
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     coords["layer"] = np.arange(nlay) + 1
     kwargs = {"name": "layer", "coords": coords, "dims": ("layer", "y", "x")}
     data = np.ones((nlay, nrow, ncol), dtype=np.float32)
@@ -124,7 +125,7 @@ def test_timelayerda(request):
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     coords["layer"] = np.arange(nlay) + 8
     coords["time"] = pd.date_range("2000-01-01", "2002-01-01", freq="YS").values
 
@@ -157,7 +158,7 @@ def test_da_nonequidistant(request):
     dy = np.array([-1.3, -0.7, -1.0])
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     kwargs = {"name": "nonequidistant", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=np.float32)
 
@@ -185,7 +186,7 @@ def test_da_subdomains(request):
 
     das = []
     for subd_extent in zip(xmin, xmax, ymin, ymax):
-        kwargs["coords"] = idf._xycoords(subd_extent, (dx, dy))
+        kwargs["coords"] = util._xycoords(subd_extent, (dx, dy))
         das.append(xr.DataArray(data, **kwargs))
 
     def remove():
@@ -207,7 +208,7 @@ def test_open_subdomains(test_da_subdomains):
     assert len(da.x) == 8
     assert len(da.y) == 6
 
-    coords = idf._xycoords((0.0, 8.0, 0.0, 6.0), (1.0, -1.0))
+    coords = util._xycoords((0.0, 8.0, 0.0, 6.0), (1.0, -1.0))
     assert np.all(da["y"].values == coords["y"])
     assert np.all(da["x"].values == coords["x"])
 
@@ -216,7 +217,7 @@ def test_xycoords_equidistant():
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     assert np.allclose(coords["x"], np.arange(xmin + dx / 2.0, xmax, dx))
     assert np.allclose(coords["y"], np.arange(ymax + dy / 2.0, ymin, dy))
     assert coords["dx"] == dx
@@ -228,7 +229,7 @@ def test_xycoords_nonequidistant():
     dy = np.array([-1.3, -0.7, -1.0])
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     assert np.allclose(coords["x"], np.array([0.45, 1.45, 2.4, 3.4]))
     assert np.allclose(coords["y"], np.array([2.35, 1.35, 0.5]))
     assert coords["dx"][0] == "x"

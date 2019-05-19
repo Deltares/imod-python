@@ -399,7 +399,7 @@ def test_regrid_coord():
     dy = np.array([-1.3, -0.7, -1.0])
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
-    coords = imod.idf._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    coords = imod.util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     kwargs = {"name": "nonequidistant", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=np.float32)
     da = xr.DataArray(data, **kwargs)
