@@ -42,7 +42,7 @@ setup(
             "nbstripout",
             "black",
         ],
-        "optional": ["rasterio>=1"],
+        "optional": ["rasterio>=1", "geopandas"],
     },
     classifiers=[
         # https://pypi.python.org/pypi?%3Aaction=list_classifiers
