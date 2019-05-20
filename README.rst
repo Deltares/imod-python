@@ -3,7 +3,7 @@
 .. image:: https://gitlab.com/deltares/imod/imod-python/badges/master/coverage.svg
    :target: https://gitlab.com/deltares/imod/imod-python/commits/master
 
-Work with `iMOD <http://oss.deltares.nl/web/imod>`__ MODFLOW models in
+Work with `iMOD <https://oss.deltares.nl/web/imod>`__ MODFLOW models in
 Python.
 
 Documentation: https://deltares.gitlab.io/imod/imod-python/
