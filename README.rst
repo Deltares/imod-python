@@ -23,7 +23,7 @@ Getting started
 
     # get all calculated heads in a xarray DataArray
     # with dimensions time, layer, y, x
-    da = imod.io.idf.open('path/to/results/head_*.idf')
+    da = imod.idf.open('path/to/results/head_*.idf')
 
 Introduction
 ============
