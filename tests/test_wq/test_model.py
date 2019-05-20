@@ -233,7 +233,15 @@ def test_render_gen(basicmodel):
         "    start_month = 01\n"
         "    start_day = 01"
     )
-    assert m._render_gen(modelname=modelname, globaltimes=globaltimes) == compare
+    assert (
+        m._render_gen(
+            modelname=modelname,
+            globaltimes=globaltimes,
+            writehelp=False,
+            result_dir="results",
+        )
+        == compare
+    )
 
 
 def test_render_pgk__gcg(basicmodel):

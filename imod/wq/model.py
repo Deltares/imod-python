@@ -1,5 +1,6 @@
 import collections
 import pathlib
+import os
 
 import cftime
 import imod
@@ -48,7 +49,7 @@ class SeawatModel(Model):
         "    runtype = SEAWAT\n"
         "    modelname = {{modelname}}\n"
         "    writehelp = {{writehelp}}\n"
-        "    result_dir = results\n"
+        "    result_dir = {{result_dir}}\n"
         "    packages = {{package_set|join(', ')}}\n"
         "    coord_xll = {{xmin}}\n"
         "    coord_yll = {{ymin}}\n"
@@ -153,7 +154,7 @@ class SeawatModel(Model):
             timestep_duration=timestep_duration
         )
 
-    def _render_gen(self, modelname, globaltimes, writehelp=False):
+    def _render_gen(self, modelname, globaltimes, writehelp, result_dir):
         package_set = set([pkg._pkg_id for pkg in self.values()])
         package_set.update(("btn", "ssm"))
         package_set = sorted(package_set)
@@ -171,7 +172,7 @@ class SeawatModel(Model):
         d = {}
         d["modelname"] = modelname
         d["writehelp"] = writehelp
-        d["result_dir"] = modelname
+        d["result_dir"] = result_dir
         d["xmin"] = xmin
         d["xmax"] = xmax
         d["ymin"] = ymin
@@ -285,19 +286,25 @@ class SeawatModel(Model):
 
         return n_extra
 
-    def render(self, writehelp=False):
+    def render(self, writehelp=False, result_dir=None):
         """
         Render the runfile as a string, package by package.
         """
         diskey = self._get_pkgkey("dis")
         globaltimes = self[diskey]["time"].values
-        # directory = pathlib.Path(self.modelname)
+        # Always set the directory relative to the runfile
+        # since imod-wq will generate the namefile here as well.
         directory = pathlib.Path(".")
+        if result_dir is None:
+            result_dir = "results"
 
         content = []
         content.append(
             self._render_gen(
-                modelname=self.modelname, globaltimes=globaltimes, writehelp=writehelp
+                modelname=self.modelname,
+                globaltimes=globaltimes,
+                writehelp=writehelp,
+                result_dir=result_dir,
             )
         )
         content.append(self._render_dis(directory=directory, globaltimes=globaltimes))
@@ -335,9 +342,19 @@ class SeawatModel(Model):
 
         return "\n\n".join(content)
 
-    def write(self, directory="."):
-        runfile_content = self.render()
-        directory = pathlib.Path(directory).joinpath(self.modelname)
+    def write(self, directory=".", result_dir=None):
+        if isinstance(directory, str):
+            directory = pathlib.Path(directory).joinpath(self.modelname)
+        # imod-wq has the somewhat annoying feature that it dumps the namefile
+        # and associated input files into the working directory. To keep
+        # directories clean, this means it's a bad idea to run a model in root
+        # directories. This relpath operation allows for defining the the
+        # result directory relative to the Python working directory, but
+        # result_dir written in the runfile will be RELATIVE TO the runfile, so
+        # it ends up in the right place when you call imod-wq in that
+        # directory.
+        result_dir = pathlib.Path(os.path.relpath(result_dir, directory))
+        runfile_content = self.render(writehelp=False, result_dir=result_dir)
         directory.mkdir(exist_ok=True, parents=True)
         runfilepath = directory.joinpath(f"{self.modelname}.run")
         # Write the runfile
