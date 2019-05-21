@@ -25,7 +25,7 @@ def read_imod_legend(path):
     leg = pd.read_csv(
         path,
         header=1,
-        sep="[\s,]+",
+        sep=r"[\s,]+",
         index_col=False,
         engine="python",
         usecols=[0, 1, 2, 3, 4],
