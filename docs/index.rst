@@ -6,10 +6,10 @@
 iMOD-Python documentation
 =========================
 
-Work with `iMOD <http://oss.deltares.nl/web/imod>`__ MODFLOW models in
+Work with `iMOD <https://oss.deltares.nl/web/imod>`__ MODFLOW models in
 Python.
 
-Documentation: https://deltares.gitlab.io/deltares/imod-python/
+Documentation: https://deltares.gitlab.io/imod/imod-python/
 
 Source code: https://gitlab.com/deltares/imod/imod-python
 
@@ -17,6 +17,7 @@ Source code: https://gitlab.com/deltares/imod/imod-python
    :maxdepth: 4
    :caption: Contents:
 
+   installation
    imod
 
 Getting started

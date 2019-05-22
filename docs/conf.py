@@ -14,7 +14,6 @@
 #
 # import os
 # import sys
-import re
 import imod
 
 # sys.path.insert(0, 'd:\code\py\imod\imod')
@@ -182,13 +181,6 @@ epub_exclude_files = ["search.html"]
 
 
 # -- Extension configuration -------------------------------------------------
-
-# Settings for sphinxcontrib-versioning
-# https://robpol86.github.io/sphinxcontrib-versioning/settings.html
-# For now only build selected branches, no tags
-scv_root_ref = "master"
-scv_whitelist_branches = ("release", "master")
-scv_whitelist_tags = (re.compile("a^"),)
 
 # Settings for sphinxcontrib.googleanalytics
 googleanalytics_id = "UA-138606256-1"

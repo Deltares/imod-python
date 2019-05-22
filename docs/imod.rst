@@ -30,7 +30,7 @@ imod.ipf module
     :show-inheritance:
 
 imod.prepare module
----------------
+-------------------
 
 .. automodule:: imod.prepare
     :members:

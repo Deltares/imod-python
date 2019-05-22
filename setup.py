@@ -33,11 +33,10 @@ setup(
         "Jinja2",
     ],
     extras_require={
-        # sphinx version requirement due to sphinxcontrib-versioning
         "dev": [
             "pytest",
             "pytest-cov",
-            "sphinx==1.7.9",
+            "sphinx",
             "sphinx_rtd_theme",
             "nbstripout",
             "black",

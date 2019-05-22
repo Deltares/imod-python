@@ -17,7 +17,7 @@ def write(path, da, driver=None, nodata=np.nan):
         The DataArray to be written. Should have only x and y dimensions.
     driver: str; optional
         Which GDAL format driver to use. The complete list is at
-        http://www.gdal.org/formats_list.html.
+        https://www.gdal.org/formats_list.html.
         By default tries to guess from the file extension.
     nodata: float
         Nodata value to use. Should be convertible to the DataArray and GDAL dtype.
