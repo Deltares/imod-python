@@ -17,6 +17,7 @@ Source code: https://gitlab.com/deltares/imod/imod-python
    :maxdepth: 4
    :caption: Contents:
 
+   installation
    imod
 
 Getting started
