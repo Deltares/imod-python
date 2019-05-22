@@ -1,6 +1,8 @@
 import collections
+import contextlib
 import pathlib
 import os
+import subprocess
 
 import cftime
 import imod
@@ -343,23 +345,56 @@ class SeawatModel(Model):
         return "\n\n".join(content)
 
     def write(self, directory=".", result_dir=None):
+        """
+        Parameters
+        ----------
+        directory : str, pathlib.Path
+            Directory into which the model input will be written. The model
+            input will be written into a (new) directory, equal to the given
+            modelname.
+        result_dir : str, pathlib.Path
+            Path to directory in which output will be written when running the
+            model. Is written as the value of the `result_dir` key in the
+            runfile.
+
+            The value path given here will be resolved *relative* to the
+            runfile before being written into the runfile. The reason for
+            this is that imod-wq writes a number of files in the working
+            directory. This serves to help keep directories tidy.
+
+            See the examples.
+
+        Returns
+        -------
+        None
+            Writes model input files.
+
+        Examples
+        --------
+        Say we wish to write the model input to a file called input, and we
+        desire that when running the model, the results end up in a directory
+        called output. We may run:
+
+        >>> model.write(directory="input", result_dir="output")
+
+        And in the runfile, a value of `../../output` will be written for
+        result_dir.
+        """
         if isinstance(directory, str):
             directory = pathlib.Path(directory).joinpath(self.modelname)
-        # imod-wq has the somewhat annoying feature that it dumps the namefile
-        # and associated input files into the working directory. To keep
-        # directories clean, this means it's a bad idea to run a model in root
-        # directories. This relpath operation allows for defining the the
-        # result directory relative to the Python working directory, but
-        # result_dir written in the runfile will be RELATIVE TO the runfile, so
-        # it ends up in the right place when you call imod-wq in that
-        # directory.
-        result_dir = pathlib.Path(os.path.relpath(result_dir, directory))
+        if result_dir is None:
+            result_dir = "results"
+        else:
+            result_dir = pathlib.Path(os.path.relpath(result_dir, directory))
+
         runfile_content = self.render(writehelp=False, result_dir=result_dir)
-        directory.mkdir(exist_ok=True, parents=True)
         runfilepath = directory.joinpath(f"{self.modelname}.run")
+        directory.mkdir(exist_ok=True, parents=True)
+
         # Write the runfile
         with open(runfilepath, "w") as f:
             f.write(runfile_content)
+
         # Write all IDFs and IPFs
         for pkgname, pkg in self.items():
             if "x" in pkg.coords and "y" in pkg.coords:

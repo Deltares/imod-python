@@ -79,7 +79,7 @@ We highly recommend installing packages via conda. Conda is a package and
 environment manager that install packages from a remote repository. Pip
 (acronym for "Pip install packages") can also be used for installing Python
 packages, but was designed mainly to install pure Python packages, without
-binary dependencies; trying to `pip install` packages with complex depencies
+binary dependencies; trying to ``pip install`` packages with complex depencies
 is therefore a recipe for frustration and disaster.
 
 Conda does several things, primarily: it provides isolated Python

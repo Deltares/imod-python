@@ -1,4 +1,5 @@
 import pathlib
+import shutil
 
 import imod
 import imod.wq
@@ -127,6 +128,14 @@ def basicmodel(request):
         lump_dispersion=True,
     )
     m["oc"] = imod.wq.OutputControl(save_head_idf=True, save_concentration_idf=True)
+
+    def teardown():
+        try:
+            shutil.rmtree("test_model")
+        except FileNotFoundError:
+            pass
+
+    request.addfinalizer(teardown)
 
     return m
 
@@ -528,3 +537,15 @@ def test_mxsscount_incongruent_icbund(basicmodel):
     n_sinkssources = m._bas_btn_rch_sinkssources()
     print(n_sinkssources)
     assert n_sinkssources == 100
+
+
+def test_write(basicmodel):
+    basicmodel.write()
+    assert pathlib.Path("test_model").exists()
+    # TODO: more rigorous testing
+
+
+def test_write_result_dir(basicmodel):
+    basicmodel.write(result_dir="results")
+    assert pathlib.Path("test_model").exists()
+    # TODO: more rigorous testing
