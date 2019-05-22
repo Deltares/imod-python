@@ -6,29 +6,44 @@ A bit of background
 
 Here's a an overview of a few relevant terms:
 
-* Interpreter: pragmatically defined, an interpreter is a computer program that executes instructions interactively.
+* Interpreter: pragmatically defined, an interpreter is a computer program that
+  executes instructions interactively.
 
-    * The ``python.exe`` you find in your Python installation is an interpreter. It will run commands one by one.
-    * Interpreted programming languages are often contrasted against compiled programming languages. 
+    * The ``python.exe`` you find in your Python installation is an interpreter.
+      It will run commands one by one.
+    * Interpreted programming languages are often contrasted against compiled
+      programming languages.
     * Python is an interpreted language, as is R, for example.
 
-* Compilation: the act of translating a program from source code (human-readable text form) to machine code.
+* Compilation: the act of translating a program from source code (human-readable
+  text form) to machine code.
 
-    * Machine code is the set of low level instructions that a processor understands.
-    * A compiled program doesn't run line by line, but rather builds to entire program first, and then be called to execute. We're greatly simplifying, but the general idea is: building the entire program at once allows for optimization. This means that compiled languages are generally (much) faster than interpreted languages. 
+    * Machine code is the set of low level instructions that a processor
+      understands.
+    * A compiled program doesn't run line by line, but rather builds to entire
+      program first, and then be called to execute. We're greatly simplifying,
+      but the general idea is: building the entire program at once allows for
+      optimization. This means that compiled languages are generally (much)
+      faster than interpreted languages.
     * C, C++, and Fortran are examples of compiled languages.
-    * The most popular Python interpreter, CPython, is a compiled program written in C!
-    * Depending on operating system (Linux, MacOS, Windows) and processor architecture(e.g. x86, ARM; 32 bit versus 64 bit), different machine code has to be generated.
-    
-* A Python installation includes the Python interpreter, and the Python
-* standard library: modules to deal with dates, calendars, mathematics, file
-* handling, etc.
+    * The most popular Python interpreter, CPython, is a compiled program
+      written in C!
+    * Depending on operating system (Linux, MacOS, Windows) and processor
+      architecture(e.g. x86, ARM; 32 bit versus 64 bit), different machine code
+      has to be generated.
 
 And a few notes specific to Python:
 
-* Package: a collection of files that provide a certain set of functionality. For example: the ``numpy`` package for working with large, multi-dimension arrays and matrices.
-* A Python package generally consists of several modules. These are generally the invididual ``.py`` files.
-* In terms of files: packages can exist out of single module (``.py`` file), or a set of directories "marked" with a ``__init__.py`` file.
+* A Python installation includes the Python interpreter, and the Python
+  standard library: modules to deal with dates, calendars, mathematics, file
+  handling, etc.
+* Package: a collection of files that provide a certain set of
+  functionality. For example: the ``numpy`` package for working with large,
+  multi-dimension arrays and matrices.
+* A Python package generally consists of several modules. These are generally
+  the invididual ``.py`` files.
+* In terms of files: packages can exist out of single module (``.py`` file), or
+  a set of directories "marked" with a ``__init__.py`` file.
 
 Generally, we would like to write the entire program in one language. Due to
 slowness of interpreted languages, this has not been feasible within Python;
@@ -48,11 +63,13 @@ Dependency conflicts
 Multiple packages often share dependencies, but they might depend on
 different, incompatible, versions. For example, package ``B`` and ``C`` might
 both rely on package ``A``; but ``B`` relies on version ``A.1``, and ``C``
-relies on version ``A.2``. Typically, you might succeed in installing a
-version of ``B`` and ``C`` that use the same version of ``A``, but you'll
-find that suddenly package ``D`` (which also depends on a version of A) will
-no longer work. This state of affairs is colloquially called `"dependency
-hell" <https://en.wikipedia.org/wiki/Dependency_hell>`_.
+relies on version ``A.2``.
+
+Typically, you might succeed in installing a version of ``B`` and ``C`` that
+use the same version of ``A``, but you'll find that suddenly package ``D``
+(which also depends on a version of ``A``) will no longer work. This state of
+affairs is colloquially called `"dependency hell"
+<https://en.wikipedia.org/wiki/Dependency_hell>`_.
 
 
 Installing Python packages with conda -- `without the agonizing pain <https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.110.418>`_
@@ -75,6 +92,7 @@ and Misconceptions
 <https://jakevdp.github.io/blog/2016/08/25/conda-myths-and-misconceptions/>`_
 for additional information.
 
+
 Anaconda and Miniconda
 ----------------------
 
@@ -89,7 +107,6 @@ You can find installers for Miniconda or Anaconda here:
 
 * https://conda.io/miniconda.html
 * https://www.anaconda.com/distribution/
-
 
 During installation, tick the box "Add Anaconda to PATH", even though it
 colors a suggestive red.
@@ -154,7 +171,7 @@ file.
 Environments can be "activated" by running ``conda activate {name of
 environment}``. Active the just installed environment by running ``conda
 activate imod``. This essentially temporarily updates your `PATH variable
-<https://en.wikipedia.org/wiki/PATH_(variable)>`_ which is the set of
+<https://en.wikipedia.org/wiki/PATH_(variable)>`_, which is the set of
 directories where executable programs are located. After deactivating the
 conda environment, either via `conda deactivate` or by closing the command
 prompt, these directories are removed from PATH again so that the Python
@@ -171,9 +188,9 @@ installs the version available on the `Python Package Index
 <https://pypi.org/>`_.
 
 Since we're currently in the process of adding a lot of features, the version
-on PyPI doesn't always install the latest version. To get the latest version,
-activate the environment, clone the reposistory to a repository of choice,
-and do a "development install":
+on PyPI doesn't always install the carry the latest updates. To get the
+latest version, activate the environment, clone the reposistory to a
+repository of choice, and do a "development install":
 
 .. code-block:: console
 
