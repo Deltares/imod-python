@@ -110,10 +110,9 @@ def _formation_number(tops, bots, ztop, zbot, out):
 
 
 @numba.njit
-def _fill_in_by_formation(formation, kh, kv):
+def _fill_in_by_formation(formation, src):
     nlay, nrow, ncol = formation.shape
-    kh_out = np.full((nlay, nrow, ncol), np.nan)
-    kv_out = np.full((nlay, nrow, ncol), np.nan)
+    dst = np.full((nlay, nrow, ncol), np.nan)
     for i in range(nlay):
         for j in range(nrow):
             for k in range(ncol):
@@ -121,38 +120,82 @@ def _fill_in_by_formation(formation, kh, kv):
                 if f < 0:
                     continue
                 else:
-                    # lookup the appropriate value
-                    khf = kh[f, j, k]
-                    kvf = kv[f, j, k]
-                    # Since GeoTOP has only kh or kv
-                    # and we need both
-                    if np.isnan(khf):
-                        khf = kvf
-                    if np.isnan(kvf):
-                        kvf = khf
-                    kh_out[i, j, k] = khf
-                    kv_out[i, j, k] = kvf
-    return kh_out, kv_out
+                    # look up the appropriate value
+                    v = src[f, j, k]
+                    dst[i, j, k] = v
+    return dst
 
 
-def voxelize(regis, like, dz):
-    top = regis["top"]
-    bot = regis["bot"]
-    kh = regis["kh"]
-    kv = regis["kv"]
+def voxelize(top, bottom, like, *parameters):
+    """
+    Turn a layer model into a voxel model.
+
+    Parameters
+    ----------
+    top: xr.DataArray
+        Top elevation of layers
+        with dimensions ("layer", "y", "x")
+    bottom: xr.DataArray
+        Bottom elevaion of layers
+        with dimensions ("layer", "y", "x")
+    like: xr.DataArray
+        Example of what the output should look like.
+        with dimensions ("z", "y", "x); or ("layer", "y", "x") with
+        coordinate "z": ("layer", z)
+    parameters: xr.DataArray(s)
+        variable number of parameters to voxelize with dimensions
+        ("layer", "y", "x")
+
+    Returns
+    -------
+    voxelized parameters : single, or tuple of, xr.DataArray
+        Have identical dimensions and coordinates as `like`.
+    """
+
+    def dim_format(dims):
+        return ", ".join(dim for dim in dims)
+
     # Checks on inputs
-    assert top.dims == bot.dims == kh.dims == kv.dims
-    assert top.dims == ("formation", "y", "x")
-    assert like.dims == ("z", "y", "x")
-    assert (np.diff(like.coords["z"]) == 0.50).all()
-    assert np.array_equal(top.coords["y"], like.coords["y"])
-    assert np.array_equal(top.coords["x"], like.coords["x"])
+    if not like.dims == ("z", "y", "x"):
+        if like.dims == ("layer", "y", "x"):
+            if not "z" in like.coords:
+                raise ValueError('"z" has to be given in `like` coordinates')
+        else:
+            raise ValueError(
+                '`like` coordinates need to be exactly ("z", "y", "x"); or'
+                ' ("layer", "y", "x") with coordinate "z": ("layer", z).'
+                f" Got instead: {dim_format(like.dims)}."
+            )
+    if "dz" not in like.coords:
+        dzs = np.diff(like.coords["z"].values)
+        dz = dzs[0]
+        if not np.allclose(dzs, dz):
+            raise ValueError(
+                '"dz" has to be given as a coordinate in case of'
+                ' non-equidistant "z" coordinate.'
+            )
+        like["dz"] = dz
+    for da in [top, bottom, *parameters]:
+        if not da.dims == ("layer", "y", "x"):
+            raise ValueError(
+                "Dimensions for top, bottom, and parameters have to be exactly"
+                f' ("layer", "y", "x"). Got instead {dim_format(da.dims)}.'
+            )
+    for da in [bottom, *parameters]:
+        for (k1, v1), (_, v2) in zip(top.coords.items(), da.coords.items()):
+            if not v1.equals(v2):
+                raise ValueError(f"Input coordinates do not match along {k1}")
 
     formation = np.full_like(like.values, -2147483648, dtype=np.int)
-    ztop = like.coords["z"] + 0.25
-    zbot = like.coords["z"] - 0.25
+    ztop = like.coords["z"] + 0.5 * np.abs(like.coords["dz"])
+    zbot = like.coords["z"] - 0.5 * np.abs(like.coords["dz"])
     formation = _formation_number(
-        top.values, bot.values, ztop.values, zbot.values, formation
+        top.values, bottom.values, ztop.values, zbot.values, formation
     )
-    kh_out, kv_out = _fill_in_by_formation(formation, kh.values, kv.values)
-    return xr.full_like(like, kh_out), xr.full_like(like, kv_out)
+    arrays = [p.values for p in parameters]
+    voxelized = [_fill_in_by_formation(formation, a) for a in arrays]
+
+    if len(voxelized) > 1:
+        return tuple(xr.full_like(like, a) for a in voxelized)
+    else:
+        return xr.full_like(like, voxelized[0])
