@@ -46,7 +46,7 @@ def example_legend(request):
 
 def test_read_legend(example_legend):
 
-    colors, levels = imod.visualize.spatial.read_imod_legend("example_legend.leg")
+    colors, levels = imod.visualize.spatial.read_imod_legend(path="example_legend.leg")
 
     assert colors == [
         "#00007d",
@@ -89,9 +89,10 @@ def test_read_legend(example_legend):
 
 def test_plot_map():
     fig, ax = imod.visualize.spatial.plot_map(
-        xr.DataArray(np.random.randn(2, 3), dims=("x", "y")),
-        ["#ff0000", "#00ff00", "#0000ff"],
-        [0.2, 0.8],
+        raster=xr.DataArray(np.random.randn(2, 3), dims=("x", "y")),
+        legend_colors=["#ff0000", "#00ff00", "#0000ff"],
+        legend_levels=[0.2, 0.8],
     )
 
     assert isinstance(fig, plt.Figure)
+    assert isinstance(ax, plt.Axes)
