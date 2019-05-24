@@ -13,6 +13,7 @@ from imod import util
 # subpackages
 import imod.prepare
 import imod.wq
+import imod.visualize
 
 # since this is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
