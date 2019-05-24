@@ -10,11 +10,10 @@ import imod
 
 @pytest.fixture(scope="function")
 def write_legend(request):
-
     def _write_legend(delim):
         legend_content = (
-            '17{delim}1{delim}1{delim}1{delim}1{delim}1{delim}1{delim}1\n'
-            'UPPERBND{delim}LOWERBND{delim}IRED{delim}IGREEN{delim}IBLUE{delim}DOMAIN\n'
+            "17{delim}1{delim}1{delim}1{delim}1{delim}1{delim}1{delim}1\n"
+            "UPPERBND{delim}LOWERBND{delim}IRED{delim}IGREEN{delim}IBLUE{delim}DOMAIN\n"
             '200.0{delim}10.00{delim}75{delim}0{delim}0{delim}"> 10 m"\n'
             '10.00{delim}6.000{delim}115{delim}0{delim}0{delim}"6.0 - 10.0 m"\n'
             '6.000{delim}4.000{delim}166{delim}0{delim}0{delim}"4.0 - 6.0 m"\n'
