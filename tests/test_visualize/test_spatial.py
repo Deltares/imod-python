@@ -1,39 +1,40 @@
 import os
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 import xarray as xr
-import matplotlib.pyplot as plt
 
 import imod
 
 
-@pytest.fixture(scope="module")
-def example_legend(request):
-    legend_content = """
-   17    1    1    1    1    1    1    1
- UPPER BND LOWER BND      IRED    IGREEN     IBLUE     DOMAIN
- 200.0      10.00             75          0          0 "> 10 m"
- 10.00      6.000            115          0          0 "6.0 - 10.0 m"
- 6.000      4.000            166          0          0 "4.0 - 6.0 m"
- 4.000      3.000            191          0          0 "3.0 - 4.0 m"
- 3.000      2.500            217          0          0 "2.5 - 3.0 m"
- 2.500      2.000            237          0          0 "2.0 - 2.5 m"
- 2.000      1.800            255         85          0 "1.8 - 2.0 m"
- 1.800      1.600            254        140          0 "1.6 - 1.8 m"
- 1.600      1.400            254        191         10 "1.4 - 1.6 m"
- 1.400      1.200            254        221         51 "1.2 - 1.4 m"
- 1.200      1.000            254        255        115 "1.0 - 1.2 m"
- 1.000     0.8000            255        255        190 "0.8 - 1.0 m"
-0.8000     0.6000            136        255         72 "0.6 - 0.8 m"
-0.6000     0.4000              0        168          0 "0.4 - 0.6 m"
-0.4000     0.2000              0        206        206 "0.2 - 0.4 m"
-0.2000      0.000             17         17        255 "0 - 0.2 m"
- 0.000     -200.0              0          0        125 "< 0 m"
-    """
+@pytest.fixture(scope="function")
+def write_legend(request):
 
-    with open("example_legend.leg", "w") as f:
-        f.write(legend_content)
+    def _write_legend(delim):
+        legend_content = (
+            '17{delim}1{delim}1{delim}1{delim}1{delim}1{delim}1{delim}1\n'
+            'UPPERBND{delim}LOWERBND{delim}IRED{delim}IGREEN{delim}IBLUE{delim}DOMAIN\n'
+            '200.0{delim}10.00{delim}75{delim}0{delim}0{delim}"> 10 m"\n'
+            '10.00{delim}6.000{delim}115{delim}0{delim}0{delim}"6.0 - 10.0 m"\n'
+            '6.000{delim}4.000{delim}166{delim}0{delim}0{delim}"4.0 - 6.0 m"\n'
+            '4.000{delim}3.000{delim}191{delim}0{delim}0{delim}"3.0 - 4.0 m"\n'
+            '3.000{delim}2.500{delim}217{delim}0{delim}0{delim}"2.5 - 3.0 m"\n'
+            '2.500{delim}2.000{delim}237{delim}0{delim}0{delim}"2.0 - 2.5 m"\n'
+            '2.000{delim}1.800{delim}255{delim}85{delim}0{delim}"1.8 - 2.0 m"\n'
+            '1.800{delim}1.600{delim}254{delim}140{delim}0{delim}"1.6 - 1.8 m"\n'
+            '1.600{delim}1.400{delim}254{delim}191{delim}10{delim}"1.4 - 1.6 m"\n'
+            '1.400{delim}1.200{delim}254{delim}221{delim}51{delim}"1.2 - 1.4 m"\n'
+            '1.200{delim}1.000{delim}254{delim}255{delim}115{delim}"1.0 - 1.2 m"\n'
+            '1.000{delim}0.800{delim}255{delim}255{delim}190{delim}"0.8 - 1.0 m"\n'
+            '0.800{delim}0.600{delim}136{delim}255{delim}72{delim}"0.6 - 0.8 m"\n'
+            '0.600{delim}0.400{delim}0{delim}168{delim}0{delim}"0.4 - 0.6 m"\n'
+            '0.400{delim}0.200{delim}0{delim}206{delim}206{delim}"0.2 - 0.4 m"\n'
+            '0.200{delim}0.000{delim}17{delim}17{delim}255{delim}"0 - 0.2 m"\n'
+            '0.000{delim}200.0{delim}0{delim}0{delim}125{delim}"< 0 m"\n'
+        )
+        with open("example_legend.leg", "w") as f:
+            f.write(legend_content.format(delim=delim))
 
     def teardown():
         try:
@@ -42,10 +43,12 @@ def example_legend(request):
             pass
 
     request.addfinalizer(teardown)
+    return _write_legend
 
 
-def test_read_legend(example_legend):
-
+@pytest.mark.parametrize("delim", [",", " ", "\t"])
+def test_read_legend(write_legend, delim):
+    write_legend(delim=delim)
     colors, levels = imod.visualize.spatial.read_imod_legend(path="example_legend.leg")
 
     assert colors == [
@@ -90,9 +93,8 @@ def test_read_legend(example_legend):
 def test_plot_map():
     fig, ax = imod.visualize.spatial.plot_map(
         raster=xr.DataArray(np.random.randn(2, 3), dims=("x", "y")),
-        legend_colors=["#ff0000", "#00ff00", "#0000ff"],
-        legend_levels=[0.2, 0.8],
+        colors=["#ff0000", "#00ff00", "#0000ff"],
+        levels=[0.2, 0.8],
     )
-
     assert isinstance(fig, plt.Figure)
     assert isinstance(ax, plt.Axes)
