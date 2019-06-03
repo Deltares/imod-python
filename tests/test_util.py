@@ -103,6 +103,17 @@ def test_decompose_steady_state():
     assert d == refd
 
 
+def test_decompose_underscore_in_name():
+    d = util.decompose("path/to/some_name.idf")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("path", "to"),
+        "name": "some_name",
+    }
+    assert isinstance(d, dict)
+    assert d == refd
+
+
 def test_decompose_regexpattern():
     pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)", re.IGNORECASE)
     d = util.decompose("headL11.idf", pattern=pattern)
