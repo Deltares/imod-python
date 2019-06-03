@@ -101,7 +101,7 @@ def decompose(path, pattern=None):
         d["name"] = "_".join(d.values())
 
     # steady-state as time identifier isn't picked up by <time>[0-9] regex, so strip from name
-    d["name"] = d["name"].replace("_steady-state","") 
+    d["name"] = d["name"].replace("_steady-state", "")
 
     # String -> type conversion
     if "layer" in d.keys():
