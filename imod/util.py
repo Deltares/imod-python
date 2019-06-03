@@ -84,9 +84,11 @@ def decompose(path, pattern=None):
             re_pattern = re.compile(base_pattern)
             d = re_pattern.match(stem).groupdict()
         except AttributeError:  # probably no time
-            base_pattern = r"(?P<name>[\w]+)"
+            base_pattern = r"(?P<name>[\w-]+)"
             if has_layer:
                 base_pattern += r"_l(?P<layer>[0-9]+)"
+            print(base_pattern)
+            print(stem)
             re_pattern = re.compile(base_pattern)
             d = re_pattern.match(stem).groupdict()
 

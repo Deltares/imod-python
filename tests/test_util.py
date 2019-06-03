@@ -35,6 +35,19 @@ def test_decompose():
     assert d == refd
 
 
+def test_decompose_short_date():
+    d = util.decompose("path/to/head_20180222_l5.idf")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("path", "to"),
+        "name": "head",
+        "time": datetime.datetime(2018, 2, 22),
+        "layer": 5,
+    }
+    assert isinstance(d, dict)
+    assert d == refd
+
+
 def test_decompose_underscore():
     d = util.decompose("path/to/starting_head_20180222090657_l5.idf")
     refd = {
@@ -56,6 +69,29 @@ def test_decompose_dash():
         "name": "starting-head",
         "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
         "layer": 5,
+    }
+    assert isinstance(d, dict)
+    assert d == refd
+
+
+def test_decompose_steady_state():
+    d = util.decompose("path/to/head_steady-state_l64.idf")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("path", "to"),
+        "name": "head",
+        "layer": 64,
+    }
+    assert isinstance(d, dict)
+    assert d == refd
+
+
+def test_decompose_underscore_in_name():
+    d = util.decompose("path/to/some_name.idf")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("path", "to"),
+        "name": "some_name",
     }
     assert isinstance(d, dict)
     assert d == refd
@@ -86,29 +122,6 @@ def test_decompose_pattern_dash():
         "name": "starting-head",
         "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
         "layer": 5,
-    }
-    assert isinstance(d, dict)
-    assert d == refd
-
-
-def test_decompose_steady_state():
-    d = util.decompose("path/to/head_steady-state_l64.idf")
-    refd = {
-        "extension": ".idf",
-        "directory": pathlib.Path("path", "to"),
-        "name": "head",
-        "layer": 64,
-    }
-    assert isinstance(d, dict)
-    assert d == refd
-
-
-def test_decompose_underscore_in_name():
-    d = util.decompose("path/to/some_name.idf")
-    refd = {
-        "extension": ".idf",
-        "directory": pathlib.Path("path", "to"),
-        "name": "some_name",
     }
     assert isinstance(d, dict)
     assert d == refd
