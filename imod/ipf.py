@@ -24,10 +24,10 @@ def _read(path, kwargs={}, assoc_kwargs={}):
         globpath for IPF files to read.
     kwargs : dict
         Dictionary containing the `pandas.read_csv()` keyword arguments for the
-        IPF files (e.g. `whitespace_delimited: True`)
+        IPF files (e.g. `{"delim_whitespace": True}`)
     assoc_kwargs: dict
         Dictionary containing the `pandas.read_csv()` keyword arguments for the
-        associated (TXT) files (e.g. `whitespace_delimited: True`)
+        associated (TXT) files (e.g. `{"delim_whitespace": True}`)
 
     Returns
     -------
@@ -82,7 +82,7 @@ def read_associated(path, kwargs={}):
         Path to associated file.
     kwargs : dict
         Dictionary containing the `pandas.read_csv()` keyword arguments for the
-        associated (TXT) file (e.g. `whitespace_delimited: True`)
+        associated (TXT) file (e.g. `{"delim_whitespace": True}`)
 
     Returns
     -------
@@ -194,10 +194,10 @@ def read(path, kwargs={}, assoc_kwargs={}):
         globpath for IPF files to load.
     kwargs : dict
         Dictionary containing the `pandas.read_csv()` keyword arguments for the
-        IPF files (e.g. `whitespace_delimited: True`)
+        IPF files (e.g. `{"delim_whitespace": True}`)
     assoc_kwargs: dict
         Dictionary containing the `pandas.read_csv()` keyword arguments for the
-        associated (TXT) files (e.g. `whitespace_delimited: True`)
+        associated (TXT) files (e.g. `{"delim_whitespace": True}`)
 
     Returns
     -------
