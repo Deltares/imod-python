@@ -78,15 +78,15 @@ def decompose(path, pattern=None):
     else:  # Default to "iMOD conventions": {name}_{time}_l{layer}
         has_layer = bool(re.search(r"_l\d+$", stem))
         try:  # try for time
-            base_pattern = r"(?P<name>[\w-]+)_(?P<time>[\w-]+)"
+            base_pattern = r"(?P<name>[\w-]+)_(?P<time>[0-9]+)"
             if has_layer:
-                base_pattern += r"_l(?P<layer>[\w]+)"
+                base_pattern += r"_l(?P<layer>[0-9]+)"
             re_pattern = re.compile(base_pattern)
             d = re_pattern.match(stem).groupdict()
         except AttributeError:  # probably no time
-            base_pattern = r"(?P<name>[\w]+)"
+            base_pattern = r"(?P<name>[\w-]+)"
             if has_layer:
-                base_pattern += r"_l(?P<layer>[\w]+)"
+                base_pattern += r"_l(?P<layer>[0-9]+)"
             re_pattern = re.compile(base_pattern)
             d = re_pattern.match(stem).groupdict()
 
@@ -100,18 +100,18 @@ def decompose(path, pattern=None):
     if "name" not in d.keys():
         d["name"] = "_".join(d.values())
 
+    # steady-state as time identifier isn't picked up by <time>[0-9] regex, so strip from name
+    d["name"] = d["name"].replace("_steady-state", "")
+
     # String -> type conversion
     if "layer" in d.keys():
         d["layer"] = int(d["layer"])
     if "time" in d.keys():
         # iMOD supports two datetime formats
-        if d["time"] == "steady-state":
-            d.pop("time")
-        else:
-            try:
-                d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d%H%M%S")
-            except ValueError:
-                d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d")
+        try:
+            d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d%H%M%S")
+        except ValueError:
+            d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d")
 
     d["extension"] = path.suffix
     d["directory"] = path.parent
