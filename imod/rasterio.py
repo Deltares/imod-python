@@ -22,6 +22,16 @@ def write(path, da, driver=None, nodata=np.nan):
     nodata: float
         Nodata value to use. Should be convertible to the DataArray and GDAL dtype.
         Default value is np.nan
+        
+    Examples
+    --------
+    Save dataarray in ascii format:
+    >>> imod.rasterio.write("example.asc", da)
+    
+    Save dataarray in ascii format, with 6 significant digits:
+    >>> da.attrs['SIGNIFICANT_DIGITS'] = 6
+    >>> imod.rasterio.write("example.asc", da)
+    
     """
     # Not directly related to iMOD, but provides a missing link, together
     # with xarray.open_rasterio.
