@@ -73,7 +73,6 @@ def write(path, model, name=None, runfile_parameters=None):
     >>> runfile_parameters = imod.run.get_runfile(model=a)
     >>> runfile_parameters["hclose"] = 0.00001
     >>> imod.write(path="example_dir", model=a, runfile_parameters=runfile_parameters)
-
     """
     if isinstance(path, str):
         path = pathlib.Path(path)
@@ -178,7 +177,6 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
     >>> runfile_parameters = imod.run.get_runfile(model=a, seawat=True)
     >>> runfile_parameters["hclose"] = 0.00001
     >>> imod.seawat_write(path="example_dir", model=a, runfile_parameters=runfile_parameters)
-
     """
     if isinstance(path, str):
         path = pathlib.Path(path)

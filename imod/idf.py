@@ -344,14 +344,17 @@ def open(path, memmap=False, use_cftime=False, pattern=None):
     Examples
     --------
     Open an IDF file:
+
     >>> da = imod.idf.open("example.idf")
 
     Open an IDF file, relying on default naming conventions to identify
     layer:
+
     >>> da = imod.idf.open("example_l1.idf")
 
     Open an IDF file, relying on default naming conventions to identify layer
     and time:
+    
     >>> head = imod.idf.open("head_20010101_l1.idf")
 
     Open multiple IDF files, in this case files for the year 2001 for all

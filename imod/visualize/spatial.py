@@ -91,6 +91,7 @@ def plot_map(
     Examples
     --------
     Plot with an overlay:
+    
     >>> overlays = [{"gdf": geodataframe, "edgecolor": "black"}]
     >>> imod.visualize.spatial.plot_map(raster, legend, overlays)
     """

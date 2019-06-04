@@ -35,11 +35,12 @@ class SeawatModel(Model):
     """
     Examples
     --------
-    m = SeawatModel("example")
-    m["riv"] = River(...)
-    ...etc.
-    m.time_discretization(endtime)
-    m.write()
+    
+    >>> m = SeawatModel("example")
+    >>> m["riv"] = River(...)
+    >>> # ...etc.
+    >>> m.time_discretization(endtime)
+    >>> m.write()
     """
 
     # These templates end up here since they require global information
