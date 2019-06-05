@@ -82,7 +82,7 @@ def read_associated(path, kwargs={}):
         Path to associated file.
     kwargs : dict
         Dictionary containing the `pandas.read_csv()` keyword arguments for the
-        associated (TXT) file (e.g. `{"delim_whitespace": True}`)
+        associated (TXT) file (e.g. `{"delim_whitespace": True}`).
 
     Returns
     -------

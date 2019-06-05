@@ -104,7 +104,7 @@ def load(path, variables=None, times=None):
     return read(path, variables, times)
 
 
-def read(path, variables=None, times=None):
+def read(path, variables=None, times=None, kwargs={}):
     """
     Read a Tecplot ASCII data file to an xarray Dataset.
 
@@ -124,6 +124,9 @@ def read(path, variables=None, times=None):
         Which timesteps to read. The Tecplot file starts
         numbering at 0.0, and the numbers function solely as index.
         Defaults to all timesteps.
+    kwargs : dict
+        Dictionary containing the `pandas.read_csv()` keyword arguments used
+        for reading the Tecplot ASCII file (e.g. `{"delim_whitespace": True}`).
 
     Examples
     --------
@@ -191,7 +194,7 @@ def read(path, variables=None, times=None):
             f.seek(line_idx[start])
             time = _get_time(f.readline())
             df = pd.read_csv(
-                f, nrows=nlines_timestep, names=variables, usecols=var_cols
+                f, nrows=nlines_timestep, names=variables, usecols=var_cols, **kwargs
             )
             dss.append(_dataset(df, time, **tec_kwargs))
 
