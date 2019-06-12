@@ -666,7 +666,9 @@ def save(path, a, nodata=1.0e20):
         if (coord in a.coords) and not (coord in a.dims):
             if coord == "time":
                 # .item() gives an integer for datetime64[ns], so convert first.
-                val = a.coords[coord].values.astype("datetime64[us]").item()
+                val = a.coords[coord].values
+                if not (val == "steady-state").all():
+                    val = a.coords[coord].values.astype("datetime64[us]").item()
             else:
                 val = a.coords[coord].item()
             d[coord] = val

@@ -36,12 +36,12 @@ def test_decompose():
 
 
 def test_decompose_short_date():
-    d = util.decompose("path/to/head_20180222_l5.idf")
+    d = util.decompose("path/to/head_steady-state_l5.idf")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
         "name": "head",
-        "time": datetime.datetime(2018, 2, 22),
+        "time": "steady-state",
         "layer": 5,
     }
     assert isinstance(d, dict)
@@ -80,6 +80,7 @@ def test_decompose_steady_state():
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
         "name": "head",
+        "time": "steady-state",
         "layer": 64,
     }
     assert isinstance(d, dict)
