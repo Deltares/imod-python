@@ -22,6 +22,31 @@ def test_compose():
     assert path == targetpath
 
 
+def test_compose__pattern():
+    d = {
+        "name": "head",
+        "directory": pathlib.Path("path", "to"),
+        "extension": ".idf",
+        "layer": 5,
+        "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
+    }
+    targetpath = pathlib.Path(d["directory"], "head_2018-02-22_l05.idf")
+
+    path = util.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
+    assert isinstance(path, pathlib.Path)
+    assert path == targetpath
+
+    d["time"] = cftime.DatetimeProlepticGregorian(2018, 2, 22, 9, 6, 57)
+    path = util.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
+    assert isinstance(path, pathlib.Path)
+    assert path == targetpath
+
+    d["time"] = np.datetime64("2018-02-22 09:06:57")
+    path = util.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
+    assert isinstance(path, pathlib.Path)
+    assert path == targetpath
+
+
 def test_decompose():
     d = util.decompose("path/to/head_20180222090657_l5.idf")
     refd = {
@@ -37,6 +62,19 @@ def test_decompose():
 
 def test_decompose_short_date():
     d = util.decompose("path/to/head_20180222_l5.idf")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("path", "to"),
+        "name": "head",
+        "time": datetime.datetime(2018, 2, 22),
+        "layer": 5,
+    }
+    assert isinstance(d, dict)
+    assert d == refd
+
+
+def test_decompose_nonstandard_date():
+    d = util.decompose("path/to/head_2018-02-22_l5.idf")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
