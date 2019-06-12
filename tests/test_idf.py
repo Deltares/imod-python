@@ -56,7 +56,6 @@ def test_da__nodxdy(request):
     return xr.DataArray(data, **kwargs)
 
 
-
 @pytest.fixture(scope="module")
 def test_nptimeda(request):
     nrow, ncol = 3, 4

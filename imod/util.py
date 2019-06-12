@@ -176,7 +176,9 @@ def compose(d):
                 # The following line is because numpy.datetime64[ns] does not
                 # support converting to datetime, but returns an integer instead.
                 # This solution is 20 times faster than using pd.to_datetime()
-                d["timestr"] = time.astype("datetime64[us]").item().strftime("%Y%m%d%H%M%S")
+                d["timestr"] = (
+                    time.astype("datetime64[us]").item().strftime("%Y%m%d%H%M%S")
+                )
             else:
                 d["timestr"] = time.strftime("%Y%m%d%H%M%S")
 
