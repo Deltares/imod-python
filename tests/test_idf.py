@@ -434,6 +434,7 @@ def test_check_cellsizes():
     c = np.array([1.0, 2.1, 3.0])
     d = np.array([2.0, 2.000001, 2.0])
     e = np.array([4.0, 5.0, 6.0])
+    f = np.array([4.0, 5.0, 6.0, 7.0])
     # length one always checks out
     idf._check_cellsizes([(2.0, 3.0)])
     # floats only
@@ -441,13 +442,17 @@ def test_check_cellsizes():
     idf._check_cellsizes([(2.0, 3.0), (2.000001, 3.0)])
     # ndarrays only
     idf._check_cellsizes([(a, e), (a, e)])
+    # different length a and f
+    idf._check_cellsizes([(a, f), (a, f)])
     idf._check_cellsizes([(a, e), (b, e)])
     # mix of floats and ndarrays
     idf._check_cellsizes([(2.0, d)])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Cellsizes of IDFs do not match"):
         # floats only
         idf._check_cellsizes([(2.0, 3.0), (2.1, 3.0)])
         # ndarrays only
         idf._check_cellsizes([(a, e), (c, e)])
         # mix of floats and ndarrays
         idf._check_cellsizes([(2.1, d)])
+        # Unequal lengths
+        idf._check_cellsizes([(a, e), (f, e)])
