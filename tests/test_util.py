@@ -17,7 +17,6 @@ def test_compose():
         "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
     }
     path = util.compose(d)
-    assert isinstance(path, pathlib.Path)
     targetpath = pathlib.Path(d["directory"], "head_20180222090657_l5.idf")
     assert path == targetpath
 
@@ -33,17 +32,14 @@ def test_compose__pattern():
     targetpath = pathlib.Path(d["directory"], "head_2018-02-22_l05.idf")
 
     path = util.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
-    assert isinstance(path, pathlib.Path)
     assert path == targetpath
 
     d["time"] = cftime.DatetimeProlepticGregorian(2018, 2, 22, 9, 6, 57)
     path = util.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
-    assert isinstance(path, pathlib.Path)
     assert path == targetpath
 
     d["time"] = np.datetime64("2018-02-22 09:06:57")
     path = util.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
-    assert isinstance(path, pathlib.Path)
     assert path == targetpath
 
 
@@ -212,7 +208,6 @@ def test_compose_year9999():
         "time": datetime.datetime(9999, 2, 22, 9, 6, 57),
     }
     path = util.compose(d)
-    assert isinstance(path, pathlib.Path)
     targetpath = pathlib.Path(d["directory"], "head_99990222090657_l5.idf")
     assert path == targetpath
 
