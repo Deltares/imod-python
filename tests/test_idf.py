@@ -243,6 +243,17 @@ def test_save__error(test_da):
         idf.save("test.idf", test_da)
 
 
+def test_saveopen__steady(test_da):
+    first = test_da.copy().assign_coords(layer=1)
+    second = test_da.copy().assign_coords(layer=2)
+    steady_layers = xr.concat([first, second], dim="layer")
+    steady_layers = steady_layers.assign_coords(time="steady-state")
+    steady_layers = steady_layers.expand_dims("time")
+    idf.save("test", steady_layers)
+    da = idf.open("test_steady-state_l*.idf")
+    assert da.identical(steady_layers)
+
+
 def test_to_nan():
     a = np.array([1.0, 2.000001, np.nan, 4.0])
     c = idf._to_nan(a, np.nan)
