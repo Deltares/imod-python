@@ -80,6 +80,7 @@ def test_decompose_steady_state():
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
         "name": "head",
+        "time": "steady-state",
         "layer": 64,
     }
     assert isinstance(d, dict)

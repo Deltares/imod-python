@@ -101,12 +101,16 @@ def decompose(path, pattern=None):
         d["name"] = "_".join(d.values())
 
     # steady-state as time identifier isn't picked up by <time>[0-9] regex, so strip from name
-    d["name"] = d["name"].replace("_steady-state", "")
+    steady = False
+    if "steady-state" in d["name"]:
+        steady = True
+        d["name"] = d["name"].replace("_steady-state", "")
+        d["time"] = "steady-state"
 
     # String -> type conversion
     if "layer" in d.keys():
         d["layer"] = int(d["layer"])
-    if "time" in d.keys():
+    if "time" in d.keys() and not steady:
         # iMOD supports two datetime formats
         try:
             d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d%H%M%S")
@@ -127,6 +131,9 @@ def _convert_datetimes(times, use_cftime):
     Alternatively, always returns as cftime.DatetimeProlepticGregorian if
     `use_cf_time` is True.
     """
+    if all(time == "steady-state" for time in times):
+        return times, False
+
     out_of_bounds = False
     if use_cftime:
         converted = [
@@ -162,13 +169,18 @@ def compose(d):
     hastime = "time" in d
     if hastime:
         time = d["time"]
-        if isinstance(time, np.datetime64):
-            # The following line is because numpy.datetime64[ns] does not
-            # support converting to datetime, but returns an integer instead.
-            # This solution is 20 times faster than using pd.to_datetime()
-            d["timestr"] = time.astype("datetime64[us]").item().strftime("%Y%m%d%H%M%S")
+        if time == "steady-state":
+            d["timestr"] = time
         else:
-            d["timestr"] = time.strftime("%Y%m%d%H%M%S")
+            if isinstance(time, np.datetime64):
+                # The following line is because numpy.datetime64[ns] does not
+                # support converting to datetime, but returns an integer instead.
+                # This solution is 20 times faster than using pd.to_datetime()
+                d["timestr"] = (
+                    time.astype("datetime64[us]").item().strftime("%Y%m%d%H%M%S")
+                )
+            else:
+                d["timestr"] = time.strftime("%Y%m%d%H%M%S")
 
     if haslayer:
         d["layer"] = int(d["layer"])
