@@ -33,7 +33,7 @@ def test_da(request):
     data = np.ones((nrow, ncol), dtype=np.float32)
 
     def remove():
-        globremove("test.idf")
+        globremove("test*.idf")
 
     request.addfinalizer(remove)
     return xr.DataArray(data, **kwargs)
