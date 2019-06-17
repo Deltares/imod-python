@@ -25,12 +25,12 @@ def test_compose__pattern():
     d = {
         "name": "head",
         "directory": pathlib.Path("path", "to"),
-        "extension": ".idf",
+        "extension": ".foo",
         "layer": 5,
-        "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
     }
-    targetpath = pathlib.Path(d["directory"], "head_2018-02-22_l05.idf")
+    targetpath = pathlib.Path(d["directory"], "head_2018-02-22_l05.foo")
 
+    d["time"] = datetime.datetime(2018, 2, 22, 9, 6, 57)
     path = util.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
     assert path == targetpath
 
@@ -40,6 +40,10 @@ def test_compose__pattern():
 
     d["time"] = np.datetime64("2018-02-22 09:06:57")
     path = util.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
+    assert path == targetpath
+
+    targetpath = pathlib.Path(d["directory"], ".foo_makes_head_no_layer5_sense_day22")
+    path = util.compose(d, pattern="{extension}_makes_{name}_no_layer{layer:d}_sense_day{time:%d}")
     assert path == targetpath
 
 
