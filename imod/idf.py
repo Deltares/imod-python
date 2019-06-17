@@ -96,8 +96,12 @@ def _check_cellsizes(cellsizes):
     except ValueError:  # contains ndarrays
         try:
             # all ndarrays
-            if not all(np.allclose(cellsizes[0], c) for c in cellsizes):
-                raise ValueError(msg)
+            dx0, dy0 = cellsizes[0]
+            for dx, dy in cellsizes[1:]:
+                if np.allclose(dx0, dx) and np.allclose(dy0, dy):
+                    pass
+                else:
+                    raise ValueError(msg)
         except ValueError:
             # some ndarrays, some floats
             # create floats for comparison with allclose
@@ -603,7 +607,6 @@ def _top_bot_dicts(a):
     return d_top, d_bot
 
 
-# write DataArrays to IDF
 def save(path, a, nodata=1.0e20, pattern=None):
     """
     Write a xarray.DataArray to one or more IDF files
@@ -687,7 +690,9 @@ def save(path, a, nodata=1.0e20, pattern=None):
         if (coord in a.coords) and not (coord in a.dims):
             if coord == "time":
                 # .item() gives an integer for datetime64[ns], so convert first.
-                val = a.coords[coord].values.astype("datetime64[us]").item()
+                val = a.coords[coord].values
+                if not (val == "steady-state").all():
+                    val = a.coords[coord].values.astype("datetime64[us]").item()
             else:
                 val = a.coords[coord].item()
             d[coord] = val

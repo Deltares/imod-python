@@ -33,7 +33,7 @@ def test_da(request):
     data = np.ones((nrow, ncol), dtype=np.float32)
 
     def remove():
-        globremove("test.idf")
+        globremove("test*.idf")
 
     request.addfinalizer(remove)
     return xr.DataArray(data, **kwargs)
@@ -243,6 +243,17 @@ def test_save__error(test_da):
         idf.save("test.idf", test_da)
 
 
+def test_saveopen__steady(test_da):
+    first = test_da.copy().assign_coords(layer=1)
+    second = test_da.copy().assign_coords(layer=2)
+    steady_layers = xr.concat([first, second], dim="layer")
+    steady_layers = steady_layers.assign_coords(time="steady-state")
+    steady_layers = steady_layers.expand_dims("time")
+    idf.save("test", steady_layers)
+    da = idf.open("test_steady-state_l*.idf")
+    assert da.identical(steady_layers)
+
+
 def test_to_nan():
     a = np.array([1.0, 2.000001, np.nan, 4.0])
     c = idf._to_nan(a, np.nan)
@@ -434,6 +445,7 @@ def test_check_cellsizes():
     c = np.array([1.0, 2.1, 3.0])
     d = np.array([2.0, 2.000001, 2.0])
     e = np.array([4.0, 5.0, 6.0])
+    f = np.array([4.0, 5.0, 6.0, 7.0])
     # length one always checks out
     idf._check_cellsizes([(2.0, 3.0)])
     # floats only
@@ -441,13 +453,17 @@ def test_check_cellsizes():
     idf._check_cellsizes([(2.0, 3.0), (2.000001, 3.0)])
     # ndarrays only
     idf._check_cellsizes([(a, e), (a, e)])
+    # different length a and f
+    idf._check_cellsizes([(a, f), (a, f)])
     idf._check_cellsizes([(a, e), (b, e)])
     # mix of floats and ndarrays
     idf._check_cellsizes([(2.0, d)])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Cellsizes of IDFs do not match"):
         # floats only
         idf._check_cellsizes([(2.0, 3.0), (2.1, 3.0)])
         # ndarrays only
         idf._check_cellsizes([(a, e), (c, e)])
         # mix of floats and ndarrays
         idf._check_cellsizes([(2.1, d)])
+        # Unequal lengths
+        idf._check_cellsizes([(a, e), (f, e)])
