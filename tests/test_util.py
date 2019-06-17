@@ -43,7 +43,9 @@ def test_compose__pattern():
     assert path == targetpath
 
     targetpath = pathlib.Path(d["directory"], ".foo_makes_head_no_layer5_sense_day22")
-    path = util.compose(d, pattern="{extension}_makes_{name}_no_layer{layer:d}_sense_day{time:%d}")
+    path = util.compose(
+        d, pattern="{extension}_makes_{name}_no_layer{layer:d}_sense_day{time:%d}"
+    )
     assert path == targetpath
 
 
