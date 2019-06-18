@@ -72,8 +72,15 @@ def get_xy_indices(da, x, y):
         )
     nrow = da.y.size
     ncol = da.x.size
+
+    # Compute edges
     ys = np.full(nrow + 1, ymin)
     xs = np.full(ncol + 1, xmin)
+    # Turn dx, dy into array
+    if isinstance(dx, float):
+        dx = np.full(da.x.size, dx)
+    if isinstance(dy, float):
+        dy = np.full(da.y.size, dy)
     # Always increasing
     if x_decreasing:
         xs[1:] += np.abs(dx[::-1]).cumsum()
