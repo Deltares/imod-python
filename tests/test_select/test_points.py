@@ -108,7 +108,6 @@ def test_get_xy_indices__equidistant(test_da):
     assert expected == actual
 
 
-
 def test_set_xy_values(test_da_nonequidistant):
     out = xr.full_like(test_da_nonequidistant, 0.0)
     x = 0.0
