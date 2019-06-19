@@ -70,7 +70,7 @@ class PreconditionedConjugateGradientSolver(Package):
 
     def _pkgcheck(self):
         if not self["hclose"] > 0:
-            raise ValueError
+            raise ValueError(f"hclose in {self} needs to be positive")
 
 
 class GeneralizedConjugateGradientSolver(Package):
@@ -295,7 +295,7 @@ class ParallelKrylovFlowSolver(ParallelSolver):
         to_check = ["hclose", "rclose", "max_iter", "inner_iter", "relax"]
         for arg in to_check:
             if not self[arg] > 0:
-                raise ValueError
+                raise ValueError(f"{arg} in {self} needs to be positive")
 
         # Check whether option is actually an available option
         for opt_arg in self._keywords.keys():
@@ -404,7 +404,7 @@ class ParallelKrylovTransportSolver(ParallelSolver):
         to_check = ["cclose", "max_iter", "inner_iter", "relax"]
         for arg in to_check:
             if not self[arg] > 0:
-                raise ValueError
+                raise ValueError(f"{arg} in {self} needs to be positive")
 
         # Check whether option is actually an available option
         for opt_arg in self._keywords.keys():
