@@ -1,5 +1,7 @@
 import pathlib
+import subprocess
 
+import dask
 import numba
 import numpy as np
 import pandas as pd
@@ -510,3 +512,56 @@ def rasterize_table(table, column, like):
     dst = like.copy()
     dst.values = _burn_cells(dst.values, rows, cols, area)
     return dst
+
+
+def _create_chunks(like, resolution, chunksize):
+    """
+    Cuts data into chunksize by chunksize.
+
+    Parameters
+    ----------
+    like : xarray.DataArray
+    resolution : float
+    chunksize : int
+
+    Returns
+    -------
+    chunks : list of xr.DataArray
+    """
+
+    dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial_reference(like)
+    # Compute how many rows and columns are necessary for fine resolution
+    nrow = int((ymax - ymin) / resolution)
+    ncol = int((xmax - xmin) / resolution)
+    # Number of rows and columns in a single chunk
+    chunk_nrow = int(np.ceil(nrow / chunksize))
+    chunk_ncol = int(np.ceil(ncol / chunksize))
+    # Now compute how large these chunks are for the larger like cells
+    height = int(chunk_nrow * (dy / resolution))
+    width = int(chunk_ncol * (dx / resolution))
+
+    chunks = []
+    for i in range(chunk_nrow):
+        for j in range(chunk_ncol):
+            col_start = i * width
+            col_end = (i + 1) * width
+            row_start = i * height
+            row_end = (i + 1) * height
+            chunks.append(
+                like.isel(y=slice(row_start, row_end), x=slice(col_start, col_end))
+            )
+    return chunks
+
+
+def chunkwise_celltable(path, column, resolution, like, chunksize=1e4):
+    """
+    Process area of features by rasterizing in a chunkwise to limit memory
+    usage.
+    """
+    like_chunks = _create_chunks(like, resolution, chunksize)
+    collection = [
+        dask.delayed(cell_table)(path, column, resolution, chunk)
+        for chunk in like_chunks
+    ]
+    result = dask.compute(collection)[0]
+    return pd.concat(result)

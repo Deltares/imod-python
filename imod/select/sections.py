@@ -31,10 +31,11 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
     & Woo, 1987.
 
     Note: out of bound values are marked with -1. This might be slightly
-    misleading, since -1 is valid indexing value in Python. However, that is
-    actually desirable, since the values will be taken from a DataArray/Dataset.
-    In this case, the section will automatically have the right dimension size,
-    even with skipped parts at the start and end of the cross section.
+    misleading, since -1 is valid indexing value in Python. However, it is
+    actually desirable in this case, since the values will be taken from a
+    DataArray/Dataset. In this case, the section will automatically have the
+    right dimension size, even with skipped parts at the start and end of the
+    cross section.
 
     Parameters
     ----------
@@ -156,7 +157,10 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
     iys.append(iy)
 
     # Main loop, move through grid
-    while True:
+    ncol = xs.size - 1
+    nrow = ys.size - 1
+    tstep = 0.0
+    while ix < ncol and iy < nrow and (t + tstep) < t_end:
         # Compute distance to cell boundary
         # We need the start of the cell if we're moving in negative direction.
         if x_increment == -1:
@@ -188,18 +192,15 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
             iy += y_increment
             tstep = tmax_y
 
-        # Check if end has been reached yet
-        if (t + tstep) >= t_end:
-            tstep = t_end - t
-            # Store final step
-            segment_length.append(tstep)
-            break
-        else:
-            t += tstep
-            # Store
-            ixs.append(ix)
-            iys.append(iy)
-            segment_length.append(tstep)
+        t += tstep
+        # Store
+        ixs.append(ix)
+        iys.append(iy)
+        segment_length.append(tstep)
+    else:
+        tstep = t_end - t
+        # Store final step
+        segment_length.append(tstep)
 
     if skipped_end > 0.0:
         segment_length.append(skipped_end)
@@ -254,21 +255,23 @@ def _cross_section(data, linecoords):
 
     bounding_box = _bounding_box(xmin, xmax, ymin, ymax)
     for start, end in zip(linecoords[:-1], linecoords[1:]):
-        # Continue if no intersection occurs
-        if not sg.LineString([start, end]).intersects(bounding_box):
-            continue
-
-        x0, y0 = start
-        x1, y1 = end
-        i, j, segment_length = _draw_line(
-            xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax
-        )
+        linestring = sg.LineString([start, end])
+        if linestring.intersects(bounding_box):
+            x0, y0 = start
+            x1, y1 = end
+            i, j, segment_length = _draw_line(
+                xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax
+            )
+        else:  # append the linestring in full as nodata section
+            i = np.array([-1])
+            j = np.array([-1])
+            segment_length = np.array([linestring.length])
 
         ixs.append(i)
         iys.append(j)
         segments.append(segment_length)
 
-    # Convert to numpy arrays
+    # Concatenate into a single array
     ixs = np.concatenate(ixs)
     iys = np.concatenate(iys)
     segments = np.concatenate(segments)
@@ -279,16 +282,18 @@ def _cross_section(data, linecoords):
     # Flip around indexes
     if x_decreasing:
         ixs = ncol - 1 - ixs
+        ixs[ixs >= ncol] = -1
     if y_decreasing:
         iys = nrow - 1 - iys
+        iys[iys >= nrow] = -1
 
     # Select data
     ind_x = xr.DataArray(ixs, dims=["s"])
     ind_y = xr.DataArray(iys, dims=["s"])
     section = data.isel(x=ind_x, y=ind_y).where(ixs >= 0)
     # Set dimension values
-    section.coords["s"] = segment_length.cumsum() - 0.5 * segment_length
-    section = section.assign_coords(ds=("s", segment_length))
+    section.coords["s"] = segments.cumsum() - 0.5 * segments
+    section = section.assign_coords(ds=("s", segments))
 
     return section
 
@@ -342,7 +347,7 @@ def cross_section_linestring(data, linestring):
     data on a regular grid, which is given as an `xarray.DataArray` so that
     we can utilize its coordinate data.
 
-    Slightly adapted from Metpy:
+    Adapted from Metpy:
     https://github.com/Unidata/MetPy/blob/master/metpy/interpolate/slices.py
 
     Parameters
@@ -357,7 +362,7 @@ def cross_section_linestring(data, linestring):
         cross section.
 
         Note that a LineString can easily be taken from a geopandas.GeoDataFrame
-        using the .geometry attribute. Check the examples.
+        using the .geometry attribute. Please refer to the examples.
 
     Returns
     -------
@@ -380,6 +385,13 @@ def cross_section_linestring(data, linestring):
     >>> import shapely.geometry as sg
     >>> linestring = sg.LineString([(0.0, 1.0), (5.0, 5.0), (7.5, 5.0)])
     >>> section = cross_section_linestring(data, linestring)
+
+    If you have drawn multiple cross sections within a shapefile, simply loop
+    over the linestring:
+
+    >>> sections = [cross_section_linestring(data, ls) for ls in geodataframe.geometry]
+
     """
+
     linecoords = np.array(linestring.coords)
     return _cross_section(data, linecoords)
