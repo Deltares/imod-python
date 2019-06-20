@@ -76,6 +76,10 @@ Documentation
 Getting started
 ---------------
 
+Install the latest release using ``conda install -c conda-forge imod``, or, when
+not using Anaconda, ``pip install imod``. For more detailed installation
+information see :doc:`installation`.
+
 .. code:: python
 
    import imod
