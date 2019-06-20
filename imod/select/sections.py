@@ -271,13 +271,13 @@ def _cross_section(data, linecoords):
         iys.append(j)
         segments.append(segment_length)
 
+    if len(ixs) == 0:
+        raise ValueError("Linestring does not intersect data")
+
     # Concatenate into a single array
     ixs = np.concatenate(ixs)
     iys = np.concatenate(iys)
     segments = np.concatenate(segments)
-
-    if len(ixs) == 0:
-        raise ValueError("Linestring does not intersect data")
 
     # Flip around indexes
     if x_decreasing:
@@ -387,11 +387,10 @@ def cross_section_linestring(data, linestring):
     >>> section = cross_section_linestring(data, linestring)
 
     If you have drawn multiple cross sections within a shapefile, simply loop
-    over the linestring:
+    over the linestrings:
 
     >>> sections = [cross_section_linestring(data, ls) for ls in geodataframe.geometry]
 
     """
-
     linecoords = np.array(linestring.coords)
     return _cross_section(data, linecoords)
