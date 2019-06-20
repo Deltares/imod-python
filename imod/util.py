@@ -210,13 +210,58 @@ def _xycoords(bounds, cellsizes):
     return coords
 
 
-def _delta(x, coordname):
-    dxs = np.diff(x.astype(np.float64))
-    dx = dxs[0]
-    atolx = abs(1.0e-6 * dx)
-    if not np.allclose(dxs, dx, atolx):
-        raise ValueError(f"DataArray has to be equidistant along {coordname}.")
-    return dx
+def coord_reference(da_coord):
+    """
+    Extracts dx, xmin, xmax for a coordinate DataArray, where x is any coordinate.
+
+    If the DataArray coordinates are nonequidistant, dx will be returned as
+    1D ndarray instead of float.
+
+    Parameters
+    ----------
+    a : xarray.DataArray of a coordinate
+
+    Returns
+    --------------
+    tuple
+        (dx, xmin, xmax) for a coordinate x
+    """
+    x = da_coord.values
+
+    # Possibly non-equidistant
+    dx_string = f"d{da_coord.name}"
+    if dx_string in da_coord.coords:
+        dx = da_coord.coords[dx_string]
+        if (dx.shape == x.shape) and (dx.size != 1):
+            # choose correctly for decreasing coordinate
+            if dx[0] < 0.0:
+                end = 0
+                start = -1
+            else:
+                start = 0
+                end = -1
+            dx = dx.values.astype(np.float64)
+            xmin = float(x.min()) - 0.5 * abs(dx[start])
+            xmax = float(x.max()) + 0.5 * abs(dx[end])
+        else:
+            dx = float(dx)
+            xmin = float(x.min()) - 0.5 * abs(dx)
+            xmax = float(x.max()) + 0.5 * abs(dx)
+    else:  # Equidistant
+        # TODO: decide on decent criterium for what equidistant means
+        # make use of floating point epsilon? E.g:
+        # https://github.com/ioam/holoviews/issues/1869#issuecomment-353115449
+        dxs = np.diff(x.astype(np.float64))
+        dx = dxs[0]
+        atolx = abs(1.0e-6 * dx)
+        if not np.allclose(dxs, dx, atolx):
+            raise ValueError(f"DataArray has to be equidistant along {da_coord.name}.")
+
+        # as xarray uses midpoint coordinates
+        xmin = float(x.min()) - 0.5 * abs(dx)
+        xmax = float(x.max()) + 0.5 * abs(dx)
+
+    return dx, xmin, xmax
 
 
 def spatial_reference(a):
@@ -240,47 +285,21 @@ def spatial_reference(a):
     y = a.y.values
     ncol = x.size
     nrow = y.size
-
-    # Possibly non-equidistant
-    if ("dx" in a.coords) and ("dy" in a.coords):
-        dx = a.coords["dx"]
-        dy = a.coords["dy"]
-        if (dx.shape == x.shape) and (dx.size != 1):
-            dx = dx.values.astype(np.float64)
-            xmin = float(x.min()) - 0.5 * abs(dx[0])
-            xmax = float(x.max()) + 0.5 * abs(dx[-1])
-        else:
-            dx = float(dx)
-            xmin = float(x.min()) - 0.5 * abs(dx)
-            xmax = float(x.max()) + 0.5 * abs(dx)
-        if (dy.shape == y.shape) and (dy.size != 1):
-            dy = dy.values.astype(np.float64)
-            ymin = float(y.min()) - 0.5 * abs(dy[-1])
-            ymax = float(y.max()) + 0.5 * abs(dy[0])
-        else:
-            dy = float(dy)
-            ymin = float(y.min()) - 0.5 * abs(dy)
-            ymax = float(y.max()) + 0.5 * abs(dy)
-    else:  # Equidistant
-        # TODO: decide on decent criterium for what equidistant means
-        # make use of floating point epsilon? E.g:
-        # https://github.com/ioam/holoviews/issues/1869#issuecomment-353115449
-        if ncol == 1:
-            dy = _delta(y, "y")
-            dx = -dy
-        elif nrow == 1:
-            dx = _delta(x, "x")
-            dy = -dx
-        else:
-            dx = _delta(x, "x")
-            dy = _delta(y, "y")
-
-        # as xarray used midpoint coordinates
-        xmin = float(x.min()) - 0.5 * abs(dx)
-        xmax = float(x.max()) + 0.5 * abs(dx)
+    if ncol > 1 and nrow > 1:
+        dx, xmin, xmax = coord_reference(a["x"])
+        dy, ymin, ymax = coord_reference(a["y"])
+    elif ncol == 1:
+        dy, ymin, ymax = coord_reference(a["y"])
+        dx = abs(dy)
+        xmin = float(x.min()) - 0.5 * abs(dy)
+        xmax = float(x.max()) + 0.5 * abs(dy)
+    elif nrow == 1:
+        dx, xmin, xmax = coord_reference(a["x"])
+        dy = -abs(dx)
         ymin = float(y.min()) - 0.5 * abs(dy)
         ymax = float(y.max()) + 0.5 * abs(dy)
-
+    else:  # ncol == 1 and nrow == 1:
+        raise NotImplementedError("Not implemented for single cell DataArrays")
     return dx, xmin, xmax, dy, ymin, ymax
 
 
