@@ -30,66 +30,73 @@ def test_da_nonequidistant(request):
     return xr.DataArray(data, **kwargs)
 
 
+def xy_indices(indices):
+    """A little helper function to return tuples of np.arrays"""
+    return indices["y"].values, indices["x"].values
+
+
 def test_in_bounds(test_da_nonequidistant):
     x = 2.0
     y = 2.0
     expected = np.array([True])
-    actual = imod.select.points.in_bounds(test_da_nonequidistant, x, y)
+    actual = imod.select.points.in_bounds(test_da_nonequidistant, x=x, y=y)
     assert (expected == actual).all()
 
     x = -2.0
     y = 2.0
     expected = np.array([False])
-    actual = imod.select.points.in_bounds(test_da_nonequidistant, x, y)
+    actual = imod.select.points.in_bounds(test_da_nonequidistant, x=x, y=y)
     assert (expected == actual).all()
 
     # Lower inclusive
     x = 0.0
     y = 0.0
     expected = np.array([True])
-    actual = imod.select.points.in_bounds(test_da_nonequidistant, x, y)
+    actual = imod.select.points.in_bounds(test_da_nonequidistant, x=x, y=y)
     assert (expected == actual).all()
 
     # Upper exclusive
     x = 4.0
     y = 3.0
     expected = np.array([False])
-    actual = imod.select.points.in_bounds(test_da_nonequidistant, x, y)
+    actual = imod.select.points.in_bounds(test_da_nonequidistant, x=x, y=y)
     assert (expected == actual).all()
 
 
-def test_get_xy_indices__nonequidistant(test_da_nonequidistant):
+def test_get_indices__nonequidistant(test_da_nonequidistant):
     x = 3.0
     y = 2.5
     expected = (np.array([0]), np.array([3]))
-    actual = imod.select.points.get_xy_indices(test_da_nonequidistant, x, y)
-    assert expected == actual
+    actual = imod.select.points.get_indices(test_da_nonequidistant, x=x, y=y)
+    assert expected == xy_indices(actual)
 
     # Lower inclusive
     x = 2.8
     y = 2.5
     expected = (np.array([0]), np.array([3]))
-    actual = imod.select.points.get_xy_indices(test_da_nonequidistant, x, y)
-    assert expected == actual
+    actual = imod.select.points.get_indices(test_da_nonequidistant, x=x, y=y)
+    assert expected == xy_indices(actual)
 
     # Lower inclusive
     x = 0.0
     y = 0.0
     expected = (np.array([2]), np.array([0]))
-    actual = imod.select.points.get_xy_indices(test_da_nonequidistant, x, y)
-    assert expected == actual
+    actual = imod.select.points.get_indices(test_da_nonequidistant, x=x, y=y)
+    assert expected == xy_indices(actual)
 
     # Upper exclusive
     x = 4.0
     y = 2.5
     with pytest.raises(ValueError):
-        actual = imod.select.points.get_xy_indices(test_da_nonequidistant, x, y)
+        actual = imod.select.points.get_indices(test_da_nonequidistant, x=x, y=y)
 
     # Arrays
     x = [3.0, 0.0]
     y = [2.5, 0.0]
     rr_e, cc_e = (np.array([0, 2]), np.array([3, 0]))
-    rr_a, cc_a = imod.select.points.get_xy_indices(test_da_nonequidistant, x, y)
+    rr_a, cc_a = xy_indices(
+        imod.select.points.get_indices(test_da_nonequidistant, x=x, y=y)
+    )
     assert (rr_e == rr_a).all()
     assert (cc_e == cc_a).all()
 
@@ -97,22 +104,22 @@ def test_get_xy_indices__nonequidistant(test_da_nonequidistant):
     x = [4.0, 0.0]
     y = [2.5, 0.0]
     with pytest.raises(ValueError):
-        rr_a, cc_a = imod.select.points.get_xy_indices(test_da_nonequidistant, x, y)
+        _ = imod.select.points.get_indices(test_da_nonequidistant, x=x, y=y)
 
 
-def test_get_xy_indices__equidistant(test_da):
+def test_get_indices__equidistant(test_da):
     x = 3.0
     y = 2.5
     expected = (np.array([0]), np.array([3]))
-    actual = imod.select.points.get_xy_indices(test_da, x, y)
-    assert expected == actual
+    actual = imod.select.points.get_indices(test_da, x=x, y=y)
+    assert expected == xy_indices(actual)
 
 
-def test_set_xy_values(test_da_nonequidistant):
+def test_set_values(test_da_nonequidistant):
     out = xr.full_like(test_da_nonequidistant, 0.0)
     x = 0.0
     y = 0.0
-    imod.select.points.set_xy_values(out, x, y, 1.0)
+    imod.select.points.set_values(out, 1.0, x=x, y=y)
     expected = np.array(
         [[0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0]]
     )
@@ -123,34 +130,34 @@ def test_set_xy_values(test_da_nonequidistant):
     # paint diagonal
     x = [0.45, 1.45, 2.4]
     y = [2.25, 1.25, 0.5]
-    imod.select.points.set_xy_values(out, x, y, 1.0)
+    imod.select.points.set_values(out, 1.0, x=x, y=y)
     expected = np.array(
         [[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0]]
     )
     assert (out.values == expected).all()
 
     values = [1.0, 2.0, 3.0]
-    imod.select.points.set_xy_values(out, x, y, values)
+    imod.select.points.set_values(out, values, x=x, y=y)
     expected = np.array(
         [[1.0, 0.0, 0.0, 0.0], [0.0, 2.0, 0.0, 0.0], [0.0, 0.0, 3.0, 0.0]]
     )
     assert (out.values == expected).all()
 
 
-def test_set_xy_values__xyerror():
+def test_set_values__error():
     da = xr.DataArray(
         np.random.rand(3, 2, 1),
         {"x": [1, 2, 3], "y": [2, 1], "z": [1]},
         dims=("x", "y", "z"),
     )
     with pytest.raises(ValueError):
-        imod.select.points.set_xy_values(da, 0, 0, 1.0)
+        imod.select.points.set_values(da, 1.0, x=0, y=0)
 
 
-def test_get_xy_values(test_da_nonequidistant):
+def test_get_values(test_da_nonequidistant):
     x = [0.45, 1.45, 2.4]
     y = [2.25, 1.25, 0.5]
-    actual = imod.select.points.get_xy_values(test_da_nonequidistant, x, y)
+    actual = imod.select.points.get_values(test_da_nonequidistant, x=x, y=y)
     actual = actual.drop("dx")
     actual = actual.drop("dy")
     data = [0, 5, 10]
@@ -159,4 +166,3 @@ def test_get_xy_values(test_da_nonequidistant):
         coords={"index": [0, 1, 2], "x": ("index", x), "y": ("index", y)},
         dims=["index"],
     )
-    assert actual.identical(expected)

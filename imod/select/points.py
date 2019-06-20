@@ -4,39 +4,111 @@ import xarray as xr
 import imod
 
 
-def in_bounds(da, x, y):
+def in_bounds(da, **points):
     """
-    Returns whether points specified by `x` and `y` fall within the bounds of
-    `da`.
+    Returns whether points specified by keyword arguments fall within the bounds
+    of `da`.
 
     Parameters
     ----------
     da : xr.DataArray
-    y : np.array of floats
-    x : np.array of floats
-
+    points : keyword arguments of coordinate=values
+        keyword arguments specifying coordinate and values. Please refer to the
+        examples.
+    
     Returns
     -------
     in_bounds : np.array of bools
+    
+    Examples
+    --------
+    Create the DataArray, then use the keyword arguments to define along which
+    coordinate to check whether the points are within bounds.
+    
+    >>> nrow, ncol = 3, 4
+    >>> data = np.arange(12.0).reshape(nrow, ncol)
+    >>> coords = {"x": [0.5, 1.5, 2.5, 3.5], "y": [2.5, 1.5, 0.5]}
+    >>> dims = ("y", "x")
+    >>> da = xr.DataArray(data, coords, dims)
+    >>> x = [0.4, 2.6]
+    >>> in_bounds(da, x=x)
+    
+    This works for an arbitrary number of coordinates:
+    
+    >>> y = [1.3, 2.7]
+    >>> in_bounds(da, x=x, y=y)
+    
     """
-    _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(da)
-    return (x >= xmin) & (x < xmax) & (y >= ymin) & (y < ymax)
+    # check sizes
+    shapes = []
+    for coord, value in points.items():
+        arr = np.atleast_1d(value)
+        points[coord] = arr
+        shape = arr.shape
+        if not len(shape) == 1:
+            raise ValueError(
+                f"Coordinate {coord} is not one-dimensional, but has shape: {shape}"
+            )
+        shapes.append(shape)
+    if not len(set(shapes)) == 1:
+        msg = [f"{coord}: {shape}" for coord, shape in shapes.items()].join("\n")
+        raise ValueError(f"Shapes of coordinates do match each other:\n{msg}")
+
+    # Re-use shape state from loop above
+    in_bounds = np.full(shape, True)
+    for key, x in points.items():
+        da_x = da.coords[key]
+        _, xmin, xmax = imod.util.coord_reference(da_x)
+        # Inplace bitwise operator
+        in_bounds &= (x >= xmin) & (x < xmax)
+
+    return in_bounds
 
 
-def get_xy_indices(da, x, y):
+def _get_indices_1d(da, coordname, x):
+    x = np.atleast_1d(x)
+    x_decreasing = da.indexes[coordname].is_monotonic_decreasing
+    dx, xmin, _ = imod.util.coord_reference(da.coords[coordname])
+
+    ncell = da[coordname].size
+    # Compute edges
+    xs = np.full(ncell + 1, xmin)
+    # Turn dx into array
+    if isinstance(dx, float):
+        dx = np.full(ncell, dx)
+    # Always increasing
+    if x_decreasing:
+        xs[1:] += np.abs(dx[::-1]).cumsum()
+    else:
+        xs[1:] += np.abs(dx).cumsum()
+
+    # From np.searchsorted docstring:
+    # Find the indices into a sorted array a such that, if the corresponding
+    # elements in v were inserted before the indices, the order of a would
+    # be preserved.
+    ixs = np.searchsorted(xs, x, side="right")
+
+    # Take care of decreasing coordinates
+    if x_decreasing:
+        ixs = ncell - ixs
+    else:
+        ixs = ixs - 1
+
+    return ixs
+
+
+def get_indices(da, **points):
     """
     Get the indices for points as defined by the arrays x and y.
 
     Parameters
     ----------
     da : xr.DataArray
-    y : float or np.array of floats
-    x : float or np.array of floats
+    points : keyword arguments of coordinates and values
 
     Returns
     -------
-    rr, cc : np.array of integers
-        row and column indices
+    indices : dict of {coordinate: xr.DataArray with indices}
 
     Examples
     --------
@@ -45,112 +117,100 @@ def get_xy_indices(da, x, y):
 
     >>> x = [1.0, 2.2, 3.0]
     >>> y = [4.0, 5.6, 7.0]
-    >>> rr, xx = imod.select.points.get_indices(da, x, y)
-    >>> ind_y = xr.DataArray(rr, dims=["index"])
-    >>> ind_x = xr.DataArray(cc, dims=["index"])
-    >>> selection = da.sel(x=ind_x, y=ind_y)
+    >>> indices = imod.select.points.get_indices(da, x=x, y=y)
+    >>> ind_y = indices["y"]
+    >>> ind_x = indices["x"]
+    >>> selection = da.isel(x=ind_x, y=ind_y)
+
+    Or shorter, using dictionary unpacking:
+    >>> indices = imod.select.points.get_indices(da, x=x, y=y)
+    >>> selection = da.isel(**indices)
 
     To set values (in a new array), the following will do the trick:
 
     >>> empty = xr.full_like(da, np.nan)
-    >>> empty.data[rr, ii] = values
+    >>> empty.data[indices["y"].values, indices["x"].values] = values
 
     Unfortunately, at the time of writing, xarray's .sel method does not
     support setting values yet. The method here works for both numpy and dask
     arrays, but you'll have to manage dimensions yourself!
+    
+    The `imod.select.points.set_values()` function will take care of the
+    dimensions.
     """
-    dx, xmin, _, dy, ymin, _ = imod.util.spatial_reference(da)
-    x = np.atleast_1d(x)
-    y = np.atleast_1d(y)
-    x_decreasing = da.indexes["x"].is_monotonic_decreasing
-    y_decreasing = da.indexes["y"].is_monotonic_decreasing
-
-    inside = in_bounds(da, x, y)
+    inside = in_bounds(da, **points)
+    # Error handling
     if not inside.all():
-        raise ValueError(
-            f"Points with x {x[~inside]} and {y[~inside]} are out of bounds"
-        )
-    nrow = da.y.size
-    ncol = da.x.size
+        raise ValueError(f"Not all points are within the bounds of the DataArray")
 
-    # Compute edges
-    ys = np.full(nrow + 1, ymin)
-    xs = np.full(ncol + 1, xmin)
-    # Turn dx, dy into array
-    if isinstance(dx, float):
-        dx = np.full(da.x.size, dx)
-    if isinstance(dy, float):
-        dy = np.full(da.y.size, dy)
-    # Always increasing
-    if x_decreasing:
-        xs[1:] += np.abs(dx[::-1]).cumsum()
-    else:
-        xs[1:] += np.abs(dx).cumsum()
-    if y_decreasing:
-        ys[1:] += np.abs(dy[::-1]).cumsum()
-    else:
-        ys[1:] += np.abs(dy).cumsum()
+    indices = {}
+    for coordname, value in points.items():
+        ind_da = xr.DataArray(_get_indices_1d(da, coordname, value), dims=["index"])
+        ind_da["index"] = np.arange(ind_da.size)
+        indices[coordname] = ind_da
 
-    # From np.searchsorted docstring:
-    # Find the indices into a sorted array a such that, if the corresponding
-    # elements in v were inserted before the indices, the order of a would
-    # be preserved.
-    iys = np.searchsorted(ys, y, side="right")
-    ixs = np.searchsorted(xs, x, side="right")
-
-    # Take care of decreasing coordinates
-    if x_decreasing:
-        cc = ncol - 1
-    else:
-        cc = ixs - 1
-    if y_decreasing:
-        rr = nrow - iys
-    else:
-        rr = iys - 1
-
-    return rr, cc
+    return indices
 
 
-def set_xy_values(da, x, y, values):
+def get_values(da, **points):
     """
-    Set values at specified x and y coordinates.
+    Get values from specified points.
 
     Parameters
     ----------
     da : xr.DataArray
-    x : np.array of length N
-    y : np.array of length N
-    values : np.array of length N
-
-    Returns
-    -------
-    da : xr.DataArray
-    """
-    if not da.dims[-2:] == ("y", "x"):
-        raise ValueError('Last two dimensions of DataArray must be ("y", "x")')
-    rr, cc = get_xy_indices(da, x, y)
-    da.data[..., rr, cc] = values
-    return da
-
-
-def get_xy_values(da, x, y):
-    """
-    Get values from specified x and y coordinates.
-    Out of bounds values are not returned.
-
-    Parameters
-    ----------
-    da : xr.DataArray
-    x : np.array
-    y : np.array
-
+    points : keyword arguments of coordinate=values
+        keyword arguments specifying coordinate and values.
     Returns
     -------
     selection : xr.DataArray
     """
-    rr, cc = get_xy_indices(da, x, y)
-    ind_y = xr.DataArray(rr, dims=["index"])
-    ind_x = xr.DataArray(cc, dims=["index"])
-    selection = da.isel(x=ind_x, y=ind_y)
-    selection.coords["index"] = np.arange(rr.size)
+    for coordname in points.keys():
+        if coordname not in da.coords:
+            raise ValueError(f'DataArray has no coordinate "{coordname}"')
+    indices = get_indices(da, **points)
+    selection = da.isel(**indices)
+    # Fetch a value from the dictionary, and get its size.
+    sample_size = len(next(iter(points.values())))
+    selection.coords["index"] = np.arange(sample_size)
     return selection
+
+
+def set_values(da, values, **points):
+    """
+    Set values at specified points.
+
+    Parameters
+    ----------
+    da : xr.DataArray
+    points : keyword arguments of coordinate=values
+        keyword arguments specifying coordinate and values. 
+
+    Returns
+    -------
+    None : mutates da.
+    """
+    inside = in_bounds(da, **points)
+    # Error handling
+    if not inside.all():
+        raise ValueError(f"Not all points are within the bounds of the DataArray")
+
+    sel_indices = {}
+    for coordname in points.keys():
+        if coordname not in da.coords:
+            raise ValueError(f'DataArray has no coordinate "{coordname}"')
+        underlying_dims = da.coords[coordname].dims
+        if len(underlying_dims) != 1:
+            raise ValueError(f"Coordinate {coordname} is not one-dimensional")
+        # Use the first and only element of underlying_dims
+        sel_indices[underlying_dims[0]] = _get_indices_1d(
+            da, coordname, points[coordname]
+        )
+
+    # Collect indices in the right order
+    indices = []
+    for dim in da.dims:
+        indices.append(sel_indices.get(dim, slice(None, None)))
+
+    # Set values in dask or numpy array
+    da.data[indices] = values
