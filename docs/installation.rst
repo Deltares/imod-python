@@ -49,12 +49,12 @@ Generally, we would like to write the entire program in one language. Due to
 slowness of interpreted languages, this has not been feasible within Python;
 especially for technical computing since we typically want to crunch large
 amounts of numbers. The solution people have come up with is to write the
-performance critical parts in a compiled language, and then intermittently
-call these programs from Python. This solves the performance problem, but at
-a price: while the package previously consisted of simply a set of Python
-modules (.py text files), it now includes compiled (binary) files, that are
-specific to your operating system and processor architecture. Not
-surprisingly, these are more complicated to distribute.
+performance critical parts in a compiled language like C or Fortran, and then
+intermittently call these programs from Python. This solves the performance
+problem, but at a price: while the package previously consisted of simply a
+set of Python modules (.py text files), it now includes compiled (binary)
+files, that are specific to your operating system and processor architecture.
+Not surprisingly, these are more complicated to distribute.
 
 
 Dependency conflicts
@@ -76,15 +76,21 @@ Installing Python packages with conda -- `without the agonizing pain <https://ci
 -----------------------------------------------------------------------------------------------------------------------------------------
 
 We highly recommend installing packages via conda. Conda is a package and
-environment manager that install packages from a remote repository. Pip
-(acronym for "Pip install packages") can also be used for installing Python
-packages, but was designed mainly to install pure Python packages, without
-binary dependencies; trying to ``pip install`` packages with complex depencies
-is therefore a recipe for frustration and disaster.
+environment manager that installs packages from a remote repository (which is
+a remote storage location of software packages). Pip (acronym for "Pip
+install packages") can also be used for installing Python packages, but was
+designed mainly to install pure Python packages, without binary dependencies;
+trying to ``pip install`` packages with complex depencies is therefore a
+recipe for frustration and disaster.
 
-Conda does several things, primarily: it provides isolated Python
-installations (termed environments), it install binary dependencies, and it
-solves the dependency problem when installing a package.
+Conda solves the dependency problem when installing a package. In case when
+version requirements cannot be satisfied, one can create in conda a new
+environment, through which two isolated environment with different package
+versions exist. 
+
+Some packages cannot be installed by conda, because those packages are not
+available on the conda channels. In that case, install the package via Pip
+(``pip install {package name}``). 
 
 Find the articles: `Understanding conda and pip
 <https://www.anaconda.com/understanding-conda-and-pip/>`_ and `Conda: Myths
@@ -99,7 +105,7 @@ Anaconda and Miniconda
 Ananaconda and Miniconda both provide a Python installation and conda as the
 package manager. The difference between them is that Anaconda comes with a
 large number of packages pre-installed in the base environment (which is why
-the installation is over a gigabyte). Miniconda, one the other hand, come
+the installation is over a gigabyte). Miniconda, on the other hand, comes
 bare bones. Since we recommend working from environments to install packages
 into (see below), we suggest to install Miniconda rather than Anaconda.
 
@@ -128,11 +134,11 @@ practical sense.)
 
 Below is the specification for an environment that should provide you with
 all the dependencies and requirements you need to build groundwater models
-with `imod-python`.
+with `imod-python`. 
 
 .. code-block:: yaml
 
-    name: imod
+    name: main
 
     channels:
       - conda-forge
@@ -165,12 +171,12 @@ Save this text into a file called ``environment.yml``, location doesn't
 really matter. In your command prompt, ``cd`` to this location and run:
 ``conda env create -f environment.yml``
 
-This will create a conda environment name ``imod`` as it is specified in the
+This will create a conda environment named ``main`` as it is specified in the
 file.
 
 Environments can be "activated" by running ``conda activate {name of
 environment}``. Active the just installed environment by running ``conda
-activate imod``. This essentially temporarily updates your `PATH variable
+activate main``. This essentially temporarily updates your `PATH variable
 <https://en.wikipedia.org/wiki/PATH_(variable)>`_, which is the set of
 directories where executable programs are located. After deactivating the
 conda environment, either via `conda deactivate` or by closing the command
@@ -195,7 +201,7 @@ repository of choice, and do a "development install":
 
 .. code-block:: console
 
-  activate imod
+  activate main
   git clone https://gitlab.com/deltares/imod/imod-python.git
   cd imod-python
   pip install -e .
