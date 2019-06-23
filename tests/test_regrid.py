@@ -643,6 +643,8 @@ def test_str_method():
     out = imod.prepare.Regridder(method="mean").regrid(source, like)
     assert np.allclose(out.values, compare)
 
+    out = imod.prepare.Regridder(method="nearest").regrid(source, like)
+
 
 # TODO: test nan values
 # Implement different methods: ignore, or accept

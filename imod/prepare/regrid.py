@@ -154,7 +154,7 @@ def _starts(src_x, dst_x):
 
 
 @numba.njit(cache=True)
-def _weights_1d(src_x, dst_x, is_increasing, use_relative_weights):
+def _weights_1d(src_x, dst_x, is_increasing, use_relative_weights=False):
     """
     Calculate regridding weights and indices for a single dimension
 
@@ -969,6 +969,7 @@ def conductance(values, weights):
 
 
 methods = {
+    "nearest": "nearest",
     "mean": mean,
     "harmonic_mean": harmonic_mean,
     "geometric_mean": geometric_mean,
