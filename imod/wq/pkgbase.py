@@ -77,9 +77,8 @@ class Package(xr.Dataset):
         directory : str
             Path to working directory, where files will be written.
             Necessary to generate the paths for the runfile.
-        d : dict, optional
-            Partially filled in dictionary with the parts of the filename.
-            Used for transient data.
+        time : datetime like, optional
+            Time corresponding to the value.
         da : xr.DataArray, optional
             In some cases fetching the DataArray by varname is not desired.
             It can be passed directly via this optional argument.

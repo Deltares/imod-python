@@ -184,8 +184,9 @@ Installing
 ----------
 
 The `imod` Python package can be installed with ``pip install imod``, and
-installs the version available on the `Python Package Index
-<https://pypi.org/>`_.
+installs the latest released version from the `Python Package Index
+<https://pypi.org/>`_. When using Anaconda Python, it is recommended to instead
+use ``conda install -c conda-forge imod``.
 
 Since we're currently in the process of adding a lot of features, the version
 on PyPI doesn't always install the carry the latest updates. To get the

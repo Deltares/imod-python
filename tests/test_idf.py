@@ -33,7 +33,7 @@ def test_da(request):
     data = np.ones((nrow, ncol), dtype=np.float32)
 
     def remove():
-        globremove("test.idf")
+        globremove("test*.idf")
 
     request.addfinalizer(remove)
     return xr.DataArray(data, **kwargs)
@@ -241,6 +241,17 @@ def test_xycoords_nonequidistant():
 def test_save__error(test_da):
     with pytest.raises(ValueError):
         idf.save("test.idf", test_da)
+
+
+def test_saveopen__steady(test_da):
+    first = test_da.copy().assign_coords(layer=1)
+    second = test_da.copy().assign_coords(layer=2)
+    steady_layers = xr.concat([first, second], dim="layer")
+    steady_layers = steady_layers.assign_coords(time="steady-state")
+    steady_layers = steady_layers.expand_dims("time")
+    idf.save("test", steady_layers)
+    da = idf.open("test_steady-state_l*.idf")
+    assert da.identical(steady_layers)
 
 
 def test_to_nan():
