@@ -969,6 +969,7 @@ def conductance(values, weights):
 
 
 methods = {
+    "nearest": "nearest",
     "mean": mean,
     "harmonic_mean": harmonic_mean,
     "geometric_mean": geometric_mean,
