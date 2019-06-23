@@ -6,6 +6,7 @@ import warnings
 
 import affine
 import cftime
+import dateutil
 import numpy as np
 
 try:
@@ -78,7 +79,7 @@ def decompose(path, pattern=None):
     else:  # Default to "iMOD conventions": {name}_{time}_l{layer}
         has_layer = bool(re.search(r"_l\d+$", stem))
         try:  # try for time
-            base_pattern = r"(?P<name>[\w-]+)_(?P<time>[0-9]+)"
+            base_pattern = r"(?P<name>[\w-]+)_(?P<time>[0-9-]+)"
             if has_layer:
                 base_pattern += r"_l(?P<layer>[0-9]+)"
             re_pattern = re.compile(base_pattern)
@@ -101,17 +102,25 @@ def decompose(path, pattern=None):
         d["name"] = "_".join(d.values())
 
     # steady-state as time identifier isn't picked up by <time>[0-9] regex, so strip from name
-    d["name"] = d["name"].replace("_steady-state", "")
+    steady = False
+    if "steady-state" in d["name"]:
+        steady = True
+        d["name"] = d["name"].replace("_steady-state", "")
+        d["time"] = "steady-state"
 
     # String -> type conversion
     if "layer" in d.keys():
         d["layer"] = int(d["layer"])
-    if "time" in d.keys():
+    if "time" in d.keys() and not steady:
         # iMOD supports two datetime formats
+        # try fast options first
         try:
-            d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d%H%M%S")
-        except ValueError:
-            d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d")
+            try:
+                d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d%H%M%S")
+            except ValueError:
+                d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d")
+        except ValueError:  # Try fullblown dateutil date parser
+            d["time"] = dateutil.parser.parse(d["time"])
 
     d["extension"] = path.suffix
     d["directory"] = path.parent
@@ -127,6 +136,9 @@ def _convert_datetimes(times, use_cftime):
     Alternatively, always returns as cftime.DatetimeProlepticGregorian if
     `use_cf_time` is True.
     """
+    if all(time == "steady-state" for time in times):
+        return times, False
+
     out_of_bounds = False
     if use_cftime:
         converted = [
@@ -153,34 +165,55 @@ def _convert_datetimes(times, use_cftime):
     return converted, use_cftime
 
 
-def compose(d):
+def compose(d, pattern=None):
     """
     From a dict of parts, construct a filename, following the iMOD
     conventions
     """
     haslayer = "layer" in d
     hastime = "time" in d
-    if hastime:
-        time = d["time"]
-        if isinstance(time, np.datetime64):
-            # The following line is because numpy.datetime64[ns] does not
-            # support converting to datetime, but returns an integer instead.
-            # This solution is 20 times faster than using pd.to_datetime()
-            d["timestr"] = time.astype("datetime64[us]").item().strftime("%Y%m%d%H%M%S")
-        else:
-            d["timestr"] = time.strftime("%Y%m%d%H%M%S")
 
-    if haslayer:
-        d["layer"] = int(d["layer"])
+    if pattern is None:
         if hastime:
-            s = "{name}_{timestr}_l{layer}{extension}".format(**d)
+            time = d["time"]
+            if time == "steady-state":
+                d["timestr"] = time
+            else:
+                if isinstance(time, np.datetime64):
+                    # The following line is because numpy.datetime64[ns] does not
+                    # support converting to datetime, but returns an integer instead.
+                    # This solution is 20 times faster than using pd.to_datetime()
+                    d["timestr"] = (
+                        time.astype("datetime64[us]").item().strftime("%Y%m%d%H%M%S")
+                    )
+                else:
+                    d["timestr"] = time.strftime("%Y%m%d%H%M%S")
+
+        if haslayer:
+            d["layer"] = int(d["layer"])
+            if hastime:
+                s = "{name}_{timestr}_l{layer}{extension}".format(**d)
+            else:
+                s = "{name}_l{layer}{extension}".format(**d)
         else:
-            s = "{name}_l{layer}{extension}".format(**d)
+            if hastime:
+                s = "{name}_{timestr}{extension}".format(**d)
+            else:
+                s = "{name}{extension}".format(**d)
     else:
         if hastime:
-            s = "{name}_{timestr}{extension}".format(**d)
-        else:
-            s = "{name}{extension}".format(**d)
+            time = d["time"]
+            if time == "steady-state":
+                d["timestr"] = time
+            else:
+                # Change time to datetime.datetime
+                if isinstance(time, np.datetime64):
+                    d["time"] = time.item()
+                elif isinstance(time, cftime.datetime):
+                    # Take first six elements of timetuple and convert to datetime
+                    d["time"] = datetime.datetime(*time.timetuple()[:6])
+        s = pattern.format(**d)
+
     if "directory" in d:
         return d["directory"].joinpath(s)
     else:

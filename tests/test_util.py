@@ -17,8 +17,35 @@ def test_compose():
         "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
     }
     path = util.compose(d)
-    assert isinstance(path, pathlib.Path)
     targetpath = pathlib.Path(d["directory"], "head_20180222090657_l5.idf")
+    assert path == targetpath
+
+
+def test_compose__pattern():
+    d = {
+        "name": "head",
+        "directory": pathlib.Path("path", "to"),
+        "extension": ".foo",
+        "layer": 5,
+    }
+    targetpath = pathlib.Path(d["directory"], "head_2018-02-22_l05.foo")
+
+    d["time"] = datetime.datetime(2018, 2, 22, 9, 6, 57)
+    path = util.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
+    assert path == targetpath
+
+    d["time"] = cftime.DatetimeProlepticGregorian(2018, 2, 22, 9, 6, 57)
+    path = util.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
+    assert path == targetpath
+
+    d["time"] = np.datetime64("2018-02-22 09:06:57")
+    path = util.compose(d, pattern="{name}_{time:%Y-%m-%d}_l{layer:02d}{extension}")
+    assert path == targetpath
+
+    targetpath = pathlib.Path(d["directory"], ".foo_makes_head_no_layer5_sense_day22")
+    path = util.compose(
+        d, pattern="{extension}_makes_{name}_no_layer{layer:d}_sense_day{time:%d}"
+    )
     assert path == targetpath
 
 
@@ -37,6 +64,19 @@ def test_decompose():
 
 def test_decompose_short_date():
     d = util.decompose("path/to/head_20180222_l5.idf")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("path", "to"),
+        "name": "head",
+        "time": datetime.datetime(2018, 2, 22),
+        "layer": 5,
+    }
+    assert isinstance(d, dict)
+    assert d == refd
+
+
+def test_decompose_nonstandard_date():
+    d = util.decompose("path/to/head_2018-02-22_l5.idf")
     refd = {
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
@@ -80,6 +120,7 @@ def test_decompose_steady_state():
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
         "name": "head",
+        "time": "steady-state",
         "layer": 64,
     }
     assert isinstance(d, dict)
@@ -174,7 +215,6 @@ def test_compose_year9999():
         "time": datetime.datetime(9999, 2, 22, 9, 6, 57),
     }
     path = util.compose(d)
-    assert isinstance(path, pathlib.Path)
     targetpath = pathlib.Path(d["directory"], "head_99990222090657_l5.idf")
     assert path == targetpath
 
