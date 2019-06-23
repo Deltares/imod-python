@@ -14,4 +14,5 @@ from imod.prepare.regrid import (
     maximum,
     mode,
     median,
+    conductance,
 )

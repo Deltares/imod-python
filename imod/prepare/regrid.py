@@ -154,7 +154,7 @@ def _starts(src_x, dst_x):
 
 
 @numba.njit(cache=True)
-def _weights_1d(src_x, dst_x, is_increasing):
+def _weights_1d(src_x, dst_x, is_increasing, use_relative_weights):
     """
     Calculate regridding weights and indices for a single dimension
 
@@ -181,6 +181,7 @@ def _weights_1d(src_x, dst_x, is_increasing):
     dst_inds = []
     src_inds = []
     weights = []
+    rel_weights = []
 
     # Reverse the coordinate direction locally if coordinate is not
     # monotonically increasing, so starts and overlap continue to work.
@@ -197,6 +198,7 @@ def _weights_1d(src_x, dst_x, is_increasing):
 
         _inds = []
         _weights = []
+        _rel_weights = []
         has_value = False
         while j < src_x.size - 1:
             src_x0 = src_x[j]
@@ -209,11 +211,14 @@ def _weights_1d(src_x, dst_x, is_increasing):
                 has_value = True
                 _inds.append(j)
                 _weights.append(overlap)
+                relative_overlap = overlap / (src_x1 - src_x0)
+                _rel_weights.append(relative_overlap)
                 j += 1
         if has_value:
             dst_inds.append(i)
             src_inds.append(_inds)
             weights.append(_weights)
+            rel_weights.append(_rel_weights)
             # Save max number of source cells
             # So we know how much to pre-allocate later on
             inds_len = len(_inds)
@@ -233,6 +238,8 @@ def _weights_1d(src_x, dst_x, is_increasing):
             np_src_inds[i, j] = ind
 
     np_weights = np.full((nrow, ncol), 0.0)
+    if use_relative_weights:
+        weights = rel_weights
     for i in range(nrow):
         for j, ind in enumerate(weights[i]):
             np_weights[i, j] = ind
@@ -485,7 +492,7 @@ def _is_increasing(src_x, dst_x):
         return True
 
 
-def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid):
+def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid, use_relative_weights):
     """
     Regrids an ndarray up to maximum 3 dimensions.
     Dimensionality of regridding is determined by the the length of src_coords
@@ -510,7 +517,7 @@ def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid):
     alloc_len = 1
     for src_x, dst_x in zip(src_coords, dst_coords):
         is_increasing = _is_increasing(src_x, dst_x)
-        size, i_w = _weights_1d(src_x, dst_x, is_increasing)
+        size, i_w = _weights_1d(src_x, dst_x, is_increasing, use_relative_weights)
         for elem in i_w:
             inds_weights.append(elem)
         alloc_len *= size
@@ -640,23 +647,107 @@ def _coord(da, dim):
     return x
 
 
+def _get_method(method):
+    if isinstance(method, str):
+        try:
+            _method = methods[method]
+        except KeyError as e:
+            raise ValueError(
+                "Invalid regridding method. Available methods are: {}".format(
+                    methods.keys()
+                )
+            ) from e
+    elif callable(method):
+        _method = method
+    else:
+        raise TypeError("method must be a string or rasterio.enums.Resampling")
+    return _method
+
+
 class Regridder(object):
     """
     Object to repeatedly regrid similar objects. Compiles once on first call,
     can then be repeatedly called without JIT compilation overhead.
+
+    Attributes
+    ----------
+    method : str, function
+        The method to use for regridding. Default available methods are:
+        {"mean", "harmonic_mean", "geometric_mean", "sum", "minimum",
+        "maximum", "mode", "median", "conductance"}
+    ndim_regrid : int, optional
+        The number of dimensions over which to regrid. If not provided,
+        `ndim_regrid` will be inferred. It serves to prevent regridding over an
+        unexpected number of dimensions; say you want to regrid over only two
+        dimensions. Due to an input error in the coordinates of `like`, three
+        dimensions may be inferred in the first `.regrid` call. An error will
+        be raised if ndim_regrid not match the number of inferred dimensions.
+        Default value is None.
+    use_relative_weights : bool, optional
+        Whether to use relative weights in the regridding method or not.
+        Relative weights are defined as: cell_overlap / source_cellsize, for
+        every axis.
+
+        This argument should only be used if you are providing your own
+        `method` as a function, where the function requires relative, rather
+        than absolute weights (the provided `conductance` method requires
+        relative weights, for example). Default value is False.
+
+    Examples
+    --------
+    Initialize the Regridder object:
+
+    >>> mean_regridder = imod.prepare.Regridder(method="mean")
+
+    Then call the `regrid` method to regrid.
+    >>> result = mean_regridder(source, like)
+
+    The regridder can be re-used if the number of regridding dimensions
+    match, saving some time by not (re)compiling the regridding method.
+
+    >>> second_result = mean_regrid(second_source, like)
+
+    A one-liner is possible for single use:
+
+    >>> result = imod.prepare.Regridder(method="mean").regrid(source, like)
+
+    It's possible to provide your own methods to the `Regridder`, provided that
+    numba can compile them. They need to take the arguments `values` and
+    `weights`. Make sure they deal with nan values gracefully!
+
+    >>> def p30(values, weights):
+    >>>     return np.nanpercentile(values, 30)
+
+    >>> p30_regridder = imod.prepare.Regridder(method=p30)
+    >>> p30_result = p30_regridder.regrid(source, like)
+
+    The Numba developers maintain a list of support Numpy features here:
+    https://numba.pydata.org/numba-doc/dev/reference/numpysupported.html
+
+    In general, however, the provided methods should be adequate for your
+    regridding needs.
     """
 
-    def __init__(self, method, ndim_regrid=None):
-        self.method = method
+    def __init__(self, method, ndim_regrid=None, use_relative_weights=False):
+        _method = _get_method(method)
+        self.method = _method
         self.ndim_regrid = ndim_regrid
         self._first_call = True
+        if _method == conductance:
+            use_relative_weights = True
+        self.use_relative_weights = use_relative_weights
 
     def _make_regrid(self):
         iter_regrid = _make_regrid(self.method, self.ndim_regrid)
 
         def nd_regrid(src, dst, src_coords_regrid, dst_coords_regrid):
             return _nd_regrid(
-                src, dst, src_coords_regrid, dst_coords_regrid, iter_regrid
+                src,
+                dst,
+                src_coords_regrid,
+                dst_coords_regrid,
+                iter_regrid,
+                self.use_relative_weights,
             )
 
         self._nd_regrid = nd_regrid
@@ -675,8 +766,16 @@ class Regridder(object):
         # Create tailor made regridding function: take method and ndims into
         # account and call it
         if self._first_call:
+
             if self.ndim_regrid is None:
-                self.ndim_regrid = len(regrid_dims)
+                ndim_regrid = len(regrid_dims)
+                if self.method == conductance and ndim_regrid > 2:
+                    raise ValueError(
+                        "The conductance method should not be applied to "
+                        "regridding more than two dimensions"
+                    )
+                self.ndim_regrid = ndim_regrid
+
             self._make_regrid()
             self._first_call = False
         else:
@@ -851,3 +950,32 @@ def mode(values, weights):
 
 def median(values, weights):
     return np.nanpercentile(values, 50)
+
+
+def conductance(values, weights):
+    v_agg = 0.0
+    w_sum = 0.0
+    for i in range(values.size):
+        v = values[i]
+        w = weights[i]
+        if np.isnan(v):
+            continue
+        v_agg += v * w
+        w_sum += w
+    if w_sum == 0:
+        return np.nan
+    else:
+        return v_agg
+
+
+methods = {
+    "mean": mean,
+    "harmonic_mean": harmonic_mean,
+    "geometric_mean": geometric_mean,
+    "sum": sum,
+    "minimum": minimum,
+    "maximum": maximum,
+    "mode": mode,
+    "median": median,
+    "conductance": conductance,
+}
