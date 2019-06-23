@@ -607,6 +607,40 @@ def _top_bot_dicts(a):
     return d_top, d_bot
 
 
+def _infer_top_bot(a):
+    # Allow tops and bottoms to be written for voxel like IDFs.
+    # TODO: this needs refactoring
+    has_topbot = False
+    if "z" in a.dims and "layer" not in a.dims:
+        # Check if they are interchangeable
+        if tuple(a["layer"].indexes.keys()) == ("z",):
+            # Avoid side-effects
+            a = a.copy().swap_dims({"z": "layer"})
+    if "top" in a.attrs and "bot" in a.attrs:
+        # This way of working should be deprecated
+        has_topbot = True
+        d_top, d_bot = _top_bot_dicts(a)
+    else:
+        try:
+            if "z" in a.coords and "layer" in a.coords:
+                # Data is only voxel data if z depends only on layer
+                if tuple(a["z"].indexes.keys()) == ("layer",):
+                    dz, _, _ = imod.util.coord_reference(a["z"])
+                    top = a["z"].values + 0.5 * np.abs(dz)
+                    bot = a["z"].values - 0.5 * np.abs(dz)
+                    layers = np.atleast_1d(a.coords["layer"].values)
+                    d_top = {laynum: t for laynum, t in zip(layers, top)}
+                    d_bot = {laynum: b for laynum, b in zip(layers, bot)}
+                    has_topbot = True
+        except:  # Just skip this step if it doesn't work out...
+            pass
+
+    if has_topbot:
+        return a, has_topbot, d_top, d_bot
+    else:
+        return a, has_topbot, {}, {}
+
+
 def save(path, a, nodata=1.0e20, pattern=None):
     """
     Write a xarray.DataArray to one or more IDF files
@@ -682,6 +716,9 @@ def save(path, a, nodata=1.0e20, pattern=None):
     d = {"extension": ".idf", "name": path.stem, "directory": path.parent}
     d["directory"].mkdir(exist_ok=True, parents=True)
 
+    # Allow tops and bottoms to be written for voxel like IDFs.
+    a, has_topbot, d_top, d_bot = _infer_top_bot(a)
+
     # handle the case where they are not a dim but are a coord
     # i.e. you only have one layer but you did a.assign_coords(layer=1)
     # in this case we do want _l1 in the IDF file name
@@ -696,12 +733,6 @@ def save(path, a, nodata=1.0e20, pattern=None):
             else:
                 val = a.coords[coord].item()
             d[coord] = val
-
-    # Allow tops and bottoms to be written for voxel like IDFs.
-    has_topbot = False
-    if "top" in a.attrs and "bot" in a.attrs:
-        has_topbot = True
-        d_top, d_bot = _top_bot_dicts(a)
 
     # stack all non idf dims into one new idf dimension,
     # over which we can then iterate to write all individual idfs
