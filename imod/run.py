@@ -31,9 +31,9 @@ package_schema = collections.OrderedDict(
 stress_period_schema = collections.OrderedDict(
     [
         ("wel", {"systems": True}),
-        ("drn", {"systems": True, "order": ("bot", "cond")}),
-        ("riv", {"systems": True, "order": ("stage", "cond", "bot", "inff")}),
-        ("ghb", {"systems": True, "order": ("head", "cond")}),
+        ("drn", {"systems": True, "order": ("cond", "bot")}),
+        ("riv", {"systems": True, "order": ("cond", "stage", "bot", "inff")}),
+        ("ghb", {"systems": True, "order": ("cond", "head")}),
         ("rch", {"systems": False}),
         ("chd", {"systems": False}),
     ]
