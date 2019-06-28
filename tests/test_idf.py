@@ -386,7 +386,11 @@ def test_lazy():
     This does the job of testing whether that function is part the graph.
     """
     a, _ = idf._dask("test.idf")
-    assert "_read" in str(next(a.dask.items())[1])
+    try:  # dask 2.0
+        assert "_read" in str(a.dask.items()[0][1])
+    # TODO: Remove when dask 2.0 is commonly installed
+    except TypeError:  # dask < 2.0
+        assert "_read" in str(next(a.dask.items())[1])
 
     # Test whether a change directory doesn't mess up reading a file
     @contextlib.contextmanager
