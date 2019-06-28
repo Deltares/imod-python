@@ -174,19 +174,21 @@ def test_da_nonequidistant(request):
 
 @pytest.fixture(scope="module")
 def test_da_subdomains(request):
-    nrow, ncol = (4, 5)
+    nlayer, nrow, ncol = (3, 4, 5)
     dx, dy = (1.0, -1.0)
+    layer = [1, 2, 3]
     xmin = (0.0, 3.0, 3.0, 0.0)
     xmax = (5.0, 8.0, 8.0, 5.0)
     ymin = (0.0, 2.0, 0.0, 2.0)
     ymax = (4.0, 6.0, 4.0, 6.0)
-    data = np.ones((nrow, ncol), dtype=np.float32)
+    data = np.ones((nlayer, nrow, ncol), dtype=np.float32)
 
-    kwargs = {"name": "subdomains", "dims": ("y", "x")}
+    kwargs = {"name": "subdomains", "dims": ("layer", "y", "x")}
 
     das = []
     for subd_extent in zip(xmin, xmax, ymin, ymax):
         kwargs["coords"] = util._xycoords(subd_extent, (dx, dy))
+        kwargs["coords"]["layer"] = layer
         das.append(xr.DataArray(data, **kwargs))
 
     def remove():
@@ -200,9 +202,10 @@ def test_open_subdomains(test_da_subdomains):
     subdomains = test_da_subdomains
 
     for i, subdomain in enumerate(subdomains):
-        idf.write(f"subdomains_p00{i}.idf", subdomain)
+        for layer, da in subdomain.groupby("layer"):
+            idf.write(f"subdomains_l{layer}_p00{i}.idf", da)
 
-    da = idf.open_subdomains("subdomains_*", use_cftime=False, pattern=r"{name}_p\d*")
+    da = idf.open_subdomains("subdomains_*.idf", pattern=r"{name}_l{layer}_p\d+")
 
     assert np.all(da == 1.0)
     assert len(da.x) == 8
@@ -211,6 +214,22 @@ def test_open_subdomains(test_da_subdomains):
     coords = util._xycoords((0.0, 8.0, 0.0, 6.0), (1.0, -1.0))
     assert np.all(da["y"].values == coords["y"])
     assert np.all(da["x"].values == coords["x"])
+
+    assert isinstance(da, xr.DataArray)
+
+
+def test_open_subdomains_error(test_da_subdomains):
+    subdomains = test_da_subdomains
+
+    for i, subdomain in enumerate(subdomains):
+        for layer, da in subdomain.groupby("layer"):
+            idf.write(f"subdomains_l{layer}_p00{i}.idf", da)
+
+    # Add an additional subdomain with only one layer
+    idf.write("subdomains_l1_p010.idf", subdomain.sel(layer=1))
+
+    with pytest.raises(ValueError):
+        da = idf.open_subdomains("subdomains_*.idf", pattern=r"{name}_l{layer}_p\d+")
 
 
 def test_xycoords_equidistant():
