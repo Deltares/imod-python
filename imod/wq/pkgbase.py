@@ -1,4 +1,5 @@
 import pathlib
+import warnings
 
 import jinja2
 import numpy as np
@@ -150,6 +151,49 @@ class Package(xr.Dataset):
                     if "layer" in da.dims:
                         da = da.dropna(dim="layer", how="all")
                 imod.idf.save(path, da)
+
+    def _check_positive(self, varnames):
+        for var in varnames:
+            # Take care with nan values
+            if (self[var] < 0).any():
+                raise ValueError(f"{var} in {self} must be positive")
+
+    def _check_range(self, varname, lower, upper):
+        warn = False
+        msg = ""
+        if (self[varname] < lower).any():
+            warn = True
+            msg += f"{var} in {self}: values lower than {lower} detected. "
+        if (self[varname] > upper).any():
+            warn = True
+            msg += f"{var} in {self}: values higher than {upper} detected."
+        if warn:
+            warnings.RuntimeWarning(msg)
+
+    def _check_location_consistent(self, varnames):
+        dims = set(self.dims)
+        for var in varnames:
+            if not self[var].shape == ():  # skip scalar value
+                dims.intersection(self[var].dims)
+
+        is_nan = True
+        for var in varnames:
+            if not self[var].shape == ():  # skip scalar values
+                # dimensions cannot change for in-place operations
+                # reduce to lowest set of dimension (e.g. just x and y)
+                var_dims = set(self[var].dims)
+                reduce_dims = var_dims.difference(dims)
+                # Inplace boolean operator
+                is_nan &= np.isnan(self[var]).all(dim=reduce_dims)
+
+        for var in varnames:
+            if not self[var].shape == ():
+                # minus gives difference: should be 0 everywhere.
+                if (np.isnan(self[var]) - is_nan).any():
+                    raise ValueError(
+                        f"{var} in {self} is not consistent with all variables in: "
+                        f"{', '.join(varnames)}. nan values do not line up."
+                    )
 
 
 class BoundaryCondition(Package):

@@ -167,3 +167,14 @@ class LayerPropertyFlow(Package):
         d["dicts"] = dicts
 
         return self._template.render(d)
+
+    def _pkgcheck(self, ibound=None):
+        to_check = [
+            "k_horizontal",
+            "k_vertical",
+            "horizontal_anisotropy",
+            "specific_storage",
+            "specific_yield",
+        ]
+        self._check_positive(to_check)
+        self._check_location_consistent(to_check)

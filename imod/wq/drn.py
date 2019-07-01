@@ -28,3 +28,7 @@ class Drainage(BoundaryCondition):
         self["elevation"] = elevation
         self["conductance"] = conductance
         self["save_budget"] = save_budget
+
+    def _pkgcheck(self, ibound=None):
+        self._check_positive(["conductance"])
+        self._check_location_consistent(["elevation", "conductance"])

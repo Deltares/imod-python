@@ -69,8 +69,8 @@ class PreconditionedConjugateGradientSolver(Package):
         self["damp"] = damp
 
     def _pkgcheck(self):
-        if not self["hclose"] > 0:
-            raise ValueError(f"hclose in {self} needs to be positive")
+        to_check = ["max_iter", "inner_iter", "rclose", "hclose", "damp"]
+        self._positive_check(to_check)
 
 
 class GeneralizedConjugateGradientSolver(Package):
@@ -134,6 +134,16 @@ class GeneralizedConjugateGradientSolver(Package):
         self["cclose"] = cclose
         self["preconditioner"] = preconditioner
         self["lump_dispersion"] = lump_dispersion
+
+    def _pkgcheck(self):
+        to_check = [
+            "max_iter",
+            "inner_iter",
+            "cclose",
+            "preconditioner",
+            "lump_dispersion",
+        ]
+        self._check_positive(to_check)
 
 
 class ParallelSolver(Package):
@@ -293,9 +303,7 @@ class ParallelKrylovFlowSolver(ParallelSolver):
 
     def _pkgcheck(self):
         to_check = ["hclose", "rclose", "max_iter", "inner_iter", "relax"]
-        for arg in to_check:
-            if not self[arg] > 0:
-                raise ValueError(f"{arg} in {self} needs to be positive")
+        self._positive_check(to_check)
 
         # Check whether option is actually an available option
         for opt_arg in self._keywords.keys():
@@ -402,9 +410,7 @@ class ParallelKrylovTransportSolver(ParallelSolver):
 
     def _pkgcheck(self):
         to_check = ["cclose", "max_iter", "inner_iter", "relax"]
-        for arg in to_check:
-            if not self[arg] > 0:
-                raise ValueError(f"{arg} in {self} needs to be positive")
+        self._positive_check(to_check)
 
         # Check whether option is actually an available option
         for opt_arg in self._keywords.keys():
