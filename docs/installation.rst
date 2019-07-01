@@ -83,14 +83,15 @@ designed mainly to install pure Python packages, without binary dependencies;
 trying to ``pip install`` packages with complex depencies is therefore a
 recipe for frustration and disaster.
 
-Conda solves the dependency problem when installing a package. In case when
-version requirements cannot be satisfied, one can create in conda a new
-environment, through which two isolated environment with different package
-versions exist. 
+Conda does several things. First and foremost, it solves the dependency
+problem when installing a package. Secondly, it also installs binary
+dependencies. Thirdly, it provides isolated Python installations (termed
+environments). You might create a new environment if you have unsatisfiable
+version requirements, like two versions of Python (e.g. 2.7 and 3.6).
 
-Some packages cannot be installed by conda, because those packages are not
-available on the conda channels. In that case, install the package via Pip
-(``pip install {package name}``). 
+Some packages cannot be installed by conda because they are not available on
+the conda channels. In that case, you can fall back on ``pip`` to install the
+package (``pip install {package name}``).
 
 Find the articles: `Understanding conda and pip
 <https://www.anaconda.com/understanding-conda-and-pip/>`_ and `Conda: Myths
@@ -134,11 +135,11 @@ practical sense.)
 
 Below is the specification for an environment that should provide you with
 all the dependencies and requirements you need to build groundwater models
-with `imod-python`. 
+with `imod-python`.
 
 .. code-block:: yaml
 
-    name: main
+    name: env_imod
 
     channels:
       - conda-forge
@@ -161,6 +162,7 @@ with `imod-python`.
       - pip
       - python=3.6
       - rasterio>=1.0
+      - scikit-image
       - scipy
       - spyder
       - toolz
@@ -171,7 +173,7 @@ Save this text into a file called ``environment.yml``, location doesn't
 really matter. In your command prompt, ``cd`` to this location and run:
 ``conda env create -f environment.yml``
 
-This will create a conda environment named ``main`` as it is specified in the
+This will create a conda environment named ``env_imod`` as it is specified in the
 file.
 
 Environments can be "activated" by running ``conda activate {name of
@@ -195,13 +197,13 @@ installs the latest released version from the `Python Package Index
 use ``conda install -c conda-forge imod``.
 
 Since we're currently in the process of adding a lot of features, the version
-on PyPI doesn't always install the carry the latest updates. To get the
-latest version, activate the environment, clone the reposistory to a
-repository of choice, and do a "development install":
+on PyPI or conda-forge doesn't always install the carry the latest updates.
+To get the latest version, activate the environment, clone the reposistory to
+a repository of choice, and do a "development install":
 
 .. code-block:: console
 
-  activate main
+  activate env_imod
   git clone https://gitlab.com/deltares/imod/imod-python.git
   cd imod-python
   pip install -e .
