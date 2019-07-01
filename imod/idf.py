@@ -358,7 +358,7 @@ def open(path, memmap=False, use_cftime=False, pattern=None):
 
     Open an IDF file, relying on default naming conventions to identify layer
     and time:
-    
+
     >>> head = imod.idf.open("head_20010101_l1.idf")
 
     Open multiple IDF files, in this case files for the year 2001 for all
@@ -398,9 +398,24 @@ def open(path, memmap=False, use_cftime=False, pattern=None):
     return _load(paths, use_cftime, pattern)
 
 
-def open_subdomains(path, use_cftime, pattern=None):
+def open_subdomains(path, use_cftime=False, pattern=None):
     """
     Combine IDF files of multiple subdomains.
+
+    Nota bene: Writing the resulting xr.DataArray to a netcdf with
+    `to_netcdf` is quite fast. However, saving the result to IDFs with
+    `imod.idf.save` is unfortunately extremely slow. The cause appears to be
+    a failure of the xarray scheduler: when saving to IDFs, it starts to
+    merge the IDFs for a single layer and a single time. This means that if
+    you 10 layers, and 30 times, that it will perform 300 individual merge
+    operations!
+
+    The easiest way around it is by calling `.load()` on the result once, if
+    it fits in your memory all at once. In this case, it will perform the
+    merge only once, combining layers and times in one go.
+
+    If it doesn't fit in memory, you might try re-chunking the result:
+    http://xarray.pydata.org/en/stable/generated/xarray.DataArray.chunk.html
 
     Parameters
     ----------
@@ -424,9 +439,24 @@ def open_subdomains(path, use_cftime, pattern=None):
     # There are no real benefits to itertools.groupby in this case, as there's
     # no benefit to using a (lazy) iterator in this case.
     grouped = collections.defaultdict(list)
+    numbers = []
     for p in paths:
         number = subdomain_pattern.search(p).group(1)
+        numbers.append(number)
         grouped[number].append(pathlib.Path(p))
+
+    numbers = sorted(set(numbers))
+    first = numbers[0]
+    first_len = len(grouped[first])
+
+    for number in numbers:
+        group_len = len(grouped[number])
+        if not group_len == first_len:
+            raise ValueError(
+                f"The number of IDFs are not identical for every subdomain. "
+                f"Subdomain p{first} has {first_len} IDF files, subdomain p{number} "
+                f"has {group_len} IDF files."
+            )
 
     # This pattern will ignore the subdomain part
     if pattern is None:
@@ -442,7 +472,12 @@ def open_subdomains(path, use_cftime, pattern=None):
     # See issue: https://github.com/pydata/xarray/issues/2947
     combined = xr.merge(subdomains).sortby("y", ascending=False)
 
-    return combined
+    # xr.merge always returns a Dataset. We want the DataArray.
+    data_vars = list(combined.data_vars.keys())
+    assert len(data_vars) == 1
+    name = data_vars[0]
+
+    return combined[name]
 
 
 def _load(paths, use_cftime, pattern):
@@ -658,7 +693,7 @@ def save(path, a, nodata=1.0e20, pattern=None):
         actual filename(s) using conventions, so it only takes the directory and
         name from this parameter.
     a : xarray.DataArray
-        DataArray to be written. It needs to have dimensions ('y', 'x'), and 
+        DataArray to be written. It needs to have dimensions ('y', 'x'), and
         optionally `layer` and `time`.
     nodata : float, optional
         Nodata value in the saved IDF files. Xarray uses nan values to represent
@@ -687,12 +722,12 @@ def save(path, a, nodata=1.0e20, pattern=None):
     file manager, you may specify:
 
         save("example", pattern="{name}_l{layer:02d}{extension}")
-    
+
     In this case, a 0 will be padded for single digit numbers ('1' will become
     '01').
-    
+
     To get a date with dashes, use the following pattern:
-        
+
         "{name}_{time:%Y-%m-%d}_l{layer}{extension}"
 
     """

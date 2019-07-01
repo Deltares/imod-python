@@ -163,3 +163,16 @@ class TimeDiscretization(Package):
             dicts[varname] = self._compose_values_time(varname, globaltimes)
         d["dicts"] = dicts
         return self._btn_template.render(d)
+
+    def _pkgcheck(self, ibound=None):
+        to_check = [
+            "timestep_duration",
+            "n_timesteps",
+            "transient",
+            "timestep_multiplier",
+            "max_n_transport_timestep",
+            "transport_initial_timestep",
+        ]
+        if "transport_timestep_multiplier" in self.data_vars:
+            to_check.append("transport_timestep_multiplier")
+        self._check_positive(to_check)

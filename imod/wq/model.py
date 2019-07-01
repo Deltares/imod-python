@@ -16,23 +16,27 @@ from imod.wq.pkggroup import PackageGroups
 
 # This class allows only imod packages as values
 class Model(collections.UserDict):
-    pass
+    def __setitem__(self, key, value):
+        # TODO: raise ValueError on setting certain duplicates
+        # e.g. two solvers
+        if self.check == "eager":
+            value._pkgcheck()
+        dict.__setitem__(self, key, value)
 
-
-#    def __setitem__(self, key, value):
-#        # TODO: raise ValueError on setting certain duplicates
-#        # e.g. two solvers
-#        if not hasattr(value, "_pkg_id"):
-#            raise ValueError("The value to set is not an imod package")
-#        dict.__setitem__(self, key, value)
-#
-#    def update(self, *args, **kwargs):
-#        for k, v in dict(*args, **kwargs).items():
-#            self[k] = v
+    def update(self, *args, **kwargs):
+        for k, v in dict(*args, **kwargs).items():
+            self[k] = v
 
 
 class SeawatModel(Model):
     """
+    Attributes
+    ----------
+    modelname : str
+    check : str, optional
+        When to perform model checks {None, "defer", "eager"}.
+        Defaults to "defer".
+
     Examples
     --------
     
@@ -61,9 +65,10 @@ class SeawatModel(Model):
         "    start_day = {{start_date[6:8]}}\n"
     )
 
-    def __init__(self, modelname):
+    def __init__(self, modelname, check="defer"):
         super(__class__, self).__init__()
         self.modelname = modelname
+        self.check = check
 
     def _get_pkgkey(self, pkg_id):
         """
@@ -390,6 +395,11 @@ class SeawatModel(Model):
 
         runfile_content = self.render(writehelp=False, result_dir=result_dir)
         runfilepath = directory.joinpath(f"{self.modelname}.run")
+
+        if not self.check is None:
+            self.package_check()
+
+        # Start writing
         directory.mkdir(exist_ok=True, parents=True)
 
         # Write the runfile
@@ -400,3 +410,17 @@ class SeawatModel(Model):
         for pkgname, pkg in self.items():
             if "x" in pkg.coords and "y" in pkg.coords:
                 pkg.save(directory=directory.joinpath(pkgname))
+
+    def package_check(self):
+        baskey = self._get_pkgkey("bas6")
+        if baskey is not None:
+            ibound = self[baskey]["ibound"]
+            top = self[baskey]["top"]
+            bottom = self[baskey]["bottom"]
+        else:
+            ibound = None
+            top = None
+            bottom = None
+
+        for pkg in self.values():
+            pkg._pkgcheck(ibound=ibound)

@@ -1,4 +1,5 @@
 import jinja2
+import skimage.morphology
 
 from imod.wq.pkgbase import Package
 
@@ -135,3 +136,26 @@ class BasicTransport(Package):
         )
         d["dicts"] = dicts
         return self._template.render(d)
+
+    def _pkgcheck(self, ibound=None):
+        to_check = [
+            "starting_concentration",
+            "porosity",
+            "n_species",
+            "minimum_active_thickness",
+        ]
+        self._check_positive(to_check)
+
+        active_cells = self["icbund"] != 0
+        if (active_cells & np.isnan(self["starting_concentration"])).any():
+            raise ValueError(
+                f"Active cells in icbund may not have a nan value in starting_concentration in {self}"
+            )
+
+        _, nlabels = skimage.morphology.label(
+            active_cells.values, connectivity=1, return_num=True
+        )
+        if nlabels > 1:
+            raise ValueError(
+                f"{nlabels} disconnected model domain detected in the icbund in {self}"
+            )
