@@ -50,7 +50,7 @@ class GeneralHeadBoundary(BoundaryCondition):
             self["density"] = density
         self["save_budget"] = save_budget
 
-    def _pgkcheck(self, ibound=None):
+    def _pkgcheck(self, ibound=None):
         to_check = ["conductance"]
         if "concentration" in self.data_vars:
             to_check.append("concentration")

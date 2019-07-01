@@ -1,4 +1,5 @@
 import jinja2
+import numpy as np
 import skimage.morphology
 
 from imod.wq.pkgbase import Package

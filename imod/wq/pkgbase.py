@@ -163,10 +163,10 @@ class Package(xr.Dataset):
         msg = ""
         if (self[varname] < lower).any():
             warn = True
-            msg += f"{var} in {self}: values lower than {lower} detected. "
+            msg += f"{varname} in {self}: values lower than {lower} detected. "
         if (self[varname] > upper).any():
             warn = True
-            msg += f"{var} in {self}: values higher than {upper} detected."
+            msg += f"{varname} in {self}: values higher than {upper} detected."
         if warn:
             warnings.RuntimeWarning(msg)
 
@@ -188,8 +188,7 @@ class Package(xr.Dataset):
 
         for var in varnames:
             if not self[var].shape == ():
-                # minus gives difference: should be 0 everywhere.
-                if (np.isnan(self[var]) - is_nan).any():
+                if (np.isnan(self[var]) ^ is_nan).any():
                     raise ValueError(
                         f"{var} in {self} is not consistent with all variables in: "
                         f"{', '.join(varnames)}. nan values do not line up."
