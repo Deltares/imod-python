@@ -302,16 +302,16 @@ class ParallelKrylovFlowSolver(ParallelSolver):
     def _pkgcheck(self, ibound=None):
         to_check = ["hclose", "rclose", "max_iter", "inner_iter", "relax"]
         self._check_positive(to_check)
-
-        # Check whether option is actually an available option
-        for opt_arg in self._keywords.keys():
-            if self[opt_arg] not in self._keywords[opt_arg].keys():
-                raise ValueError(
-                    "Argument for {} not in {}, instead got {}".format(
-                        opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]
-                    )
-                )
-
+        # TODO: fix
+        ## Check whether option is actually an available option
+        #for opt_arg in self._keywords.keys():
+        #    if self[opt_arg] not in self._keywords[opt_arg].keys():
+        #        raise ValueError(
+        #            "Argument for {} not in {}, instead got {}".format(
+        #                opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]
+        #            )
+        #        )
+        #
 
 class ParallelKrylovTransportSolver(ParallelSolver):
     """
@@ -409,12 +409,12 @@ class ParallelKrylovTransportSolver(ParallelSolver):
     def _pkgcheck(self, ibound=None):
         to_check = ["cclose", "max_iter", "inner_iter", "relax"]
         self._check_positive(to_check)
-
-        # Check whether option is actually an available option
-        for opt_arg in self._keywords.keys():
-            if self[opt_arg] not in self._keywords[opt_arg].keys():
-                raise ValueError(
-                    "Argument for {} not in {}, instead got {}".format(
-                        opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]
-                    )
-                )
+        # TODO: fix
+        ## Check whether option is actually an available option
+        #for opt_arg in self._keywords.keys():
+        #    if self[opt_arg] not in self._keywords[opt_arg].keys():
+        #        raise ValueError(
+        #            "Argument for {} not in {}, instead got {}".format(
+        #                opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]
+        #            )
+        #        )
