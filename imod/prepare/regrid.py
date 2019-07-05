@@ -753,11 +753,6 @@ class Regridder(object):
         self._nd_regrid = nd_regrid
 
     def regrid(self, source, like, fill_value=np.nan):
-        # TODO: add methods for "conserve" and "linear"
-        # Use xarray for nearest, and exit early.
-        if self.method == "nearest":
-            return source.reindex_like(like, method="nearest")
-
         # Find coordinates that already match, and those that have to be
         # regridded, and those that exist in source but not in like (left
         # untouched)
@@ -807,11 +802,22 @@ class Regridder(object):
         # defined somewhat intelligently: for 1d regridding for example the iter
         # loop is "hot" enough that numba compilation makes sense
 
-        # Allocate dst
-        # TODO: allocate lazy --> dask.array.full
-        dst = xr.DataArray(
-            data=np.full(dst_shape, fill_value), coords=dst_da_coords, dims=dst_dims
-        )
+        # TODO: add methods for "conserve" and "linear"
+        # Use xarray for nearest, and exit early.
+        if self.method == "nearest":
+            dst = xr.DataArray(
+                data=source.reindex_like(like, method="nearest"),
+                coords=dst_da_coords,
+                dims=dst_dims,
+            )
+            return dst
+        else:
+            # Allocate dst
+            # TODO: allocate lazy --> dask.array.full
+            dst = xr.DataArray(
+                data=np.full(dst_shape, fill_value), coords=dst_da_coords, dims=dst_dims
+            )
+
         # TODO: check that axes are aligned
         dst_coords_regrid = [_coord(dst, dim) for dim in regrid_dims]
         src_coords_regrid = [_coord(src, dim) for dim in regrid_dims]
