@@ -288,7 +288,10 @@ def coord_reference(da_coord):
         dx = dxs[0]
         atolx = abs(1.0e-6 * dx)
         if not np.allclose(dxs, dx, atolx):
-            raise ValueError(f"DataArray has to be equidistant along {da_coord.name}.")
+            raise ValueError(
+                f"DataArray has to be equidistant along {da_coord.name}, or cellsizes"
+                " must be provided as a coordinate named d{da_coord.name}."
+            )
 
         # as xarray uses midpoint coordinates
         xmin = float(x.min()) - 0.5 * abs(dx)
