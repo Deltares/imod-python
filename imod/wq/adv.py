@@ -40,7 +40,7 @@ class AdvectionFiniteDifference(Package):
         self["weighting"] = weighting
         self["weighting_factor"] = weighting_factor
 
-    def _pkgcheck(self):
+    def _pkgcheck(self, ibound=None):
         self._check_positive(["courant", "weighting", "weighting_factor"])
 
 
@@ -362,5 +362,5 @@ class AdvectionTVD(Package):
         super(__class__, self).__init__()
         self["courant"] = courant
 
-    def _pkgcheck(self):
+    def _pkgcheck(self, ibound=None):
         self._check_positive(["courant"])

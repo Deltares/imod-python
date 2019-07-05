@@ -21,7 +21,7 @@ class Model(collections.UserDict):
         # e.g. two solvers
         if self.check == "eager":
             value._pkgcheck()
-        dict.__setitem__(self, key, value)
+        super(__class__, self).__setitem__(key, value)
 
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).items():

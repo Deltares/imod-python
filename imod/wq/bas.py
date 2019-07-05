@@ -154,8 +154,8 @@ class BasicFlow(Package):
         # TODO: check dx > 0, dy < 0?
         # TODO: add non-equidistant support
         if "dx" not in self or "dy" not in self:  # assume equidistant
-            dx = util._delta(self["x"], "x")
-            dy = util._delta(self["y"], "y")
+            dx, _, _ = util.coord_reference(self["x"])
+            dy, _, _ = util.coord_reference(self["y"])
         else:
             dx = self.coords["dx"]
             dy = self.coords["dy"]
@@ -181,7 +181,7 @@ class BasicFlow(Package):
         )
         return th
 
-    def _pgkcheck(self, ibound=None):
+    def _pkgcheck(self, ibound=None):
         if (self["top"] < self["bottom"]).any():
             raise ValueError(f"top should be larger than bottom in {self}")
 

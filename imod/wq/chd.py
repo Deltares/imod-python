@@ -27,6 +27,6 @@ class ConstantHead(BoundaryCondition):
         self["head_end"] = head_end
         self["concentration"] = concentration
 
-    def _pgkcheck(self, ibound=None):
+    def _pkgcheck(self, ibound=None):
         self._check_positive(["concentration"])
         self._check_location_consistent(["head_start", "head_end", "concentration"])

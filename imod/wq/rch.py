@@ -38,6 +38,9 @@ class Recharge(BoundaryCondition):
 
         return self._template.render(d)
 
+    def _pkgcheck(self, ibound=None):
+        pass
+
 
 class RechargeTopLayer(Recharge):
     """

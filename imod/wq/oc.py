@@ -77,3 +77,6 @@ class OutputControl(Package):
         self["save_head_vtk"] = save_head_vtk
         self["save_concentration_vtk"] = save_concentration_vtk
         self["save_budget_vtk"] = save_budget_vtk
+
+    def _pkgcheck(self, ibound=None):
+        pass
