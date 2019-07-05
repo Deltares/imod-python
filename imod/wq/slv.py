@@ -136,11 +136,7 @@ class GeneralizedConjugateGradientSolver(Package):
         self["lump_dispersion"] = lump_dispersion
 
     def _pkgcheck(self, ibound=None):
-        to_check = [
-            "max_iter",
-            "inner_iter",
-            "cclose",
-        ]
+        to_check = ["max_iter", "inner_iter", "cclose"]
         self._check_positive(to_check)
 
 
@@ -304,7 +300,7 @@ class ParallelKrylovFlowSolver(ParallelSolver):
         self._check_positive(to_check)
         # TODO: fix
         ## Check whether option is actually an available option
-        #for opt_arg in self._keywords.keys():
+        # for opt_arg in self._keywords.keys():
         #    if self[opt_arg] not in self._keywords[opt_arg].keys():
         #        raise ValueError(
         #            "Argument for {} not in {}, instead got {}".format(
@@ -312,6 +308,7 @@ class ParallelKrylovFlowSolver(ParallelSolver):
         #            )
         #        )
         #
+
 
 class ParallelKrylovTransportSolver(ParallelSolver):
     """
@@ -411,7 +408,7 @@ class ParallelKrylovTransportSolver(ParallelSolver):
         self._check_positive(to_check)
         # TODO: fix
         ## Check whether option is actually an available option
-        #for opt_arg in self._keywords.keys():
+        # for opt_arg in self._keywords.keys():
         #    if self[opt_arg] not in self._keywords[opt_arg].keys():
         #        raise ValueError(
         #            "Argument for {} not in {}, instead got {}".format(

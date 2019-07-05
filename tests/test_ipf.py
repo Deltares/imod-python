@@ -169,7 +169,9 @@ def test_read__space(write_basic_ipf):
 @pytest.mark.parametrize("delim3", [",", " "])
 @pytest.mark.parametrize("delim4", [",", " "])
 @pytest.mark.parametrize("delim5", [",", " "])
-def test_read_associated__parameterized_delim(write_assoc_ipf, delim1, delim2, delim3, delim4, delim5):
+def test_read_associated__parameterized_delim(
+    write_assoc_ipf, delim1, delim2, delim3, delim4, delim5
+):
     path = "assoc.txt"
     write_assoc_ipf(path, delim1, delim2, delim3, delim4, delim5)
     df = ipf.read(path)
