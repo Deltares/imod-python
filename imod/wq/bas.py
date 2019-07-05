@@ -196,5 +196,5 @@ class BasicFlow(Package):
         )
         if nlabels > 1:
             raise ValueError(
-                f"{nlabel} disconnected model domain detected in the ibound in {self}"
+                f"{nlabels} disconnected model domain detected in the ibound in {self}"
             )
