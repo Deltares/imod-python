@@ -40,7 +40,7 @@ def in_bounds(da, **points):
     
     """
     # check sizes
-    shapes = []
+    shapes = {}
     for coord, value in points.items():
         arr = np.atleast_1d(value)
         points[coord] = arr
@@ -49,9 +49,9 @@ def in_bounds(da, **points):
             raise ValueError(
                 f"Coordinate {coord} is not one-dimensional, but has shape: {shape}"
             )
-        shapes.append(shape)
-    if not len(set(shapes)) == 1:
-        msg = [f"{coord}: {shape}" for coord, shape in shapes.items()].join("\n")
+        shapes[coord] = shape
+    if not len(set(shapes.values())) == 1:
+        msg = "\n".join([f"{coord}: {shape}" for coord, shape in shapes.items()])
         raise ValueError(f"Shapes of coordinates do match each other:\n{msg}")
 
     # Re-use shape state from loop above
@@ -101,6 +101,10 @@ def get_indices(da, **points):
     """
     Get the indices for points as defined by the arrays x and y.
 
+    This function will raise a ValueError if the points fall outside of the
+    bounds of the DataArray to avoid undefined behavior. Use the
+    `imod.select.points.in_bounds` function to detect these points.
+
     Parameters
     ----------
     da : xr.DataArray
@@ -112,8 +116,8 @@ def get_indices(da, **points):
 
     Examples
     --------
-    Using the indices that this function provides might be straightforward.
-    To get values, the following works:
+
+    To extract values:
 
     >>> x = [1.0, 2.2, 3.0]
     >>> y = [4.0, 5.6, 7.0]
@@ -123,13 +127,14 @@ def get_indices(da, **points):
     >>> selection = da.isel(x=ind_x, y=ind_y)
 
     Or shorter, using dictionary unpacking:
+
     >>> indices = imod.select.points.get_indices(da, x=x, y=y)
     >>> selection = da.isel(**indices)
 
     To set values (in a new array), the following will do the trick:
 
     >>> empty = xr.full_like(da, np.nan)
-    >>> empty.data[indices["y"].values, indices["x"].values] = values
+    >>> empty.data[indices["y"].values, indices["x"].values] = values_to_set
 
     Unfortunately, at the time of writing, xarray's .sel method does not
     support setting values yet. The method here works for both numpy and dask
@@ -156,6 +161,10 @@ def get_values(da, **points):
     """
     Get values from specified points.
 
+    This function will raise a ValueError if the points fall outside of the
+    bounds of the DataArray to avoid undefined behavior. Use the
+    `imod.select.points.in_bounds` function to detect these points.
+
     Parameters
     ----------
     da : xr.DataArray
@@ -164,6 +173,14 @@ def get_values(da, **points):
     Returns
     -------
     selection : xr.DataArray
+
+    Examples
+    --------
+
+    >>> x = [1.0, 2.2, 3.0]
+    >>> y = [4.0, 5.6, 7.0]
+    >>> selection = imod.select.points.get_values(da, x=x, y=y)
+
     """
     for coordname in points.keys():
         if coordname not in da.coords:
@@ -180,20 +197,41 @@ def set_values(da, values, **points):
     """
     Set values at specified points.
 
+    This function will raise a ValueError if the points fall outside of the
+    bounds of the DataArray to avoid undefined behavior. Use the
+    `imod.select.points.in_bounds` function to detect these points.
+
     Parameters
     ----------
     da : xr.DataArray
+    values : (int, float) or array of (int, float)
+
     points : keyword arguments of coordinate=values
         keyword arguments specifying coordinate and values. 
 
     Returns
     -------
     None : mutates da.
+
+    Examples
+    --------
+
+    >>> x = [1.0, 2.2, 3.0]
+    >>> y = [4.0, 5.6, 7.0]
+    >>> values = [10.0, 11.0, 12.0]
+    >>> selection = imod.select.points.get_values(da, values, x=x, y=y)
+
     """
     inside = in_bounds(da, **points)
     # Error handling
     if not inside.all():
         raise ValueError(f"Not all points are within the bounds of the DataArray")
+    if not isinstance(values, (int, float)):  # then it might be an array
+        if len(values) != len(inside):
+            raise ValueError(
+                "Shape of `values` does not match shape of coordinates."
+                f"Shape of values: {values.shape}; shape of coordinates: {inside.shape}."
+            )
 
     sel_indices = {}
     for coordname in points.keys():

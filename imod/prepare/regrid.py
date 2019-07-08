@@ -700,6 +700,7 @@ class Regridder(object):
     >>> mean_regridder = imod.prepare.Regridder(method="mean")
 
     Then call the `regrid` method to regrid.
+
     >>> result = mean_regridder(source, like)
 
     The regridder can be re-used if the number of regridding dimensions

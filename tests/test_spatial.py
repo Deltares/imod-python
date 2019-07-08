@@ -158,7 +158,7 @@ def test_table(test_shapefile):
     expected["id"] = [2]
     expected["area"] = [1.0]
 
-    actual = imod.prepare.spatial.cell_table(
+    actual = imod.prepare.spatial._celltable(
         "testvector/shape.shp", "values", 1.0, like
     )
     pd.testing.assert_frame_equal(actual, expected, check_dtype=False)
@@ -176,5 +176,5 @@ def test_rasterize_table():
     like = xr.DataArray(np.full((2, 2), np.nan), coords, dims)
     expected = xr.DataArray([[np.nan, np.nan], [1.0, np.nan]], coords, dims)
 
-    actual = imod.prepare.spatial.rasterize_table(table, "area", like)
+    actual = imod.prepare.spatial.rasterize_celltable(table, "area", like)
     assert actual.identical(expected)
