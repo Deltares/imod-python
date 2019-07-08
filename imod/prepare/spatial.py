@@ -816,4 +816,3 @@ def rasterize_celltable(table, column, like):
     dst = like.copy()
     dst.values = _burn_cells(dst.values, rows, cols, area)
     return dst
-
