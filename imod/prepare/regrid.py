@@ -482,11 +482,11 @@ def _is_increasing(src_x, dst_x):
     Make sure coordinate values always increase so the _starts function above
     works properly.
     """
-    src_dx0 = np.atleast_1d(src_x[1] - src_x[0])
-    dst_dx0 = np.atleast_1d(dst_x[1] - dst_x[0])
-    if (src_dx0 > 0.0).any() ^ (dst_dx0 > 0.0).any():
+    src_dx0 = src_x[1] - src_x[0]
+    dst_dx0 = dst_x[1] - dst_x[0]
+    if (src_dx0 > 0.0) ^ (dst_dx0 > 0.0):
         raise ValueError("source and like coordinates not in the same direction")
-    if (src_dx0 < 0.0).any():
+    if src_dx0 < 0.0:
         return False
     else:
         return True
@@ -975,6 +975,17 @@ def conductance(values, weights):
         return v_agg
 
 
+def max_overlap(values, weights):
+    max_w = 0.0
+    v = np.nan
+    for i in range(values.size):
+        w = weights[i]
+        if w > max_w:
+            max_w = w
+            v = values[i]
+    return v
+
+
 METHODS = {
     "nearest": "nearest",
     "mean": mean,
@@ -986,4 +997,5 @@ METHODS = {
     "mode": mode,
     "median": median,
     "conductance": conductance,
+    "max_overlap": max_overlap,
 }

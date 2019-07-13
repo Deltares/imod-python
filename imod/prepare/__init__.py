@@ -13,4 +13,6 @@ from imod.prepare.regrid import (
     mode,
     median,
     conductance,
+    max_overlap,
 )
+from imod.prepare.voxelize import Voxelizer

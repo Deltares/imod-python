@@ -80,6 +80,7 @@ def test_methods():
     assert np.allclose(imod.prepare.regrid.maximum(values, weights), 4.0)
     assert np.allclose(imod.prepare.regrid.median(values, weights), 2.5)
     assert np.allclose(imod.prepare.regrid.conductance(values, weights), 300.0)
+    assert np.allclose(imod.prepare.regrid.max_overlap(values, weights), 4.0)
 
     # Check if no issues arise with all nan
     values[:] = np.nan
@@ -88,6 +89,7 @@ def test_methods():
     assert np.isnan(imod.prepare.regrid.maximum(values, weights))
     assert np.isnan(imod.prepare.regrid.median(values, weights))
     assert np.isnan(imod.prepare.regrid.conductance(values, weights))
+    assert np.isnan(imod.prepare.regrid.max_overlap(values, weights))
 
 
 def test_methods_zeros():
