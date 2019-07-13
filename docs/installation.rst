@@ -190,7 +190,7 @@ use ``conda install -c conda-forge imod``.
 
 Since we're currently in the process of adding a lot of features, the version
 on PyPI doesn't always install the carry the latest updates. To get the
-latest version, activate the environment, clone the reposistory to a
+latest version, activate the environment, clone the repository to a
 repository of choice, and do a "development install":
 
 .. code-block:: console
