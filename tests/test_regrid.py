@@ -90,6 +90,12 @@ def test_methods():
     assert np.isnan(imod.prepare.regrid.conductance(values, weights))
 
 
+def test_methods_zeros():
+    values = np.zeros(5)
+    weights = np.arange(0.0, 50.0, 10.0)
+    assert np.allclose(imod.prepare.regrid.mean(values, weights), 0.0)
+
+
 def test_overlap():
     assert imod.prepare.regrid._overlap((0.0, 1.0), (0.0, 2.0)) == 1.0
     assert imod.prepare.regrid._overlap((-1.0, 1.0), (0.0, 2.0)) == 1.0

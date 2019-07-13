@@ -482,11 +482,11 @@ def _is_increasing(src_x, dst_x):
     Make sure coordinate values always increase so the _starts function above
     works properly.
     """
-    src_dx0 = src_x[1] - src_x[0]
-    dst_dx0 = dst_x[1] - dst_x[0]
-    if (src_dx0 > 0.0) ^ (dst_dx0 > 0.0):
+    src_dx0 = np.atleast_1d(src_x[1] - src_x[0])
+    dst_dx0 = np.atleast_1d(dst_x[1] - dst_x[0])
+    if (src_dx0 > 0.0).any() ^ (dst_dx0 > 0.0).any():
         raise ValueError("source and like coordinates not in the same direction")
-    if src_dx0 < 0.0:
+    if (src_dx0 < 0.0).any():
         return False
     else:
         return True
@@ -647,7 +647,7 @@ def _coord(da, dim):
     return x
 
 
-def _get_method(method):
+def _get_method(method, methods):
     if isinstance(method, str):
         try:
             _method = methods[method]
@@ -730,7 +730,7 @@ class Regridder(object):
     """
 
     def __init__(self, method, ndim_regrid=None, use_relative_weights=False):
-        _method = _get_method(method)
+        _method = _get_method(method, METHODS)
         self.method = _method
         self.ndim_regrid = ndim_regrid
         self._first_call = True
@@ -845,7 +845,7 @@ def mean(values, weights):
             continue
         vsum += w * v
         wsum += w
-    if vsum == 0:
+    if wsum == 0:
         return np.nan
     else:
         return vsum / wsum
@@ -975,7 +975,7 @@ def conductance(values, weights):
         return v_agg
 
 
-methods = {
+METHODS = {
     "nearest": "nearest",
     "mean": mean,
     "harmonic_mean": harmonic_mean,
