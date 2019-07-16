@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import versioneer
 
 with open("README.rst") as f:
@@ -14,7 +14,7 @@ setup(
     author="Martijn Visser",
     author_email="martijn.visser@deltares.nl",
     license="MIT",
-    packages=["imod"],
+    packages=find_packages(),
     package_dir={"imod": "imod"},
     package_data={"imod": ["templates/*.j2"]},
     test_suite="tests",
