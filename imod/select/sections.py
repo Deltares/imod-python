@@ -294,6 +294,10 @@ def _cross_section(data, linecoords):
     # Set dimension values
     section.coords["s"] = segments.cumsum() - 0.5 * segments
     section = section.assign_coords(ds=("s", segments))
+    # Without this sort, the is_increasing_monotonic property of the "s" index
+    # in the DataArray returns False, and plotting the DataArray as a quadmesh
+    # appears to fail. TODO: investigate, seems like an xarray issue.
+    section = section.sortby("s")
 
     return section
 
