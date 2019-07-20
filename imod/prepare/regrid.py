@@ -3,7 +3,7 @@ import numpy as np
 import xarray as xr
 
 
-def _linear_inds_weights_1d(src_x, dst_x, xmin, xmax):
+def _linear_inds_weights_1d(src_x, dst_x):
     """
     Returns indices and weights for linear interpolation along a single dimension.
     A sentinel value of -1 is added for dst cells that are fully out of bounds.
@@ -11,18 +11,23 @@ def _linear_inds_weights_1d(src_x, dst_x, xmin, xmax):
     Parameters
     ----------
     src_x : np.array
-        Location of points on source grid. NOT vertex locations!
-    dst_x : np.array
-        Location of points on destination grid. NOT vertex locations!
-    xmin : float
-        Minimum coordinate value for src
-    xmax : float
-        Maximum coordinate value for src
+        vertex coordinates of source
+    dst_x: np.array
+        vertex coordinates of destination
     """
     # From np.searchsorted docstring:
     # Find the indices into a sorted array a such that, if the corresponding
     # elements in v were inserted before the indices, the order of a would
     # be preserved.
+    xmin = src_x.min()
+    xmax = src_x.max()
+
+    # Compute midpoints for linear interpolation
+    src_dx = np.diff(src_x)
+    src_x = src_x[:-1] + 0.5 * src_dx
+    dst_dx = np.diff(dst_x)
+    dst_x = dst_x[:-1] + 0.5 * dst_dx
+
     i = np.searchsorted(src_x, dst_x) - 1
     # Out of bounds indices
     i[i < 0] = 0
@@ -54,72 +59,159 @@ def _linear_inds_weights_1d(src_x, dst_x, xmin, xmax):
     return i, norm_weights
 
 
-@numba.njit
-def _iter_interpolate(src, dst, inds, weights):
+@numba.njit(cache=True)
+def _interp_1d(src, dst, *inds_weights):
     """
+    numba compiled function to regrid in three dimensions
+
     Parameters
     ----------
     src : np.array
-        source array, reshaped to a 2d array. Interpolation occurs over the
-        last dimension.
     dst : np.array
-        destination array, reshaped to a 2d array.
-    inds : np.array
-        indexes, size equal to last dimension of dst
-    weights : np.array
-        normalized weight, size equal to last dimension of dst
-
-    Returns
-    -------
-    dst : np.array
-        destination, contains interpolated values over last dimension
+    src_coords : tuple of np.arrays of edges
+    dst_coords : tuple of np.arrays of edges
+    method : numba.njit'ed function
     """
-    n_iter, _ = src.shape
-    for i in range(n_iter):
-        for j, ind in enumerate(inds):
-            if ind < 0:  # sentinel value: out of bounds
+    kk, weights_x = inds_weights
+    # i, j, k are indices of dst array
+    for k, (ix, wx) in enumerate(zip(kk, weights_x)):
+        if ix < 0:
+            continue
+        v0 = src[ix]
+        v1 = src[ix + 1]
+        v = v0 + wx * (v1 - v0)
+        dst[k] = v
+    return dst
+
+
+@numba.njit(cache=True)
+def _interp_2d(src, dst, *inds_weights):
+    jj, weights_y, kk, weights_x = inds_weights
+
+    for j, (iy, wy) in enumerate(zip(jj, weights_y)):
+        if iy < 0:
+            continue
+
+        for k, (ix, wx) in enumerate(zip(kk, weights_x)):
+            if ix < 0:
                 continue
-            v0 = src[i, ind]
-            v1 = src[i, ind + 1]
-            dst[i, j] = v0 + weights[j] * (v1 - v0)
-            # See _linear_inds_weights_1d for explanation of weight
+
+            v00 = src[iy, ix]
+            v01 = src[iy, ix + 1]
+            v10 = src[iy + 1, ix]
+            v11 = src[iy + 1, ix + 1]
+
+            # First interpolate over y
+            v0 = v00 + wy * (v00 - v10)
+            v1 = v01 + wy * (v10 - v11)
+            # Second interpolate over x
+            v = v0 + wx * (v1 - v0)
+
+            dst[j, k] = v
     return dst
 
 
-def _nd_interp(src, inds, weights, fill_value=np.nan):
-    # Make sure we don't mutate source
-    temp = src.copy()
-    dst = temp
-    # Get all the necessary shape information
-    orig_shape = src.shape
-    ndim_regrid = len(inds)
-    new_shape = orig_shape[:-ndim_regrid] + tuple([i.size for i in inds])
-    # Temp shape for bookkeeping, where which axis ends up
-    temp_shape = list(new_shape)
+@numba.njit(cache=True)
+def _interp_3d(src, dst, *inds_weights):
+    ii, weights_z, jj, weights_y, kk, weights_x = inds_weights
+    for i, (iz, wz) in enumerate(zip(ii, weights_z)):
+        if iz < 0:
+            continue
 
-    for count, (i, w) in enumerate(zip(inds, weights)):
-        if count > 0:
-            # Move interpolated axis to the start
-            # Expose next axis at the end to interpolate
-            temp = np.moveaxis(temp, -1, 0)
-            temp_shape.insert(0, temp_shape.pop(-1))
+        for j, (iy, wy) in enumerate(zip(jj, weights_y)):
+            if iy < 0:
+                continue
 
-        # Allocate destination
-        dst = np.full((*temp.shape[:-1], i.size), fill_value)
-        # ndim_regrid for linear interpolation is always one
-        temp, dst = _reshape(temp, dst, ndim_regrid=1)
-        # Interpolate over a single dimension
-        dst = _iter_interpolate(temp, dst, i, w)
-        temp = dst.reshape(orig_shape[: count - 1] + new_shape[count - 1 :])
+            for k, (ix, wx) in enumerate(zip(kk, weights_x)):
+                if ix < 0:
+                    continue
 
-    # Restore to original shape
-    # Doesn't allocate
-    # TODO: maybe call .ascontiguousarray?
-    dst = dst.reshape(temp_shape)
-    for _ in range(count):
-        dst = np.moveaxis(dst, 0, -1)
+                v000 = src[iz, iy, ix]
+                v001 = src[iz, iy, ix + 1]
+                v010 = src[iz, iy + 1, ix]
+                v011 = src[iz, iy + 1, ix + 1]
+                v100 = src[iz + 1, iy, ix]
+                v101 = src[iz + 1, iy, ix + 1]
+                v110 = src[iz + 1, iy + 1, ix]
+                v111 = src[iz + 1, iy + 1, ix + 1]
 
+                # First interpolate over z
+                v00 = v000 + wz * (v100 - v000)
+                v01 = v000 + wz * (v101 - v001)
+                v10 = v000 + wz * (v110 - v010)
+                v11 = v000 + wz * (v111 - v011)
+                # Second interpolate over y
+                v0 = v00 + wy * (v00 - v10)
+                v1 = v01 + wy * (v10 - v11)
+                # Third interpolate over x
+                v = v0 + wx * (v1 - v0)
+
+                dst[i, j, k] = v
     return dst
+
+
+@numba.njit
+def _iter_interp(iter_src, iter_dst, interp_function, *inds_weights):
+    n_iter = iter_src.shape[0]
+    for i in range(n_iter):
+        iter_dst[i, ...] = interp_function(
+            iter_src[i, ...], iter_dst[i, ...], *inds_weights
+        )
+    return iter_dst
+
+
+def _jit_interp(ndim_interp):
+    @numba.njit
+    def jit_interp_1d(src, dst, *inds_weights):
+        return _interp_1d(src, dst, *inds_weights)
+
+    @numba.njit
+    def jit_interp_2d(src, dst, *inds_weights):
+        return _interp_2d(src, dst, *inds_weights)
+
+    @numba.njit
+    def jit_interp_3d(src, dst, *inds_weights):
+        return _interp_3d(src, dst, *inds_weights)
+
+    if ndim_interp == 1:
+        jit_interp = jit_interp_1d
+    elif ndim_interp == 2:
+        jit_interp = jit_interp_2d
+    elif ndim_interp == 3:
+        jit_interp = jit_interp_3d
+    else:
+        raise NotImplementedError("cannot regrid over more than three dimensions")
+
+    return jit_interp
+
+
+def _make_interp(ndim_regrid):
+    jit_interp = _jit_interp(ndim_regrid)
+
+    @numba.njit
+    def iter_interp(iter_src, iter_dst, *inds_weights):
+        return _iter_interp(iter_src, iter_dst, jit_interp, *inds_weights)
+
+    return iter_interp
+
+
+def _nd_interp(src, dst, src_coords, dst_coords, iter_interp):
+    assert len(src.shape) == len(dst.shape)
+    assert len(src_coords) == len(dst_coords)
+    ndim_regrid = len(src_coords)
+
+    # Determine weights for every regrid dimension, and alloc_len,
+    # the maximum number of src cells that may end up in a single dst cell
+    inds_weights = []
+    for src_x, dst_x in zip(src_coords, dst_coords):
+        iw = _linear_inds_weights_1d(src_x, dst_x)
+        for elem in iw:
+            inds_weights.append(elem)
+
+    iter_src, iter_dst = _reshape(src, dst, ndim_regrid)
+    iter_dst = iter_interp(iter_src, iter_dst, *inds_weights)
+
+    return iter_dst.reshape(dst.shape)
 
 
 @numba.njit(cache=True)
@@ -740,6 +832,7 @@ class Regridder(object):
 
     def _make_regrid(self):
         iter_regrid = _make_regrid(self.method, self.ndim_regrid)
+        iter_interp = _make_interp(self.ndim_regrid)
 
         def nd_regrid(src, dst, src_coords_regrid, dst_coords_regrid):
             return _nd_regrid(
@@ -751,7 +844,17 @@ class Regridder(object):
                 self.use_relative_weights,
             )
 
-        self._nd_regrid = nd_regrid
+        def nd_interp(src, dst, src_coords_regrid, dst_coords_regrid):
+            return _nd_interp(
+                src, dst, src_coords_regrid, dst_coords_regrid, iter_interp
+            )
+
+        if self.method == "nearest":
+            pass
+        elif self.method == "linear":
+            self._nd_regrid = nd_interp
+        else:
+            self._nd_regrid = nd_regrid
 
     def regrid(self, source, like, fill_value=np.nan):
         # Find coordinates that already match, and those that have to be
@@ -988,6 +1091,7 @@ def max_overlap(values, weights):
 
 METHODS = {
     "nearest": "nearest",
+    "linear": "linear",
     "mean": mean,
     "harmonic_mean": harmonic_mean,
     "geometric_mean": geometric_mean,
