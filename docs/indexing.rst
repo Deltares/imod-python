@@ -307,8 +307,8 @@ sufficient:
    nrow, ncol = grid.shape
    for i in range(nrow):
       for j in range(ncol):
-         class = landuse_classes[i, j]
-         aggregated[class] += grid[i, j]
+         landuse = landuse_classes[i, j]
+         aggregated[landuse] += grid[i, j]
 
 While this code takes only a single pass over the data, it will generally be
 much slower than the two alternatives above. The reason is that while they take
