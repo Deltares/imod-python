@@ -1,3 +1,9 @@
+"""
+Functions that make use of `rasterio <https://rasterio.readthedocs.io/en/stable/>`_ for input and output.
+
+Currently only :func:`imod.rasterio.write` is implemented.
+"""
+
 import pathlib
 
 import numpy as np
@@ -7,7 +13,7 @@ from imod import idf, util
 
 
 def write(path, da, driver=None, nodata=np.nan):
-    """Write DataArray to GDAL supported geospatial rasters using rasterio
+    """Write `xarray.DataArray` to GDAL supported geospatial rasters using `rasterio`.
     
     Parameters
     ----------

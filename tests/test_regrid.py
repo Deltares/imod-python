@@ -628,7 +628,7 @@ def test_regrid_conductance3d__errors():
     like = xr.DataArray(np.empty((5, 2, 2)), likecoords, dims)
 
     with pytest.raises(ValueError):
-        _ = imod.prepare.Regridder(method=imod.prepare.conductance).regrid(source, like)
+        _ = imod.prepare.Regridder(method=imod.prepare.regrid.conductance).regrid(source, like)
     with pytest.raises(ValueError):
         _ = imod.prepare.Regridder(method="conductance").regrid(source, like)
 
@@ -643,7 +643,7 @@ def test_str_method():
     source = xr.DataArray(values, coords, dims)
     like = xr.DataArray(np.empty(2), like_coords, dims)
     # Test function method
-    out = imod.prepare.Regridder(method=imod.prepare.mean).regrid(source, like)
+    out = imod.prepare.Regridder(method=imod.prepare.regrid.mean).regrid(source, like)
     compare = np.array([1.5, 3.0])
     assert np.allclose(out.values, compare)
 

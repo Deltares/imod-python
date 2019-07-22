@@ -9,11 +9,8 @@ imod module
     :undoc-members:
     :show-inheritance:
 
-Submodules
-----------
-
-imod.idf module
----------------
+imod.idf submodule
+------------------
 
 .. automodule:: imod.idf
     :members:
@@ -21,19 +18,16 @@ imod.idf module
     :exclude-members: dask, dataarray
     :show-inheritance:
 
-imod.ipf module
----------------
+imod.ipf submodule
+------------------
 
 .. automodule:: imod.ipf
     :members:
     :undoc-members:
     :show-inheritance:
 
-imod.prepare module
--------------------
-
-imod.prepare.Regridder
-~~~~~~~~~~~~~~~~~~~~~~
+imod.prepare submodule
+----------------------
 
 .. automodule:: imod.prepare
     :members:
@@ -41,83 +35,58 @@ imod.prepare.Regridder
     :undoc-members:
     :show-inheritance:
 
-imod.prepare.spatial
-~~~~~~~~~~~~~~~~~~~~
-
-.. automodule:: imod.prepare.spatial
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-imod.prepare.subsoil
-~~~~~~~~~~~~~~~~~~~~
-
-.. automodule:: imod.prepare.subsoil
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-imod.prepare.surface_water
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. automodule:: imod.prepare.surface_water
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-imod.rasterio module
---------------------
+imod.rasterio submodule
+-----------------------
 
 .. automodule:: imod.rasterio
     :members:
     :undoc-members:
     :show-inheritance:
 
-imod.select module
+imod.select submodule
+---------------------
+
+.. automodule:: imod.select
+    :members:
+    :imported-members:
+    :undoc-members:
+    :show-inheritance:
+
+imod.run submodule
 ------------------
-
-imod.select.points
-~~~~~~~~~~~~~~~~~~
-
-.. automodule:: imod.select.points
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-imod.select.sections
-~~~~~~~~~~~~~~~~~~~~
-
-.. automodule:: imod.select.sections
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-imod.run module
----------------
 
 .. automodule:: imod.run
     :members:
     :undoc-members:
     :show-inheritance:
 
-imod.tec module
----------------
+imod.tec submodule
+------------------
 
 .. automodule:: imod.tec
     :members:
     :undoc-members:
     :show-inheritance:
 
-imod.util module
-----------------
+imod.util submodule
+-------------------
 
 .. automodule:: imod.util
     :members:
     :undoc-members:
     :show-inheritance:
 
-imod.wq module
---------------
+imod.visualize submodule
+------------------------
+
+.. automodule:: imod.visualize
+    :members:
+    :imported-members:
+    :undoc-members:
+    :show-inheritance:
+
+imod.wq submodule
+-----------------
 
 .. automodule:: imod.wq
     :members:

@@ -1,4 +1,5 @@
 import pathlib
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -138,6 +139,9 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
     Writes an iMODSEAWAT model, including runfile, as specified by `model` into
     directory `path`.
 
+    .. deprecated:: 0.7.0
+        imod.seawat_write is deprecated, use the write method of imod.wq.SeawatModel instead.
+
     Directory `path` is created if it does not already exist.
 
     When `runfile_parameters` is specified, its values are used to fill in the
@@ -179,6 +183,8 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
     >>> runfile_parameters["hclose"] = 0.00001
     >>> imod.seawat_write(path="example_dir", model=a, runfile_parameters=runfile_parameters)
     """
+    warnings.warn("imod.seawat_write is deprecated, use the write method of imod.wq.SeawatModel instead.", FutureWarning)
+
     if isinstance(path, str):
         path = pathlib.Path(path)
     path.mkdir(exist_ok=True, parents=True)

@@ -1,3 +1,10 @@
+"""
+Functions for reading and writing iMOD Point Files (IDFs) to ``pandas.DataFrame``.
+
+The primary functions to use are :func:`imod.ipf.read` and
+:func:`imod.ipf.save`, though lower level functions are also available.
+"""
+
 import collections
 import csv
 import glob

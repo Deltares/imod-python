@@ -1,3 +1,10 @@
+"""
+Functions for reading and writing iMOD Data Files (IDFs) to ``xarray`` objects.
+
+The primary functions to use are :func:`imod.idf.open` and
+:func:`imod.idf.save`, though lower level functions are also available.
+"""
+
 import collections
 import glob
 import itertools

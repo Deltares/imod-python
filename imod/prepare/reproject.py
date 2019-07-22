@@ -198,7 +198,7 @@ def reproject(
             dst_transform = imod.util.transform(like)
             dst = xr.DataArray(
                 data=np.zeros(like.shape, source.dtype),
-                coords={"y": source.y, "x": source.x},
+                coords={"y": like.y, "x": like.x},
                 dims=("y", "x"),
             )
 

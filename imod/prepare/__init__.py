@@ -1,18 +1,11 @@
-from imod.prepare import reproject
-from imod.prepare import spatial
-from imod.prepare import subsoil
-
-from imod.prepare.regrid import (
-    Regridder,
-    mean,
-    harmonic_mean,
-    geometric_mean,
-    sum,
-    minimum,
-    maximum,
-    mode,
-    median,
-    conductance,
-    max_overlap,
+from imod.prepare import reproject, spatial, subsoil, surface_water
+from imod.prepare.regrid import Regridder
+from imod.prepare.reproject import reproject
+from imod.prepare.spatial import (
+    celltable,
+    fill,
+    gdal_rasterize,
+    rasterize,
+    rasterize_celltable,
 )
 from imod.prepare.voxelize import Voxelizer

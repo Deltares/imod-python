@@ -43,7 +43,7 @@ def test_draw_line__diagonal():
     # Simple diagonal
     x0, y0 = 0.0, 0.0
     x1, y1 = 3.0, 3.0
-    a_ixs, a_iys, a_s = imod.select.sections._draw_line(
+    a_ixs, a_iys, a_s = imod.select.cross_sections._draw_line(
         xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax
     )
     e_ixs = np.array([0, 1, 2])
@@ -55,7 +55,7 @@ def test_draw_line__diagonal():
     # Simple diagonal, flip it around
     x0, y0 = 3.0, 3.0
     x1, y1 = 0.0, 0.0
-    a_ixs, a_iys, a_s = imod.select.sections._draw_line(
+    a_ixs, a_iys, a_s = imod.select.cross_sections._draw_line(
         xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax
     )
     assert (e_ixs == a_ixs[::-1]).all()
@@ -65,7 +65,7 @@ def test_draw_line__diagonal():
     # Deal with out of bounds, just one
     x0, y0 = -1.0, -1.0
     x1, y1 = 3.0, 3.0
-    a_ixs, a_iys, a_s = imod.select.sections._draw_line(
+    a_ixs, a_iys, a_s = imod.select.cross_sections._draw_line(
         xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax
     )
     e_ixs = np.array([-1, 0, 1, 2])
@@ -77,7 +77,7 @@ def test_draw_line__diagonal():
     # Deal with out of bounds, both
     x0, y0 = -1.0, -1.0
     x1, y1 = 4.0, 4.0
-    a_ixs, a_iys, a_s = imod.select.sections._draw_line(
+    a_ixs, a_iys, a_s = imod.select.cross_sections._draw_line(
         xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax
     )
     e_ixs = np.array([-1, 0, 1, 2, -1])
@@ -89,7 +89,7 @@ def test_draw_line__diagonal():
     # And flipped around
     x0, y0 = 4.0, 4.0
     x1, y1 = -1.0, -1.0
-    a_ixs, a_iys, a_s = imod.select.sections._draw_line(
+    a_ixs, a_iys, a_s = imod.select.cross_sections._draw_line(
         xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax
     )
     assert (e_ixs == a_ixs[::-1]).all()
@@ -114,7 +114,7 @@ def test_cross_section(test_da):
         },
         dims=("s",),
     )
-    actual = imod.select.sections.cross_section_line(test_da, start, end)
+    actual = imod.select.cross_section_line(test_da, start, end)
     actual["s"] = actual["s"].round(3)
     actual["ds"] = actual["ds"].round(3)
     assert actual.identical(expected)
