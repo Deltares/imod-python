@@ -497,9 +497,12 @@ def _load(paths, use_cftime, pattern):
     layers = [c.get("layer", None) for c in headers]
     bounds = [(h["xmin"], h["xmax"], h["ymin"], h["ymax"]) for h in headers]
     cellsizes = [(h["dx"], h["dy"]) for h in headers]
+    tops = [c.get("top", None) for c in headers]
+    bots = [c.get("bot", None) for c in headers]
 
     hastime = _has_dim(times)
     haslayer = _has_dim(layers)
+    all_have_z = all(map(lambda v: v is not None, itertools.chain(tops, bots)))
     _all_equal(bounds, "bounding boxes")
     _check_cellsizes(cellsizes)
 
@@ -508,8 +511,34 @@ def _load(paths, use_cftime, pattern):
     dims = ["y", "x"]
     # order matters here due to inserting dims
     if haslayer:
-        coords["layer"] = np.unique(layers)
+        coords["layer"], unique_indices = np.unique(layers, return_index=True)
         dims.insert(0, "layer")
+
+    if all_have_z:
+        if haslayer:
+            top = np.array(tops)[unique_indices]
+            bot = np.array(bots)[unique_indices]
+            dz = top - bot
+            z = top - 0.5 * dz
+            if top[0] < top[1]:  # decreasing coordinate
+                dz *= -1.0
+            if np.allclose(dz, dz[0]):
+                coords["dz"] = dz[0]
+            else:
+                coords["dz"] = ("layer", dz)
+            coords["z"] = ("layer", z)
+        else:
+            # They must be all the same to be used, as they cannot be assigned
+            # to layer.
+            top = np.unique(tops)
+            bot = np.unique(bots)
+            if top.size == bot.size == 1:
+                dz = top - bot
+                z = top - 0.5 * dz
+                coords["dz"] = float(dz)  # cast from array
+                coords["z"] = float(z)
+                coords["z"] = ("layer", z)
+
     if hastime:
         times, use_cftime = util._convert_datetimes(times, use_cftime)
         if use_cftime:
@@ -619,61 +648,51 @@ def open_dataset(globpath, memmap=False, use_cftime=False, pattern=None):
     return dd
 
 
-def _top_bot_dicts(a):
-    """Returns a dictionary with the top and bottom per layer"""
-    top = np.atleast_1d(a.attrs["top"]).astype(np.float64)
-    bot = np.atleast_1d(a.attrs["bot"]).astype(np.float64)
-    if not top.shape == bot.shape:
-        raise ValueError('"top" and "bot" attrs should have the same shape')
-    if "layer" in a.coords:
-        layers = np.atleast_1d(a.coords["layer"].values)
-        if not top.shape == layers.shape:
-            raise ValueError('"top" attr shape does not match shape of layer dimension')
-        d_top = {laynum: t for laynum, t in zip(layers, top)}
-        d_bot = {laynum: b for laynum, b in zip(layers, bot)}
-    else:
-        if not top.shape == (1,):
-            raise ValueError(
-                'if "layer" is not a coordinate, "top"'
-                ' and "bot" attrs should hold only one value'
-            )
-        d_top = {"no_layer": top[0]}
-        d_bot = {"no_layer": bot[0]}
-    return d_top, d_bot
+def _as_voxeldata(a):
+    """
+    If "z" is present as a dimension, generate layer if necessary. Ensure that
+    layer is the dimension (via swap_dims). Infer "dz" if necessary, and if
+    possible.
 
+    Parameters
+    ----------
+    a : xr.DataArray
 
-def _infer_top_bot(a):
-    # Allow tops and bottoms to be written for voxel like IDFs.
-    # TODO: this needs refactoring
-    has_topbot = False
-    if "z" in a.dims and "layer" not in a.dims:
-        # Check if they are interchangeable
-        if tuple(a["layer"].indexes.keys()) == ("z",):
-            # Avoid side-effects
-            a = a.copy().swap_dims({"z": "layer"})
-    if "top" in a.attrs and "bot" in a.attrs:
-        # This way of working should be deprecated
-        has_topbot = True
-        d_top, d_bot = _top_bot_dicts(a)
-    else:
-        try:
-            if "z" in a.coords and "layer" in a.coords:
-                # Data is only voxel data if z depends only on layer
+    Returns
+    -------
+    a : xr.DataArray
+        copy of input a, with swapped dims and dz added, if necessary.
+    """
+    # Avoid side-effects
+    a = a.copy()
+
+    if "z" in a.coords:
+        if "z" in a.dims:  # it's definitely 1D
+            # have to swap it with layer in this case
+            if "layer" not in a.coords:
+                a = a.assign_coords(layer=("z", np.arange(1, a["z"].size + 1)))
+            a = a.swap_dims({"z": "layer"})
+
+            # It'll raise an Error if it cannot infer dz
+            if "dz" not in a.coords:
+                dz, _, _ = imod.util.coord_reference(a["z"])
+                if isinstance(dz, float):
+                    a = a.assign_coords(dz=dz)
+                else:
+                    a = a.assign_coords(dz=("layer", dz))
+
+        elif len(a["z"].shape) == 1:  # one dimensional
+            if "layer" in a.coords:
+                # Check if z depends only on layer
                 if tuple(a["z"].indexes.keys()) == ("layer",):
-                    dz, _, _ = imod.util.coord_reference(a["z"])
-                    top = a["z"].values + 0.5 * np.abs(dz)
-                    bot = a["z"].values - 0.5 * np.abs(dz)
-                    layers = np.atleast_1d(a.coords["layer"].values)
-                    d_top = {laynum: t for laynum, t in zip(layers, top)}
-                    d_bot = {laynum: b for laynum, b in zip(layers, bot)}
-                    has_topbot = True
-        except:  # Just skip this step if it doesn't work out...
-            pass
-
-    if has_topbot:
-        return a, has_topbot, d_top, d_bot
-    else:
-        return a, has_topbot, {}, {}
+                    if "dz" not in a.coords:
+                        # It'll raise an Error if it cannot infer dz
+                        dz, _, _ = imod.util.coord_reference(a["z"])
+                        if isinstance(dz, float):
+                            a = a.assign_coords(dz=dz)
+                        else:
+                            a = a.assign_coords(dz=("layer", dz))
+    return a
 
 
 def save(path, a, nodata=1.0e20, pattern=None):
@@ -751,8 +770,8 @@ def save(path, a, nodata=1.0e20, pattern=None):
     d = {"extension": ".idf", "name": path.stem, "directory": path.parent}
     d["directory"].mkdir(exist_ok=True, parents=True)
 
-    # Allow tops and bottoms to be written for voxel like IDFs.
-    a, has_topbot, d_top, d_bot = _infer_top_bot(a)
+    # Swap coordinates if possible, add "dz" if possible.
+    a = _as_voxeldata(a)
 
     # handle the case where they are not a dim but are a coord
     # i.e. you only have one layer but you did a.assign_coords(layer=1)
@@ -778,10 +797,6 @@ def save(path, a, nodata=1.0e20, pattern=None):
             # set the right layer/timestep/etc in the dict to make the filename
             d.update(dict(zip(extradims, coordvals)))
             fn = util.compose(d, pattern)
-            if has_topbot:
-                layer = d.get("layer", "no_layer")
-                a_yx.attrs["top"] = d_top[layer]
-                a_yx.attrs["bot"] = d_bot[layer]
             write(fn, a_yx, nodata)
     else:
         # no extra dims, only one IDF
@@ -819,10 +834,6 @@ def write(path, a, nodata=1.0e20):
         f.write(struct.pack("i", 1271))  # Lahey RecordLength Ident.
         nrow = a.y.size
         ncol = a.x.size
-        attrs = a.attrs
-        itb = isinstance(attrs.get("top", None), (int, float)) and isinstance(
-            attrs.get("bot", None), (int, float)
-        )
         f.write(struct.pack("i", ncol))
         f.write(struct.pack("i", nrow))
         dx, xmin, xmax, dy, ymin, ymax = util.spatial_reference(a)
@@ -847,14 +858,25 @@ def write(path, a, nodata=1.0e20):
             ieq = False  # nonequidistant
             f.write(struct.pack("?", not ieq))  # ieq
 
+        itb = False
+        if "z" in a.coords and "dz" in a.coords:
+            z = a.coords["z"]
+            dz = abs(a.coords["dz"])
+            try:
+                top = float(z + 0.5 * dz)
+                bot = float(z - 0.5 * dz)
+                itb = True
+            except TypeError:  # not a scalar value
+                pass
+
         f.write(struct.pack("?", itb))
         f.write(struct.pack("xx"))  # not used
         if ieq:
             f.write(struct.pack("f", dx))
             f.write(struct.pack("f", -dy))
         if itb:
-            f.write(struct.pack("f", attrs["top"]))
-            f.write(struct.pack("f", attrs["bot"]))
+            f.write(struct.pack("f", top))
+            f.write(struct.pack("f", bot))
         if not ieq:
             a.coords["dx"].values.astype(np.float32).tofile(f)
             (-a.coords["dy"].values).astype(np.float32).tofile(f)

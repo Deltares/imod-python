@@ -412,8 +412,8 @@ def test_lazy():
 
 def test_save_topbot__single_layer(test_da):
     da = test_da
-    da.attrs["top"] = 1.0
-    da.attrs["bot"] = 0.0
+    da = da.assign_coords(z=0.5)
+    da = da.assign_coords(dz=1.0)
     idf.save("test", da)
     _, attrs = idf.read("test.idf")
     assert attrs["top"] == 1.0
@@ -422,8 +422,24 @@ def test_save_topbot__single_layer(test_da):
 
 def test_save_topbot__layers(test_layerda):
     da = test_layerda
-    da.attrs["top"] = range(1, 6)
-    da.attrs["bot"] = range(5)
+    da = da.assign_coords(z=("layer", np.arange(1.0, 6.0) - 0.5))
+    idf.save("layer", da)
+    _, attrs = idf.read("layer_l1.idf")
+    assert attrs["top"] == 1.0
+    assert attrs["bot"] == 0.0
+    _, attrs = idf.read("layer_l2.idf")
+    assert attrs["top"] == 2.0
+    assert attrs["bot"] == 1.0
+    # Read multiple idfs
+    actual = idf.open("layer_l*.idf")
+    assert np.allclose(actual["z"], da["z"])
+
+
+def test_save_topbot__only_z(test_layerda):
+    da = test_layerda
+    da = da.assign_coords(z=("layer", np.arange(1.0, 6.0) - 0.5))
+    da = da.swap_dims({"layer": "z"})
+    da = da.drop("layer")
     idf.save("layer", da)
     _, attrs = idf.read("layer_l1.idf")
     assert attrs["top"] == 1.0
@@ -435,20 +451,9 @@ def test_save_topbot__layers(test_layerda):
 
 def test_save_topbot__errors(test_layerda):
     da = test_layerda
-    da.attrs["top"] = 1
-    da.attrs["bot"] = 0
-    with pytest.raises(ValueError):
-        idf.save("layer", da)
-    da.attrs["top"] = [1, 2]
-    da.attrs["bot"] = [0, 1]
-    with pytest.raises(ValueError):
-        idf.save("layer", da)
-    da.attrs["top"] = ["a", "b"]
-    da.attrs["bot"] = ["c", "d"]
-    with pytest.raises(ValueError):
-        idf.save("layer", da)
-    da.attrs["top"] = [1, 2]
-    da.attrs["bot"] = [0, 1, 3]
+    # non-equidistant, cannot infer dz
+    z = np.array([0.0, -1.0, -3.0, -4.5, -5.0])
+    da = da.assign_coords(z=("layer", z))
     with pytest.raises(ValueError):
         idf.save("layer", da)
 
