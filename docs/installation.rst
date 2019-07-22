@@ -135,50 +135,23 @@ practical sense.)
 
 Below is the specification for an environment that should provide you with
 all the dependencies and requirements you need to build groundwater models
-with `imod-python`.
+with `imod-python`, and then some (for testing/development).
 
-.. code-block:: yaml
-
-    name: env_imod
-
-    channels:
-      - conda-forge
-      - defaults
-
-    dependencies:
-      - affine
-      - black
-      - cftime>=1
-      - cytoolz
-      - dask
-      - geopandas
-      - git
-      - jinja2
-      - jupyter
-      - netcdf4
-      - numba
-      - numpy
-      - pandas
-      - pip
-      - python=3.6
-      - rasterio>=1.0
-      - scikit-image
-      - scipy
-      - spyder
-      - toolz
-      - xarray>=0.11
-
+.. literalinclude:: /environment.yml
+   :language: yaml
+   :linenos:
+   :caption: environment.yml
 
 Save this text into a file called ``environment.yml``, location doesn't
 really matter. In your command prompt, ``cd`` to this location and run:
 ``conda env create -f environment.yml``
 
-This will create a conda environment named ``env_imod`` as it is specified in the
+This will create a conda environment named ``imod`` as it is specified in the
 file.
 
 Environments can be "activated" by running ``conda activate {name of
 environment}``. Active the just installed environment by running ``conda
-activate main``. This essentially temporarily updates your `PATH variable
+activate imod``. This essentially temporarily updates your `PATH variable
 <https://en.wikipedia.org/wiki/PATH_(variable)>`_, which is the set of
 directories where executable programs are located. After deactivating the
 conda environment, either via `conda deactivate` or by closing the command
@@ -203,7 +176,7 @@ a repository of choice, and do a "development install":
 
 .. code-block:: console
 
-  activate env_imod
+  activate imod
   git clone https://gitlab.com/deltares/imod/imod-python.git
   cd imod-python
   pip install -e .
