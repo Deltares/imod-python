@@ -99,7 +99,7 @@ class SeawatModel(Model):
                     groups[pkg_id][key] = package
                 else:
                     groups[pkg_id] = {key: package}
-                    has_group.update(pkg_id)
+                    has_group.update([pkg_id])
 
         package_groups = []
         for pkg_id, group in groups.items():
