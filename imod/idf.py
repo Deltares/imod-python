@@ -227,7 +227,7 @@ def read(path, pattern=None):
     return _read(path, headersize, nrow, ncol, nodata), attrs
 
 
-def _dask(path, memmap=False, attrs=None, pattern=None):
+def _dask(path, attrs=None, pattern=None):
     """
     Read a single IDF file to a dask.array
 
@@ -257,9 +257,6 @@ def _dask(path, memmap=False, attrs=None, pattern=None):
     if isinstance(path, str):
         path = pathlib.Path(path)
 
-    if memmap:
-        warnings.warn("memmap option is removed", FutureWarning)
-
     if attrs is None:
         attrs = header(path, pattern)
     # If we don't unpack, it seems we run into trouble with the dask array later
@@ -277,44 +274,8 @@ def _dask(path, memmap=False, attrs=None, pattern=None):
     return x, attrs
 
 
-def dataarray(path, memmap=False, pattern=None):
-    """
-    Read a single IDF file to a xarray.DataArray
-
-    The function imod.idf.open is more general and can load multiple layers
-    and/or timestamps at once.
-
-    Parameters
-    ----------
-    path : str or Path
-        Path to the IDF file to be read
-    memmap : bool, optional
-        Whether to use a memory map to the file, or an in memory
-        copy. Default is to use a memory map.
-
-    Returns
-    -------
-    xarray.DataArray
-        A float32 xarray.DataArray of the values in the IDF file.
-        All metadata needed for writing the file to IDF or other formats
-        using imod.rasterio are included in the xarray.DataArray.attrs.
-    """
-    warnings.warn(
-        "imod.idf.dataarray is deprecated, use imod.idf.open instead", FutureWarning
-    )
-    return _load([path], False, pattern)
-
-
-def load(path, memmap=False, use_cftime=False):
-    """
-    load is deprecated. Check the documentation for `imod.idf.open` instead.
-    """
-    warnings.warn("load is deprecated, use imod.idf.open instead.", FutureWarning)
-    return open(path, memmap, use_cftime)
-
-
 # Open IDFs for multiple times and/or layers into one DataArray
-def open(path, memmap=False, use_cftime=False, pattern=None):
+def open(path, use_cftime=False, pattern=None):
     r"""
     Open one or more IDF files as an xarray.DataArray.
 
@@ -390,8 +351,6 @@ def open(path, memmap=False, use_cftime=False, pattern=None):
     remember. The website https://regex101.com is a nice help. Alternatively,
     the most pragmatic solution may be to just rename your files.
     """
-    if memmap:
-        warnings.warn("memmap option is removed", FutureWarning)
 
     if isinstance(path, list):
         return _load(path, use_cftime, pattern)
@@ -470,7 +429,7 @@ def open_subdomains(path, use_cftime=False, pattern=None):
         pattern = r"{name}_{time}_l{layer}_p\d+"
 
     subdomains = [
-        open(pathlist, False, use_cftime=use_cftime, pattern=pattern)
+        open(pathlist, use_cftime=use_cftime, pattern=pattern)
         for pathlist in grouped.values()
     ]
 
@@ -580,7 +539,7 @@ def _load(paths, use_cftime, pattern):
     return xr.DataArray(dask_array, coords, dims, name=names_unsorted[0])
 
 
-def open_dataset(globpath, memmap=False, use_cftime=False, pattern=None):
+def open_dataset(globpath, use_cftime=False, pattern=None):
     """
     Open a set of IDFs to a dict of xarray.DataArrays.
 
@@ -617,8 +576,6 @@ def open_dataset(globpath, memmap=False, use_cftime=False, pattern=None):
         All metadata needed for writing the file to IDF or other formats
         using imod.rasterio are included in the xarray.DataArray.attrs.
     """
-    if memmap:
-        warnings.warn("memmap option is removed", FutureWarning)
 
     # convert since for Path.glob non-relative patterns are unsupported
     if isinstance(globpath, pathlib.Path):

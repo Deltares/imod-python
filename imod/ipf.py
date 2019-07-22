@@ -226,12 +226,6 @@ def read_associated(path, kwargs={}):
     return df
 
 
-def load(path, kwargs={}, assoc_kwargs={}):
-    "load is deprecated. Use read instead."
-    warnings.warn("load is deprecated, use imod.ipf.read instead.", FutureWarning)
-    return read(path, kwargs, assoc_kwargs)
-
-
 def read(path, kwargs={}, assoc_kwargs={}):
     """
     Read one or more IPF files to a single pandas.DataFrame, including associated
@@ -243,7 +237,7 @@ def read(path, kwargs={}, assoc_kwargs={}):
     Parameters
     ----------
     path: pathlib.Path or str
-        globpath for IPF files to load.
+        globpath for IPF files to read.
     kwargs : dict
         Dictionary containing the `pandas.read_csv()` keyword arguments for the
         IPF files (e.g. `{"delim_whitespace": True}`)

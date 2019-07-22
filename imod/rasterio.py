@@ -13,7 +13,7 @@ from imod import idf, util
 
 
 def write(path, da, driver=None, nodata=np.nan):
-    """Write `xarray.DataArray` to GDAL supported geospatial rasters using `rasterio`.
+    """Write ``xarray.DataArray`` to GDAL supported geospatial rasters using ``rasterio``.
     
     Parameters
     ----------
@@ -31,11 +31,11 @@ def write(path, da, driver=None, nodata=np.nan):
         
     Examples
     --------
-    Save dataarray in ascii format:
+    Save ``xarray.DataArray`` in ASCII format:
 
     >>> imod.rasterio.write("example.asc", da)
     
-    Save dataarray in ascii format, with 6 significant digits:
+    Save ``xarray.DataArray`` in ASCII format, with 6 significant digits:
     
     >>> da.attrs['SIGNIFICANT_DIGITS'] = 6
     >>> imod.rasterio.write("example.asc", da)
