@@ -20,6 +20,7 @@ dependencies:
   - pytest-cov
   - python=3.6
   - rasterio>=1.0
+  - scikit-image
   - scipy
   - sphinx
   - sphinx_rtd_theme

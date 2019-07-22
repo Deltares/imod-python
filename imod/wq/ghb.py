@@ -49,3 +49,14 @@ class GeneralHeadBoundary(BoundaryCondition):
         if density is not None:
             self["density"] = density
         self["save_budget"] = save_budget
+
+    def _pkgcheck(self, ibound=None):
+        to_check = ["conductance"]
+        if "concentration" in self.data_vars:
+            to_check.append("concentration")
+        if "density" in self.data_vars:
+            to_check.append("density")
+        self._check_positive(to_check)
+
+        to_check.append("head")
+        self._check_location_consistent(to_check)

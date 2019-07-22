@@ -11,6 +11,14 @@ import pandas as pd
 from imod import util
 
 
+def _infer_delimwhitespace(line, ncol):
+    n_elem = len(next(csv.reader([line])))
+    if n_elem == ncol:
+        return False
+    else:
+        return True
+
+
 # Maybe look at dask dataframes, if we run into very large tabular datasets:
 # http://dask.pydata.org/en/latest/examples/dataframe-csv.html
 # the simple CSV format IPF cannot be read like this, it is best to use pandas.read_csv
@@ -49,26 +57,42 @@ def _read(path, kwargs={}, assoc_kwargs={}):
         except ValueError:  # then try whitespace delimited
             indexcol, ext = map(str.strip, next(csv.reader([line], delimiter=" ")))
 
+        position = f.tell()
+        line = f.readline()
+        delim_whitespace = _infer_delimwhitespace(line, ncol)
+        f.seek(position)
+
+        ipf_kwargs = {
+            "delim_whitespace": delim_whitespace,
+            "header": None,
+            "names": colnames,
+            "nrows": nrow,
+            "skipinitialspace": True,
+        }
+        ipf_kwargs.update(kwargs)
+        df = pd.read_csv(f, **ipf_kwargs)
+
+        # See if reading associated files is necessary
         indexcol = int(indexcol)
         if indexcol > 1:
-            df = pd.read_csv(f, header=None, names=colnames, nrows=nrow, **kwargs)
+            # df = pd.read_csv(f, header=None, names=colnames, nrows=nrow, **kwargs)
             dfs = []
             for row in df.itertuples():
                 filename = row[indexcol]
                 # associate paths are relative to the ipf
-                path_assoc = path.parent.joinpath(filename + "." + ext)
+                path_assoc = path.parent.joinpath(f"{filename}.{ext}")
                 # Note that these kwargs handle all associated files, which might differ
                 # within an IPF. If this happens we could consider supporting a dict
                 # or function that maps assoc filenames to different kwargs.
                 df_assoc = read_associated(path_assoc, assoc_kwargs)
-
+                # Include records of the "mother" ipf file.
                 for name, value in zip(colnames, row[1:]):  # ignores df.index in row
                     df_assoc[name] = value
-
+                # Append to list
                 dfs.append(df_assoc)
+            # Merge into a single whole
             df = pd.concat(dfs, ignore_index=True, sort=False)
-        else:
-            df = pd.read_csv(f, header=None, names=colnames, nrows=nrow, **kwargs)
+
     return df
 
 
@@ -110,28 +134,58 @@ def read_associated(path, kwargs={}):
                 ncol, itype = map(
                     int, map(str.strip, next(csv.reader([line], delimiter=" ")))
                 )
-        na_values = collections.OrderedDict()
 
         # use pandas for csv parsing: stuff like commas within quotes
         # this is a workaround for a pandas bug, probable related issue:
         # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
-        lines = []
-        for _ in range(ncol):
-            lines.append(f.readline())
-        lines = "".join(lines)
+        lines = [f.readline() for _ in range(ncol)]
+        delim_whitespace = _infer_delimwhitespace(lines[0], 2)
         # Normally, this ought to work:
         # metadata = pd.read_csv(f, header=None, nrows=ncol).values
         # TODO: replace when bugfix is released
-        metadata = pd.read_csv(io.StringIO(lines), header=None, nrows=ncol, **kwargs)
+        # try both comma and whitespace delimited, everything can be be mixed
+        # in a single file...
+        lines = "".join(lines)
+
+        # TODO: find out whether this can be replace by csv.reader
+        # the challenge lies in replacing the pd.notnull for nodata values.
+        # is otherwise quite a bit faster for such a header block.
+        metadata = pd.read_csv(
+            io.StringIO(lines),
+            delim_whitespace=delim_whitespace,
+            header=None,
+            nrows=ncol,
+            skipinitialspace=True,
+        )
         # header description possibly includes nodata
         usecols = np.arange(ncol)[pd.notnull(metadata[0])]
         metadata = metadata.iloc[usecols, :]
 
+        # Collect column names and nodata values
+        colnames = []
+        na_values = collections.OrderedDict()
         for colname, nodata in metadata.values:
             na_values[colname] = [nodata, "-"]  # "-" seems common enough to ignore
+            if isinstance(colname, str):
+                colnames.append(colname.strip())
+            else:
+                colnames.append(colname)
 
-        colnames = list(na_values.keys())
-        itype_kwargs = {}
+        # Sniff the first line of the data block
+        position = f.tell()
+        line = f.readline()
+        f.seek(position)
+        delim_whitespace = _infer_delimwhitespace(line, ncol)
+
+        itype_kwargs = {
+            "delim_whitespace": delim_whitespace,
+            "header": None,
+            "names": colnames,
+            "usecols": usecols,
+            "nrows": nrow,
+            "na_values": na_values,
+            "skipinitialspace": True,
+        }
         if itype == 1:  # Timevariant information: timeseries
             # check if first column is time in [yyyymmdd] or [yyyymmddhhmmss]
             itype_kwargs["dtype"] = {colnames[0]: str}
@@ -148,29 +202,20 @@ def read_associated(path, kwargs={}):
                 colnames[1]: np.float64,
                 colnames[2]: np.float64,
             }
-
         itype_kwargs.update(kwargs)
+        df = pd.read_csv(f, **itype_kwargs)
 
-        df = pd.read_csv(
-            f,
-            header=None,
-            names=colnames,
-            usecols=usecols,
-            nrows=nrow,
-            na_values=na_values,
-            **itype_kwargs,
-        )
-
-        if itype == 1:
-            len_date = len(df["time"].iloc[0])
-            if len_date == 14:
-                df["time"] = pd.to_datetime(df["time"], format="%Y%m%d%H%M%S")
-            elif len_date == 8:
-                df["time"] = pd.to_datetime(df["time"], format="%Y%m%d")
-            else:
-                raise ValueError(
-                    f"{path.name}: datetime format must be yyyymmddhhmmss or yyyymmdd"
-                )
+    if itype == 1:
+        time_column = colnames[0]
+        len_date = len(df[time_column].iloc[0])
+        if len_date == 14:
+            df[time_column] = pd.to_datetime(df[time_column], format="%Y%m%d%H%M%S")
+        elif len_date == 8:
+            df[time_column] = pd.to_datetime(df[time_column], format="%Y%m%d")
+        else:
+            raise ValueError(
+                f"{path.name}: datetime format must be yyyymmddhhmmss or yyyymmdd"
+            )
     return df
 
 

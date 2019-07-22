@@ -138,3 +138,7 @@ class Well(pd.DataFrame):
                 self._save_layers(timedf, directory, time=time)
         else:
             self._save_layers(self, directory)
+
+    def _pkgcheck(self, ibound=None):
+        # TODO: implement
+        pass

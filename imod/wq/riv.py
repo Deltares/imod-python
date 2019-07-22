@@ -54,3 +54,20 @@ class River(BoundaryCondition):
         if density is not None:
             self["density"] = density
         self["save_budget"] = save_budget
+
+    def _pkgcheck(self, ibound=None):
+        to_check = ["conductance"]
+        if "concentration" in self.data_vars:
+            to_check.append("concentration")
+        if "density" in self.data_vars:
+            to_check.append("density")
+        self._check_positive(to_check)
+
+        to_check.append("stage")
+        to_check.append("bottom_elevation")
+        self._check_location_consistent(to_check)
+
+        if (self["bottom_elevation"] > self["stage"]).any():
+            raise ValueError(
+                "Bottom elevation in {self} should not be higher than stage"
+            )

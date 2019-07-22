@@ -1,4 +1,6 @@
 import jinja2
+import numpy as np
+import skimage.morphology
 import xarray as xr
 
 from imod.wq.pkgbase import Package
@@ -152,8 +154,8 @@ class BasicFlow(Package):
         # TODO: check dx > 0, dy < 0?
         # TODO: add non-equidistant support
         if "dx" not in self or "dy" not in self:  # assume equidistant
-            dx = util._delta(self["x"], "x")
-            dy = util._delta(self["y"], "y")
+            dx, _, _ = util.coord_reference(self["x"])
+            dy, _, _ = util.coord_reference(self["y"])
         else:
             dx = self.coords["dx"]
             dy = self.coords["dy"]
@@ -178,3 +180,21 @@ class BasicFlow(Package):
             dim="layer",
         )
         return th
+
+    def _pkgcheck(self, ibound=None):
+        if (self["top"] < self["bottom"]).any():
+            raise ValueError(f"top should be larger than bottom in {self}")
+
+        active_cells = self["ibound"] != 0
+        if (active_cells & np.isnan(self["starting_head"])).any():
+            raise ValueError(
+                f"Active cells in ibound may not have a nan value in starting_head in {self}"
+            )
+
+        _, nlabels = skimage.morphology.label(
+            active_cells.values, connectivity=1, return_num=True
+        )
+        if nlabels > 1:
+            raise ValueError(
+                f"{nlabels} disconnected model domain detected in the ibound in {self}"
+            )

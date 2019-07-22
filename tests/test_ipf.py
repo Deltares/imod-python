@@ -52,7 +52,7 @@ def write_basic_ipf(request):
 
 @pytest.fixture(scope="module")
 def write_assoc_ipf(request):
-    def _write_assoc_ipf(path, delim, assoc_delim):
+    def _write_assoc_ipf(path, delim1, delim2, delim3, delim4, delim5):
         if isinstance(path, str):
             path = pathlib.Path(path)
         path.parent.mkdir(exist_ok=True, parents=True)
@@ -62,20 +62,20 @@ def write_assoc_ipf(request):
             "X\n"
             "Y\n"
             "ID\n"
-            "3{delim}txt\n"
-            "100.0{delim}435.0{delim}A1000\n"
-            "553.0{delim}143.0{delim}B2000\n"
+            "3{delim1}txt\n"
+            "100.0{delim2}435.0{delim2}A1000\n"
+            "553.0{delim2}143.0{delim2}B2000\n"
         )
         assoc_string = (
             "2\n"
-            "2{delim}1\n"
-            "time{delim}-999.0\n"
-            "level{delim}-999.0\n"
-            "20180101000000{delim}1.0\n"
-            "20180102000000{delim}-999.0\n"
+            "2{delim3}1\n"
+            "time{delim4}-999.0\n"
+            "level{delim4}-999.0\n"
+            "20180101000000{delim5}1.0\n"
+            "20180102000000{delim5}-999.0\n"
         )
-        ipfstring = ipfstring.format(delim=delim)
-        assoc_string = assoc_string.format(delim=assoc_delim)
+        ipfstring = ipfstring.format(delim1=delim1, delim2=delim2)
+        assoc_string = assoc_string.format(delim3=delim3, delim4=delim4, delim5=delim5)
         with open(path, "w") as f:
             f.write(ipfstring)
         with open(path.parent.joinpath("A1000.txt"), "w") as f:
@@ -164,60 +164,18 @@ def test_read__space(write_basic_ipf):
     assert df.iloc[1, 3] == "Den Bosch"
 
 
-def test_read_associated__comma_comma(write_assoc_ipf):
+@pytest.mark.parametrize("delim1", [",", " "])
+@pytest.mark.parametrize("delim2", [",", " "])
+@pytest.mark.parametrize("delim3", [",", " "])
+@pytest.mark.parametrize("delim4", [",", " "])
+@pytest.mark.parametrize("delim5", [",", " "])
+def test_read_associated__parameterized_delim(
+    write_assoc_ipf, delim1, delim2, delim3, delim4, delim5
+):
     path = "assoc.txt"
-    write_assoc_ipf(path, ",", ",")
+    write_assoc_ipf(path, delim1, delim2, delim3, delim4, delim5)
     df = ipf.read(path)
-
-    nrecords, nfields = df.shape
-    assert isinstance(df, pd.DataFrame)
-    assert nrecords == 4
-    assert nfields == 5
-    assert df["time"].iloc[0] == pd.to_datetime("2018-01-01")
-    assert df["time"].iloc[1] == pd.to_datetime("2018-01-02")
-    assert df["level"].iloc[0] == df["level"].iloc[2] == 1.0
-    assert pd.isnull(df["level"].iloc[1])
-    assert pd.isnull(df["level"].iloc[3])
-
-
-def test_read_associated__comma_space(write_assoc_ipf):
-    path = "assoc.ipf"
-    write_assoc_ipf(path, ",", " ")
-    df = ipf.read(path, assoc_kwargs={"delim_whitespace": True})
-
-    nrecords, nfields = df.shape
-    assert isinstance(df, pd.DataFrame)
-    assert nrecords == 4
-    assert nfields == 5
-    assert df["time"].iloc[0] == pd.to_datetime("2018-01-01")
-    assert df["time"].iloc[1] == pd.to_datetime("2018-01-02")
-    assert df["level"].iloc[0] == df["level"].iloc[2] == 1.0
-    assert pd.isnull(df["level"].iloc[1])
-    assert pd.isnull(df["level"].iloc[3])
-
-
-def test_read_associated__space_space(write_assoc_ipf):
-    path = "assoc.ipf"
-    write_assoc_ipf(path, " ", " ")
-    df = ipf.read(
-        path, kwargs={"delim_whitespace": True}, assoc_kwargs={"delim_whitespace": True}
-    )
-
-    nrecords, nfields = df.shape
-    assert isinstance(df, pd.DataFrame)
-    assert nrecords == 4
-    assert nfields == 5
-    assert df["time"].iloc[0] == pd.to_datetime("2018-01-01")
-    assert df["time"].iloc[1] == pd.to_datetime("2018-01-02")
-    assert df["level"].iloc[0] == df["level"].iloc[2] == 1.0
-    assert pd.isnull(df["level"].iloc[1])
-    assert pd.isnull(df["level"].iloc[3])
-
-
-def test_read_associated__space_comma(write_assoc_ipf):
-    path = "assoc.ipf"
-    write_assoc_ipf(path, " ", ",")
-    df = ipf.read(path, kwargs={"delim_whitespace": True})
+    print(df)
 
     nrecords, nfields = df.shape
     assert isinstance(df, pd.DataFrame)

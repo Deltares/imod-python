@@ -68,9 +68,9 @@ class PreconditionedConjugateGradientSolver(Package):
         self["relax"] = relax
         self["damp"] = damp
 
-    def _pkgcheck(self):
-        if not self["hclose"] > 0:
-            raise ValueError(f"hclose in {self} needs to be positive")
+    def _pkgcheck(self, ibound=None):
+        to_check = ["max_iter", "inner_iter", "rclose", "hclose", "damp"]
+        self._check_positive(to_check)
 
 
 class GeneralizedConjugateGradientSolver(Package):
@@ -134,6 +134,10 @@ class GeneralizedConjugateGradientSolver(Package):
         self["cclose"] = cclose
         self["preconditioner"] = preconditioner
         self["lump_dispersion"] = lump_dispersion
+
+    def _pkgcheck(self, ibound=None):
+        to_check = ["max_iter", "inner_iter", "cclose"]
+        self._check_positive(to_check)
 
 
 class ParallelSolver(Package):
@@ -291,20 +295,19 @@ class ParallelKrylovFlowSolver(ParallelSolver):
         self["debug"] = debug
         self["load_balance_weight"] = load_balance_weight
 
-    def _pkgcheck(self):
+    def _pkgcheck(self, ibound=None):
         to_check = ["hclose", "rclose", "max_iter", "inner_iter", "relax"]
-        for arg in to_check:
-            if not self[arg] > 0:
-                raise ValueError(f"{arg} in {self} needs to be positive")
-
-        # Check whether option is actually an available option
-        for opt_arg in self._keywords.keys():
-            if self[opt_arg] not in self._keywords[opt_arg].keys():
-                raise ValueError(
-                    "Argument for {} not in {}, instead got {}".format(
-                        opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]
-                    )
-                )
+        self._check_positive(to_check)
+        # TODO: fix
+        ## Check whether option is actually an available option
+        # for opt_arg in self._keywords.keys():
+        #    if self[opt_arg] not in self._keywords[opt_arg].keys():
+        #        raise ValueError(
+        #            "Argument for {} not in {}, instead got {}".format(
+        #                opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]
+        #            )
+        #        )
+        #
 
 
 class ParallelKrylovTransportSolver(ParallelSolver):
@@ -400,17 +403,15 @@ class ParallelKrylovTransportSolver(ParallelSolver):
         self["debug"] = debug
         self["load_balance_weight"] = load_balance_weight
 
-    def _pkgcheck(self):
+    def _pkgcheck(self, ibound=None):
         to_check = ["cclose", "max_iter", "inner_iter", "relax"]
-        for arg in to_check:
-            if not self[arg] > 0:
-                raise ValueError(f"{arg} in {self} needs to be positive")
-
-        # Check whether option is actually an available option
-        for opt_arg in self._keywords.keys():
-            if self[opt_arg] not in self._keywords[opt_arg].keys():
-                raise ValueError(
-                    "Argument for {} not in {}, instead got {}".format(
-                        opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]
-                    )
-                )
+        self._check_positive(to_check)
+        # TODO: fix
+        ## Check whether option is actually an available option
+        # for opt_arg in self._keywords.keys():
+        #    if self[opt_arg] not in self._keywords[opt_arg].keys():
+        #        raise ValueError(
+        #            "Argument for {} not in {}, instead got {}".format(
+        #                opt_arg, self._keywords[opt_arg].keys(), self[opt_arg]
+        #            )
+        #        )

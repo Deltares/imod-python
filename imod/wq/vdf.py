@@ -124,3 +124,14 @@ class VariableDensityFlow(Package):
         self["internodal"] = internodal
         self["coupling"] = coupling
         self["correct_water_table"] = correct_water_table
+
+    def _pkgcheck(self, ibound=None):
+        to_check = [
+            "density_species",
+            "density_min",
+            "density_max",
+            "density_ref",
+            "density_concentration_slope",
+            "density_criterion",
+        ]
+        self._check_positive(to_check)

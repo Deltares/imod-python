@@ -74,3 +74,13 @@ class Dispersion(Package):
         d["dicts"] = dicts
 
         return self._template.render(d)
+
+    def _pkgcheck(self, ibound=None):
+        to_check = [
+            "longitudinal",
+            "ratio_horizontal",
+            "ratio_vertical",
+            "diffusion_coefficient",
+        ]
+        self._check_positive(to_check)
+        self._check_location_consistent(to_check)
