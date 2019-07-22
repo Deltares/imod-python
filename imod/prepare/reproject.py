@@ -4,7 +4,7 @@ import rasterio
 import rasterio.warp
 import xarray as xr
 
-from imod import util
+import imod
 
 
 def _reproject_dst(source, src_crs, dst_crs, src_transform):
@@ -103,7 +103,7 @@ def reproject(
     --------
     Resample a DataArray `a` to a new cellsize, using an existing DataArray `b`:
     
-    >>> c = imod.rasterio.resample(source=a, like=b)
+    >>> c = imod.rasterio.reproject(source=a, like=b)
     
     Resample a DataArray to a new cellsize of 100.0, by creating a `like` DataArray first:
     (Note that dy must be negative, as is usual for geospatial grids.)
@@ -111,37 +111,37 @@ def reproject(
     >>> dims = ("y", "x")
     >>> coords = {"y": np.arange(200_000.0, 100_000.0, -100.0), "x": np.arange(0.0, 100_000.0, 100.0)}
     >>> b = xr.DataArray(data=np.empty((200, 100)), coords=coords, dims=dims)
-    >>> c = imod.rasterio.resample(source=a, like=b)
+    >>> c = imod.rasterio.reproject(source=a, like=b)
 
     Reproject a DataArray from one coordinate system (WGS84, EPSG:4326) to another (UTM30N, EPSG:32630):
 
-    >>> c = imod.rasterio.resample(source=a, src_crs="+init=EPSG:4326", dst_crs="+init=EPSG:32630")
+    >>> c = imod.rasterio.reproject(source=a, src_crs="+init=EPSG:4326", dst_crs="+init=EPSG:32630")
 
     Get the reprojected DataArray in the desired shape and coordinates by providing `like`:
 
-    >>> c = imod.rasterio.resample(source=a, like=b, src_crs="+init=EPSG:4326", dst_crs="+init=EPSG:32630")
+    >>> c = imod.rasterio.reproject(source=a, like=b, src_crs="+init=EPSG:4326", dst_crs="+init=EPSG:32630")
 
     Open a single band raster, and reproject to RD new coordinate system (EPSG:28992), without explicitly specifying `src_crs`.
     `src_crs` is taken from `a.attrs`, so the raster file has to include coordinate system metadata for this to work.
 
     >>> a = xr.open_rasterio("example.tif").squeeze("band")
-    >>> c = imod.rasterio.resample(source=a, use_src_attrs=True, dst_crs="+init=EPSG:28992")
+    >>> c = imod.rasterio.reproject(source=a, use_src_attrs=True, dst_crs="+init=EPSG:28992")
 
     In case of a rotated `source`, provide `src_transform` directly or `use_src_attrs=True` to rely on generated attributes:
 
     >>> rotated = xr.open_rasterio("rotated_example.tif").squeeze("band")
-    >>> c = imod.rasterio.resample(source=rotated, dst_crs="+init=EPSG:28992", reproject_kwargs={"src_transform":affine.Affine(...)})
-    >>> c = imod.rasterio.resample(source=rotated, dst_crs="+init=EPSG:28992", use_src_attrs=True)
+    >>> c = imod.rasterio.reproject(source=rotated, dst_crs="+init=EPSG:28992", reproject_kwargs={"src_transform":affine.Affine(...)})
+    >>> c = imod.rasterio.reproject(source=rotated, dst_crs="+init=EPSG:28992", use_src_attrs=True)
     """
-    assert source.dims == (
-        "y",
-        "x",
-    ), "resample does not support dimensions other than `x` and `y` for `source`."
+    if not source.dims == ("y", "x"):
+        raise ValueError(
+            "reproject does not support dimensions other than `x` and `y` for `source`."
+        )
     if like is not None:
-        assert like.dims == (
-            "y",
-            "x",
-        ), "resample does not support dimensions other than `x` and `y` for `like`."
+        if not like.dims == ("y", "x"):
+            raise ValueError(
+                "reproject does not support dimensions other than `x` and `y` for `like`."
+            )
     if use_src_attrs:  # only provided when reproject is necessary
         src_crs = rasterio.crs.CRS.from_string(source.attrs["crs"])
         src_nodata = source.attrs["nodatavals"][0]
@@ -179,8 +179,8 @@ def reproject(
             # (Any projected coordinate system should suffice, Cartesian plane == Cartesian plane)
             dst = like.copy()
             src_crs = dst_crs = rasterio.crs.CRS.from_epsg(32630)
-        src_transform = util.transform(source)
-        dst_transform = util.transform(like)
+        src_transform = imod.util.transform(source)
+        dst_transform = imod.util.transform(like)
 
     elif src_crs and dst_crs:
         if use_src_attrs:
@@ -189,24 +189,32 @@ def reproject(
         elif "src_transform" in reproject_kwargs.keys():
             src_transform = reproject_kwargs.pop("src_transform")
         else:
-            src_transform = util.transform(source)
+            src_transform = imod.util.transform(source)
 
-        # If no like is provided, just resample to different coordinate system
+        # If no like is provided, just reproject to different coordinate system
         if like is None:
             dst_transform, dst = _reproject_dst(source, src_crs, dst_crs, src_transform)
         else:
-            dst_transform = util.transform(like)
-            dst = like.copy()
+            dst_transform = imod.util.transform(like)
+            dst = xr.DataArray(
+                data=np.zeros(like.shape, source.dtype),
+                coords={"y": source.y, "x": source.x},
+                dims=("y", "x"),
+            )
 
     else:
         raise ValueError(
             "At least `like`, or crs information for source and destination must be provided."
         )
 
-    assert src_transform[0] > 0, "dx of 'source' must be positive"
-    assert src_transform[4] < 0, "dy of 'source' must be negative"
-    assert dst_transform[0] > 0, "dx of 'like' must be positive"
-    assert dst_transform[4] < 0, "dy of 'like' must be negative"
+    if not src_transform[0] > 0:
+        raise ValueError("dx of 'source' must be positive")
+    if not src_transform[4] < 0:
+        raise ValueError("dy of 'source' must be negative")
+    if not dst_transform[0] > 0:
+        raise ValueError("dx of 'like' must be positive")
+    if not dst_transform[4] < 0:
+        raise ValueError("dy of 'like' must be negative")
 
     rasterio.warp.reproject(
         source.values,
