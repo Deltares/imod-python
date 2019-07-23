@@ -9,7 +9,33 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
-.. _061---2019-04-17:
+[0.7.0] - 2019-07-23
+--------------------
+
+Added
+~~~~~
+
+-  :mod:`imod.wq` module to create iMODFLOW Water Quality models
+-  conda-forge recipe to install imod (https://github.com/conda-forge/imod-feedstock/)
+-  significantly extended documentation and examples
+-  :mod:`imod.prepare` module with many data mangling functions
+
+Changed
+~~~~~~~
+
+-  Namespaces: lift many functions one level, such that you can use e.g. the function ``imod.prepare.reproject`` instead of ``imod.prepare.reproject.reproject``
+
+Removed
+~~~~~~~
+
+-  All that was deprecated in v0.6.0
+
+Deprecated
+~~~~~~~~~~
+
+-  :func:`imod.seawat_write` is deprecated, use the write method of :class:`imod.wq.SeawatModel` instead
+-  :func:`imod.run.seawat_get_runfile` is deprecated, use :mod:`imod.wq` instead
+-  :func:`imod.run.seawat_write_runfile` is deprecated, use :mod:`imod.wq` instead
 
 [0.6.1] - 2019-04-17
 --------------------
@@ -23,8 +49,6 @@ Fixed
 ~~~~~
 
 -  Time conversion in runfile now also accepts cftime objects
-
-.. _060---2019-03-15:
 
 [0.6.0] - 2019-03-15
 --------------------
@@ -67,8 +91,6 @@ Changed
 -  ``assert`` is no longer used to catch faulty input arguments,
    appropriate exceptions are raised instead
 
-.. _fixed-1:
-
 Fixed
 ~~~~~
 
@@ -83,27 +105,19 @@ Fixed
 -  ``ipf.write`` no longer writes ``,,`` for missing data (which iMOD
    does not accept)
 
-.. _050---2019-02-26:
-
 [0.5.0] - 2019-02-26
 --------------------
-
-.. _removed-1:
 
 Removed
 ~~~~~~~
 
 -  Reading IDFs with the ``chunks`` option
 
-.. _deprecated-1:
-
 Deprecated
 ~~~~~~~~~~
 
 -  Reading IDFs with the ``memmap`` option
 -  ``imod.idf.dataarray``, use ``imod.idf.load`` instead
-
-.. _changed-1:
 
 Changed
 ~~~~~~~
@@ -114,10 +128,8 @@ Changed
    ``dy`` coordinates (0D or 1D)
 -  Use ``cftime.DatetimeProlepticGregorian`` to support time instead of
    ``np.datetime64``, allowing longer timespans
--  Repository moved from `https://gitlab.com/deltares/imod-python/`_ to
-   `https://gitlab.com/deltares/imod/imod-python/`_
-
-.. _added-1:
+-  Repository moved from ``https://gitlab.com/deltares/`` to
+   ``https://gitlab.com/deltares/imod/``
 
 Added
 ~~~~~
@@ -126,8 +138,6 @@ Added
 -  Support for nonequidistant IDF files, by adding ``dx`` and ``dy``
    coordinates
 
-.. _fixed-2:
-
 Fixed
 ~~~~~
 
@@ -135,5 +145,3 @@ Fixed
 
 .. _Keep a Changelog: https://keepachangelog.com/en/1.0.0/
 .. _Semantic Versioning: https://semver.org/spec/v2.0.0.html
-.. _`https://gitlab.com/deltares/imod-python/`: https://gitlab.com/deltares/imod-python/
-.. _`https://gitlab.com/deltares/imod/imod-python/`: https://gitlab.com/deltares/imod/imod-python/
