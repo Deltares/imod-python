@@ -10,7 +10,7 @@ from imod.wq import timeutil
 from imod.wq.pkgbase import Package
 
 
-class Well(pd.DataFrame):
+class Well(BoundaryCondition):
     """
     The Well package is used to simulate a specified flux to individual cells
     and specified in units of length3/time.
@@ -52,23 +52,46 @@ class Well(pd.DataFrame):
 
     def __init__(self, id_name, x, y, rate, layer=None, time=None, save_budget=False):
         super(__class__, self).__init__()
-        self["x"] = np.atleast_1d(x)
-        self["y"] = y
-        self["rate"] = rate
-        self["id_name"] = id_name
-        if layer is not None:
-            self["layer"] = layer
-        if time is not None:
-            self["time"] = time
+        variables = {
+            "id_name": id_name,
+            "x": x,
+            "y": y,
+            "rate": rate,
+            "layer": layer,
+            "time": time,
+        }
+        variables = {k: np.atleast_1d(v) for k, v in variables.items() if v is not None}
+        length = max(map(len, variables.values()))
+        index = np.arange(1, length + 1)
+        self["index"] = index
+
+        for k, v in variables.items():
+            if v.size == index.size:
+                self[k] = ("index", v)
+            elif v.size == 1:
+                self[k] = ("index", np.full(length, v))
+            else:
+                raise ValueError(f"Length of {k} does not match other arguments")
+
         self.save_budget = save_budget
 
-    @property
-    def data_vars(self):
-        return self.columns
+    def _max_active_n(self, varname, nlayer):
+        """
+        Determine the maximum active number of cells that are active
+        during a stress period.
 
-    @property
-    def coords(self):
-        return self.columns
+        Parameters
+        ----------
+        varname : str
+            name of the variable to use to calculate the maximum number of
+            active cells. Not used for well, here for polymorphism.
+        nlayer : int
+            number of layers, taken from ibound.
+        """
+        nmax = np.unique(self["id_name"]).size
+        if not "layer" in self.coords:  # Then it applies to every layer
+            nmax *= nlayer
+        return nmax
 
     def _compose_values_layer(self, directory, time=None):
         values = {}

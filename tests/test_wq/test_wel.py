@@ -45,7 +45,7 @@ def test_render__notime_nolayer(well):
     # Necessary because using drop return a pandas.DataFrame instead of a Well
     # object
     d = {
-        k: v for k, v in well.copy().drop("layer", axis=1).drop("time", axis=1).items()
+        k: v for k, v in well.copy().drop("layer").drop("time").items()
     }
     path = pathlib.Path("well").joinpath("well")
     wel = Well(**d)
@@ -56,7 +56,7 @@ def test_render__notime_nolayer(well):
 
 
 def test_render__time_nolayer(well):
-    d = {k: v for k, v in well.copy().drop("layer", axis=1).items()}
+    d = {k: v for k, v in well.copy().drop("layer").items()}
     wel = Well(**d)
     directory = pathlib.Path("well")
     path = pathlib.Path("well").joinpath("well")
@@ -92,7 +92,7 @@ def test_save(well):
 
 
 def test_save__time_nolayer(well):
-    d = {k: v for k, v in well.copy().drop("layer", axis=1).items()}
+    d = {k: v for k, v in well.copy().drop("layer").items()}
     wel = Well(**d)
     directory = pathlib.Path("well")
     path = pathlib.Path("well").joinpath("well")

@@ -408,7 +408,7 @@ class SeawatModel(Model):
 
         # Write all IDFs and IPFs
         for pkgname, pkg in self.items():
-            if "x" in pkg.coords and "y" in pkg.coords:
+            if "x" in pkg.coords and "y" in pkg.coords or pkg._pkg_id == "wel":
                 pkg.save(directory=directory.joinpath(pkgname))
 
     def package_check(self):
