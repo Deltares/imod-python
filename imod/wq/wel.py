@@ -7,7 +7,7 @@ import pandas as pd
 import imod
 from imod import util
 from imod.wq import timeutil
-from imod.wq.pkgbase import Package
+from imod.wq.pkgbase import BoundaryCondition
 
 
 class Well(BoundaryCondition):
