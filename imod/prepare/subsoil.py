@@ -149,7 +149,7 @@ def voxelize(top, bottom, like, *parameters):
     Returns
     -------
     voxelized parameters : single, or tuple of, xr.DataArray
-        Have identical dimensions and coordinates as `like`.
+        Have identical dimensions and coordinates as ``like``.
     """
 
     def dim_format(dims):
@@ -159,10 +159,10 @@ def voxelize(top, bottom, like, *parameters):
     if not like.dims == ("z", "y", "x"):
         if like.dims == ("layer", "y", "x"):
             if not "z" in like.coords:
-                raise ValueError('"z" has to be given in `like` coordinates')
+                raise ValueError('"z" has to be given in ``like`` coordinates')
         else:
             raise ValueError(
-                '`like` coordinates need to be exactly ("z", "y", "x"); or'
+                '``like`` coordinates need to be exactly ("z", "y", "x"); or'
                 ' ("layer", "y", "x") with coordinate "z": ("layer", z).'
                 f" Got instead: {dim_format(like.dims)}."
             )

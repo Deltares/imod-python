@@ -99,7 +99,7 @@ class Voxelizer:
             # might be a coordinate
             if "layer" in like.dims:
                 if not like.coords["z"].dims == ("layer",):
-                    raise ValueError('"z" has to be given in `like` coordinates')
+                    raise ValueError('"z" has to be given in ``like`` coordinates')
         if "dz" not in like.coords:
             dzs = np.diff(like.coords["z"].values)
             dz = dzs[0]

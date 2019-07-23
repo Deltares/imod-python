@@ -13,15 +13,15 @@ from imod.wq import timeutil
 class Package(xr.Dataset):
     """
     Base package for the different SEAWAT packages.
-    Every package contains a `_pkg_id` for identification.
+    Every package contains a ``_pkg_id`` for identification.
     Used to check for duplicate entries, or to group multiple systems together
     (riv, ghb, drn).
 
-    The `_template` attribute is the template for a section of the runfile.
+    The ``_template`` attribute is the template for a section of the runfile.
     This is filled in based on the metadata from the DataArrays that are within
     the Package.
 
-    The `_keywords` attribute is a dictionary that's used to replace
+    The ``_keywords`` attribute is a dictionary that's used to replace
     keyword argument by integer arguments for SEAWAT.
     """
 
@@ -38,14 +38,14 @@ class Package(xr.Dataset):
         Method to replace a readable keyword value by the corresponding cryptic
         integer value that SEAWAT demands.
 
-        Dict `d` is updated in place.
+        Dict ``d`` is updated in place.
 
         Parameters
         ----------
         d : dict
             Updated in place.
         key : str
-            key of value in dict `d` to replace.
+            key of value in dict ``d`` to replace.
         """
         keyword = d[key][()]  # Get value from 0d np.array
         value = self._keywords[key][keyword]

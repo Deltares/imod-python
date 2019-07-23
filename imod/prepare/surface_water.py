@@ -52,7 +52,7 @@ def coordinate_index(x, xmin, xmax, dx):
 
 def rivers(rivers_lines, width_column, depth_column, dem):
     # TODO check for model tops and bots
-    # TODO replace `dem` by `like` or something more general
+    # TODO replace ``dem`` by ``like`` or something more general
     buffered = []
     for _, row in rivers_lines.iterrows():
         width = row[width_column]

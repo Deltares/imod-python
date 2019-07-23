@@ -1,3 +1,7 @@
+"""
+Read Tecplot ASCII data.
+"""
+
 import collections
 import functools
 import re
@@ -96,14 +100,6 @@ def _dataset(df, time, **kwargs):
     return xr.Dataset(**kwargs)
 
 
-def load(path, variables=None, times=None):
-    "Load is deprecated. Use read instead."
-    warnings.warn(
-        "imod.tec.load is deprecated. Use imod.tec.read instead.", FutureWarning
-    )
-    return read(path, variables, times)
-
-
 def read(path, variables=None, times=None, kwargs={}):
     """
     Read a Tecplot ASCII data file to an xarray Dataset.
@@ -125,7 +121,7 @@ def read(path, variables=None, times=None, kwargs={}):
         numbering at 0.0, and the numbers function solely as index.
         Defaults to all timesteps.
     kwargs : dict
-        Dictionary containing the `pandas.read_csv()` keyword arguments used
+        Dictionary containing the ``pandas.read_csv()`` keyword arguments used
         for reading the Tecplot ASCII file (e.g. `{"delim_whitespace": True}`).
 
     Examples
@@ -150,7 +146,7 @@ def read(path, variables=None, times=None, kwargs={}):
     
     >>> ds = imod.tec.read(path, 'vx', times=slice(None, None, 10))
 
-    See also the documentation for `slice()`.
+    See also the documentation for ``slice()``.
     """
     # For a description of the Tecplot ASCII file format see:
     # ftp://ftp.tecplot.com/pub/doc/tecplot/360/dataformat.pdf

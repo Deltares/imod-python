@@ -1,4 +1,5 @@
 import pathlib
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -11,6 +12,7 @@ from imod import tec
 from imod import util
 
 # subpackages
+import imod.flow
 import imod.prepare
 import imod.wq
 import imod.select
@@ -30,94 +32,24 @@ del get_versions
 
 
 def write(path, model, name=None, runfile_parameters=None):
-    """
-    Writes an iMODFLOW model, including runfile, as specified by `model` into
-    directory `path`.
-
-    Directory `path` is created if it does not already exist.
-
-    When `runfile_parameters` is specified, its values are used to fill in the
-    runfile instead of those generated automatically from the
-    data in `model`. This is necessary when the default runfile parameters do
-    not suffice, but you do not want to change the runfile after it is written.
-
-    **Note**: every `xarray.DataArray` in `model` must have layer coordinates specified;
-    use `da.assign_coords(layer=...)`.
-
-    Parameters
-    ----------
-    path : str
-        The directory to write the model to.
-    model : collections.OrderedDict
-        Dictionary containing the package data as `xarray.DataArray` or
-        `pandas.DataFrame`.
-    name : str
-        Name given to the runfile. Defaults to "runfile".
-    runfile_parameters : dict
-        Dictionary containing the runfile parameters. Defaults to None,
-        in which case runfile_parameters is generated from data in `model`.
-
-    Returns
-    -------
-    None
-
-    Examples
-    --------
-    Write the model data in dictionary `a` as iMODFLOW model files, to directory
-    "example_dir":
-
-    >>> imod.write(path="example_dir", model=a)
-
-    Generate runfile parameters for data in dictionary `a` using
-    `imod.run.get_runfile()`, change the value for `hclose`, and write:
-
-    >>> runfile_parameters = imod.run.get_runfile(model=a)
-    >>> runfile_parameters["hclose"] = 0.00001
-    >>> imod.write(path="example_dir", model=a, runfile_parameters=runfile_parameters)
-    """
-    if isinstance(path, str):
-        path = pathlib.Path(path)
-    path.mkdir(exist_ok=True, parents=True)
-
-    if runfile_parameters is None:
-        runfile_parameters = imod.run.get_runfile(model, path)
-
-    if name is None:
-        name = "runfile"
-    else:
-        runfile_parameters["modelname"] = name
-
-    runfile_path = path.joinpath("{}.run".format(name))
-    imod.run.write_runfile(runfile_path, runfile_parameters)
-
-    for key, data in model.items():
-        # Get rid of time dimension
-        # It might be present to force a transient run of otherwise steady-state
-        # forcings.
-        if key == "bnd":
-            if "time" in data.dims:
-                data = data.isel(time=0).drop("time")
-
-        name = key.split("-")[0]
-        package_path = path.joinpath(name).joinpath(key)
-        if name == "wel":
-            if "time" in data.columns:
-                imod.ipf.save(package_path, data, itype="timeseries")
-            else:
-                imod.ipf.save(package_path, data)
-        else:
-            imod.idf.save(package_path, data)
+    warnings.warn("imod.write is moved, use imod.flow.write instead.", FutureWarning)
+    return imod.flow.write(
+        path, model, name=name, runfile_parameters=runfile_parameters
+    )
 
 
+# remove together with imod.seawat_write
 def _uniques(da):
     uniques = np.unique(da)
     return uniques[~np.isnan(uniques)]
 
 
+# remove together with imod.seawat_write
 def _all_single(a):
     return all([len(v) == 1 for v in a])
 
 
+# remove together with imod.seawat_write
 def _top_bot_dicts(model):
     top = model["top"]
     bot = model["bot"]
@@ -135,31 +67,34 @@ def _top_bot_dicts(model):
 
 def seawat_write(path, model, name=None, runfile_parameters=None):
     """
-    Writes an iMODSEAWAT model, including runfile, as specified by `model` into
-    directory `path`.
+    Writes an iMODSEAWAT model, including runfile, as specified by ``model`` into
+    directory ``path``.
 
-    Directory `path` is created if it does not already exist.
+    .. deprecated:: 0.7.0
+        imod.seawat_write is deprecated, use the write method of imod.wq.SeawatModel instead.
 
-    When `runfile_parameters` is specified, its values are used to fill in the
+    Directory ``path`` is created if it does not already exist.
+
+    When ``runfile_parameters`` is specified, its values are used to fill in the
     runfile instead of those generated automatically from the
-    data in `model`. This is necessary when the default runfile parameters do
+    data in ``model``. This is necessary when the default runfile parameters do
     not suffice, but you do not want to change the runfile after it is written.
 
-    **Note**: every `xarray.DataArray` in `model` must have layer coordinates specified;
-    use `da.assign_coords(layer=...)`.
+    **Note**: every ``xarray.DataArray`` in ``model`` must have layer coordinates specified;
+    use ``da.assign_coords(layer=...)``.
 
     Parameters
     ----------
     path : str
         The directory to write the model to.
     model : collections.OrderedDict
-        Dictionary containing the package data as `xarray.DataArray` or
-        `pandas.DataFrame`.
+        Dictionary containing the package data as ``xarray.DataArray`` or
+        ``pandas.DataFrame``.
     name : str
         Name given to the runfile. Defaults to "runfile".
     runfile_parameters : dict
         Dictionary containing the runfile parameters. Defaults to None,
-        in which case runfile_parameters is generated from data in `model`.
+        in which case runfile_parameters is generated from data in ``model``.
 
     Returns
     -------
@@ -167,18 +102,23 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
 
     Examples
     --------
-    Write the model data in dictionary `a` as iMODFLOW model files, to directory
+    Write the model data in dictionary ``a`` as iMODFLOW model files, to directory
     "example_dir":
 
     >>> imod.write(path="example_dir", model=a)
 
-    Generate runfile parameters for data in dictionary `a` using
-    `imod.run.get_runfile()`, change the value for `hclose`, and write:
+    Generate runfile parameters for data in dictionary ``a`` using
+    ``imod.run.get_runfile()``, change the value for ``hclose``, and write:
 
     >>> runfile_parameters = imod.run.get_runfile(model=a, seawat=True)
     >>> runfile_parameters["hclose"] = 0.00001
     >>> imod.seawat_write(path="example_dir", model=a, runfile_parameters=runfile_parameters)
     """
+    warnings.warn(
+        "imod.seawat_write is deprecated, use the write method of imod.wq.SeawatModel instead.",
+        FutureWarning,
+    )
+
     if isinstance(path, str):
         path = pathlib.Path(path)
     path.mkdir(exist_ok=True, parents=True)

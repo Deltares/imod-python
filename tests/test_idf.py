@@ -290,8 +290,6 @@ def test_saveopen(test_da):
     assert da.identical(test_da)
     da = idf.open(pathlib.Path("test.idf"))
     assert da.identical(test_da)
-    with pytest.warns(FutureWarning):
-        idf.open("test.idf", memmap=True)
 
 
 def test_saveopen__paths(test_da, tmp_path):

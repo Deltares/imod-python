@@ -1,3 +1,10 @@
+"""
+Functions for reading and writing iMOD Point Files (IDFs) to ``pandas.DataFrame``.
+
+The primary functions to use are :func:`imod.ipf.read` and
+:func:`imod.ipf.save`, though lower level functions are also available.
+"""
+
 import collections
 import csv
 import glob
@@ -31,10 +38,10 @@ def _read(path, kwargs={}, assoc_kwargs={}):
     path: pathlib.Path or str
         globpath for IPF files to read.
     kwargs : dict
-        Dictionary containing the `pandas.read_csv()` keyword arguments for the
+        Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
         IPF files (e.g. `{"delim_whitespace": True}`)
     assoc_kwargs: dict
-        Dictionary containing the `pandas.read_csv()` keyword arguments for the
+        Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
         associated (TXT) files (e.g. `{"delim_whitespace": True}`)
 
     Returns
@@ -105,7 +112,7 @@ def read_associated(path, kwargs={}):
     path : pathlib.Path or str
         Path to associated file.
     kwargs : dict
-        Dictionary containing the `pandas.read_csv()` keyword arguments for the
+        Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
         associated (TXT) file (e.g. `{"delim_whitespace": True}`).
 
     Returns
@@ -219,12 +226,6 @@ def read_associated(path, kwargs={}):
     return df
 
 
-def load(path, kwargs={}, assoc_kwargs={}):
-    "load is deprecated. Use read instead."
-    warnings.warn("load is deprecated, use imod.ipf.read instead.", FutureWarning)
-    return read(path, kwargs, assoc_kwargs)
-
-
 def read(path, kwargs={}, assoc_kwargs={}):
     """
     Read one or more IPF files to a single pandas.DataFrame, including associated
@@ -236,12 +237,12 @@ def read(path, kwargs={}, assoc_kwargs={}):
     Parameters
     ----------
     path: pathlib.Path or str
-        globpath for IPF files to load.
+        globpath for IPF files to read.
     kwargs : dict
-        Dictionary containing the `pandas.read_csv()` keyword arguments for the
+        Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
         IPF files (e.g. `{"delim_whitespace": True}`)
     assoc_kwargs: dict
-        Dictionary containing the `pandas.read_csv()` keyword arguments for the
+        Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
         associated (TXT) files (e.g. `{"delim_whitespace": True}`)
 
     Returns
@@ -429,13 +430,13 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20):
     df : pandas.DataFrame
         DataFrame containing the data to write.
     itype : int or str or None
-        If `None` no associated files are written.
+        If ``None`` no associated files are written.
         Other possible values, either integer or string:
         
-        * `1` or `"timeseries"`
-        * `2` or `"borehole1d"`
-        * `3` or `"cpt"`
-        * `4` or `"borehole3d"`
+        * ``1`` or ``"timeseries"``
+        * ``2`` or ``"borehole1d"``
+        * ``3`` or ``"cpt"``
+        * ``4`` or ``"borehole3d"``
     assoc_ext : str
         Extension of the associated files. Normally ".txt".
     nodata : float
@@ -507,13 +508,13 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20):
     df : pandas.DataFrame
         DataFrame containing the data to write.
     itype : int or str or None
-        IPF type. Defaults to `None`, in which case no associated files are
+        IPF type. Defaults to ``None``, in which case no associated files are
         created. Possible other values, either integer or string:
         
-        * `1` or `"timeseries"`
-        * `2` or `"borehole1d"`
-        * `3` or `"cpt"`
-        * `4` or `"borehole3d"`
+        * ``1`` or ``"timeseries"``
+        * ``2`` or ``"borehole1d"``
+        * ``3`` or ``"cpt"``
+        * ``4`` or ``"borehole3d"``
     assoc_ext : str
         Extension of the associated files. Defaults to "txt".
     nodata : float

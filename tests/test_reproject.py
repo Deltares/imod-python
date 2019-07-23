@@ -61,7 +61,7 @@ def test_basic_resample__nearest(write_tif):
         }
         dims = ("y", "x")
         like = xr.DataArray(data, coords, dims)
-        newda = imod.prepare.spatial.reproject(da, like, method="nearest")
+        newda = imod.prepare.reproject(da, like, method="nearest")
 
     newarr = np.empty((10, 16))
     with rasterio.open("basic.tif") as src:
@@ -96,7 +96,7 @@ def test_basic_resample__bilinear(write_tif):
         }
         dims = ("y", "x")
         like = xr.DataArray(data, coords, dims)
-        newda = imod.prepare.spatial.reproject(da, like, method="bilinear")
+        newda = imod.prepare.reproject(da, like, method="bilinear")
 
     newarr = np.empty((10, 16))
     with rasterio.open("basic.tif") as src:
@@ -123,7 +123,7 @@ def test_basic_reproject(write_tif):
     write_tif("basic.tif", epsg=28992)
     dst_crs = {"init": "EPSG:32631"}
     with xr.open_rasterio("basic.tif").squeeze("band") as da:
-        newda = imod.prepare.spatial.reproject(
+        newda = imod.prepare.reproject(
             da, src_crs={"init": "EPSG:28992"}, dst_crs=dst_crs
         )
 
@@ -160,7 +160,7 @@ def test_reproject__use_src_attrs(write_tif):
     write_tif("basic.tif", epsg=28992)
     dst_crs = {"init": "EPSG:32631"}
     with xr.open_rasterio("basic.tif").squeeze("band") as da:
-        newda = imod.prepare.spatial.reproject(da, dst_crs=dst_crs, use_src_attrs=True)
+        newda = imod.prepare.reproject(da, dst_crs=dst_crs, use_src_attrs=True)
 
     with rasterio.open("basic.tif") as src:
         arr = src.read()
@@ -205,9 +205,7 @@ def test_reproject_resample(write_tif):
         }
         dims = ("y", "x")
         like = xr.DataArray(data, coords, dims)
-        newda = imod.prepare.spatial.reproject(
-            da, like, dst_crs=dst_crs, use_src_attrs=True
-        )
+        newda = imod.prepare.reproject(da, like, dst_crs=dst_crs, use_src_attrs=True)
 
     with rasterio.open("basic.tif") as src:
         arr = src.read()
@@ -236,7 +234,7 @@ def test_reproject_rotation__via_kwargs(write_tif):
     dst_crs = {"init": "EPSG:32631"}
     da = xr.open_rasterio("rotated.tif").squeeze("band")
     src_transform = affine.Affine.scale(1.0, -1.0) * affine.Affine.rotation(45.0)
-    newda = imod.prepare.spatial.reproject(
+    newda = imod.prepare.reproject(
         da, src_crs={"init": "EPSG:28992"}, dst_crs=dst_crs, src_transform=src_transform
     )
 
@@ -273,7 +271,7 @@ def test_reproject_rotation__use_src_attrs(write_tif):
     write_tif("rotated.tif", epsg=28992, rotation_angle=45.0)
     dst_crs = {"init": "EPSG:32631"}
     da = xr.open_rasterio("rotated.tif").squeeze("band")
-    newda = imod.prepare.spatial.reproject(da, dst_crs=dst_crs, use_src_attrs=True)
+    newda = imod.prepare.reproject(da, dst_crs=dst_crs, use_src_attrs=True)
 
     with rasterio.open("rotated.tif") as src:
         arr = src.read()

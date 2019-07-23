@@ -305,7 +305,7 @@ def _cross_section(data, linecoords):
 def cross_section_line(data, start, end):
     r"""
     Obtain an interpolated cross-sectional slice through gridded data.
-    Utilizing the interpolation functionality in `xarray`, this function
+    Utilizing the interpolation functionality in ``xarray``, this function
     takes a vertical cross-sectional slice along a line through the given
     data on a regular (possibly non-equidistant) grid, which is given as an
     `xarray.DataArray` so that we can utilize its coordinate data.
@@ -318,7 +318,8 @@ def cross_section_line(data, start, end):
     data: `xarray.DataArray` or `xarray.Dataset`
         Three- (or higher) dimensional field(s) to interpolate. The DataArray
         (or each DataArray in the Dataset) must have been parsed by MetPy and
-        include both an x and y coordinate dimension and the added `crs`
+        include both an x and y coordinate dimension and the added ``crs``
+
         coordinate.
     start: (2, ) array_like
         A latitude-longitude pair designating the start point of the cross
@@ -346,7 +347,7 @@ def cross_section_line(data, start, end):
 def cross_section_linestring(data, linestring):
     r"""
     Obtain an interpolated cross-sectional slice through gridded data.
-    Utilizing the interpolation functionality in `xarray`, this function
+    Utilizing the interpolation functionality in ``xarray``, this function
     takes a vertical cross-sectional slice along a linestring through the given
     data on a regular grid, which is given as an `xarray.DataArray` so that
     we can utilize its coordinate data.
@@ -359,7 +360,8 @@ def cross_section_linestring(data, linestring):
     data: `xarray.DataArray` or `xarray.Dataset`
         Three- (or higher) dimensional field(s) to interpolate. The DataArray
         (or each DataArray in the Dataset) must have been parsed by MetPy and
-        include both an x and y coordinate dimension and the added `crs`
+        include both an x and y coordinate dimension and the added ``crs``
+
         coordinate.
     linestring : shapely.geometry.LineString
         Shapely geometry designating the linestring along which to sample the

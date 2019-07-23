@@ -1,3 +1,11 @@
+"""
+Functions that make use of `rasterio
+<https://rasterio.readthedocs.io/en/stable/>`_ for input and output to other
+raster formats.
+
+Currently only :func:`imod.rasterio.write` is implemented.
+"""
+
 import pathlib
 
 import numpy as np
@@ -7,7 +15,7 @@ from imod import idf, util
 
 
 def write(path, da, driver=None, nodata=np.nan):
-    """Write DataArray to GDAL supported geospatial rasters using rasterio
+    """Write ``xarray.DataArray`` to GDAL supported geospatial rasters using ``rasterio``.
     
     Parameters
     ----------
@@ -25,11 +33,11 @@ def write(path, da, driver=None, nodata=np.nan):
         
     Examples
     --------
-    Save dataarray in ascii format:
+    Save ``xarray.DataArray`` in ASCII format:
 
     >>> imod.rasterio.write("example.asc", da)
     
-    Save dataarray in ascii format, with 6 significant digits:
+    Save ``xarray.DataArray`` in ASCII format, with 6 significant digits:
     
     >>> da.attrs['SIGNIFICANT_DIGITS'] = 6
     >>> imod.rasterio.write("example.asc", da)

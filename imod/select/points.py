@@ -4,10 +4,10 @@ import xarray as xr
 import imod
 
 
-def in_bounds(da, **points):
+def points_in_bounds(da, **points):
     """
     Returns whether points specified by keyword arguments fall within the bounds
-    of `da`.
+    of ``da``.
 
     Parameters
     ----------
@@ -31,12 +31,12 @@ def in_bounds(da, **points):
     >>> dims = ("y", "x")
     >>> da = xr.DataArray(data, coords, dims)
     >>> x = [0.4, 2.6]
-    >>> in_bounds(da, x=x)
+    >>> points_in_bounds(da, x=x)
     
     This works for an arbitrary number of coordinates:
     
     >>> y = [1.3, 2.7]
-    >>> in_bounds(da, x=x, y=y)
+    >>> points_in_bounds(da, x=x, y=y)
     
     """
     # check sizes
@@ -97,13 +97,13 @@ def _get_indices_1d(da, coordname, x):
     return ixs
 
 
-def get_indices(da, **points):
+def points_indices(da, **points):
     """
     Get the indices for points as defined by the arrays x and y.
 
     This function will raise a ValueError if the points fall outside of the
     bounds of the DataArray to avoid undefined behavior. Use the
-    `imod.select.points.in_bounds` function to detect these points.
+    ``imod.select.points_in_bounds`` function to detect these points.
 
     Parameters
     ----------
@@ -121,14 +121,14 @@ def get_indices(da, **points):
 
     >>> x = [1.0, 2.2, 3.0]
     >>> y = [4.0, 5.6, 7.0]
-    >>> indices = imod.select.points.get_indices(da, x=x, y=y)
+    >>> indices = imod.select.points_indices(da, x=x, y=y)
     >>> ind_y = indices["y"]
     >>> ind_x = indices["x"]
     >>> selection = da.isel(x=ind_x, y=ind_y)
 
     Or shorter, using dictionary unpacking:
 
-    >>> indices = imod.select.points.get_indices(da, x=x, y=y)
+    >>> indices = imod.select.points_indices(da, x=x, y=y)
     >>> selection = da.isel(**indices)
 
     To set values (in a new array), the following will do the trick:
@@ -140,10 +140,10 @@ def get_indices(da, **points):
     support setting values yet. The method here works for both numpy and dask
     arrays, but you'll have to manage dimensions yourself!
     
-    The `imod.select.points.set_values()` function will take care of the
+    The ``imod.select.points_set_values()`` function will take care of the
     dimensions.
     """
-    inside = in_bounds(da, **points)
+    inside = points_in_bounds(da, **points)
     # Error handling
     if not inside.all():
         raise ValueError(f"Not all points are within the bounds of the DataArray")
@@ -157,13 +157,13 @@ def get_indices(da, **points):
     return indices
 
 
-def get_values(da, **points):
+def points_values(da, **points):
     """
     Get values from specified points.
 
     This function will raise a ValueError if the points fall outside of the
     bounds of the DataArray to avoid undefined behavior. Use the
-    `imod.select.points.in_bounds` function to detect these points.
+    ``imod.select.points_in_bounds`` function to detect these points.
 
     Parameters
     ----------
@@ -179,13 +179,13 @@ def get_values(da, **points):
 
     >>> x = [1.0, 2.2, 3.0]
     >>> y = [4.0, 5.6, 7.0]
-    >>> selection = imod.select.points.get_values(da, x=x, y=y)
+    >>> selection = imod.select.points_values(da, x=x, y=y)
 
     """
     for coordname in points.keys():
         if coordname not in da.coords:
             raise ValueError(f'DataArray has no coordinate "{coordname}"')
-    indices = get_indices(da, **points)
+    indices = points_indices(da, **points)
     selection = da.isel(**indices)
     # Fetch a value from the dictionary, and get its size.
     sample_size = len(next(iter(points.values())))
@@ -193,13 +193,13 @@ def get_values(da, **points):
     return selection
 
 
-def set_values(da, values, **points):
+def points_set_values(da, values, **points):
     """
     Set values at specified points.
 
     This function will raise a ValueError if the points fall outside of the
     bounds of the DataArray to avoid undefined behavior. Use the
-    `imod.select.points.in_bounds` function to detect these points.
+    ``imod.select.points_in_bounds`` function to detect these points.
 
     Parameters
     ----------
@@ -219,17 +219,17 @@ def set_values(da, values, **points):
     >>> x = [1.0, 2.2, 3.0]
     >>> y = [4.0, 5.6, 7.0]
     >>> values = [10.0, 11.0, 12.0]
-    >>> selection = imod.select.points.get_values(da, values, x=x, y=y)
+    >>> selection = imod.select.points_values(da, values, x=x, y=y)
 
     """
-    inside = in_bounds(da, **points)
+    inside = points_in_bounds(da, **points)
     # Error handling
     if not inside.all():
         raise ValueError(f"Not all points are within the bounds of the DataArray")
     if not isinstance(values, (int, float)):  # then it might be an array
         if len(values) != len(inside):
             raise ValueError(
-                "Shape of `values` does not match shape of coordinates."
+                "Shape of ``values`` does not match shape of coordinates."
                 f"Shape of values: {values.shape}; shape of coordinates: {inside.shape}."
             )
 

@@ -1,12 +1,19 @@
-import xarray as xr
-import pandas as pd
-import numpy as np
-import itertools
-import jinja2
-from imod import util
-import pathlib
+"""
+Write iMODFLOW Runfiles.
+"""
+
 import collections
+import itertools
+import pathlib
+import warnings
+
 import cftime
+import jinja2
+import numpy as np
+import pandas as pd
+import xarray as xr
+
+from imod import util
 
 # change into namedtuple?
 package_schema = collections.OrderedDict(
@@ -221,7 +228,7 @@ def _check_input(model, seawat=False):
     Returns
     -------
     consumed_model: collections.OrderedDict
-        Copied `model` dict with lower case keys, which will be consumed during
+        Copied ``model`` dict with lower case keys, which will be consumed during
         writing.
     """
     # TODO: needs a better name?
@@ -271,7 +278,7 @@ def _data_bounds(model, seawat=False):
     model : collections.OrderedDict
         The dictionary containing the model data.
     seawat : boolean
-        Set to `True` if data is for an iMODSEAWAT model.
+        Set to ``True`` if data is for an iMODSEAWAT model.
 
     """
     # TODO: Think of what should be done when ibound_l1 is not the largest
@@ -424,7 +431,7 @@ def _parse(key, stress_period_schema):
 
 def _groupby_field(package, stress_period_schema):
     """
-    Groups imodflow package content by field (using `itertools.groupby`).
+    Groups imodflow package content by field (using ``itertools.groupby``).
 
     E.g. riv-stage-sys1 and riv-stage-sys2 end up in the same "stage" group.
 
@@ -542,7 +549,7 @@ def _get_wel(item, times, directory):
     """
     Generates all the paths to IPFs for a single system of a package.
 
-    Steady-state is assumed when `times` evaluates to `False`.
+    Steady-state is assumed when ``times`` evaluates to ``False``.
 
     The nesting of an item is in the following order: system - layer.
     Time is handled by use of associated ipf files (.txt).
@@ -589,7 +596,7 @@ def _get_system(item, times, directory):
     """
     Generates all the paths to IDFs for a single system of a package.
 
-    Steady-state is assumed when `times` evaluates to `False`.
+    Steady-state is assumed when ``times`` evaluates to ``False``.
 
     The nesting of an item is in the following order: system - layer - time.
 
@@ -740,7 +747,7 @@ def _get_package(package, directory, package_schema):
 def get_runfile(model, directory):
     """
     Generates an collections.OrderedDict containing the values to be filled in in a runfile 
-    template, from the data contained in `model`.
+    template, from the data contained in ``model``.
     These values are mainly the paths of the IDFs and IPFs, nested in such a 
     way that it can be easily unpacked when filling in the runfiles; 
     plus a fairly large number of configuration values.
@@ -751,8 +758,8 @@ def get_runfile(model, directory):
     For packages that have stress periods, the nesting is:
     package - field - system - layer - time
 
-    **Note**: every `xarray.DataArray` containing the data must have layer coordinates specified;
-    use `da.assign_coords(layer=...)`.
+    **Note**: every ``xarray.DataArray`` containing the data must have layer coordinates specified;
+    use ``da.assign_coords(layer=...)``.
 
     Parameters
     ----------
@@ -833,7 +840,7 @@ def _jinja2_template(fname):
 def write_runfile(path, runfile_parameters):
     """
     Writes an IMODFLOW runfile from metadata collected from model by
-    `imod.run.get_runfile()`.
+    ``imod.run.get_runfile()``.
 
     Parameters
     ----------
@@ -856,8 +863,11 @@ def write_runfile(path, runfile_parameters):
 def seawat_get_runfile(model, directory):
     """
     Generates an collections.OrderedDict containing the values to be filled in in a runfile 
-    template, from the data contained in `model`, specifically for an
+    template, from the data contained in ``model``, specifically for an
     IMODSEAWAT model.
+
+    .. deprecated:: 0.7.0
+        imod.run.seawat_get_runfile is deprecated, use imod.wq instead.
 
     These values are mainly the paths of the IDFs and IPFs, nested in such a 
     way that it can be easily unpacked when filling in the runfiles; 
@@ -869,8 +879,8 @@ def seawat_get_runfile(model, directory):
     For packages that have stress periods, the nesting is:
     package - field - system - layer - time
 
-    **Note**: every `xarray.DataArray` containing the data must have layer specified;
-    use `da.assign_coords(layer=...)`.
+    **Note**: every ``xarray.DataArray`` containing the data must have layer specified;
+    use ``da.assign_coords(layer=...)``.
 
     Parameters
     ----------
@@ -888,6 +898,9 @@ def seawat_get_runfile(model, directory):
         template.
     
     """
+    warnings.warn(
+        "imod.run.seawat_get_runfile is deprecated, use imod.wq instead.", FutureWarning
+    )
     consumed_model = _check_input(model, seawat=True)
     bounds = _data_bounds(model, seawat=True)
     times = bounds.pop("times", False)
@@ -943,7 +956,10 @@ def seawat_get_runfile(model, directory):
 def seawat_write_runfile(path, runfile_parameters):
     """
     Writes an IMODSEAWAT runfile from metadata collected from model by
-    `imod.run.get_runfile()`.
+    ``imod.run.get_runfile()``.
+
+    .. deprecated:: 0.7.0
+        imod.run.seawat_write_runfile is deprecated, use imod.wq instead.
 
     Parameters
     ----------
@@ -956,6 +972,10 @@ def seawat_write_runfile(path, runfile_parameters):
     -------
     None
     """
+    warnings.warn(
+        "imod.run.seawat_write_runfile is deprecated, use imod.wq instead.",
+        FutureWarning,
+    )
     template = _jinja2_template("seawat_runfile.j2")
     out = template.render(**runfile_parameters)
 
