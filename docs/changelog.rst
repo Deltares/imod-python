@@ -19,6 +19,11 @@ Added
 -  conda-forge recipe to install imod (https://github.com/conda-forge/imod-feedstock/)
 -  significantly extended documentation and examples
 -  :mod:`imod.prepare` module with many data mangling functions
+-  :mod:`imod.select` module for extracting data along cross sections or at points
+-  :mod:`imod.visualize` module added to visualize results
+-  :func:`imod.idf.open_subdomains` function to open and merge the IDF results of a parallelized run
+-  :func:`imod.ipf.read` now infers delimeters for the headers and the body
+-  :func:`imod.ipf.read` can now deal with heterogeneous delimiters between multiple IPF files, and between the headers and body in a single file
 
 Changed
 ~~~~~~~
