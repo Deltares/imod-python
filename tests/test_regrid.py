@@ -628,7 +628,9 @@ def test_regrid_conductance3d__errors():
     like = xr.DataArray(np.empty((5, 2, 2)), likecoords, dims)
 
     with pytest.raises(ValueError):
-        _ = imod.prepare.Regridder(method=imod.prepare.regrid.conductance).regrid(source, like)
+        _ = imod.prepare.Regridder(method=imod.prepare.regrid.conductance).regrid(
+            source, like
+        )
     with pytest.raises(ValueError):
         _ = imod.prepare.Regridder(method="conductance").regrid(source, like)
 

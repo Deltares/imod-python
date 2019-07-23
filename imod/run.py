@@ -1,12 +1,15 @@
-import xarray as xr
-import pandas as pd
-import numpy as np
-import itertools
-import jinja2
-from imod import util
-import pathlib
 import collections
+import itertools
+import pathlib
+import warnings
+
 import cftime
+import jinja2
+import numpy as np
+import pandas as pd
+import xarray as xr
+
+from imod import util
 
 # change into namedtuple?
 package_schema = collections.OrderedDict(
@@ -859,6 +862,9 @@ def seawat_get_runfile(model, directory):
     template, from the data contained in ``model``, specifically for an
     IMODSEAWAT model.
 
+    .. deprecated:: 0.7.0
+        imod.run.seawat_get_runfile is deprecated, use imod.wq instead.
+
     These values are mainly the paths of the IDFs and IPFs, nested in such a 
     way that it can be easily unpacked when filling in the runfiles; 
     plus a fairly large number of configuration values.
@@ -888,6 +894,9 @@ def seawat_get_runfile(model, directory):
         template.
     
     """
+    warnings.warn(
+        "imod.run.seawat_get_runfile is deprecated, use imod.wq instead.", FutureWarning
+    )
     consumed_model = _check_input(model, seawat=True)
     bounds = _data_bounds(model, seawat=True)
     times = bounds.pop("times", False)
@@ -945,6 +954,9 @@ def seawat_write_runfile(path, runfile_parameters):
     Writes an IMODSEAWAT runfile from metadata collected from model by
     ``imod.run.get_runfile()``.
 
+    .. deprecated:: 0.7.0
+        imod.run.seawat_write_runfile is deprecated, use imod.wq instead.
+
     Parameters
     ----------
     path : str
@@ -956,6 +968,10 @@ def seawat_write_runfile(path, runfile_parameters):
     -------
     None
     """
+    warnings.warn(
+        "imod.run.seawat_write_runfile is deprecated, use imod.wq instead.",
+        FutureWarning,
+    )
     template = _jinja2_template("seawat_runfile.j2")
     out = template.render(**runfile_parameters)
 

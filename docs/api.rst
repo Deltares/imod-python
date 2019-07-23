@@ -1,94 +1,28 @@
-imod package
-============
+API Reference
+=============
 
-imod module
------------
+.. toctree::
+    :maxdepth: 1
+    :caption: File input/output
 
-.. automodule:: imod
-    :members:
-    :undoc-members:
-    :show-inheritance:
+    api/idf.rst
+    api/ipf.rst
+    api/rasterio.rst
+    api/tec.rst
+    api/run.rst
 
-imod.idf submodule
-------------------
+.. toctree::
+    :maxdepth: 1
+    :caption: Data preparation and evaluation
 
-.. automodule:: imod.idf
-    :members:
-    :undoc-members:
-    :show-inheritance:
+    api/prepare.rst
+    api/select.rst
+    api/util.rst
+    api/visualize.rst
 
-imod.ipf submodule
-------------------
+.. toctree::
+    :maxdepth: 1
+    :caption: Defining a groundwater model
 
-.. automodule:: imod.ipf
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-imod.prepare submodule
-----------------------
-
-.. automodule:: imod.prepare
-    :members:
-    :imported-members:
-    :undoc-members:
-    :show-inheritance:
-
-imod.rasterio submodule
------------------------
-
-.. automodule:: imod.rasterio
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-imod.select submodule
----------------------
-
-.. automodule:: imod.select
-    :members:
-    :imported-members:
-    :undoc-members:
-    :show-inheritance:
-
-imod.run submodule
-------------------
-
-.. automodule:: imod.run
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-imod.tec submodule
-------------------
-
-.. automodule:: imod.tec
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-imod.util submodule
--------------------
-
-.. automodule:: imod.util
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-imod.visualize submodule
-------------------------
-
-.. automodule:: imod.visualize
-    :members:
-    :imported-members:
-    :undoc-members:
-    :show-inheritance:
-
-imod.wq submodule
------------------
-
-.. automodule:: imod.wq
-    :members:
-    :imported-members:
-    :undoc-members:
-    :show-inheritance:
+    api/wq.rst
+    api/flow.rst

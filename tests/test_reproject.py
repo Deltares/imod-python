@@ -205,9 +205,7 @@ def test_reproject_resample(write_tif):
         }
         dims = ("y", "x")
         like = xr.DataArray(data, coords, dims)
-        newda = imod.prepare.reproject(
-            da, like, dst_crs=dst_crs, use_src_attrs=True
-        )
+        newda = imod.prepare.reproject(da, like, dst_crs=dst_crs, use_src_attrs=True)
 
     with rasterio.open("basic.tif") as src:
         arr = src.read()

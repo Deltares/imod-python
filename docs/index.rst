@@ -53,10 +53,10 @@ Documentation
    model
    post-processing
 
-**Help & reference**
+**API Reference & Help**
 
-* :doc:`changelog`
 * :doc:`api`
+* :doc:`changelog`
 * :doc:`internals`
 * :doc:`roadmap`
 * :doc:`contributing`
@@ -64,10 +64,10 @@ Documentation
 .. toctree::
    :maxdepth: 1
    :hidden:
-   :caption: Help & reference
+   :caption: API Reference & Help
 
-   changelog
    api
+   changelog
    internals
    roadmap
    contributing
