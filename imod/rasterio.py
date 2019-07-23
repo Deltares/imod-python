@@ -9,7 +9,13 @@ Currently only :func:`imod.rasterio.write` is implemented.
 import pathlib
 
 import numpy as np
-import rasterio
+
+# since rasterio is a big dependency that is sometimes hard to install
+# and not always required, we made this an optional dependency
+try:
+    import rasterio
+except ImportError:
+    pass
 
 from imod import idf, util
 

@@ -1,7 +1,13 @@
-import geopandas as gpd
 import numpy as np
 import shapely.geometry as sg
 import xarray as xr
+
+# since geopandas is a big dependency that is sometimes hard to install
+# and not always required, we made this an optional dependency
+try:
+    import geopandas as gpd
+except ImportError:
+    pass
 
 import imod
 

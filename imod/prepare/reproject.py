@@ -1,8 +1,14 @@
 import affine
 import numpy as np
-import rasterio
-import rasterio.warp
 import xarray as xr
+
+# since rasterio is a big dependency that is sometimes hard to install
+# and not always required, we made this an optional dependency
+try:
+    import rasterio
+    import rasterio.warp
+except ImportError:
+    pass
 
 import imod
 

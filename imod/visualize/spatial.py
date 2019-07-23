@@ -1,11 +1,17 @@
 import copy
 
-import geopandas as gpd
 import matplotlib.colors
 import matplotlib.pyplot as plt
 import pandas as pd
 import xarray as xr
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+# since geopandas is a big dependency that is sometimes hard to install
+# and not always required, we made this an optional dependency
+try:
+    import geopandas as gpd
+except ImportError:
+    pass
 
 import imod
 

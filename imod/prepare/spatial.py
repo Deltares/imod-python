@@ -6,11 +6,17 @@ import dask
 import numba
 import numpy as np
 import pandas as pd
-import rasterio
-import rasterio.features
-import rasterio.warp
 import scipy.ndimage
 import xarray as xr
+
+# since rasterio is a big dependency that is sometimes hard to install
+# and not always required, we made this an optional dependency
+try:
+    import rasterio
+    import rasterio.features
+    import rasterio.warp
+except ImportError:
+    pass
 
 import imod
 

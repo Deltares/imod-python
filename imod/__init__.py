@@ -10,6 +10,7 @@ from imod import ipf
 from imod import run
 from imod import tec
 from imod import util
+from imod import rasterio
 
 # subpackages
 import imod.flow
@@ -17,13 +18,6 @@ import imod.prepare
 import imod.wq
 import imod.select
 import imod.visualize
-
-# since this is a big dependency that is sometimes hard to install
-# and not always required, we made this an optional dependency
-try:
-    import imod.rasterio
-except ImportError:
-    pass
 
 from imod._version import get_versions
 
