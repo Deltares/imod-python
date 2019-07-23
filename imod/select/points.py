@@ -7,7 +7,7 @@ import imod
 def points_in_bounds(da, **points):
     """
     Returns whether points specified by keyword arguments fall within the bounds
-    of `da`.
+    of ``da``.
 
     Parameters
     ----------
@@ -103,7 +103,7 @@ def points_indices(da, **points):
 
     This function will raise a ValueError if the points fall outside of the
     bounds of the DataArray to avoid undefined behavior. Use the
-    `imod.select.points_in_bounds` function to detect these points.
+    ``imod.select.points_in_bounds`` function to detect these points.
 
     Parameters
     ----------
@@ -140,7 +140,7 @@ def points_indices(da, **points):
     support setting values yet. The method here works for both numpy and dask
     arrays, but you'll have to manage dimensions yourself!
     
-    The `imod.select.points_set_values()` function will take care of the
+    The ``imod.select.points_set_values()`` function will take care of the
     dimensions.
     """
     inside = points_in_bounds(da, **points)
@@ -163,7 +163,7 @@ def points_values(da, **points):
 
     This function will raise a ValueError if the points fall outside of the
     bounds of the DataArray to avoid undefined behavior. Use the
-    `imod.select.points_in_bounds` function to detect these points.
+    ``imod.select.points_in_bounds`` function to detect these points.
 
     Parameters
     ----------
@@ -199,7 +199,7 @@ def points_set_values(da, values, **points):
 
     This function will raise a ValueError if the points fall outside of the
     bounds of the DataArray to avoid undefined behavior. Use the
-    `imod.select.points_in_bounds` function to detect these points.
+    ``imod.select.points_in_bounds`` function to detect these points.
 
     Parameters
     ----------
@@ -229,7 +229,7 @@ def points_set_values(da, values, **points):
     if not isinstance(values, (int, float)):  # then it might be an array
         if len(values) != len(inside):
             raise ValueError(
-                "Shape of `values` does not match shape of coordinates."
+                "Shape of ``values`` does not match shape of coordinates."
                 f"Shape of values: {values.shape}; shape of coordinates: {inside.shape}."
             )
 

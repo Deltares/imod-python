@@ -46,7 +46,7 @@ def _fill_np(data, invalid):
 
 def fill(da, invalid=None, by=None):
     """
-    Replace the value of invalid `da` cells (indicated by `invalid`)
+    Replace the value of invalid ``da`` cells (indicated by ``invalid``)
     using basic nearest neighbour interpolation.
 
     Parameters
@@ -57,7 +57,7 @@ def fill(da, invalid=None, by=None):
         a time (2D interpolation over x and y in case of dims == (by, "y", "x")).
 
     invalid: xr.DataArray
-        a binary array of same shape as `da`.
+        a binary array of same shape as ``da``.
         data value are replaced where invalid is True
         If None (default), uses: `invalid = np.isnan(data)`
 
@@ -101,7 +101,7 @@ def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
     Returns
     -------
     rasterized : xarray.DataArray
-        Vector data rasterized. Matches shape and coordinates of `like`.
+        Vector data rasterized. Matches shape and coordinates of ``like``.
     """
 
     if column is not None:
@@ -229,7 +229,7 @@ def gdal_rasterize(
 
     if dtype is None:
         if like is None:
-            raise ValueError("If `like` is not provided, `dtype` has to be given")
+            raise ValueError("If ``like`` is not provided, ``dtype`` has to be given")
         else:
             dtype = like.dtype
     gdal_dtype, nodata = _handle_dtype(dtype, nodata)
@@ -571,7 +571,7 @@ def _burn_cells(raster, rows, cols, values):
 
 def rasterize_celltable(table, column, like):
     """
-    Rasterizes a table, such as produced by `imod.prepare.spatial.celltable`.
+    Rasterizes a table, such as produced by ``imod.prepare.spatial.celltable``.
     Before rasterization, multiple values should be grouped and aggregated per
     cell. Values will be overwritten otherwise.
 

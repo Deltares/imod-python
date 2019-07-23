@@ -49,7 +49,7 @@ def decompose(path, pattern=None):
 
     The format string pattern will only work on tidy paths, where variables are
     separated by underscores. You can also pass a compiled regex pattern.
-    Make sure to include the `re.IGNORECASE` flag since all paths are lowered.
+    Make sure to include the ``re.IGNORECASE`` flag since all paths are lowered.
 
     >>> import re
     >>> pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)")
@@ -134,7 +134,7 @@ def _convert_datetimes(times, use_cftime):
     np.datetime64[ns]: [1678-01-01 AD, 2261-12-31 AD].
 
     Alternatively, always returns as cftime.DatetimeProlepticGregorian if
-    `use_cf_time` is True.
+    ``use_cf_time`` is True.
     """
     if all(time == "steady-state" for time in times):
         return times, False

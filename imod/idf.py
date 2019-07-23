@@ -1,8 +1,8 @@
 """
 Functions for reading and writing iMOD Data Files (IDFs) to ``xarray`` objects.
 
-The primary functions to use are :func:`imod.idf.open` and
-:func:`imod.idf.save`, though lower level functions are also available.
+The primary functions to use are :func:``imod.idf.open`` and
+:func:``imod.idf.save``, though lower level functions are also available.
 """
 
 import collections
@@ -207,7 +207,7 @@ def read(path, pattern=None):
         If the filenames do match default naming conventions of
         {name}_{time}_l{layer}, a custom pattern can be defined here either
         as a string, or as a compiled regular expression pattern. Please refer
-        to the examples for `imod.idf.open`.
+        to the examples for ``imod.idf.open``.
 
     Returns
     -------
@@ -242,7 +242,7 @@ def _dask(path, attrs=None, pattern=None):
         If the filenames do match default naming conventions of
         {name}_{time}_l{layer}, a custom pattern can be defined here either
         as a string, or as a compiled regular expression pattern. Please refer
-        to the examples in `imod.idf.open`.
+        to the examples in ``imod.idf.open``.
 
     Returns
     -------
@@ -279,7 +279,7 @@ def open(path, use_cftime=False, pattern=None):
     r"""
     Open one or more IDF files as an xarray.DataArray.
 
-    In accordance with xarray's design, `open` loads the data of IDF files
+    In accordance with xarray's design, ``open`` loads the data of IDF files
     lazily. This means the data of the IDFs are not loaded into memory until the
     data is needed. This allows for easier handling of large datasets, and
     more efficient computations.
@@ -293,13 +293,13 @@ def open(path, use_cftime=False, pattern=None):
         first underscore) but have a different layer and/or timestamp,
         such that they can be combined in a single xarray.DataArray.
     use_cftime : bool, optional
-        Use `cftime.DatetimeProlepticGregorian` instead of `np.datetime64[ns]`
+        Use ``cftime.DatetimeProlepticGregorian`` instead of `np.datetime64[ns]`
         for the time axis.
 
-        Dates are normally encoded as `np.datetime64[ns]`; however, if dates
+        Dates are normally encoded as ``np.datetime64[ns]``; however, if dates
         fall before 1678 or after 2261, they are automatically encoded as
-        `cftime.DatetimeProlepticGregorian` objects rather than
-        `np.datetime64[ns]`.
+        ``cftime.DatetimeProlepticGregorian`` objects rather than
+        ``np.datetime64[ns]``.
     pattern : str, regex pattern, optional
         If the filenames do match default naming conventions of
         {name}_{time}_l{layer}, a custom pattern can be defined here either
@@ -334,13 +334,13 @@ def open(path, use_cftime=False, pattern=None):
 
     >>> head = imod.idf.open("head_2001*_l*.idf")
 
-    The same, this time explicitly specifying `name`, `time`, and `layer`:
+    The same, this time explicitly specifying ``name``, ``time``, and ``layer``:
 
     >>> head = imod.idf.open("head_2001*_l*.idf", pattern="{name}_{time}_l{layer}")
 
     The format string pattern will only work on tidy paths, where variables are
     separated by underscores. You can also pass a compiled regex pattern.
-    Make sure to include the `re.IGNORECASE` flag since all paths are lowered.
+    Make sure to include the ``re.IGNORECASE`` flag since all paths are lowered.
 
     >>> import re
     >>> pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)", re.IGNORECASE)
@@ -369,14 +369,14 @@ def open_subdomains(path, use_cftime=False, pattern=None):
     Combine IDF files of multiple subdomains.
 
     Nota bene: Writing the resulting xr.DataArray to a netcdf with
-    `to_netcdf` is quite fast. However, saving the result to IDFs with
-    `imod.idf.save` is unfortunately extremely slow. The cause appears to be
+    ``to_netcdf`` is quite fast. However, saving the result to IDFs with
+    ``imod.idf.save`` is unfortunately extremely slow. The cause appears to be
     a failure of the xarray scheduler: when saving to IDFs, it starts to
     merge the IDFs for a single layer and a single time. This means that if
     you 10 layers, and 30 times, that it will perform 300 individual merge
     operations!
 
-    The easiest way around it is by calling `.load()` on the result once, if
+    The easiest way around it is by calling ``.load()`` on the result once, if
     it fits in your memory all at once. In this case, it will perform the
     merge only once, combining layers and times in one go.
 
@@ -551,23 +551,23 @@ def open_dataset(globpath, use_cftime=False, pattern=None):
     Parameters
     ----------
     globpath : str or Path
-        A glob pattern expansion such as `'model/**/*.idf'`, which recursively
+        A glob pattern expansion such as ``'model/**/*.idf'``, which recursively
         finds all IDF files under the model directory. Note that files with
         the same name (part before the first underscore) wil be combined into
         a single xarray.DataArray.
     use_cftime : bool, optional
-        Use `cftime.DatetimeProlepticGregorian` instead of `np.datetime64[ns]`
+        Use ``cftime.DatetimeProlepticGregorian`` instead of `np.datetime64[ns]`
         for the time axis.
 
-        Dates are normally encoded as `np.datetime64[ns]`; however, if dates
+        Dates are normally encoded as ``np.datetime64[ns]``; however, if dates
         fall before 1679 or after 2262, they are automatically encoded as
-        `cftime.DatetimeProlepticGregorian` objects rather than
-        `np.datetime64[ns]`.
+        ``cftime.DatetimeProlepticGregorian`` objects rather than
+        ``np.datetime64[ns]``.
     pattern : str, regex pattern, optional
         If the filenames do match default naming conventions of
         {name}_{time}_l{layer}, a custom pattern can be defined here either
         as a string, or as a compiled regular expression pattern. Please refer
-        to the examples for `imod.idf.open`.
+        to the examples for ``imod.idf.open``.
 
     Returns
     -------
@@ -663,11 +663,11 @@ def save(path, a, nodata=1.0e20, pattern=None):
     """
     Write a xarray.DataArray to one or more IDF files
 
-    If the DataArray only has `y` and `x` dimensions, a single IDF file is
-    written, like the `imod.idf.write` function. This function is more general
-    and also supports `time` and `layer` dimensions. It will split these up,
+    If the DataArray only has ``y`` and ``x`` dimensions, a single IDF file is
+    written, like the ``imod.idf.write`` function. This function is more general
+    and also supports ``time`` and ``layer`` dimensions. It will split these up,
     give them their own filename according to the conventions in
-    `imod.util.compose`, and write them each.
+    ``imod.util.compose``, and write them each.
 
     Parameters
     ----------
@@ -677,7 +677,7 @@ def save(path, a, nodata=1.0e20, pattern=None):
         name from this parameter.
     a : xarray.DataArray
         DataArray to be written. It needs to have dimensions ('y', 'x'), and
-        optionally `layer` and `time`.
+        optionally ``layer`` and ``time``.
     nodata : float, optional
         Nodata value in the saved IDF files. Xarray uses nan values to represent
         nodata, but these tend to work unreliably in iMOD(FLOW).
@@ -687,7 +687,7 @@ def save(path, a, nodata=1.0e20, pattern=None):
 
     Example
     -------
-    Consider a DataArray `da` that has dimensions 'layer', 'y' and 'x', with the
+    Consider a DataArray ``da`` that has dimensions 'layer', 'y' and 'x', with the
     'layer' dimension consisting of layer 1 and 2::
 
         save('path/to/head', da)
@@ -722,8 +722,8 @@ def save(path, a, nodata=1.0e20, pattern=None):
 
     if path.suffix != "":
         raise ValueError(
-            "`imod.idf.save` generates time, layer, and file extension for the path."
-            " Use `imod.idf.write` instead to write a single IDF file with a fully"
+            "``imod.idf.save`` generates time, layer, and file extension for the path."
+            " Use ``imod.idf.write`` instead to write a single IDF file with a fully"
             " specified path."
         )
 

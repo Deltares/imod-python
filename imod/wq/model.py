@@ -360,7 +360,7 @@ class SeawatModel(Model):
             modelname.
         result_dir : str, pathlib.Path
             Path to directory in which output will be written when running the
-            model. Is written as the value of the `result_dir` key in the
+            model. Is written as the value of the ``result_dir`` key in the
             runfile.
 
             The value path given here will be resolved *relative* to the
@@ -383,7 +383,7 @@ class SeawatModel(Model):
 
         >>> model.write(directory="input", result_dir="output")
 
-        And in the runfile, a value of `../../output` will be written for
+        And in the runfile, a value of ``../../output`` will be written for
         result_dir.
         """
         if isinstance(directory, str):

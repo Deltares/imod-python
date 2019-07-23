@@ -1,7 +1,7 @@
 """
-Functions that make use of `rasterio <https://rasterio.readthedocs.io/en/stable/>`_ for input and output.
+Functions that make use of `rasterio <https://rasterio.readthedocs.io/en/stable/>`_ for input and output to other GIS formats.
 
-Currently only :func:`imod.rasterio.write` is implemented.
+Currently only :func:``imod.rasterio.write`` is implemented.
 """
 
 import pathlib

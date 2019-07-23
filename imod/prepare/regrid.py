@@ -536,7 +536,9 @@ def _match_dims(src, like):
         The source DataArray to be regridded
     like : xr.DataArray
         Example DataArray that shows what the resampled result should look like
-        in terms of coordinates. `source` is regridded along dimensions of `like`
+        in terms of coordinates. ``source`` is regridded along dimensions of ``like``
+
+
         that have the same name, but have different values.
 
     Returns
@@ -677,10 +679,10 @@ class Regridder(object):
         "maximum", "mode", "median", "conductance"}
     ndim_regrid : int, optional
         The number of dimensions over which to regrid. If not provided,
-        `ndim_regrid` will be inferred. It serves to prevent regridding over an
+        ``ndim_regrid`` will be inferred. It serves to prevent regridding over an
         unexpected number of dimensions; say you want to regrid over only two
-        dimensions. Due to an input error in the coordinates of `like`, three
-        dimensions may be inferred in the first `.regrid` call. An error will
+        dimensions. Due to an input error in the coordinates of ``like``, three
+        dimensions may be inferred in the first ``.regrid`` call. An error will
         be raised if ndim_regrid not match the number of inferred dimensions.
         Default value is None.
     use_relative_weights : bool, optional
@@ -689,8 +691,8 @@ class Regridder(object):
         every axis.
 
         This argument should only be used if you are providing your own
-        `method` as a function, where the function requires relative, rather
-        than absolute weights (the provided `conductance` method requires
+        ``method`` as a function, where the function requires relative, rather
+        than absolute weights (the provided ``conductance`` method requires
         relative weights, for example). Default value is False.
 
     Examples
@@ -699,7 +701,7 @@ class Regridder(object):
 
     >>> mean_regridder = imod.prepare.Regridder(method="mean")
 
-    Then call the `regrid` method to regrid.
+    Then call the ``regrid`` method to regrid.
 
     >>> result = mean_regridder(source, like)
 
@@ -712,9 +714,9 @@ class Regridder(object):
 
     >>> result = imod.prepare.Regridder(method="mean").regrid(source, like)
 
-    It's possible to provide your own methods to the `Regridder`, provided that
-    numba can compile them. They need to take the arguments `values` and
-    `weights`. Make sure they deal with nan values gracefully!
+    It's possible to provide your own methods to the ``Regridder``, provided that
+    numba can compile them. They need to take the arguments ``values`` and
+    ``weights``. Make sure they deal with nan values gracefully!
 
     >>> def p30(values, weights):
     >>>     return np.nanpercentile(values, 30)
