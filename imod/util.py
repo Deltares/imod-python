@@ -1,3 +1,16 @@
+"""
+Miscellaneous Utilities.
+
+Conventional IDF filenames can be understood and constructed using
+:func:`imod.util.decompose` and :func:`imod.util.compose`. These are used
+automatically in :func:`imod.idf`.
+
+Furthermore there are some utility functions for dealing with the spatial
+location of rasters: :func:`imod.util.coord_reference`,
+:func:`imod.util.spatial_reference` and :func:`imod.util.transform`. These are
+used internally, but are not private since they may be useful to users as well.
+"""
+
 import collections
 import datetime
 import pathlib

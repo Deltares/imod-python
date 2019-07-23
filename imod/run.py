@@ -1,3 +1,7 @@
+"""
+Write iMODFLOW Runfiles.
+"""
+
 import collections
 import itertools
 import pathlib

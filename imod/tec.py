@@ -1,3 +1,7 @@
+"""
+Read Tecplot ASCII data.
+"""
+
 import collections
 import functools
 import re

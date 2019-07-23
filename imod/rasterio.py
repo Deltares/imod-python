@@ -1,5 +1,7 @@
 """
-Functions that make use of `rasterio <https://rasterio.readthedocs.io/en/stable/>`_ for input and output to other GIS formats.
+Functions that make use of `rasterio
+<https://rasterio.readthedocs.io/en/stable/>`_ for input and output to other
+raster formats.
 
 Currently only :func:`imod.rasterio.write` is implemented.
 """

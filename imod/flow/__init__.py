@@ -1,3 +1,14 @@
+"""
+Create iMODFLOW model.
+
+With this module full iMODFLOW models can be written to disk. In :mod:`imod.wq`
+this is done with classes that understand more about the model and can therefore
+offer more help. Here a more rudimentary approach is used where you can pass a
+dictionary with all data. This works, but you need to be extra careful about
+writing a full and correct model definition, since no extra checks are done by
+this module.
+"""
+
 import pathlib
 import warnings
 
