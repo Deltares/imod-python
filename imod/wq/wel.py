@@ -126,15 +126,6 @@ class Well(BoundaryCondition):
     def _render_ssm(self, directory, globaltimes):
         return ""
 
-    def _max_active_n(self, varname, nlayer):
-        if "time" in self:
-            nmax = self.groupby("time").size().max()
-        else:
-            nmax = self.shape[0]
-        if "layer" not in self:
-            nmax *= nlayer
-        return nmax
-
     @staticmethod
     def _save_layers(df, directory, time=None):
         d = {"directory": directory, "name": directory.stem, "extension": ".ipf"}
@@ -157,10 +148,11 @@ class Well(BoundaryCondition):
 
     def save(self, directory):
         if "time" in self:
-            for time, timedf in self.groupby("time"):
+            for time, timeda in self.groupby("time"):
+                timedf = timeda.to_dataframe()
                 self._save_layers(timedf, directory, time=time)
         else:
-            self._save_layers(self, directory)
+            self._save_layers(self.to_dataframe(), directory)
 
     def _pkgcheck(self, ibound=None):
         # TODO: implement

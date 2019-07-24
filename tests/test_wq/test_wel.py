@@ -44,9 +44,7 @@ def test_render(well):
 def test_render__notime_nolayer(well):
     # Necessary because using drop return a pandas.DataFrame instead of a Well
     # object
-    d = {
-        k: v for k, v in well.copy().drop("layer").drop("time").items()
-    }
+    d = {k: v for k, v in well.copy().drop("layer").drop("time").items()}
     path = pathlib.Path("well").joinpath("well")
     wel = Well(**d)
     directory = pathlib.Path("well")
