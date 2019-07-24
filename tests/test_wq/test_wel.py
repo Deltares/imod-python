@@ -28,17 +28,14 @@ def test_render(well):
     path = pathlib.Path("well").joinpath("well")
     compare = (
         "\n"
-        "    wel_p1_s1_l2 = {path}_20000101000000.ipf\n"
-        "    wel_p2_s1_l2 = {path}_20000102000000.ipf\n"
-        "    wel_p3_s1_l2 = {path}_20000103000000.ipf\n"
-        "    wel_p4_s1_l2 = {path}_20000104000000.ipf\n"
-        "    wel_p5_s1_l2 = {path}_20000105000000.ipf"
+        "    wel_p1_s1_l2 = {path}_20000101000000_l2.ipf\n"
+        "    wel_p2_s1_l2 = {path}_20000102000000_l2.ipf\n"
+        "    wel_p3_s1_l2 = {path}_20000103000000_l2.ipf\n"
+        "    wel_p4_s1_l2 = {path}_20000104000000_l2.ipf\n"
+        "    wel_p5_s1_l2 = {path}_20000105000000_l2.ipf"
     ).format(path=path)
-
-    assert (
-        wel._render(directory, globaltimes=wel["time"].values, system_index=1)
-        == compare
-    )
+    actual = wel._render(directory, globaltimes=wel["time"].values, system_index=1)
+    assert actual == compare
 
 
 def test_render__notime_nolayer(well):
@@ -49,8 +46,29 @@ def test_render__notime_nolayer(well):
     wel = Well(**d)
     directory = pathlib.Path("well")
     compare = "\n" "    wel_p?_s1_l? = {path}.ipf".format(path=path)
+    actual = wel._render(directory, globaltimes=["?"], system_index=1)
+    print(actual)
+    print(compare)
+    assert actual == compare
 
-    assert wel._render(directory, globaltimes=["?"], system_index=1) == compare
+
+def test_render__notime_layer(well):
+    d = {k: v for k, v in well.copy().drop("time").items()}
+    d["layer"] = [1, 2, 3, 4, 5]
+    wel = Well(**d)
+    directory = pathlib.Path("well")
+    path = pathlib.Path("well").joinpath("well")
+    compare = (
+        "\n"
+        "    wel_p?_s1_l1 = {path}_l1.ipf\n"
+        "    wel_p?_s1_l2 = {path}_l2.ipf\n"
+        "    wel_p?_s1_l3 = {path}_l3.ipf\n"
+        "    wel_p?_s1_l4 = {path}_l4.ipf\n"
+        "    wel_p?_s1_l5 = {path}_l5.ipf"
+    ).format(path=path)
+
+    actual = wel._render(directory, globaltimes=["?"], system_index=1)
+    assert actual == compare
 
 
 def test_render__time_nolayer(well):
@@ -71,6 +89,27 @@ def test_render__time_nolayer(well):
         wel._render(directory, globaltimes=wel["time"].values, system_index=1)
         == compare
     )
+
+
+def test_render__time_layer(well):
+    d = {k: v for k, v in well.items()}
+    d["layer"] = [1, 2, 3, 4, 5]
+    wel = Well(**d)
+    directory = pathlib.Path("well")
+    path = pathlib.Path("well").joinpath("well")
+    compare = (
+        "\n"
+        "    wel_p1_s1_l1 = {path}_20000101000000_l1.ipf\n"
+        "    wel_p2_s1_l2 = {path}_20000102000000_l2.ipf\n"
+        "    wel_p3_s1_l3 = {path}_20000103000000_l3.ipf\n"
+        "    wel_p4_s1_l4 = {path}_20000104000000_l4.ipf\n"
+        "    wel_p5_s1_l5 = {path}_20000105000000_l5.ipf"
+    ).format(path=path)
+
+    actual = wel._render(directory, globaltimes=wel["time"].values, system_index=1)
+    print(actual)
+    print(compare)
+    assert actual == compare
 
 
 def test_save(well):

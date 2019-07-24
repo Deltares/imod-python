@@ -2,7 +2,6 @@ import pathlib
 
 import jinja2
 import numpy as np
-import pandas as pd
 
 import imod
 from imod import util
@@ -96,14 +95,28 @@ class Well(BoundaryCondition):
     def _compose_values_layer(self, directory, time=None):
         values = {}
         d = {"directory": directory, "name": directory.stem, "extension": ".ipf"}
-        if time is not None:
-            d["time"] = time
-        if "layer" in self:
-            for layer in pd.unique(self["layer"]):
-                layer = int(layer)
-                values[layer] = util.compose(d)
+
+        if time is None:
+            if "layer" in self:
+                for layer in np.unique(self["layer"]):
+                    layer = int(layer)
+                    d["layer"] = layer
+                    values[layer] = util.compose(d)
+            else:
+                values["?"] = util.compose(d)
+
         else:
-            values["?"] = util.compose(d)
+            d["time"] = time
+            if "layer" in self:
+                # Since the well data is in long table format, it's the only
+                # input that has to be inspected.
+                select = np.argwhere((self["time"] == time).values)[0]
+                for layer in np.unique(self["layer"].values[select]):
+                    d["layer"] = layer
+                    values[layer] = util.compose(d)
+            else:
+                values["?"] = util.compose(d)
+
         return values
 
     def _compose_values_time(self, directory, globaltimes):
@@ -114,7 +127,7 @@ class Well(BoundaryCondition):
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
             for time, start_end in zip(package_times, starts_ends):
                 values[start_end] = self._compose_values_layer(directory, time)
-        else:
+        else:  # for all periods
             values["?"] = self._compose_values_layer(directory)
         return values
 
