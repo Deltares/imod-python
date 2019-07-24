@@ -1,3 +1,5 @@
+import warnings
+
 import numba
 import numpy as np
 import xarray as xr
@@ -917,11 +919,15 @@ def sum(values, weights):
 
 
 def minimum(values, weights):
-    return np.nanmin(values)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", "All-NaN slice encountered")
+        return np.nanmin(values)
 
 
 def maximum(values, weights):
-    return np.nanmax(values)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", "All-NaN slice encountered")
+        return np.nanmax(values)
 
 
 def mode(values, weights):
@@ -958,7 +964,9 @@ def mode(values, weights):
 
 
 def median(values, weights):
-    return np.nanpercentile(values, 50)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", "All-NaN slice encountered")
+        return np.nanpercentile(values, 50)
 
 
 def conductance(values, weights):

@@ -251,4 +251,4 @@ def points_set_values(da, values, **points):
         indices.append(sel_indices.get(dim, slice(None, None)))
 
     # Set values in dask or numpy array
-    da.data[indices] = values
+    da.data[tuple(indices)] = values

@@ -288,7 +288,9 @@ class SeawatModel(Model):
         rchkey = self._get_pkgkey("rch")
         if rchkey is not None:
             if "time" in self[rchkey].dims:
-                n_extra += int(self[rchkey]["rate"].groupby("time").count().max())
+                n_extra += int(
+                    self[rchkey]["rate"].groupby("time").count(xr.ALL_DIMS).max()
+                )
             else:  # TODO: add test
                 n_extra += int(self[rchkey]["rate"].count())
 

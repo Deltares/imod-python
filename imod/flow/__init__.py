@@ -55,14 +55,14 @@ def write(path, model, name=None, runfile_parameters=None):
     Write the model data in dictionary ``a`` as iMODFLOW model files, to directory
     "example_dir":
 
-    >>> imod.write(path="example_dir", model=a)
+    >>> imod.flow.write(path="example_dir", model=a)
 
     Generate runfile parameters for data in dictionary ``a`` using
     ``imod.run.get_runfile()``, change the value for ``hclose``, and write:
 
     >>> runfile_parameters = imod.run.get_runfile(model=a)
     >>> runfile_parameters["hclose"] = 0.00001
-    >>> imod.write(path="example_dir", model=a, runfile_parameters=runfile_parameters)
+    >>> imod.flow.write(path="example_dir", model=a, runfile_parameters=runfile_parameters)
     """
     if isinstance(path, str):
         path = pathlib.Path(path)

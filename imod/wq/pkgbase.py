@@ -290,7 +290,7 @@ class BoundaryCondition(Package):
             number of layers, taken from ibound.
         """
         if "time" in self[varname].coords:
-            nmax = int(self[varname].groupby("time").count().max())
+            nmax = int(self[varname].groupby("time").count(xr.ALL_DIMS).max())
         else:
             nmax = int(self[varname].count())
         if not "layer" in self.coords:  # Then it applies to every layer

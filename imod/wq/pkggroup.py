@@ -44,7 +44,7 @@ class PackageGroup(collections.UserDict):
         # ds = self[key]
 
         # if "time" in ds[varname].coords:
-        #    nmax = int(ds[varname].groupby("time").count().max())
+        #    nmax = int(ds[varname].groupby("time").count(xr.ALL_DIMS).max())
         # else:
         #    nmax = int(ds[varname].count())
         return self.n_max_active
