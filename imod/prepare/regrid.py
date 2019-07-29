@@ -639,8 +639,8 @@ def _coord(da, dim):
         atolx = abs(1.0e-6 * dx)
         if not np.allclose(dxs, dx, atolx):
             raise ValueError(
-                f"DataArray has to be equidistant along {dim}, or cellsizes"
-                " must be provided as a coordinate."
+                f"DataArray has to be equidistant along {dim}, or d{dim} must"
+                " be provided as a coordinate."
             )
         dxs = np.full(da[dim].size, dx)
 
