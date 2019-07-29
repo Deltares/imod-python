@@ -15,6 +15,7 @@ from imod import rasterio
 # subpackages
 import imod.flow
 import imod.prepare
+import imod.mf6
 import imod.wq
 import imod.select
 import imod.visualize
