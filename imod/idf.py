@@ -502,7 +502,6 @@ def _load(paths, use_cftime, pattern):
                 z = top - 0.5 * dz
                 coords["dz"] = float(dz)  # cast from array
                 coords["z"] = float(z)
-                coords["z"] = ("layer", z)
 
     if hastime:
         times, use_cftime = util._convert_datetimes(times, use_cftime)
