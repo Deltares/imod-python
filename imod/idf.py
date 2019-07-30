@@ -480,12 +480,12 @@ def _load(paths, use_cftime, pattern):
         dims.insert(0, "layer")
 
     if all_have_z:
-        if haslayer:
+        if haslayer and coords["layer"].size > 1:
             top = np.array(tops)[unique_indices]
             bot = np.array(bots)[unique_indices]
             dz = top - bot
             z = top - 0.5 * dz
-            if top[0] < top[1]:  # decreasing coordinate
+            if top[0] > top[1]:  # decreasing coordinate
                 dz *= -1.0
             if np.allclose(dz, dz[0]):
                 coords["dz"] = dz[0]

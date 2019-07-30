@@ -433,6 +433,19 @@ def test_save_topbot__layers(test_layerda):
     assert np.allclose(actual["z"], da["z"])
 
 
+def test_save_topbot__layers_nonequidistant(test_layerda):
+    da = test_layerda
+    dz = np.arange(-1.0, -6.0, -1.0)
+    z = np.cumsum(dz) - 0.5 * dz
+    da = da.assign_coords(z=("layer", z))
+    da = da.assign_coords(dz=("layer", dz))
+    idf.save("layer", da)
+    # Read multiple idfs
+    actual = idf.open("layer_l*.idf")
+    assert np.allclose(actual["z"], da["z"])
+    assert np.allclose(actual["dz"], da["dz"])
+
+
 def test_save_topbot__only_z(test_layerda):
     da = test_layerda
     da = da.assign_coords(z=("layer", np.arange(1.0, 6.0) - 0.5))
@@ -445,6 +458,9 @@ def test_save_topbot__only_z(test_layerda):
     _, attrs = idf.read("layer_l2.idf")
     assert attrs["top"] == 2.0
     assert attrs["bot"] == 1.0
+
+    actual = idf.open("layer_l1.idf")
+    assert float(actual["z"]) == 0.5
 
 
 def test_save_topbot__errors(test_layerda):
