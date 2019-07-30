@@ -76,3 +76,37 @@ class BoundaryCondition(Package):
         if not "layer" in self.coords:  # Then it applies to every layer
             nmax *= nlayer
         return nmax
+
+    def _compose_values_time(self, globaltimes, directory):
+        values = {}
+
+        if "time" in da.coords:
+            package_times = da.coords["time"].values
+            starts = np.searchsorted(globaltimes, package_times) + 1
+
+            if ("y" in da.coords) ^ ("x" in da.coords):
+                raise ValueError("Need both x and y coords, or neither")
+            elif "y" in da.coords and "x" in da.coords:
+                for s in starts:
+                    values[s] = f"open/close {directory}/{self.pkg_id}_{s}.bin (binary)"
+            else:  # varies only with time and layer?
+                if "layer" in da.coords:
+                    raise ValueError("If layer is a coordinate, x and y are also required.")
+                else:
+                    for itime, s in enumerate(starts):
+                        values[s] = f"constant {da.isel(time=itime).values[()]}"
+
+
+    def render(self, directory, globaltimes):
+        mapping = tuple([(k, v) for k, v in self._mapping if v in self.data_vars])
+        d = {"mapping": mapping}
+        dicts = {}
+
+        for varname in self.data_vars.keys():
+            dicts[varname] = self._compose_values(
+                varname, globaltimes, directory
+            )
+
+        d["dicts"] = dicts
+
+        return self._template.render(d)
