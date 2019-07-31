@@ -1,20 +1,20 @@
 begin options
-{% if auxiliary is defined %}  auxiliary {{auxiliary(naux)}}{% endif %}
-{% if auxmultname is defined %}  auxmultname {{auxmultname}}{% endif %}
-{% if boundnames is defined %}  boundnames{% endif %}
-{% if print_input is defined %}  print_input{% endif %}
-{% if print_flows is defined %}  print_flows{% endif %}
-{% if save_flows is defined %}  save_flows{% endif %}
-{% if budget_filerecord is defined %}  budget fileout {{budgetfile}}{% endif %}
-{% if ts_filerecord is defined %}  ts6 filein {{ts6_filename}}{% endif %}
-{% if obs_filerecord is defined %}  obs6 filein {{obs6_filename}}{% endif %}
-{% if mover is defined %}  mover{% endif %}
-{% if simulate_et is defined %}  simulate_et{% endif %}
-{% if linear_gwet is defined %}  linear_gwet{% endif %}
-{% if square_gwet is defined %}  square_gwet{% endif %}
-{% if simulate_gwseep is defined %}  simulate_gwseep{% endif %}
-{% if unsat_etwc is defined %}  unsat_etwc{% endif %}
-{% if unsat_etae is defined %}  unsat_etae{% endif %}
+{%- if auxiliary is defined -%}  auxiliary {{auxiliary(naux)}}{%- endif -%}
+{%- if auxmultname is defined -%}  auxmultname {{auxmultname}}{%- endif -%}
+{%- if boundnames is defined -%}  boundnames{%- endif -%}
+{%- if print_input is defined -%}  print_input{%- endif -%}
+{%- if print_flows is defined -%}  print_flows{%- endif -%}
+{%- if save_flows is defined -%}  save_flows{%- endif -%}
+{%- if budget_filerecord is defined -%}  budget fileout {{budgetfile}}{%- endif -%}
+{%- if ts_filerecord is defined -%}  ts6 filein {{ts6_filename}}{%- endif -%}
+{%- if obs_filerecord is defined -%}  obs6 filein {{obs6_filename}}{%- endif -%}
+{%- if mover is defined -%}  mover{%- endif -%}
+{%- if simulate_et is defined -%}  simulate_et{%- endif -%}
+{%- if linear_gwet is defined -%}  linear_gwet{%- endif -%}
+{%- if square_gwet is defined -%}  square_gwet{%- endif -%}
+{%- if simulate_gwseep is defined -%}  simulate_gwseep{%- endif -%}
+{%- if unsat_etwc is defined -%}  unsat_etwc{%- endif -%}
+{%- if unsat_etae is defined -%}  unsat_etae{%- endif -%}
 end options
 
 begin dimensions
@@ -24,8 +24,8 @@ begin dimensions
 end dimensions
 
 begin packagedata
-  {{iuzno}} {{cellid(ncelldim)}} {{landflag}} {{ivertcon}} {{surfdep}} {{vks}} {{thtr}} {{thts}} {{thti}} {{eps}} {% if boundname is defined %}{{boundname}}{% endif %}
-  {{iuzno}} {{cellid(ncelldim)}} {{landflag}} {{ivertcon}} {{surfdep}} {{vks}} {{thtr}} {{thts}} {{thti}} {{eps}} {% if boundname is defined %}{{boundname}}{% endif %}
+  {{iuzno}} {{cellid(ncelldim)}} {{landflag}} {{ivertcon}} {{surfdep}} {{vks}} {{thtr}} {{thts}} {{thti}} {{eps}} {%- if boundname is defined -%}{{boundname}}{%- endif -%}
+  {{iuzno}} {{cellid(ncelldim)}} {{landflag}} {{ivertcon}} {{surfdep}} {{vks}} {{thtr}} {{thts}} {{thti}} {{eps}} {%- if boundname is defined -%}{{boundname}}{%- endif -%}
   ...
 end packagedata
 

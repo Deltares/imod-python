@@ -4,8 +4,8 @@ begin dimensions
 end dimensions
 
 begin table
-  {{stage}} {{volume}} {{sarea}} {% if barea is defined %}{{barea}}{% endif %}
-  {{stage}} {{volume}} {{sarea}} {% if barea is defined %}{{barea}}{% endif %}
+  {{stage}} {{volume}} {{sarea}} {%- if barea is defined -%}{{barea}}{%- endif -%}
+  {{stage}} {{volume}} {{sarea}} {%- if barea is defined -%}{{barea}}{%- endif -%}
   ...
 end table
 

@@ -1,8 +1,8 @@
 begin options
-{% if print_input is defined %}  print_input{% endif %}
-{% if print_flows is defined %}  print_flows{% endif %}
-{% if modelnames is defined %}  modelnames{% endif %}
-{% if budget_filerecord is defined %}  budget fileout {{budgetfile}}{% endif %}
+{%- if print_input is defined -%}  print_input{%- endif -%}
+{%- if print_flows is defined -%}  print_flows{%- endif -%}
+{%- if modelnames is defined -%}  modelnames{%- endif -%}
+{%- if budget_filerecord is defined -%}  budget fileout {{budgetfile}}{%- endif -%}
 end options
 
 begin dimensions
@@ -11,8 +11,8 @@ begin dimensions
 end dimensions
 
 begin packages
-  {% if mname is defined %}{{mname}}{% endif %} {{pname}}
-  {% if mname is defined %}{{mname}}{% endif %} {{pname}}
+  {%- if mname is defined -%}{{mname}}{%- endif -%} {{pname}}
+  {%- if mname is defined -%}{{mname}}{%- endif -%} {{pname}}
   ...
 end packages
 

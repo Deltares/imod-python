@@ -1,15 +1,15 @@
 begin options
-{% if length_units is defined %}  length_units {{length_units}}{% endif %}
-{% if nogrb is defined %}  nogrb{% endif %}
-{% if xorigin is defined %}  xorigin {{xorigin}}{% endif %}
-{% if yorigin is defined %}  yorigin {{yorigin}}{% endif %}
-{% if angrot is defined %}  angrot {{angrot}}{% endif %}
+{%- if length_units is defined -%}  length_units {{length_units}}{%- endif -%}
+{%- if nogrb is defined -%}  nogrb{%- endif -%}
+{%- if xorigin is defined -%}  xorigin {{xorigin}}{%- endif -%}
+{%- if yorigin is defined -%}  yorigin {{yorigin}}{%- endif -%}
+{%- if angrot is defined -%}  angrot {{angrot}}{%- endif -%}
 end options
 
 begin dimensions
   nodes {{nodes}}
   nja {{nja}}
-{% if nvert is defined %}  nvert {{nvert}}{% endif %}
+{%- if nvert is defined -%}  nvert {{nvert}}{%- endif -%}
 end dimensions
 
 begin griddata
@@ -32,8 +32,8 @@ begin connectiondata
     {cl12}
   hwva
     {hwva}
-{% if angldegx is defined %}  angldegx
-    {angldegx}{% endif %}
+{%- if angldegx is defined -%}  angldegx
+    {angldegx}{%- endif -%}
 end connectiondata
 
 begin vertices

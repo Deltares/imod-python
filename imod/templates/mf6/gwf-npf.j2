@@ -1,12 +1,12 @@
 begin options
-{% if save_flows is defined %}  save_flows{% endif %}
-{% if alternative_cell_averaging is defined %}  alternative_cell_averaging {{alternative_cell_averaging}}{% endif %}
-{% if thickstrt is defined %}  thickstrt{% endif %}
-{% if cvoptions is defined %}  variablecv {% if dewatered is defined %}dewatered{% endif %}{% endif %}
-{% if perched is defined %}  perched{% endif %}
-{% if rewet_record is defined %}  rewet wetfct {{wetfct}} iwetit {{iwetit}} ihdwet {{ihdwet}}{% endif %}
-{% if xt3doptions is defined %}  xt3d {% if rhs is defined %}rhs{% endif %}{% endif %}
-{% if save_specific_discharge is defined %}  save_specific_discharge{% endif %}
+{%- if save_flows is defined -%}  save_flows{%- endif -%}
+{%- if alternative_cell_averaging is defined -%}  alternative_cell_averaging {{alternative_cell_averaging}}{%- endif -%}
+{%- if thickstrt is defined -%}  thickstrt{%- endif -%}
+{%- if cvoptions is defined -%}  variablecv {%- if dewatered is defined -%}dewatered{%- endif -%}{%- endif -%}
+{%- if perched is defined -%}  perched{%- endif -%}
+{%- if rewet_record is defined -%}  rewet wetfct {{wetfct}} iwetit {{iwetit}} ihdwet {{ihdwet}}{%- endif -%}
+{%- if xt3doptions is defined -%}  xt3d {%- if rhs is defined -%}rhs{%- endif -%}{%- endif -%}
+{%- if save_specific_discharge is defined -%}  save_specific_discharge{%- endif -%}
 end options
 
 begin griddata
@@ -14,17 +14,17 @@ begin griddata
     {icelltype}
   k {% if layered is sameas true %}layered{% endif %}
     {k}
-{% if k22 is defined %}  k22 {% if layered is sameas true %}layered{% endif %}
-    {k22}{% endif %}
-{% if k33 is defined %}  k33 {% if layered is sameas true %}layered{% endif %}
-    {k33}{% endif %}
-{% if angle1 is defined %}  angle1 {% if layered is sameas true %}layered{% endif %}
-    {angle1}{% endif %}
-{% if angle2 is defined %}  angle2 {% if layered is sameas true %}layered{% endif %}
-    {angle2}{% endif %}
-{% if angle3 is defined %}  angle3 {% if layered is sameas true %}layered{% endif %}
-    {angle3}{% endif %}
-{% if wetdry is defined %}  wetdry {% if layered is sameas true %}layered{% endif %}
-    {wetdry}{% endif %}
+{%- if k22 is defined -%}  k22 {% if layered is sameas true %}layered{% endif %}
+    {k22}{%- endif -%}
+{%- if k33 is defined -%}  k33 {% if layered is sameas true %}layered{% endif %}
+    {k33}{%- endif -%}
+{%- if angle1 is defined -%}  angle1 {% if layered is sameas true %}layered{% endif %}
+    {angle1}{%- endif -%}
+{%- if angle2 is defined -%}  angle2 {% if layered is sameas true %}layered{% endif %}
+    {angle2}{%- endif -%}
+{%- if angle3 is defined -%}  angle3 {% if layered is sameas true %}layered{% endif %}
+    {angle3}{%- endif -%}
+{%- if wetdry is defined -%}  wetdry {% if layered is sameas true %}layered{% endif %}
+    {wetdry}{%- endif -%}
 end griddata
 

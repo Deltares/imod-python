@@ -100,7 +100,7 @@ def block_entry(varname, block, vardict, indent="  "):
 
     # if optional, wrap string in square brackets
     if v.get("optional") == "true":
-        s = f"{{% if {varname} is defined %}}{indent}{s.strip()}{{% endif %}}"
+        s = f"{{%- if {varname} is defined -%}}{indent}{s.strip()}{{%- endif -%}}"
     else:
         # prepend with indent and return string
         s = f"{indent}{s}"

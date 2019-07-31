@@ -1,19 +1,19 @@
 begin options
-{% if auxiliary is defined %}  auxiliary {{auxiliary(naux)}}{% endif %}
-{% if boundnames is defined %}  boundnames{% endif %}
-{% if print_input is defined %}  print_input{% endif %}
-{% if print_head is defined %}  print_head{% endif %}
-{% if print_flows is defined %}  print_flows{% endif %}
-{% if save_flows is defined %}  save_flows{% endif %}
-{% if stage_filerecord is defined %}  head fileout {{headfile}}{% endif %}
-{% if budget_filerecord is defined %}  budget fileout {{budgetfile}}{% endif %}
-{% if no_well_storage is defined %}  no_well_storage{% endif %}
-{% if flowing_wells is defined %}  flowing_wells{% endif %}
-{% if shutdown_theta is defined %}  shutdown_theta {{shutdown_theta}}{% endif %}
-{% if shutdown_kappa is defined %}  shutdown_kappa {{shutdown_kappa}}{% endif %}
-{% if ts_filerecord is defined %}  ts6 filein {{ts6_filename}}{% endif %}
-{% if obs_filerecord is defined %}  obs6 filein {{obs6_filename}}{% endif %}
-{% if mover is defined %}  mover{% endif %}
+{%- if auxiliary is defined -%}  auxiliary {{auxiliary(naux)}}{%- endif -%}
+{%- if boundnames is defined -%}  boundnames{%- endif -%}
+{%- if print_input is defined -%}  print_input{%- endif -%}
+{%- if print_head is defined -%}  print_head{%- endif -%}
+{%- if print_flows is defined -%}  print_flows{%- endif -%}
+{%- if save_flows is defined -%}  save_flows{%- endif -%}
+{%- if stage_filerecord is defined -%}  head fileout {{headfile}}{%- endif -%}
+{%- if budget_filerecord is defined -%}  budget fileout {{budgetfile}}{%- endif -%}
+{%- if no_well_storage is defined -%}  no_well_storage{%- endif -%}
+{%- if flowing_wells is defined -%}  flowing_wells{%- endif -%}
+{%- if shutdown_theta is defined -%}  shutdown_theta {{shutdown_theta}}{%- endif -%}
+{%- if shutdown_kappa is defined -%}  shutdown_kappa {{shutdown_kappa}}{%- endif -%}
+{%- if ts_filerecord is defined -%}  ts6 filein {{ts6_filename}}{%- endif -%}
+{%- if obs_filerecord is defined -%}  obs6 filein {{obs6_filename}}{%- endif -%}
+{%- if mover is defined -%}  mover{%- endif -%}
 end options
 
 begin dimensions
@@ -21,8 +21,8 @@ begin dimensions
 end dimensions
 
 begin packagedata
-  {{wellno}} {{radius}} {{bottom}} {{strt}} {{condeqn}} {{ngwfnodes}} {% if aux is defined %}{{aux(naux)}}{% endif %} {% if boundname is defined %}{{boundname}}{% endif %}
-  {{wellno}} {{radius}} {{bottom}} {{strt}} {{condeqn}} {{ngwfnodes}} {% if aux is defined %}{{aux(naux)}}{% endif %} {% if boundname is defined %}{{boundname}}{% endif %}
+  {{wellno}} {{radius}} {{bottom}} {{strt}} {{condeqn}} {{ngwfnodes}} {%- if aux is defined -%}{{aux(naux)}}{%- endif -%} {%- if boundname is defined -%}{{boundname}}{%- endif -%}
+  {{wellno}} {{radius}} {{bottom}} {{strt}} {{condeqn}} {{ngwfnodes}} {%- if aux is defined -%}{{aux(naux)}}{%- endif -%} {%- if boundname is defined -%}{{boundname}}{%- endif -%}
   ...
 end packagedata
 
