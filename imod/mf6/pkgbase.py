@@ -26,6 +26,7 @@ class Package(xr.Dataset):
             f.write(content)
 
     def to_sparse(self, data):
+        """Convert from dense arrays to list based input"""
         notnull = ~np.isnan(data)
         indices = np.argwhere(notnull)
         values = data[notnull]
@@ -44,6 +45,28 @@ class Package(xr.Dataset):
         for k, v in self.data_vars.items():
             d[k] = v
         self._template.render(**d)
+
+    def _compose_values(self, varname, directory, *args, **kwargs):
+        """
+        Compose values of dictionary
+
+        See documentation of wq
+        """
+        da = self[varname]
+        
+        layered = False
+        values = []
+        if "x" in da.coords and "y" in da.coords:
+            values.append(f"open/close {directory}/{self.pkg_id}_{s}.bin (binary)")          
+        else:
+            if "layer" in da.coords:
+                layered = True
+                for layer in da.coords["layer"]:
+                    values.append(f"constant {da.sel(layer=layer).values[()]}")
+            else:
+                values.append(f"constant {da.values[()]}")
+        
+        return layered, values
 
     def write(self, pkgname, directory):
         outdir = directory.join(pgkname)
@@ -79,27 +102,21 @@ class BoundaryCondition(Package):
             nmax *= nlayer
         return nmax
 
-    def _compose_values_time(self, varname, globaltimes, directory):
+    def _compose_values(self, varname, globaltimes, directory):
         da = self[varname]
         values = {}
 
+        if "x" not in da.coords or "y" not in da.coords:
+            raise ValueError("Boundary conditions only accept")
+            
         if "time" in da.coords:
             package_times = da.coords["time"].values
             starts = np.searchsorted(globaltimes, package_times) + 1
-
-            if ("y" in da.coords) ^ ("x" in da.coords):
-                raise ValueError("Need both x and y coords, or neither")
-            elif "y" in da.coords and "x" in da.coords:
-                for s in starts:
-                    values[s] = f"open/close {directory}/{self.pkg_id}_{s}.bin (binary)"
-            else:  # varies only with time and layer?
-                if "layer" in da.coords:
-                    raise ValueError(
-                        "If layer is a coordinate, x and y are also required."
-                    )
-                else:
-                    for itime, s in enumerate(starts):
-                        values[s] = f"constant {da.isel(time=itime).values[()]}"
+            for s in starts:
+                values[s] = f"open/close {directory}/{self.pkg_id}_{s}.bin (binary)"
+        else:
+            values[1] = f"open/close {directory}/{self.pkg_id}_1.bin (binary)"
+        return False, values
 
     def render(self, directory, globaltimes):
         mapping = tuple([(k, v) for k, v in self._mapping if v in self.data_vars])
