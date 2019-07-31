@@ -1,5 +1,12 @@
 import collections
+import os
+import pathlib
+
+import cftime
 import numpy as np
+import xarray as xr
+
+import imod
 
 
 class Model(collections.UserDict):
@@ -64,20 +71,20 @@ class Modflow6(Model):
         """
         self.use_cftime = self._use_cftime()
 
-        times = [timeutil.to_datetime(time, self.use_cftime) for time in times]
+        times = [imod.wq.timeutil.to_datetime(time, self.use_cftime) for time in times]
         for pkg in self.values():
             if "time" in pkg.coords:
                 times.append(pkg["time"].values)
 
         # TODO: check that endtime is later than all other times.
-        times.append(timeutil.to_datetime(endtime, self.use_cftime))
+        times.append(imod.wq.timeutil.to_datetime(endtime, self.use_cftime))
         if starttime is not None:
-            times.append(timeutil.to_datetime(starttime, self.use_cftime))
+            times.append(imod.wq.timeutil.to_datetime(starttime, self.use_cftime))
 
         # np.unique also sorts
         times = np.unique(np.hstack(times))
 
-        duration = timeutil.timestep_duration(times, self.use_cftime)
+        duration = imod.wq.timeutil.timestep_duration(times, self.use_cftime)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
         timestep_duration = xr.DataArray(

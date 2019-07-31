@@ -1,7 +1,9 @@
-import numpy as np
-import numba
-import xarray as xr
 import pathlib
+
+import jinja2
+import numba
+import numpy as np
+import xarray as xr
 
 
 class Package(xr.Dataset):
@@ -77,7 +79,8 @@ class BoundaryCondition(Package):
             nmax *= nlayer
         return nmax
 
-    def _compose_values_time(self, globaltimes, directory):
+    def _compose_values_time(self, varname, globaltimes, directory):
+        da = self[varname]
         values = {}
 
         if "time" in da.coords:
