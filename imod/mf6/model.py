@@ -16,6 +16,7 @@ class Modflow6(Model):
     """
     Contains data and writes consistent model input files
     """
+
     def __init__(self, modelname):
         self.modelname = modelname
 

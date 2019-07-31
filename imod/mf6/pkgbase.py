@@ -91,11 +91,12 @@ class BoundaryCondition(Package):
                     values[s] = f"open/close {directory}/{self.pkg_id}_{s}.bin (binary)"
             else:  # varies only with time and layer?
                 if "layer" in da.coords:
-                    raise ValueError("If layer is a coordinate, x and y are also required.")
+                    raise ValueError(
+                        "If layer is a coordinate, x and y are also required."
+                    )
                 else:
                     for itime, s in enumerate(starts):
                         values[s] = f"constant {da.isel(time=itime).values[()]}"
-
 
     def render(self, directory, globaltimes):
         mapping = tuple([(k, v) for k, v in self._mapping if v in self.data_vars])
@@ -103,9 +104,7 @@ class BoundaryCondition(Package):
         dicts = {}
 
         for varname in self.data_vars.keys():
-            dicts[varname] = self._compose_values(
-                varname, globaltimes, directory
-            )
+            dicts[varname] = self._compose_values(varname, globaltimes, directory)
 
         d["dicts"] = dicts
 
