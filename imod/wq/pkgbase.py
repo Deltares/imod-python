@@ -174,7 +174,7 @@ class Package(xr.Dataset):
         dims = set(self.dims)
         for var in varnames:
             if not self[var].shape == ():  # skip scalar value
-                dims.intersection(self[var].dims)
+                dims = dims.intersection(self[var].dims)
 
         is_nan = True
         for var in varnames:
