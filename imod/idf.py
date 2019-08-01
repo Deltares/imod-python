@@ -363,7 +363,38 @@ def open(path, use_cftime=False, pattern=None):
     return _load(paths, use_cftime, pattern)
 
 
-def open_subdomains(path, use_cftime=False, pattern=None):
+def _place_subdomains(das, dim):
+    """
+    Computes how to place DataArrays relative to each other in a single array
+    """
+    # np.unique does a sort
+    x = np.unique(np.concatenate(da[dim].values for da in das))
+    is_increasing = das[dim][0] < das[dim][1]
+    ncol = x.size
+    inds = []
+    for da in das:
+        x0 = da[dim][0]
+        ncolpart = da[dim].size
+        ix0 = np.searchsorted(x, x0)
+        if is_increasing:
+            ix1 = ix0 + ncolpart
+        else:
+            ix1 = ncol - ix0
+            ix0 = ix1 - ncolpart
+        inds.append(slice(ix0, ix1))
+    if not is_increasing:
+        x = x[::-1]
+    return inds, x, x.size
+
+
+def _merge_subdomains(das, yslices, xslices, shape):
+    merged = np.full(shape, np.nan)
+    for da, yslice, xslice in zip(das, yslices, xslices):
+        merged[..., yslice, xslice] = da.values
+    return merged
+
+
+def open_subdomains(path, use_cftime=False):
     """
     Combine IDF files of multiple subdomains.
 
@@ -400,15 +431,17 @@ def open_subdomains(path, use_cftime=False, pattern=None):
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
 
-    subdomain_pattern = re.compile(r"_p(\d{3})", re.IGNORECASE)
+    pattern = re.compile(r"[\w-]+_(?P<time>[0-9-]+)_l[0-9]+(?P<subdomain>_p\d{3})", re.IGNORECASE)
     # There are no real benefits to itertools.groupby in this case, as there's
     # no benefit to using a (lazy) iterator in this case.
-    grouped = collections.defaultdict(list)
+    groups = collections.defaultdict(dict)
     numbers = []
     for p in paths:
-        number = subdomain_pattern.search(p).group(1)
+        search = pattern.search(p)
+        timestr = search.group(1)
+        number = search.group(2)
+        grouped[timestr][number] = p
         numbers.append(number)
-        grouped[number].append(pathlib.Path(p))
 
     numbers = sorted(set(numbers))
     first = numbers[0]
@@ -423,26 +456,32 @@ def open_subdomains(path, use_cftime=False, pattern=None):
                 f"has {group_len} IDF files."
             )
 
-    # This pattern will ignore the subdomain part
-    if pattern is None:
-        pattern = r"{name}_{time}_l{layer}_p\d+"
+    # Get a tasting
+    das = groups[0]
+    yslices, y, nrow = _place_subdomains(das, "y")
+    xslices, x, ncol = _place_subdomains(das, "x")
+    nlayer = das[0].shape[0]
+    layer = das[0]["layer"]
+    dtype = das[0].dtype
+    shape = (nlayer, nrow, ncol)
+    dims = ("time", "layer", "y", "x")
+    coords = {"layer": layer, "y": y, "x": x}
+    times = [da["time"] for da in das]
+    times, use_cftime = util._convert_datetimes(times, use_cftime)
+    if use_cftime:
+        coords["time"] = xr.CFTimeIndex(np.unique(times))
+    else:
+        coords["time"] = np.unique(times)
 
-    subdomains = [
-        open(pathlist, use_cftime=use_cftime, pattern=pattern)
-        for pathlist in grouped.values()
-    ]
+    merged = []
+    for group in groups.values():
+        for subdomains in group.values():
+            das = [_load(subdomains, use_cftime)]
+            a = dask.delayed(_merge_subdomains)(das, yslices, xslices, shape)
+            merged.append(dask.array.from_delayed(a, shape, dtype))
+    data = dask.array.stack(merged, axis=0)
 
-    # Sortby y-coordinate, since xarray.merge automatically sorts all
-    # coordinates in ascending order
-    # See issue: https://github.com/pydata/xarray/issues/2947
-    combined = xr.merge(subdomains).sortby("y", ascending=False)
-
-    # xr.merge always returns a Dataset. We want the DataArray.
-    data_vars = list(combined.data_vars.keys())
-    assert len(data_vars) == 1
-    name = data_vars[0]
-
-    return combined[name]
+    return xr.DataArray(data, coords, dims)
 
 
 def _load(paths, use_cftime, pattern):
