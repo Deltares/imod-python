@@ -762,6 +762,9 @@ class Regridder(object):
         # regridded, and those that exist in source but not in like (left
         # untouched)
         matching_dims, regrid_dims, add_dims = _match_dims(source, like)
+        
+        if len(regrid_dims) == 0:
+            return source
 
         # Create tailor made regridding function: take method and ndims into
         # account and call it
