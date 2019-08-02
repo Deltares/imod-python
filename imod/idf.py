@@ -501,6 +501,34 @@ def open_subdomains(path, use_cftime=False):
     return xr.DataArray(data, coords, dims)
 
 
+def _array_z_coord(coords, tops, bots, unique_indices):
+    top = np.array(tops)[unique_indices]
+    bot = np.array(bots)[unique_indices]
+    dz = top - bot
+    z = top - 0.5 * dz
+    if top[0] > top[1]:  # decreasing coordinate
+        dz *= -1.0
+    if np.allclose(dz, dz[0]):
+        coords["dz"] = dz[0]
+    else:
+        coords["dz"] = ("layer", dz)
+    coords["z"] = ("layer", z)
+    return coords
+
+
+def _scalar_z_coord(coords, tops, bots):
+    # They must be all the same to be used, as they cannot be assigned
+    # to layer.
+    top = np.unique(tops)
+    bot = np.unique(bots)
+    if top.size == bot.size == 1:
+        dz = top - bot
+        z = top - 0.5 * dz
+        coords["dz"] = float(dz)  # cast from array
+        coords["z"] = float(z)
+    return coords
+
+
 def _load(paths, use_cftime, pattern):
     """Combine a list of paths to IDFs to a single xarray.DataArray"""
     # this function also works for single IDFs
@@ -537,27 +565,9 @@ def _load(paths, use_cftime, pattern):
 
     if all_have_z:
         if haslayer and coords["layer"].size > 1:
-            top = np.array(tops)[unique_indices]
-            bot = np.array(bots)[unique_indices]
-            dz = top - bot
-            z = top - 0.5 * dz
-            if top[0] > top[1]:  # decreasing coordinate
-                dz *= -1.0
-            if np.allclose(dz, dz[0]):
-                coords["dz"] = dz[0]
-            else:
-                coords["dz"] = ("layer", dz)
-            coords["z"] = ("layer", z)
+            coords = _array_z_coord(coords, tops, bots, unique_indices)
         else:
-            # They must be all the same to be used, as they cannot be assigned
-            # to layer.
-            top = np.unique(tops)
-            bot = np.unique(bots)
-            if top.size == bot.size == 1:
-                dz = top - bot
-                z = top - 0.5 * dz
-                coords["dz"] = float(dz)  # cast from array
-                coords["z"] = float(z)
+            coords = _scalar_z_coord(coords, tops, bots)
 
     if hastime:
         times, use_cftime = util._convert_datetimes(times, use_cftime)
@@ -719,10 +729,30 @@ def _extra_dims(a):
 
 
 def _write_chunks(a, pattern, d, nodata):
+    """
+    This function writes one chunk of the DataArray 'a' at a time. This is
+    necessary to avoid heavily sub-optimal scheduling by xarray/dask when
+    writing data to idf's. The problem appears to be caused by the fact that
+    .groupby results in repeated computations for every single IDF chunk
+    (time and layer). Specifically, merging several subdomains with
+    open_subdomains, and then calling save ends up being extremely slow.
+
+    This functions avoids this by calling compute() on the individual chunk,
+    before writing (so the chunk therefore has to fit in memory). 'x' and 'y'
+    dimensions are not treated as chunks, as all values over x and y have to
+    end up in single IDF file.
+
+    The number of chunks is not known beforehand; it may vary per dimension,
+    and the number of dimensions may vary as well. The naive solution to this
+    is a variable number of for loops, writting explicitly beforehand. Instead,
+    this function uses recursion, selecting one chunk per dimension per time.
+    The base case is one where only a single chunks remains, and then the write
+    occurs (ignoring chunks in x and y).
+    """
     dim = a.dims[0]
     dim_is_xy = (dim == "x") or (dim == "y")
     nochunks = a.chunks is None or max(map(len, a.chunks)) == 1
-    if nochunks or dim_is_xy:
+    if nochunks or dim_is_xy:  # Base case
         a = a.compute()
         extradims = _extra_dims(a)
         if extradims:
@@ -735,7 +765,7 @@ def _write_chunks(a, pattern, d, nodata):
         else:
             fn = util.compose(d, pattern)
             write(fn, a, nodata)
-    else:  # select a single dimensions chunk, recurse
+    else:  # recursive case
         chunksizes = a.chunks[0]
         start = 0
         for chunksize in chunksizes:
