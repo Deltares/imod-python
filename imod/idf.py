@@ -387,21 +387,6 @@ def open_subdomains(path, use_cftime=False):
     """
     Combine IDF files of multiple subdomains.
 
-    Nota bene: Writing the resulting xr.DataArray to a netcdf with
-    ``to_netcdf`` is quite fast. However, saving the result to IDFs with
-    ``imod.idf.save`` is unfortunately extremely slow. The cause appears to be
-    a failure of the xarray scheduler: when saving to IDFs, it starts to
-    merge the IDFs for a single layer and a single time. This means that if
-    you 10 layers, and 30 times, that it will perform 300 individual merge
-    operations!
-
-    The easiest way around it is by calling ``.load()`` on the result once, if
-    it fits in your memory all at once. In this case, it will perform the
-    merge only once, combining layers and times in one go.
-
-    If it doesn't fit in memory, you might try re-chunking the result:
-    http://xarray.pydata.org/en/stable/generated/xarray.DataArray.chunk.html
-
     Parameters
     ----------
     path : str, Path or list
