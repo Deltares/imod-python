@@ -493,11 +493,9 @@ def open_subdomains(path, use_cftime=False):
         # Build a single array per timestep
         timestep_data = dask.delayed(_merge_subdomains)(group, use_cftime, pattern)
         dask_array = dask.array.from_delayed(timestep_data, shape, dtype=np.float32)
-        #        dask_array = _merge_subdomains(group, use_cftime, pattern)
         merged.append(dask_array)
 
     data = dask.array.concatenate(merged, axis=0)
-    #    data = np.concatenate(merged, axis=0)
     return xr.DataArray(data, coords, dims)
 
 
