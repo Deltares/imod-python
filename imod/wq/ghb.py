@@ -60,3 +60,16 @@ class GeneralHeadBoundary(BoundaryCondition):
 
         to_check.append("head")
         self._check_location_consistent(to_check)
+
+    def add_timemap(
+        self,
+        head=None,
+        conductance=None,
+        concentration=None,
+        density=None,
+        use_cftime=False,
+    ):
+        varnames = ["head", "conductance", "concentration", "density"]
+        values = [head, conductance, concentration, density]
+        for varname, value in zip(varnames, values):
+            self._add_timemap(varname, value, use_cftime)

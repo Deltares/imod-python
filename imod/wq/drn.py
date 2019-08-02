@@ -32,3 +32,9 @@ class Drainage(BoundaryCondition):
     def _pkgcheck(self, ibound=None):
         self._check_positive(["conductance"])
         self._check_location_consistent(["elevation", "conductance"])
+
+    def add_timemap(self, elevation=None, conductance=None, use_cftime=False):
+        varnames = ["elevation", "conductance"]
+        values = [elevation, conductance]
+        for varname, value in zip(varnames, values):
+            self._add_timemap(varname, value, use_cftime)

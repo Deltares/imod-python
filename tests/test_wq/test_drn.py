@@ -42,7 +42,7 @@ def test_render(drainage):
 
 
 def test_render_with_time(drainage):
-    drn = drainage
+    drn = drainage.copy()
     directory = pathlib.Path(".")
     elev = drn["elevation"]
     datetimes = pd.date_range("2000-01-01", "2000-01-02")
@@ -60,6 +60,38 @@ def test_render_with_time(drainage):
         "    elevation_p2_s1_l1 = elevation_20000102000000_l1.idf\n"
         "    elevation_p2_s1_l2 = elevation_20000102000000_l2.idf\n"
         "    elevation_p2_s1_l3 = elevation_20000102000000_l3.idf\n"
+        "    cond_p?_s1_l1 = conductance_l1.idf\n"
+        "    cond_p?_s1_l2 = conductance_l2.idf\n"
+        "    cond_p?_s1_l3 = conductance_l3.idf"
+    )
+
+    assert drn._render(directory, globaltimes=datetimes, system_index=1) == compare
+
+
+def test_render_with_timemap(drainage):
+    drn = drainage
+    directory = pathlib.Path(".")
+    elev = drn["elevation"]
+    datetimes = pd.date_range("2000-01-01", "2000-01-03")
+
+    elev_transient = xr.concat(
+        [elev.assign_coords(time=t) for t in datetimes[:-1]], dim="time"
+    )
+    drn["elevation"] = elev_transient
+    timemap = {datetimes[-1]: datetimes[0]}
+    drn.add_timemap(elevation=timemap)
+
+    compare = (
+        "\n"
+        "    elevation_p1_s1_l1 = elevation_20000101000000_l1.idf\n"
+        "    elevation_p1_s1_l2 = elevation_20000101000000_l2.idf\n"
+        "    elevation_p1_s1_l3 = elevation_20000101000000_l3.idf\n"
+        "    elevation_p2_s1_l1 = elevation_20000102000000_l1.idf\n"
+        "    elevation_p2_s1_l2 = elevation_20000102000000_l2.idf\n"
+        "    elevation_p2_s1_l3 = elevation_20000102000000_l3.idf\n"
+        "    elevation_p3_s1_l1 = elevation_20000101000000_l1.idf\n"
+        "    elevation_p3_s1_l2 = elevation_20000101000000_l2.idf\n"
+        "    elevation_p3_s1_l3 = elevation_20000101000000_l3.idf\n"
         "    cond_p?_s1_l1 = conductance_l1.idf\n"
         "    cond_p?_s1_l2 = conductance_l2.idf\n"
         "    cond_p?_s1_l3 = conductance_l3.idf"

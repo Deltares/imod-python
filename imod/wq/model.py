@@ -143,6 +143,11 @@ class SeawatModel(Model):
         for pkg in self.values():
             if "time" in pkg.coords:
                 times.append(pkg["time"].values)
+                for var in pkg.data_vars:
+                    if "timemap" in pkg[var].attrs:
+                        timemap = pkg[var].attrs["timemap"]
+                        for time in timemap.keys():
+                            times.append(time)
 
         # TODO: check that endtime is later than all other times.
         times.append(timeutil.to_datetime(endtime, self.use_cftime))
