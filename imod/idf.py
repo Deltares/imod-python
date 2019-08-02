@@ -364,57 +364,23 @@ def open(path, use_cftime=False, pattern=None):
     return _load(paths, use_cftime, pattern)
 
 
-def _place_subdomains(das, dim):
-    """
-    Computes how to place DataArrays relative to each other in a single array
-    """
-    # np.unique does a sort
-    x = np.unique(np.concatenate([da[dim].values for da in das]))
-    is_increasing = das[0][dim][0] < das[0][dim][1]
-    ncol = x.size
-    inds = []
-    for da in das:
-        x0 = da[dim][0]
-        ncolpart = da[dim].size
-        ix0 = np.searchsorted(x, x0)
-        if is_increasing:
-            ix1 = ix0 + ncolpart
-        else:
-            ix1 = ncol - ix0
-            ix0 = ix1 - ncolpart
-        inds.append(slice(ix0, ix1))
-    if not is_increasing:
-        x = x[::-1]
-    return inds, x, x.size
-
-def _merge_subdomains(das, yslices, xslices, shape):
-    merged = np.full(shape, np.nan)
-    for da, yslice, xslice in zip(das, yslices, xslices):
-        merged[..., yslice, xslice] = da.values
-    return merged
-
-
-def _merge_idfs(das):
+def _merge_subdomains(pathlists, use_cftime, pattern):
+    das = [_load(pathlist, use_cftime, pattern) for pathlist in pathlists.values()]
     x = np.unique(np.concatenate([da.x.values for da in das]))
     y = np.unique(np.concatenate([da.y.values for da in das]))
-    
+
     nrow = y.size
     ncol = x.size
     nlayer = das[0].coords["layer"].size
     out = np.full((1, nlayer, nrow, ncol), np.nan)
-    
+
     for da in das:
         ix = np.searchsorted(x, da.x.values[0], side="left")
         iy = nrow - np.searchsorted(y, da.y.values[0], side="right")
         _, _, ysize, xsize = da.shape
-        out[:, :,  iy: iy + ysize, ix: ix + xsize] = da.values
+        out[:, :, iy : iy + ysize, ix : ix + xsize] = da.values
 
-    coords = dict(das[0].coords)
-    coords["x"] = x
-    coords["y"] = y
-    dims = das[0].dims
-    
-    return xr.DataArray(out, coords, dims)
+    return out
 
 
 def open_subdomains(path, use_cftime=False):
@@ -454,21 +420,29 @@ def open_subdomains(path, use_cftime=False):
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
 
-    pattern = re.compile(r"[\w-]+_(?P<time>[0-9-]+)_l[0-9]+_p(?P<subdomain>[0-9]{3})", re.IGNORECASE)
+    pattern = re.compile(
+        r"[\w-]+_(?P<time>[0-9-]+)_l(?P<layer>[0-9]+)_p(?P<subdomain>[0-9]{3})",
+        re.IGNORECASE,
+    )
     # There are no real benefits to itertools.groupby in this case, as there's
     # no benefit to using a (lazy) iterator in this case
-    grouped_by_time = collections.defaultdict(functools.partial(collections.defaultdict, list))
-    #grouped_by_time = collections.defaultdict(collections.defaultdict(list))
+    grouped_by_time = collections.defaultdict(
+        functools.partial(collections.defaultdict, list)
+    )
+    # grouped_by_time = collections.defaultdict(collections.defaultdict(list))
     count_per_subdomain = collections.defaultdict(int)  # used only for checking counts
     timestrings = []
+    layers = []
     numbers = []
     for p in paths:
         search = pattern.search(p)
         timestr = int(search.group(1))
-        number = int(search.group(2))
+        layer = int(search.group(2))
+        number = int(search.group(3))
         grouped_by_time[timestr][number].append(p)
         count_per_subdomain[number] += 1
         numbers.append(number)
+        layers.append(layer)
         timestrings.append(timestr)
 
     numbers = sorted(set(numbers))
@@ -483,38 +457,48 @@ def open_subdomains(path, use_cftime=False):
                 f"has {group_len} IDF files."
             )
 
-    # Get a tasting of the first time
     pattern = r"{name}_{time}_l{layer}_p\d+"
     timestrings = sorted(set(timestrings))
-#    first = timestrings[0]
-#    das = [_load(paths, use_cftime, pattern) for paths in grouped_by_time[first].values()]
-#    yslices, y, nrow = _place_subdomains(das, "y")
-#    xslices, x, ncol = _place_subdomains(das, "x")
-#    layer = das[0]["layer"]
-#    nlayer = layer.size
-#    dtype = das[0].dtype
-#    shape = (nlayer, nrow, ncol)
-#    dims = ("time", "layer", "y", "x")
-#    coords = {"layer": layer, "y": y, "x": x}
+
     coords = {}
+    first_time = timestrings[0]
+    samplingpaths = [
+        pathlist[first] for pathlist in grouped_by_time[first_time].values()
+    ]
+    headers = [header(path, pattern) for path in samplingpaths]
+    subdomain_bounds = [(h["xmin"], h["xmax"], h["ymin"], h["ymax"]) for h in headers]
+    subdomain_cellsizes = [(h["dx"], h["dy"]) for h in headers]
+    subdomain_coords = [
+        util._xycoords(bounds, cellsizes)
+        for bounds, cellsizes in zip(subdomain_bounds, subdomain_cellsizes)
+    ]
+    coords["y"] = np.unique(
+        np.concatenate([coords["y"] for coords in subdomain_coords])
+    )[::-1]
+    coords["x"] = np.unique(
+        np.concatenate([coords["x"] for coords in subdomain_coords])
+    )
+    coords["layer"] = np.array(sorted(set(layers)))
     times = [util.to_datetime(str(timestr)) for timestr in timestrings]
     times, use_cftime = util._convert_datetimes(times, use_cftime)
     if use_cftime:
         coords["time"] = xr.CFTimeIndex(np.unique(times))
     else:
         coords["time"] = np.unique(times)
+    shape = (1, coords["layer"].size, coords["y"].size, coords["x"].size)
+    dims = ("time", "layer", "y", "x")
 
     merged = []
     for group in grouped_by_time.values():
-#        das = [_load(subdomain, use_cftime, pattern) for subdomain in group.values()]
-#        a = dask.delayed(_merge_subdomains)(das, yslices, xslices, shape)
-#        merged.append(dask.array.from_delayed(a, shape, dtype))
-#    data = dask.array.concatenate(merged, axis=0)  # concatenate on time
-        das = [_load(subdomain, use_cftime, pattern) for subdomain in group.values()]
-        merged.append(_merge_idfs(das))
-    
-    result = xr.concat(merged, dim="time")
-    return result
+        # Build a single array per timestep
+        timestep_data = dask.delayed(_merge_subdomains)(group, use_cftime, pattern)
+        dask_array = dask.array.from_delayed(timestep_data, shape, dtype=np.float32)
+        #        dask_array = _merge_subdomains(group, use_cftime, pattern)
+        merged.append(dask_array)
+
+    data = dask.array.concatenate(merged, axis=0)
+    #    data = np.concatenate(merged, axis=0)
+    return xr.DataArray(data, coords, dims)
 
 
 def _load(paths, use_cftime, pattern):
@@ -729,6 +713,39 @@ def _as_voxeldata(a):
     return a
 
 
+def _extra_dims(a):
+    dims = filter(lambda dim: dim not in ("y", "x"), a.dims)
+    return list(dims)
+
+
+def _write_chunks(a, pattern, d, nodata):
+    dim = a.dims[0]
+    dim_is_xy = (dim == "x") or (dim == "y")
+    nochunks = a.chunks is None or max(map(len, a.chunks)) == 1
+    if nochunks or dim_is_xy:
+        a = a.compute()
+        extradims = _extra_dims(a)
+        if extradims:
+            stacked = a.stack(idf=extradims)
+            for coordvals, a_yx in list(stacked.groupby("idf")):
+                # set the right layer/timestep/etc in the dict to make the filename
+                d.update(dict(zip(extradims, coordvals)))
+                fn = util.compose(d, pattern)
+                write(fn, a_yx, nodata)
+        else:
+            fn = util.compose(d, pattern)
+            write(fn, a, nodata)
+    else:  # select a single dimensions chunk, recurse
+        chunksizes = a.chunks[0]
+        start = 0
+        for chunksize in chunksizes:
+            end = start + chunksize
+            b = a.isel({dim: slice(start, end)})
+            # Recurse
+            _write_chunks(b, pattern, d, nodata, False)
+            start = end
+
+
 def save(path, a, nodata=1.0e20, pattern=None):
     """
     Write a xarray.DataArray to one or more IDF files
@@ -824,23 +841,7 @@ def save(path, a, nodata=1.0e20, pattern=None):
 
     # stack all non idf dims into one new idf dimension,
     # over which we can then iterate to write all individual idfs
-    extradims = _extra_dims(a)
-    if extradims:
-        stacked = a.stack(idf=extradims)
-        for coordvals, a_yx in list(stacked.groupby("idf")):
-            # set the right layer/timestep/etc in the dict to make the filename
-            d.update(dict(zip(extradims, coordvals)))
-            fn = util.compose(d, pattern)
-            write(fn, a_yx, nodata)
-    else:
-        # no extra dims, only one IDF
-        fn = util.compose(d, pattern)
-        write(fn, a, nodata)
-
-
-def _extra_dims(a):
-    dims = filter(lambda dim: dim not in ("y", "x"), a.dims)
-    return list(dims)
+    _write_chunks(a, pattern, d, nodata)
 
 
 def write(path, a, nodata=1.0e20):
