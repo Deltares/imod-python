@@ -429,14 +429,13 @@ def open_subdomains(path, use_cftime=False):
     grouped_by_time = collections.defaultdict(
         functools.partial(collections.defaultdict, list)
     )
-    # grouped_by_time = collections.defaultdict(collections.defaultdict(list))
     count_per_subdomain = collections.defaultdict(int)  # used only for checking counts
     timestrings = []
     layers = []
     numbers = []
     for p in paths:
         search = pattern.search(p)
-        timestr = int(search.group(1))
+        timestr = search.group(1)
         layer = int(search.group(2))
         number = int(search.group(3))
         grouped_by_time[timestr][number].append(p)
@@ -481,7 +480,7 @@ def open_subdomains(path, use_cftime=False):
         np.concatenate([coords["x"] for coords in subdomain_coords])
     )
     coords["layer"] = np.array(sorted(set(layers)))
-    times = [util.to_datetime(str(timestr)) for timestr in timestrings]
+    times = [util.to_datetime(timestr) for timestr in timestrings]
     times, use_cftime = util._convert_datetimes(times, use_cftime)
     if use_cftime:
         coords["time"] = xr.CFTimeIndex(np.unique(times))
