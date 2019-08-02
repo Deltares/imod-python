@@ -6,6 +6,7 @@ The primary functions to use are :func:`imod.idf.open` and
 """
 
 import collections
+import functools
 import glob
 import itertools
 import pathlib
@@ -368,8 +369,8 @@ def _place_subdomains(das, dim):
     Computes how to place DataArrays relative to each other in a single array
     """
     # np.unique does a sort
-    x = np.unique(np.concatenate(da[dim].values for da in das))
-    is_increasing = das[dim][0] < das[dim][1]
+    x = np.unique(np.concatenate([da[dim].values for da in das]))
+    is_increasing = das[0][dim][0] < das[0][dim][1]
     ncol = x.size
     inds = []
     for da in das:
@@ -386,12 +387,34 @@ def _place_subdomains(das, dim):
         x = x[::-1]
     return inds, x, x.size
 
-
 def _merge_subdomains(das, yslices, xslices, shape):
     merged = np.full(shape, np.nan)
     for da, yslice, xslice in zip(das, yslices, xslices):
         merged[..., yslice, xslice] = da.values
     return merged
+
+
+def _merge_idfs(das):
+    x = np.unique(np.concatenate([da.x.values for da in das]))
+    y = np.unique(np.concatenate([da.y.values for da in das]))
+    
+    nrow = y.size
+    ncol = x.size
+    nlayer = das[0].coords["layer"].size
+    out = np.full((1, nlayer, nrow, ncol), np.nan)
+    
+    for da in das:
+        ix = np.searchsorted(x, da.x.values[0], side="left")
+        iy = nrow - np.searchsorted(y, da.y.values[0], side="right")
+        _, _, ysize, xsize = da.shape
+        out[:, :,  iy: iy + ysize, ix: ix + xsize] = da.values
+
+    coords = dict(das[0].coords)
+    coords["x"] = x
+    coords["y"] = y
+    dims = das[0].dims
+    
+    return xr.DataArray(out, coords, dims)
 
 
 def open_subdomains(path, use_cftime=False):
@@ -431,42 +454,50 @@ def open_subdomains(path, use_cftime=False):
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
 
-    pattern = re.compile(r"[\w-]+_(?P<time>[0-9-]+)_l[0-9]+(?P<subdomain>_p\d{3})", re.IGNORECASE)
+    pattern = re.compile(r"[\w-]+_(?P<time>[0-9-]+)_l[0-9]+_p(?P<subdomain>[0-9]{3})", re.IGNORECASE)
     # There are no real benefits to itertools.groupby in this case, as there's
-    # no benefit to using a (lazy) iterator in this case.
-    groups = collections.defaultdict(dict)
+    # no benefit to using a (lazy) iterator in this case
+    grouped_by_time = collections.defaultdict(functools.partial(collections.defaultdict, list))
+    #grouped_by_time = collections.defaultdict(collections.defaultdict(list))
+    count_per_subdomain = collections.defaultdict(int)  # used only for checking counts
+    timestrings = []
     numbers = []
     for p in paths:
         search = pattern.search(p)
-        timestr = search.group(1)
-        number = search.group(2)
-        grouped[timestr][number] = p
+        timestr = int(search.group(1))
+        number = int(search.group(2))
+        grouped_by_time[timestr][number].append(p)
+        count_per_subdomain[number] += 1
         numbers.append(number)
+        timestrings.append(timestr)
 
     numbers = sorted(set(numbers))
     first = numbers[0]
-    first_len = len(grouped[first])
-
+    first_len = count_per_subdomain[first]
     for number in numbers:
-        group_len = len(grouped[number])
-        if not group_len == first_len:
+        group_len = count_per_subdomain[number]
+        if group_len != first_len:
             raise ValueError(
                 f"The number of IDFs are not identical for every subdomain. "
                 f"Subdomain p{first} has {first_len} IDF files, subdomain p{number} "
                 f"has {group_len} IDF files."
             )
 
-    # Get a tasting
-    das = groups[0]
-    yslices, y, nrow = _place_subdomains(das, "y")
-    xslices, x, ncol = _place_subdomains(das, "x")
-    nlayer = das[0].shape[0]
-    layer = das[0]["layer"]
-    dtype = das[0].dtype
-    shape = (nlayer, nrow, ncol)
-    dims = ("time", "layer", "y", "x")
-    coords = {"layer": layer, "y": y, "x": x}
-    times = [da["time"] for da in das]
+    # Get a tasting of the first time
+    pattern = r"{name}_{time}_l{layer}_p\d+"
+    timestrings = sorted(set(timestrings))
+#    first = timestrings[0]
+#    das = [_load(paths, use_cftime, pattern) for paths in grouped_by_time[first].values()]
+#    yslices, y, nrow = _place_subdomains(das, "y")
+#    xslices, x, ncol = _place_subdomains(das, "x")
+#    layer = das[0]["layer"]
+#    nlayer = layer.size
+#    dtype = das[0].dtype
+#    shape = (nlayer, nrow, ncol)
+#    dims = ("time", "layer", "y", "x")
+#    coords = {"layer": layer, "y": y, "x": x}
+    coords = {}
+    times = [util.to_datetime(str(timestr)) for timestr in timestrings]
     times, use_cftime = util._convert_datetimes(times, use_cftime)
     if use_cftime:
         coords["time"] = xr.CFTimeIndex(np.unique(times))
@@ -474,14 +505,16 @@ def open_subdomains(path, use_cftime=False):
         coords["time"] = np.unique(times)
 
     merged = []
-    for group in groups.values():
-        for subdomains in group.values():
-            das = [_load(subdomains, use_cftime)]
-            a = dask.delayed(_merge_subdomains)(das, yslices, xslices, shape)
-            merged.append(dask.array.from_delayed(a, shape, dtype))
-    data = dask.array.stack(merged, axis=0)
-
-    return xr.DataArray(data, coords, dims)
+    for group in grouped_by_time.values():
+#        das = [_load(subdomain, use_cftime, pattern) for subdomain in group.values()]
+#        a = dask.delayed(_merge_subdomains)(das, yslices, xslices, shape)
+#        merged.append(dask.array.from_delayed(a, shape, dtype))
+#    data = dask.array.concatenate(merged, axis=0)  # concatenate on time
+        das = [_load(subdomain, use_cftime, pattern) for subdomain in group.values()]
+        merged.append(_merge_idfs(das))
+    
+    result = xr.concat(merged, dim="time")
+    return result
 
 
 def _load(paths, use_cftime, pattern):
