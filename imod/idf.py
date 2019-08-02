@@ -445,6 +445,7 @@ def open_subdomains(path, use_cftime=False):
         layers.append(layer)
         timestrings.append(timestr)
 
+    # Test whether subdomains are complete
     numbers = sorted(set(numbers))
     first = numbers[0]
     first_len = count_per_subdomain[first]
@@ -460,6 +461,7 @@ def open_subdomains(path, use_cftime=False):
     pattern = r"{name}_{time}_l{layer}_p\d+"
     timestrings = sorted(set(timestrings))
 
+    # Prepare output coordinates
     coords = {}
     first_time = timestrings[0]
     samplingpaths = [
@@ -488,14 +490,28 @@ def open_subdomains(path, use_cftime=False):
     shape = (1, coords["layer"].size, coords["y"].size, coords["x"].size)
     dims = ("time", "layer", "y", "x")
 
+    # Collect and merge data
     merged = []
     for group in grouped_by_time.values():
         # Build a single array per timestep
         timestep_data = dask.delayed(_merge_subdomains)(group, use_cftime, pattern)
         dask_array = dask.array.from_delayed(timestep_data, shape, dtype=np.float32)
         merged.append(dask_array)
-
     data = dask.array.concatenate(merged, axis=0)
+
+    # Get tops and bottoms if possible
+    headers = [header(path, pattern) for path in grouped_by_time[first_time][first]]
+    tops = [c.get("top", None) for c in headers]
+    bots = [c.get("bot", None) for c in headers]
+    layers = [c.get("layer", None) for c in headers]
+    _ , unique_indices = np.unique(layers, return_index=True)
+    all_have_z = all(map(lambda v: v is not None, itertools.chain(tops, bots)))
+    if all_have_z:
+        if coords["layer"].size > 1:
+            coords = _array_z_coord(coords, tops, bots, unique_indices)
+        else:
+            coords = _scalar_z_coord(coords, tops, bots)
+
     return xr.DataArray(data, coords, dims)
 
 
