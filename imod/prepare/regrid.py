@@ -5,220 +5,18 @@ import numpy as np
 import xarray as xr
 
 
-def _linear_inds_weights_1d(src_x, dst_x):
-    """
-    Returns indices and weights for linear interpolation along a single dimension.
-    A sentinel value of -1 is added for dst cells that are fully out of bounds.
-
-    Parameters
-    ----------
-    src_x : np.array
-        vertex coordinates of source
-    dst_x: np.array
-        vertex coordinates of destination
-    """
-    # From np.searchsorted docstring:
-    # Find the indices into a sorted array a such that, if the corresponding
-    # elements in v were inserted before the indices, the order of a would
-    # be preserved.
-    xmin = src_x.min()
-    xmax = src_x.max()
-
-    # Compute midpoints for linear interpolation
-    src_dx = np.diff(src_x)
-    src_x = src_x[:-1] + 0.5 * src_dx
-    dst_dx = np.diff(dst_x)
-    dst_x = dst_x[:-1] + 0.5 * dst_dx
-
-    i = np.searchsorted(src_x, dst_x) - 1
-    # Out of bounds indices
-    i[i < 0] = 0
-    i[i > src_x.size - 2] = src_x.size - 2
-
-    # -------------------------------------------------------------------------
-    # Visual example: interpolate from src with 2 cells to dst 3 cells
-    # The period . marks the midpoint of the cell
-    # The pipe | marks the cell edge
-    #
-    #    |_____._____|_____._____|
-    #    src_x0      src_x1
-    #
-    #    |___.___|___.___|___.___|
-    #        x0      x1      x2
-    #
-    # Then normalized weight for cell x1:
-    # weight = (x1 - src_x0) / (src_x1 - src_x0)
-    # -------------------------------------------------------------------------
-
-    norm_weights = (dst_x - src_x[i]) / (src_x[i + 1] - src_x[i])
-    # deal with out of bounds locations
-    # we place a sentinel value of -1 here
-    i[dst_x < xmin] = -1
-    i[dst_x > xmax] = -1
-    # In case it's just inside of bounds, use only the value at the boundary
-    norm_weights[norm_weights < 0.0] = 0.0
-    norm_weights[norm_weights > 1.0] = 1.0
-    return i, norm_weights
-
-
-@numba.njit(cache=True)
-def _interp_1d(src, dst, *inds_weights):
-    """
-    numba compiled function to regrid in three dimensions
-
-    Parameters
-    ----------
-    src : np.array
-    dst : np.array
-    src_coords : tuple of np.arrays of edges
-    dst_coords : tuple of np.arrays of edges
-    method : numba.njit'ed function
-    """
-    kk, weights_x = inds_weights
-    # i, j, k are indices of dst array
-    for k, (ix, wx) in enumerate(zip(kk, weights_x)):
-        if ix < 0:
-            continue
-        v0 = src[ix]
-        v1 = src[ix + 1]
-        v = v0 + wx * (v1 - v0)
-        dst[k] = v
-    return dst
-
-
-@numba.njit(cache=True)
-def _interp_2d(src, dst, *inds_weights):
-    jj, weights_y, kk, weights_x = inds_weights
-
-    for j, (iy, wy) in enumerate(zip(jj, weights_y)):
-        if iy < 0:
-            continue
-
-        for k, (ix, wx) in enumerate(zip(kk, weights_x)):
-            if ix < 0:
-                continue
-
-            v00 = src[iy, ix]
-            v01 = src[iy, ix + 1]
-            v10 = src[iy + 1, ix]
-            v11 = src[iy + 1, ix + 1]
-
-            # First interpolate over y
-            v0 = v00 + wy * (v00 - v10)
-            v1 = v01 + wy * (v10 - v11)
-            # Second interpolate over x
-            v = v0 + wx * (v1 - v0)
-
-            dst[j, k] = v
-    return dst
-
-
-@numba.njit(cache=True)
-def _interp_3d(src, dst, *inds_weights):
-    ii, weights_z, jj, weights_y, kk, weights_x = inds_weights
-    for i, (iz, wz) in enumerate(zip(ii, weights_z)):
-        if iz < 0:
-            continue
-
-        for j, (iy, wy) in enumerate(zip(jj, weights_y)):
-            if iy < 0:
-                continue
-
-            for k, (ix, wx) in enumerate(zip(kk, weights_x)):
-                if ix < 0:
-                    continue
-
-                v000 = src[iz, iy, ix]
-                v001 = src[iz, iy, ix + 1]
-                v010 = src[iz, iy + 1, ix]
-                v011 = src[iz, iy + 1, ix + 1]
-                v100 = src[iz + 1, iy, ix]
-                v101 = src[iz + 1, iy, ix + 1]
-                v110 = src[iz + 1, iy + 1, ix]
-                v111 = src[iz + 1, iy + 1, ix + 1]
-
-                # First interpolate over z
-                v00 = v000 + wz * (v100 - v000)
-                v01 = v000 + wz * (v101 - v001)
-                v10 = v000 + wz * (v110 - v010)
-                v11 = v000 + wz * (v111 - v011)
-                # Second interpolate over y
-                v0 = v00 + wy * (v00 - v10)
-                v1 = v01 + wy * (v10 - v11)
-                # Third interpolate over x
-                v = v0 + wx * (v1 - v0)
-
-                dst[i, j, k] = v
-    return dst
-
-
-@numba.njit
-def _iter_interp(iter_src, iter_dst, interp_function, *inds_weights):
-    n_iter = iter_src.shape[0]
-    for i in range(n_iter):
-        iter_dst[i, ...] = interp_function(
-            iter_src[i, ...], iter_dst[i, ...], *inds_weights
-        )
-    return iter_dst
-
-
-def _jit_interp(ndim_interp):
-    @numba.njit
-    def jit_interp_1d(src, dst, *inds_weights):
-        return _interp_1d(src, dst, *inds_weights)
-
-    @numba.njit
-    def jit_interp_2d(src, dst, *inds_weights):
-        return _interp_2d(src, dst, *inds_weights)
-
-    @numba.njit
-    def jit_interp_3d(src, dst, *inds_weights):
-        return _interp_3d(src, dst, *inds_weights)
-
-    if ndim_interp == 1:
-        jit_interp = jit_interp_1d
-    elif ndim_interp == 2:
-        jit_interp = jit_interp_2d
-    elif ndim_interp == 3:
-        jit_interp = jit_interp_3d
-    else:
-        raise NotImplementedError("cannot regrid over more than three dimensions")
-
-    return jit_interp
-
-
-def _make_interp(ndim_regrid):
-    jit_interp = _jit_interp(ndim_regrid)
-
-    @numba.njit
-    def iter_interp(iter_src, iter_dst, *inds_weights):
-        return _iter_interp(iter_src, iter_dst, jit_interp, *inds_weights)
-
-    return iter_interp
-
-
-def _nd_interp(src, dst, src_coords, dst_coords, iter_interp):
-    assert len(src.shape) == len(dst.shape)
-    assert len(src_coords) == len(dst_coords)
-    ndim_regrid = len(src_coords)
-
-    # Determine weights for every regrid dimension, and alloc_len,
-    # the maximum number of src cells that may end up in a single dst cell
-    inds_weights = []
-    for src_x, dst_x in zip(src_coords, dst_coords):
-        iw = _linear_inds_weights_1d(src_x, dst_x)
-        for elem in iw:
-            inds_weights.append(elem)
-
-    iter_src, iter_dst = _reshape(src, dst, ndim_regrid)
-    iter_dst = iter_interp(iter_src, iter_dst, *inds_weights)
-
-    return iter_dst.reshape(dst.shape)
-
-
-@numba.njit(cache=True)
-def _overlap(a, b):
-    return max(0, min(a[1], b[1]) - max(a[0], b[0]))
+from .common import _check_monotonic
+from .common import _match_dims
+from .common import _slice_src
+from .common import _dst_coords
+from .common import _check_monotonic
+from .common import _coord
+from .common import _get_method
+from .common import _overlap
+from .common import _is_increasing
+from .common import _reshape
+from .common import METHODS
+from .interpolate import _nd_interp, _make_interp, _iter_interp
 
 
 @numba.njit(cache=True)
@@ -542,48 +340,6 @@ def _make_regrid(method, ndim_regrid):
     return iter_regrid
 
 
-def _reshape(src, dst, ndim_regrid):
-    """
-    If ndim > ndim_regrid, the non regridding dimension are combined into
-    a single dimension, so we can use a single loop, irrespective of the
-    total number of dimensions.
-    (The alternative is pre-writing N for-loops for every N dimension we
-    intend to support.)
-    If ndims == ndim_regrid, all dimensions will be used in regridding
-    in that case no looping over other dimensions is required and we add
-    a dummy dimension here so there's something to iterate over.
-    """
-    src_shape = src.shape
-    dst_shape = dst.shape
-    ndim = len(src_shape)
-
-    if ndim == ndim_regrid:
-        n_iter = 1
-    else:
-        n_iter = int(np.product(src_shape[:-ndim_regrid]))
-
-    src_itershape = (n_iter, *src_shape[-ndim_regrid:])
-    dst_itershape = (n_iter, *dst_shape[-ndim_regrid:])
-
-    iter_src = np.reshape(src, src_itershape)
-    iter_dst = np.reshape(dst, dst_itershape)
-
-    return iter_src, iter_dst
-
-
-def _is_increasing(src_x, dst_x):
-    """
-    Make sure coordinate values always increase so the _starts function above
-    works properly.
-    """
-    src_dx0 = src_x[1] - src_x[0]
-    dst_dx0 = dst_x[1] - dst_x[0]
-    if (src_dx0 > 0.0) ^ (dst_dx0 > 0.0):
-        raise ValueError("source and like coordinates not in the same direction")
-    if src_dx0 < 0.0:
-        return False
-    else:
-        return True
 
 
 def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid, use_relative_weights):
@@ -620,142 +376,6 @@ def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid, use_relative_weigh
     iter_dst = iter_regrid(iter_src, iter_dst, alloc_len, *inds_weights)
 
     return iter_dst.reshape(dst.shape)
-
-
-def _match_dims(src, like):
-    """
-    Parameters
-    ----------
-    source : xr.DataArray
-        The source DataArray to be regridded
-    like : xr.DataArray
-        Example DataArray that shows what the resampled result should look like
-        in terms of coordinates. ``source`` is regridded along dimensions of ``like``
-
-
-        that have the same name, but have different values.
-
-    Returns
-    -------
-    matching_dims, regrid_dims, add_dims : tuple of lists
-        matching_dims: dimensions along which the coordinates match exactly
-        regrid_dims: dimensions along which source will be regridded
-        add_dims: dimensions that are not present in like
-
-    """
-    # TODO: deal with different extent?
-    # Do another check if not identical
-    # Check if subset or superset?
-    matching_dims = []
-    regrid_dims = []
-    add_dims = []
-    for dim in src.dims:
-        try:
-            if src[dim].identical(like[dim]):
-                matching_dims.append(dim)
-            else:
-                regrid_dims.append(dim)
-        except KeyError:
-            add_dims.append(dim)
-
-    ndim_regrid = len(regrid_dims)
-    # Check number of dimension to regrid
-    if ndim_regrid > 3:
-        raise NotImplementedError("cannot regrid over more than three dimensions")
-
-    return matching_dims, regrid_dims, add_dims
-
-
-def _slice_src(src, like, matching_dims):
-    """
-    Make sure src matches dst in dims that do not have to be regridded
-    """
-
-    slices = {}
-    for dim in matching_dims:
-        x0 = like[dim][0]  # start of slice
-        x1 = like[dim][-1]  # end of slice
-        slices[dim] = slice(x0, x1)
-    return src.sel(slices).compute()
-
-
-def _dst_coords(src, like, dims_from_src, dims_from_like):
-    """
-    Gather destination coordinates
-    """
-
-    dst_da_coords = {}
-    dst_shape = []
-    # TODO: do some more checking, more robust handling
-    like_coords = dict(like.coords)
-    for dim in dims_from_src:
-        try:
-            like_coords.pop(dim)
-        except KeyError:
-            pass
-        dst_da_coords[dim] = src[dim].values
-        dst_shape.append(src[dim].size)
-    for dim in dims_from_like:
-        try:
-            like_coords.pop(dim)
-        except KeyError:
-            pass
-        dst_da_coords[dim] = like[dim].values
-        dst_shape.append(like[dim].size)
-
-    dst_da_coords.update(like_coords)
-    return dst_da_coords, dst_shape
-
-
-def _check_monotonic(dxs, dim):
-    # use xor to check if one or the other
-    if not ((dxs > 0.0).all() ^ (dxs < 0.0).all()):
-        raise ValueError(f"{dim} is not only increasing or only decreasing")
-
-
-def _coord(da, dim):
-    delta_dim = "d" + dim  # e.g. dx, dy, dz, etc.
-
-    if delta_dim in da.coords:  # equidistant or non-equidistant
-        dx = da[delta_dim].values
-        if dx.shape == () or dx.shape == (1,):  # scalar -> equidistant
-            dxs = np.full(da[dim].size, dx)
-        else:  # array -> non-equidistant
-            dxs = dx
-
-    else:  # undefined -> equidistant
-        dxs = np.diff(da[dim].values)
-        dx = dxs[0]
-        atolx = abs(1.0e-6 * dx)
-        if not np.allclose(dxs, dx, atolx):
-            raise ValueError(
-                f"DataArray has to be equidistant along {dim}, or d{dim} must"
-                " be provided as a coordinate."
-            )
-        dxs = np.full(da[dim].size, dx)
-
-    _check_monotonic(dxs, dim)
-    x0 = da[dim][0] - 0.5 * dxs[0]
-    x = np.full(dxs.size + 1, x0)
-    x[1:] += np.cumsum(dxs)
-    return x
-
-
-def _get_method(method, methods):
-    if isinstance(method, str):
-        try:
-            _method = methods[method]
-        except KeyError as e:
-            raise ValueError(
-                "Invalid regridding method. Available methods are: {}".format(
-                    methods.keys()
-                )
-            ) from e
-    elif callable(method):
-        _method = method
-    else:
-        raise TypeError("method must be a string or rasterio.enums.Resampling")
-    return _method
 
 
 class Regridder(object):
@@ -828,7 +448,7 @@ class Regridder(object):
         self.method = _method
         self.ndim_regrid = ndim_regrid
         self._first_call = True
-        if _method == conductance:
+        if _method == METHODS["conductance"]:
             use_relative_weights = True
         self.use_relative_weights = use_relative_weights
 
@@ -853,7 +473,7 @@ class Regridder(object):
 
         if self.method == "nearest":
             pass
-        elif self.method == "linear":
+        elif self.method == "multilinear":
             self._nd_regrid = nd_interp
         else:
             self._nd_regrid = nd_regrid
@@ -873,7 +493,7 @@ class Regridder(object):
 
             if self.ndim_regrid is None:
                 ndim_regrid = len(regrid_dims)
-                if self.method == conductance and ndim_regrid > 2:
+                if self.method == METHODS["conductance"] and ndim_regrid > 2:
                     raise ValueError(
                         "The conductance method should not be applied to "
                         "regridding more than two dimensions"
@@ -911,7 +531,6 @@ class Regridder(object):
         # defined somewhat intelligently: for 1d regridding for example the iter
         # loop is "hot" enough that numba compilation makes sense
 
-        # TODO: add methods for "conserve" and "linear"
         # Use xarray for nearest, and exit early.
         if self.method == "nearest":
             dst = xr.DataArray(
@@ -941,176 +560,3 @@ class Regridder(object):
         dst = dst.transpose(*source.dims)
 
         return dst
-
-
-def mean(values, weights):
-    vsum = 0.0
-    wsum = 0.0
-    for i in range(values.size):
-        v = values[i]
-        w = weights[i]
-        if np.isnan(v):
-            continue
-        vsum += w * v
-        wsum += w
-    if wsum == 0:
-        return np.nan
-    else:
-        return vsum / wsum
-
-
-def harmonic_mean(values, weights):
-    v_agg = 0.0
-    w_sum = 0.0
-    for i in range(values.size):
-        v = values[i]
-        w = weights[i]
-        if np.isnan(v) or v == 0:
-            continue
-        if w > 0:
-            w_sum += w
-            v_agg += w / v
-    if v_agg == 0 or w_sum == 0:
-        return np.nan
-    else:
-        return w_sum / v_agg
-
-
-def geometric_mean(values, weights):
-    v_agg = 0.0
-    w_sum = 0.0
-
-    # Compute sum to ormalize weights to avoid tiny or huge values in exp
-    normsum = 0.0
-    for i in range(values.size):
-        normsum += weights[i]
-    # Early return if no values
-    if normsum == 0:
-        return np.nan
-
-    m = 0
-    for i in range(values.size):
-        w = weights[i] / normsum
-        v = values[i]
-        if np.isnan(v):
-            continue
-        if w > 0:
-            v_agg += w * np.log(abs(v))
-            w_sum += w
-            if v < 0:
-                m += 1
-
-    if w_sum == 0:
-        return np.nan
-    else:
-        return (-1.0) ** m * np.exp((1.0 / w_sum) * v_agg)
-
-
-def sum(values, weights):
-    v_sum = 0.0
-    w_sum = 0.0
-    for i in range(values.size):
-        v = values[i]
-        w = weights[i]
-        if np.isnan(v):
-            continue
-        v_sum += v
-        w_sum += w
-    if w_sum == 0:
-        return np.nan
-    else:
-        return v_sum
-
-
-def minimum(values, weights):
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", "All-NaN slice encountered")
-        return np.nanmin(values)
-
-
-def maximum(values, weights):
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", "All-NaN slice encountered")
-        return np.nanmax(values)
-
-
-def mode(values, weights):
-    # Area weighted mode
-    # Reuse weights to do counting: no allocations
-    # The alternative is defining a separate frequency array in which to add
-    # the weights. This implementation is less efficient in terms of looping.
-    # With many unique values, it keeps having to loop through a big part of
-    # the weights array... but it would do so with a separate frequency array
-    # as well. There are somewhat more elements to traverse in this case.
-    s = values.size
-    w_sum = 0
-    for i in range(s):
-        v = values[i]
-        w = weights[i]
-        if np.isnan(v):
-            continue
-        w_sum += 1
-        for j in range(i):  # Compare with previously found values
-            if values[j] == v:  # matches previous value
-                weights[j] += w  # increase previous weight
-                break
-
-    if w_sum == 0:  # It skipped everything: only nodata values
-        return np.nan
-    else:  # Find value with highest frequency
-        w_max = 0
-        for i in range(s):
-            w = weights[i]
-            if w > w_max:
-                w_max = w
-                v = values[i]
-        return v
-
-
-def median(values, weights):
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", "All-NaN slice encountered")
-        return np.nanpercentile(values, 50)
-
-
-def conductance(values, weights):
-    v_agg = 0.0
-    w_sum = 0.0
-    for i in range(values.size):
-        v = values[i]
-        w = weights[i]
-        if np.isnan(v):
-            continue
-        v_agg += v * w
-        w_sum += w
-    if w_sum == 0:
-        return np.nan
-    else:
-        return v_agg
-
-
-def max_overlap(values, weights):
-    max_w = 0.0
-    v = np.nan
-    for i in range(values.size):
-        w = weights[i]
-        if w > max_w:
-            max_w = w
-            v = values[i]
-    return v
-
-
-METHODS = {
-    "nearest": "nearest",
-    "linear": "linear",
-    "mean": mean,
-    "harmonic_mean": harmonic_mean,
-    "geometric_mean": geometric_mean,
-    "sum": sum,
-    "minimum": minimum,
-    "maximum": maximum,
-    "mode": mode,
-    "median": median,
-    "conductance": conductance,
-    "max_overlap": max_overlap,
-}
