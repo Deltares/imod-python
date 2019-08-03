@@ -2,16 +2,17 @@ import numba
 import numpy as np
 import xarray as xr
 
-from .regrid import METHODS
-from .regrid import _overlap
-from .regrid import _coord
-from .regrid import _get_method
+from .common import METHODS
+from .common import _overlap
+from .common import _coord
+from .common import _get_method
 
 
-# Voxelize does not support conductance method or nearest
+# Voxelize does not support conductance method, nearest, or linear
 METHODS = METHODS.copy()
 METHODS.pop("conductance")
 METHODS.pop("nearest")
+METHODS.pop("multilinear")
 
 
 @numba.njit(cache=True)
