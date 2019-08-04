@@ -16,10 +16,7 @@ def _linear_inds_weights_1d(src_x, dst_x, is_increasing):
     dst_x: np.array
         vertex coordinates of destination
     """
-    if is_increasing:
-        src_x = src_x.copy()
-        dst_x = dst_x.copy()
-    else:
+    if not is_increasing:
         src_x = src_x.copy() * -1.0
         dst_x = dst_x.copy() * -1.0
     xmin = src_x.min()
@@ -27,18 +24,18 @@ def _linear_inds_weights_1d(src_x, dst_x, is_increasing):
 
     # Compute midpoints for linear interpolation
     src_dx = np.diff(src_x)
-    src_x = src_x[:-1] + 0.5 * src_dx
+    mid_src_x = src_x[:-1] + 0.5 * src_dx
     dst_dx = np.diff(dst_x)
-    dst_x = dst_x[:-1] + 0.5 * dst_dx
+    mid_dst_x = dst_x[:-1] + 0.5 * dst_dx
 
     # From np.searchsorted docstring:
     # Find the indices into a sorted array a such that, if the corresponding
     # elements in v were inserted before the indices, the order of a would
     # be preserved.
-    i = np.searchsorted(src_x, dst_x) - 1
+    i = np.searchsorted(mid_src_x, mid_dst_x) - 1
     # Out of bounds indices
     i[i < 0] = 0
-    i[i > src_x.size - 2] = src_x.size - 2
+    i[i > mid_src_x.size - 2] = mid_src_x.size - 2
 
     # -------------------------------------------------------------------------
     # Visual example: interpolate from src with 2 cells to dst 3 cells
@@ -55,15 +52,24 @@ def _linear_inds_weights_1d(src_x, dst_x, is_increasing):
     # weight = (x1 - src_x0) / (src_x1 - src_x0)
     # -------------------------------------------------------------------------
 
-    norm_weights = (dst_x - src_x[i]) / (src_x[i + 1] - src_x[i])
+    norm_weights = (mid_dst_x - mid_src_x[i]) / (mid_src_x[i + 1] - mid_src_x[i])
     # deal with out of bounds locations
     # we place a sentinel value of -1 here
-    i[dst_x < xmin] = -1
-    i[dst_x > xmax] = -1
+    i[mid_dst_x < xmin] = -1
+    i[mid_dst_x > xmax] = -1
     # In case it's just inside of bounds, use only the value at the boundary
     norm_weights[norm_weights < 0.0] = 0.0
     norm_weights[norm_weights > 1.0] = 1.0
-    return i, norm_weights
+    # The following array is used only to deal with nodata values at the edges
+    # Recall that src_x are the cell edges
+    # Exclude the edges
+    within = (mid_dst_x >= src_x[i]) & (mid_dst_x <= src_x[i + 1])
+    start_edge = mid_dst_x == src_x[i]
+    end_edge = mid_dst_x == src_x[i + 1]
+    within = within.astype(np.int)
+    within[start_edge] = -1
+    within[end_edge] = -2
+    return i, norm_weights, within
 
 
 @numba.njit(cache=True)
@@ -73,31 +79,29 @@ def _interp_1d(src, dst, *inds_weights):
     ----------
     src : np.array
     dst : np.array
-    src_coords : tuple of np.arrays of edges
-    dst_coords : tuple of np.arrays of edges
-    method : numba.njit'ed function
     """
-    kk, weights_x = inds_weights
+    kk, weights_x, within_x = inds_weights
     # i, j, k are indices of dst array
-    for k, (ix, wx) in enumerate(zip(kk, weights_x)):
+    for k, (ix, wx, in_x) in enumerate(zip(kk, weights_x, within_x)):
         if ix < 0:
             continue
         v0 = src[ix]
         v1 = src[ix + 1]
-        v = v0 + wx * (v1 - v0)
-        dst[k] = v
+        v, ok = _catch_nan(v0, v1, wx, in_x)
+        if ok:  # else: this value is skipped
+            dst[k] = v
     return dst
 
 
 @numba.njit(cache=True)
 def _interp_2d(src, dst, *inds_weights):
-    jj, weights_y, kk, weights_x = inds_weights
+    jj, weights_y, within_y, kk, weights_x, within_x = inds_weights
 
-    for j, (iy, wy) in enumerate(zip(jj, weights_y)):
+    for j, (iy, wy, in_y) in enumerate(zip(jj, weights_y, within_y)):
         if iy < 0:
             continue
 
-        for k, (ix, wx) in enumerate(zip(kk, weights_x)):
+        for k, (ix, wx, in_x) in enumerate(zip(kk, weights_x, within_x)):
             if ix < 0:
                 continue
 
@@ -119,7 +123,7 @@ def _interp_2d(src, dst, *inds_weights):
 
 @numba.njit(cache=True)
 def _interp_3d(src, dst, *inds_weights):
-    ii, weights_z, jj, weights_y, kk, weights_x = inds_weights
+    ii, weights_z, within_z, jj, weights_y, within_y, kk, weights_x, within_x = inds_weights
     for i, (iz, wz) in enumerate(zip(ii, weights_z)):
         if iz < 0:
             continue
@@ -147,8 +151,8 @@ def _interp_3d(src, dst, *inds_weights):
                 v10 = v000 + wz * (v110 - v010)
                 v11 = v000 + wz * (v111 - v011)
                 # Second interpolate over y
-                v0 = v00 + wy * (v00 - v10)
-                v1 = v01 + wy * (v10 - v11)
+                v0 = v00 + wy * (v10 - v00)
+                v1 = v01 + wy * (v11 - v01)
                 # Third interpolate over x
                 v = v0 + wx * (v1 - v0)
 

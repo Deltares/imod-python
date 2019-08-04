@@ -33,6 +33,18 @@ def test_interpolate_1d__reversed():
     expected = xr.full_like(like, [3.5, 2.5])
     assert actual.identical(expected)
 
+def test_interpolate_1d__beyond_egdes():
+    data = [0.0, 1.0]
+    x = [0.5, 1.5]
+    dst_x = [-1.25, -0.75, -0.25, 0.25, 0.75, 1.25, 1.75, 2.25]
+    dims = ("x",)
+    source = xr.DataArray(data, {"x": x}, dims)
+    like_data = np.full(len(dst_x), np.nan)
+    like = xr.DataArray(like_data, {"x": dst_x}, dims)
+    interpolator_1d = imod.prepare.Regridder(method="multilinear")
+    actual = interpolator_1d.regrid(source, like)
+    expected = xr.full_like(like, [np.nan] * 3 + [0.0, 0.25, 0.75, 1.0, np.nan])
+    assert actual.identical(expected)
 
 def test_interpolate_2d():
     data = np.array([[0.0, 0.0], [1.0, 1.0]])
@@ -64,3 +76,34 @@ def test_interpolate_2d__reversed_y():
     actual = interpolator_2d.regrid(source, like)
     expected = xr.full_like(like, [[0.25, 0.25], [0.75, 0.75]])
     assert actual.identical(expected)
+
+
+def test_interpolate_2d__beyond_boundary():
+    data = np.array([[1.0, 1.0], [1.0, 1.0]])
+    x = [0.5, 1.5]
+    dst_x = [-1.5, -0.5]
+    y = [0.0, 1.0]
+    dst_y = [0.25, 0.75]
+    dims = ("y", "x")
+    source = xr.DataArray(data, {"x": x, "y": y}, dims)
+    dst_data = np.full_like(data, np.nan)
+    like = xr.DataArray(dst_data, {"y": dst_y, "x": dst_x}, dims)
+    interpolator_2d = imod.prepare.Regridder(method="multilinear")
+    actual = interpolator_2d.regrid(source, like)
+    expected = xr.full_like(like, [[0.25, 0.25], [0.75, 0.75]])
+    assert actual.identical(expected)
+
+
+def test_interpolate_1d_tmp():
+    data = [np.nan, 1.0, 1.0]
+    x = [0.5, 1.5, 2.5]
+    dst_x = [-0.25, 0.0, 0.25, 0.50]
+    dims = ("x",)
+    source = xr.DataArray(data, {"x": x}, dims)
+    like_data = np.full(len(dst_x), np.nan)
+    like = xr.DataArray(like_data, {"x": dst_x}, dims)
+    interpolator_1d = imod.prepare.Regridder(method="multilinear")
+    actual = interpolator_1d.regrid(source, like)
+
+test_interpolate_1d_tmp()
+
