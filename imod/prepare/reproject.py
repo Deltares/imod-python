@@ -183,7 +183,11 @@ def reproject(
             # if no crs is defined, assume it should remain the same
             # in this case use UTM30, ESPG:32630, as a dummy value for GDAL
             # (Any projected coordinate system should suffice, Cartesian plane == Cartesian plane)
-            dst = like.copy()
+            dst = xr.DataArray(
+                data=np.zeros(like.shape, source.dtype),
+                coords={"y": like.y, "x": like.x},
+                dims=("y", "x"),
+            )
             src_crs = dst_crs = rasterio.crs.CRS.from_epsg(32630)
         src_transform = imod.util.transform(source)
         dst_transform = imod.util.transform(like)
