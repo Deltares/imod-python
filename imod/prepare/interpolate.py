@@ -110,13 +110,29 @@ def _interp_2d(src, dst, *inds_weights):
             v10 = src[iy + 1, ix]
             v11 = src[iy + 1, ix + 1]
 
-            # First interpolate over y
-            v0 = v00 + wy * (v10 - v00)
-            v1 = v01 + wy * (v11 - v01)
-            # Second interpolate over x
-            v = v0 + wx * (v1 - v0)
+            accumulator = 0
+            accumulator_divisor = 0
 
-            dst[j, k] = v
+            if ~np.isnan(v00):
+                multiplier = (1 - wx) * (1 - wy)
+                accumulator += multiplier * v00
+                accumulator_divisor += multiplier
+            if ~np.isnan(v01):
+                multiplier = wx * (1 - wy)
+                accumulator += multiplier * v01
+                accumulator_divisor += multiplier
+            if ~np.isnan(v10):
+                multiplier = (1 - wx) * wy
+                accumulator += multiplier * v10
+                accumulator_divisor += multiplier
+            if ~np.isnan(v11):
+                multiplier = wx * wy
+                accumulator += multiplier * v11
+                accumulator_divisor += multiplier
+            
+            if accumulator_divisor > 0.0:
+                v = accumulator / accumulator_divisor
+                dst[j, k] = v
 
     return dst
 
