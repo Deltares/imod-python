@@ -338,8 +338,6 @@ def _make_regrid(method, ndim_regrid):
     return iter_regrid
 
 
-
-
 def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid, use_relative_weights):
     """
     Regrids an ndarray up to maximum 3 dimensions.

@@ -105,5 +105,3 @@ def test_is_increasing():
     dst_x = np.arange(5.0)
     with pytest.raises(ValueError):
         is_increasing = imod.prepare.common._is_increasing(src_x, dst_x)
-
-
