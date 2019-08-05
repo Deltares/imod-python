@@ -63,12 +63,7 @@ def _linear_inds_weights_1d(src_x, dst_x, is_increasing):
     # The following array is used only to deal with nodata values at the edges
     # Recall that src_x are the cell edges
     # Exclude the edges
-    within = (mid_dst_x >= src_x[i]) & (mid_dst_x <= src_x[i + 1])
-    start_edge = mid_dst_x == src_x[i]
-    end_edge = mid_dst_x == src_x[i + 1]
-    within = within.astype(np.int)
-    within[start_edge] = -1
-    within[end_edge] = -2
+    within = (mid_dst_x >= src_x[i]) & (mid_dst_x < src_x[i + 1])
     return i, norm_weights, within
 
 
@@ -113,25 +108,51 @@ def _interp_2d(src, dst, *inds_weights):
             accumulator = 0
             accumulator_divisor = 0
 
-            if ~np.isnan(v00):
+            v00_ok = np.isfinite(v00)
+            v01_ok = np.isfinite(v01)
+            v10_ok = np.isfinite(v10)
+            v11_ok = np.isfinite(v11)
+            count_ok = 0
+
+            if v00_ok:
                 multiplier = (1 - wx) * (1 - wy)
                 accumulator += multiplier * v00
                 accumulator_divisor += multiplier
-            if ~np.isnan(v01):
+                count_ok += 1
+            if v01_ok:
                 multiplier = wx * (1 - wy)
                 accumulator += multiplier * v01
                 accumulator_divisor += multiplier
-            if ~np.isnan(v10):
+                count_ok += 1
+            if v10_ok:
                 multiplier = (1 - wx) * wy
                 accumulator += multiplier * v10
                 accumulator_divisor += multiplier
-            if ~np.isnan(v11):
+                count_ok += 1
+            if v11_ok:
                 multiplier = wx * wy
                 accumulator += multiplier * v11
                 accumulator_divisor += multiplier
-            
+                count_ok += 1
+
             if accumulator_divisor > 0.0:
                 v = accumulator / accumulator_divisor
+                if count_ok == 4:
+                    pass # skip other conditionals
+                elif in_x:
+                    if in_y:
+                        if not v00_ok:
+                            continue
+                    else:
+                        if not v10_ok:
+                            continue
+                else:
+                    if in_y:
+                        if not v01_ok:
+                            continue
+                    else:
+                        if not v11_ok:
+                            continue
                 dst[j, k] = v
 
     return dst
