@@ -112,34 +112,27 @@ def _interp_2d(src, dst, *inds_weights):
             v01_ok = np.isfinite(v01)
             v10_ok = np.isfinite(v10)
             v11_ok = np.isfinite(v11)
-            count_ok = 0
 
             if v00_ok:
                 multiplier = (1 - wx) * (1 - wy)
                 accumulator += multiplier * v00
                 accumulator_divisor += multiplier
-                count_ok += 1
             if v01_ok:
                 multiplier = wx * (1 - wy)
                 accumulator += multiplier * v01
                 accumulator_divisor += multiplier
-                count_ok += 1
             if v10_ok:
                 multiplier = (1 - wx) * wy
                 accumulator += multiplier * v10
                 accumulator_divisor += multiplier
-                count_ok += 1
             if v11_ok:
                 multiplier = wx * wy
                 accumulator += multiplier * v11
                 accumulator_divisor += multiplier
-                count_ok += 1
 
-            if accumulator_divisor > 0.0:
+            if accumulator_divisor > 0:
                 v = accumulator / accumulator_divisor
-                if count_ok == 4:
-                    pass # skip other conditionals
-                elif in_x:
+                if in_x:
                     if in_y:
                         if not v00_ok:
                             continue
@@ -160,7 +153,9 @@ def _interp_2d(src, dst, *inds_weights):
 
 @numba.njit(cache=True)
 def _interp_3d(src, dst, *inds_weights):
-    ii, weights_z, within_z, jj, weights_y, within_y, kk, weights_x, within_x = inds_weights
+    ii, weights_z, within_z, jj, weights_y, within_y, kk, weights_x, within_x = (
+        inds_weights
+    )
     for i, (iz, wz) in enumerate(zip(ii, weights_z)):
         if iz < 0:
             continue
