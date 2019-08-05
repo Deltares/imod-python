@@ -187,6 +187,7 @@ def _get_method(method, methods):
 def _overlap(a, b):
     return max(0, min(a[1], b[1]) - max(a[0], b[0]))
 
+
 def mean(values, weights):
     vsum = 0.0
     wsum = 0.0
