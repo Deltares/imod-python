@@ -101,3 +101,15 @@ class Modflow6(Model):
             result_dir = "results"
         else:
             result_dir = pathlib.Path(os.path.relpath(result_dir, directory))
+
+        # # Start writing
+        # directory.mkdir(exist_ok=True, parents=True)
+
+        # # Write the runfile
+        # with open(runfilepath, "w") as f:
+        #     f.write(runfile_content)
+
+        # # Write all IDFs and IPFs
+        # for pkgname, pkg in self.items():
+        #     if "x" in pkg.coords and "y" in pkg.coords or pkg._pkg_id == "wel":
+        #         pkg.save(directory=directory.joinpath(pkgname))

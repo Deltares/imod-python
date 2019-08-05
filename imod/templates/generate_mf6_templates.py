@@ -100,7 +100,9 @@ def block_entry(varname, block, vardict, indent="  "):
 
     # if optional, wrap string in square brackets
     if v.get("optional") == "true":
-        s = f"{{%- if {varname} is defined -%}}{indent}{s.strip()}{{%- endif -%}}"
+        # TODO if first entry in block, do not slurp whats in front of if
+        # TODO if last enty in block, slurp anfer last endif
+        s = f"{{%- if {varname} is defined %}}{indent}{s.strip()}\n{{% endif %}}"
     else:
         # prepend with indent and return string
         s = f"{indent}{s}"
@@ -126,7 +128,7 @@ def write_block(vardict, block):
                 s = textwrap.dedent(
                     """\
                 {% for i, path in periods.items() %}begin period {{i}}
-                    open/close {{path}} (binary)
+                  open/close {{path}} (binary)
                 end period{% endfor %}"""
                 )
                 return s

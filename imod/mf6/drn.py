@@ -1,11 +1,11 @@
-from imod.mf6.pgkbase import BoundaryCondition
+from imod.mf6.pkgbase import BoundaryCondition
 
 
 class Drainage(BoundaryCondition):
 
     _pkg_id = "drn"
-
-    _binary_data = ("elevation", "conductance", "observations")
+    # has to be ordered as in the list
+    _binary_data = ("elevation", "conductance")
 
     def __init__(
         self,
@@ -24,3 +24,5 @@ class Drainage(BoundaryCondition):
         self["print_flows"] = print_flows
         self["save_flows"] = save_flows
         self["observations"] = observations
+
+        self._initialize_template()
