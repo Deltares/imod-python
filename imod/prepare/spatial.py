@@ -303,12 +303,6 @@ def gdal_rasterize(
     else:
         rasterized = xr.DataArray(memory_raster.ReadAsArray(), coords, dims)
 
-    # Rasterio and GDAL’s bindings can contend for global GDAL objects
-    # https://rasterio.readthedocs.io/en/stable/topics/switch.html#mutual-incompatibilities
-    # TODO: Would this help at all?
-    del gdal
-    del ogr
-
     return rasterized
 
 
@@ -487,27 +481,34 @@ def _create_chunks(like, resolution, chunksize):
     chunks : list of xr.DataArray
     """
 
-    dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial_reference(like)
+    _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(like)
     # Compute how many rows and columns are necessary for fine resolution
     nrow = int((ymax - ymin) / resolution)
     ncol = int((xmax - xmin) / resolution)
-    # Number of rows and columns in a single chunk
-    chunk_nrow = int(np.ceil(nrow / chunksize))
-    chunk_ncol = int(np.ceil(ncol / chunksize))
-    # Now compute how large these chunks are for the larger like cells
-    height = int(chunk_nrow * (dy / resolution))
-    width = int(chunk_ncol * (dx / resolution))
-
+    # Find out where to cut
+    x_starts = np.arange(0, ncol, chunksize) * resolution + xmin
+    y_starts = np.arange(0, nrow, chunksize) * resolution + ymin
+    # Searchsorted assumes the arrays are pre-sorted.
+    x = np.sort(like.coords["x"].values)
+    y = np.sort(like.coords["y"].values)
+    # Get the matching indices of like.
+    # Technically y is flipped around (decreasing dy), but this doesn't matter
+    # because we're just getting indices that result in rasterized chunks of
+    # e.g. size 10_000
+    ix_starts = list(np.searchsorted(x, x_starts))
+    iy_starts = list(np.searchsorted(y, y_starts))
+    # Append None. In python's slice object, None denotes "slice including
+    # first/last element"
+    ix_ends = ix_starts[1:] + [None]
+    iy_ends = iy_starts[1:] + [None]
+    # Use xarray to grab the chunks. The chunks have x and y coordinates.
+    # These will inform GDAL on which part to rasterize.
+    # GDAL will only rasterize within the boundaries of the chunks, so there's
+    # no need to clip the shapefile beforehand.
     chunks = []
-    for i in range(chunk_nrow):
-        for j in range(chunk_ncol):
-            col_start = i * width
-            col_end = (i + 1) * width
-            row_start = i * height
-            row_end = (i + 1) * height
-            chunks.append(
-                like.isel(y=slice(row_start, row_end), x=slice(col_start, col_end))
-            )
+    for j0, j1 in zip(iy_starts, iy_ends):
+        for i0, i1 in zip(ix_starts, ix_ends):
+            chunks.append(like.isel(y=slice(j0, j1), x=slice(i0, i1)))
     return chunks
 
 
