@@ -68,7 +68,7 @@ def test_render_with_time(drainage):
     assert drn._render(directory, globaltimes=datetimes, system_index=1) == compare
 
 
-def test_render_with_timemap(drainage):
+def test_render_with_timemap__elevation(drainage):
     drn = drainage
     directory = pathlib.Path(".")
     elev = drn["elevation"]
@@ -96,5 +96,9 @@ def test_render_with_timemap(drainage):
         "    cond_p?_s1_l2 = conductance_l2.idf\n"
         "    cond_p?_s1_l3 = conductance_l3.idf"
     )
+    actual = drn._render(directory, globaltimes=datetimes, system_index=1)
+    assert actual == compare
 
-    assert drn._render(directory, globaltimes=datetimes, system_index=1) == compare
+    # Conductance does not depend on time, therefore cannot have a timemap
+    with pytest.raises(ValueError):
+        drn.add_timemap(conductance=timemap)

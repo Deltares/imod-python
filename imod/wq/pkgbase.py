@@ -231,6 +231,11 @@ class BoundaryCondition(Package):
                 raise ValueError(
                     f"{varname} does not occur in {self}, cannot add timemap"
                 )
+            if "time" not in self[varname].coords:
+                raise ValueError(
+                    f"{varname} in {self} does not have dimension time, cannot add timemap."
+                )
+
             # Replace both key and value by the right datetime type
             d = {
                 timeutil.to_datetime(k, use_cftime): timeutil.to_datetime(v, use_cftime)

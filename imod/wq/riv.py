@@ -81,7 +81,13 @@ class River(BoundaryCondition):
         density=None,
         use_cftime=False,
     ):
-        varnames = ["stage", "conductance", "bottom_elevation", "concentration", "density"]
+        varnames = [
+            "stage",
+            "conductance",
+            "bottom_elevation",
+            "concentration",
+            "density",
+        ]
         values = [stage, conductance, bottom_elevation, concentration, density]
         for varname, value in zip(varnames, values):
             self._add_timemap(varname, value, use_cftime)
