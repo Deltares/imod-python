@@ -488,7 +488,7 @@ def open_subdomains(path, use_cftime=False):
     tops = [c.get("top", None) for c in headers]
     bots = [c.get("bot", None) for c in headers]
     layers = [c.get("layer", None) for c in headers]
-    _ , unique_indices = np.unique(layers, return_index=True)
+    _, unique_indices = np.unique(layers, return_index=True)
     all_have_z = all(map(lambda v: v is not None, itertools.chain(tops, bots)))
     if all_have_z:
         if coords["layer"].size > 1:
