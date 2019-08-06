@@ -1,13 +1,14 @@
 import pathlib
 
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 
 from imod.wq import River
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def river(request):
     layer = np.arange(1, 4)
     y = np.arange(4.5, 0.0, -1.0)
@@ -49,3 +50,21 @@ def test_render(river):
     )
 
     assert riv._render(directory, globaltimes=["?"], system_index=1) == compare
+
+
+@pytest.mark.parametrize(
+    "varname", ["stage", "conductance", "bottom_elevation", "concentration", "density"]
+)
+def test_render__timemap(river, varname):
+    riv = river
+    directory = pathlib.Path(".")
+    da = riv[varname]
+    datetimes = pd.date_range("2000-01-01", "2000-01-03")
+    da_transient = xr.concat(
+        [da.assign_coords(time=t) for t in datetimes[:-1]], dim="time"
+    )
+    riv[varname] = da_transient
+
+    timemap = {datetimes[-1]: datetimes[0]}
+    riv.add_timemap(**{varname: timemap})
+    actual = riv._render(directory, globaltimes=datetimes, system_index=1)

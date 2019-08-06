@@ -8,7 +8,7 @@ import xarray as xr
 from imod.wq import Drainage
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def drainage(request):
     layer = np.arange(1, 4)
     y = np.arange(4.5, 0.0, -1.0)
@@ -102,3 +102,19 @@ def test_render_with_timemap__elevation(drainage):
     # Conductance does not depend on time, therefore cannot have a timemap
     with pytest.raises(ValueError):
         drn.add_timemap(conductance=timemap)
+
+
+@pytest.mark.parametrize("varname", ["conductance", "elevation"])
+def test_render__timemap(drainage, varname):
+    drn = drainage
+    directory = pathlib.Path(".")
+    da = drn[varname]
+    datetimes = pd.date_range("2000-01-01", "2000-01-03")
+    da_transient = xr.concat(
+        [da.assign_coords(time=t) for t in datetimes[:-1]], dim="time"
+    )
+    drn[varname] = da_transient
+
+    timemap = {datetimes[-1]: datetimes[0]}
+    drn.add_timemap(**{varname: timemap})
+    actual = drn._render(directory, globaltimes=datetimes, system_index=1)

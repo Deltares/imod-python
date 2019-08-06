@@ -1,13 +1,14 @@
 import pathlib
 
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 
 from imod.wq import GeneralHeadBoundary
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def headboundary(request):
     layer = np.arange(1, 4)
     y = np.arange(4.5, 0.0, -1.0)
@@ -45,3 +46,19 @@ def test_render(headboundary):
     )
 
     assert ghb._render(directory, globaltimes=["?"], system_index=1) == compare
+
+
+@pytest.mark.parametrize("varname", ["head", "conductance", "concentration", "density"])
+def test_render__timemap(headboundary, varname):
+    ghb = headboundary
+    directory = pathlib.Path(".")
+    da = ghb[varname]
+    datetimes = pd.date_range("2000-01-01", "2000-01-03")
+    da_transient = xr.concat(
+        [da.assign_coords(time=t) for t in datetimes[:-1]], dim="time"
+    )
+    ghb[varname] = da_transient
+
+    timemap = {datetimes[-1]: datetimes[0]}
+    ghb.add_timemap(**{varname: timemap})
+    actual = ghb._render(directory, globaltimes=datetimes, system_index=1)
