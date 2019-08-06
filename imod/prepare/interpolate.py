@@ -97,7 +97,7 @@ extrapolation should occur.
 import numba
 import numpy as np
 
-from imod.prepare.common import _is_increasing, _reshape
+from imod.prepare import common
 
 
 def _linear_inds_weights_1d(src_x, dst_x, is_increasing):
@@ -163,7 +163,7 @@ def _linear_inds_weights_1d(src_x, dst_x, is_increasing):
     return i, norm_weights, within
 
 
-# @numba.njit(cache=True)
+@numba.njit(cache=True)
 def _interp_1d(src, dst, *inds_weights):
     """
     Parameters
@@ -171,19 +171,23 @@ def _interp_1d(src, dst, *inds_weights):
     src : np.array
     dst : np.array
     """
+    # Unpack the variadic arguments
     kk, weights_x, within_x = inds_weights
-    # i, j, k are indices of dst array
+    # k are indices of dst array
     for k, (ix, wx, in_x) in enumerate(zip(kk, weights_x, within_x)):
         if ix < 0:
             continue
 
+        # Fetch the values from source array, left v0, right v1
         v0 = src[ix]
         v1 = src[ix + 1]
+        # Check whether they are nodata
         v0_ok = np.isfinite(v0)
         v1_ok = np.isfinite(v1)
+
+        # Initialize and add to accumulators
         accumulator = 0
         accumulator_divisor = 0
-
         if v0_ok:
             multiplier = 1 - wx
             accumulator += multiplier * v0
@@ -193,6 +197,9 @@ def _interp_1d(src, dst, *inds_weights):
             accumulator += multiplier * v1
             accumulator_divisor += multiplier
 
+        # Check if the point to interpolate to falls fully within a nodata cell
+        # if that's the case, don't use the value, but continue with the next iteration.
+        # else: use the value, fill it into the destination array.
         if accumulator_divisor > 0:
             if in_x:
                 if not v0_ok:
@@ -206,10 +213,11 @@ def _interp_1d(src, dst, *inds_weights):
     return dst
 
 
-# @numba.njit(cache=True)
+@numba.njit(cache=True)
 def _interp_2d(src, dst, *inds_weights):
+    # Unpack the variadic arguments
     jj, weights_y, within_y, kk, weights_x, within_x = inds_weights
-
+    # j, k are indices of dst array
     for j, (iy, wy, in_y) in enumerate(zip(jj, weights_y, within_y)):
         if iy < 0:
             continue
@@ -218,18 +226,20 @@ def _interp_2d(src, dst, *inds_weights):
             if ix < 0:
                 continue
 
+            # Fetch the values from source array, upper left v00, lower right v11
             v00 = src[iy, ix]
             v01 = src[iy, ix + 1]
             v10 = src[iy + 1, ix]
             v11 = src[iy + 1, ix + 1]
+            # Check whether they are nodata
             v00_ok = np.isfinite(v00)
             v01_ok = np.isfinite(v01)
             v10_ok = np.isfinite(v10)
             v11_ok = np.isfinite(v11)
 
+            # Initialize and add to accumulators
             accumulator = 0
             accumulator_divisor = 0
-
             if v00_ok:
                 multiplier = (1 - wx) * (1 - wy)
                 accumulator += multiplier * v00
@@ -247,6 +257,9 @@ def _interp_2d(src, dst, *inds_weights):
                 accumulator += multiplier * v11
                 accumulator_divisor += multiplier
 
+            # Check if the point to interpolate to falls fully within a nodata cell
+            # if that's the case, don't use the value, but continue with the next iteration.
+            # else: use the value, fill it into the destination array.
             if accumulator_divisor > 0:
                 if in_y:
                     if in_x:
@@ -268,11 +281,13 @@ def _interp_2d(src, dst, *inds_weights):
     return dst
 
 
-# @numba.njit(cache=True)
+@numba.njit(cache=True)
 def _interp_3d(src, dst, *inds_weights):
+    # Unpack the variadic arguments
     ii, weights_z, within_z, jj, weights_y, within_y, kk, weights_x, within_x = (
         inds_weights
     )
+    # i, j, k are indices of dst array
     for i, (iz, wz, in_z) in enumerate(zip(ii, weights_z, within_z)):
         if iz < 0:
             continue
@@ -285,6 +300,8 @@ def _interp_3d(src, dst, *inds_weights):
                 if ix < 0:
                     continue
 
+                # Fetch the values from source array, top upper left v000,
+                # bottom lower right v11
                 v000 = src[iz, iy, ix]
                 v001 = src[iz, iy, ix + 1]
                 v010 = src[iz, iy + 1, ix]
@@ -293,6 +310,7 @@ def _interp_3d(src, dst, *inds_weights):
                 v101 = src[iz + 1, iy, ix + 1]
                 v110 = src[iz + 1, iy + 1, ix]
                 v111 = src[iz + 1, iy + 1, ix + 1]
+                # Check whether they are nodata
                 v000_ok = np.isfinite(v000)
                 v001_ok = np.isfinite(v001)
                 v010_ok = np.isfinite(v010)
@@ -302,9 +320,9 @@ def _interp_3d(src, dst, *inds_weights):
                 v110_ok = np.isfinite(v110)
                 v111_ok = np.isfinite(v111)
 
+                # Initialize and add to accumulators
                 accumulator = 0
                 accumulator_divisor = 0
-
                 if v000_ok:
                     multiplier = (1 - wz) * (1 - wx) * (1 - wy)
                     accumulator += multiplier * v000
@@ -338,6 +356,9 @@ def _interp_3d(src, dst, *inds_weights):
                     accumulator += multiplier * v111
                     accumulator_divisor += multiplier
 
+                # Check if the point to interpolate to falls fully within a nodata cell
+                # if that's the case, don't use the value, but continue with the next iteration.
+                # else: use the value, fill it into the destination array.
                 if accumulator_divisor > 0:
                     if in_z:
                         if in_y:
@@ -375,7 +396,7 @@ def _interp_3d(src, dst, *inds_weights):
     return dst
 
 
-# @numba.njit
+@numba.njit
 def _iter_interp(iter_src, iter_dst, interp_function, *inds_weights):
     n_iter = iter_src.shape[0]
     for i in range(n_iter):
@@ -386,15 +407,15 @@ def _iter_interp(iter_src, iter_dst, interp_function, *inds_weights):
 
 
 def _jit_interp(ndim_interp):
-    # @numba.njit
+    @numba.njit
     def jit_interp_1d(src, dst, *inds_weights):
         return _interp_1d(src, dst, *inds_weights)
 
-    # @numba.njit
+    @numba.njit
     def jit_interp_2d(src, dst, *inds_weights):
         return _interp_2d(src, dst, *inds_weights)
 
-    # @numba.njit
+    @numba.njit
     def jit_interp_3d(src, dst, *inds_weights):
         return _interp_3d(src, dst, *inds_weights)
 
@@ -413,7 +434,7 @@ def _jit_interp(ndim_interp):
 def _make_interp(ndim_regrid):
     jit_interp = _jit_interp(ndim_regrid)
 
-    # @numba.njit
+    @numba.njit
     def iter_interp(iter_src, iter_dst, *inds_weights):
         return _iter_interp(iter_src, iter_dst, jit_interp, *inds_weights)
 
@@ -429,12 +450,12 @@ def _nd_interp(src, dst, src_coords, dst_coords, iter_interp):
     # the maximum number of src cells that may end up in a single dst cell
     inds_weights = []
     for src_x, dst_x in zip(src_coords, dst_coords):
-        is_increasing = _is_increasing(src_x, dst_x)
+        is_increasing = common._is_increasing(src_x, dst_x)
         iw = _linear_inds_weights_1d(src_x, dst_x, is_increasing)
         for elem in iw:
             inds_weights.append(elem)
 
-    iter_src, iter_dst = _reshape(src, dst, ndim_regrid)
+    iter_src, iter_dst = common._reshape(src, dst, ndim_regrid)
     iter_dst = iter_interp(iter_src, iter_dst, *inds_weights)
 
     return iter_dst.reshape(dst.shape)

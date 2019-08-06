@@ -443,15 +443,15 @@ def _celltable(path, column, resolution, like):
         path, column, nodata=nodata, dtype=np.int32, spatial_reference=spatial_reference
     )
 
-    dst_coords = [imod.prepare.regrid._coord(like, dim) for dim in ("y", "x")]
-    src_coords = [imod.prepare.regrid._coord(rasterized, dim) for dim in ("y", "x")]
+    dst_coords = [imod.prepare.common._coord(like, dim) for dim in ("y", "x")]
+    src_coords = [imod.prepare.common._coord(rasterized, dim) for dim in ("y", "x")]
     # Determine weights for every regrid dimension, and alloc_len,
     # the maximum number of src cells that may end up in a single dst cell
     inds_weights = []
     alloc_len = 1
     for src_x, dst_x in zip(src_coords, dst_coords):
-        is_increasing = imod.prepare.regrid._is_increasing(src_x, dst_x)
-        size, i_w = imod.prepare.regrid._weights_1d(src_x, dst_x, is_increasing)
+        is_increasing = imod.prepare.common._is_increasing(src_x, dst_x)
+        size, i_w = imod.prepare.common._weights_1d(src_x, dst_x, is_increasing)
         for elem in i_w:
             inds_weights.append(elem)
         alloc_len *= size

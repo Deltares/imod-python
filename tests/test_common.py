@@ -8,6 +8,125 @@ import xarray as xr
 import imod
 
 
+def test_starts():
+    @numba.njit
+    def get_starts(src_x, dst_x):
+        result = []
+        for i, j in imod.prepare.common._starts(src_x, dst_x):
+            result.append((i, j))
+        return result
+
+    # Complete range
+    src_x = np.arange(0.0, 11.0, 1.0)
+    dst_x = np.arange(0.0, 11.0, 2.5)
+    # Returns tuples with (src_ind, dst_ind)
+    # List comprehension gives PicklingError
+    result = get_starts(src_x, dst_x)
+    assert result == [(0, 0), (1, 2), (2, 5), (3, 7)]
+
+    # Partial dst
+    dst_x = np.arange(5.0, 11.0, 2.5)
+    result = get_starts(src_x, dst_x)
+    assert result == [(0, 5), (1, 7)]
+
+    # Partial src
+    src_x = np.arange(5.0, 11.0, 1.0)
+    dst_x = np.arange(0.0, 11.0, 2.5)
+    result = get_starts(src_x, dst_x)
+    assert result == [(0, 0), (1, 0), (2, 0), (3, 2)]
+
+    # Irregular grid
+    src_x = np.array([0.0, 2.5, 7.5, 10.0])
+    dst_x = np.array([0.0, 5.0, 10.0])
+    result = get_starts(src_x, dst_x)
+    assert result == [(0, 0), (1, 1)]
+
+    # Negative coords
+    src_x = np.arange(-20.0, -9.0, 1.0)
+    dst_x = np.arange(-20.0, -9.0, 2.5)
+    result = get_starts(src_x, dst_x)
+    assert result == [(0, 0), (1, 2), (2, 5), (3, 7)]
+
+    # Mixed coords
+    src_x = np.arange(-5.0, 6.0, 1.0)
+    dst_x = np.arange(-5.0, 6.0, 2.5)
+    result = get_starts(src_x, dst_x)
+    assert result == [(0, 0), (1, 2), (2, 5), (3, 7)]
+
+
+def test_weights():
+    src_x = np.arange(0.0, 11.0, 1.0)
+    dst_x = np.arange(0.0, 11.0, 2.5)
+    max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
+        src_x, dst_x, True, False
+    )
+    assert max_len == 3
+    assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
+    assert np.allclose(src_inds, np.array([[0, 1, 2], [2, 3, 4], [5, 6, 7], [7, 8, 9]]))
+    assert np.allclose(
+        weights,
+        np.array([[1.0, 1.0, 0.5], [0.5, 1.0, 1.0], [1.0, 1.0, 0.5], [0.5, 1.0, 1.0]]),
+    )
+
+    # Irregular grid
+    src_x = np.array([0.0, 2.5, 7.5, 10.0])
+    dst_x = np.array([0.0, 5.0, 10.0])
+    max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
+        src_x, dst_x, True, False
+    )
+    assert max_len == 2
+    assert np.allclose(dst_inds, np.array([0, 1]))
+    assert np.allclose(src_inds, np.array([[0, 1], [1, 2]]))
+    assert np.allclose(weights, np.array([[2.5, 2.5], [2.5, 2.5]]))
+
+    # Mixed coords
+    src_x = np.arange(-5.0, 6.0, 1.0)
+    dst_x = np.arange(-5.0, 6.0, 2.5)
+    max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
+        src_x, dst_x, True, False
+    )
+    assert max_len == 3
+    assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
+    assert np.allclose(src_inds, np.array([[0, 1, 2], [2, 3, 4], [5, 6, 7], [7, 8, 9]]))
+    assert np.allclose(
+        weights,
+        np.array([[1.0, 1.0, 0.5], [0.5, 1.0, 1.0], [1.0, 1.0, 0.5], [0.5, 1.0, 1.0]]),
+    )
+
+
+def test_relative_weights():
+    # In the test above, the absolute weights are the same as the relative weights
+    # To have a test case, we simply multiply coordinates by two, while the
+    # relative weights should remain the same.
+    src_x = np.arange(0.0, 11.0, 1.0) * 2.0
+    dst_x = np.arange(0.0, 11.0, 2.5) * 2.0
+    max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
+        src_x, dst_x, True, True
+    )
+    assert max_len == 3
+    assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
+    assert np.allclose(src_inds, np.array([[0, 1, 2], [2, 3, 4], [5, 6, 7], [7, 8, 9]]))
+    assert np.allclose(
+        weights,
+        np.array([[1.0, 1.0, 0.5], [0.5, 1.0, 1.0], [1.0, 1.0, 0.5], [0.5, 1.0, 1.0]]),
+    )
+
+    # Something non-equidistant
+    src_x = np.array([0.0, 1.5])
+    dst_x = np.array([0.0, 3.0])
+    max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
+        src_x, dst_x, True, True
+    )
+    assert np.allclose(weights, np.array([[1.0]]))
+
+    src_x = np.array([0.0, 3.0])
+    dst_x = np.array([0.0, 1.5])
+    max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
+        src_x, dst_x, True, True
+    )
+    assert np.allclose(weights, np.array([[0.5]]))
+
+
 def test_area_weighted_methods():
     values = np.arange(5.0)
     weights = np.arange(0.0, 50.0, 10.0)

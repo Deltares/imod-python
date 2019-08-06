@@ -1,6 +1,133 @@
+"""
+Common methods used for interpolation, voxelization.
+
+Includes methods for dealing with different coordinates and dimensions of the
+xarray.DataArrays, as well as aggregation methods operating on weights and
+values.
+"""
 import numba
 import numpy as np
 import xarray as xr
+
+
+@numba.njit(cache=True)
+def _starts(src_x, dst_x):
+    """
+    Calculate regridding weights for a single dimension
+
+    Parameters
+    ----------
+    src_x : np.array
+        vertex coordinates of source
+    dst_x: np.array
+        vertex coordinates of destination
+    """
+    i = 0
+    j = 0
+    while i < dst_x.size - 1:
+        x = dst_x[i]
+        while j < src_x.size:
+            if src_x[j] > x:
+                out = max(j - 1, 0)
+                yield (i, out)
+                break
+            else:
+                j += 1
+        i += 1
+
+
+@numba.njit(cache=True)
+def _weights_1d(src_x, dst_x, is_increasing, use_relative_weights=False):
+    """
+    Calculate regridding weights and indices for a single dimension
+
+    Parameters
+    ----------
+    src_x : np.array
+        vertex coordinates of source
+    dst_x: np.array
+        vertex coordinates of destination
+
+    Returns
+    -------
+    max_len : int
+        maximum number of source cells to a single destination cell for this
+        dimension
+    dst_inds : list of int
+        destination cell index
+    src_inds: list of list of int
+        source cell index, per destination index
+    weights : list of list of float
+        weight of source cell, per destination index
+    """
+    max_len = 0
+    dst_inds = []
+    src_inds = []
+    weights = []
+    rel_weights = []
+
+    # Reverse the coordinate direction locally if coordinate is not
+    # monotonically increasing, so starts and overlap continue to work.
+    # copy() to avoid side-effects
+    if not is_increasing:
+        src_x = src_x.copy() * -1.0
+        dst_x = dst_x.copy() * -1.0
+
+    # i is index of dst
+    # j is index of src
+    for i, j in _starts(src_x, dst_x):
+        dst_x0 = dst_x[i]
+        dst_x1 = dst_x[i + 1]
+
+        _inds = []
+        _weights = []
+        _rel_weights = []
+        has_value = False
+        while j < src_x.size - 1:
+            src_x0 = src_x[j]
+            src_x1 = src_x[j + 1]
+            overlap = _overlap((dst_x0, dst_x1), (src_x0, src_x1))
+            # No longer any overlap, continue to next dst cell
+            if overlap == 0:
+                break
+            else:
+                has_value = True
+                _inds.append(j)
+                _weights.append(overlap)
+                relative_overlap = overlap / (src_x1 - src_x0)
+                _rel_weights.append(relative_overlap)
+                j += 1
+        if has_value:
+            dst_inds.append(i)
+            src_inds.append(_inds)
+            weights.append(_weights)
+            rel_weights.append(_rel_weights)
+            # Save max number of source cells
+            # So we know how much to pre-allocate later on
+            inds_len = len(_inds)
+            if inds_len > max_len:
+                max_len = inds_len
+
+    # Convert all output to numpy arrays
+    # numba does NOT like arrays or lists in tuples
+    # Compilation time goes through the roof
+    nrow = len(dst_inds)
+    ncol = max_len
+    np_dst_inds = np.array(dst_inds)
+
+    np_src_inds = np.full((nrow, ncol), -1)
+    for i in range(nrow):
+        for j, ind in enumerate(src_inds[i]):
+            np_src_inds[i, j] = ind
+
+    np_weights = np.full((nrow, ncol), 0.0)
+    if use_relative_weights:
+        weights = rel_weights
+    for i in range(nrow):
+        for j, ind in enumerate(weights[i]):
+            np_weights[i, j] = ind
+
+    return max_len, (np_dst_inds, np_src_inds, np_weights)
 
 
 def _reshape(src, dst, ndim_regrid):
