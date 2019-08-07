@@ -84,3 +84,26 @@ have to be perfect! We'll have a look, an
 .. _here: https://github.com/ambv/black#editor-integration
 .. _Format On Save: https://code.visualstudio.com/updates/v1_6#_format-on-save
 .. _pytest documentation: https://docs.pytest.org/en/latest/
+
+How to release a new version
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To follow these steps, you need to be one of the maintainers for imod on both
+`PyPI <https://pypi.org/project/imod/>`_ and `conda-forge
+<https://github.com/conda-forge/imod-feedstock>`_.
+
+1. Update the :doc:`changelog`.
+
+2. Tag in Gitlab UI. `Old tags are here <https://gitlab.com/deltares/imod/imod-python/-/tags>`_. `Old releases are here <https://gitlab.com/deltares/imod/imod-python/-/releases>`_. To make a tag show up under releases, fill in the release notes in the UI. Since we keep changes in the :doc:`changelog` only, just put ``See https://deltares.gitlab.io/imod/imod-python/changelog.html`` in both the ``Message`` and ``Release notes`` box. The tag name should be ``vx.y.z``, where x, y and z are version numbers according to `Semantic Versioning <https://semver.org/>`_.
+
+3. Locally, ``git fetch --tags`` and ``git pull``, verify you are on the commit you want to release, and that it is clean.
+
+4. Remove the ``build`` and ``dist`` folders if present.
+
+5. Create a wheel under ``dist/`` with ``python setup.py bdist_wheel``
+
+6. Create a source distribution under ``dist/`` with ``python setup.py sdist``
+
+7. Upload the files from step 5 and 6 to PyPI with ``twine upload dist/*``
+
+8. For `conda-forge <https://github.com/conda-forge/imod-feedstock>`_, a PR will be created automatically. If the requirements are up to date in `meta.yaml <https://github.com/conda-forge/imod-feedstock/blob/master/recipe/meta.yaml>`_ then you can merge it. Otherwise you have to edit them and push this to the bot's branch.
