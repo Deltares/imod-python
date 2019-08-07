@@ -28,7 +28,7 @@ def drainage(request):
 def test_save(drainage):
     drn = drainage
     directory = pathlib.Path(".")
-    drn.save(directory, "mydrn", [1])
+    drn.write(directory, "mydrn", [1])
 
     block_expected = textwrap.dedent(
         """\

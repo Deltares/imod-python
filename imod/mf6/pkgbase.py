@@ -136,8 +136,9 @@ class BoundaryCondition(Package):
 
         return self._template.render(d)
 
-    def save(self, directory, pkgname, globaltimes):
-        """Save writes the binary data
+    def write(self, directory, pkgname, globaltimes):
+        """
+        writes the blockfile and binary data
         
         directory is modelname
         """
