@@ -67,7 +67,7 @@ class Voxelizer:
     method : str, function
         The method to use for regridding. Default available methods are:
         {"mean", "harmonic_mean", "geometric_mean", "sum", "minimum",
-        "maximum", "mode", "median", "maxcommon._overlap"}
+        "maximum", "mode", "median", "max_overlap"}
     """
 
     def __init__(self, method, use_relative_weights=False):
