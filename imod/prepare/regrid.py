@@ -282,8 +282,8 @@ class Regridder(object):
     ----------
     method : str, function
         The method to use for regridding. Default available methods are:
-        {"mean", "harmonic_mean", "geometric_mean", "sum", "minimum",
-        "maximum", "mode", "median", "conductance"}
+        ``{"nearest", "multilinear", mean", "harmonic_mean", "geometric_mean",
+        "sum", "minimum", "maximum", "mode", "median", "conductance"}``
     ndim_regrid : int, optional
         The number of dimensions over which to regrid. If not provided,
         ``ndim_regrid`` will be inferred. It serves to prevent regridding over an
@@ -374,6 +374,26 @@ class Regridder(object):
             self._nd_regrid = nd_regrid
 
     def regrid(self, source, like, fill_value=np.nan):
+        """
+        Regrid ``source`` along dimensions that ``source`` and ``like`` share.
+        These dimensions will be inferred the first time ``.regrid`` is called
+        for the Regridder object.
+        
+        Following xarray conventions, nodata is assumed to ``np.nan``.
+        
+        Parameters
+        ----------
+        source : xr.DataArray of floats
+        like : xr.DataArray of floats
+            The like array present what the coordinates should look like.
+        fill_value : float
+            The fill_value. Defaults to np.nan
+            
+        Returns
+        -------
+        result : xr.DataArray
+            Regridded result.
+        """
         # Find coordinates that already match, and those that have to be
         # regridded, and those that exist in source but not in like (left
         # untouched)
