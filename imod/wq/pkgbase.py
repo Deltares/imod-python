@@ -225,6 +225,24 @@ class BoundaryCondition(Package):
         "{%- endfor -%}"
     )
 
+    def _add_timemap(self, varname, value, use_cftime):
+        if value is not None:
+            if varname not in self:
+                raise ValueError(
+                    f"{varname} does not occur in {self}, cannot add timemap"
+                )
+            if "time" not in self[varname].coords:
+                raise ValueError(
+                    f"{varname} in {self} does not have dimension time, cannot add timemap."
+                )
+
+            # Replace both key and value by the right datetime type
+            d = {
+                timeutil.to_datetime(k, use_cftime): timeutil.to_datetime(v, use_cftime)
+                for k, v in value.items()
+            }
+            self[varname].attrs["timemap"] = d
+
     def _compose_values_timelayer(self, varname, globaltimes, directory, da=None):
         """
         Composes paths to files, or gets the appropriate scalar value for
@@ -264,11 +282,21 @@ class BoundaryCondition(Package):
             da = self[varname]
 
         if "time" in da.coords:
-            package_times = da.coords["time"].values
+            da_times = da.coords["time"].values
+            if "timemap" in da.attrs:
+                timemap_keys = np.array(list(da.attrs["timemap"].keys()))
+                timemap_values = np.array(list(da.attrs["timemap"].values()))
+                package_times, inds = np.unique(
+                    np.concatenate([da_times, timemap_keys]), return_index=True
+                )
+                # Times to write in the runfile
+                runfile_times = np.concatenate([da_times, timemap_values])[inds]
+            else:
+                runfile_times = package_times = da_times
 
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
 
-            for time, start_end in zip(package_times, starts_ends):
+            for time, start_end in zip(runfile_times, starts_ends):
                 values[start_end] = self._compose_values_layer(varname, directory, time)
 
         else:

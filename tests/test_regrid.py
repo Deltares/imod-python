@@ -49,207 +49,6 @@ def conductance(values, weights):
         return v_agg
 
 
-def test_area_weighted_methods():
-    values = np.arange(5.0)
-    weights = np.arange(0.0, 50.0, 10.0)
-    values[0] = np.nan
-
-    assert np.allclose(imod.prepare.regrid.mean(values, weights), 3.0)
-    assert np.allclose(imod.prepare.regrid.harmonic_mean(values, weights), 2.5)
-    assert np.allclose(
-        imod.prepare.regrid.geometric_mean(values, weights), 2.780778340631819
-    )
-
-    values[1] = 3.0
-    assert np.allclose(imod.prepare.regrid.mode(values, weights), 3.0)
-
-    # Check if no issues arise with all nan
-    values[:] = np.nan
-    assert np.isnan(imod.prepare.regrid.mean(values, weights))
-    assert np.isnan(imod.prepare.regrid.harmonic_mean(values, weights))
-    assert np.isnan(imod.prepare.regrid.geometric_mean(values, weights))
-    assert np.isnan(imod.prepare.regrid.mode(values, weights))
-
-
-def test_methods():
-    values = np.arange(5.0)
-    weights = np.arange(0.0, 50.0, 10.0)
-    values[0] = np.nan
-    assert np.allclose(imod.prepare.regrid.sum(values, weights), 10.0)
-    assert np.allclose(imod.prepare.regrid.minimum(values, weights), 1.0)
-    assert np.allclose(imod.prepare.regrid.maximum(values, weights), 4.0)
-    assert np.allclose(imod.prepare.regrid.median(values, weights), 2.5)
-    assert np.allclose(imod.prepare.regrid.conductance(values, weights), 300.0)
-    assert np.allclose(imod.prepare.regrid.max_overlap(values, weights), 4.0)
-
-    # Check if no issues arise with all nan
-    values[:] = np.nan
-    assert np.isnan(imod.prepare.regrid.sum(values, weights))
-    assert np.isnan(imod.prepare.regrid.minimum(values, weights))
-    assert np.isnan(imod.prepare.regrid.maximum(values, weights))
-    assert np.isnan(imod.prepare.regrid.median(values, weights))
-    assert np.isnan(imod.prepare.regrid.conductance(values, weights))
-    assert np.isnan(imod.prepare.regrid.max_overlap(values, weights))
-
-
-def test_methods_zeros():
-    values = np.zeros(5)
-    weights = np.arange(0.0, 50.0, 10.0)
-    assert np.allclose(imod.prepare.regrid.mean(values, weights), 0.0)
-
-
-def test_overlap():
-    assert imod.prepare.regrid._overlap((0.0, 1.0), (0.0, 2.0)) == 1.0
-    assert imod.prepare.regrid._overlap((-1.0, 1.0), (0.0, 2.0)) == 1.0
-    assert imod.prepare.regrid._overlap((-1.0, 3.0), (0.0, 2.0)) == 2.0
-    assert imod.prepare.regrid._overlap((-1.0, 3.0), (-2.0, 2.0)) == 3.0
-
-
-def test_starts():
-    @numba.njit
-    def get_starts(src_x, dst_x):
-        result = []
-        for i, j in imod.prepare.regrid._starts(src_x, dst_x):
-            result.append((i, j))
-        return result
-
-    # Complete range
-    src_x = np.arange(0.0, 11.0, 1.0)
-    dst_x = np.arange(0.0, 11.0, 2.5)
-    # Returns tuples with (src_ind, dst_ind)
-    # List comprehension gives PicklingError
-    result = get_starts(src_x, dst_x)
-    assert result == [(0, 0), (1, 2), (2, 5), (3, 7)]
-
-    # Partial dst
-    dst_x = np.arange(5.0, 11.0, 2.5)
-    result = get_starts(src_x, dst_x)
-    assert result == [(0, 5), (1, 7)]
-
-    # Partial src
-    src_x = np.arange(5.0, 11.0, 1.0)
-    dst_x = np.arange(0.0, 11.0, 2.5)
-    result = get_starts(src_x, dst_x)
-    assert result == [(0, 0), (1, 0), (2, 0), (3, 2)]
-
-    # Irregular grid
-    src_x = np.array([0.0, 2.5, 7.5, 10.0])
-    dst_x = np.array([0.0, 5.0, 10.0])
-    result = get_starts(src_x, dst_x)
-    assert result == [(0, 0), (1, 1)]
-
-    # Negative coords
-    src_x = np.arange(-20.0, -9.0, 1.0)
-    dst_x = np.arange(-20.0, -9.0, 2.5)
-    result = get_starts(src_x, dst_x)
-    assert result == [(0, 0), (1, 2), (2, 5), (3, 7)]
-
-    # Mixed coords
-    src_x = np.arange(-5.0, 6.0, 1.0)
-    dst_x = np.arange(-5.0, 6.0, 2.5)
-    result = get_starts(src_x, dst_x)
-    assert result == [(0, 0), (1, 2), (2, 5), (3, 7)]
-
-
-def test_weights():
-    src_x = np.arange(0.0, 11.0, 1.0)
-    dst_x = np.arange(0.0, 11.0, 2.5)
-    max_len, (dst_inds, src_inds, weights) = imod.prepare.regrid._weights_1d(
-        src_x, dst_x, True, False
-    )
-    assert max_len == 3
-    assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
-    assert np.allclose(src_inds, np.array([[0, 1, 2], [2, 3, 4], [5, 6, 7], [7, 8, 9]]))
-    assert np.allclose(
-        weights,
-        np.array([[1.0, 1.0, 0.5], [0.5, 1.0, 1.0], [1.0, 1.0, 0.5], [0.5, 1.0, 1.0]]),
-    )
-
-    # Irregular grid
-    src_x = np.array([0.0, 2.5, 7.5, 10.0])
-    dst_x = np.array([0.0, 5.0, 10.0])
-    max_len, (dst_inds, src_inds, weights) = imod.prepare.regrid._weights_1d(
-        src_x, dst_x, True, False
-    )
-    assert max_len == 2
-    assert np.allclose(dst_inds, np.array([0, 1]))
-    assert np.allclose(src_inds, np.array([[0, 1], [1, 2]]))
-    assert np.allclose(weights, np.array([[2.5, 2.5], [2.5, 2.5]]))
-
-    # Mixed coords
-    src_x = np.arange(-5.0, 6.0, 1.0)
-    dst_x = np.arange(-5.0, 6.0, 2.5)
-    max_len, (dst_inds, src_inds, weights) = imod.prepare.regrid._weights_1d(
-        src_x, dst_x, True, False
-    )
-    assert max_len == 3
-    assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
-    assert np.allclose(src_inds, np.array([[0, 1, 2], [2, 3, 4], [5, 6, 7], [7, 8, 9]]))
-    assert np.allclose(
-        weights,
-        np.array([[1.0, 1.0, 0.5], [0.5, 1.0, 1.0], [1.0, 1.0, 0.5], [0.5, 1.0, 1.0]]),
-    )
-
-
-def test_relative_weights():
-    # In the test above, the absolute weights are the same as the relative weights
-    # To have a test case, we simply multiply coordinates by two, while the
-    # relative weights should remain the same.
-    src_x = np.arange(0.0, 11.0, 1.0) * 2.0
-    dst_x = np.arange(0.0, 11.0, 2.5) * 2.0
-    max_len, (dst_inds, src_inds, weights) = imod.prepare.regrid._weights_1d(
-        src_x, dst_x, True, True
-    )
-    assert max_len == 3
-    assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
-    assert np.allclose(src_inds, np.array([[0, 1, 2], [2, 3, 4], [5, 6, 7], [7, 8, 9]]))
-    assert np.allclose(
-        weights,
-        np.array([[1.0, 1.0, 0.5], [0.5, 1.0, 1.0], [1.0, 1.0, 0.5], [0.5, 1.0, 1.0]]),
-    )
-
-    # Something non-equidistant
-    src_x = np.array([0.0, 1.5])
-    dst_x = np.array([0.0, 3.0])
-    max_len, (dst_inds, src_inds, weights) = imod.prepare.regrid._weights_1d(
-        src_x, dst_x, True, True
-    )
-    assert np.allclose(weights, np.array([[1.0]]))
-
-    src_x = np.array([0.0, 3.0])
-    dst_x = np.array([0.0, 1.5])
-    max_len, (dst_inds, src_inds, weights) = imod.prepare.regrid._weights_1d(
-        src_x, dst_x, True, True
-    )
-    assert np.allclose(weights, np.array([[0.5]]))
-
-
-def test_reshape():
-    src = np.zeros((3, 5))
-    dst = np.zeros((3, 2))
-    iter_src, iter_dst = imod.prepare.regrid._reshape(src, dst, ndim_regrid=1)
-    assert iter_src.shape == (3, 5)
-    assert iter_dst.shape == (3, 2)
-
-    src = np.zeros((2, 4, 3, 5))
-    dst = np.zeros((2, 4, 3, 2))
-    iter_src, iter_dst = imod.prepare.regrid._reshape(src, dst, ndim_regrid=1)
-    assert iter_src.shape == (24, 5)
-    assert iter_dst.shape == (24, 2)
-
-    src = np.zeros((3, 5))
-    dst = np.zeros((3, 2))
-    iter_src, iter_dst = imod.prepare.regrid._reshape(src, dst, ndim_regrid=2)
-    assert iter_src.shape == (1, 3, 5)
-    assert iter_dst.shape == (1, 3, 2)
-
-    src = np.zeros((2, 4, 3, 5))
-    dst = np.zeros((2, 4, 3, 2))
-    iter_src, iter_dst = imod.prepare.regrid._reshape(src, dst, ndim_regrid=3)
-    assert iter_src.shape == (2, 4, 3, 5)
-    assert iter_dst.shape == (2, 4, 3, 2)
-
-
 def test_make_regrid():
     if "NUMBA_DISABLE_JIT" in os.environ:
         pass
@@ -266,7 +65,7 @@ def test_make_regrid():
 def test_regrid_1d():
     src_x = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
     dst_x = np.array([0.0, 2.5, 5.0])
-    alloc_len, i_w = imod.prepare.regrid._weights_1d(src_x, dst_x, True, False)
+    alloc_len, i_w = imod.prepare.common._weights_1d(src_x, dst_x, True, False)
     inds_weights = [tuple(elem) for elem in i_w]
     values = np.zeros(alloc_len)
     weights = np.zeros(alloc_len)
@@ -298,14 +97,14 @@ def test_iter_regrid__1d():
     ndim_regrid = 1
     src_x = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
     dst_x = np.array([0.0, 2.5, 5.0])
-    alloc_len, i_w = imod.prepare.regrid._weights_1d(src_x, dst_x, True, False)
+    alloc_len, i_w = imod.prepare.common._weights_1d(src_x, dst_x, True, False)
     inds_weights = [tuple(elem) for elem in i_w]
 
     # 1D regrid over 1D array
     src = np.array([10.0, 20.0, 30.0, 40.0, 50.0])
     dst = np.zeros(2)
     iter_regrid = imod.prepare.regrid._make_regrid(first, ndim_regrid)
-    iter_src, iter_dst = imod.prepare.regrid._reshape(src, dst, ndim_regrid)
+    iter_src, iter_dst = imod.prepare.common._reshape(src, dst, ndim_regrid)
     iter_dst = iter_regrid(iter_src, iter_dst, alloc_len, *inds_weights)
     assert np.allclose(dst, np.array([10.0, 30.0]))
 
@@ -313,7 +112,7 @@ def test_iter_regrid__1d():
     src = np.array([[10.0, 20.0, 30.0, 40.0, 50.0] for _ in range(3)])
     dst = np.zeros((3, 2))
     iter_regrid = imod.prepare.regrid._make_regrid(first, ndim_regrid)
-    iter_src, iter_dst = imod.prepare.regrid._reshape(src, dst, ndim_regrid)
+    iter_src, iter_dst = imod.prepare.common._reshape(src, dst, ndim_regrid)
     iter_dst = iter_regrid(iter_src, iter_dst, alloc_len, *inds_weights)
     assert np.allclose(dst, np.array([[10.0, 30.0], [10.0, 30.0], [10.0, 30.0]]))
 
@@ -322,28 +121,11 @@ def test_iter_regrid__1d():
     src[..., :] = [10.0, 20.0, 30.0, 40.0, 50.0]
     dst = np.zeros((4, 3, 2))
     iter_regrid = imod.prepare.regrid._make_regrid(first, ndim_regrid)
-    iter_src, iter_dst = imod.prepare.regrid._reshape(src, dst, ndim_regrid)
+    iter_src, iter_dst = imod.prepare.common._reshape(src, dst, ndim_regrid)
     iter_dst = iter_regrid(iter_src, iter_dst, alloc_len, *inds_weights)
     compare = np.zeros((4, 3, 2))
     compare[..., :] = [10.0, 30.0]
     assert np.allclose(dst, compare)
-
-
-def test_is_increasing():
-    src_x = np.arange(5.0)
-    dst_x = np.arange(5.0)
-    is_increasing = imod.prepare.regrid._is_increasing(src_x, dst_x)
-    assert is_increasing
-
-    src_x = np.arange(5.0, 0.0, -1.0)
-    dst_x = np.arange(5.0, 0.0, -1.0)
-    is_increasing = imod.prepare.regrid._is_increasing(src_x, dst_x)
-    assert not is_increasing
-
-    src_x = np.arange(5.0, 0.0, -1.0)
-    dst_x = np.arange(5.0)
-    with pytest.raises(ValueError):
-        is_increasing = imod.prepare.regrid._is_increasing(src_x, dst_x)
 
 
 def test_nd_regrid__1d():
@@ -449,17 +231,17 @@ def test_nd_regrid__4d3d__first():
 def test_regrid_coord():
     # Regular
     da = xr.DataArray((np.zeros(4)), {"x": np.arange(4.0) + 0.5}, ("x",))
-    regridx = imod.prepare.regrid._coord(da, "x")
+    regridx = imod.prepare.common._coord(da, "x")
     assert np.allclose(regridx, np.arange(5.0))
 
     # Negative x
     da = xr.DataArray((np.zeros(4)), {"x": np.arange(-4.0, 0.0, 1.0) + 0.5}, ("x",))
-    regridx = imod.prepare.regrid._coord(da, "x")
+    regridx = imod.prepare.common._coord(da, "x")
     assert np.allclose(regridx, np.arange(-4.0, 1.0, 1.0))
 
     # Negative dx
     da = xr.DataArray((np.zeros(4)), {"x": np.arange(0.0, -4.0, -1.0) - 0.5}, ("x",))
-    regridx = imod.prepare.regrid._coord(da, "x")
+    regridx = imod.prepare.common._coord(da, "x")
     assert np.allclose(regridx, np.arange(0.0, -5.0, -1.0))
 
     # Non-equidistant, postive dx, negative dy/n
@@ -473,8 +255,8 @@ def test_regrid_coord():
     data = np.ones((nrow, ncol), dtype=np.float32)
     da = xr.DataArray(data, **kwargs)
 
-    regridx = imod.prepare.regrid._coord(da, "x")
-    regridy = imod.prepare.regrid._coord(da, "y")
+    regridx = imod.prepare.common._coord(da, "x")
+    regridy = imod.prepare.common._coord(da, "y")
     assert float(regridx.min()) == xmin
     assert float(regridx.max()) == xmax
     assert float(regridy.min()) == ymin
@@ -628,10 +410,6 @@ def test_regrid_conductance3d__errors():
     like = xr.DataArray(np.empty((5, 2, 2)), likecoords, dims)
 
     with pytest.raises(ValueError):
-        _ = imod.prepare.Regridder(method=imod.prepare.regrid.conductance).regrid(
-            source, like
-        )
-    with pytest.raises(ValueError):
         _ = imod.prepare.Regridder(method="conductance").regrid(source, like)
 
 
@@ -645,7 +423,7 @@ def test_str_method():
     source = xr.DataArray(values, coords, dims)
     like = xr.DataArray(np.empty(2), like_coords, dims)
     # Test function method
-    out = imod.prepare.Regridder(method=imod.prepare.regrid.mean).regrid(source, like)
+    out = imod.prepare.Regridder(method=mean).regrid(source, like)
     compare = np.array([1.5, 3.0])
     assert np.allclose(out.values, compare)
 
@@ -654,7 +432,3 @@ def test_str_method():
     assert np.allclose(out.values, compare)
 
     out = imod.prepare.Regridder(method="nearest").regrid(source, like)
-
-
-# TODO: test nan values
-# Implement different methods: ignore, or accept

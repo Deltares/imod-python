@@ -8,7 +8,7 @@ import xarray as xr
 from imod.wq import RechargeHighestActive, RechargeTopLayer, RechargeLayers
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def recharge_top(request):
     datetimes = pd.date_range("2000-01-01", "2000-01-05")
     y = np.arange(4.5, 0.0, -1.0)
@@ -23,7 +23,7 @@ def recharge_top(request):
     return rch
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def recharge_layers(request):
     datetimes = pd.date_range("2000-01-01", "2000-01-05")
     y = np.arange(4.5, 0.0, -1.0)
@@ -43,7 +43,7 @@ def recharge_layers(request):
     return rch
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def recharge_ha(request):
     datetimes = pd.date_range("2000-01-01", "2000-01-05")
     y = np.arange(4.5, 0.0, -1.0)
@@ -112,3 +112,19 @@ def test_render__highest_active(recharge_ha):
     )
 
     assert rch._render(directory, globaltimes=rch.time.values) == compare
+
+
+@pytest.mark.parametrize("varname", ["rate", "concentration"])
+def test_render__timemap(recharge_ha, varname):
+    rch = recharge_ha.isel(time=0)
+    directory = pathlib.Path(".")
+    da = rch[varname]
+    datetimes = pd.date_range("2000-01-01", "2000-01-03")
+    da_transient = xr.concat(
+        [da.assign_coords(time=t) for t in datetimes[:-1]], dim="time"
+    )
+    rch[varname] = da_transient
+
+    timemap = {datetimes[-1]: datetimes[0]}
+    rch.add_timemap(**{varname: timemap})
+    actual = rch._render(directory, globaltimes=datetimes, system_index=1)

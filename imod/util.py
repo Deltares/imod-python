@@ -28,6 +28,17 @@ except AttributeError:
     Pattern = re.Pattern  # Python 3.7+
 
 
+def to_datetime(s):
+    try:
+        try:
+            time = datetime.datetime.strptime(s, "%Y%m%d%H%M%S")
+        except ValueError:
+            time = datetime.datetime.strptime(s, "%Y%m%d")
+    except ValueError:  # Try fullblown dateutil date parser
+        time = dateutil.parser.parse(s)
+    return time
+
+
 def decompose(path, pattern=None):
     r"""
     Parse a path, returning a dict of the parts, following the iMOD conventions.
