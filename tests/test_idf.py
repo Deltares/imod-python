@@ -203,9 +203,9 @@ def test_open_subdomains(test_da_subdomains):
 
     for i, subdomain in enumerate(subdomains):
         for layer, da in subdomain.groupby("layer"):
-            idf.write(f"subdomains_l{layer}_p00{i}.idf", da)
+            idf.write(f"subdomains_20000101_l{layer}_p00{i}.idf", da)
 
-    da = idf.open_subdomains("subdomains_*.idf", pattern=r"{name}_l{layer}_p\d+")
+    da = idf.open_subdomains("subdomains_*.idf")
 
     assert np.all(da == 1.0)
     assert len(da.x) == 8
@@ -223,13 +223,13 @@ def test_open_subdomains_error(test_da_subdomains):
 
     for i, subdomain in enumerate(subdomains):
         for layer, da in subdomain.groupby("layer"):
-            idf.write(f"subdomains_l{layer}_p00{i}.idf", da)
+            idf.write(f"subdomains_20000101_l{layer}_p00{i}.idf", da)
 
     # Add an additional subdomain with only one layer
-    idf.write("subdomains_l1_p010.idf", subdomain.sel(layer=1))
+    idf.write("subdomains_20000101_l1_p010.idf", subdomain.sel(layer=1))
 
     with pytest.raises(ValueError):
-        da = idf.open_subdomains("subdomains_*.idf", pattern=r"{name}_l{layer}_p\d+")
+        da = idf.open_subdomains("subdomains_*.idf")
 
 
 def test_xycoords_equidistant():
