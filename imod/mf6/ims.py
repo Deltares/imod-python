@@ -55,6 +55,12 @@ class Solution(Package):
         self.scaling_method = scaling_method
         self.reordering_method = reordering_method
 
+    def write(self, directory, solvername):
+        ims_path = directory / f"{solvername}.ims"
+        ims_content = self.render()
+        with open(ims_path, "w") as f:
+            f.write(ims_content)
+
 
 def SolutionPresetSimple(print_option, csv_output, no_ptc):
     solution = Solution(

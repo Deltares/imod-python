@@ -69,7 +69,19 @@ class Modflow6Simulation(collections.UserDict):
         # Write time discretization file
         self["time_discretization"].write(directory)
 
+        # Write solution groups
+        # TODO: where is the mapping between model and solution group?
+        # not very relevant now, all models will belong to a single solution
+        for key, solution in self.items():
+            try:
+                if solution._pkg_id == "ims":
+                    solution.write(directory, key)
+            except AttributeError:
+                continue
+
         # Write individual models
         globaltimes = self["time_discretization"]["time"].values
         for model in self.values():
-            model.write(directory, globaltimes)
+            # skip timedis, solution group, and exchanges
+            if hasattr(model, "modelname"):
+                model.write(directory, globaltimes)
