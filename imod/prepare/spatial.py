@@ -400,7 +400,7 @@ def _cell_count(src, values, frequencies, nodata, *inds_weights):
     return row_i_arr, col_i_arr, value_arr, count_arr
 
 
-def _celltable(path, column, resolution, like):
+def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
     """
     Returns a table of cell indices (row, column) with feature ID, and feature
     area within cell. Essentially returns a COO sparse matrix, but with
@@ -458,8 +458,8 @@ def _celltable(path, column, resolution, like):
     )
 
     df = pd.DataFrame()
-    df["row_index"] = rows
-    df["col_index"] = cols
+    df["row_index"] = rows + rowstart
+    df["col_index"] = cols + colstart
     df["id"] = values
     df["area"] = counts * (dx * dx)
 
@@ -492,9 +492,6 @@ def _create_chunks(like, resolution, chunksize):
     x = np.sort(like.coords["x"].values)
     y = np.sort(like.coords["y"].values)
     # Get the matching indices of like.
-    # Technically y is flipped around (decreasing dy), but this doesn't matter
-    # because we're just getting indices that result in rasterized chunks of
-    # e.g. size 10_000
     ix_starts = list(np.searchsorted(x, x_starts))
     iy_starts = list(np.searchsorted(y, y_starts))
     # Append None. In python's slice object, None denotes "slice including
@@ -506,10 +503,14 @@ def _create_chunks(like, resolution, chunksize):
     # GDAL will only rasterize within the boundaries of the chunks, so there's
     # no need to clip the shapefile beforehand.
     chunks = []
+    rowstarts = []
+    colstarts = []
     for j0, j1 in zip(iy_starts, iy_ends):
         for i0, i1 in zip(ix_starts, ix_ends):
             chunks.append(like.isel(y=slice(j0, j1), x=slice(i0, i1)))
-    return chunks
+            rowstarts.append(j0)
+            colstarts.append(i0)
+    return chunks, rowstarts, colstarts
 
 
 def celltable(path, column, resolution, like, chunksize=1e4):
@@ -544,10 +545,10 @@ def celltable(path, column, resolution, like, chunksize=1e4):
     -------
     celltable : pandas.DataFrame
     """
-    like_chunks = _create_chunks(like, resolution, chunksize)
+    like_chunks, rowstarts, colstarts = _create_chunks(like, resolution, chunksize)
     collection = [
-        dask.delayed(_celltable)(path, column, resolution, chunk)
-        for chunk in like_chunks
+        dask.delayed(_celltable)(path, column, resolution, chunk, rowstart, colstart)
+        for chunk, rowstart, colstart in zip(like_chunks, rowstarts, colstarts)
     ]
     result = dask.compute(collection)[0]
     return pd.concat(result)
