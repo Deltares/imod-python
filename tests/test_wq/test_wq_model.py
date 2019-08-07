@@ -253,7 +253,7 @@ def test_render_gen(basicmodel):
     )
 
 
-def test_render_pgk__gcg(basicmodel):
+def test_render_pkg__gcg(basicmodel):
     m = basicmodel
     m.time_discretization(endtime="2000-01-06")
     diskey = m._get_pkgkey("dis")
@@ -273,7 +273,7 @@ def test_render_pgk__gcg(basicmodel):
     assert m._render_pkg("gcg", directory=directory, globaltimes=globaltimes) == compare
 
 
-def test_render_pgk__rch(basicmodel):
+def test_render_pkg__rch(basicmodel):
     m = basicmodel
     m.time_discretization(endtime="2000-01-06")
     diskey = m._get_pkgkey("dis")

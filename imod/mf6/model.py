@@ -86,4 +86,4 @@ class Modflow6(Model):
 
         # write package contents
         for pkgname, pkg in self.items():
-            pkg.write(modeldirectory, pgkname, globaltimes)
+            pkg.write(modeldirectory, pkgname, globaltimes)
