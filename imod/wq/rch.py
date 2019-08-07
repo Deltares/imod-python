@@ -41,6 +41,12 @@ class Recharge(BoundaryCondition):
     def _pkgcheck(self, ibound=None):
         pass
 
+    def add_timemap(self, rate=None, concentration=None, use_cftime=False):
+        varnames = ["rate", "concentration"]
+        values = [rate, concentration]
+        for varname, value in zip(varnames, values):
+            self._add_timemap(varname, value, use_cftime)
+
 
 class RechargeTopLayer(Recharge):
     """
