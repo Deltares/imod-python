@@ -6,6 +6,7 @@ The primary functions to use are :func:`imod.idf.open` and
 """
 
 import collections
+import functools
 import glob
 import itertools
 import pathlib
@@ -363,24 +364,28 @@ def open(path, use_cftime=False, pattern=None):
     return _load(paths, use_cftime, pattern)
 
 
-def open_subdomains(path, use_cftime=False, pattern=None):
+def _merge_subdomains(pathlists, use_cftime, pattern):
+    das = [_load(pathlist, use_cftime, pattern) for pathlist in pathlists.values()]
+    x = np.unique(np.concatenate([da.x.values for da in das]))
+    y = np.unique(np.concatenate([da.y.values for da in das]))
+
+    nrow = y.size
+    ncol = x.size
+    nlayer = das[0].coords["layer"].size
+    out = np.full((1, nlayer, nrow, ncol), np.nan)
+
+    for da in das:
+        ix = np.searchsorted(x, da.x.values[0], side="left")
+        iy = nrow - np.searchsorted(y, da.y.values[0], side="right")
+        _, _, ysize, xsize = da.shape
+        out[:, :, iy : iy + ysize, ix : ix + xsize] = da.values
+
+    return out
+
+
+def open_subdomains(path, use_cftime=False):
     """
     Combine IDF files of multiple subdomains.
-
-    Nota bene: Writing the resulting xr.DataArray to a netcdf with
-    ``to_netcdf`` is quite fast. However, saving the result to IDFs with
-    ``imod.idf.save`` is unfortunately extremely slow. The cause appears to be
-    a failure of the xarray scheduler: when saving to IDFs, it starts to
-    merge the IDFs for a single layer and a single time. This means that if
-    you 10 layers, and 30 times, that it will perform 300 individual merge
-    operations!
-
-    The easiest way around it is by calling ``.load()`` on the result once, if
-    it fits in your memory all at once. In this case, it will perform the
-    merge only once, combining layers and times in one go.
-
-    If it doesn't fit in memory, you might try re-chunking the result:
-    http://xarray.pydata.org/en/stable/generated/xarray.DataArray.chunk.html
 
     Parameters
     ----------
@@ -400,49 +405,126 @@ def open_subdomains(path, use_cftime=False, pattern=None):
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
 
-    subdomain_pattern = re.compile(r"_p(\d{3})", re.IGNORECASE)
+    pattern = re.compile(
+        r"[\w-]+_(?P<time>[0-9-]+)_l(?P<layer>[0-9]+)_p(?P<subdomain>[0-9]{3})",
+        re.IGNORECASE,
+    )
     # There are no real benefits to itertools.groupby in this case, as there's
-    # no benefit to using a (lazy) iterator in this case.
-    grouped = collections.defaultdict(list)
+    # no benefit to using a (lazy) iterator in this case
+    grouped_by_time = collections.defaultdict(
+        functools.partial(collections.defaultdict, list)
+    )
+    count_per_subdomain = collections.defaultdict(int)  # used only for checking counts
+    timestrings = []
+    layers = []
     numbers = []
     for p in paths:
-        number = subdomain_pattern.search(p).group(1)
+        search = pattern.search(p)
+        timestr = search.group(1)
+        layer = int(search.group(2))
+        number = int(search.group(3))
+        grouped_by_time[timestr][number].append(p)
+        count_per_subdomain[number] += 1
         numbers.append(number)
-        grouped[number].append(pathlib.Path(p))
+        layers.append(layer)
+        timestrings.append(timestr)
 
+    # Test whether subdomains are complete
     numbers = sorted(set(numbers))
     first = numbers[0]
-    first_len = len(grouped[first])
-
+    first_len = count_per_subdomain[first]
     for number in numbers:
-        group_len = len(grouped[number])
-        if not group_len == first_len:
+        group_len = count_per_subdomain[number]
+        if group_len != first_len:
             raise ValueError(
                 f"The number of IDFs are not identical for every subdomain. "
                 f"Subdomain p{first} has {first_len} IDF files, subdomain p{number} "
                 f"has {group_len} IDF files."
             )
 
-    # This pattern will ignore the subdomain part
-    if pattern is None:
-        pattern = r"{name}_{time}_l{layer}_p\d+"
+    pattern = r"{name}_{time}_l{layer}_p\d+"
+    timestrings = sorted(set(timestrings))
 
-    subdomains = [
-        open(pathlist, use_cftime=use_cftime, pattern=pattern)
-        for pathlist in grouped.values()
+    # Prepare output coordinates
+    coords = {}
+    first_time = timestrings[0]
+    samplingpaths = [
+        pathlist[first] for pathlist in grouped_by_time[first_time].values()
     ]
+    headers = [header(path, pattern) for path in samplingpaths]
+    subdomain_bounds = [(h["xmin"], h["xmax"], h["ymin"], h["ymax"]) for h in headers]
+    subdomain_cellsizes = [(h["dx"], h["dy"]) for h in headers]
+    subdomain_coords = [
+        util._xycoords(bounds, cellsizes)
+        for bounds, cellsizes in zip(subdomain_bounds, subdomain_cellsizes)
+    ]
+    coords["y"] = np.unique(
+        np.concatenate([coords["y"] for coords in subdomain_coords])
+    )[::-1]
+    coords["x"] = np.unique(
+        np.concatenate([coords["x"] for coords in subdomain_coords])
+    )
+    coords["layer"] = np.array(sorted(set(layers)))
+    times = [util.to_datetime(timestr) for timestr in timestrings]
+    times, use_cftime = util._convert_datetimes(times, use_cftime)
+    if use_cftime:
+        coords["time"] = xr.CFTimeIndex(np.unique(times))
+    else:
+        coords["time"] = np.unique(times)
+    shape = (1, coords["layer"].size, coords["y"].size, coords["x"].size)
+    dims = ("time", "layer", "y", "x")
 
-    # Sortby y-coordinate, since xarray.merge automatically sorts all
-    # coordinates in ascending order
-    # See issue: https://github.com/pydata/xarray/issues/2947
-    combined = xr.merge(subdomains).sortby("y", ascending=False)
+    # Collect and merge data
+    merged = []
+    for group in grouped_by_time.values():
+        # Build a single array per timestep
+        timestep_data = dask.delayed(_merge_subdomains)(group, use_cftime, pattern)
+        dask_array = dask.array.from_delayed(timestep_data, shape, dtype=np.float32)
+        merged.append(dask_array)
+    data = dask.array.concatenate(merged, axis=0)
 
-    # xr.merge always returns a Dataset. We want the DataArray.
-    data_vars = list(combined.data_vars.keys())
-    assert len(data_vars) == 1
-    name = data_vars[0]
+    # Get tops and bottoms if possible
+    headers = [header(path, pattern) for path in grouped_by_time[first_time][first]]
+    tops = [c.get("top", None) for c in headers]
+    bots = [c.get("bot", None) for c in headers]
+    layers = [c.get("layer", None) for c in headers]
+    _, unique_indices = np.unique(layers, return_index=True)
+    all_have_z = all(map(lambda v: v is not None, itertools.chain(tops, bots)))
+    if all_have_z:
+        if coords["layer"].size > 1:
+            coords = _array_z_coord(coords, tops, bots, unique_indices)
+        else:
+            coords = _scalar_z_coord(coords, tops, bots)
 
-    return combined[name]
+    return xr.DataArray(data, coords, dims)
+
+
+def _array_z_coord(coords, tops, bots, unique_indices):
+    top = np.array(tops)[unique_indices]
+    bot = np.array(bots)[unique_indices]
+    dz = top - bot
+    z = top - 0.5 * dz
+    if top[0] > top[1]:  # decreasing coordinate
+        dz *= -1.0
+    if np.allclose(dz, dz[0]):
+        coords["dz"] = dz[0]
+    else:
+        coords["dz"] = ("layer", dz)
+    coords["z"] = ("layer", z)
+    return coords
+
+
+def _scalar_z_coord(coords, tops, bots):
+    # They must be all the same to be used, as they cannot be assigned
+    # to layer.
+    top = np.unique(tops)
+    bot = np.unique(bots)
+    if top.size == bot.size == 1:
+        dz = top - bot
+        z = top - 0.5 * dz
+        coords["dz"] = float(dz)  # cast from array
+        coords["z"] = float(z)
+    return coords
 
 
 def _load(paths, use_cftime, pattern):
@@ -481,27 +563,9 @@ def _load(paths, use_cftime, pattern):
 
     if all_have_z:
         if haslayer and coords["layer"].size > 1:
-            top = np.array(tops)[unique_indices]
-            bot = np.array(bots)[unique_indices]
-            dz = top - bot
-            z = top - 0.5 * dz
-            if top[0] > top[1]:  # decreasing coordinate
-                dz *= -1.0
-            if np.allclose(dz, dz[0]):
-                coords["dz"] = dz[0]
-            else:
-                coords["dz"] = ("layer", dz)
-            coords["z"] = ("layer", z)
+            coords = _array_z_coord(coords, tops, bots, unique_indices)
         else:
-            # They must be all the same to be used, as they cannot be assigned
-            # to layer.
-            top = np.unique(tops)
-            bot = np.unique(bots)
-            if top.size == bot.size == 1:
-                dz = top - bot
-                z = top - 0.5 * dz
-                coords["dz"] = float(dz)  # cast from array
-                coords["z"] = float(z)
+            coords = _scalar_z_coord(coords, tops, bots)
 
     if hastime:
         times, use_cftime = util._convert_datetimes(times, use_cftime)
@@ -657,6 +721,59 @@ def _as_voxeldata(a):
     return a
 
 
+def _extra_dims(a):
+    dims = filter(lambda dim: dim not in ("y", "x"), a.dims)
+    return list(dims)
+
+
+def _write_chunks(a, pattern, d, nodata):
+    """
+    This function writes one chunk of the DataArray 'a' at a time. This is
+    necessary to avoid heavily sub-optimal scheduling by xarray/dask when
+    writing data to idf's. The problem appears to be caused by the fact that
+    .groupby results in repeated computations for every single IDF chunk
+    (time and layer). Specifically, merging several subdomains with
+    open_subdomains, and then calling save ends up being extremely slow.
+
+    This functions avoids this by calling compute() on the individual chunk,
+    before writing (so the chunk therefore has to fit in memory). 'x' and 'y'
+    dimensions are not treated as chunks, as all values over x and y have to
+    end up in single IDF file.
+
+    The number of chunks is not known beforehand; it may vary per dimension,
+    and the number of dimensions may vary as well. The naive solution to this
+    is a variable number of for loops, writting explicitly beforehand. Instead,
+    this function uses recursion, selecting one chunk per dimension per time.
+    The base case is one where only a single chunks remains, and then the write
+    occurs (ignoring chunks in x and y).
+    """
+    dim = a.dims[0]
+    dim_is_xy = (dim == "x") or (dim == "y")
+    nochunks = a.chunks is None or max(map(len, a.chunks)) == 1
+    if nochunks or dim_is_xy:  # Base case
+        a = a.compute()
+        extradims = _extra_dims(a)
+        if extradims:
+            stacked = a.stack(idf=extradims)
+            for coordvals, a_yx in list(stacked.groupby("idf")):
+                # set the right layer/timestep/etc in the dict to make the filename
+                d.update(dict(zip(extradims, coordvals)))
+                fn = util.compose(d, pattern)
+                write(fn, a_yx, nodata)
+        else:
+            fn = util.compose(d, pattern)
+            write(fn, a, nodata)
+    else:  # recursive case
+        chunksizes = a.chunks[0]
+        start = 0
+        for chunksize in chunksizes:
+            end = start + chunksize
+            b = a.isel({dim: slice(start, end)})
+            # Recurse
+            _write_chunks(b, pattern, d, nodata, False)
+            start = end
+
+
 def save(path, a, nodata=1.0e20, pattern=None):
     """
     Write a xarray.DataArray to one or more IDF files
@@ -752,23 +869,7 @@ def save(path, a, nodata=1.0e20, pattern=None):
 
     # stack all non idf dims into one new idf dimension,
     # over which we can then iterate to write all individual idfs
-    extradims = _extra_dims(a)
-    if extradims:
-        stacked = a.stack(idf=extradims)
-        for coordvals, a_yx in list(stacked.groupby("idf")):
-            # set the right layer/timestep/etc in the dict to make the filename
-            d.update(dict(zip(extradims, coordvals)))
-            fn = util.compose(d, pattern)
-            write(fn, a_yx, nodata)
-    else:
-        # no extra dims, only one IDF
-        fn = util.compose(d, pattern)
-        write(fn, a, nodata)
-
-
-def _extra_dims(a):
-    dims = filter(lambda dim: dim not in ("y", "x"), a.dims)
-    return list(dims)
+    _write_chunks(a, pattern, d, nodata)
 
 
 def write(path, a, nodata=1.0e20):
