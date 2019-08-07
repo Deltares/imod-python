@@ -65,51 +65,25 @@ class Modflow6(Model):
             else:
                 raise ValueError("Use either cftime or numpy.datetime64[ns].")
 
-    def time_discretization(self, endtime, starttime=None, *times):
-        """
-        Collect all unique times
-        """
-        self.use_cftime = self._use_cftime()
-
-        times = [imod.wq.timeutil.to_datetime(time, self.use_cftime) for time in times]
+    def _yield_times(self):
+        modeltimes = []
         for pkg in self.values():
             if "time" in pkg.coords:
-                times.append(pkg["time"].values)
+                modeltimes.append(pkg["times"].values)
+        return modeltimes
 
-        # TODO: check that endtime is later than all other times.
-        times.append(imod.wq.timeutil.to_datetime(endtime, self.use_cftime))
-        if starttime is not None:
-            times.append(imod.wq.timeutil.to_datetime(starttime, self.use_cftime))
-
-        # np.unique also sorts
-        times = np.unique(np.hstack(times))
-
-        duration = imod.wq.timeutil.timestep_duration(times, self.use_cftime)
-        # Generate time discretization, just rely on default arguments
-        # Probably won't be used that much anyway?
-        timestep_duration = xr.DataArray(
-            duration, coords={"time": np.array(times)[:-1]}, dims=("time",)
-        )
-        self["time_discretization"] = imod.wq.TimeDiscretization(
-            timestep_duration=timestep_duration
-        )
-
-    def write(self, directory=".", result_dir=None):
+    def write(self, directory, globaltimes):
         if isinstance(directory, str):
-            directory = pathlib.Path(directory).joinpath(self.modelname)
-        if result_dir is None:
-            result_dir = "results"
-        else:
-            result_dir = pathlib.Path(os.path.relpath(result_dir, directory))
+            directory = pathlib.Path(directory)
+        modeldirectory = directory / self.modelname
+        modeldirectory.mkdir(exist_ok=True, parents=True)
 
-        # # Start writing
-        # directory.mkdir(exist_ok=True, parents=True)
+        # write model namefile
+        namefile_content = self.render()
+        namefile_path = modeldirectory / f"{modelname}.nam"
+        with open(namefile_path, "w") as f:
+            f.write(namefile_content)
 
-        # # Write the runfile
-        # with open(runfilepath, "w") as f:
-        #     f.write(runfile_content)
-
-        # # Write all IDFs and IPFs
-        # for pkgname, pkg in self.items():
-        #     if "x" in pkg.coords and "y" in pkg.coords or pkg._pkg_id == "wel":
-        #         pkg.save(directory=directory.joinpath(pkgname))
+        # write package contents
+        for pkgname, pkg in self.items():
+            pkg.write(modeldirectory, pgkname, globaltimes)
