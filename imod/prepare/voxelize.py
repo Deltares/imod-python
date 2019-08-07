@@ -2,16 +2,15 @@ import numba
 import numpy as np
 import xarray as xr
 
-from .regrid import METHODS
-from .regrid import _overlap
-from .regrid import _coord
-from .regrid import _get_method
+
+from imod.prepare import common
 
 
-# Voxelize does not support conductance method or nearest
-METHODS = METHODS.copy()
+# Voxelize does not support conductance method, nearest, or linear
+METHODS = common.METHODS.copy()
 METHODS.pop("conductance")
 METHODS.pop("nearest")
+METHODS.pop("multilinear")
 
 
 @numba.njit(cache=True)
@@ -40,7 +39,7 @@ def _voxelize(src, dst, src_top, src_bot, dst_z, weights, values, method):
                     if np.isnan(z0) or np.isnan(z1):
                         continue
 
-                    overlap = _overlap((bot, top), (zb, zt))
+                    overlap = common._overlap((bot, top), (zb, zt))
                     if overlap == 0:
                         continue
 
@@ -68,11 +67,11 @@ class Voxelizer:
     method : str, function
         The method to use for regridding. Default available methods are:
         {"mean", "harmonic_mean", "geometric_mean", "sum", "minimum",
-        "maximum", "mode", "median", "max_overlap"}
+        "maximum", "mode", "median", "maxcommon._overlap"}
     """
 
     def __init__(self, method, use_relative_weights=False):
-        _method = _get_method(method, METHODS)
+        _method = common._get_method(method, METHODS)
         self.method = _method
         self._first_call = True
 
@@ -125,7 +124,7 @@ class Voxelizer:
             self._first_call = False
 
         dst_nlayer = like["z"].size
-        dst_z = _coord(like, "z")
+        dst_z = common._coord(like, "z")
         _, nrow, ncol = source.shape
 
         src_max_thickness = float((top - bottom).max())
