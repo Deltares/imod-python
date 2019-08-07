@@ -69,21 +69,9 @@ out how it works.
 Code review
 ~~~~~~~~~~~
 
-Create a branch, and send a merge or pull request. Your code doesn't
-have to be perfect! We'll have a look, an
-
-.. _Contributing to xarray guide: https://xarray.pydata.org/en/latest/contributing.html
-.. _pages: https://gitlab.com/deltares/imod/imod-python/issues
-.. _this stackoverflow article: https://stackoverflow.com/help/mcve
-.. _the extensive manual online: https://git-scm.com/doc
-.. _handbook: https://guides.github.com/introduction/git-handbook/
-.. _GitHub help: https://help.github.com/en
-.. _cheatsheet: https://github.github.com/training-kit/downloads/github-git-cheat-sheet/
-.. _interactive tutorial: https://learngitbranching.js.org/
-.. _Black: https://github.com/ambv/black
-.. _here: https://github.com/ambv/black#editor-integration
-.. _Format On Save: https://code.visualstudio.com/updates/v1_6#_format-on-save
-.. _pytest documentation: https://docs.pytest.org/en/latest/
+Create a branch, and send a merge or pull request. Your code doesn't have to be
+perfect! We'll have a look, and we will probably suggest some modifications or
+ask for some clarifications.
 
 How to release a new version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -107,3 +95,17 @@ To follow these steps, you need to be one of the maintainers for imod on both
 7. Upload the files from step 5 and 6 to PyPI with ``twine upload dist/*``
 
 8. For `conda-forge <https://github.com/conda-forge/imod-feedstock>`_, a PR will be created automatically. If the requirements are up to date in `meta.yaml <https://github.com/conda-forge/imod-feedstock/blob/master/recipe/meta.yaml>`_ then you can merge it. Otherwise you have to edit them and push this to the bot's branch.
+
+
+.. _Contributing to xarray guide: https://xarray.pydata.org/en/latest/contributing.html
+.. _pages: https://gitlab.com/deltares/imod/imod-python/issues
+.. _this stackoverflow article: https://stackoverflow.com/help/mcve
+.. _the extensive manual online: https://git-scm.com/doc
+.. _handbook: https://guides.github.com/introduction/git-handbook/
+.. _GitHub help: https://help.github.com/en
+.. _cheatsheet: https://github.github.com/training-kit/downloads/github-git-cheat-sheet/
+.. _interactive tutorial: https://learngitbranching.js.org/
+.. _Black: https://github.com/ambv/black
+.. _here: https://github.com/ambv/black#editor-integration
+.. _Format On Save: https://code.visualstudio.com/updates/v1_6#_format-on-save
+.. _pytest documentation: https://docs.pytest.org/en/latest/
