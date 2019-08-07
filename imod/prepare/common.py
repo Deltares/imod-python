@@ -210,8 +210,6 @@ def _match_dims(src, like):
 
     ndim_regrid = len(regrid_dims)
     # Check number of dimension to regrid
-    if ndim_regrid == 0:
-        return src
     if ndim_regrid > 3:
         raise NotImplementedError("cannot regrid over more than three dimensions")
 
