@@ -1,38 +1,7 @@
 from imod.mf6.pkgbase import Package
 
 
-class SolutionBase(Package):
-    def __init__(self, print_option, csv_output, no_ptc):
-        self.print_option = print_option
-        self.csv_output = csv_output
-        self.no_ptc = no_ptc
-
-
-class SolutionPresetSimple(SolutionBase):
-    def render(self):
-        d = {"complexity": "simple"}
-        for k, v in self.data_vars.items():
-            d[k] = v
-        self._template.render(**d)
-
-
-class SolutionPresetModerate(SolutionBase):
-    def render(self):
-        d = {"complexity": "moderate"}
-        for k, v in self.data_vars.items():
-            d[k] = v
-        self._template.render(**d)
-
-
-class SolutionPresetComplex(SolutionBase):
-    def render(self):
-        d = {"complexity": "complex"}
-        for k, v in self.data_vars.items():
-            d[k] = v
-        self._template.render(**d)
-
-
-class Solution(SolutionBase):
+class Solution(Package):
     def __init__(
         self,
         print_option,
@@ -85,3 +54,99 @@ class Solution(SolutionBase):
         self.number_orthogonalizations = number_orthogonalizations
         self.scaling_method = scaling_method
         self.reordering_method = reordering_method
+
+
+def SolutionPresetSimple(print_option, csv_output, no_ptc):
+    solution = Solution(
+        print_option=print_option,
+        csv_output=csv_output,
+        no_ptc=no_ptc,
+        outer_hclose=0.001,
+        outer_rclosebnd=0.1,
+        outer_maximum=25,
+        under_relaxation=None,
+        under_relaxation_theta=0.0,
+        under_relaxation_kappa=0.0,
+        under_relaxation_gamma=0.0,
+        under_relaxation_momentum=0.0,
+        backtracking_number=0.0,
+        backtracking_tolerance=0.0,
+        backtracking_reduction_factor=0.0,
+        backtracking_residual_limit=0.0,
+        inner_maximum=50,
+        inner_hclose=0.001,
+        inner_rclose=0.1,
+        rclose_option="infinity-norm",
+        linear_acceleration="cg",
+        relaxation_factor=0.0,
+        preconditioner_levels=0,
+        preconditioner_drop_tolerance=0,
+        number_orthogonalizations=0,
+        scaling_method=None,
+        reordering_method=None,
+    )
+    return solution
+
+
+def SolutionPresetModerate(print_option, csv_output, no_ptc):
+    solution = Solution(
+        print_option=print_option,
+        csv_output=csv_output,
+        no_ptc=no_ptc,
+        outer_hclose=0.01,
+        outer_rclosebnd=0.1,
+        outer_maximum=50,
+        under_relaxation="dbd",
+        under_relaxation_theta=0.9,
+        under_relaxation_kappa=0.0001,
+        under_relaxation_gamma=0.0,
+        under_relaxation_momentum=0.0,
+        backtracking_number=0,
+        backtracking_tolerance=0.0,
+        backtracking_reduction_factor=0.0,
+        backtracking_residual_limit=0.0,
+        inner_maximum=100,
+        inner_hclose=0.01,
+        inner_rclose=0.1,
+        rclose_option="infinity-norm",
+        linear_acceleration="bicgstab",
+        relaxation_factor=0,
+        preconditioner_levels=0,
+        preconditioner_drop_tolerance=0.0,
+        number_orthogonalizations=0,
+        scaling_method=None,
+        reordering_method=None,
+    )
+    return solution
+
+
+def SolutionPresetComplex(print_option, csv_output, no_ptc):
+    solution = Solution(
+        print_option=print_option,
+        csv_output=csv_output,
+        no_ptc=no_ptc,
+        outer_hclose=0.1,
+        outer_rclosebnd=0.1,
+        outer_maximum=100,
+        under_relaxation="dbd",
+        under_relaxation_theta=0.8,
+        under_relaxation_kappa=0.0001,
+        under_relaxation_gamma=0.0,
+        under_relaxation_momentum=0.0,
+        backtracking_number=20,
+        backtracking_tolerance=1.05,
+        backtracking_reduction_factor=0.1,
+        backtracking_residual_limit=0.002,
+        inner_maximum=500,
+        inner_hclose=0.1,
+        inner_rclose=0.1,
+        rclose_option="infinity-norm",
+        linear_acceleration="bicgstab",
+        relaxation_factor=0.0,
+        preconditioner_levels=5,
+        preconditioner_drop_tolerance=0.0001,
+        number_orthogonalizations=2,
+        scaling_method=None,
+        reordering_method=None,
+    )
+    return solution
