@@ -770,7 +770,7 @@ def _write_chunks(a, pattern, d, nodata):
             end = start + chunksize
             b = a.isel({dim: slice(start, end)})
             # Recurse
-            _write_chunks(b, pattern, d, nodata, False)
+            _write_chunks(b, pattern, d, nodata)
             start = end
 
 
