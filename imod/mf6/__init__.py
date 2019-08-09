@@ -6,3 +6,4 @@ Create a structured Modflow 6 model.
 from imod.mf6.drn import Drainage
 from imod.mf6.timedis import TimeDiscretization
 from imod.mf6.pkgbase import Package, BoundaryCondition
+from imod.mf6.dis import StructuredDiscretization

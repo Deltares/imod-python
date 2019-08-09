@@ -70,13 +70,13 @@ class Package(xr.Dataset):
         outpath.parent.mkdir(exist_ok=True, parents=True)
         sparse_data.tofile(outpath)
 
-    def render(self):
+    def render(self, *args, **kwargs):
         d = {}
         for k, v in self.data_vars.items():
             d[k] = v
         self._template.render(**d)
 
-    def _compose_values(self, varname, directory, *args, **kwargs):
+    def _compose_values(self, da, directory, *args, **kwargs):
         """
         Compose values of dictionary.
 
@@ -85,14 +85,12 @@ class Package(xr.Dataset):
 
         See documentation of wq
         """
-        da = self[varname]
-
         layered = False
         values = []
-        if "x" in da.coords and "y" in da.coords:
-            values.append(f"open/close {directory}/{self._pkg_id}_{s}.bin (binary)")
+        if "x" in da.dims and "y" in da.dims:
+            values.append(f"open/close {directory}/{self._pkg_id}.bin (binary)")
         else:
-            if "layer" in da.coords:
+            if "layer" in da.dims:
                 layered = True
                 for layer in da.coords["layer"]:
                     values.append(f"constant {da.sel(layer=layer).values[()]}")

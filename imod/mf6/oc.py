@@ -14,6 +14,7 @@ class OutputControl(Package):
     save_budget : bool, or xr.DataArray of bools
         Bool per stress period
     """
+
     _pkg_id = "oc"
 
     def __init__(self, save_head, save_budget):
