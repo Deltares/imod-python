@@ -23,13 +23,6 @@ class Package(xr.Dataset):
         env = jinja2.Environment(loader=loader)
         self._template = env.get_template(f"gwf-{self._pkg_id}.j2")
 
-    def render(self, *args, **kwargs):
-        d = {k: v.values for k, v in self.data_vars.items()}
-        if hasattr(self, "_keywords"):
-            for key in self._keywords.keys():
-                self._replace_fomat(d, key)
-        return self._template.format(**d)
-
     def write_blockfile(self, directory, pkgname, globaltimes=None):
         content = self.render(directory, pkgname, globaltimes)
         filename = directory / f"{pkgname}.{self._pkg_id}"
@@ -69,6 +62,33 @@ class Package(xr.Dataset):
         sparse_data = self.to_sparse(arrays)
         outpath.parent.mkdir(exist_ok=True, parents=True)
         sparse_data.tofile(outpath)
+
+    def write_binary_griddata(self, outpath, da, dtype):
+        # From the modflow6 source, the header is defined as:
+        # integer(I4B) :: kstp --> np.int8
+        # integer(I4B) :: pertim --> np.int8
+        # character(len=16) :: text --> 16 * np.int8
+        # integer(I4B) :: m1, m2, m3 --> 3 * np.int8
+        # so writing 21 bytes suffices to create a header.
+        haslayer = "layer" in da.dims
+        if haslayer:
+            _, nrow, ncol = da.shape
+        else:
+            nrow, ncol = da.shape
+
+        header = np.zeros(21, np.int8)
+        header[18] = np.int8(ncol)
+        header[19] = np.int8(nrow)
+        header[20] = 1
+        with open(outpath, "w") as f:
+            if haslayer:
+                for layer in da.dims["layer"]:
+                    a = da.sel(layer=layer)
+                    header.to_file(f)
+                    a.values.flatten().astype(dtype).to_file(f)
+            else:
+                header.to_file(f)
+                da.values.flatten().astype(dtype).to_file(f)
 
     def render(self, *args, **kwargs):
         d = {}
