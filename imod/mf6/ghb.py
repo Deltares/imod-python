@@ -1,23 +1,20 @@
 from imod.mf6.pkgbase import BoundaryCondition
 
 
-class Drainage(BoundaryCondition):
-
-    _pkg_id = "drn"
-    # has to be ordered as in the list
-    _binary_data = ("elevation", "conductance")
+class GeneralHeadBoundary(BoundaryCondition):
+    _pkg_id = "ghb"
+    _binary_data = ("head", "conductance")
 
     def __init__(
         self,
-        elevation,
+        head,
         conductance,
         print_input=False,
         print_flows=False,
         save_flows=False,
         observations=None,
     ):
-        super(__class__, self).__init__()
-        self["elevation"] = elevation
+        self["head"] = head
         self["conductance"] = conductance
         self["print_input"] = print_input
         self["print_flows"] = print_flows
