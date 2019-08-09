@@ -35,3 +35,5 @@ class Evapotranspiration(BoundaryCondition):
         self["observations"] = observations
         self._initialize_template()
 
+        # TODO: add write logic for transforming proportion rate and depth to
+        # the right shape in the binary file.
