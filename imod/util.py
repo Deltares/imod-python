@@ -314,7 +314,7 @@ def coord_reference(da_coord):
         if not np.allclose(dxs, dx, atolx):
             raise ValueError(
                 f"DataArray has to be equidistant along {da_coord.name}, or cellsizes"
-                " must be provided as a coordinate named d{da_coord.name}."
+                f" must be provided as a coordinate named d{da_coord.name}."
             )
 
         # as xarray uses midpoint coordinates
@@ -350,12 +350,12 @@ def spatial_reference(a):
         dy, ymin, ymax = coord_reference(a["y"])
     elif ncol == 1:
         dy, ymin, ymax = coord_reference(a["y"])
-        dx = abs(dy)
+        dx = 1.0
         xmin = float(x.min()) - 0.5 * abs(dy)
         xmax = float(x.max()) + 0.5 * abs(dy)
     elif nrow == 1:
         dx, xmin, xmax = coord_reference(a["x"])
-        dy = -abs(dx)
+        dy = -1.0
         ymin = float(y.min()) - 0.5 * abs(dy)
         ymax = float(y.max()) + 0.5 * abs(dy)
     else:  # ncol == 1 and nrow == 1:
