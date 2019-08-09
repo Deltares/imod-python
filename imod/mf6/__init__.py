@@ -14,10 +14,11 @@ from imod.mf6.ims import (
     SolutionPresetModerate,
     SolutionPresetSimple,
 )
-from imod.mf6.model import Modflow6
+from imod.mf6.model import GroundwaterFlowModel
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.oc import OutputControl
 from imod.mf6.rch import Recharge
 from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.sto import Storage
 from imod.mf6.timedis import TimeDiscretization
+from imod.mf6.wel import Well

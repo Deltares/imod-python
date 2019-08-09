@@ -19,7 +19,7 @@ class Model(collections.UserDict):
             self[k] = v
 
 
-class Modflow6(Model):
+class GroundwaterFlowModel(Model):
     """
     Contains data and writes consistent model input files
     """
@@ -27,6 +27,7 @@ class Modflow6(Model):
     _pkg_id = "model"
 
     def __init__(self, newton=False, under_relaxation=False):
+        super(__class__, self).__init__()
         self.newton = newton
         self.under_relaxation = under_relaxation
 

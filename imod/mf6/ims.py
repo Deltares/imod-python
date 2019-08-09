@@ -4,57 +4,57 @@ from imod.mf6.pkgbase import Package
 class Solution(Package):
     def __init__(
         self,
-        print_option,
-        csv_output,
-        no_ptc,
         outer_hclose,
-        outer_rclosebnd,
         outer_maximum,
-        under_relaxation,
-        under_relaxation_theta,
-        under_relaxation_kappa,
-        under_relaxation_gamma,
-        under_relaxation_momentum,
-        backtracking_number,
-        backtracking_tolerance,
-        backtracking_reduction_factor,
-        backtracking_residual_limit,
         inner_maximum,
         inner_hclose,
         inner_rclose,
-        rclose_option,
         linear_acceleration,
-        relaxation_factor,
-        preconditioner_levels,
-        preconditioner_drop_tolerance,
-        number_orthogonalizations,
-        scaling_method,
-        reordering_method,
+        outer_rclosebnd=None,
+        under_relaxation=None,
+        under_relaxation_theta=None,
+        under_relaxation_kappa=None,
+        under_relaxation_gamma=None,
+        under_relaxation_momentum=None,
+        backtracking_number=None,
+        backtracking_tolerance=None,
+        backtracking_reduction_factor=None,
+        backtracking_residual_limit=None,
+        rclose_option=None,
+        relaxation_factor=None,
+        preconditioner_levels=None,
+        preconditioner_drop_tolerance=None,
+        number_orthogonalizations=None,
+        scaling_method=None,
+        reordering_method=None,
+        print_option=False,
+        csv_output=False,
+        no_ptc=False,
     ):
         super(__class__, self).__init__()
-        self.outer_hclose = outer_hclose
-        self.outer_rclosebnd = outer_rclosebnd
-        self.outer_maximum = outer_maximum
-        self.under_relaxation = under_relaxation
-        self.under_relaxation_theta = under_relaxation_theta
-        self.under_relaxation_kappa = under_relaxation_kappa
-        self.under_relaxation_gamma = under_relaxation_gamma
-        self.under_relaxation_momentum = under_relaxation_momentum
-        self.backtracking_number = backtracking_number
-        self.backtracking_tolerance = backtracking_tolerance
-        self.backtracking_reduction_factor = backtracking_reduction_factor
-        self.backtracking_residual_limit = backtracking_residual_limit
-        self.inner_maximum = inner_maximum
-        self.inner_hclose = inner_hclose
-        self.inner_rclose = inner_rclose
-        self.rclose_option = rclose_option
-        self.linear_acceleration = linear_acceleration
-        self.relaxation_factor = relaxation_factor
-        self.preconditioner_levels = preconditioner_levels
-        self.preconditioner_drop_tolerance = preconditioner_drop_tolerance
-        self.number_orthogonalizations = number_orthogonalizations
-        self.scaling_method = scaling_method
-        self.reordering_method = reordering_method
+        self["outer_hclose"] = outer_hclose
+        self["outer_rclosebnd"] = outer_rclosebnd
+        self["outer_maximum"] = outer_maximum
+        self["under_relaxation"] = under_relaxation
+        self["under_relaxation_theta"] = under_relaxation_theta
+        self["under_relaxation_kappa"] = under_relaxation_kappa
+        self["under_relaxation_gamma"] = under_relaxation_gamma
+        self["under_relaxation_momentum"] = under_relaxation_momentum
+        self["backtracking_number"] = backtracking_number
+        self["backtracking_tolerance"] = backtracking_tolerance
+        self["backtracking_reduction_factor"] = backtracking_reduction_factor
+        self["backtracking_residual_limit"] = backtracking_residual_limit
+        self["inner_maximum"] = inner_maximum
+        self["inner_hclose"] = inner_hclose
+        self["inner_rclose"] = inner_rclose
+        self["rclose_option"] = rclose_option
+        self["linear_acceleration"] = linear_acceleration
+        self["relaxation_factor"] = relaxation_factor
+        self["preconditioner_levels"] = preconditioner_levels
+        self["preconditioner_drop_tolerance"] = preconditioner_drop_tolerance
+        self["number_orthogonalizations"] = number_orthogonalizations
+        self["scaling_method"] = scaling_method
+        self["reordering_method"] = reordering_method
 
     def write(self, directory, solvername):
         ims_path = directory / f"{solvername}.ims"
