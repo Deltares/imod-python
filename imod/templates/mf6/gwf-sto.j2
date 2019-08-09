@@ -1,18 +1,20 @@
 begin options
-{%- if save_flows is defined -%}  save_flows{%- endif -%}
-{%- if storagecoefficient is defined -%}  storagecoefficient{%- endif -%}
+{% if save_flows is defined %}  save_flows
+{% endif %}
+{%- if storagecoefficient is defined %}  storagecoefficient
+{% endif -%}
 end options
 
 begin griddata
-  iconvert {% if layered is sameas true %}layered{% endif %}
-    {iconvert}
-  ss {% if layered is sameas true %}layered{% endif %}
-    {ss}
-  sy {% if layered is sameas true %}layered{% endif %}
-    {sy}
+  iconvert{% if iconvert_layered is sameas true %} layered{% endif %}
+{% for x in iconvert %}    {{x}}
+{% endfor %}  ss{% if ss_layered is sameas true %} layered{% endif %}
+{% for x in ss %}    {{x}}
+{% endfor %}  sy{% if sy_layered is sameas true %} layered{% endif %}
+{% for x in sy %}    {{x}}
+{% endfor -%}
 end griddata
 
 {% for i, path in periods.items() %}begin period {{i}}
     open/close {{path}} (binary)
 end period{% endfor %}
-

@@ -1,5 +1,5 @@
 begin options
-{% if auxiliary is defined %}  auxiliary {{auxiliary(naux)}}
+{% if auxiliary is defined %}  auxiliary {{auxiliary}}
 {% endif %}
 {%- if auxmultname is defined %}  auxmultname {{auxmultname}}
 {% endif %}
@@ -26,4 +26,3 @@ end dimensions
 {% for i, path in periods.items() %}begin period {{i}}
   open/close {{path}} (binary)
 end period{% endfor %}
-

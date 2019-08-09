@@ -1,9 +1,14 @@
 begin options
-{%- if length_units is defined -%}  length_units {{length_units}}{%- endif -%}
-{%- if nogrb is defined -%}  nogrb{%- endif -%}
-{%- if xorigin is defined -%}  xorigin {{xorigin}}{%- endif -%}
-{%- if yorigin is defined -%}  yorigin {{yorigin}}{%- endif -%}
-{%- if angrot is defined -%}  angrot {{angrot}}{%- endif -%}
+{% if length_units is defined %}  length_units {{length_units}}
+{% endif %}
+{%- if nogrb is defined %}  nogrb
+{% endif %}
+{%- if xorigin is defined %}  xorigin {{xorigin}}
+{% endif %}
+{%- if yorigin is defined %}  yorigin {{yorigin}}
+{% endif %}
+{%- if angrot is defined %}  angrot {{angrot}}
+{% endif -%}
 end options
 
 begin dimensions
@@ -14,14 +19,15 @@ end dimensions
 
 begin griddata
   delr
-    {delr}
+    {{delr}}
   delc
-    {delc}
+    {{delc}}
   top
-    {top}
-  botm {% if layered is sameas true %}layered{% endif %}
-    {botm}
-{%- if idomain is defined -%}  idomain {% if layered is sameas true %}layered{% endif %}
-    {idomain}{%- endif -%}
+{% for x in top %}    {{x}}
+{% endfor %}  botm{% if botm_layered is sameas true %} layered{% endif %}
+{% for x in botm %}    {{x}}
+{% endfor %}{% if idomain is defined %}  idomain{% if idomain_layered is sameas true %} layered{% endif %}
+{% for x in idomain %}    {{x}}
+{% endfor -%}
+{% endif -%}
 end griddata
-

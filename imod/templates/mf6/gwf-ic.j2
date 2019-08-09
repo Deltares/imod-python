@@ -1,5 +1,5 @@
 begin griddata
-  strt {% if layered is sameas true %}layered{% endif %}
-    {strt}
+  strt{% if strt_layered is sameas true %} layered{% endif %}
+{% for x in strt %}    {{x}}
+{% endfor -%}
 end griddata
-

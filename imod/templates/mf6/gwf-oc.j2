@@ -1,10 +1,12 @@
 begin options
-{%- if budget_filerecord is defined -%}  budget fileout {{budgetfile}}{%- endif -%}
-{%- if head_filerecord is defined -%}  head fileout {{headfile}}{%- endif -%}
-{%- if headprintrecord is defined -%}  head print_format columns {{columns}} width {{width}} digits {{digits}} {{format}}{%- endif -%}
+{% if budget_filerecord is defined %}  budget fileout {{budgetfile}}
+{% endif %}
+{%- if head_filerecord is defined %}  head fileout {{headfile}}
+{% endif %}
+{%- if headprintrecord is defined %}  head print_format columns {{columns}} width {{width}} digits {{digits}} {{format}}
+{% endif -%}
 end options
 
 {% for i, path in periods.items() %}begin period {{i}}
     open/close {{path}} (binary)
 end period{% endfor %}
-
