@@ -76,4 +76,3 @@ class Modflow6Simulation(collections.UserDict):
                 value.write(modeldirectory, globaltimes)
             elif value._pkg_id == "ims":
                 value.write(directory, key)
-

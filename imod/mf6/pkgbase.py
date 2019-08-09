@@ -7,6 +7,15 @@ import xarray as xr
 
 
 class Package(xr.Dataset):
+    """
+    Package is used to share methods for specific packages with no time component.
+
+    It is not meant to be used directly, only to inherit from, to implement new packages.
+    
+    This class only supports `array input <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=16>`_,
+    not the list input which is used in :class:`BoundaryCondition`.
+    """
+
     _template = None
 
     def _initialize_template(self):
@@ -94,6 +103,15 @@ class Package(xr.Dataset):
 
 
 class BoundaryCondition(Package):
+    """
+    BoundaryCondition is used to share methods for specific stress packages with a time component.
+
+    It is not meant to be used directly, only to inherit from, to implement new packages.
+
+    This class only supports `list input <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=19>`_,
+    not the array input which is used in :class:`Package`.
+    """
+
     def _max_active_n(self):
         """
         Determine the maximum active number of cells that are active

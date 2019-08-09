@@ -23,6 +23,7 @@ class Modflow6(Model):
     """
     Contains data and writes consistent model input files
     """
+
     _pkg_id = "model"
 
     def __init__(self, newton=False, under_relaxation=False):
