@@ -23,9 +23,11 @@ class Modflow6(Model):
     """
     Contains data and writes consistent model input files
     """
+    _pkg_id = "model"
 
-    def __init__(self, modelname, newton=False, under_relaxation=False):
-        self.modelname = modelname
+    def __init__(self, newton=False, under_relaxation=False):
+        self.newton = newton
+        self.under_relaxation = under_relaxation
 
     def _get_pkgkey(self, pkg_id):
         """
@@ -84,14 +86,11 @@ class Modflow6(Model):
         d["packages"] = packages
         return self._template.render(**d)
 
-    def write(self, directory, globaltimes):
+    def write(self, modeldirectory, globaltimes):
         """
         Write model namefile
         Write packages
         """
-        if isinstance(directory, str):
-            directory = pathlib.Path(directory)
-        modeldirectory = directory / self.modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
 
         # write model namefile

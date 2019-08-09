@@ -14,8 +14,6 @@ class Modflow6Simulation(collections.UserDict):
 
     def __setitem__(self, key, value):
         # Synchronize names
-        if isinstance(imod.mf6.model.Modflow6, value):
-            value.modelname = key
         super(__class__, self).__setitem__(key, value)
 
     def update(self, *args, **kwargs):
@@ -69,19 +67,13 @@ class Modflow6Simulation(collections.UserDict):
         # Write time discretization file
         self["time_discretization"].write(directory)
 
-        # Write solution groups
-        # TODO: where is the mapping between model and solution group?
-        # not very relevant now, all models will belong to a single solution
-        for key, solution in self.items():
-            try:
-                if solution._pkg_id == "ims":
-                    solution.write(directory, key)
-            except AttributeError:
-                continue
-
         # Write individual models
         globaltimes = self["time_discretization"]["time"].values
-        for model in self.values():
-            # skip timedis, solution group, and exchanges
-            if hasattr(model, "modelname"):
-                model.write(directory, globaltimes)
+        for key, value in self.values():
+            # skip timedis, exchanges
+            if value._pkg_id == "model":
+                modeldirectory = directory / key
+                value.write(modeldirectory, globaltimes)
+            elif value._pkg_id == "ims":
+                value.write(directory, key)
+
