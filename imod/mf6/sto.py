@@ -7,6 +7,7 @@ class Storage(Package):
     _pkg_id = "sto"
 
     def __init__(self, specific_storage, specific_yield, transient, convertible):
+        super(__class__, self).__init__()
         self["specific_storage"] = specific_storage
         self["specific_yield"] = specific_yield
         self["convertible"] = convertible

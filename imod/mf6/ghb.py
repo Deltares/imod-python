@@ -14,6 +14,7 @@ class GeneralHeadBoundary(BoundaryCondition):
         save_flows=False,
         observations=None,
     ):
+        super(__class__, self).__init__()
         self["head"] = head
         self["conductance"] = conductance
         self["print_input"] = print_input

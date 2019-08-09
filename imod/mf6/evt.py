@@ -18,6 +18,7 @@ class Evapotranspiration(BoundaryCondition):
         save_flows=False,
         observations=None,
     ):
+        super(__class__, self).__init__()
         self["surface"] = surface
         self["rate"] = rate
         self["depth"] = depth

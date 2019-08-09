@@ -12,6 +12,7 @@ class Recharge(BoundaryCondition):
         save_flows=False,
         observations=None,
     ):
+        super(__class__, self).__init__()
         self["rate"] = rate
         self["print_input"] = print_input
         self["print_flows"] = print_flows

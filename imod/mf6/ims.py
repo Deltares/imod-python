@@ -31,6 +31,7 @@ class Solution(Package):
         scaling_method,
         reordering_method,
     ):
+        super(__class__, self).__init__()
         self.outer_hclose = outer_hclose
         self.outer_rclosebnd = outer_rclosebnd
         self.outer_maximum = outer_maximum
