@@ -92,7 +92,15 @@ gwf_model["npf"] = imod.mf6.NodePropertyFlow(
 )
 gwf_model["oc"] = imod.mf6.OutputControl(save_head=True, save_budget=True)
 gwf_model["rch"] = imod.mf6.Recharge(rate=3.0e-8)
-gwf_model["wel"] = imod.mf6.Well(layer=layer, row=row, column=column, rate=rate, print_input=True, print_flows=True, save_flows=True)
+gwf_model["wel"] = imod.mf6.Well(
+    layer=layer,
+    row=row,
+    column=column,
+    rate=rate,
+    print_input=True,
+    print_flows=True,
+    save_flows=True,
+)
 
 # Attach it to a simulation
 simulation = imod.mf6.Modflow6Simulation("ex01-twri")
@@ -115,5 +123,3 @@ simulation["solver"] = imod.mf6.Solution(
 )
 # Collect time discretization
 simulation.time_discretization(starttime="2000-01-01", endtime="2000-01-02")
-
-

@@ -49,7 +49,9 @@ class NodePropertyFlow(Package):
     ):
         super(__class__, self).__init__()
         # check rewetting
-        if not rewet and any([rewet_layer, rewet_factor, rewet_iterations, rewet_method]):
+        if not rewet and any(
+            [rewet_layer, rewet_factor, rewet_iterations, rewet_method]
+        ):
             raise ValueError(
                 "rewet_layer, rewet_factor, rewet_iterations, and rewet_method should"
                 " all be left at a default value of None if rewet is False."
