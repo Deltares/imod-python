@@ -24,20 +24,20 @@ class TimeDiscretization(Package):
 
         # Broadcast everything to a 1D array so it's iterable
         # also fills in a scalar value everywhere
-        broadcast_array = np.ones(nper)
-        timestep_duration *= broadcast_array
-        n_timesteps *= broadcast_array
-        timestep_multiplier *= broadcast_array
+        broadcast_array = np.ones(nper, dtype=np.int)
+        timestep_duration = np.atleast_1d(timestep_duration) * broadcast_array
+        n_timesteps = np.atleast_1d(n_timesteps) * broadcast_array
+        timestep_multiplier = np.atleast_1d(timestep_multiplier) * broadcast_array
 
         # Zip through the arrays
-        period_data = []
-        for (perlen, nstp, tsmult) in enumerate(
-            zip(timestep_multiplier, n_timesteps, timestep_multiplier)
+        perioddata = []
+        for (perlen, nstp, tsmult) in zip(
+            timestep_multiplier, n_timesteps, timestep_multiplier
         ):
-            period_data.append({"perlen": perlen, "nstp": nstp, "tsmult": tsmult})
-        d["period_data"] = period_data
+            perioddata.append((perlen, nstp, tsmult))
+        d["perioddata"] = perioddata
 
-        return self._template.render(**d)
+        return self._template.render(d)
 
     def write(self, directory):
         timedis_content = self.render()

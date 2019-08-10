@@ -1,3 +1,5 @@
+import textwrap
+
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -123,3 +125,25 @@ simulation["solver"] = imod.mf6.Solution(
 )
 # Collect time discretization
 simulation.time_discretization(starttime="2000-01-01", endtime="2000-01-02")
+
+#simulation.write("ex01-twri")
+
+actual = simulation["time_discretization"].render()
+expected = textwrap.dedent(
+    """\
+        begin options
+          time_units days
+        end options
+
+        begin dimensions
+          nper 1
+        end dimensions
+
+        begin perioddata
+          1.0 1 1.0
+        end perioddata"""
+)
+assert actual == expected
+
+
+actual["GWF_1"].render()

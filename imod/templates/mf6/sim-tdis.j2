@@ -10,7 +10,6 @@ begin dimensions
 end dimensions
 
 begin perioddata
-{% for perlen, nstp, tsmult in perioddata %}
-  {{perlen}} {{nstp}} {{tsmult}}
+{% for perlen, nstp, tsmult in perioddata %}  {{perlen}} {{nstp}} {{tsmult}}
 {% endfor -%}
 end perioddata
