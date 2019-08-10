@@ -39,7 +39,7 @@ elevation[7, 1:10] = np.array([0.0, 0.0, 10.0, 20.0, 30.0, 50.0, 70.0, 90.0, 100
 conductance[7, 1:10] = 0.0
 
 # Node properties
-celltype = xr.DataArray([1, 0, 0], {"layer": layer}, ("layer",))
+icelltype = xr.DataArray([1, 0, 0], {"layer": layer}, ("layer",))
 k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": layer}, ("layer",))
 k33 = xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",))
 
@@ -82,7 +82,7 @@ gwf_model["drn"] = imod.mf6.Drainage(
 )
 gwf_model["ic"] = imod.mf6.InitialConditions(head=0.0)
 gwf_model["npf"] = imod.mf6.NodePropertyFlow(
-    celltype=celltype,
+    icelltype=icelltype,
     k=k,
     k33=k33,
     variable_vertical_conductance=True,

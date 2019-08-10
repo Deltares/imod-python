@@ -105,7 +105,7 @@ class Package(xr.Dataset):
         d = {}
         for k, v in self.data_vars.items():
             value = v.values[()]
-            if value is not None:
+            if value:  # skip None and False
                 d[k] = value
         return self._template.render(d)
 
@@ -128,7 +128,9 @@ class Package(xr.Dataset):
                 for layer in da.coords["layer"]:
                     values.append(f"constant {da.sel(layer=layer).values[()]}")
             else:
-                values.append(f"constant {da.values[()]}")
+                value = da.values[()]
+                if value:  # skip None or False
+                    values.append(f"constant {value}")
 
         return layered, values
 

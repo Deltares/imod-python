@@ -15,7 +15,7 @@ class NodePropertyFlow(Package):
 
     _pkg_id = "npf"
     _binary_data = (
-        "celltype",
+        "icelltype",
         "k",
         "rewet_layer",
         "k22",
@@ -27,7 +27,7 @@ class NodePropertyFlow(Package):
 
     def __init__(
         self,
-        celltype,
+        icelltype,
         k,
         rewet=False,
         rewet_layer=None,
@@ -56,7 +56,7 @@ class NodePropertyFlow(Package):
                 "rewet_layer, rewet_factor, rewet_iterations, and rewet_method should"
                 " all be left at a default value of None if rewet is False."
             )
-        self["celltype"] = celltype
+        self["icelltype"] = icelltype
         self["k"] = k
         self["rewet"] = rewet
         self["rewet_layer"] = rewet_layer
@@ -77,3 +77,32 @@ class NodePropertyFlow(Package):
         self["dewatered"] = dewatered
         self["perched"] = perched
         self["save_specific_discharge"] = save_specific_discharge
+        self._initialize_template()
+
+    def render(self, directory, pkgname, *args, **kwargs):
+        d = {}
+        replace_keywords = {
+            "rewet": "rewet_record",
+            "rewet_factor": "wetfct",
+            "rewet_iterations": "rewet_iterations",
+            "rewet_method": "ihdwet",
+            "rewet_layer": "wetdry",
+            "variable_vertical_conductance": "variablecv",
+            "starting_head_as_confined_thickness": "thickstrt",
+        }
+        for varname in self.data_vars:
+            if varname in replace_keywords:
+                key = replace_keywords[varname]
+            else:
+                key = varname
+
+            if varname in self._binary_data:
+                layered, value = self._compose_values(self[varname], directory)
+                if value:  # skip False or None
+                    d[f"{key}_layered"], d[key] = layered, value
+            else:
+                value = self[varname].values[()]
+                if value:  # skip False or None
+                    d[key] = value
+
+        return self._template.render(d)
