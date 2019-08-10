@@ -98,11 +98,11 @@ class NodePropertyFlow(Package):
 
             if varname in self._binary_data:
                 layered, value = self._compose_values(self[varname], directory)
-                if value:  # skip False or None
+                if self._valid(value):  # skip False or None
                     d[f"{key}_layered"], d[key] = layered, value
             else:
                 value = self[varname].values[()]
-                if value:  # skip False or None
+                if self._valid(value):  # skip False or None
                     d[key] = value
 
         return self._template.render(d)

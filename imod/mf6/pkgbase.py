@@ -18,6 +18,21 @@ class Package(xr.Dataset):
 
     _template = None
 
+    def _valid(self, value):
+        """
+        Filters values that are None, False, or a numpy.bool_ False.
+        Needs to be this specific, since 0.0 and 0 are valid values, but are
+        equal to a boolean False.
+        """
+        # Test singletons
+        if value is False or value is None:
+            return False
+        # Test numpy bool (not singleton)
+        elif isinstance(value, np.bool_) and not value:
+            return False
+        else:
+            return True
+
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader)
@@ -101,7 +116,7 @@ class Package(xr.Dataset):
         d = {}
         for k, v in self.data_vars.items():
             value = v.values[()]
-            if value:  # skip None and False
+            if self._valid(value):  # skip None and False
                 d[k] = value
         return self._template.render(d)
 
@@ -125,8 +140,10 @@ class Package(xr.Dataset):
                     values.append(f"constant {da.sel(layer=layer).values[()]}")
             else:
                 value = da.values[()]
-                if value:  # skip None or False
+                if self._valid(value):  # skip None or False
                     values.append(f"constant {value}")
+                else:
+                    values = None
 
         return layered, values
 
