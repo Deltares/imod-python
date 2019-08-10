@@ -15,7 +15,7 @@ def twri_model(request):
     nrow = 15
     ncol = 15
     shape = (nlay, nrow, ncol)
-    
+
     dx = 5000.0
     dy = -5000.0
     xmin = 0.0
@@ -23,32 +23,32 @@ def twri_model(request):
     ymin = 0.0
     ymax = abs(dy) * nrow
     dims = ("layer", "y", "x")
-    
+
     layer = np.array([1, 2, 3])
     y = np.arange(ymax, ymin, dy) + 0.5 * dy
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
     coords = {"layer": layer, "y": y, "x": x}
-    
+
     # Discretization data
     idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
     bottom = xr.DataArray([-200.0, -350.0, -450.0], {"layer": layer}, ("layer",))
-    
+
     # Constant head
     head = xr.full_like(idomain, np.nan).sel(layer=[1, 2])
     head[...] = np.nan
     head[..., 0] = 0.0
-    
+
     # Drainage
     elevation = xr.full_like(idomain.sel(layer=1), np.nan)
     conductance = xr.full_like(idomain.sel(layer=1), np.nan)
     elevation[7, 1:10] = np.array([0.0, 0.0, 10.0, 20.0, 30.0, 50.0, 70.0, 90.0, 100.0])
     conductance[7, 1:10] = 0.0
-    
+
     # Node properties
     icelltype = xr.DataArray([1, 0, 0], {"layer": layer}, ("layer",))
     k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": layer}, ("layer",))
     k33 = xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",))
-    
+
     # Well
     layer = [3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     row = [5, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13]
@@ -70,7 +70,7 @@ def twri_model(request):
         -5.0,
         -5.0,
     ]
-    
+
     # Create and fill the groundwater model.
     gwf_model = imod.mf6.GroundwaterFlowModel()
     gwf_model["dis"] = imod.mf6.StructuredDiscretization(
@@ -107,7 +107,7 @@ def twri_model(request):
         print_flows=True,
         save_flows=True,
     )
-    
+
     # Attach it to a simulation
     simulation = imod.mf6.Modflow6Simulation("ex01-twri")
     simulation["GWF_1"] = gwf_model
@@ -140,11 +140,11 @@ def test_timedis_render(twri_model):
             begin options
               time_units days
             end options
-    
+
             begin dimensions
               nper 1
             end dimensions
-    
+
             begin perioddata
               1.0 1 1.0
             end perioddata"""
@@ -160,7 +160,7 @@ def test_gwfmodel_render(twri_model):
         """\
             begin options
             end options
-    
+
             begin packages
               dis6 GWF_1/dis.dis
               chd6 GWF_1/chd.chd
@@ -182,18 +182,18 @@ def test_simulation_render(twri_model):
         """\
             begin options
             end options
-    
+
             begin timing
               tdis6 time_discretization.tdis
             end timing
-    
+
             begin models
               gwf6 GWF_1/GWF_1.nam GWF_1
             end models
-    
+
             begin exchanges
             end exchanges
-    
+
             begin solutiongroup 1
               im6 solver.ims GWF_1
             end solutiongroup"""
