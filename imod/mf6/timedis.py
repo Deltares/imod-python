@@ -4,7 +4,7 @@ from imod.mf6.pkgbase import Package
 
 
 class TimeDiscretization(Package):
-    _pkg_id = "timedis"
+    _pkg_id = "tdis"
 
     def __init__(self, timestep_duration, n_timesteps=1, timestep_multiplier=1.0):
         super(__class__, self).__init__()

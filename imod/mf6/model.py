@@ -3,6 +3,7 @@ import os
 import pathlib
 
 import cftime
+import jinja2
 import numpy as np
 import xarray as xr
 
@@ -26,10 +27,16 @@ class GroundwaterFlowModel(Model):
 
     _pkg_id = "model"
 
+    def _initialize_template(self):
+        loader = jinja2.PackageLoader("imod", "templates/mf6")
+        env = jinja2.Environment(loader=loader)
+        self._template = env.get_template("gwf-nam.j2")
+
     def __init__(self, newton=False, under_relaxation=False):
         super(__class__, self).__init__()
         self.newton = newton
         self.under_relaxation = under_relaxation
+        self._initialize_template()
 
     def _get_pkgkey(self, pkg_id):
         """

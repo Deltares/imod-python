@@ -21,12 +21,8 @@ class Package(xr.Dataset):
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader)
-        if self._pkg_id == "model":
-            fname = "gwf-nam.j2"
-        elif self._pkg_id == "ims":
+        if self._pkg_id == "ims":
             fname = "sln-ims.j2"
-        elif self._pkg_id == "simulation":
-            fname = "sim-nam.j2"
         elif self._pkg_id == "tdis":
             fname = "sim-tdis.j2"
         else:

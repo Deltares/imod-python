@@ -1,6 +1,7 @@
 import collections
 import pathlib
 
+import jinja2
 import numpy as np
 import xarray as xr
 
@@ -8,12 +9,17 @@ import imod
 
 
 class Modflow6Simulation(collections.UserDict):
+    def _initialize_template(self):
+        loader = jinja2.PackageLoader("imod", "templates/mf6")
+        env = jinja2.Environment(loader=loader)
+        self._template = env.get_template("sim-nam.j2")
+ 
     def __init__(self, name):
         super(__class__, self).__init__()
         self.name = name
+        self._initialize_template()
 
     def __setitem__(self, key, value):
-        # Synchronize names
         super(__class__, self).__setitem__(key, value)
 
     def update(self, *args, **kwargs):
@@ -28,7 +34,8 @@ class Modflow6Simulation(collections.UserDict):
 
         times = [imod.wq.timeutil.to_datetime(time, self.use_cftime) for time in times]
         for model in self.values():
-            times.append(model._yield_times())
+            if model._pkg_id == "model":
+                times.extend(model._yield_times())
 
         # TODO: check that endtime is later than all other times.
         times.append(imod.wq.timeutil.to_datetime(endtime, self.use_cftime))
