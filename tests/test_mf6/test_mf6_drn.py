@@ -44,8 +44,7 @@ def test_write(drainage):
 
             begin period 1
               open/close mydrn/drn.bin (binary)
-            end period
-        """
+            end period"""
     )
 
     with open(directory / "mydrn.drn") as f:

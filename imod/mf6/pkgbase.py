@@ -71,7 +71,8 @@ class Package(xr.Dataset):
             arrays.append(ds[datavar].values)
         sparse_data = self.to_sparse(arrays)
         outpath.parent.mkdir(exist_ok=True, parents=True)
-        sparse_data.tofile(outpath)
+        with open(outpath, "w") as f:
+            sparse_data.tofile(f)
 
     def write_binary_griddata(self, outpath, da, dtype):
         # From the modflow6 source, the header is defined as:
