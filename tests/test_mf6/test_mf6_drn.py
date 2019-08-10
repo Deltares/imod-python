@@ -25,7 +25,7 @@ def drainage(request):
     return drn
 
 
-def test_save(drainage):
+def test_write(drainage):
     drn = drainage
     directory = pathlib.Path(".")
     drn.write(directory, "mydrn", [1])

@@ -24,7 +24,7 @@ class Modflow6Simulation(collections.UserDict):
         """
         Collect all unique times
         """
-        self.use_cftime = any([model._use_cftime() for model in self.values()])
+        self.use_cftime = any([model._use_cftime() for model in self.values() if model._pkg_id == "model"])
 
         times = [imod.wq.timeutil.to_datetime(time, self.use_cftime) for time in times]
         for model in self.values():

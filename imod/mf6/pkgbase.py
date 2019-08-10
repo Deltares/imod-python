@@ -21,7 +21,17 @@ class Package(xr.Dataset):
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader)
-        self._template = env.get_template(f"gwf-{self._pkg_id}.j2")
+        if self._pkg_id == "model":
+            fname = "gwf-nam.j2"
+        elif self._pkg_id == "ims":
+            fname = "sln-ims.j2"
+        elif self._pkg_id == "simulation":
+            fname = "sim-nam.j2"
+        elif self._pkg_id == "tdis":
+            fname = "sim-tdis.j2"
+        else:
+            fname = f"gwf-{self._pkg_id}.j2"
+        self._template = env.get_template(fname)
 
     def write_blockfile(self, directory, pkgname, globaltimes=None):
         content = self.render(directory, pkgname, globaltimes)
@@ -93,8 +103,10 @@ class Package(xr.Dataset):
     def render(self, *args, **kwargs):
         d = {}
         for k, v in self.data_vars.items():
-            d[k] = v
-        self._template.render(**d)
+            value = v.values[()]
+            if value is not None:
+                d[k] = value
+        return self._template.render(d)
 
     def _compose_values(self, da, directory, *args, **kwargs):
         """

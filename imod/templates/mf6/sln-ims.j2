@@ -31,7 +31,7 @@ begin nonlinear
 {%- if backtracking_reduction_factor is defined %}  backtracking_reduction_factor {{backtracking_reduction_factor}}
 {% endif %}
 {%- if backtracking_residual_limit is defined %}  backtracking_residual_limit {{backtracking_residual_limit}}
-{% endif -%}
+{% endif %}
 end nonlinear
 
 begin linear
@@ -39,7 +39,7 @@ begin linear
   inner_hclose {{inner_hclose}}
   inner_rclose {{inner_rclose}}{% if rclose_option is defined %} {{rclose_option}}{% endif %}
   linear_acceleration {{linear_acceleration}}
-{%- if relaxation_factor is defined %}  relaxation_factor {{relaxation_factor}}
+{% if relaxation_factor is defined %}  relaxation_factor {{relaxation_factor}}
 {% endif %}
 {%- if preconditioner_levels is defined %}  preconditioner_levels {{preconditioner_levels}}
 {% endif %}

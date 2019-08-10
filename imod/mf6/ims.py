@@ -2,6 +2,8 @@ from imod.mf6.pkgbase import Package
 
 
 class Solution(Package):
+    _pkg_id = "ims"
+
     def __init__(
         self,
         outer_hclose,
@@ -55,6 +57,7 @@ class Solution(Package):
         self["number_orthogonalizations"] = number_orthogonalizations
         self["scaling_method"] = scaling_method
         self["reordering_method"] = reordering_method
+        self._initialize_template()
 
     def write(self, directory, solvername):
         ims_path = directory / f"{solvername}.ims"
