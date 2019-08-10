@@ -50,21 +50,22 @@ class Package(xr.Dataset):
         with open(filename, "w") as f:
             f.write(content)
 
-    def to_sparse(self, arrlist):
+    def to_sparse(self, arrlist, layer):
         """Convert from dense arrays to list based input"""
         # TODO add pkgcheck that period table aligns
         data = arrlist[0]
         notnull = ~np.isnan(data)
-        indices = np.argwhere(notnull)
-
-        nrow = len(indices)
+        nrow = notnull.sum()
         # 3 columns for i j k
         # times 2 for int32 view of float64 values
         # (such that we can write as a single block)
         ncol = 3 + len(arrlist) * 2
-
         listarr = np.empty((nrow, ncol), dtype=np.int32)
-        listarr[:, 0:3] = indices
+        if layer is not None:
+            listarr[:, 0] = layer
+            listarr[:, 1:3] = np.argwhere(notnull) + 1
+        else:
+            listarr[:, 0:3] = np.argwhere(notnull) + 1
 
         for i, arr in enumerate(arrlist):
             values = arr[notnull].astype(np.float64)
@@ -80,7 +81,11 @@ class Package(xr.Dataset):
         arrays = []
         for datavar in ds.data_vars:
             arrays.append(ds[datavar].values)
-        sparse_data = self.to_sparse(arrays)
+        if "layer" in ds.coords and "layer" not in ds.dims:
+            layer = ds["layer"].values
+        else:
+            layer = None
+        sparse_data = self.to_sparse(arrays, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)
         with open(outpath, "w") as f:
             sparse_data.tofile(f)
@@ -152,7 +157,6 @@ class Package(xr.Dataset):
             directory = pathlib.Path(directory)
 
         self.write_blockfile(directory, pkgname)
-
 
 
 class BoundaryCondition(Package):

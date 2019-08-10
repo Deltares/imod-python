@@ -53,7 +53,7 @@ def test_render():
             end dimensions
 
             begin period 1
-                open/close mymodel/well/wel.bin (binary)
+              open/close mymodel/well/wel.bin (binary)
             end period"""
     )
     assert actual == expected

@@ -8,7 +8,7 @@ import imod
 
 
 def test_render():
-    layer = np.array([1, 2, 3]) 
+    layer = np.array([1, 2, 3])
     icelltype = xr.DataArray([1, 0, 0], {"layer": layer}, ("layer",))
     k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": layer}, ("layer",))
     k33 = xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",))

@@ -59,12 +59,6 @@ class Solution(Package):
         self["reordering_method"] = reordering_method
         self._initialize_template()
 
-    def write(self, directory, solvername):
-        ims_path = directory / f"{solvername}.ims"
-        ims_content = self.render()
-        with open(ims_path, "w") as f:
-            f.write(ims_content)
-
 
 def SolutionPresetSimple(print_option, csv_output, no_ptc):
     solution = Solution(

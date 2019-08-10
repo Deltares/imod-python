@@ -2,6 +2,7 @@ import textwrap
 
 import imod
 
+
 def test_render():
     ims = imod.mf6.Solution(
         print_option=False,

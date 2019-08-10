@@ -115,4 +115,4 @@ class Modflow6Simulation(collections.UserDict):
                 if value._pkg_id == "model":
                     value.write(key, globaltimes)
                 elif value._pkg_id == "ims":
-                    value.write(key)
+                    value.write(".", key)

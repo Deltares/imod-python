@@ -63,4 +63,3 @@ def test_render():
             end griddata"""
     )
     assert actual == expected
-
