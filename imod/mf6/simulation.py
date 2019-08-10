@@ -13,7 +13,7 @@ class Modflow6Simulation(collections.UserDict):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader)
         self._template = env.get_template("sim-nam.j2")
- 
+
     def __init__(self, name):
         super(__class__, self).__init__()
         self.name = name
@@ -30,7 +30,9 @@ class Modflow6Simulation(collections.UserDict):
         """
         Collect all unique times
         """
-        self.use_cftime = any([model._use_cftime() for model in self.values() if model._pkg_id == "model"])
+        self.use_cftime = any(
+            [model._use_cftime() for model in self.values() if model._pkg_id == "model"]
+        )
 
         times = [imod.wq.timeutil.to_datetime(time, self.use_cftime) for time in times]
         for model in self.values():
@@ -57,8 +59,23 @@ class Modflow6Simulation(collections.UserDict):
 
     def render(self):
         """Renders simulation namefile"""
-        # includes timing, models, exchanges, solution groups
-        return ""
+        d = {}
+        solvername = None
+        models = []
+        modelnames = []
+        for key, value in self.items():
+            if value._pkg_id == "tdis":
+                d["tdis6"] = f"{key}.tdis"
+            elif value._pkg_id == "model":
+                models.append(("gwf6", f"{key}.nam", key))
+                modelnames.append(key)
+            elif value._pkg_id == "ims":
+                solvername = key
+        d["models"] = models
+        if solvername is None:
+            raise ValueError("No numerical solution")
+        d["solutiongroups"] = [[("im6", f"{solvername}.ims", modelnames)]]
+        return self._template.render(d)
 
     def write(self, directory="."):
         if isinstance(directory, str):

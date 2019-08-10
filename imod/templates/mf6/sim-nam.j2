@@ -12,8 +12,7 @@ begin timing
 end timing
 
 begin models
-{% for mtype, mfname in models.items() %}
-  {{mtype}} {{mfname}}
+{% for mtype, mfname, name in models %}  {{mtype}} {{mfname}} {{name}}
 {% endfor -%}
 end models
 
@@ -25,8 +24,7 @@ end exchanges
 
 {% for solutiongroup in solutiongroups %}begin solutiongroup {{loop.index}}
 {% if mxiter is defined %}  mxiter {{mxiter}}
-{% endif %}
-{% for slntype, slnfname, slnmnames in solutiongroup %}
-  {{slntype}} {{slnfname}} {{slnmnames|join(' ')}}
+{% endif -%}
+{% for slntype, slnfname, slnmnames in solutiongroup %}  {{slntype}} {{slnfname}} {{slnmnames|join(' ')}}
 {% endfor -%}
 end solutiongroup{% endfor %}
