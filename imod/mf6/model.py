@@ -85,7 +85,7 @@ class GroundwaterFlowModel(Model):
 
     def render(self):
         """Render model namefile"""
-        d = {"newton": self["newton"], "under_relaxation": self["under_relaxation"]}
+        d = {"newton": self.newton, "under_relaxation": self.under_relaxation}
         packages = {}
         for pkgname, pkg in self.items():
             # Add the six to the package id
@@ -93,7 +93,7 @@ class GroundwaterFlowModel(Model):
             key = f"{pkg_id}6"
             packages[key] = f"{pkgname}.{pkg_id}"
         d["packages"] = packages
-        return self._template.render(**d)
+        return self._template.render(d)
 
     def write(self, modeldirectory, globaltimes):
         """

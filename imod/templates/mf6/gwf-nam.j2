@@ -12,7 +12,6 @@ begin options
 end options
 
 begin packages
-{% for ftype, fname in packages.items() %}
-  {{ftype}} {{fname}}
+{% for ftype, fname in packages.items() %}  {{ftype}} {{fname}}
 {% endfor -%}
 end packages

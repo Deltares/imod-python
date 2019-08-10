@@ -146,4 +146,21 @@ expected = textwrap.dedent(
 assert actual == expected
 
 
-actual["GWF_1"].render()
+actual = simulation["GWF_1"].render()
+expected = textwrap.dedent(
+    """\
+        begin options
+        end options
+        
+        begin packages
+          dis6 dis.dis
+          chd6 chd.chd
+          drn6 drn.drn
+          ic6 ic.ic
+          npf6 npf.npf
+          oc6 oc.oc
+          rch6 rch.rch
+          wel6 wel.wel
+        end packages"""
+)
+assert actual == expected
