@@ -147,6 +147,13 @@ class Package(xr.Dataset):
 
         return layered, values
 
+    def write(self, directory, pkgname, *args, **kwargs):
+        if isinstance(directory, str):
+            directory = pathlib.Path(directory)
+
+        self.write_blockfile(directory, pkgname)
+
+
 
 class BoundaryCondition(Package):
     """

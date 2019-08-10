@@ -1,11 +1,26 @@
 import collections
+import contextlib
 import pathlib
+import os
 
 import jinja2
 import numpy as np
 import xarray as xr
 
 import imod
+
+
+@contextlib.contextmanager
+def _remember_cwd():
+    """
+    from:
+    https://stackoverflow.com/questions/169070/how-do-i-write-a-decorator-that-restores-the-cwd
+    """
+    curdir = os.getcwd()
+    try:
+        yield
+    finally:
+        os.chdir(curdir)
 
 
 class Modflow6Simulation(collections.UserDict):
@@ -67,7 +82,7 @@ class Modflow6Simulation(collections.UserDict):
             if value._pkg_id == "tdis":
                 d["tdis6"] = f"{key}.tdis"
             elif value._pkg_id == "model":
-                models.append(("gwf6", f"{key}.nam", key))
+                models.append(("gwf6", f"{key}/{key}.nam", key))
                 modelnames.append(key)
             elif value._pkg_id == "ims":
                 solvername = key
@@ -93,10 +108,11 @@ class Modflow6Simulation(collections.UserDict):
 
         # Write individual models
         globaltimes = self["time_discretization"]["time"].values
-        for key, value in self.values():
-            # skip timedis, exchanges
-            if value._pkg_id == "model":
-                modeldirectory = directory / key
-                value.write(modeldirectory, globaltimes)
-            elif value._pkg_id == "ims":
-                value.write(directory, key)
+        with _remember_cwd():
+            os.chdir(directory)
+            for key, value in self.items():
+                # skip timedis, exchanges
+                if value._pkg_id == "model":
+                    value.write(key, globaltimes)
+                elif value._pkg_id == "ims":
+                    value.write(key)

@@ -67,4 +67,4 @@ class StructuredDiscretization(Package):
             self["idomain"], directory
         )
 
-        return self._template.render(**d)
+        return self._template.render(d)

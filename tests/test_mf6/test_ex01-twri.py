@@ -1,3 +1,4 @@
+import pathlib
 import textwrap
 
 import numpy as np
@@ -153,21 +154,22 @@ def test_timedis_render(twri_model):
 
 def test_gwfmodel_render(twri_model):
     simulation = twri_model
-    actual = simulation["GWF_1"].render()
+    modeldirectory = pathlib.Path("GWF_1")
+    actual = simulation["GWF_1"].render(modeldirectory)
     expected = textwrap.dedent(
         """\
             begin options
             end options
     
             begin packages
-              dis6 dis.dis
-              chd6 chd.chd
-              drn6 drn.drn
-              ic6 ic.ic
-              npf6 npf.npf
-              oc6 oc.oc
-              rch6 rch.rch
-              wel6 wel.wel
+              dis6 GWF_1/dis.dis
+              chd6 GWF_1/chd.chd
+              drn6 GWF_1/drn.drn
+              ic6 GWF_1/ic.ic
+              npf6 GWF_1/npf.npf
+              oc6 GWF_1/oc.oc
+              rch6 GWF_1/rch.rch
+              wel6 GWF_1/wel.wel
             end packages"""
     )
     assert actual == expected
@@ -186,7 +188,7 @@ def test_simulation_render(twri_model):
             end timing
     
             begin models
-              gwf6 GWF_1.nam GWF_1
+              gwf6 GWF_1/GWF_1.nam GWF_1
             end models
     
             begin exchanges
@@ -197,3 +199,8 @@ def test_simulation_render(twri_model):
             end solutiongroup"""
     )
     assert actual == expected
+
+
+def test_simulation_write(twri_model):
+    simulation = twri_model
+    simulation.write("ex01-twri")

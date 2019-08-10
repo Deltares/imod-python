@@ -83,7 +83,7 @@ class GroundwaterFlowModel(Model):
                 modeltimes.append(pkg["times"].values)
         return modeltimes
 
-    def render(self):
+    def render(self, modeldirectory):
         """Render model namefile"""
         d = {"newton": self.newton, "under_relaxation": self.under_relaxation}
         packages = {}
@@ -91,19 +91,21 @@ class GroundwaterFlowModel(Model):
             # Add the six to the package id
             pkg_id = pkg._pkg_id
             key = f"{pkg_id}6"
-            packages[key] = f"{pkgname}.{pkg_id}"
+            path = modeldirectory / f"{pkgname}.{pkg_id}"
+            packages[key] = path.as_posix()
         d["packages"] = packages
         return self._template.render(d)
 
-    def write(self, modeldirectory, globaltimes):
+    def write(self, modelname, globaltimes):
         """
         Write model namefile
         Write packages
         """
+        modeldirectory = pathlib.Path(modelname)
         modeldirectory.mkdir(exist_ok=True, parents=True)
 
         # write model namefile
-        namefile_content = self.render()
+        namefile_content = self.render(modeldirectory)
         namefile_path = modeldirectory / f"{modelname}.nam"
         with open(namefile_path, "w") as f:
             f.write(namefile_content)
