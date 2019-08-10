@@ -3,6 +3,7 @@ from imod.mf6.pkgbase import BoundaryCondition
 
 class Recharge(BoundaryCondition):
     _pkg_id = "rch"
+    _binary_data = ("rate",)
 
     def __init__(
         self,
