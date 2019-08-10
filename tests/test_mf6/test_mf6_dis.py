@@ -31,8 +31,9 @@ def test_render():
     idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
     bottom = xr.DataArray([-200.0, -350.0, -450.0], {"layer": layer}, ("layer",))
 
+    directory = pathlib.Path("mymodel")
     dis = imod.mf6.StructuredDiscretization(top=200.0, bottom=bottom, idomain=idomain)
-    actual = dis.render("mymodel", "dis")
+    actual = dis.render(directory, "dis")
     expected = textwrap.dedent(
         """\
             begin options

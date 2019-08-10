@@ -3,7 +3,7 @@ from imod.mf6.pkgbase import BoundaryCondition
 
 class ConstantHead(BoundaryCondition):
     _pkg_id = "chd"
-    _binary_data = "head"
+    _binary_data = ("head",)
 
     def __init__(
         self,
