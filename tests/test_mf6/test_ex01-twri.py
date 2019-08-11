@@ -31,7 +31,7 @@ def twri_model(request):
 
     # Discretization data
     idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
-    bottom = xr.DataArray([-200.0, -350.0, -450.0], {"layer": layer}, ("layer",))
+    bottom = xr.DataArray([-200.0, -300.0, -450.0], {"layer": layer}, ("layer",))
 
     # Constant head
     head = xr.full_like(idomain, np.nan).sel(layer=[1, 2])
@@ -42,12 +42,15 @@ def twri_model(request):
     elevation = xr.full_like(idomain.sel(layer=1), np.nan)
     conductance = xr.full_like(idomain.sel(layer=1), np.nan)
     elevation[7, 1:10] = np.array([0.0, 0.0, 10.0, 20.0, 30.0, 50.0, 70.0, 90.0, 100.0])
-    conductance[7, 1:10] = 0.0
+    conductance[7, 1:10] = 1.0
 
     # Node properties
     icelltype = xr.DataArray([1, 0, 0], {"layer": layer}, ("layer",))
     k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": layer}, ("layer",))
     k33 = xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",))
+
+    # Recharge
+    rch_rate = xr.full_like(idomain.sel(layer=1), 3.0e-8)
 
     # Well
     layer = [3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
@@ -97,7 +100,7 @@ def twri_model(request):
         save_flows=True,
     )
     gwf_model["oc"] = imod.mf6.OutputControl(save_head=True, save_budget=True)
-    gwf_model["rch"] = imod.mf6.Recharge(rate=3.0e-8)
+    gwf_model["rch"] = imod.mf6.Recharge(rch_rate)
     gwf_model["wel"] = imod.mf6.Well(
         layer=layer,
         row=row,
@@ -116,7 +119,7 @@ def twri_model(request):
         print_option=False,
         csv_output=False,
         no_ptc=True,
-        outer_hclose=1.0 - 4,
+        outer_hclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,
         inner_hclose=1.0e-4,
@@ -195,7 +198,7 @@ def test_simulation_render(twri_model):
             end exchanges
 
             begin solutiongroup 1
-              im6 solver.ims GWF_1
+              ims6 solver.ims GWF_1
             end solutiongroup"""
     )
     assert actual == expected
@@ -204,3 +207,4 @@ def test_simulation_render(twri_model):
 def test_simulation_write(twri_model):
     simulation = twri_model
     simulation.write("ex01-twri")
+    # TODO: compare heads with other version?
