@@ -38,6 +38,4 @@ def test_render():
               relaxation_factor 0.97
             end linear"""
     )
-    print(actual)
-    print(expected)
     assert expected == actual

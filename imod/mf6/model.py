@@ -112,5 +112,4 @@ class GroundwaterFlowModel(Model):
 
         # write package contents
         for pkgname, pkg in self.items():
-            print(pkgname)
             pkg.write(modeldirectory, pkgname, globaltimes)

@@ -535,7 +535,6 @@ def test_mxsscount_incongruent_icbund(basicmodel):
     m["btn"]["icbund"][...] = 0.0
 
     n_sinkssources = m._bas_btn_rch_sinkssources()
-    print(n_sinkssources)
     assert n_sinkssources == 100
 
 
