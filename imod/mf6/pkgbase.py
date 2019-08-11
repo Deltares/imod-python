@@ -92,30 +92,27 @@ class Package(xr.Dataset):
 
     def write_binary_griddata(self, outpath, da, dtype):
         # From the modflow6 source, the header is defined as:
-        # integer(I4B) :: kstp --> np.int8
-        # integer(I4B) :: pertim --> np.int8
-        # character(len=16) :: text --> 16 * np.int8
-        # integer(I4B) :: m1, m2, m3 --> 3 * np.int8
-        # so writing 21 bytes suffices to create a header.
+        # integer(I4B) :: kstp --> np.int32 : 1
+        # integer(I4B) :: kper --> np.int32 : 2
+        # real(DP) :: pertim --> 2 * np.int32 : 4
+        # real(DP) :: totim --> 2 * np.int32 : 6
+        # character(len=16) :: text --> 4 * np.int32 : 10
+        # integer(I4B) :: m1, m2, m3 --> 3 * np.int32 : 13
+        # so writing 13 bytes suffices to create a header.
         haslayer = "layer" in da.dims
         if haslayer:
-            _, nrow, ncol = da.shape
+            nlayer, nrow, ncol = da.shape
         else:
             nrow, ncol = da.shape
+            nlayer = 1
 
-        header = np.zeros(21, np.int8)
-        header[18] = np.int8(ncol)
-        header[19] = np.int8(nrow)
-        header[20] = 1
+        header = np.zeros(13, np.int32)
+        header[-3] = np.int32(ncol)
+        header[-2] = np.int32(nrow)
+        header[-1] = np.int32(nlayer) 
         with open(outpath, "w") as f:
-            if haslayer:
-                for layer in da.dims["layer"]:
-                    a = da.sel(layer=layer)
-                    header.to_file(f)
-                    a.values.flatten().astype(dtype).to_file(f)
-            else:
-                header.to_file(f)
-                da.values.flatten().astype(dtype).to_file(f)
+            header.tofile(f)
+            da.values.flatten().astype(dtype).tofile(f)
 
     def render(self, *args, **kwargs):
         d = {}
@@ -125,7 +122,7 @@ class Package(xr.Dataset):
                 d[k] = value
         return self._template.render(d)
 
-    def _compose_values(self, da, directory, *args, **kwargs):
+    def _compose_values(self, da, directory, name=None, *args, **kwargs):
         """
         Compose values of dictionary.
 
@@ -137,7 +134,9 @@ class Package(xr.Dataset):
         layered = False
         values = []
         if "x" in da.dims and "y" in da.dims:
-            values.append(f"open/close {directory}/{self._pkg_id}.bin (binary)")
+            if name is None:
+                name = self._pkg_id
+            values.append(f"open/close {directory}/{name}.bin (binary)")
         else:
             if "layer" in da.dims:
                 layered = True
@@ -157,6 +156,16 @@ class Package(xr.Dataset):
             directory = pathlib.Path(directory)
 
         self.write_blockfile(directory, pkgname)
+
+        if hasattr(self, "_binary_data"):
+            if "x" in self.dims and "y" in self.dims:
+                pkgdirectory = directory / pkgname
+                pkgdirectory.mkdir(exist_ok=True, parents=True)
+                for varname in self._binary_data:
+                    da = self[varname]
+                    if "x" in da.dims and "y" in da.dims:
+                        path = pkgdirectory / f"{varname}.bin"
+                        self.write_binary_griddata(path, da, dtype=np.int32)
 
 
 class BoundaryCondition(Package):
