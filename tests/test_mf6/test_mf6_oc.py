@@ -14,6 +14,8 @@ def test_render():
     expected = textwrap.dedent(
         """\
             begin options
+              budget fileout mymodel/mymodel.cbb
+              head fileout mymodel/mymodel.hds
             end options
 
             begin period 1

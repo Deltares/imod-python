@@ -28,6 +28,7 @@ def test_render():
         """\
             begin options
               save_flows
+              variablecv dewatered
               perched
             end options
             

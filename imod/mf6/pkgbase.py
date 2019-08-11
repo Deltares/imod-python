@@ -136,7 +136,8 @@ class Package(xr.Dataset):
         if "x" in da.dims and "y" in da.dims:
             if name is None:
                 name = self._pkg_id
-            values.append(f"open/close {directory}/{name}.bin (binary)")
+            path = (directory / f"{name}.bin").as_posix()
+            values.append(f"open/close {path} (binary)")
         else:
             if "layer" in da.dims:
                 layered = True
