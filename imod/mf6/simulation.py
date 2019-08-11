@@ -89,7 +89,7 @@ class Modflow6Simulation(collections.UserDict):
         d["models"] = models
         if solvername is None:
             raise ValueError("No numerical solution")
-        d["solutiongroups"] = [[("im6", f"{solvername}.ims", modelnames)]]
+        d["solutiongroups"] = [[("ims6", f"{solvername}.ims", modelnames)]]
         return self._template.render(d)
 
     def write(self, directory="."):
@@ -104,7 +104,7 @@ class Modflow6Simulation(collections.UserDict):
             f.write(mfsim_content)
 
         # Write time discretization file
-        self["time_discretization"].write(directory)
+        self["time_discretization"].write(directory, "time_discretization")
 
         # Write individual models
         globaltimes = self["time_discretization"]["time"].values
