@@ -109,7 +109,7 @@ class Package(xr.Dataset):
         header = np.zeros(13, np.int32)
         header[-3] = np.int32(ncol)
         header[-2] = np.int32(nrow)
-        header[-1] = np.int32(nlayer) 
+        header[-1] = np.int32(nlayer)
         with open(outpath, "w") as f:
             header.tofile(f)
             da.values.flatten().astype(dtype).tofile(f)
