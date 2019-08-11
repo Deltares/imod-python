@@ -39,8 +39,8 @@ class TimeDiscretization(Package):
 
         return self._template.render(d)
 
-    def write(self, name):
+    def write(self, directory, name):
         timedis_content = self.render()
-        timedis_path = f"{name}.tdis"
+        timedis_path = directory / f"{name}.tdis"
         with open(timedis_path, "w") as f:
             f.write(timedis_content)
