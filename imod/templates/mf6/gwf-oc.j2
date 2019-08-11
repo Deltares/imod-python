@@ -1,7 +1,7 @@
 begin options
-{% if budget_filerecord is defined %}  budget fileout {{budgetfile}}
+{% if budgetfile is defined %}  budget fileout {{budgetfile}}
 {% endif %}
-{%- if head_filerecord is defined %}  head fileout {{headfile}}
+{%- if headfile is defined %}  head fileout {{headfile}}
 {% endif %}
 {%- if headprintrecord is defined %}  head print_format columns {{columns}} width {{width}} digits {{digits}} {{format}}
 {% endif -%}
