@@ -27,6 +27,7 @@ class StructuredDiscretization(Package):
     """
 
     _pkg_id = "dis"
+    _binary_data = ("top", "bottom", "idomain")
 
     def __init__(self, top, bottom, idomain):
         super(__class__, self).__init__()
@@ -63,8 +64,9 @@ class StructuredDiscretization(Package):
         d["delc"] = self._delrc(np.abs(dx))
         _, d["top"] = self._compose_values(self["top"], directory)
         d["botm_layered"], d["botm"] = self._compose_values(self["bottom"], directory)
+        disdirectory = directory / "dis"
         d["idomain_layered"], d["idomain"] = self._compose_values(
-            self["idomain"], directory
+            self["idomain"], disdirectory, "idomain"
         )
 
         return self._template.render(d)
