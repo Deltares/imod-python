@@ -25,6 +25,11 @@ class OutputControl(Package):
 
     def render(self, directory, pkgname, globaltimes):
         d = {}
+        modelname = directory.stem
+        if self["save_head"].values.any():
+            d["headfile"] = directory / f"{modelname}.hds"
+        if self["save_budget"].any():
+            d["budgetfile"] = directory / f"{modelname}.cbb"
 
         periods = collections.defaultdict(dict)
         for datavar in self.data_vars:
