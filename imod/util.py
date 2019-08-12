@@ -262,8 +262,12 @@ def _xycoords(bounds, cellsizes):
         dy = dy.astype(np.float64)
         coords["x"] = xmin + np.cumsum(dx) - 0.5 * dx
         coords["y"] = ymax + np.cumsum(dy) - 0.5 * dy
-        coords["dx"] = ("x", dx)
-        coords["dy"] = ("y", dy)
+        if np.allclose(dx, dx[0]) and np.allclose(dy, dy[0]):
+            coords["dx"] = float(dx[0])
+            coords["dy"] = float(dy[0])
+        else:
+            coords["dx"] = ("x", dx)
+            coords["dy"] = ("y", dy)
     return coords
 
 
