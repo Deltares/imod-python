@@ -93,7 +93,7 @@ class NodePropertyFlow(Package):
         }
         npfdirectory = directory / "npf"
         for varname in self.data_vars:
-            key = replace_keywords.get(varname, key)
+            key = replace_keywords.get(varname, varname)
 
             if varname in self._binary_data:
                 layered, value = self._compose_values(
