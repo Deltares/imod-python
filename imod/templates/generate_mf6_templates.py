@@ -56,28 +56,38 @@ import pathlib
 import textwrap
 
 
-def block_entry(varname, block, vardict, indent="  "):
+def griddata(v):
+    name = v["name"]
+    if v["name"] in ("delr", "delc"):
+        s = f"  {name}\n    {{{{name}}}}"
+    else:
+        s = f"  {name}\n"
+    return s
 
+def block_entry(varname, block, vardict):
     v = vardict[(varname, block)]
 
     if v.get("tagged") == "false":
-        s = ""
+        s = "\n"
     else:
-        s = f"{varname.lower()}"
+        s = f"{varname}\n"
 
     if block == "period":
         print(f"period block; varname = {varname}")
 
+    elif block == "griddata":
+        s = griddata(v)
+    
     # record or recarray
-    if v["type"].startswith("rec"):
+    elif v["type"].startswith("rec"):
         varnames = v["type"].strip().split()[1:]
         s = ""
         for vn in varnames:
-            blockentry = block_entry(vn, block, vardict, indent="")
+            blockentry = block_entry(vn, block, vardict)
             s += f"{blockentry.strip()} "
         if v["type"].startswith("recarray"):
             s = s.strip()
-            s = f"{s}\n{indent}{s}\n{indent}{'...'}"
+            s = f"{s}\n  {s}\n  {'...'}\n"
 
     # layered
     elif v["reader"] == "readarray":
@@ -85,10 +95,12 @@ def block_entry(varname, block, vardict, indent="  "):
         if v.get("layered") == "true":
             # if layered is supported according to dfn,
             # and we get passed {layered: True}, add layered keyword
-            layered = " {% if layered is sameas true %}layered{% endif %}"
+            layered = (
+                f" {{% if layered is sameas true %}}{varname}_layered{{% endif %}}"
+            )
         else:
             layered = ""
-        s = f"{s}{layered}\n{indent}{indent}{{{varname}}}"
+        s = f"{s}{layered}\n    {{{varname}}}\n"
 
     # keyword
     elif v["type"] != "keyword":
@@ -96,22 +108,22 @@ def block_entry(varname, block, vardict, indent="  "):
         if "shape" in v:
             shape = v["shape"]
             vtmp += shape
-        s = f"{s} {{{{{vtmp}}}}}"
+        s = f"{s} {{{{{vtmp}}}}}\n"
 
     # if optional, wrap string in square brackets
     if v.get("optional") == "true":
         # TODO if first entry in block, do not slurp whats in front of if
         # TODO if last enty in block, slurp anfer last endif
-        s = f"{{%- if {varname} is defined %}}{indent}{s.strip()}\n{{% endif %}}"
+        s = f"{{%- if {varname} is defined %}}  {s.strip()}\n{{% endif %}}\n"
     else:
         # prepend with indent and return string
-        s = f"{indent}{s}"
+        s = f"  {s}\n"
 
     return s
 
 
 def write_block(vardict, block):
-    s = f"begin {block.lower()}\n"
+    s = f"begin {block}\n"
     for (name, b), v in vardict.items():
         if b == block:
             addv = True
@@ -134,8 +146,8 @@ def write_block(vardict, block):
                 return s
             if addv:
                 ts = block_entry(name, block, vardict)
-                s += f"{ts}\n"
-    s += f"end {block.lower()}"
+                s += f"{ts}"
+    s += f"end {block}"
     return s
 
 
@@ -143,7 +155,7 @@ if __name__ == "__main__":
 
     # path to mf6ivar directory and output directory
     mf6ivar_dir = pathlib.Path("d:/repo/imod/modflow6/doc/mf6io/mf6ivar")
-    j2dir = pathlib.Path("mf6").resolve()
+    j2dir = pathlib.Path(__file__).resolve().parent / "mf6"
     os.chdir(mf6ivar_dir)  # is needed for mf6ivar relative paths
 
     # the below does import mf6ivar, but based on its path
@@ -157,8 +169,9 @@ if __name__ == "__main__":
 
     # construct list of dfn paths to process
     # include the dash to leave out common.dfn
-    dfnpaths = list(dfndir.glob("*-*.dfn"))
-    assert len(dfnpaths) > 30
+    # dfnpaths = list(dfndir.glob("*-*.dfn"))
+    # assert len(dfnpaths) > 30
+    dfnpaths = list(dfndir.glob("gwf-dis.dfn"))
 
     for dfnpath in dfnpaths:
         component, package = dfnpath.stem.split("-", maxsplit=1)
