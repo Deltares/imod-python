@@ -1,3 +1,5 @@
+import numpy as np
+
 from imod.mf6.pkgbase import Package
 
 
@@ -14,16 +16,16 @@ class NodePropertyFlow(Package):
     """
 
     _pkg_id = "npf"
-    _binary_data = (
-        "icelltype",
-        "k",
-        "rewet_layer",
-        "k22",
-        "k33",
-        "angle1",
-        "angle2",
-        "angle3",
-    )
+    _binary_data = {
+        "icelltype": np.int32,
+        "k": np.float64,
+        "rewet_layer": np.float64,
+        "k22": np.float64,
+        "k33": np.float64,
+        "angle1": np.float64,
+        "angle2": np.float64,
+        "angle3": np.float64,
+    }
 
     def __init__(
         self,

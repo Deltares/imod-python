@@ -1,9 +1,11 @@
+import numpy as np
+
 from imod.mf6.pkgbase import Package
 
 
 class InitialConditions(Package):
     _pkg_id = "ic"
-    _binary_data = ("head",)
+    _binary_data = {"head": np.float64}
 
     def __init__(self, head):
         super(__class__, self).__init__()

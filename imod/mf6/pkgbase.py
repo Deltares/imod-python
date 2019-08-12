@@ -162,11 +162,11 @@ class Package(xr.Dataset):
             if "x" in self.dims and "y" in self.dims:
                 pkgdirectory = directory / pkgname
                 pkgdirectory.mkdir(exist_ok=True, parents=True)
-                for varname in self._binary_data:
+                for varname, dtype in self._binary_data.items():
                     da = self[varname]
                     if "x" in da.dims and "y" in da.dims:
                         path = pkgdirectory / f"{varname}.bin"
-                        self.write_binary_griddata(path, da, dtype=np.int32)
+                        self.write_binary_griddata(path, da, dtype)
 
 
 class BoundaryCondition(Package):

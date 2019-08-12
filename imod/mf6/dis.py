@@ -27,7 +27,7 @@ class StructuredDiscretization(Package):
     """
 
     _pkg_id = "dis"
-    _binary_data = ("top", "bottom", "idomain")
+    _binary_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
 
     def __init__(self, top, bottom, idomain):
         super(__class__, self).__init__()
@@ -49,6 +49,7 @@ class StructuredDiscretization(Package):
             raise ValueError(f"Unhandled type of {dx}")
 
     def render(self, directory, pkgname, *args, **kwargs):
+        disdirectory = directory / "dis"
         d = {}
         x = self["idomain"].coords["x"]
         y = self["idomain"].coords["y"]
@@ -62,9 +63,10 @@ class StructuredDiscretization(Package):
         d["ncol"] = x.size
         d["delr"] = self._delrc(np.abs(dy))
         d["delc"] = self._delrc(np.abs(dx))
-        _, d["top"] = self._compose_values(self["top"], directory)
-        d["botm_layered"], d["botm"] = self._compose_values(self["bottom"], directory)
-        disdirectory = directory / "dis"
+        _, d["top"] = self._compose_values(self["top"], disdirectory, "top")
+        d["botm_layered"], d["botm"] = self._compose_values(
+            self["bottom"], disdirectory, "bottom"
+        )
         d["idomain_layered"], d["idomain"] = self._compose_values(
             self["idomain"], disdirectory, "idomain"
         )
