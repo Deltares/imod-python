@@ -64,6 +64,7 @@ def griddata(v):
         s = f"  {name}\n"
     return s
 
+
 def block_entry(varname, block, vardict):
     v = vardict[(varname, block)]
 
@@ -77,7 +78,7 @@ def block_entry(varname, block, vardict):
 
     elif block == "griddata":
         s = griddata(v)
-    
+
     # record or recarray
     elif v["type"].startswith("rec"):
         varnames = v["type"].strip().split()[1:]
