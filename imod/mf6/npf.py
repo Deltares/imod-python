@@ -96,7 +96,9 @@ class NodePropertyFlow(Package):
             key = replace_keywords.get(varname, key)
 
             if varname in self._binary_data:
-                layered, value = self._compose_values(self[varname], npfdirectory, varname)
+                layered, value = self._compose_values(
+                    self[varname], npfdirectory, varname
+                )
                 if self._valid(value):  # skip False or None
                     d[f"{key}_layered"], d[key] = layered, value
             else:
