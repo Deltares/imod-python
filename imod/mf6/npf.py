@@ -86,7 +86,6 @@ class NodePropertyFlow(Package):
         replace_keywords = {
             "rewet": "rewet_record",
             "rewet_factor": "wetfct",
-            "rewet_iterations": "rewet_iterations",
             "rewet_method": "ihdwet",
             "rewet_layer": "wetdry",
             "variable_vertical_conductance": "variablecv",
@@ -94,10 +93,7 @@ class NodePropertyFlow(Package):
         }
         npfdirectory = directory / "npf"
         for varname in self.data_vars:
-            if varname in replace_keywords:
-                key = replace_keywords[varname]
-            else:
-                key = varname
+            key = replace_keywords.get(varname, key)
 
             if varname in self._binary_data:
                 layered, value = self._compose_values(self[varname], npfdirectory, varname)
