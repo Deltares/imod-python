@@ -215,7 +215,9 @@ class BoundaryCondition(Package):
         for varname in self.data_vars.keys():
             if varname in self._binary_data:
                 continue
-            d[varname] = self[varname].values[()]
+            v = self[varname].values[()]
+            if self._valid(v):  # skip None and False
+                d[varname] = v
 
         d["maxbound"] = self._max_active_n()
 

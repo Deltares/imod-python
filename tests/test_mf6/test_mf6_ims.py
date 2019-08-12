@@ -5,7 +5,7 @@ import imod
 
 def test_render():
     ims = imod.mf6.Solution(
-        print_option=False,
+        print_option=True,
         csv_output=False,
         no_ptc=True,
         outer_hclose=1.0 - 4,

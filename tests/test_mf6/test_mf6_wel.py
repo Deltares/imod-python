@@ -33,9 +33,9 @@ def test_render():
         row=row,
         column=column,
         rate=rate,
-        print_input=True,
-        print_flows=True,
-        save_flows=True,
+        print_input=False,
+        print_flows=False,
+        save_flows=False,
     )
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
@@ -43,9 +43,6 @@ def test_render():
     expected = textwrap.dedent(
         """\
             begin options
-              print_input
-              print_flows
-              save_flows
             end options
 
             begin dimensions

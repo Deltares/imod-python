@@ -14,9 +14,6 @@ def test_render():
     expected = textwrap.dedent(
         """\
             begin options
-              print_input
-              print_flows
-              save_flows
             end options
 
             begin dimensions

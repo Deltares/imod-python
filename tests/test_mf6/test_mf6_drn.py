@@ -33,9 +33,6 @@ def test_write(drainage):
     block_expected = textwrap.dedent(
         """\
             begin options
-              print_input
-              print_flows
-              save_flows
             end options
 
             begin dimensions
