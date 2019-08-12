@@ -92,6 +92,7 @@ class NodePropertyFlow(Package):
             "variable_vertical_conductance": "variablecv",
             "starting_head_as_confined_thickness": "thickstrt",
         }
+        npfdirectory = directory / "npf"
         for varname in self.data_vars:
             if varname in replace_keywords:
                 key = replace_keywords[varname]
@@ -99,7 +100,7 @@ class NodePropertyFlow(Package):
                 key = varname
 
             if varname in self._binary_data:
-                layered, value = self._compose_values(self[varname], directory)
+                layered, value = self._compose_values(self[varname], npfdirectory, varname)
                 if self._valid(value):  # skip False or None
                     d[f"{key}_layered"], d[key] = layered, value
             else:
