@@ -19,7 +19,7 @@ except ImportError:
     pass
 
 import imod
-from . import pcg  # relative import because it's a private module
+from imod.prepare import pcg
 
 
 def round_extent(extent, cellsize):
