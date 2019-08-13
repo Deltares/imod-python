@@ -20,6 +20,7 @@ from imod.prepare.spatial import (
     celltable,
     fill,
     gdal_rasterize,
+    laplace_interpolate,
     rasterize,
     rasterize_celltable,
 )

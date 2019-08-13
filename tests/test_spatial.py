@@ -60,6 +60,21 @@ def test_fill():
     assert actual_y.identical(expected_y)
 
 
+def test_laplace_interpolate():
+    nrow, ncol = 3, 4
+    dx, dy = 1.0, -1.0
+    xmin, xmax = 0.0, 4.0
+    ymin, ymax = 0.0, 3.0
+    coords = imod.util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
+    data = np.ones((nrow, ncol), dtype=np.float32)
+    da = xr.DataArray(data, **kwargs)
+    # remove some values
+    da.values[:, 1] = np.nan
+    actual = imod.prepare.laplace_interpolate(da, mxiter=5, iter1=30)
+    assert np.allclose(actual.values, 1.0)
+
+
 def test_rasterize():
     geom = sg.Polygon([(0.0, 0.0), (1.1, 0.0), (1.1, 1.1), (0.0, 1.1)])
     gdf = gpd.GeoDataFrame()

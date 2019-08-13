@@ -19,6 +19,7 @@ except ImportError:
     pass
 
 import imod
+from . import pcg  # relative import because it's a private module
 
 
 def round_extent(extent, cellsize):
@@ -84,6 +85,101 @@ def fill(da, invalid=None, by=None):
         out.values = _fill_np(da.values, invalid.values)
 
     return out
+
+
+def laplace_interpolate(
+    source, ibound=None, close=0.01, mxiter=5, iter1=50, relax=0.98
+):
+    """
+    Fills gaps in `source` by interpolating from existing values using Laplace
+    interpolation.
+
+    Parameters
+    ----------
+    source : xr.DataArray with dims (y, x)
+        Data values to interpolate.
+    ibound : xr.DataArray with dims (y, x)
+        Precomputed array which marks where to interpolate
+    close : float
+        Closure criteration of iterative solver. Should be one to two orders
+        of magnitude smaller than desired accuracy.
+    mxiter : int
+        Outer iterations of iterative solver.
+    iter1 : int
+        Inner iterations of iterative solver. Should not exceed 50.
+    relax : float
+        Iterative solver relaxation parameter. Should be between 0 and 1.
+
+    Returns
+    -------
+    interpolated : xr.DataArray with dims (y, x)
+        source, with interpolated values where ibound equals 1
+    """
+    solver = pcg.PreconditionedConjugateGradientSolver(
+        close, close * 1.0e6, mxiter, iter1, relax
+    )
+
+    if not source.dims == ("y", "x"):
+        raise ValueError('source dims must be ("y", "x")')
+
+    if ibound is not None:
+        if not ibound.dims == ("y", "x"):
+            raise ValueError('ibound dims must be ("y", "x")')
+        if not ibound.shape == source.shape:
+            raise ValueError("ibound and source must have the same shape")
+
+        # expand dims to make 3d
+        source3d = source.expand_dims("layer")
+        hnew = source3d.values
+        iboundv = ibound.expand_dims("layer").astype(np.int).values
+    else:
+        # expand dims to make 3d
+        source3d = source.expand_dims("layer")
+        hnew = source3d.fillna(0.0).values  # Set start interpolated estimate to 0.0
+        ibound = np.isnan(source3d)  # Mark nodata values as 1
+        # Mark data values as -1, convert to int np.array
+        iboundv = ibound.where(ibound).fillna(-1.0).astype(np.int).values
+
+    shape = iboundv.shape
+    nlay, nrow, ncol = shape
+    nodes = nlay * nrow * ncol
+    # Allocate work arrays
+    # Not really used now, but might come in handy to implements weights
+    cc = cr = cv = np.ones(shape)
+    rhs = np.zeros(shape)
+    hcof = np.zeros(shape)
+    # Solver work arrays
+    res = np.zeros(nodes)
+    cd = np.zeros(nodes)
+    v = np.zeros(nodes)
+    ss = np.zeros(nodes)
+    p = np.zeros(nodes)
+
+    # Picard iteration
+    converged = False
+    outer_iteration = 0
+    while not converged and outer_iteration < mxiter:
+        # Mutates hnew
+        converged = solver.solve(
+            hnew=hnew,
+            cc=cc,
+            cr=cr,
+            cv=cv,
+            ibound=iboundv,
+            rhs=rhs,
+            hcof=hcof,
+            res=res,
+            cd=cd,
+            v=v,
+            ss=ss,
+            p=p,
+        )
+        outer_iteration += 1
+    else:
+        if not converged:
+            raise RuntimeError("Failed to converge")
+
+    return xr.full_like(source, hnew[0])
 
 
 def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
