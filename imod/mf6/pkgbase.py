@@ -99,17 +99,28 @@ class Package(xr.Dataset):
         # character(len=16) :: text --> 4 * np.int32 : 10
         # integer(I4B) :: m1, m2, m3 --> 3 * np.int32 : 13
         # so writing 13 bytes suffices to create a header.
-        haslayer = "layer" in da.dims
-        if haslayer:
-            nlayer, nrow, ncol = da.shape
-        else:
-            nrow, ncol = da.shape
-            nlayer = 1
 
+        # The following code is commented out due to modflow issue 189
+        # https://github.com/MODFLOW-USGS/modflow6/issues/189
+        # We never write LAYERED data.
+        # The (structured) dis array reader results in an error if you try to
+        # read a 3D botm array. By storing nlayer * nrow * ncol in the first
+        # header entry, the array is read properly.
+
+        #haslayer = "layer" in da.dims
+        #if haslayer:
+        #    nlayer, nrow, ncol = da.shape
+        #else:
+        #    nrow, ncol = da.shape
+        #    nlayer = 1
+
+        # This is a work around for the abovementioned issue.
+        nval = np.product(da.shape)
         header = np.zeros(13, np.int32)
-        header[-3] = np.int32(ncol)
-        header[-2] = np.int32(nrow)
-        header[-1] = np.int32(nlayer)
+        header[-3] = np.int32(nval)  # ncol
+        header[-2] = np.int32(1)  # nrow
+        header[-1] = np.int32(1)  # nlayer
+
         with open(outpath, "w") as f:
             header.tofile(f)
             da.values.flatten().astype(dtype).tofile(f)
