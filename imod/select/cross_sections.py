@@ -288,9 +288,10 @@ def _cross_section(data, linecoords):
         iys[iys >= nrow] = -1
 
     # Select data
+    # use .where to get rid of out of nodata parts
     ind_x = xr.DataArray(ixs, dims=["s"])
     ind_y = xr.DataArray(iys, dims=["s"])
-    section = data.isel(x=ind_x, y=ind_y).where(ixs >= 0)
+    section = data.isel(x=ind_x, y=ind_y).where(ind_x >= 0)
     # Set dimension values
     section.coords["s"] = segments.cumsum() - 0.5 * segments
     section = section.assign_coords(ds=("s", segments))
