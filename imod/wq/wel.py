@@ -110,7 +110,7 @@ class Well(BoundaryCondition):
             if "layer" in self:
                 # Since the well data is in long table format, it's the only
                 # input that has to be inspected.
-                select = np.argwhere((self["time"] == time).values)[0]
+                select = np.argwhere((self["time"] == time).values)
                 for layer in np.unique(self["layer"].values[select]):
                     d["layer"] = layer
                     values[layer] = util.compose(d)
