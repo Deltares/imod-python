@@ -92,6 +92,7 @@ def decompose(path, pattern=None):
         if isinstance(pattern, Pattern):
             d = pattern.match(stem).groupdict()
         else:
+            pattern = pattern.lower()
             # Get the variables between curly braces
             in_curly = re.compile(r"{(.*?)}").findall(pattern)
             regex_parts = {key: f"(?P<{key}>[\\w-]+)" for key in in_curly}

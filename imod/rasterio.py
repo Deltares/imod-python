@@ -117,6 +117,7 @@ def ndconcat(das, dims):
         Input concatenated over n dimensions.
     """
     if len(dims) == 1:  # base case
+        das.sort(key=lambda da: da.coords[dims[0]])
         return xr.concat(das, dim=dims[0])
     else:
         dims_in = dims[1:]  # recursive case
@@ -124,21 +125,60 @@ def ndconcat(das, dims):
         return xr.concat(out, dims[0])
 
 
+def set_nested(d, keys, value):
+    if len(keys) == 1:
+        d.append(value)
+    else:
+        set_nested(d[keys[0]], keys[1:], value)
+
+
+def _read(paths, use_cftime, pattern):
+    dicts = []
+    firstlen = len(util.decompose(paths[0], pattern=pattern))
+    for path in paths:
+        d = util.decompose(path, pattern=pattern)
+        if not len(d) == firstlen:
+            raise ValueError("Number of dimensions on grids do not match.")
+        d["path"] = path
+        dicts.append(d)
+
+    dict_dims = [key for key in dicts[0] if key not in ("name", "extension", "directory", "path")]
+    ndims = len(dict_dims)
+
+    dims = dict_dims
+    groupby = initialize_groupby(ndims)
+    for d in dicts:
+        # Read array
+        da = xr.open_rasterio(d["path"]).squeeze("band", drop=True)
+        # Assign coordinates
+        groupbykeys = []
+        for dim in dict_dims:
+            value = d[dim]
+            da = da.assign_coords(**{dim: value})
+            groupbykeys.append(value)
+        # Group in the right dimension
+        set_nested(groupby, groupbykeys, da)
+
+    return ndconcat(groupby, dims)
+
+
 def initialize_groupby(ndims):
-    # In explicit form, say we have ndims=4
+    # In explicit form, say we have ndims=5
     # Then, writing it out, we get:
     # a = partial(defaultdict, list)
     # b = partial(defaultdict, a)
     # c = partial(defaultdict, b)
     # d = defaultdict(c)
-    # This can obviously be written as a for loop, as below.
-    d = collections.defaultdict(list)
+    # This can obviously be done iteratively.
     if ndims == 1:
-        return d
+        return list()
+    elif ndims == 2:
+        return collections.defaultdict(list)
     else:
-        for _ in range(ndims - 1):
+        d = functools.partial(collections.defaultdict, list)
+        for _ in range(ndims - 2):
             d = functools.partial(collections.defaultdict, d)
-        return d
+        return collections.defaultdict(d)
 
 
 def read(path, use_cftime=False, pattern=None):
