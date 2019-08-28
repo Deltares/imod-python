@@ -57,6 +57,9 @@ class Solution(Package):
         self["number_orthogonalizations"] = number_orthogonalizations
         self["scaling_method"] = scaling_method
         self["reordering_method"] = reordering_method
+        self["print_option"] = print_option
+        self["csv_output"] = csv_output
+        self["no_ptc"] = no_ptc
         self._initialize_template()
 
 
@@ -73,7 +76,7 @@ def SolutionPresetSimple(print_option, csv_output, no_ptc):
         under_relaxation_kappa=0.0,
         under_relaxation_gamma=0.0,
         under_relaxation_momentum=0.0,
-        backtracking_number=0.0,
+        backtracking_number=0,
         backtracking_tolerance=0.0,
         backtracking_reduction_factor=0.0,
         backtracking_residual_limit=0.0,

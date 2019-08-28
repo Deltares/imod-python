@@ -130,9 +130,9 @@ gwf_model["dis"] = imod.mf6.StructuredDiscretization(
     idomain=idomain,
 )
 gwf_model["npf"] = imod.mf6.NodePropertyFlow(
-    k=kh,
-    k22=kh,
-    k33=kv,
+    k=k,
+    k22=k,
+    k33=k,
     icelltype=0,
 )
 gwf_model["ic"] = imod.mf6.InitialConditions(head=startingheads)
@@ -151,7 +151,7 @@ gwf_model["oc"] = imod.mf6.OutputControl(save_head=True, save_budget=False)
 # Attach it to a simulation
 simulation = imod.mf6.Modflow6Simulation("Brabant-steady")
 simulation["gwf_1"] = gwf_model
-simulation["ims"] = imod.mf6.SolutionPresetSimple(True, False, True)
+simulation["ims"] = imod.mf6.SolutionPresetSimple(print_option=True, csv_output=False, no_ptc=True)
 #simulation["solver"] = imod.mf6.Solution(
 #    print_option=False,
 #    csv_output=False,

@@ -1,7 +1,5 @@
 begin options
-{% if print_option is defined %}  print_option {{print_option}}
-{% endif %}
-{%- if complexity is defined %}  complexity {{complexity}}
+{% if print_option is defined %}  print_option all
 {% endif %}
 {%- if csv_output_filerecord is defined %}  csv_output fileout {{csvfile}}
 {% endif %}
@@ -11,10 +9,10 @@ end options
 
 begin nonlinear
   outer_hclose {{outer_hclose}}
-{%- if outer_rclosebnd is defined %}  outer_rclosebnd {{outer_rclosebnd}}
-{% endif %}
+{% if outer_rclosebnd is defined %}  outer_rclosebnd {{outer_rclosebnd}}
+{%- endif %}
   outer_maximum {{outer_maximum}}
-{%- if under_relaxation is defined %}  under_relaxation {{under_relaxation}}
+{% if under_relaxation is defined %}  under_relaxation {{under_relaxation}}
 {% endif %}
 {%- if under_relaxation_theta is defined %}  under_relaxation_theta {{under_relaxation_theta}}
 {% endif %}
@@ -31,7 +29,7 @@ begin nonlinear
 {%- if backtracking_reduction_factor is defined %}  backtracking_reduction_factor {{backtracking_reduction_factor}}
 {% endif %}
 {%- if backtracking_residual_limit is defined %}  backtracking_residual_limit {{backtracking_residual_limit}}
-{% endif %}
+{% endif -%}
 end nonlinear
 
 begin linear
