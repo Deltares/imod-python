@@ -64,7 +64,7 @@ class Package(xr.Dataset):
         if layer is not None:
             listarr[:, 0] = layer
             listarr[:, 1:3] = np.argwhere(notnull) + 1
-        else:
+        else:  # TODO: I think this is right..., argwhere returns 2 dims in this case.
             listarr[:, 0:3] = np.argwhere(notnull) + 1
 
         for i, arr in enumerate(arrlist):

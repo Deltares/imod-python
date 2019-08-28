@@ -133,6 +133,9 @@ def set_nested(d, keys, value):
 
 
 def _read(paths, use_cftime, pattern):
+    if len(paths) == 1:
+        return xr.open_rasterio(paths[0]).squeeze("band", drop=True)
+
     dicts = []
     firstlen = len(util.decompose(paths[0], pattern=pattern))
     for path in paths:
