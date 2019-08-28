@@ -166,3 +166,17 @@ def test_get_values(test_da_nonequidistant):
         coords={"index": [0, 1, 2], "x": ("index", x), "y": ("index", y)},
         dims=["index"],
     )
+
+
+def test_get_values__scalar(test_da_nonequidistant):
+    x = 0.45
+    y = 2.25
+    actual = imod.select.points_values(test_da_nonequidistant, x=x, y=y)
+    actual = actual.drop("dx")
+    actual = actual.drop("dy")
+    data = [0]
+    expected = xr.DataArray(
+        data,
+        coords={"index": [0], "x": ("index", [x]), "y": ("index", [y])},
+        dims=["index"],
+    )

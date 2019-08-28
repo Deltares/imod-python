@@ -182,9 +182,12 @@ def points_values(da, **points):
     >>> selection = imod.select.points_values(da, x=x, y=y)
 
     """
-    for coordname in points.keys():
+    for coordname, value in points.items():
         if coordname not in da.coords:
             raise ValueError(f'DataArray has no coordinate "{coordname}"')
+        # contents must be iterable
+        points[coordname] = np.atleast_1d(value)
+
     indices = points_indices(da, **points)
     selection = da.isel(**indices)
     # Fetch a value from the dictionary, and get its size.
