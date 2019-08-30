@@ -27,6 +27,38 @@ class Model(collections.UserDict):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
+    def visualize(
+        self,
+        directory,
+        cmap="viridis",
+        overlays=[],
+        quantile_colorscale=True,
+        figsize=(8, 8),
+    ):
+        if isinstance(directory, str):
+            directory = pathlib.Path(directory)
+
+        for key, value in self.items():
+            if value._pkg_id == "well":
+                pass
+                #grouped = value.groupby(["x", "y"])
+                #x = grouped["x"].first()
+                #y = grouped["y"].first()
+            # Select appropriate datasets
+            if "x" in value.dims and "y" in value.dims:
+                for varname in value.data_vars:
+                    da = value[varname]
+                    if "x" in value.dims and "y" in da:
+                        imod.visualize.spatial.nd_imshow(
+                            da=da,
+                            name=varname,
+                            directory=directory / key,
+                            cmap=cmap,
+                            overlays=overlays,
+                            quantile_colorscale=quantile_colorscale,
+                            figsize=figsize,
+                        )
+
 
 class SeawatModel(Model):
     """

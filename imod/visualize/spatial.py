@@ -1,7 +1,9 @@
 import copy
+import pathlib
 
 import matplotlib.colors
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import xarray as xr
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -167,3 +169,53 @@ def plot_map(
 
     # Return
     return fig, ax
+
+
+def nd_imshow(
+    da,
+    name,
+    directory=".",
+    cmap="viridis",
+    overlays=[],
+    quantile_colorscale=True,
+    figsize=(8, 8),
+):
+    """
+    Automatically colors by quantile.
+
+    Dumps PNGs into directory of choice.
+    """
+    if "x" not in da.dims or "y" not in da.dims:
+        raise ValueError("DataArray must have dims x and y.")
+
+    _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(da)
+    settings_raster = {"interpolation": "nearest", "extent": [xmin, xmax, ymin, ymax]}
+    extradims = [dim for dim in da.dims if dim not in ("x", "y")]
+    stacked = da.stack(idf=extradims)
+    directory = pathlib.Path(directory)
+    for coordvals, a_yx in list(stacked.groupby("idf")):
+        fig, ax = plt.subplots(figsize=figsize)
+        if quantile_colorscale:
+            levels = np.unique(np.percentile(a_yx.values, np.linspace(0, 100, 101)))
+            norm = matplotlib.colors.BoundaryNorm(levels, 256)
+        else:
+            norm = None
+        ax1 = ax.imshow(a_yx, cmap=cmap, norm=norm, **settings_raster)
+        for overlay in overlays:
+            tmp = overlay.copy()
+            gdf = tmp.pop("gdf")
+            gdf.plot(ax=ax, **tmp)
+
+        divider = make_axes_locatable(ax)
+        cbar_ax = divider.append_axes("right", size="5%", pad="5%")
+        fig.colorbar(ax1, cmap=cmap, norm=norm, cax=cbar_ax)
+
+        fname_parts = "_".join(
+            [f"{key}{coordval}" for key, coordval in zip(extradims, coordvals)]
+        )
+        title_parts = " ,".join(
+            [f"{key}: {coordval}" for key, coordval in zip(extradims, coordvals)]
+        )
+        ax.set_title(f"{name}, {title_parts}")
+        plt.savefig(directory / f"{name}_{fname_parts}.png", dpi=200, bbox_inches="tight")
+        plt.close()
