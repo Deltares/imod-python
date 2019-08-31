@@ -86,13 +86,13 @@ class GroundwaterFlowModel(Model):
     def render(self, modeldirectory):
         """Render model namefile"""
         d = {"newton": self.newton, "under_relaxation": self.under_relaxation}
-        packages = {}
+        packages = []
         for pkgname, pkg in self.items():
             # Add the six to the package id
             pkg_id = pkg._pkg_id
             key = f"{pkg_id}6"
             path = modeldirectory / f"{pkgname}.{pkg_id}"
-            packages[key] = path.as_posix()
+            packages.append((key, path.as_posix()))
         d["packages"] = packages
         return self._template.render(d)
 
