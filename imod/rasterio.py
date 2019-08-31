@@ -145,7 +145,9 @@ def _read(paths, use_cftime, pattern):
         d["path"] = path
         dicts.append(d)
 
-    dict_dims = [key for key in dicts[0] if key not in ("name", "extension", "directory", "path")]
+    dict_dims = [
+        key for key in dicts[0] if key not in ("name", "extension", "directory", "path")
+    ]
     ndims = len(dict_dims)
 
     dims = dict_dims

@@ -107,10 +107,10 @@ class Package(xr.Dataset):
         # read a 3D botm array. By storing nlayer * nrow * ncol in the first
         # header entry, the array is read properly.
 
-        #haslayer = "layer" in da.dims
-        #if haslayer:
+        # haslayer = "layer" in da.dims
+        # if haslayer:
         #    nlayer, nrow, ncol = da.shape
-        #else:
+        # else:
         #    nrow, ncol = da.shape
         #    nlayer = 1
 
