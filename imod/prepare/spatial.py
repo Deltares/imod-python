@@ -556,7 +556,7 @@ def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
     df = pd.DataFrame()
     df["row_index"] = rows + rowstart
     df["col_index"] = cols + colstart
-    df["id"] = values
+    df[column] = values
     df["area"] = counts * (dx * dx)
 
     return df
@@ -610,17 +610,34 @@ def _create_chunks(like, resolution, chunksize):
 
 
 def celltable(path, column, resolution, like, chunksize=1e4):
-    """
+    r"""
     Process area of features by rasterizing in a chunkwise to limit memory
     usage.
 
-    Returns a table of cell indices (row, column) with feature ID, and feature
-    area within cell. Essentially returns a COO sparse matrix, but with
-    duplicate values per cell, since more than one geometry may be present.
+    Returns a table of cell indices (row, column) with for example feature ID,
+    and feature area within cell. Essentially returns a COO sparse matrix, but
+    with duplicate values per cell, since more than one geometry may be present.
 
     The feature area within the cell is approximated by first rasterizing the
     feature, and then counting the number of occuring cells. This means the
     accuracy of the area depends on the cellsize of the rasterization step.
+
+    A celltable is returned, as a ``pandas.DataFrame``. It has the following
+    columns:
+
+    1. ``"row_index"``
+    2. ``"col_index"``
+    3. the value of the ``column`` argument
+    4. ``"area"``
+
+    ``"row_index"`` and ``"col_index"`` are the indices of the like array in
+    which the polygon is located. The ``column`` value holds the rasterized
+    value of the specified column. ``"area"`` contains the area of the 
+    polygon within the cell.
+
+    The most convenient way of using this celltable is by specifying a feature
+    ID as ``column``. After creating a celltable, ``pandas.DataFrame.merge()``
+    can be used to join additional data on this ID. Refer to the examples.
 
     Parameters
     ----------
@@ -640,6 +657,60 @@ def celltable(path, column, resolution, like, chunksize=1e4):
     Returns
     -------
     celltable : pandas.DataFrame
+
+    Examples
+    --------
+    Assume we have a shapefile called ``waterways.shp`` and information on the
+    model discretization is described by a ``like`` DataArray. The feature ID is
+    provided by a column in the shapefile called "ID-code". Additionally, this
+    shapefile also specifies bed hydraulic resistance (c0). For this specific
+    discretization, we wish to calculate a conductance (area divided by
+    hydraulic resistance). To do so, we:
+
+    1. create a ``celltable``
+    2. join the additional attributes (such as c0)
+    3. compute the conductance per feature
+    4. sum conductances per cell
+
+    Import the required packages.
+
+    >>> import imod
+    >>> import geopandas as gpd
+
+    Generate the celltable.
+
+    >>> celltable = imod.prepare.celltable(
+            path="waterways.shp",
+            column="ID-code",
+            resolution=0.5,
+            like=like,
+        )
+
+    Load the shapefile with geopandas into a ``GeoDataFrame``.
+
+    >>> gdf = gpd.read_file("waterways.shp)
+
+    Select the relevant columns into a ``pandas.DataFrame`` and merge with the
+    celltable.
+
+    >>> df = gdf[["ID-code", "c0"]]
+    >>> joined = celltable.merge(gdf, on="ID-code")
+
+    We compute the conductance, and sum it per cell using ``pandas`` methods:
+
+    >>> joined["conductance"] = joined["area"] / joined["c0"]
+    >>> summed_conductance = joined.groupby(["row_index", "col_index"], as_index=False)[
+            "conductance"
+        ].sum()
+
+    Finally, turn the result into a DataArray so it can be used as model input:
+
+    >>> conductance = imod.prepare.rasterize_celltable(
+            table=summed_conductance,
+            column="conductance",
+            like=like,
+        )
+
     """
     like_chunks, rowstarts, colstarts = _create_chunks(like, resolution, chunksize)
     collection = [

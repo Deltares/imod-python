@@ -170,7 +170,7 @@ def test_table(test_shapefile):
     expected = pd.DataFrame()
     expected["row_index"] = [1]
     expected["col_index"] = [0]
-    expected["id"] = [2]
+    expected["values"] = [2]
     expected["area"] = [1.0]
 
     actual = imod.prepare.spatial._celltable(
@@ -183,7 +183,7 @@ def test_rasterize_table():
     table = pd.DataFrame()
     table["row_index"] = [1]
     table["col_index"] = [0]
-    table["id"] = [2]
+    table["values"] = [2]
     table["area"] = [1.0]
 
     coords = {"y": [1.5, 0.5], "x": [0.5, 1.5]}
