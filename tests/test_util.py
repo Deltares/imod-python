@@ -2,9 +2,11 @@ import datetime
 import pathlib
 import re
 
+import affine
 import cftime
 import numpy as np
 import pytest
+import xarray as xr
 from imod import util
 
 
@@ -257,3 +259,38 @@ def test_datetime_conversion__withinbounds_cftime():
     assert all(type(t) == cftime.DatetimeProlepticGregorian for t in converted)
     assert converted[0] == cftime.DatetimeProlepticGregorian(2000, 1, 1)
     assert converted[-1] == cftime.DatetimeProlepticGregorian(2009, 1, 1)
+
+
+def test_transform():
+    # implicit dx dy
+    data = np.ones((2, 3))
+    coords = {"x": [0.5, 1.5, 2.5], "y": [1.5, 0.5]}
+    dims = ("y", "x")
+    da = xr.DataArray(data, coords, dims)
+    actual = util.transform(da)
+    expected = affine.Affine(1.0, 0.0, 0.0, 0.0, -1.0, 2.0)
+    assert actual == expected
+
+    # explicit dx dy, equidistant
+    coords = {
+        "x": [0.5, 1.5, 2.5],
+        "y": [1.5, 0.5],
+        "dx": ("x", [1.0, 1.0, 1.0]),
+        "dy": ("y", [-1.0, -1.0]),
+    }
+    dims = ("y", "x")
+    da = xr.DataArray(data, coords, dims)
+    actual = util.transform(da)
+    assert actual == expected
+
+    # explicit dx dy, non-equidistant
+    coords = {
+        "x": [0.5, 1.5, 3.5],
+        "y": [1.5, 0.5],
+        "dx": ("x", [1.0, 1.0, 2.0]),
+        "dy": ("y", [-1.0, -1.0]),
+    }
+    dims = ("y", "x")
+    da = xr.DataArray(data, coords, dims)
+    with pytest.raises(ValueError):
+        util.transform(da)

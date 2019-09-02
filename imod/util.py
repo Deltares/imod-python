@@ -378,6 +378,19 @@ def transform(a):
 
     """
     dx, xmin, _, dy, _, ymax = spatial_reference(a)
+
+    def equidistant(dx, name):
+        if isinstance(dx, np.ndarray):
+            if np.unique(dx).size == 1:
+                return dx[0]
+            else:
+                raise ValueError(f"DataArray is not equidistant along {name}")
+        else:
+            return dx
+
+    dx = equidistant(dx, "x")
+    dy = equidistant(dy, "y")
+
     if dx < 0.0:
         raise ValueError("dx must be positive")
     if dy > 0.0:
