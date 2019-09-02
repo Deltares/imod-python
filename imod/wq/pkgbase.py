@@ -152,7 +152,14 @@ class Package(xr.Dataset):
                 if isinstance(da, xr.DataArray):
                     if "layer" in da.dims:
                         da = da.dropna(dim="layer", how="all")
-                imod.idf.save(path, da)
+
+                if "species" in da.coords:
+                    if "time" in da.coords:
+                        imod.idf.save(path, da, pattern="{name}_{species}_{time}_l{layer}")
+                    else:
+                        imod.idf.save(path, da, pattern="{name}_{species}_l{layer}")
+                else:
+                    imod.idf.save(path, da)
 
     def _check_positive(self, varnames):
         for var in varnames:
