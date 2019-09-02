@@ -41,9 +41,9 @@ class Model(collections.UserDict):
         for key, value in self.items():
             if value._pkg_id == "well":
                 pass
-                #grouped = value.groupby(["x", "y"])
-                #x = grouped["x"].first()
-                #y = grouped["y"].first()
+                # grouped = value.groupby(["x", "y"])
+                # x = grouped["x"].first()
+                # y = grouped["y"].first()
             # Select appropriate datasets
             if "x" in value.dims and "y" in value.dims:
                 for varname in value.data_vars:
