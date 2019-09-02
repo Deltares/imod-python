@@ -201,11 +201,7 @@ def format_time(time):
         # The following line is because numpy.datetime64[ns] does not
         # support converting to datetime, but returns an integer instead.
         # This solution is 20 times faster than using pd.to_datetime()
-        return (
-            time.astype("datetime64[us]")
-            .item()
-            .strftime("%Y%m%d%H%M%S")
-        )
+        return time.astype("datetime64[us]").item().strftime("%Y%m%d%H%M%S")
     else:
         return coordval.strftime("%Y%m%d%H%M%S")
 
@@ -237,6 +233,8 @@ def nd_imshow(
     else:
         stacked = da.stack(idf=extradims)
         for coordvals, a_yx in list(stacked.groupby("idf")):
+            if a_yx.isnull().all():
+                continue
 
             fname_parts = []
             title_parts = []

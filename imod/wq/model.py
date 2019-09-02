@@ -49,6 +49,9 @@ class Model(collections.UserDict):
                 for varname in value.data_vars:
                     da = value[varname]
                     if "x" in value.dims and "y" in da:
+                        if da.isnull().all():
+                            continue
+
                         imod.visualize.spatial.nd_imshow(
                             da=da,
                             name=varname,
