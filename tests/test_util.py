@@ -59,6 +59,22 @@ def test_decompose():
         "name": "head",
         "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
         "layer": 5,
+        "dims": ["time", "layer"],
+    }
+    assert isinstance(d, dict)
+    assert d == refd
+
+
+def test_decompose_species():
+    d = util.decompose("path/to/conc_20180222090657_c3_l5.idf")
+    refd = {
+        "extension": ".idf",
+        "species": 3,
+        "directory": pathlib.Path("path", "to"),
+        "name": "conc",
+        "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
+        "layer": 5,
+        "dims": ["time", "species", "layer"],
     }
     assert isinstance(d, dict)
     assert d == refd
@@ -72,6 +88,7 @@ def test_decompose_short_date():
         "name": "head",
         "time": datetime.datetime(2018, 2, 22),
         "layer": 5,
+        "dims": ["time", "layer"],
     }
     assert isinstance(d, dict)
     assert d == refd
@@ -85,6 +102,7 @@ def test_decompose_nonstandard_date():
         "name": "head",
         "time": datetime.datetime(2018, 2, 22),
         "layer": 5,
+        "dims": ["time", "layer"],
     }
     assert isinstance(d, dict)
     assert d == refd
@@ -98,6 +116,7 @@ def test_decompose_underscore():
         "name": "starting_head",
         "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
         "layer": 5,
+        "dims": ["time", "layer"],
     }
     assert isinstance(d, dict)
     assert d == refd
@@ -111,6 +130,7 @@ def test_decompose_dash():
         "name": "starting-head",
         "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
         "layer": 5,
+        "dims": ["time", "layer"],
     }
     assert isinstance(d, dict)
     assert d == refd
@@ -124,6 +144,7 @@ def test_decompose_steady_state():
         "name": "head",
         "time": "steady-state",
         "layer": 64,
+        "dims": ["layer", "time"],
     }
     assert isinstance(d, dict)
     assert d == refd
@@ -135,6 +156,7 @@ def test_decompose_underscore_in_name():
         "extension": ".idf",
         "directory": pathlib.Path("path", "to"),
         "name": "some_name",
+        "dims": [],
     }
     assert isinstance(d, dict)
     assert d == refd
@@ -150,6 +172,7 @@ def test_decompose_pattern_underscore():
         "name": "starting_head",
         "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
         "layer": 5,
+        "dims": ["time", "layer"],
     }
     assert isinstance(d, dict)
     assert d == refd
@@ -165,6 +188,7 @@ def test_decompose_pattern_dash():
         "name": "starting-head",
         "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
         "layer": 5,
+        "dims": ["time", "layer"],
     }
     assert isinstance(d, dict)
     assert d == refd
@@ -178,6 +202,7 @@ def test_decompose_regexpattern():
         "directory": pathlib.Path("."),
         "name": "head",
         "layer": 11,
+        "dims": ["layer"],
     }
     assert isinstance(d, dict)
     assert d == refd
@@ -197,6 +222,7 @@ def test_decompose_dateonly():
         "directory": pathlib.Path("."),
         "name": "20180222090657",
         "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
+        "dims": ["time"],
     }
     assert isinstance(d, dict)
     assert d == refd
@@ -210,6 +236,7 @@ def test_decompose_datelayeronly():
         "name": "20180222090657_7",
         "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
         "layer": 7,
+        "dims": ["time", "layer"],
     }
     assert isinstance(d, dict)
     assert d == refd
@@ -222,6 +249,7 @@ def test_compose_year9999():
         "extension": ".idf",
         "layer": 5,
         "time": datetime.datetime(9999, 2, 22, 9, 6, 57),
+        "dims": ["time"],
     }
     path = util.compose(d)
     targetpath = pathlib.Path(d["directory"], "head_99990222090657_l5.idf")
@@ -235,6 +263,7 @@ def test_decompose_dateonly_year9999():
         "directory": pathlib.Path("."),
         "name": "99990222090657",
         "time": datetime.datetime(9999, 2, 22, 9, 6, 57),
+        "dims": ["time"],
     }
     assert isinstance(d, dict)
     assert d == refd

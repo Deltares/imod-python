@@ -75,6 +75,8 @@ class BasicTransport(Package):
 
     _template = jinja2.Template(
         "[btn]\n"
+        "    ncomp = {{n_species}}\n"  # Number of components
+        "    mcomp = {{n_species}}\n"  # Number of mobile components
         "    thkmin = {{minimum_active_thickness}}\n"
         "    cinact = {{inactive_concentration}}\n"
         "    {%- for species, layerdict in starting_concentration.items() %}\n"

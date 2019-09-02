@@ -127,19 +127,6 @@ def _check_cellsizes(cellsizes):
                     raise ValueError(msg)
 
 
-def _sort_time_layer(header):
-    """Key to sort headers by time and layer
-
-    Works regardless of whether time and layer is present in the header,
-    by returning the sortable but constant 0 if it is not. Not that this
-    requires that all headers in the list either have or don't have time
-    or layer. This is ensured by _all_or_nothing.
-    """
-    time = header.get("time", 0)
-    layer = header.get("layer", 0)
-    return time, layer
-
-
 def _has_dim(seq):
     """Check if either 0 or all None are present
 
@@ -526,78 +513,217 @@ def _scalar_z_coord(coords, tops, bots):
     return coords
 
 
-def _load(paths, use_cftime, pattern):
-    """Combine a list of paths to IDFs to a single xarray.DataArray"""
-    # this function also works for single IDFs
+def _initialize_groupby(ndims):
+    """
+    This function generates a data structure consisting of defaultdicts, to use
+    for grouping arrays by dimension. The number of dimensions may vary, so the
+    degree of nesting might vary as well.
 
-    headers_unsorted = [imod.idf.header(p, pattern) for p in paths]
-    names_unsorted = [h["name"] for h in headers_unsorted]
-    _all_equal(names_unsorted, "names")
+    For a single dimension such as layer, it'll look like:
+    d = {1: da1, 2: da2, etc.}
 
-    # sort headers and paths by time then layer
-    zipped = zip(headers_unsorted, paths)
-    zipped_sorted = sorted(zipped, key=lambda pair: _sort_time_layer(pair[0]))
-    headers, paths = map(list, zip(*zipped_sorted))
+    For two dimensions, layer and time:
+    d = {"2001-01-01": {1: da1, 2: da3}, "2001-01-02": {1: da3, 2: da4}, etc.}
 
-    times = [c.get("time", None) for c in headers]
-    layers = [c.get("layer", None) for c in headers]
-    bounds = [(h["xmin"], h["xmax"], h["ymin"], h["ymax"]) for h in headers]
-    cellsizes = [(h["dx"], h["dy"]) for h in headers]
-    tops = [c.get("top", None) for c in headers]
-    bots = [c.get("bot", None) for c in headers]
+    And so on for more dimensions.
 
-    hastime = _has_dim(times)
-    haslayer = _has_dim(layers)
-    all_have_z = all(map(lambda v: v is not None, itertools.chain(tops, bots)))
-    _all_equal(bounds, "bounding boxes")
-    _check_cellsizes(cellsizes)
+    Defaultdicts are very well suited to this application. The
+    itertools.groupby object does not provide any benefits in this case, it
+    simply provides a generator; its entries have to come presorted. It also
+    does not provide tools for these kind of variably nested groupby's.
 
+    Pandas.groupby does provide this functionality. However, pandas dataframes
+    do not accept any field value, whereas these dictionaries do. Might be 
+    worthwhile to look into, if performance is an issue.
+
+    Parameters
+    ----------
+    ndims : int
+        Number of dimensions
+
+    Returns
+    -------
+        groupby : Defaultdicts, ndims - 1 times nested
+    """
+    # In explicit form, say we have ndims=5
+    # Then, writing it out, we get:
+    # a = partial(defaultdict, {})
+    # b = partial(defaultdict, a)
+    # c = partial(defaultdict, b)
+    # d = defaultdict(c)
+    # This can obviously be done iteratively.
+    if ndims == 1:
+        return {}
+    elif ndims == 2:
+        return collections.defaultdict(dict)
+    else:
+        d = functools.partial(collections.defaultdict, dict)
+        for _ in range(ndims - 2):
+            d = functools.partial(collections.defaultdict, d)
+        return collections.defaultdict(d)
+
+
+def _set_nested(d, keys, value):
+    """
+    Set in the deepest dict of a set of nested dictionaries, as created by the
+    _initialize_groupby function above. 
+
+    Mutates d.
+
+    Parameters
+    ----------
+    d : (Nested dict of) dict
+    keys : list of keys
+        Each key is a level of nesting
+    value : dask array, typically
+
+    Returns
+    -------
+    None
+    """
+    if len(keys) == 1:
+        d[keys[0]] = value
+    else:
+        _set_nested(d[keys[0]], keys[1:], value)
+
+
+def _sorteddict(d):
+    """
+    Sorts a variably nested dict (of dicts) by keys.
+
+    Each dictionary will be sorted by its keys.
+
+    Parameters
+    ----------
+    d : (Nested dict of) dict
+
+    Returns
+    -------
+    sorted_lists : list (of lists)
+        Values sorted by keys, matches the nesting of d.
+    """
+    firstkey = next(iter(d.keys()))
+    if not isinstance(d[firstkey], dict):  # Base case
+        return [v for (_, v) in sorted(d.items(), key=lambda t: t[0])]
+    else:  # Recursive case
+        return [_sorteddict(v) for (_, v) in sorted(d.items(), key=lambda t: t[0])]
+
+
+def _ndconcat(arrays, ndim):
+    """
+    Parameters
+    ----------
+    arrays : list of lists, n levels deep.
+        E.g.  [[da1, da2], [da3, da4]] for n = 2. 
+        (compare with docstring for _initialize_groupby)
+    ndim : int
+        number of dimensions over which to concatenate.
+
+    Returns
+    -------
+    concatenated : xr.DataArray
+        Input concatenated over n dimensions.
+    """
+    if ndim == 1:  # base case
+        return dask.array.stack(arrays, axis=0)
+    else:  # recursive case
+        ndim = ndim - 1
+        out = [_ndconcat(arrays_in, ndim) for arrays_in in arrays]
+        return dask.array.stack(out, axis=0)
+
+
+def _dims_coordinates(header_coords, bounds, cellsizes, tops, bots, use_cftime):
     # create coordinates
     coords = util._xycoords(bounds[0], cellsizes[0])
     dims = ["y", "x"]
-    # order matters here due to inserting dims
-    if haslayer:
-        coords["layer"], unique_indices = np.unique(layers, return_index=True)
-        dims.insert(0, "layer")
+    # Time and layer have to be special cased.
+    # Time due to the multitude of datetimes possible
+    # Layer because layer is required to properly assign top and bot data.
+    haslayer = False
+    hastime = False
+    otherdims = []
+    for dim in list(header_coords.keys()):
+        if dim == "layer":
+            haslayer = True
+            coords["layer"], unique_indices = np.unique(
+                header_coords["layer"], return_index=True
+            )
+        elif dim == "time":
+            hastime = True
+            times, use_cftime = util._convert_datetimes(
+                header_coords["time"], use_cftime
+            )
+            if use_cftime:
+                coords["time"] = xr.CFTimeIndex(np.unique(times))
+            else:
+                coords["time"] = np.unique(times)
+        else:
+            otherdims.append(dim)
+            coords[dim] = np.unique(header_coords[dim])
 
+    # Ensure right dimension
+    if haslayer:
+        dims.insert(0, "layer")
+    if hastime:
+        dims.insert(0, "time")
+    for dim in otherdims:
+        dims.insert(0, dim)
+
+    # Deal with voxel idf top and bottom data
+    all_have_z = all(map(lambda v: v is not None, itertools.chain(tops, bots)))
     if all_have_z:
         if haslayer and coords["layer"].size > 1:
             coords = _array_z_coord(coords, tops, bots, unique_indices)
         else:
             coords = _scalar_z_coord(coords, tops, bots)
 
-    if hastime:
-        times, use_cftime = util._convert_datetimes(times, use_cftime)
-        if use_cftime:
-            coords["time"] = xr.CFTimeIndex(np.unique(times))
-        else:
-            coords["time"] = np.unique(times)
-        dims.insert(0, "time")
+    return dims, coords
 
-    # avoid calling imod.idf.header again here with attrs keyword
-    dask_arrays = [
-        imod.idf._dask(path, attrs=attrs)[0] for (path, attrs) in zip(paths, headers)
-    ]
 
-    if hastime and haslayer:
-        # first stack layers per timestep, then stack that
-        # this order has to match the dims
-        dask_timesteps = []
-        # for this groupby the argument needs to be presorted, which is done above
-        for _, g in itertools.groupby(zip(dask_arrays, times), key=lambda z: z[1]):
-            # a list of dask arrays belonging to a single timestep (all layers)
-            dask_list = [t[0] for t in g]
-            # stack with dask, adding a new dimension to the front
-            dask_timestep = dask.array.stack(dask_list, axis=0)
-            dask_timesteps.append(dask_timestep)
+def _load(paths, use_cftime, pattern):
+    """Combine a list of paths to IDFs to a single xarray.DataArray"""
+    # this function also works for single IDFs
 
-        dask_array = dask.array.stack(dask_timesteps, axis=0)
-    elif hastime or haslayer:
-        dask_array = dask.array.stack(dask_arrays, axis=0)
+    headers = [imod.idf.header(p, pattern) for p in paths]
+    names = [h["name"] for h in headers]
+    _all_equal(names, "names")
+
+    # Extract data from headers
+    bounds = []
+    cellsizes = []
+    tops = []
+    bots = []
+    header_coords = collections.defaultdict(list)
+    for h in headers:
+        bounds.append((h["xmin"], h["xmax"], h["ymin"], h["ymax"]))
+        cellsizes.append((h["dx"], h["dy"]))
+        tops.append(h.get("top", None))
+        bots.append(h.get("bot", None))
+        for key in h["dims"]:
+            header_coords[key].append(h[key])
+    # Do a basic check whether IDFs align in x and y
+    _all_equal(bounds, "bounding boxes")
+    _check_cellsizes(cellsizes)
+    # Generate coordinates
+    dims, coords = _dims_coordinates(
+        header_coords, bounds, cellsizes, tops, bots, use_cftime
+    )
+    # This part have makes use of recursion to deal with an arbitrary number
+    # of dimensions. It may therefore be a little hard to read.
+    groupbydims = dims[:-2]  # skip y and x
+    ndim = len(groupbydims)
+    groupby = _initialize_groupby(ndim)
+    if ndim == 0:  # Single idf
+        dask_array, _ = imod.idf._dask(paths[0], headers[0])
     else:
-        dask_array = dask_arrays[0]
+        for path, attrs in zip(paths, headers):
+            da, _ = imod.idf._dask(path, attrs=attrs)
+            groupbykeys = [attrs[k] for k in groupbydims]
+            _set_nested(groupby, groupbykeys, da)
+        dask_arrays = _sorteddict(groupby)
+        dask_array = _ndconcat(dask_arrays, ndim)
 
-    return xr.DataArray(dask_array, coords, dims, name=names_unsorted[0])
+    return xr.DataArray(dask_array, coords, dims, name=names[0])
 
 
 def open_dataset(globpath, use_cftime=False, pattern=None):

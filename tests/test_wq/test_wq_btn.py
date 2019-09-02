@@ -39,6 +39,8 @@ def test_btn_render_arrays(basictransport):
     compare = textwrap.dedent(
         """\
             [btn]
+                ncomp = 1
+                mcomp = 1
                 thkmin = 0.01
                 cinact = 1e+30
                 sconc_t1_l1 = starting_concentration_l1.idf
@@ -72,6 +74,8 @@ def test_btn_render_constants(basictransport):
     compare = textwrap.dedent(
         """\
             [btn]
+                ncomp = 1
+                mcomp = 1
                 thkmin = 0.01
                 cinact = 1e+30
                 sconc_t1_l? = 0.0
