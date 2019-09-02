@@ -712,6 +712,12 @@ def celltable(path, column, resolution, like, chunksize=1e4):
         )
 
     """
+    dx, _, _, dy, _, _ = imod.util.spatial_reference(like)
+    if not (np.atleast_1d(dx) % resolution == 0.0).all():
+        raise ValueError("resolution is not an (integer) divisor of dx")
+    if not (np.atleast_1d(dy) % resolution == 0.0).all():
+        raise ValueError("resolution is not an (integer) divisor of dy")
+
     like_chunks, rowstarts, colstarts = _create_chunks(like, resolution, chunksize)
     collection = [
         dask.delayed(_celltable)(path, column, resolution, chunk, rowstart, colstart)

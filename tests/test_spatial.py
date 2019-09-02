@@ -162,7 +162,7 @@ def test_gdal_rasterize(test_shapefile):
     assert actual.identical(expected)
 
 
-def test_table(test_shapefile):
+def test_private_celltable(test_shapefile):
     coords = {"y": [1.5, 0.5], "x": [0.5, 1.5]}
     dims = ("y", "x")
     like = xr.DataArray(np.full((2, 2), np.nan), coords, dims)
@@ -177,6 +177,27 @@ def test_table(test_shapefile):
         "testvector/shape.shp", "values", 1.0, like
     )
     pd.testing.assert_frame_equal(actual, expected, check_dtype=False)
+
+
+def test_celltable(test_shapefile):
+    coords = {"y": [1.5, 0.5], "x": [0.5, 1.5]}
+    dims = ("y", "x")
+    like = xr.DataArray(np.full((2, 2), np.nan), coords, dims)
+
+    expected = pd.DataFrame()
+    expected["row_index"] = [1]
+    expected["col_index"] = [0]
+    expected["values"] = [2]
+    expected["area"] = [1.0]
+
+    actual = imod.prepare.spatial.celltable("testvector/shape.shp", "values", 1.0, like)
+    pd.testing.assert_frame_equal(actual, expected, check_dtype=False)
+
+    # test resolution error:
+    with pytest.raises(ValueError):
+        actual = imod.prepare.spatial.celltable(
+            "testvector/shape.shp", "values", 0.17, like
+        )
 
 
 def test_rasterize_table():
