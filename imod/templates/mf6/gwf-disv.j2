@@ -1,0 +1,35 @@
+begin options
+{%- if length_units is defined -%}  length_units {{length_units}}{%- endif -%}
+{%- if nogrb is defined -%}  nogrb{%- endif -%}
+{%- if xorigin is defined -%}  xorigin {{xorigin}}{%- endif -%}
+{%- if yorigin is defined -%}  yorigin {{yorigin}}{%- endif -%}
+{%- if angrot is defined -%}  angrot {{angrot}}{%- endif -%}
+end options
+
+begin dimensions
+  nlay {{nlay}}
+  ncpl {{ncpl}}
+  nvert {{nvert}}
+end dimensions
+
+begin griddata
+  top
+    {top}
+  botm {% if layered is sameas true %}layered{% endif %}
+    {botm}
+{%- if idomain is defined -%}  idomain {% if layered is sameas true %}layered{% endif %}
+    {idomain}{%- endif -%}
+end griddata
+
+begin vertices
+  {{iv}} {{xv}} {{yv}}
+  {{iv}} {{xv}} {{yv}}
+  ...
+end vertices
+
+begin cell2d
+  {{icell2d}} {{xc}} {{yc}} {{ncvert}} {{icvert(ncvert)}}
+  {{icell2d}} {{xc}} {{yc}} {{ncvert}} {{icvert(ncvert)}}
+  ...
+end cell2d
+

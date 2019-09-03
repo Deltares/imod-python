@@ -16,7 +16,7 @@ setup(
     license="MIT",
     packages=find_packages(),
     package_dir={"imod": "imod"},
-    package_data={"imod": ["templates/*.j2"]},
+    package_data={"imod": ["templates/*.j2", "templates/mf6/*.j2"]},
     test_suite="tests",
     python_requires=">=3.6",
     install_requires=[

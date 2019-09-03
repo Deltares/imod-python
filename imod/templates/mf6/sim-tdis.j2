@@ -1,0 +1,15 @@
+begin options
+{% if time_units is defined %}  time_units {{time_units}}
+{% endif %}
+{%- if start_date_time is defined %}  start_date_time {{start_date_time}}
+{% endif -%}
+end options
+
+begin dimensions
+  nper {{nper}}
+end dimensions
+
+begin perioddata
+{% for perlen, nstp, tsmult in perioddata %}  {{perlen}} {{nstp}} {{tsmult}}
+{% endfor -%}
+end perioddata

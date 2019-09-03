@@ -126,6 +126,4 @@ def test_voxelize__max_overlap_2(test_da):
         coords,
         dims,
     )
-    print(actual)
-    print(expected)
     assert actual.identical(expected)

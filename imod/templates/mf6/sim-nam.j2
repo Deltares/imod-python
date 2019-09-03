@@ -1,0 +1,30 @@
+begin options
+{% if continue is defined %}  continue
+{% endif %}
+{%- if nocheck is defined %}  nocheck
+{% endif %}
+{%- if memory_print_option is defined %}  memory_print_option {{memory_print_option}}
+{% endif -%}
+end options
+
+begin timing
+  tdis6 {{tdis6}}
+end timing
+
+begin models
+{% for mtype, mfname, name in models %}  {{mtype}} {{mfname}} {{name}}
+{% endfor -%}
+end models
+
+begin exchanges
+{% for exgtype, exgfile, exgmnamea, exgmnameb in exchanges %}
+  {{exgtype}} {{exgfile}} {{exgmnamea}} {{exgmnameb}}
+{% endfor -%}
+end exchanges
+
+{% for solutiongroup in solutiongroups %}begin solutiongroup {{loop.index}}
+{% if mxiter is defined %}  mxiter {{mxiter}}
+{% endif -%}
+{% for slntype, slnfname, slnmnames in solutiongroup %}  {{slntype}} {{slnfname}} {{slnmnames|join(' ')}}
+{% endfor -%}
+end solutiongroup{% endfor %}

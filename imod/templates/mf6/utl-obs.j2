@@ -1,0 +1,11 @@
+begin options
+{%- if digits is defined -%}  digits {{digits}}{%- endif -%}
+{%- if print_input is defined -%}  print_input{%- endif -%}
+end options
+
+begin continuous
+  {{obsname}} {{obstype}} {{id}} {%- if id2 is defined -%}{{id2}}{%- endif -%}
+  {{obsname}} {{obstype}} {{id}} {%- if id2 is defined -%}{{id2}}{%- endif -%}
+  ...
+end continuous
+

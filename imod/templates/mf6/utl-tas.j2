@@ -1,0 +1,17 @@
+begin attributes
+  name {{time_series_nameany1d}} 
+  name
+   {{time_series_nameany1d}}
+{%- if interpolation_methodrecord is defined -%}  method {{interpolation_method}}{%- endif -%}
+  method
+   {{interpolation_method}}
+{%- if sfacrecord is defined -%}  sfac {{sfacvaltime_series_name}}{%- endif -%}
+  sfac
+   {{sfacvaltime_series_name}}
+end attributes
+
+begin time
+  
+    {tas_array}
+end time
+

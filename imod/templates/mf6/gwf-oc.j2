@@ -1,0 +1,13 @@
+begin options
+{% if budgetfile is defined %}  budget fileout {{budgetfile}}
+{% endif %}
+{%- if headfile is defined %}  head fileout {{headfile}}
+{% endif %}
+{%- if headprintrecord is defined %}  head print_format columns {{columns}} width {{width}} digits {{digits}} {{format}}
+{% endif -%}
+end options
+
+{% for i, perioddict in periods.items() %}begin period {{i}}
+{% for key, value in perioddict.items() %}  {{key}} {{value}}
+{% endfor -%} 
+end period{% endfor %}
