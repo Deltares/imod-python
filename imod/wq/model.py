@@ -144,12 +144,15 @@ class SeawatModel(Model):
 
         return package_groups
 
+    def _hastime(self, pkg):
+        return (pkg._pkg_id == "wel" and "time" in pkg) or ("time" in pkg.coords)
+
     def _use_cftime(self):
         """
         Also checks if datetime types are homogeneous across packages.
         """
         types = [
-            type(pkg["time"].values[0]) for pkg in self.values() if "time" in pkg.coords
+            type(pkg["time"].values[0]) for pkg in self.values() if self._hastime(pkg)
         ]
         # Types will be empty if there's no time dependent input
         if len(set(types)) == 0:
@@ -175,14 +178,16 @@ class SeawatModel(Model):
         self.use_cftime = self._use_cftime()
 
         times = [timeutil.to_datetime(time, self.use_cftime) for time in times]
-        for pkg in self.values():
-            if "time" in pkg.coords:
-                times.append(pkg["time"].values)
+        first_times = {}  # first time per package
+        for key, pkg in self.items():
+            if self._hastime(pkg):
+                pkgtimes = list(pkg["time"].values)
+                first_times[key] = np.sort(pkg["time"].values)[0]
                 for var in pkg.data_vars:
                     if "timemap" in pkg[var].attrs:
-                        timemap = pkg[var].attrs["timemap"]
-                        for time in timemap.keys():
-                            times.append(time)
+                        timemap_times = list(pkg[var].attrs["timemap"].keys())
+                        pkgtimes.append(timemap_times)
+                times.append(pkgtimes)
 
         # TODO: check that endtime is later than all other times.
         times.append(timeutil.to_datetime(endtime, self.use_cftime))
@@ -191,6 +196,17 @@ class SeawatModel(Model):
 
         # np.unique also sorts
         times = np.unique(np.hstack(times))
+
+        # Check if every transient package commences at the same time.
+        for key, first_time in first_times.items():
+            time0 = times[0]
+            if first_time != time0:
+                raise ValueError(
+                    f"Package {key} does not have a value specified for the "
+                    f"first time: {time0}. Every input must be present in the "
+                    "first stress period. Values are only filled forward in "
+                    "time."
+                )
 
         duration = timeutil.timestep_duration(times, self.use_cftime)
         # Generate time discretization, just rely on default arguments

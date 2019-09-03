@@ -545,6 +545,21 @@ def test_write(basicmodel):
     # TODO: more rigorous testing
 
 
+def test_write__error_stress_time_not_first(basicmodel):
+    """
+    In this case, the WEL package isn't specified for the first stress period.
+    This should raise an error.
+    """
+    m = basicmodel
+    datetimes = pd.date_range("2000-01-01", "2000-01-05")[1:]
+    # WEL
+    welly = np.arange(4.5, 0.0, -1.0)[1:]
+    wellx = np.arange(0.5, 5.0, 1.0)[1:]
+    m["wel"] = imod.wq.Well(id_name="well", x=wellx, y=welly, rate=5.0, time=datetimes)
+    with pytest.raises(ValueError):
+        m.time_discretization(endtime="2000-01-06")
+
+
 def test_write_result_dir(basicmodel):
     basicmodel.write(result_dir="results")
     assert pathlib.Path("test_model").exists()
