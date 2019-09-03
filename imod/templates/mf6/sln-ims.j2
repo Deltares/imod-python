@@ -1,0 +1,52 @@
+begin options
+{% if print_option is defined %}  print_option {{print_option}}
+{% endif %}
+{%- if csv_output_filerecord is defined %}  csv_output fileout {{csvfile}}
+{% endif %}
+{%- if no_ptcrecord is defined %}  no_ptc {% if no_ptc_option is defined %}{{no_ptc_option}}{% endif %}
+{% endif -%}
+end options
+
+begin nonlinear
+  outer_hclose {{outer_hclose}}
+{%- if outer_rclosebnd is defined %}  outer_rclosebnd {{outer_rclosebnd}}
+{% endif %}
+  outer_maximum {{outer_maximum}}
+{%- if under_relaxation is defined %}  under_relaxation {{under_relaxation}}
+{% endif %}
+{%- if under_relaxation_theta is defined %}  under_relaxation_theta {{under_relaxation_theta}}
+{% endif %}
+{%- if under_relaxation_kappa is defined %}  under_relaxation_kappa {{under_relaxation_kappa}}
+{% endif %}
+{%- if under_relaxation_gamma is defined %}  under_relaxation_gamma {{under_relaxation_gamma}}
+{% endif %}
+{%- if under_relaxation_momentum is defined %}  under_relaxation_momentum {{under_relaxation_momentum}}
+{% endif %}
+{%- if backtracking_number is defined %}  backtracking_number {{backtracking_number}}
+{% endif %}
+{%- if backtracking_tolerance is defined %}  backtracking_tolerance {{backtracking_tolerance}}
+{% endif %}
+{%- if backtracking_reduction_factor is defined %}  backtracking_reduction_factor {{backtracking_reduction_factor}}
+{% endif %}
+{%- if backtracking_residual_limit is defined %}  backtracking_residual_limit {{backtracking_residual_limit}}
+{% endif %}
+end nonlinear
+
+begin linear
+  inner_maximum {{inner_maximum}}
+  inner_hclose {{inner_hclose}}
+  inner_rclose {{inner_rclose}}{% if rclose_option is defined %} {{rclose_option}}{% endif %}
+  linear_acceleration {{linear_acceleration}}
+{% if relaxation_factor is defined %}  relaxation_factor {{relaxation_factor}}
+{% endif %}
+{%- if preconditioner_levels is defined %}  preconditioner_levels {{preconditioner_levels}}
+{% endif %}
+{%- if preconditioner_drop_tolerance is defined %}  preconditioner_drop_tolerance {{preconditioner_drop_tolerance}}
+{% endif %}
+{%- if number_orthogonalizations is defined %}  number_orthogonalizations {{number_orthogonalizations}}
+{% endif %}
+{%- if scaling_method is defined %}  scaling_method {{scaling_method}}
+{% endif %}
+{%- if reordering_method is defined %}  reordering_method {{reordering_method}}
+{% endif -%}
+end linear

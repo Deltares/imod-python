@@ -1,0 +1,22 @@
+begin options
+{%- if print_input is defined -%}  print_input{%- endif -%}
+{%- if print_flows is defined -%}  print_flows{%- endif -%}
+{%- if modelnames is defined -%}  modelnames{%- endif -%}
+{%- if budget_filerecord is defined -%}  budget fileout {{budgetfile}}{%- endif -%}
+end options
+
+begin dimensions
+  maxmvr {{maxmvr}}
+  maxpackages {{maxpackages}}
+end dimensions
+
+begin packages
+  {%- if mname is defined -%}{{mname}}{%- endif -%} {{pname}}
+  {%- if mname is defined -%}{{mname}}{%- endif -%} {{pname}}
+  ...
+end packages
+
+{% for i, path in periods.items() %}begin period {{i}}
+    open/close {{path}} (binary)
+end period{% endfor %}
+

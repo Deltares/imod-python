@@ -257,6 +257,18 @@ def test_xycoords_nonequidistant():
     assert np.allclose(coords["dy"][1], dy)
 
 
+def test_xycoords_equidistant_array():
+    dx = np.array([2.0, 2.0, 2.0, 2.0])
+    dy = np.array([-0.5, -0.500001, -0.5])
+    xmin, xmax = 0.0, 8.0
+    ymin, ymax = 0.0, 1.5
+    coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    assert np.allclose(coords["x"], np.arange(xmin + 1.0, xmax, 2.0))
+    assert np.allclose(coords["y"], np.arange(ymax - 0.25, ymin, -0.5))
+    assert coords["dx"] == 2.0
+    assert coords["dy"] == -0.5
+
+
 def test_save__error(test_da):
     with pytest.raises(ValueError):
         idf.save("test.idf", test_da)

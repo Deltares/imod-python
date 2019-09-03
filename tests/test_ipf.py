@@ -175,7 +175,6 @@ def test_read_associated__parameterized_delim(
     path = "assoc.txt"
     write_assoc_ipf(path, delim1, delim2, delim3, delim4, delim5)
     df = ipf.read(path)
-    print(df)
 
     nrecords, nfields = df.shape
     assert isinstance(df, pd.DataFrame)

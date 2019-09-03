@@ -1,0 +1,17 @@
+begin options
+{% if list is defined %}  list {{list}}
+{% endif %}
+{%- if print_input is defined %}  print_input
+{% endif %}
+{%- if print_flows is defined %}  print_flows
+{% endif %}
+{%- if save_flows is defined %}  save_flows
+{% endif %}
+{%- if newtonoptions is defined %}  newton {% if under_relaxation is defined %}under_relaxation{% endif %}
+{% endif -%}
+end options
+
+begin packages
+{% for (ftype, fname) in packages%}  {{ftype}} {{fname}}
+{% endfor -%}
+end packages

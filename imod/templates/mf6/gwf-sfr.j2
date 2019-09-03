@@ -1,0 +1,43 @@
+begin options
+{%- if auxiliary is defined -%}  auxiliary {{auxiliary(naux)}}{%- endif -%}
+{%- if boundnames is defined -%}  boundnames{%- endif -%}
+{%- if print_input is defined -%}  print_input{%- endif -%}
+{%- if print_stage is defined -%}  print_stage{%- endif -%}
+{%- if print_flows is defined -%}  print_flows{%- endif -%}
+{%- if save_flows is defined -%}  save_flows{%- endif -%}
+{%- if stage_filerecord is defined -%}  stage fileout {{stagefile}}{%- endif -%}
+{%- if budget_filerecord is defined -%}  budget fileout {{budgetfile}}{%- endif -%}
+{%- if ts_filerecord is defined -%}  ts6 filein {{ts6_filename}}{%- endif -%}
+{%- if obs_filerecord is defined -%}  obs6 filein {{obs6_filename}}{%- endif -%}
+{%- if mover is defined -%}  mover{%- endif -%}
+{%- if maximum_iterations is defined -%}  maximum_iterations {{maximum_iterations}}{%- endif -%}
+{%- if maximum_depth_change is defined -%}  maximum_depth_change {{maximum_depth_change}}{%- endif -%}
+{%- if unit_conversion is defined -%}  unit_conversion {{unit_conversion}}{%- endif -%}
+end options
+
+begin dimensions
+  nreaches {{nreaches}}
+end dimensions
+
+begin packagedata
+  {{rno}} {{cellid(ncelldim)}} {{rlen}} {{rwid}} {{rgrd}} {{rtp}} {{rbth}} {{rhk}} {{man}} {{ncon}} {{ustrf}} {{ndv}} {%- if aux is defined -%}{{aux(naux)}}{%- endif -%} {%- if boundname is defined -%}{{boundname}}{%- endif -%}
+  {{rno}} {{cellid(ncelldim)}} {{rlen}} {{rwid}} {{rgrd}} {{rtp}} {{rbth}} {{rhk}} {{man}} {{ncon}} {{ustrf}} {{ndv}} {%- if aux is defined -%}{{aux(naux)}}{%- endif -%} {%- if boundname is defined -%}{{boundname}}{%- endif -%}
+  ...
+end packagedata
+
+begin connectiondata
+  {{rno}} {{ic(ncon(rno))}}
+  {{rno}} {{ic(ncon(rno))}}
+  ...
+end connectiondata
+
+begin diversions
+  {{rno}} {{idv}} {{iconr}} {{cprior}}
+  {{rno}} {{idv}} {{iconr}} {{cprior}}
+  ...
+end diversions
+
+{% for i, path in periods.items() %}begin period {{i}}
+    open/close {{path}} (binary)
+end period{% endfor %}
+
