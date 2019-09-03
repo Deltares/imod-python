@@ -29,7 +29,7 @@ class Solution(Package):
         number_orthogonalizations=None,
         scaling_method=None,
         reordering_method=None,
-        print_option=False,
+        print_option="summary",
         csv_output=False,
         no_ptc=False,
     ):

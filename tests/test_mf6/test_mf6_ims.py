@@ -5,7 +5,7 @@ import imod
 
 def test_render():
     ims = imod.mf6.Solution(
-        print_option=True,
+        print_option="summary",
         csv_output=False,
         no_ptc=True,
         outer_hclose=1.0 - 4,
@@ -23,6 +23,7 @@ def test_render():
     expected = textwrap.dedent(
         """\
             begin options
+              print_option summary
             end options
 
             begin nonlinear

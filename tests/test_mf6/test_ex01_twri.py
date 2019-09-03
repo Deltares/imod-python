@@ -116,7 +116,7 @@ def twri_model(request):
     simulation["GWF_1"] = gwf_model
     # Define solver settings
     simulation["solver"] = imod.mf6.Solution(
-        print_option=False,
+        print_option="summary",
         csv_output=False,
         no_ptc=True,
         outer_hclose=1.0e-4,

@@ -197,7 +197,7 @@ gwf_model["oc"] = imod.mf6.OutputControl(save_head=True, save_budget=False)
 # Attach it to a simulation
 simulation = imod.mf6.Modflow6Simulation("Brabant-steady")
 simulation["gwf_1"] = gwf_model
-simulation["ims"] = imod.mf6.SolutionPresetSimple(print_option=True, csv_output=False, no_ptc=True)
+simulation["ims"] = imod.mf6.SolutionPresetSimple(print_option="summary", csv_output=False, no_ptc=True)
 
 # Determine time discretization
 simulation.time_discretization(starttime="2000-01-01", endtime="2000-01-02")
