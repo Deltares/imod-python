@@ -6,9 +6,14 @@ raster formats.
 Currently only :func:`imod.rasterio.write` is implemented.
 """
 
+import collections
+import functools
+import glob
 import pathlib
+import re
 
 import numpy as np
+import xarray as xr
 
 # since rasterio is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
@@ -93,3 +98,102 @@ def write(path, da, driver=None, nodata=np.nan):
     with rasterio.Env():
         with rasterio.open(path, "w", **profile) as ds:
             ds.write(dafilled.values, 1)
+
+
+def ndconcat(das, dims):
+    """
+    Parameters
+    ----------
+    das : dict (of dicts) of lists, n levels deep. Bottoms out at a list.
+        E.g. {2000-01-01: [da1, da2], 2001-01-01: [da3, da4]}
+        for n = 2.
+    dims : tuple
+        Tuple of dimensions over which to concatenate. Has to be n elements long.
+        E.g. ("time", "layer") for n = 2.
+
+    Returns
+    -------
+    concatenated : xr.DataArray
+        Input concatenated over n dimensions.
+    """
+    if len(dims) == 1:  # base case
+        das.sort(key=lambda da: da.coords[dims[0]])
+        return xr.concat(das, dim=dims[0])
+    else:
+        dims_in = dims[1:]  # recursive case
+        out = [ndconcat(das_in, dims_in) for das_in in das.values()]
+        return xr.concat(out, dims[0])
+
+
+def set_nested(d, keys, value):
+    if len(keys) == 1:
+        d.append(value)
+    else:
+        set_nested(d[keys[0]], keys[1:], value)
+
+
+def _read(paths, use_cftime, pattern):
+    if len(paths) == 1:
+        return xr.open_rasterio(paths[0]).squeeze("band", drop=True)
+
+    dicts = []
+    firstlen = len(util.decompose(paths[0], pattern=pattern))
+    for path in paths:
+        d = util.decompose(path, pattern=pattern)
+        if not len(d) == firstlen:
+            raise ValueError("Number of dimensions on grids do not match.")
+        d["path"] = path
+        dicts.append(d)
+
+    dict_dims = [
+        key for key in dicts[0] if key not in ("name", "extension", "directory", "path")
+    ]
+    ndims = len(dict_dims)
+
+    dims = dict_dims
+    groupby = initialize_groupby(ndims)
+    for d in dicts:
+        # Read array
+        da = xr.open_rasterio(d["path"]).squeeze("band", drop=True)
+        # Assign coordinates
+        groupbykeys = []
+        for dim in dict_dims:
+            value = d[dim]
+            da = da.assign_coords(**{dim: value})
+            groupbykeys.append(value)
+        # Group in the right dimension
+        set_nested(groupby, groupbykeys, da)
+
+    return ndconcat(groupby, dims)
+
+
+def initialize_groupby(ndims):
+    # In explicit form, say we have ndims=5
+    # Then, writing it out, we get:
+    # a = partial(defaultdict, list)
+    # b = partial(defaultdict, a)
+    # c = partial(defaultdict, b)
+    # d = defaultdict(c)
+    # This can obviously be done iteratively.
+    if ndims == 1:
+        return list()
+    elif ndims == 2:
+        return collections.defaultdict(list)
+    else:
+        d = functools.partial(collections.defaultdict, list)
+        for _ in range(ndims - 2):
+            d = functools.partial(collections.defaultdict, d)
+        return collections.defaultdict(d)
+
+
+def read(path, use_cftime=False, pattern=None):
+    if isinstance(path, list):
+        return _read(path, use_cftime, pattern)
+    elif isinstance(path, pathlib.Path):
+        path = str(path)
+
+    paths = [pathlib.Path(p) for p in glob.glob(path)]
+    n = len(paths)
+    if n == 0:
+        raise FileNotFoundError(f"Could not find any files matching {path}")
+    return _read(paths, use_cftime, pattern)

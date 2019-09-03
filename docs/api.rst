@@ -24,5 +24,6 @@ API Reference
     :maxdepth: 1
     :caption: Defining a groundwater model
 
+    api/mf6.rst
     api/wq.rst
     api/flow.rst

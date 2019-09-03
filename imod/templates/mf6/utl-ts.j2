@@ -1,0 +1,25 @@
+begin attributes
+  names {{time_series_namesany1d}} 
+  names
+   {{time_series_namesany1d}}
+{%- if interpolation_methodrecord is defined -%}  methods {{interpolation_methodtime_series_names}}{%- endif -%}
+  methods
+   {{interpolation_methodtime_series_names}}
+{%- if interpolation_methodrecord_single is defined -%}  method {{interpolation_method_single}}{%- endif -%}
+  method
+   {{interpolation_method_single}}
+{%- if sfacrecord is defined -%}  sfacs {{sfacval<time_series_name}}{%- endif -%}
+  sfacs
+   {{sfacval<time_series_name}}
+{%- if sfacrecord_single is defined -%}  {{sfacval<time_series_name}}{%- endif -%}
+  
+end attributes
+
+begin timeseries
+  {{ts_time}} {{ts_arraytime_series_names}}
+  {{ts_time}} {{ts_arraytime_series_names}}
+  ...
+   {{ts_time}}
+   {{ts_arraytime_series_names}}
+end timeseries
+

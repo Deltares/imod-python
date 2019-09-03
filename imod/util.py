@@ -92,6 +92,7 @@ def decompose(path, pattern=None):
         if isinstance(pattern, Pattern):
             d = pattern.match(stem).groupdict()
         else:
+            pattern = pattern.lower()
             # Get the variables between curly braces
             in_curly = re.compile(r"{(.*?)}").findall(pattern)
             regex_parts = {key: f"(?P<{key}>[\\w-]+)" for key in in_curly}
@@ -262,8 +263,12 @@ def _xycoords(bounds, cellsizes):
         dy = dy.astype(np.float64)
         coords["x"] = xmin + np.cumsum(dx) - 0.5 * dx
         coords["y"] = ymax + np.cumsum(dy) - 0.5 * dy
-        coords["dx"] = ("x", dx)
-        coords["dy"] = ("y", dy)
+        if np.allclose(dx, dx[0]) and np.allclose(dy, dy[0]):
+            coords["dx"] = float(dx[0])
+            coords["dy"] = float(dy[0])
+        else:
+            coords["dx"] = ("x", dx)
+            coords["dy"] = ("y", dy)
     return coords
 
 
@@ -314,7 +319,7 @@ def coord_reference(da_coord):
         if not np.allclose(dxs, dx, atolx):
             raise ValueError(
                 f"DataArray has to be equidistant along {da_coord.name}, or cellsizes"
-                " must be provided as a coordinate named d{da_coord.name}."
+                f" must be provided as a coordinate named d{da_coord.name}."
             )
 
         # as xarray uses midpoint coordinates
@@ -350,12 +355,12 @@ def spatial_reference(a):
         dy, ymin, ymax = coord_reference(a["y"])
     elif ncol == 1:
         dy, ymin, ymax = coord_reference(a["y"])
-        dx = abs(dy)
+        dx = 1.0
         xmin = float(x.min()) - 0.5 * abs(dy)
         xmax = float(x.max()) + 0.5 * abs(dy)
     elif nrow == 1:
         dx, xmin, xmax = coord_reference(a["x"])
-        dy = -abs(dx)
+        dy = -1.0
         ymin = float(y.min()) - 0.5 * abs(dy)
         ymax = float(y.max()) + 0.5 * abs(dy)
     else:  # ncol == 1 and nrow == 1:

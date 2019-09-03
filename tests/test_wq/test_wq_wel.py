@@ -47,8 +47,6 @@ def test_render__notime_nolayer(well):
     directory = pathlib.Path("well")
     compare = "\n" "    wel_p?_s1_l? = {path}.ipf".format(path=path)
     actual = wel._render(directory, globaltimes=["?"], system_index=1)
-    print(actual)
-    print(compare)
     assert actual == compare
 
 
@@ -107,8 +105,6 @@ def test_render__time_layer(well):
     ).format(path=path)
 
     actual = wel._render(directory, globaltimes=wel["time"].values, system_index=1)
-    print(actual)
-    print(compare)
     assert actual == compare
 
 
