@@ -39,8 +39,8 @@ def open_disgrb(path):
         xorigin = struct.unpack("d", f.read(8))[0]
         yorigin = struct.unpack("d", f.read(8))[0]
         f.seek(8, 1)  # skip angrot
-        delr = np.fromfile(f, np.float64, ncol)
-        delc = np.fromfile(f, np.float64, nrow)
+        delr = np.fromfile(f, np.float64, nrow)
+        delc = np.fromfile(f, np.float64, ncol)
         # TODO verify dimension order
         top_np = np.reshape(np.fromfile(f, np.float64, nrow * ncol), (nrow, ncol))
         bottom_np = np.reshape(np.fromfile(f, np.float64, ncells), (nlayer, nrow, ncol))
@@ -108,16 +108,16 @@ def _read_times(path, ntime, nlayer, nrow, ncol):
 
 # Dependent Variable File / DIS Grids
 # https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=167
-def open_hds(path, dry_nan=False):
+def open_hds(hds_path, grb_path, dry_nan=False):
     """
     Open head data
     """
 
-    d = open_disgrb("twri.dis.grb")
+    d = open_disgrb(grb_path)
     nlayer, nrow, ncol = d["nlayer"], d["nrow"], d["ncol"]
-    filesize = os.path.getsize(path)
+    filesize = os.path.getsize(hds_path)
     ntime = filesize // (nlayer * (52 + (nrow * ncol * 8)))
-    times = _read_times(path, ntime, nlayer, nrow, ncol)
+    times = _read_times(hds_path, ntime, nlayer, nrow, ncol)
     d["coords"]["time"] = times
 
     dask_list = []
@@ -125,7 +125,7 @@ def open_hds(path, dry_nan=False):
     for i in range(ntime):
         # TODO verify dimension order
         pos = i * (nlayer * (52 + nrow * ncol * 8))
-        a = dask.delayed(_read_hds)(path, nlayer, nrow, ncol, dry_nan, pos)
+        a = dask.delayed(_read_hds)(hds_path, nlayer, nrow, ncol, dry_nan, pos)
         x = dask.array.from_delayed(a, shape=(nlayer, nrow, ncol), dtype=np.float64)
         dask_list.append(x)
 

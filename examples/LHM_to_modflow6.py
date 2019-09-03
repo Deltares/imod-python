@@ -6,12 +6,12 @@ import imod
 ibound = imod.idf.open("../model_v3.3.0/dbase/bnd/*.idf")
 is_active = ibound != 0
 
-#wvp_top_l1 = imod.idf.open("../lagenmodel/ahn_f250_m.idf").assign_coords(layer=1)
-#wvp_top_l2 = imod.idf.open("../lagenmodel/bot_sdl1_m.idf").assign_coords(layer=2)
-#wvp_top_l3 = imod.idf.open("../lagenmodel/bot_sdl2_m.idf").assign_coords(layer=3)
-#wvp_top_l4 = imod.idf.open("../lagenmodel/bot_sdl3_m.idf").assign_coords(layer=4)
-#wvp_top_l5 = imod.idf.open("../lagenmodel/bot_sdl4_m.idf").assign_coords(layer=5)
-#wvp_top_l6 = imod.idf.open("../lagenmodel/bot_sdl5_m.idf").assign_coords(layer=6)
+# wvp_top_l1 = imod.idf.open("../lagenmodel/ahn_f250_m.idf").assign_coords(layer=1)
+# wvp_top_l2 = imod.idf.open("../lagenmodel/bot_sdl1_m.idf").assign_coords(layer=2)
+# wvp_top_l3 = imod.idf.open("../lagenmodel/bot_sdl2_m.idf").assign_coords(layer=3)
+# wvp_top_l4 = imod.idf.open("../lagenmodel/bot_sdl3_m.idf").assign_coords(layer=4)
+# wvp_top_l5 = imod.idf.open("../lagenmodel/bot_sdl4_m.idf").assign_coords(layer=5)
+# wvp_top_l6 = imod.idf.open("../lagenmodel/bot_sdl5_m.idf").assign_coords(layer=6)
 wvp_top_l1 = imod.idf.open("../lagenmodel/ahn_f250_m.idf").assign_coords(layer=1)
 wvp_top_l2 = imod.idf.open("../lagenmodel/top_sdl1_m.idf").assign_coords(layer=2)
 wvp_top_l3 = imod.idf.open("../lagenmodel/top_sdl2_m.idf").assign_coords(layer=3)
@@ -39,7 +39,7 @@ wvp_top = xr.concat(
         wvp_top_l6,
         wvp_top_l7,
     ],
-    dim = "layer",
+    dim="layer",
 )
 wvp_bot = xr.concat(
     [
@@ -51,10 +51,15 @@ wvp_bot = xr.concat(
         wvp_bot_l6,
         wvp_bot_l7,
     ],
-    dim = "layer",
+    dim="layer",
 )
 is_active = is_active & wvp_bot.notnull()
-idomain = is_active.where(wvp_top > wvp_bot, other=-1).where(is_active).fillna(0.0).astype(np.int32)
+idomain = (
+    is_active.where(wvp_top > wvp_bot, other=-1)
+    .where(is_active)
+    .fillna(0.0)
+    .astype(np.int32)
+)
 is_active = idomain == 1
 
 wvp_top = wvp_top.where(wvp_top > wvp_bot, other=wvp_bot)
@@ -72,7 +77,7 @@ c = imod.idf.open("../model_v3.3.0/dbase/c/*.idf")
 # replace negative c value...
 c = c.where(~(c < 0.0), other=10.0)
 assert c.min() >= 0.0
-assert kd.min() >= 0.0 
+assert kd.min() >= 0.0
 
 # Add a centimer to avoid dividin by zero ...
 kh = (kd / (wvp_thickness + 0.01)).where(is_active)
@@ -82,8 +87,12 @@ kv[:-1, ...].values = kv_tmp.values
 
 
 # drainage
-drn_buis_cond = imod.idf.open("../model_v3.3.0/dbase/drn/cond_b_250.idf", pattern="{name}")
-drn_buis_elev = imod.idf.open("../model_v3.3.0/dbase/drn/BODH_B_250_HYDT_CORRECT2.IDF", pattern="{name}")
+drn_buis_cond = imod.idf.open(
+    "../model_v3.3.0/dbase/drn/cond_b_250.idf", pattern="{name}"
+)
+drn_buis_elev = imod.idf.open(
+    "../model_v3.3.0/dbase/drn/BODH_B_250_HYDT_CORRECT2.IDF", pattern="{name}"
+)
 is_buis = drn_buis_cond.notnull() & drn_buis_elev.notnull()
 drn_buis_cond = drn_buis_cond.where(is_buis).where(is_active)
 drn_buis_elev = drn_buis_elev.where(is_buis).where(is_active)
@@ -179,7 +188,9 @@ secondary_stage = imod.idf.open(
 secondary_bot = imod.idf.open(
     "../model_v3.3.0/dbase/riv/BODH_S1W_250.IDF", pattern="{name}"
 ).assign_coords(layer=1)
-is_secondary = secondary_cond.notnull() & secondary_stage.notnull() & secondary_bot.notnull()
+is_secondary = (
+    secondary_cond.notnull() & secondary_stage.notnull() & secondary_bot.notnull()
+)
 secondary_cond = secondary_cond.where(is_secondary).where(is_active)
 secondary_stage = secondary_stage.where(is_secondary).where(is_active)
 secondary_bot = secondary_bot.where(is_secondary).where(is_active)
@@ -194,7 +205,9 @@ tertiary_stage = imod.idf.open(
 tertiary_bot = imod.idf.open(
     "../model_v3.3.0/dbase/riv/PEIL_T1_stat_250.IDF", pattern="{name}"
 ).assign_coords(layer=1)
-is_tertiary = tertiary_cond.notnull() & tertiary_stage.notnull() & tertiary_bot.notnull()
+is_tertiary = (
+    tertiary_cond.notnull() & tertiary_stage.notnull() & tertiary_bot.notnull()
+)
 tertiary_cond = tertiary_cond.where(is_tertiary).where(is_active)
 tertiary_stage = tertiary_stage.where(is_tertiary).where(is_active)
 tertiary_bot = tertiary_bot.where(is_tertiary).where(is_active)
@@ -225,57 +238,33 @@ constant_head = shd.where(ibound == -1).where(is_active)
 lhm = imod.mf6.GroundwaterFlowModel()
 
 lhm["dis"] = imod.mf6.StructuredDiscretization(
-    top=wvp_top.sel(layer=1),
-    bottom=wvp_bot,
-    idomain=idomain,
+    top=wvp_top.sel(layer=1), bottom=wvp_bot, idomain=idomain
 )
-lhm["npf"] = imod.mf6.NodePropertyFlow(
-    icelltype=0,
-    k = kh,
-    k33 = kv,
-)
+lhm["npf"] = imod.mf6.NodePropertyFlow(icelltype=0, k=kh, k33=kv)
 lhm["ic"] = imod.mf6.InitialConditions(head=shd)
 lhm["chd-edges"] = imod.mf6.ConstantHead(constant_head)
-lhm["ghb"] = imod.mf6.GeneralHeadBoundary(
-    head=ghb_head,
-    conductance=ghb_cond,
-)
+lhm["ghb"] = imod.mf6.GeneralHeadBoundary(head=ghb_head, conductance=ghb_cond)
 lhm["drn-overland"] = imod.mf6.Drainage(
-    elevation=drn_overland_elev,
-    conductance=drn_overland_cond,
+    elevation=drn_overland_elev, conductance=drn_overland_cond
 )
 lhm["drn-greppel"] = imod.mf6.Drainage(
-    elevation=drn_greppel_elev,
-    conductance=drn_greppel_cond,
+    elevation=drn_greppel_elev, conductance=drn_greppel_cond
 )
-lhm["drn-buis"] = imod.mf6.Drainage(
-    elevation=drn_buis_elev,
-    conductance=drn_buis_cond,
-)
+lhm["drn-buis"] = imod.mf6.Drainage(elevation=drn_buis_elev, conductance=drn_buis_cond)
 lhm["riv-main"] = imod.mf6.River(
-    conductance=main_cond,
-    stage=main_stage,
-    bottom_elevation=main_bot
+    conductance=main_cond, stage=main_stage, bottom_elevation=main_bot
 )
 lhm["riv-primary"] = imod.mf6.River(
-    conductance=primary_cond,
-    stage=primary_stage,
-    bottom_elevation=primary_bot
+    conductance=primary_cond, stage=primary_stage, bottom_elevation=primary_bot
 )
 lhm["riv-secondary"] = imod.mf6.River(
-    conductance=secondary_cond,
-    stage=secondary_stage,
-    bottom_elevation=secondary_bot
+    conductance=secondary_cond, stage=secondary_stage, bottom_elevation=secondary_bot
 )
 lhm["riv-tertiary"] = imod.mf6.River(
-    conductance=tertiary_cond,
-    stage=tertiary_stage,
-    bottom_elevation=tertiary_bot
+    conductance=tertiary_cond, stage=tertiary_stage, bottom_elevation=tertiary_bot
 )
 lhm["riv-boils"] = imod.mf6.River(
-    conductance=boils_cond,
-    stage=boils_stage,
-    bottom_elevation=boils_bot
+    conductance=boils_cond, stage=boils_stage, bottom_elevation=boils_bot
 )
 
 simulation = imod.mf6.Modflow6Simulation("LHM-3.3.0-stationary")
@@ -293,7 +282,7 @@ simulation["ims"] = imod.mf6.Solution(
     linear_acceleration="cg",
     scaling_method=None,
     reordering_method=None,
-    relaxation_factor=0.98
+    relaxation_factor=0.98,
 )
 simulation.time_discretization(starttime="2000-01-01", endtime="2000-01-02")
 
