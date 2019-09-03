@@ -544,6 +544,15 @@ def test_write(basicmodel):
     # TODO: more rigorous testing
 
 
+def test_write__timemap(basicmodel):
+    # fictitious timemap
+    timemap = {basicmodel["rch"].time.values[4]: basicmodel["rch"].time.values[0]}
+    basicmodel["rch"].add_timemap(rate=timemap)
+    basicmodel.write()
+    assert pathlib.Path("test_model").exists()
+    # TODO: more rigorous testing
+
+
 def test_write__error_stress_time_not_first(basicmodel):
     """
     In this case, the WEL package isn't specified for the first stress period.
