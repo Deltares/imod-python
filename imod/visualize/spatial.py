@@ -174,7 +174,7 @@ def plot_map(
 def imshow(a_yx, fname, title, cmap, overlays, quantile_colorscale, figsize, settings):
     fig, ax = plt.subplots(figsize=figsize)
     if quantile_colorscale:
-        levels = np.unique(np.percentile(a_yx.values, np.linspace(0, 100, 101)))
+        levels = np.unique(np.nanpercentile(a_yx.values, np.linspace(0, 100, 101)))
         if levels.size < 3:  # let matplotlib take care of it
             norm = None
         else:
