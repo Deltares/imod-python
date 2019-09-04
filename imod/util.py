@@ -39,6 +39,37 @@ def to_datetime(s):
     return time
 
 
+def _groupdict(stem, pattern):
+    if pattern is not None:
+        if isinstance(pattern, Pattern):
+            d = pattern.match(stem).groupdict()
+        else:
+            pattern = pattern.lower()
+            # Get the variables between curly braces
+            in_curly = re.compile(r"{(.*?)}").findall(pattern)
+            regex_parts = {key: f"(?P<{key}>[\\w-]+)" for key in in_curly}
+            # Format the regex string, by filling in the variables
+            simple_regex = pattern.format(**regex_parts)
+            re_pattern = re.compile(simple_regex)
+            # Use it to get the required variables
+            d = re_pattern.match(stem).groupdict()
+    else:  # Default to "iMOD conventions": {name}_{time}_l{layer}
+        has_layer = bool(re.search(r"_l\d+$", stem))
+        try:  # try for time
+            base_pattern = r"(?P<name>[\w-]+)_(?P<time>[0-9-]+)"
+            if has_layer:
+                base_pattern += r"_l(?P<layer>[0-9]+)"
+            re_pattern = re.compile(base_pattern)
+            d = re_pattern.match(stem).groupdict()
+        except AttributeError:  # probably no time
+            base_pattern = r"(?P<name>[\w-]+)"
+            if has_layer:
+                base_pattern += r"_l(?P<layer>[0-9]+)"
+            re_pattern = re.compile(base_pattern)
+            d = re_pattern.match(stem).groupdict()
+    return d
+
+
 def decompose(path, pattern=None):
     r"""
     Parse a path, returning a dict of the parts, following the iMOD conventions.
@@ -88,33 +119,7 @@ def decompose(path, pattern=None):
     # We'll ignore upper case
     stem = path.stem.lower()
 
-    if pattern is not None:
-        if isinstance(pattern, Pattern):
-            d = pattern.match(stem).groupdict()
-        else:
-            pattern = pattern.lower()
-            # Get the variables between curly braces
-            in_curly = re.compile(r"{(.*?)}").findall(pattern)
-            regex_parts = {key: f"(?P<{key}>[\\w-]+)" for key in in_curly}
-            # Format the regex string, by filling in the variables
-            simple_regex = pattern.format(**regex_parts)
-            re_pattern = re.compile(simple_regex)
-            # Use it to get the required variables
-            d = re_pattern.match(stem).groupdict()
-    else:  # Default to "iMOD conventions": {name}_{time}_l{layer}
-        has_layer = bool(re.search(r"_l\d+$", stem))
-        try:  # try for time
-            base_pattern = r"(?P<name>[\w-]+)_(?P<time>[0-9-]+)"
-            if has_layer:
-                base_pattern += r"_l(?P<layer>[0-9]+)"
-            re_pattern = re.compile(base_pattern)
-            d = re_pattern.match(stem).groupdict()
-        except AttributeError:  # probably no time
-            base_pattern = r"(?P<name>[\w-]+)"
-            if has_layer:
-                base_pattern += r"_l(?P<layer>[0-9]+)"
-            re_pattern = re.compile(base_pattern)
-            d = re_pattern.match(stem).groupdict()
+    d = _groupdict(stem, pattern)
 
     # TODO: figure out what to with user specified variables
     # basically type inferencing via regex?
