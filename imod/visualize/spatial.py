@@ -203,7 +203,7 @@ def format_time(time):
         # This solution is 20 times faster than using pd.to_datetime()
         return time.astype("datetime64[us]").item().strftime("%Y%m%d%H%M%S")
     else:
-        return coordval.strftime("%Y%m%d%H%M%S")
+        return time.strftime("%Y%m%d%H%M%S")
 
 
 def nd_imshow(
@@ -220,6 +220,9 @@ def nd_imshow(
 
     Dumps PNGs into directory of choice.
     """
+    if isinstance(directory, str):
+        directory = pathlib.Path(directory)
+    directory.mkdir(parents=True, exist_ok=True)
     if "x" not in da.dims or "y" not in da.dims:
         raise ValueError("DataArray must have dims x and y.")
     directory = pathlib.Path(directory)

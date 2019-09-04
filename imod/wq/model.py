@@ -48,7 +48,7 @@ class Model(collections.UserDict):
             if "x" in value.dims and "y" in value.dims:
                 for varname in value.data_vars:
                     da = value[varname]
-                    if "x" in value.dims and "y" in da:
+                    if "x" in da.dims and "y" in da.dims:
                         if da.isnull().all():
                             continue
 
