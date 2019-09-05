@@ -9,23 +9,11 @@ import pytest
 from imod import ipf
 
 
-def remove(globpath):
-    paths = glob.glob(globpath)
-    for p in paths:
-        try:
-            os.remove(p)
-        except FileNotFoundError:
-            pass
-
-
 @pytest.fixture(scope="module")
-def write_basic_ipf(request):
+def write_basic_ipf():
 
     # factory function seems easiest way to parameterize tests
     def _write_basic_ipf(path, delim):
-        if isinstance(path, str):
-            path = pathlib.Path(path)
-        path.parent.mkdir(exist_ok=True, parents=True)
         ipfstring = (
             "2\n"
             "4\n"
@@ -41,21 +29,12 @@ def write_basic_ipf(request):
         with open(path, "w") as f:
             f.write(ipfstring)
 
-    # Use global list to add to a list of paths
-    # that were generated during testing?
-    def teardown():
-        remove("*.ipf")
-
-    request.addfinalizer(teardown)
     return _write_basic_ipf
 
 
 @pytest.fixture(scope="module")
-def write_assoc_ipf(request):
+def write_assoc_ipf():
     def _write_assoc_ipf(path, delim1, delim2, delim3, delim4, delim5):
-        if isinstance(path, str):
-            path = pathlib.Path(path)
-        path.parent.mkdir(exist_ok=True, parents=True)
         ipfstring = (
             "2\n"
             "3\n"
@@ -78,49 +57,38 @@ def write_assoc_ipf(request):
         assoc_string = assoc_string.format(delim3=delim3, delim4=delim4, delim5=delim5)
         with open(path, "w") as f:
             f.write(ipfstring)
-        with open(path.parent.joinpath("A1000.txt"), "w") as f:
+        with open(path.parent / "A1000.txt", "w") as f:
             f.write(assoc_string)
-        with open(path.parent.joinpath("B2000.txt"), "w") as f:
+        with open(path.parent / "B2000.txt", "w") as f:
             f.write(assoc_string)
 
-    def teardown():
-        remove("*.ipf")
-        remove("*.txt")
-
-    request.addfinalizer(teardown)
     return _write_assoc_ipf
 
 
 @pytest.fixture(scope="module")
-def nodata_ipf(request):
+def nodata_ipf(tmp_path_factory):
+    tmp_dir = tmp_path_factory.mktemp("nodata_ipf")
     df = pd.DataFrame()
     df["id"] = np.arange(3)
     df["nodatacolumn"] = np.nan
     df["thirdcolumn"] = "dummy"
-    ipf.write("nodata.ipf", df)
-
-    def teardown():
-        remove("nodata.ipf")
-
-    request.addfinalizer(teardown)
+    ipf.write(tmp_dir / "nodata.ipf", df)
+    return tmp_dir / "nodata.ipf"
 
 
 @pytest.fixture(scope="module")
-def nodata_assoc(request):
+def nodata_assoc(tmp_path_factory):
+    tmp_dir = tmp_path_factory.mktemp("nodata_ipf")
     df = pd.DataFrame()
     df["id"] = np.arange(3)
     df["time"] = pd.date_range("2000-01-01", "2000-01-03")
     df["nodatacolumn"] = np.nan
-    ipf.write_assoc("nodata.txt", df, itype="timeseries")
-
-    def teardown():
-        remove("nodata.txt")
-
-    request.addfinalizer(teardown)
+    ipf.write_assoc(tmp_dir / "nodata.txt", df, itype="timeseries")
+    return tmp_dir / "nodata.txt"
 
 
-def test_read_associated__itype1implicit():
-    path = "A1000.txt"
+def test_read_associated__itype1implicit(tmp_path):
+    path = tmp_path / "A1000.txt"
     delim = ","
     assoc_string = (
         "2\n"
@@ -142,8 +110,8 @@ def test_read_associated__itype1implicit():
     assert df.shape == (2, 2)
 
 
-def test_read__comma(write_basic_ipf):
-    path = "basic_comma.ipf"
+def test_read__comma(write_basic_ipf, tmp_path):
+    path = tmp_path / "basic_comma.ipf"
     write_basic_ipf(path, ",")
     df = ipf.read(path)
     assert isinstance(df, pd.DataFrame)
@@ -153,8 +121,8 @@ def test_read__comma(write_basic_ipf):
     assert df.iloc[1, 3] == "Den Bosch"
 
 
-def test_read__space(write_basic_ipf):
-    path = "basic_space.ipf"
+def test_read__space(write_basic_ipf, tmp_path):
+    path = tmp_path / "basic_space.ipf"
     write_basic_ipf(path, " ")
     df = ipf.read(path, {"delim_whitespace": True})
     assert isinstance(df, pd.DataFrame)
@@ -170,9 +138,9 @@ def test_read__space(write_basic_ipf):
 @pytest.mark.parametrize("delim4", [",", " "])
 @pytest.mark.parametrize("delim5", [",", " "])
 def test_read_associated__parameterized_delim(
-    write_assoc_ipf, delim1, delim2, delim3, delim4, delim5
+    write_assoc_ipf, delim1, delim2, delim3, delim4, delim5, tmp_path
 ):
-    path = "assoc.txt"
+    path = tmp_path / "assoc.txt"
     write_assoc_ipf(path, delim1, delim2, delim3, delim4, delim5)
     df = ipf.read(path)
 
@@ -187,7 +155,7 @@ def test_read_associated__parameterized_delim(
     assert pd.isnull(df["level"].iloc[3])
 
 
-def test_write_assoc_itype1():
+def test_write_assoc_itype1(tmp_path):
     times = [pd.to_datetime(s) for s in ["2018-01-01", "2018-02-01"]]
     df = pd.DataFrame.from_dict(
         {
@@ -200,14 +168,12 @@ def test_write_assoc_itype1():
         }
     )
     _, first_df = list(df.groupby("id"))[0]
-    ipf.write_assoc("A1.txt", first_df, itype=1, nodata=-999.0)
-    df2 = ipf.read_associated("A1.txt")
+    ipf.write_assoc(tmp_path / "A1.txt", first_df, itype=1, nodata=-999.0)
+    df2 = ipf.read_associated(tmp_path / "A1.txt")
     pd.testing.assert_frame_equal(first_df, df2, check_like=True)
 
-    remove("A1.txt")
 
-
-def test_write_assoc_itype2():
+def test_write_assoc_itype2(tmp_path):
     df = pd.DataFrame.from_dict(
         {
             "x": [1, 1, 2, 2],
@@ -219,14 +185,12 @@ def test_write_assoc_itype2():
         }
     )
     _, first_df = list(df.groupby("id"))[0]
-    ipf.write_assoc("A1.txt", first_df, itype=2, nodata=-999.0)
-    df2 = ipf.read_associated("A1.txt")
+    ipf.write_assoc(tmp_path / "A1.txt", first_df, itype=2, nodata=-999.0)
+    df2 = ipf.read_associated(tmp_path / "A1.txt")
     pd.testing.assert_frame_equal(first_df, df2, check_like=True)
 
-    remove("A1.txt")
 
-
-def test_write():
+def test_write(tmp_path):
     df = pd.DataFrame.from_dict(
         {
             "X": [100.0, 553.0],
@@ -235,11 +199,9 @@ def test_write():
             "City of Holland": ["Amsterdam", "Den Bosch"],
         }
     )
-    ipf.write("basic.ipf", df)
-    df2 = ipf.read("basic.ipf")
+    ipf.write(tmp_path / "basic.ipf", df)
+    df2 = ipf.read(tmp_path / "basic.ipf")
     pd.testing.assert_frame_equal(df, df2, check_like=True)
-
-    remove("basic.ipf")
 
 
 def test_lower_dataframe_colnames():
@@ -270,7 +232,7 @@ def test_is_single_value():
     assert grouped["grp_const"].apply(ipf._is_single_value).all()
 
 
-def test_save__assoc_itype1():
+def test_save__assoc_itype1(tmp_path):
     times = [pd.to_datetime(s) for s in ["2018-01-01", "2018-02-01"]]
     df = pd.DataFrame.from_dict(
         {
@@ -283,22 +245,18 @@ def test_save__assoc_itype1():
         }
     )
 
-    ipf.save("save.ipf", df, itype=1, nodata=-999.0)
-    assert pathlib.Path("save.ipf").exists()
-    assert pathlib.Path("A1.txt").exists()
-    assert pathlib.Path("B2.txt").exists()
-    df2 = ipf.read("save.ipf")
+    ipf.save(tmp_path / "save.ipf", df, itype=1, nodata=-999.0)
+    assert (tmp_path / "save.ipf").exists()
+    assert (tmp_path / "A1.txt").exists()
+    assert (tmp_path / "B2.txt").exists()
+    df2 = ipf.read(tmp_path / "save.ipf")
     df = df.sort_values(by="x")
     df2.index = df.index
     df2 = df2.sort_values(by="x")
     pd.testing.assert_frame_equal(df, df2, check_like=True)
 
-    remove("save.ipf")
-    remove("A1.txt")
-    remove("B2.txt")
 
-
-def test_save__assoc_itype2_():
+def test_save__assoc_itype2_(tmp_path):
     df = pd.DataFrame.from_dict(
         {
             "X": [1, 1, 2, 2],
@@ -310,22 +268,18 @@ def test_save__assoc_itype2_():
         }
     )
 
-    ipf.save("save.ipf", df, itype=2, nodata=-999.0)
-    assert pathlib.Path("save.ipf").exists()
-    assert pathlib.Path("A1.txt").exists()
-    assert pathlib.Path("B2.txt").exists()
-    df2 = ipf.read("save.ipf")
+    ipf.save(tmp_path / "save.ipf", df, itype=2, nodata=-999.0)
+    assert (tmp_path / "save.ipf").exists()
+    assert (tmp_path / "A1.txt").exists()
+    assert (tmp_path / "B2.txt").exists()
+    df2 = ipf.read(tmp_path / "save.ipf")
     df = df.sort_values(by="x")
     df2 = df2.sort_values(by="x")
     df2.index = df.index
     pd.testing.assert_frame_equal(df, df2, check_like=True)
 
-    remove("save.ipf")
-    remove("A1.txt")
-    remove("B2.txt")
 
-
-def test_save__assoc_itype1__layers():
+def test_save__assoc_itype1__layers(tmp_path):
     times = [pd.to_datetime(s) for s in ["2018-01-01", "2018-02-01"]]
     df = pd.DataFrame.from_dict(
         {
@@ -348,25 +302,18 @@ def test_save__assoc_itype1__layers():
         }
     )
 
-    ipf.save("save.ipf", df, itype=1, nodata=-999.0)
-    assert pathlib.Path("save_l1.ipf").exists()
-    assert pathlib.Path("save_l3.ipf").exists()
-    assert pathlib.Path("A1.txt").exists()
-    assert pathlib.Path("B2.txt").exists()
-    assert pathlib.Path("C3.txt").exists()
-    assert pathlib.Path("D4.txt").exists()
-    df2 = ipf.read("save_l*.ipf")
+    ipf.save(tmp_path / "save.ipf", df, itype=1, nodata=-999.0)
+    assert (tmp_path / "save_l1.ipf").exists()
+    assert (tmp_path / "save_l3.ipf").exists()
+    assert (tmp_path / "A1.txt").exists()
+    assert (tmp_path / "B2.txt").exists()
+    assert (tmp_path / "C3.txt").exists()
+    assert (tmp_path / "D4.txt").exists()
+    df2 = ipf.read(tmp_path / "save_l*.ipf")
     df = df.sort_values(by="x")
     df2 = df2.sort_values(by="x")
     df2.index = df.index
     pd.testing.assert_frame_equal(df, df2, check_like=True)
-
-    remove("save_l1.ipf")
-    remove("save_l3.ipf")
-    remove("A1.txt")
-    remove("B2.txt")
-    remove("C3.txt")
-    remove("D4.txt")
 
 
 def test_save__missing(nodata_ipf):
@@ -374,7 +321,7 @@ def test_save__missing(nodata_ipf):
     iMOD does not accept ",," for nodata. These should be filled in by a nodata
     values.
     """
-    with open("nodata.ipf") as f:
+    with open(nodata_ipf) as f:
         content = f.read()
     assert ",," not in content
 
@@ -384,6 +331,6 @@ def test_save__assoc_missing(nodata_assoc):
     iMOD does not accept ",," for nodata. These should be filled in by a nodata
     values.
     """
-    with open("nodata.txt") as f:
+    with open(nodata_assoc) as f:
         content = f.read()
     assert ",," not in content

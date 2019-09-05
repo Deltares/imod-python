@@ -1,3 +1,5 @@
+import textwrap
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -6,7 +8,7 @@ from imod.wq import TimeDiscretization
 
 
 @pytest.fixture(scope="module")
-def discret(request):
+def discret():
     datetimes = pd.date_range("2000-01-01", "2000-01-05")
     timestep_duration = xr.DataArray(
         np.full(5, 1.0), coords={"time": datetimes}, dims=("time",)
@@ -28,30 +30,28 @@ def test_render_dis(discret):
     dis = discret
     globaltimes = dis.time.values
 
-    compare = (
-        "\n"
-        "    nper = 5\n"
-        "    perlen_p1 = 1.0\n"
-        "    perlen_p2 = 1.0\n"
-        "    perlen_p3 = 1.0\n"
-        "    perlen_p4 = 1.0\n"
-        "    perlen_p5 = 1.0\n"
-        "    nstp_p1 = 1\n"
-        "    nstp_p2 = 1\n"
-        "    nstp_p3 = 1\n"
-        "    nstp_p4 = 1\n"
-        "    nstp_p5 = 1\n"
-        "    sstr_p1 = tr\n"
-        "    sstr_p2 = tr\n"
-        "    sstr_p3 = tr\n"
-        "    sstr_p4 = tr\n"
-        "    sstr_p5 = tr\n"
-        "    tsmult_p1 = 1.0\n"
-        "    tsmult_p2 = 1.0\n"
-        "    tsmult_p3 = 1.0\n"
-        "    tsmult_p4 = 1.0\n"
-        "    tsmult_p5 = 1.0"
-    )
+    compare = """
+    nper = 5
+    perlen_p1 = 1.0
+    perlen_p2 = 1.0
+    perlen_p3 = 1.0
+    perlen_p4 = 1.0
+    perlen_p5 = 1.0
+    nstp_p1 = 1
+    nstp_p2 = 1
+    nstp_p3 = 1
+    nstp_p4 = 1
+    nstp_p5 = 1
+    sstr_p1 = tr
+    sstr_p2 = tr
+    sstr_p3 = tr
+    sstr_p4 = tr
+    sstr_p5 = tr
+    tsmult_p1 = 1.0
+    tsmult_p2 = 1.0
+    tsmult_p3 = 1.0
+    tsmult_p4 = 1.0
+    tsmult_p5 = 1.0"""
 
     assert dis._render(globaltimes) == compare
 
@@ -60,14 +60,12 @@ def test_render_dis__notime(discret):
     dis = discret.isel(time=0).drop("time")
     globaltimes = ["?"]
 
-    compare = (
-        "\n"
-        "    nper = 1\n"
-        "    perlen_p? = 1.0\n"
-        "    nstp_p? = 1\n"
-        "    sstr_p? = tr\n"
-        "    tsmult_p? = 1.0"
-    )
+    compare = """
+    nper = 1
+    perlen_p? = 1.0
+    nstp_p? = 1
+    sstr_p? = tr
+    tsmult_p? = 1.0"""
 
     assert dis._render(globaltimes) == compare
 
@@ -76,11 +74,10 @@ def test_render_btn(discret):
     dis = discret.isel(time=0).drop("time")
     globaltimes = ["?"]
 
-    compare = (
-        "\n"
-        "    tsmult_p? = 1.0\n"
-        "    dt0_p? = 0\n"
-        "    ttsmult_p? = 1.0\n"
-        "    mxstrn_p? = 10"
-    )
+    compare = """
+    tsmult_p? = 1.0
+    dt0_p? = 0
+    ttsmult_p? = 1.0
+    mxstrn_p? = 10"""
+
     assert dis._render_btn(globaltimes) == compare

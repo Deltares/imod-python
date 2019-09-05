@@ -14,7 +14,7 @@ from imod import run
 
 
 @pytest.fixture(scope="module")
-def make_test_model(request):
+def make_test_model():
     def _make_test_model(transient=False):
         nrow, ncol, nlayer = 8, 10, 3
         times = [
@@ -91,18 +91,6 @@ def make_test_model(request):
             "ntime": ntime,
         }
 
-    def runfile_teardown():
-        try:
-            os.remove("runfile.run")
-        except:
-            pass
-
-        try:
-            shutil.rmtree("test_write")
-        except:
-            pass
-
-    request.addfinalizer(runfile_teardown)
     return _make_test_model
 
 
@@ -380,22 +368,21 @@ def test_get_runfile__transient(make_test_model):
         )
 
 
-def test_write_runfile__steady_state(make_test_model):
+def test_write_runfile__steady_state(make_test_model, tmp_path):
     test_model = make_test_model(transient=False)
     modeldata = test_model["modeldata"]
-    directory = pathlib.Path(os.getcwd())
-    runfile_parameters = run.get_runfile(modeldata, directory)
-    path = directory.joinpath("runfile.run")
-    run.write_runfile(path, runfile_parameters)
+    runfile_parameters = run.get_runfile(modeldata, tmp_path)
+    run_path = tmp_path / "runfile.run"
+    run.write_runfile(run_path, runfile_parameters)
 
-    with open("runfile.run") as f:
+    with open(run_path) as f:
         testcontent = f.readlines()
 
     # TODO: think of robust, less dumb test
     assert len(testcontent) == 38
 
 
-def test_write_runfile__well_steady_state(make_test_model):
+def test_write_runfile__well_steady_state(make_test_model, tmp_path):
     test_model = make_test_model(transient=False)
     modeldata = test_model["modeldata"]
     weldata = pd.DataFrame(
@@ -407,34 +394,32 @@ def test_write_runfile__well_steady_state(make_test_model):
         }
     )
     modeldata["wel"] = weldata
-    directory = pathlib.Path(os.getcwd())
-    runfile_parameters = run.get_runfile(modeldata, directory)
-    path = directory.joinpath("runfile.run")
-    run.write_runfile(path, runfile_parameters)
+    runfile_parameters = run.get_runfile(modeldata, tmp_path)
+    run_path = tmp_path / "runfile.run"
+    run.write_runfile(run_path, runfile_parameters)
 
-    with open("runfile.run") as f:
+    with open(run_path) as f:
         testcontent = f.readlines()
 
     # TODO: think of robust, less dumb test
     assert len(testcontent) == 41
 
 
-def test_write_runfile__transient(make_test_model):
+def test_write_runfile__transient(make_test_model, tmp_path):
     test_model = make_test_model(transient=True)
     modeldata = test_model["modeldata"]
-    directory = pathlib.Path(os.getcwd())
-    runfile_parameters = run.get_runfile(modeldata, directory)
-    path = directory.joinpath("runfile.run")
-    run.write_runfile(path, runfile_parameters)
+    runfile_parameters = run.get_runfile(modeldata, tmp_path)
+    run_path = tmp_path / "runfile.run"
+    run.write_runfile(run_path, runfile_parameters)
 
-    with open("runfile.run") as f:
+    with open(run_path) as f:
         testcontent = f.readlines()
 
     # TODO: think of robust, less dumb test
     assert len(testcontent) == 62
 
 
-def test_write_runfile__well_transient(make_test_model):
+def test_write_runfile__well_transient(make_test_model, tmp_path):
     test_model = make_test_model(transient=True)
     times = test_model["times"]
     modeldata = test_model["modeldata"]
@@ -455,27 +440,25 @@ def test_write_runfile__well_transient(make_test_model):
         dfs.append(df_t)
 
     modeldata["wel"] = pd.concat(dfs, sort=False)
-    directory = pathlib.Path(os.getcwd())
-    runfile_parameters = run.get_runfile(modeldata, directory)
-    path = directory.joinpath("runfile.run")
-    run.write_runfile(path, runfile_parameters)
+    runfile_parameters = run.get_runfile(modeldata, tmp_path)
+    run_path = tmp_path / "runfile.run"
+    run.write_runfile(run_path, runfile_parameters)
 
-    with open("runfile.run") as f:
+    with open(run_path) as f:
         testcontent = f.readlines()
 
-    # TODO: think of robust, less dumb test
+    # TODO: think of a better test
     assert len(testcontent) == 71
 
 
-def test_write__transient(make_test_model):
+def test_write__transient(make_test_model, tmp_path):
     test_model = make_test_model(transient=True)
     modeldata = test_model["modeldata"]
-    directory = pathlib.Path(os.getcwd())
-    path = directory.joinpath("test_write")
-    imod.flow.write(path, modeldata)
+    run_path = tmp_path / "test_write"
+    imod.flow.write(run_path, modeldata)
 
     nlayer = test_model["nlayer"]
-    runfile_parameters = run.get_runfile(modeldata, path)
+    runfile_parameters = run.get_runfile(modeldata, run_path)
     for name in ["bnd", "shd", "kdw", "vcw"]:
         package = runfile_parameters["packages"][name]["value"]
         for layer in range(1, 1 + nlayer):
@@ -490,7 +473,7 @@ def test_write__transient(make_test_model):
                         assert pathlib.Path(path).exists()
 
 
-def test_write__basic_seawat(make_test_model):
+def test_write__basic_seawat(make_test_model, tmp_path):
     nrow, ncol, nlayer = 8, 10, 3
     times = [
         pd.to_datetime(s)
@@ -571,12 +554,10 @@ def test_write__basic_seawat(make_test_model):
     )
 
     with pytest.warns(FutureWarning):
-        imod.seawat_write("test_write", model)
+        imod.seawat_write(tmp_path / "test_write", model)
 
     with pytest.warns(FutureWarning):
-        runfile_parameters = imod.run.seawat_get_runfile(
-            model, pathlib.Path("test_write")
-        )
+        runfile_parameters = imod.run.seawat_get_runfile(model, tmp_path / "test_write")
 
     for name in ["top", "bot", "thickness", "shd", "sconc", "khv", "kva", "sto", "por"]:
         package = runfile_parameters["packages"][name]["value"]

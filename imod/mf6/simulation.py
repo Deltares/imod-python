@@ -93,8 +93,7 @@ class Modflow6Simulation(collections.UserDict):
         return self._template.render(d)
 
     def write(self, directory="."):
-        if isinstance(directory, str):
-            directory = pathlib.Path(directory)
+        directory = pathlib.Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
 
         # Write simulation namefile

@@ -42,15 +42,15 @@ def test_render():
     actual = wel.render(directory, "well", globaltimes)
     expected = textwrap.dedent(
         """\
-            begin options
-            end options
+        begin options
+        end options
 
-            begin dimensions
-              maxbound 15
-            end dimensions
+        begin dimensions
+          maxbound 15
+        end dimensions
 
-            begin period 1
-              open/close mymodel/well/wel.bin (binary)
-            end period"""
+        begin period 1
+          open/close mymodel/well/wel.bin (binary)
+        end period"""
     )
     assert actual == expected

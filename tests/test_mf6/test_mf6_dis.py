@@ -36,30 +36,30 @@ def test_render():
     actual = dis.render(directory, "dis")
     expected = textwrap.dedent(
         """\
-            begin options
-              xorigin 0.0
-              yorigin 0.0
-            end options
+        begin options
+          xorigin 0.0
+          yorigin 0.0
+        end options
 
-            begin dimensions
-              nlay 3
-              nrow 15
-              ncol 15
-            end dimensions
+        begin dimensions
+          nlay 3
+          nrow 15
+          ncol 15
+        end dimensions
 
-            begin griddata
-              delr
-                constant 5000.0
-              delc
-                constant 5000.0
-              top
-                constant 200.0
-              botm layered
-                constant -200.0
-                constant -350.0
-                constant -450.0
-              idomain
-                open/close mymodel/dis/idomain.bin (binary)
-            end griddata"""
+        begin griddata
+          delr
+            constant 5000.0
+          delc
+            constant 5000.0
+          top
+            constant 200.0
+          botm layered
+            constant -200.0
+            constant -350.0
+            constant -450.0
+          idomain
+            open/close mymodel/dis/idomain.bin (binary)
+        end griddata"""
     )
     assert actual == expected

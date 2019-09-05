@@ -109,7 +109,7 @@ class Package(xr.Dataset):
 
         if "layer" not in da.coords:
             if idf:
-                values["?"] = util.compose(d)
+                values["?"] = util.compose(d).as_posix()
             else:
                 values["?"] = da.values[()]
 
@@ -117,7 +117,7 @@ class Package(xr.Dataset):
             for layer in np.atleast_1d(da.coords["layer"].values):
                 if idf:
                     d["layer"] = layer
-                    values[layer] = util.compose(d)
+                    values[layer] = util.compose(d).as_posix()
                 else:
                     if "layer" in da.dims:
                         values[layer] = da.sel(layer=layer).values[()]

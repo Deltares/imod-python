@@ -22,21 +22,21 @@ def test_render():
     actual = ims.render()
     expected = textwrap.dedent(
         """\
-            begin options
-              print_option summary
-            end options
+        begin options
+          print_option summary
+        end options
 
-            begin nonlinear
-              outer_hclose -3.0
-              outer_maximum 500
-            end nonlinear
+        begin nonlinear
+          outer_hclose -3.0
+          outer_maximum 500
+        end nonlinear
 
-            begin linear
-              inner_maximum 100
-              inner_hclose 0.0001
-              inner_rclose 0.001
-              linear_acceleration cg
-              relaxation_factor 0.97
-            end linear"""
+        begin linear
+          inner_maximum 100
+          inner_hclose 0.0001
+          inner_rclose 0.001
+          linear_acceleration cg
+          relaxation_factor 0.97
+        end linear"""
     )
     assert expected == actual

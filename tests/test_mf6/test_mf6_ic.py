@@ -10,12 +10,12 @@ def test_render():
     actual = ic.render(directory, "ic")
     expected = textwrap.dedent(
         """\
-            begin options
-            end options
+        begin options
+        end options
 
-            begin griddata
-              strt
-                constant 0.0
-            end griddata"""
+        begin griddata
+          strt
+            constant 0.0
+        end griddata"""
     )
     assert actual == expected

@@ -59,8 +59,7 @@ def write(path, da, driver=None, nodata=np.nan):
     # the xarray rasterio connection matures, see for instance:
     # https://github.com/pydata/xarray/issues/1736
     # https://github.com/pydata/xarray/pull/1712
-    if isinstance(path, str):
-        path = pathlib.Path(path)
+    path = pathlib.Path(path)
     profile = da.attrs.copy()
     if driver is None:
         ext = path.suffix.lower()
