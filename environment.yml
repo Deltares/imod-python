@@ -12,6 +12,7 @@ dependencies:
   - dask
   - geopandas
   - jinja2
+  - matplotlib
   - nbstripout
   - numba
   - numpy
