@@ -310,12 +310,12 @@ class Regridder(object):
 
     Then call the ``regrid`` method to regrid.
 
-    >>> result = mean_regridder(source, like)
+    >>> result = mean_regridder.regrid(source, like)
 
     The regridder can be re-used if the number of regridding dimensions
     match, saving some time by not (re)compiling the regridding method.
 
-    >>> second_result = mean_regrid(second_source, like)
+    >>> second_result = mean_regridder.regrid(second_source, like)
 
     A one-liner is possible for single use:
 
