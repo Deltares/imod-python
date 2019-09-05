@@ -1,6 +1,6 @@
 import jinja2
 import numpy as np
-import skimage.morphology
+import scipy.ndimage.morphology
 
 from imod.wq.pkgbase import Package
 
@@ -153,9 +153,7 @@ class BasicTransport(Package):
                 f"Active cells in icbund may not have a nan value in starting_concentration in {self}"
             )
 
-        _, nlabels = skimage.morphology.label(
-            active_cells.values, connectivity=1, return_num=True
-        )
+        _, nlabels = scipy.ndimage.label(active_cells.values)
         if nlabels > 1:
             raise ValueError(
                 f"{nlabels} disconnected model domain detected in the icbund in {self}"

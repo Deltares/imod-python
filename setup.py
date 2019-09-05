@@ -23,7 +23,6 @@ setup(
         "numba",
         "numpy",
         "scipy",
-        "scikit-image",
         "xarray>=0.11",
         "cftime>=1",
         "pandas",
