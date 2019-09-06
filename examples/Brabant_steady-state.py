@@ -191,7 +191,7 @@ simulation["ims"] = imod.mf6.SolutionPresetSimple(
 )
 
 # Determine time discretization
-simulation.time_discretization(starttime="2000-01-01", endtime="2000-01-02")
+simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
 
 # Write!
 simulation.write("Brabant-steady")

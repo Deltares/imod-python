@@ -284,7 +284,7 @@ simulation["ims"] = imod.mf6.Solution(
     reordering_method=None,
     relaxation_factor=0.98,
 )
-simulation.time_discretization(starttime="2000-01-01", endtime="2000-01-02")
+simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
 
 
 simulation.write("test-LHM")

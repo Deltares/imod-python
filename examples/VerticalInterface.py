@@ -88,7 +88,7 @@ m["gcg"] = imod.wq.GeneralizedConjugateGradientSolver(
     lump_dispersion=True,
 )
 m["oc"] = imod.wq.OutputControl(save_head_idf=True, save_concentration_idf=True)
-m.time_discretization(starttime="2000-01-01", endtime="2000-01-02")
+m.time_discretization(times=["2000-01-01", "2000-01-02"])
 
 # Now we write the model, including runfile:
 m.write()

@@ -150,7 +150,9 @@ class SeawatModel(Model):
         Also checks if datetime types are homogeneous across packages.
         """
         types = [
-            type(pkg["time"].values[0]) for pkg in self.values() if self._hastime(pkg)
+            type(np.atleast_1d(pkg["time"].values)[0])
+            for pkg in self.values()
+            if self._hastime(pkg)
         ]
         # Types will be empty if there's no time dependent input
         if len(set(types)) == 0:
@@ -169,10 +171,38 @@ class SeawatModel(Model):
             else:
                 raise ValueError("Use either cftime or numpy.datetime64[ns].")
 
-    def time_discretization(self, endtime, starttime=None, *times):
+    def time_discretization(self, times):
         """
         Collect all unique times
+
+        Parameters
+        ----------
+        times : str, datetime; or iterable of str, datetimes.
+            Times to add to the time discretization. At least one single time
+            should be given, which will be used as the ending time of the
+            simulation.
+
+        Examples
+        --------
+        Add a single time:
+
+        >>> m.time_discretization("2001-01-01")
+
+        Add a daterange:
+
+        >>> m.time_discretization(pd.daterange("2000-01-01", "2001-01-01"))
+        
+        Add a list of times:
+
+        >>> m.time_discretization(["2000-01-01", "2001-01-01"])
+
         """
+
+        # Make sure it's an iterable
+        if not isinstance(times, (np.ndarray, list, tuple)):
+            times = [times]
+
+        # Loop through all packages, check if cftime is required.
         self.use_cftime = self._use_cftime()
 
         times = [timeutil.to_datetime(time, self.use_cftime) for time in times]
@@ -180,17 +210,12 @@ class SeawatModel(Model):
         for key, pkg in self.items():
             if self._hastime(pkg):
                 pkgtimes = list(pkg["time"].values)
-                first_times[key] = np.sort(pkg["time"].values)[0]
+                first_times[key] = sorted(pkgtimes)[0]
                 for var in pkg.data_vars:
                     if "timemap" in pkg[var].attrs:
                         timemap_times = list(pkg[var].attrs["timemap"].keys())
                         pkgtimes.extend(timemap_times)
                 times.extend(pkgtimes)
-
-        # TODO: check that endtime is later than all other times.
-        times.append(timeutil.to_datetime(endtime, self.use_cftime))
-        if starttime is not None:
-            times.append(timeutil.to_datetime(starttime, self.use_cftime))
 
         # np.unique also sorts
         times = np.unique(np.hstack(times))

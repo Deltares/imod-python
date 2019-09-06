@@ -131,7 +131,7 @@ def twri_model():
         relaxation_factor=0.97,
     )
     # Collect time discretization
-    simulation.time_discretization(starttime="2000-01-01", endtime="2000-01-02")
+    simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
     return simulation
 
 

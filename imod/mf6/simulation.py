@@ -27,7 +27,7 @@ class Modflow6Simulation(collections.UserDict):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
-    def time_discretization(self, endtime, starttime=None, *times):
+    def time_discretization(self, times):
         """
         Collect all unique times
         """
@@ -39,11 +39,6 @@ class Modflow6Simulation(collections.UserDict):
         for model in self.values():
             if model._pkg_id == "model":
                 times.extend(model._yield_times())
-
-        # TODO: check that endtime is later than all other times.
-        times.append(imod.wq.timeutil.to_datetime(endtime, self.use_cftime))
-        if starttime is not None:
-            times.append(imod.wq.timeutil.to_datetime(starttime, self.use_cftime))
 
         # np.unique also sorts
         times = np.unique(np.hstack(times))
