@@ -817,7 +817,7 @@ def get_runfile(model, directory):
 
     runfile_parameters["packages"] = packages
     runfile_parameters["stress_periods"] = stress_periods
-    runfile_parameters["output"]["shd"] = list(model["bnd"].layer.values)
+    runfile_parameters["output"]["shd"] = list(np.atleast_1d(model["bnd"].layer.values))
 
     if times:
         runfile_parameters["time_discretisation"] = _time_discretisation(times)
