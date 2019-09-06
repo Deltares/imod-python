@@ -1,5 +1,4 @@
 import collections
-import contextlib
 import pathlib
 import os
 
@@ -8,19 +7,6 @@ import numpy as np
 import xarray as xr
 
 import imod
-
-
-@contextlib.contextmanager
-def _remember_cwd():
-    """
-    from:
-    https://stackoverflow.com/questions/169070/how-do-i-write-a-decorator-that-restores-the-cwd
-    """
-    curdir = os.getcwd()
-    try:
-        yield
-    finally:
-        os.chdir(curdir)
 
 
 class Modflow6Simulation(collections.UserDict):
@@ -107,8 +93,7 @@ class Modflow6Simulation(collections.UserDict):
 
         # Write individual models
         globaltimes = self["time_discretization"]["time"].values
-        with _remember_cwd():
-            os.chdir(directory)
+        with imod.util.cd(directory):
             for key, value in self.items():
                 # skip timedis, exchanges
                 if value._pkg_id == "model":

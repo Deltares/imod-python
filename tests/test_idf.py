@@ -1,4 +1,3 @@
-import contextlib
 import glob
 import os
 import pathlib
@@ -348,18 +347,7 @@ def test_lazy(test_da, tmp_path):
     except TypeError:  # dask < 2.0
         assert "_read" in str(next(a.dask.items())[1])
 
-    # Test whether a change directory doesn't mess up reading a file
-    @contextlib.contextmanager
-    def remember_cwd():
-        # code based on https://stackoverflow.com/a/170174/2875964
-        curdir = os.getcwd()
-        try:
-            yield
-        finally:
-            os.chdir(curdir)
-
-    with remember_cwd():
-        os.chdir("..")
+    with util.cd(".."):
         a.compute()
 
 

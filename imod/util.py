@@ -12,9 +12,11 @@ used internally, but are not private since they may be useful to users as well.
 """
 
 import collections
+import contextlib
 import datetime
 import pathlib
 import re
+import os
 import warnings
 
 import affine
@@ -405,3 +407,22 @@ def transform(a):
     if dy > 0.0:
         raise ValueError("dy must be negative")
     return affine.Affine(dx, 0.0, xmin, 0.0, dy, ymax)
+
+
+@contextlib.contextmanager
+def cd(path):
+    """
+    Change directory, and change it back after the with block.
+
+    Examples
+    --------
+    >>> with imod.util.cd("docs"):
+            do_something_in_docs()
+
+    """
+    curdir = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(curdir)
