@@ -12,21 +12,14 @@ import imod
 
 
 @pytest.fixture(scope="module")
-def test_shapefile(request):
+def test_shapefile(tmp_path_factory):
+    tmp_dir = tmp_path_factory.mktemp("testvector")
     geom = sg.Polygon([(0.0, 0.0), (1.1, 0.0), (1.1, 1.1), (0.0, 1.1)])
     gdf = gpd.GeoDataFrame()
     gdf.geometry = [geom]
     gdf["values"] = [2.0]
-    pathlib.Path("testvector").mkdir(exist_ok=True)
-    gdf.to_file("testvector/shape.shp")
-
-    def teardown():
-        try:
-            shutil.rmtree("testvector")
-        except FileNotFoundError:
-            pass
-
-    request.addfinalizer(teardown)
+    gdf.to_file(tmp_dir / "shape.shp")
+    return tmp_dir / "shape.shp"
 
 
 def test_round_extent():
@@ -117,25 +110,22 @@ def test_gdal_rasterize(test_shapefile):
     expected = xr.DataArray([[np.nan, np.nan], [2.0, np.nan]], coords, dims)
 
     # Test with like
-    actual = imod.prepare.spatial.gdal_rasterize("testvector/shape.shp", "values", like)
+    actual = imod.prepare.spatial.gdal_rasterize(test_shapefile, "values", like)
     assert actual.identical(expected)
 
     # Test whether GDAL error results in a RuntimeError
     with pytest.raises(RuntimeError):  # misnamed column
-        imod.prepare.spatial.gdal_rasterize("testvector/shape.shp", "value", like)
+        imod.prepare.spatial.gdal_rasterize(test_shapefile, "value", like)
 
     # Can't determine dtype without like, raise ValueError
     with pytest.raises(ValueError):
         imod.prepare.spatial.gdal_rasterize(
-            "testvector/shape.shp", "values", spatial_reference=spatial_reference
+            test_shapefile, "values", spatial_reference=spatial_reference
         )
 
     # Test without like
     actual = imod.prepare.spatial.gdal_rasterize(
-        "testvector/shape.shp",
-        "values",
-        dtype=np.float64,
-        spatial_reference=spatial_reference,
+        test_shapefile, "values", dtype=np.float64, spatial_reference=spatial_reference
     )
     coords = {"y": [1.5, 0.5], "x": [0.5, 1.5], "dx": 1.0, "dy": -1.0}
     expected = xr.DataArray([[np.nan, np.nan], [2.0, np.nan]], coords, dims)
@@ -144,17 +134,14 @@ def test_gdal_rasterize(test_shapefile):
     # Test integer dtype, and nodata default (0 for uint8)
     expected = xr.DataArray([[0, 0], [2, 0]], coords, dims)
     actual = imod.prepare.spatial.gdal_rasterize(
-        "testvector/shape.shp",
-        "values",
-        dtype=np.uint8,
-        spatial_reference=spatial_reference,
+        test_shapefile, "values", dtype=np.uint8, spatial_reference=spatial_reference
     )
     assert actual.identical(expected)
 
     # test with pathlib
     expected = xr.DataArray([[0, 0], [2, 0]], coords, dims)
     actual = imod.prepare.spatial.gdal_rasterize(
-        pathlib.Path("testvector/shape.shp"),
+        pathlib.Path(test_shapefile),
         "values",
         dtype=np.uint8,
         spatial_reference=spatial_reference,
@@ -173,9 +160,7 @@ def test_private_celltable(test_shapefile):
     expected["values"] = [2]
     expected["area"] = [1.0]
 
-    actual = imod.prepare.spatial._celltable(
-        "testvector/shape.shp", "values", 1.0, like
-    )
+    actual = imod.prepare.spatial._celltable(test_shapefile, "values", 1.0, like)
     pd.testing.assert_frame_equal(actual, expected, check_dtype=False)
 
 
@@ -190,14 +175,12 @@ def test_celltable(test_shapefile):
     expected["values"] = [2]
     expected["area"] = [1.0]
 
-    actual = imod.prepare.spatial.celltable("testvector/shape.shp", "values", 1.0, like)
+    actual = imod.prepare.spatial.celltable(test_shapefile, "values", 1.0, like)
     pd.testing.assert_frame_equal(actual, expected, check_dtype=False)
 
     # test resolution error:
     with pytest.raises(ValueError):
-        actual = imod.prepare.spatial.celltable(
-            "testvector/shape.shp", "values", 0.17, like
-        )
+        actual = imod.prepare.spatial.celltable(test_shapefile, "values", 0.17, like)
 
 
 def test_rasterize_table():

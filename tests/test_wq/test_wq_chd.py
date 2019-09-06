@@ -1,4 +1,5 @@
 import pathlib
+import textwrap
 
 import numpy as np
 import pandas as pd
@@ -9,7 +10,7 @@ from imod.wq import ConstantHead
 
 
 @pytest.fixture(scope="function")
-def constanthead(request):
+def constanthead():
     layer = np.arange(1, 4)
     y = np.arange(4.5, 0.0, -1.0)
     x = np.arange(0.5, 5.0, 1.0)
@@ -27,15 +28,13 @@ def test_render(constanthead):
     chd = constanthead
     directory = pathlib.Path(".")
 
-    compare = (
-        "\n"
-        "    shead_p?_s1_l1 = head_start_l1.idf\n"
-        "    shead_p?_s1_l2 = head_start_l2.idf\n"
-        "    shead_p?_s1_l3 = head_start_l3.idf\n"
-        "    ehead_p?_s1_l1 = head_end_l1.idf\n"
-        "    ehead_p?_s1_l2 = head_end_l2.idf\n"
-        "    ehead_p?_s1_l3 = head_end_l3.idf"
-    )
+    compare = """
+    shead_p?_s1_l1 = head_start_l1.idf
+    shead_p?_s1_l2 = head_start_l2.idf
+    shead_p?_s1_l3 = head_start_l3.idf
+    ehead_p?_s1_l1 = head_end_l1.idf
+    ehead_p?_s1_l2 = head_end_l2.idf
+    ehead_p?_s1_l3 = head_end_l3.idf"""
 
     assert chd._render(directory, globaltimes=["?"], system_index=1) == compare
 

@@ -6,7 +6,7 @@ import imod
 
 
 @pytest.fixture(scope="module")
-def test_da(request):
+def test_da():
     nlayer = 2
     nrow = 2
     ncol = 3

@@ -13,17 +13,8 @@ from imod import idf
 from imod import util
 
 
-def globremove(globpath):
-    paths = glob.glob(globpath)
-    for path in paths:
-        try:
-            os.remove(path)
-        except FileNotFoundError:
-            pass
-
-
 @pytest.fixture(scope="module")
-def test_da(request):
+def test_da():
     nrow, ncol = 3, 4
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
@@ -31,16 +22,11 @@ def test_da(request):
     coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=np.float32)
-
-    def remove():
-        globremove("test*.idf")
-
-    request.addfinalizer(remove)
     return xr.DataArray(data, **kwargs)
 
 
 @pytest.fixture(scope="module")
-def test_da__nodxdy(request):
+def test_da__nodxdy():
     nrow, ncol = 3, 4
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
@@ -48,16 +34,11 @@ def test_da__nodxdy(request):
     coords = {"y": np.arange(ymax, ymin, dy), "x": np.arange(xmin, xmax, dx)}
     kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=np.float32)
-
-    def remove():
-        globremove("testnodxdy.idf")
-
-    request.addfinalizer(remove)
     return xr.DataArray(data, **kwargs)
 
 
 @pytest.fixture(scope="module")
-def test_nptimeda(request):
+def test_nptimeda():
     nrow, ncol = 3, 4
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
@@ -67,16 +48,11 @@ def test_nptimeda(request):
     ntime = len(coords["time"])
     kwargs = {"name": "testnptime", "coords": coords, "dims": ("time", "y", "x")}
     data = np.ones((ntime, nrow, ncol), dtype=np.float32)
-
-    def remove():
-        globremove("testnptime*.idf")
-
-    request.addfinalizer(remove)
     return xr.DataArray(data, **kwargs)
 
 
 @pytest.fixture(scope="module")
-def test_cftimeda(request):
+def test_cftimeda():
     nrow, ncol = 3, 4
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
@@ -88,16 +64,11 @@ def test_cftimeda(request):
     ntime = len(coords["time"])
     kwargs = {"name": "testcftime", "coords": coords, "dims": ("time", "y", "x")}
     data = np.ones((ntime, nrow, ncol), dtype=np.float32)
-
-    def remove():
-        globremove("testcftime*.idf")
-
-    request.addfinalizer(remove)
     return xr.DataArray(data, **kwargs)
 
 
 @pytest.fixture(scope="module")
-def test_layerda(request):
+def test_layerda():
     nlay, nrow, ncol = 5, 3, 4
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
@@ -106,21 +77,11 @@ def test_layerda(request):
     coords["layer"] = np.arange(nlay) + 1
     kwargs = {"name": "layer", "coords": coords, "dims": ("layer", "y", "x")}
     data = np.ones((nlay, nrow, ncol), dtype=np.float32)
-
-    def remove():
-        paths = glob.glob("layer_l[0-9].idf")
-        for p in paths:
-            try:
-                os.remove(p)
-            except FileNotFoundError:
-                pass
-
-    request.addfinalizer(remove)
     return xr.DataArray(data, **kwargs)
 
 
 @pytest.fixture(scope="module")
-def test_timelayerda(request):
+def test_timelayerda():
     ntime, nlay, nrow, ncol = 3, 5, 3, 4
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
@@ -139,20 +100,11 @@ def test_timelayerda(request):
         for j, layer in enumerate(range(8, 8 + nlay)):
             data[i, j, ...] = layer * (i + 1)
 
-    def remove():
-        paths = glob.glob("timelayer*.idf")
-        for p in paths:
-            try:
-                os.remove(p)
-            except FileNotFoundError:
-                pass
-
-    request.addfinalizer(remove)
     return xr.DataArray(data, **kwargs)
 
 
 @pytest.fixture(scope="module")
-def test_da_nonequidistant(request):
+def test_da_nonequidistant():
     nrow, ncol = 3, 4
     dx = np.array([0.9, 1.1, 0.8, 1.2])
     dy = np.array([-1.3, -0.7, -1.0])
@@ -162,18 +114,11 @@ def test_da_nonequidistant(request):
     kwargs = {"name": "nonequidistant", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=np.float32)
 
-    def remove():
-        try:
-            os.remove("nonequidistant.idf")
-        except FileNotFoundError:
-            pass
-
-    request.addfinalizer(remove)
     return xr.DataArray(data, **kwargs)
 
 
 @pytest.fixture(scope="module")
-def test_da_subdomains(request):
+def test_da_subdomains():
     nlayer, nrow, ncol = (3, 4, 5)
     dx, dy = (1.0, -1.0)
     layer = [1, 2, 3]
@@ -191,21 +136,17 @@ def test_da_subdomains(request):
         kwargs["coords"]["layer"] = layer
         das.append(xr.DataArray(data, **kwargs))
 
-    def remove():
-        globremove("subdomains_*.idf")
-
-    request.addfinalizer(remove)
     return das
 
 
-def test_open_subdomains(test_da_subdomains):
+def test_open_subdomains(test_da_subdomains, tmp_path):
     subdomains = test_da_subdomains
 
     for i, subdomain in enumerate(subdomains):
         for layer, da in subdomain.groupby("layer"):
-            idf.write(f"subdomains_20000101_l{layer}_p00{i}.idf", da)
+            idf.write(tmp_path / f"subdomains_20000101_l{layer}_p00{i}.idf", da)
 
-    da = idf.open_subdomains("subdomains_*.idf")
+    da = idf.open_subdomains(tmp_path / "subdomains_*.idf")
 
     assert np.all(da == 1.0)
     assert len(da.x) == 8
@@ -218,18 +159,18 @@ def test_open_subdomains(test_da_subdomains):
     assert isinstance(da, xr.DataArray)
 
 
-def test_open_subdomains_error(test_da_subdomains):
+def test_open_subdomains_error(test_da_subdomains, tmp_path):
     subdomains = test_da_subdomains
 
     for i, subdomain in enumerate(subdomains):
         for layer, da in subdomain.groupby("layer"):
-            idf.write(f"subdomains_20000101_l{layer}_p00{i}.idf", da)
+            idf.write(tmp_path / f"subdomains_20000101_l{layer}_p00{i}.idf", da)
 
     # Add an additional subdomain with only one layer
-    idf.write("subdomains_20000101_l1_p010.idf", subdomain.sel(layer=1))
+    idf.write(tmp_path / "subdomains_20000101_l1_p010.idf", subdomain.sel(layer=1))
 
     with pytest.raises(ValueError):
-        da = idf.open_subdomains("subdomains_*.idf")
+        da = idf.open_subdomains(tmp_path / "subdomains_*.idf")
 
 
 def test_xycoords_equidistant():
@@ -269,19 +210,19 @@ def test_xycoords_equidistant_array():
     assert coords["dy"] == -0.5
 
 
-def test_save__error(test_da):
+def test_save__error(test_da, tmp_path):
     with pytest.raises(ValueError):
-        idf.save("test.idf", test_da)
+        idf.save(tmp_path / "test.idf", test_da)
 
 
-def test_saveopen__steady(test_da):
+def test_saveopen__steady(test_da, tmp_path):
     first = test_da.copy().assign_coords(layer=1)
     second = test_da.copy().assign_coords(layer=2)
     steady_layers = xr.concat([first, second], dim="layer")
     steady_layers = steady_layers.assign_coords(time="steady-state")
     steady_layers = steady_layers.expand_dims("time")
-    idf.save("test", steady_layers)
-    da = idf.open("test_steady-state_l*.idf")
+    idf.save(tmp_path / "test", steady_layers)
+    da = idf.open(tmp_path / "test_steady-state_l*.idf")
     assert da.identical(steady_layers)
 
 
@@ -294,28 +235,27 @@ def test_to_nan():
     assert np.allclose(c, b, equal_nan=True)
 
 
-def test_saveopen(test_da):
-    idf.save("test", test_da)
-    assert pathlib.Path("test.idf").exists()
-    da = idf.open("test.idf")
+def test_saveopen(test_da, tmp_path):
+    idf.save(tmp_path / "test", test_da)
+    assert (tmp_path / "test.idf").exists()
+    da = idf.open(tmp_path / "test.idf")
     assert isinstance(da, xr.DataArray)
     assert da.identical(test_da)
-    da = idf.open(pathlib.Path("test.idf"))
+    da = idf.open(tmp_path / "test.idf")
     assert da.identical(test_da)
 
 
 def test_saveopen__paths(test_da, tmp_path):
-    print("tmp_path:", tmp_path)
-    idf.save("test", test_da)
+    idf.save(tmp_path / "test", test_da)
     # open paths as a list of str
-    da = idf.open(["test.idf"])
+    da = idf.open([str(tmp_path / "test.idf")])
     assert da.identical(test_da)
     # open paths as a list of pathlib.Path
-    da = idf.open([pathlib.Path("test.idf")])
+    da = idf.open([tmp_path / "test.idf"])
     assert da.identical(test_da)
     # open nonexistent path
     with pytest.raises(FileNotFoundError):
-        idf.open("nonexistent.idf")
+        idf.open(tmp_path / "nonexistent.idf")
     # open a file that is not an idf
     with open(tmp_path / "no.idf", "w") as f:
         f.write("not the IDF header you expect")
@@ -323,64 +263,69 @@ def test_saveopen__paths(test_da, tmp_path):
         idf.open(tmp_path / "no.idf")
 
 
-def test_save__int32coords(test_da__nodxdy):
+def test_save__int32coords(test_da__nodxdy, tmp_path):
     test_da = test_da__nodxdy
     test_da.x.values = test_da.x.values.astype(np.int32)
     test_da.y.values = test_da.y.values.astype(np.int32)
-    idf.save("testnodxdy", test_da)
-    assert pathlib.Path("testnodxdy.idf").exists()
+    idf.save(tmp_path / "testnodxdy", test_da)
+    assert (tmp_path / "testnodxdy.idf").exists()
 
 
-def test_saveopen__nptime(test_nptimeda):
-    idf.save("testnptime", test_nptimeda)
-    da = idf.open("testnptime*.idf")
+def test_saveopen__nptime(test_nptimeda, tmp_path):
+    idf.save(tmp_path / "testnptime", test_nptimeda)
+    da = idf.open(tmp_path / "testnptime*.idf")
     assert isinstance(da, xr.DataArray)
     assert da.identical(test_nptimeda)
 
 
-def test_saveopen__cftime_withinbounds(test_nptimeda):
+def test_saveopen__cftime_withinbounds(test_nptimeda, tmp_path):
     cftimes = []
     for time in test_nptimeda.time.values:
         dt = pd.Timestamp(time).to_pydatetime()
         cftimes.append(cftime.DatetimeProlepticGregorian(*dt.timetuple()[:6]))
-    da = idf.open("testnptime*.idf", use_cftime=True)
+    idf.save(tmp_path / "testnptime", test_nptimeda)
+    da = idf.open(tmp_path / "testnptime*.idf", use_cftime=True)
     assert isinstance(da, xr.DataArray)
     assert all(np.array(cftimes) == da.time.values)
 
 
-def test_saveopen__cftime_outofbounds(test_cftimeda):
-    idf.save("testcftime", test_cftimeda)
+def test_saveopen__cftime_outofbounds(test_cftimeda, tmp_path):
+    idf.save(tmp_path / "testcftime", test_cftimeda)
     with pytest.warns(UserWarning):
-        da = idf.open("testcftime*.idf")
+        da = idf.open(tmp_path / "testcftime*.idf")
     assert isinstance(da, xr.DataArray)
     assert da.identical(test_cftimeda)
 
 
-def test_saveopen__cftime_nodim(test_cftimeda):
+def test_saveopen__cftime_nodim(test_cftimeda, tmp_path):
     da = test_cftimeda.copy().isel(time=0)
     da.name = "testcftime-nodim"
-    idf.save("testcftime-nodim", da)
-    loaded = idf.open("testcftime-nodim*.idf", use_cftime=True).squeeze("time").load()
+    idf.save(tmp_path / "testcftime-nodim", da)
+    loaded = (
+        idf.open(tmp_path / "testcftime-nodim*.idf", use_cftime=True)
+        .squeeze("time")
+        .load()
+    )
     assert da.identical(loaded)
 
 
-def test_saveopen_sorting_headers_paths(test_timelayerda):
-    idf.save("timelayer", test_timelayerda)
-    loaded = idf.open("timelayer_*.idf").isel(x=0, y=0).values.ravel()
+def test_saveopen_sorting_headers_paths(test_timelayerda, tmp_path):
+    idf.save(tmp_path / "timelayer", test_timelayerda)
+    loaded = idf.open(tmp_path / "timelayer_*.idf").isel(x=0, y=0).values.ravel()
     assert np.allclose(np.sort(loaded), loaded)
 
 
-def test_saveopen_timelayer(test_timelayerda):
-    idf.save("timelayer", test_timelayerda)
-    da = idf.open("timelayer_*.idf")
+def test_saveopen_timelayer(test_timelayerda, tmp_path):
+    idf.save(tmp_path / "timelayer", test_timelayerda)
+    da = idf.open(tmp_path / "timelayer_*.idf")
     assert isinstance(da, xr.DataArray)
     assert da.identical(test_timelayerda)
 
 
-def test_saveopen__nonequidistant(test_da_nonequidistant):
-    idf.save("nonequidistant", test_da_nonequidistant)
-    assert pathlib.Path("nonequidistant.idf").exists()
-    da = idf.open("nonequidistant.idf")
+def test_saveopen__nonequidistant(test_da_nonequidistant, tmp_path):
+    idf.save(tmp_path / "nonequidistant", test_da_nonequidistant)
+    assert (tmp_path / "nonequidistant.idf").exists()
+    da = idf.open(tmp_path / "nonequidistant.idf")
     assert isinstance(da, xr.DataArray)
     assert np.array_equal(da, test_da_nonequidistant)
     # since the coordinates are created in float64 and stored in float32,
@@ -388,14 +333,15 @@ def test_saveopen__nonequidistant(test_da_nonequidistant):
     xr.testing.assert_allclose(da, test_da_nonequidistant)
 
 
-def test_lazy():
+def test_lazy(test_da, tmp_path):
     """
     Reading should be lazily executed. That means it has to be part of the dask
     graph. Specifcally, the delayed function is imod.idf._read.
 
     This does the job of testing whether that function is part the graph.
     """
-    a, _ = idf._dask("test.idf")
+    idf.save(tmp_path / "test", test_da)
+    a, _ = idf._dask(tmp_path / "test.idf")
     try:  # dask 2.0
         assert "_read" in str(a.dask.items()[0][1])
     # TODO: Remove when dask 2.0 is commonly installed
@@ -405,10 +351,7 @@ def test_lazy():
     # Test whether a change directory doesn't mess up reading a file
     @contextlib.contextmanager
     def remember_cwd():
-        """
-        from:
-        https://stackoverflow.com/questions/169070/how-do-i-write-a-decorator-that-restores-the-cwd
-        """
+        # code based on https://stackoverflow.com/a/170174/2875964
         curdir = os.getcwd()
         try:
             yield
@@ -420,68 +363,68 @@ def test_lazy():
         a.compute()
 
 
-def test_save_topbot__single_layer(test_da):
+def test_save_topbot__single_layer(test_da, tmp_path):
     da = test_da
     da = da.assign_coords(z=0.5)
     da = da.assign_coords(dz=1.0)
-    idf.save("test", da)
-    _, attrs = idf.read("test.idf")
+    idf.save(tmp_path / "test", da)
+    _, attrs = idf.read(tmp_path / "test.idf")
     assert attrs["top"] == 1.0
     assert attrs["bot"] == 0.0
 
 
-def test_save_topbot__layers(test_layerda):
+def test_save_topbot__layers(test_layerda, tmp_path):
     da = test_layerda
     da = da.assign_coords(z=("layer", np.arange(1.0, 6.0) - 0.5))
-    idf.save("layer", da)
-    _, attrs = idf.read("layer_l1.idf")
+    idf.save(tmp_path / "layer", da)
+    _, attrs = idf.read(tmp_path / "layer_l1.idf")
     assert attrs["top"] == 1.0
     assert attrs["bot"] == 0.0
-    _, attrs = idf.read("layer_l2.idf")
+    _, attrs = idf.read(tmp_path / "layer_l2.idf")
     assert attrs["top"] == 2.0
     assert attrs["bot"] == 1.0
     # Read multiple idfs
-    actual = idf.open("layer_l*.idf")
+    actual = idf.open(tmp_path / "layer_l*.idf")
     assert np.allclose(actual["z"], da["z"])
 
 
-def test_save_topbot__layers_nonequidistant(test_layerda):
+def test_save_topbot__layers_nonequidistant(test_layerda, tmp_path):
     da = test_layerda
     dz = np.arange(-1.0, -6.0, -1.0)
     z = np.cumsum(dz) - 0.5 * dz
     da = da.assign_coords(z=("layer", z))
     da = da.assign_coords(dz=("layer", dz))
-    idf.save("layer", da)
+    idf.save(tmp_path / "layer", da)
     # Read multiple idfs
-    actual = idf.open("layer_l*.idf")
+    actual = idf.open(tmp_path / "layer_l*.idf")
     assert np.allclose(actual["z"], da["z"])
     assert np.allclose(actual["dz"], da["dz"])
 
 
-def test_save_topbot__only_z(test_layerda):
+def test_save_topbot__only_z(test_layerda, tmp_path):
     da = test_layerda
     da = da.assign_coords(z=("layer", np.arange(1.0, 6.0) - 0.5))
     da = da.swap_dims({"layer": "z"})
     da = da.drop("layer")
-    idf.save("layer", da)
-    _, attrs = idf.read("layer_l1.idf")
+    idf.save(tmp_path / "layer", da)
+    _, attrs = idf.read(tmp_path / "layer_l1.idf")
     assert attrs["top"] == 1.0
     assert attrs["bot"] == 0.0
-    _, attrs = idf.read("layer_l2.idf")
+    _, attrs = idf.read(tmp_path / "layer_l2.idf")
     assert attrs["top"] == 2.0
     assert attrs["bot"] == 1.0
 
-    actual = idf.open("layer_l1.idf")
+    actual = idf.open(tmp_path / "layer_l1.idf")
     assert float(actual["z"]) == 0.5
 
 
-def test_save_topbot__errors(test_layerda):
+def test_save_topbot__errors(test_layerda, tmp_path):
     da = test_layerda
     # non-equidistant, cannot infer dz
     z = np.array([0.0, -1.0, -3.0, -4.5, -5.0])
     da = da.assign_coords(z=("layer", z))
     with pytest.raises(ValueError):
-        idf.save("layer", da)
+        idf.save(tmp_path / "layer", da)
 
 
 def test_has_dim():

@@ -9,8 +9,8 @@ import imod
 
 
 @pytest.fixture(scope="function")
-def write_legend(request):
-    def _write_legend(delim):
+def write_legend():
+    def _write_legend(delim, path):
         legend_content = (
             "17{delim}1{delim}1{delim}1{delim}1{delim}1{delim}1{delim}1\n"
             "UPPERBND{delim}LOWERBND{delim}IRED{delim}IGREEN{delim}IBLUE{delim}DOMAIN\n"
@@ -32,23 +32,18 @@ def write_legend(request):
             '0.200{delim}0.000{delim}17{delim}17{delim}255{delim}"0 - 0.2 m"\n'
             '0.000{delim}200.0{delim}0{delim}0{delim}125{delim}"< 0 m"\n'
         )
-        with open("example_legend.leg", "w") as f:
+
+        with open(path, "w") as f:
             f.write(legend_content.format(delim=delim))
 
-    def teardown():
-        try:
-            os.remove("example_legend.leg")
-        except FileNotFoundError:
-            pass
-
-    request.addfinalizer(teardown)
     return _write_legend
 
 
 @pytest.mark.parametrize("delim", [",", " ", "\t"])
-def test_read_legend(write_legend, delim):
-    write_legend(delim=delim)
-    colors, levels = imod.visualize.spatial.read_imod_legend(path="example_legend.leg")
+def test_read_legend(write_legend, delim, tmp_path):
+    leg_path = tmp_path / "example_legend.leg"
+    write_legend(delim=delim, path=leg_path)
+    colors, levels = imod.visualize.spatial.read_imod_legend(path=leg_path)
 
     assert colors == [
         "#00007d",

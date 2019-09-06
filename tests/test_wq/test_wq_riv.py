@@ -1,4 +1,5 @@
 import pathlib
+import textwrap
 
 import numpy as np
 import pandas as pd
@@ -9,7 +10,7 @@ from imod.wq import River
 
 
 @pytest.fixture(scope="function")
-def river(request):
+def river():
     layer = np.arange(1, 4)
     y = np.arange(4.5, 0.0, -1.0)
     x = np.arange(0.5, 5.0, 1.0)
@@ -33,21 +34,19 @@ def test_render(river):
     riv = river
     directory = pathlib.Path(".")
 
-    compare = (
-        "\n"
-        "    stage_p?_s1_l1 = stage_l1.idf\n"
-        "    stage_p?_s1_l2 = stage_l2.idf\n"
-        "    stage_p?_s1_l3 = stage_l3.idf\n"
-        "    cond_p?_s1_l1 = conductance_l1.idf\n"
-        "    cond_p?_s1_l2 = conductance_l2.idf\n"
-        "    cond_p?_s1_l3 = conductance_l3.idf\n"
-        "    rbot_p?_s1_l1 = bottom_elevation_l1.idf\n"
-        "    rbot_p?_s1_l2 = bottom_elevation_l2.idf\n"
-        "    rbot_p?_s1_l3 = bottom_elevation_l3.idf\n"
-        "    rivssmdens_p?_s1_l1 = density_l1.idf\n"
-        "    rivssmdens_p?_s1_l2 = density_l2.idf\n"
-        "    rivssmdens_p?_s1_l3 = density_l3.idf"
-    )
+    compare = """
+    stage_p?_s1_l1 = stage_l1.idf
+    stage_p?_s1_l2 = stage_l2.idf
+    stage_p?_s1_l3 = stage_l3.idf
+    cond_p?_s1_l1 = conductance_l1.idf
+    cond_p?_s1_l2 = conductance_l2.idf
+    cond_p?_s1_l3 = conductance_l3.idf
+    rbot_p?_s1_l1 = bottom_elevation_l1.idf
+    rbot_p?_s1_l2 = bottom_elevation_l2.idf
+    rbot_p?_s1_l3 = bottom_elevation_l3.idf
+    rivssmdens_p?_s1_l1 = density_l1.idf
+    rivssmdens_p?_s1_l2 = density_l2.idf
+    rivssmdens_p?_s1_l3 = density_l3.idf"""
 
     assert riv._render(directory, globaltimes=["?"], system_index=1) == compare
 

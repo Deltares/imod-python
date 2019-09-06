@@ -1,4 +1,5 @@
 import pathlib
+import textwrap
 
 import numpy as np
 import pytest
@@ -8,7 +9,7 @@ from imod.wq import LayerPropertyFlow
 
 
 @pytest.fixture(scope="module")
-def layerpropertyflow(request):
+def layerpropertyflow():
     layer = np.arange(1, 4)
     y = np.arange(4.5, 0.0, -1.0)
     x = np.arange(0.5, 5.0, 1.0)
@@ -40,35 +41,36 @@ def test_render(layerpropertyflow):
     lpf = layerpropertyflow
     directory = pathlib.Path(".")
 
-    compare = (
-        "[lpf]\n"
-        "    ilpfcb = 0\n"
-        "    hdry = 1e+20\n"
-        "    layvka_l? = 0\n"
-        "    laytyp_l1 = layer_type_l1.idf\n"
-        "    laytyp_l2 = layer_type_l2.idf\n"
-        "    laytyp_l3 = layer_type_l3.idf\n"
-        "    layavg_l1 = interblock_l1.idf\n"
-        "    layavg_l2 = interblock_l2.idf\n"
-        "    layavg_l3 = interblock_l3.idf\n"
-        "    chani_l1 = horizontal_anisotropy_l1.idf\n"
-        "    chani_l2 = horizontal_anisotropy_l2.idf\n"
-        "    chani_l3 = horizontal_anisotropy_l3.idf\n"
-        "    hk_l1 = k_horizontal_l1.idf\n"
-        "    hk_l2 = k_horizontal_l2.idf\n"
-        "    hk_l3 = k_horizontal_l3.idf\n"
-        "    vka_l1 = k_vertical_l1.idf\n"
-        "    vka_l2 = k_vertical_l2.idf\n"
-        "    vka_l3 = k_vertical_l3.idf\n"
-        "    ss_l1 = specific_storage_l1.idf\n"
-        "    ss_l2 = specific_storage_l2.idf\n"
-        "    ss_l3 = specific_storage_l3.idf\n"
-        "    sy_l1 = specific_yield_l1.idf\n"
-        "    sy_l2 = specific_yield_l2.idf\n"
-        "    sy_l3 = specific_yield_l3.idf\n"
-        "    laywet_l1 = layer_wet_l1.idf\n"
-        "    laywet_l2 = layer_wet_l2.idf\n"
-        "    laywet_l3 = layer_wet_l3.idf"
+    compare = textwrap.dedent(
+        """\
+        [lpf]
+            ilpfcb = 0
+            hdry = 1e+20
+            layvka_l? = 0
+            laytyp_l1 = layer_type_l1.idf
+            laytyp_l2 = layer_type_l2.idf
+            laytyp_l3 = layer_type_l3.idf
+            layavg_l1 = interblock_l1.idf
+            layavg_l2 = interblock_l2.idf
+            layavg_l3 = interblock_l3.idf
+            chani_l1 = horizontal_anisotropy_l1.idf
+            chani_l2 = horizontal_anisotropy_l2.idf
+            chani_l3 = horizontal_anisotropy_l3.idf
+            hk_l1 = k_horizontal_l1.idf
+            hk_l2 = k_horizontal_l2.idf
+            hk_l3 = k_horizontal_l3.idf
+            vka_l1 = k_vertical_l1.idf
+            vka_l2 = k_vertical_l2.idf
+            vka_l3 = k_vertical_l3.idf
+            ss_l1 = specific_storage_l1.idf
+            ss_l2 = specific_storage_l2.idf
+            ss_l3 = specific_storage_l3.idf
+            sy_l1 = specific_yield_l1.idf
+            sy_l2 = specific_yield_l2.idf
+            sy_l3 = specific_yield_l3.idf
+            laywet_l1 = layer_wet_l1.idf
+            laywet_l2 = layer_wet_l2.idf
+            laywet_l3 = layer_wet_l3.idf"""
     )
 
     assert lpf._render(directory) == compare

@@ -1,4 +1,5 @@
 import pathlib
+import textwrap
 
 import numpy as np
 import pytest
@@ -11,7 +12,7 @@ from imod.wq import ParallelKrylovTransportSolver
 
 
 @pytest.fixture(scope="module")
-def load_weight_da(request):
+def load_weight_da():
     coords = {"y": np.arange(5.0), "x": np.arange(4.0)}
     dims = ("y", "x")
     da = xr.DataArray(np.full((5, 4), 1.0), coords, dims)
@@ -19,7 +20,7 @@ def load_weight_da(request):
 
 
 @pytest.fixture(scope="module")
-def ibound_da(request):
+def ibound_da():
     coords = {"layer": np.arange(1, 4), "y": np.arange(5.0), "x": np.arange(4.0)}
     dims = ("layer", "y", "x")
     da = xr.DataArray(np.full((3, 5, 4), 1.0), coords, dims)
@@ -32,17 +33,18 @@ def test_pcg_render():
         max_iter=150, inner_iter=30, hclose=0.0001, rclose=1000.0, relax=0.98, damp=1.0
     )
 
-    compare = (
-        "[pcg]\n"
-        "    mxiter = 150\n"
-        "    iter1 = 30\n"
-        "    npcond = 1\n"
-        "    hclose = 0.0001\n"
-        "    rclose = 1000.0\n"
-        "    relax = 0.98\n"
-        "    iprpcg = 1\n"
-        "    mutpcg = 0\n"
-        "    damp = 1.0"
+    compare = textwrap.dedent(
+        """\
+        [pcg]
+            mxiter = 150
+            iter1 = 30
+            npcond = 1
+            hclose = 0.0001
+            rclose = 1000.0
+            relax = 0.98
+            iprpcg = 1
+            mutpcg = 0
+            damp = 1.0"""
     )
 
     assert pcg._render() == compare
@@ -57,14 +59,15 @@ def test_gcg_render():
         lump_dispersion=True,
     )
 
-    compare = (
-        "[gcg]\n"
-        "    mxiter = 150\n"
-        "    iter1 = 30\n"
-        "    isolve = 3\n"
-        "    ncrs = 0\n"
-        "    cclose = 1e-06\n"
-        "    iprgcg = 0"
+    compare = textwrap.dedent(
+        """\
+        [gcg]
+            mxiter = 150
+            iter1 = 30
+            isolve = 3
+            ncrs = 0
+            cclose = 1e-06
+            iprgcg = 0"""
     )
 
     assert gcg._render() == compare
@@ -94,19 +97,21 @@ def test_pksf_render(load_weight_da):
 
     directory = pathlib.Path(".")
 
-    compare = (
-        "[pksf]\n"
-        "    mxiter = 10\n"
-        "    innerit = 10\n"
-        "    hclosepks = 0.0001\n"
-        "    rclosepks = 100.0\n"
-        "    relax = 0.99\n"
-        "    partopt = 0\n"
-        "    isolver = 1\n"
-        "    npc = 2\n"
-        "    npcdef = 0\n"
-        "    loadptr = None\n"
-        "    pressakey = False\n"
+    compare = textwrap.dedent(
+        """\
+        [pksf]
+            mxiter = 10
+            innerit = 10
+            hclosepks = 0.0001
+            rclosepks = 100.0
+            relax = 0.99
+            partopt = 0
+            isolver = 1
+            npc = 2
+            npcdef = 0
+            loadptr = None
+            pressakey = False
+        """
     )
 
     assert pksf._render(directory=directory) == compare
@@ -125,19 +130,21 @@ def test_pksf_render_rcb(load_weight_da):
 
     directory = pathlib.Path(".")
 
-    compare = (
-        "[pksf]\n"
-        "    mxiter = 10\n"
-        "    innerit = 10\n"
-        "    hclosepks = 0.0001\n"
-        "    rclosepks = 100.0\n"
-        "    relax = 0.99\n"
-        "    partopt = 5\n"
-        "    isolver = 1\n"
-        "    npc = 2\n"
-        "    npcdef = 0\n"
-        "    loadptr = load_balance_weight.asc\n"
-        "    pressakey = False\n"
+    compare = textwrap.dedent(
+        """\
+        [pksf]
+            mxiter = 10
+            innerit = 10
+            hclosepks = 0.0001
+            rclosepks = 100.0
+            relax = 0.99
+            partopt = 5
+            isolver = 1
+            npc = 2
+            npcdef = 0
+            loadptr = load_balance_weight.asc
+            pressakey = False
+        """
     )
 
     assert pksf._render(directory=directory) == compare
@@ -157,17 +164,19 @@ def test_pkst_render(load_weight_da):
 
     directory = pathlib.Path(".")
 
-    compare = (
-        "[pkst]\n"
-        "    mxiter = 1000\n"
-        "    innerit = 30\n"
-        "    cclosepks = 1e-06\n"
-        "    relax = 0.98\n"
-        "    partopt = 0\n"
-        "    isolver = 2\n"
-        "    npc = 2\n"
-        "    loadptr = None\n"
-        "    pressakey = False\n"
+    compare = textwrap.dedent(
+        """\
+        [pkst]
+            mxiter = 1000
+            innerit = 30
+            cclosepks = 1e-06
+            relax = 0.98
+            partopt = 0
+            isolver = 2
+            npc = 2
+            loadptr = None
+            pressakey = False
+        """
     )
 
     assert pkst._render(directory=directory) == compare
@@ -188,17 +197,19 @@ def test_pkst_render_rcb(load_weight_da):
 
     directory = pathlib.Path(".")
 
-    compare = (
-        "[pkst]\n"
-        "    mxiter = 1000\n"
-        "    innerit = 30\n"
-        "    cclosepks = 1e-06\n"
-        "    relax = 0.98\n"
-        "    partopt = 5\n"
-        "    isolver = 2\n"
-        "    npc = 2\n"
-        "    loadptr = load_balance_weight.asc\n"
-        "    pressakey = False\n"
+    compare = textwrap.dedent(
+        """\
+        [pkst]
+            mxiter = 1000
+            innerit = 30
+            cclosepks = 1e-06
+            relax = 0.98
+            partopt = 5
+            isolver = 2
+            npc = 2
+            loadptr = load_balance_weight.asc
+            pressakey = False
+        """
     )
 
     assert pkst._render(directory=directory) == compare

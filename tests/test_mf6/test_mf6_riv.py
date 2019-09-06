@@ -13,15 +13,15 @@ def test_render():
     actual = riv.render(directory, "river", globaltimes)
     expected = textwrap.dedent(
         """\
-            begin options
-            end options
+        begin options
+        end options
 
-            begin dimensions
-              maxbound 1
-            end dimensions
+        begin dimensions
+          maxbound 1
+        end dimensions
 
-            begin period 1
-                open/close mymodel/river/riv.bin (binary)
-            end period"""
+        begin period 1
+          open/close mymodel/river/riv.bin (binary)
+        end period"""
     )
     assert actual == expected

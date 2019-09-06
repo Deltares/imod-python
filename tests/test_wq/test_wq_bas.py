@@ -1,4 +1,5 @@
 import pathlib
+import textwrap
 
 import numpy as np
 import pytest
@@ -8,7 +9,7 @@ from imod.wq import BasicFlow
 
 
 @pytest.fixture(scope="module")
-def basicflow(request):
+def basicflow():
     layer = np.arange(1, 4)
     y = np.arange(4.5, 0.0, -1.0)
     x = np.arange(0.5, 5.0, 1.0)
@@ -37,16 +38,16 @@ def test_thickness(basicflow):
 def test_render(basicflow):
     bas = basicflow
     directory = pathlib.Path(".")
-
-    compare = (
-        "[bas6]\n"
-        "    ibound_l1 = ibound_l1.idf\n"
-        "    ibound_l2 = ibound_l2.idf\n"
-        "    ibound_l3 = ibound_l3.idf\n"
-        "    hnoflo = 1e+30\n"
-        "    strt_l1 = starting_head_l1.idf\n"
-        "    strt_l2 = starting_head_l2.idf\n"
-        "    strt_l3 = starting_head_l3.idf"
+    compare = textwrap.dedent(
+        """\
+        [bas6]
+            ibound_l1 = ibound_l1.idf
+            ibound_l2 = ibound_l2.idf
+            ibound_l3 = ibound_l3.idf
+            hnoflo = 1e+30
+            strt_l1 = starting_head_l1.idf
+            strt_l2 = starting_head_l2.idf
+            strt_l3 = starting_head_l3.idf"""
     )
     assert bas._render(directory) == compare
 
@@ -54,19 +55,19 @@ def test_render(basicflow):
 def test_render_dis__scalartopbot(basicflow):
     bas = basicflow
     directory = pathlib.Path(".")
-
-    compare = (
-        "[dis]\n"
-        "    nlay = 3\n"
-        "    nrow = 5\n"
-        "    ncol = 5\n"
-        "    delc_r? = 1.0\n"
-        "    delr_c? = 1.0\n"
-        "    top = 30.0\n"
-        "    botm_l1 = 20.0\n"
-        "    botm_l2 = 10.0\n"
-        "    botm_l3 = 0.0\n"
-        "    laycbd_l? = 0"
+    compare = textwrap.dedent(
+        """\
+        [dis]
+            nlay = 3
+            nrow = 5
+            ncol = 5
+            delc_r? = 1.0
+            delr_c? = 1.0
+            top = 30.0
+            botm_l1 = 20.0
+            botm_l2 = 10.0
+            botm_l3 = 0.0
+            laycbd_l? = 0"""
     )
     assert bas._render_dis(directory) == compare
 
@@ -76,18 +77,18 @@ def test_render_dis__arraytopbot(basicflow):
     bas["bottom"] = xr.full_like(bas["ibound"], 10.0)
     bas["top"] = bas["bottom"].isel(layer=0)
     directory = pathlib.Path(".")
-
-    compare = (
-        "[dis]\n"
-        "    nlay = 3\n"
-        "    nrow = 5\n"
-        "    ncol = 5\n"
-        "    delc_r? = 1.0\n"
-        "    delr_c? = 1.0\n"
-        "    top = top.idf\n"
-        "    botm_l1 = bottom_l1.idf\n"
-        "    botm_l2 = bottom_l2.idf\n"
-        "    botm_l3 = bottom_l3.idf\n"
-        "    laycbd_l? = 0"
+    compare = textwrap.dedent(
+        """\
+        [dis]
+            nlay = 3
+            nrow = 5
+            ncol = 5
+            delc_r? = 1.0
+            delr_c? = 1.0
+            top = top.idf
+            botm_l1 = bottom_l1.idf
+            botm_l2 = bottom_l2.idf
+            botm_l3 = bottom_l3.idf
+            laycbd_l? = 0"""
     )
     assert bas._render_dis(directory) == compare

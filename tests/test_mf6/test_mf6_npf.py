@@ -26,25 +26,25 @@ def test_render():
     actual = npf.render(directory, "npf")
     expected = textwrap.dedent(
         """\
-            begin options
-              save_flows
-              variablecv dewatered
-              perched
-            end options
-            
-            begin griddata
-              icelltype layered
-                constant 1
-                constant 0
-                constant 0
-              k layered
-                constant 0.001
-                constant 0.0001
-                constant 0.0002
-              k33 layered
-                constant 2e-08
-                constant 2e-08
-                constant 2e-08
-            end griddata"""
+        begin options
+          save_flows
+          variablecv dewatered
+          perched
+        end options
+        
+        begin griddata
+          icelltype layered
+            constant 1
+            constant 0
+            constant 0
+          k layered
+            constant 0.001
+            constant 0.0001
+            constant 0.0002
+          k33 layered
+            constant 2e-08
+            constant 2e-08
+            constant 2e-08
+        end griddata"""
     )
     assert actual == expected

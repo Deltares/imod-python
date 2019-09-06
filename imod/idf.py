@@ -254,8 +254,7 @@ def _dask(path, attrs=None, pattern=None):
         A dict with all metadata.
     """
 
-    if isinstance(path, str):
-        path = pathlib.Path(path)
+    path = pathlib.Path(path)
 
     if attrs is None:
         attrs = header(path, pattern)
@@ -832,8 +831,7 @@ def save(path, a, nodata=1.0e20, pattern=None):
     if not isinstance(a, xr.DataArray):
         raise TypeError("Data to save must be an xarray.DataArray")
 
-    if isinstance(path, str):
-        path = pathlib.Path(path)
+    path = pathlib.Path(path)
 
     if path.suffix != "":
         raise ValueError(

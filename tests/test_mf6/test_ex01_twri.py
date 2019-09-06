@@ -10,7 +10,7 @@ import imod
 
 
 @pytest.fixture(scope="module")
-def twri_model(request):
+def twri_model():
     nlay = 3
     nrow = 15
     ncol = 15
@@ -155,24 +155,24 @@ def test_timedis_render(twri_model):
     assert actual == expected
 
 
-def test_gwfmodel_render(twri_model):
+def test_gwfmodel_render(twri_model, tmp_path):
     simulation = twri_model
-    modeldirectory = pathlib.Path("GWF_1")
-    actual = simulation["GWF_1"].render(modeldirectory)
+    actual = simulation["GWF_1"].render(tmp_path)
+    path = tmp_path.as_posix()
     expected = textwrap.dedent(
-        """\
+        f"""\
             begin options
             end options
 
             begin packages
-              dis6 GWF_1/dis.dis
-              chd6 GWF_1/chd.chd
-              drn6 GWF_1/drn.drn
-              ic6 GWF_1/ic.ic
-              npf6 GWF_1/npf.npf
-              oc6 GWF_1/oc.oc
-              rch6 GWF_1/rch.rch
-              wel6 GWF_1/wel.wel
+              dis6 {path}/dis.dis
+              chd6 {path}/chd.chd
+              drn6 {path}/drn.drn
+              ic6 {path}/ic.ic
+              npf6 {path}/npf.npf
+              oc6 {path}/oc.oc
+              rch6 {path}/rch.rch
+              wel6 {path}/wel.wel
             end packages"""
     )
     assert actual == expected
@@ -204,7 +204,7 @@ def test_simulation_render(twri_model):
     assert actual == expected
 
 
-def test_simulation_write(twri_model):
+def test_simulation_write(twri_model, tmp_path):
     simulation = twri_model
-    simulation.write("ex01-twri")
+    simulation.write(tmp_path / "ex01-twri")
     # TODO: compare heads with other version?
