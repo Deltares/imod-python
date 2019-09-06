@@ -137,3 +137,9 @@ class RechargeHighestActive(Recharge):
         self["rate"] = rate
         self["concentration"] = concentration
         self["save_budget"] = save_budget
+
+    def add_timemap(self, rate=None, concentration=None, use_cftime=False):
+        varnames = ["rate", "concentration"]
+        values = [rate, concentration]
+        for varname, value in zip(varnames, values):
+            self._add_timemap(varname, value, use_cftime)
