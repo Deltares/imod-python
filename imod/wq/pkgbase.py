@@ -229,11 +229,11 @@ class BoundaryCondition(Package):
         if value is not None:
             if varname not in self:
                 raise ValueError(
-                    f"{varname} does not occur in {self}, cannot add timemap"
+                    f"{varname} does not occur in {self}\n cannot add timemap"
                 )
             if "time" not in self[varname].coords:
                 raise ValueError(
-                    f"{varname} in {self} does not have dimension time, cannot add timemap."
+                    f"{varname} in {self}\n does not have dimension time, cannot add timemap."
                 )
 
             # Replace both key and value by the right datetime type
