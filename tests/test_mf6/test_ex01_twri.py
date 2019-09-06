@@ -1,4 +1,5 @@
 import pathlib
+import subprocess
 import textwrap
 
 import numpy as np
@@ -206,5 +207,17 @@ def test_simulation_render(twri_model):
 
 def test_simulation_write(twri_model, tmp_path):
     simulation = twri_model
-    simulation.write(tmp_path / "ex01-twri")
-    # TODO: compare heads with other version?
+    modeldir = tmp_path / "ex01-twri"
+    simulation.write(modeldir)
+    with imod.util.cd(modeldir):
+        p = subprocess.run("mf6", check=True, capture_output=True, text=True)
+        assert p.stdout.endswith("Normal termination of simulation.\n")
+        # hds file is identical to the official example, except for the
+        # time units, which are days here and seconds in the official one
+        head = imod.mf6.open_hds("GWF_1/GWF_1.hds", "GWF_1/dis.dis.grb")
+        print(head)
+        assert head.dims == ("time", "layer", "y", "x")
+        assert head.shape == (1, 3, 15, 15)
+        meanhead_layer = head.groupby("layer").mean()
+        mean_answer = np.array([59.79181509, 30.44132373, 24.88576811])
+        assert np.allclose(meanhead_layer, mean_answer)
