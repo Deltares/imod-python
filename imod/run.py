@@ -783,8 +783,7 @@ def get_runfile(model, directory):
     bounds["cellsize"] = bounds.pop("dx")
     times = bounds.pop("times", False)
 
-    if isinstance(directory, str):
-        directory = pathlib.Path(directory)
+    directory = pathlib.Path(directory)
     directory = directory.absolute()  # as iMODFLOW supports only absolute paths
     runfile_parameters = default_runfile.copy()
     runfile_parameters.update(bounds)
@@ -905,8 +904,7 @@ def seawat_get_runfile(model, directory):
     bounds = _data_bounds(model, seawat=True)
     times = bounds.pop("times", False)
 
-    if isinstance(directory, str):
-        directory = pathlib.Path(directory)
+    directory = pathlib.Path(directory)
     directory = directory.absolute()  # as iMODFLOW supports only absolute paths
     runfile_parameters = seawat_default_runfile.copy()
     runfile_parameters.update(bounds)

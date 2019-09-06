@@ -220,8 +220,7 @@ def nd_imshow(
 
     Dumps PNGs into directory of choice.
     """
-    if isinstance(directory, str):
-        directory = pathlib.Path(directory)
+    directory = pathlib.Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
     if "x" not in da.dims or "y" not in da.dims:
         raise ValueError("DataArray must have dims x and y.")

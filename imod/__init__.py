@@ -114,8 +114,7 @@ def seawat_write(path, model, name=None, runfile_parameters=None):
         FutureWarning,
     )
 
-    if isinstance(path, str):
-        path = pathlib.Path(path)
+    path = pathlib.Path(path)
     path.mkdir(exist_ok=True, parents=True)
 
     if runfile_parameters is None:

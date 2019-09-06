@@ -35,8 +35,7 @@ class Model(collections.UserDict):
         quantile_colorscale=True,
         figsize=(8, 8),
     ):
-        if isinstance(directory, str):
-            directory = pathlib.Path(directory)
+        directory = pathlib.Path(directory)
 
         for key, value in self.items():
             if value._pkg_id == "well":
@@ -258,7 +257,7 @@ class SeawatModel(Model):
             else:
                 raise ValueError(f"No {key} package provided.")
         return self[pkgkey]._render(
-            directory=directory.joinpath(pkgkey), globaltimes=globaltimes
+            directory=directory / pkgkey, globaltimes=globaltimes
         )
 
     def _render_dis(self, directory, globaltimes):
@@ -408,14 +407,15 @@ class SeawatModel(Model):
 
         return "\n\n".join(content)
 
-    def write(self, directory=".", result_dir=None):
+    def write(self, directory=pathlib.Path("."), result_dir=pathlib.Path("results")):
         """
+        Writes model input files.
+
         Parameters
         ----------
         directory : str, pathlib.Path
             Directory into which the model input will be written. The model
-            input will be written into a (new) directory, equal to the given
-            modelname.
+            input will be written into a directory called modelname.
         result_dir : str, pathlib.Path
             Path to directory in which output will be written when running the
             model. Is written as the value of the ``result_dir`` key in the
@@ -431,7 +431,6 @@ class SeawatModel(Model):
         Returns
         -------
         None
-            Writes model input files.
 
         Examples
         --------
@@ -444,15 +443,18 @@ class SeawatModel(Model):
         And in the runfile, a value of ``../../output`` will be written for
         result_dir.
         """
-        if isinstance(directory, str):
-            directory = pathlib.Path(directory).joinpath(self.modelname)
-        if result_dir is None:
-            result_dir = "results"
-        else:
-            result_dir = pathlib.Path(os.path.relpath(result_dir, directory))
+        directory = pathlib.Path(directory) / self.modelname
+        result_dir = pathlib.Path(result_dir)
+
+        if not result_dir.is_absolute():
+            try:
+                result_dir = os.path.relpath(result_dir, directory)
+            except ValueError:
+                result_dir = os.path.abspath(result_dir)
+            result_dir = pathlib.Path(result_dir)
 
         runfile_content = self.render(writehelp=False, result_dir=result_dir)
-        runfilepath = directory.joinpath(f"{self.modelname}.run")
+        runfilepath = directory / f"{self.modelname}.run"
 
         if not self.check is None:
             self.package_check()
@@ -467,7 +469,7 @@ class SeawatModel(Model):
         # Write all IDFs and IPFs
         for pkgname, pkg in self.items():
             if "x" in pkg.coords and "y" in pkg.coords or pkg._pkg_id == "wel":
-                pkg.save(directory=directory.joinpath(pkgname))
+                pkg.save(directory=directory / pkgname)
 
     def package_check(self):
         baskey = self._get_pkgkey("bas6")

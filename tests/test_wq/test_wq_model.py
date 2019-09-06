@@ -1,5 +1,6 @@
 import pathlib
 import shutil
+import textwrap
 
 import imod
 import imod.wq
@@ -11,7 +12,7 @@ import cftime
 
 
 @pytest.fixture(scope="module")
-def basicmodel(request):
+def basicmodel():
 
     # Basic flow
     layer = np.arange(1, 4)
@@ -129,14 +130,6 @@ def basicmodel(request):
     )
     m["oc"] = imod.wq.OutputControl(save_head_idf=True, save_concentration_idf=True)
 
-    def teardown():
-        try:
-            shutil.rmtree("test_model")
-        except FileNotFoundError:
-            pass
-
-    request.addfinalizer(teardown)
-
     return m
 
 
@@ -229,18 +222,19 @@ def test_render_gen(basicmodel):
     globaltimes = m[diskey]["time"].values
     modelname = m.modelname
 
-    compare = (
-        "[gen]\n"
-        "    runtype = SEAWAT\n"
-        "    modelname = test_model\n"
-        "    writehelp = False\n"
-        "    result_dir = results\n"
-        "    packages = adv, bas6, btn, dis, dsp, gcg, ghb, lpf, oc, pcg, rch, riv, ssm, vdf, wel\n"
-        "    coord_xll = 0.0\n"
-        "    coord_yll = 0.0\n"
-        "    start_year = 2000\n"
-        "    start_month = 01\n"
-        "    start_day = 01"
+    compare = textwrap.dedent(
+        """\
+        [gen]
+            runtype = SEAWAT
+            modelname = test_model
+            writehelp = False
+            result_dir = results
+            packages = adv, bas6, btn, dis, dsp, gcg, ghb, lpf, oc, pcg, rch, riv, ssm, vdf, wel
+            coord_xll = 0.0
+            coord_yll = 0.0
+            start_year = 2000
+            start_month = 01
+            start_day = 01"""
     )
     assert (
         m._render_gen(
@@ -258,17 +252,17 @@ def test_render_pkg__gcg(basicmodel):
     m.time_discretization(endtime="2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
-    modelname = m.modelname
     directory = pathlib.Path(".")
 
-    compare = (
-        "[gcg]\n"
-        "    mxiter = 150\n"
-        "    iter1 = 30\n"
-        "    isolve = 3\n"
-        "    ncrs = 0\n"
-        "    cclose = 1e-06\n"
-        "    iprgcg = 0"
+    compare = textwrap.dedent(
+        """\
+        [gcg]
+            mxiter = 150
+            iter1 = 30
+            isolve = 3
+            ncrs = 0
+            cclose = 1e-06
+            iprgcg = 0"""
     )
     assert m._render_pkg("gcg", directory=directory, globaltimes=globaltimes) == compare
 
@@ -278,20 +272,19 @@ def test_render_pkg__rch(basicmodel):
     m.time_discretization(endtime="2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
-    modelname = m.modelname
     directory = pathlib.Path(".")
-    path = pathlib.Path("rch").joinpath("rate")
 
-    compare = (
-        "[rch]\n"
-        "    nrchop = 3\n"
-        "    irchcb = 0\n"
-        "    rech_p1 = {path}_20000101000000.idf\n"
-        "    rech_p2 = {path}_20000102000000.idf\n"
-        "    rech_p3 = {path}_20000103000000.idf\n"
-        "    rech_p4 = {path}_20000104000000.idf\n"
-        "    rech_p5 = {path}_20000105000000.idf"
-    ).format(path=path)
+    compare = textwrap.dedent(
+        """\
+        [rch]
+            nrchop = 3
+            irchcb = 0
+            rech_p1 = rch/rate_20000101000000.idf
+            rech_p2 = rch/rate_20000102000000.idf
+            rech_p3 = rch/rate_20000103000000.idf
+            rech_p4 = rch/rate_20000104000000.idf
+            rech_p5 = rch/rate_20000105000000.idf"""
+    )
     assert m._render_pkg("rch", directory=directory, globaltimes=globaltimes) == compare
 
 
@@ -300,30 +293,30 @@ def test_render_dis(basicmodel):
     m.time_discretization(endtime="2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
-    modelname = m.modelname
     directory = pathlib.Path(".")
 
-    compare = (
-        "[dis]\n"
-        "    nlay = 3\n"
-        "    nrow = 5\n"
-        "    ncol = 5\n"
-        "    delc_r? = 1.0\n"
-        "    delr_c? = 1.0\n"
-        "    top = 30.0\n"
-        "    botm_l1 = 20.0\n"
-        "    botm_l2 = 10.0\n"
-        "    botm_l3 = 0.0\n"
-        "    laycbd_l? = 0\n"
-        "    nper = 5\n"
-        "    perlen_p1 = 1.0\n"
-        "    perlen_p2 = 1.0\n"
-        "    perlen_p3 = 1.0\n"
-        "    perlen_p4 = 1.0\n"
-        "    perlen_p5 = 1.0\n"
-        "    nstp_p? = 1\n"
-        "    sstr_p? = tr\n"
-        "    tsmult_p? = 1.0"
+    compare = textwrap.dedent(
+        """\
+        [dis]
+            nlay = 3
+            nrow = 5
+            ncol = 5
+            delc_r? = 1.0
+            delr_c? = 1.0
+            top = 30.0
+            botm_l1 = 20.0
+            botm_l2 = 10.0
+            botm_l3 = 0.0
+            laycbd_l? = 0
+            nper = 5
+            perlen_p1 = 1.0
+            perlen_p2 = 1.0
+            perlen_p3 = 1.0
+            perlen_p4 = 1.0
+            perlen_p5 = 1.0
+            nstp_p? = 1
+            sstr_p? = tr
+            tsmult_p? = 1.0"""
     )
     assert m._render_dis(directory=directory, globaltimes=globaltimes) == compare
 
@@ -333,73 +326,59 @@ def test_render_groups__ghb_riv_wel(basicmodel):
     m.time_discretization(endtime="2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
-    modelname = m.modelname
     directory = pathlib.Path(".")
 
-    compare = (
-        "[ghb]\n"
-        "    mghbsys = 1\n"
-        "    mxactb = 75\n"
-        "    ighbcb = 0\n"
-        "    bhead_p?_s1_l1 = {gh}_l1.idf\n"
-        "    bhead_p?_s1_l2 = {gh}_l2.idf\n"
-        "    bhead_p?_s1_l3 = {gh}_l3.idf\n"
-        "    cond_p?_s1_l1 = {gc}_l1.idf\n"
-        "    cond_p?_s1_l2 = {gc}_l2.idf\n"
-        "    cond_p?_s1_l3 = {gc}_l3.idf\n"
-        "    ghbssmdens_p?_s1_l1 = {gd}_l1.idf\n"
-        "    ghbssmdens_p?_s1_l2 = {gd}_l2.idf\n"
-        "    ghbssmdens_p?_s1_l3 = {gd}_l3.idf\n"
-        "\n"
-        "[riv]\n"
-        "    mrivsys = 1\n"
-        "    mxactr = 75\n"
-        "    irivcb = 0\n"
-        "    stage_p?_s1_l1 = {rs}_l1.idf\n"
-        "    stage_p?_s1_l2 = {rs}_l2.idf\n"
-        "    stage_p?_s1_l3 = {rs}_l3.idf\n"
-        "    cond_p?_s1_l1 = {rc}_l1.idf\n"
-        "    cond_p?_s1_l2 = {rc}_l2.idf\n"
-        "    cond_p?_s1_l3 = {rc}_l3.idf\n"
-        "    rbot_p?_s1_l1 = {re}_l1.idf\n"
-        "    rbot_p?_s1_l2 = {re}_l2.idf\n"
-        "    rbot_p?_s1_l3 = {re}_l3.idf\n"
-        "    rivssmdens_p?_s1_l1 = {rd}_l1.idf\n"
-        "    rivssmdens_p?_s1_l2 = {rd}_l2.idf\n"
-        "    rivssmdens_p?_s1_l3 = {rd}_l3.idf\n"
-        "\n"
-        "[wel]\n"
-        "    mwelsys = 1\n"
-        "    mxactw = 3\n"
-        "    iwelcb = 0\n"
-        "    wel_p1_s1_l? = {welpath}_20000101000000.ipf\n"
-        "    wel_p2_s1_l? = {welpath}_20000102000000.ipf\n"
-        "    wel_p3_s1_l? = {welpath}_20000103000000.ipf\n"
-        "    wel_p4_s1_l? = {welpath}_20000104000000.ipf\n"
-        "    wel_p5_s1_l? = {welpath}_20000105000000.ipf"
-    ).format(
-        gh=pathlib.Path("ghb").joinpath("head"),
-        gc=pathlib.Path("ghb").joinpath("conductance"),
-        gd=pathlib.Path("ghb").joinpath("density"),
-        rs=pathlib.Path("riv").joinpath("stage"),
-        rc=pathlib.Path("riv").joinpath("conductance"),
-        re=pathlib.Path("riv").joinpath("bottom_elevation"),
-        rd=pathlib.Path("riv").joinpath("density"),
-        welpath=pathlib.Path("wel").joinpath("wel"),
-    )  # Format is necessary because of Windows versus Unix paths
-
-    ssm_compare = (
-        "\n"
-        "    cghb_t1_p?_l1 = {gc}_l1.idf\n"
-        "    cghb_t1_p?_l2 = {gc}_l2.idf\n"
-        "    cghb_t1_p?_l3 = {gc}_l3.idf\n"
-        "    criv_t1_p?_l1 = {rc}_l1.idf\n"
-        "    criv_t1_p?_l2 = {rc}_l2.idf\n"
-        "    criv_t1_p?_l3 = {rc}_l3.idf"
-    ).format(
-        gc=pathlib.Path("ghb").joinpath("concentration"),
-        rc=pathlib.Path("riv").joinpath("concentration"),
+    compare = textwrap.dedent(
+        """\
+        [ghb]
+            mghbsys = 1
+            mxactb = 75
+            ighbcb = 0
+            bhead_p?_s1_l1 = ghb/head_l1.idf
+            bhead_p?_s1_l2 = ghb/head_l2.idf
+            bhead_p?_s1_l3 = ghb/head_l3.idf
+            cond_p?_s1_l1 = ghb/conductance_l1.idf
+            cond_p?_s1_l2 = ghb/conductance_l2.idf
+            cond_p?_s1_l3 = ghb/conductance_l3.idf
+            ghbssmdens_p?_s1_l1 = ghb/density_l1.idf
+            ghbssmdens_p?_s1_l2 = ghb/density_l2.idf
+            ghbssmdens_p?_s1_l3 = ghb/density_l3.idf
+        
+        [riv]
+            mrivsys = 1
+            mxactr = 75
+            irivcb = 0
+            stage_p?_s1_l1 = riv/stage_l1.idf
+            stage_p?_s1_l2 = riv/stage_l2.idf
+            stage_p?_s1_l3 = riv/stage_l3.idf
+            cond_p?_s1_l1 = riv/conductance_l1.idf
+            cond_p?_s1_l2 = riv/conductance_l2.idf
+            cond_p?_s1_l3 = riv/conductance_l3.idf
+            rbot_p?_s1_l1 = riv/bottom_elevation_l1.idf
+            rbot_p?_s1_l2 = riv/bottom_elevation_l2.idf
+            rbot_p?_s1_l3 = riv/bottom_elevation_l3.idf
+            rivssmdens_p?_s1_l1 = riv/density_l1.idf
+            rivssmdens_p?_s1_l2 = riv/density_l2.idf
+            rivssmdens_p?_s1_l3 = riv/density_l3.idf
+        
+        [wel]
+            mwelsys = 1
+            mxactw = 3
+            iwelcb = 0
+            wel_p1_s1_l? = wel/wel_20000101000000.ipf
+            wel_p2_s1_l? = wel/wel_20000102000000.ipf
+            wel_p3_s1_l? = wel/wel_20000103000000.ipf
+            wel_p4_s1_l? = wel/wel_20000104000000.ipf
+            wel_p5_s1_l? = wel/wel_20000105000000.ipf"""
     )
+
+    ssm_compare = """
+    cghb_t1_p?_l1 = ghb/concentration_l1.idf
+    cghb_t1_p?_l2 = ghb/concentration_l2.idf
+    cghb_t1_p?_l3 = ghb/concentration_l3.idf
+    criv_t1_p?_l1 = riv/concentration_l1.idf
+    criv_t1_p?_l2 = riv/concentration_l2.idf
+    criv_t1_p?_l3 = riv/concentration_l3.idf"""
     content, ssm_content, n_sinkssources = m._render_groups(
         directory=directory, globaltimes=globaltimes
     )
@@ -413,17 +392,18 @@ def test_render_flowsolver(basicmodel):
     m = basicmodel
     directory = pathlib.Path(".")
 
-    compare = (
-        "[pcg]\n"
-        "    mxiter = 150\n"
-        "    iter1 = 30\n"
-        "    npcond = 1\n"
-        "    hclose = 0.0001\n"
-        "    rclose = 1000.0\n"
-        "    relax = 0.98\n"
-        "    iprpcg = 1\n"
-        "    mutpcg = 0\n"
-        "    damp = 1.0"
+    compare = textwrap.dedent(
+        """\
+        [pcg]
+            mxiter = 150
+            iter1 = 30
+            npcond = 1
+            hclose = 0.0001
+            rclose = 1000.0
+            relax = 0.98
+            iprpcg = 1
+            mutpcg = 0
+            damp = 1.0"""
     )
     assert m._render_flowsolver(directory) == compare
 
@@ -435,29 +415,26 @@ def test_render_btn(basicmodel):
     globaltimes = m[diskey]["time"].values
     directory = pathlib.Path(".")
 
-    compare = (
-        "[btn]\n"
-        "    thkmin = 0.01\n"
-        "    cinact = 1e+30\n"
-        "    sconc_t1_l1 = {sc}_concentration_l1.idf\n"
-        "    sconc_t1_l2 = {sc}_concentration_l2.idf\n"
-        "    sconc_t1_l3 = {sc}_concentration_l3.idf\n"
-        "    icbund_l1 = {ic}_l1.idf\n"
-        "    icbund_l2 = {ic}_l2.idf\n"
-        "    icbund_l3 = {ic}_l3.idf\n"
-        "    dz_l1 = 10.0\n"
-        "    dz_l2 = 10.0\n"
-        "    dz_l3 = 10.0\n"
-        "    prsity_l1 = {pr}_l1.idf\n"
-        "    prsity_l2 = {pr}_l2.idf\n"
-        "    prsity_l3 = {pr}_l3.idf\n"
-        "    tsmult_p? = 1.0\n"
-        "    dt0_p? = 0.0\n"
-        "    mxstrn_p? = 50000"
-    ).format(
-        sc=pathlib.Path("btn").joinpath("starting"),
-        ic=pathlib.Path("btn").joinpath("icbund"),
-        pr=pathlib.Path("btn").joinpath("porosity"),
+    compare = textwrap.dedent(
+        """\
+        [btn]
+            thkmin = 0.01
+            cinact = 1e+30
+            sconc_t1_l1 = btn/starting_concentration_l1.idf
+            sconc_t1_l2 = btn/starting_concentration_l2.idf
+            sconc_t1_l3 = btn/starting_concentration_l3.idf
+            icbund_l1 = btn/icbund_l1.idf
+            icbund_l2 = btn/icbund_l2.idf
+            icbund_l3 = btn/icbund_l3.idf
+            dz_l1 = 10.0
+            dz_l2 = 10.0
+            dz_l3 = 10.0
+            prsity_l1 = btn/porosity_l1.idf
+            prsity_l2 = btn/porosity_l2.idf
+            prsity_l3 = btn/porosity_l3.idf
+            tsmult_p? = 1.0
+            dt0_p? = 0.0
+            mxstrn_p? = 50000"""
     )
     assert m._render_btn(directory=directory, globaltimes=globaltimes) == compare
 
@@ -469,14 +446,13 @@ def test_render_ssm_rch(basicmodel):
     globaltimes = m[diskey]["time"].values
     directory = pathlib.Path(".")
 
-    compare = (
-        "\n"
-        "    crch_t1_p1_l? = concentration_20000101000000.idf\n"
-        "    crch_t1_p2_l? = concentration_20000102000000.idf\n"
-        "    crch_t1_p3_l? = concentration_20000103000000.idf\n"
-        "    crch_t1_p4_l? = concentration_20000104000000.idf\n"
-        "    crch_t1_p5_l? = concentration_20000105000000.idf"
-    )
+    compare = """
+    crch_t1_p1_l? = concentration_20000101000000.idf
+    crch_t1_p2_l? = concentration_20000102000000.idf
+    crch_t1_p3_l? = concentration_20000103000000.idf
+    crch_t1_p4_l? = concentration_20000104000000.idf
+    crch_t1_p5_l? = concentration_20000105000000.idf"""
+
     assert m._render_ssm_rch(directory=directory, globaltimes=globaltimes) == compare
 
 
@@ -484,14 +460,15 @@ def test_render_transportsolver(basicmodel):
     m = basicmodel
     directory = pathlib.Path(".")
 
-    compare = (
-        "[gcg]\n"
-        "    mxiter = 150\n"
-        "    iter1 = 30\n"
-        "    isolve = 3\n"
-        "    ncrs = 0\n"
-        "    cclose = 1e-06\n"
-        "    iprgcg = 0"
+    compare = textwrap.dedent(
+        """\
+        [gcg]
+            mxiter = 150
+            iter1 = 30
+            isolve = 3
+            ncrs = 0
+            cclose = 1e-06
+            iprgcg = 0"""
     )
     assert m._render_transportsolver(directory) == compare
 
@@ -538,18 +515,16 @@ def test_mxsscount_incongruent_icbund(basicmodel):
     assert n_sinkssources == 100
 
 
-def test_write(basicmodel):
-    basicmodel.write()
-    assert pathlib.Path("test_model").exists()
+def test_write(basicmodel, tmp_path):
+    basicmodel.write(directory=tmp_path, result_dir=tmp_path / "results")
     # TODO: more rigorous testing
 
 
-def test_write__timemap(basicmodel):
+def test_write__timemap(basicmodel, tmp_path):
     # fictitious timemap
     timemap = {basicmodel["rch"].time.values[4]: basicmodel["rch"].time.values[0]}
     basicmodel["rch"].add_timemap(rate=timemap)
-    basicmodel.write()
-    assert pathlib.Path("test_model").exists()
+    basicmodel.write(directory=tmp_path, result_dir=tmp_path / "results")
     # TODO: more rigorous testing
 
 
@@ -568,7 +543,6 @@ def test_write__error_stress_time_not_first(basicmodel):
         m.time_discretization(endtime="2000-01-06")
 
 
-def test_write_result_dir(basicmodel):
-    basicmodel.write(result_dir="results")
-    assert pathlib.Path("test_model").exists()
+def test_write_result_dir(basicmodel, tmp_path):
+    basicmodel.write(directory=tmp_path, result_dir=tmp_path / "results")
     # TODO: more rigorous testing

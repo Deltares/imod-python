@@ -1,4 +1,5 @@
 import pathlib
+import textwrap
 
 import numpy as np
 import pandas as pd
@@ -9,7 +10,7 @@ from imod.wq import RechargeHighestActive, RechargeTopLayer, RechargeLayers
 
 
 @pytest.fixture(scope="function")
-def recharge_top(request):
+def recharge_top():
     datetimes = pd.date_range("2000-01-01", "2000-01-05")
     y = np.arange(4.5, 0.0, -1.0)
     x = np.arange(0.5, 5.0, 1.0)
@@ -24,7 +25,7 @@ def recharge_top(request):
 
 
 @pytest.fixture(scope="function")
-def recharge_layers(request):
+def recharge_layers():
     datetimes = pd.date_range("2000-01-01", "2000-01-05")
     y = np.arange(4.5, 0.0, -1.0)
     x = np.arange(0.5, 5.0, 1.0)
@@ -44,7 +45,7 @@ def recharge_layers(request):
 
 
 @pytest.fixture(scope="function")
-def recharge_ha(request):
+def recharge_ha():
     datetimes = pd.date_range("2000-01-01", "2000-01-05")
     y = np.arange(4.5, 0.0, -1.0)
     x = np.arange(0.5, 5.0, 1.0)
@@ -61,15 +62,16 @@ def recharge_ha(request):
 def test_render__highest_top(recharge_top):
     rch = recharge_top
     directory = pathlib.Path(".")
-    compare = (
-        "[rch]\n"
-        "    nrchop = 1\n"
-        "    irchcb = 0\n"
-        "    rech_p1 = rate_20000101000000.idf\n"
-        "    rech_p2 = rate_20000102000000.idf\n"
-        "    rech_p3 = rate_20000103000000.idf\n"
-        "    rech_p4 = rate_20000104000000.idf\n"
-        "    rech_p5 = rate_20000105000000.idf"
+    compare = textwrap.dedent(
+        """\
+        [rch]
+            nrchop = 1
+            irchcb = 0
+            rech_p1 = rate_20000101000000.idf
+            rech_p2 = rate_20000102000000.idf
+            rech_p3 = rate_20000103000000.idf
+            rech_p4 = rate_20000104000000.idf
+            rech_p5 = rate_20000105000000.idf"""
     )
 
     assert rch._render(directory, globaltimes=rch.time.values) == compare
@@ -78,20 +80,21 @@ def test_render__highest_top(recharge_top):
 def test_render__layers(recharge_layers):
     rch = recharge_layers
     directory = pathlib.Path(".")
-    compare = (
-        "[rch]\n"
-        "    nrchop = 2\n"
-        "    irchcb = 0\n"
-        "    rech_p1 = rate_20000101000000.idf\n"
-        "    rech_p2 = rate_20000102000000.idf\n"
-        "    rech_p3 = rate_20000103000000.idf\n"
-        "    rech_p4 = rate_20000104000000.idf\n"
-        "    rech_p5 = rate_20000105000000.idf\n"
-        "    irch_p1 = recharge_layer_20000101000000.idf\n"
-        "    irch_p2 = recharge_layer_20000102000000.idf\n"
-        "    irch_p3 = recharge_layer_20000103000000.idf\n"
-        "    irch_p4 = recharge_layer_20000104000000.idf\n"
-        "    irch_p5 = recharge_layer_20000105000000.idf"
+    compare = textwrap.dedent(
+        """\
+        [rch]
+            nrchop = 2
+            irchcb = 0
+            rech_p1 = rate_20000101000000.idf
+            rech_p2 = rate_20000102000000.idf
+            rech_p3 = rate_20000103000000.idf
+            rech_p4 = rate_20000104000000.idf
+            rech_p5 = rate_20000105000000.idf
+            irch_p1 = recharge_layer_20000101000000.idf
+            irch_p2 = recharge_layer_20000102000000.idf
+            irch_p3 = recharge_layer_20000103000000.idf
+            irch_p4 = recharge_layer_20000104000000.idf
+            irch_p5 = recharge_layer_20000105000000.idf"""
     )
 
     assert rch._render(directory, globaltimes=rch.time.values) == compare
@@ -100,15 +103,16 @@ def test_render__layers(recharge_layers):
 def test_render__highest_active(recharge_ha):
     rch = recharge_ha
     directory = pathlib.Path(".")
-    compare = (
-        "[rch]\n"
-        "    nrchop = 3\n"
-        "    irchcb = 0\n"
-        "    rech_p1 = rate_20000101000000.idf\n"
-        "    rech_p2 = rate_20000102000000.idf\n"
-        "    rech_p3 = rate_20000103000000.idf\n"
-        "    rech_p4 = rate_20000104000000.idf\n"
-        "    rech_p5 = rate_20000105000000.idf"
+    compare = textwrap.dedent(
+        """\
+        [rch]
+            nrchop = 3
+            irchcb = 0
+            rech_p1 = rate_20000101000000.idf
+            rech_p2 = rate_20000102000000.idf
+            rech_p3 = rate_20000103000000.idf
+            rech_p4 = rate_20000104000000.idf
+            rech_p5 = rate_20000105000000.idf"""
     )
 
     assert rch._render(directory, globaltimes=rch.time.values) == compare

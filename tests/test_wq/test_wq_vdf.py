@@ -1,3 +1,5 @@
+import textwrap
+
 from imod.wq import VariableDensityFlow
 
 
@@ -15,17 +17,19 @@ def test_render():
         correct_water_table=False,
     )
 
-    compare = (
-        "[vdf]\n"
-        "    mtdnconc = 1\n"
-        "    densemin = 1000.0\n"
-        "    densemax = 1025.0\n"
-        "    denseref = 1000.0\n"
-        "    denseslp = 0.71\n"
-        "    dnscrit = 0.01\n"
-        "    nswtcpl = 1\n"
-        "    iwtable = 0\n"
-        "    mfnadvfd = 2\n"
+    compare = textwrap.dedent(
+        """\
+        [vdf]
+            mtdnconc = 1
+            densemin = 1000.0
+            densemax = 1025.0
+            denseref = 1000.0
+            denseslp = 0.71
+            dnscrit = 0.01
+            nswtcpl = 1
+            iwtable = 0
+            mfnadvfd = 2
+        """
     )
 
     assert vdf._render() == compare

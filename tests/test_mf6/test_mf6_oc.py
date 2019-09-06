@@ -13,14 +13,14 @@ def test_render():
     actual = oc.render(directory, "outputcontrol", globaltimes)
     expected = textwrap.dedent(
         """\
-            begin options
-              budget fileout mymodel/mymodel.cbb
-              head fileout mymodel/mymodel.hds
-            end options
+        begin options
+          budget fileout mymodel/mymodel.cbb
+          head fileout mymodel/mymodel.hds
+        end options
 
-            begin period 1
-              save head all
-              save budget all
-            end period"""
+        begin period 1
+          save head all
+          save budget all
+        end period"""
     )
     assert actual == expected

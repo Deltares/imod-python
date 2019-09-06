@@ -114,8 +114,7 @@ def decompose(path, pattern=None):
     a fiddly process. The website https://regex101.com is a nice help.
     Alternatively, the most pragmatic solution may be to just rename your files.
     """
-    if isinstance(path, str):
-        path = pathlib.Path(path)
+    path = pathlib.Path(path)
     # We'll ignore upper case
     stem = path.stem.lower()
 
@@ -198,7 +197,7 @@ def _convert_datetimes(times, use_cftime):
 def compose(d, pattern=None):
     """
     From a dict of parts, construct a filename, following the iMOD
-    conventions
+    conventions. Returns a pathlib.Path.
     """
     haslayer = "layer" in d
     hastime = "time" in d
@@ -245,9 +244,9 @@ def compose(d, pattern=None):
         s = pattern.format(**d)
 
     if "directory" in d:
-        return d["directory"].joinpath(s)
+        return pathlib.Path(d["directory"]) / s
     else:
-        return s
+        return pathlib.Path(s)
 
 
 def _xycoords(bounds, cellsizes):

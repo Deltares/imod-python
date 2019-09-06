@@ -43,18 +43,18 @@ def test_render():
 
     expected = textwrap.dedent(
         """\
-            begin options
-              print_input
-              print_flows
-              save_flows
-            end options
+        begin options
+          print_input
+          print_flows
+          save_flows
+        end options
 
-            begin dimensions
-              maxbound 30
-            end dimensions
+        begin dimensions
+          maxbound 30
+        end dimensions
 
-            begin period 1
-                open/close mymodel/chd/chd.bin (binary)
-            end period"""
+        begin period 1
+          open/close mymodel/chd/chd.bin (binary)
+        end period"""
     )
     assert actual == expected

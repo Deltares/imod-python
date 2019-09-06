@@ -7,7 +7,7 @@ import imod
 
 
 @pytest.fixture(scope="module")
-def test_da(request):
+def test_da():
     nrow, ncol = 3, 4
     dx, dy = 1.0, -1.0
     xmin, xmax = 0.0, 4.0
@@ -19,7 +19,7 @@ def test_da(request):
 
 
 @pytest.fixture(scope="module")
-def test_da_nonequidistant(request):
+def test_da_nonequidistant():
     nrow, ncol = 3, 4
     dx = np.array([0.9, 1.1, 0.8, 1.2])
     dy = np.array([-1.5, -0.5, -1.0])

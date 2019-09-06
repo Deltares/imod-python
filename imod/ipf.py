@@ -49,8 +49,7 @@ def _read(path, kwargs={}, assoc_kwargs={}):
     pandas.DataFrame
     """
 
-    if isinstance(path, str):
-        path = pathlib.Path(path)
+    path = pathlib.Path(path)
 
     with open(path) as f:
         nrow = int(f.readline().strip())
@@ -121,9 +120,7 @@ def read_associated(path, kwargs={}):
     """
 
     # deal with e.g. incorrect capitalization
-    if isinstance(path, str):
-        path = pathlib.Path(path)
-    path = path.resolve()
+    path = pathlib.Path(path).resolve()
 
     with open(path) as f:
         nrow = int(f.readline().strip())
@@ -528,8 +525,7 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20):
         Writes files.
     """
 
-    if isinstance(path, str):
-        path = pathlib.Path(path)
+    path = pathlib.Path(path)
 
     d = {"extension": ".ipf", "name": path.stem, "directory": path.parent}
     d["directory"].mkdir(exist_ok=True, parents=True)
