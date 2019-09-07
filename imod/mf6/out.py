@@ -79,7 +79,6 @@ def _read_hds(path, nlayer, nrow, ncol, dry_nan, pos):
     with open(path, "rb") as f:
         f.seek(pos)
         a1d = np.empty(nlayer * nrow * ncol, dtype=np.float64)
-        # a3d = np.empty((nlayer, nrow, ncol), dtype=np.float64)
         for k in range(nlayer):
             f.seek(52, 1)  # skip kstp, kper, pertime
             a1d[k * n_per_layer : (k + 1) * n_per_layer] = np.fromfile(
