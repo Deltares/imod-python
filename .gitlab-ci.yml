@@ -8,6 +8,12 @@ before_script:
   - source activate imod
   - pip install -e .
   - pip install git+https://github.com/jelmer/googleanalytics
+  # download mf6 binary and move it to the env's bin which is in the path
+  # see https://gitlab.com/deltares/imod/imod-python/snippets/1893049
+  - curl -O -L https://gitlab.com/deltares/imod/imod-python/uploads/404c0b0f1975939573ac8f2d4b154354/mf6.gz
+  - gunzip mf6.gz
+  - chmod +x mf6
+  - mv mf6 /opt/conda/envs/imod/bin
 
 tests:
   script:

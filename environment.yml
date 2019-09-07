@@ -19,7 +19,7 @@ dependencies:
   - pandas
   - pytest
   - pytest-cov
-  - python=3.6
+  - python>=3.6
   - rasterio>=1.0
   - scipy
   - sphinx
