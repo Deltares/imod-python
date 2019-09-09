@@ -244,7 +244,7 @@ def test_regrid_coord():
     regridx = imod.prepare.common._coord(da, "x")
     assert np.allclose(regridx, np.arange(0.0, -5.0, -1.0))
 
-    # Non-equidistant, postive dx, negative dy/n
+    # Non-equidistant, postive dx, negative dy
     nrow, ncol = 3, 4
     dx = np.array([0.9, 1.1, 0.8, 1.2])
     dy = np.array([-1.3, -0.7, -1.0])
@@ -263,6 +263,12 @@ def test_regrid_coord():
     assert float(regridy.max()) == ymax
     assert np.allclose(np.diff(regridx), dx)
     assert np.allclose(np.diff(regridy), dy)
+
+    # Now test it if dy doesn't have the right sign
+    # it should automatically infer it based on y instead.
+    da["dy"].values *= -1.0
+    regridy2 = imod.prepare.common._coord(da, "y")
+    assert np.allclose(regridy, regridy2)
 
 
 def test_regrid_mean1d():

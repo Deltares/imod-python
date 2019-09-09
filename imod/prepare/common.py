@@ -272,6 +272,7 @@ def _coord(da, dim):
             dxs = np.full(da[dim].size, dx)
         else:  # array -> non-equidistant
             dxs = dx
+        _check_monotonic(dxs, dim)
 
     else:  # undefined -> equidistant
         dxs = np.diff(da[dim].values)
@@ -284,8 +285,15 @@ def _coord(da, dim):
             )
         dxs = np.full(da[dim].size, dx)
 
-    _check_monotonic(dxs, dim)
-    x0 = da[dim][0] - 0.5 * dxs[0]
+    # Check if the sign of dxs is correct for the coordinate values of x
+    x = da[dim]
+    dxs = np.abs(dxs)
+    if x.size > 1:
+        if x[1] < x[0]:
+            dxs = -1.0 * dxs
+
+    # Note: this works for both positive dx (increasing x) and negative dx
+    x0 = x[0] - 0.5 * dxs[0]
     x = np.full(dxs.size + 1, x0)
     x[1:] += np.cumsum(dxs)
     return x
