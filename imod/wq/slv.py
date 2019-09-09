@@ -28,11 +28,19 @@ class PreconditionedConjugateGradientSolver(Package):
         model data. When the maximum absolute value of the residual at all nodes
         during an iteration is less than or equal to RCLOSE, and the criterion
         for HCLOSE is also satisfied (see below), iteration stops.
+
+        Default value: 100.0. **Nota bene**: this is aimed at regional modelling.
+        For detailed studies (e.g. lab experiments) much smaller values can be
+        required.
+        Very general rule of thumb: should be less than 10% of smallest cell volume.
     hclose: float
         is the head change criterion for convergence, in units of length. When
         the maximum absolute value of head change from all nodes during an
         iteration is less than or equal to HCLOSE, and the criterion for RCLOSE
         is also satisfied (see above), iteration stops.
+        Default value: 1.0e-4. **Nota bene**: This is aimed at regional modelling, `
+        for detailed studies (e.g. lab experiments) much smaller values can be
+        required.
     relax: float, optional
         is the relaxation parameter used. Usually, RELAX = 1.0, but for some
         problems a value of 0.99, 0.98, or 0.97 will reduce the number of
@@ -59,7 +67,7 @@ class PreconditionedConjugateGradientSolver(Package):
         "    damp = {damp}"
     )
 
-    def __init__(self, max_iter, inner_iter, rclose, hclose, relax=0.98, damp=1.0):
+    def __init__(self, max_iter=150, inner_iter=100, rclose=1000.0, hclose=1.0e-4, relax=0.98, damp=1.0):
         super(__class__, self).__init__()
         self["max_iter"] = max_iter
         self["inner_iter"] = inner_iter
@@ -94,7 +102,7 @@ class GeneralizedConjugateGradientSolver(Package):
         isolve = 2: SSOR
         isolve = 3: Modified Incomplete Cholesky (MIC)
         (MIC usually converges faster, but it needs significantly more memory)
-    ncrs: int
+    lump_dispersion: bool
         is an integer flag for treatment of dispersion tensor cross terms:
         ncrs = 0: lump all dispersion cross terms to the right-hand-side
         (approximate but highly efficient).
@@ -122,8 +130,8 @@ class GeneralizedConjugateGradientSolver(Package):
 
     def __init__(
         self,
-        max_iter,
-        inner_iter,
+        max_iter=1,
+        inner_iter=50,
         cclose=1.0e-6,
         preconditioner="mic",
         lump_dispersion=True,
@@ -270,11 +278,11 @@ class ParallelKrylovFlowSolver(ParallelSolver):
 
     def __init__(
         self,
-        max_iter,
-        inner_iter,
-        hclose,
-        rclose,
-        relax,
+        max_iter=150,
+        inner_iter=100,
+        hclose=1.0e-4,
+        rclose=1000.0,
+        relax=0.98,
         partition="uniform",
         solver="pcg",
         preconditioner="ilu",
@@ -382,8 +390,8 @@ class ParallelKrylovTransportSolver(ParallelSolver):
 
     def __init__(
         self,
-        max_iter,
-        inner_iter,
+        max_iter=1,
+        inner_iter=50,
         cclose=1.0e-6,
         relax=0.98,
         partition="uniform",

@@ -47,12 +47,6 @@ class BasicFlow(Package):
         drawdown option is used. Even if the user does not anticipate having
         inactive cells, a value for inactive_head must be entered.
         Default value is 1.0e30.
-    confining_bed_below: int, optional
-        is a flag, with one value for each model layer, that indicates whether
-        or not a layer has a Quasi-3D confining bed below it (LAYCBD). 0
-        indicates no confining bed, and not zero indicates a confining bed.
-        confining_bed_below for the bottom layer must be 0.
-        Default value is 0.
     """
 
     _pkg_id = "bas6"
@@ -99,7 +93,6 @@ class BasicFlow(Package):
         self["bottom"] = bottom
         self["starting_head"] = starting_head
         self["inactive_head"] = inactive_head
-        self["confining_bed_below"] = confining_bed_below
         # TODO: create dx, dy if they don't exist?
 
     def _check_ibound(self, ibound):

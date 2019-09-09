@@ -13,6 +13,7 @@ class Dispersion(Package):
     longitudinal: float
         is the longitudinal dispersivity (AL), for every cell of the model grid
         (unit: L).
+        Default value is 1.0 m. Nota bene: this is for regional applications.
     ratio_horizontal: float
         is a 1D real array defining the ratio of the horizontal transverse
         dispersivity (TRPT), to the longitudinal dispersivity. Each value in the
@@ -32,6 +33,8 @@ class Dispersion(Package):
         diffusion_coefficient = 0 if the effect of molecular diffusion is
         considered unimportant. Each value in the array corresponds to one model
         layer.
+
+        iMOD-wq always uses meters and days.
     """
 
     _pkg_id = "dsp"
@@ -54,10 +57,10 @@ class Dispersion(Package):
 
     def __init__(
         self,
-        longitudinal,
+        longitudinal=1.0,
         ratio_horizontal=0.1,
         ratio_vertical=0.1,
-        diffusion_coefficient=1.0e-9,
+        diffusion_coefficient=8.64e-5,
     ):
         super(__class__, self).__init__()
         self["longitudinal"] = longitudinal
