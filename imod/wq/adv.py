@@ -21,32 +21,31 @@ class AdvectionFiniteDifference(Package):
         than one is specified.
     weighting : {"upstream", "central"}, optional
         Indication of which weighting scheme should be used, set to default
-        value "upstream" (NADVFD = 0  or 1)
+        value "upstream" (NADVFD = 0 or 1)
         Default value: "upstream"
-    weighting_factor: float, optional
-        is a concentration weighting factor (WD) between 0.5 and 1. It is used for
-        operator splitting in the particle tracking based methods. The value of
-        0.5 is generally adequate. The value may be adjusted to achieve better
-        mass balance. Generally, it can be increased toward 1.0 as advection
-        becomes more dominant.
-        Default value: 0.5.
     """
 
     _pkg_id = "adv"
 
-    def __init__(self, courant, weighting="upstream", weighting_factor=0.5):
+    def __init__(self, courant=0.75, weighting="upstream"):
         super(__class__, self).__init__()
         self["courant"] = courant
         self["weighting"] = weighting
-        self["weighting_factor"] = weighting_factor
 
     def _pkgcheck(self, ibound=None):
-        self._check_positive(["courant", "weighting", "weighting_factor"])
+        self._check_positive(["courant", "weighting"])
 
 
 class AdvectionMOC(Package):
     """
     Solve the advection term using the Method of Characteristics (MIXELM = 1)
+
+    Nota bene: number of particles settings have not been tested. The defaults
+    here are chosen conservatively, with many particles. This increases both
+    memory usage and computational effort.
+
+    Medium settings:
+    4, 15, 16, 75
 
     Attributes
     -----------
@@ -63,10 +62,15 @@ class AdvectionMOC(Package):
         than one is specified.
     max_nparticles: int
         is the maximum total number of moving particles allowed (MXPART).
-    tracking: {"euler"}, optional
+    tracking: {"euler", "runge-kutta", "hybrid"}, optional
         indicates which particle tracking algorithm is selected for the
-        Eulerian-Lagrangian methods. Here, the first order Euler algorithm is used
-        (ITRACK = 1)
+        Eulerian-Lagrangian methods. ITRACK = 1, the first-order Euler algorithm is
+        used; ITRACK = 2, the fourth-order Runge-Kutta algorithm is used; this
+        option is computationally demanding and may be needed only when PERCEL is
+        set greater than one. ITRACK = 3, the hybrid 1st and 4th order algorithm is
+        used; the Runge- Kutta algorithm is used in sink/source cells and the cells
+        next to sinks/sources while the Euler algorithm is used elsewhere.
+        Default value is "hybrid".
     weighting_factor: float, optional
         is a concentration weighting factor (WD) between 0.5 and 1. It is used for
         operator splitting in the particle tracking based methods. The value of
@@ -136,9 +140,9 @@ class AdvectionMOC(Package):
 
     def __init__(
         self,
-        courant,
+        courant=0.75,
         max_nparticles,
-        tracking="euler",
+        tracking="hybrid",
         weighting_factor=0.5,
         dconcentration_epsilon=1.0e-5,
         nplane=2,
@@ -148,6 +152,9 @@ class AdvectionMOC(Package):
         cell_max_nparticles=80,
     ):
         super(__class__, self).__init__()
+        # TODO: calculate max_nparticles dynamically
+        # 0.5 is estimation
+        # max_nparticles = nlayer * nrow * ncol * call_max_nparticles * 0.5
 
 
 class AdvectionModifiedMOC(Package):
@@ -183,6 +190,11 @@ class AdvectionModifiedMOC(Package):
         0.5 is generally adequate. The value may be adjusted to achieve better
         mass balance. Generally, it can be increased toward 1.0 as advection
         becomes more dominant.
+    dconcentration_epsilon: float, optional
+        is a small Relative Cell Concentration Gradient (DCEPS) below which advective
+        transport is considered negligible. A value around 1.0e-5 is generally
+        adequate.
+        Default value: 1.0e-5.
     sink_particle_placement: int
         indicates whether the random or fixed pattern is selected for initial
         placement of particles to approximate sink cells in the MMOC scheme.
@@ -212,10 +224,10 @@ class AdvectionModifiedMOC(Package):
         courant=1.0,
         tracking="hybrid",
         weighting_factor=0.5,
-        sink_particle_placement=0,
-        sink_nparticles=15,
+        dconcentration_epsilon=1.0e-5,
+        sink_particle_placement=2,
+        sink_nparticles=40,
     ):
-        # TODO: ask Gu about NPLANE in ModifiedMOC, is nlsink being used as planes?
         super(__class__, self).__init__()
         self["courant"] = courant
         self["tracking"] = tracking
@@ -320,17 +332,19 @@ class AdvectionHybridMOC(Package):
 
     def __init__(
         self,
-        courant,
+        courant=0.75,
         max_particles,
-        tracking,
-        weighting_factor,
-        dceps,
-        nplane,
-        npl,
-        nph,
-        npmin,
-        npmax,
-        dchmoc,
+        tracking="hybrid",
+        weighting_factor=0.5,
+        dconcentration_epsilon=1.0e-5,
+        nplane=2,
+        nparticles_no_advection=10,
+        nparticles_advection=40,
+        cell_min_nparticles=5,
+        cell_max_nparticles=80,
+        sink_particle_placement=2,
+        sink_nparticles=40,
+        dconcentration_hybrid=1.0e-4,
     ):
         super(__class__, self).__init__()
 
@@ -358,7 +372,7 @@ class AdvectionTVD(Package):
 
     _template = "[adv]\n" "    mixelm = -1\n" "    percel = {courant}\n"
 
-    def __init__(self, courant):
+    def __init__(self, courant=0.75):
         super(__class__, self).__init__()
         self["courant"] = courant
 
