@@ -4,6 +4,9 @@ channels:
   - conda-forge
   - defaults
 
+# note that these are the developer dependencies,
+# if you only want the user dependencies, see
+# install_requires in setup.py
 dependencies:
   - affine
   - black
@@ -11,6 +14,7 @@ dependencies:
   - cytoolz
   - dask
   - geopandas
+  - flopy
   - jinja2
   - matplotlib
   - nbstripout
@@ -18,6 +22,7 @@ dependencies:
   - numpy
   - pandas
   - pytest
+  - pytest-benchmark
   - pytest-cov
   - python>=3.6
   - rasterio>=1.0

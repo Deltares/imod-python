@@ -37,6 +37,8 @@ setup(
         "dev": [
             "pytest",
             "pytest-cov",
+            "pytest-benchmark",
+            "flopy",
             "sphinx",
             "sphinx_rtd_theme",
             "nbstripout",
