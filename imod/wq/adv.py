@@ -44,9 +44,6 @@ class AdvectionMOC(Package):
     here are chosen conservatively, with many particles. This increases both
     memory usage and computational effort.
 
-    Medium settings:
-    4, 15, 16, 75
-
     Attributes
     -----------
     courant: real
@@ -141,7 +138,6 @@ class AdvectionMOC(Package):
     def __init__(
         self,
         courant=0.75,
-        max_nparticles,
         tracking="hybrid",
         weighting_factor=0.5,
         dconcentration_epsilon=1.0e-5,
@@ -152,9 +148,15 @@ class AdvectionMOC(Package):
         cell_max_nparticles=80,
     ):
         super(__class__, self).__init__()
-        # TODO: calculate max_nparticles dynamically
-        # 0.5 is estimation
-        # max_nparticles = nlayer * nrow * ncol * call_max_nparticles * 0.5
+        self["courant"] = courant
+        self["tracking"] = tracking
+        self["weighting_factor"] = weighting_factor
+        self["dconcentration_epsilon"] = dconcentration_epsilon
+        self["nplane"] = nplane
+        self["nparticles_no_advection"] = nparticles_no_advection
+        self["nparticles_advection"] = nparticles_advection
+        self["cell_min_nparticles"] = cell_min_nparticles
+        self["cell_max_nparticles"] = cell_max_nparticles
 
 
 class AdvectionModifiedMOC(Package):
@@ -333,7 +335,6 @@ class AdvectionHybridMOC(Package):
     def __init__(
         self,
         courant=0.75,
-        max_particles,
         tracking="hybrid",
         weighting_factor=0.5,
         dconcentration_epsilon=1.0e-5,
@@ -347,6 +348,18 @@ class AdvectionHybridMOC(Package):
         dconcentration_hybrid=1.0e-4,
     ):
         super(__class__, self).__init__()
+        self["courant"] = courant
+        self["tracking"] = tracking
+        self["weighting_factor"] = weighting_factor
+        self["dconcentration_epsilon"] = dconcentration_epsilon
+        self["nplane"] = nplane
+        self["nparticles_no_advection"] = nparticles_no_advection
+        self["nparticles_advection"] = nparticles_advection
+        self["cell_min_nparticles"] = cell_min_nparticles
+        self["cell_max_nparticles"] = cell_max_nparticles
+        self["sink_particle_placement"] = sink_particle_placement
+        self["sink_nparticles"] = sink_nparticles
+        self["dconcentration_hybrid"] = dconcentration_hybrid
 
 
 class AdvectionTVD(Package):

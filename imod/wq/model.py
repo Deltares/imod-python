@@ -419,6 +419,16 @@ class SeawatModel(Model):
         content.append(self._render_flowsolver(directory=directory))
 
         # MT3D and Seawat settings
+        # Make an estimate of the required number of particles.
+        advkey = self._get_pkgkey("adv")
+        baskey = self._get_pkgkey("bas")
+        if isinstance(self[advkey], (imod.wq.AdvectionMOC, imod.wq.AdvectionHybridMOC)):
+            ibound = self[baskey]["ibound"]
+            cell_max_nparticles = self[advkey]["cell_max_nparticles"]
+            self[advkey]["max_nparticles"] = (
+                np.product(ibound.shape) * 0.5 * cell_max_nparticles
+            )
+
         content.append(self._render_btn(directory=directory, globaltimes=globaltimes))
         for key in ("vdf", "adv", "dsp"):
             content.append(

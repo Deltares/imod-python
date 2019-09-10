@@ -67,7 +67,15 @@ class PreconditionedConjugateGradientSolver(Package):
         "    damp = {damp}"
     )
 
-    def __init__(self, max_iter=150, inner_iter=100, rclose=1000.0, hclose=1.0e-4, relax=0.98, damp=1.0):
+    def __init__(
+        self,
+        max_iter=150,
+        inner_iter=100,
+        rclose=1000.0,
+        hclose=1.0e-4,
+        relax=0.98,
+        damp=1.0,
+    ):
         super(__class__, self).__init__()
         self["max_iter"] = max_iter
         self["inner_iter"] = inner_iter
