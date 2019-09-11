@@ -68,6 +68,37 @@ class Voxelizer:
         The method to use for regridding. Default available methods are:
         {"mean", "harmonic_mean", "geometric_mean", "sum", "minimum",
         "maximum", "mode", "median", "max_overlap"}
+
+    Examples
+    --------
+    Usage is similar to the regridding. Initialize the Voxelizer object:
+
+    >>> mean_voxelizer = imod.prepare.Voxelizer(method="mean")
+
+    Then call the ``voxelize`` method to transform a layered dataset into a
+    voxel based one. The vertical coordinates of the layers must be provided
+    by ``top`` and ``bottom``.
+
+    >>> mean_voxelizer.voxelize(source, top, bottom, like)
+
+    If your data is already voxel based, i.e. the layers have tops and bottoms
+    that do no differ with x or y, you should use a ``Regridder`` instead.
+
+    It's possible to provide your own methods to the ``Regridder``, provided that
+    numba can compile them. They need to take the arguments ``values`` and
+    ``weights``. Make sure they deal with ``nan`` values gracefully!
+
+    >>> def p30(values, weights):
+    >>>     return np.nanpercentile(values, 30)
+
+    >>> p30_voxelizer = imod.prepare.Voxelizer(method=p30)
+    >>> p30_result = p30_voxelizer.regrid(source, top, bottom, like)
+
+    The Numba developers maintain a list of support Numpy features here:
+    https://numba.pydata.org/numba-doc/dev/reference/numpysupported.html
+
+    In general, however, the provided methods should be adequate for your
+    voxelizing needs.
     """
 
     def __init__(self, method, use_relative_weights=False):
@@ -90,6 +121,26 @@ class Voxelizer:
         self._voxelize = voxelize
 
     def voxelize(self, source, top, bottom, like):
+        """
+
+        Parameters
+        ----------
+        source : xr.DataArray
+            The values of the layered model.
+        top : xr.DataArray
+            The vertical location of the layer tops.
+        bottom : xr.DataArray
+            The vertical location of the layer bottoms.
+        like : xr.DataArray
+            An example DataArray providing the coordinates of the voxelized
+            results; what it should look like in terms of dimensions, data type,
+            and coordinates.
+
+        Returns
+        -------
+        voxelized : xr.DataArray
+        """
+
         def dim_format(dims):
             return ", ".join(dim for dim in dims)
 
