@@ -70,8 +70,11 @@ def _weights_1d(src_x, dst_x, is_increasing, use_relative_weights=False):
     # monotonically increasing, so starts and overlap continue to work.
     # copy() to avoid side-effects
     if not is_increasing:
-        src_x = src_x.copy() * -1.0
-        dst_x = dst_x.copy() * -1.0
+        # Ignore single cell cases, these are always positive already.
+        if src_x.size > 2:
+            src_x = src_x.copy() * -1.0
+        if dst_x.size > 2:
+            dst_x = dst_x.copy() * -1.0
 
     # i is index of dst
     # j is index of src
@@ -164,14 +167,30 @@ def _is_increasing(src_x, dst_x):
     Make sure coordinate values always increase so the _starts function above
     works properly.
     """
+    # TODO: fix somewhere else
     src_dx0 = src_x[1] - src_x[0]
     dst_dx0 = dst_x[1] - dst_x[0]
-    if (src_dx0 > 0.0) ^ (dst_dx0 > 0.0):
-        raise ValueError("source and like coordinates not in the same direction")
-    if src_dx0 < 0.0:
-        return False
+    if src_x.size == 2 and dst_x.size == 2:
+        return True  # single cell case, always increasing
+    elif src_x.size == 2:  # dst_x.size > 2
+        # ignore direction of src_x
+        if dst_dx0 < 0.0:
+            return False
+        else:
+            return True
+    elif dst_x.size == 2:  # src_x.size > 2
+        # ignore direction of dst_x
+        if src_dx0 < 0.0:
+            return False
+        else:
+            return True
     else:
-        return True
+        if (src_dx0 > 0.0) ^ (dst_dx0 > 0.0):
+            raise ValueError("source and like coordinates not in the same direction")
+        if src_dx0 < 0.0:
+            return False
+        else:
+            return True
 
 
 def _match_dims(src, like):
