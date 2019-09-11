@@ -323,7 +323,7 @@ class Regridder(object):
 
     It's possible to provide your own methods to the ``Regridder``, provided that
     numba can compile them. They need to take the arguments ``values`` and
-    ``weights``. Make sure they deal with nan values gracefully!
+    ``weights``. Make sure they deal with ``nan`` values gracefully!
 
     >>> def p30(values, weights):
     >>>     return np.nanpercentile(values, 30)
