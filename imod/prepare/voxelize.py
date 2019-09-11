@@ -66,8 +66,8 @@ class Voxelizer:
     ----------
     method : str, function
         The method to use for regridding. Default available methods are:
-        {"mean", "harmonic_mean", "geometric_mean", "sum", "minimum",
-        "maximum", "mode", "median", "max_overlap"}
+        ``{"mean", "harmonic_mean", "geometric_mean", "sum", "minimum",
+        "maximum", "mode", "median", "max_overlap"}``
 
     Examples
     --------
@@ -82,7 +82,7 @@ class Voxelizer:
     >>> mean_voxelizer.voxelize(source, top, bottom, like)
 
     If your data is already voxel based, i.e. the layers have tops and bottoms
-    that do no differ with x or y, you should use a ``Regridder`` instead.
+    that do not differ with x or y, you should use a ``Regridder`` instead.
 
     It's possible to provide your own methods to the ``Regridder``, provided that
     numba can compile them. They need to take the arguments ``values`` and
