@@ -53,27 +53,32 @@ class Package(xr.Dataset):
     def to_sparse(self, arrlist, layer):
         """Convert from dense arrays to list based input"""
         # TODO add pkgcheck that period table aligns
+        # Get the number of valid values
         data = arrlist[0]
         notnull = ~np.isnan(data)
         nrow = notnull.sum()
-        # 3 columns for i j k
-        # times 2 for int32 view of float64 values
-        # (such that we can write as a single block)
-        ncol = 3 + len(arrlist) * 2
-        listarr = np.empty((nrow, ncol), dtype=np.int32)
-        if layer is not None:
-            listarr[:, 0] = layer
-            listarr[:, 1:3] = np.argwhere(notnull) + 1
-        else:  # TODO: I don't think this is right..., argwhere returns 2 dims in this case.
-            listarr[:, 0:3] = np.argwhere(notnull) + 1
+        # Define the numpy structured array dtype
+        index_spec = [("k", np.int32), ("i", np.int32), ("j", np.int32)]
+        field_spec = [(f"f{i}", np.float64) for i in range(len(arrlist))]
+        sparse_dtype = np.dtype(index_spec + field_spec)
 
+        # Initialize the structured array
+        listarr = np.empty(nrow, dtype=sparse_dtype)
+        # Fill in the indices
+        if layer is not None:
+            listarr["k"] = layer
+            listarr["i"], listarr["j"] = (np.argwhere(notnull) + 1).transpose()
+        else:
+            listarr["k"], listarr["i"], listarr["j"] = (
+                np.argwhere(notnull) + 1
+            ).transpose()
+
+        # Fill in the data
         for i, arr in enumerate(arrlist):
             values = arr[notnull].astype(np.float64)
-            c = 3 + i * 2
-            listarr[:, c : c + 2] = values.reshape(values.size, 1).view(np.int32)
+            listarr[f"f{i}"] = values
 
-        # flatten to 1D such that numpy tofile doesn't write extra array dims
-        return listarr.flatten()
+        return listarr
 
     def write_binaryfile(self, outpath, ds):
         """
