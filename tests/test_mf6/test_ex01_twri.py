@@ -218,6 +218,6 @@ def test_simulation_write(twri_model, tmp_path):
         print(head)
         assert head.dims == ("time", "layer", "y", "x")
         assert head.shape == (1, 3, 15, 15)
-        meanhead_layer = head.groupby("layer").mean()
+        meanhead_layer = head.groupby("layer").mean(dim=xr.ALL_DIMS)
         mean_answer = np.array([59.79181509, 30.44132373, 24.88576811])
         assert np.allclose(meanhead_layer, mean_answer)
