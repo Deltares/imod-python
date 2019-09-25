@@ -75,7 +75,7 @@ extrapolation should occur.
 ### Function responsibilities:
 * linear_inds_weights: returns per single dimensions the weights (wx, wy), 
     the source indexes (column, row numbers), and whether the destination x
-    lies fully within the cell of the matching source index. The sourc index
+    lies fully within the cell of the matching source index. The source index
     is always the "starting" or "leftmost" cell. Interpolation occurs between
     this value and its neighbor to the right (index + 1).
 * interp_ function implement functionality described above, taking the weights,
