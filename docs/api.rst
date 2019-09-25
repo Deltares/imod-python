@@ -17,8 +17,9 @@ API Reference
 
     api/prepare.rst
     api/select.rst
-    api/util.rst
+    api/evaluate.rst
     api/visualize.rst
+    api/util.rst
 
 .. toctree::
     :maxdepth: 1

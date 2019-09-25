@@ -13,6 +13,7 @@ from imod import util
 from imod import rasterio
 
 # subpackages
+import imod.evaluate
 import imod.flow
 import imod.prepare
 import imod.mf6
