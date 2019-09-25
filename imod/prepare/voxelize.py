@@ -14,9 +14,11 @@ METHODS.pop("multilinear")
 
 
 @numba.njit(cache=True)
-def _voxelize(src, dst, src_top, src_bot, dst_z, weights, values, method):
+def _voxelize(src, dst, src_top, src_bot, dst_z, method):
     nlayer, nrow, ncol = src.shape
     nz = dst_z.size - 1
+    values = np.zeros(nlayer)
+    weights = np.zeros(nlayer)
 
     for i in range(nrow):
         for j in range(ncol):
@@ -27,17 +29,17 @@ def _voxelize(src, dst, src_top, src_bot, dst_z, weights, values, method):
             for ii in range(nz):
                 z0 = dst_z[ii]
                 z1 = dst_z[ii + 1]
+                if np.isnan(z0) or np.isnan(z1):
+                    continue
+
                 zb = min(z0, z1)
                 zt = max(z0, z1)
-
                 count = 0
                 has_value = False
                 # jj is index of src
                 for jj in range(nlayer):
                     top = tops[jj]
                     bot = bots[jj]
-                    if np.isnan(z0) or np.isnan(z1):
-                        continue
 
                     overlap = common._overlap((bot, top), (zb, zt))
                     if overlap == 0:
@@ -110,13 +112,11 @@ class Voxelizer:
         """
         Use closure to avoid numba overhead
         """
-        jit_method = numba.njit(self.method, cache=True)
+        jit_method = numba.njit(self.method)
 
         @numba.njit
-        def voxelize(src, dst, src_top, src_bot, dst_z, weights, values):
-            return _voxelize(
-                src, dst, src_top, src_bot, dst_z, weights, values, jit_method
-            )
+        def voxelize(src, dst, src_top, src_bot, dst_z):
+            return _voxelize(src, dst, src_top, src_bot, dst_z, jit_method)
 
         self._voxelize = voxelize
 
@@ -178,12 +178,6 @@ class Voxelizer:
         dst_z = common._coord(like, "z")
         _, nrow, ncol = source.shape
 
-        src_max_thickness = float((top - bottom).max())
-        dst_min_dz = np.abs(np.diff(dst_z)).min()
-        alloc_len = int(np.ceil(src_max_thickness / dst_min_dz))
-        values = np.zeros(alloc_len)
-        weights = np.zeros(alloc_len)
-
         dst_coords = {
             "z": like.coords["z"],
             "y": source.coords["y"],
@@ -194,7 +188,7 @@ class Voxelizer:
 
         dst = xr.DataArray(np.full(dst_shape, np.nan), dst_coords, dst_dims)
         dst.values = self._voxelize(
-            source.values, dst.values, top.values, bottom.values, dst_z, weights, values
+            source.values, dst.values, top.values, bottom.values, dst_z
         )
 
         return dst
