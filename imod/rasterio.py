@@ -75,6 +75,12 @@ def write(path, da, driver=None, nodata=np.nan):
     if driver == "AAIGrid":
         profile.pop("res", None)
         profile.pop("is_tiled", None)
+    elif driver == "PCRaster":
+        profile["PCRASTER_VALUESCALE"] = "VS_SCALAR"
+        if da.dtype == "float64":
+            da = da.astype("float32")
+        elif da.dtype == "int64":
+            da = da.astype("int32")
     extradims = idf._extra_dims(da)
     # TODO only equidistant IDFs are compatible with GDAL / rasterio
     # TODO try squeezing extradims here, such that 1 layer, 1 time, etc. is acccepted
