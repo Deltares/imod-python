@@ -6,7 +6,7 @@
 Work with `iMOD <https://oss.deltares.nl/web/imod>`__ MODFLOW models in
 Python.
 
-Documentation: https://deltares.gitlab.io/imod/imod-python/
+Documentation: https://imod.xyz/
 
 Source code: https://gitlab.com/deltares/imod/imod-python
 
