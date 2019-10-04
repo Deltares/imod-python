@@ -1,7 +1,7 @@
 import copy
 import pathlib
 
-import matplotlib.colors
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -171,16 +171,68 @@ def plot_map(
     return fig, ax
 
 
-def imshow(a_yx, fname, title, cmap, overlays, quantile_colorscale, figsize, settings):
-    fig, ax = plt.subplots(figsize=figsize)
-    if quantile_colorscale:
-        levels = np.unique(np.nanpercentile(a_yx.values, np.linspace(0, 100, 101)))
-        if levels.size < 3:  # let matplotlib take care of it
-            norm = None
-        else:
-            norm = matplotlib.colors.BoundaryNorm(levels, 256)
+def _colorscale(a_yx, levels, cmap, quantile_colorscale):
+    """
+    This is an attempt to automatically create somewhat robust color scales.
+
+    Parameters
+    ----------
+    a_yx : xr.DataArray
+        2D DataArray with only dimensions ("y", "x")
+    levels : integer, np.ndarray or None
+        Number of levels (if integer), or level boundaries (if ndarray)
+    quantile_colorscale : boolean
+        Whether to create a colorscale based on quantile classification
+
+    Returns
+    -------
+    norm : matplotlib.colors.BoundaryNorm
+    cmap : matplotlib.colors.ListedColormap
+    """
+    # This is all an attempt at a somewhat robust colorscale handling
+    if levels is None:  # Nothing given, default to 25 colors
+        levels = 25
+    if isinstance(levels, int):
+        nlevels = levels
+        if quantile_colorscale:
+            levels = np.unique(np.nanpercentile(a_yx.values, np.linspace(0, 100, 101)))
+            if levels.size > nlevels:
+                # Decrease the number of levels
+                # Pretty rough approach, but should be sufficient
+                x = np.linspace(0.0, 100.0, nlevels)
+                xp = np.linspace(0.0, 100.0, levels.size)
+                yp = levels
+                levels = np.interp(x, xp, yp)
+            else:  # Can't make more levels out of only a few quantiles
+                nlevels = levels.size
+        else:  # Go start to end
+            vmin = float(a_yx.min())
+            vmax = float(a_yx.max())
+            levels = np.linspace(vmin, vmax, nlevels)
+    elif isinstance(levels, (np.ndarray, list, tuple)):  # Pre-defined by user
+        nlevels = levels.size
     else:
+        raise ValueError("levels argument should be None, an integer, or an array.")
+
+    if nlevels < 3:  # let matplotlib take care of it
         norm = None
+    else:
+        norm = matplotlib.colors.BoundaryNorm(boundaries=levels, ncolors=nlevels)
+
+    # Interpolate colormap to nlevels
+    if isinstance(cmap, str):
+        cmap = matplotlib.cm.get_cmap(cmap)
+    # cmap is a callable object
+    cmap = matplotlib.colors.ListedColormap(cmap(np.linspace(0.0, 1.0, nlevels)))
+
+    return norm, cmap
+
+
+def _imshow_xy(
+    a_yx, fname, title, cmap, overlays, quantile_colorscale, figsize, settings, levels
+):
+    fig, ax = plt.subplots(figsize=figsize)
+    norm, cmap = _colorscale(a_yx, levels, cmap, quantile_colorscale)
     ax1 = ax.imshow(a_yx, cmap=cmap, norm=norm, **settings)
     for overlay in overlays:
         tmp = overlay.copy()
@@ -206,7 +258,7 @@ def format_time(time):
         return time.strftime("%Y%m%d%H%M%S")
 
 
-def nd_imshow(
+def imshow_topview(
     da,
     name,
     directory=".",
@@ -214,6 +266,7 @@ def nd_imshow(
     overlays=[],
     quantile_colorscale=True,
     figsize=(8, 8),
+    levels=None,
 ):
     """
     Automatically colors by quantile.
@@ -231,7 +284,17 @@ def nd_imshow(
 
     if len(extradims) == 0:
         fname = directory / f"{name}.png"
-        imshow(da, fname, name, cmap, overlays, quantile_colorscale, figsize, settings)
+        _imshow_xy(
+            da,
+            fname,
+            name,
+            cmap,
+            overlays,
+            quantile_colorscale,
+            figsize,
+            settings,
+            levels,
+        )
     else:
         stacked = da.stack(idf=extradims)
         for coordvals, a_yx in list(stacked.groupby("idf")):
@@ -250,7 +313,7 @@ def nd_imshow(
             title_parts = ", ".join(title_parts)
             fname = directory / f"{name}_{fname_parts}.png"
             title = f"{name}, {title_parts}"
-            imshow(
+            _imshow_xy(
                 a_yx,
                 fname,
                 title,
@@ -259,4 +322,5 @@ def nd_imshow(
                 quantile_colorscale,
                 figsize,
                 settings,
+                levels,
             )

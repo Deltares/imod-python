@@ -50,7 +50,7 @@ class Model(collections.UserDict):
                         if da.isnull().all():
                             continue
 
-                        imod.visualize.spatial.nd_imshow(
+                        imod.visualize.spatial.imshow_topview(
                             da=da,
                             name=varname,
                             directory=directory / key,
