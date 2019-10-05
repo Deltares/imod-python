@@ -36,7 +36,7 @@ def write(path, da, driver=None, nodata=np.nan):
         The DataArray to be written. Should have only x and y dimensions.
     driver: str; optional
         Which GDAL format driver to use. The complete list is at
-        https://www.gdal.org/formats_list.html.
+        https://gdal.org/drivers/raster/index.html.
         By default tries to guess from the file extension.
     nodata: float
         Nodata value to use. Should be convertible to the DataArray and GDAL dtype.
@@ -76,18 +76,20 @@ def write(path, da, driver=None, nodata=np.nan):
         profile.pop("res", None)
         profile.pop("is_tiled", None)
     elif driver == "PCRaster":
-         if da.dtype == "float64":
+        if da.dtype == "float64":
             da = da.astype("float32")
         elif da.dtype == "int64":
             da = da.astype("int32")
+        elif da.dtype == "bool":
+            da = da.astype("uint8")
         if "PCRASTER_VALUESCALE" not in profile:
             if da.dtype == "int32":
                 profile["PCRASTER_VALUESCALE"] = "VS_NOMINAL"
-            if da.dtype == "bool":
+            elif da.dtype == "uint8":
                 profile["PCRASTER_VALUESCALE"] = "VS_BOOLEAN"
             else:
                 profile["PCRASTER_VALUESCALE"] = "VS_SCALAR"
-   extradims = idf._extra_dims(da)
+    extradims = idf._extra_dims(da)
     # TODO only equidistant IDFs are compatible with GDAL / rasterio
     # TODO try squeezing extradims here, such that 1 layer, 1 time, etc. is acccepted
     if extradims:
@@ -175,7 +177,10 @@ def _read(paths, use_cftime, pattern):
         # Group in the right dimension
         set_nested(groupby, groupbykeys, da)
 
-    return ndconcat(groupby, dims)
+    nd = ndconcat(groupby, dims)
+    nd.coords["dx"] = abs(nd.res[0])
+    nd.coords["dy"] = -abs(nd.res[1])
+    return nd
 
 
 def initialize_groupby(ndims):
