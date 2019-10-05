@@ -36,7 +36,7 @@ def write(path, da, driver=None, nodata=np.nan):
         The DataArray to be written. Should have only x and y dimensions.
     driver: str; optional
         Which GDAL format driver to use. The complete list is at
-        https://www.gdal.org/formats_list.html.
+        https://gdal.org/drivers/raster/index.html.
         By default tries to guess from the file extension.
     nodata: float
         Nodata value to use. Should be convertible to the DataArray and GDAL dtype.
@@ -75,6 +75,20 @@ def write(path, da, driver=None, nodata=np.nan):
     if driver == "AAIGrid":
         profile.pop("res", None)
         profile.pop("is_tiled", None)
+    elif driver == "PCRaster":
+        if da.dtype == "float64":
+            da = da.astype("float32")
+        elif da.dtype == "int64":
+            da = da.astype("int32")
+        elif da.dtype == "bool":
+            da = da.astype("uint8")
+        if "PCRASTER_VALUESCALE" not in profile:
+            if da.dtype == "int32":
+                profile["PCRASTER_VALUESCALE"] = "VS_NOMINAL"
+            elif da.dtype == "uint8":
+                profile["PCRASTER_VALUESCALE"] = "VS_BOOLEAN"
+            else:
+                profile["PCRASTER_VALUESCALE"] = "VS_SCALAR"
     extradims = idf._extra_dims(da)
     # TODO only equidistant IDFs are compatible with GDAL / rasterio
     # TODO try squeezing extradims here, such that 1 layer, 1 time, etc. is acccepted
@@ -163,7 +177,10 @@ def _read(paths, use_cftime, pattern):
         # Group in the right dimension
         set_nested(groupby, groupbykeys, da)
 
-    return ndconcat(groupby, dims)
+    nd = ndconcat(groupby, dims)
+    nd.coords["dx"] = abs(nd.res[0])
+    nd.coords["dy"] = -abs(nd.res[1])
+    return nd
 
 
 def initialize_groupby(ndims):
@@ -186,6 +203,62 @@ def initialize_groupby(ndims):
 
 
 def read(path, use_cftime=False, pattern=None):
+    """Read one or more GDAL supported geospatial rasters to a ``xarray.DataArray``.
+    
+    Parameters
+    ----------
+    path : str, Path or list
+        This can be a single file, 'head_l1.tif', a glob pattern expansion,
+        'head_l*.tif', or a list of files, ['head_l1.tif', 'head_l2.tif'].
+        Note that each file needs to be of the same name (part before the
+        first underscore) but have a different layer and/or timestamp,
+        such that they can be combined in a single xarray.DataArray.
+    use_cftime : bool, optional
+        Use ``cftime.DatetimeProlepticGregorian`` instead of `np.datetime64[ns]`
+        for the time axis.
+
+        Dates are normally encoded as ``np.datetime64[ns]``; however, if dates
+        fall before 1678 or after 2261, they are automatically encoded as
+        ``cftime.DatetimeProlepticGregorian`` objects rather than
+        ``np.datetime64[ns]``.
+    pattern : str, regex pattern, optional
+        If the filenames do match default naming conventions of
+        {name}_{time}_l{layer}, a custom pattern can be defined here either
+        as a string, or as a compiled regular expression pattern. See the
+        examples below.
+
+    Returns
+    -------
+    xarray.DataArray
+        A xarray.DataArray of the values in the raster file(s).
+
+    Examples
+    --------
+    Open a GeoTIFF file:
+
+    >>> da = imod.rasterio.read("example.tif")
+
+    Open multiple GeoTIFF files, relying on default naming conventions to identify time:
+
+    >>> head = imod.rasterio.read("head_*_l1.tif")
+
+    The same, this time explicitly specifying ``name``, ``time``, and ``layer``:
+
+    >>> head = imod.rasterio.read("head_2001*_l*.tif", pattern="{name}_{time}_l{layer}")
+
+    The format string pattern will only work on tidy paths, where variables are
+    separated by underscores. You can also pass a compiled regex pattern.
+    Make sure to include the ``re.IGNORECASE`` flag since all paths are lowered.
+
+    >>> import re
+    >>> pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)", re.IGNORECASE)
+    >>> head = imod.rasterio.read("headL11", pattern=pattern)
+
+    However, this requires constructing regular expressions, which is
+    generally a fiddly process. Regex notation is also impossible to
+    remember. The website https://regex101.com is a nice help. Alternatively,
+    the most pragmatic solution may be to just rename your files.
+    """
     if isinstance(path, list):
         return _read(path, use_cftime, pattern)
     elif isinstance(path, pathlib.Path):
