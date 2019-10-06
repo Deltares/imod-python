@@ -35,8 +35,8 @@ class Well(BoundaryCondition):
         Default is False.
     """
 
+    __slots__ = ("save_budget",)
     _pkg_id = "wel"
-    save_budget = False
 
     _template = jinja2.Template(
         "    {%- for time, timedict in wels.items() -%}"

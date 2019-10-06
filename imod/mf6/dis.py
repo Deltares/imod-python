@@ -26,6 +26,7 @@ class StructuredDiscretization(Package):
         cell.
     """
 
+    __slots__ = ("top", "bottom", "idomain")
     _pkg_id = "dis"
     _binary_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
 

@@ -1,4 +1,5 @@
 import os
+import warnings
 
 import numba
 import numpy as np
@@ -162,12 +163,14 @@ def test_methods():
 
     # Check if no issues arise with all nan
     values[:] = np.nan
-    assert np.isnan(imod.prepare.common.sum(values, weights))
-    assert np.isnan(imod.prepare.common.minimum(values, weights))
-    assert np.isnan(imod.prepare.common.maximum(values, weights))
-    assert np.isnan(imod.prepare.common.median(values, weights))
-    assert np.isnan(imod.prepare.common.conductance(values, weights))
-    assert np.isnan(imod.prepare.common.max_overlap(values, weights))
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', 'All-NaN slice encountered')
+        assert np.isnan(imod.prepare.common.sum(values, weights))
+        assert np.isnan(imod.prepare.common.minimum(values, weights))
+        assert np.isnan(imod.prepare.common.maximum(values, weights))
+        assert np.isnan(imod.prepare.common.median(values, weights))
+        assert np.isnan(imod.prepare.common.conductance(values, weights))
+        assert np.isnan(imod.prepare.common.max_overlap(values, weights))
 
 
 def test_methods_zeros():

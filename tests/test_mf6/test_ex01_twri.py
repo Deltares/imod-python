@@ -1,5 +1,6 @@
 import pathlib
 import subprocess
+import sys
 import textwrap
 
 import numpy as np
@@ -205,6 +206,7 @@ def test_simulation_render(twri_model):
     assert actual == expected
 
 
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write(twri_model, tmp_path):
     simulation = twri_model
     modeldir = tmp_path / "ex01-twri"

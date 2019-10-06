@@ -4,6 +4,7 @@ from imod.mf6.pkgbase import Package
 
 
 class InitialConditions(Package):
+    __slots__ = ("head",)
     _pkg_id = "ic"
     _binary_data = {"head": np.float64}
 

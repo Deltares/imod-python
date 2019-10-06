@@ -25,6 +25,8 @@ class Package(xr.Dataset):
     keyword argument by integer arguments for SEAWAT.
     """
 
+    __slots__ = ("_template", "_pkg_id", "_keywords", "_mapping")
+
     def __setitem__(self, key, value):
         if isinstance(value, xr.DataArray):
             if "z" in value.dims:
@@ -205,6 +207,7 @@ class BoundaryCondition(Package):
     * drainage
     """
 
+    __slots__ = ()
     _template = jinja2.Template(
         "    {%- for name, dictname in mapping -%}"
         "        {%- for time, timedict in dicts[dictname].items() -%}"
@@ -213,16 +216,6 @@ class BoundaryCondition(Package):
         "            {%- endfor -%}\n"
         "        {%- endfor -%}"
         "    {%- endfor -%}"
-    )
-
-    _ssm_template = jinja2.Template(
-        "{%- for species, timedict in concentration.items() -%}"
-        "    {%- for time, layerdict in timedict.items() -%}"
-        "       {%- for layer, value in layerdict.items() %}\n"
-        "    c{{pkg_id}}_t{{species}}_p{{time}}_l{{layer}} = {{value}}\n"
-        "        {%- endfor -%}"
-        "    {%- endfor -%}"
-        "{%- endfor -%}"
     )
 
     def _add_timemap(self, varname, value, use_cftime):
@@ -407,4 +400,15 @@ class BoundaryCondition(Package):
                 )
             }
         d["concentration"] = concentration
-        return self._ssm_template.render(d)
+
+        _ssm_template = jinja2.Template(
+            "{%- for species, timedict in concentration.items() -%}"
+            "    {%- for time, layerdict in timedict.items() -%}"
+            "       {%- for layer, value in layerdict.items() %}\n"
+            "    c{{pkg_id}}_t{{species}}_p{{time}}_l{{layer}} = {{value}}\n"
+            "        {%- endfor -%}"
+            "    {%- endfor -%}"
+            "{%- endfor -%}"
+        )
+
+        return _ssm_template.render(d)

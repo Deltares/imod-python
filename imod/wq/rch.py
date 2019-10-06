@@ -4,6 +4,7 @@ from imod.wq.pkgbase import BoundaryCondition
 
 
 class Recharge(BoundaryCondition):
+    __slots__ = ("_option",)
     _pkg_id = "rch"
 
     _mapping = (("rech", "rate"),)
@@ -67,6 +68,8 @@ class RechargeTopLayer(Recharge):
         Default is False.
     """
 
+    __slots__ = ()
+
     _option = 1
 
     def __init__(self, rate, concentration, save_budget=False):
@@ -97,6 +100,8 @@ class RechargeLayers(Recharge):
         flag indicating if the budget needs to be saved.
         Default is False.
     """
+
+    __slots__ = ()
 
     _option = 2
 
@@ -129,6 +134,8 @@ class RechargeHighestActive(Recharge):
         flag indicating if the budget needs to be saved.
         Default is False.
     """
+
+    __slots__ = ()
 
     _option = 3
 
