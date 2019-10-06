@@ -231,6 +231,16 @@ def read(path, kwargs={}, assoc_kwargs={}):
     The different IPF files can be from different model layers,
     and column names may differ between them.
 
+    Note that this function always returns a ``pandas.DataFrame``. IPF files
+    always contain spatial information, for which ``geopandas.GeoDataFrame``s
+    are a better fit, in principle. However, GeoDataFrames are not the best fit
+    for the associated data.
+
+    To perform spatial operations on the points, you're likely best served by
+    (temporarily) creating a GeoDataFrame, doing the spatial operation, and
+    then using the output to select values in the original DataFrame. Please
+    refer to the examples.
+
     Parameters
     ----------
     path: pathlib.Path or str
@@ -245,6 +255,53 @@ def read(path, kwargs={}, assoc_kwargs={}):
     Returns
     -------
     pandas.DataFrame
+
+    Examples
+    --------
+    Read an IPF file into a dataframe:
+
+    >>> import imod
+    >>> df = imod.ipf.read("example.ipf")
+
+    Convert the x and y data into a GeoDataFrame, do a spatial operation, and
+    use it to select points within a polygon.
+    Note: ``gpd.points_from_xy()`` requires a geopandas version >= 0.5.
+
+    >>> import geopandas as gpd
+    >>> polygon = gpd.read_file("polygon.shp").geometry[0]
+    >>> ipf_points = gpd.GeoDataFrame(geometry=gpd.points_from_xy(df["x"], df["y"]))
+    >>> within_polygon = ipf_points.within(polygon)
+    >>> selection = df[within_polygon]
+
+    The same exercise is a little more complicated when associated files (like
+    timeseries) are involved, since many duplicate values of x and y will exist.
+    The easiest way to isolate these is by applying a groupby, and then taking
+    first of x and y of every group:
+
+    >>> df = imod.ipf.read("example_with_time.ipf")
+    >>> first = df.groupby("id").first()  # replace "id" by what your ID column is called
+    >>> x = first["x"]
+    >>> y = first["y"]
+    >>> id_code = first.index  # id is a reserved keyword in python
+    >>> ipf_points = gpd.GeoDataFrame(geometry=gpd.points_from_xy(x, y))
+    >>> within_polygon = ipf_points.within(polygon)
+
+    Using the result is a little more complicated as well, since it has to be
+    mapped back to many duplicate values of the original dataframe.
+    There are two options. First, by using the index:
+
+    >>> within_polygon.index = id_code
+    >>> df = df.set_index("id")
+    >>> selection = df[within_polygon]
+
+    If you do not wish to change index on the original dataframe, use
+    ``pandas.DataFrame.merge()`` instead.
+
+    >>> import pandas as pd
+    >>> within_polygon = pd.DataFrame({"within": within_polygon})
+    >>> within_polygon["id"] = id_code
+    >>> df = df.merge(within_polygon, on="id")
+    >>> df = df[df["within"]]
     """
 
     # convert since for Path.glob non-relative patterns are unsupported
