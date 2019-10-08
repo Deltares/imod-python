@@ -58,7 +58,7 @@ def _groupdict(stem, pattern):
     else:  # Default to "iMOD conventions": {name}_{time}_l{layer}
         has_layer = bool(re.search(r"_l\d+$", stem))
         try:  # try for time
-            base_pattern = r"(?P<name>[\w-]+)_(?P<time>[0-9-]+)"
+            base_pattern = r"(?P<name>[\w-]+)_(?P<time>[0-9-]{6,})"
             if has_layer:
                 base_pattern += r"_l(?P<layer>[0-9]+)"
             re_pattern = re.compile(base_pattern)

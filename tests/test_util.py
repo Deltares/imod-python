@@ -183,6 +183,13 @@ def test_decompose_regexpattern():
     assert d == refd
 
 
+def test_decompose_nodate():
+    d = util.decompose("dem_10m.idf")
+    refd = {"extension": ".idf", "directory": pathlib.Path("."), "name": "dem_10m"}
+    assert isinstance(d, dict)
+    assert d == refd
+
+
 def test_decompose_dateonly():
     d = util.decompose("20180222090657.idf", pattern="{time}")
     refd = {
