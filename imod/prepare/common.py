@@ -220,7 +220,7 @@ def _match_dims(src, like):
     add_dims = []
     for dim in src.dims:
         try:
-            if src[dim].identical(like[dim]):
+            if np.array_equal(src[dim].values, like[dim].values):
                 matching_dims.append(dim)
             else:
                 regrid_dims.append(dim)
