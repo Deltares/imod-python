@@ -27,6 +27,14 @@ class River(BoundaryCondition):
         Default is False.
     """
 
+    __slots__ = (
+        "stage",
+        "conductance",
+        "bottom_elevation",
+        "concentration",
+        "density",
+        "save_budget",
+    )
     _pkg_id = "riv"
 
     _mapping = (

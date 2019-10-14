@@ -2,6 +2,14 @@ from imod.mf6.pkgbase import BoundaryCondition
 
 
 class GeneralHeadBoundary(BoundaryCondition):
+    __slots__ = (
+        "head",
+        "conductance",
+        "print_input",
+        "print_flows",
+        "save_flows",
+        "observations",
+    )
     _pkg_id = "ghb"
     _binary_data = ("head", "conductance")
 

@@ -61,6 +61,14 @@ class BasicTransport(Package):
         Default value is 0.01 (i.e., 1% of the model layer thickness).
     """
 
+    __slots__ = (
+        "icbund",
+        "starting_concentration",
+        "porosity",
+        "n_species",
+        "inactive_concentration",
+        "minimum_active_thickness",
+    )
     _pkg_id = "btn"
 
     _mapping = (("icbund", "icbund"), ("dz", "thickness"), ("prsity", "porosity"))

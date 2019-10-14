@@ -53,6 +53,7 @@ class PreconditionedConjugateGradientSolver(Package):
         Default value: 1.0.
     """
 
+    __slots__ = ("max_iter", "inner_iter", "rclose", "hclose", "relax", "damp")
     _pkg_id = "pcg"
     _template = (
         "[pcg]\n"
@@ -120,6 +121,13 @@ class GeneralizedConjugateGradientSolver(Package):
         value between 10-4 and 10-6 is generally adequate.
     """
 
+    __slots__ = (
+        "max_iter",
+        "inner_iter",
+        "cclose",
+        "preconditioner",
+        "lump_dispersion",
+    )
     _pkg_id = "gcg"
     _template = (
         "[gcg]\n"
@@ -160,6 +168,8 @@ class ParallelSolver(Package):
     """
     Base package for the parallel solvers.
     """
+
+    __slots__ = ()
 
     def _compute_load_balance_weight(self, ibound):
         if self["partition"] == "rcb":
@@ -260,6 +270,8 @@ class ParallelKrylovFlowSolver(ParallelSolver):
         `pd.DataFrame(load_balance_weight.values).to_csv(path, sep='\\t',
         header=False, index=False, float_format = "%8.2f")`
     """
+
+    __slots__ = ()
 
     _pkg_id = "pksf"
     _template = (
@@ -374,8 +386,9 @@ class ParallelKrylovTransportSolver(ParallelSolver):
         (without a header). Formatting is done as follows:
         `pd.DataFrame(load_balance_weight.values).to_csv(path, sep='\\t',
         header=False, index=False, float_format = "%8.2f")`
-        """
+    """
 
+    __slots__ = ()
     _pkg_id = "pkst"
     _template = (
         "[pkst]\n"

@@ -35,6 +35,7 @@ class GeneralHeadBoundary(BoundaryCondition):
         Default is False.
     """
 
+    __slots__ = ("head", "conductance", "concentration", "density", "save_budget")
     _pkg_id = "ghb"
     _mapping = (("bhead", "head"), ("cond", "conductance"), ("ghbssmdens", "density"))
 

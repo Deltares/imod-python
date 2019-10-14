@@ -3,6 +3,14 @@ from imod.mf6.pkgbase import BoundaryCondition
 
 class Drainage(BoundaryCondition):
 
+    __slots__ = (
+        "elevation",
+        "conductance",
+        "print_input",
+        "print_flows",
+        "save_flows",
+        "observations",
+    )
     _pkg_id = "drn"
     # has to be ordered as in the list
     _binary_data = ("elevation", "conductance")
