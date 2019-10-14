@@ -9,6 +9,21 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+[0.8.0] - 2019-10-14
+--------------------
+
+Added
+~~~~~
+-  Laplace grid interpolation (:meth:`imod.prepare.laplace_interpolate`)
+-  Experimental Modflow 6 structured model write support (:mod:`imod.mf6`)
+-  More supported visualizations (:mod:`imod.visualize`)
+-  More extensive reading and writing of GDAL raster in (:mod:`imod.rasterio`)
+
+Changed
+~~~~~~~
+
+-  The documentation moved to a custom domain name: https://imod.xyz/
+
 [0.7.1] - 2019-08-07
 --------------------
 
