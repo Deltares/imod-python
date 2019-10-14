@@ -15,6 +15,27 @@ class NodePropertyFlow(Package):
 
     """
 
+    __slots__ = (
+        "icelltype",
+        "k",
+        "rewet",
+        "rewet_layer",
+        "rewet_factor",
+        "rewet_iterations",
+        "rewet_method",
+        "k22",
+        "k33",
+        "angle1",
+        "angle2",
+        "angle3",
+        "cell_averaging",
+        "save_flows",
+        "starting_head_as_confined_thickness",
+        "variable_vertical_conductance",
+        "dewatered",
+        "perched",
+        "save_specific_discharge",
+    )
     _pkg_id = "npf"
     _binary_data = {
         "icelltype": np.int32,

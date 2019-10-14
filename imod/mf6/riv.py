@@ -2,6 +2,15 @@ from imod.mf6.pkgbase import BoundaryCondition
 
 
 class River(BoundaryCondition):
+    __slots__ = (
+        "stage",
+        "conductance",
+        "bottom_elevation",
+        "print_input",
+        "print_flows",
+        "save_flows",
+        "observations",
+    )
     _pkg_id = "riv"
     _binary_data = ("stage", "conductance", "bottom_elevation")
 

@@ -15,6 +15,7 @@ class OutputControl(Package):
         Bool per stress period
     """
 
+    __slots__ = ("save_head", "save_budget")
     _pkg_id = "oc"
 
     def __init__(self, save_head, save_budget):

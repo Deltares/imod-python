@@ -2,6 +2,7 @@ from imod.mf6.pkgbase import BoundaryCondition
 
 
 class Recharge(BoundaryCondition):
+    __slots__ = ("rate", "print_input", "print_flows", "save_flows", "observations")
     _pkg_id = "rch"
     _binary_data = ("rate",)
 

@@ -18,6 +18,7 @@ class ConstantHead(BoundaryCondition):
         the SSM package.
     """
 
+    __slots__ = ("head_start", "head_end", "concentration")
     _pkg_id = "chd"
     _mapping = (("shead", "head_start"), ("ehead", "head_end"))
 

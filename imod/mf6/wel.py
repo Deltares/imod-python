@@ -4,6 +4,16 @@ from imod.mf6.pkgbase import BoundaryCondition
 
 
 class Well(BoundaryCondition):
+    __slots__ = (
+        "layer",
+        "row",
+        "column",
+        "rate",
+        "print_input",
+        "print_flows",
+        "save_flows",
+        "observations",
+    )
     _pkg_id = "wel"
     _binary_data = ("layer", "row", "column", "rate")
 
