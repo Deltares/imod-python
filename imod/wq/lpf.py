@@ -92,6 +92,20 @@ class LayerPropertyFlow(Package):
         Default value: 1.0e20.
     """
 
+    __slots__ = (
+        "k_horizontal",
+        "k_vertical",
+        "horizontal_anisotropy",
+        "interblock",
+        "layer_type",
+        "specific_storage",
+        "specific_yield",
+        "save_budget",
+        "layer_wet",
+        "interval_wet",
+        "method_wet",
+        "head_dry",
+    )
     _pkg_id = "lpf"
 
     _mapping = (

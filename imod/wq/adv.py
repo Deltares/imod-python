@@ -25,6 +25,7 @@ class AdvectionFiniteDifference(Package):
         Default value: "upstream"
     """
 
+    __slots__ = ("courant", "weighting")
     _pkg_id = "adv"
 
     def __init__(self, courant=0.75, weighting="upstream"):
@@ -133,6 +134,17 @@ class AdvectionMOC(Package):
         Default value: 80.
     """
 
+    __slots__ = (
+        "courant",
+        "tracking",
+        "weighting_factor",
+        "dconcentration_epsilon",
+        "nplane",
+        "nparticles_no_advection",
+        "nparticles_advection",
+        "cell_min_nparticles",
+        "cell_max_nparticles",
+    )
     _pkg_id = "adv"
 
     def __init__(
@@ -206,6 +218,14 @@ class AdvectionModifiedMOC(Package):
         scheme. (NPSINK)
     """
 
+    __slots__ = (
+        "courant",
+        "tracking",
+        "weighting_factor",
+        "dconcentration_epsilon",
+        "sink_particle_placement",
+        "sink_nparticles",
+    )
     _pkg_id = "adv"
 
     _keywords = {"tracking": {"euler": 1, "runge-kutta": 2, "hybrid": 3}}
@@ -330,6 +350,20 @@ class AdvectionHybridMOC(Package):
         Relative Concentration Gradient is less than or equal to DCHMOC
     """
 
+    __slots__ = (
+        "courant",
+        "tracking",
+        "weighting_factor",
+        "dconcentration_epsilon",
+        "nplane",
+        "nparticles_no_advection",
+        "nparticles_advection",
+        "cell_min_nparticles",
+        "cell_max_nparticles",
+        "sink_particle_placement",
+        "sink_nparticles",
+        "dconcentration_hybrid",
+    )
     _pkg_id = "adv"
 
     def __init__(
@@ -381,6 +415,7 @@ class AdvectionTVD(Package):
         than one is specified.
     """
 
+    __slots__ = ("courant",)
     _pkg_id = "adv"
 
     _template = "[adv]\n" "    mixelm = -1\n" "    percel = {courant}\n"

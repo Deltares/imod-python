@@ -2,6 +2,7 @@ from imod.mf6.pkgbase import BoundaryCondition
 
 
 class ConstantHead(BoundaryCondition):
+    __slots__ = ("head", "print_input", "print_flows", "save_flows", "observations")
     _pkg_id = "chd"
     _binary_data = ("head",)
 

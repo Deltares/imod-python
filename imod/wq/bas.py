@@ -49,6 +49,7 @@ class BasicFlow(Package):
         Default value is 1.0e30.
     """
 
+    __slots__ = ("ibound", "top", "bottom", "starting_head", "inactive_head")
     _pkg_id = "bas6"
     _template = jinja2.Template(
         "[bas6]\n"
@@ -59,22 +60,6 @@ class BasicFlow(Package):
         "    {%- for layer, value in starting_head.items() %}\n"
         "    strt_l{{layer}} = {{value}}\n"
         "    {%- endfor -%}"
-    )
-
-    # Non-time dependent part of dis
-    # Can be inferred from ibound
-    _dis_template = jinja2.Template(
-        "[dis]\n"
-        "    nlay = {{nlay}}\n"
-        "    nrow = {{nrow}}\n"
-        "    ncol = {{ncol}}\n"
-        "    delc_r? = {{dy}}\n"
-        "    delr_c? = {{dx}}\n"
-        "    top = {{top}}\n"
-        "    {%- for layer, value in bottom.items() %}\n"
-        "    botm_l{{layer}} = {{value}}\n"
-        "    {%- endfor %}\n"
-        "    laycbd_l? = 0"
     )
 
     def __init__(
@@ -155,7 +140,23 @@ class BasicFlow(Package):
         d["dx"] = abs(float(dx))
         d["dy"] = abs(float(dy))
 
-        return self._dis_template.render(d)
+        # Non-time dependent part of dis
+        # Can be inferred from ibound
+        _dis_template = jinja2.Template(
+            "[dis]\n"
+            "    nlay = {{nlay}}\n"
+            "    nrow = {{nrow}}\n"
+            "    ncol = {{ncol}}\n"
+            "    delc_r? = {{dy}}\n"
+            "    delr_c? = {{dx}}\n"
+            "    top = {{top}}\n"
+            "    {%- for layer, value in bottom.items() %}\n"
+            "    botm_l{{layer}} = {{value}}\n"
+            "    {%- endfor %}\n"
+            "    laycbd_l? = 0"
+        )
+
+        return _dis_template.render(d)
 
     def thickness(self):
         """

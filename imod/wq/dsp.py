@@ -37,6 +37,12 @@ class Dispersion(Package):
         iMOD-wq always uses meters and days.
     """
 
+    __slots__ = (
+        "longitudinal",
+        "ratio_horizontal",
+        "ratio_vertical",
+        "diffusion_coefficient",
+    )
     _pkg_id = "dsp"
 
     _mapping = (

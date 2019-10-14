@@ -16,7 +16,7 @@ class Package(xr.Dataset):
     not the list input which is used in :class:`BoundaryCondition`.
     """
 
-    _template = None
+    __slots__ = ("_template", "_pkg_id", "_binary_data")
 
     def _valid(self, value):
         """
@@ -193,6 +193,8 @@ class BoundaryCondition(Package):
     This class only supports `list input <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=19>`_,
     not the array input which is used in :class:`Package`.
     """
+
+    __slots__ = ()
 
     def _max_active_n(self):
         """

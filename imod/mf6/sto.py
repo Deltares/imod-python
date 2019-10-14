@@ -4,6 +4,7 @@ from imod.mf6.pkgbase import Package
 
 
 class Storage(Package):
+    __slots__ = ("specific_storage", "specific_yield", "convertible", "transient")
     _pkg_id = "sto"
 
     def __init__(self, specific_storage, specific_yield, transient, convertible):

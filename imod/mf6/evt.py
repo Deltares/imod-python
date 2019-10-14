@@ -2,6 +2,18 @@ from imod.mf6.pkgbase import BoundaryCondition
 
 
 class Evapotranspiration(BoundaryCondition):
+    __slots__ = (
+        "surface",
+        "rate",
+        "depth",
+        "proportion_rate",
+        "proportion_depth",
+        "fixed_cell",
+        "print_input",
+        "print_flows",
+        "save_flows",
+        "observations",
+    )
     _pkg_id = "evt"
     _binary_data = ("surface", "rate", "depth", "proportion_depth", "proportion_rate")
 
