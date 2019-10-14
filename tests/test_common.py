@@ -164,7 +164,7 @@ def test_methods():
     # Check if no issues arise with all nan
     values[:] = np.nan
     with warnings.catch_warnings():
-        warnings.filterwarnings('ignore', 'All-NaN slice encountered')
+        warnings.filterwarnings("ignore", "All-NaN slice encountered")
         assert np.isnan(imod.prepare.common.sum(values, weights))
         assert np.isnan(imod.prepare.common.minimum(values, weights))
         assert np.isnan(imod.prepare.common.maximum(values, weights))

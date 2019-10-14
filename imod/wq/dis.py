@@ -109,7 +109,6 @@ class TimeDiscretization(Package):
             self["transport_timestep_multiplier"] = transport_timestep_multiplier
         self["transport_initial_timestep"] = transport_initial_timestep
 
-
     def _render(self, globaltimes):
         d = {}
         dicts = {}
