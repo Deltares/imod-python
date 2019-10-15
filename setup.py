@@ -1,13 +1,10 @@
 from setuptools import setup, find_packages
-import versioneer
 
 with open("README.rst") as f:
     long_description = f.read()
 
 setup(
     name="imod",
-    version=versioneer.get_version(),
-    cmdclass=versioneer.get_cmdclass(),
     description="Work with iMOD MODFLOW models",
     long_description=long_description,
     url="https://gitlab.com/deltares/imod/imod-python",
@@ -18,6 +15,8 @@ setup(
     package_dir={"imod": "imod"},
     package_data={"imod": ["templates/*.j2", "templates/mf6/*.j2"]},
     test_suite="tests",
+    use_scm_version=True,
+    setup_requires=["setuptools_scm"],
     python_requires=">=3.6",
     install_requires=[
         "numba",
