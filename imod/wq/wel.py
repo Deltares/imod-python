@@ -72,7 +72,7 @@ class Well(BoundaryCondition):
             else:
                 raise ValueError(f"Length of {k} does not match other arguments")
 
-        self.save_budget = save_budget
+        self["save_budget"] = save_budget
 
     def _max_active_n(self, varname, nlayer):
         """
