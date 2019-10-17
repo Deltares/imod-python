@@ -1,4 +1,5 @@
 import pathlib
+import pkg_resources
 import warnings
 
 import numpy as np
@@ -21,10 +22,11 @@ import imod.wq
 import imod.select
 import imod.visualize
 
-from imod._version import get_versions
-
-__version__ = get_versions()["version"]
-del get_versions
+try:
+    __version__ = pkg_resources.get_distribution(__name__).version
+except pkg_resources.DistributionNotFound:
+    # package is not installed
+    pass
 
 
 def write(path, model, name=None, runfile_parameters=None):

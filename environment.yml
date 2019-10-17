@@ -27,6 +27,7 @@ dependencies:
   - python>=3.6
   - rasterio>=1.0
   - scipy
+  - setuptools_scm
   - sphinx
   - sphinx_rtd_theme
   - toolz

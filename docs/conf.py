@@ -12,23 +12,20 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
+import pkg_resources
+
 import imod
-
-# sys.path.insert(0, 'd:\code\py\imod\imod')
-
 
 # -- Project information -----------------------------------------------------
 
 project = "imod-python"
 copyright = "Deltares"
-author = "Martijn Visser"
+author = "Martijn Visser, Huite Bootsma"
 
-# The short X.Y version
-version = imod.__version__
 # The full version, including alpha/beta/rc tags
-release = imod.__version__
+release = pkg_resources.get_distribution("imod").version
+# The short version which is displayed
+version = ".".join(release.split(".")[:3]) + ".dev"
 
 
 # -- General configuration ---------------------------------------------------
@@ -45,7 +42,6 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.todo",
     "sphinx.ext.napoleon",
-    "sphinxcontrib.googleanalytics",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -182,12 +178,6 @@ epub_exclude_files = ["search.html"]
 
 # -- Extension configuration -------------------------------------------------
 
-# Settings for sphinxcontrib.googleanalytics
-googleanalytics_id = "UA-138606256-1"
-googleanalytics_enabled = True
-
-
-# -- Options for todo extension ----------------------------------------------
-
+# extension sphinx.ext.todo
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True

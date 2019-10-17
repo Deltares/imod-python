@@ -232,8 +232,8 @@ def read(path, kwargs={}, assoc_kwargs={}):
     and column names may differ between them.
 
     Note that this function always returns a ``pandas.DataFrame``. IPF files
-    always contain spatial information, for which ``geopandas.GeoDataFrame``s
-    are a better fit, in principle. However, GeoDataFrames are not the best fit
+    always contain spatial information, for which ``geopandas.GeoDataFrame``
+    is a better fit, in principle. However, GeoDataFrames are not the best fit
     for the associated data.
 
     To perform spatial operations on the points, you're likely best served by
