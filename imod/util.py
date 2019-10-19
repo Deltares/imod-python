@@ -141,20 +141,12 @@ def decompose(path, pattern=None):
     #    if \d*\.\d* -> float
     # else: keep as string
 
-    # steady-state as time identifier isn't picked up by <time>[0-9] regex, so strip from name
-    steady = False
-    if "steady-state" in d["name"]:
-        steady = True
-        d["name"] = d["name"].replace("_steady-state", "")
-        d["time"] = "steady-state"
-        dims.append("time")
-
     # String -> type conversion
     if "layer" in d.keys():
         d["layer"] = int(d["layer"])
     if "species" in d.keys():
         d["species"] = int(d["species"])
-    if "time" in d.keys() and not steady:
+    if "time" in d.keys():
         # iMOD supports two datetime formats
         # try fast options first
         try:
@@ -164,6 +156,11 @@ def decompose(path, pattern=None):
                 d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d")
         except ValueError:  # Try fullblown dateutil date parser
             d["time"] = dateutil.parser.parse(d["time"])
+    if "steady-state" in d["name"]:
+        # steady-state as time identifier isn't picked up by <time>[0-9] regex
+        d["name"] = d["name"].replace("_steady-state", "")
+        d["time"] = "steady-state"
+        dims.append("time")
 
     d["extension"] = path.suffix
     d["directory"] = path.parent
