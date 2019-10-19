@@ -150,27 +150,23 @@ def _read(paths, use_cftime, pattern):
         return xr.open_rasterio(paths[0]).squeeze("band", drop=True)
 
     dicts = []
-    firstlen = len(util.decompose(paths[0], pattern=pattern))
+    firstlen = len(util.decompose(paths[0], pattern=pattern)["dims"])
     for path in paths:
         d = util.decompose(path, pattern=pattern)
-        if not len(d) == firstlen:
+        if not len(d["dims"]) == firstlen:
             raise ValueError("Number of dimensions on grids do not match.")
         d["path"] = path
         dicts.append(d)
 
-    dict_dims = [
-        key for key in dicts[0] if key not in ("name", "extension", "directory", "path")
-    ]
-    ndims = len(dict_dims)
-
-    dims = dict_dims
+    dims = d["dims"]
+    ndims = len(dims)
     groupby = initialize_groupby(ndims)
     for d in dicts:
         # Read array
         da = xr.open_rasterio(d["path"]).squeeze("band", drop=True)
         # Assign coordinates
         groupbykeys = []
-        for dim in dict_dims:
+        for dim in dims:
             value = d[dim]
             da = da.assign_coords(**{dim: value})
             groupbykeys.append(value)

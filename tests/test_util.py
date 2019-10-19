@@ -210,7 +210,12 @@ def test_decompose_regexpattern():
 
 def test_decompose_nodate():
     d = util.decompose("dem_10m.idf")
-    refd = {"extension": ".idf", "directory": pathlib.Path("."), "name": "dem_10m"}
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("."),
+        "name": "dem_10m",
+        "dims": [],
+    }
     assert isinstance(d, dict)
     assert d == refd
 
