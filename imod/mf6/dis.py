@@ -29,13 +29,13 @@ class StructuredDiscretization(Package):
     __slots__ = ("top", "bottom", "idomain")
     _pkg_id = "dis"
     _binary_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
+    _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, top, bottom, idomain):
         super(__class__, self).__init__()
         self["top"] = top
         self["bottom"] = bottom
         self["idomain"] = idomain
-        self._initialize_template()
 
     def _delrc(self, dx):
         """

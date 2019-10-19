@@ -17,12 +17,12 @@ class OutputControl(Package):
 
     __slots__ = ("save_head", "save_budget")
     _pkg_id = "oc"
+    _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, save_head, save_budget):
         super(__class__, self).__init__()
         self["save_head"] = save_head
         self["save_budget"] = save_budget
-        self._initialize_template()
 
     def render(self, directory, pkgname, globaltimes):
         d = {}

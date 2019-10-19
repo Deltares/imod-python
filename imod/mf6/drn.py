@@ -14,6 +14,7 @@ class Drainage(BoundaryCondition):
     _pkg_id = "drn"
     # has to be ordered as in the list
     _binary_data = ("elevation", "conductance")
+    _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
         self,
@@ -31,4 +32,3 @@ class Drainage(BoundaryCondition):
         self["print_flows"] = print_flows
         self["save_flows"] = save_flows
         self["observations"] = observations
-        self._initialize_template()
