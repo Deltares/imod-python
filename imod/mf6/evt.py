@@ -16,6 +16,7 @@ class Evapotranspiration(BoundaryCondition):
     )
     _pkg_id = "evt"
     _binary_data = ("surface", "rate", "depth", "proportion_depth", "proportion_rate")
+    _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
         self,
@@ -46,7 +47,6 @@ class Evapotranspiration(BoundaryCondition):
         self["print_flows"] = print_flows
         self["save_flows"] = save_flows
         self["observations"] = observations
-        self._initialize_template()
 
         # TODO: add write logic for transforming proportion rate and depth to
         # the right shape in the binary file.

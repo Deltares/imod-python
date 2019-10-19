@@ -5,6 +5,7 @@ class ConstantHead(BoundaryCondition):
     __slots__ = ("head", "print_input", "print_flows", "save_flows", "observations")
     _pkg_id = "chd"
     _binary_data = ("head",)
+    _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
         self,
@@ -20,4 +21,3 @@ class ConstantHead(BoundaryCondition):
         self["print_flows"] = print_flows
         self["save_flows"] = save_flows
         self["observations"] = observations
-        self._initialize_template()
