@@ -16,6 +16,7 @@ class Well(BoundaryCondition):
     )
     _pkg_id = "wel"
     _binary_data = ("layer", "row", "column", "rate")
+    _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
         self,
@@ -39,7 +40,6 @@ class Well(BoundaryCondition):
         self["print_flows"] = print_flows
         self["save_flows"] = save_flows
         self["observations"] = observations
-        self._initialize_template()
 
     def to_sparse(self, arrlist, *args, **kwargs):
         nrow = arrlist[0].size

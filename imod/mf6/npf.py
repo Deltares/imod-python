@@ -47,6 +47,7 @@ class NodePropertyFlow(Package):
         "angle2": np.float64,
         "angle3": np.float64,
     }
+    _template = Package._initialize_template(_pkg_id)
 
     def __init__(
         self,
@@ -100,7 +101,6 @@ class NodePropertyFlow(Package):
         self["dewatered"] = dewatered
         self["perched"] = perched
         self["save_specific_discharge"] = save_specific_discharge
-        self._initialize_template()
 
     def render(self, directory, pkgname, *args, **kwargs):
         d = {}

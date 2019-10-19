@@ -6,13 +6,13 @@ from imod.mf6.pkgbase import Package
 class TimeDiscretization(Package):
     __slots__ = ("timestep_duration", "n_timesteps", "timestep_multiplier")
     _pkg_id = "tdis"
+    _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, timestep_duration, n_timesteps=1, timestep_multiplier=1.0):
         super(__class__, self).__init__()
         self["timestep_duration"] = timestep_duration
         self["n_timesteps"] = n_timesteps
         self["timestep_multiplier"] = timestep_multiplier
-        self._initialize_template()
 
     def render(self):
         d = {}

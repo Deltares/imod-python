@@ -33,16 +33,17 @@ class Package(xr.Dataset):
         else:
             return True
 
-    def _initialize_template(self):
+    @staticmethod
+    def _initialize_template(pkg_id):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader)
-        if self._pkg_id == "ims":
+        if pkg_id == "ims":
             fname = "sln-ims.j2"
-        elif self._pkg_id == "tdis":
+        elif pkg_id == "tdis":
             fname = "sim-tdis.j2"
         else:
-            fname = f"gwf-{self._pkg_id}.j2"
-        self._template = env.get_template(fname)
+            fname = f"gwf-{pkg_id}.j2"
+        return env.get_template(fname)
 
     def write_blockfile(self, directory, pkgname, globaltimes=None):
         content = self.render(directory, pkgname, globaltimes)
