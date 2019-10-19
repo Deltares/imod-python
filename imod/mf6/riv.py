@@ -13,6 +13,7 @@ class River(BoundaryCondition):
     )
     _pkg_id = "riv"
     _binary_data = ("stage", "conductance", "bottom_elevation")
+    _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
         self,
@@ -32,4 +33,3 @@ class River(BoundaryCondition):
         self["print_flows"] = print_flows
         self["save_flows"] = save_flows
         self["observations"] = observations
-        self._initialize_template()

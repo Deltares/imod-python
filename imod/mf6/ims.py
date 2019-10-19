@@ -31,6 +31,7 @@ class Solution(Package):
         "no_ptc",
     )
     _pkg_id = "ims"
+    _template = Package._initialize_template(_pkg_id)
 
     def __init__(
         self,
@@ -88,7 +89,6 @@ class Solution(Package):
         self["print_option"] = print_option
         self["csv_output"] = csv_output
         self["no_ptc"] = no_ptc
-        self._initialize_template()
 
 
 def SolutionPresetSimple(print_option, csv_output, no_ptc):

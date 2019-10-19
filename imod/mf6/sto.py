@@ -6,6 +6,7 @@ from imod.mf6.pkgbase import Package
 class Storage(Package):
     __slots__ = ("specific_storage", "specific_yield", "convertible", "transient")
     _pkg_id = "sto"
+    _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, specific_storage, specific_yield, transient, convertible):
         super(__class__, self).__init__()
@@ -13,7 +14,6 @@ class Storage(Package):
         self["specific_yield"] = specific_yield
         self["convertible"] = convertible
         self["transient"] = transient
-        self._initialize_template()
 
     def render(self, directory, pkgname, globaltimes):
         d = {}

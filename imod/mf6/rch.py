@@ -5,6 +5,7 @@ class Recharge(BoundaryCondition):
     __slots__ = ("rate", "print_input", "print_flows", "save_flows", "observations")
     _pkg_id = "rch"
     _binary_data = ("rate",)
+    _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
         self,
@@ -20,4 +21,3 @@ class Recharge(BoundaryCondition):
         self["print_flows"] = print_flows
         self["save_flows"] = save_flows
         self["observations"] = observations
-        self._initialize_template()
