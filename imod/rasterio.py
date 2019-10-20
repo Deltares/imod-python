@@ -6,11 +6,8 @@ raster formats.
 Currently only :func:`imod.rasterio.write` is implemented.
 """
 
-import collections
-import functools
 import glob
 import pathlib
-import re
 
 import numpy as np
 import xarray as xr
@@ -22,7 +19,143 @@ try:
 except ImportError:
     pass
 
+import imod
 from imod import idf, util
+from . import array_IO
+
+
+def _limitations(riods, path):
+    if riods.count != 1:
+        raise NotImplementedError(
+            f"Cannot open multi-band grid: {path}. Try xarray.open_rasterio() instead."
+        )
+    if not riods.transform.is_rectilinear:
+        raise NotImplementedError(
+            f"Cannot open non-rectilinear grid: {path}. Try xarray.open_rasterio() instead."
+        )
+
+
+def header(path, pattern):
+    attrs = util.decompose(path, pattern)
+    
+    # TODO:
+    # Check bands, datatypes, rotation, etc.
+    # Raise NotImplementedErrors and point to xr.open_rasterio
+    with rasterio.open(path, "r") as riods:
+        _limitations(riods, path)
+        nrow = riods.height
+        ncol = riods.width
+        dx, xmin, _, _, dy, ymax = tuple(riods.transform[:6])
+        xmax = xmin + ncol * dx
+        ymin = ymax + nrow * dy
+        attrs["nodata"] = riods.nodata
+
+    attrs["nrow"] = nrow
+    attrs["ncol"] = ncol
+    attrs["dx"] = dx
+    attrs["dy"] = dy
+    attrs["xmin"] = xmin
+    attrs["xmax"] = xmax
+    attrs["ymin"] = ymin
+    attrs["ymax"] = ymax
+    attrs["headersize"] = None
+    return attrs
+
+
+def _read(path, *args):
+    with rasterio.open(path, "r") as dataset:
+        a = dataset.read(1)
+    return a
+
+
+# Open IDFs for multiple times and/or layers into one DataArray
+def open(path, use_cftime=False, pattern=None):
+    r"""
+    Open one or more IDF files as an xarray.DataArray.
+
+    In accordance with xarray's design, ``open`` loads the data of IDF files
+    lazily. This means the data of the IDFs are not loaded into memory until the
+    data is needed. This allows for easier handling of large datasets, and
+    more efficient computations.
+
+    Parameters
+    ----------
+    path : str, Path or list
+        This can be a single file, 'head_l1.idf', a glob pattern expansion,
+        'head_l*.idf', or a list of files, ['head_l1.idf', 'head_l2.idf'].
+        Note that each file needs to be of the same name (part before the
+        first underscore) but have a different layer and/or timestamp,
+        such that they can be combined in a single xarray.DataArray.
+    use_cftime : bool, optional
+        Use ``cftime.DatetimeProlepticGregorian`` instead of `np.datetime64[ns]`
+        for the time axis.
+
+        Dates are normally encoded as ``np.datetime64[ns]``; however, if dates
+        fall before 1678 or after 2261, they are automatically encoded as
+        ``cftime.DatetimeProlepticGregorian`` objects rather than
+        ``np.datetime64[ns]``.
+    pattern : str, regex pattern, optional
+        If the filenames do match default naming conventions of
+        {name}_{time}_l{layer}, a custom pattern can be defined here either
+        as a string, or as a compiled regular expression pattern. See the
+        examples below.
+
+    Returns
+    -------
+    xarray.DataArray
+        A float32 xarray.DataArray of the values in the IDF file(s).
+        All metadata needed for writing the file to IDF or other formats
+        using imod.rasterio are included in the xarray.DataArray.attrs.
+
+    Examples
+    --------
+    Open an IDF file:
+
+    >>> da = imod.idf.open("example.idf")
+
+    Open an IDF file, relying on default naming conventions to identify
+    layer:
+
+    >>> da = imod.idf.open("example_l1.idf")
+
+    Open an IDF file, relying on default naming conventions to identify layer
+    and time:
+
+    >>> head = imod.idf.open("head_20010101_l1.idf")
+
+    Open multiple IDF files, in this case files for the year 2001 for all
+    layers, again relying on default conventions for naming:
+
+    >>> head = imod.idf.open("head_2001*_l*.idf")
+
+    The same, this time explicitly specifying ``name``, ``time``, and ``layer``:
+
+    >>> head = imod.idf.open("head_2001*_l*.idf", pattern="{name}_{time}_l{layer}")
+
+    The format string pattern will only work on tidy paths, where variables are
+    separated by underscores. You can also pass a compiled regex pattern.
+    Make sure to include the ``re.IGNORECASE`` flag since all paths are lowered.
+
+    >>> import re
+    >>> pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)", re.IGNORECASE)
+    >>> head = imod.idf.open("headL11", pattern=pattern)
+
+    However, this requires constructing regular expressions, which is
+    generally a fiddly process. Regex notation is also impossible to
+    remember. The website https://regex101.com is a nice help. Alternatively,
+    the most pragmatic solution may be to just rename your files.
+    """
+
+    if isinstance(path, list):
+        return array_IO.reading._load(path, use_cftime, pattern, _read, header)
+    elif isinstance(path, pathlib.Path):
+        path = str(path)
+
+    paths = [pathlib.Path(p) for p in glob.glob(path)]
+    n = len(paths)
+    if n == 0:
+        raise FileNotFoundError(f"Could not find any files matching {path}")
+    return array_IO.reading._load(paths, use_cftime, pattern, _read, header)
 
 
 def write(path, da, driver=None, nodata=np.nan):
@@ -89,7 +222,7 @@ def write(path, da, driver=None, nodata=np.nan):
                 profile["PCRASTER_VALUESCALE"] = "VS_BOOLEAN"
             else:
                 profile["PCRASTER_VALUESCALE"] = "VS_SCALAR"
-    extradims = idf._extra_dims(da)
+    extradims = list(filter(lambda dim: dim not in ("y", "x"), da.dims))
     # TODO only equidistant IDFs are compatible with GDAL / rasterio
     # TODO try squeezing extradims here, such that 1 layer, 1 time, etc. is acccepted
     if extradims:
@@ -113,155 +246,59 @@ def write(path, da, driver=None, nodata=np.nan):
             ds.write(dafilled.values, 1)
 
 
-def ndconcat(das, dims):
+def save(path, a, nodata=1.0e20, pattern=None):
     """
+    Write a xarray.DataArray to one or more IDF files
+
+    If the DataArray only has ``y`` and ``x`` dimensions, a single IDF file is
+    written, like the ``imod.idf.write`` function. This function is more general
+    and also supports ``time`` and ``layer`` dimensions. It will split these up,
+    give them their own filename according to the conventions in
+    ``imod.util.compose``, and write them each.
+
     Parameters
     ----------
-    das : dict (of dicts) of lists, n levels deep. Bottoms out at a list.
-        E.g. {2000-01-01: [da1, da2], 2001-01-01: [da3, da4]}
-        for n = 2.
-    dims : tuple
-        Tuple of dimensions over which to concatenate. Has to be n elements long.
-        E.g. ("time", "layer") for n = 2.
+    path : str or Path
+        Path to the IDF file to be written. This function decides on the
+        actual filename(s) using conventions, so it only takes the directory and
+        name from this parameter.
+    a : xarray.DataArray
+        DataArray to be written. It needs to have dimensions ('y', 'x'), and
+        optionally ``layer`` and ``time``.
+    nodata : float, optional
+        Nodata value in the saved IDF files. Xarray uses nan values to represent
+        nodata, but these tend to work unreliably in iMOD(FLOW).
+        Defaults to a value of 1.0e20.
+    pattern : str
+        Format string which defines how to create the filenames. See examples.
 
-    Returns
+    Example
     -------
-    concatenated : xr.DataArray
-        Input concatenated over n dimensions.
+    Consider a DataArray ``da`` that has dimensions 'layer', 'y' and 'x', with the
+    'layer' dimension consisting of layer 1 and 2::
+
+        save('path/to/head', da)
+
+    This writes the following two IDF files: 'path/to/head_l1.idf' and
+    'path/to/head_l2.idf'.
+
+
+    It is possible to generate custom filenames using a format string. The
+    default filenames would be generated by the following format string:
+
+        save("example", pattern="{name}_l{layer}{extension}")
+
+    If you desire zero-padded numbers that show up neatly sorted in a
+    file manager, you may specify:
+
+        save("example", pattern="{name}_l{layer:02d}{extension}")
+
+    In this case, a 0 will be padded for single digit numbers ('1' will become
+    '01').
+
+    To get a date with dashes, use the following pattern:
+
+        "{name}_{time:%Y-%m-%d}_l{layer}{extension}"
+
     """
-    if len(dims) == 1:  # base case
-        das.sort(key=lambda da: da.coords[dims[0]])
-        return xr.concat(das, dim=dims[0])
-    else:
-        dims_in = dims[1:]  # recursive case
-        out = [ndconcat(das_in, dims_in) for das_in in das.values()]
-        return xr.concat(out, dims[0])
-
-
-def set_nested(d, keys, value):
-    if len(keys) == 1:
-        d.append(value)
-    else:
-        set_nested(d[keys[0]], keys[1:], value)
-
-
-def _read(paths, use_cftime, pattern):
-    if len(paths) == 1:
-        return xr.open_rasterio(paths[0]).squeeze("band", drop=True)
-
-    dicts = []
-    firstlen = len(util.decompose(paths[0], pattern=pattern)["dims"])
-    for path in paths:
-        d = util.decompose(path, pattern=pattern)
-        if not len(d["dims"]) == firstlen:
-            raise ValueError("Number of dimensions on grids do not match.")
-        d["path"] = path
-        dicts.append(d)
-
-    dims = d["dims"]
-    ndims = len(dims)
-    groupby = initialize_groupby(ndims)
-    for d in dicts:
-        # Read array
-        da = xr.open_rasterio(d["path"]).squeeze("band", drop=True)
-        # Assign coordinates
-        groupbykeys = []
-        for dim in dims:
-            value = d[dim]
-            da = da.assign_coords(**{dim: value})
-            groupbykeys.append(value)
-        # Group in the right dimension
-        set_nested(groupby, groupbykeys, da)
-
-    nd = ndconcat(groupby, dims)
-    nd.coords["dx"] = abs(nd.res[0])
-    nd.coords["dy"] = -abs(nd.res[1])
-    return nd
-
-
-def initialize_groupby(ndims):
-    # In explicit form, say we have ndims=5
-    # Then, writing it out, we get:
-    # a = partial(defaultdict, list)
-    # b = partial(defaultdict, a)
-    # c = partial(defaultdict, b)
-    # d = defaultdict(c)
-    # This can obviously be done iteratively.
-    if ndims == 1:
-        return list()
-    elif ndims == 2:
-        return collections.defaultdict(list)
-    else:
-        d = functools.partial(collections.defaultdict, list)
-        for _ in range(ndims - 2):
-            d = functools.partial(collections.defaultdict, d)
-        return collections.defaultdict(d)
-
-
-def read(path, use_cftime=False, pattern=None):
-    """Read one or more GDAL supported geospatial rasters to a ``xarray.DataArray``.
-    
-    Parameters
-    ----------
-    path : str, Path or list
-        This can be a single file, 'head_l1.tif', a glob pattern expansion,
-        'head_l*.tif', or a list of files, ['head_l1.tif', 'head_l2.tif'].
-        Note that each file needs to be of the same name (part before the
-        first underscore) but have a different layer and/or timestamp,
-        such that they can be combined in a single xarray.DataArray.
-    use_cftime : bool, optional
-        Use ``cftime.DatetimeProlepticGregorian`` instead of `np.datetime64[ns]`
-        for the time axis.
-
-        Dates are normally encoded as ``np.datetime64[ns]``; however, if dates
-        fall before 1678 or after 2261, they are automatically encoded as
-        ``cftime.DatetimeProlepticGregorian`` objects rather than
-        ``np.datetime64[ns]``.
-    pattern : str, regex pattern, optional
-        If the filenames do match default naming conventions of
-        {name}_{time}_l{layer}, a custom pattern can be defined here either
-        as a string, or as a compiled regular expression pattern. See the
-        examples below.
-
-    Returns
-    -------
-    xarray.DataArray
-        A xarray.DataArray of the values in the raster file(s).
-
-    Examples
-    --------
-    Open a GeoTIFF file:
-
-    >>> da = imod.rasterio.read("example.tif")
-
-    Open multiple GeoTIFF files, relying on default naming conventions to identify time:
-
-    >>> head = imod.rasterio.read("head_*_l1.tif")
-
-    The same, this time explicitly specifying ``name``, ``time``, and ``layer``:
-
-    >>> head = imod.rasterio.read("head_2001*_l*.tif", pattern="{name}_{time}_l{layer}")
-
-    The format string pattern will only work on tidy paths, where variables are
-    separated by underscores. You can also pass a compiled regex pattern.
-    Make sure to include the ``re.IGNORECASE`` flag since all paths are lowered.
-
-    >>> import re
-    >>> pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)", re.IGNORECASE)
-    >>> head = imod.rasterio.read("headL11", pattern=pattern)
-
-    However, this requires constructing regular expressions, which is
-    generally a fiddly process. Regex notation is also impossible to
-    remember. The website https://regex101.com is a nice help. Alternatively,
-    the most pragmatic solution may be to just rename your files.
-    """
-    if isinstance(path, list):
-        return _read(path, use_cftime, pattern)
-    elif isinstance(path, pathlib.Path):
-        path = str(path)
-
-    paths = [pathlib.Path(p) for p in glob.glob(path)]
-    n = len(paths)
-    if n == 0:
-        raise FileNotFoundError(f"Could not find any files matching {path}")
-    return _read(paths, use_cftime, pattern)
+    array_IO.writing._save(path, a, nodata, pattern, write)

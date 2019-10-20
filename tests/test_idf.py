@@ -10,6 +10,7 @@ import xarray as xr
 
 from imod import idf
 from imod import util
+from imod import array_IO
 
 
 @pytest.fixture(scope="module")
@@ -262,15 +263,6 @@ def test_saveopen__steady(test_da, tmp_path):
     assert da.identical(steady_layers)
 
 
-def test_to_nan():
-    a = np.array([1.0, 2.000001, np.nan, 4.0])
-    c = idf._to_nan(a, np.nan)
-    assert np.allclose(c, a, equal_nan=True)
-    c = idf._to_nan(a, 2.0)
-    b = np.array([1.0, np.nan, np.nan, 4.0])
-    assert np.allclose(c, b, equal_nan=True)
-
-
 def test_saveopen(test_da, tmp_path):
     idf.save(tmp_path / "test", test_da)
     assert (tmp_path / "test.idf").exists()
@@ -377,7 +369,9 @@ def test_lazy(test_da, tmp_path):
     This does the job of testing whether that function is part the graph.
     """
     idf.save(tmp_path / "test", test_da)
-    a, _ = idf._dask(tmp_path / "test.idf")
+    a, _ = array_IO.reading._dask(
+        tmp_path / "test.idf", _read=idf._read, header=idf.header
+    )
     try:  # dask 2.0
         assert "_read" in str(a.dask.items()[0][1])
     # TODO: Remove when dask 2.0 is commonly installed
@@ -450,42 +444,3 @@ def test_save_topbot__errors(test_layerda, tmp_path):
     da = da.assign_coords(z=("layer", z))
     with pytest.raises(ValueError):
         idf.save(tmp_path / "layer", da)
-
-
-def test_has_dim():
-    t = cftime.DatetimeProlepticGregorian(2019, 2, 28)
-    assert idf._has_dim([t, 2, 3])
-    assert not idf._has_dim([None, None, None])
-    with pytest.raises(ValueError):
-        idf._has_dim([t, 2, None])
-
-
-def test_check_cellsizes():
-    # (h["dx"], h["dy"])
-    a = np.array([1.0, 2.0, 3.0])
-    b = np.array([1.0, 2.000001, 3.0])
-    c = np.array([1.0, 2.1, 3.0])
-    d = np.array([2.0, 2.000001, 2.0])
-    e = np.array([4.0, 5.0, 6.0])
-    f = np.array([4.0, 5.0, 6.0, 7.0])
-    # length one always checks out
-    idf._check_cellsizes([(2.0, 3.0)])
-    # floats only
-    idf._check_cellsizes([(2.0, 3.0), (2.0, 3.0)])
-    idf._check_cellsizes([(2.0, 3.0), (2.000001, 3.0)])
-    # ndarrays only
-    idf._check_cellsizes([(a, e), (a, e)])
-    # different length a and f
-    idf._check_cellsizes([(a, f), (a, f)])
-    idf._check_cellsizes([(a, e), (b, e)])
-    # mix of floats and ndarrays
-    idf._check_cellsizes([(2.0, d)])
-    with pytest.raises(ValueError, match="Cellsizes of IDFs do not match"):
-        # floats only
-        idf._check_cellsizes([(2.0, 3.0), (2.1, 3.0)])
-        # ndarrays only
-        idf._check_cellsizes([(a, e), (c, e)])
-        # mix of floats and ndarrays
-        idf._check_cellsizes([(2.1, d)])
-        # Unequal lengths
-        idf._check_cellsizes([(a, e), (f, e)])
