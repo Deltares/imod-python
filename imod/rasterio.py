@@ -37,7 +37,7 @@ def _limitations(riods, path):
 
 def header(path, pattern):
     attrs = util.decompose(path, pattern)
-    
+
     # TODO:
     # Check bands, datatypes, rotation, etc.
     # Raise NotImplementedErrors and point to xr.open_rasterio

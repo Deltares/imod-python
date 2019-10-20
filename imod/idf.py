@@ -221,7 +221,10 @@ def open(path, use_cftime=False, pattern=None):
 
 
 def _merge_subdomains(pathlists, use_cftime, pattern):
-    das = [array_IO.reading._load(pathlist, use_cftime, pattern, _read, header) for pathlist in pathlists.values()]
+    das = [
+        array_IO.reading._load(pathlist, use_cftime, pattern, _read, header)
+        for pathlist in pathlists.values()
+    ]
     x = np.unique(np.concatenate([da.x.values for da in das]))
     y = np.unique(np.concatenate([da.y.values for da in das]))
 
@@ -413,7 +416,10 @@ def open_dataset(globpath, use_cftime=False, pattern=None):
         d[n].append(p)
 
     # load each group into a DataArray
-    das = [array_IO.reading._load(v, use_cftime, pattern, _read, header) for v in d.values()]
+    das = [
+        array_IO.reading._load(v, use_cftime, pattern, _read, header)
+        for v in d.values()
+    ]
 
     # store each DataArray under it's own name in a dictionary
     dd = collections.OrderedDict()

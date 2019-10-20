@@ -38,7 +38,7 @@ def test_nptimeda():
 
 
 # TODO: decide on functionality, reimplement test
-#def test_rasterio_write_read(test_da, tmp_path):
+# def test_rasterio_write_read(test_da, tmp_path):
 #    imod.rasterio.write(tmp_path / "raster.asc", test_da)
 #    da_back = imod.rasterio.open(tmp_path / "raster.asc")
 #    assert da_back.dims == ("y", "x")

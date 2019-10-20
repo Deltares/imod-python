@@ -379,5 +379,3 @@ def _load(paths, use_cftime, pattern, _read, header):
         dask_array = _ndconcat(dask_arrays, ndim)
 
     return xr.DataArray(dask_array, coords, dims, name=names[0])
-
-
