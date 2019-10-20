@@ -573,8 +573,7 @@ def save(path, a, nodata=1.0e20, pattern=None):
     ----------
     path : str or Path
         Path to the IDF file to be written. This function decides on the
-        actual filename(s) using conventions, so it only takes the directory and
-        name from this parameter.
+        actual filename(s) using conventions.
     a : xarray.DataArray
         DataArray to be written. It needs to have dimensions ('y', 'x'), and
         optionally ``layer`` and ``time``.
@@ -616,4 +615,11 @@ def save(path, a, nodata=1.0e20, pattern=None):
     """
     # Swap coordinates if possible, add "dz" if possible.
     a = _as_voxeldata(a)
+
+    # Deal with path
+    path = pathlib.Path(path)
+
+    if path.suffix == "":
+        path = path.with_suffix(".idf")
+
     array_IO.writing._save(path, a, nodata, pattern, write)

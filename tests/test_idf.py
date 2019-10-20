@@ -247,11 +247,6 @@ def test_xycoords_equidistant_array():
     assert coords["dy"] == -0.5
 
 
-def test_save__error(test_da, tmp_path):
-    with pytest.raises(ValueError):
-        idf.save(tmp_path / "test.idf", test_da)
-
-
 def test_saveopen__steady(test_da, tmp_path):
     first = test_da.copy().assign_coords(layer=1)
     second = test_da.copy().assign_coords(layer=2)

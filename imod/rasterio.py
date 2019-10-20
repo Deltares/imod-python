@@ -24,6 +24,98 @@ from imod import idf, util
 from . import array_IO
 
 
+# Based on this comment
+# https://github.com/mapbox/rasterio/issues/265#issuecomment-367044836
+def _create_ext_driver_code_map():
+    import gdal
+
+    if hasattr(gdal, "DCAP_RASTER"):
+
+        def _check_driver(drv):
+            return drv.GetMetadataItem(gdal.DCAP_RASTER)
+
+    else:
+
+        def _check_driver(drv):
+            return True
+
+    output = {}
+    for i in range(gdal.GetDriverCount()):
+        drv = gdal.GetDriver(i)
+        if _check_driver(drv):
+            if drv.GetMetadataItem(gdal.DCAP_CREATE) or drv.GetMetadataItem(
+                gdal.DCAP_CREATECOPY
+            ):
+                ext = drv.GetMetadataItem(gdal.DMD_EXTENSION)
+                if ext is not None and len(ext) > 0:
+                    output[drv.GetMetadataItem(gdal.DMD_EXTENSION)] = drv.ShortName
+    sortedkeys = sorted(output.keys())
+    output = {k: output[k] for k in sortedkeys}
+    return output
+
+
+# tiff and jpeg keys have been added manually.
+EXTENSION_GDAL_DRIVER_CODE_MAP = {
+    "asc": "AAIGrid",
+    "bag": "BAG",
+    "bil": "EHdr",
+    "blx": "BLX",
+    "bmp": "BMP",
+    "bt": "BT",
+    "dat": "ZMap",
+    "dem": "USGSDEM",
+    "ers": "ERS",
+    "gen": "ADRG",
+    "gif": "GIF",
+    "gpkg": "GPKG",
+    "grd": "NWT_GRD",
+    "gsb": "NTv2",
+    "gtx": "GTX",
+    "hdr": "MFF",
+    "hf2": "HF2",
+    "hgt": "SRTMHGT",
+    "img": "HFA",
+    "jp2": "JP2OpenJPEG",
+    "jpg": "JPEG",
+    "jpeg": "JPEG",
+    "kea": "KEA",
+    "kro": "KRO",
+    "lcp": "LCP",
+    "map": "PCRaster",
+    "mbtiles": "MBTiles",
+    "mrf": "MRF",
+    "nc": "netCDF",
+    "ntf": "NITF",
+    "pdf": "PDF",
+    "pix": "PCIDSK",
+    "png": "PNG",
+    "rda": "R",
+    "rgb": "SGI",
+    "rst": "RST",
+    "rsw": "RMF",
+    "sigdem": "SIGDEM",
+    "sqlite": "Rasterlite",
+    "ter": "Terragen",
+    "tif": "GTiff",
+    "tiff": "GTiff",
+    "vrt": "VRT",
+    "xml": "PDS4",
+    "xpm": "XPM",
+    "xyz": "XYZ",
+}
+
+
+def _get_driver(path):
+    ext = path.suffix.lower()[1:]  # skip the period
+    try:
+        return EXTENSION_GDAL_DRIVER_CODE_MAP[ext]
+    except KeyError:
+        raise ValueError(
+            f'Unknown extension "{ext}", available extensions: '
+            f'{", ".join(EXTENSION_GDAL_DRIVER_CODE_MAP.keys())}'
+        )
+
+
 def _limitations(riods, path):
     if riods.count != 1:
         raise NotImplementedError(
@@ -195,15 +287,8 @@ def write(path, da, driver=None, nodata=np.nan):
     path = pathlib.Path(path)
     profile = da.attrs.copy()
     if driver is None:
-        ext = path.suffix.lower()
-        if ext in (".tif", ".tiff"):
-            driver = "GTiff"
-        elif ext == ".asc":
-            driver = "AAIGrid"
-        elif ext == ".map":
-            driver = "PCRaster"
-        else:
-            raise ValueError(f"Unknown extension {ext}, specifiy driver")
+        driver = _get_driver(path)
+
     # prevent rasterio warnings
     if driver == "AAIGrid":
         profile.pop("res", None)
@@ -222,6 +307,7 @@ def write(path, da, driver=None, nodata=np.nan):
                 profile["PCRASTER_VALUESCALE"] = "VS_BOOLEAN"
             else:
                 profile["PCRASTER_VALUESCALE"] = "VS_SCALAR"
+
     extradims = list(filter(lambda dim: dim not in ("y", "x"), da.dims))
     # TODO only equidistant IDFs are compatible with GDAL / rasterio
     # TODO try squeezing extradims here, such that 1 layer, 1 time, etc. is acccepted
@@ -246,29 +332,27 @@ def write(path, da, driver=None, nodata=np.nan):
             ds.write(dafilled.values, 1)
 
 
-def save(path, a, nodata=1.0e20, pattern=None):
+def save(path, a, nodata=np.nan, pattern=None):
     """
-    Write a xarray.DataArray to one or more IDF files
+    Write a xarray.DataArray to one or more rasterio supported files
 
-    If the DataArray only has ``y`` and ``x`` dimensions, a single IDF file is
-    written, like the ``imod.idf.write`` function. This function is more general
-    and also supports ``time`` and ``layer`` dimensions. It will split these up,
+    If the DataArray only has ``y`` and ``x`` dimensions, a single raster file is
+    written, like the ``imod.rasterio.write`` function. This function is more general
+    and also supports ``time`` and ``layer`` and other dimensions. It will split these up,
     give them their own filename according to the conventions in
     ``imod.util.compose``, and write them each.
 
     Parameters
     ----------
     path : str or Path
-        Path to the IDF file to be written. This function decides on the
+        Path to the raster file to be written. This function decides on the
         actual filename(s) using conventions, so it only takes the directory and
         name from this parameter.
     a : xarray.DataArray
         DataArray to be written. It needs to have dimensions ('y', 'x'), and
         optionally ``layer`` and ``time``.
     nodata : float, optional
-        Nodata value in the saved IDF files. Xarray uses nan values to represent
-        nodata, but these tend to work unreliably in iMOD(FLOW).
-        Defaults to a value of 1.0e20.
+        Nodata value in the saved raster files. Defaults to a value of nan.
     pattern : str
         Format string which defines how to create the filenames. See examples.
 
@@ -279,8 +363,8 @@ def save(path, a, nodata=1.0e20, pattern=None):
 
         save('path/to/head', da)
 
-    This writes the following two IDF files: 'path/to/head_l1.idf' and
-    'path/to/head_l2.idf'.
+    This writes the following two tif files: 'path/to/head_l1.tif' and
+    'path/to/head_l2.tif'.
 
 
     It is possible to generate custom filenames using a format string. The
@@ -301,4 +385,16 @@ def save(path, a, nodata=1.0e20, pattern=None):
         "{name}_{time:%Y-%m-%d}_l{layer}{extension}"
 
     """
-    array_IO.writing._save(path, a, nodata, pattern, write)
+    path = pathlib.Path(path)
+    # defaults to geotiff
+    if path.suffix == "":
+        driver = "GTiff"
+    else:
+        driver = _get_driver(path)
+
+    # Use a closure to skip the driver argument
+    # so it takes the same arguments as the idf write
+    def _write(path, a, nodata):
+        return write(path, a, driver, nodata)
+
+    array_IO.writing._save(path, a, nodata, pattern, _write)
