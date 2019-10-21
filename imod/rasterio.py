@@ -137,9 +137,9 @@ def header(path, pattern):
         _limitations(riods, path)
         nrow = riods.height
         ncol = riods.width
-        dx, xmin, _, _, dy, ymax = tuple(riods.transform[:6])
-        xmax = xmin + ncol * dx
-        ymin = ymax + nrow * dy
+        xmin, ymin, xmax, ymax = riods.bounds
+        dx = riods.transform[0]
+        dy = riods.transform[4]
         attrs["nodata"] = riods.nodata
 
     attrs["nrow"] = nrow
@@ -154,10 +154,10 @@ def header(path, pattern):
     return attrs
 
 
-def _read(path, *args):
+def _read(path, headersize, nrow, ncol, nodata):
     with rasterio.open(path, "r") as dataset:
         a = dataset.read(1)
-    return a
+    return array_IO.reading._to_nan(a, nodata)
 
 
 # Open IDFs for multiple times and/or layers into one DataArray
