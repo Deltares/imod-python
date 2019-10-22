@@ -12,6 +12,7 @@ import itertools
 import pathlib
 import re
 import struct
+import warnings
 
 import dask
 import numpy as np
@@ -133,6 +134,11 @@ def read(path, pattern=None):
     dict
         A dict with all metadata.
     """
+    warnings.warn(
+        "The idf.read() function is deprecated. To get a numpy array of an IDF, "
+        "use instead: imod.idf.open(path).values",
+        FutureWarning,
+    )
     attrs = header(path, pattern)
     headersize = attrs.pop("headersize")
     nrow = attrs.pop("nrow")
