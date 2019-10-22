@@ -21,7 +21,7 @@ except ImportError:
 
 import imod
 from imod import idf, util
-from . import array_IO
+from . import array_io
 
 
 # Based on this comment
@@ -157,7 +157,7 @@ def header(path, pattern):
 def _read(path, headersize, nrow, ncol, nodata):
     with rasterio.open(path, "r") as dataset:
         a = dataset.read(1)
-    return array_IO.reading._to_nan(a, nodata)
+    return array_io.reading._to_nan(a, nodata)
 
 
 # Open IDFs for multiple times and/or layers into one DataArray
@@ -239,7 +239,7 @@ def open(path, use_cftime=False, pattern=None):
     """
 
     if isinstance(path, list):
-        return array_IO.reading._load(path, use_cftime, pattern, _read, header)
+        return array_io.reading._load(path, use_cftime, pattern, _read, header)
     elif isinstance(path, pathlib.Path):
         path = str(path)
 
@@ -247,7 +247,7 @@ def open(path, use_cftime=False, pattern=None):
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
-    return array_IO.reading._load(paths, use_cftime, pattern, _read, header)
+    return array_io.reading._load(paths, use_cftime, pattern, _read, header)
 
 
 def write(path, da, driver=None, nodata=np.nan):
@@ -397,4 +397,4 @@ def save(path, a, nodata=np.nan, pattern=None):
     def _write(path, a, nodata):
         return write(path, a, driver, nodata)
 
-    array_IO.writing._save(path, a, nodata, pattern, _write)
+    array_io.writing._save(path, a, nodata, pattern, _write)

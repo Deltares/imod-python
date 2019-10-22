@@ -18,7 +18,7 @@ import numpy as np
 import xarray as xr
 
 from imod import util
-from . import array_IO
+from . import array_io
 
 # Make sure we can still use the built-in function...
 f_open = open
@@ -96,7 +96,7 @@ def _read(path, headersize, nrow, ncol, nodata):
     with f_open(path, "rb") as f:
         f.seek(headersize)
         a = np.reshape(np.fromfile(f, np.float32, nrow * ncol), (nrow, ncol))
-    return array_IO.reading._to_nan(a, nodata)
+    return array_io.reading._to_nan(a, nodata)
 
 
 def read(path, pattern=None):
@@ -209,7 +209,7 @@ def open(path, use_cftime=False, pattern=None):
     """
 
     if isinstance(path, list):
-        return array_IO.reading._load(path, use_cftime, pattern, _read, header)
+        return array_io.reading._load(path, use_cftime, pattern, _read, header)
     elif isinstance(path, pathlib.Path):
         path = str(path)
 
@@ -217,12 +217,12 @@ def open(path, use_cftime=False, pattern=None):
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
-    return array_IO.reading._load(paths, use_cftime, pattern, _read, header)
+    return array_io.reading._load(paths, use_cftime, pattern, _read, header)
 
 
 def _merge_subdomains(pathlists, use_cftime, pattern):
     das = [
-        array_IO.reading._load(pathlist, use_cftime, pattern, _read, header)
+        array_io.reading._load(pathlist, use_cftime, pattern, _read, header)
         for pathlist in pathlists.values()
     ]
     x = np.unique(np.concatenate([da.x.values for da in das]))
@@ -417,7 +417,7 @@ def open_dataset(globpath, use_cftime=False, pattern=None):
 
     # load each group into a DataArray
     das = [
-        array_IO.reading._load(v, use_cftime, pattern, _read, header)
+        array_io.reading._load(v, use_cftime, pattern, _read, header)
         for v in d.values()
     ]
 
@@ -622,4 +622,4 @@ def save(path, a, nodata=1.0e20, pattern=None):
     if path.suffix == "":
         path = path.with_suffix(".idf")
 
-    array_IO.writing._save(path, a, nodata, pattern, write)
+    array_io.writing._save(path, a, nodata, pattern, write)

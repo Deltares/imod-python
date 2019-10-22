@@ -10,7 +10,7 @@ import xarray as xr
 
 from imod import idf
 from imod import util
-from imod import array_IO
+from imod import array_io
 
 
 @pytest.fixture(scope="module")
@@ -364,7 +364,7 @@ def test_lazy(test_da, tmp_path):
     This does the job of testing whether that function is part the graph.
     """
     idf.save(tmp_path / "test", test_da)
-    a, _ = array_IO.reading._dask(
+    a, _ = array_io.reading._dask(
         tmp_path / "test.idf", _read=idf._read, header=idf.header
     )
     try:  # dask 2.0

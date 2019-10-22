@@ -2,7 +2,7 @@ import cftime
 import numpy as np
 import pytest
 
-from imod.array_IO import reading
+from imod.array_io import reading
 
 
 def test_to_nan():
