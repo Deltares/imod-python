@@ -325,13 +325,19 @@ def _dask(path, attrs=None, pattern=None, _read=None, header=None):
     headersize = attrs.pop("headersize")
     nrow = attrs["nrow"]
     ncol = attrs["ncol"]
-    nodata = attrs.pop("nodata")
+    dtype = attrs["dtype"]
+    # In case of floating point data, nodata is always represented by nan.
+    if "float" in dtype:
+        nodata = attrs.pop("nodata")
+    else:
+        nodata = attrs["nodata"]
+
     # Dask delayed caches the input arguments. If the working directory changes
     # before .compute(), the file cannot be found if the path is relative.
     abspath = path.resolve()
     # dask.delayed requires currying
-    a = dask.delayed(_read)(abspath, headersize, nrow, ncol, nodata)
-    x = dask.array.from_delayed(a, shape=(nrow, ncol), dtype=np.float32)
+    a = dask.delayed(_read)(abspath, headersize, nrow, ncol, nodata, dtype)
+    x = dask.array.from_delayed(a, shape=(nrow, ncol), dtype=dtype)
     return x, attrs
 
 
@@ -378,4 +384,11 @@ def _load(paths, use_cftime, pattern, _read, header):
         dask_arrays = _sorteddict(groupby)
         dask_array = _ndconcat(dask_arrays, ndim)
 
-    return xr.DataArray(dask_array, coords, dims, name=names[0])
+    out = xr.DataArray(dask_array, coords, dims, name=names[0])
+
+    first_attrs = headers[0]
+    out.attrs["crs"] = first_attrs["crs"]
+    if "nodata" in first_attrs:
+        out.attrs["nodata"] = first_attrs["nodata"]
+
+    return out

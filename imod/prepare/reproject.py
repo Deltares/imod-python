@@ -23,9 +23,8 @@ def _reproject_dst(source, src_crs, dst_crs, src_transform):
         src_crs, dst_crs, src_width, src_height, *bounds
     )
     # from: http://xarray.pydata.org/en/stable/generated/xarray.open_rasterio.html
-    x, y = (
-        np.meshgrid(np.arange(dst_width) + 0.5, np.arange(dst_height) + 0.5)
-        * dst_transform
+    x, y = dst_transform * np.meshgrid(
+        np.arange(dst_width) + 0.5, np.arange(dst_height) + 0.5
     )
     dst = xr.DataArray(
         data=np.zeros((dst_height, dst_width), source.dtype),

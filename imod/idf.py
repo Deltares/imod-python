@@ -29,18 +29,27 @@ def header(path, pattern):
     attrs = util.decompose(path, pattern)
     with f_open(path, "rb") as f:
         reclen_id = struct.unpack("i", f.read(4))[0]  # Lahey RecordLength Ident.
-        if reclen_id != 1271:
+        if reclen_id == 1271:
+            floatsize = 4
+            floatformat = "f"
+            dtype = "float32"
+        elif reclen_id == 2296:
+            floatsize = 8
+            floatformat = "d"
+            dtype = "float64"
+        else:
             raise ValueError(f"Not a supported IDF file: {path}")
+
         ncol = struct.unpack("i", f.read(4))[0]
         nrow = struct.unpack("i", f.read(4))[0]
-        attrs["xmin"] = struct.unpack("f", f.read(4))[0]
-        attrs["xmax"] = struct.unpack("f", f.read(4))[0]
-        attrs["ymin"] = struct.unpack("f", f.read(4))[0]
-        attrs["ymax"] = struct.unpack("f", f.read(4))[0]
+        attrs["xmin"] = struct.unpack(floatformat, f.read(floatsize))[0]
+        attrs["xmax"] = struct.unpack(floatformat, f.read(floatsize))[0]
+        attrs["ymin"] = struct.unpack(floatformat, f.read(floatsize))[0]
+        attrs["ymax"] = struct.unpack(floatformat, f.read(floatsize))[0]
         # dmin and dmax are recomputed during writing
-        f.read(4)  # dmin, minimum data value present
-        f.read(4)  # dmax, maximum data value present
-        nodata = struct.unpack("f", f.read(4))[0]
+        f.read(floatsize)  # dmin, minimum data value present
+        f.read(floatsize)  # dmax, maximum data value present
+        nodata = struct.unpack(floatformat, f.read(floatsize))[0]
         attrs["nodata"] = nodata
         # flip definition here such that True means equidistant
         # equidistant IDFs
@@ -51,28 +60,30 @@ def header(path, pattern):
         if ieq:
             # dx and dy are stored positively in the IDF
             # dy is made negative here to be consistent with the nonequidistant case
-            attrs["dx"] = struct.unpack("f", f.read(4))[0]
-            attrs["dy"] = -struct.unpack("f", f.read(4))[0]
+            attrs["dx"] = struct.unpack(floatformat, f.read(floatsize))[0]
+            attrs["dy"] = -struct.unpack(floatformat, f.read(floatsize))[0]
 
         if itb:
-            attrs["top"] = struct.unpack("f", f.read(4))[0]
-            attrs["bot"] = struct.unpack("f", f.read(4))[0]
+            attrs["top"] = struct.unpack(floatformat, f.read(floatsize))[0]
+            attrs["bot"] = struct.unpack(floatformat, f.read(floatsize))[0]
 
         if not ieq:
             # dx and dy are stored positive in the IDF, but since the difference between
             # successive y coordinates is negative, it is made negative here
-            attrs["dx"] = np.fromfile(f, np.float32, ncol)
-            attrs["dy"] = -np.fromfile(f, np.float32, nrow)
+            attrs["dx"] = np.fromfile(f, dtype, ncol)
+            attrs["dy"] = -np.fromfile(f, dtype, nrow)
 
         # These are derived, remove after using them downstream
         attrs["headersize"] = f.tell()
         attrs["ncol"] = ncol
         attrs["nrow"] = nrow
+        attrs["dtype"] = dtype
+        attrs["crs"] = None
 
     return attrs
 
 
-def _read(path, headersize, nrow, ncol, nodata):
+def _read(path, headersize, nrow, ncol, nodata, dtype):
     """
     Read a single IDF file to a numpy.ndarray
 
@@ -84,18 +95,18 @@ def _read(path, headersize, nrow, ncol, nodata):
         byte size of header
     nrow : int
     ncol : int
-    nodata : np.float32
+    nodata : np.float
 
     Returns
     -------
     numpy.ndarray
-        A float32 numpy.ndarray with shape (nrow, ncol) of the values
+        A float numpy.ndarray with shape (nrow, ncol) of the values
         in the IDF file. On opening all nodata values are changed
         to NaN in the numpy.ndarray.
     """
     with f_open(path, "rb") as f:
         f.seek(headersize)
-        a = np.reshape(np.fromfile(f, np.float32, nrow * ncol), (nrow, ncol))
+        a = np.reshape(np.fromfile(f, dtype, nrow * ncol), (nrow, ncol))
     return array_io.reading._to_nan(a, nodata)
 
 
@@ -116,7 +127,7 @@ def read(path, pattern=None):
     Returns
     -------
     numpy.ndarray
-        A float32 numpy.ndarray with shape (nrow, ncol) of the values
+        A float numpy.ndarray with shape (nrow, ncol) of the values
         in the IDF file. On opening all nodata values are changed
         to NaN in the numpy.ndarray.
     dict
@@ -127,7 +138,8 @@ def read(path, pattern=None):
     nrow = attrs.pop("nrow")
     ncol = attrs.pop("ncol")
     nodata = attrs.pop("nodata")
-    return _read(path, headersize, nrow, ncol, nodata), attrs
+    dtype = attrs.pop("dtype")
+    return _read(path, headersize, nrow, ncol, nodata, dtype), attrs
 
 
 # Open IDFs for multiple times and/or layers into one DataArray
@@ -165,7 +177,7 @@ def open(path, use_cftime=False, pattern=None):
     Returns
     -------
     xarray.DataArray
-        A float32 xarray.DataArray of the values in the IDF file(s).
+        A float xarray.DataArray of the values in the IDF file(s).
         All metadata needed for writing the file to IDF or other formats
         using imod.rasterio are included in the xarray.DataArray.attrs.
 
@@ -335,10 +347,11 @@ def open_subdomains(path, use_cftime=False):
 
     # Collect and merge data
     merged = []
+    dtype = headers[0]["dtype"]
     for group in grouped_by_time.values():
         # Build a single array per timestep
         timestep_data = dask.delayed(_merge_subdomains)(group, use_cftime, pattern)
-        dask_array = dask.array.from_delayed(timestep_data, shape, dtype=np.float32)
+        dask_array = dask.array.from_delayed(timestep_data, shape, dtype=dtype)
         merged.append(dask_array)
     data = dask.array.concatenate(merged, axis=0)
 
@@ -390,7 +403,7 @@ def open_dataset(globpath, use_cftime=False, pattern=None):
 
     Returns
     -------
-    collections.OrderedDict
+    dictionary
         Dictionary of str (parameter name) to xarray.DataArray.
         All metadata needed for writing the file to IDF or other formats
         using imod.rasterio are included in the xarray.DataArray.attrs.
@@ -409,7 +422,7 @@ def open_dataset(globpath, use_cftime=False, pattern=None):
     # note that directory names are ignored, and in case of duplicates, the last one wins
     names = [util.decompose(path, pattern)["name"] for path in paths]
     unique_names = list(np.unique(names))
-    d = collections.OrderedDict()
+    d = {}
     for n in unique_names:
         d[n] = []  # prepare empty lists to append to
     for p, n in zip(paths, names):
@@ -422,9 +435,7 @@ def open_dataset(globpath, use_cftime=False, pattern=None):
     ]
 
     # store each DataArray under it's own name in a dictionary
-    dd = collections.OrderedDict()
-    for da in das:
-        dd[da.name] = da
+    dd = {da.name: da for da in das}
     # Initially I wanted to return a xarray Dataset here,
     # but then realised that it is not always aligned, and therefore not possible, see
     # https://github.com/pydata/xarray/issues/1471#issuecomment-313719395
@@ -455,8 +466,23 @@ def write(path, a, nodata=1.0e20):
     if not a.dims == ("y", "x"):
         raise ValueError("Dimensions must be exactly ('y', 'x').")
 
+    if a.dtype == np.float64:
+        reclenid = 2296
+        floatsize = 8
+        floatformat = "d"
+        a = a.fillna(nodata)
+    else:  # Default to 32 bit otherwise
+        reclenid = 1271
+        floatsize = 4
+        floatformat = "f"
+        # Only fillna if data can contain na values
+        if a.dtype != np.float32:
+            a = a.astype(np.float32)
+        else:
+            a = a.fillna(nodata)
+
     with f_open(path, "wb") as f:
-        f.write(struct.pack("i", 1271))  # Lahey RecordLength Ident.
+        f.write(struct.pack("i", reclenid))  # Lahey RecordLength Ident.
         nrow = a.y.size
         ncol = a.x.size
         f.write(struct.pack("i", ncol))
@@ -468,13 +494,13 @@ def write(path, a, nodata=1.0e20):
         if (np.atleast_1d(dy) > 0.0).all():
             raise ValueError("dy must be negative")
 
-        f.write(struct.pack("f", xmin))
-        f.write(struct.pack("f", xmax))
-        f.write(struct.pack("f", ymin))
-        f.write(struct.pack("f", ymax))
-        f.write(struct.pack("f", float(a.min())))  # dmin
-        f.write(struct.pack("f", float(a.max())))  # dmax
-        f.write(struct.pack("f", nodata))
+        f.write(struct.pack(floatformat, xmin))
+        f.write(struct.pack(floatformat, xmax))
+        f.write(struct.pack(floatformat, ymin))
+        f.write(struct.pack(floatformat, ymax))
+        f.write(struct.pack(floatformat, float(a.min())))  # dmin
+        f.write(struct.pack(floatformat, float(a.max())))  # dmax
+        f.write(struct.pack(floatformat, nodata))
 
         if isinstance(dx, float) and isinstance(dy, float):
             ieq = True  # equidistant
@@ -497,18 +523,14 @@ def write(path, a, nodata=1.0e20):
         f.write(struct.pack("?", itb))
         f.write(struct.pack("xx"))  # not used
         if ieq:
-            f.write(struct.pack("f", dx))
-            f.write(struct.pack("f", -dy))
+            f.write(struct.pack(floatformat, dx))
+            f.write(struct.pack(floatformat, -dy))
         if itb:
-            f.write(struct.pack("f", top))
-            f.write(struct.pack("f", bot))
+            f.write(struct.pack(floatformat, top))
+            f.write(struct.pack(floatformat, bot))
         if not ieq:
-            a.coords["dx"].values.astype(np.float32).tofile(f)
-            (-a.coords["dy"].values).astype(np.float32).tofile(f)
-        # convert to a numpy.ndarray of float32
-        if a.dtype != np.float32:
-            a = a.astype(np.float32)
-        a = a.fillna(nodata)
+            a.coords["dx"].values.astype(a.dtype).tofile(f)
+            (-a.coords["dy"].values).astype(a.dtype).tofile(f)
         a.values.tofile(f)
 
 

@@ -131,21 +131,19 @@ def header(path, pattern):
     attrs = util.decompose(path, pattern)
 
     # TODO:
-    # Check bands, datatypes, rotation, etc.
+    # Check bands, rotation, etc.
     # Raise NotImplementedErrors and point to xr.open_rasterio
     with rasterio.open(path, "r") as riods:
         _limitations(riods, path)
-        nrow = riods.height
-        ncol = riods.width
+        attrs["nrow"] = riods.height
+        attrs["ncol"] = riods.width
         xmin, ymin, xmax, ymax = riods.bounds
-        dx = riods.transform[0]
-        dy = riods.transform[4]
+        attrs["dx"] = riods.transform[0]
+        attrs["dy"] = riods.transform[4]
         attrs["nodata"] = riods.nodata
+        attrs["dtype"] = riods.dtypes[0]
+        attrs["crs"] = riods.crs
 
-    attrs["nrow"] = nrow
-    attrs["ncol"] = ncol
-    attrs["dx"] = dx
-    attrs["dy"] = dy
     attrs["xmin"] = xmin
     attrs["xmax"] = xmax
     attrs["ymin"] = ymin
@@ -154,27 +152,29 @@ def header(path, pattern):
     return attrs
 
 
-def _read(path, headersize, nrow, ncol, nodata):
+def _read(path, headersize, nrow, ncol, nodata, dtype):
     with rasterio.open(path, "r") as dataset:
         a = dataset.read(1)
-    return array_io.reading._to_nan(a, nodata)
+    if (a.dtype == np.float64) or (a.dtype == np.float32):
+        return array_io.reading._to_nan(a, nodata)
+    else:
+        return a
 
 
-# Open IDFs for multiple times and/or layers into one DataArray
 def open(path, use_cftime=False, pattern=None):
     r"""
-    Open one or more IDF files as an xarray.DataArray.
+    Open one or more GDAL supported raster files as an xarray.DataArray.
 
-    In accordance with xarray's design, ``open`` loads the data of IDF files
-    lazily. This means the data of the IDFs are not loaded into memory until the
+    In accordance with xarray's design, ``open`` loads the data of the files
+    lazily. This means the data of the rasters are not loaded into memory until the
     data is needed. This allows for easier handling of large datasets, and
     more efficient computations.
 
     Parameters
     ----------
     path : str, Path or list
-        This can be a single file, 'head_l1.idf', a glob pattern expansion,
-        'head_l*.idf', or a list of files, ['head_l1.idf', 'head_l2.idf'].
+        This can be a single file, 'head_l1.tif', a glob pattern expansion,
+        'head_l*.tif', or a list of files, ['head_l1.tif', 'head_l2.tif'].
         Note that each file needs to be of the same name (part before the
         first underscore) but have a different layer and/or timestamp,
         such that they can be combined in a single xarray.DataArray.
@@ -195,34 +195,34 @@ def open(path, use_cftime=False, pattern=None):
     Returns
     -------
     xarray.DataArray
-        A float32 xarray.DataArray of the values in the IDF file(s).
-        All metadata needed for writing the file to IDF or other formats
+        A float32 xarray.DataArray of the values in the raster file(s).
+        All metadata needed for writing the file to raster or other formats
         using imod.rasterio are included in the xarray.DataArray.attrs.
 
     Examples
     --------
-    Open an IDF file:
+    Open a raster file:
 
-    >>> da = imod.idf.open("example.idf")
+    >>> da = imod.rasterio.open("example.tif")
 
-    Open an IDF file, relying on default naming conventions to identify
+    Open a raster file, relying on default naming conventions to identify
     layer:
 
-    >>> da = imod.idf.open("example_l1.idf")
+    >>> da = imod.rasterio.open("example_l1.tif")
 
     Open an IDF file, relying on default naming conventions to identify layer
     and time:
 
-    >>> head = imod.idf.open("head_20010101_l1.idf")
+    >>> head = imod.rasterio.open("head_20010101_l1.tif")
 
-    Open multiple IDF files, in this case files for the year 2001 for all
+    Open multiple files, in this case files for the year 2001 for all
     layers, again relying on default conventions for naming:
 
-    >>> head = imod.idf.open("head_2001*_l*.idf")
+    >>> head = imod.rasterio.open("head_2001*_l*.tif")
 
     The same, this time explicitly specifying ``name``, ``time``, and ``layer``:
 
-    >>> head = imod.idf.open("head_2001*_l*.idf", pattern="{name}_{time}_l{layer}")
+    >>> head = imod.rasterio.open("head_2001*_l*.tif", pattern="{name}_{time}_l{layer}")
 
     The format string pattern will only work on tidy paths, where variables are
     separated by underscores. You can also pass a compiled regex pattern.
@@ -289,11 +289,7 @@ def write(path, da, driver=None, nodata=np.nan):
     if driver is None:
         driver = _get_driver(path)
 
-    # prevent rasterio warnings
-    if driver == "AAIGrid":
-        profile.pop("res", None)
-        profile.pop("is_tiled", None)
-    elif driver == "PCRaster":
+    if driver == "PCRaster":
         if da.dtype == "float64":
             da = da.astype("float32")
         elif da.dtype == "int64":
@@ -332,7 +328,7 @@ def write(path, da, driver=None, nodata=np.nan):
             ds.write(dafilled.values, 1)
 
 
-def save(path, a, nodata=np.nan, pattern=None):
+def save(path, a, driver=None, nodata=np.nan, pattern=None):
     """
     Write a xarray.DataArray to one or more rasterio supported files
 
@@ -351,6 +347,10 @@ def save(path, a, nodata=np.nan, pattern=None):
     a : xarray.DataArray
         DataArray to be written. It needs to have dimensions ('y', 'x'), and
         optionally ``layer`` and ``time``.
+    driver: str, optional
+        Which GDAL format driver to use. The complete list is at
+        https://gdal.org/drivers/raster/index.html.
+        By default tries to guess from the file extension.
     nodata : float, optional
         Nodata value in the saved raster files. Defaults to a value of nan.
     pattern : str
@@ -387,10 +387,12 @@ def save(path, a, nodata=np.nan, pattern=None):
     """
     path = pathlib.Path(path)
     # defaults to geotiff
-    if path.suffix == "":
-        driver = "GTiff"
-    else:
-        driver = _get_driver(path)
+    if driver is None:
+        if path.suffix == "":
+            path = path.with_suffix(".tif")
+            driver = "GTiff"
+        else:
+            driver = _get_driver(path)
 
     # Use a closure to skip the driver argument
     # so it takes the same arguments as the idf write
