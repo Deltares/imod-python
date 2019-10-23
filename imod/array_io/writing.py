@@ -6,7 +6,7 @@ import xarray as xr
 from imod import util
 
 
-def _write_chunks(a, pattern, d, nodata, write):
+def _write_chunks(a, pattern, d, nodata, dtype, write):
     """
     This function writes one chunk of the DataArray 'a' at a time. This is
     necessary to avoid heavily sub-optimal scheduling by xarray/dask when
@@ -39,10 +39,10 @@ def _write_chunks(a, pattern, d, nodata, write):
                 # set the right layer/timestep/etc in the dict to make the filename
                 d.update(dict(zip(extradims, coordvals)))
                 fn = util.compose(d, pattern)
-                write(fn, a_yx, nodata)
+                write(fn, a_yx, nodata, dtype)
         else:
             fn = util.compose(d, pattern)
-            write(fn, a, nodata)
+            write(fn, a, nodata, dtype)
     else:  # recursive case
         chunksizes = a.chunks[0]
         start = 0
@@ -50,11 +50,11 @@ def _write_chunks(a, pattern, d, nodata, write):
             end = start + chunksize
             b = a.isel({dim: slice(start, end)})
             # Recurse
-            _write_chunks(b, pattern, d, nodata, write)
+            _write_chunks(b, pattern, d, nodata, dtype, write)
             start = end
 
 
-def _save(path, a, nodata, pattern, write):
+def _save(path, a, nodata, pattern, dtype, write):
     """
     Write a xarray.DataArray to one or more IDF files
 
@@ -111,4 +111,4 @@ def _save(path, a, nodata, pattern, write):
 
     # stack all non idf dims into one new idf dimension,
     # over which we can then iterate to write all individual idfs
-    _write_chunks(a, pattern, d, nodata, write)
+    _write_chunks(a, pattern, d, nodata, dtype, write)

@@ -222,3 +222,23 @@ def test_save_topbot__errors(test_layerda, tmp_path):
     da = da.assign_coords(z=("layer", z))
     with pytest.raises(ValueError):
         idf.save(tmp_path / "layer", da)
+
+
+def test_saveopen_dtype(test_da, tmp_path):
+    da = test_da
+    idf.save(tmp_path / "dtype", da, dtype=np.float32)
+    backda = idf.open(tmp_path / "dtype.idf")
+    assert backda.dtype == np.float32
+
+    idf.save(tmp_path / "dtype", da, dtype=np.float64)
+    backda = idf.open(tmp_path / "dtype.idf")
+    assert backda.dtype == np.float64
+
+
+def test_dtype_error(test_da, tmp_path):
+    da = test_da
+    with pytest.raises(ValueError):
+        idf.save(tmp_path / "integer", da, dtype=np.int32)
+
+    with pytest.raises(ValueError):
+        idf.write(tmp_path / "integer.idf", da, dtype=np.int32)

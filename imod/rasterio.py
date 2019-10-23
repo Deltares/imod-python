@@ -155,6 +155,11 @@ def header(path, pattern):
 def _read(path, headersize, nrow, ncol, nodata, dtype):
     with rasterio.open(path, "r") as dataset:
         a = dataset.read(1)
+
+    # None signifies no replacement; skip if nodata already is nan
+    if (nodata is None) or np.isnan(nodata):
+        return a
+    # Only set nodata to nan if the dtype supports it
     if (a.dtype == np.float64) or (a.dtype == np.float32):
         return array_io.reading._to_nan(a, nodata)
     else:
@@ -250,7 +255,7 @@ def open(path, use_cftime=False, pattern=None):
     return array_io.reading._load(paths, use_cftime, pattern, _read, header)
 
 
-def write(path, da, driver=None, nodata=np.nan):
+def write(path, da, driver=None, nodata=np.nan, dtype=None):
     """Write ``xarray.DataArray`` to GDAL supported geospatial rasters using ``rasterio``.
     
     Parameters
@@ -289,6 +294,21 @@ def write(path, da, driver=None, nodata=np.nan):
     if driver is None:
         driver = _get_driver(path)
 
+    # Only try to fill data that can contains nan's
+    # Do this before casting to another type!
+    ignore_nodata = (nodata is None) or np.isnan(nodata)
+    if not ignore_nodata:
+        if (da.dtype == np.float32) or (da.dtype == np.float64):
+            # NaN is the default missing value in xarray
+            # None is different in that the raster won't have a nodata value
+            da = da.fillna(nodata)
+
+    # Cast to dtype if dtype is given
+    if dtype is not None:
+        if da.dtype != dtype:
+            da = da.astype(dtype)
+
+    # Cast to supported pcraster dtypes
     if driver == "PCRaster":
         if da.dtype == "float64":
             da = da.astype("float32")
@@ -317,18 +337,12 @@ def write(path, da, driver=None, nodata=np.nan):
     profile["count"] = 1
     profile["dtype"] = da.dtype
     profile["nodata"] = nodata
-    if (nodata is None) or np.isnan(nodata):
-        # NaN is the default missing value in xarray
-        # None is different in that the raster won't have a nodata value
-        dafilled = da
-    else:
-        dafilled = da.fillna(nodata)
     with rasterio.Env():
         with rasterio.open(path, "w", **profile) as ds:
-            ds.write(dafilled.values, 1)
+            ds.write(da.values, 1)
 
 
-def save(path, a, driver=None, nodata=np.nan, pattern=None):
+def save(path, a, driver=None, nodata=np.nan, pattern=None, dtype=None):
     """
     Write a xarray.DataArray to one or more rasterio supported files
 
@@ -396,7 +410,7 @@ def save(path, a, driver=None, nodata=np.nan, pattern=None):
 
     # Use a closure to skip the driver argument
     # so it takes the same arguments as the idf write
-    def _write(path, a, nodata):
-        return write(path, a, driver, nodata)
+    def _write(path, a, nodata, dtype):
+        return write(path, a, driver, nodata, dtype)
 
-    array_io.writing._save(path, a, nodata, pattern, _write)
+    array_io.writing._save(path, a, nodata, pattern, dtype, _write)

@@ -464,7 +464,7 @@ def open_dataset(globpath, use_cftime=False, pattern=None):
     return dd
 
 
-def write(path, a, nodata=1.0e20):
+def write(path, a, nodata=1.0e20, dtype=np.float32):
     """
     Write a 2D xarray.DataArray to a IDF file
 
@@ -488,24 +488,30 @@ def write(path, a, nodata=1.0e20):
     # Header is fully doubled in size in case of double precision ...
     # This means integers are also turned into 8 bytes
     # and requires padding with some additional bytes
-    if a.dtype == np.float64:
+    if dtype == np.float64:
+        if not a.dtype == np.float64:
+            a = a.astype(np.float64)
+        # Only fillna if data can contain na values
+        else:
+            a = a.fillna(nodata)
         reclenid = 2296
         floatsize = 8
         floatformat = "d"
         intformat = "q"
         doubleprecision = True
-        a = a.fillna(nodata)
-    else:  # Default to 32 bit otherwise
+    elif dtype == np.float32:
         reclenid = 1271
         floatsize = 4
         floatformat = "f"
         intformat = "i"
         doubleprecision = False
-        # Only fillna if data can contain na values
         if a.dtype != np.float32:
             a = a.astype(np.float32)
+        # Only fillna if data can contain na values
         else:
             a = a.fillna(nodata)
+    else:
+        raise ValueError("Invalid dtype, IDF allows only np.float32 and np.float64")
 
     with f_open(path, "wb") as f:
         f.write(struct.pack("i", reclenid))  # Lahey RecordLength Ident.
@@ -612,7 +618,7 @@ def _as_voxeldata(a):
     return a
 
 
-def save(path, a, nodata=1.0e20, pattern=None):
+def save(path, a, nodata=1.0e20, pattern=None, dtype=np.float32):
     """
     Write a xarray.DataArray to one or more IDF files
 
@@ -666,6 +672,11 @@ def save(path, a, nodata=1.0e20, pattern=None):
         "{name}_{time:%Y-%m-%d}_l{layer}{extension}"
 
     """
+
+    # Cast datatype if necessary
+    if dtype not in (np.float32, np.float64):
+        raise ValueError("Invalid dtype, IDF allows only np.float32 and np.float64")
+
     # Swap coordinates if possible, add "dz" if possible.
     a = _as_voxeldata(a)
 
@@ -675,4 +686,4 @@ def save(path, a, nodata=1.0e20, pattern=None):
     if path.suffix == "":
         path = path.with_suffix(".idf")
 
-    array_io.writing._save(path, a, nodata, pattern, write)
+    array_io.writing._save(path, a, nodata, pattern, dtype, write)
