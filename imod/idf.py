@@ -31,18 +31,28 @@ def header(path, pattern):
     with f_open(path, "rb") as f:
         reclen_id = struct.unpack("i", f.read(4))[0]  # Lahey RecordLength Ident.
         if reclen_id == 1271:
-            floatsize = 4
+            floatsize = intsize = 4
             floatformat = "f"
+            intformat = "i"
             dtype = "float32"
+            doubleprecision = False
         elif reclen_id == 2296:
-            floatsize = 8
+            floatsize = intsize = 8
             floatformat = "d"
+            intformat = "q"
             dtype = "float64"
+            doubleprecision = True
         else:
             raise ValueError(f"Not a supported IDF file: {path}")
 
-        ncol = struct.unpack("i", f.read(4))[0]
-        nrow = struct.unpack("i", f.read(4))[0]
+        # Header is fully doubled in size in case of double precision ...
+        # This means integers are also turned into 8 bytes
+        # and requires padding with some additional bytes
+        if doubleprecision:
+            f.read(4)  # not used
+
+        ncol = struct.unpack(intformat, f.read(intsize))[0]
+        nrow = struct.unpack(intformat, f.read(intsize))[0]
         attrs["xmin"] = struct.unpack(floatformat, f.read(floatsize))[0]
         attrs["xmax"] = struct.unpack(floatformat, f.read(floatsize))[0]
         attrs["ymin"] = struct.unpack(floatformat, f.read(floatsize))[0]
@@ -56,7 +66,10 @@ def header(path, pattern):
         # equidistant IDFs
         ieq = not struct.unpack("?", f.read(1))[0]
         itb = struct.unpack("?", f.read(1))[0]
+
         f.read(2)  # not used
+        if doubleprecision:
+            f.read(4)  # not used
 
         if ieq:
             # dx and dy are stored positively in the IDF
@@ -472,15 +485,22 @@ def write(path, a, nodata=1.0e20):
     if not a.dims == ("y", "x"):
         raise ValueError("Dimensions must be exactly ('y', 'x').")
 
+    # Header is fully doubled in size in case of double precision ...
+    # This means integers are also turned into 8 bytes
+    # and requires padding with some additional bytes
     if a.dtype == np.float64:
         reclenid = 2296
         floatsize = 8
         floatformat = "d"
+        intformat = "q"
+        doubleprecision = True
         a = a.fillna(nodata)
     else:  # Default to 32 bit otherwise
         reclenid = 1271
         floatsize = 4
         floatformat = "f"
+        intformat = "i"
+        doubleprecision = False
         # Only fillna if data can contain na values
         if a.dtype != np.float32:
             a = a.astype(np.float32)
@@ -489,10 +509,13 @@ def write(path, a, nodata=1.0e20):
 
     with f_open(path, "wb") as f:
         f.write(struct.pack("i", reclenid))  # Lahey RecordLength Ident.
+        if doubleprecision:
+            f.write(struct.pack("i", reclenid))
         nrow = a.y.size
         ncol = a.x.size
-        f.write(struct.pack("i", ncol))
-        f.write(struct.pack("i", nrow))
+        f.write(struct.pack(intformat, ncol))
+        f.write(struct.pack(intformat, nrow))
+
         dx, xmin, xmax, dy, ymin, ymax = util.spatial_reference(a)
         # IDF supports only incrementing x, and decrementing y
         if (np.atleast_1d(dx) < 0.0).all():
@@ -510,10 +533,9 @@ def write(path, a, nodata=1.0e20):
 
         if isinstance(dx, float) and isinstance(dy, float):
             ieq = True  # equidistant
-            f.write(struct.pack("?", not ieq))  # ieq
         else:
             ieq = False  # nonequidistant
-            f.write(struct.pack("?", not ieq))  # ieq
+        f.write(struct.pack("?", not ieq))  # ieq
 
         itb = False
         if "z" in a.coords and "dz" in a.coords:
@@ -528,6 +550,9 @@ def write(path, a, nodata=1.0e20):
 
         f.write(struct.pack("?", itb))
         f.write(struct.pack("xx"))  # not used
+        if doubleprecision:
+            f.write(struct.pack("xxxx"))  # not used
+
         if ieq:
             f.write(struct.pack(floatformat, dx))
             f.write(struct.pack(floatformat, -dy))
