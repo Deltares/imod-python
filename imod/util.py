@@ -57,14 +57,21 @@ def _groupdict(stem, pattern):
             d = re_pattern.match(stem).groupdict()
     else:  # Default to "iMOD conventions": {name}_{time}_l{layer}
         has_layer = bool(re.search(r"_l\d+$", stem))
+        has_species = bool(
+            re.search(r"conc_\d{8,14}_c\d{1,3}", stem)
+        )  # We are strict in recognizing species
         try:  # try for time
             base_pattern = r"(?P<name>[\w-]+)_(?P<time>[0-9-]{6,})"
+            if has_species:
+                base_pattern += r"_c(?P<species>[0-9]+)"
             if has_layer:
                 base_pattern += r"_l(?P<layer>[0-9]+)"
             re_pattern = re.compile(base_pattern)
             d = re_pattern.match(stem).groupdict()
         except AttributeError:  # probably no time
             base_pattern = r"(?P<name>[\w-]+)"
+            if has_species:
+                base_pattern += r"_c(?P<species>[0-9]+)"
             if has_layer:
                 base_pattern += r"_l(?P<layer>[0-9]+)"
             re_pattern = re.compile(base_pattern)
@@ -121,28 +128,25 @@ def decompose(path, pattern=None):
     stem = path.stem.lower()
 
     d = _groupdict(stem, pattern)
-
-    # TODO: figure out what to with user specified variables
-    # basically type inferencing via regex?
-    # if purely numericdcal \d* -> int or float
-    #    if \d*\.\d* -> float
-    # else: keep as string
-
+    dims = list(d.keys())
     # If name is not provided, generate one from other fields
     if "name" not in d.keys():
         d["name"] = "_".join(d.values())
+    else:
+        dims.remove("name")
 
-    # steady-state as time identifier isn't picked up by <time>[0-9] regex, so strip from name
-    steady = False
-    if "steady-state" in d["name"]:
-        steady = True
-        d["name"] = d["name"].replace("_steady-state", "")
-        d["time"] = "steady-state"
+    # TODO: figure out what to with user specified variables
+    # basically type inferencing via regex?
+    # if purely numerical \d* -> int or float
+    #    if \d*\.\d* -> float
+    # else: keep as string
 
     # String -> type conversion
     if "layer" in d.keys():
         d["layer"] = int(d["layer"])
-    if "time" in d.keys() and not steady:
+    if "species" in d.keys():
+        d["species"] = int(d["species"])
+    if "time" in d.keys():
         # iMOD supports two datetime formats
         # try fast options first
         try:
@@ -152,9 +156,15 @@ def decompose(path, pattern=None):
                 d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d")
         except ValueError:  # Try fullblown dateutil date parser
             d["time"] = dateutil.parser.parse(d["time"])
+    if "steady-state" in d["name"]:
+        # steady-state as time identifier isn't picked up by <time>[0-9] regex
+        d["name"] = d["name"].replace("_steady-state", "")
+        d["time"] = "steady-state"
+        dims.append("time")
 
     d["extension"] = path.suffix
     d["directory"] = path.parent
+    d["dims"] = dims
     return d
 
 
@@ -239,7 +249,7 @@ def compose(d, pattern=None):
             else:
                 # Change time to datetime.datetime
                 if isinstance(time, np.datetime64):
-                    d["time"] = time.item()
+                    d["time"] = time.astype("datetime64[us]").item()
                 elif isinstance(time, cftime.datetime):
                     # Take first six elements of timetuple and convert to datetime
                     d["time"] = datetime.datetime(*time.timetuple()[:6])

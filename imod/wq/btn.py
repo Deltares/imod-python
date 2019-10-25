@@ -75,10 +75,14 @@ class BasicTransport(Package):
 
     _template = jinja2.Template(
         "[btn]\n"
+        "    ncomp = {{n_species}}\n"  # Number of components
+        "    mcomp = {{n_species}}\n"  # Number of mobile components
         "    thkmin = {{minimum_active_thickness}}\n"
         "    cinact = {{inactive_concentration}}\n"
-        "    {%- for layer, value in starting_concentration.items() %}\n"
-        "    sconc_t1_l{{layer}} = {{value}}\n"
+        "    {%- for species, layerdict in starting_concentration.items() %}\n"
+        "        {%- for layer, value in layerdict.items() %}\n"
+        "    sconc_t{{species}}_l{{layer}} = {{value}}\n"
+        "        {%- endfor -%}\n"
         "    {%- endfor -%}\n"
         "    {%- for name, dictname in mapping -%}\n"
         "        {%- for layer, value in dicts[dictname].items() %}\n"
@@ -124,9 +128,22 @@ class BasicTransport(Package):
         d["mapping"] = self._mapping
         # Starting concentration also includes a species, and can't be written
         # in the same way as the other variables; _T? in the runfile
-        d["starting_concentration"] = self._compose_values_layer(
-            "starting_concentration", directory
-        )
+        if "species" in self["starting_concentration"].coords:
+            starting_concentration = {}
+
+            for i, species in enumerate(
+                self["starting_concentration"]["species"].values
+            ):
+                da = self["starting_concentration"].sel(species=species)
+                starting_concentration[i + 1] = self._compose_values_layer(
+                    "starting_concentration", directory, da=da
+                )
+
+            d["starting_concentration"] = starting_concentration
+        else:
+            d["starting_concentration"] = {
+                1: self._compose_values_layer("starting_concentration", directory)
+            }
 
         # Collect which entries are complex (multi-dim)
         data_vars = [t[1] for t in self._mapping]

@@ -6,11 +6,8 @@ raster formats.
 Currently only :func:`imod.rasterio.write` is implemented.
 """
 
-import collections
-import functools
 import glob
 import pathlib
-import re
 
 import numpy as np
 import xarray as xr
@@ -22,10 +19,243 @@ try:
 except ImportError:
     pass
 
+import imod
 from imod import idf, util
+from . import array_io
 
 
-def write(path, da, driver=None, nodata=np.nan):
+# Based on this comment
+# https://github.com/mapbox/rasterio/issues/265#issuecomment-367044836
+def _create_ext_driver_code_map():
+    import gdal
+
+    if hasattr(gdal, "DCAP_RASTER"):
+
+        def _check_driver(drv):
+            return drv.GetMetadataItem(gdal.DCAP_RASTER)
+
+    else:
+
+        def _check_driver(drv):
+            return True
+
+    output = {}
+    for i in range(gdal.GetDriverCount()):
+        drv = gdal.GetDriver(i)
+        if _check_driver(drv):
+            if drv.GetMetadataItem(gdal.DCAP_CREATE) or drv.GetMetadataItem(
+                gdal.DCAP_CREATECOPY
+            ):
+                ext = drv.GetMetadataItem(gdal.DMD_EXTENSION)
+                if ext is not None and len(ext) > 0:
+                    output[drv.GetMetadataItem(gdal.DMD_EXTENSION)] = drv.ShortName
+    sortedkeys = sorted(output.keys())
+    output = {k: output[k] for k in sortedkeys}
+    return output
+
+
+# tiff and jpeg keys have been added manually.
+EXTENSION_GDAL_DRIVER_CODE_MAP = {
+    "asc": "AAIGrid",
+    "bag": "BAG",
+    "bil": "EHdr",
+    "blx": "BLX",
+    "bmp": "BMP",
+    "bt": "BT",
+    "dat": "ZMap",
+    "dem": "USGSDEM",
+    "ers": "ERS",
+    "gen": "ADRG",
+    "gif": "GIF",
+    "gpkg": "GPKG",
+    "grd": "NWT_GRD",
+    "gsb": "NTv2",
+    "gtx": "GTX",
+    "hdr": "MFF",
+    "hf2": "HF2",
+    "hgt": "SRTMHGT",
+    "img": "HFA",
+    "jp2": "JP2OpenJPEG",
+    "jpg": "JPEG",
+    "jpeg": "JPEG",
+    "kea": "KEA",
+    "kro": "KRO",
+    "lcp": "LCP",
+    "map": "PCRaster",
+    "mbtiles": "MBTiles",
+    "mrf": "MRF",
+    "nc": "netCDF",
+    "ntf": "NITF",
+    "pdf": "PDF",
+    "pix": "PCIDSK",
+    "png": "PNG",
+    "rda": "R",
+    "rgb": "SGI",
+    "rst": "RST",
+    "rsw": "RMF",
+    "sigdem": "SIGDEM",
+    "sqlite": "Rasterlite",
+    "ter": "Terragen",
+    "tif": "GTiff",
+    "tiff": "GTiff",
+    "vrt": "VRT",
+    "xml": "PDS4",
+    "xpm": "XPM",
+    "xyz": "XYZ",
+}
+
+
+def _get_driver(path):
+    ext = path.suffix.lower()[1:]  # skip the period
+    try:
+        return EXTENSION_GDAL_DRIVER_CODE_MAP[ext]
+    except KeyError:
+        raise ValueError(
+            f'Unknown extension "{ext}", available extensions: '
+            f'{", ".join(EXTENSION_GDAL_DRIVER_CODE_MAP.keys())}'
+        )
+
+
+def _limitations(riods, path):
+    if riods.count != 1:
+        raise NotImplementedError(
+            f"Cannot open multi-band grid: {path}. Try xarray.open_rasterio() instead."
+        )
+    if not riods.transform.is_rectilinear:
+        raise NotImplementedError(
+            f"Cannot open non-rectilinear grid: {path}. Try xarray.open_rasterio() instead."
+        )
+
+
+def header(path, pattern):
+    attrs = util.decompose(path, pattern)
+
+    # TODO:
+    # Check bands, rotation, etc.
+    # Raise NotImplementedErrors and point to xr.open_rasterio
+    with rasterio.open(path, "r") as riods:
+        _limitations(riods, path)
+        attrs["nrow"] = riods.height
+        attrs["ncol"] = riods.width
+        xmin, ymin, xmax, ymax = riods.bounds
+        attrs["dx"] = riods.transform[0]
+        attrs["dy"] = riods.transform[4]
+        attrs["nodata"] = riods.nodata
+        attrs["dtype"] = riods.dtypes[0]
+        attrs["crs"] = riods.crs
+
+    attrs["xmin"] = xmin
+    attrs["xmax"] = xmax
+    attrs["ymin"] = ymin
+    attrs["ymax"] = ymax
+    attrs["headersize"] = None
+    return attrs
+
+
+def _read(path, headersize, nrow, ncol, nodata, dtype):
+    with rasterio.open(path, "r") as dataset:
+        a = dataset.read(1)
+
+    # None signifies no replacement; skip if nodata already is nan
+    if (nodata is None) or np.isnan(nodata):
+        return a
+    # Only set nodata to nan if the dtype supports it
+    if (a.dtype == np.float64) or (a.dtype == np.float32):
+        return array_io.reading._to_nan(a, nodata)
+    else:
+        return a
+
+
+def open(path, use_cftime=False, pattern=None):
+    r"""
+    Open one or more GDAL supported raster files as an xarray.DataArray.
+
+    In accordance with xarray's design, ``open`` loads the data of the files
+    lazily. This means the data of the rasters are not loaded into memory until the
+    data is needed. This allows for easier handling of large datasets, and
+    more efficient computations.
+
+    Parameters
+    ----------
+    path : str, Path or list
+        This can be a single file, 'head_l1.tif', a glob pattern expansion,
+        'head_l*.tif', or a list of files, ['head_l1.tif', 'head_l2.tif'].
+        Note that each file needs to be of the same name (part before the
+        first underscore) but have a different layer and/or timestamp,
+        such that they can be combined in a single xarray.DataArray.
+    use_cftime : bool, optional
+        Use ``cftime.DatetimeProlepticGregorian`` instead of `np.datetime64[ns]`
+        for the time axis.
+
+        Dates are normally encoded as ``np.datetime64[ns]``; however, if dates
+        fall before 1678 or after 2261, they are automatically encoded as
+        ``cftime.DatetimeProlepticGregorian`` objects rather than
+        ``np.datetime64[ns]``.
+    pattern : str, regex pattern, optional
+        If the filenames do match default naming conventions of
+        {name}_{time}_l{layer}, a custom pattern can be defined here either
+        as a string, or as a compiled regular expression pattern. See the
+        examples below.
+
+    Returns
+    -------
+    xarray.DataArray
+        A float32 xarray.DataArray of the values in the raster file(s).
+        All metadata needed for writing the file to raster or other formats
+        using imod.rasterio are included in the xarray.DataArray.attrs.
+
+    Examples
+    --------
+    Open a raster file:
+
+    >>> da = imod.rasterio.open("example.tif")
+
+    Open a raster file, relying on default naming conventions to identify
+    layer:
+
+    >>> da = imod.rasterio.open("example_l1.tif")
+
+    Open an IDF file, relying on default naming conventions to identify layer
+    and time:
+
+    >>> head = imod.rasterio.open("head_20010101_l1.tif")
+
+    Open multiple files, in this case files for the year 2001 for all
+    layers, again relying on default conventions for naming:
+
+    >>> head = imod.rasterio.open("head_2001*_l*.tif")
+
+    The same, this time explicitly specifying ``name``, ``time``, and ``layer``:
+
+    >>> head = imod.rasterio.open("head_2001*_l*.tif", pattern="{name}_{time}_l{layer}")
+
+    The format string pattern will only work on tidy paths, where variables are
+    separated by underscores. You can also pass a compiled regex pattern.
+    Make sure to include the ``re.IGNORECASE`` flag since all paths are lowered.
+
+    >>> import re
+    >>> pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)", re.IGNORECASE)
+    >>> head = imod.idf.open("headL11", pattern=pattern)
+
+    However, this requires constructing regular expressions, which is
+    generally a fiddly process. Regex notation is also impossible to
+    remember. The website https://regex101.com is a nice help. Alternatively,
+    the most pragmatic solution may be to just rename your files.
+    """
+
+    if isinstance(path, list):
+        return array_io.reading._load(path, use_cftime, pattern, _read, header)
+    elif isinstance(path, pathlib.Path):
+        path = str(path)
+
+    paths = [pathlib.Path(p) for p in glob.glob(path)]
+    n = len(paths)
+    if n == 0:
+        raise FileNotFoundError(f"Could not find any files matching {path}")
+    return array_io.reading._load(paths, use_cftime, pattern, _read, header)
+
+
+def write(path, da, driver=None, nodata=np.nan, dtype=None):
     """Write ``xarray.DataArray`` to GDAL supported geospatial rasters using ``rasterio``.
     
     Parameters
@@ -62,20 +292,24 @@ def write(path, da, driver=None, nodata=np.nan):
     path = pathlib.Path(path)
     profile = da.attrs.copy()
     if driver is None:
-        ext = path.suffix.lower()
-        if ext in (".tif", ".tiff"):
-            driver = "GTiff"
-        elif ext == ".asc":
-            driver = "AAIGrid"
-        elif ext == ".map":
-            driver = "PCRaster"
-        else:
-            raise ValueError(f"Unknown extension {ext}, specifiy driver")
-    # prevent rasterio warnings
-    if driver == "AAIGrid":
-        profile.pop("res", None)
-        profile.pop("is_tiled", None)
-    elif driver == "PCRaster":
+        driver = _get_driver(path)
+
+    # Only try to fill data that can contains nan's
+    # Do this before casting to another type!
+    ignore_nodata = (nodata is None) or np.isnan(nodata)
+    if not ignore_nodata:
+        if (da.dtype == np.float32) or (da.dtype == np.float64):
+            # NaN is the default missing value in xarray
+            # None is different in that the raster won't have a nodata value
+            da = da.fillna(nodata)
+
+    # Cast to dtype if dtype is given
+    if dtype is not None:
+        if da.dtype != dtype:
+            da = da.astype(dtype)
+
+    # Cast to supported pcraster dtypes
+    if driver == "PCRaster":
         if da.dtype == "float64":
             da = da.astype("float32")
         elif da.dtype == "int64":
@@ -89,7 +323,8 @@ def write(path, da, driver=None, nodata=np.nan):
                 profile["PCRASTER_VALUESCALE"] = "VS_BOOLEAN"
             else:
                 profile["PCRASTER_VALUESCALE"] = "VS_SCALAR"
-    extradims = idf._extra_dims(da)
+
+    extradims = list(filter(lambda dim: dim not in ("y", "x"), da.dims))
     # TODO only equidistant IDFs are compatible with GDAL / rasterio
     # TODO try squeezing extradims here, such that 1 layer, 1 time, etc. is acccepted
     if extradims:
@@ -102,170 +337,80 @@ def write(path, da, driver=None, nodata=np.nan):
     profile["count"] = 1
     profile["dtype"] = da.dtype
     profile["nodata"] = nodata
-    if (nodata is None) or np.isnan(nodata):
-        # NaN is the default missing value in xarray
-        # None is different in that the raster won't have a nodata value
-        dafilled = da
-    else:
-        dafilled = da.fillna(nodata)
     with rasterio.Env():
         with rasterio.open(path, "w", **profile) as ds:
-            ds.write(dafilled.values, 1)
+            ds.write(da.values, 1)
 
 
-def ndconcat(das, dims):
+def save(path, a, driver=None, nodata=np.nan, pattern=None, dtype=None):
     """
+    Write a xarray.DataArray to one or more rasterio supported files
+
+    If the DataArray only has ``y`` and ``x`` dimensions, a single raster file is
+    written, like the ``imod.rasterio.write`` function. This function is more general
+    and also supports ``time`` and ``layer`` and other dimensions. It will split these up,
+    give them their own filename according to the conventions in
+    ``imod.util.compose``, and write them each.
+
     Parameters
     ----------
-    das : dict (of dicts) of lists, n levels deep. Bottoms out at a list.
-        E.g. {2000-01-01: [da1, da2], 2001-01-01: [da3, da4]}
-        for n = 2.
-    dims : tuple
-        Tuple of dimensions over which to concatenate. Has to be n elements long.
-        E.g. ("time", "layer") for n = 2.
+    path : str or Path
+        Path to the raster file to be written. This function decides on the
+        actual filename(s) using conventions, so it only takes the directory and
+        name from this parameter.
+    a : xarray.DataArray
+        DataArray to be written. It needs to have dimensions ('y', 'x'), and
+        optionally ``layer`` and ``time``.
+    driver: str, optional
+        Which GDAL format driver to use. The complete list is at
+        https://gdal.org/drivers/raster/index.html.
+        By default tries to guess from the file extension.
+    nodata : float, optional
+        Nodata value in the saved raster files. Defaults to a value of nan.
+    pattern : str
+        Format string which defines how to create the filenames. See examples.
 
-    Returns
+    Example
     -------
-    concatenated : xr.DataArray
-        Input concatenated over n dimensions.
+    Consider a DataArray ``da`` that has dimensions 'layer', 'y' and 'x', with the
+    'layer' dimension consisting of layer 1 and 2::
+
+        save('path/to/head', da)
+
+    This writes the following two tif files: 'path/to/head_l1.tif' and
+    'path/to/head_l2.tif'.
+
+
+    It is possible to generate custom filenames using a format string. The
+    default filenames would be generated by the following format string:
+
+        save("example", pattern="{name}_l{layer}{extension}")
+
+    If you desire zero-padded numbers that show up neatly sorted in a
+    file manager, you may specify:
+
+        save("example", pattern="{name}_l{layer:02d}{extension}")
+
+    In this case, a 0 will be padded for single digit numbers ('1' will become
+    '01').
+
+    To get a date with dashes, use the following pattern:
+
+        "{name}_{time:%Y-%m-%d}_l{layer}{extension}"
+
     """
-    if len(dims) == 1:  # base case
-        das.sort(key=lambda da: da.coords[dims[0]])
-        return xr.concat(das, dim=dims[0])
-    else:
-        dims_in = dims[1:]  # recursive case
-        out = [ndconcat(das_in, dims_in) for das_in in das.values()]
-        return xr.concat(out, dims[0])
+    path = pathlib.Path(path)
+    # defaults to geotiff
+    if driver is None:
+        if path.suffix == "":
+            path = path.with_suffix(".tif")
+            driver = "GTiff"
+        else:
+            driver = _get_driver(path)
 
+    # Use a closure to skip the driver argument
+    # so it takes the same arguments as the idf write
+    def _write(path, a, nodata, dtype):
+        return write(path, a, driver, nodata, dtype)
 
-def set_nested(d, keys, value):
-    if len(keys) == 1:
-        d.append(value)
-    else:
-        set_nested(d[keys[0]], keys[1:], value)
-
-
-def _read(paths, use_cftime, pattern):
-    if len(paths) == 1:
-        return xr.open_rasterio(paths[0]).squeeze("band", drop=True)
-
-    dicts = []
-    firstlen = len(util.decompose(paths[0], pattern=pattern))
-    for path in paths:
-        d = util.decompose(path, pattern=pattern)
-        if not len(d) == firstlen:
-            raise ValueError("Number of dimensions on grids do not match.")
-        d["path"] = path
-        dicts.append(d)
-
-    dict_dims = [
-        key for key in dicts[0] if key not in ("name", "extension", "directory", "path")
-    ]
-    ndims = len(dict_dims)
-
-    dims = dict_dims
-    groupby = initialize_groupby(ndims)
-    for d in dicts:
-        # Read array
-        da = xr.open_rasterio(d["path"]).squeeze("band", drop=True)
-        # Assign coordinates
-        groupbykeys = []
-        for dim in dict_dims:
-            value = d[dim]
-            da = da.assign_coords(**{dim: value})
-            groupbykeys.append(value)
-        # Group in the right dimension
-        set_nested(groupby, groupbykeys, da)
-
-    nd = ndconcat(groupby, dims)
-    nd.coords["dx"] = abs(nd.res[0])
-    nd.coords["dy"] = -abs(nd.res[1])
-    return nd
-
-
-def initialize_groupby(ndims):
-    # In explicit form, say we have ndims=5
-    # Then, writing it out, we get:
-    # a = partial(defaultdict, list)
-    # b = partial(defaultdict, a)
-    # c = partial(defaultdict, b)
-    # d = defaultdict(c)
-    # This can obviously be done iteratively.
-    if ndims == 1:
-        return list()
-    elif ndims == 2:
-        return collections.defaultdict(list)
-    else:
-        d = functools.partial(collections.defaultdict, list)
-        for _ in range(ndims - 2):
-            d = functools.partial(collections.defaultdict, d)
-        return collections.defaultdict(d)
-
-
-def read(path, use_cftime=False, pattern=None):
-    """Read one or more GDAL supported geospatial rasters to a ``xarray.DataArray``.
-    
-    Parameters
-    ----------
-    path : str, Path or list
-        This can be a single file, 'head_l1.tif', a glob pattern expansion,
-        'head_l*.tif', or a list of files, ['head_l1.tif', 'head_l2.tif'].
-        Note that each file needs to be of the same name (part before the
-        first underscore) but have a different layer and/or timestamp,
-        such that they can be combined in a single xarray.DataArray.
-    use_cftime : bool, optional
-        Use ``cftime.DatetimeProlepticGregorian`` instead of `np.datetime64[ns]`
-        for the time axis.
-
-        Dates are normally encoded as ``np.datetime64[ns]``; however, if dates
-        fall before 1678 or after 2261, they are automatically encoded as
-        ``cftime.DatetimeProlepticGregorian`` objects rather than
-        ``np.datetime64[ns]``.
-    pattern : str, regex pattern, optional
-        If the filenames do match default naming conventions of
-        {name}_{time}_l{layer}, a custom pattern can be defined here either
-        as a string, or as a compiled regular expression pattern. See the
-        examples below.
-
-    Returns
-    -------
-    xarray.DataArray
-        A xarray.DataArray of the values in the raster file(s).
-
-    Examples
-    --------
-    Open a GeoTIFF file:
-
-    >>> da = imod.rasterio.read("example.tif")
-
-    Open multiple GeoTIFF files, relying on default naming conventions to identify time:
-
-    >>> head = imod.rasterio.read("head_*_l1.tif")
-
-    The same, this time explicitly specifying ``name``, ``time``, and ``layer``:
-
-    >>> head = imod.rasterio.read("head_2001*_l*.tif", pattern="{name}_{time}_l{layer}")
-
-    The format string pattern will only work on tidy paths, where variables are
-    separated by underscores. You can also pass a compiled regex pattern.
-    Make sure to include the ``re.IGNORECASE`` flag since all paths are lowered.
-
-    >>> import re
-    >>> pattern = re.compile(r"(?P<name>[\w]+)L(?P<layer>[\d+]*)", re.IGNORECASE)
-    >>> head = imod.rasterio.read("headL11", pattern=pattern)
-
-    However, this requires constructing regular expressions, which is
-    generally a fiddly process. Regex notation is also impossible to
-    remember. The website https://regex101.com is a nice help. Alternatively,
-    the most pragmatic solution may be to just rename your files.
-    """
-    if isinstance(path, list):
-        return _read(path, use_cftime, pattern)
-    elif isinstance(path, pathlib.Path):
-        path = str(path)
-
-    paths = [pathlib.Path(p) for p in glob.glob(path)]
-    n = len(paths)
-    if n == 0:
-        raise FileNotFoundError(f"Could not find any files matching {path}")
-    return _read(paths, use_cftime, pattern)
+    array_io.writing._save(path, a, nodata, pattern, dtype, _write)

@@ -9,6 +9,27 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Added
+~~~~~
+-  IDF files representing data of arbitrary dimensionality can be opened and
+   saved. This enables reading and writing files with more dimensions than just x,
+   y, layer, and time.
+-  Added multi-species support for (:mod:`imod.wq`)
+-  GDAL rasters representing N-dimensional data can be opened and saved similar to (:mod:`imod.idf`) in (:mod:`imod.rasterio`)
+-  Writing GDAL rasters using (:meth:`imod.rasterio.save`) and (:meth:`imod.rasterio.write`) auto-detects GDAL driver based on file extension
+-  64-bit IDF files can be opened (:meth:`imod.idf.open`)
+-  64-bit IDF files can be written using (:meth:`imod.idf.save`) and (:meth:`imod.idf.write`) using keyword ``dtype=np.float64``
+
+Changed
+~~~~~~~
+
+-  :func:`imod.idf.read` is deprecated, use :mod:`imod.idf.open` instead
+
+Fixed
+~~~~~
+
+-  (:meth:`imod.prepare.reproject`) working instead of silently failing when given a ``"+init=ESPG:XXXX`` CRS string
+
 [0.8.0] - 2019-10-14
 --------------------
 
