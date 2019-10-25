@@ -78,6 +78,7 @@ class BasicFlow(Package):
         self["bottom"] = bottom
         self["starting_head"] = starting_head
         self["inactive_head"] = inactive_head
+        self["confining_bed_below"] = confining_bed_below
         # TODO: create dx, dy if they don't exist?
 
     def _check_ibound(self, ibound):
@@ -139,6 +140,7 @@ class BasicFlow(Package):
             dy = self.coords["dy"]
         d["dx"] = abs(float(dx))
         d["dy"] = abs(float(dy))
+        d["confining_bed_below"] = int(self["confining_bed_below"])
 
         # Non-time dependent part of dis
         # Can be inferred from ibound
@@ -153,7 +155,7 @@ class BasicFlow(Package):
             "    {%- for layer, value in bottom.items() %}\n"
             "    botm_l{{layer}} = {{value}}\n"
             "    {%- endfor %}\n"
-            "    laycbd_l? = 0"
+            "    laycbd_l? = {{confining_bed_below}}"
         )
 
         return _dis_template.render(d)
