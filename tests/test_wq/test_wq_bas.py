@@ -55,6 +55,7 @@ def test_render(basicflow):
 def test_render_dis__scalartopbot(basicflow):
     bas = basicflow
     directory = pathlib.Path(".")
+    confining_bed_below = 0
     compare = textwrap.dedent(
         """\
         [dis]
@@ -69,7 +70,7 @@ def test_render_dis__scalartopbot(basicflow):
             botm_l3 = 0.0
             laycbd_l? = 0"""
     )
-    assert bas._render_dis(directory) == compare
+    assert bas._render_dis(directory, confining_bed_below) == compare
 
 
 def test_render_dis__arraytopbot(basicflow):
@@ -77,6 +78,7 @@ def test_render_dis__arraytopbot(basicflow):
     bas["bottom"] = xr.full_like(bas["ibound"], 10.0)
     bas["top"] = bas["bottom"].isel(layer=0)
     directory = pathlib.Path(".")
+    confining_bed_below = 1
     compare = textwrap.dedent(
         """\
         [dis]
@@ -89,6 +91,6 @@ def test_render_dis__arraytopbot(basicflow):
             botm_l1 = bottom_l1.idf
             botm_l2 = bottom_l2.idf
             botm_l3 = bottom_l3.idf
-            laycbd_l? = 0"""
+            laycbd_l? = 1"""
     )
-    assert bas._render_dis(directory) == compare
+    assert bas._render_dis(directory, confining_bed_below) == compare

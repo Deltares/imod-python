@@ -62,15 +62,7 @@ class BasicFlow(Package):
         "    {%- endfor -%}"
     )
 
-    def __init__(
-        self,
-        ibound,
-        top,
-        bottom,
-        starting_head,
-        inactive_head=1.0e30,
-        confining_bed_below=0,
-    ):
+    def __init__(self, ibound, top, bottom, starting_head, inactive_head=1.0e30):
         self._check_ibound(ibound)
         super(__class__, self).__init__()
         self["ibound"] = ibound
@@ -78,7 +70,6 @@ class BasicFlow(Package):
         self["bottom"] = bottom
         self["starting_head"] = starting_head
         self["inactive_head"] = inactive_head
-        self["confining_bed_below"] = confining_bed_below
         # TODO: create dx, dy if they don't exist?
 
     def _check_ibound(self, ibound):
@@ -122,7 +113,7 @@ class BasicFlow(Package):
             value = float(da)
         return value
 
-    def _render_dis(self, directory):
+    def _render_dis(self, directory, confining_bed_below):
         """
         Renders part of runfile that ends up under [dis] section.
         """
@@ -140,7 +131,7 @@ class BasicFlow(Package):
             dy = self.coords["dy"]
         d["dx"] = abs(float(dx))
         d["dy"] = abs(float(dy))
-        d["confining_bed_below"] = int(self["confining_bed_below"])
+        d["confining_bed_below"] = confining_bed_below
 
         # Non-time dependent part of dis
         # Can be inferred from ibound

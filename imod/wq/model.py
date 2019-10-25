@@ -287,7 +287,14 @@ class SeawatModel(Model):
     def _render_dis(self, directory, globaltimes):
         baskey = self._get_pkgkey("bas6")
         diskey = self._get_pkgkey("dis")
-        bas_content = self[baskey]._render_dis(directory=directory.joinpath(baskey))
+        lpfkey = self._get_pkgkey("lpf")
+        if "confining_bed_k_vertical" in self[lpfkey].data_vars:
+            cbb = 1
+        else:
+            cbb = 0
+        bas_content = self[baskey]._render_dis(
+            directory=directory.joinpath(baskey), confining_bed_below=cbb
+        )
         dis_content = self[diskey]._render(globaltimes=globaltimes)
         return bas_content + dis_content
 
