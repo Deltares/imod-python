@@ -418,6 +418,8 @@ def test_render_btn(basicmodel):
     compare = textwrap.dedent(
         """\
         [btn]
+            ncomp = 1
+            mcomp = 1
             thkmin = 0.01
             cinact = 1e+30
             sconc_t1_l1 = btn/starting_concentration_l1.idf

@@ -93,13 +93,21 @@ class Package(xr.Dataset):
             Alternatively: {layer number: scalar value}. The layer number may be
             a wildcard (e.g. '?').
         """
+        pattern = "{name}"
+
         values = {}
         if da is None:
             da = self[varname]
 
         d = {"directory": directory, "name": varname, "extension": ".idf"}
+
+        if "species" in da.coords:
+            d["species"] = da.coords["species"].values
+            pattern += "_c{species}"
+
         if time is not None:
             d["time"] = time
+            pattern += "_{time:%Y%m%d%H%M%S}"
 
         # Scalar value or not?
         # If it's a scalar value we can immediately write
@@ -111,15 +119,17 @@ class Package(xr.Dataset):
 
         if "layer" not in da.coords:
             if idf:
-                values["?"] = util.compose(d).as_posix()
+                pattern += "{extension}"
+                values["?"] = util.compose(d, pattern=pattern).as_posix()
             else:
                 values["?"] = da.values[()]
 
         else:
+            pattern += "_l{layer}{extension}"
             for layer in np.atleast_1d(da.coords["layer"].values):
                 if idf:
                     d["layer"] = layer
-                    values[layer] = util.compose(d).as_posix()
+                    values[layer] = util.compose(d, pattern=pattern).as_posix()
                 else:
                     if "layer" in da.dims:
                         values[layer] = da.sel(layer=layer).values[()]
@@ -152,7 +162,20 @@ class Package(xr.Dataset):
                 if isinstance(da, xr.DataArray):
                     if "layer" in da.dims:
                         da = da.dropna(dim="layer", how="all")
-                imod.idf.save(path, da)
+
+                if "species" in da.coords:
+                    if "time" in da.coords:
+                        imod.idf.save(
+                            path,
+                            da,
+                            pattern="{name}_c{species}_{time:%Y%m%d%H%M%S}_l{layer}{extension}",
+                        )
+                    else:
+                        imod.idf.save(
+                            path, da, pattern="{name}_c{species}_l{layer}{extension}"
+                        )
+                else:
+                    imod.idf.save(path, da)
 
     def _check_positive(self, varnames):
         for var in varnames:
@@ -290,10 +313,12 @@ class BoundaryCondition(Package):
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
 
             for time, start_end in zip(runfile_times, starts_ends):
-                values[start_end] = self._compose_values_layer(varname, directory, time)
+                values[start_end] = self._compose_values_layer(
+                    varname, directory, time=time, da=da
+                )
 
         else:
-            values["?"] = self._compose_values_layer(varname, directory)
+            values["?"] = self._compose_values_layer(varname, directory, da=da)
 
         return values
 
