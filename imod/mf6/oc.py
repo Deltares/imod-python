@@ -6,13 +6,16 @@ from imod.mf6.pkgbase import Package
 
 class OutputControl(Package):
     """
-    Attributes
-    ----------
+    The Output Control Option determines how and when heads are printed to the
+    listing file and/or written to a separate binary output file.
+    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=47
 
+    Parameters
+    ----------
     save_head : bool, or xr.DataArray of bools
-        Bool per stress period
+        Bool per stress period. 
     save_budget : bool, or xr.DataArray of bools
-        Bool per stress period
+        Bool per stress period.
     """
 
     __slots__ = ("save_head", "save_budget")
