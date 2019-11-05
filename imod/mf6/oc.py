@@ -13,7 +13,7 @@ class OutputControl(Package):
     Parameters
     ----------
     save_head : bool, or xr.DataArray of bools
-        Bool per stress period. 
+        Bool per stress period.
     save_budget : bool, or xr.DataArray of bools
         Bool per stress period.
     """

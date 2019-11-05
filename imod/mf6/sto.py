@@ -16,12 +16,12 @@ class Storage(Package):
     Parameters
     ----------
     specific_storage: array of floats (xr.DataArray)
-        Is specific storage (ss). Specific storage values must be greater than
-        or equal to 0.
+        Is specific storage. Specific storage values must be greater than
+        or equal to 0. (ss)
     specific_yield: array of floats (xr.DataArray)
-        Is specific yield (sy). Specific yield values must be greater than or
+        Is specific yield. Specific yield values must be greater than or
         equal to 0. Specific yield does not have to be specified if there are no
-        convertible cells (convertible=0 in every cell).
+        convertible cells (convertible=0 in every cell). (sy)
     convertible: array of int (xr.DataArray)
         Is a flag for each cell that specifies whether or not a cell is
         convertible for the storage calculation. 0 indicates confined storage is

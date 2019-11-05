@@ -4,9 +4,9 @@ from imod.mf6.pkgbase import BoundaryCondition
 class Recharge(BoundaryCondition):
     """
     Recharge Package.
-     Any number of RCH Packages can be specified for a single groundwater flow
-     model.
-     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=79
+    Any number of RCH Packages can be specified for a single groundwater flow
+    model.
+    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=79
 
     Parameters
     ----------
@@ -15,17 +15,20 @@ class Recharge(BoundaryCondition):
         program by the surface area of the cell to calculate the volumetric
         recharge rate. A time-series name may be specified.
     print_input: ({True, False}, optional)
-        keyword to indicate that the list of recharge information will be written
-        to the listing file immediately after it is read. Default is False.
+        keyword to indicate that the list of recharge information will be
+        written to the listing file immediately after it is read.
+        Default is False.
     print_flows: ({True, False}, optional)
         Indicates that the list of recharge flow rates will be printed to the
-        listing file for every stress period time step in which “BUDGET PRINT”
-        is specified in Output Control. If there is no Output Control option and
+        listing file for every stress period time step in which “BUDGET PRINT”is
+        specified in Output Control. If there is no Output Control option and
         PRINT FLOWS is specified, then flow rates are printed for the last time
-        step of each stress period. Default is False.
+        step of each stress period.
+        Default is False.
     save_flows: ({True, False}, optional)
         Indicates that recharge flow terms will be written to the file specified
-        with “BUDGET FILEOUT” in Output Control. Default is False.
+        with “BUDGET FILEOUT” in Output Control.
+        Default is False.
     observations: [Not yet supported.]
         Default is None.
     """

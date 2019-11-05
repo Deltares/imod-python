@@ -20,7 +20,8 @@ class Drainage(BoundaryCondition):
         listing file for every stress period time step in which “BUDGET PRINT”
         is specified in Output Control. If there is no Output Control option and
         PRINT FLOWS is specified, then flow rates are printed for the last time
-        step of each stress period. Default is False.
+        step of each stress period.
+        Default is False.
     save_flows: ({True, False}, optional)
         Indicates that drain flow terms will be written to the file specified
         with “BUDGET FILEOUT” in Output Control. Default is False.
