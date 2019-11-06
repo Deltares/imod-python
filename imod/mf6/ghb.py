@@ -2,7 +2,7 @@ from imod.mf6.pkgbase import BoundaryCondition
 
 
 class GeneralHeadBoundary(BoundaryCondition):
-"""
+    """
     The General-Head Boundary package is used to simulate head-dependent flux
     boundaries.
     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=75
@@ -31,7 +31,7 @@ class GeneralHeadBoundary(BoundaryCondition):
         Default is False.
     observations: [Not yet supported.]
         Default is None.
-"""
+    """
 
     __slots__ = (
         "head",

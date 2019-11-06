@@ -4,7 +4,7 @@ from imod.mf6.pkgbase import Package
 
 
 class InitialConditions(Package):
-"""
+    """
     Initial Conditions (IC) Package information is read from the file that is
     specified by “IC6” as the file type. Only one IC Package can be specified
     for a GWF model.
@@ -22,7 +22,7 @@ class InitialConditions(Package):
         be less if STRT includes hydraulic heads that are close to the
         steadystate solution. A head value lower than the cell bottom can be
         provided if a cell should start as dry. (strt)
-"""
+    """
     __slots__ = ("head",)
     _pkg_id = "ic"
     _binary_data = {"head": np.float64}
