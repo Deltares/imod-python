@@ -242,3 +242,18 @@ def test_dtype_error(test_da, tmp_path):
 
     with pytest.raises(ValueError):
         idf.write(tmp_path / "integer.idf", da, dtype=np.int32)
+
+
+def test_nodata(test_da, tmp_path):
+    da = test_da
+    test_da[...] = np.nan
+    path = tmp_path / "nodata.idf"
+    idf.write(path, da, dtype=np.float32, nodata=1.0e20)
+
+    header = idf.header(path, pattern=None)
+    size = header["nrow"] * header["ncol"]
+    with open(path) as f:
+        f.seek(header["headersize"])
+        a = np.fromfile(f, np.float32, size)
+
+    assert not np.isnan(a).any()

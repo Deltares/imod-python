@@ -488,12 +488,10 @@ def write(path, a, nodata=1.0e20, dtype=np.float32):
     # Header is fully doubled in size in case of double precision ...
     # This means integers are also turned into 8 bytes
     # and requires padding with some additional bytes
+    data_dtype = a.dtype
     if dtype == np.float64:
-        if not a.dtype == np.float64:
+        if data_dtype != np.float64:
             a = a.astype(np.float64)
-        # Only fillna if data can contain na values
-        else:
-            a = a.fillna(nodata)
         reclenid = 2296
         floatsize = 8
         floatformat = "d"
@@ -505,13 +503,14 @@ def write(path, a, nodata=1.0e20, dtype=np.float32):
         floatformat = "f"
         intformat = "i"
         doubleprecision = False
-        if a.dtype != np.float32:
+        if data_dtype != np.float32:
             a = a.astype(np.float32)
-        # Only fillna if data can contain na values
-        else:
-            a = a.fillna(nodata)
     else:
         raise ValueError("Invalid dtype, IDF allows only np.float32 and np.float64")
+
+    # Only fillna if data can contain na values
+    if (data_dtype == np.float32) or (data_dtype == np.float64):
+        a = a.fillna(nodata)
 
     with f_open(path, "wb") as f:
         f.write(struct.pack("i", reclenid))  # Lahey RecordLength Ident.
