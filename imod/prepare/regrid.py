@@ -132,9 +132,17 @@ def _regrid_3d(src, dst, values, weights, method, *inds_weights):
     dst_coords : tuple of np.arrays of edges
     method : numba.njit'ed function
     """
-    ii, blocks_iz, blocks_weights_z, jj, blocks_iy, blocks_weights_y, kk, blocks_ix, blocks_weights_x = (
-        inds_weights
-    )
+    (
+        ii,
+        blocks_iz,
+        blocks_weights_z,
+        jj,
+        blocks_iy,
+        blocks_weights_y,
+        kk,
+        blocks_ix,
+        blocks_weights_x,
+    ) = inds_weights
 
     # i, j, k are indices of dst array
     # block_i contains indices of src array

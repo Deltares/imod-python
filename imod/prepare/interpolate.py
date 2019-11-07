@@ -284,9 +284,17 @@ def _interp_2d(src, dst, *inds_weights):
 @numba.njit(cache=True)
 def _interp_3d(src, dst, *inds_weights):
     # Unpack the variadic arguments
-    ii, weights_z, within_z, jj, weights_y, within_y, kk, weights_x, within_x = (
-        inds_weights
-    )
+    (
+        ii,
+        weights_z,
+        within_z,
+        jj,
+        weights_y,
+        within_y,
+        kk,
+        weights_x,
+        within_x,
+    ) = inds_weights
     # i, j, k are indices of dst array
     for i, (iz, wz, in_z) in enumerate(zip(ii, weights_z, within_z)):
         if iz < 0:
