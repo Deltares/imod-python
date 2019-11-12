@@ -13,6 +13,11 @@ Documentation: https://imod.xyz/
 
 Source code: https://gitlab.com/deltares/imod/imod-python
 
+Interactive notebook examples:
+
+.. image:: https://mybinder.org/badge_logo.svg
+   :target: https://mybinder.org/v2/gh/Deltares/iMOD-DSD-International-2019/master
+
 
 Documentation
 -------------

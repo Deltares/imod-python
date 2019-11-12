@@ -2,6 +2,8 @@
    :target: https://gitlab.com/deltares/imod/imod-python/commits/master
 .. image:: https://gitlab.com/deltares/imod/imod-python/badges/master/coverage.svg
    :target: https://gitlab.com/deltares/imod/imod-python/commits/master
+.. image:: https://mybinder.org/badge_logo.svg
+   :target: https://mybinder.org/v2/gh/Deltares/iMOD-DSD-International-2019/master
 
 Work with `iMOD <https://oss.deltares.nl/web/imod>`__ MODFLOW models in
 Python.
