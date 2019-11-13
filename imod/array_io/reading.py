@@ -387,7 +387,9 @@ def _load(paths, use_cftime, pattern, _read, header):
     out = xr.DataArray(dask_array, coords, dims, name=names[0])
 
     first_attrs = headers[0]
-    out.attrs["crs"] = first_attrs["crs"]
+
+    if "crs" in first_attrs:
+        out.attrs["crs"] = first_attrs["crs"]
     if "nodata" in first_attrs:
         out.attrs["nodata"] = first_attrs["nodata"]
 

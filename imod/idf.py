@@ -92,7 +92,6 @@ def header(path, pattern):
         attrs["ncol"] = ncol
         attrs["nrow"] = nrow
         attrs["dtype"] = dtype
-        attrs["crs"] = None
 
     return attrs
 

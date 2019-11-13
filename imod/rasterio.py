@@ -142,7 +142,9 @@ def header(path, pattern):
         attrs["dy"] = riods.transform[4]
         attrs["nodata"] = riods.nodata
         attrs["dtype"] = riods.dtypes[0]
-        attrs["crs"] = riods.crs
+        crs = riods.crs
+        if crs is not None:
+            attrs["crs"] = crs
 
     attrs["xmin"] = xmin
     attrs["xmax"] = xmax
