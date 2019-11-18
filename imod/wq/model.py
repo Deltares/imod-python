@@ -60,6 +60,26 @@ class Model(collections.UserDict):
                             figsize=figsize,
                         )
 
+    def sel(self, **dimensions):
+        selmodel = type(self)(self.modelname, self.check)
+        for pgkname, pkg in self.items():
+            sel_dims = {k: v for k, v in dimensions.items() if k in pkg}
+            if len(this_dims) == 0:
+                selmodel[pkgname] = pkg
+            else:
+                selmodel[pkgname] = pkg.loc[sel_dims]
+        return selmodel
+
+    def isel(self, **dimensions):
+        selmodel = type(self)(self.modelname, self.check)
+        for pgkname, pkg in self.items():
+            sel_dims = {k: v for k, v in dimensions.items() if k in pkg}
+            if len(this_dims) == 0:
+                selmodel[pkgname] = pkg
+            else:
+                selmodel[pkgname] = pkg[sel_dims]
+        return selmodel
+
 
 class SeawatModel(Model):
     """
@@ -525,13 +545,3 @@ class SeawatModel(Model):
 
         for pkg in self.values():
             pkg._pkgcheck(ibound=ibound)
-
-    def sel(self, **dimensions):
-        selmodel = SeawatModel(self.modelname, self.check)
-        for pgkname, pkg in self.items():
-            sel_dims = {k: v for k, v in dimensions.items() if k in pkg}
-            if len(this_dims) == 0:
-                selmodel[pkgname] = pkg
-            else:
-                selmodel[pkgname] = pkg.loc[sel_dims]
-        return selmodel
