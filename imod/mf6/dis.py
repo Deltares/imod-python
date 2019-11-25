@@ -7,23 +7,28 @@ from imod.mf6.pkgbase import Package
 
 class StructuredDiscretization(Package):
     """
-    The Drain package is used to simulate head-dependent flux boundaries. In the
-    Drain package if the head in the cell falls below a certain threshold, the
-    flux from the drain to the model cell drops to zero.
+    Discretization information for structered grids is specified using the file.
+    (DIS6) Only one discretization input file (DISU6, DISV6 or DIS6) can be
+    specified for a model.
+    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=35
 
     Parameters
     ----------
+    top: array of floats (xr.DataArray)
+        is the top elevation for each cell in the top model layer.
+    bottom: array of floats (xr.DataArray)
+        is the bottom elevation for each cell.
     idomain: array of integers (xr.DataArray)
-        Indicates the existence status of a cell. Horizontal discretization information will
-        be derived from the ``x`` and ``y`` coordinates of the DataArray.
-
-        If the IDOMAIN value for a cell is 0, the cell does not exist in the simulation. Input
-        and output values will be read and written for the cell, but internal to the program,
-        the cell is excluded from the solution. If the IDOMAIN value for a cell is 1, the cell
-        exists in the simulation. If the IDOMAIN value for a cell is -1, the cell does not exist
-        in the simulation. Furthermore, the first existing cell above will be connected to the
-        first existing cell below. This type of cell is referred to as a “vertical pass through”
-        cell.
+        Indicates the existence status of a cell. Horizontal discretization
+        information will be derived from the x and y coordinates of the
+        DataArray. If the idomain value for a cell is 0, the cell does not exist
+        in the simulation. Input and output values will be read and written for
+        the cell, but internal to the program, the cell is excluded from the
+        solution. If the idomain value for a cell is 1, the cell exists in the
+        simulation. if the idomain value for a cell is -1, the cell does not
+        exist in the simulation. Furthermore, the first existing cell above will
+        be connected to the first existing cell below. This type of cell is
+        referred to as a “vertical pass through”cell.
     """
 
     __slots__ = ("top", "bottom", "idomain")
