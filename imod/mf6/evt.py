@@ -46,6 +46,7 @@ class Evapotranspiration(BoundaryCondition):
     observations: [Not yet supported.]
         Default is None.
     """
+
     __slots__ = (
         "surface",
         "rate",

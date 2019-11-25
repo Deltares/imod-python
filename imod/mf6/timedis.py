@@ -22,6 +22,7 @@ class TimeDiscretization(Package):
         step by timestep_multiplier (TSMULT).
         Default value: 1.0
     """
+
     __slots__ = ("timestep_duration", "n_timesteps", "timestep_multiplier")
     _pkg_id = "tdis"
     _template = Package._initialize_template(_pkg_id)

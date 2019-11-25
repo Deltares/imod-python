@@ -41,6 +41,7 @@ class ConstantHead(BoundaryCondition):
     observations: [Not yet supported.]
         Default is None.
     """
+
     __slots__ = ("head", "print_input", "print_flows", "save_flows", "observations")
     _pkg_id = "chd"
     _binary_data = ("head",)

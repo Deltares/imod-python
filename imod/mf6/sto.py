@@ -31,6 +31,7 @@ class Storage(Package):
     transient: ({True, False})
         Boolean to indicate if the model is transient or steady-state.
     """
+
     __slots__ = ("specific_storage", "specific_yield", "convertible", "transient")
     _pkg_id = "sto"
     _template = Package._initialize_template(_pkg_id)

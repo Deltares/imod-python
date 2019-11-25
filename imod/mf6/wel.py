@@ -38,6 +38,7 @@ class Well(BoundaryCondition):
     observations: [Not yet supported.]
         Default is None.
     """
+
     __slots__ = (
         "layer",
         "row",

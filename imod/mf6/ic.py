@@ -23,6 +23,7 @@ class InitialConditions(Package):
         steadystate solution. A head value lower than the cell bottom can be
         provided if a cell should start as dry. (strt)
     """
+
     __slots__ = ("head",)
     _pkg_id = "ic"
     _binary_data = {"head": np.float64}
