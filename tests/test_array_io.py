@@ -308,6 +308,17 @@ def test_saveopen_timelayer(test_timelayerda, kind, tmp_path):
     assert da.identical(test_timelayerda)
 
 
+@pytest.mark.parametrize("kind", [(imod.rasterio, "tif"), (imod.idf, "idf")])
+def test_saveopen_timelayer_chunks(test_timelayerda, kind, tmp_path):
+    chunkda = test_timelayerda.chunk({"layer": 1, "time": 1})
+    module, ext = kind
+    module.save(tmp_path / "chunked", chunkda)
+    da = module.open(tmp_path / f"chunked_*.{ext}")
+    # .identical() fails in this case ...
+    assert isinstance(da, xr.DataArray)
+    assert da.equals(chunkda)
+
+
 def test_lazy(test_da, tmp_path):
     """
     Reading should be lazily executed. That means it has to be part of the dask
