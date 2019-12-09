@@ -25,7 +25,6 @@ def test_da(request):
     kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=request.param)
     da = xr.DataArray(data, **kwargs)
-    da.attrs["crs"] = None
     return da
 
 
@@ -39,7 +38,6 @@ def test_da__nodxdy(request):
     kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=request.param)
     da = xr.DataArray(data, **kwargs)
-    da.attrs["crs"] = None
     return da
 
 
@@ -55,7 +53,6 @@ def test_nptimeda(request):
     kwargs = {"name": "testnptime", "coords": coords, "dims": ("time", "y", "x")}
     data = np.ones((ntime, nrow, ncol), dtype=request.param)
     da = xr.DataArray(data, **kwargs)
-    da.attrs["crs"] = None
     return da
 
 
@@ -73,7 +70,6 @@ def test_cftimeda(request):
     kwargs = {"name": "testcftime", "coords": coords, "dims": ("time", "y", "x")}
     data = np.ones((ntime, nrow, ncol), dtype=request.param)
     da = xr.DataArray(data, **kwargs)
-    da.attrs["crs"] = None
     return da
 
 
@@ -88,7 +84,6 @@ def test_layerda():
     kwargs = {"name": "layer", "coords": coords, "dims": ("layer", "y", "x")}
     data = np.ones((nlay, nrow, ncol), dtype=np.float32)
     da = xr.DataArray(data, **kwargs)
-    da.attrs["crs"] = None
     return da
 
 
@@ -113,7 +108,6 @@ def test_timelayerda():
             data[i, j, ...] = layer * (i + 1)
 
     da = xr.DataArray(data, **kwargs)
-    da.attrs["crs"] = None
     return da
 
 
@@ -140,7 +134,6 @@ def test_speciestimelayerda():
                 data[s, i, j, ...] = layer * (i + 1)
 
     da = xr.DataArray(data, **kwargs)
-    da.attrs["crs"] = None
     return da
 
 
