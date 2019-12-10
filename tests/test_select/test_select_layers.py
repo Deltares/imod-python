@@ -116,4 +116,3 @@ def test_upper_active_layer_not_an_ibound():
     # assert
     with pytest.raises(ValueError):
         assert imod.select.upper_active_layer(da_test, is_ibound=True)
-
