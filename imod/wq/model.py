@@ -331,13 +331,11 @@ class SeawatModel(Model):
         baskey = self._get_pkgkey("bas6")
         btnkey = self._get_pkgkey("btn")
         diskey = self._get_pkgkey("dis")
-        thickness = self[baskey].thickness()
+        self[btnkey]["thickness"] = self[baskey].thickness()
 
         if btnkey is None:
             raise ValueError("No BasicTransport package provided.")
-        btn_content = self[btnkey]._render(
-            directory=directory.joinpath(btnkey), thickness=thickness
-        )
+        btn_content = self[btnkey]._render(directory=directory.joinpath(btnkey))
         dis_content = self[diskey]._render_btn(globaltimes=globaltimes)
         return btn_content + dis_content
 
