@@ -68,6 +68,7 @@ class BasicTransport(Package):
         "n_species",
         "inactive_concentration",
         "minimum_active_thickness",
+        "thickness",
     )
     _pkg_id = "btn"
 
@@ -108,7 +109,7 @@ class BasicTransport(Package):
         self["inactive_concentration"] = inactive_concentration
         self["minimum_active_thickness"] = minimum_active_thickness
 
-    def _render(self, directory, thickness):
+    def _render(self, directory):
         """
         Renders part of [btn] section that does not depend on time,
         and can be inferred without checking the BoundaryConditions.
@@ -158,7 +159,7 @@ class BasicTransport(Package):
         # Add these from the outside, thickness from BasicFlow
         # layer_type from LayerPropertyFlow
         dicts["thickness"] = self._compose_values_layer(
-            "thickness", directory, da=thickness
+            "thickness", directory, da=self.thickness
         )
         d["dicts"] = dicts
         return self._template.render(d)
@@ -179,7 +180,9 @@ class BasicTransport(Package):
             )
 
         _, nlabels = scipy.ndimage.label(active_cells.values)
-        if nlabels > 1:
-            raise ValueError(
-                f"{nlabels} disconnected model domain detected in the icbund in {self}"
-            )
+
+
+#        if nlabels > 1:
+#            raise ValueError(
+#                f"{nlabels} disconnected model domain detected in the icbund in {self}"
+#            )

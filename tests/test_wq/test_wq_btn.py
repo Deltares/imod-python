@@ -49,18 +49,18 @@ def test_btn_render_arrays(basictransport):
                 icbund_l1 = icbund_l1.idf
                 icbund_l2 = icbund_l2.idf
                 icbund_l3 = icbund_l3.idf
-                dz_l1 = 10.0
-                dz_l2 = 10.0
-                dz_l3 = 10.0
+                dz_l1 = thickness_l1.idf
+                dz_l2 = thickness_l2.idf
+                dz_l3 = thickness_l3.idf
                 prsity_l1 = 0.3
                 prsity_l2 = 0.3
                 prsity_l3 = 0.3"""
     )
 
-    layer = np.arange(1, 4)
-    thickness = xr.DataArray(np.full(3, 10.0), {"layer": layer}, dims=("layer",))
-
-    assert btn._render(directory, thickness=thickness) == compare
+    shape = btn["icbund"].shape
+    thickness = xr.full_like(btn["icbund"], np.ones(shape))
+    btn["thickness"] = thickness
+    assert btn._render(directory) == compare
 
 
 def test_btn_render_constants(basictransport):
@@ -88,4 +88,6 @@ def test_btn_render_constants(basictransport):
                 prsity_l? = 0.3"""
     )
 
-    assert btn._render(directory, thickness=thickness) == compare
+    thickness = xr.DataArray(np.full(3, 10.0), {"layer": layer}, dims=("layer",))
+    btn["thickness"] = thickness
+    assert btn._render(directory) == compare
