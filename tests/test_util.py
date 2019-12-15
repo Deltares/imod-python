@@ -247,6 +247,17 @@ def test_decompose_datelayeronly():
     assert d == refd
 
 
+def test_decompose_z_float():
+    d = util.decompose("test_0.25.idf", pattern="{name}_{z}")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("."),
+        "name": "test",
+        "z": "0.25",
+        "dims": ["z"],
+    }
+
+
 def test_compose_year9999():
     d = {
         "name": "head",
