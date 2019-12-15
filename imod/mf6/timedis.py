@@ -4,6 +4,25 @@ from imod.mf6.pkgbase import Package
 
 
 class TimeDiscretization(Package):
+    """
+    Timing for all models of the simulation is controlled by the Temporal
+    Discretization (TDIS) Package.
+    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=17
+
+    Paremeters
+    ----------
+    timestep_duration: float
+        is the length of a stress period. (PERLEN)
+    n_timesteps: int, optional
+        is the number of time steps in a stress period (nstp).
+        Default value: 1
+    timestep_multiplier: float, optional
+        is the multiplier for the length of successive time steps. The length of
+        a time step is calculated by multiplying the length of the previous time
+        step by timestep_multiplier (TSMULT).
+        Default value: 1.0
+    """
+
     __slots__ = ("timestep_duration", "n_timesteps", "timestep_multiplier")
     _pkg_id = "tdis"
     _template = Package._initialize_template(_pkg_id)

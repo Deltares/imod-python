@@ -44,7 +44,9 @@ def _write_chunks(a, pattern, d, nodata, dtype, write):
             fn = util.compose(d, pattern)
             write(fn, a, nodata, dtype)
     else:  # recursive case
-        chunksizes = a.chunks[0]
+        for dim, chunksizes in zip(a.dims, a.chunks):
+            if len(chunksizes) > 1:
+                break
         start = 0
         for chunksize in chunksizes:
             end = start + chunksize

@@ -2,6 +2,51 @@ from imod.mf6.pkgbase import BoundaryCondition
 
 
 class Evapotranspiration(BoundaryCondition):
+    """
+    Evapotranspiration (EVT) Package.
+    Any number of EVT Packages can be specified for a single groundwater flow
+    model. All single-valued variables are free format.
+    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=86
+
+    Parameters
+    ----------
+    surface: array of floats (xr.DataArray)
+        is the elevation of the ET surface (L). A time-series name may be
+        specified.
+    rate: array of floats (xr.DataArray)
+        is the maximum ET flux rate (LT −1). A time-series name may be
+        specified.
+    depth: array of floats (xr.DataArray)
+        is the ET extinction depth (L). A time-series name may be specified.
+    proportion_rate: array of floats (xr.DataArray)
+        is the proportion of the maximum ET flux rate at the bottom of a segment
+        (dimensionless). A time-series name may be specified. (petm)
+    proportion_depth: array of floats (xr.DataArray)
+        is the proportion of the ET extinction depth at the bottom of a segment
+        (dimensionless). A timeseries name may be specified. (pxdp)
+    fixed_cell: array of floats (xr.DataArray)
+        indicates that evapotranspiration will not be reassigned to a cell
+        underlying the cell specified in the list if the specified cell is
+        inactive.
+    print_input: ({True, False}, optional)
+        keyword to indicate that the list of evapotranspiration information will
+        be written to the listing file immediately after it is read.
+        Default is False.
+    print_flows: ({True, False}, optional)
+        Indicates that the list of evapotranspiration flow rates will be printed
+        to the listing file for every stress period time step in which “BUDGET
+        PRINT”is specified in Output Control. If there is no Output Control
+        option and PRINT FLOWS is specified, then flow rates are printed for the
+        last time step of each stress period.
+        Default is False.
+    save_flows: ({True, False}, optional)
+        Indicates that evapotranspiration flow terms will be written to the file
+        specified with “BUDGET FILEOUT” in Output Control.
+        Default is False.
+    observations: [Not yet supported.]
+        Default is None.
+    """
+
     __slots__ = (
         "surface",
         "rate",

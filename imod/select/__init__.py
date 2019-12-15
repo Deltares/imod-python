@@ -1,5 +1,5 @@
 """
-Get points and cross sections.
+Get points, cross sections and layers.
 """
 
 from imod.select.cross_sections import cross_section_line, cross_section_linestring
@@ -9,3 +9,4 @@ from imod.select.points import (
     points_set_values,
     points_values,
 )
+from imod.select.layers import upper_active_layer

@@ -31,6 +31,7 @@ def test_saveopen(test_da, tmp_path):
     imod.rasterio.save(tmp_path / "no_crs.asc", da)
     daback = imod.rasterio.open(tmp_path / "no_crs.asc").load()
     daback.name = "test"
+    da.attrs.pop("crs")
     assert daback.identical(da)
 
 
