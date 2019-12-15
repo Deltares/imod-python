@@ -49,7 +49,7 @@ def _groupdict(stem, pattern):
             pattern = pattern.lower()
             # Get the variables between curly braces
             in_curly = re.compile(r"{(.*?)}").findall(pattern)
-            regex_parts = {key: f"(?P<{key}>[\\w-]+)" for key in in_curly}
+            regex_parts = {key: f"(?P<{key}>[\\w.-]+)" for key in in_curly}
             # Format the regex string, by filling in the variables
             simple_regex = pattern.format(**regex_parts)
             re_pattern = re.compile(simple_regex)
