@@ -4,7 +4,7 @@ import numpy as np
 import imod
 
 
-def cross_section(da, layers=False, **kwargs):
+def cross_section(da, colors, levels, layers=False, kwargs_pcolormesh, kwargs_colorbar):
     """
     Wraps matplotlib.pcolormesh to draw cross-sections, drawing cell boundaries
     accurately.
@@ -18,10 +18,20 @@ def cross_section(da, layers=False, **kwargs):
 
         Coordinates "top" and "bottom" must be present, and must have the same
         dimensions.
+    colors : list of str, or list of RGB tuples
+        Matplotlib acceptable list of colors. Length N.
+        Accepts both tuples of (R, G, B) and hexidecimal (e.g. "#7ec0ee").
+
+        Looking for good colormaps? Try: http://colorbrewer2.org/
+        Choose a colormap, and use the HEX JS array.
+    levels : listlike of floats or integers
+        Boundaries between the legend colors/classes. Length: N - 1.
     layers : boolean, optional
         Whether to draw lines separating the layers.
-    **kwargs
+    kwargs_pcolormesh
         Other optional keyword arguments for matplotlib.pcolormesh.
+    kwargs_colorbar
+        These arguments are forwarded to fig.colorbar()
 
     Returns
     -------
@@ -46,6 +56,34 @@ def cross_section(da, layers=False, **kwargs):
         # Switch 'm around
         dims = (dims[1], dims[0])
 
+    ncolors = len(colors)
+    nlevels = len(levels)
+    if not nlevels == ncolors - 1:
+        raise ValueError(
+            f"Incorrect number of levels. Number of colors is {ncolors},"
+            f" expected {ncolors - 1}, got {nlevels} instead."
+        )
+    # Read legend settings
+    cmap = matplotlib.colors.ListedColormap(colors[1:-1])
+    cmap.set_under(colors[0])  # this is the color for values smaller than raster.min()
+    cmap.set_over(colors[-1])  # this is the color for values larger than raster.max()
+    norm = matplotlib.colors.BoundaryNorm(levels, cmap.N)
+
+    # cbar kwargs
+    settings_cbar = {"ticks": levels, "extend": "both"}
+
+    # Find a unit in the raster to use in the colorbar label
+    try:
+        settings_cbar["label"] = da.attrs["units"]
+    except (KeyError, AttributeError):
+        try:
+            settings_cbar["label"] = da.attrs["unit"]
+        except (KeyError, AttributeError):
+            pass
+
+    if kwargs_colorbar is not None:
+        settings_cbar.update(kwargs_colorbar)
+
     # Ensure dimensions are in the right order
     da = da.transpose(*dims, transpose_coords=True)
     data = da.values
@@ -64,7 +102,7 @@ def cross_section(da, layers=False, **kwargs):
             pass
         else:
             raise ValueError(f"{xcoord} is not monotonic")
-        X = (xmin + dx[0]) + dx[1:]
+        X = (xmin + dx[0]) + dx[1:].cumsum()
 
     Y = np.vstack([da["top"].isel(layer=0).values, da["bottom"].values])
     Y = np.repeat(Y, 2, 1)
@@ -79,9 +117,22 @@ def cross_section(da, layers=False, **kwargs):
     C[:, 0::2] = data
 
     fig, ax = plt.subplots()
-    ax.pcolormesh(X, Y, C, **kwargs)
+    # Plot raster
+    ax1 = ax.pcolormesh(X, Y, C, **kwargs_pcolormesh)
     if layers:
         Y[nodata] = np.nan
         for y in Y:
             ax.step(x=X[0], y=y)
+
+    # Make triangles white if data is not larger/smaller than legend_levels-range
+    if float(da.max().compute()) < levels[-1]:
+        ax1.cmap.set_over("#FFFFFF")
+    if float(da.min().compute()) > levels[0]:
+        ax1.cmap.set_under("#FFFFFF")
+
+    # Add colorbar
+    divider = make_axes_locatable(ax)
+    cbar_ax = divider.append_axes("right", size="5%", pad="5%")
+    fig.colorbar(ax1, cmap=cmap, norm=norm, cax=cbar_ax, **settings_cbar)
+
     return fig, ax
