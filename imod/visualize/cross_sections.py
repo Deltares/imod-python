@@ -4,7 +4,7 @@ import numpy as np
 import imod
 
 
-def cross_section(da, colors, levels, layers=False, kwargs_pcolormesh, kwargs_colorbar):
+def cross_section(da, colors, levels, layers=False, kwargs_pcolormesh={}, kwargs_colorbar={}):
     """
     Wraps matplotlib.pcolormesh to draw cross-sections, drawing cell boundaries
     accurately.
