@@ -1,14 +1,24 @@
 begin options
-{%- if auxiliary is defined -%}  auxiliary {{auxiliary(naux)}}{%- endif -%}
-{%- if print_input is defined -%}  print_input{%- endif -%}
-{%- if print_flows is defined -%}  print_flows{%- endif -%}
-{%- if save_flows is defined -%}  save_flows{%- endif -%}
-{%- if cell_averaging is defined -%}  cell_averaging {{cell_averaging}}{%- endif -%}
-{%- if cvoptions is defined -%}  variablecv {%- if dewatered is defined -%}dewatered{%- endif -%}{%- endif -%}
-{%- if newton is defined -%}  newton{%- endif -%}
-{%- if gnc_filerecord is defined -%}  gnc6 filein {{gnc6_filename}}{%- endif -%}
-{%- if mvr_filerecord is defined -%}  mvr6 filein {{mvr6_filename}}{%- endif -%}
-{%- if obs_filerecord is defined -%}  obs6 filein {{obs6_filename}}{%- endif -%}
+{%- if auxiliary is defined -%}  auxiliary {{auxiliary}}
+{% endif -%}
+{%- if print_input is defined -%}  print_input
+{% endif -%}
+{%- if print_flows is defined -%}  print_flows
+{% endif -%}
+{%- if save_flows is defined -%}  save_flows
+{% endif -%}
+{%- if cell_averaging is defined -%}  cell_averaging {{cell_averaging}}
+{% endif -%}
+{%- if variablecv is defined -%}  variablecv {%- if dewatered is defined -%}dewatered{%- endif -%}
+{% endif -%}
+{%- if newton is defined -%}  newton
+{% endif -%}
+{%- if gnc is defined -%}  gnc6 filein {{gnc}}
+{% endif -%}
+{%- if mvr is defined -%}  mvr6 filein {{mvr}}
+{% endif -%}
+{%- if obs is defined -%}  obs6 filein {{obs}}
+{% endif -%}
 end options
 
 begin dimensions
@@ -16,8 +26,5 @@ begin dimensions
 end dimensions
 
 begin exchangedata
-  {{cellidm1}} {{cellidm2}} {{ihc}} {{cl1}} {{cl2}} {{hwva}} {%- if aux is defined -%}{{aux(naux)}}{%- endif -%}
-  {{cellidm1}} {{cellidm2}} {{ihc}} {{cl1}} {{cl2}} {{hwva}} {%- if aux is defined -%}{{aux(naux)}}{%- endif -%}
-  ...
+  open/close {{path}} (binary)
 end exchangedata
-
