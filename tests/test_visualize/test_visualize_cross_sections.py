@@ -34,6 +34,10 @@ def test_plot_cross_section(testda, equidistant, transposed, transpose_coords):
     da = testda(equidistant)
     if transposed:
         da = da.transpose("x", "layer", transpose_coords=transpose_coords)
-    fig, ax = imod.visualize.cross_section(da, layers=True)
+    levels = [0.0, 0.25, 0.50, 0.75, 1.0]
+    colors = ["#ffffcc", "#c7e9b4", "#7fcdbb", "#41b6c4", "#2c7fb8", "#253494"]
+    fig, ax = imod.visualize.cross_section(
+        da, layers=True, levels=levels, colors=colors
+    )
     assert isinstance(fig, plt.Figure)
     assert isinstance(ax, plt.Axes)
