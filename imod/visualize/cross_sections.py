@@ -32,9 +32,9 @@ def cross_section(
         Boundaries between the legend colors/classes. Length: N - 1.
     layers : boolean, optional
         Whether to draw lines separating the layers.
-    kwargs_pcolormesh
+    kwargs_pcolormesh : dict
         Other optional keyword arguments for matplotlib.pcolormesh.
-    kwargs_colorbar
+    kwargs_colorbar : dict
         These arguments are forwarded to fig.colorbar()
 
     Returns
