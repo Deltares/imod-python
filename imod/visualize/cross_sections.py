@@ -89,7 +89,7 @@ def cross_section(
         settings_cbar.update(kwargs_colorbar)
 
     # pcmesh kwargs
-    settings_pcmesh = {"cmap":cmap, "norm":norm}
+    settings_pcmesh = {"cmap": cmap, "norm": norm}
     if kwargs_pcolormesh is not None:
         settings_pcmesh.update(kwargs_pcolormesh)
 
