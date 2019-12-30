@@ -88,6 +88,11 @@ def cross_section(
     if kwargs_colorbar is not None:
         settings_cbar.update(kwargs_colorbar)
 
+    # pcmesh kwargs
+    settings_pcmesh = {"cmap":cmap, "norm":norm}
+    if kwargs_pcolormesh is not None:
+        settings_pcmesh.update(kwargs_pcolormesh)
+
     # Ensure dimensions are in the right order
     da = da.transpose(*dims, transpose_coords=True)
     data = da.values
@@ -122,7 +127,7 @@ def cross_section(
 
     fig, ax = plt.subplots()
     # Plot raster
-    ax1 = ax.pcolormesh(X, Y, C, **kwargs_pcolormesh)
+    ax1 = ax.pcolormesh(X, Y, C, **settings_pcmesh)
     if layers:
         Y[nodata] = np.nan
         for y in Y:
