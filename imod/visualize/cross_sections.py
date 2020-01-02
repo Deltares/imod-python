@@ -7,7 +7,7 @@ import imod
 
 
 def cross_section(
-    da, colors, levels, layers=False, kwargs_pcolormesh={}, kwargs_colorbar={}
+    da, colors, levels, layers=False, kwargs_pcolormesh={}, kwargs_colorbar={}, return_cmap_norm=False
 ):
     """
     Wraps matplotlib.pcolormesh to draw cross-sections, drawing cell boundaries
@@ -36,11 +36,16 @@ def cross_section(
         Other optional keyword arguments for matplotlib.pcolormesh.
     kwargs_colorbar : dict
         These arguments are forwarded to fig.colorbar()
+    return_cmap_norm : boolean, optional
+        Return the cmap and norm of the plot, default False
 
     Returns
     -------
     fig : matplotlib.figure
     ax : matplotlig.ax
+    if return_cmap_norm == True:
+    cmap : matplotlib.colors.ListedColormap
+    norm : matplotlib.colors.BoundaryNorm
     """
     if len(da.dims) != 2:
         raise ValueError("DataArray must be 2D")
@@ -144,4 +149,7 @@ def cross_section(
     cbar_ax = divider.append_axes("right", size="5%", pad="5%")
     fig.colorbar(ax1, cmap=cmap, norm=norm, cax=cbar_ax, **settings_cbar)
 
-    return fig, ax
+    if not return_cmap_norm:
+        return fig, ax
+    else:
+        return fig, ax, cmap, norm
