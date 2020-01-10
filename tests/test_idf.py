@@ -7,10 +7,9 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from pytest import approx
 
-from imod import idf
-from imod import util
-from imod import array_io
+from imod import array_io, idf, util
 
 
 @pytest.fixture(scope="module", params=[np.float32, np.float64])
@@ -142,8 +141,8 @@ def test_xycoords_equidistant_array():
     coords = util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
     assert np.allclose(coords["x"], np.arange(xmin + 1.0, xmax, 2.0))
     assert np.allclose(coords["y"], np.arange(ymax - 0.25, ymin, -0.5))
-    assert coords["dx"] == 2.0
-    assert coords["dy"] == -0.5
+    assert coords["dx"] == approx(2.0)
+    assert coords["dy"] == approx(-0.5)
 
 
 def test_saveopen__nonequidistant(test_da_nonequidistant, tmp_path):
@@ -162,24 +161,25 @@ def test_save_topbot__single_layer(test_da, tmp_path):
     da = da.assign_coords(z=0.5)
     da = da.assign_coords(dz=1.0)
     idf.save(tmp_path / "test", da)
-    _, attrs = idf.read(tmp_path / "test.idf")
-    assert attrs["top"] == 1.0
-    assert attrs["bot"] == 0.0
+    da_read = idf.open(tmp_path / "test.idf")
+    assert da_read["z"] == approx(0.5)
+    assert da_read["dz"] == approx(1.0)
 
 
 def test_save_topbot__layers(test_layerda, tmp_path):
     da = test_layerda
     da = da.assign_coords(z=("layer", np.arange(1.0, 6.0) - 0.5))
     idf.save(tmp_path / "layer", da)
-    _, attrs = idf.read(tmp_path / "layer_l1.idf")
-    assert attrs["top"] == 1.0
-    assert attrs["bot"] == 0.0
-    _, attrs = idf.read(tmp_path / "layer_l2.idf")
-    assert attrs["top"] == 2.0
-    assert attrs["bot"] == 1.0
+    da_l1 = idf.open(tmp_path / "layer_l1.idf")
+    assert da_l1["z"] == approx(0.5)
+    assert da_l1["dz"] == approx(1.0)
+    da_l2 = idf.open(tmp_path / "layer_l2.idf")
+    assert da_l2["z"] == approx(1.5)
+    assert da_l2["dz"] == approx(1.0)
     # Read multiple idfs
     actual = idf.open(tmp_path / "layer_l*.idf")
     assert np.allclose(actual["z"], da["z"])
+    assert actual["dz"] == approx(1.0)
 
 
 def test_save_topbot__layers_nonequidistant(test_layerda, tmp_path):
@@ -201,15 +201,12 @@ def test_save_topbot__only_z(test_layerda, tmp_path):
     da = da.swap_dims({"layer": "z"})
     da = da.drop("layer")
     idf.save(tmp_path / "layer", da)
-    _, attrs = idf.read(tmp_path / "layer_l1.idf")
-    assert attrs["top"] == 1.0
-    assert attrs["bot"] == 0.0
-    _, attrs = idf.read(tmp_path / "layer_l2.idf")
-    assert attrs["top"] == 2.0
-    assert attrs["bot"] == 1.0
-
-    actual = idf.open(tmp_path / "layer_l1.idf")
-    assert float(actual["z"]) == 0.5
+    da_l1 = idf.open(tmp_path / "layer_l1.idf")
+    assert da_l1["z"] == approx(0.5)
+    assert da_l1["dz"] == approx(1.0)
+    da_l2 = idf.open(tmp_path / "layer_l2.idf")
+    assert da_l2["z"] == approx(1.5)
+    assert da_l2["dz"] == approx(1.0)
 
 
 def test_save_topbot__errors(test_layerda, tmp_path):
