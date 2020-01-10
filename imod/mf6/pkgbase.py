@@ -86,6 +86,10 @@ class Package(xr.Dataset):
         data is a xr.Dataset with only the binary variables"""
         arrays = []
         for datavar in ds.data_vars:
+            if ds[datavar].shape == ():
+                raise ValueError(
+                    f"{datavar} in {ds._pkg_id} package cannot be a scalar"
+                )
             arrays.append(ds[datavar].values)
         if "layer" in ds.coords and "layer" not in ds.dims:
             layer = ds["layer"].values
