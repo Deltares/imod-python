@@ -26,8 +26,8 @@ def cross_section(
         dimension must be "layer", and the second dimension will be used as the
         x-axis for the cross-section.
 
-        Coordinates "top" and "bottom" must be present, and must have the same
-        dimensions.
+        Coordinates "top" and "bottom" must be present, and must have at least the 
+        "layer" dimension (voxels) or both the "layer" and x-coordinate dimension.
     colors : list of str, or list of RGB tuples
         Matplotlib acceptable list of colors. Length N.
         Accepts both tuples of (R, G, B) and hexidecimal (e.g. "#7ec0ee").
@@ -61,10 +61,10 @@ def cross_section(
         raise ValueError('DataArray must contain coordinate "top"')
     if "bottom" not in da.coords:
         raise ValueError('DataArray must contain coordinate "bottom"')
-    if len(da["top"].dims) != 2:
-        raise ValueError('"top" coordinate be 2D')
-    if len(da["bottom"].dims) != 2:
-        raise ValueError('"bottom" coordinate be 2D')
+    if len(da["top"].dims) > 2:
+        raise ValueError('"top" coordinate be 1D or 2D')
+    if len(da["bottom"].dims) > 2:
+        raise ValueError('"bottom" coordinate be 1D or 2D')
 
     dims = tuple(da.dims)
     if not dims[0] == "layer":
@@ -123,6 +123,13 @@ def cross_section(
         else:
             raise ValueError(f"{xcoord} is not monotonic")
         X = (xmin + dx[0]) + dx[1:].cumsum()
+
+    # if dimensions of top and bottom are 1D (voxels), promote to 2D
+    if len(da["top"].dims) == 1 and len(da["bottom"].dims) == 1:
+        top = np.repeat(np.atleast_2d(da.top), len(da[xcoord]), axis=0).T
+        da = da.assign_coords(top=(("layer", xcoord), top))
+        bot = np.repeat(np.atleast_2d(da.bottom), len(da[xcoord]), axis=0).T
+        da = da.assign_coords(bottom=(("layer", xcoord), bot))
 
     Y = np.vstack([da["top"].isel(layer=0).values, da["bottom"].values])
     Y = np.repeat(Y, 2, 1)
