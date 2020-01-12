@@ -10,6 +10,50 @@ from imod import util
 from imod.wq import timeutil
 
 
+def da_filenames(path, a, pattern=None):
+    """
+    Generate filenames for a single DataArray `a`.
+    Note that this code has been taken from:
+
+    * imod.array_io.writing._write_chunk()
+    * imod.array_io.writing._save()
+
+    As these do the actual writing. Accordingly, changes there should be
+    repeated here...
+    """
+    # Part taken from imod.array_io.writing._save
+    d = {"extension": ".idf", "name": path.stem, "directory": path.parent}
+    # handle the case where they are not a dim but are a coord
+    # i.e. you only have one layer but you did a.assign_coords(layer=1)
+    # in this case we do want _l1 in the IDF file name
+    check_coords = ["layer", "time"]
+    for coord in check_coords:
+        if (coord in a.coords) and not (coord in a.dims):
+            if coord == "time":
+                # .item() gives an integer for datetime64[ns], so convert first.
+                val = a.coords[coord].values
+                if not (val == "steady-state").all():
+                    val = a.coords[coord].values.astype("datetime64[us]").item()
+            else:
+                val = a.coords[coord].item()
+            d[coord] = val
+
+    # Part taken from imod.array_io.writing._write_chunk
+    filenames = []
+    extradims = list(filter(lambda dim: dim not in ("y", "x"), a.dims))
+    if extradims:
+        stacked = a.stack(idf=extradims)
+        for coordvals, a_yx in list(stacked.groupby("idf")):
+            # set the right layer/timestep/etc in the dict to make the filename
+            d.update(dict(zip(extradims, coordvals)))
+            fn = util.compose(d, pattern)
+            filenames.append(fn)
+    else:
+        fn = util.compose(d, pattern)
+        filenames.append(fn)
+    return filenames
+
+
 class Package(xr.Dataset):
     """
     Base package for the different SEAWAT packages.
@@ -159,9 +203,6 @@ class Package(xr.Dataset):
         for name, da in self.data_vars.items():
             if "y" in da.coords and "x" in da.coords:
                 path = pathlib.Path(directory).joinpath(name)
-                if isinstance(da, xr.DataArray):
-                    if "layer" in da.dims:
-                        da = da.dropna(dim="layer", how="all")
 
                 if "species" in da.coords:
                     if "time" in da.coords:
@@ -218,6 +259,27 @@ class Package(xr.Dataset):
                         f"{var} in {self} is not consistent with all variables in: "
                         f"{', '.join(varnames)}. nan values do not line up."
                     )
+
+    def output_filenames(self, directory):
+        """
+        Produce output filenames for a single package.
+        Taken from imod.wq.pkgbase.save()
+        """
+        filenames = []
+        for name, da in self.data_vars.items():
+            if "y" in da.coords and "x" in da.coords:
+                path = pathlib.Path(directory).joinpath(name)
+                if "species" in da.coords:
+                    if "time" in da.coords:
+                        pattern = (
+                            "{name}_c{species}_{time:%Y%m%d%H%M%S}_l{layer}{extension}",
+                        )
+                    else:
+                        pattern = "{name}_c{species}_l{layer}{extension}"
+                    filenames.extend(da_filenames(path, da, pattern))
+                else:
+                    filenames.extend(da_filenames(path, da))
+        return filenames
 
 
 class BoundaryCondition(Package):

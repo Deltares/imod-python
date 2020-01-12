@@ -466,6 +466,18 @@ class SeawatModel(Model):
 
         return "\n\n".join(content)
 
+    def _set_caching_packages(self):
+        # TODO:
+        # Basically every package should rely on bas for checks via ibound
+        # basic domain checking, etc.
+        # baskey = self._get_pkgkey("bas6")
+        # So far, only slv does? Others only depend on themselves.
+        for pkgname, pkg in self.items():
+            if hasattr(pkg, "_filehashself"):
+                pkg._filehashes[pkgname] = pkg._filehashself
+        # If more complex dependencies do show up, probably push methods down
+        # to the individual packages.
+
     def write(self, directory=pathlib.Path("."), result_dir=pathlib.Path("results")):
         """
         Writes model input files.
@@ -511,6 +523,9 @@ class SeawatModel(Model):
             except ValueError:
                 result_dir = os.path.abspath(result_dir)
             result_dir = pathlib.Path(result_dir)
+
+        # Check if any caching packages are present, and set necessary states.
+        self._set_caching_packages()
 
         runfile_content = self.render(writehelp=False, result_dir=result_dir)
         runfilepath = directory / f"{self.modelname}.run"
