@@ -17,7 +17,6 @@ from imod.wq.adv import (
 from imod.wq.bas import BasicFlow
 from imod.wq.btn import BasicTransport
 
-from imod.wq.caching import caching
 from imod.wq.chd import ConstantHead
 from imod.wq.dis import TimeDiscretization
 from imod.wq.drn import Drainage

@@ -8,6 +8,7 @@ import xarray as xr
 import imod
 from imod import util
 from imod.wq import timeutil
+from .caching import caching
 
 
 class Package(xr.Dataset):
@@ -26,6 +27,22 @@ class Package(xr.Dataset):
     """
 
     __slots__ = ("_template", "_pkg_id", "_keywords", "_mapping")
+
+    @classmethod
+    def from_file(cls, path, cache=None):
+        ds = xr.open_dataset(path)
+        kwargs = {var: ds[var] for var in ds.data_vars}
+        if cache is None:
+            return cls(**kwargs)
+        else:
+            # Dynamically construct a CachingPackage
+            # Note:
+            #    "a method cannot be decorated at class definition, because when
+            #    the class is instantiated, the first argument (self) is bound,
+            #    and no longer accessible to the Memory object."
+            # See: https://joblib.readthedocs.io/en/latest/memory.html
+            CachingPackage = caching(cls, cache)
+            return CachingPackage(path, **kwargs)
 
     def __setitem__(self, key, value):
         if isinstance(value, xr.DataArray):

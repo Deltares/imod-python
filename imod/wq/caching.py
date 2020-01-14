@@ -62,7 +62,7 @@ def check_filehashes(filehashes):
     return out
 
 
-def caching(package, path, memory):
+def caching(package, memory):
     """
     This function produces a special version of an input package, which avoids
     expensive computation during rendering and writing of the runfile, and
@@ -80,12 +80,6 @@ def caching(package, path, memory):
         imod.SeawatModel input package with caching mechanisms for the
         computationally expensive methods.
     """
-    if isinstance(path, str):
-        path = pathlib.Path(path)
-
-    ds = xr.open_dataset(path)
-    filehash = hash_filemetadata(path)
-    kwargs = {var: ds[var] for var in ds.data_vars}
     output_status = memory.cache(insert_hash)
 
     # Define methods which take the filehashes. These are the functions that
@@ -114,11 +108,13 @@ def caching(package, path, memory):
             "_caching_max_n",
         )
 
-        def __init__(self, *args, **kwargs):
+        def __init__(self, path, *args, **kwargs):
             self._caching_save = memory.cache(_save, ignore=["pkg"])
             self._caching_check = memory.cache(_check, ignore=["pkg", "ibound"])
             self._caching_max_n = memory.cache(_max_n, ignore=["pkg"])
             super(__class__, self).__init__(*args, **kwargs)
+            package._filehashself = filehash(path)
+            package._filehashes = {}
             self._outputfiles = []
             # TODO: ensure some immutability somehow?
 
@@ -155,7 +151,8 @@ def caching(package, path, memory):
                 output_hashes = output_metadata_hashes(self, directory)
                 output_status(output_hashes)
 
-    pkg = CachingPackage(**kwargs)
-    pkg._filehashself = filehash
-    pkg._filehashes = {}
-    return pkg
+    # Update name of CachingPackage
+    CachingPackage.__name__ = "Caching" + package.__name__
+    CachingPackage.__qualname__ = "Caching" + package.__qualname__
+
+    return CachingPackage
