@@ -527,11 +527,11 @@ class SeawatModel(Model):
         # Check if any caching packages are present, and set necessary states.
         self._set_caching_packages()
 
-        runfile_content = self.render(writehelp=False, result_dir=result_dir)
-        runfilepath = directory / f"{self.modelname}.run"
-
         if not self.check is None:
             self.package_check()
+
+        runfile_content = self.render(writehelp=False, result_dir=result_dir)
+        runfilepath = directory / f"{self.modelname}.run"
 
         # Start writing
         directory.mkdir(exist_ok=True, parents=True)

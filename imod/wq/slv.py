@@ -183,7 +183,7 @@ class ParallelSolver(Package):
                 self._replace_keyword(d, key)
 
         if self["partition"] == "rcb":
-            d["load_balance_weight"] = util.compose(
+            d["load_balance_weight"] = self._compose(
                 {
                     "directory": directory,
                     "name": "load_balance_weight",

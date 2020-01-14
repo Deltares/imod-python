@@ -112,9 +112,9 @@ class Well(BoundaryCondition):
                 for layer in np.unique(self["layer"]):
                     layer = int(layer)
                     d["layer"] = layer
-                    values[layer] = util.compose(d).as_posix()
+                    values[layer] = self._compose(d).as_posix()
             else:
-                values["?"] = util.compose(d).as_posix()
+                values["?"] = self._compose(d).as_posix()
 
         else:
             d["time"] = time
@@ -124,9 +124,9 @@ class Well(BoundaryCondition):
                 select = np.argwhere((self["time"] == time).values)
                 for layer in np.unique(self["layer"].values[select]):
                     d["layer"] = layer
-                    values[layer] = util.compose(d).as_posix()
+                    values[layer] = self._compose(d).as_posix()
             else:
-                values["?"] = util.compose(d).as_posix()
+                values["?"] = self._compose(d).as_posix()
 
         return values
 
@@ -179,8 +179,7 @@ class Well(BoundaryCondition):
         else:
             return ""
 
-    @staticmethod
-    def _save_layers(df, directory, time=None):
+    def _save_layers(self, df, directory, time=None):
         d = {"directory": directory, "name": directory.stem, "extension": ".ipf"}
         d["directory"].mkdir(exist_ok=True, parents=True)
 
@@ -192,11 +191,11 @@ class Well(BoundaryCondition):
                 d["layer"] = layer
                 # Ensure right order
                 outdf = layerdf[["x", "y", "rate", "id_name"]]
-                path = util.compose(d)
+                path = self._compose(d)
                 imod.ipf.write(path, outdf)
         else:
             outdf = df[["x", "y", "rate", "id_name"]]
-            path = util.compose(d)
+            path = self._compose(d)
             imod.ipf.write(path, outdf)
 
     @staticmethod

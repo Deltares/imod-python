@@ -75,37 +75,45 @@ def test_cached_river__max_n(test_timelayerda, tmp_path):
 def test_cached_river__save(test_timelayerda, tmp_path):
     da = test_timelayerda
     river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da,)
+    # Default save for checking
     river.to_netcdf(tmp_path / "river.nc")
 
     memory = joblib.Memory(tmp_path / "my-cache")
     cached_river = imod.wq.caching(imod.wq.River, tmp_path / "river.nc", memory)
     cached_river._filehashes["riv"] = cached_river._filehashself
 
-    river.save("basic-riv")
-    cached_river.save("cached-riv")
+    river.save(tmp_path / "basic-riv")
+    cached_river.save(tmp_path / "cached-riv")
+    # Call render to generate the list of _outputfiles
+    cached_river._render(
+        directory=tmp_path / "cached-riv",
+        globaltimes=cached_river["time"].values,
+        system_index=1,
+    )
     cache_path = tmp_path / "my-cache/imod/wq/caching/_save"
+    output_path = str(tmp_path / "cached-riv/**/*.idf")
+    ref_path = str(tmp_path / "basic-riv/**/*.idf")
     assert len(os.listdir(cache_path)) == 2
 
-    basic_files = [
-        pathlib.Path(p) for p in glob.glob("basic-riv/**/*.idf", recursive=True)
-    ]
-    caching_files = [
-        pathlib.Path(p) for p in glob.glob("cached-riv/**/*.idf", recursive=True)
-    ]
+    basic_files = [pathlib.Path(p) for p in glob.glob(ref_path, recursive=True)]
+    caching_files = [pathlib.Path(p) for p in glob.glob(output_path, recursive=True)]
     assert set(p.name for p in basic_files) == set(p.name for p in caching_files)
 
     # Now remove a single file, this should trigger a recompute.
     os.remove(caching_files[0])
-    cached_river.save("cached-riv")
-    caching_files = [
-        pathlib.Path(p) for p in glob.glob("cached-riv/**/*.idf", recursive=True)
-    ]
+    cached_river.save(tmp_path / "cached-riv")
+    caching_files = [pathlib.Path(p) for p in glob.glob(output_path, recursive=True)]
     assert set(p.name for p in basic_files) == set(p.name for p in caching_files)
 
     del cached_river
     river.to_netcdf(tmp_path / "river.nc")
     cached_river = imod.wq.caching(imod.wq.River, tmp_path / "river.nc", memory)
+    cached_river._render(
+        directory=tmp_path / "cached-riv",
+        globaltimes=cached_river["time"].values,
+        system_index=1,
+    )
     cached_river._filehashes["riv"] = cached_river._filehashself
-    cached_river.save("cached-riv")
+    cached_river.save(tmp_path / "cached-riv")
     assert len(os.listdir(cache_path)) == 3
     assert set(p.name for p in basic_files) == set(p.name for p in caching_files)

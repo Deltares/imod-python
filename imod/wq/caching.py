@@ -1,3 +1,4 @@
+import collections
 import pathlib
 import os
 
@@ -25,7 +26,7 @@ def output_metadata_hashes(pkg, directory):
     a single hash.
     """
     # Generate full list of output files, check sta
-    paths = pkg.output_filenames(directory)
+    paths = pkg._outputfiles
     hashes = []
     for path in paths:
         try:
@@ -107,6 +108,7 @@ def caching(package, path, memory):
         __slots__ = (
             "_filehashself",
             "_filehashes",
+            "_outputfiles",
             "_caching_save",
             "_caching_check",
             "_caching_max_n",
@@ -117,6 +119,7 @@ def caching(package, path, memory):
             self._caching_check = memory.cache(_check, ignore=["pkg", "ibound"])
             self._caching_max_n = memory.cache(_max_n, ignore=["pkg"])
             super(__class__, self).__init__(*args, **kwargs)
+            self._outputfiles = []
             # TODO: ensure some immutability somehow?
 
         def _max_active_n(self, varname, nlayer):
