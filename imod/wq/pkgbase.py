@@ -88,12 +88,7 @@ class Package(xr.Dataset):
     def _compose(self, d, pattern=None):
         # d : dict
         # pattern : string or re.pattern
-        path = util.compose(d, pattern)
-        # if the class has _outputfiles, it's a cachingpackage and we store
-        # the list of output files so we can hash their metadata later.
-        if hasattr(self, "_outputfiles"):
-            self._outputfiles.append(path)
-        return path
+        return util.compose(d, pattern)
 
     def _compose_values_layer(self, varname, directory, time=None, da=None):
         """
@@ -147,7 +142,7 @@ class Package(xr.Dataset):
         if "layer" not in da.coords:
             if idf:
                 pattern += "{extension}"
-                values["?"] = self._compose(d, pattern=pattern).as_posix()
+                values["?"] = self._compose(d, pattern=pattern)
             else:
                 values["?"] = da.values[()]
 
@@ -156,7 +151,7 @@ class Package(xr.Dataset):
             for layer in np.atleast_1d(da.coords["layer"].values):
                 if idf:
                     d["layer"] = layer
-                    values[layer] = self._compose(d, pattern=pattern).as_posix()
+                    values[layer] = self._compose(d, pattern=pattern)
                 else:
                     if "layer" in da.dims:
                         values[layer] = da.sel(layer=layer).values[()]

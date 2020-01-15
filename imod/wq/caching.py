@@ -97,7 +97,7 @@ def caching(package, memory):
     def _save(pkg, filehashes, directory):
         super(type(pkg), pkg).save(directory)
 
-    # Subclass package: overloads max_active_n, pkgcheck, and save methods.
+    # Subclass package: overloads _compose, max_active_n, pkgcheck, and save methods.
     class CachingPackage(package):
         __slots__ = (
             "_filehashself",
@@ -117,6 +117,13 @@ def caching(package, memory):
             package._filehashes = {}
             self._outputfiles = []
             # TODO: ensure some immutability somehow?
+
+        def _compose(self, d, pattern=None):
+            # d : dict
+            # pattern : string or re.pattern
+            path = util.compose(d, pattern).as_posix()
+            self._outputfiles.append(path)
+            return path
 
         def _max_active_n(self, varname, nlayer):
             filehashes = check_filehashes(self._filehashes)

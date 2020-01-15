@@ -112,9 +112,9 @@ class Well(BoundaryCondition):
                 for layer in np.unique(self["layer"]):
                     layer = int(layer)
                     d["layer"] = layer
-                    values[layer] = self._compose(d).as_posix()
+                    values[layer] = self._compose(d)
             else:
-                values["?"] = self._compose(d).as_posix()
+                values["?"] = self._compose(d)
 
         else:
             d["time"] = time
@@ -124,9 +124,9 @@ class Well(BoundaryCondition):
                 select = np.argwhere((self["time"] == time).values)
                 for layer in np.unique(self["layer"].values[select]):
                     d["layer"] = layer
-                    values[layer] = self._compose(d).as_posix()
+                    values[layer] = self._compose(d)
             else:
-                values["?"] = self._compose(d).as_posix()
+                values["?"] = self._compose(d)
 
         return values
 
