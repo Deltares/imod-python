@@ -14,9 +14,7 @@ METHODS.pop("multilinear")
 
 
 @numba.njit(cache=True)
-def _regrid_layers(
-    src, dst, src_top, dst_top, src_bot, dst_bot, method
-):
+def _regrid_layers(src, dst, src_top, dst_top, src_bot, dst_bot, method):
     """
     Maps one set of layers unto the other.
     """
