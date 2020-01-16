@@ -122,10 +122,21 @@ class Well(BoundaryCondition):
     def _compose_values_time(self, directory, globaltimes):
         values = {}
         if "time" in self:
-            package_times = self["time"].values
+            self_times = self["time"].values
+            if "timemap" in self.attrs:
+                timemap_keys = np.array(list(self.attrs["timemap"].keys()))
+                timemap_values = np.array(list(self.attrs["timemap"].values()))
+                package_times, inds = np.unique(
+                    np.concatenate([self_times, timemap_keys]), return_index=True
+                )
+                # Times to write in the runfile
+                runfile_times = np.concatenate([self_times, timemap_values])[inds]
+            else:
+                runfile_times = package_times = self_times
 
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
-            for time, start_end in zip(package_times, starts_ends):
+
+            for time, start_end in zip(runfile_times, starts_ends):
                 values[start_end] = self._compose_values_layer(directory, time)
         else:  # for all periods
             values["?"] = self._compose_values_layer(directory)
@@ -170,3 +181,18 @@ class Well(BoundaryCondition):
     def _pkgcheck(self, ibound=None):
         # TODO: implement
         pass
+
+    def add_timemap(self, timemap, use_cftime=False):
+        # To ensure consistency, it isn't possible to use differing timemaps
+        # between rate and concentration: the number of points might change
+        # between stress periods, and isn't especially easy to check.
+        if "time" not in self:
+            raise ValueError(
+                f"This Wel package does not have time, cannot add timemap."
+            )
+        # Replace both key and value by the right datetime type
+        d = {
+            timeutil.to_datetime(k, use_cftime): timeutil.to_datetime(v, use_cftime)
+            for k, v in timemap.items()
+        }
+        self.attrs["timemap"] = d
