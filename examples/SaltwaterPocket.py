@@ -39,12 +39,6 @@ top1D = xr.DataArray(
 
 bot = top1D - dz
 
-# Define WEL data, need to define the x, y, and pumping rate (q)
-weldata = pd.DataFrame()
-weldata["x"] = 0.5 * dx  # np.full(1, 0.5 * dx)
-weldata["y"] = 0.5  # np.full(1, 0.5)
-weldata["q"] = 0.28512  # positive, so it's an injection well
-
 # Defining the starting concentrations
 sconc = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 0.0),
@@ -72,9 +66,7 @@ m["btn"] = imod.wq.BasicTransport(
 m["adv"] = imod.wq.AdvectionTVD(courant=1.0)
 m["dsp"] = imod.wq.Dispersion(longitudinal=0.001, diffusion_coefficient=0.0000864)
 m["vdf"] = imod.wq.VariableDensityFlow(density_concentration_slope=0.71)
-m["wel"] = imod.wq.Well(
-    id_name="wel", x=weldata["x"], y=weldata["y"], rate=weldata["q"]
-)
+m["wel"] = imod.wq.Well(id_name="wel", x=0.5 * dx, y=0.5, rate=0.28512)
 m["pcg"] = imod.wq.PreconditionedConjugateGradientSolver(
     max_iter=150, inner_iter=30, hclose=0.0001, rclose=0.1, relax=0.98, damp=1.0
 )
