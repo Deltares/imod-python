@@ -64,8 +64,9 @@ def _regrid_layers(src, dst, src_top, dst_top, src_bot, dst_bot, method):
 
 class LayerRegridder:
     """
-    Object to repeatedly voxelize similar objects. Compiles once on first call,
-    can then be repeatedly called without JIT compilation overhead.
+    Object to repeatedly regrid layers from similar objects. Compiles 
+    once on first call, \can then be repeatedly called without 
+    JIT compilation overhead.
 
     Attributes
     ----------
