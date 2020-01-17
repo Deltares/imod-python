@@ -14,9 +14,7 @@ METHODS.pop("multilinear")
 
 
 @numba.njit(cache=True)
-def _regrid_layers(
-    src, dst, src_top, dst_top, src_bot, dst_bot, values, weights, method
-):
+def _regrid_layers(src, dst, src_top, dst_top, src_bot, dst_bot, method):
     """
     Maps one set of layers unto the other.
     """
@@ -52,7 +50,7 @@ def _regrid_layers(
 
                     has_value = True
                     values[count] = src[jj, i, j]
-                    values[count] = overlap
+                    weights[count] = overlap
                     count += 1
                 else:
                     if has_value:
@@ -80,7 +78,7 @@ class LayerRegridder:
     def __init__(self, method):
         _method = common._get_method(method, METHODS)
         self.method = _method
-        self.first_call = True
+        self._first_call = True
 
     def _make_regrid(self):
         """
@@ -89,7 +87,7 @@ class LayerRegridder:
         jit_method = numba.njit(self.method)
 
         @numba.njit
-        def regrid(src, dst, src_top, dst_top, src_bot, dst_bot, weights, values):
+        def regrid(src, dst, src_top, dst_top, src_bot, dst_bot):
             return _regrid_layers(
                 src, dst, src_top, dst_top, src_bot, dst_bot, jit_method
             )
@@ -134,9 +132,9 @@ class LayerRegridder:
                     "Dimensions for top, bottom, and source have to be exactly"
                     f' ("layer", "y", "x"). Got instead {dim_format(da.dims)}.'
                 )
-        for da in [bottom, source]:
-            for (k1, v1), (_, v2) in zip(top.coords.items(), da.coords.items()):
-                if not v1.equals(v2):
+        for da in [source_bottom, source]:
+            for (k1, v1) in source_top.coords.items():
+                if not v1.equals(da.coords[k1]):
                     raise ValueError(f"Input coordinates do not match along {k1}")
 
         if self._first_call:
