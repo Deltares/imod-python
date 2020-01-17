@@ -146,4 +146,3 @@ def test_layerregridder__mode(test_da):
         dims,
     )
     assert actual.identical(expected)
-
