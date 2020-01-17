@@ -56,12 +56,6 @@ icbund[81, :, :] = -1
 icbund[0, :, 41:120] = -1
 icbund.plot(y="layer", yincrease=False)
 
-# Define WEL data
-weldata = pd.DataFrame()
-weldata["x"] = 0.5 * dx
-weldata["y"] = 0.5
-weldata["q"] = 0.28512
-
 # Define the starting concentration
 sconc = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 0.0),
@@ -90,9 +84,7 @@ m["btn"] = imod.wq.BasicTransport(
 m["adv"] = imod.wq.AdvectionTVD(courant=1.0)
 m["dsp"] = imod.wq.Dispersion(longitudinal=0.0, diffusion_coefficient=0.308)
 m["vdf"] = imod.wq.VariableDensityFlow(density_concentration_slope=0.71)
-m["wel"] = imod.wq.Well(
-    id_name="wel", x=weldata["x"], y=weldata["y"], rate=weldata["q"]
-)
+m["wel"] = imod.wq.Well(id_name="wel", x=0.5 * dx, y=0.5, rate=0.28512)
 m["pcg"] = imod.wq.PreconditionedConjugateGradientSolver(
     max_iter=150, inner_iter=30, hclose=0.0001, rclose=0.1, relax=0.98, damp=1.0
 )
