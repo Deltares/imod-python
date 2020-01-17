@@ -25,3 +25,4 @@ from imod.prepare.spatial import (
     rasterize_celltable,
 )
 from imod.prepare.voxelize import Voxelizer
+from imod.prepare.layerregrid import LayerRegridder
