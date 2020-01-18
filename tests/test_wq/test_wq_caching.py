@@ -1,6 +1,9 @@
+import filecmp
 import glob
+import logging
 import pathlib
 import os
+import textwrap
 import time
 
 import joblib
@@ -33,48 +36,47 @@ def test_timelayerda():
     return da
 
 
-def test_cached_river__max_n(test_timelayerda, tmp_path):
+def test_cached_river__max_n(test_timelayerda, tmp_path, capsys):
+    # Use capsys to capture joblib stdout since it doesn't use logging...
     da = test_timelayerda
-    river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da,)
+    river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da)
     riverpath = tmp_path / "river.nc"
     river.to_netcdf(riverpath)
     expected = river._max_active_n("conductance", 2)
 
-    memory = joblib.Memory(tmp_path / "my-cache")
-    cached_river = imod.wq.River.from_file(riverpath, memory)
+    my_cache = tmp_path / "my-cache"
+    cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._filehashes["riv"] = cached_river._filehashself
 
-    cache_path = tmp_path / "my-cache/imod/wq/caching/_max_n"
+    cache_path = tmp_path / "my-cache/River/imod/wq/caching/_max_n"
     # First round, cache is still empty.
     assert cache_path.exists()
-    assert len(os.listdir(cache_path)) == 0
     # First time, runs code
     actual1 = cached_river._max_active_n("conductance", 2)
-    assert cache_path.exists()
-    # a dir with a hash is created, and the function have been stored: a dir and a file.
-    assert len(os.listdir(cache_path)) == 2
+    assert "Calling imod.wq.caching._max_n" in capsys.readouterr().out
     actual2 = cached_river._max_active_n("conductance", 2)
-    assert len(os.listdir(cache_path)) == 2
+    assert "Loading _max_n" in capsys.readouterr().out
 
     # Recreate object
-    cached_river = imod.wq.River.from_file(riverpath, memory)
+    cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._filehashes["riv"] = cached_river._filehashself
     actual3 = cached_river._max_active_n("conductance", 2)
-    assert len(os.listdir(cache_path)) == 2
+    assert "Loading _max_n" in capsys.readouterr().out
 
     # Delete cached_river to release netcdf
+    # Change river
     del cached_river
+    river["conductance"][0, ...] = np.nan
     river.to_netcdf(riverpath)
-    cached_river = imod.wq.River.from_file(riverpath, memory)
+    cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._filehashes["riv"] = cached_river._filehashself
     actual4 = cached_river._max_active_n("conductance", 2)
-    # A new hash should've been created since the file has been modified.
-    assert len(os.listdir(cache_path)) == 3
+    assert "Calling imod.wq.caching._max_n" in capsys.readouterr().out
 
     assert actual1 == actual2 == actual3 == actual4 == expected
 
 
-def test_cached_river__check(test_timelayerda, tmp_path):
+def test_cached_river__check(test_timelayerda, tmp_path, capsys):
     da = test_timelayerda
     river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da,)
     riverpath = tmp_path / "river.nc"
@@ -82,50 +84,66 @@ def test_cached_river__check(test_timelayerda, tmp_path):
     river._pkgcheck()
 
     # Only tests whether it runs without erroring
-    memory = joblib.Memory(tmp_path / "my-cache")
-    cached_river = imod.wq.River.from_file(riverpath, memory)
+    my_cache = tmp_path / "my-cache"
+    cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._filehashes["riv"] = cached_river._filehashself
     cached_river._pkgcheck()
+    assert "Calling imod.wq.caching._check" in capsys.readouterr().out
+    cached_river._pkgcheck()
+    assert "Loading _check" in capsys.readouterr().out
 
 
 def test_cached_river__save(test_timelayerda, tmp_path):
+    # Setup logging
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    fh = logging.FileHandler(tmp_path / "caching-save.log", mode="w")
+    logger.addHandler(fh)
+
     da = test_timelayerda
     riverpath = tmp_path / "river.nc"
-    river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da,)
+    river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da)
     # Default save for checking
     river.to_netcdf(riverpath)
 
-    memory = joblib.Memory(tmp_path / "my-cache")
-    cached_river = imod.wq.River.from_file(riverpath, memory)
+    my_cache = tmp_path / "my-cache"
+    cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._filehashes["riv"] = cached_river._filehashself
     cached_river._reldir = pathlib.Path(".")
 
     river.save(tmp_path / "basic-riv")
-    cached_river.save(tmp_path / "cached-riv")
+    ref_path = str(tmp_path / "basic-riv/**/*.idf")
+
+    # SAVING: Input is new. Saving anew.
     # Call render to generate the list of _outputfiles
     cached_river._render(
         directory=tmp_path / "cached-riv",
         globaltimes=cached_river["time"].values,
         system_index=1,
     )
-    cache_path = tmp_path / "my-cache/imod/wq/caching/_save"
+    cached_river.save(tmp_path / "cached-riv")
     output_path = str(tmp_path / "cached-riv/**/*.idf")
-    ref_path = str(tmp_path / "basic-riv/**/*.idf")
-    assert len(os.listdir(cache_path)) == 2
 
     basic_files = [pathlib.Path(p) for p in glob.glob(ref_path, recursive=True)]
     caching_files = [pathlib.Path(p) for p in glob.glob(output_path, recursive=True)]
     assert set(p.name for p in basic_files) == set(p.name for p in caching_files)
 
+    # SAVING: Input recognized.
+    # SAVING: Output recognized. Skipping.
+    cached_river.save(tmp_path / "cached-riv")
+
     # Now remove a single file, this should trigger a recompute.
+    # SAVING: Input recognized.
+    # SAVING: Output has been changed. Saving anew.
     os.remove(caching_files[0])
     cached_river.save(tmp_path / "cached-riv")
     caching_files = [pathlib.Path(p) for p in glob.glob(output_path, recursive=True)]
     assert set(p.name for p in basic_files) == set(p.name for p in caching_files)
 
+    # SAVING: Input is new. Saving anew.
     del cached_river
     river.to_netcdf(riverpath)
-    cached_river = imod.wq.River.from_file(riverpath, memory)
+    cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._render(
         directory=tmp_path / "cached-riv",
         globaltimes=cached_river["time"].values,
@@ -134,11 +152,26 @@ def test_cached_river__save(test_timelayerda, tmp_path):
     cached_river._filehashes["riv"] = cached_river._filehashself
     cached_river._reldir = pathlib.Path(".")
     cached_river.save(tmp_path / "cached-riv")
-    assert len(os.listdir(cache_path)) == 3
     assert set(p.name for p in basic_files) == set(p.name for p in caching_files)
 
+    fh.close()
+    with open(tmp_path / "caching-save.log") as f:
+        actual_log = f.read()
 
-# keep track of performance using pytest-benchmark
+    expected_log = textwrap.dedent(
+        """\
+    SAVING: Input is new. Saving anew.
+    SAVING: Input recognized.
+    SAVING: Output recognized. Skipping.
+    SAVING: Input recognized.
+    SAVING: Output has been changed. Saving anew.
+    SAVING: Input is new. Saving anew.
+    """
+    )
+    assert actual_log == expected_log
+
+
+# keep track of performance using pytest-benchmark?
 # https://pytest-benchmark.readthedocs.io/en/stable/
 def henry_input():
     # Discretization1
@@ -214,10 +247,7 @@ def henry_write(tmp_path):
     # If this seems crude, it is.
     # However, pytest-benchmark is very difficult to get to work
     starttime = time.time()
-    for i in range(10):
-        m1.write(tmp_path / "henry-caching")
-    endtime = time.time()
-    return endtime - starttime
+    m1.write(tmp_path / "henry-basic")
 
 
 def henry_write_cache(tmp_path):
@@ -230,7 +260,7 @@ def henry_write_cache(tmp_path):
     dsp.to_netcdf(tmp_path / "dsp.nc")
     wel.to_netcdf(tmp_path / "wel.nc")
     # Now load again
-    my_cache = joblib.Memory(tmp_path / "my-cache")
+    my_cache = tmp_path / "my-cache"
     bas2 = imod.wq.BasicFlow.from_file(tmp_path / "bas.nc", my_cache)
     lpf2 = imod.wq.LayerPropertyFlow.from_file(tmp_path / "lpf.nc", my_cache)
     btn2 = imod.wq.BasicTransport.from_file(tmp_path / "btn.nc", my_cache)
@@ -252,19 +282,15 @@ def henry_write_cache(tmp_path):
 
     m2.write(tmp_path / "henry-caching")
 
-    starttime = time.time()
-    for i in range(10):
-        m2.write("henry-caching")
-    endtime = time.time()
-    return endtime - starttime
-
 
 def test_cached_model_write(tmp_path):
     # It seems like pytest-benchmark cannot be used here succesfully
     # the issue is the combination with tmp_path, and the existence
-    # of the joblib.Memory and netCDF files.
-    t1 = henry_write(tmp_path)
-    t2 = henry_write_cache(tmp_path)
+    # of the joblib.my_cache and netCDF files.
+    henry_write(tmp_path)
+    henry_write_cache(tmp_path)
+    # Test whether written files are the same.
+    assert filecmp.dircmp(tmp_path / "henry-basic", tmp_path / "henry-caching")
     # Speedup should be atleast a factor two in this case
     # it gets bigger with more data
-    assert (t1 / t2) > 2
+    # This needs a benchmarking solution

@@ -2,6 +2,7 @@ import pathlib
 import warnings
 
 import jinja2
+import joblib
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -29,7 +30,7 @@ class Package(xr.Dataset):
     __slots__ = ("_template", "_pkg_id", "_keywords", "_mapping")
 
     @classmethod
-    def from_file(cls, path, cache=None):
+    def from_file(cls, path, cache_path=None, cache_verbose=0):
         """
         Loads an imod-wq package from a file (currently only netcdf is supported).
 
@@ -41,8 +42,8 @@ class Package(xr.Dataset):
         ----------
         path : str, pathlib.Path
             Path to the file.
-        cache : joblib.Memory, optional
-            The joblib.Memory where intermediate answers are stored.
+        cache_path : str, pathlib.Path, optional
+            The path to the joblib.Memory where intermediate answers are stored.
 
         Refer to the examples.
 
@@ -67,9 +68,10 @@ class Package(xr.Dataset):
 
         """
         path = pathlib.Path(path)
+
         ds = xr.open_dataset(path)
         kwargs = {var: ds[var] for var in ds.data_vars}
-        if cache is None:
+        if cache_path is None:
             return cls(**kwargs)
         else:
             # Dynamically construct a CachingPackage
@@ -78,6 +80,9 @@ class Package(xr.Dataset):
             #    the class is instantiated, the first argument (self) is bound,
             #    and no longer accessible to the Memory object."
             # See: https://joblib.readthedocs.io/en/latest/memory.html
+            cache_path = pathlib.Path(cache_path)
+            cache = joblib.Memory(cache_path / cls.__name__, verbose=cache_verbose)
+            cache_path.mkdir(exist_ok=True, parents=True)
             CachingPackage = caching(cls, cache)
             return CachingPackage(path, **kwargs)
 

@@ -1,4 +1,5 @@
 import collections
+import logging
 import pathlib
 import os
 
@@ -89,21 +90,6 @@ def caching(package, memory):
     """
     output_status = memory.cache(insert_hash)
 
-    # Define methods which take the filehashes. These are the functions that
-    # will be cached by joblib. We ignore pkg (self) so non-deterministic
-    # dask DAG hashes within DataArrays do not lead to repeat computation.
-    #
-    # More methods could be added, but these are the ones drawing data into
-    # memory / making passes over the data, rather than using just metadata.
-    def _max_n(pkg, filehashes, varname, nlayer):
-        return super(type(pkg), pkg)._max_active_n(varname, nlayer)
-
-    def _check(pkg, filehashes, ibound):
-        return super(type(pkg), pkg)._pkgcheck(ibound)
-
-    def _save(pkg, filehashes, directory):
-        super(type(pkg), pkg).save(directory)
-
     # Subclass package: overloads _compose, max_active_n, pkgcheck, and save methods.
     class CachingPackage(package):
         __slots__ = (
@@ -114,16 +100,38 @@ def caching(package, memory):
             "_caching_save",
             "_caching_check",
             "_caching_max_n",
+            "_logger",
         )
+        # Define methods which take the filehashes. These are the functions that
+        # will be cached by joblib. We ignore pkg (self) so non-deterministic
+        # dask DAG hashes within DataArrays do not lead to repeat computation.
+        #
+        # More methods could be added, but these are the ones drawing data into
+        # memory / making passes over the data, rather than using just metadata.
+        @staticmethod
+        def _max_n(pkg, filehashes, varname, nlayer):
+            pkg._logger.info("MAX_N: Input is new. Counting anew.")
+            return super(type(pkg), pkg)._max_active_n(varname, nlayer)
+
+        @staticmethod
+        def _check(pkg, filehashes, ibound):
+            pkg._logger.info("CHECK: Input is new. Checking anew.")
+            return super(type(pkg), pkg)._pkgcheck(ibound)
+
+        @staticmethod
+        def _save(pkg, filehashes, directory):
+            super(type(pkg), pkg).save(directory)
 
         def __init__(self, path, *args, **kwargs):
-            self._caching_save = memory.cache(_save, ignore=["pkg"])
-            self._caching_check = memory.cache(_check, ignore=["pkg", "ibound"])
-            self._caching_max_n = memory.cache(_max_n, ignore=["pkg"])
+            self._caching_save = memory.cache(self._save, ignore=["pkg"])
+            self._caching_check = memory.cache(self._check, ignore=["pkg", "ibound"])
+            self._caching_max_n = memory.cache(self._max_n, ignore=["pkg"])
             super(__class__, self).__init__(*args, **kwargs)
             self._filehashself = hash_filemetadata(path)
             self._filehashes = {}
             self._outputfiles = []
+            self._logger = logging.getLogger(__class__.__name__)
+            self._logger.setLevel(logging.INFO)
             # TODO: ensure some immutability somehow?
 
         def _compose(self, d, pattern=None):
@@ -146,11 +154,13 @@ def caching(package, memory):
             # Check if the output has already been written once with the current
             # input files.
             if hash_exists(self._caching_save, self, filehashes, directory):
+                self._logger.info("SAVING: Input recognized.")
                 # Hash exists within store, so files should exist already.
                 # But check whether the output looks good.
                 output_hashes = output_metadata_hashes(self)
                 # If it doesn't exist in store, something's wrong:
                 if not hash_exists(output_status, output_hashes):
+                    self._logger.info("SAVING: Output has been changed. Saving anew.")
                     # Clear caches, and retry.
                     self._caching_save.clear(warn=False)
                     output_status.clear(warn=False)
@@ -159,15 +169,18 @@ def caching(package, memory):
                     self._caching_save(self, filehashes, directory)
                     output_hashes = output_metadata_hashes(self)
                     output_status(output_hashes)
+                else:
+                    self._logger.info("SAVING: Output recognized. Skipping.")
             else:  # The files haven't been written yet with the current input.
                 # Write it, collect hash for the output data,
                 # and store it.
+                self._logger.info("SAVING: Input is new. Saving anew.")
                 self._caching_save(self, filehashes, directory)
                 output_hashes = output_metadata_hashes(self)
                 output_status(output_hashes)
 
     # Update name of CachingPackage
-    CachingPackage.__name__ = "Caching" + package.__name__
-    CachingPackage.__qualname__ = "Caching" + package.__qualname__
+    CachingPackage.__name__ = f"Caching{package.__name__}"
+    CachingPackage.__qualname__ = f"Caching{package.__qualname__}"
 
     return CachingPackage
