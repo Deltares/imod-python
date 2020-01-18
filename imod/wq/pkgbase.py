@@ -240,6 +240,15 @@ class BoundaryCondition(Package):
         "        {%- endfor -%}"
         "    {%- endfor -%}"
     )
+    _ssm_template = jinja2.Template(
+        "{%- for species, timedict in concentration.items() -%}"
+        "    {%- for time, layerdict in timedict.items() -%}"
+        "       {%- for layer, value in layerdict.items() %}\n"
+        "    c{{pkg_id}}_t{{species}}_p{{time}}_l{{layer}} = {{value}}\n"
+        "        {%- endfor -%}"
+        "    {%- endfor -%}"
+        "{%- endfor -%}"
+    )
 
     def _add_timemap(self, varname, value, use_cftime):
         if value is not None:
@@ -404,8 +413,7 @@ class BoundaryCondition(Package):
         if "concentration" not in self:
             return ""
 
-        d = {}
-        d["pkg_id"] = self._pkg_id
+        d = {"pkg_id": self._pkg_id}
         if "species" in self["concentration"].coords:
             concentration = {}
             for i, species in enumerate(self["concentration"]["species"].values):
@@ -426,14 +434,4 @@ class BoundaryCondition(Package):
             }
         d["concentration"] = concentration
 
-        _ssm_template = jinja2.Template(
-            "{%- for species, timedict in concentration.items() -%}"
-            "    {%- for time, layerdict in timedict.items() -%}"
-            "       {%- for layer, value in layerdict.items() %}\n"
-            "    c{{pkg_id}}_t{{species}}_p{{time}}_l{{layer}} = {{value}}\n"
-            "        {%- endfor -%}"
-            "    {%- endfor -%}"
-            "{%- endfor -%}"
-        )
-
-        return _ssm_template.render(d)
+        return self._ssm_template.render(d)

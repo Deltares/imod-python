@@ -49,7 +49,17 @@ class Well(BoundaryCondition):
     # TODO: implement well to concentration IDF and use ssm_template
     # Ignored for now, since wells are nearly always extracting
 
-    def __init__(self, id_name, x, y, rate, layer=None, time=None, save_budget=False):
+    def __init__(
+        self,
+        id_name,
+        x,
+        y,
+        rate,
+        layer=None,
+        time=None,
+        concentration=None,
+        save_budget=False,
+    ):
         super(__class__, self).__init__()
         variables = {
             "id_name": id_name,
@@ -58,6 +68,7 @@ class Well(BoundaryCondition):
             "rate": rate,
             "layer": layer,
             "time": time,
+            "concentration": concentration,
         }
         variables = {k: np.atleast_1d(v) for k, v in variables.items() if v is not None}
         length = max(map(len, variables.values()))
@@ -92,9 +103,9 @@ class Well(BoundaryCondition):
             nmax *= nlayer
         return nmax
 
-    def _compose_values_layer(self, directory, time=None):
+    def _compose_values_layer(self, directory, name, time=None):
         values = {}
-        d = {"directory": directory, "name": directory.stem, "extension": ".ipf"}
+        d = {"directory": directory, "name": name, "extension": ".ipf"}
 
         if time is None:
             if "layer" in self:
@@ -119,7 +130,8 @@ class Well(BoundaryCondition):
 
         return values
 
-    def _compose_values_time(self, directory, globaltimes):
+    def _compose_values_time(self, directory, name, globaltimes):
+        # TODO: rename to _compose_values_timelayer?
         values = {}
         if "time" in self:
             self_times = self["time"].values
@@ -137,18 +149,30 @@ class Well(BoundaryCondition):
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
 
             for time, start_end in zip(runfile_times, starts_ends):
-                values[start_end] = self._compose_values_layer(directory, time)
+                values[start_end] = self._compose_values_layer(directory, name, time)
         else:  # for all periods
-            values["?"] = self._compose_values_layer(directory)
+            values["?"] = self._compose_values_layer(directory, name)
         return values
 
     def _render(self, directory, globaltimes, system_index):
         d = {"system_index": system_index}
-        d["wels"] = self._compose_values_time(directory, globaltimes)
+        name = directory.stem
+        d["wels"] = self._compose_values_time(directory, name, globaltimes)
         return self._template.render(d)
 
     def _render_ssm(self, directory, globaltimes):
-        return ""
+        d = {"pkg_id": self._pkg_id}
+        name = f"{directory.stem}-concentration"
+        if "species" in self["concentration"].coords:
+            concentration = {}
+            for i, species in enumerate(self["concentration"]["species"].values):
+                concentration[i + 1] = self._compose_values_time(
+                    directory, name, globaltimes
+                )
+        else:
+            concentration = {1: self._compose_values_time(directory, name, globaltimes)}
+        d["concentration"] = concentration
+        return self._ssm_template.render(d)
 
     @staticmethod
     def _save_layers(df, directory, time=None):
@@ -170,13 +194,39 @@ class Well(BoundaryCondition):
             path = util.compose(d)
             imod.ipf.write(path, outdf)
 
+    @staticmethod
+    def _save_layers_concentration(df, directory, name, time=None):
+        d = {"directory": directory, "name": name, "extension": ".ipf"}
+        d["directory"].mkdir(exist_ok=True, parents=True)
+
+        if time is not None:
+            d["time"] = time
+
+        if "layer" in df:
+            for layer, layerdf in df.groupby("layer"):
+                d["layer"] = layer
+                # Ensure right order
+                outdf = layerdf[["x", "y", "concentration", "id_name"]]
+                path = util.compose(d)
+                imod.ipf.write(path, outdf)
+        else:
+            outdf = df[["x", "y", "concentration", "id_name"]]
+            path = util.compose(d)
+            imod.ipf.write(path, outdf)
+
     def save(self, directory):
         if "time" in self:
             for time, timeda in self.groupby("time"):
                 timedf = timeda.to_dataframe()
                 self._save_layers(timedf, directory, time=time)
+                if "concentration" in self.data_vars:
+                    name = f"{directory.stem}-concentration"
+                    self._save_layers_concentration(timedf, directory, name, time=time)
         else:
             self._save_layers(self.to_dataframe(), directory)
+            if "concentration" in self.data_vars:
+                name = f"{directory.stem}-concentration"
+                self._save_layers_concentration(timedf, directory, name)
 
     def _pkgcheck(self, ibound=None):
         # TODO: implement

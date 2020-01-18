@@ -16,6 +16,16 @@ def well():
     return Well(id_name="well", x=x, y=y, rate=5.0, layer=2, time=datetimes)
 
 
+@pytest.fixture(scope="module")
+def well_conc():
+    datetimes = pd.date_range("2000-01-01", "2000-01-05")
+    y = np.arange(4.5, 0.0, -1.0)
+    x = np.arange(0.5, 5.0, 1.0)
+    return Well(
+        id_name="well", x=x, y=y, rate=5.0, layer=2, time=datetimes, concentration=2.5
+    )
+
+
 def test_render(well):
     wel = well
     directory = pathlib.Path("well")
@@ -146,6 +156,32 @@ def test_timemap__multiple_layers():
     assert actual == compare
 
 
+def test_render_concentration(well_conc, tmp_path):
+    wel = well_conc
+    directory = pathlib.Path("well")
+    # Test rate
+    compare = """
+    wel_p1_s1_l2 = well/well_20000101000000_l2.ipf
+    wel_p2_s1_l2 = well/well_20000102000000_l2.ipf
+    wel_p3_s1_l2 = well/well_20000103000000_l2.ipf
+    wel_p4_s1_l2 = well/well_20000104000000_l2.ipf
+    wel_p5_s1_l2 = well/well_20000105000000_l2.ipf"""
+
+    actual = wel._render(directory, globaltimes=wel["time"].values, system_index=1)
+    assert actual == compare
+
+    # Test concentration
+    compare = """
+    cwel_t1_p1_l2 = well/well-concentration_20000101000000_l2.ipf
+    cwel_t1_p2_l2 = well/well-concentration_20000102000000_l2.ipf
+    cwel_t1_p3_l2 = well/well-concentration_20000103000000_l2.ipf
+    cwel_t1_p4_l2 = well/well-concentration_20000104000000_l2.ipf
+    cwel_t1_p5_l2 = well/well-concentration_20000105000000_l2.ipf"""
+
+    actual = wel._render_ssm(directory, globaltimes=wel["time"].values)
+    assert actual == compare
+
+
 def test_save(well, tmp_path):
     wel = well
     wel.save(tmp_path / "well")
@@ -156,6 +192,26 @@ def test_save(well, tmp_path):
         "well_20000103000000_l2.ipf",
         "well_20000104000000_l2.ipf",
         "well_20000105000000_l2.ipf",
+    ]
+    for file in files:
+        assert (tmp_path / "well" / file).is_file()
+
+
+def test_save(well_conc, tmp_path):
+    wel = well_conc
+    wel.save(tmp_path / "well")
+
+    files = [
+        "well_20000101000000_l2.ipf",
+        "well_20000102000000_l2.ipf",
+        "well_20000103000000_l2.ipf",
+        "well_20000104000000_l2.ipf",
+        "well_20000105000000_l2.ipf",
+        "well-concentration_20000101000000_l2.ipf",
+        "well-concentration_20000102000000_l2.ipf",
+        "well-concentration_20000103000000_l2.ipf",
+        "well-concentration_20000104000000_l2.ipf",
+        "well-concentration_20000105000000_l2.ipf",
     ]
     for file in files:
         assert (tmp_path / "well" / file).is_file()
