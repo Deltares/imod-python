@@ -161,18 +161,23 @@ class Well(BoundaryCondition):
         return self._template.render(d)
 
     def _render_ssm(self, directory, globaltimes):
-        d = {"pkg_id": self._pkg_id}
-        name = f"{directory.stem}-concentration"
-        if "species" in self["concentration"].coords:
-            concentration = {}
-            for i, species in enumerate(self["concentration"]["species"].values):
-                concentration[i + 1] = self._compose_values_time(
-                    directory, name, globaltimes
-                )
+        if "concentration" in self.data_vars:
+            d = {"pkg_id": self._pkg_id}
+            name = f"{directory.stem}-concentration"
+            if "species" in self["concentration"].coords:
+                concentration = {}
+                for i, species in enumerate(self["concentration"]["species"].values):
+                    concentration[i + 1] = self._compose_values_time(
+                        directory, name, globaltimes
+                    )
+            else:
+                concentration = {
+                    1: self._compose_values_time(directory, name, globaltimes)
+                }
+            d["concentration"] = concentration
+            return self._ssm_template.render(d)
         else:
-            concentration = {1: self._compose_values_time(directory, name, globaltimes)}
-        d["concentration"] = concentration
-        return self._ssm_template.render(d)
+            return ""
 
     @staticmethod
     def _save_layers(df, directory, time=None):
