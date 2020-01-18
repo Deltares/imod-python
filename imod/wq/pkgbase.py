@@ -30,6 +30,43 @@ class Package(xr.Dataset):
 
     @classmethod
     def from_file(cls, path, cache=None):
+        """
+        Loads an imod-wq package from a file (currently only netcdf is supported).
+
+        This enables caching of intermediate input and should result in much
+        faster model.write() times. To enable caching, provide a ``joblib.Memory``
+        object.
+
+        Parameters
+        ----------
+        path : str, pathlib.Path
+            Path to the file.
+        cache : joblib.Memory, optional
+            The joblib.Memory where intermediate answers are stored.
+
+        Refer to the examples.
+
+        Returns
+        -------
+        package : imod.wq.Package, imod.wq.CachingPackage
+            Returns a package with data loaded from file. Returns a CachingPackage
+            if a joblib.Memory object has been provied for ``cache``.
+
+        Examples
+        --------
+
+        To load a package from a file, e.g. a River package:
+
+        >>> river = imod.wq.River.from_file("river.nc")
+
+        To load a package, and enable caching:
+
+        >>> import joblib
+        >>> cache = joblib.Memory("my-cache")
+        >>> river = imod.wq.River.from_file("river.nc", cache)
+
+        """
+        path = pathlib.Path(path)
         ds = xr.open_dataset(path)
         kwargs = {var: ds[var] for var in ds.data_vars}
         if cache is None:
@@ -88,7 +125,7 @@ class Package(xr.Dataset):
     def _compose(self, d, pattern=None):
         # d : dict
         # pattern : string or re.pattern
-        return util.compose(d, pattern)
+        return util.compose(d, pattern).as_posix()
 
     def _compose_values_layer(self, varname, directory, time=None, da=None):
         """
