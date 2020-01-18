@@ -1,6 +1,7 @@
 import glob
 import pathlib
 import os
+import time
 
 import joblib
 import numpy as np
@@ -97,7 +98,7 @@ def test_cached_river__save(test_timelayerda, tmp_path):
     memory = joblib.Memory(tmp_path / "my-cache")
     cached_river = imod.wq.River.from_file(riverpath, memory)
     cached_river._filehashes["riv"] = cached_river._filehashself
-    cached_river._render_dir = pathlib.Path(".")
+    cached_river._reldir = pathlib.Path(".")
 
     river.save(tmp_path / "basic-riv")
     cached_river.save(tmp_path / "cached-riv")
@@ -131,7 +132,7 @@ def test_cached_river__save(test_timelayerda, tmp_path):
         system_index=1,
     )
     cached_river._filehashes["riv"] = cached_river._filehashself
-    cached_river._render_dir = pathlib.Path(".")
+    cached_river._reldir = pathlib.Path(".")
     cached_river.save(tmp_path / "cached-riv")
     assert len(os.listdir(cache_path)) == 3
     assert set(p.name for p in basic_files) == set(p.name for p in caching_files)
@@ -139,11 +140,10 @@ def test_cached_river__save(test_timelayerda, tmp_path):
 
 # keep track of performance using pytest-benchmark
 # https://pytest-benchmark.readthedocs.io/en/stable/
-@pytest.fixture(scope="function")
-def HenryCase_input():
+def henry_input():
     # Discretization1
     nrow = 200
-    ncol = 200
+    ncol = 20  # made larger for noticeable
     nlay = 50
 
     dz = 1.0
@@ -153,19 +153,11 @@ def HenryCase_input():
     # scale parameters with discretization
     qscaled = 0.03 * (dz * abs(dy))
 
-    # Fresh water injection with well
-    # Add the arguments as a list, so pandas doesn't complain about having to set
-    # an index.
-    weldata = pd.DataFrame()
-    weldata["x"] = [0.5]
-    weldata["y"] = [0.5]
-    weldata["q"] = [qscaled]
-
     # Setup ibound
     bnd = xr.DataArray(
         data=np.full((nlay, nrow, ncol), 1.0),
         coords={
-            "y": np.arange(0.5 * dy, dy * ncol, dy),
+            "y": np.arange(0.5 * dy, dy * nrow, dy),
             "x": np.arange(0.5 * dx, dx * ncol, dx),
             "layer": np.arange(1, 1 + nlay),
             "dx": dx,
@@ -178,8 +170,6 @@ def HenryCase_input():
         np.arange(nlay * dz, 0.0, -dz), {"layer": np.arange(1, 1 + nlay)}, ("layer")
     )
     bot = top1D - 1.0
-    # We define constant head here, after generating the tops, or we'd end up with negative top values
-    bnd[:, :, -1] = -1
 
     bas = imod.wq.BasicFlow(ibound=bnd, top=50.0, bottom=bot, starting_head=1.0)
     lpf = imod.wq.LayerPropertyFlow(
@@ -189,9 +179,7 @@ def HenryCase_input():
     adv = imod.wq.AdvectionTVD(courant=1.0)
     dsp = imod.wq.Dispersion(longitudinal=0.1, diffusion_coefficient=1.0e-9)
     vdf = imod.wq.VariableDensityFlow(density_concentration_slope=0.71)
-    wel = imod.wq.Well(
-        id_name="well", x=weldata["x"], y=weldata["y"], rate=weldata["q"]
-    )
+    wel = imod.wq.Well(id_name="well", x=0.5, y=0.5, rate=qscaled)
     pcg = imod.wq.PreconditionedConjugateGradientSolver(
         max_iter=150, inner_iter=30, hclose=0.0001, rclose=1.0, relax=0.98, damp=1.0
     )
@@ -208,17 +196,8 @@ def HenryCase_input():
     return bas, lpf, btn, adv, dsp, vdf, wel, pcg, gcg, oc
 
 
-def write_regular(tmp_path, m1):
-    m1.write(tmp_path / "regular-Henry")
-
-
-def write_caching(tmp_path, m2):
-    m2.write(tmp_path / "caching-Henry")
-
-
-def test_write_regular(benchmark, HenryCase_input, tmp_path):
-    bas, lpf, btn, adv, dsp, vdf, wel, pcg, gcg, oc = HenryCase_input
-    # Regular case
+def henry_write(tmp_path):
+    bas, lpf, btn, adv, dsp, vdf, wel, pcg, gcg, oc = henry_input()
     m1 = imod.wq.SeawatModel("HenryCase")
     m1["bas"] = bas
     m1["lpf"] = lpf
@@ -232,19 +211,24 @@ def test_write_regular(benchmark, HenryCase_input, tmp_path):
     m1["gcg"] = gcg
     m1.time_discretization(times=["2000-01-01", "2001-01-01"])
 
-    benchmark(write_regular, tmp_path, m1)
+    # If this seems crude, it is.
+    # However, pytest-benchmark is very difficult to get to work
+    starttime = time.time()
+    for i in range(10):
+        m1.write(tmp_path / "henry-caching")
+    endtime = time.time()
+    return endtime - starttime
 
 
-def test_write_caching(benchmark, HenryCase_input, tmp_path):
-    bas, lpf, btn, adv, dsp, vdf, wel, pcg, gcg, oc = HenryCase_input
-    # Store data
+def henry_write_cache(tmp_path):
+    bas, lpf, btn, adv, dsp, vdf, wel, pcg, gcg, oc = henry_input()
+    # Store all data
     bas.to_netcdf(tmp_path / "bas.nc")
     lpf.to_netcdf(tmp_path / "lpf.nc")
     btn.to_netcdf(tmp_path / "btn.nc")
     adv.to_netcdf(tmp_path / "adv.nc")
     dsp.to_netcdf(tmp_path / "dsp.nc")
     wel.to_netcdf(tmp_path / "wel.nc")
-
     # Now load again
     my_cache = joblib.Memory(tmp_path / "my-cache")
     bas2 = imod.wq.BasicFlow.from_file(tmp_path / "bas.nc", my_cache)
@@ -252,7 +236,7 @@ def test_write_caching(benchmark, HenryCase_input, tmp_path):
     btn2 = imod.wq.BasicTransport.from_file(tmp_path / "btn.nc", my_cache)
     dsp2 = imod.wq.Dispersion.from_file(tmp_path / "dsp.nc", my_cache)
     wel2 = imod.wq.Well.from_file(tmp_path / "wel.nc", my_cache)
-
+    # Caching case
     m2 = imod.wq.SeawatModel("HenryCase")
     m2["bas"] = bas2
     m2["lpf"] = lpf2
@@ -266,7 +250,21 @@ def test_write_caching(benchmark, HenryCase_input, tmp_path):
     m2["gcg"] = gcg
     m2.time_discretization(times=["2000-01-01", "2001-01-01"])
 
-    # Write once to cache
-    m2.write(tmp_path / "caching-henry")
+    m2.write(tmp_path / "henry-caching")
 
-    benchmark(write_caching, tmp_path, m2)
+    starttime = time.time()
+    for i in range(10):
+        m2.write("henry-caching")
+    endtime = time.time()
+    return endtime - starttime
+
+
+def test_cached_model_write(tmp_path):
+    # It seems like pytest-benchmark cannot be used here succesfully
+    # the issue is the combination with tmp_path, and the existence
+    # of the joblib.Memory and netCDF files.
+    t1 = henry_write(tmp_path)
+    t2 = henry_write_cache(tmp_path)
+    # Speedup should be atleast a factor two in this case
+    # it gets bigger with more data
+    assert (t1 / t2) > 2

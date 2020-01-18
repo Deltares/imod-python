@@ -470,7 +470,7 @@ class SeawatModel(Model):
 
         return "\n\n".join(content)
 
-    def _set_caching_packages(self, render_dir):
+    def _set_caching_packages(self, reldir):
         # TODO:
         # Basically every package should rely on bas for checks via ibound
         # basic domain checking, etc.
@@ -478,8 +478,10 @@ class SeawatModel(Model):
         # So far, only slv does? Others only depend on themselves.
         for pkgname, pkg in self.items():
             if hasattr(pkg, "_filehashself"):
+                # Clear _outputfiles in case of repeat writes
+                pkg._outputfiles = []
                 pkg._filehashes[pkgname] = pkg._filehashself
-                pkg._render_dir = render_dir
+                pkg._reldir = reldir
         # If more complex dependencies do show up, probably push methods down
         # to the individual packages.
 
@@ -535,20 +537,26 @@ class SeawatModel(Model):
         # Where will the model run?
         # Default is inputdir, next to runfile:
         # in that case, resultdir is relative to inputdir
-        # If resultdir is workspace, inputdir is relative to resultdir
+        # If resultdir_is_workdir, inputdir is relative to resultdir
+        # render_dir is the inputdir that is printed in the runfile.
+        # result_dir is the resultdir that is printed in the runfile.
+        # caching_reldir is from where to check for files. This location
+        # is the same as the eventual model working dir.
         if resultdir_is_workdir:
+            caching_reldir = result_dir
             if not directory.is_absolute():
                 render_dir = _relpath(directory, result_dir)
             else:
                 render_dir = directory
             result_dir = pathlib.Path(".")
         else:
+            caching_reldir = directory
             render_dir = pathlib.Path(".")
             if not result_dir.is_absolute():
                 result_dir = _relpath(result_dir, directory)
 
         # Check if any caching packages are present, and set necessary states.
-        self._set_caching_packages(render_dir)
+        self._set_caching_packages(caching_reldir)
 
         if not self.check is None:
             self.package_check()
