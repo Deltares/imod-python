@@ -81,6 +81,7 @@ def test_cached_river__save(test_timelayerda, tmp_path):
     memory = joblib.Memory(tmp_path / "my-cache")
     cached_river = imod.wq.caching(imod.wq.River, tmp_path / "river.nc", memory)
     cached_river._filehashes["riv"] = cached_river._filehashself
+    cached_river._render_dir = pathlib.Path(".")
 
     river.save(tmp_path / "basic-riv")
     cached_river.save(tmp_path / "cached-riv")
@@ -114,6 +115,7 @@ def test_cached_river__save(test_timelayerda, tmp_path):
         system_index=1,
     )
     cached_river._filehashes["riv"] = cached_river._filehashself
+    cached_river._render_dir = pathlib.Path(".")
     cached_river.save(tmp_path / "cached-riv")
     assert len(os.listdir(cache_path)) == 3
     assert set(p.name for p in basic_files) == set(p.name for p in caching_files)

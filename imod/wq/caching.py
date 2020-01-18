@@ -4,6 +4,7 @@ import os
 
 import joblib
 import xarray as xr
+import imod
 
 
 def hash_filemetadata(path):
@@ -20,7 +21,7 @@ def insert_hash(metadatahash):
     pass
 
 
-def output_metadata_hashes(pkg, directory):
+def output_metadata_hashes(pkg, render_dir):
     """
     Generate full list of output files, get metadata of all files, and create
     a single hash.
@@ -28,11 +29,16 @@ def output_metadata_hashes(pkg, directory):
     # Generate full list of output files, check sta
     paths = pkg._outputfiles
     hashes = []
-    for path in paths:
-        try:
-            hashes.append(hash_filemetadata(path))
-        except FileNotFoundError:
-            break
+
+    # Temporarily change working to directory to one matching the paths as
+    # produced by the render methods.
+    with imod.util.cd(render_dir):
+        for path in paths:
+            try:
+                hashes.append(hash_filemetadata(path))
+            except FileNotFoundError:
+                break
+
     return joblib.hash(hashes)
 
 
@@ -102,6 +108,7 @@ def caching(package, memory):
         __slots__ = (
             "_filehashself",
             "_filehashes",
+            "_render_dir",
             "_outputfiles",
             "_caching_save",
             "_caching_check",
@@ -140,7 +147,7 @@ def caching(package, memory):
             if hash_exists(self._caching_save, self, filehashes, directory):
                 # Hash exists within store, so files should exist already.
                 # But check whether the output looks good.
-                output_hashes = output_metadata_hashes(self, directory)
+                output_hashes = output_metadata_hashes(self, self._render_dir)
                 # If it doesn't exist in store, something's wrong:
                 if not hash_exists(output_status, output_hashes):
                     # Clear caches, and retry.
@@ -149,13 +156,13 @@ def caching(package, memory):
                     # Retry: write it again, collect hash for the output data,
                     # and store it.
                     self._caching_save(self, filehashes, directory)
-                    output_hashes = output_metadata_hashes(self, directory)
+                    output_hashes = output_metadata_hashes(self, self._render_dir)
                     output_status(output_hashes)
             else:  # The files haven't been written yet with the current input.
                 # Write it, collect hash for the output data,
                 # and store it.
                 self._caching_save(self, filehashes, directory)
-                output_hashes = output_metadata_hashes(self, directory)
+                output_hashes = output_metadata_hashes(self, self._render_dir)
                 output_status(output_hashes)
 
     # Update name of CachingPackage

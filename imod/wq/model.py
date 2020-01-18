@@ -13,6 +13,15 @@ from imod.wq import timeutil
 from imod.wq.pkggroup import PackageGroups
 
 
+def _relpath(path, to):
+    # Wraps os.path.relpath
+    try:
+        return pathlib.Path(os.path.relpath(path, to))
+    except ValueError:
+        # Fails to switch between drives e.g.
+        return pathlib.Path(os.path.abspath(path))
+
+
 # This class allows only imod packages as values
 class Model(collections.UserDict):
     def __setitem__(self, key, value):
@@ -400,17 +409,12 @@ class SeawatModel(Model):
 
         return n_extra
 
-    def render(self, writehelp=False, result_dir=None):
+    def render(self, directory, result_dir, writehelp):
         """
         Render the runfile as a string, package by package.
         """
         diskey = self._get_pkgkey("dis")
         globaltimes = self[diskey]["time"].values
-        # Always set the directory relative to the runfile
-        # since imod-wq will generate the namefile here as well.
-        directory = pathlib.Path(".")
-        if result_dir is None:
-            result_dir = "results"
 
         content = []
         content.append(
@@ -466,7 +470,7 @@ class SeawatModel(Model):
 
         return "\n\n".join(content)
 
-    def _set_caching_packages(self):
+    def _set_caching_packages(self, render_dir):
         # TODO:
         # Basically every package should rely on bas for checks via ibound
         # basic domain checking, etc.
@@ -475,10 +479,13 @@ class SeawatModel(Model):
         for pkgname, pkg in self.items():
             if hasattr(pkg, "_filehashself"):
                 pkg._filehashes[pkgname] = pkg._filehashself
+                pkg._render_dir = render_dir
         # If more complex dependencies do show up, probably push methods down
         # to the individual packages.
 
-    def write(self, directory=pathlib.Path("."), result_dir=pathlib.Path("results")):
+    def write(
+        self, directory=pathlib.Path("."), result_dir=None, resultdir_is_workdir=False,
+    ):
         """
         Writes model input files.
 
@@ -492,12 +499,12 @@ class SeawatModel(Model):
             model. Is written as the value of the ``result_dir`` key in the
             runfile.
 
-            The value path given here will be resolved *relative* to the
-            runfile before being written into the runfile. The reason for
-            this is that imod-wq writes a number of files in the working
-            directory. This serves to help keep directories tidy.
-
             See the examples.
+        resultdir_is_workdir: boolean, optional
+            Wether the set all input paths in the runfile relative to the output
+            directory. Because iMOD-wq generates a number of files in its working
+            directory, it may be advantageous to set the working directory to
+            a different path than the runfile location.
 
         Returns
         -------
@@ -514,28 +521,44 @@ class SeawatModel(Model):
         And in the runfile, a value of ``../../output`` will be written for
         result_dir.
         """
-        directory = pathlib.Path(directory) / self.modelname
-        result_dir = pathlib.Path(result_dir)
-
-        if not result_dir.is_absolute():
-            try:
-                result_dir = os.path.relpath(result_dir, directory)
-            except ValueError:
-                result_dir = os.path.abspath(result_dir)
+        # Coerce to pathlib.Path
+        directory = pathlib.Path(directory)
+        if result_dir is None:
+            result_dir = pathlib.Path("results")
+        else:
             result_dir = pathlib.Path(result_dir)
 
+        # Create directories if necessary
+        directory.mkdir(exist_ok=True, parents=True)
+        result_dir.mkdir(exist_ok=True, parents=True)
+
+        # Where will the model run?
+        # Default is inputdir, next to runfile:
+        # in that case, resultdir is relative to inputdir
+        # If resultdir is workspace, inputdir is relative to resultdir
+        if resultdir_is_workdir:
+            if not directory.is_absolute():
+                render_dir = _relpath(directory, result_dir)
+            else:
+                render_dir = directory
+            result_dir = pathlib.Path(".")
+        else:
+            render_dir = pathlib.Path(".")
+            if not result_dir.is_absolute():
+                result_dir = _relpath(result_dir, directory)
+
         # Check if any caching packages are present, and set necessary states.
-        self._set_caching_packages()
+        self._set_caching_packages(render_dir)
 
         if not self.check is None:
             self.package_check()
 
-        runfile_content = self.render(writehelp=False, result_dir=result_dir)
+        runfile_content = self.render(
+            directory=render_dir, result_dir=result_dir, writehelp=False
+        )
         runfilepath = directory / f"{self.modelname}.run"
 
         # Start writing
-        directory.mkdir(exist_ok=True, parents=True)
-
         # Write the runfile
         with open(runfilepath, "w") as f:
             f.write(runfile_content)
