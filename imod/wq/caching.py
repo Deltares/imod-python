@@ -4,7 +4,7 @@ import os
 
 import joblib
 import xarray as xr
-import imod
+from imod import util
 
 
 def hash_filemetadata(path):
@@ -12,6 +12,7 @@ def hash_filemetadata(path):
     Create a hash based on the path to the file, the size, and the modification
     time. This should be sufficiently robust.
     """
+    path = pathlib.Path(path)
     status = os.stat(path)
     return joblib.hash((path.name, status.st_size, status.st_mtime))
 
@@ -32,7 +33,7 @@ def output_metadata_hashes(pkg, render_dir):
 
     # Temporarily change working to directory to one matching the paths as
     # produced by the render methods.
-    with imod.util.cd(render_dir):
+    with util.cd(render_dir):
         for path in paths:
             try:
                 hashes.append(hash_filemetadata(path))
@@ -120,8 +121,8 @@ def caching(package, memory):
             self._caching_check = memory.cache(_check, ignore=["pkg", "ibound"])
             self._caching_max_n = memory.cache(_max_n, ignore=["pkg"])
             super(__class__, self).__init__(*args, **kwargs)
-            package._filehashself = filehash(path)
-            package._filehashes = {}
+            self._filehashself = hash_filemetadata(path)
+            self._filehashes = {}
             self._outputfiles = []
             # TODO: ensure some immutability somehow?
 
