@@ -66,6 +66,7 @@ def test_cached_river__max_n(test_timelayerda, tmp_path):
 
     # release netcdf
     # Change river
+    time.sleep(2.0)  # sleep two seconds so the modification time is different
     cached_river._dataset.close()
     river.to_netcdf(riverpath)
     cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
@@ -112,6 +113,7 @@ def test_cached_river__check(test_timelayerda, tmp_path):
     cached_river._pkgcheck()
     cached_river._pkgcheck()
 
+    time.sleep(2.0)  # sleep two seconds so the modification time is different
     cached_river._dataset.close()
     river.to_netcdf(riverpath)
     cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
@@ -182,6 +184,7 @@ def test_cached_river__save(test_timelayerda, tmp_path):
     assert set(p.name for p in basic_files) == set(p.name for p in caching_files)
 
     # SAVING: Input is new. Saving anew.
+    time.sleep(2.0)  # sleep two seconds so the modification time is different
     cached_river._dataset.close()
     river.to_netcdf(riverpath)
     cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
