@@ -110,12 +110,12 @@ def caching(package, memory):
         # memory / making passes over the data, rather than using just metadata.
         @staticmethod
         def _max_n(pkg, filehashes, varname, nlayer):
-            pkg._logger.info("MAX_N: Input is new. Counting anew.")
+
             return super(type(pkg), pkg)._max_active_n(varname, nlayer)
 
         @staticmethod
         def _check(pkg, filehashes, ibound):
-            pkg._logger.info("CHECK: Input is new. Checking anew.")
+
             return super(type(pkg), pkg)._pkgcheck(ibound)
 
         @staticmethod
@@ -143,10 +143,18 @@ def caching(package, memory):
 
         def _max_active_n(self, varname, nlayer):
             filehashes = check_filehashes(self._filehashes)
+            if hash_exists(self._caching_max_n, self, filehashes, varname, nlayer):
+                self._logger.info("MAX_N: Input recognized. Skipping.")
+            else:
+                self._logger.info("MAX_N: Input is new. Counting anew.")
             return self._caching_max_n(self, filehashes, varname, nlayer)
 
         def _pkgcheck(self, ibound=None):
             filehashes = check_filehashes(self._filehashes)
+            if hash_exists(self._caching_check, self, filehashes, ibound):
+                self._logger.info("CHECK: Input recognized. Skipping.")
+            else:
+                self._logger.info("CHECK: Input is new. Checking anew.")
             self._caching_check(self, filehashes, ibound)
 
         def save(self, directory):
@@ -161,12 +169,10 @@ def caching(package, memory):
                 # If it doesn't exist in store, something's wrong:
                 if not hash_exists(output_status, output_hashes):
                     self._logger.info("SAVING: Output has been changed. Saving anew.")
-                    # Clear caches, and retry.
-                    self._caching_save.clear(warn=False)
-                    output_status.clear(warn=False)
                     # Retry: write it again, collect hash for the output data,
                     # and store it.
-                    self._caching_save(self, filehashes, directory)
+                    # By-pass caching: filehash already exists
+                    self._save(self, filehashes, directory)
                     output_hashes = output_metadata_hashes(self)
                     output_status(output_hashes)
                 else:

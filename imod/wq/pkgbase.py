@@ -81,8 +81,7 @@ class Package(xr.Dataset):
             #    and no longer accessible to the Memory object."
             # See: https://joblib.readthedocs.io/en/latest/memory.html
             cache_path = pathlib.Path(cache_path)
-            cache = joblib.Memory(cache_path / cls.__name__, verbose=cache_verbose)
-            cache_path.mkdir(exist_ok=True, parents=True)
+            cache = joblib.Memory(cache_path, verbose=cache_verbose)
             CachingPackage = caching(cls, cache)
             return CachingPackage(path, **kwargs)
 

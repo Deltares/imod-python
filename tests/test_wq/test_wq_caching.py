@@ -36,11 +36,16 @@ def test_timelayerda():
     return da
 
 
-def test_cached_river__max_n(test_timelayerda, tmp_path, capsys):
-    # Use capsys to capture joblib stdout since it doesn't use logging...
+def test_cached_river__max_n(test_timelayerda, tmp_path):
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    fh = logging.FileHandler(tmp_path / "caching-max_n.log", mode="w")
+    logger.addHandler(fh)
+
     da = test_timelayerda
     river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da)
     riverpath = tmp_path / "river.nc"
+    riverpath2 = tmp_path / "river2.nc"
     river.to_netcdf(riverpath)
     expected = river._max_active_n("conductance", 2)
 
@@ -48,38 +53,56 @@ def test_cached_river__max_n(test_timelayerda, tmp_path, capsys):
     cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._filehashes["riv"] = cached_river._filehashself
 
-    cache_path = tmp_path / "my-cache/River/imod/wq/caching/_max_n"
+    cache_path = tmp_path / "my-cache/imod/wq/caching/_max_n"
     # First round, cache is still empty.
     assert cache_path.exists()
     # First time, runs code
     actual1 = cached_river._max_active_n("conductance", 2)
-    assert "Calling imod.wq.caching._max_n" in capsys.readouterr().out
     actual2 = cached_river._max_active_n("conductance", 2)
-    assert "Loading _max_n" in capsys.readouterr().out
 
     # Recreate object
     cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._filehashes["riv"] = cached_river._filehashself
     actual3 = cached_river._max_active_n("conductance", 2)
-    assert "Loading _max_n" in capsys.readouterr().out
 
     # Delete cached_river to release netcdf
     # Change river
-    del cached_river
     river["conductance"][0, ...] = np.nan
-    river.to_netcdf(riverpath)
-    cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
+    river.to_netcdf(riverpath2)
+    cached_river = imod.wq.River.from_file(riverpath2, my_cache, 2)
     cached_river._filehashes["riv"] = cached_river._filehashself
     actual4 = cached_river._max_active_n("conductance", 2)
-    assert "Calling imod.wq.caching._max_n" in capsys.readouterr().out
+    actual4 = cached_river._max_active_n("conductance", 2)
 
     assert actual1 == actual2 == actual3 == actual4 == expected
 
+    fh.close()
+    with open(tmp_path / "caching-max_n.log") as f:
+        actual_log = f.read()
 
-def test_cached_river__check(test_timelayerda, tmp_path, capsys):
+    expected_log = textwrap.dedent(
+        """\
+    MAX_N: Input is new. Counting anew.
+    MAX_N: Input recognized. Skipping.
+    MAX_N: Input recognized. Skipping.
+    MAX_N: Input is new. Counting anew.
+    MAX_N: Input recognized. Skipping.
+    """
+    )
+    print(actual_log)
+    assert actual_log == expected_log
+
+
+def test_cached_river__check(test_timelayerda, tmp_path):
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    fh = logging.FileHandler(tmp_path / "caching-check.log", mode="w")
+    logger.addHandler(fh)
+
     da = test_timelayerda
     river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da,)
     riverpath = tmp_path / "river.nc"
+    riverpath2 = tmp_path / "river2.nc"
     river.to_netcdf(riverpath)
     river._pkgcheck()
 
@@ -87,10 +110,29 @@ def test_cached_river__check(test_timelayerda, tmp_path, capsys):
     my_cache = tmp_path / "my-cache"
     cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._filehashes["riv"] = cached_river._filehashself
+    # this should result in only a single call.
     cached_river._pkgcheck()
-    assert "Calling imod.wq.caching._check" in capsys.readouterr().out
     cached_river._pkgcheck()
-    assert "Loading _check" in capsys.readouterr().out
+
+    river.to_netcdf(riverpath2)
+    cached_river = imod.wq.River.from_file(riverpath2, my_cache, 2)
+    cached_river._pkgcheck()
+    cached_river._pkgcheck()
+
+    fh.close()
+    with open(tmp_path / "caching-check.log") as f:
+        actual_log = f.read()
+
+    expected_log = textwrap.dedent(
+        """\
+    CHECK: Input is new. Checking anew.
+    CHECK: Input recognized. Skipping.
+    CHECK: Input is new. Checking anew.
+    CHECK: Input recognized. Skipping.
+    """
+    )
+    print(actual_log)
+    assert actual_log == expected_log
 
 
 def test_cached_river__save(test_timelayerda, tmp_path):
@@ -102,6 +144,7 @@ def test_cached_river__save(test_timelayerda, tmp_path):
 
     da = test_timelayerda
     riverpath = tmp_path / "river.nc"
+    riverpath2 = tmp_path / "river2.nc"
     river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da)
     # Default save for checking
     river.to_netcdf(riverpath)
@@ -141,9 +184,8 @@ def test_cached_river__save(test_timelayerda, tmp_path):
     assert set(p.name for p in basic_files) == set(p.name for p in caching_files)
 
     # SAVING: Input is new. Saving anew.
-    del cached_river
-    river.to_netcdf(riverpath)
-    cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
+    river.to_netcdf(riverpath2)
+    cached_river = imod.wq.River.from_file(riverpath2, my_cache, 2)
     cached_river._render(
         directory=tmp_path / "cached-riv",
         globaltimes=cached_river["time"].values,
