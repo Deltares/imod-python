@@ -5,7 +5,7 @@ with open("README.rst") as f:
 
 setup(
     name="imod",
-    description="Work with iMOD MODFLOW models",
+    description="Make massive MODFLOW models",
     long_description=long_description,
     url="https://gitlab.com/deltares/imod/imod-python",
     author="Martijn Visser",
@@ -50,7 +50,7 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
-        "Topic :: Scientific/Engineering",
+        "Topic :: Scientific/Engineering :: Hydrology",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
