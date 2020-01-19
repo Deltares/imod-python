@@ -27,7 +27,7 @@ class Package(xr.Dataset):
     keyword argument by integer arguments for SEAWAT.
     """
 
-    __slots__ = ("_template", "_pkg_id", "_keywords", "_mapping")
+    __slots__ = ("_template", "_pkg_id", "_keywords", "_mapping", "_dataset")
 
     @classmethod
     def from_file(cls, path, cache_path=None, cache_verbose=0):
@@ -69,8 +69,8 @@ class Package(xr.Dataset):
         """
         path = pathlib.Path(path)
 
-        ds = xr.open_dataset(path)
-        kwargs = {var: ds[var] for var in ds.data_vars}
+        cls._dataset = xr.open_dataset(path)
+        kwargs = {var: cls._dataset[var] for var in cls._dataset.data_vars}
         if cache_path is None:
             return cls(**kwargs)
         else:

@@ -45,7 +45,6 @@ def test_cached_river__max_n(test_timelayerda, tmp_path):
     da = test_timelayerda
     river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da)
     riverpath = tmp_path / "river.nc"
-    riverpath2 = tmp_path / "river2.nc"
     river.to_netcdf(riverpath)
     expected = river._max_active_n("conductance", 2)
 
@@ -65,11 +64,11 @@ def test_cached_river__max_n(test_timelayerda, tmp_path):
     cached_river._filehashes["riv"] = cached_river._filehashself
     actual3 = cached_river._max_active_n("conductance", 2)
 
-    # Delete cached_river to release netcdf
+    # release netcdf
     # Change river
-    river["conductance"][0, ...] = np.nan
-    river.to_netcdf(riverpath2)
-    cached_river = imod.wq.River.from_file(riverpath2, my_cache, 2)
+    cached_river._dataset.close()
+    river.to_netcdf(riverpath)
+    cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._filehashes["riv"] = cached_river._filehashself
     actual4 = cached_river._max_active_n("conductance", 2)
     actual4 = cached_river._max_active_n("conductance", 2)
@@ -102,7 +101,6 @@ def test_cached_river__check(test_timelayerda, tmp_path):
     da = test_timelayerda
     river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da,)
     riverpath = tmp_path / "river.nc"
-    riverpath2 = tmp_path / "river2.nc"
     river.to_netcdf(riverpath)
     river._pkgcheck()
 
@@ -114,8 +112,9 @@ def test_cached_river__check(test_timelayerda, tmp_path):
     cached_river._pkgcheck()
     cached_river._pkgcheck()
 
-    river.to_netcdf(riverpath2)
-    cached_river = imod.wq.River.from_file(riverpath2, my_cache, 2)
+    cached_river._dataset.close()
+    river.to_netcdf(riverpath)
+    cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._pkgcheck()
     cached_river._pkgcheck()
 
@@ -144,7 +143,6 @@ def test_cached_river__save(test_timelayerda, tmp_path):
 
     da = test_timelayerda
     riverpath = tmp_path / "river.nc"
-    riverpath2 = tmp_path / "river2.nc"
     river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da)
     # Default save for checking
     river.to_netcdf(riverpath)
@@ -184,8 +182,9 @@ def test_cached_river__save(test_timelayerda, tmp_path):
     assert set(p.name for p in basic_files) == set(p.name for p in caching_files)
 
     # SAVING: Input is new. Saving anew.
-    river.to_netcdf(riverpath2)
-    cached_river = imod.wq.River.from_file(riverpath2, my_cache, 2)
+    cached_river._dataset.close()
+    river.to_netcdf(riverpath)
+    cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._render(
         directory=tmp_path / "cached-riv",
         globaltimes=cached_river["time"].values,
