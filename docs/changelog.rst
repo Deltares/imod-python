@@ -10,7 +10,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 ------------
 
 [0.9.0] - 2020-01-19
-------------
+--------------------
 
 Added
 ~~~~~

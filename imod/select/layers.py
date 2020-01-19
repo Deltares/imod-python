@@ -6,15 +6,22 @@ import imod
 
 def upper_active_layer(da, is_ibound=True, include_constant_head=False):
     """
-    Function to get the upper active layer from ibound xr.DataArray
+    Function to get the upper active layer from ibound xarray.DataArray
 
-    Parameters:
-    da : 3d xr.DataArray
-    is_ibound: da is interpreted as ibound, with values 0 inactive, 1, active, -1 chd
-                if False: upper_active_layer is interpreted as upper layer that has data
-    include_constant_head : also incluse chd cells? bool, default False
+    Parameters
+    ----------
+    da : xarray.DataArray
+        A 3D DataArray
+    is_ibound: bool, optional
+        If True, ``da`` is interpreted as ibound, with values 0: inactive, 1: active, -1 constant head.
+        If False, ``upper_active_layer`` is interpreted as first layer that has data.
+        Default is True.
+    include_constant_head : bool, optional
+        If True and ``is_ibound``, also include constant head cells.
+        Default is False.
 
-    Returns:
+    Returns
+    -------
     2d xr.DataArray of layernumber of upper active model layer
     """
     if is_ibound:
