@@ -9,6 +9,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+[0.9.0] - 2020-01-19
+--------------------
+
 Added
 ~~~~~
 -  IDF files representing data of arbitrary dimensionality can be opened and
@@ -19,11 +22,15 @@ Added
 -  Writing GDAL rasters using (:meth:`imod.rasterio.save`) and (:meth:`imod.rasterio.write`) auto-detects GDAL driver based on file extension
 -  64-bit IDF files can be opened (:meth:`imod.idf.open`)
 -  64-bit IDF files can be written using (:meth:`imod.idf.save`) and (:meth:`imod.idf.write`) using keyword ``dtype=np.float64``
+-  ``sel`` and ``isel`` methods to ``SeawatModel`` to support taking out a subdomain
+-  Docstrings for the Modflow 6 classes in :mod:`imod.mf6`
+-  :meth:`imod.select.upper_active_layer` function to get the upper active layer from ibound ``xr.DataArray``
 
 Changed
 ~~~~~~~
 
 -  :func:`imod.idf.read` is deprecated, use :mod:`imod.idf.open` instead
+-  :func:`imod.rasterio.read` is deprecated, use :mod:`imod.rasterio.open` instead
 
 Fixed
 ~~~~~
