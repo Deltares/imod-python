@@ -218,6 +218,26 @@ class Well(BoundaryCondition):
             path = util.compose(d)
             imod.ipf.write(path, outdf)
 
+    @staticmethod
+    def _save_layers_concentration(df, directory, name, time=None):
+        d = {"directory": directory, "name": name, "extension": ".ipf"}
+        d["directory"].mkdir(exist_ok=True, parents=True)
+
+        if time is not None:
+            d["time"] = time
+
+        if "layer" in df:
+            for layer, layerdf in df.groupby("layer"):
+                d["layer"] = layer
+                # Ensure right order
+                outdf = layerdf[["x", "y", "concentration", "id_name"]]
+                path = util.compose(d)
+                imod.ipf.write(path, outdf)
+        else:
+            outdf = df[["x", "y", "concentration", "id_name"]]
+            path = util.compose(d)
+            imod.ipf.write(path, outdf)
+
     def save(self, directory):
         if "time" in self:
             for time, timeda in self.groupby("time"):
