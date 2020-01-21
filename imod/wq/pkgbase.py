@@ -2,12 +2,14 @@ import pathlib
 import warnings
 
 import jinja2
+import joblib
 import numpy as np
 import pandas as pd
 import xarray as xr
 import imod
 from imod import util
 from imod.wq import timeutil
+from .caching import caching
 
 
 class Package(xr.Dataset):
@@ -25,7 +27,63 @@ class Package(xr.Dataset):
     keyword argument by integer arguments for SEAWAT.
     """
 
-    __slots__ = ("_template", "_pkg_id", "_keywords", "_mapping")
+    __slots__ = ("_template", "_pkg_id", "_keywords", "_mapping", "_dataset")
+
+    @classmethod
+    def from_file(cls, path, cache_path=None, cache_verbose=0):
+        """
+        Loads an imod-wq package from a file (currently only netcdf is supported).
+
+        This enables caching of intermediate input and should result in much
+        faster model.write() times. To enable caching, provide a ``joblib.Memory``
+        object.
+
+        Parameters
+        ----------
+        path : str, pathlib.Path
+            Path to the file.
+        cache_path : str, pathlib.Path, optional
+            The path to the joblib.Memory where intermediate answers are stored.
+
+        Refer to the examples.
+
+        Returns
+        -------
+        package : imod.wq.Package, imod.wq.CachingPackage
+            Returns a package with data loaded from file. Returns a CachingPackage
+            if a joblib.Memory object has been provied for ``cache``.
+
+        Examples
+        --------
+
+        To load a package from a file, e.g. a River package:
+
+        >>> river = imod.wq.River.from_file("river.nc")
+
+        To load a package, and enable caching:
+
+        >>> import joblib
+        >>> cache = joblib.Memory("my-cache")
+        >>> river = imod.wq.River.from_file("river.nc", cache)
+
+        """
+        path = pathlib.Path(path)
+
+        cls._dataset = xr.open_dataset(path)
+        kwargs = {var: cls._dataset[var] for var in cls._dataset.data_vars}
+        if cache_path is None:
+            return cls(**kwargs)
+        else:
+            # Dynamically construct a CachingPackage
+            # Note:
+            #    "a method cannot be decorated at class definition, because when
+            #    the class is instantiated, the first argument (self) is bound,
+            #    and no longer accessible to the Memory object."
+            # See: https://joblib.readthedocs.io/en/latest/memory.html
+            cache_path = pathlib.Path(cache_path)
+            cache = joblib.Memory(cache_path, verbose=cache_verbose)
+            CachingPackage = caching(cls, cache)
+            return CachingPackage(path, **kwargs)
 
     def __setitem__(self, key, value):
         if isinstance(value, xr.DataArray):
@@ -67,6 +125,11 @@ class Package(xr.Dataset):
             for key in self._keywords.keys():
                 self._replace_keyword(d, key)
         return self._template.format(**d)
+
+    def _compose(self, d, pattern=None):
+        # d : dict
+        # pattern : string or re.pattern
+        return util.compose(d, pattern).as_posix()
 
     def _compose_values_layer(self, varname, directory, time=None, da=None):
         """
@@ -120,7 +183,7 @@ class Package(xr.Dataset):
         if "layer" not in da.coords:
             if idf:
                 pattern += "{extension}"
-                values["?"] = util.compose(d, pattern=pattern).as_posix()
+                values["?"] = self._compose(d, pattern=pattern)
             else:
                 values["?"] = da.values[()]
 
@@ -129,7 +192,7 @@ class Package(xr.Dataset):
             for layer in np.atleast_1d(da.coords["layer"].values):
                 if idf:
                     d["layer"] = layer
-                    values[layer] = util.compose(d, pattern=pattern).as_posix()
+                    values[layer] = self._compose(d, pattern=pattern)
                 else:
                     if "layer" in da.dims:
                         values[layer] = da.sel(layer=layer).values[()]
@@ -159,9 +222,6 @@ class Package(xr.Dataset):
         for name, da in self.data_vars.items():
             if "y" in da.coords and "x" in da.coords:
                 path = pathlib.Path(directory).joinpath(name)
-                if isinstance(da, xr.DataArray):
-                    if "layer" in da.dims:
-                        da = da.dropna(dim="layer", how="all")
 
                 if "species" in da.coords:
                     if "time" in da.coords:

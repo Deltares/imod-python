@@ -31,6 +31,7 @@ setup(
         "toolz",  # optional dask dependency we need
         "affine",
         "Jinja2",
+        "joblib",
     ],
     extras_require={
         "dev": [

@@ -478,21 +478,25 @@ def test_render_transportsolver(basicmodel):
 def test_render(basicmodel):
     m = basicmodel
     m.time_discretization("2000-01-06")
-
-    s = m.render()
+    d = pathlib.Path(".")
+    r = pathlib.Path("results")
+    s = m.render(d, r, False)
 
 
 def test_render_cf(cftime_model):
     m_cf = cftime_model
     m_cf.time_discretization("2000-01-06")
-
-    s = m_cf.render()
+    d = pathlib.Path(".")
+    r = pathlib.Path("results")
+    s = m_cf.render(d, r, False)
 
 
 def test_render_notime(notime_model):
     m = notime_model
     m.time_discretization(times=["2000-01-01", "2000-01-06"])
-    s = m.render()
+    d = pathlib.Path(".")
+    r = pathlib.Path("results")
+    s = m.render(d, r, False)
 
 
 def test_mxsscount_incongruent_icbund(basicmodel):
@@ -547,4 +551,19 @@ def test_write__error_stress_time_not_first(basicmodel):
 
 def test_write_result_dir(basicmodel, tmp_path):
     basicmodel.write(directory=tmp_path, result_dir=tmp_path / "results")
+    # TODO: more rigorous testing
+
+
+def test_write_result_dir_is_workdir(basicmodel, tmp_path):
+    basicmodel.write(
+        directory=tmp_path, result_dir=tmp_path / "results", resultdir_is_workdir=True
+    )
+    with open(tmp_path / "test_model.run") as f:
+        lines = f.readlines()
+
+    for line in lines:
+        if "result" in line:
+            break
+
+    assert line.split("=")[-1].strip() == "."
     # TODO: more rigorous testing
