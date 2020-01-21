@@ -9,6 +9,25 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Changed
+~~~~~~~
+- (:meth:`imod.wq.SeawatModel.write`) no longer automatically appends the model
+   name to the directory where the input is written. Instead, it simply writes
+   to the directory as specified.
+
+Added
+~~~~~
+-  (:meth:`from_file`) constructors have been added to all `imod.wq.Package`.
+   This allows loading directly package from a netCDF file.
+-  This can be combined with the `cache` argument in (:meth:`from_file`) to
+   enable caching of answers to avoid repeated computation during
+   (:meth:`imod.wq.SeawatModel.write`); it works by checking whether input and
+   output files have changed.
+-  The ``resultdir_is_workspace`` argument has been added to (:meth:`imod.wq.SeawatModel.write`).
+   iMOD-wq writes a number of files (e.g. list file) in the directory where the
+   runfile is located. This results in mixing of input and output. By setting it
+   ``True``, **all** model output is written in the results directory.
+
 [0.9.0] - 2020-01-19
 --------------------
 
