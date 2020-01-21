@@ -112,9 +112,9 @@ class Well(BoundaryCondition):
                 for layer in np.unique(self["layer"]):
                     layer = int(layer)
                     d["layer"] = layer
-                    values[layer] = util.compose(d).as_posix()
+                    values[layer] = self._compose(d)
             else:
-                values["?"] = util.compose(d).as_posix()
+                values["?"] = self._compose(d)
 
         else:
             d["time"] = time
@@ -124,9 +124,9 @@ class Well(BoundaryCondition):
                 select = np.argwhere((self["time"] == time).values)
                 for layer in np.unique(self["layer"].values[select]):
                     d["layer"] = layer
-                    values[layer] = util.compose(d).as_posix()
+                    values[layer] = self._compose(d)
             else:
-                values["?"] = util.compose(d).as_posix()
+                values["?"] = self._compose(d)
 
         return values
 
@@ -179,8 +179,7 @@ class Well(BoundaryCondition):
         else:
             return ""
 
-    @staticmethod
-    def _save_layers(df, directory, time=None):
+    def _save_layers(self, df, directory, time=None):
         d = {"directory": directory, "name": directory.stem, "extension": ".ipf"}
         d["directory"].mkdir(exist_ok=True, parents=True)
 
@@ -192,10 +191,30 @@ class Well(BoundaryCondition):
                 d["layer"] = layer
                 # Ensure right order
                 outdf = layerdf[["x", "y", "rate", "id_name"]]
-                path = util.compose(d)
+                path = self._compose(d)
                 imod.ipf.write(path, outdf)
         else:
             outdf = df[["x", "y", "rate", "id_name"]]
+            path = self._compose(d)
+            imod.ipf.write(path, outdf)
+
+    @staticmethod
+    def _save_layers_concentration(df, directory, name, time=None):
+        d = {"directory": directory, "name": name, "extension": ".ipf"}
+        d["directory"].mkdir(exist_ok=True, parents=True)
+
+        if time is not None:
+            d["time"] = time
+
+        if "layer" in df:
+            for layer, layerdf in df.groupby("layer"):
+                d["layer"] = layer
+                # Ensure right order
+                outdf = layerdf[["x", "y", "concentration", "id_name"]]
+                path = util.compose(d)
+                imod.ipf.write(path, outdf)
+        else:
+            outdf = df[["x", "y", "concentration", "id_name"]]
             path = util.compose(d)
             imod.ipf.write(path, outdf)
 
