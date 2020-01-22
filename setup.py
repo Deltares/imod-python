@@ -32,6 +32,7 @@ setup(
         "affine",
         "Jinja2",
         "joblib",
+        "pyvista",
     ],
     extras_require={
         "dev": [
