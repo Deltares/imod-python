@@ -7,58 +7,6 @@ import xarray as xr
 from imod import util
 
 
-def to_grid(data):
-    """
-    Parameters
-    ----------
-    data : xr.DataArray
-
-    Returns
-    -------
-    pyvista.RectilinearGrid or pyvista.StructuredGrid
-    """
-    # x and y dimension
-    dx, xmin, xmax, dy, ymin, ymax = util.spatial_reference(data)
-    if isinstance(dx, float):
-        dx = np.full(data.x.size, dx)
-    if isinstance(dy, float):
-        dy = np.full(data.y.size, dy)
-    nx = da.coords["x"].size
-    ny = da.coords["y"].size
-    # TODO: x and y increasing...
-    x = np.full(nx + 1, xmin)
-    y = np.full(ny + 1, ymin)
-    x[1:] += dx.cumsum()
-    y[1:] += dy.cumsum()
-    # z dimension
-    if "top" in da.coords and "bottom" in da.coords:
-        # TODO
-        raise NotImplementedError
-    elif "z" in da.coords:
-        dz, zmin, zmax = imod.util.coord_reference(da["z"])
-        nz = da.coords["z"].size
-        z = np.full(nz + 1, zmin)
-        if isinstance(dz, float):
-            dz = np.full(nz, dz)
-        z[1:] += dz.cumsum()
-
-    grid = pv.RectilinearGrid(x, y, z)
-    grid.cell_arrays["values"] = da.values.ravel()
-    # Test what is faster: Rectilinear -> filter
-    # or: da.where -> unstructured
-    # Unstructured might be required anyway.
-    # Prisms of six corners, always. Pretty easy to generate.
-    grid = grid.threshold([da.min(), da.max()])
-    # This is sufficient for voxel models.
-    # This is insufficient for varying tops and bottoms.
-    # We need to specify all corners exactly of the prisms.
-    # The question is whether building an unstructured grid isn't faster
-    # Likely not, because rectilinear might still be able to make assumptions
-    # about dimensions.
-    # Cheaply: approximate, linear interpolation.
-    return grid
-
-
 @numba.njit
 def _create_hexahedra_z1d(data, x, y, z):
     nz, ny, nx = data.shape
