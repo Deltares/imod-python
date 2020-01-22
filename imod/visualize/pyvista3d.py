@@ -162,9 +162,9 @@ def _create_plane_surface(data, x, y):
 
     # Allocate
     # VTK_HEXAHEDRON is just an enum
-    offset = np.arange(0, 4 * (n + 1), 4)
-    cells = np.empty(n * 4)
-    cell_type = np.full(n, vtk.VTK_PLANE_SURFACE)
+    offset = np.arange(0, 5 * (n + 1), 5)
+    cells = np.empty(n * 5)
+    cell_type = np.full(n, vtk.VTK_QUAD)
     # A hexahedron has r corners
     points = np.empty((n * 4, 3))
     values = np.empty(n)
@@ -177,10 +177,10 @@ def _create_plane_surface(data, x, y):
             v = data[i, j]
             if ~np.isnan(v):
                 # Set coordinates of points
-                points[ii] = (x[k], y[j], v)
-                points[ii + 1] = (x[k + 1], y[j], v)
-                points[ii + 2] = (x[k + 1], y[j + 1], v)
-                points[ii + 3] = (x[k], y[j + 1], v)
+                points[ii] = (x[i], y[j], v)
+                points[ii + 1] = (x[i + 1], y[j], v)
+                points[ii + 2] = (x[i + 1], y[j + 1], v)
+                points[ii + 3] = (x[i], y[j + 1], v)
                 # Set number of cells, and point number
                 cells[jj] = 4
                 cells[jj + 1] = ii
@@ -193,10 +193,10 @@ def _create_plane_surface(data, x, y):
                 values[kk] = v
                 kk += 1
 
-    return offset, cells, cell_type, points, value
+    return offset, cells, cell_type, points, values
 
 
-def to_grid(data):
+def grid_3d(da):
     """
     2.44 ms for filtering
     1.64 ms for this one
@@ -204,18 +204,18 @@ def to_grid(data):
 
     Parameters
     ----------
-    data : xr.DataArray
+    da : xr.DataArray
 
     Returns
     -------
     pyvista.RectilinearGrid or pyvista.StructuredGrid
     """
     # x and y dimension
-    dx, xmin, xmax, dy, ymin, ymax = util.spatial_reference(data)
+    dx, xmin, xmax, dy, ymin, ymax = util.spatial_reference(da)
     if isinstance(dx, float):
-        dx = np.full(data.x.size, dx)
+        dx = np.full(da.x.size, dx)
     if isinstance(dy, float):
-        dy = np.full(data.y.size, dy)
+        dy = np.full(da.y.size, dy)
     nx = da.coords["x"].size
     ny = da.coords["y"].size
     # TODO: x and y increasing...
@@ -225,27 +225,27 @@ def to_grid(data):
     y[1:] += dy.cumsum()
     # z dimension
     if "top" in da.coords and "bottom" in da.coords:
-        ztop = da.coords["top"].transpose("layer", "y", "x")
-        zbot = da.coords["bottom"].transpose("layer", "y", "x")
-        z3d = np.stack([ztop.isel(layer=1).values, zbot.values])
+        ztop = da.coords["top"].transpose("layer", "y", "x", transpose_coords=True)
+        zbot = da.coords["bottom"].transpose("layer", "y", "x", transpose_coords=True)
+        z3d = np.vstack([np.expand_dims(ztop.isel(layer=1).values, 0), zbot.values])
         offset, cells, cell_type, points, values = _create_hexahedra_z3d(
-            data.values, x, y, z3d
+            da.values, x, y, z3d
         )
     elif "z" in da.coords:
-        dz, zmin, zmax = imod.util.coord_reference(da["z"])
+        dz, zmin, zmax = util.coord_reference(da["z"])
         nz = da.coords["z"].size
         z = np.full(nz + 1, zmin)
         if isinstance(dz, float):
             dz = np.full(nz, dz)
         z[1:] += dz.cumsum()
         offset, cells, cell_type, points, values = _create_hexahedra_z1d(
-            data.values, x, y, z
+            da.values, x, y, z
         )
     else:  # surface plot
         if not da.dims == ("y", "x"):
             raise ValueError()
         offset, cells, cell_type, points, values = _create_plane_surface(
-            data.values, x, y
+            da.values, x, y
         )
 
     grid = pv.UnstructuredGrid(offset, cells, cell_type, points)
