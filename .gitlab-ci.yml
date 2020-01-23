@@ -13,6 +13,7 @@ before_script:
 tests:
   script:
     - cd tests
+    - python -m pytest --cache-clear
     - python -m pytest --verbose test_regrid.py
     - python -m pytest --verbose test_visualize/test_visualize_pyvista3d.py
     - export NUMBA_DISABLE_JIT=1
