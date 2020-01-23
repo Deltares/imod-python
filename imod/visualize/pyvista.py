@@ -191,7 +191,7 @@ def _create_hexahedra_z3d(data, x, y, z3d):
 
 
 @numba.njit
-def _create_plane_surface(data, x, y, z):
+def _create_plane_surface(data, x, y):
     """
     Parameters
     ----------
