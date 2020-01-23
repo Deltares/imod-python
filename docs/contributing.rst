@@ -127,7 +127,7 @@ Pull the CI image (at the time of writing), and run it interactively:
 .. code-block:: console
 
   docker pull continuumio/miniconda3:latest
-  docker run -it continuumio/miniconda3:latest
+  docker run -it continuumio/miniconda3
 
 This should land you in the docker image. Next, we reproduce the CI setup steps.
 Some changes are required, such as installing git and cloning the repository,
