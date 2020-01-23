@@ -9,3 +9,4 @@ plots that may be useful to evaluate groundwater models. All
 
 from imod.visualize.spatial import plot_map, read_imod_legend
 from imod.visualize.cross_sections import cross_section
+from imod.visualize.pyvista import grid_3d
