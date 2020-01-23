@@ -35,23 +35,25 @@ class Package(xr.Dataset):
         Loads an imod-wq package from a file (currently only netcdf is supported).
 
         This enables caching of intermediate input and should result in much
-        faster model.write() times. To enable caching, provide a ``joblib.Memory``
-        object.
+        faster model.write() times. To enable caching, provide a path to a 
+        ``joblib.Memory`` caching directory.
 
         Parameters
         ----------
         path : str, pathlib.Path
             Path to the file.
         cache_path : str, pathlib.Path, optional
-            The path to the joblib.Memory where intermediate answers are stored.
-
+            The path to the ``joblib.Memory`` caching dir where intermediate answers are stored.
+        cache_verbose : int
+            Verbosity flag of ``joblib.Memory``, controls the debug messages that are issued as 
+            functions are evaluated.
         Refer to the examples.
 
         Returns
         -------
         package : imod.wq.Package, imod.wq.CachingPackage
             Returns a package with data loaded from file. Returns a CachingPackage
-            if a joblib.Memory object has been provied for ``cache``.
+            if a path to a ``joblib.Memory`` caching directory has been provided for ``cache``.
 
         Examples
         --------
@@ -62,8 +64,7 @@ class Package(xr.Dataset):
 
         To load a package, and enable caching:
 
-        >>> import joblib
-        >>> cache = joblib.Memory("my-cache")
+        >>> cache = "./.cache_dir"
         >>> river = imod.wq.River.from_file("river.nc", cache)
 
         """
