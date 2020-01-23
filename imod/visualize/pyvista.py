@@ -36,11 +36,15 @@ The methods below construct pyvista.UnstructuredGrids for voxel models (z1d),
 """
 import numba
 import numpy as np
-import pyvista as pv
-import vtk
 import xarray as xr
 
 from imod import util
+
+try:
+    import pyvista as pv
+    import vtk
+except ImportError:
+    pass
 
 
 @numba.njit
