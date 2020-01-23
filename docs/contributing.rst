@@ -109,3 +109,45 @@ To follow these steps, you need to be one of the maintainers for imod on both
 .. _here: https://github.com/ambv/black#editor-integration
 .. _Format On Save: https://code.visualstudio.com/updates/v1_6#_format-on-save
 .. _pytest documentation: https://docs.pytest.org/en/latest/
+
+
+Debugging Continuous Integration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Continuous Integration runs on an image with a specific operating system, and
+Python installation. Due to system idiosyncrasies, CI failing might not
+reproduce locally. If an issue requires more than trial-and-error changes,
+Docker is likely the easiest way to debug.
+
+On windows, install Docker:
+https://docs.docker.com/docker-for-windows/install/
+
+Pull the CI image (at the time of writing), and run it interactively:
+
+.. code-block:: console
+
+  docker pull continuumio/miniconda3:latest
+  docker run -it continuumio/miniconda3:latest
+
+This should land you in the docker image. Next, we reproduce the CI setup steps.
+Some changes are required, such as installing git and cloning the repository,
+which happens automatically within CI.
+
+.. code-block:: console
+
+  apt-get update -q -y
+  apt-get install -y build-essential
+  conda update -n base conda
+  conda install git
+  cd /usr/src
+  git clone https://gitlab.com/deltares/imod/imod-python.git
+  cd imod-python
+  conda env create -f environment.yml
+  source activate imod
+  pip install -e .
+  curl -O -L https://gitlab.com/deltares/imod/imod-python/uploads/947a1e194a02ade1376d1111327db34d/mf6.gz
+  gunzip mf6.gz
+  chmod +x mf6
+  mv mf6 /opt/conda/envs/imod/bin
+
+At this point, everything should be ready to run the tests on the Docker image.
