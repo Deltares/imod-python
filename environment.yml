@@ -16,6 +16,7 @@ dependencies:
   - geopandas
   - flopy
   - jinja2
+  - joblib
   - matplotlib
   - nbstripout
   - numba
