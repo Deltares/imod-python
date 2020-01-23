@@ -62,18 +62,18 @@ def test_grid3_plane(tmp_path, test_da):
     da = test_da
     g = imod.visualize.grid_3d(da)
     assert g.bounds
-    #g.plot(screenshot=tmp_path / "plane.png", off_screen=True)
+    # g.plot(screenshot=tmp_path / "plane.png", off_screen=True)
 
 
 def test_grid3d_z(tmp_path, test_zda):
     da = test_zda
     g = imod.visualize.grid_3d(da)
     assert g.bounds
-    #g.plot(screenshot=tmp_path / "z.png", off_screen=True)
+    # g.plot(screenshot=tmp_path / "z.png", off_screen=True)
 
 
 def test_grid3d_z3d(tmp_path, test_3dzda):
     da = test_3dzda
     g = imod.visualize.grid_3d(da)
     assert g.bounds
-    #g.plot(screenshot=tmp_path / "z3d.png", off_screen=True)
+    # g.plot(screenshot=tmp_path / "z3d.png", off_screen=True)
