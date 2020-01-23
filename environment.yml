@@ -33,4 +33,5 @@ dependencies:
   - sphinx_rtd_theme
   - toolz
   - twine
+  - vtk
   - xarray>=0.11
