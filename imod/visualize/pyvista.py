@@ -177,10 +177,10 @@ def _create_plane_surface(data, x, y):
             v = data[i, j]
             if ~np.isnan(v):
                 # Set coordinates of points
-                points[ii] = (x[i], y[j], v)
-                points[ii + 1] = (x[i + 1], y[j], v)
-                points[ii + 2] = (x[i + 1], y[j + 1], v)
-                points[ii + 3] = (x[i], y[j + 1], v)
+                points[ii] = (x[j], y[i], v)
+                points[ii + 1] = (x[j + 1], y[i], v)
+                points[ii + 2] = (x[j + 1], y[i + 1], v)
+                points[ii + 3] = (x[j], y[i + 1], v)
                 # Set number of cells, and point number
                 cells[jj] = 4
                 cells[jj + 1] = ii
