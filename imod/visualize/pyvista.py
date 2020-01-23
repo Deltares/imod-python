@@ -331,7 +331,7 @@ def grid_3d(da):
                 'Coordinate "z" is present, only dimensions allowed are: '
                 '{"layer", "y", "x"} or {"z", "y", "x"}'
             )
-        if "z" not in dims:
+        if "z" not in da.dims:
             da = da.transpose("layer", "y", "x", transpose_coords=True)
         else:
             da = da.transpose("z", "y", "x", transpose_coords=True)
@@ -345,7 +345,7 @@ def grid_3d(da):
         offset, cells, cell_type, points, values = _create_hexahedra_z1d(
             da.values, x, y, z
         )
-    elif set(da.dims) == ("y", "x"):
+    elif set(da.dims) == {"y", "x"}:
         da = da.transpose("y", "x", transpose_coords=True)
         offset, cells, cell_type, points, values = _create_plane_surface(
             da.values, x, y
