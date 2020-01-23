@@ -1,6 +1,11 @@
-image: huite/imod:latest
+image: continuumio/miniconda3:latest
 
 before_script:
+  - apt-get update -q -y
+  - apt-get install -y build-essential
+  - apt-get install libgl1-mesa-glx -y
+  - conda update -n base conda
+  - conda env create -f environment.yml
   - source activate imod
   - pip install -e .
   # download mf6 binary and move it to the env's bin which is in the path
