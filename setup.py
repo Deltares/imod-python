@@ -19,33 +19,32 @@ setup(
     setup_requires=["setuptools_scm"],
     python_requires=">=3.6",
     install_requires=[
-        "numba",
-        "numpy",
-        "scipy",
-        "matplotlib",
-        "xarray>=0.11",
-        "cftime>=1",
-        "pandas",
-        "dask",
-        "cytoolz",  # optional dask dependency we need
-        "toolz",  # optional dask dependency we need
         "affine",
+        "dask",
+        "cftime>=1",
+        "cytoolz",  # optional dask dependency we need
         "Jinja2",
         "joblib",
-        "pyvista",
+        "matplotlib",
+        "numba",
+        "numpy",
+        "pandas",
+        "scipy",
+        "toolz",  # optional dask dependency we need
+        "xarray>=0.11",
     ],
     extras_require={
         "dev": [
+            "black",
+            "flopy",
+            "nbstripout",
             "pytest",
             "pytest-cov",
             "pytest-benchmark",
-            "flopy",
             "sphinx",
             "sphinx_rtd_theme",
-            "nbstripout",
-            "black",
         ],
-        "optional": ["rasterio>=1", "geopandas"],
+        "optional": ["geopandas", "pyvista", "rasterio>=1"],
     },
     classifiers=[
         # https://pypi.python.org/pypi?%3Aaction=list_classifiers
