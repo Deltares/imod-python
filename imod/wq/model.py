@@ -178,14 +178,14 @@ class SeawatModel(Model):
         """
         Also checks if datetime types are homogeneous across packages.
         """
-        types = [
-            type(np.atleast_1d(pkg["time"].values)[0])
-            for pkg in self.values()
-            if self._hastime(pkg)
-        ]
+        types = []
+        for pkg in self.values():
+            if self._hastime(pkg):
+                types.append(type(np.atleast_1d(pkg["time"].values)[0]))
+
         # Types will be empty if there's no time dependent input
         if len(set(types)) == 0:
-            return False
+            return None
         else:  # there is time dependent input
             if not len(set(types)) == 1:
                 raise ValueError(
@@ -233,6 +233,20 @@ class SeawatModel(Model):
 
         # Loop through all packages, check if cftime is required.
         self.use_cftime = self._use_cftime()
+        # use_cftime is None if you no datetimes are present in packages
+        # use_cftime is False if np.datetimes present in packages
+        # use_cftime is True if cftime.datetime present in packages
+        for time in times:
+            if issubclass(type(time), cftime.datetime):
+                if self.use_cftime is None:
+                    self.use_cftime = True
+                if self.use_cftime is False:
+                    raise ValueError(
+                        "Multiple datetime types detected. "
+                        "Use either cftime or numpy.datetime64[ns]."
+                    )
+        if self.use_cftime is None:
+            self.use_cftime = False
 
         times = [timeutil.to_datetime(time, self.use_cftime) for time in times]
         first_times = {}  # first time per package
@@ -486,7 +500,7 @@ class SeawatModel(Model):
         # to the individual packages.
 
     def write(
-        self, directory=pathlib.Path("."), result_dir=None, resultdir_is_workdir=False,
+        self, directory=pathlib.Path("."), result_dir=None, resultdir_is_workdir=False
     ):
         """
         Writes model input files.
