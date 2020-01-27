@@ -64,7 +64,7 @@ def _regrid_layers(src, dst, src_top, dst_top, src_bot, dst_bot, method):
 
 class LayerRegridder:
     """
-    Object to repeatedly regrid layers from similar objects. Compiles 
+    Object to repeatedly regrid layers of similar objects. Compiles 
     once on first call, \can then be repeatedly called without 
     JIT compilation overhead.
 

@@ -24,6 +24,7 @@ def upper_active_layer(da, is_ibound=True, include_constant_head=False):
     -------
     2d xr.DataArray of layernumber of upper active model layer
     """
+    da = da.load()
     if is_ibound:
         # check if indeed ibound: convertible to int
         if not da.astype(int).equals(da):
