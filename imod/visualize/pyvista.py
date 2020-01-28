@@ -37,6 +37,8 @@ The methods below construct pyvista.UnstructuredGrids for voxel models (z1d),
 import numba
 import numpy as np
 import xarray as xr
+import scipy.ndimage.morphology
+import tqdm
 
 from imod import util
 
@@ -45,6 +47,14 @@ try:
     import vtk
 except ImportError:
     pass
+
+
+def exterior(da, n):
+    has_data = da.notnull()
+    eroded = xr.full_like(
+        da, scipy.ndimage.binary_erosion(has_data.values, iterations=n), dtype=np.bool
+    )
+    return has_data & ~eroded
 
 
 @numba.njit
@@ -78,6 +88,7 @@ def _create_hexahedra_z1d(data, x, y, z):
     # VTK_HEXAHEDRON is just an enum
     offset = np.arange(0, 9 * (n + 1), 9)
     cells = np.empty(n * 9)
+    indices = np.empty(n, dtype=np.int32)
     cell_type = np.full(n, vtk.VTK_HEXAHEDRON)
     # A hexahedron has 8 corners
     points = np.empty((n * 8, 3))
@@ -86,6 +97,7 @@ def _create_hexahedra_z1d(data, x, y, z):
     ii = 0
     jj = 0
     kk = 0
+    linear_index = 0
     for i in range(nz):
         for j in range(ny):
             for k in range(nx):
@@ -113,9 +125,12 @@ def _create_hexahedra_z1d(data, x, y, z):
                     jj += 9
                     # Set values
                     values[kk] = data[i, j, k]
+                    # Set indices
+                    indices[kk] = linear_index
                     kk += 1
+                linear_index += 1
 
-    return offset, cells, cell_type, points, values
+    return indices, offset, cells, cell_type, points, values
 
 
 @numba.njit
@@ -149,6 +164,7 @@ def _create_hexahedra_z3d(data, x, y, z3d):
     # VTK_HEXAHEDRON is just an enum
     offset = np.arange(0, 9 * (n + 1), 9)
     cells = np.empty(n * 9)
+    indices = np.empty(n, dtype=np.int32)
     cell_type = np.full(n, vtk.VTK_HEXAHEDRON)
     # A hexahedron has 8 corners
     points = np.empty((n * 8, 3))
@@ -157,6 +173,7 @@ def _create_hexahedra_z3d(data, x, y, z3d):
     ii = 0
     jj = 0
     kk = 0
+    linear_index = 0
     for i in range(nz):
         for j in range(ny):
             for k in range(nx):
@@ -185,9 +202,12 @@ def _create_hexahedra_z3d(data, x, y, z3d):
                     jj += 9
                     # Set values
                     values[kk] = v
+                    # Set index
+                    indices[kk] = linear_index
                     kk += 1
+                linear_index += 1
 
-    return offset, cells, cell_type, points, values
+    return indices, offset, cells, cell_type, points, values
 
 
 @numba.njit
@@ -219,6 +239,7 @@ def _create_plane_surface(data, x, y):
     # VTK_HEXAHEDRON is just an enum
     offset = np.arange(0, 5 * (n + 1), 5)
     cells = np.empty(n * 5)
+    indices = np.empty(n, dtype=np.int32)
     cell_type = np.full(n, vtk.VTK_QUAD)
     # A hexahedron has r corners
     points = np.empty((n * 4, 3))
@@ -227,6 +248,7 @@ def _create_plane_surface(data, x, y):
     ii = 0
     jj = 0
     kk = 0
+    linear_index = 0
     for i in range(ny):
         for j in range(nx):
             v = data[i, j]
@@ -246,12 +268,21 @@ def _create_plane_surface(data, x, y):
                 jj += 5
                 # Set values
                 values[kk] = v
+                # Set index
+                indices[kk] = i * ny + j
                 kk += 1
+            linear_index += 1
 
-    return offset, cells, cell_type, points, values
+    return indices, offset, cells, cell_type, points, values
 
 
-def grid_3d(da):
+def grid_3d(
+    da,
+    vertical_exaggeration=30.0,
+    exterior_only=True,
+    exterior_depth=1,
+    return_index=False,
+):
     """
     Constructs a 3D PyVista representation of a DataArray.
     DataArrays should be two-dimensional or three-dimensional:
@@ -264,7 +295,17 @@ def grid_3d(da):
     Parameters
     ----------
     da : xr.DataArray
-
+    vertical_exaggeration : float, default 30.0
+    exterior_only : bool, default True
+        Whether or not to only draw the exterior. Greatly speeds up rendering,
+        but it means that pyvista slices and filters produce "hollowed out"
+        results.
+    exterior_depth : int, default 1
+        How many cells to consider as exterior. In case of large jumps, holes
+        can occur. By settings this argument to a higher value, more of the
+        inner cells will be rendered, reducing the chances of gaps occurring.
+    return_index : bool, default False
+    
     Returns
     -------
     pyvista.UnstructuredGrid
@@ -320,7 +361,11 @@ def grid_3d(da):
         ztop = da.coords["top"]
         zbot = da.coords["bottom"]
         z3d = np.vstack([np.expand_dims(ztop.isel(layer=1).values, 0), zbot.values])
-        offset, cells, cell_type, points, values = _create_hexahedra_z3d(
+
+        if exterior_only:
+            da = da.where(exterior(da, exterior_depth))
+
+        indices, offset, cells, cell_type, points, values = _create_hexahedra_z3d(
             da.values, x, y, z3d
         )
     elif "z" in da.coords:
@@ -342,12 +387,16 @@ def grid_3d(da):
         if isinstance(dz, float):
             dz = np.full(nz, dz)
         z[1:] += dz.cumsum()
-        offset, cells, cell_type, points, values = _create_hexahedra_z1d(
+
+        if exterior_only:
+            da = da.where(exterior(da, exterior_depth))
+
+        indices, offset, cells, cell_type, points, values = _create_hexahedra_z1d(
             da.values, x, y, z
         )
     elif set(da.dims) == {"y", "x"}:
         da = da.transpose("y", "x", transpose_coords=True)
-        offset, cells, cell_type, points, values = _create_plane_surface(
+        indices, offset, cells, cell_type, points, values = _create_plane_surface(
             da.values, x, y
         )
     else:
@@ -358,8 +407,13 @@ def grid_3d(da):
         )
 
     grid = pv.UnstructuredGrid(offset, cells, cell_type, points)
+    grid.points[:, -1] *= vertical_exaggeration
     grid.cell_arrays["values"] = values
-    return grid
+
+    if return_index:
+        return grid, indices
+    else:
+        return grid
 
 
 # For arrow plots: compute magnitude of vector
@@ -368,3 +422,101 @@ def grid_3d(da):
 # Select with .where?
 # Create an array of (n, 3) shape
 # Vectors are located somewhere
+
+
+def line_3d(polygon, z=0.0):
+    """
+    Returns the exterior line of a shapely polygon.
+
+    Parameters
+    ----------
+    polygon : shapely.geometry.Polygon
+    z : float
+
+    Returns
+    -------
+    pyvista.PolyData    
+    """
+    x, y = map(np.array, polygon.exterior.coords.xy)
+    z = np.full_like(x, z)
+    coords = np.vstack([x, y, z]).transpose()
+    return pv.lines_from_points(coords)
+
+
+class Animation_3d:
+    """
+    Class to easily setup 3D animations for transient data.
+
+    You can iteratively add or change settings to the plotter, until you're
+    satisfied. Call the ``.peek()`` method to take a look. When satisfied, call
+    ``.output()`` to write to a file.
+
+    Examples
+    --------
+
+    Initialize the animation:
+
+    >>> animation = imod.visualize.Animation3D(concentration, mesh_kwargs=dict(cmap="jet"))
+
+    Check what it looks like:
+
+    >>> animation.peek()
+    
+    Change the camera position, add bounding box, and check the result:
+
+    >>> animation.plotter.camera_position = (2, 1, 0.5)
+    >>> animation.plotter.add_bounding_box()
+    >>> animation.peek()
+
+    When it looks good, write to a file:
+
+    >>> animation.write("example.mp4")
+
+    If you've made some changes that don't look good, call ``.reset()`` to start over:
+
+    >>> animation.reset()
+
+    Note that ``.reset()`` is automatically called when the animation has finished writing.
+
+    """
+
+    def __init__(
+        self, da, vertical_exaggeration=30.0, mesh_kwargs={}, plotter_kwargs={}
+    ):
+        # Store data
+        self.da = da
+        self.vertical_exaggeration = vertical_exaggeration
+        self.mesh_kwargs = mesh_kwargs
+        self.plotter_kwargs = plotter_kwargs
+        # Initialize pyvista objects
+        self.mesh, self.indices = grid_3d(
+            da.isel(time=0),
+            vertical_exaggeration=vertical_exaggeration,
+            return_index=True,
+        )
+        self.plotter = pv.Plotter(**plotter_kwargs)
+        self.plotter.add_mesh(self.mesh, **mesh_kwargs)
+
+    def peek(self):
+        self.plotter.show(auto_close=False)
+
+    def reset(self):
+        self.plotter = pv.Plotter(**self.plotter_kwargs)
+        self.mesh.cell_arrays["values"] = self.da.isel(time=0).values.ravel()[
+            self.indices
+        ]
+        self.plotter.add_mesh(self.mesh, **self.mesh_kwargs)
+
+    def write(self, filename):
+        self.plotter.open_movie(filename)
+        self.plotter.show(auto_close=False)
+        self.plotter.write_frame()
+
+        for itime in tqdm.tqdm(range(1, self.da.coords["time"].size)):
+            da_t = self.da.isel(time=itime)
+            self.mesh.cell_arrays["values"] = da_t.values.ravel()[self.indices]
+            self.plotter.write_frame()
+
+        # Close and reinitialize
+        self.plotter.close()
+        self.reset()
