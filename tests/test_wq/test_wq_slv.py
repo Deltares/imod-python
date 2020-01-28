@@ -92,7 +92,13 @@ def test_compute_load_balance_weight(ibound_da):
 
 def test_pksf_render(load_weight_da):
     pksf = ParallelKrylovFlowSolver(
-        max_iter=10, inner_iter=10, hclose=1.0e-4, rclose=100.0, relax=0.99
+        max_iter=10,
+        inner_iter=10,
+        hclose=1.0e-4,
+        rclose=100.0,
+        relax=0.99,
+        h_fstrict=0.1,
+        r_fstrict=0.01,
     )
 
     directory = pathlib.Path(".")
@@ -105,6 +111,8 @@ def test_pksf_render(load_weight_da):
             hclosepks = 0.0001
             rclosepks = 100.0
             relax = 0.99
+            h_fstrictpks = 0.1
+            r_fstrictpks = 0.01
             partopt = 0
             isolver = 1
             npc = 2
@@ -124,6 +132,8 @@ def test_pksf_render_rcb(load_weight_da):
         hclose=1.0e-4,
         rclose=100.0,
         relax=0.99,
+        h_fstrict=0.1,
+        r_fstrict=0.01,
         partition="rcb",
         load_balance_weight=load_weight_da,
     )
@@ -138,6 +148,8 @@ def test_pksf_render_rcb(load_weight_da):
             hclosepks = 0.0001
             rclosepks = 100.0
             relax = 0.99
+            h_fstrictpks = 0.1
+            r_fstrictpks = 0.01
             partopt = 5
             isolver = 1
             npc = 2
