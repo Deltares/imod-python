@@ -29,6 +29,7 @@ setup(
         "numba",
         "numpy",
         "pandas",
+        "tqdm",
         "scipy",
         "toolz",  # optional dask dependency we need
         "xarray>=0.11",

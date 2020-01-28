@@ -33,6 +33,7 @@ dependencies:
   - sphinx
   - sphinx_rtd_theme
   - toolz
+  - tqdm
   - twine
   - vtk
   - xarray>=0.11
