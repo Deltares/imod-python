@@ -3,7 +3,7 @@ This module creates unstructured grids from DataArrays.
 Directly creating pyvista.UnstructuredGrids is advantageous for several reasons.
 
 1. Structured (modflow) grids are rectilinear, so the pyvista.RectilinearGrid might
-seem obvious. However, nodata values are also present, and have to removed using
+seem obvious. However, nodata values are also present, and have to be removed using
 a .treshold(). This means constructing every cell, followed by throwing most away.
 This also returns an unstructured grid, and is slower.
 
@@ -23,7 +23,7 @@ The grid is constructed with:
 offset, cells, cell_type, points, values
 
 As presented here:
-https://github.com/pyvista/pyvista/blob/master/examples/00-load/create-unstructured-surface.py
+https://github.com/pyvista/pyvista/blob/0.23.0/examples/00-load/create-unstructured-surface.py
 
 * offset: start of each cell in the cells array.
 * cells: number of points in the cell, then point number; for every cell.
@@ -34,6 +34,7 @@ https://github.com/pyvista/pyvista/blob/master/examples/00-load/create-unstructu
 The methods below construct pyvista.UnstructuredGrids for voxel models (z1d),
 "layer models" (z3d), and two dimensional data (e.g. a DEM).
 """
+
 import numba
 import numpy as np
 import xarray as xr
