@@ -61,6 +61,10 @@ def exterior(da, n):
 @numba.njit
 def _create_hexahedra_z1d(data, x, y, z):
     """
+    This function creates the necessary arrays to create hexahedra, based on a
+    one-dimensional z array: i.e. one that does not depend on x and y.
+    These arrays are used to create a pyvista.UnstructuredGrid.
+
     Parameters
     ----------
     data : np.array of size (nz, ny, nx)
@@ -93,7 +97,7 @@ def _create_hexahedra_z1d(data, x, y, z):
     cell_type = np.full(n, vtk.VTK_HEXAHEDRON)
     # A hexahedron has 8 corners
     points = np.empty((n * 8, 3))
-    values = np.empty(n)
+    values = np.empty(n, data.dtype)
 
     ii = 0
     jj = 0
@@ -137,6 +141,10 @@ def _create_hexahedra_z1d(data, x, y, z):
 @numba.njit
 def _create_hexahedra_z3d(data, x, y, z3d):
     """
+    This function creates the necessary arrays to create hexahedra, based on a
+    three-dimensional z array: i.e. one that depends on x and y.
+    These arrays are used to create a pyvista.UnstructuredGrid.
+    
     Parameters
     ----------
     data : np.array of size (nz, ny, nx)
@@ -169,7 +177,7 @@ def _create_hexahedra_z3d(data, x, y, z3d):
     cell_type = np.full(n, vtk.VTK_HEXAHEDRON)
     # A hexahedron has 8 corners
     points = np.empty((n * 8, 3))
-    values = np.empty(n)
+    values = np.empty(n, data.dtype)
 
     ii = 0
     jj = 0
@@ -214,6 +222,16 @@ def _create_hexahedra_z3d(data, x, y, z3d):
 @numba.njit
 def _create_plane_surface(data, x, y):
     """
+    This function creates the necessary arrays to create quads, based on a
+    two-dimensional data array. The data array is used for the z dimension.
+    All the horizontal surfaces are connected by vertical faces, exactly
+    representing the cell geometry, with a constant value per cell.
+    The alternative is linear interpolation, which does not represent
+     geometry exactly, or holes in the surface, with isolated quads floating
+     in space.
+
+    These arrays are used to create a pyvista.UnstructuredGrid.
+
     Parameters
     ----------
     data : np.array of size (ny, nx)
@@ -235,24 +253,29 @@ def _create_plane_surface(data, x, y):
         for j in range(nx):
             if ~np.isnan(data[i, j]):
                 n += 1
+                if j < nx - 1:
+                    if ~np.isnan(data[i, j + 1]):
+                        n += 1
+                if i < ny - 1:
+                    if ~np.isnan(data[i + 1, j]):
+                        n += 1
 
     # Allocate
-    # VTK_HEXAHEDRON is just an enum
+    # VTK_QUAD is just an enum
     offset = np.arange(0, 5 * (n + 1), 5)
     cells = np.empty(n * 5)
-    indices = np.empty(n, dtype=np.int32)
     cell_type = np.full(n, vtk.VTK_QUAD)
     # A hexahedron has r corners
     points = np.empty((n * 4, 3))
-    values = np.empty(n)
+    values = np.empty(n, data.dtype)
 
     ii = 0
     jj = 0
     kk = 0
-    linear_index = 0
     for i in range(ny):
         for j in range(nx):
             v = data[i, j]
+            # Create horizontal quad
             if ~np.isnan(v):
                 # Set coordinates of points
                 points[ii] = (x[j], y[i], v)
@@ -270,11 +293,67 @@ def _create_plane_surface(data, x, y):
                 # Set values
                 values[kk] = v
                 # Set index
-                indices[kk] = i * ny + j
                 kk += 1
-            linear_index += 1
 
-    return indices, offset, cells, cell_type, points, values
+                if j < nx - 1:
+                    v01 = data[i, j + 1]
+                    # Create vertical quads
+                    if ~np.isnan(v01):
+                        # Set coordinates of points
+                        points[ii] = (x[j + 1], y[i], v)
+                        points[ii + 1] = (x[j + 1], y[i + 1], v)
+                        points[ii + 2] = (x[j + 1], y[i + 1], v01)
+                        points[ii + 3] = (x[j + 1], y[i], v01)
+                        # Set number of cells, and point number
+                        cells[jj] = 4
+                        cells[jj + 1] = ii
+                        cells[jj + 2] = ii + 1
+                        cells[jj + 3] = ii + 2
+                        cells[jj + 4] = ii + 3
+                        ii += 4
+                        jj += 5
+                        # Set values
+                        values[kk] = v if v > v01 else v01
+                        # Set index
+                        kk += 1
+
+                if i < ny - 1:
+                    v10 = data[i + 1, j]
+                    if ~np.isnan(v10):
+                        # Set coordinates of points
+                        points[ii] = (x[j], y[i + 1], v)
+                        points[ii + 1] = (x[j + 1], y[i + 1], v)
+                        points[ii + 2] = (x[j + 1], y[i + 1], v10)
+                        points[ii + 3] = (x[j], y[i + 1], v10)
+                        # Set number of cells, and point number
+                        cells[jj] = 4
+                        cells[jj + 1] = ii
+                        cells[jj + 2] = ii + 1
+                        cells[jj + 3] = ii + 2
+                        cells[jj + 4] = ii + 3
+                        ii += 4
+                        jj += 5
+                        # Set values
+                        values[kk] = v if v > v10 else v10
+                        # Set index
+                        kk += 1
+
+    return offset, cells, cell_type, points, values
+
+
+def vertices_coords(dx, xmin, xmax, nx):
+    """
+    Return the coordinates of the vertices.
+    (xarray stores midpoints)
+    """
+    if isinstance(dx, float):
+        dx = np.full(nx, dx)
+    if dx[0] > 0:
+        x = np.full(nx + 1, xmin)
+    else:
+        x = np.full(nx + 1, xmax)
+    x[1:] += dx.cumsum()
+    return x
 
 
 def grid_3d(
@@ -335,17 +414,11 @@ def grid_3d(
     """
     # x and y dimension
     dx, xmin, xmax, dy, ymin, ymax = util.spatial_reference(da)
-    if isinstance(dx, float):
-        dx = np.full(da.x.size, dx)
-    if isinstance(dy, float):
-        dy = np.full(da.y.size, dy)
     nx = da.coords["x"].size
     ny = da.coords["y"].size
-    # TODO: Currently assuming dx positive, dy negative
-    x = np.full(nx + 1, xmin)
-    y = np.full(ny + 1, ymax)
-    x[1:] += dx.cumsum()
-    y[1:] += dy.cumsum()
+    x = vertices_coords(dx, xmin, xmax, nx)
+    y = vertices_coords(dy, ymin, ymax, ny)
+    # Coordinates should always have dtype == np.float64 by now
 
     # z dimension
     if "top" in da.coords and "bottom" in da.coords:
@@ -384,10 +457,7 @@ def grid_3d(
 
         dz, zmin, zmax = util.coord_reference(da["z"])
         nz = da.coords["z"].size
-        z = np.full(nz + 1, zmin)
-        if isinstance(dz, float):
-            dz = np.full(nz, dz)
-        z[1:] += dz.cumsum()
+        z = vertices_coords(dz, zmin, zmax, nz)
 
         if exterior_only:
             da = da.where(exterior(da, exterior_depth))
@@ -396,9 +466,11 @@ def grid_3d(
             da.values, x, y, z
         )
     elif set(da.dims) == {"y", "x"}:
+        if return_index:
+            raise ValueError("Cannot return indices for a 2D dataarray.")
         da = da.transpose("y", "x", transpose_coords=True)
-        indices, offset, cells, cell_type, points, values = _create_plane_surface(
-            da.values, x, y
+        offset, cells, cell_type, points, values = _create_plane_surface(
+            da.values.astype(np.float64), x, y
         )
     else:
         raise ValueError(
@@ -444,9 +516,11 @@ def line_3d(polygon, z=0.0):
     return pv.lines_from_points(coords)
 
 
-class Animation_3d:
+class GridAnimation3D:
     """
     Class to easily setup 3D animations for transient data.
+    Use the ``imod.visualize.StaticGridAnimation3D`` when the location of the
+    displayed cells is constant over time, it will render faster.
 
     You can iteratively add or change settings to the plotter, until you're
     satisfied. Call the ``.peek()`` method to take a look. When satisfied, call
@@ -481,6 +555,16 @@ class Animation_3d:
 
     """
 
+    def _initialize(self, da):
+        self.mesh = grid_3d(
+            da, vertical_exaggeration=self.vertical_exaggeration, return_index=False,
+        )
+        self.mesh_actor = self.plotter.add_mesh(self.mesh, **self.mesh_kwargs)
+
+    def _update(self, da):
+        self.plotter.remove_actor(self.mesh_actor)
+        self._initialize(da)
+
     def __init__(
         self, da, vertical_exaggeration=30.0, mesh_kwargs={}, plotter_kwargs={}
     ):
@@ -490,34 +574,60 @@ class Animation_3d:
         self.mesh_kwargs = mesh_kwargs
         self.plotter_kwargs = plotter_kwargs
         # Initialize pyvista objects
-        self.mesh, self.indices = grid_3d(
-            da.isel(time=0),
-            vertical_exaggeration=vertical_exaggeration,
-            return_index=True,
-        )
+        self._initialize(da.isel(time=0))
         self.plotter = pv.Plotter(**plotter_kwargs)
-        self.plotter.add_mesh(self.mesh, **mesh_kwargs)
+        self.mesh_actor = self.plotter.add_mesh(self.mesh, **mesh_kwargs)
 
     def peek(self):
+        """
+        Display the current state of the animation plotter.
+        """
         self.plotter.show(auto_close=False)
 
     def reset(self):
+        """
+        Reset the plotter to its base state.
+        """
         self.plotter = pv.Plotter(**self.plotter_kwargs)
-        self.mesh.cell_arrays["values"] = self.da.isel(time=0).values.ravel()[
-            self.indices
-        ]
-        self.plotter.add_mesh(self.mesh, **self.mesh_kwargs)
+        self._update(self.da.isel(time=0))
 
     def write(self, filename):
+        """
+        Write the animation to a video.
+
+        Resets the plotter when finished animating.
+
+        Parameters
+        ----------
+        filename : str, pathlib.Path
+            Filename to write the video to. Should likely be an .mp4.
+        """
         self.plotter.open_movie(filename)
         self.plotter.show(auto_close=False)
         self.plotter.write_frame()
 
         for itime in tqdm.tqdm(range(1, self.da.coords["time"].size)):
-            da_t = self.da.isel(time=itime)
-            self.mesh.cell_arrays["values"] = da_t.values.ravel()[self.indices]
+            self._update(self.da.isel(time=itime))
             self.plotter.write_frame()
 
         # Close and reinitialize
         self.plotter.close()
         self.reset()
+
+
+class StaticGridAnimation3D(GridAnimation3D):
+    """
+    Class to easily setup 3D animations for transient data;
+    Should only be used when the location of the displayed cells is constant
+    over time. It will render faster than ``imod.visualize.GridAnimation3D``.
+
+    Refer to examples of ``imod.visualize.GridAnimation3D``.
+    """
+
+    def _initialize(self, da):
+        self.mesh, self.indices = grid_3d(
+            da, vertical_exaggeration=self.vertical_exaggeration, return_index=True,
+        )
+
+    def _update(self, da):
+        self.mesh.cell_arrays["values"] = da.values.ravel()[self.indices]
