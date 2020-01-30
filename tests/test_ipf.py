@@ -164,13 +164,17 @@ def test_write_assoc_itype1(tmp_path):
             "id": ["A1", "A1", "B2", "B2"],
             "level": [0.1, 0.2, 0.3, 0.4],
             "time": times + times,
-            "location": ["loc1", "loc1", "loc2", "loc2"],
+            "location": ["loc one", "loc one", "loc two", "loc two"],
         }
     )
     _, first_df = list(df.groupby("id"))[0]
     ipf.write_assoc(tmp_path / "A1.txt", first_df, itype=1, nodata=-999.0)
     df2 = ipf.read_associated(tmp_path / "A1.txt")
     pd.testing.assert_frame_equal(first_df, df2, check_like=True)
+    # check quoting, to prevent imod seperator confusion
+    with open(tmp_path / "A1.txt") as io:
+        lastline = io.readlines()[-1].rstrip()
+    assert lastline == '"20180201000000",1,3,"A1",0.2,"loc one"'
 
 
 def test_write_assoc_itype2(tmp_path):
