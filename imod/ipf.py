@@ -425,7 +425,7 @@ def write_assoc(path, df, itype=1, nodata=1.0e20):
         header=False,
         mode="a",
         date_format="%Y%m%d%H%M%S",
-        quoting=csv.QUOTE_NONE,
+        quoting=csv.QUOTE_NONNUMERIC,
     )
 
 
