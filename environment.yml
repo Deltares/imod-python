@@ -16,6 +16,7 @@ dependencies:
   - geopandas
   - flopy
   - jinja2
+  - joblib
   - matplotlib
   - nbstripout
   - numba
@@ -25,11 +26,14 @@ dependencies:
   - pytest-benchmark
   - pytest-cov
   - python>=3.6
+  - pyvista
   - rasterio>=1.0
   - scipy
   - setuptools_scm
   - sphinx
   - sphinx_rtd_theme
   - toolz
+  - tqdm
   - twine
+  - vtk
   - xarray>=0.11
