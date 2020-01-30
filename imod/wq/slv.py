@@ -225,22 +225,30 @@ class ParallelKrylovFlowSolver(ParallelSolver):
     inner_iter: int
         is the maximum number of inner iterations (INNERIT); a value of 30-50
         should be adequate for most problems.
+    hclose: float
+        is the head change criterion for convergence (HCLOSEPKS), in units of
+        length. When the maximum absolute value of head change from all nodes
+        during an iteration is less than or equal to HCLOSE, and the criterion
+        for RCLOSE is also satisfied (see below), iteration stops.
     rclose: float
         is the residual criterion for convergence (RCLOSEPKS), in units of cubic
         length per time. The units for length and time are the same as
         established for all model data. When the maximum absolute value of the
         residual at all nodes during an iteration is less than or equal to
-        RCLOSE, and the criterion for HCLOSE is also satisfied (see below),
+        RCLOSE, and the criterion for HCLOSE is also satisfied (see above),
         iteration stops.
-    hclose: float
-        is the head change criterion for convergence (HCLOSEPKS), in units of
-        length. When the maximum absolute value of head change from all nodes
-        during an iteration is less than or equal to HCLOSE, and the criterion
-        for RCLOSE is also satisfied (see above), iteration stops.
     relax: float
         is the relaxation parameter used. Usually, RELAX = 1.0, but for some
         problems a value of 0.99, 0.98, or 0.97 will reduce the number of
         iterations required for convergence.
+    h_fstrict: float, optional
+        is a factor to apply to HCLOSE to set a stricter hclose for the linear
+        inner iterations (H_FSTRICTPKS). HCLOSE_inner is calculated as follows:
+        HCLOSEPKS * H_FSTRICTPKS.
+    r_fstrict: float, optional
+        is a factor to apply to RCLOSE to set a stricter rclose for the linear
+        inner iterations (R_FSTRICTPKS). RCLOSE_inner is calculated as follows:
+        RCLOSEPKS * R_FSTRICTPKS.
     partition: {"uniform", "rcb"}, optional
         Partitioning option (PARTOPT). "uniform" partitions the model domain
         into equally sized subdomains. "rcb" (Recursive Coordinate Bisection)
@@ -281,6 +289,8 @@ class ParallelKrylovFlowSolver(ParallelSolver):
         "    hclosepks = {hclose}\n"
         "    rclosepks = {rclose}\n"
         "    relax = {relax}\n"
+        "    h_fstrictpks = {h_fstrict}\n"
+        "    r_fstrictpks = {r_fstrict}\n"
         "    partopt = {partition}\n"
         "    isolver = {solver}\n"
         "    npc = {preconditioner}\n"
@@ -303,6 +313,8 @@ class ParallelKrylovFlowSolver(ParallelSolver):
         hclose=1.0e-4,
         rclose=1000.0,
         relax=0.98,
+        h_fstrict=1.0,
+        r_fstrict=1.0,
         partition="uniform",
         solver="pcg",
         preconditioner="ilu",
@@ -316,6 +328,8 @@ class ParallelKrylovFlowSolver(ParallelSolver):
         self["hclose"] = hclose
         self["rclose"] = rclose
         self["relax"] = relax
+        self["h_fstrict"] = h_fstrict
+        self["r_fstrict"] = r_fstrict
         self["partition"] = partition
         self["solver"] = solver
         self["preconditioner"] = preconditioner
@@ -324,7 +338,15 @@ class ParallelKrylovFlowSolver(ParallelSolver):
         self["load_balance_weight"] = load_balance_weight
 
     def _pkgcheck(self, ibound=None):
-        to_check = ["hclose", "rclose", "max_iter", "inner_iter", "relax"]
+        to_check = [
+            "hclose",
+            "rclose",
+            "h_fstrict",
+            "r_fstrict",
+            "max_iter",
+            "inner_iter",
+            "relax",
+        ]
         self._check_positive(to_check)
         # TODO: fix
         ## Check whether option is actually an available option

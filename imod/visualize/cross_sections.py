@@ -14,6 +14,8 @@ def cross_section(
     kwargs_pcolormesh={},
     kwargs_colorbar={},
     return_cmap_norm=False,
+    fig=None,
+    ax=None,
 ):
     """
     Wraps matplotlib.pcolormesh to draw cross-sections, drawing cell boundaries
@@ -44,6 +46,10 @@ def cross_section(
         These arguments are forwarded to fig.colorbar()
     return_cmap_norm : boolean, optional
         Return the cmap and norm of the plot, default False
+    fig : matplotlib Figure instance, optional
+        Figure to write plot to. If not supplied, a Figure instance is created
+    ax : matplotlib Axes instance, optional
+        Axes to write plot to. If not supplied, an Axes instance is created
 
     Returns
     -------
@@ -143,7 +149,9 @@ def cross_section(
     C = np.full((nrow - 1, ncol - 1), np.nan)
     C[:, 0::2] = data
 
-    fig, ax = plt.subplots()
+    if fig is None or ax is None:
+        fig, ax = plt.subplots()
+
     # Plot raster
     ax1 = ax.pcolormesh(X, Y, C, **settings_pcmesh)
     if layers:

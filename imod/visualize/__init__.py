@@ -7,6 +7,7 @@ plots that may be useful to evaluate groundwater models. All
 ``.imshow()`` methods to plot them directly.
 """
 
+from imod.visualize.spatial import imshow_topview, plot_map, read_imod_legend
 from imod.visualize.cross_sections import cross_section
 from imod.visualize.pyvista import (
     GridAnimation3D,
