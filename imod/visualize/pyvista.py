@@ -520,18 +520,29 @@ class GridAnimation3D:
     """
     Class to easily setup 3D animations for transient data.
     Use the ``imod.visualize.StaticGridAnimation3D`` when the location of the
-    displayed cells is constant over time, it will render faster.
+    displayed cells is constant over time: it will render much faster.
 
     You can iteratively add or change settings to the plotter, until you're
     satisfied. Call the ``.peek()`` method to take a look. When satisfied, call
     ``.output()`` to write to a file.
+
+    Parameters 
+    ---------- 
+    da : xr.DataArray
+        The dataarray with transient data. Must contain a "time" dimension.
+    vertical_exaggeration : float, defaults to 30.0
+    mesh_kwargs : dict
+        keyword arguments that are forwarded to the pyvista mesh representing
+        "da".
+    plotter_kwargs : dict
+        keyword arguments that are forwarded to the pyvista plotter.
 
     Examples
     --------
 
     Initialize the animation:
 
-    >>> animation = imod.visualize.Animation3D(concentration, mesh_kwargs=dict(cmap="jet"))
+    >>> animation = imod.visualize.GridAnimation3D(concentration, mesh_kwargs=dict(cmap="jet"))
 
     Check what it looks like:
 
@@ -573,9 +584,9 @@ class GridAnimation3D:
         self.vertical_exaggeration = vertical_exaggeration
         self.mesh_kwargs = mesh_kwargs
         self.plotter_kwargs = plotter_kwargs
+        self.plotter = pv.Plotter(**plotter_kwargs)
         # Initialize pyvista objects
         self._initialize(da.isel(time=0))
-        self.plotter = pv.Plotter(**plotter_kwargs)
         self.mesh_actor = self.plotter.add_mesh(self.mesh, **mesh_kwargs)
 
     def peek(self):
@@ -619,7 +630,7 @@ class StaticGridAnimation3D(GridAnimation3D):
     """
     Class to easily setup 3D animations for transient data;
     Should only be used when the location of the displayed cells is constant
-    over time. It will render faster than ``imod.visualize.GridAnimation3D``.
+    over time. It will render much faster than ``imod.visualize.GridAnimation3D``.
 
     Refer to examples of ``imod.visualize.GridAnimation3D``.
     """
