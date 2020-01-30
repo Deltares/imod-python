@@ -3,6 +3,7 @@ image: continuumio/miniconda3:latest
 before_script:
   - apt-get update -q -y
   - apt-get install -y build-essential
+  - apt-get install libgl1-mesa-glx -y
   - conda update -n base conda
   - conda env create -f environment.yml
   - source activate imod
@@ -17,7 +18,9 @@ before_script:
 tests:
   script:
     - cd tests
+    - python -m pytest --cache-clear
     - python -m pytest --verbose test_regrid.py
+    - python -m pytest --verbose test_visualize/test_visualize_pyvista.py
     - export NUMBA_DISABLE_JIT=1
     - python -m pytest --verbose --cov=imod
     - cd ..

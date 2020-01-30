@@ -27,6 +27,16 @@ Added
    iMOD-wq writes a number of files (e.g. list file) in the directory where the
    runfile is located. This results in mixing of input and output. By setting it
    ``True``, **all** model output is written in the results directory.
+-  (:func:`imod.visualize.imshow_topview`) has been added to visualize a complete
+   DataArray with atleast dimensions ``x`` and ``y``; it dumps PNGs into a
+   specified directory.
+-  Some support for 3D visualization has been added.
+   (:func:`imod.visualize.grid_3d`) and (:func:`imod.visualize.line_3d`) have been
+   added to produce ``pyvista`` meshes from ``xarray.DataArray``'s and
+   ``shapely`` polygons, respectively.
+   (:class:`imod.visualize.GridAnimation3D`) and (:class:`imod.visualize.StaticGridAnimation3D`) 
+   have been added to setup 3D animations of DataArrays with transient data.
+
 
 [0.9.0] - 2020-01-19
 --------------------
