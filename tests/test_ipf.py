@@ -171,7 +171,7 @@ def test_write_assoc_itype1(tmp_path):
     ipf.write_assoc(tmp_path / "A1.txt", first_df, itype=1, nodata=-999.0)
     df2 = ipf.read_associated(tmp_path / "A1.txt")
     pd.testing.assert_frame_equal(first_df, df2, check_like=True)
-    # check quoting, to prevent imod seperator confusion
+    # check quoting, to prevent imod separator confusion
     with open(tmp_path / "A1.txt") as io:
         lastline = io.readlines()[-1].rstrip()
     assert lastline == '"20180201000000",1,3,"A1",0.2,"loc one"'
