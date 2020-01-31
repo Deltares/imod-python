@@ -5,6 +5,7 @@ Includes methods for dealing with different coordinates and dimensions of the
 xarray.DataArrays, as well as aggregation methods operating on weights and
 values.
 """
+import dask
 import numba
 import numpy as np
 import xarray as xr
@@ -316,6 +317,85 @@ def _coord(da, dim):
     x = np.full(dxs.size + 1, x0)
     x[1:] += np.cumsum(dxs)
     return x
+
+
+def _define_single_dim_slices(src_x, dst_x, chunksizes):
+    # TODO: convert src_x, dst_x to vertex location
+    # Make sure they're ascending, and correct indices if so
+    # if one chunk, skip
+    # TODO: if cellsizes are common divisor, this likely selects arrays that are
+    # one or two cells larger than necessary...
+    n = len(chunksizes)
+    assert n > 0
+    if n > 1:
+        chunk_indices = np.full(n + 1, 0)
+        chunk_indices[1:] = np.cumsum(chunksizes)
+        src_chunk_x = src_x[chunk_indices]
+        # Find where these x's are located in destination
+        dst_start_indices = np.searchsorted(dst_x, src_chunk_x[:-1], side="left")
+        dst_end_indices = np.searchsorted(dst_x, src_chunk_x[1:], side="right")
+        # Grab the dst x
+        dst_x_chunk_start = dst_x[dst_start_indices]
+        dst_x_chunk_end = dst_x[dst_end_indices]
+        # Now, back to src, making sure necessary overlap is included
+        src_start_indices = np.searchsorted(src_x, dst_x_chunk_start, side="left")
+        src_end_indices = np.searchsorted(src_x, dst_x_chunk_end, side="right")
+
+        src_slices = [slice(s, e) for s, e in zip(src_start_indices, src_end_indices)]
+        dst_slices = [slice(s, e) for s, e in zip(dst_start_indices, dst_end_indices)]
+        return src_slices, dst_slices
+    else:
+        return [slice(None, None)], [slice(None, None)]
+
+
+def _define_slices(src, like):
+    src_dim_slices = []
+    dst_dim_slices = []
+    for dim, chunksizes in zip(src.dims, src.chunks):
+        src_slices, dst_slices = _define_single_dim_slices(
+            src[dim].values, like[dim].values, chunksizes
+        )
+        src_dim_slices.append(src_slices)
+        dst_dim_slices.append(dst_slices)
+    
+    src_expanded_slices = np.stack([a.ravel() for a in np.meshgrid(*src_dim_slices)], axis=-1)
+    dst_expanded_slices = np.stack([a.ravel() for a in np.meshgrid(*dst_dim_slices)], axis=-1)
+    return src_expanded_slices, dst_expanded_slices
+
+
+def _sel_chunks(da, expanded_slices):
+    das = []
+    for dim_slices in expanded_slices:
+        slice_dict = {}
+        for dim, dim_slice in zip(da.dims, dim_slices):
+            slice_dict[dim] = dim_slice
+        das.append(da.isel(**slice_dict))
+    return das
+    
+
+def _chunked_regrid(regridder, src, like):
+    src_expanded_slices, dst_expanded_slices = _define_slices(src, like)
+    src_das = _sel_chunks(src, src_expanded_slices)
+    dst_das = _sel_chunks(src, dst_expanded_slices)
+    # Regridder should compute first chunk once
+    # so numba has compiled the necessary functions for subsequent chunks
+    _ = regridder._regrid(src_das[0], dst_das[0])
+    # At this point, the compiled method is part of the regridder class
+    # and will be re-used by dask.
+    # We're throwing away the result since it is a numpy array.
+
+    np_collection = np.full(len(src_das), None)
+    for i, (src_da, dst_da) in enumerate(zip(src_das, dst_das)):
+        # Alllocation occurs inside
+        result = dask.delayed(regridder._regrid)(src_da, dst_da)
+        dask_array = dask.array.from_delayed(result, dst_da.shape, src_da.dtype)
+        np_collection[i] = dask_array
+    
+    # Determine the shape of the chunks, and reshape so dask.block does the right thing
+    shape_chunks = tuple(len(c) for c in src.chunks)
+    reshaped_collection = np.reshape(np_collection, shape_chunks)
+    result_dask_array = dask.array.block(reshaped_collection)
+    return result_dask_array
 
 
 def _get_method(method, methods):
