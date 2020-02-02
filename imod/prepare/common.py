@@ -240,7 +240,7 @@ def _slice_src(src, like, matching_dims):
     """
     Make sure src matches dst in dims that do not have to be regridded
     """
-
+    # TODO: expand min and max by one(?) cellsize of like to make sure slices occur properly!
     slices = {}
     for dim in matching_dims:
         x0 = like[dim][0]  # start of slice
@@ -320,47 +320,56 @@ def _coord(da, dim):
 
 
 def _define_single_dim_slices(src_x, dst_x, chunksizes):
-    # TODO: convert src_x, dst_x to vertex location
-    # Make sure they're ascending, and correct indices if so
-    # if one chunk, skip
-    # TODO: if cellsizes are common divisor, this likely selects arrays that are
-    # one or two cells larger than necessary...
     n = len(chunksizes)
     assert n > 0
-    if n > 1:
-        chunk_indices = np.full(n + 1, 0)
-        chunk_indices[1:] = np.cumsum(chunksizes)
-        src_chunk_x = src_x[chunk_indices]
-        # Find where these x's are located in destination
-        dst_start_indices = np.searchsorted(dst_x, src_chunk_x[:-1], side="left")
-        dst_end_indices = np.searchsorted(dst_x, src_chunk_x[1:], side="right")
-        # Grab the dst x
-        dst_x_chunk_start = dst_x[dst_start_indices]
-        dst_x_chunk_end = dst_x[dst_end_indices]
-        # Now, back to src, making sure necessary overlap is included
-        src_start_indices = np.searchsorted(src_x, dst_x_chunk_start, side="left")
-        src_end_indices = np.searchsorted(src_x, dst_x_chunk_end, side="right")
+    if n == 1:
+        return [slice(None, None)]
 
-        src_slices = [slice(s, e) for s, e in zip(src_start_indices, src_end_indices)]
-        dst_slices = [slice(s, e) for s, e in zip(dst_start_indices, dst_end_indices)]
-        return src_slices, dst_slices
+    # Deal with descending coordinates
+    # for np.searchsorted
+    if (src_x[1] > src_x[0]) and (dst_x[1] > dst_x[0]):
+        flipped = False
+    elif (src_x[1] < src_x[0]) and (dst_x[1] < dst_x[0]):
+        src_x = src_x[::-1]
+        dst_x = dst_x[::-1]
+        chunksizes = chunksizes[::-1]
+        flipped = True
     else:
-        return [slice(None, None)], [slice(None, None)]
+        raise ValueError("Opposite directions on coordinate")
+
+    chunk_indices = np.full(n + 1, 0)
+    chunk_indices[1:] = np.cumsum(chunksizes)
+    # Find locations to cut.
+    src_chunk_x = src_x[chunk_indices]
+    if dst_x[0] < src_chunk_x[0]:
+        src_chunk_x[0] = dst_x[0]
+    if dst_x[-1] > src_chunk_x[-1]:
+        src_chunk_x[-1] = dst_x[-1]
+    # Destinations should NOT have any overlap
+    # Sources may have overlap
+    # We find the most suitable places to cut. 
+    dst_i = np.searchsorted(dst_x, src_chunk_x, "left")
+    dst_i[dst_i > dst_x.size - 1] = dst_x.size - 1
+
+    if flipped:
+        dst_i = (dst_x.size - 1) - dst_i[::-1]
+
+    dst_slices = [
+        slice(s, e) for s, e in zip(dst_i[:-1], dst_i[1:]) if s != e
+    ]
+    return dst_slices 
 
 
 def _define_slices(src, like):
-    src_dim_slices = []
     dst_dim_slices = []
     for dim, chunksizes in zip(src.dims, src.chunks):
-        src_slices, dst_slices = _define_single_dim_slices(
-            src[dim].values, like[dim].values, chunksizes
+        dst_slices = _define_single_dim_slices(
+            _coord(src, dim), _coord(like, dim), chunksizes
         )
-        src_dim_slices.append(src_slices)
         dst_dim_slices.append(dst_slices)
     
-    src_expanded_slices = np.stack([a.ravel() for a in np.meshgrid(*src_dim_slices)], axis=-1)
     dst_expanded_slices = np.stack([a.ravel() for a in np.meshgrid(*dst_dim_slices)], axis=-1)
-    return src_expanded_slices, dst_expanded_slices
+    return dst_expanded_slices
 
 
 def _sel_chunks(da, expanded_slices):
@@ -372,31 +381,6 @@ def _sel_chunks(da, expanded_slices):
         das.append(da.isel(**slice_dict))
     return das
     
-
-def _chunked_regrid(regridder, src, like):
-    src_expanded_slices, dst_expanded_slices = _define_slices(src, like)
-    src_das = _sel_chunks(src, src_expanded_slices)
-    dst_das = _sel_chunks(src, dst_expanded_slices)
-    # Regridder should compute first chunk once
-    # so numba has compiled the necessary functions for subsequent chunks
-    _ = regridder._regrid(src_das[0], dst_das[0])
-    # At this point, the compiled method is part of the regridder class
-    # and will be re-used by dask.
-    # We're throwing away the result since it is a numpy array.
-
-    np_collection = np.full(len(src_das), None)
-    for i, (src_da, dst_da) in enumerate(zip(src_das, dst_das)):
-        # Alllocation occurs inside
-        result = dask.delayed(regridder._regrid)(src_da, dst_da)
-        dask_array = dask.array.from_delayed(result, dst_da.shape, src_da.dtype)
-        np_collection[i] = dask_array
-    
-    # Determine the shape of the chunks, and reshape so dask.block does the right thing
-    shape_chunks = tuple(len(c) for c in src.chunks)
-    reshaped_collection = np.reshape(np_collection, shape_chunks)
-    result_dask_array = dask.array.block(reshaped_collection)
-    return result_dask_array
-
 
 def _get_method(method, methods):
     if isinstance(method, str):

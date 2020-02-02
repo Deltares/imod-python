@@ -26,6 +26,7 @@ The single aggregated value is then filled into the destination array (dst).
 """
 import warnings
 
+import dask
 import numba
 import numpy as np
 import xarray as xr
@@ -381,35 +382,7 @@ class Regridder(object):
         else:
             self._nd_regrid = nd_regrid
 
-    def regrid(self, source, like, fill_value=np.nan):
-        """
-        Regrid ``source`` along dimensions that ``source`` and ``like`` share.
-        These dimensions will be inferred the first time ``.regrid`` is called
-        for the Regridder object.
-        
-        Following xarray conventions, nodata is assumed to ``np.nan``.
-        
-        Parameters
-        ----------
-        source : xr.DataArray of floats
-        like : xr.DataArray of floats
-            The like array present what the coordinates should look like.
-        fill_value : float
-            The fill_value. Defaults to np.nan
-            
-        Returns
-        -------
-        result : xr.DataArray
-            Regridded result.
-        """
-        # Find coordinates that already match, and those that have to be
-        # regridded, and those that exist in source but not in like (left
-        # untouched)
-        matching_dims, regrid_dims, add_dims = common._match_dims(source, like)
-
-        if len(regrid_dims) == 0:
-            return source
-
+    def _prepare(self, regrid_dims):
         # Create tailor made regridding function: take method and ndims into
         # account and call it
         if self._first_call:
@@ -432,9 +405,14 @@ class Regridder(object):
                     f"Regridder.ndim_regrid = {self.ndim_regrid}"
                 )
 
+    def _regrid(self, source, like, fill_value):
+        # Find coordinates that already match, and those that have to be
+        # regridded, and those that exist in source but not in like (left
+        # untouched)
+        matching_dims, regrid_dims, add_dims = common._match_dims(source, like)
+
         # Don't mutate source; src stands for source, dst for destination
         src = source.copy()
-
         # Make sure src matches dst in dims that do not have to be regridded
         src = common._slice_src(src, like, matching_dims)
 
@@ -449,27 +427,10 @@ class Regridder(object):
             src, like, dims_from_src, dims_from_like
         )
 
-        # TODO: Check dimensionality of coordinates
-        # 2-d coordinates should raise a ValueError
-        # TODO: Check possibility to make gridding lazy
-        # iter_regrid provides an opportunity for this, but the chunks need to be
-        # defined somewhat intelligently: for 1d regridding for example the iter
-        # loop is "hot" enough that numba compilation makes sense
-
-        # Use xarray for nearest, and exit early.
-        if self.method == "nearest":
-            dst = xr.DataArray(
-                data=source.reindex_like(like, method="nearest"),
-                coords=dst_da_coords,
-                dims=dst_dims,
-            )
-            return dst
-        else:
-            # Allocate dst
-            # TODO: allocate lazy --> dask.array.full
-            dst = xr.DataArray(
-                data=np.full(dst_shape, fill_value), coords=dst_da_coords, dims=dst_dims
-            )
+        # Allocate dst
+        dst = xr.DataArray(
+            data=np.full(dst_shape, fill_value), coords=dst_da_coords, dims=dst_dims
+        )
 
         # TODO: check that axes are aligned
         dst_coords_regrid = [common._coord(dst, dim) for dim in regrid_dims]
@@ -480,8 +441,81 @@ class Regridder(object):
         dst.values = self._nd_regrid(
             src.values, dst.values, src_coords_regrid, dst_coords_regrid
         )
+        return dst.values
 
-        # Tranpose back to desired shape
-        dst = dst.transpose(*source.dims)
+    def regrid(self, source, like, fill_value=np.nan):
+        """
+        Regrid ``source`` along dimensions that ``source`` and ``like`` share.
+        These dimensions will be inferred the first time ``.regrid`` is called
+        for the Regridder object.
+        
+        Following xarray conventions, nodata is assumed to ``np.nan``.
+        
+        Parameters
+        ----------
+        source : xr.DataArray of floats
+        like : xr.DataArray of floats
+            The like array present what the coordinates should look like.
+        fill_value : float
+            The fill_value. Defaults to np.nan
+            
+        Returns
+        -------
+        result : xr.DataArray
+            Regridded result.
+        """
+        # TODO: Check dimensionality of coordinates
+        # 2-d coordinates should raise a ValueError
+        matching_dims, regrid_dims, add_dims = common._match_dims(source, like)
+        # Exit early if nothing is to be done
+        if len(regrid_dims) == 0:
+            return source
 
-        return dst
+        self._prepare(regrid_dims)
+        # Order dimensions in the right way:
+        # dimensions that are regridded end up at the end for efficient iteration
+        dst_dims = (*add_dims, *matching_dims, *regrid_dims)
+        dims_from_src = (*add_dims, *matching_dims)
+        dims_from_like = tuple(regrid_dims)
+        # Gather destination coordinates
+        dst_da_coords, _ = common._dst_coords(
+            source, like, dims_from_src, dims_from_like
+        )
+
+        # Use xarray for nearest, and exit early.
+        if self.method == "nearest":
+            dst = xr.DataArray(
+                data=source.reindex_like(like, method="nearest"),
+                coords=dst_da_coords,
+                dims=dst_dims,
+            )
+            return dst
+
+        if source.chunks is None:
+            data = self._regrid(source, like, fill_value)
+        else:
+            like_expanded_slices = common._define_slices(source, like)
+            like_das = common._sel_chunks(like, like_expanded_slices)
+            # Regridder should compute first chunk once
+            # so numba has compiled the necessary functions for subsequent chunks
+            _ = self._regrid(source, like_das[0], fill_value)
+            # At this point, the compiled method is part of the regridder class
+            # and will be re-used by dask.
+            # We're throwing away the result since it is a numpy array.
+        
+            np_collection = np.full(len(like_das), None)
+            for i, dst_da in enumerate(like_das):
+                # Alllocation occurs inside
+                result = dask.delayed(self._regrid)(source, dst_da, fill_value)
+                dask_array = dask.array.from_delayed(result, dst_da.shape, source.dtype)
+                np_collection[i] = dask_array
+            
+            # Determine the shape of the chunks, and reshape so dask.block does the right thing
+            shape_chunks = tuple(len(c) for c in source.chunks)
+            reshaped_collection = np.reshape(np_collection, shape_chunks)
+            data = dask.array.block(reshaped_collection)
+
+        dst = xr.DataArray(
+            data=data, coords=dst_da_coords, dims=dst_dims
+        )
+        return dst.transpose(*source.dims)
