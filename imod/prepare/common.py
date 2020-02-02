@@ -10,6 +10,8 @@ import numba
 import numpy as np
 import xarray as xr
 
+import imod
+
 
 @numba.njit(cache=True)
 def _starts(src_x, dst_x):
@@ -194,6 +196,20 @@ def _is_increasing(src_x, dst_x):
             return True
 
 
+def _is_subset(a1, a2):
+    if np.in1d(a2, a1).all():
+        # This means all are present
+        # now check if it's an actual subset
+        # Generate number, and fetch only those present
+        idx = np.arange(a1.size)[np.in1d(a1, a2)]
+        if idx.size > 1:
+            increment = np.diff(idx)
+            # If the maximum increment is only 1, it's a subset
+            if increment.max() == 1:
+                return True
+    return False
+
+
 def _match_dims(src, like):
     """
     Parameters
@@ -221,7 +237,9 @@ def _match_dims(src, like):
     add_dims = []
     for dim in src.dims:
         try:
-            if np.array_equal(src[dim].values, like[dim].values):
+            a1 = _coord(src, dim)
+            a2 = _coord(like, dim)
+            if np.array_equal(a1, a2) or _is_subset(a1, a2):
                 matching_dims.append(dim)
             else:
                 regrid_dims.append(dim)
@@ -236,17 +254,33 @@ def _match_dims(src, like):
     return matching_dims, regrid_dims, add_dims
 
 
+def _selection_indices(src_x, xmin, xmax):
+    """Left-inclusive"""
+    if src_x[1] > src_x[0]:  # ascending
+        i0 = np.searchsorted(src_x, xmin, side="right") - 1
+        i1 = np.searchsorted(src_x, xmax, side="left")
+    else:  # descending
+        src_x = src_x[::-1]
+        n = src_x.size - 1
+        r_i0 = np.searchsorted(src_x, xmin, side="right") - 1
+        r_i1 = np.searchsorted(src_x, xmax)
+        i0 = n - r_i1
+        i1 = n - r_i0
+    return i0, i1
+
+
 def _slice_src(src, like, matching_dims):
     """
     Make sure src matches dst in dims that do not have to be regridded
     """
-    # TODO: expand min and max by one(?) cellsize of like to make sure slices occur properly!
     slices = {}
     for dim in matching_dims:
-        x0 = like[dim][0]  # start of slice
-        x1 = like[dim][-1]  # end of slice
-        slices[dim] = slice(x0, x1)
-    return src.sel(slices).compute()
+        # Generate vertices
+        src_x = _coord(src, dim)
+        _, xmin, xmax = imod.util.coord_reference(like[dim])
+        i0, i1 = _selection_indices(src_x, xmin, xmax)
+        slices[dim] = slice(i0, i1)
+    return src.isel(slices).compute()
 
 
 def _dst_coords(src, like, dims_from_src, dims_from_like):
@@ -347,32 +381,54 @@ def _define_single_dim_slices(src_x, dst_x, chunksizes):
         src_chunk_x[-1] = dst_x[-1]
     # Destinations should NOT have any overlap
     # Sources may have overlap
-    # We find the most suitable places to cut. 
+    # We find the most suitable places to cut.
     dst_i = np.searchsorted(dst_x, src_chunk_x, "left")
     dst_i[dst_i > dst_x.size - 1] = dst_x.size - 1
 
+    # Put back to descending
     if flipped:
         dst_i = (dst_x.size - 1) - dst_i[::-1]
 
-    dst_slices = [
-        slice(s, e) for s, e in zip(dst_i[:-1], dst_i[1:]) if s != e
-    ]
-    return dst_slices 
+    # Create slices, but only if start and end are different
+    # (otherwise, the slice would be empty)
+    dst_slices = [slice(s, e) for s, e in zip(dst_i[:-1], dst_i[1:]) if s != e]
+    return dst_slices
 
 
 def _define_slices(src, like):
+    """
+    Defines the slices for every dimension, based on the chunks that are
+    present within src.
+
+    First, we get a single list of chunks per dimension.
+    Next, these are expanded into an N-dimensional array, equal to the number
+    of dimensions that have chunks.
+    Finally, these arrays are ravelled, and stacked for easier iteration.
+    """
     dst_dim_slices = []
+    dst_chunks_shape = []
     for dim, chunksizes in zip(src.dims, src.chunks):
         dst_slices = _define_single_dim_slices(
             _coord(src, dim), _coord(like, dim), chunksizes
         )
         dst_dim_slices.append(dst_slices)
-    
-    dst_expanded_slices = np.stack([a.ravel() for a in np.meshgrid(*dst_dim_slices)], axis=-1)
-    return dst_expanded_slices
+        dst_chunks_shape.append(len(dst_slices))
+
+    dst_expanded_slices = np.stack(
+        [a.ravel() for a in np.meshgrid(*dst_dim_slices, indexing="ij")], axis=-1
+    )
+    return dst_expanded_slices, dst_chunks_shape
 
 
 def _sel_chunks(da, expanded_slices):
+    """
+    Using the slices created with the functions above, use xarray's index
+    selection methods to create a list of "like" DataArrays which are used
+    to inform the regridding. During the regrid() call of the 
+    imod.prepare.Regridder object, data from the input array is selected,
+    ideally one chunk at time, or 2 ** ndim_chunks if there is overlap
+    required due to cellsize differences.
+    """
     das = []
     for dim_slices in expanded_slices:
         slice_dict = {}
@@ -380,7 +436,7 @@ def _sel_chunks(da, expanded_slices):
             slice_dict[dim] = dim_slice
         das.append(da.isel(**slice_dict))
     return das
-    
+
 
 def _get_method(method, methods):
     if isinstance(method, str):

@@ -386,7 +386,6 @@ class Regridder(object):
         # Create tailor made regridding function: take method and ndims into
         # account and call it
         if self._first_call:
-
             if self.ndim_regrid is None:
                 ndim_regrid = len(regrid_dims)
                 if self.method == common.METHODS["conductance"] and ndim_regrid > 2:
@@ -397,7 +396,6 @@ class Regridder(object):
                 self.ndim_regrid = ndim_regrid
 
             self._make_regrid()
-            self._first_call = False
         else:
             if not len(regrid_dims) == self.ndim_regrid:
                 raise ValueError(
@@ -409,6 +407,7 @@ class Regridder(object):
         # Find coordinates that already match, and those that have to be
         # regridded, and those that exist in source but not in like (left
         # untouched)
+        self._first_call = False
         matching_dims, regrid_dims, add_dims = common._match_dims(source, like)
 
         # Don't mutate source; src stands for source, dst for destination
@@ -471,6 +470,7 @@ class Regridder(object):
         if len(regrid_dims) == 0:
             return source
 
+        # Prepare for regridding; quick checks
         self._prepare(regrid_dims)
         # Order dimensions in the right way:
         # dimensions that are regridded end up at the end for efficient iteration
@@ -483,6 +483,7 @@ class Regridder(object):
         )
 
         # Use xarray for nearest, and exit early.
+        # TODO: replace by more efficient, specialized method
         if self.method == "nearest":
             dst = xr.DataArray(
                 data=source.reindex_like(like, method="nearest"),
@@ -494,28 +495,33 @@ class Regridder(object):
         if source.chunks is None:
             data = self._regrid(source, like, fill_value)
         else:
-            like_expanded_slices = common._define_slices(source, like)
+            like_expanded_slices, shape_chunks = common._define_slices(source, like)
             like_das = common._sel_chunks(like, like_expanded_slices)
             # Regridder should compute first chunk once
             # so numba has compiled the necessary functions for subsequent chunks
-            _ = self._regrid(source, like_das[0], fill_value)
+            if self._first_call:
+                dst_da = like_das[0]
+                a = self._regrid(source, dst_da, fill_value)
+                arr1 = dask.array.from_array(a)
+            else:
+                arr1 = None
             # At this point, the compiled method is part of the regridder class
             # and will be re-used by dask.
-            # We're throwing away the result since it is a numpy array.
-        
+
             np_collection = np.full(len(like_das), None)
             for i, dst_da in enumerate(like_das):
+                # Skip first step if applicable
+                if i == 0 and arr1 is not None:
+                    np_collection[0] = arr1
+                    continue
                 # Alllocation occurs inside
                 result = dask.delayed(self._regrid)(source, dst_da, fill_value)
                 dask_array = dask.array.from_delayed(result, dst_da.shape, source.dtype)
                 np_collection[i] = dask_array
-            
+
             # Determine the shape of the chunks, and reshape so dask.block does the right thing
-            shape_chunks = tuple(len(c) for c in source.chunks)
-            reshaped_collection = np.reshape(np_collection, shape_chunks)
+            reshaped_collection = np.reshape(np_collection, shape_chunks).tolist()
             data = dask.array.block(reshaped_collection)
 
-        dst = xr.DataArray(
-            data=data, coords=dst_da_coords, dims=dst_dims
-        )
+        dst = xr.DataArray(data=data, coords=dst_da_coords, dims=dst_dims)
         return dst.transpose(*source.dims)
