@@ -36,7 +36,17 @@ Added
    ``shapely`` polygons, respectively.
    (:class:`imod.visualize.GridAnimation3D`) and (:class:`imod.visualize.StaticGridAnimation3D`) 
    have been added to setup 3D animations of DataArrays with transient data.
+-  Support for out of core computation by ``imod.prepare.Regridder`` if ``source``
+   is chunked.
 
+Fixed
+~~~~~
+
+-  (:meth:`imod.prepare.Regridder`) detects if the `like` DataArray is a subset
+   along a dimension, in which case the dimension is not regridded.
+-  (:meth:`imod.prepare.Regridder`) now slices the `source` array accurately
+   before regridding, taking cell boundaries into account rather than only
+   cell midpoints.
 
 [0.9.0] - 2020-01-19
 --------------------
