@@ -536,16 +536,9 @@ def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
     )
 
     # Make sure the coordinates are increasing.
-    flip_src = [
-        dim for dim in ("y", "x") if rasterized.indexes[dim].is_monotonic_decreasing
-    ]
-    flip_dst = [dim for dim in ("y", "x") if like.indexes[dim].is_monotonic_decreasing]
-    flip = slice(None, None, -1)
-    # Flip them around
-    for dim in flip_src:
-        rasterized = rasterized.sel({dim: flip})
-    for dim in flip_dst:
-        like = like.sel({dim: flip})
+    dims = ("y", "x")
+    src, _ = common._increasing_dims(src, dims)
+    like, flip_dst = common._increasing_dims(src, dims)
 
     dst_coords = [imod.prepare.common._coord(like, dim) for dim in ("y", "x")]
     src_coords = [imod.prepare.common._coord(rasterized, dim) for dim in ("y", "x")]

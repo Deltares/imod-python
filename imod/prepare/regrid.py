@@ -499,18 +499,8 @@ class Regridder(object):
             return src
 
         # Collect dimensions to flip to make everything ascending
-        flip_src = [
-            dim for dim in regrid_dims if src.indexes[dim].is_monotonic_decreasing
-        ]
-        flip_dst = [
-            dim for dim in regrid_dims if like.indexes[dim].is_monotonic_decreasing
-        ]
-        flip = slice(None, None, -1)
-        # Flip them around
-        for dim in flip_src:
-            src = src.sel({dim: flip})
-        for dim in flip_dst:
-            like = like.sel({dim: flip})
+        src, _ = common._increasing_dims(src, regrid_dims)
+        like, flip_dst = common._increasing_dims(like, regrid_dims)
 
         # Prepare for regridding; quick checks
         self._prepare(regrid_dims)

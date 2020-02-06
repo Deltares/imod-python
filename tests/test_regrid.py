@@ -239,11 +239,6 @@ def test_regrid_coord():
     regridx = imod.prepare.common._coord(da, "x")
     assert np.allclose(regridx, np.arange(-4.0, 1.0, 1.0))
 
-    # Negative dx
-    da = xr.DataArray((np.zeros(4)), {"x": np.arange(0.0, -4.0, -1.0) - 0.5}, ("x",))
-    regridx = imod.prepare.common._coord(da, "x")
-    assert np.allclose(regridx, np.arange(0.0, -5.0, -1.0))
-
     # Non-equidistant, postive dx, negative dy
     nrow, ncol = 3, 4
     dx = np.array([0.9, 1.1, 0.8, 1.2])
@@ -251,6 +246,10 @@ def test_regrid_coord():
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
     coords = imod.util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    # Flip around the y to be increasing
+    # this is what happens in the regridding fuctions with the DataArrays
+    coords["y"] = coords["y"][::-1]
+    coords["dy"] = (coords["dy"][0], coords["dy"][1][::-1])
     kwargs = {"name": "nonequidistant", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=np.float32)
     da = xr.DataArray(data, **kwargs)
@@ -262,7 +261,7 @@ def test_regrid_coord():
     assert float(regridy.min()) == ymin
     assert float(regridy.max()) == ymax
     assert np.allclose(np.diff(regridx), dx)
-    assert np.allclose(np.diff(regridy), dy)
+    assert np.allclose(np.diff(regridy), dy[::-1] * -1.0)
 
     # Now test it if dy doesn't have the right sign
     # it should automatically infer it based on y instead.
@@ -296,6 +295,27 @@ def test_regrid_mean1d__dx_negative():
     like = xr.DataArray(np.empty(2), like_coords, dims)
     out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
     compare = np.array([1.5, 3.0])
+    assert np.allclose(out.values, compare)
+
+
+def test_regrid_mean1d__opposite_dx():
+    values = np.array([1.0, 2.0, 3.0])
+    src_x = np.array([2.5, 1.5, 0.5])
+    dst_x = np.array([0.5, 2.0])
+    coords = {"x": src_x, "dx": ("x", np.array([-1.0, -1.0, -1.0]))}
+    like_coords = {"x": dst_x, "dx": ("x", np.array([1.0, 2.0]))}
+    dims = ("x",)
+    source = xr.DataArray(values, coords, dims)
+    like = xr.DataArray(np.empty(2), like_coords, dims)
+    out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+    compare = np.array([3.0, 1.5])
+    assert np.allclose(out.values, compare)
+
+    # Check sensitivity for dx, it shouldn't matter
+    like_coords = {"x": dst_x, "dx": ("x", np.array([-1.0, -2.0]))}
+    like = xr.DataArray(np.empty(2), like_coords, dims)
+    out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+    compare = np.array([3.0, 1.5])
     assert np.allclose(out.values, compare)
 
 

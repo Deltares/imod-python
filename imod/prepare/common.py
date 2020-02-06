@@ -213,6 +213,17 @@ def _match_dims(src, like):
     return matching_dims, regrid_dims, add_dims
 
 
+def _increasing_dims(da, dims):
+    flip_dims = []
+    for dim in dims:
+        if not da.indexes[dim].is_monotonic:
+            raise ValueError(f'Dimension "{dim}" is not monotonic')
+        if not da.indexes[dim].is_monotonic_increasing:
+            flip_dims.append(dim)
+            da = da.isel({dim: slice(None, None, -1)})
+    return da, flip_dims
+        
+
 def _selection_indices(src_x, xmin, xmax):
     """Left-inclusive"""
     i0 = np.searchsorted(src_x, xmin, side="right") - 1
@@ -269,6 +280,11 @@ def _check_monotonic(dxs, dim):
 
 
 def _coord(da, dim):
+    """
+    Transform N xarray midpoints into N + 1 vertex edges
+    Note: the midpoints have to be monotonic_increasing
+    """
+    assert da.indexes[dim].is_monotonic_increasing
     delta_dim = "d" + dim  # e.g. dx, dy, dz, etc.
 
     if delta_dim in da.coords:  # equidistant or non-equidistant
@@ -289,7 +305,7 @@ def _coord(da, dim):
                 " must be provided as a coordinate."
             )
         dxs = np.full(da[dim].size, dx)
-
+        
     x = da[dim]
     dxs = np.abs(dxs)
     x0 = x[0] - 0.5 * dxs[0]
