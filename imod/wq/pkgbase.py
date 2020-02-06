@@ -30,7 +30,7 @@ class Package(xr.Dataset):
     __slots__ = ("_template", "_pkg_id", "_keywords", "_mapping", "_dataset")
 
     @classmethod
-    def from_file(cls, path, cache_path=None, cache_verbose=0):
+    def from_file(cls, path, cache_path=None, cache_verbose=0, **kwargs):
         """
         Loads an imod-wq package from a file (currently only netcdf is supported).
 
@@ -47,6 +47,9 @@ class Package(xr.Dataset):
         cache_verbose : int
             Verbosity flag of ``joblib.Memory``, controls the debug messages that are issued as 
             functions are evaluated.
+        **kwargs : keyword arguments
+            Arbitrary keyword arguments forwarded to ``xarray.open_dataset()``, or
+            ``xarray.open_zarr()``.
         Refer to the examples.
 
         Returns
@@ -70,10 +73,15 @@ class Package(xr.Dataset):
         """
         path = pathlib.Path(path)
 
-        cls._dataset = xr.open_dataset(path)
-        kwargs = {var: cls._dataset[var] for var in cls._dataset.data_vars}
+        if path.suffix in (".zip", ".zarr"):
+            # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
+            cls._dataset = xr.open_zarr(str(path), **kwargs)
+        else:
+            cls._dataset = xr.open_dataset(path, **kwargs)
+
+        pkg_kwargs = {var: cls._dataset[var] for var in cls._dataset.data_vars}
         if cache_path is None:
-            return cls(**kwargs)
+            return cls(**pkg_kwargs)
         else:
             # Dynamically construct a CachingPackage
             # Note:
@@ -84,7 +92,7 @@ class Package(xr.Dataset):
             cache_path = pathlib.Path(cache_path)
             cache = joblib.Memory(cache_path, verbose=cache_verbose)
             CachingPackage = caching(cls, cache)
-            return CachingPackage(path, **kwargs)
+            return CachingPackage(path, **pkg_kwargs)
 
     def __setitem__(self, key, value):
         if isinstance(value, xr.DataArray):
