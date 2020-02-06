@@ -18,7 +18,8 @@ Changed
 Added
 ~~~~~
 -  (:meth:`from_file`) constructors have been added to all `imod.wq.Package`.
-   This allows loading directly package from a netCDF file.
+   This allows loading directly package from a netCDF file (or any file supported by
+   ``xarray.open_dataset``), or a path to a Zarr directory with suffix ".zarr" or ".zip".
 -  This can be combined with the `cache` argument in (:meth:`from_file`) to
    enable caching of answers to avoid repeated computation during
    (:meth:`imod.wq.SeawatModel.write`); it works by checking whether input and
