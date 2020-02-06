@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+import zarr
 
 import imod
 from imod import util
@@ -34,6 +35,24 @@ def test_timelayerda():
     data = np.ones((ntime, nlay, nrow, ncol), dtype=np.float32)
     da = xr.DataArray(data, **kwargs)
     return da
+
+
+def test_from_file(test_timelayerda, tmp_path):
+    da = test_timelayerda
+    river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da)
+    river_ncpath = tmp_path / "river.nc"
+    river_zarrpath = tmp_path / "river.zarr"
+    river_zarrzippath = tmp_path / "river.zip"
+
+    river.to_netcdf(river_ncpath)
+    river.to_zarr(river_zarrpath)
+    river.to_zarr(zarr.ZipStore(river_zarrzippath, mode="w"))
+
+    # Test kwargs also
+    chunks = {"time": 1, "layer": 1, "y": 3, "x": 4}
+    imod.wq.River.from_file(river_ncpath, chunks=chunks)
+    imod.wq.River.from_file(river_zarrpath, chunks=chunks)
+    imod.wq.River.from_file(river_zarrzippath, chunks=chunks)
 
 
 def test_cached_river__max_n(test_timelayerda, tmp_path):
@@ -295,6 +314,39 @@ def henry_write(tmp_path):
 
 
 def henry_write_cache(tmp_path):
+    bas, lpf, btn, adv, dsp, vdf, wel, pcg, gcg, oc = henry_input()
+    # Store all data
+    bas.to_netcdf(tmp_path / "bas.nc")
+    lpf.to_netcdf(tmp_path / "lpf.nc")
+    btn.to_netcdf(tmp_path / "btn.nc")
+    adv.to_netcdf(tmp_path / "adv.nc")
+    dsp.to_netcdf(tmp_path / "dsp.nc")
+    wel.to_netcdf(tmp_path / "wel.nc")
+    # Now load again
+    my_cache = tmp_path / "my-cache"
+    bas2 = imod.wq.BasicFlow.from_file(tmp_path / "bas.nc", my_cache)
+    lpf2 = imod.wq.LayerPropertyFlow.from_file(tmp_path / "lpf.nc", my_cache)
+    btn2 = imod.wq.BasicTransport.from_file(tmp_path / "btn.nc", my_cache)
+    dsp2 = imod.wq.Dispersion.from_file(tmp_path / "dsp.nc", my_cache)
+    wel2 = imod.wq.Well.from_file(tmp_path / "wel.nc", my_cache)
+    # Caching case
+    m2 = imod.wq.SeawatModel("HenryCase")
+    m2["bas"] = bas2
+    m2["lpf"] = lpf2
+    m2["btn"] = btn2
+    m2["wel"] = wel2
+    m2["adv"] = adv
+    m2["dsp"] = dsp2
+    m2["vdf"] = vdf
+    m2["oc"] = oc
+    m2["pcg"] = pcg
+    m2["gcg"] = gcg
+    m2.time_discretization(times=["2000-01-01", "2001-01-01"])
+
+    m2.write(tmp_path / "henry-caching")
+
+
+def henry_write_cache_zarr(tmp_path):
     bas, lpf, btn, adv, dsp, vdf, wel, pcg, gcg, oc = henry_input()
     # Store all data
     bas.to_netcdf(tmp_path / "bas.nc")
