@@ -70,7 +70,10 @@ class Package(xr.Dataset):
         """
         path = pathlib.Path(path)
 
-        cls._dataset = xr.open_dataset(path)
+        try:
+            cls._dataset = xr.open_dataset(path, chunks={"layer": 1})
+        except ValueError:
+            cls._dataset = xr.open_dataset(path)
         kwargs = {var: cls._dataset[var] for var in cls._dataset.data_vars}
         if cache_path is None:
             return cls(**kwargs)
