@@ -245,12 +245,6 @@ def test_selection_indices():
     assert i0 == 0
     assert i1 == 2
 
-    src_x2 = src_x[::-1]
-    xmin, xmax = 0.0, 40.0
-    ri0, ri1 = imod.prepare.common._selection_indices(src_x2, xmin, xmax)
-    assert ri0 == 3
-    assert ri1 == 5
-
 
 def test_slice_src():
     matching_dims = ("x",)
@@ -264,17 +258,6 @@ def test_slice_src():
 
     actual = imod.prepare.common._slice_src(src, like, matching_dims)
     expected = src.isel(x=slice(0, 2))
-    assert actual.equals(expected)
-
-    # And descending
-    src_x = np.array([50.0, 150.0, 250.0, 350.0, 450.0])[::-1]
-    # dx of 50.0
-    like_x = np.array([75.0, 125.0, 175.0])[::-1]
-    src = xr.DataArray(np.ones(src_x.size), {"x": src_x}, ("x",))
-    like = xr.DataArray(np.ones(like_x.size), {"x": like_x}, ("x",))
-
-    actual = imod.prepare.common._slice_src(src, like, matching_dims)
-    expected = src.isel(x=slice(-2, None))
     assert actual.equals(expected)
 
 
@@ -333,15 +316,6 @@ def test_define_single_dim_slices():
     chunksizes = (3,) * 5
     dst_slices = imod.prepare.common._define_single_dim_slices(src_x, dst_x, chunksizes)
     assert len(dst_slices) == 5
-
-    # Descending direction
-    src_x = np.arange(0.0, 325.0, 25.0)[::-1]
-    dst_x = np.arange(0.0, 330.0, 10.0)[::-1]
-    chunksizes = (2, 5, 5)
-    dst_slices = imod.prepare.common._define_single_dim_slices(src_x, dst_x, chunksizes)
-    s1 = dst_slices[0]
-    s2 = dst_slices[1]
-    assert (s1.stop - s1.start) < (s2.stop - s2.start)
 
 
 def test_sel_chunks():

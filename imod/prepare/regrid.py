@@ -529,7 +529,7 @@ class Regridder(object):
 
         # Flip dimensions to return as like
         for dim in flip_dst:
-            dst = dst.sel({dim: flip})
+            dst = dst.sel({dim: slice(None, None, -1)})
         # Transpose to original dimension coordinates
         # TODO: profile how much this matters!
         return dst.transpose(*source.dims)

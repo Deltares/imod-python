@@ -20,6 +20,7 @@ except ImportError:
 
 import imod
 from imod.prepare import pcg
+from imod.prepare import common
 
 
 def round_extent(extent, cellsize):
@@ -537,8 +538,8 @@ def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
 
     # Make sure the coordinates are increasing.
     dims = ("y", "x")
-    src, _ = common._increasing_dims(src, dims)
-    like, flip_dst = common._increasing_dims(src, dims)
+    rasterized, _ = common._increasing_dims(rasterized, dims)
+    like, flip_dst = common._increasing_dims(like, dims)
 
     dst_coords = [imod.prepare.common._coord(like, dim) for dim in ("y", "x")]
     src_coords = [imod.prepare.common._coord(rasterized, dim) for dim in ("y", "x")]

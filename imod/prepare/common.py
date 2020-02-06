@@ -216,8 +216,6 @@ def _match_dims(src, like):
 def _increasing_dims(da, dims):
     flip_dims = []
     for dim in dims:
-        if not da.indexes[dim].is_monotonic:
-            raise ValueError(f'Dimension "{dim}" is not monotonic')
         if not da.indexes[dim].is_monotonic_increasing:
             flip_dims.append(dim)
             da = da.isel({dim: slice(None, None, -1)})
@@ -282,9 +280,7 @@ def _check_monotonic(dxs, dim):
 def _coord(da, dim):
     """
     Transform N xarray midpoints into N + 1 vertex edges
-    Note: the midpoints have to be monotonic_increasing
     """
-    assert da.indexes[dim].is_monotonic_increasing
     delta_dim = "d" + dim  # e.g. dx, dy, dz, etc.
 
     if delta_dim in da.coords:  # equidistant or non-equidistant
@@ -306,8 +302,13 @@ def _coord(da, dim):
             )
         dxs = np.full(da[dim].size, dx)
 
-    x = da[dim]
     dxs = np.abs(dxs)
+    x = da[dim].values
+    if not da.indexes[dim].is_monotonic_increasing:
+        x = x[::-1]
+        dxs = dxs[::-1]
+
+    # This assumes the coordinate to be monotonic increasing
     x0 = x[0] - 0.5 * dxs[0]
     x = np.full(dxs.size + 1, x0)
     x[1:] += np.cumsum(dxs)
