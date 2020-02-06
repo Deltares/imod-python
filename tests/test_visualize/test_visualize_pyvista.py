@@ -79,6 +79,7 @@ def test_grid3d_z3d(tmp_path, test_3dzda):
     # g.plot(screenshot=tmp_path / "z3d.png", off_screen=True)
 
 
+@pytest.mark.skip(reason="CI isn't cooperating")
 def test_grid_animation_3d(tmp_path, test_zda):
     # Can't test show functions right now...
     # Due to OpenGL issues on CI
@@ -91,6 +92,7 @@ def test_grid_animation_3d(tmp_path, test_zda):
     animation.reset()
 
 
+@pytest.mark.skip(reason="CI isn't cooperating")
 def test_static_grid_animation_3d(tmp_path, test_zda):
     # Can't test show functions right now...
     # Due to OpenGL issues on CI
