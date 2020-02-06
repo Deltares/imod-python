@@ -59,7 +59,7 @@ def test_weights():
     src_x = np.arange(0.0, 11.0, 1.0)
     dst_x = np.arange(0.0, 11.0, 2.5)
     max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
-        src_x, dst_x, True, False
+        src_x, dst_x, False
     )
     assert max_len == 3
     assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
@@ -73,7 +73,7 @@ def test_weights():
     src_x = np.array([0.0, 2.5, 7.5, 10.0])
     dst_x = np.array([0.0, 5.0, 10.0])
     max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
-        src_x, dst_x, True, False
+        src_x, dst_x, False
     )
     assert max_len == 2
     assert np.allclose(dst_inds, np.array([0, 1]))
@@ -84,7 +84,7 @@ def test_weights():
     src_x = np.arange(-5.0, 6.0, 1.0)
     dst_x = np.arange(-5.0, 6.0, 2.5)
     max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
-        src_x, dst_x, True, False
+        src_x, dst_x, False
     )
     assert max_len == 3
     assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
@@ -102,7 +102,7 @@ def test_relative_weights():
     src_x = np.arange(0.0, 11.0, 1.0) * 2.0
     dst_x = np.arange(0.0, 11.0, 2.5) * 2.0
     max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
-        src_x, dst_x, True, True
+        src_x, dst_x, True
     )
     assert max_len == 3
     assert np.allclose(dst_inds, np.array([0, 1, 2, 3]))
@@ -116,14 +116,14 @@ def test_relative_weights():
     src_x = np.array([0.0, 1.5])
     dst_x = np.array([0.0, 3.0])
     max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
-        src_x, dst_x, True, True
+        src_x, dst_x, True
     )
     assert np.allclose(weights, np.array([[1.0]]))
 
     src_x = np.array([0.0, 3.0])
     dst_x = np.array([0.0, 1.5])
     max_len, (dst_inds, src_inds, weights) = imod.prepare.common._weights_1d(
-        src_x, dst_x, True, True
+        src_x, dst_x, True
     )
     assert np.allclose(weights, np.array([[0.5]]))
 
@@ -210,23 +210,6 @@ def test_reshape():
     iter_src, iter_dst = imod.prepare.common._reshape(src, dst, ndim_regrid=3)
     assert iter_src.shape == (2, 4, 3, 5)
     assert iter_dst.shape == (2, 4, 3, 2)
-
-
-def test_is_increasing():
-    src_x = np.arange(5.0)
-    dst_x = np.arange(5.0)
-    is_increasing = imod.prepare.common._is_increasing(src_x, dst_x)
-    assert is_increasing
-
-    src_x = np.arange(5.0, 0.0, -1.0)
-    dst_x = np.arange(5.0, 0.0, -1.0)
-    is_increasing = imod.prepare.common._is_increasing(src_x, dst_x)
-    assert not is_increasing
-
-    src_x = np.arange(5.0, 0.0, -1.0)
-    dst_x = np.arange(5.0)
-    with pytest.raises(ValueError):
-        is_increasing = imod.prepare.common._is_increasing(src_x, dst_x)
 
 
 def test_is_subset():

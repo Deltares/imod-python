@@ -268,9 +268,7 @@ def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid, use_relative_weigh
     inds_weights = []
     alloc_len = 1
     for src_x, dst_x in zip(src_coords, dst_coords):
-        size, i_w = common._weights_1d(
-            src_x, dst_x, use_relative_weights
-        )
+        size, i_w = common._weights_1d(src_x, dst_x, use_relative_weights)
         for elem in i_w:
             inds_weights.append(elem)
         alloc_len *= size
@@ -439,6 +437,36 @@ class Regridder(object):
         )
         return dst.values
 
+    def _chunked_regrid(self, src, like, fill_value):
+        like_expanded_slices, shape_chunks = common._define_slices(src, like)
+        like_das = common._sel_chunks(like, like_expanded_slices)
+        # Regridder should compute first chunk once
+        # so numba has compiled the necessary functions for subsequent chunks
+        if self._first_call:
+            dst_da = like_das[0]
+            a = self._regrid(src, dst_da, fill_value)
+            arr1 = dask.array.from_array(a)
+        else:
+            arr1 = None
+        # At this point, the compiled method is part of the regridder class
+        # and will be re-used by dask.
+
+        np_collection = np.full(len(like_das), None)
+        for i, dst_da in enumerate(like_das):
+            # Skip first step if applicable
+            if i == 0 and arr1 is not None:
+                np_collection[0] = arr1
+                continue
+            # Alllocation occurs inside
+            result = dask.delayed(self._regrid)(src, dst_da, fill_value)
+            dask_array = dask.array.from_delayed(result, dst_da.shape, src.dtype)
+            np_collection[i] = dask_array
+
+        # Determine the shape of the chunks, and reshape so dask.block does the right thing
+        reshaped_collection = np.reshape(np_collection, shape_chunks).tolist()
+        data = dask.array.block(reshaped_collection)
+        return data
+
     def regrid(self, source, like, fill_value=np.nan):
         """
         Regrid ``source`` along dimensions that ``source`` and ``like`` share.
@@ -461,8 +489,8 @@ class Regridder(object):
             Regridded result.
         """
         # Don't mutate source; src stands for source, dst for destination
-        src = source.copy()
-        like = like.copy()
+        src = source.copy(deep=False)
+        like = like.copy(deep=False)
         # TODO: Check dimensionality of coordinates
         # 2-d coordinates should raise a ValueError
         matching_dims, regrid_dims, add_dims = common._match_dims(src, like)
@@ -471,13 +499,18 @@ class Regridder(object):
             return src
 
         # Collect dimensions to flip to make everything ascending
-        flip_src = [dim for dim in regrid_dims if src.indexes[dim].is_monotonic_decreasing]
-        flip_dst = [dim for dim in regrid_dims if like.indexes[dim].is_monotonic_decreasing]
+        flip_src = [
+            dim for dim in regrid_dims if src.indexes[dim].is_monotonic_decreasing
+        ]
+        flip_dst = [
+            dim for dim in regrid_dims if like.indexes[dim].is_monotonic_decreasing
+        ]
+        flip = slice(None, None, -1)
         # Flip them around
         for dim in flip_src:
-            src = src.sel({dim: slice(None, None, -1)})
+            src = src.sel({dim: flip})
         for dim in flip_dst:
-            like = like.sel({dim: slice(None, None, -1)})
+            like = like.sel({dim: flip})
 
         # Prepare for regridding; quick checks
         self._prepare(regrid_dims)
@@ -487,11 +520,9 @@ class Regridder(object):
         dims_from_src = (*add_dims, *matching_dims)
         dims_from_like = tuple(regrid_dims)
         # Gather destination coordinates
-        dst_da_coords, _ = common._dst_coords(
-            src, like, dims_from_src, dims_from_like
-        )
+        dst_da_coords, _ = common._dst_coords(src, like, dims_from_src, dims_from_like)
 
-        # Use xarray for nearest, and exit early.
+        # Use xarray for nearest
         # TODO: replace by more efficient, specialized method
         if self.method == "nearest":
             dst = xr.DataArray(
@@ -499,44 +530,16 @@ class Regridder(object):
                 coords=dst_da_coords,
                 dims=dst_dims,
             )
-            for dim in flip_dst:
-                like = like.sel({dim: slice(None, None, -1)})
-            return dst
-    
-
-        if src.chunks is None:
-            data = self._regrid(src, like, fill_value)
         else:
-            like_expanded_slices, shape_chunks = common._define_slices(src, like)
-            like_das = common._sel_chunks(like, like_expanded_slices)
-            # Regridder should compute first chunk once
-            # so numba has compiled the necessary functions for subsequent chunks
-            if self._first_call:
-                dst_da = like_das[0]
-                a = self._regrid(src, dst_da, fill_value)
-                arr1 = dask.array.from_array(a)
+            if src.chunks is None:
+                data = self._regrid(src, like, fill_value)
             else:
-                arr1 = None
-            # At this point, the compiled method is part of the regridder class
-            # and will be re-used by dask.
+                data = self._chunked_regrid(src, like, fill_value)
+            dst = xr.DataArray(data=data, coords=dst_da_coords, dims=dst_dims)
 
-            np_collection = np.full(len(like_das), None)
-            for i, dst_da in enumerate(like_das):
-                # Skip first step if applicable
-                if i == 0 and arr1 is not None:
-                    np_collection[0] = arr1
-                    continue
-                # Alllocation occurs inside
-                result = dask.delayed(self._regrid)(src, dst_da, fill_value)
-                dask_array = dask.array.from_delayed(result, dst_da.shape, src.dtype)
-                np_collection[i] = dask_array
-
-            # Determine the shape of the chunks, and reshape so dask.block does the right thing
-            reshaped_collection = np.reshape(np_collection, shape_chunks).tolist()
-            data = dask.array.block(reshaped_collection)
-
-        dst = xr.DataArray(data=data, coords=dst_da_coords, dims=dst_dims)
+        # Flip dimensions to return as like
         for dim in flip_dst:
-            like = like.sel({dim: slice(None, None, -1)})
- 
+            dst = dst.sel({dim: flip})
+        # Transpose to original dimension coordinates
+        # TODO: profile how much this matters!
         return dst.transpose(*source.dims)

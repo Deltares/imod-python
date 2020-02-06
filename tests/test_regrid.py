@@ -65,7 +65,7 @@ def test_make_regrid():
 def test_regrid_1d():
     src_x = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
     dst_x = np.array([0.0, 2.5, 5.0])
-    alloc_len, i_w = imod.prepare.common._weights_1d(src_x, dst_x, True, False)
+    alloc_len, i_w = imod.prepare.common._weights_1d(src_x, dst_x, False)
     inds_weights = [tuple(elem) for elem in i_w]
     values = np.zeros(alloc_len)
     weights = np.zeros(alloc_len)
@@ -97,7 +97,7 @@ def test_iter_regrid__1d():
     ndim_regrid = 1
     src_x = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
     dst_x = np.array([0.0, 2.5, 5.0])
-    alloc_len, i_w = imod.prepare.common._weights_1d(src_x, dst_x, True, False)
+    alloc_len, i_w = imod.prepare.common._weights_1d(src_x, dst_x, False)
     inds_weights = [tuple(elem) for elem in i_w]
 
     # 1D regrid over 1D array
