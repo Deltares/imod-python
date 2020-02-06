@@ -70,6 +70,14 @@ class Package(xr.Dataset):
         >>> cache = "./.cache_dir"
         >>> river = imod.wq.River.from_file("river.nc", cache)
 
+        For large datasets, you likely want to process it in chunks. You can
+        forward keyword arguments to ``xarray.open_dataset()`` or
+        ``xarray.open_zarr()``:
+        
+        >>> cache = "./.cache_dir"
+        >>> river = imod.wq.River.from_file("river.nc", cache, chunks={"time": 1})
+
+        Refer to the xarray documentation for the possible keyword arguments.
         """
         path = pathlib.Path(path)
 
