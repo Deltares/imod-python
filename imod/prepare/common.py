@@ -215,16 +215,8 @@ def _match_dims(src, like):
 
 def _selection_indices(src_x, xmin, xmax):
     """Left-inclusive"""
-    if src_x[1] > src_x[0]:  # ascending
-        i0 = np.searchsorted(src_x, xmin, side="right") - 1
-        i1 = np.searchsorted(src_x, xmax, side="left")
-    else:  # descending
-        src_x = src_x[::-1]
-        n = src_x.size - 1
-        r_i0 = np.searchsorted(src_x, xmin, side="right") - 1
-        r_i1 = np.searchsorted(src_x, xmax)
-        i0 = n - r_i1
-        i1 = n - r_i0
+    i0 = np.searchsorted(src_x, xmin, side="right") - 1
+    i1 = np.searchsorted(src_x, xmax, side="left")
     return i0, i1
 
 
@@ -298,14 +290,8 @@ def _coord(da, dim):
             )
         dxs = np.full(da[dim].size, dx)
 
-    # Check if the sign of dxs is correct for the coordinate values of x
     x = da[dim]
     dxs = np.abs(dxs)
-    if x.size > 1:
-        if x[1] < x[0]:
-            dxs = -1.0 * dxs
-
-    # Note: this works for both positive dx (increasing x) and negative dx
     x0 = x[0] - 0.5 * dxs[0]
     x = np.full(dxs.size + 1, x0)
     x[1:] += np.cumsum(dxs)
@@ -317,18 +303,6 @@ def _define_single_dim_slices(src_x, dst_x, chunksizes):
     assert n > 0
     if n == 1:
         return [slice(None, None)]
-
-    # Deal with descending coordinates
-    # for np.searchsorted
-    if (src_x[1] > src_x[0]) and (dst_x[1] > dst_x[0]):
-        flipped = False
-    elif (src_x[1] < src_x[0]) and (dst_x[1] < dst_x[0]):
-        src_x = src_x[::-1]
-        dst_x = dst_x[::-1]
-        chunksizes = chunksizes[::-1]
-        flipped = True
-    else:
-        raise ValueError("Opposite directions on coordinate")
 
     chunk_indices = np.full(n + 1, 0)
     chunk_indices[1:] = np.cumsum(chunksizes)
@@ -343,10 +317,6 @@ def _define_single_dim_slices(src_x, dst_x, chunksizes):
     # We find the most suitable places to cut.
     dst_i = np.searchsorted(dst_x, src_chunk_x, "left")
     dst_i[dst_i > dst_x.size - 1] = dst_x.size - 1
-
-    # Put back to descending
-    if flipped:
-        dst_i = (dst_x.size - 1) - dst_i[::-1]
 
     # Create slices, but only if start and end are different
     # (otherwise, the slice would be empty)
