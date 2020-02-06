@@ -222,7 +222,7 @@ def _increasing_dims(da, dims):
             flip_dims.append(dim)
             da = da.isel({dim: slice(None, None, -1)})
     return da, flip_dims
-        
+
 
 def _selection_indices(src_x, xmin, xmax):
     """Left-inclusive"""
@@ -305,7 +305,7 @@ def _coord(da, dim):
                 " must be provided as a coordinate."
             )
         dxs = np.full(da[dim].size, dx)
-        
+
     x = da[dim]
     dxs = np.abs(dxs)
     x0 = x[0] - 0.5 * dxs[0]

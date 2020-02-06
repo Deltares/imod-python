@@ -58,6 +58,7 @@ def _voxelize(src, dst, src_top, src_bot, dst_z, method):
 
     return dst
 
+
 def _coord(da, dim):
     delta_dim = "d" + dim  # e.g. dx, dy, dz, etc.
 
@@ -92,6 +93,7 @@ def _coord(da, dim):
     x = np.full(dxs.size + 1, x0)
     x[1:] += np.cumsum(dxs)
     return x
+
 
 class Voxelizer:
     """
