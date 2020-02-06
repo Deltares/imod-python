@@ -79,25 +79,25 @@ def test_grid3d_z3d(tmp_path, test_3dzda):
     # g.plot(screenshot=tmp_path / "z3d.png", off_screen=True)
 
 
-def test_grid_animation_3d(tmp_path, test_zda):
-    # Can't test show functions right now...
-    # Due to OpenGL issues on CI
-    da = test_zda
-    das = [da.assign_coords(time=i) for i in range(3)]
-    timeda = xr.concat(das, dim="time")
-    animation = imod.visualize.GridAnimation3D(timeda)
-    # Make a random change
-    animation.plotter.camera_position = [0.0, 0.0, 0.0]
-    animation.reset()
-
-
-def test_static_grid_animation_3d(tmp_path, test_zda):
-    # Can't test show functions right now...
-    # Due to OpenGL issues on CI
-    da = test_zda
-    das = [da.assign_coords(time=i) for i in range(3)]
-    timeda = xr.concat(das, dim="time")
-    animation = imod.visualize.StaticGridAnimation3D(timeda)
-    # Make a random change
-    animation.plotter.camera_position = [0.0, 0.0, 0.0]
-    animation.reset()
+#def test_grid_animation_3d(tmp_path, test_zda):
+#    # Can't test show functions right now...
+#    # Due to OpenGL issues on CI
+#    da = test_zda
+#    das = [da.assign_coords(time=i) for i in range(3)]
+#    timeda = xr.concat(das, dim="time")
+#    animation = imod.visualize.GridAnimation3D(timeda)
+#    # Make a random change
+#    animation.plotter.camera_position = [0.0, 0.0, 0.0]
+#    animation.reset()
+#
+#
+#def test_static_grid_animation_3d(tmp_path, test_zda):
+#    # Can't test show functions right now...
+#    # Due to OpenGL issues on CI
+#    da = test_zda
+#    das = [da.assign_coords(time=i) for i in range(3)]
+#    timeda = xr.concat(das, dim="time")
+#    animation = imod.visualize.StaticGridAnimation3D(timeda)
+#    # Make a random change
+#    animation.plotter.camera_position = [0.0, 0.0, 0.0]
+#    animation.reset()
