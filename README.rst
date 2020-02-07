@@ -1,9 +1,21 @@
+.. image:: https://img.shields.io/badge/lifecycle-maturing-blue
+   :target: https://www.tidyverse.org/lifecycle/
 .. image:: https://gitlab.com/deltares/imod/imod-python/badges/master/pipeline.svg
    :target: https://gitlab.com/deltares/imod/imod-python/commits/master
+.. image:: https://img.shields.io/pypi/l/imod
+   :target: https://choosealicense.com/licenses/mit/
 .. image:: https://gitlab.com/deltares/imod/imod-python/badges/master/coverage.svg
    :target: https://gitlab.com/deltares/imod/imod-python/commits/master
+.. image:: https://img.shields.io/conda/vn/conda-forge/imod.svg
+   :target: https://github.com/conda-forge/imod-feedstock
 .. image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/Deltares/iMOD-DSD-International-2019/master
+
+.. note::
+   This package is currently maturing on the way to a stable release. It is being actively used and
+   developed at `Deltares <https://www.deltares.nl/en/>`__. To make it easier for others to use this
+   package, the documentation still needs significant work. The API reference is fairly complete, but
+   high level overviews and more examples are still lacking. Extending Modflow 6 support is also planned.
 
 The imod Python package is designed to help you in your MODFLOW groundwater modeling efforts.
 It makes it easy to go from your raw data to a fully defined MODFLOW model, with the aim to make this process reproducable.
@@ -16,7 +28,7 @@ for free.
 
 Currently we support the creation of the following MODFLOW-based models:
 
-* `USGS MODFLOW 6 <https://www.usgs.gov/software/modflow-6-usgs-modular-hydrologic-model>`__, structured grids only
+* `USGS MODFLOW 6 <https://www.usgs.gov/software/modflow-6-usgs-modular-hydrologic-model>`__, structured grids only, and no advanced stress packages yet (LAK, MAW, SFR, UZF)
 * `iMODFLOW <https://oss.deltares.nl/web/imod>`__
 * `iMOD-WQ <https://oss.deltares.nl/web/imod>`__, which integrates SEAWAT (density-dependent groundwater flow) and MT3DMS (multi-species reactive transport calculations)
 
