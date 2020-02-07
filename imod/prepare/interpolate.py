@@ -112,6 +112,9 @@ def _linear_inds_weights_1d(src_x, dst_x):
     dst_x: np.array
         vertex coordinates of destination
     """
+    # Cannot interpolate "between" only one point
+    assert src_x.size > 2
+
     xmin = src_x.min()
     xmax = src_x.max()
 

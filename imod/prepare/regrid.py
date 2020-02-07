@@ -307,6 +307,10 @@ class Regridder(object):
         ``method`` as a function, where the function requires relative, rather
         than absolute weights (the provided ``conductance`` method requires
         relative weights, for example). Default value is False.
+    extra_overlap : integer, optional
+        In case of chunked regridding, how many cells of additional overlap is
+        necessary. Linear interpolation requires this for example, as it reaches
+        beyond cell boundaries to compute values. Default value is 0.
 
     Examples
     --------
@@ -344,7 +348,9 @@ class Regridder(object):
     regridding needs.
     """
 
-    def __init__(self, method, ndim_regrid=None, use_relative_weights=False):
+    def __init__(
+        self, method, ndim_regrid=None, use_relative_weights=False, extra_overlap=0
+    ):
         _method = common._get_method(method, common.METHODS)
         self.method = _method
         self.ndim_regrid = ndim_regrid
@@ -352,6 +358,9 @@ class Regridder(object):
         if _method == common.METHODS["conductance"]:
             use_relative_weights = True
         self.use_relative_weights = use_relative_weights
+        if _method == common.METHODS["multilinear"]:
+            extra_overlap = 1
+        self.extra_overlap = extra_overlap
 
     def _make_regrid(self):
         iter_regrid = _make_regrid(self.method, self.ndim_regrid)
@@ -404,11 +413,7 @@ class Regridder(object):
         # Find coordinates that already match, and those that have to be
         # regridded, and those that exist in source but not in like (left
         # untouched)
-        self._first_call = False
         matching_dims, regrid_dims, add_dims = common._match_dims(src, like)
-
-        # Make sure src matches dst in dims that do not have to be regridded
-        src = common._slice_src(src, like, matching_dims)
 
         # Order dimensions in the right way:
         # dimensions that are regridded end up at the end for efficient iteration
@@ -448,8 +453,13 @@ class Regridder(object):
         # so numba has compiled the necessary functions for subsequent chunks
         if self._first_call:
             dst_da = like_das[0]
-            a = self._regrid(src, dst_da, fill_value)
+            matching_dims, regrid_dims, _ = common._match_dims(src, dst_da)
+            chunk_src = common._slice_src(
+                src, dst_da, matching_dims + regrid_dims, self.extra_overlap
+            )
+            a = self._regrid(chunk_src, dst_da, fill_value)
             arr1 = dask.array.from_array(a)
+            self._first_call = False
         else:
             arr1 = None
         # At this point, the compiled method is part of the regridder class
@@ -461,9 +471,24 @@ class Regridder(object):
             if i == 0 and arr1 is not None:
                 np_collection[0] = arr1
                 continue
-            # Alllocation occurs inside
-            result = dask.delayed(self._regrid)(src, dst_da, fill_value)
-            dask_array = dask.array.from_delayed(result, dst_da.shape, src.dtype)
+            matching_dims, regrid_dims, _ = common._match_dims(src, dst_da)
+
+            # NOTA BENE: slice must occur BEFORE sending it to dask.delayed
+            # if not, dask will attempt to allocate the full array!
+            chunk_src = common._slice_src(
+                src, dst_da, matching_dims + regrid_dims, self.extra_overlap
+            )
+            if any(
+                size == 0 for size in chunk_src.shape
+            ):  # zero overlap for the chunk, zero size chunk
+                dask_array = dask.array.full(dst_da.shape, fill_value, src.dtype)
+            else:
+                # Alllocation occurs inside
+                result = dask.delayed(self._regrid, pure=True)(
+                    chunk_src, dst_da, fill_value
+                )
+                dask_array = dask.array.from_delayed(result, dst_da.shape, src.dtype)
+
             np_collection[i] = dask_array
 
         # Determine the shape of the chunks, and reshape so dask.block does the right thing
@@ -531,6 +556,10 @@ class Regridder(object):
             )
         else:
             if src.chunks is None:
+                self._first_call = False
+                src = common._slice_src(
+                    src, like, matching_dims + regrid_dims, self.extra_overlap
+                )
                 data = self._regrid(src, like, fill_value)
             else:
                 data = self._chunked_regrid(src, like, fill_value)

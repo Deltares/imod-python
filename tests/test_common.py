@@ -237,19 +237,29 @@ def test_selection_indices():
     # Vertices
     src_x = np.array([0.0, 20.0, 40.0, 60.0, 80.0, 100.0])
     xmin, xmax = 0.0, 20.0
-    i0, i1 = imod.prepare.common._selection_indices(src_x, xmin, xmax)
+    i0, i1 = imod.prepare.common._selection_indices(src_x, xmin, xmax, 0)
     assert i0 == 0
     assert i1 == 1
 
     xmin, xmax = 0.0, 21.0
-    i0, i1 = imod.prepare.common._selection_indices(src_x, xmin, xmax)
+    i0, i1 = imod.prepare.common._selection_indices(src_x, xmin, xmax, 0)
     assert i0 == 0
     assert i1 == 2
 
     xmin, xmax = 0.0, 40.0
-    i0, i1 = imod.prepare.common._selection_indices(src_x, xmin, xmax)
+    i0, i1 = imod.prepare.common._selection_indices(src_x, xmin, xmax, 0)
     assert i0 == 0
     assert i1 == 2
+
+    xmin, xmax = 0.0, 40.0
+    i0, i1 = imod.prepare.common._selection_indices(src_x, xmin, xmax, 1)
+    assert i0 == 0
+    assert i1 == 3
+
+    xmin, xmax = 20.0, 40.0
+    i0, i1 = imod.prepare.common._selection_indices(src_x, xmin, xmax, 1)
+    assert i0 == 0
+    assert i1 == 3
 
 
 def test_slice_src():
@@ -262,8 +272,18 @@ def test_slice_src():
     src = xr.DataArray(np.ones(src_x.size), {"x": src_x}, ("x",))
     like = xr.DataArray(np.ones(like_x.size), {"x": like_x}, ("x",))
 
-    actual = imod.prepare.common._slice_src(src, like, matching_dims)
+    actual = imod.prepare.common._slice_src(src, like, matching_dims, 0)
     expected = src.isel(x=slice(0, 2))
+    assert actual.equals(expected)
+
+    actual = imod.prepare.common._slice_src(src, like, matching_dims, 1)
+    expected = src.isel(x=slice(0, 3))
+    assert actual.equals(expected)
+
+    like_x = np.array([125.0, 175.0, 225.0])
+    like = xr.DataArray(np.ones(like_x.size), {"x": like_x}, ("x",))
+    actual = imod.prepare.common._slice_src(src, like, matching_dims, 1)
+    expected = src.isel(x=slice(0, 4))
     assert actual.equals(expected)
 
 

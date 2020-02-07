@@ -222,25 +222,27 @@ def _increasing_dims(da, dims):
     return da, flip_dims
 
 
-def _selection_indices(src_x, xmin, xmax):
+def _selection_indices(src_x, xmin, xmax, extra_overlap):
     """Left-inclusive"""
-    i0 = np.searchsorted(src_x, xmin, side="right") - 1
-    i1 = np.searchsorted(src_x, xmax, side="left")
+    # Extra overlap is needed, for example with (multi)linear interpolation
+    # We simply enlarge the slice at the start and at the end.
+    i0 = max(0, np.searchsorted(src_x, xmin, side="right") - 1 - extra_overlap)
+    i1 = np.searchsorted(src_x, xmax, side="left") + extra_overlap
     return i0, i1
 
 
-def _slice_src(src, like, matching_dims):
+def _slice_src(src, like, dims, extra_overlap):
     """
     Make sure src matches dst in dims that do not have to be regridded
     """
     slices = {}
-    for dim in matching_dims:
+    for dim in dims:
         # Generate vertices
         src_x = _coord(src, dim)
         _, xmin, xmax = imod.util.coord_reference(like[dim])
-        i0, i1 = _selection_indices(src_x, xmin, xmax)
+        i0, i1 = _selection_indices(src_x, xmin, xmax, extra_overlap)
         slices[dim] = slice(i0, i1)
-    return src.isel(slices).compute()
+    return src.isel(slices)
 
 
 def _dst_coords(src, like, dims_from_src, dims_from_like):
