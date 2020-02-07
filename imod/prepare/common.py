@@ -277,6 +277,17 @@ def _check_monotonic(dxs, dim):
         raise ValueError(f"{dim} is not only increasing or only decreasing")
 
 
+def _set_cellsizes(da, dims):
+    for dim in dims:
+        dx_string = f"d{dim}"
+        if dx_string not in da:
+            dx, _, _ = imod.util.coord_reference(da[dim])
+            if isinstance(dx, (int, float)):
+                dx = np.full(da[dim].size, dx)
+            da = da.assign_coords({dx_string: (dim, dx)})
+    return da
+
+
 def _coord(da, dim):
     """
     Transform N xarray midpoints into N + 1 vertex edges
@@ -292,6 +303,11 @@ def _coord(da, dim):
         _check_monotonic(dxs, dim)
 
     else:  # undefined -> equidistant
+        if da[dim].size == 1:
+            raise ValueError(
+                f"DataArray has size 1 along {dim}, so cellsize must be provided"
+                " as a coordinate."
+            )
         dxs = np.diff(da[dim].values)
         dx = dxs[0]
         atolx = abs(1.0e-6 * dx)

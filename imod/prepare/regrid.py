@@ -432,10 +432,14 @@ class Regridder(object):
         # Transpose src so that dims to regrid are last
         src = src.transpose(*dst_dims)
 
-        dst.values = self._nd_regrid(
-            src.values, dst.values, src_coords_regrid, dst_coords_regrid
-        )
-        return dst.values
+        # Exit early if nothing is to be done
+        if len(regrid_dims) == 0:
+            return src.values.copy()
+        else:
+            dst.values = self._nd_regrid(
+                src.values, dst.values, src_coords_regrid, dst_coords_regrid
+            )
+            return dst.values
 
     def _chunked_regrid(self, src, like, fill_value):
         like_expanded_slices, shape_chunks = common._define_slices(src, like)
@@ -501,6 +505,11 @@ class Regridder(object):
         # Collect dimensions to flip to make everything ascending
         src, _ = common._increasing_dims(src, regrid_dims)
         like, flip_dst = common._increasing_dims(like, regrid_dims)
+        # Ensure all dimensions have a dx coordinate, so that if the chunks
+        # results in chunks which are size 1 along a dimension, the cellsize
+        # can still be determined.
+        src = common._set_cellsizes(src, regrid_dims)
+        like = common._set_cellsizes(like, regrid_dims)
 
         # Prepare for regridding; quick checks
         self._prepare(regrid_dims)
