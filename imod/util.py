@@ -325,6 +325,11 @@ def coord_reference(da_coord):
             dx = float(dx)
             xmin = float(x.min()) - 0.5 * abs(dx)
             xmax = float(x.max()) + 0.5 * abs(dx)
+    elif x.size == 1:
+        raise ValueError(
+            f"DataArray has size 1 along {da_coord.name}, so cellsize must be provided"
+            " as a coordinate named d{da_coord.name}."
+        )
     else:  # Equidistant
         # TODO: decide on decent criterium for what equidistant means
         # make use of floating point epsilon? E.g:
