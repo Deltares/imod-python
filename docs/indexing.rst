@@ -250,12 +250,12 @@ Or using the inverse:
 
 These operations also work in three dimensions.
 
-``skimage.morpohology`` has a few other functions to be aware of:
+``skimage.morphology`` has a few other functions to be aware of:
 
-* ``skimage.morpohology.label`` to find connected zones (also in 3D)
-* ``skimage.morpohology.watershed`` to find watershed basins
-* ``skimage.morpohology.skeletonize`` to reduce connected zones to a pixel wide line
-* ``skimage.morpohology.fill`` to perform flood filling on an image
+* ``skimage.morphology.label`` to find connected zones (also in 3D)
+* ``skimage.morphology.watershed`` to find watershed basins
+* ``skimage.morphology.skeletonize`` to reduce connected zones to a pixel wide line
+* ``skimage.morphology.fill`` to perform flood filling on an image
 
 
 Aggregating with groupby
