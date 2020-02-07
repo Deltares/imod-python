@@ -213,17 +213,23 @@ def test_reshape():
 
 
 def test_is_subset():
+    # increasing
     a1 = np.array([0.0, 1.0, 2.0, 3.0])
     a2 = np.array([0.0, 1.0])
     assert imod.prepare.common._is_subset(a1, a2)
     a2 = np.array([0.0, 1.0, 3.0])
     assert not imod.prepare.common._is_subset(a1, a2)
-
+    # decreasing
     a1 = np.array([0.0, 1.0, 2.0, 3.0])[::-1]
     a2 = np.array([0.0, 1.0])[::-1]
     assert imod.prepare.common._is_subset(a1, a2)
     a2 = np.array([0.0, 1.0, 3.0])[::-1]
     assert not imod.prepare.common._is_subset(a1, a2)
+    # Not a contiguous subset
+    a1 = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
+    a2 = np.array([0.0, 2.0, 4.0])
+    assert not imod.prepare.common._is_subset(a1, a2)
+    assert not imod.prepare.common._is_subset(a2, a1)
 
 
 def test_selection_indices():
