@@ -38,6 +38,12 @@ Added
    (:class:`imod.visualize.GridAnimation3D`) and (:class:`imod.visualize.StaticGridAnimation3D`) 
    have been added to setup 3D animations of DataArrays with transient data.
 
+Fixed
+~~~~~
+-   ``density`` is no longer an optional argument in (:class:`imod.wq.GeneralHeadboundary`) and
+   (:class:`imod.wq.River). The reason is that iMOD-WQ fully removes (!) these packages if density
+   is not present.
+
 
 [0.9.0] - 2020-01-19
 --------------------

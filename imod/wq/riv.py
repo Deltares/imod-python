@@ -15,13 +15,12 @@ class River(BoundaryCondition):
         is the bottom of the riverbed (RBOT).
     conductance: array of floats (xr.DataArray)
         is the conductance of the river.
+    density: array of floats (xr.DataArray)
+        is the density used to convert the point head to the freshwater head
+        (RIVSSMDENS).
     concentration: "None", float or array of floats (xr.DataArray), optional
         is the concentration in the river.
         Default is None.
-    density: "None" or float, optional
-        is the density used to convert the point head to the freshwater head
-        (RIVSSMDENS). If not specified, the density is calculated dynamically
-        using the concentration. Default is None.
     save_budget: {True, False}, optional
         is a flag indicating if the budget should be saved (IRIVCB).
         Default is False.
@@ -31,8 +30,8 @@ class River(BoundaryCondition):
         "stage",
         "conductance",
         "bottom_elevation",
-        "concentration",
         "density",
+        "concentration",
         "save_budget",
     )
     _pkg_id = "riv"
@@ -49,26 +48,23 @@ class River(BoundaryCondition):
         stage,
         conductance,
         bottom_elevation,
+        density,
         concentration=None,
-        density=None,
         save_budget=False,
     ):
         super(__class__, self).__init__()
         self["stage"] = stage
         self["conductance"] = conductance
         self["bottom_elevation"] = bottom_elevation
+        self["density"] = density
         if concentration is not None:
             self["concentration"] = concentration
-        if density is not None:
-            self["density"] = density
         self["save_budget"] = save_budget
 
     def _pkgcheck(self, ibound=None):
-        to_check = ["conductance"]
+        to_check = ["conductance", "density"]
         if "concentration" in self.data_vars:
             to_check.append("concentration")
-        if "density" in self.data_vars:
-            to_check.append("density")
         self._check_positive(to_check)
 
         to_check.append("stage")
@@ -93,9 +89,9 @@ class River(BoundaryCondition):
             "stage",
             "conductance",
             "bottom_elevation",
-            "concentration",
             "density",
+            "concentration",
         ]
-        values = [stage, conductance, bottom_elevation, concentration, density]
+        values = [stage, conductance, bottom_elevation, density, concentration]
         for varname, value in zip(varnames, values):
             self._add_timemap(varname, value, use_cftime)
