@@ -38,6 +38,7 @@ def ghb_group():
 
 def test_render(ghb_group):
     group = ghb_group
+    nlayer, nrow, ncol = ghb_group["primary"]["head"].shape
     directory = pathlib.Path(".")
     compare = textwrap.dedent(
         """\
@@ -60,7 +61,10 @@ def test_render(ghb_group):
             cond_p?_s3_l1 = tertiary/conductance_l1.idf
             cond_p?_s3_l2 = tertiary/conductance_l2.idf"""
     )
-    assert group.render(directory, globaltimes=["?"], nlayer=3) == compare
+    assert (
+        group.render(directory, globaltimes=["?"], nlayer=nlayer, nrow=nrow, ncol=ncol)
+        == compare
+    )
 
 
 def test_render_error__concentration_twice(ghb_group):
@@ -112,6 +116,7 @@ def test_render__count_nolayer():
     ghb3 = ghb2.copy()
     d = {"primary": ghb1, "secondary": ghb2, "tertiary": ghb3}
     group = GeneralHeadBoundaryGroup(**d)
+    nlayer, nrow, ncol = (3, 5, 5)
 
     directory = pathlib.Path(".")
 
@@ -130,7 +135,10 @@ def test_render__count_nolayer():
             bhead_p?_s3_l? = tertiary/head.idf
             cond_p?_s3_l? = tertiary/conductance.idf"""
     )
-    assert group.render(directory, globaltimes=["?"], nlayer=3) == compare
+    assert (
+        group.render(directory, globaltimes=["?"], nlayer=nlayer, nrow=nrow, ncol=ncol)
+        == compare
+    )
 
 
 # TODO add test for Well that has no time, to calculate max_n_active

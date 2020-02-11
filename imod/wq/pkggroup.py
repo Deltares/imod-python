@@ -37,25 +37,19 @@ class PackageGroup(collections.UserDict):
         self.key_order = order
 
     def max_n_sinkssources(self):
-        # TODO: check if this is necessary
-        # with sinks, are system 2 and higher also a sink?
-        # If that's the case, active_max_n is sufficient for every package
-        # key = self.first_key
-        # ds = self[key]
+        # Only render for the first system, that has concentrations defined.
+        key = self.first_key
+        return self[key]._ssm_cellcount
 
-        # if "time" in ds[varname].coords:
-        #    nmax = int(ds[varname].groupby("time").count(xr.ALL_DIMS).max())
-        # else:
-        #    nmax = int(ds[varname].count())
-        return self.n_max_active
-
-    def render(self, directory, globaltimes, nlayer):
+    def render(self, directory, globaltimes, nlayer, nrow, ncol):
         d = {}
         d["n_systems"] = len(self.keys())
-        self.n_max_active = sum(
-            [v._max_active_n(self._cellcount_varname, nlayer) for v in self.values()]
+        d["n_max_active"] = sum(
+            [
+                v._max_active_n(self._cellcount_varname, nlayer, nrow, ncol)
+                for v in self.values()
+            ]
         )
-        d["n_max_active"] = self.n_max_active
         d["save_budget"] = 1 if any([v.save_budget for v in self.values()]) else 0
 
         content = [self._template.format(**d)]

@@ -343,10 +343,13 @@ class SeawatModel(Model):
 
     def _render_groups(self, directory, globaltimes):
         baskey = self._get_pkgkey("bas6")
-        nlayer = self[baskey]["ibound"].shape[0]
+        nlayer, nrow, ncol = self[baskey]["ibound"].shape
         package_groups = self._group()
         content = "\n\n".join(
-            [group.render(directory, globaltimes, nlayer) for group in package_groups]
+            [
+                group.render(directory, globaltimes, nlayer, nrow, ncol)
+                for group in package_groups
+            ]
         )
         ssm_content = "".join(
             [group.render_ssm(directory, globaltimes) for group in package_groups]
@@ -414,13 +417,13 @@ class SeawatModel(Model):
 
         rchkey = self._get_pkgkey("rch")
         if rchkey is not None:
-            if "time" in self[rchkey].dims:
-                n_extra += int(
-                    self[rchkey]["rate"].groupby("time").count(xr.ALL_DIMS).max()
-                )
-            else:  # TODO: add test
-                n_extra += int(self[rchkey]["rate"].count())
-
+            _, nrow, ncol = ibound.shape
+            rch = self[rchkey]
+            rch._set_ssm_layers(ibound)
+            nlay = rch._ssm_layers.size
+            n_rch = nlay * nrow * ncol
+            print(n_rch)
+            n_extra += n_rch
         return n_extra
 
     def render(self, directory, result_dir, writehelp):
@@ -450,12 +453,12 @@ class SeawatModel(Model):
         modflowcontent, ssm_content, n_sinkssources = self._render_groups(
             directory=directory, globaltimes=globaltimes
         )
+        # Add recharge to sinks and sources
+        n_sinkssources += self._bas_btn_rch_sinkssources()
         # Add recharge to ssm_content
         ssm_content += self._render_ssm_rch(
             directory=directory, globaltimes=globaltimes
         )
-        # Add recharge to sinks and sources
-        n_sinkssources += self._bas_btn_rch_sinkssources()
 
         # Wrap up modflow part
         content.append(modflowcontent)
