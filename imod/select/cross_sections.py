@@ -256,6 +256,8 @@ def _cross_section(data, linecoords):
     bounding_box = _bounding_box(xmin, xmax, ymin, ymax)
     for start, end in zip(linecoords[:-1], linecoords[1:]):
         linestring = sg.LineString([start, end])
+        if not linestring.length:
+            continue
         if linestring.intersects(bounding_box):
             x0, y0 = start
             x1, y1 = end
