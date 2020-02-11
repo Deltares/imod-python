@@ -96,6 +96,13 @@ def _save(path, a, nodata, pattern, dtype, write):
     d = {"extension": path.suffix, "name": path.stem, "directory": path.parent}
     d["directory"].mkdir(exist_ok=True, parents=True)
 
+    # Make sure all non-xy dims are ascending
+    # otherwise a.stack fails in _write_chunks.
+    for dim in a.dims:
+        if dim not in ("y", "x"):
+            if not a.indexes[dim].is_monotonic_increasing:
+                a = a.isel({dim: slice(None, None, -1)})
+
     # handle the case where they are not a dim but are a coord
     # i.e. you only have one layer but you did a.assign_coords(layer=1)
     # in this case we do want _l1 in the IDF file name

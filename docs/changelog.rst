@@ -40,9 +40,11 @@ Added
 
 Fixed
 ~~~~~
--   ``density`` is no longer an optional argument in (:class:`imod.wq.GeneralHeadboundary`) and
+-  ``density`` is no longer an optional argument in (:class:`imod.wq.GeneralHeadboundary`) and
    (:class:`imod.wq.River). The reason is that iMOD-WQ fully removes (!) these packages if density
    is not present.
+-  (:func:`imod.idf.save`) and (:func:`imod.rasterio.save`) will now also save DataArrays in
+   which a coordinate other than ``x`` or ``y`` is descending.
 
 
 [0.9.0] - 2020-01-19
