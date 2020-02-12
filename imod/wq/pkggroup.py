@@ -32,7 +32,10 @@ class PackageGroup(collections.UserDict):
             else:
                 order.append(k)
         if n_system_concentrations > 1:
-            raise ValueError("Only one system with concentrations allowed per package")
+            raise ValueError(
+                f"Multiple systems with concentrations detected: {order}\n"
+                "Only one system with concentration is allowed per package kind."
+            )
         self.first_key = order[0]
         self.key_order = order
 
