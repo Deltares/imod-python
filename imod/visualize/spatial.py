@@ -143,6 +143,14 @@ def plot_map(
     # Make figure
     fig, ax = plt.subplots(figsize=figsize)
 
+    # Make sure x is increasing, y is decreasing
+    raster = raster.copy(deep=False)
+    flip = slice(None, None, -1)
+    if not raster.indexes["x"].is_monotonic_increasing:
+        raster = raster.isel(x=flip)
+    if not raster.indexes["y"].is_monotonic_decreasing:
+        raster = raster.isel(y=flip)
+
     # Plot raster
     ax1 = ax.imshow(raster, cmap=cmap, norm=norm, **settings_raster)
 

@@ -46,6 +46,8 @@ Fixed
    is not present.
 -  (:func:`imod.idf.save`) and (:func:`imod.rasterio.save`) will now also save DataArrays in
    which a coordinate other than ``x`` or ``y`` is descending.
+-  (:func:`imod.visualize.plot_map`) enforces decreasing ``y``, which ensures maps are not plotted
+   upside down.
 
 
 [0.9.0] - 2020-01-19
