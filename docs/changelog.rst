@@ -37,6 +37,7 @@ Added
    ``shapely`` polygons, respectively.
    (:class:`imod.visualize.GridAnimation3D`) and (:class:`imod.visualize.StaticGridAnimation3D`) 
    have been added to setup 3D animations of DataArrays with transient data.
+-  (:func:`imod.ipf.read`) now reports the problematic file if reading errors occurs.
 
 Fixed
 ~~~~~

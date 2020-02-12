@@ -330,11 +330,46 @@ def test_save__missing(nodata_ipf):
     assert ",," not in content
 
 
-def test_save__assoc_missing(nodata_assoc):
+def test_error_fileinfo(tmp_path):
     """
-    iMOD does not accept ",," for nodata. These should be filled in by a nodata
-    values.
+    Test whether the filename is given in the error.
     """
-    with open(nodata_assoc) as f:
-        content = f.read()
-    assert ",," not in content
+    path = tmp_path / "good.ipf"
+    ipfstring = (
+        "2\n"
+        "3\n"
+        "X\n"
+        "Y\n"
+        "ID\n"
+        "3{delim1}txt\n"
+        "100.0{delim2}435.0{delim2}bad1\n"
+        "553.0{delim2}143.0{delim2}bad2\n"
+    )
+    # Wrong number or entries in last row
+    bad_assoc_string = (
+        "2\n"
+        "2{delim3}1\n"
+        "time{delim4}-999.0\n"
+        "level{delim4}-999.0\n"
+        "20180101000000{delim5}1.0\n"
+        '20180102000000{delim5}"fill\t,1.0\n'
+    )
+    delim1 = delim2 = delim3 = delim4 = delim5 = ","
+    ipfstring = ipfstring.format(delim1=delim1, delim2=delim2)
+    bad_assoc_string = bad_assoc_string.format(
+        delim3=delim3, delim4=delim4, delim5=delim5
+    )
+    with open(path, "w") as f:
+        f.write(ipfstring)
+    with open(path.parent / "bad1.txt", "w") as f:
+        f.write(bad_assoc_string)
+    with open(path.parent / "bad2.txt", "w") as f:
+        f.write(bad_assoc_string)
+
+    with pytest.raises(
+        # Match uses regex, and the base path of the IPF is non-deterministic
+        # due to tmp_path
+        pd.errors.ParserError,
+        match=r'".*bad1\.txt" of IPF file ".*good.ipf"',
+    ):
+        ipf.read(path)
