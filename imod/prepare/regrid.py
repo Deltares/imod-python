@@ -517,6 +517,11 @@ class Regridder(object):
         result : xr.DataArray
             Regridded result.
         """
+        # Use xarray for nearest
+        # TODO: replace by more efficient, specialized method
+        if self.method == "nearest":
+            return source.reindex_like(like, method="nearest")
+
         # Don't mutate source; src stands for source, dst for destination
         src = source.copy(deep=False)
         like = like.copy(deep=False)
@@ -546,25 +551,16 @@ class Regridder(object):
         # Gather destination coordinates
         dst_da_coords, _ = common._dst_coords(src, like, dims_from_src, dims_from_like)
 
-        # Use xarray for nearest
-        # TODO: replace by more efficient, specialized method
-        if self.method == "nearest":
-            dst = xr.DataArray(
-                data=src.reindex_like(like, method="nearest"),
-                coords=dst_da_coords,
-                dims=dst_dims,
+        if src.chunks is None:
+            self._first_call = False
+            src = common._slice_src(
+                src, like, matching_dims + regrid_dims, self.extra_overlap
             )
+            data = self._regrid(src, like, fill_value)
         else:
-            if src.chunks is None:
-                self._first_call = False
-                src = common._slice_src(
-                    src, like, matching_dims + regrid_dims, self.extra_overlap
-                )
-                data = self._regrid(src, like, fill_value)
-            else:
-                data = self._chunked_regrid(src, like, fill_value)
-            dst = xr.DataArray(data=data, coords=dst_da_coords, dims=dst_dims)
+            data = self._chunked_regrid(src, like, fill_value)
 
+        dst = xr.DataArray(data=data, coords=dst_da_coords, dims=dst_dims)
         # Flip dimensions to return as like
         for dim in flip_dst:
             dst = dst.sel({dim: slice(None, None, -1)})
