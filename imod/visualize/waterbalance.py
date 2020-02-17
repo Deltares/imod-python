@@ -20,7 +20,7 @@ def _draw_bars(ax, x, df, labels, barwidth, colors):
             )
     else:
         for label, bottom, height, color in zip(
-            labels, heights[:-1], heights[1:], colors
+            labels, bottoms, heights, colors
         ):
             ax.bar(
                 x,
