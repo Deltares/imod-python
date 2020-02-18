@@ -14,13 +14,14 @@ def _outer_edge(da):
 @numba.njit
 def _facebudget(budgetzone, face, flowfront, flowlower, flowright):
     shape = nlay, nrow, ncol = budgetzone.shape
-    result = np.zeros(shape)
+    result_front = np.zeros(shape)
+    result_lower = np.zeros(shape)
+    result_right = np.zeros(shape)
     for k in range(nlay):
         for i in range(nrow):
             for j in range(ncol):
                 # Initialize accumulator
                 if face[k, i, j] == 1:
-                    acc = 0.0
                     # Default value: part of domain (1) for edges
                     lower = front = right = upper = back = left = 1
                     if k > 0:
@@ -38,20 +39,19 @@ def _facebudget(budgetzone, face, flowfront, flowlower, flowright):
 
                     # Test if cell is a control surface cell
                     if upper == 1 and lower == 0:
-                        acc += flowlower[k, i, j]
+                        result_lower[k, i, j] += flowlower[k, i, j]
                     if upper == 0 and lower == 1:
-                        acc -= flowlower[k - 1, i, j]
+                        result_lower[k, i, j] -= flowlower[k - 1, i, j]
                     if front == 1 and back == 0:
-                        acc -= flowlower[k, i - 1, j]
+                        result_front[k, i, j] -= flowlower[k, i - 1, j]
                     if front == 0 and back == 1:
-                        acc += flowlower[k, i, j]
+                        result_front[k, i, j] += flowlower[k, i, j]
                     if right == 1 and left == 0:
-                        acc -= flowright[k, i, j - 1]
+                        result_right[k, i, j] -= flowright[k, i, j - 1]
                     if right == 0 and left == 1:
-                        acc += flowright[k, i, j]
+                        result_right[k, i, j] += flowright[k, i, j]
 
-                    result[k, i, j] = acc
-    return result
+    return result_front, result_lower, result_right
 
 
 def facebudget(budgetzone, front=None, lower=None, right=None):
@@ -96,7 +96,9 @@ def facebudget(budgetzone, front=None, lower=None, right=None):
 
     Returns
     -------
-    facebudget: xr.DataArray of floats
+    facebudget_front : xr.DataArray of floats
+    facebudget_lower : xr.DataArray of floats
+    facebudget_right : xr.DataArray of floats
 
     Examples
     --------
@@ -170,10 +172,12 @@ def facebudget(budgetzone, front=None, lower=None, right=None):
     # TODO: check for nans?
     # TODO: loop over time if present?
     face = _outer_edge(budgetzone)
-    result = xr.full_like(
-        budgetzone,
-        _facebudget(
-            budgetzone.values, face.values, front.values, lower.values, right.values
-        ),
+    result_front, result_lower, result_right = _facebudget(
+        budgetzone.values, face.values, front.values, lower.values, right.values
     )
-    return result
+    results = (
+        xr.full_like(budgetzone, result_front),
+        xr.full_like(budgetzone, result_lower),
+        xr.full_like(budgetzone, result_right),
+    )
+    return results
