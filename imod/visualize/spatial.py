@@ -73,9 +73,16 @@ def plot_map(
     ----------
     raster : xr.DataArray
         2D grid to plot.
-    colors : list of str, or list of RGB tuples
-        Matplotlib acceptable list of colors. Length N.
-        Accepts both tuples of (R, G, B) and hexidecimal (e.g. "#7ec0ee").
+    colors : list of str, list of RGBA/RGBA tuples, colormap name (str), or
+	    LinearSegmentedColormap
+        If list, it should be a Matplotlib acceptable list of colors. Length N.
+        Accepts both tuples of (R, G, B) and hexidecimal (e.g. `#7ec0ee`).
+		If str, use an existing Matplotlib colormap. This function will
+		autmatically add distinctive colors for pixels lower or high than the given
+		min respectivly max level.
+		If LinearSegmentedColormap, you can use something like
+		`matplotlib.cm.get_cmap('jet')` as input. This function will not alter
+		the colormap, so add under- and over-colors yourself.
 
         Looking for good colormaps? Try: http://colorbrewer2.org/
         Choose a colormap, and use the HEX JS array.
@@ -103,22 +110,37 @@ def plot_map(
     >>> overlays = [{"gdf": geodataframe, "edgecolor": "black"}]
     >>> imod.visualize.spatial.plot_map(raster, legend, overlays)
     """
-    ncolors = len(colors)
-    nlevels = len(levels)
-    if not nlevels == ncolors - 1:
-        raise ValueError(
-            f"Incorrect number of levels. Number of colors is {ncolors},"
-            f" expected {ncolors - 1}, got {nlevels} instead."
-        )
+    # Read legend settings
+    if isinstance(colors, matplotlib.colors.LinearSegmentedColormap):
+        # use given cmap
+        cmap = colors
+    else:
+        nlevels = len(levels)
+        if isinstance(colors, str):
+            # Use given cmap, but fix the under and over colors
+            # The colormap (probably) does not have a nice under and over color.
+            # So we cant use `cmap = matplotlib.cm.get_cmap(colors)`
+            cmap = matplotlib.cm.get_cmap(colors)
+            colors = cmap(np.linspace(0, 1, nlevels + 1))
+        # Validate number of colors vs number of levels
+        ncolors = len(colors)
+        if not nlevels == ncolors - 1:
+            raise ValueError(
+                f"Incorrect number of levels. Number of colors is {ncolors},"
+                f" expected {ncolors - 1} levels, got {nlevels} levels instead."
+            )
+        # Crate cmap from given list of colors
+        cmap = matplotlib.colors.ListedColormap(colors[1:-1])
+        cmap.set_under(
+            colors[0]
+        )  # this is the color for values smaller than raster.min()
+        cmap.set_over(
+            colors[-1]
+        )  # this is the color for values larger than raster.max()
+    norm = matplotlib.colors.BoundaryNorm(levels, cmap.N)
 
     # Get extent
     _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(raster)
-
-    # Read legend settings
-    cmap = matplotlib.colors.ListedColormap(colors[1:-1])
-    cmap.set_under(colors[0])  # this is the color for values smaller than raster.min()
-    cmap.set_over(colors[-1])  # this is the color for values larger than raster.max()
-    norm = matplotlib.colors.BoundaryNorm(levels, cmap.N)
 
     # raster kwargs
     settings_raster = {"interpolation": "nearest", "extent": [xmin, xmax, ymin, ymax]}
