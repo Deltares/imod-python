@@ -12,11 +12,17 @@ def _outer_edge(da):
 
 
 @numba.njit
-def _facebudget(budgetzone, face, flowfront, flowlower, flowright):
-    shape = nlay, nrow, ncol = budgetzone.shape
-    result_front = np.zeros(shape)
-    result_lower = np.zeros(shape)
-    result_right = np.zeros(shape)
+def _facebudget(
+    budgetzone,
+    face,
+    flowfront,
+    flowlower,
+    flowright,
+    result_front,
+    result_lower,
+    result_right,
+):
+    nlay, nrow, ncol = budgetzone.shape
     for k in range(nlay):
         for i in range(nrow):
             for j in range(ncol):
@@ -51,10 +57,8 @@ def _facebudget(budgetzone, face, flowfront, flowlower, flowright):
                     if right == 0 and left == 1:
                         result_right[k, i, j] += flowright[k, i, j]
 
-    return result_front, result_lower, result_right
 
-
-def facebudget(budgetzone, front=None, lower=None, right=None):
+def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
     """
     Computes net face flow into a control volume, as defined by ``budgetzone``.
 
@@ -93,12 +97,16 @@ def facebudget(budgetzone, front=None, lower=None, right=None):
         Dimensions must be exactly ``("layer", "y", "x")``.
     right: xr.DataArray of floats, optional
         Dimensions must be exactly ``("layer", "y", "x")``.
+    netflow : bool, optional
+        Whether to split flows by direction (front, lower, right).
+        True: sum all flows. False: return individual directions.
 
     Returns
     -------
-    facebudget_front : xr.DataArray of floats
-    facebudget_lower : xr.DataArray of floats
-    facebudget_right : xr.DataArray of floats
+    facebudget_front, facebudget_lower, face_budget_right : xr.DataArray of floats
+        Only returned if `netflow` is False.
+    facebudget_net : xr.DataArray of floats
+        Only returned if `netflow` is True.
 
     Examples
     --------
@@ -151,6 +159,13 @@ def facebudget(budgetzone, front=None, lower=None, right=None):
     interest. The most flexible one with regards to the ``x`` and ``y``
     dimensions is by drawing a vector file, rasterizing it, and using it to
     select with ``xarray.where()``.
+
+    To get the flows per direction, pass ``netflow=False``.
+
+    >>> flowfront, flowlower, flowright = imod.evaluate.facebudget(
+    >>>    budgetzone=zone, front=front, lower=lower, right=right, netflow=False
+    >>> )
+
     """
     # Error handling
     if front is None and lower is None and right is None:
@@ -172,12 +187,31 @@ def facebudget(budgetzone, front=None, lower=None, right=None):
     # TODO: check for nans?
     # TODO: loop over time if present?
     face = _outer_edge(budgetzone)
-    result_front, result_lower, result_right = _facebudget(
-        budgetzone.values, face.values, front.values, lower.values, right.values
+    shape = budgetzone.shape
+    # In case of netflow, only a single accumulator is necessary
+    # The different arrays are just aliases
+    if netflow:
+        result_front = result_lower = result_right = np.zeros(shape)
+    else:
+        result_front = np.zeros(shape)
+        result_lower = np.zeros(shape)
+        result_right = np.zeros(shape)
+
+    _facebudget(
+        budgetzone.values,
+        face.values,
+        front.values,
+        lower.values,
+        right.values,
+        result_front,
+        result_lower,
+        result_right,
     )
-    results = (
-        xr.full_like(budgetzone, result_front),
-        xr.full_like(budgetzone, result_lower),
-        xr.full_like(budgetzone, result_right),
-    )
-    return results
+    if netflow:
+        return xr.full_like(budgetzone, result_front)
+    else:
+        return (
+            xr.full_like(budgetzone, result_front),
+            xr.full_like(budgetzone, result_lower),
+            xr.full_like(budgetzone, result_right)
+        )
