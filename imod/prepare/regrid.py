@@ -26,6 +26,7 @@ The single aggregated value is then filled into the destination array (dst).
 """
 import warnings
 
+import dask
 import numba
 import numpy as np
 import xarray as xr
@@ -267,10 +268,7 @@ def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid, use_relative_weigh
     inds_weights = []
     alloc_len = 1
     for src_x, dst_x in zip(src_coords, dst_coords):
-        is_increasing = common._is_increasing(src_x, dst_x)
-        size, i_w = common._weights_1d(
-            src_x, dst_x, is_increasing, use_relative_weights
-        )
+        size, i_w = common._weights_1d(src_x, dst_x, use_relative_weights)
         for elem in i_w:
             inds_weights.append(elem)
         alloc_len *= size
@@ -309,6 +307,10 @@ class Regridder(object):
         ``method`` as a function, where the function requires relative, rather
         than absolute weights (the provided ``conductance`` method requires
         relative weights, for example). Default value is False.
+    extra_overlap : integer, optional
+        In case of chunked regridding, how many cells of additional overlap is
+        necessary. Linear interpolation requires this for example, as it reaches
+        beyond cell boundaries to compute values. Default value is 0.
 
     Examples
     --------
@@ -346,7 +348,9 @@ class Regridder(object):
     regridding needs.
     """
 
-    def __init__(self, method, ndim_regrid=None, use_relative_weights=False):
+    def __init__(
+        self, method, ndim_regrid=None, use_relative_weights=False, extra_overlap=0
+    ):
         _method = common._get_method(method, common.METHODS)
         self.method = _method
         self.ndim_regrid = ndim_regrid
@@ -354,6 +358,9 @@ class Regridder(object):
         if _method == common.METHODS["conductance"]:
             use_relative_weights = True
         self.use_relative_weights = use_relative_weights
+        if _method == common.METHODS["multilinear"]:
+            extra_overlap = 1
+        self.extra_overlap = extra_overlap
 
     def _make_regrid(self):
         iter_regrid = _make_regrid(self.method, self.ndim_regrid)
@@ -381,6 +388,118 @@ class Regridder(object):
         else:
             self._nd_regrid = nd_regrid
 
+    def _prepare(self, regrid_dims):
+        # Create tailor made regridding function: take method and ndims into
+        # account and call it
+        if self._first_call:
+            if self.ndim_regrid is None:
+                ndim_regrid = len(regrid_dims)
+                if self.method == common.METHODS["conductance"] and ndim_regrid > 2:
+                    raise ValueError(
+                        "The conductance method should not be applied to "
+                        "regridding more than two dimensions"
+                    )
+                self.ndim_regrid = ndim_regrid
+
+            self._make_regrid()
+        else:
+            if not len(regrid_dims) == self.ndim_regrid:
+                raise ValueError(
+                    "Number of dimensions to regrid does not match: "
+                    f"Regridder.ndim_regrid = {self.ndim_regrid}"
+                )
+
+    def _regrid(self, src, like, fill_value):
+        # Find coordinates that already match, and those that have to be
+        # regridded, and those that exist in source but not in like (left
+        # untouched)
+        matching_dims, regrid_dims, add_dims = common._match_dims(src, like)
+
+        # Order dimensions in the right way:
+        # dimensions that are regridded end up at the end for efficient iteration
+        dst_dims = (*add_dims, *matching_dims, *regrid_dims)
+        dims_from_src = (*add_dims, *matching_dims)
+        dims_from_like = tuple(regrid_dims)
+
+        # Gather destination coordinates
+        dst_da_coords, dst_shape = common._dst_coords(
+            src, like, dims_from_src, dims_from_like
+        )
+
+        # Allocate dst
+        dst = xr.DataArray(
+            data=np.full(dst_shape, fill_value), coords=dst_da_coords, dims=dst_dims
+        )
+
+        # TODO: check that axes are aligned
+        dst_coords_regrid = [common._coord(dst, dim) for dim in regrid_dims]
+        src_coords_regrid = [common._coord(src, dim) for dim in regrid_dims]
+        # Transpose src so that dims to regrid are last
+        src = src.transpose(*dst_dims)
+
+        # Exit early if nothing is to be done
+        if len(regrid_dims) == 0:
+            return src.values.copy()
+        else:
+            dst.values = self._nd_regrid(
+                src.values, dst.values, src_coords_regrid, dst_coords_regrid
+            )
+            return dst.values
+
+    def _chunked_regrid(self, src, like, fill_value):
+        like_expanded_slices, shape_chunks = common._define_slices(src, like)
+        like_das = common._sel_chunks(like, like_expanded_slices)
+        # Regridder should compute first chunk once
+        # so numba has compiled the necessary functions for subsequent chunks
+        if self._first_call:
+            dst_da = like_das[0]
+            matching_dims, regrid_dims, _ = common._match_dims(src, dst_da)
+            chunk_src = common._slice_src(
+                src, dst_da, matching_dims + regrid_dims, self.extra_overlap
+            )
+            a = self._regrid(chunk_src, dst_da, fill_value)
+            arr1 = dask.array.from_array(a)
+            self._first_call = False
+        else:
+            arr1 = None
+        # At this point, the compiled method is part of the regridder class
+        # and will be re-used by dask.
+
+        np_collection = np.full(len(like_das), None)
+        for i, dst_da in enumerate(like_das):
+            # Skip first step if applicable
+            if i == 0 and arr1 is not None:
+                np_collection[0] = arr1
+                continue
+            matching_dims, regrid_dims, _ = common._match_dims(src, dst_da)
+
+            # NOTA BENE: slice must occur BEFORE sending it to dask.delayed
+            # if not, dask will attempt to allocate the full array!
+            chunk_src = common._slice_src(
+                src, dst_da, matching_dims + regrid_dims, self.extra_overlap
+            )
+            if any(
+                size == 0 for size in chunk_src.shape
+            ):  # zero overlap for the chunk, zero size chunk
+                dask_array = dask.array.full(
+                    shape=dst_da.shape, fill_value=fill_value, dtype=src.dtype
+                )
+            else:
+                # Alllocation occurs inside
+                result = dask.delayed(self._regrid, pure=True)(
+                    chunk_src, dst_da, fill_value
+                )
+                dask_array = dask.array.from_delayed(
+                    result, shape=dst_da.shape, dtype=src.dtype
+                )
+
+            np_collection[i] = dask_array
+
+        # Determine the shape of the chunks, and reshape so dask.block does the right thing
+        reshaped_collection = np.reshape(np_collection, shape_chunks).tolist()
+        data = dask.array.block(reshaped_collection)
+        return data
+
     def regrid(self, source, like, fill_value=np.nan):
         """
         Regrid ``source`` along dimensions that ``source`` and ``like`` share.
@@ -402,86 +521,53 @@ class Regridder(object):
         result : xr.DataArray
             Regridded result.
         """
-        # Find coordinates that already match, and those that have to be
-        # regridded, and those that exist in source but not in like (left
-        # untouched)
-        matching_dims, regrid_dims, add_dims = common._match_dims(source, like)
-
-        if len(regrid_dims) == 0:
-            return source
-
-        # Create tailor made regridding function: take method and ndims into
-        # account and call it
-        if self._first_call:
-
-            if self.ndim_regrid is None:
-                ndim_regrid = len(regrid_dims)
-                if self.method == common.METHODS["conductance"] and ndim_regrid > 2:
-                    raise ValueError(
-                        "The conductance method should not be applied to "
-                        "regridding more than two dimensions"
-                    )
-                self.ndim_regrid = ndim_regrid
-
-            self._make_regrid()
-            self._first_call = False
-        else:
-            if not len(regrid_dims) == self.ndim_regrid:
-                raise ValueError(
-                    "Number of dimensions to regrid does not match: "
-                    f"Regridder.ndim_regrid = {self.ndim_regrid}"
-                )
+        # Use xarray for nearest
+        # TODO: replace by more efficient, specialized method
+        if self.method == "nearest":
+            return source.reindex_like(like, method="nearest")
 
         # Don't mutate source; src stands for source, dst for destination
-        src = source.copy()
+        src = source.copy(deep=False)
+        like = like.copy(deep=False)
+        # TODO: Check dimensionality of coordinates
+        # 2-d coordinates should raise a ValueError
+        matching_dims, regrid_dims, add_dims = common._match_dims(src, like)
+        # Exit early if nothing is to be done
+        if len(regrid_dims) == 0:
+            return src
 
-        # Make sure src matches dst in dims that do not have to be regridded
-        src = common._slice_src(src, like, matching_dims)
+        # Collect dimensions to flip to make everything ascending
+        src, _ = common._increasing_dims(src, regrid_dims)
+        like, flip_dst = common._increasing_dims(like, regrid_dims)
+        # Ensure all dimensions have a dx coordinate, so that if the chunks
+        # results in chunks which are size 1 along a dimension, the cellsize
+        # can still be determined.
+        src = common._set_cellsizes(src, regrid_dims)
+        like = common._set_cellsizes(like, regrid_dims)
 
+        # Prepare for regridding; quick checks
+        self._prepare(regrid_dims)
         # Order dimensions in the right way:
         # dimensions that are regridded end up at the end for efficient iteration
         dst_dims = (*add_dims, *matching_dims, *regrid_dims)
         dims_from_src = (*add_dims, *matching_dims)
         dims_from_like = tuple(regrid_dims)
-
         # Gather destination coordinates
-        dst_da_coords, dst_shape = common._dst_coords(
-            src, like, dims_from_src, dims_from_like
-        )
+        dst_da_coords, _ = common._dst_coords(src, like, dims_from_src, dims_from_like)
 
-        # TODO: Check dimensionality of coordinates
-        # 2-d coordinates should raise a ValueError
-        # TODO: Check possibility to make gridding lazy
-        # iter_regrid provides an opportunity for this, but the chunks need to be
-        # defined somewhat intelligently: for 1d regridding for example the iter
-        # loop is "hot" enough that numba compilation makes sense
-
-        # Use xarray for nearest, and exit early.
-        if self.method == "nearest":
-            dst = xr.DataArray(
-                data=source.reindex_like(like, method="nearest"),
-                coords=dst_da_coords,
-                dims=dst_dims,
+        if src.chunks is None:
+            self._first_call = False
+            src = common._slice_src(
+                src, like, matching_dims + regrid_dims, self.extra_overlap
             )
-            return dst
+            data = self._regrid(src, like, fill_value)
         else:
-            # Allocate dst
-            # TODO: allocate lazy --> dask.array.full
-            dst = xr.DataArray(
-                data=np.full(dst_shape, fill_value), coords=dst_da_coords, dims=dst_dims
-            )
+            data = self._chunked_regrid(src, like, fill_value)
 
-        # TODO: check that axes are aligned
-        dst_coords_regrid = [common._coord(dst, dim) for dim in regrid_dims]
-        src_coords_regrid = [common._coord(src, dim) for dim in regrid_dims]
-        # Transpose src so that dims to regrid are last
-        src = src.transpose(*dst_dims)
-
-        dst.values = self._nd_regrid(
-            src.values, dst.values, src_coords_regrid, dst_coords_regrid
-        )
-
-        # Tranpose back to desired shape
-        dst = dst.transpose(*source.dims)
-
-        return dst
+        dst = xr.DataArray(data=data, coords=dst_da_coords, dims=dst_dims)
+        # Flip dimensions to return as like
+        for dim in flip_dst:
+            dst = dst.sel({dim: slice(None, None, -1)})
+        # Transpose to original dimension coordinates
+        # TODO: profile how much this matters!
+        return dst.transpose(*source.dims)

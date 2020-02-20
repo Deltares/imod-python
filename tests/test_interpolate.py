@@ -18,7 +18,8 @@ def test_interpolate_1d():
     interpolator_1d = imod.prepare.Regridder(method="multilinear")
     actual = interpolator_1d.regrid(source, like)
     expected = xr.full_like(like, [2.5, 3.5])
-    assert actual.identical(expected)
+    # Note: xr.identical() fails, as the regridder as a dx coord for cellsizes.
+    assert np.allclose(actual.values, expected.values, equal_nan=True)
 
 
 def test_interpolate_1d__reversed():
@@ -31,7 +32,7 @@ def test_interpolate_1d__reversed():
     interpolator_1d = imod.prepare.Regridder(method="multilinear")
     actual = interpolator_1d.regrid(source, like)
     expected = xr.full_like(like, [3.5, 2.5])
-    assert actual.identical(expected)
+    assert np.allclose(actual.values, expected.values, equal_nan=True)
 
 
 def test_interpolate_1d__beyond_egdes():
@@ -45,10 +46,11 @@ def test_interpolate_1d__beyond_egdes():
     interpolator_1d = imod.prepare.Regridder(method="multilinear")
     actual = interpolator_1d.regrid(source, like)
     expected = xr.full_like(like, [np.nan] * 3 + [0.0, 0.25, 0.75, 1.0, np.nan])
-    assert actual.identical(expected)
+    assert np.allclose(actual.values, expected.values, equal_nan=True)
 
 
-def test_interpolate_2d():
+@pytest.mark.parametrize("chunksize", [1, 2])
+def test_interpolate_2d(chunksize):
     data = np.array([[0.0, 0.0], [1.0, 1.0]])
     x = [0.5, 1.5]
     dst_x = [0.75, 1.25]
@@ -61,10 +63,16 @@ def test_interpolate_2d():
     interpolator_2d = imod.prepare.Regridder(method="multilinear")
     actual = interpolator_2d.regrid(source, like)
     expected = xr.full_like(like, [[0.25, 0.25], [0.75, 0.75]])
-    assert actual.identical(expected)
+    assert np.allclose(actual.values, expected.values, equal_nan=True)
+
+    # Now with chunks
+    source = source.chunk({"x": chunksize, "y": chunksize})
+    actual = interpolator_2d.regrid(source, like)
+    assert np.allclose(actual.values, expected.values, equal_nan=True)
 
 
-def test_interpolate_2d__reversed_y():
+@pytest.mark.parametrize("chunksize", [1, 2])
+def test_interpolate_2d__reversed_y(chunksize):
     data = np.array([[0.0, 0.0], [1.0, 1.0]])
     x = [0.5, 1.5]
     dst_x = [0.75, 1.25]
@@ -77,10 +85,16 @@ def test_interpolate_2d__reversed_y():
     interpolator_2d = imod.prepare.Regridder(method="multilinear")
     actual = interpolator_2d.regrid(source, like)
     expected = xr.full_like(like, [[0.25, 0.25], [0.75, 0.75]])
-    assert actual.identical(expected)
+    assert np.allclose(actual.values, expected.values, equal_nan=True)
+
+    # Now with chunks
+    source = source.chunk({"x": chunksize})
+    actual = interpolator_2d.regrid(source, like)
+    assert np.allclose(actual.values, expected.values, equal_nan=True)
 
 
-def test_interpolate_1d__nan_withstartingedge():
+@pytest.mark.parametrize("chunksize", [1, 2])
+def test_interpolate_1d__nan_withstartingedge(chunksize):
     data = [np.nan, 1.0, 1.0]
     x = [0.5, 1.5, 2.5]
     # 1.0 is on the starting edge, and should get a value
@@ -92,10 +106,16 @@ def test_interpolate_1d__nan_withstartingedge():
     interpolator_1d = imod.prepare.Regridder(method="multilinear")
     actual = interpolator_1d.regrid(source, like)
     expected = xr.full_like(like, [np.nan] * 3 + [1.0])
-    assert actual.identical(expected)
+    assert np.allclose(actual.values, expected.values, equal_nan=True)
+
+    # Now with chunks
+    source = source.chunk({"x": chunksize})
+    actual = interpolator_1d.regrid(source, like)
+    assert np.allclose(actual.values, expected.values, equal_nan=True)
 
 
-def test_interpolate_1d__nan_withendingedge():
+@pytest.mark.parametrize("chunksize", [1, 2])
+def test_interpolate_1d__nan_withendingedge(chunksize):
     data = [1.0, 1.0, np.nan]
     x = [0.5, 1.5, 2.5]
     # 3.0 is on the starting edge, and should get a value
@@ -107,10 +127,16 @@ def test_interpolate_1d__nan_withendingedge():
     interpolator_1d = imod.prepare.Regridder(method="multilinear")
     actual = interpolator_1d.regrid(source, like)
     expected = xr.full_like(like, [1.0] * 2 + [np.nan] * 2)
-    assert actual.identical(expected)
+    assert np.allclose(actual.values, expected.values, equal_nan=True)
+
+    # Now with chunks
+    source = source.chunk({"x": chunksize})
+    actual = interpolator_1d.regrid(source, like)
+    assert np.allclose(actual.values, expected.values, equal_nan=True)
 
 
-def test_interpolate_2d__over_z():
+@pytest.mark.parametrize("chunksize", [1, 2])
+def test_interpolate_2d__over_z(chunksize):
     data = np.array([[[0.0, 0.0], [1.0, 1.0]], [[1.0, 1.0], [2.0, 2.0]]])
     x = [0.5, 1.5]
     dst_x = [0.75, 1.25]
@@ -127,10 +153,16 @@ def test_interpolate_2d__over_z():
     expected = xr.full_like(
         like, [[[0.25, 0.25], [0.75, 0.75]], [[1.25, 1.25], [1.75, 1.75]]]
     )
-    assert actual.identical(expected)
+    assert np.allclose(actual.values, expected.values, equal_nan=True)
+
+    # Now with chunks
+    source = source.chunk({"x": chunksize, "y": chunksize})
+    actual = interpolator_2d.regrid(source, like)
+    assert np.allclose(actual.values, expected.values, equal_nan=True)
 
 
-def test_interpolate_3d__over_xyz():
+@pytest.mark.parametrize("chunksize", [1, 2])
+def test_interpolate_3d__over_xyz(chunksize):
     data = np.array([[[0.0, 0.0], [1.0, 1.0]], [[1.0, 1.0], [2.0, 2.0]]])
     x = [0.5, 1.5]
     dst_x = [0.75, 1.25]
@@ -147,8 +179,13 @@ def test_interpolate_3d__over_xyz():
     expected = xr.full_like(like, [[[0.3, 0.3], [0.8, 0.8]], [[1.2, 1.2], [1.7, 1.7]]])
     # This fails for some reason, different ordering of coords (not dims!):
     # assert actual.identical(expected)
-    assert np.allclose(actual.values, expected.values)
+    assert np.allclose(actual.values, expected.values, equal_nan=True)
+
+    # Now with chunks
+    source = source.chunk({"x": chunksize, "y": chunksize, "z": chunksize})
+    actual = interpolator_3d.regrid(source, like)
+    assert np.allclose(actual.values, expected.values, equal_nan=True)
 
 
 # TODO: add tests for checking nodata behaviour in 2D and 3D
-# TODO: maybe do parameterized stuff versus scipy linear interp?
+# TODO: maybe do parametrize stuff versus scipy linear interp?

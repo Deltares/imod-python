@@ -5,9 +5,12 @@ Includes methods for dealing with different coordinates and dimensions of the
 xarray.DataArrays, as well as aggregation methods operating on weights and
 values.
 """
+import dask
 import numba
 import numpy as np
 import xarray as xr
+
+import imod
 
 
 @numba.njit(cache=True)
@@ -37,7 +40,7 @@ def _starts(src_x, dst_x):
 
 
 @numba.njit(cache=True)
-def _weights_1d(src_x, dst_x, is_increasing, use_relative_weights=False):
+def _weights_1d(src_x, dst_x, use_relative_weights=False):
     """
     Calculate regridding weights and indices for a single dimension
 
@@ -65,16 +68,6 @@ def _weights_1d(src_x, dst_x, is_increasing, use_relative_weights=False):
     src_inds = []
     weights = []
     rel_weights = []
-
-    # Reverse the coordinate direction locally if coordinate is not
-    # monotonically increasing, so starts and overlap continue to work.
-    # copy() to avoid side-effects
-    if not is_increasing:
-        # Ignore single cell cases, these are always positive already.
-        if src_x.size > 2:
-            src_x = src_x.copy() * -1.0
-        if dst_x.size > 2:
-            dst_x = dst_x.copy() * -1.0
 
     # i is index of dst
     # j is index of src
@@ -162,35 +155,18 @@ def _reshape(src, dst, ndim_regrid):
     return iter_src, iter_dst
 
 
-def _is_increasing(src_x, dst_x):
-    """
-    Make sure coordinate values always increase so the _starts function above
-    works properly.
-    """
-    # TODO: fix somewhere else
-    src_dx0 = src_x[1] - src_x[0]
-    dst_dx0 = dst_x[1] - dst_x[0]
-    if src_x.size == 2 and dst_x.size == 2:
-        return True  # single cell case, always increasing
-    elif src_x.size == 2:  # dst_x.size > 2
-        # ignore direction of src_x
-        if dst_dx0 < 0.0:
-            return False
-        else:
-            return True
-    elif dst_x.size == 2:  # src_x.size > 2
-        # ignore direction of dst_x
-        if src_dx0 < 0.0:
-            return False
-        else:
-            return True
-    else:
-        if (src_dx0 > 0.0) ^ (dst_dx0 > 0.0):
-            raise ValueError("source and like coordinates not in the same direction")
-        if src_dx0 < 0.0:
-            return False
-        else:
-            return True
+def _is_subset(a1, a2):
+    if np.in1d(a2, a1).all():
+        # This means all are present
+        # now check if it's an actual subset
+        # Generate number, and fetch only those present
+        idx = np.arange(a1.size)[np.in1d(a1, a2)]
+        if idx.size > 1:
+            increment = np.diff(idx)
+            # If the maximum increment is only 1, it's a subset
+            if increment.max() == 1:
+                return True
+    return False
 
 
 def _match_dims(src, like):
@@ -220,7 +196,9 @@ def _match_dims(src, like):
     add_dims = []
     for dim in src.dims:
         try:
-            if np.array_equal(src[dim].values, like[dim].values):
+            a1 = _coord(src, dim)
+            a2 = _coord(like, dim)
+            if np.array_equal(a1, a2) or _is_subset(a1, a2):
                 matching_dims.append(dim)
             else:
                 regrid_dims.append(dim)
@@ -235,17 +213,36 @@ def _match_dims(src, like):
     return matching_dims, regrid_dims, add_dims
 
 
-def _slice_src(src, like, matching_dims):
+def _increasing_dims(da, dims):
+    flip_dims = []
+    for dim in dims:
+        if not da.indexes[dim].is_monotonic_increasing:
+            flip_dims.append(dim)
+            da = da.isel({dim: slice(None, None, -1)})
+    return da, flip_dims
+
+
+def _selection_indices(src_x, xmin, xmax, extra_overlap):
+    """Left-inclusive"""
+    # Extra overlap is needed, for example with (multi)linear interpolation
+    # We simply enlarge the slice at the start and at the end.
+    i0 = max(0, np.searchsorted(src_x, xmin, side="right") - 1 - extra_overlap)
+    i1 = np.searchsorted(src_x, xmax, side="left") + extra_overlap
+    return i0, i1
+
+
+def _slice_src(src, like, dims, extra_overlap):
     """
     Make sure src matches dst in dims that do not have to be regridded
     """
-
     slices = {}
-    for dim in matching_dims:
-        x0 = like[dim][0]  # start of slice
-        x1 = like[dim][-1]  # end of slice
-        slices[dim] = slice(x0, x1)
-    return src.sel(slices).compute()
+    for dim in dims:
+        # Generate vertices
+        src_x = _coord(src, dim)
+        _, xmin, xmax = imod.util.coord_reference(like[dim])
+        i0, i1 = _selection_indices(src_x, xmin, xmax, extra_overlap)
+        slices[dim] = slice(i0, i1)
+    return src.isel(slices)
 
 
 def _dst_coords(src, like, dims_from_src, dims_from_like):
@@ -282,7 +279,21 @@ def _check_monotonic(dxs, dim):
         raise ValueError(f"{dim} is not only increasing or only decreasing")
 
 
+def _set_cellsizes(da, dims):
+    for dim in dims:
+        dx_string = f"d{dim}"
+        if dx_string not in da:
+            dx, _, _ = imod.util.coord_reference(da[dim])
+            if isinstance(dx, (int, float)):
+                dx = np.full(da[dim].size, dx)
+            da = da.assign_coords({dx_string: (dim, dx)})
+    return da
+
+
 def _coord(da, dim):
+    """
+    Transform N xarray midpoints into N + 1 vertex edges
+    """
     delta_dim = "d" + dim  # e.g. dx, dy, dz, etc.
 
     if delta_dim in da.coords:  # equidistant or non-equidistant
@@ -294,6 +305,11 @@ def _coord(da, dim):
         _check_monotonic(dxs, dim)
 
     else:  # undefined -> equidistant
+        if da[dim].size == 1:
+            raise ValueError(
+                f"DataArray has size 1 along {dim}, so cellsize must be provided"
+                " as a coordinate."
+            )
         dxs = np.diff(da[dim].values)
         dx = dxs[0]
         atolx = abs(1.0e-6 * dx)
@@ -304,18 +320,86 @@ def _coord(da, dim):
             )
         dxs = np.full(da[dim].size, dx)
 
-    # Check if the sign of dxs is correct for the coordinate values of x
-    x = da[dim]
     dxs = np.abs(dxs)
-    if x.size > 1:
-        if x[1] < x[0]:
-            dxs = -1.0 * dxs
+    x = da[dim].values
+    if not da.indexes[dim].is_monotonic_increasing:
+        x = x[::-1]
+        dxs = dxs[::-1]
 
-    # Note: this works for both positive dx (increasing x) and negative dx
+    # This assumes the coordinate to be monotonic increasing
     x0 = x[0] - 0.5 * dxs[0]
     x = np.full(dxs.size + 1, x0)
     x[1:] += np.cumsum(dxs)
     return x
+
+
+def _define_single_dim_slices(src_x, dst_x, chunksizes):
+    n = len(chunksizes)
+    assert n > 0
+    if n == 1:
+        return [slice(None, None)]
+
+    chunk_indices = np.full(n + 1, 0)
+    chunk_indices[1:] = np.cumsum(chunksizes)
+    # Find locations to cut.
+    src_chunk_x = src_x[chunk_indices]
+    if dst_x[0] < src_chunk_x[0]:
+        src_chunk_x[0] = dst_x[0]
+    if dst_x[-1] > src_chunk_x[-1]:
+        src_chunk_x[-1] = dst_x[-1]
+    # Destinations should NOT have any overlap
+    # Sources may have overlap
+    # We find the most suitable places to cut.
+    dst_i = np.searchsorted(dst_x, src_chunk_x, "left")
+    dst_i[dst_i > dst_x.size - 1] = dst_x.size - 1
+
+    # Create slices, but only if start and end are different
+    # (otherwise, the slice would be empty)
+    dst_slices = [slice(s, e) for s, e in zip(dst_i[:-1], dst_i[1:]) if s != e]
+    return dst_slices
+
+
+def _define_slices(src, like):
+    """
+    Defines the slices for every dimension, based on the chunks that are
+    present within src.
+
+    First, we get a single list of chunks per dimension.
+    Next, these are expanded into an N-dimensional array, equal to the number
+    of dimensions that have chunks.
+    Finally, these arrays are ravelled, and stacked for easier iteration.
+    """
+    dst_dim_slices = []
+    dst_chunks_shape = []
+    for dim, chunksizes in zip(src.dims, src.chunks):
+        dst_slices = _define_single_dim_slices(
+            _coord(src, dim), _coord(like, dim), chunksizes
+        )
+        dst_dim_slices.append(dst_slices)
+        dst_chunks_shape.append(len(dst_slices))
+
+    dst_expanded_slices = np.stack(
+        [a.ravel() for a in np.meshgrid(*dst_dim_slices, indexing="ij")], axis=-1
+    )
+    return dst_expanded_slices, dst_chunks_shape
+
+
+def _sel_chunks(da, expanded_slices):
+    """
+    Using the slices created with the functions above, use xarray's index
+    selection methods to create a list of "like" DataArrays which are used
+    to inform the regridding. During the regrid() call of the 
+    imod.prepare.Regridder object, data from the input array is selected,
+    ideally one chunk at time, or 2 ** ndim_chunks if there is overlap
+    required due to cellsize differences.
+    """
+    das = []
+    for dim_slices in expanded_slices:
+        slice_dict = {}
+        for dim, dim_slice in zip(da.dims, dim_slices):
+            slice_dict[dim] = dim_slice
+        das.append(da.isel(**slice_dict))
+    return das
 
 
 def _get_method(method, methods):

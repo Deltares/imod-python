@@ -65,7 +65,7 @@ def test_make_regrid():
 def test_regrid_1d():
     src_x = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
     dst_x = np.array([0.0, 2.5, 5.0])
-    alloc_len, i_w = imod.prepare.common._weights_1d(src_x, dst_x, True, False)
+    alloc_len, i_w = imod.prepare.common._weights_1d(src_x, dst_x, False)
     inds_weights = [tuple(elem) for elem in i_w]
     values = np.zeros(alloc_len)
     weights = np.zeros(alloc_len)
@@ -97,7 +97,7 @@ def test_iter_regrid__1d():
     ndim_regrid = 1
     src_x = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
     dst_x = np.array([0.0, 2.5, 5.0])
-    alloc_len, i_w = imod.prepare.common._weights_1d(src_x, dst_x, True, False)
+    alloc_len, i_w = imod.prepare.common._weights_1d(src_x, dst_x, False)
     inds_weights = [tuple(elem) for elem in i_w]
 
     # 1D regrid over 1D array
@@ -239,11 +239,6 @@ def test_regrid_coord():
     regridx = imod.prepare.common._coord(da, "x")
     assert np.allclose(regridx, np.arange(-4.0, 1.0, 1.0))
 
-    # Negative dx
-    da = xr.DataArray((np.zeros(4)), {"x": np.arange(0.0, -4.0, -1.0) - 0.5}, ("x",))
-    regridx = imod.prepare.common._coord(da, "x")
-    assert np.allclose(regridx, np.arange(0.0, -5.0, -1.0))
-
     # Non-equidistant, postive dx, negative dy
     nrow, ncol = 3, 4
     dx = np.array([0.9, 1.1, 0.8, 1.2])
@@ -251,6 +246,10 @@ def test_regrid_coord():
     xmin, xmax = 0.0, 4.0
     ymin, ymax = 0.0, 3.0
     coords = imod.util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
+    # Flip around the y to be increasing
+    # this is what happens in the regridding fuctions with the DataArrays
+    coords["y"] = coords["y"][::-1]
+    coords["dy"] = (coords["dy"][0], coords["dy"][1][::-1])
     kwargs = {"name": "nonequidistant", "coords": coords, "dims": ("y", "x")}
     data = np.ones((nrow, ncol), dtype=np.float32)
     da = xr.DataArray(data, **kwargs)
@@ -262,7 +261,7 @@ def test_regrid_coord():
     assert float(regridy.min()) == ymin
     assert float(regridy.max()) == ymax
     assert np.allclose(np.diff(regridx), dx)
-    assert np.allclose(np.diff(regridy), dy)
+    assert np.allclose(np.diff(regridy), dy[::-1] * -1.0)
 
     # Now test it if dy doesn't have the right sign
     # it should automatically infer it based on y instead.
@@ -299,7 +298,71 @@ def test_regrid_mean1d__dx_negative():
     assert np.allclose(out.values, compare)
 
 
-def test_regrid_mean2d():
+@pytest.mark.parametrize("chunksize", [1, 2, 3])
+def test_regrid_mean1d__opposite_dx(chunksize):
+    values = np.array([1.0, 2.0, 3.0])
+    src_x = np.array([2.5, 1.5, 0.5])
+    dst_x = np.array([0.5, 2.0])
+    coords = {"x": src_x, "dx": ("x", np.array([-1.0, -1.0, -1.0]))}
+    like_coords = {"x": dst_x, "dx": ("x", np.array([1.0, 2.0]))}
+    dims = ("x",)
+    source = xr.DataArray(values, coords, dims)
+    like = xr.DataArray(np.empty(2), like_coords, dims)
+    out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+    compare = np.array([3.0, 1.5])
+    assert np.allclose(out.values, compare)
+
+    # Check sensitivity for dx, it shouldn't matter
+    like_coords = {"x": dst_x, "dx": ("x", np.array([-1.0, -2.0]))}
+    like = xr.DataArray(np.empty(2), like_coords, dims)
+    out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+    compare = np.array([3.0, 1.5])
+    assert np.allclose(out.values, compare)
+
+    # Now with chunking
+    source = source.chunk({"x": chunksize})
+    out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+    assert np.allclose(out.values, compare)
+
+
+def test_regrid__coordinate_errors():
+    values = np.array([1.0, 2.0, 3.0])
+    # Non-equidistant, dx not provided
+    src_x = np.array([0.5, 1.5, 3.5])
+    dst_x = np.array([0.5, 2.0])
+    coords = {"x": src_x}
+    like_coords = {"x": dst_x}
+    dims = ("x",)
+    source = xr.DataArray(values, coords, dims)
+    like = xr.DataArray(np.empty(2), like_coords, dims)
+    with pytest.raises(ValueError):
+        imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+
+    # Single cell src, dx not provided
+    # dst stays the same
+    values = np.array([1.0])
+    src_x = np.array([0.5])
+    coords = {"x": src_x}
+    source = xr.DataArray(values, coords, dims)
+    like = xr.DataArray(np.empty(2), like_coords, dims)
+    with pytest.raises(ValueError):
+        imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+
+    # Now for dst
+    values = np.array([1.0, 2.0, 3.0])
+    src_x = np.array([2.5, 1.5, 0.5])
+    dst_x = np.array([0.5])
+    coords = {"x": src_x, "dx": ("x", np.array([-1.0, -1.0, -1.0]))}
+    like_coords = {"x": dst_x}
+    dims = ("x",)
+    source = xr.DataArray(values, coords, dims)
+    like = xr.DataArray(np.empty(1), like_coords, dims)
+    with pytest.raises(ValueError):
+        imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+
+
+@pytest.mark.parametrize("chunksize", [1, 2, 3])
+def test_regrid_mean2d(chunksize):
     values = np.array([[0.6, 0.2, 3.4], [1.4, 1.6, 1.0], [4.0, 2.8, 3.0]])
     src_x = np.arange(3.0) + 0.5
     coords = {"y": src_x, "x": src_x}
@@ -324,8 +387,14 @@ def test_regrid_mean2d():
     )
     assert np.allclose(out.values, compare)
 
+    # Now with chunking
+    source = source.chunk({"x": chunksize, "y": chunksize})
+    out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+    assert np.allclose(out.values, compare)
 
-def test_regrid_mean2d_over3darray():
+
+@pytest.mark.parametrize("chunksize", [1, 2, 3])
+def test_regrid_mean2d_over3darray(chunksize):
     values = np.array([[0.6, 0.2, 3.4], [1.4, 1.6, 1.0], [4.0, 2.8, 3.0]])
     values = np.stack([values for _ in range(5)])
     src_x = np.arange(3.0) + 0.5
@@ -353,6 +422,11 @@ def test_regrid_mean2d_over3darray():
     compare = np.empty((5, 2, 2))
     compare[:, ...] = compare_values
 
+    assert np.allclose(out.values, compare)
+
+    # Now with chunking
+    source = source.chunk({"x": chunksize, "y": chunksize})
+    out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
     assert np.allclose(out.values, compare)
 
 

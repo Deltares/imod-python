@@ -100,7 +100,7 @@ import numpy as np
 from imod.prepare import common
 
 
-def _linear_inds_weights_1d(src_x, dst_x, is_increasing):
+def _linear_inds_weights_1d(src_x, dst_x):
     """
     Returns indices and weights for linear interpolation along a single dimension.
     A sentinel value of -1 is added for dst cells that are fully out of bounds.
@@ -112,9 +112,9 @@ def _linear_inds_weights_1d(src_x, dst_x, is_increasing):
     dst_x: np.array
         vertex coordinates of destination
     """
-    if not is_increasing:
-        src_x = src_x.copy() * -1.0
-        dst_x = dst_x.copy() * -1.0
+    # Cannot interpolate "between" only one point
+    assert src_x.size > 2
+
     xmin = src_x.min()
     xmax = src_x.max()
 
@@ -458,9 +458,7 @@ def _nd_interp(src, dst, src_coords, dst_coords, iter_interp):
     # the maximum number of src cells that may end up in a single dst cell
     inds_weights = []
     for src_x, dst_x in zip(src_coords, dst_coords):
-        is_increasing = common._is_increasing(src_x, dst_x)
-        iw = _linear_inds_weights_1d(src_x, dst_x, is_increasing)
-        for elem in iw:
+        for elem in _linear_inds_weights_1d(src_x, dst_x):
             inds_weights.append(elem)
 
     iter_src, iter_dst = common._reshape(src, dst, ndim_regrid)

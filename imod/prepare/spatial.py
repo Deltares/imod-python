@@ -20,6 +20,7 @@ except ImportError:
 
 import imod
 from imod.prepare import pcg
+from imod.prepare import common
 
 
 def round_extent(extent, cellsize):
@@ -523,6 +524,8 @@ def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
     -------
     cell_table : pandas.DataFrame
     """
+    # Avoid side-effects
+    like = like.copy(deep=False)
     _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(like)
     dx = resolution
     dy = -dx
@@ -533,6 +536,11 @@ def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
         path, column, nodata=nodata, dtype=np.int32, spatial_reference=spatial_reference
     )
 
+    # Make sure the coordinates are increasing.
+    dims = ("y", "x")
+    rasterized, _ = common._increasing_dims(rasterized, dims)
+    like, flip_dst = common._increasing_dims(like, dims)
+
     dst_coords = [imod.prepare.common._coord(like, dim) for dim in ("y", "x")]
     src_coords = [imod.prepare.common._coord(rasterized, dim) for dim in ("y", "x")]
     # Determine weights for every regrid dimension, and alloc_len,
@@ -540,8 +548,7 @@ def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
     inds_weights = []
     alloc_len = 1
     for src_x, dst_x in zip(src_coords, dst_coords):
-        is_increasing = imod.prepare.common._is_increasing(src_x, dst_x)
-        size, i_w = imod.prepare.common._weights_1d(src_x, dst_x, is_increasing)
+        size, i_w = imod.prepare.common._weights_1d(src_x, dst_x)
         for elem in i_w:
             inds_weights.append(elem)
         alloc_len *= size
@@ -552,6 +559,11 @@ def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
     rows, cols, values, counts = _cell_count(
         rasterized.values, values, frequencies, nodata, *inds_weights
     )
+
+    if "y" in flip_dst:
+        rows = (like["y"].size - 1) - rows
+    if "x" in flip_dst:
+        cols = (like["x"].size - 1) - cols
 
     df = pd.DataFrame()
     df["row_index"] = rows + rowstart

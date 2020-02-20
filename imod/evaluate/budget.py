@@ -213,5 +213,5 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
         return (
             xr.full_like(budgetzone, result_front),
             xr.full_like(budgetzone, result_lower),
-            xr.full_like(budgetzone, result_right)
+            xr.full_like(budgetzone, result_right),
         )
