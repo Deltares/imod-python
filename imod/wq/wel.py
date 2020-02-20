@@ -85,7 +85,7 @@ class Well(BoundaryCondition):
 
         self["save_budget"] = save_budget
 
-    def _max_active_n(self, varname, nlayer):
+    def _max_active_n(self, varname, nlayer, nrow, ncol):
         """
         Determine the maximum active number of cells that are active
         during a stress period.
@@ -95,12 +95,13 @@ class Well(BoundaryCondition):
         varname : str
             name of the variable to use to calculate the maximum number of
             active cells. Not used for well, here for polymorphism.
-        nlayer : int
-            number of layers, taken from ibound.
+        nlayer, nrow, ncol : int
         """
         nmax = np.unique(self["id_name"]).size
         if not "layer" in self.coords:  # Then it applies to every layer
             nmax *= nlayer
+        self._cellcount = nmax
+        self._ssm_cellcount = nmax
         return nmax
 
     def _compose_values_layer(self, directory, name, time=None):

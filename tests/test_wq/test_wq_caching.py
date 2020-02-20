@@ -66,7 +66,8 @@ def test_cached_river__max_n(test_timelayerda, tmp_path):
     river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da)
     riverpath = tmp_path / "river.nc"
     river.to_netcdf(riverpath)
-    expected = river._max_active_n("conductance", 2)
+    nlayer, nrow, ncol = test_timelayerda.isel(time=0).shape
+    expected = river._max_active_n("conductance", nlayer, nrow, ncol)
 
     my_cache = tmp_path / "my-cache"
     cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
@@ -76,13 +77,13 @@ def test_cached_river__max_n(test_timelayerda, tmp_path):
     # First round, cache is still empty.
     assert cache_path.exists()
     # First time, runs code
-    actual1 = cached_river._max_active_n("conductance", 2)
-    actual2 = cached_river._max_active_n("conductance", 2)
+    actual1 = cached_river._max_active_n("conductance", nlayer, nrow, ncol)
+    actual2 = cached_river._max_active_n("conductance", nlayer, nrow, ncol)
 
     # Recreate object
     cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._filehashes["riv"] = cached_river._filehashself
-    actual3 = cached_river._max_active_n("conductance", 2)
+    actual3 = cached_river._max_active_n("conductance", nlayer, nrow, ncol)
 
     # release netcdf
     # Change river
@@ -91,8 +92,8 @@ def test_cached_river__max_n(test_timelayerda, tmp_path):
     river.to_netcdf(riverpath)
     cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._filehashes["riv"] = cached_river._filehashself
-    actual4 = cached_river._max_active_n("conductance", 2)
-    actual4 = cached_river._max_active_n("conductance", 2)
+    actual4 = cached_river._max_active_n("conductance", nlayer, nrow, ncol)
+    actual4 = cached_river._max_active_n("conductance", nlayer, nrow, ncol)
 
     assert actual1 == actual2 == actual3 == actual4 == expected
 

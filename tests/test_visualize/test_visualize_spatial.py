@@ -84,7 +84,11 @@ def test_read_legend(write_legend, delim, tmp_path):
 
 def test_plot_map():
     fig, ax = imod.visualize.spatial.plot_map(
-        raster=xr.DataArray(np.random.randn(2, 3), dims=("x", "y")),
+        raster=xr.DataArray(
+            np.random.randn(2, 3),
+            coords={"x": [0.5, 1.5], "y": [1.5, 0.5, -0.5]},
+            dims=("x", "y"),
+        ),
         colors=["#ff0000", "#00ff00", "#0000ff"],
         levels=[0.2, 0.8],
     )

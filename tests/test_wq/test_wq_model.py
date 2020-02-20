@@ -1,3 +1,4 @@
+from copy import deepcopy
 import pathlib
 import shutil
 import textwrap
@@ -35,8 +36,11 @@ def basicmodel():
     # LPF
     k_horizontal = ibound.copy()
 
-    # GHB
+    # RIV
     head = ibound.copy()
+
+    # GHB, only part of domain
+    ghbhead = ibound.isel(z=slice(0, 2))
 
     # RCH
     datetimes = pd.date_range("2000-01-01", "2000-01-05")
@@ -73,10 +77,10 @@ def basicmodel():
         head_dry=1.0e20,
     )
     m["ghb"] = imod.wq.GeneralHeadBoundary(
-        head=head,
-        conductance=head.copy(),
-        concentration=head.copy(),
-        density=head.copy(),
+        head=ghbhead,
+        conductance=ghbhead.copy(),
+        concentration=1.5,
+        density=ghbhead.copy(),
         save_budget=False,
     )
     m["riv"] = imod.wq.River(
@@ -332,17 +336,14 @@ def test_render_groups__ghb_riv_wel(basicmodel):
         """\
         [ghb]
             mghbsys = 1
-            mxactb = 75
+            mxactb = 50
             ighbcb = 0
             bhead_p?_s1_l1 = ghb/head_l1.idf
             bhead_p?_s1_l2 = ghb/head_l2.idf
-            bhead_p?_s1_l3 = ghb/head_l3.idf
             cond_p?_s1_l1 = ghb/conductance_l1.idf
             cond_p?_s1_l2 = ghb/conductance_l2.idf
-            cond_p?_s1_l3 = ghb/conductance_l3.idf
             ghbssmdens_p?_s1_l1 = ghb/density_l1.idf
             ghbssmdens_p?_s1_l2 = ghb/density_l2.idf
-            ghbssmdens_p?_s1_l3 = ghb/density_l3.idf
         
         [riv]
             mrivsys = 1
@@ -373,9 +374,8 @@ def test_render_groups__ghb_riv_wel(basicmodel):
     )
 
     ssm_compare = """
-    cghb_t1_p?_l1 = ghb/concentration_l1.idf
-    cghb_t1_p?_l2 = ghb/concentration_l2.idf
-    cghb_t1_p?_l3 = ghb/concentration_l3.idf
+    cghb_t1_p?_l1 = 1.5
+    cghb_t1_p?_l2 = 1.5
     criv_t1_p?_l1 = riv/concentration_l1.idf
     criv_t1_p?_l2 = riv/concentration_l2.idf
     criv_t1_p?_l3 = riv/concentration_l3.idf"""
@@ -383,7 +383,7 @@ def test_render_groups__ghb_riv_wel(basicmodel):
         directory=directory, globaltimes=globaltimes
     )
 
-    assert n_sinkssources == 153
+    assert n_sinkssources == 128
     assert content == compare
     assert ssm_content == ssm_compare
 
@@ -458,6 +458,36 @@ def test_render_ssm_rch(basicmodel):
     assert m._render_ssm_rch(directory=directory, globaltimes=globaltimes) == compare
 
 
+def test_render_ssm_rch_constant(basicmodel):
+    # Make sure it only writes crch for layers in which recharge are constant.
+    m = deepcopy(basicmodel)
+    m["rch"] = imod.wq.RechargeHighestActive(
+        rate=0.001, concentration=0.15, save_budget=False
+    )
+    m.time_discretization("2000-01-06")
+    diskey = m._get_pkgkey("dis")
+    globaltimes = m[diskey]["time"].values
+    directory = pathlib.Path(".")
+
+    compare = """
+    crch_t1_p?_l1 = 0.15"""
+
+    # Setup ssm_layers
+    m._bas_btn_rch_sinkssources()
+    assert hasattr(m["rch"], "_ssm_layers")
+    assert m._render_ssm_rch(directory=directory, globaltimes=globaltimes) == compare
+
+    compare = """
+    crch_t1_p?_l1 = 0.15
+    crch_t1_p?_l2 = 0.15"""
+
+    # Setup ssm_layers
+    m["bas6"]["ibound"][0, 0, 0] = 0.0
+    m._bas_btn_rch_sinkssources()
+    assert hasattr(m["rch"], "_ssm_layers")
+    assert m._render_ssm_rch(directory=directory, globaltimes=globaltimes) == compare
+
+
 def test_render_transportsolver(basicmodel):
     m = basicmodel
     directory = pathlib.Path(".")
@@ -513,12 +543,33 @@ def test_mxsscount_incongruent_icbund(basicmodel):
     This test mutates the basicmodel provided by the fixture!
     """
 
-    m = basicmodel
-    m["bas6"]["ibound"][...] = -1.0
+    m = deepcopy(basicmodel)
+    m["bas6"]["ibound"][1:, ...] = -1.0
     m["btn"]["icbund"][...] = 0.0
 
     n_sinkssources = m._bas_btn_rch_sinkssources()
-    assert n_sinkssources == 100
+    # 50 from ibound, 25 from recharge
+    assert n_sinkssources == 75
+
+
+def test_highest_active_recharge(basicmodel):
+    m = basicmodel
+    n_sinkssources = m._bas_btn_rch_sinkssources()
+    assert np.array_equal(m["rch"]._ssm_layers, np.array([1]))
+    assert n_sinkssources == 25
+
+    m["bas6"]["ibound"][0, 0, 0] = 0.0
+    m["btn"]["icbund"][...] = 0.0
+    n_sinkssources = m._bas_btn_rch_sinkssources()
+    print(m["bas6"]["ibound"])
+    assert np.array_equal(m["rch"]._ssm_layers, np.array([1, 2]))
+    assert n_sinkssources == 50
+
+    m["bas6"]["ibound"][...] = -1.0
+    m["btn"]["icbund"][...] = 0.0
+    n_sinkssources = m._bas_btn_rch_sinkssources()
+    assert np.array_equal(m["rch"]._ssm_layers, np.array([]))
+    assert n_sinkssources == 75
 
 
 def test_write(basicmodel, tmp_path):

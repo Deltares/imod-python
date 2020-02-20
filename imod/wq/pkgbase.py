@@ -199,10 +199,22 @@ class Package(xr.Dataset):
 
         if "layer" not in da.coords:
             if idf:
-                pattern += "{extension}"
-                values["?"] = self._compose(d, pattern=pattern)
+                # Special case concentration
+                # Using "?" results in too many sinks and sources according to imod-wq.
+                if hasattr(self, "_ssm_layers"):
+                    for layer in self._ssm_layers:
+                        values[layer] = da.values[()]
+                else:
+                    pattern += "{extension}"
+                    values["?"] = self._compose(d, pattern=pattern)
             else:
-                values["?"] = da.values[()]
+                # Special case concentration
+                # Using "?" results in too many sinks and sources according to imod-wq.
+                if hasattr(self, "_ssm_layers"):
+                    for layer in self._ssm_layers:
+                        values[layer] = da.values[()]
+                else:
+                    values["?"] = da.values[()]
 
         else:
             pattern += "_l{layer}{extension}"
@@ -307,7 +319,7 @@ class BoundaryCondition(Package):
     * drainage
     """
 
-    __slots__ = ()
+    __slots__ = ("_cellcount", "_ssm_cellcount", "_ssm_layers")
     _template = jinja2.Template(
         "    {%- for name, dictname in mapping -%}"
         "        {%- for time, timedict in dicts[dictname].items() -%}"
@@ -408,7 +420,7 @@ class BoundaryCondition(Package):
 
         return values
 
-    def _max_active_n(self, varname, nlayer):
+    def _max_active_n(self, varname, nlayer, nrow, ncol):
         """
         Determine the maximum active number of cells that are active
         during a stress period.
@@ -418,20 +430,45 @@ class BoundaryCondition(Package):
         varname : str
             name of the variable to use to calculate the maximum number of
             active cells. Generally conductance.
-        nlayer : int
-            number of layers, taken from ibound.
+        shape : tuple of ints
+            nlay, nrow, ncol taken from ibound.
         """
+        # First compute active number of cells
         if "time" in self[varname].coords:
             nmax = int(self[varname].groupby("time").count(xr.ALL_DIMS).max())
         else:
             nmax = int(self[varname].count())
         if not "layer" in self.coords:  # Then it applies to every layer
             nmax *= nlayer
+        self._cellcount = nmax  # Store cellcount so it can be re-used for ssm.
+
+        # Second, compute active number of sinks and sources
+        if "concentration" in self:
+            da = self["concentration"]
+
+            if "species" in da.coords:
+                nspecies = da.coords["species"].size
+            else:
+                nspecies = 1
+
+            if "y" not in da.coords and "x" not in da.coords:
+                # It's not idf data, but scalar instead
+                if "layer" in self.coords:
+                    # Store layers for rendering
+                    da_nlayer = self.coords["layer"].size
+                    if da_nlayer == nlayer:
+                        # Insert wildcard
+                        self._ssm_layers = ["?"]
+                    else:
+                        self._ssm_layers = self.coords["layer"].values
+                        nlayer = da_nlayer
+                # Sinks and sources are applied everywhere
+                # in contrast to other inputs
+                nmax = nlayer * nrow * ncol
+
+            self._ssm_cellcount = nmax * nspecies
+
         return nmax
-        # TODO: save this as attribute so it doesn't have to be recomputed for SSM?
-        # Maybe call in __init__, then.
-        # or just call it before render
-        # and always make sure to call SSM render afterwards
 
     def _render(self, directory, globaltimes, system_index):
         """

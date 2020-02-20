@@ -39,6 +39,17 @@ Added
    have been added to setup 3D animations of DataArrays with transient data.
 -  Support for out of core computation by ``imod.prepare.Regridder`` if ``source``
    is chunked.
+-  (:func:`imod.ipf.read`) now reports the problematic file if reading errors occurs.
+
+Fixed
+~~~~~
+-  ``density`` is no longer an optional argument in (:class:`imod.wq.GeneralHeadboundary`) and
+   (:class:`imod.wq.River). The reason is that iMOD-WQ fully removes (!) these packages if density
+   is not present.
+-  (:func:`imod.idf.save`) and (:func:`imod.rasterio.save`) will now also save DataArrays in
+   which a coordinate other than ``x`` or ``y`` is descending.
+-  (:func:`imod.visualize.plot_map`) enforces decreasing ``y``, which ensures maps are not plotted
+   upside down.
 
 Fixed
 ~~~~~

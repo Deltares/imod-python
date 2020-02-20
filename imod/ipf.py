@@ -90,7 +90,13 @@ def _read(path, kwargs={}, assoc_kwargs={}):
                 # Note that these kwargs handle all associated files, which might differ
                 # within an IPF. If this happens we could consider supporting a dict
                 # or function that maps assoc filenames to different kwargs.
-                df_assoc = read_associated(path_assoc, assoc_kwargs)
+                try:  # Capture the error and print the offending path
+                    df_assoc = read_associated(path_assoc, assoc_kwargs)
+                except Exception as e:
+                    raise type(e)(
+                        f'{e}\nWhile reading associated file "{path_assoc}" of IPF file "{path}"'
+                    ) from e
+
                 # Include records of the "mother" ipf file.
                 for name, value in zip(colnames, row[1:]):  # ignores df.index in row
                     df_assoc[name] = value
@@ -318,7 +324,10 @@ def read(path, kwargs={}, assoc_kwargs={}):
         dfs = []
         for p in paths:
             layer = util.decompose(p).get("layer")
-            df = _read(p, kwargs, assoc_kwargs)
+            try:
+                df = _read(p, kwargs, assoc_kwargs)
+            except Exception as e:
+                raise type(e)(f'{e}\nWhile reading IPF file "{p}"') from e
             if layer is not None:
                 df["layer"] = layer
             dfs.append(df)

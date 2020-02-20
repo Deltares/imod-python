@@ -21,42 +21,37 @@ class GeneralHeadBoundary(BoundaryCondition):
         head value for the GHB (BHEAD).
     conductance: array of floats (xr.DataArray)
         the conductance of the GHB (COND).
+    density: array of floats (xr.DataArray)
+        is the density used to convert the point head to the freshwater head
+        (GHBSSMDENS).
     concentration: "None" or array of floats (xr.DataArray), optional
         concentration of the GHB (CGHB), get automatically inserted into the SSM
         package.
-        Default is "None".
-    density: "None" or float, optional
-        is the density used to convert the point head to the freshwater head
-        (GHBSSMDENS). If not specified, the density is calculated dynamically
-        using the concentration.
         Default is "None".
     save_budget: {True, False}, optional
         is a flag indicating if the budget should be saved (IGHBCB).
         Default is False.
     """
 
-    __slots__ = ("head", "conductance", "concentration", "density", "save_budget")
+    __slots__ = ("head", "conductance", "density", "concentration", "save_budget")
     _pkg_id = "ghb"
     _mapping = (("bhead", "head"), ("cond", "conductance"), ("ghbssmdens", "density"))
 
     def __init__(
-        self, head, conductance, concentration=None, density=None, save_budget=False
+        self, head, conductance, density, concentration=None, save_budget=False
     ):
         super(__class__, self).__init__()
         self["head"] = head
         self["conductance"] = conductance
+        self["density"] = density
         if concentration is not None:
             self["concentration"] = concentration
-        if density is not None:
-            self["density"] = density
         self["save_budget"] = save_budget
 
     def _pkgcheck(self, ibound=None):
-        to_check = ["conductance"]
+        to_check = ["conductance", "density"]
         if "concentration" in self.data_vars:
             to_check.append("concentration")
-        if "density" in self.data_vars:
-            to_check.append("density")
         self._check_positive(to_check)
 
         to_check.append("head")
@@ -66,11 +61,11 @@ class GeneralHeadBoundary(BoundaryCondition):
         self,
         head=None,
         conductance=None,
-        concentration=None,
         density=None,
+        concentration=None,
         use_cftime=False,
     ):
-        varnames = ["head", "conductance", "concentration", "density"]
-        values = [head, conductance, concentration, density]
+        varnames = ["head", "conductance", "density", "concentration"]
+        values = [head, conductance, density, concentration]
         for varname, value in zip(varnames, values):
             self._add_timemap(varname, value, use_cftime)

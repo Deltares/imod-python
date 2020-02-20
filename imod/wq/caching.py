@@ -109,9 +109,9 @@ def caching(package, memory):
         # More methods could be added, but these are the ones drawing data into
         # memory / making passes over the data, rather than using just metadata.
         @staticmethod
-        def _max_n(pkg, filehashes, varname, nlayer):
+        def _max_n(pkg, filehashes, varname, nlayer, nrow, ncol):
 
-            return super(type(pkg), pkg)._max_active_n(varname, nlayer)
+            return super(type(pkg), pkg)._max_active_n(varname, nlayer, nrow, ncol)
 
         @staticmethod
         def _check(pkg, filehashes, ibound):
@@ -141,13 +141,15 @@ def caching(package, memory):
             self._outputfiles.append(path)
             return path
 
-        def _max_active_n(self, varname, nlayer):
+        def _max_active_n(self, varname, nlayer, nrow, ncol):
             filehashes = check_filehashes(self._filehashes)
-            if hash_exists(self._caching_max_n, self, filehashes, varname, nlayer):
+            if hash_exists(
+                self._caching_max_n, self, filehashes, varname, nlayer, nrow, ncol
+            ):
                 self._logger.info("MAX_N: Input recognized. Skipping.")
             else:
                 self._logger.info("MAX_N: Input is new. Counting anew.")
-            return self._caching_max_n(self, filehashes, varname, nlayer)
+            return self._caching_max_n(self, filehashes, varname, nlayer, nrow, ncol)
 
         def _pkgcheck(self, ibound=None):
             filehashes = check_filehashes(self._filehashes)

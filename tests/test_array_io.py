@@ -211,6 +211,19 @@ def test_saveopen(test_da, kind, tmp_path):
 
 
 @pytest.mark.parametrize("kind", [(imod.rasterio, "tif"), (imod.idf, "idf")])
+def test_saveopen__descending_layer(test_layerda, kind, tmp_path):
+    module, ext = kind
+    # Flip around test_layerda
+    flip = slice(None, None, -1)
+    test_layerda = test_layerda.copy().isel(layer=flip)
+    module.save(tmp_path / f"layer", test_layerda)
+    assert (tmp_path / f"layer_l1.{ext}").exists()
+    da = module.open(tmp_path / f"layer_l*.{ext}")
+    assert isinstance(da, xr.DataArray)
+    assert da.identical(test_layerda.isel(layer=flip))
+
+
+@pytest.mark.parametrize("kind", [(imod.rasterio, "tif"), (imod.idf, "idf")])
 def test_saveopen__paths(test_da, kind, tmp_path):
     module, ext = kind
     module.save(tmp_path / "test", test_da)

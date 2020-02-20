@@ -18,6 +18,10 @@ def test_flowlower_up():
     lower[:2] = 1.0
     budgetzone[:2] = 1
     assert imod.evaluate.facebudget(budgetzone, front, lower, right).sum() == 2.0
+    rf, rl, rr = imod.evaluate.facebudget(budgetzone, front, lower, right, False)
+    assert rf.sum() == 0.0
+    assert rl.sum() == 2.0
+    assert rr.sum() == 0.0
 
 
 def test_flowlower_down():
