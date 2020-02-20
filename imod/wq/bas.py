@@ -136,14 +136,14 @@ class BasicFlow(Package):
             dx0 = dx[0]
             if not np.allclose(dx, dx0):
                 raise ValueError("x must be equidistant")
-            dx = abs(float(dx0))
+            d["dx"] = abs(float(dx0))
         try:
             d["dy"] = abs(float(dy))
         except TypeError:
             dy0 = dy[0]
             if not np.allclose(dy, dy0):
                 raise ValueError("y must be equidistant")
-            dy = abs(float(dy0))
+            d["dy"] = abs(float(dy0))
 
         d["confining_bed_below"] = confining_bed_below
 
