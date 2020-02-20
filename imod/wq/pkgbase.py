@@ -468,6 +468,9 @@ class BoundaryCondition(Package):
 
             self._ssm_cellcount = nmax * nspecies
 
+        else:
+            self._ssm_cellcount = 0
+
         return nmax
 
     def _render(self, directory, globaltimes, system_index):
