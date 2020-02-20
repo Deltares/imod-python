@@ -1,4 +1,4 @@
-import jinja2
+﻿import jinja2
 import numpy as np
 import scipy.ndimage.morphology
 import xarray as xr
@@ -129,8 +129,22 @@ class BasicFlow(Package):
         else:
             dx = self.coords["dx"]
             dy = self.coords["dy"]
-        d["dx"] = abs(float(dx))
-        d["dy"] = abs(float(dy))
+
+        try:
+            d["dx"] = abs(float(dx))
+        except TypeError:
+            dx0 = dx[0]
+            if not np.allclose(dx, dx0):
+                raise ValueError("x must be equidistant")
+            dx = abs(float(dx0))
+        try:
+            d["dy"] = abs(float(dy))
+        except TypeError:
+            dy0 = dy[0]
+            if not np.allclose(dy, dy0):
+                raise ValueError("y must be equidistant")
+            dy = abs(float(dy0))
+
         d["confining_bed_below"] = confining_bed_below
 
         # Non-time dependent part of dis
