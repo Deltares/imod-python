@@ -5,6 +5,7 @@ Includes methods for dealing with different coordinates and dimensions of the
 xarray.DataArrays, as well as aggregation methods operating on weights and
 values.
 """
+import cftime
 import dask
 import numba
 import numpy as np
@@ -195,15 +196,23 @@ def _match_dims(src, like):
     regrid_dims = []
     add_dims = []
     for dim in src.dims:
-        try:
-            a1 = _coord(src, dim)
-            a2 = _coord(like, dim)
-            if np.array_equal(a1, a2) or _is_subset(a1, a2):
-                matching_dims.append(dim)
-            else:
-                regrid_dims.append(dim)
-        except KeyError:
+        if dim not in like.dims:
             add_dims.append(dim)
+        else:
+            try:
+                a1 = _coord(src, dim)
+                a2 = _coord(like, dim)
+                if np.array_equal(a1, a2) or _is_subset(a1, a2):
+                    matching_dims.append(dim)
+                else:
+                    regrid_dims.append(dim)
+            except TypeError:
+                first_type = type(like[dim].values[0])
+                if issubclass(first_type, (cftime.datetime, np.datetime64)):
+                    raise RuntimeError(
+                        "cannot regrid over datetime dimensions. "
+                        "Use xarray.Dataset.resample() instead"
+                    )
 
     ndim_regrid = len(regrid_dims)
     # Check number of dimension to regrid

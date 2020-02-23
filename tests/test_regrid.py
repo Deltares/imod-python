@@ -298,6 +298,23 @@ def test_regrid_mean1d__dx_negative():
     assert np.allclose(out.values, compare)
 
 
+def test_regrid_mean1d__with_time():
+    values = np.full((4, 3), [1.0, 2.0, 3.0])
+    src_x = np.array([2.5, 1.5, 0.5])
+    dst_x = np.array([2.0, 0.5])
+    time = np.arange("2001-01-01", "2001-01-05", dtype=np.datetime64)
+    coords = {"time": time, "x": src_x, "dx": ("x", np.array([-1.0, -1.0, -1.0]))}
+    like_coords = {"x": dst_x, "dx": ("x", np.array([-2.0, -1.0]))}
+    source = xr.DataArray(values, coords, ["time", "x"])
+    like = xr.DataArray(np.empty(2), like_coords, ["x"])
+    out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+
+    like_coords = {"time": time, "x": dst_x, "dx": ("x", np.array([-2.0, -1.0]))}
+    like = xr.DataArray(np.empty((4, 2)), like_coords, ["time", "x"])
+    with pytest.raises(RuntimeError):
+        out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+
+
 @pytest.mark.parametrize("chunksize", [1, 2, 3])
 def test_regrid_mean1d__opposite_dx(chunksize):
     values = np.array([1.0, 2.0, 3.0])
