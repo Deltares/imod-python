@@ -96,9 +96,6 @@ class LayerPropertyFlow(Package):
         Package, which is the value assigned to cells that are no-flow cells at
         the start of a model simulation.
         Default value: 1.0e20.
-    confining_bed_k_vertical : float, optional
-        is the vertical hydraulic conductivity of a Quasi-three-dimensional
-        confining bed below a layer (VKCB).
     """
 
     __slots__ = (
@@ -114,7 +111,6 @@ class LayerPropertyFlow(Package):
         "interval_wet",
         "method_wet",
         "head_dry",
-        "confining_bed_k_vertical",
     )
     _pkg_id = "lpf"
 
@@ -127,7 +123,6 @@ class LayerPropertyFlow(Package):
         ("ss", "specific_storage"),
         ("sy", "specific_yield"),
         ("laywet", "layer_wet"),
-        ("vkcb", "confining_bed_k_vertical"),
     )
 
     _template = jinja2.Template(
@@ -161,7 +156,6 @@ class LayerPropertyFlow(Package):
         interval_wet=0.001,
         method_wet="wetfactor",
         head_dry=1.0e20,
-        confining_bed_k_vertical=None,
     ):
         super(__class__, self).__init__()
         self["k_horizontal"] = k_horizontal
@@ -176,12 +170,10 @@ class LayerPropertyFlow(Package):
         self["interval_wet"] = interval_wet
         self["method_wet"] = method_wet
         self["head_dry"] = head_dry
-        if confining_bed_k_vertical is not None:
-            self["confining_bed_k_vertical"] = confining_bed_k_vertical
 
     def _render(self, directory, *args, **kwargs):
         d = {}
-        # Don't include absentee members (in this case confining_bed_k_vertical)
+        # Don't include absentee members
         mapping = tuple([(k, v) for k, v in self._mapping if v in self.data_vars])
         d["mapping"] = mapping
         dicts = {}
@@ -206,7 +198,5 @@ class LayerPropertyFlow(Package):
             "specific_storage",
             "specific_yield",
         ]
-        if "confining_bed_k_vertical" in self.data_vars:
-            to_check.append("confining_bed_k_vertical")
         self._check_positive(to_check)
         self._check_location_consistent(to_check)

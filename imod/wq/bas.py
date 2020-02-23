@@ -113,7 +113,23 @@ class BasicFlow(Package):
             value = float(da)
         return value
 
-    def _render_dis(self, directory, confining_bed_below):
+    @staticmethod
+    def _cellsizes(dx):
+        ncell = dx.size
+        index_ends = np.argwhere(np.diff(dx) != 0.0) + 1
+        index_ends = np.append(index_ends, ncell)
+        index_starts = np.insert(index_ends[:-1], 0, 0) + 1
+
+        d = {}
+        for s, e in zip(index_starts, index_ends):
+            value = abs(float(dx[s - 1]))
+            if s == e:
+                d[str(s)] = value
+            else:
+                d[f"{s}:{e}"] = value
+        return d
+
+    def _render_dis(self, directory):
         """
         Renders part of runfile that ends up under [dis] section.
         """
@@ -129,9 +145,16 @@ class BasicFlow(Package):
         else:
             dx = self.coords["dx"]
             dy = self.coords["dy"]
-        d["dx"] = abs(float(dx))
-        d["dy"] = abs(float(dy))
-        d["confining_bed_below"] = confining_bed_below
+
+        if isinstance(dy, (float, int)) or dy.shape in ((), (1,)):
+            d["dy"] = {"?": abs(float(dy))}
+        else:
+            d["dy"] = self._cellsizes(dy)
+
+        if isinstance(dx, (float, int)) or dx.shape in ((), (1,)):
+            d["dx"] = {"?": abs(float(dx))}
+        else:
+            d["dx"] = self._cellsizes(dx)
 
         # Non-time dependent part of dis
         # Can be inferred from ibound
@@ -140,13 +163,17 @@ class BasicFlow(Package):
             "    nlay = {{nlay}}\n"
             "    nrow = {{nrow}}\n"
             "    ncol = {{ncol}}\n"
-            "    delc_r? = {{dy}}\n"
-            "    delr_c? = {{dx}}\n"
+            "    {%- for row, value in dy.items() %}\n"
+            "    delc_r{{row}} = {{value}}\n"
+            "    {%- endfor %}\n"
+            "    {%- for col, value in dx.items() %}\n"
+            "    delr_c{{col}} = {{value}}\n"
+            "    {%- endfor %}\n"
             "    top = {{top}}\n"
             "    {%- for layer, value in bottom.items() %}\n"
             "    botm_l{{layer}} = {{value}}\n"
             "    {%- endfor %}\n"
-            "    laycbd_l? = {{confining_bed_below}}"
+            "    laycbd_l? = 0"
         )
 
         return _dis_template.render(d)
