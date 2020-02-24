@@ -98,10 +98,15 @@ def _save(path, a, nodata, pattern, dtype, write):
 
     # Make sure all non-xy dims are ascending
     # otherwise a.stack fails in _write_chunks.
+    # y has to be monotonic decreasing
+    flip = slice(None, None, -1)
     for dim in a.dims:
-        if dim not in ("y", "x"):
+        if dim == "y":
+            if not a.indexes[dim].is_monotonic_decreasing:
+                a = a.isel({dim: flip})
+        else:
             if not a.indexes[dim].is_monotonic_increasing:
-                a = a.isel({dim: slice(None, None, -1)})
+                a = a.isel({dim: flip})
 
     # handle the case where they are not a dim but are a coord
     # i.e. you only have one layer but you did a.assign_coords(layer=1)

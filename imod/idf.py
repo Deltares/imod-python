@@ -484,6 +484,13 @@ def write(path, a, nodata=1.0e20, dtype=np.float32):
     if not a.dims == ("y", "x"):
         raise ValueError("Dimensions must be exactly ('y', 'x').")
 
+    flip = slice(None, None, -1)
+    if not a.indexes["x"].is_monotonic_increasing:
+        a = a.isel(x=flip)
+    if not a.indexes["y"].is_monotonic_decreasing:
+        a = a.isel(y=flip)
+    # TODO: check is_monotonic, but also for single col/row idfs...
+
     # Header is fully doubled in size in case of double precision ...
     # This means integers are also turned into 8 bytes
     # and requires padding with some additional bytes
@@ -521,11 +528,6 @@ def write(path, a, nodata=1.0e20, dtype=np.float32):
         f.write(struct.pack(intformat, nrow))
 
         dx, xmin, xmax, dy, ymin, ymax = util.spatial_reference(a)
-        # IDF supports only incrementing x, and decrementing y
-        if (np.atleast_1d(dx) < 0.0).all():
-            raise ValueError("dx must be positive")
-        if (np.atleast_1d(dy) > 0.0).all():
-            raise ValueError("dy must be negative")
 
         f.write(struct.pack(floatformat, xmin))
         f.write(struct.pack(floatformat, xmax))
@@ -558,14 +560,14 @@ def write(path, a, nodata=1.0e20, dtype=np.float32):
             f.write(struct.pack("xxxx"))  # not used
 
         if ieq:
-            f.write(struct.pack(floatformat, dx))
-            f.write(struct.pack(floatformat, -dy))
+            f.write(struct.pack(floatformat, abs(dx)))
+            f.write(struct.pack(floatformat, abs(dy)))
         if itb:
             f.write(struct.pack(floatformat, top))
             f.write(struct.pack(floatformat, bot))
         if not ieq:
-            a.coords["dx"].values.astype(a.dtype).tofile(f)
-            (-a.coords["dy"].values).astype(a.dtype).tofile(f)
+            np.abs(a.coords["dx"].values).astype(a.dtype).tofile(f)
+            np.abs(a.coords["dy"].values).astype(a.dtype).tofile(f)
         a.values.tofile(f)
 
 
