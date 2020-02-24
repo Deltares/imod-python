@@ -228,7 +228,7 @@ class SeawatModel(Model):
         """
 
         # Make sure it's an iterable
-        if not isinstance(times, (np.ndarray, list, tuple)):
+        if not isinstance(times, (np.ndarray, list, tuple, pd.DatetimeIndex)):
             times = [times]
 
         # Loop through all packages, check if cftime is required.
