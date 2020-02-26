@@ -1,3 +1,5 @@
+import textwrap
+
 from imod.wq.pkgbase import Package
 
 
@@ -146,6 +148,26 @@ class AdvectionMOC(Package):
         "cell_max_nparticles",
     )
     _pkg_id = "adv"
+    _keywords = {
+        "tracking": {"euler": 1, "runge-kutta": 2, "hybrid": 3},
+    }
+
+    _template = textwrap.dedent(
+        """
+        [adv]
+            mixelm = 1
+            percel = {courant}
+            mxpart = {max_nparticles}
+            itrack = {tracking}
+            wd = {weighting_factor}
+            dceps = {dconcentration_epsilon}
+            nplane = {nplane}
+            npl = {nparticles_no_advection}
+            nph = {nparticles_advection}
+            npmin = {cell_min_nparticles}
+            npmax = {cell_max_nparticles}
+    """
+    )
 
     def __init__(
         self,
@@ -169,6 +191,9 @@ class AdvectionMOC(Package):
         self["nparticles_advection"] = nparticles_advection
         self["cell_min_nparticles"] = cell_min_nparticles
         self["cell_max_nparticles"] = cell_max_nparticles
+
+    def _pkgcheck(self, ibound=None):
+        self._check_positive(["courant", "weighting_factor"])
 
 
 class AdvectionModifiedMOC(Package):

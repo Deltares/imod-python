@@ -461,11 +461,11 @@ class SeawatModel(Model):
         # MT3D and Seawat settings
         # Make an estimate of the required number of particles.
         advkey = self._get_pkgkey("adv")
-        baskey = self._get_pkgkey("bas")
+        baskey = self._get_pkgkey("bas6")
         if isinstance(self[advkey], (imod.wq.AdvectionMOC, imod.wq.AdvectionHybridMOC)):
             ibound = self[baskey]["ibound"]
             cell_max_nparticles = self[advkey]["cell_max_nparticles"]
-            self[advkey]["max_nparticles"] = (
+            self[advkey]["max_nparticles"] = int(
                 np.product(ibound.shape) * 0.5 * cell_max_nparticles
             )
 
