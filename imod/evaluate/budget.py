@@ -49,13 +49,13 @@ def _facebudget(
                     if upper == 0 and lower == 1:
                         result_lower[k, i, j] -= flowlower[k - 1, i, j]
                     if front == 1 and back == 0:
-                        result_front[k, i, j] -= flowlower[k, i - 1, j]
+                        result_front[k, i, j] += flowfront[k, i - 1, j]
                     if front == 0 and back == 1:
-                        result_front[k, i, j] += flowlower[k, i, j]
+                        result_front[k, i, j] -= flowfront[k, i, j]
                     if right == 1 and left == 0:
-                        result_right[k, i, j] -= flowright[k, i, j - 1]
+                        result_right[k, i, j] += flowright[k, i, j - 1]
                     if right == 0 and left == 1:
-                        result_right[k, i, j] += flowright[k, i, j]
+                        result_right[k, i, j] -= flowright[k, i, j]
 
 
 def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
@@ -208,10 +208,10 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
         result_right,
     )
     if netflow:
-        return xr.full_like(budgetzone, result_front)
+        return xr.full_like(budgetzone, result_front, dtype=np.float)
     else:
         return (
-            xr.full_like(budgetzone, result_front),
-            xr.full_like(budgetzone, result_lower),
-            xr.full_like(budgetzone, result_right),
+            xr.full_like(budgetzone, result_front, dtype=np.float),
+            xr.full_like(budgetzone, result_lower, dtype=np.float),
+            xr.full_like(budgetzone, result_right, dtype=np.float),
         )
