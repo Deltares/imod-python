@@ -96,10 +96,8 @@ def _collect_flowlower(indices, flow):
         i = indices[count, DIM_Y]
         j = indices[count, DIM_X]
         if indices[count, LOWER]:
-            print(LOWER)
             result[k, i, j] += flow[k, i, j]
         if indices[count, UPPER]:
-            print(LOWER)
             result[k, i, j] -= flow[k - 1, i, j]
     return result
 
