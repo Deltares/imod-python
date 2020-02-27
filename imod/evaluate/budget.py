@@ -164,15 +164,18 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
 
     Parameters
     ----------
-    budgetzone: xr.DataAray
-        Binary array defining zone (``1`` or ``True``) and outside of zone 
-        (``0`` or ``False``). Dimensions must be exactly ``("layer", "y", "x")``.
+    budgetzone: xr.DataAray of floats
+        Array defining zones. Non-zones should be with a ``np.nan`` value.
+        Dimensions must be exactly ``("layer", "y", "x")``.
     front: xr.DataArray of floats, optional
-        Dimensions must be exactly ``("layer", "y", "x")``.
+        Dimensions must be exactly ``("layer", "y", "x")`` or 
+        ``("time", "layer", "y", "x")``.
     lower: xr.DataArray of floats, optional
-        Dimensions must be exactly ``("layer", "y", "x")``.
+        Dimensions must be exactly ``("layer", "y", "x")`` or 
+        ``("time", "layer", "y", "x")``.
     right: xr.DataArray of floats, optional
-        Dimensions must be exactly ``("layer", "y", "x")``.
+        Dimensions must be exactly ``("layer", "y", "x")`` or 
+        ``("time", "layer", "y", "x")``.
     netflow : bool, optional
         Whether to split flows by direction (front, lower, right).
         True: sum all flows. False: return individual directions.
@@ -201,7 +204,7 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
 
     Broadcast it to three dimensions:
 
-    >>> zone = xr.full_like(flow, zone2D, dtype=np.bool)
+    >>> zone = xr.full_like(flow, zone2D)
 
     Compute net flow through the (control) surface of the budget zone:
 
