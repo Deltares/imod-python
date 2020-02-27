@@ -25,7 +25,7 @@ def _outer_edge(da):
 
 @numba.njit
 def _face_indices(face, budgetzone):
-    shape = (face.sum(), 9)
+    shape = (int(face.sum()), 9)
     indices = np.zeros(shape, dtype=np.int32)
     # Loop over cells
     nlay, nrow, ncol = budgetzone.shape
@@ -44,14 +44,14 @@ def _face_indices(face, budgetzone):
                         upper = budgetzone[k - 1, i, j]
                     if k < (nlay - 1):
                         lower = budgetzone[k + 1, i, j]
-                    if i < (nrow - 1):
-                        front = budgetzone[k, i + 1, j]
                     if i > 0:
                         back = budgetzone[k, i - 1, j]
-                    if j < (ncol - 1):
-                        right = budgetzone[k, i, j + 1]
+                    if i < (nrow - 1):
+                        front = budgetzone[k, i + 1, j]
                     if j > 0:
                         left = budgetzone[k, i, j - 1]
+                    if j < (ncol - 1):
+                        right = budgetzone[k, i, j + 1]
 
                     # Test if cell is a control surface cell for the direction
                     if lower == 0:
@@ -72,46 +72,60 @@ def _face_indices(face, budgetzone):
     return indices
 
 
-def _collect_flow(indices, flowfront, flowlower, flowright, result_front, result_lower, result_right):
+@numba.njit
+def _collect_flowfront(indices, flow):
+    result = np.zeros(flow.shape)
+    nface = indices.shape[0]
+    for count in range(nface):
+        k = indices[count, DIM_Z]
+        i = indices[count, DIM_Y]
+        j = indices[count, DIM_X]
+        if indices[count, FRONT]:
+            result[k, i, j] -= flow[k, i, j]
+        if indices[count, BACK]:
+            result[k, i, j] += flow[k, i - 1, j]
+    return result
+
+
+@numba.njit
+def _collect_flowlower(indices, flow):
+    result = np.zeros(flow.shape)
     nface = indices.shape[0]
     for count in range(nface):
         k = indices[count, DIM_Z]
         i = indices[count, DIM_Y]
         j = indices[count, DIM_X]
         if indices[count, LOWER]:
-            result_lower[k, i, j] += flowlower[k, i, j]
+            print(LOWER)
+            result[k, i, j] += flow[k, i, j]
         if indices[count, UPPER]:
-            result_lower[k, i, j] -= flowlower[k - 1, i, j]
-        if indices[count, FRONT]:
-            result_front[k, i, j] -= flowfront[k, i, j]
-        if indices[count, BACK]:
-            result_front[k, i, j] += flowfront[k, i - 1, j]
+            print(LOWER)
+            result[k, i, j] -= flow[k - 1, i, j]
+    return result
+
+
+@numba.njit
+def _collect_flowright(indices, flow):
+    result = np.zeros(flow.shape)
+    nface = indices.shape[0]
+    for count in range(nface):
+        k = indices[count, DIM_Z]
+        i = indices[count, DIM_Y]
+        j = indices[count, DIM_X]
         if indices[count, RIGHT]:
-            result_right[k, i, j] -= flowright[k, i, j]
+            result[k, i, j] -= flow[k, i, j]
         if indices[count, LEFT]:
-            result_right[k, i, j] += flowright[k, i, j - 1]
+            result[k, i, j] += flow[k, i, j - 1]
+    return result
 
 
-def collect_flow(indices, flowfront, flowlower, flowright, netflow):
-    shape = flowfront.shape
-    if netflow:
-        result_front = result_lower = result_right = np.zeros(shape, dtype=np.float)
-    else:
-        result_front = np.zeros(shape, dtype=np.float)
-        result_lower = np.zeros(shape, dtype=np.float)
-        result_right = np.zeros(shape, dtype=np.float)
-    # Call jit'ed function. Mutates result_front, result_lower, result_right
-    _collect_flow(indices, flowfront.values, flowlower.values, flowright.values, result_front, result_lower, result_right)
-    # Return as numpy array
-    return result_front, result_lower, result_lower
-
-
-def delayed_collect(indices, front, lower, right, netflow):
-    shape = front.shape
-    result_front, result_lower, result_right = dask.delayed(collect_flow, nout=3)(indices, front, lower, right, netflow)
-    dask_front = dask.array.from_delayed(result_front, shape, dtype=np.float)
-    dask_lower = dask.array.from_delayed(result_lower, shape, dtype=np.float)
-    dask_right = dask.array.from_delayed(result_right, shape, dtype=np.float)
+def delayed_collect(indices, front, lower, right):
+    result_front = dask.delayed(_collect_flowfront, nout=1)(indices, front.values)
+    result_lower = dask.delayed(_collect_flowlower, nout=1)(indices, lower.values)
+    result_right = dask.delayed(_collect_flowright, nout=1)(indices, right.values)
+    dask_front = dask.array.from_delayed(result_front, front.shape, dtype=np.float)
+    dask_lower = dask.array.from_delayed(result_lower, lower.shape, dtype=np.float)
+    dask_right = dask.array.from_delayed(result_right, right.shape, dtype=np.float)
     return dask_front, dask_lower, dask_right
 
 
@@ -234,7 +248,11 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
         if da is not None:
             dims = da.dims
             coords = da.coords
-            if da.shape[1:] != shape:
+            if "time" in dims:
+                da_shape = da.shape[1:]
+            else:
+                da_shape = da.shape
+            if da_shape != shape:
                 raise ValueError(f"Shape of {daname} does not match budgetzone")
 
     # Create dummy arrays for skipped values, allocate just once
@@ -254,7 +272,7 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
     results_front = []
     results_lower = []
     results_right = []
-    
+
     if "time" in dims:
         for itime in range(front.dims.size):
             if front is not None:
@@ -269,15 +287,11 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
             results_front.append(df)
             results_lower.append(dl)
             results_right.append(dr)
-        
+
         # Concatenate over time dimension
-        # If netflow, all results are collected in results_front already
-        # the other ones are just aliases
         dask_front = dask.array.concatenate(results_front, axis=0)
-        # If not netflow, also generate other arrays
-        if not netflow:
-            dask_lower = dask.array.concatenate(results_lower, axis=0)
-            dask_right = dask.array.concatenate(results_right, axis=0)
+        dask_lower = dask.array.concatenate(results_lower, axis=0)
+        dask_right = dask.array.concatenate(results_right, axis=0)
     else:
         if front is not None:
             f = front
@@ -285,10 +299,10 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
             l = lower
         if right is not None:
             r = right
-        dask_front, dask_lower, dask_right = delayed_collect(indices, f, l, r, netflow)
+        dask_front, dask_lower, dask_right = delayed_collect(indices, f, l, r)
 
     if netflow:
-        return xr.DataArray(dask_front, coords, dims)
+        return xr.DataArray(dask_front + dask_lower + dask_right, coords, dims)
     else:
         return (
             xr.DataArray(dask_front, coords, dims),
