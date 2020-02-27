@@ -17,15 +17,21 @@ LEFT = 8
 
 
 def _outer_edge(da):
-    data = da.values.copy()
-    from_edge = scipy.ndimage.morphology.binary_erosion(data)
-    is_edge = (data == 1) & (from_edge == 0)
-    return xr.full_like(da, is_edge, dtype=np.bool)
+    faces = xr.full_like(da, np.nan)
+    unique_ids = np.unique(da.values)
+    unique_ids = unique_ids[~np.isnan(unique_ids)]
+    # Number the faces by their id
+    for unique_id in unique_ids:
+        data = da.where(da == unique_id).values
+        from_edge = scipy.ndimage.morphology.binary_erosion(data)
+        is_edge = (data == 1) & (from_edge == 0)
+        faces.values[is_edge] = unique_id
+    return faces
 
 
 @numba.njit
 def _face_indices(face, budgetzone):
-    shape = (int(face.sum()), 9)
+    shape = (int(np.nansum(face)), 9)
     indices = np.zeros(shape, dtype=np.int32)
     # Loop over cells
     nlay, nrow, ncol = budgetzone.shape
@@ -33,13 +39,14 @@ def _face_indices(face, budgetzone):
     for k in range(nlay):
         for i in range(nrow):
             for j in range(ncol):
-                if face[k, i, j] == 1:
+                face_value = face[k, i, j]
+                if ~np.isnan(face_value):
                     # Store indices
                     indices[count, DIM_Z] = k
                     indices[count, DIM_Y] = i
                     indices[count, DIM_X] = j
-                    # Default value: part of domain (1) for edges
-                    lower = front = right = upper = back = left = 1
+                    # Default value: part of domain for edges
+                    lower = front = right = upper = back = left = face_value
                     if k > 0:
                         upper = budgetzone[k - 1, i, j]
                     if k < (nlay - 1):
@@ -54,17 +61,17 @@ def _face_indices(face, budgetzone):
                         right = budgetzone[k, i, j + 1]
 
                     # Test if cell is a control surface cell for the direction
-                    if lower == 0:
+                    if lower != face_value:
                         indices[count, LOWER] = 1
-                    if upper == 0:
+                    if upper != face_value:
                         indices[count, UPPER] = 1
-                    if front == 0:
+                    if front != face_value:
                         indices[count, FRONT] = 1
-                    if back == 0:
+                    if back != face_value:
                         indices[count, BACK] = 1
-                    if right == 0:
+                    if right != face_value:
                         indices[count, RIGHT] = 1
-                    if left == 0:
+                    if left != face_value:
                         indices[count, LEFT] = 1
 
                     # Incrementer counter
@@ -81,9 +88,9 @@ def _collect_flowfront(indices, flow):
         i = indices[count, DIM_Y]
         j = indices[count, DIM_X]
         if indices[count, FRONT]:
-            result[k, i, j] -= flow[k, i, j]
+            result[k, i, j] += flow[k, i, j]
         if indices[count, BACK]:
-            result[k, i, j] += flow[k, i - 1, j]
+            result[k, i, j] -= flow[k, i - 1, j]
     return result
 
 
@@ -111,9 +118,9 @@ def _collect_flowright(indices, flow):
         i = indices[count, DIM_Y]
         j = indices[count, DIM_X]
         if indices[count, RIGHT]:
-            result[k, i, j] -= flow[k, i, j]
+            result[k, i, j] += flow[k, i, j]
         if indices[count, LEFT]:
-            result[k, i, j] += flow[k, i, j - 1]
+            result[k, i, j] -= flow[k, i, j - 1]
     return result
 
 
@@ -280,7 +287,7 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
             if right is not None:
                 r = right.isel(time=itime)
             # collect dask arrays
-            df, dl, dr = delayed_collect(indices, f, l, r, netflow)
+            df, dl, dr = delayed_collect(indices, f, l, r)
             # append
             results_front.append(df)
             results_lower.append(dl)

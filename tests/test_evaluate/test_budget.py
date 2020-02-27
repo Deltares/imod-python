@@ -13,7 +13,7 @@ def test_flowlower_up():
     front = xr.full_like(da, 0.0)
     right = xr.full_like(da, 0.0)
     lower = xr.full_like(da, 0.0)
-    budgetzone = xr.full_like(da, 0.0)
+    budgetzone = xr.full_like(da, np.nan)
 
     lower[:2] = 1.0
     budgetzone[:2] = 1
@@ -33,7 +33,7 @@ def test_flowlower_down():
     front = xr.full_like(da, 0.0)
     right = xr.full_like(da, 0.0)
     lower = xr.full_like(da, 0.0)
-    budgetzone = xr.full_like(da, 0.0)
+    budgetzone = xr.full_like(da, np.nan)
 
     lower[0] = 1.0
     budgetzone[0] = 1
@@ -43,7 +43,7 @@ def test_flowlower_down():
     assert imod.evaluate.facebudget(budgetzone, front, lower, right).sum() == -2.0
 
     lower = xr.full_like(da, 0.0)
-    budgetzone = xr.full_like(da, 0.0)
+    budgetzone = xr.full_like(da, np.nan)
     lower[0] = 1.0
     budgetzone[1] = 1
     assert imod.evaluate.facebudget(budgetzone, front, lower, right).sum() == -2.0
@@ -58,7 +58,7 @@ def test_lower_netzero():
     front = xr.full_like(da, 0.0)
     right = xr.full_like(da, 0.0)
     lower = xr.full_like(da, 0.0)
-    budgetzone = xr.full_like(da, 0.0)
+    budgetzone = xr.full_like(da, np.nan)
 
     lower[:2] = 1.0
     budgetzone[1] = 1
@@ -74,7 +74,7 @@ def test_lower_right():
     front = xr.full_like(da, 0.0)
     right = xr.full_like(da, 0.0)
     lower = xr.full_like(da, 0.0)
-    budgetzone = xr.full_like(da, 0.0)
+    budgetzone = xr.full_like(da, np.nan)
 
     right[:] = 1.0
     lower[:] = 1.0
@@ -92,7 +92,7 @@ def test_flow_right_lower_netzero():
     front = xr.full_like(da, 1.0)
     right = xr.full_like(da, 1.0)
     lower = xr.full_like(da, 1.0)
-    budgetzone = xr.full_like(da, 0.0)
+    budgetzone = xr.full_like(da, np.nan)
 
     budgetzone[:, 0, :] = 1
     budgetzone[:, 1, 1:] = 1
@@ -108,16 +108,31 @@ def test_flow_right_lower():
     front = xr.full_like(da, 1.0)
     right = xr.full_like(da, 5.0)
     lower = xr.full_like(da, 1.0)
-    budgetzone = xr.full_like(da, 0.0)
+    budgetzone = xr.full_like(da, np.nan)
 
     budgetzone[:, 0, :] = 1
     budgetzone[:, 1, :1] = 1
     budgetzone[:, 2, :2] = 1
-    assert imod.evaluate.facebudget(budgetzone, front, lower, right).sum() == -11.0
+    assert (
+        float(imod.evaluate.facebudget(budgetzone, front, lower, right).sum()) == 11.0
+    )
 
     # Inverted
-    budgetzone = abs(budgetzone - 1)
-    assert imod.evaluate.facebudget(budgetzone, front, lower, right).sum() == 11.0
+    budgetzone = xr.full_like(budgetzone, 1.0).where(budgetzone.isnull())
+    assert (
+        float(imod.evaluate.facebudget(budgetzone, front, lower, right).sum()) == -11.0
+    )
+
+    # Test two zones
+    budgetzone = xr.full_like(da, np.nan)
+    budgetzone[:, 0, :] = 1
+    budgetzone[:, 1, :1] = 1
+    budgetzone[:, 2, :2] = 1
+    budgetzone = budgetzone.fillna(2)
+    netflow = imod.evaluate.facebudget(budgetzone, front, lower, right)
+    assert float(netflow.sum()) == 0.0
+    assert float(netflow.where(budgetzone == 1).sum()) == 11.0
+    assert float(netflow.where(budgetzone == 2).sum()) == -11.0
 
 
 def test_flow_right_lower__aniflow():
@@ -128,21 +143,21 @@ def test_flow_right_lower__aniflow():
     front = xr.full_like(da, 1.0)
     right = xr.full_like(da, 2.0)
     lower = xr.full_like(da, 3.0)
-    budgetzone = xr.full_like(da, 0.0)
+    budgetzone = xr.full_like(da, np.nan)
 
     budgetzone[0, 1, 1] = 1
-    assert imod.evaluate.facebudget(budgetzone, front, lower, right).sum() == 3.0
+    assert float(imod.evaluate.facebudget(budgetzone, front, lower, right).sum()) == 3.0
 
     # reset
-    budgetzone[...] = 0
+    budgetzone[...] = np.nan
     budgetzone[:, :, -1] = 1
-    assert (
-        imod.evaluate.facebudget(budgetzone, front, lower, right).sum() == 2 * 3 * 2.0
+    assert float(imod.evaluate.facebudget(budgetzone, front, lower, right).sum()) == -(
+        2 * 3 * 2.0
     )
 
     # reset
-    budgetzone[...] = 0
+    budgetzone[...] = np.nan
     budgetzone[:, -1, :] = 1
-    assert (
-        imod.evaluate.facebudget(budgetzone, front, lower, right).sum() == 2 * 3 * 1.0
+    assert float(imod.evaluate.facebudget(budgetzone, front, lower, right).sum()) == -(
+        2 * 3 * 1.0
     )
