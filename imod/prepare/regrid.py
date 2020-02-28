@@ -430,6 +430,9 @@ class Regridder(object):
         dst = xr.DataArray(
             data=np.full(dst_shape, fill_value), coords=dst_da_coords, dims=dst_dims
         )
+        # No overlap whatsoever, early exit
+        if any(size == 0 for size in src.shape):
+            return dst.values
 
         # TODO: check that axes are aligned
         dst_coords_regrid = [common._coord(dst, dim) for dim in regrid_dims]

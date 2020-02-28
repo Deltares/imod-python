@@ -198,6 +198,8 @@ def _match_dims(src, like):
     for dim in src.dims:
         if dim not in like.dims:
             add_dims.append(dim)
+        elif src[dim].size == 0:  # zero overlap
+            regrid_dims.append(dim)
         else:
             try:
                 a1 = _coord(src, dim)
