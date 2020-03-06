@@ -135,7 +135,7 @@ class Well(BoundaryCondition):
         # TODO: rename to _compose_values_timelayer?
         values = {}
         if "time" in self:
-            self_times = self["time"].values
+            self_times = np.unique(self["time"].values)
             if "timemap" in self.attrs:
                 timemap_keys = np.array(list(self.attrs["timemap"].keys()))
                 timemap_values = np.array(list(self.attrs["timemap"].values()))
