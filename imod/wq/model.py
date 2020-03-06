@@ -71,9 +71,9 @@ class Model(collections.UserDict):
 
     def sel(self, **dimensions):
         selmodel = type(self)(self.modelname, self.check)
-        for pgkname, pkg in self.items():
+        for pkgname, pkg in self.items():
             sel_dims = {k: v for k, v in dimensions.items() if k in pkg}
-            if len(this_dims) == 0:
+            if len(sel_dims) == 0:
                 selmodel[pkgname] = pkg
             else:
                 selmodel[pkgname] = pkg.loc[sel_dims]
@@ -81,9 +81,9 @@ class Model(collections.UserDict):
 
     def isel(self, **dimensions):
         selmodel = type(self)(self.modelname, self.check)
-        for pgkname, pkg in self.items():
+        for pkgname, pkg in self.items():
             sel_dims = {k: v for k, v in dimensions.items() if k in pkg}
-            if len(this_dims) == 0:
+            if len(sel_dims) == 0:
                 selmodel[pkgname] = pkg
             else:
                 selmodel[pkgname] = pkg[sel_dims]
