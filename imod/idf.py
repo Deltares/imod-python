@@ -382,9 +382,9 @@ def open_subdomains(path, use_cftime=False):
     all_have_z = all(map(lambda v: v is not None, itertools.chain(tops, bots)))
     if all_have_z:
         if coords["layer"].size > 1:
-            coords = _array_z_coord(coords, tops, bots, unique_indices)
+            coords = array_io.reading._array_z_coord(coords, tops, bots, unique_indices)
         else:
-            coords = _scalar_z_coord(coords, tops, bots)
+            coords = array_io.reading._scalar_z_coord(coords, tops, bots)
 
     return xr.DataArray(data, coords, dims)
 
