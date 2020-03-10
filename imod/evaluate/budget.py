@@ -282,7 +282,7 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
     results_right = []
 
     if "time" in dims:
-        for itime in range(front.dims.size):
+        for itime in range(front.dims["time"].size):
             if front is not None:
                 f = front.isel(time=itime)
             if lower is not None:
