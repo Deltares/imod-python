@@ -32,8 +32,11 @@ def _outer_edge(da):
 
 @numba.njit
 def _face_indices(face, budgetzone):
-    shape = (int(np.nansum(face)), 9)
+    nface = int(np.nansum(face))
+    shape = (nface, 9)
     indices = np.zeros(shape, dtype=np.int32)
+    if nface == 0:
+        return indices
     # Loop over cells
     nlay, nrow, ncol = budgetzone.shape
     count = 0
@@ -265,51 +268,59 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
             if da_shape != shape:
                 raise ValueError(f"Shape of {daname} does not match budgetzone")
 
-    # Create dummy arrays for skipped values, allocate just once
-    if front is None:
-        f = xr.full_like(budgetzone, 0.0, dtype=np.float)
-    if lower is None:
-        l = xr.full_like(budgetzone, 0.0, dtype=np.float)
-    if right is None:
-        r = xr.full_like(budgetzone, 0.0, dtype=np.float)
-
     # Determine control surface
     face = _outer_edge(budgetzone)
     # Convert indices array to dask array, otherwise garbage collection gets
     # rid of the array and we get a segfault.
     indices = dask.array.from_array(_face_indices(budgetzone.values, face.values))
+    # Make sure it returns NaNs if no zones are defined.
+    print(indices.size)
+    print(indices)
+    if indices.size > 0:
+        # Create dummy arrays for skipped values, allocate just once
+        if front is None:
+            f = xr.full_like(budgetzone, 0.0, dtype=np.float)
+        if lower is None:
+            l = xr.full_like(budgetzone, 0.0, dtype=np.float)
+        if right is None:
+            r = xr.full_like(budgetzone, 0.0, dtype=np.float)
 
-    results_front = []
-    results_lower = []
-    results_right = []
+        results_front = []
+        results_lower = []
+        results_right = []
 
-    if "time" in dims:
-        for itime in range(front.coords["time"].size):
+        if "time" in dims:
+            for itime in range(front.coords["time"].size):
+                if front is not None:
+                    f = front.isel(time=itime)
+                if lower is not None:
+                    l = lower.isel(time=itime)
+                if right is not None:
+                    r = right.isel(time=itime)
+                # collect dask arrays
+                df, dl, dr = delayed_collect(indices, f, l, r)
+                # append
+                results_front.append(df)
+                results_lower.append(dl)
+                results_right.append(dr)
+
+            # Concatenate over time dimension
+            dask_front = dask.array.stack(results_front, axis=0)
+            dask_lower = dask.array.stack(results_lower, axis=0)
+            dask_right = dask.array.stack(results_right, axis=0)
+        else:
             if front is not None:
-                f = front.isel(time=itime)
+                f = front
             if lower is not None:
-                l = lower.isel(time=itime)
+                l = lower
             if right is not None:
-                r = right.isel(time=itime)
-            # collect dask arrays
-            df, dl, dr = delayed_collect(indices, f, l, r)
-            # append
-            results_front.append(df)
-            results_lower.append(dl)
-            results_right.append(dr)
-
-        # Concatenate over time dimension
-        dask_front = dask.array.stack(results_front, axis=0)
-        dask_lower = dask.array.stack(results_lower, axis=0)
-        dask_right = dask.array.stack(results_right, axis=0)
+                r = right
+            dask_front, dask_lower, dask_right = delayed_collect(indices, f, l, r)
     else:
-        if front is not None:
-            f = front
-        if lower is not None:
-            l = lower
-        if right is not None:
-            r = right
-        dask_front, dask_lower, dask_right = delayed_collect(indices, f, l, r)
+        chunks = (1, *da_shape)
+        dask_front = dask.array.full(front.shape, np.nan, chunks=chunks)
+        dask_lower = dask.array.full(lower.shape, np.nan, chunks=chunks)
+        dask_right = dask.array.full(right.shape, np.nan, chunks=chunks)
 
     if netflow:
         return xr.DataArray(dask_front + dask_lower + dask_right, coords, dims)

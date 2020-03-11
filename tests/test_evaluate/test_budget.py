@@ -179,10 +179,20 @@ def test_transient_flow():
     right = xr.full_like(da, 0.0)
     lower = xr.full_like(da, 0.0)
     budgetzone = xr.DataArray(
-        data=np.zeros((3, 2, 1)),
+        data=np.ones((3, 2, 1)),
         coords={"layer": [1, 2, 3], "y": [0.5, 1.5], "x": [0.5]},
         dims=("layer", "y", "x"),
     )
     netflow = imod.evaluate.facebudget(budgetzone, front, lower, right)
     assert netflow.shape == (4, 3, 2, 1)
     assert float(netflow.sum()) == 0.0
+
+    # Test it without zones defined
+    budgetzone = xr.DataArray(
+        data=np.zeros((3, 2, 1)),
+        coords={"layer": [1, 2, 3], "y": [0.5, 1.5], "x": [0.5]},
+        dims=("layer", "y", "x"),
+    )
+    netflow = imod.evaluate.facebudget(budgetzone, front, lower, right)
+    assert netflow.shape == (4, 3, 2, 1)
+    assert np.isnan(netflow.values).all()
