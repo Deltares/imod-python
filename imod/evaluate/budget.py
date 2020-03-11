@@ -1,3 +1,4 @@
+import joblib
 import dask
 import dask.array
 import numba
@@ -125,6 +126,7 @@ def _collect_flowright(indices, flow):
 
 
 def delayed_collect(indices, front, lower, right):
+    indices = indices.compute()
     result_front = dask.delayed(_collect_flowfront, nout=1)(indices, front.values)
     result_lower = dask.delayed(_collect_flowlower, nout=1)(indices, lower.values)
     result_right = dask.delayed(_collect_flowright, nout=1)(indices, right.values)
@@ -273,7 +275,9 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
 
     # Determine control surface
     face = _outer_edge(budgetzone)
-    indices = _face_indices(budgetzone.values, face.values)
+    # Convert indices array to dask array, otherwise garbage collection gets
+    # rid of the array and we get a segfault.
+    indices = dask.array.from_array(_face_indices(budgetzone.values, face.values))
 
     results_front = []
     results_lower = []
@@ -288,7 +292,7 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
             if right is not None:
                 r = right.isel(time=itime)
             # collect dask arrays
-            df, dl, dr = delayed_collect(indices.copy(), f, l, r)
+            df, dl, dr = delayed_collect(indices, f, l, r)
             # append
             results_front.append(df)
             results_lower.append(dl)
