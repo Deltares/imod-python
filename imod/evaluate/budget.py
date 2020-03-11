@@ -272,8 +272,6 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
         r = xr.full_like(budgetzone, 0.0, dtype=np.float)
 
     # Determine control surface
-    # TODO: check for nans?
-    # TODO: loop over time if present?
     face = _outer_edge(budgetzone)
     indices = _face_indices(budgetzone.values, face.values)
 
@@ -282,7 +280,7 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
     results_right = []
 
     if "time" in dims:
-        for itime in range(front.dims["time"].size):
+        for itime in range(front.coords["time"].size):
             if front is not None:
                 f = front.isel(time=itime)
             if lower is not None:
@@ -290,16 +288,16 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
             if right is not None:
                 r = right.isel(time=itime)
             # collect dask arrays
-            df, dl, dr = delayed_collect(indices, f, l, r)
+            df, dl, dr = delayed_collect(indices.copy(), f, l, r)
             # append
             results_front.append(df)
             results_lower.append(dl)
             results_right.append(dr)
 
         # Concatenate over time dimension
-        dask_front = dask.array.concatenate(results_front, axis=0)
-        dask_lower = dask.array.concatenate(results_lower, axis=0)
-        dask_right = dask.array.concatenate(results_right, axis=0)
+        dask_front = dask.array.stack(results_front, axis=0)
+        dask_lower = dask.array.stack(results_lower, axis=0)
+        dask_right = dask.array.stack(results_right, axis=0)
     else:
         if front is not None:
             f = front
