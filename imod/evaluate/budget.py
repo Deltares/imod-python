@@ -1,4 +1,3 @@
-import joblib
 import dask
 import dask.array
 import numba
@@ -18,16 +17,16 @@ LEFT = 8
 
 
 def _outer_edge(da):
-    faces = xr.full_like(da, np.nan)
+    faces = np.full(da.shape, np.nan)
     unique_ids = np.unique(da.values)
     unique_ids = unique_ids[~np.isnan(unique_ids)]
     # Number the faces by their id
     for unique_id in unique_ids:
-        data = da.where(da == unique_id).values
+        data = (da == unique_id).values
         from_edge = scipy.ndimage.morphology.binary_erosion(data)
         is_edge = (data == 1) & (from_edge == 0)
-        faces.values[is_edge] = unique_id
-    return faces
+        faces[is_edge] = unique_id
+    return xr.DataArray(faces, da.coords, da.dims)
 
 
 @numba.njit
@@ -272,7 +271,7 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
     face = _outer_edge(budgetzone)
     # Convert indices array to dask array, otherwise garbage collection gets
     # rid of the array and we get a segfault.
-    indices = dask.array.from_array(_face_indices(budgetzone.values, face.values))
+    indices = dask.array.from_array(_face_indices(face.values, budgetzone.values))
     # Make sure it returns NaNs if no zones are defined.
     print(indices.size)
     print(indices)
