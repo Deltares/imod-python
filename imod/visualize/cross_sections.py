@@ -100,10 +100,7 @@ def _plot_aquitards(aquitards, ax, kwargs_aquitards):
         keyword arguments for ax.fill_between()
     """
     if kwargs_aquitards is None:
-        kwargs_aquitards = {
-            "alpha": 0.5,
-            "facecolor": "grey",
-        }
+        kwargs_aquitards = {"alpha": 0.5, "facecolor": "grey"}
     X_aq, Y_aq, C_aq, _ = _meshcoords(aquitards, continuous=False)
     C_aq.astype(np.float)
     for j, i in enumerate(range(0, X_aq.shape[0] - 1, 2)):
@@ -112,9 +109,7 @@ def _plot_aquitards(aquitards, ax, kwargs_aquitards):
         C_i[C_i == 0.0] = np.nan
         nodata = np.repeat(np.isnan(C_i[0::2]), 2)
         Y_i[:, nodata] = np.nan
-        ax.fill_between(
-            X_aq[0], Y_i[0], Y_i[1], **kwargs_aquitards,
-        )
+        ax.fill_between(X_aq[0], Y_i[0], Y_i[1], **kwargs_aquitards)
 
 
 def cross_section(

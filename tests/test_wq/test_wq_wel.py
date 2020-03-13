@@ -137,10 +137,7 @@ def test_timemap__multiple_layers():
     wel = Well(id_name="well", x=x, y=y, rate=5.0, layer=layer, time=time)
     # Set a periodic boundary condition
     # test number of well layers is not constant between periods
-    timemap = {
-        datetimes[2]: datetimes[0],
-        datetimes[3]: datetimes[1],
-    }
+    timemap = {datetimes[2]: datetimes[0], datetimes[3]: datetimes[1]}
     wel.add_timemap(timemap)
 
     directory = pathlib.Path("well")

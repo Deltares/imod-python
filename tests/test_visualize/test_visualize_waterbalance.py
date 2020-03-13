@@ -22,9 +22,7 @@ def test_waterbalance_barchart(waterbalance_df):
     outflows = ["ET", "Wel", "Drainage"]
 
     # Without optional arguments
-    imod.visualize.waterbalance_barchart(
-        df=df, inflows=inflows, outflows=outflows,
-    )
+    imod.visualize.waterbalance_barchart(df=df, inflows=inflows, outflows=outflows)
 
     # With optional arguments
     _, ax = plt.subplots()
