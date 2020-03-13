@@ -356,6 +356,6 @@ def test_sel_chunks():
     # 2D
     src = xr.DataArray(np.ones((5, 5)), {"y": src_x, "x": src_x}, ("y", "x"))
     src = src.chunk({"x": (2, 2, 1), "y": (2, 2, 1)})
-    like = xr.DataArray(np.ones((3, 3,)), {"y": dst_x, "x": dst_x}, ("y", "x"))
+    like = xr.DataArray(np.ones((3, 3)), {"y": dst_x, "x": dst_x}, ("y", "x"))
     dst_slices, chunks_shape = imod.prepare.common._define_slices(src, like)
     assert len(dst_slices) == np.product(chunks_shape)

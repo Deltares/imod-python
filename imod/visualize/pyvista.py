@@ -568,7 +568,7 @@ class GridAnimation3D:
 
     def _initialize(self, da):
         self.mesh = grid_3d(
-            da, vertical_exaggeration=self.vertical_exaggeration, return_index=False,
+            da, vertical_exaggeration=self.vertical_exaggeration, return_index=False
         )
         self.mesh_actor = self.plotter.add_mesh(self.mesh, **self.mesh_kwargs)
 
@@ -637,7 +637,7 @@ class StaticGridAnimation3D(GridAnimation3D):
 
     def _initialize(self, da):
         self.mesh, self.indices = grid_3d(
-            da, vertical_exaggeration=self.vertical_exaggeration, return_index=True,
+            da, vertical_exaggeration=self.vertical_exaggeration, return_index=True
         )
 
     def _update(self, da):

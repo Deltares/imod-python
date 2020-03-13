@@ -10,6 +10,7 @@ channels:
 dependencies:
   - affine
   - black
+  - bottleneck
   - cftime>=1
   - cytoolz
   - dask

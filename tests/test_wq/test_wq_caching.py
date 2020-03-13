@@ -121,7 +121,7 @@ def test_cached_river__check(test_timelayerda, tmp_path):
     logger.addHandler(fh)
 
     da = test_timelayerda
-    river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da,)
+    river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da)
     riverpath = tmp_path / "river.nc"
     river.to_netcdf(riverpath)
     river._pkgcheck()

@@ -31,9 +31,7 @@ coords = {"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy}
 
 # Discretization data
 idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
-bottom = xr.DataArray(
-    np.arange(-0.03, -5.71, step=-0.03), {"layer": layer}, ("layer",),
-)
+bottom = xr.DataArray(np.arange(-0.03, -5.71, step=-0.03), {"layer": layer}, ("layer",))
 
 # layer 1, row 1, all columns
 constant_head_values = np.array(
