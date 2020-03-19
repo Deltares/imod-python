@@ -21,6 +21,11 @@ from imod.wq.chd import ConstantHead
 from imod.wq.dis import TimeDiscretization
 from imod.wq.drn import Drainage
 from imod.wq.dsp import Dispersion
+from imod.wq.evt import (
+    EvapotranspirationTopLayer,
+    EvapotranspirationLayers,
+    EvapotranspirationHighestActive,
+)
 from imod.wq.ghb import GeneralHeadBoundary
 from imod.wq.lpf import LayerPropertyFlow
 from imod.wq.model import SeawatModel
