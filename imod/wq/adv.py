@@ -148,9 +148,7 @@ class AdvectionMOC(Package):
         "cell_max_nparticles",
     )
     _pkg_id = "adv"
-    _keywords = {
-        "tracking": {"euler": 1, "runge-kutta": 2, "hybrid": 3},
-    }
+    _keywords = {"tracking": {"euler": 1, "runge-kutta": 2, "hybrid": 3}}
 
     _template = textwrap.dedent(
         """

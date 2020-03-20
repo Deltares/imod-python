@@ -52,4 +52,3 @@ def interpolate_value_boundaries(values, z, threshold):
     _interpolate_value_boundaries(values.values, z.values, threshold, out.values)
     out = out.rename({"layer": "boundary"})
     return out.dropna(dim="boundary", how="all")
-
