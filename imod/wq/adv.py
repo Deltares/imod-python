@@ -30,13 +30,24 @@ class AdvectionFiniteDifference(Package):
     __slots__ = ("courant", "weighting")
     _pkg_id = "adv"
 
+    _keywords = {
+        "weighting": {"upstream": 0, "central": 1},
+    }
+
+    _template = (
+        "[adv]\n"
+        "    mixelm = 0\n"
+        "    percel = {courant}\n"
+        "    nadvfd = {weighting}\n"
+    )
+
     def __init__(self, courant=0.75, weighting="upstream"):
         super(__class__, self).__init__()
         self["courant"] = courant
         self["weighting"] = weighting
 
     def _pkgcheck(self, ibound=None):
-        self._check_positive(["courant", "weighting"])
+        self._check_positive(["courant"])
 
 
 class AdvectionMOC(Package):
