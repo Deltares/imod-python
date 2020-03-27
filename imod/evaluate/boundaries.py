@@ -45,7 +45,7 @@ def interpolate_value_boundaries(values, z, threshold):
     Returns
     -------
     xr.DataArray
-        Z locations of exceedance and non-exceedance of threshold. Dimensions ``boundary``, ``y``, ``x`` 
+        Z locations of exceedance of and falling below threshold. Dimensions ``boundary``, ``y``, ``x`` 
     """
     values = values.load()
     out = xr.full_like(values, np.nan)
