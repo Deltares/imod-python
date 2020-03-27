@@ -252,8 +252,8 @@ def test_saveopen__paths(test_da, kind, tmp_path):
 def test_save__int32coords(test_da__nodxdy, kind, tmp_path):
     module, ext = kind
     test_da = test_da__nodxdy
-    test_da.x.values = test_da.x.values.astype(np.int32)
-    test_da.y.values = test_da.y.values.astype(np.int32)
+    test_da.coords["x"] = test_da.coords["x"].astype(np.int32)
+    test_da.coords["y"] = test_da.coords["y"].astype(np.int32)
     module.save(tmp_path / "testnodxdy", test_da)
     assert (tmp_path / f"testnodxdy.{ext}").exists()
 
