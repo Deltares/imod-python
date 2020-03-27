@@ -190,8 +190,8 @@ def cross_section(
     kwargs_pcolormesh : dict
         Other optional keyword arguments for matplotlib.pcolormesh.
     kwargs_colorbar : dict
-        ``whiten_triangles`` defaults to True, whitens respective colorbar triangle if 
-        data is not larger/smaller than legend_levels-range
+        Optional keyword argument ``whiten_triangles`` whitens respective colorbar triangle if 
+        data is not larger/smaller than legend_levels-range. Defaults to True.
         Other arguments are forwarded to fig.colorbar()
     kwargs_aquitards: dict
         These arguments are forwarded to matplotlib.fill_between to draw the
