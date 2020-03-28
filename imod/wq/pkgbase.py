@@ -203,7 +203,8 @@ class Package(xr.Dataset):
                 # Using "?" results in too many sinks and sources according to imod-wq.
                 if hasattr(self, "_ssm_layers"):
                     for layer in self._ssm_layers:
-                        values[layer] = da.values[()]
+                        d["layer"] = layer
+                        values[layer] = self._compose(d, pattern=pattern)
                 else:
                     pattern += "{extension}"
                     values["?"] = self._compose(d, pattern=pattern)
