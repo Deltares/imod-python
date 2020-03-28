@@ -35,18 +35,10 @@ def test_render(river):
     directory = pathlib.Path(".")
 
     compare = """
-    stage_p?_s1_l1 = stage_l1.idf
-    stage_p?_s1_l2 = stage_l2.idf
-    stage_p?_s1_l3 = stage_l3.idf
-    cond_p?_s1_l1 = conductance_l1.idf
-    cond_p?_s1_l2 = conductance_l2.idf
-    cond_p?_s1_l3 = conductance_l3.idf
-    rbot_p?_s1_l1 = bottom_elevation_l1.idf
-    rbot_p?_s1_l2 = bottom_elevation_l2.idf
-    rbot_p?_s1_l3 = bottom_elevation_l3.idf
-    rivssmdens_p?_s1_l1 = density_l1.idf
-    rivssmdens_p?_s1_l2 = density_l2.idf
-    rivssmdens_p?_s1_l3 = density_l3.idf"""
+    stage_p?_s1_l1:3 = stage_l:.idf
+    cond_p?_s1_l1:3 = conductance_l:.idf
+    rbot_p?_s1_l1:3 = bottom_elevation_l:.idf
+    rivssmdens_p?_s1_l1:3 = density_l:.idf"""
 
     assert riv._render(directory, globaltimes=["?"], system_index=1) == compare
 

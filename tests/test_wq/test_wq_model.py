@@ -313,11 +313,7 @@ def test_render_dis(basicmodel):
             botm_l3 = 0.0
             laycbd_l? = 0
             nper = 5
-            perlen_p1 = 1.0
-            perlen_p2 = 1.0
-            perlen_p3 = 1.0
-            perlen_p4 = 1.0
-            perlen_p5 = 1.0
+            perlen_p1:5 = 1.0
             nstp_p? = 1
             sstr_p? = tr
             tsmult_p? = 1.0"""
@@ -338,29 +334,18 @@ def test_render_groups__ghb_riv_wel(basicmodel):
             mghbsys = 1
             mxactb = 50
             ighbcb = 0
-            bhead_p?_s1_l1 = ghb/head_l1.idf
-            bhead_p?_s1_l2 = ghb/head_l2.idf
-            cond_p?_s1_l1 = ghb/conductance_l1.idf
-            cond_p?_s1_l2 = ghb/conductance_l2.idf
-            ghbssmdens_p?_s1_l1 = ghb/density_l1.idf
-            ghbssmdens_p?_s1_l2 = ghb/density_l2.idf
+            bhead_p?_s1_l1:2 = ghb/head_l:.idf
+            cond_p?_s1_l1:2 = ghb/conductance_l:.idf
+            ghbssmdens_p?_s1_l1:2 = ghb/density_l:.idf
         
         [riv]
             mrivsys = 1
             mxactr = 75
             irivcb = 0
-            stage_p?_s1_l1 = riv/stage_l1.idf
-            stage_p?_s1_l2 = riv/stage_l2.idf
-            stage_p?_s1_l3 = riv/stage_l3.idf
-            cond_p?_s1_l1 = riv/conductance_l1.idf
-            cond_p?_s1_l2 = riv/conductance_l2.idf
-            cond_p?_s1_l3 = riv/conductance_l3.idf
-            rbot_p?_s1_l1 = riv/bottom_elevation_l1.idf
-            rbot_p?_s1_l2 = riv/bottom_elevation_l2.idf
-            rbot_p?_s1_l3 = riv/bottom_elevation_l3.idf
-            rivssmdens_p?_s1_l1 = riv/density_l1.idf
-            rivssmdens_p?_s1_l2 = riv/density_l2.idf
-            rivssmdens_p?_s1_l3 = riv/density_l3.idf
+            stage_p?_s1_l1:3 = riv/stage_l:.idf
+            cond_p?_s1_l1:3 = riv/conductance_l:.idf
+            rbot_p?_s1_l1:3 = riv/bottom_elevation_l:.idf
+            rivssmdens_p?_s1_l1:3 = riv/density_l:.idf
         
         [wel]
             mwelsys = 1
@@ -374,11 +359,8 @@ def test_render_groups__ghb_riv_wel(basicmodel):
     )
 
     ssm_compare = """
-    cghb_t1_p?_l1 = 1.5
-    cghb_t1_p?_l2 = 1.5
-    criv_t1_p?_l1 = riv/concentration_l1.idf
-    criv_t1_p?_l2 = riv/concentration_l2.idf
-    criv_t1_p?_l3 = riv/concentration_l3.idf"""
+    cghb_t1_p?_l1:2 = 1.5
+    criv_t1_p?_l1:3 = riv/concentration_l:.idf"""
     content, ssm_content, n_sinkssources = m._render_groups(
         directory=directory, globaltimes=globaltimes
     )
@@ -422,18 +404,10 @@ def test_render_btn(basicmodel):
             mcomp = 1
             thkmin = 0.01
             cinact = 1e+30
-            sconc_t1_l1 = btn/starting_concentration_l1.idf
-            sconc_t1_l2 = btn/starting_concentration_l2.idf
-            sconc_t1_l3 = btn/starting_concentration_l3.idf
-            icbund_l1 = btn/icbund_l1.idf
-            icbund_l2 = btn/icbund_l2.idf
-            icbund_l3 = btn/icbund_l3.idf
-            dz_l1 = 10.0
-            dz_l2 = 10.0
-            dz_l3 = 10.0
-            prsity_l1 = btn/porosity_l1.idf
-            prsity_l2 = btn/porosity_l2.idf
-            prsity_l3 = btn/porosity_l3.idf
+            sconc_t1_l1:3 = btn/starting_concentration_l:.idf
+            icbund_l1:3 = btn/icbund_l:.idf
+            dz_l1:3 = 10.0
+            prsity_l1:3 = btn/porosity_l:.idf
             tsmult_p? = 1.0
             dt0_p? = 0.0
             mxstrn_p? = 50000"""
@@ -478,8 +452,7 @@ def test_render_ssm_rch_constant(basicmodel):
     assert m._render_ssm_rch(directory=directory, globaltimes=globaltimes) == compare
 
     compare = """
-    crch_t1_p?_l1 = 0.15
-    crch_t1_p?_l2 = 0.15"""
+    crch_t1_p?_l1:2 = 0.15"""
 
     # Setup ssm_layers
     m["bas6"]["ibound"][0, 0, 0] = 0.0

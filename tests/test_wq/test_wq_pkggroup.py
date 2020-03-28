@@ -46,20 +46,13 @@ def test_render(ghb_group):
             mghbsys = 3
             mxactb = 150
             ighbcb = 0
-            bhead_p?_s1_l1 = primary/head_l1.idf
-            bhead_p?_s1_l2 = primary/head_l2.idf
-            cond_p?_s1_l1 = primary/conductance_l1.idf
-            cond_p?_s1_l2 = primary/conductance_l2.idf
-            ghbssmdens_p?_s1_l1 = primary/density_l1.idf
-            ghbssmdens_p?_s1_l2 = primary/density_l2.idf
-            bhead_p?_s2_l1 = secondary/head_l1.idf
-            bhead_p?_s2_l2 = secondary/head_l2.idf
-            cond_p?_s2_l1 = secondary/conductance_l1.idf
-            cond_p?_s2_l2 = secondary/conductance_l2.idf
-            bhead_p?_s3_l1 = tertiary/head_l1.idf
-            bhead_p?_s3_l2 = tertiary/head_l2.idf
-            cond_p?_s3_l1 = tertiary/conductance_l1.idf
-            cond_p?_s3_l2 = tertiary/conductance_l2.idf"""
+            bhead_p?_s1_l1:2 = primary/head_l:.idf
+            cond_p?_s1_l1:2 = primary/conductance_l:.idf
+            ghbssmdens_p?_s1_l1:2 = primary/density_l:.idf
+            bhead_p?_s2_l1:2 = secondary/head_l:.idf
+            cond_p?_s2_l1:2 = secondary/conductance_l:.idf
+            bhead_p?_s3_l1:2 = tertiary/head_l:.idf
+            cond_p?_s3_l1:2 = tertiary/conductance_l:.idf"""
     )
     assert (
         group.render(directory, globaltimes=["?"], nlayer=nlayer, nrow=nrow, ncol=ncol)

@@ -32,26 +32,10 @@ def test_render_dis(discret):
 
     compare = """
     nper = 5
-    perlen_p1 = 1.0
-    perlen_p2 = 1.0
-    perlen_p3 = 1.0
-    perlen_p4 = 1.0
-    perlen_p5 = 1.0
-    nstp_p1 = 1
-    nstp_p2 = 1
-    nstp_p3 = 1
-    nstp_p4 = 1
-    nstp_p5 = 1
-    sstr_p1 = tr
-    sstr_p2 = tr
-    sstr_p3 = tr
-    sstr_p4 = tr
-    sstr_p5 = tr
-    tsmult_p1 = 1.0
-    tsmult_p2 = 1.0
-    tsmult_p3 = 1.0
-    tsmult_p4 = 1.0
-    tsmult_p5 = 1.0"""
+    perlen_p1:5 = 1.0
+    nstp_p1:5 = 1
+    sstr_p1:5 = tr
+    tsmult_p1:5 = 1.0"""
 
     assert dis._render(globaltimes) == compare
 

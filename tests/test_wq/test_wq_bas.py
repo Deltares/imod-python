@@ -41,13 +41,9 @@ def test_render(basicflow):
     compare = textwrap.dedent(
         """\
         [bas6]
-            ibound_l1 = ibound_l1.idf
-            ibound_l2 = ibound_l2.idf
-            ibound_l3 = ibound_l3.idf
+            ibound_l1:3 = ibound_l:.idf
             hnoflo = 1e+30
-            strt_l1 = starting_head_l1.idf
-            strt_l2 = starting_head_l2.idf
-            strt_l3 = starting_head_l3.idf"""
+            strt_l1:3 = starting_head_l:.idf"""
     )
     assert bas._render(directory) == compare
 
@@ -86,9 +82,7 @@ def test_render_dis__arraytopbot(basicflow):
             delc_r? = 1.0
             delr_c? = 1.0
             top = top.idf
-            botm_l1 = bottom_l1.idf
-            botm_l2 = bottom_l2.idf
-            botm_l3 = bottom_l3.idf
+            botm_l1:3 = bottom_l:.idf
             laycbd_l? = 0"""
     )
     assert bas._render_dis(directory) == compare
