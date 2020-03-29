@@ -115,6 +115,7 @@ class BasicFlow(Package):
 
     @staticmethod
     def _cellsizes(dx):
+        # TODO: replace by _compress_values?
         ncell = dx.size
         index_ends = np.argwhere(np.diff(dx) != 0.0) + 1
         index_ends = np.append(index_ends, ncell)
@@ -124,7 +125,7 @@ class BasicFlow(Package):
         for s, e in zip(index_starts, index_ends):
             value = abs(float(dx[s - 1]))
             if s == e:
-                d[str(s)] = value
+                d[f"{s}"] = value
             else:
                 d[f"{s}:{e}"] = value
         return d

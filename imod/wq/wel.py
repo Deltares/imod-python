@@ -129,6 +129,13 @@ class Well(BoundaryCondition):
             else:
                 values["?"] = self._compose(d)
 
+        if "layer" in self:
+            # Compose does not accept non-integers, so use 0, then replace
+            d["layer"] = 0
+            range_path = imod.util.compose(d).as_posix()
+            range_path = range_path.replace("_l0", "_l:")
+            values = self._compress_idflayers(values, range_path)
+
         return values
 
     def _compose_values_time(self, directory, name, globaltimes):

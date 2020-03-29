@@ -29,12 +29,8 @@ def test_render(constanthead):
     directory = pathlib.Path(".")
 
     compare = """
-    shead_p?_s1_l1 = head_start_l1.idf
-    shead_p?_s1_l2 = head_start_l2.idf
-    shead_p?_s1_l3 = head_start_l3.idf
-    ehead_p?_s1_l1 = head_end_l1.idf
-    ehead_p?_s1_l2 = head_end_l2.idf
-    ehead_p?_s1_l3 = head_end_l3.idf"""
+    shead_p?_s1_l1:3 = head_start_l:.idf
+    ehead_p?_s1_l1:3 = head_end_l:.idf"""
 
     assert chd._render(directory, globaltimes=["?"], system_index=1) == compare
 

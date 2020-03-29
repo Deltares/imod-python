@@ -1,4 +1,20 @@
-from imod.wq import AdvectionTVD, AdvectionModifiedMOC
+from imod.wq import AdvectionFiniteDifference, AdvectionTVD, AdvectionModifiedMOC
+
+
+def test_render__DF():
+    adv = AdvectionFiniteDifference(courant=1.0, weighting="upstream")
+    out = adv._render()
+    compare = "[adv]\n" "    mixelm = 0\n" "    percel = 1.0\n" "    nadvfd = 0\n"
+    print(out)
+    print(compare)
+    assert out == compare
+
+    adv = AdvectionFiniteDifference(courant=0.5, weighting="central")
+    out = adv._render()
+    compare = "[adv]\n" "    mixelm = 0\n" "    percel = 0.5\n" "    nadvfd = 1\n"
+    print(out)
+    print(compare)
+    assert out == compare
 
 
 def test_render__TVD():

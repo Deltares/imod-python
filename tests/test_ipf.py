@@ -373,3 +373,35 @@ def test_error_fileinfo(tmp_path):
         match=r'".*bad1\.txt" of IPF file ".*good.ipf"',
     ):
         ipf.read(path)
+
+
+def test_save__assoc_itype1__layers__integerID(tmp_path):
+    times = [pd.to_datetime(s) for s in ["2018-01-01", "2018-02-01"]]
+    df = pd.DataFrame.from_dict(
+        {
+            "x": [1, 1, 2, 2, 3, 3, 4, 4],
+            "y": [3, 3, 4, 4, 5, 5, 6, 6],
+            "id": [1, 1, 2, 2, 3, 3, 4, 4],
+            "level": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8],
+            "time": times * 4,
+            "location": [
+                "loc1",
+                "loc1",
+                "loc2",
+                "loc2",
+                "loc3",
+                "loc3",
+                "loc4",
+                "loc4",
+            ],
+            "layer": [1, 1, 1, 1, 3, 3, 3, 3],
+        }
+    )
+
+    ipf.save(tmp_path / "save.ipf", df, itype=1, nodata=-999.0)
+    assert (tmp_path / "save_l1.ipf").exists()
+    assert (tmp_path / "save_l3.ipf").exists()
+    assert (tmp_path / "1.txt").exists()
+    assert (tmp_path / "2.txt").exists()
+    assert (tmp_path / "3.txt").exists()
+    assert (tmp_path / "4.txt").exists()

@@ -6,6 +6,42 @@ import numpy as np
 import imod
 
 
+def _cmapnorm_from_colorslevels(colors, levels):
+    """
+    Create ListedColormap and BoundaryNorm from colors and levels list
+
+    Parameters
+    ----------
+
+    colors : list of str, or list of RGB tuples
+        Matplotlib acceptable list of colors. Length N.
+        Accepts both tuples of (R, G, B) and hexidecimal (e.g. "#7ec0ee").
+
+        Looking for good colormaps? Try: http://colorbrewer2.org/
+        Choose a colormap, and use the HEX JS array.
+    levels : listlike of floats or integers
+        Boundaries between the legend colors/classes. Length: N - 1.
+
+    Returns
+    -------
+    cmap : matplotlib.colors.ListedColormap
+    norm : matplotlib.colors.BoundaryNorm
+    """
+    ncolors = len(colors)
+    nlevels = len(levels)
+    if not nlevels == ncolors - 1:
+        raise ValueError(
+            f"Incorrect number of levels. Number of colors is {ncolors},"
+            f" expected {ncolors - 1}, got {nlevels} instead."
+        )
+
+    cmap = matplotlib.colors.ListedColormap(colors[1:-1])
+    cmap.set_under(colors[0])  # this is the color for values smaller than raster.min()
+    cmap.set_over(colors[-1])  # this is the color for values larger than raster.max()
+    norm = matplotlib.colors.BoundaryNorm(levels, cmap.N)
+    return cmap, norm
+
+
 def _meshcoords(da, continuous=True):
     """
     Generate coordinates for pcolormesh, or fill_between
@@ -154,7 +190,9 @@ def cross_section(
     kwargs_pcolormesh : dict
         Other optional keyword arguments for matplotlib.pcolormesh.
     kwargs_colorbar : dict
-        These arguments are forwarded to fig.colorbar()
+        Optional keyword argument ``whiten_triangles`` whitens respective colorbar triangle if 
+        data is not larger/smaller than legend_levels-range. Defaults to True.
+        Other arguments are forwarded to fig.colorbar()
     kwargs_aquitards: dict
         These arguments are forwarded to matplotlib.fill_between to draw the
         aquitards.
@@ -208,18 +246,8 @@ def cross_section(
     if len(da["bottom"].dims) > 2:
         raise ValueError('"bottom" coordinate be 1D or 2D')
 
-    ncolors = len(colors)
-    nlevels = len(levels)
-    if not nlevels == ncolors - 1:
-        raise ValueError(
-            f"Incorrect number of levels. Number of colors is {ncolors},"
-            f" expected {ncolors - 1}, got {nlevels} instead."
-        )
     # Read legend settings
-    cmap = matplotlib.colors.ListedColormap(colors[1:-1])
-    cmap.set_under(colors[0])  # this is the color for values smaller than raster.min()
-    cmap.set_over(colors[-1])  # this is the color for values larger than raster.max()
-    norm = matplotlib.colors.BoundaryNorm(levels, cmap.N)
+    cmap, norm = _cmapnorm_from_colorslevels(colors, levels)
 
     # cbar kwargs
     settings_cbar = {"ticks": levels, "extend": "both"}
@@ -233,7 +261,9 @@ def cross_section(
         except (KeyError, AttributeError):
             pass
 
+    whiten_triangles = True
     if kwargs_colorbar is not None:
+        whiten_triangles = kwargs_colorbar.pop("whiten_triangles", True)
         settings_cbar.update(kwargs_colorbar)
 
     # pcmesh kwargs
@@ -257,10 +287,11 @@ def cross_section(
             ax.step(x=X[0], y=y)
 
     # Make triangles white if data is not larger/smaller than legend_levels-range
-    if float(da.max().compute()) < levels[-1]:
-        ax1.cmap.set_over("#FFFFFF")
-    if float(da.min().compute()) > levels[0]:
-        ax1.cmap.set_under("#FFFFFF")
+    if whiten_triangles:
+        if float(da.max().compute()) < levels[-1]:
+            ax1.cmap.set_over("#FFFFFF")
+        if float(da.min().compute()) > levels[0]:
+            ax1.cmap.set_under("#FFFFFF")
 
     # Add colorbar
     divider = make_axes_locatable(ax)

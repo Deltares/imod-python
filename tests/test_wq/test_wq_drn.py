@@ -29,12 +29,8 @@ def test_render(drainage):
     directory = pathlib.Path(".")
 
     compare = """
-    elevation_p?_s1_l1 = elevation_l1.idf
-    elevation_p?_s1_l2 = elevation_l2.idf
-    elevation_p?_s1_l3 = elevation_l3.idf
-    cond_p?_s1_l1 = conductance_l1.idf
-    cond_p?_s1_l2 = conductance_l2.idf
-    cond_p?_s1_l3 = conductance_l3.idf"""
+    elevation_p?_s1_l1:3 = elevation_l:.idf
+    cond_p?_s1_l1:3 = conductance_l:.idf"""
 
     assert drn._render(directory, globaltimes=["?"], system_index=1) == compare
 
@@ -51,15 +47,9 @@ def test_render_with_time(drainage):
     drn["elevation"] = elev_transient
 
     compare = """
-    elevation_p1_s1_l1 = elevation_20000101000000_l1.idf
-    elevation_p1_s1_l2 = elevation_20000101000000_l2.idf
-    elevation_p1_s1_l3 = elevation_20000101000000_l3.idf
-    elevation_p2_s1_l1 = elevation_20000102000000_l1.idf
-    elevation_p2_s1_l2 = elevation_20000102000000_l2.idf
-    elevation_p2_s1_l3 = elevation_20000102000000_l3.idf
-    cond_p?_s1_l1 = conductance_l1.idf
-    cond_p?_s1_l2 = conductance_l2.idf
-    cond_p?_s1_l3 = conductance_l3.idf"""
+    elevation_p1_s1_l1:3 = elevation_20000101000000_l:.idf
+    elevation_p2_s1_l1:3 = elevation_20000102000000_l:.idf
+    cond_p?_s1_l1:3 = conductance_l:.idf"""
 
     assert drn._render(directory, globaltimes=datetimes, system_index=1) == compare
 
@@ -78,18 +68,10 @@ def test_render_with_timemap__elevation(drainage):
     drn.add_timemap(elevation=timemap)
 
     compare = """
-    elevation_p1_s1_l1 = elevation_20000101000000_l1.idf
-    elevation_p1_s1_l2 = elevation_20000101000000_l2.idf
-    elevation_p1_s1_l3 = elevation_20000101000000_l3.idf
-    elevation_p2_s1_l1 = elevation_20000102000000_l1.idf
-    elevation_p2_s1_l2 = elevation_20000102000000_l2.idf
-    elevation_p2_s1_l3 = elevation_20000102000000_l3.idf
-    elevation_p3_s1_l1 = elevation_20000101000000_l1.idf
-    elevation_p3_s1_l2 = elevation_20000101000000_l2.idf
-    elevation_p3_s1_l3 = elevation_20000101000000_l3.idf
-    cond_p?_s1_l1 = conductance_l1.idf
-    cond_p?_s1_l2 = conductance_l2.idf
-    cond_p?_s1_l3 = conductance_l3.idf"""
+    elevation_p1_s1_l1:3 = elevation_20000101000000_l:.idf
+    elevation_p2_s1_l1:3 = elevation_20000102000000_l:.idf
+    elevation_p3_s1_l1:3 = elevation_20000101000000_l:.idf
+    cond_p?_s1_l1:3 = conductance_l:.idf"""
 
     actual = drn._render(directory, globaltimes=datetimes, system_index=1)
     assert actual == compare

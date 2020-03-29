@@ -35,18 +35,10 @@ def test_render_idf(dispersion):
     compare = textwrap.dedent(
         """\
         [dsp]
-            al_l1 = longitudinal_l1.idf
-            al_l2 = longitudinal_l2.idf
-            al_l3 = longitudinal_l3.idf
-            trpt_l1 = ratio_horizontal_l1.idf
-            trpt_l2 = ratio_horizontal_l2.idf
-            trpt_l3 = ratio_horizontal_l3.idf
-            trpv_l1 = ratio_vertical_l1.idf
-            trpv_l2 = ratio_vertical_l2.idf
-            trpv_l3 = ratio_vertical_l3.idf
-            dmcoef_l1 = diffusion_coefficient_l1.idf
-            dmcoef_l2 = diffusion_coefficient_l2.idf
-            dmcoef_l3 = diffusion_coefficient_l3.idf"""
+            al_l1:3 = longitudinal_l:.idf
+            trpt_l1:3 = ratio_horizontal_l:.idf
+            trpv_l1:3 = ratio_vertical_l:.idf
+            dmcoef_l1:3 = diffusion_coefficient_l:.idf"""
     )
 
     assert dsp._render(directory) == compare
@@ -77,18 +69,10 @@ def test_render_constant_per_layer(dispersion):
     compare = textwrap.dedent(
         """\
         [dsp]
-            al_l1 = 1.0
-            al_l2 = 1.0
-            al_l3 = 1.0
-            trpt_l1 = 1.0
-            trpt_l2 = 1.0
-            trpt_l3 = 1.0
-            trpv_l1 = 1.0
-            trpv_l2 = 1.0
-            trpv_l3 = 1.0
-            dmcoef_l1 = 1.0
-            dmcoef_l2 = 1.0
-            dmcoef_l3 = 1.0"""
+            al_l1:3 = 1.0
+            trpt_l1:3 = 1.0
+            trpv_l1:3 = 1.0
+            dmcoef_l1:3 = 1.0"""
     )
 
     assert dsp._render(directory) == compare

@@ -148,6 +148,35 @@ class Package(xr.Dataset):
         # pattern : string or re.pattern
         return util.compose(d, pattern).as_posix()
 
+    def _compress_idflayers(self, values, range_path):
+        """
+        Compresses explicit layers into ranges
+
+        Saves on number of lines, makes the runfile smaller, and imod-wq faster.
+        """
+        layers = np.array(list(values.keys()))
+        if len(layers) == 1:
+            return values
+
+        breaks = np.argwhere(np.diff(layers) != 1)
+        if breaks.size == 0:
+            start = layers[0]
+            end = layers[-1]
+            return {f"{start}:{end}": range_path}
+        starts = [0] + list(*breaks + 1)
+        ends = list(*breaks) + [len(layers) - 1]
+
+        compressed = {}
+        for start_index, end_index in zip(starts, ends):
+            start = layers[start_index]
+            end = layers[end_index]
+            if start == end:
+                compressed[f"{start}"] = values[start]
+            else:
+                compressed[f"{start}:{end}"] = range_path
+
+        return compressed
+
     def _compose_values_layer(self, varname, directory, time=None, da=None):
         """
         Composes paths to files, or gets the appropriate scalar value for
@@ -203,7 +232,8 @@ class Package(xr.Dataset):
                 # Using "?" results in too many sinks and sources according to imod-wq.
                 if hasattr(self, "_ssm_layers"):
                     for layer in self._ssm_layers:
-                        values[layer] = da.values[()]
+                        d["layer"] = layer
+                        values[layer] = self._compose(d, pattern=pattern)
                 else:
                     pattern += "{extension}"
                     values["?"] = self._compose(d, pattern=pattern)
@@ -213,6 +243,7 @@ class Package(xr.Dataset):
                 if hasattr(self, "_ssm_layers"):
                     for layer in self._ssm_layers:
                         values[layer] = da.values[()]
+                    values = self._compress_values(values)
                 else:
                     values["?"] = da.values[()]
 
@@ -228,7 +259,49 @@ class Package(xr.Dataset):
                     else:
                         values[layer] = da.values[()]
 
+        # Compress the runfile contents using the imod-wq macros
+        if "layer" in da.dims:
+            if idf:
+                # Compose does not accept non-integers, so use 0, then replace
+                d["layer"] = 0
+                range_path = util.compose(d, pattern=pattern).as_posix()
+                range_path = range_path.replace("_l0", "_l:")
+                values = self._compress_idflayers(values, range_path)
+            else:
+                values = self._compress_values(values)
+
         return values
+
+    def _compress_values(self, values):
+        """
+        Compress repeated values into fewer lines, aimed at imod-wq macros.
+        """
+        keys = list(values.keys())
+        values = np.array(list(values.values()))
+        n = len(values)
+        # Try fast method first
+        try:
+            index_ends = np.argwhere(np.diff(values) != 0)
+        except np.core._exceptions.UFuncTypeError:
+            # Now try a fully general method
+            index_ends = []
+            for i in range(n - 1):
+                if values[i] != values[i + 1]:
+                    index_ends.append(i)
+            index_ends = np.array(index_ends)
+
+        index_ends = np.append(index_ends, n - 1)
+        index_starts = np.insert(index_ends[:-1] + 1, 0, 0)
+        compressed = {}
+        for start_index, end_index in zip(index_starts, index_ends):
+            s = keys[start_index]
+            e = keys[end_index]
+            value = values[start_index]
+            if s == e:
+                compressed[f"{s}"] = value
+            else:
+                compressed[f"{s}:{e}"] = value
+        return compressed
 
     def _compose_values_time(self, varname, globaltimes):
         da = self[varname]
@@ -245,6 +318,7 @@ class Package(xr.Dataset):
         else:
             values["?"] = da.values[()]
 
+        values = self._compress_values(values)
         return values
 
     def save(self, directory):

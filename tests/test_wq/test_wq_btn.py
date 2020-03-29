@@ -43,18 +43,10 @@ def test_btn_render_arrays(basictransport):
                 mcomp = 1
                 thkmin = 0.01
                 cinact = 1e+30
-                sconc_t1_l1 = starting_concentration_l1.idf
-                sconc_t1_l2 = starting_concentration_l2.idf
-                sconc_t1_l3 = starting_concentration_l3.idf
-                icbund_l1 = icbund_l1.idf
-                icbund_l2 = icbund_l2.idf
-                icbund_l3 = icbund_l3.idf
-                dz_l1 = thickness_l1.idf
-                dz_l2 = thickness_l2.idf
-                dz_l3 = thickness_l3.idf
-                prsity_l1 = 0.3
-                prsity_l2 = 0.3
-                prsity_l3 = 0.3"""
+                sconc_t1_l1:3 = starting_concentration_l:.idf
+                icbund_l1:3 = icbund_l:.idf
+                dz_l1:3 = thickness_l:.idf
+                prsity_l1:3 = 0.3"""
     )
 
     shape = btn["icbund"].shape
@@ -79,12 +71,8 @@ def test_btn_render_constants(basictransport):
                 thkmin = 0.01
                 cinact = 1e+30
                 sconc_t1_l? = 0.0
-                icbund_l1 = icbund_l1.idf
-                icbund_l2 = icbund_l2.idf
-                icbund_l3 = icbund_l3.idf
-                dz_l1 = 10.0
-                dz_l2 = 10.0
-                dz_l3 = 10.0
+                icbund_l1:3 = icbund_l:.idf
+                dz_l1:3 = 10.0
                 prsity_l? = 0.3"""
     )
 

@@ -33,15 +33,9 @@ def test_render(headboundary):
     directory = pathlib.Path(".")
 
     compare = """
-    bhead_p?_s1_l1 = head_l1.idf
-    bhead_p?_s1_l2 = head_l2.idf
-    bhead_p?_s1_l3 = head_l3.idf
-    cond_p?_s1_l1 = conductance_l1.idf
-    cond_p?_s1_l2 = conductance_l2.idf
-    cond_p?_s1_l3 = conductance_l3.idf
-    ghbssmdens_p?_s1_l1 = density_l1.idf
-    ghbssmdens_p?_s1_l2 = density_l2.idf
-    ghbssmdens_p?_s1_l3 = density_l3.idf"""
+    bhead_p?_s1_l1:3 = head_l:.idf
+    cond_p?_s1_l1:3 = conductance_l:.idf
+    ghbssmdens_p?_s1_l1:3 = density_l:.idf"""
 
     assert ghb._render(directory, globaltimes=["?"], system_index=1) == compare
 

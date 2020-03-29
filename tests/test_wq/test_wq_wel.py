@@ -59,11 +59,7 @@ def test_render__notime_layer(well):
     wel = Well(**d)
     directory = pathlib.Path("well")
     compare = """
-    wel_p?_s1_l1 = well/well_l1.ipf
-    wel_p?_s1_l2 = well/well_l2.ipf
-    wel_p?_s1_l3 = well/well_l3.ipf
-    wel_p?_s1_l4 = well/well_l4.ipf
-    wel_p?_s1_l5 = well/well_l5.ipf"""
+    wel_p?_s1_l1:5 = well/well_l:.ipf"""
 
     actual = wel._render(directory, globaltimes=["?"], system_index=1)
     assert actual == compare
@@ -142,11 +138,9 @@ def test_timemap__multiple_layers():
 
     directory = pathlib.Path("well")
     compare = """
-    wel_p1_s1_l1 = well/well_20000101000000_l1.ipf
-    wel_p1_s1_l2 = well/well_20000101000000_l2.ipf
+    wel_p1_s1_l1:2 = well/well_20000101000000_l:.ipf
     wel_p2_s1_l1 = well/well_20000102000000_l1.ipf
-    wel_p3_s1_l1 = well/well_20000101000000_l1.ipf
-    wel_p3_s1_l2 = well/well_20000101000000_l2.ipf
+    wel_p3_s1_l1:2 = well/well_20000101000000_l:.ipf
     wel_p4_s1_l1 = well/well_20000102000000_l1.ipf"""
 
     actual = wel._render(directory, globaltimes=datetimes, system_index=1)
