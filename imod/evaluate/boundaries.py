@@ -4,46 +4,81 @@ import xarray as xr
 
 
 @numba.njit
-def _interpolate_value_boundaries_z1d(values, z, dz_top, threshold, out):
+def _interpolate_value_boundaries_z1d(values, z, dz, threshold, out):
     nlay, nrow, ncol = values.shape
     for i in range(nrow):
         for j in range(ncol):
             n = 0
             if values[0, i, j] >= threshold:  # top cell exceeds threshold
-                out[n, i, j] = z[0] + 0.5 * dz_top
+                out[n, i, j] = z[0] + 0.5 * dz[0]
                 n += 1
             for k in range(1, nlay):
                 # from top downward
                 if (n % 2 == 0 and values[k, i, j] >= threshold) or (
                     n % 2 == 1 and values[k, i, j] <= threshold
                 ):  # exceeding (n even) or falling below threshold (n odd)
-                    # interpolate z coord of threshold
-                    out[n, i, j] = z[k - 1] + (threshold - values[k - 1, i, j]) * (
-                        z[k] - z[k - 1]
-                    ) / (values[k, i, j] - values[k - 1, i, j])
+                    if not np.isnan(values[k - 1, i, j]):
+                        # interpolate z coord of threshold
+                        out[n, i, j] = z[k - 1] + (threshold - values[k - 1, i, j]) * (
+                            z[k] - z[k - 1]
+                        ) / (values[k, i, j] - values[k - 1, i, j])
+                    else:
+                        # set to top of layer
+                        out[n, i, j] = z[k] + 0.5 * dz[k]
                     n += 1
 
 
 @numba.njit
-def _interpolate_value_boundaries_z3d(values, z, dz_top, threshold, out):
+def _interpolate_value_boundaries_z3d(values, z, dz, threshold, out):
     nlay, nrow, ncol = values.shape
     for i in range(nrow):
         for j in range(ncol):
             n = 0
             if values[0, i, j] >= threshold:  # top cell exceeds threshold
-                out[n, i, j] = z[0, i, j] + 0.5 * dz_top[i, j]
+                out[n, i, j] = z[0, i, j] + 0.5 * dz[0, i, j]
                 n += 1
             for k in range(1, nlay):
                 # from top downward
                 if (n % 2 == 0 and values[k, i, j] >= threshold) or (
                     n % 2 == 1 and values[k, i, j] <= threshold
                 ):  # exceeding (n even) or falling below threshold (n odd)
-                    # interpolate z coord of threshold
-                    out[n, i, j] = z[k - 1, i, j] + (
-                        threshold - values[k - 1, i, j]
-                    ) * (z[k, i, j] - z[k - 1, i, j]) / (
-                        values[k, i, j] - values[k - 1, i, j]
-                    )
+                    if not np.isnan(values[k - 1, i, j]):
+                        # interpolate z coord of threshold
+                        out[n, i, j] = z[k - 1, i, j] + (
+                            threshold - values[k - 1, i, j]
+                        ) * (z[k, i, j] - z[k - 1, i, j]) / (
+                            values[k, i, j] - values[k - 1, i, j]
+                        )
+                    else:
+                        # set to top of layer
+                        out[n, i, j] = z[k, i, j] + 0.5 * dz[k, i, j]
+                    n += 1
+
+
+@numba.njit
+def _interpolate_value_boundaries_z3ddz1d(values, z, dz, threshold, out):
+    nlay, nrow, ncol = values.shape
+    for i in range(nrow):
+        for j in range(ncol):
+            n = 0
+            if values[0, i, j] >= threshold:  # top cell exceeds threshold
+                out[n, i, j] = z[0, i, j] + 0.5 * dz[0]
+                n += 1
+            for k in range(1, nlay):
+                # from top downward
+                if (n % 2 == 0 and values[k, i, j] >= threshold) or (
+                    n % 2 == 1 and values[k, i, j] <= threshold
+                ):  # exceeding (n even) or falling below threshold (n odd)
+                    if not np.isnan(values[k - 1, i, j]):
+                        # interpolate z coord of threshold
+                        out[n, i, j] = z[k - 1, i, j] + (
+                            threshold - values[k - 1, i, j]
+                        ) * (z[k, i, j] - z[k - 1, i, j]) / (
+                            values[k, i, j] - values[k - 1, i, j]
+                        )
+                    else:
+                        # set to top of layer
+                        out[n, i, j] = z[k, i, j] + 0.5 * dz[k]
                     n += 1
 
 
@@ -78,17 +113,17 @@ def interpolate_value_boundaries(values, z, threshold):
     out = xr.full_like(values, np.nan)
     if len(z.dims) == 1:
         _interpolate_value_boundaries_z1d(
-            values.values, z.values, z.dz.values[0], threshold, out.values
+            values.values, z.values, z.dz.values, threshold, out.values
         )
     else:
         if len(z.dz.dims) == 1:
-            # broadcast to 2d
-            dz_top = xr.ones_like(z.isel(layer=0)) * z.dz.isel(layer=0)
+            _interpolate_value_boundaries_z3ddz1d(
+                values.values, z.values, z.dz.values, threshold, out.values
+            )
         else:
-            dz_top = z.dz.isel(layer=0)
-        _interpolate_value_boundaries_z3d(
-            values.values, z.values, dz_top.values, threshold, out.values
-        )
+            _interpolate_value_boundaries_z3d(
+                values.values, z.values, z.dz.values, threshold, out.values
+            )
     out = out.rename({"layer": "boundary"})
     out = out.dropna(dim="boundary", how="all")
 

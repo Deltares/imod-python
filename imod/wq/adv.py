@@ -30,9 +30,7 @@ class AdvectionFiniteDifference(Package):
     __slots__ = ("courant", "weighting")
     _pkg_id = "adv"
 
-    _keywords = {
-        "weighting": {"upstream": 0, "central": 1},
-    }
+    _keywords = {"weighting": {"upstream": 0, "central": 1}}
 
     _template = (
         "[adv]\n"

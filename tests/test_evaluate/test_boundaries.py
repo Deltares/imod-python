@@ -79,7 +79,7 @@ def test_interpolate_value_boundaries2():
 
 def test_interpolate_value_boundaries_nan():
     # nan values in data
-    data = np.array([[[0.5], [np.nan]], [[np.nan], [0.5]], [[0.8], [3.0]]])
+    data = np.array([[[0.5], [np.nan]], [[np.nan], [0.5]], [[1.2], [3.0]]])
     z = np.array([[[0.5], [0.5]], [[-1.0], [-1.0]], [[-5.0], [-5.0]]])
     dz = np.array([[[1.0], [1.0]], [[2.0], [2.0]], [[6.0], [6.0]]])
     coords = {"layer": [1, 2, 3], "y": [0.5, 1.5], "x": [0.5]}
@@ -88,7 +88,7 @@ def test_interpolate_value_boundaries_nan():
     z = xr.DataArray(z, coords, dims)
     z = z.assign_coords({"dz": (("layer", "y", "x"), dz)})
 
-    exc_ref = np.array([[[np.nan], [-1.8]]])
+    exc_ref = np.array([[[-2.0], [-1.8]]])
     fallb_ref = np.empty((0, 2, 1))
     coords2 = {"boundary": [0], "y": [0.5, 1.5], "x": [0.5]}
     dims2 = ("boundary", "y", "x")
