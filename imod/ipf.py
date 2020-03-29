@@ -549,7 +549,7 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20):
         agg_kwargs.update(ipf_columns)
         agg_df = grouped.agg(agg_kwargs)
         # Quote so spaces don't mess up paths
-        agg_df["id"] = '"' + agg_df["id"] + '"'
+        agg_df["id"] = '"' + agg_df["id"].astype(str) + '"'
         write(path, agg_df, 3, assoc_ext, nodata=nodata)
 
 
