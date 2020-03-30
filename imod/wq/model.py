@@ -319,7 +319,7 @@ class SeawatModel(Model):
         pkgkey = self._get_pkgkey(key)
         if pkgkey is None:
             # Maybe do enum look for full package name?
-            if key == "rch":  # since recharge is optional
+            if (key == "rch") or (key == "evt"):  # since recharge is optional
                 return ""
             else:
                 raise ValueError(f"No {key} package provided.")
@@ -418,6 +418,17 @@ class SeawatModel(Model):
             n_rch = nlay * nrow * ncol
             print(n_rch)
             n_extra += n_rch
+
+        evtkey = self._get_pkgkey("evt")
+        if evtkey is not None:
+            _, nrow, ncol = ibound.shape
+            evt = self[evtkey]
+            evt._set_ssm_layers(ibound)
+            nlay = evt._ssm_layers.size
+            n_evt = nlay * nrow * ncol
+            print(n_evt)
+            n_extra += n_evt
+
         return n_extra
 
     def render(self, directory, result_dir, writehelp):
@@ -438,7 +449,7 @@ class SeawatModel(Model):
         )
         content.append(self._render_dis(directory=directory, globaltimes=globaltimes))
         # Modflow
-        for key in ("bas6", "oc", "lpf", "rch"):
+        for key in ("bas6", "oc", "lpf", "rch", "evt"):
             content.append(
                 self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
             )

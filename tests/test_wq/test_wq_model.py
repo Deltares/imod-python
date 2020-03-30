@@ -50,6 +50,13 @@ def basicmodel():
         dims=("time", "y", "x"),
     )
 
+    # EVT
+    maximum_rate = xr.DataArray(
+        np.full((5, 5, 5), 1.0),
+        coords={"time": datetimes, "y": y, "x": x, "dx": 1.0, "dy": -1.0},
+        dims=("time", "y", "x"),
+    )
+
     # WEL
     welly = np.arange(4.5, 0.0, -1.0)
     wellx = np.arange(0.5, 5.0, 1.0)
@@ -94,6 +101,12 @@ def basicmodel():
     m["wel"] = imod.wq.Well(id_name="well", x=wellx, y=welly, rate=5.0, time=datetimes)
     m["rch"] = imod.wq.RechargeHighestActive(
         rate=rate, concentration=rate.copy(), save_budget=False
+    )
+    m["evt"] = evt = imod.wq.EvapotranspirationTopLayer(
+        maximum_rate=maximum_rate,
+        surface=maximum_rate.copy(),
+        extinction_depth=maximum_rate.copy(),
+        save_budget=False,
     )
     m["pcg"] = imod.wq.PreconditionedConjugateGradientSolver(
         max_iter=150, inner_iter=30, hclose=0.0001, rclose=1000.0, relax=0.98, damp=1.0
@@ -233,7 +246,7 @@ def test_render_gen(basicmodel):
             modelname = test_model
             writehelp = False
             result_dir = results
-            packages = adv, bas6, btn, dis, dsp, gcg, ghb, lpf, oc, pcg, rch, riv, ssm, vdf, wel
+            packages = adv, bas6, btn, dis, dsp, evt, gcg, ghb, lpf, oc, pcg, rch, riv, ssm, vdf, wel
             coord_xll = 0.0
             coord_yll = 0.0
             start_year = 2000
@@ -272,6 +285,37 @@ def test_render_pkg__gcg(basicmodel):
 
 
 def test_render_pkg__rch(basicmodel):
+    m = basicmodel
+    m.time_discretization("2000-01-06")
+    diskey = m._get_pkgkey("dis")
+    globaltimes = m[diskey]["time"].values
+    directory = pathlib.Path(".")
+
+    compare = textwrap.dedent(
+        """\
+        [evt]
+            nevtop = 1
+            ievtcb = 0
+            evtr_p1 = evt/maximum_rate_20000101000000.idf
+            evtr_p2 = evt/maximum_rate_20000102000000.idf
+            evtr_p3 = evt/maximum_rate_20000103000000.idf
+            evtr_p4 = evt/maximum_rate_20000104000000.idf
+            evtr_p5 = evt/maximum_rate_20000105000000.idf
+            surf_p1 = evt/surface_20000101000000.idf
+            surf_p2 = evt/surface_20000102000000.idf
+            surf_p3 = evt/surface_20000103000000.idf
+            surf_p4 = evt/surface_20000104000000.idf
+            surf_p5 = evt/surface_20000105000000.idf
+            exdp_p1 = evt/extinction_depth_20000101000000.idf
+            exdp_p2 = evt/extinction_depth_20000102000000.idf
+            exdp_p3 = evt/extinction_depth_20000103000000.idf
+            exdp_p4 = evt/extinction_depth_20000104000000.idf
+            exdp_p5 = evt/extinction_depth_20000105000000.idf"""
+    )
+    assert m._render_pkg("evt", directory=directory, globaltimes=globaltimes) == compare
+
+
+def test_render_pkg__evt(basicmodel):
     m = basicmodel
     m.time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
@@ -521,28 +565,28 @@ def test_mxsscount_incongruent_icbund(basicmodel):
     m["btn"]["icbund"][...] = 0.0
 
     n_sinkssources = m._bas_btn_rch_sinkssources()
-    # 50 from ibound, 25 from recharge
-    assert n_sinkssources == 75
+    # 50 from ibound, 25 from recharge + 25 from evapotranspiration
+    assert n_sinkssources == 75 + 25
 
 
 def test_highest_active_recharge(basicmodel):
     m = basicmodel
     n_sinkssources = m._bas_btn_rch_sinkssources()
     assert np.array_equal(m["rch"]._ssm_layers, np.array([1]))
-    assert n_sinkssources == 25
+    assert n_sinkssources == 25 + 25
 
     m["bas6"]["ibound"][0, 0, 0] = 0.0
     m["btn"]["icbund"][...] = 0.0
     n_sinkssources = m._bas_btn_rch_sinkssources()
     print(m["bas6"]["ibound"])
     assert np.array_equal(m["rch"]._ssm_layers, np.array([1, 2]))
-    assert n_sinkssources == 50
+    assert n_sinkssources == 50 + 25
 
     m["bas6"]["ibound"][...] = -1.0
     m["btn"]["icbund"][...] = 0.0
     n_sinkssources = m._bas_btn_rch_sinkssources()
     assert np.array_equal(m["rch"]._ssm_layers, np.array([]))
-    assert n_sinkssources == 75
+    assert n_sinkssources == 75 + 25
 
 
 def test_write(basicmodel, tmp_path):
