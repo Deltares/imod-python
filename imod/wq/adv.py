@@ -30,9 +30,7 @@ class AdvectionFiniteDifference(Package):
     __slots__ = ("courant", "weighting")
     _pkg_id = "adv"
 
-    _keywords = {
-        "weighting": {"upstream": 0, "central": 1},
-    }
+    _keywords = {"weighting": {"upstream": 0, "central": 1}}
 
     _template = (
         "[adv]\n"
@@ -159,9 +157,7 @@ class AdvectionMOC(Package):
         "cell_max_nparticles",
     )
     _pkg_id = "adv"
-    _keywords = {
-        "tracking": {"euler": 1, "runge-kutta": 2, "hybrid": 3},
-    }
+    _keywords = {"tracking": {"euler": 1, "runge-kutta": 2, "hybrid": 3}}
 
     _template = textwrap.dedent(
         """
