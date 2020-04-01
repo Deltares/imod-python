@@ -156,10 +156,11 @@ class Well(BoundaryCondition):
                 runfile_times = package_times = self_times
 
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
-            # Check whether any range occurs in the input. If does does, compress should be False
-            compress = not any(":" in e for e in starts_ends)
 
             for time, start_end in zip(runfile_times, starts_ends):
+                # Check whether any range occurs in the input.
+                # If does does, compress should be False
+                compress = not (":" in start_end)
                 values[start_end] = self._compose_values_layer(
                     directory, name, time, compress=compress
                 )
