@@ -177,7 +177,9 @@ class Package(xr.Dataset):
 
         return compressed
 
-    def _compose_values_layer(self, varname, directory, time=None, da=None):
+    def _compose_values_layer(
+        self, varname, directory, time=None, da=None, compress=True
+    ):
         """
         Composes paths to files, or gets the appropriate scalar value for
         a single variable in a dataset.
@@ -194,6 +196,9 @@ class Package(xr.Dataset):
         da : xr.DataArray, optional
             In some cases fetching the DataArray by varname is not desired.
             It can be passed directly via this optional argument.
+        compress : boolean
+            Whether or not to compress the layers using the imod-wq macros.
+            Should be disabled for time-dependent input.
 
         Returns
         -------
@@ -260,7 +265,7 @@ class Package(xr.Dataset):
                         values[layer] = da.values[()]
 
         # Compress the runfile contents using the imod-wq macros
-        if "layer" in da.dims:
+        if "layer" in da.dims and compress:
             if idf:
                 # Compose does not accept non-integers, so use 0, then replace
                 d["layer"] = 0
@@ -483,10 +488,12 @@ class BoundaryCondition(Package):
                 runfile_times = package_times = da_times
 
             starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
+            # Check whether any range occurs in the input. If does does, compress should be False
+            compress = not any(":" in e for e in starts_ends)
 
             for time, start_end in zip(runfile_times, starts_ends):
                 values[start_end] = self._compose_values_layer(
-                    varname, directory, time=time, da=da
+                    varname, directory, time=time, da=da, compress=compress
                 )
 
         else:
