@@ -81,6 +81,25 @@ def test_render_with_timemap__elevation(drainage):
         drn.add_timemap(conductance=timemap)
 
 
+def test_compress_discontinuous_layers(drainage):
+    drn = drainage
+    layer = drn["layer"].values
+    layer[1] += 1
+    layer[2] += 2
+    drn["layer"] = xr.full_like(drn["layer"], layer)
+    directory = pathlib.Path(".")
+
+    compare = """
+    elevation_p?_s1_l1 = elevation_l1.idf
+    elevation_p?_s1_l3 = elevation_l3.idf
+    elevation_p?_s1_l5 = elevation_l5.idf
+    cond_p?_s1_l1 = conductance_l1.idf
+    cond_p?_s1_l3 = conductance_l3.idf
+    cond_p?_s1_l5 = conductance_l5.idf"""
+
+    assert drn._render(directory, globaltimes=["?"], system_index=1) == compare
+
+
 @pytest.mark.parametrize("varname", ["conductance", "elevation"])
 def test_render__timemap(drainage, varname):
     drn = drainage

@@ -163,8 +163,8 @@ class Package(xr.Dataset):
             start = layers[0]
             end = layers[-1]
             return {f"{start}:{end}": range_path}
-        starts = [0] + list(*breaks + 1)
-        ends = list(*breaks) + [len(layers) - 1]
+        starts = [0] + list(breaks[:, 0] + 1)
+        ends = list(breaks[:, 0]) + [len(layers) - 1]
 
         compressed = {}
         for start_index, end_index in zip(starts, ends):
