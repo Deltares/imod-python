@@ -527,7 +527,22 @@ class Regridder(object):
         # Use xarray for nearest
         # TODO: replace by more efficient, specialized method
         if self.method == "nearest":
-            return source.reindex_like(like, method="nearest")
+            matching_dims, regrid_dims, add_dims = common._match_dims(source, like)
+
+            # Order dimensions in the right way:
+            # dimensions that are regridded end up at the end for efficient iteration
+            dst_dims = (*add_dims, *matching_dims, *regrid_dims)
+            dims_from_src = (*add_dims, *matching_dims)
+            dims_from_like = tuple(regrid_dims)
+
+            # Gather destination coordinates
+            dst_da_coords, _ = common._dst_coords(
+                source, like, dims_from_src, dims_from_like
+            )
+
+            dst = source.reindex_like(like, method="nearest")
+            dst = dst.assign_coords(dst_da_coords)
+            return dst
 
         # Don't mutate source; src stands for source, dst for destination
         src = source.copy(deep=False)
