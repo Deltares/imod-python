@@ -42,6 +42,7 @@ import scipy.ndimage.morphology
 import tqdm
 
 from imod import util
+from imod.select import points_values
 
 try:
     import pyvista as pv
@@ -504,14 +505,19 @@ def line_3d(polygon, z=0.0):
     Parameters
     ----------
     polygon : shapely.geometry.Polygon
-    z : float
+    z : float or xr.DataArray
+        z-coordinate to assign to line. If DataArray, assigns z-coordinate
+        based on xy locations in DataArray.
 
     Returns
     -------
     pyvista.PolyData    
     """
     x, y = map(np.array, polygon.exterior.coords.xy)
-    z = np.full_like(x, z)
+    if isinstance(z, xr.DataArray):
+        z = points_values(z, x=x, y=y).values
+    else:
+        z = np.full_like(x, z)
     coords = np.vstack([x, y, z]).transpose()
     return pv.lines_from_points(coords)
 
