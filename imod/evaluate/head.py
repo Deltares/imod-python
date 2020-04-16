@@ -22,14 +22,14 @@ def convert_pointwaterhead_freshwaterhead(
     Parameters
     ----------
     pointwaterhead : float or xr.DataArray of floats
-    `pointwaterhead` is the point water head as outputted by SEAWAT, in m.
+        the point water head as outputted by SEAWAT, in m.
     density : float or xr.DataArray of floats
-    `density` is the water density on the same locations as `pointwaterhead`. 
+        the water density at the same locations as `pointwaterhead`. 
     elevation : float or xr.DataArray of floats
-    `elevation` is elevation on the same locations as `pointwaterhead`. 
+        elevation at the same locations as `pointwaterhead`, in m. 
     density_fresh : float, optional
-    `density_fresh` is the density of freshwater (1000 kg/m3), or a different value 
-    if different units are used, or a different density reference is required.
+        the density of freshwater (1000 kg/m3), or a different value if 
+        different units are used, or a different density reference is required.
 
     Returns
     -------
