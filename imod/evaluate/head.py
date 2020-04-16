@@ -59,24 +59,24 @@ def calculate_gxg(head, below_surfacelevel=False):
     hydrological year (april - april), for head values measured at a semi-monthly frequency
     (14th and 28th of every month). GVG (average spring groundwater level) is calculated as
     the average of groundwater level on 28th of March, 14th and 28th of April. Supplied head 
-    values are resampled to the 14/28 frequency. Hydrological years without all 14/28 dates 
-    present are discarded.
+    values are resampled (nearest) to the 14/28 frequency. Hydrological years without all 24 
+    14/28 dates present are discarded.
 
     *Requires bottleneck.*
 
     Parameters
     ----------
     head : xr.DataArray of floats
-        Head relative to sea level, in m, or m below surface level if `` is set to True. 
-        Must be of dimensions (``time``, ``y``, ``x``).
-    below_surfacelevel : boolean
+        Head relative to sea level, in m, or m below surface level if `below_surfacelevel` is 
+        set to True. Must be of dimensions ``("time", "y", "x")``.
+    below_surfacelevel : boolean, optional
         False (default) if heads are relative to sea level. If True, heads are taken as m
         below surface level.
 
     Returns
     -------
     gxg : xr.Dataset 
-        Dataset containing `glg`, average lowest head, `ghg`, average highest head`, `gvg`
+        Dataset containing `glg`: average lowest head, `ghg`: average highest head, and `gvg`:
         average spring head.
 
     Examples
@@ -84,7 +84,7 @@ def calculate_gxg(head, below_surfacelevel=False):
     Load the heads, and calculate groundwater characteristics after the year 2000:
 
     >>> import imod
-    >>> heads = imod.idf.open("heads*.idf").sel(time=heads.time.dt.year >= 2000)
+    >>> heads = imod.idf.open("head*.idf").sel(time=heads.time.dt.year >= 2000)
     >>> gxg = imod.evaluate.calculate_gxg(heads)
 
     Transform to meters below surface level by substracting from surface level:
