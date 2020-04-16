@@ -552,7 +552,7 @@ class GridAnimation3D:
 
     >>> animation = imod.visualize.GridAnimation3D(concentration, mesh_kwargs=dict(cmap="jet"))
 
-    Check what it looks like (use "q" to close the window and return):
+    Check what it looks like (if a window pops up: press "q" instead of the X to return):
 
     >>> animation.peek()
     
