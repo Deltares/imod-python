@@ -533,6 +533,11 @@ class GridAnimation3D:
     satisfied. Call the ``.peek()`` method to take a look. When satisfied, call
     ``.output()`` to write to a file.
 
+    *Note* that a bug in xarray may result in a `ValueError: could not broadcast 
+    input array from shape ( , , ) into shape ( , , )` error when supplied with 
+    certain dask arrays. Workaround is to supply a `loaded` DataArray (``.load()``).
+
+
     Parameters 
     ---------- 
     da : xr.DataArray
@@ -580,9 +585,7 @@ class GridAnimation3D:
 
     def _initialize(self, da):
         self.mesh = grid_3d(
-            da.load(),
-            vertical_exaggeration=self.vertical_exaggeration,
-            return_index=False,
+            da, vertical_exaggeration=self.vertical_exaggeration, return_index=False
         )
         mesh_kwargs = self.mesh_kwargs.copy()
         if "stitle" in mesh_kwargs and "{timestamp" in mesh_kwargs["stitle"]:
