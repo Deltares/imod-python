@@ -580,11 +580,15 @@ class GridAnimation3D:
 
     def _initialize(self, da):
         self.mesh = grid_3d(
-            da, vertical_exaggeration=self.vertical_exaggeration, return_index=False
+            da.load(),
+            vertical_exaggeration=self.vertical_exaggeration,
+            return_index=False,
         )
         mesh_kwargs = self.mesh_kwargs.copy()
         if "stitle" in mesh_kwargs and "{timestamp" in mesh_kwargs["stitle"]:
-            mesh_kwargs["stitle"] = mesh_kwargs["stitle"].format(timestamp=pd.Timestamp(da.time.values))
+            mesh_kwargs["stitle"] = mesh_kwargs["stitle"].format(
+                timestamp=pd.Timestamp(da.time.values)
+            )
 
         self.mesh_actor = self.plotter.add_mesh(self.mesh, **mesh_kwargs)
 
