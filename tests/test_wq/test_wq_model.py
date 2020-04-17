@@ -1,15 +1,16 @@
-from copy import deepcopy
 import pathlib
 import shutil
 import textwrap
+from copy import deepcopy
 
-import imod
-import imod.wq
+import cftime
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-import cftime
+
+import imod
+import imod.wq
 
 
 @pytest.fixture(scope="module")

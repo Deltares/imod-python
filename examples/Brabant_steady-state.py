@@ -7,7 +7,6 @@ import xarray as xr
 
 import imod
 
-
 os.chdir("/projects/imodx/Brabant_stationary")
 
 

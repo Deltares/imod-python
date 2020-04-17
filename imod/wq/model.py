@@ -1,14 +1,15 @@
 import collections
-import pathlib
 import os
+import pathlib
 import subprocess
 
 import cftime
-import imod
 import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
+
+import imod
 from imod.wq import timeutil
 from imod.wq.pkggroup import PackageGroups
 

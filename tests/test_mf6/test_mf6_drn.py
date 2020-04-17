@@ -1,12 +1,12 @@
-import textwrap
 import pathlib
-
-import imod
+import textwrap
 
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+
+import imod
 
 
 @pytest.fixture(scope="module")

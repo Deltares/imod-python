@@ -1,7 +1,8 @@
-import imod
 import numpy as np
 import pandas as pd
 import xarray as xr
+
+import imod
 
 # Discretization
 nrow = 1

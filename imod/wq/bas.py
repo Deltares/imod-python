@@ -3,8 +3,8 @@ import numpy as np
 import scipy.ndimage.morphology
 import xarray as xr
 
-from imod.wq.pkgbase import Package
 from imod import util
+from imod.wq.pkgbase import Package
 
 
 class BasicFlow(Package):

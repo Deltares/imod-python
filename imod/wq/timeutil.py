@@ -1,9 +1,9 @@
 import datetime
 
-import numpy as np
-import pandas as pd
 import cftime
 import dateutil  # is a dependency of pandas
+import numpy as np
+import pandas as pd
 
 
 def to_datetime(time, use_cftime):

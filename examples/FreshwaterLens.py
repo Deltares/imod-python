@@ -1,7 +1,7 @@
-import imod
 import numpy as np
 import xarray as xr
 
+import imod
 
 # Discretization
 nrow = 1  # number of rows

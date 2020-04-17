@@ -222,7 +222,7 @@ def points_set_values(da, values, **points):
     >>> x = [1.0, 2.2, 3.0]
     >>> y = [4.0, 5.6, 7.0]
     >>> values = [10.0, 11.0, 12.0]
-    >>> selection = imod.select.points_values(da, values, x=x, y=y)
+    >>> imod.select.points_set_values(da, values, x=x, y=y)
 
     """
     inside = points_in_bounds(da, **points)

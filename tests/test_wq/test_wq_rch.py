@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-from imod.wq import RechargeHighestActive, RechargeTopLayer, RechargeLayers
+from imod.wq import RechargeHighestActive, RechargeLayers, RechargeTopLayer
 
 
 @pytest.fixture(scope="function")

@@ -1,8 +1,8 @@
 import filecmp
 import glob
 import logging
-import pathlib
 import os
+import pathlib
 import textwrap
 import time
 

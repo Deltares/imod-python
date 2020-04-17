@@ -1,26 +1,20 @@
 import pathlib
-import pkg_resources
 import warnings
 
 import numpy as np
 import pandas as pd
-
-# submodules
-from imod import idf
-from imod import ipf
-from imod import run
-from imod import tec
-from imod import util
-from imod import rasterio
+import pkg_resources
 
 # subpackages
 import imod.evaluate
 import imod.flow
-import imod.prepare
 import imod.mf6
-import imod.wq
+import imod.prepare
 import imod.select
 import imod.visualize
+import imod.wq
+# submodules
+from imod import idf, ipf, rasterio, run, tec, util
 
 try:
     __version__ = pkg_resources.get_distribution(__name__).version

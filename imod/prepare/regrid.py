@@ -31,8 +31,7 @@ import numba
 import numpy as np
 import xarray as xr
 
-from imod.prepare import common
-from imod.prepare import interpolate
+from imod.prepare import common, interpolate
 
 
 @numba.njit(cache=True)

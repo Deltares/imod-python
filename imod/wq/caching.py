@@ -1,10 +1,11 @@
 import collections
 import logging
-import pathlib
 import os
+import pathlib
 
 import joblib
 import xarray as xr
+
 from imod import util
 
 

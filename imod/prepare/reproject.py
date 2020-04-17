@@ -2,6 +2,8 @@ import affine
 import numpy as np
 import xarray as xr
 
+import imod
+
 # since rasterio is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
 try:
@@ -10,7 +12,6 @@ try:
 except ImportError:
     pass
 
-import imod
 
 
 def _reproject_dst(source, src_crs, dst_crs, src_transform):

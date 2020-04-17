@@ -2,9 +2,7 @@ import numba
 import numpy as np
 import xarray as xr
 
-
 from imod.prepare import common
-
 
 # Voxelize does not support conductance method, nearest, or linear
 METHODS = common.METHODS.copy()

@@ -14,9 +14,9 @@ used internally, but are not private since they may be useful to users as well.
 import collections
 import contextlib
 import datetime
+import os
 import pathlib
 import re
-import os
 import warnings
 
 import affine

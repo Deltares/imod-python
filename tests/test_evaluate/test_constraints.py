@@ -1,7 +1,8 @@
 import numpy as np
-import xarray as xr
 import pandas as pd
 import pytest
+import xarray as xr
+
 import imod
 
 

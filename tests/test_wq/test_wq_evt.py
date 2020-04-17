@@ -7,10 +7,8 @@ import pytest
 import xarray as xr
 
 from imod.wq import (
-    EvapotranspirationHighestActive,
-    EvapotranspirationTopLayer,
-    EvapotranspirationLayers,
-)
+    EvapotranspirationHighestActive, EvapotranspirationLayers,
+    EvapotranspirationTopLayer)
 
 
 @pytest.fixture(scope="function")

@@ -1,10 +1,8 @@
-import numpy as np
 import numba
+import numpy as np
 import xarray as xr
 
-
 from imod.prepare import common
-
 
 # LayerRegrid does not support conductance method, nearest, or linear
 METHODS = common.METHODS.copy()

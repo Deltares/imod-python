@@ -10,8 +10,7 @@ import rasterio
 import xarray as xr
 
 import imod
-from imod import util
-from imod import array_io
+from imod import array_io, util
 from imod.array_io import reading
 
 

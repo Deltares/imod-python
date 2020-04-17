@@ -1,6 +1,6 @@
 import collections
-import pathlib
 import os
+import pathlib
 
 import jinja2
 import numpy as np

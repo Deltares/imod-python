@@ -1,7 +1,7 @@
+import collections
 import os
 import pathlib
 import shutil
-import collections
 
 import cftime
 import numpy as np

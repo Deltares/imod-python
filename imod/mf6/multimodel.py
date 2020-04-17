@@ -1,6 +1,6 @@
-import xarray as xr
-import numpy as np
 import numba
+import numpy as np
+import xarray as xr
 
 import imod
 

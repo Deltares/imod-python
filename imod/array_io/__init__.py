@@ -1,2 +1,1 @@
-from . import reading
-from . import writing
+from . import reading, writing

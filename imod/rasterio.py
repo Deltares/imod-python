@@ -13,6 +13,11 @@ import warnings
 import numpy as np
 import xarray as xr
 
+import imod
+from imod import idf, util
+
+from . import array_io
+
 # since rasterio is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
 try:
@@ -20,9 +25,6 @@ try:
 except ImportError:
     pass
 
-import imod
-from imod import idf, util
-from . import array_io
 
 
 # Based on this comment

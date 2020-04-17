@@ -1,8 +1,10 @@
-from imod.wq.pkgbase import Package
-import numpy as np
 import pathlib
+
+import numpy as np
 import pandas as pd
+
 from imod import util
+from imod.wq.pkgbase import Package
 
 
 class PreconditionedConjugateGradientSolver(Package):

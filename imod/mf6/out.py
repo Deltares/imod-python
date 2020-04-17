@@ -1,9 +1,11 @@
-import numpy as np
-import struct
-import imod
-import xarray as xr
-import dask
 import os
+import struct
+
+import dask
+import numpy as np
+import xarray as xr
+
+import imod
 
 
 def _grb_text(f, lentxt=50):

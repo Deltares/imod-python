@@ -1,7 +1,8 @@
-import imod
-import pandas as pd
 import numpy as np
+import pandas as pd
 import xarray as xr
+
+import imod
 
 
 def stability_constraint_wel(wel, top_bot, porosity=0.3, R=1.0):

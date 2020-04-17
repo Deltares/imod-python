@@ -8,6 +8,8 @@ import pandas as pd
 import xarray as xr
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+import imod
+
 # since geopandas is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
 try:
@@ -15,7 +17,6 @@ try:
 except ImportError:
     pass
 
-import imod
 
 
 def read_imod_legend(path):
