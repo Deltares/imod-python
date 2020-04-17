@@ -37,6 +37,7 @@ The methods below construct pyvista.UnstructuredGrids for voxel models (z1d),
 
 import numba
 import numpy as np
+import pandas as pd
 import scipy.ndimage.morphology
 import tqdm
 import xarray as xr
@@ -530,11 +531,7 @@ class GridAnimation3D:
     satisfied. Call the ``.peek()`` method to take a look. When satisfied, call
     ``.output()`` to write to a file.
 
-    *Note* that a bug in xarray may result in a `ValueError: could not broadcast 
-    input array from shape ( , , ) into shape ( , , )` error when supplied with 
-    certain dask arrays. Workaround is to supply a `loaded` DataArray (``.load()``).
-
-
+    
     Parameters 
     ---------- 
     da : xr.DataArray
