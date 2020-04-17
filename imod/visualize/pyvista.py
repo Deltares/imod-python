@@ -37,9 +37,9 @@ The methods below construct pyvista.UnstructuredGrids for voxel models (z1d),
 
 import numba
 import numpy as np
-import xarray as xr
 import scipy.ndimage.morphology
 import tqdm
+import xarray as xr
 
 from imod import util
 
@@ -52,9 +52,7 @@ except ImportError:
 
 def exterior(da, n):
     has_data = da.notnull()
-    eroded = xr.full_like(
-        da, scipy.ndimage.binary_erosion(has_data.values, iterations=n), dtype=np.bool
-    )
+    eroded = da.copy(data=scipy.ndimage.binary_erosion(has_data.values, iterations=n))
     return has_data & ~eroded
 
 

@@ -9,6 +9,9 @@ import pandas as pd
 import scipy.ndimage
 import xarray as xr
 
+import imod
+from imod.prepare import common, pcg
+
 # since rasterio is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
 try:
@@ -18,9 +21,6 @@ try:
 except ImportError:
     pass
 
-import imod
-from imod.prepare import pcg
-from imod.prepare import common
 
 
 def round_extent(extent, cellsize):
@@ -180,7 +180,7 @@ def laplace_interpolate(
         if not converged:
             raise RuntimeError("Failed to converge")
 
-    return xr.full_like(source, hnew[0])
+    return source.copy(data=hnew[0])
 
 
 def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
@@ -396,7 +396,7 @@ def gdal_rasterize(
             raise RuntimeError("GDAL error: " + error.err_msg)
 
     if like is not None:
-        rasterized = xr.full_like(like, memory_raster.ReadAsArray(), dtype=dtype)
+        rasterized = like.copy(data=memory_raster.ReadAsArray())
     else:
         rasterized = xr.DataArray(memory_raster.ReadAsArray(), coords, dims)
 
