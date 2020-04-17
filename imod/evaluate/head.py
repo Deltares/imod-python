@@ -43,7 +43,7 @@ def convert_pointwaterhead_freshwaterhead(
     # return freshwater head of top underlying cell where elevation < pointwaterhead
     # only for xr.DataArrays
     if isinstance(pointwaterhead, xr.DataArray) and "layer" in pointwaterhead.dims:
-        freshwaterhead = freshwaterhead.where(pointwaterhead > elevation).compute()
+        freshwaterhead = freshwaterhead.where(pointwaterhead > elevation)
         freshwaterhead = freshwaterhead.bfill(dim="layer")
 
     return freshwaterhead
