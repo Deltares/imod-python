@@ -42,6 +42,7 @@ import tqdm
 import xarray as xr
 
 from imod import util
+from imod.select import points_values
 
 try:
     import pyvista as pv
@@ -502,14 +503,19 @@ def line_3d(polygon, z=0.0):
     Parameters
     ----------
     polygon : shapely.geometry.Polygon
-    z : float
+    z : float or xr.DataArray
+        z-coordinate to assign to line. If DataArray, assigns z-coordinate
+        based on xy locations in DataArray.
 
     Returns
     -------
     pyvista.PolyData    
     """
     x, y = map(np.array, polygon.exterior.coords.xy)
-    z = np.full_like(x, z)
+    if isinstance(z, xr.DataArray):
+        z = points_values(z, x=x, y=y).values
+    else:
+        z = np.full_like(x, z)
     coords = np.vstack([x, y, z]).transpose()
     return pv.lines_from_points(coords)
 
@@ -524,6 +530,11 @@ class GridAnimation3D:
     satisfied. Call the ``.peek()`` method to take a look. When satisfied, call
     ``.output()`` to write to a file.
 
+    *Note* that a bug in xarray may result in a `ValueError: could not broadcast 
+    input array from shape ( , , ) into shape ( , , )` error when supplied with 
+    certain dask arrays. Workaround is to supply a `loaded` DataArray (``.load()``).
+
+
     Parameters 
     ---------- 
     da : xr.DataArray
@@ -531,7 +542,8 @@ class GridAnimation3D:
     vertical_exaggeration : float, defaults to 30.0
     mesh_kwargs : dict
         keyword arguments that are forwarded to the pyvista mesh representing
-        "da".
+        "da". If "stitle" is given as one of the arguments, the special keyword "timestamp"
+        can be used to render the plotted time as part of the title. See example.
     plotter_kwargs : dict
         keyword arguments that are forwarded to the pyvista plotter.
 
@@ -542,7 +554,7 @@ class GridAnimation3D:
 
     >>> animation = imod.visualize.GridAnimation3D(concentration, mesh_kwargs=dict(cmap="jet"))
 
-    Check what it looks like:
+    Check what it looks like (if a window pops up: press "q" instead of the X to return):
 
     >>> animation.peek()
     
@@ -562,13 +574,23 @@ class GridAnimation3D:
 
     Note that ``.reset()`` is automatically called when the animation has finished writing.
 
+    You can use "stitle" in mesh_kwargs in conjunction with the "timestamp" keyword to print
+    a formatted timestamp in the animation:
+
+    >>> animation = imod.visualize.GridAnimation3D(concentration, mesh_kwargs=dict(stitle="Concentration on {timestamp:%Y-%m-%d}"))
     """
 
     def _initialize(self, da):
         self.mesh = grid_3d(
             da, vertical_exaggeration=self.vertical_exaggeration, return_index=False
         )
-        self.mesh_actor = self.plotter.add_mesh(self.mesh, **self.mesh_kwargs)
+        mesh_kwargs = self.mesh_kwargs.copy()
+        if "stitle" in mesh_kwargs and "{timestamp" in mesh_kwargs["stitle"]:
+            mesh_kwargs["stitle"] = mesh_kwargs["stitle"].format(
+                timestamp=pd.Timestamp(da.time.values)
+            )
+
+        self.mesh_actor = self.plotter.add_mesh(self.mesh, **mesh_kwargs)
 
     def _update(self, da):
         self.plotter.remove_actor(self.mesh_actor)
@@ -580,12 +602,11 @@ class GridAnimation3D:
         # Store data
         self.da = da
         self.vertical_exaggeration = vertical_exaggeration
-        self.mesh_kwargs = mesh_kwargs
+        self.mesh_kwargs = mesh_kwargs.copy()
         self.plotter_kwargs = plotter_kwargs
         self.plotter = pv.Plotter(**plotter_kwargs)
         # Initialize pyvista objects
         self._initialize(da.isel(time=0))
-        self.mesh_actor = self.plotter.add_mesh(self.mesh, **mesh_kwargs)
 
     def peek(self):
         """
@@ -600,7 +621,7 @@ class GridAnimation3D:
         self.plotter = pv.Plotter(**self.plotter_kwargs)
         self._update(self.da.isel(time=0))
 
-    def write(self, filename):
+    def write(self, filename, framerate=24):
         """
         Write the animation to a video.
 
@@ -610,9 +631,11 @@ class GridAnimation3D:
         ----------
         filename : str, pathlib.Path
             Filename to write the video to. Should likely be an .mp4.
+        framerate : int, optional
+            Frames per second.
         """
-        self.plotter.open_movie(filename)
-        self.plotter.show(auto_close=False)
+        self.plotter.open_movie(filename, framerate=framerate)
+        self.plotter.show(auto_close=False, interactive=False)
         self.plotter.write_frame()
 
         for itime in tqdm.tqdm(range(1, self.da.coords["time"].size)):
