@@ -5,9 +5,12 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from imod.wq import (GeneralizedConjugateGradientSolver,
-                     ParallelKrylovFlowSolver, ParallelKrylovTransportSolver,
-                     PreconditionedConjugateGradientSolver)
+from imod.wq import (
+    GeneralizedConjugateGradientSolver,
+    ParallelKrylovFlowSolver,
+    ParallelKrylovTransportSolver,
+    PreconditionedConjugateGradientSolver,
+)
 
 
 @pytest.fixture(scope="module")

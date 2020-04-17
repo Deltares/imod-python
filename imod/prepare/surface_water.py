@@ -12,7 +12,6 @@ except ImportError:
     pass
 
 
-
 def raster_to_features(raster):
     """
     Parameters

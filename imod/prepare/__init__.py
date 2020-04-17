@@ -17,7 +17,12 @@ from imod.prepare import reproject, spatial, subsoil, surface_water
 from imod.prepare.layerregrid import LayerRegridder
 from imod.prepare.regrid import Regridder
 from imod.prepare.reproject import reproject
-from imod.prepare.spatial import (celltable, fill, gdal_rasterize,
-                                  laplace_interpolate, rasterize,
-                                  rasterize_celltable)
+from imod.prepare.spatial import (
+    celltable,
+    fill,
+    gdal_rasterize,
+    laplace_interpolate,
+    rasterize,
+    rasterize_celltable,
+)
 from imod.prepare.voxelize import Voxelizer

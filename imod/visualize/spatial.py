@@ -18,7 +18,6 @@ except ImportError:
     pass
 
 
-
 def read_imod_legend(path):
     """
     Parameters

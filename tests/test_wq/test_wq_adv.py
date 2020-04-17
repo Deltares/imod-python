@@ -1,5 +1,4 @@
-from imod.wq import (AdvectionFiniteDifference, AdvectionModifiedMOC,
-                     AdvectionTVD)
+from imod.wq import AdvectionFiniteDifference, AdvectionModifiedMOC, AdvectionTVD
 
 
 def test_render__DF():

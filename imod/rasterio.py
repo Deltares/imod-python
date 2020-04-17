@@ -26,7 +26,6 @@ except ImportError:
     pass
 
 
-
 # Based on this comment
 # https://github.com/mapbox/rasterio/issues/265#issuecomment-367044836
 def _create_ext_driver_code_map():

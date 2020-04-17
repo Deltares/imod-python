@@ -13,7 +13,6 @@ except ImportError:
     pass
 
 
-
 def _reproject_dst(source, src_crs, dst_crs, src_transform):
     """
     Prepares destination transform Affine and DataArray for projection.

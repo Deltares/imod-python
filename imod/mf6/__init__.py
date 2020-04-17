@@ -9,8 +9,12 @@ from imod.mf6.drn import Drainage
 from imod.mf6.evt import Evapotranspiration
 from imod.mf6.ghb import GeneralHeadBoundary
 from imod.mf6.ic import InitialConditions
-from imod.mf6.ims import (Solution, SolutionPresetComplex,
-                          SolutionPresetModerate, SolutionPresetSimple)
+from imod.mf6.ims import (
+    Solution,
+    SolutionPresetComplex,
+    SolutionPresetModerate,
+    SolutionPresetSimple,
+)
 from imod.mf6.model import GroundwaterFlowModel
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.oc import OutputControl
