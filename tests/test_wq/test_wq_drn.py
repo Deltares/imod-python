@@ -86,7 +86,7 @@ def test_compress_discontinuous_layers(drainage):
     layer = drn["layer"].values
     layer[1] += 1
     layer[2] += 2
-    drn["layer"] = xr.full_like(drn["layer"], layer)
+    drn["layer"] = drn["layer"].copy(data=layer)
     directory = pathlib.Path(".")
 
     compare = """
