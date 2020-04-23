@@ -250,8 +250,12 @@ def _slice_src(src, like, dims, extra_overlap):
     for dim in dims:
         # Generate vertices
         src_x = _coord(src, dim)
-        _, xmin, xmax = imod.util.coord_reference(like[dim])
-        i0, i1 = _selection_indices(src_x, xmin, xmax, extra_overlap)
+        if dim in like:
+            _, xmin, xmax = imod.util.coord_reference(like[dim])
+            i0, i1 = _selection_indices(src_x, xmin, xmax, extra_overlap)
+        else:
+            i0 = 0
+            i1 = -1
         slices[dim] = slice(i0, i1)
     return src.isel(slices)
 
