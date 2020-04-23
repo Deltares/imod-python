@@ -387,6 +387,8 @@ def _define_slices(src, like):
     dst_dim_slices = []
     dst_chunks_shape = []
     for dim, chunksizes in zip(src.dims, src.chunks):
+        if dim not in like:
+            continue
         dst_slices = _define_single_dim_slices(
             _coord(src, dim), _coord(like, dim), chunksizes
         )
