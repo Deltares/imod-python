@@ -250,12 +250,8 @@ def _slice_src(src, like, dims, extra_overlap):
     for dim in dims:
         # Generate vertices
         src_x = _coord(src, dim)
-        if dim in like:
-            _, xmin, xmax = imod.util.coord_reference(like[dim])
-            i0, i1 = _selection_indices(src_x, xmin, xmax, extra_overlap)
-        else:
-            i0 = 0
-            i1 = -1
+        _, xmin, xmax = imod.util.coord_reference(like[dim])
+        i0, i1 = _selection_indices(src_x, xmin, xmax, extra_overlap)
         slices[dim] = slice(i0, i1)
     return src.isel(slices)
 
@@ -387,8 +383,6 @@ def _define_slices(src, like):
     dst_dim_slices = []
     dst_chunks_shape = []
     for dim, chunksizes in zip(src.dims, src.chunks):
-        if dim not in like.dims:
-            continue
         dst_slices = _define_single_dim_slices(
             _coord(src, dim), _coord(like, dim), chunksizes
         )

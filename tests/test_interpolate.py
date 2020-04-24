@@ -150,8 +150,8 @@ def test_interpolate_2d__over_z(chunksize):
     like = xr.DataArray(dst_data, {"y": dst_y, "x": dst_x, "z": dst_z}, dims)
     interpolator_2d = imod.prepare.Regridder(method="multilinear")
     actual = interpolator_2d.regrid(source, like)
-    expected = xr.full_like(
-        like, [[[0.25, 0.25], [0.75, 0.75]], [[1.25, 1.25], [1.75, 1.75]]]
+    expected = like.copy(
+        data=[[[0.25, 0.25], [0.75, 0.75]], [[1.25, 1.25], [1.75, 1.75]]]
     )
     assert np.allclose(actual.values, expected.values, equal_nan=True)
 
