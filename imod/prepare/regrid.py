@@ -35,18 +35,19 @@ import xarray as xr
 from imod.prepare import common, interpolate
 
 _RegridInfo = namedtuple(
-typename="_RegridInfo",
-field_names=[
-    "matching_dims",
-    "regrid_dims",
-    "add_dims",
-    "dst_shape",
-    "dst_dims",
-    "dst_da_coords",
-    "src_coords_regrid",
-    "dst_coords_regrid",
-],
+    typename="_RegridInfo",
+    field_names=[
+        "matching_dims",
+        "regrid_dims",
+        "add_dims",
+        "dst_shape",
+        "dst_dims",
+        "dst_da_coords",
+        "src_coords_regrid",
+        "dst_coords_regrid",
+    ],
 )
+
 
 @numba.njit(cache=True)
 def _regrid_1d(src, dst, values, weights, method, *inds_weights):
@@ -481,61 +482,37 @@ class Regridder(object):
     def _chunked_regrid(self, src, like, fill_value):
         like_expanded_slices, shape_chunks = common._define_slices(src, like)
         like_das = common._sel_chunks(like, like_expanded_slices)
+        n_das = len(like_das)
+        np_collection = np.full(n_das, None)
+
         # Regridder should compute first chunk once
         # so numba has compiled the necessary functions for subsequent chunks
-        if self._first_call:
-            dst_da = like_das[0]
-            matching_dims, regrid_dims, _ = common._match_dims(src, dst_da)
-            chunk_src = common._slice_src(
-                src, dst_da, matching_dims + regrid_dims, self.extra_overlap
-            )
+        i = 0
+        while i < n_das:
+            dst_da = like_das[i]
+            chunk_src = common._slice_src(src, dst_da, self.extra_overlap)
             info = self._regrid_info(chunk_src, dst_da)
-            a = self._regrid(chunk_src, fill_value, info)
-            arr1 = dask.array.from_array(a)
-            self._first_call = False
-        else:
-            arr1 = None
-        # At this point, the compiled method is part of the regridder class
-        # and will be re-used by dask.
 
-        np_collection = np.full(len(like_das), None)
-        for i, dst_da in enumerate(like_das):
-            # Skip first step if applicable
-            if i == 0 and arr1 is not None:
-                np_collection[0] = arr1
-                continue
-            matching_dims, regrid_dims, add_dims = common._match_dims(src, dst_da)
-
-            # NOTA BENE: slice must occur BEFORE sending it to dask.delayed
-            # if not, dask will attempt to allocate the full array!
-            chunk_src = common._slice_src(
-                src, dst_da, matching_dims + regrid_dims, self.extra_overlap
-            )
-
-            # Determine shape of array
-            dims_from_src = (*add_dims, *matching_dims)
-            dims_from_like = tuple(regrid_dims)
-            _, dst_shape = common._dst_coords(
-                chunk_src, dst_da, dims_from_src, dims_from_like
-            )
-
-            info = self._regrid_info(chunk_src, dst_da)
             if any(
                 size == 0 for size in chunk_src.shape
             ):  # zero overlap for the chunk, zero size chunk
                 dask_array = dask.array.full(
-                    shape=dst_shape, fill_value=fill_value, dtype=src.dtype
+                    shape=info.dst_shape, fill_value=fill_value, dtype=src.dtype
                 )
+            elif self._first_call:
+                # NOT delayed, trigger compilation
+                a = self._regrid(chunk_src, fill_value, info)
+                dask_array = dask.array.from_array(a)
+                self._first_call = False
             else:
                 # Alllocation occurs inside
-                result = dask.delayed(self._regrid, pure=True)(
-                    chunk_src, fill_value, info
-                )
+                a = dask.delayed(self._regrid, pure=True)(chunk_src, fill_value, info)
                 dask_array = dask.array.from_delayed(
-                    result, shape=dst_shape, dtype=src.dtype
+                    a, shape=info.dst_shape, dtype=src.dtype
                 )
 
             np_collection[i] = dask_array
+            i += 1
 
         # Determine the shape of the chunks, and reshape so dask.block does the right thing
         reshaped_collection = np.reshape(np_collection, shape_chunks).tolist()
@@ -563,57 +540,34 @@ class Regridder(object):
         result : xr.DataArray
             Regridded result.
         """
-        # Use xarray for nearest
-        # TODO: replace by more efficient, specialized method
-        if self.method == "nearest":
-            matching_dims, regrid_dims, add_dims = common._match_dims(source, like)
-
-            # Order dimensions in the right way:
-            # dimensions that are regridded end up at the end for efficient iteration
-            dst_dims = (*add_dims, *matching_dims, *regrid_dims)
-            dims_from_src = (*add_dims, *matching_dims)
-            dims_from_like = tuple(regrid_dims)
-
-            # Gather destination coordinates
-            dst_da_coords, _ = common._dst_coords(
-                source, like, dims_from_src, dims_from_like
-            )
-
-            dst = source.reindex_like(like, method="nearest")
-            dst = dst.assign_coords(dst_da_coords)
-            return dst
+        info = self._regrid_info(source, like)
+        # Exit early if nothing is to be done
+        if len(info.regrid_dims) == 0:
+            return source.copy(deep=True)
 
         # Don't mutate source; src stands for source, dst for destination
         src = source.copy(deep=False)
         like = like.copy(deep=False)
-        # TODO: Check dimensionality of coordinates
-        # 2-d coordinates should raise a ValueError
-        matching_dims, regrid_dims, add_dims = common._match_dims(src, like)
-        # Exit early if nothing is to be done
-        if len(regrid_dims) == 0:
-            return src
+
+        # Use xarray for nearest
+        # TODO: replace by more efficient, specialized method
+        if self.method == "nearest":
+            dst = source.reindex_like(like, method="nearest")
+            dst = dst.assign_coords(info.dst_da_coords)
+            return dst
 
         # Collect dimensions to flip to make everything ascending
-        src, _ = common._increasing_dims(src, regrid_dims)
-        like, flip_dst = common._increasing_dims(like, regrid_dims)
+        src, _ = common._increasing_dims(src, info.regrid_dims)
+        like, flip_dst = common._increasing_dims(like, info.regrid_dims)
 
         # Prepare for regridding; quick checks
-        self._prepare(regrid_dims)
-        # Order dimensions in the right way:
-        # dimensions that are regridded end up at the end for efficient iteration
-        dst_dims = (*add_dims, *matching_dims, *regrid_dims)
-        dims_from_src = (*add_dims, *matching_dims)
-        dims_from_like = tuple(regrid_dims)
-        # Gather destination coordinates
-        dst_da_coords, _ = common._dst_coords(src, like, dims_from_src, dims_from_like)
-
-        info = self._regrid_info(src, like)
+        self._prepare(info.regrid_dims)
 
         if src.chunks is None:
             self._first_call = False
-            src = common._slice_src(
-                src, like, info.matching_dims + info.regrid_dims, self.extra_overlap
-            )
+            src = common._slice_src(src, like, self.extra_overlap)
+            # Recollect info with sliced part of src
+            info = self._regrid_info(src, like)
             data = self._regrid(src, fill_value, info)
             dst = xr.DataArray(data=data, coords=info.dst_da_coords, dims=info.dst_dims)
         else:

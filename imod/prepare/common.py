@@ -242,10 +242,13 @@ def _selection_indices(src_x, xmin, xmax, extra_overlap):
     return i0, i1
 
 
-def _slice_src(src, like, dims, extra_overlap):
+def _slice_src(src, like, extra_overlap):
     """
     Make sure src matches dst in dims that do not have to be regridded
     """
+    matching_dims, regrid_dims, _ = _match_dims(src, like)
+    dims = matching_dims + regrid_dims
+
     slices = {}
     for dim in dims:
         # Generate vertices
