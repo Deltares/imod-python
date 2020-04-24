@@ -200,9 +200,9 @@ class Voxelizer:
                     f' ("layer", "y", "x"). Got instead {dim_format(da.dims)}.'
                 )
         for da in [bottom, source]:
-            for (k1, v1), (_, v2) in zip(top.coords.items(), da.coords.items()):
-                if not v1.equals(v2):
-                    raise ValueError(f"Input coordinates do not match along {k1}")
+            for dim in ["layer", "y", "x"]:
+                if not top[dim].equals(da[dim]):
+                    raise ValueError(f"Input coordinates do not match along {dim}")
 
         if self._first_call:
             self._make_voxelize()
