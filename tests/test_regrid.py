@@ -379,8 +379,6 @@ def test_regrid__coordinate_errors():
 
 @pytest.mark.parametrize("chunksize", [1, 2, 3])
 def test_regrid_mean2d(chunksize):
-    os.environ["NUMBA_DISABLE_JIT"] = "1"
-
     values = np.array([[0.6, 0.2, 3.4], [1.4, 1.6, 1.0], [4.0, 2.8, 3.0]])
     src_x = np.arange(3.0) + 0.5
     coords = {"y": src_x, "x": src_x}
