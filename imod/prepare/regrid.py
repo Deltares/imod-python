@@ -24,6 +24,7 @@ and weights that have been gathered by _weights_1d, these methods fetch the
 values from the source array (src), and pass it on to the aggregation method.
 The single aggregated value is then filled into the destination array (dst).
 """
+from collections import namedtuple
 import warnings
 
 import dask
@@ -33,6 +34,19 @@ import xarray as xr
 
 from imod.prepare import common, interpolate
 
+_RegridInfo = namedtuple(
+typename="_RegridInfo",
+field_names=[
+    "matching_dims",
+    "regrid_dims",
+    "add_dims",
+    "dst_shape",
+    "dst_dims",
+    "dst_da_coords",
+    "src_coords_regrid",
+    "dst_coords_regrid",
+],
+)
 
 @numba.njit(cache=True)
 def _regrid_1d(src, dst, values, weights, method, *inds_weights):
@@ -408,7 +422,8 @@ class Regridder(object):
                     f"Regridder.ndim_regrid = {self.ndim_regrid}"
                 )
 
-    def _regrid(self, src, like, fill_value):
+    @staticmethod
+    def _regrid_info(src, like):
         # Find coordinates that already match, and those that have to be
         # regridded, and those that exist in source but not in like (left
         # untouched)
@@ -425,28 +440,43 @@ class Regridder(object):
             src, like, dims_from_src, dims_from_like
         )
 
-        # Allocate dst
-        dst = xr.DataArray(
-            data=np.full(dst_shape, fill_value), coords=dst_da_coords, dims=dst_dims
+        dst_tmp = xr.DataArray(
+            data=dask.array.empty(dst_shape), coords=dst_da_coords, dims=dst_dims
         )
+
+        # TODO: check that axes are aligned
+        src_coords_regrid = [common._coord(src, dim) for dim in regrid_dims]
+        dst_coords_regrid = [common._coord(dst_tmp, dim) for dim in regrid_dims]
+
+        return _RegridInfo(
+            matching_dims=matching_dims,
+            regrid_dims=regrid_dims,
+            add_dims=add_dims,
+            dst_shape=dst_shape,
+            dst_da_coords=dst_da_coords,
+            dst_dims=(*add_dims, *matching_dims, *regrid_dims),
+            src_coords_regrid=src_coords_regrid,
+            dst_coords_regrid=dst_coords_regrid,
+        )
+
+    def _regrid(self, src, fill_value, info):
+        # Allocate dst
+        dst = np.full(info.dst_shape, fill_value)
         # No overlap whatsoever, early exit
         if any(size == 0 for size in src.shape):
             return dst.values
 
-        # TODO: check that axes are aligned
-        dst_coords_regrid = [common._coord(dst, dim) for dim in regrid_dims]
-        src_coords_regrid = [common._coord(src, dim) for dim in regrid_dims]
         # Transpose src so that dims to regrid are last
-        src = src.transpose(*dst_dims)
+        src = src.transpose(*info.dst_dims)
 
         # Exit early if nothing is to be done
-        if len(regrid_dims) == 0:
+        if len(info.regrid_dims) == 0:
             return src.values.copy()
         else:
-            dst.values = self._nd_regrid(
-                src.values, dst.values, src_coords_regrid, dst_coords_regrid
+            dst = self._nd_regrid(
+                src.values, dst, info.src_coords_regrid, info.dst_coords_regrid
             )
-            return dst.values
+            return dst
 
     def _chunked_regrid(self, src, like, fill_value):
         like_expanded_slices, shape_chunks = common._define_slices(src, like)
@@ -459,7 +489,8 @@ class Regridder(object):
             chunk_src = common._slice_src(
                 src, dst_da, matching_dims + regrid_dims, self.extra_overlap
             )
-            a = self._regrid(chunk_src, dst_da, fill_value)
+            info = self._regrid_info(chunk_src, dst_da)
+            a = self._regrid(chunk_src, fill_value, info)
             arr1 = dask.array.from_array(a)
             self._first_call = False
         else:
@@ -488,6 +519,7 @@ class Regridder(object):
                 chunk_src, dst_da, dims_from_src, dims_from_like
             )
 
+            info = self._regrid_info(chunk_src, dst_da)
             if any(
                 size == 0 for size in chunk_src.shape
             ):  # zero overlap for the chunk, zero size chunk
@@ -497,7 +529,7 @@ class Regridder(object):
             else:
                 # Alllocation occurs inside
                 result = dask.delayed(self._regrid, pure=True)(
-                    chunk_src, dst_da, fill_value
+                    chunk_src, fill_value, info
                 )
                 dask_array = dask.array.from_delayed(
                     result, shape=dst_shape, dtype=src.dtype
@@ -575,26 +607,29 @@ class Regridder(object):
         # Gather destination coordinates
         dst_da_coords, _ = common._dst_coords(src, like, dims_from_src, dims_from_like)
 
+        info = self._regrid_info(src, like)
+
         if src.chunks is None:
             self._first_call = False
             src = common._slice_src(
-                src, like, matching_dims + regrid_dims, self.extra_overlap
+                src, like, info.matching_dims + info.regrid_dims, self.extra_overlap
             )
-            data = self._regrid(src, like, fill_value)
+            data = self._regrid(src, fill_value, info)
+            dst = xr.DataArray(data=data, coords=info.dst_da_coords, dims=info.dst_dims)
         else:
             # Ensure all dimensions have a dx coordinate, so that if the chunks
             # results in chunks which are size 1 along a dimension, the cellsize
             # can still be determined.
-            src = common._set_cellsizes(src, regrid_dims)
-            like = common._set_cellsizes(like, regrid_dims)
+            src = common._set_cellsizes(src, info.regrid_dims)
+            like = common._set_cellsizes(like, info.regrid_dims)
             data = self._chunked_regrid(src, like, fill_value)
+            dst = xr.DataArray(data=data, coords=info.dst_da_coords, dims=info.dst_dims)
+            # Replace equidistant cellsize arrays by scalar values
+            dst = common._set_scalar_cellsizes(dst)
 
-        dst = xr.DataArray(data=data, coords=dst_da_coords, dims=dst_dims)
         # Flip dimensions to return as like
         for dim in flip_dst:
             dst = dst.sel({dim: slice(None, None, -1)})
-        # Replace equidistant cellsize arrays by scalar values
-        dst = common._set_scalar_cellsizes(dst)
+
         # Transpose to original dimension coordinates
-        # TODO: profile how much this matters!
         return dst.transpose(*source.dims)
