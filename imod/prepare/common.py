@@ -301,6 +301,16 @@ def _set_cellsizes(da, dims):
     return da
 
 
+def _set_scalar_cellsizes(da):
+    for dim in da.dims:
+        dx_string = f"d{dim}"
+        if dx_string in da:
+            dx = da[dx_string]
+            if np.allclose(dx, dx[0]):
+                da = da.assign_coords({dx_string: dx[0]})
+    return da
+
+
 def _coord(da, dim):
     """
     Transform N xarray midpoints into N + 1 vertex edges

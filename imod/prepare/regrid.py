@@ -564,11 +564,6 @@ class Regridder(object):
         # Collect dimensions to flip to make everything ascending
         src, _ = common._increasing_dims(src, regrid_dims)
         like, flip_dst = common._increasing_dims(like, regrid_dims)
-        # Ensure all dimensions have a dx coordinate, so that if the chunks
-        # results in chunks which are size 1 along a dimension, the cellsize
-        # can still be determined.
-        src = common._set_cellsizes(src, regrid_dims)
-        like = common._set_cellsizes(like, regrid_dims)
 
         # Prepare for regridding; quick checks
         self._prepare(regrid_dims)
@@ -587,12 +582,19 @@ class Regridder(object):
             )
             data = self._regrid(src, like, fill_value)
         else:
+            # Ensure all dimensions have a dx coordinate, so that if the chunks
+            # results in chunks which are size 1 along a dimension, the cellsize
+            # can still be determined.
+            src = common._set_cellsizes(src, regrid_dims)
+            like = common._set_cellsizes(like, regrid_dims)
             data = self._chunked_regrid(src, like, fill_value)
 
         dst = xr.DataArray(data=data, coords=dst_da_coords, dims=dst_dims)
         # Flip dimensions to return as like
         for dim in flip_dst:
             dst = dst.sel({dim: slice(None, None, -1)})
+        # Replace equidistant cellsize arrays by scalar values
+        dst = common._set_scalar_cellsizes(dst)
         # Transpose to original dimension coordinates
         # TODO: profile how much this matters!
         return dst.transpose(*source.dims)
