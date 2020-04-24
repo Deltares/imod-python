@@ -321,6 +321,9 @@ def coord_reference(da_coord):
             dx = dx.values.astype(np.float64)
             xmin = float(x.min()) - 0.5 * abs(dx[start])
             xmax = float(x.max()) + 0.5 * abs(dx[end])
+            # As a single value if equidistant
+            if np.allclose(dx, dx[0]):
+                dx = dx[0]
         else:
             dx = float(dx)
             xmin = float(x.min()) - 0.5 * abs(dx)
@@ -328,7 +331,7 @@ def coord_reference(da_coord):
     elif x.size == 1:
         raise ValueError(
             f"DataArray has size 1 along {da_coord.name}, so cellsize must be provided"
-            " as a coordinate named d{da_coord.name}."
+            f" as a coordinate named d{da_coord.name}."
         )
     else:  # Equidistant
         # TODO: decide on decent criterium for what equidistant means
