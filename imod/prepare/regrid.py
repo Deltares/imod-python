@@ -473,18 +473,26 @@ class Regridder(object):
             if i == 0 and arr1 is not None:
                 np_collection[0] = arr1
                 continue
-            matching_dims, regrid_dims, _ = common._match_dims(src, dst_da)
+            matching_dims, regrid_dims, add_dims = common._match_dims(src, dst_da)
 
             # NOTA BENE: slice must occur BEFORE sending it to dask.delayed
             # if not, dask will attempt to allocate the full array!
             chunk_src = common._slice_src(
                 src, dst_da, matching_dims + regrid_dims, self.extra_overlap
             )
+
+            # Determine shape of array
+            dims_from_src = (*add_dims, *matching_dims)
+            dims_from_like = tuple(regrid_dims)
+            _, dst_shape = common._dst_coords(
+                chunk_src, dst_da, dims_from_src, dims_from_like
+            )
+
             if any(
                 size == 0 for size in chunk_src.shape
             ):  # zero overlap for the chunk, zero size chunk
                 dask_array = dask.array.full(
-                    shape=dst_da.shape, fill_value=fill_value, dtype=src.dtype
+                    shape=dst_shape, fill_value=fill_value, dtype=src.dtype
                 )
             else:
                 # Alllocation occurs inside
@@ -492,7 +500,7 @@ class Regridder(object):
                     chunk_src, dst_da, fill_value
                 )
                 dask_array = dask.array.from_delayed(
-                    result, shape=dst_da.shape, dtype=src.dtype
+                    result, shape=dst_shape, dtype=src.dtype
                 )
 
             np_collection[i] = dask_array

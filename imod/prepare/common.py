@@ -383,11 +383,12 @@ def _define_slices(src, like):
     dst_dim_slices = []
     dst_chunks_shape = []
     for dim, chunksizes in zip(src.dims, src.chunks):
-        dst_slices = _define_single_dim_slices(
-            _coord(src, dim), _coord(like, dim), chunksizes
-        )
-        dst_dim_slices.append(dst_slices)
-        dst_chunks_shape.append(len(dst_slices))
+        if dim in like.dims:
+            dst_slices = _define_single_dim_slices(
+                _coord(src, dim), _coord(like, dim), chunksizes
+            )
+            dst_dim_slices.append(dst_slices)
+            dst_chunks_shape.append(len(dst_slices))
 
     dst_expanded_slices = np.stack(
         [a.ravel() for a in np.meshgrid(*dst_dim_slices, indexing="ij")], axis=-1
