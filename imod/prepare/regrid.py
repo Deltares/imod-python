@@ -402,26 +402,28 @@ class Regridder(object):
         else:
             self._nd_regrid = nd_regrid
 
+    def _check_ndim_regrid(self, regrid_dims):
+        if not len(regrid_dims) == self.ndim_regrid:
+            raise ValueError(
+                "Number of dimensions to regrid does not match: "
+                f"Regridder.ndim_regrid = {self.ndim_regrid}"
+            )
+
     def _prepare(self, regrid_dims):
         # Create tailor made regridding function: take method and ndims into
         # account and call it
-        if self._first_call:
-            if self.ndim_regrid is None:
-                ndim_regrid = len(regrid_dims)
-                if self.method == common.METHODS["conductance"] and ndim_regrid > 2:
-                    raise ValueError(
-                        "The conductance method should not be applied to "
-                        "regridding more than two dimensions"
-                    )
-                self.ndim_regrid = ndim_regrid
-
-            self._make_regrid()
+        if self.ndim_regrid is None:
+            self.ndim_regrid = len(regrid_dims)
         else:
-            if not len(regrid_dims) == self.ndim_regrid:
-                raise ValueError(
-                    "Number of dimensions to regrid does not match: "
-                    f"Regridder.ndim_regrid = {self.ndim_regrid}"
-                )
+            self._check_ndim_regrid(regrid_dims)
+
+        if self.method == common.METHODS["conductance"] and len(regrid_dims) > 2:
+            raise ValueError(
+                "The conductance method should not be applied to "
+                "regridding more than two dimensions"
+            )
+        # Create the method.
+        self._make_regrid()
 
     @staticmethod
     def _regrid_info(src, like):
@@ -561,15 +563,17 @@ class Regridder(object):
         like, flip_dst = common._increasing_dims(like, info.regrid_dims)
 
         # Prepare for regridding; quick checks
-        self._prepare(info.regrid_dims)
+        if self._first_call:
+            self._prepare(info.regrid_dims)
+        self._check_ndim_regrid(info.regrid_dims)
 
         if src.chunks is None:
-            self._first_call = False
             src = common._slice_src(src, like, self.extra_overlap)
             # Recollect info with sliced part of src
             info = self._regrid_info(src, like)
             data = self._regrid(src, fill_value, info)
             dst = xr.DataArray(data=data, coords=info.dst_da_coords, dims=info.dst_dims)
+            self._first_call = False
         else:
             # Ensure all dimensions have a dx coordinate, so that if the chunks
             # results in chunks which are size 1 along a dimension, the cellsize

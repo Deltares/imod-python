@@ -498,7 +498,7 @@ def test_regrid_conductance2d():
     assert float(src_da.sum()) == float(dst_da.sum())
 
 
-def test_regrid_conductance3d__errors():
+def test_regrid_errors():
     values = np.array([[0.6, 0.2, 3.4], [1.4, 1.6, 1.0], [4.0, 2.8, 3.0]])
     values = np.stack([values for _ in range(5)])
     src_x = np.arange(3.0) + 0.5
@@ -511,8 +511,13 @@ def test_regrid_conductance3d__errors():
     likecoords = {"z": dst_z, "y": dst_x, "x": dst_x}
     like = xr.DataArray(np.empty((5, 2, 2)), likecoords, dims)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="The conductance method"):
         _ = imod.prepare.Regridder(method="conductance").regrid(source, like)
+
+    like = source.isel(z=slice(1, 3))
+    like["z"] = [1.5, 2.5]
+    with pytest.raises(ValueError, match="Number of dimensions to regrid"):
+        _ = imod.prepare.Regridder(method="mean", ndim_regrid=3).regrid(source, like)
 
 
 def test_str_method():
