@@ -14,6 +14,8 @@ Changed
 - (:meth:`imod.wq.SeawatModel.write`) no longer automatically appends the model
    name to the directory where the input is written. Instead, it simply writes
    to the directory as specified.
+-  (:func:`imod.select.points_set_values`) returns a new DataArray rather than
+   mutating the input `da`.
 
 Added
 ~~~~~
@@ -43,6 +45,11 @@ Added
 
 Fixed
 ~~~~~
+-  (:meth:`imod.prepare.Regridder`) detects if the `like` DataArray is a subset
+   along a dimension, in which case the dimension is not regridded.
+-  (:meth:`imod.prepare.Regridder`) now slices the `source` array accurately
+   before regridding, taking cell boundaries into account rather than only
+   cell midpoints.
 -  ``density`` is no longer an optional argument in (:class:`imod.wq.GeneralHeadboundary`) and
    (:class:`imod.wq.River). The reason is that iMOD-WQ fully removes (!) these packages if density
    is not present.
@@ -50,15 +57,15 @@ Fixed
    which a coordinate other than ``x`` or ``y`` is descending.
 -  (:func:`imod.visualize.plot_map`) enforces decreasing ``y``, which ensures maps are not plotted
    upside down.
-
-Fixed
-~~~~~
-
--  (:meth:`imod.prepare.Regridder`) detects if the `like` DataArray is a subset
-   along a dimension, in which case the dimension is not regridded.
--  (:meth:`imod.prepare.Regridder`) now slices the `source` array accurately
-   before regridding, taking cell boundaries into account rather than only
-   cell midpoints.
+-  (:func:`imod.util.coord_reference`) now returns a scalar cellsize if coordinate is equidistant.
+-  (:meth:`imod.prepare.Regridder.regrid`) returns cellsizes as scalar when coordinates are 
+   equidistant.
+-  (:meth:`imod.prepare.Regridder.regrid`) also works for chunked DataArrays where
+   a chunked dimension does not have to be regridded, and for `like` arrays that
+   feature less dimensions than `source` (making behavior consistent with non-chunked
+   regridding).
+-  Raise proper ValueError in (:meth:`imod.prepare.Regridder.regrid`) when the number of
+   dimensions to regrid does not match the regridder dimensions.
 
 [0.9.0] - 2020-01-19
 --------------------
