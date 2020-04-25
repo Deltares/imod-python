@@ -116,28 +116,26 @@ def test_get_indices__equidistant(test_da):
 
 
 def test_set_values(test_da_nonequidistant):
-    out = xr.full_like(test_da_nonequidistant, 0.0)
+    da = xr.full_like(test_da_nonequidistant, 0.0)
     x = 0.0
     y = 0.0
-    imod.select.points_set_values(out, 1.0, x=x, y=y)
+    out = imod.select.points_set_values(da, 1.0, x=x, y=y)
     expected = np.array(
         [[0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0]]
     )
     assert (out.values == expected).all()
 
-    # reset values
-    out[:] = 0.0
     # paint diagonal
     x = [0.45, 1.45, 2.4]
     y = [2.25, 1.25, 0.5]
-    imod.select.points_set_values(out, 1.0, x=x, y=y)
+    out = imod.select.points_set_values(da, 1.0, x=x, y=y)
     expected = np.array(
         [[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0]]
     )
     assert (out.values == expected).all()
 
     values = [1.0, 2.0, 3.0]
-    imod.select.points_set_values(out, values, x=x, y=y)
+    out = imod.select.points_set_values(da, values, x=x, y=y)
     expected = np.array(
         [[1.0, 0.0, 0.0, 0.0], [0.0, 2.0, 0.0, 0.0], [0.0, 0.0, 3.0, 0.0]]
     )

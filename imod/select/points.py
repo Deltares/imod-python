@@ -214,7 +214,8 @@ def points_set_values(da, values, **points):
 
     Returns
     -------
-    None : mutates da.
+    da : xr.DataArray
+        DataArray with values set at the point locations.
 
     Examples
     --------
@@ -222,9 +223,13 @@ def points_set_values(da, values, **points):
     >>> x = [1.0, 2.2, 3.0]
     >>> y = [4.0, 5.6, 7.0]
     >>> values = [10.0, 11.0, 12.0]
-    >>> imod.select.points_set_values(da, values, x=x, y=y)
+    >>> out = imod.select.points_set_values(da, values, x=x, y=y)
 
     """
+    # Avoid side-effects just in case
+    # Load into memory, so values can be set efficiently via numpy indexing.
+    da = da.copy(deep=True).load()
+
     inside = points_in_bounds(da, **points)
     # Error handling
     if not inside.all():
@@ -255,3 +260,4 @@ def points_set_values(da, values, **points):
 
     # Set values in dask or numpy array
     da.data[tuple(indices)] = values
+    return da
