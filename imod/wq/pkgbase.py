@@ -525,8 +525,10 @@ class BoundaryCondition(Package):
         if not "layer" in self.coords:  # Then it applies to every layer
             nmax *= nlayer
         self._cellcount = nmax  # Store cellcount so it can be re-used for ssm.
+        self._ssm_cellcount = nmax
 
         # Second, compute active number of sinks and sources
+        # overwite _ssm_cellcount if more specific info is available.
         if "concentration" in self:
             da = self["concentration"]
 
@@ -551,9 +553,6 @@ class BoundaryCondition(Package):
                 nmax = nlayer * nrow * ncol
 
             self._ssm_cellcount = nmax * nspecies
-
-        else:
-            self._ssm_cellcount = 0
 
         return nmax
 
