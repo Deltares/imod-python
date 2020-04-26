@@ -60,12 +60,8 @@ Fixed
 -  (:func:`imod.util.coord_reference`) now returns a scalar cellsize if coordinate is equidistant.
 -  (:meth:`imod.prepare.Regridder.regrid`) returns cellsizes as scalar when coordinates are 
    equidistant.
--  (:meth:`imod.prepare.Regridder.regrid`) also works for chunked DataArrays where
-   a chunked dimension does not have to be regridded, and for `like` arrays that
-   feature less dimensions than `source` (making behavior consistent with non-chunked
-   regridding).
--  Raise proper ValueError in (:meth:`imod.prepare.Regridder.regrid`) when the number of
-   dimensions to regrid does not match the regridder dimensions.
+-  Raise proper ValueError in (:meth:`imod.prepare.Regridder.regrid`) consistenly when the number
+   of dimensions to regrid does not match the regridder dimensions.
 
 [0.9.0] - 2020-01-19
 --------------------

@@ -572,7 +572,6 @@ class Regridder(object):
             # Recollect info with sliced part of src
             info = self._regrid_info(src, like)
             data = self._regrid(src, fill_value, info)
-            dst = xr.DataArray(data=data, coords=info.dst_da_coords, dims=info.dst_dims)
             self._first_call = False
         else:
             # Ensure all dimensions have a dx coordinate, so that if the chunks
@@ -581,9 +580,10 @@ class Regridder(object):
             src = common._set_cellsizes(src, info.regrid_dims)
             like = common._set_cellsizes(like, info.regrid_dims)
             data = self._chunked_regrid(src, like, fill_value)
-            dst = xr.DataArray(data=data, coords=info.dst_da_coords, dims=info.dst_dims)
-            # Replace equidistant cellsize arrays by scalar values
-            dst = common._set_scalar_cellsizes(dst)
+
+        dst = xr.DataArray(data=data, coords=info.dst_da_coords, dims=info.dst_dims)
+        # Replace equidistant cellsize arrays by scalar values
+        dst = common._set_scalar_cellsizes(dst)
 
         # Flip dimensions to return as like
         for dim in flip_dst:
