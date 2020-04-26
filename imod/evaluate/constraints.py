@@ -238,7 +238,6 @@ def intra_cell_boundary_conditions(
             if sourceid == sinkid:
                 continue
             comb = f"{sourceid}-{sinkid}"
-            print(comb)
 
             if comb not in resultids:
                 # source in riv: only where stage > bottom elev

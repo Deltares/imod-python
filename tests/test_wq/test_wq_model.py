@@ -579,7 +579,6 @@ def test_highest_active_recharge(basicmodel):
     m["bas6"]["ibound"][0, 0, 0] = 0.0
     m["btn"]["icbund"][...] = 0.0
     n_sinkssources = m._bas_btn_rch_sinkssources()
-    print(m["bas6"]["ibound"])
     assert np.array_equal(m["rch"]._ssm_layers, np.array([1, 2]))
     assert n_sinkssources == 50 + 25
 

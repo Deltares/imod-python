@@ -110,7 +110,6 @@ def test_cached_river__max_n(test_timelayerda, tmp_path):
     MAX_N: Input recognized. Skipping.
     """
     )
-    print(actual_log)
     assert actual_log == expected_log
 
 
@@ -153,7 +152,6 @@ def test_cached_river__check(test_timelayerda, tmp_path):
     CHECK: Input recognized. Skipping.
     """
     )
-    print(actual_log)
     assert actual_log == expected_log
 
 

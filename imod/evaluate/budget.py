@@ -273,8 +273,6 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
     # rid of the array and we get a segfault.
     indices = dask.array.from_array(_face_indices(face.values, budgetzone.values))
     # Make sure it returns NaNs if no zones are defined.
-    print(indices.size)
-    print(indices)
     if indices.size > 0:
         # Create dummy arrays for skipped values, allocate just once
         if front is None:

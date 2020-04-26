@@ -457,7 +457,6 @@ def test_simulation_write(twri_model, tmp_path):
         # hds file is identical to the official example, except for the
         # time units, which are days here and seconds in the official one
         head = imod.mf6.open_hds("GWF_1/GWF_1.hds", "GWF_1/dis.dis.grb")
-        print(head)
         assert head.dims == ("time", "layer", "y", "x")
         assert head.shape == (1, 3, 15, 15)
         meanhead_layer = head.groupby("layer").mean(dim=xr.ALL_DIMS)

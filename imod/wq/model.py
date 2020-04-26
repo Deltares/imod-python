@@ -417,7 +417,6 @@ class SeawatModel(Model):
             rch._set_ssm_layers(ibound)
             nlay = rch._ssm_layers.size
             n_rch = nlay * nrow * ncol
-            print(n_rch)
             n_extra += n_rch
 
         evtkey = self._get_pkgkey("evt")
@@ -427,7 +426,6 @@ class SeawatModel(Model):
             evt._set_ssm_layers(ibound)
             nlay = evt._ssm_layers.size
             n_evt = nlay * nrow * ncol
-            print(n_evt)
             n_extra += n_evt
 
         return n_extra
