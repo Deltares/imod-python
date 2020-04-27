@@ -155,7 +155,13 @@ class RechargeHighestActive(Recharge):
         self["save_budget"] = save_budget
 
     def _set_ssm_layers(self, ibound):
-        top_layer = ibound["layer"].where(ibound > 0).min("layer")
+        rate = self["rate"]
+        idf = ("x" in rate.dims) and ("y" in rate.dims)
+        if idf:
+            rch_active = (rate != 0.0) & rate.notnull()
+        else:
+            rch_active = ibound > 0
+        top_layer = ibound["layer"].where(rch_active).min("layer")
         top_layer = top_layer.where(ibound.notnull().any("layer"))
         unique_layers = np.unique(top_layer.values)
         unique_layers = unique_layers[~np.isnan(unique_layers)]
