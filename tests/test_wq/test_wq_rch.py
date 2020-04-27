@@ -118,6 +118,28 @@ def test_render__highest_active(recharge_ha):
     assert rch._render(directory, globaltimes=rch.time.values) == compare
 
 
+def test_ssm_cellcount_scalar_highest_active(recharge_ha):
+    rch_template = recharge_ha
+    rate = rch_template["rate"]
+    rate[:, 0, :] = np.nan
+    rch = RechargeHighestActive(rate=rate, concentration=0.1)
+    ibound = xr.DataArray(
+        np.full((3, 5, 5), 1.0),
+        coords={
+            "layer": [1, 2, 3],
+            "y": recharge_ha["y"],
+            "x": recharge_ha["x"],
+            "dx": 1.0,
+            "dy": -1.0,
+        },
+        dims=("layer", "y", "x"),
+    )
+    ibound[0, 0, :] = 0.0
+
+    rch._set_ssm_layers(ibound)
+    assert np.allclose(rch._ssm_layers, [1])
+
+
 @pytest.mark.parametrize("varname", ["rate", "concentration"])
 def test_render__timemap(recharge_ha, varname):
     rch = recharge_ha.isel(time=0)

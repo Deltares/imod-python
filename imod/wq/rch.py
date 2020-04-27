@@ -156,12 +156,11 @@ class RechargeHighestActive(Recharge):
 
     def _set_ssm_layers(self, ibound):
         rate = self["rate"]
-        
-        if "y" not in rate.coords and "x" not in rate.coords:
-            rch_active = ibound > 0
+        idf = ("x" in rate.dims) and ("y" in rate.dims)
+        if idf:
+            rch_active = (rate != 0.0) & rate.notnull()
         else:
-            rch_active = (rate != 0) & rate.notnull()
-        
+            rch_active = ibound > 0
         top_layer = ibound["layer"].where(rch_active).min("layer")
         top_layer = top_layer.where(ibound.notnull().any("layer"))
         unique_layers = np.unique(top_layer.values)
