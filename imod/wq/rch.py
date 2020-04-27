@@ -150,19 +150,29 @@ class RechargeHighestActive(Recharge):
 
     def __init__(self, rate, concentration, save_budget=False):
         super(__class__, self).__init__()
+
+        rate_scalar = np.ndim(rate) == 0
+        conc_scalar = np.ndim(concentration) == 0
+        if rate_scalar and (not conc_scalar):
+            raise ValueError("Rate cannot be scalar if concentration is non-scalar.")
+
         self["rate"] = rate
         self["concentration"] = concentration
         self["save_budget"] = save_budget
 
     def _set_ssm_layers(self, ibound):
         rate = self["rate"]
-        idf = ("x" in rate.dims) and ("y" in rate.dims)
-        if idf:
+        rate_idf = ("x" in rate.dims) and ("y" in rate.dims)
+        conc_scalar = np.ndim(self["concentration"]) == 0
+        if rate_idf and conc_scalar:
             rch_active = (rate != 0.0) & rate.notnull()
+            if "time" in rch_active.dims:
+                rch_active = rch_active.any("time")
         else:
             rch_active = ibound > 0
+
         top_layer = ibound["layer"].where(rch_active).min("layer")
-        top_layer = top_layer.where(ibound.notnull().any("layer"))
+        top_layer = top_layer.where((ibound > 0).any("layer"))
         unique_layers = np.unique(top_layer.values)
         unique_layers = unique_layers[~np.isnan(unique_layers)]
         self._ssm_layers = unique_layers.astype(np.int)

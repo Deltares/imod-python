@@ -139,6 +139,9 @@ def test_ssm_cellcount_scalar_highest_active(recharge_ha):
     rch._set_ssm_layers(ibound)
     assert np.allclose(rch._ssm_layers, [1])
 
+    with pytest.raises(ValueError, match="Rate cannot be scalar"):
+        RechargeHighestActive(rate=0.001, concentration=rate)
+        
 
 @pytest.mark.parametrize("varname", ["rate", "concentration"])
 def test_render__timemap(recharge_ha, varname):
