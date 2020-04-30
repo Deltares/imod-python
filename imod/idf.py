@@ -333,7 +333,7 @@ def open_subdomains(path, use_cftime=False):
             )
 
     pattern = r"{name}_{time}_l{layer}_p\d+"
-    timestrings = sorted(set(timestrings))
+    timestrings = list(grouped_by_time.keys())
 
     # Prepare output coordinates
     coords = {}
@@ -358,6 +358,7 @@ def open_subdomains(path, use_cftime=False):
     times = [util.to_datetime(timestr) for timestr in timestrings]
     times, use_cftime = util._convert_datetimes(times, use_cftime)
     if use_cftime:
+        # unique also sorts
         coords["time"] = xr.CFTimeIndex(np.unique(times))
     else:
         coords["time"] = np.unique(times)
@@ -372,6 +373,9 @@ def open_subdomains(path, use_cftime=False):
         timestep_data = dask.delayed(_merge_subdomains)(group, use_cftime, pattern)
         dask_array = dask.array.from_delayed(timestep_data, shape, dtype=dtype)
         merged.append(dask_array)
+
+    sorted_order = np.argsort(times)
+    merged = np.array(merged)[sorted_order]
     data = dask.array.concatenate(merged, axis=0)
 
     # Get tops and bottoms if possible
