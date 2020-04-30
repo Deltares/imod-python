@@ -542,25 +542,25 @@ class Regridder(object):
         result : xr.DataArray
             Regridded result.
         """
-        info = self._regrid_info(source, like)
-        # Exit early if nothing is to be done
-        if len(info.regrid_dims) == 0:
-            return source.copy(deep=True)
-
         # Don't mutate source; src stands for source, dst for destination
         src = source.copy(deep=False)
         like = like.copy(deep=False)
+        _, regrid_dims, _ = common._match_dims(src, like)
+        # Exit early if nothing is to be done
+        if len(regrid_dims) == 0:
+            return source.copy(deep=True)
 
+        # Collect dimensions to flip to make everything ascending
+        src, _ = common._increasing_dims(src, regrid_dims)
+        like, flip_dst = common._increasing_dims(like, regrid_dims)
+
+        info = self._regrid_info(source, like)
         # Use xarray for nearest
         # TODO: replace by more efficient, specialized method
         if self.method == "nearest":
             dst = source.reindex_like(like, method="nearest")
             dst = dst.assign_coords(info.dst_da_coords)
             return dst
-
-        # Collect dimensions to flip to make everything ascending
-        src, _ = common._increasing_dims(src, info.regrid_dims)
-        like, flip_dst = common._increasing_dims(like, info.regrid_dims)
 
         # Prepare for regridding; quick checks
         if self._first_call:
