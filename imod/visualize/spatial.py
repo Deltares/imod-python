@@ -67,6 +67,7 @@ def plot_map(
     kwargs_raster=None,
     kwargs_colorbar=None,
     figsize=None,
+    return_cbar=False,
 ):
     """
     Parameters
@@ -97,11 +98,15 @@ def plot_map(
         These arguments are forwarded to fig.colorbar()
     figsize : tuple of two floats or integers, optional
         This is used in plt.subplots(figsize)
+    return_cbar : boolean, optional
+        Return the matplotlib.Colorbar instance. Defaults to False.
 
     Returns
     -------
     fig : matplotlib.figure
     ax : matplotlig.ax
+    if return_cbar == True:
+    cbar : matplotlib.Colorbar
 
     Examples
     --------
@@ -109,6 +114,8 @@ def plot_map(
     
     >>> overlays = [{"gdf": geodataframe, "edgecolor": "black"}]
     >>> imod.visualize.spatial.plot_map(raster, legend, overlays)
+
+    Label the colorbar and the colorbar ticks
     """
     # Read legend settings
     if isinstance(colors, matplotlib.colors.LinearSegmentedColormap):
@@ -189,7 +196,8 @@ def plot_map(
     # Add colorbar
     divider = make_axes_locatable(ax)
     cbar_ax = divider.append_axes("right", size="5%", pad="5%")
-    fig.colorbar(ax1, cmap=cmap, norm=norm, cax=cbar_ax, **settings_cbar)
+    ticklabels = settings_cbar.pop("ticklabels", None)
+    cbar = fig.colorbar(ax1, cmap=cmap, norm=norm, cax=cbar_ax, **settings_cbar)
 
     # Add overlays
     for overlay in overlays:
@@ -198,7 +206,10 @@ def plot_map(
         gdf.plot(ax=ax, **tmp)
 
     # Return
-    return fig, ax
+    if return_cbar:
+        return fig, ax, cbar
+    else:
+        return fig, ax
 
 
 def _colorscale(a_yx, levels, cmap, quantile_colorscale):
