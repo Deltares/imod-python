@@ -132,9 +132,9 @@ class LayerRegridder:
                     f' ("layer", "y", "x"). Got instead {dim_format(da.dims)}.'
                 )
         for da in [source_bottom, source]:
-            for (k1, v1) in source_top.coords.items():
-                if not v1.equals(da.coords[k1]):
-                    raise ValueError(f"Input coordinates do not match along {k1}")
+            for dim in ["layer", "y", "x"]:
+                if not source_top[dim].equals(da[dim]):
+                    raise ValueError(f"Input coordinates do not match along {dim}")
 
         if self._first_call:
             self._make_regrid()
