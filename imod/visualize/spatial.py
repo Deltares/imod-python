@@ -9,6 +9,7 @@ import xarray as xr
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import imod
+from imod.visualize import common
 
 # since geopandas is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
@@ -118,33 +119,7 @@ def plot_map(
     Label the colorbar and the colorbar ticks
     """
     # Read legend settings
-    if isinstance(colors, matplotlib.colors.LinearSegmentedColormap):
-        # use given cmap
-        cmap = colors
-    else:
-        nlevels = len(levels)
-        if isinstance(colors, str):
-            # Use given cmap, but fix the under and over colors
-            # The colormap (probably) does not have a nice under and over color.
-            # So we cant use `cmap = matplotlib.cm.get_cmap(colors)`
-            cmap = matplotlib.cm.get_cmap(colors)
-            colors = cmap(np.linspace(0, 1, nlevels + 1))
-        # Validate number of colors vs number of levels
-        ncolors = len(colors)
-        if not nlevels == ncolors - 1:
-            raise ValueError(
-                f"Incorrect number of levels. Number of colors is {ncolors},"
-                f" expected {ncolors - 1} levels, got {nlevels} levels instead."
-            )
-        # Crate cmap from given list of colors
-        cmap = matplotlib.colors.ListedColormap(colors[1:-1])
-        cmap.set_under(
-            colors[0]
-        )  # this is the color for values smaller than raster.min()
-        cmap.set_over(
-            colors[-1]
-        )  # this is the color for values larger than raster.max()
-    norm = matplotlib.colors.BoundaryNorm(levels, cmap.N)
+    cmap, norm = common._cmapnorm_from_colorslevels(colors, levels)
 
     # Get extent
     _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(raster)
