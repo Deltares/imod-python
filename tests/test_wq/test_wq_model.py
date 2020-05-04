@@ -103,7 +103,7 @@ def basicmodel():
     m["rch"] = imod.wq.RechargeHighestActive(
         rate=rate, concentration=rate.copy(), save_budget=False
     )
-    m["evt"] = evt = imod.wq.EvapotranspirationTopLayer(
+    m["evt"] = imod.wq.EvapotranspirationTopLayer(
         maximum_rate=maximum_rate,
         surface=maximum_rate.copy(),
         extinction_depth=maximum_rate.copy(),
@@ -413,6 +413,24 @@ def test_render_groups__ghb_riv_wel(basicmodel):
     assert n_sinkssources == 128
     assert content == compare
     assert ssm_content == ssm_compare
+
+
+def test_render_groups__double_gbh(basicmodel):
+    m = basicmodel.copy()
+    ghbhead = m["ghb"]["head"].copy()
+    m["ghb2"] = imod.wq.GeneralHeadBoundary(
+        head=ghbhead,
+        conductance=ghbhead.copy(),
+        density=ghbhead.copy(),
+        save_budget=False,
+    )
+    m.time_discretization("2000-01-06")
+    diskey = m._get_pkgkey("dis")
+    globaltimes = m[diskey]["time"].values
+    directory = pathlib.Path(".")
+
+    n_sinkssources = m._render_groups(directory=directory, globaltimes=globaltimes)[2]
+    assert n_sinkssources == 178
 
 
 def test_render_flowsolver(basicmodel):

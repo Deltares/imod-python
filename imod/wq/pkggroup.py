@@ -40,9 +40,7 @@ class PackageGroup(collections.UserDict):
         self.key_order = order
 
     def max_n_sinkssources(self):
-        # Only render for the first system, that has concentrations defined.
-        key = self.first_key
-        return self[key]._ssm_cellcount
+        return sum(pkg._ssm_cellcount for pkg in self.values())
 
     def render(self, directory, globaltimes, nlayer, nrow, ncol):
         d = {}
