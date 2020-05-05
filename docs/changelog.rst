@@ -42,6 +42,7 @@ Added
 -  Support for out of core computation by ``imod.prepare.Regridder`` if ``source``
    is chunked.
 -  (:func:`imod.ipf.read`) now reports the problematic file if reading errors occurs.
+-  (:func:`imod.prepare.polygonize`) added to polygonize DataArrays to GeoDataFrames.
 
 Fixed
 ~~~~~
