@@ -22,6 +22,7 @@ from imod.prepare.spatial import (
     fill,
     gdal_rasterize,
     laplace_interpolate,
+    polygonize,
     rasterize,
     rasterize_celltable,
 )
