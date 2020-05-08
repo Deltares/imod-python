@@ -46,7 +46,7 @@ class Storage(Package):
     def render(self, directory, pkgname, globaltimes):
         d = {}
         for varname in ["specific_storage", "specific_yield", "convertible"]:
-            d[varname] = self._compose_values(varname, directory)
+            d[varname] = self._compose_values(self[varname], directory)
 
         periods = {}
         if "time" in self["transient"]:
