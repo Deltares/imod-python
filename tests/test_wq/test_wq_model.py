@@ -263,8 +263,6 @@ def test_render_gen(basicmodel):
         writehelp=False,
         result_dir="results",
     )
-    print(actual)
-    print(compare)
     assert actual == compare
 
 
