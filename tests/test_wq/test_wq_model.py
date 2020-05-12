@@ -252,17 +252,20 @@ def test_render_gen(basicmodel):
             coord_yll = 0.0
             start_year = 2000
             start_month = 01
-            start_day = 01"""
+            start_day = 01
+            start_hour = 00
+            start_minute = 00
+            start_second = 00"""
     )
-    assert (
-        m._render_gen(
-            modelname=modelname,
-            globaltimes=globaltimes,
-            writehelp=False,
-            result_dir="results",
-        )
-        == compare
+    actual = m._render_gen(
+        modelname=modelname,
+        globaltimes=globaltimes,
+        writehelp=False,
+        result_dir="results",
     )
+    print(actual)
+    print(compare)
+    assert actual == compare
 
 
 def test_render_pkg__gcg(basicmodel):
