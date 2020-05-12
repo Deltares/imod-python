@@ -368,14 +368,14 @@ def open_subdomains(path, use_cftime=False):
     # Collect and merge data
     merged = []
     dtype = headers[0]["dtype"]
-    for group in grouped_by_time.values():
+    sorted_order = np.argsort(times)  # get time ordering right before merging
+    sorted_timestrings = np.array(timestrings)[sorted_order]
+    for timestr in sorted_timestrings:
+        group = grouped_by_time[timestr]
         # Build a single array per timestep
         timestep_data = dask.delayed(_merge_subdomains)(group, use_cftime, pattern)
         dask_array = dask.array.from_delayed(timestep_data, shape, dtype=dtype)
         merged.append(dask_array)
-
-    sorted_order = np.argsort(times)
-    merged = np.array(merged)[sorted_order]
     data = dask.array.concatenate(merged, axis=0)
 
     # Get tops and bottoms if possible
