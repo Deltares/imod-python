@@ -38,6 +38,7 @@ The methods below construct pyvista.UnstructuredGrids for voxel models (z1d),
 import numba
 import numpy as np
 import pandas as pd
+from pathlib import Path
 import scipy.ndimage.morphology
 import tqdm
 import xarray as xr
@@ -620,18 +621,23 @@ class GridAnimation3D:
 
     def write(self, filename, framerate=24):
         """
-        Write the animation to a video.
+        Write the animation to a video or gif.
 
         Resets the plotter when finished animating.
 
         Parameters
         ----------
         filename : str, pathlib.Path
-            Filename to write the video to. Should likely be an .mp4.
+            Filename to write the video to. Should be an .mp4 or .gif.
         framerate : int, optional
-            Frames per second.
+            Frames per second. Not honoured for gif.
         """
-        self.plotter.open_movie(filename, framerate=framerate)
+        if Path(filename).suffix.lower() == ".gif":
+            self.plotter.open_gif(
+                Path(filename).with_suffix(".gif").as_posix()
+            )  # only lowercase gif and no Path allowed
+        else:
+            self.plotter.open_movie(filename, framerate=framerate)
         self.plotter.show(auto_close=False, interactive=False)
         self.plotter.write_frame()
 
