@@ -212,21 +212,21 @@ def _colorscale(a_yx, levels, cmap, quantile_colorscale):
         nlevels = levels
         if quantile_colorscale:
             levels = np.unique(np.nanpercentile(a_yx.values, np.linspace(0, 100, 101)))
-            if levels.size > nlevels:
+            if len(levels) > nlevels:
                 # Decrease the number of levels
                 # Pretty rough approach, but should be sufficient
                 x = np.linspace(0.0, 100.0, nlevels)
-                xp = np.linspace(0.0, 100.0, levels.size)
+                xp = np.linspace(0.0, 100.0, len(levels))
                 yp = levels
                 levels = np.interp(x, xp, yp)
             else:  # Can't make more levels out of only a few quantiles
-                nlevels = levels.size
+                nlevels = len(levels)
         else:  # Go start to end
             vmin = float(a_yx.min())
             vmax = float(a_yx.max())
             levels = np.linspace(vmin, vmax, nlevels)
     elif isinstance(levels, (np.ndarray, list, tuple)):  # Pre-defined by user
-        nlevels = levels.size
+        nlevels = len(levels)
     else:
         raise ValueError("levels argument should be None, an integer, or an array.")
 
