@@ -16,6 +16,8 @@ Changed
    to the directory as specified.
 -  (:func:`imod.select.points_set_values`) returns a new DataArray rather than
    mutating the input `da`.
+-  (:func:`imod.select.points_values`) returns a DataArray with an index taken
+   from the data of the first provided dimensions if it is a `pandas.Series`.
 
 Added
 ~~~~~

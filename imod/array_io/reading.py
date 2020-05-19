@@ -6,6 +6,7 @@ import pathlib
 
 import dask
 import numpy as np
+import tqdm
 import xarray as xr
 
 import imod
@@ -345,7 +346,7 @@ def _load(paths, use_cftime, pattern, _read, header):
     """Combine a list of paths to IDFs to a single xarray.DataArray"""
     # this function also works for single IDFs
 
-    headers = [header(p, pattern) for p in paths]
+    headers = [header(p, pattern) for p in tqdm.tqdm(paths)]
     names = [h["name"] for h in headers]
     _all_equal(names, "names")
 
