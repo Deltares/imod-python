@@ -1,5 +1,6 @@
 import pathlib
 
+import jinja2
 import numpy as np
 import pandas as pd
 
@@ -193,7 +194,7 @@ class ParallelSolver(Package):
                 }
             )
 
-        return self._template.format(**d)
+        return self._template.render(**d)
 
     def save(self, directory):
         """
@@ -284,23 +285,22 @@ class ParallelKrylovFlowSolver(ParallelSolver):
     __slots__ = ()
 
     _pkg_id = "pksf"
-    _template = (
+    _template = jinja2.Template(
         "[pksf]\n"
-        "    mxiter = {max_iter}\n"
-        "    innerit = {inner_iter}\n"
-        "    hclosepks = {hclose}\n"
-        "    rclosepks = {rclose}\n"
-        "    relax = {relax}\n"
-        "    h_fstrictpks = {h_fstrict}\n"
-        "    r_fstrictpks = {r_fstrict}\n"
-        "    partopt = {partition}\n"
-        "    isolver = {solver}\n"
-        "    npc = {preconditioner}\n"
-        "    npcdef = {deflate}\n"
-        "    loadptr = {load_balance_weight}\n"
-        "    pressakey = {debug}\n"
+        "    mxiter = {{max_iter}}\n"
+        "    innerit = {{inner_iter}}\n"
+        "    hclosepks = {{hclose}}\n"
+        "    rclosepks = {{rclose}}\n"
+        "    relax = {{relax}}\n"
+        "    h_fstrictpks = {{h_fstrict}}\n"
+        "    r_fstrictpks = {{r_fstrict}}\n"
+        "    partopt = {{partition}}\n"
+        "    isolver = {{solver}}\n"
+        "    npc = {{preconditioner}}\n"
+        "    npcdef = {{deflate}}\n"
+        "{% if load_balance_weight %}    loadptr = {{load_balance_weight}}\n {% endif %}"
+        "    pressakey = {{debug}}\n"
     )
-
     _keywords = {
         "partition": {"uniform": 0, "rcb": 5},
         "solver": {"pcg": 1},
@@ -414,17 +414,17 @@ class ParallelKrylovTransportSolver(ParallelSolver):
 
     __slots__ = ()
     _pkg_id = "pkst"
-    _template = (
+    _template = jinja2.Template(
         "[pkst]\n"
-        "    mxiter = {max_iter}\n"
-        "    innerit = {inner_iter}\n"
-        "    cclosepks = {cclose}\n"
-        "    relax = {relax}\n"
-        "    partopt = {partition}\n"
-        "    isolver = {solver}\n"
-        "    npc = {preconditioner}\n"
-        "    loadptr = {load_balance_weight}\n"
-        "    pressakey = {debug}\n"
+        "    mxiter = {{max_iter}}\n"
+        "    innerit = {{inner_iter}}\n"
+        "    cclosepks = {{cclose}}\n"
+        "    relax = {{relax}}\n"
+        "    partopt = {{partition}}\n"
+        "    isolver = {{solver}}\n"
+        "    npc = {{preconditioner}}\n"
+        "{% if load_balance_weight %}    loadptr = {{load_balance_weight}}\n {% endif %}"
+        "    pressakey = {{debug}}\n"
     )
 
     _keywords = {
