@@ -65,6 +65,8 @@ Fixed
    equidistant.
 -  Raise proper ValueError in (:meth:`imod.prepare.Regridder.regrid`) consistenly when the number
    of dimensions to regrid does not match the regridder dimensions.
+-  When writing DataArrays that have size 1 in dimension ``x`` or ``y``: raise error if cellsize 
+   (``dx`` or ``dy``) is not specified; and actually use ``dy`` or ``dx`` when size is 1.
 
 [0.9.0] - 2020-01-19
 --------------------
