@@ -55,6 +55,8 @@ sconc = xr.DataArray(
         "y": [0.5],
         "x": np.arange(0.5 * dx, dx * ncol, dx),
         "layer": np.arange(1, nlay + 1),
+        "dx": dx,
+        "dy": dy,
     },
     dims=("layer", "y", "x"),
 )
@@ -69,6 +71,8 @@ icbund = xr.DataArray(
         "y": [0.5],
         "x": np.arange(0.5 * dx, dx * ncol, dx),
         "layer": np.arange(1, nlay + 1),
+        "dx": dx,
+        "dy": dy,
     },
     dims=("layer", "y", "x"),
 )
@@ -85,6 +89,8 @@ khv = xr.DataArray(
         "y": [0.5],
         "x": np.arange(0.5 * dx, dx * ncol, dx),
         "layer": np.arange(1, nlay + 1),
+        "dx": dx,
+        "dy": dy,
     },
     dims=("layer", "y", "x"),
 )
@@ -99,6 +105,8 @@ shd = xr.DataArray(
         "y": [0.5],
         "x": np.arange(0.5 * dx, dx * ncol, dx),
         "layer": np.arange(1, nlay + 1),
+        "dx": dx,
+        "dy": dy,
     },
     dims=("layer", "y", "x"),
 )
