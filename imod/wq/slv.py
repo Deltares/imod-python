@@ -298,7 +298,7 @@ class ParallelKrylovFlowSolver(ParallelSolver):
         "    isolver = {{solver}}\n"
         "    npc = {{preconditioner}}\n"
         "    npcdef = {{deflate}}\n"
-        "{% if load_balance_weight %}    loadptr = {{load_balance_weight}}\n {% endif %}"
+        "{% if load_balance_weight %}    loadptr = {{load_balance_weight}}\n{% endif %}"
         "    pressakey = {{debug}}\n"
     )
     _keywords = {
@@ -423,7 +423,7 @@ class ParallelKrylovTransportSolver(ParallelSolver):
         "    partopt = {{partition}}\n"
         "    isolver = {{solver}}\n"
         "    npc = {{preconditioner}}\n"
-        "{% if load_balance_weight %}    loadptr = {{load_balance_weight}}\n {% endif %}"
+        "{% if load_balance_weight %}    loadptr = {{load_balance_weight}}\n{% endif %}"
         "    pressakey = {{debug}}\n"
     )
 

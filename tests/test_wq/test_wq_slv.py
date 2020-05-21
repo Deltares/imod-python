@@ -119,11 +119,8 @@ def test_pksf_render(load_weight_da):
             isolver = 1
             npc = 2
             npcdef = 0
-            loadptr = None
-            pressakey = False
-        """
+            pressakey = False"""
     )
-
     assert pksf._render(directory=directory) == compare
 
 
@@ -157,8 +154,7 @@ def test_pksf_render_rcb(load_weight_da):
             npc = 2
             npcdef = 0
             loadptr = load_balance_weight.asc
-            pressakey = False
-        """
+            pressakey = False"""
     )
 
     assert pksf._render(directory=directory) == compare
@@ -188,10 +184,14 @@ def test_pkst_render(load_weight_da):
             partopt = 0
             isolver = 2
             npc = 2
-            loadptr = None
-            pressakey = False
-        """
+            pressakey = False"""
     )
+    actual = pkst._render(directory=directory)
+
+    with open("actual.txt", "w") as f:
+        f.write(actual)
+    with open("compare.txt", "w") as f:
+        f.write(compare)
 
     assert pkst._render(directory=directory) == compare
 
@@ -222,8 +222,7 @@ def test_pkst_render_rcb(load_weight_da):
             isolver = 2
             npc = 2
             loadptr = load_balance_weight.asc
-            pressakey = False
-        """
+            pressakey = False"""
     )
 
     assert pkst._render(directory=directory) == compare
