@@ -186,12 +186,6 @@ def test_pkst_render(load_weight_da):
             npc = 2
             pressakey = False"""
     )
-    actual = pkst._render(directory=directory)
-
-    with open("actual.txt", "w") as f:
-        f.write(actual)
-    with open("compare.txt", "w") as f:
-        f.write(compare)
 
     assert pkst._render(directory=directory) == compare
 
