@@ -370,25 +370,8 @@ def spatial_reference(a):
         (dx, xmin, xmax, dy, ymin, ymax)
 
     """
-    x = a.x.values
-    y = a.y.values
-    ncol = x.size
-    nrow = y.size
-    if ncol > 1 and nrow > 1:
-        dx, xmin, xmax = coord_reference(a["x"])
-        dy, ymin, ymax = coord_reference(a["y"])
-    elif ncol == 1:
-        dy, ymin, ymax = coord_reference(a["y"])
-        dx = 1.0
-        xmin = float(x.min()) - 0.5 * abs(dy)
-        xmax = float(x.max()) + 0.5 * abs(dy)
-    elif nrow == 1:
-        dx, xmin, xmax = coord_reference(a["x"])
-        dy = -1.0
-        ymin = float(y.min()) - 0.5 * abs(dy)
-        ymax = float(y.max()) + 0.5 * abs(dy)
-    else:  # ncol == 1 and nrow == 1:
-        raise NotImplementedError("Not implemented for single cell DataArrays")
+    dx, xmin, xmax = coord_reference(a["x"])
+    dy, ymin, ymax = coord_reference(a["y"])
     return dx, xmin, xmax, dy, ymin, ymax
 
 
