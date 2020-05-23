@@ -487,7 +487,9 @@ def write(path, a, nodata=1.0e20, dtype=np.float32):
     if not isinstance(a, xr.DataArray):
         raise TypeError("Data to write must be an xarray.DataArray")
     if not a.dims == ("y", "x"):
-        raise ValueError("Dimensions must be exactly ('y', 'x').")
+        raise ValueError(
+            f"Dimensions must be exactly ('y', 'x'). Received {a.dims} instead."
+        )
 
     flip = slice(None, None, -1)
     if not a.indexes["x"].is_monotonic_increasing:
