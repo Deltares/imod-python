@@ -9,6 +9,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+[0.10.0] - 2020-05-23
+---------------------
+
 Changed
 ~~~~~~~
 -  :meth:`imod.wq.SeawatModel.write()` no longer automatically appends the model
