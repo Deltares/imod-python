@@ -40,7 +40,6 @@ def _starts(src_x, dst_x):
         i += 1
 
 
-@numba.njit(cache=True)
 def _weights_1d(src_x, dst_x, use_relative_weights=False):
     """
     Calculate regridding weights and indices for a single dimension
