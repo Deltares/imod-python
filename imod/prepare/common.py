@@ -14,7 +14,7 @@ import xarray as xr
 import imod
 
 
-@numba.njit(cache=True)
+@numba.njit
 def _starts(src_x, dst_x):
     """
     Calculate regridding weights for a single dimension
@@ -443,7 +443,7 @@ def _get_method(method, methods):
     return _method
 
 
-@numba.njit(cache=True)
+@numba.njit
 def _overlap(a, b):
     return max(0, min(a[1], b[1]) - max(a[0], b[0]))
 
