@@ -11,61 +11,64 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 Changed
 ~~~~~~~
-- (:meth:`imod.wq.SeawatModel.write`) no longer automatically appends the model
+-  :meth:`imod.wq.SeawatModel.write()` no longer automatically appends the model
    name to the directory where the input is written. Instead, it simply writes
    to the directory as specified.
--  (:func:`imod.select.points_set_values`) returns a new DataArray rather than
-   mutating the input `da`.
--  (:func:`imod.select.points_values`) returns a DataArray with an index taken
-   from the data of the first provided dimensions if it is a `pandas.Series`.
+-  :func:`imod.select.points_set_values` returns a new DataArray rather than
+   mutating the input ``da``.
+-  :func:`imod.select.points_values` returns a DataArray with an index taken
+   from the data of the first provided dimensions if it is a ``pandas.Series``.
+-  :meth:`imod.wq.SeawatModel.write()` now writes a runfile with ``start_hour``
+   and ``start_minute`` (this results in output IDFs with datetime format
+   ``"%Y%m%d%H%M"``).
 
 Added
 ~~~~~
--  (:meth:`from_file`) constructors have been added to all `imod.wq.Package`.
+-  :meth:`from_file` constructors have been added to all `imod.wq.Package`.
    This allows loading directly package from a netCDF file (or any file supported by
    ``xarray.open_dataset``), or a path to a Zarr directory with suffix ".zarr" or ".zip".
--  This can be combined with the `cache` argument in (:meth:`from_file`) to
+-  This can be combined with the `cache` argument in :meth:`from_file` to
    enable caching of answers to avoid repeated computation during
-   (:meth:`imod.wq.SeawatModel.write`); it works by checking whether input and
+   :meth:`imod.wq.SeawatModel.write`; it works by checking whether input and
    output files have changed.
--  The ``resultdir_is_workspace`` argument has been added to (:meth:`imod.wq.SeawatModel.write`).
+-  The ``resultdir_is_workspace`` argument has been added to :meth:`imod.wq.SeawatModel.write`.
    iMOD-wq writes a number of files (e.g. list file) in the directory where the
    runfile is located. This results in mixing of input and output. By setting it
    ``True``, **all** model output is written in the results directory.
--  (:func:`imod.visualize.imshow_topview`) has been added to visualize a complete
+-  :func:`imod.visualize.imshow_topview` has been added to visualize a complete
    DataArray with atleast dimensions ``x`` and ``y``; it dumps PNGs into a
    specified directory.
 -  Some support for 3D visualization has been added.
-   (:func:`imod.visualize.grid_3d`) and (:func:`imod.visualize.line_3d`) have been
+   :func:`imod.visualize.grid_3d` and :func:`imod.visualize.line_3d` have been
    added to produce ``pyvista`` meshes from ``xarray.DataArray``'s and
    ``shapely`` polygons, respectively.
-   (:class:`imod.visualize.GridAnimation3D`) and (:class:`imod.visualize.StaticGridAnimation3D`) 
+   :class:`imod.visualize.GridAnimation3D` and :class:`imod.visualize.StaticGridAnimation3D` 
    have been added to setup 3D animations of DataArrays with transient data.
 -  Support for out of core computation by ``imod.prepare.Regridder`` if ``source``
    is chunked.
--  (:func:`imod.ipf.read`) now reports the problematic file if reading errors occurs.
--  (:func:`imod.prepare.polygonize`) added to polygonize DataArrays to GeoDataFrames.
+-  :func:`imod.ipf.read` now reports the problematic file if reading errors occur.
+-  :func:`imod.prepare.polygonize` added to polygonize DataArrays to GeoDataFrames.
 -  Added more support for multiple species imod-wq models, specifically: scalar concentration
    for boundary condition packages and well IPFs.
 
 Fixed
 ~~~~~
--  (:meth:`imod.prepare.Regridder`) detects if the `like` DataArray is a subset
+-  :meth:`imod.prepare.Regridder` detects if the ``like`` DataArray is a subset
    along a dimension, in which case the dimension is not regridded.
--  (:meth:`imod.prepare.Regridder`) now slices the `source` array accurately
+-  :meth:`imod.prepare.Regridder` now slices the ``source`` array accurately
    before regridding, taking cell boundaries into account rather than only
    cell midpoints.
--  ``density`` is no longer an optional argument in (:class:`imod.wq.GeneralHeadboundary`) and
-   (:class:`imod.wq.River). The reason is that iMOD-WQ fully removes (!) these packages if density
+-  ``density`` is no longer an optional argument in :class:`imod.wq.GeneralHeadboundary` and
+   :class:`imod.wq.River`. The reason is that iMOD-WQ fully removes (!) these packages if density
    is not present.
--  (:func:`imod.idf.save`) and (:func:`imod.rasterio.save`) will now also save DataArrays in
+-  :func:`imod.idf.save` and :func:`imod.rasterio.save` will now also save DataArrays in
    which a coordinate other than ``x`` or ``y`` is descending.
--  (:func:`imod.visualize.plot_map`) enforces decreasing ``y``, which ensures maps are not plotted
+-  :func:`imod.visualize.plot_map` enforces decreasing ``y``, which ensures maps are not plotted
    upside down.
--  (:func:`imod.util.coord_reference`) now returns a scalar cellsize if coordinate is equidistant.
--  (:meth:`imod.prepare.Regridder.regrid`) returns cellsizes as scalar when coordinates are 
+-  :func:`imod.util.coord_reference` now returns a scalar cellsize if coordinate is equidistant.
+-  :meth:`imod.prepare.Regridder.regrid` returns cellsizes as scalar when coordinates are 
    equidistant.
--  Raise proper ValueError in (:meth:`imod.prepare.Regridder.regrid`) consistenly when the number
+-  Raise proper ValueError in :meth:`imod.prepare.Regridder.regrid` consistenly when the number
    of dimensions to regrid does not match the regridder dimensions.
 -  When writing DataArrays that have size 1 in dimension ``x`` or ``y``: raise error if cellsize 
    (``dx`` or ``dy``) is not specified; and actually use ``dy`` or ``dx`` when size is 1.
@@ -80,9 +83,9 @@ Added
    y, layer, and time.
 -  Added multi-species support for (:mod:`imod.wq`)
 -  GDAL rasters representing N-dimensional data can be opened and saved similar to (:mod:`imod.idf`) in (:mod:`imod.rasterio`)
--  Writing GDAL rasters using (:meth:`imod.rasterio.save`) and (:meth:`imod.rasterio.write`) auto-detects GDAL driver based on file extension
--  64-bit IDF files can be opened (:meth:`imod.idf.open`)
--  64-bit IDF files can be written using (:meth:`imod.idf.save`) and (:meth:`imod.idf.write`) using keyword ``dtype=np.float64``
+-  Writing GDAL rasters using :meth:`imod.rasterio.save` and (:meth:`imod.rasterio.write`) auto-detects GDAL driver based on file extension
+-  64-bit IDF files can be opened :meth:`imod.idf.open`
+-  64-bit IDF files can be written using :meth:`imod.idf.save` and (:meth:`imod.idf.write`) using keyword ``dtype=np.float64``
 -  ``sel`` and ``isel`` methods to ``SeawatModel`` to support taking out a subdomain
 -  Docstrings for the Modflow 6 classes in :mod:`imod.mf6`
 -  :meth:`imod.select.upper_active_layer` function to get the upper active layer from ibound ``xr.DataArray``
@@ -96,17 +99,17 @@ Changed
 Fixed
 ~~~~~
 
--  (:meth:`imod.prepare.reproject`) working instead of silently failing when given a ``"+init=ESPG:XXXX`` CRS string
+-  :meth:`imod.prepare.reproject` working instead of silently failing when given a ``"+init=ESPG:XXXX`` CRS string
 
 [0.8.0] - 2019-10-14
 --------------------
 
 Added
 ~~~~~
--  Laplace grid interpolation (:meth:`imod.prepare.laplace_interpolate`)
--  Experimental Modflow 6 structured model write support (:mod:`imod.mf6`)
--  More supported visualizations (:mod:`imod.visualize`)
--  More extensive reading and writing of GDAL raster in (:mod:`imod.rasterio`)
+-  Laplace grid interpolation :meth:`imod.prepare.laplace_interpolate`
+-  Experimental Modflow 6 structured model write support :mod:`imod.mf6`
+-  More supported visualizations :mod:`imod.visualize`
+-  More extensive reading and writing of GDAL raster in :mod:`imod.rasterio`
 
 Changed
 ~~~~~~~
