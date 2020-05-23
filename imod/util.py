@@ -30,12 +30,17 @@ except AttributeError:
     Pattern = re.Pattern  # Python 3.7+
 
 
+DATETIME_FORMATS = {
+    14: "%Y%m%d%H%M%S",
+    12: "%Y%m%d%H%M",
+    10: "%Y%m%d%H",
+    8: "%Y%m%d",
+}
+
+
 def to_datetime(s):
     try:
-        try:
-            time = datetime.datetime.strptime(s, "%Y%m%d%H%M%S")
-        except ValueError:
-            time = datetime.datetime.strptime(s, "%Y%m%d")
+        time = datetime.datetime.strptime(s, DATETIME_FORMATS[len(s)])
     except ValueError:  # Try fullblown dateutil date parser
         time = dateutil.parser.parse(s)
     return time
@@ -147,15 +152,7 @@ def decompose(path, pattern=None):
     if "species" in d.keys():
         d["species"] = int(d["species"])
     if "time" in d.keys():
-        # iMOD supports two datetime formats
-        # try fast options first
-        try:
-            try:
-                d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d%H%M%S")
-            except ValueError:
-                d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d")
-        except ValueError:  # Try fullblown dateutil date parser
-            d["time"] = dateutil.parser.parse(d["time"])
+        d["time"] = to_datetime(d["time"])
     if "steady-state" in d["name"]:
         # steady-state as time identifier isn't picked up by <time>[0-9] regex
         d["name"] = d["name"].replace("_steady-state", "")
