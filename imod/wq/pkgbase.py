@@ -367,13 +367,18 @@ class Package(xr.Dataset):
 
     def _check_location_consistent(self, varnames):
         dims = set(self.dims)
+        is_scalar = {}
         for var in varnames:
-            if not self[var].shape == ():  # skip scalar value
+            scalar = (self[var].shape == ()) or not any(
+                dim in self[var].dims for dim in ["time", "layer", "y", "x"]
+            )
+            if not scalar:  # skip scalar value
                 dims = dims.intersection(self[var].dims)
+            is_scalar[var] = scalar
 
         is_nan = True
         for var in varnames:
-            if not self[var].shape == ():  # skip scalar values
+            if not is_scalar[var]:  # skip scalar values
                 # dimensions cannot change for in-place operations
                 # reduce to lowest set of dimension (e.g. just x and y)
                 var_dims = set(self[var].dims)
@@ -382,7 +387,7 @@ class Package(xr.Dataset):
                 is_nan &= np.isnan(self[var]).all(dim=reduce_dims)
 
         for var in varnames:
-            if not self[var].shape == ():
+            if not is_scalar[var]:  # skip scalar values
                 if (np.isnan(self[var]) ^ is_nan).any():
                     raise ValueError(
                         f"{var} in {self} is not consistent with all variables in: "
@@ -584,6 +589,8 @@ class BoundaryCondition(Package):
         dicts = {}
 
         for varname in self.data_vars.keys():
+            if varname == "concentration":
+                continue
             dicts[varname] = self._compose_values_timelayer(
                 varname, globaltimes, directory
             )
@@ -616,8 +623,8 @@ class BoundaryCondition(Package):
         d = {"pkg_id": self._pkg_id}
         if "species" in self["concentration"].coords:
             concentration = {}
-            for i, species in enumerate(self["concentration"]["species"].values):
-                concentration[i + 1] = self._compose_values_timelayer(
+            for species in self["concentration"]["species"].values:
+                concentration[species] = self._compose_values_timelayer(
                     varname="concentration",
                     da=self["concentration"].sel(species=species),
                     globaltimes=globaltimes,

@@ -180,9 +180,9 @@ class Well(BoundaryCondition):
             name = f"{directory.stem}-concentration"
             if "species" in self["concentration"].coords:
                 concentration = {}
-                for i, species in enumerate(self["concentration"]["species"].values):
-                    concentration[i + 1] = self._compose_values_time(
-                        directory, name, globaltimes
+                for species in self["concentration"]["species"].values:
+                    concentration[species] = self._compose_values_time(
+                        directory, f"{name}_c{species}", globaltimes
                     )
             else:
                 concentration = {
@@ -253,18 +253,36 @@ class Well(BoundaryCondition):
             imod.ipf.write(path, outdf)
 
     def save(self, directory):
-        if "time" in self:
-            for time, timeda in self.groupby("time"):
-                timedf = timeda.to_dataframe()
-                self._save_layers(timedf, directory, time=time)
-                if "concentration" in self.data_vars:
+        all_species = [None]
+        if "concentration" in self.data_vars:
+            if "species" in self["concentration"].coords:
+                all_species = self["concentration"]["species"].values
+
+        # Loop over species if applicable
+        for species in all_species:
+            if species is not None:
+                ds = self.sel(species=species)
+            else:
+                ds = self
+
+            if "time" in ds:
+                for time, timeda in ds.groupby("time"):
+                    timedf = timeda.to_dataframe()
+                    ds._save_layers(timedf, directory, time=time)
+                    if "concentration" in ds.data_vars:
+                        name = f"{directory.stem}-concentration"
+                        if species is not None:
+                            name = f"{name}_c{species}"
+                        ds._save_layers_concentration(
+                            timedf, directory, name, time=time
+                        )
+            else:
+                ds._save_layers(ds.to_dataframe(), directory)
+                if "concentration" in ds.data_vars:
                     name = f"{directory.stem}-concentration"
-                    self._save_layers_concentration(timedf, directory, name, time=time)
-        else:
-            self._save_layers(self.to_dataframe(), directory)
-            if "concentration" in self.data_vars:
-                name = f"{directory.stem}-concentration"
-                self._save_layers_concentration(timedf, directory, name)
+                    if species is not None:
+                        name = f"{name}_c{species}"
+                    ds._save_layers_concentration(timedf, directory, name)
 
     def _pkgcheck(self, ibound=None):
         # TODO: implement

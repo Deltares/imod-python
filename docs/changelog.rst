@@ -45,6 +45,8 @@ Added
    is chunked.
 -  (:func:`imod.ipf.read`) now reports the problematic file if reading errors occurs.
 -  (:func:`imod.prepare.polygonize`) added to polygonize DataArrays to GeoDataFrames.
+-  Added more support for multiple species imod-wq models, specifically: scalar concentration
+   for boundary condition packages and well IPFs.
 
 Fixed
 ~~~~~
