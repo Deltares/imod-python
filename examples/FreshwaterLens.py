@@ -93,8 +93,7 @@ m["oc"] = imod.wq.OutputControl(save_head_idf=True, save_concentration_idf=True)
 m.time_discretization(times=["1900-01-01T00:00", "2000-01-01T00:00"])
 
 # Now we write the model, including runfile:
-m.write()
-
+m.write("FreshwaterLens")
 # You can run the model using the command prompt and the iMOD SEAWAT executable
 
 # Results
