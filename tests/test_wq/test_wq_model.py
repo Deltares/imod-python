@@ -254,8 +254,7 @@ def test_render_gen(basicmodel):
             start_month = 01
             start_day = 01
             start_hour = 00
-            start_minute = 00
-            start_second = 00"""
+            start_minute = 00"""
     )
     actual = m._render_gen(
         modelname=modelname,

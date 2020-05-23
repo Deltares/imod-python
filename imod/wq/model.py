@@ -128,7 +128,6 @@ class SeawatModel(Model):
         "    start_day = {{start_date[6:8]}}\n"
         "    start_hour = {{start_date[8:10]}}\n"
         "    start_minute = {{start_date[10:12]}}\n"
-        "    start_second = {{start_date[12:14]}}\n"
     )
 
     def __init__(self, modelname, check="defer"):
