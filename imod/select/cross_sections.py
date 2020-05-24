@@ -160,7 +160,7 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
     ncol = xs.size - 1
     nrow = ys.size - 1
     tstep = 0.0
-    while ix < ncol and iy < nrow and (t + tstep) < t_end:
+    while ix < ncol and iy < nrow:
         # Compute distance to cell boundary
         # We need the start of the cell if we're moving in negative direction.
         if x_increment == -1:
@@ -192,15 +192,17 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
             iy += y_increment
             tstep = tmax_y
 
-        t += tstep
-        # Store
-        ixs.append(ix)
-        iys.append(iy)
-        segment_length.append(tstep)
-    else:
-        tstep = t_end - t
-        # Store final step
-        segment_length.append(tstep)
+        if (t + tstep) < t_end:
+            t += tstep
+            # Store
+            ixs.append(ix)
+            iys.append(iy)
+            segment_length.append(tstep)
+        else:
+            tstep = t_end - t
+            # Store final step
+            segment_length.append(tstep)
+            break
 
     if skipped_end > 0.0:
         segment_length.append(skipped_end)
