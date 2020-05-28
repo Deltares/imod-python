@@ -744,7 +744,7 @@ def _get_package(package, directory, package_schema):
     return package_data
 
 
-def get_runfile(model, directory, output_packs):
+def get_runfile(model, directory, output_packs=["shd"]):
     """
     Generates an collections.OrderedDict containing the values to be filled in in a runfile 
     template, from the data contained in ``model``.
