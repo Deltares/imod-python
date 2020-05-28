@@ -818,7 +818,9 @@ def get_runfile(model, directory, output_packs):
     runfile_parameters["packages"] = packages
     runfile_parameters["stress_periods"] = stress_periods
     for pack in output_packs:
-        runfile_parameters["output"][pack] = list(np.atleast_1d(model["bnd"].layer.values))
+        runfile_parameters["output"][pack] = list(
+            np.atleast_1d(model["bnd"].layer.values)
+        )
 
     if times:
         runfile_parameters["time_discretisation"] = _time_discretisation(times)
