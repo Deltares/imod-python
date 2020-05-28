@@ -744,7 +744,7 @@ def _get_package(package, directory, package_schema):
     return package_data
 
 
-def get_runfile(model, directory, output_packs=["shd"]):
+def get_runfile(model, directory, output_packages=["shd"]):
     """
     Generates an collections.OrderedDict containing the values to be filled in in a runfile 
     template, from the data contained in ``model``.
@@ -817,8 +817,8 @@ def get_runfile(model, directory, output_packs=["shd"]):
 
     runfile_parameters["packages"] = packages
     runfile_parameters["stress_periods"] = stress_periods
-    for pack in output_packs:
-        runfile_parameters["output"][pack] = list(
+    for package in output_packages:
+        runfile_parameters["output"][package] = list(
             np.atleast_1d(model["bnd"].layer.values)
         )
 
