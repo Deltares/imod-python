@@ -45,7 +45,11 @@ def write(path, model, name=None, runfile_parameters=None, output_packages=["shd
     runfile_parameters : dict
         Dictionary containing the runfile parameters. Defaults to None,
         in which case runfile_parameters is generated from data in ``model``.
-
+    output_packages : list
+        List of package names for which to write output, following the iMODFLOW
+        conventions. For example, providing output_packages=["shd", "bnd"] 
+        writes heads, bdgfff, bdgflf, and bdgfrf.
+        
     Returns
     -------
     None
