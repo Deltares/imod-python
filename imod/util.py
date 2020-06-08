@@ -30,18 +30,13 @@ except AttributeError:
     Pattern = re.Pattern  # Python 3.7+
 
 
-DATETIME_FORMATS = {
-    14: "%Y%m%d%H%M%S",
-    12: "%Y%m%d%H%M",
-    10: "%Y%m%d%H",
-    8: "%Y%m%d",
-}
+DATETIME_FORMATS = {14: "%Y%m%d%H%M%S", 12: "%Y%m%d%H%M", 10: "%Y%m%d%H", 8: "%Y%m%d"}
 
 
 def to_datetime(s):
     try:
         time = datetime.datetime.strptime(s, DATETIME_FORMATS[len(s)])
-    except ValueError:  # Try fullblown dateutil date parser
+    except (ValueError, KeyError):  # Try fullblown dateutil date parser
         time = dateutil.parser.parse(s)
     return time
 
