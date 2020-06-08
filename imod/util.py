@@ -30,7 +30,13 @@ except AttributeError:
     Pattern = re.Pattern  # Python 3.7+
 
 
-DATETIME_FORMATS = {14: "%Y%m%d%H%M%S", 12: "%Y%m%d%H%M", 10: "%Y%m%d%H", 8: "%Y%m%d"}
+DATETIME_FORMATS = {
+    14: "%Y%m%d%H%M%S",
+    12: "%Y%m%d%H%M",
+    10: "%Y%m%d%H",
+    8: "%Y%m%d",
+    4: "%Y",
+}
 
 
 def to_datetime(s):

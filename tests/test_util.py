@@ -109,6 +109,19 @@ def test_decompose_nonstandard_date():
     assert d == refd
 
 
+def test_decompose_only_year():
+    d = util.decompose("path/to/head_2018_l5.idf", pattern="{name}_{time}_l{layer}")
+    refd = {
+        "extension": ".idf",
+        "directory": pathlib.Path("path", "to"),
+        "name": "head",
+        "time": datetime.datetime(2018, 1, 1),
+        "layer": 5,
+        "dims": ["time", "layer"],
+    }
+    assert isinstance(d, dict)
+    assert d == refd
+
 def test_decompose_underscore():
     d = util.decompose("path/to/starting_head_20180222090657_l5.idf")
     refd = {
@@ -257,6 +270,8 @@ def test_decompose_z_float():
         "z": "0.25",
         "dims": ["z"],
     }
+    assert isinstance(d, dict)
+    assert d == refd
 
 
 def test_compose_year9999():
