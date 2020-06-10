@@ -423,7 +423,7 @@ def gdal_rasterize(
         message = error.err_msg
         if message.startswith(
             "Failed to fetch spatial reference on layer"
-        ) and message.endswith("assuming matching coordinate systems"):
+        ) and message.endswith("assuming matching coordinate systems."):
             pass
         else:
             raise RuntimeError("GDAL error: " + error.err_msg)
