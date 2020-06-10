@@ -420,11 +420,10 @@ def gdal_rasterize(
     options = [f"ATTRIBUTE={column}"]
     gdal.RasterizeLayer(memory_raster, [1], vector_layer, None, None, [1], options)
     if error.err_level >= gdal.CE_Warning:
-        reference_err_msg = (
-            "Failed to fetch spatial reference on layer shape to build"
-            " transformer, assuming matching coordinate systems."
-        )
-        if error.err_msg == reference_err_msg:
+        message = error.err_msg
+        if message.startswith(
+            "Failed to fetch spatial reference on layer"
+        ) and message.endswith("assuming matching coordinate systems"):
             pass
         else:
             raise RuntimeError("GDAL error: " + error.err_msg)
