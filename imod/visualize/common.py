@@ -41,6 +41,11 @@ def _cmapnorm_from_colorslevels(colors, levels):
             # So we cant use `cmap = matplotlib.cm.get_cmap(colors)`
             cmap = matplotlib.cm.get_cmap(colors)
             colors = cmap(np.linspace(0, 1, nlevels + 1))
+        else:
+            # levels and colors are possibly not given in correct order
+            # sort colors based on levels, levels are sorted later
+            colors = [x for _,x in sorted(zip(levels,colors))]
+        
         # Validate number of colors vs number of levels
         ncolors = len(colors)
         if not nlevels == ncolors - 1:
@@ -56,5 +61,5 @@ def _cmapnorm_from_colorslevels(colors, levels):
         cmap.set_over(
             colors[-1]
         )  # this is the color for values larger than raster.max()
-    norm = matplotlib.colors.BoundaryNorm(levels, cmap.N)
+    norm = matplotlib.colors.BoundaryNorm(sorted(levels), cmap.N)
     return cmap, norm
