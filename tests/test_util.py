@@ -122,6 +122,7 @@ def test_decompose_only_year():
     assert isinstance(d, dict)
     assert d == refd
 
+
 def test_decompose_underscore():
     d = util.decompose("path/to/starting_head_20180222090657_l5.idf")
     refd = {

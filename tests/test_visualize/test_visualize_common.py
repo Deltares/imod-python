@@ -55,4 +55,3 @@ def test_cmapnorm_from_colorslevels_nooflevels():
     colors = ["k", "b", "w"]
     with pytest.raises(ValueError):
         cmap, norm = imod.visualize.common._cmapnorm_from_colorslevels(colors, levels)
-
