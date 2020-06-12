@@ -93,7 +93,7 @@ def _create_hexahedra_z1d(data, x, y, z):
     # Allocate
     # VTK_HEXAHEDRON is just an enum
     offset = np.arange(0, 9 * (n + 1), 9)
-    cells = np.empty(n * 9)
+    cells = np.empty(n * 9, dtype=np.int32)
     indices = np.empty(n, dtype=np.int32)
     cell_type = np.full(n, vtk.VTK_HEXAHEDRON)
     # A hexahedron has 8 corners
@@ -173,7 +173,7 @@ def _create_hexahedra_z3d(data, x, y, z3d):
     # Allocate
     # VTK_HEXAHEDRON is just an enum
     offset = np.arange(0, 9 * (n + 1), 9)
-    cells = np.empty(n * 9)
+    cells = np.empty(n * 9, dtype=np.int32)
     indices = np.empty(n, dtype=np.int32)
     cell_type = np.full(n, vtk.VTK_HEXAHEDRON)
     # A hexahedron has 8 corners
@@ -264,11 +264,11 @@ def _create_plane_surface(data, x, y):
     # Allocate
     # VTK_QUAD is just an enum
     offset = np.arange(0, 5 * (n + 1), 5)
-    cells = np.empty(n * 5)
+    cells = np.empty(n * 5, dtype=np.int32)
     cell_type = np.full(n, vtk.VTK_QUAD)
     # A hexahedron has r corners
     points = np.empty((n * 4, 3))
-    values = np.empty(n, data.dtype)
+    values = np.empty(n, dtype=data.dtype)
 
     ii = 0
     jj = 0
