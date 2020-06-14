@@ -40,6 +40,7 @@ class Drainage(BoundaryCondition):
     _pkg_id = "drn"
     # has to be ordered as in the list
     _binary_data = ("elevation", "conductance")
+    _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(

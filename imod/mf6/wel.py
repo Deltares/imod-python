@@ -51,6 +51,7 @@ class Well(BoundaryCondition):
     )
     _pkg_id = "wel"
     _binary_data = ("layer", "row", "column", "rate")
+    _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
