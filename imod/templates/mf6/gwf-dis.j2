@@ -24,9 +24,9 @@ begin griddata
     {{delc}}
   top
 {% for x in top %}    {{x}}
-{% endfor %}  botm{% if botm_layered is sameas true %} layered{% endif %}
+{% endfor %}  botm{% if botm_layered %} layered{% endif %}
 {% for x in botm %}    {{x}}
-{% endfor %}{% if idomain is defined %}  idomain{% if idomain_layered is sameas true %} layered{% endif %}
+{% endfor %}{% if idomain is defined %}  idomain{% if idomain_layered %} layered{% endif %}
 {% for x in idomain %}    {{x}}
 {% endfor -%}
 {% endif -%}

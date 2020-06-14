@@ -2,7 +2,7 @@ begin options
 end options
 
 begin griddata
-  strt{% if strt_layered is sameas true %} layered{% endif %}
+  strt{% if strt_layered %} layered{% endif %}
 {% for x in strt %}    {{x}}
 {% endfor -%}
 end griddata

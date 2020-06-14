@@ -15,9 +15,9 @@ end dimensions
 begin griddata
   top
     {top}
-  botm {% if layered is sameas true %}layered{% endif %}
+  botm {% if layered %}layered{% endif %}
     {botm}
-{%- if idomain is defined -%}  idomain {% if layered is sameas true %}layered{% endif %}
+{%- if idomain is defined -%}  idomain {% if layered %}layered{% endif %}
     {idomain}{%- endif -%}
 end griddata
 

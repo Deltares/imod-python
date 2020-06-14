@@ -18,26 +18,26 @@ begin options
 end options
 
 begin griddata
-  icelltype{% if icelltype_layered is sameas true %} layered{% endif %}
+  icelltype{% if icelltype_layered %} layered{% endif %}
 {% for x in icelltype %}    {{x}}
-{% endfor %}  k{% if k_layered is sameas true %} layered{% endif %}
+{% endfor %}  k{% if k_layered %} layered{% endif %}
 {% for x in k %}    {{x}}
-{% endfor %}{% if k22 is defined %}  k22{% if k22_layered is sameas true %} layered{% endif %}
+{% endfor %}{% if k22 is defined %}  k22{% if k22_layered %} layered{% endif %}
 {% for x in k22 %}    {{x}}
 {% endfor -%}
-{% endif -%}{% if k33 is defined %}  k33{% if k33_layered is sameas true %} layered{% endif %}
+{% endif -%}{% if k33 is defined %}  k33{% if k33_layered %} layered{% endif %}
 {% for x in k33 %}    {{x}}
 {% endfor -%}
-{% endif -%}{% if angle1 is defined %}  angle1{% if angle1_layered is sameas true %} layered{% endif %}
+{% endif -%}{% if angle1 is defined %}  angle1{% if angle1_layered %} layered{% endif %}
 {% for x in angle1 %}    {{x}}
 {% endfor -%}
-{% endif -%}{% if angle2 is defined %}  angle2{% if angle2_layered is sameas true %} layered{% endif %}
+{% endif -%}{% if angle2 is defined %}  angle2{% if angle2_layered %} layered{% endif %}
 {% for x in angle2 %}    {{x}}
 {% endfor -%}
-{% endif -%}{% if angle3 is defined %}  angle3{% if angle3_layered is sameas true %} layered{% endif %}
+{% endif -%}{% if angle3 is defined %}  angle3{% if angle3_layered %} layered{% endif %}
 {% for x in angle3 %}    {{x}}
 {% endfor -%}
-{% endif -%}{% if wetdry is defined %}  wetdry{% if wetdry_layered is sameas true %} layered{% endif %}
+{% endif -%}{% if wetdry is defined %}  wetdry{% if wetdry_layered %} layered{% endif %}
 {% for x in wetdry %}    {{x}}
 {% endfor -%}
 {% endif -%}
