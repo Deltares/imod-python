@@ -287,6 +287,9 @@ def _dst_coords(src, like, dims_from_src, dims_from_like):
 
 
 def _check_monotonic(dxs, dim):
+    # Don't check empty array
+    if dxs.size == 0:
+        return
     # use xor to check if one or the other
     if not ((dxs > 0.0).all() ^ (dxs < 0.0).all()):
         raise ValueError(f"{dim} is not only increasing or only decreasing")
