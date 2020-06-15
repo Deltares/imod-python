@@ -287,9 +287,6 @@ def _dst_coords(src, like, dims_from_src, dims_from_like):
 
 
 def _check_monotonic(dxs, dim):
-    # Don't check empty array
-    if dxs.size == 0:
-        return
     # use xor to check if one or the other
     if not ((dxs > 0.0).all() ^ (dxs < 0.0).all()):
         raise ValueError(f"{dim} is not only increasing or only decreasing")
@@ -321,6 +318,10 @@ def _coord(da, dim):
     Transform N xarray midpoints into N + 1 vertex edges
     """
     delta_dim = "d" + dim  # e.g. dx, dy, dz, etc.
+    
+    # If empty array, return empty
+    if da[dim].size == 0:
+        return np.array(())
 
     if delta_dim in da.coords:  # equidistant or non-equidistant
         dx = da[delta_dim].values
