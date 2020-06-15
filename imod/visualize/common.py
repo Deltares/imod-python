@@ -30,6 +30,10 @@ def _cmapnorm_from_colorslevels(colors, levels):
     cmap : matplotlib.colors.ListedColormap
     norm : matplotlib.colors.BoundaryNorm
     """
+    # check monotonic increasing levels
+    if not (np.diff(levels) > 0).all():
+        raise ValueError(f"Levels {levels} are not monotonic increasing.")
+
     if isinstance(colors, matplotlib.colors.Colormap):
         # use given cmap
         cmap = colors
@@ -41,6 +45,7 @@ def _cmapnorm_from_colorslevels(colors, levels):
             # So we cant use `cmap = matplotlib.cm.get_cmap(colors)`
             cmap = matplotlib.cm.get_cmap(colors)
             colors = cmap(np.linspace(0, 1, nlevels + 1))
+
         # Validate number of colors vs number of levels
         ncolors = len(colors)
         if not nlevels == ncolors - 1:
