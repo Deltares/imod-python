@@ -306,6 +306,12 @@ def write(path, da, driver=None, nodata=np.nan, dtype=None):
     if driver is None:
         driver = _get_driver(path)
 
+    flip = slice(None, None, -1)
+    if not a.indexes["x"].is_monotonic_increasing:
+        a = a.isel(x=flip)
+    if not a.indexes["y"].is_monotonic_decreasing:
+        a = a.isel(y=flip)
+
     # Only try to fill data that can contains nan's
     # Do this before casting to another type!
     ignore_nodata = (nodata is None) or np.isnan(nodata)

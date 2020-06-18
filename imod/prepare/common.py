@@ -318,7 +318,7 @@ def _coord(da, dim):
     Transform N xarray midpoints into N + 1 vertex edges
     """
     delta_dim = "d" + dim  # e.g. dx, dy, dz, etc.
-    
+
     # If empty array, return empty
     if da[dim].size == 0:
         return np.array(())
