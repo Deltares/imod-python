@@ -498,13 +498,19 @@ class Regridder(object):
             if any(
                 size == 0 for size in chunk_src.shape
             ):  # zero overlap for the chunk, zero size chunk
+                # N.B. Make sure to include chunks=-1, defaults to chunks="auto", which
+                # automatically results in unnecessary, error prone chunks.
+                # TODO: Not covered by tests -- but also rather hard to test.
                 dask_array = dask.array.full(
-                    shape=info.dst_shape, fill_value=fill_value, dtype=src.dtype
+                    shape=info.dst_shape,
+                    fill_value=fill_value,
+                    dtype=src.dtype,
+                    chunks=-1,
                 )
             elif self._first_call:
                 # NOT delayed, trigger compilation
                 a = self._regrid(chunk_src, fill_value, info)
-                dask_array = dask.array.from_array(a)
+                dask_array = dask.array.from_array(a, chunks=-1)
                 self._first_call = False
             else:
                 # Alllocation occurs inside
