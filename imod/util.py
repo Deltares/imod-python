@@ -30,19 +30,13 @@ except AttributeError:
     Pattern = re.Pattern  # Python 3.7+
 
 
-DATETIME_FORMATS = {
-    14: "%Y%m%d%H%M%S",
-    12: "%Y%m%d%H%M",
-    10: "%Y%m%d%H",
-    8: "%Y%m%d",
-    4: "%Y",
-}
-
-
 def to_datetime(s):
     try:
-        time = datetime.datetime.strptime(s, DATETIME_FORMATS[len(s)])
-    except (ValueError, KeyError):  # Try fullblown dateutil date parser
+        try:
+            time = datetime.datetime.strptime(s, "%Y%m%d%H%M%S")
+        except ValueError:
+            time = datetime.datetime.strptime(s, "%Y%m%d")
+    except ValueError:  # Try fullblown dateutil date parser
         time = dateutil.parser.parse(s)
     return time
 
@@ -153,7 +147,15 @@ def decompose(path, pattern=None):
     if "species" in d.keys():
         d["species"] = int(d["species"])
     if "time" in d.keys():
-        d["time"] = to_datetime(d["time"])
+        # iMOD supports two datetime formats
+        # try fast options first
+        try:
+            try:
+                d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d%H%M%S")
+            except ValueError:
+                d["time"] = datetime.datetime.strptime(d["time"], "%Y%m%d")
+        except ValueError:  # Try fullblown dateutil date parser
+            d["time"] = dateutil.parser.parse(d["time"])
     if "steady-state" in d["name"]:
         # steady-state as time identifier isn't picked up by <time>[0-9] regex
         d["name"] = d["name"].replace("_steady-state", "")
@@ -368,8 +370,25 @@ def spatial_reference(a):
         (dx, xmin, xmax, dy, ymin, ymax)
 
     """
-    dx, xmin, xmax = coord_reference(a["x"])
-    dy, ymin, ymax = coord_reference(a["y"])
+    x = a.x.values
+    y = a.y.values
+    ncol = x.size
+    nrow = y.size
+    if ncol > 1 and nrow > 1:
+        dx, xmin, xmax = coord_reference(a["x"])
+        dy, ymin, ymax = coord_reference(a["y"])
+    elif ncol == 1:
+        dy, ymin, ymax = coord_reference(a["y"])
+        dx = 1.0
+        xmin = float(x.min()) - 0.5 * abs(dy)
+        xmax = float(x.max()) + 0.5 * abs(dy)
+    elif nrow == 1:
+        dx, xmin, xmax = coord_reference(a["x"])
+        dy = -1.0
+        ymin = float(y.min()) - 0.5 * abs(dy)
+        ymax = float(y.max()) + 0.5 * abs(dy)
+    else:  # ncol == 1 and nrow == 1:
+        raise NotImplementedError("Not implemented for single cell DataArrays")
     return dx, xmin, xmax, dy, ymin, ymax
 
 

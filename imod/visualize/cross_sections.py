@@ -4,7 +4,42 @@ import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import imod
-from imod.visualize import common
+
+
+def _cmapnorm_from_colorslevels(colors, levels):
+    """
+    Create ListedColormap and BoundaryNorm from colors and levels list
+
+    Parameters
+    ----------
+
+    colors : list of str, or list of RGB tuples
+        Matplotlib acceptable list of colors. Length N.
+        Accepts both tuples of (R, G, B) and hexidecimal (e.g. "#7ec0ee").
+
+        Looking for good colormaps? Try: http://colorbrewer2.org/
+        Choose a colormap, and use the HEX JS array.
+    levels : listlike of floats or integers
+        Boundaries between the legend colors/classes. Length: N - 1.
+
+    Returns
+    -------
+    cmap : matplotlib.colors.ListedColormap
+    norm : matplotlib.colors.BoundaryNorm
+    """
+    ncolors = len(colors)
+    nlevels = len(levels)
+    if not nlevels == ncolors - 1:
+        raise ValueError(
+            f"Incorrect number of levels. Number of colors is {ncolors},"
+            f" expected {ncolors - 1}, got {nlevels} instead."
+        )
+
+    cmap = matplotlib.colors.ListedColormap(colors[1:-1])
+    cmap.set_under(colors[0])  # this is the color for values smaller than raster.min()
+    cmap.set_over(colors[-1])  # this is the color for values larger than raster.max()
+    norm = matplotlib.colors.BoundaryNorm(levels, cmap.N)
+    return cmap, norm
 
 
 def _meshcoords(da, continuous=True):
@@ -140,9 +175,6 @@ def cross_section(
 
         Coordinates "top" and "bottom" must be present, and must have at least the 
         "layer" dimension (voxels) or both the "layer" and x-coordinate dimension.
-
-        *Use imod.select.cross_section_line() or cross_section_linestring() to obtain 
-        the required DataArray.*
     colors : list of str, or list of RGB tuples
         Matplotlib acceptable list of colors. Length N.
         Accepts both tuples of (R, G, B) and hexidecimal (e.g. "#7ec0ee").
@@ -215,7 +247,7 @@ def cross_section(
         raise ValueError('"bottom" coordinate be 1D or 2D')
 
     # Read legend settings
-    cmap, norm = common._cmapnorm_from_colorslevels(colors, levels)
+    cmap, norm = _cmapnorm_from_colorslevels(colors, levels)
 
     # cbar kwargs
     settings_cbar = {"ticks": levels, "extend": "both"}

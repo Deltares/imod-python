@@ -21,6 +21,7 @@ class OutputControl(Package):
 
     __slots__ = ("save_head", "save_budget")
     _pkg_id = "oc"
+    _keyword_map = {}
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, save_head, save_budget):

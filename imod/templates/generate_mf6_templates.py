@@ -96,9 +96,7 @@ def block_entry(varname, block, vardict):
         if v.get("layered") == "true":
             # if layered is supported according to dfn,
             # and we get passed {layered: True}, add layered keyword
-            layered = (
-                f" {{% if layered is sameas true %}}{varname}_layered{{% endif %}}"
-            )
+            layered = f" {{% if layered %}}{varname}_layered{{% endif %}}"
         else:
             layered = ""
         s = f"{s}{layered}\n    {{{varname}}}\n"
@@ -142,7 +140,8 @@ def write_block(vardict, block):
                     """\
                 {% for i, path in periods.items() %}begin period {{i}}
                   open/close {{path}} (binary)
-                end period{% endfor %}"""
+                end period
+                {% endfor %}"""
                 )
                 return s
             if addv:

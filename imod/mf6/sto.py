@@ -34,6 +34,16 @@ class Storage(Package):
 
     __slots__ = ("specific_storage", "specific_yield", "convertible", "transient")
     _pkg_id = "sto"
+    _binary_data = {
+        "convertible": np.int32,
+        "specific_storage": np.float64,
+        "specific_yield": np.float64,
+    }
+    _keyword_map = {
+        "specific_storage": "ss",
+        "specific_yield": "sy",
+        "convertible": "iconvert",
+    }
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, specific_storage, specific_yield, transient, convertible):
@@ -45,11 +55,15 @@ class Storage(Package):
 
     def render(self, directory, pkgname, globaltimes):
         d = {}
+        stodirectory = directory / "sto"
         for varname in ["specific_storage", "specific_yield", "convertible"]:
-            d[varname] = self._compose_values(varname, directory)
+            key = self._keyword_map.get(varname, varname)
+            layered, value = self._compose_values(self[varname], stodirectory, key)
+            if self._valid(value):  # skip False or None
+                d[f"{key}_layered"], d[key] = layered, value
 
         periods = {}
-        if "time" in self["transient"]:
+        if "time" in self["transient"].coords:
             package_times = self["transient"].coords["time"].values
             starts = np.searchsorted(globaltimes, package_times) + 1
             for i, s in enumerate(starts):

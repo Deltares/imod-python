@@ -14,7 +14,7 @@ import xarray as xr
 import imod
 
 
-@numba.njit
+@numba.njit(cache=True)
 def _starts(src_x, dst_x):
     """
     Calculate regridding weights for a single dimension
@@ -40,6 +40,7 @@ def _starts(src_x, dst_x):
         i += 1
 
 
+@numba.njit(cache=True)
 def _weights_1d(src_x, dst_x, use_relative_weights=False):
     """
     Calculate regridding weights and indices for a single dimension
@@ -319,10 +320,6 @@ def _coord(da, dim):
     """
     delta_dim = "d" + dim  # e.g. dx, dy, dz, etc.
 
-    # If empty array, return empty
-    if da[dim].size == 0:
-        return np.array(())
-
     if delta_dim in da.coords:  # equidistant or non-equidistant
         dx = da[delta_dim].values
         if dx.shape == () or dx.shape == (1,):  # scalar -> equidistant
@@ -447,7 +444,7 @@ def _get_method(method, methods):
     return _method
 
 
-@numba.njit
+@numba.njit(cache=True)
 def _overlap(a, b):
     return max(0, min(a[1], b[1]) - max(a[0], b[0]))
 

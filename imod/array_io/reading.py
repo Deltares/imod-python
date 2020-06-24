@@ -6,7 +6,6 @@ import pathlib
 
 import dask
 import numpy as np
-import tqdm
 import xarray as xr
 
 import imod

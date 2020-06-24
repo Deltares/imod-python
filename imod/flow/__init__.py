@@ -18,7 +18,7 @@ import pandas as pd
 import imod
 
 
-def write(path, model, name=None, runfile_parameters=None, output_packages=["shd"]):
+def write(path, model, name=None, runfile_parameters=None):
     """
     Writes an iMODFLOW model, including runfile, as specified by ``model`` into
     directory ``path``.
@@ -45,11 +45,7 @@ def write(path, model, name=None, runfile_parameters=None, output_packages=["shd
     runfile_parameters : dict
         Dictionary containing the runfile parameters. Defaults to None,
         in which case runfile_parameters is generated from data in ``model``.
-    output_packages : list
-        List of package names for which to write output, following the iMODFLOW
-        conventions. For example, providing output_packages=["shd", "bnd"] 
-        writes heads, bdgfff, bdgflf, and bdgfrf.
-        
+
     Returns
     -------
     None
@@ -72,7 +68,7 @@ def write(path, model, name=None, runfile_parameters=None, output_packages=["shd
     path.mkdir(exist_ok=True, parents=True)
 
     if runfile_parameters is None:
-        runfile_parameters = imod.run.get_runfile(model, path, output_packages)
+        runfile_parameters = imod.run.get_runfile(model, path)
 
     if name is None:
         name = "runfile"

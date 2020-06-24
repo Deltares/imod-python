@@ -126,8 +126,6 @@ class SeawatModel(Model):
         "    start_year = {{start_date[:4]}}\n"
         "    start_month = {{start_date[4:6]}}\n"
         "    start_day = {{start_date[6:8]}}\n"
-        "    start_hour = {{start_date[8:10]}}\n"
-        "    start_minute = {{start_date[10:12]}}\n"
     )
 
     def __init__(self, modelname, check="defer"):
@@ -556,8 +554,6 @@ class SeawatModel(Model):
         # Create directories if necessary
         directory.mkdir(exist_ok=True, parents=True)
         result_dir.mkdir(exist_ok=True, parents=True)
-        runfilepath = directory / f"{self.modelname}.run"
-        results_runfilepath = result_dir / f"{self.modelname}.run"
 
         # Where will the model run?
         # Default is inputdir, next to runfile:
@@ -589,15 +585,12 @@ class SeawatModel(Model):
         runfile_content = self.render(
             directory=render_dir, result_dir=result_dir, writehelp=False
         )
+        runfilepath = directory / f"{self.modelname}.run"
 
         # Start writing
         # Write the runfile
         with open(runfilepath, "w") as f:
             f.write(runfile_content)
-        # Also write the runfile in the workdir
-        if resultdir_is_workdir:
-            with open(results_runfilepath, "w") as f:
-                f.write(runfile_content)
 
         # Write all IDFs and IPFs
         for pkgname, pkg in self.items():

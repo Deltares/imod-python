@@ -27,6 +27,7 @@ class InitialConditions(Package):
     __slots__ = ("head",)
     _pkg_id = "ic"
     _binary_data = {"head": np.float64}
+    _keyword_map = {"head": "strt"}
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, head):
@@ -37,6 +38,6 @@ class InitialConditions(Package):
         d = {}
         icdirectory = directory / "ic"
         d["layered"], d["strt"] = self._compose_values(
-            self["head"], icdirectory, "head"
+            self["head"], icdirectory, "strt"
         )
         return self._template.render(d)

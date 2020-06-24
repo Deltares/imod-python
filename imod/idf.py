@@ -333,7 +333,7 @@ def open_subdomains(path, use_cftime=False):
             )
 
     pattern = r"{name}_{time}_l{layer}_p\d+"
-    timestrings = list(grouped_by_time.keys())
+    timestrings = sorted(set(timestrings))
 
     # Prepare output coordinates
     coords = {}
@@ -358,7 +358,6 @@ def open_subdomains(path, use_cftime=False):
     times = [util.to_datetime(timestr) for timestr in timestrings]
     times, use_cftime = util._convert_datetimes(times, use_cftime)
     if use_cftime:
-        # unique also sorts
         coords["time"] = xr.CFTimeIndex(np.unique(times))
     else:
         coords["time"] = np.unique(times)
@@ -368,10 +367,7 @@ def open_subdomains(path, use_cftime=False):
     # Collect and merge data
     merged = []
     dtype = headers[0]["dtype"]
-    sorted_order = np.argsort(times)  # get time ordering right before merging
-    sorted_timestrings = np.array(timestrings)[sorted_order]
-    for timestr in sorted_timestrings:
-        group = grouped_by_time[timestr]
+    for group in grouped_by_time.values():
         # Build a single array per timestep
         timestep_data = dask.delayed(_merge_subdomains)(group, use_cftime, pattern)
         dask_array = dask.array.from_delayed(timestep_data, shape, dtype=dtype)
@@ -487,9 +483,7 @@ def write(path, a, nodata=1.0e20, dtype=np.float32):
     if not isinstance(a, xr.DataArray):
         raise TypeError("Data to write must be an xarray.DataArray")
     if not a.dims == ("y", "x"):
-        raise ValueError(
-            f"Dimensions must be exactly ('y', 'x'). Received {a.dims} instead."
-        )
+        raise ValueError("Dimensions must be exactly ('y', 'x').")
 
     flip = slice(None, None, -1)
     if not a.indexes["x"].is_monotonic_increasing:

@@ -206,6 +206,15 @@ class NodePropertyFlow(Package):
         "angle2": np.float64,
         "angle3": np.float64,
     }
+    _keyword_map = {
+        "rewet": "rewet_record",
+        "rewet_factor": "wetfct",
+        "rewet_method": "ihdwet",
+        "rewet_layer": "wetdry",
+        "variable_vertical_conductance": "variablecv",
+        "starting_head_as_confined_thickness": "thickstrt",
+        "rewet_iterations": "iwetit",
+    }
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(
@@ -263,23 +272,12 @@ class NodePropertyFlow(Package):
 
     def render(self, directory, pkgname, *args, **kwargs):
         d = {}
-        replace_keywords = {
-            "rewet": "rewet_record",
-            "rewet_factor": "wetfct",
-            "rewet_method": "ihdwet",
-            "rewet_layer": "wetdry",
-            "variable_vertical_conductance": "variablecv",
-            "starting_head_as_confined_thickness": "thickstrt",
-            "rewet_iterations": "iwetit",
-        }
         npfdirectory = directory / "npf"
         for varname in self.data_vars:
-            key = replace_keywords.get(varname, varname)
+            key = self._keyword_map.get(varname, varname)
 
             if varname in self._binary_data:
-                layered, value = self._compose_values(
-                    self[varname], npfdirectory, varname
-                )
+                layered, value = self._compose_values(self[varname], npfdirectory, key)
                 if self._valid(value):  # skip False or None
                     d[f"{key}_layered"], d[key] = layered, value
             else:

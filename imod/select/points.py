@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import xarray as xr
 
 import imod
@@ -183,24 +182,17 @@ def points_values(da, **points):
     >>> selection = imod.select.points_values(da, x=x, y=y)
 
     """
-    iterable_points = {}
     for coordname, value in points.items():
         if coordname not in da.coords:
             raise ValueError(f'DataArray has no coordinate "{coordname}"')
         # contents must be iterable
-        iterable_points[coordname] = np.atleast_1d(value)
+        points[coordname] = np.atleast_1d(value)
 
-    indices = imod.select.points.points_indices(da, **iterable_points)
+    indices = points_indices(da, **points)
     selection = da.isel(**indices)
-
-    # Fetch a value from the dictionary, try to extract a meaningful index
-    sample_dim = next(iter(points.values()))
-    if isinstance(sample_dim, pd.Series):
-        selection.coords["index"] = sample_dim.index
-    else:
-        sample_dim = next(iter(iterable_points.values()))
-        selection.coords["index"] = np.arange(len(sample_dim))
-
+    # Fetch a value from the dictionary, and get its size.
+    sample_size = len(next(iter(points.values())))
+    selection.coords["index"] = np.arange(sample_size)
     return selection
 
 
