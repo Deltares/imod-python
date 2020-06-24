@@ -241,7 +241,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         path = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"   
         d["packagedata"] = path.as_posix() 
 
-        d["maxbound"] = self._max_active_n()
+        d["nuzfcells"] = self._max_active_n()
 
         return self._template.render(d)
 
