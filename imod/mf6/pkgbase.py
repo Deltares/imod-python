@@ -81,24 +81,44 @@ class Package(xr.Dataset):
 
         return listarr
 
-    def write_binaryfile(self, outpath, ds):
+    def _check_layer_presence(self, ds):
         """
-        data is a xr.Dataset with only the binary variables"""
-        arrays = []
+        If layer present in coordinates and dimensions return layers, 
+        if not return None
+        """
+        
+        if "layer" in ds.coords and "layer" not in ds.dims:
+            layer = ds["layer"].values
+        else:
+            layer = None
+        return(layer)
+
+    def _ds_to_arrlist(self, ds):
+        arrlist = []
         for datavar in ds.data_vars:
             if ds[datavar].shape == ():
                 raise ValueError(
                     f"{datavar} in {ds._pkg_id} package cannot be a scalar"
                 )
-            arrays.append(ds[datavar].values)
-        if "layer" in ds.coords and "layer" not in ds.dims:
-            layer = ds["layer"].values
-        else:
-            layer = None
+            arrlist.append(ds[datavar].values)
+        return(arrlist)
+
+    def write_binaryfile(self, outpath, ds, binary_format=True):
+        """
+        data is a xr.Dataset with only the binary variables"""
+
+        layer = self._check_layer_presence(ds)
+        arrays = self._ds_to_arrlist(ds)
         sparse_data = self.to_sparse(arrays, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)
+        
+        if binary_format:
+            sep=""
+        else:
+            sep="\t"
+        
         with open(outpath, "w") as f:
-            sparse_data.tofile(f)
+            sparse_data.tofile(f, sep=sep)
 
     def write_binary_griddata(self, outpath, da, dtype):
         # From the modflow6 source, the header is defined as:
@@ -214,13 +234,7 @@ class BoundaryCondition(Package):
             nmax = int(da.count())
         return nmax
 
-    def render(self, directory, pkgname, globaltimes):
-        """Render fills in the template only, doesn't write binary data"""
-        d = {}
-
-        # period = {1: f"{directory}/{self._pkg_id}-{i}.bin"}
-
-        bin_ds = self[[*self._binary_data]]
+    def period_paths(self, directory, pkgname, globaltimes, bin_ds):
         periods = {}
         if "time" in bin_ds:  # one of bin_ds has time
             package_times = bin_ds.coords["time"].values
@@ -230,9 +244,19 @@ class BoundaryCondition(Package):
                 periods[s] = path.as_posix()
         else:
             path = directory / pkgname / f"{self._pkg_id}.bin"
-            periods[1] = path.as_posix()
+            periods[1] = path.as_posix()        
+        return(periods)
 
-        d["periods"] = periods
+    def render(self, directory, pkgname, globaltimes):
+        """Render fills in the template only, doesn't write binary data"""
+        d = {}
+
+        # period = {1: f"{directory}/{self._pkg_id}-{i}.bin"}
+
+        bin_ds = self[[*self._binary_data]]
+
+
+        d["periods"] = self.period_paths(directory, pkgname, globaltimes, bin_ds)
 
         # construct the rest (dict for render)
         for varname in self.data_vars.keys():
@@ -253,6 +277,11 @@ class BoundaryCondition(Package):
         directory is modelname
         """
 
+        if self._pkg_id in ["uzf", "lak", "maw", "str"]:
+            binary_format=False
+        else:
+            binary_format=True
+
         directory = pathlib.Path(directory)
 
         self.write_blockfile(directory, pkgname, globaltimes)
@@ -262,7 +291,7 @@ class BoundaryCondition(Package):
         if "time" in bin_ds:  # one of bin_ds has time
             for i in range(len(self.time)):
                 path = directory / pkgname / f"{self._pkg_id}-{i}.bin"
-                self.write_binaryfile(path, bin_ds.isel(time=i))  # one timestep
+                self.write_binaryfile(path, bin_ds.isel(time=i), binary_format)  # one timestep
         else:
             path = directory / pkgname / f"{self._pkg_id}.bin"
-            self.write_binaryfile(path, bin_ds)
+            self.write_binaryfile(path, bin_ds, binary_format)
