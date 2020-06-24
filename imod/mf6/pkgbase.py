@@ -247,6 +247,18 @@ class BoundaryCondition(Package):
             periods[1] = path.as_posix()        
         return(periods)
 
+    def get_options(self, d, not_options=None):
+        if not_options is None:
+            not_options = self._binary_data
+        
+        for varname in self.data_vars.keys():
+            if varname in not_options:
+                continue
+            v = self[varname].values[()]
+            if self._valid(v):  # skip None and False
+                d[varname] = v
+        return(d)
+
     def render(self, directory, pkgname, globaltimes):
         """Render fills in the template only, doesn't write binary data"""
         d = {}
@@ -255,16 +267,10 @@ class BoundaryCondition(Package):
 
         bin_ds = self[[*self._binary_data]]
 
-
         d["periods"] = self.period_paths(directory, pkgname, globaltimes, bin_ds)
-
+        
         # construct the rest (dict for render)
-        for varname in self.data_vars.keys():
-            if varname in self._binary_data:
-                continue
-            v = self[varname].values[()]
-            if self._valid(v):  # skip None and False
-                d[varname] = v
+        d = self.get_options(self, d)
 
         d["maxbound"] = self._max_active_n()
 
