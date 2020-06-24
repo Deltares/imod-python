@@ -236,7 +236,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         
         not_options = list(self._binary_data) + list(self._package_data) + ["iuzno" + "ivertcon"]
         # construct the rest (dict for render)
-        d = self.get_options(self, d, not_options=not_options)
+        d = self.get_options(d, not_options=not_options)
 
         path = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"   
         d["packagedata"] = path.as_posix() 
@@ -272,15 +272,15 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         return listarr
     
     def write(self, directory, pkgname, globaltimes):
-        super(BoundaryCondition, self).write(directory, pkgname, globaltimes)
+        super().write(directory, pkgname, globaltimes)
+#        self.write(directory, pkgname, globaltimes)
         
         outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
         outpath.parent.mkdir(exist_ok=True, parents=True)
         
         package_data = self.get_packagedata()
         
-        with open(outpath, "w") as f:
-            package_data.tofile(f, sep="\t")
+        np.savetxt(outpath, package_data)
         
         
     
