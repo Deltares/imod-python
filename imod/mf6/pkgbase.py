@@ -103,22 +103,32 @@ class Package(xr.Dataset):
             arrlist.append(ds[datavar].values)
         return(arrlist)
 
-    def write_binaryfile(self, outpath, ds, binary_format=True):
+    def write_datafile(self, outpath, ds, to_binaryfile=True):
         """
-        data is a xr.Dataset with only the binary variables"""
-
+        """
         layer = self._check_layer_presence(ds)
         arrays = self._ds_to_arrlist(ds)
         sparse_data = self.to_sparse(arrays, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)
         
-        if binary_format:
-            sep=""
+        if to_binaryfile:
+            self.write_binaryfile(outpath, sparse_data)
         else:
-            sep="\t"
+            self.write_textfile(outpath, sparse_data)
+
+    def write_textfile(self, outpath, sparse_data):
+        """
+        Write to textfile, which is necessary for Advanced Stress Packages
+        """
         
+        np.savetxt(outpath, sparse_data, delimiter = " ")
+
+    def write_binaryfile(self, outpath, sparse_data):
+        """
+        data is a xr.Dataset with only the binary variables"""
+    
         with open(outpath, "w") as f:
-            sparse_data.tofile(f, sep=sep)
+            sparse_data.tofile(f)
 
     def write_binary_griddata(self, outpath, da, dtype):
         # From the modflow6 source, the header is defined as:
@@ -283,9 +293,9 @@ class BoundaryCondition(Package):
         """
 
         if self._pkg_id in ["uzf", "lak", "maw", "str"]:
-            binary_format=False
+            to_binary=False
         else:
-            binary_format=True
+            to_binary=True
 
         directory = pathlib.Path(directory)
 
@@ -296,7 +306,7 @@ class BoundaryCondition(Package):
         if "time" in bin_ds:  # one of bin_ds has time
             for i in range(len(self.time)):
                 path = directory / pkgname / f"{self._pkg_id}-{i}.bin"
-                self.write_binaryfile(path, bin_ds.isel(time=i), binary_format)  # one timestep
+                self.write_datafile(path, bin_ds.isel(time=i), to_binary)  # one timestep
         else:
             path = directory / pkgname / f"{self._pkg_id}.bin"
-            self.write_binaryfile(path, bin_ds, binary_format)
+            self.write_datafile(path, bin_ds, to_binary)
