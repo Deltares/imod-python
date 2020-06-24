@@ -24,13 +24,11 @@ begin dimensions
 end dimensions
 
 begin packagedata
-  {{iuzno}} {{cellid(ncelldim)}} {{landflag}} {{ivertcon}} {{surfdep}} {{vks}} {{thtr}} {{thts}} {{thti}} {{eps}} {%- if boundname is defined -%}{{boundname}}{%- endif -%}
-  {{iuzno}} {{cellid(ncelldim)}} {{landflag}} {{ivertcon}} {{surfdep}} {{vks}} {{thtr}} {{thts}} {{thti}} {{eps}} {%- if boundname is defined -%}{{boundname}}{%- endif -%}
-  ...
+  open/close {{packagedata}}
 end packagedata
 
 {% for i, path in periods.items() %}begin period {{i}}
-  open/close {{path}} (binary)
+  open/close {{path}}
 end period
 {% endfor %}
 
