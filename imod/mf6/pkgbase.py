@@ -250,7 +250,7 @@ class BoundaryCondition(Package):
     def get_options(self, d, not_options=None):
         if not_options is None:
             not_options = self._binary_data
-        
+
         for varname in self.data_vars.keys():
             if varname in not_options:
                 continue
@@ -268,9 +268,8 @@ class BoundaryCondition(Package):
         bin_ds = self[[*self._binary_data]]
 
         d["periods"] = self.period_paths(directory, pkgname, globaltimes, bin_ds)
-        
         # construct the rest (dict for render)
-        d = self.get_options(self, d)
+        d = self.get_options(d)
 
         d["maxbound"] = self._max_active_n()
 
