@@ -273,7 +273,6 @@ class UnsaturatedZoneFlow(BoundaryCondition):
     
     def write(self, directory, pkgname, globaltimes):
         super().write(directory, pkgname, globaltimes)
-#        self.write(directory, pkgname, globaltimes)
         
         outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
         outpath.parent.mkdir(exist_ok=True, parents=True)
