@@ -186,13 +186,13 @@ class UnsaturatedZoneFlow(BoundaryCondition):
     def _create_uzf_numbers(self, landflag):
         """Create unique UZF ID's. Inactive cells equal 0
         """
-        return(np.cumsum(np.ravel(landflag)).reshape(landflag.shape) * landflag)
+        return np.cumsum(np.ravel(landflag)).reshape(landflag.shape) * landflag
 
     def _determine_landflag(self, kv_sat):
-        return((np.isfinite(kv_sat)).astype(np.int32))
+        return (np.isfinite(kv_sat)).astype(np.int32)
 
     def _determine_vertical_connection(self, uzf_number):
-        return(uzf_number.shift(layer=-1, fill_value=0))
+        return uzf_number.shift(layer=-1, fill_value=0)
 
     def _get_field_spec_from_dtype(self, listarr):
         """
@@ -222,8 +222,28 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         listarr_new["iuzno"] = iuzno[notnull]
         listarr_new[field_names] = listarr
         
-        return(listarr_new)
+        return listarr_new
 
+    def render(self, directory, pkgname, globaltimes):
+        """Render fills in the template only, doesn't write binary data"""
+        d = {}
+
+        # period = {1: f"{directory}/{self._pkg_id}-{i}.bin"}
+
+        bin_ds = self[[*self._binary_data]]
+
+        d["periods"] = self.period_paths(directory, pkgname, globaltimes, bin_ds)
+        
+        not_options = list(self._binary_data) + list(self._package_data) + ["iuzno" + "ivertcon"]
+        # construct the rest (dict for render)
+        d = self.get_options(self, d, not_options=not_options)
+
+        path = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"   
+        d["packagedata"] = path.as_posix() 
+
+        d["maxbound"] = self._max_active_n()
+
+        return self._template.render(d)
 
         
     def to_sparse(self, arrlist, layer):
@@ -251,5 +271,16 @@ class UnsaturatedZoneFlow(BoundaryCondition):
 
         return listarr
     
-
+    def write(self, directory, pkgname, globaltimes):
+        super(BoundaryCondition, self).write(directory, pkgname, globaltimes)
+        
+        outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
+        outpath.parent.mkdir(exist_ok=True, parents=True)
+        
+        package_data = self.get_packagedata()
+        
+        with open(outpath, "w") as f:
+            package_data.tofile(f, sep="\t")
+        
+        
     
