@@ -197,7 +197,8 @@ def test_chd_render(twri_model, tmp_path):
             
             begin period 1
               open/close {path}/chd/chd.bin (binary)
-            end period"""
+            end period
+            """
     )
     assert actual == expected
     chd.write(tmp_path, "chd", globaltimes)
@@ -226,7 +227,8 @@ def test_drn_render(twri_model, tmp_path):
             
             begin period 1
               open/close {path}/drn/drn.bin (binary)
-            end period"""
+            end period
+            """
     )
     assert actual == expected
     drn.write(tmp_path, "drn", globaltimes)
@@ -302,7 +304,8 @@ def test_oc_render(twri_model, tmp_path):
             begin period 1
               save head all
               save budget all
-            end period"""
+            end period
+            """
     )
     assert actual == expected
     oc.write(tmp_path, "oc", globaltimes)
@@ -326,7 +329,8 @@ def test_rch_render(twri_model, tmp_path):
 
             begin period 1
               open/close {path}/rch/rch.bin (binary)
-            end period"""
+            end period
+            """
     )
     assert actual == expected
     rch.write(tmp_path, "rch", globaltimes)
@@ -355,7 +359,8 @@ def test_wel_render(twri_model, tmp_path):
 
             begin period 1
               open/close {path}/wel/wel.bin (binary)
-            end period"""
+            end period
+            """
     )
     assert actual == expected
     wel.write(tmp_path, "wel", globaltimes)

@@ -103,7 +103,7 @@ def basicmodel():
     m["rch"] = imod.wq.RechargeHighestActive(
         rate=rate, concentration=rate.copy(), save_budget=False
     )
-    m["evt"] = imod.wq.EvapotranspirationTopLayer(
+    m["evt"] = evt = imod.wq.EvapotranspirationTopLayer(
         maximum_rate=maximum_rate,
         surface=maximum_rate.copy(),
         extinction_depth=maximum_rate.copy(),
@@ -252,17 +252,17 @@ def test_render_gen(basicmodel):
             coord_yll = 0.0
             start_year = 2000
             start_month = 01
-            start_day = 01
-            start_hour = 00
-            start_minute = 00"""
+            start_day = 01"""
     )
-    actual = m._render_gen(
-        modelname=modelname,
-        globaltimes=globaltimes,
-        writehelp=False,
-        result_dir="results",
+    assert (
+        m._render_gen(
+            modelname=modelname,
+            globaltimes=globaltimes,
+            writehelp=False,
+            result_dir="results",
+        )
+        == compare
     )
-    assert actual == compare
 
 
 def test_render_pkg__gcg(basicmodel):
@@ -413,24 +413,6 @@ def test_render_groups__ghb_riv_wel(basicmodel):
     assert n_sinkssources == 128
     assert content == compare
     assert ssm_content == ssm_compare
-
-
-def test_render_groups__double_gbh(basicmodel):
-    m = basicmodel.copy()
-    ghbhead = m["ghb"]["head"].copy()
-    m["ghb2"] = imod.wq.GeneralHeadBoundary(
-        head=ghbhead,
-        conductance=ghbhead.copy(),
-        density=ghbhead.copy(),
-        save_budget=False,
-    )
-    m.time_discretization("2000-01-06")
-    diskey = m._get_pkgkey("dis")
-    globaltimes = m[diskey]["time"].values
-    directory = pathlib.Path(".")
-
-    n_sinkssources = m._render_groups(directory=directory, globaltimes=globaltimes)[2]
-    assert n_sinkssources == 178
 
 
 def test_render_flowsolver(basicmodel):

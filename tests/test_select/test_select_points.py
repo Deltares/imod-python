@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import pytest
 import xarray as xr
 
@@ -165,22 +164,6 @@ def test_get_values(test_da_nonequidistant):
         coords={"index": [0, 1, 2], "x": ("index", x), "y": ("index", y)},
         dims=["index"],
     )
-    assert actual.identical(expected)
-
-
-def test_get_values__index(test_da_nonequidistant):
-    x = pd.Series(data=[0.45, 1.45, 2.4], index=[11, 12, 13])
-    y = [2.25, 1.25, 0.5]
-    actual = imod.select.points_values(test_da_nonequidistant, x=x, y=y)
-    actual = actual.drop("dx")
-    actual = actual.drop("dy")
-    data = [0, 5, 10]
-    expected = xr.DataArray(
-        data,
-        coords={"index": [11, 12, 13], "x": ("index", x), "y": ("index", y)},
-        dims=["index"],
-    )
-    assert actual.identical(expected)
 
 
 def test_get_values__scalar(test_da_nonequidistant):
@@ -195,4 +178,3 @@ def test_get_values__scalar(test_da_nonequidistant):
         coords={"index": [0], "x": ("index", [x]), "y": ("index", [y])},
         dims=["index"],
     )
-    assert actual.identical(expected)
