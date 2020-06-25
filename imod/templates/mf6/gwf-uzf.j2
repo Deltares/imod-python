@@ -14,7 +14,7 @@ begin options
 {%- if square_gwet is defined -%}  square_gwet{%- endif -%}
 {%- if simulate_gwseep is defined -%}  simulate_gwseep{%- endif -%}
 {%- if unsat_etwc is defined -%}  unsat_etwc{%- endif -%}
-{%- if unsat_etae is defined -%}  unsat_etae{%- endif -%}
+{% if unsat_etae is defined %}  unsat_etae{% endif %}
 end options
 
 begin dimensions
@@ -30,5 +30,6 @@ end packagedata
 {% for i, path in periods.items() %}begin period {{i}}
   open/close {{path}}
 end period
+
 {% endfor %}
 
