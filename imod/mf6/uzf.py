@@ -198,7 +198,9 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         """Use parent.to_sparse to get cellids
         """
         notnull = self["landflag"].values == 1
-        iuzno = self["iuzno"].values
+        iuzno = self["iuzno"].values[notnull]
+        landflag = self["landflag"].values[notnull]
+        ivertcon = self["ivertcon"].values[notnull]
 
         ds = self[[*self._package_data]]
 
@@ -207,13 +209,18 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         
         listarr = super(BoundaryCondition, self).to_sparse(arrays, layer)
         
-        index_spec = [("iuzno", np.int32)]
         field_spec = self._get_field_spec_from_dtype(listarr)
         field_names = [i[0] for i in field_spec]
+        
+        index_spec = [("iuzno", np.int32)] + field_spec[:3]
+        field_spec = [("landflag", np.int32)] + [("ivertcon", np.int32)] + field_spec[3:]
+        
         sparse_dtype = np.dtype(index_spec + field_spec)
         
         listarr_new = np.empty(listarr.shape, dtype=sparse_dtype)
-        listarr_new["iuzno"] = iuzno[notnull]
+        listarr_new["iuzno"] = iuzno
+        listarr_new["landflag"] = landflag
+        listarr_new["ivertcon"] = ivertcon
         listarr_new[field_names] = listarr
         
         return listarr_new
