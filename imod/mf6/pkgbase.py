@@ -183,9 +183,10 @@ class Package(xr.Dataset):
                 pkgdirectory = directory / pkgname
                 pkgdirectory.mkdir(exist_ok=True, parents=True)
                 for varname, dtype in self._binary_data.items():
+                    key = self._keyword_map.get(varname, varname)
                     da = self[varname]
                     if "x" in da.dims and "y" in da.dims:
-                        path = pkgdirectory / f"{varname}.bin"
+                        path = pkgdirectory / f"{key}.bin"
                         self.write_binary_griddata(path, da, dtype)
 
 

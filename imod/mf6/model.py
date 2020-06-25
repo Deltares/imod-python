@@ -80,7 +80,7 @@ class GroundwaterFlowModel(Model):
         modeltimes = []
         for pkg in self.values():
             if "time" in pkg.coords:
-                modeltimes.append(pkg["times"].values)
+                modeltimes.append(pkg["time"].values)
         return modeltimes
 
     def render(self, modeldirectory):

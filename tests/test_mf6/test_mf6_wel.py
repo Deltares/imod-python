@@ -51,6 +51,7 @@ def test_render():
 
         begin period 1
           open/close mymodel/well/wel.bin (binary)
-        end period"""
+        end period
+        """
     )
     assert actual == expected

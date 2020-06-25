@@ -372,6 +372,7 @@ class Solution(Package):
         "no_ptc",
     )
     _pkg_id = "ims"
+    _keyword_map = {}
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(

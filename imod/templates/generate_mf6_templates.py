@@ -96,9 +96,7 @@ def block_entry(varname, block, vardict):
         if v.get("layered") == "true":
             # if layered is supported according to dfn,
             # and we get passed {layered: True}, add layered keyword
-            layered = (
-                f" {{% if layered is sameas true %}}{varname}_layered{{% endif %}}"
-            )
+            layered = f" {{% if layered %}}{varname}_layered{{% endif %}}"
         else:
             layered = ""
         s = f"{s}{layered}\n    {{{varname}}}\n"

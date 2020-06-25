@@ -34,6 +34,7 @@ class StructuredDiscretization(Package):
     __slots__ = ("top", "bottom", "idomain")
     _pkg_id = "dis"
     _binary_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
+    _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, top, bottom, idomain):
@@ -71,7 +72,7 @@ class StructuredDiscretization(Package):
         d["delc"] = self._delrc(np.abs(dx))
         _, d["top"] = self._compose_values(self["top"], disdirectory, "top")
         d["botm_layered"], d["botm"] = self._compose_values(
-            self["bottom"], disdirectory, "bottom"
+            self["bottom"], disdirectory, "botm"
         )
         d["idomain_layered"], d["idomain"] = self._compose_values(
             self["idomain"], disdirectory, "idomain"

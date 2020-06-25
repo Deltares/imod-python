@@ -25,6 +25,7 @@ class TimeDiscretization(Package):
 
     __slots__ = ("timestep_duration", "n_timesteps", "timestep_multiplier")
     _pkg_id = "tdis"
+    _keyword_map = {}
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, timestep_duration, n_timesteps=1, timestep_multiplier=1.0):
