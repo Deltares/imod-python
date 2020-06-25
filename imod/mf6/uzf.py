@@ -194,12 +194,6 @@ class UnsaturatedZoneFlow(BoundaryCondition):
     def _determine_vertical_connection(self, uzf_number):
         return uzf_number.shift(layer=-1, fill_value=0)
 
-    def _get_field_spec_from_dtype(self, listarr):
-        """
-        From https://stackoverflow.com/questions/21777125/how-to-output-dtype-to-a-list-or-dict
-        """
-        return([(x,y[0]) for x,y in sorted(listarr.dtype.fields.items(),key=lambda k: k[1])])
-
     def get_packagedata(self):
         """Use parent.to_sparse to get cellids
         """
@@ -272,6 +266,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         return listarr
     
     def write(self, directory, pkgname, globaltimes):
+        #Write Stress Period data and Options
         super().write(directory, pkgname, globaltimes)
         
         outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
@@ -279,7 +274,8 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         
         package_data = self.get_packagedata()
         
-        np.savetxt(outpath, package_data)
+        #Write PackageData
+        self.write_textfile(outpath, package_data)
         
         
     
