@@ -242,7 +242,6 @@ class BoundaryCondition(Package):
         Write to textfile, which is necessary for Advanced Stress Packages
         """
         textformat = self.get_textformat(sparse_data)
-        print(textformat)
         np.savetxt(outpath, sparse_data, delimiter = " ", fmt=textformat)
 
     def write_binaryfile(self, outpath, sparse_data):
