@@ -43,6 +43,7 @@ class River(BoundaryCondition):
     )
     _pkg_id = "riv"
     _binary_data = ("stage", "conductance", "bottom_elevation")
+    _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(

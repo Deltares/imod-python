@@ -21,6 +21,7 @@ def test_render():
         begin period 1
           save head all
           save budget all
-        end period"""
+        end period
+        """
     )
     assert actual == expected

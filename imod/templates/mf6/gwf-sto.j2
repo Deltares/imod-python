@@ -6,15 +6,16 @@ begin options
 end options
 
 begin griddata
-  iconvert{% if iconvert_layered is sameas true %} layered{% endif %}
+  iconvert{% if iconvert_layered %} layered{% endif %}
 {% for x in iconvert %}    {{x}}
-{% endfor %}  ss{% if ss_layered is sameas true %} layered{% endif %}
+{% endfor %}  ss{% if ss_layered %} layered{% endif %}
 {% for x in ss %}    {{x}}
-{% endfor %}  sy{% if sy_layered is sameas true %} layered{% endif %}
+{% endfor %}  sy{% if sy_layered %} layered{% endif %}
 {% for x in sy %}    {{x}}
 {% endfor -%}
 end griddata
 
-{% for i, path in periods.items() %}begin period {{i}}
-  open/close {{path}} (binary)
-end period{% endfor %}
+{% for i, value in periods.items() %}begin period {{i}}
+  {% if value %}transient{% else %}steady-state{% endif %}
+end period
+{% endfor %}

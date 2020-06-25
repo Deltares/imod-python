@@ -10,4 +10,5 @@ end options
 {% for i, perioddict in periods.items() %}begin period {{i}}
 {% for key, value in perioddict.items() %}  {{key}} {{value}}
 {% endfor -%} 
-end period{% endfor %}
+end period
+{% endfor %}
