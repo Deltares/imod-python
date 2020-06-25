@@ -4,7 +4,7 @@ import jinja2
 import numba
 import numpy as np
 import xarray as xr
-
+import string
 
 class Package(xr.Dataset):
     """
@@ -102,33 +102,6 @@ class Package(xr.Dataset):
                 )
             arrlist.append(ds[datavar].values)
         return(arrlist)
-
-    def write_datafile(self, outpath, ds, to_binaryfile=True):
-        """
-        """
-        layer = self._check_layer_presence(ds)
-        arrays = self._ds_to_arrlist(ds)
-        sparse_data = self.to_sparse(arrays, layer)
-        outpath.parent.mkdir(exist_ok=True, parents=True)
-        
-        if to_binaryfile:
-            self.write_binaryfile(outpath, sparse_data)
-        else:
-            self.write_textfile(outpath, sparse_data)
-
-    def write_textfile(self, outpath, sparse_data):
-        """
-        Write to textfile, which is necessary for Advanced Stress Packages
-        """
-        
-        np.savetxt(outpath, sparse_data, delimiter = " ")
-
-    def write_binaryfile(self, outpath, sparse_data):
-        """
-        data is a xr.Dataset with only the binary variables"""
-    
-        with open(outpath, "w") as f:
-            sparse_data.tofile(f)
 
     def write_binary_griddata(self, outpath, da, dtype):
         # From the modflow6 source, the header is defined as:
@@ -243,6 +216,54 @@ class BoundaryCondition(Package):
         else:
             nmax = int(da.count())
         return nmax
+
+    def _get_field_spec_from_dtype(self, listarr):
+        """
+        From https://stackoverflow.com/questions/21777125/how-to-output-dtype-to-a-list-or-dict
+        """
+        return([(x,y[0]) for x,y in sorted(listarr.dtype.fields.items(),key=lambda k: k[1])])
+
+    def get_textformat(self, sparse_data):
+        field_spec = self._get_field_spec_from_dtype(sparse_data)
+        dtypes = list(zip(*field_spec))[1]
+        textformat = []
+        for dtype in dtypes:
+            if np.issubdtype(dtype, np.integer): #integer
+                textformat.append("%4d")
+            elif np.issubdtype(dtype, np.inexact): #floatish
+                textformat.append("%6.3f")
+            else:
+                raise ValueError("Data should be a subdatatype of either 'np.integer' or 'np.inexact'")
+        textformat = " ".join(textformat)
+        return(textformat)
+
+    def write_textfile(self, outpath, sparse_data):
+        """
+        Write to textfile, which is necessary for Advanced Stress Packages
+        """
+        textformat = self.get_textformat(sparse_data)
+        print(textformat)
+        np.savetxt(outpath, sparse_data, delimiter = " ", fmt=textformat)
+
+    def write_binaryfile(self, outpath, sparse_data):
+        """
+        data is a xr.Dataset with only the binary variables"""
+    
+        with open(outpath, "w") as f:
+            sparse_data.tofile(f)
+
+    def write_datafile(self, outpath, ds, to_binaryfile=True):
+        """
+        """
+        layer = self._check_layer_presence(ds)
+        arrays = self._ds_to_arrlist(ds)
+        sparse_data = self.to_sparse(arrays, layer)
+        outpath.parent.mkdir(exist_ok=True, parents=True)
+        
+        if to_binaryfile:
+            self.write_binaryfile(outpath, sparse_data)
+        else:
+            self.write_textfile(outpath, sparse_data)
 
     def period_paths(self, directory, pkgname, globaltimes, bin_ds):
         periods = {}
