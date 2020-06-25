@@ -498,19 +498,13 @@ class Regridder(object):
             if any(
                 size == 0 for size in chunk_src.shape
             ):  # zero overlap for the chunk, zero size chunk
-                # N.B. Make sure to include chunks=-1, defaults to chunks="auto", which
-                # automatically results in unnecessary, error prone chunks.
-                # TODO: Not covered by tests -- but also rather hard to test.
                 dask_array = dask.array.full(
-                    shape=info.dst_shape,
-                    fill_value=fill_value,
-                    dtype=src.dtype,
-                    chunks=-1,
+                    shape=info.dst_shape, fill_value=fill_value, dtype=src.dtype
                 )
             elif self._first_call:
                 # NOT delayed, trigger compilation
                 a = self._regrid(chunk_src, fill_value, info)
-                dask_array = dask.array.from_array(a, chunks=-1)
+                dask_array = dask.array.from_array(a)
                 self._first_call = False
             else:
                 # Alllocation occurs inside
@@ -548,25 +542,25 @@ class Regridder(object):
         result : xr.DataArray
             Regridded result.
         """
+        info = self._regrid_info(source, like)
+        # Exit early if nothing is to be done
+        if len(info.regrid_dims) == 0:
+            return source.copy(deep=True)
+
         # Don't mutate source; src stands for source, dst for destination
         src = source.copy(deep=False)
         like = like.copy(deep=False)
-        _, regrid_dims, _ = common._match_dims(src, like)
-        # Exit early if nothing is to be done
-        if len(regrid_dims) == 0:
-            return source.copy(deep=True)
 
-        # Collect dimensions to flip to make everything ascending
-        src, _ = common._increasing_dims(src, regrid_dims)
-        like, flip_dst = common._increasing_dims(like, regrid_dims)
-
-        info = self._regrid_info(source, like)
         # Use xarray for nearest
         # TODO: replace by more efficient, specialized method
         if self.method == "nearest":
             dst = source.reindex_like(like, method="nearest")
             dst = dst.assign_coords(info.dst_da_coords)
             return dst
+
+        # Collect dimensions to flip to make everything ascending
+        src, _ = common._increasing_dims(src, info.regrid_dims)
+        like, flip_dst = common._increasing_dims(like, info.regrid_dims)
 
         # Prepare for regridding; quick checks
         if self._first_call:

@@ -38,7 +38,6 @@ The methods below construct pyvista.UnstructuredGrids for voxel models (z1d),
 import numba
 import numpy as np
 import pandas as pd
-from pathlib import Path
 import scipy.ndimage.morphology
 import tqdm
 import xarray as xr
@@ -93,7 +92,7 @@ def _create_hexahedra_z1d(data, x, y, z):
     # Allocate
     # VTK_HEXAHEDRON is just an enum
     offset = np.arange(0, 9 * (n + 1), 9)
-    cells = np.empty(n * 9, dtype=np.int32)
+    cells = np.empty(n * 9)
     indices = np.empty(n, dtype=np.int32)
     cell_type = np.full(n, vtk.VTK_HEXAHEDRON)
     # A hexahedron has 8 corners
@@ -173,7 +172,7 @@ def _create_hexahedra_z3d(data, x, y, z3d):
     # Allocate
     # VTK_HEXAHEDRON is just an enum
     offset = np.arange(0, 9 * (n + 1), 9)
-    cells = np.empty(n * 9, dtype=np.int32)
+    cells = np.empty(n * 9)
     indices = np.empty(n, dtype=np.int32)
     cell_type = np.full(n, vtk.VTK_HEXAHEDRON)
     # A hexahedron has 8 corners
@@ -264,11 +263,11 @@ def _create_plane_surface(data, x, y):
     # Allocate
     # VTK_QUAD is just an enum
     offset = np.arange(0, 5 * (n + 1), 5)
-    cells = np.empty(n * 5, dtype=np.int32)
+    cells = np.empty(n * 5)
     cell_type = np.full(n, vtk.VTK_QUAD)
     # A hexahedron has r corners
     points = np.empty((n * 4, 3))
-    values = np.empty(n, dtype=data.dtype)
+    values = np.empty(n, data.dtype)
 
     ii = 0
     jj = 0
@@ -621,23 +620,18 @@ class GridAnimation3D:
 
     def write(self, filename, framerate=24):
         """
-        Write the animation to a video or gif.
+        Write the animation to a video.
 
         Resets the plotter when finished animating.
 
         Parameters
         ----------
         filename : str, pathlib.Path
-            Filename to write the video to. Should be an .mp4 or .gif.
+            Filename to write the video to. Should likely be an .mp4.
         framerate : int, optional
-            Frames per second. Not honoured for gif.
+            Frames per second.
         """
-        if Path(filename).suffix.lower() == ".gif":
-            self.plotter.open_gif(
-                Path(filename).with_suffix(".gif").as_posix()
-            )  # only lowercase gif and no Path allowed
-        else:
-            self.plotter.open_movie(filename, framerate=framerate)
+        self.plotter.open_movie(filename, framerate=framerate)
         self.plotter.show(auto_close=False, interactive=False)
         self.plotter.write_frame()
 

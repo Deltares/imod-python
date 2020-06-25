@@ -140,7 +140,8 @@ def write_block(vardict, block):
                     """\
                 {% for i, path in periods.items() %}begin period {{i}}
                   open/close {{path}} (binary)
-                end period{% endfor %}"""
+                end period
+                {% endfor %}"""
                 )
                 return s
             if addv:

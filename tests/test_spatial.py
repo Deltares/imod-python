@@ -87,22 +87,6 @@ def test_rasterize():
     assert actual.identical(expected)
 
 
-def test_polygonize():
-    nrow, ncol = 2, 2
-    dx, dy = 1.0, -1.0
-    xmin, xmax = 0.0, 2.0
-    ymin, ymax = 0.0, 2.0
-    coords = imod.util._xycoords((xmin, xmax, ymin, ymax), (dx, dy))
-    kwargs = {"name": "test", "coords": coords, "dims": ("y", "x")}
-    data = np.ones((nrow, ncol), dtype=np.float32)
-    data[0, 1] = 2.0
-    data[1, 1] = 3.0
-    da = xr.DataArray(data, **kwargs)
-    gdf = imod.prepare.polygonize(da)
-    assert len(gdf) == 3
-    assert sorted(gdf["value"]) == [1.0, 2.0, 3.0]
-
-
 def test_handle_dtype():
     assert imod.prepare.spatial._handle_dtype(np.uint8, None) == (1, 0)
     assert imod.prepare.spatial._handle_dtype(np.uint16, None) == (2, 0)

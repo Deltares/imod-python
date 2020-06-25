@@ -3,12 +3,10 @@ import subprocess
 
 import affine
 import dask
-import geopandas as gpd
 import numba
 import numpy as np
 import pandas as pd
 import scipy.ndimage
-import shapely.geometry as sg
 import xarray as xr
 
 import imod
@@ -233,39 +231,6 @@ def rasterize(geodataframe, like, column=None, fill=np.nan, **kwargs):
     return xr.DataArray(raster, like.coords, like.dims)
 
 
-def polygonize(da):
-    """
-    Polygonize a 2D-DataArray into a GeoDataFrame of polygons.
-
-    Parameters
-    ----------
-    da : xr.DataArray
-
-    Returns
-    -------
-    polygonized : geopandas.GeoDataFrame
-    """
-    if da.dims != ("y", "x"):
-        raise ValueError('Dimensions must be ("y", "x")')
-
-    values = da.values
-    if values.dtype == np.float64:
-        values = values.astype(np.float32)
-
-    transform = imod.util.transform(da)
-    shapes = rasterio.features.shapes(values, transform=transform)
-
-    geometries = []
-    colvalues = []
-    for (geom, colval) in shapes:
-        geometries.append(sg.Polygon(geom["coordinates"][0]))
-        colvalues.append(colval)
-
-    gdf = gpd.GeoDataFrame({"value": colvalues, "geometry": geometries})
-    gdf.crs = da.attrs.get("crs")
-    return gdf
-
-
 def _handle_dtype(dtype, nodata):
     # Largely taken from rasterio.dtypes
     # https://github.com/mapbox/rasterio/blob/master/rasterio/dtypes.py
@@ -420,10 +385,11 @@ def gdal_rasterize(
     options = [f"ATTRIBUTE={column}"]
     gdal.RasterizeLayer(memory_raster, [1], vector_layer, None, None, [1], options)
     if error.err_level >= gdal.CE_Warning:
-        message = error.err_msg
-        if message.startswith(
-            "Failed to fetch spatial reference on layer"
-        ) and message.endswith("assuming matching coordinate systems."):
+        reference_err_msg = (
+            "Failed to fetch spatial reference on layer shape to build"
+            " transformer, assuming matching coordinate systems."
+        )
+        if error.err_msg == reference_err_msg:
             pass
         else:
             raise RuntimeError("GDAL error: " + error.err_msg)

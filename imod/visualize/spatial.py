@@ -9,7 +9,6 @@ import xarray as xr
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import imod
-from imod.visualize import common
 
 # since geopandas is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
@@ -68,7 +67,6 @@ def plot_map(
     kwargs_raster=None,
     kwargs_colorbar=None,
     figsize=None,
-    return_cbar=False,
 ):
     """
     Parameters
@@ -99,15 +97,11 @@ def plot_map(
         These arguments are forwarded to fig.colorbar()
     figsize : tuple of two floats or integers, optional
         This is used in plt.subplots(figsize)
-    return_cbar : boolean, optional
-        Return the matplotlib.Colorbar instance. Defaults to False.
 
     Returns
     -------
     fig : matplotlib.figure
     ax : matplotlig.ax
-    if return_cbar == True:
-    cbar : matplotlib.Colorbar
 
     Examples
     --------
@@ -115,11 +109,35 @@ def plot_map(
     
     >>> overlays = [{"gdf": geodataframe, "edgecolor": "black"}]
     >>> imod.visualize.spatial.plot_map(raster, legend, overlays)
-
-    Label the colorbar and the colorbar ticks
     """
     # Read legend settings
-    cmap, norm = common._cmapnorm_from_colorslevels(colors, levels)
+    if isinstance(colors, matplotlib.colors.LinearSegmentedColormap):
+        # use given cmap
+        cmap = colors
+    else:
+        nlevels = len(levels)
+        if isinstance(colors, str):
+            # Use given cmap, but fix the under and over colors
+            # The colormap (probably) does not have a nice under and over color.
+            # So we cant use `cmap = matplotlib.cm.get_cmap(colors)`
+            cmap = matplotlib.cm.get_cmap(colors)
+            colors = cmap(np.linspace(0, 1, nlevels + 1))
+        # Validate number of colors vs number of levels
+        ncolors = len(colors)
+        if not nlevels == ncolors - 1:
+            raise ValueError(
+                f"Incorrect number of levels. Number of colors is {ncolors},"
+                f" expected {ncolors - 1} levels, got {nlevels} levels instead."
+            )
+        # Crate cmap from given list of colors
+        cmap = matplotlib.colors.ListedColormap(colors[1:-1])
+        cmap.set_under(
+            colors[0]
+        )  # this is the color for values smaller than raster.min()
+        cmap.set_over(
+            colors[-1]
+        )  # this is the color for values larger than raster.max()
+    norm = matplotlib.colors.BoundaryNorm(levels, cmap.N)
 
     # Get extent
     _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(raster)
@@ -171,8 +189,7 @@ def plot_map(
     # Add colorbar
     divider = make_axes_locatable(ax)
     cbar_ax = divider.append_axes("right", size="5%", pad="5%")
-    ticklabels = settings_cbar.pop("ticklabels", None)
-    cbar = fig.colorbar(ax1, cmap=cmap, norm=norm, cax=cbar_ax, **settings_cbar)
+    fig.colorbar(ax1, cmap=cmap, norm=norm, cax=cbar_ax, **settings_cbar)
 
     # Add overlays
     for overlay in overlays:
@@ -181,10 +198,7 @@ def plot_map(
         gdf.plot(ax=ax, **tmp)
 
     # Return
-    if return_cbar:
-        return fig, ax, cbar
-    else:
-        return fig, ax
+    return fig, ax
 
 
 def _colorscale(a_yx, levels, cmap, quantile_colorscale):
@@ -212,21 +226,21 @@ def _colorscale(a_yx, levels, cmap, quantile_colorscale):
         nlevels = levels
         if quantile_colorscale:
             levels = np.unique(np.nanpercentile(a_yx.values, np.linspace(0, 100, 101)))
-            if len(levels) > nlevels:
+            if levels.size > nlevels:
                 # Decrease the number of levels
                 # Pretty rough approach, but should be sufficient
                 x = np.linspace(0.0, 100.0, nlevels)
-                xp = np.linspace(0.0, 100.0, len(levels))
+                xp = np.linspace(0.0, 100.0, levels.size)
                 yp = levels
                 levels = np.interp(x, xp, yp)
             else:  # Can't make more levels out of only a few quantiles
-                nlevels = len(levels)
+                nlevels = levels.size
         else:  # Go start to end
             vmin = float(a_yx.min())
             vmax = float(a_yx.max())
             levels = np.linspace(vmin, vmax, nlevels)
     elif isinstance(levels, (np.ndarray, list, tuple)):  # Pre-defined by user
-        nlevels = len(levels)
+        nlevels = levels.size
     else:
         raise ValueError("levels argument should be None, an integer, or an array.")
 
