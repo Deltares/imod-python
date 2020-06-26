@@ -15,8 +15,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         is the surface depression depth of the UZF cell.
     kv_sat: array of floats (xr.DataArray)
         is the vertical saturated hydraulic conductivity of the UZF cell.
-        TODO: If nothing provided, select from vertical hydraulic conducivity npf
-        TODO: Let user provide mapping with dim uzf_number, or an array with layer, y, x
+        NOTE: the UZF package determines the location of inactive cells where kv_sat is np.nan
     theta_r: array of floats (xr.DataArray)
         is the residual (irreducible) water content of the UZF cell.
     theta_sat: array of floats (xr.DataArray)
@@ -32,8 +31,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         GWF cell. Evapotranspiration is first removed from the unsaturated zone and any remaining
         potential evapotranspiration is applied to the saturated zone. If IVERTCON is greater than zero
         then residual potential evapotranspiration not satisfied in the UZF cell is applied to the underlying
-        UZF and GWF cells. PET is always specified, but is only used if SIMULATE ET is specified in the
-        OPTIONS block.
+        UZF and GWF cells.
     extinction_depth: array of floats (xr.DataArray, optional)
         defines the evapotranspiration extinction depth of the UZF cell. If
         IVERTCON is greater than zero and EXTDP extends below the GWF cell bottom then remaining
@@ -97,7 +95,8 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         "theta_r",
         "theta_sat",
         "theta_init",
-        "epsilon" "infiltration_rate",
+        "epsilon", 
+        "infiltration_rate",
         "et_pot",
         "extinction_depth",
         "extinction_theta",
@@ -106,10 +105,13 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         "root_activity",
         "ntrailwaves",
         "nwavesets",
-        "simulate_ET",
+        "simulate_et",
         "groundwater_ET_function",
         "simulate_seepage",
-        "unsaturated_ET_function",
+        "unsat_etwc",
+        "unsat_etae",
+        "linear_gwet",
+        "square_gwet",
         "print_input",
         "print_flows",
         "save_flows",
@@ -121,7 +123,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         "iuzno",
     )
 
-    _binary_data = (
+    _binary_data = ( # Stress period data, not really binary in this case
         "infiltration_rate",
         "et_pot",
         "extinction_depth",
@@ -160,7 +162,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         root_activity=None,
         ntrailwaves=7,  # Recommended in manual
         nwavesets=40,
-        groundwater_ET_function="linear",
+        groundwater_ET_function=None,
         simulate_groundwater_seepage=False,
         print_input=False,
         print_flows=False,
@@ -223,7 +225,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         """Modflow6 requires something to be filled in the stress perioddata, 
         even though the data is not used in the current configuration. 
         Only an infiltration rate is required,
-        the rest can be filled with dummy values.
+        the rest can be filled with dummy values if not provided.
         """
         for var in self._binary_data:
             if self[var].size == 1:  # Prevent loading large arrays in memory
