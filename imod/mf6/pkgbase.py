@@ -6,6 +6,7 @@ import numpy as np
 import xarray as xr
 import string
 
+
 class Package(xr.Dataset):
     """
     Package is used to share methods for specific packages with no time component.
@@ -86,12 +87,12 @@ class Package(xr.Dataset):
         If layer present in coordinates and dimensions return layers, 
         if not return None
         """
-        
+
         if "layer" in ds.coords and "layer" not in ds.dims:
             layer = ds["layer"].values
         else:
             layer = None
-        return(layer)
+        return layer
 
     def _ds_to_arrlist(self, ds):
         arrlist = []
@@ -101,7 +102,7 @@ class Package(xr.Dataset):
                     f"{datavar} in {ds._pkg_id} package cannot be a scalar"
                 )
             arrlist.append(ds[datavar].values)
-        return(arrlist)
+        return arrlist
 
     def write_binary_griddata(self, outpath, da, dtype):
         # From the modflow6 source, the header is defined as:
@@ -221,33 +222,38 @@ class BoundaryCondition(Package):
         """
         From https://stackoverflow.com/questions/21777125/how-to-output-dtype-to-a-list-or-dict
         """
-        return([(x,y[0]) for x,y in sorted(listarr.dtype.fields.items(),key=lambda k: k[1])])
+        return [
+            (x, y[0])
+            for x, y in sorted(listarr.dtype.fields.items(), key=lambda k: k[1])
+        ]
 
     def get_textformat(self, sparse_data):
         field_spec = self._get_field_spec_from_dtype(sparse_data)
         dtypes = list(zip(*field_spec))[1]
         textformat = []
         for dtype in dtypes:
-            if np.issubdtype(dtype, np.integer): #integer
+            if np.issubdtype(dtype, np.integer):  # integer
                 textformat.append("%4d")
-            elif np.issubdtype(dtype, np.inexact): #floatish
+            elif np.issubdtype(dtype, np.inexact):  # floatish
                 textformat.append("%6.3f")
             else:
-                raise ValueError("Data should be a subdatatype of either 'np.integer' or 'np.inexact'")
+                raise ValueError(
+                    "Data should be a subdatatype of either 'np.integer' or 'np.inexact'"
+                )
         textformat = " ".join(textformat)
-        return(textformat)
+        return textformat
 
     def write_textfile(self, outpath, sparse_data):
         """
         Write to textfile, which is necessary for Advanced Stress Packages
         """
         textformat = self.get_textformat(sparse_data)
-        np.savetxt(outpath, sparse_data, delimiter = " ", fmt=textformat)
+        np.savetxt(outpath, sparse_data, delimiter=" ", fmt=textformat)
 
     def write_binaryfile(self, outpath, sparse_data):
         """
         data is a xr.Dataset with only the binary variables"""
-    
+
         with open(outpath, "w") as f:
             sparse_data.tofile(f)
 
@@ -258,7 +264,7 @@ class BoundaryCondition(Package):
         arrays = self._ds_to_arrlist(ds)
         sparse_data = self.to_sparse(arrays, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)
-        
+
         if to_binaryfile:
             self.write_binaryfile(outpath, sparse_data)
         else:
@@ -274,8 +280,8 @@ class BoundaryCondition(Package):
                 periods[s] = path.as_posix()
         else:
             path = directory / pkgname / f"{self._pkg_id}.bin"
-            periods[1] = path.as_posix()        
-        return(periods)
+            periods[1] = path.as_posix()
+        return periods
 
     def get_options(self, d, not_options=None):
         if not_options is None:
@@ -287,7 +293,7 @@ class BoundaryCondition(Package):
             v = self[varname].values[()]
             if self._valid(v):  # skip None and False
                 d[varname] = v
-        return(d)
+        return d
 
     def render(self, directory, pkgname, globaltimes):
         """Render fills in the template only, doesn't write binary data"""
@@ -313,9 +319,9 @@ class BoundaryCondition(Package):
         """
 
         if self._pkg_id in ["uzf", "lak", "maw", "str"]:
-            to_binary=False
+            to_binary = False
         else:
-            to_binary=True
+            to_binary = True
 
         directory = pathlib.Path(directory)
 
@@ -326,7 +332,9 @@ class BoundaryCondition(Package):
         if "time" in bin_ds:  # one of bin_ds has time
             for i in range(len(self.time)):
                 path = directory / pkgname / f"{self._pkg_id}-{i}.bin"
-                self.write_datafile(path, bin_ds.isel(time=i), to_binary)  # one timestep
+                self.write_datafile(
+                    path, bin_ds.isel(time=i), to_binary
+                )  # one timestep
         else:
             path = directory / pkgname / f"{self._pkg_id}.bin"
             self.write_datafile(path, bin_ds, to_binary)

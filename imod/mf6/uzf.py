@@ -97,54 +97,88 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         use a pd.DataFrame and use the MF6 timeseries files to read input. The latter could
         save memory for laterally large-scale models, through efficient use of the UZF cell identifiers.
     """
-    
-    __slots__ = ("surface_depression_depth", "kv_sat", "theta_r", 
-                "theta_sat", "theta_init", "epsilon" "infiltration_rate", "et_pot",
-                "extinction_depth", "extinction_theta", "air_entry_potential", 
-                "root_potential", "root_activity", "ntrailwaves", "nwavesets", 
-                "simulate_ET", "groundwater_ET_function", "simulate_seepage", 
-                "unsaturated_ET_function", "print_input", "print_flows", "save_flows", 
-                "observations", "water_mover", "timeseries", "landflag", "ivertcon", "iuzno")
-    
-    _binary_data = ("infiltration_rate", "et_pot", "extinction_depth", 
-                    "extinction_theta", "air_entry_potential", "root_potential",
-                    "root_activity")
-    
-    _package_data = ("surface_depression_depth", "kv_sat", 
-                     "theta_r", "theta_sat", "theta_init", "epsilon")
+
+    __slots__ = (
+        "surface_depression_depth",
+        "kv_sat",
+        "theta_r",
+        "theta_sat",
+        "theta_init",
+        "epsilon" "infiltration_rate",
+        "et_pot",
+        "extinction_depth",
+        "extinction_theta",
+        "air_entry_potential",
+        "root_potential",
+        "root_activity",
+        "ntrailwaves",
+        "nwavesets",
+        "simulate_ET",
+        "groundwater_ET_function",
+        "simulate_seepage",
+        "unsaturated_ET_function",
+        "print_input",
+        "print_flows",
+        "save_flows",
+        "observations",
+        "water_mover",
+        "timeseries",
+        "landflag",
+        "ivertcon",
+        "iuzno",
+    )
+
+    _binary_data = (
+        "infiltration_rate",
+        "et_pot",
+        "extinction_depth",
+        "extinction_theta",
+        "air_entry_potential",
+        "root_potential",
+        "root_activity",
+    )
+
+    _package_data = (
+        "surface_depression_depth",
+        "kv_sat",
+        "theta_r",
+        "theta_sat",
+        "theta_init",
+        "epsilon",
+    )
     _pkg_id = "uzf"
-    
+
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
-            self, 
-            surface_depression_depth,
-            kv_sat,
-            theta_r,
-            theta_sat,
-            theta_init,
-            epsilon,
-            infiltration_rate,
-            et_pot=None,
-            extinction_depth=None,
-            extinction_theta=None,
-            air_entry_potential=None,
-            root_potential=None,
-            root_activity=None,
-            ntrailwaves=7, #Recommended in manual
-            nwavesets=40,
-            simulate_ET=False,
-            groundwater_ET_function="linear",
-            groundwater_seepage=False,
-            unsaturated_ET_function="water_content",
-            print_input=False,
-            print_flows=False,
-            save_flows=False,
-            observations=None,
-            water_mover=None,
-            timeseries=None
-            ):
-        super(__class__, self).__init__()        
+        self,
+        surface_depression_depth,
+        kv_sat,
+        theta_r,
+        theta_sat,
+        theta_init,
+        epsilon,
+        infiltration_rate,
+        et_pot=None,
+        extinction_depth=None,
+        extinction_theta=None,
+        air_entry_potential=None,
+        root_potential=None,
+        root_activity=None,
+        ntrailwaves=7,  # Recommended in manual
+        nwavesets=40,
+        simulate_ET=False,
+        groundwater_ET_function="linear",
+        groundwater_seepage=False,
+        unsaturated_ET_function="water_content",
+        print_input=False,
+        print_flows=False,
+        save_flows=False,
+        observations=None,
+        water_mover=None,
+        timeseries=None,
+    ):
+        super(__class__, self).__init__()
         self["surface_depression_depth"] = surface_depression_depth
         self["kv_sat"] = kv_sat
         self["theta_r"] = theta_r
@@ -158,10 +192,10 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         self["air_entry_potential"] = air_entry_potential
         self["root_potential"] = root_potential
         self["root_activity"] = root_activity
-        
+
         self["ntrailwaves"] = ntrailwaves
         self["nwavesets"] = nwavesets
-        
+
         self["simulate_ET"] = simulate_ET
         self["groundwater_ET_function"] = groundwater_ET_function
         self["groundwater_seepage"] = groundwater_seepage
@@ -206,23 +240,25 @@ class UnsaturatedZoneFlow(BoundaryCondition):
 
         layer = self._check_layer_presence(ds)
         arrays = self._ds_to_arrlist(ds)
-        
+
         listarr = super(BoundaryCondition, self).to_sparse(arrays, layer)
-        
+
         field_spec = self._get_field_spec_from_dtype(listarr)
         field_names = [i[0] for i in field_spec]
-        
+
         index_spec = [("iuzno", np.int32)] + field_spec[:3]
-        field_spec = [("landflag", np.int32)] + [("ivertcon", np.int32)] + field_spec[3:]
-        
+        field_spec = (
+            [("landflag", np.int32)] + [("ivertcon", np.int32)] + field_spec[3:]
+        )
+
         sparse_dtype = np.dtype(index_spec + field_spec)
-        
+
         listarr_new = np.empty(listarr.shape, dtype=sparse_dtype)
         listarr_new["iuzno"] = iuzno
         listarr_new["landflag"] = landflag
         listarr_new["ivertcon"] = ivertcon
         listarr_new[field_names] = listarr
-        
+
         return listarr_new
 
     def render(self, directory, pkgname, globaltimes):
@@ -234,19 +270,20 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         bin_ds = self[[*self._binary_data]]
 
         d["periods"] = self.period_paths(directory, pkgname, globaltimes, bin_ds)
-        
-        not_options = list(self._binary_data) + list(self._package_data) + ["iuzno" + "ivertcon"]
+
+        not_options = (
+            list(self._binary_data) + list(self._package_data) + ["iuzno" + "ivertcon"]
+        )
         # construct the rest (dict for render)
         d = self.get_options(d, not_options=not_options)
 
-        path = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"   
-        d["packagedata"] = path.as_posix() 
+        path = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
+        d["packagedata"] = path.as_posix()
 
         d["nuzfcells"] = self._max_active_n()
 
         return self._template.render(d)
 
-        
     def to_sparse(self, arrlist, layer):
         """Convert from dense arrays to list based input, 
         since the perioddata does not require cellids but iuzno, we hgave to override"""
@@ -271,18 +308,15 @@ class UnsaturatedZoneFlow(BoundaryCondition):
             listarr[f"f{i}"] = values
 
         return listarr
-    
+
     def write(self, directory, pkgname, globaltimes):
-        #Write Stress Period data and Options
+        # Write Stress Period data and Options
         super().write(directory, pkgname, globaltimes)
-        
+
         outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
         outpath.parent.mkdir(exist_ok=True, parents=True)
-        
+
         package_data = self.get_packagedata()
-        
-        #Write PackageData
+
+        # Write PackageData
         self.write_textfile(outpath, package_data)
-        
-        
-    
