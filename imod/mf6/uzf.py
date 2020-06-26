@@ -95,7 +95,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         "theta_r",
         "theta_sat",
         "theta_init",
-        "epsilon", 
+        "epsilon",
         "infiltration_rate",
         "et_pot",
         "extinction_depth",
@@ -123,7 +123,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         "iuzno",
     )
 
-    _binary_data = ( # Stress period data, not really binary in this case
+    _binary_data = (  # Stress period data, not really binary in this case
         "infiltration_rate",
         "et_pot",
         "extinction_depth",
