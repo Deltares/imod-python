@@ -1,6 +1,6 @@
 from imod.mf6.pkgbase import BoundaryCondition
 import numpy as np
-
+import xarray as xr
 
 class UnsaturatedZoneFlow(BoundaryCondition):
     """
@@ -40,25 +40,22 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         specified, but is only used if SIMULATE ET is specified in the OPTIONS block.
     extinction_theta: array of floats (xr.DataArray, optional)
         defines the evapotranspiration extinction water content of the UZF
-        cell. EXTWC is always specified, but is only used if SIMULATE ET and UNSAT ETWC are specified
-        in the OPTIONS block.
+        cell. If specified, ET in the unsaturated zone will be simulated either as a function of the
+        specified PET rate while the water content (THETA) is greater than the ET extinction water content
     air_entry_potential: array of floats (xr.DataArray, optional)
-        defines the air entry potential (head) of the UZF cell. HA is always
-        specified, but is only used if SIMULATE ET and UNSAT ETAE are specified in the OPTIONS
-        block.
+        defines the air entry potential (head) of the UZF cell. If specified, ET will be 
+        simulated using a capillary pressure based formulation. 
+        Capillary pressure is calculated using the Brooks-Corey retention function ("air_entry")
     root_potential: array of floats (xr.DataArray, optional)
-        defines the root potential (head) of the UZF cell. HROOT is always
-        specified, but is only used if SIMULATE ET and UNSAT ETAE are specified in the OPTIONS
-        block.
+        defines the root potential (head) of the UZF cell. If specified, ET will be 
+        simulated using a capillary pressure based formulation. 
+        Capillary pressure is calculated using the Brooks-Corey retention function ("air_entry"
     root_activity: array of floats (xr.DataArray, optional)
         defines the root activity function of the UZF cell. ROOTACT is
         the length of roots in a given volume of soil divided by that volume. Values range from 0 to about 3
-        cm-2, depending on the plant community and its stage of development. ROOTACT is always specified,
-        but is only used if SIMULATE ET and UNSAT ETAE are specified in the OPTIONS block.
-    simulate_ET: ({True, False}, optional)
-        keyword specifying that ET in the unsaturated (UZF) and saturated zones (GWF) will
-        be simulated. ET can be simulated in the UZF cell and not the GWF cell by omitting keywords
-        LINEAR GWET and SQUARE GWET.
+        cm-2, depending on the plant community and its stage of development. If specified, ET will be 
+        simulated using a capillary pressure based formulation. 
+        Capillary pressure is calculated using the Brooks-Corey retention function ("air_entry"
     groundwater_ET_function: ({"linear", "square"}, optional)
         keyword specifying that groundwater evapotranspiration will be simulated using either
         the original ET formulation of MODFLOW-2005 ("linear"). Or by assuming a constant ET
@@ -68,11 +65,6 @@ class UnsaturatedZoneFlow(BoundaryCondition):
     simulate_seepage: ({True, False}, optional)
         keyword specifying that groundwater discharge (GWSEEP) to land surface will be
         simulated. Groundwater discharge is nonzero when groundwater head is greater than land surface.
-    unsaturated_ET_function: ({"water_content", "air_entry"}, optional)
-        keyword specifying that ET in the unsaturated zone will be simulated either as a function of the
-        specified PET rate while the water content (THETA) is greater than the ET extinction water content
-        ("water_content") or will be simulated using a capillary pressure based formulation. 
-        Capillary pressure is calculated using the Brooks-Corey retention function ("air_entry").
     print_input: ({True, False}, optional)
         keyword to indicate that the list of UZF information will be written to the listing file
         immediately after it is read.
@@ -167,10 +159,8 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         root_activity=None,
         ntrailwaves=7,  # Recommended in manual
         nwavesets=40,
-        simulate_ET=False,
         groundwater_ET_function="linear",
-        groundwater_seepage=False,
-        unsaturated_ET_function="water_content",
+        simulate_groundwater_seepage=False,
         print_input=False,
         print_flows=False,
         save_flows=False,
@@ -179,12 +169,20 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         timeseries=None,
     ):
         super(__class__, self).__init__()
+        #Package data
         self["surface_depression_depth"] = surface_depression_depth
         self["kv_sat"] = kv_sat
         self["theta_r"] = theta_r
         self["theta_sat"] = theta_sat
         self["theta_init"] = theta_init
         self["epsilon"] = epsilon
+        
+        #Stress period data
+        self._check_options(groundwater_ET_function, 
+                           et_pot, extinction_depth, 
+                           extinction_theta, air_entry_potential,
+                           root_potential, root_activity)
+        
         self["infiltration_rate"] = infiltration_rate
         self["et_pot"] = et_pot
         self["extinction_depth"] = extinction_depth
@@ -192,14 +190,14 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         self["air_entry_potential"] = air_entry_potential
         self["root_potential"] = root_potential
         self["root_activity"] = root_activity
-
+        
+        #Dimensions
         self["ntrailwaves"] = ntrailwaves
         self["nwavesets"] = nwavesets
-
-        self["simulate_ET"] = simulate_ET
+        
+        #Options
         self["groundwater_ET_function"] = groundwater_ET_function
-        self["groundwater_seepage"] = groundwater_seepage
-        self["unsaturated_ET_function"] = unsaturated_ET_function
+        self["simulate_gwseep"] = simulate_groundwater_seepage
         self["print_input"] = print_input
         self["print_flows"] = print_flows
         self["save_flows"] = save_flows
@@ -207,6 +205,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         self["water_mover"] = water_mover
         self["timeseries"] = timeseries
 
+        #Additonal indices for Packagedata
         self["landflag"] = self._determine_landflag(kv_sat)
 
         self["iuzno"] = self._create_uzf_numbers(self["landflag"])
@@ -214,8 +213,48 @@ class UnsaturatedZoneFlow(BoundaryCondition):
 
         self["ivertcon"] = self._determine_vertical_connection(self["iuzno"])
 
-    def _check_settings():
-        pass
+    def fill_stress_perioddata(self):
+        """Modflow6 requires something to be filled in the stress perioddata, 
+        even though the data is not used in the current configuration. 
+        Only an infiltration rate is required,
+        the rest can be filled with dummy values.
+        """
+        for var in self._binary_data:
+            if self[var].size == 1: #Prevent loading large arrays in memory
+                if self[var].values[()] is None:
+                    self[var] = xr.full_like(self["infiltration_rate"], 0.0)
+                else:
+                    raise ValueError("{} cannot be a scalar".format(var))
+
+    def _check_options(self, groundwater_ET_function, 
+                       et_pot, extinction_depth, 
+                       extinction_theta, air_entry_potential,
+                       root_potential, root_activity):
+        
+        simulate_et = [x is not None for x in [et_pot, extinction_depth]]
+        unsat_etae = [x is not None for x in [air_entry_potential, root_potential, root_activity]]
+        
+        if all(simulate_et):
+            self["simulate_et"] = True
+        elif any(simulate_et):
+            raise ValueError("To simulate ET, set both et_pot and extinction_depth")
+        
+        if extinction_theta is not None:
+            self["unsat_etwc"] = True
+        
+        if all(unsat_etae):
+            self["unsat_etae"] = True
+        elif any(unsat_etae):
+            raise ValueError(
+                    "To simulate ET with a capillary based formulation, set air_entry_potential, root_potential, and root_activity"
+                    )
+        
+        if groundwater_ET_function not in ["linear", "square", None]:
+            raise ValueError("Groundwater ET function should be either 'linear','square' or None")
+        elif groundwater_ET_function == "linear":
+            self["linear_gwet"] = True
+        elif groundwater_ET_function == "square":
+            self["square_gwet"] = True
 
     def _create_uzf_numbers(self, landflag):
         """Create unique UZF ID's. Inactive cells equal 0
@@ -311,6 +350,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
 
     def write(self, directory, pkgname, globaltimes):
         # Write Stress Period data and Options
+        self.fill_stress_perioddata()
         super().write(directory, pkgname, globaltimes)
 
         outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
