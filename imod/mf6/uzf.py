@@ -2,6 +2,7 @@ from imod.mf6.pkgbase import BoundaryCondition
 import numpy as np
 import xarray as xr
 
+
 class UnsaturatedZoneFlow(BoundaryCondition):
     """
     Unsaturated Zone Flow (UZF) package.
@@ -169,20 +170,25 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         timeseries=None,
     ):
         super(__class__, self).__init__()
-        #Package data
+        # Package data
         self["surface_depression_depth"] = surface_depression_depth
         self["kv_sat"] = kv_sat
         self["theta_r"] = theta_r
         self["theta_sat"] = theta_sat
         self["theta_init"] = theta_init
         self["epsilon"] = epsilon
-        
-        #Stress period data
-        self._check_options(groundwater_ET_function, 
-                           et_pot, extinction_depth, 
-                           extinction_theta, air_entry_potential,
-                           root_potential, root_activity)
-        
+
+        # Stress period data
+        self._check_options(
+            groundwater_ET_function,
+            et_pot,
+            extinction_depth,
+            extinction_theta,
+            air_entry_potential,
+            root_potential,
+            root_activity,
+        )
+
         self["infiltration_rate"] = infiltration_rate
         self["et_pot"] = et_pot
         self["extinction_depth"] = extinction_depth
@@ -190,12 +196,12 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         self["air_entry_potential"] = air_entry_potential
         self["root_potential"] = root_potential
         self["root_activity"] = root_activity
-        
-        #Dimensions
+
+        # Dimensions
         self["ntrailwaves"] = ntrailwaves
         self["nwavesets"] = nwavesets
-        
-        #Options
+
+        # Options
         self["groundwater_ET_function"] = groundwater_ET_function
         self["simulate_gwseep"] = simulate_groundwater_seepage
         self["print_input"] = print_input
@@ -205,7 +211,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         self["water_mover"] = water_mover
         self["timeseries"] = timeseries
 
-        #Additonal indices for Packagedata
+        # Additonal indices for Packagedata
         self["landflag"] = self._determine_landflag(kv_sat)
 
         self["iuzno"] = self._create_uzf_numbers(self["landflag"])
@@ -220,37 +226,47 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         the rest can be filled with dummy values.
         """
         for var in self._binary_data:
-            if self[var].size == 1: #Prevent loading large arrays in memory
+            if self[var].size == 1:  # Prevent loading large arrays in memory
                 if self[var].values[()] is None:
                     self[var] = xr.full_like(self["infiltration_rate"], 0.0)
                 else:
                     raise ValueError("{} cannot be a scalar".format(var))
 
-    def _check_options(self, groundwater_ET_function, 
-                       et_pot, extinction_depth, 
-                       extinction_theta, air_entry_potential,
-                       root_potential, root_activity):
-        
+    def _check_options(
+        self,
+        groundwater_ET_function,
+        et_pot,
+        extinction_depth,
+        extinction_theta,
+        air_entry_potential,
+        root_potential,
+        root_activity,
+    ):
+
         simulate_et = [x is not None for x in [et_pot, extinction_depth]]
-        unsat_etae = [x is not None for x in [air_entry_potential, root_potential, root_activity]]
-        
+        unsat_etae = [
+            x is not None for x in [air_entry_potential, root_potential, root_activity]
+        ]
+
         if all(simulate_et):
             self["simulate_et"] = True
         elif any(simulate_et):
             raise ValueError("To simulate ET, set both et_pot and extinction_depth")
-        
+
         if extinction_theta is not None:
             self["unsat_etwc"] = True
-        
+
         if all(unsat_etae):
             self["unsat_etae"] = True
         elif any(unsat_etae):
             raise ValueError(
-                    "To simulate ET with a capillary based formulation, set air_entry_potential, root_potential, and root_activity"
-                    )
-        
+                "To simulate ET with a capillary based formulation, set air_entry_potential, root_potential, and root_activity"
+            )
+
         if groundwater_ET_function not in ["linear", "square", None]:
-            raise ValueError("Groundwater ET function should be either 'linear','square' or None")
+            raise ValueError(
+                "Groundwater ET function should be either 'linear','square' or None"
+            )
         elif groundwater_ET_function == "linear":
             self["linear_gwet"] = True
         elif groundwater_ET_function == "square":
