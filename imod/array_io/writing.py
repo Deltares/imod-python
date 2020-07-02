@@ -1,6 +1,7 @@
 import pathlib
 import warnings
 
+import numpy as np
 import xarray as xr
 
 from imod import util
@@ -117,7 +118,7 @@ def _save(path, a, nodata, pattern, dtype, write):
             if coord == "time":
                 # .item() gives an integer for datetime64[ns], so convert first.
                 val = a.coords[coord].values
-                if not (val == "steady-state").all():
+                if not val == "steady-state":
                     val = a.coords[coord].values.astype("datetime64[us]").item()
             else:
                 val = a.coords[coord].item()
