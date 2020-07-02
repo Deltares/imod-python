@@ -603,7 +603,12 @@ class SeawatModel(Model):
         # Write all IDFs and IPFs
         for pkgname, pkg in self.items():
             if "x" in pkg.coords and "y" in pkg.coords or pkg._pkg_id == "wel":
-                pkg.save(directory=directory / pkgname)
+                try:
+                    pkg.save(directory=directory / pkgname)
+                except Exception as error:
+                    raise RuntimeError(
+                        f"An error occured during saving of package: {pkgname}."
+                    ) from error
 
     def package_check(self):
         baskey = self._get_pkgkey("bas6")
