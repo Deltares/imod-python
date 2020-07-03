@@ -265,7 +265,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
                 "To simulate ET with a capillary based formulation, set air_entry_potential, root_potential, and root_activity"
             )
 
-        if self["unsat_etae"] and self["unsat_etwc"]:
+        if all(unsat_etae) and (extinction_theta is not None):
             raise ValueError(
                 """Both capillary based formulation and water content based formulation set based on provided input data. 
                 Please provide either only extinction_theta or (air_entry_potential, root_potential, and root_activity)"""
