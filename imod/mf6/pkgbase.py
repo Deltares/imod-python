@@ -218,46 +218,14 @@ class BoundaryCondition(Package):
             nmax = int(da.count())
         return nmax
 
-    def _get_field_spec_from_dtype(self, listarr):
-        """
-        From https://stackoverflow.com/questions/21777125/how-to-output-dtype-to-a-list-or-dict
-        """
-        return [
-            (x, y[0])
-            for x, y in sorted(listarr.dtype.fields.items(), key=lambda k: k[1])
-        ]
-
-    def get_textformat(self, sparse_data):
-        field_spec = self._get_field_spec_from_dtype(sparse_data)
-        dtypes = list(zip(*field_spec))[1]
-        textformat = []
-        for dtype in dtypes:
-            if np.issubdtype(dtype, np.integer):  # integer
-                textformat.append("%4d")
-            elif np.issubdtype(dtype, np.inexact):  # floatish
-                textformat.append("%6.3f")
-            else:
-                raise ValueError(
-                    "Data should be a subdatatype of either 'np.integer' or 'np.inexact'"
-                )
-        textformat = " ".join(textformat)
-        return textformat
-
-    def write_textfile(self, outpath, sparse_data):
-        """
-        Write to textfile, which is necessary for Advanced Stress Packages
-        """
-        textformat = self.get_textformat(sparse_data)
-        np.savetxt(outpath, sparse_data, delimiter=" ", fmt=textformat)
-
-    def write_binaryfile(self, outpath, sparse_data):
+    def _write_file(self, outpath, sparse_data):
         """
         data is a xr.Dataset with only the binary variables"""
 
         with open(outpath, "w") as f:
             sparse_data.tofile(f)
 
-    def write_datafile(self, outpath, ds, to_binaryfile=True):
+    def write_datafile(self, outpath, ds):
         """
         """
         layer = self._check_layer_presence(ds)
@@ -265,10 +233,7 @@ class BoundaryCondition(Package):
         sparse_data = self.to_sparse(arrays, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)
 
-        if to_binaryfile:
-            self.write_binaryfile(outpath, sparse_data)
-        else:
-            self.write_textfile(outpath, sparse_data)
+        self._write_file(outpath, sparse_data)
 
     def period_paths(self, directory, pkgname, globaltimes, bin_ds):
         periods = {}
@@ -318,11 +283,6 @@ class BoundaryCondition(Package):
         directory is modelname
         """
 
-        if self._pkg_id in ["uzf", "lak", "maw", "str"]:
-            to_binary = False
-        else:
-            to_binary = True
-
         directory = pathlib.Path(directory)
 
         self.write_blockfile(directory, pkgname, globaltimes)
@@ -333,8 +293,50 @@ class BoundaryCondition(Package):
             for i in range(len(self.time)):
                 path = directory / pkgname / f"{self._pkg_id}-{i}.bin"
                 self.write_datafile(
-                    path, bin_ds.isel(time=i), to_binary
+                    path, bin_ds.isel(time=i)
                 )  # one timestep
         else:
             path = directory / pkgname / f"{self._pkg_id}.bin"
-            self.write_datafile(path, bin_ds, to_binary)
+            self.write_datafile(path, bin_ds)
+
+class AdvancedBoundaryCondition(BoundaryCondition):
+    """Class dedicated to advanced boundary conditions, since MF6 does not support
+    binary files for Advanced Boundary conditions.  
+    
+    The advanced boundary condition packages are: "uzf", "lak", "maw", "str".
+    
+    """
+    
+    __slots__ = ()
+    
+    def _get_field_spec_from_dtype(self, listarr):
+        """
+        From https://stackoverflow.com/questions/21777125/how-to-output-dtype-to-a-list-or-dict
+        """
+        return [
+            (x, y[0])
+            for x, y in sorted(listarr.dtype.fields.items(), key=lambda k: k[1])
+        ]
+    
+    def _write_file(self, outpath, sparse_data):
+        """
+        Write to textfile, which is necessary for Advanced Stress Packages
+        """
+        textformat = self.get_textformat(sparse_data)
+        np.savetxt(outpath, sparse_data, delimiter=" ", fmt=textformat)
+
+    def get_textformat(self, sparse_data):
+        field_spec = self._get_field_spec_from_dtype(sparse_data)
+        dtypes = list(zip(*field_spec))[1]
+        textformat = []
+        for dtype in dtypes:
+            if np.issubdtype(dtype, np.integer):  # integer
+                textformat.append("%4d")
+            elif np.issubdtype(dtype, np.inexact):  # floatish
+                textformat.append("%6.3f")
+            else:
+                raise ValueError(
+                    "Data should be a subdatatype of either 'np.integer' or 'np.inexact'"
+                )
+        textformat = " ".join(textformat)
+        return textformat

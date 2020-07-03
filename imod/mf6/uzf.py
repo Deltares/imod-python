@@ -1,9 +1,9 @@
-from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.pkgbase import AdvancedBoundaryCondition
 import numpy as np
 import xarray as xr
 
 
-class UnsaturatedZoneFlow(BoundaryCondition):
+class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     """
     Unsaturated Zone Flow (UZF) package.
     
