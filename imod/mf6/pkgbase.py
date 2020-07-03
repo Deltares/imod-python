@@ -342,7 +342,7 @@ class AdvancedBoundaryCondition(BoundaryCondition):
         textformat = " ".join(textformat)
         return textformat
 
-    def get_packagedata(self):
+    def _package_data_to_sparse(self):
         """Get packagedata, override with function for the advanced boundary condition in particular
         """
         pass
@@ -351,7 +351,7 @@ class AdvancedBoundaryCondition(BoundaryCondition):
         outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
         outpath.parent.mkdir(exist_ok=True, parents=True)
 
-        package_data = self.get_packagedata()
+        package_data = self._package_data_to_sparse()
 
         # Write PackageData
         self._write_file(outpath, package_data)

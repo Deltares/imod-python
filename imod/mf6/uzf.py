@@ -293,7 +293,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     def _determine_vertical_connection(self, uzf_number):
         return uzf_number.shift(layer=-1, fill_value=0)
 
-    def get_packagedata(self):
+    def _package_data_to_sparse(self):
         """Use parent.to_sparse to get cellids
         """
         notnull = self["landflag"].values == 1
