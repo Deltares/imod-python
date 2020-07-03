@@ -265,14 +265,22 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
                 "To simulate ET with a capillary based formulation, set air_entry_potential, root_potential, and root_activity"
             )
 
-        if groundwater_ET_function not in ["linear", "square", None]:
+        if self["unsat_etae"] and self["unsat_etwc"]:
             raise ValueError(
-                "Groundwater ET function should be either 'linear','square' or None"
+                """Both capillary based formulation and water content based formulation set based on provided input data. 
+                Please provide either only extinction_theta or (air_entry_potential, root_potential, and root_activity)"""
             )
-        elif groundwater_ET_function == "linear":
+
+        if groundwater_ET_function == "linear":
             self["linear_gwet"] = True
         elif groundwater_ET_function == "square":
             self["square_gwet"] = True
+        elif groundwater_ET_function is None:
+            pass
+        else:
+            raise ValueError(
+                "Groundwater ET function should be either 'linear','square' or None"
+            )            
 
     def _create_uzf_numbers(self, landflag):
         """Create unique UZF ID's. Inactive cells equal 0
