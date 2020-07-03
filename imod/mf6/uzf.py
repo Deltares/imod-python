@@ -16,7 +16,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
     kv_sat: array of floats (xr.DataArray)
         is the vertical saturated hydraulic conductivity of the UZF cell.
         NOTE: the UZF package determines the location of inactive cells where kv_sat is np.nan
-    theta_r: array of floats (xr.DataArray)
+    theta_res: array of floats (xr.DataArray)
         is the residual (irreducible) water content of the UZF cell.
     theta_sat: array of floats (xr.DataArray)
         is the saturated water content of the UZF cell.
@@ -92,7 +92,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
     __slots__ = (
         "surface_depression_depth",
         "kv_sat",
-        "theta_r",
+        "theta_res",
         "theta_sat",
         "theta_init",
         "epsilon",
@@ -136,7 +136,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
     _package_data = (
         "surface_depression_depth",
         "kv_sat",
-        "theta_r",
+        "theta_res",
         "theta_sat",
         "theta_init",
         "epsilon",
@@ -149,7 +149,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         self,
         surface_depression_depth,
         kv_sat,
-        theta_r,
+        theta_res,
         theta_sat,
         theta_init,
         epsilon,
@@ -175,7 +175,7 @@ class UnsaturatedZoneFlow(BoundaryCondition):
         # Package data
         self["surface_depression_depth"] = surface_depression_depth
         self["kv_sat"] = kv_sat
-        self["theta_r"] = theta_r
+        self["theta_res"] = theta_res
         self["theta_sat"] = theta_sat
         self["theta_init"] = theta_init
         self["epsilon"] = epsilon
