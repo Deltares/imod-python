@@ -196,7 +196,7 @@ class NodePropertyFlow(Package):
         "save_specific_discharge",
     )
     _pkg_id = "npf"
-    _binary_data = {
+    _grid_data = {
         "icelltype": np.int32,
         "k": np.float64,
         "rewet_layer": np.float64,
@@ -276,7 +276,7 @@ class NodePropertyFlow(Package):
         for varname in self.data_vars:
             key = self._keyword_map.get(varname, varname)
 
-            if varname in self._binary_data:
+            if varname in self._grid_data:
                 layered, value = self._compose_values(self[varname], npfdirectory, key)
                 if self._valid(value):  # skip False or None
                     d[f"{key}_layered"], d[key] = layered, value
