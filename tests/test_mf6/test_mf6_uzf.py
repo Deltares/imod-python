@@ -136,7 +136,7 @@ def test_packagedata():
 
     uzf = imod.mf6.UnsaturatedZoneFlow(**d)
 
-    packagedata = uzf.get_packagedata()
+    packagedata = uzf._package_data_to_sparse()
 
     assert len(packagedata.dtype) == 12
     assert len(packagedata) == 6
