@@ -35,7 +35,7 @@ class Recharge(BoundaryCondition):
 
     __slots__ = ("rate", "print_input", "print_flows", "save_flows", "observations")
     _pkg_id = "rch"
-    _binary_data = ("rate",)
+    _period_data = ("rate",)
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 

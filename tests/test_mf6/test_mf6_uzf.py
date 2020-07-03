@@ -104,7 +104,7 @@ def test_to_sparsedata():
 
     uzf = imod.mf6.UnsaturatedZoneFlow(**d)
     uzf.fill_stress_perioddata()
-    bin_data = uzf[[*(uzf._binary_data)]]
+    bin_data = uzf[[*(uzf._period_data)]]
     arrlist = uzf._ds_to_arrlist(bin_data.isel(time=0))
     layer = uzf._check_layer_presence(bin_data.isel(time=0))
     sparse_data = uzf.to_sparse(arrlist, layer)

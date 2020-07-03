@@ -123,7 +123,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         "iuzno",
     )
 
-    _binary_data = (  # Stress period data, not really binary in this case
+    _period_data = (
         "infiltration_rate",
         "et_pot",
         "extinction_depth",
@@ -227,7 +227,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         Only an infiltration rate is required,
         the rest can be filled with dummy values if not provided.
         """
-        for var in self._binary_data:
+        for var in self._period_data:
             if self[var].size == 1:  # Prevent loading large arrays in memory
                 if self[var].values[()] is None:
                     self[var] = xr.full_like(self["infiltration_rate"], 0.0)
@@ -324,12 +324,12 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         # period = {1: f"{directory}/{self._pkg_id}-{i}.bin"}
 
-        bin_ds = self[[*self._binary_data]]
+        bin_ds = self[[*self._period_data]]
 
         d["periods"] = self.period_paths(directory, pkgname, globaltimes, bin_ds)
 
         not_options = (
-            list(self._binary_data) + list(self._package_data) + ["iuzno" + "ivertcon"]
+            list(self._period_data) + list(self._package_data) + ["iuzno" + "ivertcon"]
         )
         # construct the rest (dict for render)
         d = self.get_options(d, not_options=not_options)

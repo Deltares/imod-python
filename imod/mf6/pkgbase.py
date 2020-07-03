@@ -17,7 +17,7 @@ class Package(xr.Dataset):
     not the list input which is used in :class:`BoundaryCondition`.
     """
 
-    __slots__ = ("_template", "_pkg_id", "_binary_data")
+    __slots__ = ("_template", "_pkg_id", "_period_data")
 
     def _valid(self, value):
         """
@@ -182,11 +182,11 @@ class Package(xr.Dataset):
 
         self.write_blockfile(directory, pkgname)
 
-        if hasattr(self, "_binary_data"):
+        if hasattr(self, "_period_data"):
             if "x" in self.dims and "y" in self.dims:
                 pkgdirectory = directory / pkgname
                 pkgdirectory.mkdir(exist_ok=True, parents=True)
-                for varname, dtype in self._binary_data.items():
+                for varname, dtype in self._period_data.items():
                     key = self._keyword_map.get(varname, varname)
                     da = self[varname]
                     if "x" in da.dims and "y" in da.dims:
@@ -211,7 +211,7 @@ class BoundaryCondition(Package):
         Determine the maximum active number of cells that are active
         during a stress period.
         """
-        da = self[self._binary_data[0]]
+        da = self[self._period_data[0]]
         if "time" in da.coords:
             nmax = int(da.groupby("time").count(xr.ALL_DIMS).max())
         else:
@@ -250,7 +250,7 @@ class BoundaryCondition(Package):
 
     def get_options(self, d, not_options=None):
         if not_options is None:
-            not_options = self._binary_data
+            not_options = self._period_data
 
         for varname in self.data_vars.keys():
             if varname in not_options:
@@ -266,7 +266,7 @@ class BoundaryCondition(Package):
 
         # period = {1: f"{directory}/{self._pkg_id}-{i}.bin"}
 
-        bin_ds = self[[*self._binary_data]]
+        bin_ds = self[[*self._period_data]]
 
         d["periods"] = self.period_paths(directory, pkgname, globaltimes, bin_ds)
         # construct the rest (dict for render)
@@ -277,7 +277,7 @@ class BoundaryCondition(Package):
         return self._template.render(d)
 
     def write_perioddata(self, directory, pkgname):
-        bin_ds = self[[*self._binary_data]]
+        bin_ds = self[[*self._period_data]]
 
         if "time" in bin_ds:  # one of bin_ds has time
             for i in range(len(self.time)):
