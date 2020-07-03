@@ -267,6 +267,25 @@ def test_saveopen__nptime(test_nptimeda, kind, tmp_path):
 
 
 @pytest.mark.parametrize("kind", [(imod.rasterio, "tif"), (imod.idf, "idf")])
+def test_saveopen__timecoord(test_nptimeda, tmp_path, kind):
+    module, ext = kind
+    da_timecoord = test_nptimeda.copy().isel(time=1)
+    module.save(tmp_path / "testnptime", da_timecoord)
+    da = module.open(tmp_path / f"testnptime_*.{ext}").squeeze("time")
+    assert da.identical(da_timecoord)
+
+
+@pytest.mark.parametrize("kind", [(imod.rasterio, "tif"), (imod.idf, "idf")])
+def test_saveopen__timecoordsteady(test_nptimeda, tmp_path, kind):
+    module, ext = kind
+    da_timecoord = test_nptimeda.copy().isel(time=1)
+    da_timecoord.coords["time"] = "steady-state"
+    module.save(tmp_path / "testnptime", da_timecoord)
+    da = module.open(tmp_path / f"testnptime_*.{ext}").squeeze("time")
+    assert da.identical(da_timecoord)
+
+
+@pytest.mark.parametrize("kind", [(imod.rasterio, "tif"), (imod.idf, "idf")])
 def test_saveopen__cftime_withinbounds(test_nptimeda, kind, tmp_path):
     module, ext = kind
     cftimes = []

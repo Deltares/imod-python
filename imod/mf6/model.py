@@ -59,13 +59,14 @@ class GroundwaterFlowModel(Model):
         types = [
             type(pkg["time"].values[0]) for pkg in self.values() if "time" in pkg.coords
         ]
+        set_of_types = set(types)
         # Types will be empty if there's no time dependent input
-        if len(set(types)) == 0:
+        if len(set_of_types) == 0:
             return False
         else:  # there is time dependent input
-            if not len(set(types)) == 1:
+            if not len(set_of_types) == 1:
                 raise ValueError(
-                    "Multiple datetime types detected. "
+                    f"Multiple datetime types detected: {set_of_types}"
                     "Use either cftime or numpy.datetime64[ns]."
                 )
             # Since we compare types and not instances, we use issubclass

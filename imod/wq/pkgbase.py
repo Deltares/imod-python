@@ -107,6 +107,10 @@ class Package(xr.Dataset):
     def __setitem__(self, key, value):
         if isinstance(value, xr.DataArray):
             if "z" in value.dims:
+                if "layer" not in value.coords:
+                    raise ValueError(
+                        'Coordinate "layer" must be present in DataArrays with a "z" dimension'
+                    )
                 value = value.swap_dims({"z": "layer"})
             if "layer" in value.dims:
                 value = value.dropna(dim="layer", how="all")
