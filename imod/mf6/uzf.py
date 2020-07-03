@@ -1,4 +1,4 @@
-from imod.mf6.pkgbase import AdvancedBoundaryCondition
+from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition
 import numpy as np
 import xarray as xr
 
@@ -366,15 +366,3 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         return listarr
 
-    def write(self, directory, pkgname, globaltimes):
-        # Write Stress Period data and Options
-        self.fill_stress_perioddata()
-        super().write(directory, pkgname, globaltimes)
-
-        outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
-        outpath.parent.mkdir(exist_ok=True, parents=True)
-
-        package_data = self.get_packagedata()
-
-        # Write PackageData
-        self.write_textfile(outpath, package_data)

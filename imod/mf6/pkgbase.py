@@ -276,17 +276,7 @@ class BoundaryCondition(Package):
 
         return self._template.render(d)
 
-    def write(self, directory, pkgname, globaltimes):
-        """
-        writes the blockfile and binary data
-        
-        directory is modelname
-        """
-
-        directory = pathlib.Path(directory)
-
-        self.write_blockfile(directory, pkgname, globaltimes)
-
+    def write_perioddata(self, directory, pkgname):
         bin_ds = self[[*self._binary_data]]
 
         if "time" in bin_ds:  # one of bin_ds has time
@@ -297,7 +287,20 @@ class BoundaryCondition(Package):
                 )  # one timestep
         else:
             path = directory / pkgname / f"{self._pkg_id}.bin"
-            self.write_datafile(path, bin_ds)
+            self.write_datafile(path, bin_ds)        
+
+    def write(self, directory, pkgname, globaltimes):
+        """
+        writes the blockfile and binary data
+        
+        directory is modelname
+        """
+
+        directory = pathlib.Path(directory)
+
+        self.write_blockfile(directory, pkgname, globaltimes)
+        self.write_perioddata(directory, pkgname)
+
 
 class AdvancedBoundaryCondition(BoundaryCondition):
     """Class dedicated to advanced boundary conditions, since MF6 does not support
@@ -340,3 +343,24 @@ class AdvancedBoundaryCondition(BoundaryCondition):
                 )
         textformat = " ".join(textformat)
         return textformat
+
+    def get_packagedata(self):
+        """Get packagedata, override with function for the advanced boundary condition in particular
+        """
+        pass
+
+    def write_packagedata(self, directory, pkgname):
+        outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
+        outpath.parent.mkdir(exist_ok=True, parents=True)
+
+        package_data = self.get_packagedata()        
+
+        # Write PackageData
+        self._write_file(outpath, package_data)
+
+    def write(self, directory, pkgname, globaltimes):
+        # Write Stress Period data and Options
+        self.fill_stress_perioddata()
+        self.write_blockfile(directory, pkgname, globaltimes)
+        self.write_perioddata(directory, pkgname)        
+        self.write_packagedata(directory, pkgname)
