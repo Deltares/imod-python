@@ -95,7 +95,7 @@ def uzf_model():
 
     uds["kv_sat"] = uzf_units * 1.5
     uds["theta_sat"] = uzf_units * 0.1 + 0.1
-    uds["theta_r"] = uzf_units * 0.05
+    uds["theta_res"] = uzf_units * 0.05
     uds["theta_init"] = uzf_units * 0.08
     uds["epsilon"] = ones_shape * 7.0
     uds["surface_depression_depth"] = ones_shape * top + 0.1

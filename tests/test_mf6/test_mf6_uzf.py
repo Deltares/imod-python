@@ -44,7 +44,7 @@ def test_data():
     d = {}
     d["kv_sat"] = active * 10.0
     d["theta_sat"] = active * 0.1
-    d["theta_r"] = active * 0.05
+    d["theta_res"] = active * 0.05
     d["theta_init"] = active * 0.08
     d["epsilon"] = active * 7.0
     d["surface_depression_depth"] = active * 1.0
