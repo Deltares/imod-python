@@ -182,11 +182,11 @@ class Package(xr.Dataset):
 
         self.write_blockfile(directory, pkgname)
 
-        if hasattr(self, "_period_data"):
+        if hasattr(self, "_grid_data"):
             if "x" in self.dims and "y" in self.dims:
                 pkgdirectory = directory / pkgname
                 pkgdirectory.mkdir(exist_ok=True, parents=True)
-                for varname, dtype in self._period_data.items():
+                for varname, dtype in self._grid_data.items():
                     key = self._keyword_map.get(varname, varname)
                     da = self[varname]
                     if "x" in da.dims and "y" in da.dims:
