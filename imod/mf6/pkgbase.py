@@ -282,12 +282,10 @@ class BoundaryCondition(Package):
         if "time" in bin_ds:  # one of bin_ds has time
             for i in range(len(self.time)):
                 path = directory / pkgname / f"{self._pkg_id}-{i}.bin"
-                self.write_datafile(
-                    path, bin_ds.isel(time=i)
-                )  # one timestep
+                self.write_datafile(path, bin_ds.isel(time=i))  # one timestep
         else:
             path = directory / pkgname / f"{self._pkg_id}.bin"
-            self.write_datafile(path, bin_ds)        
+            self.write_datafile(path, bin_ds)
 
     def write(self, directory, pkgname, globaltimes):
         """
@@ -309,9 +307,9 @@ class AdvancedBoundaryCondition(BoundaryCondition):
     The advanced boundary condition packages are: "uzf", "lak", "maw", "str".
     
     """
-    
+
     __slots__ = ()
-    
+
     def _get_field_spec_from_dtype(self, listarr):
         """
         From https://stackoverflow.com/questions/21777125/how-to-output-dtype-to-a-list-or-dict
@@ -320,7 +318,7 @@ class AdvancedBoundaryCondition(BoundaryCondition):
             (x, y[0])
             for x, y in sorted(listarr.dtype.fields.items(), key=lambda k: k[1])
         ]
-    
+
     def _write_file(self, outpath, sparse_data):
         """
         Write to textfile, which is necessary for Advanced Stress Packages
@@ -353,7 +351,7 @@ class AdvancedBoundaryCondition(BoundaryCondition):
         outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
         outpath.parent.mkdir(exist_ok=True, parents=True)
 
-        package_data = self.get_packagedata()        
+        package_data = self.get_packagedata()
 
         # Write PackageData
         self._write_file(outpath, package_data)
@@ -362,5 +360,5 @@ class AdvancedBoundaryCondition(BoundaryCondition):
         # Write Stress Period data and Options
         self.fill_stress_perioddata()
         self.write_blockfile(directory, pkgname, globaltimes)
-        self.write_perioddata(directory, pkgname)        
+        self.write_perioddata(directory, pkgname)
         self.write_packagedata(directory, pkgname)

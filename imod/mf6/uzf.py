@@ -280,7 +280,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         else:
             raise ValueError(
                 "Groundwater ET function should be either 'linear','square' or None"
-            )            
+            )
 
     def _create_uzf_numbers(self, landflag):
         """Create unique UZF ID's. Inactive cells equal 0
@@ -373,4 +373,3 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             listarr[f"f{i}"] = values
 
         return listarr
-
