@@ -26,7 +26,7 @@ class InitialConditions(Package):
 
     __slots__ = ("head",)
     _pkg_id = "ic"
-    _binary_data = {"head": np.float64}
+    _grid_data = {"head": np.float64}
     _keyword_map = {"head": "strt"}
     _template = Package._initialize_template(_pkg_id)
 

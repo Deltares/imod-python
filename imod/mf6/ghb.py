@@ -42,7 +42,7 @@ class GeneralHeadBoundary(BoundaryCondition):
         "observations",
     )
     _pkg_id = "ghb"
-    _binary_data = ("head", "conductance")
+    _period_data = ("head", "conductance")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
