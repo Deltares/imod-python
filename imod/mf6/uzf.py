@@ -294,19 +294,17 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         return uzf_number.shift(layer=-1, fill_value=0)
 
     def _package_data_to_sparse(self):
-        """Use parent.to_sparse to get cellids
-        """
         notnull = self["landflag"].values == 1
         iuzno = self["iuzno"].values[notnull]
         landflag = self["landflag"].values[notnull]
         ivertcon = self["ivertcon"].values[notnull]
 
-        ds = self[[*self._package_data]]
+        ds = self[list(self._package_data)]
 
         layer = self._check_layer_presence(ds)
         arrays = self._ds_to_arrlist(ds)
 
-        listarr = super(BoundaryCondition, self).to_sparse(arrays, layer)
+        listarr = super(__class__, self).to_sparse(arrays, layer)
 
         field_spec = self._get_field_spec_from_dtype(listarr)
         field_names = [i[0] for i in field_spec]
@@ -332,7 +330,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         # period = {1: f"{directory}/{self._pkg_id}-{i}.bin"}
 
-        bin_ds = self[[*self._period_data]]
+        bin_ds = self[list(self._period_data)]
 
         d["periods"] = self.period_paths(directory, pkgname, globaltimes, bin_ds)
 

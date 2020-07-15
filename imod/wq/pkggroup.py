@@ -1,8 +1,9 @@
+import abc
 import collections
 import enum
 
 
-class PackageGroup(collections.UserDict):
+class PackageGroup(collections.UserDict, abc.ABC):
     """
     Groups for packes that support multiple systems:
     * chd
@@ -47,13 +48,13 @@ class PackageGroup(collections.UserDict):
         d["n_systems"] = len(self.keys())
         d["n_max_active"] = sum(
             [
-                v._max_active_n(self._cellcount_varname, nlayer, nrow, ncol)
+                v._max_active_n(self._cellcount_varname, nlayer, nrow, ncol)  # pylint:disable=no-member
                 for v in self.values()
             ]
         )
         d["save_budget"] = 1 if any([v.save_budget for v in self.values()]) else 0
 
-        content = [self._template.format(**d)]
+        content = [self._template.format(**d)]  # pylint: disable=no-member
         for i, key in enumerate(self.key_order):
             system_index = i + 1
             content.append(

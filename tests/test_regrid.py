@@ -307,6 +307,7 @@ def test_regrid_mean1d__with_time():
     source = xr.DataArray(values, coords, ["time", "x"])
     like = xr.DataArray(np.empty(2), like_coords, ["x"])
     out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+    assert isinstance(out, xr.DataArray)
 
     like_coords = {"time": time, "x": dst_x, "dx": ("x", np.array([-2.0, -1.0]))}
     like = xr.DataArray(np.empty((4, 2)), like_coords, ["time", "x"])
@@ -388,7 +389,7 @@ def test_regrid_mean2d(chunksize):
     likecoords = {"y": dst_x, "x": dst_x}
     like = xr.DataArray(np.empty((2, 2)), likecoords, dims)
 
-    # out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+    out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
     compare = np.array(
         [
             [
@@ -401,12 +402,12 @@ def test_regrid_mean2d(chunksize):
             ],
         ]
     )
-    # assert np.allclose(out.values, compare)
+    assert np.allclose(out.values, compare)
 
     # Now with chunking
     source = source.chunk({"x": chunksize, "y": chunksize})
-    # out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
-    # assert np.allclose(out.values, compare)
+    out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+    assert np.allclose(out.values, compare)
 
     # Now with orthogonal chunks
     source = source.chunk({"x": 2})

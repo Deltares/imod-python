@@ -1,3 +1,4 @@
+import abc
 import pathlib
 
 import jinja2
@@ -7,13 +8,16 @@ import xarray as xr
 import string
 
 
-class Package(xr.Dataset):
+class Package(xr.Dataset, abc.ABC):
     """
-    Package is used to share methods for specific packages with no time component.
+    Package is used to share methods for specific packages with no time
+    component.
 
-    It is not meant to be used directly, only to inherit from, to implement new packages.
-    
-    This class only supports `array input <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=16>`_,
+    It is not meant to be used directly, only to inherit from, to implement new
+    packages.
+
+    This class only supports `array input
+    <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=16>`_,
     not the list input which is used in :class:`BoundaryCondition`.
     """
 
@@ -141,7 +145,7 @@ class Package(xr.Dataset):
 
     def render(self, *args, **kwargs):
         d = {}
-        for k, v in self.data_vars.items():
+        for k, v in self.data_vars.items():  # pylint:disable=no-member
             value = v.values[()]
             if self._valid(value):  # skip None and False
                 d[k] = value
@@ -194,7 +198,7 @@ class Package(xr.Dataset):
                         self.write_binary_griddata(path, da, dtype)
 
 
-class BoundaryCondition(Package):
+class BoundaryCondition(Package, abc.ABC):
     """
     BoundaryCondition is used to share methods for specific stress packages with a time component.
 
@@ -252,7 +256,7 @@ class BoundaryCondition(Package):
         if not_options is None:
             not_options = self._period_data
 
-        for varname in self.data_vars.keys():
+        for varname in self.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
                 continue
             v = self[varname].values[()]
@@ -266,7 +270,7 @@ class BoundaryCondition(Package):
 
         # period = {1: f"{directory}/{self._pkg_id}-{i}.bin"}
 
-        bin_ds = self[[*self._period_data]]
+        bin_ds = self[list(self._period_data)]
 
         d["periods"] = self.period_paths(directory, pkgname, globaltimes, bin_ds)
         # construct the rest (dict for render)
@@ -277,7 +281,7 @@ class BoundaryCondition(Package):
         return self._template.render(d)
 
     def write_perioddata(self, directory, pkgname):
-        bin_ds = self[[*self._period_data]]
+        bin_ds = self[list(self._period_data)]
 
         if "time" in bin_ds:  # one of bin_ds has time
             for i in range(len(self.time)):
@@ -300,7 +304,7 @@ class BoundaryCondition(Package):
         self.write_perioddata(directory, pkgname)
 
 
-class AdvancedBoundaryCondition(BoundaryCondition):
+class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     """Class dedicated to advanced boundary conditions, since MF6 does not support
     binary files for Advanced Boundary conditions.  
     
@@ -342,10 +346,13 @@ class AdvancedBoundaryCondition(BoundaryCondition):
         textformat = " ".join(textformat)
         return textformat
 
+    @abc.abstractmethod
     def _package_data_to_sparse(self):
-        """Get packagedata, override with function for the advanced boundary condition in particular
         """
-        pass
+        Get packagedata, override with function for the advanced boundary
+        condition in particular
+        """
+        return
 
     def write_packagedata(self, directory, pkgname):
         outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"

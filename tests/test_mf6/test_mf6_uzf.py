@@ -104,8 +104,12 @@ def test_to_sparsedata():
 
     expected_iuzno = np.array([1, 2, 3, 4, 5, 6])
 
-    assert sparse_data.dtype[0] == np.dtype("int32")
-    assert sparse_data.dtype[1] == np.dtype("float64")
+    assert sparse_data.dtype[0] == np.dtype(
+        "int32"
+    )  # pylint: disable=unsubscriptable-object
+    assert sparse_data.dtype[1] == np.dtype(
+        "float64"
+    )  # pylint: disable=unsubscriptable-object
     assert np.all(sparse_data["iuzno"] == expected_iuzno)
     assert len(sparse_data.dtype) == 8
     assert len(sparse_data) == 6
