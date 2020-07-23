@@ -9,6 +9,12 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Fixed
+~~~~~
+-  IO methods for IDF files will now correctly identify double precision IDFs.
+   The correct record length identifier is 2295 rather than 2296 (2296 was a
+   typo in the iMOD manual).
+
 [0.10.0] - 2020-05-23
 ---------------------
 
