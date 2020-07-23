@@ -37,14 +37,21 @@ def header(path, pattern):
             intformat = "i"
             dtype = "float32"
             doubleprecision = False
-        elif reclen_id == 2296:
+        # 2296 was a typo in the iMOD manual. Keep 2296 around in case some IDFs
+        # were written with this identifier to avoid possible incompatibility
+        # issues.
+        elif reclen_id == 2295 or reclen_id == 2296:
             floatsize = intsize = 8
             floatformat = "d"
             intformat = "q"
             dtype = "float64"
             doubleprecision = True
         else:
-            raise ValueError(f"Not a supported IDF file: {path}")
+            raise ValueError(
+                f"Not a supported IDF file: {path}\n"
+                "Record length identifier should be 1271 or 2295, "
+                f"received {reclen_id} instead."
+            )
 
         # Header is fully doubled in size in case of double precision ...
         # This means integers are also turned into 8 bytes
@@ -505,7 +512,7 @@ def write(path, a, nodata=1.0e20, dtype=np.float32):
     if dtype == np.float64:
         if data_dtype != np.float64:
             a = a.astype(np.float64)
-        reclenid = 2296
+        reclenid = 2295
         floatsize = 8
         floatformat = "d"
         intformat = "q"
