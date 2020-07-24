@@ -35,6 +35,8 @@ The methods below construct pyvista.UnstructuredGrids for voxel models (z1d),
 "layer models" (z3d), and two dimensional data (e.g. a DEM).
 """
 
+from typing import Optional, Tuple
+
 import numba
 import numpy as np
 import pandas as pd
@@ -228,8 +230,8 @@ def _create_plane_surface(data, x, y):
     All the horizontal surfaces are connected by vertical faces, exactly
     representing the cell geometry, with a constant value per cell.
     The alternative is linear interpolation, which does not represent
-     geometry exactly, or holes in the surface, with isolated quads floating
-     in space.
+    geometry exactly, or holes in the surface, with isolated quads floating
+    in space.
 
     These arrays are used to create a pyvista.UnstructuredGrid.
 
@@ -666,3 +668,60 @@ class StaticGridAnimation3D(GridAnimation3D):
 
     def _update(self, da):
         self.mesh.cell_arrays["values"] = da.values.ravel()[self.indices]
+
+
+def velocity_field(
+    vx: xr.DataArray,
+    vy: xr.DataArray,
+    vz: xr.DataArray,
+    z: Optional[xr.DataArray] = None,
+    vertical_exaggeration: Optional[float] = 30.0,
+    scale_by_magnitude: Optional[bool] = True,
+    factor: Optional[float] = 1.0,
+    tolerance: Optional[float] = 0.0,
+    absolute: Optional[bool] = False,
+    clamping: Optional[bool] = False,
+    rng: Optional[Tuple[float, float]] = None,
+):
+    if z is None:
+        z = vx["z"].values
+
+    if not (vx.shape == vy.shape == vz.shape):
+        raise ValueError("Shapes of velocity components vx, vy, vz do not match")
+    if not (vx.dims == ("layer", "y", "x") or vx.dims == ("z", "y", "x")):
+        raise ValueError(
+            'Velocity components must have dimensions ("layer", "y", "x") '
+            'or ("z", "y", "x") exactly.\n'
+            f"Received {vx.dims} instead."
+        )
+
+    # Start by generating the location of the velocity arrows
+    # Ensure the points follow the memory layout of the v DataArrays (z, y, x)
+    # otherwise, the result of np.ravel() doesn't match up
+    if z.dim == 1:
+        zz, yy, xx = np.meshgrid(z, vx["y"].values, vx["x"].values, indexing="ij")
+    elif z.dim == 3:
+        if not z.shape == vx.shape:
+            raise ValueError("Shape of `z` does not match velocity components.")
+        _, yy, xx = np.meshgrid(
+            np.arange(z.shape[0]), vx["x"].values, vy["y"].avlues, indexing="ij"
+        )
+        zz = z
+    else:
+        raise ValueError("z should be one or three dimensional.")
+
+    zz *= vertical_exaggeration
+    cellcenters = pv.PolyData(np.stack([np.ravel(x) for x in (xx, yy, zz)], axis=1))
+    # Add the velocity components in x, y, z order
+    cellcenters["velocity"] = np.stack([x.data.ravel() for x in (vx, vy, vz)], axis=1)
+    scale = "velocity" if scale_by_magnitude else None
+
+    return cellcenters.glyph(
+        scale=scale,
+        orient="velocity",
+        factor=factor,
+        tolerance=tolerance,
+        absolute=absolute,
+        clamping=clamping,
+        rng=rng,
+    )

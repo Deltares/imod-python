@@ -102,21 +102,16 @@ def stability_constraint_advection(front, lower, right, top_bot, porosity=0.3, R
     # top_bot reselect to bdg bounds
     top_bot = top_bot.sel(x=right.x, y=right.y, layer=right.layer)
 
+    # Compute flow velocities
+    qs_x, qs_y, qs_z = imod.evaluate.flow_velocity(
+        front, lower, right, top_bot, porosity
+    )
+
     if "dz" not in top_bot:
         top_bot["dz"] = top_bot["top"] - top_bot["bot"]
     # dz between layers is 0.5*dz_up + 0.5*dz_down
     dz_m = top_bot.dz.rolling(layer=2, min_periods=2).mean()
     dz_m = dz_m.shift(layer=-1)
-
-    # cell side area (m2)
-    A_x = np.abs(top_bot.dz * right.dy)
-    A_y = np.abs(top_bot.dz * front.dx)
-    A_z = np.abs(lower.dx * lower.dy)
-
-    # specific discharge (m/d)
-    qs_x = right / A_x
-    qs_y = front / A_y
-    qs_z = lower / A_z
 
     # absolute velocities (m/d)
     abs_v_x = np.abs(qs_x / porosity)
