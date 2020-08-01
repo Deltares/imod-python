@@ -75,8 +75,13 @@ class PackageGroup(collections.UserDict, abc.ABC):
 
 
 class ConstantHeadGroup(PackageGroup):
-    _cellcount_varname = "head"
-    _template = "[chd]\n" "    mchdsys = {n_systems}\n" "    mxactc = {n_max_active}\n"
+    _cellcount_varname = "head_start"
+    _template = (
+        "[chd]\n"
+        "    mchdsys = {n_systems}\n"
+        "    mxactc = {n_max_active}\n"
+        "    ichdcb = {save_budget}"
+    )
 
 
 class DrainageGroup(PackageGroup):

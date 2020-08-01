@@ -16,17 +16,21 @@ class ConstantHead(BoundaryCondition):
     concentration: array of floats (xr.DataArray)
         concentrations for the constant heads. It gets automatically written to
         the SSM package.
+    save_budget: {True, False}, optional
+        is a flag indicating if the budget should be saved (ICHDCB).
+        Default is False.
     """
 
-    __slots__ = ("head_start", "head_end", "concentration")
+    __slots__ = ("head_start", "head_end", "concentration", "save_budget")
     _pkg_id = "chd"
     _mapping = (("shead", "head_start"), ("ehead", "head_end"))
 
-    def __init__(self, head_start, head_end, concentration):
+    def __init__(self, head_start, head_end, concentration, save_budget=False):
         super(__class__, self).__init__()
         self["head_start"] = head_start
         self["head_end"] = head_end
         self["concentration"] = concentration
+        self["save_budget"] = save_budget
 
     def _pkgcheck(self, ibound=None):
         self._check_positive(["concentration"])

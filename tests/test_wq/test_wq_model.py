@@ -43,6 +43,9 @@ def basicmodel():
     # GHB, only part of domain
     ghbhead = ibound.isel(z=slice(0, 2))
 
+    # CHD
+    constanthead = xr.full_like(ibound.isel(z=-1), 1.0)
+
     # RCH
     datetimes = pd.date_range("2000-01-01", "2000-01-05")
     rate = xr.DataArray(
@@ -89,6 +92,12 @@ def basicmodel():
         conductance=ghbhead.copy(),
         concentration=1.5,
         density=ghbhead.copy(),
+        save_budget=False,
+    )
+    m["chd"] = imod.wq.ConstantHead(
+        head_start=constanthead,
+        head_end=constanthead,
+        concentration=35.0,
         save_budget=False,
     )
     m["riv"] = imod.wq.River(
@@ -176,6 +185,7 @@ def cftime_model(basicmodel):
 
     m_cf = imod.wq.SeawatModel("test_model_cf")
     m_cf["lpf"] = m["lpf"]
+    m_cf["chd"] = m["chd"]
     m_cf["riv"] = m["riv"]
     m_cf["pcg"] = m["pcg"]
     m_cf["btn"] = m["btn"]
@@ -247,7 +257,7 @@ def test_render_gen(basicmodel):
             modelname = test_model
             writehelp = False
             result_dir = results
-            packages = adv, bas6, btn, dis, dsp, evt, gcg, ghb, lpf, oc, pcg, rch, riv, ssm, vdf, wel
+            packages = adv, bas6, btn, chd, dis, dsp, evt, gcg, ghb, lpf, oc, pcg, rch, riv, ssm, vdf, wel
             coord_xll = 0.0
             coord_yll = 0.0
             start_year = 2000
@@ -285,7 +295,7 @@ def test_render_pkg__gcg(basicmodel):
     assert m._render_pkg("gcg", directory=directory, globaltimes=globaltimes) == compare
 
 
-def test_render_pkg__rch(basicmodel):
+def test_render_pkg__evt(basicmodel):
     m = basicmodel
     m.time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
@@ -316,7 +326,7 @@ def test_render_pkg__rch(basicmodel):
     assert m._render_pkg("evt", directory=directory, globaltimes=globaltimes) == compare
 
 
-def test_render_pkg__evt(basicmodel):
+def test_render_pkg__rch(basicmodel):
     m = basicmodel
     m.time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
@@ -382,7 +392,14 @@ def test_render_groups__ghb_riv_wel(basicmodel):
             bhead_p?_s1_l1:2 = ghb/head_l:.idf
             cond_p?_s1_l1:2 = ghb/conductance_l:.idf
             ghbssmdens_p?_s1_l1:2 = ghb/density_l:.idf
-        
+
+        [chd]
+            mchdsys = 1
+            mxactc = 25
+            ichdcb = 0
+            shead_p?_s1_l3 = chd/head_start_l3.idf
+            ehead_p?_s1_l3 = chd/head_end_l3.idf
+
         [riv]
             mrivsys = 1
             mxactr = 75
@@ -391,7 +408,7 @@ def test_render_groups__ghb_riv_wel(basicmodel):
             cond_p?_s1_l1:3 = riv/conductance_l:.idf
             rbot_p?_s1_l1:3 = riv/bottom_elevation_l:.idf
             rivssmdens_p?_s1_l1:3 = riv/density_l:.idf
-        
+
         [wel]
             mwelsys = 1
             mxactw = 3
@@ -405,12 +422,13 @@ def test_render_groups__ghb_riv_wel(basicmodel):
 
     ssm_compare = """
     cghb_t1_p?_l1:2 = 1.5
+    cchd_t1_p?_l3 = 35.0
     criv_t1_p?_l1:3 = riv/concentration_l:.idf"""
     content, ssm_content, n_sinkssources = m._render_groups(
         directory=directory, globaltimes=globaltimes
     )
 
-    assert n_sinkssources == 128
+    assert n_sinkssources == 153
     assert content == compare
     assert ssm_content == ssm_compare
 
@@ -430,7 +448,7 @@ def test_render_groups__double_gbh(basicmodel):
     directory = pathlib.Path(".")
 
     n_sinkssources = m._render_groups(directory=directory, globaltimes=globaltimes)[2]
-    assert n_sinkssources == 178
+    assert n_sinkssources == 203
 
 
 def test_render_flowsolver(basicmodel):
