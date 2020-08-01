@@ -37,7 +37,7 @@ def to_datetime(time, use_cftime):
     if use_cftime:
         return cftime.DatetimeProlepticGregorian(*time.timetuple()[:6])
     else:
-        return np.datetime64(time, unit="ns")
+        return np.datetime64(time, "ns")
 
 
 def timestep_duration(times, use_cftime):
