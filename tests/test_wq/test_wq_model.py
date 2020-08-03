@@ -46,6 +46,12 @@ def basicmodel():
     # CHD
     constanthead = xr.full_like(ibound.isel(z=-1), 1.0)
 
+    # MAL
+    mal_concentration = constanthead.copy()
+
+    # TVC
+    tvc_concentration = constanthead.copy()
+
     # RCH
     datetimes = pd.date_range("2000-01-01", "2000-01-05")
     rate = xr.DataArray(
@@ -136,6 +142,8 @@ def basicmodel():
         ratio_vertical=longitudinal.copy(),
         diffusion_coefficient=longitudinal.copy(),
     )
+    m["mal"] = imod.wq.MassLoading(concentration=mal_concentration)
+    m["tvc"] = imod.wq.TimeVaryingConstantConcentration(concentration=tvc_concentration)
     m["vdf"] = imod.wq.VariableDensityFlow(
         density_species=1,
         density_min=1000.0,
@@ -175,6 +183,8 @@ def notime_model(basicmodel):
     m_notime["vdf"] = m["vdf"]
     m_notime["gcg"] = m["gcg"]
     m_notime["oc"] = m["oc"]
+    m_notime["mal"] = m["mal"]
+    m_notime["tvc"] = m["tvc"]
     return m_notime
 
 
@@ -194,6 +204,8 @@ def cftime_model(basicmodel):
     m_cf["vdf"] = m["vdf"]
     m_cf["gcg"] = m["gcg"]
     m_cf["oc"] = m["oc"]
+    m_cf["mal"] = m["mal"]
+    m_cf["tvc"] = m["tvc"]
     # We are not going to test for wells for now,
     # as cftime is not supported in WEL yet
 
@@ -257,7 +269,7 @@ def test_render_gen(basicmodel):
             modelname = test_model
             writehelp = False
             result_dir = results
-            packages = adv, bas6, btn, chd, dis, dsp, evt, gcg, ghb, lpf, oc, pcg, rch, riv, ssm, vdf, wel
+            packages = adv, bas6, btn, chd, dis, dsp, evt, gcg, ghb, lpf, mal, oc, pcg, rch, riv, ssm, tvc, vdf, wel
             coord_xll = 0.0
             coord_yll = 0.0
             start_year = 2000
@@ -508,12 +520,12 @@ def test_render_ssm_rch_mal_tvc(basicmodel):
     crch_t1_p2_l? = concentration_20000102000000.idf
     crch_t1_p3_l? = concentration_20000103000000.idf
     crch_t1_p4_l? = concentration_20000104000000.idf
-    crch_t1_p5_l? = concentration_20000105000000.idf"""
+    crch_t1_p5_l? = concentration_20000105000000.idf
+    cmal_t1_p?_l3 = concentration_l3.idf
+    ctvc_t1_p?_l3 = concentration_l3.idf"""
 
-    assert (
-        m._render_ssm_rch_mal_tvc(directory=directory, globaltimes=globaltimes)
-        == compare
-    )
+    actual = m._render_ssm_rch_mal_tvc(directory=directory, globaltimes=globaltimes)
+    assert actual == compare
 
 
 def test_render_ssm_rch_constant(basicmodel):
@@ -528,27 +540,29 @@ def test_render_ssm_rch_constant(basicmodel):
     directory = pathlib.Path(".")
 
     compare = """
-    crch_t1_p?_l1 = 0.15"""
+    crch_t1_p?_l1 = 0.15
+    cmal_t1_p?_l3 = concentration_l3.idf
+    ctvc_t1_p?_l3 = concentration_l3.idf"""
 
     # Setup ssm_layers
     m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert hasattr(m["rch"], "_ssm_layers")
-    assert (
-        m._render_ssm_rch_mal_tvc(directory=directory, globaltimes=globaltimes)
-        == compare
-    )
+
+    actual = m._render_ssm_rch_mal_tvc(directory=directory, globaltimes=globaltimes)
+    assert actual == compare
 
     compare = """
-    crch_t1_p?_l1:2 = 0.15"""
+    crch_t1_p?_l1:2 = 0.15
+    cmal_t1_p?_l3 = concentration_l3.idf
+    ctvc_t1_p?_l3 = concentration_l3.idf"""
 
     # Setup ssm_layers
     m["bas6"]["ibound"][0, 0, 0] = 0.0
     m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert hasattr(m["rch"], "_ssm_layers")
-    assert (
-        m._render_ssm_rch_mal_tvc(directory=directory, globaltimes=globaltimes)
-        == compare
-    )
+
+    actual = m._render_ssm_rch_mal_tvc(directory=directory, globaltimes=globaltimes)
+    assert actual == compare
 
 
 def test_render_transportsolver(basicmodel):
@@ -611,27 +625,27 @@ def test_mxsscount_incongruent_icbund(basicmodel):
     m["btn"]["icbund"][...] = 0.0
 
     n_sinkssources = m._bas_btn_rch_evt_mal_tvc_sinkssources()
-    # 50 from ibound, 25 from recharge + 25 from evapotranspiration
-    assert n_sinkssources == 75 + 25
+    # 50 from ibound, 25 from recharge + 25 from evapotranspiration, 25 from mal, 25 from tvc
+    assert n_sinkssources == 50 + 25 + 25 + 25 + 25
 
 
 def test_highest_active_recharge(basicmodel):
     m = basicmodel
     n_sinkssources = m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert np.array_equal(m["rch"]._ssm_layers, np.array([1]))
-    assert n_sinkssources == 25 + 25
+    assert n_sinkssources == 25 + 25 + 25 + 25
 
     m["bas6"]["ibound"][0, 0, 0] = 0.0
     m["btn"]["icbund"][...] = 0.0
     n_sinkssources = m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert np.array_equal(m["rch"]._ssm_layers, np.array([1, 2]))
-    assert n_sinkssources == 50 + 25
+    assert n_sinkssources == 50 + 25 + 25 + 25
 
     m["bas6"]["ibound"][...] = -1.0
     m["btn"]["icbund"][...] = 0.0
     n_sinkssources = m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert np.array_equal(m["rch"]._ssm_layers, np.array([]))
-    assert n_sinkssources == 75 + 25
+    assert n_sinkssources == 75 + 25 + 25 + 25
 
 
 def test_write(basicmodel, tmp_path):
