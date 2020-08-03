@@ -324,11 +324,7 @@ class SeawatModel(Model):
         # Get name of pkg, e.g. lookup "recharge" for rch _pkg_id
         pkgkey = self._get_pkgkey(key)
         if pkgkey is None:
-            # Maybe do enum look for full package name?
-            if (key == "rch") or (key == "evt"):  # since recharge is optional
-                return ""
-            else:
-                raise ValueError(f"No {key} package provided.")
+            raise ValueError(f"No {key} package provided.")
         return self[pkgkey]._render(
             directory=directory / pkgkey, globaltimes=globaltimes
         )
@@ -397,15 +393,14 @@ class SeawatModel(Model):
         else:
             baskey = self._get_pkgkey("bas6")
             self[pkstkey]._compute_load_balance_weight(self[baskey]["ibound"])
-            return self[pkstkey]._render(directory=directory.joinpath(pkstkey))
+            return self[pkstkey]._render(directory=directory / pkstkey)
 
     def _render_ssm_rch_mal_tvc(self, directory, globaltimes):
         out = ""
-        for key in ("rch", "mal", "tvc"):
-            pkgkey = self._get_pkgkey(key)
-            if pkgkey is not None:
-                out += self[pkgkey]._render_ssm(
-                    directory=directory, globaltimes=globaltimes
+        for key, pkg in self.items():
+            if pkg._pkg_id in ("rch", "mal", "tvc"):
+                out += pkg._render_ssm(
+                    directory=directory / key, globaltimes=globaltimes
                 )
         return out
 
@@ -448,7 +443,7 @@ class SeawatModel(Model):
         )
         content.append(self._render_dis(directory=directory, globaltimes=globaltimes))
         # Modflow
-        for key in ("bas6", "oc", "lpf", "rch", "evt"):
+        for key in ("bas6", "oc", "lpf"):
             content.append(
                 self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
             )

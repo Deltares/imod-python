@@ -516,13 +516,13 @@ def test_render_ssm_rch_mal_tvc(basicmodel):
     directory = pathlib.Path(".")
 
     compare = """
-    crch_t1_p1_l? = concentration_20000101000000.idf
-    crch_t1_p2_l? = concentration_20000102000000.idf
-    crch_t1_p3_l? = concentration_20000103000000.idf
-    crch_t1_p4_l? = concentration_20000104000000.idf
-    crch_t1_p5_l? = concentration_20000105000000.idf
-    cmal_t1_p?_l3 = concentration_l3.idf
-    ctvc_t1_p?_l3 = concentration_l3.idf"""
+    crch_t1_p1_l? = rch/concentration_20000101000000.idf
+    crch_t1_p2_l? = rch/concentration_20000102000000.idf
+    crch_t1_p3_l? = rch/concentration_20000103000000.idf
+    crch_t1_p4_l? = rch/concentration_20000104000000.idf
+    crch_t1_p5_l? = rch/concentration_20000105000000.idf
+    cmal_t1_p?_l3 = mal/concentration_l3.idf
+    ctvc_t1_p?_l3 = tvc/concentration_l3.idf"""
 
     actual = m._render_ssm_rch_mal_tvc(directory=directory, globaltimes=globaltimes)
     assert actual == compare
@@ -541,8 +541,8 @@ def test_render_ssm_rch_constant(basicmodel):
 
     compare = """
     crch_t1_p?_l1 = 0.15
-    cmal_t1_p?_l3 = concentration_l3.idf
-    ctvc_t1_p?_l3 = concentration_l3.idf"""
+    cmal_t1_p?_l3 = mal/concentration_l3.idf
+    ctvc_t1_p?_l3 = tvc/concentration_l3.idf"""
 
     # Setup ssm_layers
     m._bas_btn_rch_evt_mal_tvc_sinkssources()
@@ -553,8 +553,8 @@ def test_render_ssm_rch_constant(basicmodel):
 
     compare = """
     crch_t1_p?_l1:2 = 0.15
-    cmal_t1_p?_l3 = concentration_l3.idf
-    ctvc_t1_p?_l3 = concentration_l3.idf"""
+    cmal_t1_p?_l3 = mal/concentration_l3.idf
+    ctvc_t1_p?_l3 = tvc/concentration_l3.idf"""
 
     # Setup ssm_layers
     m["bas6"]["ibound"][0, 0, 0] = 0.0
