@@ -269,7 +269,7 @@ def test_render_gen(basicmodel):
             modelname = test_model
             writehelp = False
             result_dir = results
-            packages = adv, bas6, btn, chd, dis, dsp, evt, gcg, ghb, lpf, mal, oc, pcg, rch, riv, ssm, tvc, vdf, wel
+            packages = adv, bas6, btn, chd, dis, dsp, evt, gcg, ghb, lpf, oc, pcg, rch, riv, ssm, vdf, wel
             coord_xll = 0.0
             coord_yll = 0.0
             start_year = 2000

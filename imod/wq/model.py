@@ -289,7 +289,9 @@ class SeawatModel(Model):
         )
 
     def _render_gen(self, modelname, globaltimes, writehelp, result_dir):
-        package_set = set([pkg._pkg_id for pkg in self.values()])
+        package_set = set(
+            [pkg._pkg_id for pkg in self.values() if pkg._pkg_id not in ("tvc", "mal")]
+        )
         package_set.update(("btn", "ssm"))
         package_set = sorted(package_set)
         baskey = self._get_pkgkey("bas6")
