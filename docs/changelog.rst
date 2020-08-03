@@ -14,6 +14,16 @@ Fixed
 -  IO methods for IDF files will now correctly identify double precision IDFs.
    The correct record length identifier is 2295 rather than 2296 (2296 was a
    typo in the iMOD manual).
+-  :meth:`imod.wq.SeawatModel.write()` will now write the correct path for
+   recharge package concentration given in IDF files. It did not prepend the
+   name of the package correctly (resulting in paths like
+   ``concentration_l1.idf`` instead of ``rch/concentration_l1.idf``).
+
+Added
+~~~~~
+-  :class:`imod.wq.MassLoading` and
+   :class:`imod.wq.TimeVaryingConstantConcentration` have been added to allow
+   additional concentration boundary conditions.
 
 [0.10.0] - 2020-05-23
 ---------------------
