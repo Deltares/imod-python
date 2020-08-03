@@ -496,7 +496,7 @@ def test_render_btn(basicmodel):
     assert m._render_btn(directory=directory, globaltimes=globaltimes) == compare
 
 
-def test_render_ssm_rch(basicmodel):
+def test_render_ssm_rch_mal_tvc(basicmodel):
     m = basicmodel
     m.time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
@@ -510,7 +510,10 @@ def test_render_ssm_rch(basicmodel):
     crch_t1_p4_l? = concentration_20000104000000.idf
     crch_t1_p5_l? = concentration_20000105000000.idf"""
 
-    assert m._render_ssm_rch(directory=directory, globaltimes=globaltimes) == compare
+    assert (
+        m._render_ssm_rch_mal_tvc(directory=directory, globaltimes=globaltimes)
+        == compare
+    )
 
 
 def test_render_ssm_rch_constant(basicmodel):
@@ -528,18 +531,24 @@ def test_render_ssm_rch_constant(basicmodel):
     crch_t1_p?_l1 = 0.15"""
 
     # Setup ssm_layers
-    m._bas_btn_rch_sinkssources()
+    m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert hasattr(m["rch"], "_ssm_layers")
-    assert m._render_ssm_rch(directory=directory, globaltimes=globaltimes) == compare
+    assert (
+        m._render_ssm_rch_mal_tvc(directory=directory, globaltimes=globaltimes)
+        == compare
+    )
 
     compare = """
     crch_t1_p?_l1:2 = 0.15"""
 
     # Setup ssm_layers
     m["bas6"]["ibound"][0, 0, 0] = 0.0
-    m._bas_btn_rch_sinkssources()
+    m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert hasattr(m["rch"], "_ssm_layers")
-    assert m._render_ssm_rch(directory=directory, globaltimes=globaltimes) == compare
+    assert (
+        m._render_ssm_rch_mal_tvc(directory=directory, globaltimes=globaltimes)
+        == compare
+    )
 
 
 def test_render_transportsolver(basicmodel):
@@ -601,26 +610,26 @@ def test_mxsscount_incongruent_icbund(basicmodel):
     m["bas6"]["ibound"][1:, ...] = -1.0
     m["btn"]["icbund"][...] = 0.0
 
-    n_sinkssources = m._bas_btn_rch_sinkssources()
+    n_sinkssources = m._bas_btn_rch_evt_mal_tvc_sinkssources()
     # 50 from ibound, 25 from recharge + 25 from evapotranspiration
     assert n_sinkssources == 75 + 25
 
 
 def test_highest_active_recharge(basicmodel):
     m = basicmodel
-    n_sinkssources = m._bas_btn_rch_sinkssources()
+    n_sinkssources = m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert np.array_equal(m["rch"]._ssm_layers, np.array([1]))
     assert n_sinkssources == 25 + 25
 
     m["bas6"]["ibound"][0, 0, 0] = 0.0
     m["btn"]["icbund"][...] = 0.0
-    n_sinkssources = m._bas_btn_rch_sinkssources()
+    n_sinkssources = m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert np.array_equal(m["rch"]._ssm_layers, np.array([1, 2]))
     assert n_sinkssources == 50 + 25
 
     m["bas6"]["ibound"][...] = -1.0
     m["btn"]["icbund"][...] = 0.0
-    n_sinkssources = m._bas_btn_rch_sinkssources()
+    n_sinkssources = m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert np.array_equal(m["rch"]._ssm_layers, np.array([]))
     assert n_sinkssources == 75 + 25
 

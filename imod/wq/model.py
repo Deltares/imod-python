@@ -397,39 +397,34 @@ class SeawatModel(Model):
             self[pkstkey]._compute_load_balance_weight(self[baskey]["ibound"])
             return self[pkstkey]._render(directory=directory.joinpath(pkstkey))
 
-    def _render_ssm_rch(self, directory, globaltimes):
-        rchkey = self._get_pkgkey("rch")
-        if rchkey is not None:
-            return self[rchkey]._render_ssm(
-                directory=directory, globaltimes=globaltimes
-            )
-        else:
-            return ""
+    def _render_ssm_rch_mal_tvc(self, directory, globaltimes):
+        out = ""
+        for key in ("rch", "mal", "tvc"):
+            pkgkey = self._get_pkgkey(key)
+            if pkgkey is not None:
+                out += self[pkgkey]._render_ssm(
+                    directory=directory, globaltimes=globaltimes
+                )
+        return out
 
-    def _bas_btn_rch_sinkssources(self):
+    def _bas_btn_rch_evt_mal_tvc_sinkssources(self):
         baskey = self._get_pkgkey("bas6")
         btnkey = self._get_pkgkey("btn")
         ibound = self[baskey]["ibound"]
         icbund = self[btnkey]["icbund"]
         n_extra = int(((ibound < 0) | (icbund < 0)).sum())
 
-        rchkey = self._get_pkgkey("rch")
-        if rchkey is not None:
-            _, nrow, ncol = ibound.shape
-            rch = self[rchkey]
-            rch._set_ssm_layers(ibound)
-            nlay = rch._ssm_layers.size
-            n_rch = nlay * nrow * ncol
-            n_extra += n_rch
-
-        evtkey = self._get_pkgkey("evt")
-        if evtkey is not None:
-            _, nrow, ncol = ibound.shape
-            evt = self[evtkey]
-            evt._set_ssm_layers(ibound)
-            nlay = evt._ssm_layers.size
-            n_evt = nlay * nrow * ncol
-            n_extra += n_evt
+        nlayer, nrow, ncol = ibound.shape
+        for key in ("rch", "evt", "mal", "tvc"):
+            pkgkey = self._get_pkgkey(key)
+            if pkgkey is not None:
+                pkg = self[pkgkey]
+                if key in ("rch", "evt"):
+                    pkg._set_ssm_layers(ibound)
+                    n_extra += pkg._ssm_layers.size * nrow * ncol
+                elif key in ("mal", "tvc"):
+                    _ = pkg._max_active_n("concentration", nlayer, nrow, ncol)
+                    n_extra += pkg._ssm_cellcount
 
         return n_extra
 
@@ -461,9 +456,9 @@ class SeawatModel(Model):
             directory=directory, globaltimes=globaltimes
         )
         # Add recharge to sinks and sources
-        n_sinkssources += self._bas_btn_rch_sinkssources()
-        # Add recharge to ssm_content
-        ssm_content += self._render_ssm_rch(
+        n_sinkssources += self._bas_btn_rch_evt_mal_tvc_sinkssources()
+        # Add recharge, mass loading, time varying constant concentration to ssm_content
+        ssm_content += self._render_ssm_rch_mal_tvc(
             directory=directory, globaltimes=globaltimes
         )
 
