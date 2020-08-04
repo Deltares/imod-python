@@ -324,7 +324,11 @@ class SeawatModel(Model):
         # Get name of pkg, e.g. lookup "recharge" for rch _pkg_id
         pkgkey = self._get_pkgkey(key)
         if pkgkey is None:
-            raise ValueError(f"No {key} package provided.")
+            # Maybe do enum look for full package name?
+            if (key == "rch") or (key == "evt"):  # since recharge is optional
+                return ""
+            else:
+                raise ValueError(f"No {key} package provided.")
         return self[pkgkey]._render(
             directory=directory / pkgkey, globaltimes=globaltimes
         )
@@ -443,7 +447,7 @@ class SeawatModel(Model):
         )
         content.append(self._render_dis(directory=directory, globaltimes=globaltimes))
         # Modflow
-        for key in ("bas6", "oc", "lpf"):
+        for key in ("bas6", "oc", "lpf", "rch", "evt"):
             content.append(
                 self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
             )
