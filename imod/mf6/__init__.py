@@ -24,4 +24,5 @@ from imod.mf6.riv import River
 from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.sto import Storage
 from imod.mf6.timedis import TimeDiscretization
+from imod.mf6.uzf import UnsaturatedZoneFlow
 from imod.mf6.wel import Well

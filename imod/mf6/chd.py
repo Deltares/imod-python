@@ -44,7 +44,7 @@ class ConstantHead(BoundaryCondition):
 
     __slots__ = ("head", "print_input", "print_flows", "save_flows", "observations")
     _pkg_id = "chd"
-    _binary_data = ("head",)
+    _period_data = ("head",)
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 

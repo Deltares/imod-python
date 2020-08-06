@@ -34,7 +34,7 @@ class Storage(Package):
 
     __slots__ = ("specific_storage", "specific_yield", "convertible", "transient")
     _pkg_id = "sto"
-    _binary_data = {
+    _grid_data = {
         "convertible": np.int32,
         "specific_storage": np.float64,
         "specific_yield": np.float64,

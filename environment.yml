@@ -20,7 +20,7 @@ dependencies:
   - joblib
   - matplotlib
   - nbstripout
-  - numba
+  - numba>=0.50
   - numpy
   - pandas
   - pytest

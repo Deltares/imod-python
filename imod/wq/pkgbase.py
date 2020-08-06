@@ -1,3 +1,4 @@
+import abc
 import pathlib
 import warnings
 
@@ -14,7 +15,7 @@ from imod.wq import timeutil
 from .caching import caching
 
 
-class Package(xr.Dataset):
+class Package(xr.Dataset, abc.ABC):
     """
     Base package for the different SEAWAT packages.
     Every package contains a ``_pkg_id`` for identification.
@@ -143,7 +144,9 @@ class Package(xr.Dataset):
         rendered : str
             The rendered runfile part for a single boundary condition system.
         """
-        d = {k: v.values for k, v in self.data_vars.items()}
+        d = {
+            k: v.values for k, v in self.data_vars.items()
+        }  # pylint: disable=no-member
         if hasattr(self, "_keywords"):
             for key in self._keywords.keys():
                 self._replace_keyword(d, key)
@@ -333,7 +336,7 @@ class Package(xr.Dataset):
         return values
 
     def save(self, directory):
-        for name, da in self.data_vars.items():
+        for name, da in self.data_vars.items():  # pylint: disable=no-member
             if "y" in da.coords and "x" in da.coords:
                 path = pathlib.Path(directory).joinpath(name)
 
@@ -358,6 +361,7 @@ class Package(xr.Dataset):
                 raise ValueError(f"{var} in {self} must be positive")
 
     def _check_range(self, varname, lower, upper):
+        # TODO: this isn't used anywhere so far.
         warn = False
         msg = ""
         if (self[varname] < lower).any():
@@ -367,7 +371,7 @@ class Package(xr.Dataset):
             warn = True
             msg += f"{varname} in {self}: values higher than {upper} detected."
         if warn:
-            warnings.RuntimeWarning(msg)
+            warnings.warn(msg, RuntimeWarning)
 
     def _check_location_consistent(self, varnames):
         dims = set(self.dims)
@@ -399,7 +403,7 @@ class Package(xr.Dataset):
                     )
 
 
-class BoundaryCondition(Package):
+class BoundaryCondition(Package, abc.ABC):
     """
     Base package for (transient) boundary conditions:
     * recharge
@@ -592,7 +596,7 @@ class BoundaryCondition(Package):
         d = {"mapping": mapping, "system_index": system_index}
         dicts = {}
 
-        for varname in self.data_vars.keys():
+        for varname in self.data_vars.keys():  # pylint: disable=no-member
             if varname == "concentration":
                 continue
             dicts[varname] = self._compose_values_timelayer(

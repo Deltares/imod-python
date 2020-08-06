@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import dask
 import dask.array
 import numba
@@ -208,7 +210,7 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
 
     Broadcast it to three dimensions:
 
-    >>> zone = xr.full_like(flow, zone2D)
+    >>> zone = xr.ones_like(flow) * zone2D
 
     Compute net flow through the (control) surface of the budget zone:
 
@@ -327,3 +329,45 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
             xr.DataArray(dask_lower, coords, dims),
             xr.DataArray(dask_right, coords, dims),
         )
+
+
+def flow_velocity(
+    front: xr.DataArray,
+    lower: xr.DataArray,
+    right: xr.DataArray,
+    top_bot: xr.DataArray,
+    porosity: float = 0.3,
+) -> Tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
+    """
+    Compute flow velocities (m/d) from budgets (m3/d).
+
+    Parameters
+    ----------
+    front: xr.DataArray of floats, optional
+        Dimensions must be exactly ``("layer", "y", "x")``.
+    lower: xr.DataArray of floats, optional
+        Dimensions must be exactly ``("layer", "y", "x")``.
+    right: xr.DataArray of floats, optional
+        Dimensions must be exactly ``("layer", "y", "x")``.
+    top_bot: xr.Dataset of floats, containing 'top', 'bot' and optionally
+        'dz' of layers.
+        Dimensions must be exactly ``("layer", "y", "x")``.
+    porosity: float or xr.DataArray of floats, optional (default 0.3)
+        If xr.DataArray, dimensions must be exactly ``("layer", "y", "x")``.
+    
+    Returns
+    -------
+    vx, vy, vz: xr.DataArray of floats
+        Velocity components in x, y, z direction.
+    """
+    if "dz" not in top_bot:
+        top_bot["dz"] = top_bot["top"] - top_bot["bot"]
+
+    # cell side area (m2)
+    A_x = np.abs(top_bot.dz * right.dy)
+    A_y = np.abs(top_bot.dz * front.dx)
+    A_z = np.abs(lower.dx * lower.dy)
+
+    # Divide flux (m3/d) by area (m2) -> (m/d)
+    # Flip direction around for x (right)
+    return (-right / A_x, front / A_y, lower / A_z)

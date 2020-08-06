@@ -1,10 +1,12 @@
+import abc
+
 import jinja2
 import numpy as np
 
 from imod.wq.pkgbase import BoundaryCondition
 
 
-class Recharge(BoundaryCondition):
+class Recharge(BoundaryCondition, abc.ABC):
     __slots__ = ("_option",)
     _pkg_id = "rch"
 

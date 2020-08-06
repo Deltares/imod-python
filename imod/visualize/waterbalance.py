@@ -150,10 +150,10 @@ def waterbalance_barchart(
         labelbottom=False,
         length=barwidth * 45,
     )
-    ax.set_xticks(xticks_location)
-    ax.set_xticklabels(xticks_labels)
+    ax.xaxis.set_ticks(xticks_location)
+    ax.xaxis.set_ticklabels(xticks_labels)
     xticks_location_minor = r1[1:] - barwidth
-    ax.set_xticks(xticks_location_minor, minor=True)
+    ax.xaxis.set_ticks(xticks_location_minor, minor=True)
 
     # Create a legend on the right side of the chart
     ax.legend(
@@ -166,6 +166,6 @@ def waterbalance_barchart(
 
     # Set a unit on the y-axis
     if unit is not None:
-        ax.set_ylabel(unit)
+        ax.yaxis.set_label(unit)
 
     return ax

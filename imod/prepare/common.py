@@ -339,7 +339,7 @@ def _coord(da, dim):
             )
         dxs = np.diff(da[dim].values)
         dx = dxs[0]
-        atolx = abs(1.0e-6 * dx)
+        atolx = abs(1.0e-4 * dx)
         if not np.allclose(dxs, dx, atolx):
             raise ValueError(
                 f"DataArray has to be equidistant along {dim}, or cellsizes"

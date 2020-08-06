@@ -33,7 +33,7 @@ class StructuredDiscretization(Package):
 
     __slots__ = ("top", "bottom", "idomain")
     _pkg_id = "dis"
-    _binary_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
+    _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
 

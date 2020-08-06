@@ -60,7 +60,7 @@ class Evapotranspiration(BoundaryCondition):
         "observations",
     )
     _pkg_id = "evt"
-    _binary_data = ("surface", "rate", "depth", "proportion_depth", "proportion_rate")
+    _period_data = ("surface", "rate", "depth", "proportion_depth", "proportion_rate")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 

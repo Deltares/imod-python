@@ -90,6 +90,25 @@ class Model(collections.UserDict):
                 selmodel[pkgname] = pkg[sel_dims]
         return selmodel
 
+    def to_netcdf(self, directory=".", pattern="{pkgname}.nc", **kwargs):
+        """Convenience function to write all model packages 
+        to netcdf files.
+        
+        Parameters
+        ----------
+        directory : str, pathlib.Path
+            Directory into which the different model packages will be written.
+        pattern : str, optional.
+            Pattern for filename of each package, in which `pkgname` 
+            signifies the package name. Default is `"{pkgname}.nc"`,
+            so `model["river"]` would get written to `path / river.nc`.
+        kwargs : 
+            Additional kwargs to be forwarded to `xarray.Dataset.to_netcdf`.
+        """
+        directory = pathlib.Path(directory)
+        for pkgname, pkg in self.items():
+            pkg.to_netcdf(directory / pattern.format(pkgname=pkgname), **kwargs)
+
 
 class SeawatModel(Model):
     """
@@ -289,7 +308,9 @@ class SeawatModel(Model):
         )
 
     def _render_gen(self, modelname, globaltimes, writehelp, result_dir):
-        package_set = set([pkg._pkg_id for pkg in self.values()])
+        package_set = set(
+            [pkg._pkg_id for pkg in self.values() if pkg._pkg_id not in ("tvc", "mal")]
+        )
         package_set.update(("btn", "ssm"))
         package_set = sorted(package_set)
         baskey = self._get_pkgkey("bas6")
@@ -395,41 +416,35 @@ class SeawatModel(Model):
         else:
             baskey = self._get_pkgkey("bas6")
             self[pkstkey]._compute_load_balance_weight(self[baskey]["ibound"])
-            return self[pkstkey]._render(directory=directory.joinpath(pkstkey))
+            return self[pkstkey]._render(directory=directory / pkstkey)
 
-    def _render_ssm_rch(self, directory, globaltimes):
-        rchkey = self._get_pkgkey("rch")
-        if rchkey is not None:
-            return self[rchkey]._render_ssm(
-                directory=directory, globaltimes=globaltimes
-            )
-        else:
-            return ""
+    def _render_ssm_rch_mal_tvc(self, directory, globaltimes):
+        out = ""
+        for key, pkg in self.items():
+            if pkg._pkg_id in ("rch", "mal", "tvc"):
+                out += pkg._render_ssm(
+                    directory=directory / key, globaltimes=globaltimes
+                )
+        return out
 
-    def _bas_btn_rch_sinkssources(self):
+    def _bas_btn_rch_evt_mal_tvc_sinkssources(self):
         baskey = self._get_pkgkey("bas6")
         btnkey = self._get_pkgkey("btn")
         ibound = self[baskey]["ibound"]
         icbund = self[btnkey]["icbund"]
         n_extra = int(((ibound < 0) | (icbund < 0)).sum())
 
-        rchkey = self._get_pkgkey("rch")
-        if rchkey is not None:
-            _, nrow, ncol = ibound.shape
-            rch = self[rchkey]
-            rch._set_ssm_layers(ibound)
-            nlay = rch._ssm_layers.size
-            n_rch = nlay * nrow * ncol
-            n_extra += n_rch
-
-        evtkey = self._get_pkgkey("evt")
-        if evtkey is not None:
-            _, nrow, ncol = ibound.shape
-            evt = self[evtkey]
-            evt._set_ssm_layers(ibound)
-            nlay = evt._ssm_layers.size
-            n_evt = nlay * nrow * ncol
-            n_extra += n_evt
+        nlayer, nrow, ncol = ibound.shape
+        for key in ("rch", "evt", "mal", "tvc"):
+            pkgkey = self._get_pkgkey(key)
+            if pkgkey is not None:
+                pkg = self[pkgkey]
+                if key in ("rch", "evt"):
+                    pkg._set_ssm_layers(ibound)
+                    n_extra += pkg._ssm_layers.size * nrow * ncol
+                elif key in ("mal", "tvc"):
+                    _ = pkg._max_active_n("concentration", nlayer, nrow, ncol)
+                    n_extra += pkg._ssm_cellcount
 
         return n_extra
 
@@ -461,9 +476,9 @@ class SeawatModel(Model):
             directory=directory, globaltimes=globaltimes
         )
         # Add recharge to sinks and sources
-        n_sinkssources += self._bas_btn_rch_sinkssources()
-        # Add recharge to ssm_content
-        ssm_content += self._render_ssm_rch(
+        n_sinkssources += self._bas_btn_rch_evt_mal_tvc_sinkssources()
+        # Add recharge, mass loading, time varying constant concentration to ssm_content
+        ssm_content += self._render_ssm_rch_mal_tvc(
             directory=directory, globaltimes=globaltimes
         )
 

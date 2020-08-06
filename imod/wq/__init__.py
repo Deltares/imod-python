@@ -27,6 +27,7 @@ from imod.wq.evt import (
 )
 from imod.wq.ghb import GeneralHeadBoundary
 from imod.wq.lpf import LayerPropertyFlow
+from imod.wq.mal import MassLoading
 from imod.wq.model import SeawatModel
 from imod.wq.oc import OutputControl
 from imod.wq.rch import RechargeHighestActive, RechargeLayers, RechargeTopLayer
@@ -37,5 +38,6 @@ from imod.wq.slv import (
     ParallelKrylovTransportSolver,
     PreconditionedConjugateGradientSolver,
 )
+from imod.wq.tvc import TimeVaryingConstantConcentration
 from imod.wq.vdf import VariableDensityFlow
 from imod.wq.wel import Well
