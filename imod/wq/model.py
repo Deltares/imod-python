@@ -90,14 +90,14 @@ class Model(collections.UserDict):
                 selmodel[pkgname] = pkg[sel_dims]
         return selmodel
 
-    def to_netcdf(self, path, pattern="{pkgname}.nc", **kwargs):
+    def to_netcdf(self, directory=".", pattern="{pkgname}.nc", **kwargs):
         """Convenience function to write all model packages 
         to netcdf files.
         
         Parameters
         ----------
-        path : str, pathlib.Path.
-            Path where to write the different model packages.
+        directory : str, pathlib.Path
+            Directory into which the different model packages will be written.
         pattern : str, optional.
             Pattern for filename of each package, in which `pkgname` 
             signifies the package name. Default is `"{pkgname}.nc"`,
