@@ -90,6 +90,25 @@ class Model(collections.UserDict):
                 selmodel[pkgname] = pkg[sel_dims]
         return selmodel
 
+    def to_netcdf(self, path, pattern="{pkgname}.nc", **kwargs):
+        """Convenience function to write all model packages 
+        to netcdf files.
+        
+        Parameters
+        ----------
+        path : str, pathlib.Path.
+            Path where to write the different model packages.
+        pattern : str, optional.
+            Pattern for filename of each package, in which `pkgname` 
+            signifies the package name. Default is `"{pkgname}.nc"`,
+            so `model["river"]` would get written to `path / river.nc`.
+        kwargs : 
+            Additional kwargs to be forwarded to `xarray.Dataset.to_netcdf`.
+        """
+        path = pathlib.Path(path)
+        for pkgname, pkg in self.items():
+            pkg.to_netcdf(path / pattern.format(pkgname=pkgname), **kwargs)
+
 
 class SeawatModel(Model):
     """
