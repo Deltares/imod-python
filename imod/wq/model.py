@@ -105,9 +105,9 @@ class Model(collections.UserDict):
         kwargs : 
             Additional kwargs to be forwarded to `xarray.Dataset.to_netcdf`.
         """
-        path = pathlib.Path(path)
+        directory = pathlib.Path(directory)
         for pkgname, pkg in self.items():
-            pkg.to_netcdf(path / pattern.format(pkgname=pkgname), **kwargs)
+            pkg.to_netcdf(directory / pattern.format(pkgname=pkgname), **kwargs)
 
 
 class SeawatModel(Model):
