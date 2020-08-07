@@ -132,7 +132,7 @@ class Well(BoundaryCondition):
         if "layer" in self and compress:
             # Compose does not accept non-integers, so use 0, then replace
             d["layer"] = 0
-            if self["layer"].unique().size == nlayer:
+            if np.unique(self["layer"].values).size == nlayer:
                 token_path = imod.util.compose(d).as_posix()
                 token_path = token_path.replace("_l0", "_l$")
                 values = {"$": token_path}
