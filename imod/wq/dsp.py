@@ -79,7 +79,9 @@ class Dispersion(Package):
         dicts = {}
 
         for varname in self.data_vars.keys():
-            dicts[varname] = self._compose_values_layer(varname, directory, nlayer=nlayer)
+            dicts[varname] = self._compose_values_layer(
+                varname, directory, nlayer=nlayer
+            )
         d["dicts"] = dicts
 
         return self._template.render(d)

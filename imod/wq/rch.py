@@ -37,7 +37,9 @@ class Recharge(BoundaryCondition, abc.ABC):
 
         dicts = {}
         for _, name in self._mapping:
-            dicts[name] = self._compose_values_timelayer(name, globaltimes, directory, nlayer=nlayer)
+            dicts[name] = self._compose_values_timelayer(
+                name, globaltimes, directory, nlayer=nlayer
+            )
         d["dicts"] = dicts
 
         return self._template.render(d)

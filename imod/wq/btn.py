@@ -143,7 +143,9 @@ class BasicTransport(Package):
             d["starting_concentration"] = starting_concentration
         else:
             d["starting_concentration"] = {
-                1: self._compose_values_layer("starting_concentration", directory, nlayer=nlayer)
+                1: self._compose_values_layer(
+                    "starting_concentration", directory, nlayer=nlayer
+                )
             }
 
         # Collect which entries are complex (multi-dim)
@@ -152,7 +154,9 @@ class BasicTransport(Package):
             if varname == "starting_concentration":
                 continue  # skip it, as mentioned above
             if varname in data_vars:  # multi-dim entry
-                dicts[varname] = self._compose_values_layer(varname, directory, nlayer=nlayer)
+                dicts[varname] = self._compose_values_layer(
+                    varname, directory, nlayer=nlayer
+                )
             else:  # simple entry, just get the scalar value
                 d[varname] = self[varname].values
 

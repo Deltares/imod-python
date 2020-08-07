@@ -356,7 +356,9 @@ class SeawatModel(Model):
         baskey = self._get_pkgkey("bas6")
         diskey = self._get_pkgkey("dis")
         lpfkey = self._get_pkgkey("lpf")
-        bas_content = self[baskey]._render_dis(directory=directory.joinpath(baskey), nlayer=nlayer)
+        bas_content = self[baskey]._render_dis(
+            directory=directory.joinpath(baskey), nlayer=nlayer
+        )
         dis_content = self[diskey]._render(globaltimes=globaltimes)
         return bas_content + dis_content
 
@@ -371,7 +373,10 @@ class SeawatModel(Model):
             ]
         )
         ssm_content = "".join(
-            [group.render_ssm(directory, globaltimes, nlayer) for group in package_groups]
+            [
+                group.render_ssm(directory, globaltimes, nlayer)
+                for group in package_groups
+            ]
         )
 
         # Calculate number of sinks and sources
@@ -400,7 +405,9 @@ class SeawatModel(Model):
 
         if btnkey is None:
             raise ValueError("No BasicTransport package provided.")
-        btn_content = self[btnkey]._render(directory=directory.joinpath(btnkey), nlayer=nlayer)
+        btn_content = self[btnkey]._render(
+            directory=directory.joinpath(btnkey), nlayer=nlayer
+        )
         dis_content = self[diskey]._render_btn(globaltimes=globaltimes)
         return btn_content + dis_content
 
@@ -466,11 +473,17 @@ class SeawatModel(Model):
                 result_dir=result_dir,
             )
         )
-        content.append(self._render_dis(directory=directory, globaltimes=globaltimes, nlayer=nlayer))
+        content.append(
+            self._render_dis(
+                directory=directory, globaltimes=globaltimes, nlayer=nlayer
+            )
+        )
         # Modflow
         for key in ("bas6", "oc", "lpf", "rch", "evt"):
             content.append(
-                self._render_pkg(key=key, directory=directory, globaltimes=globaltimes, nlayer=nlayer)
+                self._render_pkg(
+                    key=key, directory=directory, globaltimes=globaltimes, nlayer=nlayer
+                )
             )
 
         # multi-system package group: chd, drn, ghb, riv, wel
@@ -498,10 +511,16 @@ class SeawatModel(Model):
                 np.product(ibound.shape) * 0.5 * cell_max_nparticles
             )
 
-        content.append(self._render_btn(directory=directory, globaltimes=globaltimes, nlayer=nlayer))
+        content.append(
+            self._render_btn(
+                directory=directory, globaltimes=globaltimes, nlayer=nlayer
+            )
+        )
         for key in ("vdf", "adv", "dsp"):
             content.append(
-                self._render_pkg(key=key, directory=directory, globaltimes=globaltimes, nlayer=nlayer)
+                self._render_pkg(
+                    key=key, directory=directory, globaltimes=globaltimes, nlayer=nlayer
+                )
             )
         ssm_content = f"[ssm]\n    mxss = {n_sinkssources}" + ssm_content
 

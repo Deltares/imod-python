@@ -129,14 +129,14 @@ class Well(BoundaryCondition):
             else:
                 values["?"] = self._compose(d)
 
-        if "layer" in self and compress:
+        if "layer" in self:
             # Compose does not accept non-integers, so use 0, then replace
             d["layer"] = 0
             if np.unique(self["layer"].values).size == nlayer:
                 token_path = imod.util.compose(d).as_posix()
                 token_path = token_path.replace("_l0", "_l$")
                 values = {"$": token_path}
-            else:
+            elif compress:
                 range_path = imod.util.compose(d).as_posix()
                 range_path = range_path.replace("_l0", "_l:")
                 # TODO: temporarily disable until imod-wq is fixed
@@ -170,7 +170,9 @@ class Well(BoundaryCondition):
                     directory, nlayer=nlayer, name=name, time=time, compress=compress
                 )
         else:  # for all periods
-            values["?"] = self._compose_values_layer(directory, nlayer=nlayer, name=name)
+            values["?"] = self._compose_values_layer(
+                directory, nlayer=nlayer, name=name
+            )
         return values
 
     def _render(self, directory, globaltimes, system_index, nlayer):
@@ -191,7 +193,9 @@ class Well(BoundaryCondition):
                     )
             else:
                 concentration = {
-                    1: self._compose_values_time(directory, name, globaltimes, nlayer=nlayer)
+                    1: self._compose_values_time(
+                        directory, name, globaltimes, nlayer=nlayer
+                    )
                 }
             d["concentration"] = concentration
             return self._ssm_template.render(d)

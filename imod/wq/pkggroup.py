@@ -72,7 +72,9 @@ class PackageGroup(collections.UserDict, abc.ABC):
     def render_ssm(self, directory, globaltimes, nlayer):
         # Only render for the first system, that has concentrations defined.
         key = self.first_key
-        return self[key]._render_ssm(directory.joinpath(key), globaltimes, nlayer=nlayer)
+        return self[key]._render_ssm(
+            directory.joinpath(key), globaltimes, nlayer=nlayer
+        )
 
 
 class ConstantHeadGroup(PackageGroup):

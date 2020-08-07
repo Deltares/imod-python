@@ -274,14 +274,14 @@ class Package(xr.Dataset, abc.ABC):
                         values[layer] = da.values[()]
 
         # Compress the runfile contents using the imod-wq macros
-        if "layer" in da.dims and compress:
+        if "layer" in da.dims:
             if idf and da["layer"].size == nlayer:
                 # Compose does not accept non-integers, so use 0, then replace
                 d["layer"] = 0
                 token_path = util.compose(d, pattern=pattern).as_posix()
                 token_path = token_path.replace("_l0", "_l$")
                 values = {"$": token_path}
-            elif idf:
+            elif idf and compress:
                 # Compose does not accept non-integers, so use 0, then replace
                 d["layer"] = 0
                 range_path = util.compose(d, pattern=pattern).as_posix()
@@ -457,7 +457,9 @@ class BoundaryCondition(Package, abc.ABC):
             }
             self[varname].attrs["timemap"] = d
 
-    def _compose_values_timelayer(self, varname, globaltimes, directory, nlayer, da=None):
+    def _compose_values_timelayer(
+        self, varname, globaltimes, directory, nlayer, da=None
+    ):
         """
         Composes paths to files, or gets the appropriate scalar value for
         a single variable in a dataset.
@@ -515,11 +517,18 @@ class BoundaryCondition(Package, abc.ABC):
                 # If does does, compress should be False
                 compress = not (":" in start_end)
                 values[start_end] = self._compose_values_layer(
-                    varname, directory, nlayer=nlayer, time=time, da=da, compress=compress
+                    varname,
+                    directory,
+                    nlayer=nlayer,
+                    time=time,
+                    da=da,
+                    compress=compress,
                 )
 
         else:
-            values["?"] = self._compose_values_layer(varname, directory, nlayer=nlayer, da=da)
+            values["?"] = self._compose_values_layer(
+                varname, directory, nlayer=nlayer, da=da
+            )
 
         return values
 
