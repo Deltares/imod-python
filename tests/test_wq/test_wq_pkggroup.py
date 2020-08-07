@@ -46,13 +46,13 @@ def test_render(ghb_group):
             mghbsys = 3
             mxactb = 150
             ighbcb = 0
-            bhead_p?_s1_l1:2 = primary/head_l:.idf
-            cond_p?_s1_l1:2 = primary/conductance_l:.idf
-            ghbssmdens_p?_s1_l1:2 = primary/density_l:.idf
-            bhead_p?_s2_l1:2 = secondary/head_l:.idf
-            cond_p?_s2_l1:2 = secondary/conductance_l:.idf
-            bhead_p?_s3_l1:2 = tertiary/head_l:.idf
-            cond_p?_s3_l1:2 = tertiary/conductance_l:.idf"""
+            bhead_p?_s1_l$ = primary/head_l$.idf
+            cond_p?_s1_l$ = primary/conductance_l$.idf
+            ghbssmdens_p?_s1_l$ = primary/density_l$.idf
+            bhead_p?_s2_l$ = secondary/head_l$.idf
+            cond_p?_s2_l$ = secondary/conductance_l$.idf
+            bhead_p?_s3_l$ = tertiary/head_l$.idf
+            cond_p?_s3_l$ = tertiary/conductance_l$.idf"""
     )
     assert (
         group.render(directory, globaltimes=["?"], nlayer=nlayer, nrow=nrow, ncol=ncol)

@@ -50,14 +50,14 @@ def test_render(layerpropertyflow):
             ilpfcb = 0
             hdry = 1e+20
             layvka_l? = 0
-            laytyp_l1:3 = layer_type_l:.idf
-            layavg_l1:3 = interblock_l:.idf
-            chani_l1:3 = horizontal_anisotropy_l:.idf
-            hk_l1:3 = k_horizontal_l:.idf
-            vka_l1:3 = k_vertical_l:.idf
-            ss_l1:3 = specific_storage_l:.idf
-            sy_l1:3 = specific_yield_l:.idf
-            laywet_l1:3 = layer_wet_l:.idf"""
+            laytyp_l$ = layer_type_l$.idf
+            layavg_l$ = interblock_l$.idf
+            chani_l$ = horizontal_anisotropy_l$.idf
+            hk_l$ = k_horizontal_l$.idf
+            vka_l$ = k_vertical_l$.idf
+            ss_l$ = specific_storage_l$.idf
+            sy_l$ = specific_yield_l$.idf
+            laywet_l$ = layer_wet_l$.idf"""
     )
 
-    assert lpf._render(directory) == compare
+    assert lpf._render(directory, nlayer=3) == compare

@@ -182,6 +182,7 @@ def test_cached_river__save(test_timelayerda, tmp_path):
         directory=tmp_path / "cached-riv",
         globaltimes=cached_river["time"].values,
         system_index=1,
+        nlayer=5,
     )
     cached_river.save(tmp_path / "cached-riv")
     output_path = str(tmp_path / "cached-riv/**/*.idf")
@@ -211,6 +212,7 @@ def test_cached_river__save(test_timelayerda, tmp_path):
         directory=tmp_path / "cached-riv",
         globaltimes=cached_river["time"].values,
         system_index=1,
+        nlayer=5,
     )
     cached_river._filehashes["riv"] = cached_river._filehashself
     cached_river._reldir = pathlib.Path(".")

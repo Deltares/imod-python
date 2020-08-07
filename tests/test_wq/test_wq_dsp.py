@@ -35,13 +35,13 @@ def test_render_idf(dispersion):
     compare = textwrap.dedent(
         """\
         [dsp]
-            al_l1:3 = longitudinal_l:.idf
-            trpt_l1:3 = ratio_horizontal_l:.idf
-            trpv_l1:3 = ratio_vertical_l:.idf
-            dmcoef_l1:3 = diffusion_coefficient_l:.idf"""
+            al_l$ = longitudinal_l$.idf
+            trpt_l$ = ratio_horizontal_l$.idf
+            trpv_l$ = ratio_vertical_l$.idf
+            dmcoef_l$ = diffusion_coefficient_l$.idf"""
     )
 
-    assert dsp._render(directory) == compare
+    assert dsp._render(directory, nlayer=3) == compare
 
 
 def test_render_constant(dispersion):
@@ -57,7 +57,7 @@ def test_render_constant(dispersion):
             dmcoef_l? = 1.0"""
     )
 
-    assert dsp._render(directory) == compare
+    assert dsp._render(directory, nlayer=4) == compare
 
 
 def test_render_constant_per_layer(dispersion):
@@ -75,4 +75,4 @@ def test_render_constant_per_layer(dispersion):
             dmcoef_l1:3 = 1.0"""
     )
 
-    assert dsp._render(directory) == compare
+    assert dsp._render(directory, nlayer=3) == compare

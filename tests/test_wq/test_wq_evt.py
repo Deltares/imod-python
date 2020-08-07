@@ -99,7 +99,7 @@ def test_render__highest_top(evapotranspiration_top):
             exdp_p5 = extinction_depth_20000105000000.idf"""
     )
 
-    assert evt._render(directory, globaltimes=evt.time.values) == compare
+    assert evt._render(directory, globaltimes=evt.time.values, nlayer=3) == compare
 
 
 def test_render__layers(evapotranspiration_layers):
@@ -132,7 +132,7 @@ def test_render__layers(evapotranspiration_layers):
             ievt_p5 = evapotranspiration_layer_20000105000000.idf"""
     )
 
-    assert evt._render(directory, globaltimes=evt.time.values) == compare
+    assert evt._render(directory, globaltimes=evt.time.values, nlayer=3) == compare
 
 
 def test_render__highest_active(evapotranspiration_ha):
@@ -160,7 +160,7 @@ def test_render__highest_active(evapotranspiration_ha):
             exdp_p5 = extinction_depth_20000105000000.idf"""
     )
 
-    assert evt._render(directory, globaltimes=evt.time.values) == compare
+    assert evt._render(directory, globaltimes=evt.time.values, nlayer=3) == compare
 
 
 @pytest.mark.parametrize("varname", ["maximum_rate", "surface", "extinction_depth"])
@@ -176,4 +176,4 @@ def test_render__timemap(evapotranspiration_ha, varname):
 
     timemap = {datetimes[-1]: datetimes[0]}
     evt.add_timemap(**{varname: timemap})
-    actual = evt._render(directory, globaltimes=datetimes, system_index=1)
+    actual = evt._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)

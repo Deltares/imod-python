@@ -51,7 +51,9 @@ def test_render(well):
     wel_p4_s1_l2 = well/well_20000104000000_l2.ipf
     wel_p5_s1_l2 = well/well_20000105000000_l2.ipf"""
 
-    actual = wel._render(directory, globaltimes=wel["time"].values, system_index=1)
+    actual = wel._render(
+        directory, globaltimes=wel["time"].values, system_index=1, nlayer=3
+    )
     assert actual == compare
 
 
@@ -64,7 +66,7 @@ def test_render__notime_nolayer(well):
     compare = """
     wel_p?_s1_l? = well/well.ipf"""
 
-    actual = wel._render(directory, globaltimes=["?"], system_index=1)
+    actual = wel._render(directory, globaltimes=["?"], system_index=1, nlayer=3)
     assert actual == compare
 
 
@@ -76,7 +78,7 @@ def test_render__notime_layer(well):
     compare = """
     wel_p?_s1_l1:5 = well/well_l:.ipf"""
 
-    actual = wel._render(directory, globaltimes=["?"], system_index=1)
+    actual = wel._render(directory, globaltimes=["?"], system_index=1, nlayer=3)
     assert actual == compare
 
 
@@ -92,7 +94,7 @@ def test_render__time_nolayer(well):
     wel_p5_s1_l? = well/well_20000105000000.ipf"""
 
     assert (
-        wel._render(directory, globaltimes=wel["time"].values, system_index=1)
+        wel._render(directory, globaltimes=wel["time"].values, system_index=1, nlayer=3)
         == compare
     )
 
@@ -109,7 +111,9 @@ def test_render__time_layer(well):
     wel_p4_s1_l4 = well/well_20000104000000_l4.ipf
     wel_p5_s1_l5 = well/well_20000105000000_l5.ipf"""
 
-    actual = wel._render(directory, globaltimes=wel["time"].values, system_index=1)
+    actual = wel._render(
+        directory, globaltimes=wel["time"].values, system_index=1, nlayer=3
+    )
     assert actual == compare
 
 
@@ -135,7 +139,7 @@ def test_timemap__single_layer():
     wel_p4_s1_l1 = well/well_20000102000000_l1.ipf
     wel_p5_s1_l1 = well/well_20000101000000_l1.ipf"""
 
-    actual = wel._render(directory, globaltimes=datetimes, system_index=1)
+    actual = wel._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
     assert actual == compare
 
 
@@ -158,7 +162,7 @@ def test_timemap__multiple_layers():
     wel_p3_s1_l1:2 = well/well_20000101000000_l:.ipf
     wel_p4_s1_l1 = well/well_20000102000000_l1.ipf"""
 
-    actual = wel._render(directory, globaltimes=datetimes, system_index=1)
+    actual = wel._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
     assert actual == compare
 
 
@@ -173,7 +177,9 @@ def test_render_concentration(well_conc, tmp_path):
     wel_p4_s1_l2 = well/well_20000104000000_l2.ipf
     wel_p5_s1_l2 = well/well_20000105000000_l2.ipf"""
 
-    actual = wel._render(directory, globaltimes=wel["time"].values, system_index=1)
+    actual = wel._render(
+        directory, globaltimes=wel["time"].values, system_index=1, nlayer=3
+    )
     assert actual == compare
 
     # Test concentration
@@ -184,7 +190,7 @@ def test_render_concentration(well_conc, tmp_path):
     cwel_t1_p4_l2 = well/well-concentration_20000104000000_l2.ipf
     cwel_t1_p5_l2 = well/well-concentration_20000105000000_l2.ipf"""
 
-    actual = wel._render_ssm(directory, globaltimes=wel["time"].values)
+    actual = wel._render_ssm(directory, globaltimes=wel["time"].values, nlayer=3)
     assert actual == compare
 
 
@@ -199,7 +205,9 @@ def test_render_concentration_multiple_species(well_conc_multiple_species, tmp_p
     wel_p4_s1_l2 = well/well_20000104000000_l2.ipf
     wel_p5_s1_l2 = well/well_20000105000000_l2.ipf"""
 
-    actual = wel._render(directory, globaltimes=wel["time"].values, system_index=1)
+    actual = wel._render(
+        directory, globaltimes=wel["time"].values, system_index=1, nlayer=3
+    )
     assert actual == compare
 
     # Test concentration
@@ -215,7 +223,7 @@ def test_render_concentration_multiple_species(well_conc_multiple_species, tmp_p
     cwel_t2_p4_l2 = well/well-concentration_c2_20000104000000_l2.ipf
     cwel_t2_p5_l2 = well/well-concentration_c2_20000105000000_l2.ipf"""
 
-    actual = wel._render_ssm(directory, globaltimes=wel["time"].values)
+    actual = wel._render_ssm(directory, globaltimes=wel["time"].values, nlayer=3)
     assert actual == compare
 
 

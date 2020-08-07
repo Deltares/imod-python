@@ -32,7 +32,9 @@ def test_render(drainage):
     elevation_p?_s1_l1:3 = elevation_l:.idf
     cond_p?_s1_l1:3 = conductance_l:.idf"""
 
-    assert drn._render(directory, globaltimes=["?"], system_index=1) == compare
+    assert (
+        drn._render(directory, globaltimes=["?"], system_index=1, nlayer=4) == compare
+    )
 
 
 def test_render_with_time(drainage):
@@ -51,7 +53,10 @@ def test_render_with_time(drainage):
     elevation_p2_s1_l1:3 = elevation_20000102000000_l:.idf
     cond_p?_s1_l1:3 = conductance_l:.idf"""
 
-    assert drn._render(directory, globaltimes=datetimes, system_index=1) == compare
+    assert (
+        drn._render(directory, globaltimes=datetimes, system_index=1, nlayer=4)
+        == compare
+    )
 
 
 def test_render_with_timemap__elevation(drainage):
@@ -73,7 +78,7 @@ def test_render_with_timemap__elevation(drainage):
     elevation_p3_s1_l1:3 = elevation_20000101000000_l:.idf
     cond_p?_s1_l1:3 = conductance_l:.idf"""
 
-    actual = drn._render(directory, globaltimes=datetimes, system_index=1)
+    actual = drn._render(directory, globaltimes=datetimes, system_index=1, nlayer=4)
     assert actual == compare
 
     # Conductance does not depend on time, therefore cannot have a timemap
@@ -97,7 +102,9 @@ def test_compress_discontinuous_layers(drainage):
     cond_p?_s1_l3 = conductance_l3.idf
     cond_p?_s1_l5 = conductance_l5.idf"""
 
-    assert drn._render(directory, globaltimes=["?"], system_index=1) == compare
+    assert (
+        drn._render(directory, globaltimes=["?"], system_index=1, nlayer=4) == compare
+    )
 
 
 @pytest.mark.parametrize("varname", ["conductance", "elevation"])
@@ -113,4 +120,4 @@ def test_render__timemap(drainage, varname):
 
     timemap = {datetimes[-1]: datetimes[0]}
     drn.add_timemap(**{varname: timemap})
-    actual = drn._render(directory, globaltimes=datetimes, system_index=1)
+    actual = drn._render(directory, globaltimes=datetimes, system_index=1, nlayer=4)

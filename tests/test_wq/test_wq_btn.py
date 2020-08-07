@@ -43,16 +43,16 @@ def test_btn_render_arrays(basictransport):
                 mcomp = 1
                 thkmin = 0.01
                 cinact = 1e+30
-                sconc_t1_l1:3 = starting_concentration_l:.idf
-                icbund_l1:3 = icbund_l:.idf
-                dz_l1:3 = thickness_l:.idf
+                sconc_t1_l$ = starting_concentration_l$.idf
+                icbund_l$ = icbund_l$.idf
+                dz_l$ = thickness_l$.idf
                 prsity_l1:3 = 0.3"""
     )
 
     shape = btn["icbund"].shape
     thickness = xr.full_like(btn["icbund"], 1.0)
     btn["thickness"] = thickness
-    assert btn._render(directory) == compare
+    assert btn._render(directory, nlayer=3) == compare
 
 
 def test_btn_render_constants(basictransport):
@@ -71,11 +71,11 @@ def test_btn_render_constants(basictransport):
                 thkmin = 0.01
                 cinact = 1e+30
                 sconc_t1_l? = 0.0
-                icbund_l1:3 = icbund_l:.idf
+                icbund_l$ = icbund_l$.idf
                 dz_l1:3 = 10.0
                 prsity_l? = 0.3"""
     )
 
     thickness = xr.DataArray(np.full(3, 10.0), {"layer": layer}, dims=("layer",))
     btn["thickness"] = thickness
-    assert btn._render(directory) == compare
+    assert btn._render(directory, nlayer=3) == compare

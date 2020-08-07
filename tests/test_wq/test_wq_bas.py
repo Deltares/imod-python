@@ -41,11 +41,11 @@ def test_render(basicflow):
     compare = textwrap.dedent(
         """\
         [bas6]
-            ibound_l1:3 = ibound_l:.idf
+            ibound_l$ = ibound_l$.idf
             hnoflo = 1e+30
-            strt_l1:3 = starting_head_l:.idf"""
+            strt_l$ = starting_head_l$.idf"""
     )
-    assert bas._render(directory) == compare
+    assert bas._render(directory, nlayer=3) == compare
 
 
 def test_render_dis__scalartopbot(basicflow):
@@ -65,7 +65,7 @@ def test_render_dis__scalartopbot(basicflow):
             botm_l3 = 0.0
             laycbd_l? = 0"""
     )
-    assert bas._render_dis(directory) == compare
+    assert bas._render_dis(directory, nlayer=3) == compare
 
 
 def test_render_dis__arraytopbot(basicflow):
@@ -82,10 +82,10 @@ def test_render_dis__arraytopbot(basicflow):
             delc_r? = 1.0
             delr_c? = 1.0
             top = top.idf
-            botm_l1:3 = bottom_l:.idf
+            botm_l$ = bottom_l$.idf
             laycbd_l? = 0"""
     )
-    assert bas._render_dis(directory) == compare
+    assert bas._render_dis(directory, nlayer=3) == compare
 
 
 def test_render_dis__nonequidistant():
@@ -125,4 +125,4 @@ def test_render_dis__nonequidistant():
             botm_l3 = 0.0
             laycbd_l? = 0"""
     )
-    assert bas._render_dis(directory) == compare
+    assert bas._render_dis(directory, nlayer=3) == compare

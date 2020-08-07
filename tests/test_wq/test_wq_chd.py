@@ -29,10 +29,12 @@ def test_render(constanthead):
     directory = pathlib.Path(".")
 
     compare = """
-    shead_p?_s1_l1:3 = head_start_l:.idf
-    ehead_p?_s1_l1:3 = head_end_l:.idf"""
+    shead_p?_s1_l$ = head_start_l$.idf
+    ehead_p?_s1_l$ = head_end_l$.idf"""
 
-    assert chd._render(directory, globaltimes=["?"], system_index=1) == compare
+    assert (
+        chd._render(directory, globaltimes=["?"], system_index=1, nlayer=3) == compare
+    )
 
 
 @pytest.mark.parametrize("varname", ["head_start", "head_end"])
@@ -48,4 +50,4 @@ def test_render__timemap(constanthead, varname):
 
     timemap = {datetimes[-1]: datetimes[0]}
     chd.add_timemap(**{varname: timemap})
-    actual = chd._render(directory, globaltimes=datetimes, system_index=1)
+    actual = chd._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)

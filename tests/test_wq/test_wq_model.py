@@ -304,7 +304,10 @@ def test_render_pkg__gcg(basicmodel):
             cclose = 1e-06
             iprgcg = 0"""
     )
-    assert m._render_pkg("gcg", directory=directory, globaltimes=globaltimes) == compare
+    assert (
+        m._render_pkg("gcg", directory=directory, globaltimes=globaltimes, nlayer=3)
+        == compare
+    )
 
 
 def test_render_pkg__evt(basicmodel):
@@ -335,7 +338,10 @@ def test_render_pkg__evt(basicmodel):
             exdp_p4 = evt/extinction_depth_20000104000000.idf
             exdp_p5 = evt/extinction_depth_20000105000000.idf"""
     )
-    assert m._render_pkg("evt", directory=directory, globaltimes=globaltimes) == compare
+    assert (
+        m._render_pkg("evt", directory=directory, globaltimes=globaltimes, nlayer=3)
+        == compare
+    )
 
 
 def test_render_pkg__rch(basicmodel):
@@ -356,7 +362,10 @@ def test_render_pkg__rch(basicmodel):
             rech_p4 = rch/rate_20000104000000.idf
             rech_p5 = rch/rate_20000105000000.idf"""
     )
-    assert m._render_pkg("rch", directory=directory, globaltimes=globaltimes) == compare
+    assert (
+        m._render_pkg("rch", directory=directory, globaltimes=globaltimes, nlayer=3)
+        == compare
+    )
 
 
 def test_render_dis(basicmodel):
@@ -385,7 +394,9 @@ def test_render_dis(basicmodel):
             sstr_p? = tr
             tsmult_p? = 1.0"""
     )
-    assert m._render_dis(directory=directory, globaltimes=globaltimes) == compare
+    assert (
+        m._render_dis(directory=directory, globaltimes=globaltimes, nlayer=3) == compare
+    )
 
 
 def test_render_groups__ghb_riv_wel(basicmodel):
@@ -416,10 +427,10 @@ def test_render_groups__ghb_riv_wel(basicmodel):
             mrivsys = 1
             mxactr = 75
             irivcb = 0
-            stage_p?_s1_l1:3 = riv/stage_l:.idf
-            cond_p?_s1_l1:3 = riv/conductance_l:.idf
-            rbot_p?_s1_l1:3 = riv/bottom_elevation_l:.idf
-            rivssmdens_p?_s1_l1:3 = riv/density_l:.idf
+            stage_p?_s1_l$ = riv/stage_l$.idf
+            cond_p?_s1_l$ = riv/conductance_l$.idf
+            rbot_p?_s1_l$ = riv/bottom_elevation_l$.idf
+            rivssmdens_p?_s1_l$ = riv/density_l$.idf
 
         [wel]
             mwelsys = 1
@@ -435,7 +446,7 @@ def test_render_groups__ghb_riv_wel(basicmodel):
     ssm_compare = """
     cghb_t1_p?_l1:2 = 1.5
     cchd_t1_p?_l3 = 35.0
-    criv_t1_p?_l1:3 = riv/concentration_l:.idf"""
+    criv_t1_p?_l$ = riv/concentration_l$.idf"""
     content, ssm_content, n_sinkssources = m._render_groups(
         directory=directory, globaltimes=globaltimes
     )
@@ -497,15 +508,17 @@ def test_render_btn(basicmodel):
             mcomp = 1
             thkmin = 0.01
             cinact = 1e+30
-            sconc_t1_l1:3 = btn/starting_concentration_l:.idf
-            icbund_l1:3 = btn/icbund_l:.idf
+            sconc_t1_l$ = btn/starting_concentration_l$.idf
+            icbund_l$ = btn/icbund_l$.idf
             dz_l1:3 = 10.0
-            prsity_l1:3 = btn/porosity_l:.idf
+            prsity_l$ = btn/porosity_l$.idf
             tsmult_p? = 1.0
             dt0_p? = 0.0
             mxstrn_p? = 50000"""
     )
-    assert m._render_btn(directory=directory, globaltimes=globaltimes) == compare
+    assert (
+        m._render_btn(directory=directory, globaltimes=globaltimes, nlayer=3) == compare
+    )
 
 
 def test_render_ssm_rch_mal_tvc(basicmodel):
@@ -524,7 +537,9 @@ def test_render_ssm_rch_mal_tvc(basicmodel):
     cmal_t1_p?_l3 = mal/concentration_l3.idf
     ctvc_t1_p?_l3 = tvc/concentration_l3.idf"""
 
-    actual = m._render_ssm_rch_mal_tvc(directory=directory, globaltimes=globaltimes)
+    actual = m._render_ssm_rch_mal_tvc(
+        directory=directory, globaltimes=globaltimes, nlayer=3
+    )
     assert actual == compare
 
 
@@ -548,7 +563,9 @@ def test_render_ssm_rch_constant(basicmodel):
     m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert hasattr(m["rch"], "_ssm_layers")
 
-    actual = m._render_ssm_rch_mal_tvc(directory=directory, globaltimes=globaltimes)
+    actual = m._render_ssm_rch_mal_tvc(
+        directory=directory, globaltimes=globaltimes, nlayer=3
+    )
     assert actual == compare
 
     compare = """
@@ -561,7 +578,9 @@ def test_render_ssm_rch_constant(basicmodel):
     m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert hasattr(m["rch"], "_ssm_layers")
 
-    actual = m._render_ssm_rch_mal_tvc(directory=directory, globaltimes=globaltimes)
+    actual = m._render_ssm_rch_mal_tvc(
+        directory=directory, globaltimes=globaltimes, nlayer=3
+    )
     assert actual == compare
 
 

@@ -33,11 +33,13 @@ def test_render(headboundary):
     directory = pathlib.Path(".")
 
     compare = """
-    bhead_p?_s1_l1:3 = head_l:.idf
-    cond_p?_s1_l1:3 = conductance_l:.idf
-    ghbssmdens_p?_s1_l1:3 = density_l:.idf"""
+    bhead_p?_s1_l$ = head_l$.idf
+    cond_p?_s1_l$ = conductance_l$.idf
+    ghbssmdens_p?_s1_l$ = density_l$.idf"""
 
-    assert ghb._render(directory, globaltimes=["?"], system_index=1) == compare
+    assert (
+        ghb._render(directory, globaltimes=["?"], system_index=1, nlayer=3) == compare
+    )
 
 
 @pytest.mark.parametrize("varname", ["head", "conductance", "concentration", "density"])
@@ -53,5 +55,5 @@ def test_render__timemap(headboundary, varname):
 
     timemap = {datetimes[-1]: datetimes[0]}
     ghb.add_timemap(**{varname: timemap})
-    actual = ghb._render(directory, globaltimes=datetimes, system_index=1)
+    actual = ghb._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
     # TODO check result

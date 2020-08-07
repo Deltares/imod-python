@@ -59,12 +59,14 @@ def test_render(river):
     directory = pathlib.Path(".")
 
     compare = """
-    stage_p?_s1_l1:3 = stage_l:.idf
-    cond_p?_s1_l1:3 = conductance_l:.idf
-    rbot_p?_s1_l1:3 = bottom_elevation_l:.idf
-    rivssmdens_p?_s1_l1:3 = density_l:.idf"""
+    stage_p?_s1_l$ = stage_l$.idf
+    cond_p?_s1_l$ = conductance_l$.idf
+    rbot_p?_s1_l$ = bottom_elevation_l$.idf
+    rivssmdens_p?_s1_l$ = density_l$.idf"""
 
-    assert riv._render(directory, globaltimes=["?"], system_index=1) == compare
+    assert (
+        riv._render(directory, globaltimes=["?"], system_index=1, nlayer=3) == compare
+    )
 
 
 def test_render_multiple_scalar_concentration(river):
@@ -77,7 +79,7 @@ def test_render_multiple_scalar_concentration(river):
     compare = """
     criv_t1_p?_l? = 10.0
     criv_t2_p?_l? = 20.0"""
-    actual = riv._render_ssm(directory, globaltimes=["?"])
+    actual = riv._render_ssm(directory, globaltimes=["?"], nlayer=3)
     assert compare == actual
 
 
@@ -86,9 +88,9 @@ def test_render_multiple_array_concentration(river_multiple_species, tmp_path):
     directory = pathlib.Path(".")
 
     compare = """
-    criv_t1_p?_l1:3 = concentration_c1_l:.idf
-    criv_t2_p?_l1:3 = concentration_c2_l:.idf"""
-    actual = riv._render_ssm(directory, globaltimes=["?"])
+    criv_t1_p?_l$ = concentration_c1_l$.idf
+    criv_t2_p?_l$ = concentration_c2_l$.idf"""
+    actual = riv._render_ssm(directory, globaltimes=["?"], nlayer=3)
     assert compare == actual
 
 
@@ -136,4 +138,4 @@ def test_render__timemap(river, varname):
 
     timemap = {datetimes[-1]: datetimes[0]}
     riv.add_timemap(**{varname: timemap})
-    actual = riv._render(directory, globaltimes=datetimes, system_index=1)
+    actual = riv._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)

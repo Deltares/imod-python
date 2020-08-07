@@ -74,7 +74,7 @@ def test_render__highest_top(recharge_top):
             rech_p5 = rate_20000105000000.idf"""
     )
 
-    assert rch._render(directory, globaltimes=rch.time.values) == compare
+    assert rch._render(directory, globaltimes=rch.time.values, nlayer=3) == compare
 
 
 def test_render__layers(recharge_layers):
@@ -97,7 +97,7 @@ def test_render__layers(recharge_layers):
             irch_p5 = recharge_layer_20000105000000.idf"""
     )
 
-    assert rch._render(directory, globaltimes=rch.time.values) == compare
+    assert rch._render(directory, globaltimes=rch.time.values, nlayer=3) == compare
 
 
 def test_render__highest_active(recharge_ha):
@@ -115,7 +115,7 @@ def test_render__highest_active(recharge_ha):
             rech_p5 = rate_20000105000000.idf"""
     )
 
-    assert rch._render(directory, globaltimes=rch.time.values) == compare
+    assert rch._render(directory, globaltimes=rch.time.values, nlayer=3) == compare
 
 
 def test_ssm_cellcount_scalar_highest_active(recharge_ha):
@@ -156,4 +156,4 @@ def test_render__timemap(recharge_ha, varname):
 
     timemap = {datetimes[-1]: datetimes[0]}
     rch.add_timemap(**{varname: timemap})
-    actual = rch._render(directory, globaltimes=datetimes, system_index=1)
+    actual = rch._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
