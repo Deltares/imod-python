@@ -287,7 +287,7 @@ class Package(xr.Dataset, abc.ABC):
                 range_path = util.compose(d, pattern=pattern).as_posix()
                 range_path = range_path.replace("_l0", "_l:")
                 values = self._compress_idflayers(values, range_path)
-            else:
+            elif compress:
                 values = self._compress_values(values)
 
         return values
