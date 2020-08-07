@@ -6,3 +6,12 @@ imod.wq  -  Create Water Quality model
     :imported-members:
     :undoc-members:
     :show-inheritance:
+
+.. automodule:: imod.wq.model
+    :members: Model
+    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: imod.wq.pkgbase
+    :members:
+    :show-inheritance:
