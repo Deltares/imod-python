@@ -74,12 +74,12 @@ class Dispersion(Package):
         self["ratio_vertical"] = ratio_vertical
         self["diffusion_coefficient"] = diffusion_coefficient
 
-    def _render(self, directory, *args, **kwargs):
+    def _render(self, directory, nlayer, *args, **kwargs):
         d = {"mapping": self._mapping}
         dicts = {}
 
         for varname in self.data_vars.keys():
-            dicts[varname] = self._compose_values_layer(varname, directory)
+            dicts[varname] = self._compose_values_layer(varname, directory, nlayer=nlayer)
         d["dicts"] = dicts
 
         return self._template.render(d)

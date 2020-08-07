@@ -171,7 +171,7 @@ class LayerPropertyFlow(Package):
         self["method_wet"] = method_wet
         self["head_dry"] = head_dry
 
-    def _render(self, directory, *args, **kwargs):
+    def _render(self, directory, nlayer, *args, **kwargs):
         d = {}
         # Don't include absentee members
         mapping = tuple([(k, v) for k, v in self._mapping if v in self.data_vars])
@@ -181,7 +181,7 @@ class LayerPropertyFlow(Package):
         da_vars = [t[1] for t in self._mapping]
         for varname in self.data_vars.keys():
             if varname in da_vars:
-                dicts[varname] = self._compose_values_layer(varname, directory)
+                dicts[varname] = self._compose_values_layer(varname, directory, nlayer=nlayer)
             else:
                 d[varname] = self[varname].values
                 if varname == "save_budget" or varname == "method_wet":

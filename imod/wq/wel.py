@@ -104,7 +104,7 @@ class Well(BoundaryCondition):
         self._ssm_cellcount = nmax
         return nmax
 
-    def _compose_values_layer(self, directory, name, time=None, compress=True):
+    def _compose_values_layer(self, directory, nlayer, name, time=None, compress=True):
         values = {}
         d = {"directory": directory, "name": name, "extension": ".ipf"}
 
@@ -132,14 +132,19 @@ class Well(BoundaryCondition):
         if "layer" in self and compress:
             # Compose does not accept non-integers, so use 0, then replace
             d["layer"] = 0
-            range_path = imod.util.compose(d).as_posix()
-            range_path = range_path.replace("_l0", "_l:")
-            # TODO: temporarily disable until imod-wq is fixed
-            values = self._compress_idflayers(values, range_path)
+            if self["layer"].unique().size == nlayer:
+                token_path = imod.util.compose(d).as_posix()
+                token_path = token_path.replace("_l0", "_l$")
+                values = {"$": token_path}
+            else:
+                range_path = imod.util.compose(d).as_posix()
+                range_path = range_path.replace("_l0", "_l:")
+                # TODO: temporarily disable until imod-wq is fixed
+                values = self._compress_idflayers(values, range_path)
 
         return values
 
-    def _compose_values_time(self, directory, name, globaltimes):
+    def _compose_values_time(self, directory, name, globaltimes, nlayer):
         # TODO: rename to _compose_values_timelayer?
         values = {}
         if "time" in self:
@@ -162,19 +167,19 @@ class Well(BoundaryCondition):
                 # If does does, compress should be False
                 compress = not (":" in start_end)
                 values[start_end] = self._compose_values_layer(
-                    directory, name, time, compress=compress
+                    directory, nlayer=nlayer, name=name, time=time, compress=compress
                 )
         else:  # for all periods
-            values["?"] = self._compose_values_layer(directory, name)
+            values["?"] = self._compose_values_layer(directory, nlayer=nlayer, name=name)
         return values
 
-    def _render(self, directory, globaltimes, system_index):
+    def _render(self, directory, globaltimes, system_index, nlayer):
         d = {"system_index": system_index}
         name = directory.stem
-        d["wels"] = self._compose_values_time(directory, name, globaltimes)
+        d["wels"] = self._compose_values_time(directory, name, globaltimes, nlayer)
         return self._template.render(d)
 
-    def _render_ssm(self, directory, globaltimes):
+    def _render_ssm(self, directory, globaltimes, nlayer):
         if "concentration" in self.data_vars:
             d = {"pkg_id": self._pkg_id}
             name = f"{directory.stem}-concentration"
@@ -182,11 +187,11 @@ class Well(BoundaryCondition):
                 concentration = {}
                 for species in self["concentration"]["species"].values:
                     concentration[species] = self._compose_values_time(
-                        directory, f"{name}_c{species}", globaltimes
+                        directory, f"{name}_c{species}", globaltimes, nlayer=nlayer
                     )
             else:
                 concentration = {
-                    1: self._compose_values_time(directory, name, globaltimes)
+                    1: self._compose_values_time(directory, name, globaltimes, nlayer=nlayer)
                 }
             d["concentration"] = concentration
             return self._ssm_template.render(d)

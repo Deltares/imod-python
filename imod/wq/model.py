@@ -336,7 +336,7 @@ class SeawatModel(Model):
         d["start_date"] = start_date
         return self._gen_template.render(d)
 
-    def _render_pkg(self, key, directory, globaltimes):
+    def _render_pkg(self, key, directory, globaltimes, nlayer):
         """
         Rendering method for straightforward packages
         """
@@ -349,14 +349,14 @@ class SeawatModel(Model):
             else:
                 raise ValueError(f"No {key} package provided.")
         return self[pkgkey]._render(
-            directory=directory / pkgkey, globaltimes=globaltimes
+            directory=directory / pkgkey, globaltimes=globaltimes, nlayer=nlayer
         )
 
-    def _render_dis(self, directory, globaltimes):
+    def _render_dis(self, directory, globaltimes, nlayer):
         baskey = self._get_pkgkey("bas6")
         diskey = self._get_pkgkey("dis")
         lpfkey = self._get_pkgkey("lpf")
-        bas_content = self[baskey]._render_dis(directory=directory.joinpath(baskey))
+        bas_content = self[baskey]._render_dis(directory=directory.joinpath(baskey), nlayer=nlayer)
         dis_content = self[diskey]._render(globaltimes=globaltimes)
         return bas_content + dis_content
 
@@ -371,7 +371,7 @@ class SeawatModel(Model):
             ]
         )
         ssm_content = "".join(
-            [group.render_ssm(directory, globaltimes) for group in package_groups]
+            [group.render_ssm(directory, globaltimes, nlayer) for group in package_groups]
         )
 
         # Calculate number of sinks and sources
@@ -392,7 +392,7 @@ class SeawatModel(Model):
             self[pksfkey]._compute_load_balance_weight(self[baskey]["ibound"])
             return self[pksfkey]._render(directory=directory.joinpath(pksfkey))
 
-    def _render_btn(self, directory, globaltimes):
+    def _render_btn(self, directory, globaltimes, nlayer):
         baskey = self._get_pkgkey("bas6")
         btnkey = self._get_pkgkey("btn")
         diskey = self._get_pkgkey("dis")
@@ -400,7 +400,7 @@ class SeawatModel(Model):
 
         if btnkey is None:
             raise ValueError("No BasicTransport package provided.")
-        btn_content = self[btnkey]._render(directory=directory.joinpath(btnkey))
+        btn_content = self[btnkey]._render(directory=directory.joinpath(btnkey), nlayer=nlayer)
         dis_content = self[diskey]._render_btn(globaltimes=globaltimes)
         return btn_content + dis_content
 
@@ -418,12 +418,12 @@ class SeawatModel(Model):
             self[pkstkey]._compute_load_balance_weight(self[baskey]["ibound"])
             return self[pkstkey]._render(directory=directory / pkstkey)
 
-    def _render_ssm_rch_mal_tvc(self, directory, globaltimes):
+    def _render_ssm_rch_mal_tvc(self, directory, globaltimes, nlayer):
         out = ""
         for key, pkg in self.items():
             if pkg._pkg_id in ("rch", "mal", "tvc"):
                 out += pkg._render_ssm(
-                    directory=directory / key, globaltimes=globaltimes
+                    directory=directory / key, globaltimes=globaltimes, nlayer=nlayer
                 )
         return out
 
@@ -454,6 +454,8 @@ class SeawatModel(Model):
         """
         diskey = self._get_pkgkey("dis")
         globaltimes = self[diskey]["time"].values
+        baskey = self._get_pkgkey("bas6")
+        nlayer = self[baskey]["layer"].size
 
         content = []
         content.append(
@@ -464,11 +466,11 @@ class SeawatModel(Model):
                 result_dir=result_dir,
             )
         )
-        content.append(self._render_dis(directory=directory, globaltimes=globaltimes))
+        content.append(self._render_dis(directory=directory, globaltimes=globaltimes, nlayer=nlayer))
         # Modflow
         for key in ("bas6", "oc", "lpf", "rch", "evt"):
             content.append(
-                self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
+                self._render_pkg(key=key, directory=directory, globaltimes=globaltimes, nlayer=nlayer)
             )
 
         # multi-system package group: chd, drn, ghb, riv, wel
@@ -479,7 +481,7 @@ class SeawatModel(Model):
         n_sinkssources += self._bas_btn_rch_evt_mal_tvc_sinkssources()
         # Add recharge, mass loading, time varying constant concentration to ssm_content
         ssm_content += self._render_ssm_rch_mal_tvc(
-            directory=directory, globaltimes=globaltimes
+            directory=directory, globaltimes=globaltimes, nlayer=nlayer
         )
 
         # Wrap up modflow part
@@ -489,7 +491,6 @@ class SeawatModel(Model):
         # MT3D and Seawat settings
         # Make an estimate of the required number of particles.
         advkey = self._get_pkgkey("adv")
-        baskey = self._get_pkgkey("bas6")
         if isinstance(self[advkey], (imod.wq.AdvectionMOC, imod.wq.AdvectionHybridMOC)):
             ibound = self[baskey]["ibound"]
             cell_max_nparticles = self[advkey]["cell_max_nparticles"]
@@ -497,10 +498,10 @@ class SeawatModel(Model):
                 np.product(ibound.shape) * 0.5 * cell_max_nparticles
             )
 
-        content.append(self._render_btn(directory=directory, globaltimes=globaltimes))
+        content.append(self._render_btn(directory=directory, globaltimes=globaltimes, nlayer=nlayer))
         for key in ("vdf", "adv", "dsp"):
             content.append(
-                self._render_pkg(key=key, directory=directory, globaltimes=globaltimes)
+                self._render_pkg(key=key, directory=directory, globaltimes=globaltimes, nlayer=nlayer)
             )
         ssm_content = f"[ssm]\n    mxss = {n_sinkssources}" + ssm_content
 

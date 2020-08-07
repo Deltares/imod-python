@@ -64,14 +64,15 @@ class PackageGroup(collections.UserDict, abc.ABC):
                     directory=directory.joinpath(key),
                     globaltimes=globaltimes,
                     system_index=system_index,
+                    nlayer=nlayer,
                 )
             )
         return "".join(content)
 
-    def render_ssm(self, directory, globaltimes):
+    def render_ssm(self, directory, globaltimes, nlayer):
         # Only render for the first system, that has concentrations defined.
         key = self.first_key
-        return self[key]._render_ssm(directory.joinpath(key), globaltimes)
+        return self[key]._render_ssm(directory.joinpath(key), globaltimes, nlayer=nlayer)
 
 
 class ConstantHeadGroup(PackageGroup):

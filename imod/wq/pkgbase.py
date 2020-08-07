@@ -187,7 +187,7 @@ class Package(xr.Dataset, abc.ABC):
         return compressed
 
     def _compose_values_layer(
-        self, varname, directory, time=None, da=None, compress=True
+        self, varname, directory, nlayer, time=None, da=None, compress=True
     ):
         """
         Composes paths to files, or gets the appropriate scalar value for
@@ -275,7 +275,13 @@ class Package(xr.Dataset, abc.ABC):
 
         # Compress the runfile contents using the imod-wq macros
         if "layer" in da.dims and compress:
-            if idf:
+            if idf and da["layer"].size == nlayer:
+                # Compose does not accept non-integers, so use 0, then replace
+                d["layer"] = 0
+                token_path = util.compose(d, pattern=pattern).as_posix()
+                token_path = token_path.replace("_l0", "_l$")
+                values = {"$": token_path}
+            elif idf:
                 # Compose does not accept non-integers, so use 0, then replace
                 d["layer"] = 0
                 range_path = util.compose(d, pattern=pattern).as_posix()
@@ -451,7 +457,7 @@ class BoundaryCondition(Package, abc.ABC):
             }
             self[varname].attrs["timemap"] = d
 
-    def _compose_values_timelayer(self, varname, globaltimes, directory, da=None):
+    def _compose_values_timelayer(self, varname, globaltimes, directory, nlayer, da=None):
         """
         Composes paths to files, or gets the appropriate scalar value for
         a single variable in a dataset.
@@ -509,11 +515,11 @@ class BoundaryCondition(Package, abc.ABC):
                 # If does does, compress should be False
                 compress = not (":" in start_end)
                 values[start_end] = self._compose_values_layer(
-                    varname, directory, time=time, da=da, compress=compress
+                    varname, directory, nlayer=nlayer, time=time, da=da, compress=compress
                 )
 
         else:
-            values["?"] = self._compose_values_layer(varname, directory, da=da)
+            values["?"] = self._compose_values_layer(varname, directory, nlayer=nlayer, da=da)
 
         return values
 
@@ -569,7 +575,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         return nmax
 
-    def _render(self, directory, globaltimes, system_index):
+    def _render(self, directory, globaltimes, system_index, nlayer):
         """
         Parameters
         ----------
@@ -600,14 +606,14 @@ class BoundaryCondition(Package, abc.ABC):
             if varname == "concentration":
                 continue
             dicts[varname] = self._compose_values_timelayer(
-                varname, globaltimes, directory
+                varname, globaltimes, directory, nlayer=nlayer
             )
 
         d["dicts"] = dicts
 
         return self._template.render(d)
 
-    def _render_ssm(self, directory, globaltimes):
+    def _render_ssm(self, directory, globaltimes, nlayer):
         """
         Parameters
         ----------
@@ -637,6 +643,7 @@ class BoundaryCondition(Package, abc.ABC):
                     da=self["concentration"].sel(species=species),
                     globaltimes=globaltimes,
                     directory=directory,
+                    nlayer=nlayer,
                 )
         else:
             concentration = {
@@ -645,6 +652,7 @@ class BoundaryCondition(Package, abc.ABC):
                     da=self["concentration"],
                     globaltimes=globaltimes,
                     directory=directory,
+                    nlayer=nlayer,
                 )
             }
         d["concentration"] = concentration

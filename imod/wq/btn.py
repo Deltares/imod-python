@@ -109,7 +109,7 @@ class BasicTransport(Package):
         self["inactive_concentration"] = inactive_concentration
         self["minimum_active_thickness"] = minimum_active_thickness
 
-    def _render(self, directory):
+    def _render(self, directory, nlayer):
         """
         Renders part of [btn] section that does not depend on time,
         and can be inferred without checking the BoundaryConditions.
@@ -137,13 +137,13 @@ class BasicTransport(Package):
             ):
                 da = self["starting_concentration"].sel(species=species)
                 starting_concentration[i + 1] = self._compose_values_layer(
-                    "starting_concentration", directory, da=da
+                    "starting_concentration", directory, nlayer=nlayer, da=da
                 )
 
             d["starting_concentration"] = starting_concentration
         else:
             d["starting_concentration"] = {
-                1: self._compose_values_layer("starting_concentration", directory)
+                1: self._compose_values_layer("starting_concentration", directory, nlayer=nlayer)
             }
 
         # Collect which entries are complex (multi-dim)
@@ -152,14 +152,14 @@ class BasicTransport(Package):
             if varname == "starting_concentration":
                 continue  # skip it, as mentioned above
             if varname in data_vars:  # multi-dim entry
-                dicts[varname] = self._compose_values_layer(varname, directory)
+                dicts[varname] = self._compose_values_layer(varname, directory, nlayer=nlayer)
             else:  # simple entry, just get the scalar value
                 d[varname] = self[varname].values
 
         # Add these from the outside, thickness from BasicFlow
         # layer_type from LayerPropertyFlow
         dicts["thickness"] = self._compose_values_layer(
-            "thickness", directory, da=self.thickness
+            "thickness", directory, nlayer=nlayer, da=self.thickness
         )
         d["dicts"] = dicts
         return self._template.render(d)

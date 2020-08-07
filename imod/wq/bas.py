@@ -78,13 +78,13 @@ class BasicFlow(Package):
         if not len(ibound.shape) == 3:
             raise ValueError
 
-    def _render(self, directory, *args, **kwargs):
+    def _render(self, directory, nlayer, *args, **kwargs):
         """
         Renders part of runfile that ends up under [bas] section.
         """
         d = {}
         for varname in ("ibound", "starting_head"):
-            d[varname] = self._compose_values_layer(varname, directory)
+            d[varname] = self._compose_values_layer(varname, directory, nlayer)
         d["inactive_head"] = self["inactive_head"].values
 
         return self._template.render(d)
@@ -130,13 +130,13 @@ class BasicFlow(Package):
                 d[f"{s}:{e}"] = value
         return d
 
-    def _render_dis(self, directory):
+    def _render_dis(self, directory, nlayer):
         """
         Renders part of runfile that ends up under [dis] section.
         """
         d = {}
         d["top"] = self._compose_top(directory)
-        d["bottom"] = self._compose_values_layer("bottom", directory)
+        d["bottom"] = self._compose_values_layer("bottom", directory, nlayer)
         d["nlay"], d["nrow"], d["ncol"] = self["ibound"].shape
         # TODO: check dx > 0, dy < 0?
         # TODO: add non-equidistant support
