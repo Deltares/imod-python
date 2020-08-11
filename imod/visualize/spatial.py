@@ -74,7 +74,7 @@ def plot_map(
     basemap=None,
     kwargs_raster=None,
     kwargs_colorbar=None,
-    kwargs_basemap=None,
+    kwargs_basemap={},
     figsize=None,
     return_cbar=False,
 ):
