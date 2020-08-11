@@ -12,6 +12,7 @@ dependencies:
   - black
   - bottleneck
   - cftime>=1
+  - contextily>=1
   - cytoolz
   - dask
   - geopandas

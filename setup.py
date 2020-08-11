@@ -45,7 +45,14 @@ setup(
             "sphinx",
             "sphinx_rtd_theme",
         ],
-        "optional": ["geopandas", "pyvista", "rasterio>=1", "zarr", "bottleneck"],
+        "optional": [
+            "geopandas",
+            "pyvista",
+            "rasterio>=1",
+            "zarr",
+            "bottleneck",
+            "contextily>=1",
+        ],
     },
     classifiers=[
         # https://pypi.python.org/pypi?%3Aaction=list_classifiers

@@ -17,6 +17,12 @@ try:
     import geopandas as gpd
 except ImportError:
     pass
+# contextily is an optional dependency
+try:
+    import contextily as ctx
+except ImportError:
+    ctx = None
+    pass
 
 
 def read_imod_legend(path):
@@ -65,8 +71,10 @@ def plot_map(
     colors,
     levels,
     overlays=[],
+    basemap=None,
     kwargs_raster=None,
     kwargs_colorbar=None,
+    kwargs_basemap=None,
     figsize=None,
     return_cbar=False,
 ):
@@ -93,10 +101,20 @@ def plot_map(
     overlays : list of dicts, optional
         Dicts contain geodataframe (key is "gdf"), and the keyword arguments
         for plotting the geodataframe.
+    basemap : bool or contextily._providers.TileProvider, optional
+        When `True` or a `contextily._providers.TileProvider` object: plot a 
+        translucent basemap over the plot.  If `basemap=True`, then 
+        `Stamen.TonerLite` is used as provider. If not set explicitly 
+        through kwargs_basemap, plot_map() will try and infer the crs from 
+        the raster or overlays, or fall back to EPSG:28992 (Amersfoort/RDnew).
+
+        *requires contextily*
     kwargs_raster : dict of keyword arguments, optional
         These arguments are forwarded to ax.imshow()
     kwargs_colorbar : dict of keyword arguments, optional
         These arguments are forwarded to fig.colorbar()
+    kwargs_basemap : dict of keyword arguments, optional
+        These arguments are forwarded to contextily.add_basemap()
     figsize : tuple of two floats or integers, optional
         This is used in plt.subplots(figsize)
     return_cbar : boolean, optional
@@ -179,6 +197,32 @@ def plot_map(
         tmp = overlay.copy()
         gdf = tmp.pop("gdf")
         gdf.plot(ax=ax, **tmp)
+
+    # Add basemap
+    if basemap is not None:
+        if ctx is None:
+            raise ImportError("Module contextily is required for adding basemaps")
+
+        if "crs" in kwargs_basemap:
+            crs = kwargs_basemap.pop("crs")
+        elif "crs" in raster.attrs:
+            crs = raster.attrs["crs"].to_string()
+        elif len(overlays):
+            for overlay in overlays:
+                if "crs" in overlay["gdf"]:
+                    crs = overlay["gdf"].crs.to_string()
+                    break
+        else:
+            crs = "EPSG:28992"  # default Amersfoort/RDnew
+
+        if isinstance(basemap, bool):
+            source = ctx.providers["Stamen"]["TonerLite"]
+        else:
+            source = basemap
+        if "alpha" not in kwargs_basemap:
+            kwargs_basemap["alpha"] = 0.4
+
+        ctx.add_basemap(ax=ax, source=source, crs=crs, **kwargs_basemap)
 
     # Return
     if return_cbar:
