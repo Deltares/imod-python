@@ -104,17 +104,17 @@ def plot_map(
     basemap : bool or contextily._providers.TileProvider, optional
         When `True` or a `contextily._providers.TileProvider` object: plot a 
         translucent basemap over the plot.  If `basemap=True`, then 
-        `Stamen.TonerLite` is used as provider. If not set explicitly 
+        `CartoDB.Positron` is used as provider. If not set explicitly 
         through kwargs_basemap, plot_map() will try and infer the crs from 
         the raster or overlays, or fall back to EPSG:28992 (Amersfoort/RDnew).
-
         *requires contextily*
     kwargs_raster : dict of keyword arguments, optional
         These arguments are forwarded to ax.imshow()
     kwargs_colorbar : dict of keyword arguments, optional
         These arguments are forwarded to fig.colorbar()
     kwargs_basemap : dict of keyword arguments, optional
-        These arguments are forwarded to contextily.add_basemap()
+        Except for "alpha", these arguments are forwarded to contextily.add_basemap(). 
+        Parameter "alpha" controls the transparency of raster.
     figsize : tuple of two floats or integers, optional
         This is used in plt.subplots(figsize)
     return_cbar : boolean, optional
@@ -144,6 +144,9 @@ def plot_map(
 
     # raster kwargs
     settings_raster = {"interpolation": "nearest", "extent": [xmin, xmax, ymin, ymax]}
+    # if basemap: set alpha
+    if basemap is not None:
+        settings_raster["alpha"] = kwargs_basemap.pop("alpha", 0.7)
     if kwargs_raster is not None:
         settings_raster.update(kwargs_raster)
 
@@ -174,7 +177,7 @@ def plot_map(
         raster = raster.isel(y=flip)
 
     # Plot raster
-    ax1 = ax.imshow(raster, cmap=cmap, norm=norm, **settings_raster)
+    ax1 = ax.imshow(raster, cmap=cmap, norm=norm, zorder=1, **settings_raster)
 
     # Set ax imits
     ax.set_xlim(xmin, xmax)
@@ -216,11 +219,9 @@ def plot_map(
             crs = "EPSG:28992"  # default Amersfoort/RDnew
 
         if isinstance(basemap, bool):
-            source = ctx.providers["Stamen"]["TonerLite"]
+            source = ctx.providers["CartoDB"]["Positron"]
         else:
             source = basemap
-        if "alpha" not in kwargs_basemap:
-            kwargs_basemap["alpha"] = 0.4
 
         ctx.add_basemap(ax=ax, source=source, crs=crs, **kwargs_basemap)
 
