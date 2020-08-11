@@ -144,9 +144,18 @@ def plot_map(
     Plot with an overlay:
     
     >>> overlays = [{"gdf": geodataframe, "edgecolor": "black", "facecolor": "None"}]
-    >>> imod.visualize.spatial.plot_map(raster, legend, overlays)
+    >>> imod.visualize.plot_map(raster, colors, levels, overlays)
 
-    Label the colorbar and the colorbar ticks
+    Label the colorbar:
+
+    >>> imod.visualize.plot_map(raster, colors, levels, kwargs_colorbar={"label":"Head aquifer (m)"})
+
+    Plot with a basemap:
+
+    >>> import contextily as ctx
+    >>> src = ctx.providers.Stamen.TonerLite
+    >>> imod.visualize.plot_map(raster, colors, levels, basemap=src, kwargs_basemap={"alpha":0.6})
+
     """
     # Read legend settings
     cmap, norm = common._cmapnorm_from_colorslevels(colors, levels)
