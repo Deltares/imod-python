@@ -66,6 +66,19 @@ def read_imod_legend(path):
     return colors, levels
 
 
+def _crs2string(crs):
+    if isinstance(crs, str):
+        if "epsg" in crs.lower():
+            return crs
+    try:
+        return crs.to_string()
+    except AttributeError:
+        try:
+            return crs["init"]
+        except KeyError:
+            return crs
+
+
 def plot_map(
     raster,
     colors,
@@ -83,8 +96,7 @@ def plot_map(
     ----------
     raster : xr.DataArray
         2D grid to plot.
-    colors : list of str, list of RGBA/RGBA tuples, colormap name (str), or
-	    LinearSegmentedColormap
+    colors : list of str, list of RGBA/RGBA tuples, colormap name (str), or LinearSegmentedColormap
         If list, it should be a Matplotlib acceptable list of colors. Length N.
         Accepts both tuples of (R, G, B) and hexidecimal (e.g. `#7ec0ee`).
 		If str, use an existing Matplotlib colormap. This function will
@@ -131,7 +143,7 @@ def plot_map(
     --------
     Plot with an overlay:
     
-    >>> overlays = [{"gdf": geodataframe, "edgecolor": "black"}]
+    >>> overlays = [{"gdf": geodataframe, "edgecolor": "black", "facecolor": "None"}]
     >>> imod.visualize.spatial.plot_map(raster, legend, overlays)
 
     Label the colorbar and the colorbar ticks
@@ -206,17 +218,17 @@ def plot_map(
         if ctx is None:
             raise ImportError("Module contextily is required for adding basemaps")
 
-        if "crs" in kwargs_basemap:
-            crs = kwargs_basemap.pop("crs")
-        elif "crs" in raster.attrs:
-            crs = raster.attrs["crs"].to_string()
-        elif len(overlays):
-            for overlay in overlays:
-                if "crs" in overlay["gdf"]:
-                    crs = overlay["gdf"].crs.to_string()
-                    break
-        else:
-            crs = "EPSG:28992"  # default Amersfoort/RDnew
+        crs = "EPSG:28992"  # default Amersfoort/RDnew
+        try:
+            crs = _crs2string(kwargs_basemap.pop("crs"))
+        except (KeyError, AttributeError):
+            try:
+                crs = _crs2string(raster.attrs["crs"])
+            except (KeyError, AttributeError):
+                for overlay in overlays:
+                    if "crs" in overlay["gdf"]:
+                        crs = _crs2string(overlay["gdf"].crs)
+                        break
 
         if isinstance(basemap, bool):
             source = ctx.providers["CartoDB"]["Positron"]
