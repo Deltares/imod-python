@@ -425,3 +425,20 @@ def cd(path):
         yield
     finally:
         os.chdir(curdir)
+
+
+@contextlib.contextmanager
+def ignore_warnings():
+    """
+    Contextmanager to ignore RuntimeWarnings as they are frequently
+    raised by the Dask delayed scheduler.
+
+    Examples
+    --------
+    >>> with imod.util.ignore_warnings():
+            function_that_throws_warnings()
+
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        yield
