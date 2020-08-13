@@ -115,11 +115,13 @@ def plot_map(
         for plotting the geodataframe.
     basemap : bool or contextily._providers.TileProvider, optional
         When `True` or a `contextily._providers.TileProvider` object: plot a 
-        translucent basemap over the plot.  If `basemap=True`, then 
-        `CartoDB.Positron` is used as provider. If not set explicitly 
-        through kwargs_basemap, plot_map() will try and infer the crs from 
-        the raster or overlays, or fall back to EPSG:28992 (Amersfoort/RDnew).
-        *requires contextily*
+        basemap as a background for the plot and make the raster translucent. 
+        If `basemap=True`, then `CartoDB.Positron` is used as the default provider. 
+        If not set explicitly through kwargs_basemap, plot_map() will try and infer 
+        the crs from the raster or overlays, or fall back to EPSG:28992 (Amersfoort/RDnew).
+        
+        *Requires contextily*
+
     kwargs_raster : dict of keyword arguments, optional
         These arguments are forwarded to ax.imshow()
     kwargs_colorbar : dict of keyword arguments, optional
@@ -217,10 +219,10 @@ def plot_map(
     cbar = fig.colorbar(ax1, cmap=cmap, norm=norm, cax=cbar_ax, **settings_cbar)
 
     # Add overlays
-    for overlay in overlays:
+    for i, overlay in enumerate(overlays):
         tmp = overlay.copy()
         gdf = tmp.pop("gdf")
-        gdf.plot(ax=ax, **tmp)
+        gdf.plot(ax=ax, zorder=2 + i, **tmp)
 
     # Add basemap
     if basemap is not None:
