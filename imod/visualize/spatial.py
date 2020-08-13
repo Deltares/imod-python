@@ -159,6 +159,12 @@ def plot_map(
     >>> imod.visualize.plot_map(raster, colors, levels, basemap=src, kwargs_basemap={"alpha":0.6})
 
     """
+    # Account for both None or False to skip adding a basemap
+    if basemap is None or (isinstance(basemap, bool) and not basemap):
+        add_basemap = False
+    else:
+        add_basemap = True
+
     # Read legend settings
     cmap, norm = common._cmapnorm_from_colorslevels(colors, levels)
 
@@ -167,8 +173,8 @@ def plot_map(
 
     # raster kwargs
     settings_raster = {"interpolation": "nearest", "extent": [xmin, xmax, ymin, ymax]}
-    # if basemap: set alpha
-    if basemap is not None:
+    # if a basemap is added: set alpha of raster
+    if add_basemap:
         settings_raster["alpha"] = kwargs_basemap.pop("alpha", 0.7)
     if kwargs_raster is not None:
         settings_raster.update(kwargs_raster)
@@ -224,8 +230,8 @@ def plot_map(
         gdf = tmp.pop("gdf")
         gdf.plot(ax=ax, zorder=2 + i, **tmp)
 
-    # Add basemap
-    if basemap is not None:
+    # Add basemap, if basemap is neither None nor False
+    if add_basemap:
         if ctx is None:
             raise ImportError("Module contextily is required for adding basemaps")
 
