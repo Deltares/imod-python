@@ -165,11 +165,9 @@ def test_simulation_write(uzf_model, tmp_path):
     with imod.util.cd(modeldir):
         p = subprocess.run("mf6", check=True, capture_output=True, text=True)
         assert p.stdout.endswith("Normal termination of simulation.\n")
-        # hds file is identical to the official example, except for the
-        # time units, which are days here and seconds in the official one
         head = imod.mf6.open_hds("GWF_1/GWF_1.hds", "GWF_1/dis.dis.grb")
         assert head.dims == ("time", "layer", "y", "x")
         assert head.shape == (47, 7, 9, 9)
         meanhead = head.mean().values
-        mean_answer = 0.65853157
+        mean_answer = 17.32092902
         assert np.allclose(meanhead, mean_answer)

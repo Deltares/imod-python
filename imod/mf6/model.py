@@ -29,7 +29,7 @@ class GroundwaterFlowModel(Model):
 
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
-        env = jinja2.Environment(loader=loader)
+        env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         self._template = env.get_template("gwf-nam.j2")
 
     def __init__(self, newton=False, under_relaxation=False):
