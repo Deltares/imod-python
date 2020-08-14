@@ -41,7 +41,7 @@ class Package(xr.Dataset, abc.ABC):
     @staticmethod
     def _initialize_template(pkg_id):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
-        env = jinja2.Environment(loader=loader)
+        env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         if pkg_id == "ims":
             fname = "sln-ims.j2"
         elif pkg_id == "tdis":

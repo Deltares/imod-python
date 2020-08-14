@@ -37,6 +37,7 @@ def test_render():
           inner_rclose 0.001
           linear_acceleration cg
           relaxation_factor 0.97
-        end linear"""
+        end linear
+        """
     )
     assert expected == actual

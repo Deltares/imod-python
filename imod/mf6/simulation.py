@@ -12,7 +12,7 @@ import imod
 class Modflow6Simulation(collections.UserDict):
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
-        env = jinja2.Environment(loader=loader)
+        env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         self._template = env.get_template("sim-nam.j2")
 
     def __init__(self, name):

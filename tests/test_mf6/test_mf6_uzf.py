@@ -185,8 +185,7 @@ def test_render():
     begin period 4
       open/close mymodel/uzf/uzf-3.bin
     end period
-        
-    
-     """
+
+    """
     )
     assert actual == expected
