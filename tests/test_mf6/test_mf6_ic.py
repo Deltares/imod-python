@@ -16,6 +16,7 @@ def test_render():
         begin griddata
           strt
             constant 0.0
-        end griddata"""
+        end griddata
+        """
     )
     assert actual == expected

@@ -368,7 +368,7 @@ def _lower(colnames):
     return lowered_colnames
 
 
-def write_assoc(path, df, itype=1, nodata=1.0e20):
+def write_assoc(path, df, itype=1, nodata=1.0e20, assoc_columns=None):
     """
     Writes a single IPF associated (TXT) file.
 
@@ -390,6 +390,10 @@ def write_assoc(path, df, itype=1, nodata=1.0e20):
         The value given to nodata values. These are generally NaN (Not-a-Number)
         in pandas, but this leads to errors in iMOD(FLOW) for IDFs.
         Defaults to value of 1.0e20 instead.
+    assoc_columns : optional, list or dict
+        Columns to store in the associated file. In case of a dictionary, the
+        columns will be renamed according to the mapping in the dictionary.
+        Defaults to None.
 
     Returns
     -------
@@ -415,6 +419,11 @@ def write_assoc(path, df, itype=1, nodata=1.0e20):
         colnames.remove(colname)
         columnorder.append(colname)
     columnorder += colnames
+
+    # Check if columns have to be renamed
+    if isinstance(assoc_columns, dict):
+        columnorder = [assoc_columns[col] for col in columnorder]
+        df = df.rename(columns=assoc_columns)
 
     nrecords, nfields = df.shape
     with open(path, "w") as f:
@@ -479,7 +488,7 @@ def _is_single_value(group):
     return len(pd.unique(group)) == 1
 
 
-def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20):
+def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20, assoc_columns=None):
     """
     When itype is not None, breaks down the pandas DataFrame into its IPF part
     and its associated TXT files, creating the IPF data structure.
@@ -506,6 +515,10 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20):
         The value given to nodata values. These are generally NaN (Not-a-Number)
         in pandas, but this leads to errors in iMOD(FLOW) for IDFs.
         Defaults to value of 1.0e20 instead.
+    assoc_columns : optional, list or dict
+        Columns to store in the associated file. In case of a dictionary, the
+        columns will be renamed according to the mapping in the dictionary.
+        Defaults to None.
 
     Returns
     -------
@@ -538,9 +551,16 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20):
         for idcode, group in grouped:
             assoc_path = path.parent.joinpath(str(idcode) + "." + str(assoc_ext))
             assoc_path.parent.mkdir(parents=True, exist_ok=True)
-            selection = [colname for colname in colnames if colname not in ipf_columns]
+            if isinstance(assoc_columns, list):
+                selection = assoc_columns
+            elif isinstance(assoc_columns, dict):
+                selection = list(assoc_columns.keys())
+            else:
+                selection = [
+                    colname for colname in colnames if colname not in ipf_columns
+                ]
             out_df = group[selection]
-            write_assoc(assoc_path, out_df, itype, nodata)
+            write_assoc(assoc_path, out_df, itype, nodata, assoc_columns)
 
         # ensures right order for x, y, id; so that also indexcolumn == 3
         agg_kwargs = collections.OrderedDict(
@@ -553,7 +573,7 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20):
         write(path, agg_df, 3, assoc_ext, nodata=nodata)
 
 
-def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20):
+def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=None):
     """
     Saves the contents of a pandas DataFrame to one or more IPF files, and
     associated (TXT) files.
@@ -584,6 +604,10 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20):
         The value given to nodata values. These are generally NaN (Not-a-Number)
         in pandas, but this leads to errors in iMOD(FLOW) for IDFs.
         Defaults to value of 1.0e20 instead.
+    assoc_columns : optional, list or dict
+        Columns to store in the associated file. In case of a dictionary, the
+        columns will be renamed according to the mapping in the dictionary.
+        Defaults to None.
 
     Returns
     -------
@@ -597,12 +621,20 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20):
     d["directory"].mkdir(exist_ok=True, parents=True)
 
     colnames = _lower(list(df))
+    # Lower assoc_columns as well if available
+    if isinstance(assoc_columns, list):
+        assoc_columns = _lower(assoc_columns)
+    elif isinstance(assoc_columns, dict):
+        keys = _lower(assoc_columns.keys())
+        values = _lower(assoc_columns.values())
+        assoc_columns = {k: v for k, v in zip(keys, values)}
+
     df.columns = colnames
     if "layer" in colnames:
         for layer, group in df.groupby("layer"):
             d["layer"] = layer
             fn = util.compose(d)
-            _compose_ipf(fn, group, itype, assoc_ext, nodata)
+            _compose_ipf(fn, group, itype, assoc_ext, nodata, assoc_columns)
     else:
         fn = util.compose(d)
-        _compose_ipf(fn, df, itype, assoc_ext, nodata)
+        _compose_ipf(fn, df, itype, assoc_ext, nodata, assoc_columns)

@@ -41,7 +41,7 @@ class Package(xr.Dataset, abc.ABC):
     @staticmethod
     def _initialize_template(pkg_id):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
-        env = jinja2.Environment(loader=loader)
+        env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         if pkg_id == "ims":
             fname = "sln-ims.j2"
         elif pkg_id == "tdis":
@@ -50,8 +50,8 @@ class Package(xr.Dataset, abc.ABC):
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
 
-    def write_blockfile(self, directory, pkgname, globaltimes=None):
-        content = self.render(directory, pkgname, globaltimes)
+    def write_blockfile(self, directory, pkgname, *args):
+        content = self.render(directory, pkgname, *args)
         filename = directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
@@ -184,7 +184,7 @@ class Package(xr.Dataset, abc.ABC):
     def write(self, directory, pkgname, *args, **kwargs):
         directory = pathlib.Path(directory)
 
-        self.write_blockfile(directory, pkgname)
+        self.write_blockfile(directory, pkgname, *args)
 
         if hasattr(self, "_grid_data"):
             if "x" in self.dims and "y" in self.dims:

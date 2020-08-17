@@ -45,6 +45,7 @@ def test_render():
             constant 2e-08
             constant 2e-08
             constant 2e-08
-        end griddata"""
+        end griddata
+        """
     )
     assert actual == expected

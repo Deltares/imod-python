@@ -168,7 +168,8 @@ def test_dis_render(twri_model, tmp_path):
                 constant -450.0
               idomain
                 open/close {path}/dis/idomain.bin (binary)
-            end griddata"""
+            end griddata
+            """
     )
     assert actual == expected
     dis.write(tmp_path, "dis")
@@ -249,7 +250,8 @@ def test_ic_render(twri_model, tmp_path):
             begin griddata
               strt
                 constant 0.0
-            end griddata"""
+            end griddata
+            """
     )
     assert actual == expected
     ic.write(tmp_path, "ic")
@@ -281,7 +283,8 @@ def test_npf_render(twri_model, tmp_path):
                 constant 2e-08
                 constant 2e-08
                 constant 2e-08
-            end griddata"""
+            end griddata
+            """
     )
     assert actual == expected
     npf.write(tmp_path, "npf")
@@ -390,7 +393,8 @@ def test_solver_render(twri_model, tmp_path):
               inner_rclose 0.001
               linear_acceleration cg
               relaxation_factor 0.97
-            end linear"""
+            end linear
+            """
     )
     assert actual == expected
     solver.write(tmp_path, "solver")
@@ -417,7 +421,8 @@ def test_gwfmodel_render(twri_model, tmp_path):
               oc6 {path}/oc.oc
               rch6 {path}/rch.rch
               wel6 {path}/wel.wel
-            end packages"""
+            end packages
+            """
     )
     assert actual == expected
     gwfmodel.write(tmp_path / "GWF_1", globaltimes)
@@ -446,7 +451,8 @@ def test_simulation_render(twri_model):
 
             begin solutiongroup 1
               ims6 solver.ims GWF_1
-            end solutiongroup"""
+            end solutiongroup
+            """
     )
     assert actual == expected
 

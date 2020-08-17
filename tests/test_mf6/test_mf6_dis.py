@@ -60,6 +60,7 @@ def test_render():
             constant -450.0
           idomain
             open/close mymodel/dis/idomain.bin (binary)
-        end griddata"""
+        end griddata
+        """
     )
     assert actual == expected
