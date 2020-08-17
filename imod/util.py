@@ -211,6 +211,7 @@ def compose(d, pattern=None):
     """
     haslayer = "layer" in d
     hastime = "time" in d
+    hasspecies = "species" in d
 
     if pattern is None:
         if hastime:
@@ -227,24 +228,25 @@ def compose(d, pattern=None):
                     )
                 else:
                     d["timestr"] = time.strftime("%Y%m%d%H%M%S")
+            d["timestr"] = "_{}".format(d["timestr"])
+        else:
+            d["timestr"] = ""
 
         if haslayer:
-            d["layer"] = int(d["layer"])
-            if hastime:
-                s = "{name}_{timestr}_l{layer}{extension}".format(**d)
-            else:
-                s = "{name}_l{layer}{extension}".format(**d)
+            d["layerstr"] = "_l{}".format(int(d["layer"]))
         else:
-            if hastime:
-                s = "{name}_{timestr}{extension}".format(**d)
-            else:
-                s = "{name}{extension}".format(**d)
+            d["layerstr"] = ""
+
+        if hasspecies:
+            d["speciesstr"] = "_c{}".format(int(d["species"]))
+        else:
+            d["speciesstr"] = ""
+
+        s = "{name}{speciesstr}{timestr}{layerstr}{extension}".format(**d)
     else:
         if hastime:
             time = d["time"]
-            if time == "steady-state":
-                d["timestr"] = time
-            else:
+            if time != "steady-state":
                 # Change time to datetime.datetime
                 if isinstance(time, np.datetime64):
                     d["time"] = time.astype("datetime64[us]").item()

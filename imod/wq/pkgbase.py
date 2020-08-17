@@ -345,20 +345,7 @@ class Package(xr.Dataset, abc.ABC):
         for name, da in self.data_vars.items():  # pylint: disable=no-member
             if "y" in da.coords and "x" in da.coords:
                 path = pathlib.Path(directory).joinpath(name)
-
-                if "species" in da.coords:
-                    if "time" in da.coords:
-                        imod.idf.save(
-                            path,
-                            da,
-                            pattern="{name}_c{species}_{time:%Y%m%d%H%M%S}_l{layer}{extension}",
-                        )
-                    else:
-                        imod.idf.save(
-                            path, da, pattern="{name}_c{species}_l{layer}{extension}"
-                        )
-                else:
-                    imod.idf.save(path, da)
+                imod.idf.save(path, da)
 
     def _check_positive(self, varnames):
         for var in varnames:

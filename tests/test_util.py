@@ -18,9 +18,31 @@ def test_compose():
         "extension": ".idf",
         "layer": 5,
         "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
+        "species": 6,
     }
     path = util.compose(d)
+    targetpath = pathlib.Path(d["directory"], "head_c6_20180222090657_l5.idf")
+    assert path == targetpath
+
+    d.pop("species")
+    path = util.compose(d)
     targetpath = pathlib.Path(d["directory"], "head_20180222090657_l5.idf")
+    assert path == targetpath
+
+    d.pop("layer")
+    path = util.compose(d)
+    targetpath = pathlib.Path(d["directory"], "head_20180222090657.idf")
+    assert path == targetpath
+
+    d.pop("time")
+    d["layer"] = 1
+    path = util.compose(d)
+    targetpath = pathlib.Path(d["directory"], "head_l1.idf")
+    assert path == targetpath
+
+    d["species"] = 6
+    path = util.compose(d)
+    targetpath = pathlib.Path(d["directory"], "head_c6_l1.idf")
     assert path == targetpath
 
 
