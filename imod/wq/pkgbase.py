@@ -244,12 +244,12 @@ class Package(xr.Dataset, abc.ABC):
             if idf:
                 # Special case concentration
                 # Using "?" results in too many sinks and sources according to imod-wq.
+                pattern += "{extension}"
                 if hasattr(self, "_ssm_layers"):
                     for layer in self._ssm_layers:
                         d["layer"] = layer
                         values[layer] = self._compose(d, pattern=pattern)
                 else:
-                    pattern += "{extension}"
                     values["?"] = self._compose(d, pattern=pattern)
             else:
                 # Special case concentration
