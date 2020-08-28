@@ -61,15 +61,16 @@ def _groupdict(stem, pattern):
             re_pattern = re.compile(simple_regex)
             # Use it to get the required variables
             d = re_pattern.match(stem).groupdict()
-    else:  # Default to "iMOD conventions": {name}_{time}_l{layer}
+    else:  # Default to "iMOD conventions": {name}_c{species}_{time}_l{layer}
         has_layer = bool(re.search(r"_l\d+$", stem))
         has_species = bool(
-            re.search(r"conc_\d{8,14}_c\d{1,3}", stem)
+            re.search(r"conc_c\d{1,3}_\d{8,14}", stem)
         )  # We are strict in recognizing species
         try:  # try for time
-            base_pattern = r"(?P<name>[\w-]+)_(?P<time>[0-9-]{6,})"
+            base_pattern = r"(?P<name>[\w-]+)"
             if has_species:
                 base_pattern += r"_c(?P<species>[0-9]+)"
+            base_pattern += r"_(?P<time>[0-9-]{6,})"
             if has_layer:
                 base_pattern += r"_l(?P<layer>[0-9]+)"
             re_pattern = re.compile(base_pattern)
