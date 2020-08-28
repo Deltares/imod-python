@@ -89,7 +89,7 @@ def test_decompose():
 
 
 def test_decompose_species():
-    d = util.decompose("path/to/conc_20180222090657_c3_l5.idf")
+    d = util.decompose("path/to/conc_c3_20180222090657_l5.idf")
     refd = {
         "extension": ".idf",
         "species": 3,
@@ -97,7 +97,7 @@ def test_decompose_species():
         "name": "conc",
         "time": datetime.datetime(2018, 2, 22, 9, 6, 57),
         "layer": 5,
-        "dims": ["time", "species", "layer"],
+        "dims": ["species", "time", "layer"],
     }
     assert isinstance(d, dict)
     assert d == refd
