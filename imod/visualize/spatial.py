@@ -125,7 +125,10 @@ def plot_map(
     kwargs_raster : dict of keyword arguments, optional
         These arguments are forwarded to ax.imshow()
     kwargs_colorbar : dict of keyword arguments, optional
-        These arguments are forwarded to fig.colorbar()
+        These arguments are forwarded to fig.colorbar(). The key label can be used to label
+        the colorbar. Key whiten_triangles can be set to False to alter the default behavior
+        of coloring the min / max triangles of the colorbar white if the value is not present
+        in the map.
     kwargs_basemap : dict of keyword arguments, optional
         Except for "alpha", these arguments are forwarded to contextily.add_basemap(). 
         Parameter "alpha" controls the transparency of raster.
@@ -191,7 +194,9 @@ def plot_map(
         except (KeyError, AttributeError):
             pass
 
+    whiten_triangles = True
     if kwargs_colorbar is not None:
+        whiten_triangles = kwargs_colorbar.pop("whiten_triangles", True)
         settings_cbar.update(kwargs_colorbar)
 
     # Make figure
@@ -213,10 +218,11 @@ def plot_map(
     ax.set_ylim(ymin, ymax)
 
     # Make triangles white if data is not larger/smaller than legend_levels-range
-    if float(raster.max().compute()) < levels[-1]:
-        ax1.cmap.set_over("#FFFFFF")
-    if float(raster.min().compute()) > levels[0]:
-        ax1.cmap.set_under("#FFFFFF")
+    if whiten_triangles:
+        if float(raster.max().compute()) < levels[-1]:
+            ax1.cmap.set_over("#FFFFFF")
+        if float(raster.min().compute()) > levels[0]:
+            ax1.cmap.set_under("#FFFFFF")
 
     # Add colorbar
     divider = make_axes_locatable(ax)
