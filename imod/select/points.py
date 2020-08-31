@@ -196,7 +196,7 @@ def points_values(da, **points):
     # Fetch a value from the dictionary, try to extract a meaningful index
     sample_dim = next(iter(points.values()))
     if isinstance(sample_dim, pd.Series):
-        selection.coords["index"] = sample_dim.index
+        selection.coords["index"] = sample_dim.index.values
     else:
         sample_dim = next(iter(iterable_points.values()))
         selection.coords["index"] = np.arange(len(sample_dim))
