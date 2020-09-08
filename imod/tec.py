@@ -26,10 +26,10 @@ def header(path):
         ]
         if "x" in line1_parts and "y" in line1_parts and "z" in line1_parts:
             is_xyz_tec = True
-            d["coord_names"] = (line1_parts[:3])
+            d["coord_names"] = line1_parts[:3]
         else:
             is_xyz_tec = False
-            d["coord_names"] = (line1_parts[:3])
+            d["coord_names"] = line1_parts[:3]
         nvars = len(line1_parts) - 3
         d["data_vars"] = collections.OrderedDict(
             (var, None) for var in line1_parts[3 : 3 + nvars]
@@ -51,7 +51,7 @@ def header(path):
         attrs["nlay"] = nlay
         attrs["nrow"] = nrow
         attrs["ncol"] = ncol
-        #attrs["nvars"] = nvars
+        # attrs["nvars"] = nvars
         attrs["xyz"] = is_xyz_tec
         d["coords"] = coords
         d["attrs"] = attrs
@@ -107,7 +107,7 @@ def _index_lines(path):
 
 def _dataset(df, time, **kwargs):
     nlay, nrow, ncol = [v for v in kwargs["attrs"].values()]
-    d = {"x":ncol, "y":nrow, "z":nlay,"i":ncol,"j":nrow,"k":nlay}
+    d = {"x": ncol, "y": nrow, "z": nlay, "i": ncol, "j": nrow, "k": nlay}
     coords = tuple(kwargs.pop("coord_names"))
     shape = tuple(d[c] for c in coords)
     kwargs["coords"]["time"] = time
@@ -220,7 +220,7 @@ def read(path, variables=None, times=None, kwargs={}):
             dss.append(_dataset(df, time, **tec_kwargs))
     dss = xr.concat(dss, dim="time")
     if is_xyz_tec:
-        dss = dss.assign_coords({"layer":("z",range(1,dss.attrs["nlay"]+1))})
-        return dss.transpose("time","z","y","x")
+        dss = dss.assign_coords({"layer": ("z", range(1, dss.attrs["nlay"] + 1))})
+        return dss.transpose("time", "z", "y", "x")
     else:
-        return dss.transpose("time","layer","row","col")
+        return dss.transpose("time", "layer", "row", "col")
