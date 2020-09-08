@@ -20,9 +20,16 @@ def header(path):
         coords = collections.OrderedDict()
 
         line1 = f.readline()
+        line1 = line1.split("=")[1]
         line1_parts = [
             part.strip().lower() for part in line1.replace('"', "").split(",")
         ]
+        if "x" in line1_parts and "y" in line1_parts and "z" in line1_parts:
+            is_xyz_tec = True
+            d["coord_names"] = (line1_parts[:3])
+        else:
+            is_xyz_tec = False
+            d["coord_names"] = (line1_parts[:3])
         nvars = len(line1_parts) - 3
         d["data_vars"] = collections.OrderedDict(
             (var, None) for var in line1_parts[3 : 3 + nvars]
@@ -33,13 +40,19 @@ def header(path):
         nlay = int(re.findall(r"K=\d+", line2)[0].split("=")[-1])
         nrow = int(re.findall(r"J=\d+", line2)[0].split("=")[-1])
         ncol = int(re.findall(r"I=\d+", line2)[0].split("=")[-1])
-        coords["layer"] = np.arange(nlay)
-        coords["row"] = np.arange(nrow)
-        coords["column"] = np.arange(ncol)
+        if is_xyz_tec:
+            coords["z"] = np.arange(nlay)
+            coords["y"] = np.arange(nrow)
+            coords["x"] = np.arange(ncol)
+        else:
+            coords["layer"] = np.arange(nlay)
+            coords["row"] = np.arange(nrow)
+            coords["column"] = np.arange(ncol)
         attrs["nlay"] = nlay
         attrs["nrow"] = nrow
         attrs["ncol"] = ncol
-        attrs["nvars"] = nvars
+        #attrs["nvars"] = nvars
+        attrs["xyz"] = is_xyz_tec
         d["coords"] = coords
         d["attrs"] = attrs
         return d
@@ -47,7 +60,7 @@ def header(path):
 
 def _get_time(line):
     line = "".join(line.split())  # remove all whitespace
-    return np.float32(re.findall(r'ZONET="\d*.\d*', line)[0].split('="')[-1])
+    return np.float32(re.match(r'ZONET="\D*(\d*[.]?\d*)', line)[1])
 
 
 def _ntimes(nlines, count):
@@ -55,6 +68,7 @@ def _ntimes(nlines, count):
     if ntimes.is_integer():
         return int(ntimes)
     else:
+        print(ntimes, nlines, count)
         raise RuntimeError(
             "Could not find number of timesteps!"
             "Check whether the Tecplot file is well-formed."
@@ -93,10 +107,16 @@ def _index_lines(path):
 
 def _dataset(df, time, **kwargs):
     nlay, nrow, ncol = [v for v in kwargs["attrs"].values()]
+    d = {"x":ncol, "y":nrow, "z":nlay,"i":ncol,"j":nrow,"k":nlay}
+    coords = tuple(kwargs.pop("coord_names"))
+    shape = tuple(d[c] for c in coords)
     kwargs["coords"]["time"] = time
-    for var in df:
-        data = df[var].values.reshape(nlay, nrow, ncol)
-        kwargs["data_vars"][var] = (("layer", "row", "column"), data)
+    for c in coords:
+        if c in df:
+            kwargs["coords"][c] = df[c].unique()  # take sorting from tec
+    for var in kwargs["data_vars"]:
+        data = df[var].values.reshape(shape)
+        kwargs["data_vars"][var] = (coords, data)
     return xr.Dataset(**kwargs)
 
 
@@ -105,9 +125,10 @@ def read(path, variables=None, times=None, kwargs={}):
     Read a Tecplot ASCII data file to an xarray Dataset.
 
     Reads the data from a Tecplot ASCII file (.TEC or .DAT), as outputted by iMODSEAWAT,
-    into an xarray Dataset. The Tecplot file provides no coordinate values,
-    exclusively indices. The dataset is returned with dimensions: layer, row,
-    column, time.
+    into an xarray Dataset. If there are coordinates x, y and z present in the Tecplot file,
+    these will be returned as coordinates (time, z, y, x). If the Tecplot file does not 
+    provide coordinate values, only indices, then the dataset is returned with 
+    dimensions: layer, row, column, time.
 
     Parameters
     ----------
@@ -151,7 +172,8 @@ def read(path, variables=None, times=None, kwargs={}):
     # For a description of the Tecplot ASCII file format see:
     # ftp://ftp.tecplot.com/pub/doc/tecplot/360/dataformat.pdf
     tec_kwargs = header(path)
-    var_cols = range(3, 3 + tec_kwargs["attrs"].pop("nvars"))
+    is_xyz_tec = tec_kwargs["attrs"].pop("xyz")
+
     # get a byte location for the start of every line
     # so that we can jump to locations in the file
     # and skip timesteps
@@ -167,14 +189,17 @@ def read(path, variables=None, times=None, kwargs={}):
     else:
         variables = _vars_as_list(variables)
         variables = [var.lower() for var in variables]
-        var_cols = [
-            col_num
-            for (col_num, var) in zip(var_cols, tec_kwargs["data_vars"].keys())
-            if var in variables
-        ]
-        for var in list(tec_kwargs["data_vars"].keys()):
-            if var not in variables:
-                tec_kwargs["data_vars"].pop(var)
+    var_cols = [
+        col_num
+        for (col_num, var) in enumerate(tec_kwargs["data_vars"].keys())
+        if var in variables
+    ]
+    if is_xyz_tec:
+        variables = tec_kwargs["coord_names"] + variables
+        var_cols = [0, 1, 2] + [3 + v for v in var_cols]
+    for var in list(tec_kwargs["data_vars"].keys()):
+        if var not in variables:
+            tec_kwargs["data_vars"].pop(var)
 
     # generates a list of line numbers which indicate the start
     # of a new timestep
@@ -193,5 +218,9 @@ def read(path, variables=None, times=None, kwargs={}):
                 f, nrows=nlines_timestep, names=variables, usecols=var_cols, **kwargs
             )
             dss.append(_dataset(df, time, **tec_kwargs))
-
-    return xr.concat(dss, dim="time")
+    dss = xr.concat(dss, dim="time")
+    if is_xyz_tec:
+        dss = dss.assign_coords({"layer":("z",range(1,dss.attrs["nlay"]+1))})
+        return dss.transpose("time","z","y","x")
+    else:
+        return dss.transpose("time","layer","row","col")
