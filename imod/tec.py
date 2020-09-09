@@ -24,10 +24,6 @@ def header(path):
         line1_parts = [
             part.strip().lower() for part in line1.replace('"', "").split(",")
         ]
-        # if "x" in line1_parts and "y" in line1_parts and "z" in line1_parts:  # no, they are always called that
-        #    is_xyz_tec = True
-        # else:
-        #    is_xyz_tec = False
         nvars = len(line1_parts) - 3
         d["coord_names"] = line1_parts[:3]
         d["data_vars"] = collections.OrderedDict(
@@ -39,19 +35,12 @@ def header(path):
         nlay = int(re.findall(r"K=\d+", line2)[0].split("=")[-1])
         nrow = int(re.findall(r"J=\d+", line2)[0].split("=")[-1])
         ncol = int(re.findall(r"I=\d+", line2)[0].split("=")[-1])
-        # if is_xyz_tec:
         coords["z"] = np.arange(nlay)
         coords["y"] = np.arange(nrow)
         coords["x"] = np.arange(ncol)
-        # else:
-        #    coords["layer"] = np.arange(nlay)
-        #    coords["row"] = np.arange(nrow)
-        #    coords["column"] = np.arange(ncol)
         attrs["nlay"] = nlay
         attrs["nrow"] = nrow
         attrs["ncol"] = ncol
-        # attrs["nvars"] = nvars
-        # attrs["xyz"] = is_xyz_tec
         d["coords"] = coords
         d["attrs"] = attrs
         return d
@@ -124,8 +113,8 @@ def read(path, variables=None, times=None, kwargs={}):
     Read a Tecplot ASCII data file to an xarray Dataset.
 
     Reads the data from a Tecplot ASCII file (.TEC or .DAT), as outputted by iMODSEAWAT,
-    into an xarray Dataset. If there are coordinates x, y and z present in the Tecplot file,
-    these will be returned as coordinates (time, z, y, x). If the Tecplot file does not 
+    into an xarray Dataset. If there are valid coordinates x, y and z present in the Tecplot 
+    file, these will be returned as coordinates (time, z, y, x). If the Tecplot file does not 
     provide coordinate values, only indices, then the dataset is returned with 
     dimensions: layer, row, column, time.
 
@@ -171,7 +160,6 @@ def read(path, variables=None, times=None, kwargs={}):
     # For a description of the Tecplot ASCII file format see:
     # ftp://ftp.tecplot.com/pub/doc/tecplot/360/dataformat.pdf
     tec_kwargs = header(path)
-    # is_xyz_tec = tec_kwargs["attrs"].pop("xyz")
 
     # get a byte location for the start of every line
     # so that we can jump to locations in the file
@@ -193,7 +181,6 @@ def read(path, variables=None, times=None, kwargs={}):
         for (col_num, var) in enumerate(tec_kwargs["data_vars"].keys())
         if var in variables
     ]
-    # if is_xyz_tec:
     variables = tec_kwargs["coord_names"] + variables
     var_cols = [0, 1, 2] + [3 + v for v in var_cols]
     for var in list(tec_kwargs["data_vars"].keys()):
@@ -216,6 +203,14 @@ def read(path, variables=None, times=None, kwargs={}):
             df = pd.read_csv(
                 f, nrows=nlines_timestep, names=variables, usecols=var_cols, **kwargs
             )
+            if start == start_lines[0]:
+                # save coords columns for later, remove from further processing
+                df_coords = df[tec_kwargs["coord_names"]]
+                variables = variables[3:]
+                var_cols = var_cols[3:]
+            else:
+                # append coords to df
+                df = pd.concat((df_coords, df), axis=1)
             dss.append(_dataset(df, time, **tec_kwargs))
     dss = xr.concat(dss, dim="time")
 
@@ -224,8 +219,8 @@ def read(path, variables=None, times=None, kwargs={}):
         dss.coords["x"].values[0] == 1
         and dss.coords["x"].values[-1] == dss.attrs["ncol"]
     ):
-        dss = dss.rename({"x": "col", "y": "row", "z": "layer"})
-        return dss.transpose("time", "layer", "row", "col")
+        dss = dss.rename({"x": "column", "y": "row", "z": "layer"})
+        return dss.transpose("time", "layer", "row", "column")
     else:
         # add layer coordinate
         dss = dss.assign_coords({"layer": ("z", range(1, dss.attrs["nlay"] + 1))})
