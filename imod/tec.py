@@ -24,13 +24,12 @@ def header(path):
         line1_parts = [
             part.strip().lower() for part in line1.replace('"', "").split(",")
         ]
-        if "x" in line1_parts and "y" in line1_parts and "z" in line1_parts:
-            is_xyz_tec = True
-            d["coord_names"] = line1_parts[:3]
-        else:
-            is_xyz_tec = False
-            d["coord_names"] = line1_parts[:3]
+        # if "x" in line1_parts and "y" in line1_parts and "z" in line1_parts:  # no, they are always called that
+        #    is_xyz_tec = True
+        # else:
+        #    is_xyz_tec = False
         nvars = len(line1_parts) - 3
+        d["coord_names"] = line1_parts[:3]
         d["data_vars"] = collections.OrderedDict(
             (var, None) for var in line1_parts[3 : 3 + nvars]
         )
@@ -40,19 +39,19 @@ def header(path):
         nlay = int(re.findall(r"K=\d+", line2)[0].split("=")[-1])
         nrow = int(re.findall(r"J=\d+", line2)[0].split("=")[-1])
         ncol = int(re.findall(r"I=\d+", line2)[0].split("=")[-1])
-        if is_xyz_tec:
-            coords["z"] = np.arange(nlay)
-            coords["y"] = np.arange(nrow)
-            coords["x"] = np.arange(ncol)
-        else:
-            coords["layer"] = np.arange(nlay)
-            coords["row"] = np.arange(nrow)
-            coords["column"] = np.arange(ncol)
+        # if is_xyz_tec:
+        coords["z"] = np.arange(nlay)
+        coords["y"] = np.arange(nrow)
+        coords["x"] = np.arange(ncol)
+        # else:
+        #    coords["layer"] = np.arange(nlay)
+        #    coords["row"] = np.arange(nrow)
+        #    coords["column"] = np.arange(ncol)
         attrs["nlay"] = nlay
         attrs["nrow"] = nrow
         attrs["ncol"] = ncol
         # attrs["nvars"] = nvars
-        attrs["xyz"] = is_xyz_tec
+        # attrs["xyz"] = is_xyz_tec
         d["coords"] = coords
         d["attrs"] = attrs
         return d
@@ -108,7 +107,7 @@ def _index_lines(path):
 def _dataset(df, time, **kwargs):
     nlay, nrow, ncol = [v for v in kwargs["attrs"].values()]
     d = {"x": ncol, "y": nrow, "z": nlay, "i": ncol, "j": nrow, "k": nlay}
-    coords = tuple(kwargs.pop("coord_names"))
+    coords = tuple(kwargs.pop("coord_names")[::-1])  # flip order
     shape = tuple(d[c] for c in coords)
     kwargs["coords"]["time"] = time
     for c in coords:
@@ -172,7 +171,7 @@ def read(path, variables=None, times=None, kwargs={}):
     # For a description of the Tecplot ASCII file format see:
     # ftp://ftp.tecplot.com/pub/doc/tecplot/360/dataformat.pdf
     tec_kwargs = header(path)
-    is_xyz_tec = tec_kwargs["attrs"].pop("xyz")
+    # is_xyz_tec = tec_kwargs["attrs"].pop("xyz")
 
     # get a byte location for the start of every line
     # so that we can jump to locations in the file
@@ -194,9 +193,9 @@ def read(path, variables=None, times=None, kwargs={}):
         for (col_num, var) in enumerate(tec_kwargs["data_vars"].keys())
         if var in variables
     ]
-    if is_xyz_tec:
-        variables = tec_kwargs["coord_names"] + variables
-        var_cols = [0, 1, 2] + [3 + v for v in var_cols]
+    # if is_xyz_tec:
+    variables = tec_kwargs["coord_names"] + variables
+    var_cols = [0, 1, 2] + [3 + v for v in var_cols]
     for var in list(tec_kwargs["data_vars"].keys()):
         if var not in variables:
             tec_kwargs["data_vars"].pop(var)
@@ -219,8 +218,15 @@ def read(path, variables=None, times=None, kwargs={}):
             )
             dss.append(_dataset(df, time, **tec_kwargs))
     dss = xr.concat(dss, dim="time")
-    if is_xyz_tec:
+
+    # check if coordinates mean something or are just indexes
+    if (
+        dss.coords["x"].values[0] == 1
+        and dss.coords["x"].values[-1] == dss.attrs["ncol"]
+    ):
+        dss = dss.rename({"x": "col", "y": "row", "z": "layer"})
+        return dss.transpose("time", "layer", "row", "col")
+    else:
+        # add layer coordinate
         dss = dss.assign_coords({"layer": ("z", range(1, dss.attrs["nlay"] + 1))})
         return dss.transpose("time", "z", "y", "x")
-    else:
-        return dss.transpose("time", "layer", "row", "col")
