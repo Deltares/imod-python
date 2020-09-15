@@ -416,7 +416,7 @@ def _sel_chunks(da, expanded_slices):
     """
     Using the slices created with the functions above, use xarray's index
     selection methods to create a list of "like" DataArrays which are used
-    to inform the regridding. During the regrid() call of the 
+    to inform the regridding. During the regrid() call of the
     imod.prepare.Regridder object, data from the input array is selected,
     ideally one chunk at time, or 2 ** ndim_chunks if there is overlap
     required due to cellsize differences.

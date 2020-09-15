@@ -38,7 +38,7 @@ class Package(xr.Dataset, abc.ABC):
         Loads an imod-wq package from a file (currently only netcdf is supported).
 
         This enables caching of intermediate input and should result in much
-        faster model.write() times. To enable caching, provide a path to a 
+        faster model.write() times. To enable caching, provide a path to a
         ``joblib.Memory`` caching directory.
 
         Parameters
@@ -48,7 +48,7 @@ class Package(xr.Dataset, abc.ABC):
         cache_path : str, pathlib.Path, optional
             The path to the ``joblib.Memory`` caching dir where intermediate answers are stored.
         cache_verbose : int
-            Verbosity flag of ``joblib.Memory``, controls the debug messages that are issued as 
+            Verbosity flag of ``joblib.Memory``, controls the debug messages that are issued as
             functions are evaluated.
         **kwargs : keyword arguments
             Arbitrary keyword arguments forwarded to ``xarray.open_dataset()``, or
@@ -76,7 +76,7 @@ class Package(xr.Dataset, abc.ABC):
         For large datasets, you likely want to process it in chunks. You can
         forward keyword arguments to ``xarray.open_dataset()`` or
         ``xarray.open_zarr()``:
-        
+
         >>> cache = "./.cache_dir"
         >>> river = imod.wq.River.from_file("river.nc", cache, chunks={"time": 1})
 

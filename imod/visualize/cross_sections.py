@@ -130,7 +130,7 @@ def cross_section(
     Wraps matplotlib.pcolormesh to draw cross-sections, drawing cell boundaries
     accurately. Aquitards can be plotted on top of the cross-section, by providing
     a DataArray with the aquitard location for `aquitards`.
- 
+
     Parameters
     ----------
     da : xr.DataArray
@@ -138,10 +138,10 @@ def cross_section(
         dimension must be "layer", and the second dimension will be used as the
         x-axis for the cross-section.
 
-        Coordinates "top" and "bottom" must be present, and must have at least the 
+        Coordinates "top" and "bottom" must be present, and must have at least the
         "layer" dimension (voxels) or both the "layer" and x-coordinate dimension.
 
-        *Use imod.select.cross_section_line() or cross_section_linestring() to obtain 
+        *Use imod.select.cross_section_line() or cross_section_linestring() to obtain
         the required DataArray.*
     colors : list of str, or list of RGB tuples
         Matplotlib acceptable list of colors. Length N.
@@ -158,7 +158,7 @@ def cross_section(
     kwargs_pcolormesh : dict
         Other optional keyword arguments for matplotlib.pcolormesh.
     kwargs_colorbar : dict
-        Optional keyword argument ``whiten_triangles`` whitens respective colorbar triangle if 
+        Optional keyword argument ``whiten_triangles`` whitens respective colorbar triangle if
         data is not larger/smaller than legend_levels-range. Defaults to True.
         Other arguments are forwarded to fig.colorbar()
     kwargs_aquitards: dict
@@ -193,7 +193,7 @@ def cross_section(
     >>> imod.visualize.cross_section(da, colors, levels, aquitards=aquitards, kwargs_aquitards)
 
     For a hatched overlay:
-    
+
     >>> kwargs_aquitards = {"hatch": "/", "edgecolor": "k"}
     >>> imod.visualize.cross_section(da, colors, levels, aquitards=aquitards, kwargs_aquitards)
     """

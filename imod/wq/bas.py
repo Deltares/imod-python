@@ -12,7 +12,7 @@ class BasicFlow(Package):
     The Basic package is used to specify certain data used in all models.
     These include:
     1. the locations of acitve, inactive, and specified head in cells,
-    2. the head stored in inactive cells, 
+    2. the head stored in inactive cells,
     3. the initial head in all cells, and
     4. the top and bottom of the aquifer
     The number of layers (NLAY) is automatically calculated using the IBOUND.

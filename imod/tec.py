@@ -143,7 +143,7 @@ def read(path, variables=None, times=None, kwargs={}):
     >>> ds = imod.tec.read(path, 'vx', times=slice(0, 20, 4))
 
     Or for every tenth timestep:
-    
+
     >>> ds = imod.tec.read(path, 'vx', times=slice(None, None, 10))
 
     See also the documentation for ``slice()``.

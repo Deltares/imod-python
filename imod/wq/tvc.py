@@ -6,7 +6,7 @@ class TimeVaryingConstantConcentration(BoundaryCondition):
     Time varying constant concentration package. Has no direct effect on
     groundwater flow, is only included via MT3DMS source and sinks. (SSM ITYPE
     -1)
-    
+
     Parameters
     ----------
     concentration: array of floats (xr.DataArray)

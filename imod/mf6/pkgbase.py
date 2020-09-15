@@ -88,7 +88,7 @@ class Package(xr.Dataset, abc.ABC):
 
     def _check_layer_presence(self, ds):
         """
-        If layer present in coordinates and dimensions return layers, 
+        If layer present in coordinates and dimensions return layers,
         if not return None
         """
 
@@ -230,8 +230,7 @@ class BoundaryCondition(Package, abc.ABC):
             sparse_data.tofile(f)
 
     def write_datafile(self, outpath, ds):
-        """
-        """
+        """"""
         layer = self._check_layer_presence(ds)
         arrays = self._ds_to_arrlist(ds)
         sparse_data = self.to_sparse(arrays, layer)
@@ -294,7 +293,7 @@ class BoundaryCondition(Package, abc.ABC):
     def write(self, directory, pkgname, globaltimes):
         """
         writes the blockfile and binary data
-        
+
         directory is modelname
         """
 
@@ -306,10 +305,10 @@ class BoundaryCondition(Package, abc.ABC):
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     """Class dedicated to advanced boundary conditions, since MF6 does not support
-    binary files for Advanced Boundary conditions.  
-    
+    binary files for Advanced Boundary conditions.
+
     The advanced boundary condition packages are: "uzf", "lak", "maw", "str".
-    
+
     """
 
     __slots__ = ()

@@ -51,7 +51,7 @@ class TimeDiscretization(Package):
         the original MT3D code, and transport_timestep_multiplier is always set
         to 1.0 regardless of the user-specified input. Note that for the
         particle tracking based solution options and the 3rd-order TVD scheme,
-        transport_timestep_multiplier does not apply. 
+        transport_timestep_multiplier does not apply.
         Default is {"None"}.
     transport_initial_timestep: int, optional
         is the user-specified transport stepsize within each time step of the

@@ -43,16 +43,16 @@ class LayerPropertyFlow(Package):
         is specific storage (SS). Read only for a transient simulation (at least
         one transient stress period). Include only if at least one stress period
         is transient.
-        Specific storage is the amount of water released when the head in an aquifer 
-        drops by 1 m, in one meter of the aquifer (or model layer). 
+        Specific storage is the amount of water released when the head in an aquifer
+        drops by 1 m, in one meter of the aquifer (or model layer).
         The unit is: ((m3 / m2) / m head change) / m aquifer = m-1
     specific_yield: float or array of floats (xarray.DataArray)
         is specific yield (SY). Read only for a transient simulation (at least
         one transient stress period) and if the layer is convertible (layer_type
-        is not 0). Include only if at least one stress period is transient. 
+        is not 0). Include only if at least one stress period is transient.
         The specific yield is the volume of water released from (or added to) the
-        pore matrix for one meter of head change. 
-        The unit is: (m3 / m2) / m head change = dimensionless 
+        pore matrix for one meter of head change.
+        The unit is: (m3 / m2) / m head change = dimensionless
     save_budget: int
         is a flag and a unit number (ILPFCB).
         If save_budget > 0, it is the unit number to which cell-by-cell flow

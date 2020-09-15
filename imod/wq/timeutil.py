@@ -9,10 +9,10 @@ import pandas as pd
 def to_datetime(time, use_cftime):
     """
     Check whether time is cftime object, else convert to datetime64 series.
-    
+
     cftime currently has no pd.to_datetime equivalent:
     a method that accepts a lot of different input types.
-    
+
     Parameters
     ----------
     time : cftime object or datetime-like scalar
@@ -48,7 +48,7 @@ def timestep_duration(times, use_cftime):
     ----------
     times : np.array
         Array containing containing time in a datetime-like format
-    
+
     Returns
     -------
     duration : 1D numpy array of floats
