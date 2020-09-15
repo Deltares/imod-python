@@ -6,9 +6,9 @@ import xarray as xr
 class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     """
     Unsaturated Zone Flow (UZF) package.
-    
+
     TODO: Support timeseries file? Observations? Water Mover?
-    
+
     Parameters
     ----------
     surface_depression_depth: array of floats (xr.DataArray)
@@ -42,24 +42,24 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         cell. If specified, ET in the unsaturated zone will be simulated either as a function of the
         specified PET rate while the water content (THETA) is greater than the ET extinction water content
     air_entry_potential: array of floats (xr.DataArray, optional)
-        defines the air entry potential (head) of the UZF cell. If specified, ET will be 
-        simulated using a capillary pressure based formulation. 
+        defines the air entry potential (head) of the UZF cell. If specified, ET will be
+        simulated using a capillary pressure based formulation.
         Capillary pressure is calculated using the Brooks-Corey retention function ("air_entry")
     root_potential: array of floats (xr.DataArray, optional)
-        defines the root potential (head) of the UZF cell. If specified, ET will be 
-        simulated using a capillary pressure based formulation. 
+        defines the root potential (head) of the UZF cell. If specified, ET will be
+        simulated using a capillary pressure based formulation.
         Capillary pressure is calculated using the Brooks-Corey retention function ("air_entry"
     root_activity: array of floats (xr.DataArray, optional)
         defines the root activity function of the UZF cell. ROOTACT is
         the length of roots in a given volume of soil divided by that volume. Values range from 0 to about 3
-        cm-2, depending on the plant community and its stage of development. If specified, ET will be 
-        simulated using a capillary pressure based formulation. 
+        cm-2, depending on the plant community and its stage of development. If specified, ET will be
+        simulated using a capillary pressure based formulation.
         Capillary pressure is calculated using the Brooks-Corey retention function ("air_entry"
     groundwater_ET_function: ({"linear", "square"}, optional)
         keyword specifying that groundwater evapotranspiration will be simulated using either
         the original ET formulation of MODFLOW-2005 ("linear"). Or by assuming a constant ET
         rate for groundwater levels between land surface (TOP) and land surface minus the ET extinction
-        depth (TOP-EXTDP) ("square"). In the latter case, groundwater ET is smoothly reduced 
+        depth (TOP-EXTDP) ("square"). In the latter case, groundwater ET is smoothly reduced
         from the PET rate to zero over a nominal interval at TOP-EXTDP.
     simulate_seepage: ({True, False}, optional)
         keyword specifying that groundwater discharge (GWSEEP) to land surface will be
@@ -83,8 +83,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     water_mover: [Not yet supported.]
         Default is None.
     timeseries: [Not yet supported.]
-        Default is None. 
-        TODO: We could allow the user to either use xarray DataArrays to specify BCS or 
+        Default is None.
+        TODO: We could allow the user to either use xarray DataArrays to specify BCS or
         use a pd.DataFrame and use the MF6 timeseries files to read input. The latter could
         save memory for laterally large-scale models, through efficient use of the UZF cell identifiers.
     """
@@ -222,8 +222,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         self["ivertcon"] = self._determine_vertical_connection(self["iuzno"])
 
     def fill_stress_perioddata(self):
-        """Modflow6 requires something to be filled in the stress perioddata, 
-        even though the data is not used in the current configuration. 
+        """Modflow6 requires something to be filled in the stress perioddata,
+        even though the data is not used in the current configuration.
         Only an infiltration rate is required,
         the rest can be filled with dummy values if not provided.
         """
@@ -283,8 +283,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             )
 
     def _create_uzf_numbers(self, landflag):
-        """Create unique UZF ID's. Inactive cells equal 0
-        """
+        """Create unique UZF ID's. Inactive cells equal 0"""
         return np.cumsum(np.ravel(landflag)).reshape(landflag.shape) * landflag
 
     def _determine_landflag(self, kv_sat):
@@ -348,7 +347,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         return self._template.render(d)
 
     def to_sparse(self, arrlist, layer):
-        """Convert from dense arrays to list based input, 
+        """Convert from dense arrays to list based input,
         since the perioddata does not require cellids but iuzno, we hgave to override"""
         # TODO add pkgcheck that period table aligns
         # Get the number of valid values

@@ -532,9 +532,9 @@ class Regridder(object):
         Regrid ``source`` along dimensions that ``source`` and ``like`` share.
         These dimensions will be inferred the first time ``.regrid`` is called
         for the Regridder object.
-        
+
         Following xarray conventions, nodata is assumed to ``np.nan``.
-        
+
         Parameters
         ----------
         source : xr.DataArray of floats
@@ -542,7 +542,7 @@ class Regridder(object):
             The like array present what the coordinates should look like.
         fill_value : float
             The fill_value. Defaults to np.nan
-            
+
         Returns
         -------
         result : xr.DataArray

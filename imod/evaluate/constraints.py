@@ -8,10 +8,10 @@ import imod
 def stability_constraint_wel(wel, top_bot, porosity=0.3, R=1.0):
     r"""
     Computes sink/source stability constraint as applied in MT3D for adaptive
-    timestepping (Zheng & Wang, 1999 p54). 
-    
+    timestepping (Zheng & Wang, 1999 p54).
+
     .. math:: \Delta t \leq \frac{R\theta }{\left | q_{s} \right |}
-    
+
     For the WEL package, a flux is known
     beforehand, so we can evaluate beforehand if a flux assigned to a cell
     will necessitate a small timestap, thereby slowing down calculations.
@@ -34,7 +34,7 @@ def stability_constraint_wel(wel, top_bot, porosity=0.3, R=1.0):
 
     Returns
     -------
-    wel: pd.DataFrame containing addition qs (specific discharge) and 
+    wel: pd.DataFrame containing addition qs (specific discharge) and
         dt (minimum timestep) columns
     """
 
@@ -58,8 +58,8 @@ def stability_constraint_wel(wel, top_bot, porosity=0.3, R=1.0):
 def stability_constraint_advection(front, lower, right, top_bot, porosity=0.3, R=1.0):
     r"""
     Computes advection stability constraint as applied in MT3D for adaptive
-    timestepping (Zheng & Wang, 1999 p54): 
-    
+    timestepping (Zheng & Wang, 1999 p54):
+
     .. math:: \Delta t \leq \frac{R}{\frac{\left | v_{x} \right |}{\Delta x}+\frac{\left | v_{y} \right |}{\Delta y}+\frac{\left | v_{z} \right |}{\Delta z}}
 
     This function can be used to select
@@ -74,7 +74,7 @@ def stability_constraint_advection(front, lower, right, top_bot, porosity=0.3, R
 
     Returns the minimum timestep that is required to satisfy this constraint.
     The resulting dt xr.DataArray is the minimum timestep over all three directions,
-    dt_xyz is an xr.Dataset containing minimum timesteps for the three directions 
+    dt_xyz is an xr.Dataset containing minimum timesteps for the three directions
     separately.
 
     Parameters
@@ -150,7 +150,7 @@ def intra_cell_boundary_conditions(
 ):
     """Function to pre-check boundary-conditions against one another for large intra-cell fluxes.
     ghb and river can function as source and sink, drn only as sink.
-    
+
     Parameters
     ----------
     top_bot : xr.Dataset of floats

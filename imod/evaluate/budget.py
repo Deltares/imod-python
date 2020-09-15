@@ -174,13 +174,13 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
         Array defining zones. Non-zones should be with a ``np.nan`` value.
         Dimensions must be exactly ``("layer", "y", "x")``.
     front: xr.DataArray of floats, optional
-        Dimensions must be exactly ``("layer", "y", "x")`` or 
+        Dimensions must be exactly ``("layer", "y", "x")`` or
         ``("time", "layer", "y", "x")``.
     lower: xr.DataArray of floats, optional
-        Dimensions must be exactly ``("layer", "y", "x")`` or 
+        Dimensions must be exactly ``("layer", "y", "x")`` or
         ``("time", "layer", "y", "x")``.
     right: xr.DataArray of floats, optional
-        Dimensions must be exactly ``("layer", "y", "x")`` or 
+        Dimensions must be exactly ``("layer", "y", "x")`` or
         ``("time", "layer", "y", "x")``.
     netflow : bool, optional
         Whether to split flows by direction (front, lower, right).
@@ -224,7 +224,7 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
     >>>     budgetzone=zone, front=front, right=right
     >>> )
 
-    Extract the net flow, only on the right side of the zone, for example as 
+    Extract the net flow, only on the right side of the zone, for example as
     defined by x > 10000:
 
     >>> netflow_right = flow.where(flow["x"] > 10_000.0).sum()
@@ -354,7 +354,7 @@ def flow_velocity(
         Dimensions must be exactly ``("layer", "y", "x")``.
     porosity: float or xr.DataArray of floats, optional (default 0.3)
         If xr.DataArray, dimensions must be exactly ``("layer", "y", "x")``.
-    
+
     Returns
     -------
     vx, vy, vz: xr.DataArray of floats

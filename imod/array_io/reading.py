@@ -143,7 +143,7 @@ def _initialize_groupby(ndims):
     does not provide tools for these kind of variably nested groupby's.
 
     Pandas.groupby does provide this functionality. However, pandas dataframes
-    do not accept any field value, whereas these dictionaries do. Might be 
+    do not accept any field value, whereas these dictionaries do. Might be
     worthwhile to look into, if performance is an issue.
 
     Parameters
@@ -176,7 +176,7 @@ def _initialize_groupby(ndims):
 def _set_nested(d, keys, value):
     """
     Set in the deepest dict of a set of nested dictionaries, as created by the
-    _initialize_groupby function above. 
+    _initialize_groupby function above.
 
     Mutates d.
 
@@ -224,7 +224,7 @@ def _ndconcat(arrays, ndim):
     Parameters
     ----------
     arrays : list of lists, n levels deep.
-        E.g.  [[da1, da2], [da3, da4]] for n = 2. 
+        E.g.  [[da1, da2], [da3, da4]] for n = 2.
         (compare with docstring for _initialize_groupby)
     ndim : int
         number of dimensions over which to concatenate.

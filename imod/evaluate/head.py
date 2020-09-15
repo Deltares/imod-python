@@ -24,11 +24,11 @@ def convert_pointwaterhead_freshwaterhead(
     pointwaterhead : float or xr.DataArray of floats
         the point water head as outputted by SEAWAT, in m.
     density : float or xr.DataArray of floats
-        the water density at the same locations as `pointwaterhead`. 
+        the water density at the same locations as `pointwaterhead`.
     elevation : float or xr.DataArray of floats
-        elevation at the same locations as `pointwaterhead`, in m. 
+        elevation at the same locations as `pointwaterhead`, in m.
     density_fresh : float, optional
-        the density of freshwater (1000 kg/m3), or a different value if 
+        the density of freshwater (1000 kg/m3), or a different value if
         different units are used, or a different density reference is required.
 
     Returns
@@ -58,8 +58,8 @@ def calculate_gxg(head, below_surfacelevel=False):
     calculated as the average of the three lowest (GLG) or highest (GHG) head values per
     hydrological year (april - april), for head values measured at a semi-monthly frequency
     (14th and 28th of every month). GVG (average spring groundwater level) is calculated as
-    the average of groundwater level on 28th of March, 14th and 28th of April. Supplied head 
-    values are resampled (nearest) to the 14/28 frequency. Hydrological years without all 24 
+    the average of groundwater level on 28th of March, 14th and 28th of April. Supplied head
+    values are resampled (nearest) to the 14/28 frequency. Hydrological years without all 24
     14/28 dates present are discarded.
 
     *Requires bottleneck.*
@@ -67,7 +67,7 @@ def calculate_gxg(head, below_surfacelevel=False):
     Parameters
     ----------
     head : xr.DataArray of floats
-        Head relative to sea level, in m, or m below surface level if `below_surfacelevel` is 
+        Head relative to sea level, in m, or m below surface level if `below_surfacelevel` is
         set to True. Must be of dimensions ``("time", "y", "x")``.
     below_surfacelevel : boolean, optional
         False (default) if heads are relative to sea level. If True, heads are taken as m
@@ -75,7 +75,7 @@ def calculate_gxg(head, below_surfacelevel=False):
 
     Returns
     -------
-    gxg : xr.Dataset 
+    gxg : xr.Dataset
         Dataset containing `glg`: average lowest head, `ghg`: average highest head, and `gvg`:
         average spring head.
 
