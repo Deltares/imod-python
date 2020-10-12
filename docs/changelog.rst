@@ -24,6 +24,19 @@ Added
 -  :class:`imod.wq.MassLoading` and
    :class:`imod.wq.TimeVaryingConstantConcentration` have been added to allow
    additional concentration boundary conditions.
+- IPF writing methods support an ``assoc_columns`` keyword to allow greater
+   flexibility in including and renaming columns of the associated files.
+- Optional basemap plotting has been added to :meth:`imod.visualize.plot_map()`.
+
+Changed
+~~~~~~~
+- :meth:`imod.wq.SeawatModel.to_netcdf()` has been added to write all model
+   packages to netCDF files.
+- :meth:`imod.wq.SeawatModel.write()` now generates iMOD-WQ runfiles with
+   more intelligent use of the "macro tokens". ``:`` is used exclusively for
+   ranges; ``$`` is used to signify all layers. (This makes runfiles shorter,
+   speeding up parsing, which takes a significant amount of time in the runfile
+   to namefile conversion of iMOD-WQ.)
 
 [0.10.0] - 2020-05-23
 ---------------------
