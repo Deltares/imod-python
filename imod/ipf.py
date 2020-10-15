@@ -504,7 +504,7 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20, assoc_columns=None):
     itype : int or str or None
         If ``None`` no associated files are written.
         Other possible values, either integer or string:
-        
+
         * ``1`` or ``"timeseries"``
         * ``2`` or ``"borehole1d"``
         * ``3`` or ``"cpt"``
@@ -593,7 +593,7 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=Non
     itype : int or str or None
         IPF type. Defaults to ``None``, in which case no associated files are
         created. Possible other values, either integer or string:
-        
+
         * ``1`` or ``"timeseries"``
         * ``2`` or ``"borehole1d"``
         * ``3`` or ``"cpt"``

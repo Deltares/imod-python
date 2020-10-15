@@ -113,9 +113,9 @@ def read(path, variables=None, times=None, kwargs={}):
     Read a Tecplot ASCII data file to an xarray Dataset.
 
     Reads the data from a Tecplot ASCII file (.TEC or .DAT), as outputted by iMODSEAWAT,
-    into an xarray Dataset. If there are valid coordinates x, y and z present in the Tecplot 
-    file, these will be returned as coordinates (time, z, y, x). If the Tecplot file does not 
-    provide coordinate values, only indices, then the dataset is returned with 
+    into an xarray Dataset. If there are valid coordinates x, y and z present in the Tecplot
+    file, these will be returned as coordinates (time, z, y, x). If the Tecplot file does not
+    provide coordinate values, only indices, then the dataset is returned with
     dimensions: layer, row, column, time.
 
     Parameters
@@ -152,7 +152,7 @@ def read(path, variables=None, times=None, kwargs={}):
     >>> ds = imod.tec.read(path, 'vx', times=slice(0, 20, 4))
 
     Or for every tenth timestep:
-    
+
     >>> ds = imod.tec.read(path, 'vx', times=slice(None, None, 10))
 
     See also the documentation for ``slice()``.

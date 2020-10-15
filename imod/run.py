@@ -214,8 +214,8 @@ seawat_default_runfile = collections.OrderedDict(
 
 def _check_input(model, seawat=False):
     """
-    Tests whether model and content is of appropriate type, generates new 
-    dictionary to avoid destroying the model dictionary, and lowers keys for further 
+    Tests whether model and content is of appropriate type, generates new
+    dictionary to avoid destroying the model dictionary, and lowers keys for further
     processing.
 
     Parameters
@@ -224,7 +224,7 @@ def _check_input(model, seawat=False):
         The dictionary containing the model data.
     seawat : bool
         Set True if model is seawat model
-    
+
     Returns
     -------
     consumed_model: collections.OrderedDict
@@ -254,7 +254,7 @@ def _check_input(model, seawat=False):
 
 
 def _data_bounds(model, seawat=False):
-    """ 
+    """
     Collects spatial bounds from bnd (bnd is therefore required):
 
     * nlay
@@ -373,9 +373,9 @@ def _parse(key, stress_period_schema):
     * Parameter is required (stage, cond, etc.) for some packages
     * System is optional for some packages
 
-    This function first gets the name of the package, e.g. "riv", then if the 
+    This function first gets the name of the package, e.g. "riv", then if the
     package has multiple fields, it checks if the field is valid, e.g. "stage".
-    Finally, if the package supports multiple systems, it attempts to get the 
+    Finally, if the package supports multiple systems, it attempts to get the
     system name.
 
     Package and field names are standardized; system names may be arbitrary (no dashes).
@@ -385,7 +385,7 @@ def _parse(key, stress_period_schema):
     key : str
     stress_period_schema : collections.OrderedDict
         Schema against which to validate key
-    
+
     Returns
     -------
     dict
@@ -440,7 +440,7 @@ def _groupby_field(package, stress_period_schema):
     package : dict
 
     stress_period_schema: collections.OrderedDict
-        Schema against which to validate 
+        Schema against which to validate
 
     Returns
     -------
@@ -474,7 +474,7 @@ def _sortby_field(package_data, name, stress_period_schema):
     Returns
     -------
     package_data : dict
-        data for a single imodflow package, reordered for writing to 
+        data for a single imodflow package, reordered for writing to
         runfile
 
     """
@@ -495,9 +495,9 @@ def _sortby_field(package_data, name, stress_period_schema):
 def _maybe_to_datetime(time):
     """
     Check whether time is cftime object, else convert to datetime64 series.
-    
+
     cftime currently has no pd.to_datetime equivalent: a method that accepts a lot of different input types.
-    
+
     Parameters
     ----------
     time : cftime object or datetime-like scalar
@@ -516,7 +516,7 @@ def _time_discretisation(times):
     ----------
     times : np.array
         Array containing containing time in a datetime-like format
-    
+
     Returns
     -------
     collections.OrderedDict
@@ -558,7 +558,7 @@ def _get_wel(item, times, directory):
     ----------
     item : collections.OrderedDict
     times : np.array
-        Array containing "global" times: the datetimes collected from all 
+        Array containing "global" times: the datetimes collected from all
         model data objects. The times in the item are a subset.
     directory : str
         Directory in which the IDF/IPFs will be written
@@ -566,7 +566,7 @@ def _get_wel(item, times, directory):
     Returns
     -------
     single_system : collections.OrderedDict
-        Dictionary containing the generated paths (IPF) for a single system. 
+        Dictionary containing the generated paths (IPF) for a single system.
     """
     # When the time resolution of an associated .txt file is higher than the
     # time resolution of the stress periods, iMODFLOW (apparently) simply
@@ -604,7 +604,7 @@ def _get_system(item, times, directory):
     ----------
     item : collections.OrderedDict
     times : np.array
-        Array containing "global" times: the datetimes collected from all 
+        Array containing "global" times: the datetimes collected from all
         model data objects. The times in the item are a subset.
     directory : str
         Directory in which the IDF/IPFs will be written
@@ -612,7 +612,7 @@ def _get_system(item, times, directory):
     Returns
     -------
     single_system : collections.OrderedDict
-        Dictionary containing the generated paths (IDF) for a single system. 
+        Dictionary containing the generated paths (IDF) for a single system.
     """
     # TODO: Currently all packages, except for WEL, have to be defined in the
     # first stress period (and when no time is assigned, it is assumed constant
@@ -652,16 +652,16 @@ def _get_system(item, times, directory):
 
 
 def _get_period(package, times, directory, stress_period_schema):
-    """ 
-    Generates paths for all fields, systems, layers, and times of a package, 
-    that has stress periods. 
+    """
+    Generates paths for all fields, systems, layers, and times of a package,
+    that has stress periods.
 
     Parameters
     ----------
     package : collections.OrderedDict
         Data for a single imodflow package
     times : np.array
-        Array containing "global" times: the datetimes collected from all 
+        Array containing "global" times: the datetimes collected from all
         model data objects. The times in the item are a subset.
     directory : str
         Directory in which the model will be written.
@@ -671,7 +671,7 @@ def _get_period(package, times, directory, stress_period_schema):
     Returns
     -------
     package_data : collections.OrderedDict
-        Dictionary containing the generated paths (IDF, IPF) for a single package. 
+        Dictionary containing the generated paths (IDF, IPF) for a single package.
     """
     name = list(package.keys())[0].split("-")[0]
     package_data = collections.OrderedDict()
@@ -692,7 +692,7 @@ def _get_period(package, times, directory, stress_period_schema):
 
 
 def _get_package(package, directory, package_schema):
-    """ 
+    """
     Generates paths for all fields and layers of a package, that does not have
     stress periods.
 
@@ -708,7 +708,7 @@ def _get_package(package, directory, package_schema):
     Returns
     -------
     package_data : collections.OrderedDict
-        Dictionary containing the generated paths (IDF, IPF) for a single package. 
+        Dictionary containing the generated paths (IDF, IPF) for a single package.
     """
     package_data = collections.OrderedDict()
 
@@ -746,15 +746,15 @@ def _get_package(package, directory, package_schema):
 
 def get_runfile(model, directory, output_packages=["shd"]):
     """
-    Generates an collections.OrderedDict containing the values to be filled in in a runfile 
+    Generates an collections.OrderedDict containing the values to be filled in in a runfile
     template, from the data contained in ``model``.
-    These values are mainly the paths of the IDFs and IPFs, nested in such a 
-    way that it can be easily unpacked when filling in the runfiles; 
+    These values are mainly the paths of the IDFs and IPFs, nested in such a
+    way that it can be easily unpacked when filling in the runfiles;
     plus a fairly large number of configuration values.
 
     For packages that do not have stress periods, the nesting is:
     package - field - layer
-    
+
     For packages that have stress periods, the nesting is:
     package - field - system - layer - time
 
@@ -765,17 +765,17 @@ def get_runfile(model, directory, output_packages=["shd"]):
     ----------
     model: collections.OrderedDict
         Dictionary containing the model data.
-    directory : str 
-        Directory in which the model will be written (and therefore necessary 
+    directory : str
+        Directory in which the model will be written (and therefore necessary
         for generating paths)
 
     Returns
     -------
     parameter_values : collections.OrderedDict
-        Dictionary containing all the values necessary for filling in a 
-        runfile. Nested in such a way that it can be easily unpacked in a 
+        Dictionary containing all the values necessary for filling in a
+        runfile. Nested in such a way that it can be easily unpacked in a
         template.
-    
+
     """
     consumed_model = _check_input(model)
     bounds = _data_bounds(model)
@@ -850,7 +850,7 @@ def write_runfile(path, runfile_parameters):
         Path to write runfile contents to.
     runfile_parameters : collections.OrderedDict
         Dictionary used to fill in runfile.
-    
+
     Returns
     -------
     None
@@ -864,20 +864,20 @@ def write_runfile(path, runfile_parameters):
 
 def seawat_get_runfile(model, directory):
     """
-    Generates an collections.OrderedDict containing the values to be filled in in a runfile 
+    Generates an collections.OrderedDict containing the values to be filled in in a runfile
     template, from the data contained in ``model``, specifically for an
     IMODSEAWAT model.
 
     .. deprecated:: 0.7.0
         imod.run.seawat_get_runfile is deprecated, use imod.wq instead.
 
-    These values are mainly the paths of the IDFs and IPFs, nested in such a 
-    way that it can be easily unpacked when filling in the runfiles; 
+    These values are mainly the paths of the IDFs and IPFs, nested in such a
+    way that it can be easily unpacked when filling in the runfiles;
     plus a fairly large number of configuration values.
 
     For packages that do not have stress periods, the nesting is:
     package - field - layer
-    
+
     For packages that have stress periods, the nesting is:
     package - field - system - layer - time
 
@@ -889,16 +889,16 @@ def seawat_get_runfile(model, directory):
     model: collections.OrderedDict
         Dictionary containing the model data.
     directory : str
-        Directory in which the model will be written (and therefore necessary 
+        Directory in which the model will be written (and therefore necessary
         for generating paths)
 
     Returns
     -------
     parameter_values : collections.OrderedDict
-        Dictionary containing all the values necessary for filling in a 
-        runfile. Nested in such a way that it can be easily unpacked in a 
+        Dictionary containing all the values necessary for filling in a
+        runfile. Nested in such a way that it can be easily unpacked in a
         template.
-    
+
     """
     warnings.warn(
         "imod.run.seawat_get_runfile is deprecated, use imod.wq instead.", FutureWarning
@@ -968,7 +968,7 @@ def seawat_write_runfile(path, runfile_parameters):
         Path to write runfile contents to.
     runfile_parameters : collections.OrderedDict
         Dictionary used to fill in runfile.
-    
+
     Returns
     -------
     None

@@ -84,9 +84,9 @@ def _interpolate_value_boundaries_z3ddz1d(values, z, dz, threshold, out):
 
 def interpolate_value_boundaries(values, z, threshold):
     """Function that returns all exceedance and non-exceedance boundaries for
-    a given threshold in a 3D values DataArray. Returned z-coordinates are 
-    linearly interpolated between cell mids. As many boundaries are returned as are maximally 
-    present in the 3D values DataArray. Function returns xr.DataArray of exceedance boundaries 
+    a given threshold in a 3D values DataArray. Returned z-coordinates are
+    linearly interpolated between cell mids. As many boundaries are returned as are maximally
+    present in the 3D values DataArray. Function returns xr.DataArray of exceedance boundaries
     and xr.DataArray of z-coordinates where values fall below the set treshold.
 
     Parameters
@@ -101,9 +101,9 @@ def interpolate_value_boundaries(values, z, threshold):
     Returns
     -------
     xr.DataArray
-        Z locations of successive exceedances of threshold from the top down. Dimensions ``boundary``, ``y``, ``x`` 
+        Z locations of successive exceedances of threshold from the top down. Dimensions ``boundary``, ``y``, ``x``
     xr.DataArray
-        Z locations of successive instances of falling below threshold from the top down. Dimensions ``boundary``, ``y``, ``x`` 
+        Z locations of successive instances of falling below threshold from the top down. Dimensions ``boundary``, ``y``, ``x``
     """
 
     if "dz" not in z.coords:

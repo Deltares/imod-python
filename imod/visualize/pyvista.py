@@ -147,7 +147,7 @@ def _create_hexahedra_z3d(data, x, y, z3d):
     This function creates the necessary arrays to create hexahedra, based on a
     three-dimensional z array: i.e. one that depends on x and y.
     These arrays are used to create a pyvista.UnstructuredGrid.
-    
+
     Parameters
     ----------
     data : np.array of size (nz, ny, nx)
@@ -388,7 +388,7 @@ def grid_3d(
         can occur. By settings this argument to a higher value, more of the
         inner cells will be rendered, reducing the chances of gaps occurring.
     return_index : bool, default False
-    
+
     Returns
     -------
     pyvista.UnstructuredGrid
@@ -513,7 +513,7 @@ def line_3d(polygon, z=0.0):
 
     Returns
     -------
-    pyvista.PolyData    
+    pyvista.PolyData
     """
     x, y = map(np.array, polygon.exterior.coords.xy)
     if isinstance(z, xr.DataArray):
@@ -534,9 +534,9 @@ class GridAnimation3D:
     satisfied. Call the ``.peek()`` method to take a look. When satisfied, call
     ``.output()`` to write to a file.
 
-    
-    Parameters 
-    ---------- 
+
+    Parameters
+    ----------
     da : xr.DataArray
         The dataarray with transient data. Must contain a "time" dimension.
     vertical_exaggeration : float, defaults to 30.0
@@ -557,7 +557,7 @@ class GridAnimation3D:
     Check what it looks like (if a window pops up: press "q" instead of the X to return):
 
     >>> animation.peek()
-    
+
     Change the camera position, add bounding box, and check the result:
 
     >>> animation.plotter.camera_position = (2, 1, 0.5)

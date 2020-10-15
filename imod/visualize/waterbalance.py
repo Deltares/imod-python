@@ -57,7 +57,7 @@ def waterbalance_barchart(
 
     Returns
     -------
-    ax : matplotlib.Axes 
+    ax : matplotlib.Axes
 
     Examples
     --------

@@ -16,16 +16,16 @@ def points_in_bounds(da, **points):
     points : keyword arguments of coordinate=values
         keyword arguments specifying coordinate and values. Please refer to the
         examples.
-    
+
     Returns
     -------
     in_bounds : np.array of bools
-    
+
     Examples
     --------
     Create the DataArray, then use the keyword arguments to define along which
     coordinate to check whether the points are within bounds.
-    
+
     >>> nrow, ncol = 3, 4
     >>> data = np.arange(12.0).reshape(nrow, ncol)
     >>> coords = {"x": [0.5, 1.5, 2.5, 3.5], "y": [2.5, 1.5, 0.5]}
@@ -33,12 +33,12 @@ def points_in_bounds(da, **points):
     >>> da = xr.DataArray(data, coords, dims)
     >>> x = [0.4, 2.6]
     >>> points_in_bounds(da, x=x)
-    
+
     This works for an arbitrary number of coordinates:
-    
+
     >>> y = [1.3, 2.7]
     >>> points_in_bounds(da, x=x, y=y)
-    
+
     """
     # check sizes
     shapes = {}
@@ -140,7 +140,7 @@ def points_indices(da, **points):
     Unfortunately, at the time of writing, xarray's .sel method does not
     support setting values yet. The method here works for both numpy and dask
     arrays, but you'll have to manage dimensions yourself!
-    
+
     The ``imod.select.points_set_values()`` function will take care of the
     dimensions.
     """
@@ -218,7 +218,7 @@ def points_set_values(da, values, **points):
     values : (int, float) or array of (int, float)
 
     points : keyword arguments of coordinate=values
-        keyword arguments specifying coordinate and values. 
+        keyword arguments specifying coordinate and values.
 
     Returns
     -------

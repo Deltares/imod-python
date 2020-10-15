@@ -269,7 +269,7 @@ def open(path, use_cftime=False, pattern=None):
 
 def write(path, da, driver=None, nodata=np.nan, dtype=None):
     """Write ``xarray.DataArray`` to GDAL supported geospatial rasters using ``rasterio``.
-    
+
     Parameters
     ----------
     path: str or Path
@@ -283,15 +283,15 @@ def write(path, da, driver=None, nodata=np.nan, dtype=None):
     nodata: float
         Nodata value to use. Should be convertible to the DataArray and GDAL dtype.
         Default value is np.nan
-        
+
     Examples
     --------
     Save ``xarray.DataArray`` in ASCII format:
 
     >>> imod.rasterio.write("example.asc", da)
-    
+
     Save ``xarray.DataArray`` in ASCII format, with 6 significant digits:
-    
+
     >>> da.attrs['SIGNIFICANT_DIGITS'] = 6
     >>> imod.rasterio.write("example.asc", da)
     """

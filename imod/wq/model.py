@@ -91,18 +91,18 @@ class Model(collections.UserDict):
         return selmodel
 
     def to_netcdf(self, directory=".", pattern="{pkgname}.nc", **kwargs):
-        """Convenience function to write all model packages 
+        """Convenience function to write all model packages
         to netcdf files.
-        
+
         Parameters
         ----------
         directory : str, pathlib.Path
             Directory into which the different model packages will be written.
         pattern : str, optional.
-            Pattern for filename of each package, in which `pkgname` 
+            Pattern for filename of each package, in which `pkgname`
             signifies the package name. Default is `"{pkgname}.nc"`,
             so `model["river"]` would get written to `path / river.nc`.
-        kwargs : 
+        kwargs :
             Additional kwargs to be forwarded to `xarray.Dataset.to_netcdf`.
         """
         directory = pathlib.Path(directory)
@@ -121,7 +121,7 @@ class SeawatModel(Model):
 
     Examples
     --------
-    
+
     >>> m = SeawatModel("example")
     >>> m["riv"] = River(...)
     >>> # ...etc.
@@ -243,7 +243,7 @@ class SeawatModel(Model):
         Add a daterange:
 
         >>> m.time_discretization(pd.daterange("2000-01-01", "2001-01-01"))
-        
+
         Add a list of times:
 
         >>> m.time_discretization(["2000-01-01", "2001-01-01"])

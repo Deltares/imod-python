@@ -677,7 +677,7 @@ def celltable(path, column, resolution, like, chunksize=1e4):
 
     ``"row_index"`` and ``"col_index"`` are the indices of the like array in
     which the polygon is located. The ``column`` value holds the rasterized
-    value of the specified column. ``"area"`` contains the area of the 
+    value of the specified column. ``"area"`` contains the area of the
     polygon within the cell.
 
     The most convenient way of using this celltable is by specifying a feature
@@ -783,7 +783,7 @@ def _burn_cells(raster, rows, cols, values):
     ----------
     raster : np.array
         raster to burn values into.
-    rows : np.array of integers 
+    rows : np.array of integers
         row indices (i)
     cols : np.array of integers
         column indices (j)
