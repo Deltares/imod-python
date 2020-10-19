@@ -30,7 +30,7 @@ Added
    flexibility in including and renaming columns of the associated files.
 -  Optional basemap plotting has been added to :meth:`imod.visualize.plot_map()`.
 -  :meth:`imod.tec.read` can read labelled coordinates ``time``, ``z``, ``y``,
-   and ``x`` if present in the ``.tec` file.
+   and ``x`` if present in the ``.tec`` file.
 -  :meth:`imod.idf.open_subdomains` will now also accept iMOD-WQ output of
    multiple species runs.
 
@@ -44,7 +44,7 @@ Changed
    speeding up parsing, which takes a significant amount of time in the runfile
    to namefile conversion of iMOD-WQ.)
 -  Datetime formats are inferred based on length of the time string according to
-   ``%Y%m%d%H%M%S``; supported lengths 4 (year only) to 14.
+   ``%Y%m%d%H%M%S``; supported lengths 4 (year only) to 14 (full format string).
 
 [0.10.0] - 2020-05-23
 ---------------------
