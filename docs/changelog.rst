@@ -18,25 +18,33 @@ Fixed
    recharge package concentration given in IDF files. It did not prepend the
    name of the package correctly (resulting in paths like
    ``concentration_l1.idf`` instead of ``rch/concentration_l1.idf``).
+-  :meth:`imod.idf.save()` will simplify constant cellsize arrays to a scalar
+   value -- this greatly speeds up drawing in the iMOD-GUI.
 
 Added
 ~~~~~
 -  :class:`imod.wq.MassLoading` and
    :class:`imod.wq.TimeVaryingConstantConcentration` have been added to allow
    additional concentration boundary conditions.
-- IPF writing methods support an ``assoc_columns`` keyword to allow greater
+-  IPF writing methods support an ``assoc_columns`` keyword to allow greater
    flexibility in including and renaming columns of the associated files.
-- Optional basemap plotting has been added to :meth:`imod.visualize.plot_map()`.
+-  Optional basemap plotting has been added to :meth:`imod.visualize.plot_map()`.
+-  :meth:`imod.tec.read` can read labelled coordinates ``time``, ``z``, ``y``,
+   and ``x`` if present in the ``.tec` file.
+-  :meth:`imod.idf.open_subdomains` will now also accept iMOD-WQ output of
+   multiple species runs.
 
 Changed
 ~~~~~~~
-- :meth:`imod.wq.SeawatModel.to_netcdf()` has been added to write all model
+-  :meth:`imod.wq.SeawatModel.to_netcdf()` has been added to write all model
    packages to netCDF files.
-- :meth:`imod.wq.SeawatModel.write()` now generates iMOD-WQ runfiles with
+-  :meth:`imod.wq.SeawatModel.write()` now generates iMOD-WQ runfiles with
    more intelligent use of the "macro tokens". ``:`` is used exclusively for
    ranges; ``$`` is used to signify all layers. (This makes runfiles shorter,
    speeding up parsing, which takes a significant amount of time in the runfile
    to namefile conversion of iMOD-WQ.)
+-  Datetime formats are inferred based on length of the time string according to
+   ``%Y%m%d%H%M%S``; supported lengths 4 (year only) to 14.
 
 [0.10.0] - 2020-05-23
 ---------------------
