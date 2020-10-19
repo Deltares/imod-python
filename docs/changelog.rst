@@ -33,11 +33,11 @@ Added
    and ``x`` if present in the ``.tec`` file.
 -  :meth:`imod.idf.open_subdomains` will now also accept iMOD-WQ output of
    multiple species runs.
+-  :meth:`imod.wq.SeawatModel.to_netcdf()` has been added to write all model
+   packages to netCDF files.
 
 Changed
 ~~~~~~~
--  :meth:`imod.wq.SeawatModel.to_netcdf()` has been added to write all model
-   packages to netCDF files.
 -  :meth:`imod.wq.SeawatModel.write()` now generates iMOD-WQ runfiles with
    more intelligent use of the "macro tokens". ``:`` is used exclusively for
    ranges; ``$`` is used to signify all layers. (This makes runfiles shorter,
