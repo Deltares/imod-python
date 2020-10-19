@@ -269,13 +269,22 @@ def _merge_subdomains(pathlists, use_cftime, pattern):
     nrow = y.size
     ncol = x.size
     nlayer = das[0].coords["layer"].size
-    out = np.full((1, nlayer, nrow, ncol), np.nan)
+    if "species" in das[0].dims:
+        has_species = True
+        nspecies = das[0].coords["species"].size
+        out = np.full((nspecies, 1, nlayer, nrow, ncol), np.nan)
+    else:
+        has_species = False
+        out = np.full((1, nlayer, nrow, ncol), np.nan)
 
     for da in das:
         ix = np.searchsorted(x, da.x.values[0], side="left")
         iy = nrow - np.searchsorted(y, da.y.values[0], side="right")
-        _, _, ysize, xsize = da.shape
-        out[:, :, iy : iy + ysize, ix : ix + xsize] = da.values
+        ysize, xsize = da.shape[-2:]
+        if has_species:
+            out[:, :, :, iy : iy + ysize, ix : ix + xsize] = da.values
+        else:
+            out[:, :, iy : iy + ysize, ix : ix + xsize] = da.values
 
     return out
 
@@ -306,6 +315,10 @@ def open_subdomains(path, use_cftime=False):
         r"[\w-]+_(?P<time>[0-9-]+)_l(?P<layer>[0-9]+)_p(?P<subdomain>[0-9]{3})",
         re.IGNORECASE,
     )
+    pattern_species = re.compile(
+        r"[\w-]+_c(?P<species>[0-9]+)_(?P<time>[0-9-]+)_l(?P<layer>[0-9]+)_p(?P<subdomain>[0-9]{3})",
+        re.IGNORECASE,
+    )
     # There are no real benefits to itertools.groupby in this case, as there's
     # no benefit to using a (lazy) iterator in this case
     grouped_by_time = collections.defaultdict(
@@ -315,16 +328,24 @@ def open_subdomains(path, use_cftime=False):
     timestrings = []
     layers = []
     numbers = []
-    for p in paths:
+    species = []
+    has_species = False
+    for i, p in enumerate(paths):
+        if not i:
+            if pattern_species.search(paths[0]) is not None:
+                has_species = True
+                pattern = pattern_species
         search = pattern.search(p)
-        timestr = search.group(1)
-        layer = int(search.group(2))
-        number = int(search.group(3))
+        timestr = search["time"]
+        layer = int(search["layer"])
+        number = int(search["subdomain"])
         grouped_by_time[timestr][number].append(p)
         count_per_subdomain[number] += 1
         numbers.append(number)
         layers.append(layer)
         timestrings.append(timestr)
+        if has_species:
+            species.append(int(search["species"]))
 
     # Test whether subdomains are complete
     numbers = sorted(set(numbers))
@@ -339,7 +360,10 @@ def open_subdomains(path, use_cftime=False):
                 f"has {group_len} IDF files."
             )
 
-    pattern = r"{name}_{time}_l{layer}_p\d+"
+    if has_species:
+        pattern = r"{name}_c{species}_{time}_l{layer}_p\d+"
+    else:
+        pattern = r"{name}_{time}_l{layer}_p\d+"
     timestrings = list(grouped_by_time.keys())
 
     # Prepare output coordinates
@@ -369,8 +393,21 @@ def open_subdomains(path, use_cftime=False):
         coords["time"] = xr.CFTimeIndex(np.unique(times))
     else:
         coords["time"] = np.unique(times)
-    shape = (1, coords["layer"].size, coords["y"].size, coords["x"].size)
-    dims = ("time", "layer", "y", "x")
+    if has_species:
+        coords["species"] = np.array(sorted(set(species)))
+        shape = (
+            coords["species"].size,
+            1,
+            coords["layer"].size,
+            coords["y"].size,
+            coords["x"].size,
+        )
+        dims = ("species", "time", "layer", "y", "x")
+        time_axis = 1
+    else:
+        shape = (1, coords["layer"].size, coords["y"].size, coords["x"].size)
+        dims = ("time", "layer", "y", "x")
+        time_axis = 0
 
     # Collect and merge data
     merged = []
@@ -383,7 +420,7 @@ def open_subdomains(path, use_cftime=False):
         timestep_data = dask.delayed(_merge_subdomains)(group, use_cftime, pattern)
         dask_array = dask.array.from_delayed(timestep_data, shape, dtype=dtype)
         merged.append(dask_array)
-    data = dask.array.concatenate(merged, axis=0)
+    data = dask.array.concatenate(merged, axis=time_axis)
 
     # Get tops and bottoms if possible
     headers = [header(path, pattern) for path in grouped_by_time[first_time][first]]

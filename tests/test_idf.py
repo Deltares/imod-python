@@ -74,6 +74,30 @@ def test_da_subdomains():
     return das
 
 
+@pytest.fixture(scope="module")
+def test_da_subdomains_species():
+    nspecies, nlayer, nrow, ncol = (2, 3, 4, 5)
+    dx, dy = (1.0, -1.0)
+    layer = [1, 2, 3]
+    species = [1, 2]
+    xmin = (0.0, 3.0, 3.0, 0.0)
+    xmax = (5.0, 8.0, 8.0, 5.0)
+    ymin = (0.0, 2.0, 0.0, 2.0)
+    ymax = (4.0, 6.0, 4.0, 6.0)
+    data = np.ones((nspecies, nlayer, nrow, ncol), dtype=np.float32)
+
+    kwargs = {"name": "subdomains", "dims": ("species", "layer", "y", "x")}
+
+    das = []
+    for subd_extent in zip(xmin, xmax, ymin, ymax):
+        kwargs["coords"] = util._xycoords(subd_extent, (dx, dy))
+        kwargs["coords"]["layer"] = layer
+        kwargs["coords"]["species"] = species
+        das.append(xr.DataArray(data, **kwargs))
+
+    return das
+
+
 def test_open_subdomains(test_da_subdomains, tmp_path):
     subdomains = test_da_subdomains
 
@@ -81,7 +105,30 @@ def test_open_subdomains(test_da_subdomains, tmp_path):
         for layer, da in subdomain.groupby("layer"):
             idf.write(tmp_path / f"subdomains_20000101_l{layer}_p00{i}.idf", da)
 
-    da = idf.open_subdomains(tmp_path / "subdomains_*.idf")
+    da = idf.open_subdomains(tmp_path / "subdomains_*.idf").load()
+
+    assert np.all(da == 1.0)
+    assert len(da.x) == 8
+    assert len(da.y) == 6
+
+    coords = util._xycoords((0.0, 8.0, 0.0, 6.0), (1.0, -1.0))
+    assert np.all(da["y"].values == coords["y"])
+    assert np.all(da["x"].values == coords["x"])
+
+    assert isinstance(da, xr.DataArray)
+
+
+def test_open_subdomains_species(test_da_subdomains_species, tmp_path):
+    subdomains = test_da_subdomains_species
+
+    for i, subdomain in enumerate(subdomains):
+        for species, das in subdomain.groupby("species"):
+            for layer, da in das.groupby("layer"):
+                idf.write(
+                    tmp_path / f"subdomains_c{species}_20000101_l{layer}_p00{i}.idf", da
+                )
+
+    da = idf.open_subdomains(tmp_path / "subdomains_*.idf").load()
 
     assert np.all(da == 1.0)
     assert len(da.x) == 8
