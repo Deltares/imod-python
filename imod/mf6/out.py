@@ -15,7 +15,7 @@ import imod
 # Type annotations
 IntArray = np.ndarray
 FloatArray = np.ndarray
-FilePath = Union[str, pathlib.Path
+FilePath = Union[str, pathlib.Path]
 
 
 def _grb_text(f: BinaryIO, lentxt: int=50):
@@ -228,7 +228,7 @@ def _read_imeth6_header(f: BinaryIO) -> Dict[str, Any]:
     return content
 
 
-def read_cbc_headers(cbc_path: FilePath) -> Dict[List[Union(Imeth1Header, Imeth6Header)]]:
+def read_cbc_headers(cbc_path: FilePath) -> Dict[str, List[Union[Imeth1Header, Imeth6Header]]]:
     """
     Read all the header data from a cell-by-cell (.cbc) budget file.
 
@@ -559,7 +559,7 @@ def _dis_indices(ia: IntArray, ja: IntArray, ncells: int, nlayer: int, nrow: int
     for i in range(ncells):
         for nzi in range(ia[i], ia[i + 1]):
             nzi -= 1  # python is 0-based, modflow6 is 1-based
-            j = ja[nzi]
+            j = ja[nzi] - 1 # python is 0-based, modflow6 is 1-based
             d = j - i
             if d <= 0:  # left, back, upper
                 continue
