@@ -18,7 +18,7 @@ FloatArray = np.ndarray
 FilePath = Union[str, pathlib.Path]
 
 
-def _grb_text(f: BinaryIO, lentxt: int=50):
+def _grb_text(f: BinaryIO, lentxt: int = 50):
     return f.read(lentxt).decode("utf-8").strip().lower()
 
 
@@ -32,15 +32,15 @@ def open_disgrb(path):
             raise ValueError(f'Expected "grid dis" file, got {h1}')
         if h2 != "version 1":
             raise ValueError(f"Only version 1 supported, got {h2}")
-    
+
         ntxt = int(_grb_text(f).split()[1])
         lentxt = int(_grb_text(f).split()[1])
-    
+
         # we don't need any information from the the text lines that follow,
         # they are definitions that aim to make the file more portable,
         # so let's skip straight to the binary data
         f.seek(ntxt * lentxt, 1)
-    
+
         ncells = struct.unpack("i", f.read(4))[0]
         nlayer = struct.unpack("i", f.read(4))[0]
         nrow = struct.unpack("i", f.read(4))[0]
@@ -59,8 +59,10 @@ def open_disgrb(path):
         ia = np.fromfile(f, np.int32, ncells + 1)
         ja = np.fromfile(f, np.int32, nja)
         idomain_np = np.reshape(np.fromfile(f, np.int32, ncells), (nlayer, nrow, ncol))
-        icelltype_np = np.reshape(np.fromfile(f, np.int32, ncells), (nlayer, nrow, ncol)) 
-    
+        icelltype_np = np.reshape(
+            np.fromfile(f, np.int32, ncells), (nlayer, nrow, ncol)
+        )
+
     bounds = (xorigin, xorigin + delc.sum(), yorigin, yorigin + delr.sum())
     coords = imod.util._xycoords(bounds, (delc, -delr))
     top = xr.DataArray(top_np, coords, ("y", "x"), name="top")
@@ -155,7 +157,7 @@ def open_hds(hds_path, grb_path, dry_nan=False):
 
 
 # -------------------
-# Cell-by-cell flows 
+# Cell-by-cell flows
 # -------------------
 class Imeth1Header(NamedTuple):
     kstp: int
@@ -228,14 +230,16 @@ def _read_imeth6_header(f: BinaryIO) -> Dict[str, Any]:
     return content
 
 
-def read_cbc_headers(cbc_path: FilePath) -> Dict[str, List[Union[Imeth1Header, Imeth6Header]]]:
+def read_cbc_headers(
+    cbc_path: FilePath,
+) -> Dict[str, List[Union[Imeth1Header, Imeth6Header]]]:
     """
     Read all the header data from a cell-by-cell (.cbc) budget file.
 
     All budget data for a MODFLOW6 model is stored in a single file. This
     function collects all header data, as well as the starting byte position of
     the actual budget data.
-    
+
     This function groups the headers per TEXT record (e.g. "flow-ja-face",
     "drn", etc.). The headers are stored as a list of named tuples.
     flow-ja-face, storage-ss, and storage-sy are written using IMETH=1, all
@@ -243,7 +247,7 @@ def read_cbc_headers(cbc_path: FilePath) -> Dict[str, List[Union[Imeth1Header, I
 
     Parameters
     ----------
-    cbc_path: str, pathlib.Path 
+    cbc_path: str, pathlib.Path
         Path to the budget file.
 
     Returns
@@ -257,15 +261,16 @@ def read_cbc_headers(cbc_path: FilePath) -> Dict[str, List[Union[Imeth1Header, I
         filesize = os.fstat(f.fileno()).st_size
         while f.tell() < filesize:
             header = _read_common_cbc_header(f)
-            key = header["text"]
             if header["imeth"] == 1:
                 datasize = header["ndim1"] * 8
                 header["pos"] = f.tell()
+                key = header["text"]
                 headers[key].append(Imeth1Header(**header))
             elif header["imeth"] == 6:
                 imeth6_header = _read_imeth6_header(f)
                 datasize = imeth6_header["nlist"] * (8 + imeth6_header["ndat"] * 8)
                 header["pos"] = f.tell()
+                key = imeth6_header["txt2id2"]
                 headers[key].append(Imeth6Header(**header, **imeth6_header))
             else:
                 raise ValueError(
@@ -288,7 +293,7 @@ def _read_imeth1_budgets(cbc_path: FilePath, count: int, pos: int) -> FloatArray
         number of values to read
     pos:
         position in the file where the data for a timestep starts
-    
+
     Returns
     -------
     1-D array of floats
@@ -343,7 +348,7 @@ def _read_imeth6_budgets(
     * id2: the boundary condition index
     * budget: the budget terms
     * and assorted auxiliary columns, if present
-    
+
     Parameters
     ----------
     cbc_path: str, pathlib.Path
@@ -400,7 +405,12 @@ def _open_imeth6_budgets(
 
 
 def _dis_read_imeth6_budgets(
-    cbc_path: FilePath, count: int, dtype: np.dtype, pos: int, size: int, shape: tuple,
+    cbc_path: FilePath,
+    count: int,
+    dtype: np.dtype,
+    pos: int,
+    size: int,
+    shape: tuple,
 ) -> FloatArray:
     """
     Read the data for an imeth==6 budget section.
@@ -422,7 +432,7 @@ def _dis_read_imeth6_budgets(
         size of the entire model domain
     shape: tuple[int, int, int]
         Shape (nlayer, nrow, ncolumn) of entire model domain.
-    
+
     Returns
     -------
     Three-dimensional array of floats
@@ -434,8 +444,8 @@ def _dis_read_imeth6_budgets(
         table = np.fromfile(f, dtype, count)
     out[table["id1"]] = table["budget"]
     return out.reshape(shape)
-    
- 
+
+
 def _dis_open_imeth1_budgets(
     cbc_path: FilePath, grb_content: dict, header_list: List[Imeth1Header]
 ) -> xr.DataArray:
@@ -487,7 +497,7 @@ def _dis_open_imeth6_budgets(
     cbc_path: str, pathlib.Path
     grb_content: dict
     header_list: List[Imeth1Header]
-    
+
     Returns
     -------
     xr.DataArray with dims ("time", "layer", "y", "x")
@@ -517,7 +527,9 @@ def _dis_open_imeth6_budgets(
 
 
 @numba.njit
-def _dis_indices(ia: IntArray, ja: IntArray, ncells: int, nlayer: int, nrow: int, ncol: int, nja: int):
+def _dis_indices(
+    ia: IntArray, ja: IntArray, ncells: int, nlayer: int, nrow: int, ncol: int, nja: int
+):
     """
     Infer type of connection via cell number comparison. Returns arrays that can
     be used for extracting right, front, and lower face flow from the
@@ -543,7 +555,7 @@ def _dis_indices(ia: IntArray, ja: IntArray, ncells: int, nlayer: int, nrow: int
     ncol: int
     nja: int
         Number of cell-to-cell connections
-    
+
     Returns
     -------
     right: 3D array of ints
@@ -559,7 +571,7 @@ def _dis_indices(ia: IntArray, ja: IntArray, ncells: int, nlayer: int, nrow: int
     for i in range(ncells):
         for nzi in range(ia[i], ia[i + 1]):
             nzi -= 1  # python is 0-based, modflow6 is 1-based
-            j = ja[nzi] - 1 # python is 0-based, modflow6 is 1-based
+            j = ja[nzi] - 1  # python is 0-based, modflow6 is 1-based
             d = j - i
             if d <= 0:  # left, back, upper
                 continue
@@ -577,7 +589,9 @@ def _dis_indices(ia: IntArray, ja: IntArray, ncells: int, nlayer: int, nrow: int
     return right.reshape(shape), front.reshape(shape), lower.reshape(shape)
 
 
-def _dis_to_right_front_lower_indices(grb_content: dict) -> Tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
+def _dis_to_right_front_lower_indices(
+    grb_content: dict,
+) -> Tuple[xr.DataArray, xr.DataArray, xr.DataArray]:
     """
     Infer the indices to extract right, front, and lower face flows from the
     flow-ja-face array.
@@ -608,7 +622,9 @@ def _dis_to_right_front_lower_indices(grb_content: dict) -> Tuple[xr.DataArray, 
     )
 
 
-def _dis_extract_face_budgets(budgets: xr.DataArray, index: xr.DataArray) -> xr.DataArray:
+def _dis_extract_face_budgets(
+    budgets: xr.DataArray, index: xr.DataArray
+) -> xr.DataArray:
     """
     Grab right, front, or lower face flows from the flow-ja-face array.
 
@@ -623,7 +639,7 @@ def _dis_extract_face_budgets(budgets: xr.DataArray, index: xr.DataArray) -> xr.
         the individual cells.
     index: xr.DataArray of ints
         right, front, or lower index array with dims("layer", "y", "x")
-    
+
     Returns
     -------
     xr.DataArray of floats with dims ("time", "layer", "y", "x")
@@ -678,7 +694,7 @@ def open_cbc(cbc_path: FilePath, grb_path: FilePath) -> Dict[str, xr.DataArray]:
     The data is lazily read per timestep and automatically converted into
     (dense) xr.DataArrays. The conversion is done via the information stored in
     the Binary Grid File (GRB).
-    
+
     Currently only structured discretization (DIS) is supported. The flow-ja-face
     data is automatically converted into "right-face-flow", "front-face-flow" and
     "lower-face-flow".
@@ -698,7 +714,7 @@ def open_cbc(cbc_path: FilePath, grb_path: FilePath) -> Dict[str, xr.DataArray]:
 
     Examples
     --------
-    
+
     Open a cbc file:
 
     >>> import imod
@@ -707,7 +723,7 @@ def open_cbc(cbc_path: FilePath, grb_path: FilePath) -> Dict[str, xr.DataArray]:
     Check the contents:
 
     >>> print(cbc_content.keys())
-    
+
     Get the drainage budget, compute a time mean for the first layer:
 
     >>> drn_budget = cbc_content["drn]
