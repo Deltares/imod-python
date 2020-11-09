@@ -577,6 +577,21 @@ def ugrid2d_data(da: xr.DataArray) -> xr.DataArray:
     )
 
 
+def _unstack_layers(ds: xr.Dataset) -> xr.Dataset:
+    """
+    Unstack the layer dimensions, as MDAL does not have support for
+    UGRID-2D-layered datasets yet. Layers are stored as separate variables
+    instead for now.
+    """
+    for variable in ds.data_vars:
+        if "layer" in ds[variable].dims:
+            stacked = ds[variable]
+            ds = ds.drop_vars(variable)
+            for layer in stacked["layer"].values:
+                ds[f"{variable}_layer_{layer}"] = stacked.sel(layer=layer)
+    return ds
+
+
 def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
     """
     Convert a structured DataArray or Dataset into its UGRID-2D quadrilateral
@@ -611,4 +626,4 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
             ds[variable] = ugrid2d_data(data[variable])
     else:
         raise TypeError("data must be xarray.DataArray or xr.Dataset")
-    return ds
+    return _unstack_layers(ds)
