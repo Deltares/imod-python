@@ -17,17 +17,23 @@ import datetime
 import os
 import pathlib
 import re
+from typing import Tuple, Union
 import warnings
 
 import affine
 import cftime
 import dateutil
 import numpy as np
+import xarray as xr
 
 try:
     Pattern = re._pattern_type
 except AttributeError:
     Pattern = re.Pattern  # Python 3.7+
+
+
+FloatArray = np.ndarray
+IntArray = np.ndarray
 
 
 DATETIME_FORMATS = {
@@ -445,3 +451,164 @@ def ignore_warnings():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
         yield
+
+
+def _ugrid2d_dataset(
+    node_x: FloatArray,
+    node_y: FloatArray,
+    face_x: FloatArray,
+    face_y: FloatArray,
+    face_nodes: IntArray,
+) -> xr.Dataset:
+    ds = xr.Dataset()
+    ds["mesh2d"] = xr.DataArray(
+        data=0,
+        attrs={
+            "cf_role": "mesh_topology",
+            "long_name": "Topology data of 2D mesh",
+            "topology_dimension": 2,
+            "node_coordinates": "node_x node_y",
+            "face_node_connectivity": "face_nodes",
+            "edge_node_connectivity": "edge_nodes",
+        },
+    )
+    ds = ds.assign_coords(
+        node_x=xr.DataArray(
+            data=node_x,
+            dims=["node"],
+        )
+    )
+    ds = ds.assign_coords(
+        node_y=xr.DataArray(
+            data=node_y,
+            dims=["node"],
+        )
+    )
+    ds["face_nodes"] = xr.DataArray(
+        data=face_nodes,
+        coords={
+            "face_x": ("face", face_x),
+            "face_y": ("face", face_y),
+        },
+        dims=["face", "nmax_face"],
+        attrs={
+            "cf_role": "face_node_connectivity",
+            "long_name": "Vertex nodes of mesh faces (counterclockwise)",
+            "start_index": 0,
+            "_FillValue": -1,
+        },
+    )
+    ds.attrs = {"Conventions": "CF-1.8 UGRID-1.0"}
+    return ds
+
+
+def ugrid2d_topology(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
+    """
+    Derive the 2D-UGRID quadrilateral mesh topology from a structured DataArray
+    or Dataset, with (2D-dimensions) "y" and "x".
+
+    Parameters
+    ----------
+    data: Union[xr.DataArray, xr.Dataset]
+        Structured data from which the "x" and "y" coordinate will be used to
+        define the UGRID-2D topology.
+
+    Returns
+    -------
+    ugrid_topology: xr.Dataset
+        Dataset with the required arrays describing 2D unstructured topology:
+        node_x, node_y, face_x, face_y, face_nodes (connectivity).
+    """
+    from imod.prepare import common
+
+    # Transform midpoints into vertices
+    # These are always returned monotonically increasing
+    x = data["x"].values
+    xcoord = common._coord(data, "x")
+    if not data.indexes["x"].is_monotonic_increasing:
+        xcoord = xcoord[::-1]
+    y = data["y"].values
+    ycoord = common._coord(data, "y")
+    if not data.indexes["y"].is_monotonic_increasing:
+        ycoord = ycoord[::-1]
+    # Compute all vertices, these are the ugrid nodes
+    node_y, node_x = (a.ravel() for a in np.meshgrid(ycoord, xcoord, indexing="ij"))
+    face_y, face_x = (a.ravel() for a in np.meshgrid(y, x, indexing="ij"))
+    linear_index = np.arange(node_x.size, dtype=np.int).reshape(
+        ycoord.size, xcoord.size
+    )
+    # Allocate face_node_connectivity
+    nfaces = (ycoord.size - 1) * (xcoord.size - 1)
+    face_nodes = np.empty((nfaces, 4))
+    # Set connectivity in counterclockwise manner
+    face_nodes[:, 0] = linear_index[:-1, 1:].ravel()  # upper right
+    face_nodes[:, 1] = linear_index[:-1, :-1].ravel()  # upper left
+    face_nodes[:, 2] = linear_index[1:, :-1].ravel()  # lower left
+    face_nodes[:, 3] = linear_index[1:, 1:].ravel()  # lower right
+    # Tie it together
+    ds = _ugrid2d_dataset(node_x, node_y, face_x, face_y, face_nodes)
+    return ds
+
+
+def ugrid2d_data(da: xr.DataArray) -> xr.DataArray:
+    """
+    Reshape a structured (x, y) DataArray into unstructured (face) form.
+    Extra dimensions are maintained:
+    e.g. (time, layer, x, y) becomes (time, layer, face).
+
+    Parameters
+    ----------
+    da: xr.DataArray
+        Structured DataArray with last two dimensions ("y", "x").
+
+    Returns
+    -------
+    Unstructured DataArray with dimensions ("y", "x") replaced by ("face",).
+    """
+    if da.dims[:-2] == ("y", "x"):
+        raise ValueError('Last two dimensions must be ("y", "x").')
+    extra_dims = list(set(da.dims) - set(["y", "x"]))
+    shape = da.data.shape
+    new_shape = shape[:-2] + (np.product(shape[-2:]),)
+    return xr.DataArray(
+        data=da.data.reshape(new_shape),
+        coords={k: da[k] for k in da.coords if k not in ("y", "x", "dy", "dx")},
+        dims=extra_dims + ["face"],
+    )
+
+
+def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
+    """
+    Convert a structured DataArray or Dataset into its UGRID-2D quadrilateral
+    equivalent.
+
+    See:
+    https://ugrid-conventions.github.io/ugrid-conventions/#2d-flexible-mesh-mixed-triangles-quadrilaterals-etc-topology
+
+    Parameters
+    ----------
+    data: Union[xr.DataArray, xr.Dataset]
+        Dataset or DataArray with last two dimensions ("y", "x").
+        In case of a Dataset, the 2D topology is defined once and variables are
+        added one by one.
+        In case of a DataArray, a name is required; a name can be set with:
+        ``da.name = "..."``'
+
+    Returns
+    -------
+    ugrid2d_dataset: xr.Dataset
+        The equivalent data, in UGRID-2D quadrilateral form.
+    """
+    ds = ugrid2d_topology(data)
+    if isinstance(data, xr.DataArray):
+        if data.name is None:
+            raise ValueError(
+                'A name is required for the DataArray. It can be set with ``da.name = "..."`'
+            )
+        ds[data.name] = ugrid2d_data(data)
+    elif isinstance(data, xr.Dataset):
+        for variable in data.data_vars:
+            ds[variable] = ugrid2d_data(data[variable])
+    else:
+        raise TypeError("data must be xarray.DataArray or xr.Dataset")
+    return ds
