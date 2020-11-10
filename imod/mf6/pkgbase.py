@@ -197,6 +197,35 @@ class Package(xr.Dataset, abc.ABC):
                         path = pkgdirectory / f"{key}.bin"
                         self.write_binary_griddata(path, da, dtype)
 
+    def _netcdf_path(self, directory, pkgname):
+        """create path for netcdf, this function is also used to create paths to use inside the qgis projectfiles"""
+        return directory / pkgname / f"{self._pkg_id}.nc"
+
+    def write_netcdf(self, directory, pkgname):
+        """Write to netcdf. Useful for generating .qgs projectfiles to view model input.
+        These files cannot be used to run a modflow model.
+        """
+
+        has_dims = []
+        for varname in self.data_vars.keys():  # pylint:disable=no-member
+            if all(i in self[varname].dims for i in ["x", "y"]):
+                has_dims.append(varname)
+
+        spatial_ds = self[has_dims]
+
+        if "time" not in spatial_ds:
+            # Hack to circumvent this issue:
+            # https://github.com/lutraconsulting/MDAL/issues/300
+            spatial_ds = spatial_ds.assign_coords(
+                time=np.array("1970-01-01", dtype=np.datetime64)
+            ).expand_dims(dim="time")
+
+        path = self._netcdf_path(directory, pkgname)
+        path.parent.mkdir(exist_ok=True, parents=True)
+
+        spatial_ds.to_netcdf(path)
+        return has_dims
+
 
 class BoundaryCondition(Package, abc.ABC):
     """

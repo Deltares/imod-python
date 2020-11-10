@@ -95,3 +95,13 @@ class Modflow6Simulation(collections.UserDict):
                     value.write(key, globaltimes)
                 elif value._pkg_id == "ims":
                     value.write(".", key)
+
+    def write_qgis_project(self, directory="."):
+        directory = pathlib.Path(directory)
+        directory.mkdir(exist_ok=True, parents=True)
+
+        with imod.util.cd(directory):
+            for key, value in self.items():
+                # skip timedis, exchanges
+                if value._pkg_id == "model":
+                    value.write_qgis_project(key)

@@ -23,6 +23,7 @@ setup(
         "dask",
         "cftime>=1",
         "cytoolz",  # optional dask dependency we need
+        "declxml",
         "Jinja2",
         "joblib",
         "matplotlib",

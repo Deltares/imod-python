@@ -24,6 +24,9 @@ dependencies:
   - numba>=0.50
   - numpy
   - pandas
+  - pip
+  - pip:
+    - declxml
   - pytest
   - pytest-benchmark
   - pytest-cov
