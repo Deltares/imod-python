@@ -8,6 +8,7 @@ import numpy as np
 import xarray as xr
 
 import imod
+from imod.mf6 import qgs_util
 
 
 class Model(collections.UserDict):
@@ -114,3 +115,29 @@ class GroundwaterFlowModel(Model):
         # write package contents
         for pkgname, pkg in self.items():
             pkg.write(modeldirectory, pkgname, globaltimes)
+
+    def write_qgis_project(self, modelname):
+        """
+        Write qgis projectfile and accompanying netcdf files that can be read in qgis.
+        """
+        ext = ".qgs"
+
+        modeldirectory = pathlib.Path(modelname)
+        modeldirectory.mkdir(exist_ok=True, parents=True)
+
+        pkgnames = [
+            pkgname
+            for pkgname, pkg in self.items()
+            if all(i in pkg.dims for i in ["x", "y"])
+        ]
+        data_paths = []
+        data_vars_ls = []
+        for pkgname in pkgnames:
+            pkg = self[pkgname]
+            data_path = pkg._netcdf_path(modeldirectory, pkgname)
+            data_path = "./" + data_path.relative_to(modeldirectory).as_posix()
+            data_paths.append(data_path)
+            data_vars_ls.append(pkg.write_netcdf(modeldirectory, pkgname))
+
+        qgs_tree = qgs_util._create_qgis_tree(self, pkgnames, data_paths, data_vars_ls)
+        qgs_util._write_qgis_projectfile(qgs_tree, modeldirectory / (modelname + ext))
