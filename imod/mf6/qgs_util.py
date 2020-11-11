@@ -4,6 +4,8 @@ import imod
 import imod.qgs as qgs
 from itertools import product
 import declxml as xml
+from xml.sax.saxutils import unescape
+import pyproj
 
 # For creating colormap
 from matplotlib import colors, cm
@@ -38,9 +40,9 @@ def _generate_layer_ids(pkgnames):
     ]
 
 
-def _create_groups(pkg, data_vars):
+def _create_groups(pkg, data_vars, aggregate_layers):
     """Create unique groups for each data variable - layer combination"""
-    if "layer" in pkg.dims:
+    if ("layer" in pkg.dims) and not aggregate_layers:
         layers = pkg.layer.values
     else:
         layers = [1]  # Exception for recharge package
@@ -75,7 +77,16 @@ def _create_mesh_dataset_group(pkgname, groups):
     )
 
 
-def _create_maplayers(model, pkgnames, layer_ids, data_paths, data_vars_ls, extent):
+def _create_maplayers(
+    model,
+    pkgnames,
+    layer_ids,
+    data_paths,
+    data_vars_ls,
+    extent,
+    spatial_ref_sys,
+    aggregate_layers,
+):
     time_format = "%Y-%m-%dT%H:%M:%SZ"
     start_time_string, end_time_string = [
         imod.util._compose_timestring(t, time_format=time_format)
@@ -92,7 +103,7 @@ def _create_maplayers(model, pkgnames, layer_ids, data_paths, data_vars_ls, exte
         pkgnames, layer_ids, data_paths, data_vars_ls
     ):
         pkg = model[pkgname]
-        groups = _create_groups(pkg, data_vars)
+        groups = _create_groups(pkg, data_vars, aggregate_layers)
 
         dataset_group = _create_mesh_dataset_group(pkgname, groups)
 
@@ -110,7 +121,10 @@ def _create_maplayers(model, pkgnames, layer_ids, data_paths, data_vars_ls, exte
             for group_nr, (data_var, _) in enumerate(groups)
         ]
 
+        srs = qgs.Srs(spatialrefsys=spatial_ref_sys)
+
         maplayer_kwargs = dict(
+            srs=srs,
             extent=extent,
             id=layer_id,
             layername=pkgname,
@@ -131,11 +145,39 @@ def _create_maplayers(model, pkgnames, layer_ids, data_paths, data_vars_ls, exte
     return maplayers
 
 
-def _create_qgis_tree(model, pkgnames, data_paths, data_vars_ls):
+def _create_qgis_tree(
+    model, pkgnames, data_paths, data_vars_ls, crs, aggregate_layers=False
+):
+    """Create tree of qgis objects.
+
+
+    Parameters
+    ----------
+    model : imod.wq.Model, imod.mf6.Model
+        model objects, to which the packages are assigned
+    pkgnames : list of str
+        list with names of packages that contain an x and y dimension
+    data_paths : list of str
+        relative path to the respective netcdf a package is saved in
+    data_vars_ls : nested list of str
+        list with a list of str per variable that contains an x and y dimension
+    crs : TYPE
+        project crs
+
+    Returns
+    -------
+    qgs_tree : qgs.QGIS
+        a tree-like object with all qgis settings, which can be saved to xml
+
+    """
     # Find if "dis" should be taken (mf6) or "bas" (wq)
     for n in ["dis", "bas"]:
         if n in model.keys():
             spatial_ref_var = n
+
+    spatial_ref_sys = qgs.SpatialRefSys(
+        wkt=pyproj.crs.CRS(crs).to_wkt(), geographicflag=True
+    )
 
     # Create map canvas
     _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(model[spatial_ref_var])
@@ -154,7 +196,14 @@ def _create_qgis_tree(model, pkgnames, data_paths, data_vars_ls):
 
     # Create project layers
     maplayers = _create_maplayers(
-        model, pkgnames, layer_ids, data_paths, data_vars_ls, extent
+        model,
+        pkgnames,
+        layer_ids,
+        data_paths,
+        data_vars_ls,
+        extent,
+        spatial_ref_sys,
+        aggregate_layers,
     )
     projectlayers = qgs.ProjectLayers(maplayer=maplayers)
 
@@ -172,6 +221,7 @@ def _create_qgis_tree(model, pkgnames, data_paths, data_vars_ls):
     layerorder = qgs.LayerOrder(layer=[qgs.Layer(id=i) for i in layer_ids])
 
     qgs_tree = qgs.Qgis(
+        projectcrs=qgs.ProjectCrs(spatialrefsys=spatial_ref_sys),
         layer_tree_group_leaf=layer_tree_group,
         layerorder=layerorder,
         mapcanvas=mapcanvas,
@@ -184,6 +234,11 @@ def _create_qgis_tree(model, pkgnames, data_paths, data_vars_ls):
 def _write_qgis_projectfile(qgs_tree, qgs_path):
     processor = qgs.make_processor(qgs.Qgis)
     text = xml.serialize_to_string(processor, qgs_tree, indent="  ")
+    # Double quote characters get automatically changed to '&quot;' by this function
+    # Because when using indents, minidom.toprettyxml() is used, which automatically escapes double quotes
+    # Double quotes are unfortunately included in WKT strings, so we need to fix this by unescaping
+    text = unescape(text, {"&quot;": '"'})
+
     lines_out = text.splitlines(keepends=True)[
         1:
     ]  # remove the first line as it is just some xml info we do not want.
