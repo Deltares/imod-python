@@ -16,14 +16,14 @@ class Attribute(abc.ABC):
 #%%Mapcanvas
 @dataclass
 class SpatialRefSys(Aggregate):
-    proj4: str = ""
+    # proj4: str = ""
     wkt: Optional[str] = None
-    srsid: int = 0
-    srid: int = 0
-    authid: str = ""
-    description: str = ""
-    projectionacronym: str = ""
-    ellipsoidacronym: str = ""
+    # srsid: int = 0
+    # srid: int = 0
+    # authid: str = ""
+    # description: str = ""
+    # projectionacronym: str = ""
+    # ellipsoidacronym: str = ""
     geographicflag: bool = False
 
 
@@ -365,7 +365,28 @@ class Legend(Aggregate):
     updateDrawingOrder: Union[Attribute, str] = "true"
 
 
+#%%properties
+@dataclass
+class SpatialRefSys_Property(Aggregate):
+    ProjectionsEnabled: int = 1
+    type: Union[Attribute, str] = "int"
+
+
+@dataclass
+class Properties(Aggregate):
+    spatialrefsys_property: SpatialRefSys_Property = SpatialRefSys_Property()
+
+
 #%%qgis
+@dataclass
+class SrcDest(Aggregate):
+    src: SpatialRefSys
+    dest: SpatialRefSys
+
+
+@dataclass
+class TransformContext(Aggregate):
+    srcdest: SrcDest
 
 
 @dataclass
@@ -418,10 +439,12 @@ class Qgis(Aggregate):
     projectlayers: ProjectLayers = None
     layerorder: LayerOrder = None
     visibility_presets: str = ""
-    transformContext: str = ""
     Annotations: str = ""
     Layouts: str = ""
     Bookmarks: str = ""
+    transformcontext: str = ""
+    properties: Properties = Properties()
+    # transformcontext: Union[TransformContext, str] = ""
     saveUser: Union[Attribute, str] = "imod-python"
     version: Union[Attribute, str] = "3.14.15-Pi"
     saveUserFull: Union[Attribute, str] = "Deltares"
@@ -441,10 +464,13 @@ name_mapping = {
     NoDataList: "noDataList",
     KeywordList: "keywordList",
     ProjectCrs: "projectCrs",
+    TransformContext: "transformContext",
     EvaluateDefaultValues: "evaluateDefaultValues",
     HomePath: "homePath",
     Layer_Tree_Group_Leaf: "layer-tree-group",
     Layer_Tree_Group_Root: "layer-tree-group",
+    SrcDest: "srcDest",
+    SpatialRefSys_Property: "SpatialRefSys",
 }
 
 #%%Functions
@@ -526,11 +552,39 @@ def process_primitive(name, vartype, datacls, required):
     return field
 
 
+def special_case_SpatialRefSys_Property(datacls):
+    """
+    The current recursive strategy does not support primitives with an attribute
+    assigned to them. This is luckily only needed once in our current
+    approach, namely to set a property, so we special case this.
+
+    Returns
+    -------
+    xml.user_object
+
+    """
+    children = [
+        xml.integer("ProjectionsEnabled"),
+        xml.string("ProjectionsEnabled", attribute="type"),
+    ]
+
+    return xml.user_object(
+        element_name=qgis_xml_name(datacls),
+        cls=datacls,
+        child_processors=children,
+        alias=datacls.__name__.lower(),
+        required=True,
+    )
+
+
 def make_processor(datacls: type, element_required: bool = True):
     """
     This is a utility to automate setting up of xml_preprocessors from the
     dataclass annotations. Nested aggregate types are dealt with via recursion.
     """
+    if datacls == SpatialRefSys_Property:
+        return special_case_SpatialRefSys_Property(datacls)
+
     children = []
     for name, vartype in datacls.__annotations__.items():
         required = element_required and is_required(vartype)
