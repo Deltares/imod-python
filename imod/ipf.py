@@ -437,13 +437,22 @@ def write_assoc(path, df, itype=1, nodata=1.0e20, assoc_columns=None):
 
     df = df.fillna(nodata)
     df = df[columnorder]
+
+    # We cannot rely on the quoting=QUOTE_NONNUMERIC policy
+    # The reason is that datetime columns are converted to string as well
+    # and then quoted. This causes trouble with some iMOD(batch) functions.
+    for column in df.columns:
+        if df[column].dtype == np.dtype("O"):
+            df[column] = df[column].astype(str)
+            df[column] = '"' + df[column] + '"'
+
     df.to_csv(
         path,
         index=False,
         header=False,
         mode="a",
         date_format="%Y%m%d%H%M%S",
-        quoting=csv.QUOTE_NONNUMERIC,
+        quoting=csv.QUOTE_NONE,
     )
 
 
