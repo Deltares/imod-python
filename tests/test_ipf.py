@@ -174,7 +174,7 @@ def test_write_assoc_itype1(tmp_path):
     # check quoting, to prevent imod separator confusion
     with open(tmp_path / "A1.txt") as io:
         lastline = io.readlines()[-1].rstrip()
-    assert lastline == '"20180201000000",1,3,"A1",0.2,"loc one"'
+    assert lastline == '20180201000000,1,3,"A1",0.2,"loc one"'
 
 
 def test_write_assoc_itype2(tmp_path):
