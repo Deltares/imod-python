@@ -89,6 +89,7 @@ def open_disgrb(path):
 
 
 def _to_nan(a, dry_nan):
+    # TODO: this could really use a docstring?
     a[a == 1e30] = np.nan
     if dry_nan:
         a[a == -1e30] = np.nan
@@ -528,7 +529,7 @@ def _dis_open_imeth6_budgets(
 
 @numba.njit
 def _dis_indices(
-    ia: IntArray, ja: IntArray, ncells: int, nlayer: int, nrow: int, ncol: int, nja: int
+    ia: IntArray, ja: IntArray, ncells: int, nlayer: int, nrow: int, ncol: int, 
 ):
     """
     Infer type of connection via cell number comparison. Returns arrays that can
@@ -553,8 +554,6 @@ def _dis_indices(
     nlayer: int
     nrow: int
     ncol: int
-    nja: int
-        Number of cell-to-cell connections
 
     Returns
     -------
@@ -583,7 +582,7 @@ def _dis_indices(
                 lower[i] = nzi
             else:  # skips one: must be pass through
                 npassed = int(d / ncells_per_layer)
-                for ipass in range(0, npassed + 1):
+                for ipass in range(0, npassed):
                     lower[i + ipass * ncells_per_layer] = nzi
 
     return right.reshape(shape), front.reshape(shape), lower.reshape(shape)
@@ -613,7 +612,6 @@ def _dis_to_right_front_lower_indices(
         nlayer=grb_content["nlayer"],
         nrow=grb_content["nrow"],
         ncol=grb_content["ncol"],
-        nja=grb_content["nja"],
     )
     return (
         xr.DataArray(right, grb_content["coords"], ("layer", "y", "x")),
