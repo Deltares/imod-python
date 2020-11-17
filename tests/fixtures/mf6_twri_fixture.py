@@ -132,9 +132,9 @@ def twri_model():
     simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
     return simulation
 
- 
+
 @pytest.mark.usefixtures("twri_model")
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def twri_result(twri_model, tmpdir_factory):
     # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
     # directory between different testing modules.

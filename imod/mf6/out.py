@@ -529,7 +529,12 @@ def _dis_open_imeth6_budgets(
 
 @numba.njit
 def _dis_indices(
-    ia: IntArray, ja: IntArray, ncells: int, nlayer: int, nrow: int, ncol: int, 
+    ia: IntArray,
+    ja: IntArray,
+    ncells: int,
+    nlayer: int,
+    nrow: int,
+    ncol: int,
 ):
     """
     Infer type of connection via cell number comparison. Returns arrays that can
