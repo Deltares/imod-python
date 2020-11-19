@@ -119,11 +119,21 @@ def _read_times(path, ntime, nlayer, nrow, ncol):
     Reads all total simulation times.
     """
     times = np.empty(ntime, dtype=np.float64)
-    # rest of first header and data + other layers of this timestep
-    nskip = 28 + nrow * ncol * 8 + (nlayer - 1) * (52 + nrow * ncol * 8)
+
+    # Compute how much to skip to the next timestamp
+    start_of_header = 16
+    rest_of_header = 28
+    data_single_layer = nrow * ncol * 8
+    header = 52
+    nskip = (
+        rest_of_header
+        + data_single_layer
+        + (nlayer - 1) * (header + data_single_layer)
+        + start_of_header
+    )
 
     with open(path, "rb") as f:
-        f.seek(16)
+        f.seek(start_of_header)
         for i in range(ntime):
             times[i] = struct.unpack("d", f.read(8))[0]  # total simulation time
             f.seek(nskip, 1)
@@ -529,7 +539,12 @@ def _dis_open_imeth6_budgets(
 
 @numba.njit
 def _dis_indices(
-    ia: IntArray, ja: IntArray, ncells: int, nlayer: int, nrow: int, ncol: int, 
+    ia: IntArray,
+    ja: IntArray,
+    ncells: int,
+    nlayer: int,
+    nrow: int,
+    ncol: int,
 ):
     """
     Infer type of connection via cell number comparison. Returns arrays that can
