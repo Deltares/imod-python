@@ -20,6 +20,8 @@ Fixed
    ``concentration_l1.idf`` instead of ``rch/concentration_l1.idf``).
 -  :meth:`imod.idf.save()` will simplify constant cellsize arrays to a scalar
    value -- this greatly speeds up drawing in the iMOD-GUI.
+-  :meth:`imod.mf6.open_hds()` did not read the appropriate bytes from the
+   heads file, apart for the first timestep. It will now read the right records.
 
 Added
 ~~~~~
@@ -35,6 +37,9 @@ Added
    multiple species runs.
 -  :meth:`imod.wq.SeawatModel.to_netcdf()` has been added to write all model
    packages to netCDF files.
+-  :meth:`imod.mf6.open_cbc()` has been added to read the budget data of 
+   structured (DIS) MODFLOW6 models. The data is read lazily into xarray
+   DataArrays per timestep.
 
 Changed
 ~~~~~~~
