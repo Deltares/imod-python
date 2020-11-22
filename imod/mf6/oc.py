@@ -35,7 +35,7 @@ class OutputControl(Package):
         if self["save_head"].values.any():
             d["headfile"] = (directory / f"{modelname}.hds").as_posix()
         if self["save_budget"].any():
-            d["budgetfile"] = (directory / f"{modelname}.cbb").as_posix()
+            d["budgetfile"] = (directory / f"{modelname}.cbc").as_posix()
 
         periods = collections.defaultdict(dict)
         for datavar in self.data_vars:

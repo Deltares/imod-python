@@ -18,7 +18,7 @@ from imod.mf6.ims import (
 from imod.mf6.model import GroundwaterFlowModel
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.oc import OutputControl
-from imod.mf6.out import open_hds
+from imod.mf6.out import open_hds, open_cbc, read_cbc_headers
 from imod.mf6.rch import Recharge
 from imod.mf6.riv import River
 from imod.mf6.simulation import Modflow6Simulation
