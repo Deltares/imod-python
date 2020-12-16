@@ -43,7 +43,7 @@ def test_draw_line__diagonal():
     # Simple diagonal
     x0, y0 = 0.0, 0.0
     x1, y1 = 3.0, 3.0
-    a_ixs, a_iys, a_s = imod.select.cross_sections._draw_line(
+    a_ixs, a_iys, a_s, a_dxs, a_dys = imod.select.cross_sections._draw_line(
         xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax
     )
     e_ixs = np.array([0, 1, 2])
@@ -51,21 +51,25 @@ def test_draw_line__diagonal():
     assert (e_ixs == a_ixs).all()
     assert (e_iys == a_iys).all()
     assert np.allclose(a_s, np.sqrt(2.0))
+    assert np.allclose(a_dxs, 1.0)
+    assert np.allclose(a_dys, 1.0)
 
     # Simple diagonal, flip it around
     x0, y0 = 3.0, 3.0
     x1, y1 = 0.0, 0.0
-    a_ixs, a_iys, a_s = imod.select.cross_sections._draw_line(
+    a_ixs, a_iys, a_s, a_dxs, a_dys = imod.select.cross_sections._draw_line(
         xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax
     )
     assert (e_ixs == a_ixs[::-1]).all()
     assert (e_iys == a_iys[::-1]).all()
     assert np.allclose(a_s, np.sqrt(2.0))
+    assert np.allclose(a_dxs, -1.0)
+    assert np.allclose(a_dys, -1.0)
 
     # Deal with out of bounds, just one
     x0, y0 = -1.0, -1.0
     x1, y1 = 3.0, 3.0
-    a_ixs, a_iys, a_s = imod.select.cross_sections._draw_line(
+    a_ixs, a_iys, a_s, a_dxs, a_dys = imod.select.cross_sections._draw_line(
         xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax
     )
     e_ixs = np.array([-1, 0, 1, 2])
@@ -73,11 +77,13 @@ def test_draw_line__diagonal():
     assert (e_ixs == a_ixs).all()
     assert (e_iys == a_iys).all()
     assert np.allclose(a_s, np.sqrt(2.0))
+    assert np.allclose(a_dxs, 1.0)
+    assert np.allclose(a_dys, 1.0)
 
     # Deal with out of bounds, both
     x0, y0 = -1.0, -1.0
     x1, y1 = 4.0, 4.0
-    a_ixs, a_iys, a_s = imod.select.cross_sections._draw_line(
+    a_ixs, a_iys, a_s, a_dxs, a_dys = imod.select.cross_sections._draw_line(
         xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax
     )
     e_ixs = np.array([-1, 0, 1, 2, -1])
@@ -85,16 +91,20 @@ def test_draw_line__diagonal():
     assert (e_ixs == a_ixs).all()
     assert (e_iys == a_iys).all()
     assert np.allclose(a_s, np.sqrt(2.0))
+    assert np.allclose(a_dxs, 1.0)
+    assert np.allclose(a_dys, 1.0)
 
     # And flipped around
     x0, y0 = 4.0, 4.0
     x1, y1 = -1.0, -1.0
-    a_ixs, a_iys, a_s = imod.select.cross_sections._draw_line(
+    a_ixs, a_iys, a_s, a_dxs, a_dys = imod.select.cross_sections._draw_line(
         xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax
     )
     assert (e_ixs == a_ixs[::-1]).all()
     assert (e_iys == a_iys[::-1]).all()
     assert np.allclose(a_s, np.sqrt(2.0))
+    assert np.allclose(a_dxs, -1.0)
+    assert np.allclose(a_dys, -1.0)
 
 
 def test_cross_section(test_da):
@@ -107,8 +117,8 @@ def test_cross_section(test_da):
         coords={
             "x": ("s", [0.5, 1.5, 2.5]),
             "y": ("s", [0.5, 1.5, 2.5]),
-            "dx": 1.0,
-            "dy": -1.0,
+            "dx": ("s", [1.0, 1.0, 1.0]),
+            "dy": ("s", [1.0, 1.0, 1.0]),
             "s": np.round(s, 3),
             "ds": ("s", np.round(ds, 3)),
         },
