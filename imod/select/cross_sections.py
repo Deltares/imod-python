@@ -58,6 +58,10 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
         row indices, out of bound values marked with -1.
     segment_length : np.array
         length of segment per sampled cell
+    dxs : np.array
+        length along column of segment per sampled cell
+    dys : np.array
+        length along row of segment per sampled cell
     """
     # Vector equations given by:
     # x = x0 + a_x * t
@@ -135,6 +139,8 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
     ixs = []
     iys = []
     segment_length = []
+    dxs = []
+    dys = []
 
     # Store how much of the cross-section has no data
     skipped_start = t
@@ -143,6 +149,8 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
         ixs.append(-1)
         iys.append(-1)
         segment_length.append(skipped_start)
+        dxs.append(x(skipped_start) - x(0))
+        dys.append(y(skipped_start) - y(0))
 
     # Arbitrarily large number so it's always the largest one
     if no_dx:
@@ -176,8 +184,10 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
         # Compute max distance to move along t.
         # Checks for infinite slopes
         if not no_dx:
+            # dx_t = cellboundary_x - x(t)
             tmax_x = t_x * (cellboundary_x - x(t))
         if not no_dy:
+            # dy_t = cellboundary_y - y(t)
             tmax_y = t_y * (cellboundary_y - y(t))
 
         # Find which dimension requires smallest step along t
@@ -193,6 +203,8 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
             tstep = tmax_y
 
         if (t + tstep) < t_end:
+            dxs.append(x(t + tstep) - x(t))
+            dys.append(y(t + tstep) - y(t))
             t += tstep
             # Store
             ixs.append(ix)
@@ -201,6 +213,8 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
         else:
             tstep = t_end - t
             # Store final step
+            dxs.append(x(t + tstep) - x(t))
+            dys.append(y(t + tstep) - y(t))
             segment_length.append(tstep)
             break
 
@@ -208,15 +222,19 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
         segment_length.append(skipped_end)
         ixs.append(-1)
         iys.append(-1)
+        dxs.append(x(length) - x(t_end))
+        dys.append(y(length) - y(t_end))
 
     # Because of numerical precision, extremely small segments might be
     # included. Those are filtered out here.
     ixs = np.array(ixs)
     iys = np.array(iys)
+    dxs = np.array(dxs)
+    dys = np.array(dys)
     segment_length = np.array(segment_length)
     use = np.abs(segment_length) > 1.0e-6
 
-    return ixs[use], iys[use], segment_length[use]
+    return ixs[use], iys[use], segment_length[use], dxs[use], dys[use]
 
 
 def _bounding_box(xmin, xmax, ymin, ymax):
@@ -253,6 +271,8 @@ def _cross_section(data, linecoords):
 
     ixs = []
     iys = []
+    sdxs = []
+    sdys = []
     segments = []
 
     bounding_box = _bounding_box(xmin, xmax, ymin, ymax)
@@ -263,16 +283,20 @@ def _cross_section(data, linecoords):
         if linestring.intersects(bounding_box):
             x0, y0 = start
             x1, y1 = end
-            i, j, segment_length = _draw_line(
+            i, j, segment_length, sdx, sdy = _draw_line(
                 xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax
             )
         else:  # append the linestring in full as nodata section
             i = np.array([-1])
             j = np.array([-1])
+            sdx = np.array([-1])
+            sdy = np.array([-1])
             segment_length = np.array([linestring.length])
 
         ixs.append(i)
         iys.append(j)
+        sdxs.append(sdx)
+        sdys.append(sdy)
         segments.append(segment_length)
 
     if len(ixs) == 0:
@@ -281,6 +305,8 @@ def _cross_section(data, linecoords):
     # Concatenate into a single array
     ixs = np.concatenate(ixs)
     iys = np.concatenate(iys)
+    sdxs = np.concatenate(sdxs)
+    sdys = np.concatenate(sdys)
     segments = np.concatenate(segments)
 
     # Flip around indexes
@@ -299,6 +325,8 @@ def _cross_section(data, linecoords):
     # Set dimension values
     section.coords["s"] = segments.cumsum() - 0.5 * segments
     section = section.assign_coords(ds=("s", segments))
+    section = section.assign_coords(dx=("s", sdxs))
+    section = section.assign_coords(dy=("s", sdys))
     # Without this sort, the is_increasing_monotonic property of the "s" index
     # in the DataArray returns False, and plotting the DataArray as a quadmesh
     # appears to fail. TODO: investigate, seems like an xarray issue.
