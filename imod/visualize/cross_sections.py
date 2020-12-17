@@ -1,6 +1,7 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import xarray as xr
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import imod
@@ -270,3 +271,182 @@ def cross_section(
         return fig, ax
     else:
         return fig, ax, cmap, norm
+
+
+def streamfunction(da, ax, n_streamlines=10, kwargs_contour={}):
+    """
+    Wraps matplotlib.contour to draw stream lines. Function can be used to draw
+    stream lines on top of a cross-section.
+
+    Parameters
+    ----------
+    da : xr.DataArray
+        Two dimensional DataArray containing data of the cross section. One
+        dimension must be "layer", and the second dimension will be used as the
+        x-axis for the cross-section.
+
+        Coordinates "top" and "bottom" must be present, and must have at least the
+        "layer" dimension (voxels) or both the "layer" and x-coordinate dimension.
+
+        *Use imod.evaluate.streamfunction_line() or streamfunction_linestring() to obtain
+        the required DataArray.*
+    ax : matplotlib Axes instance
+        Axes to write plot to.
+    n_streamlines : int or array_like
+        Determines the number and positions of the contour lines / regions.
+
+        If an int n, use n data intervals; i.e. draw n+1 contour lines. The level heights are automatically chosen.
+
+        If array-like, draw contour lines at the specified levels. The values must be in increasing order.
+    kwargs_contour : dict
+        Other optional keyword arguments for matplotlib.contour.
+
+    Returns
+    -------
+    matplotlib.contour.QuadContourSet
+        The drawn contour lines.
+    """
+
+    da = da.copy(deep=False)
+    if len(da.dims) != 2:
+        raise ValueError("DataArray must be 2D")
+    if "layer" not in da.dims:
+        raise ValueError('DataArray must contain dimension "layer"')
+    if "top" not in da.coords:
+        raise ValueError('DataArray must contain coordinate "top"')
+    if "bottom" not in da.coords:
+        raise ValueError('DataArray must contain coordinate "bottom"')
+    if len(da["top"].dims) > 2:
+        raise ValueError('"top" coordinate be 1D or 2D')
+    if len(da["bottom"].dims) > 2:
+        raise ValueError('"bottom" coordinate be 1D or 2D')
+
+    # add a row of zeros at the bottom, with thickness zero
+    # moved here i/o imod.evaluate to not bother user with
+    # additional layer hampering coord assignment
+    zeros = xr.zeros_like(da.isel(layer=-1))
+    zeros.coords["layer"] += 1
+    zeros.coords["top"] = zeros.coords["bottom"]  # layer of zero thickness
+    zeros.coords["bottom"] = zeros.coords["bottom"] - 0.1
+    da = xr.concat((da, zeros), dim="layer")
+
+    # _meshcoords returns mesh edges, but useful here to allow 1D/2D
+    # dimensions in da
+    # go back to cell centers in 2D
+    X = np.vstack(da.shape[0] * [da.s])
+    Y = 0.5 * da.top + 0.5 * da.bottom
+    if Y.ndim == 1:
+        # promote to 2D
+        Y2 = xr.concat(da.shape[1] * [Y], dim=da.s)
+
+    settings_contour = {
+        "colors": "w",
+        "linestyles": "solid",
+        "linewidths": 0.8,
+        "zorder": 10,
+    }
+    settings_contour.update(kwargs_contour)
+
+    CS = ax.contour(X, Y, da.values, n_streamlines, **settings_contour)
+    return CS
+
+
+def quiver(u, v, ax, kwargs_quiver={}):
+    """
+    Wraps matplotlib.quiver to draw quiver plots. Function can be used to draw
+    flow quivers on top of a cross-section.
+
+    Parameters
+    ----------
+    u : xr.DataArray
+        Two dimensional DataArray containing u component of quivers. One
+        dimension must be "layer", and the second dimension will be used as the
+        x-axis for the cross-section.
+
+        Coordinates "top" and "bottom" must be present, and must have at least the
+        "layer" dimension (voxels) or both the "layer" and x-coordinate dimension.
+
+        *Use imod.evaluate.quiver_line() or quiver_linestring() to obtain
+        the required DataArray.*
+    v : xr.DataArray
+        Two dimensional DataArray containing v component of quivers. One
+        dimension must be "layer", and the second dimension will be used as the
+        x-axis for the cross-section.
+
+        Coordinates "top" and "bottom" must be present, and must have at least the
+        "layer" dimension (voxels) or both the "layer" and x-coordinate dimension.
+
+        *Use imod.evaluate.quiver_line() or quiver_linestring() to obtain
+        the required DataArray.*
+    ax : matplotlib Axes instance
+        Axes to write plot to.
+    kwargs_quiver : dict
+        Other optional keyword arguments for matplotlib.quiver.
+
+    Returns
+    -------
+    matplotlib.quiver.Quiver
+        The drawn quivers.
+
+    Examples
+    --------
+
+    First: apply evaluate.quiver_line to get the u and v components of the quivers
+    from a three dimensional flow field. Assign top and bottom coordinates if these are
+    not already present in the flow field data arrays.
+
+    >>> u, v = imod.evaluate.quiver_line(right, front, lower, start, end)
+    >>> u.assign_coords(top=top, bottom=bottom)
+    >>> v.assign_coords(top=top, bottom=bottom)
+
+    The quivers can then be plotted over a cross section created by imod.visualize.cross_section():
+
+    >>> imod.visualize.quiver(u, v, ax)
+
+    Quivers can easily overwhelm your plot, so it is a good idea to 'thin out' some of the quivers:
+
+    >>> # Only plot quivers at every 5th cell and every 3rd layer
+    >>> thin = {"s": slice(0, None, 5), "layer": slice(0, None, 3)}
+    >>> imod.visualize.quiver(u.isel(**thin), v.isel(**thin), ax)
+    """
+
+    for da, name in zip([u, v], ["u", "v"]):
+        if len(da.dims) != 2:
+            raise ValueError(f"DataArray {name} must be 2D")
+        if "layer" not in da.dims:
+            raise ValueError(f'DataArray {name} must contain dimension "layer"')
+        if "top" not in da.coords:
+            raise ValueError(f'DataArray {name} must contain coordinate "top"')
+        if "bottom" not in da.coords:
+            raise ValueError(f'DataArray {name} must contain coordinate "bottom"')
+        if len(da["top"].dims) > 2:
+            raise ValueError(f'"top" coordinate in dataarray {name} must be 1D or 2D')
+        if len(da["bottom"].dims) > 2:
+            raise ValueError(
+                f'"bottom" coordinate in dataarray {name} must be 1D or 2D'
+            )
+
+    # do not draw quivers for cells that are only thinly sliced (ds > 25% of cellsize)
+    dsmin = 0.25 * u.dx
+    u = u.where(u.ds > dsmin)
+    v = v.where(v.ds > dsmin)
+
+    # _meshcoords returns mesh edges, but useful here to allow 1D/2D
+    # dimensions in da
+    # go back to cell centers in 2D
+    X, _ = np.meshgrid(u.s.values, u.layer.values)
+    Y = 0.5 * u.top + 0.5 * u.bottom
+    if Y.ndim == 1:
+        # promote to 2D
+        Y = xr.concat(u.shape[1] * [Y], dim=u.s)
+
+    settings_quiver = {
+        "color": "w",
+        "scale": None,  # autoscaling
+        "linestyle": "-",
+        "zorder": 10,
+    }
+    settings_quiver.update(kwargs_quiver)
+
+    Q = ax.quiver(X, Y, u.values, v.values, **settings_quiver)
+    return Q
