@@ -8,7 +8,6 @@ import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
-import rioxarray
 
 import imod
 from imod.wq import timeutil
