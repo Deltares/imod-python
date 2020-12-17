@@ -5,8 +5,10 @@ import subprocess
 
 import cftime
 import jinja2
+import geopandas as gpd
 import numpy as np
 import pandas as pd
+from scipy.ndimage import binary_dilation
 import xarray as xr
 
 import imod
@@ -78,7 +80,18 @@ class Model(collections.UserDict):
             if len(sel_dims) == 0:
                 selmodel[pkgname] = pkg
             else:
-                selmodel[pkgname] = pkg.loc[sel_dims]
+                if pkg._pkg_id != "wel":
+                    selmodel[pkgname] = pkg.loc[sel_dims]
+                else:
+                    df = pkg.to_dataframe()
+                    for k, v in sel_dims.items():
+                        try:  # slice?
+                            df = df.loc[(df[k] >= v.start) & (df[k] <= v.stop)]
+                        except:  # list, labels etc
+                            df = df.loc[df[k].isin(v)]
+                        finally:
+                            raise ValueError("Invalid indexer for Well package")
+                    selmodel[pkgname] = df.to_xarray()
         return selmodel
 
     def isel(self, **dimensions):
@@ -170,6 +183,91 @@ class Model(collections.UserDict):
         )
         qgs_util._write_qgis_projectfile(qgs_tree, directory / (filename + ext))
 
+    def clip(self, extent, heads_boundary=None, concentration_boundary=None):
+        """
+        Method to clip the model to a certain `extent`. Extent may be a (`xmin`,`xmax`,`ymin`,`ymax`) tuple,
+        a `shapely.Polygon` or an `xarray.DataArray`. Clipped model resolution is unchanged.
+        Boundary conditions of clipped model can be derived from parent model and are applied
+        along the edge of `extent` (CHD and TVC). Packages from parent that have no data within extent are removed.
+        """
+        ml = type(self)(self.modelname, self.check)
+        if isinstance(extent, (list, tuple)):
+            xmin, xmax, ymin, ymax = extent
+            # TODO: create extent da from lims
+        elif isinstance(extent, gpd.GeoDataFrame):
+            extent = imod.prepare.rasterize(extent, like=ml["bas"]["top"])
+        elif isinstance(extent, xr.DataArray):
+            pass
+        else:
+            raise ValueError("extent must be of type tuple, GeoDataFrame or DataArray")
+
+        extent = xr.ones_like(extent).where(extent > 0)
+
+        def get_clip_na_slices(da, dims=None):
+            """Clips a DataArray to its maximum extent in different dimensions.
+            if dims not given, clips to all dimensions in da.
+            """
+            if dims is None:
+                dims = da.dims
+            slices = {}
+            for d in dims:
+                tmp = sorted(da.dropna(dim=d, how="all")[d])
+                if len(tmp) > 2:
+                    dtmp = 0.5 * (tmp[1] - tmp[0])
+                else:
+                    dtmp = 0
+                slices[d] = slice(tmp[0] - dtmp, tmp[-1] + dtmp)
+            return slices
+
+        # create edge around extent to apply boundary conditions
+        if not (heads_boundary is None and concentration_boundary is None):
+            extentwithedge = extent.copy(data=binary_dilation(extent.fillna(0).values))
+            extentwithedge = extentwithedge.where(extentwithedge)
+        else:
+            extentwithedge = extent
+        # clip to extent with edge
+        clip_slices = get_clip_na_slices(extentwithedge)
+        extentwithedge = extentwithedge.sel(**clip_slices)
+        extent = extent.sel(**clip_slices)
+        edge = extentwithedge.where(extent.isnull())
+
+        # Clip model to extent, set outside extent to nodata or 0
+        ml = ml.sel(**clip_slices)
+        for pck in ml.keys():
+            for d in ml[pck].data_vars:
+                if d in ["ibound", "icbund"]:
+                    ml[pck][d] = ml[pck][d].where(extentwithedge == 1, 0)
+                elif "x" in ml[pck][d].dims:
+                    ml[pck][d] = ml[pck][d].where(extentwithedge == 1)
+
+        if heads_boundary is not None:
+            heads_boundary = heads_boundary.sel(**clip_slices)
+            head_end = head.shift(time=-1).combine_first(head)
+            ml["chd"] = imod.wq.ConstantHead(
+        """
+    head_start=head.where(edge == 1),
+    head_end=head_end.where(edge == 1),
+    concentration=conc.where(edge == 1),
+)  # concentration relevant for fwh calc (?)
+
+        if 
+# Clip to model area
+head = head.sel(**clip_slices)
+conc = conc.sel(**clip_slices)
+# Create packages only at model edge
+head_end = head.shift(time=-1).combine_first(head)
+ml["chd"] = imod.wq.ConstantHead(
+    head_start=head.where(edge == 1),
+    head_end=head_end.where(edge == 1),
+    concentration=conc.where(edge == 1),
+)  # concentration relevant for fwh calc (?)
+# linearly interpolate concentration for yearly data in TVC
+conc_tvc = conc.where(edge == 1)
+dates = pd.date_range(conc.time.values[0], conc.time.values[-1], freq="AS")
+conc_tvc = conc_tvc.load().interp(time=dates, method="linear")
+ml["tvc"] = imod.wq.TimeVaryingConstantConcentration(concentration=conc_tvc)
+        """
+        return ml
 
 class SeawatModel(Model):
     """
