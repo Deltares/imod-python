@@ -141,8 +141,8 @@ def _quiver(sfrf, sfff, sflf):  # , dx, dy, dz):
 
 def quiver_line(frf, fff, flf, start, end):
     """Obtain the u and v components for quiver plots for a line cross section
-    through a three-dimensional flow field. The u and v components are obtained
-    by first projecting the threedimensional flow components onto the provided
+    through a three-dimensional flux field. The u and v components are obtained
+    by first projecting the threedimensional flux components onto the provided
     cross-section.
 
     Parameters
@@ -170,6 +170,12 @@ def quiver_line(frf, fff, flf, start, end):
         The v component (y-component) of the flow projection on the cross-section between start and end coordinate,
         with new dimension "s" along the cross-section. The cellsizes along "s" are given in
         the "ds" coordinate.
+
+    Notes
+    -----
+    Use imod.evaluate.flow_velocity() first to obtain groundwater velocities
+    as input for this function. Velocity in x direction is, however, inverted and must
+    be re-inverted before using as input here.
     """
     # interpolate frf and fff to cell center
     frf = 0.5 * frf + 0.5 * frf.shift({"x": -1})
@@ -209,6 +215,12 @@ def quiver_linestring(frf, fff, flf, linestring):
         The v component (y-component) of the flow projection on the cross-section between start and end coordinate,
         with new dimension "s" along the cross-section. The cellsizes along "s" are given in
         the "ds" coordinate.
+
+    Notes
+    -----
+    Use imod.evaluate.flow_velocity() first to obtain groundwater velocities
+    as input for this function. Velocity in x direction is, however, inverted and must
+    be re-inverted before using as input here.
     """
     # interpolate frf and fff to cell center
     frf = 0.5 * frf + 0.5 * frf.shift({"x": -1})
