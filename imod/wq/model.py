@@ -90,7 +90,9 @@ class Model(collections.UserDict):
                         except:  # list, labels etc
                             df = df.loc[df[k].isin(v)]
                         finally:
-                            raise ValueError("Invalid indexer for Well package")
+                            raise ValueError(
+                                "Invalid indexer for Well package, accepts slice or list-like of values"
+                            )
                     selmodel[pkgname] = df.to_xarray()
         return selmodel
 
@@ -186,14 +188,24 @@ class Model(collections.UserDict):
     def clip(self, extent, heads_boundary=None, concentration_boundary=None):
         """
         Method to clip the model to a certain `extent`. Extent may be a (`xmin`,`xmax`,`ymin`,`ymax`) tuple,
-        a `shapely.Polygon` or an `xarray.DataArray`. Clipped model resolution is unchanged.
-        Boundary conditions of clipped model can be derived from parent model and are applied
+        a `geopandas.GeoDataFrame` or an `xarray.DataArray`. Clipped model resolution is unchanged.
+        Boundary conditions of clipped model can be derived from parent model calculation results and are applied
         along the edge of `extent` (CHD and TVC). Packages from parent that have no data within extent are removed.
         """
         ml = type(self)(self.modelname, self.check)
         if isinstance(extent, (list, tuple)):
             xmin, xmax, ymin, ymax = extent
-            # TODO: create extent da from lims
+            assert (xmin < xmax) & (
+                ymin < ymax
+            ), "Either xmin or ymin is equal to or larger than xmax or ymax. Correct order is xmin, xmax, ymin, ymax."
+            extent = xr.ones_like(ml["bas"]["top"])
+            extent = extent.where(
+                (extent.x >= xmin)
+                & (extent.x <= xmax)
+                & (extent.y >= ymin)
+                & (extent.y <= ymax),
+                0,
+            )
         elif isinstance(extent, gpd.GeoDataFrame):
             extent = imod.prepare.rasterize(extent, like=ml["bas"]["top"])
         elif isinstance(extent, xr.DataArray):
@@ -205,10 +217,10 @@ class Model(collections.UserDict):
 
         def get_clip_na_slices(da, dims=None):
             """Clips a DataArray to its maximum extent in different dimensions.
-            if dims not given, clips to all dimensions in da.
+            if dims not given, clips to x and y.
             """
             if dims is None:
-                dims = da.dims
+                dims = ["x", "y"]
             slices = {}
             for d in dims:
                 tmp = sorted(da.dropna(dim=d, how="all")[d])
@@ -240,34 +252,28 @@ class Model(collections.UserDict):
                 elif "x" in ml[pck][d].dims:
                     ml[pck][d] = ml[pck][d].where(extentwithedge == 1)
 
+        # Create boundary conditions as CHD and/or TVC package
+        if concentration_boundary is not None:
+            concentration_boundary = concentration_boundary.sel(**clip_slices)
+            concentration_boundary = concentration_boundary.where(edge == 1)
+
+            ml["tvc"] = imod.wq.TimeVaryingConstantConcentration(
+                concentration=concentration_boundary
+            )
+
         if heads_boundary is not None:
             heads_boundary = heads_boundary.sel(**clip_slices)
-            head_end = head.shift(time=-1).combine_first(head)
-            ml["chd"] = imod.wq.ConstantHead(
-        """
-    head_start=head.where(edge == 1),
-    head_end=head_end.where(edge == 1),
-    concentration=conc.where(edge == 1),
-)  # concentration relevant for fwh calc (?)
+            heads_boundary = heads_boundary.where(edge == 1)
+            head_end = heads_boundary.shift(time=-1).combine_first(heads_boundary)
 
-        if 
-# Clip to model area
-head = head.sel(**clip_slices)
-conc = conc.sel(**clip_slices)
-# Create packages only at model edge
-head_end = head.shift(time=-1).combine_first(head)
-ml["chd"] = imod.wq.ConstantHead(
-    head_start=head.where(edge == 1),
-    head_end=head_end.where(edge == 1),
-    concentration=conc.where(edge == 1),
-)  # concentration relevant for fwh calc (?)
-# linearly interpolate concentration for yearly data in TVC
-conc_tvc = conc.where(edge == 1)
-dates = pd.date_range(conc.time.values[0], conc.time.values[-1], freq="AS")
-conc_tvc = conc_tvc.load().interp(time=dates, method="linear")
-ml["tvc"] = imod.wq.TimeVaryingConstantConcentration(concentration=conc_tvc)
-        """
+            ml["chd"] = imod.wq.ConstantHead(
+                head_start=heads_boundary,
+                head_end=head_end,
+                concentration=concentration_boundary,  # concentration relevant for fwh calc (?)
+            )
+
         return ml
+
 
 class SeawatModel(Model):
     """
