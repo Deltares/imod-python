@@ -51,6 +51,9 @@ from imod.select import points_values
 try:
     import pyvista as pv
     import vtk
+
+    if vtk.vtkVersion().GetVTKMajorVersion() < 9:
+        raise ImportError("VTK version of 9.0 or higher required")
 except ImportError:
     pass
 
@@ -482,7 +485,7 @@ def grid_3d(
             " either."
         )
 
-    grid = pv.UnstructuredGrid(offset, cells, cell_type, points)
+    grid = pv.UnstructuredGrid(cells, cell_type, points)
     grid.points[:, -1] *= vertical_exaggeration
     grid.cell_arrays["values"] = values
 
