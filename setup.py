@@ -48,6 +48,7 @@ setup(
         ],
         "optional": [
             "geopandas",
+            "vtk>=9.0",
             "pyvista",
             "rasterio>=1",
             "zarr",
