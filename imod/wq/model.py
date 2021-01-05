@@ -83,17 +83,23 @@ class Model(collections.UserDict):
                 if pkg._pkg_id != "wel":
                     selmodel[pkgname] = pkg.loc[sel_dims]
                 else:
-                    df = pkg.to_dataframe()
+                    df = pkg.to_dataframe().drop(columns="save_budget")
                     for k, v in sel_dims.items():
-                        try:  # slice?
-                            df = df.loc[(df[k] >= v.start) & (df[k] <= v.stop)]
-                        except:  # list, labels etc
-                            df = df.loc[df[k].isin(v)]
-                        finally:
+                        try:
+                            if isinstance(v, slice):
+                                # slice?
+                                # to account for reversed order of y
+                                low, high = min(v.start, v.stop), max(v.start, v.stop)
+                                df = df.loc[(df[k] >= low) & (df[k] <= high)]
+                            else:  # list, labels etc
+                                df = df.loc[df[k].isin(v)]
+                        except:
                             raise ValueError(
                                 "Invalid indexer for Well package, accepts slice or list-like of values"
                             )
-                    selmodel[pkgname] = df.to_xarray()
+                    selmodel[pkgname] = imod.wq.Well(
+                        save_budget=pkg["save_budget"], **df
+                    )
         return selmodel
 
     def isel(self, **dimensions):
@@ -133,7 +139,11 @@ class Model(collections.UserDict):
         """
         directory = pathlib.Path(directory)
         for pkgname, pkg in self.items():
-            pkg.to_netcdf(directory / pattern.format(pkgname=pkgname), **kwargs)
+            try:
+                pkg.to_netcdf(directory / pattern.format(pkgname=pkgname), **kwargs)
+            except:
+                print(f"Package {pkgname} can not be written to NetCDF")
+                raise
 
     def write_qgis_project(self, directory, crs, filename=None, aggregate_layers=False):
         """
@@ -185,94 +195,16 @@ class Model(collections.UserDict):
         )
         qgs_util._write_qgis_projectfile(qgs_tree, directory / (filename + ext))
 
-    def clip(self, extent, heads_boundary=None, concentration_boundary=None):
-        """
-        Method to clip the model to a certain `extent`. Extent may be a (`xmin`,`xmax`,`ymin`,`ymax`) tuple,
-        a `geopandas.GeoDataFrame` or an `xarray.DataArray`. Clipped model resolution is unchanged.
-        Boundary conditions of clipped model can be derived from parent model calculation results and are applied
-        along the edge of `extent` (CHD and TVC). Packages from parent that have no data within extent are removed.
-        """
-        ml = type(self)(self.modelname, self.check)
-        if isinstance(extent, (list, tuple)):
-            xmin, xmax, ymin, ymax = extent
-            assert (xmin < xmax) & (
-                ymin < ymax
-            ), "Either xmin or ymin is equal to or larger than xmax or ymax. Correct order is xmin, xmax, ymin, ymax."
-            extent = xr.ones_like(ml["bas"]["top"])
-            extent = extent.where(
-                (extent.x >= xmin)
-                & (extent.x <= xmax)
-                & (extent.y >= ymin)
-                & (extent.y <= ymax),
-                0,
-            )
-        elif isinstance(extent, gpd.GeoDataFrame):
-            extent = imod.prepare.rasterize(extent, like=ml["bas"]["top"])
-        elif isinstance(extent, xr.DataArray):
-            pass
-        else:
-            raise ValueError("extent must be of type tuple, GeoDataFrame or DataArray")
-
-        extent = xr.ones_like(extent).where(extent > 0)
-
-        def get_clip_na_slices(da, dims=None):
-            """Clips a DataArray to its maximum extent in different dimensions.
-            if dims not given, clips to x and y.
-            """
-            if dims is None:
-                dims = ["x", "y"]
-            slices = {}
-            for d in dims:
-                tmp = sorted(da.dropna(dim=d, how="all")[d])
-                if len(tmp) > 2:
-                    dtmp = 0.5 * (tmp[1] - tmp[0])
-                else:
-                    dtmp = 0
-                slices[d] = slice(tmp[0] - dtmp, tmp[-1] + dtmp)
-            return slices
-
-        # create edge around extent to apply boundary conditions
-        if not (heads_boundary is None and concentration_boundary is None):
-            extentwithedge = extent.copy(data=binary_dilation(extent.fillna(0).values))
-            extentwithedge = extentwithedge.where(extentwithedge)
-        else:
-            extentwithedge = extent
-        # clip to extent with edge
-        clip_slices = get_clip_na_slices(extentwithedge)
-        extentwithedge = extentwithedge.sel(**clip_slices)
-        extent = extent.sel(**clip_slices)
-        edge = extentwithedge.where(extent.isnull())
-
-        # Clip model to extent, set outside extent to nodata or 0
-        ml = ml.sel(**clip_slices)
-        for pck in ml.keys():
-            for d in ml[pck].data_vars:
-                if d in ["ibound", "icbund"]:
-                    ml[pck][d] = ml[pck][d].where(extentwithedge == 1, 0)
-                elif "x" in ml[pck][d].dims:
-                    ml[pck][d] = ml[pck][d].where(extentwithedge == 1)
-
-        # Create boundary conditions as CHD and/or TVC package
-        if concentration_boundary is not None:
-            concentration_boundary = concentration_boundary.sel(**clip_slices)
-            concentration_boundary = concentration_boundary.where(edge == 1)
-
-            ml["tvc"] = imod.wq.TimeVaryingConstantConcentration(
-                concentration=concentration_boundary
-            )
-
-        if heads_boundary is not None:
-            heads_boundary = heads_boundary.sel(**clip_slices)
-            heads_boundary = heads_boundary.where(edge == 1)
-            head_end = heads_boundary.shift(time=-1).combine_first(heads_boundary)
-
-            ml["chd"] = imod.wq.ConstantHead(
-                head_start=heads_boundary,
-                head_end=head_end,
-                concentration=concentration_boundary,  # concentration relevant for fwh calc (?)
-            )
-
-        return ml
+    def _delete_empty_packages(self, verbose=False):
+        to_del = []
+        for pkg in self.keys():
+            dv = list(self[pkg].data_vars)[0]
+            if not self[pkg][dv].notnull().any().compute():
+                if verbose:
+                    print(f"Deleting package {pkg}, found no data in parameter {dv}")
+                to_del.append(pkg)
+        for pkg in to_del:
+            del self[pkg]
 
 
 class SeawatModel(Model):
@@ -787,6 +719,9 @@ class SeawatModel(Model):
         if not self.check is None:
             self.package_check()
 
+        # Delete packages without data
+        self._delete_empty_packages(verbose=True)
+
         runfile_content = self.render(
             directory=render_dir, result_dir=result_dir, writehelp=False
         )
@@ -823,3 +758,119 @@ class SeawatModel(Model):
 
         for pkg in self.values():
             pkg._pkgcheck(ibound=ibound)
+
+    def clip(
+        self,
+        extent,
+        heads_boundary=None,
+        concentration_boundary=None,
+        delete_empty_pkg=False,
+    ):
+        """
+        Method to clip the model to a certain `extent`. Clipped model resolution is unchanged.
+        Boundary conditions of clipped model can be derived from parent model calculation results and are applied
+        along the edge of `extent` (CHD and TVC). Packages from parent that have no data within extent are optionally removed.
+
+        Parameters
+        ----------
+        extent : tuple, geopandas.GeoDataFrame, xarray.DataArray
+            Extent of the clipped model. Tuple must be in the form of (`xmin`,`xmax`,`ymin`,`ymax`). If a GeoDataFrame, all
+            polygons are included in the model extent. If a DataArray, non-null/non-zero values are taken as the new extent.
+
+        heads_boundary : xarray.DataArray, optional.
+            Heads to be applied as a Constant Head boundary condition along the edge of the model extent. These heads can be
+            derived from calculations with the parent model. If None (default), no constant heads boundary condition is applied.
+
+        concentration_boundary : xarray.DataArray, optional.
+            Concentration to be applied as a Time Varying Concentration boundary condition along the edge of the model extent.
+            These concentrations can be derived from calculations with the parent model. If None (default), no time varying
+            concentration boundary condition is applied.
+
+        delete_empty_pkg : bool, optional.
+            Set to True to delete packages that contain no data in the clipped model. Defaults to False.
+        """
+
+        if isinstance(extent, (list, tuple)):
+            xmin, xmax, ymin, ymax = extent
+            assert (xmin < xmax) & (
+                ymin < ymax
+            ), "Either xmin or ymin is equal to or larger than xmax or ymax. Correct order is xmin, xmax, ymin, ymax."
+            extent = xr.ones_like(self["bas"]["top"])
+            extent = extent.where(
+                (extent.x >= xmin)
+                & (extent.x <= xmax)
+                & (extent.y >= ymin)
+                & (extent.y <= ymax),
+                0,
+            )
+        elif isinstance(extent, gpd.GeoDataFrame):
+            extent = imod.prepare.rasterize(extent, like=self["bas"]["top"])
+        elif isinstance(extent, xr.DataArray):
+            pass
+        else:
+            raise ValueError("extent must be of type tuple, GeoDataFrame or DataArray")
+
+        extent = xr.ones_like(extent).where(extent > 0)
+
+        def get_clip_na_slices(da, dims=None):
+            """Clips a DataArray to its maximum extent in different dimensions.
+            if dims not given, clips to x and y.
+            """
+            if dims is None:
+                dims = ["x", "y"]
+            slices = {}
+            for d in dims:
+                tmp = da.dropna(dim=d, how="all")[d]
+                if len(tmp) > 2:
+                    dtmp = 0.5 * (tmp[1] - tmp[0])
+                else:
+                    dtmp = 0
+                slices[d] = slice(float(tmp[0] - dtmp), float(tmp[-1] + dtmp))
+            return slices
+
+        # create edge around extent to apply boundary conditions
+        if not (heads_boundary is None and concentration_boundary is None):
+            extentwithedge = extent.copy(data=binary_dilation(extent.fillna(0).values))
+            extentwithedge = extentwithedge.where(extentwithedge)
+        else:
+            extentwithedge = extent
+        # clip to extent with edge
+        clip_slices = get_clip_na_slices(extentwithedge)
+        extentwithedge = extentwithedge.sel(**clip_slices)
+        extent = extent.sel(**clip_slices)
+        edge = extentwithedge.where(extent.isnull())
+
+        # Clip model to extent, set outside extent to nodata or 0
+        ml = self.sel(**clip_slices)
+        for pck in ml.keys():
+            for d in ml[pck].data_vars:
+                if d in ["ibound", "icbund"]:
+                    ml[pck][d] = ml[pck][d].where(extentwithedge == 1, 0)
+                elif "x" in ml[pck][d].dims:
+                    ml[pck][d] = ml[pck][d].where(extentwithedge == 1)
+
+        # Create boundary conditions as CHD and/or TVC package
+        if concentration_boundary is not None:
+            concentration_boundary = concentration_boundary.sel(**clip_slices)
+            concentration_boundary = concentration_boundary.where(edge == 1)
+
+            ml["tvc"] = imod.wq.TimeVaryingConstantConcentration(
+                concentration=concentration_boundary
+            )
+
+        if heads_boundary is not None:
+            heads_boundary = heads_boundary.sel(**clip_slices)
+            heads_boundary = heads_boundary.where(edge == 1)
+            head_end = heads_boundary.shift(time=-1).combine_first(heads_boundary)
+
+            ml["chd"] = imod.wq.ConstantHead(
+                head_start=heads_boundary,
+                head_end=head_end,
+                concentration=concentration_boundary,  # concentration relevant for fwh calc (?)
+            )
+
+        # delete packages if no data in sliced model
+        if delete_empty_pkg:
+            ml._delete_empty_packages(verbose=True)
+
+        return ml
