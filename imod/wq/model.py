@@ -767,7 +767,7 @@ class SeawatModel(Model):
         delete_empty_pkg=False,
     ):
         """
-        Method to clip the model to a certain `extent`. Clipped model resolution is unchanged.
+        Method to clip the model to a certain `extent`. The spatial resolution of the clipped model is unchanged.
         Boundary conditions of clipped model can be derived from parent model calculation results and are applied
         along the edge of `extent` (CHD and TVC). Packages from parent that have no data within extent are optionally removed.
 
@@ -778,24 +778,59 @@ class SeawatModel(Model):
             polygons are included in the model extent. If a DataArray, non-null/non-zero values are taken as the new extent.
 
         heads_boundary : xarray.DataArray, optional.
-            Heads to be applied as a Constant Head boundary condition along the edge of the model extent. These heads can be
-            derived from calculations with the parent model. If None (default), no constant heads boundary condition is applied.
+            Heads to be applied as a Constant Head boundary condition along the edge of the model extent. These heads are assumed
+            to be derived from calculations with the parent model. Timestamp of boundary condition is shifted to correct for difference
+            between 'end of period' timestamp of results and 'start of period' timestamp of boundary condition.
+            If None (default), no constant heads boundary condition is applied.
 
         concentration_boundary : xarray.DataArray, optional.
             Concentration to be applied as a Time Varying Concentration boundary condition along the edge of the model extent.
-            These concentrations can be derived from calculations with the parent model. If None (default), no time varying
-            concentration boundary condition is applied.
+            These concentrations can be derived from calculations with the parent model. Timestamp of boundary condition is shifted
+            to correct for difference between 'end of period' timestamp of results and 'start of period' timestamp of boundary condition.
+            If None (default), no time varying concentration boundary condition is applied.
+
+            *Note that the Time Varying Concentration boundary sets a constant concentration for the entire stress period,
+            unlike the linearly varying Constant Head. This will inevitably cause a time shift in concentrations along the boundary.
+            This shift becomes more significant when stress periods are longer. If necessary, consider interpolating concentrations
+            along the time axis, to reduce the length of stress periods (see examples).*
 
         delete_empty_pkg : bool, optional.
             Set to True to delete packages that contain no data in the clipped model. Defaults to False.
+
+        Examples
+        --------
+        Given a full model, clip a 1 x 1 km rectangular submodel without boundary conditions along its edge:
+
+        >>> extent = (1000., 2000., 5000., 6000.)  # xmin, xmax, ymin, ymax
+        >>> clipped = ml.clip(extent)
+
+        Load heads and concentrations from full model results:
+
+        >>> heads = imod.idf.open("head/head_*.idf")
+        >>> conc = imod.idf.open("conc/conc_*.idf")
+        >>> clipped = ml.clip(extent, heads, conc)
+
+        Use a shape of a model area:
+
+        >>> extent = geopandas.read_file("clipped_model_area.shp")
+        >>> clipped = ml.clip(extent, heads, conc)
+
+        Interpolate concentration results to annual results using xarray.interp(), to improve time resolution of concentration boundary:
+
+        >>> conc = imod.idf.open("conc/conc_*.idf")
+        >>> dates = pd.date_range(conc.time.values[0], conc.time.values[-1], freq="AS")
+        >>> conc_interpolated = conc.load().interp(time=dates, method="linear")
+        >>> clipped = ml.clip(extent, heads, conc_interpolated)
         """
+        baskey = self._get_pkgkey("bas6")
+        like = self[baskey]["ibound"].isel(layer=0).squeeze(drop=True)
 
         if isinstance(extent, (list, tuple)):
             xmin, xmax, ymin, ymax = extent
             assert (xmin < xmax) & (
                 ymin < ymax
             ), "Either xmin or ymin is equal to or larger than xmax or ymax. Correct order is xmin, xmax, ymin, ymax."
-            extent = xr.ones_like(self["bas"]["top"])
+            extent = xr.ones_like(like)
             extent = extent.where(
                 (extent.x >= xmin)
                 & (extent.x <= xmax)
@@ -804,7 +839,7 @@ class SeawatModel(Model):
                 0,
             )
         elif isinstance(extent, gpd.GeoDataFrame):
-            extent = imod.prepare.rasterize(extent, like=self["bas"]["top"])
+            extent = imod.prepare.rasterize(extent, like=like)
         elif isinstance(extent, xr.DataArray):
             pass
         else:
@@ -850,9 +885,15 @@ class SeawatModel(Model):
                     ml[pck][d] = ml[pck][d].where(extentwithedge == 1)
 
         # Create boundary conditions as CHD and/or TVC package
+        # Time shifts: assume heads and conc are calculation results. Then:
+        # timestamp of result is _end_ of stress period, while timestamp input
+        # is the _start_ of the stress period.
         if concentration_boundary is not None:
             concentration_boundary = concentration_boundary.sel(**clip_slices)
             concentration_boundary = concentration_boundary.where(edge == 1)
+            concentration_boundary = concentration_boundary.shift(
+                time=-1
+            ).combine_first(concentration_boundary)
 
             ml["tvc"] = imod.wq.TimeVaryingConstantConcentration(
                 concentration=concentration_boundary
@@ -860,13 +901,13 @@ class SeawatModel(Model):
 
         if heads_boundary is not None:
             heads_boundary = heads_boundary.sel(**clip_slices)
-            heads_boundary = heads_boundary.where(edge == 1)
-            head_end = heads_boundary.shift(time=-1).combine_first(heads_boundary)
+            head_end = heads_boundary.where(edge == 1)
+            head_start = head_end.shift(time=1).combine_first(head_end)
 
             ml["chd"] = imod.wq.ConstantHead(
-                head_start=heads_boundary,
+                head_start=head_start,
                 head_end=head_end,
-                concentration=concentration_boundary,  # concentration relevant for fwh calc (?)
+                concentration=concentration_boundary,  # concentration relevant for fwh calc
             )
 
         # delete packages if no data in sliced model
