@@ -11,33 +11,23 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 Fixed
 ~~~~~
--  IO methods for IDF files will now correctly identify double precision IDFs.
-   The correct record length identifier is 2295 rather than 2296 (2296 was a
-   typo in the iMOD manual).
--  :meth:`imod.wq.SeawatModel.write()` will now write the correct path for
-   recharge package concentration given in IDF files. It did not prepend the
-   name of the package correctly (resulting in paths like
-   ``concentration_l1.idf`` instead of ``rch/concentration_l1.idf``).
--  :meth:`imod.idf.save()` will simplify constant cellsize arrays to a scalar
-   value -- this greatly speeds up drawing in the iMOD-GUI.
--  :meth:`imod.mf6.open_hds()` did not read the appropriate bytes from the
+-  :func:`imod.mf6.open_hds()` did not read the appropriate bytes from the
    heads file, apart for the first timestep. It will now read the right records.
+-  Use the appropriate array for modflow6 timestep duration: the
+   :meth:`imod.mf6.Model.write()` would write the timesteps multiplier in place
+   of of the duration array.
+-  :func:`imod.util.to_ugrid2d()` has been added to convert a (structured) xarray
+   DataArray or Dataset to a quadrilateral UGRID dataset.
 
 Added
 ~~~~~
--  :class:`imod.wq.MassLoading` and
-   :class:`imod.wq.TimeVaryingConstantConcentration` have been added to allow
-   additional concentration boundary conditions.
--  IPF writing methods support an ``assoc_columns`` keyword to allow greater
-   flexibility in including and renaming columns of the associated files.
--  Optional basemap plotting has been added to :meth:`imod.visualize.plot_map()`.
--  :meth:`imod.tec.read` can read labelled coordinates ``time``, ``z``, ``y``,
+-  :func:`imod.tec.read` can read labelled coordinates ``time``, ``z``, ``y``,
    and ``x`` if present in the ``.tec`` file.
--  :meth:`imod.idf.open_subdomains` will now also accept iMOD-WQ output of
+-  :func:`imod.idf.open_subdomains` will now also accept iMOD-WQ output of
    multiple species runs.
 -  :meth:`imod.wq.SeawatModel.to_netcdf()` has been added to write all model
    packages to netCDF files.
--  :meth:`imod.mf6.open_cbc()` has been added to read the budget data of 
+-  :func:`imod.mf6.open_cbc()` has been added to read the budget data of 
    structured (DIS) MODFLOW6 models. The data is read lazily into xarray
    DataArrays per timestep.
 -  :func:`imod.visualize.streamfunction()` and :func:`imod.visualize.quiver()`
@@ -50,6 +40,21 @@ Added
 -  :func:`imod.evaluate.quiver_line()` and :func:`imod.evaluate.quiver_linestring()` 
    were added to extract the u and v components of the 3D flow field for a given
    cross section.
+-  Added :meth:`imod.mf6.Model.write_qgis_project()` to write a QGIS project 
+   for easier inspection of model input in QGIS.
+-  Added :meth:`imod.wq.Model.clip()` to clip a model to a provided extent.
+   Boundary conditions of clipped model can be automatically derived from parent
+   model calculation results and are applied along the edges of the extent.
+
+Changed
+~~~~~~~
+
+-  Datetime columns in IPF associated files (via
+   :func:`imod.ipf.write_assoc()`) will not be placed within quotes, as this can
+   break certain iMOD batch functions.
+
+[0.10.1] - 2020-10-19
+---------------------
 
 Changed
 ~~~~~~~
@@ -60,6 +65,27 @@ Changed
    to namefile conversion of iMOD-WQ.)
 -  Datetime formats are inferred based on length of the time string according to
    ``%Y%m%d%H%M%S``; supported lengths 4 (year only) to 14 (full format string).
+
+Added
+~~~~~
+-  :class:`imod.wq.MassLoading` and
+   :class:`imod.wq.TimeVaryingConstantConcentration` have been added to allow
+   additional concentration boundary conditions.
+-  IPF writing methods support an ``assoc_columns`` keyword to allow greater
+   flexibility in including and renaming columns of the associated files.
+-  Optional basemap plotting has been added to :meth:`imod.visualize.plot_map()`.
+
+Fixed
+~~~~~
+-  IO methods for IDF files will now correctly identify double precision IDFs.
+   The correct record length identifier is 2295 rather than 2296 (2296 was a
+   typo in the iMOD manual).
+-  :meth:`imod.wq.SeawatModel.write()` will now write the correct path for
+   recharge package concentration given in IDF files. It did not prepend the
+   name of the package correctly (resulting in paths like
+   ``concentration_l1.idf`` instead of ``rch/concentration_l1.idf``).
+-  :meth:`imod.idf.save()` will simplify constant cellsize arrays to a scalar
+   value -- this greatly speeds up drawing in the iMOD-GUI.
 
 [0.10.0] - 2020-05-23
 ---------------------
