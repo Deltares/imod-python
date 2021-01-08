@@ -113,6 +113,9 @@ def stability_constraint_advection(front, lower, right, top_bot, porosity=0.3, R
     dz_m = top_bot.dz.rolling(layer=2, min_periods=2).mean()
     dz_m = dz_m.shift(layer=-1)
 
+    # assert all dz positive - Issue #140
+    assert np.all(dz_m.values[~np.isnan(dz_m.values)] >= 0)
+
     # absolute velocities (m/d)
     abs_v_x = np.abs(qs_x / porosity)
     abs_v_y = np.abs(qs_y / porosity)

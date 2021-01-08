@@ -5,8 +5,10 @@ import subprocess
 
 import cftime
 import jinja2
+import geopandas as gpd
 import numpy as np
 import pandas as pd
+from scipy.ndimage import binary_dilation
 import xarray as xr
 
 import imod
@@ -78,7 +80,26 @@ class Model(collections.UserDict):
             if len(sel_dims) == 0:
                 selmodel[pkgname] = pkg
             else:
-                selmodel[pkgname] = pkg.loc[sel_dims]
+                if pkg._pkg_id != "wel":
+                    selmodel[pkgname] = pkg.loc[sel_dims]
+                else:
+                    df = pkg.to_dataframe().drop(columns="save_budget")
+                    for k, v in sel_dims.items():
+                        try:
+                            if isinstance(v, slice):
+                                # slice?
+                                # to account for reversed order of y
+                                low, high = min(v.start, v.stop), max(v.start, v.stop)
+                                df = df.loc[(df[k] >= low) & (df[k] <= high)]
+                            else:  # list, labels etc
+                                df = df.loc[df[k].isin(v)]
+                        except:
+                            raise ValueError(
+                                "Invalid indexer for Well package, accepts slice or list-like of values"
+                            )
+                    selmodel[pkgname] = imod.wq.Well(
+                        save_budget=pkg["save_budget"], **df
+                    )
         return selmodel
 
     def isel(self, **dimensions):
@@ -107,42 +128,83 @@ class Model(collections.UserDict):
         ----------
         directory : str, pathlib.Path
             Directory into which the different model packages will be written.
+
         pattern : str, optional.
             Pattern for filename of each package, in which `pkgname`
             signifies the package name. Default is `"{pkgname}.nc"`,
             so `model["river"]` would get written to `path / river.nc`.
+
         kwargs :
             Additional kwargs to be forwarded to `xarray.Dataset.to_netcdf`.
         """
         directory = pathlib.Path(directory)
         for pkgname, pkg in self.items():
-            pkg.to_netcdf(directory / pattern.format(pkgname=pkgname), **kwargs)
+            try:
+                pkg.to_netcdf(directory / pattern.format(pkgname=pkgname), **kwargs)
+            except:
+                print(f"Package {pkgname} can not be written to NetCDF")
+                raise
 
-    def write_qgis_project(self, modelname):
+    def write_qgis_project(self, directory, crs, filename=None, aggregate_layers=False):
         """
         Write qgis projectfile and accompanying netcdf files that can be read in qgis.
+
+        Parameters
+        ----------
+        directory : Path
+            directory of qgis project
+
+        crs : str, int,
+            anything that can be converted to a pyproj.crs.CRS
+
+        filename : Optional, str
+            name of qgis projectfile.
+
+        aggregate_layers : Optional, bool
+            If True, aggregate layers by taking the mean, i.e. ds.mean(dim="layer")
+
         """
         ext = ".qgs"
+        if filename is None:
+            filename = self.modelname
 
-        modeldirectory = pathlib.Path(modelname)
-        modeldirectory.mkdir(exist_ok=True, parents=True)
+        directory = pathlib.Path(directory)
+        directory.mkdir(exist_ok=True, parents=True)
 
         pkgnames = [
             pkgname
             for pkgname, pkg in self.items()
             if all(i in pkg.dims for i in ["x", "y"])
         ]
+
         data_paths = []
         data_vars_ls = []
         for pkgname in pkgnames:
-            pkg = self[pkgname]
-            data_path = pkg._netcdf_path(modeldirectory, pkgname)
-            data_path = "./" + data_path.relative_to(modeldirectory).as_posix()
+            pkg = self[pkgname].rio.write_crs(crs)
+            data_path = pkg._netcdf_path(directory, pkgname)
+            data_path = "./" + data_path.relative_to(directory).as_posix()
             data_paths.append(data_path)
-            data_vars_ls.append(pkg.write_netcdf(modeldirectory, pkgname))
+            # FUTURE: MDAL has matured enough that we do not necessarily
+            #           have to write seperate netcdfs anymore
+            data_vars_ls.append(
+                pkg.write_netcdf(directory, pkgname, aggregate_layers=aggregate_layers)
+            )
 
-        qgs_tree = qgs_util._create_qgis_tree(self, pkgnames, data_paths, data_vars_ls)
-        qgs_util._write_qgis_projectfile(qgs_tree, modeldirectory / (modelname + ext))
+        qgs_tree = qgs_util._create_qgis_tree(
+            self, pkgnames, data_paths, data_vars_ls, crs
+        )
+        qgs_util._write_qgis_projectfile(qgs_tree, directory / (filename + ext))
+
+    def _delete_empty_packages(self, verbose=False):
+        to_del = []
+        for pkg in self.keys():
+            dv = list(self[pkg].data_vars)[0]
+            if not self[pkg][dv].notnull().any().compute():
+                if verbose:
+                    print(f"Deleting package {pkg}, found no data in parameter {dv}")
+                to_del.append(pkg)
+        for pkg in to_del:
+            del self[pkg]
 
 
 class SeawatModel(Model):
@@ -657,6 +719,9 @@ class SeawatModel(Model):
         if not self.check is None:
             self.package_check()
 
+        # Delete packages without data
+        self._delete_empty_packages(verbose=True)
+
         runfile_content = self.render(
             directory=render_dir, result_dir=result_dir, writehelp=False
         )
@@ -693,3 +758,160 @@ class SeawatModel(Model):
 
         for pkg in self.values():
             pkg._pkgcheck(ibound=ibound)
+
+    def clip(
+        self,
+        extent,
+        heads_boundary=None,
+        concentration_boundary=None,
+        delete_empty_pkg=False,
+    ):
+        """
+        Method to clip the model to a certain `extent`. The spatial resolution of the clipped model is unchanged.
+        Boundary conditions of clipped model can be derived from parent model calculation results and are applied
+        along the edge of `extent` (CHD and TVC). Packages from parent that have no data within extent are optionally removed.
+
+        Parameters
+        ----------
+        extent : tuple, geopandas.GeoDataFrame, xarray.DataArray
+            Extent of the clipped model. Tuple must be in the form of (`xmin`,`xmax`,`ymin`,`ymax`). If a GeoDataFrame, all
+            polygons are included in the model extent. If a DataArray, non-null/non-zero values are taken as the new extent.
+
+        heads_boundary : xarray.DataArray, optional.
+            Heads to be applied as a Constant Head boundary condition along the edge of the model extent. These heads are assumed
+            to be derived from calculations with the parent model. Timestamp of boundary condition is shifted to correct for difference
+            between 'end of period' timestamp of results and 'start of period' timestamp of boundary condition.
+            If None (default), no constant heads boundary condition is applied.
+
+        concentration_boundary : xarray.DataArray, optional.
+            Concentration to be applied as a Time Varying Concentration boundary condition along the edge of the model extent.
+            These concentrations can be derived from calculations with the parent model. Timestamp of boundary condition is shifted
+            to correct for difference between 'end of period' timestamp of results and 'start of period' timestamp of boundary condition.
+            If None (default), no time varying concentration boundary condition is applied.
+
+            *Note that the Time Varying Concentration boundary sets a constant concentration for the entire stress period,
+            unlike the linearly varying Constant Head. This will inevitably cause a time shift in concentrations along the boundary.
+            This shift becomes more significant when stress periods are longer. If necessary, consider interpolating concentrations
+            along the time axis, to reduce the length of stress periods (see examples).*
+
+        delete_empty_pkg : bool, optional.
+            Set to True to delete packages that contain no data in the clipped model. Defaults to False.
+
+        Examples
+        --------
+        Given a full model, clip a 1 x 1 km rectangular submodel without boundary conditions along its edge:
+
+        >>> extent = (1000., 2000., 5000., 6000.)  # xmin, xmax, ymin, ymax
+        >>> clipped = ml.clip(extent)
+
+        Load heads and concentrations from full model results:
+
+        >>> heads = imod.idf.open("head/head_*.idf")
+        >>> conc = imod.idf.open("conc/conc_*.idf")
+        >>> clipped = ml.clip(extent, heads, conc)
+
+        Use a shape of a model area:
+
+        >>> extent = geopandas.read_file("clipped_model_area.shp")
+        >>> clipped = ml.clip(extent, heads, conc)
+
+        Interpolate concentration results to annual results using xarray.interp(), to improve time resolution of concentration boundary:
+
+        >>> conc = imod.idf.open("conc/conc_*.idf")
+        >>> dates = pd.date_range(conc.time.values[0], conc.time.values[-1], freq="AS")
+        >>> conc_interpolated = conc.load().interp(time=dates, method="linear")
+        >>> clipped = ml.clip(extent, heads, conc_interpolated)
+        """
+        baskey = self._get_pkgkey("bas6")
+        like = self[baskey]["ibound"].isel(layer=0).squeeze(drop=True)
+
+        if isinstance(extent, (list, tuple)):
+            xmin, xmax, ymin, ymax = extent
+            assert (xmin < xmax) & (
+                ymin < ymax
+            ), "Either xmin or ymin is equal to or larger than xmax or ymax. Correct order is xmin, xmax, ymin, ymax."
+            extent = xr.ones_like(like)
+            extent = extent.where(
+                (extent.x >= xmin)
+                & (extent.x <= xmax)
+                & (extent.y >= ymin)
+                & (extent.y <= ymax),
+                0,
+            )
+        elif isinstance(extent, gpd.GeoDataFrame):
+            extent = imod.prepare.rasterize(extent, like=like)
+        elif isinstance(extent, xr.DataArray):
+            pass
+        else:
+            raise ValueError("extent must be of type tuple, GeoDataFrame or DataArray")
+
+        extent = xr.ones_like(extent).where(extent > 0)
+
+        def get_clip_na_slices(da, dims=None):
+            """Clips a DataArray to its maximum extent in different dimensions.
+            if dims not given, clips to x and y.
+            """
+            if dims is None:
+                dims = ["x", "y"]
+            slices = {}
+            for d in dims:
+                tmp = da.dropna(dim=d, how="all")[d]
+                if len(tmp) > 2:
+                    dtmp = 0.5 * (tmp[1] - tmp[0])
+                else:
+                    dtmp = 0
+                slices[d] = slice(float(tmp[0] - dtmp), float(tmp[-1] + dtmp))
+            return slices
+
+        # create edge around extent to apply boundary conditions
+        if not (heads_boundary is None and concentration_boundary is None):
+            extentwithedge = extent.copy(data=binary_dilation(extent.fillna(0).values))
+            extentwithedge = extentwithedge.where(extentwithedge)
+        else:
+            extentwithedge = extent
+        # clip to extent with edge
+        clip_slices = get_clip_na_slices(extentwithedge)
+        extentwithedge = extentwithedge.sel(**clip_slices)
+        extent = extent.sel(**clip_slices)
+        edge = extentwithedge.where(extent.isnull())
+
+        # Clip model to extent, set outside extent to nodata or 0
+        ml = self.sel(**clip_slices)
+        for pck in ml.keys():
+            for d in ml[pck].data_vars:
+                if d in ["ibound", "icbund"]:
+                    ml[pck][d] = ml[pck][d].where(extentwithedge == 1, 0)
+                elif "x" in ml[pck][d].dims:
+                    ml[pck][d] = ml[pck][d].where(extentwithedge == 1)
+
+        # Create boundary conditions as CHD and/or TVC package
+        # Time shifts: assume heads and conc are calculation results. Then:
+        # timestamp of result is _end_ of stress period, while timestamp input
+        # is the _start_ of the stress period.
+        if concentration_boundary is not None:
+            concentration_boundary = concentration_boundary.sel(**clip_slices)
+            concentration_boundary = concentration_boundary.where(edge == 1)
+            concentration_boundary = concentration_boundary.shift(
+                time=-1
+            ).combine_first(concentration_boundary)
+
+            ml["tvc"] = imod.wq.TimeVaryingConstantConcentration(
+                concentration=concentration_boundary
+            )
+
+        if heads_boundary is not None:
+            heads_boundary = heads_boundary.sel(**clip_slices)
+            head_end = heads_boundary.where(edge == 1)
+            head_start = head_end.shift(time=1).combine_first(head_end)
+
+            ml["chd"] = imod.wq.ConstantHead(
+                head_start=head_start,
+                head_end=head_end,
+                concentration=concentration_boundary,  # concentration relevant for fwh calc
+            )
+
+        # delete packages if no data in sliced model
+        if delete_empty_pkg:
+            ml._delete_empty_packages(verbose=True)
+
+        return ml

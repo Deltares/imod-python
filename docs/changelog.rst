@@ -20,6 +20,8 @@ Fixed
    ``concentration_l1.idf`` instead of ``rch/concentration_l1.idf``).
 -  :meth:`imod.idf.save()` will simplify constant cellsize arrays to a scalar
    value -- this greatly speeds up drawing in the iMOD-GUI.
+-  :meth:`imod.mf6.open_hds()` did not read the appropriate bytes from the
+   heads file, apart for the first timestep. It will now read the right records.
 
 Added
 ~~~~~
@@ -35,6 +37,19 @@ Added
    multiple species runs.
 -  :meth:`imod.wq.SeawatModel.to_netcdf()` has been added to write all model
    packages to netCDF files.
+-  :meth:`imod.mf6.open_cbc()` has been added to read the budget data of 
+   structured (DIS) MODFLOW6 models. The data is read lazily into xarray
+   DataArrays per timestep.
+-  :func:`imod.visualize.streamfunction()` and :func:`imod.visualize.quiver()`
+   were added to plot a 2D representation of the groundwater flow field using
+   either streamlines or quivers over a cross section plot 
+   (:func:`imod.visualize.cross_section()`). 
+-  :func:`imod.evaluate.streamfunction_line()` and 
+   :func:`imod.evaluate.streamfunction_linestring()` were added to extract the
+   2D projected streamfunction of the 3D flow field for a given cross section. 
+-  :func:`imod.evaluate.quiver_line()` and :func:`imod.evaluate.quiver_linestring()` 
+   were added to extract the u and v components of the 3D flow field for a given
+   cross section.
 
 Changed
 ~~~~~~~

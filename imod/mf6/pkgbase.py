@@ -201,9 +201,26 @@ class Package(xr.Dataset, abc.ABC):
         """create path for netcdf, this function is also used to create paths to use inside the qgis projectfiles"""
         return directory / pkgname / f"{self._pkg_id}.nc"
 
-    def write_netcdf(self, directory, pkgname):
+    def write_netcdf(self, directory, pkgname, aggregate_layers=False):
         """Write to netcdf. Useful for generating .qgs projectfiles to view model input.
         These files cannot be used to run a modflow model.
+
+        Parameters
+        ----------
+        directory : Path
+            directory of qgis project
+
+        pkgname : str
+            package name
+
+        aggregate_layers : bool
+            If True, aggregate layers by taking the mean, i.e. ds.mean(dim="layer")
+
+        Returns
+        -------
+        has_dims : list of str
+            list of variables that have an x and y dimension.
+
         """
 
         has_dims = []
@@ -212,6 +229,9 @@ class Package(xr.Dataset, abc.ABC):
                 has_dims.append(varname)
 
         spatial_ds = self[has_dims]
+
+        if aggregate_layers and ("layer" in spatial_ds.dims):
+            spatial_ds = spatial_ds.mean(dim="layer")
 
         if "time" not in spatial_ds:
             # Hack to circumvent this issue:

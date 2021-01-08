@@ -113,8 +113,9 @@ def qgs_tree(simple_model):
     pkgnames = ["chd", "sto"]
     data_paths = [".", "."]
     data_vars_ls = [["head"], ["convertible"]]
+    epsg = "epsg:28992"
 
-    return qgs_util._create_qgis_tree(gwf, pkgnames, data_paths, data_vars_ls)
+    return qgs_util._create_qgis_tree(gwf, pkgnames, data_paths, data_vars_ls, crs=epsg)
 
 
 def test_get_color_hexes_cmap():
@@ -162,7 +163,7 @@ def test_generate_layer_ids():
 def test_create_groups(simple_model):
     gwf = simple_model["GWF_1"]
     data_vars = ["specific_storage", "specific_yield", "convertible"]
-    actual = qgs_util._create_groups(gwf["sto"], data_vars)
+    actual = qgs_util._create_groups(gwf["sto"], data_vars, aggregate_layers=False)
     expected = [("specific_storage", 1), ("specific_yield", 1), ("convertible", 1)]
 
     assert actual == expected
@@ -187,7 +188,7 @@ def test_get_time_range(simple_model):
 def test_create_mesh_dataset_group(simple_model):
     gwf = simple_model["GWF_1"]
     data_vars = ["specific_storage", "specific_yield", "convertible"]
-    groups = qgs_util._create_groups(gwf["sto"], data_vars)
+    groups = qgs_util._create_groups(gwf["sto"], data_vars, aggregate_layers=False)
     actual = qgs_util._create_mesh_dataset_group(gwf["sto"], groups)
     actual = list(actual.__dict__.items())[0]
 
@@ -209,7 +210,7 @@ def test_create_qgis_tree(qgs_tree):
 
     xmax_first_layer = actual.projectlayers.maplayer[0].extent.xmax
 
-    assert len(actual.__dict__) == 26
+    assert len(actual.__dict__) == 27
     assert len(actual.projectlayers.maplayer) == 2
     assert np.isclose(xmax_first_layer, 9000.0)
 
@@ -226,4 +227,4 @@ def test_make_processor(qgs_tree):
     to_string = xml.serialize_to_string(processor, qgs_tree, indent="  ")
 
     # TODO: create more robust test than this
-    assert len(to_string.splitlines()) == 241
+    assert len(to_string.splitlines()) == 225

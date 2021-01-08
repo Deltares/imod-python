@@ -93,7 +93,7 @@ def setup_mf6_basic_simulation_flopy():
     # Create the output control package
     headfile = f"{name}.hds"
     head_filerecord = [headfile]
-    budgetfile = f"{name}.cbb"
+    budgetfile = f"{name}.cbc"
     budget_filerecord = [budgetfile]
     saverecord = [("HEAD", "ALL"), ("BUDGET", "ALL")]
     printrecord = [("HEAD", "LAST")]

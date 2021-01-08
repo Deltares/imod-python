@@ -27,12 +27,14 @@ dependencies:
   - pip
   - pip:
     - declxml
+  - pyproj
   - pytest
   - pytest-benchmark
   - pytest-cov
   - python>=3.6
   - pyvista
   - rasterio>=1.0
+  - rioxarray
   - scipy
   - setuptools_scm
   - sphinx
@@ -40,6 +42,6 @@ dependencies:
   - toolz
   - tqdm
   - twine
-  - vtk
+  - vtk>=9.0
   - xarray>=0.15
   - zarr
