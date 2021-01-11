@@ -326,22 +326,23 @@ class SeawatModel(Model):
         unique times are used as stress periods in the model. All stress packages must
         have the same starting time.
 
-        The time discretization in imod-python works as follows::
+        The time discretization in imod-python works as follows:
 
-            - The datetimes of all packages you send in are always respected
-            - Subsequently, the input data you use is always included fully as well
-            - All times are treated as starting times for the stress: a stress is always applied until the next specified date
-            - For this reason, a final time is required to determine the length of the last stress period
-            - Additional times can be provided to force shorter stress periods & more detailed output
-            - Every stress has to be defined on the first stress period (this is a modflow requirement)
+        - The datetimes of all packages you send in are always respected
+        - Subsequently, the input data you use is always included fully as well
+        - All times are treated as starting times for the stress: a stress is always applied until the next specified date
+        - For this reason, a final time is required to determine the length of the last stress period
+        - Additional times can be provided to force shorter stress periods & more detailed output
+        - Every stress has to be defined on the first stress period (this is a modflow requirement)
 
-            Or visually (every letter a date in the time axes):
+        Or visually (every letter a date in the time axes)::
             recharge a - b - c - d - e - f
             river    g - - - - h - - - - j
             times    - - - - - - - - - - - i
 
             model    a - b - c h d - e - f i
-            with the stress periods defined between these dates. I.e. the model times are the set of all times you include in the model.
+        
+        with the stress periods defined between these dates. I.e. the model times are the set of all times you include in the model.
 
         Parameters
         ----------
