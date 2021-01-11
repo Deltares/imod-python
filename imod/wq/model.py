@@ -341,7 +341,7 @@ class SeawatModel(Model):
             times    - - - - - - - - - - - i
 
             model    a - b - c h d - e - f i
-        
+
         with the stress periods defined between these dates. I.e. the model times are the set of all times you include in the model.
 
         Parameters
