@@ -8,33 +8,33 @@ class OutputControl(Package):
 
     Parameters
     ----------
-    save_head_idf: {True, False}, optional
+    save_head_idf: bool, optional
         Save calculated head values in IDF format.
         Default value is False.
-    save_concentration_idf: {True, False}, optional
+    save_concentration_idf: bool, optional
         Save calculated concentration values in IDF format.
         Default value is False.
-    save_budget_idf: {True, False}, optional
+    save_budget_idf: bool, optional
         Save calculated budget in IDF format.
         Default value is False.
-    save_head_tec: {True, False}, optional
+    save_head_tec: bool, optional
         Save calculated head values in a format compatible with Tecplot.
         Default value is False.
-    save_concentration_tec: {True, False}, optional
+    save_concentration_tec: bool, optional
         Save calculated concentration values in a format compatible with
         Tecplot.
         Default value is False.
-    save_budget_tec: {True, False}, optional
+    save_budget_tec: bool, optional
         Save calculated budget in a format compatible with Tecplot.
         Default value is False.
-    save_head_vtk: {True, False}, optional
+    save_head_vtk: bool, optional
         Save calculated head values in a format compatible with ParaView (VTK).
         Default value is False.
-    save_concentration_vtk: {True, False}, optional
+    save_concentration_vtk: bool, optional
         Save calculated concentration values in a format compatible with
         ParaView (VTK).
         Default value is False.
-    save_budget_vtk: {True, False}, optional
+    save_budget_vtk: bool, optional
         Save calculated budget in a format compatible with ParaView (VTK).
         Default value is False.
     """

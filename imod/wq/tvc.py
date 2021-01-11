@@ -9,7 +9,7 @@ class TimeVaryingConstantConcentration(BoundaryCondition):
 
     Parameters
     ----------
-    concentration: array of floats (xr.DataArray)
+    concentration: xr.DataArray of floats
     """
 
     __slots__ = ("concentration",)

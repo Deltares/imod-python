@@ -9,14 +9,14 @@ class ConstantHead(BoundaryCondition):
 
     Parameters
     ----------
-    head_start: array of floats (xr.DataArray)
+    head_start: xr.DataArray of floats
         is the head at the boundary at the start of the stress period.
-    head_end: array of floats (xr.DataArray)
+    head_end: xr.DataArray of floats
         is the head at the boundary at the end of the stress period.
-    concentration: array of floats (xr.DataArray)
+    concentration: xr.DataArray of floats
         concentrations for the constant heads. It gets automatically written to
         the SSM package.
-    save_budget: {True, False}, optional
+    save_budget: bool, optional
         is a flag indicating if the budget should be saved (ICHDCB).
         Default is False.
     """

@@ -10,7 +10,7 @@ class AdvectionFiniteDifference(Package):
 
     Attributes
     ----------
-    courant: real
+    courant: float
         Courant number (PERCEL) is the number of cells (or a fraction of a cell)
         advection will be allowed in any direction in one transport step. For
         implicit finite-difference or particle tracking based schemes, there is
@@ -21,7 +21,7 @@ class AdvectionFiniteDifference(Package):
         finite-difference, PERCEL is also a stability constraint, which must not
         exceed one and will be automatically reset to one if a value greater
         than one is specified.
-    weighting : {"upstream", "central"}, optional
+    weighting : string {"upstream", "central"}, optional
         Indication of which weighting scheme should be used, set to default
         value "upstream" (NADVFD = 0 or 1)
         Default value: "upstream"
@@ -58,7 +58,7 @@ class AdvectionMOC(Package):
 
     Attributes
     -----------
-    courant: real
+    courant: float
         Courant number (PERCEL) is the number of cells (or a fraction of a cell)
         advection will be allowed in any direction in one transport step. For
         implicit finite-difference or particle tracking based schemes, there is
@@ -71,7 +71,7 @@ class AdvectionMOC(Package):
         than one is specified.
     max_nparticles: int
         is the maximum total number of moving particles allowed (MXPART).
-    tracking: {"euler", "runge-kutta", "hybrid"}, optional
+    tracking: string {"euler", "runge-kutta", "hybrid"}, optional
         indicates which particle tracking algorithm is selected for the
         Eulerian-Lagrangian methods. ITRACK = 1, the first-order Euler algorithm is
         used; ITRACK = 2, the fourth-order Runge-Kutta algorithm is used; this
@@ -211,7 +211,7 @@ class AdvectionModifiedMOC(Package):
 
     Attributes
     ----------
-    courant: real
+    courant: float
         Courant number (PERCEL) is the number of cells (or a fraction of a cell)
         advection will be allowed in any direction in one transport step. For
         implicit finite-difference or particle tracking based schemes, there is
@@ -222,7 +222,7 @@ class AdvectionModifiedMOC(Package):
         finite-difference, PERCEL is also a stability constraint, which must not
         exceed one and will be automatically reset to one if a value greater
         than one is specified.
-    tracking: str, {"euler", "runge-kutta", "hybrid"}
+    tracking: string, {"euler", "runge-kutta", "hybrid"}
         indicates which particle tracking algorithm is selected for the
         Eulerian-Lagrangian methods. ITRACK = 1, the first-order Euler algorithm is
         used; ITRACK = 2, the fourth-order Runge-Kutta algorithm is used; this
@@ -230,7 +230,7 @@ class AdvectionModifiedMOC(Package):
         set greater than one. ITRACK = 3, the hybrid 1st and 4th order algorithm is
         used; the Runge- Kutta algorithm is used in sink/source cells and the cells
         next to sinks/sources while the Euler algorithm is used elsewhere.
-    weighting_factor: real
+    weighting_factor: float
         is a concentration weighting factor (WD) between 0.5 and 1. It is used for
         operator splitting in the particle tracking based methods. The value of
         0.5 is generally adequate. The value may be adjusted to achieve better
@@ -289,6 +289,9 @@ class AdvectionModifiedMOC(Package):
         self["sink_particle_placement"] = sink_particle_placement
         self["sink_nparticles"] = sink_nparticles
 
+    def _pkgcheck(self, ibound=None):
+        self._check_positive(["courant", "weighting_factor"])
+
 
 class AdvectionHybridMOC(Package):
     """
@@ -318,13 +321,13 @@ class AdvectionHybridMOC(Package):
         set greater than one. ITRACK = 3, the hybrid 1st and 4th order algorithm is
         used; the Runge- Kutta algorithm is used in sink/source cells and the cells
         next to sinks/sources while the Euler algorithm is used elsewhere.
-    weighting_factor: real
+    weighting_factor: float
         is a concentration weighting factor (WD) between 0.5 and 1. It is used for
         operator splitting in the particle tracking based methods. The value of
         0.5 is generally adequate. The value may be adjusted to achieve better
         mass balance. Generally, it can be increased toward 1.0 as advection
         becomes more dominant.
-    dceps: real
+    dceps: float
         is a small Relative Cell Concentration Gradient below which advective
         transport is considered negligible. A value around 10-5 is generally
         adequate.
@@ -426,6 +429,9 @@ class AdvectionHybridMOC(Package):
         self["sink_particle_placement"] = sink_particle_placement
         self["sink_nparticles"] = sink_nparticles
         self["dconcentration_hybrid"] = dconcentration_hybrid
+
+    def _pkgcheck(self, ibound=None):
+        self._check_positive(["courant", "weighting_factor"])
 
 
 class AdvectionTVD(Package):

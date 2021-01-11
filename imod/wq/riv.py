@@ -9,19 +9,19 @@ class River(BoundaryCondition):
 
     Parameters
     ----------
-    stage: array of floats (xr.DataArray)
+    stage: float or xr.DataArray of floats
         is the head in the river (STAGE).
-    bottom_elevation: array of floats (xr.DataArray)
+    bottom_elevation: float or xr.DataArray of floats
         is the bottom of the riverbed (RBOT).
-    conductance: array of floats (xr.DataArray)
+    conductance: float or xr.DataArray of floats
         is the conductance of the river.
-    density: array of floats (xr.DataArray)
+    density: float or xr.DataArray of floats
         is the density used to convert the point head to the freshwater head
         (RIVSSMDENS).
-    concentration: "None", float or array of floats (xr.DataArray), optional
+    concentration: "None", float or xr.DataArray of floats, optional
         is the concentration in the river.
         Default is None.
-    save_budget: {True, False}, optional
+    save_budget: bool, optional
         is a flag indicating if the budget should be saved (IRIVCB).
         Default is False.
     """

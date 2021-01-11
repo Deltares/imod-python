@@ -10,13 +10,13 @@ class LayerPropertyFlow(Package):
 
     Parameters
     ----------
-    k_horizontal: float or array of floats (xarray.DataArray)
+    k_horizontal: float or xr.DataArray of floats
         is the hydraulic conductivity along rows (HK). HK is multiplied by
         horizontal anisotropy (see horizontal_anisotropy) to obtain hydraulic
         conductivity along columns.
-    k_vertical: float or array of floats (xarray.DataArray)
+    k_vertical: float or xr.DataArray of floats
         is the vertical hydraulic conductivity (VKA).
-    horizontal_anisotropy: float or array of floats (xarray.DataArray)
+    horizontal_anisotropy: float or xr.DataArray of floats
         contains a value for each layer that is the horizontal anisotropy
         (CHANI). Use as many records as needed to enter a value of CHANI for
         each layer. The horizontal anisotropy is the ratio of the hydraulic
@@ -39,14 +39,14 @@ class LayerPropertyFlow(Package):
         Use as many records needed to enter a value for each layer.
         0 = confined
         not 0 = convertible
-    specific_storage: float or array of floats (xarray.DataArray)
+    specific_storage: float or xr.DataArray of floats
         is specific storage (SS). Read only for a transient simulation (at least
         one transient stress period). Include only if at least one stress period
         is transient.
         Specific storage is the amount of water released when the head in an aquifer
         drops by 1 m, in one meter of the aquifer (or model layer).
         The unit is: ((m3 / m2) / m head change) / m aquifer = m-1
-    specific_yield: float or array of floats (xarray.DataArray)
+    specific_yield: float or xr.DataArray of floats
         is specific yield (SY). Read only for a transient simulation (at least
         one transient stress period) and if the layer is convertible (layer_type
         is not 0). Include only if at least one stress period is transient.

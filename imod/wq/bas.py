@@ -21,19 +21,19 @@ class BasicFlow(Package):
 
     Parameters
     ----------
-    ibound: array of int (xr.DataArray)
-        is the boundary variable. One value is read for every model cell.
-        Values are read a layer at the time.
+    ibound: xr.DataArray of integers
+        is the boundary variable.
         If IBOUND(J,I,K) < 0, cell J,I,K has a constant head.
         If IBOUND(J,I,K) = 0, cell J,I,K is inactive.
         If IBOUND(J,I,K) > 0, cell J,I,K is active.
-    top: float or array of floats (xr.DataArray)
+    top: float or xr.DataArray of floats
         is the top elevation of layer 1. For the common situation in which the
         top layer represents a water-table aquifer, it may be reasonable to set
-        Top equal to land-surface elevation.
-    bottom: float or array of floats (xr.DataArray)
-        is the bottom elevation of a model layer or a Quasi-3d confining bed.
-    starting_head: float or array of floats (xr.DataArray)
+        `top` equal to land-surface elevation.
+    bottom: xr.DataArray of floats
+        is the bottom elevation of model layers or Quasi-3d confining beds. The
+        DataArray should at least include the `layer` dimension.
+    starting_head: float or xr.DataArray of floats
         is initial (starting) head—that is, head at the beginning of the
         simulation (STRT). starting_head must be specified for all simulations,
         including steady-state simulations. One value is read for every model

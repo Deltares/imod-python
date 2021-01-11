@@ -14,7 +14,7 @@ class BasicTransport(Package):
 
     Parameters
     ----------
-    icbund: xr.DataArray
+    icbund: xr.DataArray of int
         is an integer array specifying the boundary condition type (inactive,
         constant-concentration, or active) for every model cell. For
         multi-species simulation, ICBUND defines the boundary condition type
@@ -36,7 +36,7 @@ class BasicTransport(Package):
         not treated as a constantconcentration cell.
         If ICBUND>0, the cell is an active (variable) concentration cell where
         the concentration value will be calculated.
-    starting_concentration: float or array of floats (xr.DataArray)
+    starting_concentration: float or xr.DataArray of floats
         is the starting concentration (initial condition) at the beginning of
         the simulation (unit: ML-3) (SCONC). For multispecies simulation, the
         starting concentration must be specified for all species, one species at

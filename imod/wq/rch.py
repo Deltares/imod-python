@@ -57,18 +57,18 @@ class Recharge(BoundaryCondition, abc.ABC):
 class RechargeTopLayer(Recharge):
     """
     The Recharge package is used to simulate a specified flux distributed over
-    the top of the model and specified in units of length/time. Within MODFLOW,
+    the top of the model and specified in units of length/time (usually m/d). Within MODFLOW,
     these rates are multiplied by the horizontal area of the cells to which they
     are applied to calculate the volumetric flux rates. In this class the
     Recharge gets applied to the top grid layer (NRCHOP=1).
 
     Parameters
     ----------
-    rate: float or array of floats (xr.DataArray)
+    rate: float or xr.DataArray of floats
         is the amount of recharge.
-    concentration: float or array of floats (xr.DataArray)
+    concentration: float or xr.DataArray of floats
         is the concentration of the recharge
-    save_budget: {True, False}, optional
+    save_budget: bool, optional
         flag indicating if the budget needs to be saved.
         Default is False.
     """
@@ -90,21 +90,21 @@ class RechargeTopLayer(Recharge):
 class RechargeLayers(Recharge):
     """
     The Recharge package is used to simulate a specified flux distributed over
-    the top of the model and specified in units of length/time. Within MODFLOW,
+    the top of the model and specified in units of length/time (usually m/d). Within MODFLOW,
     these rates are multiplied by the horizontal area of the cells to which they
     are applied to calculate the volumetric flux rates. In this class the
     Recharge gets applied to a specific, specified, layer (NRCHOP=2).
 
     Parameters
     ----------
-    rate: float or array of floats (xr.DataArray)
+    rate: float or xr.DataArray of floats
         is the amount of recharge.
-    recharge_layer: float or array of integers (xr.DataArray)
+    recharge_layer: int or xr.DataArray of integers
         layer number variable that defines the layer in each vertical column
         where recharge is applied
-    concentration: float or array of floats (xr.DataArray)
+    concentration: float or xr.DataArray of floats
         is the concentration of the recharge
-    save_budget: {True, False}, optional
+    save_budget: bool, optional
         flag indicating if the budget needs to be saved.
         Default is False.
     """
@@ -131,7 +131,7 @@ class RechargeLayers(Recharge):
 class RechargeHighestActive(Recharge):
     """
     The Recharge package is used to simulate a specified flux distributed over
-    the top of the model and specified in units of length/time. Within MODFLOW,
+    the top of the model and specified in units of length/time (usually m/d). Within MODFLOW,
     these rates are multiplied by the horizontal area of the cells to which they
     are applied to calculate the volumetric flux rates. In this class the
     Recharge gets applied to the highest active cell in each vertical column
@@ -139,11 +139,11 @@ class RechargeHighestActive(Recharge):
 
     Parameters
     ----------
-    rate: float or array of floats (xr.DataArray)
+    rate: float or xr.DataArray of floats
         is the amount of recharge.
-    concentration: float or array of floats (xr.DataArray)
+    concentration: float or xr.DataArray of floats
         is the concentration of the recharge
-    save_budget: {True, False}, optional
+    save_budget: bool, optional
         flag indicating if the budget needs to be saved.
         Default is False.
     """
