@@ -336,6 +336,7 @@ class SeawatModel(Model):
         - Every stress has to be defined on the first stress period (this is a modflow requirement)
 
         Or visually (every letter a date in the time axes)::
+
             recharge a - b - c - d - e - f
             river    g - - - - h - - - - j
             times    - - - - - - - - - - - i
