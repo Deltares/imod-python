@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 
 
+@np.vectorize
 def to_datetime(time, use_cftime):
     """
     Check whether time is cftime object, else convert to datetime64 series.
