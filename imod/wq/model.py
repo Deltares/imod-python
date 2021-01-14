@@ -26,6 +26,9 @@ def _relpath(path, to):
         return pathlib.Path(os.path.abspath(path))
 
 
+_np_to_datetime = np.vectorize(timeutil.to_datetime)
+
+
 # This class allows only imod packages as values
 class Model(collections.UserDict):
     def __setitem__(self, key, value):
@@ -94,10 +97,10 @@ class Model(collections.UserDict):
                 else:
                     # (list of) individual dates
                     # select appropriate stress period and rename dim to selected dates
-                    time_sel = timeutil.to_datetime(np.array(time_sel), use_cftime)
+                    time_sel = _np_to_datetime(np.array(time_sel), use_cftime)
                     sel = pkg.sel(time=time_sel, method="ffill")
                     sel["time"] = time_sel
-                    selmodel[pkgname] = pkg
+                    selmodel[pkgname] = sel
             else:
                 selmodel[pkgname] = pkg
 
