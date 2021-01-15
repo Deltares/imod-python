@@ -62,8 +62,9 @@ def fill(da, invalid=None, by=None):
     ----------
     da: xr.DataArray with gaps
         array containing missing value
-        if one of the dimensions is layer, it will interpolate one layer at a
-        a time (2D interpolation over x and y in case of dims == (by, "y", "x")).
+    by: str, optional
+        dimension over which the array will be filled, one by one.
+        See the examples.
 
     invalid: xr.DataArray
         a binary array of same shape as ``da``.
@@ -74,6 +75,24 @@ def fill(da, invalid=None, by=None):
     -------
     xarray.DataArray
         with the same coordinates as the input.
+
+    Examples
+    --------
+
+    A common use case is filling holes in a DataArray, filling it with the
+    value of its nearest (valid) neighbor:
+
+    >>> filled = imod.prepare.fill(da)
+
+    In case of a tie (e.g. neighbors in x and y are both one cell removed), the
+    neighbor in the last dimension is chosen (for rasters, that's generally x).
+
+    A typical use case is filling a 3D array (layer, y, x), but only in the
+    horizontal dimensions. The ``by`` keyword can be used to do this:
+
+    >>> filled = imod.prepare.fill(da, by="layer")
+
+    In this case, the array is filled by one layer at a time.
     """
 
     out = xr.full_like(da, np.nan)
@@ -656,8 +675,8 @@ def _create_chunks(like, resolution, chunksize):
 
 def celltable(path, column, resolution, like, chunksize=1e4):
     r"""
-    Process area of features by rasterizing in a chunkwise to limit memory
-    usage.
+    Process area of features by rasterizing in a chunkwise manner to limit
+    memory usage.
 
     Returns a table of cell indices (row, column) with for example feature ID,
     and feature area within cell. Essentially returns a COO sparse matrix, but

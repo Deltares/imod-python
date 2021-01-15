@@ -42,6 +42,6 @@ dependencies:
   - toolz
   - tqdm
   - twine
-  - vtk
+  - vtk>=9.0
   - xarray>=0.15
   - zarr

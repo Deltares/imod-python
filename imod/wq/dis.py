@@ -18,7 +18,7 @@ class TimeDiscretization(Package):
         is the number of time steps for the transient flow solution in the
         current stress period (NSTP). If the flow solution is steady-state,
         n_timestep=1. Default value is 1.
-    transient: {True, False}, optional
+    transient: bool, optional
         Flag indicating wether the flow simulation is transient (True) or False
         (Steady State).
         Default is True.
@@ -41,7 +41,7 @@ class TimeDiscretization(Package):
         flow time step exceeds max_n_transport_timestep, the simulation is
         terminated.
         Default is 50_000.
-    transport_timestep_multiplier: float of {"None"}, optional
+    transport_timestep_multiplier: float or {"None"}, optional
         is the multiplier for successive transport steps within a flow time step
         (TTSMULT).
         If the Generalized Conjugate Gradient (GCG) solver is used and the

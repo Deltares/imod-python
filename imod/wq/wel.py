@@ -24,13 +24,13 @@ class Well(BoundaryCondition):
         y coordinate of the well(s).
     rate: float or list of floats.
         pumping rate in the well(s).
-    Layer: "None" or int, optional
+    layer: "None" or int, optional
         layer from which the pumping takes place.
     time: "None" or listlike of np.datetime64, datetime.datetime, pd.Timestamp,
     cftime.datetime
         time during which the pumping takes place. Only need to specify if model
         is transient.
-    save_budget: {True, False}, optional
+    save_budget: bool, optional
         is a flag indicating if the budget should be saved (IRIVCB).
         Default is False.
     """
