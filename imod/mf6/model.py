@@ -6,6 +6,7 @@ import cftime
 import jinja2
 import numpy as np
 import xarray as xr
+import rioxarray
 
 import imod
 from imod.mf6 import qgs_util
