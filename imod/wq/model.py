@@ -26,9 +26,6 @@ def _relpath(path, to):
         return pathlib.Path(os.path.abspath(path))
 
 
-_np_to_datetime = np.vectorize(timeutil.to_datetime)
-
-
 # This class allows only imod packages as values
 class Model(collections.UserDict):
     def __setitem__(self, key, value):
@@ -76,78 +73,16 @@ class Model(collections.UserDict):
                             figsize=figsize,
                         )
 
-    def _sel_time(self, time_sel):
-        # select on time
-        selmodel = type(self)(self.modelname, self.check)
-        try:
-            use_cftime = self.use_cftime
-        except NameError:
-            use_cftime = False
-
-        for pkgname, pkg in self.items():
-            if "time" in pkg:
-                if isinstance(time_sel, slice):
-                    sel = pkg.sel(time=time_sel)
-                    # time_sel.start included? Otherwise, concat
-                    if timeutil.to_datetime(time_sel.start, use_cftime) not in sel.time:
-                        start = pkg.sel(time=time_sel.start, method="ffill")
-                        start["time"] = timeutil.to_datetime(time_sel.start, use_cftime)
-                        sel = xr.concat([start, sel], dim="time")
-                    selmodel[pkgname] = sel
-                else:
-                    # (list of) individual dates
-                    # select appropriate stress period and rename dim to selected dates
-                    time_sel = _np_to_datetime(np.array(time_sel), use_cftime)
-                    sel = pkg.sel(time=time_sel, method="ffill")
-                    sel["time"] = time_sel
-                    selmodel[pkgname] = sel
-            else:
-                selmodel[pkgname] = pkg
-
-        return selmodel
-
     def sel(self, **dimensions):
         selmodel = type(self)(self.modelname, self.check)
-
-        # filter out possible keyword arguments method tolerance and drop
-        method = dimensions.pop("method", None)
-        tolerance = dimensions.pop("tolerance", None)
-        drop = dimensions.pop("drop", False)
-        # account for time separately
-        time_sel = dimensions.pop("time", None)
 
         for pkgname, pkg in self.items():
             sel_dims = {k: v for k, v in dimensions.items() if k in pkg}
             if len(sel_dims) == 0:
                 selmodel[pkgname] = pkg
             else:
-                if pkg._pkg_id != "wel":
-                    selmodel[pkgname] = pkg.sel(
-                        sel_dims, method=method, tolerance=tolerance, drop=drop
-                    )
-                else:
-                    df = pkg.to_dataframe().drop(columns="save_budget")
-                    for k, v in sel_dims.items():
-                        try:
-                            if isinstance(v, slice):
-                                # slice?
-                                # to account for reversed order of y
-                                low, high = min(v.start, v.stop), max(v.start, v.stop)
-                                df = df.loc[(df[k] >= low) & (df[k] <= high)]
-                            else:  # list, labels etc
-                                df = df.loc[df[k].isin(v)]
-                        except:
-                            raise ValueError(
-                                "Invalid indexer for Well package, accepts slice or list-like of values"
-                            )
-                    selmodel[pkgname] = imod.wq.Well(
-                        save_budget=pkg["save_budget"], **df
-                    )
-
-        if time_sel is not None:
-            return selmodel._sel_time(time_sel)
-        else:
-            return selmodel
+                selmodel[pkgname] = pkg.sel(**dimensions)
+        return selmodel
 
     def isel(self, **dimensions):
         selmodel = type(self)(self.modelname, self.check)

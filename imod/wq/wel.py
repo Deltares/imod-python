@@ -2,6 +2,7 @@ import pathlib
 
 import jinja2
 import numpy as np
+import pandas as pd
 
 import imod
 from imod import util
@@ -311,3 +312,102 @@ class Well(BoundaryCondition):
             for k, v in timemap.items()
         }
         self.attrs["timemap"] = d
+
+    def _sel_time(self, time_sel):
+        # some foo to select last previous time for indexed times
+        if "time" in self:
+            df = self.to_dataframe().drop(columns="save_budget")
+            grouped = df.groupby(["id_name", "x", "y", "layer"])
+
+            if isinstance(time_sel, slice):
+                if time_sel.start is None:
+                    time_sel = slice(df["time"].min(), time_sel.stop, time_sel.step)
+                if time_sel.stop is None:
+                    time_sel = slice(time_sel.start, df["time"].max(), time_sel.step)
+
+                # set start time per group to last previous time (concurrent stress)
+                def _set_times(g):
+                    g.iloc[
+                        g.searchsorted(
+                            pd.Timestamp(time_sel.start) + pd.to_timedelta("1ns")
+                        )
+                        - 1
+                    ] = pd.Timestamp(time_sel.start)
+                    return g
+
+                df["time"] = grouped["time"].transform(_set_times)
+
+                # and select for time slice
+                sel = df.loc[
+                    (df["time"] >= time_sel.start) & (df["time"] <= time_sel.stop)
+                ]
+            else:
+                # (list of) individual dates
+                time_sel = timeutil.array_to_datetime(
+                    np.atleast_1d(time_sel), False
+                )  # TODO: Well and cftime?
+
+                # set requested times per group to last previous time (concurrent stress)
+                def _set_times(g):
+                    g.iloc[
+                        g.searchsorted(time_sel + pd.to_timedelta("1ns")) - 1
+                    ] = time_sel
+                    return g
+
+                df["time"] = grouped["time"].transform(_set_times)
+
+                # and select for times
+                sel = df.loc[df["time"].isin(time_sel)]
+
+            # back to Well package
+            sel = type(self)(save_budget=self["save_budget"], **sel)
+            return sel
+        else:
+            return self
+
+    def sel(self, **dimensions):
+        # filter out possible keyword arguments method tolerance and drop
+        method = dimensions.pop("method", None)
+        tolerance = dimensions.pop("tolerance", None)
+        drop = dimensions.pop("drop", False)
+        # account for time separately
+        time_sel = dimensions.pop("time", None)
+
+        sel_dims = {k: v for k, v in dimensions.items() if k in self}
+        if len(sel_dims) == 0:
+            sel = self
+        else:
+            df = self.to_dataframe().drop(columns="save_budget")
+            b = np.ones(len(df), dtype=bool)
+            for k, v in sel_dims.items():
+                try:
+                    if isinstance(v, slice):
+                        # slice?
+                        if v.start is None:
+                            v = slice(df[k].min(), v.stop, v.step)
+                        if v.stop is None:
+                            v = slice(v.start, df[k].min(), v.step)
+                        # to account for reversed order of y
+                        low, high = min(v.start, v.stop), max(v.start, v.stop)
+                        b = b & (df[k] >= low) & (df[k] <= high)
+                    else:
+                        v = np.atleast_1d(v)
+                        # boolean indexer
+                        if v.dtype == bool:
+                            b = b & v
+                        else:
+                            # list, labels etc
+                            b = b & df[k].isin(v)
+                except:
+                    raise ValueError(
+                        "Invalid indexer for Well package, accepts slice or (list-like of) values"
+                    )
+            sel = df.loc[b]
+            sel = type(self)(
+                save_budget=self["save_budget"], **sel
+            )  # recast df to Well package
+
+        if time_sel is not None:
+            return sel._sel_time(time_sel)
+        else:
+            return sel

@@ -1,7 +1,9 @@
 import abc
+import copy
 import pathlib
 import warnings
 
+import cftime
 import jinja2
 import joblib
 import numpy as np
@@ -444,6 +446,30 @@ class Package(xr.Dataset, abc.ABC):
         spatial_ds.to_netcdf(path)
         return has_dims
 
+    def sel(self, **dimensions):
+        # filter out possible keyword arguments method tolerance and drop
+        method = dimensions.pop("method", None)
+        tolerance = dimensions.pop("tolerance", None)
+        drop = dimensions.pop("drop", False)
+        # account for time separately if this is a BoundaryCondition
+        if isinstance(self, BoundaryCondition):
+            time_sel = dimensions.pop("time", None)
+
+        sel_dims = {k: v for k, v in dimensions.items() if k in self}
+        if len(sel_dims) == 0:
+            sel = self
+        else:
+            # Note: .sel for Well is overloaded
+            # explicitly call xr.Dataset's sel method
+            sel = xr.Dataset.sel(
+                self, sel_dims, method=method, tolerance=tolerance, drop=drop
+            )
+
+        if time_sel is not None:
+            return sel._sel_time(time_sel)
+        else:
+            return sel
+
 
 class BoundaryCondition(Package, abc.ABC):
     """
@@ -703,3 +729,26 @@ class BoundaryCondition(Package, abc.ABC):
         d["concentration"] = concentration
 
         return self._ssm_template.render(d)
+
+    def _sel_time(self, time_sel):
+        # select last previous time for BoundayConditions
+        # explicitly call xr.Dataset's sel method
+        if "time" in self.coords:
+            use_cftime = isinstance(self.time[0], cftime.datetime)
+
+            if isinstance(time_sel, slice):
+                sel = xr.Dataset.sel(self, time=time_sel)
+                # time_sel.start included? Otherwise, concat
+                if timeutil.to_datetime(time_sel.start, use_cftime) not in sel.time:
+                    start = xr.Dataset.sel(self, time=time_sel.start, method="ffill")
+                    start["time"] = timeutil.to_datetime(time_sel.start, use_cftime)
+                    sel = xr.concat([start, sel], dim="time")
+            else:
+                # (list of) individual dates
+                # select appropriate stress period and rename dim to selected dates
+                time_sel = timeutil.array_to_datetime(np.array(time_sel), use_cftime)
+                sel = xr.Dataset.sel(self, time=time_sel, method="ffill")
+                sel["time"] = time_sel
+            return sel
+        else:
+            return self

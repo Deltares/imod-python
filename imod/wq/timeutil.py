@@ -40,6 +40,9 @@ def to_datetime(time, use_cftime):
         return np.datetime64(time, "ns")
 
 
+array_to_datetime = np.vectorize(to_datetime)
+
+
 def timestep_duration(times, use_cftime):
     """
     Generates dictionary containing stress period time discretization data.
