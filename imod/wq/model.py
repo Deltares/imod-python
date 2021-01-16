@@ -894,9 +894,10 @@ class SeawatModel(Model):
         if concentration_boundary is not None:
             concentration_boundary = concentration_boundary.sel(**clip_slices)
             concentration_boundary = concentration_boundary.where(edge == 1)
-            concentration_boundary = concentration_boundary.shift(
-                time=-1
-            ).combine_first(concentration_boundary)
+            if "time" in concentration_boundary.dims:
+                concentration_boundary = concentration_boundary.shift(
+                    time=-1
+                ).combine_first(concentration_boundary)
 
             ml["tvc"] = imod.wq.TimeVaryingConstantConcentration(
                 concentration=concentration_boundary
@@ -905,7 +906,10 @@ class SeawatModel(Model):
         if heads_boundary is not None:
             heads_boundary = heads_boundary.sel(**clip_slices)
             head_end = heads_boundary.where(edge == 1)
-            head_start = head_end.shift(time=1).combine_first(head_end)
+            if "time" in head_end.dims:
+                head_start = head_end.shift(time=1).combine_first(head_end)
+            else:
+                head_start = head_end
 
             ml["chd"] = imod.wq.ConstantHead(
                 head_start=head_start,

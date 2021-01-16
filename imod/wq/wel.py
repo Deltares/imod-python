@@ -3,6 +3,7 @@ import pathlib
 import jinja2
 import numpy as np
 import pandas as pd
+import xarray as xr
 
 import imod
 from imod import util
@@ -313,11 +314,35 @@ class Well(BoundaryCondition):
         }
         self.attrs["timemap"] = d
 
+    def _df_to_well(self, df):
+        # to handle concentration with species when casting back to Well
+        conc = None
+        if "species" in df.index.names:
+            conc = df["concentration"]
+            df = df.drop(columns="concentration")
+            df = df.droplevel("species").drop_duplicates()
+        elif "species" in df:
+            conc = df.set_index([df.index, df["species"]])["concentration"]
+            df = df.drop(columns=["concentration", "species"])
+        elif "concentration" in df:
+            conc = df["concentration"]
+            df = df.drop(columns="concentration")
+
+        w = type(self)(
+            save_budget=self["save_budget"], **df
+        )  # recast df to Well package
+        if conc is not None:
+            w["concentration"] = conc.to_xarray().transpose()
+        return w
+
     def _sel_time(self, time_sel):
         # some foo to select last previous time for indexed times
         if "time" in self:
             df = self.to_dataframe().drop(columns="save_budget")
-            grouped = df.groupby(["id_name", "x", "y", "layer"])
+            if "layer" in df:
+                grouped = df.groupby(["id_name", "x", "y", "layer"])
+            else:
+                grouped = df.groupby(["id_name", "x", "y"])
 
             if isinstance(time_sel, slice):
                 if time_sel.start is None:
@@ -327,12 +352,14 @@ class Well(BoundaryCondition):
 
                 # set start time per group to last previous time (concurrent stress)
                 def _set_times(g):
-                    g.iloc[
+                    il = (
                         g.searchsorted(
                             pd.Timestamp(time_sel.start) + pd.to_timedelta("1ns")
                         )
                         - 1
-                    ] = pd.Timestamp(time_sel.start)
+                    )
+                    if il >= 0:
+                        g.iloc[il] = pd.Timestamp(time_sel.start)
                     return g
 
                 df["time"] = grouped["time"].transform(_set_times)
@@ -360,8 +387,7 @@ class Well(BoundaryCondition):
                 sel = df.loc[df["time"].isin(time_sel)]
 
             # back to Well package
-            sel = type(self)(save_budget=self["save_budget"], **sel)
-            return sel
+            return self._df_to_well(sel)
         else:
             return self
 
@@ -373,6 +399,16 @@ class Well(BoundaryCondition):
         # account for time separately
         time_sel = dimensions.pop("time", None)
 
+        # first: selection on dimensions
+        sel_dims = {k: v for k, v in dimensions.items() if k in self.dims}
+        if len(sel_dims):
+            for k, v in sel_dims.items():
+                v = dimensions.pop(k)
+                return xr.Dataset.sel(
+                    self, {k: v}, method=method, tolerance=tolerance, drop=drop
+                ).sel(**dimensions)
+
+        # then: selection on dataframe
         sel_dims = {k: v for k, v in dimensions.items() if k in self}
         if len(sel_dims) == 0:
             sel = self
@@ -403,10 +439,7 @@ class Well(BoundaryCondition):
                         "Invalid indexer for Well package, accepts slice or (list-like of) values"
                     )
             sel = df.loc[b]
-            sel = type(self)(
-                save_budget=self["save_budget"], **sel
-            )  # recast df to Well package
-
+            sel = self._df_to_well(sel)
         if time_sel is not None:
             return sel._sel_time(time_sel)
         else:

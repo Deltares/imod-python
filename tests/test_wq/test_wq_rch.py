@@ -59,6 +59,21 @@ def recharge_ha():
     return rch
 
 
+@pytest.fixture(scope="function")
+def recharge_times():
+    datetimes = pd.date_range("2000-01-01", "2001-01-01", freq="MS")
+    y = np.arange(4.5, 0.0, -1.0)
+    x = np.arange(0.5, 5.0, 1.0)
+    rate = xr.DataArray(
+        np.full((13, 5, 5), 1.0),
+        coords={"time": datetimes, "y": y, "x": x, "dx": 1.0, "dy": -1.0},
+        dims=("time", "y", "x"),
+    )
+
+    rch = RechargeTopLayer(rate=rate, concentration=rate.copy(), save_budget=False)
+    return rch
+
+
 def test_render__highest_top(recharge_top):
     rch = recharge_top
     directory = pathlib.Path(".")
@@ -157,3 +172,14 @@ def test_render__timemap(recharge_ha, varname):
     timemap = {datetimes[-1]: datetimes[0]}
     rch.add_timemap(**{varname: timemap})
     actual = rch._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
+
+
+def test_select_time(recharge_times):
+    rch = recharge_times
+    sel = rch.sel(time=slice("2000-01-01", "2000-05-10"))
+    assert len(sel.time) == 5
+    assert sel.time[0] == pd.Timestamp("2000-01-01")
+
+    sel = rch.sel(time=slice("2000-01-15", "2000-05-10"))
+    assert len(sel.time) == 5
+    assert sel.time[0] == pd.Timestamp("2000-01-15")

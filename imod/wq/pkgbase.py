@@ -452,10 +452,11 @@ class Package(xr.Dataset, abc.ABC):
         tolerance = dimensions.pop("tolerance", None)
         drop = dimensions.pop("drop", False)
         # account for time separately if this is a BoundaryCondition
+        time_sel = None
         if isinstance(self, BoundaryCondition):
             time_sel = dimensions.pop("time", None)
 
-        sel_dims = {k: v for k, v in dimensions.items() if k in self}
+        sel_dims = {k: v for k, v in dimensions.items() if k in self.dims}
         if len(sel_dims) == 0:
             sel = self
         else:

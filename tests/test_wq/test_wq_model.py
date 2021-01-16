@@ -713,3 +713,60 @@ def test_write_result_dir_is_workdir(basicmodel, tmp_path):
 
     assert line.split("=")[-1].strip() == "."
     # TODO: more rigorous testing
+
+
+def select_model(basicmodel):
+    m = basicmodel.sel(layer=1)
+    assert "layer" not in m["bas6"].dims
+    assert "layer" not in m["riv"].dims
+
+    m = basicmodel.sel(x=slice(2, 4), y=slice(4, 2))
+    assert m["bas6"]["ibound"].shape == (3, 2, 2)
+    assert m["riv"]["stage"].shape == (3, 2, 2)
+    assert len(m["wel"]["index"]) == 1
+
+    m = basicmodel.sel(time=slice("2000-01-02", "2000-01-04"))
+    assert len(m["rch"].time) == 3
+    assert (
+        len(m["wel"].time) == 4
+    )  # 4 as each well is - based on x-y coords - treated separately. so the first well also remains valid
+
+    m = basicmodel.sel(
+        x=slice(2, 4), y=slice(4, 2), time=slice("2000-01-02", "2000-01-04")
+    )
+    assert m["bas6"]["ibound"].shape == (3, 2, 2)
+    assert len(m["wel"].time) == 1  # only one left
+
+
+def clip_model(basicmodel):
+    m = basicmodel.clip((2, 4, 2, 4))
+    assert m["bas6"]["ibound"].shape == (3, 2, 2)
+    assert m["riv"]["stage"].shape == (3, 2, 2)
+    assert len(m["wel"]["index"]) == 1
+
+    tvc_ref = np.array(
+        [
+            [np.nan, 1.0, 1.0, np.nan],
+            [1.0, np.nan, np.nan, 1.0],
+            [1.0, np.nan, np.nan, 1.0],
+            [np.nan, 1.0, 1.0, np.nan],
+        ]
+    )
+    chd_ref = np.array(
+        [
+            [np.nan, 0.0, 0.0, np.nan],
+            [0.0, np.nan, np.nan, 0.0],
+            [0.0, np.nan, np.nan, 0.0],
+            [np.nan, 0.0, 0.0, np.nan],
+        ]
+    )
+    m = basicmodel.clip(
+        (2, 4, 2, 4),
+        heads_boundary=basicmodel["bas6"]["starting_head"],
+        concentration_boundary=basicmodel["btn"]["starting_concentration"],
+    )
+    np.testing.assert_array_equal(m["tvc"]["concentration"].values[0], tvc_ref)
+    np.testing.assert_array_equal(m["chd"]["concentration"].values[0], tvc_ref)
+    np.testing.assert_array_equal(m["chd"]["head_start"].values[0], chd_ref)
+    assert m["riv"]["stage"].shape == (3, 4, 4)
+    assert len(m["wel"]["index"]) == 3

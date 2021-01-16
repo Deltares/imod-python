@@ -318,38 +318,38 @@ def test_save__time_nolayer(well, tmp_path):
 
 def test_sel(well2):
     sel = well2.sel(id_name="well2")
-    assert len(sel) == 7
+    assert len(sel.index) == 7
     assert (np.unique(sel.id_name) == np.array(["well2"])).all()
 
     sel = well2.sel(rate=slice(4, 6))
-    assert len(sel) == 3
+    assert len(sel.index) == 3
     assert np.allclose(sel.rate, [4.462, 5.154, 5.846], atol=0.001)
 
     sel = well2.sel(layer=2.0)
-    assert len(sel) == 14
+    assert len(sel.index) == 14
 
     sel = well2.sel(id_name="well1", rate=well2.rate < 3)
-    assert len(sel) == 3
+    assert len(sel.index) == 3
     assert np.allclose(sel.rate, [1.0, 1.692, 2.385], atol=0.001)
 
 
 def test_sel_time(well2):
     sel = well2.sel(time=slice("2000-01-02", "2000-02-01"))
-    assert len(sel) == 14
+    assert len(sel.index) == 14
     assert sel.time[0] == pd.Timestamp("2000-01-02")
     assert sel.time[-1] == pd.Timestamp("2000-01-31")
 
     sel = well2.sel(time=slice("2000-01-12", None))
-    assert len(sel) == 10
+    assert len(sel.index) == 10
     assert sel.time[0] == pd.Timestamp("2000-01-12")
     assert sel.time[-1] == pd.Timestamp("2000-01-31")
 
     sel = well2.sel(time="2000-01-07")
-    assert len(sel) == 2
+    assert len(sel.index) == 2
     assert sel.time[0] == pd.Timestamp("2000-01-07")
     assert np.allclose(sel.rate, [1.692, 6.538], atol=0.001)
 
     sel = well2.sel(time="2000-01-07", id_name="well2")
-    assert len(sel) == 1
+    assert len(sel.index) == 1
     assert (np.unique(sel.id_name) == np.array(["well2"])).all()
     assert np.allclose(sel.rate, [6.538], atol=0.001)
