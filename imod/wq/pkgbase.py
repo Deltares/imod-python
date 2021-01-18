@@ -455,8 +455,8 @@ class Package(xr.Dataset, abc.ABC):
         The Package.sel method is a special implementation of Dataset.sel method.
         For BoundaryCondition packages, selecting for times returns the times
         that are active on the selected time. E.g., if a stress starts at time a,
-        and is still active at time b, selection for time b will return this stress
-        (unlike a straightforward Dataset selection would).
+        and is still active at time b, selection for time b will return stress a
+        (unlike a straightforward Dataset selection would), while its time is set to b.
 
         Parameters
         ----------

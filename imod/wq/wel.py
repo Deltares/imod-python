@@ -401,7 +401,8 @@ class Well(BoundaryCondition):
         allows selecting on coords in the Well data, not just on its dimensions. Well
         times are selected within separate wells, so that active times are selected
         per well. E.g., if a well becomes active at time a, and still active at a
-        later time b, a is returned when time b is selected for.
+        later time b, a is returned when time b is selected for. Time a in the returned
+        result is adjusted to b.
 
 
         Parameters
