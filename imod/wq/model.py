@@ -310,18 +310,22 @@ class SeawatModel(Model):
 
     def time_discretization(self, times):
         """
-        Collect all unique times from model packages and additional given `times`. These
-        unique times are used as stress periods in the model. All stress packages must
-        have the same starting time.
+        Collect all unique times from model packages and additional given
+        ``times``. These unique times are used as stress periods in the model.
+        All stress packages must have the same starting time.
 
         The time discretization in imod-python works as follows:
 
-        - The datetimes of all packages you send in are always respected
-        - Subsequently, the input data you use is always included fully as well
-        - All times are treated as starting times for the stress: a stress is always applied until the next specified date
-        - For this reason, a final time is required to determine the length of the last stress period
-        - Additional times can be provided to force shorter stress periods & more detailed output
-        - Every stress has to be defined on the first stress period (this is a modflow requirement)
+        * The datetimes of all packages you send in are always respected
+        * Subsequently, the input data you use is always included fully as well
+        * All times are treated as starting times for the stress: a stress is
+          always applied until the next specified date
+        * For this reason, a final time is required to determine the length of
+          the last stress period
+        * Additional times can be provided to force shorter stress periods &
+          more detailed output
+        * Every stress has to be defined on the first stress period (this is a
+          modflow requirement)
 
         Or visually (every letter a date in the time axes)::
 
@@ -331,7 +335,8 @@ class SeawatModel(Model):
 
             model    a - b - c h d - e - f i
 
-        with the stress periods defined between these dates. I.e. the model times are the set of all times you include in the model.
+        With the stress periods defined between these dates. I.e. the model
+        times are the set of all times you include in the model.
 
         Parameters
         ----------
@@ -776,39 +781,54 @@ class SeawatModel(Model):
         delete_empty_pkg=False,
     ):
         """
-        Method to clip the model to a certain `extent`. The spatial resolution of the clipped model is unchanged.
-        Boundary conditions of clipped model can be derived from parent model calculation results and are applied
-        along the edge of `extent` (CHD and TVC). Packages from parent that have no data within extent are optionally removed.
+        Method to clip the model to a certain `extent`. The spatial resolution
+        of the clipped model is unchanged. Boundary conditions of clipped model
+        can be derived from parent model calculation results and are applied
+        along the edge of `extent` (CHD and TVC). Packages from parent that have
+        no data within extent are optionally removed.
 
         Parameters
         ----------
         extent : tuple, geopandas.GeoDataFrame, xarray.DataArray
-            Extent of the clipped model. Tuple must be in the form of (`xmin`,`xmax`,`ymin`,`ymax`). If a GeoDataFrame, all
-            polygons are included in the model extent. If a DataArray, non-null/non-zero values are taken as the new extent.
+            Extent of the clipped model. Tuple must be in the form of
+            (`xmin`,`xmax`,`ymin`,`ymax`). If a GeoDataFrame, all polygons are
+            included in the model extent. If a DataArray, non-null/non-zero
+            values are taken as the new extent.
 
         heads_boundary : xarray.DataArray, optional.
-            Heads to be applied as a Constant Head boundary condition along the edge of the model extent. These heads are assumed
-            to be derived from calculations with the parent model. Timestamp of boundary condition is shifted to correct for difference
-            between 'end of period' timestamp of results and 'start of period' timestamp of boundary condition.
-            If None (default), no constant heads boundary condition is applied.
+            Heads to be applied as a Constant Head boundary condition along the
+            edge of the model extent. These heads are assumed to be derived from
+            calculations with the parent model. Timestamp of boundary condition
+            is shifted to correct for difference between 'end of period'
+            timestamp of results and 'start of period' timestamp of boundary
+            condition. If None (default), no constant heads boundary condition
+            is applied.
 
         concentration_boundary : xarray.DataArray, optional.
-            Concentration to be applied as a Time Varying Concentration boundary condition along the edge of the model extent.
-            These concentrations can be derived from calculations with the parent model. Timestamp of boundary condition is shifted
-            to correct for difference between 'end of period' timestamp of results and 'start of period' timestamp of boundary condition.
-            If None (default), no time varying concentration boundary condition is applied.
+            Concentration to be applied as a Time Varying Concentration boundary
+            condition along the edge of the model extent. These concentrations
+            can be derived from calculations with the parent model. Timestamp of
+            boundary condition is shifted to correct for difference between 'end
+            of period' timestamp of results and 'start of period' timestamp of
+            boundary condition. If None (default), no time varying concentration
+            boundary condition is applied.
 
-            *Note that the Time Varying Concentration boundary sets a constant concentration for the entire stress period,
-            unlike the linearly varying Constant Head. This will inevitably cause a time shift in concentrations along the boundary.
-            This shift becomes more significant when stress periods are longer. If necessary, consider interpolating concentrations
-            along the time axis, to reduce the length of stress periods (see examples).*
+            Note: the Time Varying Concentration boundary sets a constant
+            concentration for the entire stress period, unlike the linearly
+            varying Constant Head. This will inevitably cause a time shift in
+            concentrations along the boundary.  This shift becomes more
+            significant when stress periods are longer. If necessary, consider
+            interpolating concentrations along the time axis, to reduce the
+            length of stress periods (see examples).
 
         delete_empty_pkg : bool, optional.
-            Set to True to delete packages that contain no data in the clipped model. Defaults to False.
+            Set to True to delete packages that contain no data in the clipped
+            model. Defaults to False.
 
         Examples
         --------
-        Given a full model, clip a 1 x 1 km rectangular submodel without boundary conditions along its edge:
+        Given a full model, clip a 1 x 1 km rectangular submodel without
+        boundary conditions along its edge:
 
         >>> extent = (1000., 2000., 5000., 6000.)  # xmin, xmax, ymin, ymax
         >>> clipped = ml.clip(extent)
@@ -824,7 +844,8 @@ class SeawatModel(Model):
         >>> extent = geopandas.read_file("clipped_model_area.shp")
         >>> clipped = ml.clip(extent, heads, conc)
 
-        Interpolate concentration results to annual results using xarray.interp(), to improve time resolution of concentration boundary:
+        Interpolate concentration results to annual results using
+        xarray.interp(), to improve time resolution of concentration boundary:
 
         >>> conc = imod.idf.open("conc/conc_*.idf")
         >>> dates = pd.date_range(conc.time.values[0], conc.time.values[-1], freq="AS")
