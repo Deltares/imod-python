@@ -392,6 +392,57 @@ class Well(BoundaryCondition):
             return self
 
     def sel(self, **dimensions):
+        """Returns a new Well package with each array indexed by tick labels
+        along the specified dimension(s).
+
+        Indexers for this method should use labels instead of integers.
+
+        The Well.sel method is a special implementation of Package.sel method, that
+        allows selecting on coords in the Well data, not just on its dimensions. Well
+        times are selected within separate wells, so that active times are selected
+        per well. E.g., if a well becomes active at time a, and still active at a 
+        later time b, a is returned when time b is selected for.
+
+        
+        Parameters
+        ----------
+        **dimensions : {dim: indexer, ...}
+            Keyword arguments with keys matching dimensions and values given
+            by scalars, slices or arrays of tick labels. For dimensions with
+            multi-index, the indexer may also be a dict-like object with keys
+            matching index level names.
+            If DataArrays are passed as indexers, xarray-style indexing will be
+            carried out. See :ref:`indexing` for the details.
+            Dimensions not present in Package are ignored.
+            
+        method : {None, 'nearest', 'pad'/'ffill', 'backfill'/'bfill'}, optional
+            Method to use for inexact matches:
+
+            * None (default): only exact matches
+            * pad / ffill: propagate last valid index value forward
+            * backfill / bfill: propagate next valid index value backward
+            * nearest: use nearest valid index value
+        tolerance : optional
+            Maximum distance between original and new labels for inexact
+            matches. The values of the index at the matching locations must
+            satisfy the equation ``abs(index[indexer] - target) <= tolerance``.
+        drop : bool, optional
+            If ``drop=True``, drop coordinates variables in `indexers` instead
+            of making them scalar.
+
+        Returns
+        -------
+        obj : Well
+            A new Well with the same contents as this package, except each
+            variable and dimension is indexed by the appropriate indexers.
+            If indexer DataArrays have coordinates that do not conflict with
+            this object, then these coordinates will be attached.
+
+        See Also
+        --------
+        Package.sel
+        xarray.Dataset.sel
+        """
         # filter out possible keyword arguments method tolerance and drop
         method = dimensions.pop("method", None)
         tolerance = dimensions.pop("tolerance", None)

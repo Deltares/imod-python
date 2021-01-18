@@ -74,6 +74,9 @@ class Model(collections.UserDict):
                         )
 
     def sel(self, **dimensions):
+        """Label-based selection of Model. sel method is passed down to each 
+        Package in Model.
+        """
         selmodel = type(self)(self.modelname, self.check)
 
         for pkgname, pkg in self.items():
@@ -85,6 +88,9 @@ class Model(collections.UserDict):
         return selmodel
 
     def isel(self, **dimensions):
+        """Index-based selection of Model. isel method is passed down to each 
+        Package in Model.
+        """
         selmodel = type(self)(self.modelname, self.check)
         for pkgname, pkg in self.items():
             sel_dims = {k: v for k, v in dimensions.items() if k in pkg}

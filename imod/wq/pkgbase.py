@@ -447,6 +447,55 @@ class Package(xr.Dataset, abc.ABC):
         return has_dims
 
     def sel(self, **dimensions):
+        """Returns a new package with each array indexed by tick labels
+        along the specified dimension(s).
+
+        Indexers for this method should use labels instead of integers.
+
+        The Package.sel method is a special implementation of Dataset.sel method.
+        For BoundaryCondition packages, selecting for times returns the times
+        that are active on the selected time. E.g., if a stress starts at time a,
+        and is still active at time b, selection for time b will return this stress
+        (unlike a straightforward Dataset selection would).
+        
+        Parameters
+        ----------
+        **dimensions : {dim: indexer, ...}
+            Keyword arguments with keys matching dimensions and values given
+            by scalars, slices or arrays of tick labels. For dimensions with
+            multi-index, the indexer may also be a dict-like object with keys
+            matching index level names.
+            If DataArrays are passed as indexers, xarray-style indexing will be
+            carried out. See :ref:`indexing` for the details.
+            Dimensions not present in Package are ignored.
+            
+        method : {None, 'nearest', 'pad'/'ffill', 'backfill'/'bfill'}, optional
+            Method to use for inexact matches:
+
+            * None (default): only exact matches
+            * pad / ffill: propagate last valid index value forward
+            * backfill / bfill: propagate next valid index value backward
+            * nearest: use nearest valid index value
+        tolerance : optional
+            Maximum distance between original and new labels for inexact
+            matches. The values of the index at the matching locations must
+            satisfy the equation ``abs(index[indexer] - target) <= tolerance``.
+        drop : bool, optional
+            If ``drop=True``, drop coordinates variables in `indexers` instead
+            of making them scalar.
+
+        Returns
+        -------
+        obj : Package
+            A new Package with the same contents as this package, except each
+            variable and dimension is indexed by the appropriate indexers.
+            If indexer DataArrays have coordinates that do not conflict with
+            this object, then these coordinates will be attached.
+
+        See Also
+        --------
+        xarray.Dataset.sel
+        """
         # filter out possible keyword arguments method tolerance and drop
         method = dimensions.pop("method", None)
         tolerance = dimensions.pop("tolerance", None)
