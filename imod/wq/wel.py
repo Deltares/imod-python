@@ -400,10 +400,10 @@ class Well(BoundaryCondition):
         The Well.sel method is a special implementation of Package.sel method, that
         allows selecting on coords in the Well data, not just on its dimensions. Well
         times are selected within separate wells, so that active times are selected
-        per well. E.g., if a well becomes active at time a, and still active at a 
+        per well. E.g., if a well becomes active at time a, and still active at a
         later time b, a is returned when time b is selected for.
 
-        
+
         Parameters
         ----------
         **dimensions : {dim: indexer, ...}
@@ -414,7 +414,7 @@ class Well(BoundaryCondition):
             If DataArrays are passed as indexers, xarray-style indexing will be
             carried out. See :ref:`indexing` for the details.
             Dimensions not present in Package are ignored.
-            
+
         method : {None, 'nearest', 'pad'/'ffill', 'backfill'/'bfill'}, optional
             Method to use for inexact matches:
 

@@ -457,7 +457,7 @@ class Package(xr.Dataset, abc.ABC):
         that are active on the selected time. E.g., if a stress starts at time a,
         and is still active at time b, selection for time b will return this stress
         (unlike a straightforward Dataset selection would).
-        
+
         Parameters
         ----------
         **dimensions : {dim: indexer, ...}
@@ -468,7 +468,7 @@ class Package(xr.Dataset, abc.ABC):
             If DataArrays are passed as indexers, xarray-style indexing will be
             carried out. See :ref:`indexing` for the details.
             Dimensions not present in Package are ignored.
-            
+
         method : {None, 'nearest', 'pad'/'ffill', 'backfill'/'bfill'}, optional
             Method to use for inexact matches:
 

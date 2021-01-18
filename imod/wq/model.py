@@ -74,7 +74,7 @@ class Model(collections.UserDict):
                         )
 
     def sel(self, **dimensions):
-        """Label-based selection of Model. sel method is passed down to each 
+        """Label-based selection of Model. sel method is passed down to each
         Package in Model.
         """
         selmodel = type(self)(self.modelname, self.check)
@@ -88,7 +88,7 @@ class Model(collections.UserDict):
         return selmodel
 
     def isel(self, **dimensions):
-        """Index-based selection of Model. isel method is passed down to each 
+        """Index-based selection of Model. isel method is passed down to each
         Package in Model.
         """
         selmodel = type(self)(self.modelname, self.check)
