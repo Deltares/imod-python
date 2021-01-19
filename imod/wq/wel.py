@@ -386,8 +386,9 @@ class Well(BoundaryCondition):
                 # set requested times per group to last previous time (concurrent stress)
                 def _set_times(g):
                     il = g.searchsorted(time_indexer + pd.to_timedelta("1ns")) - 1
-                    il = il[il >= 0]
-                    g.iloc[il] = time_indexer[il]
+                    is_valid = il >= 0
+                    il = il[is_valid]
+                    g.iloc[il] = time_indexer[is_valid]
                     return g
 
                 df["time"] = grouped["time"].transform(_set_times)
