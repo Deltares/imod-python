@@ -387,7 +387,7 @@ class Well(BoundaryCondition):
                 def _set_times(g):
                     il = g.searchsorted(time_indexer + pd.to_timedelta("1ns")) - 1
                     il = il[il >= 0]
-                    g.iloc[il] = time_indexer
+                    g.iloc[il] = time_indexer[il]
                     return g
 
                 df["time"] = grouped["time"].transform(_set_times)

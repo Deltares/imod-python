@@ -369,6 +369,16 @@ def test_sel_time(well2):
     assert (np.unique(sel.id_name) == np.array(["well2"])).all()
     assert np.allclose(sel.rate, [6.538], atol=0.001)
 
+    sel = well2.sel(time=["2000-01-01", "2000-01-06"])
+    assert len(sel.index) == 4
+    assert sel.time[0] == pd.Timestamp("2000-01-01")
+    assert np.allclose(sel.rate, [1.0, 1.692, 5.846, 6.538], atol=0.001)
+
+    sel = well2.sel(time=["1990-01-01", "2000-01-06"])
+    assert len(sel.index) == 2
+    assert sel.time[0] == pd.Timestamp("2000-01-06")
+    assert np.allclose(sel.rate, [1.692, 6.538], atol=0.001)
+
 
 def test_sel_multiple_species(well2_conc_multiple_species):
     well2 = well2_conc_multiple_species
