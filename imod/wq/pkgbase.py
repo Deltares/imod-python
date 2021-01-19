@@ -9,6 +9,7 @@ import joblib
 import numpy as np
 import pandas as pd
 import xarray as xr
+from xarray.core.utils import either_dict_or_kwargs
 
 import imod
 from imod import util
@@ -446,7 +447,17 @@ class Package(xr.Dataset, abc.ABC):
         spatial_ds.to_netcdf(path)
         return has_dims
 
-    def sel(self, **dimensions):
+    def _sel_time(self, time_indexer):
+        raise AttributeError(f"Invalid dimension 'time' in Package {self._pkg_id}")
+
+    def sel(
+        self,
+        indexers=None,
+        method=None,
+        tolerance=None,
+        drop=False,
+        **indexers_kwargs,
+    ) -> "Package":
         """Returns a new package with each array indexed by tick labels
         along the specified dimension(s).
 
@@ -460,14 +471,14 @@ class Package(xr.Dataset, abc.ABC):
 
         Parameters
         ----------
-        **dimensions : {dim: indexer, ...}
-            Keyword arguments with keys matching dimensions and values given
-            by scalars, slices or arrays of tick labels. For dimensions with
-            multi-index, the indexer may also be a dict-like object with keys
-            matching index level names.
-            If DataArrays are passed as indexers, xarray-style indexing will be
-            carried out. See :ref:`indexing` for the details.
+        **indexers : dict, optional
+            A dict with keys matching dimensions and values given by scalars,
+            slices or arrays of tick labels. For dimensions with multi-index,
+            the indexer may also be a dict-like object with keys matching index
+            level names. If DataArrays are passed as indexers, xarray-style
+            indexing will be carried out. See :ref:`indexing` for the details.
             Dimensions not present in Package are ignored.
+            One of indexers or indexers_kwargs must be provided.
 
         method : {None, 'nearest', 'pad'/'ffill', 'backfill'/'bfill'}, optional
             Method to use for inexact matches:
@@ -483,6 +494,9 @@ class Package(xr.Dataset, abc.ABC):
         drop : bool, optional
             If ``drop=True``, drop coordinates variables in `indexers` instead
             of making them scalar.
+        **indexers_kwarg : {dim: indexer, ...}, optional
+            The keyword arguments form of ``indexers``.
+            One of indexers or indexers_kwargs must be provided.
 
         Returns
         -------
@@ -496,29 +510,24 @@ class Package(xr.Dataset, abc.ABC):
         --------
         xarray.Dataset.sel
         """
-        # filter out possible keyword arguments method tolerance and drop
-        method = dimensions.pop("method", None)
-        tolerance = dimensions.pop("tolerance", None)
-        drop = dimensions.pop("drop", False)
-        # account for time separately if this is a BoundaryCondition
-        time_sel = None
-        if isinstance(self, BoundaryCondition):
-            time_sel = dimensions.pop("time", None)
+        indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "sel")
 
-        sel_dims = {k: v for k, v in dimensions.items() if k in self.dims}
-        if len(sel_dims) == 0:
-            sel = self
+        indexers = {k: v for k, v in indexers.items() if k in self.dims}
+        # account for time separately if this is a BoundaryCondition
+        time_indexer = indexers.pop("time", None)
+        if len(indexers) == 0:
+            selection = self
         else:
             # Note: .sel for Well is overloaded
             # explicitly call xr.Dataset's sel method
-            sel = xr.Dataset.sel(
-                self, sel_dims, method=method, tolerance=tolerance, drop=drop
+            selection = xr.Dataset.sel(
+                self, indexers, method=method, tolerance=tolerance, drop=drop
             )
 
-        if time_sel is not None:
-            return sel._sel_time(time_sel)
-        else:
-            return sel
+        if time_indexer:
+            selection = selection._sel_time(time_indexer)
+
+        return selection
 
 
 class BoundaryCondition(Package, abc.ABC):
@@ -780,25 +789,32 @@ class BoundaryCondition(Package, abc.ABC):
 
         return self._ssm_template.render(d)
 
-    def _sel_time(self, time_sel):
+    def _sel_time(self, time_indexer):
         # select last previous time for BoundayConditions
         # explicitly call xr.Dataset's sel method
         if "time" in self.coords:
             use_cftime = isinstance(self.time[0], cftime.datetime)
 
-            if isinstance(time_sel, slice):
-                sel = xr.Dataset.sel(self, time=time_sel)
+            if isinstance(time_indexer, slice):
+                selection = xr.Dataset.sel(self, time=time_indexer)
                 # time_sel.start included? Otherwise, concat
-                if timeutil.to_datetime(time_sel.start, use_cftime) not in sel.time:
-                    start = xr.Dataset.sel(self, time=time_sel.start, method="ffill")
-                    start["time"] = timeutil.to_datetime(time_sel.start, use_cftime)
-                    sel = xr.concat([start, sel], dim="time")
+                if (
+                    timeutil.to_datetime(time_indexer.start, use_cftime)
+                    not in selection.time
+                ):
+                    start = xr.Dataset.sel(
+                        self, time=time_indexer.start, method="ffill"
+                    )
+                    start["time"] = timeutil.to_datetime(time_indexer.start, use_cftime)
+                    selection = xr.concat([start, selection], dim="time")
             else:
                 # (list of) individual dates
                 # select appropriate stress period and rename dim to selected dates
-                time_sel = timeutil.array_to_datetime(np.array(time_sel), use_cftime)
-                sel = xr.Dataset.sel(self, time=time_sel, method="ffill")
-                sel["time"] = time_sel
-            return sel
+                time_indexer = timeutil.array_to_datetime(
+                    np.array(time_indexer), use_cftime
+                )
+                selection = xr.Dataset.sel(self, time=time_indexer, method="ffill")
+                selection["time"] = time_indexer
+            return selection
         else:
             return self

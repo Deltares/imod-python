@@ -126,3 +126,34 @@ def test_render_dis__nonequidistant():
             laycbd_l? = 0"""
     )
     assert bas._render_dis(directory, nlayer=3) == compare
+
+
+def test_basicflow_sel(basicflow):
+    sel = basicflow.sel(layer=2, x=1.5)
+    assert sel.layer == 2
+    assert sel.x == 1.5
+
+    sel = basicflow.sel({"layer": 2, "x": 1.5})
+    assert sel.layer == 2
+    assert sel.x == 1.5
+
+    sel = basicflow.sel({"layer": 2, "x": 1.5, "time": "2000-01-01"})
+    assert sel.layer == 2
+    assert sel.x == 1.5
+
+
+def test_basicflow_sel_method(basicflow):
+    sel = basicflow.sel(layer=2, x=1.4, method="nearest")
+    assert sel.layer == 2
+    assert sel.x == 1.5
+
+
+def test_basicflow_sel_time(basicflow):
+    basicflow = basicflow.assign_coords({"time": np.datetime64("2000-01-01")})
+    sel = basicflow.sel({"layer": 2, "x": 1.5, "time": "2000-01-01"})
+    assert sel.layer == 2
+    assert sel.x == 1.5
+
+    bastime = basicflow.expand_dims("time")
+    with pytest.raises(AttributeError, match="Invalid dimension 'time' in Package"):
+        sel = bastime.sel({"layer": 2, "x": 1.5, "time": "2000-01-01"})
