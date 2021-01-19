@@ -413,7 +413,7 @@ class Well(BoundaryCondition):
         tolerance=None,
         drop=False,
         **indexers_kwargs,
-    ) -> "Package":
+    ) -> "Well":
         """Returns a new Well package with each array indexed by tick labels
         along the specified dimension(s).
 
