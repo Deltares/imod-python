@@ -54,6 +54,21 @@ def well_conc_multiple_species():
     return w
 
 
+@pytest.fixture(scope="module")
+def well2_conc_multiple_species():
+    datetimes = pd.date_range("2000-01-01", "2000-02-01", freq="5D")
+    id_name = ["well1"] * 7 + ["well2"] * 7
+    rate = np.linspace(1.0, 10.0, 14)
+    time = list(datetimes) + list(datetimes)
+    w = Well(
+        id_name=id_name, x=1.0, y=1.0, rate=rate, layer=2, time=time, concentration=2.5
+    )
+    conc1 = w["concentration"].assign_coords(species=1)
+    conc2 = w["concentration"].assign_coords(species=2)
+    w["concentration"] = xr.concat([conc1, conc2], dim="species")
+    return w
+
+
 def test_render(well):
     wel = well
     directory = pathlib.Path("well")
@@ -353,3 +368,17 @@ def test_sel_time(well2):
     assert len(sel.index) == 1
     assert (np.unique(sel.id_name) == np.array(["well2"])).all()
     assert np.allclose(sel.rate, [6.538], atol=0.001)
+
+
+def test_sel_multiple_species(well2_conc_multiple_species):
+    well2 = well2_conc_multiple_species
+
+    sel = well2.sel(species=1)
+    assert len(sel.index) == 14
+    assert sel.species == 1
+
+    sel = well2.sel(time=slice("2000-01-07", "2000-02-01"), species=1)
+    assert len(sel.index) == 12
+    assert sel.species == 1
+    assert sel.time[0] == pd.Timestamp("2000-01-07")
+    assert sel.time[-1] == pd.Timestamp("2000-01-31")

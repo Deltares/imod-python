@@ -4,6 +4,7 @@ import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
+from xarray.core.utils import either_dict_or_kwargs
 
 import imod
 from imod import util
@@ -335,87 +336,107 @@ class Well(BoundaryCondition):
             w["concentration"] = conc.to_xarray().transpose()
         return w
 
-    def _sel_time(self, time_sel):
+    def _sel_time(self, time_indexer):
         # some foo to select last previous time for indexed times
         if "time" in self:
-            df = self.to_dataframe().drop(columns="save_budget")
+            df = self.to_dataframe()
+            df = df.reset_index().drop(columns="save_budget")
             if "layer" in df:
                 grouped = df.groupby(["id_name", "x", "y", "layer"])
             else:
                 grouped = df.groupby(["id_name", "x", "y"])
 
-            if isinstance(time_sel, slice):
-                if time_sel.start is None:
-                    time_sel = slice(df["time"].min(), time_sel.stop, time_sel.step)
-                if time_sel.stop is None:
-                    time_sel = slice(time_sel.start, df["time"].max(), time_sel.step)
+            if isinstance(time_indexer, slice):
+                if time_indexer.start is None:
+                    time_indexer = slice(
+                        df["time"].min(), time_indexer.stop, time_indexer.step
+                    )
+                if time_indexer.stop is None:
+                    time_indexer = slice(
+                        time_indexer.start, df["time"].max(), time_indexer.step
+                    )
 
                 # set start time per group to last previous time (concurrent stress)
                 def _set_times(g):
                     il = (
                         g.searchsorted(
-                            pd.Timestamp(time_sel.start) + pd.to_timedelta("1ns")
+                            pd.Timestamp(time_indexer.start) + pd.to_timedelta("1ns")
                         )
                         - 1
                     )
                     if il >= 0:
-                        g.iloc[il] = pd.Timestamp(time_sel.start)
+                        g.iloc[il] = pd.Timestamp(time_indexer.start)
                     return g
 
                 df["time"] = grouped["time"].transform(_set_times)
 
                 # and select for time slice
-                sel = df.loc[
-                    (df["time"] >= time_sel.start) & (df["time"] <= time_sel.stop)
+                selected = df.loc[
+                    (df["time"] >= time_indexer.start)
+                    & (df["time"] <= time_indexer.stop)
                 ]
+                index_indexer = selected["index"].values
+                times = selected["time"].values
             else:
                 # (list of) individual dates
-                time_sel = timeutil.array_to_datetime(
-                    np.atleast_1d(time_sel), False
+                time_indexer = timeutil.array_to_datetime(
+                    np.atleast_1d(time_indexer), False
                 )  # TODO: Well and cftime?
 
                 # set requested times per group to last previous time (concurrent stress)
                 def _set_times(g):
-                    g.iloc[
-                        g.searchsorted(time_sel + pd.to_timedelta("1ns")) - 1
-                    ] = time_sel
+                    il = g.searchsorted(time_indexer + pd.to_timedelta("1ns")) - 1
+                    il = il[il >= 0]
+                    g.iloc[il] = time_indexer
                     return g
 
                 df["time"] = grouped["time"].transform(_set_times)
 
                 # and select for times
-                sel = df.loc[df["time"].isin(time_sel)]
+                selected = df.loc[df["time"].isin(time_indexer)]
+                index_indexer = selected["index"].values
+                times = selected["time"].values
 
-            # back to Well package
-            return self._df_to_well(sel)
+            # assign times to selected Well package
+            selection = xr.Dataset.sel(self, {"index": index_indexer})
+            selection["time"] = xr.DataArray(
+                data=times, coords={"index": selection.index}, dims="index"
+            )
+            return selection
         else:
             return self
 
-    def sel(self, **dimensions):
+    def sel(
+        self,
+        indexers=None,
+        method=None,
+        tolerance=None,
+        drop=False,
+        **indexers_kwargs,
+    ) -> "Package":
         """Returns a new Well package with each array indexed by tick labels
         along the specified dimension(s).
 
         Indexers for this method should use labels instead of integers.
 
-        The Well.sel method is a special implementation of Package.sel method, that
-        allows selecting on coords in the Well data, not just on its dimensions. Well
-        times are selected within separate wells, so that active times are selected
-        per well. E.g., if a well becomes active at time a, and still active at a
-        later time b, a is returned when time b is selected for. Time a in the returned
-        result is adjusted to b.
+        The Well.sel method is a special implementation of Package.sel method,
+        that allows selecting on coords in the Well data, not just on its
+        dimensions. Well times are selected within separate wells, so that
+        active times are selected per well. E.g., if a well becomes active at
+        time a, and still active at a later time b, a is returned when time b is
+        selected for. Time a in the returned result is adjusted to b.
 
 
         Parameters
         ----------
-        **dimensions : {dim: indexer, ...}
-            Keyword arguments with keys matching dimensions and values given
-            by scalars, slices or arrays of tick labels. For dimensions with
-            multi-index, the indexer may also be a dict-like object with keys
-            matching index level names.
-            If DataArrays are passed as indexers, xarray-style indexing will be
-            carried out. See :ref:`indexing` for the details.
-            Dimensions not present in Package are ignored.
-
+        indexers : dict, optional
+            A dict with keys matching dimensions and values given by scalars,
+            slices or arrays of tick labels. For dimensions with multi-index,
+            the indexer may also be a dict-like object with keys matching index
+            level names. If DataArrays are passed as indexers, xarray-style
+            indexing will be carried out.
+            Dimensions not present in Well are ignored.
+            One of indexers or indexers_kwargs must be provided.
         method : {None, 'nearest', 'pad'/'ffill', 'backfill'/'bfill'}, optional
             Method to use for inexact matches:
 
@@ -430,6 +451,9 @@ class Well(BoundaryCondition):
         drop : bool, optional
             If ``drop=True``, drop coordinates variables in `indexers` instead
             of making them scalar.
+        **indexers_kwarg : {dim: indexer, ...}, optional
+            The keyword arguments form of ``indexers``.
+            One of indexers or indexers_kwargs must be provided.
 
         Returns
         -------
@@ -444,55 +468,63 @@ class Well(BoundaryCondition):
         Package.sel
         xarray.Dataset.sel
         """
-        # filter out possible keyword arguments method tolerance and drop
-        method = dimensions.pop("method", None)
-        tolerance = dimensions.pop("tolerance", None)
-        drop = dimensions.pop("drop", False)
-        # account for time separately
-        time_sel = dimensions.pop("time", None)
+        indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "sel")
 
         # first: selection on dimensions
-        sel_dims = {k: v for k, v in dimensions.items() if k in self.dims}
-        if len(sel_dims):
-            for k, v in sel_dims.items():
-                v = dimensions.pop(k)
-                return xr.Dataset.sel(
+        dim_indexers = {k: v for k, v in indexers.items() if k in self.dims}
+        if len(dim_indexers):
+            for k, v in dim_indexers.items():
+                v = indexers.pop(k)
+                selection = xr.Dataset.sel(
                     self, {k: v}, method=method, tolerance=tolerance, drop=drop
-                ).sel(**dimensions)
+                )
+                return selection.sel(
+                    indexers, method=method, tolerance=tolerance, drop=drop
+                )
 
         # then: selection on dataframe
-        sel_dims = {k: v for k, v in dimensions.items() if k in self}
-        if len(sel_dims) == 0:
-            sel = self
+        indexers = {k: v for k, v in indexers.items() if k in self}
+        # account for time separately
+        time_indexer = indexers.pop("time", None)
+        if len(indexers) == 0:
+            selection = self
         else:
-            df = self.to_dataframe().drop(columns="save_budget")
-            b = np.ones(len(df), dtype=bool)
-            for k, v in sel_dims.items():
+            df = self.to_dataframe()
+            df = df.reset_index().drop(columns="save_budget")
+            selected = np.ones(len(df), dtype=bool)
+            for k, v in indexers.items():
                 try:
                     if isinstance(v, slice):
                         # slice?
                         if v.start is None:
                             v = slice(df[k].min(), v.stop, v.step)
                         if v.stop is None:
-                            v = slice(v.start, df[k].min(), v.step)
+                            v = slice(v.start, df[k].max(), v.step)
                         # to account for reversed order of y
                         low, high = min(v.start, v.stop), max(v.start, v.stop)
-                        b = b & (df[k] >= low) & (df[k] <= high)
+                        selected = selected & (df[k] >= low) & (df[k] <= high)
                     else:
                         v = np.atleast_1d(v)
                         # boolean indexer
                         if v.dtype == bool:
-                            b = b & v
+                            selected = selected & v
                         else:
                             # list, labels etc
-                            b = b & df[k].isin(v)
+                            selected = selected & df[k].isin(v)
                 except:
                     raise ValueError(
                         "Invalid indexer for Well package, accepts slice or (list-like of) values"
                     )
-            sel = df.loc[b]
-            sel = self._df_to_well(sel)
-        if time_sel is not None:
-            return sel._sel_time(time_sel)
-        else:
-            return sel
+            index_indexer = df["index"].loc[selected]
+            selection = xr.Dataset.sel(
+                self,
+                {"index": index_indexer.values},
+                method=method,
+                tolerance=tolerance,
+                drop=drop,
+            )
+
+        if time_indexer:
+            selection = selection._sel_time(time_indexer)
+
+        return selection

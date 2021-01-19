@@ -471,12 +471,12 @@ class Package(xr.Dataset, abc.ABC):
 
         Parameters
         ----------
-        **indexers : dict, optional
+        indexers : dict, optional
             A dict with keys matching dimensions and values given by scalars,
             slices or arrays of tick labels. For dimensions with multi-index,
             the indexer may also be a dict-like object with keys matching index
             level names. If DataArrays are passed as indexers, xarray-style
-            indexing will be carried out. See :ref:`indexing` for the details.
+            indexing will be carried out.
             Dimensions not present in Package are ignored.
             One of indexers or indexers_kwargs must be provided.
 
