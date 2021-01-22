@@ -9,7 +9,6 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-import imod
 import imod.wq
 
 
@@ -715,7 +714,7 @@ def test_write_result_dir_is_workdir(basicmodel, tmp_path):
     # TODO: more rigorous testing
 
 
-def select_model(basicmodel):
+def test_select_model(basicmodel):
     m = basicmodel.sel(layer=1)
     assert "layer" not in m["bas6"].dims
     assert "layer" not in m["riv"].dims
@@ -738,12 +737,17 @@ def select_model(basicmodel):
     assert len(m["wel"].time) == 1  # only one left
 
 
-def clip_model(basicmodel):
+def test_clip_model_rect(basicmodel):
+    # simple clip, no boundaries
     m = basicmodel.clip((2, 4, 2, 4))
     assert m["bas6"]["ibound"].shape == (3, 2, 2)
+    np.testing.assert_array_equal(m["bas6"].x.values, [2.5, 3.5])
+    np.testing.assert_array_equal(m["bas6"].y.values, [3.5, 2.5])
     assert m["riv"]["stage"].shape == (3, 2, 2)
     assert len(m["wel"]["index"]) == 1
 
+
+def test_clip_model_rect_boundaries(basicmodel):
     tvc_ref = np.array(
         [
             [np.nan, 1.0, 1.0, np.nan],
@@ -770,3 +774,104 @@ def clip_model(basicmodel):
     np.testing.assert_array_equal(m["chd"]["head_start"].values[0], chd_ref)
     assert m["riv"]["stage"].shape == (3, 4, 4)
     assert len(m["wel"]["index"]) == 3
+
+
+def test_clip_model_rect_boundaries_time(basicmodel):
+    times = basicmodel["rch"].time
+    h1 = xr.ones_like(basicmodel["bas6"]["ibound"])
+    heads_boundary = xr.concat([h1 * v for v in range(1, 6)], dim=times)
+    concentration_boundary = heads_boundary
+
+    m = basicmodel.clip(
+        (2, 4, 2, 4),
+        heads_boundary=heads_boundary,
+        concentration_boundary=concentration_boundary,
+    )
+    np.testing.assert_array_equal(
+        m["chd"]["head_start"].isel(x=1, y=0, layer=0), [1.0, 1.0, 2.0, 3.0, 4.0]
+    )
+    np.testing.assert_array_equal(
+        m["chd"]["head_end"].isel(x=1, y=0, layer=0), [1.0, 2.0, 3.0, 4.0, 5.0]
+    )
+    np.testing.assert_array_equal(
+        m["tvc"]["concentration"].isel(x=1, y=0, layer=0), [2.0, 3.0, 4.0, 5.0, 5.0]
+    )
+
+    m = basicmodel.clip((2, 4, 2, 4), heads_boundary=heads_boundary)
+    np.testing.assert_array_equal(
+        m["chd"]["head_start"].isel(x=1, y=0, layer=0), [1.0, 1.0, 2.0, 3.0, 4.0]
+    )
+    np.testing.assert_array_equal(
+        m["chd"]["head_end"].isel(x=1, y=0, layer=0), [1.0, 2.0, 3.0, 4.0, 5.0]
+    )
+
+
+def test_clip_model_da(basicmodel):
+    extent = np.array(
+        [
+            [0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 1.0, 1.0, 0.0],
+            [1.0, 1.0, 1.0, 1.0, 0.0],
+            [1.0, 1.0, 0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0, 0.0, 0.0],
+        ]
+    )
+    extent = basicmodel["bas6"]["ibound"].isel(layer=0).copy(data=extent)
+
+    ref_ibound = np.array(
+        [
+            [0.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0, 0.0],
+        ]
+    )
+
+    # simple clip, no boundaries
+    m = basicmodel.clip(extent=extent)
+    np.testing.assert_array_equal(m["bas6"]["ibound"].isel(layer=0), ref_ibound)
+
+
+def test_clip_model_da_boundaries(basicmodel):
+    extent = np.array(
+        [
+            [0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 1.0, 1.0, 0.0],
+            [1.0, 1.0, 1.0, 1.0, 0.0],
+            [1.0, 1.0, 0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0, 0.0, 0.0],
+        ]
+    )
+    extent = basicmodel["bas6"]["ibound"].isel(layer=0).copy(data=extent)
+
+    ref_ibound = np.array(
+        [
+            [0.0, 1.0, 1.0, 1.0, 0.0],
+            [1.0, 1.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0, 0.0],
+            [1.0, 1.0, 0.0, 0.0, 0.0],
+        ]
+    )
+    ref_tvc = np.array(
+        [
+            [np.nan, 1.0, 1.0, 1.0, np.nan],
+            [1.0, np.nan, np.nan, np.nan, 1.0],
+            [np.nan, np.nan, np.nan, np.nan, 1.0],
+            [np.nan, np.nan, 1.0, 1.0, np.nan],
+            [np.nan, 1.0, np.nan, np.nan, np.nan],
+        ]
+    )
+
+    m = basicmodel.clip(
+        extent=extent,
+        heads_boundary=basicmodel["bas6"]["starting_head"],
+        concentration_boundary=basicmodel["btn"]["starting_concentration"],
+    )
+    np.testing.assert_array_equal(m["bas6"]["ibound"].isel(layer=0), ref_ibound)
+    np.testing.assert_array_equal(m["tvc"]["concentration"].isel(layer=0), ref_tvc)
+
+
+def test_clip_write_result_dir(basicmodel, tmp_path):
+    m = basicmodel.clip((2, 4, 2, 4))
+    m.write(directory=tmp_path, result_dir=tmp_path / "results")

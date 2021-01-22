@@ -1,6 +1,6 @@
 import jinja2
 
-from imod.wq.pkgbase import Package
+from imod.wq.pkgbase import Package, BoundaryCondition
 
 
 class TimeDiscretization(Package):
@@ -184,3 +184,6 @@ class TimeDiscretization(Package):
         if "transport_timestep_multiplier" in self.data_vars:
             to_check.append("transport_timestep_multiplier")
         self._check_positive(to_check)
+
+    def _sel_time(self, time_indexer):
+        return BoundaryCondition._sel_time(self, time_indexer)

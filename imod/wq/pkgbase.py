@@ -806,7 +806,9 @@ class BoundaryCondition(Package, abc.ABC):
                         self, time=time_indexer.start, method="ffill"
                     )
                     start["time"] = timeutil.to_datetime(time_indexer.start, use_cftime)
-                    selection = xr.concat([start, selection], dim="time")
+                    selection = type(self)(
+                        **xr.concat([start, selection], dim="time", data_vars="minimal")
+                    )  # xr.concat changes type to dataset
             else:
                 # (list of) individual dates
                 # select appropriate stress period and rename dim to selected dates
