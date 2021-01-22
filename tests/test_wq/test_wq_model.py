@@ -1027,7 +1027,13 @@ def test_clip_model_da_boundaries(basicmodel2):
     np.testing.assert_array_equal(m["tvc"]["concentration"].isel(layer=0), ref_tvc)
 
 
-@pytest.mark.skip()
 def test_clip_write_result_dir(basicmodel2, tmp_path):
     m = basicmodel2.clip((2, 4, 2, 4))
-    m.write(directory=tmp_path, result_dir=tmp_path / "results")
+
+    # selection only leaves a well that starts at jan 3
+    with pytest.raises(ValueError, match="Package wel does not have"):
+        m.time_discretization("2000-01-06")
+    
+    del m["wel"]
+    m.time_discretization("2000-01-06")
+    m.write(directory=tmp_path, result_dir=tmp_path)
