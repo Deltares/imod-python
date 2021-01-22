@@ -49,9 +49,6 @@ class Well(BoundaryCondition):
         "    {%- endfor -%}"
     )
 
-    # TODO: implement well to concentration IDF and use ssm_template
-    # Ignored for now, since wells are nearly always extracting
-
     def __init__(
         self,
         id_name,
