@@ -513,7 +513,6 @@ class Package(xr.Dataset, abc.ABC):
         indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "sel")
 
         indexers = {k: v for k, v in indexers.items() if k in self.dims}
-        # account for time separately if this is a BoundaryCondition
         time_indexer = indexers.pop("time", None)
         if len(indexers) == 0:
             selection = self
