@@ -1033,7 +1033,7 @@ def test_clip_write_result_dir(basicmodel2, tmp_path):
     # selection only leaves a well that starts at jan 3
     with pytest.raises(ValueError, match="Package wel does not have"):
         m.time_discretization("2000-01-06")
-    
+
     del m["wel"]
     m.time_discretization("2000-01-06")
     m.write(directory=tmp_path, result_dir=tmp_path)
