@@ -9,7 +9,6 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-import imod
 import imod.wq
 
 
@@ -239,6 +238,161 @@ def cftime_model(basicmodel):
     )
 
     return m_cf
+
+
+@pytest.fixture(scope="function")
+def basicmodel2():
+
+    # Basic flow
+    layer = np.arange(1, 4)
+    z = np.arange(25.0, 0.0, -10.0)
+    y = np.arange(4.5, 0.0, -1.0)
+    x = np.arange(0.5, 5.0, 1.0)
+    ibound = xr.DataArray(
+        np.full((3, 5, 5), 1.0),
+        coords={"z": z, "layer": ("z", layer), "y": y, "x": x, "dx": 1.0, "dy": -1.0},
+        dims=("z", "y", "x"),
+    )
+    starting_head = xr.full_like(ibound, 0.0)
+    top = 30.0
+    bot = xr.DataArray(
+        np.arange(20.0, -10.0, -10.0), coords={"layer": layer}, dims=("layer",)
+    )
+    # BTN
+    icbund = ibound.copy()
+
+    # LPF
+    k_horizontal = ibound.copy()
+
+    # RIV
+    head = ibound.copy()
+
+    # GHB, only part of domain
+    ghbhead = ibound.isel(z=slice(0, 2))
+
+    # CHD
+    constanthead = xr.full_like(ibound.isel(z=-1), 1.0)
+
+    # MAL
+    mal_concentration = constanthead.copy()
+
+    # TVC
+    tvc_concentration = constanthead.copy()
+
+    # RCH
+    datetimes = pd.date_range("2000-01-01", "2000-01-05")
+    rate = xr.DataArray(
+        np.full((5, 5, 5), 1.0),
+        coords={"time": datetimes, "y": y, "x": x, "dx": 1.0, "dy": -1.0},
+        dims=("time", "y", "x"),
+    )
+
+    # EVT
+    maximum_rate = xr.DataArray(
+        np.full((5, 5, 5), 1.0),
+        coords={"time": datetimes, "y": y, "x": x, "dx": 1.0, "dy": -1.0},
+        dims=("time", "y", "x"),
+    )
+
+    # WEL
+    welly = np.arange(4.5, 0.0, -1.0)
+    wellx = np.arange(0.5, 5.0, 1.0)
+
+    # DSP
+    longitudinal = ibound.copy()
+
+    # Fill model
+    m = imod.wq.SeawatModel("test_model")
+    m["bas6"] = imod.wq.BasicFlow(
+        ibound=ibound, top=top, bottom=bot, starting_head=starting_head
+    )
+    m["lpf"] = imod.wq.LayerPropertyFlow(
+        k_horizontal=k_horizontal,
+        k_vertical=k_horizontal.copy(),
+        horizontal_anisotropy=k_horizontal.copy(),
+        interblock=k_horizontal.copy(),
+        layer_type=k_horizontal.copy(),
+        specific_storage=k_horizontal.copy(),
+        specific_yield=k_horizontal.copy(),
+        save_budget=False,
+        layer_wet=k_horizontal.copy(),
+        interval_wet=0.01,
+        method_wet="wetfactor",
+        head_dry=1.0e20,
+    )
+    m["ghb"] = imod.wq.GeneralHeadBoundary(
+        head=ghbhead,
+        conductance=ghbhead.copy(),
+        concentration=1.5,
+        density=ghbhead.copy(),
+        save_budget=False,
+    )
+    m["chd"] = imod.wq.ConstantHead(
+        head_start=constanthead,
+        head_end=constanthead,
+        concentration=35.0,
+        save_budget=False,
+    )
+    m["riv"] = imod.wq.River(
+        stage=head,
+        conductance=head.copy(),
+        bottom_elevation=head.copy(),
+        concentration=head.copy(),
+        density=head.copy(),
+        save_budget=False,
+    )
+    m["wel"] = imod.wq.Well(id_name="well", x=wellx, y=welly, rate=5.0, time=datetimes)
+    m["rch"] = imod.wq.RechargeHighestActive(
+        rate=rate, concentration=rate.copy(), save_budget=False
+    )
+    m["evt"] = imod.wq.EvapotranspirationTopLayer(
+        maximum_rate=maximum_rate,
+        surface=maximum_rate.copy(),
+        extinction_depth=maximum_rate.copy(),
+        save_budget=False,
+    )
+    m["pcg"] = imod.wq.PreconditionedConjugateGradientSolver(
+        max_iter=150, inner_iter=30, hclose=0.0001, rclose=1000.0, relax=0.98, damp=1.0
+    )
+    m["btn"] = imod.wq.BasicTransport(
+        icbund=icbund,
+        starting_concentration=icbund.copy(),
+        porosity=icbund.copy(),
+        n_species=1,
+        inactive_concentration=1.0e30,
+        minimum_active_thickness=0.01,
+    )
+    m["adv"] = imod.wq.AdvectionTVD(courant=1.0)
+    m["dsp"] = imod.wq.Dispersion(
+        longitudinal=longitudinal,
+        ratio_horizontal=longitudinal.copy(),
+        ratio_vertical=longitudinal.copy(),
+        diffusion_coefficient=longitudinal.copy(),
+    )
+    m["mal"] = imod.wq.MassLoading(concentration=mal_concentration)
+    m["tvc"] = imod.wq.TimeVaryingConstantConcentration(concentration=tvc_concentration)
+    m["vdf"] = imod.wq.VariableDensityFlow(
+        density_species=1,
+        density_min=1000.0,
+        density_max=1025.0,
+        density_ref=1000.0,
+        density_concentration_slope=0.71,
+        density_criterion=0.01,
+        read_density=False,
+        internodal="central",
+        coupling=1,
+        correct_water_table=False,
+    )
+    m["gcg"] = imod.wq.GeneralizedConjugateGradientSolver(
+        max_iter=150,
+        inner_iter=30,
+        cclose=1.0e-6,
+        preconditioner="mic",
+        lump_dispersion=True,
+    )
+    m["oc"] = imod.wq.OutputControl(save_head_idf=True, save_concentration_idf=True)
+
+    return m
 
 
 def test_get_pkgkey(basicmodel):
@@ -715,35 +869,40 @@ def test_write_result_dir_is_workdir(basicmodel, tmp_path):
     # TODO: more rigorous testing
 
 
-def select_model(basicmodel):
-    m = basicmodel.sel(layer=1)
+def test_select_model(basicmodel2):
+    m = basicmodel2.sel(layer=1)
     assert "layer" not in m["bas6"].dims
     assert "layer" not in m["riv"].dims
 
-    m = basicmodel.sel(x=slice(2, 4), y=slice(4, 2))
+    m = basicmodel2.sel(x=slice(2, 4), y=slice(4, 2))
     assert m["bas6"]["ibound"].shape == (3, 2, 2)
     assert m["riv"]["stage"].shape == (3, 2, 2)
     assert len(m["wel"]["index"]) == 1
 
-    m = basicmodel.sel(time=slice("2000-01-02", "2000-01-04"))
+    m = basicmodel2.sel(time=slice("2000-01-02", "2000-01-04"))
     assert len(m["rch"].time) == 3
     assert (
         len(m["wel"].time) == 4
     )  # 4 as each well is - based on x-y coords - treated separately. so the first well also remains valid
 
-    m = basicmodel.sel(
+    m = basicmodel2.sel(
         x=slice(2, 4), y=slice(4, 2), time=slice("2000-01-02", "2000-01-04")
     )
     assert m["bas6"]["ibound"].shape == (3, 2, 2)
     assert len(m["wel"].time) == 1  # only one left
 
 
-def clip_model(basicmodel):
-    m = basicmodel.clip((2, 4, 2, 4))
+def test_clip_model_rect(basicmodel2):
+    # simple clip, no boundaries
+    m = basicmodel2.clip((2, 4, 2, 4))
     assert m["bas6"]["ibound"].shape == (3, 2, 2)
+    np.testing.assert_array_equal(m["bas6"].x.values, [2.5, 3.5])
+    np.testing.assert_array_equal(m["bas6"].y.values, [3.5, 2.5])
     assert m["riv"]["stage"].shape == (3, 2, 2)
     assert len(m["wel"]["index"]) == 1
 
+
+def test_clip_model_rect_boundaries(basicmodel2):
     tvc_ref = np.array(
         [
             [np.nan, 1.0, 1.0, np.nan],
@@ -760,13 +919,121 @@ def clip_model(basicmodel):
             [np.nan, 0.0, 0.0, np.nan],
         ]
     )
-    m = basicmodel.clip(
+    m = basicmodel2.clip(
         (2, 4, 2, 4),
-        heads_boundary=basicmodel["bas6"]["starting_head"],
-        concentration_boundary=basicmodel["btn"]["starting_concentration"],
+        heads_boundary=basicmodel2["bas6"]["starting_head"],
+        concentration_boundary=basicmodel2["btn"]["starting_concentration"],
     )
     np.testing.assert_array_equal(m["tvc"]["concentration"].values[0], tvc_ref)
     np.testing.assert_array_equal(m["chd"]["concentration"].values[0], tvc_ref)
     np.testing.assert_array_equal(m["chd"]["head_start"].values[0], chd_ref)
     assert m["riv"]["stage"].shape == (3, 4, 4)
     assert len(m["wel"]["index"]) == 3
+
+
+def test_clip_model_rect_boundaries_time(basicmodel2):
+    times = basicmodel2["rch"].time
+    h1 = xr.ones_like(basicmodel2["bas6"]["ibound"])
+    heads_boundary = xr.concat([h1 * v for v in range(1, 6)], dim=times)
+    concentration_boundary = heads_boundary
+
+    m = basicmodel2.clip(
+        (2, 4, 2, 4),
+        heads_boundary=heads_boundary,
+        concentration_boundary=concentration_boundary,
+    )
+    np.testing.assert_array_equal(
+        m["chd"]["head_start"].isel(x=1, y=0, layer=0), [1.0, 1.0, 2.0, 3.0, 4.0]
+    )
+    np.testing.assert_array_equal(
+        m["chd"]["head_end"].isel(x=1, y=0, layer=0), [1.0, 2.0, 3.0, 4.0, 5.0]
+    )
+    np.testing.assert_array_equal(
+        m["tvc"]["concentration"].isel(x=1, y=0, layer=0), [2.0, 3.0, 4.0, 5.0, 5.0]
+    )
+
+    m = basicmodel2.clip((2, 4, 2, 4), heads_boundary=heads_boundary)
+    np.testing.assert_array_equal(
+        m["chd"]["head_start"].isel(x=1, y=0, layer=0), [1.0, 1.0, 2.0, 3.0, 4.0]
+    )
+    np.testing.assert_array_equal(
+        m["chd"]["head_end"].isel(x=1, y=0, layer=0), [1.0, 2.0, 3.0, 4.0, 5.0]
+    )
+
+
+def test_clip_model_da(basicmodel2):
+    extent = np.array(
+        [
+            [0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 1.0, 1.0, 0.0],
+            [1.0, 1.0, 1.0, 1.0, 0.0],
+            [1.0, 1.0, 0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0, 0.0, 0.0],
+        ]
+    )
+    extent = basicmodel2["bas6"]["ibound"].isel(layer=0).copy(data=extent)
+
+    ref_ibound = np.array(
+        [
+            [0.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0, 0.0],
+        ]
+    )
+
+    # simple clip, no boundaries
+    m = basicmodel2.clip(extent=extent)
+    np.testing.assert_array_equal(m["bas6"]["ibound"].isel(layer=0), ref_ibound)
+
+
+def test_clip_model_da_boundaries(basicmodel2):
+    extent = np.array(
+        [
+            [0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 1.0, 1.0, 0.0],
+            [1.0, 1.0, 1.0, 1.0, 0.0],
+            [1.0, 1.0, 0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0, 0.0, 0.0],
+        ]
+    )
+    extent = basicmodel2["bas6"]["ibound"].isel(layer=0).copy(data=extent)
+
+    ref_ibound = np.array(
+        [
+            [0.0, 1.0, 1.0, 1.0, 0.0],
+            [1.0, 1.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0, 1.0],
+            [1.0, 1.0, 1.0, 1.0, 0.0],
+            [1.0, 1.0, 0.0, 0.0, 0.0],
+        ]
+    )
+    ref_tvc = np.array(
+        [
+            [np.nan, 1.0, 1.0, 1.0, np.nan],
+            [1.0, np.nan, np.nan, np.nan, 1.0],
+            [np.nan, np.nan, np.nan, np.nan, 1.0],
+            [np.nan, np.nan, 1.0, 1.0, np.nan],
+            [np.nan, 1.0, np.nan, np.nan, np.nan],
+        ]
+    )
+
+    m = basicmodel2.clip(
+        extent=extent,
+        heads_boundary=basicmodel2["bas6"]["starting_head"],
+        concentration_boundary=basicmodel2["btn"]["starting_concentration"],
+    )
+    np.testing.assert_array_equal(m["bas6"]["ibound"].isel(layer=0), ref_ibound)
+    np.testing.assert_array_equal(m["tvc"]["concentration"].isel(layer=0), ref_tvc)
+
+
+def test_clip_write_result_dir(basicmodel2, tmp_path):
+    m = basicmodel2.clip((2, 4, 2, 4))
+
+    # selection only leaves a well that starts at jan 3
+    with pytest.raises(ValueError, match="Package wel does not have"):
+        m.time_discretization("2000-01-06")
+
+    del m["wel"]
+    m.time_discretization("2000-01-06")
+    m.write(directory=tmp_path, result_dir=tmp_path)

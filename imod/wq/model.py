@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 from scipy.ndimage import binary_dilation
 import xarray as xr
+from xarray.core.utils import either_dict_or_kwargs
 
 import imod
 from imod.wq import timeutil
@@ -34,6 +35,22 @@ class Model(collections.UserDict):
         if self.check == "eager":
             value._pkgcheck()
         super(__class__, self).__setitem__(key, value)
+
+    def __repr__(self):
+        reprstr = f"{type(self)}\nAvailable packages:\n"
+        pkgstr = [f"{pkgname} ({pkg._pkg_id})" for pkgname, pkg in self.items()]
+        reprstr = f"{reprstr}{', '.join(sorted(pkgstr))}\n"
+
+        times = self._yield_times()
+        if len(times):
+            times = sorted(np.unique(times))
+            timestr = []
+            for t in times:
+                if isinstance(t, np.datetime64):
+                    t = pd.to_datetime(t)
+                timestr.append(f"{t:%Y-%m-%dT%H:%M:%S}")
+            reprstr = f"{reprstr}Times present:\n{', '.join(timestr)}"
+        return reprstr
 
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).items():
@@ -73,31 +90,127 @@ class Model(collections.UserDict):
                             figsize=figsize,
                         )
 
-    def sel(self, **dimensions):
-        """Label-based selection of Model. sel method is passed down to each
-        Package in Model.
+    def sel(
+        self, indexers=None, method=None, tolerance=None, drop=False, **indexers_kwargs
+    ) -> "Model":
+        """Returns a new Model with each array indexed by tick labels along the
+        specified dimension(s).
+
+        Indexers for this method should use labels instead of integers.
+
+        The Model.sel method passes the .sel method down to each Package in
+        Model.
+
+        Parameters
+        ----------
+        indexers : dict, optional
+            A dict with keys matching dimensions and values given by scalars,
+            slices or arrays of tick labels. For dimensions with multi-index,
+            the indexer may also be a dict-like object with keys matching index
+            level names. If DataArrays are passed as indexers, xarray-style
+            indexing will be carried out.
+            Dimensions not present in a Package are ignored.
+            One of indexers or indexers_kwargs must be provided.
+
+        method : {None, 'nearest', 'pad'/'ffill', 'backfill'/'bfill'}, optional
+            Method to use for inexact matches:
+
+            * None (default): only exact matches
+            * pad / ffill: propagate last valid index value forward
+            * backfill / bfill: propagate next valid index value backward
+            * nearest: use nearest valid index value
+        tolerance : optional
+            Maximum distance between original and new labels for inexact
+            matches. The values of the index at the matching locations must
+            satisfy the equation ``abs(index[indexer] - target) <= tolerance``.
+        drop : bool, optional
+            If ``drop=True``, drop coordinates variables in `indexers` instead
+            of making them scalar.
+        **indexers_kwarg : {dim: indexer, ...}, optional
+            The keyword arguments form of ``indexers``.
+            One of indexers or indexers_kwargs must be provided.
+
+        Returns
+        -------
+        obj : Model
+            A new Model with the same contents as this Model, except each
+            variable and dimension in each Package is indexed by the appropriate
+            indexers. If indexer DataArrays have coordinates that do not
+            conflict with this object, then these coordinates will be attached.
+
+        See Also
+        --------
+        xarray.Dataset.sel, Package.sel
         """
+        indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "sel")
         selmodel = type(self)(self.modelname, self.check)
 
         for pkgname, pkg in self.items():
-            sel_dims = {k: v for k, v in dimensions.items() if k in pkg}
-            if len(sel_dims) == 0:
+            pkg_indexers = {k: v for k, v in indexers.items() if k in pkg}
+            if len(pkg_indexers) == 0:
                 selmodel[pkgname] = pkg
             else:
-                selmodel[pkgname] = pkg.sel(**dimensions)
+                selmodel[pkgname] = pkg.sel(
+                    pkg_indexers, method=method, tolerance=tolerance, drop=drop
+                )
         return selmodel
 
-    def isel(self, **dimensions):
-        """Index-based selection of Model. isel method is passed down to each
-        Package in Model.
+    def isel(
+        self,
+        indexers=None,
+        drop=False,
+        **indexers_kwargs,
+    ) -> "Model":
+        """Returns a new Model with each array indexed by tick labels along the
+        specified dimension(s).
+
+        This method selects values from each array using its `__getitem__`
+        method, except this method does not require knowing the order of
+        each array's dimensions.
+
+        The Model.isel method passes the .isel method down to each Package in
+        Model.
+
+        Parameters
+        ----------
+        indexers : dict, optional
+            A dict with keys matching dimensions and values given
+            by integers, slice objects or arrays.
+            indexer can be a integer, slice, array-like or DataArray.
+            If DataArrays are passed as indexers, xarray-style indexing will be
+            carried out. See :ref:`indexing` for the details.
+            One of indexers or indexers_kwargs must be provided.
+        drop : bool, optional
+            If ``drop=True``, drop coordinates variables indexed by integers
+            instead of making them scalar.
+        **indexers_kwarg : {dim: indexer, ...}, optional
+            The keyword arguments form of ``indexers``.
+            One of indexers or indexers_kwargs must be provided.
+
+        Returns
+        -------
+        obj : Model
+            A new Model with the same contents as this Model, except each
+            array and dimension of each Package is indexed by the appropriate indexers.
+            If indexer DataArrays have coordinates that do not conflict with
+            this object, then these coordinates will be attached.
+            In general, each array's data will be a view of the array's data
+            in this dataset, unless vectorized indexing was triggered by using
+            an array indexer, in which case the data will be a copy.
+
+        See Also
+        --------
+        Dataset.sel
         """
+        indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "isel")
         selmodel = type(self)(self.modelname, self.check)
+
         for pkgname, pkg in self.items():
-            sel_dims = {k: v for k, v in dimensions.items() if k in pkg}
-            if len(sel_dims) == 0:
+            pkg_indexers = {k: v for k, v in indexers.items() if k in pkg}
+            if len(pkg_indexers) == 0:
                 selmodel[pkgname] = pkg
             else:
-                selmodel[pkgname] = pkg[sel_dims]
+                selmodel[pkgname] = pkg.isel(pkg_indexers, drop=drop)
         return selmodel
 
     def _yield_times(self):
@@ -857,9 +970,10 @@ class SeawatModel(Model):
 
         if isinstance(extent, (list, tuple)):
             xmin, xmax, ymin, ymax = extent
-            assert (xmin < xmax) & (
-                ymin < ymax
-            ), "Either xmin or ymin is equal to or larger than xmax or ymax. Correct order is xmin, xmax, ymin, ymax."
+            if not ((xmin < xmax) & (ymin < ymax)):
+                raise ValueError(
+                    "Either xmin or ymin is equal to or larger than xmax or ymax. Correct order is xmin, xmax, ymin, ymax."
+                )
             extent = xr.ones_like(like)
             extent = extent.where(
                 (extent.x >= xmin)
@@ -877,42 +991,31 @@ class SeawatModel(Model):
 
         extent = xr.ones_like(extent).where(extent > 0)
 
-        def get_clip_na_slices(da, dims=None):
-            """Clips a DataArray to its maximum extent in different dimensions.
-            if dims not given, clips to x and y.
-            """
-            if dims is None:
-                dims = ["x", "y"]
-            slices = {}
-            for d in dims:
-                tmp = da.dropna(dim=d, how="all")[d]
-                if len(tmp) > 2:
-                    dtmp = 0.5 * (tmp[1] - tmp[0])
-                else:
-                    dtmp = 0
-                slices[d] = slice(float(tmp[0] - dtmp), float(tmp[-1] + dtmp))
-            return slices
-
         # create edge around extent to apply boundary conditions
         if not (heads_boundary is None and concentration_boundary is None):
             extentwithedge = extent.copy(data=binary_dilation(extent.fillna(0).values))
-            extentwithedge = extentwithedge.where(extentwithedge)
+            is_domain = extentwithedge == 1
         else:
-            extentwithedge = extent
-        # clip to extent with edge
-        clip_slices = get_clip_na_slices(extentwithedge)
-        extentwithedge = extentwithedge.sel(**clip_slices)
-        extent = extent.sel(**clip_slices)
-        edge = extentwithedge.where(extent.isnull())
+            is_domain = extent == 1
 
-        # Clip model to extent, set outside extent to nodata or 0
-        ml = self.sel(**clip_slices)
-        for pck in ml.keys():
-            for d in ml[pck].data_vars:
-                if d in ["ibound", "icbund"]:
-                    ml[pck][d] = ml[pck][d].where(extentwithedge == 1, 0)
-                elif "x" in ml[pck][d].dims:
-                    ml[pck][d] = ml[pck][d].where(extentwithedge == 1)
+        # clip to domain
+        extent = extent.where(is_domain, drop=True)
+        is_domain = (
+            is_domain.where(is_domain, drop=True) == 1
+        )  # again == 1 as it is cast to float b/c nans
+        is_edge = xr.ones_like(extent).where(is_domain & extent.isnull()) == 1
+
+        # Clip model to extent, set area outside extent to nodata or 0
+        clip_slices = {"x": is_domain.x.values, "y": is_domain.y.values}
+        model = self.sel(**clip_slices)
+        for pkgname in model.keys():
+            for variable in model[pkgname].data_vars:
+                da = model[pkgname][variable]
+                if variable in ["ibound", "icbund"]:
+                    model[pkgname][variable] = da.where(is_domain, 0)
+                # Check if geospatial (IDF) data
+                elif "x" in da.dims and "y" in da.dims:
+                    model[pkgname][variable] = da.where(is_domain)
 
         # Create boundary conditions as CHD and/or TVC package
         # Time shifts: assume heads and conc are calculation results. Then:
@@ -920,25 +1023,35 @@ class SeawatModel(Model):
         # is the _start_ of the stress period.
         if concentration_boundary is not None:
             concentration_boundary = concentration_boundary.sel(**clip_slices)
-            concentration_boundary = concentration_boundary.where(edge == 1)
+            concentration_boundary = concentration_boundary.where(is_edge)
             if "time" in concentration_boundary.dims:
-                concentration_boundary = concentration_boundary.shift(
-                    time=-1
-                ).combine_first(concentration_boundary)
-
-            ml["tvc"] = imod.wq.TimeVaryingConstantConcentration(
+                concentration_boundary = xr.concat(
+                    [
+                        concentration_boundary.shift(time=-1).isel(
+                            time=slice(None, -1)
+                        ),
+                        concentration_boundary.isel(time=-1),
+                    ],
+                    dim="time",
+                )
+            model["tvc"] = imod.wq.TimeVaryingConstantConcentration(
                 concentration=concentration_boundary
             )
 
         if heads_boundary is not None:
             heads_boundary = heads_boundary.sel(**clip_slices)
-            head_end = heads_boundary.where(edge == 1)
-            if "time" in head_end.dims:
-                head_start = head_end.shift(time=1).combine_first(head_end)
-            else:
-                head_start = head_end
+            head_end = heads_boundary.where(is_edge)
+            head_start = head_end.copy()
+            if "time" in head_start.dims:
+                head_start = xr.concat(
+                    [
+                        head_start.isel(time=0),
+                        head_start.shift(time=1).isel(time=slice(1, None)),
+                    ],
+                    dim="time",
+                )
 
-            ml["chd"] = imod.wq.ConstantHead(
+            model["chd"] = imod.wq.ConstantHead(
                 head_start=head_start,
                 head_end=head_end,
                 concentration=concentration_boundary,  # concentration relevant for fwh calc
@@ -946,6 +1059,6 @@ class SeawatModel(Model):
 
         # delete packages if no data in sliced model
         if delete_empty_pkg:
-            ml._delete_empty_packages(verbose=True)
+            model._delete_empty_packages(verbose=True)
 
-        return ml
+        return model
