@@ -442,9 +442,9 @@ def write_assoc(path, df, itype=1, nodata=1.0e20, assoc_columns=None):
     # The reason is that datetime columns are converted to string as well
     # and then quoted. This causes trouble with some iMOD(batch) functions.
     for column in df.columns:
-        if df[column].dtype == np.dtype("O"):
-            df[column] = df[column].astype(str)
-            df[column] = '"' + df[column] + '"'
+        if df.loc[:, column].dtype == np.dtype("O"):
+            df.loc[:, column] = df.loc[:, column].astype(str)
+            df.loc[:, column] = '"' + df.loc[:, column] + '"'
 
     df.to_csv(
         path,
@@ -488,6 +488,15 @@ def write(path, df, indexcolumn=0, assoc_ext="txt", nodata=1.0e20):
                 colname = '"' + colname + '"'
             f.write(f"{colname}\n")
         f.write(f"{indexcolumn},{assoc_ext}\n")
+
+    # We cannot rely on the quoting=QUOTE_NONNUMERIC policy
+    # The reason is that datetime columns are converted to string as well
+    # and then quoted. This causes trouble with some iMOD(batch) functions.
+    for column in df.columns:
+        if df.loc[:, column].dtype == np.dtype("O"):
+            df.loc[:, column] = df.loc[:, column].astype(str)
+            df.loc[:, column] = '"' + df.loc[:, column] + '"'
+            
     # workaround pandas issue by closing the file first, see
     # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
     df.to_csv(path, index=False, header=False, mode="a", quoting=csv.QUOTE_NONE)
