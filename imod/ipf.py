@@ -496,7 +496,7 @@ def write(path, df, indexcolumn=0, assoc_ext="txt", nodata=1.0e20):
         if df.loc[:, column].dtype == np.dtype("O"):
             df.loc[:, column] = df.loc[:, column].astype(str)
             df.loc[:, column] = '"' + df.loc[:, column] + '"'
-            
+
     # workaround pandas issue by closing the file first, see
     # https://github.com/pandas-dev/pandas/issues/19827#issuecomment-398649163
     df.to_csv(path, index=False, header=False, mode="a", quoting=csv.QUOTE_NONE)

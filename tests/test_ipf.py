@@ -405,3 +405,31 @@ def test_save__assoc_itype1__layers__integerID(tmp_path):
     assert (tmp_path / "2.txt").exists()
     assert (tmp_path / "3.txt").exists()
     assert (tmp_path / "4.txt").exists()
+
+
+def test_quoting(tmp_path):
+    df = pd.DataFrame.from_dict(
+        {
+            "x": [1.0, 2.0],
+            "y": [3.0, 4.0],
+            "date": pd.to_datetime(["2000-01-01", "2000-01-02"]),
+            "strings": ["abc", "d e f"],
+            "integers": [1, 2],
+        }
+    )
+
+    path = tmp_path / "quoting.ipf"
+    ipf.save(path, df)
+
+    with open(path) as f:
+        lines = f.readlines()
+        firstrow = lines[8]
+        secondrow = lines[9]
+
+    # Quoting rules are basically:
+    # * Don't quote integers, floats
+    # * Quote every string
+    # * Don't quote datetime: some iMOD-batch functions expect "integer" values
+    #   and will infer the wrong type when seeing quotes...
+    assert firstrow == '1.0,3.0,2000-01-01,"abc",1\n'
+    assert secondrow == '2.0,4.0,2000-01-02,"d e f",2\n'
