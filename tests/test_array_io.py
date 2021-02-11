@@ -361,11 +361,7 @@ def test_lazy(test_da, tmp_path):
     a, _ = array_io.reading._dask(
         tmp_path / "test.idf", _read=imod.idf._read, header=imod.idf.header
     )
-    try:  # dask 2.0
-        assert "_read" in str(a.dask.items()[0][1])
-    # TODO: Remove when dask 2.0 is commonly installed
-    except TypeError:  # dask < 2.0
-        assert "_read" in str(next(a.dask.items())[1])
+    assert "_read" in str(list(a.dask.items())[0][1])
 
     with util.cd(".."):
         a.compute()
