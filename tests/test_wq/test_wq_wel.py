@@ -270,7 +270,7 @@ def test_save(well, tmp_path):
         assert (tmp_path / "well" / file).is_file()
 
 
-def test_save(well_conc, tmp_path):
+def test_save_concentration(well_conc, tmp_path):
     wel = well_conc
     wel.save(tmp_path / "well")
 
@@ -331,14 +331,15 @@ def test_save__time_nolayer(well, tmp_path):
         assert (tmp_path / "well" / file).is_file()
 
 
+def test_sparse_conversion(well):
+    actual = Well.from_sparse_dataset(well.to_sparse_dataset())
+    assert xr.Dataset.identical(actual, well)
+
+
 def test_sel(well2):
     sel = well2.sel(id_name="well2")
     assert len(sel.index) == 7
     assert (np.unique(sel.id_name) == np.array(["well2"])).all()
-
-    sel = well2.sel(rate=slice(4, 6))
-    assert len(sel.index) == 3
-    assert np.allclose(sel.rate, [4.462, 5.154, 5.846], atol=0.001)
 
     sel = well2.sel(layer=2.0)
     assert len(sel.index) == 14

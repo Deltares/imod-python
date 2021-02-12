@@ -312,97 +312,71 @@ class Well(BoundaryCondition):
         }
         self.attrs["timemap"] = d
 
-    def _df_to_well(self, df):
-        # to handle concentration with species when casting back to Well
-        conc = None
-        if "species" in df.index.names:
-            conc = df["concentration"]
-            df = df.drop(columns="concentration")
-            df = df.droplevel("species").drop_duplicates()
-        elif "species" in df:
-            conc = df.set_index([df.index, df["species"]])["concentration"]
-            df = df.drop(columns=["concentration", "species"])
-        elif "concentration" in df:
-            conc = df["concentration"]
-            df = df.drop(columns="concentration")
+    def to_sparse_dataset(self):
+        """
+        Converts Well to a xr.Dataset with sparse variables with coordinates:
 
-        w = type(self)(
-            save_budget=self["save_budget"], **df
-        )  # recast df to Well package
-        if conc is not None:
-            w["concentration"] = conc.to_xarray().transpose()
-        return w
+        * ``id_name``
+        * ``y``
+        * ``x``
+        * ``time`` (optional)
+        * ``layer`` (optional)
+        * ``species`` (optional)
 
-    def _sel_time(self, time_indexer):
-        # some foo to select last previous time for indexed times
-        if "time" in self:
-            df = self.to_dataframe()
-            df = df.reset_index().drop(columns="save_budget")
-            if "layer" in df:
-                grouped = df.groupby(["id_name", "x", "y", "layer"])
+        The optional coordinates will only be added if they have been set in
+        the Well.
+
+        Symmetrical with ``.from_sparse_dataset()``.
+
+        Returns
+        -------
+        sparse_dataset: xr.Dataset
+        """
+        index_vars = ["id_name", "y", "x", "time", "layer", "species"]
+        tmp_df = (
+            self.drop_vars("save_budget")
+            .to_dataframe()
+            .set_index([i for i in index_vars if i in self])
+        )
+        sparse_ds = xr.Dataset.from_dataframe(tmp_df, sparse=True)
+        sparse_ds["save_budget"] = self["save_budget"]
+        return sparse_ds
+
+    @staticmethod
+    def from_sparse_dataset(ds: xr.Dataset) -> "Well":
+        """
+        Create a Well object from an xarray Dataset with sparse data variables. 
+        
+        Symmetrical with ``.to_sparse_dataset()``.
+
+        Returns
+        -------
+        well: imod.wq.Well
+        """
+        from sparse import COO
+
+        # Rate, concentration variables will always have all dimensions.
+        indexes = ds["rate"].indexes
+        sparse_coordinates = ds["rate"].data.coords
+        # First: collect the scalar coordinates
+        well_kwargs = {
+            k: v.values
+            for k, v in ds["rate"].coords.items()
+            if k not in indexes
+        }
+        # Now add the array coordinates
+        for (k, v), idx in zip(indexes.items(), sparse_coordinates):
+            well_kwargs[k] = v[idx]
+
+        # Finally add the data variables
+        for var in ds.data_vars:
+            data = ds[var].data
+            if isinstance(data, COO):
+                well_kwargs[var] = data.data
             else:
-                grouped = df.groupby(["id_name", "x", "y"])
+                well_kwargs[var] = data
 
-            if isinstance(time_indexer, slice):
-                if time_indexer.start is None:
-                    time_indexer = slice(
-                        df["time"].min(), time_indexer.stop, time_indexer.step
-                    )
-                if time_indexer.stop is None:
-                    time_indexer = slice(
-                        time_indexer.start, df["time"].max(), time_indexer.step
-                    )
-
-                # set start time per group to last previous time (concurrent stress)
-                def _set_times(g):
-                    il = (
-                        g.searchsorted(
-                            pd.Timestamp(time_indexer.start) + pd.to_timedelta("1ns")
-                        )
-                        - 1
-                    )
-                    if il >= 0:
-                        g.iloc[il] = pd.Timestamp(time_indexer.start)
-                    return g
-
-                df["time"] = grouped["time"].transform(_set_times)
-
-                # and select for time slice
-                selected = df.loc[
-                    (df["time"] >= time_indexer.start)
-                    & (df["time"] <= time_indexer.stop)
-                ]
-                index_indexer = selected["index"].values
-                times = selected["time"].values
-            else:
-                # (list of) individual dates
-                time_indexer = timeutil.array_to_datetime(
-                    np.atleast_1d(time_indexer), False
-                )  # TODO: Well and cftime?
-
-                # set requested times per group to last previous time (concurrent stress)
-                def _set_times(g):
-                    il = g.searchsorted(time_indexer + pd.to_timedelta("1ns")) - 1
-                    is_valid = il >= 0
-                    il = il[is_valid]
-                    g.iloc[il] = time_indexer[is_valid]
-                    return g
-
-                df["time"] = grouped["time"].transform(_set_times)
-
-                # and select for times
-                selected = df.loc[df["time"].isin(time_indexer)]
-                index_indexer = selected["index"].values
-                times = selected["time"].values
-
-            # assign times to selected Well package
-            selection = xr.Dataset.sel(self, {"index": index_indexer})
-            selection["time"] = xr.DataArray(
-                data=times, coords={"index": selection.index}, dims="index"
-            )
-            return selection
-        else:
-            return self
+        return Well(**well_kwargs)
 
     def sel(
         self,
@@ -423,7 +397,6 @@ class Well(BoundaryCondition):
         active times are selected per well. E.g., if a well becomes active at
         time a, and still active at a later time b, a is returned when time b is
         selected for. Time a in the returned result is adjusted to b.
-
 
         Parameters
         ----------
@@ -446,9 +419,6 @@ class Well(BoundaryCondition):
             Maximum distance between original and new labels for inexact
             matches. The values of the index at the matching locations must
             satisfy the equation ``abs(index[indexer] - target) <= tolerance``.
-        drop : bool, optional
-            If ``drop=True``, drop coordinates variables in `indexers` instead
-            of making them scalar.
         **indexers_kwarg : {dim: indexer, ...}, optional
             The keyword arguments form of ``indexers``.
             One of indexers or indexers_kwargs must be provided.
@@ -467,62 +437,23 @@ class Well(BoundaryCondition):
         xarray.Dataset.sel
         """
         indexers = either_dict_or_kwargs(indexers, indexers_kwargs, "sel")
-
-        # first: selection on dimensions
-        dim_indexers = {k: v for k, v in indexers.items() if k in self.dims}
-        if len(dim_indexers):
-            for k, v in dim_indexers.items():
-                v = indexers.pop(k)
-                selection = xr.Dataset.sel(
-                    self, {k: v}, method=method, tolerance=tolerance, drop=drop
-                )
-                return selection.sel(
-                    indexers, method=method, tolerance=tolerance, drop=drop
-                )
-
-        # then: selection on dataframe
         indexers = {k: v for k, v in indexers.items() if k in self}
-        # account for time separately
-        time_indexer = indexers.pop("time", None)
-        if len(indexers) == 0:
-            selection = self
+
+        if len(indexers) == 0:  # Nothing to be done.
+            return self
         else:
-            df = self.to_dataframe()
-            df = df.reset_index().drop(columns="save_budget")
-            selected = np.ones(len(df), dtype=bool)
-            for k, v in indexers.items():
-                try:
-                    if isinstance(v, slice):
-                        # slice?
-                        if v.start is None:
-                            v = slice(df[k].min(), v.stop, v.step)
-                        if v.stop is None:
-                            v = slice(v.start, df[k].max(), v.step)
-                        # to account for reversed order of y
-                        low, high = min(v.start, v.stop), max(v.start, v.stop)
-                        selected = selected & (df[k] >= low) & (df[k] <= high)
-                    else:
-                        v = np.atleast_1d(v)
-                        # boolean indexer
-                        if v.dtype == bool:
-                            selected = selected & v
-                        else:
-                            # list, labels etc
-                            selected = selected & df[k].isin(v)
-                except:
-                    raise ValueError(
-                        "Invalid indexer for Well package, accepts slice or (list-like of) values"
-                    )
-            index_indexer = df["index"].loc[selected]
-            selection = xr.Dataset.sel(
-                self,
-                {"index": index_indexer.values},
-                method=method,
-                tolerance=tolerance,
-                drop=drop,
-            )
+            # Create a temporary dataframe and temporary sparse dataset
+            # use this sparse dataset to do the selection
+            sparse_ds = self.to_sparse_dataset()
+            time_indexer = indexers.pop("time", None)
+            if len(indexers) == 0:
+                selection = sparse_ds
+            else:
+                selection = xr.Dataset.sel(
+                    sparse_ds, indexers, method=method, tolerance=tolerance, drop=False
+                )
 
-        if time_indexer:
-            selection = selection._sel_time(time_indexer)
-
-        return selection
+            if time_indexer:
+                selection = selection._sel_time(selection, time_indexer)
+            
+            return self.from_sparse_dataset(selection)
