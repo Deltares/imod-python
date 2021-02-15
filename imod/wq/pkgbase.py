@@ -447,8 +447,9 @@ class Package(xr.Dataset, abc.ABC):
         spatial_ds.to_netcdf(path)
         return has_dims
 
-    def _sel_time(self, time_indexer):
-        raise AttributeError(f"Invalid dimension 'time' in Package {self._pkg_id}")
+    @staticmethod
+    def _sel_time(obj, time_indexer):
+        raise AttributeError(f"Invalid dimension 'time' in Package {obj._pkg_id}")
 
     def sel(
         self,
@@ -524,7 +525,9 @@ class Package(xr.Dataset, abc.ABC):
             )
 
         if time_indexer:
-            selection = selection._sel_time(time_indexer)
+            selection = self._sel_time(selection, time_indexer)
+            if not isinstance(selection, type(self)):
+                selection = type(self)(**selection)
 
         return selection
 
@@ -788,34 +791,36 @@ class BoundaryCondition(Package, abc.ABC):
 
         return self._ssm_template.render(d)
 
-    def _sel_time(self, time_indexer):
+    @staticmethod
+    def _sel_time(obj, time_indexer):
         # select last previous time for BoundayConditions
         # explicitly call xr.Dataset's sel method
-        if "time" in self.coords:
-            use_cftime = isinstance(self.time[0], cftime.datetime)
+        if "time" in obj.coords:
+            use_cftime = isinstance(obj.time[0], cftime.datetime)
 
             if isinstance(time_indexer, slice):
-                selection = xr.Dataset.sel(self, time=time_indexer)
+                selection = xr.Dataset.sel(obj, time=time_indexer)
                 # time_sel.start included? Otherwise, concat
                 if (
                     timeutil.to_datetime(time_indexer.start, use_cftime)
                     not in selection.time
                 ):
                     start = xr.Dataset.sel(
-                        self, time=time_indexer.start, method="ffill"
+                        obj, time=time_indexer.start, method="ffill"
                     )
                     start["time"] = timeutil.to_datetime(time_indexer.start, use_cftime)
-                    selection = type(self)(
-                        **xr.concat([start, selection], dim="time", data_vars="minimal")
-                    )  # xr.concat changes type to dataset
+#                    selection = type(obj)(
+#                        **xr.concat([start, selection], dim="time", data_vars="minimal")
+#                    )  # xr.concat changes type to dataset
+                    selection = xr.concat([start, selection], dim="time", data_vars="minimal")
             else:
                 # (list of) individual dates
                 # select appropriate stress period and rename dim to selected dates
                 time_indexer = timeutil.array_to_datetime(
                     np.array(time_indexer), use_cftime
                 )
-                selection = xr.Dataset.sel(self, time=time_indexer, method="ffill")
+                selection = xr.Dataset.sel(obj, time=time_indexer, method="ffill")
                 selection["time"] = time_indexer
             return selection
         else:
-            return self
+            return obj

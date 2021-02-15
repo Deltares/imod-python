@@ -185,5 +185,6 @@ class TimeDiscretization(Package):
             to_check.append("transport_timestep_multiplier")
         self._check_positive(to_check)
 
-    def _sel_time(self, time_indexer):
-        return BoundaryCondition._sel_time(self, time_indexer)
+    @staticmethod
+    def _sel_time(obj, time_indexer):
+        return BoundaryCondition._sel_time(obj, time_indexer)

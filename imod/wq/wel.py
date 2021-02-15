@@ -61,6 +61,15 @@ class Well(BoundaryCondition):
         save_budget=False,
     ):
         super(__class__, self).__init__()
+
+        if (
+            isinstance(concentration, xr.DataArray)
+            and "species" in concentration.coords
+        ):
+            self["species"] = concentration["species"].values
+        elif isinstance(concentration, np.ndarray) and len(concentration.shape) == 2:
+            self["species"] = np.arange(1, concentration.shape[0] + 1)
+
         variables = {
             "id_name": id_name,
             "x": x,
@@ -71,12 +80,18 @@ class Well(BoundaryCondition):
             "concentration": concentration,
         }
         variables = {k: np.atleast_1d(v) for k, v in variables.items() if v is not None}
-        length = max(map(len, variables.values()))
+        length = max([max(v.shape) for v in variables.values()])
         index = np.arange(1, length + 1)
         self["index"] = index
 
         for k, v in variables.items():
-            if v.size == index.size:
+            if (
+                k == "concentration"
+                and (len(v.shape) == 2)
+                and (v.shape[1] == index.size)
+            ):
+                self[k] = (["species", "index"], v)
+            elif v.size == index.size:
                 self[k] = ("index", v)
             elif v.size == 1:
                 self[k] = ("index", np.full(length, v))
@@ -185,7 +200,7 @@ class Well(BoundaryCondition):
         if "concentration" in self.data_vars:
             d = {"pkg_id": self._pkg_id}
             name = f"{directory.stem}-concentration"
-            if "species" in self["concentration"].coords:
+            if "species" in self["concentration"].dims:
                 concentration = {}
                 for species in self["concentration"]["species"].values:
                     concentration[species] = self._compose_values_time(
@@ -264,13 +279,13 @@ class Well(BoundaryCondition):
     def save(self, directory):
         all_species = [None]
         if "concentration" in self.data_vars:
-            if "species" in self["concentration"].coords:
+            if "species" in self["concentration"].dims:
                 all_species = self["concentration"]["species"].values
 
         # Loop over species if applicable
         for species in all_species:
             if species is not None:
-                ds = self.sel(species=species)
+                ds = xr.Dataset.sel(self, species=species)
             else:
                 ds = self
 
@@ -332,50 +347,86 @@ class Well(BoundaryCondition):
         -------
         sparse_dataset: xr.Dataset
         """
-        index_vars = ["id_name", "y", "x", "time", "layer", "species"]
-        tmp_df = (
-            self.drop_vars("save_budget")
-            .to_dataframe()
-            .set_index([i for i in index_vars if i in self])
-        )
-        sparse_ds = xr.Dataset.from_dataframe(tmp_df, sparse=True)
+
+        def to_sparse(ds, index_vars):
+            tmp_df = (
+                ds.drop_vars(["save_budget"])
+                .to_dataframe()
+                .reset_index()
+                .set_index([i for i in index_vars if i in ds])
+            )
+            return xr.Dataset.from_dataframe(tmp_df.drop("index", 1), sparse=True)
+
+        index_vars = ["id_name", "y", "x", "layer", "time"]
+        if "concentration" in self and "species" in self["concentration"].dims:
+            conc_ds = self.drop_vars(["rate"])
+            rate_ds = self.drop_vars(["concentration", "species"])
+            sparse_ds = to_sparse(conc_ds, ["species"] + index_vars)
+            sparse_ds["rate"] = to_sparse(rate_ds, index_vars)["rate"]
+        else:
+            sparse_ds = to_sparse(self, index_vars)
+
         sparse_ds["save_budget"] = self["save_budget"]
         return sparse_ds
 
     @staticmethod
+    def _check_sparse_concentration(ds: xr.Dataset):
+        has_species = "species" in ds["concentration"].dims
+        if has_species:
+            if not ds["concentration"].dims[0] == "species":
+                raise ValueError("species must be first dimension for concentration")
+            sample = ds["concentration"].isel(species=0, drop=True)
+        else:
+            sample = ds["concentration"]
+
+        # Check that rate and concentration COO coordinates match up
+        rate_coords = {k: v for k, v in zip(ds["rate"].indexes, ds["rate"].data.coords)}
+        conc_coords = {k: v for k, v in zip(sample.indexes, sample.data.coords)}
+        for dim in rate_coords:
+            if not np.array_equal(rate_coords[dim], conc_coords[dim]):
+                raise ValueError(
+                    "Sparse COO coords do not match between rate and concentration"
+                    f" for dimension {dim}"
+                )
+
+        if has_species:
+            return xr.DataArray(
+                data=ds["concentration"].data.data.reshape(len(ds["species"]), -1),
+                coords={"species": ds["species"]},
+                dims=["species", "index"],
+            )
+        else:
+            return ds["concentration"].data.data
+
+    @staticmethod
     def from_sparse_dataset(ds: xr.Dataset) -> "Well":
         """
-        Create a Well object from an xarray Dataset with sparse data variables. 
-        
+        Create a Well object from an xarray Dataset with sparse data variables.
+
         Symmetrical with ``.to_sparse_dataset()``.
 
         Returns
         -------
         well: imod.wq.Well
         """
-        from sparse import COO
-
-        # Rate, concentration variables will always have all dimensions.
-        indexes = ds["rate"].indexes
-        sparse_coordinates = ds["rate"].data.coords
-        # First: collect the scalar coordinates
-        well_kwargs = {
-            k: v.values
-            for k, v in ds["rate"].coords.items()
-            if k not in indexes
-        }
-        # Now add the array coordinates
-        for (k, v), idx in zip(indexes.items(), sparse_coordinates):
+        # Rate variable will always have all dimensions, except species
+        # Add the scalar coordinates coordinates
+        well_kwargs = {}
+        # Add the scalar coordinates
+        for k, v in ds["rate"].coords.items():
+            if k not in ds["rate"].indexes:
+                well_kwargs[k] = v.values
+        # Add the array coordinates
+        for (k, v), idx in zip(ds["rate"].indexes.items(), ds["rate"].data.coords):
             well_kwargs[k] = v[idx]
+        # Add the rate data variable
+        well_kwargs["rate"] = ds["rate"].data.data
+        # Now deal with concentration
+        if "concentration" in ds:
+            well_kwargs["concentration"] = Well._check_sparse_concentration(ds)
 
-        # Finally add the data variables
-        for var in ds.data_vars:
-            data = ds[var].data
-            if isinstance(data, COO):
-                well_kwargs[var] = data.data
-            else:
-                well_kwargs[var] = data
-
+        well_kwargs["save_budget"] = bool(ds["save_budget"])
+        well_kwargs.pop("species", None)  # Species might have ended up in the selection
         return Well(**well_kwargs)
 
     def sel(
@@ -454,6 +505,6 @@ class Well(BoundaryCondition):
                 )
 
             if time_indexer:
-                selection = selection._sel_time(selection, time_indexer)
-            
+                selection = self._sel_time(selection, time_indexer)
+
             return self.from_sparse_dataset(selection)
