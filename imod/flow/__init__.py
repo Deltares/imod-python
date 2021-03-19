@@ -9,6 +9,11 @@ writing a full and correct model definition, since no extra checks are done by
 this module.
 """
 
+from imod.flow.bas import BasicFlow
+from imod.flow.chd import ConstantHead
+from imod.flow.model import ImodflowModel
+from imod.flow.dis import TimeDiscretization
+
 import pathlib
 import warnings
 
