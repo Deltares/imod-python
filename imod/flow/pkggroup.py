@@ -3,6 +3,8 @@ import collections
 import enum
 import jinja2
 
+from imod.flow.util import Vividict
+
 class PackageGroup(collections.UserDict, abc.ABC):
     """
     Groups for packs that support multiple systems:
@@ -29,16 +31,25 @@ class PackageGroup(collections.UserDict, abc.ABC):
             self[k] = v
         #self.reorder_keys()
 
-    def reorder_keys(self):
-        #TODO: Needed for template priority: lay_nr - sys_nr - variable - timestep
-        """
-        """
-        order = []
-        for k, v in self.items():
-            order.append(k)
+    def compose(
+        self, directory, globaltimes, nlayer, 
+        compose_projectfile=True, composition = None
+        ):
 
-        self.first_key = order[0]
-        self.key_order = order
+        if composition is None:
+            composition = Vividict()
+
+        for i, (key, pkg) in enumerate(self.items()):
+            sys_nr = i+1
+            pkg.compose(
+                directory.joinpath(key), 
+                globaltimes, nlayer, 
+                sys_nr=sys_nr,
+                compose_projectfile=compose_projectfile,
+                composition=composition
+                )
+        
+        return composition
 
     def render(self, directory, globaltimes, nlayer, nrow, ncol):
         d = {}

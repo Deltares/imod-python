@@ -10,6 +10,8 @@ import pathlib
 from imod import util
 from imod.wq import timeutil
 
+from imod.flow.util import Vividict
+
 class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we using abstract methods?
     """   
     Base package for the different iMODFLOW packages.
@@ -33,14 +35,14 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
     
     _template = jinja2.Template(
         "{%- for layer, path in variable_data %}\n"
-        '{{layer}, 1.0, 0.0, "{{path}}"\n'
-        "%{- endfor %}\n"
+        '{{layer}}, 1.0, 0.0, "{{path}}"\n'
+        "{%- endfor %}\n"
     )
 
     #if file_flag == 1 for constant_value used, if file_flag == 2 path used
     _template_projectfile = jinja2.Template(
         "{%- for layer, path in variable_data%}\n"
-        '1, {{file_flag}}, {{{:03d}.format(layer)}}, 1.000, 0.000, {{constant}}, {{path}}\n'
+        '1, {{file_flag}}, {{"{:03d}".format(layer)}}, 1.000, 0.000, {{constant}}, {{path}}\n'
         "{%- endfor %}\n"
     )
     
@@ -56,13 +58,39 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
     #"implement the: https://github.com/xgcm/xgcm/issues/225#issuecomment-762248339"
     #    pass
 
-    def _compose(self, d, pattern=None):
+    def compose(
+        self, directory, globaltimes, nlayer, 
+        compose_projectfile=True, composition=None
+    ):
+        """
+        Composes package, not useful for boundary conditions
+
+        Parameters
+        ----------
+        directory : str
+            Path to working directory, where files will be written.
+            Necessary to generate the paths for the runfile.
+        globaltimes : list #TODO make this an *arg, change order.
+            Not used, only included to comply with BoundaryCondition.compose
+        nlayer : int
+            Number of layers.
+        """
+
+        if composition is None:
+            composition = Vividict()
+
+        for varname in self.dataset.data_vars:
+            composition[self._pkg_id][varname] = self._compose_values_layer(varname, directory, nlayer)
+
+        return composition
+
+    def _compose_path(self, d, pattern=None):
         # d : dict
         # pattern : string or re.pattern
         return util.compose(d, pattern).as_posix()
 
     def _compose_values_layer(
-        self, varname, directory, nlayer, time=None, da=None, compress=True
+        self, varname, directory, nlayer, time=None, da=None
     ):
         """
         Composes paths to files, or gets the appropriate scalar value for
@@ -80,9 +108,6 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
         da : xr.DataArray, optional
             In some cases fetching the DataArray by varname is not desired.
             It can be passed directly via this optional argument.
-        compress : boolean
-            Whether or not to compress the layers using the imod-wq macros.
-            Should be disabled for time-dependent input.
 
         Returns
         -------
@@ -93,7 +118,7 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
         """
         pattern = "{name}"
 
-        values = {}
+        values = Vividict()
         if da is None:
             da = self[varname]
 
@@ -113,10 +138,8 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
 
         if "layer" not in da.coords:
             if idf:
-                # Special case concentration
-                # Using "?" results in too many sinks and sources according to imod-wq.
                 pattern += "{extension}"
-                values["?"] = self._compose(d, pattern=pattern)
+                values["?"] = self._compose_path(d, pattern=pattern)
             else:
                 values["?"] = da.values[()]
 
@@ -125,7 +148,7 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
             for layer in np.atleast_1d(da.coords["layer"].values):
                 if idf:
                     d["layer"] = layer
-                    values[layer] = self._compose(d, pattern=pattern)
+                    values[layer] = self._compose_path(d, pattern=pattern)
                 else:
                     if "layer" in da.dims:
                         values[layer] = da.sel(layer=layer).values[()]
@@ -215,8 +238,63 @@ class BoundaryCondition(Package, abc.ABC):
     #2, 1.0, 0.0, "c:\ghb-head-sys2_19710101000000_l2.idf"
     #3, 1.0, 0.0, "c:\ghb-head-sys2_19710101000000_l3.idf"
 
+    _template_projectfile = jinja2.Template(
+        "{{package_data|length}}, ({{pkg_id}}), name, {{variable_order}}"
+        "{%- for time_key, time_data in package_data.items()%}\n"
+        '{{times[time_key]}}\n'
+        '{{time_data|length}}, {{nsub}}\n'
+        "{%-    for variable in variable_order%}\n" #Preserve variable order
+        "{%-        for system, system_data in time_data[variable].items() %}\n"
+        "{%-            for layer, value in system_data.items() %}\n"
+        "{%-                if value is string %}\n" #If string then assume path
+        '1, 2, {{"{:03d}".format(layer)}}, 1.000, 0.000, -9999., {{value}}\n'
+        "{%-                else %}\n"
+        '1, 1, {{"{:03d}".format(layer)}}, 1.000, 0.000, {{value}}, ""\n'
+        "{%-                endif %}\n"
+        "{%-            endfor %}\n"
+        "{%-        endfor %}\n"
+        "{%-    endfor %}\n"
+        "{%- endfor %}\n"
+    )
+
+    def _get_runfile_times(self, da, globaltimes):
+            da_times = da.coords["time"].values
+            if "timemap" in da.attrs:
+                timemap_keys = np.array(list(da.attrs["timemap"].keys()))
+                timemap_values = np.array(list(da.attrs["timemap"].values()))
+                package_times, inds = np.unique(
+                    np.concatenate([da_times, timemap_keys]), return_index=True
+                )
+                # Times to write in the runfile
+                runfile_times = np.concatenate([da_times, timemap_values])[inds]
+            else:
+                runfile_times = package_times = da_times
+
+            starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
+
+            return runfile_times, starts_ends
+
+    def compose(self, directory, globaltimes, nlayer, 
+        composition=None, sys_nr=1, compose_projectfile=True):
+        """
+        Composes all variables for one system. 
+        """
+        
+        if composition is None:
+            composition = Vividict()
+
+        for data_var in self.dataset.data_vars:
+            self._compose_values_timelayer(
+                data_var, globaltimes, directory, nlayer, 
+                values = composition, sys_nr = sys_nr,
+                compose_projectfile=compose_projectfile)
+        
+        return composition
+
     def _compose_values_timelayer(
-        self, varname, globaltimes, directory, nlayer, da=None
+        self, varname, globaltimes, directory, nlayer, 
+        values = None, sys_nr=1, da=None,
+        compose_projectfile=True
     ):
         """
         Composes paths to files, or gets the appropriate scalar value for
@@ -237,6 +315,10 @@ class BoundaryCondition(Package, abc.ABC):
         directory : str
             Path to working directory, where files will be written.
             Necessary to generate the paths for the runfile.
+        values : Vividict
+            Vividict (tree-like dictionary) to which values should be added
+        sys_nr : int
+            System number. Defaults as 1, but for package groups it 
         da : xr.DataArray, optional
             In some cases fetching the DataArray by varname is not desired.
             It can be passed directly via this optional argument.
@@ -250,42 +332,30 @@ class BoundaryCondition(Package, abc.ABC):
             The stress period number and layer number may be wildcards (e.g. '?').
         """
 
-        values = {}
+        if values == None:
+            values = Vividict()
 
         if da is None:
             da = self[varname]
 
-        if "time" in da.coords:
-            da_times = da.coords["time"].values
-            if "timemap" in da.attrs:
-                timemap_keys = np.array(list(da.attrs["timemap"].keys()))
-                timemap_values = np.array(list(da.attrs["timemap"].values()))
-                package_times, inds = np.unique(
-                    np.concatenate([da_times, timemap_keys]), return_index=True
-                )
-                # Times to write in the runfile
-                runfile_times = np.concatenate([da_times, timemap_values])[inds]
-            else:
-                runfile_times = package_times = da_times
+        args = (varname, directory)
+        kwargs = dict(nlayer=nlayer, da=da, time=None)
 
-            starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
+        if "time" in da.coords:
+            runfile_times, starts_ends = self._get_runfile_times(da, globaltimes)
 
             for time, start_end in zip(runfile_times, starts_ends):
-                # Check whether any range occurs in the input.
-                # If does does, compress should be False
-                compress = not (":" in start_end)
-                values[start_end] = self._compose_values_layer(
-                    varname,
-                    directory,
-                    nlayer=nlayer,
-                    time=time,
-                    da=da,
-                    compress=compress,
-                )
+                kwargs["time"] = time
+                if compose_projectfile == True:
+                    values[self._pkg_id][start_end][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
+                    #values[self._pkg_id][start_end][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
+                else: #render runfile
+                    values[start_end][self._pkg_id][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
 
         else:
-            values["?"] = self._compose_values_layer(
-                varname, directory, nlayer=nlayer, da=da
-            )
+            if compose_projectfile == True:
+                values[self._pkg_id]["steady-state"][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
+            else:
+                values["steady-state"][self._pkg_id][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
 
         return values 

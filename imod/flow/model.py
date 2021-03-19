@@ -11,18 +11,13 @@ import pandas as pd
 
 import imod
 from imod.wq import timeutil
+import imod.util as util
+from imod.flow.util import Vividict #TODO: Find less confusing place for Vividict
+
 from imod.flow.pkggroup import PackageGroups
 from imod.flow.pkgbase import BoundaryCondition
 
 from dataclasses import dataclass
-
-@dataclass
-class ComposedRecord:
-    "Dataclass for keeping a record of composed data"
-    pkg_id: str
-    key: str
-    variable: str
-    variable_data: dict
 
 def _relpath(path, to):
     # Wraps os.path.relpath
@@ -275,30 +270,41 @@ class ImodflowModel(Model):
         return self[pkgkey]._render(
             directory=directory / pkgkey, globaltimes=globaltimes, nlayer=nlayer
         )
-    
-    def _render_groups(self, directory, globaltimes):
-        baskey = self._get_pkgkey("bas6")
-        nlayer, nrow, ncol = self[baskey]["ibound"].shape
-        package_groups = self._group()
-        content = "\n\n".join(
-            [
-                group.render(directory, globaltimes, nlayer, nrow, ncol)
-                for group in package_groups
-            ]
-        )
-        return content
 
-    def _compose_timesstrings(self, globaltimes):
+    def _calc_nsub(self, composed_boundary_condition):
+        """Calculate amount of entries for each timestep.
+        """
+
+        def first(d):
+            """Get first value of dictionary values
+            """
+            return next(iter(d.values()))
+
+        first_variable = first(first(composed_boundary_condition))
+
+        nsub = 0
+        for sys in first_variable.values():
+            nsub += len(sys)
+
+        return nsub
+
+    def _compose_timestrings(self, globaltimes):
+        time_format = "%Y-%m-%d %H:%M:%S"
         time_composed = self["time_discretization"]._compose_values_time("time", globaltimes)
         time_composed = dict(
             [
-                (timestep_nr, util._compose_timesstring(time)) 
-                for timestep_nr, time in time_composed.items
+                (timestep_nr, util._compose_timestring(
+                    time, time_format = time_format
+                    )
+                    ) 
+                for timestep_nr, time in time_composed.items()
             ]
         )
         return time_composed
 
-    def _precompose_all_packages(self, directory, globaltimes, nlay):
+    def _compose_all_packages(
+        self, directory, globaltimes, nlayer, compose_projectfile = True
+        ):
         """compose all transient packages before rendering. 
         
         Required because of outer timeloop
@@ -308,35 +314,65 @@ class ImodflowModel(Model):
         A tuple with lists of respectively the composed packages and boundary conditions
 
         """       
-        composed_packages = []
-        composed_boundary_conditions = []
+        composition = Vividict()
+
+        group_packages = self._group()
+
+        #Get get pkg_id from first value in dictionary in group list
+        group_pkg_ids = [next(iter(group.values()))._pkg_id for group in group_packages]
+
+        for group in group_packages:
+            group.compose(directory, globaltimes, nlayer,
+                composition = composition, compose_projectfile=compose_projectfile)
 
         for key, package in self.items():
-            if isinstance(package, BoundaryCondition):
-                for variable in package.dataset.data_vars:
-                    composed_data = package._compose_values_timelayer(variable, globaltimes, directory, nlay)
-                    record = ComposedRecord(
-                        pkg_id = package._pkg_id, key = key, 
-                        variable = variable, variable_data = composed_data
-                        )
-                    composed_boundary_conditions.append(record)
+            if package._pkg_id not in group_pkg_ids:
+                package.compose(directory.joinpath(key), globaltimes, nlayer, 
+                    composition=composition,
+                    compose_projectfile=compose_projectfile)
             
-            elif package._pkg_id not in ["dis", "oc", "pcg"]:
-                for variable in package.dataset.data_vars:
-                    composed_data = package._compose_values_layer(variable, directory, nlay)
-                    record = ComposedRecord(
-                        pkg_id = package._pkg_id, key = key, 
-                        variable = variable, variable_data = composed_data
-                        )
-                    composed_packages.append(record)
+        return composition
 
-        return composed_packages, composed_boundary_conditions
-
-    def _render_projectfile(self, directory, globaltimes, composed_data):
+    def _render_projectfile(self, directory, globaltimes, nlayer):
         """Render projectfile. The projectfile has the hierarchy:
         package - time - system - layer
         """
-        pass
+        
+        content = []
+
+        composition = self._compose_all_packages(
+            directory, globaltimes, nlayer,
+            compose_projectfile=True
+            )
+        
+        times = self._compose_timestrings(globaltimes)
+
+        rendered = []
+
+        for key, package in self.items():
+            pkg_id = package._pkg_id
+
+            if pkg_id in rendered:
+                continue #Skip if already rendered (for groups)
+
+            if isinstance(package, BoundaryCondition):
+                nsub = self._calc_nsub(composition[pkg_id])
+                
+                r = package._template_projectfile.render(
+                    pkg_id = pkg_id,
+                    nsub = nsub,
+                    variable_order = package._variable_order,
+                    package_data = composition[pkg_id],
+                    times = times,
+                )
+
+                content.append(r)
+            
+            rendered.append(pkg_id)
+        
+        return "\n\n".join(content)
+        
+
         # multi-system package group: chd, drn, ghb, riv, wel
 
     def _render_runfile(self, directory, globaltimes, composed_data):
