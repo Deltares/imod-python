@@ -333,72 +333,16 @@ class ImodflowModel(Model):
         return composed_packages, composed_boundary_conditions
 
     def _render_projectfile(self, directory, globaltimes, composed_data):
-        """Render runfile. The runfile has the hierarchy:
+        """Render projectfile. The projectfile has the hierarchy:
         package - time - system - layer
         """
-
-        _package_header_template = "\n{ntimesteps:03d}, ({pkg_id}), 1, {variable_order}"
-
-        composed_pkgs, composed_bcs = composed_data
-        sorted(composed_bcs, key=lambda x: (x.pkg_id, x.key, x.variable), reverse=True)
-
-        content = []
-
-        # Render static packages
-        for record in composed_pkgs:
-            package = self[record.key]
-            header = _package_header_template.format(ntimesteps = 1, pkg_id = record.pkg_id, variable_order = package.variable_order
-            content.append(header)
-            content.append(package.render(render_projectfile=True, **record.__dict__))
-
-        #Render boundary conditions
-        pacakge_group_dict = {}
-        package_groups = self._group()
-
-        for group in package_groups:
-            pkg_id = next(iter(group.values()))._pkg_id
-            package_group_dict[pkg_id] = group
-
-        #Perhaps this data should not have been flattened
-        i_start = 0
-        while i <= len(composed_bcs):
-            pkg_id = composed_bcs[i_start].pkg_id
-            n_timesteps = len(composed_bcs[i_start].variable_data)
-
-            if pkg_id in package_groups.keys():
-                group = package_group_dict[pkg_id]
-                n_var = group._n_variables
-                n_sys = len(group)
-            else:
-                n_var = len(self[pkg_id].data_vars)
-                n_sys = 1
-
-            n_sub = n_var * n_sys
-            i_end = i_start + n_sub
-
-            for i in range(i_start, i_end):
-                record = composed_bcs[i]
-                package = self[record.key]
-                for time, var_data in record.variable_data.items():
-                    # copy dict
-                    d = dict(k, v for k, v in record.__dict__.items())
-                    # 
-                    d["variable_data"] = var_data 
-
-                    content.append(package.render())
-
-
-            content.append()
-
-            i_start = i_end
-
-
-        for time in globaltimes:
-            n_var = 
-            content.append(self._render_runfile_timestep(directory, time, composed_data))
+        pass
         # multi-system package group: chd, drn, ghb, riv, wel
 
     def _render_runfile(self, directory, globaltimes, composed_data):
+        """Render runfile. The runfile has the hierarchy:
+        time - package - system - layer
+        """
         pass
 
     def render(self, directory, result_dir, render_projectfile=True):
