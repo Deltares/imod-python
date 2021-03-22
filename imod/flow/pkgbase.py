@@ -246,7 +246,7 @@ class BoundaryCondition(Package, abc.ABC):
     #3, 1.0, 0.0, "c:\ghb-head-sys2_19710101000000_l3.idf"
 
     _template_projectfile = jinja2.Template(
-        '{{"{:03d}".format(package_data|length)}}, ({{pkg_id}}), name, {{variable_order}}\n'
+        '{{"{:04d}".format(package_data|length)}}, ({{pkg_id}}), name, {{variable_order}}\n'
         "{%- for time_key, time_data in package_data.items()%}\n"
         '{{times[time_key]}}\n'
         '{{"{:03d}".format(time_data|length)}}, {{"{:03d}".format(nsub)}}\n'
