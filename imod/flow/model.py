@@ -348,26 +348,27 @@ class ImodflowModel(Model):
         times = self._compose_timestrings(globaltimes)
 
         rendered = []
+        ignored = ["dis"]
 
         for key, package in self.items():
             pkg_id = package._pkg_id
 
-            if pkg_id in rendered:
-                continue #Skip if already rendered (for groups)
+            if (pkg_id in rendered) or (pkg_id in ignored):
+                continue #Skip if already rendered (for groups) or not necessary to render
 
-            if isinstance(package, BoundaryCondition):
-                nsub = self._calc_nsub(composition[pkg_id])
-                
-                r = package._template_projectfile.render(
-                    pkg_id = pkg_id,
-                    nsub = nsub,
-                    variable_order = package._variable_order,
-                    package_data = composition[pkg_id],
-                    times = times,
+            kwargs = dict(
+                pkg_id = pkg_id,
+                variable_order = package._variable_order,
+                package_data = composition[pkg_id],
                 )
 
-                content.append(r)
-            
+            if isinstance(package, BoundaryCondition):
+                kwargs["nsub"] = self._calc_nsub(composition[pkg_id])
+                kwargs["times"] = times
+            else:
+                kwargs["nsub"] = 1
+
+            content.append(package._template_projectfile.render(**kwargs))
             rendered.append(pkg_id)
         
         return "\n\n".join(content)
