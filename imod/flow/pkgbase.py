@@ -31,7 +31,7 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
 
     """
 
-    __slots__ = ("_pkg_id", "_var_order")
+    __slots__ = ("_pkg_id", "_variable_order")
     
     _template = jinja2.Template(
         "{%- for layer, path in variable_data %}\n"
@@ -39,10 +39,17 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
         "{%- endfor %}\n"
     )
 
-    #if file_flag == 1 for constant_value used, if file_flag == 2 path used
     _template_projectfile = jinja2.Template(
-        "{%- for layer, path in variable_data%}\n"
-        '1, {{file_flag}}, {{"{:03d}".format(layer)}}, 1.000, 0.000, {{constant}}, {{path}}\n'
+        "0001, ({{pkg_id}}), name, {{variable_order}}\n"
+        '001, {{"{:03d}".format(nsub)}}\n'
+        "{%- for variable in variable_order%}\n" #Preserve variable order
+        "{%-    for layer, value in package_data[variable].items()%}\n"
+        "{%-        if value is string %}\n" #If string then assume path
+        '1, 2, {{"{:03d}".format(layer)}}, 1.000, 0.000, -9999., {{value}}\n'
+        "{%-        else %}\n"
+        '1, 1, {{"{:03d}".format(layer)}}, 1.000, 0.000, {{value}}, ""\n'
+        "{%-        endif %}\n"
+        "{%-    endfor %}\n"
         "{%- endfor %}\n"
     )
     
@@ -239,10 +246,10 @@ class BoundaryCondition(Package, abc.ABC):
     #3, 1.0, 0.0, "c:\ghb-head-sys2_19710101000000_l3.idf"
 
     _template_projectfile = jinja2.Template(
-        "{{package_data|length}}, ({{pkg_id}}), name, {{variable_order}}"
+        '{{"{:03d}".format(package_data|length)}}, ({{pkg_id}}), name, {{variable_order}}\n'
         "{%- for time_key, time_data in package_data.items()%}\n"
         '{{times[time_key]}}\n'
-        '{{time_data|length}}, {{nsub}}\n'
+        '{{"{:03d}".format(time_data|length)}}, {{"{:03d}".format(nsub)}}\n'
         "{%-    for variable in variable_order%}\n" #Preserve variable order
         "{%-        for system, system_data in time_data[variable].items() %}\n"
         "{%-            for layer, value in system_data.items() %}\n"
