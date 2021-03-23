@@ -368,7 +368,7 @@ class ImodflowModel(Model):
             else:
                 kwargs["nsub"] = 1
 
-            content.append(package._template_projectfile.render(**kwargs))
+            content.append(package._render(**kwargs))
             rendered.append(pkg_id)
         
         return "\n\n".join(content)
