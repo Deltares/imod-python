@@ -329,14 +329,18 @@ class BoundaryCondition(Package, abc.ABC):
         da : xr.DataArray, optional
             In some cases fetching the DataArray by varname is not desired.
             It can be passed directly via this optional argument.
+        compose_projectfile : bool
+            Compose values in a hierarchy suitable for the projectfile
 
         Returns
         -------
-        values : dict
-            Dictionary containing the {stress period number: {layer number: path
-            to file}}. Alternatively: {stress period number: {layer number: scalar
-            value}}.
-            The stress period number and layer number may be wildcards (e.g. '?').
+        values : Vividict
+            A nested dictionary containing following the projectfile hierarchy:
+            {_pkg_id : {stress_period : {varname : {sys_nr : {lay_nr : value}}}}}
+            or runfile hierarchy:
+            {stress_period : {_pkg_id : {varname : {sys_nr : {lay_nr : value}}}}}
+            where 'value' can be a scalar or a path to a file.
+            The stress period number may be the wildcard '?'.
         """
 
         if values == None:
@@ -355,7 +359,6 @@ class BoundaryCondition(Package, abc.ABC):
                 kwargs["time"] = time
                 if compose_projectfile == True:
                     values[self._pkg_id][start_end][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
-                    #values[self._pkg_id][start_end][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
                 else: #render runfile
                     values[start_end][self._pkg_id][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
 
