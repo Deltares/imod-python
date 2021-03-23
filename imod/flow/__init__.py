@@ -10,6 +10,8 @@ this module.
 """
 
 from imod.flow.bas import ActiveBoundary, Top, Bottom, StartingHead
+from imod.flow.bcf import Transmissivity, VerticalResistance
+from imod.flow.lpf import HorizontalHydraulicConductivity, VerticalHydraulicConductivity, VerticalAnistropy
 from imod.flow.chd import ConstantHead
 from imod.flow.model import ImodflowModel
 from imod.flow.dis import TimeDiscretization
