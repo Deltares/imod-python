@@ -372,15 +372,12 @@ class ImodflowModel(Model):
             rendered.append(pkg_id)
         
         return "\n\n".join(content)
-        
-
-        # multi-system package group: chd, drn, ghb, riv, wel
 
     def _render_runfile(self, directory, globaltimes, composed_data):
         """Render runfile. The runfile has the hierarchy:
         time - package - system - layer
         """
-        pass
+        raise NotImplementedError("Currently only projectfiles can be rendered.")
 
     def render(self, directory, result_dir, render_projectfile=True):
         """
