@@ -1,4 +1,4 @@
-from imod.flow.pkgbase import GeneralHeadBoundary
+from imod.flow.pkgbase import BoundaryCondition
 
 class GeneralHeadBoundary(BoundaryCondition):
     """
