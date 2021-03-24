@@ -19,6 +19,8 @@ from imod.flow.wel import Well
 from imod.flow.chd import ConstantHead
 from imod.flow.model import ImodflowModel
 from imod.flow.dis import TimeDiscretization
+from imod.flow.slv import PreconditionedConjugateGradientSolver
+from imod.flow.sto import StorageCoefficient
 
 import pathlib
 import warnings
