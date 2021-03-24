@@ -86,12 +86,11 @@ class TimeDiscretization(Package):
 
         return _dis_template.render(d)
 
-    def _pkgcheck(self, ibound=None):
+    def _pkgcheck(self, **kwargs):
         to_check = [
             "timestep_duration",
             "n_timesteps",
             "transient",
         ]
-        if "transport_timestep_multiplier" in self.data_vars:
-            to_check.append("transport_timestep_multiplier")
+
         self._check_positive(to_check)

@@ -65,6 +65,15 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
     #"implement the: https://github.com/xgcm/xgcm/issues/225#issuecomment-762248339"
     #    pass
 
+    def _pkgcheck(self, **kwargs):
+        pass
+
+    def _check_positive(self, varnames):
+        for var in varnames:
+            # Take care with nan values
+            if (self[var] < 0).any():
+                raise ValueError(f"{var} in {self} must be positive")
+
     def compose(
         self, directory, globaltimes, nlayer, 
         compose_projectfile=True, composition=None
@@ -206,42 +215,6 @@ class BoundaryCondition(Package, abc.ABC):
 
     It is not meant to be used directly, only to inherit from, to implement new packages.
     """
-
-    #PSEUDO template for projectfile:
-    #{ntimesteps}, (_pkg_id),1, name, [list_variables]
-    #{timestamp}
-    #{nvar}, {nlay * nsys}
-    #1,{file_flag}, {{:03d}.format(lay_nr)}, 1.0000, 0.0000, {constant_value}, {path}
-    
-    #if file_flag == 1 for constant_value used, if file_flag == 2 path used
-
-    #PSEUDO template for runfile:
-    #{timestep_nr},1.0,{timestamp},-1
-    #{nlay * nsys}, ({_pkg_id})
-    #{lay_nr}, 1.0, 0.0, {path}
-
-    #EXAMPLE projectfile
-    #0001,(DRN),1, Drainage,[CON,DEL]
-    #2002-01-01 00:00:00
-    #002,001
-    #1,2, 001,   1.000000    ,   0.000000    ,  -999.9900    ,'z:\buisdrainage_conductance.idf'
-    #1,2, 001,   1.000000    ,   0.000000    ,  -999.9900    ,'z:\buisdrainage_peil.idf'
-
-    #EXAMPLE runfile
-    #1,1.0,19710101000000,-1
-    #6, (ghb)
-    #1, 1.0, 0.0, "c:\ghb-cond_19710101000000_l1.idf"
-    #2, 1.0, 0.0, "c:\ghb-cond_19710101000000_l2.idf"
-    #3, 1.0, 0.0, "c:\ghb-cond_19710101000000_l3.idf"
-    #1, 1.0, 0.0, "c:\ghb-cond-sys2_19710101000000_l1.idf"
-    #2, 1.0, 0.0, "c:\ghb-cond-sys2_19710101000000_l2.idf"
-    #3, 1.0, 0.0, "c:\ghb-cond-sys2_19710101000000_l3.idf"
-    #1, 1.0, 0.0, "c:\ghb-head_19710101000000_l1.idf"
-    #2, 1.0, 0.0, "c:\ghb-head_19710101000000_l2.idf"
-    #3, 1.0, 0.0, "c:\ghb-head_19710101000000_l3.idf"
-    #1, 1.0, 0.0, "c:\ghb-head-sys2_19710101000000_l1.idf"
-    #2, 1.0, 0.0, "c:\ghb-head-sys2_19710101000000_l2.idf"
-    #3, 1.0, 0.0, "c:\ghb-head-sys2_19710101000000_l3.idf"
 
     _template_projectfile = jinja2.Template(
         '{{"{:04d}".format(package_data|length)}}, ({{pkg_id}}), name, {{variable_order}}\n'

@@ -1,4 +1,6 @@
 from imod.flow.pkgbase import Package
+import scipy.ndimage
+import numpy as np
 
 class ActiveBoundary(Package):
     """Specify the locations of active, inactive, and specified head in cells
@@ -18,6 +20,13 @@ class ActiveBoundary(Package):
     def __init__(self, ibound):
         super(__class__, self).__init__()
         self.dataset["ibound"] = ibound
+
+    def _pkgcheck(self, active_cells = None):
+        _, nlabels = scipy.ndimage.label(active_cells.values)
+        if nlabels > 1:
+            raise ValueError(
+                f"{nlabels} disconnected model domain detected in the ibound in {bndkey}"
+            )
 
 class Top(Package):
     """The top of the aquifers
@@ -73,3 +82,9 @@ class StartingHead(Package):
     def __init__(self, starting_head):
         super(__class__, self).__init__()
         self.dataset["starting_head"] = starting_head
+    
+    def _pkgcheck(self, active_cells=None):
+        if (active_cells & np.isnan(self.dataset["starting_head"])).any():
+            raise ValueError(
+                f"Active cells in ibound may not have a nan value in starting_head in {shdkey}"
+            )
