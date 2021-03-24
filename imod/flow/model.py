@@ -373,13 +373,13 @@ class ImodflowModel(Model):
         
         return "\n\n".join(content)
 
-    def _render_runfile(self, directory, globaltimes, composed_data):
+    def _render_runfile(self, directory, globaltimes, nlayer):
         """Render runfile. The runfile has the hierarchy:
         time - package - system - layer
         """
         raise NotImplementedError("Currently only projectfiles can be rendered.")
 
-    def render(self, directory, result_dir, render_projectfile=True):
+    def render(self, directory, render_projectfile=True):
         """
         Render the runfile as a string, package by package.
         """
@@ -387,15 +387,12 @@ class ImodflowModel(Model):
         globaltimes = self[diskey]["time"].values
         baskey = self._get_pkgkey("bas6")
         nlayer = self[baskey]["layer"].size
-
-        composed_data = _precompose_all_packages(self, globaltimes, nlay)
         
         if render_projectfile:
-            self._render_projectfile(directory, globaltimes, composed_data)
+            return self._render_projectfile(directory, globaltimes, nlayer)
         else:
-            self._render_runfile(directory, globaltimes, composed_data)
+            return self._render_runfile(directory, globaltimes, nlayer)
 
-        return "\n\n".join(content)
 
     def write(
         self, directory=pathlib.Path("."), result_dir=None, resultdir_is_workdir=False
@@ -514,3 +511,8 @@ class ImodflowModel(Model):
 
         for pkg in self.values():
             pkg._pkgcheck(ibound=ibound)
+        
+
+        modules = [pkg.__module__ for pkg in self.values()]
+        if ('imod.flow.lpf' in modules) and ('imod.flow.bcf' in modules):
+            raise ValueError("Both Layer Property Flow and Block Centered Flow packages defined, define either HydraulicConductivities or Transmissivities/Resistances.")
