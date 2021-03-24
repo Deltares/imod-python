@@ -105,8 +105,8 @@ class Well(BoundaryCondition):
         self, varname, globaltimes, directory, nlayer, 
         values = None, sys_nr=1,
         compose_projectfile=True
-    ):
-            """
+        ):
+        """
         Composes paths to files, or gets the appropriate scalar value for
         a single variable in a dataset.
 
@@ -143,7 +143,7 @@ class Well(BoundaryCondition):
             The stress period number may be the wildcard '?'.
         """
 
-        if values == None:
+        if values is None:
             values = Vividict()
         
         args = (varname, directory)
