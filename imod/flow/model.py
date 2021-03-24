@@ -385,8 +385,8 @@ class ImodflowModel(Model):
         """
         diskey = self._get_pkgkey("dis")
         globaltimes = self[diskey]["time"].values
-        baskey = self._get_pkgkey("bas6")
-        nlayer = self[baskey]["layer"].size
+        bndkey = self._get_pkgkey("bnd")
+        nlayer = self[bndkey]["layer"].size
         
         if render_projectfile:
             return self._render_projectfile(directory, globaltimes, nlayer)
@@ -394,9 +394,60 @@ class ImodflowModel(Model):
             return self._render_runfile(directory, globaltimes, nlayer)
 
 
+    def _model_path_management(
+        self, 
+        directory, 
+        result_dir, 
+        resultdir_is_workdir,
+        render_projectfile
+        ):
+        # Coerce to pathlib.Path
+        directory = pathlib.Path(directory)
+        if result_dir is None:
+            result_dir = pathlib.Path("results")
+        else:
+            result_dir = pathlib.Path(result_dir)
+
+        # Create directories if necessary
+        directory.mkdir(exist_ok=True, parents=True)
+        result_dir.mkdir(exist_ok=True, parents=True)
+        
+        if render_projectfile:
+            ext = ".prj"
+        else:
+            ext = ".run"
+
+        runfilepath = directory / f"{self.modelname}{ext}"
+        results_runfilepath = result_dir / f"{self.modelname}{ext}"
+
+        # Where will the model run?
+        # Default is inputdir, next to runfile:
+        # in that case, resultdir is relative to inputdir
+        # If resultdir_is_workdir, inputdir is relative to resultdir
+        # render_dir is the inputdir that is printed in the runfile.
+        # result_dir is the resultdir that is printed in the runfile.
+        # caching_reldir is from where to check for files. This location
+        # is the same as the eventual model working dir.
+        if resultdir_is_workdir:
+            caching_reldir = result_dir
+            if not directory.is_absolute():
+                render_dir = _relpath(directory, result_dir)
+            else:
+                render_dir = directory
+            result_dir = pathlib.Path(".")
+        else:
+            caching_reldir = directory
+            render_dir = pathlib.Path(".")
+            if not result_dir.is_absolute():
+                result_dir = _relpath(result_dir, directory)
+
+        return result_dir, render_dir, runfilepath, results_runfilepath, caching_reldir
+
     def write(
-        self, directory=pathlib.Path("."), result_dir=None, resultdir_is_workdir=False
-    ):
+        self, directory=pathlib.Path("."), result_dir=None, 
+        resultdir_is_workdir=False,
+        render_projectfile = True
+        ):
         """
         Writes model input files.
 
@@ -432,52 +483,25 @@ class ImodflowModel(Model):
         And in the runfile, a value of ``../../output`` will be written for
         result_dir.
         """
-        # Coerce to pathlib.Path
-        directory = pathlib.Path(directory)
-        if result_dir is None:
-            result_dir = pathlib.Path("results")
-        else:
-            result_dir = pathlib.Path(result_dir)
 
-        # Create directories if necessary
-        directory.mkdir(exist_ok=True, parents=True)
-        result_dir.mkdir(exist_ok=True, parents=True)
-        runfilepath = directory / f"{self.modelname}.run"
-        results_runfilepath = result_dir / f"{self.modelname}.run"
+        #TODO: Find a cleaner way to pack and unpack these paths
+        result_dir, render_dir, runfilepath, results_runfilepath, caching_reldir = self._model_path_management(directory, result_dir, resultdir_is_workdir, render_projectfile)
 
-        # Where will the model run?
-        # Default is inputdir, next to runfile:
-        # in that case, resultdir is relative to inputdir
-        # If resultdir_is_workdir, inputdir is relative to resultdir
-        # render_dir is the inputdir that is printed in the runfile.
-        # result_dir is the resultdir that is printed in the runfile.
-        # caching_reldir is from where to check for files. This location
-        # is the same as the eventual model working dir.
-        if resultdir_is_workdir:
-            caching_reldir = result_dir
-            if not directory.is_absolute():
-                render_dir = _relpath(directory, result_dir)
-            else:
-                render_dir = directory
-            result_dir = pathlib.Path(".")
-        else:
-            caching_reldir = directory
-            render_dir = pathlib.Path(".")
-            if not result_dir.is_absolute():
-                result_dir = _relpath(result_dir, directory)
-
+        #TODO
         # Check if any caching packages are present, and set necessary states.
-        self._set_caching_packages(caching_reldir)
+        #self._set_caching_packages(caching_reldir)
 
         if not self.check is None:
             self.package_check()
 
+        #TODO Necessary?
         # Delete packages without data
-        self._delete_empty_packages(verbose=True)
+        #self._delete_empty_packages(verbose=True)
 
         runfile_content = self.render(
-            directory=render_dir, result_dir=result_dir, writehelp=False
-        )
+            directory=render_dir, 
+            render_projectfile=render_projectfile
+            )
 
         # Start writing
         # Write the runfile
@@ -490,7 +514,7 @@ class ImodflowModel(Model):
 
         # Write all IDFs and IPFs
         for pkgname, pkg in self.items():
-            if "x" in pkg.dataset.coords and "y" in pkg.dateset.coords or pkg._pkg_id == "wel":
+            if "x" in pkg.dataset.coords and "y" in pkg.dataset.coords or pkg._pkg_id == "wel":
                 try:
                     pkg.save(directory=directory / pkgname)
                 except Exception as error:
@@ -498,21 +522,26 @@ class ImodflowModel(Model):
                         f"An error occured during saving of package: {pkgname}."
                     ) from error
 
+    def _check_top_bottom(self):
+        """Check whether bottom of a layer does not exceed a top somewhere.
+        """
+        basic_ids = ["top", "bot"]
+
+        topkey, botkey = [self._get_pkgkey(pkg_id) for pkg_id in basic_ids]
+        top, bot = [self[key] for key in (topkey, botkey)]
+
+        if (top["top"] < bot["bottom"]).any():
+            raise ValueError(f"top should be larger than bottom in {topkey} and {botkey}")
+
     def package_check(self):
-        baskey = self._get_pkgkey("bas6")
-        if baskey is not None:
-            ibound = self[baskey]["ibound"]
-            top = self[baskey]["top"]
-            bottom = self[baskey]["bottom"]
-        else:
-            ibound = None
-            top = None
-            bottom = None
+        bndkey = self._get_pkgkey("bnd")
+        active_cells = self[bndkey]["ibound"] != 0
+
+        self._check_top_bottom()
 
         for pkg in self.values():
-            pkg._pkgcheck(ibound=ibound)
+            pkg._pkgcheck(active_cells=active_cells)
         
-
         modules = [pkg.__module__ for pkg in self.values()]
         if ('imod.flow.lpf' in modules) and ('imod.flow.bcf' in modules):
             raise ValueError("Both Layer Property Flow and Block Centered Flow packages defined, define either HydraulicConductivities or Transmissivities/Resistances.")
