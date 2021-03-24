@@ -183,17 +183,15 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
 
     def _render(self, render_projectfile=True, **kwargs):
         """
-        Rendering method for simple keyword packages (vdf, pcg).
-
         Returns
         -------
         rendered : str
             The rendered runfile part for a single boundary condition system.
         """
         if render_projectfile:
-            return self._template_projectfile.format(**kwargs)
+            return self._template_projectfile.render(**kwargs)
         else:
-            return self._template.format(**kwargs)
+            return self._template.render(**kwargs)
 
     def save(self, directory):
         for name, da in self.dataset.data_vars.items():  # pylint: disable=no-member
