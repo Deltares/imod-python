@@ -1,7 +1,7 @@
 import jinja2
 
 from imod.flow.pkgbase import Package
-
+import imod.util
 
 class TimeDiscretization(Package):
     """
@@ -44,7 +44,7 @@ class TimeDiscretization(Package):
         timestep_duration,
         n_timesteps=1,
         transient=True,
-        timestep_multiplier=1.0 #TODO: Does iMODFLOW support the timestep multiplier?
+        timestep_multiplier=1.0
     ):
         super(__class__, self).__init__()
         self.dataset["timestep_duration"] = timestep_duration
@@ -52,45 +52,36 @@ class TimeDiscretization(Package):
         self.dataset["transient"] = transient
         self.dataset["timestep_multiplier"] = timestep_multiplier
 
-    def _render(self, globaltimes):
-        d = {}
-        dicts = {}
-        _dis_mapping = (
-            ("perlen", "timestep_duration"),
-            ("nstp", "n_timesteps"),
-            ("sstr", "transient"),
-            ("tsmult", "timestep_multiplier"),
+    def _render(self):
+        """Render iMOD TIM file, which is the time discretization of the iMODFLOW model
+        """
+        _template = jinja2.Template(
+            '{%- for time in timestrings%}\n'
+            "{{time}},1,{{n_timesteps}},{{timestep_multiplier}}\n"
+            '{%- endfor %}'
         )
-        d["mapping"] = _dis_mapping
-        datavars = [t[1] for t in _dis_mapping]
-        for varname in datavars:
-            dicts[varname] = self._compose_values_time(varname, globaltimes)
-            if varname == "transient":
-                for k, v in dicts[varname].items():
-                    if v == 1:
-                        dicts[varname][k] = "tr"
-                    else:
-                        dicts[varname][k] = "ss"
-        d["dicts"] = dicts
-        d["n_periods"] = len(globaltimes)
+        times = self.dataset["time"].values
+        timestrings = [
+            imod.util._compose_timestring(time) for time in times
+            ]
+        
+        d = dict(
+            timestrings = timestrings, 
+            n_timesteps = self.dataset["n_timesteps"].item(),
+            timestep_multiplier = self.dataset["timestep_multiplier"].item())
 
-        _dis_template = jinja2.Template(
-            "\n"
-            "    nper = {{n_periods}}\n"
-            "    {%- for name, dictname in mapping -%}"
-            "        {%- for time, value in dicts[dictname].items() %}\n"
-            "    {{name}}_p{{time}} = {{value}}"
-            "        {%- endfor -%}"
-            "    {%- endfor -%}"
-        )
+        return _template.render(**d)
 
-        return _dis_template.render(d)
+    def save(self, path):
+        tim_content = self._render()
+
+        with open(path, "w") as f:
+            f.write(tim_content)
 
     def _pkgcheck(self, **kwargs):
         to_check = [
             "timestep_duration",
             "n_timesteps",
-            "transient",
         ]
 
         self._check_positive(to_check)

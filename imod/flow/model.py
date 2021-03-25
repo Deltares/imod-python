@@ -512,6 +512,10 @@ class ImodflowModel(Model):
             with open(results_runfilepath, "w") as f:
                 f.write(runfile_content)
 
+        # Write iMOD TIM file
+        diskey = self._get_pkgkey("dis")
+        self[diskey].save(directory / f"{diskey}.tim")
+
         # Write all IDFs and IPFs
         for pkgname, pkg in self.items():
             if "x" in pkg.dataset.coords and "y" in pkg.dataset.coords or pkg._pkg_id == "wel":
