@@ -362,11 +362,10 @@ class ImodflowModel(Model):
                 package_data = composition[pkg_id],
                 )
 
+            kwargs["nsub"] = self._calc_nsub(composition[pkg_id])
+
             if isinstance(package, BoundaryCondition):
-                kwargs["nsub"] = self._calc_nsub(composition[pkg_id])
                 kwargs["times"] = times
-            else:
-                kwargs["nsub"] = 1
 
             content.append(package._render(**kwargs))
             rendered.append(pkg_id)
@@ -514,7 +513,20 @@ class ImodflowModel(Model):
 
         # Write iMOD TIM file
         diskey = self._get_pkgkey("dis")
-        self[diskey].save(directory / f"{diskey}.tim")
+        time_path = directory / f"{diskey}.tim"
+        self[diskey].save(time_path)
+
+        # Create and write INI file to configure conversion/simulation
+        config = imod.flow.ImodflowConversion(
+            prjfile_in = render_dir / runfilepath.name,
+            runfile_out = render_dir / (runfilepath.stem + ".run"),
+            iss = 1,
+            timfname = render_dir / time_path.name
+        )
+        config_content = config.render()
+
+        with open(directory / "config_run.ini", "w") as f:
+            f.write(config_content)
 
         # Write all IDFs and IPFs
         for pkgname, pkg in self.items():
