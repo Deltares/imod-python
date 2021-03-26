@@ -56,9 +56,9 @@ class TimeDiscretization(Package):
         """Render iMOD TIM file, which is the time discretization of the iMODFLOW model
         """
         _template = jinja2.Template(
-            '{%- for time in timestrings%}\n'
+            '{% for time in timestrings%}'
             "{{time}},1,{{n_timesteps}},{{timestep_multiplier}}\n"
-            '{%- endfor %}'
+            '{% endfor %}\n'
         )
         times = self.dataset["time"].values
         timestrings = [
