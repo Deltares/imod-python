@@ -358,6 +358,7 @@ class ImodflowModel(Model):
 
             kwargs = dict(
                 pkg_id = pkg_id,
+                name = package.__class__.__name__,
                 variable_order = package._variable_order,
                 package_data = composition[pkg_id],
                 )
