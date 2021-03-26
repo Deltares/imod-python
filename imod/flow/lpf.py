@@ -40,7 +40,6 @@ class VerticalHydraulicConductivity(Package):
         super(__class__, self).__init__()
         self.dataset["k_vertical"] = k_vertical
 
-#TODO: For iMOD-WQ we excluded vertical anisotropy as it is only confusing. Also for iMODFLOW?
 class VerticalAnistropy(Package):
     """Specify the vertical anisotropy, defined as the 
     vertical hydraulic conductivity over the horizontal 
