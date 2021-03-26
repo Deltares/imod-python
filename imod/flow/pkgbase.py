@@ -41,7 +41,7 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
 
     _template_projectfile = jinja2.Template(
         "0001, ({{pkg_id}}), 1, {{name}}, {{variable_order}}\n"
-        '001, {{"{:03d}".format(nsub)}}\n'
+        '001, {{"{:03d}".format(n_entry)}}\n'
         "{%- for variable in variable_order%}\n" #Preserve variable order
         "{%-    for layer, value in package_data[variable].items()%}\n"
         "{%-        if value is string %}\n" #If string then assume path
@@ -103,7 +103,7 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
     def _compose_path(self, d, pattern=None):
         # d : dict
         # pattern : string or re.pattern
-        return util.compose(d, pattern).as_posix()
+        return str(util.compose(d, pattern))
 
     def _compose_values_layer(
         self, varname, directory, nlayer, time=None, da=None
@@ -217,10 +217,10 @@ class BoundaryCondition(Package, abc.ABC):
     """
 
     _template_projectfile = jinja2.Template(
-        '{{"{:04d}".format(package_data|length)}}, ({{pkg_id}}), name, {{variable_order}}\n'
+        '{{"{:04d}".format(package_data|length)}}, ({{pkg_id}}), 1, {{name}}, {{variable_order}}\n'
         "{%- for time_key, time_data in package_data.items()%}\n"
         '{{times[time_key]}}\n'
-        '{{"{:03d}".format(time_data|length)}}, {{"{:03d}".format(nsub)}}\n'
+        '{{"{:03d}".format(time_data|length)}}, {{"{:03d}".format(n_entry)}}\n'
         "{%-    for variable in variable_order%}\n" #Preserve variable order
         "{%-        for system, system_data in time_data[variable].items() %}\n"
         "{%-            for layer, value in system_data.items() %}\n"

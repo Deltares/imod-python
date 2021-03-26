@@ -271,8 +271,8 @@ class ImodflowModel(Model):
             directory=directory / pkgkey, globaltimes=globaltimes, nlayer=nlayer
         )
 
-    def _calc_nsub(self, composed_boundary_condition):
-        """Calculate amount of entries for each timestep.
+    def _calc_n_entry(self, composed_boundary_condition):
+        """Calculate amount of entries for each timestep and variable.
         """
 
         def first(d):
@@ -282,11 +282,11 @@ class ImodflowModel(Model):
 
         first_variable = first(first(composed_boundary_condition))
 
-        nsub = 0
+        n_entry = 0
         for sys in first_variable.values():
-            nsub += len(sys)
+            n_entry += len(sys)
 
-        return nsub
+        return n_entry
 
     def _compose_timestrings(self, globaltimes):
         time_format = "%Y-%m-%d %H:%M:%S"
@@ -363,10 +363,11 @@ class ImodflowModel(Model):
                 package_data = composition[pkg_id],
                 )
 
-            kwargs["nsub"] = self._calc_nsub(composition[pkg_id])
-
             if isinstance(package, BoundaryCondition):
+                kwargs["n_entry"] = self._calc_n_entry(composition[pkg_id])
                 kwargs["times"] = times
+            else:
+                kwargs["n_entry"] = nlayer
 
             content.append(package._render(**kwargs))
             rendered.append(pkg_id)
