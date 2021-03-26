@@ -103,7 +103,7 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
     def _compose_path(self, d, pattern=None):
         # d : dict
         # pattern : string or re.pattern
-        return str(util.compose(d, pattern))
+        return str(util.compose(d, pattern).resolve())
 
     def _compose_values_layer(
         self, varname, directory, nlayer, time=None, da=None

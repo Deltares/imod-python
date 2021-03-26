@@ -488,6 +488,8 @@ class ImodflowModel(Model):
         #TODO: Find a cleaner way to pack and unpack these paths
         result_dir, render_dir, runfilepath, results_runfilepath, caching_reldir = self._model_path_management(directory, result_dir, resultdir_is_workdir, render_projectfile)
 
+        directory = directory.resolve() #Force absolute paths
+
         #TODO
         # Check if any caching packages are present, and set necessary states.
         #self._set_caching_packages(caching_reldir)
@@ -500,7 +502,7 @@ class ImodflowModel(Model):
         #self._delete_empty_packages(verbose=True)
 
         runfile_content = self.render(
-            directory=render_dir, 
+            directory=directory,
             render_projectfile=render_projectfile
             )
 
@@ -519,11 +521,11 @@ class ImodflowModel(Model):
         self[diskey].save(time_path)
 
         # Create and write INI file to configure conversion/simulation
-        config = imod.flow.ImodflowConversion(
-            prjfile_in = render_dir / runfilepath.name,
-            runfile_out = render_dir / (runfilepath.stem + ".run"),
+        config = imod.flow.Modflow6Conversion(
+            prjfile_in = directory / runfilepath.name,
+            namfile_out = directory / (runfilepath.stem + ".nam"),
             iss = 1,
-            timfname = render_dir / time_path.name
+            timfname = directory / time_path.name
         )
         config_content = config.render()
 
