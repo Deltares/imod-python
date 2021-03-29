@@ -75,7 +75,7 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
                 raise ValueError(f"{var} in {self} must be positive")
 
     def compose(
-        self, directory, globaltimes, nlayer, 
+        self, directory, globaltimes, 
         compose_projectfile=True, composition=None
     ):
         """
@@ -88,15 +88,13 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
             Necessary to generate the paths for the runfile.
         globaltimes : list #TODO make this an *arg, change order.
             Not used, only included to comply with BoundaryCondition.compose
-        nlayer : int
-            Number of layers.
         """
 
         if composition is None:
             composition = Vividict()
 
         for varname in self.dataset.data_vars:
-            composition[self._pkg_id][varname] = self._compose_values_layer(varname, directory, nlayer)
+            composition[self._pkg_id][varname] = self._compose_values_layer(varname, directory)
 
         return composition
 
@@ -106,7 +104,7 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
         return str(util.compose(d, pattern).resolve())
 
     def _compose_values_layer(
-        self, varname, directory, nlayer, time=None, da=None
+        self, varname, directory, time=None, da=None
     ):
         """
         Composes paths to files, or gets the appropriate scalar value for
@@ -252,7 +250,7 @@ class BoundaryCondition(Package, abc.ABC):
 
             return runfile_times, starts_ends
 
-    def compose(self, directory, globaltimes, nlayer, 
+    def compose(self, directory, globaltimes,
         composition=None, sys_nr=1, compose_projectfile=True):
         """
         Composes all variables for one system. 
@@ -261,16 +259,16 @@ class BoundaryCondition(Package, abc.ABC):
         if composition is None:
             composition = Vividict()
 
-        for data_var in self.dataset.data_vars:
+        for data_var in self._variable_order:
             self._compose_values_timelayer(
-                data_var, globaltimes, directory, nlayer, 
+                data_var, globaltimes, directory,
                 values = composition, sys_nr = sys_nr,
                 compose_projectfile=compose_projectfile)
         
         return composition
 
     def _compose_values_timelayer(
-        self, varname, globaltimes, directory, nlayer, 
+        self, varname, globaltimes, directory, 
         values = None, sys_nr=1, da=None,
         compose_projectfile=True
     ):
@@ -321,7 +319,7 @@ class BoundaryCondition(Package, abc.ABC):
             da = self[varname]
 
         args = (varname, directory)
-        kwargs = dict(nlayer=nlayer, da=da, time=None)
+        kwargs = dict(da=da, time=None)
 
         if "time" in da.coords:
             runfile_times, starts_ends = self._get_runfile_times(da, globaltimes)

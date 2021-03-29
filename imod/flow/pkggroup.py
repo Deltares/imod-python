@@ -32,7 +32,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
         #self.reorder_keys()
 
     def compose(
-        self, directory, globaltimes, nlayer, 
+        self, directory, globaltimes,
         compose_projectfile=True, composition = None
         ):
 
@@ -43,7 +43,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
             sys_nr = i+1
             pkg.compose(
                 directory.joinpath(key), 
-                globaltimes, nlayer, 
+                globaltimes,
                 sys_nr=sys_nr,
                 compose_projectfile=compose_projectfile,
                 composition=composition
@@ -51,29 +51,8 @@ class PackageGroup(collections.UserDict, abc.ABC):
         
         return composition
 
-    def render(self, directory, globaltimes, nlayer, nrow, ncol):
-        d = {}
-        d["n_systems"] = len(self.keys())
-        d["n_layer"] = nlayer
-        d["n_variables"] = self._n_variables
-
-        content = [self._template.format(**d)]  # pylint: disable=no-member
-        for i, key in enumerate(self.key_order):
-            system_index = i + 1
-            content.append(
-                self[key]._render(
-                    directory=directory.joinpath(key),
-                    globaltimes=globaltimes,
-                    system_index=system_index,
-                    nlayer=nlayer,
-                )
-            )
-        return "".join(content)
-
-
 class ConstantHeadGroup(PackageGroup):
     _n_variables = 1
-
 
 class DrainageGroup(PackageGroup):
     _n_variables = 2

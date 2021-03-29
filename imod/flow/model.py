@@ -121,7 +121,7 @@ class ImodflowModel(Model):
         return package_groups
 
     def _hastime(self, pkg):
-        return (pkg._pkg_id == "wel" and "time" in pkg) or ("time" in pkg.dataset.coords)
+        return (pkg._pkg_id == "wel" and "time" in pkg.dataset) or ("time" in pkg.dataset.coords)
 
     def _use_cftime(self):
         """
@@ -255,7 +255,7 @@ class ImodflowModel(Model):
             timestep_duration=timestep_duration
         )
     
-    def _render_pkg(self, key, directory, globaltimes, nlayer):
+    def _render_pkg(self, key, directory, globaltimes):
         """
         Rendering method for straightforward packages
         """
@@ -268,10 +268,10 @@ class ImodflowModel(Model):
             else:
                 raise ValueError(f"No {key} package provided.")
         return self[pkgkey]._render(
-            directory=directory / pkgkey, globaltimes=globaltimes, nlayer=nlayer
+            directory=directory / pkgkey, globaltimes=globaltimes
         )
 
-    def _calc_n_entry(self, composed_boundary_condition):
+    def _calc_n_entry(self, composed_package, is_boundary_condition):
         """Calculate amount of entries for each timestep and variable.
         """
 
@@ -280,13 +280,17 @@ class ImodflowModel(Model):
             """
             return next(iter(d.values()))
 
-        first_variable = first(first(composed_boundary_condition))
+        if is_boundary_condition:
+            first_variable = first(first(composed_package))
+            n_entry = 0
+            for sys in first_variable.values():
+                n_entry += len(sys)
 
-        n_entry = 0
-        for sys in first_variable.values():
-            n_entry += len(sys)
+            return n_entry
 
-        return n_entry
+        else: #No time and no systems in regular packages
+            first_variable = first(composed_package)
+            return len(first_variable)
 
     def _compose_timestrings(self, globaltimes):
         time_format = "%Y-%m-%d %H:%M:%S"
@@ -303,7 +307,7 @@ class ImodflowModel(Model):
         return time_composed
 
     def _compose_all_packages(
-        self, directory, globaltimes, nlayer, compose_projectfile = True
+        self, directory, globaltimes, compose_projectfile = True
         ):
         """compose all transient packages before rendering. 
         
@@ -322,18 +326,18 @@ class ImodflowModel(Model):
         group_pkg_ids = [next(iter(group.values()))._pkg_id for group in group_packages]
 
         for group in group_packages:
-            group.compose(directory, globaltimes, nlayer,
+            group.compose(directory, globaltimes,
                 composition = composition, compose_projectfile=compose_projectfile)
 
         for key, package in self.items():
             if package._pkg_id not in group_pkg_ids:
-                package.compose(directory.joinpath(key), globaltimes, nlayer, 
+                package.compose(directory.joinpath(key), globaltimes,
                     composition=composition,
                     compose_projectfile=compose_projectfile)
             
         return composition
 
-    def _render_projectfile(self, directory, globaltimes, nlayer):
+    def _render_projectfile(self, directory, globaltimes):
         """Render projectfile. The projectfile has the hierarchy:
         package - time - system - layer
         """
@@ -341,7 +345,7 @@ class ImodflowModel(Model):
         content = []
 
         composition = self._compose_all_packages(
-            directory, globaltimes, nlayer,
+            directory, globaltimes,
             compose_projectfile=True
             )
         
@@ -364,17 +368,17 @@ class ImodflowModel(Model):
                 )
 
             if isinstance(package, BoundaryCondition):
-                kwargs["n_entry"] = self._calc_n_entry(composition[pkg_id])
+                kwargs["n_entry"] = self._calc_n_entry(composition[pkg_id], True)
                 kwargs["times"] = times
             else:
-                kwargs["n_entry"] = nlayer
+                kwargs["n_entry"] = self._calc_n_entry(composition[pkg_id], False)
 
             content.append(package._render(**kwargs))
             rendered.append(pkg_id)
         
         return "\n\n".join(content)
 
-    def _render_runfile(self, directory, globaltimes, nlayer):
+    def _render_runfile(self, directory, globaltimes):
         """Render runfile. The runfile has the hierarchy:
         time - package - system - layer
         """
@@ -390,9 +394,9 @@ class ImodflowModel(Model):
         nlayer = self[bndkey]["layer"].size
         
         if render_projectfile:
-            return self._render_projectfile(directory, globaltimes, nlayer)
+            return self._render_projectfile(directory, globaltimes)
         else:
-            return self._render_runfile(directory, globaltimes, nlayer)
+            return self._render_runfile(directory, globaltimes)
 
 
     def _model_path_management(
