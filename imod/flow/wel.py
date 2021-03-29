@@ -4,6 +4,7 @@ import imod
 import numpy as np
 from imod.wq import timeutil
 
+
 class Well(BoundaryCondition):
     """
     The Well package is used to simulate a specified flux to individual cells
@@ -102,14 +103,18 @@ class Well(BoundaryCondition):
             runfile_times = package_times = self_times
 
         starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
-        
+
         return runfile_times, starts_ends
 
     def _compose_values_timelayer(
-        self, varname, globaltimes, directory,
-        values = None, sys_nr=1,
-        compose_projectfile=True
-        ):
+        self,
+        varname,
+        globaltimes,
+        directory,
+        values=None,
+        sys_nr=1,
+        compose_projectfile=True,
+    ):
         """
         Composes paths to files, or gets the appropriate scalar value for
         a single variable in a dataset.
@@ -132,7 +137,7 @@ class Well(BoundaryCondition):
         values : Vividict
             Vividict (tree-like dictionary) to which values should be added
         sys_nr : int
-            System number. Defaults as 1, but for package groups it 
+            System number. Defaults as 1, but for package groups it
         compose_projectfile : bool
             Compose values in a hierarchy suitable for the projectfile
 
@@ -149,7 +154,7 @@ class Well(BoundaryCondition):
 
         if values is None:
             values = Vividict()
-        
+
         args = (varname, directory)
         kwargs = dict(time=None)
 
@@ -159,15 +164,23 @@ class Well(BoundaryCondition):
             for time, start_end in zip(runfile_times, starts_ends):
                 kwargs["time"] = time
                 if compose_projectfile == True:
-                    values[self._pkg_id][start_end][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
-                else: #render runfile
-                    values[start_end][self._pkg_id][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
+                    values[self._pkg_id][start_end][varname][
+                        sys_nr
+                    ] = self._compose_values_layer(*args, **kwargs)
+                else:  # render runfile
+                    values[start_end][self._pkg_id][varname][
+                        sys_nr
+                    ] = self._compose_values_layer(*args, **kwargs)
 
         else:
             if compose_projectfile == True:
-                values[self._pkg_id]["steady-state"][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
+                values[self._pkg_id]["steady-state"][varname][
+                    sys_nr
+                ] = self._compose_values_layer(*args, **kwargs)
             else:
-                values["steady-state"][self._pkg_id][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
+                values["steady-state"][self._pkg_id][varname][
+                    sys_nr
+                ] = self._compose_values_layer(*args, **kwargs)
 
         return values
 
@@ -191,11 +204,11 @@ class Well(BoundaryCondition):
             imod.ipf.write(path, outdf)
 
     def save(self, directory):
-            ds = self.dataset
+        ds = self.dataset
 
-            if "time" in ds:
-                for time, timeda in ds.groupby("time"):
-                    timedf = timeda.to_dataframe()
-                    self._save_layers(timedf, directory, time=time)
-            else:
-                self._save_layers(ds.to_dataframe(), directory)
+        if "time" in ds:
+            for time, timeda in ds.groupby("time"):
+                timedf = timeda.to_dataframe()
+                self._save_layers(timedf, directory, time=time)
+        else:
+            self._save_layers(ds.to_dataframe(), directory)

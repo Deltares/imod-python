@@ -11,7 +11,11 @@ this module.
 
 from imod.flow.bas import ActiveBoundary, Top, Bottom, StartingHead
 from imod.flow.bcf import Transmissivity, VerticalResistance
-from imod.flow.lpf import HorizontalHydraulicConductivity, VerticalHydraulicConductivity, VerticalAnistropy
+from imod.flow.lpf import (
+    HorizontalHydraulicConductivity,
+    VerticalHydraulicConductivity,
+    VerticalAnistropy,
+)
 from imod.flow.riv import River
 from imod.flow.drn import Drain
 from imod.flow.ghb import GeneralHeadBoundary

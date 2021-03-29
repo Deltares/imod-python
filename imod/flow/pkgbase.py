@@ -12,8 +12,11 @@ from imod.wq import timeutil
 
 from imod.flow.util import Vividict
 
-class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we using abstract methods?
-    """   
+
+class Package(
+    abc.ABC
+):  # TODO: Abstract base class really necessary? Are we using abstract methods?
+    """
     Base package for the different iMODFLOW packages.
     Package is used to share methods for specific packages with no time
     component.
@@ -32,7 +35,7 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
     """
 
     __slots__ = ("_pkg_id", "_variable_order")
-    
+
     _template = jinja2.Template(
         "{%- for layer, path in variable_data %}\n"
         '{{layer}}, 1.0, 0.0, "{{path}}"\n'
@@ -42,9 +45,9 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
     _template_projectfile = jinja2.Template(
         "0001, ({{pkg_id}}), 1, {{name}}, {{variable_order}}\n"
         '001, {{"{:03d}".format(n_entry)}}\n'
-        "{%- for variable in variable_order%}\n" #Preserve variable order
+        "{%- for variable in variable_order%}\n"  # Preserve variable order
         "{%-    for layer, value in package_data[variable].items()%}\n"
-        "{%-        if value is string %}\n" #If string then assume path
+        "{%-        if value is string %}\n"  # If string then assume path
         '1, 2, {{"{:03d}".format(layer)}}, 1.000, 0.000, -9999., {{value}}\n'
         "{%-        else %}\n"
         '1, 1, {{"{:03d}".format(layer)}}, 1.000, 0.000, {{value}}, ""\n'
@@ -52,7 +55,7 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
         "{%-    endfor %}\n"
         "{%- endfor %}\n"
     )
-    
+
     def __init__(self):
         super(__class__, self).__init__()
         self.dataset = xr.Dataset()
@@ -60,9 +63,9 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
     def __getitem__(self, key):
         return self.dataset.__getitem__(key)
 
-    #TODO:
-    #def __getattribute__(self, name):
-    #"implement the: https://github.com/xgcm/xgcm/issues/225#issuecomment-762248339"
+    # TODO:
+    # def __getattribute__(self, name):
+    # "implement the: https://github.com/xgcm/xgcm/issues/225#issuecomment-762248339"
     #    pass
 
     def _pkgcheck(self, **kwargs):
@@ -75,8 +78,7 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
                 raise ValueError(f"{var} in {self} must be positive")
 
     def compose(
-        self, directory, globaltimes, 
-        compose_projectfile=True, composition=None
+        self, directory, globaltimes, compose_projectfile=True, composition=None
     ):
         """
         Composes package, not useful for boundary conditions
@@ -94,7 +96,9 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
             composition = Vividict()
 
         for varname in self.dataset.data_vars:
-            composition[self._pkg_id][varname] = self._compose_values_layer(varname, directory)
+            composition[self._pkg_id][varname] = self._compose_values_layer(
+                varname, directory
+            )
 
         return composition
 
@@ -103,9 +107,7 @@ class Package(abc.ABC): #TODO: Abstract base class really necessary? Are we usin
         # pattern : string or re.pattern
         return str(util.compose(d, pattern).resolve())
 
-    def _compose_values_layer(
-        self, varname, directory, time=None, da=None
-    ):
+    def _compose_values_layer(self, varname, directory, time=None, da=None):
         """
         Composes paths to files, or gets the appropriate scalar value for
         a single variable in a dataset.
@@ -217,12 +219,12 @@ class BoundaryCondition(Package, abc.ABC):
     _template_projectfile = jinja2.Template(
         '{{"{:04d}".format(package_data|length)}}, ({{pkg_id}}), 1, {{name}}, {{variable_order}}\n'
         "{%- for time_key, time_data in package_data.items()%}\n"
-        '{{times[time_key]}}\n'
+        "{{times[time_key]}}\n"
         '{{"{:03d}".format(time_data|length)}}, {{"{:03d}".format(n_entry)}}\n'
-        "{%-    for variable in variable_order%}\n" #Preserve variable order
+        "{%-    for variable in variable_order%}\n"  # Preserve variable order
         "{%-        for system, system_data in time_data[variable].items() %}\n"
         "{%-            for layer, value in system_data.items() %}\n"
-        "{%-                if value is string %}\n" #If string then assume path
+        "{%-                if value is string %}\n"  # If string then assume path
         '1, 2, {{"{:03d}".format(layer)}}, 1.000, 0.000, -9999., {{value}}\n'
         "{%-                else %}\n"
         '1, 1, {{"{:03d}".format(layer)}}, 1.000, 0.000, {{value}}, ""\n'
@@ -234,43 +236,58 @@ class BoundaryCondition(Package, abc.ABC):
     )
 
     def _get_runfile_times(self, da, globaltimes):
-            da_times = da.coords["time"].values
-            if "timemap" in da.attrs:
-                timemap_keys = np.array(list(da.attrs["timemap"].keys()))
-                timemap_values = np.array(list(da.attrs["timemap"].values()))
-                package_times, inds = np.unique(
-                    np.concatenate([da_times, timemap_keys]), return_index=True
-                )
-                # Times to write in the runfile
-                runfile_times = np.concatenate([da_times, timemap_values])[inds]
-            else:
-                runfile_times = package_times = da_times
+        da_times = da.coords["time"].values
+        if "timemap" in da.attrs:
+            timemap_keys = np.array(list(da.attrs["timemap"].keys()))
+            timemap_values = np.array(list(da.attrs["timemap"].values()))
+            package_times, inds = np.unique(
+                np.concatenate([da_times, timemap_keys]), return_index=True
+            )
+            # Times to write in the runfile
+            runfile_times = np.concatenate([da_times, timemap_values])[inds]
+        else:
+            runfile_times = package_times = da_times
 
-            starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
+        starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
 
-            return runfile_times, starts_ends
+        return runfile_times, starts_ends
 
-    def compose(self, directory, globaltimes,
-        composition=None, sys_nr=1, compose_projectfile=True):
+    def compose(
+        self,
+        directory,
+        globaltimes,
+        composition=None,
+        sys_nr=1,
+        compose_projectfile=True,
+    ):
         """
-        Composes all variables for one system. 
+        Composes all variables for one system.
         """
-        
+
         if composition is None:
             composition = Vividict()
 
         for data_var in self._variable_order:
             self._compose_values_timelayer(
-                data_var, globaltimes, directory,
-                values = composition, sys_nr = sys_nr,
-                compose_projectfile=compose_projectfile)
-        
+                data_var,
+                globaltimes,
+                directory,
+                values=composition,
+                sys_nr=sys_nr,
+                compose_projectfile=compose_projectfile,
+            )
+
         return composition
 
     def _compose_values_timelayer(
-        self, varname, globaltimes, directory, 
-        values = None, sys_nr=1, da=None,
-        compose_projectfile=True
+        self,
+        varname,
+        globaltimes,
+        directory,
+        values=None,
+        sys_nr=1,
+        da=None,
+        compose_projectfile=True,
     ):
         """
         Composes paths to files, or gets the appropriate scalar value for
@@ -294,7 +311,7 @@ class BoundaryCondition(Package, abc.ABC):
         values : Vividict
             Vividict (tree-like dictionary) to which values should be added
         sys_nr : int
-            System number. Defaults as 1, but for package groups it 
+            System number. Defaults as 1, but for package groups it
         da : xr.DataArray, optional
             In some cases fetching the DataArray by varname is not desired.
             It can be passed directly via this optional argument.
@@ -327,14 +344,22 @@ class BoundaryCondition(Package, abc.ABC):
             for time, start_end in zip(runfile_times, starts_ends):
                 kwargs["time"] = time
                 if compose_projectfile == True:
-                    values[self._pkg_id][start_end][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
-                else: #render runfile
-                    values[start_end][self._pkg_id][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
+                    values[self._pkg_id][start_end][varname][
+                        sys_nr
+                    ] = self._compose_values_layer(*args, **kwargs)
+                else:  # render runfile
+                    values[start_end][self._pkg_id][varname][
+                        sys_nr
+                    ] = self._compose_values_layer(*args, **kwargs)
 
         else:
             if compose_projectfile == True:
-                values[self._pkg_id]["steady-state"][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
+                values[self._pkg_id]["steady-state"][varname][
+                    sys_nr
+                ] = self._compose_values_layer(*args, **kwargs)
             else:
-                values["steady-state"][self._pkg_id][varname][sys_nr] = self._compose_values_layer(*args, **kwargs)
+                values["steady-state"][self._pkg_id][varname][
+                    sys_nr
+                ] = self._compose_values_layer(*args, **kwargs)
 
-        return values 
+        return values

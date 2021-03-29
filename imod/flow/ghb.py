@@ -1,5 +1,6 @@
 from imod.flow.pkgbase import BoundaryCondition
 
+
 class GeneralHeadBoundary(BoundaryCondition):
     """
     The General-Head Boundary package is used to simulate head-dependent flux
@@ -13,12 +14,11 @@ class GeneralHeadBoundary(BoundaryCondition):
     conductance: float or xr.DataArray of floats
         the conductance of the GHB (COND).
     """
+
     _pkg_id = "ghb"
     _variable_order = ["conductance", "head"]
 
-    def __init__(
-        self, conductance=None, head=None):
+    def __init__(self, conductance=None, head=None):
         super(__class__, self).__init__()
         self.dataset["conductance"] = conductance
         self.dataset["head"] = head
-        

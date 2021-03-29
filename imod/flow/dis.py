@@ -3,6 +3,7 @@ import jinja2
 from imod.flow.pkgbase import Package
 import imod.util
 
+
 class TimeDiscretization(Package):
     """
     Time discretisation package class.
@@ -40,11 +41,7 @@ class TimeDiscretization(Package):
     _pkg_id = "dis"
 
     def __init__(
-        self,
-        timestep_duration,
-        n_timesteps=1,
-        transient=True,
-        timestep_multiplier=1.0
+        self, timestep_duration, n_timesteps=1, transient=True, timestep_multiplier=1.0
     ):
         super(__class__, self).__init__()
         self.dataset["timestep_duration"] = timestep_duration
@@ -53,22 +50,20 @@ class TimeDiscretization(Package):
         self.dataset["timestep_multiplier"] = timestep_multiplier
 
     def _render(self):
-        """Render iMOD TIM file, which is the time discretization of the iMODFLOW model
-        """
+        """Render iMOD TIM file, which is the time discretization of the iMODFLOW model"""
         _template = jinja2.Template(
-            '{% for time in timestrings%}'
+            "{% for time in timestrings%}"
             "{{time}},1,{{n_timesteps}},{{timestep_multiplier}}\n"
-            '{% endfor %}\n'
+            "{% endfor %}\n"
         )
         times = self.dataset["time"].values
-        timestrings = [
-            imod.util._compose_timestring(time) for time in times
-            ]
-        
+        timestrings = [imod.util._compose_timestring(time) for time in times]
+
         d = dict(
-            timestrings = timestrings, 
-            n_timesteps = self.dataset["n_timesteps"].item(),
-            timestep_multiplier = self.dataset["timestep_multiplier"].item())
+            timestrings=timestrings,
+            n_timesteps=self.dataset["n_timesteps"].item(),
+            timestep_multiplier=self.dataset["timestep_multiplier"].item(),
+        )
 
         return _template.render(**d)
 

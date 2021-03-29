@@ -1,5 +1,6 @@
 from imod.flow.pkgbase import BoundaryCondition
 
+
 class ConstantHead(BoundaryCondition):
     """
     The Constant Head package. The Time-Variant Specified-Head package is used

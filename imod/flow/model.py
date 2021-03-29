@@ -12,12 +12,13 @@ import pandas as pd
 import imod
 from imod.wq import timeutil
 import imod.util as util
-from imod.flow.util import Vividict #TODO: Find less confusing place for Vividict
+from imod.flow.util import Vividict  # TODO: Find less confusing place for Vividict
 
 from imod.flow.pkggroup import PackageGroups
 from imod.flow.pkgbase import BoundaryCondition
 
 from dataclasses import dataclass
+
 
 def _relpath(path, to):
     # Wraps os.path.relpath
@@ -121,7 +122,9 @@ class ImodflowModel(Model):
         return package_groups
 
     def _hastime(self, pkg):
-        return (pkg._pkg_id == "wel" and "time" in pkg.dataset) or ("time" in pkg.dataset.coords)
+        return (pkg._pkg_id == "wel" and "time" in pkg.dataset) or (
+            "time" in pkg.dataset.coords
+        )
 
     def _use_cftime(self):
         """
@@ -254,7 +257,7 @@ class ImodflowModel(Model):
         self["time_discretization"] = imod.flow.TimeDiscretization(
             timestep_duration=timestep_duration
         )
-    
+
     def _render_pkg(self, key, directory, globaltimes):
         """
         Rendering method for straightforward packages
@@ -272,12 +275,10 @@ class ImodflowModel(Model):
         )
 
     def _calc_n_entry(self, composed_package, is_boundary_condition):
-        """Calculate amount of entries for each timestep and variable.
-        """
+        """Calculate amount of entries for each timestep and variable."""
 
         def first(d):
-            """Get first value of dictionary values
-            """
+            """Get first value of dictionary values"""
             return next(iter(d.values()))
 
         if is_boundary_condition:
@@ -288,67 +289,70 @@ class ImodflowModel(Model):
 
             return n_entry
 
-        else: #No time and no systems in regular packages
+        else:  # No time and no systems in regular packages
             first_variable = first(composed_package)
             return len(first_variable)
 
     def _compose_timestrings(self, globaltimes):
         time_format = "%Y-%m-%d %H:%M:%S"
-        time_composed = self["time_discretization"]._compose_values_time("time", globaltimes)
+        time_composed = self["time_discretization"]._compose_values_time(
+            "time", globaltimes
+        )
         time_composed = dict(
             [
-                (timestep_nr, util._compose_timestring(
-                    time, time_format = time_format
-                    )
-                    ) 
+                (timestep_nr, util._compose_timestring(time, time_format=time_format))
                 for timestep_nr, time in time_composed.items()
             ]
         )
         return time_composed
 
-    def _compose_all_packages(
-        self, directory, globaltimes, compose_projectfile = True
-        ):
-        """compose all transient packages before rendering. 
-        
+    def _compose_all_packages(self, directory, globaltimes, compose_projectfile=True):
+        """compose all transient packages before rendering.
+
         Required because of outer timeloop
 
         Returns
         -------
         A tuple with lists of respectively the composed packages and boundary conditions
 
-        """       
+        """
         composition = Vividict()
 
         group_packages = self._group()
 
-        #Get get pkg_id from first value in dictionary in group list
+        # Get get pkg_id from first value in dictionary in group list
         group_pkg_ids = [next(iter(group.values()))._pkg_id for group in group_packages]
 
         for group in group_packages:
-            group.compose(directory, globaltimes,
-                composition = composition, compose_projectfile=compose_projectfile)
+            group.compose(
+                directory,
+                globaltimes,
+                composition=composition,
+                compose_projectfile=compose_projectfile,
+            )
 
         for key, package in self.items():
             if package._pkg_id not in group_pkg_ids:
-                package.compose(directory.joinpath(key), globaltimes,
+                package.compose(
+                    directory.joinpath(key),
+                    globaltimes,
                     composition=composition,
-                    compose_projectfile=compose_projectfile)
-            
+                    compose_projectfile=compose_projectfile,
+                )
+
         return composition
 
     def _render_projectfile(self, directory, globaltimes):
         """Render projectfile. The projectfile has the hierarchy:
         package - time - system - layer
         """
-        
+
         content = []
 
         composition = self._compose_all_packages(
-            directory, globaltimes,
-            compose_projectfile=True
-            )
-        
+            directory, globaltimes, compose_projectfile=True
+        )
+
         times = self._compose_timestrings(globaltimes)
 
         rendered = []
@@ -358,14 +362,14 @@ class ImodflowModel(Model):
             pkg_id = package._pkg_id
 
             if (pkg_id in rendered) or (pkg_id in ignored):
-                continue #Skip if already rendered (for groups) or not necessary to render
+                continue  # Skip if already rendered (for groups) or not necessary to render
 
             kwargs = dict(
-                pkg_id = pkg_id,
-                name = package.__class__.__name__,
-                variable_order = package._variable_order,
-                package_data = composition[pkg_id],
-                )
+                pkg_id=pkg_id,
+                name=package.__class__.__name__,
+                variable_order=package._variable_order,
+                package_data=composition[pkg_id],
+            )
 
             if isinstance(package, BoundaryCondition):
                 kwargs["n_entry"] = self._calc_n_entry(composition[pkg_id], True)
@@ -375,7 +379,7 @@ class ImodflowModel(Model):
 
             content.append(package._render(**kwargs))
             rendered.append(pkg_id)
-        
+
         return "\n\n".join(content)
 
     def _render_runfile(self, directory, globaltimes):
@@ -392,20 +396,15 @@ class ImodflowModel(Model):
         globaltimes = self[diskey]["time"].values
         bndkey = self._get_pkgkey("bnd")
         nlayer = self[bndkey]["layer"].size
-        
+
         if render_projectfile:
             return self._render_projectfile(directory, globaltimes)
         else:
             return self._render_runfile(directory, globaltimes)
 
-
     def _model_path_management(
-        self, 
-        directory, 
-        result_dir, 
-        resultdir_is_workdir,
-        render_projectfile
-        ):
+        self, directory, result_dir, resultdir_is_workdir, render_projectfile
+    ):
         # Coerce to pathlib.Path
         directory = pathlib.Path(directory)
         if result_dir is None:
@@ -416,7 +415,7 @@ class ImodflowModel(Model):
         # Create directories if necessary
         directory.mkdir(exist_ok=True, parents=True)
         result_dir.mkdir(exist_ok=True, parents=True)
-        
+
         if render_projectfile:
             ext = ".prj"
         else:
@@ -449,10 +448,12 @@ class ImodflowModel(Model):
         return result_dir, render_dir, runfilepath, results_runfilepath, caching_reldir
 
     def write(
-        self, directory=pathlib.Path("."), result_dir=None, 
+        self,
+        directory=pathlib.Path("."),
+        result_dir=None,
         resultdir_is_workdir=False,
-        render_projectfile = True
-        ):
+        render_projectfile=True,
+    ):
         """
         Writes model input files.
 
@@ -489,26 +490,33 @@ class ImodflowModel(Model):
         result_dir.
         """
 
-        #TODO: Find a cleaner way to pack and unpack these paths
-        result_dir, render_dir, runfilepath, results_runfilepath, caching_reldir = self._model_path_management(directory, result_dir, resultdir_is_workdir, render_projectfile)
+        # TODO: Find a cleaner way to pack and unpack these paths
+        (
+            result_dir,
+            render_dir,
+            runfilepath,
+            results_runfilepath,
+            caching_reldir,
+        ) = self._model_path_management(
+            directory, result_dir, resultdir_is_workdir, render_projectfile
+        )
 
-        directory = directory.resolve() #Force absolute paths
+        directory = directory.resolve()  # Force absolute paths
 
-        #TODO
+        # TODO
         # Check if any caching packages are present, and set necessary states.
-        #self._set_caching_packages(caching_reldir)
+        # self._set_caching_packages(caching_reldir)
 
         if not self.check is None:
             self.package_check()
 
-        #TODO Necessary?
+        # TODO Necessary?
         # Delete packages without data
-        #self._delete_empty_packages(verbose=True)
+        # self._delete_empty_packages(verbose=True)
 
         runfile_content = self.render(
-            directory=directory,
-            render_projectfile=render_projectfile
-            )
+            directory=directory, render_projectfile=render_projectfile
+        )
 
         # Start writing
         # Write the runfile
@@ -526,10 +534,10 @@ class ImodflowModel(Model):
 
         # Create and write INI file to configure conversion/simulation
         config = imod.flow.Modflow6Conversion(
-            prjfile_in = directory / runfilepath.name,
-            namfile_out = directory / (runfilepath.stem + ".nam"),
-            iss = 1,
-            timfname = directory / time_path.name
+            prjfile_in=directory / runfilepath.name,
+            namfile_out=directory / (runfilepath.stem + ".nam"),
+            iss=1,
+            timfname=directory / time_path.name,
         )
         config_content = config.render()
 
@@ -538,7 +546,11 @@ class ImodflowModel(Model):
 
         # Write all IDFs and IPFs
         for pkgname, pkg in self.items():
-            if "x" in pkg.dataset.coords and "y" in pkg.dataset.coords or pkg._pkg_id == "wel":
+            if (
+                "x" in pkg.dataset.coords
+                and "y" in pkg.dataset.coords
+                or pkg._pkg_id == "wel"
+            ):
                 try:
                     pkg.save(directory=directory / pkgname)
                 except Exception as error:
@@ -547,15 +559,16 @@ class ImodflowModel(Model):
                     ) from error
 
     def _check_top_bottom(self):
-        """Check whether bottom of a layer does not exceed a top somewhere.
-        """
+        """Check whether bottom of a layer does not exceed a top somewhere."""
         basic_ids = ["top", "bot"]
 
         topkey, botkey = [self._get_pkgkey(pkg_id) for pkg_id in basic_ids]
         top, bot = [self[key] for key in (topkey, botkey)]
 
         if (top["top"] < bot["bottom"]).any():
-            raise ValueError(f"top should be larger than bottom in {topkey} and {botkey}")
+            raise ValueError(
+                f"top should be larger than bottom in {topkey} and {botkey}"
+            )
 
     def package_check(self):
         bndkey = self._get_pkgkey("bnd")
@@ -565,7 +578,9 @@ class ImodflowModel(Model):
 
         for pkg in self.values():
             pkg._pkgcheck(active_cells=active_cells)
-        
+
         modules = [pkg.__module__ for pkg in self.values()]
-        if ('imod.flow.lpf' in modules) and ('imod.flow.bcf' in modules):
-            raise ValueError("Both Layer Property Flow and Block Centered Flow packages defined, define either HydraulicConductivities or Transmissivities/Resistances.")
+        if ("imod.flow.lpf" in modules) and ("imod.flow.bcf" in modules):
+            raise ValueError(
+                "Both Layer Property Flow and Block Centered Flow packages defined, define either HydraulicConductivities or Transmissivities/Resistances."
+            )

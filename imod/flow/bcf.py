@@ -1,11 +1,12 @@
 from imod.flow.pkgbase import Package
 
+
 class Transmissivity(Package):
-    """Transmissivity of the aquifer [L^2/T], 
-    defined as the thickness multiplied by the horizontal hydraulic 
+    """Transmissivity of the aquifer [L^2/T],
+    defined as the thickness multiplied by the horizontal hydraulic
     conductivity. Using this package means you follow MODFLOW 2005's
-    Quasi-3D "Block Centred Flow (BCF)" schematization, 
-    meaning you cannot assign a vertical hydraulic conductivity as well. 
+    Quasi-3D "Block Centred Flow (BCF)" schematization,
+    meaning you cannot assign a vertical hydraulic conductivity as well.
     Instead use the vertical resistance.
 
     Parameters
@@ -21,14 +22,15 @@ class Transmissivity(Package):
         super(__class__, self).__init__()
         self.dataset["transmissivity"] = transmissivity
 
+
 class VerticalResistance(Package):
     """Vertical Resistance of the aquitard [T],
-    defined as the thickness of the aquitard divided by the 
-    vertical horizontal conductivity. 
-    
+    defined as the thickness of the aquitard divided by the
+    vertical horizontal conductivity.
+
     Using this package means you follow MODFLOW 2005's
-    Quasi-3D "Block Centred Flow (BCF)" schematization, 
-    meaning you cannot assign a horizontal hydraulic conductivity as well. 
+    Quasi-3D "Block Centred Flow (BCF)" schematization,
+    meaning you cannot assign a horizontal hydraulic conductivity as well.
     Instead use the transmissivity.
 
     Parameters

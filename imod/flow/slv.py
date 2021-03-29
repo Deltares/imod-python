@@ -1,6 +1,7 @@
 from imod.flow.pkgbase import Package
 import jinja2
 
+
 class PreconditionedConjugateGradientSolver(Package):
     """
     The Preconditioned Conjugate Gradient Solver is used to solve the finite
@@ -51,8 +52,16 @@ class PreconditionedConjugateGradientSolver(Package):
 
     _pkg_id = "pcg"
 
-    #TODO: update when all options are known
-    _variable_order = ["max_iter", "inner_iter", "hclose", "rclose", "relax", "npcond", "damp"]
+    # TODO: update when all options are known
+    _variable_order = [
+        "max_iter",
+        "inner_iter",
+        "hclose",
+        "rclose",
+        "relax",
+        "npcond",
+        "damp",
+    ]
 
     _template_projectfile = jinja2.Template(
         "0001, ({{pkg_id}}), 1, Precondition Conjugate-Gradient\n"
@@ -69,8 +78,8 @@ class PreconditionedConjugateGradientSolver(Package):
         hclose=1.0e-4,
         relax=0.98,
         damp=1.0,
-        npcond=1
-        ):
+        npcond=1,
+    ):
         super(__class__, self).__init__()
         self.dataset["max_iter"] = max_iter
         self.dataset["inner_iter"] = inner_iter
@@ -80,8 +89,8 @@ class PreconditionedConjugateGradientSolver(Package):
         self.dataset["npcond"] = npcond
         self.dataset["damp"] = damp
 
-        #TODO Check with Peter what these settings do
-        #I now used the settings from the LHM here...
+        # TODO Check with Peter what these settings do
+        # I now used the settings from the LHM here...
         self.dataset["IPRPCG"] = 0
         self.dataset["MUTPCG"] = 1
         self.dataset["DAMPPCGT"] = 1.0

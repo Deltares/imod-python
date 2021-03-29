@@ -2,6 +2,7 @@ from imod.flow.pkgbase import Package
 import scipy.ndimage
 import numpy as np
 
+
 class ActiveBoundary(Package):
     """Specify the locations of active, inactive, and specified head in cells
 
@@ -21,12 +22,13 @@ class ActiveBoundary(Package):
         super(__class__, self).__init__()
         self.dataset["ibound"] = ibound
 
-    def _pkgcheck(self, active_cells = None):
+    def _pkgcheck(self, active_cells=None):
         _, nlabels = scipy.ndimage.label(active_cells.values)
         if nlabels > 1:
             raise ValueError(
                 f"{nlabels} disconnected model domain detected in the ibound in {bndkey}"
             )
+
 
 class Top(Package):
     """The top of the aquifers
@@ -36,7 +38,7 @@ class Top(Package):
     top: float or xr.DataArray of floats
         is the top elevation. For the common situation in which the
         top layer represents a water-table aquifer, it may be reasonable to set
-        `top` equal to land-surface elevation. The DataArray should at 
+        `top` equal to land-surface elevation. The DataArray should at
         least include the `layer` dimension.
     """
 
@@ -46,6 +48,7 @@ class Top(Package):
     def __init__(self, top):
         super(__class__, self).__init__()
         self.dataset["top"] = top
+
 
 class Bottom(Package):
     """The bottom of the aquifers
@@ -63,6 +66,7 @@ class Bottom(Package):
     def __init__(self, bottom):
         super(__class__, self).__init__()
         self.dataset["bottom"] = bottom
+
 
 class StartingHead(Package):
     """The initial head in all cells
@@ -82,7 +86,7 @@ class StartingHead(Package):
     def __init__(self, starting_head):
         super(__class__, self).__init__()
         self.dataset["starting_head"] = starting_head
-    
+
     def _pkgcheck(self, active_cells=None):
         if (active_cells & np.isnan(self.dataset["starting_head"])).any():
             raise ValueError(
