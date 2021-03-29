@@ -28,13 +28,14 @@ class Well(BoundaryCondition):
     """
 
     _pkg_id = "wel"
+    _variable_order = ["rate"]
 
     def __init__(
         self,
-        id_name,
-        x,
-        y,
-        rate,
+        id_name=None,
+        x=None,
+        y=None,
+        rate=None,
         layer=None,
         time=None,
     ):
@@ -50,48 +51,48 @@ class Well(BoundaryCondition):
         variables = {k: np.atleast_1d(v) for k, v in variables.items() if v is not None}
         length = max(map(len, variables.values()))
         index = np.arange(1, length + 1)
-        self["index"] = index
+        self.dataset["index"] = index
 
         for k, v in variables.items():
             if v.size == index.size:
-                self[k] = ("index", v)
+                self.dataset[k] = ("index", v)
             elif v.size == 1:
-                self[k] = ("index", np.full(length, v))
+                self.dataset[k] = ("index", np.full(length, v))
             else:
                 raise ValueError(f"Length of {k} does not match other arguments")
 
-    def _compose_values_layer(self, directory, nlayer, name, time=None):
+    def _compose_values_layer(self, varname, directory, time=None):
         values = {}
-        d = {"directory": directory, "name": name, "extension": ".ipf"}
+        d = {"directory": directory, "name": self._pkg_id, "extension": ".ipf"}
 
         if time is None:
-            if "layer" in self:
-                for layer in np.unique(self["layer"]):
+            if "layer" in self.dataset:
+                for layer in np.unique(self.dataset["layer"]):
                     layer = int(layer)
                     d["layer"] = layer
-                    values[layer] = self._compose(d)
+                    values[layer] = self._compose_path(d)
             else:
-                values["?"] = self._compose(d)
+                values["?"] = self._compose_path(d)
 
         else:
             d["time"] = time
-            if "layer" in self:
+            if "layer" in self.dataset:
                 # Since the well data is in long table format, it's the only
                 # input that has to be inspected.
                 select = np.argwhere((self["time"] == time).values)
                 for layer in np.unique(self["layer"].values[select]):
                     d["layer"] = layer
-                    values[layer] = self._compose(d)
+                    values[layer] = self._compose_path(d)
             else:
-                values["?"] = self._compose(d)
+                values["?"] = self._compose_path(d)
 
         return values
 
     def _get_runfile_times(self, globaltimes):
         self_times = np.unique(self["time"].values)
-        if "timemap" in self.attrs:
-            timemap_keys = np.array(list(self.attrs["timemap"].keys()))
-            timemap_values = np.array(list(self.attrs["timemap"].values()))
+        if "timemap" in self.dataset.attrs:
+            timemap_keys = np.array(list(self.dataset.attrs["timemap"].keys()))
+            timemap_values = np.array(list(self.dataset.attrs["timemap"].values()))
             package_times, inds = np.unique(
                 np.concatenate([self_times, timemap_keys]), return_index=True
             )
@@ -105,7 +106,7 @@ class Well(BoundaryCondition):
         return runfile_times, starts_ends
 
     def _compose_values_timelayer(
-        self, varname, globaltimes, directory, nlayer, 
+        self, varname, globaltimes, directory,
         values = None, sys_nr=1,
         compose_projectfile=True
         ):
@@ -152,7 +153,7 @@ class Well(BoundaryCondition):
         args = (varname, directory)
         kwargs = dict(time=None)
 
-        if "time" in self:
+        if "time" in self.dataset:
             runfile_times, starts_ends = self._get_runfile_times(globaltimes)
 
             for time, start_end in zip(runfile_times, starts_ends):
@@ -182,11 +183,11 @@ class Well(BoundaryCondition):
                 d["layer"] = layer
                 # Ensure right order
                 outdf = layerdf[["x", "y", "rate", "id_name"]]
-                path = self._compose(d)
+                path = self._compose_path(d)
                 imod.ipf.write(path, outdf)
         else:
             outdf = df[["x", "y", "rate", "id_name"]]
-            path = self._compose(d)
+            path = self._compose_path(d)
             imod.ipf.write(path, outdf)
 
     def save(self, directory):
@@ -195,6 +196,6 @@ class Well(BoundaryCondition):
             if "time" in ds:
                 for time, timeda in ds.groupby("time"):
                     timedf = timeda.to_dataframe()
-                    ds._save_layers(timedf, directory, time=time)
+                    self._save_layers(timedf, directory, time=time)
             else:
-                ds._save_layers(ds.to_dataframe(), directory)
+                self._save_layers(ds.to_dataframe(), directory)
