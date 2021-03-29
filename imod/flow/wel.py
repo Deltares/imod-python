@@ -1,5 +1,8 @@
 from imod.flow.pkgbase import BoundaryCondition
 from imod.flow.util import Vividict
+import imod
+import numpy as np
+from imod.wq import timeutil
 
 class Well(BoundaryCondition):
     """
@@ -147,7 +150,7 @@ class Well(BoundaryCondition):
             values = Vividict()
         
         args = (varname, directory)
-        kwargs = dict(nlayer=nlayer, da=da, time=None)
+        kwargs = dict(time=None)
 
         if "time" in self:
             runfile_times, starts_ends = self._get_runfile_times(globaltimes)
