@@ -37,6 +37,7 @@ dependencies:
   - rioxarray
   - scipy
   - setuptools_scm
+  - sparse
   - sphinx
   - sphinx_rtd_theme
   - toolz
