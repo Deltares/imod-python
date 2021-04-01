@@ -13,6 +13,12 @@ import shapely.geometry as sg
 from scipy.io import FortranFile, FortranFormattingError
 
 
+# Unfortunately, the binary GEN files are written as Fortran Record files, so
+# they cannot be read directly with e.g. numpy.fromfile (like direct access) The
+# scipy FortranFile is mostly adequate, it just misses a method to read char
+# records (always ascii encoded; note all ascii is valid utf-8, but not vice
+# versa). Reading and writing methods are monkeypatched here.
+#
 # https://mail.python.org/pipermail/python-dev/2008-January/076194.html
 def monkeypatch_method(cls):
     def decorator(func):
@@ -43,6 +49,16 @@ def write_char_record(self, string: str):
     self._fp.write(bytes_string)
     nb.tofile(self._fp)
 
+# The binary GEN file has some idiosyncratic geometries:
+# * A separate circle geometry
+# * A seperate rectangle geometry
+# In OGC (WKT) terms, these are polygons.
+#
+# Both are defined by two vertices:
+# * Circle: center and any other outside point (from which we can infer the radius)
+# * Rectangle: (left, lower), (right, upper); may also be (left, upper), (right, lower)
+#
+# The other shapely geometries can be generated directly from the vertices.
 
 def from_circle(xy: np.ndarray) -> sg.Polygon:
     radius = np.sqrt(np.sum((xy[1] - xy[0]) ** 2))
@@ -95,7 +111,7 @@ POINT = 1027
 LINE = 1028
 MAX_NAME_WIDTH = 11
 
-# Map integers to strings
+# Map integer enumerators to strings
 GENTYPE_TO_NAME = {
     CIRCLE: "circle",
     POLYGON: "polygon",
@@ -136,6 +152,17 @@ GENTYPE_TO_VERTICES = {
 
 
 def read(path: Union[str, Path]) -> gpd.GeoDataFrame:
+    """
+    Read a binary GEN file to a geopandas GeoDataFrame.
+
+    Parameters
+    ----------
+    path: Union[str, Path]
+
+    Returns
+    -------
+    geodataframe: gpd.GeoDataFrame
+    """
     with warnings.catch_warnings(record=True):
         warnings.filterwarnings(
             "ignore", message="Given a dtype which is not unsigned."
@@ -178,7 +205,16 @@ def read(path: Union[str, Path]) -> gpd.GeoDataFrame:
     return gpd.GeoDataFrame(df, geometry=geometry)
 
 
-def vertices(geometry: Union[sg.Point, sg.Polygon, sg.LineString], ftype: str):
+def vertices(
+    geometry: Union[sg.Point, sg.Polygon, sg.LineString], ftype: str
+) -> (int, np.ndarray, int):
+    """
+    Infer from geometry, or convert from string, the feature type to the GEN
+    expected Enum (int).
+
+    Convert the geometry to the GEN expected vertices, and the number of
+    vertices.
+    """
     if ftype != "":
         # Start by checking whether the feature type matches the geometry
         try:
@@ -210,6 +246,30 @@ def write(
     geodataframe: gpd.GeoDataFrame,
     feature_type: Optional[str] = None,
 ) -> None:
+    """
+    Write a GeoDataFrame to a binary GEN file.
+
+    Note that the binary GEN file has two geometry types, circles and
+    rectangles, which cannot be mapped directly from a shapely type. Points,
+    lines, and polygons can be converted automatically.
+
+    In shapely, circles and rectangles will also be represented by polygons. To
+    specifically write circles and rectangles to a binary GEN file, an
+    additional column of strings is required which specifies the geometry type.
+
+    Parameters
+    ----------
+    path : Union[str, Path]
+    geodataframe : gpd.GeoDataFrame
+    feature_type : Optional[str]
+        Which column to interpret as geometry type, one of: point, line, polygon, circle,
+        rectangle. Default value is ``None``.
+
+    Returns
+    -------
+    None
+        Writes file.
+    """
     df = pd.DataFrame(geodataframe.drop(columns="geometry")).astype("string")
     if feature_type is not None:
         types = df.pop(feature_type).str.lower()
