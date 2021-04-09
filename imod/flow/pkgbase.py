@@ -72,7 +72,6 @@ class Package(
     )
 
     def __init__(self):
-        super(__class__, self).__init__()
         self.dataset = xr.Dataset()
 
     def __getitem__(self, key):
