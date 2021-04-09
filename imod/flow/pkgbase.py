@@ -266,16 +266,27 @@ class BoundaryCondition(Package, abc.ABC):
     """
 
     _template_projectfile = jinja2.Template(
+        # Specify amount of timesteps for a package
+        # 1 indicates if package is active or not
         '{{"{:04d}".format(package_data|length)}}, ({{pkg_id}}), 1, {{name}}, {{variable_order}}\n'
         "{%- for time_key, time_data in package_data.items()%}\n"
+        # Specify stress period
+        # Specify amount of variables and entries(nlay, nsys) to be expected
         "{{times[time_key]}}\n"
         '{{"{:03d}".format(time_data|length)}}, {{"{:03d}".format(n_entry)}}\n'
         "{%-    for variable in variable_order%}\n"  # Preserve variable order
         "{%-        for system, system_data in time_data[variable].items() %}\n"
         "{%-            for layer, value in system_data.items() %}\n"
-        "{%-                if value is string %}\n"  # If string then assume path
+        "{%-                if value is string %}\n"  
+        # If string then assume path:
+        # 1 indicates the layer is activated
+        # 2 indicates the second element of the final two elements should be read
+        # 1.000 is the multiplication factor
+        # 0.000 is the addition factor
+        # -9999 indicates there is no data, following iMOD usual practice
         '1, 2, {{"{:03d}".format(layer)}}, 1.000, 0.000, -9999., {{value}}\n'
         "{%-                else %}\n"
+        # Else assume a constant value is provided
         '1, 1, {{"{:03d}".format(layer)}}, 1.000, 0.000, {{value}}, ""\n'
         "{%-                endif %}\n"
         "{%-            endfor %}\n"
