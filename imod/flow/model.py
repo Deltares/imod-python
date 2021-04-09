@@ -580,9 +580,3 @@ class ImodflowModel(Model):
 
         for pkg in self.values():
             pkg._pkgcheck(active_cells=active_cells)
-
-        modules = [pkg.__module__ for pkg in self.values()]
-        if ("imod.flow.lpf" in modules) and ("imod.flow.bcf" in modules):
-            raise ValueError(
-                "Both Layer Property Flow and Block Centered Flow packages defined, define either HydraulicConductivities or Transmissivities/Resistances."
-            )
