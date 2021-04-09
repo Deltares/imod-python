@@ -128,7 +128,7 @@ class PreconditionedConjugateGradientSolver(Package):
         self.dataset["IQERROR"] = 1
         self.dataset["QERROR"] = 5.0
 
-    def _render(self, **kwargs):
+    def _render_projectfile(self, **kwargs):
         d = {k: v.item() for k, v in self.dataset.items()}
         d["pkg_id"] = self._pkg_id
 
