@@ -110,6 +110,7 @@ class Well(BoundaryCondition):
         varname,
         globaltimes,
         directory,
+        nlayer, 
         values=None,
         sys_nr=1,
         compose_projectfile=True,
@@ -133,6 +134,8 @@ class Well(BoundaryCondition):
         directory : str
             Path to working directory, where files will be written.
             Necessary to generate the paths for the runfile.
+        nlayer : int
+            Number of layers, unused
         values : Vividict
             Vividict (tree-like dictionary) to which values should be added
         sys_nr : int

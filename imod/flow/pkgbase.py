@@ -100,7 +100,7 @@ class Package(
                 raise ValueError(f"{var} in {self} must be positive")
 
     def compose(
-        self, directory, globaltimes, composition=None, **ignored
+        self, directory, globaltimes, nlayer, composition=None, **ignored
     ):
         """
         Composes package, not useful for boundary conditions
@@ -123,7 +123,7 @@ class Package(
 
         for varname in self.dataset.data_vars:
             composition[self._pkg_id][varname] = self._compose_values_layer(
-                varname, directory
+                varname, directory, nlayer
             )
 
         return composition
@@ -148,7 +148,7 @@ class Package(
         """
         return str(util.compose(d, pattern).resolve())
 
-    def _compose_values_layer(self, varname, directory, time=None):
+    def _compose_values_layer(self, varname, directory, nlayer, time=None):
         """
         Composes paths to files, or gets the appropriate scalar value for
         a single variable in a dataset.
@@ -160,6 +160,8 @@ class Package(
         directory : str
             Path to working directory, where files will be written.
             Necessary to generate the paths for the runfile.
+        nlayer : int
+            Amount of layers
         time : datetime like, optional
             Time corresponding to the value.
 
@@ -192,9 +194,11 @@ class Package(
         if "layer" not in da.coords:
             if idf:
                 pattern += "{extension}"
-                values["?"] = self._compose_path(d, pattern=pattern)
+                for layer in range(1, nlayer+1): #1-based indexing
+                    values[layer] = self._compose_path(d, pattern=pattern)
             else:
-                values["?"] = da.values[()]
+                for layer in range(1, nlayer+1): #1-based indexing
+                    values[layer] = da.values[()]
 
         else:
             pattern += "_l{layer}{extension}"
@@ -301,6 +305,7 @@ class BoundaryCondition(Package, abc.ABC):
         self,
         directory,
         globaltimes,
+        nlayer,
         composition=None,
         sys_nr=1,
         compose_projectfile=True,
@@ -317,6 +322,7 @@ class BoundaryCondition(Package, abc.ABC):
                 data_var,
                 globaltimes,
                 directory,
+                nlayer,
                 values=composition,
                 sys_nr=sys_nr,
                 compose_projectfile=compose_projectfile,
@@ -329,6 +335,7 @@ class BoundaryCondition(Package, abc.ABC):
         varname,
         globaltimes,
         directory,
+        nlayer,
         values=None,
         sys_nr=1,
         compose_projectfile=True,
@@ -352,10 +359,12 @@ class BoundaryCondition(Package, abc.ABC):
         directory : str
             Path to working directory, where files will be written.
             Necessary to generate the paths for the runfile.
+        nlayer : int
+            Number of layers
         values : Vividict
             Vividict (tree-like dictionary) to which values should be added
         sys_nr : int
-            System number. Defaults as 1, but for package groups it
+            System number. Defaults to 1, but for package groups it is used
         compose_projectfile : bool
             Compose values in a hierarchy suitable for the projectfile
 
@@ -375,7 +384,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         da = self[varname]
 
-        args = (varname, directory)
+        args = (varname, directory, nlayer)
         kwargs = dict(time=None)
 
         if "time" in da.coords:

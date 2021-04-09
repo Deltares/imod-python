@@ -343,7 +343,10 @@ class ImodflowModel(Model):
         Returns
         -------
         A tuple with lists of respectively the composed packages and boundary conditions
-        """
+        """      
+        bndkey = self._get_pkgkey("bnd")
+        nlayer = self[bndkey]["layer"].size
+
         composition = Vividict()
 
         group_packages = self._group()
@@ -355,6 +358,7 @@ class ImodflowModel(Model):
             group.compose(
                 directory,
                 globaltimes,
+                nlayer, 
                 composition=composition,
                 compose_projectfile=compose_projectfile,
             )
@@ -364,17 +368,20 @@ class ImodflowModel(Model):
                 package.compose(
                     directory.joinpath(key),
                     globaltimes,
+                    nlayer,
                     composition=composition,
                     compose_projectfile=compose_projectfile,
                 )
 
         return composition
 
-    def _render_projectfile(self, directory, globaltimes):
+    def _render_projectfile(self, directory):
         """
         Render projectfile. The projectfile has the hierarchy:
         package - time - system - layer
         """
+        diskey = self._get_pkgkey("dis")
+        globaltimes = self[diskey]["time"].values
 
         content = []
 
@@ -411,7 +418,7 @@ class ImodflowModel(Model):
 
         return "\n\n".join(content)
 
-    def _render_runfile(self, directory, globaltimes):
+    def _render_runfile(self, directory):
         """
         Render runfile. The runfile has the hierarchy:
         time - package - system - layer
@@ -422,15 +429,10 @@ class ImodflowModel(Model):
         """
         Render the runfile as a string, package by package.
         """
-        diskey = self._get_pkgkey("dis")
-        globaltimes = self[diskey]["time"].values
-        bndkey = self._get_pkgkey("bnd")
-        nlayer = self[bndkey]["layer"].size
-
         if render_projectfile:
-            return self._render_projectfile(directory, globaltimes)
+            return self._render_projectfile(directory)
         else:
-            return self._render_runfile(directory, globaltimes)
+            return self._render_runfile(directory)
 
     def _model_path_management(
         self, directory, result_dir, resultdir_is_workdir, render_projectfile

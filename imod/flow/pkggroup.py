@@ -29,7 +29,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
         # self.reorder_keys()
 
     def compose(
-        self, directory, globaltimes, compose_projectfile=True, composition=None
+        self, directory, globaltimes, nlayer, compose_projectfile=True, composition=None
     ):
 
         if composition is None:
@@ -40,6 +40,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
             pkg.compose(
                 directory.joinpath(key),
                 globaltimes,
+                nlayer,
                 sys_nr=sys_nr,
                 compose_projectfile=compose_projectfile,
                 composition=composition,
