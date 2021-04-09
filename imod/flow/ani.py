@@ -31,4 +31,4 @@ class HorizontalAnisotropy(Package):
     def __init__(self, anistropy_factor=None, anisotropy_angle=None):
         super(__class__, self).__init__()
         self.dataset["anistropy_factor"] = anistropy_factor
-        self.dataset["anistropy_angle"] = anistropy_angle
+        self.dataset["anistropy_angle"] = anisotropy_angle
