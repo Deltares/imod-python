@@ -1,7 +1,6 @@
 import collections
 import os
 import pathlib
-import subprocess
 
 import cftime
 import jinja2
@@ -18,6 +17,35 @@ from imod.flow.pkggroup import PackageGroups
 from imod.flow.pkgbase import BoundaryCondition
 
 from dataclasses import dataclass
+
+import collections
+import abc
+
+
+class IniFile(collections.UserDict, abc.ABC):
+    """
+    Some basic support for iMOD ini files here
+
+    These files contain the settings that iMOD uses to run its' batch fucntions.
+    For example to convert its' model description 
+    (a projectfile containing paths to respective .IDFs for each package) 
+    to a Modflow6 model.
+    """
+    # TODO: Create own key mapping to avoid keys like "edate"?
+    _template = jinja2.Template(
+        "{%- for key, value in settings %}\n" "{{key}}={{value}}\n" "{%- endfor %}\n"
+    )
+
+    def _format_datetimes(self):
+        for timekey in ["sdate", "edate"]:
+            if timekey in self.keys():
+                # If not string assume it is in some kind of datetime format
+                if type(self[timekey]) != str:
+                    self[timekey] = util._compose_timestring(self[timekey])
+
+    def render(self):
+        self._format_datetimes()
+        return self._template.render(settings=self.items())
 
 
 def _relpath(path, to):
@@ -535,7 +563,9 @@ class ImodflowModel(Model):
         self[diskey].save(time_path)
 
         # Create and write INI file to configure conversion/simulation
-        config = imod.flow.Modflow6Conversion(
+        config = IniFile(
+            sim_type=2,
+            function="runfile",
             prjfile_in=directory / runfilepath.name,
             namfile_out=directory / (runfilepath.stem + ".nam"),
             iss=1,

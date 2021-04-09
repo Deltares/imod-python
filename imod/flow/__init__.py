@@ -24,7 +24,6 @@ from imod.flow.model import ImodflowModel
 from imod.flow.dis import TimeDiscretization
 from imod.flow.slv import PreconditionedConjugateGradientSolver
 from imod.flow.sto import StorageCoefficient
-from imod.flow.ini import ImodflowConversion, Modflow2005Conversion, Modflow6Conversion
 
 import pathlib
 import warnings
