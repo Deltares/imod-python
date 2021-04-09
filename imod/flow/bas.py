@@ -52,6 +52,12 @@ class Top(Package):
         super(__class__, self).__init__()
         self.dataset["top"] = top
 
+    def _pkgcheck(self, active_cells=None):
+        vars_to_check = ["top"]
+        self._check_if_nan_in_active_cells(
+            active_cells=active_cells, 
+            vars_to_check=vars_to_check
+            )
 
 class Bottom(Package):
     """
@@ -72,6 +78,12 @@ class Bottom(Package):
         super(__class__, self).__init__()
         self.dataset["bottom"] = bottom
 
+    def _pkgcheck(self, active_cells=None):
+        vars_to_check = ["bottom"]
+        self._check_if_nan_in_active_cells(
+            active_cells=active_cells, 
+            vars_to_check=vars_to_check
+            )
 
 class StartingHead(Package):
     """
@@ -94,7 +106,8 @@ class StartingHead(Package):
         self.dataset["starting_head"] = starting_head
 
     def _pkgcheck(self, active_cells=None):
-        if (active_cells & np.isnan(self.dataset["starting_head"])).any():
-            raise ValueError(
-                f"Active cells in ibound may not have a nan value in starting_head"
+        vars_to_check = ["starting_head"]
+        self._check_if_nan_in_active_cells(
+            active_cells=active_cells, 
+            vars_to_check=vars_to_check
             )

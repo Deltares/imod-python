@@ -1,5 +1,5 @@
 from imod.flow.pkgbase import Package
-
+import numpy as np
 
 class HorizontalHydraulicConductivity(Package):
     """
@@ -23,6 +23,12 @@ class HorizontalHydraulicConductivity(Package):
         super(__class__, self).__init__()
         self.dataset["k_horizontal"] = k_horizontal
 
+    def _pkgcheck(self, active_cells=None):
+        vars_to_check = ["k_horizontal"]
+        self._check_if_nan_in_active_cells(
+            active_cells=active_cells, 
+            vars_to_check=vars_to_check
+            )
 
 class VerticalHydraulicConductivity(Package):
     """
@@ -48,6 +54,12 @@ class VerticalHydraulicConductivity(Package):
         super(__class__, self).__init__()
         self.dataset["k_vertical"] = k_vertical
 
+    def _pkgcheck(self, active_cells=None):
+        vars_to_check = ["k_vertical"]
+        self._check_if_nan_in_active_cells(
+            active_cells=active_cells, 
+            vars_to_check=vars_to_check
+            )
 
 class VerticalAnistropy(Package):
     """
@@ -65,3 +77,10 @@ class VerticalAnistropy(Package):
     def __init__(self, vertical_anistropy=None):
         super(__class__, self).__init__()
         self.dataset["vertical_anistropy"] = vertical_anistropy
+
+    def _pkgcheck(self, active_cells=None):
+        vars_to_check = ["vertical_anistropy"]
+        self._check_if_nan_in_active_cells(
+            active_cells=active_cells, 
+            vars_to_check=vars_to_check
+            )

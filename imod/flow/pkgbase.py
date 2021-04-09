@@ -71,6 +71,14 @@ class Package(
     def _pkgcheck(self, **kwargs):
         pass
 
+    def _check_if_nan_in_active_cells(self, active_cells=None, vars_to_check=None):
+        """Check if there are any nans in the active domain"""
+        for var in vars_to_check:
+            if (active_cells & np.isnan(self.dataset[var])).any():
+                raise ValueError(
+                    f"Active cells in ibound may not have a nan value in {var}"
+                )
+
     def _check_positive(self, varnames):
         for var in varnames:
             # Take care with nan values
