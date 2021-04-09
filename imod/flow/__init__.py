@@ -9,7 +9,7 @@ writing a full and correct model definition, since no extra checks are done by
 this module.
 """
 
-from imod.flow.bas import ActiveBoundary, Top, Bottom, StartingHead
+from imod.flow.bas import Boundary, Top, Bottom, StartingHead
 from imod.flow.bcf import Transmissivity, VerticalResistance
 from imod.flow.lpf import (
     HorizontalHydraulicConductivity,
