@@ -395,31 +395,27 @@ class BoundaryCondition(Package, abc.ABC):
 
         da = self[varname]
 
-        args = (varname, directory, nlayer)
-        kwargs = dict(time=None)
-
         if "time" in da.coords:
             runfile_times, starts_ends = self._get_runfile_times(da, globaltimes)
 
             for time, start_end in zip(runfile_times, starts_ends):
-                kwargs["time"] = time
                 if compose_projectfile == True:
                     values[self._pkg_id][start_end][varname][
                         system_index
-                    ] = self._compose_values_layer(*args, **kwargs)
+                    ] = self._compose_values_layer(varname, directory, nlayer, time=time)
                 else:  # render runfile
                     values[start_end][self._pkg_id][varname][
                         system_index
-                    ] = self._compose_values_layer(*args, **kwargs)
+                    ] = self._compose_values_layer(varname, directory, nlayer, time=time)
 
         else:
             if compose_projectfile == True:
                 values[self._pkg_id]["steady-state"][varname][
                     system_index
-                ] = self._compose_values_layer(*args, **kwargs)
-            else:
+                ] = self._compose_values_layer(varname, directory, nlayer, time=None)
+            else:  # render runfile
                 values["steady-state"][self._pkg_id][varname][
                     system_index
-                ] = self._compose_values_layer(*args, **kwargs)
+                ] = self._compose_values_layer(varname, directory, nlayer, time=None)
 
         return values
