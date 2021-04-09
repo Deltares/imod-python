@@ -1,5 +1,6 @@
 from imod.flow.pkgbase import Package
 
+
 class StorageCoefficient(Package):
     """
     Storage coefficient [-].
@@ -31,14 +32,15 @@ class StorageCoefficient(Package):
         super(__class__, self).__init__()
         self.dataset["storage_coefficient"] = storage_coefficient
 
+
 class SpecificStorage(Package):
     """
     Specific storage [L-1].
     Be careful, this is not the same as the storage coefficient.
 
     From wikipedia (https://en.wikipedia.org/wiki/Specific_storage):
-    The specific storage is the amount of water that a portion 
-    of an aquifer releases from storage, per unit mass or volume of aquifer, 
+    The specific storage is the amount of water that a portion
+    of an aquifer releases from storage, per unit mass or volume of aquifer,
     per unit change in hydraulic head, while remaining fully saturated.
 
     Parameters

@@ -27,10 +27,11 @@ class IniFile(collections.UserDict, abc.ABC):
     Some basic support for iMOD ini files here
 
     These files contain the settings that iMOD uses to run its' batch fucntions.
-    For example to convert its' model description 
-    (a projectfile containing paths to respective .IDFs for each package) 
+    For example to convert its' model description
+    (a projectfile containing paths to respective .IDFs for each package)
     to a Modflow6 model.
     """
+
     # TODO: Create own key mapping to avoid keys like "edate"?
     _template = jinja2.Template(
         "{%- for key, value in settings %}\n" "{{key}}={{value}}\n" "{%- endfor %}\n"
@@ -343,7 +344,7 @@ class ImodflowModel(Model):
         Returns
         -------
         A tuple with lists of respectively the composed packages and boundary conditions
-        """      
+        """
         bndkey = self._get_pkgkey("bnd")
         nlayer = self[bndkey]["layer"].size
 
@@ -358,7 +359,7 @@ class ImodflowModel(Model):
             group.compose(
                 directory,
                 globaltimes,
-                nlayer, 
+                nlayer,
                 composition=composition,
                 compose_projectfile=compose_projectfile,
             )

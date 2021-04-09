@@ -48,23 +48,23 @@ class PreconditionedConjugateGradientSolver(Package):
             1 is for Modified Incomplete Cholesky (for use on scalar computers)
             2 is for Polynomial (for use on vector computers or to conserve computer memory)
     damp: float, optional
-        the damping factor. 
+        the damping factor.
         It is typically set equal to one, which indicates
         no damping. A value less than 1 and greater than 0 causes damping. DAMP
         does not affect inner iterations; instead, it affects outer iterations.
         Default value: 1.0.
     damp_transient: float, optional
-        the damping factor for transient stress periods. 
-        it is read only when `damp` is specified as a negative value. 
-        If damp_transient is not read, then the single damping factor, 
+        the damping factor for transient stress periods.
+        it is read only when `damp` is specified as a negative value.
+        If damp_transient is not read, then the single damping factor,
         `damp`, is used for both transient and steady-state stress periods.
     printout_interval: int, optional
-        is the printout interval for PCG. 
-        If equal to zero, it is changed to 999. 
-        The maximum head change (positive or negative) and 
-        residual change are printed for each iteration of a time step 
-        whenever the time step is an even multiple of printout_interval. 
-        This printout also occurs at the end of each stress period 
+        is the printout interval for PCG.
+        If equal to zero, it is changed to 999.
+        The maximum head change (positive or negative) and
+        residual change are printed for each iteration of a time step
+        whenever the time step is an even multiple of printout_interval.
+        This printout also occurs at the end of each stress period
         regardless of the value of printout_interval.
     print_convergence_info: int, optional
         a flag that controls printing of convergence information from the solver:
@@ -109,7 +109,7 @@ class PreconditionedConjugateGradientSolver(Package):
         damp_transient=1.0,
         matrix_conditioning_method=1,
         printout_interval=0,
-        print_convergence_info=1
+        print_convergence_info=1,
     ):
         super(__class__, self).__init__()
         self.dataset["max_iter"] = max_iter

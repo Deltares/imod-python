@@ -1,15 +1,16 @@
 from imod.flow.pkgbase import Package
 import numpy as np
 
+
 class HorizontalHydraulicConductivity(Package):
     """
     Horizontal hydraulic conductivity [L/T] of the aquifers (between TOP and BOT).
 
-    This variable behaves somewhat similar to the 
-    horizontal hydraulic conductivity in MODFLOW 2005's 
-    "Layer Property Flow" schematization. 
-    
-    Note however that this does not hold for the 
+    This variable behaves somewhat similar to the
+    horizontal hydraulic conductivity in MODFLOW 2005's
+    "Layer Property Flow" schematization.
+
+    Note however that this does not hold for the
     vertical hydraulic conductivity:
     iMODFLOW uses the vertical hydraulic conductivity
     to specify the hydraulic conductivity of aquitards (between BOT and TOP)
@@ -30,18 +31,18 @@ class HorizontalHydraulicConductivity(Package):
     def _pkgcheck(self, active_cells=None):
         vars_to_check = ["k_horizontal"]
         self._check_if_nan_in_active_cells(
-            active_cells=active_cells, 
-            vars_to_check=vars_to_check
-            )
+            active_cells=active_cells, vars_to_check=vars_to_check
+        )
+
 
 class VerticalHydraulicConductivity(Package):
     """
     Vertical hydraulic conductivity [L/T] for aquitards (between BOT and TOP).
 
-    Note that this is different from MODFLOW 2005's 
+    Note that this is different from MODFLOW 2005's
     "Layer Property Flow" schematization.
     To specify the vertical hydraulic conductivity for aquifers,
-    use VerticalAnisotropy in combination with 
+    use VerticalAnisotropy in combination with
     HorizontalHydraulicConductivity.
 
     Parameters
@@ -60,14 +61,14 @@ class VerticalHydraulicConductivity(Package):
     def _pkgcheck(self, active_cells=None):
         vars_to_check = ["k_vertical"]
         self._check_if_nan_in_active_cells(
-            active_cells=active_cells, 
-            vars_to_check=vars_to_check
-            )
+            active_cells=active_cells, vars_to_check=vars_to_check
+        )
+
 
 class VerticalAnistropy(Package):
     """
-    Vertical anisotropy for aquifers [-], 
-    defined as the horizontal hydraulic conductivity 
+    Vertical anisotropy for aquifers [-],
+    defined as the horizontal hydraulic conductivity
     over the vertical hydraulic conductivity.
 
     Use this package in combination with HorizontalHydraulicConductivity
@@ -87,6 +88,5 @@ class VerticalAnistropy(Package):
     def _pkgcheck(self, active_cells=None):
         vars_to_check = ["vertical_anistropy"]
         self._check_if_nan_in_active_cells(
-            active_cells=active_cells, 
-            vars_to_check=vars_to_check
-            )
+            active_cells=active_cells, vars_to_check=vars_to_check
+        )

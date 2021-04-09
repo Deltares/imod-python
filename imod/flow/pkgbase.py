@@ -10,6 +10,7 @@ import pathlib
 from imod import util
 from imod.wq import timeutil
 
+
 class Vividict(dict):
     """
     Vividict is used to generate tree structures
@@ -43,7 +44,7 @@ class Package(
 
     __slots__ = ("_pkg_id", "_variable_order")
 
-    #TODO Runfile template not implemented yet
+    # TODO Runfile template not implemented yet
     _template_runfile = jinja2.Template(
         "{%- for layer, path in variable_data %}\n"
         '{{layer}}, 1.0, 0.0, "{{path}}"\n'
@@ -55,14 +56,14 @@ class Package(
         '001, {{"{:03d}".format(n_entry)}}\n'
         "{%- for variable in variable_order%}\n"  # Preserve variable order
         "{%-    for layer, value in package_data[variable].items()%}\n"
-        "{%-        if value is string %}\n"  
+        "{%-        if value is string %}\n"
         # If string then assume path:
         # 1 indicates the layer is activated
         # 2 indicates the second element of the final two elements should be read
         # 1.000 is the multiplication factor
         # 0.000 is the addition factor
         # -9999 indicates there is no data, following iMOD usual practice
-        '1, 2, {{"{:03d}".format(layer)}}, 1.000, 0.000, -9999., {{value}}\n' 
+        '1, 2, {{"{:03d}".format(layer)}}, 1.000, 0.000, -9999., {{value}}\n'
         "{%-        else %}\n"
         # Else assume a constant value is provided
         '1, 1, {{"{:03d}".format(layer)}}, 1.000, 0.000, {{value}}, ""\n'
@@ -99,9 +100,7 @@ class Package(
             if (self[var] < 0).any():
                 raise ValueError(f"{var} in {self} must be positive")
 
-    def compose(
-        self, directory, globaltimes, nlayer, composition=None, **ignored
-    ):
+    def compose(self, directory, globaltimes, nlayer, composition=None, **ignored):
         """
         Composes package, not useful for boundary conditions
 
@@ -130,7 +129,7 @@ class Package(
 
     def _compose_path(self, d, pattern=None):
         """
-        Construct a filename, following the iMOD conventions. 
+        Construct a filename, following the iMOD conventions.
         Returns an absolute path.
 
         Parameters
@@ -194,10 +193,10 @@ class Package(
         if "layer" not in da.coords:
             if idf:
                 pattern += "{extension}"
-                for layer in range(1, nlayer+1): #1-based indexing
+                for layer in range(1, nlayer + 1):  # 1-based indexing
                     values[layer] = self._compose_path(d, pattern=pattern)
             else:
-                for layer in range(1, nlayer+1): #1-based indexing
+                for layer in range(1, nlayer + 1):  # 1-based indexing
                     values[layer] = da.values[()]
 
         else:
@@ -236,7 +235,7 @@ class Package(
         Returns
         -------
         rendered : str
-            The rendered projfectfile part, 
+            The rendered projfectfile part,
             if part of PkgGroup: for a single boundary condition system.
         """
         return self._template_projectfile.render(**kwargs)
@@ -246,9 +245,9 @@ class Package(
         Returns
         -------
         rendered : str
-            The rendered runfile part, 
+            The rendered runfile part,
             if part of PkgGroup: for a single boundary condition system.
-        """        
+        """
         return self._template.render(**kwargs)
 
     def save(self, directory):
@@ -277,7 +276,7 @@ class BoundaryCondition(Package, abc.ABC):
         "{%-    for variable in variable_order%}\n"  # Preserve variable order
         "{%-        for system, system_data in time_data[variable].items() %}\n"
         "{%-            for layer, value in system_data.items() %}\n"
-        "{%-                if value is string %}\n"  
+        "{%-                if value is string %}\n"
         # If string then assume path:
         # 1 indicates the layer is activated
         # 2 indicates the second element of the final two elements should be read
@@ -402,11 +401,15 @@ class BoundaryCondition(Package, abc.ABC):
                 if compose_projectfile == True:
                     values[self._pkg_id][start_end][varname][
                         system_index
-                    ] = self._compose_values_layer(varname, directory, nlayer, time=time)
+                    ] = self._compose_values_layer(
+                        varname, directory, nlayer, time=time
+                    )
                 else:  # render runfile
                     values[start_end][self._pkg_id][varname][
                         system_index
-                    ] = self._compose_values_layer(varname, directory, nlayer, time=time)
+                    ] = self._compose_values_layer(
+                        varname, directory, nlayer, time=time
+                    )
 
         else:
             if compose_projectfile == True:

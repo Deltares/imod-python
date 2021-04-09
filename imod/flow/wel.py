@@ -110,7 +110,7 @@ class Well(BoundaryCondition):
         varname,
         globaltimes,
         directory,
-        nlayer, 
+        nlayer,
         values=None,
         system_index=1,
         compose_projectfile=True,

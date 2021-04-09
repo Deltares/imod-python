@@ -38,10 +38,10 @@ class Top(Package):
     Parameters
     ----------
     top: xr.DataArray of floats
-        is the top elevation with dimensions ("layer", "y", "x"). 
+        is the top elevation with dimensions ("layer", "y", "x").
         For the common situation in which the
-        top layer represents a water-table aquifer, 
-        it may be reasonable to set`top` equal to land-surface elevation. 
+        top layer represents a water-table aquifer,
+        it may be reasonable to set`top` equal to land-surface elevation.
         The DataArray should at least include the `layer` dimension.
     """
 
@@ -55,9 +55,9 @@ class Top(Package):
     def _pkgcheck(self, active_cells=None):
         vars_to_check = ["top"]
         self._check_if_nan_in_active_cells(
-            active_cells=active_cells, 
-            vars_to_check=vars_to_check
-            )
+            active_cells=active_cells, vars_to_check=vars_to_check
+        )
+
 
 class Bottom(Package):
     """
@@ -66,8 +66,8 @@ class Bottom(Package):
     Parameters
     ----------
     bottom: xr.DataArray of floats
-        is the bottom elevation of model layers or Quasi-3d confining beds, 
-        with dimensions ("layer", "y", "x"). 
+        is the bottom elevation of model layers or Quasi-3d confining beds,
+        with dimensions ("layer", "y", "x").
         The DataArray should at least include the `layer` dimension.
     """
 
@@ -81,9 +81,9 @@ class Bottom(Package):
     def _pkgcheck(self, active_cells=None):
         vars_to_check = ["bottom"]
         self._check_if_nan_in_active_cells(
-            active_cells=active_cells, 
-            vars_to_check=vars_to_check
-            )
+            active_cells=active_cells, vars_to_check=vars_to_check
+        )
+
 
 class StartingHead(Package):
     """
@@ -108,6 +108,5 @@ class StartingHead(Package):
     def _pkgcheck(self, active_cells=None):
         vars_to_check = ["starting_head"]
         self._check_if_nan_in_active_cells(
-            active_cells=active_cells, 
-            vars_to_check=vars_to_check
-            )
+            active_cells=active_cells, vars_to_check=vars_to_check
+        )
