@@ -10,9 +10,9 @@ class Drain(BoundaryCondition):
     Parameters
     ----------
     elevation: float or xr.DataArray of floats
-        elevation of the drain.
+        elevation of the drain, dims = ("layer", "y", "x").
     conductance: float or xr.DataArray of floats
-        is the conductance of the drain.
+        is the conductance of the drain, dims = ("layer", "y", "x").
     """
 
     _pkg_id = "drn"

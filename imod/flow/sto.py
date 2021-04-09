@@ -21,7 +21,7 @@ class StorageCoefficient(Package):
     Parameters
     ----------
     storage_coefficient : xr.DataArray
-        Storage coefficient.
+        Storage coefficient, dims = ("layer", "y", "x").
 
     """
 

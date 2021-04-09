@@ -13,7 +13,7 @@ class HorizontalHydraulicConductivity(Package):
     Parameters
     ----------
     k_horizontal : xr.DataArray
-        Horizontal hydraulic conductivity.
+        Horizontal hydraulic conductivity, dims = ("layer", "y", "x").
     """
 
     _pkg_id = "khv"
@@ -44,7 +44,7 @@ class VerticalHydraulicConductivity(Package):
     Parameters
     ----------
     k_vertical : xr.DataArray
-        Vertical hydraulic conductivity.
+        Vertical hydraulic conductivity, dims = ("layer", "y", "x").
     """
 
     _pkg_id = "kvv"
@@ -68,7 +68,7 @@ class VerticalAnistropy(Package):
     hydraulic conductivity.
 
     vertical_anistropy : xr.DataArray
-        Vertical anistropy factor (Kv/Kh).
+        Vertical anistropy factor (Kv/Kh), dims = ("layer", "y", "x").
     """
 
     _pkg_id = "kva"

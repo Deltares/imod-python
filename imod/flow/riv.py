@@ -10,15 +10,15 @@ class River(BoundaryCondition):
     Parameters
     ----------
     stage: float or xr.DataArray of floats
-        is the head in the river (STAGE).
+        is the head in the river (STAGE), dims = ("layer", "y", "x").
     bottom_elevation: float or xr.DataArray of floats
-        is the bottom of the riverbed (RBOT).
+        is the bottom of the riverbed (RBOT), dims = ("layer", "y", "x").
     conductance: float or xr.DataArray of floats
-        is the conductance of the river.
+        is the conductance of the river, dims = ("layer", "y", "x").
     infiltration_factor: float or xr.DataArray of floats
-        is the infiltration factor. This factor defines the
-        extra resistance exerted for infiltrating water compared to
-        exfiltrating water.
+        is the infiltration factor, dims = ("layer", "y", "x"). 
+        This factor defines the extra resistance exerted 
+        for infiltrating water compared to exfiltrating water.
     """
 
     _pkg_id = "riv"
