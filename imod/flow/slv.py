@@ -43,11 +43,36 @@ class PreconditionedConjugateGradientSolver(Package):
         problems a value of 0.99, 0.98, or 0.97 will reduce the number of
         iterations required for convergence.
         Default value: 0.98.
+    matrix_conditioning_method: int, optional
+        the flag used to select the matrix conditioning method
+            1 is for Modified Incomplete Cholesky (for use on scalar computers)
+            2 is for Polynomial (for use on vector computers or to conserve computer memory)
     damp: float, optional
-        is the damping factor. It is typically set equal to one, which indicates
+        the damping factor. 
+        It is typically set equal to one, which indicates
         no damping. A value less than 1 and greater than 0 causes damping. DAMP
         does not affect inner iterations; instead, it affects outer iterations.
         Default value: 1.0.
+    damp_transient: float, optional
+        the damping factor for transient stress periods. 
+        it is read only when `damp` is specified as a negative value. 
+        If damp_transient is not read, then the single damping factor, 
+        `damp`, is used for both transient and steady-state stress periods.
+    printout_interval: int, optional
+        is the printout interval for PCG. 
+        If equal to zero, it is changed to 999. 
+        The maximum head change (positive or negative) and 
+        residual change are printed for each iteration of a time step 
+        whenever the time step is an even multiple of printout_interval. 
+        This printout also occurs at the end of each stress period 
+        regardless of the value of printout_interval.
+    print_convergence_info: int, optional
+        a flag that controls printing of convergence information from the solver:
+            0 is for printing tables of maximum head change and residual each iteration
+            1 is for printing only the total number of iterations
+            2 is for no printing
+            3 is for printing only if convergence fails
+
     """
 
     _pkg_id = "pcg"
@@ -59,14 +84,17 @@ class PreconditionedConjugateGradientSolver(Package):
         "hclose",
         "rclose",
         "relax",
-        "npcond",
+        "matrix_conditioning_method",
         "damp",
+        "damp_transient",
+        "printout_interval",
+        "print_convergence_info",
     ]
 
     _template_projectfile = jinja2.Template(
         "0001, ({{pkg_id}}), 1, Precondition Conjugate-Gradient\n"
         "{{max_iter}}, {{inner_iter}}, {{hclose}}, {{rclose}}, {{relax}}, "
-        "{{npcond}}, {{IPRPCG}}, {{MUTPCG}}, {{damp}}, {{DAMPPCGT}}, "
+        "{{matrix_conditioning_method}}, {{printout_interval}}, {{print_convergence_info}}, {{damp}}, {{damp_transient}}, "
         "{{IQERROR}}, {{QERROR}}\n"
     )
 
@@ -78,7 +106,10 @@ class PreconditionedConjugateGradientSolver(Package):
         hclose=1.0e-4,
         relax=0.98,
         damp=1.0,
-        npcond=1,
+        damp_transient=1.0,
+        matrix_conditioning_method=1,
+        printout_interval=0,
+        print_convergence_info=1
     ):
         super(__class__, self).__init__()
         self.dataset["max_iter"] = max_iter
@@ -86,14 +117,14 @@ class PreconditionedConjugateGradientSolver(Package):
         self.dataset["rclose"] = rclose
         self.dataset["hclose"] = hclose
         self.dataset["relax"] = relax
-        self.dataset["npcond"] = npcond
+        self.dataset["matrix_conditioning_method"] = matrix_conditioning_method
         self.dataset["damp"] = damp
+        self.dataset["damp_transient"] = damp_transient
+        self.dataset["printout_interval"] = printout_interval
+        self.dataset["print_convergence_info"] = print_convergence_info
 
         # TODO Check with Peter what these settings do
         # I now used the settings from the LHM here...
-        self.dataset["IPRPCG"] = 0
-        self.dataset["MUTPCG"] = 1
-        self.dataset["DAMPPCGT"] = 1.0
         self.dataset["IQERROR"] = 1
         self.dataset["QERROR"] = 5.0
 
