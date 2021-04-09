@@ -226,7 +226,7 @@ class Package(
                 # solution roughly the same as for layer above?
                 values[start_end] = da.isel(time=itime).values[()]
         else:
-            values["?"] = da.values[()]
+            values["steady-state"] = da.values[()]
 
         return values
 
