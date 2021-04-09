@@ -27,7 +27,7 @@ class Boundary(Package):
         _, nlabels = scipy.ndimage.label(active_cells.values)
         if nlabels > 1:
             raise ValueError(
-                f"{nlabels} disconnected model domain detected in the ibound in {bndkey}"
+                f"{nlabels} disconnected model domain detected in the ibound"
             )
 
 
@@ -96,5 +96,5 @@ class StartingHead(Package):
     def _pkgcheck(self, active_cells=None):
         if (active_cells & np.isnan(self.dataset["starting_head"])).any():
             raise ValueError(
-                f"Active cells in ibound may not have a nan value in starting_head in {shdkey}"
+                f"Active cells in ibound may not have a nan value in starting_head"
             )
