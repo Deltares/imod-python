@@ -17,8 +17,16 @@ class River(BoundaryCondition):
         is the conductance of the river, dims = ("layer", "y", "x").
     infiltration_factor: float or xr.DataArray of floats
         is the infiltration factor, dims = ("layer", "y", "x"). 
-        This factor defines the extra resistance exerted 
-        for infiltrating water compared to exfiltrating water.
+        This factor defines the reduces the conductance
+        for infiltrating water compared to exfiltrating water:
+
+        cond = A/(c * iff)
+        
+        where 'A' [L2] is the area where surface water 
+        and groundwater interact, 'c' [L] is the resistance,
+        and 'iff' is the infiltration factor.
+        
+        The infiltration factor is thus equal or larger than 1.
     """
 
     _pkg_id = "riv"
