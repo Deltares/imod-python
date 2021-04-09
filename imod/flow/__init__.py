@@ -10,7 +10,7 @@ this module.
 """
 
 from imod.flow.bas import Boundary, Top, Bottom, StartingHead
-from imod.flow.lpf import (
+from imod.flow.conductivity import (
     HorizontalHydraulicConductivity,
     VerticalHydraulicConductivity,
     VerticalAnistropy,
