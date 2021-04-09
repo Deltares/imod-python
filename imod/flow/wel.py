@@ -112,7 +112,7 @@ class Well(BoundaryCondition):
         directory,
         nlayer, 
         values=None,
-        sys_nr=1,
+        system_index=1,
         compose_projectfile=True,
     ):
         """
@@ -138,7 +138,7 @@ class Well(BoundaryCondition):
             Number of layers, unused
         values : Vividict
             Vividict (tree-like dictionary) to which values should be added
-        sys_nr : int
+        system_index : int
             System number. Defaults as 1, but for package groups it
         compose_projectfile : bool
             Compose values in a hierarchy suitable for the projectfile
@@ -147,9 +147,9 @@ class Well(BoundaryCondition):
         -------
         values : Vividict
             A nested dictionary containing following the projectfile hierarchy:
-            {_pkg_id : {stress_period : {varname : {sys_nr : {lay_nr : value}}}}}
+            {_pkg_id : {stress_period : {varname : {system_index : {lay_nr : value}}}}}
             or runfile hierarchy:
-            {stress_period : {_pkg_id : {varname : {sys_nr : {lay_nr : value}}}}}
+            {stress_period : {_pkg_id : {varname : {system_index : {lay_nr : value}}}}}
             where 'value' can be a scalar or a path to a file.
             The stress period number may be the wildcard '?'.
         """
@@ -167,21 +167,21 @@ class Well(BoundaryCondition):
                 kwargs["time"] = time
                 if compose_projectfile == True:
                     values[self._pkg_id][start_end][varname][
-                        sys_nr
+                        system_index
                     ] = self._compose_values_layer(*args, **kwargs)
                 else:  # render runfile
                     values[start_end][self._pkg_id][varname][
-                        sys_nr
+                        system_index
                     ] = self._compose_values_layer(*args, **kwargs)
 
         else:
             if compose_projectfile == True:
                 values[self._pkg_id]["steady-state"][varname][
-                    sys_nr
+                    system_index
                 ] = self._compose_values_layer(*args, **kwargs)
             else:
                 values["steady-state"][self._pkg_id][varname][
-                    sys_nr
+                    system_index
                 ] = self._compose_values_layer(*args, **kwargs)
 
         return values

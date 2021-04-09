@@ -36,12 +36,12 @@ class PackageGroup(collections.UserDict, abc.ABC):
             composition = Vividict()
 
         for i, (key, pkg) in enumerate(self.items()):
-            sys_nr = i + 1
+            system_index = i + 1
             pkg.compose(
                 directory.joinpath(key),
                 globaltimes,
                 nlayer,
-                sys_nr=sys_nr,
+                system_index=system_index,
                 compose_projectfile=compose_projectfile,
                 composition=composition,
             )
