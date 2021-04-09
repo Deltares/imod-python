@@ -3,7 +3,7 @@ import scipy.ndimage
 import numpy as np
 
 
-class ActiveBoundary(Package):
+class Boundary(Package):
     """
     Specify the locations of active, inactive, and specified head in cells
 
