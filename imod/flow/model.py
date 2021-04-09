@@ -406,7 +406,7 @@ class ImodflowModel(Model):
             else:
                 kwargs["n_entry"] = self._calc_n_entry(composition[pkg_id], False)
 
-            content.append(package._render(**kwargs))
+            content.append(package._render_projectfile(**kwargs))
             rendered.append(pkg_id)
 
         return "\n\n".join(content)

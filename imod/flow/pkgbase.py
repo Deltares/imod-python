@@ -36,15 +36,15 @@ class Package(
     Used to check for duplicate entries, or to group multiple systems together
     (riv, ghb, drn).
 
-    The ``_template`` attribute is the template for a section of the runfile.
+    The ``_template_runfile`` attribute is the template for a section of the runfile.
     This is filled in based on the metadata from the DataArrays that are within
-    the Package.
-
+    the Package. Same applies to ``_template_projectfile`` for the projectfile.
     """
 
     __slots__ = ("_pkg_id", "_variable_order")
 
-    _template = jinja2.Template(
+    #TODO Runfile template not implemented yet
+    _template_runfile = jinja2.Template(
         "{%- for layer, path in variable_data %}\n"
         '{{layer}}, 1.0, 0.0, "{{path}}"\n'
         "{%- endfor %}\n"
@@ -227,17 +227,25 @@ class Package(
 
         return values
 
-    def _render(self, render_projectfile=True, **kwargs):
+    def _render_projectfile(self, **kwargs):
         """
         Returns
         -------
         rendered : str
-            The rendered runfile part for a single boundary condition system.
+            The rendered projfectfile part, 
+            if part of PkgGroup: for a single boundary condition system.
         """
-        if render_projectfile:
-            return self._template_projectfile.render(**kwargs)
-        else:
-            return self._template.render(**kwargs)
+        return self._template_projectfile.render(**kwargs)
+
+    def _render_runfile(self, **kwargs):
+        """
+        Returns
+        -------
+        rendered : str
+            The rendered runfile part, 
+            if part of PkgGroup: for a single boundary condition system.
+        """        
+        return self._template.render(**kwargs)
 
     def save(self, directory):
         for name, da in self.dataset.data_vars.items():  # pylint: disable=no-member
