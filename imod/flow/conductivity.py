@@ -3,12 +3,16 @@ import numpy as np
 
 class HorizontalHydraulicConductivity(Package):
     """
-    Specify horizontal hydraulic conductivity of the aquifers.
+    Horizontal hydraulic conductivity [L/T] of the aquifers (between TOP and BOT).
 
-    Assigning this package to a model means you chose MODFLOW 2005's
-    "Layer Property Flow (LPF)" schematization.
-    Assigning packages of the Block Centered Flow (BCF) as well
-    to the model will result in errors.
+    This variable behaves somewhat similar to the 
+    horizontal hydraulic conductivity in MODFLOW 2005's 
+    "Layer Property Flow" schematization. 
+    
+    Note however that this does not hold for the 
+    vertical hydraulic conductivity:
+    iMODFLOW uses the vertical hydraulic conductivity
+    to specify the hydraulic conductivity of aquitards (between BOT and TOP)
 
     Parameters
     ----------
@@ -32,14 +36,13 @@ class HorizontalHydraulicConductivity(Package):
 
 class VerticalHydraulicConductivity(Package):
     """
-    Specify vertical hydraulic conductivity for aquitards (between BOT and TOP)
-    To specify the vertical hydraulic conductivity for aquifers,
-    use "VerticalAnisotropy" in combination with HorizontalHydraulicConductivity.
+    Vertical hydraulic conductivity [L/T] for aquitards (between BOT and TOP).
 
-    Assigning this package to a model means you chose MODFLOW 2005's
-    "Layer Property Flow (LPF)" schematization.
-    Assigning packages of the Block Centered Flow (BCF) as well
-    to the model will result in errors.
+    Note that this is different from MODFLOW 2005's 
+    "Layer Property Flow" schematization.
+    To specify the vertical hydraulic conductivity for aquifers,
+    use VerticalAnisotropy in combination with 
+    HorizontalHydraulicConductivity.
 
     Parameters
     ----------
@@ -63,9 +66,12 @@ class VerticalHydraulicConductivity(Package):
 
 class VerticalAnistropy(Package):
     """
-    Specify the vertical anisotropy for aquifers, defined as the
-    vertical hydraulic conductivity over the horizontal
-    hydraulic conductivity.
+    Vertical anisotropy for aquifers [-], 
+    defined as the horizontal hydraulic conductivity 
+    over the vertical hydraulic conductivity.
+
+    Use this package in combination with HorizontalHydraulicConductivity
+    to specify the vertical hydraulic conductivity.
 
     vertical_anistropy : xr.DataArray
         Vertical anistropy factor (Kv/Kh), dims = ("layer", "y", "x").
