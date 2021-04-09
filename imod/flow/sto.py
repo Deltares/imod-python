@@ -2,7 +2,8 @@ from imod.flow.pkgbase import Package
 
 
 class StorageCoefficient(Package):
-    """Define the storage coefficient.
+    """
+    Define the storage coefficient.
     Be careful, this is not the same as the specific storage.
 
     From wikipedia (https://en.wikipedia.org/wiki/Specific_storage):

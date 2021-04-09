@@ -2,7 +2,8 @@ from imod.flow.pkgbase import Package
 
 
 class Transmissivity(Package):
-    """Transmissivity of the aquifer [L^2/T],
+    """
+    Transmissivity of the aquifer [L^2/T],
     defined as the thickness multiplied by the horizontal hydraulic
     conductivity. Using this package means you follow MODFLOW 2005's
     Quasi-3D "Block Centred Flow (BCF)" schematization,
@@ -24,7 +25,8 @@ class Transmissivity(Package):
 
 
 class VerticalResistance(Package):
-    """Vertical Resistance of the aquitard [T],
+    """
+    Vertical Resistance of the aquitard [T],
     defined as the thickness of the aquitard divided by the
     vertical horizontal conductivity.
 

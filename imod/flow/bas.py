@@ -4,7 +4,8 @@ import numpy as np
 
 
 class ActiveBoundary(Package):
-    """Specify the locations of active, inactive, and specified head in cells
+    """
+    Specify the locations of active, inactive, and specified head in cells
 
     Parameters
     ----------
@@ -31,7 +32,8 @@ class ActiveBoundary(Package):
 
 
 class Top(Package):
-    """The top of the aquifers
+    """
+    The top of the aquifers
 
     Parameters
     ----------
@@ -51,7 +53,8 @@ class Top(Package):
 
 
 class Bottom(Package):
-    """The bottom of the aquifers
+    """
+    The bottom of the aquifers
 
     Parameters
     ----------
@@ -69,7 +72,8 @@ class Bottom(Package):
 
 
 class StartingHead(Package):
-    """The initial head in all cells
+    """
+    The initial head in all cells
 
     Parameters
     ----------

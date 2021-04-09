@@ -307,14 +307,14 @@ class ImodflowModel(Model):
         return time_composed
 
     def _compose_all_packages(self, directory, globaltimes, compose_projectfile=True):
-        """compose all transient packages before rendering.
+        """
+        Compose all transient packages before rendering.
 
         Required because of outer timeloop
 
         Returns
         -------
         A tuple with lists of respectively the composed packages and boundary conditions
-
         """
         composition = Vividict()
 
@@ -343,7 +343,8 @@ class ImodflowModel(Model):
         return composition
 
     def _render_projectfile(self, directory, globaltimes):
-        """Render projectfile. The projectfile has the hierarchy:
+        """
+        Render projectfile. The projectfile has the hierarchy:
         package - time - system - layer
         """
 
@@ -383,7 +384,8 @@ class ImodflowModel(Model):
         return "\n\n".join(content)
 
     def _render_runfile(self, directory, globaltimes):
-        """Render runfile. The runfile has the hierarchy:
+        """
+        Render runfile. The runfile has the hierarchy:
         time - package - system - layer
         """
         raise NotImplementedError("Currently only projectfiles can be rendered.")

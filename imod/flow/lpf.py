@@ -2,7 +2,8 @@ from imod.flow.pkgbase import Package
 
 
 class HorizontalHydraulicConductivity(Package):
-    """Specify horizontal hydraulic conductivity of the aquifers.
+    """
+    Specify horizontal hydraulic conductivity of the aquifers.
 
     Assigning this package to a model means you chose MODFLOW 2005's
     "Layer Property Flow (LPF)" schematization.
@@ -24,7 +25,8 @@ class HorizontalHydraulicConductivity(Package):
 
 
 class VerticalHydraulicConductivity(Package):
-    """Specify vertical hydraulic conductivity for aquitards (between BOT and TOP)
+    """
+    Specify vertical hydraulic conductivity for aquitards (between BOT and TOP)
     To specify the vertical hydraulic conductivity for aquifers,
     use "VerticalAnisotropy" in combination with HorizontalHydraulicConductivity.
 
@@ -48,7 +50,8 @@ class VerticalHydraulicConductivity(Package):
 
 
 class VerticalAnistropy(Package):
-    """Specify the vertical anisotropy for aquifers, defined as the
+    """
+    Specify the vertical anisotropy for aquifers, defined as the
     vertical hydraulic conductivity over the horizontal
     hydraulic conductivity.
 
