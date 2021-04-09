@@ -4,12 +4,12 @@ from imod.flow.pkgbase import BoundaryCondition
 class ConstantHead(BoundaryCondition):
     """
     The Constant Head package. The Time-Variant Specified-Head package is used
-    to simulate specified head boundaries that can change within or between
+    to simulate specified head boundaries that can change between
     stress periods.
 
     Parameters
     ----------
-    stage: xr.DataArray of floats
+    head: xr.DataArray of floats
         is the head at the boundary
     """
 
