@@ -100,7 +100,7 @@ class Package(
                 raise ValueError(f"{var} in {self} must be positive")
 
     def compose(
-        self, directory, globaltimes, compose_projectfile=True, composition=None
+        self, directory, globaltimes, composition=None, **ignored
     ):
         """
         Composes package, not useful for boundary conditions
@@ -112,6 +112,10 @@ class Package(
             Necessary to generate the paths for the runfile.
         globaltimes : list #TODO make this an *arg, change order.
             Not used, only included to comply with BoundaryCondition.compose
+        composition : Vividict
+            Existing composition to add composed packages to.
+        **ignored
+            Contains keyword arguments unused for packages, i.e. compose_projectfile
         """
 
         if composition is None:
