@@ -9,8 +9,8 @@ class Boundary(Package):
 
     Parameters
     ----------
-    ibound: xr.DataArray of integers
-        is the boundary variable.
+    ibound: xr.DataArray of ints
+        is the boundary variable with dimensions ("layer", "y", "x").
         If IBOUND(J,I,K) < 0, cell J,I,K has a constant head.
         If IBOUND(J,I,K) = 0, cell J,I,K is inactive.
         If IBOUND(J,I,K) > 0, cell J,I,K is active.
@@ -37,11 +37,12 @@ class Top(Package):
 
     Parameters
     ----------
-    top: float or xr.DataArray of floats
-        is the top elevation. For the common situation in which the
-        top layer represents a water-table aquifer, it may be reasonable to set
-        `top` equal to land-surface elevation. The DataArray should at
-        least include the `layer` dimension.
+    top: xr.DataArray of floats
+        is the top elevation with dimensions ("layer", "y", "x"). 
+        For the common situation in which the
+        top layer represents a water-table aquifer, 
+        it may be reasonable to set`top` equal to land-surface elevation. 
+        The DataArray should at least include the `layer` dimension.
     """
 
     _pkg_id = "top"
@@ -59,8 +60,9 @@ class Bottom(Package):
     Parameters
     ----------
     bottom: xr.DataArray of floats
-        is the bottom elevation of model layers or Quasi-3d confining beds. The
-        DataArray should at least include the `layer` dimension.
+        is the bottom elevation of model layers or Quasi-3d confining beds, 
+        with dimensions ("layer", "y", "x"). 
+        The DataArray should at least include the `layer` dimension.
     """
 
     _pkg_id = "bot"
