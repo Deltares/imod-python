@@ -11,7 +11,7 @@ import pandas as pd
 import imod
 from imod.wq import timeutil
 import imod.util as util
-from imod.flow.util import Vividict  # TODO: Find less confusing place for Vividict
+from imod.flow.pkgbase import Vividict
 
 from imod.flow.pkggroup import PackageGroups
 from imod.flow.pkgbase import BoundaryCondition

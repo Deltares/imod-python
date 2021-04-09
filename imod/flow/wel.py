@@ -1,5 +1,4 @@
-from imod.flow.pkgbase import BoundaryCondition
-from imod.flow.util import Vividict
+from imod.flow.pkgbase import BoundaryCondition, Vividict
 import imod
 import numpy as np
 from imod.wq import timeutil

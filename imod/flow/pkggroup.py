@@ -3,7 +3,7 @@ import collections
 import enum
 import jinja2
 
-from imod.flow.util import Vividict
+from imod.flow.pkgbase import Vividict
 
 
 class PackageGroup(collections.UserDict, abc.ABC):
