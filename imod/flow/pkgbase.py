@@ -148,7 +148,7 @@ class Package(
         """
         return str(util.compose(d, pattern).resolve())
 
-    def _compose_values_layer(self, varname, directory, time=None, da=None):
+    def _compose_values_layer(self, varname, directory, time=None):
         """
         Composes paths to files, or gets the appropriate scalar value for
         a single variable in a dataset.
@@ -162,9 +162,6 @@ class Package(
             Necessary to generate the paths for the runfile.
         time : datetime like, optional
             Time corresponding to the value.
-        da : xr.DataArray, optional
-            In some cases fetching the DataArray by varname is not desired.
-            It can be passed directly via this optional argument.
 
         Returns
         -------
@@ -176,8 +173,7 @@ class Package(
         pattern = "{name}"
 
         values = Vividict()
-        if da is None:
-            da = self[varname]
+        da = self[varname]
 
         d = {"directory": directory, "name": varname, "extension": ".idf"}
 
@@ -327,7 +323,6 @@ class BoundaryCondition(Package, abc.ABC):
         directory,
         values=None,
         sys_nr=1,
-        da=None,
         compose_projectfile=True,
     ):
         """
@@ -353,9 +348,6 @@ class BoundaryCondition(Package, abc.ABC):
             Vividict (tree-like dictionary) to which values should be added
         sys_nr : int
             System number. Defaults as 1, but for package groups it
-        da : xr.DataArray, optional
-            In some cases fetching the DataArray by varname is not desired.
-            It can be passed directly via this optional argument.
         compose_projectfile : bool
             Compose values in a hierarchy suitable for the projectfile
 
@@ -373,11 +365,10 @@ class BoundaryCondition(Package, abc.ABC):
         if values == None:
             values = Vividict()
 
-        if da is None:
-            da = self[varname]
+        da = self[varname]
 
         args = (varname, directory)
-        kwargs = dict(da=da, time=None)
+        kwargs = dict(time=None)
 
         if "time" in da.coords:
             runfile_times, starts_ends = self._get_runfile_times(da, globaltimes)
