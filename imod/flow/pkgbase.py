@@ -129,8 +129,23 @@ class Package(
         return composition
 
     def _compose_path(self, d, pattern=None):
-        # d : dict
-        # pattern : string or re.pattern
+        """
+        Construct a filename, following the iMOD conventions. 
+        Returns an absolute path.
+
+        Parameters
+        ----------
+        d : dict
+            dict of parts (time, layer) for filename.
+        pattern : string or re.pattern
+            Format to create pattern for.
+
+        Returns
+        -------
+        str
+            Absolute path.
+
+        """
         return str(util.compose(d, pattern).resolve())
 
     def _compose_values_layer(self, varname, directory, time=None, da=None):
