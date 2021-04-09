@@ -55,9 +55,16 @@ class Package(
         '001, {{"{:03d}".format(n_entry)}}\n'
         "{%- for variable in variable_order%}\n"  # Preserve variable order
         "{%-    for layer, value in package_data[variable].items()%}\n"
-        "{%-        if value is string %}\n"  # If string then assume path
-        '1, 2, {{"{:03d}".format(layer)}}, 1.000, 0.000, -9999., {{value}}\n'
+        "{%-        if value is string %}\n"  
+        # If string then assume path:
+        # 1 indicates the layer is activated
+        # 2 indicates the second element of the final two elements should be read
+        # 1.000 is the multiplication factor
+        # 0.000 is the addition factor
+        # -9999 indicates there is no data, following iMOD usual practice
+        '1, 2, {{"{:03d}".format(layer)}}, 1.000, 0.000, -9999., {{value}}\n' 
         "{%-        else %}\n"
+        # Else assume a constant value is provided
         '1, 1, {{"{:03d}".format(layer)}}, 1.000, 0.000, {{value}}, ""\n'
         "{%-        endif %}\n"
         "{%-    endfor %}\n"
