@@ -23,9 +23,10 @@ from imod.flow.dis import TimeDiscretization
 from imod.flow.slv import PreconditionedConjugateGradientSolver
 from imod.flow.sto import StorageCoefficient
 
+
 def write(path, model, name=None, runfile_parameters=None, output_packages=["shd"]):
     """Deprectated function"""
     raise DeprecationWarning(
-        "This function has been deprecated. " 
+        "This function has been deprecated. "
         "Instead initiate an imod.flow.ImodflowModel instance and use its' write method."
-        )
+    )
