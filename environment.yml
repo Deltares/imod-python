@@ -34,7 +34,6 @@ dependencies:
   - python>=3.6,<3.9
   - pyvista
   - rasterio>=1.0
-  - rioxarray
   - scipy
   - setuptools_scm
   - sphinx
