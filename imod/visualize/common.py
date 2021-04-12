@@ -5,7 +5,13 @@ import numpy as np
 def _cmapnorm_from_colorslevels(colors, levels):
     """
     Create ListedColormap and BoundaryNorm from colors (either a list of colors
-    or a named colormap) and a list of levels.
+    or a named colormap) and a list of levels. Number of levels must be at least
+    two, and number of colors therefore least three.
+
+    In the case of a list of colors, the resulting colorbar looks like:
+    < color 0 | color 1 | color 2 ... n-1 | color n >
+              ^         ^                 ^
+           level 0   level 1           level n-1
 
     Parameters
     ----------
@@ -30,6 +36,10 @@ def _cmapnorm_from_colorslevels(colors, levels):
     cmap : matplotlib.colors.ListedColormap
     norm : matplotlib.colors.BoundaryNorm
     """
+    # check number of levels
+    if len(levels) < 2:
+        raise ValueError(f"Number of levels {levels} should exceed 1.")
+
     # check monotonic increasing levels
     if not (np.diff(levels) > 0).all():
         raise ValueError(f"Levels {levels} are not monotonic increasing.")

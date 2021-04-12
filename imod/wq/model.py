@@ -10,7 +10,6 @@ import numpy as np
 import pandas as pd
 from scipy.ndimage import binary_dilation
 import xarray as xr
-import rioxarray
 
 import imod
 from imod.wq import timeutil

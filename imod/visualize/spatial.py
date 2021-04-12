@@ -228,7 +228,7 @@ def plot_map(
     divider = make_axes_locatable(ax)
     cbar_ax = divider.append_axes("right", size="5%", pad="5%")
     ticklabels = settings_cbar.pop("ticklabels", None)
-    cbar = fig.colorbar(ax1, cmap=cmap, norm=norm, cax=cbar_ax, **settings_cbar)
+    cbar = fig.colorbar(ax1, cax=cbar_ax, **settings_cbar)
 
     # Add overlays
     for i, overlay in enumerate(overlays):
@@ -337,7 +337,7 @@ def _imshow_xy(
 
     divider = make_axes_locatable(ax)
     cbar_ax = divider.append_axes("right", size="5%", pad="5%")
-    fig.colorbar(ax1, cmap=cmap, norm=norm, cax=cbar_ax)
+    fig.colorbar(ax1, cax=cbar_ax)
 
     ax.set_title(title)
     plt.savefig(fname, dpi=200, bbox_inches="tight")
