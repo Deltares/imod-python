@@ -2,15 +2,16 @@ from imod.flow import Top, Bottom, Boundary, StartingHead
 import pathlib
 import os
 
+
 def test_boundary(basic_dis, get_render_dict):
     # Resolve in advance, so that comparisons have the same directory
     # See e.g. https://github.com/omarkohl/pytest-datafiles/issues/6
     directory = str(pathlib.Path(".").resolve())
-    
+
     ibound, _, _ = basic_dis
     boundary = Boundary(ibound=ibound)
     nlayer = len(boundary["layer"])
-    
+
     to_render = get_render_dict(boundary, directory, None, nlayer)
     to_render["n_entry"] = nlayer
 
@@ -31,7 +32,7 @@ def test_top(basic_dis, get_render_dict):
     _, top, _ = basic_dis
     top = Top(top=top)
     nlayer = len(top["layer"])
-    
+
     to_render = get_render_dict(top, ".", None, nlayer)
     to_render["n_entry"] = nlayer
 
@@ -52,7 +53,7 @@ def test_bot(basic_dis, get_render_dict):
     _, _, bottom = basic_dis
     bottom = Bottom(bottom=bottom)
     nlayer = len(bottom["layer"])
-    
+
     to_render = get_render_dict(bottom, ".", None, nlayer)
     to_render["n_entry"] = nlayer
 
@@ -68,15 +69,16 @@ def test_bot(basic_dis, get_render_dict):
 
     assert rendered == compare
 
+
 def test_starting_head(basic_dis, get_render_dict):
     # Resolve in advance, so that comparisons have the same directory
     # See e.g. https://github.com/omarkohl/pytest-datafiles/issues/6
     directory = str(pathlib.Path(".").resolve())
-    
+
     ibound, _, _ = basic_dis
     starting_head = StartingHead(starting_head=ibound)
     nlayer = len(starting_head["layer"])
-    
+
     to_render = get_render_dict(starting_head, directory, None, nlayer)
     to_render["n_entry"] = nlayer
 

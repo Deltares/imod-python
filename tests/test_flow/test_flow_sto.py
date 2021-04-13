@@ -1,18 +1,16 @@
-from imod.flow import (
-    StorageCoefficient,
-    SpecificStorage
-)
+from imod.flow import StorageCoefficient, SpecificStorage
 import pathlib
+
 
 def test_storage_coefficient(basic_dis, get_render_dict):
     # Resolve in advance, so that comparisons have the same directory
     # See e.g. https://github.com/omarkohl/pytest-datafiles/issues/6
     directory = str(pathlib.Path(".").resolve())
-    
+
     ibound, _, _ = basic_dis
     storage = StorageCoefficient(storage_coefficient=0.2)
     nlayer = len(ibound["layer"])
-    
+
     to_render = get_render_dict(storage, directory, None, nlayer)
     to_render["n_entry"] = nlayer
 
@@ -28,15 +26,16 @@ def test_storage_coefficient(basic_dis, get_render_dict):
 
     assert rendered == compare
 
+
 def test_specific_storage(basic_dis, get_render_dict):
     # Resolve in advance, so that comparisons have the same directory
     # See e.g. https://github.com/omarkohl/pytest-datafiles/issues/6
     directory = str(pathlib.Path(".").resolve())
-    
+
     ibound, _, _ = basic_dis
     storage = SpecificStorage(specific_storage=1e-5)
     nlayer = len(ibound["layer"])
-    
+
     to_render = get_render_dict(storage, directory, None, nlayer)
     to_render["n_entry"] = nlayer
 

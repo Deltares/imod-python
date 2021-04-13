@@ -1,19 +1,20 @@
 from imod.flow import (
-    HorizontalHydraulicConductivity, 
-    VerticalHydraulicConductivity, 
-    VerticalAnisotropy
+    HorizontalHydraulicConductivity,
+    VerticalHydraulicConductivity,
+    VerticalAnisotropy,
 )
 import pathlib
+
 
 def test_horizontal_conductivity(basic_dis, get_render_dict):
     # Resolve in advance, so that comparisons have the same directory
     # See e.g. https://github.com/omarkohl/pytest-datafiles/issues/6
     directory = str(pathlib.Path(".").resolve())
-    
+
     ibound, _, _ = basic_dis
-    conductivity = HorizontalHydraulicConductivity(k_horizontal=10.)
+    conductivity = HorizontalHydraulicConductivity(k_horizontal=10.0)
     nlayer = len(ibound["layer"])
-    
+
     to_render = get_render_dict(conductivity, directory, None, nlayer)
     to_render["n_entry"] = nlayer
 
@@ -29,15 +30,16 @@ def test_horizontal_conductivity(basic_dis, get_render_dict):
 
     assert rendered == compare
 
+
 def test_vertical_conductivity(basic_dis, get_render_dict):
     # Resolve in advance, so that comparisons have the same directory
     # See e.g. https://github.com/omarkohl/pytest-datafiles/issues/6
     directory = str(pathlib.Path(".").resolve())
-    
+
     ibound, _, _ = basic_dis
-    conductivity = VerticalHydraulicConductivity(k_vertical=10.)
+    conductivity = VerticalHydraulicConductivity(k_vertical=10.0)
     nlayer = len(ibound["layer"])
-    
+
     to_render = get_render_dict(conductivity, directory, None, nlayer)
     to_render["n_entry"] = nlayer
 
@@ -53,15 +55,16 @@ def test_vertical_conductivity(basic_dis, get_render_dict):
 
     assert rendered == compare
 
+
 def test_vertical_anisotropy(basic_dis, get_render_dict):
     # Resolve in advance, so that comparisons have the same directory
     # See e.g. https://github.com/omarkohl/pytest-datafiles/issues/6
     directory = str(pathlib.Path(".").resolve())
-    
+
     ibound, _, _ = basic_dis
-    anisotropy = VerticalAnisotropy(vertical_anisotropy=1.)
+    anisotropy = VerticalAnisotropy(vertical_anisotropy=1.0)
     nlayer = len(ibound["layer"])
-    
+
     to_render = get_render_dict(anisotropy, directory, None, nlayer)
     to_render["n_entry"] = nlayer
 
