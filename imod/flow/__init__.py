@@ -11,7 +11,7 @@ from imod.flow.bas import Boundary, Top, Bottom, StartingHead
 from imod.flow.conductivity import (
     HorizontalHydraulicConductivity,
     VerticalHydraulicConductivity,
-    VerticalAnistropy,
+    VerticalAnisotropy,
 )
 from imod.flow.riv import River
 from imod.flow.drn import Drain
