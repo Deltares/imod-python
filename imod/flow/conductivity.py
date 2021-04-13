@@ -65,7 +65,7 @@ class VerticalHydraulicConductivity(Package):
         )
 
 
-class VerticalAnistropy(Package):
+class VerticalAnisotropy(Package):
     """
     Vertical anisotropy for aquifers [-],
     defined as the horizontal hydraulic conductivity
@@ -74,19 +74,19 @@ class VerticalAnistropy(Package):
     Use this package in combination with HorizontalHydraulicConductivity
     to specify the vertical hydraulic conductivity.
 
-    vertical_anistropy : xr.DataArray
-        Vertical anistropy factor (Kv/Kh), dims = ("layer", "y", "x").
+    vertical_anisotropy : xr.DataArray
+        Vertical anisotropy factor (Kv/Kh), dims = ("layer", "y", "x").
     """
 
     _pkg_id = "kva"
-    _variable_order = ["vertical_anistropy"]
+    _variable_order = ["vertical_anisotropy"]
 
-    def __init__(self, vertical_anistropy=None):
+    def __init__(self, vertical_anisotropy=None):
         super(__class__, self).__init__()
-        self.dataset["vertical_anistropy"] = vertical_anistropy
+        self.dataset["vertical_anisotropy"] = vertical_anisotropy
 
     def _pkgcheck(self, active_cells=None):
-        vars_to_check = ["vertical_anistropy"]
+        vars_to_check = ["vertical_anisotropy"]
         self._check_if_nan_in_active_cells(
             active_cells=active_cells, vars_to_check=vars_to_check
         )
