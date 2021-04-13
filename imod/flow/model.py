@@ -390,7 +390,7 @@ class ImodflowModel(Model):
             directory, globaltimes, compose_projectfile=True
         )
 
-        times = self._compose_timestrings(globaltimes)
+        times_composed = self._compose_timestrings(globaltimes)
 
         rendered = []
         ignored = ["dis"]
@@ -410,7 +410,7 @@ class ImodflowModel(Model):
 
             if isinstance(package, BoundaryCondition):
                 kwargs["n_entry"] = self._calc_n_entry(composition[pkg_id], True)
-                kwargs["times"] = times
+                kwargs["times"] = times_composed
             else:
                 kwargs["n_entry"] = self._calc_n_entry(composition[pkg_id], False)
 
