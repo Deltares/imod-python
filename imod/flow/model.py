@@ -57,6 +57,40 @@ def _relpath(path, to):
         # Fails to switch between drives e.g.
         return pathlib.Path(os.path.abspath(path))
 
+def insert_unique_package_times(package_mapping, times):
+    """
+    Insert unique package times in a list of times
+
+    Parameters
+    ----------
+    package_mapping : iterable
+        Iterable of key, package pairs
+    times : list
+        List with times. This list will be extended with the package times if not present.
+
+    Returns
+    -------
+    times : list
+        List with times, extended with package times
+    first_times : dict
+        Dictionary with first timestamp per package
+    """
+    first_times = {}
+    for key, pkg in package_mapping:
+        if pkg._hastime():
+            pkgtimes = list(pkg["time"].values)
+            first_times[key] = sorted(pkgtimes)[0]
+            for var in pkg.dataset.data_vars:
+                if "timemap" in pkg[var].attrs:
+                    timemap_times = list(pkg[var].attrs["timemap"].keys())
+                    pkgtimes.extend(timemap_times)
+            times.extend(pkgtimes)
+    
+    # np.unique also sorts
+    times = np.unique(np.hstack(times))
+
+    return times, first_times
+
 
 # This class allows only imod packages as values
 class Model(collections.UserDict):
@@ -150,18 +184,13 @@ class ImodflowModel(Model):
 
         return package_groups
 
-    def _hastime(self, pkg):
-        return (pkg._pkg_id == "wel" and "time" in pkg.dataset) or (
-            "time" in pkg.dataset.coords
-        )
-
     def _use_cftime(self):
         """
         Also checks if datetime types are homogeneous across packages.
         """
         types = []
         for pkg in self.values():
-            if self._hastime(pkg):
+            if pkg._hastime():
                 types.append(type(np.atleast_1d(pkg["time"].values)[0]))
 
         # Types will be empty if there's no time dependent input
@@ -252,19 +281,7 @@ class ImodflowModel(Model):
             self.use_cftime = False
 
         times = [timeutil.to_datetime(time, self.use_cftime) for time in times]
-        first_times = {}  # first time per package
-        for key, pkg in self.items():
-            if self._hastime(pkg):
-                pkgtimes = list(pkg["time"].values)
-                first_times[key] = sorted(pkgtimes)[0]
-                for var in pkg.dataset.data_vars:
-                    if "timemap" in pkg[var].attrs:
-                        timemap_times = list(pkg[var].attrs["timemap"].keys())
-                        pkgtimes.extend(timemap_times)
-                times.extend(pkgtimes)
-
-        # np.unique also sorts
-        times = np.unique(np.hstack(times))
+        times, first_times = insert_unique_package_times(self.items(), times)
 
         # Check if every transient package commences at the same time.
         for key, first_time in first_times.items():

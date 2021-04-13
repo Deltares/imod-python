@@ -100,6 +100,11 @@ class Package(
             if (self[var] < 0).any():
                 raise ValueError(f"{var} in {self} must be positive")
 
+    def _hastime(self):
+        return (self._pkg_id == "wel" and "time" in self.dataset) or (
+            "time" in self.dataset.coords
+        )
+
     def compose(self, directory, globaltimes, nlayer, composition=None, **ignored):
         """
         Composes package, not useful for boundary conditions
@@ -312,8 +317,10 @@ class BoundaryCondition(Package, abc.ABC):
             }
             self[varname].attrs["timemap"] = d
 
-    def _get_runfile_times(self, da, globaltimes):
-        ds_times = self.dataset.coords["time"].values
+    def _get_runfile_times(self, da, globaltimes, ds_times=None):
+        if ds_times is None:
+            ds_times = self.dataset.coords["time"].values
+
         if "timemap" in da.attrs:
             timemap_keys = np.array(list(da.attrs["timemap"].keys()))
             timemap_values = np.array(list(da.attrs["timemap"].values()))
@@ -337,6 +344,7 @@ class BoundaryCondition(Package, abc.ABC):
         composition=None,
         system_index=1,
         compose_projectfile=True,
+        pkggroup_times=None,
     ):
         """
         Composes all variables for one system.
@@ -354,6 +362,7 @@ class BoundaryCondition(Package, abc.ABC):
                 values=composition,
                 system_index=system_index,
                 compose_projectfile=compose_projectfile,
+                pkggroup_times=pkggroup_times
             )
 
         return composition
@@ -367,6 +376,7 @@ class BoundaryCondition(Package, abc.ABC):
         values=None,
         system_index=1,
         compose_projectfile=True,
+        pkggroup_times=None,
     ):
         """
         Composes paths to files, or gets the appropriate scalar value for
@@ -395,6 +405,9 @@ class BoundaryCondition(Package, abc.ABC):
             System number. Defaults to 1, but for package groups it is used
         compose_projectfile : bool
             Compose values in a hierarchy suitable for the projectfile
+        pkggroup_times : optional, list, np.array
+            Holds the package_group times. 
+            Packages in one group need to be synchronized for iMODFLOW.
 
         Returns
         -------
@@ -412,7 +425,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         da = self[varname]
 
-        if "time" in self.dataset.coords:
+        if ("time" in self.dataset.coords) or (pkggroup_times is not None):
             runfile_times, starts_ends = self._get_runfile_times(da, globaltimes)
 
             for time, start_end in zip(runfile_times, starts_ends):
