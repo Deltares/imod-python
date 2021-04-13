@@ -294,18 +294,36 @@ class BoundaryCondition(Package, abc.ABC):
         "{%- endfor %}\n"
     )
 
+    def _add_timemap(self, varname, value, use_cftime):
+        if value is not None:
+            if varname not in self:
+                raise ValueError(
+                    f"{varname} does not occur in {self}\n cannot add timemap"
+                )
+            if "time" not in self[varname].coords:
+                raise ValueError(
+                    f"{varname} in {self}\n does not have dimension time, cannot add timemap."
+                )
+
+            # Replace both key and value by the right datetime type
+            d = {
+                timeutil.to_datetime(k, use_cftime): timeutil.to_datetime(v, use_cftime)
+                for k, v in value.items()
+            }
+            self[varname].attrs["timemap"] = d
+
     def _get_runfile_times(self, da, globaltimes):
-        da_times = da.coords["time"].values
+        ds_times = self.dataset.coords["time"].values
         if "timemap" in da.attrs:
             timemap_keys = np.array(list(da.attrs["timemap"].keys()))
             timemap_values = np.array(list(da.attrs["timemap"].values()))
             package_times, inds = np.unique(
-                np.concatenate([da_times, timemap_keys]), return_index=True
+                np.concatenate([ds_times, timemap_keys]), return_index=True
             )
             # Times to write in the runfile
-            runfile_times = np.concatenate([da_times, timemap_values])[inds]
+            runfile_times = np.concatenate([ds_times, timemap_values])[inds]
         else:
-            runfile_times = package_times = da_times
+            runfile_times = package_times = ds_times
 
         starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
 
@@ -394,7 +412,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         da = self[varname]
 
-        if "time" in da.coords:
+        if "time" in self.dataset.coords:
             runfile_times, starts_ends = self._get_runfile_times(da, globaltimes)
 
             for time, start_end in zip(runfile_times, starts_ends):
