@@ -42,6 +42,13 @@ def three_days():
 
 
 @pytest.fixture(scope="module")
+def two_days():
+    """Simple time discretization of two days"""
+
+    return pd.date_range(start='1/1/2018', end='1/2/2018', freq="D")
+
+
+@pytest.fixture(scope="module")
 def get_render_dict():
     """
     Helper function to return dict to render.
@@ -54,7 +61,7 @@ def get_render_dict():
     def _get_render_dict(
         package, directory, globaltimes, nlayer, composition=None, system_index=1
         ):
-        
+
         composition = package.compose(
             directory, globaltimes, nlayer, composition=composition, system_index=system_index
             )
