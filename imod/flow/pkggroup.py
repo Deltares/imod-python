@@ -1,10 +1,9 @@
 import abc
 import collections
 import enum
-import jinja2
 
 from imod.flow.pkgbase import Vividict
-
+from imod.flow.timeutil import insert_unique_package_times
 
 class PackageGroup(collections.UserDict, abc.ABC):
     """
@@ -28,6 +27,9 @@ class PackageGroup(collections.UserDict, abc.ABC):
         self, directory, globaltimes, nlayer, compose_projectfile=True, composition=None
     ):
 
+        pkggroup_times = []
+        pkggroup_times, _ = insert_unique_package_times(self.items(), pkggroup_times)
+
         if composition is None:
             composition = Vividict()
 
@@ -40,6 +42,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
                 system_index=system_index,
                 compose_projectfile=compose_projectfile,
                 composition=composition,
+                pkggroup_time=pkggroup_times
             )
 
         return composition

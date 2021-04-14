@@ -344,7 +344,7 @@ class BoundaryCondition(Package, abc.ABC):
         composition=None,
         system_index=1,
         compose_projectfile=True,
-        pkggroup_times=None,
+        pkggroup_time=None,
     ):
         """
         Composes all variables for one system.
@@ -353,7 +353,7 @@ class BoundaryCondition(Package, abc.ABC):
         if composition is None:
             composition = Vividict()
 
-        for data_var in self._variable_order:
+        for data_var in self._variable_order: 
             self._compose_values_timelayer(
                 data_var,
                 globaltimes,
@@ -362,7 +362,7 @@ class BoundaryCondition(Package, abc.ABC):
                 values=composition,
                 system_index=system_index,
                 compose_projectfile=compose_projectfile,
-                pkggroup_times=pkggroup_times
+                pkggroup_times=pkggroup_time
             )
 
         return composition
@@ -426,7 +426,7 @@ class BoundaryCondition(Package, abc.ABC):
         da = self[varname]
 
         if ("time" in self.dataset.coords) or (pkggroup_times is not None):
-            runfile_times, starts_ends = self._get_runfile_times(da, globaltimes)
+            runfile_times, starts_ends = self._get_runfile_times(da, globaltimes, ds_times=pkggroup_times)
 
             for time, start_end in zip(runfile_times, starts_ends):
                 if compose_projectfile == True:

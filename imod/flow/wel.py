@@ -88,18 +88,19 @@ class Well(BoundaryCondition):
 
         return values
 
-    def _get_runfile_times(self, globaltimes):
-        self_times = np.unique(self["time"].values)
+    def _get_runfile_times(self, globaltimes, ds_times=None):
+        if ds_times is None:
+            ds_times = np.unique(self["time"].values)
         if "timemap" in self.dataset.attrs:
             timemap_keys = np.array(list(self.dataset.attrs["timemap"].keys()))
             timemap_values = np.array(list(self.dataset.attrs["timemap"].values()))
             package_times, inds = np.unique(
-                np.concatenate([self_times, timemap_keys]), return_index=True
+                np.concatenate([ds_times, timemap_keys]), return_index=True
             )
             # Times to write in the runfile
-            runfile_times = np.concatenate([self_times, timemap_values])[inds]
+            runfile_times = np.concatenate([ds_times, timemap_values])[inds]
         else:
-            runfile_times = package_times = self_times
+            runfile_times = package_times = ds_times
 
         starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
 
@@ -114,6 +115,7 @@ class Well(BoundaryCondition):
         values=None,
         system_index=1,
         compose_projectfile=True,
+        pkggroup_times=None
     ):
         """
         Composes paths to files, or gets the appropriate scalar value for
@@ -161,7 +163,7 @@ class Well(BoundaryCondition):
         kwargs = dict(time=None)
 
         if "time" in self.dataset:
-            runfile_times, starts_ends = self._get_runfile_times(globaltimes)
+            runfile_times, starts_ends = self._get_runfile_times(globaltimes, ds_times=pkggroup_times)
 
             for time, start_end in zip(runfile_times, starts_ends):
                 kwargs["time"] = time

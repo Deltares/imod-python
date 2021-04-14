@@ -9,7 +9,9 @@ import numpy as np
 import pandas as pd
 
 import imod
+#TODO: Merge time utilities, this is becoming a mess
 from imod.wq import timeutil
+from imod.flow.timeutil import insert_unique_package_times
 import imod.util as util
 from imod.flow.pkgbase import Vividict
 
@@ -56,40 +58,6 @@ def _relpath(path, to):
     except ValueError:
         # Fails to switch between drives e.g.
         return pathlib.Path(os.path.abspath(path))
-
-def insert_unique_package_times(package_mapping, times):
-    """
-    Insert unique package times in a list of times
-
-    Parameters
-    ----------
-    package_mapping : iterable
-        Iterable of key, package pairs
-    times : list
-        List with times. This list will be extended with the package times if not present.
-
-    Returns
-    -------
-    times : list
-        List with times, extended with package times
-    first_times : dict
-        Dictionary with first timestamp per package
-    """
-    first_times = {}
-    for key, pkg in package_mapping:
-        if pkg._hastime():
-            pkgtimes = list(pkg["time"].values)
-            first_times[key] = sorted(pkgtimes)[0]
-            for var in pkg.dataset.data_vars:
-                if "timemap" in pkg[var].attrs:
-                    timemap_times = list(pkg[var].attrs["timemap"].keys())
-                    pkgtimes.extend(timemap_times)
-            times.extend(pkgtimes)
-    
-    # np.unique also sorts
-    times = np.unique(np.hstack(times))
-
-    return times, first_times
 
 
 # This class allows only imod packages as values
