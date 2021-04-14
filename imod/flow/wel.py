@@ -115,7 +115,7 @@ class Well(BoundaryCondition):
         values=None,
         system_index=1,
         compose_projectfile=True,
-        pkggroup_times=None
+        pkggroup_times=None,
     ):
         """
         Composes paths to files, or gets the appropriate scalar value for
@@ -163,7 +163,9 @@ class Well(BoundaryCondition):
         kwargs = dict(time=None)
 
         if "time" in self.dataset:
-            runfile_times, starts_ends = self._get_runfile_times(globaltimes, ds_times=pkggroup_times)
+            runfile_times, starts_ends = self._get_runfile_times(
+                globaltimes, ds_times=pkggroup_times
+            )
 
             for time, start_end in zip(runfile_times, starts_ends):
                 kwargs["time"] = time

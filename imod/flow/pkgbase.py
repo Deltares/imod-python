@@ -353,7 +353,7 @@ class BoundaryCondition(Package, abc.ABC):
         if composition is None:
             composition = Vividict()
 
-        for data_var in self._variable_order: 
+        for data_var in self._variable_order:
             self._compose_values_timelayer(
                 data_var,
                 globaltimes,
@@ -362,7 +362,7 @@ class BoundaryCondition(Package, abc.ABC):
                 values=composition,
                 system_index=system_index,
                 compose_projectfile=compose_projectfile,
-                pkggroup_times=pkggroup_time
+                pkggroup_times=pkggroup_time,
             )
 
         return composition
@@ -406,7 +406,7 @@ class BoundaryCondition(Package, abc.ABC):
         compose_projectfile : bool
             Compose values in a hierarchy suitable for the projectfile
         pkggroup_times : optional, list, np.array
-            Holds the package_group times. 
+            Holds the package_group times.
             Packages in one group need to be synchronized for iMODFLOW.
 
         Returns
@@ -426,7 +426,9 @@ class BoundaryCondition(Package, abc.ABC):
         da = self[varname]
 
         if ("time" in self.dataset.coords) or (pkggroup_times is not None):
-            runfile_times, starts_ends = self._get_runfile_times(da, globaltimes, ds_times=pkggroup_times)
+            runfile_times, starts_ends = self._get_runfile_times(
+                da, globaltimes, ds_times=pkggroup_times
+            )
 
             for time, start_end in zip(runfile_times, starts_ends):
                 if compose_projectfile == True:

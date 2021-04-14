@@ -7,6 +7,7 @@ import pathlib
 import os
 from copy import deepcopy
 
+
 @pytest.fixture(scope="module")
 def constant_head(basic_dis, three_days):
     ibound, _, _ = basic_dis
@@ -22,6 +23,7 @@ def constant_head(basic_dis, three_days):
     head = xr.DataArray(trend, coords={"time": times}, dims=["time"]) * head
 
     return ConstantHead(head=head)
+
 
 def test_group_rendered(constant_head, three_days):
 
@@ -46,42 +48,42 @@ def test_group_rendered(constant_head, three_days):
     pkg_id = chd1._pkg_id
 
     to_render = dict(
-            pkg_id=pkg_id,
-            name="ConstantHead",
-            variable_order=chd1._variable_order,
-            package_data=group_composition[pkg_id],
-            times=time_composed,
-            n_entry=6
-        )
-    
+        pkg_id=pkg_id,
+        name="ConstantHead",
+        variable_order=chd1._variable_order,
+        package_data=group_composition[pkg_id],
+        times=time_composed,
+        n_entry=6,
+    )
+
     rendered = chd1._render_projectfile(**to_render)
 
     compare = (
-    "0003, (chd), 1, ConstantHead, ['head']\n"
-    '2018-01-01 00:00:00\n'
-    '001, 006\n'
-    f'1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l1.idf\n'
-    f'1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l2.idf\n'
-    f'1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l3.idf\n'
-    f'1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180101000000_l1.idf\n'
-    f'1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180101000000_l2.idf\n'
-    f'1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180101000000_l3.idf\n'
-    '2018-01-02 00:00:00\n'
-    '001, 006\n'
-    f'1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l1.idf\n'
-    f'1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l2.idf\n'
-    f'1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l3.idf\n'
-    f'1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180102000000_l1.idf\n'
-    f'1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180102000000_l2.idf\n'
-    f'1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180102000000_l3.idf\n'
-    '2018-01-03 00:00:00\n'
-    '001, 006\n'
-    f'1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l1.idf\n'
-    f'1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l2.idf\n'
-    f'1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l3.idf\n'
-    f'1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180103000000_l1.idf\n'
-    f'1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180103000000_l2.idf\n'
-    f'1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180103000000_l3.idf'
+        "0003, (chd), 1, ConstantHead, ['head']\n"
+        "2018-01-01 00:00:00\n"
+        "001, 006\n"
+        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l1.idf\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l2.idf\n"
+        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l3.idf\n"
+        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180101000000_l1.idf\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180101000000_l2.idf\n"
+        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180101000000_l3.idf\n"
+        "2018-01-02 00:00:00\n"
+        "001, 006\n"
+        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l1.idf\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l2.idf\n"
+        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l3.idf\n"
+        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180102000000_l1.idf\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180102000000_l2.idf\n"
+        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180102000000_l3.idf\n"
+        "2018-01-03 00:00:00\n"
+        "001, 006\n"
+        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l1.idf\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l2.idf\n"
+        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l3.idf\n"
+        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180103000000_l1.idf\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180103000000_l2.idf\n"
+        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180103000000_l3.idf"
     )
 
     assert compare == rendered
@@ -90,7 +92,7 @@ def test_group_rendered(constant_head, three_days):
 def test_group_synchronize_times_rendered(constant_head, three_days):
 
     chd1 = constant_head
-    chd2 = ConstantHead(head=2.)
+    chd2 = ConstantHead(head=2.0)
     d = {"primary": chd1, "secondary": chd2}
 
     nlayer = len(constant_head["layer"])
@@ -110,43 +112,42 @@ def test_group_synchronize_times_rendered(constant_head, three_days):
     pkg_id = chd1._pkg_id
 
     to_render = dict(
-            pkg_id=pkg_id,
-            name="ConstantHead",
-            variable_order=chd1._variable_order,
-            package_data=group_composition[pkg_id],
-            times=time_composed,
-            n_entry=6
-        )
-    
+        pkg_id=pkg_id,
+        name="ConstantHead",
+        variable_order=chd1._variable_order,
+        package_data=group_composition[pkg_id],
+        times=time_composed,
+        n_entry=6,
+    )
+
     rendered = chd1._render_projectfile(**to_render)
 
     compare = (
-    "0003, (chd), 1, ConstantHead, ['head']\n"
-    '2018-01-01 00:00:00\n'
-    '001, 006\n'
-    f'1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l1.idf\n'
-    f'1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l2.idf\n'
-    f'1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l3.idf\n'
-    '1, 1, 001, 1.000, 0.000, 2.0, ""\n'
-    '1, 1, 002, 1.000, 0.000, 2.0, ""\n'
-    '1, 1, 003, 1.000, 0.000, 2.0, ""\n'
-    '2018-01-02 00:00:00\n'
-    '001, 006\n'
-    f'1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l1.idf\n'
-    f'1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l2.idf\n'
-    f'1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l3.idf\n'
-    '1, 1, 001, 1.000, 0.000, 2.0, ""\n'
-    '1, 1, 002, 1.000, 0.000, 2.0, ""\n'
-    '1, 1, 003, 1.000, 0.000, 2.0, ""\n'
-    '2018-01-03 00:00:00\n'
-    '001, 006\n'
-    f'1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l1.idf\n'
-    f'1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l2.idf\n'
-    f'1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l3.idf\n'
-    '1, 1, 001, 1.000, 0.000, 2.0, ""\n'
-    '1, 1, 002, 1.000, 0.000, 2.0, ""\n'
-    '1, 1, 003, 1.000, 0.000, 2.0, ""'
+        "0003, (chd), 1, ConstantHead, ['head']\n"
+        "2018-01-01 00:00:00\n"
+        "001, 006\n"
+        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l1.idf\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l2.idf\n"
+        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l3.idf\n"
+        '1, 1, 001, 1.000, 0.000, 2.0, ""\n'
+        '1, 1, 002, 1.000, 0.000, 2.0, ""\n'
+        '1, 1, 003, 1.000, 0.000, 2.0, ""\n'
+        "2018-01-02 00:00:00\n"
+        "001, 006\n"
+        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l1.idf\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l2.idf\n"
+        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l3.idf\n"
+        '1, 1, 001, 1.000, 0.000, 2.0, ""\n'
+        '1, 1, 002, 1.000, 0.000, 2.0, ""\n'
+        '1, 1, 003, 1.000, 0.000, 2.0, ""\n'
+        "2018-01-03 00:00:00\n"
+        "001, 006\n"
+        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l1.idf\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l2.idf\n"
+        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l3.idf\n"
+        '1, 1, 001, 1.000, 0.000, 2.0, ""\n'
+        '1, 1, 002, 1.000, 0.000, 2.0, ""\n'
+        '1, 1, 003, 1.000, 0.000, 2.0, ""'
     )
 
     assert compare == rendered
-

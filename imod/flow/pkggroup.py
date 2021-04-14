@@ -5,6 +5,7 @@ import enum
 from imod.flow.pkgbase import Vividict
 from imod.flow.timeutil import insert_unique_package_times
 
+
 class PackageGroup(collections.UserDict, abc.ABC):
     """
     Groups for packs that support multiple systems:
@@ -42,7 +43,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
                 system_index=system_index,
                 compose_projectfile=compose_projectfile,
                 composition=composition,
-                pkggroup_time=pkggroup_times
+                pkggroup_time=pkggroup_times,
             )
 
         return composition

@@ -10,6 +10,7 @@ contain the function in PkgGroups felt out of place.
 
 import numpy as np
 
+
 def insert_unique_package_times(package_mapping, times):
     """
     Insert unique package times in a list of times.
@@ -38,7 +39,7 @@ def insert_unique_package_times(package_mapping, times):
                     timemap_times = list(pkg[var].attrs["timemap"].keys())
                     pkgtimes.extend(timemap_times)
             times.extend(pkgtimes)
-    
+
     # np.unique also sorts
     times = np.unique(np.hstack(times))
 

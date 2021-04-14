@@ -9,7 +9,8 @@ import numpy as np
 import pandas as pd
 
 import imod
-#TODO: Merge time utilities, this is becoming a mess
+
+# TODO: Merge time utilities, this is becoming a mess
 from imod.wq import timeutil
 from imod.flow.timeutil import insert_unique_package_times
 import imod.util as util
