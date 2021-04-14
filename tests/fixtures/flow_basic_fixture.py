@@ -50,6 +50,33 @@ def two_days():
 
 
 @pytest.fixture(scope="module")
+def well_df(three_days):
+    shape = nlay, nrow, ncol = 3, 9, 9
+    dx = 10.0
+    dy = -10.0
+    xmin = 0.0
+    xmax = dx * ncol
+    ymin = 0.0
+    ymax = abs(dy) * nrow
+
+    layer = np.arange(1, nlay + 1)
+    y = np.arange(ymax, ymin, dy) + 0.5 * dy
+    x = np.arange(xmin, xmax, dx) + 0.5 * dx
+
+    times = three_days
+    n_repeats = int(len(x) / len(times)) + 1
+
+    df = pd.DataFrame()
+    df["id_name"] = np.arange(len(x)).astype(str)
+    df["x"] = x
+    df["y"] = y
+    df["rate"] = dx * dy * -1 * 0.5
+    df["time"] = np.tile(times, n_repeats)[: len(x)]
+    df["layer"] = 2
+    return df
+
+
+@pytest.fixture(scope="module")
 def get_render_dict():
     """
     Helper function to return dict to render.

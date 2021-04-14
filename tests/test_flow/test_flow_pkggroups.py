@@ -1,5 +1,5 @@
-from imod.flow import ConstantHead
-from imod.flow.pkggroup import ConstantHeadGroup
+from imod.flow import ConstantHead, Well
+from imod.flow.pkggroup import ConstantHeadGroup, WellGroup
 import numpy as np
 import xarray as xr
 import pytest
@@ -149,5 +149,55 @@ def test_group_synchronize_times_rendered(constant_head, three_days):
         '1, 1, 002, 1.000, 0.000, 2.0, ""\n'
         '1, 1, 003, 1.000, 0.000, 2.0, ""'
     )
+
+    assert compare == rendered
+
+
+def test_two_wels(well_df, three_days, get_render_dict):
+    directory = pathlib.Path(".").resolve()
+    nlayer = 3
+    times = three_days
+
+    well = Well(**well_df)
+    well2 = Well(**well_df)
+    d = {"well_1": well, "well_2": well2}
+
+    well_group = WellGroup(**d)
+
+    group_composition = well_group.compose(directory, times, nlayer)
+
+    pkg_id = well._pkg_id
+
+    time_composed = {
+        "1": "2018-01-01 00:00:00",
+        "2": "2018-01-02 00:00:00",
+        "3": "2018-01-03 00:00:00",
+    }
+
+    to_render = dict(
+        pkg_id=pkg_id,
+        name="Well",
+        variable_order=well._variable_order,
+        package_data=group_composition[pkg_id],
+        times=time_composed,
+        n_entry=2,
+    )
+
+    compare = (
+        "0003, (wel), 1, Well, ['rate']\n"
+        "2018-01-01 00:00:00\n"
+        "001, 002\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_1{os.sep}wel_20180101000000_l2.ipf\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_2{os.sep}wel_20180101000000_l2.ipf\n"
+        "2018-01-02 00:00:00\n"
+        "001, 002\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_1{os.sep}wel_20180102000000_l2.ipf\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_2{os.sep}wel_20180102000000_l2.ipf\n"
+        "2018-01-03 00:00:00\n"
+        "001, 002\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_1{os.sep}wel_20180103000000_l2.ipf\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_2{os.sep}wel_20180103000000_l2.ipf"
+    )
+    rendered = well._render_projectfile(**to_render)
 
     assert compare == rendered
