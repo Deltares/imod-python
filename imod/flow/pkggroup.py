@@ -18,10 +18,6 @@ class PackageGroup(collections.UserDict, abc.ABC):
 
     __slots__ = ["_n_variables"]
 
-    _template = jinja2.Template("{{n_systems * n_layer}}, ({{_pkg_id}})")
-
-    _template_projectfile = jinja2.Template("{{n_variables}}, {{n_systems * n_layer}}")
-
     def __init__(self, **kwargs):
         collections.UserDict.__init__(self)
         for k, v in kwargs.items():
