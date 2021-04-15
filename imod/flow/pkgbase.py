@@ -53,7 +53,7 @@ class Package(
 
     _template_projectfile = jinja2.Template(
         "0001, ({{pkg_id}}), 1, {{name}}, {{variable_order}}\n"
-        '001, {{"{:03d}".format(n_entry)}}\n'
+        '{{"{:03d}".format(variable_order|length)}}, {{"{:03d}".format(n_entry)}}\n'
         "{%- for variable in variable_order%}\n"  # Preserve variable order
         "{%-    for layer, value in package_data[variable].items()%}\n"
         "{%-        if value is string %}\n"
