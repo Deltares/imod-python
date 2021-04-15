@@ -7,6 +7,7 @@ The ImodflowModel object by default writes iMODFLOW projectfiles now
 instead of the older iMODFLOW runfiles.
 """
 
+from imod.flow.ani import HorizontalAnisotropy
 from imod.flow.bas import Boundary, Top, Bottom, StartingHead
 from imod.flow.conductivity import (
     HorizontalHydraulicConductivity,
