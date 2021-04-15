@@ -14,11 +14,12 @@ def constant_head(basic_dis, three_days):
     times = three_days
 
     # Boundary_conditions
-    trend = np.ones(times.shape)
-    trend = np.cumsum(trend)
+    # Create rising trend
+    trend = np.cumsum(np.ones(times.shape))
+    trend = xr.DataArray(trend, coords={"time": times}, dims=["time"])
 
-    head = ibound.where(ibound.x.isin([x[0], x[-1]]))
-    head = xr.DataArray(trend, coords={"time": times}, dims=["time"]) * head
+    sides = ibound.where(ibound.x.isin([x[0], x[-1]]))
+    head = trend * sides
 
     return ConstantHead(head=head)
 
