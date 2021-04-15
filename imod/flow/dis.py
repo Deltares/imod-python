@@ -10,7 +10,7 @@ class TimeDiscretization(Package):
 
     Parameters
     ----------
-    timestep_duration: float
+    timestep_duration: xr.DataArray
         is the length of the current stress period (PERLEN). If the flow
         solution is transient, timestep_duration specified here must be equal to
         that specified for the flow model. If the flow solution is steady-state,
