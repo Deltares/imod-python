@@ -1,10 +1,8 @@
-from imod.flow import ConstantHead, Well
+from imod.flow import ConstantHead
 from imod.flow import timeutil
 import numpy as np
 import xarray as xr
 import pytest
-import pathlib
-import os
 from copy import deepcopy
 
 
@@ -38,12 +36,39 @@ def test_insert_unique_package_times(constant_head, three_days):
 
     times = []
 
-    times = timeutil.insert_unique_package_times(d.items(), times)
+    times, _ = timeutil.insert_unique_package_times(d.items(), times)
 
-    compare = [
-        np.datetime64("2018-01-01T00:00:00.000000000"),
-        np.datetime64("2018-01-02T00:00:00.000000000"),
-        np.datetime64("2018-01-03T00:00:00.000000000"),
-    ]
+    compare = np.array(
+        [
+            np.datetime64("2018-01-01T00:00:00.000000000"),
+            np.datetime64("2018-01-02T00:00:00.000000000"),
+            np.datetime64("2018-01-03T00:00:00.000000000"),
+        ]
+    )
 
-    assert times == compare
+    assert np.all(times == compare)
+
+
+def test_insert_unique_package_times_overlap(constant_head, three_days):
+    outer_days = [three_days[0], three_days[-1]]
+    first_days = three_days[:-1]
+
+    head = constant_head["head"]
+
+    chd1 = ConstantHead(head=head.sel(time=outer_days))
+    chd2 = ConstantHead(head=head.sel(time=first_days))
+    d = {"primary": chd1, "secondary": chd2}
+
+    times = []
+
+    times, _ = timeutil.insert_unique_package_times(d.items(), times)
+
+    compare = np.array(
+        [
+            np.datetime64("2018-01-01T00:00:00.000000000"),
+            np.datetime64("2018-01-02T00:00:00.000000000"),
+            np.datetime64("2018-01-03T00:00:00.000000000"),
+        ]
+    )
+
+    assert np.all(times == compare)
