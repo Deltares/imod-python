@@ -9,19 +9,19 @@ contain the function in PkgGroups felt out of place.
 """
 
 import numpy as np
-import cftime
+import pandas as pd
 
 
 def _to_list(t):
     """Helper function to catch packages that have only one time step"""
 
-    if isinstance(t, np.datetime64) or isinstance(t, cftime.datetime):
+    if not isinstance(t, (np.ndarray, list, tuple, pd.DatetimeIndex)):
         return [t]
     else:
         return list(t)
 
 
-def insert_unique_package_times(package_mapping, times):
+def insert_unique_package_times(package_mapping, manual_insert=[]):
     """
     Insert unique package times in a list of times.
 
@@ -29,7 +29,7 @@ def insert_unique_package_times(package_mapping, times):
     ----------
     package_mapping : iterable
         Iterable of key, package pairs
-    times : list
+    manual_insert : iterable of times, np.datetime64, or cftime.datetime
         List with times. This list will be extended with the package times if not present.
 
     Returns
@@ -39,6 +39,9 @@ def insert_unique_package_times(package_mapping, times):
     first_times : dict
         Dictionary with first timestamp per package
     """
+
+    times = _to_list(manual_insert)
+
     first_times = {}
     for key, pkg in package_mapping:
         if pkg._hastime():
