@@ -105,14 +105,18 @@ def test_write_model(model, tmp_path):
     assert n_files == 18
 
     # Test if file and directorynames in tmp_path match the following
-    files_directories = [
-        "bnd",
-        "chd2",
-        "config_run.ini",
-        "shd",
-        "testmodel.prj",
-        "time_discretization.tim",
-        "wel",
-    ]
+    files_directories = set(
+        [
+            "bnd",
+            "chd2",
+            "config_run.ini",
+            "shd",
+            "testmodel.prj",
+            "time_discretization.tim",
+            "wel",
+        ]
+    )
 
-    assert os.listdir(tmp_path) == files_directories
+    symmetric_difference = files_directories ^ set(os.listdir(tmp_path))
+
+    assert len(symmetric_difference) == 0
