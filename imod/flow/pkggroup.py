@@ -28,8 +28,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
         self, directory, globaltimes, nlayer, compose_projectfile=True, composition=None
     ):
 
-        pkggroup_times = []
-        pkggroup_times, _ = insert_unique_package_times(self.items(), pkggroup_times)
+        pkggroup_times, _ = insert_unique_package_times(self.items())
 
         if composition is None:
             composition = Vividict()
