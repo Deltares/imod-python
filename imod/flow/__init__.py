@@ -15,6 +15,7 @@ from imod.flow.conductivity import (
     VerticalAnisotropy,
 )
 from imod.flow.riv import River
+from imod.flow.cap import MetaSwap
 from imod.flow.drn import Drain
 from imod.flow.ghb import GeneralHeadBoundary
 from imod.flow.wel import Well
