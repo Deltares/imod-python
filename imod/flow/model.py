@@ -273,22 +273,6 @@ class ImodflowModel(Model):
             timestep_duration=timestep_duration
         )
 
-    def _render_pkg(self, key, directory, globaltimes):
-        """
-        Rendering method for straightforward packages
-        """
-        # Get name of pkg, e.g. lookup "recharge" for rch _pkg_id
-        pkgkey = self._get_pkgkey(key)
-        if pkgkey is None:
-            # Maybe do enum look for full package name?
-            if (key == "rch") or (key == "evt"):  # since recharge is optional
-                return ""
-            else:
-                raise ValueError(f"No {key} package provided.")
-        return self[pkgkey]._render(
-            directory=directory / pkgkey, globaltimes=globaltimes
-        )
-
     def _calc_n_entry(self, composed_package, is_boundary_condition):
         """Calculate amount of entries for each timestep and variable."""
 
