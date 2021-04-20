@@ -202,9 +202,9 @@ class MetaSwap(Package):
         "{%-    endfor %}\n"
         "{%- endfor %}\n"
         '{{"{:03d}".format(extra_files|length)}},extra files\n'
-        "{%- for file in extra_files}\n"
+        "{%- for file in extra_files %}\n"
         "file\n"
-        "{%- endfor}\n"
+        "{%- endfor %}\n"
     )
 
     # TODO: Check which of these actually are required.
