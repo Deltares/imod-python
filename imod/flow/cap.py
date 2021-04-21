@@ -128,6 +128,15 @@ class MetaSwap(Package):
         used during calibration. Default value
         is 1.0.
 
+    extra_files : list of pathlib.Path or str
+        List of paths to "extra files" required by MetaSWAP.
+        This a list of lookup tables and meteorological information
+        that is required by MetaSwap. Note that MetaSwap looks for files
+        with a specific name, so calling "luse_svat.inp" something else will
+        result in errors.
+        To view the files required, you can call:
+        :code:`print(MetaSwap()._required_extra)`
+
     More info
     ---------
     MetaSWAP is developed by Alterra, Wageningen as part of the SIMGRO model code.
@@ -204,7 +213,7 @@ class MetaSwap(Package):
         # Section for EXTRA FILES comes below
         '{{"{:03d}".format(extra_files|length)}},extra files\n'
         "{%- for file in extra_files %}\n"
-        "file\n"
+        "{{file}}\n"
         "{%- endfor %}\n"
     )
 
@@ -222,57 +231,57 @@ class MetaSwap(Package):
 
     def __init__(
         self,
-        boundary,
-        landuse,
-        rootzone_thickness,
-        soil_physical_unit,
-        meteo_station_number,
-        surface_elevation,
-        sprinkling_type,
-        sprinkling_layer,
-        sprinkling_capacity,
-        wetted_area,
-        urban_area,
-        ponding_depth_urban,
-        ponding_depth_rural,
-        runoff_resistance_urban,
-        runoff_resistance_rural,
-        runon_resistance_urban,
-        runon_resistance_rural,
-        infiltration_capacity_urban,
-        infiltration_capacity_rural,
-        perched_water_table,
+        boundary=None,
+        landuse=None,
+        rootzone_thickness=None,
+        soil_physical_unit=None,
+        meteo_station_number=None,
+        surface_elevation=None,
+        sprinkling_type=None,
+        sprinkling_layer=None,
+        sprinkling_capacity=None,
+        wetted_area=None,
+        urban_area=None,
+        ponding_depth_urban=None,
+        ponding_depth_rural=None,
+        runoff_resistance_urban=None,
+        runoff_resistance_rural=None,
+        runon_resistance_urban=None,
+        runon_resistance_rural=None,
+        infiltration_capacity_urban=None,
+        infiltration_capacity_rural=None,
+        perched_water_table=None,
         soil_moisture_factor=1.0,
         conductivity_factor=1.0,
         extra_files=[],
     ):
         super(__class__, self).__init__()
-        self.dataset["boundary,"] = boundary
-        self.dataset["landuse,"] = landuse
-        self.dataset["rootzone_thickness,"] = rootzone_thickness
-        self.dataset["soil_physical_unit,"] = soil_physical_unit
-        self.dataset["meteo_station_number,"] = meteo_station_number
-        self.dataset["surface_elevation,"] = surface_elevation
-        self.dataset["sprinkling_type,"] = sprinkling_type
-        self.dataset["sprinkling_layer,"] = sprinkling_layer
-        self.dataset["sprinkling_capacity,"] = sprinkling_capacity
-        self.dataset["wetted_area,"] = wetted_area
-        self.dataset["urban_area,"] = urban_area
-        self.dataset["ponding_depth_urban,"] = ponding_depth_urban
-        self.dataset["ponding_depth_rural,"] = ponding_depth_rural
-        self.dataset["runoff_resistance_urban,"] = runoff_resistance_urban
-        self.dataset["runoff_resistance_rural,"] = runoff_resistance_rural
-        self.dataset["runon_resistance_urban,"] = runon_resistance_urban
-        self.dataset["runon_resistance_rural,"] = runon_resistance_rural
-        self.dataset["infiltration_capacity_urban,"] = infiltration_capacity_urban
-        self.dataset["infiltration_capacity_rural,"] = infiltration_capacity_rural
-        self.dataset["perched_water_table,"] = perched_water_table
-        self.dataset["soil_moisture_factor,"] = soil_moisture_factor
-        self.dataset["conductivity_factor,"] = conductivity_factor
+        self.dataset["boundary"] = boundary
+        self.dataset["landuse"] = landuse
+        self.dataset["rootzone_thickness"] = rootzone_thickness
+        self.dataset["soil_physical_unit"] = soil_physical_unit
+        self.dataset["meteo_station_number"] = meteo_station_number
+        self.dataset["surface_elevation"] = surface_elevation
+        self.dataset["sprinkling_type"] = sprinkling_type
+        self.dataset["sprinkling_layer"] = sprinkling_layer
+        self.dataset["sprinkling_capacity"] = sprinkling_capacity
+        self.dataset["wetted_area"] = wetted_area
+        self.dataset["urban_area"] = urban_area
+        self.dataset["ponding_depth_urban"] = ponding_depth_urban
+        self.dataset["ponding_depth_rural"] = ponding_depth_rural
+        self.dataset["runoff_resistance_urban"] = runoff_resistance_urban
+        self.dataset["runoff_resistance_rural"] = runoff_resistance_rural
+        self.dataset["runon_resistance_urban"] = runon_resistance_urban
+        self.dataset["runon_resistance_rural"] = runon_resistance_rural
+        self.dataset["infiltration_capacity_urban"] = infiltration_capacity_urban
+        self.dataset["infiltration_capacity_rural"] = infiltration_capacity_rural
+        self.dataset["perched_water_table"] = perched_water_table
+        self.dataset["soil_moisture_factor"] = soil_moisture_factor
+        self.dataset["conductivity_factor"] = conductivity_factor
 
-        self.extra_files = [extra_files]
+        self.extra_files = extra_files
 
-    def _force_absolute_path(f):
+    def _force_absolute_path(self, f):
         """Force absolute path, because projectfile cannot handle relative paths"""
         return str(pathlib.Path(f).resolve())
 
@@ -309,9 +318,11 @@ class MetaSwap(Package):
             raise ValueError(f"Missing extra files {missing_files}")
 
     def _pkgcheck(self, active_cells=None):
-        if self.dataset.dims != ("y", "x"):
-            raise ValueError(
-                f'Dataset dims not ("y", "x"), instead got {self.dataset.dims}'
-            )
+        # Dataset.dims does not return a tuple, like DataArray does.
+        # http://xarray.pydata.org/en/stable/generated/xarray.Dataset.dims.html
+        dims = tuple(self.dataset.dims.keys())
+        # Frozen(SortedKeysDict).keys() does not preserve ordering in keys
+        if dims != ("x", "y"):
+            raise ValueError(f'Dataset dims not ("y", "x"), instead got {dims}')
 
         self.check_extra_files()
