@@ -16,6 +16,7 @@ import imod.wq
 
 # submodules
 from imod import idf, ipf, rasterio, tec, util
+from imod.data_formats import gen
 
 try:
     __version__ = pkg_resources.get_distribution(__name__).version
