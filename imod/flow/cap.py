@@ -201,6 +201,7 @@ class MetaSwap(Package):
         "{%-        endif %}\n"
         "{%-    endfor %}\n"
         "{%- endfor %}\n"
+        # Section for EXTRA FILES comes below
         '{{"{:03d}".format(extra_files|length)}},extra files\n'
         "{%- for file in extra_files %}\n"
         "file\n"
