@@ -68,8 +68,8 @@ class StructuredDiscretization(Package):
         d["nlay"] = self["idomain"].coords["layer"].size
         d["nrow"] = y.size
         d["ncol"] = x.size
-        d["delr"] = self._delrc(np.abs(dy))
-        d["delc"] = self._delrc(np.abs(dx))
+        d["delr"] = self._delrc(np.abs(dx))
+        d["delc"] = self._delrc(np.abs(dy))
         _, d["top"] = self._compose_values(self["top"], disdirectory, "top")
         d["botm_layered"], d["botm"] = self._compose_values(
             self["bottom"], disdirectory, "botm"
