@@ -6,4 +6,5 @@ from fixtures.flow_basic_fixture import (
     three_days,
     two_days,
     well_df,
+    metaswap_dict,
 )

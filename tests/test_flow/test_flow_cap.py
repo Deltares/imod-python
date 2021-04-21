@@ -5,54 +5,13 @@ import os
 from copy import deepcopy
 
 
-@pytest.fixture(scope="module")
-def metaswap(basic_dis):
-    ibound, _, _ = basic_dis
-
-    active = ibound.isel(layer=0)
-
-    d = {}
-    d["boundary"] = active
-    d["landuse"] = active
-    d["rootzone_thickness"] = 1.2
-    d["soil_physical_unit"] = active
-    d["meteo_station_number"] = active
-    d["surface_elevation"] = 0.0
-    d["sprinkling_type"] = active
-    d["sprinkling_layer"] = active
-    d["sprinkling_capacity"] = 1000.0
-    d["wetted_area"] = 30.0
-    d["urban_area"] = 30.0
-    d["ponding_depth_urban"] = 0.02
-    d["ponding_depth_rural"] = 0.005
-    d["runoff_resistance_urban"] = 1.5
-    d["runoff_resistance_rural"] = 1.5
-    d["runon_resistance_urban"] = 1.5
-    d["runon_resistance_rural"] = 1.5
-    d["infiltration_capacity_urban"] = 10.0
-    d["infiltration_capacity_rural"] = 2.0
-    d["perched_water_table"] = 0.5
-    d["soil_moisture_factor"] = 1.0
-    d["conductivity_factor"] = 1.0
-
-    d["extra_files"] = [
-        "fact_svat.inp",
-        "luse_svat.inp",
-        "mete_grid.inp",
-        "para_sim.inp",
-        "tiop_sim.inp",
-        "init_svat.inp",
-        "comp_post.inp",
-        "sel_key_svat_per.inp",
-    ]
-
-    return MetaSwap(**d)
-
-
-def test_metaswap_render(metaswap, get_render_dict):
+def test_metaswap_render(metaswap_dict, get_render_dict):
     # See e.g. https://github.com/omarkohl/pytest-datafiles/issues/6
     directory = str(pathlib.Path(".").resolve())
 
+    metaswap = MetaSwap(**metaswap_dict)
+
+    # Force extra paths as well
     metaswap.extra_files = [
         os.path.join(directory, file) for file in metaswap.extra_files
     ]
@@ -102,7 +61,8 @@ def test_metaswap_render(metaswap, get_render_dict):
     assert rendered == compare
 
 
-def test_metaswap_pkgcheck(metaswap):
+def test_metaswap_pkgcheck(metaswap_dict):
+    metaswap = MetaSwap(**metaswap_dict)
     # Test if no ValueError is thrown, source:
     # https://miguendes.me/how-to-check-if-an-exception-is-raised-or-not-with-pytest
     try:
@@ -111,8 +71,8 @@ def test_metaswap_pkgcheck(metaswap):
         assert False, f"'metaswap._pkgcheck()' raised an exception {exc}"
 
 
-def test_metaswap_pkgcheck_fail(metaswap):
-    metaswap_fail = deepcopy(metaswap)
+def test_metaswap_pkgcheck_fail(metaswap_dict):
+    metaswap_fail = MetaSwap(**metaswap_dict)
 
     metaswap_fail.dataset = metaswap_fail.dataset.expand_dims("layer")
 
@@ -120,8 +80,8 @@ def test_metaswap_pkgcheck_fail(metaswap):
         metaswap_fail._pkgcheck()
 
 
-def test_check_extra_files_no_files(metaswap):
-    metaswap_fail = deepcopy(metaswap)
+def test_check_extra_files_no_files(metaswap_dict):
+    metaswap_fail = MetaSwap(**metaswap_dict)
 
     metaswap_fail.extra_files = []
 
@@ -129,8 +89,8 @@ def test_check_extra_files_no_files(metaswap):
         metaswap_fail.check_extra_files()
 
 
-def test_check_extra_files_missing_files(metaswap):
-    metaswap_fail = deepcopy(metaswap)
+def test_check_extra_files_missing_files(metaswap_dict):
+    metaswap_fail = MetaSwap(**metaswap_dict)
 
     metaswap_fail.extra_files = [
         "fact_svat.inp",

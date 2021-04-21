@@ -106,3 +106,47 @@ def get_render_dict():
         )
 
     return _get_render_dict
+
+
+@pytest.fixture(scope="module")
+def metaswap_dict(basic_dis):
+    ibound, _, _ = basic_dis
+
+    active = ibound.isel(layer=0)
+
+    d = {}
+    d["boundary"] = active
+    d["landuse"] = active
+    d["rootzone_thickness"] = 1.2
+    d["soil_physical_unit"] = active
+    d["meteo_station_number"] = active
+    d["surface_elevation"] = 0.0
+    d["sprinkling_type"] = active
+    d["sprinkling_layer"] = active
+    d["sprinkling_capacity"] = 1000.0
+    d["wetted_area"] = 30.0
+    d["urban_area"] = 30.0
+    d["ponding_depth_urban"] = 0.02
+    d["ponding_depth_rural"] = 0.005
+    d["runoff_resistance_urban"] = 1.5
+    d["runoff_resistance_rural"] = 1.5
+    d["runon_resistance_urban"] = 1.5
+    d["runon_resistance_rural"] = 1.5
+    d["infiltration_capacity_urban"] = 10.0
+    d["infiltration_capacity_rural"] = 2.0
+    d["perched_water_table"] = 0.5
+    d["soil_moisture_factor"] = 1.0
+    d["conductivity_factor"] = 1.0
+
+    d["extra_files"] = [
+        "fact_svat.inp",
+        "luse_svat.inp",
+        "mete_grid.inp",
+        "para_sim.inp",
+        "tiop_sim.inp",
+        "init_svat.inp",
+        "comp_post.inp",
+        "sel_key_svat_per.inp",
+    ]
+
+    return d
