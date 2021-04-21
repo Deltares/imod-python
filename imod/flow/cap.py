@@ -241,8 +241,8 @@ class MetaSwap(Package):
         infiltration_capacity_urban,
         infiltration_capacity_rural,
         perched_water_table,
-        soil_moisture_factor,
-        conductivity_factor,
+        soil_moisture_factor=1.0,
+        conductivity_factor=1.0,
         extra_files=[],
     ):
         super(__class__, self).__init__()
