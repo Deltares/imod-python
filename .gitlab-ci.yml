@@ -30,7 +30,7 @@ tests:
   # https://docs.gitlab.com/ee/user/project/merge_requests/test_coverage_visualization.html#python-example
   artifacts:
     reports:
-      cobertura: coverage.xml
+      cobertura: tests/coverage.xml
 
 pages:
   script:
