@@ -1,5 +1,6 @@
 import pytest
 import imod.flow as flow
+from copy import deepcopy
 
 import numpy as np
 import xarray as xr
@@ -48,11 +49,18 @@ def model(basic_dis, three_days, well_df):
     m["shd"] = flow.StartingHead(starting_head)
 
     m["chd"] = flow.ConstantHead(head=10.0)
-    # %%
     m["chd2"] = flow.ConstantHead(head=head)
 
     m["wel"] = flow.Well(**well_df)
     m.time_discretization(times[-1])
+
+    return m
+
+
+@pytest.fixture(scope="module")
+def model_metaswap(model, metaswap_dict):
+    m = deepcopy(model)
+    m["cap"] = flow.MetaSwap(**metaswap_dict)
 
     return m
 
@@ -108,6 +116,42 @@ def test_write_model(model, tmp_path):
     files_directories = set(
         [
             "bnd",
+            "chd2",
+            "config_run.ini",
+            "shd",
+            "testmodel.prj",
+            "time_discretization.tim",
+            "wel",
+        ]
+    )
+
+    symmetric_difference = files_directories ^ set(os.listdir(tmp_path))
+
+    assert len(symmetric_difference) == 0
+
+
+def test_write_model_metaswap(model_metaswap, tmp_path):
+    model_metaswap.write(directory=tmp_path)
+
+    print(tmp_path)
+
+    # Test if prjfile at least has the right amount of lines
+    prjfile = tmp_path / "testmodel.prj"
+    with open(prjfile) as f:
+        lines = f.readlines()
+
+    assert len(lines) == 107
+
+    # Recursively walk through folder and count files
+    n_files = sum([len(files) for r, d, files in os.walk(tmp_path)])
+
+    assert n_files == 24
+
+    # Test if file and directorynames in tmp_path match the following
+    files_directories = set(
+        [
+            "bnd",
+            "cap",
             "chd2",
             "config_run.ini",
             "shd",
