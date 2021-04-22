@@ -63,7 +63,7 @@ class Well(BoundaryCondition):
 
     def _compose_values_layer(self, varname, directory, nlayer, time=None):
         values = {}
-        d = {"directory": directory, "name": self._pkg_id, "extension": ".ipf"}
+        d = {"directory": directory, "name": directory.stem, "extension": ".ipf"}
 
         if time is None:
             if "layer" in self.dataset:
