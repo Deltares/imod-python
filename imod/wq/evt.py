@@ -1,10 +1,12 @@
+import abc
+
 import jinja2
 import numpy as np
 
 from imod.wq.pkgbase import BoundaryCondition
 
 
-class Evapotranspiration(BoundaryCondition):
+class Evapotranspiration(BoundaryCondition, abc.ABC):
     __slots__ = ("_option",)
     _pkg_id = "evt"
 
@@ -63,11 +65,19 @@ class EvapotranspirationTopLayer(Evapotranspiration):
 
     _option = 1
 
-    def __init__(self, maximum_rate, surface, extinction_depth, save_budget=False):
+    def __init__(
+        self,
+        maximum_rate,
+        surface,
+        extinction_depth,
+        concentration=0.0,
+        save_budget=False,
+    ):
         super(__class__, self).__init__()
         self["maximum_rate"] = maximum_rate
         self["surface"] = surface
         self["extinction_depth"] = extinction_depth
+        self["concentration"] = concentration
         self["save_budget"] = save_budget
 
     def _set_ssm_layers(self, ibound):
@@ -92,6 +102,7 @@ class EvapotranspirationLayers(Evapotranspiration):
         surface,
         extinction_depth,
         evapotranspiration_layer,
+        concentration=0.0,
         save_budget=False,
     ):
         super(__class__, self).__init__()
@@ -99,6 +110,7 @@ class EvapotranspirationLayers(Evapotranspiration):
         self["surface"] = surface
         self["extinction_depth"] = extinction_depth
         self["evapotranspiration_layer"] = evapotranspiration_layer
+        self["concentration"] = concentration
         self["save_budget"] = save_budget
 
     def _set_ssm_layers(self, ibound):
@@ -112,11 +124,19 @@ class EvapotranspirationHighestActive(Evapotranspiration):
 
     _option = 3
 
-    def __init__(self, maximum_rate, surface, extinction_depth, save_budget=False):
+    def __init__(
+        self,
+        maximum_rate,
+        surface,
+        extinction_depth,
+        concentration=0.0,
+        save_budget=False,
+    ):
         super(__class__, self).__init__()
         self["maximum_rate"] = maximum_rate
         self["surface"] = surface
         self["extinction_depth"] = extinction_depth
+        self["concentration"] = concentration
         self["save_budget"] = save_budget
 
     def _set_ssm_layers(self, ibound):
