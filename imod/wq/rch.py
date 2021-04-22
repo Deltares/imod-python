@@ -172,6 +172,7 @@ class RechargeHighestActive(Recharge):
             rch_active = (rate != 0.0) & rate.notnull()
             if "time" in rch_active.dims:
                 rch_active = rch_active.any("time")
+            rch_active = rch_active & (ibound > 0)
         else:
             rch_active = ibound > 0
 
