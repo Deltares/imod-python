@@ -125,7 +125,7 @@ class Package(
         if composition is None:
             composition = Vividict()
 
-        for varname in self.dataset.data_vars:
+        for varname in self._variable_order:
             composition[self._pkg_id][varname] = self._compose_values_layer(
                 varname, directory, nlayer
             )
