@@ -61,7 +61,7 @@ class Well(BoundaryCondition):
             else:
                 raise ValueError(f"Length of {k} does not match other arguments")
 
-    def _compose_values_layer(self, varname, directory, time=None):
+    def _compose_values_layer(self, varname, directory, nlayer, time=None):
         values = {}
         d = {"directory": directory, "name": self._pkg_id, "extension": ".ipf"}
 
@@ -72,7 +72,8 @@ class Well(BoundaryCondition):
                     d["layer"] = layer
                     values[layer] = self._compose_path(d)
             else:
-                values["?"] = self._compose_path(d)
+                for layer in range(1, nlayer + 1):  # 1-based indexing
+                    values[layer] = self._compose_path(d)
 
         else:
             d["time"] = time
@@ -84,7 +85,8 @@ class Well(BoundaryCondition):
                     d["layer"] = layer
                     values[layer] = self._compose_path(d)
             else:
-                values["?"] = self._compose_path(d)
+                for layer in range(1, nlayer + 1):  # 1-based indexing
+                    values[layer] = self._compose_path(d)
 
         return values
 
@@ -137,7 +139,7 @@ class Well(BoundaryCondition):
             Path to working directory, where files will be written.
             Necessary to generate the paths for the runfile.
         nlayer : int
-            Number of layers, unused
+            Number of layers
         values : Vividict
             Vividict (tree-like dictionary) to which values should be added
         system_index : int
@@ -159,7 +161,7 @@ class Well(BoundaryCondition):
         if values is None:
             values = Vividict()
 
-        args = (varname, directory)
+        args = (varname, directory, nlayer)
         kwargs = dict(time=None)
 
         if "time" in self.dataset:
