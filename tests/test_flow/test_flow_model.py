@@ -65,6 +65,14 @@ def model_metaswap(model, metaswap_dict):
     return m
 
 
+@pytest.fixture(scope="module")
+def model_horizontal_flow_barrier(model, horizontal_flow_barrier_gdf):
+    m = deepcopy(model)
+    m["hfb"] = flow.HorizontalFlowBarrier(**horizontal_flow_barrier_gdf)
+
+    return m
+
+
 def test_compose_all_packages(model, tmp_path):
     def depth(d):
         """Recursively walk through nested dict"""
@@ -133,8 +141,6 @@ def test_write_model(model, tmp_path):
 def test_write_model_metaswap(model_metaswap, tmp_path):
     model_metaswap.write(directory=tmp_path)
 
-    print(tmp_path)
-
     # Test if prjfile at least has the right amount of lines
     prjfile = tmp_path / "testmodel.prj"
     with open(prjfile) as f:
@@ -154,6 +160,40 @@ def test_write_model_metaswap(model_metaswap, tmp_path):
             "cap",
             "chd2",
             "config_run.ini",
+            "shd",
+            "testmodel.prj",
+            "time_discretization.tim",
+            "wel",
+        ]
+    )
+
+    symmetric_difference = files_directories ^ set(os.listdir(tmp_path))
+
+    assert len(symmetric_difference) == 0
+
+
+def test_write_model_horizontal_flow_barrier(model_horizontal_flow_barrier, tmp_path):
+    model_horizontal_flow_barrier.write(directory=tmp_path)
+
+    # Test if prjfile at least has the right amount of lines
+    prjfile = tmp_path / "testmodel.prj"
+    with open(prjfile) as f:
+        lines = f.readlines()
+
+    assert len(lines) == 78
+
+    # Recursively walk through folder and count files
+    n_files = sum([len(files) for r, d, files in os.walk(tmp_path)])
+
+    assert n_files == 20
+
+    # Test if file and directorynames in tmp_path match the following
+    files_directories = set(
+        [
+            "bnd",
+            "chd2",
+            "config_run.ini",
+            "hfb",
             "shd",
             "testmodel.prj",
             "time_discretization.tim",

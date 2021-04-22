@@ -7,4 +7,5 @@ from fixtures.flow_basic_fixture import (
     two_days,
     well_df,
     metaswap_dict,
+    horizontal_flow_barrier_gdf,
 )

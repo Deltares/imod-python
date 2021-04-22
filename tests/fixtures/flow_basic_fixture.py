@@ -2,6 +2,8 @@ import xarray as xr
 import pytest
 import numpy as np
 import pandas as pd
+from shapely.geometry import LineString
+import geopandas as gpd
 
 
 @pytest.fixture(scope="module")
@@ -150,3 +152,24 @@ def metaswap_dict(basic_dis):
     ]
 
     return d
+
+
+@pytest.fixture(scope="module")
+def horizontal_flow_barrier_gdf(basic_dis):
+    """GeoDataframe that can be used to initiate HorizontalFlowBarriers"""
+    ibound, _, _ = basic_dis
+
+    x = ibound.x.values
+    y = ibound.y.values
+
+    line1 = LineString([(x[1], y[1]), (x[1], y[-2])])
+    line2 = LineString([(x[4], y[1]), (x[4], y[-2])])
+
+    lines = np.array([line1, line2, line1, line2], dtype="object")
+    hfb_layers = np.array([3, 3, 4, 4])
+
+    hfb_gdf = gpd.GeoDataFrame(
+        geometry=lines, data=dict(layer=hfb_layers, resistance=100.0)
+    )
+
+    return hfb_gdf
