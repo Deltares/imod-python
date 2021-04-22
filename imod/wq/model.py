@@ -543,10 +543,10 @@ class SeawatModel(Model):
             self[pkstkey]._compute_load_balance_weight(self[baskey]["ibound"])
             return self[pkstkey]._render(directory=directory / pkstkey)
 
-    def _render_ssm_rch_mal_tvc(self, directory, globaltimes, nlayer):
+    def _render_ssm_rch_evt_mal_tvc(self, directory, globaltimes, nlayer):
         out = ""
         for key, pkg in self.items():
-            if pkg._pkg_id in ("rch", "mal", "tvc"):
+            if pkg._pkg_id in ("rch", "evt", "mal", "tvc"):
                 out += pkg._render_ssm(
                     directory=directory / key, globaltimes=globaltimes, nlayer=nlayer
                 )
@@ -611,7 +611,7 @@ class SeawatModel(Model):
         # Add recharge to sinks and sources
         n_sinkssources += self._bas_btn_rch_evt_mal_tvc_sinkssources()
         # Add recharge, mass loading, time varying constant concentration to ssm_content
-        ssm_content += self._render_ssm_rch_mal_tvc(
+        ssm_content += self._render_ssm_rch_evt_mal_tvc(
             directory=directory, globaltimes=globaltimes, nlayer=nlayer
         )
 
