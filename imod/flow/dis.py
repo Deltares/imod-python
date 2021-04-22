@@ -39,6 +39,12 @@ class TimeDiscretization(Package):
     """
 
     _pkg_id = "dis"
+    _variable_order = [
+        "timestep_duration",
+        "n_timesteps",
+        "transient",
+        "timestep_multiplier",
+    ]
 
     def __init__(
         self, timestep_duration, n_timesteps=1, transient=True, timestep_multiplier=1.0
