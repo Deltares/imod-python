@@ -49,6 +49,7 @@ def write_char_record(self, string: str):
     self._fp.write(bytes_string)
     nb.tofile(self._fp)
 
+
 # The binary GEN file has some idiosyncratic geometries:
 # * A separate circle geometry
 # * A seperate rectangle geometry
@@ -59,6 +60,7 @@ def write_char_record(self, string: str):
 # * Rectangle: (left, lower), (right, upper); may also be (left, upper), (right, lower)
 #
 # The other shapely geometries can be generated directly from the vertices.
+
 
 def from_circle(xy: np.ndarray) -> sg.Polygon:
     radius = np.sqrt(np.sum((xy[1] - xy[0]) ** 2))
