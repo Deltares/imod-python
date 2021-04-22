@@ -521,7 +521,7 @@ def test_render_btn(basicmodel):
     )
 
 
-def test_render_ssm_rch_mal_tvc(basicmodel):
+def test_render_ssm_rch_evt_mal_tvc(basicmodel):
     m = basicmodel
     m.time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
@@ -534,10 +534,11 @@ def test_render_ssm_rch_mal_tvc(basicmodel):
     crch_t1_p3_l? = rch/concentration_20000103000000.idf
     crch_t1_p4_l? = rch/concentration_20000104000000.idf
     crch_t1_p5_l? = rch/concentration_20000105000000.idf
+    cevt_t1_p?_l? = 0.0
     cmal_t1_p?_l3 = mal/concentration_l3.idf
     ctvc_t1_p?_l3 = tvc/concentration_l3.idf"""
 
-    actual = m._render_ssm_rch_mal_tvc(
+    actual = m._render_ssm_rch_evt_mal_tvc(
         directory=directory, globaltimes=globaltimes, nlayer=3
     )
     assert actual == compare
@@ -556,6 +557,7 @@ def test_render_ssm_rch_constant(basicmodel):
 
     compare = """
     crch_t1_p?_l1 = 0.15
+    cevt_t1_p?_l1 = 0.0
     cmal_t1_p?_l3 = mal/concentration_l3.idf
     ctvc_t1_p?_l3 = tvc/concentration_l3.idf"""
 
@@ -563,13 +565,14 @@ def test_render_ssm_rch_constant(basicmodel):
     m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert hasattr(m["rch"], "_ssm_layers")
 
-    actual = m._render_ssm_rch_mal_tvc(
+    actual = m._render_ssm_rch_evt_mal_tvc(
         directory=directory, globaltimes=globaltimes, nlayer=3
     )
     assert actual == compare
 
     compare = """
     crch_t1_p?_l1:2 = 0.15
+    cevt_t1_p?_l1 = 0.0
     cmal_t1_p?_l3 = mal/concentration_l3.idf
     ctvc_t1_p?_l3 = tvc/concentration_l3.idf"""
 
@@ -578,7 +581,7 @@ def test_render_ssm_rch_constant(basicmodel):
     m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert hasattr(m["rch"], "_ssm_layers")
 
-    actual = m._render_ssm_rch_mal_tvc(
+    actual = m._render_ssm_rch_evt_mal_tvc(
         directory=directory, globaltimes=globaltimes, nlayer=3
     )
     assert actual == compare
