@@ -6,7 +6,7 @@ import geopandas as gpd
 import jinja2
 
 
-class HorizontalFlowBoundary(Package):
+class HorizontalFlowBarrier(Package):
     """
     Horizontal barriers obstructing flow such as semi- or impermeable fault zone or a sheet pile wall are
     defined for each model layer by a *.GEN line file.
