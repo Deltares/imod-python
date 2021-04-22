@@ -10,7 +10,7 @@ from imod.flow import Well
 def test_wel(well_df, three_days, get_render_dict):
     well = Well(**well_df)
 
-    directory = str(pathlib.Path(".").resolve())
+    directory = pathlib.Path(".").resolve()
 
     nlayer = 3
     times = three_days
@@ -29,13 +29,14 @@ def test_wel(well_df, three_days, get_render_dict):
         "0003, (wel), 1, Well, ['rate']\n"
         "2018-01-01 00:00:00\n"
         "001, 001\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}wel_20180101000000_l2.ipf\n"
+        # {directory.stem} because this is taken in both compose as well as save
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}{directory.stem}_20180101000000_l2.ipf\n"
         "2018-01-02 00:00:00\n"
         "001, 001\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}wel_20180102000000_l2.ipf\n"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}{directory.stem}_20180102000000_l2.ipf\n"
         "2018-01-03 00:00:00\n"
         "001, 001\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}wel_20180103000000_l2.ipf"
+        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}{directory.stem}_20180103000000_l2.ipf"
     )
     rendered = well._render_projectfile(**to_render)
 
