@@ -552,10 +552,8 @@ class ImodflowModel(Model):
         # Write all IDFs and IPFs
         for pkgname, pkg in self.items():
             if (
-                "x" in pkg.dataset.coords
-                and "y" in pkg.dataset.coords
-                or pkg._pkg_id == "wel"
-            ):
+                "x" in pkg.dataset.coords and "y" in pkg.dataset.coords
+            ) or pkg._pkg_id in ["wel", "hfb"]:
                 try:
                     pkg.save(directory=directory / pkgname)
                 except Exception as error:
