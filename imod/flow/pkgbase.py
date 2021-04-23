@@ -4,11 +4,12 @@ import abc
 import xarray as xr
 import numpy as np
 
+import joblib
 import jinja2
 import pathlib
 
 from imod import util
-from imod.wq import timeutil
+from imod.wq import timeutil, caching
 
 
 class Vividict(dict):
@@ -42,7 +43,7 @@ class Package(
     the Package. Same applies to ``_template_projectfile`` for the projectfile.
     """
 
-    __slots__ = ("_pkg_id", "_variable_order")
+    __slots__ = ("_pkg_id", "_variable_order", "_dataset")
 
     # TODO Runfile template not implemented yet
     _template_runfile = jinja2.Template(
@@ -77,6 +78,79 @@ class Package(
 
     def __getitem__(self, key):
         return self.dataset.__getitem__(key)
+
+    @classmethod
+    def from_file(cls, path, cache_path=None, cache_verbose=0, **kwargs):
+        """
+        Loads an imod-wq package from a file (currently only netcdf is supported).
+
+        This enables caching of intermediate input and should result in much
+        faster model.write() times. To enable caching, provide a path to a
+        ``joblib.Memory`` caching directory.
+
+        Parameters
+        ----------
+        path : str, pathlib.Path
+            Path to the file.
+        cache_path : str, pathlib.Path, optional
+            The path to the ``joblib.Memory`` caching dir where intermediate answers are stored.
+        cache_verbose : int
+            Verbosity flag of ``joblib.Memory``, controls the debug messages that are issued as
+            functions are evaluated.
+        **kwargs : keyword arguments
+            Arbitrary keyword arguments forwarded to ``xarray.open_dataset()``, or
+            ``xarray.open_zarr()``.
+        Refer to the examples.
+
+        Returns
+        -------
+        package : imod.wq.Package, imod.wq.CachingPackage
+            Returns a package with data loaded from file. Returns a CachingPackage
+            if a path to a ``joblib.Memory`` caching directory has been provided for ``cache``.
+
+        Examples
+        --------
+
+        To load a package from a file, e.g. a River package:
+
+        >>> river = imod.wq.River.from_file("river.nc")
+
+        To load a package, and enable caching:
+
+        >>> cache = "./.cache_dir"
+        >>> river = imod.wq.River.from_file("river.nc", cache)
+
+        For large datasets, you likely want to process it in chunks. You can
+        forward keyword arguments to ``xarray.open_dataset()`` or
+        ``xarray.open_zarr()``:
+
+        >>> cache = "./.cache_dir"
+        >>> river = imod.wq.River.from_file("river.nc", cache, chunks={"time": 1})
+
+        Refer to the xarray documentation for the possible keyword arguments.
+        """
+        path = pathlib.Path(path)
+
+        if path.suffix in (".zip", ".zarr"):
+            # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
+            cls._dataset = xr.open_zarr(str(path), **kwargs)
+        else:
+            cls._dataset = xr.open_dataset(path, **kwargs)
+
+        pkg_kwargs = {var: cls._dataset[var] for var in cls._dataset.data_vars}
+        if cache_path is None:
+            return cls(**pkg_kwargs)
+        else:
+            # Dynamically construct a CachingPackage
+            # Note:
+            #    "a method cannot be decorated at class definition, because when
+            #    the class is instantiated, the first argument (self) is bound,
+            #    and no longer accessible to the Memory object."
+            # See: https://joblib.readthedocs.io/en/latest/memory.html
+            cache_path = pathlib.Path(cache_path)
+            cache = joblib.Memory(cache_path, verbose=cache_verbose)
+            CachingPackage = caching(cls, cache)
+            return CachingPackage(path, **pkg_kwargs)
 
     # TODO:
     # def __getattribute__(self, name):
