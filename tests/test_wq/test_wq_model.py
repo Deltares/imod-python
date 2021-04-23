@@ -2,6 +2,7 @@ import pathlib
 import shutil
 import textwrap
 from copy import deepcopy
+import os
 
 import cftime
 import numpy as np
@@ -248,7 +249,9 @@ def test_get_pkgkey(basicmodel):
 
 
 def test_timediscretization(basicmodel):
-    m = basicmodel
+    # deepcopy to prevent side-effects to the fixture
+    # m.time_discretization() changes the basicmodel object if not deepcopied.
+    m = deepcopy(basicmodel)
     m.time_discretization("2000-01-06")
     assert np.allclose(
         m["time_discretization"]["timestep_duration"].values, np.full(5, 1.0)
@@ -256,7 +259,7 @@ def test_timediscretization(basicmodel):
 
 
 def test_render_gen(basicmodel):
-    m = basicmodel
+    m = deepcopy(basicmodel)
     m.time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
@@ -288,7 +291,7 @@ def test_render_gen(basicmodel):
 
 
 def test_render_pkg__gcg(basicmodel):
-    m = basicmodel
+    m = deepcopy(basicmodel)
     m.time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
@@ -311,7 +314,7 @@ def test_render_pkg__gcg(basicmodel):
 
 
 def test_render_pkg__evt(basicmodel):
-    m = basicmodel
+    m = deepcopy(basicmodel)
     m.time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
@@ -345,7 +348,7 @@ def test_render_pkg__evt(basicmodel):
 
 
 def test_render_pkg__rch(basicmodel):
-    m = basicmodel
+    m = deepcopy(basicmodel)
     m.time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
@@ -369,7 +372,7 @@ def test_render_pkg__rch(basicmodel):
 
 
 def test_render_dis(basicmodel):
-    m = basicmodel
+    m = deepcopy(basicmodel)
     m.time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
@@ -400,7 +403,7 @@ def test_render_dis(basicmodel):
 
 
 def test_render_groups__ghb_riv_wel(basicmodel):
-    m = basicmodel
+    m = deepcopy(basicmodel)
     m.time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
@@ -457,6 +460,8 @@ def test_render_groups__ghb_riv_wel(basicmodel):
 
 
 def test_render_groups__double_gbh(basicmodel):
+    # TODO: copy method provides a shallow copy. Rigorous enough?
+    # See: https://docs.python.org/3/library/stdtypes.html#dict.copy
     m = basicmodel.copy()
     ghbhead = m["ghb"]["head"].copy()
     m["ghb2"] = imod.wq.GeneralHeadBoundary(
@@ -475,7 +480,7 @@ def test_render_groups__double_gbh(basicmodel):
 
 
 def test_render_flowsolver(basicmodel):
-    m = basicmodel
+    m = deepcopy(basicmodel)
     directory = pathlib.Path(".")
 
     compare = textwrap.dedent(
@@ -495,7 +500,7 @@ def test_render_flowsolver(basicmodel):
 
 
 def test_render_btn(basicmodel):
-    m = basicmodel
+    m = deepcopy(basicmodel)
     m.time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
@@ -522,7 +527,7 @@ def test_render_btn(basicmodel):
 
 
 def test_render_ssm_rch_evt_mal_tvc(basicmodel):
-    m = basicmodel
+    m = deepcopy(basicmodel)
     m.time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
@@ -605,7 +610,7 @@ def test_render_transportsolver(basicmodel):
 
 
 def test_render(basicmodel):
-    m = basicmodel
+    m = deepcopy(basicmodel)
     m.time_discretization("2000-01-06")
     d = pathlib.Path(".")
     r = pathlib.Path("results")
@@ -613,7 +618,7 @@ def test_render(basicmodel):
 
 
 def test_render_cf(cftime_model):
-    m_cf = cftime_model
+    m_cf = deepcopy(cftime_model)
     m_cf.time_discretization("2000-01-06")
     d = pathlib.Path(".")
     r = pathlib.Path("results")
@@ -621,7 +626,7 @@ def test_render_cf(cftime_model):
 
 
 def test_render_notime(notime_model):
-    m = notime_model
+    m = deepcopy(notime_model)
     m.time_discretization(times=["2000-01-01", "2000-01-06"])
     d = pathlib.Path(".")
     r = pathlib.Path("results")
@@ -671,16 +676,33 @@ def test_highest_active_recharge(basicmodel):
 
 
 def test_write(basicmodel, tmp_path):
-    basicmodel.write(directory=tmp_path, result_dir=tmp_path / "results")
+    m = deepcopy(basicmodel)
+    m.time_discretization("2000-01-06")
+    m.write(directory=tmp_path, result_dir=tmp_path / "results")
     # TODO: more rigorous testing
 
 
 def test_write__timemap(basicmodel, tmp_path):
     # fictitious timemap
-    timemap = {basicmodel["rch"].time.values[4]: basicmodel["rch"].time.values[0]}
-    basicmodel["rch"].add_timemap(rate=timemap)
-    basicmodel.write(directory=tmp_path, result_dir=tmp_path / "results")
-    # TODO: more rigorous testing
+    m = deepcopy(basicmodel)
+
+    # Remove last timestep of recharge package
+    m["rch"] = m["rch"].isel(time=slice(None, 4))
+
+    timemap = {m["evt"].time.values[4]: m["evt"].time.values[0]}
+    m["rch"].add_timemap(rate=timemap)
+
+    m.time_discretization("2000-01-06")
+
+    m.write(directory=tmp_path, result_dir=tmp_path / "results")
+
+    # Test if test worked, only 8 files written, instead of 10
+    assert len(os.listdir(tmp_path / "rch")) == 8
+
+    # 'rch/rate_20000101000000.idf' should occur twice now in runfile
+    runfile = open(tmp_path / "test_model.run").read()
+    count = runfile.count("rch/rate_20000101000000.idf")
+    assert count == 2
 
 
 def test_write__error_stress_time_not_first(basicmodel):
@@ -688,7 +710,7 @@ def test_write__error_stress_time_not_first(basicmodel):
     In this case, the WEL package isn't specified for the first stress period.
     This should raise an error.
     """
-    m = basicmodel
+    m = deepcopy(basicmodel)
     datetimes = pd.date_range("2000-01-01", "2000-01-05")[1:]
     # WEL
     welly = np.arange(4.5, 0.0, -1.0)[1:]
@@ -699,12 +721,17 @@ def test_write__error_stress_time_not_first(basicmodel):
 
 
 def test_write_result_dir(basicmodel, tmp_path):
-    basicmodel.write(directory=tmp_path, result_dir=tmp_path / "results")
+    m = deepcopy(basicmodel)
+    m.time_discretization("2000-01-06")
+    m.write(directory=tmp_path, result_dir=tmp_path / "results")
     # TODO: more rigorous testing
 
 
 def test_write_result_dir_is_workdir(basicmodel, tmp_path):
-    basicmodel.write(
+    m = deepcopy(basicmodel)
+    m.time_discretization("2000-01-06")
+
+    m.write(
         directory=tmp_path, result_dir=tmp_path / "results", resultdir_is_workdir=True
     )
     with open(tmp_path / "test_model.run") as f:
