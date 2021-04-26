@@ -373,6 +373,40 @@ class BoundaryCondition(Package, abc.ABC):
         "{%- endfor %}\n"
     )
 
+    def repeat_stress(self, use_cftime=False, **repeats):
+        """
+        Repeat stress periods.
+
+        Parameters
+        ----------
+        use_cftime: bool
+            Whether to force datetimes to cftime or not.
+        **repeats: dict of datetime - datetime pairs
+            keyword argument with variable name as keyword and
+            a dict as value. This dict contains a datetime as key
+            which maps to another already existing datetime in the
+            BoundaryCondition, for which data should be repeated.
+
+        """
+        # This is a generic implementation of add_timemap in iMOD-WQ.
+        # Genericity in this module is possible because
+        # of the existence of self._variable_order.
+
+        # Check first if all the provided repeats are actually
+        # arguments of the package
+        for repeat_varname in repeats.keys():
+            if repeat_varname not in self._variable_order:
+                raise ValueError(
+                    f"{repeat_varname} not recognized for {self}, choose one of {self._variable_order}"
+                )
+
+        # Loop over variable order
+        for varname in self._variable_order:
+            if varname in repeats.keys():
+                self._add_timemap(varname, repeats[varname], use_cftime=use_cftime)
+            else:  # Default to None, like in WQ implementation
+                self._add_timemap(varname, None, use_cftime=use_cftime)
+
     def _add_timemap(self, varname, value, use_cftime):
         if value is not None:
             if varname not in self:
@@ -390,6 +424,27 @@ class BoundaryCondition(Package, abc.ABC):
                 for k, v in value.items()
             }
             self[varname].attrs["timemap"] = d
+
+    def _periodic_stress(self, varname, value, use_cftime):
+        if value is not None:
+            if varname not in self:
+                raise ValueError(
+                    f"{varname} does not occur in {self}\n cannot add timemap"
+                )
+            if "time" not in self[varname].coords:
+                raise ValueError(
+                    f"{varname} in {self}\n does not have dimension time, cannot add timemap."
+                )
+
+            if self[varname].coords["time"].size != len(value):
+                raise ValueError(
+                    f"{varname} in {self}\n does not have the same amounnt of timesteps as number of periods."
+                )
+
+            # Replace both key and value by the right datetime type
+            d = {timeutil.to_datetime(k, use_cftime): v for k, v in value.items()}
+
+            self[varname].attrs["timeperiod"] = d
 
     def _get_runfile_times(self, da, globaltimes, ds_times=None):
         if ds_times is None:
