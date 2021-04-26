@@ -388,7 +388,7 @@ class BoundaryCondition(Package, abc.ABC):
             BoundaryCondition, for which data should be repeated.
 
         """
-        # This is a generic implementation of add_timemap in iMOD-WQ.
+        # This is a generic implementation of repeat_stress in iMOD-WQ.
         # Genericity in this module is possible because
         # of the existence of self._variable_order.
 
@@ -403,19 +403,19 @@ class BoundaryCondition(Package, abc.ABC):
         # Loop over variable order
         for varname in self._variable_order:
             if varname in repeats.keys():
-                self._add_timemap(varname, repeats[varname], use_cftime=use_cftime)
+                self._repeat_stress(varname, repeats[varname], use_cftime=use_cftime)
             else:  # Default to None, like in WQ implementation
-                self._add_timemap(varname, None, use_cftime=use_cftime)
+                self._repeat_stress(varname, None, use_cftime=use_cftime)
 
-    def _add_timemap(self, varname, value, use_cftime):
+    def _repeat_stress(self, varname, value, use_cftime):
         if value is not None:
             if varname not in self:
                 raise ValueError(
-                    f"{varname} does not occur in {self}\n cannot add timemap"
+                    f"{varname} does not occur in {self}\n cannot add stress_repeats"
                 )
             if "time" not in self[varname].coords:
                 raise ValueError(
-                    f"{varname} in {self}\n does not have dimension time, cannot add timemap."
+                    f"{varname} in {self}\n does not have dimension time, cannot add stress_repeats."
                 )
 
             # Replace both key and value by the right datetime type
@@ -423,17 +423,17 @@ class BoundaryCondition(Package, abc.ABC):
                 timeutil.to_datetime(k, use_cftime): timeutil.to_datetime(v, use_cftime)
                 for k, v in value.items()
             }
-            self[varname].attrs["timemap"] = d
+            self[varname].attrs["stress_repeats"] = d
 
     def _periodic_stress(self, varname, value, use_cftime):
         if value is not None:
             if varname not in self:
                 raise ValueError(
-                    f"{varname} does not occur in {self}\n cannot add timemap"
+                    f"{varname} does not occur in {self}\n cannot add stress_repeats"
                 )
             if "time" not in self[varname].coords:
                 raise ValueError(
-                    f"{varname} in {self}\n does not have dimension time, cannot add timemap."
+                    f"{varname} in {self}\n does not have dimension time, cannot add stress_repeats."
                 )
 
             if self[varname].coords["time"].size != len(value):
@@ -444,20 +444,20 @@ class BoundaryCondition(Package, abc.ABC):
             # Replace both key and value by the right datetime type
             d = {timeutil.to_datetime(k, use_cftime): v for k, v in value.items()}
 
-            self[varname].attrs["timeperiod"] = d
+            self[varname].attrs["stress_periodic"] = d
 
     def _get_runfile_times(self, da, globaltimes, ds_times=None):
         if ds_times is None:
             ds_times = self.dataset.coords["time"].values
 
-        if "timemap" in da.attrs:
-            timemap_keys = np.array(list(da.attrs["timemap"].keys()))
-            timemap_values = np.array(list(da.attrs["timemap"].values()))
+        if "stress_repeats" in da.attrs:
+            stress_repeats_keys = np.array(list(da.attrs["stress_repeats"].keys()))
+            stress_repeats_values = np.array(list(da.attrs["stress_repeats"].values()))
             package_times, inds = np.unique(
-                np.concatenate([ds_times, timemap_keys]), return_index=True
+                np.concatenate([ds_times, stress_repeats_keys]), return_index=True
             )
             # Times to write in the runfile
-            runfile_times = np.concatenate([ds_times, timemap_values])[inds]
+            runfile_times = np.concatenate([ds_times, stress_repeats_values])[inds]
         else:
             runfile_times = package_times = ds_times
 

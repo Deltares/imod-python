@@ -93,14 +93,18 @@ class Well(BoundaryCondition):
     def _get_runfile_times(self, globaltimes, ds_times=None):
         if ds_times is None:
             ds_times = np.unique(self["time"].values)
-        if "timemap" in self.dataset.attrs:
-            timemap_keys = np.array(list(self.dataset.attrs["timemap"].keys()))
-            timemap_values = np.array(list(self.dataset.attrs["timemap"].values()))
+        if "stress_repeats" in self.dataset.attrs:
+            stress_repeats_keys = np.array(
+                list(self.dataset.attrs["stress_repeats"].keys())
+            )
+            stress_repeats_values = np.array(
+                list(self.dataset.attrs["stress_repeats"].values())
+            )
             package_times, inds = np.unique(
-                np.concatenate([ds_times, timemap_keys]), return_index=True
+                np.concatenate([ds_times, stress_repeats_keys]), return_index=True
             )
             # Times to write in the runfile
-            runfile_times = np.concatenate([ds_times, timemap_values])[inds]
+            runfile_times = np.concatenate([ds_times, stress_repeats_values])[inds]
         else:
             runfile_times = package_times = ds_times
 
