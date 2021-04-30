@@ -993,7 +993,9 @@ def zonal_aggregate_raster(
     if not imod.util.is_divisor(dy, resolution):
         raise ValueError("resolution is not an (integer) divisor of dy")
 
-    without_chunks = all(length == 1 for length in map(len, raster.chunks))
+    without_chunks = (raster.chunks is None) or (
+        all(length == 1 for length in map(len, raster.chunks))
+    )
     if without_chunks:
         raster = raster.compute()
 
