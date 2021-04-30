@@ -921,8 +921,6 @@ def _zonal_aggregate_polygons(
         dtype=np.float64,
         spatial_reference=spatial_reference,
     )
-    print(rasterized_a)
-    print(rasterized_b)
     is_data = ((rasterized_a != nodata) & (rasterized_b.notnull())).values
     a = rasterized_a.values[is_data].ravel()
     b = rasterized_b.values[is_data].ravel()
@@ -994,6 +992,10 @@ def zonal_aggregate_raster(
         raise ValueError("resolution is not an (integer) divisor of dx")
     if not imod.util.is_divisor(dy, resolution):
         raise ValueError("resolution is not an (integer) divisor of dy")
+
+    without_chunks = all(length == 1 for length in map(len, raster.chunks))
+    if without_chunks:
+        raster = raster.compute()
 
     raster_chunks, _, _ = _create_chunks(raster, resolution, chunksize)
     collection = [
