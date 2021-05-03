@@ -9,7 +9,11 @@ import jinja2
 import pathlib
 
 from imod import util
-from imod.wq import timeutil, caching
+from imod.flow import timeutil
+from imod.wq import caching
+
+
+import cftime
 
 
 class Vividict(dict):
@@ -258,8 +262,12 @@ class Package(
         d = {"directory": directory, "name": varname, "extension": ".idf"}
 
         if time is not None:
-            d["time"] = time
-            pattern += "_{time:%Y%m%d%H%M%S}"
+            if isinstance(time, (np.datetime64, cftime.datetime)):
+                d["time"] = time
+                pattern += "_{time:%Y%m%d%H%M%S}"
+            else:
+                d["timestr"] = time
+                pattern += "_{timestr}"
 
         # Scalar value or not?
         # If it's a scalar value we can immediately write
@@ -299,11 +307,11 @@ class Package(
         if "time" in da.coords:
             package_times = da.coords["time"].values
 
-            starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
-            for itime, start_end in enumerate(starts_ends):
+            starts = timeutil.forcing_starts(package_times, globaltimes)
+            for itime, start in enumerate(starts):
                 # TODO: this now fails on a non-dim time too
                 # solution roughly the same as for layer above?
-                values[start_end] = da.isel(time=itime).values[()]
+                values[start] = da.isel(time=itime).values[()]
         else:
             values["steady-state"] = da.values[()]
 
@@ -394,11 +402,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         # Check first if all the provided repeats are actually
         # arguments of the package
-        for repeat_varname in repeats.keys():
-            if repeat_varname not in self._variable_order:
-                raise ValueError(
-                    f"{repeat_varname} not recognized for {self}, choose one of {self._variable_order}"
-                )
+        self._varnames_in_variable_order(repeats.keys())
 
         # Loop over variable order
         for varname in self._variable_order:
@@ -409,7 +413,7 @@ class BoundaryCondition(Package, abc.ABC):
 
     def _repeat_stress(self, varname, value, use_cftime):
         if value is not None:
-            if varname not in self:
+            if varname not in self.dataset:
                 raise ValueError(
                     f"{varname} does not occur in {self}\n cannot add stress_repeats"
                 )
@@ -420,14 +424,43 @@ class BoundaryCondition(Package, abc.ABC):
 
             # Replace both key and value by the right datetime type
             d = {
-                timeutil.to_datetime(k, use_cftime): timeutil.to_datetime(v, use_cftime)
+                imod.wq.timeutil.to_datetime(
+                    k, use_cftime
+                ): imod.wq.timeutil.to_datetime(v, use_cftime)
                 for k, v in value.items()
             }
             self[varname].attrs["stress_repeats"] = d
 
+    def periodic_stress(self, use_cftime=False, **periods):
+        """
+        Periodic stress periods.
+
+        iMODFLOW will repeat
+
+        Parameters
+        ----------
+        use_cftime: bool
+            Whether to force datetimes to cftime or not.
+        **periods: dict of datetime - string pairs
+            keyword argument with variable name as keyword and
+            a dict as value. This dict contains a datetime as key
+            which maps to a period label.
+        """
+
+        # Check first if all the provided periods are actually
+        # arguments of the package
+        self._varnames_in_variable_order(periods.keys())
+
+        # Loop over variable order
+        for varname in self._variable_order:
+            if varname in periods.keys():
+                self._periodic_stress(varname, periods[varname], use_cftime=use_cftime)
+            else:  # Default to None, like in WQ implementation
+                self._periodic_stress(varname, None, use_cftime=use_cftime)
+
     def _periodic_stress(self, varname, value, use_cftime):
         if value is not None:
-            if varname not in self:
+            if varname not in self.dataset:
                 raise ValueError(
                     f"{varname} does not occur in {self}\n cannot add stress_repeats"
                 )
@@ -442,9 +475,19 @@ class BoundaryCondition(Package, abc.ABC):
                 )
 
             # Replace both key and value by the right datetime type
-            d = {timeutil.to_datetime(k, use_cftime): v for k, v in value.items()}
+            d = {
+                imod.wq.timeutil.to_datetime(k, use_cftime): v for k, v in value.items()
+            }
 
             self[varname].attrs["stress_periodic"] = d
+
+    def _varnames_in_variable_order(self, varnames):
+        """Check if varname in _variable_order"""
+        for varname in varnames:
+            if varname not in self._variable_order:
+                raise ValueError(
+                    f"{varname} not recognized for {self}, choose one of {self._variable_order}"
+                )
 
     def _get_runfile_times(self, da, globaltimes, ds_times=None):
         if ds_times is None:
@@ -458,12 +501,15 @@ class BoundaryCondition(Package, abc.ABC):
             )
             # Times to write in the runfile
             runfile_times = np.concatenate([ds_times, stress_repeats_values])[inds]
+        elif "stress_periodic" in da.attrs:
+            package_times = ds_times
+            runfile_times = [da.attrs["stress_periodic"][time] for time in ds_times]
         else:
             runfile_times = package_times = ds_times
 
-        starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
+        starts = timeutil.forcing_starts(package_times, globaltimes)
 
-        return runfile_times, starts_ends
+        return runfile_times, starts
 
     def compose(
         self,
@@ -555,19 +601,19 @@ class BoundaryCondition(Package, abc.ABC):
         da = self[varname]
 
         if ("time" in self.dataset.coords) or (pkggroup_times is not None):
-            runfile_times, starts_ends = self._get_runfile_times(
+            runfile_times, starts = self._get_runfile_times(
                 da, globaltimes, ds_times=pkggroup_times
             )
 
-            for time, start_end in zip(runfile_times, starts_ends):
+            for time, start in zip(runfile_times, starts):
                 if compose_projectfile == True:
-                    values[self._pkg_id][start_end][varname][
+                    values[self._pkg_id][start][varname][
                         system_index
                     ] = self._compose_values_layer(
                         varname, directory, nlayer, time=time
                     )
                 else:  # render runfile
-                    values[start_end][self._pkg_id][varname][
+                    values[start][self._pkg_id][varname][
                         system_index
                     ] = self._compose_values_layer(
                         varname, directory, nlayer, time=time
