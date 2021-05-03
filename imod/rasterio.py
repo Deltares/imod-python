@@ -29,7 +29,7 @@ except ImportError:
 # Based on this comment
 # https://github.com/mapbox/rasterio/issues/265#issuecomment-367044836
 def _create_ext_driver_code_map():
-    import gdal
+    from osgeo import gdal
 
     if hasattr(gdal, "DCAP_RASTER"):
 
