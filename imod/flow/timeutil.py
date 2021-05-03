@@ -57,3 +57,38 @@ def insert_unique_package_times(package_mapping, manual_insert=[]):
     times = np.unique(np.hstack(times))
 
     return times, first_times
+
+
+def forcing_starts(package_times, globaltimes):
+    """
+    Determines the stress period numbers for start for a forcing defined
+    at a starting time, until the next starting time.
+
+    Note
+    ----
+    This is and adapted version from imod.wq.timeutil.forcings_starts_ends
+
+    Parameters
+    ----------
+    package_times : np.array, listlike
+        Treated as starting time of forcing
+    globaltimes : np.array, listlike
+        Global times of the simulation. Defines starting time of the stress
+        periods.
+
+    Returns
+    -------
+    starts : list of tuples
+        For every entry in the package, return index of the start.
+
+    """
+    # From searchsorted docstring:
+    # Find the indices into a sorted array a such that, if the corresponding
+    # elements in v were inserted before the indices, the order of a would be
+    # preserved.
+    # Add one because of difference in 0 vs 1 based indexing.
+    starts = np.searchsorted(globaltimes, package_times) + 1
+    # convert to strings, complying with iMOD-WQ
+    starts = [str(start) for start in starts]
+    assert len(package_times) == len(starts)
+    return starts
