@@ -255,7 +255,7 @@ class ImodflowModel(Model):
         # Check if every transient package commences at the same time.
         for key, first_time in first_times.items():
             time0 = times[0]
-            if first_time != time0:
+            if (first_time != time0) and not self[key]._is_periodic():
                 raise ValueError(
                     f"Package {key} does not have a value specified for the "
                     f"first time: {time0}. Every input must be present in the "
@@ -266,11 +266,12 @@ class ImodflowModel(Model):
         duration = timeutil.timestep_duration(times, self.use_cftime)
         # Generate time discretization, just rely on default arguments
         # Probably won't be used that much anyway?
+        times = np.array(times)
         timestep_duration = xr.DataArray(
-            duration, coords={"time": np.array(times)[:-1]}, dims=("time",)
+            duration, coords={"time": times[:-1]}, dims=("time",)
         )
         self["time_discretization"] = imod.flow.TimeDiscretization(
-            timestep_duration=timestep_duration
+            timestep_duration=timestep_duration, endtime=times[-1]
         )
 
     def _calc_n_entry(self, composed_package, is_boundary_condition):
@@ -304,6 +305,28 @@ class ImodflowModel(Model):
             ]
         )
         return time_composed
+
+    def _compose_periods(self):
+        periods = {}
+
+        for key, package in self.items():
+            if package._is_periodic():
+                # Periodic stresses are defined for all variables
+                first_var = list(package.dataset.data_vars)[0]
+                periods.update(package.dataset[first_var].attrs["stress_periodic"])
+
+        # Create timestrings for "Periods" section in projectfile
+        # Basically swap around period attributes and compose timestring
+        # Note that the timeformat for periods in the Projectfile is different
+        # from that for stress periods
+        time_format = "%d-%m-%Y %H:%M:%S"
+        periods_composed = dict(
+            [
+                (value, util._compose_timestring(time, time_format=time_format))
+                for time, value in periods.items()
+            ]
+        )
+        return periods_composed
 
     def _compose_all_packages(self, directory, globaltimes, compose_projectfile=True):
         """
@@ -346,6 +369,16 @@ class ImodflowModel(Model):
 
         return composition
 
+    def _render_periods(self, periods_composed):
+        _template_periods = jinja2.Template(
+            "Periods\n"
+            "{%- for key, timestamp in periods.items() %}\n"
+            "{{key}}\n{{timestamp}}\n"
+            "{%- endfor %}\n"
+        )
+
+        return _template_periods.render(periods=periods_composed)
+
     def _render_projectfile(self, directory):
         """
         Render projectfile. The projectfile has the hierarchy:
@@ -361,6 +394,12 @@ class ImodflowModel(Model):
         )
 
         times_composed = self._compose_timestrings(globaltimes)
+
+        periods_composed = self._compose_periods()
+
+        # Add period strings to times_composed
+        # These are the strings atop each stress period in the projectfile
+        times_composed.update({key: key for key in periods_composed.keys()})
 
         rendered = []
         ignored = ["dis"]
@@ -386,6 +425,9 @@ class ImodflowModel(Model):
 
             content.append(package._render_projectfile(**kwargs))
             rendered.append(pkg_id)
+
+        # Add periods definition
+        content.append(self._render_periods(periods_composed))
 
         return "\n\n".join(content)
 
