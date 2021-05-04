@@ -178,6 +178,11 @@ class Package(
             if (self[var] < 0).any():
                 raise ValueError(f"{var} in {self} must be positive")
 
+    def _is_periodic(self):
+        # Periodic stresses are defined for all variables
+        first_var = list(self.dataset.data_vars)[0]
+        return "stress_periodic" in self.dataset[first_var].attrs
+
     def _hastime(self):
         return (self._pkg_id == "wel" and "time" in self.dataset) or (
             "time" in self.dataset.coords
@@ -431,55 +436,61 @@ class BoundaryCondition(Package, abc.ABC):
             }
             self[varname].attrs["stress_repeats"] = d
 
-    def periodic_stress(self, use_cftime=False, **periods):
+    def periodic_stress(
+        self,
+        periods,
+        use_cftime=False,
+    ):
         """
         Periodic stress periods.
 
-        iMODFLOW will repeat
+        Adds periodic stresses to each variable in the package.
+        iMODFLOW will then implicitly repeat these.
+
+        The iMOD manual currently states:
+        'A PERIOD repeats until another time definition
+        is more close to the current time step'.
 
         Parameters
         ----------
+        periods: dict of datetime - string pairs
+            contains a datetime as key which maps to a period label.
+            This will be used for the entire package.
         use_cftime: bool
             Whether to force datetimes to cftime or not.
-        **periods: dict of datetime - string pairs
-            keyword argument with variable name as keyword and
-            a dict as value. This dict contains a datetime as key
-            which maps to a period label.
+
+        Examples
+        --------
+        The following example assigns a higher head to the summer period than winter period.
+        iMODFLOW will switch to period "summer" once 'xxxx-04-01' has passed,
+        and "winter" once 'xxxx-10-01' has passed.
+
+        >>> times = [np.datetime64('2000-04-01'), np.datetime64('2000-10-01')]
+
+        >>> head_periodic = xr.DataArray([2., 1.], coords={"time": times}, dims=["time"])
+
+        >>> timemap = {times[0]: "summer", times[1]: "winter"}
+
+        >>> ghb = GeneralHeadBoundary(head = head_periodic, conductance = 10.)
+        >>> ghb.periodic_stress(timemap)
+
         """
 
-        # Check first if all the provided periods are actually
-        # arguments of the package
-        self._varnames_in_variable_order(periods.keys())
+        if "time" not in self.dataset.coords:
+            raise ValueError(
+                f"{self} does not have dimension time, cannot add stress_periodic."
+            )
 
-        # Loop over variable order
+        if self.dataset.coords["time"].size != len(periods):
+            raise ValueError(
+                f"{self} does not have the same amounnt of timesteps as number of periods."
+            )
+
+        # Replace both key and value by the right datetime type
+        d = {imod.wq.timeutil.to_datetime(k, use_cftime): v for k, v in periods.items()}
+
         for varname in self._variable_order:
-            if varname in periods.keys():
-                self._periodic_stress(varname, periods[varname], use_cftime=use_cftime)
-            else:  # Default to None, like in WQ implementation
-                self._periodic_stress(varname, None, use_cftime=use_cftime)
-
-    def _periodic_stress(self, varname, value, use_cftime):
-        if value is not None:
-            if varname not in self.dataset:
-                raise ValueError(
-                    f"{varname} does not occur in {self}\n cannot add stress_repeats"
-                )
-            if "time" not in self[varname].coords:
-                raise ValueError(
-                    f"{varname} in {self}\n does not have dimension time, cannot add stress_repeats."
-                )
-
-            if self[varname].coords["time"].size != len(value):
-                raise ValueError(
-                    f"{varname} in {self}\n does not have the same amounnt of timesteps as number of periods."
-                )
-
-            # Replace both key and value by the right datetime type
-            d = {
-                imod.wq.timeutil.to_datetime(k, use_cftime): v for k, v in value.items()
-            }
-
-            self[varname].attrs["stress_periodic"] = d
+            self.dataset[varname].attrs["stress_periodic"] = d
 
     def _varnames_in_variable_order(self, varnames):
         """Check if varname in _variable_order"""
@@ -501,13 +512,13 @@ class BoundaryCondition(Package, abc.ABC):
             )
             # Times to write in the runfile
             runfile_times = np.concatenate([ds_times, stress_repeats_values])[inds]
+            starts = timeutil.forcing_starts(package_times, globaltimes)
         elif "stress_periodic" in da.attrs:
-            package_times = ds_times
-            runfile_times = [da.attrs["stress_periodic"][time] for time in ds_times]
+            runfile_times = package_times = ds_times
+            starts = [da.attrs["stress_periodic"][time] for time in ds_times]
         else:
             runfile_times = package_times = ds_times
-
-        starts = timeutil.forcing_starts(package_times, globaltimes)
+            starts = timeutil.forcing_starts(package_times, globaltimes)
 
         return runfile_times, starts
 
