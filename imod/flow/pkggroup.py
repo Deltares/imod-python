@@ -41,6 +41,8 @@ class PackageGroup(collections.UserDict, abc.ABC):
         if not any(are_periodic):
             pkggroup_times, _ = insert_unique_package_times(self.items())
         else:
+            # FUTURE: We could catch edge case here where different periods
+            # specified for different systems. This is uncommon practice.
             pkggroup_times = None
 
         if composition is None:
