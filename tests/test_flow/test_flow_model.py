@@ -113,7 +113,7 @@ def test_write_model(model, tmp_path):
     with open(prjfile) as f:
         lines = f.readlines()
 
-    assert len(lines) == 73
+    assert len(lines) == 75
 
     # Recursively walk through folder and count files
     n_files = sum([len(files) for r, d, files in os.walk(tmp_path)])
@@ -146,7 +146,7 @@ def test_write_model_metaswap(model_metaswap, tmp_path):
     with open(prjfile) as f:
         lines = f.readlines()
 
-    assert len(lines) == 107
+    assert len(lines) == 109
 
     # Recursively walk through folder and count files
     n_files = sum([len(files) for r, d, files in os.walk(tmp_path)])
@@ -180,7 +180,7 @@ def test_write_model_horizontal_flow_barrier(model_horizontal_flow_barrier, tmp_
     with open(prjfile) as f:
         lines = f.readlines()
 
-    assert len(lines) == 78
+    assert len(lines) == 80
 
     # Recursively walk through folder and count files
     n_files = sum([len(files) for r, d, files in os.walk(tmp_path)])
