@@ -44,6 +44,8 @@ def insert_unique_package_times(package_mapping, manual_insert=[]):
 
     first_times = {}
     for key, pkg in package_mapping:
+        if pkg._is_periodic():
+            continue  # Periodic stresses can start earlier than model time domain in projectfile
         if pkg._hastime():
             pkgtimes = _to_list(pkg["time"].values)
             first_times[key] = sorted(pkgtimes)[0]
