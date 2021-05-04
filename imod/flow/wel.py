@@ -1,7 +1,6 @@
 from imod.flow.pkgbase import BoundaryCondition, Vividict
 import imod
 import numpy as np
-from imod.wq import timeutil
 
 
 class Well(BoundaryCondition):
@@ -90,27 +89,21 @@ class Well(BoundaryCondition):
 
         return values
 
+    def _is_periodic(self):
+        # Periodic stresses are defined for all variables
+        return "stress_periodic" in self.dataset.attrs
+
     def _get_runfile_times(self, globaltimes, ds_times=None):
         if ds_times is None:
             ds_times = np.unique(self["time"].values)
-        if "stress_repeats" in self.dataset.attrs:
-            stress_repeats_keys = np.array(
-                list(self.dataset.attrs["stress_repeats"].keys())
-            )
-            stress_repeats_values = np.array(
-                list(self.dataset.attrs["stress_repeats"].values())
-            )
-            package_times, inds = np.unique(
-                np.concatenate([ds_times, stress_repeats_keys]), return_index=True
-            )
-            # Times to write in the runfile
-            runfile_times = np.concatenate([ds_times, stress_repeats_values])[inds]
-        else:
-            runfile_times = package_times = ds_times
 
-        starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
+        da = self.dataset
 
-        return runfile_times, starts_ends
+        runfile_times, starts = super(__class__, self)._get_runfile_times(
+            da, globaltimes, ds_times=ds_times
+        )
+
+        return runfile_times, starts
 
     def _compose_values_timelayer(
         self,
