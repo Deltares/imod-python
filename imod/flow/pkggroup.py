@@ -27,8 +27,21 @@ class PackageGroup(collections.UserDict, abc.ABC):
     def compose(
         self, directory, globaltimes, nlayer, compose_projectfile=True, composition=None
     ):
+        are_periodic = [pkg._is_periodic() for pkg in self.values()]
 
-        pkggroup_times, _ = insert_unique_package_times(self.items())
+        # Raise error if one system is periodic and one is not
+        all_or_not_any_periodic = all(are_periodic) or (not any(are_periodic))
+        if not all_or_not_any_periodic:
+            raise ValueError(
+                "At least one system is periodic "
+                "and at least one system is not periodic. \n"
+                "Please insert all systems as periodic or not. "
+            )
+
+        if not any(are_periodic):
+            pkggroup_times, _ = insert_unique_package_times(self.items())
+        else:
+            pkggroup_times = None
 
         if composition is None:
             composition = Vividict()
