@@ -47,13 +47,19 @@ class TimeDiscretization(Package):
     ]
 
     def __init__(
-        self, timestep_duration, n_timesteps=1, transient=True, timestep_multiplier=1.0
+        self,
+        timestep_duration,
+        endtime,
+        n_timesteps=1,
+        transient=True,
+        timestep_multiplier=1.0,
     ):
         super(__class__, self).__init__()
         self.dataset["timestep_duration"] = timestep_duration
         self.dataset["n_timesteps"] = n_timesteps
         self.dataset["transient"] = transient
         self.dataset["timestep_multiplier"] = timestep_multiplier
+        self.endtime = endtime
 
     def _render(self):
         """Render iMOD TIM file, which is the time discretization of the iMODFLOW model"""
@@ -64,6 +70,7 @@ class TimeDiscretization(Package):
         )
         times = self.dataset["time"].values
         timestrings = [imod.util._compose_timestring(time) for time in times]
+        timestrings.append(imod.util._compose_timestring(self.endtime))
 
         d = dict(
             timestrings=timestrings,
