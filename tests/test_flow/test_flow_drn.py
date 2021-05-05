@@ -1,11 +1,11 @@
-from imod.flow import Drain
-import numpy as np
-import xarray as xr
 import os
+import pathlib
 import textwrap
 
-import pathlib
+import numpy as np
 import pytest
+import xarray as xr
+from imod.flow import Drain
 
 
 @pytest.fixture(scope="module")
@@ -44,7 +44,8 @@ def test_drain(get_render_dict, drain, three_days):
     to_render["n_entry"] = nlayer
     to_render["times"] = time_composed
 
-    compare = textwrap.dedent(f"""\
+    compare = textwrap.dedent(
+        f"""\
         0003, (drn), 1, Drain, ['conductance', 'elevation']
         2018-01-01 00:00:00
         002, 003

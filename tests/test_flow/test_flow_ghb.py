@@ -1,10 +1,11 @@
-from imod.flow import GeneralHeadBoundary
-import pathlib
 import os
+import pathlib
 import textwrap
+
 import numpy as np
-import xarray as xr
 import pytest
+import xarray as xr
+from imod.flow import GeneralHeadBoundary
 
 
 @pytest.fixture(scope="module")
@@ -45,7 +46,8 @@ def test_general_head(general_head, get_render_dict, two_days):
     to_render["n_entry"] = nlayer
     to_render["times"] = time_composed
 
-    compare = textwrap.dedent(f"""\
+    compare = textwrap.dedent(
+        f"""\
         0002, (ghb), 1, GeneralHeadBoundary, ['conductance', 'head']
         2018-01-01 00:00:00
         002, 003

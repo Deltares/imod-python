@@ -1,10 +1,10 @@
-import pytest
-import pandas as pd
-import numpy as np
-import pathlib
 import os
+import pathlib
 import textwrap
 
+import numpy as np
+import pandas as pd
+import pytest
 from imod.flow import Well
 
 
@@ -27,7 +27,8 @@ def test_wel(well_df, three_days, get_render_dict):
     to_render["times"] = time_composed
 
     # {directory.stem} because this is taken in both compose as well as save
-    compare = textwrap.dedent(f"""\
+    compare = textwrap.dedent(
+        f"""\
         0003, (wel), 1, Well, ['rate']
         2018-01-01 00:00:00
         001, 001

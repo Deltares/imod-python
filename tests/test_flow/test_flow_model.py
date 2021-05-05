@@ -1,11 +1,10 @@
-import pytest
-import imod.flow as flow
+import os
 from copy import deepcopy
 
+import imod.flow as flow
 import numpy as np
+import pytest
 import xarray as xr
-
-import os
 
 
 @pytest.fixture(scope="module")

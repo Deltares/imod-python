@@ -1,9 +1,9 @@
-from imod.flow import TimeDiscretization
-from imod.wq import timeutil
-import xarray as xr
+import cftime
 import numpy as np
 import pytest
-import cftime
+import xarray as xr
+from imod.flow import TimeDiscretization
+from imod.wq import timeutil
 
 
 @pytest.fixture(scope="module")

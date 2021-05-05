@@ -1,11 +1,12 @@
-from imod.flow import ConstantHead
-import pathlib
 import os
-import numpy as np
-import xarray as xr
-import pytest
+import pathlib
 import textwrap
 from copy import deepcopy
+
+import numpy as np
+import pytest
+import xarray as xr
+from imod.flow import ConstantHead
 
 
 @pytest.fixture(scope="module")

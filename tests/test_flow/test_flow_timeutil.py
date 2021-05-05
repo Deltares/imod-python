@@ -1,9 +1,9 @@
-from imod.flow import ConstantHead
-from imod.flow import timeutil
-import numpy as np
-import xarray as xr
-import pytest
 from copy import deepcopy
+
+import numpy as np
+import pytest
+import xarray as xr
+from imod.flow import ConstantHead, timeutil
 
 
 @pytest.fixture(scope="module")

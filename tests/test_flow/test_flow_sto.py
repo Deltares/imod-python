@@ -1,6 +1,7 @@
-from imod.flow import StorageCoefficient, SpecificStorage
 import pathlib
 import textwrap
+
+from imod.flow import SpecificStorage, StorageCoefficient
 
 
 def test_storage_coefficient(basic_dis, get_render_dict):
@@ -40,7 +41,8 @@ def test_specific_storage(basic_dis, get_render_dict):
     to_render = get_render_dict(storage, directory, None, nlayer)
     to_render["n_entry"] = nlayer
 
-    compare = textwrap.dedent('''\
+    compare = textwrap.dedent(
+        '''\
         0001, (ssc), 1, SpecificStorage, ['specific_storage']
         001, 003
         1, 1, 001, 1.000, 0.000, 1e-05, ""

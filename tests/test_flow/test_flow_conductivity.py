@@ -1,10 +1,11 @@
-from imod.flow import (
-    HorizontalHydraulicConductivity,
-    VerticalHydraulicConductivity,
-    VerticalAnisotropy,
-)
 import pathlib
 import textwrap
+
+from imod.flow import (
+    HorizontalHydraulicConductivity,
+    VerticalAnisotropy,
+    VerticalHydraulicConductivity,
+)
 
 
 def test_horizontal_conductivity(basic_dis, get_render_dict):

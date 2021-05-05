@@ -1,6 +1,7 @@
-from imod.flow import HorizontalAnisotropy
 import pathlib
 import textwrap
+
+from imod.flow import HorizontalAnisotropy
 
 
 def test_anisotropy(basic_dis, get_render_dict):

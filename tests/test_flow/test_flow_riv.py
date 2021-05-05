@@ -1,10 +1,11 @@
-from imod.flow import River
-import pathlib
 import os
+import pathlib
 import textwrap
+
 import numpy as np
-import xarray as xr
 import pytest
+import xarray as xr
+from imod.flow import River
 
 
 @pytest.fixture(scope="module")
@@ -44,7 +45,8 @@ def test_river(river, get_render_dict, two_days):
     to_render["n_entry"] = nlayer
     to_render["times"] = time_composed
 
-    compare = textwrap.dedent(f'''\
+    compare = textwrap.dedent(
+        f'''\
         0002, (riv), 1, River, ['conductance', 'stage', 'bottom_elevation', 'infiltration_factor']
         2018-01-01 00:00:00
         004, 003

@@ -1,8 +1,9 @@
-from imod.flow.hfb import HorizontalFlowBarrier
-import pathlib
-import pandas as pd
 import os
+import pathlib
 import textwrap
+
+import pandas as pd
+from imod.flow.hfb import HorizontalFlowBarrier
 
 
 def test_horizontal_flow_barrier_render(
@@ -20,7 +21,8 @@ def test_horizontal_flow_barrier_render(
     to_render["n_entry"] = len(pd.unique(horizontal_flow_barrier["layer"]))
 
     # {directory.stem} because this is taken in both compose as well as save
-    compare = textwrap.dedent(f"""\
+    compare = textwrap.dedent(
+        f"""\
         0001, (hfb), 1, HorizontalFlowBarrier, ['resistance']
         001, 002
         1, 2, 003, 100.0, 0.000, -9999., {directory}{os.sep}{directory.stem}_l3.gen

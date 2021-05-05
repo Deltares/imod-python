@@ -1,12 +1,13 @@
-from imod.flow import ConstantHead, Well
-from imod.flow.pkggroup import ConstantHeadGroup, WellGroup
-import numpy as np
-import xarray as xr
-import pytest
-import pathlib
 import os
+import pathlib
 import textwrap
 from copy import deepcopy
+
+import numpy as np
+import pytest
+import xarray as xr
+from imod.flow import ConstantHead, Well
+from imod.flow.pkggroup import ConstantHeadGroup, WellGroup
 
 
 @pytest.fixture(scope="module")
@@ -60,7 +61,8 @@ def test_group_rendered(constant_head, three_days):
 
     rendered = chd1._render_projectfile(**to_render)
 
-    compare = textwrap.dedent(f"""\
+    compare = textwrap.dedent(
+        f"""\
         0003, (chd), 1, ConstantHead, ['head']
         2018-01-01 00:00:00
         001, 006
@@ -124,7 +126,8 @@ def test_group_synchronize_times_rendered(constant_head, three_days):
 
     rendered = chd1._render_projectfile(**to_render)
 
-    compare = textwrap.dedent(f'''\
+    compare = textwrap.dedent(
+        f'''\
         0003, (chd), 1, ConstantHead, ['head']
         2018-01-01 00:00:00
         001, 006
@@ -185,7 +188,8 @@ def test_two_wels(well_df, three_days, get_render_dict):
         n_entry=2,
     )
 
-    compare = textwrap.dedent(f"""\
+    compare = textwrap.dedent(
+        f"""\
         0003, (wel), 1, Well, ['rate']
         2018-01-01 00:00:00
         001, 002

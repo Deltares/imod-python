@@ -1,7 +1,8 @@
-from imod.flow import Top, Bottom, Boundary, StartingHead
-import pathlib
 import os
+import pathlib
 import textwrap
+
+from imod.flow import Bottom, Boundary, StartingHead, Top
 
 
 def test_boundary(basic_dis, get_render_dict):
