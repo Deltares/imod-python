@@ -6,6 +6,19 @@ import numpy as np
 import pandas as pd
 
 
+def _check_year(year, use_cftime):
+    """Check whether year is out of bounds for np.datetime64[ns]"""
+    if year < 1678 or year > 2261:
+        if not use_cftime:
+            raise ValueError(
+                "A datetime is out of bounds for np.datetime64[ns]: "
+                "before year 1678 or after 2261. You will have to use "
+                "cftime.datetime and xarray.CFTimeIndex in your model "
+                "input instead of the default np.datetime64[ns] datetime "
+                "type."
+            )
+
+
 def to_datetime(time, use_cftime):
     """
     Check whether time is cftime object, else convert to datetime64 series.
@@ -20,20 +33,14 @@ def to_datetime(time, use_cftime):
     if isinstance(time, cftime.datetime):
         return time
     elif isinstance(time, np.datetime64):
-        return time
+        # see https://stackoverflow.com/a/26895491
+        year = time.astype("datetime64[Y]").astype(int) + 1970
+        _check_year(year, False)
+        # Force to nanoseconds, concurrent with xarray and pandas.
+        return time.astype(dtype="datetime64[ns]")
     elif isinstance(time, str):
         time = dateutil.parser.parse(time)
-        year = time.year
-        if year < 1678 or year > 2261:
-            if not use_cftime:
-                raise ValueError(
-                    "A datetime is out of bounds for np.datetime64[ns]: "
-                    "before year 1678 or after 2261. You will have to use "
-                    "cftime.datetime and xarray.CFTimeIndex in your model "
-                    "input instead of the default np.datetime64[ns] datetime "
-                    "type."
-                )
-
+        _check_year(time.year, use_cftime)
     if use_cftime:
         return cftime.DatetimeProlepticGregorian(*time.timetuple()[:6])
     else:
