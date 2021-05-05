@@ -73,6 +73,21 @@ def model_horizontal_flow_barrier(model, horizontal_flow_barrier_gdf):
     return m
 
 
+@pytest.fixture(scope="module")
+def model_periodic_stress(model):
+    m = deepcopy(model)
+    times = np.array([np.datetime64("2000-01-01"), np.datetime64("2000-01-02")])
+
+    head_periodic = xr.DataArray([2.0, 1.0], coords={"time": times}, dims=["time"])
+
+    timemap = {times[0]: "summer", times[1]: "winter"}
+
+    m["ghb"] = flow.GeneralHeadBoundary(head=head_periodic, conductance=10.0)
+    m["ghb"].periodic_stress(timemap)
+
+    return m
+
+
 def test_compose_all_packages(model, tmp_path):
     def depth(d):
         """Recursively walk through nested dict"""
@@ -194,6 +209,59 @@ def test_write_model_horizontal_flow_barrier(model_horizontal_flow_barrier, tmp_
             "chd2",
             "config_run.ini",
             "hfb",
+            "shd",
+            "testmodel.prj",
+            "time_discretization.tim",
+            "wel",
+        ]
+    )
+
+    symmetric_difference = files_directories ^ set(os.listdir(tmp_path))
+
+    assert len(symmetric_difference) == 0
+
+
+def test_compose_periods(model_periodic_stress):
+    periods_composed = model_periodic_stress._compose_periods()
+
+    compare = {"summer": "01-01-2000 00:00:00", "winter": "02-01-2000 00:00:00"}
+
+    assert periods_composed == compare
+
+
+def test_render_periods(model_periodic_stress):
+    periods_composed = model_periodic_stress._compose_periods()
+
+    compare = (
+        "Periods\n" "summer\n" "01-01-2000 00:00:00\n" "winter\n" "02-01-2000 00:00:00"
+    )
+
+    rendered = model_periodic_stress._render_periods(periods_composed)
+
+    assert compare == rendered
+
+
+def test_write_model_periodic(model_periodic_stress, tmp_path):
+    model_periodic_stress.write(directory=tmp_path)
+
+    # Test if prjfile at least has the right amount of lines
+    prjfile = tmp_path / "testmodel.prj"
+    with open(prjfile) as f:
+        lines = f.readlines()
+
+    assert len(lines) == 97
+
+    # Recursively walk through folder and count files
+    n_files = sum([len(files) for r, d, files in os.walk(tmp_path)])
+
+    assert n_files == 18
+
+    # Test if file and directorynames in tmp_path match the following
+    files_directories = set(
+        [
+            "bnd",
+            "chd2",
+            "config_run.ini",
             "shd",
             "testmodel.prj",
             "time_discretization.tim",
