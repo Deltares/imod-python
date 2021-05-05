@@ -1,24 +1,23 @@
-from imod.flow.pkgbase import Package
 import numpy as np
+from imod.flow.pkgbase import Package
 
 
 class HorizontalHydraulicConductivity(Package):
     """
-    Horizontal hydraulic conductivity [L/T] of the aquifers (between TOP and BOT).
+    Horizontal hydraulic conductivity [L/T] of the aquifers, between TOP and
+    BOT.
 
-    This variable behaves somewhat similar to the
-    horizontal hydraulic conductivity in MODFLOW 2005's
-    "Layer Property Flow" schematization.
+    This variable behaves somewhat similar to the horizontal hydraulic
+    conductivity in MODFLOW 2005's "Layer Property Flow" schematization.
 
-    Note however that this does not hold for the
-    vertical hydraulic conductivity:
-    iMODFLOW uses the vertical hydraulic conductivity
-    to specify the hydraulic conductivity of aquitards (between BOT and TOP)
+    Note however that this does not hold for the vertical hydraulic
+    conductivity: iMODFLOW uses the vertical hydraulic conductivity to specify
+    the hydraulic conductivity of aquitards (between BOT and TOP)
 
     Parameters
     ----------
     k_horizontal : xr.DataArray
-        Horizontal hydraulic conductivity, dims = ("layer", "y", "x").
+        Horizontal hydraulic conductivity, dims ``("layer", "y", "x")``.
     """
 
     _pkg_id = "khv"
@@ -39,16 +38,15 @@ class VerticalHydraulicConductivity(Package):
     """
     Vertical hydraulic conductivity [L/T] for aquitards (between BOT and TOP).
 
-    Note that this is different from MODFLOW 2005's
-    "Layer Property Flow" schematization.
-    To specify the vertical hydraulic conductivity for aquifers,
-    use VerticalAnisotropy in combination with
+    Note that this is different from MODFLOW 2005's "Layer Property Flow"
+    schematization.  To specify the vertical hydraulic conductivity for
+    aquifers, use VerticalAnisotropy in combination with
     HorizontalHydraulicConductivity.
 
     Parameters
     ----------
     k_vertical : xr.DataArray
-        Vertical hydraulic conductivity, dims = ("layer", "y", "x").
+        Vertical hydraulic conductivity, dims ``("layer", "y", "x")``.
     """
 
     _pkg_id = "kvv"
@@ -67,15 +65,16 @@ class VerticalHydraulicConductivity(Package):
 
 class VerticalAnisotropy(Package):
     """
-    Vertical anisotropy for aquifers [-],
-    defined as the horizontal hydraulic conductivity
-    over the vertical hydraulic conductivity.
+    Vertical anisotropy for aquifers [-], defined as the horizontal hydraulic
+    conductivity over the vertical hydraulic conductivity.
 
-    Use this package in combination with HorizontalHydraulicConductivity
-    to specify the vertical hydraulic conductivity.
+    Use this package in combination with HorizontalHydraulicConductivity to
+    specify the vertical hydraulic conductivity.
 
+    Parameters
+    ----------
     vertical_anisotropy : xr.DataArray
-        Vertical anisotropy factor (Kv/Kh), dims = ("layer", "y", "x").
+        Vertical anisotropy factor (Kv/Kh), dims ``("layer", "y", "x")``.
     """
 
     _pkg_id = "kva"

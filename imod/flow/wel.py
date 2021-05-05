@@ -1,6 +1,6 @@
-from imod.flow.pkgbase import BoundaryCondition, Vividict
 import imod
 import numpy as np
+from imod.flow.pkgbase import BoundaryCondition, Vividict
 
 
 class Well(BoundaryCondition):
@@ -21,9 +21,9 @@ class Well(BoundaryCondition):
     layer: "None" or int, optional
         layer from which the pumping takes place.
     time: "None" or listlike of np.datetime64, datetime.datetime, pd.Timestamp,
-    cftime.datetime
-        time during which the pumping takes place. Only need to specify if model
-        is transient.
+        cftime.datetime
+        time during which the pumping takes place. Only need to specify if
+        model is transient.
     """
 
     _pkg_id = "wel"
@@ -117,24 +117,23 @@ class Well(BoundaryCondition):
         pkggroup_times=None,
     ):
         """
-        Composes paths to files, or gets the appropriate scalar value for
-        a single variable in a dataset.
+        Composes paths to files, or gets the appropriate scalar value for a
+        single variable in a dataset.
 
         Parameters
         ----------
         varname : str
             variable name of the DataArray
         globaltimes : list, np.array
-            Holds the global times, i.e. the combined unique times of
-            every boundary condition that are used to define the stress
-            periods.
-            The times of the BoundaryCondition do not have to match all
-            the global times. When a globaltime is not present in the
-            BoundaryCondition, the value of the first previous available time is
-            filled in. The effective result is a forward fill in time.
+            Holds the global times, i.e. the combined unique times of every
+            boundary condition that are used to define the stress periods.  The
+            times of the BoundaryCondition do not have to match all the global
+            times. When a globaltime is not present in the BoundaryCondition,
+            the value of the first previous available time is filled in. The
+            effective result is a forward fill in time.
         directory : str
-            Path to working directory, where files will be written.
-            Necessary to generate the paths for the runfile.
+            Path to working directory, where files will be written.  Necessary
+            to generate the paths for the runfile.
         nlayer : int
             Number of layers
         values : Vividict

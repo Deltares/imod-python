@@ -3,19 +3,14 @@ from imod.flow.pkgbase import TopBoundaryCondition
 
 class Recharge(TopBoundaryCondition):
     """
-    Recharge provides a fixed flux boundary condition
-    to the top layer of the groundwater system.
-    Note that unlike in iMOD-WQ,
-    there is only the option in iMODFLOW to apply the recharge
-    package to the top layer.
+    Recharge provides a fixed flux boundary condition to the top layer of the
+    groundwater system.  Note that unlike in iMOD-WQ, there is only the option
+    in iMODFLOW to apply the recharge package to the top layer.
 
     Parameters
     ----------
     rate: float or xr.DataArray of floats
-        recharge rate in mm/day (!),
-        NOTA BENE: iMODFLOW expects this in mm/day,
-        dims = ("time", "y", "x").
-
+        recharge rate in mm/day (NOTA BENE!), dims ``("time", "y", "x")``.
     """
 
     _pkg_id = "rch"

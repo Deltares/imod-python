@@ -2,10 +2,11 @@
 This module contains time related functions and can be potentially merged with 
 imod.wq's timutil.py (also used a lot in flow), to a generic set of utilities.
 
-This utility was made because a similar logic that was contained in 
-ImodflowModel.time_discretization was required in PkgGroup, hence insert_unique_package_times.
-Containing this function in model.py, however, results in a circular import with PkgGroups; 
-contain the function in PkgGroups felt out of place.
+This utility was made because a similar logic that was contained in
+ImodflowModel.time_discretization was required in PkgGroup, hence
+insert_unique_package_times.  Containing this function in model.py, however,
+results in a circular import with PkgGroups; contain the function in PkgGroups
+felt out of place.
 """
 
 import numpy as np
@@ -13,8 +14,7 @@ import pandas as pd
 
 
 def _to_list(t):
-    """Helper function to catch packages that have only one time step"""
-
+    """Catch packages that have only one time step"""
     if not isinstance(t, (np.ndarray, list, tuple, pd.DatetimeIndex)):
         return [t]
     else:
@@ -30,7 +30,8 @@ def insert_unique_package_times(package_mapping, manual_insert=[]):
     package_mapping : iterable
         Iterable of key, package pairs
     manual_insert : iterable of times, np.datetime64, or cftime.datetime
-        List with times. This list will be extended with the package times if not present.
+        List with times. This list will be extended with the package times if
+        not present.
 
     Returns
     -------
@@ -63,8 +64,8 @@ def insert_unique_package_times(package_mapping, manual_insert=[]):
 
 def forcing_starts(package_times, globaltimes):
     """
-    Determines the stress period numbers for start for a forcing defined
-    at a starting time, until the next starting time.
+    Determines the stress period numbers for start for a forcing defined at a
+    starting time, until the next starting time.
 
     Note
     ----

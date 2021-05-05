@@ -9,7 +9,6 @@ API Reference
     api/ipf.rst
     api/rasterio.rst
     api/tec.rst
-    api/run.rst
 
 .. toctree::
     :maxdepth: 1

@@ -1,38 +1,32 @@
+import abc
 import collections
 import os
 import pathlib
+from dataclasses import dataclass
 
 import cftime
+import imod
+import imod.util as util
 import jinja2
-import xarray as xr
 import numpy as np
 import pandas as pd
-
-import imod
+import xarray as xr
+from imod.flow.pkgbase import BoundaryCondition, Vividict
+from imod.flow.pkggroup import PackageGroups
+from imod.flow.timeutil import insert_unique_package_times
 
 # TODO: Merge time utilities, this is becoming a mess
 from imod.wq import timeutil
-from imod.flow.timeutil import insert_unique_package_times
-import imod.util as util
-from imod.flow.pkgbase import Vividict
-
-from imod.flow.pkggroup import PackageGroups
-from imod.flow.pkgbase import BoundaryCondition
-
-from dataclasses import dataclass
-
-import collections
-import abc
 
 
 class IniFile(collections.UserDict, abc.ABC):
     """
     Some basic support for iMOD ini files here
 
-    These files contain the settings that iMOD uses to run its' batch fucntions.
-    For example to convert its' model description
-    (a projectfile containing paths to respective .IDFs for each package)
-    to a Modflow6 model.
+    These files contain the settings that iMOD uses to run its batch
+    functions. For example to convert its model description -- a projectfile
+    containing paths to respective .IDFs for each package -- to a Modflow6
+    model.
     """
 
     # TODO: Create own key mapping to avoid keys like "edate"?
@@ -190,10 +184,14 @@ class ImodflowModel(Model):
 
         - The datetimes of all packages you send in are always respected
         - Subsequently, the input data you use is always included fully as well
-        - All times are treated as starting times for the stress: a stress is always applied until the next specified date
-        - For this reason, a final time is required to determine the length of the last stress period
-        - Additional times can be provided to force shorter stress periods & more detailed output
-        - Every stress has to be defined on the first stress period (this is a modflow requirement)
+        - All times are treated as starting times for the stress: a stress is
+          always applied until the next specified date
+        - For this reason, a final time is required to determine the length of
+          the last stress period
+        - Additional times can be provided to force shorter stress periods &
+          more detailed output
+        - Every stress has to be defined on the first stress period (this is a
+          modflow requirement)
 
         Or visually (every letter a date in the time axes)::
 

@@ -3,16 +3,16 @@ from imod.flow.pkgbase import BoundaryCondition
 
 class Drain(BoundaryCondition):
     """
-    The Drain package is used to simulate head-dependent flux boundaries. In the
-    Drain package if the head in the cell falls below a certain threshold, the
-    flux from the drain to the model cell drops to zero.
+    The Drain package is used to simulate head-dependent flux boundaries. In
+    the Drain package if the head in the cell falls below a certain threshold,
+    the flux from the drain to the model cell drops to zero.
 
     Parameters
     ----------
     elevation: float or xr.DataArray of floats
-        elevation of the drain, dims = ("layer", "y", "x").
+        elevation of the drain, dims ``("layer", "y", "x")``.
     conductance: float or xr.DataArray of floats
-        is the conductance of the drain, dims = ("layer", "y", "x").
+        is the conductance of the drain, dims ``("layer", "y", "x")``.
     """
 
     _pkg_id = "drn"

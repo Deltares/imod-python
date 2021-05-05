@@ -1,7 +1,6 @@
-import jinja2
-
-from imod.flow.pkgbase import Package
 import imod.util
+import jinja2
+from imod.flow.pkgbase import Package
 
 
 class TimeDiscretization(Package):
@@ -12,30 +11,28 @@ class TimeDiscretization(Package):
     ----------
     timestep_duration: xr.DataArray
         is the length of the current stress period (PERLEN). If the flow
-        solution is transient, timestep_duration specified here must be equal to
-        that specified for the flow model. If the flow solution is steady-state,
-        timestep_duration can be set to any desired length.
+        solution is transient, timestep_duration specified here must be equal
+        to that specified for the flow model. If the flow solution is
+        steady-state, timestep_duration can be set to any desired length.
     n_timesteps: int, optional
         is the number of time steps for the transient flow solution in the
         current stress period (NSTP). If the flow solution is steady-state,
         n_timestep=1. Default value is 1.
     transient: bool, optional
         Flag indicating wether the flow simulation is transient (True) or False
-        (Steady State).
-        Default is True.
+        (Steady State).  Default is True.
     timestep_multiplier: float, optional
         is the multiplier for the length of successive time steps used in the
         transient flow solution (TSMULT); it is used only if n_timesteps>1.
         timestep_multiplier>0, the length of each flow time step within the
         current stress period is calculated using the geometric progression as
-        in MODFLOW. Note that both n_timesteps and timestep_multiplier specified
-        here must be identical to those specified in the flow model if the flow
-        model is transient.
-        timestep_multiplier ≤ 0, the length of each flow time step within the
-        current stress period is read from the record TSLNGH. This option is
-        needed in case the length of time steps for the flow solution is not
-        based on a geometric progression in a flow model, unlike MODFLOW.
-        Default is 1.0.
+        in MODFLOW. Note that both n_timesteps and timestep_multiplier
+        specified here must be identical to those specified in the flow model
+        if the flow model is transient. If timestep_multiplier ≤ 0, the length
+        of each flow time step within the current stress period is read from
+        the record TSLNGH. This option is needed in case the length of time
+        steps for the flow solution is not based on a geometric progression in
+        a flow model, unlike MODFLOW.  Default is 1.0.
     """
 
     _pkg_id = "dis"

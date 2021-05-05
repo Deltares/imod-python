@@ -1,15 +1,16 @@
-from imod.flow.pkgbase import Package, Vividict
-import imod
-import numpy as np
-from imod.wq import timeutil
 import geopandas as gpd
+import imod
 import jinja2
+import numpy as np
+from imod.flow.pkgbase import Package, Vividict
+from imod.wq import timeutil
 
 
 class HorizontalFlowBarrier(Package):
     """
-    Horizontal barriers obstructing flow such as semi- or impermeable fault zone or a sheet pile wall are
-    defined for each model layer by a *.GEN line file.
+    Horizontal barriers obstructing flow such as semi- or impermeable fault
+    zone or a sheet pile wall are defined for each model layer by a \*.GEN line
+    file.
 
     Parameters
     ----------

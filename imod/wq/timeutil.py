@@ -41,6 +41,7 @@ def to_datetime(time, use_cftime):
     elif isinstance(time, str):
         time = dateutil.parser.parse(time)
         _check_year(time.year, use_cftime)
+
     if use_cftime:
         return cftime.DatetimeProlepticGregorian(*time.timetuple()[:6])
     else:

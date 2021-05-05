@@ -1,19 +1,15 @@
-import imod
-
 import abc
-import xarray as xr
-import numpy as np
-
-import joblib
-import jinja2
 import pathlib
 
+import cftime
+import imod
+import jinja2
+import joblib
+import numpy as np
+import xarray as xr
 from imod import util
 from imod.flow import timeutil
 from imod.wq import caching
-
-
-import cftime
 
 
 class Vividict(dict):
@@ -31,20 +27,19 @@ class Package(
     abc.ABC
 ):  # TODO: Abstract base class really necessary? Are we using abstract methods?
     """
-    Base package for the different iMODFLOW packages.
-    Package is used to share methods for specific packages with no time
-    component.
+    Base package for the different iMODFLOW packages.  Package is used to share
+    methods for specific packages with no time component.
 
     It is not meant to be used directly, only to inherit from, to implement new
     packages.
 
-    Every package contains a ``_pkg_id`` for identification.
-    Used to check for duplicate entries, or to group multiple systems together
-    (riv, ghb, drn).
+    Every package contains a ``_pkg_id`` for identification.  Used to check for
+    duplicate entries, or to group multiple systems together (riv, ghb, drn).
 
-    The ``_template_runfile`` attribute is the template for a section of the runfile.
-    This is filled in based on the metadata from the DataArrays that are within
-    the Package. Same applies to ``_template_projectfile`` for the projectfile.
+    The ``_template_runfile`` attribute is the template for a section of the
+    runfile.  This is filled in based on the metadata from the DataArrays that
+    are within the Package. Same applies to ``_template_projectfile`` for the
+    projectfile.
     """
 
     __slots__ = ("_pkg_id", "_variable_order", "_dataset")
@@ -351,9 +346,11 @@ class Package(
 
 class BoundaryCondition(Package, abc.ABC):
     """
-    BoundaryCondition is used to share methods for specific stress packages with a time component.
+    BoundaryCondition is used to share methods for specific stress packages
+    with a time component.
 
-    It is not meant to be used directly, only to inherit from, to implement new packages.
+    It is not meant to be used directly, only to inherit from, to implement new
+    packages.
     """
 
     _template_projectfile = jinja2.Template(
@@ -444,26 +441,25 @@ class BoundaryCondition(Package, abc.ABC):
         """
         Periodic stress periods.
 
-        Adds periodic stresses to each variable in the package.
-        iMODFLOW will then implicitly repeat these.
+        Adds periodic stresses to each variable in the package.  iMODFLOW will
+        then implicitly repeat these.
 
-        The iMOD manual currently states:
-        'A PERIOD repeats until another time definition
-        is more close to the current time step'.
+        The iMOD manual currently states: 'A PERIOD repeats until another time
+        definition is more close to the current time step'.
 
         Parameters
         ----------
         periods: dict of datetime - string pairs
-            contains a datetime as key which maps to a period label.
-            This will be used for the entire package.
+            contains a datetime as key which maps to a period label.  This will
+            be used for the entire package.
         use_cftime: bool
             Whether to force datetimes to cftime or not.
 
         Examples
         --------
-        The following example assigns a higher head to the summer period than winter period.
-        iMODFLOW will switch to period "summer" once 'xxxx-04-01' has passed,
-        and "winter" once 'xxxx-10-01' has passed.
+        The following example assigns a higher head to the summer period than
+        winter period.  iMODFLOW will switch to period "summer" once
+        'xxxx-04-01' has passed, and "winter" once 'xxxx-10-01' has passed.
 
         >>> times = [np.datetime64('2000-04-01'), np.datetime64('2000-10-01')]
 
@@ -565,24 +561,23 @@ class BoundaryCondition(Package, abc.ABC):
         pkggroup_times=None,
     ):
         """
-        Composes paths to files, or gets the appropriate scalar value for
-        a single variable in a dataset.
+        Composes paths to files, or gets the appropriate scalar value for a
+        single variable in a dataset.
 
         Parameters
         ----------
         varname : str
             variable name of the DataArray
         globaltimes : list, np.array
-            Holds the global times, i.e. the combined unique times of
-            every boundary condition that are used to define the stress
-            periods.
-            The times of the BoundaryCondition do not have to match all
-            the global times. When a globaltime is not present in the
-            BoundaryCondition, the value of the first previous available time is
-            filled in. The effective result is a forward fill in time.
+            Holds the global times, i.e. the combined unique times of every
+            boundary condition that are used to define the stress periods.  The
+            times of the BoundaryCondition do not have to match all the global
+            times. When a globaltime is not present in the BoundaryCondition,
+            the value of the first previous available time is filled in. The
+            effective result is a forward fill in time.
         directory : str
-            Path to working directory, where files will be written.
-            Necessary to generate the paths for the runfile.
+            Path to working directory, where files will be written.  Necessary
+            to generate the paths for the runfile.
         nlayer : int
             Number of layers
         values : Vividict
@@ -592,16 +587,16 @@ class BoundaryCondition(Package, abc.ABC):
         compose_projectfile : bool
             Compose values in a hierarchy suitable for the projectfile
         pkggroup_times : optional, list, np.array
-            Holds the package_group times.
-            Packages in one group need to be synchronized for iMODFLOW.
+            Holds the package_group times.  Packages in one group need to be
+            synchronized for iMODFLOW.
 
         Returns
         -------
         values : Vividict
             A nested dictionary containing following the projectfile hierarchy:
-            {_pkg_id : {stress_period : {varname : {system_index : {lay_nr : value}}}}}
+            ``{_pkg_id : {stress_period : {varname : {system_index : {lay_nr : value}}}}}``
             or runfile hierarchy:
-            {stress_period : {_pkg_id : {varname : {system_index : {lay_nr : value}}}}}
+            ``{stress_period : {_pkg_id : {varname : {system_index : {lay_nr : value}}}}}``
             where 'value' can be a scalar or a path to a file.
             The stress period number may be the wildcard '?'.
         """

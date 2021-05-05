@@ -1,5 +1,5 @@
-from imod.flow.pkgbase import Package
 import jinja2
+from imod.flow.pkgbase import Package
 
 
 class PreconditionedConjugateGradientSolver(Package):
@@ -72,7 +72,6 @@ class PreconditionedConjugateGradientSolver(Package):
             1 is for printing only the total number of iterations
             2 is for no printing
             3 is for printing only if convergence fails
-
     """
 
     _pkg_id = "pcg"

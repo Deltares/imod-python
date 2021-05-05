@@ -10,9 +10,9 @@ class GeneralHeadBoundary(BoundaryCondition):
     Parameters
     ----------
     head: float or xr.DataArray of floats
-        head value for the GHB (BHEAD), dims = ("layer", "y", "x").
+        head value for the GHB (BHEAD), dims ``("layer", "y", "x")``.
     conductance: float or xr.DataArray of floats
-        the conductance of the GHB (COND), dims = ("layer", "y", "x").
+        the conductance of the GHB (COND), dims ``("layer", "y", "x")``.
     """
 
     _pkg_id = "ghb"

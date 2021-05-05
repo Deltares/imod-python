@@ -4,15 +4,14 @@ from imod.flow.pkgbase import Package
 
 class HorizontalAnisotropy(Package):
     """
-    Horizontal anisotropy is a phenomenon in which
-    the horizontal hydraulic conductivity is not equal along
-    the x- and y Cartesian axis. iMODFLOW allows to calculate
-    this anisotropy based on a anisotropy factor and an anisotropy angle.
-    iMODFLOW also accounts for the cross-terms in the
-    horizontal hydraulic conductivity tensor.
+    Horizontal anisotropy is a phenomenon in which the horizontal hydraulic
+    conductivity is not equal along the x and y Cartesian axes. iMODFLOW can
+    calculate this anisotropy based on a anisotropy factor and an anisotropy
+    angle. iMODFLOW also accounts for the cross-terms in the horizontal
+    hydraulic conductivity tensor.
 
-    See also section 12.14 "ANI Horizontal anisotropy module"
-    in the iMOD v5.2 manual for further explanation.
+    See also section 12.14 "ANI Horizontal anisotropy module" in the iMOD v5.2
+    manual for further explanation.
 
     Parameters
     ----------
