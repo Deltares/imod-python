@@ -632,3 +632,19 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
     else:
         raise TypeError("data must be xarray.DataArray or xr.Dataset")
     return _unstack_layers(ds)
+
+
+def is_divisor(numerator, denominator) -> bool:
+    """
+    Parameters
+    ----------
+    numerator: np.array of floats
+    denominator: float
+
+    Returns
+    -------
+    is_divisor: bool
+    """
+    denominator = abs(denominator)
+    remainder = np.abs(numerator) % denominator
+    return (np.isclose(remainder, 0.0) | np.isclose(remainder, denominator)).all()
