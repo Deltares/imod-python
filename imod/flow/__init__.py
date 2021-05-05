@@ -25,6 +25,8 @@ from imod.flow.dis import TimeDiscretization
 from imod.flow.slv import PreconditionedConjugateGradientSolver
 from imod.flow.sto import StorageCoefficient, SpecificStorage
 from imod.flow.hfb import HorizontalFlowBarrier
+from imod.flow.rch import Recharge
+from imod.flow.evt import EvapoTranspiration
 
 
 def write(path, model, name=None, runfile_parameters=None, output_packages=["shd"]):

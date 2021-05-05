@@ -632,12 +632,82 @@ class BoundaryCondition(Package, abc.ABC):
 
         else:
             if compose_projectfile == True:
-                values[self._pkg_id]["steady-state"][varname][
+                values[self._pkg_id]["1"][varname][
                     system_index
                 ] = self._compose_values_layer(varname, directory, nlayer, time=None)
             else:  # render runfile
-                values["steady-state"][self._pkg_id][varname][
+                values["1"][self._pkg_id][varname][
                     system_index
                 ] = self._compose_values_layer(varname, directory, nlayer, time=None)
 
         return values
+
+
+class TopBoundaryCondition(BoundaryCondition, abc.ABC):
+    """
+    Abstract base class for boundary conditions that are only assigned to
+    the first layer, namely the Recharge and EvapoTranspiration package.
+    """
+
+    _template_projectfile = jinja2.Template(
+        # Specify amount of timesteps for a package
+        # 1 indicates if package is active or not
+        '{{"{:04d}".format(package_data|length)}}, ({{pkg_id}}), 1, {{name}}, {{variable_order}}\n'
+        "{%- for time_key, time_data in package_data.items()%}\n"
+        # Specify stress period
+        # Specify amount of variables and entries(nlay, nsys) to be expected
+        "{{times[time_key]}}\n"
+        '{{"{:03d}".format(time_data|length)}}, {{"{:03d}".format(n_entry)}}\n'
+        "{%-    for variable in variable_order%}\n"  # Preserve variable order
+        "{%-        for system, system_data in time_data[variable].items() %}\n"
+        # Recharge only applied to first layer
+        "{%-            set value = system_data[1]%}\n"
+        "{%-            if value is string %}\n"
+        # If string then assume path:
+        # 1 indicates the layer is activated
+        # 2 indicates the second element of the final two elements should be read
+        # 001 indicates recharge is applied to the first layer
+        # 1.000 is the multiplication factor
+        # 0.000 is the addition factor
+        # -9999 indicates there is no data, following iMOD usual practice
+        "1, 2, 001, 1.000, 0.000, -9999., {{value}}\n"
+        "{%-            else %}\n"
+        # Else assume a constant value is provided
+        '1, 1, 001, 1.000, 0.000, {{value}}, ""\n'
+        "{%-            endif %}\n"
+        "{%-        endfor %}\n"
+        "{%-    endfor %}\n"
+        "{%- endfor %}\n"
+    )
+
+    def _select_first_layer_composition(self, composition):
+        """Select first layer in an exisiting composition."""
+        composition_first_layer = Vividict()
+
+        # Loop over nested dict, it is not pretty
+        for (a, aa) in composition[self._pkg_id].items():
+            for (b, bb) in aa.items():
+                for (c, cc) in bb.items():
+                    composition_first_layer[a][b][c][1] = cc[1]
+        return composition_first_layer
+
+    def compose(
+        self,
+        directory,
+        globaltimes,
+        nlayer,
+        composition=None,
+        compose_projectfile=True,
+    ):
+
+        composition = super(__class__, self).compose(
+            directory,
+            globaltimes,
+            nlayer,
+            composition,
+            compose_projectfile=compose_projectfile,
+        )
+
+        composition[self._pkg_id] = self._select_first_layer_composition(composition)
+
+        return composition
