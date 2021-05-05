@@ -213,3 +213,195 @@ def test_rasterize_table():
 
     actual = imod.prepare.spatial.rasterize_celltable(table, "area", like)
     assert actual.identical(expected)
+
+
+def test_zonal_aggregate_raster(tmp_path):
+    raster = xr.DataArray(
+        data=[[0.0, 0.0], [1.0, 1.0]],
+        coords={"x": [0.5, 1.5], "y": [1.5, 0.5]},
+        dims=("y", "x"),
+        name="my-raster",
+    )
+    geometries = [
+        sg.Polygon(
+            [
+                (0.0, 1.0),
+                (2.0, 1.0),
+                (2.0, 2.0),
+                (0.0, 2.0),
+            ]
+        ),
+        sg.Polygon(
+            [
+                (0.0, 0.0),
+                (2.0, 0.0),
+                (2.0, 1.0),
+                (0.0, 1.0),
+            ]
+        ),
+    ]
+    gdf = gpd.GeoDataFrame(geometry=geometries)
+    gdf["id"] = [1, 2]
+    path = tmp_path / "two-zones1.shp"
+    gdf.to_file(path)
+
+    actual = imod.prepare.spatial.zonal_aggregate_raster(
+        path=path,
+        column="id",
+        raster=raster,
+        resolution=1.0,
+        method="mean",
+    )
+    expected = pd.DataFrame.from_dict(
+        {
+            "id": [1, 2],
+            "area": [2.0, 2.0],
+            "my-raster": [0.0, 1.0],
+        }
+    )
+    assert actual.equals(expected)
+
+    raster.name = None
+    geometries = [
+        sg.Polygon(
+            [
+                (0.0, 1.5),
+                (2.0, 1.5),
+                (2.0, 2.0),
+                (0.0, 2.0),
+            ]
+        ),
+        sg.Polygon(
+            [
+                (0.0, 0.0),
+                (2.0, 0.0),
+                (2.0, 1.5),
+                (0.0, 1.5),
+            ]
+        ),
+    ]
+    gdf.geometry = geometries
+    path = tmp_path / "two-zones2.shp"
+    gdf.to_file(path)
+
+    actual = imod.prepare.spatial.zonal_aggregate_raster(
+        path=path,
+        column="id",
+        raster=raster,
+        resolution=0.5,
+        method="mean",
+    )
+    expected = pd.DataFrame.from_dict(
+        {
+            "id": [1, 2],
+            "area": [1.0, 3.0],
+            "aggregated": [0.0, 2.0 / 3.0],
+        }
+    )
+    assert actual.equals(expected)
+
+    actual = imod.prepare.spatial.zonal_aggregate_raster(
+        path=path,
+        column="id",
+        raster=raster,
+        resolution=0.5,
+        method=pd.Series.mode,
+    )
+    expected = pd.DataFrame.from_dict(
+        {
+            "id": [1, 2],
+            "area": [1.0, 3.0],
+            "aggregated": [0.0, 1.0],
+        }
+    )
+    assert actual.equals(expected)
+
+
+def test_zonal_aggregate_polygons(tmp_path):
+    raster = xr.DataArray(
+        data=[[np.nan, np.nan], [np.nan, np.nan]],
+        coords={"x": [0.5, 1.5], "y": [1.5, 0.5]},
+        dims=("y", "x"),
+    )
+    geometries_a = [
+        sg.Polygon(
+            [
+                (0.0, 1.0),
+                (2.0, 1.0),
+                (2.0, 2.0),
+                (0.0, 2.0),
+            ]
+        ),
+        sg.Polygon(
+            [
+                (0.0, 0.0),
+                (2.0, 0.0),
+                (2.0, 1.0),
+                (0.0, 1.0),
+            ]
+        ),
+    ]
+    gdf_a = gpd.GeoDataFrame(geometry=geometries_a)
+    gdf_a["id_a"] = [1, 2]
+    gdf_a["data_a"] = [3, 4]
+    path_a = tmp_path / "two-zones_a.shp"
+    gdf_a.to_file(path_a)
+
+    actual = imod.prepare.spatial.zonal_aggregate_polygons(
+        path_a=path_a,
+        column_a="id_a",
+        path_b=path_a,
+        column_b="data_a",
+        like=raster,
+        resolution=1.0,
+        method="mean",
+    )
+    expected = pd.DataFrame.from_dict(
+        {
+            "id_a": [1, 2],
+            "area": [2.0, 2.0],
+            "data_a": [3.0, 4.0],
+        }
+    )
+    assert actual.equals(expected)
+
+    geometries_b = [
+        sg.Polygon(
+            [
+                (0.0, 2.0),
+                (0.0, 0.0),
+                (1.0, 0.0),
+                (1.0, 2.0),
+            ]
+        ),
+        sg.Polygon(
+            [
+                (1.0, 2.0),
+                (1.0, 0.0),
+                (2.0, 0.0),
+                (2.0, 2.0),
+            ]
+        ),
+    ]
+    gdf_b = gpd.GeoDataFrame(geometry=geometries_b)
+    gdf_b["data_b"] = [3, 4]
+    path_b = tmp_path / "two-zones_b.shp"
+    gdf_b.to_file(path_b)
+
+    actual = imod.prepare.spatial.zonal_aggregate_polygons(
+        path_a=path_a,
+        column_a="id_a",
+        path_b=path_b,
+        column_b="data_b",
+        like=raster,
+        resolution=1.0,
+        method="mean",
+    )
+    expected = pd.DataFrame.from_dict(
+        {
+            "id_a": [1, 2],
+            "area": [2.0, 2.0],
+            "data_b": [3.5, 3.5],
+        }
+    )
+    assert actual.equals(expected)

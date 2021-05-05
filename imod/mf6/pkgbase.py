@@ -273,13 +273,16 @@ class BoundaryCondition(Package, abc.ABC):
 
     def _write_file(self, outpath, sparse_data):
         """
-        data is a xr.Dataset with only the binary variables"""
+        data is a xr.Dataset with only the binary variables
+        """
 
         with open(outpath, "w") as f:
             sparse_data.tofile(f)
 
     def write_datafile(self, outpath, ds):
-        """"""
+        """
+        Writes a modflow6 binary data file
+        """
         layer = self._check_layer_presence(ds)
         arrays = self._ds_to_arrlist(ds)
         sparse_data = self.to_sparse(arrays, layer)

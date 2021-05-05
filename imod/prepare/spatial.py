@@ -1,5 +1,6 @@
 import pathlib
 import subprocess
+from typing import Callable, Union
 
 import affine
 import dask
@@ -288,8 +289,6 @@ def polygonize(da):
 def _handle_dtype(dtype, nodata):
     # Largely taken from rasterio.dtypes
     # https://github.com/mapbox/rasterio/blob/master/rasterio/dtypes.py
-    # TODO: look at licensing of Mapbox license:
-    # https://github.com/mapbox/rasterio/blob/master/LICENSE.txt
     # Not supported:
     # GDT_CInt16 = 8, GDT_CInt32 = 9, GDT_CFloat32 = 10, GDT_CFloat64 = 11
     dtype_mapping = {
@@ -557,7 +556,7 @@ def _celltable(path, column, resolution, like, rowstart=0, colstart=0):
 
     The feature area within the cell is approximated by first rasterizing the
     feature, and then counting the number of occuring cells. This means the
-    accuracy of the area depends on the cellsize of the rasterization step.
+    accuracy of the area depends on the resolution of the rasterization step.
 
     Parameters
     ----------
@@ -777,9 +776,9 @@ def celltable(path, column, resolution, like, chunksize=1e4):
 
     """
     dx, _, _, dy, _, _ = imod.util.spatial_reference(like)
-    if not (np.atleast_1d(dx) % resolution == 0.0).all():
+    if not imod.util.is_divisor(dx, resolution):
         raise ValueError("resolution is not an (integer) divisor of dx")
-    if not (np.atleast_1d(dy) % resolution == 0.0).all():
+    if not imod.util.is_divisor(dy, resolution):
         raise ValueError("resolution is not an (integer) divisor of dy")
 
     like_chunks, rowstarts, colstarts = _create_chunks(like, resolution, chunksize)
@@ -838,3 +837,229 @@ def rasterize_celltable(table, column, like):
     dst = like.copy()
     dst.values = _burn_cells(dst.values, rows, cols, area)
     return dst
+
+
+def _zonal_aggregate_raster(
+    path: Union[str, pathlib.Path],
+    column: str,
+    resolution: float,
+    raster: xr.DataArray,
+    method: Union[str, Callable],
+) -> pd.DataFrame:
+    """
+    * Rasterize the polygon at given `resolution`
+    * Sample the raster at the rasterized polygon cells
+    * Store both in a dataframe, groupby and aggregate according to `method`
+    """
+    data_dx, xmin, xmax, data_dy, ymin, ymax = imod.util.spatial_reference(raster)
+    dx = resolution
+    dy = -dx
+    nodata = -1
+    spatial_reference = {"bounds": (xmin, xmax, ymin, ymax), "cellsizes": (dx, dy)}
+
+    rasterized = gdal_rasterize(
+        path, column, nodata=nodata, dtype=np.int32, spatial_reference=spatial_reference
+    )
+    ravelled = rasterized.values.ravel()
+
+    y = np.arange(ymax + 0.5 * dy, ymin, dy)
+    x = np.arange(xmin + 0.5 * dx, xmax, dx)
+    is_data = ravelled != nodata
+    feature_id = ravelled[is_data]
+    yy, xx = [a.ravel()[is_data] for a in np.meshgrid(y, x, indexing="ij")]
+
+    dims = ("y", "x")
+    rasterized, _ = common._increasing_dims(rasterized, dims)
+    raster, _ = common._increasing_dims(raster, dims)
+    y_ind = ((yy - ymin) / abs(data_dy)).astype(int)
+    x_ind = ((xx - xmin) / abs(data_dx)).astype(int)
+    sample = raster.values[y_ind, x_ind]
+
+    df = pd.DataFrame({column: feature_id, "data": sample})
+    # Remove entries where the raster has nodata.
+    # This may result in areas significantly smaller than the polygon geometry,
+    # but should come in handy for weighting later?
+    df = df[df["data"].notnull()]
+    result = df.groupby(column, as_index=False).agg(["count", method]).reset_index()
+    # Compute the area from the counted number of cells
+    result["data", "count"] *= resolution * resolution
+    name = raster.name if raster.name else "aggregated"
+    result.columns = [column, "area", name]
+    return result
+
+
+def _zonal_aggregate_polygons(
+    path_a: Union[str, pathlib.Path],
+    path_b: Union[str, pathlib.Path],
+    column_a: str,
+    column_b: str,
+    resolution: float,
+    like: xr.DataArray,
+    method: Union[str, Callable],
+) -> pd.DataFrame:
+    """
+    * Rasterize a, rasterize b for the same domain
+    * Store both in a dataframe, groupby and aggregate according to `method`
+    """
+    _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(like)
+    dx = resolution
+    dy = -dx
+    nodata = -1
+    spatial_reference = {"bounds": (xmin, xmax, ymin, ymax), "cellsizes": (dx, dy)}
+
+    rasterized_a = gdal_rasterize(
+        path_a,
+        column_a,
+        nodata=nodata,
+        dtype=np.int32,
+        spatial_reference=spatial_reference,
+    )
+    rasterized_b = gdal_rasterize(
+        path_b,
+        column_b,
+        nodata=np.nan,
+        dtype=np.float64,
+        spatial_reference=spatial_reference,
+    )
+    is_data = ((rasterized_a != nodata) & (rasterized_b.notnull())).values
+    a = rasterized_a.values[is_data].ravel()
+    b = rasterized_b.values[is_data].ravel()
+    df = pd.DataFrame({column_a: a, column_b: b})
+    # Remove entries where the raster has nodata.
+    # This may result in areas significantly smaller than the polygon geometry,
+    # but should come in handy for weighting later?
+    result = df.groupby(column_a, as_index=False).agg(["count", method]).reset_index()
+    # Compute the area from the counted number of cells
+    result[column_b, "count"] *= resolution * resolution
+    result.columns = [column_a, "area", column_b]
+    return result
+
+
+def zonal_aggregate_raster(
+    path: Union[pathlib.Path, str],
+    column: str,
+    raster: xr.DataArray,
+    resolution: float,
+    method: Union[str, Callable],
+    chunksize: int = 1e4,
+) -> pd.DataFrame:
+    """
+    Compute a zonal aggregate of raster data for polygon geometries, e.g. a mean,
+    mode, or percentile.
+
+    Parameters
+    ----------
+    path : str or pathlib.Path
+        path to OGR supported vector file (e.g. a shapefile). Defines zones
+        of aggregation.
+    column : str
+        column name of path, integer IDs defining zones.
+    resolution : float
+        cellsize at which the rasterization of polygons and sampling occurs
+    raster : xarray.DataArray
+        Raster data from which to sample and aggregate data
+    method : Union[str, Callable]
+        Aggregation method.
+        Anything that is acceptable by a pandas groupby aggregate:
+        https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.DataFrameGroupBy.aggregate.html
+    chunksize : int, optional
+        The size of the chunksize. Used for both x and y dimension.
+
+    Returns
+    -------
+    zonal_aggregates : pandas.DataFrame
+
+    Examples
+    --------
+
+    To compute the mean surface level at polygons of water bodies:
+
+    >>> import imod
+    >>> surface_level = imod.rasterio.open("surface_level.tif")
+    >>> df = imod.prepare.spatial.overlay_raster_intersection(
+    >>>    "water-bodies.shp", "id", 1.0, surface_level, "mean"
+    >>> )
+
+    For some functions, like the mode, a function should be passed instead:
+
+    >>> import pandas as pd
+    >>> df = imod.prepare.spatial.overlay_raster_intersection(
+    >>>    "water-bodies.shp", "id", 1.0, surface_level, pd.Series.mode
+    >>> )
+    """
+    dx, _, _, dy, _, _ = imod.util.spatial_reference(raster)
+    if not imod.util.is_divisor(dx, resolution):
+        raise ValueError("resolution is not an (integer) divisor of dx")
+    if not imod.util.is_divisor(dy, resolution):
+        raise ValueError("resolution is not an (integer) divisor of dy")
+
+    without_chunks = (raster.chunks is None) or (
+        all(length == 1 for length in map(len, raster.chunks))
+    )
+    if without_chunks:
+        raster = raster.compute()
+
+    raster_chunks, _, _ = _create_chunks(raster, resolution, chunksize)
+    collection = [
+        dask.delayed(_zonal_aggregate_raster)(path, column, resolution, chunk, method)
+        for chunk in raster_chunks
+    ]
+    result = dask.compute(collection)[0]
+    return pd.concat(result)
+
+
+def zonal_aggregate_polygons(
+    path_a: Union[pathlib.Path, str],
+    path_b: Union[pathlib.Path, str],
+    column_a: str,
+    column_b: str,
+    like: xr.DataArray,
+    resolution: float,
+    method: Union[str, Callable],
+    chunksize: int = 1e4,
+) -> pd.DataFrame:
+    """
+    Compute a zonal aggregate of polygon data for (other) polygon geometries,
+    e.g. a mean, mode, or percentile.
+
+    Parameters
+    ----------
+    path_a : str or pathlib.Path
+        path to OGR supported vector file (e.g. a shapefile)
+    path_b : str or pathlib.Path
+        path to OGR supported vector file (e.g. a shapefile)
+    column_a : str
+        column name of path_a. Defines zones of aggregation.
+    column_b : str
+        column name of path_b. Data to aggregate.
+    resolution : float
+        cellsize at which the rasterization, sampling, and area measurement occur.
+    method: Union[str, Callable]
+        Aggregation method.
+        Anything that is acceptable by a pandas groupby aggregate:
+        https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.DataFrameGroupBy.aggregate.html
+    like : xarray.DataArray with dims ("y", "x")
+        Example DataArray of where the cells will be located. Used only for its
+        x and y coordinates.
+    chunksize : int, optional
+        The size of the chunksize. Used for both x and y dimension.
+
+    Returns
+    -------
+    zonal_aggregates: pandas.DataFrame
+    """
+    dx, _, _, dy, _, _ = imod.util.spatial_reference(like)
+    if not imod.util.is_divisor(dx, resolution):
+        raise ValueError("resolution is not an (integer) divisor of dx")
+    if not imod.util.is_divisor(dy, resolution):
+        raise ValueError("resolution is not an (integer) divisor of dy")
+
+    like_chunks, _, _ = _create_chunks(like, resolution, chunksize)
+    collection = [
+        dask.delayed(_zonal_aggregate_polygons)(
+            path_a, path_b, column_a, column_b, resolution, chunk, method
+        )
+        for chunk in like_chunks
+    ]
+    result = dask.compute(collection)[0]
+    return pd.concat(result)

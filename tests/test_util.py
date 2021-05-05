@@ -385,3 +385,17 @@ def test_transform():
     da = xr.DataArray(data, coords, dims)
     with pytest.raises(ValueError):
         util.transform(da)
+
+
+def test_is_divisor():
+    a = np.array([1.0, 0.5, 0.1])
+    b = 0.05
+    assert util.is_divisor(a, b)
+    assert util.is_divisor(-a, b)
+    assert util.is_divisor(a, -b)
+    assert util.is_divisor(-a, -b)
+    b = 0.07
+    assert not util.is_divisor(a, b)
+    assert not util.is_divisor(-a, b)
+    assert not util.is_divisor(a, -b)
+    assert not util.is_divisor(-a, -b)
