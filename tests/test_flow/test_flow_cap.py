@@ -2,6 +2,7 @@ from imod.flow import MetaSwap
 import pathlib
 import pytest
 import os
+import textwrap
 from copy import deepcopy
 
 
@@ -20,44 +21,43 @@ def test_metaswap_render(metaswap_dict, get_render_dict):
     to_render = get_render_dict(metaswap, directory, None, nlayer)
     to_render["n_entry"] = nlayer
 
-    compare = (
-        "0001, (cap), 1, MetaSwap, ['boundary', 'landuse', 'rootzone_thickness', 'soil_physical_unit', 'meteo_station_number', 'surface_elevation', 'sprinkling_type', 'sprinkling_layer', 'sprinkling_capacity', 'wetted_area', 'urban_area', 'ponding_depth_urban', 'ponding_depth_rural', 'runoff_resistance_urban', 'runoff_resistance_rural', 'runon_resistance_urban', 'runon_resistance_rural', 'infiltration_capacity_urban', 'infiltration_capacity_rural', 'perched_water_table', 'soil_moisture_factor', 'conductivity_factor']\n"
-        "022, 001\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}boundary_l1.idf\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}landuse_l1.idf\n"
-        '1, 1, 001, 1.000, 0.000, 1.2, ""\n'
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}soil_physical_unit_l1.idf\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}meteo_station_number_l1.idf\n"
-        '1, 1, 001, 1.000, 0.000, 0.0, ""\n'
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}sprinkling_type_l1.idf\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}sprinkling_layer_l1.idf\n"
-        '1, 1, 001, 1.000, 0.000, 1000.0, ""\n'
-        '1, 1, 001, 1.000, 0.000, 30.0, ""\n'
-        '1, 1, 001, 1.000, 0.000, 30.0, ""\n'
-        '1, 1, 001, 1.000, 0.000, 0.02, ""\n'
-        '1, 1, 001, 1.000, 0.000, 0.005, ""\n'
-        '1, 1, 001, 1.000, 0.000, 1.5, ""\n'
-        '1, 1, 001, 1.000, 0.000, 1.5, ""\n'
-        '1, 1, 001, 1.000, 0.000, 1.5, ""\n'
-        '1, 1, 001, 1.000, 0.000, 1.5, ""\n'
-        '1, 1, 001, 1.000, 0.000, 10.0, ""\n'
-        '1, 1, 001, 1.000, 0.000, 2.0, ""\n'
-        '1, 1, 001, 1.000, 0.000, 0.5, ""\n'
-        '1, 1, 001, 1.000, 0.000, 1.0, ""\n'
-        '1, 1, 001, 1.000, 0.000, 1.0, ""\n'
-        "008,extra files\n"
-        f"{directory}{os.sep}fact_svat.inp\n"
-        f"{directory}{os.sep}luse_svat.inp\n"
-        f"{directory}{os.sep}mete_grid.inp\n"
-        f"{directory}{os.sep}para_sim.inp\n"
-        f"{directory}{os.sep}tiop_sim.inp\n"
-        f"{directory}{os.sep}init_svat.inp\n"
-        f"{directory}{os.sep}comp_post.inp\n"
-        f"{directory}{os.sep}sel_key_svat_per.inp"
+    compare = textwrap.dedent(
+        f"""\
+        0001, (cap), 1, MetaSwap, ['boundary', 'landuse', 'rootzone_thickness', 'soil_physical_unit', 'meteo_station_number', 'surface_elevation', 'sprinkling_type', 'sprinkling_layer', 'sprinkling_capacity', 'wetted_area', 'urban_area', 'ponding_depth_urban', 'ponding_depth_rural', 'runoff_resistance_urban', 'runoff_resistance_rural', 'runon_resistance_urban', 'runon_resistance_rural', 'infiltration_capacity_urban', 'infiltration_capacity_rural', 'perched_water_table', 'soil_moisture_factor', 'conductivity_factor']
+        022, 001
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}boundary_l1.idf
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}landuse_l1.idf
+        1, 1, 001, 1.000, 0.000, 1.2, ""
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}soil_physical_unit_l1.idf
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}meteo_station_number_l1.idf
+        1, 1, 001, 1.000, 0.000, 0.0, ""
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}sprinkling_type_l1.idf
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}sprinkling_layer_l1.idf
+        1, 1, 001, 1.000, 0.000, 1000.0, ""
+        1, 1, 001, 1.000, 0.000, 30.0, ""
+        1, 1, 001, 1.000, 0.000, 30.0, ""
+        1, 1, 001, 1.000, 0.000, 0.02, ""
+        1, 1, 001, 1.000, 0.000, 0.005, ""
+        1, 1, 001, 1.000, 0.000, 1.5, ""
+        1, 1, 001, 1.000, 0.000, 1.5, ""
+        1, 1, 001, 1.000, 0.000, 1.5, ""
+        1, 1, 001, 1.000, 0.000, 1.5, ""
+        1, 1, 001, 1.000, 0.000, 10.0, ""
+        1, 1, 001, 1.000, 0.000, 2.0, ""
+        1, 1, 001, 1.000, 0.000, 0.5, ""
+        1, 1, 001, 1.000, 0.000, 1.0, ""
+        1, 1, 001, 1.000, 0.000, 1.0, ""
+        008,extra files
+        {directory}{os.sep}fact_svat.inp
+        {directory}{os.sep}luse_svat.inp
+        {directory}{os.sep}mete_grid.inp
+        {directory}{os.sep}para_sim.inp
+        {directory}{os.sep}tiop_sim.inp
+        {directory}{os.sep}init_svat.inp
+        {directory}{os.sep}comp_post.inp
+        {directory}{os.sep}sel_key_svat_per.inp"""
     )
-
     rendered = metaswap._render_projectfile(**to_render)
-
     assert rendered == compare
 
 
