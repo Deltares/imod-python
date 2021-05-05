@@ -4,6 +4,7 @@ import os
 import numpy as np
 import xarray as xr
 import pytest
+import textwrap
 from copy import deepcopy
 
 
@@ -53,23 +54,24 @@ def test_constant_head(constant_head, get_render_dict, three_days):
     to_render["n_entry"] = nlayer
     to_render["times"] = time_composed
 
-    compare = (
-        "0003, (chd), 1, ConstantHead, ['head']\n"
-        "2018-01-01 00:00:00\n"
-        "001, 003\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}head_20180101000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}head_20180101000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}head_20180101000000_l3.idf\n"
-        "2018-01-02 00:00:00\n"
-        "001, 003\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}head_20180102000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}head_20180102000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}head_20180102000000_l3.idf\n"
-        "2018-01-03 00:00:00\n"
-        "001, 003\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}head_20180103000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}head_20180103000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}head_20180103000000_l3.idf"
+    compare = textwrap.dedent(
+        f"""\
+        0003, (chd), 1, ConstantHead, ['head']
+        2018-01-01 00:00:00
+        001, 003
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}head_20180101000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}head_20180101000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}head_20180101000000_l3.idf
+        2018-01-02 00:00:00
+        001, 003
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}head_20180102000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}head_20180102000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}head_20180102000000_l3.idf
+        2018-01-03 00:00:00
+        001, 003
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}head_20180103000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}head_20180103000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}head_20180103000000_l3.idf"""
     )
     rendered = constant_head._render_projectfile(**to_render)
 
@@ -97,23 +99,24 @@ def test_periodic_constant_head(periodic_constant_head, get_render_dict, three_d
     to_render["n_entry"] = nlayer
     to_render["times"] = time_composed
 
-    compare = (
-        "0003, (chd), 1, ConstantHead, ['head']\n"
-        "day1\n"
-        "001, 003\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}head_20180101000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}head_20180101000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}head_20180101000000_l3.idf\n"
-        "day2\n"
-        "001, 003\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}head_20180102000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}head_20180102000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}head_20180102000000_l3.idf\n"
-        "day3\n"
-        "001, 003\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}head_20180103000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}head_20180103000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}head_20180103000000_l3.idf"
+    compare = textwrap.dedent(
+        f"""\
+        0003, (chd), 1, ConstantHead, ['head']
+        day1
+        001, 003
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}head_20180101000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}head_20180101000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}head_20180101000000_l3.idf
+        day2
+        001, 003
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}head_20180102000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}head_20180102000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}head_20180102000000_l3.idf
+        day3
+        001, 003
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}head_20180103000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}head_20180103000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}head_20180103000000_l3.idf"""
     )
     rendered = periodic_constant_head._render_projectfile(**to_render)
 

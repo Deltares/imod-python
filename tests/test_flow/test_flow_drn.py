@@ -2,6 +2,7 @@ from imod.flow import Drain
 import numpy as np
 import xarray as xr
 import os
+import textwrap
 
 import pathlib
 import pytest
@@ -43,32 +44,32 @@ def test_drain(get_render_dict, drain, three_days):
     to_render["n_entry"] = nlayer
     to_render["times"] = time_composed
 
-    compare = (
-        "0003, (drn), 1, Drain, ['conductance', 'elevation']\n"
-        "2018-01-01 00:00:00\n"
-        "002, 003\n"
-        f'1, 1, 001, 1.000, 0.000, 10.0, ""\n'
-        f'1, 1, 002, 1.000, 0.000, 10.0, ""\n'
-        f'1, 1, 003, 1.000, 0.000, 10.0, ""\n'
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180101000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180101000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180101000000_l3.idf\n"
-        "2018-01-02 00:00:00\n"
-        "002, 003\n"
-        f'1, 1, 001, 1.000, 0.000, 10.0, ""\n'
-        f'1, 1, 002, 1.000, 0.000, 10.0, ""\n'
-        f'1, 1, 003, 1.000, 0.000, 10.0, ""\n'
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180102000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180102000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180102000000_l3.idf\n"
-        "2018-01-03 00:00:00\n"
-        "002, 003\n"
-        f'1, 1, 001, 1.000, 0.000, 10.0, ""\n'
-        f'1, 1, 002, 1.000, 0.000, 10.0, ""\n'
-        f'1, 1, 003, 1.000, 0.000, 10.0, ""\n'
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180103000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180103000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180103000000_l3.idf"
+    compare = textwrap.dedent(f"""\
+        0003, (drn), 1, Drain, ['conductance', 'elevation']
+        2018-01-01 00:00:00
+        002, 003
+        1, 1, 001, 1.000, 0.000, 10.0, ""
+        1, 1, 002, 1.000, 0.000, 10.0, ""
+        1, 1, 003, 1.000, 0.000, 10.0, ""
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180101000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180101000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180101000000_l3.idf
+        2018-01-02 00:00:00
+        002, 003
+        1, 1, 001, 1.000, 0.000, 10.0, ""
+        1, 1, 002, 1.000, 0.000, 10.0, ""
+        1, 1, 003, 1.000, 0.000, 10.0, ""
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180102000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180102000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180102000000_l3.idf
+        2018-01-03 00:00:00
+        002, 003
+        1, 1, 001, 1.000, 0.000, 10.0, ""
+        1, 1, 002, 1.000, 0.000, 10.0, ""
+        1, 1, 003, 1.000, 0.000, 10.0, ""
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180103000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180103000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}elevation_20180103000000_l3.idf"""
     )
     rendered = drain._render_projectfile(**to_render)
 

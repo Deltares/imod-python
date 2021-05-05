@@ -5,6 +5,7 @@ import xarray as xr
 import pytest
 import pathlib
 import os
+import textwrap
 from copy import deepcopy
 
 
@@ -59,32 +60,32 @@ def test_group_rendered(constant_head, three_days):
 
     rendered = chd1._render_projectfile(**to_render)
 
-    compare = (
-        "0003, (chd), 1, ConstantHead, ['head']\n"
-        "2018-01-01 00:00:00\n"
-        "001, 006\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l3.idf\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180101000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180101000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180101000000_l3.idf\n"
-        "2018-01-02 00:00:00\n"
-        "001, 006\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l3.idf\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180102000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180102000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180102000000_l3.idf\n"
-        "2018-01-03 00:00:00\n"
-        "001, 006\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l3.idf\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180103000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180103000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180103000000_l3.idf"
+    compare = textwrap.dedent(f"""\
+        0003, (chd), 1, ConstantHead, ['head']
+        2018-01-01 00:00:00
+        001, 006
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l3.idf
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180101000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180101000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180101000000_l3.idf
+        2018-01-02 00:00:00
+        001, 006
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l3.idf
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180102000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180102000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180102000000_l3.idf
+        2018-01-03 00:00:00
+        001, 006
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l3.idf
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180103000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180103000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}secondary{os.sep}head_20180103000000_l3.idf"""
     )
 
     assert compare == rendered
@@ -123,32 +124,32 @@ def test_group_synchronize_times_rendered(constant_head, three_days):
 
     rendered = chd1._render_projectfile(**to_render)
 
-    compare = (
-        "0003, (chd), 1, ConstantHead, ['head']\n"
-        "2018-01-01 00:00:00\n"
-        "001, 006\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l3.idf\n"
-        '1, 1, 001, 1.000, 0.000, 2.0, ""\n'
-        '1, 1, 002, 1.000, 0.000, 2.0, ""\n'
-        '1, 1, 003, 1.000, 0.000, 2.0, ""\n'
-        "2018-01-02 00:00:00\n"
-        "001, 006\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l3.idf\n"
-        '1, 1, 001, 1.000, 0.000, 2.0, ""\n'
-        '1, 1, 002, 1.000, 0.000, 2.0, ""\n'
-        '1, 1, 003, 1.000, 0.000, 2.0, ""\n'
-        "2018-01-03 00:00:00\n"
-        "001, 006\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l3.idf\n"
-        '1, 1, 001, 1.000, 0.000, 2.0, ""\n'
-        '1, 1, 002, 1.000, 0.000, 2.0, ""\n'
-        '1, 1, 003, 1.000, 0.000, 2.0, ""'
+    compare = textwrap.dedent(f'''\
+        0003, (chd), 1, ConstantHead, ['head']
+        2018-01-01 00:00:00
+        001, 006
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180101000000_l3.idf
+        1, 1, 001, 1.000, 0.000, 2.0, ""
+        1, 1, 002, 1.000, 0.000, 2.0, ""
+        1, 1, 003, 1.000, 0.000, 2.0, ""
+        2018-01-02 00:00:00
+        001, 006
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180102000000_l3.idf
+        1, 1, 001, 1.000, 0.000, 2.0, ""
+        1, 1, 002, 1.000, 0.000, 2.0, ""
+        1, 1, 003, 1.000, 0.000, 2.0, ""
+        2018-01-03 00:00:00
+        001, 006
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_20180103000000_l3.idf
+        1, 1, 001, 1.000, 0.000, 2.0, ""
+        1, 1, 002, 1.000, 0.000, 2.0, ""
+        1, 1, 003, 1.000, 0.000, 2.0, ""'''
     )
 
     assert compare == rendered
@@ -184,20 +185,20 @@ def test_two_wels(well_df, three_days, get_render_dict):
         n_entry=2,
     )
 
-    compare = (
-        "0003, (wel), 1, Well, ['rate']\n"
-        "2018-01-01 00:00:00\n"
-        "001, 002\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_1{os.sep}well_1_20180101000000_l2.ipf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_2{os.sep}well_2_20180101000000_l2.ipf\n"
-        "2018-01-02 00:00:00\n"
-        "001, 002\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_1{os.sep}well_1_20180102000000_l2.ipf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_2{os.sep}well_2_20180102000000_l2.ipf\n"
-        "2018-01-03 00:00:00\n"
-        "001, 002\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_1{os.sep}well_1_20180103000000_l2.ipf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_2{os.sep}well_2_20180103000000_l2.ipf"
+    compare = textwrap.dedent(f"""\
+        0003, (wel), 1, Well, ['rate']
+        2018-01-01 00:00:00
+        001, 002
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_1{os.sep}well_1_20180101000000_l2.ipf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_2{os.sep}well_2_20180101000000_l2.ipf
+        2018-01-02 00:00:00
+        001, 002
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_1{os.sep}well_1_20180102000000_l2.ipf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_2{os.sep}well_2_20180102000000_l2.ipf
+        2018-01-03 00:00:00
+        001, 002
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_1{os.sep}well_1_20180103000000_l2.ipf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}well_2{os.sep}well_2_20180103000000_l2.ipf"""
     )
     rendered = well._render_projectfile(**to_render)
 

@@ -1,6 +1,7 @@
 from imod.flow import River
 import pathlib
 import os
+import textwrap
 import numpy as np
 import xarray as xr
 import pytest
@@ -43,36 +44,36 @@ def test_river(river, get_render_dict, two_days):
     to_render["n_entry"] = nlayer
     to_render["times"] = time_composed
 
-    compare = (
-        "0002, (riv), 1, River, ['conductance', 'stage', 'bottom_elevation', 'infiltration_factor']\n"
-        "2018-01-01 00:00:00\n"
-        "004, 003\n"
-        f'1, 1, 001, 1.000, 0.000, 10.0, ""\n'
-        f'1, 1, 002, 1.000, 0.000, 10.0, ""\n'
-        f'1, 1, 003, 1.000, 0.000, 10.0, ""\n'
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}stage_20180101000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}stage_20180101000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}stage_20180101000000_l3.idf\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}bottom_elevation_20180101000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}bottom_elevation_20180101000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}bottom_elevation_20180101000000_l3.idf\n"
-        f'1, 1, 001, 1.000, 0.000, 1.0, ""\n'
-        f'1, 1, 002, 1.000, 0.000, 1.0, ""\n'
-        f'1, 1, 003, 1.000, 0.000, 1.0, ""\n'
-        "2018-01-02 00:00:00\n"
-        "004, 003\n"
-        f'1, 1, 001, 1.000, 0.000, 10.0, ""\n'
-        f'1, 1, 002, 1.000, 0.000, 10.0, ""\n'
-        f'1, 1, 003, 1.000, 0.000, 10.0, ""\n'
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}stage_20180102000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}stage_20180102000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}stage_20180102000000_l3.idf\n"
-        f"1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}bottom_elevation_20180102000000_l1.idf\n"
-        f"1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}bottom_elevation_20180102000000_l2.idf\n"
-        f"1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}bottom_elevation_20180102000000_l3.idf\n"
-        f'1, 1, 001, 1.000, 0.000, 1.0, ""\n'
-        f'1, 1, 002, 1.000, 0.000, 1.0, ""\n'
-        f'1, 1, 003, 1.000, 0.000, 1.0, ""'
+    compare = textwrap.dedent(f'''\
+        0002, (riv), 1, River, ['conductance', 'stage', 'bottom_elevation', 'infiltration_factor']
+        2018-01-01 00:00:00
+        004, 003
+        1, 1, 001, 1.000, 0.000, 10.0, ""
+        1, 1, 002, 1.000, 0.000, 10.0, ""
+        1, 1, 003, 1.000, 0.000, 10.0, ""
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}stage_20180101000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}stage_20180101000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}stage_20180101000000_l3.idf
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}bottom_elevation_20180101000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}bottom_elevation_20180101000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}bottom_elevation_20180101000000_l3.idf
+        1, 1, 001, 1.000, 0.000, 1.0, ""
+        1, 1, 002, 1.000, 0.000, 1.0, ""
+        1, 1, 003, 1.000, 0.000, 1.0, ""
+        2018-01-02 00:00:00
+        004, 003
+        1, 1, 001, 1.000, 0.000, 10.0, ""
+        1, 1, 002, 1.000, 0.000, 10.0, ""
+        1, 1, 003, 1.000, 0.000, 10.0, ""
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}stage_20180102000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}stage_20180102000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}stage_20180102000000_l3.idf
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}bottom_elevation_20180102000000_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}bottom_elevation_20180102000000_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}bottom_elevation_20180102000000_l3.idf
+        1, 1, 001, 1.000, 0.000, 1.0, ""
+        1, 1, 002, 1.000, 0.000, 1.0, ""
+        1, 1, 003, 1.000, 0.000, 1.0, ""'''
     )
     rendered = river._render_projectfile(**to_render)
 

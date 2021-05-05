@@ -1,5 +1,6 @@
 from imod.flow import HorizontalAnisotropy
 import pathlib
+import textwrap
 
 
 def test_anisotropy(basic_dis, get_render_dict):
@@ -14,15 +15,16 @@ def test_anisotropy(basic_dis, get_render_dict):
     to_render = get_render_dict(anisotropy, directory, None, nlayer)
     to_render["n_entry"] = nlayer
 
-    compare = (
-        "0001, (ani), 1, HorizontalAnisotropy, ['anisotropy_factor', 'anisotropy_angle']\n"
-        "002, 003\n"
-        '1, 1, 001, 1.000, 0.000, 1.0, ""\n'
-        '1, 1, 002, 1.000, 0.000, 1.0, ""\n'
-        '1, 1, 003, 1.000, 0.000, 1.0, ""\n'
-        '1, 1, 001, 1.000, 0.000, 45.0, ""\n'
-        '1, 1, 002, 1.000, 0.000, 45.0, ""\n'
-        '1, 1, 003, 1.000, 0.000, 45.0, ""'
+    compare = textwrap.dedent(
+        '''\
+        0001, (ani), 1, HorizontalAnisotropy, ['anisotropy_factor', 'anisotropy_angle']
+        002, 003
+        1, 1, 001, 1.000, 0.000, 1.0, ""
+        1, 1, 002, 1.000, 0.000, 1.0, ""
+        1, 1, 003, 1.000, 0.000, 1.0, ""
+        1, 1, 001, 1.000, 0.000, 45.0, ""
+        1, 1, 002, 1.000, 0.000, 45.0, ""
+        1, 1, 003, 1.000, 0.000, 45.0, ""'''
     )
 
     rendered = anisotropy._render_projectfile(**to_render)
