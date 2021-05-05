@@ -40,20 +40,19 @@ def basic_dis():
 @pytest.fixture(scope="module")
 def three_days():
     """Simple time discretization of three days"""
-
-    return pd.date_range(start="1/1/2018", end="1/3/2018", freq="D")
+    return pd.date_range(start="2018-01-01", end="2018-01-03", freq="D")
 
 
 @pytest.fixture(scope="module")
 def two_days():
     """Simple time discretization of two days"""
-
-    return pd.date_range(start="1/1/2018", end="1/2/2018", freq="D")
+    return pd.date_range(start="2018-01-01", end="2018-01-02", freq="D")
 
 
 @pytest.fixture(scope="module")
 def well_df(three_days):
-    shape = nlay, nrow, ncol = 3, 9, 9
+    nrow = 9
+    ncol = 9
     dx = 10.0
     dy = -10.0
     xmin = 0.0
@@ -61,7 +60,6 @@ def well_df(three_days):
     ymin = 0.0
     ymax = abs(dy) * nrow
 
-    layer = np.arange(1, nlay + 1)
     y = np.arange(ymax, ymin, dy) + 0.5 * dy
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
 
