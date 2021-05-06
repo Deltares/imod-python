@@ -88,17 +88,17 @@ class HorizontalFlowBarrier(Package):
         d = {"directory": directory, "name": directory.stem, "extension": ".gen"}
         d["directory"].mkdir(exist_ok=True, parents=True)
 
-        gdf["Id"] = gdf.index
+        gdf["id"] = gdf.index
 
         if "layer" in gdf:
             for layer, layerdf in gdf.groupby("layer"):
                 d["layer"] = layer
                 # Ensure right order
-                outdf = layerdf[["Id", "geometry"]]
+                outdf = layerdf[["id", "geometry"]]
                 path = self._compose_path(d)
                 imod.gen.write(path, outdf)
         else:
-            outdf = gdf[["Id", "geometry"]]
+            outdf = gdf[["id", "geometry"]]
             path = self._compose_path(d)
             imod.gen.write(path, outdf)
 
