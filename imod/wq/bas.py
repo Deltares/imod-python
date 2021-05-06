@@ -11,10 +11,12 @@ class BasicFlow(Package):
     """
     The Basic package is used to specify certain data used in all models.
     These include:
+
     1. the locations of acitve, inactive, and specified head in cells,
     2. the head stored in inactive cells,
     3. the initial head in all cells, and
     4. the top and bottom of the aquifer
+
     The number of layers (NLAY) is automatically calculated using the IBOUND.
     Thickness is calculated using the specified tops en bottoms.
     The Basic package input file is required in all models.
@@ -45,8 +47,8 @@ class BasicFlow(Package):
         model results but serves to identify inactive cells when head is
         printed. This value is also used as drawdown at inactive cells if the
         drawdown option is used. Even if the user does not anticipate having
-        inactive cells, a value for inactive_head must be entered.
-        Default value is 1.0e30.
+        inactive cells, a value for inactive_head must be entered. Default
+        value is 1.0e30.
     """
 
     __slots__ = ("ibound", "top", "bottom", "starting_head", "inactive_head")
@@ -70,13 +72,16 @@ class BasicFlow(Package):
         self["bottom"] = bottom
         self["starting_head"] = starting_head
         self["inactive_head"] = inactive_head
-        # TODO: create dx, dy if they don't exist?
 
     def _check_ibound(self, ibound):
         if not isinstance(ibound, xr.DataArray):
-            raise ValueError
-        if not len(ibound.shape) == 3:
-            raise ValueError
+            raise TypeError("ibound must be xarray.DataArray")
+        dims = ibound.dims
+        if not (dims == ("layer", "y", "x") or dims == ("z", "y", "x")):
+            raise ValueError(
+                f'ibound dimensions must be ("layer", "y", "x") or ("z", "y", "x"),'
+                f" got instead {dims}"
+            )
 
     def _render(self, directory, nlayer, *args, **kwargs):
         """
@@ -115,7 +120,6 @@ class BasicFlow(Package):
 
     @staticmethod
     def _cellsizes(dx):
-        # TODO: replace by _compress_values?
         ncell = dx.size
         index_ends = np.argwhere(np.diff(dx) != 0.0) + 1
         index_ends = np.append(index_ends, ncell)
@@ -139,7 +143,6 @@ class BasicFlow(Package):
         d["bottom"] = self._compose_values_layer("bottom", directory, nlayer)
         d["nlay"], d["nrow"], d["ncol"] = self["ibound"].shape
         # TODO: check dx > 0, dy < 0?
-        # TODO: add non-equidistant support
         if "dx" not in self or "dy" not in self:  # assume equidistant
             dx, _, _ = util.coord_reference(self["x"])
             dy, _, _ = util.coord_reference(self["y"])

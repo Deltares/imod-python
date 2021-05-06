@@ -6,6 +6,18 @@ import numpy as np
 import pandas as pd
 
 
+def _check_year(year):
+    """Check whether year is out of bounds for np.datetime64[ns]"""
+    if year < 1678 or year > 2261:
+        raise ValueError(
+            "A datetime is out of bounds for np.datetime64[ns]: "
+            "before year 1678 or after 2261. You will have to use "
+            "cftime.datetime and xarray.CFTimeIndex in your model "
+            "input instead of the default np.datetime64[ns] datetime "
+            "type."
+        )
+
+
 def to_datetime(time, use_cftime):
     """
     Check whether time is cftime object, else convert to datetime64 series.
@@ -20,19 +32,22 @@ def to_datetime(time, use_cftime):
     if isinstance(time, cftime.datetime):
         return time
     elif isinstance(time, np.datetime64):
-        return time
+        # Extract year from np.datetime64.
+        # First force a yearly datetime64 type,
+        # convert to int, and add the reference year.
+        # This appears to be the safest method
+        # see https://stackoverflow.com/a/26895491
+        # time.astype(object).year, produces inconsistent
+        # results when 'time' is datetime64[d] or when it is datetime64[ns]
+        # at least for numpy version 1.20.1
+        year = time.astype("datetime64[Y]").astype(int) + 1970
+        _check_year(year)
+        # Force to nanoseconds, concurrent with xarray and pandas.
+        return time.astype(dtype="datetime64[ns]")
     elif isinstance(time, str):
         time = dateutil.parser.parse(time)
-        year = time.year
-        if year < 1678 or year > 2261:
-            if not use_cftime:
-                raise ValueError(
-                    "A datetime is out of bounds for np.datetime64[ns]: "
-                    "before year 1678 or after 2261. You will have to use "
-                    "cftime.datetime and xarray.CFTimeIndex in your model "
-                    "input instead of the default np.datetime64[ns] datetime "
-                    "type."
-                )
+        if not use_cftime:
+            _check_year(time.year)
 
     if use_cftime:
         return cftime.DatetimeProlepticGregorian(*time.timetuple()[:6])

@@ -23,8 +23,14 @@ tests:
     - python -m pytest --verbose test_visualize/test_visualize_pyvista.py
     - export NUMBA_DISABLE_JIT=1
     - python -m pytest --verbose --cov=imod
+    - coverage xml
     - cd ..
     - black --check . 
+  # create coverage report as in:
+  # https://docs.gitlab.com/ee/user/project/merge_requests/test_coverage_visualization.html#python-example
+  artifacts:
+    reports:
+      cobertura: tests/coverage.xml
 
 pages:
   script:
