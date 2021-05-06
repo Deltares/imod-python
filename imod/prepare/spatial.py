@@ -340,7 +340,13 @@ def _handle_dtype(dtype, nodata):
 
 
 def gdal_rasterize(
-    path, column, like=None, nodata=None, dtype=None, spatial_reference=None
+    path,
+    column,
+    like=None,
+    nodata=None,
+    dtype=None,
+    spatial_reference=None,
+    all_touched=False,
 ):
     """
     Use GDAL to rasterize a vector file into an xarray.DataArray.
@@ -366,6 +372,10 @@ def gdal_rasterize(
 
         * bounds = (xmin, xmax, ymin, ymax)
         * cellsizes = (dx, dy)
+    all_touched : bool
+        If True: all pixels touched by lines or polygons will be updated, not
+        just those on the line render path, or whose center point is within the
+        polygon. Default value is False.
 
     Returns
     -------
@@ -435,7 +445,7 @@ def gdal_rasterize(
     memory_band.SetNoDataValue(nodata)
     memory_band.Fill(nodata)
 
-    options = [f"ATTRIBUTE={column}"]
+    options = [f"ATTRIBUTE={column}", f"ALL_TOUCHED={str(all_touched).upper()}"]
     gdal.RasterizeLayer(memory_raster, [1], vector_layer, None, None, [1], options)
     if error.err_level >= gdal.CE_Warning:
         message = error.err_msg
@@ -858,7 +868,12 @@ def _zonal_aggregate_raster(
     spatial_reference = {"bounds": (xmin, xmax, ymin, ymax), "cellsizes": (dx, dy)}
 
     rasterized = gdal_rasterize(
-        path, column, nodata=nodata, dtype=np.int32, spatial_reference=spatial_reference
+        path,
+        column,
+        nodata=nodata,
+        dtype=np.int32,
+        spatial_reference=spatial_reference,
+        all_touched=True,
     )
     ravelled = rasterized.values.ravel()
 
@@ -913,6 +928,7 @@ def _zonal_aggregate_polygons(
         nodata=nodata,
         dtype=np.int32,
         spatial_reference=spatial_reference,
+        all_touched=True,
     )
     rasterized_b = gdal_rasterize(
         path_b,
@@ -920,6 +936,7 @@ def _zonal_aggregate_polygons(
         nodata=np.nan,
         dtype=np.float64,
         spatial_reference=spatial_reference,
+        all_touched=True,
     )
     is_data = ((rasterized_a != nodata) & (rasterized_b.notnull())).values
     a = rasterized_a.values[is_data].ravel()

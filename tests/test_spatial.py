@@ -129,6 +129,10 @@ def test_gdal_rasterize(test_shapefile):
     actual = imod.prepare.spatial.gdal_rasterize(test_shapefile, "values", like)
     assert actual.identical(expected)
 
+    # Test with all_touched=True
+    actual = imod.prepare.spatial.gdal_rasterize(test_shapefile, "values", like, all_touched=True)
+    assert (actual == 2.0).all()
+
     # Test whether GDAL error results in a RuntimeError
     with pytest.raises(RuntimeError):  # misnamed column
         imod.prepare.spatial.gdal_rasterize(test_shapefile, "value", like)
