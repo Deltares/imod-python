@@ -137,7 +137,7 @@ Below is the specification for an environment that should provide you with
 all the dependencies and requirements you need to build groundwater models
 with `imod-python`, and then some (for testing/development).
 
-.. literalinclude:: ../environment.yml
+.. literalinclude:: ../../environment.yml
    :language: yaml
    :linenos:
    :caption: environment.yml

@@ -20,6 +20,7 @@ iMOD-Python: make massive MODFLOW models
    :target: https://mybinder.org/v2/gh/Deltares/iMOD-DSD-International-2019/master
 
 .. note::
+
    This package is currently maturing on the way to a stable release. It is being actively used and
    developed at `Deltares <https://www.deltares.nl>`__. To make it easier for others to use this
    package, the documentation still needs significant work. The :doc:`api` is fairly complete, but
@@ -49,72 +50,21 @@ Interactive notebook examples:
 .. image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/Deltares/iMOD-DSD-International-2019/master
 
-
-Documentation
--------------
-
-**Getting Started**
-
-* :doc:`overview`
-* :doc:`installation`
-* :doc:`examples`
-
 .. toctree::
-   :maxdepth: 1
+   :titlesonly:
    :hidden:
-   :caption: Getting Started
 
-   overview
-   installation
-   examples
-
-**User Guide**
-
-* :doc:`data-structures`
-* :doc:`coordinates`
-* :doc:`regridding`
-* :doc:`indexing`
-* :doc:`model`
-* :doc:`post-processing`
-
-.. toctree::
-   :maxdepth: 1
-   :hidden:
-   :caption: User Guide
-
-   data-structures
-   coordinates
-   regridding
-   indexing
-   model
-   post-processing
-
-**API Reference & Help**
-
-* :doc:`api`
-* :doc:`changelog`
-* :doc:`internals`
-* :doc:`roadmap`
-* :doc:`contributing`
-
-.. toctree::
-   :maxdepth: 1
-   :hidden:
-   :caption: API Reference & Help
-
-   api
-   changelog
-   internals
-   roadmap
-   contributing
-
+   getting_started/index
+   user_guide/index
+   examples/index
+   api/index
 
 Getting started
 ---------------
 
 Install the latest release using ``conda install -c conda-forge imod``, or, when
 not using Anaconda, ``pip install imod``. For more detailed installation
-information see :doc:`installation`.
+information see :doc:`getting_started/installation`.
 
 .. code:: python
 
