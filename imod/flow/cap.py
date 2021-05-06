@@ -140,7 +140,7 @@ class MetaSwap(Package):
         Conductivity Factor to adjust the vertical conductivity. This factor
         may be used during calibration. Default value is 1.0.
 
-    extra_files : list of pathlib.Path or str
+    lookup_and_forcing_files : list of pathlib.Path or str
         List of paths to "extra files" required by MetaSWAP. This a list of
         lookup tables and meteorological information that is required by
         MetaSwap. Note that MetaSwap looks for files with a specific name, so
@@ -235,9 +235,9 @@ class MetaSwap(Package):
         infiltration_capacity_urban,
         infiltration_capacity_rural,
         perched_water_table,
+        lookup_and_forcing_files,
         soil_moisture_factor=1.0,
         conductivity_factor=1.0,
-        extra_files=[],
     ):
         super(__class__, self).__init__()
         self.dataset["boundary"] = boundary
@@ -262,7 +262,7 @@ class MetaSwap(Package):
         self.dataset["perched_water_table"] = perched_water_table
         self.dataset["soil_moisture_factor"] = soil_moisture_factor
         self.dataset["conductivity_factor"] = conductivity_factor
-        self.extra_files = extra_files
+        self.lookup_and_forcing_files = lookup_and_forcing_files
 
     def _force_absolute_path(self, f):
         """Force absolute path, because projectfile cannot handle relative paths"""
@@ -280,19 +280,12 @@ class MetaSwap(Package):
         kwargs["extra_files"] = extra_files
         return self._template_projectfile.render(**kwargs)
 
-    def check_extra_files(self):
-        """
-        Check extra files. Unfortunately, these files are not so "extra",
-        because they are required by MetaSWAP to compute something.
-        """
-        if len(self.extra_files) == 0:
-            raise ValueError(
-                "No extra files provided to copy, please provide extra files"
-            )
+    def check_lookup_and_forcing_files(self):
+        """Check for presence of required MetaSWAP input files."""
         filenames = set([os.path.basename(f) for f in self.extra_files])
         missing_files = set(self._required_extra) - filenames
         if len(missing_files) > 0:
-            raise ValueError(f"Missing extra files {missing_files}")
+            raise ValueError(f"Missing MetaSWAP input files {missing_files}")
 
     def _pkgcheck(self, active_cells=None):
         # Dataset.dims does not return a tuple, like DataArray does.
@@ -301,4 +294,4 @@ class MetaSwap(Package):
         # Frozen(SortedKeysDict).keys() does not preserve ordering in keys
         if dims != ("x", "y"):
             raise ValueError(f'Dataset dims not ("y", "x"), instead got {dims}')
-        self.check_extra_files()
+        self.check_lookup_and_forcing_files()
