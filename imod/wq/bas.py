@@ -76,9 +76,11 @@ class BasicFlow(Package):
     def _check_ibound(self, ibound):
         if not isinstance(ibound, xr.DataArray):
             raise TypeError("ibound must be xarray.DataArray")
-        dims = ibound.dims 
+        dims = ibound.dims
         if not dims == ("layer", "y", "x"):
-            raise ValueError(f'ibound dimensions must be ("layer", "y", "x"), got instead {dims}')
+            raise ValueError(
+                f'ibound dimensions must be ("layer", "y", "x"), got instead {dims}'
+            )
 
     def _render(self, directory, nlayer, *args, **kwargs):
         """
