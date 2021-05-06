@@ -37,7 +37,7 @@ dependencies:
   - scipy
   - setuptools_scm
   - sphinx
-  - sphinx_rtd_theme
+  - pydata-sphinx-theme
   - toolz
   - tqdm
   - twine
