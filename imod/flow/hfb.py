@@ -7,7 +7,7 @@ from imod.wq import timeutil
 
 
 class HorizontalFlowBarrier(Package):
-    """
+    r"""
     Horizontal barriers obstructing flow such as semi- or impermeable fault
     zone or a sheet pile wall are defined for each model layer by a \*.GEN line
     file.
