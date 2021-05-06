@@ -13,9 +13,9 @@ def test_metaswap_render(metaswap_dict, get_render_dict):
 
     metaswap = MetaSwap(**metaswap_dict)
 
-    # Force extra paths as well
-    metaswap.extra_files = [
-        os.path.join(directory, file) for file in metaswap.extra_files
+    # Force paths to contain directory
+    metaswap.lookup_and_forcing_files = [
+        os.path.join(directory, file) for file in metaswap.lookup_and_forcing_files
     ]
 
     nlayer = 1
@@ -84,19 +84,19 @@ def test_metaswap_pkgcheck_fail(metaswap_dict):
 def test_check_extra_files_no_files(metaswap_dict):
     metaswap_fail = MetaSwap(**metaswap_dict)
 
-    metaswap_fail.extra_files = []
+    metaswap_fail.lookup_and_forcing_files = []
 
     with pytest.raises(ValueError):
-        metaswap_fail.check_extra_files()
+        metaswap_fail.check_lookup_and_forcing_files()
 
 
 def test_check_extra_files_missing_files(metaswap_dict):
     metaswap_fail = MetaSwap(**metaswap_dict)
 
-    metaswap_fail.extra_files = [
+    metaswap_fail.lookup_and_forcing_files = [
         "fact_svat.inp",
         "luse_svat.inp",
     ]
 
     with pytest.raises(ValueError):
-        metaswap_fail.check_extra_files()
+        metaswap_fail.check_lookup_and_forcing_files()
