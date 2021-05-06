@@ -138,7 +138,7 @@ def metaswap_dict(basic_dis):
     d["soil_moisture_factor"] = 1.0
     d["conductivity_factor"] = 1.0
 
-    d["extra_files"] = [
+    d["lookup_and_forcing_files"] = [
         "fact_svat.inp",
         "luse_svat.inp",
         "mete_grid.inp",
@@ -164,10 +164,11 @@ def horizontal_flow_barrier_gdf(basic_dis):
     line2 = LineString([(x[4], y[1]), (x[4], y[-2])])
 
     lines = np.array([line1, line2, line1, line2], dtype="object")
-    hfb_layers = np.array([3, 3, 4, 4])
+    hfb_layers = np.array([1, 1, 3, 3])
+    id_name = ["left_upper", "right_upper", "left_lower", "right_lower"]
 
     hfb_gdf = gpd.GeoDataFrame(
-        geometry=lines, data=dict(layer=hfb_layers, resistance=100.0)
+        geometry=lines, data=dict(layer=hfb_layers, resistance=100.0, id_name=id_name)
     )
 
     return hfb_gdf

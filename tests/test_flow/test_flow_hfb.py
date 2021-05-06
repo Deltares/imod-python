@@ -25,8 +25,8 @@ def test_horizontal_flow_barrier_render(
         f"""\
         0001, (hfb), 1, HorizontalFlowBarrier, ['resistance']
         001, 002
-        1, 2, 003, 100.0, 0.000, -9999., {directory}{os.sep}{directory.stem}_l3.gen
-        1, 2, 004, 100.0, 0.000, -9999., {directory}{os.sep}{directory.stem}_l4.gen"""
+        1, 2, 001, 100.0, 0.000, -9999., {directory}{os.sep}{directory.stem}_l1.gen
+        1, 2, 003, 100.0, 0.000, -9999., {directory}{os.sep}{directory.stem}_l3.gen"""
     )
 
     rendered = horizontal_flow_barrier._render_projectfile(**to_render)

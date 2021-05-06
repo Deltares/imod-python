@@ -141,7 +141,7 @@ class MetaSwap(Package):
         may be used during calibration. Default value is 1.0.
 
     lookup_and_forcing_files : list of pathlib.Path or str
-        List of paths to "extra files" required by MetaSWAP. This a list of
+        List of paths to files required by MetaSWAP. This a list of
         lookup tables and meteorological information that is required by
         MetaSwap. Note that MetaSwap looks for files with a specific name, so
         calling "luse_svat.inp" something else will result in errors. To view
@@ -195,8 +195,8 @@ class MetaSwap(Package):
         "{%-    endfor %}\n"
         "{%- endfor %}\n"
         # Section for EXTRA FILES comes below
-        '{{"{:03d}".format(extra_files|length)}},extra files\n'
-        "{%- for file in extra_files %}\n"
+        '{{"{:03d}".format(lookup_and_forcing_files|length)}},extra files\n'
+        "{%- for file in lookup_and_forcing_files %}\n"
         "{{file}}\n"
         "{%- endfor %}\n"
     )
@@ -276,13 +276,15 @@ class MetaSwap(Package):
             The rendered projfectfile part,
             if part of PkgGroup: for a single boundary condition system.
         """
-        extra_files = [self._force_absolute_path(file) for file in self.extra_files]
-        kwargs["extra_files"] = extra_files
+        lookup_and_forcing_files = [
+            self._force_absolute_path(file) for file in self.lookup_and_forcing_files
+        ]
+        kwargs["lookup_and_forcing_files"] = lookup_and_forcing_files
         return self._template_projectfile.render(**kwargs)
 
     def check_lookup_and_forcing_files(self):
         """Check for presence of required MetaSWAP input files."""
-        filenames = set([os.path.basename(f) for f in self.extra_files])
+        filenames = set([os.path.basename(f) for f in self.lookup_and_forcing_files])
         missing_files = set(self._required_extra) - filenames
         if len(missing_files) > 0:
             raise ValueError(f"Missing MetaSWAP input files {missing_files}")
