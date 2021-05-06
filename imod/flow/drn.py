@@ -18,7 +18,7 @@ class Drain(BoundaryCondition):
     _pkg_id = "drn"
     _variable_order = ["conductance", "elevation"]
 
-    def __init__(self, conductance=None, elevation=None):
+    def __init__(self, conductance, elevation):
         super(__class__, self).__init__()
         self.dataset["conductance"] = conductance
         self.dataset["elevation"] = elevation

@@ -18,10 +18,10 @@ class HorizontalFlowBarrier(Package):
         name of the barrier
     geometry: object array of shapely LineStrings
         geometry of barriers, should be lines
-    layer: "None" or int
-        layer where barrier is located
     resistance: float or list of floats
         resistance of the barrier (d).
+    layer: Optional, int
+        layer where barrier is located. Defaults to None.
     """
 
     _template_projectfile = jinja2.Template(
@@ -44,10 +44,10 @@ class HorizontalFlowBarrier(Package):
 
     def __init__(
         self,
-        id_name=None,
-        geometry=None,
+        id_name,
+        geometry,
+        resistance,
         layer=None,
-        resistance=None,
     ):
         super(__class__, self).__init__()
         variables = {

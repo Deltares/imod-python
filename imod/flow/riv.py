@@ -40,10 +40,10 @@ class River(BoundaryCondition):
 
     def __init__(
         self,
-        conductance=None,
-        stage=None,
-        bottom_elevation=None,
-        infiltration_factor=None,
+        conductance,
+        stage,
+        bottom_elevation,
+        infiltration_factor,
     ):
         super(__class__, self).__init__()
         self.dataset["conductance"] = conductance

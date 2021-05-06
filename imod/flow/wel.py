@@ -31,11 +31,11 @@ class Well(BoundaryCondition):
 
     def __init__(
         self,
-        id_name=None,
-        x=None,
-        y=None,
-        rate=None,
-        layer=None,
+        id_name,
+        x,
+        y,
+        rate,
+        layer,
         time=None,
     ):
         super(__class__, self).__init__()

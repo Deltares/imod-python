@@ -16,6 +16,6 @@ class ConstantHead(BoundaryCondition):
     _pkg_id = "chd"
     _variable_order = ["head"]
 
-    def __init__(self, head=None):
+    def __init__(self, head):
         super(__class__, self).__init__()
         self.dataset["head"] = head

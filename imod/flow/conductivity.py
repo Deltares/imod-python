@@ -80,7 +80,7 @@ class VerticalAnisotropy(Package):
     _pkg_id = "kva"
     _variable_order = ["vertical_anisotropy"]
 
-    def __init__(self, vertical_anisotropy=None):
+    def __init__(self, vertical_anisotropy):
         super(__class__, self).__init__()
         self.dataset["vertical_anisotropy"] = vertical_anisotropy
 
