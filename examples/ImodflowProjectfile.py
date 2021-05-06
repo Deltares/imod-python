@@ -18,7 +18,8 @@ from shapely.geometry import LineString
 ####################
 # Path management
 name = "my_first_imodflow_model"
-wdir = pathlib.Path("./tests/")
+## Your working directory will be placed adjacent to the imod-python folder.
+wdir = pathlib.Path("../../tests/")
 
 # Discretization
 shape = nlay, nrow, ncol = 3, 9, 9
@@ -107,8 +108,8 @@ wel_df["layer"] = 2
 ###   0100010
 ### y 0100010
 ###   0100010
-line1 = LineString([(x[2], ymin), (x[2], ymax])
-line2 = LineString([(x[7], ymin), (x[7], ymax])
+line1 = LineString([(x[2], ymin), (x[2], ymax)])
+line2 = LineString([(x[7], ymin), (x[7], ymax)])
 
 lines = np.array([line1, line2, line1, line2], dtype="object")
 hfb_layers = np.array([1, 1, 2, 2])
