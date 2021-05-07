@@ -2,13 +2,12 @@ import pathlib
 import shutil
 
 import geopandas as gpd
+import imod
 import numpy as np
 import pandas as pd
 import pytest
 import shapely.geometry as sg
 import xarray as xr
-
-import imod
 
 
 @pytest.fixture(scope="module")
@@ -130,7 +129,9 @@ def test_gdal_rasterize(test_shapefile):
     assert actual.identical(expected)
 
     # Test with all_touched=True
-    actual = imod.prepare.spatial.gdal_rasterize(test_shapefile, "values", like, all_touched=True)
+    actual = imod.prepare.spatial.gdal_rasterize(
+        test_shapefile, "values", like, all_touched=True
+    )
     assert (actual == 2.0).all()
 
     # Test whether GDAL error results in a RuntimeError
@@ -320,6 +321,24 @@ def test_zonal_aggregate_raster(tmp_path):
     )
     assert actual.equals(expected)
 
+    # Now test no overlap
+    # The functions internally explicitly return a zero row dataframe
+    # Since a method like pd.Series.mode cannot deal with 0 rows.
+    raster = xr.DataArray(
+        data=[[0.0, 0.0], [1.0, 1.0]],
+        coords={"x": [10.5, 11.5], "y": [11.5, 10.5]},
+        dims=("y", "x"),
+        name="my-raster",
+    )
+    actual = imod.prepare.spatial.zonal_aggregate_raster(
+        path=path,
+        column="id",
+        raster=raster,
+        resolution=0.5,
+        method=pd.Series.mode,
+    )
+    assert len(actual) == 0
+
 
 def test_zonal_aggregate_polygons(tmp_path):
     raster = xr.DataArray(
@@ -409,3 +428,23 @@ def test_zonal_aggregate_polygons(tmp_path):
         }
     )
     assert actual.equals(expected)
+
+    # Now test no overlap
+    # The functions internally explicitly return a zero row dataframe
+    # Since a method like pd.Series.mode cannot deal with 0 rows.
+    raster = xr.DataArray(
+        data=[[0.0, 0.0], [1.0, 1.0]],
+        coords={"x": [10.5, 11.5], "y": [11.5, 10.5]},
+        dims=("y", "x"),
+        name="my-raster",
+    )
+    actual = imod.prepare.spatial.zonal_aggregate_polygons(
+        path_a=path_a,
+        column_a="id_a",
+        path_b=path_b,
+        column_b="data_b",
+        like=raster,
+        resolution=1.0,
+        method="mean",
+    )
+    assert len(actual) == 0
