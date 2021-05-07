@@ -895,17 +895,11 @@ def _zonal_aggregate_raster(
     # This may result in areas significantly smaller than the polygon geometry,
     # but should come in handy for weighting later?
     df = df[df["data"].notnull()]
-    # If df has no content, some methods such as pd.Series.mode will fail
-    # Simply create an empty dataframe instead here.
+    result = df.groupby(column, as_index=False).agg(["count", method]).reset_index()
+    # Compute the area from the counted number of cells
+    result["data", "count"] *= resolution * resolution
     name = raster.name if raster.name else "aggregated"
-    columns = [column, "area", name]
-    if len(df) == 0:
-        result = pd.DataFrame(columns=columns)
-    else:
-        result = df.groupby(column, as_index=False).agg(["count", method]).reset_index()
-        # Compute the area from the counted number of cells
-        result["data", "count"] *= resolution * resolution
-        result.columns = columns
+    result.columns = [column, "area", name]
     return result
 
 
@@ -951,18 +945,10 @@ def _zonal_aggregate_polygons(
     # Remove entries where the raster has nodata.
     # This may result in areas significantly smaller than the polygon geometry,
     # but should come in handy for weighting later?
-    columns = [column_a, "area", column_b]
-    # If df has no content, some methods such as pd.Series.mode will fail
-    # Simply create an empty dataframe instead here.
-    if len(df) == 0:
-        result = pd.DataFrame(columns=columns)
-    else:
-        result = (
-            df.groupby(column_a, as_index=False).agg(["count", method]).reset_index()
-        )
-        # Compute the area from the counted number of cells
-        result[column_b, "count"] *= resolution * resolution
-        result.columns = columns
+    result = df.groupby(column_a, as_index=False).agg(["count", method]).reset_index()
+    # Compute the area from the counted number of cells
+    result[column_b, "count"] *= resolution * resolution
+    result.columns = [column_a, "area", column_b]
     return result
 
 
