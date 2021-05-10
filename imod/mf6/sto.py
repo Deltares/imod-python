@@ -2,9 +2,13 @@ import numpy as np
 
 from imod.mf6.pkgbase import Package
 
+
 class Storage(Package):
     def __init__(*args, **kwargs):
-        raise DeprecationWarning(r"Storage package has been deprecated. Use SpecificStorage or StorageCoefficient instead.")
+        raise DeprecationWarning(
+            r"Storage package has been deprecated. Use SpecificStorage or StorageCoefficient instead."
+        )
+
 
 class SpecificStorage(Package):
     """
@@ -82,9 +86,10 @@ class SpecificStorage(Package):
 
         return self._template.render(d)
 
+
 class StorageCoefficient(Package):
     """
-    Storage Package with a storage coefficient.  Be careful, 
+    Storage Package with a storage coefficient.  Be careful,
     this is not the same as the specific storage.
 
     From wikipedia (https://en.wikipedia.org/wiki/Specific_storage):

@@ -7,6 +7,7 @@ import xarray as xr
 import imod
 import pytest
 
+
 @pytest.fixture()
 def idomain():
     nlay = 3
@@ -30,14 +31,17 @@ def idomain():
     # Discretization data
     return xr.DataArray(np.ones(shape), coords=coords, dims=dims)
 
+
 @pytest.fixture()
 def sy_layered(idomain):
     layer = idomain["layer"].values
     return xr.DataArray([0.16, 0.15, 0.14], {"layer": layer}, ("layer",))
 
+
 @pytest.fixture()
 def convertible(idomain):
     return xr.full_like(idomain, 0, dtype=int)
+
 
 def test_render_specific_storage(sy_layered, convertible):
     # for better coverage, use full (conv) layered (sy) and constant (ss)
@@ -73,6 +77,7 @@ def test_render_specific_storage(sy_layered, convertible):
         """
     )
     assert actual == expected
+
 
 def test_render_specific_storage_three_periods(sy_layered, convertible):
     # again but starting with two steady-state periods, followed by a transient stress period
@@ -119,6 +124,7 @@ def test_render_specific_storage_three_periods(sy_layered, convertible):
     )
     assert actual == expected
 
+
 def test_render_storage_coefficient(sy_layered, convertible):
     # for better coverage, use full (conv) layered (sy) and constant (ss)
     sto = imod.mf6.StorageCoefficient(
@@ -154,12 +160,13 @@ def test_render_storage_coefficient(sy_layered, convertible):
         """
     )
     assert actual == expected
-  
+
+
 def test_storage_deprecation_warning(sy_layered, convertible):
-  with pytest.raises(DeprecationWarning):
-    imod.mf6.Storage(
-        specific_storage=0.0003,
-        specific_yield=sy_layered,
-        transient=True,
-        convertible=convertible,
-    )
+    with pytest.raises(DeprecationWarning):
+        imod.mf6.Storage(
+            specific_storage=0.0003,
+            specific_yield=sy_layered,
+            transient=True,
+            convertible=convertible,
+        )
