@@ -127,7 +127,7 @@ def uzf_model():
     Sy = xr.full_like(idomain, 0.1)
     iconvert = xr.full_like(idomain, 0).astype(np.int8)
 
-    gwf_model["sto"] = imod.mf6.Storage(Ss, Sy, True, iconvert)
+    gwf_model["sto"] = imod.mf6.SpecificStorage(Ss, Sy, True, iconvert)
 
     # Set output control
     gwf_model["oc"] = imod.mf6.OutputControl(save_head=True, save_budget=True)
