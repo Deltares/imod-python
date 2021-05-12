@@ -149,14 +149,20 @@ class Well(BoundaryCondition):
         values = {}
         if "time" in self:
             self_times = np.unique(self["time"].values)
-            if "timemap" in self.attrs:
-                timemap_keys = np.array(list(self.attrs["timemap"].keys()))
-                timemap_values = np.array(list(self.attrs["timemap"].values()))
+            if "stress_repeats" in self.attrs:
+                stress_repeats_keys = np.array(
+                    list(self.attrs["stress_repeats"].keys())
+                )
+                stress_repeats_values = np.array(
+                    list(self.attrs["stress_repeats"].values())
+                )
                 package_times, inds = np.unique(
-                    np.concatenate([self_times, timemap_keys]), return_index=True
+                    np.concatenate([self_times, stress_repeats_keys]), return_index=True
                 )
                 # Times to write in the runfile
-                runfile_times = np.concatenate([self_times, timemap_values])[inds]
+                runfile_times = np.concatenate([self_times, stress_repeats_values])[
+                    inds
+                ]
             else:
                 runfile_times = package_times = self_times
 
@@ -297,17 +303,17 @@ class Well(BoundaryCondition):
         # TODO: implement
         pass
 
-    def repeat_stress(self, timemap, use_cftime=False):
-        # To ensure consistency, it isn't possible to use differing timemaps
+    def repeat_stress(self, stress_repeats, use_cftime=False):
+        # To ensure consistency, it isn't possible to use differing stress_repeatss
         # between rate and concentration: the number of points might change
         # between stress periods, and isn't especially easy to check.
         if "time" not in self:
             raise ValueError(
-                f"This Wel package does not have time, cannot add timemap."
+                f"This Wel package does not have time, cannot add stress_repeats."
             )
         # Replace both key and value by the right datetime type
         d = {
             timeutil.to_datetime(k, use_cftime): timeutil.to_datetime(v, use_cftime)
-            for k, v in timemap.items()
+            for k, v in stress_repeats.items()
         }
-        self.attrs["timemap"] = d
+        self.attrs["stress_repeats"] = d

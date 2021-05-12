@@ -682,15 +682,15 @@ def test_write(basicmodel, tmp_path):
     # TODO: more rigorous testing
 
 
-def test_write__timemap(basicmodel, tmp_path):
-    # fictitious timemap
+def test_write__stress_repeats(basicmodel, tmp_path):
+    # fictitious stress_repeats
     m = deepcopy(basicmodel)
 
     # Remove last timestep of recharge package
     m["rch"] = m["rch"].isel(time=slice(None, 4))
 
-    timemap = {m["evt"].time.values[4]: m["evt"].time.values[0]}
-    m["rch"].repeat_stress(rate=timemap)
+    stress_repeats = {m["evt"].time.values[4]: m["evt"].time.values[0]}
+    m["rch"].repeat_stress(rate=stress_repeats)
 
     m.time_discretization("2000-01-06")
 

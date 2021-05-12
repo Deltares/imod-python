@@ -117,19 +117,19 @@ def test_render__time_layer(well):
     assert actual == compare
 
 
-def test_timemap__single_layer():
+def test_stress_repeats__single_layer():
     datetimes = pd.date_range("2000-01-01", "2000-01-05")
     x = [1.0, 1.0]
     y = [1.0, 1.0]
     time = [datetimes[0], datetimes[1]]
     wel = Well(id_name="well", x=x, y=y, rate=5.0, layer=1, time=time)
     # Set a periodic boundary condition
-    timemap = {
+    stress_repeats = {
         datetimes[2]: datetimes[0],
         datetimes[3]: datetimes[1],
         datetimes[4]: datetimes[0],
     }
-    wel.repeat_stress(timemap)
+    wel.repeat_stress(stress_repeats)
 
     directory = pathlib.Path("well")
     compare = """
@@ -143,7 +143,7 @@ def test_timemap__single_layer():
     assert actual == compare
 
 
-def test_timemap__multiple_layers():
+def test_stress_repeats__multiple_layers():
     datetimes = pd.date_range("2000-01-01", "2000-01-04")
     layer = [1, 1, 2]
     x = [1.0, 1.0, 1.0]
@@ -152,8 +152,8 @@ def test_timemap__multiple_layers():
     wel = Well(id_name="well", x=x, y=y, rate=5.0, layer=layer, time=time)
     # Set a periodic boundary condition
     # test number of well layers is not constant between periods
-    timemap = {datetimes[2]: datetimes[0], datetimes[3]: datetimes[1]}
-    wel.repeat_stress(timemap)
+    stress_repeats = {datetimes[2]: datetimes[0], datetimes[3]: datetimes[1]}
+    wel.repeat_stress(stress_repeats)
 
     directory = pathlib.Path("well")
     compare = """

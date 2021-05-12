@@ -396,9 +396,11 @@ class SeawatModel(Model):
                 pkgtimes = list(pkg["time"].values)
                 first_times[key] = sorted(pkgtimes)[0]
                 for var in pkg.data_vars:
-                    if "timemap" in pkg[var].attrs:
-                        timemap_times = list(pkg[var].attrs["timemap"].keys())
-                        pkgtimes.extend(timemap_times)
+                    if "stress_repeats" in pkg[var].attrs:
+                        stress_repeats_times = list(
+                            pkg[var].attrs["stress_repeats"].keys()
+                        )
+                        pkgtimes.extend(stress_repeats_times)
                 times.extend(pkgtimes)
 
         # np.unique also sorts

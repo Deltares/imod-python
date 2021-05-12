@@ -144,7 +144,7 @@ def test_ssm_cellcount_scalar_highest_active(recharge_ha):
 
 
 @pytest.mark.parametrize("varname", ["rate", "concentration"])
-def test_render__timemap(recharge_ha, varname):
+def test_render__stress_repeats(recharge_ha, varname):
     rch = recharge_ha.isel(time=0)
     directory = pathlib.Path(".")
     da = rch[varname]
@@ -154,6 +154,6 @@ def test_render__timemap(recharge_ha, varname):
     )
     rch[varname] = da_transient
 
-    timemap = {datetimes[-1]: datetimes[0]}
-    rch.repeat_stress(**{varname: timemap})
+    stress_repeats = {datetimes[-1]: datetimes[0]}
+    rch.repeat_stress(**{varname: stress_repeats})
     actual = rch._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)

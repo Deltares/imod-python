@@ -59,7 +59,7 @@ def test_render_with_time(drainage):
     )
 
 
-def test_render_with_timemap__elevation(drainage):
+def test_render_with_stress_repeats__elevation(drainage):
     drn = drainage
     directory = pathlib.Path(".")
     elev = drn["elevation"]
@@ -69,8 +69,8 @@ def test_render_with_timemap__elevation(drainage):
         [elev.assign_coords(time=t) for t in datetimes[:-1]], dim="time"
     )
     drn["elevation"] = elev_transient
-    timemap = {datetimes[-1]: datetimes[0]}
-    drn.repeat_stress(elevation=timemap)
+    stress_repeats = {datetimes[-1]: datetimes[0]}
+    drn.repeat_stress(elevation=stress_repeats)
 
     compare = """
     elevation_p1_s1_l1:3 = elevation_20000101000000_l:.idf
@@ -81,9 +81,9 @@ def test_render_with_timemap__elevation(drainage):
     actual = drn._render(directory, globaltimes=datetimes, system_index=1, nlayer=4)
     assert actual == compare
 
-    # Conductance does not depend on time, therefore cannot have a timemap
+    # Conductance does not depend on time, therefore cannot have a stress_repeats
     with pytest.raises(ValueError):
-        drn.repeat_stress(conductance=timemap)
+        drn.repeat_stress(conductance=stress_repeats)
 
 
 def test_compress_discontinuous_layers(drainage):
@@ -108,7 +108,7 @@ def test_compress_discontinuous_layers(drainage):
 
 
 @pytest.mark.parametrize("varname", ["conductance", "elevation"])
-def test_render__timemap(drainage, varname):
+def test_render__stress_repeats(drainage, varname):
     drn = drainage
     directory = pathlib.Path(".")
     da = drn[varname]
@@ -118,6 +118,6 @@ def test_render__timemap(drainage, varname):
     )
     drn[varname] = da_transient
 
-    timemap = {datetimes[-1]: datetimes[0]}
-    drn.repeat_stress(**{varname: timemap})
+    stress_repeats = {datetimes[-1]: datetimes[0]}
+    drn.repeat_stress(**{varname: stress_repeats})
     actual = drn._render(directory, globaltimes=datetimes, system_index=1, nlayer=4)
