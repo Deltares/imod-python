@@ -137,5 +137,5 @@ def test_render__timemap(river, varname):
     riv[varname] = da_transient
 
     timemap = {datetimes[-1]: datetimes[0]}
-    riv.add_timemap(**{varname: timemap})
+    riv.repeat_stress(**{varname: timemap})
     actual = riv._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)

@@ -70,7 +70,7 @@ def test_render_with_timemap__elevation(drainage):
     )
     drn["elevation"] = elev_transient
     timemap = {datetimes[-1]: datetimes[0]}
-    drn.add_timemap(elevation=timemap)
+    drn.repeat_stress(elevation=timemap)
 
     compare = """
     elevation_p1_s1_l1:3 = elevation_20000101000000_l:.idf
@@ -83,7 +83,7 @@ def test_render_with_timemap__elevation(drainage):
 
     # Conductance does not depend on time, therefore cannot have a timemap
     with pytest.raises(ValueError):
-        drn.add_timemap(conductance=timemap)
+        drn.repeat_stress(conductance=timemap)
 
 
 def test_compress_discontinuous_layers(drainage):
@@ -119,5 +119,5 @@ def test_render__timemap(drainage, varname):
     drn[varname] = da_transient
 
     timemap = {datetimes[-1]: datetimes[0]}
-    drn.add_timemap(**{varname: timemap})
+    drn.repeat_stress(**{varname: timemap})
     actual = drn._render(directory, globaltimes=datetimes, system_index=1, nlayer=4)

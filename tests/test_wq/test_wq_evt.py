@@ -175,5 +175,5 @@ def test_render__timemap(evapotranspiration_ha, varname):
     evt[varname] = da_transient
 
     timemap = {datetimes[-1]: datetimes[0]}
-    evt.add_timemap(**{varname: timemap})
+    evt.repeat_stress(**{varname: timemap})
     actual = evt._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)

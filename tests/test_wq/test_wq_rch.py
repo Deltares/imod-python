@@ -155,5 +155,5 @@ def test_render__timemap(recharge_ha, varname):
     rch[varname] = da_transient
 
     timemap = {datetimes[-1]: datetimes[0]}
-    rch.add_timemap(**{varname: timemap})
+    rch.repeat_stress(**{varname: timemap})
     actual = rch._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)

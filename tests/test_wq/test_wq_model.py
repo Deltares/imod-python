@@ -690,7 +690,7 @@ def test_write__timemap(basicmodel, tmp_path):
     m["rch"] = m["rch"].isel(time=slice(None, 4))
 
     timemap = {m["evt"].time.values[4]: m["evt"].time.values[0]}
-    m["rch"].add_timemap(rate=timemap)
+    m["rch"].repeat_stress(rate=timemap)
 
     m.time_discretization("2000-01-06")
 

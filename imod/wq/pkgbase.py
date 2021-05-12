@@ -475,15 +475,15 @@ class BoundaryCondition(Package, abc.ABC):
         "{%- endfor -%}"
     )
 
-    def _add_timemap(self, varname, value, use_cftime):
+    def _repeat_stress(self, varname, value, use_cftime):
         if value is not None:
             if varname not in self:
                 raise ValueError(
-                    f"{varname} does not occur in {self}\n cannot add timemap"
+                    f"{varname} does not occur in {self}\n cannot repeat stress"
                 )
             if "time" not in self[varname].coords:
                 raise ValueError(
-                    f"{varname} in {self}\n does not have dimension time, cannot add timemap."
+                    f"{varname} in {self}\n does not have dimension time, cannot repeat stress."
                 )
 
             # Replace both key and value by the right datetime type

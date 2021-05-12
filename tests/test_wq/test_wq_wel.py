@@ -129,7 +129,7 @@ def test_timemap__single_layer():
         datetimes[3]: datetimes[1],
         datetimes[4]: datetimes[0],
     }
-    wel.add_timemap(timemap)
+    wel.repeat_stress(timemap)
 
     directory = pathlib.Path("well")
     compare = """
@@ -153,7 +153,7 @@ def test_timemap__multiple_layers():
     # Set a periodic boundary condition
     # test number of well layers is not constant between periods
     timemap = {datetimes[2]: datetimes[0], datetimes[3]: datetimes[1]}
-    wel.add_timemap(timemap)
+    wel.repeat_stress(timemap)
 
     directory = pathlib.Path("well")
     compare = """

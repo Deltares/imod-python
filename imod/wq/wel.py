@@ -297,7 +297,7 @@ class Well(BoundaryCondition):
         # TODO: implement
         pass
 
-    def add_timemap(self, timemap, use_cftime=False):
+    def repeat_stress(self, timemap, use_cftime=False):
         # To ensure consistency, it isn't possible to use differing timemaps
         # between rate and concentration: the number of points might change
         # between stress periods, and isn't especially easy to check.

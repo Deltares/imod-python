@@ -54,6 +54,6 @@ def test_render__timemap(headboundary, varname):
     ghb[varname] = da_transient
 
     timemap = {datetimes[-1]: datetimes[0]}
-    ghb.add_timemap(**{varname: timemap})
+    ghb.repeat_stress(**{varname: timemap})
     actual = ghb._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
     # TODO check result

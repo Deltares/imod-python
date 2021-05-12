@@ -49,5 +49,5 @@ def test_render__timemap(constanthead, varname):
     chd[varname] = da_transient
 
     timemap = {datetimes[-1]: datetimes[0]}
-    chd.add_timemap(**{varname: timemap})
+    chd.repeat_stress(**{varname: timemap})
     actual = chd._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
