@@ -467,7 +467,7 @@ class Regridder(object):
         dst = np.full(info.dst_shape, fill_value)
         # No overlap whatsoever, early exit
         if any(size == 0 for size in src.shape):
-            return dst.values
+            return dst
 
         # Transpose src so that dims to regrid are last
         src = src.transpose(*info.dst_dims)

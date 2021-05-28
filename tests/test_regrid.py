@@ -540,3 +540,17 @@ def test_str_method():
     assert np.allclose(out.values, compare)
 
     out = imod.prepare.Regridder(method="nearest").regrid(source, like)
+
+
+def test_no_overlap():
+    values = np.array([1.0, 2.0, 3.0])
+    src_x = np.array([0.5, 1.5, 2.5])
+    dst_x = np.array([4.5, 5.5])
+    coords = {"x": src_x, "dx": ("x", np.array([1.0, 1.0, 1.0]))}
+    like_coords = {"x": dst_x, "dx": ("x", np.array([1.0, 1.0]))}
+    dims = ("x",)
+    source = xr.DataArray(values, coords, dims)
+    like = xr.DataArray(np.empty(2), like_coords, dims)
+    out = imod.prepare.Regridder(method=weightedmean).regrid(source, like)
+    assert out.shape == (2,)
+    assert out.isnull().all()
