@@ -866,7 +866,7 @@ class SeawatModel(Model):
         else:
             raise ValueError("extent must be of type tuple, GeoDataFrame or DataArray")
 
-        extent = xr.ones_like(extent).where(extent > 0)
+        extent = xr.ones_like(like).where(extent > 0)
 
         def get_clip_na_slices(da, dims=None):
             """Clips a DataArray to its maximum extent in different dimensions.
