@@ -43,7 +43,7 @@ def test_render(headboundary):
 
 
 @pytest.mark.parametrize("varname", ["head", "conductance", "concentration", "density"])
-def test_render__timemap(headboundary, varname):
+def test_render__stress_repeats(headboundary, varname):
     ghb = headboundary
     directory = pathlib.Path(".")
     da = ghb[varname]
@@ -53,7 +53,7 @@ def test_render__timemap(headboundary, varname):
     )
     ghb[varname] = da_transient
 
-    timemap = {datetimes[-1]: datetimes[0]}
-    ghb.add_timemap(**{varname: timemap})
+    stress_repeats = {datetimes[-1]: datetimes[0]}
+    ghb.repeat_stress(**{varname: stress_repeats})
     actual = ghb._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
     # TODO check result

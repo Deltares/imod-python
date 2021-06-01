@@ -51,13 +51,13 @@ class Evapotranspiration(BoundaryCondition, abc.ABC):
     def _pkgcheck(self, ibound=None):
         pass
 
-    def add_timemap(
+    def repeat_stress(
         self, surface=None, maximum_rate=None, extinction_depth=None, use_cftime=False
     ):
         varnames = ["surface", "maximum_rate", "extinction_depth"]
         values = [surface, maximum_rate, extinction_depth]
         for varname, value in zip(varnames, values):
-            self._add_timemap(varname, value, use_cftime)
+            self._repeat_stress(varname, value, use_cftime)
 
 
 class EvapotranspirationTopLayer(Evapotranspiration):

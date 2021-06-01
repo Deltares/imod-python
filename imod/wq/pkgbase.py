@@ -475,15 +475,23 @@ class BoundaryCondition(Package, abc.ABC):
         "{%- endfor -%}"
     )
 
-    def _add_timemap(self, varname, value, use_cftime):
+    def add_timemap(self, *args, **kwargs):
+        import warnings
+
+        warnings.warn(
+            "add_timemap is deprecated: use repeat_stress instead", FutureWarning
+        )
+        self.repeat_stress(*args, **kwargs)
+
+    def _repeat_stress(self, varname, value, use_cftime):
         if value is not None:
             if varname not in self:
                 raise ValueError(
-                    f"{varname} does not occur in {self}\n cannot add timemap"
+                    f"{varname} does not occur in {self}\n cannot repeat stress"
                 )
             if "time" not in self[varname].coords:
                 raise ValueError(
-                    f"{varname} in {self}\n does not have dimension time, cannot add timemap."
+                    f"{varname} in {self}\n does not have dimension time, cannot repeat stress."
                 )
 
             # Replace both key and value by the right datetime type
@@ -491,7 +499,7 @@ class BoundaryCondition(Package, abc.ABC):
                 timeutil.to_datetime(k, use_cftime): timeutil.to_datetime(v, use_cftime)
                 for k, v in value.items()
             }
-            self[varname].attrs["timemap"] = d
+            self[varname].attrs["stress_repeats"] = d
 
     def _compose_values_timelayer(
         self, varname, globaltimes, directory, nlayer, da=None
@@ -535,14 +543,16 @@ class BoundaryCondition(Package, abc.ABC):
 
         if "time" in da.coords:
             da_times = da.coords["time"].values
-            if "timemap" in da.attrs:
-                timemap_keys = np.array(list(da.attrs["timemap"].keys()))
-                timemap_values = np.array(list(da.attrs["timemap"].values()))
+            if "stress_repeats" in da.attrs:
+                stress_repeats_keys = np.array(list(da.attrs["stress_repeats"].keys()))
+                stress_repeats_values = np.array(
+                    list(da.attrs["stress_repeats"].values())
+                )
                 package_times, inds = np.unique(
-                    np.concatenate([da_times, timemap_keys]), return_index=True
+                    np.concatenate([da_times, stress_repeats_keys]), return_index=True
                 )
                 # Times to write in the runfile
-                runfile_times = np.concatenate([da_times, timemap_values])[inds]
+                runfile_times = np.concatenate([da_times, stress_repeats_values])[inds]
             else:
                 runfile_times = package_times = da_times
 

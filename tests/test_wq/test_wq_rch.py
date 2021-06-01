@@ -144,7 +144,7 @@ def test_ssm_cellcount_scalar_highest_active(recharge_ha):
 
 
 @pytest.mark.parametrize("varname", ["rate", "concentration"])
-def test_render__timemap(recharge_ha, varname):
+def test_render__stress_repeats(recharge_ha, varname):
     rch = recharge_ha.isel(time=0)
     directory = pathlib.Path(".")
     da = rch[varname]
@@ -154,6 +154,14 @@ def test_render__timemap(recharge_ha, varname):
     )
     rch[varname] = da_transient
 
-    timemap = {datetimes[-1]: datetimes[0]}
-    rch.add_timemap(**{varname: timemap})
+    stress_repeats = {datetimes[-1]: datetimes[0]}
+    rch.repeat_stress(**{varname: stress_repeats})
     actual = rch._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
+
+    # Test if deprecation warning is raised
+    with pytest.warns(FutureWarning) as warn:
+        rch.add_timemap(**{varname: stress_repeats})
+    assert (
+        warn[0].message.args[0]
+        == "add_timemap is deprecated: use repeat_stress instead"
+    )
