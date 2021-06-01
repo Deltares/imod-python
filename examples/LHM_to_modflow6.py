@@ -267,6 +267,8 @@ lhm["riv-boils"] = imod.mf6.River(
     conductance=boils_cond, stage=boils_stage, bottom_elevation=boils_bot
 )
 
+lhm["oc"] = imod.mf6.OutputControl(save_head="last", save_budget="last")
+
 simulation = imod.mf6.Modflow6Simulation("LHM-3.3.0-stationary")
 simulation["lhm"] = lhm
 simulation["ims"] = imod.mf6.Solution(

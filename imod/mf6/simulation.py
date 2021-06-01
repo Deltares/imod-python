@@ -29,7 +29,26 @@ class Modflow6Simulation(collections.UserDict):
 
     def time_discretization(self, times):
         """
-        Collect all unique times
+        Collect all unique times from boundary conditions and insert times from argument as well.
+
+        Function creates TimeDiscretization object which is set to self["time_discretization"]
+
+        Parameters
+        ----------
+        times : xr.DataArray of datetime-likes
+            times to be inserted into model time discretization.
+
+        Note
+        ----
+        To set the other parameters of the TimeDiscretization object,
+        you have to set these to the object after calling this function.
+
+        Example
+        -------
+        >>> simulation = imod.mf6.Modflow6Simulation("example")
+        >>> simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
+        >>> # Set number of timesteps
+        >>> simulation["time_discretization"]["n_timesteps"] = 5
         """
         self.use_cftime = any(
             [model._use_cftime() for model in self.values() if model._pkg_id == "model"]
