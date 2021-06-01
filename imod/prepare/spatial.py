@@ -152,7 +152,7 @@ def laplace_interpolate(
 
         # expand dims to make 3d
         source3d = source.expand_dims("layer")
-        hnew = source3d.values
+        hnew = source3d.values.copy()
         iboundv = ibound.expand_dims("layer").astype(np.int).values
     else:
         # expand dims to make 3d
