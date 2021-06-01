@@ -144,23 +144,23 @@ def laplace_interpolate(
     if not source.dims == ("y", "x"):
         raise ValueError('source dims must be ("y", "x")')
 
-    if ibound is not None:
+    if ibound is None:
+        # expand dims to make 3d
+        source3d = source.expand_dims("layer")
+        # Set start interpolated estimate to 0.0, also creates a copy.
+        hnew = source3d.fillna(0.0).values  
+        ibound = np.isnan(source3d)  # Mark nodata values as 1
+        # Mark data values as -1, convert to int np.array
+        iboundv = ibound.where(ibound).fillna(-1.0).astype(np.int).values
+    else:
         if not ibound.dims == ("y", "x"):
             raise ValueError('ibound dims must be ("y", "x")')
         if not ibound.shape == source.shape:
             raise ValueError("ibound and source must have the same shape")
-
         # expand dims to make 3d
         source3d = source.expand_dims("layer")
         hnew = source3d.values.copy()
         iboundv = ibound.expand_dims("layer").astype(np.int).values
-    else:
-        # expand dims to make 3d
-        source3d = source.expand_dims("layer")
-        hnew = source3d.fillna(0.0).values  # Set start interpolated estimate to 0.0
-        ibound = np.isnan(source3d)  # Mark nodata values as 1
-        # Mark data values as -1, convert to int np.array
-        iboundv = ibound.where(ibound).fillna(-1.0).astype(np.int).values
 
     shape = iboundv.shape
     nlay, nrow, ncol = shape
