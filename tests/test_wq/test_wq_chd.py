@@ -38,7 +38,7 @@ def test_render(constanthead):
 
 
 @pytest.mark.parametrize("varname", ["head_start", "head_end"])
-def test_render__timemap(constanthead, varname):
+def test_render__stress_repeats(constanthead, varname):
     chd = constanthead
     directory = pathlib.Path(".")
     da = chd[varname]
@@ -48,6 +48,6 @@ def test_render__timemap(constanthead, varname):
     )
     chd[varname] = da_transient
 
-    timemap = {datetimes[-1]: datetimes[0]}
-    chd.add_timemap(**{varname: timemap})
+    stress_repeats = {datetimes[-1]: datetimes[0]}
+    chd.repeat_stress(**{varname: stress_repeats})
     actual = chd._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)

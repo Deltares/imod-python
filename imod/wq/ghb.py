@@ -57,7 +57,7 @@ class GeneralHeadBoundary(BoundaryCondition):
         to_check.append("head")
         self._check_location_consistent(to_check)
 
-    def add_timemap(
+    def repeat_stress(
         self,
         head=None,
         conductance=None,
@@ -68,4 +68,4 @@ class GeneralHeadBoundary(BoundaryCondition):
         varnames = ["head", "conductance", "density", "concentration"]
         values = [head, conductance, density, concentration]
         for varname, value in zip(varnames, values):
-            self._add_timemap(varname, value, use_cftime)
+            self._repeat_stress(varname, value, use_cftime)

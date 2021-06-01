@@ -76,7 +76,7 @@ class River(BoundaryCondition):
                 "Bottom elevation in {self} should not be higher than stage"
             )
 
-    def add_timemap(
+    def repeat_stress(
         self,
         stage=None,
         conductance=None,
@@ -94,4 +94,4 @@ class River(BoundaryCondition):
         ]
         values = [stage, conductance, bottom_elevation, density, concentration]
         for varname, value in zip(varnames, values):
-            self._add_timemap(varname, value, use_cftime)
+            self._repeat_stress(varname, value, use_cftime)

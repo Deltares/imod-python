@@ -126,7 +126,7 @@ def test_save_multiple_array_concentration(river_multiple_species, tmp_path):
 @pytest.mark.parametrize(
     "varname", ["stage", "conductance", "bottom_elevation", "concentration", "density"]
 )
-def test_render__timemap(river, varname):
+def test_render__stress_repeats(river, varname):
     riv = river
     directory = pathlib.Path(".")
     da = riv[varname]
@@ -136,6 +136,6 @@ def test_render__timemap(river, varname):
     )
     riv[varname] = da_transient
 
-    timemap = {datetimes[-1]: datetimes[0]}
-    riv.add_timemap(**{varname: timemap})
+    stress_repeats = {datetimes[-1]: datetimes[0]}
+    riv.repeat_stress(**{varname: stress_repeats})
     actual = riv._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)

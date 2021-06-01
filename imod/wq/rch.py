@@ -47,11 +47,11 @@ class Recharge(BoundaryCondition, abc.ABC):
     def _pkgcheck(self, ibound=None):
         pass
 
-    def add_timemap(self, rate=None, concentration=None, use_cftime=False):
+    def repeat_stress(self, rate=None, concentration=None, use_cftime=False):
         varnames = ["rate", "concentration"]
         values = [rate, concentration]
         for varname, value in zip(varnames, values):
-            self._add_timemap(varname, value, use_cftime)
+            self._repeat_stress(varname, value, use_cftime)
 
 
 class RechargeTopLayer(Recharge):
@@ -182,8 +182,8 @@ class RechargeHighestActive(Recharge):
         unique_layers = unique_layers[~np.isnan(unique_layers)]
         self._ssm_layers = unique_layers.astype(np.int)
 
-    def add_timemap(self, rate=None, concentration=None, use_cftime=False):
+    def repeat_stress(self, rate=None, concentration=None, use_cftime=False):
         varnames = ["rate", "concentration"]
         values = [rate, concentration]
         for varname, value in zip(varnames, values):
-            self._add_timemap(varname, value, use_cftime)
+            self._repeat_stress(varname, value, use_cftime)
