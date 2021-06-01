@@ -475,6 +475,11 @@ class BoundaryCondition(Package, abc.ABC):
         "{%- endfor -%}"
     )
 
+    def add_timemap(self, *args, **kwargs):
+        import warnings
+        warnings.warn("add_timemap is deprecated: use repeat_stress instead", FutureWarning)
+        self.repeat_stress(*args, **kwargs)
+
     def _repeat_stress(self, varname, value, use_cftime):
         if value is not None:
             if varname not in self:
