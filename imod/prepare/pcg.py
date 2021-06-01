@@ -276,11 +276,12 @@ def calculate_residual(
 
                 # Skip calculations and make cell inactive if all
                 # surrounding cells are inactive
-                if (b + h + d + f + z + s) == 0.0:
-                    ibound[n] = 0.0
-                    hcof[n] = 0.0
-                    rhs[n] = 0.0
-                    continue
+                if ibound[n] == 1:
+                    if (b + h + d + f + z + s) == 0.0:
+                        ibound[n] = 0.0
+                        hcof[n] = 0.0
+                        rhs[n] = 0.0
+                        continue
 
                 # Calculate the residual and store it in res.
                 rrhs = rhs[n]
@@ -364,16 +365,21 @@ def cholesky_diagonal(
     s = 0.0
     if i != 0:
         b = cc[ic]
-    if i != nrow - 1:
+    if i != nrow:
         h = cc[n]
     if j != 0:
         d = cr[ir]
-    if j != ncol - 1:
+    if j != ncol:
         f = cr[n]
     if k != 0:
         z = cv[il]
-    if k != nlay - 1:
+    if k != nlay:
         s = cv[n]
+
+    print(cc)
+    print(cr)
+    print(cv)
+    print(n, i, j, k, "\t", z, b, d, f, h, s)
 
     hhcof = hcof[n] - z - b - d - f - h - s
     cd[n] = (1.0 + delta) * hhcof - cdcr - cdcc - cdcv - relax * (fcr + fcc + fcv)
@@ -383,7 +389,7 @@ def cholesky_diagonal(
     if (cd[n] * cd1) < 0:
         delta = 1.5 * delta + 0.001
         raise RuntimeError(
-            "Matrix is severely non-diagonally dominant. Check input files. Stopping execution."
+            "Matrix is severely non-diagonally dominant. Check input. Stopping execution."
         )
     return cd, cd1, delta
 
