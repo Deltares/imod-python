@@ -379,7 +379,7 @@ def gdal_rasterize(
 
     Returns
     -------
-    rasterized : np.array
+    rasterized : xr.DataArray
     """
     from osgeo import gdal
     from osgeo import ogr
