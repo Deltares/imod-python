@@ -54,6 +54,7 @@ import importlib.util
 import os
 import pathlib
 import textwrap
+import warnings
 
 
 def griddata(v):
@@ -74,7 +75,7 @@ def block_entry(varname, block, vardict):
         s = f"{varname}\n"
 
     if block == "period":
-        print(f"period block; varname = {varname}")
+        warnings.warn(f"period block; varname = {varname}")
 
     elif block == "griddata":
         s = griddata(v)
@@ -135,7 +136,7 @@ def write_block(vardict, block):
                 # because it is part of a record
                 addv = False
             if addv and (b == "period"):
-                print(b, v)
+                warnings.warn(b, v)
                 s = textwrap.dedent(
                     """\
                 {% for i, path in periods.items() %}begin period {{i}}
@@ -163,7 +164,8 @@ if __name__ == "__main__":
     spec.loader.exec_module(mf6ivar)
 
     dfndir = mf6ivar_dir / "dfn"
-    assert dfndir.is_dir()
+    if not dfndir.is_dir():
+        raise RuntimeError("dfndir is not a directory")
     j2dir.mkdir(parents=True, exist_ok=True)
 
     # construct list of dfn paths to process

@@ -160,7 +160,6 @@ def laplace_interpolate(
     hnew = source3d.fillna(0.0).values.astype(
         np.float64
     )  # Set start interpolated estimate to 0.0
-    print(iboundv)
 
     shape = iboundv.shape
     nlay, nrow, ncol = shape

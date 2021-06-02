@@ -3,6 +3,7 @@ import collections
 import os
 import pathlib
 from dataclasses import dataclass
+import warnings
 
 import cftime
 import imod
@@ -74,7 +75,9 @@ class Model(collections.UserDict):
             dv = list(self[pkg].dataset.data_vars)[0]
             if not self[pkg][dv].notnull().any().compute():
                 if verbose:
-                    print(f"Deleting package {pkg}, found no data in parameter {dv}")
+                    warnings.warn(
+                        f"Deleting package {pkg}, found no data in parameter {dv}"
+                    )
                 to_del.append(pkg)
         for pkg in to_del:
             del self[pkg]

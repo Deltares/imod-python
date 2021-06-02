@@ -93,5 +93,4 @@ def forcing_starts(package_times, globaltimes):
     starts = np.searchsorted(globaltimes, package_times) + 1
     # convert to strings, complying with iMOD-WQ
     starts = [str(start) for start in starts]
-    assert len(package_times) == len(starts)
     return starts

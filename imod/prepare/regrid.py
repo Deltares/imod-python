@@ -273,8 +273,10 @@ def _nd_regrid(src, dst, src_coords, dst_coords, iter_regrid, use_relative_weigh
     dst_coords : tuple of np.array
     iter_regrid : function, numba compiled
     """
-    assert len(src.shape) == len(dst.shape)
-    assert len(src_coords) == len(dst_coords)
+    if len(src.shape) != len(dst.shape):
+        raise ValueError("shape mismatch between src and dst")
+    if len(src_coords) != len(dst_coords):
+        raise ValueError("coords mismatch between src and dst")
     ndim_regrid = len(src_coords)
 
     # Determine weights for every regrid dimension, and alloc_len,

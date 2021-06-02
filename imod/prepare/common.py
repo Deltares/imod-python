@@ -362,7 +362,8 @@ def _coord(da, dim):
 
 def _define_single_dim_slices(src_x, dst_x, chunksizes):
     n = len(chunksizes)
-    assert n > 0
+    if not n > 0:
+        raise ValueError("n must be larger than zero")
     if n == 1:
         return [slice(None, None)]
 

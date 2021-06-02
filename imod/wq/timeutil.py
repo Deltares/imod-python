@@ -111,5 +111,4 @@ def forcing_starts_ends(package_times, globaltimes):
         f"{start}:{end}" if (end > start) else str(start)
         for (start, end) in zip(starts, ends)
     ]
-    assert len(package_times) == len(starts_ends)
     return starts_ends

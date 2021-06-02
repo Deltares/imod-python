@@ -376,11 +376,6 @@ def cholesky_diagonal(
     if k != nlay:
         s = cv[n]
 
-    print(cc)
-    print(cr)
-    print(cv)
-    print(n, i, j, k, "\t", z, b, d, f, h, s)
-
     hhcof = hcof[n] - z - b - d - f - h - s
     cd[n] = (1.0 + delta) * hhcof - cdcr - cdcc - cdcv - relax * (fcr + fcc + fcv)
 

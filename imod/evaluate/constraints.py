@@ -114,7 +114,8 @@ def stability_constraint_advection(front, lower, right, top_bot, porosity=0.3, R
     dz_m = dz_m.shift(layer=-1)
 
     # assert all dz positive - Issue #140
-    assert np.all(dz_m.values[~np.isnan(dz_m.values)] >= 0)
+    if not np.all(dz_m.values[~np.isnan(dz_m.values)] >= 0):
+        raise ValueError("All dz values should be positive")
 
     # absolute velocities (m/d)
     abs_v_x = np.abs(qs_x / porosity)

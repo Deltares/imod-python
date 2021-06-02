@@ -19,7 +19,8 @@ def _build_lookup_table(lithoclass, lithostrat, values):
     A workaround for the lack of dictionary support in numba. See also:
     https://github.com/numba/numba/issues/2096
     """
-    assert lithoclass.shape == lithostrat.shape == values.shape
+    if not (lithoclass.shape == lithostrat.shape == values.shape):
+        raise ValueError("shape mismatch between lithoclass, lithostrat, and values")
     nclasses = lithoclass.shape[0]
     nrow = int(lithostrat.max()) + 1
     ncol = int(lithoclass.max()) + 1

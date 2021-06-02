@@ -1,7 +1,7 @@
 import collections
 import os
 import pathlib
-import subprocess
+import warnings
 
 import cftime
 import jinja2
@@ -141,9 +141,10 @@ class Model(collections.UserDict):
         for pkgname, pkg in self.items():
             try:
                 pkg.to_netcdf(directory / pattern.format(pkgname=pkgname), **kwargs)
-            except:
-                print(f"Package {pkgname} can not be written to NetCDF")
-                raise
+            except Exception as e:
+                raise RuntimeError(
+                    "Package {pkgname} can not be written to NetCDF"
+                ) from e
 
     def write_qgis_project(self, directory, crs, filename=None, aggregate_layers=False):
         """
@@ -201,7 +202,9 @@ class Model(collections.UserDict):
             dv = list(self[pkg].data_vars)[0]
             if not self[pkg][dv].notnull().any().compute():
                 if verbose:
-                    print(f"Deleting package {pkg}, found no data in parameter {dv}")
+                    warnings.warn(
+                        f"Deleting package {pkg}, found no data in parameter {dv}"
+                    )
                 to_del.append(pkg)
         for pkg in to_del:
             del self[pkg]
@@ -850,9 +853,11 @@ class SeawatModel(Model):
 
         if isinstance(extent, (list, tuple)):
             xmin, xmax, ymin, ymax = extent
-            assert (xmin < xmax) & (
-                ymin < ymax
-            ), "Either xmin or ymin is equal to or larger than xmax or ymax. Correct order is xmin, xmax, ymin, ymax."
+            if not ((xmin < xmax) & (ymin < ymax)):
+                raise ValueError(
+                    "Either xmin or ymin is equal to or larger than xmax or ymax. "
+                    "Correct order is xmin, xmax, ymin, ymax."
+                )
             extent = xr.ones_like(like)
             extent = extent.where(
                 (extent.x >= xmin)
