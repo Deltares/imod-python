@@ -22,7 +22,7 @@ class BasicTransport(Package):
         different constant-concentration conditions through an option in the
         Source and Sink Mixing Package.
         ICBUND=0, the cell is an inactive concentration cell for all species.
-        Note that no-flow or “dry” cells are automatically converted into
+        Note that no-flow or "dry" cells are automatically converted into
         inactive concentration cells. Furthermore, active cells in terms of flow
         can be treated as inactive concentration cells to minimize the area
         needed for transport simulation, as long as the solute transport is
@@ -42,7 +42,7 @@ class BasicTransport(Package):
         starting concentration must be specified for all species, one species at
         a time.
     porosity: float, optional
-        is the “effective” porosity of the porous medium in a single porosity
+        is the "effective" porosity of the porous medium in a single porosity
         system (PRSITY).
         Default value is 0.35.
     n_species: int, optional

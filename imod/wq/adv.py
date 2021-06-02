@@ -100,7 +100,7 @@ class AdvectionMOC(Package):
         generator. This option is usually preferred and leads to smaller mass
         balance discrepancy in nonuniform or diverging/converging flow fields.
         NPLANE > 0, the fixed pattern is selected for initial placement. The
-        value of NPLANE serves as the number of vertical “planes” on which
+        value of NPLANE serves as the number of vertical "planes" on which
         initial particles are placed within each cell block. The fixed pattern
         may work better than the random pattern only in relatively uniform flow
         fields. For two-dimensional simulations in plan view, set NPLANE = 1.
@@ -339,7 +339,7 @@ class AdvectionHybridMOC(Package):
         generator. This option is usually preferred and leads to smaller mass
         balance discrepancy in nonuniform or diverging/converging flow fields.
         NPLANE > 0, the fixed pattern is selected for initial placement. The
-        value of NPLANE serves as the number of vertical “planes” on which
+        value of NPLANE serves as the number of vertical "planes" on which
         initial particles are placed within each cell block. The fixed pattern
         may work better than the random pattern only in relatively uniform flow
         fields. For two-dimensional simulations in plan view, set NPLANE = 1.

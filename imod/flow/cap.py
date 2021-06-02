@@ -37,9 +37,9 @@ class MetaSwap(Package):
     * Van Walsum, P. E. V., 2017b. SIMGRO V7.3.3.2, Users Guide. Tech. Rep.
       Alterra-Report 913.2, Alterra, Wageningen. 111 pp.
 
-    * Van Walsum, P. E. V. and P. Groenendijk, 2008. “Quasi Steady-State
+    * Van Walsum, P. E. V. and P. Groenendijk, 2008. "Quasi Steady-State
       Simulation on of the Unsaturated Zone in Groundwater Modeling of Lowland
-      Regions.” Vadose Zone Journal 7: 769-778.
+      Regions." Vadose Zone Journal 7: 769-778.
 
     * Van Walsum, P. E. V., A. A. Veldhuizen and P. Groenendijk, 2016. SIMGRO
       V7.2.27, Theory and model implementation. Tech. Rep. Alterra-Report 913.1,
