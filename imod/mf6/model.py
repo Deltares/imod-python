@@ -58,7 +58,9 @@ class GroundwaterFlowModel(Model):
         Also checks if datetime types are homogeneous across packages.
         """
         types = [
-            type(pkg["time"].values[0]) for pkg in self.values() if "time" in pkg.coords
+            type(pkg.dataset["time"].values[0])
+            for pkg in self.values()
+            if "time" in pkg.dataset.coords
         ]
         set_of_types = set(types)
         # Types will be empty if there's no time dependent input
@@ -81,8 +83,8 @@ class GroundwaterFlowModel(Model):
     def _yield_times(self):
         modeltimes = []
         for pkg in self.values():
-            if "time" in pkg.coords:
-                modeltimes.append(pkg["time"].values)
+            if "time" in pkg.dataset.coords:
+                modeltimes.append(pkg.dataset["time"].values)
         return modeltimes
 
     def render(self, modeldirectory):
@@ -143,7 +145,7 @@ class GroundwaterFlowModel(Model):
         pkgnames = [
             pkgname
             for pkgname, pkg in self.items()
-            if all(i in pkg.dims for i in ["x", "y"])
+            if all(i in pkg.dataset.dims for i in ["x", "y"])
         ]
 
         data_paths = []

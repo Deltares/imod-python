@@ -8,7 +8,7 @@ import xarray as xr
 import string
 
 
-class Package(xr.Dataset, abc.ABC):
+class Package(abc.ABC):
     """
     Package is used to share methods for specific packages with no time
     component.
@@ -22,6 +22,12 @@ class Package(xr.Dataset, abc.ABC):
     """
 
     __slots__ = ("_template", "_pkg_id", "_period_data")
+
+    def __init__(self):
+        self.dataset = xr.Dataset()
+
+    def __getitem__(self, key):
+        return self.dataset.__getitem__(key)
 
     def _valid(self, value):
         """
@@ -145,7 +151,7 @@ class Package(xr.Dataset, abc.ABC):
 
     def render(self, *args, **kwargs):
         d = {}
-        for k, v in self.data_vars.items():  # pylint:disable=no-member
+        for k, v in self.dataset.data_vars.items():  # pylint:disable=no-member
             value = v.values[()]
             if self._valid(value):  # skip None and False
                 d[k] = value
@@ -187,12 +193,13 @@ class Package(xr.Dataset, abc.ABC):
         self.write_blockfile(directory, pkgname, *args)
 
         if hasattr(self, "_grid_data"):
-            if "x" in self.dims and "y" in self.dims:
+            dims = self.dataset.dims
+            if "x" in dims and "y" in dims:
                 pkgdirectory = directory / pkgname
                 pkgdirectory.mkdir(exist_ok=True, parents=True)
                 for varname, dtype in self._grid_data.items():
                     key = self._keyword_map.get(varname, varname)
-                    da = self[varname]
+                    da = self.dataset[varname]
                     if "x" in da.dims and "y" in da.dims:
                         path = pkgdirectory / f"{key}.bin"
                         self.write_binary_griddata(path, da, dtype)
@@ -224,11 +231,11 @@ class Package(xr.Dataset, abc.ABC):
         """
 
         has_dims = []
-        for varname in self.data_vars.keys():  # pylint:disable=no-member
-            if all(i in self[varname].dims for i in ["x", "y"]):
+        for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
+            if all(i in self.dataset[varname].dims for i in ["x", "y"]):
                 has_dims.append(varname)
 
-        spatial_ds = self[has_dims]
+        spatial_ds = self.dataset[has_dims]
 
         if aggregate_layers and ("layer" in spatial_ds.dims):
             spatial_ds = spatial_ds.mean(dim="layer")
@@ -264,7 +271,7 @@ class BoundaryCondition(Package, abc.ABC):
         Determine the maximum active number of cells that are active
         during a stress period.
         """
-        da = self[self._period_data[0]]
+        da = self.dataset[self._period_data[0]]
         if "time" in da.coords:
             nmax = int(da.groupby("time").count(xr.ALL_DIMS).max())
         else:
@@ -307,10 +314,10 @@ class BoundaryCondition(Package, abc.ABC):
         if not_options is None:
             not_options = self._period_data
 
-        for varname in self.data_vars.keys():  # pylint:disable=no-member
+        for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
                 continue
-            v = self[varname].values[()]
+            v = self.dataset[varname].values[()]
             if self._valid(v):  # skip None and False
                 d[varname] = v
         return d
@@ -321,7 +328,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         # period = {1: f"{directory}/{self._pkg_id}-{i}.bin"}
 
-        bin_ds = self[list(self._period_data)]
+        bin_ds = self.dataset[list(self._period_data)]
 
         d["periods"] = self.period_paths(directory, pkgname, globaltimes, bin_ds)
         # construct the rest (dict for render)
@@ -332,10 +339,10 @@ class BoundaryCondition(Package, abc.ABC):
         return self._template.render(d)
 
     def write_perioddata(self, directory, pkgname):
-        bin_ds = self[list(self._period_data)]
+        bin_ds = self.dataset[list(self._period_data)]
 
         if "time" in bin_ds:  # one of bin_ds has time
-            for i in range(len(self.time)):
+            for i in range(len(self.dataset.time)):
                 path = directory / pkgname / f"{self._pkg_id}-{i}.bin"
                 self.write_datafile(path, bin_ds.isel(time=i))  # one timestep
         else:
