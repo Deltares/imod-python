@@ -29,8 +29,8 @@ class Package(abc.ABC):
     def __getitem__(self, key):
         return self.dataset.__getitem__(key)
 
-    def __setitem__(self, key):
-        return self.dataset.__setitem__(key)
+    def __setitem__(self, key, value):
+        return self.dataset.__setitem__(key, value)
 
     def _valid(self, value):
         """
