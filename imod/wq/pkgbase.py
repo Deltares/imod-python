@@ -15,7 +15,7 @@ from imod.wq import timeutil
 from .caching import caching
 
 
-class Package(xr.Dataset, abc.ABC):
+class Package(abc.ABC):
     """
     Base package for the different SEAWAT packages.
     Every package contains a ``_pkg_id`` for identification.
@@ -105,6 +105,9 @@ class Package(xr.Dataset, abc.ABC):
             CachingPackage = caching(cls, cache)
             return CachingPackage(path, **pkg_kwargs)
 
+    def __init__(self):
+        self.dataset = xr.Dataset()
+
     def __setitem__(self, key, value):
         if isinstance(value, xr.DataArray):
             if "z" in value.dims:
@@ -115,7 +118,10 @@ class Package(xr.Dataset, abc.ABC):
                 value = value.swap_dims({"z": "layer"})
             if "layer" in value.dims:
                 value = value.dropna(dim="layer", how="all")
-        super(__class__, self).__setitem__(key, value)
+        self.dataset.__setitem__(key, value)
+
+    def __getitem__(self, key):
+        return self.dataset.__getitem__(key)
 
     def _replace_keyword(self, d, key):
         """
@@ -220,7 +226,7 @@ class Package(xr.Dataset, abc.ABC):
 
         values = {}
         if da is None:
-            da = self[varname]
+            da = self.dataset[varname]
 
         d = {"directory": directory, "name": varname, "extension": ".idf"}
 
@@ -324,7 +330,7 @@ class Package(xr.Dataset, abc.ABC):
         return compressed
 
     def _compose_values_time(self, varname, globaltimes):
-        da = self[varname]
+        da = self.dataset[varname]
         values = {}
 
         if "time" in da.coords:
@@ -342,7 +348,7 @@ class Package(xr.Dataset, abc.ABC):
         return values
 
     def save(self, directory):
-        for name, da in self.data_vars.items():  # pylint: disable=no-member
+        for name, da in self.dataset.data_vars.items():  # pylint: disable=no-member
             if "y" in da.coords and "x" in da.coords:
                 path = pathlib.Path(directory).joinpath(name)
                 imod.idf.save(path, da)
@@ -350,17 +356,17 @@ class Package(xr.Dataset, abc.ABC):
     def _check_positive(self, varnames):
         for var in varnames:
             # Take care with nan values
-            if (self[var] < 0).any():
+            if (self.dataset[var] < 0).any():
                 raise ValueError(f"{var} in {self} must be positive")
 
     def _check_range(self, varname, lower, upper):
         # TODO: this isn't used anywhere so far.
         warn = False
         msg = ""
-        if (self[varname] < lower).any():
+        if (self.dataset[varname] < lower).any():
             warn = True
             msg += f"{varname} in {self}: values lower than {lower} detected. "
-        if (self[varname] > upper).any():
+        if (self.dataset[varname] > upper).any():
             warn = True
             msg += f"{varname} in {self}: values higher than {upper} detected."
         if warn:
@@ -370,8 +376,8 @@ class Package(xr.Dataset, abc.ABC):
         dims = set(self.dims)
         is_scalar = {}
         for var in varnames:
-            scalar = (self[var].shape == ()) or not any(
-                dim in self[var].dims for dim in ["time", "layer", "y", "x"]
+            scalar = (self.dataset[var].shape == ()) or not any(
+                dim in self.dataset[var].dims for dim in ["time", "layer", "y", "x"]
             )
             if not scalar:  # skip scalar value
                 dims = dims.intersection(self[var].dims)
@@ -382,14 +388,14 @@ class Package(xr.Dataset, abc.ABC):
             if not is_scalar[var]:  # skip scalar values
                 # dimensions cannot change for in-place operations
                 # reduce to lowest set of dimension (e.g. just x and y)
-                var_dims = set(self[var].dims)
+                var_dims = set(self.dataset[var].dims)
                 reduce_dims = var_dims.difference(dims)
                 # Inplace boolean operator
-                is_nan &= np.isnan(self[var]).all(dim=reduce_dims)
+                is_nan &= np.isnan(self.dataset[var]).all(dim=reduce_dims)
 
         for var in varnames:
             if not is_scalar[var]:  # skip scalar values
-                if (np.isnan(self[var]) ^ is_nan).any():
+                if (np.isnan(self.dataset[var]) ^ is_nan).any():
                     raise ValueError(
                         f"{var} in {self} is not consistent with all variables in: "
                         f"{', '.join(varnames)}. nan values do not line up."
@@ -422,11 +428,11 @@ class Package(xr.Dataset, abc.ABC):
         """
 
         has_dims = []
-        for varname in self.data_vars.keys():  # pylint:disable=no-member
-            if all(i in self[varname].dims for i in ["x", "y"]):
+        for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
+            if all(i in self.dataset[varname].dims for i in ["x", "y"]):
                 has_dims.append(varname)
 
-        spatial_ds = self[has_dims]
+        spatial_ds = self.dataset[has_dims]
 
         if aggregate_layers and ("layer" in spatial_ds.dims):
             spatial_ds = spatial_ds.mean(dim="layer")
@@ -485,11 +491,11 @@ class BoundaryCondition(Package, abc.ABC):
 
     def _repeat_stress(self, varname, value, use_cftime):
         if value is not None:
-            if varname not in self:
+            if varname not in self.dataset:
                 raise ValueError(
                     f"{varname} does not occur in {self}\n cannot repeat stress"
                 )
-            if "time" not in self[varname].coords:
+            if "time" not in self.dataset[varname].coords:
                 raise ValueError(
                     f"{varname} in {self}\n does not have dimension time, cannot repeat stress."
                 )
@@ -499,7 +505,7 @@ class BoundaryCondition(Package, abc.ABC):
                 timeutil.to_datetime(k, use_cftime): timeutil.to_datetime(v, use_cftime)
                 for k, v in value.items()
             }
-            self[varname].attrs["stress_repeats"] = d
+            self.dataset[varname].attrs["stress_repeats"] = d
 
     def _compose_values_timelayer(
         self, varname, globaltimes, directory, nlayer, da=None
@@ -539,11 +545,11 @@ class BoundaryCondition(Package, abc.ABC):
         values = {}
 
         if da is None:
-            da = self[varname]
+            da = self.dataset[varname]
 
-        if "time" in da.coords:
-            da_times = da.coords["time"].values
-            if "stress_repeats" in da.attrs:
+        if "time" in da.dataset.coords:
+            da_times = da.dataset.coords["time"].values
+            if "stress_repeats" in da.dataset.attrs:
                 stress_repeats_keys = np.array(list(da.attrs["stress_repeats"].keys()))
                 stress_repeats_values = np.array(
                     list(da.attrs["stress_repeats"].values())
@@ -592,18 +598,18 @@ class BoundaryCondition(Package, abc.ABC):
             nlay, nrow, ncol taken from ibound.
         """
         # First compute active number of cells
-        if "time" in self[varname].coords:
-            nmax = int(self[varname].groupby("time").count(xr.ALL_DIMS).max())
+        if "time" in self.dataset[varname].coords:
+            nmax = int(self.dataset[varname].groupby("time").count(xr.ALL_DIMS).max())
         else:
-            nmax = int(self[varname].count())
-        if not "layer" in self.coords:  # Then it applies to every layer
+            nmax = int(self.dataset[varname].count())
+        if not "layer" in self.dataset.coords:  # Then it applies to every layer
             nmax *= nlayer
         self._cellcount = nmax  # Store cellcount so it can be re-used for ssm.
         self._ssm_cellcount = nmax
 
         # Second, compute active number of sinks and sources
         # overwite _ssm_cellcount if more specific info is available.
-        if "concentration" in self:
+        if "concentration" in self.dataset:
             da = self["concentration"]
 
             if "species" in da.coords:
@@ -613,14 +619,14 @@ class BoundaryCondition(Package, abc.ABC):
 
             if "y" not in da.coords and "x" not in da.coords:
                 # It's not idf data, but scalar instead
-                if "layer" in self.coords:
+                if "layer" in self.dataset.coords:
                     # Store layers for rendering
-                    da_nlayer = self.coords["layer"].size
+                    da_nlayer = self.dataset.coords["layer"].size
                     if da_nlayer == nlayer:
                         # Insert wildcard
                         self._ssm_layers = ["?"]
                     else:
-                        self._ssm_layers = self.coords["layer"].values
+                        self._ssm_layers = self.dataset.coords["layer"].values
                         nlayer = da_nlayer
                 # Sinks and sources are applied everywhere
                 # in contrast to other inputs
@@ -653,11 +659,13 @@ class BoundaryCondition(Package, abc.ABC):
         rendered : str
             The rendered runfile part for a single boundary condition system.
         """
-        mapping = tuple([(k, v) for k, v in self._mapping if v in self.data_vars])
+        mapping = tuple(
+            [(k, v) for k, v in self._mapping if v in self.dataset.data_vars]
+        )
         d = {"mapping": mapping, "system_index": system_index}
         dicts = {}
 
-        for varname in self.data_vars.keys():  # pylint: disable=no-member
+        for varname in self.dataset.data_vars.keys():  # pylint: disable=no-member
             if varname == "concentration":
                 continue
             dicts[varname] = self._compose_values_timelayer(
@@ -686,16 +694,16 @@ class BoundaryCondition(Package, abc.ABC):
             The rendered runfile SSM part for a single boundary condition system.
         """
 
-        if "concentration" not in self:
+        if "concentration" not in self.dataset:
             return ""
 
         d = {"pkg_id": self._pkg_id}
-        if "species" in self["concentration"].coords:
+        if "species" in self.dataset["concentration"].coords:
             concentration = {}
-            for species in self["concentration"]["species"].values:
+            for species in self.dataset["concentration"]["species"].values:
                 concentration[species] = self._compose_values_timelayer(
                     varname="concentration",
-                    da=self["concentration"].sel(species=species),
+                    da=self.dataset["concentration"].sel(species=species),
                     globaltimes=globaltimes,
                     directory=directory,
                     nlayer=nlayer,
@@ -704,7 +712,7 @@ class BoundaryCondition(Package, abc.ABC):
             concentration = {
                 1: self._compose_values_timelayer(
                     varname="concentration",
-                    da=self["concentration"],
+                    da=self.dataset["concentration"],
                     globaltimes=globaltimes,
                     directory=directory,
                     nlayer=nlayer,
