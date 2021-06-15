@@ -314,10 +314,12 @@ def read(path, kwargs={}, assoc_kwargs={}):
     """
     if isinstance(path, list):
         paths = path
-    elif isinstance(path, pathlib.Path):
+    elif isinstance(path, (str, pathlib.Path)):
         # convert since for Path.glob non-relative patterns are unsupported
         path = str(path)
         paths = [pathlib.Path(p) for p in glob.glob(path)]
+    else:
+        raise ValueError(f"Path should be either a list, str or pathlib.Path")
 
     n = len(paths)
     if n == 0:
