@@ -30,7 +30,7 @@ class Package(abc.ABC):
         return self.dataset.__getitem__(key)
 
     def __setitem__(self, key, value):
-        return self.dataset.__setitem__(key, value)
+        self.dataset.__setitem__(key, value)
 
     def _valid(self, value):
         """
