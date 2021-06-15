@@ -31,7 +31,6 @@ class StructuredDiscretization(Package):
         referred to as a "vertical pass through"cell.
     """
 
-    __slots__ = ("top", "bottom", "idomain")
     _pkg_id = "dis"
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
     _keyword_map = {"bottom": "botm"}
@@ -39,9 +38,9 @@ class StructuredDiscretization(Package):
 
     def __init__(self, top, bottom, idomain):
         super(__class__, self).__init__()
-        self["top"] = top
-        self["bottom"] = bottom
-        self["idomain"] = idomain
+        self.dataset["top"] = top
+        self.dataset["bottom"] = bottom
+        self.dataset["idomain"] = idomain
 
     def _delrc(self, dx):
         """
@@ -58,19 +57,19 @@ class StructuredDiscretization(Package):
     def render(self, directory, pkgname, *args, **kwargs):
         disdirectory = directory / "dis"
         d = {}
-        x = self["idomain"].coords["x"]
-        y = self["idomain"].coords["y"]
+        x = self.dataset["idomain"].coords["x"]
+        y = self.dataset["idomain"].coords["y"]
         dx, xmin, _ = imod.util.coord_reference(x)
         dy, ymin, _ = imod.util.coord_reference(y)
 
         d["xorigin"] = xmin
         d["yorigin"] = ymin
-        d["nlay"] = self["idomain"].coords["layer"].size
+        d["nlay"] = self.dataset["idomain"].coords["layer"].size
         d["nrow"] = y.size
         d["ncol"] = x.size
         d["delr"] = self._delrc(np.abs(dx))
         d["delc"] = self._delrc(np.abs(dy))
-        _, d["top"] = self._compose_values(self["top"], disdirectory, "top")
+        _, d["top"] = self._compose_values(self.dataset["top"], disdirectory, "top")
         d["botm_layered"], d["botm"] = self._compose_values(
             self["bottom"], disdirectory, "botm"
         )

@@ -29,14 +29,6 @@ class Drainage(BoundaryCondition):
         Default is None.
     """
 
-    __slots__ = (
-        "elevation",
-        "conductance",
-        "print_input",
-        "print_flows",
-        "save_flows",
-        "observations",
-    )
     _pkg_id = "drn"
     # has to be ordered as in the list
     _period_data = ("elevation", "conductance")
@@ -53,9 +45,9 @@ class Drainage(BoundaryCondition):
         observations=None,
     ):
         super(__class__, self).__init__()
-        self["elevation"] = elevation
-        self["conductance"] = conductance
-        self["print_input"] = print_input
-        self["print_flows"] = print_flows
-        self["save_flows"] = save_flows
-        self["observations"] = observations
+        self.dataset["elevation"] = elevation
+        self.dataset["conductance"] = conductance
+        self.dataset["print_input"] = print_input
+        self.dataset["print_flows"] = print_flows
+        self.dataset["save_flows"] = save_flows
+        self.dataset["observations"] = observations

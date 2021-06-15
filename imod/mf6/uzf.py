@@ -89,40 +89,6 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         save memory for laterally large-scale models, through efficient use of the UZF cell identifiers.
     """
 
-    __slots__ = (
-        "surface_depression_depth",
-        "kv_sat",
-        "theta_res",
-        "theta_sat",
-        "theta_init",
-        "epsilon",
-        "infiltration_rate",
-        "et_pot",
-        "extinction_depth",
-        "extinction_theta",
-        "air_entry_potential",
-        "root_potential",
-        "root_activity",
-        "ntrailwaves",
-        "nwavesets",
-        "simulate_et",
-        "groundwater_ET_function",
-        "simulate_seepage",
-        "unsat_etwc",
-        "unsat_etae",
-        "linear_gwet",
-        "square_gwet",
-        "print_input",
-        "print_flows",
-        "save_flows",
-        "observations",
-        "water_mover",
-        "timeseries",
-        "landflag",
-        "ivertcon",
-        "iuzno",
-    )
-
     _period_data = (
         "infiltration_rate",
         "et_pot",
@@ -173,12 +139,12 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     ):
         super(__class__, self).__init__()
         # Package data
-        self["surface_depression_depth"] = surface_depression_depth
-        self["kv_sat"] = kv_sat
-        self["theta_res"] = theta_res
-        self["theta_sat"] = theta_sat
-        self["theta_init"] = theta_init
-        self["epsilon"] = epsilon
+        self.dataset["surface_depression_depth"] = surface_depression_depth
+        self.dataset["kv_sat"] = kv_sat
+        self.dataset["theta_res"] = theta_res
+        self.dataset["theta_sat"] = theta_sat
+        self.dataset["theta_init"] = theta_init
+        self.dataset["epsilon"] = epsilon
 
         # Stress period data
         self._check_options(
@@ -191,35 +157,35 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             root_activity,
         )
 
-        self["infiltration_rate"] = infiltration_rate
-        self["et_pot"] = et_pot
-        self["extinction_depth"] = extinction_depth
-        self["extinction_theta"] = extinction_theta
-        self["air_entry_potential"] = air_entry_potential
-        self["root_potential"] = root_potential
-        self["root_activity"] = root_activity
+        self.dataset["infiltration_rate"] = infiltration_rate
+        self.dataset["et_pot"] = et_pot
+        self.dataset["extinction_depth"] = extinction_depth
+        self.dataset["extinction_theta"] = extinction_theta
+        self.dataset["air_entry_potential"] = air_entry_potential
+        self.dataset["root_potential"] = root_potential
+        self.dataset["root_activity"] = root_activity
 
         # Dimensions
-        self["ntrailwaves"] = ntrailwaves
-        self["nwavesets"] = nwavesets
+        self.dataset["ntrailwaves"] = ntrailwaves
+        self.dataset["nwavesets"] = nwavesets
 
         # Options
-        self["groundwater_ET_function"] = groundwater_ET_function
-        self["simulate_gwseep"] = simulate_groundwater_seepage
-        self["print_input"] = print_input
-        self["print_flows"] = print_flows
-        self["save_flows"] = save_flows
-        self["observations"] = observations
-        self["water_mover"] = water_mover
-        self["timeseries"] = timeseries
+        self.dataset["groundwater_ET_function"] = groundwater_ET_function
+        self.dataset["simulate_gwseep"] = simulate_groundwater_seepage
+        self.dataset["print_input"] = print_input
+        self.dataset["print_flows"] = print_flows
+        self.dataset["save_flows"] = save_flows
+        self.dataset["observations"] = observations
+        self.dataset["water_mover"] = water_mover
+        self.dataset["timeseries"] = timeseries
 
         # Additonal indices for Packagedata
-        self["landflag"] = self._determine_landflag(kv_sat)
+        self.dataset["landflag"] = self._determine_landflag(kv_sat)
 
-        self["iuzno"] = self._create_uzf_numbers(self["landflag"])
-        self["iuzno"].name = "uzf_number"
+        self.dataset["iuzno"] = self._create_uzf_numbers(self["landflag"])
+        self.dataset["iuzno"].name = "uzf_number"
 
-        self["ivertcon"] = self._determine_vertical_connection(self["iuzno"])
+        self.dataset["ivertcon"] = self._determine_vertical_connection(self["iuzno"])
 
     def fill_stress_perioddata(self):
         """Modflow6 requires something to be filled in the stress perioddata,
@@ -228,9 +194,9 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         the rest can be filled with dummy values if not provided.
         """
         for var in self._period_data:
-            if self[var].size == 1:  # Prevent loading large arrays in memory
-                if self[var].values[()] is None:
-                    self[var] = xr.full_like(self["infiltration_rate"], 0.0)
+            if self.dataset[var].size == 1:  # Prevent loading large arrays in memory
+                if self.dataset[var].values[()] is None:
+                    self.dataset[var] = xr.full_like(self["infiltration_rate"], 0.0)
                 else:
                     raise ValueError("{} cannot be a scalar".format(var))
 
@@ -251,15 +217,15 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         ]
 
         if all(simulate_et):
-            self["simulate_et"] = True
+            self.dataset["simulate_et"] = True
         elif any(simulate_et):
             raise ValueError("To simulate ET, set both et_pot and extinction_depth")
 
         if extinction_theta is not None:
-            self["unsat_etwc"] = True
+            self.dataset["unsat_etwc"] = True
 
         if all(unsat_etae):
-            self["unsat_etae"] = True
+            self.dataset["unsat_etae"] = True
         elif any(unsat_etae):
             raise ValueError(
                 "To simulate ET with a capillary based formulation, set air_entry_potential, root_potential, and root_activity"
@@ -272,9 +238,9 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             )
 
         if groundwater_ET_function == "linear":
-            self["linear_gwet"] = True
+            self.dataset["linear_gwet"] = True
         elif groundwater_ET_function == "square":
-            self["square_gwet"] = True
+            self.dataset["square_gwet"] = True
         elif groundwater_ET_function is None:
             pass
         else:
@@ -293,12 +259,12 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         return uzf_number.shift(layer=-1, fill_value=0)
 
     def _package_data_to_sparse(self):
-        notnull = self["landflag"].values == 1
-        iuzno = self["iuzno"].values[notnull]
-        landflag = self["landflag"].values[notnull]
-        ivertcon = self["ivertcon"].values[notnull]
+        notnull = self.dataset["landflag"].values == 1
+        iuzno = self.dataset["iuzno"].values[notnull]
+        landflag = self.dataset["landflag"].values[notnull]
+        ivertcon = self.dataset["ivertcon"].values[notnull]
 
-        ds = self[list(self._package_data)]
+        ds = self.dataset[list(self._package_data)]
 
         layer = self._check_layer_presence(ds)
         arrays = self._ds_to_arrlist(ds)
@@ -329,7 +295,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         # period = {1: f"{directory}/{self._pkg_id}-{i}.bin"}
 
-        bin_ds = self[list(self._period_data)]
+        bin_ds = self.dataset[list(self._period_data)]
 
         d["periods"] = self.period_paths(directory, pkgname, globaltimes, bin_ds)
 
@@ -351,8 +317,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         since the perioddata does not require cellids but iuzno, we hgave to override"""
         # TODO add pkgcheck that period table aligns
         # Get the number of valid values
-        notnull = self["landflag"].values == 1
-        iuzno = self["iuzno"].values
+        notnull = self.dataset["landflag"].values == 1
+        iuzno = self.dataset["iuzno"].values
         nrow = notnull.sum()
         # Define the numpy structured array dtype
         index_spec = [("iuzno", np.int32)]

@@ -43,7 +43,6 @@ class SpecificStorage(Package):
         Boolean to indicate if the model is transient or steady-state.
     """
 
-    __slots__ = ("specific_storage", "specific_yield", "convertible", "transient")
     _pkg_id = "sto"
     _grid_data = {
         "convertible": np.int32,
@@ -59,10 +58,10 @@ class SpecificStorage(Package):
 
     def __init__(self, specific_storage, specific_yield, transient, convertible):
         super(__class__, self).__init__()
-        self["specific_storage"] = specific_storage
-        self["specific_yield"] = specific_yield
-        self["convertible"] = convertible
-        self["transient"] = transient
+        self.dataset["specific_storage"] = specific_storage
+        self.dataset["specific_yield"] = specific_yield
+        self.dataset["convertible"] = convertible
+        self.dataset["transient"] = transient
 
     def render(self, directory, pkgname, globaltimes):
         d = {}
@@ -74,13 +73,13 @@ class SpecificStorage(Package):
                 d[f"{key}_layered"], d[key] = layered, value
 
         periods = {}
-        if "time" in self["transient"].coords:
-            package_times = self["transient"].coords["time"].values
+        if "time" in self.dataset["transient"].coords:
+            package_times = self.dataset["transient"].coords["time"].values
             starts = np.searchsorted(globaltimes, package_times) + 1
             for i, s in enumerate(starts):
-                periods[s] = self["transient"].isel(time=i).values[()]
+                periods[s] = self.dataset["transient"].isel(time=i).values[()]
         else:
-            periods[1] = self["transient"].values[()]
+            periods[1] = self.dataset["transient"].values[()]
 
         d["periods"] = periods
 
@@ -131,7 +130,6 @@ class StorageCoefficient(Package):
         Boolean to indicate if the model is transient or steady-state.
     """
 
-    __slots__ = ("storage_coefficient", "specific_yield", "convertible", "transient")
     _pkg_id = "sto"
     _grid_data = {
         "convertible": np.int32,
@@ -147,10 +145,10 @@ class StorageCoefficient(Package):
 
     def __init__(self, storage_coefficient, specific_yield, transient, convertible):
         super(__class__, self).__init__()
-        self["storage_coefficient"] = storage_coefficient
-        self["specific_yield"] = specific_yield
-        self["convertible"] = convertible
-        self["transient"] = transient
+        self.dataset["storage_coefficient"] = storage_coefficient
+        self.dataset["specific_yield"] = specific_yield
+        self.dataset["convertible"] = convertible
+        self.dataset["transient"] = transient
 
     def render(self, directory, pkgname, globaltimes):
         d = {}
@@ -162,13 +160,13 @@ class StorageCoefficient(Package):
                 d[f"{key}_layered"], d[key] = layered, value
 
         periods = {}
-        if "time" in self["transient"].coords:
-            package_times = self["transient"].coords["time"].values
+        if "time" in self.dataset["transient"].coords:
+            package_times = self.dataset["transient"].coords["time"].values
             starts = np.searchsorted(globaltimes, package_times) + 1
             for i, s in enumerate(starts):
-                periods[s] = self["transient"].isel(time=i).values[()]
+                periods[s] = self.dataset["transient"].isel(time=i).values[()]
         else:
-            periods[1] = self["transient"].values[()]
+            periods[1] = self.dataset["transient"].values[()]
 
         d["periods"] = periods
         d["storagecoefficient"] = True
