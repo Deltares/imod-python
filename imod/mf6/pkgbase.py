@@ -29,6 +29,9 @@ class Package(abc.ABC):
     def __getitem__(self, key):
         return self.dataset.__getitem__(key)
 
+    def __setitem__(self, key):
+        return self.dataset.__setitem__(key)
+
     def _valid(self, value):
         """
         Filters values that are None, False, or a numpy.bool_ False.
