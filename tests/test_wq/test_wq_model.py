@@ -460,9 +460,7 @@ def test_render_groups__ghb_riv_wel(basicmodel):
 
 
 def test_render_groups__double_gbh(basicmodel):
-    # TODO: copy method provides a shallow copy. Rigorous enough?
-    # See: https://docs.python.org/3/library/stdtypes.html#dict.copy
-    m = basicmodel.copy()
+    m = deepcopy(basicmodel)
     ghbhead = m["ghb"]["head"].copy()
     m["ghb2"] = imod.wq.GeneralHeadBoundary(
         head=ghbhead,
@@ -593,7 +591,7 @@ def test_render_ssm_rch_constant(basicmodel):
 
 
 def test_render_transportsolver(basicmodel):
-    m = basicmodel
+    m = deepcopy(basicmodel)
     directory = pathlib.Path(".")
 
     compare = textwrap.dedent(
@@ -657,7 +655,7 @@ def test_mxsscount_incongruent_icbund(basicmodel):
 
 
 def test_highest_active_recharge(basicmodel):
-    m = basicmodel
+    m = deepcopy(basicmodel)
     n_sinkssources = m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert np.array_equal(m["rch"]._ssm_layers, np.array([1]))
     assert n_sinkssources == 25 + 25 + 25 + 25
@@ -687,9 +685,13 @@ def test_write__stress_repeats(basicmodel, tmp_path):
     m = deepcopy(basicmodel)
 
     # Remove last timestep of recharge package
-    m["rch"] = m["rch"].isel(time=slice(None, 4))
+    m["rch"] = imod.wq.RechargeHighestActive(
+        **m["rch"].dataset.isel(time=slice(None, 4))
+    )
 
-    stress_repeats = {m["evt"].time.values[4]: m["evt"].time.values[0]}
+    stress_repeats = {
+        m["evt"].dataset["time"].values[4]: m["evt"].dataset["time"].values[0]
+    }
     m["rch"].repeat_stress(rate=stress_repeats)
 
     m.time_discretization("2000-01-06")

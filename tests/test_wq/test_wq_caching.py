@@ -45,8 +45,8 @@ def test_from_file(test_timelayerda, tmp_path):
     # TODO: zip fails on CI for some reason?
     # river_zarrzippath = tmp_path / "river.zip"
 
-    river.to_netcdf(river_ncpath)
-    river.to_zarr(river_zarrpath)
+    river.dataset.to_netcdf(river_ncpath)
+    river.dataset.to_zarr(river_zarrpath)
     # river.to_zarr(zarr.ZipStore(river_zarrzippath, mode="w"))
 
     # Test kwargs also
@@ -65,7 +65,7 @@ def test_cached_river__max_n(test_timelayerda, tmp_path):
     da = test_timelayerda
     river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da)
     riverpath = tmp_path / "river.nc"
-    river.to_netcdf(riverpath)
+    river.dataset.to_netcdf(riverpath)
     nlayer, nrow, ncol = test_timelayerda.isel(time=0).shape
     expected = river._max_active_n("conductance", nlayer, nrow, ncol)
 
@@ -89,7 +89,7 @@ def test_cached_river__max_n(test_timelayerda, tmp_path):
     # Change river
     time.sleep(2.0)  # sleep two seconds so the modification time is different
     cached_river._dataset.close()
-    river.to_netcdf(riverpath)
+    river.dataset.to_netcdf(riverpath)
     cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._filehashes["riv"] = cached_river._filehashself
     actual4 = cached_river._max_active_n("conductance", nlayer, nrow, ncol)
@@ -122,7 +122,7 @@ def test_cached_river__check(test_timelayerda, tmp_path):
     da = test_timelayerda
     river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da)
     riverpath = tmp_path / "river.nc"
-    river.to_netcdf(riverpath)
+    river.dataset.to_netcdf(riverpath)
     river._pkgcheck()
 
     # Only tests whether it runs without erroring
@@ -135,7 +135,7 @@ def test_cached_river__check(test_timelayerda, tmp_path):
 
     time.sleep(2.0)  # sleep two seconds so the modification time is different
     cached_river._dataset.close()
-    river.to_netcdf(riverpath)
+    river.dataset.to_netcdf(riverpath)
     cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._pkgcheck()
     cached_river._pkgcheck()
@@ -166,7 +166,7 @@ def test_cached_river__save(test_timelayerda, tmp_path):
     riverpath = tmp_path / "river.nc"
     river = imod.wq.River(stage=da, conductance=da, bottom_elevation=da, density=da)
     # Default save for checking
-    river.to_netcdf(riverpath)
+    river.dataset.to_netcdf(riverpath)
 
     my_cache = tmp_path / "my-cache"
     cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
@@ -206,7 +206,7 @@ def test_cached_river__save(test_timelayerda, tmp_path):
     # SAVING: Input is new. Saving anew.
     time.sleep(2.0)  # sleep two seconds so the modification time is different
     cached_river._dataset.close()
-    river.to_netcdf(riverpath)
+    river.dataset.to_netcdf(riverpath)
     cached_river = imod.wq.River.from_file(riverpath, my_cache, 2)
     cached_river._render(
         directory=tmp_path / "cached-riv",
@@ -318,12 +318,12 @@ def henry_write(tmp_path):
 def henry_write_cache(tmp_path):
     bas, lpf, btn, adv, dsp, vdf, wel, pcg, gcg, oc = henry_input()
     # Store all data
-    bas.to_netcdf(tmp_path / "bas.nc")
-    lpf.to_netcdf(tmp_path / "lpf.nc")
-    btn.to_netcdf(tmp_path / "btn.nc")
-    adv.to_netcdf(tmp_path / "adv.nc")
-    dsp.to_netcdf(tmp_path / "dsp.nc")
-    wel.to_netcdf(tmp_path / "wel.nc")
+    bas.dataset.to_netcdf(tmp_path / "bas.nc")
+    lpf.dataset.to_netcdf(tmp_path / "lpf.nc")
+    btn.dataset.to_netcdf(tmp_path / "btn.nc")
+    adv.dataset.to_netcdf(tmp_path / "adv.nc")
+    dsp.dataset.to_netcdf(tmp_path / "dsp.nc")
+    wel.dataset.to_netcdf(tmp_path / "wel.nc")
     # Now load again
     my_cache = tmp_path / "my-cache"
     bas2 = imod.wq.BasicFlow.from_file(tmp_path / "bas.nc", my_cache)
@@ -351,12 +351,12 @@ def henry_write_cache(tmp_path):
 def henry_write_cache_zarr(tmp_path):
     bas, lpf, btn, adv, dsp, vdf, wel, pcg, gcg, oc = henry_input()
     # Store all data
-    bas.to_netcdf(tmp_path / "bas.nc")
-    lpf.to_netcdf(tmp_path / "lpf.nc")
-    btn.to_netcdf(tmp_path / "btn.nc")
-    adv.to_netcdf(tmp_path / "adv.nc")
-    dsp.to_netcdf(tmp_path / "dsp.nc")
-    wel.to_netcdf(tmp_path / "wel.nc")
+    bas.dataset.to_netcdf(tmp_path / "bas.nc")
+    lpf.dataset.to_netcdf(tmp_path / "lpf.nc")
+    btn.dataset.to_netcdf(tmp_path / "btn.nc")
+    adv.dataset.to_netcdf(tmp_path / "adv.nc")
+    dsp.dataset.to_netcdf(tmp_path / "dsp.nc")
+    wel.dataset.to_netcdf(tmp_path / "wel.nc")
     # Now load again
     my_cache = tmp_path / "my-cache"
     bas2 = imod.wq.BasicFlow.from_file(tmp_path / "bas.nc", my_cache)
