@@ -140,7 +140,9 @@ class Model(collections.UserDict):
         directory = pathlib.Path(directory)
         for pkgname, pkg in self.items():
             try:
-                pkg.to_netcdf(directory / pattern.format(pkgname=pkgname), **kwargs)
+                pkg.dataset.to_netcdf(
+                    directory / pattern.format(pkgname=pkgname), **kwargs
+                )
             except Exception as e:
                 raise RuntimeError(
                     "Package {pkgname} can not be written to NetCDF"
@@ -199,7 +201,7 @@ class Model(collections.UserDict):
     def _delete_empty_packages(self, verbose=False):
         to_del = []
         for pkg in self.keys():
-            dv = list(self[pkg].data_vars)[0]
+            dv = list(self[pkg].dataset.data_vars)[0]
             if not self[pkg][dv].notnull().any().compute():
                 if verbose:
                     warnings.warn(
@@ -294,7 +296,7 @@ class SeawatModel(Model):
         return package_groups
 
     def _hastime(self, pkg):
-        return (pkg._pkg_id == "wel" and "time" in pkg) or (
+        return (pkg._pkg_id == "wel" and "time" in pkg.dataset) or (
             "time" in pkg.dataset.coords
         )
 
@@ -526,7 +528,7 @@ class SeawatModel(Model):
         baskey = self._get_pkgkey("bas6")
         btnkey = self._get_pkgkey("btn")
         diskey = self._get_pkgkey("dis")
-        self[btnkey]["thickness"] = self[baskey].thickness()
+        self[btnkey].dataset["thickness"] = self[baskey].thickness()
 
         if btnkey is None:
             raise ValueError("No BasicTransport package provided.")
@@ -562,8 +564,8 @@ class SeawatModel(Model):
     def _bas_btn_rch_evt_mal_tvc_sinkssources(self):
         baskey = self._get_pkgkey("bas6")
         btnkey = self._get_pkgkey("btn")
-        ibound = self[baskey]["ibound"]
-        icbund = self[btnkey]["icbund"]
+        ibound = self[baskey].dataset["ibound"]
+        icbund = self[btnkey].dataset["icbund"]
         n_extra = int(((ibound < 0) | (icbund < 0)).sum())
 
         nlayer, nrow, ncol = ibound.shape
@@ -855,7 +857,7 @@ class SeawatModel(Model):
         >>> clipped = ml.clip(extent, heads, conc_interpolated)
         """
         baskey = self._get_pkgkey("bas6")
-        like = self.dataset[baskey]["ibound"].isel(layer=0).squeeze(drop=True)
+        like = self[baskey].dataset["ibound"].isel(layer=0).squeeze(drop=True)
 
         if isinstance(extent, (list, tuple)):
             xmin, xmax, ymin, ymax = extent
