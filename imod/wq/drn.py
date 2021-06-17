@@ -19,7 +19,6 @@ class Drainage(BoundaryCondition):
         Default is False.
     """
 
-    __slots__ = ("elevation", "conductance", "save_budget")
     _pkg_id = "drn"
 
     _mapping = (("elevation", "elevation"), ("cond", "conductance"))

@@ -26,14 +26,6 @@ class River(BoundaryCondition):
         Default is False.
     """
 
-    __slots__ = (
-        "stage",
-        "conductance",
-        "bottom_elevation",
-        "density",
-        "concentration",
-        "save_budget",
-    )
     _pkg_id = "riv"
 
     _mapping = (
@@ -63,7 +55,7 @@ class River(BoundaryCondition):
 
     def _pkgcheck(self, ibound=None):
         to_check = ["conductance", "density"]
-        if "concentration" in self.data_vars:
+        if "concentration" in self.dataset.data_vars:
             to_check.append("concentration")
         self._check_positive(to_check)
 
@@ -71,7 +63,7 @@ class River(BoundaryCondition):
         to_check.append("bottom_elevation")
         self._check_location_consistent(to_check)
 
-        if (self["bottom_elevation"] > self["stage"]).any():
+        if (self.dataset["bottom_elevation"] > self.dataset["stage"]).any():
             raise ValueError(
                 "Bottom elevation in {self} should not be higher than stage"
             )

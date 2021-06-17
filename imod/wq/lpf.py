@@ -98,20 +98,6 @@ class LayerPropertyFlow(Package):
         Default value: 1.0e20.
     """
 
-    __slots__ = (
-        "k_horizontal",
-        "k_vertical",
-        "horizontal_anisotropy",
-        "interblock",
-        "layer_type",
-        "specific_storage",
-        "specific_yield",
-        "save_budget",
-        "layer_wet",
-        "interval_wet",
-        "method_wet",
-        "head_dry",
-    )
     _pkg_id = "lpf"
 
     _mapping = (
@@ -174,18 +160,20 @@ class LayerPropertyFlow(Package):
     def _render(self, directory, nlayer, *args, **kwargs):
         d = {}
         # Don't include absentee members
-        mapping = tuple([(k, v) for k, v in self._mapping if v in self.data_vars])
+        mapping = tuple(
+            [(k, v) for k, v in self._mapping if v in self.dataset.data_vars]
+        )
         d["mapping"] = mapping
         dicts = {}
 
         da_vars = [t[1] for t in self._mapping]
-        for varname in self.data_vars.keys():
+        for varname in self.dataset.data_vars.keys():
             if varname in da_vars:
                 dicts[varname] = self._compose_values_layer(
                     varname, directory, nlayer=nlayer
                 )
             else:
-                d[varname] = self[varname].values
+                d[varname] = self.dataset[varname].values
                 if varname == "save_budget" or varname == "method_wet":
                     self._replace_keyword(d, varname)
         d["dicts"] = dicts

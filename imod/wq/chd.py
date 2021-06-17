@@ -21,7 +21,6 @@ class ConstantHead(BoundaryCondition):
         Default is False.
     """
 
-    __slots__ = ("head_start", "head_end", "concentration", "save_budget")
     _pkg_id = "chd"
     _mapping = (("shead", "head_start"), ("ehead", "head_end"))
 
