@@ -32,6 +32,20 @@ class Package(abc.ABC):
     def __setitem__(self, key, value):
         self.dataset.__setitem__(key, value)
 
+    def isel(self):
+        raise NotImplementedError(
+            f"Selection on packages not yet supported. "
+            f"To make a selection on the xr.Dataset, call {self._pkg_id}.dataset.isel instead. "
+            f"You can create a new package with a selection by calling {__class__.__name__}(**{self._pkg_id}.dataset.isel(**selection))"
+        )
+
+    def sel(self):
+        raise NotImplementedError(
+            f"Selection on packages not yet supported. "
+            f"To make a selection on the xr.Dataset, call {self._pkg_id}.dataset.sel instead. "
+            f"You can create a new package with a selection by calling {__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
+        )
+
     def _valid(self, value):
         """
         Filters values that are None, False, or a numpy.bool_ False.
