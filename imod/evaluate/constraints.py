@@ -142,7 +142,8 @@ def _calculate_intra_cell_dt(
     """Calculate intra-cell dt by assuming a flux from a higher source_stage to a lower sink_stage,
     ignoring other head influences. Use limiting (lowest) conductance. eff_volume is the effective
     volume per cell (cell volume * effective porosity)"""
-    cond = xr.ufuncs.minimum(source_cond, sink_cond)
+    source_cond, sink_cond = xr.align(source_cond, sink_cond, join="inner", copy=False)
+    cond = np.minimum(source_cond, sink_cond)
     Q = cond * (source_stage - sink_stage)
     Q = Q.where(source_stage > sink_stage)
 
@@ -219,6 +220,10 @@ def intra_cell_boundary_conditions(
     # determine effective volume
     if "dz" not in top_bot:
         top_bot["dz"] = top_bot["top"] - top_bot["bot"]
+
+    if (top_bot["dz"] <= 0.0).any():
+        raise ValueError("Cells with thickness <= 0 present in top_bot Dataset.")
+
     eff_volume = top_bot["dz"] * top_bot.dx * np.abs(top_bot.dy) * porosity
 
     def _get_stage_name(sid):
@@ -245,9 +250,9 @@ def intra_cell_boundary_conditions(
 
                 dt = _calculate_intra_cell_dt(
                     source_stage=source[_get_stage_name(sourceid)],
-                    source_cond=source["conductance"],
+                    source_cond=source["conductance"].load(),
                     sink_stage=sink[_get_stage_name(sinkid)],
-                    sink_cond=sink["conductance"],
+                    sink_cond=sink["conductance"].load(),
                     eff_volume=eff_volume,
                 )
 

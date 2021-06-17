@@ -99,3 +99,20 @@ def test_intra_cell_boundary_conditions(test_da1):
             (ghbdrn, riv1drn), pd.Index(["ghb-drn", "riv_0-drn"], name="combination")
         )
     )
+
+
+def test_intra_cell_boundary_conditions_thickness_zero(test_da1):
+    top_bot = xr.Dataset({"top": test_da1 * -1.0, "bot": test_da1 * -1.0})
+    riv1 = xr.Dataset(
+        {
+            "stage": test_da1 * 1.0,
+            "conductance": test_da1 * 100.0,
+            "bottom_elevation": test_da1 * 0.0,
+        }
+    )
+    drn = xr.Dataset({"elevation": test_da1 * 0.0, "conductance": test_da1 * 150.0})
+
+    with pytest.raises(ValueError):
+        _ = imod.evaluate.intra_cell_boundary_conditions(
+            top_bot, porosity=0.3, riv=[riv1], drn=drn, drop_allnan=True
+        )
