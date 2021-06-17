@@ -30,8 +30,6 @@ class Package(abc.ABC):
     keyword argument by integer arguments for SEAWAT.
     """
 
-    __slots__ = ("_template", "_pkg_id", "_keywords", "_mapping", "_dataset")
-
     @classmethod
     def from_file(cls, path, cache_path=None, cache_verbose=0, **kwargs):
         """
@@ -151,7 +149,7 @@ class Package(abc.ABC):
             The rendered runfile part for a single boundary condition system.
         """
         d = {
-            k: v.values for k, v in self.data_vars.items()
+            k: v.values for k, v in self.dataset.data_vars.items()
         }  # pylint: disable=no-member
         if hasattr(self, "_keywords"):
             for key in self._keywords.keys():
@@ -373,14 +371,14 @@ class Package(abc.ABC):
             warnings.warn(msg, RuntimeWarning)
 
     def _check_location_consistent(self, varnames):
-        dims = set(self.dims)
+        dims = set(self.dataset.dims)
         is_scalar = {}
         for var in varnames:
             scalar = (self.dataset[var].shape == ()) or not any(
                 dim in self.dataset[var].dims for dim in ["time", "layer", "y", "x"]
             )
             if not scalar:  # skip scalar value
-                dims = dims.intersection(self[var].dims)
+                dims = dims.intersection(self.dataset[var].dims)
             is_scalar[var] = scalar
 
         is_nan = True
@@ -461,7 +459,6 @@ class BoundaryCondition(Package, abc.ABC):
     * drainage
     """
 
-    __slots__ = ("_cellcount", "_ssm_cellcount", "_ssm_layers")
     _template = jinja2.Template(
         "    {%- for name, dictname in mapping -%}"
         "        {%- for time, timedict in dicts[dictname].items() -%}"
@@ -491,7 +488,7 @@ class BoundaryCondition(Package, abc.ABC):
 
     def _repeat_stress(self, varname, value, use_cftime):
         if value is not None:
-            if varname not in self.dataset:
+            if varname not in self.dataset.data_vars:
                 raise ValueError(
                     f"{varname} does not occur in {self}\n cannot repeat stress"
                 )
@@ -547,9 +544,9 @@ class BoundaryCondition(Package, abc.ABC):
         if da is None:
             da = self.dataset[varname]
 
-        if "time" in da.dataset.coords:
-            da_times = da.dataset.coords["time"].values
-            if "stress_repeats" in da.dataset.attrs:
+        if "time" in da.coords:
+            da_times = da.coords["time"].values
+            if "stress_repeats" in da.attrs:
                 stress_repeats_keys = np.array(list(da.attrs["stress_repeats"].keys()))
                 stress_repeats_values = np.array(
                     list(da.attrs["stress_repeats"].values())
@@ -609,7 +606,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         # Second, compute active number of sinks and sources
         # overwite _ssm_cellcount if more specific info is available.
-        if "concentration" in self.dataset:
+        if "concentration" in self.dataset.data_vars:
             da = self["concentration"]
 
             if "species" in da.coords:
@@ -694,7 +691,7 @@ class BoundaryCondition(Package, abc.ABC):
             The rendered runfile SSM part for a single boundary condition system.
         """
 
-        if "concentration" not in self.dataset:
+        if "concentration" not in self.dataset.data_vars:
             return ""
 
         d = {"pkg_id": self._pkg_id}
