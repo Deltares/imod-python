@@ -109,10 +109,12 @@ def stability_constraint_advection(front, lower, right, top_bot, porosity=0.3, R
 
     if "dz" not in top_bot:
         top_bot["dz"] = top_bot["top"] - top_bot["bot"]
-
+    # dz between layers is 0.5*dz_up + 0.5*dz_down
+    dz_m = top_bot.dz.rolling(layer=2, min_periods=2).mean()
+    dz_m = dz_m.shift(layer=-1)
 
     # assert all dz positive - Issue #140
-    if not np.all(dz.values[~np.isnan(dz.values)] >= 0):
+    if not np.all(dz_m.values[~np.isnan(dz_m.values)] >= 0):
         raise ValueError("All dz values should be positive")
 
     # absolute velocities (m/d)
@@ -123,7 +125,7 @@ def stability_constraint_advection(front, lower, right, top_bot, porosity=0.3, R
     # dt of constituents (d)
     dt_x = R / (abs_v_x / top_bot.dx)
     dt_y = R / (abs_v_y / np.abs(top_bot.dy))
-    dt_z = R / (abs_v_z / dz)
+    dt_z = R / (abs_v_z / dz_m)
 
     # overall dt due to advection criterion (d)
     dt = 1.0 / (1.0 / dt_x + 1.0 / dt_y + 1.0 / dt_z)
