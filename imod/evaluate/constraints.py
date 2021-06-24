@@ -119,11 +119,10 @@ def stability_constraint_advection(front, lower, right, top_bot, porosity=0.3, R
     abs_v_y = np.abs(qs_y / porosity)
     abs_v_z = np.abs(qs_z / porosity)
 
-    # dt of constituents (d)
-    dt_x = R / (abs_v_x / top_bot.dx)
-    dt_y = R / (abs_v_y / np.abs(top_bot.dy))
-    dt_z = R / (abs_v_z / top_bot.dz)
-    dt_z = dt_z.where(~np.isinf(dt_z))
+    # dt of constituents (d), set zero velocities to nans
+    dt_x = R / (abs_v_x.where(abs_v_x > 0) / top_bot.dx)
+    dt_y = R / (abs_v_y.where(abs_v_y > 0) / np.abs(top_bot.dy))
+    dt_z = R / (abs_v_z.where(abs_v_z > 0) / top_bot.dz)
 
     # overall dt due to advection criterion (d)
     dt = 1.0 / (1.0 / dt_x + 1.0 / dt_y + 1.0 / dt_z)
