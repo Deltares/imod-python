@@ -15,6 +15,14 @@ from imod.wq import timeutil
 from .caching import caching
 
 
+def monkeypatch_method(cls):
+    def decorator(func):
+        setattr(cls, func.__name__, func)
+        return func
+
+    return decorator
+
+
 class Package(abc.ABC):
     """
     Base package for the different SEAWAT packages.
@@ -88,20 +96,39 @@ class Package(abc.ABC):
         else:
             cls._dataset = xr.open_dataset(path, **kwargs)
 
-        pkg_kwargs = {var: cls._dataset[var] for var in cls._dataset.data_vars}
-        if cache_path is None:
-            return cls(**pkg_kwargs)
-        else:
-            # Dynamically construct a CachingPackage
-            # Note:
-            #    "a method cannot be decorated at class definition, because when
-            #    the class is instantiated, the first argument (self) is bound,
-            #    and no longer accessible to the Memory object."
-            # See: https://joblib.readthedocs.io/en/latest/memory.html
-            cache_path = pathlib.Path(cache_path)
-            cache = joblib.Memory(cache_path, verbose=cache_verbose)
-            CachingPackage = caching(cls, cache)
-            return CachingPackage(path, **pkg_kwargs)
+        # Monkeypatch class setitem to prevent costly dropna for all-nan layers at initialisation
+        # https://mail.python.org/pipermail/python-dev/2008-January/076194.html
+        # Note that the 'automagical' layer check does not work for 'from_file' packages
+        # Within try-finally to make sure the original is always restored
+        _org_setitem = cls.__setitem__
+        try:
+
+            @monkeypatch_method(cls)
+            def __setitem__(self, key, value):
+                super(__class__, self).__setitem__(key, value)
+
+            pkg_kwargs = {var: cls._dataset[var] for var in cls._dataset.data_vars}
+            if cache_path is None:
+                return_cls = cls(**pkg_kwargs)
+            else:
+                # Dynamically construct a CachingPackage
+                # Note:
+                #    "a method cannot be decorated at class definition, because when
+                #    the class is instantiated, the first argument (self) is bound,
+                #    and no longer accessible to the Memory object."
+                # See: https://joblib.readthedocs.io/en/latest/memory.html
+                cache_path = pathlib.Path(cache_path)
+                cache = joblib.Memory(cache_path, verbose=cache_verbose)
+                CachingPackage = caching(cls, cache)
+                return_cls = CachingPackage(path, **pkg_kwargs)
+
+        finally:
+            # Monkeypatch setitem back to what it was
+            @monkeypatch_method(cls)
+            def __setitem__(self, key, value):
+                return _org_setitem(self, key, value)
+
+        return return_cls
 
     def __init__(self):
         self.dataset = xr.Dataset()

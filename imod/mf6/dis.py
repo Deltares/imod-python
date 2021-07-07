@@ -38,9 +38,9 @@ class StructuredDiscretization(Package):
 
     def __init__(self, top, bottom, idomain):
         super(__class__, self).__init__()
+        self.dataset["idomain"] = idomain
         self.dataset["top"] = top
         self.dataset["bottom"] = bottom
-        self.dataset["idomain"] = idomain
 
     def _delrc(self, dx):
         """
