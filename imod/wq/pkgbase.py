@@ -3,7 +3,6 @@ import pathlib
 import warnings
 
 import jinja2
-import joblib
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -11,8 +10,6 @@ import xarray as xr
 import imod
 from imod import util
 from imod.wq import timeutil
-
-from .caching import caching
 
 
 def monkeypatch_method(cls):
@@ -39,23 +36,16 @@ class Package(abc.ABC):
     """
 
     @classmethod
-    def from_file(cls, path, cache_path=None, cache_verbose=0, **kwargs):
+    def from_file(cls, path, **kwargs):
         """
-        Loads an imod-wq package from a file (currently only netcdf is supported).
-
-        This enables caching of intermediate input and should result in much
-        faster model.write() times. To enable caching, provide a path to a
-        ``joblib.Memory`` caching directory.
+        Loads an imod-wq package from a file (currently only netcdf and zarr are supported).
+        Note that it is expected that this file was saved with imod.wq.Package.save(),
+        as the checks upon package initialization are not done again!
 
         Parameters
         ----------
         path : str, pathlib.Path
             Path to the file.
-        cache_path : str, pathlib.Path, optional
-            The path to the ``joblib.Memory`` caching dir where intermediate answers are stored.
-        cache_verbose : int
-            Verbosity flag of ``joblib.Memory``, controls the debug messages that are issued as
-            functions are evaluated.
         **kwargs : keyword arguments
             Arbitrary keyword arguments forwarded to ``xarray.open_dataset()``, or
             ``xarray.open_zarr()``.
@@ -63,9 +53,8 @@ class Package(abc.ABC):
 
         Returns
         -------
-        package : imod.wq.Package, imod.wq.CachingPackage
-            Returns a package with data loaded from file. Returns a CachingPackage
-            if a path to a ``joblib.Memory`` caching directory has been provided for ``cache``.
+        package : imod.wq.Package
+            Returns a package with data loaded from file.
 
         Examples
         --------
@@ -74,59 +63,27 @@ class Package(abc.ABC):
 
         >>> river = imod.wq.River.from_file("river.nc")
 
-        To load a package, and enable caching:
-
-        >>> cache = "./.cache_dir"
-        >>> river = imod.wq.River.from_file("river.nc", cache)
-
         For large datasets, you likely want to process it in chunks. You can
         forward keyword arguments to ``xarray.open_dataset()`` or
         ``xarray.open_zarr()``:
 
-        >>> cache = "./.cache_dir"
-        >>> river = imod.wq.River.from_file("river.nc", cache, chunks={"time": 1})
+        >>> river = imod.wq.River.from_file("river.nc", chunks={"time": 1})
 
         Refer to the xarray documentation for the possible keyword arguments.
         """
         path = pathlib.Path(path)
 
+        # See https://stackoverflow.com/a/2169191
+        # We expect the data in the netcdf has been saved a a package
+        # thus the checks run by __init__ and __setitem__ do not have
+        # to be called again.
+        return_cls = cls.__new__(cls)
+
         if path.suffix in (".zip", ".zarr"):
             # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
-            cls._dataset = xr.open_zarr(str(path), **kwargs)
+            return_cls.dataset = xr.open_zarr(str(path), **kwargs)
         else:
-            cls._dataset = xr.open_dataset(path, **kwargs)
-
-        # Monkeypatch class setitem to prevent costly dropna for all-nan layers at initialisation
-        # https://mail.python.org/pipermail/python-dev/2008-January/076194.html
-        # Note that the 'automagical' layer check does not work for 'from_file' packages
-        # Within try-finally to make sure the original is always restored
-        _org_setitem = cls.__setitem__
-        try:
-
-            @monkeypatch_method(cls)
-            def __setitem__(self, key, value):
-                super(__class__, self).__setitem__(key, value)
-
-            pkg_kwargs = {var: cls._dataset[var] for var in cls._dataset.data_vars}
-            if cache_path is None:
-                return_cls = cls(**pkg_kwargs)
-            else:
-                # Dynamically construct a CachingPackage
-                # Note:
-                #    "a method cannot be decorated at class definition, because when
-                #    the class is instantiated, the first argument (self) is bound,
-                #    and no longer accessible to the Memory object."
-                # See: https://joblib.readthedocs.io/en/latest/memory.html
-                cache_path = pathlib.Path(cache_path)
-                cache = joblib.Memory(cache_path, verbose=cache_verbose)
-                CachingPackage = caching(cls, cache)
-                return_cls = CachingPackage(path, **pkg_kwargs)
-
-        finally:
-            # Monkeypatch setitem back to what it was
-            @monkeypatch_method(cls)
-            def __setitem__(self, key, value):
-                return _org_setitem(self, key, value)
+            return_cls.dataset = xr.open_dataset(path, **kwargs)
 
         return return_cls
 
