@@ -1,5 +1,6 @@
 import abc
 import pathlib
+from typing_extensions import NotRequired
 import warnings
 
 import jinja2
@@ -71,6 +72,14 @@ class Package(abc.ABC):
 
         Refer to the xarray documentation for the possible keyword arguments.
         """
+
+        # Throw error if user tries to use old functionality
+        if "cache" in kwargs:
+            if kwargs["cache"] is not None:
+                raise NotImplementedError(
+                    "Caching functionality in pkg.from_file() is removed."
+                )
+
         path = pathlib.Path(path)
 
         # See https://stackoverflow.com/a/2169191
