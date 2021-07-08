@@ -1,6 +1,5 @@
 import abc
 import pathlib
-from typing_extensions import NotRequired
 import warnings
 
 import jinja2
