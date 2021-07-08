@@ -4,11 +4,9 @@ from imod.mf6.pkgbase import Package
 
 
 class Storage(Package):
-    __slots__ = ()  # to quell FutureWarning
-
     def __init__(*args, **kwargs):
-        raise DeprecationWarning(
-            r"Storage package has been deprecated. Use SpecificStorage or StorageCoefficient instead."
+        raise NotImplementedError(
+            r"Storage package has been removed. Use SpecificStorage or StorageCoefficient instead."
         )
 
 
