@@ -13,14 +13,6 @@ from imod import util
 from imod.wq import timeutil
 
 
-def monkeypatch_method(cls):
-    def decorator(func):
-        setattr(cls, func.__name__, func)
-        return func
-
-    return decorator
-
-
 class Package(abc.ABC):
     """
     Base package for the different SEAWAT packages.
