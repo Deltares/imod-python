@@ -23,6 +23,66 @@ class Package(abc.ABC):
 
     __slots__ = ("_template", "_pkg_id", "_period_data")
 
+    @classmethod
+    def from_file(cls, path, **kwargs):
+        """
+        Loads an imod mf6 package from a file (currently only netcdf and zarr are supported).
+        Note that it is expected that this file was saved with imod.mf6.Package.dataset.to_netcdf(),
+        as the checks upon package initialization are not done again!
+
+        Parameters
+        ----------
+        path : str, pathlib.Path
+            Path to the file.
+        **kwargs : keyword arguments
+            Arbitrary keyword arguments forwarded to ``xarray.open_dataset()``, or
+            ``xarray.open_zarr()``.
+        Refer to the examples.
+
+        Returns
+        -------
+        package : imod.mf6.Package
+            Returns a package with data loaded from file.
+
+        Examples
+        --------
+
+        To load a package from a file, e.g. a River package:
+
+        >>> river = imod.mf6.River.from_file("river.nc")
+
+        For large datasets, you likely want to process it in chunks. You can
+        forward keyword arguments to ``xarray.open_dataset()`` or
+        ``xarray.open_zarr()``:
+
+        >>> river = imod.mf6.River.from_file("river.nc", chunks={"time": 1})
+
+        Refer to the xarray documentation for the possible keyword arguments.
+        """
+
+        # Throw error if user tries to use old functionality
+        if "cache" in kwargs:
+            if kwargs["cache"] is not None:
+                raise NotImplementedError(
+                    "Caching functionality in pkg.from_file() is removed."
+                )
+
+        path = pathlib.Path(path)
+
+        # See https://stackoverflow.com/a/2169191
+        # We expect the data in the netcdf has been saved a a package
+        # thus the checks run by __init__ and __setitem__ do not have
+        # to be called again.
+        return_cls = cls.__new__(cls)
+
+        if path.suffix in (".zip", ".zarr"):
+            # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
+            return_cls.dataset = xr.open_zarr(str(path), **kwargs)
+        else:
+            return_cls.dataset = xr.open_dataset(path, **kwargs)
+
+        return return_cls
+
     def __init__(self):
         self.dataset = xr.Dataset()
 
