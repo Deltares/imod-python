@@ -606,34 +606,43 @@ class BoundaryCondition(Package, abc.ABC):
 
         da = self[varname]
 
-        if ("time" in self.dataset.coords) or (pkggroup_times is not None):
-            runfile_times, starts = self._get_runfile_times(
+        # Check if time defined for one variable in package
+        # iMODFLOW's projectfile requires all variables for every timestep
+        if self._hastime():
+            compose_with_time = True
+            times_for_path, starts = self._get_runfile_times(
                 da, globaltimes, ds_times=pkggroup_times
             )
+        # Catch case where the package has no time, but another
+        # package in the group has. So the path has no time, but
+        # needs a time entry in the composition
+        elif pkggroup_times is not None:
+            compose_with_time = True
+            _, starts = self._get_runfile_times(
+                da, globaltimes, ds_times=pkggroup_times
+            )
+            times_for_path = [None] * len(starts)
+        else:
+            compose_with_time = False
 
-            for time, start in zip(runfile_times, starts):
+        if compose_with_time:
+            for time, start in zip(times_for_path, starts):
+                composed_layers = self._compose_values_layer(
+                    varname, directory, nlayer, time=time
+                )
                 if compose_projectfile == True:
-                    values[self._pkg_id][start][varname][
-                        system_index
-                    ] = self._compose_values_layer(
-                        varname, directory, nlayer, time=time
-                    )
+                    values[self._pkg_id][start][varname][system_index] = composed_layers
                 else:  # render runfile
-                    values[start][self._pkg_id][varname][
-                        system_index
-                    ] = self._compose_values_layer(
-                        varname, directory, nlayer, time=time
-                    )
+                    values[start][self._pkg_id][varname][system_index] = composed_layers
 
         else:
+            composed_layers = self._compose_values_layer(
+                varname, directory, nlayer, time=None
+            )
             if compose_projectfile == True:
-                values[self._pkg_id]["1"][varname][
-                    system_index
-                ] = self._compose_values_layer(varname, directory, nlayer, time=None)
+                values[self._pkg_id]["1"][varname][system_index] = composed_layers
             else:  # render runfile
-                values["1"][self._pkg_id][varname][
-                    system_index
-                ] = self._compose_values_layer(varname, directory, nlayer, time=None)
+                values["1"][self._pkg_id][varname][system_index] = composed_layers
 
         return values
 
