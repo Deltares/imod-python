@@ -28,6 +28,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
         self, directory, globaltimes, nlayer, compose_projectfile=True, composition=None
     ):
         are_periodic = [pkg._is_periodic() for pkg in self.values()]
+        have_time = [pkg._hastime() for pkg in self.values()]
 
         # Raise error if one system is periodic and one is not
         all_or_not_any_periodic = all(are_periodic) or (not any(are_periodic))
@@ -38,7 +39,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
                 "Please insert all systems as periodic or not. "
             )
 
-        if not any(are_periodic):
+        if (not any(are_periodic)) & (any(have_time)):
             pkggroup_times, _ = insert_unique_package_times(self.items())
         else:
             # FUTURE: We could catch edge case here where different periods
