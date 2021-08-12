@@ -678,7 +678,7 @@ def initialize_nested_dict(depth):
         return collections.defaultdict(dict)
     else:
         d = functools.partial(collections.defaultdict, dict)
-        for _ in range(depth - 1):
+        for _ in range(depth - 2):
             d = functools.partial(collections.defaultdict, d)
         return collections.defaultdict(d)
 
@@ -705,6 +705,36 @@ def set_nested(d, keys, value):
         d[keys[0]] = value
     else:
         set_nested(d[keys[0]], keys[1:], value)
+
+
+def append_nesteddict(dict1, dict2):
+    """
+    Recursively walk through two dicts to append dict2 to dict1.
+
+    Mutates dict1
+
+    Modified from:
+    https://stackoverflow.com/a/58742155
+
+    Parameters
+    ----------
+    dict1 : nested dict
+        Nested dict to be appended to
+    dict2 : nested dict
+        Nested dict to append
+
+    """
+    for key, val in dict1.items():
+        if isinstance(val, dict):
+            if key in dict2 and isinstance(dict2[key], dict):
+                append_nesteddict(dict1[key], dict2[key])
+        else:
+            if key in dict2:
+                dict1[key] = dict2[key]
+
+    for key, val in dict2.items():
+        if not key in dict1:
+            dict1[key] = val
 
 
 def sorted_nested_dict(d):
