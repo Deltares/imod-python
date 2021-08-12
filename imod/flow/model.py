@@ -350,7 +350,7 @@ class ImodflowModel(Model):
                 globaltimes,
                 nlayer,
             )
-            util.append_nesteddict(composition, group_composition)
+            util.append_nested_dict(composition, group_composition)
 
         for key, package in self.items():
             if package._pkg_id not in group_pkg_ids:
@@ -359,7 +359,7 @@ class ImodflowModel(Model):
                     globaltimes,
                     nlayer,
                 )
-                util.append_nesteddict(composition, package_composition)
+                util.append_nested_dict(composition, package_composition)
 
         return composition
 

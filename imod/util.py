@@ -707,7 +707,7 @@ def set_nested(d, keys, value):
         set_nested(d[keys[0]], keys[1:], value)
 
 
-def append_nesteddict(dict1, dict2):
+def append_nested_dict(dict1, dict2):
     """
     Recursively walk through two dicts to append dict2 to dict1.
 
@@ -727,7 +727,7 @@ def append_nesteddict(dict1, dict2):
     for key, val in dict1.items():
         if isinstance(val, dict):
             if key in dict2 and isinstance(dict2[key], dict):
-                append_nesteddict(dict1[key], dict2[key])
+                append_nested_dict(dict1[key], dict2[key])
         else:
             if key in dict2:
                 dict1[key] = dict2[key]

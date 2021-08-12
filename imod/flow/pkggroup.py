@@ -55,7 +55,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
                 system_index=system_index,
                 pkggroup_time=pkggroup_times,
             )
-            util.append_nesteddict(composition, composed_pkg)
+            util.append_nested_dict(composition, composed_pkg)
 
         return composition
 
