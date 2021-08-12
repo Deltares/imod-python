@@ -25,20 +25,12 @@ class Package(
     Every package contains a ``_pkg_id`` for identification.  Used to check for
     duplicate entries, or to group multiple systems together (riv, ghb, drn).
 
-    The ``_template_runfile`` attribute is the template for a section of the
-    runfile.  This is filled in based on the metadata from the DataArrays that
-    are within the Package. Same applies to ``_template_projectfile`` for the
-    projectfile.
+    The ``_template_projectfile`` attribute is the template for a section of the
+    projectfile.  This is filled in based on the metadata from the DataArrays that
+    are within the Package.
     """
 
     __slots__ = ("_pkg_id", "_variable_order", "dataset")
-
-    # TODO Runfile template not implemented yet
-    _template_runfile = jinja2.Template(
-        "{%- for layer, path in variable_data %}\n"
-        '{{layer}}, 1.0, 0.0, "{{path}}"\n'
-        "{%- endfor %}\n"
-    )
 
     _template_projectfile = jinja2.Template(
         "0001, ({{pkg_id}}), 1, {{name}}, {{variable_order}}\n"
@@ -180,7 +172,7 @@ class Package(
         ----------
         directory : str
             Path to working directory, where files will be written.
-            Necessary to generate the paths for the runfile.
+            Necessary to generate the paths for the projectfile.
         globaltimes : list #TODO make this an *arg, change order.
             Not used, only included to comply with BoundaryCondition.compose
         nlayer : int
@@ -229,7 +221,7 @@ class Package(
             variable name of the DataArray
         directory : str
             Path to working directory, where files will be written.
-            Necessary to generate the paths for the runfile.
+            Necessary to generate the paths for the projectfile.
         nlayer : int
             Amount of layers
         time : datetime like, optional
@@ -314,16 +306,6 @@ class Package(
             if part of PkgGroup: for a single boundary condition system.
         """
         return self._template_projectfile.render(**kwargs)
-
-    def _render_runfile(self, **kwargs):
-        """
-        Returns
-        -------
-        rendered : str
-            The rendered runfile part,
-            if part of PkgGroup: for a single boundary condition system.
-        """
-        return self._template.render(**kwargs)
 
     def save(self, directory):
         for name, da in self.dataset.data_vars.items():  # pylint: disable=no-member
@@ -517,13 +499,31 @@ class BoundaryCondition(Package, abc.ABC):
         """
         Composes all variables for one system.
 
+        Parameters
+        ----------
+        globaltimes : list, np.array
+            Holds the global times, i.e. the combined unique times of every
+            boundary condition that are used to define the stress periods.  The
+            times of the BoundaryCondition do not have to match all the global
+            times. When a globaltime is not present in the BoundaryCondition,
+            the value of the first previous available time is filled in. The
+            effective result is a forward fill in time.
+        directory : str
+            Path to working directory, where files will be written.  Necessary
+            to generate the paths for the projectfile.
+        nlayer : int
+            Number of layers
+        system_index : int
+            System number. Defaults to 1, but for package groups it is used
+        pkggroup_times : optional, list, np.array
+            Holds the package_group times.  Packages in one group need to be
+            synchronized for iMODFLOW.
+
         Returns
         -------
         composition : defaultdict
             A nested dictionary containing following the projectfile hierarchy:
             ``{_pkg_id : {stress_period : {varname : {system_index : {lay_nr : value}}}}}``
-            or runfile hierarchy:
-            ``{stress_period : {_pkg_id : {varname : {system_index : {lay_nr : value}}}}}``
             where 'value' can be a scalar or a path to a file.
             The stress period number may be the wildcard '?'.
         """
@@ -570,7 +570,7 @@ class BoundaryCondition(Package, abc.ABC):
             effective result is a forward fill in time.
         directory : str
             Path to working directory, where files will be written.  Necessary
-            to generate the paths for the runfile.
+            to generate the paths for the projectfile.
         nlayer : int
             Number of layers
         system_index : int
