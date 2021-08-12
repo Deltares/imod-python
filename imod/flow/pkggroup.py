@@ -2,8 +2,8 @@ import abc
 import collections
 import enum
 
-from imod.flow.pkgbase import Vividict
 from imod.flow.timeutil import insert_unique_package_times
+import imod.util as util
 
 
 class PackageGroup(collections.UserDict, abc.ABC):
@@ -24,9 +24,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
             self[k] = v
         # self.reorder_keys()
 
-    def compose(
-        self, directory, globaltimes, nlayer, compose_projectfile=True, composition=None
-    ):
+    def compose(self, directory, globaltimes, nlayer):
         are_periodic = [pkg._is_periodic() for pkg in self.values()]
         have_time = [pkg._hastime() for pkg in self.values()]
 
@@ -46,20 +44,18 @@ class PackageGroup(collections.UserDict, abc.ABC):
             # specified for different systems. This is uncommon practice.
             pkggroup_times = None
 
-        if composition is None:
-            composition = Vividict()
+        composition = util.initialize_nested_dict(5)
 
         for i, (key, pkg) in enumerate(self.items()):
             system_index = i + 1
-            pkg.compose(
+            composed_pkg = pkg.compose(
                 directory.joinpath(key),
                 globaltimes,
                 nlayer,
                 system_index=system_index,
-                compose_projectfile=compose_projectfile,
-                composition=composition,
                 pkggroup_time=pkggroup_times,
             )
+            util.append_nesteddict(composition, composed_pkg)
 
         return composition
 
