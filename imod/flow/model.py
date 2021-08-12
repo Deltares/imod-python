@@ -383,9 +383,7 @@ class ImodflowModel(Model):
 
         content = []
 
-        composition = self._compose_all_packages(
-            directory, globaltimes
-        )
+        composition = self._compose_all_packages(directory, globaltimes)
 
         times_composed = self._compose_timestrings(globaltimes)
 
