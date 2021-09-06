@@ -134,7 +134,8 @@ class Package(abc.ABC):
         return env.get_template(fname)
 
     def write_blockfile(self, directory, pkgname, *args):
-        content = self.render(directory, pkgname, *args)
+        dir_for_render = pathlib.Path(directory.stem)
+        content = self.render(dir_for_render, pkgname, *args)
         filename = directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
