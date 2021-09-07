@@ -130,17 +130,12 @@ class ImodflowModel(Model):
         Group multiple systems of a single package E.g. all river or drainage
         sub-systems
         """
-        groups = {}
-        has_group = set()
+        groups = collections.defaultdict(dict)
         groupable = set(self._PACKAGE_GROUPS.__members__.keys())
         for key, package in self.items():
             pkg_id = package._pkg_id
             if pkg_id in groupable:
-                if pkg_id in has_group:  # already exists
-                    groups[pkg_id][key] = package
-                else:
-                    groups[pkg_id] = {key: package}
-                    has_group.update([pkg_id])
+                groups[pkg_id][key] = package
 
         package_groups = []
         for pkg_id, group in groups.items():
