@@ -55,7 +55,7 @@ class StructuredDiscretization(Package):
             raise ValueError(f"Unhandled type of {dx}")
 
     def render(self, directory, pkgname, *args, **kwargs):
-        disdirectory = directory / "dis"
+        disdirectory = directory / pkgname
         d = {}
         x = self.dataset["idomain"].coords["x"]
         y = self.dataset["idomain"].coords["y"]
