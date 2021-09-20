@@ -1,9 +1,9 @@
 begin options
-{%- if print_input is defined -%}  print_input{%- endif -%}
+{% if print_input is defined %}  print_input{% endif %}
 end options
 
 begin dimensions
-  maxhfb {{maxhfb}}
+  maxhfb {{maxbound}}
 end dimensions
 
 {% for i, path in periods.items() %}begin period {{i}}

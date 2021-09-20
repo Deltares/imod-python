@@ -26,3 +26,4 @@ from imod.mf6.sto import Storage, StorageCoefficient, SpecificStorage
 from imod.mf6.timedis import TimeDiscretization
 from imod.mf6.uzf import UnsaturatedZoneFlow
 from imod.mf6.wel import Well
+from imod.mf6.hfb import HorizontalFlowBarrier
