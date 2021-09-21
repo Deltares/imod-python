@@ -3,6 +3,7 @@ from imod.ugrid_utils.snapping import snap_to_grid
 import geopandas as gpd
 import pandas as pd
 import numpy as np
+import io
 
 
 class HorizontalFlowBarrier(BoundaryCondition):
@@ -127,6 +128,60 @@ class HorizontalFlowBarrier(BoundaryCondition):
 
         return snapped_gdf
 
+    def render(self, directory, pkgname, globaltimes):
+        """Render fills in the template only, doesn't write binary data"""
+        d = {}
+
+        # period = {1: f"{directory}/{self._pkg_id}-{i}.bin"}
+
+        bin_ds = self.dataset[list(self._period_data)]
+
+        sparse_data = self.to_sparse(self.dataset.to_dataframe())
+        d["periods"] = {1: self.listarr_to_string(sparse_data)}
+        # construct the rest (dict for render)
+        d = self.get_options(d)
+
+        d["maxbound"] = self._max_active_n()
+
+        return self._template.render(d)
+
+    def _get_field_spec_from_dtype(self, listarr):
+        """
+        From https://stackoverflow.com/questions/21777125/how-to-output-dtype-to-a-list-or-dict
+        """
+        return [
+            (x, y[0])
+            for x, y in sorted(listarr.dtype.fields.items(), key=lambda k: k[1])
+        ]
+
+    def listarr_to_string(self, sparse_data):
+        """
+        based on write_file for Advanced Stress Packages
+        """
+
+        s = io.StringIO()
+
+        textformat = self.get_textformat(sparse_data)
+        np.savetxt(s, sparse_data, delimiter=" ", fmt=textformat)
+
+        return s.getvalue()
+
+    def get_textformat(self, sparse_data):
+        field_spec = self._get_field_spec_from_dtype(sparse_data)
+        dtypes = list(zip(*field_spec))[1]
+        textformat = []
+        for dtype in dtypes:
+            if np.issubdtype(dtype, np.integer):  # integer
+                textformat.append("%4d")
+            elif np.issubdtype(dtype, np.inexact):  # floatish
+                textformat.append("%6.3f")
+            else:
+                raise ValueError(
+                    "Data should be a subdatatype of either 'np.integer' or 'np.inexact'"
+                )
+        textformat = " ".join(textformat)
+        return textformat
+
     def to_sparse(self, gdf):
         """Convert pandas table to numpy sparse table"""
         sparse_dtype = [
@@ -139,7 +194,11 @@ class HorizontalFlowBarrier(BoundaryCondition):
             ("hc", np.float64),
         ]
         colnames = list(list(zip(*sparse_dtype))[0])
-        listarr = gdf[colnames].values.astype(sparse_dtype)
+
+        nrow = len(gdf.index)
+        listarr = np.empty(nrow, dtype=sparse_dtype)
+        for colname in colnames:
+            listarr[colname] = gdf[colname]
 
         return listarr
 
@@ -147,10 +206,11 @@ class HorizontalFlowBarrier(BoundaryCondition):
         """
         Writes a modflow6 binary data file
         """
-        sparse_data = self.to_sparse(self.dataset.to_dataframe())
-        outpath.parent.mkdir(exist_ok=True, parents=True)
+        # sparse_data = self.to_sparse(self.dataset.to_dataframe())
+        # outpath.parent.mkdir(exist_ok=True, parents=True)
 
-        self._write_file(outpath, sparse_data)
+        # self._write_file(outpath, sparse_data)
+        pass  # Do not write file, data already in render
 
     def _pkgcheck(self):
         # TODO: Check if not multiple HFB packages are specified.
