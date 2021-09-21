@@ -174,7 +174,7 @@ class HorizontalFlowBarrier(BoundaryCondition):
             if np.issubdtype(dtype, np.integer):  # integer
                 textformat.append("%4d")
             elif np.issubdtype(dtype, np.inexact):  # floatish
-                textformat.append("%6.3f")
+                textformat.append("%e")
             else:
                 raise ValueError(
                     "Data should be a subdatatype of either 'np.integer' or 'np.inexact'"
