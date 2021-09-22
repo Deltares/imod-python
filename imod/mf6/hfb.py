@@ -128,23 +128,6 @@ class HorizontalFlowBarrier(BoundaryCondition):
 
         return snapped_gdf
 
-    def render(self, directory, pkgname, globaltimes):
-        """Render fills in the template only, doesn't write binary data"""
-        d = {}
-
-        # period = {1: f"{directory}/{self._pkg_id}-{i}.bin"}
-
-        bin_ds = self.dataset[list(self._period_data)]
-
-        sparse_data = self.to_sparse(self.dataset.to_dataframe())
-        d["periods"] = {1: self.listarr_to_string(sparse_data)}
-        # construct the rest (dict for render)
-        d = self.get_options(d)
-
-        d["maxbound"] = self._max_active_n()
-
-        return self._template.render(d)
-
     def _get_field_spec_from_dtype(self, listarr):
         """
         From https://stackoverflow.com/questions/21777125/how-to-output-dtype-to-a-list-or-dict
@@ -154,17 +137,12 @@ class HorizontalFlowBarrier(BoundaryCondition):
             for x, y in sorted(listarr.dtype.fields.items(), key=lambda k: k[1])
         ]
 
-    def listarr_to_string(self, sparse_data):
+    def _write_file(self, outpath, sparse_data):
         """
-        based on write_file for Advanced Stress Packages
+        Write to textfile, which is necessary for Advanced Stress Packages and HFB
         """
-
-        s = io.StringIO()
-
         textformat = self.get_textformat(sparse_data)
-        np.savetxt(s, sparse_data, delimiter=" ", fmt=textformat)
-
-        return s.getvalue()
+        np.savetxt(outpath, sparse_data, delimiter=" ", fmt=textformat)
 
     def get_textformat(self, sparse_data):
         field_spec = self._get_field_spec_from_dtype(sparse_data)
@@ -206,11 +184,9 @@ class HorizontalFlowBarrier(BoundaryCondition):
         """
         Writes a modflow6 binary data file
         """
-        # sparse_data = self.to_sparse(self.dataset.to_dataframe())
-        # outpath.parent.mkdir(exist_ok=True, parents=True)
-
-        # self._write_file(outpath, sparse_data)
-        pass  # Do not write file, data already in render
+        sparse_data = self.to_sparse(self.dataset.to_dataframe())
+        outpath.parent.mkdir(exist_ok=True, parents=True)
+        self._write_file(outpath, sparse_data)
 
     def _pkgcheck(self):
         # TODO: Check if not multiple HFB packages are specified.
