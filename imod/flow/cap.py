@@ -292,8 +292,11 @@ class MetaSwap(Package):
     def _pkgcheck(self, active_cells=None):
         # Dataset.dims does not return a tuple, like DataArray does.
         # http://xarray.pydata.org/en/stable/generated/xarray.Dataset.dims.html
-        dims = tuple(self.dataset.dims.keys())
         # Frozen(SortedKeysDict).keys() does not preserve ordering in keys
-        if dims != ("x", "y"):
+        # Therefore convert to set and check for symmetric difference,
+        # to see if any dimensions are missing or unexpected dimensions are included.
+        dims = set(self.dataset.dims.keys())
+
+        if len(dims.symmetric_difference(("y", "x"))) > 0:
             raise ValueError(f'Dataset dims not ("y", "x"), instead got {dims}')
         self.check_lookup_and_forcing_files()

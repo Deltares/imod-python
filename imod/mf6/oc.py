@@ -52,16 +52,20 @@ class OutputControl(Package):
         self["save_budget"] = save_budget
 
     def _get_ocsetting(self, setting):
-        """ """
-        if isinstance(setting, int):
+        """Get oc setting based on its type. If integers return f'frequency {setting}', if"""
+        if isinstance(setting, (int, np.integer)) and not isinstance(setting, bool):
             return f"frequency {setting}"
         elif isinstance(setting, str):
             if setting.lower() in ["first", "last", "all"]:
                 return setting.lower()
-
-        raise TypeError(
-            f"Output Control setting should be either integer or string in ['first', 'last', 'all'], instead got {setting}"
-        )
+            else:
+                raise ValueError(
+                    f"Output Control received wrong string. String should be one of ['first', 'last', 'all'], instead got {setting}"
+                )
+        else:
+            raise TypeError(
+                f"Output Control setting should be either integer or string in ['first', 'last', 'all'], instead got {setting}"
+            )
 
     def render(self, directory, pkgname, globaltimes):
         d = {}

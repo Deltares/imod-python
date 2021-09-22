@@ -5,6 +5,8 @@ import numpy as np
 import xarray as xr
 
 import imod
+import pytest
+import re
 
 
 def test_render_string():
@@ -75,6 +77,26 @@ def test_render_int():
         """
     )
     assert actual == expected
+
+
+def test_render_bool_fail():
+    oc = imod.mf6.OutputControl(save_head=True, save_budget=False)
+    directory = pathlib.Path("mymodel")
+    globaltimes = [np.datetime64("2000-01-01")]
+
+    expected_message = "Output Control setting should be either integer or string in ['first', 'last', 'all'], instead got True"
+    with pytest.raises(TypeError, match=re.escape(expected_message)):
+        actual = oc.render(directory, "outputcontrol", globaltimes)
+
+
+def test_render_string_fail():
+    oc = imod.mf6.OutputControl(save_head="foo", save_budget="bar")
+    directory = pathlib.Path("mymodel")
+    globaltimes = [np.datetime64("2000-01-01")]
+
+    expected_message = "Output Control received wrong string. String should be one of ['first', 'last', 'all'], instead got foo"
+    with pytest.raises(ValueError, match=re.escape(expected_message)):
+        actual = oc.render(directory, "outputcontrol", globaltimes)
 
 
 def test_render_mixed_two_timesteps():
