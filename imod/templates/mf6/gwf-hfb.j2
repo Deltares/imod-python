@@ -6,7 +6,6 @@ begin dimensions
   maxhfb {{maxbound}}
 end dimensions
 
-{% for i, file in periods.items() %}
-begin period {{i}}
+{% for i, file in periods.items() %}begin period {{i}}
   open/close {{file}}
 end period{% endfor %}
