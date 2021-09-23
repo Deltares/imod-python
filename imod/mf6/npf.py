@@ -174,27 +174,6 @@ class NodePropertyFlow(Package):
         Default is False.
     """
 
-    __slots__ = (
-        "icelltype",
-        "k",
-        "rewet",
-        "rewet_layer",
-        "rewet_factor",
-        "rewet_iterations",
-        "rewet_method",
-        "k22",
-        "k33",
-        "angle1",
-        "angle2",
-        "angle3",
-        "cell_averaging",
-        "save_flows",
-        "starting_head_as_confined_thickness",
-        "variable_vertical_conductance",
-        "dewatered",
-        "perched",
-        "save_specific_discharge",
-    )
     _pkg_id = "npf"
     _grid_data = {
         "icelltype": np.int32,
@@ -248,36 +227,38 @@ class NodePropertyFlow(Package):
                 "rewet_layer, rewet_factor, rewet_iterations, and rewet_method should"
                 " all be left at a default value of None if rewet is False."
             )
-        self["icelltype"] = icelltype
-        self["k"] = k
-        self["rewet"] = rewet
-        self["rewet_layer"] = rewet_layer
-        self["rewet_factor"] = rewet_factor
-        self["rewet_iterations"] = rewet_iterations
-        self["rewet_method"] = rewet_method
-        self["k22"] = k22
-        self["k33"] = k33
-        self["angle1"] = angle1
-        self["angle2"] = angle2
-        self["angle3"] = angle3
-        self["cell_averaging"] = cell_averaging
-        self["save_flows"] = save_flows
-        self[
+        self.dataset["icelltype"] = icelltype
+        self.dataset["k"] = k
+        self.dataset["rewet"] = rewet
+        self.dataset["rewet_layer"] = rewet_layer
+        self.dataset["rewet_factor"] = rewet_factor
+        self.dataset["rewet_iterations"] = rewet_iterations
+        self.dataset["rewet_method"] = rewet_method
+        self.dataset["k22"] = k22
+        self.dataset["k33"] = k33
+        self.dataset["angle1"] = angle1
+        self.dataset["angle2"] = angle2
+        self.dataset["angle3"] = angle3
+        self.dataset["cell_averaging"] = cell_averaging
+        self.dataset["save_flows"] = save_flows
+        self.dataset[
             "starting_head_as_confined_thickness"
         ] = starting_head_as_confined_thickness
-        self["variable_vertical_conductance"] = variable_vertical_conductance
-        self["dewatered"] = dewatered
-        self["perched"] = perched
-        self["save_specific_discharge"] = save_specific_discharge
+        self.dataset["variable_vertical_conductance"] = variable_vertical_conductance
+        self.dataset["dewatered"] = dewatered
+        self.dataset["perched"] = perched
+        self.dataset["save_specific_discharge"] = save_specific_discharge
 
     def render(self, directory, pkgname, *args, **kwargs):
         d = {}
         npfdirectory = directory / "npf"
-        for varname in self.data_vars:
+        for varname in self.dataset.data_vars:
             key = self._keyword_map.get(varname, varname)
 
             if varname in self._grid_data:
-                layered, value = self._compose_values(self[varname], npfdirectory, key)
+                layered, value = self._compose_values(
+                    self.dataset[varname], npfdirectory, key
+                )
                 if self._valid(value):  # skip False or None
                     d[f"{key}_layered"], d[key] = layered, value
             else:

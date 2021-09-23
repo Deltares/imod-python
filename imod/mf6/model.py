@@ -58,7 +58,9 @@ class GroundwaterFlowModel(Model):
         Also checks if datetime types are homogeneous across packages.
         """
         types = [
-            type(pkg["time"].values[0]) for pkg in self.values() if "time" in pkg.coords
+            type(pkg.dataset["time"].values[0])
+            for pkg in self.values()
+            if "time" in pkg.dataset.coords
         ]
         set_of_types = set(types)
         # Types will be empty if there's no time dependent input
@@ -81,33 +83,37 @@ class GroundwaterFlowModel(Model):
     def _yield_times(self):
         modeltimes = []
         for pkg in self.values():
-            if "time" in pkg.coords:
-                modeltimes.append(pkg["time"].values)
+            if "time" in pkg.dataset.coords:
+                modeltimes.append(pkg.dataset["time"].values)
         return modeltimes
 
-    def render(self, modeldirectory):
+    def render(self, modelname):
         """Render model namefile"""
+        dir_for_render = pathlib.Path(modelname)
         d = {"newton": self.newton, "under_relaxation": self.under_relaxation}
         packages = []
         for pkgname, pkg in self.items():
             # Add the six to the package id
             pkg_id = pkg._pkg_id
             key = f"{pkg_id}6"
-            path = modeldirectory / f"{pkgname}.{pkg_id}"
+            path = dir_for_render / f"{pkgname}.{pkg_id}"
             packages.append((key, path.as_posix()))
         d["packages"] = packages
         return self._template.render(d)
 
-    def write(self, modelname, globaltimes):
+    def write(self, wdir, modelname, globaltimes):
         """
         Write model namefile
         Write packages
         """
-        modeldirectory = pathlib.Path(modelname)
+
+        wdir = pathlib.Path(wdir)
+
+        modeldirectory = wdir / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
 
         # write model namefile
-        namefile_content = self.render(modeldirectory)
+        namefile_content = self.render(modelname)
         namefile_path = modeldirectory / f"{modelname}.nam"
         with open(namefile_path, "w") as f:
             f.write(namefile_content)
@@ -143,7 +149,7 @@ class GroundwaterFlowModel(Model):
         pkgnames = [
             pkgname
             for pkgname, pkg in self.items()
-            if all(i in pkg.dims for i in ["x", "y"])
+            if all(i in pkg.dataset.dims for i in ["x", "y"])
         ]
 
         data_paths = []

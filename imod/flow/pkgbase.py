@@ -4,12 +4,10 @@ import pathlib
 import cftime
 import imod
 import jinja2
-import joblib
 import numpy as np
 import xarray as xr
 from imod import util
 from imod.flow import timeutil
-from imod.wq import caching
 
 
 class Vividict(dict):
@@ -79,23 +77,16 @@ class Package(
         return self.dataset.__getitem__(key)
 
     @classmethod
-    def from_file(cls, path, cache_path=None, cache_verbose=0, **kwargs):
+    def from_file(cls, path, **kwargs):
         """
-        Loads an imod-wq package from a file (currently only netcdf is supported).
-
-        This enables caching of intermediate input and should result in much
-        faster model.write() times. To enable caching, provide a path to a
-        ``joblib.Memory`` caching directory.
+        Loads an imod-flow package from a file (currently only netcdf and zarr are supported).
+        Note that it is expected that this file was saved with imod.flow.Package.save(),
+        as the checks upon package initialization are not done again!
 
         Parameters
         ----------
         path : str, pathlib.Path
             Path to the file.
-        cache_path : str, pathlib.Path, optional
-            The path to the ``joblib.Memory`` caching dir where intermediate answers are stored.
-        cache_verbose : int
-            Verbosity flag of ``joblib.Memory``, controls the debug messages that are issued as
-            functions are evaluated.
         **kwargs : keyword arguments
             Arbitrary keyword arguments forwarded to ``xarray.open_dataset()``, or
             ``xarray.open_zarr()``.
@@ -103,53 +94,47 @@ class Package(
 
         Returns
         -------
-        package : imod.wq.Package, imod.wq.CachingPackage
-            Returns a package with data loaded from file. Returns a CachingPackage
-            if a path to a ``joblib.Memory`` caching directory has been provided for ``cache``.
+        package : imod.flow.Package
+            Returns a package with data loaded from file.
 
         Examples
         --------
 
         To load a package from a file, e.g. a River package:
 
-        >>> river = imod.wq.River.from_file("river.nc")
-
-        To load a package, and enable caching:
-
-        >>> cache = "./.cache_dir"
-        >>> river = imod.wq.River.from_file("river.nc", cache)
+        >>> river = imod.flow.River.from_file("river.nc")
 
         For large datasets, you likely want to process it in chunks. You can
         forward keyword arguments to ``xarray.open_dataset()`` or
         ``xarray.open_zarr()``:
 
-        >>> cache = "./.cache_dir"
-        >>> river = imod.wq.River.from_file("river.nc", cache, chunks={"time": 1})
+        >>> river = imod.flow.River.from_file("river.nc", chunks={"time": 1})
 
         Refer to the xarray documentation for the possible keyword arguments.
         """
+
+        # Throw error if user tries to use old functionality
+        if "cache" in kwargs:
+            if kwargs["cache"] is not None:
+                raise NotImplementedError(
+                    "Caching functionality in pkg.from_file() is removed."
+                )
+
         path = pathlib.Path(path)
+
+        # See https://stackoverflow.com/a/2169191
+        # We expect the data in the netcdf has been saved a a package
+        # thus the checks run by __init__ and __setitem__ do not have
+        # to be called again.
+        return_cls = cls.__new__(cls)
 
         if path.suffix in (".zip", ".zarr"):
             # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
-            cls._dataset = xr.open_zarr(str(path), **kwargs)
+            return_cls.dataset = xr.open_zarr(str(path), **kwargs)
         else:
-            cls._dataset = xr.open_dataset(path, **kwargs)
+            return_cls.dataset = xr.open_dataset(path, **kwargs)
 
-        pkg_kwargs = {var: cls._dataset[var] for var in cls._dataset.data_vars}
-        if cache_path is None:
-            return cls(**pkg_kwargs)
-        else:
-            # Dynamically construct a CachingPackage
-            # Note:
-            #    "a method cannot be decorated at class definition, because when
-            #    the class is instantiated, the first argument (self) is bound,
-            #    and no longer accessible to the Memory object."
-            # See: https://joblib.readthedocs.io/en/latest/memory.html
-            cache_path = pathlib.Path(cache_path)
-            cache = joblib.Memory(cache_path, verbose=cache_verbose)
-            CachingPackage = caching(cls, cache)
-            return CachingPackage(path, **pkg_kwargs)
+        return return_cls
 
     # TODO:
     # def __getattribute__(self, name):
@@ -181,6 +166,20 @@ class Package(
     def _hastime(self):
         return (self._pkg_id == "wel" and "time" in self.dataset) or (
             "time" in self.dataset.coords
+        )
+
+    def isel(self):
+        raise NotImplementedError(
+            f"Selection on packages not yet supported. "
+            f"To make a selection on the xr.Dataset, call {self._pkg_id}.dataset.isel instead. "
+            f"You can create a new package with a selection by calling {__class__.__name__}(**{self._pkg_id}.dataset.isel(**selection))"
+        )
+
+    def sel(self):
+        raise NotImplementedError(
+            f"Selection on packages not yet supported. "
+            f"To make a selection on the xr.Dataset, call {self._pkg_id}.dataset.sel instead. "
+            f"You can create a new package with a selection by calling {__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
 
     def compose(self, directory, globaltimes, nlayer, composition=None, **ignored):

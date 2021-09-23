@@ -28,8 +28,8 @@ def ghb_group():
         save_budget=False,
     )
     ghb1 = headboundary
-    ghb2 = headboundary.copy().drop(["concentration", "density"])
-    ghb3 = ghb2.copy()
+    ghb2 = GeneralHeadBoundary(**headboundary.dataset.copy().drop(["concentration"]))
+    ghb3 = GeneralHeadBoundary(**ghb2.dataset.copy())
     d = {"primary": ghb1, "secondary": ghb2, "tertiary": ghb3}
 
     ghb_group = GeneralHeadBoundaryGroup(**d)
@@ -51,8 +51,10 @@ def test_render(ghb_group):
             ghbssmdens_p?_s1_l$ = primary/density_l$.idf
             bhead_p?_s2_l$ = secondary/head_l$.idf
             cond_p?_s2_l$ = secondary/conductance_l$.idf
+            ghbssmdens_p?_s2_l$ = secondary/density_l$.idf
             bhead_p?_s3_l$ = tertiary/head_l$.idf
-            cond_p?_s3_l$ = tertiary/conductance_l$.idf"""
+            cond_p?_s3_l$ = tertiary/conductance_l$.idf
+            ghbssmdens_p?_s3_l$ = tertiary/density_l$.idf"""
     )
     assert (
         group.render(directory, globaltimes=["?"], nlayer=nlayer, nrow=nrow, ncol=ncol)
@@ -78,7 +80,7 @@ def test_render_error__concentration_twice(ghb_group):
         save_budget=False,
     )
     ghb1 = headboundary
-    ghb2 = headboundary.copy()
+    ghb2 = GeneralHeadBoundary(**headboundary.dataset.copy())
     d = {"primary": ghb1, "secondary": ghb2}
 
     with pytest.raises(ValueError):
@@ -105,8 +107,8 @@ def test_render__count_nolayer():
         save_budget=False,
     )
     ghb1 = headboundary
-    ghb2 = headboundary.copy().drop(["concentration", "density"])
-    ghb3 = ghb2.copy()
+    ghb2 = GeneralHeadBoundary(**headboundary.dataset.copy().drop(["concentration"]))
+    ghb3 = GeneralHeadBoundary(**ghb2.dataset.copy())
     d = {"primary": ghb1, "secondary": ghb2, "tertiary": ghb3}
     group = GeneralHeadBoundaryGroup(**d)
     nlayer, nrow, ncol = (3, 5, 5)
@@ -125,8 +127,10 @@ def test_render__count_nolayer():
             ghbssmdens_p?_s1_l? = primary/density.idf
             bhead_p?_s2_l? = secondary/head.idf
             cond_p?_s2_l? = secondary/conductance.idf
+            ghbssmdens_p?_s2_l? = secondary/density.idf
             bhead_p?_s3_l? = tertiary/head.idf
-            cond_p?_s3_l? = tertiary/conductance.idf"""
+            cond_p?_s3_l? = tertiary/conductance.idf
+            ghbssmdens_p?_s3_l? = tertiary/density.idf"""
     )
     assert (
         group.render(directory, globaltimes=["?"], nlayer=nlayer, nrow=nrow, ncol=ncol)

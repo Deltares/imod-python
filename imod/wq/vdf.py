@@ -80,18 +80,6 @@ class VariableDensityFlow(Package):
         conserve fluid mass are calculated using an upstream-weighted algorithm.
     """
 
-    __slots__ = (
-        "density_concentration_slope",
-        "density_species",
-        "density_min",
-        "density_max",
-        "density_ref",
-        "density_criterion",
-        "read_density",
-        "internodal",
-        "coupling",
-        "correct_water_table",
-    )
     _pkg_id = "vdf"
 
     _template = (

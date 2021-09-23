@@ -27,6 +27,8 @@ dependencies:
   - pip
   - pip:
     - declxml
+    - numba_celltree
+  - pygeos
   - pyproj
   - pytest
   - pytest-benchmark

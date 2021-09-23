@@ -12,7 +12,6 @@ class TimeVaryingConstantConcentration(BoundaryCondition):
     concentration: xr.DataArray of floats
     """
 
-    __slots__ = ("concentration",)
     _pkg_id = "tvc"
 
     def __init__(self, concentration):

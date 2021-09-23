@@ -42,16 +42,16 @@ def _generate_layer_ids(pkgnames):
 
 def _create_groups(pkg, data_vars, aggregate_layers):
     """Create unique groups for each data variable - layer combination"""
-    if ("layer" in pkg.dims) and not aggregate_layers:
-        layers = pkg.layer.values
+    if ("layer" in pkg.dataset.dims) and not aggregate_layers:
+        layers = pkg.dataset["layer"].values
     else:
         layers = [1]  # Exception for recharge package
     return list(product(data_vars, layers))
 
 
 def _data_range_per_data_var(pkg, data_vars):
-    data_min = dict([(var, float(pkg[var].min())) for var in data_vars])
-    data_max = dict([(var, float(pkg[var].max())) for var in data_vars])
+    data_min = dict([(var, float(pkg.dataset[var].min())) for var in data_vars])
+    data_max = dict([(var, float(pkg.dataset[var].max())) for var in data_vars])
     return data_min, data_max
 
 
@@ -135,7 +135,7 @@ def _create_maplayers(
             ),
         )
 
-        if "time" in pkg.dims:
+        if "time" in pkg.dataset.dims:
             maplayer_kwargs["provider"] = qgs.Provider(time_unit="3")
             maplayer_kwargs["temporal"] = temporal
         else:

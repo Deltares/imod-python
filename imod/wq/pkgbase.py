@@ -3,7 +3,6 @@ import pathlib
 import warnings
 
 import jinja2
-import joblib
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -12,18 +11,8 @@ import imod
 from imod import util
 from imod.wq import timeutil
 
-from .caching import caching
 
-
-def monkeypatch_method(cls):
-    def decorator(func):
-        setattr(cls, func.__name__, func)
-        return func
-
-    return decorator
-
-
-class Package(xr.Dataset, abc.ABC):
+class Package(abc.ABC):
     """
     Base package for the different SEAWAT packages.
     Every package contains a ``_pkg_id`` for identification.
@@ -38,26 +27,17 @@ class Package(xr.Dataset, abc.ABC):
     keyword argument by integer arguments for SEAWAT.
     """
 
-    __slots__ = ("_template", "_pkg_id", "_keywords", "_mapping", "_dataset")
-
     @classmethod
-    def from_file(cls, path, cache_path=None, cache_verbose=0, **kwargs):
+    def from_file(cls, path, **kwargs):
         """
-        Loads an imod-wq package from a file (currently only netcdf is supported).
-
-        This enables caching of intermediate input and should result in much
-        faster model.write() times. To enable caching, provide a path to a
-        ``joblib.Memory`` caching directory.
+        Loads an imod-wq package from a file (currently only netcdf and zarr are supported).
+        Note that it is expected that this file was saved with imod.wq.Package.save(),
+        as the checks upon package initialization are not done again!
 
         Parameters
         ----------
         path : str, pathlib.Path
             Path to the file.
-        cache_path : str, pathlib.Path, optional
-            The path to the ``joblib.Memory`` caching dir where intermediate answers are stored.
-        cache_verbose : int
-            Verbosity flag of ``joblib.Memory``, controls the debug messages that are issued as
-            functions are evaluated.
         **kwargs : keyword arguments
             Arbitrary keyword arguments forwarded to ``xarray.open_dataset()``, or
             ``xarray.open_zarr()``.
@@ -65,9 +45,8 @@ class Package(xr.Dataset, abc.ABC):
 
         Returns
         -------
-        package : imod.wq.Package, imod.wq.CachingPackage
-            Returns a package with data loaded from file. Returns a CachingPackage
-            if a path to a ``joblib.Memory`` caching directory has been provided for ``cache``.
+        package : imod.wq.Package
+            Returns a package with data loaded from file.
 
         Examples
         --------
@@ -76,61 +55,40 @@ class Package(xr.Dataset, abc.ABC):
 
         >>> river = imod.wq.River.from_file("river.nc")
 
-        To load a package, and enable caching:
-
-        >>> cache = "./.cache_dir"
-        >>> river = imod.wq.River.from_file("river.nc", cache)
-
         For large datasets, you likely want to process it in chunks. You can
         forward keyword arguments to ``xarray.open_dataset()`` or
         ``xarray.open_zarr()``:
 
-        >>> cache = "./.cache_dir"
-        >>> river = imod.wq.River.from_file("river.nc", cache, chunks={"time": 1})
+        >>> river = imod.wq.River.from_file("river.nc", chunks={"time": 1})
 
         Refer to the xarray documentation for the possible keyword arguments.
         """
+
+        # Throw error if user tries to use old functionality
+        if "cache" in kwargs:
+            if kwargs["cache"] is not None:
+                raise NotImplementedError(
+                    "Caching functionality in pkg.from_file() is removed."
+                )
+
         path = pathlib.Path(path)
+
+        # See https://stackoverflow.com/a/2169191
+        # We expect the data in the netcdf has been saved a a package
+        # thus the checks run by __init__ and __setitem__ do not have
+        # to be called again.
+        return_cls = cls.__new__(cls)
 
         if path.suffix in (".zip", ".zarr"):
             # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
-            cls._dataset = xr.open_zarr(str(path), **kwargs)
+            return_cls.dataset = xr.open_zarr(str(path), **kwargs)
         else:
-            cls._dataset = xr.open_dataset(path, **kwargs)
-
-        # Monkeypatch class setitem to prevent costly dropna for all-nan layers at initialisation
-        # https://mail.python.org/pipermail/python-dev/2008-January/076194.html
-        # Note that the 'automagical' layer check does not work for 'from_file' packages
-        # Within try-finally to make sure the original is always restored
-        _org_setitem = cls.__setitem__
-        try:
-
-            @monkeypatch_method(cls)
-            def __setitem__(self, key, value):
-                super(__class__, self).__setitem__(key, value)
-
-            pkg_kwargs = {var: cls._dataset[var] for var in cls._dataset.data_vars}
-            if cache_path is None:
-                return_cls = cls(**pkg_kwargs)
-            else:
-                # Dynamically construct a CachingPackage
-                # Note:
-                #    "a method cannot be decorated at class definition, because when
-                #    the class is instantiated, the first argument (self) is bound,
-                #    and no longer accessible to the Memory object."
-                # See: https://joblib.readthedocs.io/en/latest/memory.html
-                cache_path = pathlib.Path(cache_path)
-                cache = joblib.Memory(cache_path, verbose=cache_verbose)
-                CachingPackage = caching(cls, cache)
-                return_cls = CachingPackage(path, **pkg_kwargs)
-
-        finally:
-            # Monkeypatch setitem back to what it was
-            @monkeypatch_method(cls)
-            def __setitem__(self, key, value):
-                return _org_setitem(self, key, value)
+            return_cls.dataset = xr.open_dataset(path, **kwargs)
 
         return return_cls
+
+    def __init__(self):
+        self.dataset = xr.Dataset()
 
     def __setitem__(self, key, value):
         if isinstance(value, xr.DataArray):
@@ -142,7 +100,24 @@ class Package(xr.Dataset, abc.ABC):
                 value = value.swap_dims({"z": "layer"})
             if "layer" in value.dims:
                 value = value.dropna(dim="layer", how="all")
-        super(__class__, self).__setitem__(key, value)
+        self.dataset.__setitem__(key, value)
+
+    def __getitem__(self, key):
+        return self.dataset.__getitem__(key)
+
+    def isel(self):
+        raise NotImplementedError(
+            f"Selection on packages not yet supported. "
+            f"To make a selection on the xr.Dataset, call {self._pkg_id}.dataset.isel instead. "
+            f"You can create a new package with a selection by calling {__class__.__name__}(**{self._pkg_id}.dataset.isel(**selection))"
+        )
+
+    def sel(self):
+        raise NotImplementedError(
+            f"Selection on packages not yet supported. "
+            f"To make a selection on the xr.Dataset, call {self._pkg_id}.dataset.sel instead. "
+            f"You can create a new package with a selection by calling {__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
+        )
 
     def _replace_keyword(self, d, key):
         """
@@ -172,7 +147,7 @@ class Package(xr.Dataset, abc.ABC):
             The rendered runfile part for a single boundary condition system.
         """
         d = {
-            k: v.values for k, v in self.data_vars.items()
+            k: v.values for k, v in self.dataset.data_vars.items()
         }  # pylint: disable=no-member
         if hasattr(self, "_keywords"):
             for key in self._keywords.keys():
@@ -247,7 +222,7 @@ class Package(xr.Dataset, abc.ABC):
 
         values = {}
         if da is None:
-            da = self[varname]
+            da = self.dataset[varname]
 
         d = {"directory": directory, "name": varname, "extension": ".idf"}
 
@@ -351,7 +326,7 @@ class Package(xr.Dataset, abc.ABC):
         return compressed
 
     def _compose_values_time(self, varname, globaltimes):
-        da = self[varname]
+        da = self.dataset[varname]
         values = {}
 
         if "time" in da.coords:
@@ -369,7 +344,7 @@ class Package(xr.Dataset, abc.ABC):
         return values
 
     def save(self, directory):
-        for name, da in self.data_vars.items():  # pylint: disable=no-member
+        for name, da in self.dataset.data_vars.items():  # pylint: disable=no-member
             if "y" in da.coords and "x" in da.coords:
                 path = pathlib.Path(directory).joinpath(name)
                 imod.idf.save(path, da)
@@ -377,31 +352,31 @@ class Package(xr.Dataset, abc.ABC):
     def _check_positive(self, varnames):
         for var in varnames:
             # Take care with nan values
-            if (self[var] < 0).any():
+            if (self.dataset[var] < 0).any():
                 raise ValueError(f"{var} in {self} must be positive")
 
     def _check_range(self, varname, lower, upper):
         # TODO: this isn't used anywhere so far.
         warn = False
         msg = ""
-        if (self[varname] < lower).any():
+        if (self.dataset[varname] < lower).any():
             warn = True
             msg += f"{varname} in {self}: values lower than {lower} detected. "
-        if (self[varname] > upper).any():
+        if (self.dataset[varname] > upper).any():
             warn = True
             msg += f"{varname} in {self}: values higher than {upper} detected."
         if warn:
             warnings.warn(msg, RuntimeWarning)
 
     def _check_location_consistent(self, varnames):
-        dims = set(self.dims)
+        dims = set(self.dataset.dims)
         is_scalar = {}
         for var in varnames:
-            scalar = (self[var].shape == ()) or not any(
-                dim in self[var].dims for dim in ["time", "layer", "y", "x"]
+            scalar = (self.dataset[var].shape == ()) or not any(
+                dim in self.dataset[var].dims for dim in ["time", "layer", "y", "x"]
             )
             if not scalar:  # skip scalar value
-                dims = dims.intersection(self[var].dims)
+                dims = dims.intersection(self.dataset[var].dims)
             is_scalar[var] = scalar
 
         is_nan = True
@@ -409,14 +384,14 @@ class Package(xr.Dataset, abc.ABC):
             if not is_scalar[var]:  # skip scalar values
                 # dimensions cannot change for in-place operations
                 # reduce to lowest set of dimension (e.g. just x and y)
-                var_dims = set(self[var].dims)
+                var_dims = set(self.dataset[var].dims)
                 reduce_dims = var_dims.difference(dims)
                 # Inplace boolean operator
-                is_nan &= np.isnan(self[var]).all(dim=reduce_dims)
+                is_nan &= np.isnan(self.dataset[var]).all(dim=reduce_dims)
 
         for var in varnames:
             if not is_scalar[var]:  # skip scalar values
-                if (np.isnan(self[var]) ^ is_nan).any():
+                if (np.isnan(self.dataset[var]) ^ is_nan).any():
                     raise ValueError(
                         f"{var} in {self} is not consistent with all variables in: "
                         f"{', '.join(varnames)}. nan values do not line up."
@@ -449,11 +424,11 @@ class Package(xr.Dataset, abc.ABC):
         """
 
         has_dims = []
-        for varname in self.data_vars.keys():  # pylint:disable=no-member
-            if all(i in self[varname].dims for i in ["x", "y"]):
+        for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
+            if all(i in self.dataset[varname].dims for i in ["x", "y"]):
                 has_dims.append(varname)
 
-        spatial_ds = self[has_dims]
+        spatial_ds = self.dataset[has_dims]
 
         if aggregate_layers and ("layer" in spatial_ds.dims):
             spatial_ds = spatial_ds.mean(dim="layer")
@@ -482,7 +457,6 @@ class BoundaryCondition(Package, abc.ABC):
     * drainage
     """
 
-    __slots__ = ("_cellcount", "_ssm_cellcount", "_ssm_layers")
     _template = jinja2.Template(
         "    {%- for name, dictname in mapping -%}"
         "        {%- for time, timedict in dicts[dictname].items() -%}"
@@ -512,11 +486,11 @@ class BoundaryCondition(Package, abc.ABC):
 
     def _repeat_stress(self, varname, value, use_cftime):
         if value is not None:
-            if varname not in self:
+            if varname not in self.dataset.data_vars:
                 raise ValueError(
                     f"{varname} does not occur in {self}\n cannot repeat stress"
                 )
-            if "time" not in self[varname].coords:
+            if "time" not in self.dataset[varname].coords:
                 raise ValueError(
                     f"{varname} in {self}\n does not have dimension time, cannot repeat stress."
                 )
@@ -526,7 +500,7 @@ class BoundaryCondition(Package, abc.ABC):
                 timeutil.to_datetime(k, use_cftime): timeutil.to_datetime(v, use_cftime)
                 for k, v in value.items()
             }
-            self[varname].attrs["stress_repeats"] = d
+            self.dataset[varname].attrs["stress_repeats"] = d
 
     def _compose_values_timelayer(
         self, varname, globaltimes, directory, nlayer, da=None
@@ -566,7 +540,7 @@ class BoundaryCondition(Package, abc.ABC):
         values = {}
 
         if da is None:
-            da = self[varname]
+            da = self.dataset[varname]
 
         if "time" in da.coords:
             da_times = da.coords["time"].values
@@ -619,18 +593,18 @@ class BoundaryCondition(Package, abc.ABC):
             nlay, nrow, ncol taken from ibound.
         """
         # First compute active number of cells
-        if "time" in self[varname].coords:
-            nmax = int(self[varname].groupby("time").count(xr.ALL_DIMS).max())
+        if "time" in self.dataset[varname].coords:
+            nmax = int(self.dataset[varname].groupby("time").count(xr.ALL_DIMS).max())
         else:
-            nmax = int(self[varname].count())
-        if not "layer" in self.coords:  # Then it applies to every layer
+            nmax = int(self.dataset[varname].count())
+        if not "layer" in self.dataset.coords:  # Then it applies to every layer
             nmax *= nlayer
         self._cellcount = nmax  # Store cellcount so it can be re-used for ssm.
         self._ssm_cellcount = nmax
 
         # Second, compute active number of sinks and sources
         # overwite _ssm_cellcount if more specific info is available.
-        if "concentration" in self:
+        if "concentration" in self.dataset.data_vars:
             da = self["concentration"]
 
             if "species" in da.coords:
@@ -640,14 +614,14 @@ class BoundaryCondition(Package, abc.ABC):
 
             if "y" not in da.coords and "x" not in da.coords:
                 # It's not idf data, but scalar instead
-                if "layer" in self.coords:
+                if "layer" in self.dataset.coords:
                     # Store layers for rendering
-                    da_nlayer = self.coords["layer"].size
+                    da_nlayer = self.dataset.coords["layer"].size
                     if da_nlayer == nlayer:
                         # Insert wildcard
                         self._ssm_layers = ["?"]
                     else:
-                        self._ssm_layers = self.coords["layer"].values
+                        self._ssm_layers = self.dataset.coords["layer"].values
                         nlayer = da_nlayer
                 # Sinks and sources are applied everywhere
                 # in contrast to other inputs
@@ -680,11 +654,13 @@ class BoundaryCondition(Package, abc.ABC):
         rendered : str
             The rendered runfile part for a single boundary condition system.
         """
-        mapping = tuple([(k, v) for k, v in self._mapping if v in self.data_vars])
+        mapping = tuple(
+            [(k, v) for k, v in self._mapping if v in self.dataset.data_vars]
+        )
         d = {"mapping": mapping, "system_index": system_index}
         dicts = {}
 
-        for varname in self.data_vars.keys():  # pylint: disable=no-member
+        for varname in self.dataset.data_vars.keys():  # pylint: disable=no-member
             if varname == "concentration":
                 continue
             dicts[varname] = self._compose_values_timelayer(
@@ -713,16 +689,16 @@ class BoundaryCondition(Package, abc.ABC):
             The rendered runfile SSM part for a single boundary condition system.
         """
 
-        if "concentration" not in self:
+        if "concentration" not in self.dataset.data_vars:
             return ""
 
         d = {"pkg_id": self._pkg_id}
-        if "species" in self["concentration"].coords:
+        if "species" in self.dataset["concentration"].coords:
             concentration = {}
-            for species in self["concentration"]["species"].values:
+            for species in self.dataset["concentration"]["species"].values:
                 concentration[species] = self._compose_values_timelayer(
                     varname="concentration",
-                    da=self["concentration"].sel(species=species),
+                    da=self.dataset["concentration"].sel(species=species),
                     globaltimes=globaltimes,
                     directory=directory,
                     nlayer=nlayer,
@@ -731,7 +707,7 @@ class BoundaryCondition(Package, abc.ABC):
             concentration = {
                 1: self._compose_values_timelayer(
                     varname="concentration",
-                    da=self["concentration"],
+                    da=self.dataset["concentration"],
                     globaltimes=globaltimes,
                     directory=directory,
                     nlayer=nlayer,

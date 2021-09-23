@@ -29,7 +29,7 @@ def discret():
 
 def test_render_dis(discret):
     dis = discret
-    globaltimes = dis.time.values
+    globaltimes = dis.dataset["time"].values
 
     compare = """
     nper = 5
@@ -42,7 +42,7 @@ def test_render_dis(discret):
 
 
 def test_render_dis__notime(discret):
-    dis = discret.isel(time=0).drop("time")
+    dis = TimeDiscretization(**discret.dataset.isel(time=0).drop("time"))
     globaltimes = ["?"]
 
     compare = """
@@ -56,7 +56,7 @@ def test_render_dis__notime(discret):
 
 
 def test_render_btn(discret):
-    dis = discret.isel(time=0).drop("time")
+    dis = TimeDiscretization(**discret.dataset.isel(time=0).drop("time"))
     globaltimes = ["?"]
 
     compare = """

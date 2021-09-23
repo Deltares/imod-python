@@ -76,14 +76,14 @@ class Model(collections.UserDict):
     def sel(self, **dimensions):
         selmodel = type(self)(self.modelname, self.check)
         for pkgname, pkg in self.items():
-            sel_dims = {k: v for k, v in dimensions.items() if k in pkg}
+            sel_dims = {k: v for k, v in dimensions.items() if k in pkg.dataset}
             if len(sel_dims) == 0:
                 selmodel[pkgname] = pkg
             else:
                 if pkg._pkg_id != "wel":
-                    selmodel[pkgname] = pkg.loc[sel_dims]
+                    selmodel[pkgname].dataset = pkg.dataset.loc[sel_dims]
                 else:
-                    df = pkg.to_dataframe().drop(columns="save_budget")
+                    df = pkg.dataset.to_dataframe().drop(columns="save_budget")
                     for k, v in sel_dims.items():
                         try:
                             if isinstance(v, slice):
@@ -98,26 +98,26 @@ class Model(collections.UserDict):
                                 "Invalid indexer for Well package, accepts slice or list-like of values"
                             )
                     selmodel[pkgname] = imod.wq.Well(
-                        save_budget=pkg["save_budget"], **df
+                        save_budget=pkg.dataset["save_budget"], **df
                     )
         return selmodel
 
     def isel(self, **dimensions):
         selmodel = type(self)(self.modelname, self.check)
         for pkgname, pkg in self.items():
-            sel_dims = {k: v for k, v in dimensions.items() if k in pkg}
+            sel_dims = {k: v for k, v in dimensions.items() if k in pkg.dataset}
             if len(sel_dims) == 0:
                 selmodel[pkgname] = pkg
             else:
-                selmodel[pkgname] = pkg[sel_dims]
+                selmodel[pkgname].dataset = pkg.dataset[sel_dims]
         return selmodel
 
     def _yield_times(self):
         """required by qgis_util"""
         modeltimes = []
         for pkg in self.values():
-            if "time" in pkg.coords:
-                modeltimes.append(pkg["time"].values)
+            if "time" in pkg.dataset.coords:
+                modeltimes.append(pkg.dataset["time"].values)
         return modeltimes
 
     def to_netcdf(self, directory=".", pattern="{pkgname}.nc", **kwargs):
@@ -140,7 +140,9 @@ class Model(collections.UserDict):
         directory = pathlib.Path(directory)
         for pkgname, pkg in self.items():
             try:
-                pkg.to_netcdf(directory / pattern.format(pkgname=pkgname), **kwargs)
+                pkg.dataset.to_netcdf(
+                    directory / pattern.format(pkgname=pkgname), **kwargs
+                )
             except Exception as e:
                 raise RuntimeError(
                     "Package {pkgname} can not be written to NetCDF"
@@ -175,7 +177,7 @@ class Model(collections.UserDict):
         pkgnames = [
             pkgname
             for pkgname, pkg in self.items()
-            if all(i in pkg.dims for i in ["x", "y"])
+            if all(i in pkg.dataset.dims for i in ["x", "y"])
         ]
 
         data_paths = []
@@ -199,7 +201,7 @@ class Model(collections.UserDict):
     def _delete_empty_packages(self, verbose=False):
         to_del = []
         for pkg in self.keys():
-            dv = list(self[pkg].data_vars)[0]
+            dv = list(self[pkg].dataset.data_vars)[0]
             if not self[pkg][dv].notnull().any().compute():
                 if verbose:
                     warnings.warn(
@@ -294,7 +296,9 @@ class SeawatModel(Model):
         return package_groups
 
     def _hastime(self, pkg):
-        return (pkg._pkg_id == "wel" and "time" in pkg) or ("time" in pkg.coords)
+        return (pkg._pkg_id == "wel" and "time" in pkg.dataset) or (
+            "time" in pkg.dataset.coords
+        )
 
     def _use_cftime(self):
         """
@@ -303,7 +307,7 @@ class SeawatModel(Model):
         types = []
         for pkg in self.values():
             if self._hastime(pkg):
-                types.append(type(np.atleast_1d(pkg["time"].values)[0]))
+                types.append(type(np.atleast_1d(pkg.dataset["time"].values)[0]))
 
         # Types will be empty if there's no time dependent input
         set_of_types = set(types)
@@ -396,12 +400,12 @@ class SeawatModel(Model):
         first_times = {}  # first time per package
         for key, pkg in self.items():
             if self._hastime(pkg):
-                pkgtimes = list(pkg["time"].values)
+                pkgtimes = list(pkg.dataset["time"].values)
                 first_times[key] = sorted(pkgtimes)[0]
-                for var in pkg.data_vars:
-                    if "stress_repeats" in pkg[var].attrs:
+                for var in pkg.dataset.data_vars:
+                    if "stress_repeats" in pkg.dataset[var].attrs:
                         stress_repeats_times = list(
-                            pkg[var].attrs["stress_repeats"].keys()
+                            pkg.dataset[var].attrs["stress_repeats"].keys()
                         )
                         pkgtimes.extend(stress_repeats_times)
                 times.extend(pkgtimes)
@@ -524,7 +528,7 @@ class SeawatModel(Model):
         baskey = self._get_pkgkey("bas6")
         btnkey = self._get_pkgkey("btn")
         diskey = self._get_pkgkey("dis")
-        self[btnkey]["thickness"] = self[baskey].thickness()
+        self[btnkey].dataset["thickness"] = self[baskey].thickness()
 
         if btnkey is None:
             raise ValueError("No BasicTransport package provided.")
@@ -560,8 +564,8 @@ class SeawatModel(Model):
     def _bas_btn_rch_evt_mal_tvc_sinkssources(self):
         baskey = self._get_pkgkey("bas6")
         btnkey = self._get_pkgkey("btn")
-        ibound = self[baskey]["ibound"]
-        icbund = self[btnkey]["icbund"]
+        ibound = self[baskey].dataset["ibound"]
+        icbund = self[btnkey].dataset["icbund"]
         n_extra = int(((ibound < 0) | (icbund < 0)).sum())
 
         nlayer, nrow, ncol = ibound.shape
@@ -763,7 +767,11 @@ class SeawatModel(Model):
 
         # Write all IDFs and IPFs
         for pkgname, pkg in self.items():
-            if "x" in pkg.coords and "y" in pkg.coords or pkg._pkg_id == "wel":
+            if (
+                "x" in pkg.dataset.coords
+                and "y" in pkg.dataset.coords
+                or pkg._pkg_id == "wel"
+            ):
                 try:
                     pkg.save(directory=directory / pkgname)
                 except Exception as error:
@@ -849,7 +857,7 @@ class SeawatModel(Model):
         >>> clipped = ml.clip(extent, heads, conc_interpolated)
         """
         baskey = self._get_pkgkey("bas6")
-        like = self[baskey]["ibound"].isel(layer=0).squeeze(drop=True)
+        like = self[baskey].dataset["ibound"].isel(layer=0).squeeze(drop=True)
 
         if isinstance(extent, (list, tuple)):
             xmin, xmax, ymin, ymax = extent

@@ -1,5 +1,6 @@
 import pathlib
 import textwrap
+import pytest
 
 import numpy as np
 import xarray as xr
@@ -7,7 +8,8 @@ import xarray as xr
 import imod
 
 
-def test_render():
+@pytest.fixture()
+def head():
     nlay = 3
     nrow = 15
     ncol = 15
@@ -34,12 +36,53 @@ def test_render():
     head[...] = np.nan
     head[..., 0] = 0.0
 
+    return head
+
+
+def test_render(head):
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
+
     chd = imod.mf6.ConstantHead(
         head, print_input=True, print_flows=True, save_flows=True
     )
     actual = chd.render(directory, "chd", globaltimes)
+
+    expected = textwrap.dedent(
+        """\
+        begin options
+          print_input
+          print_flows
+          save_flows
+        end options
+
+        begin dimensions
+          maxbound 30
+        end dimensions
+
+        begin period 1
+          open/close mymodel/chd/chd.bin (binary)
+        end period
+        """
+    )
+    assert actual == expected
+
+
+def test_from_file(head, tmp_path):
+    directory = pathlib.Path("mymodel")
+    globaltimes = [np.datetime64("2000-01-01")]
+
+    chd = imod.mf6.ConstantHead(
+        head, print_input=True, print_flows=True, save_flows=True
+    )
+
+    path = tmp_path / "chd.nc"
+
+    chd.dataset.to_netcdf(path)
+
+    chd2 = imod.mf6.ConstantHead.from_file(path)
+
+    actual = chd2.render(directory, "chd", globaltimes)
 
     expected = textwrap.dedent(
         """\

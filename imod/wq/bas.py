@@ -51,7 +51,6 @@ class BasicFlow(Package):
         value is 1.0e30.
     """
 
-    __slots__ = ("ibound", "top", "bottom", "starting_head", "inactive_head")
     _pkg_id = "bas6"
     _template = jinja2.Template(
         "[bas6]\n"
@@ -143,12 +142,12 @@ class BasicFlow(Package):
         d["bottom"] = self._compose_values_layer("bottom", directory, nlayer)
         d["nlay"], d["nrow"], d["ncol"] = self["ibound"].shape
         # TODO: check dx > 0, dy < 0?
-        if "dx" not in self or "dy" not in self:  # assume equidistant
-            dx, _, _ = util.coord_reference(self["x"])
-            dy, _, _ = util.coord_reference(self["y"])
+        if "dx" not in self.dataset or "dy" not in self.dataset:  # assume equidistant
+            dx, _, _ = util.coord_reference(self.dataset["x"])
+            dy, _, _ = util.coord_reference(self.dataset["y"])
         else:
-            dx = self.coords["dx"]
-            dy = self.coords["dy"]
+            dx = self.dataset.coords["dx"]
+            dy = self.dataset.coords["dy"]
 
         if isinstance(dy, (float, int)) or dy.shape in ((), (1,)):
             d["dy"] = {"?": abs(float(dy))}

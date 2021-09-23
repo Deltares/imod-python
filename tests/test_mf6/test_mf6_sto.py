@@ -163,7 +163,7 @@ def test_render_storage_coefficient(sy_layered, convertible):
 
 
 def test_storage_deprecation_warning(sy_layered, convertible):
-    with pytest.raises(DeprecationWarning):
+    with pytest.raises(NotImplementedError):
         imod.mf6.Storage(
             specific_storage=0.0003,
             specific_yield=sy_layered,

@@ -79,15 +79,6 @@ class TimeDiscretization(Package):
         Default is 0.
     """
 
-    __slots__ = (
-        "timestep_duration",
-        "n_timesteps",
-        "transient",
-        "timestep_multiplier",
-        "max_n_transport_timestep",
-        "transport_timestep_multiplier",
-        "transport_initial_timestep",
-    )
     _pkg_id = "dis"
 
     def __init__(
@@ -164,7 +155,9 @@ class TimeDiscretization(Package):
             "        {%- endfor -%}"
             "    {%- endfor -%}"
         )
-        mapping = tuple([(k, v) for k, v in _btn_mapping if v in self.data_vars])
+        mapping = tuple(
+            [(k, v) for k, v in _btn_mapping if v in self.dataset.data_vars]
+        )
         d["mapping"] = mapping
         datavars = [t[1] for t in mapping]
         for varname in datavars:
@@ -181,6 +174,6 @@ class TimeDiscretization(Package):
             "max_n_transport_timestep",
             "transport_initial_timestep",
         ]
-        if "transport_timestep_multiplier" in self.data_vars:
+        if "transport_timestep_multiplier" in self.dataset.data_vars:
             to_check.append("transport_timestep_multiplier")
         self._check_positive(to_check)
