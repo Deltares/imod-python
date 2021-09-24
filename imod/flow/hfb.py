@@ -2,8 +2,7 @@ import geopandas as gpd
 import imod
 import jinja2
 import numpy as np
-from imod.flow.pkgbase import Package, Vividict
-from imod.wq import timeutil
+from imod.flow.pkgbase import Package
 
 
 class HorizontalFlowBarrier(Package):
