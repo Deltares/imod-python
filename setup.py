@@ -30,6 +30,7 @@ setup(
         "numba",
         "numpy",
         "pandas",
+        "pooch",
         "tqdm",
         "scipy",
         "toolz",  # optional dask dependency we need
@@ -39,12 +40,12 @@ setup(
         "dev": [
             "black",
             "flopy",
-            "nbstripout",
+            "pydata-sphinx-theme",
             "pytest",
             "pytest-cov",
             "pytest-benchmark",
             "sphinx",
-            "sphinx_rtd_theme",
+            "sphinx-gallery",
         ],
         "optional": [
             "geopandas",

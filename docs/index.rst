@@ -54,8 +54,8 @@ Interactive notebook examples:
    :titlesonly:
    :hidden:
 
-   getting_started/index
-   user_guide/index
+   getting-started/index
+   user-guide/index
    examples/index
    api/index
 
@@ -64,7 +64,7 @@ Getting started
 
 Install the latest release using ``conda install -c conda-forge imod``, or, when
 not using Anaconda, ``pip install imod``. For more detailed installation
-information see :doc:`getting_started/installation`.
+information see :doc:`getting-started/installation`.
 
 .. code:: python
 
