@@ -40,9 +40,16 @@ build:
     - cd ../docs
     - make html
     - cd ..
+  artifacts:
+    paths:
+      - docs/_build/html/
+      - tests/coverage.xml 
+    expire_in: 1 week
 
 publish:
   stage: publish
+  dependencies:
+    - build
   script:
     - mv docs/_build/html/ public/
   artifacts:
