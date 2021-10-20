@@ -1,9 +1,11 @@
 image: mambaorg/micromamba
 
+stages:
+  - lint
+  - build
+  - publish
+
 before_script:
-  - apt-get update -q -y
-  - apt-get install -y build-essential
-  - apt-get install libgl1-mesa-glx -y
   # download mf6 binary and move it to the env's bin which is in the path
   # see https://gitlab.com/deltares/imod/imod-python/snippets/1893049
   - curl -O -L https://gitlab.com/deltares/imod/imod-python/uploads/947a1e194a02ade1376d1111327db34d/mf6.gz
@@ -12,14 +14,17 @@ before_script:
   - export PATH=$PATH:mf6
   
 lint:
+  stage: lint
   script:
     - tox -e lint
 
 build:
+  stage: build
   script:
     - tox -e build
 
 publish:
+  stage: publish
   script:
   - mv .tox/docs_out public/
   artifacts:
