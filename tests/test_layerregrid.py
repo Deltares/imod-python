@@ -13,7 +13,7 @@ def test_da():
     shape = (nlayer, nrow, ncol)
     dims = ("layer", "y", "x")
     coords = {"layer": [1, 2], "y": [1.5, 0.5], "x": [0.5, 1.5, 2.5]}
-    data = np.arange(np.product(shape), dtype=np.float).reshape(shape)
+    data = np.arange(np.product(shape), dtype=np.float64).reshape(shape)
     source = xr.DataArray(data, coords, dims)
     return source
 

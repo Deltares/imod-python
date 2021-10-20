@@ -1,9 +1,9 @@
-import xarray as xr
-import pytest
+import geopandas as gpd
 import numpy as np
 import pandas as pd
+import pytest
+import xarray as xr
 from shapely.geometry import LineString
-import geopandas as gpd
 
 
 @pytest.fixture(scope="module")

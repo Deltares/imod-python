@@ -1,7 +1,8 @@
 import geopandas as gpd
-import imod
 import jinja2
 import numpy as np
+
+import imod
 from imod.flow.pkgbase import Package
 
 

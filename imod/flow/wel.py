@@ -1,5 +1,6 @@
-import imod
 import numpy as np
+
+import imod
 from imod.flow.pkgbase import BoundaryCondition
 
 

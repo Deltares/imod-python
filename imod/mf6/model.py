@@ -1,13 +1,10 @@
 import collections
-import os
 import pathlib
 
 import cftime
 import jinja2
 import numpy as np
-import xarray as xr
 
-import imod
 from imod.mf6 import qgs_util
 
 

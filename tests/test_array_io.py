@@ -1,7 +1,3 @@
-import glob
-import os
-import pathlib
-
 import cftime
 import numpy as np
 import pandas as pd
@@ -200,7 +196,7 @@ def test_saveopen__steady(test_da, tmp_path, kind):
 @pytest.mark.parametrize("kind", [(imod.rasterio, "tif"), (imod.idf, "idf")])
 def test_saveopen(test_da, kind, tmp_path):
     module, ext = kind
-    module.save(tmp_path / f"test", test_da)
+    module.save(tmp_path / "test", test_da)
     assert (tmp_path / f"test.{ext}").exists()
     da = module.open(tmp_path / f"test.{ext}")
     assert isinstance(da, xr.DataArray)
@@ -215,7 +211,7 @@ def test_saveopen__descending_layer(test_layerda, kind, tmp_path):
     # Flip around test_layerda
     flip = slice(None, None, -1)
     test_layerda = test_layerda.copy().isel(layer=flip)
-    module.save(tmp_path / f"layer", test_layerda)
+    module.save(tmp_path / "layer", test_layerda)
     assert (tmp_path / f"layer_l1.{ext}").exists()
     da = module.open(tmp_path / f"layer_l*.{ext}")
     assert isinstance(da, xr.DataArray)

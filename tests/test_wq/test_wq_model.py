@@ -1,8 +1,7 @@
+import os
 import pathlib
-import shutil
 import textwrap
 from copy import deepcopy
-import os
 
 import cftime
 import numpy as np
@@ -614,7 +613,7 @@ def test_render(basicmodel):
     m.time_discretization("2000-01-06")
     d = pathlib.Path(".")
     r = pathlib.Path("results")
-    s = m.render(d, r, False)
+    _ = m.render(d, r, False)
 
 
 def test_render_cf(cftime_model):
@@ -622,7 +621,7 @@ def test_render_cf(cftime_model):
     m_cf.time_discretization("2000-01-06")
     d = pathlib.Path(".")
     r = pathlib.Path("results")
-    s = m_cf.render(d, r, False)
+    _ = m_cf.render(d, r, False)
 
 
 def test_render_notime(notime_model):
@@ -630,7 +629,7 @@ def test_render_notime(notime_model):
     m.time_discretization(times=["2000-01-01", "2000-01-06"])
     d = pathlib.Path(".")
     r = pathlib.Path("results")
-    s = m.render(d, r, False)
+    _ = m.render(d, r, False)
 
 
 def test_mxsscount_incongruent_icbund(basicmodel):

@@ -1,13 +1,13 @@
 import pathlib
-import shutil
 
 import geopandas as gpd
-import imod
 import numpy as np
 import pandas as pd
 import pytest
 import shapely.geometry as sg
 import xarray as xr
+
+import imod
 
 
 @pytest.fixture(scope="module")

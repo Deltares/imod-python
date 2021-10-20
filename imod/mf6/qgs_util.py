@@ -1,14 +1,15 @@
-import numpy as np
-
-import imod
-import imod.qgs as qgs
 from itertools import product
-import declxml as xml
 from xml.sax.saxutils import unescape
+
+import declxml as xml
+import numpy as np
 import pyproj
 
 # For creating colormap
-from matplotlib import colors, cm
+from matplotlib import cm, colors
+
+import imod
+import imod.qgs as qgs
 
 
 def _get_color_hexes_cmap(n, cmap_name="magma"):

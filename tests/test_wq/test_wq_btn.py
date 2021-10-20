@@ -49,7 +49,6 @@ def test_btn_render_arrays(basictransport):
                 prsity_l1:3 = 0.3"""
     )
 
-    shape = btn["icbund"].shape
     thickness = xr.full_like(btn["icbund"], 1.0)
     btn["thickness"] = thickness
     assert btn._render(directory, nlayer=3) == compare

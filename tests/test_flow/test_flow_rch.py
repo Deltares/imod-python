@@ -1,6 +1,6 @@
-from imod.flow import Recharge
 import pathlib
-import os
+
+from imod.flow import Recharge
 
 
 def test_recharge_no_time(three_days):

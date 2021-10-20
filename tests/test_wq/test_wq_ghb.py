@@ -55,5 +55,5 @@ def test_render__stress_repeats(headboundary, varname):
 
     stress_repeats = {datetimes[-1]: datetimes[0]}
     ghb.repeat_stress(**{varname: stress_repeats})
-    actual = ghb._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
+    _ = ghb._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
     # TODO check result

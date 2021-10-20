@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-import shapely.geometry as sg
 import xarray as xr
 
 import imod

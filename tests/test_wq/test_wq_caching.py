@@ -6,12 +6,10 @@ import pathlib
 import textwrap
 import time
 
-import joblib
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-import zarr
 
 import imod
 from imod import util
@@ -311,7 +309,7 @@ def henry_write(tmp_path):
 
     # If this seems crude, it is.
     # However, pytest-benchmark is very difficult to get to work
-    starttime = time.time()
+    # starttime = time.time()
     m1.write(tmp_path / "henry-basic")
 
 

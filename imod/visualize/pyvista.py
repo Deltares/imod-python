@@ -35,12 +35,12 @@ The methods below construct pyvista.UnstructuredGrids for voxel models (z1d),
 "layer models" (z3d), and two dimensional data (e.g. a DEM).
 """
 
+from pathlib import Path
 from typing import Optional, Tuple
 
 import numba
 import numpy as np
 import pandas as pd
-from pathlib import Path
 import scipy.ndimage.morphology
 import tqdm
 import xarray as xr

@@ -14,18 +14,18 @@ used internally, but are not private since they may be useful to users as well.
 import collections
 import contextlib
 import datetime
+import functools
 import os
 import pathlib
 import re
-from typing import Tuple, Union
 import warnings
+from typing import Union
 
 import affine
 import cftime
 import dateutil
 import numpy as np
 import xarray as xr
-import functools
 
 try:
     Pattern = re._pattern_type
@@ -540,7 +540,7 @@ def ugrid2d_topology(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
     # Compute all vertices, these are the ugrid nodes
     node_y, node_x = (a.ravel() for a in np.meshgrid(ycoord, xcoord, indexing="ij"))
     face_y, face_x = (a.ravel() for a in np.meshgrid(y, x, indexing="ij"))
-    linear_index = np.arange(node_x.size, dtype=np.int).reshape(
+    linear_index = np.arange(node_x.size, dtype=np.int32).reshape(
         ycoord.size, xcoord.size
     )
     # Allocate face_node_connectivity
@@ -733,7 +733,7 @@ def append_nested_dict(dict1, dict2):
                 dict1[key] = dict2[key]
 
     for key, val in dict2.items():
-        if not key in dict1:
+        if key not in dict1:
             dict1[key] = val
 
 

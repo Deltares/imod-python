@@ -1,7 +1,5 @@
 import pathlib
-import warnings
 
-import numpy as np
 import xarray as xr
 
 from imod import util

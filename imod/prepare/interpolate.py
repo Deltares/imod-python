@@ -1,5 +1,5 @@
 """
-This module provides linear interpolation methods on regular grids, up to three 
+This module provides linear interpolation methods on regular grids, up to three
 dimensions. These functions are imported by the regrid.py module, which
 incorporates them in the Regridder class.
 
@@ -73,7 +73,7 @@ boundaries of the original cell lie. If it's fully within a nodata cell, no
 extrapolation should occur.
 
 ### Function responsibilities:
-* linear_inds_weights: returns per single dimensions the weights (wx, wy), 
+* linear_inds_weights: returns per single dimensions the weights (wx, wy),
     the source indexes (column, row numbers), and whether the destination x
     lies fully within the cell of the matching source index. The source index
     is always the "starting" or "leftmost" cell. Interpolation occurs between

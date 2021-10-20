@@ -1,9 +1,10 @@
 import geopandas as gpd
-import imod
 import numpy as np
 import pandas as pd
 import pytest
 import shapely.geometry as sg
+
+import imod
 
 TEST_GEOMETRIES = {
     "point": sg.Point(0.0, 0.0),

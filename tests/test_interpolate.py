@@ -1,6 +1,3 @@
-import os
-
-import numba
 import numpy as np
 import pytest
 import xarray as xr

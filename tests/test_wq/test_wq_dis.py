@@ -1,5 +1,3 @@
-import textwrap
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -17,10 +15,10 @@ def discret():
 
     dis = TimeDiscretization(
         timestep_duration=timestep_duration,
-        n_timesteps=xr.full_like(timestep_duration, 1, dtype=np.int),
+        n_timesteps=xr.full_like(timestep_duration, 1, dtype=np.int32),
         transient=xr.full_like(timestep_duration, True),
         timestep_multiplier=xr.full_like(timestep_duration, 1.0),
-        max_n_transport_timestep=xr.full_like(timestep_duration, 10, dtype=np.int),
+        max_n_transport_timestep=xr.full_like(timestep_duration, 10, dtype=np.int32),
         transport_timestep_multiplier=xr.full_like(timestep_duration, 1.0),
         transport_initial_timestep=0,
     )
@@ -42,7 +40,7 @@ def test_render_dis(discret):
 
 
 def test_render_dis__notime(discret):
-    dis = discret.isel(time=0).drop("time")
+    dis = discret.isel(time=0).drop_vars("time")
     globaltimes = ["?"]
 
     compare = """
@@ -56,7 +54,7 @@ def test_render_dis__notime(discret):
 
 
 def test_render_btn(discret):
-    dis = discret.isel(time=0).drop("time")
+    dis = discret.isel(time=0).drop_vars("time")
     globaltimes = ["?"]
 
     compare = """

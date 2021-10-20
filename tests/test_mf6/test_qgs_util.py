@@ -1,9 +1,10 @@
-import imod
-import imod.mf6.qgs_util as qgs_util
 import numpy as np
-import xarray as xr
 import pandas as pd
 import pytest
+import xarray as xr
+
+import imod
+import imod.mf6.qgs_util as qgs_util
 
 
 @pytest.fixture(scope="module")
@@ -221,6 +222,7 @@ def test_make_processor(qgs_tree):
     # we cannot read the object from string itsself,
     # which would be preferred.
     import declxml as xml
+
     import imod.qgs as qgs
 
     processor = qgs.make_processor(qgs.Qgis)

@@ -1,4 +1,3 @@
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
@@ -104,7 +103,7 @@ def _plot_aquitards(aquitards, ax, kwargs_aquitards):
     if kwargs_aquitards is None:
         kwargs_aquitards = {"alpha": 0.5, "facecolor": "grey"}
     X_aq, Y_aq, C_aq, _ = _meshcoords(aquitards, continuous=False)
-    C_aq.astype(np.float)
+    C_aq = C_aq.astype(np.float64)
     for j, i in enumerate(range(0, X_aq.shape[0] - 1, 2)):
         Y_i = Y_aq[i : i + 2]
         C_i = C_aq[j]
@@ -337,7 +336,7 @@ def streamfunction(da, ax, n_streamlines=10, kwargs_contour={}):
     Y = 0.5 * da.top + 0.5 * da.bottom
     if Y.ndim == 1:
         # promote to 2D
-        Y2 = xr.concat(da.shape[1] * [Y], dim=da.s)
+        Y = xr.concat(da.shape[1] * [Y], dim=da.s)
 
     settings_contour = {
         "colors": "w",

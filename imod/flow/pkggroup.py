@@ -2,8 +2,8 @@ import abc
 import collections
 import enum
 
-from imod.flow.timeutil import insert_unique_package_times
 import imod.util as util
+from imod.flow.timeutil import insert_unique_package_times
 
 
 class PackageGroup(collections.UserDict, abc.ABC):

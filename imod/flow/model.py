@@ -2,16 +2,16 @@ import abc
 import collections
 import os
 import pathlib
-from dataclasses import dataclass
 import warnings
 
 import cftime
-import imod
-import imod.util as util
 import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
+
+import imod
+import imod.util as util
 from imod.flow.pkgbase import BoundaryCondition
 from imod.flow.pkggroup import PackageGroups
 from imod.flow.timeutil import insert_unique_package_times
@@ -544,7 +544,7 @@ class ImodflowModel(Model):
         # Check if any caching packages are present, and set necessary states.
         # self._set_caching_packages(caching_reldir)
 
-        if not self.check is None:
+        if self.check is not None:
             self.package_check()
 
         # TODO Necessary?

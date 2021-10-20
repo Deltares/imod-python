@@ -1,5 +1,4 @@
 import pathlib
-import textwrap
 
 import numpy as np
 import pandas as pd
@@ -138,4 +137,4 @@ def test_render__stress_repeats(river, varname):
 
     stress_repeats = {datetimes[-1]: datetimes[0]}
     riv.repeat_stress(**{varname: stress_repeats})
-    actual = riv._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
+    _ = riv._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)

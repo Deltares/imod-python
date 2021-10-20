@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 import xarray as xr
 
 import imod
@@ -18,7 +17,7 @@ def test_streamfunction():
     da = xr.DataArray(data, coords, dims)
     front = xr.full_like(da, 1.0)
     right = xr.full_like(da, 2.0)
-    lower = xr.full_like(da, 3.0)
+    # TODO: lower = xr.full_like(da, 3.0)
 
     # ref
     data = np.zeros((2, 2))
@@ -29,7 +28,7 @@ def test_streamfunction():
     sf_x_ref = da.copy(data=[[-4.0, -4.0], [-2.0, -2.0]])
     sf_angle_ref = np.array([-1.0 / 2.0 ** 0.5] * 2)
     sf_angle_ref = da.copy(data=[2 * sf_angle_ref, sf_angle_ref])
-    v_ref = xr.full_like(da, -3.0)
+    # TODO: v_ref = xr.full_like(da, -3.0)
 
     # test different planes:
     sf = imod.evaluate.streamfunction_line(right, front, (1, 0), (1, 2))

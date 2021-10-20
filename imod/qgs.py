@@ -1,6 +1,6 @@
 import abc
 from dataclasses import dataclass
-from typing import Union, List, Optional
+from typing import List, Optional, Union
 
 import declxml as xml
 
@@ -13,7 +13,7 @@ class Attribute(abc.ABC):
     pass
 
 
-#%%Mapcanvas
+# Mapcanvas
 @dataclass
 class SpatialRefSys(Aggregate):
     # proj4: str = ""
@@ -57,7 +57,7 @@ class MapCanvas(Aggregate):
     destinationsrs: Optional[DestinationSrs] = None
 
 
-#%%Layer tree
+# Layer tree
 @dataclass
 class Layer(Aggregate):
     id: Union[Attribute, str]
@@ -100,7 +100,7 @@ class Layer_Tree_Group_Root(Aggregate):
     expanded: Optional[Union[Attribute, str]] = None
 
 
-#%%Snapping
+# Snapping
 @dataclass
 class Snapping_Settings(Aggregate):
     type: Union[Attribute, str] = "1"
@@ -112,7 +112,7 @@ class Snapping_Settings(Aggregate):
     individual_layer_settings: str = ""
 
 
-#%%Mesh renderer and settings
+# Mesh renderer and settings
 @dataclass
 class Prop(Aggregate):
     k: Union[Attribute, str]
@@ -223,7 +223,7 @@ class Mesh_Renderer_Settings(Aggregate):
     mesh_settings_triangular: Mesh_Settings_Triangular = Mesh_Settings_Triangular()
 
 
-#%%Projectlayers
+# Projectlayers
 @dataclass
 class KeywordList(Aggregate):
     value: str = ""
@@ -334,7 +334,7 @@ class ProjectLayers(Aggregate):
     maplayer: List[MapLayer]
 
 
-#%%Legend
+# Legend
 @dataclass
 class LegendLayerFile(Aggregate):
     layerid: Union[Attribute, str]
@@ -365,7 +365,7 @@ class Legend(Aggregate):
     updateDrawingOrder: Union[Attribute, str] = "true"
 
 
-#%%properties
+# properties
 @dataclass
 class SpatialRefSys_Property(Aggregate):
     ProjectionsEnabled: int = 1
@@ -377,7 +377,7 @@ class Properties(Aggregate):
     spatialrefsys_property: SpatialRefSys_Property = SpatialRefSys_Property()
 
 
-#%%qgis
+# qgis
 @dataclass
 class SrcDest(Aggregate):
     src: SpatialRefSys
@@ -451,7 +451,7 @@ class Qgis(Aggregate):
     projectname: Union[Attribute, str] = ""
 
 
-#%%Mappings
+# Mappings
 type_mapping = {
     bool: xml.boolean,
     float: xml.floating_point,
@@ -473,7 +473,7 @@ name_mapping = {
     SpatialRefSys_Property: "SpatialRefSys",
 }
 
-#%%Functions
+# Functions
 # Following dataformats are now supported:
 # ("Any" is both Aggregate and Primitive here, where "Primitive" is a placeholder for anything type_mapping)
 # -Optional[List[Any]]

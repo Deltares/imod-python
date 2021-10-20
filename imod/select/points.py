@@ -147,7 +147,7 @@ def points_indices(da, **points):
     inside = points_in_bounds(da, **points)
     # Error handling
     if not inside.all():
-        raise ValueError(f"Not all points are within the bounds of the DataArray")
+        raise ValueError("Not all points are within the bounds of the DataArray")
 
     indices = {}
     for coordname, value in points.items():
@@ -241,7 +241,7 @@ def points_set_values(da, values, **points):
     inside = points_in_bounds(da, **points)
     # Error handling
     if not inside.all():
-        raise ValueError(f"Not all points are within the bounds of the DataArray")
+        raise ValueError("Not all points are within the bounds of the DataArray")
     if not isinstance(values, (int, float)):  # then it might be an array
         if len(values) != len(inside):
             raise ValueError(

@@ -2,11 +2,12 @@ import abc
 import pathlib
 
 import cftime
-import imod
 import jinja2
 import joblib
 import numpy as np
 import xarray as xr
+
+import imod
 from imod import util
 from imod.flow import timeutil
 from imod.wq import caching

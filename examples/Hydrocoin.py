@@ -197,7 +197,7 @@ m.write()
 
 # You can run the model using the comand prompt and the iMOD SEAWAT executable
 
-## Visualise results
+# Visualise results
 # head = imod.idf.open("Hydrocoin/results/head/*.idf")
 # head.plot(yincrease=False)
 # conc = imod.idf.open("Hydrocoin/results/conc/*.idf")

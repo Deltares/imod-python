@@ -1,9 +1,3 @@
-import numpy as np
-import xarray as xr
-
-import imod
-
-
 def upper_active_layer(da, is_ibound=True, include_constant_head=False):
     """
     Function to get the upper active layer from ibound xarray.DataArray
@@ -41,7 +35,7 @@ def upper_active_layer(da, is_ibound=True, include_constant_head=False):
 
     # get layer of upper active cell
     da = is_active.layer.isel(layer=is_active.argmax(dim="layer"))
-    da = da.drop("layer")
+    da = da.drop_vars("layer")
 
     # skip where no active cells
     return da.where(is_active.sum(dim="layer") > 0)
