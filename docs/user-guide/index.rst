@@ -35,3 +35,8 @@ Specifically:
 Nearly every function in imod consumes and produces xarray, pandas, or geopandas
 data structures. Therefore, this guide first introduces these data structures.
 Secondly, it will demonstrate how a modeling workflow is set up. 
+
+.. toctree::
+   :titlesonly:
+   :hidden:
+ 
