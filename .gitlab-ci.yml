@@ -1,4 +1,4 @@
-image: mambaorg/micromamba
+image: condaforge/miniforge3
 
 stages:
   - lint
@@ -6,7 +6,7 @@ stages:
   - publish
 
 before_script:
-  - mamba install curl
+  - conda install mamba
   # download mf6 binary and move it to the env's bin which is in the path
   # see https://gitlab.com/deltares/imod/imod-python/snippets/1893049
   - curl -O -L https://gitlab.com/deltares/imod/imod-python/uploads/947a1e194a02ade1376d1111327db34d/mf6.gz
