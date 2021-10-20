@@ -6,7 +6,7 @@ from imod.mf6.pkgbase import Package
 class InitialConditions(Package):
     """
     Initial Conditions (IC) Package information is read from the file that is
-    specified by “IC6” as the file type. Only one IC Package can be specified
+    specified by "IC6" as the file type. Only one IC Package can be specified
     for a GWF model.
     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=46
 

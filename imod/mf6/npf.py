@@ -42,8 +42,8 @@ class NodePropertyFlow(Package):
         cannot be wetted. The absolute value of rewet_layer is the wetting
         threshold. When the sum of BOT and the absolute value of rewet_layer at
         a dry cell is equaled or exceeded by the head at an adjacent cell, the
-        cell is wetted. rewet_layer must be specified if “rewet” is specified in
-        the OPTIONS block. If “rewet” is not specified in the options block,
+        cell is wetted. rewet_layer must be specified if "rewet" is specified in
+        the OPTIONS block. If "rewet" is not specified in the options block,
         then rewet_layer can be entered, and memory will be allocated for it,
         even though it is not used. (WETDRY)
         Default is None.
@@ -128,7 +128,7 @@ class NodePropertyFlow(Package):
         Default: "harmonic"
     save_flows: ({True, False}, optional)
         keyword to indicate that cell-by-cell flow terms will be written to the
-        file specified with “budget save file” in Output Control.
+        file specified with "budget save file" in Output Control.
         Default is False.
     starting_head_as_confined_thickness: ({True, False}, optional)
         indicates that cells having a negative icelltype are confined, and their
@@ -164,7 +164,7 @@ class NodePropertyFlow(Package):
     save_specific_discharge: ({True, False}, optional)
         keyword to indicate that x, y, and z components of specific discharge
         will be calculated at cell centers and written to the cell-by-cell flow
-        file, which is specified with“budget save file” in Output Control. If
+        file, which is specified with"budget save file" in Output Control. If
         this option is activated, then additional information may be required in
         the discretization packages and the GWF Exchange package (if GWF models
         are coupled). Specifically, angldegx must be specified in the

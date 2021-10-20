@@ -28,7 +28,7 @@ class StructuredDiscretization(Package):
         simulation. if the idomain value for a cell is -1, the cell does not
         exist in the simulation. Furthermore, the first existing cell above will
         be connected to the first existing cell below. This type of cell is
-        referred to as a “vertical pass through”cell.
+        referred to as a "vertical pass through" cell.
     """
 
     __slots__ = ("top", "bottom", "idomain")
