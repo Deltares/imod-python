@@ -1,23 +1,36 @@
 image: condaforge/miniforge3
 
+stages:
+  - lint
+  - build
+  - publish
+
 before_script:
   - conda install mamba tox
-  # Run the linting first, abort immediately if it doesn't pass
-  - tox -e lint
-  - apt-get update -q -y
-  - apt-get install -y build-essential
-  - apt-get install libgl1-mesa-glx -y
-  - mamba env create -f imod-environment.yml
-  - source activate imod
-  - pip install .
-  # download mf6 binary and move it to the env's bin which is in the path
-  # see https://gitlab.com/deltares/imod/imod-python/snippets/1893049
-  - curl -O -L https://gitlab.com/deltares/imod/imod-python/uploads/947a1e194a02ade1376d1111327db34d/mf6.gz
-  - gunzip mf6.gz
-  - chmod +x mf6
-  - mv mf6 /opt/conda/envs/imod/bin
+  
+lint:
+  stage: lint
+  script:
+    - tox -e lint
+
+setup:
+  stage: build
+  script:
+    - apt-get update -q -y
+    - apt-get install -y build-essential
+    - apt-get install libgl1-mesa-glx -y
+    - mamba env create -f imod-environment.yml
+    - source activate imod
+    - pip install .
+    # download mf6 binary and move it to the env's bin which is in the path
+    # see https://gitlab.com/deltares/imod/imod-python/snippets/1893049
+    - curl -O -L https://gitlab.com/deltares/imod/imod-python/uploads/947a1e194a02ade1376d1111327db34d/mf6.gz
+    - gunzip mf6.gz
+    - chmod +x mf6
+    - mv mf6 /opt/conda/envs/imod/bin
 
 test:
+  stage: build
   script:
     # Run tests
     - cd tests
@@ -29,6 +42,7 @@ test:
     - cd ..
 
 pages:
+  stage: build
   script:
   - cd docs
   - make html
