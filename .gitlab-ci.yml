@@ -6,7 +6,6 @@ stages:
   - publish
 
 before_script:
-  - micromamba activate
   - micromamba install python=3.9 curl mamba tox -c conda-forge
  
 lint:
