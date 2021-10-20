@@ -13,7 +13,9 @@ lint:
   script:
     - tox -e lint
 
-setup:
+# Run tests and create docs in the same stage. The docker image cannot (easily)
+# be shared between stages, this avoids double setup of the environment.
+build:
   stage: build
   script:
     - apt-get update -q -y
@@ -28,10 +30,6 @@ setup:
     - gunzip mf6.gz
     - chmod +x mf6
     - mv mf6 /opt/conda/envs/imod/bin
-
-test:
-  stage: build
-  script:
     # Run tests
     - cd tests
     - python -m pytest --cache-clear
@@ -39,15 +37,14 @@ test:
     - python -m pytest --verbose test_visualize/test_visualize_pyvista.py
     - export NUMBA_DISABLE_JIT=1
     - python -m pytest --verbose --cov=imod
+    - cd ../docs
+    - make html
     - cd ..
 
-pages:
-  stage: build
+publish:
+  stage: publish
   script:
-  - cd docs
-  - make html
-  - cd ..
-  - mv docs/_build/html/ public/
+    - mv docs/_build/html/ public/
   artifacts:
     paths:
     - public
