@@ -13,23 +13,41 @@ lint:
   script:
     - tox -e lint
 
-build:
+setup:
   stage: build
   script:
-    - mamba install curl
-    # download mf6 binary and add to path
+    - apt-get update -q -y
+    - apt-get install -y build-essential
+    - apt-get install libgl1-mesa-glx -y
+    - mamba env create -f imod-environment.yml
+    - source activate imod
+    - pip install .
+    # download mf6 binary and move it to the env's bin which is in the path
     # see https://gitlab.com/deltares/imod/imod-python/snippets/1893049
     - curl -O -L https://gitlab.com/deltares/imod/imod-python/uploads/947a1e194a02ade1376d1111327db34d/mf6.gz
     - gunzip mf6.gz
     - chmod +x mf6
-    - export PATH=$PATH:mf6
-    # Runs tests and build docs with tox
-    - tox -e build
+    - mv mf6 /opt/conda/envs/imod/bin
 
-publish:
-  stage: publish
+test:
+  stage: build
   script:
-  - mv .tox/docs_out public/
+    # Run tests
+    - cd tests
+    - python -m pytest --cache-clear
+    - python -m pytest --verbose test_regrid.py
+    - python -m pytest --verbose test_visualize/test_visualize_pyvista.py
+    - export NUMBA_DISABLE_JIT=1
+    - python -m pytest --verbose --cov=imod
+    - cd ..
+
+pages:
+  stage: build
+  script:
+  - cd docs
+  - make html
+  - cd ..
+  - mv docs/_build/html/ public/
   artifacts:
     paths:
     - public
