@@ -191,11 +191,10 @@ def c_leakage(kh, kv, D, c0, c1, B, length, dx, dy):
         exp2x = np.exp(2.0 * x)
         return x * (exp2x + 1) / (exp2x - 1.0)
 
-    # TODO: raise ValueError when cells are far from rectangular?
+    # TODO: raise ValueError when cells are far from square?
     # Since method of average ditch distance will not work well
     # Compute geometry of ditches within cells
     cell_area = abs(dy * dx)
-    cell_side = np.sqrt(cell_area)
     wetted_area = length * B
     fraction_wetted = wetted_area / cell_area
     # Compute average distance between ditches
