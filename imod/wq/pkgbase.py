@@ -15,6 +15,14 @@ from imod.wq import timeutil
 from .caching import caching
 
 
+def monkeypatch_method(cls):
+    def decorator(func):
+        setattr(cls, func.__name__, func)
+        return func
+
+    return decorator
+
+
 class Package(xr.Dataset, abc.ABC):
     """
     Base package for the different SEAWAT packages.
@@ -90,20 +98,39 @@ class Package(xr.Dataset, abc.ABC):
         else:
             cls._dataset = xr.open_dataset(path, **kwargs)
 
-        pkg_kwargs = {var: cls._dataset[var] for var in cls._dataset.data_vars}
-        if cache_path is None:
-            return cls(**pkg_kwargs)
-        else:
-            # Dynamically construct a CachingPackage
-            # Note:
-            #    "a method cannot be decorated at class definition, because when
-            #    the class is instantiated, the first argument (self) is bound,
-            #    and no longer accessible to the Memory object."
-            # See: https://joblib.readthedocs.io/en/latest/memory.html
-            cache_path = pathlib.Path(cache_path)
-            cache = joblib.Memory(cache_path, verbose=cache_verbose)
-            CachingPackage = caching(cls, cache)
-            return CachingPackage(path, **pkg_kwargs)
+        # Monkeypatch class setitem to prevent costly dropna for all-nan layers at initialisation
+        # https://mail.python.org/pipermail/python-dev/2008-January/076194.html
+        # Note that the 'automagical' layer check does not work for 'from_file' packages
+        # Within try-finally to make sure the original is always restored
+        _org_setitem = cls.__setitem__
+        try:
+
+            @monkeypatch_method(cls)
+            def __setitem__(self, key, value):
+                super(__class__, self).__setitem__(key, value)
+
+            pkg_kwargs = {var: cls._dataset[var] for var in cls._dataset.data_vars}
+            if cache_path is None:
+                return_cls = cls(**pkg_kwargs)
+            else:
+                # Dynamically construct a CachingPackage
+                # Note:
+                #    "a method cannot be decorated at class definition, because when
+                #    the class is instantiated, the first argument (self) is bound,
+                #    and no longer accessible to the Memory object."
+                # See: https://joblib.readthedocs.io/en/latest/memory.html
+                cache_path = pathlib.Path(cache_path)
+                cache = joblib.Memory(cache_path, verbose=cache_verbose)
+                CachingPackage = caching(cls, cache)
+                return_cls = CachingPackage(path, **pkg_kwargs)
+
+        finally:
+            # Monkeypatch setitem back to what it was
+            @monkeypatch_method(cls)
+            def __setitem__(self, key, value):
+                return _org_setitem(self, key, value)
+
+        return return_cls
 
     def __setitem__(self, key, value):
         if isinstance(value, xr.DataArray):
@@ -475,15 +502,23 @@ class BoundaryCondition(Package, abc.ABC):
         "{%- endfor -%}"
     )
 
-    def _add_timemap(self, varname, value, use_cftime):
+    def add_timemap(self, *args, **kwargs):
+        import warnings
+
+        warnings.warn(
+            "add_timemap is deprecated: use repeat_stress instead", FutureWarning
+        )
+        self.repeat_stress(*args, **kwargs)
+
+    def _repeat_stress(self, varname, value, use_cftime):
         if value is not None:
             if varname not in self:
                 raise ValueError(
-                    f"{varname} does not occur in {self}\n cannot add timemap"
+                    f"{varname} does not occur in {self}\n cannot repeat stress"
                 )
             if "time" not in self[varname].coords:
                 raise ValueError(
-                    f"{varname} in {self}\n does not have dimension time, cannot add timemap."
+                    f"{varname} in {self}\n does not have dimension time, cannot repeat stress."
                 )
 
             # Replace both key and value by the right datetime type
@@ -491,7 +526,7 @@ class BoundaryCondition(Package, abc.ABC):
                 timeutil.to_datetime(k, use_cftime): timeutil.to_datetime(v, use_cftime)
                 for k, v in value.items()
             }
-            self[varname].attrs["timemap"] = d
+            self[varname].attrs["stress_repeats"] = d
 
     def _compose_values_timelayer(
         self, varname, globaltimes, directory, nlayer, da=None
@@ -535,14 +570,16 @@ class BoundaryCondition(Package, abc.ABC):
 
         if "time" in da.coords:
             da_times = da.coords["time"].values
-            if "timemap" in da.attrs:
-                timemap_keys = np.array(list(da.attrs["timemap"].keys()))
-                timemap_values = np.array(list(da.attrs["timemap"].values()))
+            if "stress_repeats" in da.attrs:
+                stress_repeats_keys = np.array(list(da.attrs["stress_repeats"].keys()))
+                stress_repeats_values = np.array(
+                    list(da.attrs["stress_repeats"].values())
+                )
                 package_times, inds = np.unique(
-                    np.concatenate([da_times, timemap_keys]), return_index=True
+                    np.concatenate([da_times, stress_repeats_keys]), return_index=True
                 )
                 # Times to write in the runfile
-                runfile_times = np.concatenate([da_times, timemap_values])[inds]
+                runfile_times = np.concatenate([da_times, stress_repeats_values])[inds]
             else:
                 runfile_times = package_times = da_times
 

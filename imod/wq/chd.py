@@ -36,8 +36,8 @@ class ConstantHead(BoundaryCondition):
         self._check_positive(["concentration"])
         self._check_location_consistent(["head_start", "head_end", "concentration"])
 
-    def add_timemap(self, head_start=None, head_end=None, use_cftime=False):
+    def repeat_stress(self, head_start=None, head_end=None, use_cftime=False):
         varnames = ["head_start", "head_end"]
         values = [head_start, head_end]
         for varname, value in zip(varnames, values):
-            self._add_timemap(varname, value, use_cftime)
+            self._repeat_stress(varname, value, use_cftime)

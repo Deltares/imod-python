@@ -5,9 +5,11 @@ import numpy as np
 import xarray as xr
 
 import imod
+import pytest
 
 
-def test_render():
+@pytest.fixture()
+def idomain():
     nlay = 3
     nrow = 15
     ncol = 15
@@ -27,16 +29,27 @@ def test_render():
     coords = {"layer": layer, "y": y, "x": x}
 
     # Discretization data
-    idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
+    return xr.DataArray(np.ones(shape), coords=coords, dims=dims)
 
+
+@pytest.fixture()
+def sy_layered(idomain):
+    layer = idomain["layer"].values
+    return xr.DataArray([0.16, 0.15, 0.14], {"layer": layer}, ("layer",))
+
+
+@pytest.fixture()
+def convertible(idomain):
+    return xr.full_like(idomain, 0, dtype=int)
+
+
+def test_render_specific_storage(sy_layered, convertible):
     # for better coverage, use full (conv) layered (sy) and constant (ss)
-    conv = xr.full_like(idomain, 0, dtype=int)
-    sy_layered = xr.DataArray([0.16, 0.15, 0.14], {"layer": layer}, ("layer",))
-    sto = imod.mf6.Storage(
+    sto = imod.mf6.SpecificStorage(
         specific_storage=0.0003,
         specific_yield=sy_layered,
         transient=True,
-        convertible=conv,
+        convertible=convertible,
     )
 
     directory = pathlib.Path("mymodel")
@@ -63,18 +76,22 @@ def test_render():
         end period
         """
     )
-    print(actual)
     assert actual == expected
 
+
+def test_render_specific_storage_three_periods(sy_layered, convertible):
     # again but starting with two steady-state periods, followed by a transient stress period
     times = [np.datetime64("2000-01-01"), np.datetime64("2000-01-03")]
     transient = xr.DataArray([False, True], {"time": times}, ("time",))
-    sto = imod.mf6.Storage(
+
+    sto = imod.mf6.SpecificStorage(
         specific_storage=0.0003,
         specific_yield=sy_layered,
         transient=transient,
-        convertible=conv,
+        convertible=convertible,
     )
+
+    directory = pathlib.Path("mymodel")
     globaltimes = [
         np.datetime64("2000-01-01"),
         np.datetime64("2000-01-02"),
@@ -106,3 +123,50 @@ def test_render():
         """
     )
     assert actual == expected
+
+
+def test_render_storage_coefficient(sy_layered, convertible):
+    # for better coverage, use full (conv) layered (sy) and constant (ss)
+    sto = imod.mf6.StorageCoefficient(
+        storage_coefficient=0.0003,
+        specific_yield=sy_layered,
+        transient=True,
+        convertible=convertible,
+    )
+
+    directory = pathlib.Path("mymodel")
+    globaltimes = [np.datetime64("2000-01-01")]
+    actual = sto.render(directory, "sto", globaltimes)
+    expected = textwrap.dedent(
+        """\
+        begin options
+          storagecoefficient
+        end options
+
+        begin griddata
+          iconvert
+            open/close mymodel/sto/iconvert.bin (binary)
+          ss
+            constant 0.0003
+          sy layered
+            constant 0.16
+            constant 0.15
+            constant 0.14
+        end griddata
+
+        begin period 1
+          transient
+        end period
+        """
+    )
+    assert actual == expected
+
+
+def test_storage_deprecation_warning(sy_layered, convertible):
+    with pytest.raises(DeprecationWarning):
+        imod.mf6.Storage(
+            specific_storage=0.0003,
+            specific_yield=sy_layered,
+            transient=True,
+            convertible=convertible,
+        )

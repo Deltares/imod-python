@@ -55,7 +55,7 @@ def test_stability_constraint_advection(test_da):
 
     dt_x = (test_da.T * np.array([0.3, 0.6, 0.3])).T.assign_coords({"direction": "x"})
     dt_y = (test_da.T * np.array([0.15, 0.3, 0.15])).T.assign_coords({"direction": "y"})
-    dt_z = (test_da.T * np.array([0.45, 0.45, np.nan])).T.assign_coords(
+    dt_z = (test_da.T * np.array([0.3, 0.6, np.nan])).T.assign_coords(
         {"direction": "z"}
     )
     dtref = (1 / (1 / dt_x + 1 / dt_y + 1 / dt_z)).drop("direction")
@@ -99,3 +99,20 @@ def test_intra_cell_boundary_conditions(test_da1):
             (ghbdrn, riv1drn), pd.Index(["ghb-drn", "riv_0-drn"], name="combination")
         )
     )
+
+
+def test_intra_cell_boundary_conditions_thickness_zero(test_da1):
+    top_bot = xr.Dataset({"top": test_da1 * -1.0, "bot": test_da1 * -1.0})
+    riv1 = xr.Dataset(
+        {
+            "stage": test_da1 * 1.0,
+            "conductance": test_da1 * 100.0,
+            "bottom_elevation": test_da1 * 0.0,
+        }
+    )
+    drn = xr.Dataset({"elevation": test_da1 * 0.0, "conductance": test_da1 * 150.0})
+
+    with pytest.raises(ValueError):
+        _ = imod.evaluate.intra_cell_boundary_conditions(
+            top_bot, porosity=0.3, riv=[riv1], drn=drn, drop_allnan=True
+        )

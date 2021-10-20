@@ -164,7 +164,7 @@ def test_render__highest_active(evapotranspiration_ha):
 
 
 @pytest.mark.parametrize("varname", ["maximum_rate", "surface", "extinction_depth"])
-def test_render__timemap(evapotranspiration_ha, varname):
+def test_render__stress_repeats(evapotranspiration_ha, varname):
     evt = evapotranspiration_ha.isel(time=0)
     directory = pathlib.Path(".")
     da = evt[varname]
@@ -174,6 +174,6 @@ def test_render__timemap(evapotranspiration_ha, varname):
     )
     evt[varname] = da_transient
 
-    timemap = {datetimes[-1]: datetimes[0]}
-    evt.add_timemap(**{varname: timemap})
+    stress_repeats = {datetimes[-1]: datetimes[0]}
+    evt.repeat_stress(**{varname: stress_repeats})
     actual = evt._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)

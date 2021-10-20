@@ -30,8 +30,8 @@ class ConstantHead(BoundaryCondition):
         False.
     print_flows: ({True, False}, optional)
         Indicates that the list of constant head flow rates will be printed to
-        the listing file for every stress period time step in which "BUDGETBUDGET
-        PRINT"is specified in Output Control. If there is no Output Control
+        the listing file for every stress period time step in which "BUDGET
+        PRINT" is specified in Output Control. If there is no Output Control
         option and PRINT FLOWS is specified, then flow rates are printed for the
         last time step of each stress period.
         Default is False.

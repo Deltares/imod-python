@@ -167,7 +167,7 @@ gwf_model["npf"] = imod.mf6.NodePropertyFlow(
     perched=False,
     save_flows=True,
 )
-gwf_model["oc"] = imod.mf6.OutputControl(save_head=True, save_budget=True)
+gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
 
 # Attach it to a simulation
 simulation = imod.mf6.Modflow6Simulation("mfsim")

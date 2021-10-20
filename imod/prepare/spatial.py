@@ -118,10 +118,10 @@ def laplace_interpolate(
 
     Parameters
     ----------
-    source : xr.DataArray with dims (y, x)
+    source : xr.DataArray of floats with dims (y, x)
         Data values to interpolate.
-    ibound : xr.DataArray with dims (y, x)
-        Precomputed array which marks where to interpolate
+    ibound : xr.DataArray of bool with dims (y, x)
+        Precomputed array which marks where to interpolate.
     close : float
         Closure criteration of iterative solver. Should be one to two orders
         of magnitude smaller than desired accuracy.
@@ -144,30 +144,31 @@ def laplace_interpolate(
     if not source.dims == ("y", "x"):
         raise ValueError('source dims must be ("y", "x")')
 
-    if ibound is not None:
+    # expand dims to make 3d
+    source3d = source.expand_dims("layer")
+    if ibound is None:
+        iboundv = xr.full_like(source3d, 1, dtype=np.int32).values
+    else:
         if not ibound.dims == ("y", "x"):
             raise ValueError('ibound dims must be ("y", "x")')
         if not ibound.shape == source.shape:
             raise ValueError("ibound and source must have the same shape")
+        iboundv = ibound.expand_dims("layer").astype(np.int32).values
 
-        # expand dims to make 3d
-        source3d = source.expand_dims("layer")
-        hnew = source3d.values
-        iboundv = ibound.expand_dims("layer").astype(np.int).values
-    else:
-        # expand dims to make 3d
-        source3d = source.expand_dims("layer")
-        hnew = source3d.fillna(0.0).values  # Set start interpolated estimate to 0.0
-        ibound = np.isnan(source3d)  # Mark nodata values as 1
-        # Mark data values as -1, convert to int np.array
-        iboundv = ibound.where(ibound).fillna(-1.0).astype(np.int).values
+    has_data = source3d.notnull().values
+    iboundv[has_data] = -1
+    hnew = source3d.fillna(0.0).values.astype(
+        np.float64
+    )  # Set start interpolated estimate to 0.0
 
     shape = iboundv.shape
     nlay, nrow, ncol = shape
     nodes = nlay * nrow * ncol
     # Allocate work arrays
     # Not really used now, but might come in handy to implements weights
-    cc = cr = cv = np.ones(shape)
+    cc = np.ones(shape)
+    cr = np.ones(shape)
+    cv = np.ones(shape)
     rhs = np.zeros(shape)
     hcof = np.zeros(shape)
     # Solver work arrays
@@ -201,6 +202,7 @@ def laplace_interpolate(
         if not converged:
             raise RuntimeError("Failed to converge")
 
+    hnew[iboundv == 0] = np.nan
     return source.copy(data=hnew[0])
 
 
@@ -379,7 +381,7 @@ def gdal_rasterize(
 
     Returns
     -------
-    rasterized : np.array
+    rasterized : xr.DataArray
     """
     from osgeo import gdal
     from osgeo import ogr

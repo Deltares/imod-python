@@ -25,7 +25,7 @@ def _outer_edge(da):
     # Number the faces by their id
     for unique_id in unique_ids:
         data = (da == unique_id).values
-        from_edge = scipy.ndimage.morphology.binary_erosion(data)
+        from_edge = ~scipy.ndimage.morphology.binary_dilation(~data)
         is_edge = (data == 1) & (from_edge == 0)
         faces[is_edge] = unique_id
     return xr.DataArray(faces, da.coords, da.dims)
@@ -33,7 +33,7 @@ def _outer_edge(da):
 
 @numba.njit
 def _face_indices(face, budgetzone):
-    nface = int(np.nansum(face))
+    nface = int(np.isfinite(face).sum())
     shape = (nface, 9)
     indices = np.zeros(shape, dtype=np.int32)
     if nface == 0:

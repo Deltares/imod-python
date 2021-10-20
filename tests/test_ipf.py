@@ -132,6 +132,21 @@ def test_read__space(write_basic_ipf, tmp_path):
     assert df.iloc[1, 3] == "Den Bosch"
 
 
+def test_read_list(write_basic_ipf, tmp_path):
+    path1 = tmp_path / "basic_comma1.ipf"
+    path2 = tmp_path / "basic_space1.ipf"
+    write_basic_ipf(path1, ",")
+    write_basic_ipf(path2, " ")
+    df = ipf.read([path1, path2])
+    assert isinstance(df, pd.DataFrame)
+    assert list(df) == ["X", "Y", "Z", "City of Holland"]
+    assert len(df) == 4
+    assert df.iloc[0, 2] == -32.3
+    assert df.iloc[1, 3] == "Den Bosch"
+    assert df.iloc[2, 2] == -32.3
+    assert df.iloc[3, 3] == "Den Bosch"
+
+
 @pytest.mark.parametrize("delim1", [",", " "])
 @pytest.mark.parametrize("delim2", [",", " "])
 @pytest.mark.parametrize("delim3", [",", " "])

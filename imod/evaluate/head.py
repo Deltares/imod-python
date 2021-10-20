@@ -98,10 +98,8 @@ def calculate_gxg(head, below_surfacelevel=False):
     >>> gxg = imod.evaluate.calculate_gxg(gwl, below_surfacelevel=True)
 
     """
-    assert head.ndim == 3
-    assert "time" in head.dims
-    assert "x" in head.dims
-    assert "y" in head.dims
+    if not head.dims == ("time", "y", "x"):
+        raise ValueError('Dimensions must be ("time", "y", "x")')
 
     # reindex to GxG frequency date_range: every 14th and 28th of the month
     d13 = pd.DateOffset(days=13)

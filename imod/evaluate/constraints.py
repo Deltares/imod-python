@@ -109,22 +109,20 @@ def stability_constraint_advection(front, lower, right, top_bot, porosity=0.3, R
 
     if "dz" not in top_bot:
         top_bot["dz"] = top_bot["top"] - top_bot["bot"]
-    # dz between layers is 0.5*dz_up + 0.5*dz_down
-    dz_m = top_bot.dz.rolling(layer=2, min_periods=2).mean()
-    dz_m = dz_m.shift(layer=-1)
 
     # assert all dz positive - Issue #140
-    assert np.all(dz_m.values[~np.isnan(dz_m.values)] >= 0)
+    if not np.all(top_bot["dz"].values[~np.isnan(top_bot["dz"].values)] >= 0):
+        raise ValueError("All dz values should be positive")
 
     # absolute velocities (m/d)
     abs_v_x = np.abs(qs_x / porosity)
     abs_v_y = np.abs(qs_y / porosity)
     abs_v_z = np.abs(qs_z / porosity)
 
-    # dt of constituents (d)
-    dt_x = R / (abs_v_x / top_bot.dx)
-    dt_y = R / (abs_v_y / np.abs(top_bot.dy))
-    dt_z = R / (abs_v_z / dz_m)
+    # dt of constituents (d), set zero velocities to nans
+    dt_x = R / (abs_v_x.where(abs_v_x > 0) / top_bot.dx)
+    dt_y = R / (abs_v_y.where(abs_v_y > 0) / np.abs(top_bot.dy))
+    dt_z = R / (abs_v_z.where(abs_v_z > 0) / top_bot.dz)
 
     # overall dt due to advection criterion (d)
     dt = 1.0 / (1.0 / dt_x + 1.0 / dt_y + 1.0 / dt_z)
@@ -141,7 +139,8 @@ def _calculate_intra_cell_dt(
     """Calculate intra-cell dt by assuming a flux from a higher source_stage to a lower sink_stage,
     ignoring other head influences. Use limiting (lowest) conductance. eff_volume is the effective
     volume per cell (cell volume * effective porosity)"""
-    cond = xr.ufuncs.minimum(source_cond, sink_cond)
+    source_cond, sink_cond = xr.align(source_cond, sink_cond, join="inner", copy=False)
+    cond = np.minimum(source_cond, sink_cond)
     Q = cond * (source_stage - sink_stage)
     Q = Q.where(source_stage > sink_stage)
 
@@ -218,6 +217,10 @@ def intra_cell_boundary_conditions(
     # determine effective volume
     if "dz" not in top_bot:
         top_bot["dz"] = top_bot["top"] - top_bot["bot"]
+
+    if (top_bot["dz"] <= 0.0).any():
+        raise ValueError("Cells with thickness <= 0 present in top_bot Dataset.")
+
     eff_volume = top_bot["dz"] * top_bot.dx * np.abs(top_bot.dy) * porosity
 
     def _get_stage_name(sid):
@@ -244,9 +247,9 @@ def intra_cell_boundary_conditions(
 
                 dt = _calculate_intra_cell_dt(
                     source_stage=source[_get_stage_name(sourceid)],
-                    source_cond=source["conductance"],
+                    source_cond=source["conductance"].load(),
                     sink_stage=sink[_get_stage_name(sinkid)],
-                    sink_cond=sink["conductance"],
+                    sink_cond=sink["conductance"].load(),
                     eff_volume=eff_volume,
                 )
 

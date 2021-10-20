@@ -97,7 +97,7 @@ def twri_model():
         perched=True,
         save_flows=True,
     )
-    gwf_model["oc"] = imod.mf6.OutputControl(save_head=True, save_budget=True)
+    gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
     gwf_model["rch"] = imod.mf6.Recharge(rch_rate)
     gwf_model["wel"] = imod.mf6.Well(
         layer=layer,

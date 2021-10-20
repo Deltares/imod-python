@@ -113,7 +113,8 @@ def _linear_inds_weights_1d(src_x, dst_x):
         vertex coordinates of destination
     """
     # Cannot interpolate "between" only one point
-    assert src_x.size > 2
+    if not src_x.size > 2:
+        raise ValueError("src_x must larger than 2. Cannot interpolate with only point")
 
     xmin = src_x.min()
     xmax = src_x.max()
@@ -450,8 +451,10 @@ def _make_interp(ndim_regrid):
 
 
 def _nd_interp(src, dst, src_coords, dst_coords, iter_interp):
-    assert len(src.shape) == len(dst.shape)
-    assert len(src_coords) == len(dst_coords)
+    if len(src.shape) != len(dst.shape):
+        raise ValueError("shape mismatch between src and dst")
+    if len(src_coords) != len(dst_coords):
+        raise ValueError("coords mismatch between src and dst")
     ndim_regrid = len(src_coords)
 
     # Determine weights for every regrid dimension, and alloc_len,

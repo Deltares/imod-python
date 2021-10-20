@@ -18,8 +18,8 @@ class MassLoading(BoundaryCondition):
         super(__class__, self).__init__()
         self["concentration"] = concentration
 
-    def add_timemap(self, concentration, use_cftime=False):
-        self._add_timemap("concentration", concentration, use_cftime)
+    def repeat_stress(self, concentration, use_cftime=False):
+        self._repeat_stress("concentration", concentration, use_cftime)
 
     def _pkgcheck(self, ibound=None):
         self._check_positive(["concentration"])

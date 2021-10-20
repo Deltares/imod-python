@@ -249,8 +249,11 @@ def read(path, kwargs={}, assoc_kwargs={}):
 
     Parameters
     ----------
-    path: pathlib.Path or str
-        globpath for IPF files to read.
+    path: str, Path or list
+        This can be a single file, 'wells_l1.ipf', a glob pattern expansion,
+        'wells_l*.ipf', or a list of files, ['wells_l1.ipf', 'wells_l2.ipf'].
+        Note that each file needs to have the same columns, such that they can
+        be combined in a single pd.DataFrame.
     kwargs : dict
         Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
         IPF files (e.g. `{"delim_whitespace": True}`)
@@ -309,12 +312,15 @@ def read(path, kwargs={}, assoc_kwargs={}):
     >>> df = df.merge(within_polygon, on="id")
     >>> df = df[df["within"]]
     """
-
-    # convert since for Path.glob non-relative patterns are unsupported
-    if isinstance(path, pathlib.Path):
+    if isinstance(path, list):
+        paths = path
+    elif isinstance(path, (str, pathlib.Path)):
+        # convert since for Path.glob non-relative patterns are unsupported
         path = str(path)
+        paths = [pathlib.Path(p) for p in glob.glob(path)]
+    else:
+        raise ValueError(f"Path should be either a list, str or pathlib.Path")
 
-    paths = [pathlib.Path(p) for p in glob.glob(path)]
     n = len(paths)
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
