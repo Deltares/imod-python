@@ -6,7 +6,7 @@ stages:
   - publish
 
 before_script:
-  - conda install curl mamba tox
+  - conda install mamba tox
   
 lint:
   stage: lint
@@ -16,18 +16,15 @@ lint:
 build:
   stage: build
   script:
-    - mamba env create -f imod-environment.yml
-    - source activate imod
-    # Let's try this to see if it's any faster
-    - python -m pip install tox-direct
-    - python -m pip install .
-    # download mf6 binary and move it to the env's bin which is in the path
+    - mamba install curl
+    # download mf6 binary and add to path
     # see https://gitlab.com/deltares/imod/imod-python/snippets/1893049
     - curl -O -L https://gitlab.com/deltares/imod/imod-python/uploads/947a1e194a02ade1376d1111327db34d/mf6.gz
     - gunzip mf6.gz
     - chmod +x mf6
     - export PATH=$PATH:mf6
-    - tox --direct -e build
+    # Runs tests and build docs with tox
+    - tox -e build
 
 publish:
   stage: publish
