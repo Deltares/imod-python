@@ -10,7 +10,6 @@ import csv
 import glob
 import io
 import pathlib
-import warnings
 
 import numpy as np
 import pandas as pd
@@ -319,7 +318,7 @@ def read(path, kwargs={}, assoc_kwargs={}):
         path = str(path)
         paths = [pathlib.Path(p) for p in glob.glob(path)]
     else:
-        raise ValueError(f"Path should be either a list, str or pathlib.Path")
+        raise ValueError("Path should be either a list, str or pathlib.Path")
 
     n = len(paths)
     if n == 0:
@@ -420,7 +419,7 @@ def write_assoc(path, df, itype=1, nodata=1.0e20, assoc_columns=None):
     df.columns = colnames
     columnorder = []
     for colname in required_columns[itype]:
-        if not colname in colnames:
+        if colname not in colnames:
             raise ValueError(f'given itype requires column "{colname}"')
         colnames.remove(colname)
         columnorder.append(colname)
@@ -556,7 +555,7 @@ def _compose_ipf(path, df, itype, assoc_ext, nodata=1.0e20, assoc_columns=None):
         colnames = _lower(list(df))
         df.columns = colnames
         for refname in ["x", "y", "id"]:
-            if not refname in colnames:
+            if refname not in colnames:
                 raise ValueError(f'given itype requires column "{refname}"')
             colnames.remove(refname)
 

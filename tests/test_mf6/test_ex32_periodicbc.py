@@ -1,16 +1,9 @@
-import pathlib
-import subprocess
-import sys
-import textwrap
-
 import numpy as np
-import pandas as pd
-import pytest
 import xarray as xr
 
 import imod
 
-# %% start of simulation
+# start of simulation
 nlay = 190
 nrow = 1
 ncol = 100
@@ -184,7 +177,7 @@ simulation["solver"] = imod.mf6.Solution(
 )
 # Collect time discretization
 simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
-# %% end of simulation
+# end of simulation
 
 
 # print(simulation.render())
@@ -192,8 +185,8 @@ simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
 # modeldir = pathlib.Path(r"d:\repo\imod\mf6-dist\examples\ex32-periodicbc-imod")
 # simulation.write(modeldir)
 
-# %% start of run model
+# start of run model
 # with imod.util.cd(modeldir):
 #     p = subprocess.run("mf6", check=True, capture_output=True, text=True)
 #     assert p.stdout.endswith("Normal termination of simulation.\n")
-# %% end of run model
+# end of run model

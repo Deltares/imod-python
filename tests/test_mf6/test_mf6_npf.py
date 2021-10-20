@@ -31,7 +31,7 @@ def test_render():
           variablecv dewatered
           perched
         end options
-        
+
         begin griddata
           icelltype layered
             constant 1

@@ -1,16 +1,15 @@
-from collections import defaultdict
 import os
-from typing import Any, BinaryIO, Dict, List, NamedTuple, Tuple, Union
+import pathlib
 import struct
+from collections import defaultdict
+from typing import Any, BinaryIO, Dict, List, NamedTuple, Tuple, Union
 
 import dask
 import numba
 import numpy as np
-import pathlib
 import xarray as xr
 
 import imod
-
 
 # Type annotations
 IntArray = np.ndarray

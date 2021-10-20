@@ -1,15 +1,9 @@
-import glob
-import os
-import pathlib
-
-import cftime
 import numpy as np
-import pandas as pd
 import pytest
 import xarray as xr
 from pytest import approx
 
-from imod import array_io, idf, util
+from imod import idf, util
 
 
 @pytest.fixture(scope="module", params=[np.float32, np.float64])
@@ -246,7 +240,7 @@ def test_save_topbot__only_z(test_layerda, tmp_path):
     da = test_layerda
     da = da.assign_coords(z=("layer", np.arange(1.0, 6.0) - 0.5))
     da = da.swap_dims({"layer": "z"})
-    da = da.drop("layer")
+    da = da.drop_vars("layer")
     idf.save(tmp_path / "layer", da)
     da_l1 = idf.open(tmp_path / "layer_l1.idf")
     assert da_l1["z"] == approx(0.5)

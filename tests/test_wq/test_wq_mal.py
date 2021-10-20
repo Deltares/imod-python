@@ -1,7 +1,8 @@
-from imod.wq import MassLoading
 import numpy as np
 import pandas as pd
 import xarray as xr
+
+from imod.wq import MassLoading
 
 
 def test_render_mal__scalar():

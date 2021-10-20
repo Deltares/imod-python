@@ -1,7 +1,8 @@
-from imod.wq import TimeVaryingConstantConcentration
-import xarray as xr
 import numpy as np
 import pandas as pd
+import xarray as xr
+
+from imod.wq import TimeVaryingConstantConcentration
 
 
 def test_render_tvc__scalar():

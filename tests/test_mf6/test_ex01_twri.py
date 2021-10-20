@@ -1,10 +1,8 @@
-import pathlib
 import subprocess
 import sys
 import textwrap
 
 import numpy as np
-import pandas as pd
 import pytest
 import xarray as xr
 
@@ -23,13 +21,13 @@ def test_dis_render(twri_model, tmp_path):
               xorigin 0.0
               yorigin 0.0
             end options
-            
+
             begin dimensions
               nlay 3
               nrow 15
               ncol 15
             end dimensions
-            
+
             begin griddata
               delr
                 constant 5000.0
@@ -67,11 +65,11 @@ def test_chd_render(twri_model, tmp_path):
               print_flows
               save_flows
             end options
-            
+
             begin dimensions
               maxbound 30
             end dimensions
-            
+
             begin period 1
               open/close {path}/chd/chd.bin (binary)
             end period
@@ -98,11 +96,11 @@ def test_drn_render(twri_model, tmp_path):
               print_flows
               save_flows
             end options
-            
+
             begin dimensions
               maxbound 9
             end dimensions
-            
+
             begin period 1
               open/close {path}/drn/drn.bin (binary)
             end period
@@ -183,7 +181,7 @@ def test_oc_render(twri_model, tmp_path):
               budget fileout {path}/{tmp_path.stem}.cbc
               head fileout {path}/{tmp_path.stem}.hds
             end options
-            
+
             begin period 1
               save head all
               save budget all
@@ -264,12 +262,12 @@ def test_solver_render(twri_model, tmp_path):
             begin options
               print_option summary
             end options
-            
+
             begin nonlinear
               outer_hclose 0.0001
               outer_maximum 500
             end nonlinear
-            
+
             begin linear
               inner_maximum 100
               inner_hclose 0.0001

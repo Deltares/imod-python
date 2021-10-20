@@ -6,10 +6,8 @@ xarray.DataArrays, as well as aggregation methods operating on weights and
 values.
 """
 import cftime
-import dask
 import numba
 import numpy as np
-import xarray as xr
 
 import imod
 

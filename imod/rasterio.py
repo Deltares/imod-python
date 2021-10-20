@@ -11,10 +11,8 @@ import pathlib
 import warnings
 
 import numpy as np
-import xarray as xr
 
-import imod
-from imod import idf, util
+from imod import util
 
 from . import array_io
 

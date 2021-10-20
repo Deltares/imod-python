@@ -1,22 +1,14 @@
-import copy
 import pathlib
 
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import xarray as xr
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import imod
 from imod.visualize import common
 
-# since geopandas is a big dependency that is sometimes hard to install
-# and not always required, we made this an optional dependency
-try:
-    import geopandas as gpd
-except ImportError:
-    pass
 # contextily is an optional dependency
 try:
     import contextily as ctx
@@ -53,7 +45,7 @@ def read_imod_legend(path):
     # Try both comma and whitespace separated
     try:
         legend = _read(delim_whitespace=False)
-    except:
+    except ValueError:
         legend = _read(delim_whitespace=True)
 
     # The colors in iMOD are formatted in RGB. Format to hexadecimal.
@@ -227,7 +219,7 @@ def plot_map(
     # Add colorbar
     divider = make_axes_locatable(ax)
     cbar_ax = divider.append_axes("right", size="5%", pad="5%")
-    ticklabels = settings_cbar.pop("ticklabels", None)
+    settings_cbar.pop("ticklabels", None)
     cbar = fig.colorbar(ax1, cax=cbar_ax, **settings_cbar)
 
     # Add overlays

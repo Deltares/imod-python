@@ -2,10 +2,10 @@ import pathlib
 import textwrap
 
 import numpy as np
+import pytest
 import xarray as xr
 
 import imod
-import pytest
 
 
 @pytest.fixture()

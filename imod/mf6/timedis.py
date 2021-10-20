@@ -45,7 +45,7 @@ class TimeDiscretization(Package):
 
         # Broadcast everything to a 1D array so it's iterable
         # also fills in a scalar value everywhere
-        broadcast_array = np.ones(nper, dtype=np.int)
+        broadcast_array = np.ones(nper, dtype=np.int32)
         timestep_duration = np.atleast_1d(timestep_duration) * broadcast_array
         n_timesteps = np.atleast_1d(n_timesteps) * broadcast_array
         timestep_multiplier = np.atleast_1d(timestep_multiplier) * broadcast_array

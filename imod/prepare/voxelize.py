@@ -57,42 +57,6 @@ def _voxelize(src, dst, src_top, src_bot, dst_z, method):
     return dst
 
 
-def _coord(da, dim):
-    delta_dim = "d" + dim  # e.g. dx, dy, dz, etc.
-
-    if delta_dim in da.coords:  # equidistant or non-equidistant
-        dx = da[delta_dim].values
-        if dx.shape == () or dx.shape == (1,):  # scalar -> equidistant
-            dxs = np.full(da[dim].size, dx)
-        else:  # array -> non-equidistant
-            dxs = dx
-        _check_monotonic(dxs, dim)
-
-    else:  # undefined -> equidistant
-        dxs = np.diff(da[dim].values)
-        dx = dxs[0]
-        atolx = abs(1.0e-4 * dx)
-        if not np.allclose(dxs, dx, atolx):
-            raise ValueError(
-                f"DataArray has to be equidistant along {dim}, or cellsizes"
-                " must be provided as a coordinate."
-            )
-        dxs = np.full(da[dim].size, dx)
-
-    # Check if the sign of dxs is correct for the coordinate values of x
-    x = da[dim]
-    dxs = np.abs(dxs)
-    if x.size > 1:
-        if x[1] < x[0]:
-            dxs = -1.0 * dxs
-
-    # Note: this works for both positive dx (increasing x) and negative dx
-    x0 = x[0] - 0.5 * dxs[0]
-    x = np.full(dxs.size + 1, x0)
-    x[1:] += np.cumsum(dxs)
-    return x
-
-
 class Voxelizer:
     """
     Object to repeatedly voxelize similar objects. Compiles once on first call,
@@ -179,7 +143,7 @@ class Voxelizer:
             return ", ".join(dim for dim in dims)
 
         # Checks on inputs
-        if not "z" in like.dims:
+        if "z" not in like.dims:
             # might be a coordinate
             if "layer" in like.dims:
                 if not like.coords["z"].dims == ("layer",):

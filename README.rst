@@ -49,12 +49,12 @@ Getting started
    import imod
 
    # read and write IPF files to pandas DataFrame
-   df = imod.ipf.read('wells.ipf')
-   imod.ipf.save('wells-out.ipf', df)
+   df = imod.ipf.read("wells.ipf")
+   imod.ipf.save("wells-out.ipf", df)
 
    # get all calculated heads in a xarray DataArray
    # with dimensions time, layer, y, x
-   da = imod.idf.open('path/to/results/head_*.idf')
+   da = imod.idf.open("path/to/results/head_*.idf")
 
    # create a groundwater model
    # abridged example, see examples for the full code

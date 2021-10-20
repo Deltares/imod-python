@@ -3,6 +3,7 @@ import pathlib
 import textwrap
 
 import pandas as pd
+
 from imod.flow.hfb import HorizontalFlowBarrier
 
 

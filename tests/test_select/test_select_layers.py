@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-import rasterio
 import xarray as xr
 
 import imod
@@ -12,10 +11,10 @@ np.random.seed(0)
 def test_upper_active_layer_ibound():
     x = np.arange(10)
     y = np.arange(10)
-    l = np.arange(1, 6)
+    layer = np.arange(1, 6)
     values = np.ones((5, 10, 10))
     active_layer = np.random.randint(low=1, high=6, size=(10, 10))
-    coords = {"x": x, "y": y, "layer": l}
+    coords = {"x": x, "y": y, "layer": layer}
     dims = ["layer", "y", "x"]
 
     # set to 0 above active layer (in loop to make sure we know what we're doing)
@@ -35,10 +34,10 @@ def test_upper_active_layer_ibound():
 def test_upper_active_layer_ibound_some_inactive():
     x = np.arange(10)
     y = np.arange(10)
-    l = np.arange(1, 6)
+    layer = np.arange(1, 6)
     values = np.ones((5, 10, 10))
     active_layer = np.random.randint(low=1, high=6, size=(10, 10))
-    coords = {"x": x, "y": y, "layer": l}
+    coords = {"x": x, "y": y, "layer": layer}
     dims = ["layer", "y", "x"]
 
     # set to 0 above active layer (in loop to make sure we know what we're doing)
@@ -63,11 +62,11 @@ def test_upper_active_layer_ibound_some_inactive():
 def test_upper_active_layer_ibound_all_inactive():
     x = np.arange(10)
     y = np.arange(10)
-    l = np.arange(1, 6)
+    layer = np.arange(1, 6)
     values = np.zeros((5, 10, 10))
     active_layer = np.empty((10, 10))
     active_layer[...] = np.nan
-    coords = {"x": x, "y": y, "layer": l}
+    coords = {"x": x, "y": y, "layer": layer}
     dims = ["layer", "y", "x"]
 
     da_test = xr.DataArray(data=values, coords=coords, dims=dims, name="test")
@@ -81,11 +80,11 @@ def test_upper_active_layer_ibound_all_inactive():
 def test_upper_active_layer_values():
     x = np.arange(10)
     y = np.arange(10)
-    l = np.arange(1, 6)
+    layer = np.arange(1, 6)
     values = np.random.random((5, 10, 10))
     values[:, 0, 0] = 0  # introduce some zeros
     active_layer = np.random.randint(low=1, high=6, size=(10, 10))
-    coords = {"x": x, "y": y, "layer": l}
+    coords = {"x": x, "y": y, "layer": layer}
     dims = ["layer", "y", "x"]
 
     # set to nan above active layer (in loop to make sure we know what we're doing)
@@ -105,10 +104,10 @@ def test_upper_active_layer_values():
 def test_upper_active_layer_not_an_ibound():
     x = np.arange(10)
     y = np.arange(10)
-    l = np.arange(1, 6)
+    layer = np.arange(1, 6)
     values = np.random.random((5, 10, 10))
-    active_layer = np.random.randint(low=1, high=6, size=(10, 10))
-    coords = {"x": x, "y": y, "layer": l}
+    # TODO:? active_layer = np.random.randint(low=1, high=6, size=(10, 10))
+    coords = {"x": x, "y": y, "layer": layer}
     dims = ["layer", "y", "x"]
 
     da_test = xr.DataArray(data=values, coords=coords, dims=dims, name="test")

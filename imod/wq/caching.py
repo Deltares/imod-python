@@ -1,10 +1,8 @@
-import collections
 import logging
 import os
 import pathlib
 
 import joblib
-import xarray as xr
 
 from imod import util
 
@@ -109,14 +107,13 @@ def caching(package, memory):
         #
         # More methods could be added, but these are the ones drawing data into
         # memory / making passes over the data, rather than using just metadata.
+
         @staticmethod
         def _max_n(pkg, filehashes, varname, nlayer, nrow, ncol):
-
             return super(type(pkg), pkg)._max_active_n(varname, nlayer, nrow, ncol)
 
         @staticmethod
         def _check(pkg, filehashes, ibound):
-
             return super(type(pkg), pkg)._pkgcheck(ibound)
 
         @staticmethod

@@ -1,12 +1,12 @@
 import pathlib
+import re
 import textwrap
 
 import numpy as np
+import pytest
 import xarray as xr
 
 import imod
-import pytest
-import re
 
 
 def test_render_string():
@@ -86,7 +86,7 @@ def test_render_bool_fail():
 
     expected_message = "Output Control setting should be either integer or string in ['first', 'last', 'all'], instead got True"
     with pytest.raises(TypeError, match=re.escape(expected_message)):
-        actual = oc.render(directory, "outputcontrol", globaltimes)
+        _ = oc.render(directory, "outputcontrol", globaltimes)
 
 
 def test_render_string_fail():
@@ -96,7 +96,7 @@ def test_render_string_fail():
 
     expected_message = "Output Control received wrong string. String should be one of ['first', 'last', 'all'], instead got foo"
     with pytest.raises(ValueError, match=re.escape(expected_message)):
-        actual = oc.render(directory, "outputcontrol", globaltimes)
+        _ = oc.render(directory, "outputcontrol", globaltimes)
 
 
 def test_render_mixed_two_timesteps():

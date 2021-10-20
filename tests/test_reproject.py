@@ -1,6 +1,3 @@
-import glob
-import os
-
 import affine
 import numpy as np
 import pytest

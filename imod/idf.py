@@ -550,13 +550,11 @@ def write(path, a, nodata=1.0e20, dtype=np.float32):
         if data_dtype != np.float64:
             a = a.astype(np.float64)
         reclenid = 2295
-        floatsize = 8
         floatformat = "d"
         intformat = "q"
         doubleprecision = True
     elif dtype == np.float32:
         reclenid = 1271
-        floatsize = 4
         floatformat = "f"
         intformat = "i"
         doubleprecision = False

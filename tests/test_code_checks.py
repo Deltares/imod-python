@@ -1,6 +1,5 @@
 import ast
 from glob import glob
-from pathlib import Path
 
 
 def check_ast(node: ast.AST, path: str):

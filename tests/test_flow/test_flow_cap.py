@@ -1,9 +1,9 @@
 import os
 import pathlib
 import textwrap
-from copy import deepcopy
 
 import pytest
+
 from imod.flow import MetaSwap
 
 

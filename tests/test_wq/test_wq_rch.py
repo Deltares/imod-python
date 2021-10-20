@@ -156,7 +156,7 @@ def test_render__stress_repeats(recharge_ha, varname):
 
     stress_repeats = {datetimes[-1]: datetimes[0]}
     rch.repeat_stress(**{varname: stress_repeats})
-    actual = rch._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
+    _ = rch._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
 
     # Test if deprecation warning is raised
     with pytest.warns(FutureWarning) as warn:

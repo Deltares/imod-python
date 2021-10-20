@@ -1,44 +1,57 @@
-image: continuumio/miniconda3:latest
+image: condaforge/miniforge3
+
+stages:
+  - lint
+  - build
+  - publish
 
 before_script:
-  - apt-get update -q -y
-  - apt-get install -y build-essential
-  - apt-get install libgl1-mesa-glx -y
-  - conda update -n base conda
-  - conda install mamba -n base -c conda-forge
-  - mamba env create -f environment.yml
-  - source activate imod
-  - pip install -e .
-  # download mf6 binary and move it to the env's bin which is in the path
-  # see https://gitlab.com/deltares/imod/imod-python/snippets/1893049
-  - curl -O -L https://gitlab.com/deltares/imod/imod-python/uploads/947a1e194a02ade1376d1111327db34d/mf6.gz
-  - gunzip mf6.gz
-  - chmod +x mf6
-  - mv mf6 /opt/conda/envs/imod/bin
-
-tests:
+  - conda install mamba tox
+  
+lint:
+  stage: lint
   script:
+    - tox -e lint
+
+# Run tests and create docs in the same stage. The docker image cannot (easily)
+# be shared between stages, this avoids double setup of the environment.
+build:
+  stage: build
+  script:
+    - apt-get update -q -y
+    - apt-get install -y build-essential
+    - apt-get install libgl1-mesa-glx -y
+    - mamba env create -f imod-environment.yml
+    - source activate imod
+    - pip install .
+    # download mf6 binary and move it to the env's bin which is in the path
+    # see https://gitlab.com/deltares/imod/imod-python/snippets/1893049
+    - curl -O -L https://gitlab.com/deltares/imod/imod-python/uploads/947a1e194a02ade1376d1111327db34d/mf6.gz
+    - gunzip mf6.gz
+    - chmod +x mf6
+    - mv mf6 /opt/conda/envs/imod/bin
+    # Run tests
     - cd tests
     - python -m pytest --cache-clear
     - python -m pytest --verbose test_regrid.py
     - python -m pytest --verbose test_visualize/test_visualize_pyvista.py
     - export NUMBA_DISABLE_JIT=1
     - python -m pytest --verbose --cov=imod
-    - coverage xml
+    - cd ../docs
+    - make html
     - cd ..
-    - black --check . 
-  # create coverage report as in:
-  # https://docs.gitlab.com/ee/user/project/merge_requests/test_coverage_visualization.html#python-example
   artifacts:
-    reports:
-      cobertura: tests/coverage.xml
+    paths:
+      - docs/_build/html/
+      - tests/coverage.xml 
+    expire_in: 1 week
 
-pages:
+publish:
+  stage: publish
+  dependencies:
+    - build
   script:
-  - cd docs
-  - make html
-  - cd ..
-  - mv docs/_build/html/ public/
+    - mv docs/_build/html/ public/
   artifacts:
     paths:
     - public

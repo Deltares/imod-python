@@ -1,9 +1,7 @@
-import os
 import warnings
 
 import numba
 import numpy as np
-import pytest
 import xarray as xr
 
 import imod

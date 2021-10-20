@@ -2,7 +2,6 @@ import pathlib
 import textwrap
 
 import numpy as np
-import xarray as xr
 
 import imod
 

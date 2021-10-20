@@ -155,7 +155,7 @@ def reproject(
                 src_crs = rasterio.crs.CRS.from_epsg(epsg_code)
             else:
                 src_crs = rasterio.crs.CRS.from_string(src_crs)
-        elif isinstance(src, rasterio.crs.CRS):
+        elif isinstance(src_crs, rasterio.crs.CRS):
             pass
         else:
             raise ValueError(

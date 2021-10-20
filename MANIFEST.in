@@ -1,2 +1,4 @@
 include README.rst
 include LICENSE
+global-include imod/templates/*.j2
+global-include imod/templates/mf6/*.j2

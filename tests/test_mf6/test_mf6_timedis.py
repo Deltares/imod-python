@@ -1,7 +1,5 @@
 import textwrap
 
-import numpy as np
-
 import imod
 
 
