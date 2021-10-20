@@ -1,46 +1,7 @@
-name: imod
+name: ci
 
 channels:
   - conda-forge
-  - defaults
 
-# note that these are the developer dependencies,
-# if you only want the user dependencies, see
-# install_requires in setup.py
 dependencies:
-  - affine
-  - black
-  - bottleneck
-  - cftime>=1
-  - contextily>=1
-  - cytoolz
-  - dask
-  - geopandas
-  - flopy
-  - jinja2
-  - joblib
-  - matplotlib
-  - nbstripout
-  - numba>=0.50
-  - numpy
-  - pandas
-  - pip
-  - pip:
-    - declxml
-  - pyproj
-  - pytest
-  - pytest-benchmark
-  - pytest-cov
-  - python>=3.6,<3.9
-  - pyvista
-  - rasterio>=1.0
-  - scipy
-  - setuptools_scm
-  - sphinx
-  - sphinx_rtd_theme
-  - toolz
-  - tqdm
-  - twine
-  - vtk>=9.0
-  - xarray>=0.15
-  - zarr
+  - python=3.9
