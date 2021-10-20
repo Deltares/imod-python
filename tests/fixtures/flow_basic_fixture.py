@@ -86,15 +86,12 @@ def get_render_dict():
     See: https://stackoverflow.com/a/51389067
     """
 
-    def _get_render_dict(
-        package, directory, globaltimes, nlayer, composition=None, system_index=1
-    ):
+    def _get_render_dict(package, directory, globaltimes, nlayer, system_index=1):
 
         composition = package.compose(
             directory,
             globaltimes,
             nlayer,
-            composition=composition,
             system_index=system_index,
         )
 
