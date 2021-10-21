@@ -1,8 +1,6 @@
 import pathlib
-import subprocess
 from typing import Callable, Union
 
-import affine
 import dask
 import geopandas as gpd
 import numba
@@ -383,8 +381,7 @@ def gdal_rasterize(
     -------
     rasterized : xr.DataArray
     """
-    from osgeo import gdal
-    from osgeo import ogr
+    from osgeo import gdal, ogr
 
     if isinstance(path, pathlib.Path):
         p = path

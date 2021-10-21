@@ -5,7 +5,6 @@ Read Tecplot ASCII data.
 import collections
 import functools
 import re
-import warnings
 
 import numpy as np
 import pandas as pd

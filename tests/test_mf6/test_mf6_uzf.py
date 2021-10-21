@@ -1,11 +1,12 @@
-import xarray as xr
-import imod
-import numpy as np
-import pandas as pd
-
-import pytest
 import pathlib
 import textwrap
+
+import numpy as np
+import pandas as pd
+import pytest
+import xarray as xr
+
+import imod
 
 
 def test_data():
@@ -83,9 +84,9 @@ def test_checkoptions():
     d = test_data()
 
     uzf = imod.mf6.UnsaturatedZoneFlow(**d)
-    assert uzf["simulate_et"] == True
-    assert uzf["linear_gwet"] == True
-    assert uzf["simulate_gwseep"] == False
+    assert bool(uzf["simulate_et"]) is True
+    assert bool(uzf["linear_gwet"]) is True
+    assert bool(uzf["simulate_gwseep"]) is False
 
     d.pop("extinction_depth")
     with pytest.raises(ValueError):
@@ -122,7 +123,7 @@ def test_fill_perioddata():
     d = test_data()
 
     uzf = imod.mf6.UnsaturatedZoneFlow(**d)
-    assert uzf["root_potential"] == None
+    assert uzf["root_potential"].item() is None
 
     uzf.fill_stress_perioddata()
     assert np.all(uzf["root_potential"] == xr.full_like(uzf["kv_sat"], 0.0))
@@ -159,29 +160,29 @@ def test_render():
       simulate_et
       linear_gwet
     end options
-    
+
     begin dimensions
       nuzfcells 6
       ntrailwaves 7
       nwavesets 40
     end dimensions
-    
+
     begin packagedata
       open/close mymodel/uzf/uzf-pkgdata.bin
     end packagedata
-    
+
     begin period 1
       open/close mymodel/uzf/uzf-0.bin
     end period
-    
+
     begin period 2
       open/close mymodel/uzf/uzf-1.bin
     end period
-    
+
     begin period 3
       open/close mymodel/uzf/uzf-2.bin
     end period
-    
+
     begin period 4
       open/close mymodel/uzf/uzf-3.bin
     end period

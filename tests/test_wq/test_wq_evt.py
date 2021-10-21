@@ -182,4 +182,4 @@ def test_render__stress_repeats(evapotranspiration_ha, varname):
 
     stress_repeats = {datetimes[-1]: datetimes[0]}
     evt.repeat_stress(**{varname: stress_repeats})
-    actual = evt._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
+    _ = evt._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)

@@ -2,23 +2,13 @@ import abc
 import pathlib
 
 import cftime
-import imod
 import jinja2
 import numpy as np
 import xarray as xr
+
+import imod
 from imod import util
 from imod.flow import timeutil
-
-
-class Vividict(dict):
-    """
-    Vividict is used to generate tree structures
-    Source: https://stackoverflow.com/questions/635483/what-is-the-best-way-to-implement-nested-dictionaries/19829714#19829714
-    """
-
-    def __missing__(self, key):
-        value = self[key] = type(self)()  # retain local pointer to value
-        return value  # faster to return than dict lookup
 
 
 class Package(
@@ -34,20 +24,12 @@ class Package(
     Every package contains a ``_pkg_id`` for identification.  Used to check for
     duplicate entries, or to group multiple systems together (riv, ghb, drn).
 
-    The ``_template_runfile`` attribute is the template for a section of the
-    runfile.  This is filled in based on the metadata from the DataArrays that
-    are within the Package. Same applies to ``_template_projectfile`` for the
-    projectfile.
+    The ``_template_projectfile`` attribute is the template for a section of the
+    projectfile.  This is filled in based on the metadata from the DataArrays that
+    are within the Package.
     """
 
     __slots__ = ("_pkg_id", "_variable_order", "dataset")
-
-    # TODO Runfile template not implemented yet
-    _template_runfile = jinja2.Template(
-        "{%- for layer, path in variable_data %}\n"
-        '{{layer}}, 1.0, 0.0, "{{path}}"\n'
-        "{%- endfor %}\n"
-    )
 
     _template_projectfile = jinja2.Template(
         "0001, ({{pkg_id}}), 1, {{name}}, {{variable_order}}\n"
@@ -190,17 +172,16 @@ class Package(
         ----------
         directory : str
             Path to working directory, where files will be written.
-            Necessary to generate the paths for the runfile.
+            Necessary to generate the paths for the projectfile.
         globaltimes : list #TODO make this an *arg, change order.
             Not used, only included to comply with BoundaryCondition.compose
-        composition : Vividict
-            Existing composition to add composed packages to.
+        nlayer : int
+            Number of layers
         **ignored
-            Contains keyword arguments unused for packages, i.e. compose_projectfile
+            Contains keyword arguments unused for packages
         """
 
-        if composition is None:
-            composition = Vividict()
+        composition = util.initialize_nested_dict(3)
 
         for varname in self._variable_order:
             composition[self._pkg_id][varname] = self._compose_values_layer(
@@ -240,7 +221,7 @@ class Package(
             variable name of the DataArray
         directory : str
             Path to working directory, where files will be written.
-            Necessary to generate the paths for the runfile.
+            Necessary to generate the paths for the projectfile.
         nlayer : int
             Amount of layers
         time : datetime like, optional
@@ -255,7 +236,7 @@ class Package(
         """
         pattern = "{name}"
 
-        values = Vividict()
+        values = util.initialize_nested_dict(1)
         da = self[varname]
 
         d = {"directory": directory, "name": varname, "extension": ".idf"}
@@ -325,16 +306,6 @@ class Package(
             if part of PkgGroup: for a single boundary condition system.
         """
         return self._template_projectfile.render(**kwargs)
-
-    def _render_runfile(self, **kwargs):
-        """
-        Returns
-        -------
-        rendered : str
-            The rendered runfile part,
-            if part of PkgGroup: for a single boundary condition system.
-        """
-        return self._template.render(**kwargs)
 
     def save(self, directory):
         for name, da in self.dataset.data_vars.items():  # pylint: disable=no-member
@@ -522,29 +493,54 @@ class BoundaryCondition(Package, abc.ABC):
         directory,
         globaltimes,
         nlayer,
-        composition=None,
         system_index=1,
-        compose_projectfile=True,
         pkggroup_time=None,
     ):
         """
         Composes all variables for one system.
+
+        Parameters
+        ----------
+        globaltimes : list, np.array
+            Holds the global times, i.e. the combined unique times of every
+            boundary condition that are used to define the stress periods.  The
+            times of the BoundaryCondition do not have to match all the global
+            times. When a globaltime is not present in the BoundaryCondition,
+            the value of the first previous available time is filled in. The
+            effective result is a forward fill in time.
+        directory : str
+            Path to working directory, where files will be written.  Necessary
+            to generate the paths for the projectfile.
+        nlayer : int
+            Number of layers
+        system_index : int
+            System number. Defaults to 1, but for package groups it is used
+        pkggroup_times : optional, list, np.array
+            Holds the package_group times.  Packages in one group need to be
+            synchronized for iMODFLOW.
+
+        Returns
+        -------
+        composition : defaultdict
+            A nested dictionary containing following the projectfile hierarchy:
+            ``{_pkg_id : {stress_period : {varname : {system_index : {lay_nr : value}}}}}``
+            where 'value' can be a scalar or a path to a file.
+            The stress period number may be the wildcard '?'.
         """
 
-        if composition is None:
-            composition = Vividict()
+        composition = util.initialize_nested_dict(5)
 
         for data_var in self._variable_order:
-            self._compose_values_timelayer(
+            keys_ls, values = self._compose_values_timelayer(
                 data_var,
                 globaltimes,
                 directory,
                 nlayer,
-                values=composition,
                 system_index=system_index,
-                compose_projectfile=compose_projectfile,
                 pkggroup_times=pkggroup_time,
             )
+            for keys, value in zip(keys_ls, values):
+                util.set_nested(composition, keys, value)
 
         return composition
 
@@ -554,9 +550,7 @@ class BoundaryCondition(Package, abc.ABC):
         globaltimes,
         directory,
         nlayer,
-        values=None,
         system_index=1,
-        compose_projectfile=True,
         pkggroup_times=None,
     ):
         """
@@ -576,65 +570,64 @@ class BoundaryCondition(Package, abc.ABC):
             effective result is a forward fill in time.
         directory : str
             Path to working directory, where files will be written.  Necessary
-            to generate the paths for the runfile.
+            to generate the paths for the projectfile.
         nlayer : int
             Number of layers
-        values : Vividict
-            Vividict (tree-like dictionary) to which values should be added
         system_index : int
             System number. Defaults to 1, but for package groups it is used
-        compose_projectfile : bool
-            Compose values in a hierarchy suitable for the projectfile
         pkggroup_times : optional, list, np.array
             Holds the package_group times.  Packages in one group need to be
             synchronized for iMODFLOW.
 
         Returns
         -------
-        values : Vividict
-            A nested dictionary containing following the projectfile hierarchy:
-            ``{_pkg_id : {stress_period : {varname : {system_index : {lay_nr : value}}}}}``
-            or runfile hierarchy:
-            ``{stress_period : {_pkg_id : {varname : {system_index : {lay_nr : value}}}}}``
-            where 'value' can be a scalar or a path to a file.
-            The stress period number may be the wildcard '?'.
+        keys : list of lists
+            Contains keys for nested dict in the right order
+        values : list
+            List with composed layers
+
         """
 
-        if values == None:
-            values = Vividict()
+        values = []
+        keys = []
 
         da = self[varname]
 
-        if ("time" in self.dataset.coords) or (pkggroup_times is not None):
-            runfile_times, starts = self._get_runfile_times(
+        # Check if time defined for one variable in package
+        # iMODFLOW's projectfile requires all variables for every timestep
+        if self._hastime():
+            compose_with_time = True
+            times_for_path, starts = self._get_runfile_times(
                 da, globaltimes, ds_times=pkggroup_times
             )
+        # Catch case where the package has no time, but another
+        # package in the group has. So the path has no time, but
+        # needs a time entry in the composition
+        elif pkggroup_times is not None:
+            compose_with_time = True
+            _, starts = self._get_runfile_times(
+                da, globaltimes, ds_times=pkggroup_times
+            )
+            times_for_path = [None] * len(starts)
+        else:
+            compose_with_time = False
 
-            for time, start in zip(runfile_times, starts):
-                if compose_projectfile == True:
-                    values[self._pkg_id][start][varname][
-                        system_index
-                    ] = self._compose_values_layer(
-                        varname, directory, nlayer, time=time
-                    )
-                else:  # render runfile
-                    values[start][self._pkg_id][varname][
-                        system_index
-                    ] = self._compose_values_layer(
-                        varname, directory, nlayer, time=time
-                    )
+        if compose_with_time:
+            for time, start in zip(times_for_path, starts):
+                composed_layers = self._compose_values_layer(
+                    varname, directory, nlayer, time=time
+                )
+                values.append(composed_layers)
+                keys.append([self._pkg_id, start, varname, system_index])
 
         else:
-            if compose_projectfile == True:
-                values[self._pkg_id]["1"][varname][
-                    system_index
-                ] = self._compose_values_layer(varname, directory, nlayer, time=None)
-            else:  # render runfile
-                values["1"][self._pkg_id][varname][
-                    system_index
-                ] = self._compose_values_layer(varname, directory, nlayer, time=None)
+            composed_layers = self._compose_values_layer(
+                varname, directory, nlayer, time=None
+            )
+            values.append(composed_layers)
+            keys.append([self._pkg_id, "1", varname, system_index])
 
-        return values
+        return keys, values
 
 
 class TopBoundaryCondition(BoundaryCondition, abc.ABC):
@@ -676,7 +669,7 @@ class TopBoundaryCondition(BoundaryCondition, abc.ABC):
 
     def _select_first_layer_composition(self, composition):
         """Select first layer in an exisiting composition."""
-        composition_first_layer = Vividict()
+        composition_first_layer = util.initialize_nested_dict(5)
 
         # Loop over nested dict, it is not pretty
         for (a, aa) in composition[self._pkg_id].items():
@@ -690,16 +683,12 @@ class TopBoundaryCondition(BoundaryCondition, abc.ABC):
         directory,
         globaltimes,
         nlayer,
-        composition=None,
-        compose_projectfile=True,
     ):
 
         composition = super(__class__, self).compose(
             directory,
             globaltimes,
             nlayer,
-            composition,
-            compose_projectfile=compose_projectfile,
         )
 
         composition[self._pkg_id] = self._select_first_layer_composition(composition)

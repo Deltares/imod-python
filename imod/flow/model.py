@@ -2,17 +2,17 @@ import abc
 import collections
 import os
 import pathlib
-from dataclasses import dataclass
 import warnings
 
 import cftime
-import imod
-import imod.util as util
 import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
-from imod.flow.pkgbase import BoundaryCondition, Vividict
+
+import imod
+import imod.util as util
+from imod.flow.pkgbase import BoundaryCondition
 from imod.flow.pkggroup import PackageGroups
 from imod.flow.timeutil import insert_unique_package_times
 
@@ -324,7 +324,7 @@ class ImodflowModel(Model):
         )
         return periods_composed
 
-    def _compose_all_packages(self, directory, globaltimes, compose_projectfile=True):
+    def _compose_all_packages(self, directory, globaltimes):
         """
         Compose all transient packages before rendering.
 
@@ -337,7 +337,7 @@ class ImodflowModel(Model):
         bndkey = self._get_pkgkey("bnd")
         nlayer = self[bndkey]["layer"].size
 
-        composition = Vividict()
+        composition = util.initialize_nested_dict(5)
 
         group_packages = self._group()
 
@@ -345,23 +345,21 @@ class ImodflowModel(Model):
         group_pkg_ids = [next(iter(group.values()))._pkg_id for group in group_packages]
 
         for group in group_packages:
-            group.compose(
+            group_composition = group.compose(
                 directory,
                 globaltimes,
                 nlayer,
-                composition=composition,
-                compose_projectfile=compose_projectfile,
             )
+            util.append_nested_dict(composition, group_composition)
 
         for key, package in self.items():
             if package._pkg_id not in group_pkg_ids:
-                package.compose(
+                package_composition = package.compose(
                     directory.joinpath(key),
                     globaltimes,
                     nlayer,
-                    composition=composition,
-                    compose_projectfile=compose_projectfile,
                 )
+                util.append_nested_dict(composition, package_composition)
 
         return composition
 
@@ -385,9 +383,7 @@ class ImodflowModel(Model):
 
         content = []
 
-        composition = self._compose_all_packages(
-            directory, globaltimes, compose_projectfile=True
-        )
+        composition = self._compose_all_packages(directory, globaltimes)
 
         times_composed = self._compose_timestrings(globaltimes)
 
@@ -548,7 +544,7 @@ class ImodflowModel(Model):
         # Check if any caching packages are present, and set necessary states.
         # self._set_caching_packages(caching_reldir)
 
-        if not self.check is None:
+        if self.check is not None:
             self.package_check()
 
         # TODO Necessary?

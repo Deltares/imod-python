@@ -112,7 +112,7 @@ class EvapotranspirationLayers(Evapotranspiration):
     def _set_ssm_layers(self, ibound):
         unique_layers = np.unique(self["recharge_layer"].values)
         unique_layers = unique_layers[~np.isnan(unique_layers)]
-        self._ssm_layers = unique_layers.astype(np.int)
+        self._ssm_layers = unique_layers.astype(np.int32)
 
 
 class EvapotranspirationHighestActive(Evapotranspiration):
@@ -138,4 +138,4 @@ class EvapotranspirationHighestActive(Evapotranspiration):
         top_layer = top_layer.where((ibound > 0).any("layer"))
         unique_layers = np.unique(top_layer.values)
         unique_layers = unique_layers[~np.isnan(unique_layers)]
-        self._ssm_layers = unique_layers.astype(np.int)
+        self._ssm_layers = unique_layers.astype(np.int32)

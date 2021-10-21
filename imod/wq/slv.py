@@ -1,10 +1,8 @@
 import pathlib
 
 import jinja2
-import numpy as np
 import pandas as pd
 
-from imod import util
 from imod.wq.pkgbase import Package
 
 
@@ -341,7 +339,7 @@ class ParallelKrylovFlowSolver(ParallelSolver):
         ]
         self._check_positive(to_check)
         # TODO: fix
-        ## Check whether option is actually an available option
+        # Check whether option is actually an available option
         # for opt_arg in self._keywords.keys():
         #    if self[opt_arg] not in self._keywords[opt_arg].keys():
         #        raise ValueError(
@@ -450,7 +448,7 @@ class ParallelKrylovTransportSolver(ParallelSolver):
         to_check = ["cclose", "max_iter", "inner_iter", "relax"]
         self._check_positive(to_check)
         # TODO: fix
-        ## Check whether option is actually an available option
+        # Check whether option is actually an available option
         # for opt_arg in self._keywords.keys():
         #    if self[opt_arg] not in self._keywords[opt_arg].keys():
         #        raise ValueError(

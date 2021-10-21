@@ -25,7 +25,7 @@ def _outer_edge(da):
     # Number the faces by their id
     for unique_id in unique_ids:
         data = (da == unique_id).values
-        from_edge = scipy.ndimage.morphology.binary_erosion(data)
+        from_edge = ~scipy.ndimage.morphology.binary_dilation(~data)
         is_edge = (data == 1) & (from_edge == 0)
         faces[is_edge] = unique_id
     return xr.DataArray(faces, da.coords, da.dims)
@@ -33,7 +33,7 @@ def _outer_edge(da):
 
 @numba.njit
 def _face_indices(face, budgetzone):
-    nface = int(np.nansum(face))
+    nface = int(np.isfinite(face).sum())
     shape = (nface, 9)
     indices = np.zeros(shape, dtype=np.int32)
     if nface == 0:
@@ -134,9 +134,9 @@ def delayed_collect(indices, front, lower, right):
     result_front = dask.delayed(_collect_flowfront, nout=1)(indices, front.values)
     result_lower = dask.delayed(_collect_flowlower, nout=1)(indices, lower.values)
     result_right = dask.delayed(_collect_flowright, nout=1)(indices, right.values)
-    dask_front = dask.array.from_delayed(result_front, front.shape, dtype=np.float)
-    dask_lower = dask.array.from_delayed(result_lower, lower.shape, dtype=np.float)
-    dask_right = dask.array.from_delayed(result_right, right.shape, dtype=np.float)
+    dask_front = dask.array.from_delayed(result_front, front.shape, dtype=np.float64)
+    dask_lower = dask.array.from_delayed(result_lower, lower.shape, dtype=np.float64)
+    dask_right = dask.array.from_delayed(result_right, right.shape, dtype=np.float64)
     return dask_front, dask_lower, dask_right
 
 
@@ -278,11 +278,11 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
     if indices.size > 0:
         # Create dummy arrays for skipped values, allocate just once
         if front is None:
-            f = xr.full_like(budgetzone, 0.0, dtype=np.float)
+            af = xr.full_like(budgetzone, 0.0, dtype=np.float64)
         if lower is None:
-            l = xr.full_like(budgetzone, 0.0, dtype=np.float)
+            al = xr.full_like(budgetzone, 0.0, dtype=np.float64)
         if right is None:
-            r = xr.full_like(budgetzone, 0.0, dtype=np.float)
+            ar = xr.full_like(budgetzone, 0.0, dtype=np.float64)
 
         results_front = []
         results_lower = []
@@ -291,13 +291,13 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
         if "time" in dims:
             for itime in range(front.coords["time"].size):
                 if front is not None:
-                    f = front.isel(time=itime)
+                    af = front.isel(time=itime)
                 if lower is not None:
-                    l = lower.isel(time=itime)
+                    al = lower.isel(time=itime)
                 if right is not None:
-                    r = right.isel(time=itime)
+                    ar = right.isel(time=itime)
                 # collect dask arrays
-                df, dl, dr = delayed_collect(indices, f, l, r)
+                df, dl, dr = delayed_collect(indices, af, al, ar)
                 # append
                 results_front.append(df)
                 results_lower.append(dl)
@@ -309,12 +309,12 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
             dask_right = dask.array.stack(results_right, axis=0)
         else:
             if front is not None:
-                f = front
+                af = front
             if lower is not None:
-                l = lower
+                al = lower
             if right is not None:
-                r = right
-            dask_front, dask_lower, dask_right = delayed_collect(indices, f, l, r)
+                ar = right
+            dask_front, dask_lower, dask_right = delayed_collect(indices, af, al, ar)
     else:
         chunks = (1, *da_shape)
         dask_front = dask.array.full(front.shape, np.nan, chunks=chunks)

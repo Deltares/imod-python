@@ -4,7 +4,6 @@ import warnings
 
 import jinja2
 import numpy as np
-import pandas as pd
 import xarray as xr
 
 import imod
@@ -596,8 +595,8 @@ class BoundaryCondition(Package, abc.ABC):
         if "time" in self.dataset[varname].coords:
             nmax = int(self.dataset[varname].groupby("time").count(xr.ALL_DIMS).max())
         else:
-            nmax = int(self.dataset[varname].count())
-        if not "layer" in self.dataset.coords:  # Then it applies to every layer
+            nmax = int(self[varname].count())
+        if "layer" not in self.coords:  # Then it applies to every layer
             nmax *= nlayer
         self._cellcount = nmax  # Store cellcount so it can be re-used for ssm.
         self._ssm_cellcount = nmax

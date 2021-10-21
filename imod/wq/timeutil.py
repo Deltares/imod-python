@@ -1,5 +1,3 @@
-import datetime
-
 import cftime
 import dateutil  # is a dependency of pandas
 import numpy as np

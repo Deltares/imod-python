@@ -1,5 +1,6 @@
-import imod.util
 import jinja2
+
+import imod.util
 from imod.flow.pkgbase import Package
 
 

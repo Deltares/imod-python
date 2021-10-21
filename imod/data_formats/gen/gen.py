@@ -1,12 +1,9 @@
 import io
 import warnings
-from enum import IntEnum
-from itertools import accumulate
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import geopandas as gpd
-import numba
 import numpy as np
 import pandas as pd
 import shapely.geometry as sg

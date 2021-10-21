@@ -1,10 +1,10 @@
 """
 Create iMODFLOW model.
 
-With this module full iMODFLOW models can be written to disk. 
-Models in :mod:`imod.flow` are created in a similar way to those created in :mod:`imod.wq`.
-The ImodflowModel object by default writes iMODFLOW projectfiles now 
-instead of the older iMODFLOW runfiles.
+With this module full iMODFLOW models can be written to disk. Models in
+:mod:`imod.flow` are created in a similar way to those created in
+:mod:`imod.wq`.  The ImodflowModel object by default writes iMODFLOW
+projectfiles now instead of the older iMODFLOW runfiles.
 """
 
 from imod.flow.ani import HorizontalAnisotropy

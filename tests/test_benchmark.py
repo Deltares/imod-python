@@ -1,9 +1,6 @@
 # keep track of performance using pytest-benchmark
 # https://pytest-benchmark.readthedocs.io/en/stable/
 
-import pathlib
-import subprocess
-
 import flopy
 import numpy as np
 import pytest

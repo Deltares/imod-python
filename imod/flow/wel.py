@@ -1,6 +1,7 @@
-import imod
 import numpy as np
-from imod.flow.pkgbase import BoundaryCondition, Vividict
+
+import imod
+from imod.flow.pkgbase import BoundaryCondition
 
 
 class Well(BoundaryCondition):
@@ -93,7 +94,7 @@ class Well(BoundaryCondition):
         # Periodic stresses are defined for all variables
         return "stress_periodic" in self.dataset.attrs
 
-    def _get_runfile_times(self, globaltimes, ds_times=None):
+    def _get_runfile_times(self, _, globaltimes, ds_times=None):
         if ds_times is None:
             ds_times = np.unique(self["time"].values)
 
@@ -104,89 +105,6 @@ class Well(BoundaryCondition):
         )
 
         return runfile_times, starts
-
-    def _compose_values_timelayer(
-        self,
-        varname,
-        globaltimes,
-        directory,
-        nlayer,
-        values=None,
-        system_index=1,
-        compose_projectfile=True,
-        pkggroup_times=None,
-    ):
-        """
-        Composes paths to files, or gets the appropriate scalar value for a
-        single variable in a dataset.
-
-        Parameters
-        ----------
-        varname : str
-            variable name of the DataArray
-        globaltimes : list, np.array
-            Holds the global times, i.e. the combined unique times of every
-            boundary condition that are used to define the stress periods.  The
-            times of the BoundaryCondition do not have to match all the global
-            times. When a globaltime is not present in the BoundaryCondition,
-            the value of the first previous available time is filled in. The
-            effective result is a forward fill in time.
-        directory : str
-            Path to working directory, where files will be written.  Necessary
-            to generate the paths for the runfile.
-        nlayer : int
-            Number of layers
-        values : Vividict
-            Vividict (tree-like dictionary) to which values should be added
-        system_index : int
-            System number. Defaults as 1, but for package groups it
-        compose_projectfile : bool
-            Compose values in a hierarchy suitable for the projectfile
-
-        Returns
-        -------
-        values : Vividict
-            A nested dictionary containing following the projectfile hierarchy:
-            {_pkg_id : {stress_period : {varname : {system_index : {lay_nr : value}}}}}
-            or runfile hierarchy:
-            {stress_period : {_pkg_id : {varname : {system_index : {lay_nr : value}}}}}
-            where 'value' can be a scalar or a path to a file.
-            The stress period number may be the wildcard '?'.
-        """
-
-        if values is None:
-            values = Vividict()
-
-        args = (varname, directory, nlayer)
-        kwargs = dict(time=None)
-
-        if "time" in self.dataset:
-            runfile_times, starts_ends = self._get_runfile_times(
-                globaltimes, ds_times=pkggroup_times
-            )
-
-            for time, start_end in zip(runfile_times, starts_ends):
-                kwargs["time"] = time
-                if compose_projectfile == True:
-                    values[self._pkg_id][start_end][varname][
-                        system_index
-                    ] = self._compose_values_layer(*args, **kwargs)
-                else:  # render runfile
-                    values[start_end][self._pkg_id][varname][
-                        system_index
-                    ] = self._compose_values_layer(*args, **kwargs)
-
-        else:
-            if compose_projectfile == True:
-                values[self._pkg_id]["steady-state"][varname][
-                    system_index
-                ] = self._compose_values_layer(*args, **kwargs)
-            else:
-                values["steady-state"][self._pkg_id][varname][
-                    system_index
-                ] = self._compose_values_layer(*args, **kwargs)
-
-        return values
 
     def _save_layers(self, df, directory, time=None):
         d = {"directory": directory, "name": directory.stem, "extension": ".ipf"}

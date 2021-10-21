@@ -1,10 +1,9 @@
-import subprocess
-
 import dask
-import imod
 import numpy as np
 import pytest
 import xarray as xr
+
+import imod
 
 
 @pytest.mark.usefixtures("twri_result")

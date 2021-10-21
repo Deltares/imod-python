@@ -1,15 +1,11 @@
 import collections
-import functools
-import glob
 import itertools
 import pathlib
 
 import dask
 import numpy as np
-import tqdm
 import xarray as xr
 
-import imod
 from imod import util
 
 
@@ -155,68 +151,7 @@ def _initialize_groupby(ndims):
     -------
         groupby : Defaultdicts, ndims - 1 times nested
     """
-    # In explicit form, say we have ndims=5
-    # Then, writing it out, we get:
-    # a = partial(defaultdict, {})
-    # b = partial(defaultdict, a)
-    # c = partial(defaultdict, b)
-    # d = defaultdict(c)
-    # This can obviously be done iteratively.
-    if ndims == 1:
-        return {}
-    elif ndims == 2:
-        return collections.defaultdict(dict)
-    else:
-        d = functools.partial(collections.defaultdict, dict)
-        for _ in range(ndims - 2):
-            d = functools.partial(collections.defaultdict, d)
-        return collections.defaultdict(d)
-
-
-def _set_nested(d, keys, value):
-    """
-    Set in the deepest dict of a set of nested dictionaries, as created by the
-    _initialize_groupby function above.
-
-    Mutates d.
-
-    Parameters
-    ----------
-    d : (Nested dict of) dict
-    keys : list of keys
-        Each key is a level of nesting
-    value : dask array, typically
-
-    Returns
-    -------
-    None
-    """
-    if len(keys) == 1:
-        d[keys[0]] = value
-    else:
-        _set_nested(d[keys[0]], keys[1:], value)
-
-
-def _sorteddict(d):
-    """
-    Sorts a variably nested dict (of dicts) by keys.
-
-    Each dictionary will be sorted by its keys.
-
-    Parameters
-    ----------
-    d : (Nested dict of) dict
-
-    Returns
-    -------
-    sorted_lists : list (of lists)
-        Values sorted by keys, matches the nesting of d.
-    """
-    firstkey = next(iter(d.keys()))
-    if not isinstance(d[firstkey], dict):  # Base case
-        return [v for (_, v) in sorted(d.items(), key=lambda t: t[0])]
-    else:  # Recursive case
-        return [_sorteddict(v) for (_, v) in sorted(d.items(), key=lambda t: t[0])]
+    return util.initialize_nested_dict(ndims - 1)
 
 
 def _ndconcat(arrays, ndim):
@@ -381,8 +316,8 @@ def _load(paths, use_cftime, pattern, _read, header):
         for path, attrs in zip(paths, headers):
             da, _ = _dask(path, attrs=attrs, _read=_read)
             groupbykeys = [attrs[k] for k in groupbydims]
-            _set_nested(groupby, groupbykeys, da)
-        dask_arrays = _sorteddict(groupby)
+            util.set_nested(groupby, groupbykeys, da)
+        dask_arrays = util.sorted_nested_dict(groupby)
         dask_array = _ndconcat(dask_arrays, ndim)
 
     out = xr.DataArray(dask_array, coords, dims, name=names[0])

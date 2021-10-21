@@ -1,5 +1,4 @@
 import pathlib
-import textwrap
 
 import numpy as np
 import pandas as pd
@@ -50,4 +49,4 @@ def test_render__stress_repeats(constanthead, varname):
 
     stress_repeats = {datetimes[-1]: datetimes[0]}
     chd.repeat_stress(**{varname: stress_repeats})
-    actual = chd._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)
+    _ = chd._render(directory, globaltimes=datetimes, system_index=1, nlayer=3)

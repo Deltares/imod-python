@@ -2,9 +2,6 @@ import os
 import pathlib
 import textwrap
 
-import numpy as np
-import pandas as pd
-import pytest
 from imod.flow import Well
 
 

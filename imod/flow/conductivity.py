@@ -1,4 +1,3 @@
-import numpy as np
 from imod.flow.pkgbase import Package
 
 

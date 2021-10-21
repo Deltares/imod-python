@@ -18,6 +18,7 @@ top = imod.rasterio.read("data/topbot/RL*.tif", pattern="RL{layer}")
 bot = imod.rasterio.read("data/topbot/TH*.tif", pattern="TH{layer}")
 recharge = imod.rasterio.read("data/recharge/RP1.tif")
 
+
 # Read the list data
 def dataframe_to_dataset(df, like, k, i, j, **kwargs):
     ds = xr.Dataset()
@@ -87,8 +88,8 @@ well_layer = wells["ilay"].values * 2 - 1
 dict_xy = imod.select.points_indices(
     da=k, x=wells["xcoordinate"].values, y=wells["ycoordinate"].values
 )
-well_row = dict_ij["y"]
-well_column = dict_ij["x"]
+well_row = dict_xy["y"]
+well_column = dict_xy["x"]
 well_active = idomain.values[well_layer - 1, well_row, well_column] == 1
 
 well_layer = well_layer[well_active]

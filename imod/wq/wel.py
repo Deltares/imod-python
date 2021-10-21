@@ -1,5 +1,3 @@
-import pathlib
-
 import jinja2
 import numpy as np
 
@@ -96,8 +94,8 @@ class Well(BoundaryCondition):
             active cells. Not used for well, here for polymorphism.
         nlayer, nrow, ncol : int
         """
-        nmax = np.unique(self.dataset["id_name"]).size
-        if not "layer" in self.dataset.coords:  # Then it applies to every layer
+        nmax = np.unique(self["id_name"]).size
+        if "layer" not in self.coords:  # Then it applies to every layer
             nmax *= nlayer
         self._cellcount = nmax
         self._ssm_cellcount = nmax
@@ -246,26 +244,6 @@ class Well(BoundaryCondition):
             path = util.compose(d)
             imod.ipf.write(path, outdf)
 
-    @staticmethod
-    def _save_layers_concentration(df, directory, name, time=None):
-        d = {"directory": directory, "name": name, "extension": ".ipf"}
-        d["directory"].mkdir(exist_ok=True, parents=True)
-
-        if time is not None:
-            d["time"] = time
-
-        if "layer" in df:
-            for layer, layerdf in df.groupby("layer"):
-                d["layer"] = layer
-                # Ensure right order
-                outdf = layerdf[["x", "y", "concentration", "id_name"]]
-                path = util.compose(d)
-                imod.ipf.write(path, outdf)
-        else:
-            outdf = df[["x", "y", "concentration", "id_name"]]
-            path = util.compose(d)
-            imod.ipf.write(path, outdf)
-
     def save(self, directory):
         all_species = [None]
         if "concentration" in self.dataset.data_vars:
@@ -308,7 +286,7 @@ class Well(BoundaryCondition):
         # between stress periods, and isn't especially easy to check.
         if "time" not in self.dataset:
             raise ValueError(
-                f"This Wel package does not have time, cannot add stress_repeats."
+                "This Wel package does not have time, cannot add stress_repeats."
             )
         # Replace both key and value by the right datetime type
         d = {

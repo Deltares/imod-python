@@ -1,6 +1,7 @@
-from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition
 import numpy as np
 import xarray as xr
+
+from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition
 
 
 class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
@@ -233,7 +234,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         if all(unsat_etae) and (extinction_theta is not None):
             raise ValueError(
-                """Both capillary based formulation and water content based formulation set based on provided input data. 
+                """Both capillary based formulation and water content based formulation set based on provided input data.
                 Please provide either only extinction_theta or (air_entry_potential, root_potential, and root_activity)"""
             )
 

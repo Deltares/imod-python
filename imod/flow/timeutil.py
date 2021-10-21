@@ -1,5 +1,5 @@
 """
-This module contains time related functions and can be potentially merged with 
+This module contains time related functions and can be potentially merged with
 imod.wq's timutil.py (also used a lot in flow), to a generic set of utilities.
 
 This utility was made because a similar logic that was contained in

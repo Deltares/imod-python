@@ -120,4 +120,4 @@ def test_render__stress_repeats(drainage, varname):
 
     stress_repeats = {datetimes[-1]: datetimes[0]}
     drn.repeat_stress(**{varname: stress_repeats})
-    actual = drn._render(directory, globaltimes=datetimes, system_index=1, nlayer=4)
+    _ = drn._render(directory, globaltimes=datetimes, system_index=1, nlayer=4)

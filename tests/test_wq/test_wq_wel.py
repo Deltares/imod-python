@@ -1,5 +1,4 @@
 import pathlib
-import shutil
 
 import numpy as np
 import pandas as pd
@@ -60,7 +59,7 @@ def test_render(well):
 def test_render__notime_nolayer(well):
     # Necessary because using drop return a pandas.DataFrame instead of a Well
     # object
-    d = {k: v for k, v in well.dataset.copy().drop("layer").drop("time").items()}
+    d = {k: v for k, v in well.copy().drop_vars("layer").drop_vars("time").items()}
     wel = Well(**d)
     directory = pathlib.Path("well")
     compare = """
@@ -71,7 +70,7 @@ def test_render__notime_nolayer(well):
 
 
 def test_render__notime_layer(well):
-    d = {k: v for k, v in well.dataset.copy().drop("time").items()}
+    d = {k: v for k, v in well.copy().drop_vars("time").items()}
     d["layer"] = [1, 2, 3, 4, 5]
     wel = Well(**d)
     directory = pathlib.Path("well")
@@ -83,7 +82,7 @@ def test_render__notime_layer(well):
 
 
 def test_render__time_nolayer(well):
-    d = {k: v for k, v in well.dataset.copy().drop("layer").items()}
+    d = {k: v for k, v in well.copy().drop_vars("layer").items()}
     wel = Well(**d)
     directory = pathlib.Path("well")
     compare = """
@@ -242,7 +241,7 @@ def test_save(well, tmp_path):
         assert (tmp_path / "well" / file).is_file()
 
 
-def test_save(well_conc, tmp_path):
+def test_save_concentration(well_conc, tmp_path):
     wel = well_conc
     wel.save(tmp_path / "well")
 
@@ -288,7 +287,7 @@ def test_save_multiple_species(well_conc_multiple_species, tmp_path):
 
 
 def test_save__time_nolayer(well, tmp_path):
-    d = {k: v for k, v in well.dataset.copy().drop("layer").items()}
+    d = {k: v for k, v in well.copy().drop_vars("layer").items()}
     wel = Well(**d)
     wel.save(tmp_path / "well")
 

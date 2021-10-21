@@ -28,7 +28,7 @@ def ghb_group():
         save_budget=False,
     )
     ghb1 = headboundary
-    ghb2 = GeneralHeadBoundary(**headboundary.dataset.copy().drop(["concentration"]))
+    ghb2 = GeneralHeadBoundary(**headboundary.dataset.copy().drop_vars(["concentration"]))
     ghb3 = GeneralHeadBoundary(**ghb2.dataset.copy())
     d = {"primary": ghb1, "secondary": ghb2, "tertiary": ghb3}
 
@@ -84,7 +84,7 @@ def test_render_error__concentration_twice(ghb_group):
     d = {"primary": ghb1, "secondary": ghb2}
 
     with pytest.raises(ValueError):
-        ghb_group = GeneralHeadBoundaryGroup(**d)
+        _ = GeneralHeadBoundaryGroup(**d)
 
 
 def test_render__count_nolayer():
@@ -107,7 +107,7 @@ def test_render__count_nolayer():
         save_budget=False,
     )
     ghb1 = headboundary
-    ghb2 = GeneralHeadBoundary(**headboundary.dataset.copy().drop(["concentration"]))
+    ghb2 = GeneralHeadBoundary(**headboundary.dataset.copy().drop_vars(["concentration"]))
     ghb3 = GeneralHeadBoundary(**ghb2.dataset.copy())
     d = {"primary": ghb1, "secondary": ghb2, "tertiary": ghb3}
     group = GeneralHeadBoundaryGroup(**d)

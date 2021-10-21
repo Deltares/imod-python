@@ -1,6 +1,6 @@
-from imod.flow import EvapoTranspiration
 import pathlib
-import os
+
+from imod.flow import EvapoTranspiration
 
 
 def test_evapotranspiration_no_time(three_days):

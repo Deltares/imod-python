@@ -4,17 +4,17 @@ import pathlib
 import warnings
 
 import cftime
-import jinja2
 import geopandas as gpd
+import jinja2
 import numpy as np
 import pandas as pd
-from scipy.ndimage import binary_dilation
 import xarray as xr
+from scipy.ndimage import binary_dilation
 
 import imod
+from imod.mf6 import qgs_util
 from imod.wq import timeutil
 from imod.wq.pkggroup import PackageGroups
-from imod.mf6 import qgs_util
 
 
 def _relpath(path, to):
@@ -93,7 +93,7 @@ class Model(collections.UserDict):
                                 df = df.loc[(df[k] >= low) & (df[k] <= high)]
                             else:  # list, labels etc
                                 df = df.loc[df[k].isin(v)]
-                        except:
+                        except Exception:
                             raise ValueError(
                                 "Invalid indexer for Well package, accepts slice or list-like of values"
                             )
@@ -482,7 +482,6 @@ class SeawatModel(Model):
     def _render_dis(self, directory, globaltimes, nlayer):
         baskey = self._get_pkgkey("bas6")
         diskey = self._get_pkgkey("dis")
-        lpfkey = self._get_pkgkey("lpf")
         bas_content = self[baskey]._render_dis(
             directory=directory.joinpath(baskey), nlayer=nlayer
         )
@@ -746,7 +745,7 @@ class SeawatModel(Model):
         # Check if any caching packages are present, and set necessary states.
         self._set_caching_packages(caching_reldir)
 
-        if not self.check is None:
+        if self.check is not None:
             self.package_check()
 
         # Delete packages without data
@@ -783,12 +782,8 @@ class SeawatModel(Model):
         baskey = self._get_pkgkey("bas6")
         if baskey is not None:
             ibound = self[baskey]["ibound"]
-            top = self[baskey]["top"]
-            bottom = self[baskey]["bottom"]
         else:
             ibound = None
-            top = None
-            bottom = None
 
         for pkg in self.values():
             pkg._pkgcheck(ibound=ibound)
