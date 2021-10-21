@@ -33,7 +33,6 @@ class Well(BoundaryCondition):
         Default is False.
     """
 
-    __slots__ = ("save_budget",)
     _pkg_id = "wel"
 
     _template = jinja2.Template(
@@ -107,8 +106,8 @@ class Well(BoundaryCondition):
         d = {"directory": directory, "name": name, "extension": ".ipf"}
 
         if time is None:
-            if "layer" in self:
-                for layer in np.unique(self["layer"]):
+            if "layer" in self.dataset:
+                for layer in np.unique(self.dataset["layer"]):
                     layer = int(layer)
                     d["layer"] = layer
                     values[layer] = self._compose(d)
@@ -117,20 +116,20 @@ class Well(BoundaryCondition):
 
         else:
             d["time"] = time
-            if "layer" in self:
+            if "layer" in self.dataset:
                 # Since the well data is in long table format, it's the only
                 # input that has to be inspected.
-                select = np.argwhere((self["time"] == time).values)
-                for layer in np.unique(self["layer"].values[select]):
+                select = np.argwhere((self.dataset["time"] == time).values)
+                for layer in np.unique(self.dataset["layer"].values[select]):
                     d["layer"] = layer
                     values[layer] = self._compose(d)
             else:
                 values["?"] = self._compose(d)
 
-        if "layer" in self:
+        if "layer" in self.dataset:
             # Compose does not accept non-integers, so use 0, then replace
             d["layer"] = 0
-            if np.unique(self["layer"].values).size == nlayer:
+            if np.unique(self.dataset["layer"].values).size == nlayer:
                 token_path = imod.util.compose(d).as_posix()
                 token_path = token_path.replace("_l0", "_l$")
                 values = {"$": token_path}
@@ -145,14 +144,14 @@ class Well(BoundaryCondition):
     def _compose_values_time(self, directory, name, globaltimes, nlayer):
         # TODO: rename to _compose_values_timelayer?
         values = {}
-        if "time" in self:
-            self_times = np.unique(self["time"].values)
-            if "stress_repeats" in self.attrs:
+        if "time" in self.dataset:
+            self_times = np.unique(self.dataset["time"].values)
+            if "stress_repeats" in self.dataset.attrs:
                 stress_repeats_keys = np.array(
-                    list(self.attrs["stress_repeats"].keys())
+                    list(self.dataset.attrs["stress_repeats"].keys())
                 )
                 stress_repeats_values = np.array(
-                    list(self.attrs["stress_repeats"].values())
+                    list(self.dataset.attrs["stress_repeats"].values())
                 )
                 package_times, inds = np.unique(
                     np.concatenate([self_times, stress_repeats_keys]), return_index=True
@@ -186,12 +185,12 @@ class Well(BoundaryCondition):
         return self._template.render(d)
 
     def _render_ssm(self, directory, globaltimes, nlayer):
-        if "concentration" in self.data_vars:
+        if "concentration" in self.dataset.data_vars:
             d = {"pkg_id": self._pkg_id}
             name = f"{directory.stem}-concentration"
-            if "species" in self["concentration"].coords:
+            if "species" in self.dataset["concentration"].coords:
                 concentration = {}
-                for species in self["concentration"]["species"].values:
+                for species in self.dataset["concentration"]["species"].values:
                     concentration[species] = self._compose_values_time(
                         directory, f"{name}_c{species}", globaltimes, nlayer=nlayer
                     )
@@ -247,35 +246,35 @@ class Well(BoundaryCondition):
 
     def save(self, directory):
         all_species = [None]
-        if "concentration" in self.data_vars:
-            if "species" in self["concentration"].coords:
-                all_species = self["concentration"]["species"].values
+        if "concentration" in self.dataset.data_vars:
+            if "species" in self.dataset["concentration"].coords:
+                all_species = self.dataset["concentration"]["species"].values
 
         # Loop over species if applicable
         for species in all_species:
             if species is not None:
-                ds = self.sel(species=species)
+                ds = self.dataset.sel(species=species)
             else:
-                ds = self
+                ds = self.dataset
 
             if "time" in ds:
                 for time, timeda in ds.groupby("time"):
                     timedf = timeda.to_dataframe()
-                    ds._save_layers(timedf, directory, time=time)
+                    self._save_layers(timedf, directory, time=time)
                     if "concentration" in ds.data_vars:
                         name = f"{directory.stem}-concentration"
                         if species is not None:
                             name = f"{name}_c{species}"
-                        ds._save_layers_concentration(
+                        self._save_layers_concentration(
                             timedf, directory, name, time=time
                         )
             else:
-                ds._save_layers(ds.to_dataframe(), directory)
+                self._save_layers(ds.to_dataframe(), directory)
                 if "concentration" in ds.data_vars:
                     name = f"{directory.stem}-concentration"
                     if species is not None:
                         name = f"{name}_c{species}"
-                    ds._save_layers_concentration(timedf, directory, name)
+                    self._save_layers_concentration(timedf, directory, name)
 
     def _pkgcheck(self, ibound=None):
         # TODO: implement
@@ -285,7 +284,7 @@ class Well(BoundaryCondition):
         # To ensure consistency, it isn't possible to use differing stress_repeatss
         # between rate and concentration: the number of points might change
         # between stress periods, and isn't especially easy to check.
-        if "time" not in self:
+        if "time" not in self.dataset:
             raise ValueError(
                 "This Wel package does not have time, cannot add stress_repeats."
             )
@@ -294,4 +293,4 @@ class Well(BoundaryCondition):
             timeutil.to_datetime(k, use_cftime): timeutil.to_datetime(v, use_cftime)
             for k, v in stress_repeats.items()
         }
-        self.attrs["stress_repeats"] = d
+        self.dataset.attrs["stress_repeats"] = d

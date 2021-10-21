@@ -7,7 +7,6 @@ from imod.wq.pkgbase import BoundaryCondition
 
 
 class Evapotranspiration(BoundaryCondition, abc.ABC):
-    __slots__ = ("_option",)
     _pkg_id = "evt"
 
     _mapping = (
@@ -61,7 +60,6 @@ class Evapotranspiration(BoundaryCondition, abc.ABC):
 
 
 class EvapotranspirationTopLayer(Evapotranspiration):
-    __slots__ = ()
 
     _option = 1
 
@@ -85,8 +83,6 @@ class EvapotranspirationTopLayer(Evapotranspiration):
 
 
 class EvapotranspirationLayers(Evapotranspiration):
-    __slots__ = ()
-
     _option = 2
 
     _mapping = (
@@ -120,8 +116,6 @@ class EvapotranspirationLayers(Evapotranspiration):
 
 
 class EvapotranspirationHighestActive(Evapotranspiration):
-    __slots__ = ()
-
     _option = 3
 
     def __init__(

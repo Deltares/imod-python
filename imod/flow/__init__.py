@@ -30,7 +30,7 @@ from imod.flow.wel import Well
 
 
 def write(path, model, name=None, runfile_parameters=None, output_packages=["shd"]):
-    """Deprectated function"""
-    raise DeprecationWarning(
-        "This function has been deprecated. Use imod.flow.ImodflowModel instead."
+    """Removed function"""
+    raise NotImplementedError(
+        "This function has been removed. Use imod.flow.ImodflowModel instead."
     )

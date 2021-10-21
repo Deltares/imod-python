@@ -27,7 +27,7 @@ class PackageGroup(collections.UserDict, abc.ABC):
         n_system_concentrations = 0
         order = []
         for k, v in self.items():
-            if "concentration" in v.data_vars:
+            if "concentration" in v.dataset.data_vars:
                 n_system_concentrations += 1
                 order.insert(0, k)
             else:
@@ -54,7 +54,9 @@ class PackageGroup(collections.UserDict, abc.ABC):
                 for v in self.values()
             ]
         )
-        d["save_budget"] = 1 if any([v.save_budget for v in self.values()]) else 0
+        d["save_budget"] = (
+            1 if any([v.dataset.save_budget for v in self.values()]) else 0
+        )
 
         content = [self._template.format(**d)]  # pylint: disable=no-member
         for i, key in enumerate(self.key_order):

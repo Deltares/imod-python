@@ -26,7 +26,7 @@ def drainage():
 def test_write(drainage, tmp_path):
     drn = drainage
     drn.write(tmp_path, "mydrn", [1])
-    path = tmp_path.as_posix()
+    dir_for_render = tmp_path.stem
     block_expected = textwrap.dedent(
         f"""\
         begin options
@@ -37,7 +37,7 @@ def test_write(drainage, tmp_path):
         end dimensions
 
         begin period 1
-          open/close {path}/mydrn/drn.bin (binary)
+          open/close {dir_for_render}/mydrn/drn.bin (binary)
         end period
         """
     )

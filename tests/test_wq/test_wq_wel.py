@@ -99,7 +99,7 @@ def test_render__time_nolayer(well):
 
 
 def test_render__time_layer(well):
-    d = {k: v for k, v in well.items()}
+    d = {k: v for k, v in well.dataset.items()}
     d["layer"] = [1, 2, 3, 4, 5]
     wel = Well(**d)
     directory = pathlib.Path("well")

@@ -43,8 +43,8 @@ def test_from_file(test_timelayerda, tmp_path):
     # TODO: zip fails on CI for some reason?
     # river_zarrzippath = tmp_path / "river.zip"
 
-    river.to_netcdf(river_ncpath)
-    river.to_zarr(river_zarrpath)
+    river.dataset.to_netcdf(river_ncpath)
+    river.dataset.to_zarr(river_zarrpath)
     # river.to_zarr(zarr.ZipStore(river_zarrzippath, mode="w"))
 
     # Test kwargs also

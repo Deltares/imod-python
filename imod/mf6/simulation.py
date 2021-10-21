@@ -106,13 +106,11 @@ class Modflow6Simulation(collections.UserDict):
 
         # Write individual models
         globaltimes = self["time_discretization"]["time"].values
-        with imod.util.cd(directory):
-            for key, value in self.items():
-                # skip timedis, exchanges
-                if value._pkg_id == "model":
-                    value.write(key, globaltimes)
-                elif value._pkg_id == "ims":
-                    value.write(".", key)
+        for key, value in self.items():
+            if value._pkg_id == "model":
+                value.write(directory, key, globaltimes)
+            elif value._pkg_id == "ims":
+                value.write(directory, key)
 
     def write_qgis_project(self, crs, directory=".", aggregate_layers=False):
         directory = pathlib.Path(directory)

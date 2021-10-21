@@ -99,7 +99,9 @@ def test_render__highest_top(evapotranspiration_top):
             exdp_p5 = extinction_depth_20000105000000.idf"""
     )
 
-    assert evt._render(directory, globaltimes=evt.time.values, nlayer=3) == compare
+    assert (
+        evt._render(directory, globaltimes=evt.dataset.time.values, nlayer=3) == compare
+    )
 
 
 def test_render__layers(evapotranspiration_layers):
@@ -132,7 +134,9 @@ def test_render__layers(evapotranspiration_layers):
             ievt_p5 = evapotranspiration_layer_20000105000000.idf"""
     )
 
-    assert evt._render(directory, globaltimes=evt.time.values, nlayer=3) == compare
+    assert (
+        evt._render(directory, globaltimes=evt.dataset.time.values, nlayer=3) == compare
+    )
 
 
 def test_render__highest_active(evapotranspiration_ha):
@@ -160,12 +164,14 @@ def test_render__highest_active(evapotranspiration_ha):
             exdp_p5 = extinction_depth_20000105000000.idf"""
     )
 
-    assert evt._render(directory, globaltimes=evt.time.values, nlayer=3) == compare
+    assert (
+        evt._render(directory, globaltimes=evt.dataset.time.values, nlayer=3) == compare
+    )
 
 
 @pytest.mark.parametrize("varname", ["maximum_rate", "surface", "extinction_depth"])
 def test_render__stress_repeats(evapotranspiration_ha, varname):
-    evt = evapotranspiration_ha.isel(time=0)
+    evt = EvapotranspirationHighestActive(**evapotranspiration_ha.dataset.isel(time=0))
     directory = pathlib.Path(".")
     da = evt[varname]
     datetimes = pd.date_range("2000-01-01", "2000-01-03")

@@ -6,7 +6,7 @@ import numpy as np
 import xarray as xr
 
 
-class Package(xr.Dataset, abc.ABC):
+class Package(abc.ABC):
     """
     Package is used to share methods for specific packages with no time
     component.
@@ -20,6 +20,89 @@ class Package(xr.Dataset, abc.ABC):
     """
 
     __slots__ = ("_template", "_pkg_id", "_period_data")
+
+    @classmethod
+    def from_file(cls, path, **kwargs):
+        """
+        Loads an imod mf6 package from a file (currently only netcdf and zarr are supported).
+        Note that it is expected that this file was saved with imod.mf6.Package.dataset.to_netcdf(),
+        as the checks upon package initialization are not done again!
+
+        Parameters
+        ----------
+        path : str, pathlib.Path
+            Path to the file.
+        **kwargs : keyword arguments
+            Arbitrary keyword arguments forwarded to ``xarray.open_dataset()``, or
+            ``xarray.open_zarr()``.
+        Refer to the examples.
+
+        Returns
+        -------
+        package : imod.mf6.Package
+            Returns a package with data loaded from file.
+
+        Examples
+        --------
+
+        To load a package from a file, e.g. a River package:
+
+        >>> river = imod.mf6.River.from_file("river.nc")
+
+        For large datasets, you likely want to process it in chunks. You can
+        forward keyword arguments to ``xarray.open_dataset()`` or
+        ``xarray.open_zarr()``:
+
+        >>> river = imod.mf6.River.from_file("river.nc", chunks={"time": 1})
+
+        Refer to the xarray documentation for the possible keyword arguments.
+        """
+
+        # Throw error if user tries to use old functionality
+        if "cache" in kwargs:
+            if kwargs["cache"] is not None:
+                raise NotImplementedError(
+                    "Caching functionality in pkg.from_file() is removed."
+                )
+
+        path = pathlib.Path(path)
+
+        # See https://stackoverflow.com/a/2169191
+        # We expect the data in the netcdf has been saved a a package
+        # thus the checks run by __init__ and __setitem__ do not have
+        # to be called again.
+        return_cls = cls.__new__(cls)
+
+        if path.suffix in (".zip", ".zarr"):
+            # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
+            return_cls.dataset = xr.open_zarr(str(path), **kwargs)
+        else:
+            return_cls.dataset = xr.open_dataset(path, **kwargs)
+
+        return return_cls
+
+    def __init__(self):
+        self.dataset = xr.Dataset()
+
+    def __getitem__(self, key):
+        return self.dataset.__getitem__(key)
+
+    def __setitem__(self, key, value):
+        self.dataset.__setitem__(key, value)
+
+    def isel(self):
+        raise NotImplementedError(
+            f"Selection on packages not yet supported. "
+            f"To make a selection on the xr.Dataset, call {self._pkg_id}.dataset.isel instead. "
+            f"You can create a new package with a selection by calling {__class__.__name__}(**{self._pkg_id}.dataset.isel(**selection))"
+        )
+
+    def sel(self):
+        raise NotImplementedError(
+            f"Selection on packages not yet supported. "
+            f"To make a selection on the xr.Dataset, call {self._pkg_id}.dataset.sel instead. "
+            f"You can create a new package with a selection by calling {__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
+        )
 
     def _valid(self, value):
         """
@@ -49,7 +132,8 @@ class Package(xr.Dataset, abc.ABC):
         return env.get_template(fname)
 
     def write_blockfile(self, directory, pkgname, *args):
-        content = self.render(directory, pkgname, *args)
+        dir_for_render = pathlib.Path(directory.stem)
+        content = self.render(dir_for_render, pkgname, *args)
         filename = directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
@@ -143,7 +227,7 @@ class Package(xr.Dataset, abc.ABC):
 
     def render(self, *args, **kwargs):
         d = {}
-        for k, v in self.data_vars.items():  # pylint:disable=no-member
+        for k, v in self.dataset.data_vars.items():  # pylint:disable=no-member
             value = v.values[()]
             if self._valid(value):  # skip None and False
                 d[k] = value
@@ -185,12 +269,13 @@ class Package(xr.Dataset, abc.ABC):
         self.write_blockfile(directory, pkgname, *args)
 
         if hasattr(self, "_grid_data"):
-            if "x" in self.dims and "y" in self.dims:
+            dims = self.dataset.dims
+            if "x" in dims and "y" in dims:
                 pkgdirectory = directory / pkgname
                 pkgdirectory.mkdir(exist_ok=True, parents=True)
                 for varname, dtype in self._grid_data.items():
                     key = self._keyword_map.get(varname, varname)
-                    da = self[varname]
+                    da = self.dataset[varname]
                     if "x" in da.dims and "y" in da.dims:
                         path = pkgdirectory / f"{key}.bin"
                         self.write_binary_griddata(path, da, dtype)
@@ -222,11 +307,11 @@ class Package(xr.Dataset, abc.ABC):
         """
 
         has_dims = []
-        for varname in self.data_vars.keys():  # pylint:disable=no-member
-            if all(i in self[varname].dims for i in ["x", "y"]):
+        for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
+            if all(i in self.dataset[varname].dims for i in ["x", "y"]):
                 has_dims.append(varname)
 
-        spatial_ds = self[has_dims]
+        spatial_ds = self.dataset[has_dims]
 
         if aggregate_layers and ("layer" in spatial_ds.dims):
             spatial_ds = spatial_ds.mean(dim="layer")
@@ -262,7 +347,7 @@ class BoundaryCondition(Package, abc.ABC):
         Determine the maximum active number of cells that are active
         during a stress period.
         """
-        da = self[self._period_data[0]]
+        da = self.dataset[self._period_data[0]]
         if "time" in da.coords:
             nmax = int(da.groupby("time").count(xr.ALL_DIMS).max())
         else:
@@ -305,10 +390,10 @@ class BoundaryCondition(Package, abc.ABC):
         if not_options is None:
             not_options = self._period_data
 
-        for varname in self.data_vars.keys():  # pylint:disable=no-member
+        for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
                 continue
-            v = self[varname].values[()]
+            v = self.dataset[varname].values[()]
             if self._valid(v):  # skip None and False
                 d[varname] = v
         return d
@@ -319,7 +404,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         # period = {1: f"{directory}/{self._pkg_id}-{i}.bin"}
 
-        bin_ds = self[list(self._period_data)]
+        bin_ds = self.dataset[list(self._period_data)]
 
         d["periods"] = self.period_paths(directory, pkgname, globaltimes, bin_ds)
         # construct the rest (dict for render)
@@ -330,10 +415,10 @@ class BoundaryCondition(Package, abc.ABC):
         return self._template.render(d)
 
     def write_perioddata(self, directory, pkgname):
-        bin_ds = self[list(self._period_data)]
+        bin_ds = self.dataset[list(self._period_data)]
 
         if "time" in bin_ds:  # one of bin_ds has time
-            for i in range(len(self.time)):
+            for i in range(len(self.dataset.time)):
                 path = directory / pkgname / f"{self._pkg_id}-{i}.bin"
                 self.write_datafile(path, bin_ds.isel(time=i))  # one timestep
         else:

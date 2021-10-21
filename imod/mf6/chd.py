@@ -42,7 +42,6 @@ class ConstantHead(BoundaryCondition):
         Default is None.
     """
 
-    __slots__ = ("head", "print_input", "print_flows", "save_flows", "observations")
     _pkg_id = "chd"
     _period_data = ("head",)
     _keyword_map = {}
@@ -57,8 +56,8 @@ class ConstantHead(BoundaryCondition):
         observations=None,
     ):
         super(__class__, self).__init__()
-        self["head"] = head
-        self["print_input"] = print_input
-        self["print_flows"] = print_flows
-        self["save_flows"] = save_flows
-        self["observations"] = observations
+        self.dataset["head"] = head
+        self.dataset["print_input"] = print_input
+        self.dataset["print_flows"] = print_flows
+        self.dataset["save_flows"] = save_flows
+        self.dataset["observations"] = observations

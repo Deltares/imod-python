@@ -63,7 +63,7 @@ def test_render_constant(dispersion):
 def test_render_constant_per_layer(dispersion):
     dsp = dispersion
     # Get rid of x and y, so it's no longer an idf
-    dsp = dsp.isel(x=0, y=0).drop_vars(["y", "x", "dx", "dy"])
+    dsp = Dispersion(**dsp.dataset.isel(x=0, y=0).drop_vars(["y", "x", "dx", "dy"]))
     directory = pathlib.Path(".")
 
     compare = textwrap.dedent(
