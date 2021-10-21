@@ -27,6 +27,7 @@ dependencies:
   - pip
   - pip:
     - declxml
+  - pydata-sphinx-theme
   - pygeos
   - pyproj
   - pytest
@@ -38,7 +39,7 @@ dependencies:
   - scipy
   - setuptools_scm
   - sphinx
-  - sphinx_rtd_theme
+  - sphinx-galllery
   - toolz
   - tqdm
   - twine
