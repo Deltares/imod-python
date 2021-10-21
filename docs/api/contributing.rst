@@ -66,6 +66,23 @@ locally by simply calling ``pytest`` in the project directory.
 the `pytest documentation`_, and have a look at the test suite to figure
 out how it works.
 
+Automation: tox
+~~~~~~~~~~~~~~~
+
+The manual steps of checking and formatting according to code style as well as
+testing can be automated. We use ``tox`` to automate these steps. Tox is
+configured for three steps:
+
+* ``tox -e format``: run ``isort`` and ``black`` on all Python modules and 
+  format them if needed.
+* ``tox -e lint``: check code with ``isort``, ``black``, and ``flake8``.
+* ``tox -e build``: run the tests and build the Sphinx documentation.
+  
+Note that tox builds a new environment for every step. The environments for
+formatting and linting are small, but the build environment requires a full
+conda installation. The configuration is setup to use mamba, so make sure
+tox and mamba are installed before running tox.
+
 Code review
 ~~~~~~~~~~~
 
@@ -109,6 +126,7 @@ To follow these steps, you need to be one of the maintainers for imod on both
 .. _here: https://github.com/ambv/black#editor-integration
 .. _Format On Save: https://code.visualstudio.com/updates/v1_6#_format-on-save
 .. _pytest documentation: https://docs.pytest.org/en/latest/
+.. _tox: https://tox.wiki/en/latest/index.html
 
 
 Debugging Continuous Integration
