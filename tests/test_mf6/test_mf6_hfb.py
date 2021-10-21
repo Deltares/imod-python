@@ -1,11 +1,10 @@
 import pathlib
 import textwrap
-import shapely.geometry as sg
-import geopandas as gpd
 
+import geopandas as gpd
 import numpy as np
-import pandas as pd
 import pytest
+import shapely.geometry as sg
 import xarray as xr
 
 import imod

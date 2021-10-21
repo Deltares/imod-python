@@ -8,7 +8,6 @@ Can be removed later when released in the xugrid package.
 from typing import Tuple, Union
 
 import geopandas as gpd
-import imod
 import numba as nb
 import numpy as np
 import pandas as pd
@@ -19,9 +18,11 @@ from scipy import sparse
 from scipy.sparse.csgraph import connected_components
 from scipy.spatial import cKDTree
 
+import imod
+
 from . import connectivity
 from .connectivity import AdjacencyMatrix
-from .typing import T_OFFSET, FloatArray, IntArray, LineArray, Point, Vector, X_EPSILON
+from .typing import T_OFFSET, X_EPSILON, FloatArray, IntArray, LineArray, Point, Vector
 
 
 def snap_nodes(

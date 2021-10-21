@@ -1,16 +1,14 @@
-import pathlib
-import shapely.geometry as sg
-import geopandas as gpd
-
-import numpy as np
-import pandas as pd
-import pytest
-import xarray as xr
-
-import imod.mf6 as mf6
-import imod
 import subprocess
 import sys
+
+import geopandas as gpd
+import numpy as np
+import pytest
+import shapely.geometry as sg
+import xarray as xr
+
+import imod
+import imod.mf6 as mf6
 
 
 @pytest.fixture(scope="module")

@@ -1,9 +1,9 @@
+import geopandas as gpd
+import numpy as np
+import pandas as pd
+
 from imod.mf6.pkgbase import BoundaryCondition
 from imod.ugrid_utils.snapping import snap_to_grid
-import geopandas as gpd
-import pandas as pd
-import numpy as np
-import io
 
 
 class HorizontalFlowBarrier(BoundaryCondition):
@@ -66,8 +66,8 @@ class HorizontalFlowBarrier(BoundaryCondition):
         # TODO: Right naming for method?
         """Add nlay rows for each segment havinng no layer specified."""
 
-        df_no_layer = gdf.loc[gdf["layer"].values == None]
-        df_layer = gdf.loc[gdf["layer"].values != None]
+        df_no_layer = gdf.loc[gdf["layer"].isnull()]
+        df_layer = gdf.loc[gdf["layer"].notnull()]
 
         n_segments = len(df_no_layer.index)
 

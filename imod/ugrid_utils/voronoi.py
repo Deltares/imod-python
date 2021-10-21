@@ -9,8 +9,8 @@ from typing import Tuple
 import numpy as np
 from scipy import sparse
 
-from .typing import FloatArray
 from .connectivity import renumber
+from .typing import FloatArray
 
 
 def voronoi_topology(

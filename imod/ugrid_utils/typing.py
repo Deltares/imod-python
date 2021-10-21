@@ -4,6 +4,7 @@ Can be removed later when released in the xugrid package.
 """
 
 from typing import NamedTuple
+
 import numpy as np
 
 # import numpy.typing as npt
