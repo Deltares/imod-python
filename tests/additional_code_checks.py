@@ -1,6 +1,6 @@
 import ast
-from glob import glob
 import sys
+from glob import glob
 
 
 def check_ast(node: ast.AST, path: str):

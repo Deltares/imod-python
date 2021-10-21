@@ -42,19 +42,19 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.todo",
     "sphinx.ext.napoleon",
-    "sphinx_gallery.gen_gallery",
+    #    "sphinx_gallery.gen_gallery",
     "IPython.sphinxext.ipython_directive",
     "IPython.sphinxext.ipython_console_highlighting",
 ]
 
-sphinx_gallery_conf = {
-    "examples_dirs": "../examples",  # path to your example scripts
-    "gallery_dirs": "examples",  # path to where to save gallery generated output
-    "filename_pattern": ".py",  # ".py",
-    "ignore_pattern": ".pytmp",
-    "abort_on_example_error": True,
-    "capture_repr": ("_repr_html_", "__repr__"),
-}
+# sphinx_gallery_conf = {
+#    "examples_dirs": "../examples",  # path to your example scripts
+#    "gallery_dirs": "examples",  # path to where to save gallery generated output
+#    "filename_pattern": ".py",  # ".py",
+#    "ignore_pattern": ".pytmp",
+#    "abort_on_example_error": True,
+#    "capture_repr": ("_repr_html_", "__repr__"),
+# }
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

@@ -56,7 +56,6 @@ Interactive notebook examples:
 
    getting-started/index
    user-guide/index
-   examples/index
    api/index
 
 Getting started
