@@ -278,11 +278,11 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
     if indices.size > 0:
         # Create dummy arrays for skipped values, allocate just once
         if front is None:
-            af = xr.full_like(budgetzone, 0.0, dtype=np.float64)
+            F = xr.full_like(budgetzone, 0.0, dtype=np.float64)
         if lower is None:
-            al = xr.full_like(budgetzone, 0.0, dtype=np.float64)
+            L = xr.full_like(budgetzone, 0.0, dtype=np.float64)
         if right is None:
-            ar = xr.full_like(budgetzone, 0.0, dtype=np.float64)
+            R = xr.full_like(budgetzone, 0.0, dtype=np.float64)
 
         results_front = []
         results_lower = []
@@ -291,17 +291,17 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
         if "time" in dims:
             for itime in range(front.coords["time"].size):
                 if front is not None:
-                    af = front.isel(time=itime)
+                    F = front.isel(time=itime)
                 if lower is not None:
-                    al = lower.isel(time=itime)
+                    L = lower.isel(time=itime)
                 if right is not None:
-                    ar = right.isel(time=itime)
+                    R = right.isel(time=itime)
                 # collect dask arrays
-                df, dl, dr = delayed_collect(indices, af, al, ar)
+                dF, dL, dR = delayed_collect(indices, F, L, R)
                 # append
-                results_front.append(df)
-                results_lower.append(dl)
-                results_right.append(dr)
+                results_front.append(dF)
+                results_lower.append(dL)
+                results_right.append(dR)
 
             # Concatenate over time dimension
             dask_front = dask.array.stack(results_front, axis=0)
@@ -309,12 +309,12 @@ def facebudget(budgetzone, front=None, lower=None, right=None, netflow=True):
             dask_right = dask.array.stack(results_right, axis=0)
         else:
             if front is not None:
-                af = front
+                F = front
             if lower is not None:
-                al = lower
+                L = lower
             if right is not None:
-                ar = right
-            dask_front, dask_lower, dask_right = delayed_collect(indices, af, al, ar)
+                R = right
+            dask_front, dask_lower, dask_right = delayed_collect(indices, F, L, R)
     else:
         chunks = (1, *da_shape)
         dask_front = dask.array.full(front.shape, np.nan, chunks=chunks)
