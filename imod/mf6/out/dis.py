@@ -119,7 +119,8 @@ def open_hds(path: FilePath, d: dict[str, Any], dry_nan: bool) -> xr.DataArray:
     filesize = os.path.getsize(path)
     ntime = filesize // (nlayer * (52 + (nrow * ncol * 8)))
     times = read_times(path, ntime, nlayer, nrow, ncol)
-    d["coords"]["time"] = times
+    coords = d["coords"]
+    coords["time"] = times
 
     dask_list = []
     # loop over times and add delayed arrays
@@ -131,7 +132,7 @@ def open_hds(path: FilePath, d: dict[str, Any], dry_nan: bool) -> xr.DataArray:
         dask_list.append(x)
 
     daskarr = dask.array.stack(dask_list, axis=0)
-    return xr.DataArray(daskarr, d["coords"], ("time", "layer", "y", "x"), name="head")
+    return xr.DataArray(daskarr, coords, ("time", "layer", "y", "x"), name=d["name"])
 
 
 def open_imeth1_budgets(
@@ -140,6 +141,13 @@ def open_imeth1_budgets(
     """
     Open the data for an imeth==1 budget section. Data is read lazily per
     timestep.
+
+    Can be used for:
+
+        * STO-SS
+        * STO-SY
+        * CSUB-CGELASTIC
+        * CSUB-WATERCOMP
 
     Utilizes the shape information from the DIS GRB file to create a dense
     array; (lazily) allocates for the entire domain (all layers, rows, columns)
@@ -166,7 +174,7 @@ def open_imeth1_budgets(
         data=budgets.data.reshape((budgets["time"].size, nlayer, nrow, ncol)),
         coords=coords,
         dims=("time", "layer", "y", "x"),
-        name="flow-ja-face",
+        name=None,
     )
 
 
@@ -222,7 +230,7 @@ def dis_indices(
     nlayer: int,
     nrow: int,
     ncol: int,
-):
+) -> Tuple[IntArray, IntArray, IntArray]:
     """
     Infer type of connection via cell number comparison. Returns arrays that can
     be used for extracting right, front, and lower face flow from the
@@ -378,19 +386,26 @@ def dis_open_face_budgets(
 
 # TODO: Currently assumes dis grb, can be checked & dispatched
 def open_cbc(
-    cbc_path: FilePath, grb_content: Dict[str, Any]
+    cbc_path: FilePath, grb_content: Dict[str, Any], flowja: bool = False
 ) -> Dict[str, xr.DataArray]:
     headers = cbc.read_cbc_headers(cbc_path)
     cbc_content = {}
     for key, header_list in headers.items():
         # TODO: validate homogeneity of header_list, ndat consistent, nlist consistent etc.
         if key == "flow-ja-face":
-            right, front, lower = dis_open_face_budgets(
-                cbc_path, grb_content, header_list
-            )
-            cbc_content["right-face-flow"] = right
-            cbc_content["front-face-flow"] = front
-            cbc_content["lower-face-flow"] = lower
+            if flowja:
+                flowja, nm = cbc.open_face_budgets_as_flowja(
+                    cbc_path, header_list, grb_content
+                )
+                cbc_content["flow-ja-face"] = flowja
+                cbc_content["connectivity"] = nm
+            else:
+                right, front, lower = dis_open_face_budgets(
+                    cbc_path, grb_content, header_list
+                )
+                cbc_content["flow-right-face"] = right
+                cbc_content["flow-front-face"] = front
+                cbc_content["flow-lower-face"] = lower
         else:
             if isinstance(header_list[0], cbc.Imeth1Header):
                 cbc_content[key] = open_imeth1_budgets(
@@ -402,3 +417,16 @@ def open_cbc(
                 )
 
     return cbc_content
+
+
+def grid_info(like: xr.DataArray) -> dict[str, Any]:
+    return {
+        "nlayer": like["layer"].size,
+        "nrow": like["y"].size,
+        "ncol": like["x"].size,
+        "coords": {
+            "layer": like["layer"],
+            "y": like["y"],
+            "x": like["x"],
+        },
+    }

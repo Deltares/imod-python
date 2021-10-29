@@ -53,15 +53,15 @@ _READ_GRB = {
 }
 
 _OPEN_HDS = {
-    "dis": dis.read_hds,
-    "disv": disv.read_hds,
-    "disu": disu.read_hds,
+    "dis": dis.open_hds,
+    "disv": disv.open_hds,
+    "disu": disu.open_hds,
 }
 
 _OPEN_CBC = {
-    "dis": dis.read_hds,
-    "disv": disv.read_hds,
-    "disu": disu.read_hds,
+    "dis": dis.open_cbc,
+    "disv": disv.open_cbc,
+    "disu": disu.open_cbc,
 }
 
 
@@ -75,6 +75,17 @@ def _get_function(d: Dict[str, Callable], key: str) -> Callable:
 
 
 def read_grb(path: FilePath) -> dict[str, Any]:
+    """
+    Read the data in a MODFLOW6 binary grid (.grb) file.
+
+    Parameters
+    ----------
+    path: Union[str, pathlib.Path]
+
+    Returns
+    -------
+    grb_content: dict[str, Any]
+    """
     with open(path, "rb") as f:
         h1 = _grb_text(f)
         _read = _get_function(_READ_GRB, h1)
@@ -91,23 +102,90 @@ def open_hds(
     hds_path: FilePath, grb_path: FilePath, dry_nan: bool = False
 ) -> Union[xr.DataArray, xu.UgridDataArray]:
     """
-    Open head data
+    Open modflow6 heads (.hds) file.
+
+    The data is lazily read per timestep and automatically converted into
+    DataArrays. The conversion is done via the information stored in the Binary
+    Grid file (GRB).
+
+    Parameters
+    ----------
+    hds_path: Union[str, pathlib.Path]
+    grb_path: Union[str, pathlib.Path]
+    dry_nan: bool, default value: False.
+        Whether to convert dry values to NaN.
+
+    Returns
+    -------
+    head: Union[xr.DataArray, xu.UgridDataArray]
     """
     grb_content = read_grb(grb_path)
+    grb_content["name"] = "head"
     distype = grb_content["distype"]
     _open = _get_function(_OPEN_HDS, distype)
     return _open(hds_path, grb_content, dry_nan)
 
 
+def open_hds_like(
+    path: FilePath,
+    like: Union[xr.DataArray, xu.UgridDataArray],
+    dry_nan: bool = False,
+) -> Union[xr.DataArray, xu.UgridDataArray]:
+    """
+    Open modflow6 heads (.hds) file.
+
+    The data is lazily read per timestep and automatically converted into
+    DataArrays. Shape and coordinates are inferred from ``like``.
+
+    Parameters
+    ----------
+    hds_path: Union[str, pathlib.Path]
+    like: Union[xr.DataArray, xu.UgridDataArray]
+    dry_nan: bool, default value: False.
+        Whether to convert dry values to NaN.
+
+    Returns
+    -------
+    head: Union[xr.DataArray, xu.UgridDataArray]
+    """
+    # TODO: check shape with hds metadata.
+    if isinstance(like, xr.DataArray):
+        d = dis.grid_info(like)
+        return dis.open_hds(path, d, dry_nan)
+
+    elif isinstance(like, xu.UgridDataArray):
+        d = disv.grid_info(like)
+        return disv.open_hds(path, d, dry_nan)
+
+    else:
+        raise TypeError(
+            "like should be a DataArray or UgridDataArray, "
+            f"received instead {type(like)}"
+        )
+
+
 def open_cbc(
-    cbc_path: FilePath, grb_path: FilePath
+    cbc_path: FilePath, grb_path: FilePath, flowja: bool = False
 ) -> Dict[str, Union[xr.DataArray, xu.UgridDataArray]]:
     """
     Open modflow6 cell-by-cell (.cbc) file.
 
     The data is lazily read per timestep and automatically converted into
     (dense) xr.DataArrays. The conversion is done via the information stored in
-    the Binary Grid File (GRB).
+    the Binary Grid file (GRB).
+
+    The ``flowja`` argument controls whether the flow-ja-face array (if
+    present) is returned in grid form as "as is". "Grid from" means:
+
+        * DIS: in right, front, and lower face flow. All flows are placed in
+          the cell.
+        * DISV: in horizontal and lower face flow.the horizontal flows are
+          placed on the edges and the lower face flow is placed on the faces.
+
+    When ``flowja=True``, the flow-ja-face array is returned as it is found in
+    the CBC file, with a flow for every cell to cell connection. Additionally,
+    a ``connectivity`` DataArray is returned describing for every cell (n) its
+    connected cells (m).
 
     Parameters
     ----------
@@ -115,6 +193,9 @@ def open_cbc(
         Path to the cell-by-cell flows file
     grb_path: str, pathlib.Path
         Path to the binary grid file
+    flowja: bool, default value: False
+        Whether to return the flow-ja-face values "as is" (``True``) or in a
+        grid form (``False``).
 
     Returns
     -------
@@ -143,4 +224,4 @@ def open_cbc(
     grb_content = read_grb(grb_path)
     distype = grb_content["distype"]
     _open = _get_function(_OPEN_CBC, distype)
-    return _open(cbc_path, grb_content)
+    return _open(cbc_path, grb_content, flowja)

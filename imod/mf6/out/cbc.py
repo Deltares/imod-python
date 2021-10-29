@@ -4,7 +4,7 @@ Cell-by-cell flows
 import os
 import struct
 from collections import defaultdict
-from typing import Any, BinaryIO, Dict, List, NamedTuple, Union
+from typing import Any, BinaryIO, Dict, List, NamedTuple, Tuple, Union
 
 import dask
 import numpy as np
@@ -189,6 +189,26 @@ def open_imeth1_budgets(
         dims=("time", "linear_index"),
         name=header_list[0].text,
     )
+
+
+def expand_indptr(ia) -> np.ndarray:
+    n = np.diff(ia)
+    return np.repeat(np.arange(ia.size - 1), n)
+
+
+def open_face_budgets_as_flowja(
+    cbc_path: FilePath, header_list: List[Imeth1Header], grb_content: Dict[str, Any]
+) -> Tuple[xr.DataArray, xr.DataArray]:
+    flowja = open_imeth1_budgets(cbc_path, header_list)
+    flowja = flowja.rename({"linear_index": "connection"})
+    n = expand_indptr(grb_content["ia"])
+    m = grb_content["ja"] - 1
+    nm = xr.DataArray(
+        np.column_stack([n, m]),
+        coords={"cell": ["n", "m"]},
+        dims=["connection", "cell"],
+    )
+    return flowja, nm
 
 
 def read_imeth6_budgets(
