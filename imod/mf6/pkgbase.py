@@ -4,6 +4,67 @@ import pathlib
 import jinja2
 import numpy as np
 import xarray as xr
+import xugrid as xu
+
+
+# TODO stream the data per stress period
+# TODO add pkgcheck that period table aligns
+def to_sparse_dis(arrlist, layer):
+    """Convert from dense arrays to list based input"""
+    # Get the number of valid values
+    data = arrlist[0]
+    notnull = ~np.isnan(data)
+    nrow = notnull.sum()
+    # Define the numpy structured array dtype
+    index_spec = [("layer", np.int32), ("row", np.int32), ("column", np.int32)]
+    field_spec = [(f"f{i}", np.float64) for i in range(len(arrlist))]
+    sparse_dtype = np.dtype(index_spec + field_spec)
+
+    # Initialize the structured array
+    listarr = np.empty(nrow, dtype=sparse_dtype)
+    # Fill in the indices
+    if layer is not None:
+        listarr["layer"] = layer
+        listarr["row"], listarr["column"] = (np.argwhere(notnull) + 1).transpose()
+    else:
+        listarr["layer"], listarr["row"], listarr["column"] = (
+            np.argwhere(notnull) + 1
+        ).transpose()
+
+    # Fill in the data
+    for i, arr in enumerate(arrlist):
+        values = arr[notnull].astype(np.float64)
+        listarr[f"f{i}"] = values
+
+    return listarr
+
+
+def to_sparse_disv(arrlist, layer):
+    """Convert from dense arrays to list based input"""
+    # Get the number of valid values
+    data = arrlist[0]
+    notnull = ~np.isnan(data)
+    nrow = notnull.sum()
+    # Define the numpy structured array dtype
+    index_spec = [("layer", np.int32), ("cell2d", np.int32)]
+    field_spec = [(f"f{i}", np.float64) for i in range(len(arrlist))]
+    sparse_dtype = np.dtype(index_spec + field_spec)
+
+    # Initialize the structured array
+    listarr = np.empty(nrow, dtype=sparse_dtype)
+    # Fill in the indices
+    if layer is not None:
+        listarr["layer"] = layer
+        listarr["cell2d"] = np.argwhere(notnull) + 1
+    else:
+        listarr["layer"], listarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
+
+    # Fill in the data
+    for i, arr in enumerate(arrlist):
+        values = arr[notnull].astype(np.float64)
+        listarr[f"f{i}"] = values
+
+    return listarr
 
 
 class Package(abc.ABC):
@@ -81,7 +142,11 @@ class Package(abc.ABC):
 
         return return_cls
 
-    def __init__(self):
+    def __init__(self, allargs):
+        for arg in allargs:
+            if isinstance(arg, xu.UgridDataArray):
+                self.dataset = xu.UgridDataset(grid=arg.ugrid.grid)
+                return
         self.dataset = xr.Dataset()
 
     def __getitem__(self, key):
@@ -92,16 +157,18 @@ class Package(abc.ABC):
 
     def isel(self):
         raise NotImplementedError(
-            f"Selection on packages not yet supported. "
-            f"To make a selection on the xr.Dataset, call {self._pkg_id}.dataset.isel instead. "
-            f"You can create a new package with a selection by calling {__class__.__name__}(**{self._pkg_id}.dataset.isel(**selection))"
+            "Selection on packages not yet supported. To make a selection on "
+            f"the xr.Dataset, call {self._pkg_id}.dataset.isel instead."
+            "You can create a new package with a selection by calling "
+            f"{__class__.__name__}(**{self._pkg_id}.dataset.isel(**selection))"
         )
 
     def sel(self):
         raise NotImplementedError(
-            f"Selection on packages not yet supported. "
-            f"To make a selection on the xr.Dataset, call {self._pkg_id}.dataset.sel instead. "
-            f"You can create a new package with a selection by calling {__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
+            "Selection on packages not yet supported. To make a selection on "
+            f"the xr.Dataset, call {self._pkg_id}.dataset.sel instead. "
+            "You can create a new package with a selection by calling "
+            f"{__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
 
     def _valid(self, value):
@@ -140,33 +207,18 @@ class Package(abc.ABC):
 
     def to_sparse(self, arrlist, layer):
         """Convert from dense arrays to list based input"""
+        # TODO stream the data per stress period
         # TODO add pkgcheck that period table aligns
         # Get the number of valid values
-        data = arrlist[0]
-        notnull = ~np.isnan(data)
-        nrow = notnull.sum()
-        # Define the numpy structured array dtype
-        index_spec = [("k", np.int32), ("i", np.int32), ("j", np.int32)]
-        field_spec = [(f"f{i}", np.float64) for i in range(len(arrlist))]
-        sparse_dtype = np.dtype(index_spec + field_spec)
-
-        # Initialize the structured array
-        listarr = np.empty(nrow, dtype=sparse_dtype)
-        # Fill in the indices
-        if layer is not None:
-            listarr["k"] = layer
-            listarr["i"], listarr["j"] = (np.argwhere(notnull) + 1).transpose()
+        if isinstance(self.dataset, xr.Dataset):
+            return to_sparse_dis(arrlist, layer)
+        elif isinstance(self.dataset, xu.UgridDataset):
+            return to_sparse_disv(arrlist, layer)
         else:
-            listarr["k"], listarr["i"], listarr["j"] = (
-                np.argwhere(notnull) + 1
-            ).transpose()
-
-        # Fill in the data
-        for i, arr in enumerate(arrlist):
-            values = arr[notnull].astype(np.float64)
-            listarr[f"f{i}"] = values
-
-        return listarr
+            raise TypeError(
+                "self.dataset should be xarray.Dataset or xugrid.UgridDataset,"
+                f" is {type(self.dataset)} instead"
+            )
 
     def _check_layer_presence(self, ds):
         """
@@ -181,6 +233,7 @@ class Package(abc.ABC):
         return layer
 
     def _ds_to_arrlist(self, ds):
+        # TODO: stream the data per stress period; don't access .values here
         arrlist = []
         for datavar in ds.data_vars:
             if ds[datavar].shape == ():
@@ -358,7 +411,6 @@ class BoundaryCondition(Package, abc.ABC):
         """
         data is a xr.Dataset with only the binary variables
         """
-
         with open(outpath, "w") as f:
             sparse_data.tofile(f)
 
@@ -370,7 +422,6 @@ class BoundaryCondition(Package, abc.ABC):
         arrays = self._ds_to_arrlist(ds)
         sparse_data = self.to_sparse(arrays, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)
-
         self._write_file(outpath, sparse_data)
 
     def period_paths(self, directory, pkgname, globaltimes, bin_ds):
@@ -491,9 +542,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     def write_packagedata(self, directory, pkgname):
         outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
         outpath.parent.mkdir(exist_ok=True, parents=True)
-
         package_data = self._package_data_to_sparse()
-
         # Write PackageData
         self._write_file(outpath, package_data)
 
