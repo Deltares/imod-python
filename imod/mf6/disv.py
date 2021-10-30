@@ -23,7 +23,7 @@ class VerticesDiscretization(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, top, bottom, idomain):
-        super(__class__, self).__init__()
+        super(__class__, self).__init__(locals())
         self.dataset["idomain"] = idomain
         self.dataset["top"] = top
         self.dataset["bottom"] = bottom
@@ -59,7 +59,7 @@ class VerticesDiscretization(Package):
         df = pd.DataFrame(grid.face_coordinates)
         df.index += 1
         # modflow requires clockwise; ugrid requires ccw
-        face_nodes = grid.face_node_connectivity[:, ::-1]
+        face_nodes = grid.face_node_connectivity[:, ::-1] + 1
         df[2] = (face_nodes != grid.fill_value).sum(axis=1)
         for i, column in enumerate(face_nodes.T):
             # Use extension array to write empty values
@@ -76,12 +76,17 @@ class VerticesDiscretization(Package):
         filename = directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
+            f.write("\n\n")
 
             f.write("begin vertices\n")
+            self._verts_dataframe().to_csv(
+                f, header=False, sep=" ", line_terminator="\n"
+            )
             f.write("end vertices\n\n")
-            self._verts_dataframe().to_csv(f, header=False, sep=" ")
 
             f.write("begin cell2d\n")
-            self._cell2d_dataframe().to_csv(f, header=False, sep=" ")
+            self._cell2d_dataframe().to_csv(
+                f, header=False, sep=" ", line_terminator="\n"
+            )
             f.write("end cell2d\n")
         return

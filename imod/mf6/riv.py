@@ -47,7 +47,7 @@ class River(BoundaryCondition):
         save_flows=False,
         observations=None,
     ):
-        super(__class__, self).__init__()
+        super(__class__, self).__init__(locals())
         self.dataset["stage"] = stage
         self.dataset["conductance"] = conductance
         self.dataset["bottom_elevation"] = bottom_elevation

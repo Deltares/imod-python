@@ -471,7 +471,7 @@ def grid_info(like: xu.UgridDataArray) -> dict[str, Any]:
     return {
         "name": "head",
         "nlayer": like["layer"].size,
-        "ncell_per_layer": like[facedim].size,
+        "ncells_per_layer": like[facedim].size,
         "coords": {
             "layer": like["layer"],
             facedim: like[facedim],

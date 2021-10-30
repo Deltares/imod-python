@@ -55,7 +55,7 @@ class Well(BoundaryCondition):
         save_flows=False,
         observations=None,
     ):
-        super(__class__, self).__init__()
+        super(__class__, self).__init__(locals())
         index = np.arange(len(layer))
         self.dataset["index"] = index
         self.dataset["layer"] = ("index", layer)

@@ -55,7 +55,7 @@ def to_sparse_disv(arrlist, layer):
     # Fill in the indices
     if layer is not None:
         listarr["layer"] = layer
-        listarr["cell2d"] = np.argwhere(notnull) + 1
+        listarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
     else:
         listarr["layer"], listarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
 
@@ -143,7 +143,7 @@ class Package(abc.ABC):
         return return_cls
 
     def __init__(self, allargs):
-        for arg in allargs:
+        for arg in allargs.values():
             if isinstance(arg, xu.UgridDataArray):
                 self.dataset = xu.UgridDataset(grid=arg.ugrid.grid)
                 return
@@ -286,6 +286,19 @@ class Package(abc.ABC):
                 d[k] = value
         return self._template.render(d)
 
+    @staticmethod
+    def _is_xy_data(obj):
+        if isinstance(obj, (xr.DataArray, xr.Dataset)):
+            xy = "x" in obj.dims and "y" in obj.dims
+        elif isinstance(obj, (xu.UgridDataArray, xu.UgridDataset)):
+            xy = obj.ugrid.grid.face_dimension in obj.dims
+        else:
+            raise TypeError(
+                "obj should be DataArray or UgridDataArray, "
+                f"received {type(obj)} instead"
+            )
+        return xy
+
     def _compose_values(self, da, directory, name=None, *args, **kwargs):
         """
         Compose values of dictionary.
@@ -297,7 +310,7 @@ class Package(abc.ABC):
         """
         layered = False
         values = []
-        if "x" in da.dims and "y" in da.dims:
+        if self._is_xy_data(da):
             if name is None:
                 name = self._pkg_id
             path = (directory / f"{name}.bin").as_posix()
@@ -322,14 +335,13 @@ class Package(abc.ABC):
         self.write_blockfile(directory, pkgname, *args)
 
         if hasattr(self, "_grid_data"):
-            dims = self.dataset.dims
-            if "x" in dims and "y" in dims:
+            if self._is_xy_data(self.dataset):
                 pkgdirectory = directory / pkgname
                 pkgdirectory.mkdir(exist_ok=True, parents=True)
                 for varname, dtype in self._grid_data.items():
                     key = self._keyword_map.get(varname, varname)
                     da = self.dataset[varname]
-                    if "x" in da.dims and "y" in da.dims:
+                    if self._is_xy_data(da):
                         path = pkgdirectory / f"{key}.bin"
                         self.write_binary_griddata(path, da, dtype)
 
@@ -467,7 +479,6 @@ class BoundaryCondition(Package, abc.ABC):
 
     def write_perioddata(self, directory, pkgname):
         bin_ds = self.dataset[list(self._period_data)]
-
         if "time" in bin_ds:  # one of bin_ds has time
             for i in range(len(self.dataset.time)):
                 path = directory / pkgname / f"{self._pkg_id}-{i}.bin"
@@ -482,18 +493,17 @@ class BoundaryCondition(Package, abc.ABC):
 
         directory is modelname
         """
-
         directory = pathlib.Path(directory)
-
         self.write_blockfile(directory, pkgname, globaltimes)
         self.write_perioddata(directory, pkgname)
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
-    """Class dedicated to advanced boundary conditions, since MF6 does not support
+    """
+    Class dedicated to advanced boundary conditions, since MF6 does not support
     binary files for Advanced Boundary conditions.
 
-    The advanced boundary condition packages are: "uzf", "lak", "maw", "str".
+    The advanced boundary condition packages are: "uzf", "lak", "maw", "sfr".
 
     """
 

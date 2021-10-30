@@ -30,7 +30,7 @@ class InitialConditions(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, head):
-        super(__class__, self).__init__()
+        super(__class__, self).__init__(locals())
         self.dataset["head"] = head
 
     def render(self, directory, pkgname, *args, **kwargs):

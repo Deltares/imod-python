@@ -138,7 +138,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         water_mover=None,
         timeseries=None,
     ):
-        super(__class__, self).__init__()
+        super(__class__, self).__init__(locals())
         # Package data
         self.dataset["surface_depression_depth"] = surface_depression_depth
         self.dataset["kv_sat"] = kv_sat

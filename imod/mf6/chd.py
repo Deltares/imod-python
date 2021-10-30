@@ -55,7 +55,7 @@ class ConstantHead(BoundaryCondition):
         save_flows=False,
         observations=None,
     ):
-        super(__class__, self).__init__()
+        super(__class__, self).__init__(locals())
         self.dataset["head"] = head
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
