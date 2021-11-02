@@ -1,8 +1,17 @@
-.. examples-index:
-
 Examples
 ========
 
-The examples in this gallery demonstrate most of the functionality of the
-``imod`` package. Every example can be downloaded as either a Python script
-or a Jupyter notebook for interactive exploration.
+The imod package can be used in many ways. By and large, imod **enables**
+functionality rather than implementing it: Geopandas, pandas, and xarray
+provide most of the functionality; imod provides the link to the MODFLOW
+specific file formats.
+
+Sometimes, commonly used functionality (in groundwater modeling) is not
+available in existing packages, or is insufficiently fast or convenient. For
+these situations, imod provides a number of additional functions. These
+functions revolve around the same principal data structures (geopandas, pandas,
+xarray) and rarely introduce new data structures.
+
+The examples here follow this rationale: a great deal of demonstrated
+funtionality is e.g. "vanilla" xarray functionality, but used for the goal of
+convenient groundwater modeling.

@@ -8,9 +8,9 @@ import re
 
 import imod
 
-###############################################################################
-# Read the input
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# %%
+# Open the data
+# -------------
 # We are going to read the top and bot data from Brabant_steady-state example directory.
 # We have 19 layers model, 601 columns, and 450 rows.
 # The cell is a rectangular cell with width of 250.
@@ -27,9 +27,9 @@ nodata = -9999.0
 top = top.where(top > -9990.0)
 bot = bot.where(bot > -9990.0)
 
-###############################################################################
-# Plotting cross section with imod cross section visualization function
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# %%
+# Plot the cross section
+# ----------------------
 # This function can be used to  to draw cross-sections and draw cell boundaries accurately.
 # If aquitard presents, it can be plotted on top of the cross-section, by providing a DataArray with the aquitard location.
 # ``top`` and ``bottom`` coordinates are required on the DataArray.
@@ -37,7 +37,7 @@ bot = bot.where(bot > -9990.0)
 top = top.assign_coords(top=(("layer", "y", "x"), top))
 top = top.assign_coords(bottom=(("layer", "y", "x"), bot))
 cross = imod.visualize.cross_section(
-    top.isel(y=200),
+    top.sel(y=384875.0),
     colors="RdYlBu_r",
     levels=range(-400, 200, 100),
     kwargs_colorbar={"label": "layer elevation at y = 384875"},
