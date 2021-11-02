@@ -46,7 +46,7 @@ build:
       - tests/coverage.xml 
     expire_in: 1 week
 
-publish:
+pages:
   stage: publish
   dependencies:
     - build
