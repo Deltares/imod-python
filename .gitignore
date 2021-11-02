@@ -68,7 +68,12 @@ instance/
 
 # Sphinx documentation
 docs/_build/
-docs/user-guide
+docs/user-guide/
+docs/examples/data/
+docs/examples/imod-wq/
+docs/examples/imodflow/
+docs/examples/mf6/
+docs/examples/visualize/
 
 # PyBuilder
 target/
