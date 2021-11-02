@@ -142,11 +142,12 @@ class Package(abc.ABC):
 
         return return_cls
 
-    def __init__(self, allargs):
-        for arg in allargs.values():
-            if isinstance(arg, xu.UgridDataArray):
-                self.dataset = xu.UgridDataset(grid=arg.ugrid.grid)
-                return
+    def __init__(self, allargs=None):
+        if allargs is not None:
+            for arg in allargs.values():
+                if isinstance(arg, xu.UgridDataArray):
+                    self.dataset = xu.UgridDataset(grid=arg.ugrid.grid)
+                    return
         self.dataset = xr.Dataset()
 
     def __getitem__(self, key):

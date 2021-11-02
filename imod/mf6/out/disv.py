@@ -66,10 +66,11 @@ def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> dict[str, Any]:
     iavert, javert = _ugrid_iavert_javert(iavert, javert)
     face_nodes = scipy.sparse.csr_matrix((javert, javert, iavert))
     grid = xu.Ugrid2d(vertices[:, 0], vertices[:, 1], -1, face_nodes)
+    facedim = grid.face_dimension
 
-    top = xu.UgridDataArray(xr.DataArray(top_np, dims=["face"], name="top"), grid)
+    top = xu.UgridDataArray(xr.DataArray(top_np, dims=[facedim], name="top"), grid)
     coords = {"layer": np.arange(1, nlayer + 1)}
-    dims = ("layer", "face")
+    dims = ("layer", facedim)
     bottom = xr.DataArray(bottom_np, coords, dims, name="bottom")
     idomain = xr.DataArray(idomain_np, coords, dims, name="idomain")
     icelltype = xr.DataArray(icelltype_np, coords, dims, name="icelltype")
@@ -139,6 +140,7 @@ def read_hds_timestep(
 
 
 def open_hds(path: FilePath, d: dict[str, Any], dry_nan: bool) -> xu.UgridDataArray:
+    grid = d["grid"]
     nlayer, ncells_per_layer = d["nlayer"], d["ncells_per_layer"]
     filesize = os.path.getsize(path)
     ntime = filesize // (nlayer * (52 + (ncells_per_layer * 8)))
@@ -160,8 +162,10 @@ def open_hds(path: FilePath, d: dict[str, Any], dry_nan: bool) -> xu.UgridDataAr
         dask_list.append(x)
 
     daskarr = dask.array.stack(dask_list, axis=0)
-    da = xr.DataArray(daskarr, coords, ("time", "layer", "face"), name=d["name"])
-    return xu.UgridDataArray(da, d["grid"])
+    da = xr.DataArray(
+        daskarr, coords, ("time", "layer", grid.face_dimension), name=d["name"]
+    )
+    return xu.UgridDataArray(da, grid)
 
 
 def open_imeth1_budgets(
@@ -190,7 +194,7 @@ def open_imeth1_budgets(
 
     Returns
     -------
-    xr.DataArray with dims ("time", "layer", "face")
+    xr.DataArray with dims ("time", "layer", face_dimension)
     """
     grid = grb_content["grid"]
     facedim = grid.face_dimension
@@ -250,8 +254,11 @@ def open_imeth6_budgets(
     coords = grb_content["coords"]
     coords["time"] = time
     name = header_list[0].text
-    da = xr.DataArray(daskarr, coords, ("time", "layer", "face"), name=name)
-    return xu.UgridDataArray(da, grb_content["grid"])
+    grid = grb_content["grid"]
+    da = xr.DataArray(
+        daskarr, coords, ("time", "layer", grid.face_dimension), name=name
+    )
+    return xu.UgridDataArray(da, grid)
 
 
 @numba.njit
