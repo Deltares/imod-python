@@ -1,4 +1,3 @@
-==========
 User Guide
 ==========
 
@@ -6,14 +5,11 @@ User Guide
    :maxdepth: 1
    :hidden:
 
-   overview
-
-The imod Python package builds on top of popular Python packages like `xarray
-<http://xarray.pydata.org/>`__, `pandas <http://pandas.pydata.org/>`__, and
-`geopandas <http://geopandas.org/>`__ to prepare and analyze MODFLOW models.
+The imod Python package builds on top of popular Python packages like
+`xarray`_, `pandas`_, and `geopandas`_ to prepare and analyze MODFLOW models.
 This user guide will introduce these packages and their data structures, and
-explains how they relate to the many forms of data we come across while modeling
-groundwater flow.
+explains how they relate to the many forms of data we come across while
+modeling groundwater flow.
 
 This user guide is not an exhaustive explanation of these packages and their
 data structures. Rather this guide intends to introduce the packages, explain
@@ -32,11 +28,16 @@ Specifically:
 * overview statistics, water balance, etc,
 * visualization of groundwater heads, cross sections, 3D animations, etc.
 
-Nearly every function in imod consumes and produces xarray, pandas, or geopandas
-data structures. Therefore, this guide first introduces these data structures.
-Secondly, it will demonstrate how a modeling workflow is set up. 
+Nearly every function in imod consumes and produces xarray, pandas, or
+geopandas data structures. Therefore, this guide first introduces these data
+structures. Secondly, it will demonstrate how a modeling workflow is set up. 
 
 .. toctree::
    :titlesonly:
    :hidden:
+   
+   examples/index
  
+.. _xarray: http://xarray.pydata.org
+.. _pandas: http://pandas.pydata.org
+.. _geopandas: http://geopandas.org

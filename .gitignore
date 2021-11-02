@@ -68,6 +68,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/user-guide
 
 # PyBuilder
 target/
@@ -125,3 +126,6 @@ examples/HenryCase/
 examples/HydroCoin/
 examples/SaltwaterPocket/
 examples/VerticalInterface/
+examples/data
+examples/circle
+old-examples

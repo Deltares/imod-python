@@ -33,9 +33,3 @@ API Reference
     :caption: Changelog
 
     changelog.rst
-
-.. toctree::
-    :maxdepth: 1
-    :caption: Contributing
-
-    contributing.rst

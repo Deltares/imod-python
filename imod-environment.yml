@@ -39,7 +39,7 @@ dependencies:
   - scipy
   - setuptools_scm
   - sphinx
-  - sphinx-galllery
+  - sphinx-gallery
   - toolz
   - tqdm
   - twine

@@ -1,8 +1,3 @@
-.. imod documentation master file, created by
-   sphinx-quickstart on Tue Apr 10 12:38:06 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 iMOD-Python: make massive MODFLOW models
 ========================================
 
@@ -21,34 +16,32 @@ iMOD-Python: make massive MODFLOW models
 
 .. note::
 
-   This package is currently maturing on the way to a stable release. It is being actively used and
-   developed at `Deltares <https://www.deltares.nl>`__. To make it easier for others to use this
-   package, the documentation still needs significant work. The :doc:`api` is fairly complete, but
-   high level overviews and more examples are still lacking. Extending Modflow 6 support is also planned.
+   This package is currently maturing on the way to a stable release. It is
+   being actively used and developed at `Deltares`_. To make it easier for
+   others to use this package, the documentation still needs significant work.
+   The :doc:`api/index` is fairly complete, but high level overviews and more
+   examples are still lacking. Extending Modflow 6 support is also planned.
 
-The imod Python package is designed to help you in your MODFLOW groundwater modeling efforts.
-It makes it easy to go from your raw data to a fully defined MODFLOW model, with the aim to make this process reproducable.
-Whether you want to build a simple 2D conceptual model, or a complex 3D regional model with millions of cells,
-imod-python scales automatically by making use of `dask <https://dask.org/>`__.
+The imod Python package is designed to help you in your MODFLOW groundwater
+modeling efforts.  It makes it easy to go from your raw data to a fully defined
+MODFLOW model, with the aim to make this process reproducable.  Whether you
+want to build a simple 2D conceptual model, or a complex 3D regional model with
+millions of cells, imod-python scales automatically by making use of `dask`_.
 
-By building on top of popular Python packages like `xarray <http://xarray.pydata.org/>`__, `pandas <http://pandas.pydata.org/>`__,
-`rasterio <https://rasterio.readthedocs.io/en/latest/>`__ and `geopandas <http://geopandas.org/>`__, a lot of functionality comes
-for free.
+By building on top of popular Python packages like `xarray`_, `pandas`_,
+`rasterio`_ and `geopandas`_, a lot of functionality comes for free.
 
 Currently we support the creation of the following MODFLOW-based models:
 
-* `USGS MODFLOW 6 <https://www.usgs.gov/software/modflow-6-usgs-modular-hydrologic-model>`__ (:doc:`api/mf6`), structured grids only, and no advanced stress packages yet (LAK, MAW, SFR, UZF)
-* `iMODFLOW <https://oss.deltares.nl/web/imod>`__ (:doc:`api/flow`)
-* `iMOD-WQ <https://oss.deltares.nl/web/imod>`__ (:doc:`api/wq`), which integrates SEAWAT (density-dependent groundwater flow) and MT3DMS (multi-species reactive transport calculations)
+* `USGS MODFLOW 6`_ (:doc:`api/mf6`), structured grids only, and not all
+  advanced stress packages yet (LAK, MAW, SFR, UZF)
+* `iMODFLOW`_ (:doc:`api/flow`)
+* `iMOD-WQ`_ (:doc:`api/wq`), which integrates SEAWAT (density-dependent
+  groundwater flow) and MT3DMS (multi-species reactive transport calculations)
 
 Documentation: https://imod.xyz/
 
 Source code: https://gitlab.com/deltares/imod/imod-python
-
-Interactive notebook examples:
-
-.. image:: https://mybinder.org/badge_logo.svg
-   :target: https://mybinder.org/v2/gh/Deltares/iMOD-DSD-International-2019/master
 
 .. toctree::
    :titlesonly:
@@ -56,14 +49,24 @@ Interactive notebook examples:
 
    getting-started/index
    user-guide/index
+   examples/index
    api/index
+   faq/index
+   development/index
 
 Getting started
 ---------------
 
-Install the latest release using ``conda install -c conda-forge imod``, or, when
-not using Anaconda, ``pip install imod``. For more detailed installation
-information see :doc:`getting-started/installation`.
+Install the latest release using::
+
+   mamba install -c conda-forge imod
+   
+or, when not using a conda python::
+
+   pip install imod
+   
+For more detailed installation information see
+:doc:`getting-started/installation`.
 
 .. code:: python
 
@@ -93,7 +96,7 @@ information see :doc:`getting-started/installation`.
 
 Authors
 -------
-This Python package was written primarily by Martijn Visser and Huite Bootsma at `Deltares <https://www.deltares.nl>`__.
+This Python package was written primarily by Martijn Visser and Huite Bootsma at `Deltares`_.
 
 .. raw:: html
 
@@ -110,3 +113,14 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+  
+
+.. _Deltares: https://www.deltares.nl
+.. _dask: https://dask.org/
+.. _xarray: http://xarray.pydata.org/
+.. _pandas: http://pandas.pydata.org/
+.. _rasterio: https://rasterio.readthedocs.io/en/latest/
+.. _geopandas: http://geopandas.org/
+.. _USGS MODFLOW 6: https://www.usgs.gov/software/modflow-6-usgs-modular-hydrologic-model
+.. _iMODFLOW: https://oss.deltares.nl/web/imod
+.. _iMOD-WQ: https://oss.deltares.nl/web/imod

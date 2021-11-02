@@ -14,6 +14,7 @@ In overview, we'll set the following steps:
 
 We'll start with the following imports:
 """
+# %%
 import subprocess
 from pathlib import Path
 
@@ -25,7 +26,7 @@ import xugrid as xu
 
 import imod
 
-###############################################################################
+# %%
 # Create a mesh
 # -------------
 #
@@ -46,7 +47,7 @@ fig, ax = plt.subplots()
 xu.plot.line(grid, ax=ax)
 ax.set_aspect(1)
 
-###############################################################################
+# %%
 # Create UgridDataArray
 # ---------------------
 #
@@ -71,7 +72,7 @@ idomain = xu.UgridDataArray(
     xr.DataArray(
         np.ones((nlayer, nface), dtype=np.int32),
         coords={"layer": [1, 2]},
-        dims=["layer", "face"],
+        dims=["layer", grid.face_dimension],
     ),
     grid=grid,
 )
@@ -82,7 +83,7 @@ rch_rate = xu.full_like(idomain.sel(layer=1), 0.001, dtype=float)
 bottom = idomain * xr.DataArray([5.0, 0.0], dims=["layer"])
 bottom = xu.UgridDataArray(bottom, grid)
 
-###############################################################################
+# %%
 # All the data above have been constants over the grid. For the constant head
 # boundary, we'd like to only set values on the external border. We can
 # `py:method:xugrid.UgridDataset.binary_dilation` to easily find these cells:
@@ -97,7 +98,7 @@ constant_head.ugrid.plot(ax=ax)
 xu.plot.line(grid, ax=ax, color="black")
 ax.set_aspect(1)
 
-###############################################################################
+# %%
 # Write the model
 # ---------------
 #
@@ -138,9 +139,11 @@ simulation["solver"] = imod.mf6.Solution(
     reordering_method=None,
     relaxation_factor=0.97,
 )
-simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
+simulation.time_discretization(
+    times=["2000-01-01", "2000-01-02"]
+)
 
-###############################################################################
+# %%
 # Write the model
 # ---------------
 #
@@ -149,7 +152,7 @@ simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
 modeldir = Path("circle")
 simulation.write(modeldir)
 
-###############################################################################
+# %%
 # Run the model
 # -------------
 #
@@ -162,7 +165,7 @@ with imod.util.cd(modeldir):
     p = subprocess.run("mf6", check=True, capture_output=True, text=True)
     assert p.stdout.endswith("Normal termination of simulation.\n")
 
-###############################################################################
+# %%
 # Open the results
 # ----------------
 #
@@ -174,7 +177,7 @@ head = imod.mf6.out.open_hds(
 )
 head
 
-###############################################################################
+# %%
 # For a DISV MODFLOW6 model, the heads are returned as a UgridDataArray.  While
 # all layers are timesteps are available, they are only loaded into memory as
 # needed.
@@ -187,7 +190,7 @@ cbc = imod.mf6.open_cbc(
 )
 print(cbc.keys())
 
-###############################################################################
+# %%
 # The flows are returned as a dictionary of UgridDataArrays. This dictionary
 # contains all entries that are stored in the CBC file, but like for the heads
 # file the data are only loaded into memory when needed.
@@ -202,7 +205,7 @@ ds = xu.UgridDataset(grid=grid)
 ds["u"] = cbc["flow-horizontal-face-x"]
 ds["v"] = cbc["flow-horizontal-face-y"]
 
-###############################################################################
+# %%
 # Visualize the results
 # ---------------------
 #
@@ -212,10 +215,10 @@ ds["v"] = cbc["flow-horizontal-face-y"]
 fig, ax = plt.subplots()
 head.isel(time=0, layer=0).ugrid.plot(ax=ax)
 ds.isel(time=0, layer=0).plot.quiver(
-    x="edge_x", y="edge_y", u="u", v="v", color="white"
+    x="mesh2d_edge_x", y="mesh2d_edge_y", u="u", v="v", color="white"
 )
 ax.set_aspect(1)
 
-###############################################################################
+# %%
 # As would be expected from our model input, we observe circular groundwater
 # mounding and increasing flows as we move from the center to the exterior.
