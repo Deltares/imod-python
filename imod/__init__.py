@@ -1,8 +1,3 @@
-import pathlib
-import warnings
-
-import numpy as np
-import pandas as pd
 import pkg_resources
 
 # subpackages
@@ -18,6 +13,7 @@ import imod.wq
 from imod import idf, ipf, rasterio, tec, util
 from imod.data_formats import gen
 
+# version
 try:
     __version__ = pkg_resources.get_distribution(__name__).version
 except pkg_resources.DistributionNotFound:
