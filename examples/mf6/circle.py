@@ -1,4 +1,7 @@
 """
+Circle
+======
+
 This example illustrates how to setup a very simple unstructured groundwater
 model using the ``imod`` package and associated packages.
 
@@ -11,10 +14,11 @@ In overview, we'll set the following steps:
     * Run the model.
     * Open the results back into UgridDataArrays.
     * Visualize the results.
-
-We'll start with the following imports:
 """
+
 # %%
+# We'll start with the following imports:
+
 import subprocess
 from pathlib import Path
 
@@ -139,17 +143,12 @@ simulation["solver"] = imod.mf6.Solution(
     reordering_method=None,
     relaxation_factor=0.97,
 )
-simulation.time_discretization(
-    times=["2000-01-01", "2000-01-02"]
-)
+simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
 
 # %%
-# Write the model
-# ---------------
-#
 # We'll create a new directory in which we will write and run the model.
 
-modeldir = Path("circle")
+modeldir = Path("generated/circle")
 simulation.write(modeldir)
 
 # %%
@@ -172,8 +171,8 @@ with imod.util.cd(modeldir):
 # First, we'll open the heads (.hds) file.
 
 head = imod.mf6.out.open_hds(
-    "circle/GWF_1/GWF_1.hds",
-    "circle/GWF_1/disv.disv.grb",
+    modeldir / "GWF_1/GWF_1.hds",
+    modeldir / "GWF_1/disv.disv.grb",
 )
 head
 
@@ -185,8 +184,8 @@ head
 # We may also open the cell-by-cell flows (.cbc) file.
 
 cbc = imod.mf6.open_cbc(
-    "circle/GWF_1/GWF_1.cbc",
-    "circle/GWF_1/disv.disv.grb",
+    modeldir / "GWF_1/GWF_1.cbc",
+    modeldir / "GWF_1/disv.disv.grb",
 )
 print(cbc.keys())
 

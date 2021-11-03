@@ -1,3 +1,32 @@
+"""
+TWRI
+====
+
+This example has been converted from the `MODFLOW6 Example problems`_.  See the
+`description`_ and the `notebook`_ which uses `FloPy`_ to setup the model.
+
+This example is a modified version of the original MODFLOW example 
+("`Techniques of Water-Resources Investigation`_" (TWRI)) described in
+(`McDonald & Harbaugh, 1988`_) and duplicated in (`Harbaugh & McDonald, 1996`_).
+This problem is also is distributed with MODFLOW-2005 (`Harbaugh, 2005`_). The
+problem has been modified from a quasi-3D problem, where confining beds are not
+explicitly simulated, to an equivalent three-dimensional problem.
+
+In overview, we'll set the following steps:
+    
+    * Create a structured grid for a rectangular geometry.
+    * Create the xarray DataArrays containg the MODFLOW6 parameters.
+    * Feed these arrays into the imod mf6 classes.
+    * Write to modflow6 files.
+    * Run the model.
+    * Open the results back into DataArrays.
+    * Visualize the results.
+
+"""
+# %%
+# We'll start with the usual imports. As this is an simple (synthetic)
+# structured model, we can make due with few packages.
+
 import subprocess
 from pathlib import Path
 
@@ -5,6 +34,13 @@ import numpy as np
 import xarray as xr
 
 import imod
+
+# %%
+# Create grid coordinates
+# -----------------------
+#
+# The first steps consist of settings up the grid -- first the number of layer,
+# rows, and columns. Cell sizes are constant throughout the model.
 
 nlay = 3
 nrow = 15
@@ -24,13 +60,22 @@ y = np.arange(ymax, ymin, dy) + 0.5 * dy
 x = np.arange(xmin, xmax, dx) + 0.5 * dx
 coords = {"layer": layer, "y": y, "x": x}
 
-# Discretization data
+# %%
+# Create DataArrays
+# -----------------
+#
+# Now that we have the grid coordinates setup, we can start defining model
+# parameters. The model is characterized by:
+#
+# * a constant head boundary on the left
+# * uniform recharge on the top layer
+# * a single drain in the center left of the mode
+# * a number of wells scattered throughout the model.
+
 idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
 bottom = xr.DataArray([-200.0, -300.0, -450.0], {"layer": layer}, ("layer",))
 
-# Constant head
 head = xr.full_like(idomain, np.nan).sel(layer=[1, 2])
-head[...] = np.nan
 head[..., 0] = 0.0
 
 # Drainage
@@ -53,7 +98,13 @@ row = [5, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13]
 column = [11, 6, 12, 8, 10, 12, 14, 8, 10, 12, 14, 8, 10, 12, 14]
 rate = [-5.0] * 15
 
-# Create and fill the groundwater model.
+# %%
+# Write the model
+# ---------------
+#
+# The first step is to define an empty model, the parameters and boundary
+# conditions are added in the form of the familiar MODFLOW packages.
+
 gwf_model = imod.mf6.GroundwaterFlowModel()
 gwf_model["dis"] = imod.mf6.StructuredDiscretization(
     top=200.0, bottom=bottom, idomain=idomain
@@ -110,12 +161,53 @@ simulation["solver"] = imod.mf6.Solution(
     relaxation_factor=0.97,
 )
 # Collect time discretization
-simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
+simulation.time_discretization(
+    times=["2000-01-01", "2000-01-02", "2000-01-03", "2000-01-04"]
+)
 
-modeldir = Path("ex01-twri")
+# %%
+# We'll create a new directory in which we will write and run the model.
+
+modeldir = Path("generated/ex01-twri")
 simulation.write(modeldir)
+
+# %%
+# Run the model
+# -------------
+#
+# .. note::
+#
+#   The following lines assume the ``mf6`` executable is available on your
+#   PATH. The examples introduction shortly describes how to add it to yours.
+
 with imod.util.cd(modeldir):
     p = subprocess.run("mf6", check=True, capture_output=True, text=True)
     assert p.stdout.endswith("Normal termination of simulation.\n")
 
-head = imod.mf6.open_hds(modeldir / "GWF_1/GWF_1.hds", modeldir / "GWF_1/dis.dis.grb")
+
+# %%
+# Open the results
+# ----------------
+#
+# We'll open the heads (.hds) file.
+
+head = imod.mf6.open_hds(
+    modeldir / "GWF_1/GWF_1.hds",
+    modeldir / "GWF_1/dis.dis.grb",
+)
+
+# %%
+# Visualize the results
+# ---------------------
+
+head.isel(layer=0, time=0).plot.contourf()
+
+# %%
+# .. _MODFLOW6 example problems: https://github.com/MODFLOW-USGS/modflow6-examples
+# .. _description: https://modflow6-examples.readthedocs.io/en/master/_examples/ex-gwf-twri.html
+# .. _notebook: https://github.com/MODFLOW-USGS/modflow6-examples/tree/master/notebooks/ex-gwf-twri.ipynb
+# .. _Techniques of Water-Resources Investigation: https://pubs.usgs.gov/twri/twri7-c1/
+# .. _McDonald & Harbaugh, 1988: https://pubs.er.usgs.gov/publication/twri06A1
+# .. _Harbaugh & McDonald, 1996: https://pubs.er.usgs.gov/publication/ofr96485
+# .. _Harbaugh, 2005: https://pubs.er.usgs.gov/publication/tm6A16
+# .. _FloPy: https://github.com/modflowpy/flopy
