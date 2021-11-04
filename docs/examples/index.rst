@@ -20,8 +20,5 @@ convenient groundwater modeling.
    :titlesonly:
    :hidden:
    
-   data/index.rst
-   geospatial/index.rst
    mf6/index.rst
    imod-wq/index.rst
-   imodflow/index.rst

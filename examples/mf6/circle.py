@@ -20,7 +20,6 @@ In overview, we'll set the following steps:
 # We'll start with the following imports:
 
 import subprocess
-from pathlib import Path
 
 import matplotlib.pyplot as plt
 import meshzoo
@@ -148,7 +147,7 @@ simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
 # %%
 # We'll create a new directory in which we will write and run the model.
 
-modeldir = Path("generated/circle")
+modeldir = imod.util.temporary_directory()
 simulation.write(modeldir)
 
 # %%

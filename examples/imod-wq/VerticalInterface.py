@@ -1,3 +1,12 @@
+"""
+Vertical Interface
+==================
+
+This 2D examples demonstrates the rotation of an initially vertical interface
+between fresh and salt water.
+"""
+
+# %%
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -92,8 +101,8 @@ m["oc"] = imod.wq.OutputControl(save_head_idf=True, save_concentration_idf=True)
 m.time_discretization(times=["2000-01-01", "2000-01-02"])
 
 # Now we write the model, including runfile:
-m.write()
-
+modeldir = imod.util.temporary_directory()
+m.write(modeldir, resultdir_is_workdir=True)
 
 # You can run the model using the comand prompt and the iMOD SEAWAT executable
 
@@ -103,3 +112,5 @@ m.write()
 # head.plot(yincrease=False)
 # conc = imod.idf.open("VerticalInterface/results/conc/*.idf")
 # conc.plot(levels=range(0, 35, 5), yincrease=False)
+
+# %%

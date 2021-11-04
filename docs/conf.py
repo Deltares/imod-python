@@ -48,19 +48,19 @@ extensions = [
 sphinx_gallery_conf = {
     "examples_dirs": [
         "../examples/user-guide",
-        "../examples/data",
+        # "../examples/data",
         "../examples/mf6",
         "../examples/imod-wq",
-        "../examples/imodflow",
-        "../examples/visualize",
+        # "../examples/imodflow",
+        # "../examples/visualize",
     ],  # path to your example scripts
     "gallery_dirs": [
         "user-guide",
-        "examples/data",
+        # "examples/data",
         "examples/mf6",
         "examples/imod-wq",
-        "examples/imodflow",
-        "examples/visualize",
+        # "examples/imodflow",
+        # "examples/visualize",
     ],  # path to where to save gallery generated output
     "filename_pattern": ".py",  # ".py",
     "ignore_pattern": ".pytmp",

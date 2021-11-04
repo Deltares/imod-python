@@ -124,13 +124,5 @@ venv.bak/
 *.run
 
 # Examples
-examples/toth/
-examples/Elder/
-examples/FreshwaterLens/
-examples/HenryCase/
-examples/HydroCoin/
-examples/SaltwaterPocket/
-examples/VerticalInterface/
-examples/data
-examples/circle
 old-examples
+examples/data

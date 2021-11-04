@@ -1,3 +1,12 @@
+"""
+Elder
+=====
+
+The classic 2D Elder problem demonstrates free convection.
+"""
+
+# %%
+
 import numpy as np
 import xarray as xr
 
@@ -100,7 +109,8 @@ m.time_discretization(times=["2000-01-01T00:00", "2020-01-01T00:00"])
 
 # Now we write the model
 
-m.write()
+modeldir = imod.util.temporary_directory()
+m.write(modeldir, resultdir_is_workdir=True)
 
 # You can run the model using the comand prompt and the iMOD SEAWAT executable
 
@@ -109,3 +119,5 @@ m.write()
 # head.plot(yincrease=False)
 # conc = imod.idf.open("Elder/results/conc/*.idf")
 # conc.plot(levels=range(0, 35, 5), yincrease=False)
+
+# %%

@@ -1,3 +1,12 @@
+"""
+Henry
+=====
+
+The classic 2D Henry problem demonstrates the development of a fresh-salt
+interface.
+"""
+
+# %%
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -45,7 +54,7 @@ bot = top1D - 1.0
 bnd[:, :, -1] = -1
 
 # Fill model
-m = imod.wq.SeawatModel("HenryCase")
+m = imod.wq.SeawatModel("Henry")
 m["bas"] = imod.wq.BasicFlow(ibound=bnd, top=50.0, bottom=bot, starting_head=1.0)
 m["lpf"] = imod.wq.LayerPropertyFlow(
     k_horizontal=10.0, k_vertical=10.0, specific_storage=0.0
@@ -71,4 +80,8 @@ m["gcg"] = imod.wq.GeneralizedConjugateGradientSolver(
 )
 m["oc"] = imod.wq.OutputControl(save_head_idf=True, save_concentration_idf=True)
 m.time_discretization(times=pd.date_range("2000-01-01", "2001-01-01", freq="M"))
-m.write("HenryCase")
+
+modeldir = imod.util.temporary_directory()
+m.write(modeldir, resultdir_is_workdir=True)
+
+# %%

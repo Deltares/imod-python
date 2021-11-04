@@ -28,7 +28,6 @@ In overview, we'll set the following steps:
 # structured model, we can make due with few packages.
 
 import subprocess
-from pathlib import Path
 
 import numpy as np
 import xarray as xr
@@ -168,7 +167,7 @@ simulation.time_discretization(
 # %%
 # We'll create a new directory in which we will write and run the model.
 
-modeldir = Path("generated/ex01-twri")
+modeldir = imod.util.temporary_directory()
 simulation.write(modeldir)
 
 # %%

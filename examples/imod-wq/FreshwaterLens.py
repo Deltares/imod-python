@@ -1,3 +1,12 @@
+"""
+Freshwater Lens
+===============
+
+This 2D examples illustrates the growth of a fresh water lens in an initially
+fully saline domain. 
+"""
+
+# %%
 import numpy as np
 import xarray as xr
 
@@ -93,7 +102,8 @@ m["oc"] = imod.wq.OutputControl(save_head_idf=True, save_concentration_idf=True)
 m.time_discretization(times=["1900-01-01T00:00", "2000-01-01T00:00"])
 
 # Now we write the model, including runfile:
-m.write("FreshwaterLens")
+modeldir = imod.util.temporary_directory()
+m.write(modeldir, resultdir_is_workdir=True)
 # You can run the model using the command prompt and the iMOD SEAWAT executable
 
 # Results
@@ -101,3 +111,5 @@ m.write("FreshwaterLens")
 # head.plot(yincrease=False)
 # conc = imod.idf.open("FreshwaterLens/results/conc/*.idf")
 # conc.plot(levels=range(0, 35, 5), yincrease=False)
+
+# %%

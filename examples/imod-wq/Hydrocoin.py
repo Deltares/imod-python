@@ -1,3 +1,11 @@
+"""
+Hydrocoin
+=========
+
+A 2D case from the Hydrological Code Intercomparison (Hydrocoin).
+"""
+
+# %%
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -193,7 +201,8 @@ m.time_discretization(times=["2000-01-01T00:00", "2010-01-01T00:00"])
 
 
 # Now we write the model, including runfile:
-m.write()
+modeldir = imod.util.temporary_directory()
+m.write(modeldir, resultdir_is_workdir=True)
 
 # You can run the model using the comand prompt and the iMOD SEAWAT executable
 
