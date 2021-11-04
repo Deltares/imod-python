@@ -63,13 +63,6 @@ class Package(abc.ABC):
         Refer to the xarray documentation for the possible keyword arguments.
         """
 
-        # Throw error if user tries to use old functionality
-        if "cache" in kwargs:
-            if kwargs["cache"] is not None:
-                raise NotImplementedError(
-                    "Caching functionality in pkg.from_file() is removed."
-                )
-
         path = pathlib.Path(path)
 
         # See https://stackoverflow.com/a/2169191
@@ -596,7 +589,7 @@ class BoundaryCondition(Package, abc.ABC):
             nmax = int(self.dataset[varname].groupby("time").count(xr.ALL_DIMS).max())
         else:
             nmax = int(self[varname].count())
-        if "layer" not in self.coords:  # Then it applies to every layer
+        if "layer" not in self.dataset.coords:  # Then it applies to every layer
             nmax *= nlayer
         self._cellcount = nmax  # Store cellcount so it can be re-used for ssm.
         self._ssm_cellcount = nmax

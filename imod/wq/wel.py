@@ -95,7 +95,7 @@ class Well(BoundaryCondition):
         nlayer, nrow, ncol : int
         """
         nmax = np.unique(self["id_name"]).size
-        if "layer" not in self.coords:  # Then it applies to every layer
+        if "layer" not in self.dataset.coords:  # Then it applies to every layer
             nmax *= nlayer
         self._cellcount = nmax
         self._ssm_cellcount = nmax
