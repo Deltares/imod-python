@@ -5,6 +5,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
+from . import cbc
 from .common import FilePath, FloatArray, IntArray, _grb_text
 
 
