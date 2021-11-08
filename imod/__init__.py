@@ -1,16 +1,20 @@
 import pkg_resources
 
-# subpackages
-import imod.evaluate
-import imod.flow
-import imod.mf6
-import imod.prepare
-import imod.select
-import imod.visualize
-import imod.wq
-
-# submodules
-from imod import idf, ipf, rasterio, tec, util
+# exports
+from imod import (
+    evaluate,
+    flow,
+    idf,
+    ipf,
+    mf6,
+    prepare,
+    rasterio,
+    select,
+    tec,
+    util,
+    visualize,
+    wq,
+)
 from imod.data_formats import gen
 
 # version
