@@ -38,7 +38,7 @@ import imod
 # Create grid coordinates
 # -----------------------
 #
-# The first steps consist of settings up the grid -- first the number of layer,
+# The first steps consist of setting up the grid -- first the number of layer,
 # rows, and columns. Cell sizes are constant throughout the model.
 
 nlay = 3
@@ -68,12 +68,13 @@ coords = {"layer": layer, "y": y, "x": x}
 #
 # * a constant head boundary on the left
 # * uniform recharge on the top layer
-# * a single drain in the center left of the mode
+# * a single drain in the center left of the model
 # * a number of wells scattered throughout the model.
 
 idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
 bottom = xr.DataArray([-200.0, -300.0, -450.0], {"layer": layer}, ("layer",))
 
+# Constant head
 head = xr.full_like(idomain, np.nan).sel(layer=[1, 2])
 head[..., 0] = 0.0
 
