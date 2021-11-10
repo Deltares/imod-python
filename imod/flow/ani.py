@@ -28,6 +28,6 @@ class HorizontalAnisotropy(Package):
     _variable_order = ["anisotropy_factor", "anisotropy_angle"]
 
     def __init__(self, anisotropy_factor, anisotropy_angle):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["anisotropy_factor"] = anisotropy_factor
         self.dataset["anisotropy_angle"] = anisotropy_angle

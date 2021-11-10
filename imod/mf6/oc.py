@@ -47,7 +47,7 @@ class OutputControl(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, save_head=None, save_budget=None):
-        super(__class__, self).__init__()
+        super().__init__()
         self["save_head"] = save_head
         self["save_budget"] = save_budget
 

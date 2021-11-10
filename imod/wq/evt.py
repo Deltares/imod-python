@@ -73,7 +73,7 @@ class EvapotranspirationTopLayer(Evapotranspiration):
         concentration=0.0,
         save_budget=False,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["maximum_rate"] = maximum_rate
         self["surface"] = surface
         self["extinction_depth"] = extinction_depth
@@ -105,7 +105,7 @@ class EvapotranspirationLayers(Evapotranspiration):
         concentration=0.0,
         save_budget=False,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["maximum_rate"] = maximum_rate
         self["surface"] = surface
         self["extinction_depth"] = extinction_depth
@@ -132,7 +132,7 @@ class EvapotranspirationHighestActive(Evapotranspiration):
         concentration=0.0,
         save_budget=False,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["maximum_rate"] = maximum_rate
         self["surface"] = surface
         self["extinction_depth"] = extinction_depth

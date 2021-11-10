@@ -21,7 +21,7 @@ class EvapoTranspiration(TopBoundaryCondition):
     _variable_order = ["rate", "top_elevation", "extinction_depth"]
 
     def __init__(self, rate, top_elevation, extinction_depth):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["rate"] = rate
         self.dataset["top_elevation"] = top_elevation
         self.dataset["extinction_depth"] = extinction_depth

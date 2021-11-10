@@ -240,7 +240,7 @@ class MetaSwap(Package):
         soil_moisture_factor=1.0,
         conductivity_factor=1.0,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["boundary"] = boundary
         self.dataset["landuse"] = landuse
         self.dataset["rootzone_thickness"] = rootzone_thickness

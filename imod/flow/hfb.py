@@ -49,7 +49,7 @@ class HorizontalFlowBarrier(Package):
         resistance,
         layer=None,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         variables = {
             "id_name": id_name,
             "geometry": geometry,

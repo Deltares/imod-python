@@ -45,7 +45,7 @@ class River(BoundaryCondition):
         bottom_elevation,
         infiltration_factor,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["conductance"] = conductance
         self.dataset["stage"] = stage
         self.dataset["bottom_elevation"] = bottom_elevation

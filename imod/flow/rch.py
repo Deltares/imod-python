@@ -17,5 +17,5 @@ class Recharge(TopBoundaryCondition):
     _variable_order = ["rate"]
 
     def __init__(self, rate):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["rate"] = rate

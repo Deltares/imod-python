@@ -15,12 +15,12 @@ class Modflow6Simulation(collections.UserDict):
         self._template = env.get_template("sim-nam.j2")
 
     def __init__(self, name):
-        super(__class__, self).__init__()
+        super().__init__()
         self.name = name
         self._initialize_template()
 
     def __setitem__(self, key, value):
-        super(__class__, self).__setitem__(key, value)
+        super().__setitem__(key, value)
 
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).items():
