@@ -68,7 +68,7 @@ class Dispersion(Package):
         ratio_vertical=0.1,
         diffusion_coefficient=8.64e-5,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["longitudinal"] = longitudinal
         self["ratio_horizontal"] = ratio_horizontal
         self["ratio_vertical"] = ratio_vertical

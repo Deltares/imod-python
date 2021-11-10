@@ -52,7 +52,7 @@ class Drainage(BoundaryCondition):
         save_flows=False,
         observations=None,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["elevation"] = elevation
         self["conductance"] = conductance
         self["print_input"] = print_input

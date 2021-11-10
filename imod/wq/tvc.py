@@ -16,7 +16,7 @@ class TimeVaryingConstantConcentration(BoundaryCondition):
     _pkg_id = "tvc"
 
     def __init__(self, concentration):
-        super(__class__, self).__init__()
+        super().__init__()
         self["concentration"] = concentration
 
     def repeat_stress(self, concentration, use_cftime=False):

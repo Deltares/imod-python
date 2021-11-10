@@ -124,7 +124,7 @@ def caching(package, memory):
             self._caching_save = memory.cache(self._save, ignore=["pkg"])
             self._caching_check = memory.cache(self._check, ignore=["pkg", "ibound"])
             self._caching_max_n = memory.cache(self._max_n, ignore=["pkg"])
-            super(__class__, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
             self._filehashself = hash_filemetadata(path)
             self._filehashes = {}
             self._outputfiles = []

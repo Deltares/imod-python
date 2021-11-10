@@ -78,7 +78,7 @@ class PreconditionedConjugateGradientSolver(Package):
         relax=0.98,
         damp=1.0,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["max_iter"] = max_iter
         self["inner_iter"] = inner_iter
         self["rclose"] = rclose
@@ -153,7 +153,7 @@ class GeneralizedConjugateGradientSolver(Package):
         preconditioner="mic",
         lump_dispersion=True,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["max_iter"] = max_iter
         self["inner_iter"] = inner_iter
         self["cclose"] = cclose
@@ -322,7 +322,7 @@ class ParallelKrylovFlowSolver(ParallelSolver):
         debug=False,
         load_balance_weight=None,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["max_iter"] = max_iter
         self["inner_iter"] = inner_iter
         self["hclose"] = hclose
@@ -443,7 +443,7 @@ class ParallelKrylovTransportSolver(ParallelSolver):
         debug=False,
         load_balance_weight=None,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["max_iter"] = max_iter
         self["inner_iter"] = inner_iter
         self["cclose"] = cclose

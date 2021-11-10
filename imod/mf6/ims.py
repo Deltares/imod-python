@@ -404,7 +404,7 @@ class Solution(Package):
         csv_output=False,
         no_ptc=False,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["outer_hclose"] = outer_hclose
         self["outer_rclosebnd"] = outer_rclosebnd
         self["outer_maximum"] = outer_maximum

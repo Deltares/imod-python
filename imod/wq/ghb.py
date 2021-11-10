@@ -40,7 +40,7 @@ class GeneralHeadBoundary(BoundaryCondition):
     def __init__(
         self, head, conductance, density, concentration=None, save_budget=False
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["head"] = head
         self["conductance"] = conductance
         self["density"] = density

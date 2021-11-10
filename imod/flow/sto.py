@@ -33,7 +33,7 @@ class StorageCoefficient(Package):
     _variable_order = ["storage_coefficient"]
 
     def __init__(self, storage_coefficient):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["storage_coefficient"] = storage_coefficient
 
 
@@ -58,5 +58,5 @@ class SpecificStorage(Package):
     _variable_order = ["specific_storage"]
 
     def __init__(self, specific_storage):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["specific_storage"] = specific_storage

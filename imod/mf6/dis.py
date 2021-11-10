@@ -37,7 +37,7 @@ class StructuredDiscretization(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, top, bottom, idomain):
-        super(__class__, self).__init__()
+        super().__init__()
         self["idomain"] = idomain
         self["bottom"] = bottom
         self["top"] = top

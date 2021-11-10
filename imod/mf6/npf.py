@@ -239,7 +239,7 @@ class NodePropertyFlow(Package):
         perched=False,
         save_specific_discharge=False,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         # check rewetting
         if not rewet and any(
             [rewet_layer, rewet_factor, rewet_iterations, rewet_method]

@@ -172,7 +172,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         water_mover=None,
         timeseries=None,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         # Package data
         self["surface_depression_depth"] = surface_depression_depth
         self["kv_sat"] = kv_sat
@@ -304,7 +304,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         layer = self._check_layer_presence(ds)
         arrays = self._ds_to_arrlist(ds)
 
-        listarr = super(__class__, self).to_sparse(arrays, layer)
+        listarr = super().to_sparse(arrays, layer)
 
         field_spec = self._get_field_spec_from_dtype(listarr)
         field_names = [i[0] for i in field_spec]

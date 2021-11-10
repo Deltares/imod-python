@@ -39,7 +39,7 @@ class Well(BoundaryCondition):
         layer,
         time=None,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         variables = {
             "id_name": id_name,
             "x": x,
@@ -100,7 +100,7 @@ class Well(BoundaryCondition):
 
         da = self.dataset
 
-        runfile_times, starts = super(__class__, self)._get_runfile_times(
+        runfile_times, starts = super()._get_runfile_times(
             da, globaltimes, ds_times=ds_times
         )
 

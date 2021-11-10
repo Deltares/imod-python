@@ -106,7 +106,7 @@ class Package(xr.Dataset, abc.ABC):
 
             @monkeypatch_method(cls)
             def __setitem__(self, key, value):
-                super(__class__, self).__setitem__(key, value)
+                super().__setitem__(key, value)
 
             pkg_kwargs = {var: cls._dataset[var] for var in cls._dataset.data_vars}
             if cache_path is None:
@@ -141,7 +141,7 @@ class Package(xr.Dataset, abc.ABC):
                 value = value.swap_dims({"z": "layer"})
             if "layer" in value.dims:
                 value = value.dropna(dim="layer", how="all")
-        super(__class__, self).__setitem__(key, value)
+        super().__setitem__(key, value)
 
     def _replace_keyword(self, d, key):
         """

@@ -60,7 +60,7 @@ class SpecificStorage(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, specific_storage, specific_yield, transient, convertible):
-        super(__class__, self).__init__()
+        super().__init__()
         self["specific_storage"] = specific_storage
         self["specific_yield"] = specific_yield
         self["convertible"] = convertible
@@ -148,7 +148,7 @@ class StorageCoefficient(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, storage_coefficient, specific_yield, transient, convertible):
-        super(__class__, self).__init__()
+        super().__init__()
         self["storage_coefficient"] = storage_coefficient
         self["specific_yield"] = specific_yield
         self["convertible"] = convertible

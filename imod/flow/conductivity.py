@@ -23,7 +23,7 @@ class HorizontalHydraulicConductivity(Package):
     _variable_order = ["k_horizontal"]
 
     def __init__(self, k_horizontal=None):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["k_horizontal"] = k_horizontal
 
     def _pkgcheck(self, active_cells=None):
@@ -52,7 +52,7 @@ class VerticalHydraulicConductivity(Package):
     _variable_order = ["k_vertical"]
 
     def __init__(self, k_vertical=None):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["k_vertical"] = k_vertical
 
     def _pkgcheck(self, active_cells=None):
@@ -80,7 +80,7 @@ class VerticalAnisotropy(Package):
     _variable_order = ["vertical_anisotropy"]
 
     def __init__(self, vertical_anisotropy):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["vertical_anisotropy"] = vertical_anisotropy
 
     def _pkgcheck(self, active_cells=None):

@@ -78,7 +78,7 @@ class OutputControl(Package):
         save_concentration_vtk=False,
         save_budget_vtk=False,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["save_head_idf"] = save_head_idf
         self["save_concentration_idf"] = save_concentration_idf
         self["save_budget_idf"] = save_budget_idf

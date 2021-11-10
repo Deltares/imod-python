@@ -125,7 +125,7 @@ class VariableDensityFlow(Package):
         coupling=1,
         correct_water_table=False,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["density_species"] = density_species
         self["density_min"] = density_min
         self["density_max"] = density_max

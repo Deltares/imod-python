@@ -63,7 +63,7 @@ class Model(collections.UserDict):
         # e.g. two solvers
         if self.check == "eager":
             value._pkgcheck()
-        super(__class__, self).__setitem__(key, value)
+        super().__setitem__(key, value)
 
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).items():
@@ -107,7 +107,7 @@ class ImodflowModel(Model):
     _PACKAGE_GROUPS = PackageGroups
 
     def __init__(self, modelname, check="defer"):
-        super(__class__, self).__init__()
+        super().__init__()
         self.modelname = modelname
         self.check = check
 

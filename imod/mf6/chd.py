@@ -56,7 +56,7 @@ class ConstantHead(BoundaryCondition):
         save_flows=False,
         observations=None,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["head"] = head
         self["print_input"] = print_input
         self["print_flows"] = print_flows

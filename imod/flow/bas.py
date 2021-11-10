@@ -21,7 +21,7 @@ class Boundary(Package):
     _variable_order = ["ibound"]
 
     def __init__(self, ibound):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["ibound"] = ibound
 
     def _pkgcheck(self, active_cells=None):
@@ -50,7 +50,7 @@ class Top(Package):
     _variable_order = ["top"]
 
     def __init__(self, top):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["top"] = top
 
     def _pkgcheck(self, active_cells=None):
@@ -76,7 +76,7 @@ class Bottom(Package):
     _variable_order = ["bottom"]
 
     def __init__(self, bottom):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["bottom"] = bottom
 
     def _pkgcheck(self, active_cells=None):
@@ -103,7 +103,7 @@ class StartingHead(Package):
     _variable_order = ["starting_head"]
 
     def __init__(self, starting_head):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["starting_head"] = starting_head
 
     def _pkgcheck(self, active_cells=None):
