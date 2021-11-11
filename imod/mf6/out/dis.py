@@ -377,7 +377,7 @@ def dis_open_face_budgets(
     right_index, front_index, lower_index = dis_to_right_front_lower_indices(
         grb_content
     )
-    budgets = open_imeth1_budgets(cbc_path, header_list)
+    budgets = cbc.open_imeth1_budgets(cbc_path, header_list)
     right = dis_extract_face_budgets(budgets, right_index)
     front = dis_extract_face_budgets(budgets, front_index)
     lower = dis_extract_face_budgets(budgets, lower_index)
