@@ -180,10 +180,7 @@ simulation.write(modeldir)
 #   The following lines assume the ``mf6`` executable is available on your
 #   PATH. The examples introduction shortly describes how to add it to yours.
 
-with imod.util.cd(modeldir):
-    p = subprocess.run("mf6", check=True, capture_output=True, text=True)
-    assert p.stdout.endswith("Normal termination of simulation.\n")
-
+simulation.run()
 
 # %%
 # Open the results
