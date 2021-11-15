@@ -38,7 +38,7 @@ import imod
 # Create grid coordinates
 # -----------------------
 #
-# The first steps consist of settings up the grid -- first the number of layer,
+# The first steps consist of setting up the grid -- first the number of layer,
 # rows, and columns. Cell sizes are constant throughout the model.
 
 nlay = 3
@@ -67,15 +67,16 @@ coords = {"layer": layer, "y": y, "x": x}
 # parameters. The model is characterized by:
 #
 # * a constant head boundary on the left
+# * a single drain in the center left of the model
 # * uniform recharge on the top layer
-# * a single drain in the center left of the mode
 # * a number of wells scattered throughout the model.
 
 idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
 bottom = xr.DataArray([-200.0, -300.0, -450.0], {"layer": layer}, ("layer",))
 
-head = xr.full_like(idomain, np.nan).sel(layer=[1, 2])
-head[..., 0] = 0.0
+# Constant head
+constant_head = xr.full_like(idomain, np.nan).sel(layer=[1, 2])
+constant_head[..., 0] = 0.0
 
 # Drainage
 elevation = xr.full_like(idomain.sel(layer=1), np.nan)
@@ -83,19 +84,19 @@ conductance = xr.full_like(idomain.sel(layer=1), np.nan)
 elevation[7, 1:10] = np.array([0.0, 0.0, 10.0, 20.0, 30.0, 50.0, 70.0, 90.0, 100.0])
 conductance[7, 1:10] = 1.0
 
-# Node properties
-icelltype = xr.DataArray([1, 0, 0], {"layer": layer}, ("layer",))
-k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": layer}, ("layer",))
-k33 = xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",))
-
 # Recharge
 rch_rate = xr.full_like(idomain.sel(layer=1), 3.0e-8)
 
 # Well
-layer = [3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-row = [5, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13]
-column = [11, 6, 12, 8, 10, 12, 14, 8, 10, 12, 14, 8, 10, 12, 14]
-rate = [-5.0] * 15
+well_layer = [3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+well_row = [5, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13]
+well_column = [11, 6, 12, 8, 10, 12, 14, 8, 10, 12, 14, 8, 10, 12, 14]
+well_rate = [-5.0] * 15
+
+# Node properties
+icelltype = xr.DataArray([1, 0, 0], {"layer": layer}, ("layer",))
+k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": layer}, ("layer",))
+k33 = xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",))
 
 # %%
 # Write the model
@@ -109,7 +110,7 @@ gwf_model["dis"] = imod.mf6.StructuredDiscretization(
     top=200.0, bottom=bottom, idomain=idomain
 )
 gwf_model["chd"] = imod.mf6.ConstantHead(
-    head, print_input=True, print_flows=True, save_flows=True
+    constant_head, print_input=True, print_flows=True, save_flows=True
 )
 gwf_model["drn"] = imod.mf6.Drainage(
     elevation=elevation,
@@ -131,10 +132,10 @@ gwf_model["npf"] = imod.mf6.NodePropertyFlow(
 gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
 gwf_model["rch"] = imod.mf6.Recharge(rch_rate)
 gwf_model["wel"] = imod.mf6.Well(
-    layer=layer,
-    row=row,
-    column=column,
-    rate=rate,
+    layer=well_layer,
+    row=well_row,
+    column=well_column,
+    rate=well_rate,
     print_input=True,
     print_flows=True,
     save_flows=True,
