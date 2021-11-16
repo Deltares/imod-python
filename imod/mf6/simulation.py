@@ -1,5 +1,6 @@
 import collections
 import pathlib
+import subprocess
 
 import jinja2
 import numpy as np
@@ -17,6 +18,7 @@ class Modflow6Simulation(collections.UserDict):
     def __init__(self, name):
         super(__class__, self).__init__()
         self.name = name
+        self.directory = None
         self._initialize_template()
 
     def __setitem__(self, key, value):
@@ -91,7 +93,7 @@ class Modflow6Simulation(collections.UserDict):
         d["solutiongroups"] = [[("ims6", f"{solvername}.ims", modelnames)]]
         return self._template.render(d)
 
-    def write(self, directory="."):
+    def write(self, directory=".") -> None:
         directory = pathlib.Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
 
@@ -111,6 +113,19 @@ class Modflow6Simulation(collections.UserDict):
                 value.write(directory, key, globaltimes)
             elif value._pkg_id == "ims":
                 value.write(directory, key)
+
+        self.directory = directory
+
+    def run(self, mf6path="mf6") -> None:
+        if self.directory is None:
+            raise RuntimeError(f"Simulation {self.name} has not been written yet.")
+        with imod.util.cd(self.directory):
+            result = subprocess.run(mf6path, capture_output=True)
+            if result.returncode != 0:
+                raise RuntimeError(
+                    f"Simulation {self.name}: {mf6path} failed to run with returncode "
+                    f"{result.returncode}, and error message:\n\n{result.stdout.decode()} "
+                )
 
     def write_qgis_project(self, crs, directory=".", aggregate_layers=False):
         directory = pathlib.Path(directory)
