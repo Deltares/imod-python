@@ -300,20 +300,16 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         ivertcon = self["ivertcon"].values[notnull]
 
         ds = self[list(self._package_data)]
-
         layer = self._check_layer_presence(ds)
         arrdict = self._ds_to_arrdict(ds)
-
         recarr = super().to_sparse(arrdict, layer)
 
         field_spec = self._get_field_spec_from_dtype(recarr)
         field_names = [i[0] for i in field_spec]
-
         index_spec = [("iuzno", np.int32)] + field_spec[:3]
         field_spec = (
             [("landflag", np.int32)] + [("ivertcon", np.int32)] + field_spec[3:]
         )
-
         sparse_dtype = np.dtype(index_spec + field_spec)
 
         recarr_new = np.empty(recarr.shape, dtype=sparse_dtype)
@@ -327,26 +323,17 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {}
-
-        # period = {1: f"{directory}/{self._pkg_id}-{i}.bin"}
-
         bin_ds = self[list(self._period_data)]
-
         d["periods"] = self.period_paths(
-            directory, pkgname, globaltimes, bin_ds, binary
+            directory, pkgname, globaltimes, bin_ds, binary=False
         )
-
         not_options = (
             list(self._period_data) + list(self._package_data) + ["iuzno" + "ivertcon"]
         )
-        # construct the rest (dict for render)
         d = self.get_options(d, not_options=not_options)
-
-        path = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
+        path = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         d["packagedata"] = path.as_posix()
-
         d["nuzfcells"] = self._max_active_n()
-
         return self._template.render(d)
 
     def to_sparse(self, arrdict, layer):

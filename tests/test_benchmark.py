@@ -182,10 +182,16 @@ def write_basic_flopy(mf6_basic_simulation_flopy, tmp_path):
     simulation.write_simulation()
 
 
-def write_basic_imod(mf6_basic_simulation_imod, tmp_path):
+def write_basic_imod_binary(mf6_basic_simulation_imod, tmp_path):
     simulation = mf6_basic_simulation_imod
     modeldir = tmp_path / "mf6-basic"
     simulation.write(modeldir)
+
+
+def write_basic_imod_text(mf6_basic_simulation_imod, tmp_path):
+    simulation = mf6_basic_simulation_imod
+    modeldir = tmp_path / "mf6-basic"
+    simulation.write(modeldir, binary=False)
 
 
 def test_setup_basic_flopy(benchmark, mf6_basic_simulation_flopy, tmp_path):
@@ -200,5 +206,9 @@ def test_write_basic_flopy(benchmark, mf6_basic_simulation_flopy, tmp_path):
     benchmark(write_basic_flopy, mf6_basic_simulation_flopy, tmp_path)
 
 
-def test_write_basic_imod(benchmark, mf6_basic_simulation_imod, tmp_path):
-    benchmark(write_basic_imod, mf6_basic_simulation_imod, tmp_path)
+def test_write_basic_imod_binary(benchmark, mf6_basic_simulation_imod, tmp_path):
+    benchmark(write_basic_imod_binary, mf6_basic_simulation_imod, tmp_path)
+
+
+def test_write_basic_imod_text(benchmark, mf6_basic_simulation_imod, tmp_path):
+    benchmark(write_basic_imod_text, mf6_basic_simulation_imod, tmp_path)

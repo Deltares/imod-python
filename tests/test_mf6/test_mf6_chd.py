@@ -79,11 +79,4 @@ def test_render():
         end period
         """
     )
-    print(actual)
-    print(expected)
-
-    with open("actual.txt", "w") as f:
-        f.write(actual)
-    with open("expected.txt", "w") as f:
-        f.write(expected)
     assert actual == expected

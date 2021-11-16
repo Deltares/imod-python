@@ -139,23 +139,23 @@ def test_render():
     end dimensions
 
     begin packagedata
-      open/close mymodel/uzf/uzf-pkgdata.bin
+      open/close mymodel/uzf/uzf-pkgdata.dat
     end packagedata
 
     begin period 1
-      open/close mymodel/uzf/uzf-0.bin
+      open/close mymodel/uzf/uzf-0.dat
     end period
 
     begin period 2
-      open/close mymodel/uzf/uzf-1.bin
+      open/close mymodel/uzf/uzf-1.dat
     end period
 
     begin period 3
-      open/close mymodel/uzf/uzf-2.bin
+      open/close mymodel/uzf/uzf-2.dat
     end period
 
     begin period 4
-      open/close mymodel/uzf/uzf-3.bin
+      open/close mymodel/uzf/uzf-3.dat
     end period
 
     """

@@ -302,15 +302,16 @@ class BoundaryCondition(Package, abc.ABC):
             nmax = int(da.count())
         return nmax
 
-    def _write_binaryfile(self, outpath, sparse_data, binary):
+    def _write_binaryfile(self, outpath, sparse_data):
         with open(outpath, "w") as f:
-            if binary:
-                sparse_data.tofile(f)
-            else:
-                fields = sparse_data.dtype.fields
-                fmt = [self._number_format(field[0]) for field in fields.values()]
-                header = " ".join(list(fields.keys()))
-                np.savetxt(fname=f, X=sparse_data, fmt=fmt, header=header)
+            sparse_data.tofile(f)
+
+    def _write_textfile(self, outpath, sparse_data):
+        fields = sparse_data.dtype.fields
+        fmt = [self._number_format(field[0]) for field in fields.values()]
+        header = " ".join(list(fields.keys()))
+        with open(outpath, "w") as f:
+            np.savetxt(fname=f, X=sparse_data, fmt=fmt, header=header)
 
     def write_datafile(self, outpath, ds, binary):
         """
@@ -320,7 +321,10 @@ class BoundaryCondition(Package, abc.ABC):
         arrdict = self._ds_to_arrdict(ds)
         sparse_data = self.to_sparse(arrdict, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)
-        self._write_binaryfile(outpath, sparse_data, binary)
+        if binary:
+            self._write_binaryfile(outpath, sparse_data)
+        else:
+            self._write_textfile(outpath, sparse_data)
 
     def period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
         if binary:
@@ -440,13 +444,13 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         return
 
     def write_packagedata(self, directory, pkgname, binary):
-        outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
+        outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         outpath.parent.mkdir(exist_ok=True, parents=True)
         package_data = self._package_data_to_sparse()
         self._write_file(outpath, package_data)
 
     def write(self, directory, pkgname, globaltimes, binary):
         self.fill_stress_perioddata()
-        self.write_blockfile(directory, pkgname, globaltimes, binary)
-        self.write_perioddata(directory, pkgname, binary)
-        self.write_packagedata(directory, pkgname, binary)
+        self.write_blockfile(directory, pkgname, globaltimes, binary=False)
+        self.write_perioddata(directory, pkgname, binary=False)
+        self.write_packagedata(directory, pkgname, binary=False)
