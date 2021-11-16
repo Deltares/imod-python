@@ -10,7 +10,7 @@ def test_render():
     riv = imod.mf6.River(stage=1.0, conductance=10.0, bottom_elevation=-1.0)
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    actual = riv.render(directory, "river", globaltimes)
+    actual = riv.render(directory, "river", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options

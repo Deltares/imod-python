@@ -77,13 +77,17 @@ class Well(BoundaryCondition):
         self["save_flows"] = save_flows
         self["observations"] = observations
 
-    def to_sparse(self, arrlist, *args, **kwargs):
-        nrow = arrlist[0].size
-        listarr = np.empty((nrow, 5), np.int32)
-        listarr[:, 0] = arrlist[0]
-        listarr[:, 1] = arrlist[1]
-        listarr[:, 2] = arrlist[2]
-        values = arrlist[3].astype(np.float64)
-        listarr[:, 3:5] = values.reshape(nrow, 1).view(np.int32)
-        # flatten to 1D such that numpy tofile doesn't write extra array dims
-        return listarr.flatten()
+    def to_sparse(self, arrdict, layer):
+        spec = []
+        for key in arrdict:
+            if key in ["layer", "row", "column"]:
+                spec.append((key, np.int32))
+            else:
+                spec.append((key, np.float64))
+
+        sparse_dtype = np.dtype(spec)
+        nrow = next(iter(arrdict.values())).size
+        recarr = np.empty(nrow, dtype=sparse_dtype)
+        for key, arr in arrdict.items():
+            recarr[key] = arr
+        return recarr

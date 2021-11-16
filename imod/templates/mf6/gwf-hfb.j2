@@ -7,5 +7,5 @@ begin dimensions
 end dimensions
 
 {% for i, path in periods.items() %}begin period {{i}}
-  open/close {{path}} (binary)
+  open/close {{path}}{% if binary %} (binary){% endif %}
 end period{% endfor %}

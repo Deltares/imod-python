@@ -25,7 +25,7 @@ def drainage():
 
 def test_write(drainage, tmp_path):
     drn = drainage
-    drn.write(tmp_path, "mydrn", [1])
+    drn.write(tmp_path, "mydrn", [1], True)
     path = tmp_path.as_posix()
     block_expected = textwrap.dedent(
         f"""\

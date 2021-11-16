@@ -19,7 +19,7 @@ def test_render():
         reordering_method=None,
         relaxation_factor=0.97,
     )
-    actual = ims.render()
+    actual = ims.render(None, None, None, None)
     expected = textwrap.dedent(
         """\
         begin options

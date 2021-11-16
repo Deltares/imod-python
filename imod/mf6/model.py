@@ -95,7 +95,7 @@ class GroundwaterFlowModel(Model):
         d["packages"] = packages
         return self._template.render(d)
 
-    def write(self, modelname, globaltimes):
+    def write(self, modelname, globaltimes, binary=True):
         """
         Write model namefile
         Write packages
@@ -111,7 +111,12 @@ class GroundwaterFlowModel(Model):
 
         # write package contents
         for pkgname, pkg in self.items():
-            pkg.write(modeldirectory, pkgname, globaltimes)
+            pkg.write(
+                directory=modeldirectory,
+                pkgname=pkgname,
+                globaltimes=globaltimes,
+                binary=binary,
+            )
 
     def write_qgis_project(self, directory, crs, aggregate_layers=False):
         """

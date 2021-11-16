@@ -7,7 +7,7 @@ import imod
 def test_render():
     ic = imod.mf6.InitialConditions(head=0.0)
     directory = pathlib.Path("mymodel")
-    actual = ic.render(directory, "ic")
+    actual = ic.render(directory, "ic", None, True)
     expected = textwrap.dedent(
         """\
         begin options

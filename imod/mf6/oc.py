@@ -67,7 +67,7 @@ class OutputControl(Package):
                 f"Output Control setting should be either integer or string in ['first', 'last', 'all'], instead got {setting}"
             )
 
-    def render(self, directory, pkgname, globaltimes):
+    def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         modelname = directory.stem
         if self["save_head"].values[()] is not None:

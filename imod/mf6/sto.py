@@ -66,12 +66,14 @@ class SpecificStorage(Package):
         self["convertible"] = convertible
         self["transient"] = transient
 
-    def render(self, directory, pkgname, globaltimes):
+    def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         stodirectory = directory / "sto"
         for varname in ["specific_storage", "specific_yield", "convertible"]:
             key = self._keyword_map.get(varname, varname)
-            layered, value = self._compose_values(self[varname], stodirectory, key)
+            layered, value = self._compose_values(
+                self[varname], stodirectory, key, binary=binary
+            )
             if self._valid(value):  # skip False or None
                 d[f"{key}_layered"], d[key] = layered, value
 
@@ -154,12 +156,14 @@ class StorageCoefficient(Package):
         self["convertible"] = convertible
         self["transient"] = transient
 
-    def render(self, directory, pkgname, globaltimes):
+    def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         stodirectory = directory / "sto"
         for varname in ["storage_coefficient", "specific_yield", "convertible"]:
             key = self._keyword_map.get(varname, varname)
-            layered, value = self._compose_values(self[varname], stodirectory, key)
+            layered, value = self._compose_values(
+                self[varname], stodirectory, key, binary=binary
+            )
             if self._valid(value):  # skip False or None
                 d[f"{key}_layered"], d[key] = layered, value
 

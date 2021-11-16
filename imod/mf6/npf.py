@@ -270,14 +270,16 @@ class NodePropertyFlow(Package):
         self["perched"] = perched
         self["save_specific_discharge"] = save_specific_discharge
 
-    def render(self, directory, pkgname, *args, **kwargs):
+    def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         npfdirectory = directory / "npf"
         for varname in self.data_vars:
             key = self._keyword_map.get(varname, varname)
 
             if varname in self._grid_data:
-                layered, value = self._compose_values(self[varname], npfdirectory, key)
+                layered, value = self._compose_values(
+                    self[varname], npfdirectory, key, binary=binary
+                )
                 if self._valid(value):  # skip False or None
                     d[f"{key}_layered"], d[key] = layered, value
             else:

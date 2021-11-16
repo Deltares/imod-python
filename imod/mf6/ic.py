@@ -34,10 +34,10 @@ class InitialConditions(Package):
         super().__init__()
         self["head"] = head
 
-    def render(self, directory, pkgname, *args, **kwargs):
+    def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         icdirectory = directory / "ic"
         d["layered"], d["strt"] = self._compose_values(
-            self["head"], icdirectory, "strt"
+            self["head"], icdirectory, "strt", binary=binary
         )
         return self._template.render(d)

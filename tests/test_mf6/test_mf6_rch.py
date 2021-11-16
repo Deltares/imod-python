@@ -10,7 +10,7 @@ def test_render():
     rch = imod.mf6.Recharge(rate=3.0e-8)
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    actual = rch.render(directory, "recharge", globaltimes)
+    actual = rch.render(directory, "recharge", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options

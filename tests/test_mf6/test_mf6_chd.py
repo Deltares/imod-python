@@ -39,7 +39,7 @@ def test_render():
     chd = imod.mf6.ConstantHead(
         head, print_input=True, print_flows=True, save_flows=True
     )
-    actual = chd.render(directory, "chd", globaltimes)
+    actual = chd.render(directory, "chd", globaltimes, True)
 
     expected = textwrap.dedent(
         """\
@@ -58,4 +58,32 @@ def test_render():
         end period
         """
     )
+    assert actual == expected
+
+    actual = chd.render(directory, "chd", globaltimes, False)
+
+    expected = textwrap.dedent(
+        """\
+        begin options
+          print_input
+          print_flows
+          save_flows
+        end options
+
+        begin dimensions
+          maxbound 30
+        end dimensions
+
+        begin period 1
+          open/close mymodel/chd/chd.dat
+        end period
+        """
+    )
+    print(actual)
+    print(expected)
+
+    with open("actual.txt", "w") as f:
+        f.write(actual)
+    with open("expected.txt", "w") as f:
+        f.write(expected)
     assert actual == expected

@@ -13,7 +13,7 @@ def test_render_string():
     oc = imod.mf6.OutputControl(save_head="first", save_budget="last")
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    actual = oc.render(directory, "outputcontrol", globaltimes)
+    actual = oc.render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -38,7 +38,7 @@ def test_render_string_two_timesteps():
 
     oc = imod.mf6.OutputControl(save_head=save_head, save_budget="last")
     directory = pathlib.Path("mymodel")
-    actual = oc.render(directory, "outputcontrol", globaltimes)
+    actual = oc.render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -62,7 +62,7 @@ def test_render_int():
     oc = imod.mf6.OutputControl(save_head=4, save_budget=3)
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    actual = oc.render(directory, "outputcontrol", globaltimes)
+    actual = oc.render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -86,7 +86,7 @@ def test_render_bool_fail():
 
     expected_message = "Output Control setting should be either integer or string in ['first', 'last', 'all'], instead got True"
     with pytest.raises(TypeError, match=re.escape(expected_message)):
-        _ = oc.render(directory, "outputcontrol", globaltimes)
+        _ = oc.render(directory, "outputcontrol", globaltimes, True)
 
 
 def test_render_string_fail():
@@ -96,7 +96,7 @@ def test_render_string_fail():
 
     expected_message = "Output Control received wrong string. String should be one of ['first', 'last', 'all'], instead got foo"
     with pytest.raises(ValueError, match=re.escape(expected_message)):
-        _ = oc.render(directory, "outputcontrol", globaltimes)
+        _ = oc.render(directory, "outputcontrol", globaltimes, True)
 
 
 def test_render_mixed_two_timesteps():
@@ -109,7 +109,7 @@ def test_render_mixed_two_timesteps():
 
     oc = imod.mf6.OutputControl(save_head=save_head, save_budget=None)
     directory = pathlib.Path("mymodel")
-    actual = oc.render(directory, "outputcontrol", globaltimes)
+    actual = oc.render(directory, "outputcontrol", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options

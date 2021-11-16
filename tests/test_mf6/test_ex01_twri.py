@@ -13,7 +13,12 @@ import imod
 def test_dis_render(twri_model, tmp_path):
     simulation = twri_model
     dis = simulation["GWF_1"]["dis"]
-    actual = dis.render(tmp_path, "dis")
+    actual = dis.render(
+        directory=tmp_path,
+        pkgname="dis",
+        globaltimes=None,
+        binary=True,
+    )
     path = tmp_path.as_posix()
     expected = textwrap.dedent(
         f"""\
@@ -45,7 +50,12 @@ def test_dis_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    dis.write(tmp_path, "dis")
+    dis.write(
+        directory=tmp_path,
+        pkgname="dis",
+        globaltimes=None,
+        binary=True,
+    )
     assert (tmp_path / "dis.dis").is_file()
     assert (tmp_path / "dis").is_dir()
     assert (tmp_path / "dis" / "idomain.bin").is_file()
@@ -56,7 +66,12 @@ def test_chd_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
     chd = simulation["GWF_1"]["chd"]
-    actual = chd.render(tmp_path, "chd", globaltimes)
+    actual = chd.render(
+        directory=tmp_path,
+        pkgname="chd",
+        globaltimes=globaltimes,
+        binary=True,
+    )
     path = tmp_path.as_posix()
     expected = textwrap.dedent(
         f"""\
@@ -76,7 +91,12 @@ def test_chd_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    chd.write(tmp_path, "chd", globaltimes)
+    chd.write(
+        directory=tmp_path,
+        pkgname="chd",
+        globaltimes=globaltimes,
+        binary=True,
+    )
     assert (tmp_path / "chd.chd").is_file()
     assert (tmp_path / "chd").is_dir()
     assert (tmp_path / "chd" / "chd.bin").is_file()
@@ -87,7 +107,12 @@ def test_drn_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
     drn = simulation["GWF_1"]["drn"]
-    actual = drn.render(tmp_path, "drn", globaltimes)
+    actual = drn.render(
+        directory=tmp_path,
+        pkgname="drn",
+        globaltimes=globaltimes,
+        binary=True,
+    )
     path = tmp_path.as_posix()
     expected = textwrap.dedent(
         f"""\
@@ -107,7 +132,12 @@ def test_drn_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    drn.write(tmp_path, "drn", globaltimes)
+    drn.write(
+        directory=tmp_path,
+        pkgname="drn",
+        globaltimes=globaltimes,
+        binary=True,
+    )
     assert (tmp_path / "drn.drn").is_file()
     assert (tmp_path / "drn").is_dir()
     assert (tmp_path / "drn" / "drn.bin").is_file()
@@ -117,7 +147,12 @@ def test_drn_render(twri_model, tmp_path):
 def test_ic_render(twri_model, tmp_path):
     simulation = twri_model
     ic = simulation["GWF_1"]["ic"]
-    actual = ic.render(tmp_path, "ic")
+    actual = ic.render(
+        directory=tmp_path,
+        pkgname="ic",
+        globaltimes=None,
+        binary=True,
+    )
     expected = textwrap.dedent(
         """\
             begin options
@@ -130,7 +165,12 @@ def test_ic_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    ic.write(tmp_path, "ic")
+    ic.write(
+        directory=tmp_path,
+        pkgname="ic",
+        globaltimes=None,
+        binary=True,
+    )
     assert (tmp_path / "ic.ic").is_file()
 
 
@@ -138,7 +178,9 @@ def test_ic_render(twri_model, tmp_path):
 def test_npf_render(twri_model, tmp_path):
     simulation = twri_model
     npf = simulation["GWF_1"]["npf"]
-    actual = npf.render(tmp_path, "npf")
+    actual = npf.render(
+        directory=tmp_path, pkgname="npf", globaltimes=None, binary=True
+    )
     expected = textwrap.dedent(
         """\
             begin options
@@ -164,7 +206,7 @@ def test_npf_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    npf.write(tmp_path, "npf")
+    npf.write(directory=tmp_path, pkgname="npf", globaltimes=None, binary=True)
     assert (tmp_path / "npf.npf").is_file()
 
 
@@ -174,7 +216,9 @@ def test_oc_render(twri_model, tmp_path):
     globaltimes = simulation["time_discretization"]["time"].values
     oc = simulation["GWF_1"]["oc"]
     path = tmp_path.as_posix()
-    actual = oc.render(tmp_path, "oc", globaltimes)
+    actual = oc.render(
+        directory=tmp_path, pkgname="oc", globaltimes=globaltimes, binary=True
+    )
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -189,7 +233,7 @@ def test_oc_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    oc.write(tmp_path, "oc", globaltimes)
+    oc.write(directory=tmp_path, pkgname="oc", globaltimes=globaltimes, binary=True)
     assert (tmp_path / "oc.oc").is_file()
 
 
@@ -198,7 +242,12 @@ def test_rch_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
     rch = simulation["GWF_1"]["rch"]
-    actual = rch.render(tmp_path, "rch", globaltimes)
+    actual = rch.render(
+        directory=tmp_path,
+        pkgname="rch",
+        globaltimes=globaltimes,
+        binary=True,
+    )
     path = tmp_path.as_posix()
     expected = textwrap.dedent(
         f"""\
@@ -215,7 +264,12 @@ def test_rch_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    rch.write(tmp_path, "rch", globaltimes)
+    rch.write(
+        directory=tmp_path,
+        pkgname="rch",
+        globaltimes=globaltimes,
+        binary=True,
+    )
     assert (tmp_path / "rch.rch").is_file()
     assert (tmp_path / "rch").is_dir()
     assert (tmp_path / "rch" / "rch.bin").is_file()
@@ -226,7 +280,12 @@ def test_wel_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
     wel = simulation["GWF_1"]["wel"]
-    actual = wel.render(tmp_path, "wel", globaltimes)
+    actual = wel.render(
+        directory=tmp_path,
+        pkgname="wel",
+        globaltimes=globaltimes,
+        binary=True,
+    )
     path = tmp_path.as_posix()
     expected = textwrap.dedent(
         f"""\
@@ -246,7 +305,12 @@ def test_wel_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    wel.write(tmp_path, "wel", globaltimes)
+    wel.write(
+        directory=tmp_path,
+        pkgname="wel",
+        globaltimes=globaltimes,
+        binary=True,
+    )
     assert (tmp_path / "wel.wel").is_file()
     assert (tmp_path / "wel").is_dir()
     assert (tmp_path / "wel" / "wel.bin").is_file()
@@ -256,7 +320,12 @@ def test_wel_render(twri_model, tmp_path):
 def test_solver_render(twri_model, tmp_path):
     simulation = twri_model
     solver = simulation["solver"]
-    actual = solver.render()
+    actual = solver.render(
+        directory=tmp_path,
+        pkgname="solver",
+        globaltimes=None,
+        binary=True,
+    )
     expected = textwrap.dedent(
         """\
             begin options
@@ -278,7 +347,12 @@ def test_solver_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    solver.write(tmp_path, "solver")
+    solver.write(
+        directory=tmp_path,
+        pkgname="solver",
+        globaltimes=None,
+        binary=True,
+    )
     assert (tmp_path / "solver.ims").is_file()
 
 
@@ -342,10 +416,32 @@ def test_simulation_render(twri_model):
 
 @pytest.mark.usefixtures("twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
-def test_simulation_write(twri_model, tmp_path):
+def test_simulation_write_binary(twri_model, tmp_path):
+    simulation = twri_model
+    import pathlib
+
+    tmp_path = pathlib.Path("my-test")
+    modeldir = tmp_path / "ex01-twri"
+    simulation.write(modeldir, binary=True)
+    with imod.util.cd(modeldir):
+        p = subprocess.run("mf6", check=True, capture_output=True, text=True)
+        assert p.stdout.endswith("Normal termination of simulation.\n")
+        # hds file is identical to the official example, except for the
+        # time units, which are days here and seconds in the official one
+        head = imod.mf6.open_hds("GWF_1/GWF_1.hds", "GWF_1/dis.dis.grb")
+        assert head.dims == ("time", "layer", "y", "x")
+        assert head.shape == (1, 3, 15, 15)
+        meanhead_layer = head.groupby("layer").mean(dim=xr.ALL_DIMS)
+        mean_answer = np.array([59.79181509, 30.44132373, 24.88576811])
+        assert np.allclose(meanhead_layer, mean_answer)
+
+
+@pytest.mark.usefixtures("twri_model")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
+def test_simulation_write_text(twri_model, tmp_path):
     simulation = twri_model
     modeldir = tmp_path / "ex01-twri"
-    simulation.write(modeldir)
+    simulation.write(modeldir, binary=False)
     with imod.util.cd(modeldir):
         p = subprocess.run("mf6", check=True, capture_output=True, text=True)
         assert p.stdout.endswith("Normal termination of simulation.\n")

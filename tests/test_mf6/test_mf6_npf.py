@@ -23,7 +23,7 @@ def test_render():
         save_flows=True,
     )
     directory = pathlib.Path("mymodel")
-    actual = npf.render(directory, "npf")
+    actual = npf.render(directory, "npf", None, True)
     expected = textwrap.dedent(
         """\
         begin options

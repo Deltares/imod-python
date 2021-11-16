@@ -91,7 +91,7 @@ class Modflow6Simulation(collections.UserDict):
         d["solutiongroups"] = [[("ims6", f"{solvername}.ims", modelnames)]]
         return self._template.render(d)
 
-    def write(self, directory="."):
+    def write(self, directory=".", binary=True):
         directory = pathlib.Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
 
@@ -110,9 +110,18 @@ class Modflow6Simulation(collections.UserDict):
             for key, value in self.items():
                 # skip timedis, exchanges
                 if value._pkg_id == "model":
-                    value.write(key, globaltimes)
+                    value.write(
+                        modelname=key,
+                        globaltimes=globaltimes,
+                        binary=binary,
+                    )
                 elif value._pkg_id == "ims":
-                    value.write(".", key)
+                    value.write(
+                        directory=".",
+                        pkgname=key,
+                        globaltimes=globaltimes,
+                        binary=binary,
+                    )
 
     def write_qgis_project(self, crs, directory=".", aggregate_layers=False):
         directory = pathlib.Path(directory)
