@@ -1,10 +1,17 @@
 import textwrap
 
+import pandas as pd
+import xarray as xr
+
 import imod
 
 
 def test_render():
-    timestep_duration = [0.001, 7, 365]
+    timestep_duration = xr.DataArray(
+        data=[0.001, 7, 365],
+        coords={"time": pd.date_range("2000-01-01", "2000-01-03")},
+        dims=["time"],
+    )
     timedis = imod.mf6.TimeDiscretization(
         timestep_duration, n_timesteps=2, timestep_multiplier=1.1
     )
@@ -13,6 +20,7 @@ def test_render():
         """\
         begin options
           time_units days
+          start_date_time 2000-01-01T00:00:00.000000000
         end options
 
         begin dimensions
