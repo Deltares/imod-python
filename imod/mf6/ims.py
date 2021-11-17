@@ -17,12 +17,12 @@ class Solution(Package):
 
     Parameters
     ----------
-    outer_hclose: float
+    outer_dvclose: float
         real value defining the head change criterion for convergence of the
         outer (nonlinear) iterations, in units of length. When the maximum
         absolute value of the head change at all nodes during an iteration is
-        less than or equal to outer_hclose, iteration stops. Commonly,
-        outer_hclose equals 0.01.
+        less than or equal to outer_dvclose, iteration stops. Commonly,
+        outer_dvclose equals 0.01.
         SolutionPresetSimple: 0.001
         SolutionPresetModerate: 0.01
         SolutionPresetComplex: 0.1
@@ -42,13 +42,13 @@ class Solution(Package):
         SolutionPresetSimple: 50
         SolutionPresetModerate: 100
         SolutionPresetComplex: 500
-    inner_hclose: float
+    inner_dvclose: float
         real value defining the head change criterion for convergence of the
         inner (linear) iterations, in units of length. When the maximum absolute
         value of the head change at all nodes during an iteration is less than
-        or equal to inner_hclose, the matrix solver assumes convergence.
-        Commonly, inner_hclose is set an order of magnitude less than the
-        outer_hclose value.
+        or equal to inner_dvclose, the matrix solver assumes convergence.
+        Commonly, inner_dvclose is set an order of magnitude less than the
+        outer_dvclose value.
         SolutionPresetSimple: 0.001
         SolutionPresetModerate: 0.01
         SolutionPresetComplex: 0.1
@@ -72,18 +72,6 @@ class Solution(Package):
         SolutionPresetSimple: "cg"
         SolutionPresetModerate: "bicgstab"
         SolutionPresetComplex: "bicgstab"
-    outer_rclosebnd: float, optional
-        real value defining the residual tolerance for convergence of model
-        packages that solve a separate equation not solved by the IMS linear
-        solver. This value represents the maximum allowable residual between
-        successive outer iterations at any single model package element. An
-        example of a model package that would use OUTER RCLOSEBND to evaluate
-        convergence is the SFR package which solves a continuity equation for
-        each reach.
-        Default value: None
-        SolutionPresetSimple: 0.1
-        SolutionPresetModerate: 0.1
-        SolutionPresetComplex: 0.1
     under_relaxation: str, optional
         options: {"None", "simple", "cooley", "bdb"}
         is an optional keyword that defines the nonlinear relative_rclose
@@ -221,7 +209,7 @@ class Solution(Package):
         instead of a infinity-Norm (absolute convergence criteria). When
         relative_rclose is specified, a reasonable initial inner_rclose value is
         1.0 × 10−4 and convergence is achieved for a given inner (linear)
-        iteration when ∆h ≤ inner_hclose and the current L-2 Norm is ≤ the
+        iteration when ∆h ≤ inner_dvclose and the current L-2 Norm is ≤ the
         product of the relativ_rclose and the initial L-2 Norm for the current
         inner (linear) iteration. If rclose_option is not specified, an absolute
         residual (infinity-norm) criterion is used.
@@ -344,13 +332,12 @@ class Solution(Package):
     """
 
     __slots__ = (
-        "outer_hclose",
+        "outer_dvclose",
         "outer_maximum",
         "inner_maximum",
-        "inner_hclose",
+        "inner_dvclose",
         "inner_rclose",
         "linear_acceleration",
-        "outer_rclosebnd",
         "under_relaxation",
         "under_relaxation_theta",
         "under_relaxation_kappa",
@@ -377,13 +364,12 @@ class Solution(Package):
 
     def __init__(
         self,
-        outer_hclose,
+        outer_dvclose,
         outer_maximum,
         inner_maximum,
-        inner_hclose,
+        inner_dvclose,
         inner_rclose,
         linear_acceleration,
-        outer_rclosebnd=None,
         under_relaxation=None,
         under_relaxation_theta=None,
         under_relaxation_kappa=None,
@@ -405,8 +391,7 @@ class Solution(Package):
         no_ptc=False,
     ):
         super().__init__()
-        self["outer_hclose"] = outer_hclose
-        self["outer_rclosebnd"] = outer_rclosebnd
+        self["outer_dvclose"] = outer_dvclose
         self["outer_maximum"] = outer_maximum
         self["under_relaxation"] = under_relaxation
         self["under_relaxation_theta"] = under_relaxation_theta
@@ -418,7 +403,7 @@ class Solution(Package):
         self["backtracking_reduction_factor"] = backtracking_reduction_factor
         self["backtracking_residual_limit"] = backtracking_residual_limit
         self["inner_maximum"] = inner_maximum
-        self["inner_hclose"] = inner_hclose
+        self["inner_dvclose"] = inner_dvclose
         self["inner_rclose"] = inner_rclose
         self["rclose_option"] = rclose_option
         self["linear_acceleration"] = linear_acceleration
@@ -438,8 +423,7 @@ def SolutionPresetSimple(print_option, csv_output, no_ptc):
         print_option=print_option,
         csv_output=csv_output,
         no_ptc=no_ptc,
-        outer_hclose=0.001,
-        outer_rclosebnd=0.1,
+        outer_dvclose=0.001,
         outer_maximum=25,
         under_relaxation=None,
         under_relaxation_theta=0.0,
@@ -451,7 +435,7 @@ def SolutionPresetSimple(print_option, csv_output, no_ptc):
         backtracking_reduction_factor=0.0,
         backtracking_residual_limit=0.0,
         inner_maximum=50,
-        inner_hclose=0.001,
+        inner_dvclose=0.001,
         inner_rclose=0.1,
         rclose_option="strict",
         linear_acceleration="cg",
@@ -470,8 +454,7 @@ def SolutionPresetModerate(print_option, csv_output, no_ptc):
         print_option=print_option,
         csv_output=csv_output,
         no_ptc=no_ptc,
-        outer_hclose=0.01,
-        outer_rclosebnd=0.1,
+        outer_dvclose=0.01,
         outer_maximum=50,
         under_relaxation="dbd",
         under_relaxation_theta=0.9,
@@ -483,7 +466,7 @@ def SolutionPresetModerate(print_option, csv_output, no_ptc):
         backtracking_reduction_factor=0.0,
         backtracking_residual_limit=0.0,
         inner_maximum=100,
-        inner_hclose=0.01,
+        inner_dvclose=0.01,
         inner_rclose=0.1,
         rclose_option="strict",
         linear_acceleration="bicgstab",
@@ -502,8 +485,7 @@ def SolutionPresetComplex(print_option, csv_output, no_ptc):
         print_option=print_option,
         csv_output=csv_output,
         no_ptc=no_ptc,
-        outer_hclose=0.1,
-        outer_rclosebnd=0.1,
+        outer_dvclose=0.1,
         outer_maximum=100,
         under_relaxation="dbd",
         under_relaxation_theta=0.8,
@@ -515,7 +497,7 @@ def SolutionPresetComplex(print_option, csv_output, no_ptc):
         backtracking_reduction_factor=0.1,
         backtracking_residual_limit=0.002,
         inner_maximum=500,
-        inner_hclose=0.1,
+        inner_dvclose=0.1,
         inner_rclose=0.1,
         rclose_option="strict",
         linear_acceleration="bicgstab",

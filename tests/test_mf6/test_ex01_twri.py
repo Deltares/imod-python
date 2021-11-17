@@ -333,13 +333,13 @@ def test_solver_render(twri_model, tmp_path):
             end options
 
             begin nonlinear
-              outer_hclose 0.0001
+              outer_dvclose 0.0001
               outer_maximum 500
             end nonlinear
 
             begin linear
               inner_maximum 100
-              inner_hclose 0.0001
+              inner_dvclose 0.0001
               inner_rclose 0.001
               linear_acceleration cg
               relaxation_factor 0.97
@@ -418,9 +418,6 @@ def test_simulation_render(twri_model):
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_write_binary(twri_model, tmp_path):
     simulation = twri_model
-    import pathlib
-
-    tmp_path = pathlib.Path("my-test")
     modeldir = tmp_path / "ex01-twri"
     simulation.write(modeldir, binary=True)
     with imod.util.cd(modeldir):
