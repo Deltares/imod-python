@@ -218,7 +218,7 @@ class NodePropertyFlow(Package):
         perched=False,
         save_specific_discharge=False,
     ):
-        super(__class__, self).__init__(locals())
+        super().__init__(locals())
         # check rewetting
         if not rewet and any(
             [rewet_layer, rewet_factor, rewet_iterations, rewet_method]
@@ -249,7 +249,7 @@ class NodePropertyFlow(Package):
         self.dataset["perched"] = perched
         self.dataset["save_specific_discharge"] = save_specific_discharge
 
-    def render(self, directory, pkgname, *args, **kwargs):
+    def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         npfdirectory = directory / "npf"
         for varname in self.dataset.data_vars:
@@ -257,7 +257,7 @@ class NodePropertyFlow(Package):
 
             if varname in self._grid_data:
                 layered, value = self._compose_values(
-                    self.dataset[varname], npfdirectory, key
+                    self.dataset[varname], npfdirectory, key, binary=binary
                 )
                 if self._valid(value):  # skip False or None
                     d[f"{key}_layered"], d[key] = layered, value

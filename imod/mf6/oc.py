@@ -46,7 +46,7 @@ class OutputControl(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, save_head=None, save_budget=None):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["save_head"] = save_head
         self.dataset["save_budget"] = save_budget
 
@@ -66,7 +66,7 @@ class OutputControl(Package):
                 f"Output Control setting should be either integer or string in ['first', 'last', 'all'], instead got {setting}"
             )
 
-    def render(self, directory, pkgname, globaltimes):
+    def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         modelname = directory.stem
         if self.dataset["save_head"].values[()] is not None:

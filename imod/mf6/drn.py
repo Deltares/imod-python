@@ -44,7 +44,7 @@ class Drainage(BoundaryCondition):
         save_flows=False,
         observations=None,
     ):
-        super(__class__, self).__init__(locals())
+        super().__init__(locals())
         self.dataset["elevation"] = elevation
         self.dataset["conductance"] = conductance
         self.dataset["print_input"] = print_input

@@ -76,7 +76,7 @@ class RechargeTopLayer(Recharge):
     _option = 1
 
     def __init__(self, rate, concentration, save_budget=False):
-        super(__class__, self).__init__()
+        super().__init__()
         self["rate"] = rate
         self["concentration"] = concentration
         self["save_budget"] = save_budget
@@ -112,7 +112,7 @@ class RechargeLayers(Recharge):
     _mapping = (("rech", "rate"), ("irch", "recharge_layer"))
 
     def __init__(self, rate, recharge_layer, concentration, save_budget=False):
-        super(__class__, self).__init__()
+        super().__init__()
         self["rate"] = rate
         self["recharge_layer"] = recharge_layer
         self["concentration"] = concentration
@@ -147,7 +147,7 @@ class RechargeHighestActive(Recharge):
     _option = 3
 
     def __init__(self, rate, concentration, save_budget=False):
-        super(__class__, self).__init__()
+        super().__init__()
 
         rate_scalar = np.ndim(rate) == 0
         conc_scalar = np.ndim(concentration) == 0

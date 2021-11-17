@@ -57,7 +57,7 @@ class Well(BoundaryCondition):
         concentration=None,
         save_budget=False,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         variables = {
             "id_name": id_name,
             "x": x,

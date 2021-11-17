@@ -8,11 +8,9 @@ begin options
 end options
 
 begin nonlinear
-  outer_hclose {{outer_hclose}}
-{%- if outer_rclosebnd is defined %}  outer_rclosebnd {{outer_rclosebnd}}
-{% endif %}
+  outer_dvclose {{outer_dvclose}}
   outer_maximum {{outer_maximum}}
-{%- if under_relaxation is defined %}  under_relaxation {{under_relaxation}}
+{% if under_relaxation is defined %}  under_relaxation {{under_relaxation}}
 {% endif %}
 {%- if under_relaxation_theta is defined %}  under_relaxation_theta {{under_relaxation_theta}}
 {% endif %}
@@ -29,12 +27,12 @@ begin nonlinear
 {%- if backtracking_reduction_factor is defined %}  backtracking_reduction_factor {{backtracking_reduction_factor}}
 {% endif %}
 {%- if backtracking_residual_limit is defined %}  backtracking_residual_limit {{backtracking_residual_limit}}
-{% endif %}
+{% endif -%}
 end nonlinear
 
 begin linear
   inner_maximum {{inner_maximum}}
-  inner_hclose {{inner_hclose}}
+  inner_dvclose {{inner_dvclose}}
   inner_rclose {{inner_rclose}}{% if rclose_option is defined %} {{rclose_option}}{% endif %}
   linear_acceleration {{linear_acceleration}}
 {% if relaxation_factor is defined %}  relaxation_factor {{relaxation_factor}}

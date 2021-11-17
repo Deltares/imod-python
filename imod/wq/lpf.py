@@ -143,7 +143,7 @@ class LayerPropertyFlow(Package):
         method_wet="wetfactor",
         head_dry=1.0e20,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["k_horizontal"] = k_horizontal
         self["k_vertical"] = k_vertical
         self["horizontal_anisotropy"] = horizontal_anisotropy

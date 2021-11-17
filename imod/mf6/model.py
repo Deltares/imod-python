@@ -11,7 +11,7 @@ from imod.mf6 import qgs_util
 class Model(collections.UserDict):
     def __setitem__(self, key, value):
         # TODO: Add packagecheck
-        super(__class__, self).__setitem__(key, value)
+        super().__setitem__(key, value)
 
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).items():
@@ -31,7 +31,7 @@ class GroundwaterFlowModel(Model):
         self._template = env.get_template("gwf-nam.j2")
 
     def __init__(self, newton=False, under_relaxation=False):
-        super(__class__, self).__init__()
+        super().__init__()
         self.newton = newton
         self.under_relaxation = under_relaxation
         self._initialize_template()
@@ -98,15 +98,13 @@ class GroundwaterFlowModel(Model):
         d["packages"] = packages
         return self._template.render(d)
 
-    def write(self, wdir, modelname, globaltimes):
+    def write(self, workdir, modelname, globaltimes, binary=True):
         """
         Write model namefile
         Write packages
         """
-
-        wdir = pathlib.Path(wdir)
-
-        modeldirectory = wdir / modelname
+        workdir = pathlib.Path(workdir)
+        modeldirectory = workdir / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
 
         # write model namefile
@@ -117,7 +115,12 @@ class GroundwaterFlowModel(Model):
 
         # write package contents
         for pkgname, pkg in self.items():
-            pkg.write(modeldirectory, pkgname, globaltimes)
+            pkg.write(
+                directory=modeldirectory,
+                pkgname=pkgname,
+                globaltimes=globaltimes,
+                binary=binary,
+            )
 
     def write_qgis_project(self, directory, crs, aggregate_layers=False):
         """

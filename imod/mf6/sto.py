@@ -57,18 +57,20 @@ class SpecificStorage(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, specific_storage, specific_yield, transient, convertible):
-        super(__class__, self).__init__(locals())
+        super().__init__(locals())
         self.dataset["specific_storage"] = specific_storage
         self.dataset["specific_yield"] = specific_yield
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
 
-    def render(self, directory, pkgname, globaltimes):
+    def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         stodirectory = directory / "sto"
         for varname in ["specific_storage", "specific_yield", "convertible"]:
             key = self._keyword_map.get(varname, varname)
-            layered, value = self._compose_values(self[varname], stodirectory, key)
+            layered, value = self._compose_values(
+                self[varname], stodirectory, key, binary=binary
+            )
             if self._valid(value):  # skip False or None
                 d[f"{key}_layered"], d[key] = layered, value
 
@@ -144,18 +146,20 @@ class StorageCoefficient(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, storage_coefficient, specific_yield, transient, convertible):
-        super(__class__, self).__init__(locals())
+        super().__init__(locals())
         self.dataset["storage_coefficient"] = storage_coefficient
         self.dataset["specific_yield"] = specific_yield
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
 
-    def render(self, directory, pkgname, globaltimes):
+    def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         stodirectory = directory / "sto"
         for varname in ["storage_coefficient", "specific_yield", "convertible"]:
             key = self._keyword_map.get(varname, varname)
-            layered, value = self._compose_values(self[varname], stodirectory, key)
+            layered, value = self._compose_values(
+                self[varname], stodirectory, key, binary=binary
+            )
             if self._valid(value):  # skip False or None
                 d[f"{key}_layered"], d[key] = layered, value
 

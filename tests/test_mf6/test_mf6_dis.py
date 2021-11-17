@@ -30,7 +30,7 @@ def test_render():
 
     directory = pathlib.Path("mymodel")
     dis = imod.mf6.StructuredDiscretization(top=200.0, bottom=bottom, idomain=idomain)
-    actual = dis.render(directory, "dis")
+    actual = dis.render(directory, "dis", None, True)
     expected = textwrap.dedent(
         """\
         begin options

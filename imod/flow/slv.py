@@ -111,7 +111,7 @@ class PreconditionedConjugateGradientSolver(Package):
         printout_interval=0,
         print_convergence_info=1,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["max_iter"] = max_iter
         self.dataset["inner_iter"] = inner_iter
         self.dataset["rclose"] = rclose

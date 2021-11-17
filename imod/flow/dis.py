@@ -52,7 +52,7 @@ class TimeDiscretization(Package):
         transient=True,
         timestep_multiplier=1.0,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["timestep_duration"] = timestep_duration
         self.dataset["n_timesteps"] = n_timesteps
         self.dataset["transient"] = transient

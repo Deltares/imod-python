@@ -65,7 +65,7 @@ class BasicFlow(Package):
 
     def __init__(self, ibound, top, bottom, starting_head, inactive_head=1.0e30):
         self._check_ibound(ibound)
-        super(__class__, self).__init__()
+        super().__init__()
         self["ibound"] = ibound
         self["top"] = top
         self["bottom"] = bottom

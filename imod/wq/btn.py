@@ -92,7 +92,7 @@ class BasicTransport(Package):
         inactive_concentration=1.0e30,
         minimum_active_thickness=0.01,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["icbund"] = icbund
         self["starting_concentration"] = starting_concentration
         self["porosity"] = porosity

@@ -25,7 +25,7 @@ def drainage():
 
 def test_write(drainage, tmp_path):
     drn = drainage
-    drn.write(tmp_path, "mydrn", [1])
+    drn.write(tmp_path, "mydrn", [1], True)
     dir_for_render = tmp_path.stem
     block_expected = textwrap.dedent(
         f"""\

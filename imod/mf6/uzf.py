@@ -138,7 +138,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         water_mover=None,
         timeseries=None,
     ):
-        super(__class__, self).__init__(locals())
+        super().__init__(locals())
         # Package data
         self.dataset["surface_depression_depth"] = surface_depression_depth
         self.dataset["kv_sat"] = kv_sat
@@ -268,52 +268,42 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         ds = self.dataset[list(self._package_data)]
 
         layer = self._check_layer_presence(ds)
-        arrays = self._ds_to_arrlist(ds)
+        arrdict = self._ds_to_arrdict(ds)
+        recarr = super().to_sparse(arrdict, layer)
 
-        listarr = super(__class__, self).to_sparse(arrays, layer)
-
-        field_spec = self._get_field_spec_from_dtype(listarr)
+        field_spec = self._get_field_spec_from_dtype(recarr)
         field_names = [i[0] for i in field_spec]
-
         index_spec = [("iuzno", np.int32)] + field_spec[:3]
         field_spec = (
             [("landflag", np.int32)] + [("ivertcon", np.int32)] + field_spec[3:]
         )
-
         sparse_dtype = np.dtype(index_spec + field_spec)
 
-        listarr_new = np.empty(listarr.shape, dtype=sparse_dtype)
-        listarr_new["iuzno"] = iuzno
-        listarr_new["landflag"] = landflag
-        listarr_new["ivertcon"] = ivertcon
-        listarr_new[field_names] = listarr
+        recarr_new = np.empty(recarr.shape, dtype=sparse_dtype)
+        recarr_new["iuzno"] = iuzno
+        recarr_new["landflag"] = landflag
+        recarr_new["ivertcon"] = ivertcon
+        recarr_new[field_names] = recarr
 
-        return listarr_new
+        return recarr_new
 
-    def render(self, directory, pkgname, globaltimes):
+    def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {}
-
-        # period = {1: f"{directory}/{self._pkg_id}-{i}.bin"}
-
         bin_ds = self.dataset[list(self._period_data)]
-
-        d["periods"] = self.period_paths(directory, pkgname, globaltimes, bin_ds)
-
+        d["periods"] = self.period_paths(
+            directory, pkgname, globaltimes, bin_ds, binary=False
+        )
         not_options = (
             list(self._period_data) + list(self._package_data) + ["iuzno" + "ivertcon"]
         )
-        # construct the rest (dict for render)
         d = self.get_options(d, not_options=not_options)
-
-        path = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
+        path = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         d["packagedata"] = path.as_posix()
-
         d["nuzfcells"] = self._max_active_n()
-
         return self._template.render(d)
 
-    def to_sparse(self, arrlist, layer):
+    def to_sparse(self, arrdict, layer):
         """Convert from dense arrays to list based input,
         since the perioddata does not require cellids but iuzno, we hgave to override"""
         # TODO add pkgcheck that period table aligns
@@ -323,17 +313,16 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         nrow = notnull.sum()
         # Define the numpy structured array dtype
         index_spec = [("iuzno", np.int32)]
-        field_spec = [(f"f{i}", np.float64) for i in range(len(arrlist))]
+        field_spec = [(key, np.float64) for key in arrdict]
         sparse_dtype = np.dtype(index_spec + field_spec)
 
         # Initialize the structured array
-        listarr = np.empty(nrow, dtype=sparse_dtype)
+        recarr = np.empty(nrow, dtype=sparse_dtype)
         # Fill in the indices
-        listarr["iuzno"] = iuzno[notnull]
+        recarr["iuzno"] = iuzno[notnull]
 
         # Fill in the data
-        for i, arr in enumerate(arrlist):
-            values = arr[notnull].astype(np.float64)
-            listarr[f"f{i}"] = values
+        for key, arr in arrdict.items():
+            recarr[key] = arr[notnull].astype(np.float64)
 
-        return listarr
+        return recarr

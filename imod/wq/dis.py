@@ -91,7 +91,7 @@ class TimeDiscretization(Package):
         transport_timestep_multiplier=None,
         transport_initial_timestep=0.0,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["timestep_duration"] = timestep_duration
         self["n_timesteps"] = n_timesteps
         self["transient"] = transient

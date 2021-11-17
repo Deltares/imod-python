@@ -188,6 +188,15 @@ class Package(abc.ABC):
             return True
 
     @staticmethod
+    def _number_format(dtype: type):
+        if np.issubdtype(dtype, np.integer):
+            return "%i"
+        elif np.issubdtype(dtype, np.floating):
+            return "%.18G"
+        else:
+            raise TypeError("dtype should be either integer or float")
+
+    @staticmethod
     def _initialize_template(pkg_id):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
@@ -199,22 +208,27 @@ class Package(abc.ABC):
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
 
-    def write_blockfile(self, directory, pkgname, *args):
-        dir_for_render = pathlib.Path(directory.stem)
-        content = self.render(dir_for_render, pkgname, *args)
+    def write_blockfile(self, directory, pkgname, globaltimes, binary):
+        renderdir = pathlib.Path(directory.stem)
+        content = self.render(
+            directory=renderdir,
+            pkgname=pkgname,
+            globaltimes=globaltimes,
+            binary=binary,
+        )
         filename = directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
 
-    def to_sparse(self, arrlist, layer):
+    def to_sparse(self, arrdict, layer):
         """Convert from dense arrays to list based input"""
         # TODO stream the data per stress period
         # TODO add pkgcheck that period table aligns
         # Get the number of valid values
         if isinstance(self.dataset, xr.Dataset):
-            return to_sparse_dis(arrlist, layer)
+            return to_sparse_dis(arrdict, layer)
         elif isinstance(self.dataset, xu.UgridDataset):
-            return to_sparse_disv(arrlist, layer)
+            return to_sparse_disv(arrdict, layer)
         else:
             raise TypeError(
                 "self.dataset should be xarray.Dataset or xugrid.UgridDataset,"
@@ -233,16 +247,15 @@ class Package(abc.ABC):
             layer = None
         return layer
 
-    def _ds_to_arrlist(self, ds):
-        # TODO: stream the data per stress period; don't access .values here
-        arrlist = []
+    def _ds_to_arrdict(self, ds):
+        arrdict = {}
         for datavar in ds.data_vars:
             if ds[datavar].shape == ():
                 raise ValueError(
                     f"{datavar} in {ds._pkg_id} package cannot be a scalar"
                 )
-            arrlist.append(ds[datavar].values)
-        return arrlist
+            arrdict[datavar] = ds[datavar].values
+        return arrdict
 
     def write_binary_griddata(self, outpath, da, dtype):
         # From the modflow6 source, the header is defined as:
@@ -279,7 +292,17 @@ class Package(abc.ABC):
             header.tofile(f)
             da.values.flatten().astype(dtype).tofile(f)
 
-    def render(self, *args, **kwargs):
+    def write_text_griddata(self, outpath, da, dtype):
+        with open(outpath, "w") as f:
+            # Note: reshaping here avoids writing newlines after every number.
+            # This dumps all the values in a single row rather than a single
+            # column. This is to be preferred, since editors can easily
+            # "reshape" a long row with "word wrap"; they cannot as easily
+            # ignore newlines.
+            fmt = self._number_format(dtype)
+            np.savetxt(fname=f, X=da.values.reshape((1, -1)), fmt=fmt)
+
+    def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         for k, v in self.dataset.data_vars.items():  # pylint:disable=no-member
             value = v.values[()]
@@ -300,7 +323,7 @@ class Package(abc.ABC):
             )
         return xy
 
-    def _compose_values(self, da, directory, name=None, *args, **kwargs):
+    def _compose_values(self, da, directory, name, binary):
         """
         Compose values of dictionary.
 
@@ -312,11 +335,14 @@ class Package(abc.ABC):
         layered = False
         values = []
         if self._is_xy_data(da):
-            if name is None:
-                name = self._pkg_id
-            path = (directory / f"{name}.bin").as_posix()
-            values.append(f"open/close {path} (binary)")
+            if binary:
+                path = (directory / f"{name}.bin").as_posix()
+                values.append(f"open/close {path} (binary)")
+            else:
+                path = (directory / f"{name}.dat").as_posix()
+                values.append(f"open/close {path}")
         else:
+
             if "layer" in da.dims:
                 layered = True
                 for layer in da.coords["layer"]:
@@ -330,10 +356,10 @@ class Package(abc.ABC):
 
         return layered, values
 
-    def write(self, directory, pkgname, *args, **kwargs):
+    def write(self, directory, pkgname, globaltimes, binary):
         directory = pathlib.Path(directory)
 
-        self.write_blockfile(directory, pkgname, *args)
+        self.write_blockfile(directory, pkgname, globaltimes, binary=binary)
 
         if hasattr(self, "_grid_data"):
             if self._is_xy_data(self.dataset):
@@ -343,8 +369,12 @@ class Package(abc.ABC):
                     key = self._keyword_map.get(varname, varname)
                     da = self.dataset[varname]
                     if self._is_xy_data(da):
-                        path = pkgdirectory / f"{key}.bin"
-                        self.write_binary_griddata(path, da, dtype)
+                        if binary:
+                            path = pkgdirectory / f"{key}.bin"
+                            self.write_binary_griddata(path, da, dtype)
+                        else:
+                            path = pkgdirectory / f"{key}.dat"
+                            self.write_text_griddata(path, da, dtype)
 
     def _netcdf_path(self, directory, pkgname):
         """create path for netcdf, this function is also used to create paths to use inside the qgis projectfiles"""
@@ -420,33 +450,45 @@ class BoundaryCondition(Package, abc.ABC):
             nmax = int(da.count())
         return nmax
 
-    def _write_file(self, outpath, sparse_data):
-        """
-        data is a xr.Dataset with only the binary variables
-        """
+    def _write_binaryfile(self, outpath, sparse_data):
         with open(outpath, "w") as f:
             sparse_data.tofile(f)
 
-    def write_datafile(self, outpath, ds):
+    def _write_textfile(self, outpath, sparse_data):
+        fields = sparse_data.dtype.fields
+        fmt = [self._number_format(field[0]) for field in fields.values()]
+        header = " ".join(list(fields.keys()))
+        with open(outpath, "w") as f:
+            np.savetxt(fname=f, X=sparse_data, fmt=fmt, header=header)
+
+    def write_datafile(self, outpath, ds, binary):
         """
         Writes a modflow6 binary data file
         """
         layer = self._check_layer_presence(ds)
-        arrays = self._ds_to_arrlist(ds)
-        sparse_data = self.to_sparse(arrays, layer)
+        arrdict = self._ds_to_arrdict(ds)
+        sparse_data = self.to_sparse(arrdict, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)
-        self._write_file(outpath, sparse_data)
+        if binary:
+            self._write_binaryfile(outpath, sparse_data)
+        else:
+            self._write_textfile(outpath, sparse_data)
 
-    def period_paths(self, directory, pkgname, globaltimes, bin_ds):
+    def period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
+        if binary:
+            ext = "bin"
+        else:
+            ext = "dat"
+
         periods = {}
         if "time" in bin_ds:  # one of bin_ds has time
             package_times = bin_ds.coords["time"].values
             starts = np.searchsorted(globaltimes, package_times) + 1
             for i, s in enumerate(starts):
-                path = directory / pkgname / f"{self._pkg_id}-{i}.bin"
+                path = directory / pkgname / f"{self._pkg_id}-{i}.{ext}"
                 periods[s] = path.as_posix()
         else:
-            path = directory / pkgname / f"{self._pkg_id}.bin"
+            path = directory / pkgname / f"{self._pkg_id}.{ext}"
             periods[1] = path.as_posix()
         return periods
 
@@ -462,41 +504,54 @@ class BoundaryCondition(Package, abc.ABC):
                 d[varname] = v
         return d
 
-    def render(self, directory, pkgname, globaltimes):
+    def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
-        d = {}
-
-        # period = {1: f"{directory}/{self._pkg_id}-{i}.bin"}
-
-        bin_ds = self.dataset[list(self._period_data)]
-
-        d["periods"] = self.period_paths(directory, pkgname, globaltimes, bin_ds)
+        d = {"binary": binary}
+        bin_ds = self[list(self._period_data)]
+        d["periods"] = self.period_paths(
+            directory, pkgname, globaltimes, bin_ds, binary
+        )
         # construct the rest (dict for render)
         d = self.get_options(d)
-
         d["maxbound"] = self._max_active_n()
-
         return self._template.render(d)
 
-    def write_perioddata(self, directory, pkgname):
-        bin_ds = self.dataset[list(self._period_data)]
-        if "time" in bin_ds:  # one of bin_ds has time
-            for i in range(len(self.dataset.time)):
-                path = directory / pkgname / f"{self._pkg_id}-{i}.bin"
-                self.write_datafile(path, bin_ds.isel(time=i))  # one timestep
-        else:
-            path = directory / pkgname / f"{self._pkg_id}.bin"
-            self.write_datafile(path, bin_ds)
+    def write_perioddata(self, directory, pkgname, binary):
+        bin_ds = self[list(self._period_data)]
 
-    def write(self, directory, pkgname, globaltimes):
+        if binary:
+            ext = "bin"
+        else:
+            ext = "dat"
+
+        if "time" in bin_ds:  # one of bin_ds has time
+            for i in range(len(self.time)):
+                path = directory / pkgname / f"{self._pkg_id}-{i}.{ext}"
+                self.write_datafile(
+                    path, bin_ds.isel(time=i), binary=binary
+                )  # one timestep
+        else:
+            path = directory / pkgname / f"{self._pkg_id}.{ext}"
+            self.write_datafile(path, bin_ds, binary=binary)
+
+    def write(self, directory, pkgname, globaltimes, binary):
         """
         writes the blockfile and binary data
 
         directory is modelname
         """
         directory = pathlib.Path(directory)
-        self.write_blockfile(directory, pkgname, globaltimes)
-        self.write_perioddata(directory, pkgname)
+        self.write_blockfile(
+            directory=directory,
+            pkgname=pkgname,
+            globaltimes=globaltimes,
+            binary=binary,
+        )
+        self.write_perioddata(
+            directory=directory,
+            pkgname=pkgname,
+            binary=binary,
+        )
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
@@ -510,37 +565,23 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
 
     __slots__ = ()
 
-    def _get_field_spec_from_dtype(self, listarr):
+    def _get_field_spec_from_dtype(self, recarr):
         """
         From https://stackoverflow.com/questions/21777125/how-to-output-dtype-to-a-list-or-dict
         """
         return [
             (x, y[0])
-            for x, y in sorted(listarr.dtype.fields.items(), key=lambda k: k[1])
+            for x, y in sorted(recarr.dtype.fields.items(), key=lambda k: k[1])
         ]
 
     def _write_file(self, outpath, sparse_data):
         """
         Write to textfile, which is necessary for Advanced Stress Packages
         """
-        textformat = self.get_textformat(sparse_data)
-        np.savetxt(outpath, sparse_data, delimiter=" ", fmt=textformat)
-
-    def get_textformat(self, sparse_data):
-        field_spec = self._get_field_spec_from_dtype(sparse_data)
-        dtypes = list(zip(*field_spec))[1]
-        textformat = []
-        for dtype in dtypes:
-            if np.issubdtype(dtype, np.integer):  # integer
-                textformat.append("%4d")
-            elif np.issubdtype(dtype, np.inexact):  # floatish
-                textformat.append("%6.3f")
-            else:
-                raise ValueError(
-                    "Data should be a subdatatype of either 'np.integer' or 'np.inexact'"
-                )
-        textformat = " ".join(textformat)
-        return textformat
+        fields = sparse_data.dtype.fields
+        fmt = [self._number_format(field[0]) for field in fields.values()]
+        header = " ".join(list(fields.keys()))
+        np.savetxt(fname=outpath, X=sparse_data, fmt=fmt, header=header)
 
     @abc.abstractmethod
     def _package_data_to_sparse(self):
@@ -550,16 +591,14 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         """
         return
 
-    def write_packagedata(self, directory, pkgname):
-        outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.bin"
+    def write_packagedata(self, directory, pkgname, binary):
+        outpath = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
         outpath.parent.mkdir(exist_ok=True, parents=True)
         package_data = self._package_data_to_sparse()
-        # Write PackageData
         self._write_file(outpath, package_data)
 
-    def write(self, directory, pkgname, globaltimes):
-        # Write Stress Period data and Options
+    def write(self, directory, pkgname, globaltimes, binary):
         self.fill_stress_perioddata()
-        self.write_blockfile(directory, pkgname, globaltimes)
-        self.write_perioddata(directory, pkgname)
-        self.write_packagedata(directory, pkgname)
+        self.write_blockfile(directory, pkgname, globaltimes, binary=False)
+        self.write_perioddata(directory, pkgname, binary=False)
+        self.write_packagedata(directory, pkgname, binary=False)

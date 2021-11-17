@@ -65,7 +65,7 @@ class Evapotranspiration(BoundaryCondition):
         save_flows=False,
         observations=None,
     ):
-        super(__class__, self).__init__(locals())
+        super().__init__(locals())
         self.dataset["surface"] = surface
         self.dataset["rate"] = rate
         self.dataset["depth"] = depth

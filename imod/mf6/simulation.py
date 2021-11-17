@@ -16,13 +16,13 @@ class Modflow6Simulation(collections.UserDict):
         self._template = env.get_template("sim-nam.j2")
 
     def __init__(self, name):
-        super(__class__, self).__init__()
+        super().__init__()
         self.name = name
         self.directory = None
         self._initialize_template()
 
     def __setitem__(self, key, value):
-        super(__class__, self).__setitem__(key, value)
+        super().__setitem__(key, value)
 
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).items():
@@ -93,7 +93,7 @@ class Modflow6Simulation(collections.UserDict):
         d["solutiongroups"] = [[("ims6", f"{solvername}.ims", modelnames)]]
         return self._template.render(d)
 
-    def write(self, directory=".") -> None:
+    def write(self, directory=".", binary=True):
         directory = pathlib.Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
 
@@ -109,11 +109,20 @@ class Modflow6Simulation(collections.UserDict):
         # Write individual models
         globaltimes = self["time_discretization"]["time"].values
         for key, value in self.items():
+            # skip timedis, exchanges
             if value._pkg_id == "model":
-                value.write(directory, key, globaltimes)
+                value.write(
+                    modelname=key,
+                    globaltimes=globaltimes,
+                    binary=binary,
+                )
             elif value._pkg_id == "ims":
-                value.write(directory, key)
-
+                value.write(
+                    directory=".",
+                    pkgname=key,
+                    globaltimes=globaltimes,
+                    binary=binary,
+                )
         self.directory = directory
 
     def run(self, mf6path="mf6") -> None:

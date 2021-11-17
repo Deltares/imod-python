@@ -1,6 +1,17 @@
+import cftime
 import numpy as np
 
 from imod.mf6.pkgbase import Package
+
+
+def iso8601(datetime):
+    datetype = type(datetime)
+    if issubclass(datetype, np.datetime64):
+        return np.datetime_as_string(datetime)
+    elif issubclass(datetype, cftime.datetime):
+        return datetime.isoformat()
+    else:
+        raise TypeError(f"Expected np.datetime64 or cftime.datetime, got {datetype}")
 
 
 class TimeDiscretization(Package):
@@ -28,14 +39,17 @@ class TimeDiscretization(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, timestep_duration, n_timesteps=1, timestep_multiplier=1.0):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["timestep_duration"] = timestep_duration
         self.dataset["n_timesteps"] = n_timesteps
         self.dataset["timestep_multiplier"] = timestep_multiplier
 
     def render(self):
-        d = {}
-        d["time_units"] = "days"
+        start_date_time = iso8601(self.dataset["time"].values[0])
+        d = {
+            "time_units": "days",
+            "start_date_time": start_date_time,
+        }
         timestep_duration = self.dataset["timestep_duration"]
         n_timesteps = self.dataset["n_timesteps"]
         timestep_multiplier = self.dataset["timestep_multiplier"]

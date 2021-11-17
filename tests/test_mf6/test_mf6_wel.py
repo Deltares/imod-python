@@ -38,7 +38,7 @@ def test_render():
     )
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    actual = wel.render(directory, "well", globaltimes)
+    actual = wel.render(directory, "well", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options

@@ -39,7 +39,7 @@ class AdvectionFiniteDifference(Package):
     )
 
     def __init__(self, courant=0.75, weighting="upstream"):
-        super(__class__, self).__init__()
+        super().__init__()
         self["courant"] = courant
         self["weighting"] = weighting
 
@@ -176,7 +176,7 @@ class AdvectionMOC(Package):
         cell_min_nparticles=5,
         cell_max_nparticles=80,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["courant"] = courant
         self["tracking"] = tracking
         self["weighting_factor"] = weighting_factor
@@ -262,7 +262,7 @@ class AdvectionModifiedMOC(Package):
         sink_particle_placement=2,
         sink_nparticles=40,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["courant"] = courant
         self["tracking"] = tracking
         self["weighting_factor"] = weighting_factor
@@ -382,7 +382,7 @@ class AdvectionHybridMOC(Package):
         sink_nparticles=40,
         dconcentration_hybrid=1.0e-4,
     ):
-        super(__class__, self).__init__()
+        super().__init__()
         self["courant"] = courant
         self["tracking"] = tracking
         self["weighting_factor"] = weighting_factor
@@ -424,7 +424,7 @@ class AdvectionTVD(Package):
     _template = "[adv]\n" "    mixelm = -1\n" "    percel = {courant}\n"
 
     def __init__(self, courant=0.75):
-        super(__class__, self).__init__()
+        super().__init__()
         self["courant"] = courant
 
     def _pkgcheck(self, ibound=None):

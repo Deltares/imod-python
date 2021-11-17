@@ -54,7 +54,7 @@ def test_render_specific_storage(sy_layered, convertible):
 
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    actual = sto.render(directory, "sto", globaltimes)
+    actual = sto.render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -97,7 +97,7 @@ def test_render_specific_storage_three_periods(sy_layered, convertible):
         np.datetime64("2000-01-02"),
         np.datetime64("2000-01-03"),
     ]
-    actual = sto.render(directory, "sto", globaltimes)
+    actual = sto.render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
@@ -136,7 +136,7 @@ def test_render_storage_coefficient(sy_layered, convertible):
 
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    actual = sto.render(directory, "sto", globaltimes)
+    actual = sto.render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options

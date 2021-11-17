@@ -19,6 +19,6 @@ class GeneralHeadBoundary(BoundaryCondition):
     _variable_order = ["conductance", "head"]
 
     def __init__(self, conductance, head):
-        super(__class__, self).__init__()
+        super().__init__()
         self.dataset["conductance"] = conductance
         self.dataset["head"] = head

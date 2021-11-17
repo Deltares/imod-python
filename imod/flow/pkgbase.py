@@ -685,7 +685,7 @@ class TopBoundaryCondition(BoundaryCondition, abc.ABC):
         nlayer,
     ):
 
-        composition = super(__class__, self).compose(
+        composition = super().compose(
             directory,
             globaltimes,
             nlayer,
