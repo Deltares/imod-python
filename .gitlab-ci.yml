@@ -26,7 +26,7 @@ build:
     - pip install .
     # download mf6 binary and move it to the env's bin which is in the path
     # see https://gitlab.com/deltares/imod/imod-python/snippets/1893049
-    - curl -O -L https://gitlab.com/deltares/imod/imod-python/uploads/947a1e194a02ade1376d1111327db34d/mf6.gz
+    - curl -O -L https://gitlab.com/deltares/imod/imod-python/uploads/a8ed27675150689c6acd425239531a5e/mf6.gz
     - gunzip mf6.gz
     - chmod +x mf6
     - mv mf6 /opt/conda/envs/imod/bin
