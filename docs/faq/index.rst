@@ -7,9 +7,13 @@ there are hundreds of parameters, and depending on the number of cells there
 may be billions of parameter values to configure. Python provides an enormous
 number of tools to help you configure, but working with any programming lanuage
 brings its own complexities. Consequently, this Frequently Asked Questions
-(FAQ) section has been organized by subject.
+(FAQ) section has been organized by subject:
 
 
 .. toctree::
    :titlesonly:
-   :hidden:
+
+   general
+   how-do-i/index
+   python
+   modeling
