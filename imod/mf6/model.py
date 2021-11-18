@@ -98,12 +98,12 @@ class GroundwaterFlowModel(Model):
         d["packages"] = packages
         return self._template.render(d)
 
-    def write(self, workdir, modelname, globaltimes, binary=True):
+    def write(self, directory, modelname, globaltimes, binary=True):
         """
         Write model namefile
         Write packages
         """
-        workdir = pathlib.Path(workdir)
+        workdir = pathlib.Path(directory)
         modeldirectory = workdir / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
 

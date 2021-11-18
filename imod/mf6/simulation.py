@@ -112,13 +112,14 @@ class Modflow6Simulation(collections.UserDict):
             # skip timedis, exchanges
             if value._pkg_id == "model":
                 value.write(
+                    directory=directory,
                     modelname=key,
                     globaltimes=globaltimes,
                     binary=binary,
                 )
             elif value._pkg_id == "ims":
                 value.write(
-                    directory=".",
+                    directory=directory,
                     pkgname=key,
                     globaltimes=globaltimes,
                     binary=binary,

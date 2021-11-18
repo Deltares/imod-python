@@ -37,7 +37,7 @@ class HorizontalFlowBarrier(BoundaryCondition):
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(self, idomain, geometry, resistance=None, multiplier=None, layer=None):
-        super(__class__, self).__init__(locals())
+        super().__init__(locals())
 
         if not ((resistance is None) ^ (multiplier is None)):
             raise ValueError("Specify either a resistance or a multiplier")

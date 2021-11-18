@@ -7,64 +7,40 @@ import xarray as xr
 import xugrid as xu
 
 
-# TODO stream the data per stress period
-# TODO add pkgcheck that period table aligns
-def to_sparse_dis(arrlist, layer):
-    """Convert from dense arrays to list based input"""
-    # Get the number of valid values
-    data = arrlist[0]
-    notnull = ~np.isnan(data)
-    nrow = notnull.sum()
+def dis_recarr(arrdict, layer, notnull):
     # Define the numpy structured array dtype
     index_spec = [("layer", np.int32), ("row", np.int32), ("column", np.int32)]
-    field_spec = [(f"f{i}", np.float64) for i in range(len(arrlist))]
+    field_spec = [(key, np.float64) for key in arrdict]
     sparse_dtype = np.dtype(index_spec + field_spec)
-
     # Initialize the structured array
-    listarr = np.empty(nrow, dtype=sparse_dtype)
+    nrow = notnull.sum()
+    recarr = np.empty(nrow, dtype=sparse_dtype)
     # Fill in the indices
     if layer is not None:
-        listarr["layer"] = layer
-        listarr["row"], listarr["column"] = (np.argwhere(notnull) + 1).transpose()
+        recarr["layer"] = layer
+        recarr["row"], recarr["column"] = (np.argwhere(notnull) + 1).transpose()
     else:
-        listarr["layer"], listarr["row"], listarr["column"] = (
+        recarr["layer"], recarr["row"], recarr["column"] = (
             np.argwhere(notnull) + 1
         ).transpose()
-
-    # Fill in the data
-    for i, arr in enumerate(arrlist):
-        values = arr[notnull].astype(np.float64)
-        listarr[f"f{i}"] = values
-
-    return listarr
+    return recarr
 
 
-def to_sparse_disv(arrlist, layer):
-    """Convert from dense arrays to list based input"""
-    # Get the number of valid values
-    data = arrlist[0]
-    notnull = ~np.isnan(data)
-    nrow = notnull.sum()
+def disv_recarr(arrdict, layer, notnull):
     # Define the numpy structured array dtype
     index_spec = [("layer", np.int32), ("cell2d", np.int32)]
-    field_spec = [(f"f{i}", np.float64) for i in range(len(arrlist))]
+    field_spec = [(key, np.float64) for key in arrdict]
     sparse_dtype = np.dtype(index_spec + field_spec)
-
     # Initialize the structured array
-    listarr = np.empty(nrow, dtype=sparse_dtype)
+    nrow = notnull.sum()
+    recarr = np.empty(nrow, dtype=sparse_dtype)
     # Fill in the indices
     if layer is not None:
-        listarr["layer"] = layer
-        listarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
+        recarr["layer"] = layer
+        recarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
     else:
-        listarr["layer"], listarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
-
-    # Fill in the data
-    for i, arr in enumerate(arrlist):
-        values = arr[notnull].astype(np.float64)
-        listarr[f"f{i}"] = values
-
-    return listarr
+        recarr["layer"], recarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
+    return recarr
 
 
 class Package(abc.ABC):
@@ -79,8 +55,6 @@ class Package(abc.ABC):
     <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=16>`_,
     not the list input which is used in :class:`BoundaryCondition`.
     """
-
-    __slots__ = ("_template", "_pkg_id", "_period_data")
 
     @classmethod
     def from_file(cls, path, **kwargs):
@@ -225,15 +199,24 @@ class Package(abc.ABC):
         # TODO stream the data per stress period
         # TODO add pkgcheck that period table aligns
         # Get the number of valid values
+        data = next(iter(arrdict.values()))
+        notnull = ~np.isnan(data)
+
         if isinstance(self.dataset, xr.Dataset):
-            return to_sparse_dis(arrdict, layer)
+            recarr = dis_recarr(arrdict, layer, notnull)
         elif isinstance(self.dataset, xu.UgridDataset):
-            return to_sparse_disv(arrdict, layer)
+            recarr = disv_recarr(arrdict, layer, notnull)
         else:
             raise TypeError(
                 "self.dataset should be xarray.Dataset or xugrid.UgridDataset,"
                 f" is {type(self.dataset)} instead"
             )
+        # Fill in the data
+        for key, arr in arrdict.items():
+            values = arr[notnull].astype(np.float64)
+            recarr[key] = values
+
+        return recarr
 
     def _check_layer_presence(self, ds):
         """
@@ -436,8 +419,6 @@ class BoundaryCondition(Package, abc.ABC):
     not the array input which is used in :class:`Package`.
     """
 
-    __slots__ = ()
-
     def _max_active_n(self):
         """
         Determine the maximum active number of cells that are active
@@ -562,8 +543,6 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     The advanced boundary condition packages are: "uzf", "lak", "maw", "sfr".
 
     """
-
-    __slots__ = ()
 
     def _get_field_spec_from_dtype(self, recarr):
         """

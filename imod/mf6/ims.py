@@ -331,33 +331,6 @@ class Solution(Package):
         SolutionPresetComplex: No Default
     """
 
-    __slots__ = (
-        "outer_dvclose",
-        "outer_maximum",
-        "inner_maximum",
-        "inner_dvclose",
-        "inner_rclose",
-        "linear_acceleration",
-        "under_relaxation",
-        "under_relaxation_theta",
-        "under_relaxation_kappa",
-        "under_relaxation_gamma",
-        "under_relaxation_momentum",
-        "backtracking_number",
-        "backtracking_tolerance",
-        "backtracking_reduction_factor",
-        "backtracking_residual_limit",
-        "rclose_option",
-        "relaxation_factor",
-        "preconditioner_levels",
-        "preconditioner_drop_tolerance",
-        "number_orthogonalizations",
-        "scaling_method",
-        "reordering_method",
-        "print_option",
-        "csv_output",
-        "no_ptc",
-    )
     _pkg_id = "ims"
     _keyword_map = {}
     _template = Package._initialize_template(_pkg_id)

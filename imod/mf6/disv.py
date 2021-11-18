@@ -23,12 +23,12 @@ class VerticesDiscretization(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, top, bottom, idomain):
-        super(__class__, self).__init__(locals())
+        super().__init__(locals())
         self.dataset["idomain"] = idomain
         self.dataset["top"] = top
         self.dataset["bottom"] = bottom
 
-    def render(self, directory, pkgname, *args, **kwargs):
+    def render(self, directory, pkgname, binary):
         disdirectory = directory / pkgname
         d = {}
         grid = self.dataset.ugrid.grid
@@ -39,12 +39,14 @@ class VerticesDiscretization(Package):
         d["ncpl"] = self.dataset["idomain"].coords[facedim].size
         d["nvert"] = grid.node_x.size
 
-        _, d["top"] = self._compose_values(self.dataset["top"], disdirectory, "top")
+        _, d["top"] = self._compose_values(
+            self.dataset["top"], disdirectory, "top", binary=binary
+        )
         d["botm_layered"], d["botm"] = self._compose_values(
-            self["bottom"], disdirectory, "botm"
+            self["bottom"], disdirectory, "botm", binary=binary
         )
         d["idomain_layered"], d["idomain"] = self._compose_values(
-            self["idomain"], disdirectory, "idomain"
+            self["idomain"], disdirectory, "idomain", binary=binary
         )
         return self._template.render(d)
 
@@ -70,9 +72,9 @@ class VerticesDiscretization(Package):
             )
         return df
 
-    def write_blockfile(self, directory, pkgname, *args):
+    def write_blockfile(self, directory, pkgname, globaltimes, binary):
         dir_for_render = pathlib.Path(directory.stem)
-        content = self.render(dir_for_render, pkgname, *args)
+        content = self.render(dir_for_render, pkgname, binary)
         filename = directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
