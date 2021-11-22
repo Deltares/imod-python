@@ -1,3 +1,4 @@
+import re
 import subprocess
 import sys
 import textwrap
@@ -377,6 +378,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
               oc6 {path}/oc.oc
               rch6 {path}/rch.rch
               wel6 {path}/wel.wel
+              sto6 {path}/sto.sto
             end packages
             """
     )
@@ -450,3 +452,27 @@ def test_simulation_write_text(twri_model, tmp_path):
         meanhead_layer = head.groupby("layer").mean(dim=xr.ALL_DIMS)
         mean_answer = np.array([59.79181509, 30.44132373, 24.88576811])
         assert np.allclose(meanhead_layer, mean_answer)
+
+
+@pytest.mark.usefixtures("transient_twri_model")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
+def test_simulation_write_storage(transient_twri_model, tmp_path):
+    simulation = transient_twri_model
+    modeldir = tmp_path / "ex01-twri-transient"
+    simulation.write(modeldir, binary=True)
+    with imod.util.cd(modeldir):
+        p = subprocess.run("mf6", check=True, capture_output=True, text=True)
+        assert p.stdout.endswith("Normal termination of simulation.\n")
+
+
+@pytest.mark.usefixtures("twri_model")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
+def test_simulation_write_errors(twri_model, tmp_path):
+    simulation = twri_model
+    model = simulation["GWF_1"]
+    model.pop("sto")
+    modeldir = tmp_path / "ex01-twri"
+
+    expected_message = "No sto package found in model GWF_1"
+    with pytest.raises(ValueError, match=re.escape(expected_message)):
+        simulation.write(modeldir, binary=True)

@@ -1,14 +1,15 @@
+import copy
 import subprocess
 
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 
 import imod
 
 
-@pytest.fixture(scope="session")
-def twri_model():
+def make_twri_model():
     nlay = 3
     nrow = 15
     ncol = 15
@@ -108,6 +109,12 @@ def twri_model():
         print_flows=True,
         save_flows=True,
     )
+    gwf_model["sto"] = imod.mf6.SpecificStorage(
+        specific_storage=1.0e-15,
+        specific_yield=0.15,
+        convertible=0,
+        transient=False,
+    )
 
     # Attach it to a simulation
     simulation = imod.mf6.Modflow6Simulation("ex01-twri")
@@ -130,6 +137,26 @@ def twri_model():
     )
     # Collect time discretization
     simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
+    return simulation
+
+
+@pytest.fixture(scope="session")
+def twri_model():
+    return make_twri_model()
+
+
+@pytest.fixture(scope="session")
+def transient_twri_model():
+    simulation = make_twri_model()
+    gwf_model = simulation["GWF_1"]
+    like = gwf_model["dis"]["idomain"].astype(float)
+    gwf_model["sto"] = imod.mf6.SpecificStorage(
+        specific_storage=xr.full_like(like, 1.0e-15),
+        specific_yield=xr.full_like(like, 0.15),
+        convertible=0,
+        transient=True,
+    )
+    simulation.time_discretization(times=pd.date_range("2000-01-01", " 2000-01-31"))
     return simulation
 
 
