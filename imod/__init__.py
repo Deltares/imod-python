@@ -9,6 +9,7 @@ from imod import (
     idf,
     ipf,
     mf6,
+    msw,
     prepare,
     rasterio,
     select,
