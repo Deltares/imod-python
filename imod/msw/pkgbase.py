@@ -61,11 +61,8 @@ class Package(abc.ABC):
         elif np.issubdtype(dtype, np.integer):
             return "{:" + f"{width}d" + "}"
         elif np.issubdtype(dtype, np.floating):
-            if width - 7 > 0:
-                return "{:" + f"+.{width - 7}e" + "}"
-            else:
-                decimal_number_width = max(0, width - metadata.whole_number_digits - 2)
-                return "{:" + f"+{width}.{decimal_number_width}f" + "}"
+            decimal_number_width = max(0, width - metadata.whole_number_digits - 2)
+            return "{:" + f"+{width}.{decimal_number_width}f" + "}"
         else:
             raise TypeError(f"dtype {dtype} is not supported")
 

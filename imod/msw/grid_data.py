@@ -45,7 +45,7 @@ class GridData(Package):
 
         # Produce values necessary for members without subunit coordinate
         extend_subunits = self.dataset["area"]["subunit"]
-        mask = self._apply_mask(self.dataset["area"], self.dataset["active"]).notnull()
+        mask = self.dataset["area"].where(self.dataset["active"]).notnull()
 
         # Generate columns for members without subunit coordinate
         surface_elevation = self._get_preprocessed_array(
@@ -94,13 +94,6 @@ class GridData(Package):
 
         return self.write_dataframe_fixed_width(file, dataframe, metadata_dict)
 
-    @staticmethod
-    def _apply_mask(array, mask):
-        if mask is not None:
-            return array.where(mask)
-        else:
-            return array
-
     def write(self, directory):
         directory = pathlib.Path(directory)
 
@@ -116,7 +109,8 @@ class GridData(Package):
             array = array.expand_dims({"subunit": extend_subunits})
 
         # Apply mask
-        array = self._apply_mask(array, mask)
+        if mask is not None:
+            array.where(mask)
 
         # Convert to numpy array and flatten it
         array = array.to_numpy().ravel()
@@ -127,7 +121,5 @@ class GridData(Package):
         # If dtype isn't None, convert to wanted type
         if dtype:
             array = array.astype(dtype)
-        else:
-            array = array
 
         return array
