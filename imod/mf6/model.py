@@ -57,7 +57,7 @@ class GroundwaterFlowModel(Model):
         if not dispresent:
             raise ValueError(f"No dis/disv/disu package found in model {modelkey}")
         for required in ["npf", "ic", "oc", "sto"]:
-            if not required in pkg_ids:
+            if required not in pkg_ids:
                 raise ValueError(f"No {required} package found in model {modelkey}")
         return
 
