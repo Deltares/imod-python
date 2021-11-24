@@ -16,6 +16,7 @@ dependencies:
   - graphviz
   - python-graphviz
   - flopy
+  - hypothesis
   - jinja2
   - matplotlib
   - meshzoo
@@ -26,7 +27,10 @@ dependencies:
   - pooch
   - pip
   - pip:
-    - pandamesh
+      - declxml
+      - meshzoo
+      - pandamesh
+      - xugrid
   - pydata-sphinx-theme
   - pygeos
   - pyproj

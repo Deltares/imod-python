@@ -44,13 +44,13 @@ class Package(abc.ABC):
 
     def _check_range(self, dataframe):
         for varname in dataframe:
-            minimum = self._metadata_dict[varname].minimum
-            maximum = self._metadata_dict[varname].maximum
-            if (dataframe[varname] < minimum).any() or (
-                dataframe[varname] > maximum
+            min_value = self._metadata_dict[varname].min_value
+            max_value = self._metadata_dict[varname].max_value
+            if (dataframe[varname] < min_value).any() or (
+                dataframe[varname] > max_value
             ).any():
                 raise ValueError(
-                    f"{varname}: not all values are within range ({minimum}-{maximum})."
+                    f"{varname}: not all values are within range ({min_value}-{max_value})."
                 )
 
     @staticmethod
@@ -88,7 +88,7 @@ class Package(abc.ABC):
     def _get_preprocessed_array(self, varname, mask, dtype=None, extend_subunits=None):
         array = self.dataset[varname]
         if extend_subunits is not None:
-            array = array.expand_dims({"subunit": extend_subunits})
+            array = array.expand_dims(subunit=extend_subunits)
 
         # Apply mask
         if mask is not None:
@@ -108,14 +108,14 @@ class Package(abc.ABC):
 
 
 class VariableMetaData:
-    def __init__(self, column_width, minimum, maximum):
+    def __init__(self, column_width, min_value, max_value):
         self.column_width = column_width
-        self.minimum = minimum
-        self.maximum = maximum
+        self.min_value = min_value
+        self.max_value = max_value
 
-        if self.minimum is not None and self.maximum is not None:
+        if self.min_value is not None and self.max_value is not None:
             self.calc_whole_number_digits()
 
     def calc_whole_number_digits(self):
-        max_abs = max(abs(self.minimum), abs(self.maximum))
+        max_abs = max(abs(self.min_value), abs(self.max_value))
         self.whole_number_digits = len(str(int(max_abs)))
