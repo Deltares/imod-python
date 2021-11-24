@@ -92,6 +92,12 @@ class Modflow6Simulation(collections.UserDict):
         return self._template.render(d)
 
     def write(self, directory=".", binary=True):
+        # Check models for required content
+        for key, model in self.items():
+            # skip timedis, exchanges
+            if model._pkg_id == "model":
+                model._check_for_required_packages(key)
+
         directory = pathlib.Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
 

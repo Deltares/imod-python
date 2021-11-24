@@ -50,6 +50,17 @@ class GroundwaterFlowModel(Model):
         else:
             return None
 
+    def _check_for_required_packages(self, modelkey: str) -> None:
+        # Check for mandatory packages
+        pkg_ids = set([pkg._pkg_id for pkg in self.values()])
+        dispresent = "dis" in pkg_ids or "disv" in pkg_ids or "disu" in pkg_ids
+        if not dispresent:
+            raise ValueError(f"No dis/disv/disu package found in model {modelkey}")
+        for required in ["npf", "ic", "oc", "sto"]:
+            if not required in pkg_ids:
+                raise ValueError(f"No {required} package found in model {modelkey}")
+        return
+
     def _use_cftime(self):
         """
         Also checks if datetime types are homogeneous across packages.
