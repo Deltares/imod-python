@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod.msw.pkgbase import MetaData, Package
+from imod.msw.pkgbase import Package, VariableMetaData
 
 
 class GridData(Package):
@@ -15,6 +15,16 @@ class GridData(Package):
     """
 
     _file_name = "area_svat.inp"
+    _metadata_dict = {
+        "svat": VariableMetaData(10, 1, 99999999),
+        "area": VariableMetaData(10, 0.0, 999999.0),
+        "surface_elevation": VariableMetaData(8, -9999.0, 9999.0),
+        "temp": VariableMetaData(8, None, None),
+        "soil_physical_unit": VariableMetaData(6, 1, 999999),
+        "soil_physical_unit_string": VariableMetaData(16, None, None),
+        "landuse": VariableMetaData(6, 1, 999999),
+        "rootzone_depth": VariableMetaData(8, 0.0, 10.0),
+    }
 
     def __init__(
         self,
@@ -79,20 +89,9 @@ class GridData(Package):
             }
         )
 
-        metadata_dict = {
-            "svat": MetaData(10, 1, 99999999),
-            "area": MetaData(10, 0.0, 999999.0),
-            "surface_elevation": MetaData(8, -9999.0, 9999.0),
-            "temp": MetaData(8, None, None),
-            "soil_physical_unit": MetaData(6, 1, 999999),
-            "soil_physical_unit_string": MetaData(16, None, None),
-            "landuse": MetaData(6, 1, 999999),
-            "rootzone_depth": MetaData(8, 0.0, 10.0),
-        }
+        self._check_range(dataframe)
 
-        self._check_range(dataframe, metadata_dict)
-
-        return self.write_dataframe_fixed_width(file, dataframe, metadata_dict)
+        return self.write_dataframe_fixed_width(file, dataframe)
 
     def write(self, directory):
         directory = pathlib.Path(directory)
@@ -100,26 +99,3 @@ class GridData(Package):
         filename = directory / self._file_name
         with open(filename, "w") as f:
             self._render(f)
-
-    def _get_preprocessed_array(
-        self, varname: str, mask: xr.DataArray, dtype: type = None, extend_subunits=None
-    ):
-        array = self.dataset[varname]
-        if extend_subunits is not None:
-            array = array.expand_dims({"subunit": extend_subunits})
-
-        # Apply mask
-        if mask is not None:
-            array.where(mask)
-
-        # Convert to numpy array and flatten it
-        array = array.to_numpy().ravel()
-
-        # Remove NaN values
-        array = array[~np.isnan(array)]
-
-        # If dtype isn't None, convert to wanted type
-        if dtype:
-            array = array.astype(dtype)
-
-        return array

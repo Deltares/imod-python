@@ -42,11 +42,10 @@ class Package(abc.ABC):
     def write(self, directory):
         return
 
-    @staticmethod
-    def _check_range(dataframe, metadata_dict):
+    def _check_range(self, dataframe):
         for varname in dataframe:
-            minimum = metadata_dict[varname].minimum
-            maximum = metadata_dict[varname].maximum
+            minimum = self._metadata_dict[varname].minimum
+            maximum = self._metadata_dict[varname].maximum
             if (dataframe[varname] < minimum).any() or (
                 dataframe[varname] > maximum
             ).any():
@@ -66,10 +65,9 @@ class Package(abc.ABC):
         else:
             raise TypeError(f"dtype {dtype} is not supported")
 
-    @classmethod
-    def write_dataframe_fixed_width(cls, file, dataframe, metadata_dict) -> str:
+    def write_dataframe_fixed_width(self, file, dataframe) -> str:
         formatter = {}
-        for index, (varname, metadata) in enumerate(metadata_dict.items()):
+        for index, (varname, metadata) in enumerate(self._metadata_dict.items()):
             if index == 0:
                 width = metadata.column_width
             else:
@@ -77,7 +75,7 @@ class Package(abc.ABC):
                 # for all but the first column
                 width = metadata.column_width - 1
 
-            number_format = cls.number_format_fixed_width(
+            number_format = self.number_format_fixed_width(
                 width, dataframe[varname].dtypes, metadata
             )
 
@@ -87,8 +85,29 @@ class Package(abc.ABC):
             file, index=False, header=False, formatters=formatter, justify="right"
         )
 
+    def _get_preprocessed_array(self, varname, mask, dtype=None, extend_subunits=None):
+        array = self.dataset[varname]
+        if extend_subunits is not None:
+            array = array.expand_dims({"subunit": extend_subunits})
 
-class MetaData:
+        # Apply mask
+        if mask is not None:
+            array = array.where(mask)
+
+        # Convert to numpy array and flatten it
+        array = array.to_numpy().ravel()
+
+        # Remove NaN values
+        array = array[~np.isnan(array)]
+
+        # If dtype isn't None, convert to wanted type
+        if dtype:
+            array = array.astype(dtype)
+
+        return array
+
+
+class VariableMetaData:
     def __init__(self, column_width, minimum, maximum):
         self.column_width = column_width
         self.minimum = minimum

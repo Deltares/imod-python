@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod.msw.pkgbase import MetaData, Package
+from imod.msw.pkgbase import Package, VariableMetaData
 
 
 class Infiltration(Package):
@@ -15,6 +15,14 @@ class Infiltration(Package):
     """
 
     _file_name = "infi_svat.inp"
+    _metadata_dict = {
+        "svat": VariableMetaData(10, 1, 99999999),
+        "infiltration_capacity": VariableMetaData(8, 0.0, 1000.0),
+        "downward_resistance": VariableMetaData(8, -9999.0, 999999.0),
+        "upward_resistance": VariableMetaData(8, -9999.0, 999999.0),
+        "bottom_resistance": VariableMetaData(8, -9999.0, 999999.0),
+        "extra_storage_coefficient": VariableMetaData(8, 0.01, 1.0),
+    }
 
     def __init__(
         self,
@@ -76,18 +84,9 @@ class Infiltration(Package):
             }
         )
 
-        metadata_dict = {
-            "svat": MetaData(10, 1, 99999999),
-            "infiltration_capacity": MetaData(8, 0.0, 1000.0),
-            "downward_resistance": MetaData(8, -9999.0, 999999.0),
-            "upward_resistance": MetaData(8, -9999.0, 999999.0),
-            "bottom_resistance": MetaData(8, -9999.0, 999999.0),
-            "extra_storage_coefficient": MetaData(8, 0.01, 1.0),
-        }
+        self._check_range(dataframe)
 
-        self._check_range(dataframe, metadata_dict)
-
-        return self.write_dataframe_fixed_width(file, dataframe, metadata_dict)
+        return self.write_dataframe_fixed_width(file, dataframe)
 
     def write(self, directory):
         directory = pathlib.Path(directory)
@@ -95,26 +94,3 @@ class Infiltration(Package):
         filename = directory / self._file_name
         with open(filename, "w") as f:
             self._render(f)
-
-    def _get_preprocessed_array(
-        self, varname: str, mask: xr.DataArray, dtype: type = None, extend_subunits=None
-    ):
-        array = self.dataset[varname]
-        if extend_subunits is not None:
-            array = array.expand_dims({"subunit": extend_subunits})
-
-        # Apply mask
-        if mask is not None:
-            array = array.where(mask)
-
-        # Convert to numpy array and flatten it
-        array = array.to_numpy().ravel()
-
-        # Remove NaN values
-        array = array[~np.isnan(array)]
-
-        # If dtype isn't None, convert to wanted type
-        if dtype:
-            array = array.astype(dtype)
-
-        return array
