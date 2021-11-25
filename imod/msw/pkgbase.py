@@ -1,4 +1,5 @@
 import abc
+import os
 
 import numpy as np
 import xarray as xr
@@ -68,12 +69,7 @@ class Package(abc.ABC):
     def write_dataframe_fixed_width(self, file, dataframe) -> str:
         formatter = {}
         for index, (varname, metadata) in enumerate(self._metadata_dict.items()):
-            if index == 0:
-                width = metadata.column_width
-            else:
-                # Compensate space that will be added by `to_string`
-                # for all but the first column
-                width = metadata.column_width - 1
+            width = metadata.column_width
 
             number_format = self.number_format_fixed_width(
                 width, dataframe[varname].dtypes, metadata
@@ -81,9 +77,11 @@ class Package(abc.ABC):
 
             formatter[varname] = number_format.format
 
-        return dataframe.to_string(
-            file, index=False, header=False, formatters=formatter, justify="right"
-        )
+        for row in dataframe.itertuples():
+            for index, (varname, format) in enumerate(formatter.items()):
+                # TODO: format according to actual values, not ranges
+                file.write(format(row[index + 1]))
+            file.write(os.linesep)
 
     def _get_preprocessed_array(self, varname, mask, dtype=None, extend_subunits=None):
         array = self.dataset[varname]
