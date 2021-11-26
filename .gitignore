@@ -125,5 +125,11 @@ venv.bak/
 
 # Examples
 old-examples
-examples/*
-!examples/*.py
+examples/imod-wq/*
+examples/imodflow/*
+examples/mf6/*
+examples/prepare/*
+examples/results/*
+examples/user-guide/*
+examples/visualize/*
+!examples/**/*.py
