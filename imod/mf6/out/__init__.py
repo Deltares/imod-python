@@ -6,7 +6,7 @@ The dis, disv, disu modules implement the following functions:
 ```python
 Darray = Union[xr.DataArray, xu.UgridDataArray]
 
-def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> dict[str, Any]:
+def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
     return
 
 def read_times(*args) -> FloatArray:
@@ -15,7 +15,7 @@ def read_times(*args) -> FloatArray:
 def read_hds_timestep(*args) -> FloatArray:
     return
 
-def open_hds(path: FilePath, d: dict[str, Any], dry_nan: bool) -> Darray:
+def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool) -> Darray:
     return
 
 def open_imeth1_budgets(
@@ -74,7 +74,7 @@ def _get_function(d: Dict[str, Callable], key: str) -> Callable:
     return func
 
 
-def read_grb(path: FilePath) -> dict[str, Any]:
+def read_grb(path: FilePath) -> Dict[str, Any]:
     """
     Read the data in a MODFLOW6 binary grid (.grb) file.
 
@@ -84,7 +84,7 @@ def read_grb(path: FilePath) -> dict[str, Any]:
 
     Returns
     -------
-    grb_content: dict[str, Any]
+    grb_content: Dict[str, Any]
     """
     with open(path, "rb") as f:
         h1 = _grb_text(f)
@@ -199,7 +199,7 @@ def open_cbc(
 
     Returns
     -------
-    cbc_content: dict[str, xr.DataArray]
+    cbc_content: Dict[str, xr.DataArray]
         DataArray contains float64 data of the budgets, with dimensions ("time",
         "layer", "y", "x").
 
