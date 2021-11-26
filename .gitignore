@@ -125,4 +125,5 @@ venv.bak/
 
 # Examples
 old-examples
-examples/data
+examples/*
+!examples/*.py
