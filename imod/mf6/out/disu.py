@@ -9,7 +9,7 @@ from . import cbc
 from .common import FilePath, FloatArray, IntArray, _grb_text
 
 
-def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> dict[str, Any]:
+def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
     read_vertices = lentxt > 10
 
     if read_vertices:
@@ -55,7 +55,7 @@ def read_hds_timestep(
     raise NotImplementedError
 
 
-def open_hds(path: FilePath, d: dict[str, Any], dry_nan: bool) -> xr.DataArray:
+def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool) -> xr.DataArray:
     raise NotImplementedError
 
 

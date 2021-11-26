@@ -15,7 +15,7 @@ from .common import FilePath, FloatArray, IntArray, _to_nan
 
 # Binary Grid File / DIS Grids
 # https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=162
-def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> dict[str, Any]:
+def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
     # we don't need any information from the the text lines that follow,
     # they are definitions that aim to make the file more portable,
     # so let's skip straight to the binary data
@@ -114,7 +114,7 @@ def read_hds_timestep(
     return _to_nan(a3d, dry_nan)
 
 
-def open_hds(path: FilePath, d: dict[str, Any], dry_nan: bool) -> xr.DataArray:
+def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool) -> xr.DataArray:
     nlayer, nrow, ncol = d["nlayer"], d["nrow"], d["ncol"]
     filesize = os.path.getsize(path)
     ntime = filesize // (nlayer * (52 + (nrow * ncol * 8)))
@@ -419,7 +419,7 @@ def open_cbc(
     return cbc_content
 
 
-def grid_info(like: xr.DataArray) -> dict[str, Any]:
+def grid_info(like: xr.DataArray) -> Dict[str, Any]:
     return {
         "nlayer": like["layer"].size,
         "nrow": like["y"].size,

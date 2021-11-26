@@ -27,7 +27,7 @@ def _ugrid_iavert_javert(
     return ia, javert[keep] - 1
 
 
-def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> dict[str, Any]:
+def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
     # we don't need any information from the the text lines that follow,
     # they are definitions that aim to make the file more portable,
     # so let's skip straight to the binary data
@@ -139,7 +139,7 @@ def read_hds_timestep(
     return _to_nan(a2d, dry_nan)
 
 
-def open_hds(path: FilePath, d: dict[str, Any], dry_nan: bool) -> xu.UgridDataArray:
+def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool) -> xu.UgridDataArray:
     grid = d["grid"]
     nlayer, ncells_per_layer = d["nlayer"], d["ncells_per_layer"]
     filesize = os.path.getsize(path)
@@ -472,7 +472,7 @@ def open_cbc(
     return cbc_content
 
 
-def grid_info(like: xu.UgridDataArray) -> dict[str, Any]:
+def grid_info(like: xu.UgridDataArray) -> Dict[str, Any]:
     grid = like.ugrid.grid
     facedim = grid.face_dimension
     return {
