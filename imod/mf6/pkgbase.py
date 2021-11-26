@@ -506,7 +506,7 @@ class BoundaryCondition(Package, abc.ABC):
             ext = "dat"
 
         if "time" in bin_ds:  # one of bin_ds has time
-            for i in range(len(self.time)):
+            for i in range(len(self.dataset.time)):
                 path = directory / pkgname / f"{self._pkg_id}-{i}.{ext}"
                 self.write_datafile(
                     path, bin_ds.isel(time=i), binary=binary
