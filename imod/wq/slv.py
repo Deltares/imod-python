@@ -162,8 +162,6 @@ class ParallelSolver(Package):
     Base package for the parallel solvers.
     """
 
-    __slots__ = ()
-
     def _compute_load_balance_weight(self, ibound):
         if self["partition"] == "rcb":
             if self["load_balance_weight"].values[()] is None:
@@ -400,7 +398,6 @@ class ParallelKrylovTransportSolver(ParallelSolver):
         header=False, index=False, float_format = "%8.2f")`
     """
 
-    __slots__ = ()
     _pkg_id = "pkst"
     _template = jinja2.Template(
         "[pkst]\n"

@@ -29,8 +29,6 @@ class Package(
     are within the Package.
     """
 
-    __slots__ = ("_pkg_id", "_variable_order", "dataset")
-
     _template_projectfile = jinja2.Template(
         "0001, ({{pkg_id}}), 1, {{name}}, {{variable_order}}\n"
         '{{"{:03d}".format(variable_order|length)}}, {{"{:03d}".format(n_entry)}}\n'

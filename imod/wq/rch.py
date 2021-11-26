@@ -7,7 +7,6 @@ from imod.wq.pkgbase import BoundaryCondition
 
 
 class Recharge(BoundaryCondition, abc.ABC):
-    __slots__ = ("_option",)
     _pkg_id = "rch"
 
     _mapping = (("rech", "rate"),)

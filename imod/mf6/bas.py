@@ -51,7 +51,6 @@ class BasicFlow(Package):
         value is 1.0e30.
     """
 
-    __slots__ = ("ibound", "top", "bottom", "starting_head", "inactive_head")
     _pkg_id = "bas6"
     _template = jinja2.Template(
         "[bas6]\n"
