@@ -55,32 +55,31 @@ class Package(abc.ABC):
                 )
 
     @staticmethod
-    def number_format_fixed_width(width: int, dtype, metadata):
+    def format_fixed_width(value, dtype, metadata):
         if dtype == "string":
-            return "{:" + f"{width}" + "}"
+            format_string = "{:" + f"{metadata.column_width}" + "}"
         elif np.issubdtype(dtype, np.integer):
-            return "{:" + f"{width}d" + "}"
+            format_string = "{:" + f"{metadata.column_width}d" + "}"
         elif np.issubdtype(dtype, np.floating):
-            decimal_number_width = max(0, width - metadata.whole_number_digits - 2)
-            return "{:" + f"+{width}.{decimal_number_width}f" + "}"
+            whole_number_digits = len(str(int(abs(value))))
+            decimal_number_width = max(
+                0, metadata.column_width - whole_number_digits - 2
+            )
+            format_string = (
+                "{:" + f"+{metadata.column_width}.{decimal_number_width}f" + "}"
+            )
         else:
             raise TypeError(f"dtype {dtype} is not supported")
 
-    def write_dataframe_fixed_width(self, file, dataframe) -> str:
-        formatter = {}
-        for index, (varname, metadata) in enumerate(self._metadata_dict.items()):
-            width = metadata.column_width
+        return format_string.format(value)
 
-            number_format = self.number_format_fixed_width(
-                width, dataframe[varname].dtypes, metadata
-            )
-
-            formatter[varname] = number_format.format
-
+    def write_dataframe_fixed_width(self, file, dataframe):
         for row in dataframe.itertuples():
-            for index, (varname, format) in enumerate(formatter.items()):
-                # TODO: format according to actual values, not ranges
-                file.write(format(row[index + 1]))
+            for index, (varname, metadata) in enumerate(self._metadata_dict.items()):
+                content = self.format_fixed_width(
+                    row[index + 1], dataframe[varname].dtypes, metadata
+                )
+                file.write(content)
             file.write(os.linesep)
 
     def _get_preprocessed_array(self, varname, mask, dtype=None, extend_subunits=None):
@@ -110,10 +109,3 @@ class VariableMetaData:
         self.column_width = column_width
         self.min_value = min_value
         self.max_value = max_value
-
-        if self.min_value is not None and self.max_value is not None:
-            self.calc_whole_number_digits()
-
-    def calc_whole_number_digits(self):
-        max_abs = max(abs(self.min_value), abs(self.max_value))
-        self.whole_number_digits = len(str(int(max_abs)))

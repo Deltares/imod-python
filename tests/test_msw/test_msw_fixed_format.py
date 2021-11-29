@@ -7,6 +7,7 @@ from hypothesis.strategies import floats
 from numpy.testing import assert_almost_equal
 
 from imod.msw import GridData, Infiltration
+from imod.msw.pkgbase import Package
 
 
 def fixed_format_parser(file, metadata_dict):
@@ -60,13 +61,39 @@ def test_grid_data_write(
             output_dir / GridData._file_name, GridData._metadata_dict
         )
 
-    # (original) integers are compared differentlz than floats
-    assert_almost_equal(float(results["area"]), area, decimal=2)
-    assert int(results["landuse"]) == int(landuse)
-    assert_almost_equal(float(results["rootzone_depth"]), rootzone_depth, decimal=2)
     assert_almost_equal(
-        float(results["surface_elevation"]), surface_elevation, decimal=2
+        float(results["area"]),
+        float(
+            Package.format_fixed_width(
+                area,
+                float,
+                GridData._metadata_dict["area"],
+            )
+        ),
     )
+    assert_almost_equal(
+        float(results["rootzone_depth"]),
+        float(
+            Package.format_fixed_width(
+                rootzone_depth,
+                float,
+                GridData._metadata_dict["rootzone_depth"],
+            )
+        ),
+    )
+    assert_almost_equal(
+        float(results["surface_elevation"]),
+        float(
+            Package.format_fixed_width(
+                surface_elevation,
+                float,
+                GridData._metadata_dict["surface_elevation"],
+            )
+        ),
+    )
+
+    # integers are compared differently than floats
+    assert int(results["landuse"]) == int(landuse)
     assert int(results["soil_physical_unit"]) == int(soil_physical_unit)
 
 
@@ -117,19 +144,55 @@ def test_infiltration_write(
         )
 
     assert_almost_equal(
-        float(results["infiltration_capacity"]), infiltration_capacity, decimal=2
+        float(results["infiltration_capacity"]),
+        float(
+            Package.format_fixed_width(
+                infiltration_capacity,
+                float,
+                Infiltration._metadata_dict["infiltration_capacity"],
+            )
+        ),
     )
     assert_almost_equal(
-        float(results["downward_resistance"]), downward_resistance, decimal=2
+        float(results["downward_resistance"]),
+        float(
+            Package.format_fixed_width(
+                downward_resistance,
+                float,
+                Infiltration._metadata_dict["downward_resistance"],
+            )
+        ),
     )
+
     assert_almost_equal(
-        float(results["upward_resistance"]), upward_resistance, decimal=2
+        float(results["upward_resistance"]),
+        float(
+            Package.format_fixed_width(
+                upward_resistance,
+                float,
+                Infiltration._metadata_dict["upward_resistance"],
+            )
+        ),
     )
+
     assert_almost_equal(
-        float(results["bottom_resistance"]), bottom_resistance, decimal=2
+        float(results["bottom_resistance"]),
+        float(
+            Package.format_fixed_width(
+                bottom_resistance,
+                float,
+                Infiltration._metadata_dict["bottom_resistance"],
+            )
+        ),
     )
+
     assert_almost_equal(
         float(results["extra_storage_coefficient"]),
-        extra_storage_coefficient,
-        decimal=2,
+        float(
+            Package.format_fixed_width(
+                extra_storage_coefficient,
+                float,
+                Infiltration._metadata_dict["extra_storage_coefficient"],
+            )
+        ),
     )
