@@ -1,5 +1,7 @@
 import abc
 import os
+from dataclasses import dataclass
+from numbers import Number
 
 import numpy as np
 import xarray as xr
@@ -55,12 +57,12 @@ class Package(abc.ABC):
                 )
 
     @staticmethod
-    def format_fixed_width(value, dtype, metadata):
-        if dtype == "string":
+    def format_fixed_width(value, metadata):
+        if metadata.dtype == str:
             format_string = "{:" + f"{metadata.column_width}" + "}"
-        elif np.issubdtype(dtype, np.integer):
+        elif metadata.dtype == int:
             format_string = "{:" + f"{metadata.column_width}d" + "}"
-        elif np.issubdtype(dtype, np.floating):
+        elif metadata.dtype == float:
             whole_number_digits = len(str(int(abs(value))))
             decimal_number_width = max(
                 0, metadata.column_width - whole_number_digits - 2
@@ -69,20 +71,19 @@ class Package(abc.ABC):
                 "{:" + f"+{metadata.column_width}.{decimal_number_width}f" + "}"
             )
         else:
-            raise TypeError(f"dtype {dtype} is not supported")
+            raise TypeError(f"dtype {metadata.dtype} is not supported")
 
-        return format_string.format(value)
+        converted_value = metadata.dtype(value)
+        return format_string.format(converted_value)
 
     def write_dataframe_fixed_width(self, file, dataframe):
         for row in dataframe.itertuples():
             for index, (varname, metadata) in enumerate(self._metadata_dict.items()):
-                content = self.format_fixed_width(
-                    row[index + 1], dataframe[varname].dtypes, metadata
-                )
+                content = self.format_fixed_width(row[index + 1], metadata)
                 file.write(content)
             file.write(os.linesep)
 
-    def _get_preprocessed_array(self, varname, mask, dtype=None, extend_subunits=None):
+    def _get_preprocessed_array(self, varname, mask, extend_subunits=None):
         array = self.dataset[varname]
         if extend_subunits is not None:
             array = array.expand_dims(subunit=extend_subunits)
@@ -97,15 +98,12 @@ class Package(abc.ABC):
         # Remove NaN values
         array = array[~np.isnan(array)]
 
-        # If dtype isn't None, convert to wanted type
-        if dtype:
-            array = array.astype(dtype)
-
         return array
 
 
+@dataclass
 class VariableMetaData:
-    def __init__(self, column_width, min_value, max_value):
-        self.column_width = column_width
-        self.min_value = min_value
-        self.max_value = max_value
+    column_width: int
+    min_value: Number
+    max_value: Number
+    dtype: type

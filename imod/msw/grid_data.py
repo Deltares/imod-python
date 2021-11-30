@@ -16,14 +16,14 @@ class GridData(Package):
 
     _file_name = "area_svat.inp"
     _metadata_dict = {
-        "svat": VariableMetaData(10, 1, 99999999),
-        "area": VariableMetaData(10, 0.0, 999999.0),
-        "surface_elevation": VariableMetaData(8, -9999.0, 9999.0),
-        "temp": VariableMetaData(8, None, None),
-        "soil_physical_unit": VariableMetaData(6, 1, 999999),
-        "soil_physical_unit_string": VariableMetaData(16, None, None),
-        "landuse": VariableMetaData(6, 1, 999999),
-        "rootzone_depth": VariableMetaData(8, 0.0, 10.0),
+        "svat": VariableMetaData(10, 1, 99999999, int),
+        "area": VariableMetaData(10, 0.0, 999999.0, float),
+        "surface_elevation": VariableMetaData(8, -9999.0, 9999.0, float),
+        "temp": VariableMetaData(8, None, None, str),
+        "soil_physical_unit": VariableMetaData(6, 1, 999999, int),
+        "soil_physical_unit_string": VariableMetaData(16, None, None, str),
+        "landuse": VariableMetaData(6, 1, 999999, int),
+        "rootzone_depth": VariableMetaData(8, 0.0, 10.0, float),
     }
 
     def __init__(
@@ -46,9 +46,7 @@ class GridData(Package):
     def _render(self, file):
         # Generate columns for members with subunit coordinate
         area = self._get_preprocessed_array("area", self.dataset["active"])
-        landuse = self._get_preprocessed_array(
-            "landuse", self.dataset["active"], dtype=int
-        )
+        landuse = self._get_preprocessed_array("landuse", self.dataset["active"])
         rootzone_depth = self._get_preprocessed_array(
             "rootzone_depth", self.dataset["active"]
         )
@@ -64,7 +62,6 @@ class GridData(Package):
         soil_physical_unit = self._get_preprocessed_array(
             "soil_physical_unit",
             mask,
-            dtype=int,
             extend_subunits=extend_subunits,
         )
 

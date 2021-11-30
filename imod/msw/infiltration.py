@@ -16,12 +16,12 @@ class Infiltration(Package):
 
     _file_name = "infi_svat.inp"
     _metadata_dict = {
-        "svat": VariableMetaData(10, 1, 99999999),
-        "infiltration_capacity": VariableMetaData(8, 0.0, 1000.0),
-        "downward_resistance": VariableMetaData(8, -9999.0, 999999.0),
-        "upward_resistance": VariableMetaData(8, -9999.0, 999999.0),
-        "bottom_resistance": VariableMetaData(8, -9999.0, 999999.0),
-        "extra_storage_coefficient": VariableMetaData(8, 0.01, 1.0),
+        "svat": VariableMetaData(10, 1, 99999999, int),
+        "infiltration_capacity": VariableMetaData(8, 0.0, 1000.0, float),
+        "downward_resistance": VariableMetaData(8, -9999.0, 999999.0, float),
+        "upward_resistance": VariableMetaData(8, -9999.0, 999999.0, float),
+        "bottom_resistance": VariableMetaData(8, -9999.0, 999999.0, float),
+        "extra_storage_coefficient": VariableMetaData(8, 0.01, 1.0, float),
     }
 
     def __init__(

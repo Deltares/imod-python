@@ -66,7 +66,6 @@ def test_grid_data_write(
         float(
             Package.format_fixed_width(
                 area,
-                float,
                 GridData._metadata_dict["area"],
             )
         ),
@@ -76,7 +75,6 @@ def test_grid_data_write(
         float(
             Package.format_fixed_width(
                 rootzone_depth,
-                float,
                 GridData._metadata_dict["rootzone_depth"],
             )
         ),
@@ -86,7 +84,6 @@ def test_grid_data_write(
         float(
             Package.format_fixed_width(
                 surface_elevation,
-                float,
                 GridData._metadata_dict["surface_elevation"],
             )
         ),
@@ -148,7 +145,6 @@ def test_infiltration_write(
         float(
             Package.format_fixed_width(
                 infiltration_capacity,
-                float,
                 Infiltration._metadata_dict["infiltration_capacity"],
             )
         ),
@@ -158,7 +154,6 @@ def test_infiltration_write(
         float(
             Package.format_fixed_width(
                 downward_resistance,
-                float,
                 Infiltration._metadata_dict["downward_resistance"],
             )
         ),
@@ -169,7 +164,6 @@ def test_infiltration_write(
         float(
             Package.format_fixed_width(
                 upward_resistance,
-                float,
                 Infiltration._metadata_dict["upward_resistance"],
             )
         ),
@@ -180,7 +174,6 @@ def test_infiltration_write(
         float(
             Package.format_fixed_width(
                 bottom_resistance,
-                float,
                 Infiltration._metadata_dict["bottom_resistance"],
             )
         ),
@@ -191,7 +184,6 @@ def test_infiltration_write(
         float(
             Package.format_fixed_width(
                 extra_storage_coefficient,
-                float,
                 Infiltration._metadata_dict["extra_storage_coefficient"],
             )
         ),
