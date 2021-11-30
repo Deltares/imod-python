@@ -32,7 +32,7 @@ from imod.msw.pkgbase import Package
         Infiltration._metadata_dict["extra_storage_coefficient"].max_value,
     ),
 )
-def test_infiltration_write(
+def test_write(
     fixed_format_parser,
     infiltration_capacity,
     downward_resistance,
@@ -58,7 +58,7 @@ def test_infiltration_write(
         )
 
     assert_almost_equal(
-        float(results["infiltration_capacity"]),
+        results["infiltration_capacity"],
         float(
             Package.format_fixed_width(
                 infiltration_capacity,
@@ -67,7 +67,7 @@ def test_infiltration_write(
         ),
     )
     assert_almost_equal(
-        float(results["downward_resistance"]),
+        results["downward_resistance"],
         float(
             Package.format_fixed_width(
                 downward_resistance,
@@ -77,7 +77,7 @@ def test_infiltration_write(
     )
 
     assert_almost_equal(
-        float(results["upward_resistance"]),
+        results["upward_resistance"],
         float(
             Package.format_fixed_width(
                 upward_resistance,
@@ -87,7 +87,7 @@ def test_infiltration_write(
     )
 
     assert_almost_equal(
-        float(results["bottom_resistance"]),
+        results["bottom_resistance"],
         float(
             Package.format_fixed_width(
                 bottom_resistance,
@@ -97,7 +97,7 @@ def test_infiltration_write(
     )
 
     assert_almost_equal(
-        float(results["extra_storage_coefficient"]),
+        results["extra_storage_coefficient"],
         float(
             Package.format_fixed_width(
                 extra_storage_coefficient,
