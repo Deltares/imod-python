@@ -6,7 +6,7 @@ from hypothesis import given
 from hypothesis.strategies import floats
 from numpy.testing import assert_almost_equal
 
-from imod.msw import GridData, Infiltration
+from imod.msw import Infiltration
 from imod.msw.pkgbase import Package
 
 
