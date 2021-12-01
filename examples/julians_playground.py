@@ -48,7 +48,6 @@ grid_data = msw.GridData(
     soil_physical_unit_array,
     active_array,
 )
-grid_data.write(output_dir)
 
 # %%
 # Parse netcdf files
@@ -77,6 +76,8 @@ infiltration = msw.Infiltration(
     extra_storage_coefficient_array,
     active_array,
 )
-infiltration.write(output_dir)
-
 # %%
+metaswap_model = msw.MetaSwapModel()
+metaswap_model["grid_data"] = grid_data
+metaswap_model["infiltration"] = infiltration
+metaswap_model.write(output_dir)
