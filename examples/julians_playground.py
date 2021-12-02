@@ -2,6 +2,7 @@
 # Define input and output dirs
 from pathlib import Path
 
+import numpy as np
 import xarray as xr
 
 from imod import couplers, mf6, msw
@@ -88,9 +89,39 @@ recharge_array = xr.open_dataset(
 
 
 # %%
+
+nlay = 3
+nrow = 9
+ncol = 9
+shape = (nlay, nrow, ncol)
+
+dx = 5000.0
+dy = -5000.0
+xmin = 0.0
+xmax = dx * ncol
+ymin = 0.0
+ymax = abs(dy) * nrow
+dims = ("layer", "y", "x")
+
+layer = np.array([1, 2, 3])
+y = np.arange(ymax, ymin, dy) + 0.5 * dy
+x = np.arange(xmin, xmax, dx) + 0.5 * dx
+coords = {"layer": layer, "y": y, "x": x}
+
+# Discretization data
+idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
+bottom = xr.DataArray([-200.0, -300.0, -450.0], {"layer": layer}, ("layer",))
+
+
 gwf_model = mf6.GroundwaterFlowModel()
 
+gwf_model["dis"] = mf6.StructuredDiscretization(
+    top=200.0, bottom=bottom, idomain=idomain
+)
+
 gwf_model["recharge"] = mf6.Recharge(recharge_array)
+
+icelltype = xr.DataArray([1, 0, 0], {"layer": layer}, ("layer",))
 
 # Well
 layer = [3, 2, 1]
@@ -99,16 +130,17 @@ column = [1, 1, 3]
 rate = [-5.0] * 3
 gwf_model["wel"] = mf6.Well(layer=layer, row=row, column=column, rate=rate)
 
-simulation = mf6.Modflow6Simulation("ex01-twri")
-simulation["GWF_1"] = gwf_model
+mf6_simulation = mf6.Modflow6Simulation("ex01-twri")
+mf6_simulation["GWF_1"] = gwf_model
 # Define solver settings
-simulation["solver"] = mf6.Solution(
+mf6_simulation["solver"] = mf6.Solution(
     print_option="summary",
     csv_output=False,
     no_ptc=True,
+    outer_dvclose=1.0e-4,
     outer_maximum=500,
     under_relaxation=None,
-    inner_hclose=1.0e-4,
+    inner_dvclose=1.0e-4,
     inner_rclose=0.001,
     inner_maximum=100,
     linear_acceleration="cg",
@@ -117,8 +149,8 @@ simulation["solver"] = mf6.Solution(
     relaxation_factor=0.97,
 )
 # Collect time discretization
-simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
+mf6_simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
 
 # %%
-metamod = couplers.MetaMod(msw_model, gwf_model)
+metamod = couplers.MetaMod(msw_model, mf6_simulation)
 metamod.write(output_dir)
