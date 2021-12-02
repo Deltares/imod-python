@@ -194,6 +194,12 @@ gwf_model["wel"] = imod.mf6.Well(
     print_flows=True,
     save_flows=True,
 )
+gwf_model["sto"] = imod.mf6.SpecificStorage(
+    specific_storage=1.0e-15,
+    specific_yield=0.15,
+    convertible=0,
+    transient=False,
+)
 
 # Attach it to a mf6_simulation
 mf6_simulation = imod.mf6.Modflow6Simulation("ex01-twri")

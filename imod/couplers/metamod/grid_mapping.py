@@ -34,7 +34,7 @@ class GridMapping(Package):
 
     def _create_mod_id(self):
         self.dataset["mod_id"] = self.dataset["area"].copy()
-        subunit_len, y_len, x_len = self.dataset["mod_id"].sizes
+        subunit_len, y_len, x_len = self.dataset["mod_id"].shape
         for subunit in range(subunit_len):
             for y in range(y_len):
                 for x in range(x_len):
