@@ -4,7 +4,7 @@ from pathlib import Path
 
 import xarray as xr
 
-from imod import msw
+from imod import couplers, mf6, msw
 
 output_dir = Path("D:/checkouts/imod_python_hooghoudt/Hooghoudt_sprinkling_playground")
 
@@ -77,7 +77,48 @@ infiltration = msw.Infiltration(
     active_array,
 )
 # %%
-metaswap_model = msw.MetaSwapModel()
-metaswap_model["grid_data"] = grid_data
-metaswap_model["infiltration"] = infiltration
-metaswap_model.write(output_dir)
+msw_model = msw.MetaSwapModel()
+msw_model["grid_data"] = grid_data
+msw_model["infiltration"] = infiltration
+
+# %%
+recharge_array = xr.open_dataset(
+    "D:/checkouts/imod_python_hooghoudt/idf_and_netcdf/netcdf/recharge.nc"
+)["recharge"]
+
+
+# %%
+gwf_model = mf6.GroundwaterFlowModel()
+
+gwf_model["recharge"] = mf6.Recharge(recharge_array)
+
+# Well
+layer = [3, 2, 1]
+row = [1, 1, 4]
+column = [1, 1, 3]
+rate = [-5.0] * 3
+gwf_model["wel"] = mf6.Well(layer=layer, row=row, column=column, rate=rate)
+
+simulation = mf6.Modflow6Simulation("ex01-twri")
+simulation["GWF_1"] = gwf_model
+# Define solver settings
+simulation["solver"] = mf6.Solution(
+    print_option="summary",
+    csv_output=False,
+    no_ptc=True,
+    outer_maximum=500,
+    under_relaxation=None,
+    inner_hclose=1.0e-4,
+    inner_rclose=0.001,
+    inner_maximum=100,
+    linear_acceleration="cg",
+    scaling_method=None,
+    reordering_method=None,
+    relaxation_factor=0.97,
+)
+# Collect time discretization
+simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
+
+# %%
+metamod = couplers.MetaMod(msw_model, gwf_model)
+metamod.write(output_dir)
