@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import xarray as xr
 
+import imod
 from imod import couplers, mf6, msw
 
 output_dir = Path("D:/checkouts/imod_python_hooghoudt/Hooghoudt_sprinkling_playground")
@@ -89,6 +90,11 @@ recharge_array = xr.open_dataset(
 
 
 # %%
+# Create grid coordinates
+# -----------------------
+#
+# The first steps consist of setting up the grid -- first the number of layer,
+# rows, and columns. Cell sizes are constant throughout the model.
 
 nlay = 3
 nrow = 9
@@ -108,32 +114,92 @@ y = np.arange(ymax, ymin, dy) + 0.5 * dy
 x = np.arange(xmin, xmax, dx) + 0.5 * dx
 coords = {"layer": layer, "y": y, "x": x}
 
-# Discretization data
+# %%
+# Create DataArrays
+# -----------------
+#
+# Now that we have the grid coordinates setup, we can start defining model
+# parameters. The model is characterized by:
+#
+# * a constant head boundary on the left
+# * a single drain in the center left of the model
+# * uniform recharge on the top layer
+# * a number of wells scattered throughout the model.
+
 idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
 bottom = xr.DataArray([-200.0, -300.0, -450.0], {"layer": layer}, ("layer",))
 
+# Constant head
+constant_head = xr.full_like(idomain, np.nan).sel(layer=[1, 2])
+constant_head[..., 0] = 0.0
 
-gwf_model = mf6.GroundwaterFlowModel()
+# Drainage
+elevation = xr.full_like(idomain.sel(layer=1), np.nan)
+conductance = xr.full_like(idomain.sel(layer=1), np.nan)
+elevation[:] = 10.0
+conductance[:] = 1.0
 
-gwf_model["dis"] = mf6.StructuredDiscretization(
+
+# Well
+well_layer = [3, 2, 1]
+well_row = [1, 1, 4]
+well_column = [1, 1, 3]
+well_rate = [-5.0] * 3
+
+# Node properties
+icelltype = xr.DataArray([1, 0, 0], {"layer": layer}, ("layer",))
+k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": layer}, ("layer",))
+k33 = xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",))
+
+# %%
+# Write the modflow model
+# ---------------
+#
+# The first step is to define an empty model, the parameters and boundary
+# conditions are added in the form of the familiar MODFLOW packages.
+
+gwf_model = imod.mf6.GroundwaterFlowModel()
+gwf_model["dis"] = imod.mf6.StructuredDiscretization(
     top=200.0, bottom=bottom, idomain=idomain
 )
 
-gwf_model["recharge"] = mf6.Recharge(recharge_array)
+gwf_model["chd"] = imod.mf6.ConstantHead(
+    constant_head, print_input=True, print_flows=True, save_flows=True
+)
+gwf_model["drn"] = imod.mf6.Drainage(
+    elevation=elevation,
+    conductance=conductance,
+    print_input=True,
+    print_flows=True,
+    save_flows=True,
+)
+gwf_model["ic"] = imod.mf6.InitialConditions(head=0.0)
+gwf_model["npf"] = imod.mf6.NodePropertyFlow(
+    icelltype=icelltype,
+    k=k,
+    k33=k33,
+    variable_vertical_conductance=True,
+    dewatered=True,
+    perched=True,
+    save_flows=True,
+)
+gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
+gwf_model["rch"] = imod.mf6.Recharge(recharge_array)
+gwf_model["wel"] = imod.mf6.Well(
+    layer=well_layer,
+    row=well_row,
+    column=well_column,
+    rate=well_rate,
+    print_input=True,
+    print_flows=True,
+    save_flows=True,
+)
 
-icelltype = xr.DataArray([1, 0, 0], {"layer": layer}, ("layer",))
-
-# Well
-layer = [3, 2, 1]
-row = [1, 1, 4]
-column = [1, 1, 3]
-rate = [-5.0] * 3
-gwf_model["wel"] = mf6.Well(layer=layer, row=row, column=column, rate=rate)
-
-mf6_simulation = mf6.Modflow6Simulation("ex01-twri")
+# Attach it to a mf6_simulation
+mf6_simulation = imod.mf6.Modflow6Simulation("ex01-twri")
 mf6_simulation["GWF_1"] = gwf_model
 # Define solver settings
-mf6_simulation["solver"] = mf6.Solution(
+mf6_simulation["solver"] = imod.mf6.Solution(
     print_option="summary",
     csv_output=False,
     no_ptc=True,
@@ -149,7 +215,10 @@ mf6_simulation["solver"] = mf6.Solution(
     relaxation_factor=0.97,
 )
 # Collect time discretization
-mf6_simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
+mf6_simulation.time_discretization(
+    times=["2000-01-01", "2000-01-02", "2000-01-03", "2000-01-04"]
+)
+
 
 # %%
 metamod = couplers.MetaMod(msw_model, mf6_simulation)
