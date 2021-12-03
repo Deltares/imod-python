@@ -6,10 +6,10 @@ import xarray as xr
 from hypothesis import given
 from hypothesis.strategies import floats
 from numpy import nan
-from numpy.testing import assert_almost_equal
+from numpy.testing import assert_almost_equal, assert_equal
 
 from imod.msw import Infiltration
-from imod.msw.pkgbase import Package
+from imod.util import format_fixed_width
 
 
 @given(
@@ -62,7 +62,7 @@ def test_write(
     assert_almost_equal(
         results["infiltration_capacity"],
         float(
-            Package.format_fixed_width(
+            format_fixed_width(
                 infiltration_capacity,
                 Infiltration._metadata_dict["infiltration_capacity"],
             )
@@ -71,7 +71,7 @@ def test_write(
     assert_almost_equal(
         results["downward_resistance"],
         float(
-            Package.format_fixed_width(
+            format_fixed_width(
                 downward_resistance,
                 Infiltration._metadata_dict["downward_resistance"],
             )
@@ -81,7 +81,7 @@ def test_write(
     assert_almost_equal(
         results["upward_resistance"],
         float(
-            Package.format_fixed_width(
+            format_fixed_width(
                 upward_resistance,
                 Infiltration._metadata_dict["upward_resistance"],
             )
@@ -91,7 +91,7 @@ def test_write(
     assert_almost_equal(
         results["bottom_resistance"],
         float(
-            Package.format_fixed_width(
+            format_fixed_width(
                 bottom_resistance,
                 Infiltration._metadata_dict["bottom_resistance"],
             )
@@ -101,7 +101,7 @@ def test_write(
     assert_almost_equal(
         results["extra_storage_coefficient"],
         float(
-            Package.format_fixed_width(
+            format_fixed_width(
                 extra_storage_coefficient,
                 Infiltration._metadata_dict["extra_storage_coefficient"],
             )
@@ -194,6 +194,7 @@ def test_simple_model(fixed_format_parser):
             output_dir / Infiltration._file_name, Infiltration._metadata_dict
         )
 
+    assert_equal(results["svat"], np.array([1, 2, 3, 4]))
     assert_almost_equal(
         results["infiltration_capacity"], np.array([0.5, 1.0, 0.5, 1.0])
     )

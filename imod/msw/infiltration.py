@@ -31,7 +31,7 @@ class Infiltration(Package):
         upward_resistance: xr.DataArray,
         bottom_resistance: xr.DataArray,
         extra_storage_coefficient: xr.DataArray,
-        active: xr.DataArray = None,
+        active: xr.DataArray,
     ):
         super().__init__()
         self.dataset["infiltration_capacity"] = infiltration_capacity

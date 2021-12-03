@@ -33,7 +33,7 @@ class GridData(Package):
         rootzone_depth: xr.DataArray,
         surface_elevation: xr.DataArray,
         soil_physical_unit: xr.DataArray,
-        active: xr.DataArray = None,
+        active: xr.DataArray,
     ):
         super().__init__()
         self.dataset["area"] = area
