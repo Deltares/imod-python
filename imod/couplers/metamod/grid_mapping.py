@@ -25,7 +25,7 @@ class GridMapping(Package):
     def __init__(
         self,
         area: xr.DataArray,
-        active: xr.DataArray = None,
+        active: xr.DataArray,
     ):
         super().__init__()
         self.dataset["area"] = area
@@ -38,7 +38,7 @@ class GridMapping(Package):
         for subunit in range(subunit_len):
             for y in range(y_len):
                 for x in range(x_len):
-                    self.dataset["mod_id"][subunit, y, x] = x + y * x_len
+                    self.dataset["mod_id"][subunit, y, x] = x + y * x_len + 1
 
     def _render(self, file):
         # Generate columns for members with subunit coordinate
