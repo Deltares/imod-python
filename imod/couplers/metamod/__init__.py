@@ -1,2 +1,2 @@
-from imod.couplers.metamod.grid_mapping import NodeSvatMapping
 from imod.couplers.metamod.metamod import MetaMod
+from imod.couplers.metamod.node_svat_mapping import NodeSvatMapping

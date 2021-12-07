@@ -1,4 +1,4 @@
-from imod.couplers.metamod import NodeSvatMapping
+from imod.couplers.metamod.node_svat_mapping import NodeSvatMapping
 
 
 class MetaMod:
