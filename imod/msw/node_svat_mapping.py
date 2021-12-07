@@ -28,21 +28,22 @@ class NodeSvatMapping(Package):
     def __init__(
         self,
         area: xr.DataArray,
-        well: Well,
         active: xr.DataArray,
+        well: Well = None,
     ):
         super().__init__()
         self.dataset["area"] = area
         self.dataset["active"] = active
-        self._create_mod_id()
+        self._create_mod_id_rch()
+        self.well = well
 
-    def _create_mod_id(self):
-        self.dataset["mod_id"] = self.dataset["area"].copy()
+    def _create_mod_id_rch(self):
+        self.dataset["mod_id_rch"] = self.dataset["area"].copy()
         subunit_len, y_len, x_len = self.dataset["mod_id"].shape
         for subunit in range(subunit_len):
             for y in range(y_len):
                 for x in range(x_len):
-                    self.dataset["mod_id"][subunit, y, x] = x + y * x_len + 1
+                    self.dataset["mod_id_rch"][subunit, y, x] = x + y * x_len + 1
 
     def _render(self, file):
         # Generate columns for members with subunit coordinate
@@ -52,7 +53,11 @@ class NodeSvatMapping(Package):
         mask = self.dataset["area"].where(self.dataset["active"]).notnull()
 
         # Generate columns and apply mask
-        mod_id = self._get_preprocessed_array("mod_id", mask)
+        mod_id_rch = self._get_preprocessed_array("mod_id_rch", mask)
+
+        # Get well values
+        if self.well:
+            self._get_well_values()
 
         # Generate remaining columns
         svat = np.arange(1, area.size + 1)
@@ -72,6 +77,26 @@ class NodeSvatMapping(Package):
         self._check_range(dataframe)
 
         return self.write_dataframe_fixed_width(file, dataframe)
+
+    def _get_well_values(self):
+        id_array = []
+        layer_array = []
+        svat_array = []
+
+        well_row = self.well["row"][1]
+        well_column = self.well["column"][1]
+        well_layer = self.well["layer"][1]
+
+        subunit_len = self.dataset["area"].shape[0]
+
+        for row, column, layer in zip(well_row, well_column, well_layer):
+            for subunit in range(subunit_len):
+                if self.dataset["active"][row, column] and not np.isnan(
+                    self.dataset["area"][subunit, row, column]
+                ):
+                    id_array += self.dataset["mod_id_rch"][subunit, row, column]
+                    layer_array += layer
+                    # TODO: fill svat_array
 
     def write(self, directory):
         directory = pathlib.Path(directory)
