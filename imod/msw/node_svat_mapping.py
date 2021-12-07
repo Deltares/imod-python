@@ -4,19 +4,20 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod.couplers.metamod.pkgbase import Package, VariableMetaData
+from imod.mf6.wel import Well
+from imod.msw.pkgbase import Package, VariableMetaData
 
 
 class NodeSvatMapping(Package):
     """
     This contains the data to map MODFLOW 6 cells to MetaSwap svats.
 
-    This class is responsible for the file `nodenr2svat.dxc`.
+    This class is responsible for the file `mod2svat.inp`.
 
-    Unlike imod.metamod.NodeSvatMapping, this class does not include mapping to wells.
+    Unlike imod.metamod.NodeSvatMapping, this class also includes mapping to wells.
     """
 
-    _file_name = "nodenr2svat.dxc"
+    _file_name = "mod2svat.inp"
     _metadata_dict = {
         "mod_id": VariableMetaData(10, 1, 9999999, int),
         "free": VariableMetaData(2, None, None, str),
@@ -27,6 +28,7 @@ class NodeSvatMapping(Package):
     def __init__(
         self,
         area: xr.DataArray,
+        well: Well,
         active: xr.DataArray,
     ):
         super().__init__()
