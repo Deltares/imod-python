@@ -1,4 +1,4 @@
-from imod.couplers.metamod import GridMapping
+from imod.couplers.metamod import NodeSvatMapping
 
 
 class MetaMod:
@@ -15,5 +15,5 @@ class MetaMod:
         # Grid mapping
         area = self.msw_model["grid_data"].dataset["area"]
         active = self.msw_model["grid_data"].dataset["active"]
-        grid_mapping = GridMapping(area, active)
+        grid_mapping = NodeSvatMapping(area, active)
         grid_mapping.write(directory)

@@ -6,7 +6,7 @@ import xarray as xr
 from numpy import nan
 from numpy.testing import assert_equal
 
-from imod.couplers.metamod import GridMapping
+from imod.couplers.metamod import NodeSvatMapping
 
 
 def test_simple_model(fixed_format_parser):
@@ -41,7 +41,7 @@ def test_simple_model(fixed_format_parser):
     )
     # fmt: on
 
-    grid_data = GridMapping(
+    grid_data = NodeSvatMapping(
         area,
         active,
     )
@@ -51,7 +51,7 @@ def test_simple_model(fixed_format_parser):
         grid_data.write(output_dir)
 
         results = fixed_format_parser(
-            output_dir / GridMapping._file_name, GridMapping._metadata_dict
+            output_dir / NodeSvatMapping._file_name, NodeSvatMapping._metadata_dict
         )
 
     assert_equal(results["mod_id"], np.array([2, 8, 2, 5]))

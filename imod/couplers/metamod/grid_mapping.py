@@ -7,14 +7,14 @@ import xarray as xr
 from imod.couplers.metamod.pkgbase import Package, VariableMetaData
 
 
-class GridMapping(Package):
+class NodeSvatMapping(Package):
     """
     This contains the data to map MODFLOW 6 cells to MetaSwap svats.
 
-    This class is responsible for the file `mod2svat.inp`
+    This class is responsible for the file `nodenr2svat.dxc`
     """
 
-    _file_name = "mod2svat.inp"
+    _file_name = "nodenr2svat.dxc"
     _metadata_dict = {
         "mod_id": VariableMetaData(10, 1, 9999999, int),
         "free": VariableMetaData(2, None, None, str),
