@@ -8,7 +8,7 @@ from imod.mf6.wel import Well
 from imod.msw.pkgbase import Package, VariableMetaData
 
 
-class NodeSvatMapping(Package):
+class CouplerMapping(Package):
     """
     This contains the data to map MODFLOW 6 cells to MetaSwap svats.
 

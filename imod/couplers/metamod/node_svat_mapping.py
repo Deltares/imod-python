@@ -13,7 +13,7 @@ class NodeSvatMapping(Package):
 
     This class is responsible for the file `nodenr2svat.dxc`.
 
-    Unlike imod.metamod.NodeSvatMapping, this class does not include mapping to wells.
+    Unlike imod.msw.CouplerMapping, this class does not include mapping to wells.
     """
 
     _file_name = "nodenr2svat.dxc"
