@@ -35,34 +35,49 @@ class CouplerMapping(Package):
         self.dataset["area"] = area
         self.dataset["active"] = active
         self._create_mod_id_rch()
+        self._create_svat()
         self.well = well
 
-    def _create_mod_id_rch(self):
-        self.dataset["mod_id_rch"] = self.dataset["area"].copy()
-        subunit_len, y_len, x_len = self.dataset["mod_id"].shape
+    def _create_svat(self):
+        self.dataset["svat"] = self.dataset["area"].copy()
+        subunit_len, y_len, x_len = self.dataset["svat"].shape
+
+        svat_index = 1
         for subunit in range(subunit_len):
             for y in range(y_len):
                 for x in range(x_len):
-                    self.dataset["mod_id_rch"][subunit, y, x] = x + y * x_len + 1
+                    if self.dataset["active"][y, x] and not np.isnan(
+                        self.dataset["area"][subunit, y, x]
+                    ):
+                        self.dataset["svat"][subunit, y, x] = svat_index
+                        svat_index += 1
+
+    def _create_mod_id_rch(self):
+        self.dataset["mod_id_rch"] = self.dataset["area"].copy()
+        subunit_len, y_len, x_len = self.dataset["mod_id_rch"].shape
+        for subunit in range(subunit_len):
+            for y in range(y_len):
+                for x in range(x_len):
+                    self.dataset["mod_id_rch"][subunit, y, x] = y * x_len + x + 1
 
     def _render(self, file):
-        # Generate columns for members with subunit coordinate
-        area = self._get_preprocessed_array("area", self.dataset["active"])
-
         # Produce values necessary for members without subunit coordinate
         mask = self.dataset["area"].where(self.dataset["active"]).notnull()
 
         # Generate columns and apply mask
-        mod_id_rch = self._get_preprocessed_array("mod_id_rch", mask)
+        mod_id = self._get_preprocessed_array("mod_id_rch", mask)
+        svat = np.arange(1, mod_id.size + 1)
+        layer = np.full_like(svat, 1)
 
         # Get well values
         if self.well:
-            self._get_well_values()
+            mod_id_well, svat_well, layer_well = self._get_well_values()
+            mod_id = np.append(mod_id_well, mod_id)
+            svat = np.append(svat_well, svat)
+            layer = np.append(layer_well, layer)
 
         # Generate remaining columns
-        svat = np.arange(1, area.size + 1)
-        layer = np.full_like(svat, 1)
-        free = pd.Series(["" for _ in range(area.size)], dtype="string")
+        free = pd.Series(["" for _ in range(mod_id.size)], dtype="string")
 
         # Create DataFrame
         dataframe = pd.DataFrame(
@@ -79,24 +94,35 @@ class CouplerMapping(Package):
         return self.write_dataframe_fixed_width(file, dataframe)
 
     def _get_well_values(self):
-        id_array = []
-        layer_array = []
-        svat_array = []
+        mod_id_array = np.array([])
+        svat_array = np.array([])
+        layer_array = np.array([])
 
-        well_row = self.well["row"][1]
-        well_column = self.well["column"][1]
-        well_layer = self.well["layer"][1]
+        well_row = self.well["row"]
+        well_column = self.well["column"]
+        well_layer = self.well["layer"]
 
-        subunit_len = self.dataset["area"].shape[0]
+        subunit_len, row_len, column_len = self.dataset["svat"].shape
 
         for row, column, layer in zip(well_row, well_column, well_layer):
+            # Convert from 1-indexing to 0 indexing
+            row -= 1
+            column -= 1
+            layer -= 1
             for subunit in range(subunit_len):
                 if self.dataset["active"][row, column] and not np.isnan(
                     self.dataset["area"][subunit, row, column]
                 ):
-                    id_array += self.dataset["mod_id_rch"][subunit, row, column]
-                    layer_array += layer
-                    # TODO: fill svat_array
+                    mod_id = (
+                        layer * column_len * row_len + row * column_len + column + 1
+                    )
+                    mod_id_array = np.append(mod_id_array, mod_id)
+                    svat_array = np.append(
+                        svat_array, self.dataset["svat"][subunit, row, column]
+                    )
+                    layer_array = np.append(layer_array, layer + 1)
+
+        return (mod_id_array, svat_array, layer_array)
 
     def write(self, directory):
         directory = pathlib.Path(directory)

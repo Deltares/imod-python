@@ -43,9 +43,6 @@ class NodeSvatMapping(Package):
                     self.dataset["mod_id"][subunit, y, x] = x + y * x_len + 1
 
     def _render(self, file):
-        # Generate columns for members with subunit coordinate
-        area = self._get_preprocessed_array("area", self.dataset["active"])
-
         # Produce values necessary for members without subunit coordinate
         mask = self.dataset["area"].where(self.dataset["active"]).notnull()
 
@@ -53,9 +50,9 @@ class NodeSvatMapping(Package):
         mod_id = self._get_preprocessed_array("mod_id", mask)
 
         # Generate remaining columns
-        svat = np.arange(1, area.size + 1)
+        svat = np.arange(1, mod_id.size + 1)
         layer = np.full_like(svat, 1)
-        free = pd.Series(["" for _ in range(area.size)], dtype="string")
+        free = pd.Series(["" for _ in range(mod_id.size)], dtype="string")
 
         # Create DataFrame
         dataframe = pd.DataFrame(
