@@ -40,6 +40,9 @@ artifial_recharge_layer_array = array = xr.open_dataset(
     "D:/checkouts/imod_python_hooghoudt/idf_and_netcdf/netcdf/cap-spr_layer_l1.nc"
 )["cap-spr_layer"]
 
+print(meteo_array)
+print(meteo_array["dx"])
+exit()
 
 # %% Create `GridData` and write to file
 grid_data = msw.GridData(

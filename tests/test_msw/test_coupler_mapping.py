@@ -14,6 +14,8 @@ def test_simple_model_with_sprinkling(fixed_format_parser):
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
+    dx = 1.0
+    dy = 1.0
     # fmt: off
     area = xr.DataArray(
         np.array(
@@ -28,7 +30,7 @@ def test_simple_model_with_sprinkling(fixed_format_parser):
             ]
         ),
         dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x}
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
     )
 
     active = xr.DataArray(
@@ -37,7 +39,7 @@ def test_simple_model_with_sprinkling(fixed_format_parser):
              [False, True, False],
              [False, True, False]]),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
     )
     # fmt: on
 
@@ -74,6 +76,8 @@ def test_simple_model_without_sprinkling(fixed_format_parser):
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
+    dx = 1.0
+    dy = 1.0
     # fmt: off
     area = xr.DataArray(
         np.array(
@@ -88,7 +92,7 @@ def test_simple_model_without_sprinkling(fixed_format_parser):
             ]
         ),
         dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x}
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
     )
 
     active = xr.DataArray(
@@ -97,7 +101,7 @@ def test_simple_model_without_sprinkling(fixed_format_parser):
              [False, True, False],
              [False, True, False]]),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
     )
     # fmt: on
 

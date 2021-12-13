@@ -114,6 +114,8 @@ def test_simple_model(fixed_format_parser):
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
+    dx = 1.0
+    dy = 1.0
     # fmt: off
     infiltration_capacity = xr.DataArray(
         np.array(
@@ -128,7 +130,7 @@ def test_simple_model(fixed_format_parser):
             ]
         ),
         dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x}
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
     )
 
     downward_resistance = xr.DataArray(
@@ -137,7 +139,7 @@ def test_simple_model(fixed_format_parser):
              [4.0, 5.0, 6.0],
              [7.0, 8.0, 9.0]]),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
     )
 
     upward_resistance = xr.DataArray(
@@ -146,7 +148,7 @@ def test_simple_model(fixed_format_parser):
              [4.0, 5.0, 6.0],
              [7.0, 8.0, 9.0]]),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
     )
 
     bottom_resistance = xr.DataArray(
@@ -155,7 +157,7 @@ def test_simple_model(fixed_format_parser):
              [4.0, 5.0, 6.0],
              [7.0, 8.0, 9.0]]),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
     )
 
     extra_storage_coefficient = xr.DataArray(
@@ -164,7 +166,7 @@ def test_simple_model(fixed_format_parser):
              [0.4, 0.5, 0.6],
              [0.7, 0.8, 0.9]]),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
     )
 
     active = xr.DataArray(
@@ -173,7 +175,7 @@ def test_simple_model(fixed_format_parser):
              [False, True, False],
              [False, True, False]]),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
     )
     # fmt: on
 

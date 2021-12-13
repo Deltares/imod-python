@@ -14,6 +14,8 @@ def test_precipitation_mapping(fixed_format_parser):
     x_svat = [1.0, 2.0, 3.0]
     y_svat = [1.0, 2.0, 3.0]
     subunit_svat = [0, 1]
+    dx_svat = 1.0
+    dy_svat = 1.0
     # fmt: off
     area = xr.DataArray(
         np.array(
@@ -28,7 +30,7 @@ def test_precipitation_mapping(fixed_format_parser):
             ]
         ),
         dims=("subunit", "y", "x"),
-        coords={"subunit": subunit_svat, "y": y_svat, "x": x_svat}
+        coords={"subunit": subunit_svat, "y": y_svat, "x": x_svat, "dx": dx_svat, "dy": dy_svat}
     )
 
     active = xr.DataArray(
@@ -37,12 +39,14 @@ def test_precipitation_mapping(fixed_format_parser):
              [False, True, False],
              [False, True, False]]),
         dims=("y", "x"),
-        coords={"y": y_svat, "x": x_svat}
+        coords={"y": y_svat, "x": x_svat, "dx": dx_svat, "dy": dy_svat}
     )
     # fmt: on
 
-    x_meteo = [1.0, 2.0, 3.0]
-    y_meteo = [1.0, 2.0, 3.0]
+    x_meteo = [-1.0, 1.0, 3.0]
+    y_meteo = [1.0, 3.0, 5.0]
+    dx_meteo = 2.0
+    dy_meteo = 2.0
 
     # TODO: create meteo grid
 
