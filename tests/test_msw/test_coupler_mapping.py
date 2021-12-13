@@ -11,8 +11,8 @@ from imod import mf6, msw
 
 def test_simple_model_with_sprinkling(fixed_format_parser):
 
-    x = [1, 2, 3]
-    y = [1, 2, 3]
+    x = [1.0, 2.0, 3.0]
+    y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
     # fmt: off
     area = xr.DataArray(
@@ -71,8 +71,8 @@ def test_simple_model_with_sprinkling(fixed_format_parser):
 
 def test_simple_model_without_sprinkling(fixed_format_parser):
 
-    x = [1, 2, 3]
-    y = [1, 2, 3]
+    x = [1.0, 2.0, 3.0]
+    y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
     # fmt: off
     area = xr.DataArray(
