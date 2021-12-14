@@ -106,18 +106,19 @@ def grid_mapping(svat_grid: xr.DataArray, meteo_grid: xr.DataArray) -> pd.DataFr
                     svat_grid_x = np.append(svat_grid_x, value["x"].values)
                     svat_grid_y = np.append(svat_grid_y, value["y"].values)
 
-    # Maybe side="left" or side="right" is appropriate...
-    index_x = np.searchsorted(meteo_x, svat_grid_x)
-    index_y = np.searchsorted(meteo_y, svat_grid_y)
+    row = np.searchsorted(meteo_y, svat_grid_y)
+    column = np.searchsorted(meteo_x, svat_grid_x)
 
     # Find out of bounds members
-    if (index_x == 0).any() or (index_x >= ncol).any():
-        raise ValueError("out of bounds for x")
-    if (index_y == 0).any() or (index_y >= nrow).any():
-        raise ValueError("out of bounds for y")
-    rows, columns = np.meshgrid(index_y, index_x, indexing="ij")
-    if flip_meteo_x ^ flip_svat_x:  # or something?
-        rows = (nrow - 1) - rows
+    if (column == 0).any() or (column > ncol).any():
+        raise ValueError("Some values are out of bounds for column")
+    if (row == 0).any() or (row > nrow).any():
+        raise ValueError("Some values are out of bounds for row")
 
+    # TODO: Add flipping
+    if flip_meteo_x ^ flip_svat_x:
+        row = (nrow - 1) - row
+
+    svat = np.arange(1, svat_grid_x.size + 1)
     # Repeat for multiple stacked SVATs I guess?
-    return pd.DataFrame({"svat": svat, "row": rows, "column": columns})
+    return pd.DataFrame({"svat": svat, "row": row, "column": column})
