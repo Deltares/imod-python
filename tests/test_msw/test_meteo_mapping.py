@@ -45,22 +45,40 @@ def test_precipitation_mapping(fixed_format_parser):
 
     x_meteo = [-1.0, 1.0, 3.0]
     y_meteo = [1.0, 3.0, 5.0]
+    subunit_meteo = [0, 1]
     dx_meteo = 2.0
     dy_meteo = 2.0
+    # fmt: off
+    precipitation = xr.DataArray(
+        np.array(
+            [
+                [[1.0, 1.0, 1.0],
+                 [1.0, 1.0, 1.0],
+                 [1.0, 1.0, 1.0]],
+
+                [[1.0, 1.0, 1.0],
+                 [1.0, 1.0, 1.0],
+                 [1.0, 1.0, 1.0]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit_meteo, "y": y_meteo, "x": x_meteo, "dx": dx_meteo, "dy": dy_meteo}
+    )
+    # fmt: on
 
     # TODO: create meteo grid
 
-    coupler_mapping = msw.PrecipitationMapping(area, active)
+    precipitation_mapping = msw.PrecipitationMapping(area, active, precipitation)
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        coupler_mapping.write(output_dir)
+        precipitation_mapping.write(output_dir)
 
         results = fixed_format_parser(
             output_dir / msw.PrecipitationMapping._file_name,
             msw.PrecipitationMapping._metadata_dict,
         )
 
-    assert_equal(results["mod_id"], np.array([2, 8, 2, 5]))
     assert_equal(results["svat"], np.array([1, 2, 3, 4]))
-    assert_equal(results["layer"], np.array([1, 1, 1, 1]))
+    assert_equal(results["row"], np.array([1, 2, 1, 1]))
+    assert_equal(results["column"], np.array([2, 2, 2, 2]))
