@@ -31,36 +31,13 @@ class PrecipitationMapping(Package):
         super().__init__()
         self.dataset["area"] = area
         self.dataset["active"] = active
-        self.dataset["precipitation"] = precipitation
+        self.precipitation = precipitation
 
     def _render(self, file):
-        # Produce values necessary for members without subunit coordinate
-        mask = self.dataset["area"].where(self.dataset["active"]).notnull()
-
-        # Generate columns and apply mask
-        mod_id = self._get_preprocessed_array("mod_id_rch", mask)
-        svat = np.arange(1, mod_id.size + 1)
-        layer = np.full_like(svat, 1)
-
-        # Get well values
-        if self.well:
-            mod_id_well, svat_well, layer_well = self._get_well_values()
-            mod_id = np.append(mod_id_well, mod_id)
-            svat = np.append(svat_well, svat)
-            layer = np.append(layer_well, layer)
-
-        # Generate remaining columns
-        free = pd.Series(["" for _ in range(mod_id.size)], dtype="string")
+        svat_grid = self.dataset["area"].where(self.dataset["active"])
 
         # Create DataFrame
-        dataframe = pd.DataFrame(
-            {
-                "mod_id": mod_id,
-                "free": free,
-                "svat": svat,
-                "layer": layer,
-            }
-        )
+        dataframe = grid_mapping(svat_grid, self.precipitation)
 
         self._check_range(dataframe)
 
@@ -111,7 +88,7 @@ def grid_mapping(svat_grid: xr.DataArray, meteo_grid: xr.DataArray) -> pd.DataFr
     flip_meteo_x = meteo_grid.indexes["x"].is_monotonic_decreasing
     flip_meteo_y = meteo_grid.indexes["y"].is_monotonic_decreasing
     nrow = meteo_grid["y"].size
-    ncol = meteo_grid["y"].size
+    ncol = meteo_grid["x"].size
 
     # Ensure all are increasing
     pass
@@ -120,9 +97,18 @@ def grid_mapping(svat_grid: xr.DataArray, meteo_grid: xr.DataArray) -> pd.DataFr
     meteo_x = common._coord(meteo_grid, "x")
     meteo_y = common._coord(meteo_grid, "y")
 
+    svat_grid_x = np.array([])
+    svat_grid_y = np.array([])
+    for subunits in svat_grid:
+        for rows in subunits:
+            for value in rows:
+                if not np.isnan(value.values):
+                    svat_grid_x = np.append(svat_grid_x, value["x"].values)
+                    svat_grid_y = np.append(svat_grid_y, value["y"].values)
+
     # Maybe side="left" or side="right" is appropriate...
-    index_x = np.searchsorted(svat_grid["x"].values, meteo_x)
-    index_y = np.searchsorted(svat_grid["y"].values, meteo_x)
+    index_x = np.searchsorted(meteo_x, svat_grid_x)
+    index_y = np.searchsorted(meteo_y, svat_grid_y)
 
     # Find out of bounds members
     if (index_x == 0).any() or (index_x >= ncol).any():
