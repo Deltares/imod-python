@@ -90,13 +90,11 @@ def grid_mapping(svat_grid: xr.DataArray, meteo_grid: xr.DataArray) -> pd.DataFr
     nrow = meteo_grid["y"].size
     ncol = meteo_grid["x"].size
 
-    # Ensure all are increasing
-    pass
-
     # Convert to cell boundaries for the meteo grid
     meteo_x = common._coord(meteo_grid, "x")
     meteo_y = common._coord(meteo_grid, "y")
 
+    # Create the SVAT grid
     svat_grid_x = np.array([])
     svat_grid_y = np.array([])
     for subunits in svat_grid:
@@ -106,6 +104,7 @@ def grid_mapping(svat_grid: xr.DataArray, meteo_grid: xr.DataArray) -> pd.DataFr
                     svat_grid_x = np.append(svat_grid_x, value["x"].values)
                     svat_grid_y = np.append(svat_grid_y, value["y"].values)
 
+    # Determine where the svats fit in within the cell boundaries of the meteo grid
     row = np.searchsorted(meteo_y, svat_grid_y)
     column = np.searchsorted(meteo_x, svat_grid_x)
 
@@ -115,10 +114,13 @@ def grid_mapping(svat_grid: xr.DataArray, meteo_grid: xr.DataArray) -> pd.DataFr
     if (row == 0).any() or (row > nrow).any():
         raise ValueError("Some values are out of bounds for row")
 
-    # TODO: Add flipping
+    # Flip axis if necessary
+    if flip_meteo_y ^ flip_svat_y:
+        row = (nrow + 1) - row
     if flip_meteo_x ^ flip_svat_x:
-        row = (nrow - 1) - row
+        column = (column + 1) - column
 
+    # Create svat column
     svat = np.arange(1, svat_grid_x.size + 1)
-    # Repeat for multiple stacked SVATs I guess?
+
     return pd.DataFrame({"svat": svat, "row": row, "column": column})
