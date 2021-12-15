@@ -168,7 +168,7 @@ practical sense.)
 
 Below is the specification for an environment that should provide you with
 all the dependencies and requirements you need to build groundwater models
-with imod-python, and then some (for testing/development).
+with iMOD Python, and then some (for testing/development).
 
 .. literalinclude:: ../../imod-environment.yml
    :language: yaml
@@ -213,7 +213,7 @@ a repository of choice, and do a "development install"::
     pip install -e .
 
 To get the latest developments at a later point in time, execute within the
-imod-python directory::
+`imod-python` directory::
 
     git pull
     
@@ -222,7 +222,7 @@ number::
 
     pip install imod==0.11.0
     
-Past versions can also be found on the imod-python `releases page`_.
+Past versions can also be found on the iMOD Python `releases page`_.
 
 .. _Python Package Index: https://pypi.org/
 .. _"dependency hell": https://en.wikipedia.org/wiki/Dependency_hell

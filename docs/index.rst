@@ -1,4 +1,4 @@
-iMOD-Python: make massive MODFLOW models
+iMOD Python: make massive MODFLOW models
 ========================================
 
 .. image:: https://img.shields.io/badge/lifecycle-maturing-blue
@@ -22,7 +22,7 @@ iMOD-Python: make massive MODFLOW models
    The :doc:`api/index` is fairly complete, but high level overviews and more
    examples are still lacking. Extending Modflow 6 support is also planned.
 
-The imod Python package is designed to help you in your MODFLOW groundwater
+The iMOD Python package is designed to help you in your MODFLOW groundwater
 modeling efforts.  It makes it easy to go from your raw data to a fully defined
 MODFLOW model, with the aim to make this process reproducable.  Whether you
 want to build a simple 2D conceptual model, or a complex 3D regional model with
