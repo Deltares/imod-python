@@ -119,6 +119,12 @@ gwf_model["npf"] = imod.mf6.NodePropertyFlow(
     k33=k33,
     save_flows=True,
 )
+gwf_model["sto"] = imod.mf6.SpecificStorage(
+    specific_storage=1.0e-5,
+    specific_yield=0.15,
+    transient=False,
+    convertible=0,
+)
 gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
 gwf_model["rch"] = imod.mf6.Recharge(rch_rate)
 

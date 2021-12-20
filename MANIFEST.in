@@ -1,4 +1,5 @@
 include README.rst
 include LICENSE
+include imod/data/registry.txt
 global-include imod/templates/*.j2
 global-include imod/templates/mf6/*.j2

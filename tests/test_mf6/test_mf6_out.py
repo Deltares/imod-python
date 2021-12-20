@@ -90,7 +90,9 @@ def test_dis_indices():
     nlayer = 1
     nrow = 2
     ncol = 3
-    right, front, lower = imod.mf6.out.dis.dis_indices(ia, ja, ncells, nlayer, nrow, ncol)
+    right, front, lower = imod.mf6.out.dis.dis_indices(
+        ia, ja, ncells, nlayer, nrow, ncol
+    )
     assert right.shape == front.shape == lower.shape == (nlayer, nrow, ncol)
     assert (lower == -1).all()  # No lower connections
     right_expected = np.array(
@@ -139,7 +141,9 @@ def test_dis_indices__idomain():
     nlayer = 3
     nrow = 3
     ncol = 1
-    right, front, lower = imod.mf6.out.dis.dis_indices(ia, ja, ncells, nlayer, nrow, ncol)
+    right, front, lower = imod.mf6.out.dis.dis_indices(
+        ia, ja, ncells, nlayer, nrow, ncol
+    )
     assert (front == -1).all()  # No front connections
     right_expected = np.array(
         [

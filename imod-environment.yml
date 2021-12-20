@@ -16,6 +16,8 @@ dependencies:
   - cytoolz
   - dask
   - geopandas
+  - graphviz
+  - python-graphviz
   - flopy
   - jinja2
   - joblib
@@ -24,9 +26,11 @@ dependencies:
   - numba>=0.50
   - numpy
   - pandas
+  - pooch
   - pip
   - pip:
     - declxml
+    - meshzoo
     - pandamesh
     - xugrid
   - pydata-sphinx-theme
@@ -35,7 +39,7 @@ dependencies:
   - pytest
   - pytest-benchmark
   - pytest-cov
-  - python>=3.7,<=3.8
+  - python>=3.7,<3.9
   - pyvista
   - rasterio>=1.0
   - scipy
