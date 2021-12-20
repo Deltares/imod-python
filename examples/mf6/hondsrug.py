@@ -297,11 +297,6 @@ rch_ss.plot.imshow()
 # The initial pp and evt datasets have been sliced to this time frame.
 
 pp_trans = pp.sel(time=slice("2010-01-01", "2015-12-31"))
-
-pp_trans["time"] = pp_trans.indexes[
-    "time"
-].normalize()  # normalizing dates for pp to remove hours information
-
 evt_trans = evt.sel(time=slice("2010-01-01", "2015-12-31"))
 
 # %%
@@ -634,12 +629,3 @@ hds.sel(layer=5).isel(time=3).plot()
 # with ``mean(dim="layer")``.
 
 hds.sel(layer=slice(3, 5)).mean(dim="layer").isel(time=3).plot()
-
-
-# %%
-da = xr.open_dataarray(r"c:\src\imod-artifacts\EV24.nc")
-# %%
-
-
-ds = xr.open_dataset(r"c:\src\imod-artifacts\hondsrug-meteorology.nc")
-# %%
