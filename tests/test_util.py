@@ -450,3 +450,34 @@ def test_where():
 
     with pytest.raises(ValueError, match="at least one of"):
         util.where(False, 1, 0)
+
+
+def test_to_ugrid2d():
+    a = xr.DataArray(
+        np.ones((3, 2, 2)),
+        {"layer": [1, 2, 3], "y": [1.5, 0.5], "x": [0.5, 1.5]},
+        ["layer", "y", "x"],
+        name=None,
+    )
+    with pytest.raises(TypeError, match="data must be xarray"):
+        util.to_ugrid2d(a.values)
+    with pytest.raises(ValueError, match="A name is required"):
+        util.to_ugrid2d(a)
+
+    a.name = "a"
+    with pytest.raises(ValueError, match="Last two dimensions of da"):
+        util.to_ugrid2d(a.transpose())
+
+    uds = util.to_ugrid2d(a)
+    assert isinstance(uds, xr.Dataset)
+    for i in range(1, 4):
+        assert f"a_layer_{i}" in uds
+
+    ds = xr.Dataset()
+    ds["a"] = a
+    ds["b"] = a.copy()
+    uds = util.to_ugrid2d(ds)
+    assert isinstance(uds, xr.Dataset)
+    for i in range(1, 4):
+        assert f"a_layer_{i}" in uds
+        assert f"b_layer_{i}" in uds
