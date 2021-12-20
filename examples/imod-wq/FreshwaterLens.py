@@ -12,6 +12,8 @@ import xarray as xr
 
 import imod
 
+import matplotlib.pyplot as plt
+
 # Discretization
 nrow = 1  # number of rows
 ncol = 40  # number of columns
@@ -37,7 +39,9 @@ bnd = xr.DataArray(
 # set constant heads
 bnd[0, :, 0:12] = -1
 bnd[0, :, 28:40] = -1
-bnd.plot(y="layer", yincrease=False)
+
+fig, ax = plt.subplots()
+bnd.plot(y="layer", yincrease=False, ax=ax)
 
 # set up tops and bottoms
 top1D = xr.DataArray(
@@ -60,7 +64,9 @@ sconc = xr.DataArray(
 )
 
 sconc[:, 13:27, 0] = 0.0
-sconc.plot(y="layer", yincrease=False)
+
+fig, ax = plt.subplots()
+sconc.plot(y="layer", yincrease=False, ax=ax)
 
 # Defining the recharge rates
 rch_rate = xr.DataArray(
@@ -69,7 +75,9 @@ rch_rate = xr.DataArray(
     dims=("y", "x"),
 )
 rch_rate[:, 13:27] = 0.001
-rch_rate.plot()
+
+fig, ax = plt.subplots()
+rch_rate.plot(ax=ax)
 
 rch_conc = xr.full_like(rch_rate, fill_value=0.0)
 
@@ -108,8 +116,10 @@ m.write(modeldir, resultdir_is_workdir=True)
 
 # Results
 # head = imod.idf.open("FreshwaterLens/results/head/*.idf")
-# head.plot(yincrease=False)
+# fig, ax = plt.subplots()
+# head.plot(yincrease=False, ax=ax)
 # conc = imod.idf.open("FreshwaterLens/results/conc/*.idf")
-# conc.plot(levels=range(0, 35, 5), yincrease=False)
+# fig, ax = plt.subplots()
+# conc.plot(levels=range(0, 35, 5), yincrease=False, ax=ax)
 
 # %%
