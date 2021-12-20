@@ -1,6 +1,6 @@
 """
-Modflow 6 model of the Hondsrug
-===============================
+Regional model
+==============
 
 This example shows a simplified script for building a groundwater model in the
 northeast of the Netherlands. A primary feature of this area is an ice-pushed
