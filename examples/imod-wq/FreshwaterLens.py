@@ -7,6 +7,7 @@ fully saline domain.
 """
 
 # %%
+# We'll start with the usual imports
 import numpy as np
 import xarray as xr
 
@@ -16,7 +17,14 @@ import matplotlib.pyplot as plt
 
 # sphinx_gallery_thumbnail_number = -1
 
+#%%
 # Discretization
+# --------------
+#
+# We'll start off by creating a model discretization, since
+# this is a simple conceptual model.
+# The model is a 2D cross-section, hence ``nrow = 1``.
+
 nrow = 1  # number of rows
 ncol = 40  # number of columns
 nlay = 15  # number of layers
@@ -25,7 +33,18 @@ dz = 10
 dx = 250
 dy = -dx
 
-# setup ibound
+# %%
+# Set up tops and bottoms
+top1D = xr.DataArray(
+    np.arange(nlay * dz, 0.0, -dz), {"layer": np.arange(1, nlay + 1)}, ("layer")
+)
+
+bot = top1D - dz
+
+
+# %%
+# Set up ibound, which sets where active cells are `(ibound = 1.0)`
+
 bnd = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 1.0),
     coords={
@@ -38,21 +57,43 @@ bnd = xr.DataArray(
     dims=("layer", "y", "x"),
 )
 
-# set constant heads
+# %%
+# Boundary Conditions
+# -------------------
+#
+# Set the constant heads by specifying a negative value in iboud,
+# that is: ``bnd[index] = -1```
+
 bnd[0, :, 0:12] = -1
 bnd[0, :, 28:40] = -1
 
 fig, ax = plt.subplots()
 bnd.plot(y="layer", yincrease=False, ax=ax)
 
-# set up tops and bottoms
-top1D = xr.DataArray(
-    np.arange(nlay * dz, 0.0, -dz), {"layer": np.arange(1, nlay + 1)}, ("layer")
+# %%
+# Define the recharge rates
+
+rch_rate = xr.DataArray(
+    data=np.full((nrow, ncol), 0.0),
+    coords={"y": [0.5], "x": np.arange(0.5 * dx, dx * ncol, dx), "dx": dx, "dy": dy},
+    dims=("y", "x"),
 )
+rch_rate[:, 13:27] = 0.001
 
-bot = top1D - dz
+fig, ax = plt.subplots()
+rch_rate.plot(ax=ax)
 
+# %%
+# The model is recharged with fresh water
+
+rch_conc = xr.full_like(rch_rate, fill_value=0.0)
+
+# %%
+# Initial Conditions
+# ------------------
+#
 # Defining the starting concentrations
+
 sconc = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 35.0),
     coords={
@@ -70,20 +111,11 @@ sconc[:, 13:27, 0] = 0.0
 fig, ax = plt.subplots()
 sconc.plot(y="layer", yincrease=False, ax=ax)
 
-# Defining the recharge rates
-rch_rate = xr.DataArray(
-    data=np.full((nrow, ncol), 0.0),
-    coords={"y": [0.5], "x": np.arange(0.5 * dx, dx * ncol, dx), "dx": dx, "dy": dy},
-    dims=("y", "x"),
-)
-rch_rate[:, 13:27] = 0.001
 
-fig, ax = plt.subplots()
-rch_rate.plot(ax=ax)
-
-rch_conc = xr.full_like(rch_rate, fill_value=0.0)
-
-
+# %%
+# Build
+# -----
+#
 # Finally, we build the model.
 
 m = imod.wq.SeawatModel("FreshwaterLens")
@@ -111,17 +143,38 @@ m["gcg"] = imod.wq.GeneralizedConjugateGradientSolver(
 m["oc"] = imod.wq.OutputControl(save_head_idf=True, save_concentration_idf=True)
 m.time_discretization(times=["1900-01-01T00:00", "2000-01-01T00:00"])
 
+# %%
 # Now we write the model, including runfile:
 modeldir = imod.util.temporary_directory()
 m.write(modeldir, resultdir_is_workdir=True)
-# You can run the model using the command prompt and the iMOD SEAWAT executable
 
-# Results
-# head = imod.idf.open("FreshwaterLens/results/head/*.idf")
-# fig, ax = plt.subplots()
-# head.plot(yincrease=False, ax=ax)
-# conc = imod.idf.open("FreshwaterLens/results/conc/*.idf")
-# fig, ax = plt.subplots()
-# conc.plot(levels=range(0, 35, 5), yincrease=False, ax=ax)
+# %%
+# Run
+# ---
+#
+# You can run the model using the comand prompt and the iMOD-WQ executable.
+# This is part of the iMOD v5 release, which can be downloaded here:
+# https://oss.deltares.nl/web/imod/download-imod5 .
+# This only works on Windows.
+
+# %%
+# Visualise results
+# -----------------
+#
+# After succesfully running the model, you can
+# plot results as follows:
+#
+# .. code:: python
+#
+#    head = imod.idf.open(modeldir / "results/head/*.idf")
+#
+#    fig, ax = plt.subplots()
+#    head.plot(yincrease=False, ax=ax)
+#
+#    conc = imod.idf.open(modeldir / "results/conc/*.idf")
+#
+#    fig, ax = plt.subplots()
+#    conc.plot(levels=range(0, 35, 5), yincrease=False, ax=ax)
+#
 
 # %%

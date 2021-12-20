@@ -1,5 +1,3 @@
-# sphinx_gallery_thumbnail_number = -1
-
 """
 Saltwater Pocket
 ================
@@ -19,7 +17,9 @@ import matplotlib.pyplot as plt
 
 # sphinx_gallery_thumbnail_number = -1
 
-# Discretization
+# %%
+# We'll start with the usual imports
+
 nrow = 1  # number of rows
 ncol = 80  # number of column
 nlay = 40  # number of layers
@@ -28,8 +28,17 @@ dz = 1.0  # 0.0125
 dx = 1.0  # 0.0125
 dy = -dx
 
+# %%
+# Setup tops and bottoms
 
-# setup ibound
+top1D = xr.DataArray(
+    np.arange(nlay * dz, 0.0, -dz), {"layer": np.arange(1, nlay + 1)}, ("layer")
+)
+
+bot = top1D - dz
+
+# %%
+# Set up ibound, which sets where active cells are `(ibound = 1.0)`
 bnd = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 1.0),
     coords={
@@ -45,18 +54,20 @@ bnd = xr.DataArray(
 fig, ax = plt.subplots()
 bnd.plot(y="layer", yincrease=False, ax=ax)
 
-# set constant heads
+# %%
+# Boundary Conditions
+# -------------------
+#
+# Set the constant heads by specifying a negative value in iboud,
+# that is: ``bnd[index] = -1```
 bnd[21, :, 0] = -1
 
-# setup tops and bottoms
+# %%
+# Initial Conditions
+# ------------------
+#
+# Define the starting concentration
 
-top1D = xr.DataArray(
-    np.arange(nlay * dz, 0.0, -dz), {"layer": np.arange(1, nlay + 1)}, ("layer")
-)
-
-bot = top1D - dz
-
-# Defining the starting concentrations
 sconc = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 0.0),
     coords={
@@ -72,6 +83,10 @@ sconc[16:24, :, 41:80] = 35.0
 fig, ax = plt.subplots()
 sconc.plot(y="layer", yincrease=False, ax=ax)
 
+# %%
+# Build
+# -----
+#
 # Finally, we build the model.
 
 m = imod.wq.SeawatModel("SaltwaterPocket")
@@ -100,20 +115,37 @@ m["oc"] = imod.wq.OutputControl(save_head_idf=True, save_concentration_idf=True)
 m.time_discretization(times=["2000-01-01T00:00", "2000-01-05T01:00"])
 
 
+# %%
 # Now we write the model, including runfile:
 modeldir = imod.util.temporary_directory()
 m.write(modeldir, resultdir_is_workdir=True)
 
-# You can run the model using the comand prompt and the iMOD SEAWAT executable
-
-# Results
+# %%
+# Run
+# ---
 #
-# head = imod.idf.open("SaltwaterPocket/results/head/*.idf")
-# fig, ax = plt.subplots()
-# head.plot(yincrease=False, ax=ax)
-#
-# conc = imod.idf.open("SaltwaterPocket/results/conc/*.idf")
-# fig, ax = plt.subplots()
-# conc.plot(levels=range(0, 35, 5), yincrease=False, ax=ax)
+# You can run the model using the comand prompt and the iMOD-WQ executable.
+# This is part of the iMOD v5 release, which can be downloaded here:
+# https://oss.deltares.nl/web/imod/download-imod5 .
+# This only works on Windows.
 
+# %%
+# Visualise results
+# -----------------
+#
+# After succesfully running the model, you can
+# plot results as follows:
+#
+# .. code:: python
+#
+#    head = imod.idf.open(modeldir / "results/head/*.idf")
+#
+#    fig, ax = plt.subplots()
+#    head.plot(yincrease=False, ax=ax)
+#
+#    conc = imod.idf.open(modeldir / "results/conc/*.idf")
+#
+#    fig, ax = plt.subplots()
+#    conc.plot(levels=range(0, 35, 5), yincrease=False, ax=ax)
+#
 # %%

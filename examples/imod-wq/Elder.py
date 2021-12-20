@@ -14,12 +14,12 @@ More info about the theory behind the Elder problem:
 Simpson, J., & Clement, P. (2003). 
 Theoretical analysis of the worthiness of Henry and Elder 
 problems as benchmark of density-dependent groundwater flow models.
-*Advances in Water Resources, 1708*(02). 
+`Advances in Water Resources, 1708` (02). 
 Retrieved from http://www.eng.auburn.edu/~clemept/publsihed_pdf/awrmat.pdf
 """
 
 # %%
-# We'll start with the following inputs
+# We'll start with the usual imports
 
 import numpy as np
 import xarray as xr
@@ -30,6 +30,12 @@ import matplotlib.pyplot as plt
 
 # %%
 # Discretization
+# --------------
+#
+# We'll start off by creating a model discretization, since
+# this is a simple conceptual model.
+# The model is a 2D cross-section, hence ``nrow = 1``.
+
 nrow = 1
 ncol = 160
 nlay = 82
@@ -39,7 +45,17 @@ dx = 3.75
 dy = -dx
 
 # %%
-# Setup ibound
+# setup tops and bottoms
+top1D = xr.DataArray(
+    np.arange(nlay * dz, 0.0, -dz), {"layer": np.arange(1, nlay + 1)}, ("layer")
+)
+
+bot = top1D - dz
+top = nlay * dz
+
+
+# %%
+# Set up ibound, which sets where active cells are `(ibound = 1.0)`
 bnd = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 1.0),
     coords={
@@ -55,7 +71,13 @@ bnd = xr.DataArray(
 fig, ax = plt.subplots()
 bnd.plot(y="layer", yincrease=False, ax=ax)
 
-# set constant heads
+# %%
+# Boundary Conditions
+# -------------------
+#
+# Set the constant heads by specifying a negative value in iboud,
+# that is: ``bnd[index] = -1```
+
 bnd[0, :, 0:40] = 0
 bnd[0, :, 121:160] = 0
 bnd[1, :, 0] = -1
@@ -64,15 +86,9 @@ bnd[1, :, 159] = -1
 fig, ax = plt.subplots()
 bnd.plot(y="layer", yincrease=False, ax=ax)
 
-# setup tops and bottoms
-top1D = xr.DataArray(
-    np.arange(nlay * dz, 0.0, -dz), {"layer": np.arange(1, nlay + 1)}, ("layer")
-)
-
-bot = top1D - dz
-top = nlay * dz
-
-# Define the icbund
+# %%
+# Define the icbund, which sets which cells
+# in the solute transport model are active, inactive or constant.
 icbund = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 1.0),
     coords={
@@ -89,7 +105,12 @@ icbund[0, :, 41:120] = -1
 fig, ax = plt.subplots()
 icbund.plot(y="layer", yincrease=False, ax=ax)
 
+# %%
+# Initial Conditions
+# ------------------
+#
 # Define the starting concentration
+
 sconc = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 0.0),
     coords={
@@ -106,7 +127,12 @@ sconc[0, :, 41:120] = 280.0
 fig, ax = plt.subplots()
 sconc.plot(y="layer", yincrease=False, ax=ax)
 
+# %%
+# Build
+# -----
+#
 # Finally, we build the model.
+
 m = imod.wq.SeawatModel("Elder")
 m["bas"] = imod.wq.BasicFlow(ibound=bnd, top=top, bottom=bot, starting_head=0.0)
 m["lpf"] = imod.wq.LayerPropertyFlow(
@@ -132,19 +158,39 @@ m["gcg"] = imod.wq.GeneralizedConjugateGradientSolver(
 m["oc"] = imod.wq.OutputControl(save_head_idf=True, save_concentration_idf=True)
 m.time_discretization(times=["2000-01-01T00:00", "2020-01-01T00:00"])
 
+# %%
 # Now we write the model
 
 modeldir = imod.util.temporary_directory()
 m.write(modeldir, resultdir_is_workdir=True)
 
-# You can run the model using the comand prompt and the iMOD SEAWAT executable
+# %%
+# Run
+# ---
+#
+# You can run the model using the comand prompt and the iMOD-WQ executable.
+# This is part of the iMOD v5 release, which can be downloaded here:
+# https://oss.deltares.nl/web/imod/download-imod5 .
+# This only works on Windows.
 
+# %%
 # Visualise results
-# head = imod.idf.open("Elder/results/head/*.idf")
-# fig, ax = plt.subplots()
-# head.plot(yincrease=False, ax=ax)
-# conc = imod.idf.open("Elder/results/conc/*.idf")
-# fig, ax = plt.subplots()
-# conc.plot(levels=range(0, 35, 5), yincrease=False, ax=ax)
+# -----------------
+#
+# After succesfully running the model, you can
+# plot results as follows:
+#
+# .. code:: python
+#
+#    head = imod.idf.open(modeldir / "results/head/*.idf")
+#
+#    fig, ax = plt.subplots()
+#    head.plot(yincrease=False, ax=ax)
+#
+#    conc = imod.idf.open(modeldir / "results/conc/*.idf")
+#
+#    fig, ax = plt.subplots()
+#    conc.plot(levels=range(0, 35, 5), yincrease=False, ax=ax)
+#
 
 # %%

@@ -4,9 +4,18 @@ Vertical Interface
 
 This 2D examples demonstrates the rotation of an initially vertical interface
 between fresh and salt water.
+
+For a detailed description of this benchmark, see:
+
+Bakker, M., Oude Essink, G. H. P., & Langevin, C. D. (2004). 
+The rotating movement of three immiscible fluids - A benchmark problem. 
+`Journal of Hydrology, 287` (1-4), 270-278. 
+https://doi.org/10.1016/j.jhydrol.2003.10.007
 """
 
 # %%
+# We'll start with the usual imports
+
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -17,7 +26,14 @@ import matplotlib.pyplot as plt
 
 # sphinx_gallery_thumbnail_number = -1
 
+# %%
 # Discretization
+# --------------
+#
+# We'll start off by creating a model discretization, since
+# this is a simple conceptual model.
+# The model is a 2D cross-section, hence ``nrow = 1``.
+
 nrow = 1
 ncol = 80
 nlay = 40
@@ -26,7 +42,16 @@ dz = 1.0  # 0.0125
 dx = 1.0  # 0.0125
 dy = -dx
 
-# setup ibound
+# Defining tops and bottoms
+top1D = xr.DataArray(
+    np.arange(nlay * dz, 0.0, -dz), {"layer": np.arange(1, nlay + 1)}, ("layer")
+)
+
+bot = top1D - dz
+top = nlay * dz
+
+# %%
+# Set up ibound, which sets where active cells are `(ibound = 1.0)`
 bnd = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 1.0),
     coords={
@@ -42,30 +67,39 @@ bnd = xr.DataArray(
 fig, ax = plt.subplots()
 bnd.plot(y="layer", yincrease=False, ax=ax)
 
-# Defining constant heads
+#%%
+# Define the icbund, which sets which cells
+# in the solute transport model are active, inactive or constant.
+#
+# We just go for active cells everywhere here
+icbund = xr.full_like(bnd, 1)
+
+# %%
+# Boundary Conditions
+# -------------------
+#
+# Set the constant heads by specifying a negative value in iboud,
+# that is: ``bnd[index] = -1```
+
 bnd[31, :, 0] = -1
 
 fig, ax = plt.subplots()
 bnd.plot(y="layer", yincrease=False, ax=ax)
 
-# Defining tops and bottoms
-top1D = xr.DataArray(
-    np.arange(nlay * dz, 0.0, -dz), {"layer": np.arange(1, nlay + 1)}, ("layer")
-)
 
-bot = top1D - dz
-top = nlay * dz
-
+# %%
 # Define WEL data
 weldata = pd.DataFrame()
 weldata["x"] = np.full(1, 0.5 * dx)
 weldata["y"] = np.full(1, 0.5)
 weldata["q"] = 0.28512  # positive, so it's an injection well
 
-# Define icbund
-icbund = xr.full_like(bnd, 1)
+# %%
+# Initial Conditions
+# ------------------
+#
+# Define the starting concentration
 
-# Define starting concentrations
 sconc = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 0.0),
     coords={
@@ -77,6 +111,12 @@ sconc = xr.DataArray(
 )
 
 sconc[:, :, 41:80] = 35.0
+
+# %%
+# Build
+# -----
+#
+# Finally, we build the model.
 
 fig, ax = plt.subplots()
 sconc.plot(y="layer", yincrease=False, ax=ax)
@@ -109,20 +149,39 @@ m["gcg"] = imod.wq.GeneralizedConjugateGradientSolver(
 m["oc"] = imod.wq.OutputControl(save_head_idf=True, save_concentration_idf=True)
 m.time_discretization(times=["2000-01-01", "2000-01-02"])
 
+# %%
 # Now we write the model, including runfile:
 modeldir = imod.util.temporary_directory()
 m.write(modeldir, resultdir_is_workdir=True)
 
-# You can run the model using the comand prompt and the iMOD SEAWAT executable
+# %%
+# Run
+# ---
+#
+# You can run the model using the comand prompt and the iMOD-WQ executable.
+# This is part of the iMOD v5 release, which can be downloaded here:
+# https://oss.deltares.nl/web/imod/download-imod5 .
+# This only works on Windows.
 
-# Results
+# %%
+# Visualise results
+# -----------------
 #
-# head = imod.idf.open("VerticalInterface/results/head/*.idf")
-# fig, ax = plt.subplots()
-# head.plot(yincrease=False, ax=ax)
+# After succesfully running the model, you can
+# plot results as follows:
 #
-# conc = imod.idf.open("VerticalInterface/results/conc/*.idf")
-# fig, ax = plt.subplots()
-# conc.plot(levels=range(0, 35, 5), yincrease=False, ax=ax)
+# .. code:: python
+#
+#    head = imod.idf.open(modeldir / "results/head/*.idf")
+#
+#    fig, ax = plt.subplots()
+#    head.plot(yincrease=False, ax=ax)
+#
+#    conc = imod.idf.open(modeldir / "results/conc/*.idf")
+#
+#    fig, ax = plt.subplots()
+#    conc.plot(levels=range(0, 35, 5), yincrease=False, ax=ax)
+#
+
 
 # %%

@@ -31,7 +31,7 @@ import matplotlib.pyplot as plt
 #
 # We'll start off by creating a model discretization, since
 # this is a simple conceptual model.
-# The model is a 2D cross-section, hence `nrow = 1`.
+# The model is a 2D cross-section, hence ``nrow = 1``.
 
 nrow = 1  # number of rows
 ncol = 45  # number of columns
@@ -50,7 +50,7 @@ top1D = xr.DataArray(
 bot = top1D - dz
 
 # %%
-# Set up ibound, which sets where active cells are (ibound = 1.0).
+# Set up ibound, which sets where active cells are `(ibound = 1.0)`.
 
 bnd = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 1.0),
@@ -95,30 +95,11 @@ weldata["y"] = np.full(1, 0.5)
 weldata["q"] = 0.28512  # positive, so it's an injection well
 
 # %%
-# Initial conditions
-# ------------------
-#
-# Define the starting concentrations
-sconc = xr.DataArray(
-    data=np.full((nlay, nrow, ncol), 0.0),
-    coords={
-        "y": [0.5],
-        "x": np.arange(0.5 * dx, dx * ncol, dx),
-        "layer": np.arange(1, nlay + 1),
-        "dx": dx,
-        "dy": dy,
-    },
-    dims=("layer", "y", "x"),
-)
-
-sconc[75, :, 15:30] = 280.0
-
-fig, ax = plt.subplots()
-sconc.plot(y="layer", yincrease=False, ax=ax)
-
-# %%
 # Define the icbund, which sets which cells
 # in the solute transport model are active, inactive or constant.
+#
+# In this case the central 15 cells on the top row have a constant concentration,
+# And, on both sides, the outer 15 cells of the top row are inactive in the transport model.
 
 icbund = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 1.0),
@@ -138,6 +119,30 @@ icbund[75, :, 15:30] = -1.0
 
 fig, ax = plt.subplots()
 icbund.plot(y="layer", yincrease=False, ax=ax)
+
+# %%
+# Initial conditions
+# ------------------
+#
+# Define the starting concentrations
+
+sconc = xr.DataArray(
+    data=np.full((nlay, nrow, ncol), 0.0),
+    coords={
+        "y": [0.5],
+        "x": np.arange(0.5 * dx, dx * ncol, dx),
+        "layer": np.arange(1, nlay + 1),
+        "dx": dx,
+        "dy": dy,
+    },
+    dims=("layer", "y", "x"),
+)
+
+sconc[75, :, 15:30] = 280.0
+
+fig, ax = plt.subplots()
+sconc.plot(y="layer", yincrease=False, ax=ax)
+
 
 # %%
 # Define starting heads, these will be inserted in the Basic Flow (BAS) package
