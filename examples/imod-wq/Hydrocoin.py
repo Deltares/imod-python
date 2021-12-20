@@ -3,6 +3,14 @@ Hydrocoin
 =========
 
 A 2D case from the Hydrological Code Intercomparison (Hydrocoin).
+
+For more information see:
+
+Konikow, L. F., Sanford, W. E., & Campbell, P. J. (1997). 
+Constant-concentration boundary condition: 
+Lessons from the HYDROCOIN variable-density groundwater benchmark problem. 
+*Water Resources Research, 33*(10), 2253-2261. 
+https://doi.org/10.1029/97WR01926
 """
 
 # %%
@@ -11,6 +19,8 @@ import pandas as pd
 import xarray as xr
 
 import imod
+
+import matplotlib.pyplot as plt
 
 # Discretization
 nrow = 1  # number of rows
@@ -34,13 +44,16 @@ bnd = xr.DataArray(
     dims=("layer", "y", "x"),
 )
 
-bnd.plot()
+fig, ax = plt.subplots()
+bnd.plot(y="layer", yincrease=False, ax=ax)
 
 # set up constant heads
 bnd[0, :, :] = -1
 bnd[75, :, 0:15] = 0.0
 bnd[75, :, 30:45] = 0.0
-bnd.plot(y="layer", yincrease=False)
+
+fig, ax = plt.subplots()
+bnd.plot(y="layer", yincrease=False, ax=ax)
 
 # setup tops and bottoms
 top1D = xr.DataArray(
@@ -70,9 +83,12 @@ sconc = xr.DataArray(
 )
 
 sconc[75, :, 15:30] = 280.0
-sconc.plot(y="layer", yincrease=False)
 
-# Define the icbund
+fig, ax = plt.subplots()
+sconc.plot(y="layer", yincrease=False, ax=ax)
+
+# Define the icbund, which sets which cells
+# in the solute transport model are active, inactive or constant.
 icbund = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 1.0),
     coords={
@@ -88,7 +104,9 @@ icbund = xr.DataArray(
 icbund[75, :, 0:15] = 0.0
 icbund[75, :, 30:45] = 0.0
 icbund[75, :, 15:30] = -1.0
-icbund.plot(y="layer", yincrease=False)
+
+fig, ax = plt.subplots()
+icbund.plot(y="layer", yincrease=False, ax=ax)
 
 # Define horizontal hydraulic conductivity
 khv = xr.DataArray(
@@ -104,7 +122,9 @@ khv = xr.DataArray(
 )
 
 khv[75, :, 15:30] = 0.0008475
-khv.plot(y="layer", yincrease=False)
+
+fig, ax = plt.subplots()
+khv.plot(y="layer", yincrease=False, ax=ax)
 
 # Define starting heads
 shd = xr.DataArray(
@@ -168,7 +188,9 @@ shd[0, :, :] = np.array(
         0.00,
     ]
 )
-shd.plot(y="layer", yincrease=False)
+
+fig, ax = plt.subplots()
+shd.plot(y="layer", yincrease=False, ax=ax)
 
 
 # Finally, we build the model.
@@ -208,6 +230,13 @@ m.write(modeldir, resultdir_is_workdir=True)
 
 # Visualise results
 # head = imod.idf.open("Hydrocoin/results/head/*.idf")
-# head.plot(yincrease=False)
-# conc = imod.idf.open("Hydrocoin/results/conc/*.idf")
-# conc.plot(levels=range(0, 35, 5), yincrease=False)
+#
+#  fig, ax = plt.subplots()
+# head.plot(yincrease=False, ax=ax)
+#
+#  conc = imod.idf.open("Hydrocoin/results/conc/*.idf")
+#
+# fig, ax = plt.subplots()
+# conc.plot(levels=range(0, 35, 5), yincrease=False, ax=ax)
+
+# %%
