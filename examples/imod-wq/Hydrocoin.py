@@ -9,7 +9,7 @@ For more information see:
 Konikow, L. F., Sanford, W. E., & Campbell, P. J. (1997). 
 Constant-concentration boundary condition: 
 Lessons from the HYDROCOIN variable-density groundwater benchmark problem. 
-*Water Resources Research, 33* (10), 2253-2261. 
+`Water Resources Research, 33` (10), 2253-2261. 
 https://doi.org/10.1029/97WR01926
 """
 
@@ -42,7 +42,7 @@ dx = 20.0
 dy = -dx
 
 # %%
-# setup tops and bottoms
+# Set up tops and bottoms
 top1D = xr.DataArray(
     np.arange(nlay * dz, 0.0, -dz), {"layer": np.arange(1, nlay + 1)}, ("layer")
 )
@@ -50,7 +50,8 @@ top1D = xr.DataArray(
 bot = top1D - dz
 
 # %%
-# Setup ibound, which sets where active cells are (ibound = 1.0).
+# Set up ibound, which sets where active cells are (ibound = 1.0).
+
 bnd = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 1.0),
     coords={
@@ -64,7 +65,8 @@ bnd = xr.DataArray(
 )
 
 #%%
-# Set inactive cells by specifying `bnd[index] = 0.0`
+# Set inactive cells by specifying ``bnd[index] = 0.0``
+
 bnd[75, :, 0:15] = 0.0
 bnd[75, :, 30:45] = 0.0
 
@@ -76,7 +78,7 @@ bnd.plot(y="layer", yincrease=False, ax=ax)
 # -------------------
 #
 # Set the constant heads by specifying a negative value in iboud,
-# that is: `bnd[index] = -1``
+# that is: ``bnd[index] = -1``
 
 bnd[0, :, :] = -1
 
@@ -267,14 +269,14 @@ m.time_discretization(times=["2000-01-01T00:00", "2010-01-01T00:00"])
 modeldir = imod.util.temporary_directory()
 m.write(modeldir, resultdir_is_workdir=True)
 
-#%%
+# %%
 # Run
 # ---
 #
 # You can run the model using the comand prompt and the iMOD-WQ executable.
 # This is part of the iMOD v5 release, which can be downloaded here:
-# https://oss.deltares.nl/web/imod/download-imod5
-# This unfortunately only works on Windows.
+# https://oss.deltares.nl/web/imod/download-imod5 .
+# This only works on Windows.
 
 # %%
 # Visualise results
@@ -285,12 +287,12 @@ m.write(modeldir, resultdir_is_workdir=True)
 #
 # .. code:: python
 #
-#    head = imod.idf.open("Hydrocoin/results/head/*.idf")
+#    head = imod.idf.open(modeldir / "results/head/*.idf")
 #
 #    fig, ax = plt.subplots()
 #    head.plot(yincrease=False, ax=ax)
 #
-#    conc = imod.idf.open("Hydrocoin/results/conc/*.idf")
+#    conc = imod.idf.open(modeldir / "results/conc/*.idf")
 #
 #    fig, ax = plt.subplots()
 #    conc.plot(levels=range(0, 35, 5), yincrease=False, ax=ax)
