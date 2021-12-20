@@ -14,11 +14,9 @@
 #
 import pkg_resources
 
-import imod
-
 # -- Project information -----------------------------------------------------
 
-project = "imod-python"
+project = "iMOD Python"
 copyright = "Deltares"
 author = "Martijn Visser, Huite Bootsma"
 
