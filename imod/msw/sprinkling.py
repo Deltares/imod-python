@@ -1,7 +1,5 @@
 import pathlib
 
-import numpy as np
-import pandas as pd
 import xarray as xr
 
 from imod.msw.pkgbase import Package, VariableMetaData
@@ -48,22 +46,22 @@ class Sprinkling(Package):
         raise NotImplementedError("Needs to put actual logic here.")
 
         # Create DataFrame
-        dataframe = pd.DataFrame(
-            {
-                "svat": svat,
-                "max_abstraction_groundwater_mm_d": max_abstraction_groundwater_mm_d,
-                "max_abstraction_surfacewater_mm_d": max_abstraction_surfacewater_mm_d,
-                "max_abstraction_groundwater_m3_d": max_abstraction_groundwater_m3_d,
-                "max_abstraction_surfacewater_m3_d": max_abstraction_surfacewater_m3_d,
-                "svat_groundwater": svat_groundwater,
-                "layer": layer,
-                "trajectory": trajectory,
-            }
-        )
+        # dataframe = pd.DataFrame(
+        #     {
+        #         "svat": svat,
+        #         "max_abstraction_groundwater_mm_d": max_abstraction_groundwater_mm_d,
+        #         "max_abstraction_surfacewater_mm_d": max_abstraction_surfacewater_mm_d,
+        #         "max_abstraction_groundwater_m3_d": max_abstraction_groundwater_m3_d,
+        #         "max_abstraction_surfacewater_m3_d": max_abstraction_surfacewater_m3_d,
+        #         "svat_groundwater": svat_groundwater,
+        #         "layer": layer,
+        #         "trajectory": trajectory,
+        #     }
+        # )
 
-        self._check_range(dataframe)
+        # self._check_range(dataframe)
 
-        return self.write_dataframe_fixed_width(file, dataframe)
+        # return self.write_dataframe_fixed_width(file, dataframe)
 
     def write(self, directory):
         directory = pathlib.Path(directory)
