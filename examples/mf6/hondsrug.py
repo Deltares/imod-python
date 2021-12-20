@@ -24,6 +24,8 @@ import xarray as xr
 
 import imod
 
+import matplotlib.pyplot as plt
+
 # %%
 # Before starting to create the input data, we will create the groundwater
 # model variable (gwf_model) using `imod.mf6.GroundwaterFlowModel
@@ -143,7 +145,8 @@ interpolated_head = interpolated_head_larger.sel(
 )
 
 # Plotting the clipped interpolation
-interpolated_head.plot.imshow()
+fig, ax = plt.subplots()
+interpolated_head.plot.imshow(ax=ax)
 
 # %%
 # The final step is to assign the 2D heads interpolation to all the
@@ -248,6 +251,9 @@ gwf_model["chd"] = imod.mf6.ConstantHead(
 # xarray function
 # `xr.open_dataset <http://xarray.pydata.org/en/stable/generated/xarray.open_dataset.html#xarray.open_dataset>`_,
 # slicing the area to the model's miminum and maximum dimensions.
+#
+# Note that the meteorological data has mm/d as unit and
+# this has to be converted to m/d for Modflow 6.
 
 xmin = 230_000.0
 xmax = 257_000.0
@@ -258,8 +264,8 @@ meteorology = imod.data.hondsrug_meteorology()
 pp = meteorology["precipitation"]
 evt = meteorology["evapotranspiration"]
 
-pp = pp.sel(x=slice(xmin, xmax), y=slice(ymax, ymin)) / 1000.0  # to meters
-evt = evt.sel(x=slice(xmin, xmax), y=slice(ymax, ymin)) / 1000.0  # to meters
+pp = pp.sel(x=slice(xmin, xmax), y=slice(ymax, ymin)) / 1000.0  # from mm/d to m/d
+evt = evt.sel(x=slice(xmin, xmax), y=slice(ymax, ymin)) / 1000.0  # from mm/d to m/d
 
 # %%
 # Recharge - Steady state
@@ -274,20 +280,26 @@ evt = evt.sel(x=slice(xmin, xmax), y=slice(ymax, ymin)) / 1000.0  # to meters
 # **Precipitation**
 pp_ss = pp.sel(time=slice("2000-01-01", "2009-12-31"))
 pp_ss_mean = pp_ss.mean(dim="time")
-pp_ss_mean.plot()
+
+fig, ax = plt.subplots()
+pp_ss_mean.plot(ax=ax)
 
 # %%
 # **Evapotranspiration**
 evt_ss = evt.sel(time=slice("2000-01-01", "2009-12-31"))
 evt_ss_mean = evt_ss.mean(dim="time")
-evt_ss_mean.plot()
+
+fig, ax = plt.subplots()
+evt_ss_mean.plot(ax=ax)
 
 # %%
 # For the recharge calculation, a first estimate
 # is the difference between the precipitation and evapotranspiration values.
 
 rch_ss = pp_ss_mean - evt_ss_mean
-rch_ss.plot.imshow()
+
+fig, ax = plt.subplots()
+rch_ss.plot.imshow(ax=ax)
 
 # %%
 # Recharge - Transient
@@ -372,7 +384,8 @@ rch_total
 rch_total = rch_total.transpose("time", "layer", "y", "x")
 rch_total
 
-rch_total.isel(layer=2, time=6).plot.imshow()
+fig, ax = plt.subplots()
+rch_total.isel(layer=2, time=6).plot.imshow(ax=ax)
 
 # %%
 # Adding information to the RCH package
@@ -603,17 +616,20 @@ hds
 
 # %%
 # We can plot the data of an individual layer as follows
-hds.sel(layer=3).isel(time=3).plot()
+fig, ax = plt.subplots()
+hds.sel(layer=3).isel(time=3).plot(ax=ax)
 
 # %%
 # As you can see layer 3 has some missing cells in the west
 # Whereas layer 4 only contains active cells in the
 # eastern peatland area
-hds.sel(layer=4).isel(time=3).plot()
+fig, ax = plt.subplots()
+hds.sel(layer=4).isel(time=3).plot(ax=ax)
 # %%
 # Layer 5 contains more data towards the west,
 # but has no active cells in the centre.
-hds.sel(layer=5).isel(time=3).plot()
+fig, ax = plt.subplots()
+hds.sel(layer=5).isel(time=3).plot(ax=ax)
 
 # %%
 # As you can see the data is individual layers
@@ -628,4 +644,5 @@ hds.sel(layer=5).isel(time=3).plot()
 # and then computing the mean across the layer dimension
 # with ``mean(dim="layer")``.
 
-hds.sel(layer=slice(3, 5)).mean(dim="layer").isel(time=3).plot()
+fig, ax = plt.subplots()
+hds.sel(layer=slice(3, 5)).mean(dim="layer").isel(time=3).plot(ax=ax)
