@@ -15,6 +15,8 @@ import imod
 
 import matplotlib.pyplot as plt
 
+# sphinx_gallery_thumbnail_number = -1
+
 # Discretization
 nrow = 1
 ncol = 80

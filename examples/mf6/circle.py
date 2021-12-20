@@ -27,6 +27,8 @@ import xugrid as xu
 
 import imod
 
+# sphinx_gallery_thumbnail_number = -1
+
 # %%
 # Create a mesh
 # -------------

@@ -22,6 +22,8 @@ import imod
 
 import matplotlib.pyplot as plt
 
+# sphinx_gallery_thumbnail_number = -1
+
 # Discretization
 nrow = 1  # number of rows
 ncol = 45  # number of columns

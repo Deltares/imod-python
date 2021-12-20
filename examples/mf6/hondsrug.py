@@ -15,6 +15,9 @@ In overview, the model features:
     * Precipitation and evapotranspiration.
 
 """
+
+# sphinx_gallery_thumbnail_number = -1
+
 # %% Import packages
 # We'll start with the usual imports, and an import from scipy.
 
