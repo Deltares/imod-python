@@ -16,13 +16,14 @@ def dis_recarr(arrdict, layer, notnull):
     nrow = notnull.sum()
     recarr = np.empty(nrow, dtype=sparse_dtype)
     # Fill in the indices
-    if layer is not None:
-        recarr["layer"] = layer
+    if layer.size == 1:
         recarr["row"], recarr["column"] = (np.argwhere(notnull) + 1).transpose()
+        recarr["layer"] = layer
     else:
-        recarr["layer"], recarr["row"], recarr["column"] = (
-            np.argwhere(notnull) + 1
-        ).transpose()
+        ilayer, irow, icolumn = np.argwhere(notnull).transpose()
+        recarr["row"] = irow + 1
+        recarr["column"] = icolumn + 1
+        recarr["layer"] = layer[ilayer]
     return recarr
 
 
@@ -35,11 +36,13 @@ def disv_recarr(arrdict, layer, notnull):
     nrow = notnull.sum()
     recarr = np.empty(nrow, dtype=sparse_dtype)
     # Fill in the indices
-    if layer is not None:
-        recarr["layer"] = layer
+    if layer.size == 1:
         recarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
+        recarr["layer"] = layer
     else:
-        recarr["layer"], recarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
+        ilayer, icell2d = np.argwhere(notnull).transpose()
+        recarr["cell2d"] = icell2d + 1
+        recarr["layer"] = layer[ilayer]
     return recarr
 
 
@@ -224,7 +227,7 @@ class Package(abc.ABC):
         if not return None
         """
 
-        if "layer" in ds.coords and "layer" not in ds.dims:
+        if "layer" in ds.coords:
             layer = ds["layer"].values
         else:
             layer = None
