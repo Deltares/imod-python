@@ -172,10 +172,7 @@ simulation.time_discretization(
 # %%
 # We'll create a new directory in which we will write and run the model.
 
-import pathlib
-
 modeldir = imod.util.temporary_directory()
-modeldir = pathlib.Path("ex01-twri")
 simulation.write(modeldir)
 
 # %%
@@ -215,3 +212,5 @@ head.isel(layer=0, time=0).plot.contourf()
 # .. _Harbaugh & McDonald, 1996: https://pubs.er.usgs.gov/publication/ofr96485
 # .. _Harbaugh, 2005: https://pubs.er.usgs.gov/publication/tm6A16
 # .. _FloPy: https://github.com/modflowpy/flopy
+
+# %%

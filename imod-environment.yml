@@ -4,9 +4,6 @@ channels:
   - conda-forge
   - defaults
 
-# note that these are the developer dependencies,
-# if you only want the user dependencies, see
-# install_requires in setup.cfg
 dependencies:
   - affine
   - black

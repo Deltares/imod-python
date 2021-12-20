@@ -7,9 +7,9 @@ between fresh and salt water.
 
 For a detailed description of this benchmark, see:
 
-Bakker, M., Oude Essink, G. H. P., & Langevin, C. D. (2004). 
-The rotating movement of three immiscible fluids - A benchmark problem. 
-`Journal of Hydrology, 287` (1-4), 270-278. 
+Bakker, M., Oude Essink, G. H. P., & Langevin, C. D. (2004).
+The rotating movement of three immiscible fluids - A benchmark problem.
+`Journal of Hydrology, 287` (1-4), 270-278.
 https://doi.org/10.1016/j.jhydrol.2003.10.007
 """
 

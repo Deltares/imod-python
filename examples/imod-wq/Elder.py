@@ -5,16 +5,16 @@ Elder
 The classic 2D Elder problem demonstrates free convection.
 Traditionally this was created for heat transport, but we use
 a modified version for salt tranpsort.
-The conceptual model can be seen as a 2D sand box, 
-with on top a salt lake in the center and fresh lakes 
+The conceptual model can be seen as a 2D sand box,
+with on top a salt lake in the center and fresh lakes
 on both the outer edges of the top row.
 
 More info about the theory behind the Elder problem:
 
-Simpson, J., & Clement, P. (2003). 
-Theoretical analysis of the worthiness of Henry and Elder 
+Simpson, J., & Clement, P. (2003).
+Theoretical analysis of the worthiness of Henry and Elder
 problems as benchmark of density-dependent groundwater flow models.
-`Advances in Water Resources, 1708` (02). 
+`Advances in Water Resources, 1708` (02).
 Retrieved from http://www.eng.auburn.edu/~clemept/publsihed_pdf/awrmat.pdf
 """
 

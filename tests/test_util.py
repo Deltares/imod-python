@@ -399,3 +399,54 @@ def test_is_divisor():
     assert not util.is_divisor(-a, b)
     assert not util.is_divisor(a, -b)
     assert not util.is_divisor(-a, -b)
+
+
+def test_empty():
+    da = util.empty_2d(1.0, 0.0, 2.0, -1.0, 10.0, 12.0)
+    assert da.isnull().all()
+    assert np.allclose(da["x"], [0.5, 1.5])
+    assert np.allclose(da["y"], [11.5, 10.5])
+    assert da.dims == ("y", "x")
+
+    with pytest.raises(ValueError, match="layer must be 1d"):
+        util.empty_3d(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, [[1, 2]])
+
+    da3d = util.empty_3d(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, 1)
+    assert da3d.ndim == 3
+    da3d = util.empty_3d(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, [1, 3])
+    assert np.array_equal(da3d["layer"], [1, 3])
+    assert da3d.dims == ("layer", "y", "x")
+
+    times = ["2000-01-01", "2001-01-01"]
+    with pytest.raises(ValueError, match="time must be 1d"):
+        util.empty_2d_transient(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, [times])
+
+    da2dt = util.empty_2d_transient(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, times[0])
+    assert da2dt.ndim == 3
+    da2dt = util.empty_2d_transient(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, times)
+    assert isinstance(da2dt["time"].values[0], np.datetime64)
+    assert da2dt.dims == ("time", "y", "x")
+
+    da3dt = util.empty_3d_transient(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, [0, 1], times)
+    assert da3dt.ndim == 4
+    assert da3dt.dims == ("time", "layer", "y", "x")
+
+
+def test_where():
+    a = xr.DataArray(
+        [[0.0, 1.0], [2.0, np.nan]],
+        {"y": [1.5, 0.5], "x": [0.5, 1.5]},
+        ["y", "x"],
+    )
+    cond = a <= 1
+    actual = util.where(cond, if_true=a, if_false=1.0)
+    assert np.allclose(actual.values, [[0.0, 1.0], [1.0, np.nan]], equal_nan=True)
+
+    actual = util.where(cond, if_true=0.0, if_false=1.0)
+    assert np.allclose(actual.values, [[0.0, 0.0], [1.0, 1.0]], equal_nan=True)
+
+    actual = util.where(cond, if_true=a, if_false=1.0, keep_nan=False)
+    assert np.allclose(actual.values, [[0.0, 1.0], [1.0, 1.0]])
+
+    with pytest.raises(ValueError, match="at least one of"):
+        util.where(False, 1, 0)

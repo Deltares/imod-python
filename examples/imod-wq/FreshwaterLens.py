@@ -17,7 +17,7 @@ import imod
 
 # sphinx_gallery_thumbnail_number = -1
 
-#%%
+# %%
 # Discretization
 # --------------
 #

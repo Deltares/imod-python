@@ -20,12 +20,13 @@ import pathlib
 import re
 import tempfile
 import warnings
-from typing import Union
+from typing import Any, Dict, Sequence, Tuple, Union
 
 import affine
 import cftime
 import dateutil
 import numpy as np
+import pandas as pd
 import xarray as xr
 
 try:
@@ -55,7 +56,7 @@ def to_datetime(s):
     return time
 
 
-def _groupdict(stem, pattern):
+def _groupdict(stem: str, pattern: str) -> Dict:
     if pattern is not None:
         if isinstance(pattern, Pattern):
             d = pattern.match(stem).groupdict()
@@ -94,7 +95,7 @@ def _groupdict(stem, pattern):
     return d
 
 
-def decompose(path, pattern=None):
+def decompose(path, pattern: str = None) -> Dict[str, Any]:
     r"""
     Parse a path, returning a dict of the parts, following the iMOD conventions.
 
@@ -213,7 +214,7 @@ def _convert_datetimes(times, use_cftime):
     return converted, use_cftime
 
 
-def _compose_timestring(time, time_format="%Y%m%d%H%M%S"):
+def _compose_timestring(time, time_format="%Y%m%d%H%M%S") -> str:
     """
     Compose timestring from time. Function takes care of different
     types of available time objects.
@@ -230,10 +231,10 @@ def _compose_timestring(time, time_format="%Y%m%d%H%M%S"):
             return time.strftime(time_format)
 
 
-def compose(d, pattern=None):
+def compose(d, pattern=None) -> pathlib.Path:
     """
     From a dict of parts, construct a filename, following the iMOD
-    conventions. Returns a pathlib.Path.
+    conventions.
     """
     haslayer = "layer" in d
     hastime = "time" in d
@@ -275,7 +276,7 @@ def compose(d, pattern=None):
         return pathlib.Path(s)
 
 
-def _xycoords(bounds, cellsizes):
+def _xycoords(bounds, cellsizes) -> Dict[str, Any]:
     """Based on bounds and cellsizes, construct coords with spatial information"""
     # unpack tuples
     xmin, xmax, ymin, ymax = bounds
@@ -302,7 +303,7 @@ def _xycoords(bounds, cellsizes):
     return coords
 
 
-def coord_reference(da_coord):
+def coord_reference(da_coord) -> Tuple[float, float, float]:
     """
     Extracts dx, xmin, xmax for a coordinate DataArray, where x is any coordinate.
 
@@ -367,7 +368,9 @@ def coord_reference(da_coord):
     return dx, xmin, xmax
 
 
-def spatial_reference(a):
+def spatial_reference(
+    a: xr.DataArray,
+) -> Tuple[float, float, float, float, float, float]:
     """
     Extracts spatial reference from DataArray.
 
@@ -389,7 +392,7 @@ def spatial_reference(a):
     return dx, xmin, xmax, dy, ymin, ymax
 
 
-def transform(a):
+def transform(a: xr.DataArray) -> affine.Affine:
     """
     Extract the spatial reference information from the DataArray coordinates,
     into an affine.Affine object for writing to e.g. rasterio supported formats.
@@ -425,7 +428,7 @@ def transform(a):
 
 
 @contextlib.contextmanager
-def cd(path):
+def cd(path: Union[str, pathlib.Path]):
     """
     Change directory, and change it back after the with block.
 
@@ -641,7 +644,7 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
     return _unstack_layers(ds)
 
 
-def is_divisor(numerator, denominator) -> bool:
+def is_divisor(numerator: FloatArray, denominator: float) -> bool:
     """
     Parameters
     ----------
@@ -657,7 +660,7 @@ def is_divisor(numerator, denominator) -> bool:
     return (np.isclose(remainder, 0.0) | np.isclose(remainder, denominator)).all()
 
 
-def initialize_nested_dict(depth):
+def initialize_nested_dict(depth: int) -> collections.defaultdict:
     """
     Initialize a nested dict with a fixed depth
 
@@ -689,7 +692,7 @@ def initialize_nested_dict(depth):
         return collections.defaultdict(d)
 
 
-def set_nested(d, keys, value):
+def set_nested(d: collections.defaultdict, keys: list[str], value: Any) -> None:
     """
     Set in the deepest dict of a set of nested dictionaries, as created by the
     initialize_nested_dict function above.
@@ -713,7 +716,7 @@ def set_nested(d, keys, value):
         set_nested(d[keys[0]], keys[1:], value)
 
 
-def append_nested_dict(dict1, dict2):
+def append_nested_dict(dict1: Dict, dict2: Dict) -> None:
     """
     Recursively walk through two dicts to append dict2 to dict1.
 
@@ -743,7 +746,7 @@ def append_nested_dict(dict1, dict2):
             dict1[key] = val
 
 
-def sorted_nested_dict(d):
+def sorted_nested_dict(d: Dict) -> Dict:
     """
     Sorts a variably nested dict (of dicts) by keys.
 
@@ -765,3 +768,273 @@ def sorted_nested_dict(d):
         return [
             sorted_nested_dict(v) for (_, v) in sorted(d.items(), key=lambda t: t[0])
         ]
+
+
+def _layer(layer: Union[int, Sequence[int], IntArray]) -> IntArray:
+    layer = np.atleast_1d(layer)
+    if layer.ndim > 1:
+        raise ValueError("layer must be 1d")
+    return layer
+
+
+def _time(time: Any) -> Any:
+    time = np.atleast_1d(time)
+    if time.ndim > 1:
+        raise ValueError("time must be 1d")
+    return pd.to_datetime(time)
+
+
+def empty_2d(
+    dx: Union[float, FloatArray],
+    xmin: float,
+    xmax: float,
+    dy: Union[float, FloatArray],
+    ymin: float,
+    ymax: float,
+) -> xr.DataArray:
+    """
+    Create an empty 2D (x, y) DataArray.
+
+    ``dx`` and ``dy`` may be provided as:
+
+        * scalar: for equidistant spacing
+        * array: for non-equidistant spacing
+
+    Note that xarray (and netCDF4) uses midpoint coordinates. ``xmin`` and
+    ``xmax`` are used to generate the appropriate midpoints.
+
+    Parameters
+    ----------
+    dx: float, 1d array of floats
+        cell size along x
+    xmin: float
+    xmax: float
+    dy: float, 1d array of floats
+        cell size along y
+    ymin: float
+    ymax: float
+
+    Returns
+    -------
+    empty: xr.DataArray
+        Filled with NaN.
+    """
+    bounds = (xmin, xmax, ymin, ymax)
+    cellsizes = (dx, dy)
+    coords = _xycoords(bounds, cellsizes)
+    nrow = coords["y"].size
+    ncol = coords["x"].size
+    return xr.DataArray(
+        data=np.full((nrow, ncol), np.nan), coords=coords, dims=["y", "x"]
+    )
+
+
+def empty_3d(
+    dx: Union[float, FloatArray],
+    xmin: float,
+    xmax: float,
+    dy: Union[float, FloatArray],
+    ymin: float,
+    ymax: float,
+    layer: Union[int, Sequence[int], IntArray],
+) -> xr.DataArray:
+    """
+    Create an empty 2D (x, y) DataArray.
+
+    ``dx`` and ``dy`` may be provided as:
+
+        * scalar: for equidistant spacing
+        * array: for non-equidistant spacing
+
+    Note that xarray (and netCDF4) uses midpoint coordinates. ``xmin`` and
+    ``xmax`` are used to generate the appropriate midpoints.
+
+    Parameters
+    ----------
+    dx: float, 1d array of floats
+        cell size along x
+    xmin: float
+    xmax: float
+    dy: float, 1d array of floats
+        cell size along y
+    ymin: float
+    ymax: float
+    layer: int, sequence of integers, 1d array of integers
+
+    Returns
+    -------
+    empty: xr.DataArray
+        Filled with NaN.
+    """
+    bounds = (xmin, xmax, ymin, ymax)
+    cellsizes = (dx, dy)
+    coords = _xycoords(bounds, cellsizes)
+    nrow = coords["y"].size
+    ncol = coords["x"].size
+    layer = _layer(layer)
+    coords["layer"] = layer
+
+    return xr.DataArray(
+        data=np.full((layer.size, nrow, ncol), np.nan),
+        coords=coords,
+        dims=["layer", "y", "x"],
+    )
+
+
+def empty_2d_transient(
+    dx: Union[float, FloatArray],
+    xmin: float,
+    xmax: float,
+    dy: Union[float, FloatArray],
+    ymin: float,
+    ymax: float,
+    time: Any,
+) -> xr.DataArray:
+    """
+    Create an empty transient 2D (time, x, y) DataArray.
+
+    ``dx`` and ``dy`` may be provided as:
+
+        * scalar: for equidistant spacing
+        * array: for non-equidistant spacing
+
+    Note that xarray (and netCDF4) uses midpoint coordinates. ``xmin`` and
+    ``xmax`` are used to generate the appropriate midpoints.
+
+    Parameters
+    ----------
+    dx: float, 1d array of floats
+        cell size along x
+    xmin: float
+    xmax: float
+    dy: float, 1d array of floats
+        cell size along y
+    ymin: float
+    ymax: float
+    time: Any
+        One or more of: str, numpy datetime64, pandas Timestamp
+
+    Returns
+    -------
+    empty: xr.DataArray
+        Filled with NaN.
+    """
+    bounds = (xmin, xmax, ymin, ymax)
+    cellsizes = (dx, dy)
+    coords = _xycoords(bounds, cellsizes)
+    nrow = coords["y"].size
+    ncol = coords["x"].size
+    time = _time(time)
+    coords["time"] = time
+    return xr.DataArray(
+        data=np.full((time.size, nrow, ncol), np.nan),
+        coords=coords,
+        dims=["time", "y", "x"],
+    )
+
+
+def empty_3d_transient(
+    dx: Union[float, FloatArray],
+    xmin: float,
+    xmax: float,
+    dy: Union[float, FloatArray],
+    ymin: float,
+    ymax: float,
+    layer: Union[int, Sequence[int], IntArray],
+    time: Any,
+) -> xr.DataArray:
+    """
+    Create an empty transient 3D (time, layer, x, y) DataArray.
+
+    ``dx`` and ``dy`` may be provided as:
+
+        * scalar: for equidistant spacing
+        * array: for non-equidistant spacing
+
+    Note that xarray (and netCDF4) uses midpoint coordinates. ``xmin`` and
+    ``xmax`` are used to generate the appropriate midpoints.
+
+    Parameters
+    ----------
+    dx: float, 1d array of floats
+        cell size along x
+    xmin: float
+    xmax: float
+    dy: float, 1d array of floats
+        cell size along y
+    ymin: float
+    ymax: float
+    layer: int, sequence of integers, 1d array of integers
+    time: Any
+        One or more of: str, numpy datetime64, pandas Timestamp
+
+    Returns
+    -------
+    empty: xr.DataArray
+        Filled with NaN.
+    """
+    bounds = (xmin, xmax, ymin, ymax)
+    cellsizes = (dx, dy)
+    coords = _xycoords(bounds, cellsizes)
+    nrow = coords["y"].size
+    ncol = coords["x"].size
+    layer = _layer(layer)
+    coords["layer"] = layer
+    time = _time(time)
+    coords["time"] = time
+    return xr.DataArray(
+        data=np.full((time.size, layer.size, nrow, ncol), np.nan),
+        coords=coords,
+        dims=["time", "layer", "y", "x"],
+    )
+
+
+def where(condition, if_true, if_false, keep_nan: bool = True) -> xr.DataArray:
+    """
+    Wrapped version of xarray's ``.where``.
+
+    This wrapped version does two differently:
+
+    Firstly, it prioritizes the dimensions as: ``if_true > if_false > condition``.
+    ``xarray.where(cond, a, b)`` will choose the dimension over ``a`` or ``b``.
+    This may result in unwanted dimension orders such as ``("y", "x", "layer)``
+    rather than ``("layer", "y', "x")``.
+
+    Secondly, it preserves the NaN values of ``if_true`` by default.  If we
+    wish to replace all values over 5 by 5, yet keep the NoData parts, this
+    requires two operations with with xarray's ``where``.
+
+    Parameters
+    ----------
+    condition: DataArray, Dataset
+        Locations at which to preserve this object's values. dtype must be `bool`.
+    if_true : scalar, DataArray or Dataset, optional
+        Value to use for locations where ``cond`` is True.
+    if_false : scalar, DataArray or Dataset, optional
+        Value to use for locations where ``cond`` is False.
+    keep_nan: bool, default: True
+        Whether to keep the NaN values in place of ``if_true``.
+    """
+    xr_obj = (xr.DataArray, xr.Dataset)
+    da_true = isinstance(if_true, xr_obj)
+    da_false = isinstance(if_false, xr_obj)
+    da_cond = isinstance(condition, xr_obj)
+
+    # Give priority to where_true or where_false for broadcasting.
+    if da_true:
+        new = if_true.copy()
+    elif da_false:
+        new = xr.full_like(if_false, if_true)
+    elif da_cond:
+        new = xr.full_like(condition, if_true, dtype=type(if_true))
+    else:
+        raise ValueError(
+            "at least one of {condition, if_true, if_false} should be a "
+            "DataArray or Dataset"
+        )
+
+    new = new.where(condition, other=if_false)
+    if keep_nan and da_true:
+        new = new.where(if_true.notnull())
+
+    return new

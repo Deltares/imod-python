@@ -10,15 +10,22 @@ Remove all values over 5.0:
 
     da = da.where(da < 5.0)
     
-Let's say we want to replace all values ``< 5`` by a ``1``, and all values
-``>= 5`` by a ``2``:
+Let's say we want to replace all values ``< 5`` by a ``1``, and all values ``>=
+5`` by a ``2``. The easiest way to do this is by using :py:func:`imod.util.where`:
+
+.. code-block:: python
+
+    condition = old < 5.0
+    new = imod.util.where(condition, if_true=1, if_false=2)
+
+This can also be done with xarray directly, but is less convenient:
 
 .. code-block:: python
 
     condition = old < 5.0
     new = xr.full_like(old, 2.0)
     new = new.where(condition, other=1)
-    
+ 
 Alternatively:
 
 .. code-block:: python
@@ -29,8 +36,19 @@ Alternatively:
 .. note::
 
     When ``condition`` does not have the same dimension as ``x`` or ``y``, you
-    may end up with an unexpected dimension order; ``da = da.where(...)`` always
-    preserves the dimension order of ``da``.
+    may end up with an unexpected dimension order; ``da = da.where(...)``
+    always preserves the dimension order of ``da``. Using
+    :py:func:`imod.util.where` avoids this.
+
+.. note::
+
+    Xarray uses NaN (Not-A-Number) for nodata / fill values. NaN values have
+    special properties in inequality operations: ``(np.nan < 5) is False``, but also
+    ``(np.nan >= 5) is False`` as well.
+    
+    For this reason, :py:func:`imod.util.where` defaults to keeping NaNs by default:
+    ``imod.util.where(old < 5.0, old, 5.0)`` will preserve the NaN values, while
+    ``xr.where(old < 5.0, old, 5.0)`` will fill the NaN values with 5.0
 
 Conditional evaluation
 **********************
@@ -138,19 +156,19 @@ For just a two dimensional x-y grid:
 
 .. code-block:: python
 
-    da = imod.util.empty2d(dx, xmin, xmax, dy, ymin, ymax)
+    da = imod.util.empty_2d(dx, xmin, xmax, dy, ymin, ymax)
     
 For a three dimensional version:
     
 .. code-block:: python
 
-    da = imod.util.empty3d(dx, xmin, xmax, dy, ymin, ymax, layer=[1, 2, 3])
+    da = imod.util.empty_3d(dx, xmin, xmax, dy, ymin, ymax, layer=[1, 2, 3])
 
 For a time varying 2d grid:
 
 .. code-block:: python
 
-    da = imod.util.empty2d_transient(
+    da = imod.util.empty_2d_transient(
         dx, xmin, xmax, dy, ymin, ymax, time=pd.date_range("2020-01-01", "2020-02-01")
     )
 
@@ -158,7 +176,7 @@ For a time varying 3d grid:
 
 .. code-block:: python
 
-    da = imod.util.empty3d_transient(
+    da = imod.util.empty_3d_transient(
         dx,
         xmin,
         xmax,
@@ -225,8 +243,8 @@ To compute a sum:
 .. note:: 
 
     This is not the most efficient way of computing zonal statistics. If it
-    takes a long time or consumes a lot of memory, see e.g. xarray-spatial's
-    zonal stats function.
+    takes a long time or consumes a lot of memory, see e.g. `xarray-spatial's
+    zonal stats`_ function.
 
 Force loading into memory / dask array to numpy array
 *****************************************************
@@ -261,4 +279,4 @@ Sum properties over layers
 .. _xarray documentation on resampling: https://xarray.pydata.org/en/stable/user-guide/time-series.html#resampling-and-grouped-operations.
 .. _xarray documentation on interpolation of NaN values: https://xarray.pydata.org/en/stable/generated/xarray.DataArray.interpolate_na.html
 .. _convolution: https://en.wikipedia.org/wiki/Convolution
-.. _xarray spatial's zonal stats: https://xarray-spatial.org/reference/_autosummary/xrspatial.zonal.stats.html
+.. _xarray-spatial's zonal stats: https://xarray-spatial.org/reference/_autosummary/xrspatial.zonal.stats.html

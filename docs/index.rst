@@ -67,7 +67,7 @@ Issues: https://gitlab.com/deltares/imod/imod-python/-/issues
    examples/index
    api/index
    faq/index
-   development/index
+   developing
 
 .. _Deltares: https://www.deltares.nl
 .. _dask: https://dask.org/
