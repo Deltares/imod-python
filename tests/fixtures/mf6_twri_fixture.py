@@ -1,5 +1,3 @@
-import subprocess
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -167,7 +165,5 @@ def twri_result(tmpdir_factory):
     modeldir = tmpdir_factory.mktemp("ex01-twri")
     simulation = make_twri_model()
     simulation.write(modeldir)
-    with imod.util.cd(modeldir):
-        p = subprocess.run("mf6", check=True, capture_output=True, text=True)
-        assert p.stdout.endswith("Normal termination of simulation.\n")
+    simulation.run()
     return modeldir

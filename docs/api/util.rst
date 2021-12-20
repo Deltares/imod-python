@@ -21,6 +21,4 @@ Utilities
     spatial_reference
     transform
 
-    ugrid2d_data
-    ugrid2d_topology
     to_ugrid2d

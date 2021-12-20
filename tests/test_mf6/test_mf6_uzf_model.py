@@ -1,4 +1,3 @@
-import subprocess
 import sys
 
 import numpy as np
@@ -161,8 +160,7 @@ def test_simulation_write(uzf_model, tmp_path):
     modeldir = tmp_path / "uzf_model"
     simulation.write(modeldir)
     with imod.util.cd(modeldir):
-        p = subprocess.run("mf6", check=True, capture_output=True, text=True)
-        assert p.stdout.endswith("Normal termination of simulation.\n")
+        simulation.run()
         head = imod.mf6.open_hds("GWF_1/GWF_1.hds", "GWF_1/dis.dis.grb")
         assert head.dims == ("time", "layer", "y", "x")
         assert head.shape == (47, 7, 9, 9)

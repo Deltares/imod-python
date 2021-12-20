@@ -432,6 +432,7 @@ def test_simulation_write_and_run(twri_model, tmp_path):
     head = imod.mf6.open_hds(
         modeldir / "GWF_1/GWF_1.hds", modeldir / "GWF_1/dis.dis.grb"
     )
+    assert isinstance(head, xr.DataArray)
     assert head.dims == ("time", "layer", "y", "x")
     assert head.shape == (1, 3, 15, 15)
     meanhead_layer = head.groupby("layer").mean(dim=xr.ALL_DIMS)

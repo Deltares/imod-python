@@ -46,8 +46,8 @@ Import a single netCDF variable as DataArray
     da = xr.open_dataarray("variable.nc")
     
 
-Convert to UGRID netCDF
-***********************
+Convert structured data to UGRID netCDF
+***************************************
 
 With :func:`imod.util.to_ugrid2d`:
 

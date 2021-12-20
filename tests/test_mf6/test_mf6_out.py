@@ -2,6 +2,7 @@ import dask
 import numpy as np
 import pytest
 import xarray as xr
+import xugrid as xu
 
 import imod
 
@@ -180,4 +181,28 @@ def test_open_cbc__dis(twri_result):
         for array in cbc.values():
             assert array.shape == (1, 3, 15, 15)
             assert isinstance(array, xr.DataArray)
+            assert isinstance(array.data, dask.array.Array)
+
+
+@pytest.mark.usefixtures("circle_result")
+def test_open_cbc__disv(circle_result):
+    modeldir = circle_result
+    with imod.util.cd(modeldir):
+        cbc = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/disv.disv.grb")
+        assert isinstance(cbc, dict)
+        assert sorted(cbc.keys()) == [
+            "chd",
+            "flow-horizontal-face",
+            "flow-horizontal-face-x",
+            "flow-horizontal-face-y",
+            "flow-lower-face",
+        ]
+        for key, array in cbc.items():
+            if key in ("chd", "flow-lower-face"):
+                assert array.shape == (1, 2, 216)
+                assert array.dims[-1] == array.ugrid.grid.face_dimension
+            else:
+                assert array.shape == (1, 2, 342)
+                assert array.dims[-1] == array.ugrid.grid.edge_dimension
+            assert isinstance(array, xu.UgridDataArray)
             assert isinstance(array.data, dask.array.Array)

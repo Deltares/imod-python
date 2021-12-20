@@ -11,7 +11,6 @@ from imod import (
     prepare,
     rasterio,
     select,
-    tec,
     util,
     visualize,
     wq,
