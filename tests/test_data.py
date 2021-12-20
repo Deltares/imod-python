@@ -8,7 +8,7 @@ import imod
 def test_twri_output():
     dirpath = imod.util.temporary_directory()
     imod.data.twri_output(dirpath)
-    contents = os.listdir(dirpath)
+    contents = sorted(os.listdir(dirpath))
 
     assert contents == [
         "twri.cbc",
