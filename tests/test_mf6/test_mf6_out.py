@@ -63,14 +63,14 @@ def test_read_cbc_headers(twri_result):
         headers = imod.mf6.read_cbc_headers("GWF_1/GWF_1.cbc")
         assert isinstance(headers, dict)
         assert sorted(headers.keys()) == [
-            "chd-1",
-            "drn-1",
+            "chd",
+            "drn",
             "flow-ja-face",
-            "wel-1",
+            "wel",
         ]
-        assert isinstance(headers["chd-1"], list)
+        assert isinstance(headers["chd"], list)
         assert isinstance(headers["flow-ja-face"][0], imod.mf6.out.cbc.Imeth1Header)
-        assert isinstance(headers["chd-1"][0], imod.mf6.out.cbc.Imeth6Header)
+        assert isinstance(headers["chd"][0], imod.mf6.out.cbc.Imeth6Header)
 
 
 def test_dis_indices():
@@ -170,12 +170,12 @@ def test_open_cbc__dis(twri_result):
         cbc = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/dis.dis.grb")
         assert isinstance(cbc, dict)
         assert sorted(cbc.keys()) == [
-            "chd-1",
-            "drn-1",
+            "chd",
+            "drn",
             "flow-front-face",
             "flow-lower-face",
             "flow-right-face",
-            "wel-1",
+            "wel",
         ]
         for array in cbc.values():
             assert array.shape == (1, 3, 15, 15)

@@ -105,7 +105,7 @@ class GroundwaterFlowModel(Model):
             pkg_id = pkg._pkg_id
             key = f"{pkg_id}6"
             path = dir_for_render / f"{pkgname}.{pkg_id}"
-            packages.append((key, path.as_posix()))
+            packages.append((key, path.as_posix(), pkgname))
         d["packages"] = packages
         return self._template.render(d)
 

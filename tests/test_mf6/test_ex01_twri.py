@@ -369,15 +369,15 @@ def test_gwfmodel_render(twri_model, tmp_path):
             end options
 
             begin packages
-              dis6 {path}/dis.dis
-              chd6 {path}/chd.chd
-              drn6 {path}/drn.drn
-              ic6 {path}/ic.ic
-              npf6 {path}/npf.npf
-              oc6 {path}/oc.oc
-              rch6 {path}/rch.rch
-              wel6 {path}/wel.wel
-              sto6 {path}/sto.sto
+              dis6 {path}/dis.dis dis
+              chd6 {path}/chd.chd chd
+              drn6 {path}/drn.drn drn
+              ic6 {path}/ic.ic ic
+              npf6 {path}/npf.npf npf
+              oc6 {path}/oc.oc oc
+              rch6 {path}/rch.rch rch
+              wel6 {path}/wel.wel wel
+              sto6 {path}/sto.sto sto
             end packages
             """
     )
