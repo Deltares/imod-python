@@ -13,6 +13,8 @@ import xarray as xr
 
 import imod
 
+import matplotlib.pyplot as plt
+
 # Discretization
 nrow = 1  # number of rows
 ncol = 80  # number of column
@@ -36,7 +38,8 @@ bnd = xr.DataArray(
     dims=("layer", "y", "x"),
 )
 
-bnd.plot()
+fig, ax = plt.subplots()
+bnd.plot(y="layer", yincrease=False, ax=ax)
 
 # set constant heads
 bnd[21, :, 0] = -1
@@ -61,7 +64,9 @@ sconc = xr.DataArray(
 )
 
 sconc[16:24, :, 41:80] = 35.0
-sconc.plot(y="layer", yincrease=False)
+
+fig, ax = plt.subplots()
+sconc.plot(y="layer", yincrease=False, ax=ax)
 
 # Finally, we build the model.
 
@@ -98,10 +103,13 @@ m.write(modeldir, resultdir_is_workdir=True)
 # You can run the model using the comand prompt and the iMOD SEAWAT executable
 
 # Results
-
+#
 # head = imod.idf.open("SaltwaterPocket/results/head/*.idf")
-# head.plot(yincrease=False)
+# fig, ax = plt.subplots()
+# head.plot(yincrease=False, ax=ax)
+#
 # conc = imod.idf.open("SaltwaterPocket/results/conc/*.idf")
-# conc.plot(levels=range(0, 35, 5), yincrease=False)
+# fig, ax = plt.subplots()
+# conc.plot(levels=range(0, 35, 5), yincrease=False, ax=ax)
 
 # %%
