@@ -9,11 +9,12 @@ For more information see:
 Konikow, L. F., Sanford, W. E., & Campbell, P. J. (1997). 
 Constant-concentration boundary condition: 
 Lessons from the HYDROCOIN variable-density groundwater benchmark problem. 
-*Water Resources Research, 33*(10), 2253-2261. 
+*Water Resources Research, 33* (10), 2253-2261. 
 https://doi.org/10.1029/97WR01926
 """
 
 # %%
+# We'll start with the usual imports
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -24,7 +25,14 @@ import matplotlib.pyplot as plt
 
 # sphinx_gallery_thumbnail_number = -1
 
+# %%
 # Discretization
+# --------------
+#
+# We'll start off by creating a model discretization, since
+# this is a simple conceptual model.
+# The model is a 2D cross-section, hence `nrow = 1`.
+
 nrow = 1  # number of rows
 ncol = 45  # number of columns
 nlay = 76  # number of layers
@@ -33,7 +41,16 @@ dz = 4.0
 dx = 20.0
 dy = -dx
 
-# setup ibound
+# %%
+# setup tops and bottoms
+top1D = xr.DataArray(
+    np.arange(nlay * dz, 0.0, -dz), {"layer": np.arange(1, nlay + 1)}, ("layer")
+)
+
+bot = top1D - dz
+
+# %%
+# Setup ibound, which sets where active cells are (ibound = 1.0).
 bnd = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 1.0),
     coords={
@@ -46,31 +63,39 @@ bnd = xr.DataArray(
     dims=("layer", "y", "x"),
 )
 
-fig, ax = plt.subplots()
-bnd.plot(y="layer", yincrease=False, ax=ax)
-
-# set up constant heads
-bnd[0, :, :] = -1
+#%%
+# Set inactive cells by specifying `bnd[index] = 0.0`
 bnd[75, :, 0:15] = 0.0
 bnd[75, :, 30:45] = 0.0
 
 fig, ax = plt.subplots()
 bnd.plot(y="layer", yincrease=False, ax=ax)
 
-# setup tops and bottoms
-top1D = xr.DataArray(
-    np.arange(nlay * dz, 0.0, -dz), {"layer": np.arange(1, nlay + 1)}, ("layer")
-)
+# %%
+# Boundary Conditions
+# -------------------
+#
+# Set the constant heads by specifying a negative value in iboud,
+# that is: `bnd[index] = -1``
 
-bot = top1D - dz
+bnd[0, :, :] = -1
 
+
+fig, ax = plt.subplots()
+bnd.plot(y="layer", yincrease=False, ax=ax)
+
+
+# %%
 # Define WEL data, need to define the x, y, and pumping rate (q)
 weldata = pd.DataFrame()
 weldata["x"] = np.full(1, 0.5 * dx)
 weldata["y"] = np.full(1, 0.5)
 weldata["q"] = 0.28512  # positive, so it's an injection well
 
-
+# %%
+# Initial conditions
+# ------------------
+#
 # Define the starting concentrations
 sconc = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 0.0),
@@ -89,8 +114,10 @@ sconc[75, :, 15:30] = 280.0
 fig, ax = plt.subplots()
 sconc.plot(y="layer", yincrease=False, ax=ax)
 
+# %%
 # Define the icbund, which sets which cells
 # in the solute transport model are active, inactive or constant.
+
 icbund = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 1.0),
     coords={
@@ -110,25 +137,9 @@ icbund[75, :, 15:30] = -1.0
 fig, ax = plt.subplots()
 icbund.plot(y="layer", yincrease=False, ax=ax)
 
-# Define horizontal hydraulic conductivity
-khv = xr.DataArray(
-    data=np.full((nlay, nrow, ncol), 0.847584),
-    coords={
-        "y": [0.5],
-        "x": np.arange(0.5 * dx, dx * ncol, dx),
-        "layer": np.arange(1, nlay + 1),
-        "dx": dx,
-        "dy": dy,
-    },
-    dims=("layer", "y", "x"),
-)
+# %%
+# Define starting heads, these will be inserted in the Basic Flow (BAS) package
 
-khv[75, :, 15:30] = 0.0008475
-
-fig, ax = plt.subplots()
-khv.plot(y="layer", yincrease=False, ax=ax)
-
-# Define starting heads
 shd = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 0.0),
     coords={
@@ -194,8 +205,35 @@ shd[0, :, :] = np.array(
 fig, ax = plt.subplots()
 shd.plot(y="layer", yincrease=False, ax=ax)
 
+# %%
+# Hydrogeology
+# ------------
+#
+# Define horizontal hydraulic conductivity
 
+khv = xr.DataArray(
+    data=np.full((nlay, nrow, ncol), 0.847584),
+    coords={
+        "y": [0.5],
+        "x": np.arange(0.5 * dx, dx * ncol, dx),
+        "layer": np.arange(1, nlay + 1),
+        "dx": dx,
+        "dy": dy,
+    },
+    dims=("layer", "y", "x"),
+)
+
+khv[75, :, 15:30] = 0.0008475
+
+fig, ax = plt.subplots()
+khv.plot(y="layer", yincrease=False, ax=ax)
+
+# %%
+# Build
+# -----
+#
 # Finally, we build the model.
+
 m = imod.wq.SeawatModel("Hydrocoin")
 m["bas"] = imod.wq.BasicFlow(ibound=bnd, top=304.0, bottom=bot, starting_head=shd)
 m["lpf"] = imod.wq.LayerPropertyFlow(
@@ -224,21 +262,38 @@ m["oc"] = imod.wq.OutputControl(save_head_idf=True, save_concentration_idf=True)
 m.time_discretization(times=["2000-01-01T00:00", "2010-01-01T00:00"])
 
 
+# %%
 # Now we write the model, including runfile:
 modeldir = imod.util.temporary_directory()
 m.write(modeldir, resultdir_is_workdir=True)
 
-# You can run the model using the comand prompt and the iMOD SEAWAT executable
+#%%
+# Run
+# ---
+#
+# You can run the model using the comand prompt and the iMOD-WQ executable.
+# This is part of the iMOD v5 release, which can be downloaded here:
+# https://oss.deltares.nl/web/imod/download-imod5
+# This unfortunately only works on Windows.
 
+# %%
 # Visualise results
-# head = imod.idf.open("Hydrocoin/results/head/*.idf")
+# -----------------
 #
-#  fig, ax = plt.subplots()
-# head.plot(yincrease=False, ax=ax)
+# After succesfully running the model, you can
+# plot results as follows:
 #
-#  conc = imod.idf.open("Hydrocoin/results/conc/*.idf")
+# .. code:: python
 #
-# fig, ax = plt.subplots()
-# conc.plot(levels=range(0, 35, 5), yincrease=False, ax=ax)
+#    head = imod.idf.open("Hydrocoin/results/head/*.idf")
+#
+#    fig, ax = plt.subplots()
+#    head.plot(yincrease=False, ax=ax)
+#
+#    conc = imod.idf.open("Hydrocoin/results/conc/*.idf")
+#
+#    fig, ax = plt.subplots()
+#    conc.plot(levels=range(0, 35, 5), yincrease=False, ax=ax)
+#
 
 # %%
