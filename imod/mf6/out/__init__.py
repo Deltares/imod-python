@@ -43,6 +43,7 @@ import xarray as xr
 import xugrid as xu
 
 from . import dis, disu, disv
+from .cbc import read_cbc_headers
 from .common import FilePath, _grb_text
 
 _READ_GRB = {

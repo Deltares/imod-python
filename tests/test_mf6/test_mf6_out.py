@@ -7,14 +7,15 @@ import imod
 
 
 @pytest.mark.usefixtures("twri_result")
-def test_open_disgrb(twri_result):
+def test_read_disgrb(twri_result):
     modeldir = twri_result
     with imod.util.cd(modeldir):
-        grb = imod.mf6.out.open_disgrb("GWF_1/dis.dis.grb")
+        grb = imod.mf6.out.read_grb("GWF_1/dis.dis.grb")
         assert isinstance(grb, dict)
         assert sorted(grb.keys()) == [
             "bottom",
             "coords",
+            "distype",
             "ia",
             "icelltype",
             "idomain",
@@ -26,6 +27,7 @@ def test_open_disgrb(twri_result):
             "nrow",
             "top",
         ]
+        assert grb["distype"] == "dis"
         assert isinstance(grb["bottom"], xr.DataArray)
         assert isinstance(grb["coords"], dict)
         assert isinstance(grb["ia"], np.ndarray)
@@ -67,8 +69,8 @@ def test_read_cbc_headers(twri_result):
             "wel-1",
         ]
         assert isinstance(headers["chd-1"], list)
-        assert isinstance(headers["flow-ja-face"][0], imod.mf6.out.Imeth1Header)
-        assert isinstance(headers["chd-1"][0], imod.mf6.out.Imeth6Header)
+        assert isinstance(headers["flow-ja-face"][0], imod.mf6.out.cbc.Imeth1Header)
+        assert isinstance(headers["chd-1"][0], imod.mf6.out.cbc.Imeth6Header)
 
 
 def test_dis_indices():
@@ -88,7 +90,7 @@ def test_dis_indices():
     nlayer = 1
     nrow = 2
     ncol = 3
-    right, front, lower = imod.mf6.out._dis_indices(ia, ja, ncells, nlayer, nrow, ncol)
+    right, front, lower = imod.mf6.out.dis.dis_indices(ia, ja, ncells, nlayer, nrow, ncol)
     assert right.shape == front.shape == lower.shape == (nlayer, nrow, ncol)
     assert (lower == -1).all()  # No lower connections
     right_expected = np.array(
@@ -137,7 +139,7 @@ def test_dis_indices__idomain():
     nlayer = 3
     nrow = 3
     ncol = 1
-    right, front, lower = imod.mf6.out._dis_indices(ia, ja, ncells, nlayer, nrow, ncol)
+    right, front, lower = imod.mf6.out.dis.dis_indices(ia, ja, ncells, nlayer, nrow, ncol)
     assert (front == -1).all()  # No front connections
     right_expected = np.array(
         [
@@ -166,9 +168,9 @@ def test_open_cbc__dis(twri_result):
         assert sorted(cbc.keys()) == [
             "chd-1",
             "drn-1",
-            "front-face-flow",
-            "lower-face-flow",
-            "right-face-flow",
+            "flow-front-face",
+            "flow-lower-face",
+            "flow-right-face",
             "wel-1",
         ]
         for array in cbc.values():

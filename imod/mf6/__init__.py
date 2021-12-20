@@ -8,7 +8,6 @@ from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.drn import Drainage
 from imod.mf6.evt import Evapotranspiration
 from imod.mf6.ghb import GeneralHeadBoundary
-from imod.mf6.hfb import HorizontalFlowBarrier
 from imod.mf6.ic import InitialConditions
 from imod.mf6.ims import (
     Solution,
