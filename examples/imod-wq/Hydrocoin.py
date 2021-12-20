@@ -6,7 +6,7 @@ A 2D case from the Hydrological Code Intercomparison (Hydrocoin).
 
 For more information see:
 
-Konikow, L. F., Sanford, W. E., & Campbell, P. J. (1997). 
+Konikow, L. F., Sanford, W. E., & Campbell, P. J. (1997).
 Constant-concentration boundary condition: Lessons from the HYDROCOIN
 variable-density groundwater benchmark problem.  Water Resources Research, 33
 (10), 2253-2261. https://doi.org/10.1029/97WR01926

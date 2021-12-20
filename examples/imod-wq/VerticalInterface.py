@@ -66,7 +66,7 @@ bnd = xr.DataArray(
 fig, ax = plt.subplots()
 bnd.plot(y="layer", yincrease=False, ax=ax)
 
-#%%
+# %%
 # Define the icbund, which sets which cells
 # in the solute transport model are active, inactive or constant.
 #
