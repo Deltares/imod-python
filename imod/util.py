@@ -18,6 +18,7 @@ import functools
 import os
 import pathlib
 import re
+import tempfile
 import warnings
 from typing import Union
 
@@ -440,6 +441,11 @@ def cd(path):
         yield
     finally:
         os.chdir(curdir)
+
+
+def temporary_directory() -> pathlib.Path:
+    tempdir = tempfile.TemporaryDirectory()
+    return pathlib.Path(tempdir.name)
 
 
 @contextlib.contextmanager

@@ -1,8 +1,23 @@
-imod.prepare  -  Prepare model input
-------------------------------------
+.. currentmodule:: imod.prepare
 
-.. automodule:: imod.prepare
-    :members:
-    :imported-members:
-    :undoc-members:
-    :show-inheritance:
+Prepare model input
+-------------------
+
+.. autosummary::
+    :toctree: generated/prepare
+
+    Regridder
+    LayerRegridder
+    Voxelizer
+
+    fill
+    laplace_interpolate
+
+    polygonize
+
+    reproject
+
+    rasterize
+    gdal_rasterize
+    celltable
+    rasterize_celltable

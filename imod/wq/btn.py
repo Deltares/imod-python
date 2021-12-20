@@ -61,15 +61,6 @@ class BasicTransport(Package):
         Default value is 0.01 (i.e., 1% of the model layer thickness).
     """
 
-    __slots__ = (
-        "icbund",
-        "starting_concentration",
-        "porosity",
-        "n_species",
-        "inactive_concentration",
-        "minimum_active_thickness",
-        "thickness",
-    )
     _pkg_id = "btn"
 
     _mapping = (("icbund", "icbund"), ("dz", "thickness"), ("prsity", "porosity"))
@@ -129,13 +120,13 @@ class BasicTransport(Package):
         d["mapping"] = self._mapping
         # Starting concentration also includes a species, and can't be written
         # in the same way as the other variables; _T? in the runfile
-        if "species" in self["starting_concentration"].coords:
+        if "species" in self.dataset["starting_concentration"].coords:
             starting_concentration = {}
 
             for i, species in enumerate(
-                self["starting_concentration"]["species"].values
+                self.dataset["starting_concentration"]["species"].values
             ):
-                da = self["starting_concentration"].sel(species=species)
+                da = self.dataset["starting_concentration"].sel(species=species)
                 starting_concentration[i + 1] = self._compose_values_layer(
                     "starting_concentration", directory, nlayer=nlayer, da=da
                 )
@@ -150,7 +141,7 @@ class BasicTransport(Package):
 
         # Collect which entries are complex (multi-dim)
         data_vars = [t[1] for t in self._mapping]
-        for varname in self.data_vars.keys():
+        for varname in self.dataset.data_vars.keys():
             if varname == "starting_concentration":
                 continue  # skip it, as mentioned above
             if varname in data_vars:  # multi-dim entry
@@ -158,12 +149,12 @@ class BasicTransport(Package):
                     varname, directory, nlayer=nlayer
                 )
             else:  # simple entry, just get the scalar value
-                d[varname] = self[varname].values
+                d[varname] = self.dataset[varname].values
 
         # Add these from the outside, thickness from BasicFlow
         # layer_type from LayerPropertyFlow
         dicts["thickness"] = self._compose_values_layer(
-            "thickness", directory, nlayer=nlayer, da=self.thickness
+            "thickness", directory, nlayer=nlayer, da=self.dataset.thickness
         )
         d["dicts"] = dicts
         return self._template.render(d)
@@ -177,8 +168,8 @@ class BasicTransport(Package):
         ]
         self._check_positive(to_check)
 
-        active_cells = self["icbund"] != 0
-        if (active_cells & np.isnan(self["starting_concentration"])).any():
+        active_cells = self.dataset["icbund"] != 0
+        if (active_cells & np.isnan(self.dataset["starting_concentration"])).any():
             raise ValueError(
                 f"Active cells in icbund may not have a nan value in starting_concentration in {self}"
             )

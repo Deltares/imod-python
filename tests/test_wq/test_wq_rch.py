@@ -74,7 +74,9 @@ def test_render__highest_top(recharge_top):
             rech_p5 = rate_20000105000000.idf"""
     )
 
-    assert rch._render(directory, globaltimes=rch.time.values, nlayer=3) == compare
+    assert (
+        rch._render(directory, globaltimes=rch.dataset.time.values, nlayer=3) == compare
+    )
 
 
 def test_render__layers(recharge_layers):
@@ -97,7 +99,9 @@ def test_render__layers(recharge_layers):
             irch_p5 = recharge_layer_20000105000000.idf"""
     )
 
-    assert rch._render(directory, globaltimes=rch.time.values, nlayer=3) == compare
+    assert (
+        rch._render(directory, globaltimes=rch.dataset.time.values, nlayer=3) == compare
+    )
 
 
 def test_render__highest_active(recharge_ha):
@@ -115,7 +119,9 @@ def test_render__highest_active(recharge_ha):
             rech_p5 = rate_20000105000000.idf"""
     )
 
-    assert rch._render(directory, globaltimes=rch.time.values, nlayer=3) == compare
+    assert (
+        rch._render(directory, globaltimes=rch.dataset.time.values, nlayer=3) == compare
+    )
 
 
 def test_ssm_cellcount_scalar_highest_active(recharge_ha):
@@ -145,7 +151,7 @@ def test_ssm_cellcount_scalar_highest_active(recharge_ha):
 
 @pytest.mark.parametrize("varname", ["rate", "concentration"])
 def test_render__stress_repeats(recharge_ha, varname):
-    rch = recharge_ha.isel(time=0)
+    rch = RechargeHighestActive(**recharge_ha.dataset.isel(time=0))
     directory = pathlib.Path(".")
     da = rch[varname]
     datetimes = pd.date_range("2000-01-01", "2000-01-03")

@@ -37,12 +37,6 @@ class Dispersion(Package):
         iMOD-wq always uses meters and days.
     """
 
-    __slots__ = (
-        "longitudinal",
-        "ratio_horizontal",
-        "ratio_vertical",
-        "diffusion_coefficient",
-    )
     _pkg_id = "dsp"
 
     _mapping = (
@@ -78,7 +72,7 @@ class Dispersion(Package):
         d = {"mapping": self._mapping}
         dicts = {}
 
-        for varname in self.data_vars.keys():
+        for varname in self.dataset.data_vars.keys():
             dicts[varname] = self._compose_values_layer(
                 varname, directory, nlayer=nlayer
             )

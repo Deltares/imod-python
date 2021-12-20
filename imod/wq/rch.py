@@ -7,7 +7,6 @@ from imod.wq.pkgbase import BoundaryCondition
 
 
 class Recharge(BoundaryCondition, abc.ABC):
-    __slots__ = ("_option",)
     _pkg_id = "rch"
 
     _mapping = (("rech", "rate"),)
@@ -30,7 +29,7 @@ class Recharge(BoundaryCondition, abc.ABC):
     def _render(self, directory, globaltimes, nlayer, *args, **kwargs):
         d = {
             "mapping": self._mapping,
-            "save_budget": self["save_budget"].values,
+            "save_budget": self.dataset["save_budget"].values,
             "recharge_option": self._option,
         }
         self._replace_keyword(d, "save_budget")
@@ -73,8 +72,6 @@ class RechargeTopLayer(Recharge):
         Default is False.
     """
 
-    __slots__ = ()
-
     _option = 1
 
     def __init__(self, rate, concentration, save_budget=False):
@@ -109,8 +106,6 @@ class RechargeLayers(Recharge):
         Default is False.
     """
 
-    __slots__ = ()
-
     _option = 2
 
     _mapping = (("rech", "rate"), ("irch", "recharge_layer"))
@@ -123,7 +118,7 @@ class RechargeLayers(Recharge):
         self["save_budget"] = save_budget
 
     def _set_ssm_layers(self, ibound):
-        unique_layers = np.unique(self["recharge_layer"].values)
+        unique_layers = np.unique(self.dataset["recharge_layer"].values)
         unique_layers = unique_layers[~np.isnan(unique_layers)]
         self._ssm_layers = unique_layers.astype(np.int32)
 
@@ -148,8 +143,6 @@ class RechargeHighestActive(Recharge):
         Default is False.
     """
 
-    __slots__ = ()
-
     _option = 3
 
     def __init__(self, rate, concentration, save_budget=False):
@@ -165,9 +158,9 @@ class RechargeHighestActive(Recharge):
         self["save_budget"] = save_budget
 
     def _set_ssm_layers(self, ibound):
-        rate = self["rate"]
+        rate = self.dataset["rate"]
         rate_idf = ("x" in rate.dims) and ("y" in rate.dims)
-        conc_scalar = np.ndim(self["concentration"]) == 0
+        conc_scalar = np.ndim(self.dataset["concentration"]) == 0
         if rate_idf and conc_scalar:
             rch_active = (rate != 0.0) & rate.notnull()
             if "time" in rch_active.dims:

@@ -1,5 +1,4 @@
 import re
-import subprocess
 import sys
 import textwrap
 
@@ -383,8 +382,8 @@ def test_gwfmodel_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    gwfmodel.write(tmp_path / "GWF_1", globaltimes)
-    assert (tmp_path / "GWF_1.nam").is_file()
+    gwfmodel.write(tmp_path, "GWF_1", globaltimes)
+    assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
     assert (tmp_path / "GWF_1").is_dir()
 
 
@@ -418,40 +417,26 @@ def test_simulation_render(twri_model):
 
 @pytest.mark.usefixtures("twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
-def test_simulation_write_binary(twri_model, tmp_path):
+def test_simulation_write_and_run(twri_model, tmp_path):
     simulation = twri_model
-    modeldir = tmp_path / "ex01-twri"
-    simulation.write(modeldir, binary=True)
-    with imod.util.cd(modeldir):
-        p = subprocess.run("mf6", check=True, capture_output=True, text=True)
-        assert p.stdout.endswith("Normal termination of simulation.\n")
-        # hds file is identical to the official example, except for the
-        # time units, which are days here and seconds in the official one
-        head = imod.mf6.open_hds("GWF_1/GWF_1.hds", "GWF_1/dis.dis.grb")
-        assert head.dims == ("time", "layer", "y", "x")
-        assert head.shape == (1, 3, 15, 15)
-        meanhead_layer = head.groupby("layer").mean(dim=xr.ALL_DIMS)
-        mean_answer = np.array([59.79181509, 30.44132373, 24.88576811])
-        assert np.allclose(meanhead_layer, mean_answer)
 
+    with pytest.raises(
+        RuntimeError, match="Simulation ex01-twri has not been written yet."
+    ):
+        twri_model.run()
 
-@pytest.mark.usefixtures("twri_model")
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
-def test_simulation_write_text(twri_model, tmp_path):
-    simulation = twri_model
     modeldir = tmp_path / "ex01-twri"
     simulation.write(modeldir, binary=False)
-    with imod.util.cd(modeldir):
-        p = subprocess.run("mf6", check=True, capture_output=True, text=True)
-        assert p.stdout.endswith("Normal termination of simulation.\n")
-        # hds file is identical to the official example, except for the
-        # time units, which are days here and seconds in the official one
-        head = imod.mf6.open_hds("GWF_1/GWF_1.hds", "GWF_1/dis.dis.grb")
-        assert head.dims == ("time", "layer", "y", "x")
-        assert head.shape == (1, 3, 15, 15)
-        meanhead_layer = head.groupby("layer").mean(dim=xr.ALL_DIMS)
-        mean_answer = np.array([59.79181509, 30.44132373, 24.88576811])
-        assert np.allclose(meanhead_layer, mean_answer)
+    simulation.run()
+
+    head = imod.mf6.open_hds(
+        modeldir / "GWF_1/GWF_1.hds", modeldir / "GWF_1/dis.dis.grb"
+    )
+    assert head.dims == ("time", "layer", "y", "x")
+    assert head.shape == (1, 3, 15, 15)
+    meanhead_layer = head.groupby("layer").mean(dim=xr.ALL_DIMS)
+    mean_answer = np.array([59.79181509, 30.44132373, 24.88576811])
+    assert np.allclose(meanhead_layer, mean_answer)
 
 
 @pytest.mark.usefixtures("transient_twri_model")
@@ -460,9 +445,7 @@ def test_simulation_write_storage(transient_twri_model, tmp_path):
     simulation = transient_twri_model
     modeldir = tmp_path / "ex01-twri-transient"
     simulation.write(modeldir, binary=True)
-    with imod.util.cd(modeldir):
-        p = subprocess.run("mf6", check=True, capture_output=True, text=True)
-        assert p.stdout.endswith("Normal termination of simulation.\n")
+    simulation.run()
 
 
 @pytest.mark.usefixtures("twri_model")

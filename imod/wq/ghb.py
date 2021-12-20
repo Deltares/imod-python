@@ -33,7 +33,6 @@ class GeneralHeadBoundary(BoundaryCondition):
         Default is False.
     """
 
-    __slots__ = ("head", "conductance", "density", "concentration", "save_budget")
     _pkg_id = "ghb"
     _mapping = (("bhead", "head"), ("cond", "conductance"), ("ghbssmdens", "density"))
 
@@ -50,7 +49,7 @@ class GeneralHeadBoundary(BoundaryCondition):
 
     def _pkgcheck(self, ibound=None):
         to_check = ["conductance", "density"]
-        if "concentration" in self.data_vars:
+        if "concentration" in self.dataset.data_vars:
             to_check.append("concentration")
         self._check_positive(to_check)
 

@@ -1,17 +1,37 @@
-imod.mf6  -  Create Modflow 6 model
------------------------------------
+.. currentmodule:: imod.mf6
 
-.. automodule:: imod.mf6
-    :members:
-    :imported-members:
-    :undoc-members:
-    :show-inheritance:
+MODFLOW6
+--------
 
-.. automodule:: imod.mf6.model
-    :members: Model
-    :undoc-members:
-    :show-inheritance:
+.. autosummary::
+    :toctree: generated/mf6
 
-.. automodule:: imod.mf6.pkgbase
-    :members:
-    :show-inheritance:
+    open_hds
+    open_cbc
+    read_cbc_headers
+    
+    Modflow6Simulation
+    GroundwaterFlowModel
+
+    StructuredDiscretization
+    VerticesDiscretization
+    TimeDiscretization
+
+    OutputControl
+    Solution
+    SolutionPresetSimple
+    SolutionPresetModerate
+    SolutionPresetComplex
+    
+    ConstantHead
+    Drainage
+    Evapotranspiration
+    GeneralHeadBoundary
+    InitialConditions
+    NodePropertyFlow
+    Recharge
+    River
+    SpecificStorage
+    StorageCoefficient
+    UnsaturatedZoneFlow
+    Well

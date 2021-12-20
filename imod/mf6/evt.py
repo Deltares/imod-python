@@ -35,7 +35,7 @@ class Evapotranspiration(BoundaryCondition):
     print_flows: ({True, False}, optional)
         Indicates that the list of evapotranspiration flow rates will be printed
         to the listing file for every stress period time step in which "BUDGET
-        PRINT"is specified in Output Control. If there is no Output Control
+        PRINT" is specified in Output Control. If there is no Output Control
         option and PRINT FLOWS is specified, then flow rates are printed for the
         last time step of each stress period.
         Default is False.
@@ -47,18 +47,6 @@ class Evapotranspiration(BoundaryCondition):
         Default is None.
     """
 
-    __slots__ = (
-        "surface",
-        "rate",
-        "depth",
-        "proportion_rate",
-        "proportion_depth",
-        "fixed_cell",
-        "print_input",
-        "print_flows",
-        "save_flows",
-        "observations",
-    )
     _pkg_id = "evt"
     _period_data = ("surface", "rate", "depth", "proportion_depth", "proportion_rate")
     _keyword_map = {}
@@ -77,22 +65,22 @@ class Evapotranspiration(BoundaryCondition):
         save_flows=False,
         observations=None,
     ):
-        super().__init__()
-        self["surface"] = surface
-        self["rate"] = rate
-        self["depth"] = depth
+        super().__init__(locals())
+        self.dataset["surface"] = surface
+        self.dataset["rate"] = rate
+        self.dataset["depth"] = depth
         if ("segment" in proportion_rate.dims) ^ ("segment" in proportion_depth.dims):
             raise ValueError(
                 "Segment must be provided for both proportion_rate and"
                 " proportion_depth, or for none at all."
             )
-        self["proportion_rate"] = proportion_rate
-        self["proportion_depth"] = proportion_depth
-        self["fixed_cell"] = fixed_cell
-        self["print_input"] = print_input
-        self["print_flows"] = print_flows
-        self["save_flows"] = save_flows
-        self["observations"] = observations
+        self.dataset["proportion_rate"] = proportion_rate
+        self.dataset["proportion_depth"] = proportion_depth
+        self.dataset["fixed_cell"] = fixed_cell
+        self.dataset["print_input"] = print_input
+        self.dataset["print_flows"] = print_flows
+        self.dataset["save_flows"] = save_flows
+        self.dataset["observations"] = observations
 
         # TODO: add write logic for transforming proportion rate and depth to
         # the right shape in the binary file.

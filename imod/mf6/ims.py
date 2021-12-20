@@ -331,33 +331,6 @@ class Solution(Package):
         SolutionPresetComplex: No Default
     """
 
-    __slots__ = (
-        "outer_dvclose",
-        "outer_maximum",
-        "inner_maximum",
-        "inner_dvclose",
-        "inner_rclose",
-        "linear_acceleration",
-        "under_relaxation",
-        "under_relaxation_theta",
-        "under_relaxation_kappa",
-        "under_relaxation_gamma",
-        "under_relaxation_momentum",
-        "backtracking_number",
-        "backtracking_tolerance",
-        "backtracking_reduction_factor",
-        "backtracking_residual_limit",
-        "rclose_option",
-        "relaxation_factor",
-        "preconditioner_levels",
-        "preconditioner_drop_tolerance",
-        "number_orthogonalizations",
-        "scaling_method",
-        "reordering_method",
-        "print_option",
-        "csv_output",
-        "no_ptc",
-    )
     _pkg_id = "ims"
     _keyword_map = {}
     _template = Package._initialize_template(_pkg_id)
@@ -391,31 +364,31 @@ class Solution(Package):
         no_ptc=False,
     ):
         super().__init__()
-        self["outer_dvclose"] = outer_dvclose
-        self["outer_maximum"] = outer_maximum
-        self["under_relaxation"] = under_relaxation
-        self["under_relaxation_theta"] = under_relaxation_theta
-        self["under_relaxation_kappa"] = under_relaxation_kappa
-        self["under_relaxation_gamma"] = under_relaxation_gamma
-        self["under_relaxation_momentum"] = under_relaxation_momentum
-        self["backtracking_number"] = backtracking_number
-        self["backtracking_tolerance"] = backtracking_tolerance
-        self["backtracking_reduction_factor"] = backtracking_reduction_factor
-        self["backtracking_residual_limit"] = backtracking_residual_limit
-        self["inner_maximum"] = inner_maximum
-        self["inner_dvclose"] = inner_dvclose
-        self["inner_rclose"] = inner_rclose
-        self["rclose_option"] = rclose_option
-        self["linear_acceleration"] = linear_acceleration
-        self["relaxation_factor"] = relaxation_factor
-        self["preconditioner_levels"] = preconditioner_levels
-        self["preconditioner_drop_tolerance"] = preconditioner_drop_tolerance
-        self["number_orthogonalizations"] = number_orthogonalizations
-        self["scaling_method"] = scaling_method
-        self["reordering_method"] = reordering_method
-        self["print_option"] = print_option
-        self["csv_output"] = csv_output
-        self["no_ptc"] = no_ptc
+        self.dataset["outer_dvclose"] = outer_dvclose
+        self.dataset["outer_maximum"] = outer_maximum
+        self.dataset["under_relaxation"] = under_relaxation
+        self.dataset["under_relaxation_theta"] = under_relaxation_theta
+        self.dataset["under_relaxation_kappa"] = under_relaxation_kappa
+        self.dataset["under_relaxation_gamma"] = under_relaxation_gamma
+        self.dataset["under_relaxation_momentum"] = under_relaxation_momentum
+        self.dataset["backtracking_number"] = backtracking_number
+        self.dataset["backtracking_tolerance"] = backtracking_tolerance
+        self.dataset["backtracking_reduction_factor"] = backtracking_reduction_factor
+        self.dataset["backtracking_residual_limit"] = backtracking_residual_limit
+        self.dataset["inner_maximum"] = inner_maximum
+        self.dataset["inner_dvclose"] = inner_dvclose
+        self.dataset["inner_rclose"] = inner_rclose
+        self.dataset["rclose_option"] = rclose_option
+        self.dataset["linear_acceleration"] = linear_acceleration
+        self.dataset["relaxation_factor"] = relaxation_factor
+        self.dataset["preconditioner_levels"] = preconditioner_levels
+        self.dataset["preconditioner_drop_tolerance"] = preconditioner_drop_tolerance
+        self.dataset["number_orthogonalizations"] = number_orthogonalizations
+        self.dataset["scaling_method"] = scaling_method
+        self.dataset["reordering_method"] = reordering_method
+        self.dataset["print_option"] = print_option
+        self.dataset["csv_output"] = csv_output
+        self.dataset["no_ptc"] = no_ptc
 
 
 def SolutionPresetSimple(print_option, csv_output, no_ptc):

@@ -54,7 +54,6 @@ class PreconditionedConjugateGradientSolver(Package):
         Default value: 1.0.
     """
 
-    __slots__ = ("max_iter", "inner_iter", "rclose", "hclose", "relax", "damp")
     _pkg_id = "pcg"
     _template = (
         "[pcg]\n"
@@ -122,13 +121,6 @@ class GeneralizedConjugateGradientSolver(Package):
         value between 10-4 and 10-6 is generally adequate.
     """
 
-    __slots__ = (
-        "max_iter",
-        "inner_iter",
-        "cclose",
-        "preconditioner",
-        "lump_dispersion",
-    )
     _pkg_id = "gcg"
     _template = (
         "[gcg]\n"
@@ -170,15 +162,13 @@ class ParallelSolver(Package):
     Base package for the parallel solvers.
     """
 
-    __slots__ = ()
-
     def _compute_load_balance_weight(self, ibound):
         if self["partition"] == "rcb":
             if self["load_balance_weight"].values[()] is None:
                 self["load_balance_weight"] = (ibound != 0).sum("layer").astype(float)
 
     def _render(self, directory):
-        d = {k: v.values for k, v in self.data_vars.items()}
+        d = {k: v.values for k, v in self.dataset.data_vars.items()}
         if hasattr(self, "_keywords"):
             for key in self._keywords.keys():
                 self._replace_keyword(d, key)
@@ -279,8 +269,6 @@ class ParallelKrylovFlowSolver(ParallelSolver):
         `pd.DataFrame(load_balance_weight.values).to_csv(path, sep='\\t',
         header=False, index=False, float_format = "%8.2f")`
     """
-
-    __slots__ = ()
 
     _pkg_id = "pksf"
     _template = jinja2.Template(
@@ -410,7 +398,6 @@ class ParallelKrylovTransportSolver(ParallelSolver):
         header=False, index=False, float_format = "%8.2f")`
     """
 
-    __slots__ = ()
     _pkg_id = "pkst"
     _template = jinja2.Template(
         "[pkst]\n"

@@ -41,15 +41,14 @@ class OutputControl(Package):
 
     """
 
-    __slots__ = ("save_head", "save_budget")
     _pkg_id = "oc"
     _keyword_map = {}
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, save_head=None, save_budget=None):
         super().__init__()
-        self["save_head"] = save_head
-        self["save_budget"] = save_budget
+        self.dataset["save_head"] = save_head
+        self.dataset["save_budget"] = save_budget
 
     def _get_ocsetting(self, setting):
         """Get oc setting based on its type. If integers return f'frequency {setting}', if"""
@@ -70,25 +69,25 @@ class OutputControl(Package):
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         modelname = directory.stem
-        if self["save_head"].values[()] is not None:
+        if self.dataset["save_head"].values[()] is not None:
             d["headfile"] = (directory / f"{modelname}.hds").as_posix()
-        if self["save_budget"].values[()] is not None:
+        if self.dataset["save_budget"].values[()] is not None:
             d["budgetfile"] = (directory / f"{modelname}.cbc").as_posix()
 
         periods = collections.defaultdict(dict)
-        for datavar in self.data_vars:
-            if self[datavar].values[()] is None:
+        for datavar in self.dataset.data_vars:
+            if self.dataset[datavar].values[()] is None:
                 continue
             key = datavar.replace("_", " ")
-            if "time" in self[datavar].coords:
-                package_times = self[datavar].coords["time"].values
+            if "time" in self.dataset[datavar].coords:
+                package_times = self.dataset[datavar].coords["time"].values
                 starts = np.searchsorted(globaltimes, package_times) + 1
                 for i, s in enumerate(starts):
-                    setting = self[datavar].isel(time=i).item()
+                    setting = self.dataset[datavar].isel(time=i).item()
                     periods[s][key] = self._get_ocsetting(setting)
 
             else:
-                setting = self[datavar].item()
+                setting = self.dataset[datavar].item()
                 periods[1][key] = self._get_ocsetting(setting)
 
         d["periods"] = periods

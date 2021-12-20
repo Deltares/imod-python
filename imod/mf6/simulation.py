@@ -1,5 +1,6 @@
 import collections
 import pathlib
+import subprocess
 
 import jinja2
 import numpy as np
@@ -17,6 +18,7 @@ class Modflow6Simulation(collections.UserDict):
     def __init__(self, name):
         super().__init__()
         self.name = name
+        self.directory = None
         self._initialize_template()
 
     def __setitem__(self, key, value):
@@ -112,22 +114,34 @@ class Modflow6Simulation(collections.UserDict):
 
         # Write individual models
         globaltimes = self["time_discretization"]["time"].values
-        with imod.util.cd(directory):
-            for key, value in self.items():
-                # skip timedis, exchanges
-                if value._pkg_id == "model":
-                    value.write(
-                        modelname=key,
-                        globaltimes=globaltimes,
-                        binary=binary,
-                    )
-                elif value._pkg_id == "ims":
-                    value.write(
-                        directory=".",
-                        pkgname=key,
-                        globaltimes=globaltimes,
-                        binary=binary,
-                    )
+        for key, value in self.items():
+            # skip timedis, exchanges
+            if value._pkg_id == "model":
+                value.write(
+                    directory=directory,
+                    modelname=key,
+                    globaltimes=globaltimes,
+                    binary=binary,
+                )
+            elif value._pkg_id == "ims":
+                value.write(
+                    directory=directory,
+                    pkgname=key,
+                    globaltimes=globaltimes,
+                    binary=binary,
+                )
+        self.directory = directory
+
+    def run(self, mf6path="mf6") -> None:
+        if self.directory is None:
+            raise RuntimeError(f"Simulation {self.name} has not been written yet.")
+        with imod.util.cd(self.directory):
+            result = subprocess.run(mf6path, capture_output=True)
+            if result.returncode != 0:
+                raise RuntimeError(
+                    f"Simulation {self.name}: {mf6path} failed to run with returncode "
+                    f"{result.returncode}, and error message:\n\n{result.stdout.decode()} "
+                )
 
     def write_qgis_project(self, crs, directory=".", aggregate_layers=False):
         directory = pathlib.Path(directory)

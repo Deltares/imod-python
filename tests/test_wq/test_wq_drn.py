@@ -38,7 +38,7 @@ def test_render(drainage):
 
 
 def test_render_with_time(drainage):
-    drn = drainage.copy()
+    drn = Drainage(**drainage.dataset.copy())
     directory = pathlib.Path(".")
     elev = drn["elevation"]
     datetimes = pd.date_range("2000-01-01", "2000-01-02")

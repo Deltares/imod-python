@@ -31,7 +31,7 @@ class ConstantHead(BoundaryCondition):
     print_flows: ({True, False}, optional)
         Indicates that the list of constant head flow rates will be printed to
         the listing file for every stress period time step in which "BUDGET
-        PRINT"is specified in Output Control. If there is no Output Control
+        PRINT" is specified in Output Control. If there is no Output Control
         option and PRINT FLOWS is specified, then flow rates are printed for the
         last time step of each stress period.
         Default is False.
@@ -42,7 +42,6 @@ class ConstantHead(BoundaryCondition):
         Default is None.
     """
 
-    __slots__ = ("head", "print_input", "print_flows", "save_flows", "observations")
     _pkg_id = "chd"
     _period_data = ("head",)
     _keyword_map = {}
@@ -56,9 +55,9 @@ class ConstantHead(BoundaryCondition):
         save_flows=False,
         observations=None,
     ):
-        super().__init__()
-        self["head"] = head
-        self["print_input"] = print_input
-        self["print_flows"] = print_flows
-        self["save_flows"] = save_flows
-        self["observations"] = observations
+        super().__init__(locals())
+        self.dataset["head"] = head
+        self.dataset["print_input"] = print_input
+        self.dataset["print_flows"] = print_flows
+        self.dataset["save_flows"] = save_flows
+        self.dataset["observations"] = observations

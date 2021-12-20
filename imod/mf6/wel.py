@@ -26,10 +26,10 @@ class Well(BoundaryCondition):
         Default is False.
     print_flows: ({True, False}, optional)
         Indicates that the list of well flow rates will be printed to the
-        listing file for every stress period time step in which "BUDGET PRINT"is
-        specified in Output Control. If there is no Output Control option and
-        PRINT FLOWS is specified, then flow rates are printed for the last time
-        step of each stress period.
+        listing file for every stress period time step in which "BUDGET PRINT"
+        is specified in Output Control. If there is no Output Control option
+        and PRINT FLOWS is specified, then flow rates are printed for the last
+        time step of each stress period.
         Default is False.
     save_flows: ({True, False}, optional)
         Indicates that well flow terms will be written to the file specified
@@ -39,16 +39,6 @@ class Well(BoundaryCondition):
         Default is None.
     """
 
-    __slots__ = (
-        "layer",
-        "row",
-        "column",
-        "rate",
-        "print_input",
-        "print_flows",
-        "save_flows",
-        "observations",
-    )
     _pkg_id = "wel"
     _period_data = ("layer", "row", "column", "rate")
     _keyword_map = {}
@@ -65,17 +55,17 @@ class Well(BoundaryCondition):
         save_flows=False,
         observations=None,
     ):
-        super().__init__()
+        super().__init__(locals())
         index = np.arange(len(layer))
-        self["index"] = index
-        self["layer"] = ("index", layer)
-        self["row"] = ("index", row)
-        self["column"] = ("index", column)
-        self["rate"] = ("index", rate)
-        self["print_input"] = print_input
-        self["print_flows"] = print_flows
-        self["save_flows"] = save_flows
-        self["observations"] = observations
+        self.dataset["index"] = index
+        self.dataset["layer"] = ("index", layer)
+        self.dataset["row"] = ("index", row)
+        self.dataset["column"] = ("index", column)
+        self.dataset["rate"] = ("index", rate)
+        self.dataset["print_input"] = print_input
+        self.dataset["print_flows"] = print_flows
+        self.dataset["save_flows"] = save_flows
+        self.dataset["observations"] = observations
 
     def to_sparse(self, arrdict, layer):
         spec = []

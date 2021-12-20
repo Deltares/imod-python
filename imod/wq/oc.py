@@ -39,17 +39,6 @@ class OutputControl(Package):
         Default value is False.
     """
 
-    __slots__ = (
-        "save_head_idf",
-        "save_concentration_idf",
-        "save_budget_idf",
-        "save_head_tec",
-        "save_concentration_tec",
-        "save_budget_tec",
-        "save_head_vtk",
-        "save_concentration_vtk",
-        "save_budget_vtk",
-    )
     _pkg_id = "oc"
     _template = (
         "[oc]\n"
@@ -82,7 +71,7 @@ class OutputControl(Package):
         self["save_head_idf"] = save_head_idf
         self["save_concentration_idf"] = save_concentration_idf
         self["save_budget_idf"] = save_budget_idf
-        self["save_head_tec"] = save_budget_tec
+        self["save_head_tec"] = save_head_tec
         self["save_concentration_tec"] = save_concentration_tec
         self["save_budget_tec"] = save_budget_tec
         self["save_head_vtk"] = save_head_vtk

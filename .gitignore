@@ -68,6 +68,13 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/user-guide/
+docs/examples/data/
+docs/examples/imod-wq/
+docs/examples/imodflow/
+docs/examples/mf6/
+docs/examples/visualize/
+docs/api/generated
 
 # PyBuilder
 target/
@@ -118,10 +125,13 @@ venv.bak/
 *.run
 
 # Examples
-examples/toth/
-examples/Elder/
-examples/FreshwaterLens/
-examples/HenryCase/
-examples/HydroCoin/
-examples/SaltwaterPocket/
-examples/VerticalInterface/
+old-examples
+examples/imod-wq/*
+examples/imodflow/*
+examples/mf6/*
+examples/prepare/*
+examples/results/*
+examples/user-guide/*
+examples/visualize/*
+examples/data
+!examples/**/*.py

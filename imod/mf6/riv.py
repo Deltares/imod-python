@@ -32,15 +32,6 @@ class River(BoundaryCondition):
         Default is None.
     """
 
-    __slots__ = (
-        "stage",
-        "conductance",
-        "bottom_elevation",
-        "print_input",
-        "print_flows",
-        "save_flows",
-        "observations",
-    )
     _pkg_id = "riv"
     _period_data = ("stage", "conductance", "bottom_elevation")
     _keyword_map = {}
@@ -56,11 +47,11 @@ class River(BoundaryCondition):
         save_flows=False,
         observations=None,
     ):
-        super().__init__()
-        self["stage"] = stage
-        self["conductance"] = conductance
-        self["bottom_elevation"] = bottom_elevation
-        self["print_input"] = print_input
-        self["print_flows"] = print_flows
-        self["save_flows"] = save_flows
-        self["observations"] = observations
+        super().__init__(locals())
+        self.dataset["stage"] = stage
+        self.dataset["conductance"] = conductance
+        self.dataset["bottom_elevation"] = bottom_elevation
+        self.dataset["print_input"] = print_input
+        self.dataset["print_flows"] = print_flows
+        self.dataset["save_flows"] = save_flows
+        self.dataset["observations"] = observations

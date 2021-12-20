@@ -91,12 +91,14 @@ def plot_map(
     colors : list of str, list of RGBA/RGBA tuples, colormap name (str), or LinearSegmentedColormap
         If list, it should be a Matplotlib acceptable list of colors. Length N.
         Accepts both tuples of (R, G, B) and hexidecimal (e.g. `#7ec0ee`).
-                If str, use an existing Matplotlib colormap. This function will
-                autmatically add distinctive colors for pixels lower or high than the given
-                min respectivly max level.
-                If LinearSegmentedColormap, you can use something like
-                `matplotlib.cm.get_cmap('jet')` as input. This function will not alter
-                the colormap, so add under- and over-colors yourself.
+
+        If str, use an existing Matplotlib colormap. This function will
+        autmatically add distinctive colors for pixels lower or high than the
+        given min respectivly max level.
+
+        If LinearSegmentedColormap, you can use something like
+        `matplotlib.cm.get_cmap('jet')` as input. This function will not alter
+        the colormap, so add under- and over-colors yourself.
 
         Looking for good colormaps? Try: http://colorbrewer2.org/
         Choose a colormap, and use the HEX JS array.

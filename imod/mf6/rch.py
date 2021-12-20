@@ -33,7 +33,6 @@ class Recharge(BoundaryCondition):
         Default is None.
     """
 
-    __slots__ = ("rate", "print_input", "print_flows", "save_flows", "observations")
     _pkg_id = "rch"
     _period_data = ("rate",)
     _keyword_map = {}
@@ -47,9 +46,9 @@ class Recharge(BoundaryCondition):
         save_flows=False,
         observations=None,
     ):
-        super().__init__()
-        self["rate"] = rate
-        self["print_input"] = print_input
-        self["print_flows"] = print_flows
-        self["save_flows"] = save_flows
-        self["observations"] = observations
+        super().__init__(locals())
+        self.dataset["rate"] = rate
+        self.dataset["print_input"] = print_input
+        self.dataset["print_flows"] = print_flows
+        self.dataset["save_flows"] = save_flows
+        self.dataset["observations"] = observations

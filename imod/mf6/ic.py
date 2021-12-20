@@ -24,15 +24,14 @@ class InitialConditions(Package):
         provided if a cell should start as dry. (strt)
     """
 
-    __slots__ = ("head",)
     _pkg_id = "ic"
     _grid_data = {"head": np.float64}
     _keyword_map = {"head": "strt"}
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, head):
-        super().__init__()
-        self["head"] = head
+        super().__init__(locals())
+        self.dataset["head"] = head
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

@@ -4,9 +4,46 @@ import pathlib
 import jinja2
 import numpy as np
 import xarray as xr
+import xugrid as xu
 
 
-class Package(xr.Dataset, abc.ABC):
+def dis_recarr(arrdict, layer, notnull):
+    # Define the numpy structured array dtype
+    index_spec = [("layer", np.int32), ("row", np.int32), ("column", np.int32)]
+    field_spec = [(key, np.float64) for key in arrdict]
+    sparse_dtype = np.dtype(index_spec + field_spec)
+    # Initialize the structured array
+    nrow = notnull.sum()
+    recarr = np.empty(nrow, dtype=sparse_dtype)
+    # Fill in the indices
+    if layer is not None:
+        recarr["layer"] = layer
+        recarr["row"], recarr["column"] = (np.argwhere(notnull) + 1).transpose()
+    else:
+        recarr["layer"], recarr["row"], recarr["column"] = (
+            np.argwhere(notnull) + 1
+        ).transpose()
+    return recarr
+
+
+def disv_recarr(arrdict, layer, notnull):
+    # Define the numpy structured array dtype
+    index_spec = [("layer", np.int32), ("cell2d", np.int32)]
+    field_spec = [(key, np.float64) for key in arrdict]
+    sparse_dtype = np.dtype(index_spec + field_spec)
+    # Initialize the structured array
+    nrow = notnull.sum()
+    recarr = np.empty(nrow, dtype=sparse_dtype)
+    # Fill in the indices
+    if layer is not None:
+        recarr["layer"] = layer
+        recarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
+    else:
+        recarr["layer"], recarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
+    return recarr
+
+
+class Package(abc.ABC):
     """
     Package is used to share methods for specific packages with no time
     component.
@@ -19,7 +56,95 @@ class Package(xr.Dataset, abc.ABC):
     not the list input which is used in :class:`BoundaryCondition`.
     """
 
-    __slots__ = ("_template", "_pkg_id", "_period_data")
+    @classmethod
+    def from_file(cls, path, **kwargs):
+        """
+        Loads an imod mf6 package from a file (currently only netcdf and zarr are supported).
+        Note that it is expected that this file was saved with imod.mf6.Package.dataset.to_netcdf(),
+        as the checks upon package initialization are not done again!
+
+        Parameters
+        ----------
+        path : str, pathlib.Path
+            Path to the file.
+        **kwargs : keyword arguments
+            Arbitrary keyword arguments forwarded to ``xarray.open_dataset()``, or
+            ``xarray.open_zarr()``.
+        Refer to the examples.
+
+        Returns
+        -------
+        package : imod.mf6.Package
+            Returns a package with data loaded from file.
+
+        Examples
+        --------
+
+        To load a package from a file, e.g. a River package:
+
+        >>> river = imod.mf6.River.from_file("river.nc")
+
+        For large datasets, you likely want to process it in chunks. You can
+        forward keyword arguments to ``xarray.open_dataset()`` or
+        ``xarray.open_zarr()``:
+
+        >>> river = imod.mf6.River.from_file("river.nc", chunks={"time": 1})
+
+        Refer to the xarray documentation for the possible keyword arguments.
+        """
+
+        # Throw error if user tries to use old functionality
+        if "cache" in kwargs:
+            if kwargs["cache"] is not None:
+                raise NotImplementedError(
+                    "Caching functionality in pkg.from_file() is removed."
+                )
+
+        path = pathlib.Path(path)
+
+        # See https://stackoverflow.com/a/2169191
+        # We expect the data in the netcdf has been saved a a package
+        # thus the checks run by __init__ and __setitem__ do not have
+        # to be called again.
+        return_cls = cls.__new__(cls)
+
+        if path.suffix in (".zip", ".zarr"):
+            # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
+            return_cls.dataset = xr.open_zarr(str(path), **kwargs)
+        else:
+            return_cls.dataset = xr.open_dataset(path, **kwargs)
+
+        return return_cls
+
+    def __init__(self, allargs=None):
+        if allargs is not None:
+            for arg in allargs.values():
+                if isinstance(arg, xu.UgridDataArray):
+                    self.dataset = xu.UgridDataset(grid=arg.ugrid.grid)
+                    return
+        self.dataset = xr.Dataset()
+
+    def __getitem__(self, key):
+        return self.dataset.__getitem__(key)
+
+    def __setitem__(self, key, value):
+        self.dataset.__setitem__(key, value)
+
+    def isel(self):
+        raise NotImplementedError(
+            "Selection on packages not yet supported. To make a selection on "
+            f"the xr.Dataset, call {self._pkg_id}.dataset.isel instead."
+            "You can create a new package with a selection by calling "
+            f"{__class__.__name__}(**{self._pkg_id}.dataset.isel(**selection))"
+        )
+
+    def sel(self):
+        raise NotImplementedError(
+            "Selection on packages not yet supported. To make a selection on "
+            f"the xr.Dataset, call {self._pkg_id}.dataset.sel instead. "
+            "You can create a new package with a selection by calling "
+            f"{__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
+        )
 
     def _valid(self, value):
         """
@@ -58,8 +183,9 @@ class Package(xr.Dataset, abc.ABC):
         return env.get_template(fname)
 
     def write_blockfile(self, directory, pkgname, globaltimes, binary):
+        renderdir = pathlib.Path(directory.stem)
         content = self.render(
-            directory=directory,
+            directory=renderdir,
             pkgname=pkgname,
             globaltimes=globaltimes,
             binary=binary,
@@ -70,27 +196,21 @@ class Package(xr.Dataset, abc.ABC):
 
     def to_sparse(self, arrdict, layer):
         """Convert from dense arrays to list based input"""
+        # TODO stream the data per stress period
         # TODO add pkgcheck that period table aligns
         # Get the number of valid values
         data = next(iter(arrdict.values()))
         notnull = ~np.isnan(data)
-        nrow = notnull.sum()
-        # Define the numpy structured array dtype
-        index_spec = [("layer", np.int32), ("row", np.int32), ("column", np.int32)]
-        field_spec = [(key, np.float64) for key in arrdict]
-        sparse_dtype = np.dtype(index_spec + field_spec)
 
-        # Initialize the structured array
-        recarr = np.empty(nrow, dtype=sparse_dtype)
-        # Fill in the indices
-        if layer is not None:
-            recarr["layer"] = layer
-            recarr["row"], recarr["column"] = (np.argwhere(notnull) + 1).transpose()
+        if isinstance(self.dataset, xr.Dataset):
+            recarr = dis_recarr(arrdict, layer, notnull)
+        elif isinstance(self.dataset, xu.UgridDataset):
+            recarr = disv_recarr(arrdict, layer, notnull)
         else:
-            recarr["layer"], recarr["row"], recarr["column"] = (
-                np.argwhere(notnull) + 1
-            ).transpose()
-
+            raise TypeError(
+                "self.dataset should be xarray.Dataset or xugrid.UgridDataset,"
+                f" is {type(self.dataset)} instead"
+            )
         # Fill in the data
         for key, arr in arrdict.items():
             values = arr[notnull].astype(np.float64)
@@ -167,11 +287,24 @@ class Package(xr.Dataset, abc.ABC):
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
-        for k, v in self.data_vars.items():  # pylint:disable=no-member
+        for k, v in self.dataset.data_vars.items():  # pylint:disable=no-member
             value = v.values[()]
             if self._valid(value):  # skip None and False
                 d[k] = value
         return self._template.render(d)
+
+    @staticmethod
+    def _is_xy_data(obj):
+        if isinstance(obj, (xr.DataArray, xr.Dataset)):
+            xy = "x" in obj.dims and "y" in obj.dims
+        elif isinstance(obj, (xu.UgridDataArray, xu.UgridDataset)):
+            xy = obj.ugrid.grid.face_dimension in obj.dims
+        else:
+            raise TypeError(
+                "obj should be DataArray or UgridDataArray, "
+                f"received {type(obj)} instead"
+            )
+        return xy
 
     def _compose_values(self, da, directory, name, binary):
         """
@@ -184,15 +317,13 @@ class Package(xr.Dataset, abc.ABC):
         """
         layered = False
         values = []
-
-        if "x" in da.dims and "y" in da.dims:
+        if self._is_xy_data(da):
             if binary:
                 path = (directory / f"{name}.bin").as_posix()
                 values.append(f"open/close {path} (binary)")
             else:
                 path = (directory / f"{name}.dat").as_posix()
                 values.append(f"open/close {path}")
-
         else:
 
             if "layer" in da.dims:
@@ -214,13 +345,13 @@ class Package(xr.Dataset, abc.ABC):
         self.write_blockfile(directory, pkgname, globaltimes, binary=binary)
 
         if hasattr(self, "_grid_data"):
-            if "x" in self.dims and "y" in self.dims:
+            if self._is_xy_data(self.dataset):
                 pkgdirectory = directory / pkgname
                 pkgdirectory.mkdir(exist_ok=True, parents=True)
                 for varname, dtype in self._grid_data.items():
                     key = self._keyword_map.get(varname, varname)
-                    da = self[varname]
-                    if "x" in da.dims and "y" in da.dims:
+                    da = self.dataset[varname]
+                    if self._is_xy_data(da):
                         if binary:
                             path = pkgdirectory / f"{key}.bin"
                             self.write_binary_griddata(path, da, dtype)
@@ -255,11 +386,11 @@ class Package(xr.Dataset, abc.ABC):
         """
 
         has_dims = []
-        for varname in self.data_vars.keys():  # pylint:disable=no-member
-            if all(i in self[varname].dims for i in ["x", "y"]):
+        for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
+            if all(i in self.dataset[varname].dims for i in ["x", "y"]):
                 has_dims.append(varname)
 
-        spatial_ds = self[has_dims]
+        spatial_ds = self.dataset[has_dims]
 
         if aggregate_layers and ("layer" in spatial_ds.dims):
             spatial_ds = spatial_ds.mean(dim="layer")
@@ -288,14 +419,12 @@ class BoundaryCondition(Package, abc.ABC):
     not the array input which is used in :class:`Package`.
     """
 
-    __slots__ = ()
-
     def _max_active_n(self):
         """
         Determine the maximum active number of cells that are active
         during a stress period.
         """
-        da = self[self._period_data[0]]
+        da = self.dataset[self._period_data[0]]
         if "time" in da.coords:
             nmax = int(da.groupby("time").count(xr.ALL_DIMS).max())
         else:
@@ -348,10 +477,10 @@ class BoundaryCondition(Package, abc.ABC):
         if not_options is None:
             not_options = self._period_data
 
-        for varname in self.data_vars.keys():  # pylint:disable=no-member
+        for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
                 continue
-            v = self[varname].values[()]
+            v = self.dataset[varname].values[()]
             if self._valid(v):  # skip None and False
                 d[varname] = v
         return d
@@ -377,7 +506,7 @@ class BoundaryCondition(Package, abc.ABC):
             ext = "dat"
 
         if "time" in bin_ds:  # one of bin_ds has time
-            for i in range(len(self.time)):
+            for i in range(len(self.dataset.time)):
                 path = directory / pkgname / f"{self._pkg_id}-{i}.{ext}"
                 self.write_datafile(
                     path, bin_ds.isel(time=i), binary=binary
@@ -392,7 +521,6 @@ class BoundaryCondition(Package, abc.ABC):
 
         directory is modelname
         """
-
         directory = pathlib.Path(directory)
         self.write_blockfile(
             directory=directory,
@@ -408,14 +536,13 @@ class BoundaryCondition(Package, abc.ABC):
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
-    """Class dedicated to advanced boundary conditions, since MF6 does not support
+    """
+    Class dedicated to advanced boundary conditions, since MF6 does not support
     binary files for Advanced Boundary conditions.
 
-    The advanced boundary condition packages are: "uzf", "lak", "maw", "str".
+    The advanced boundary condition packages are: "uzf", "lak", "maw", "sfr".
 
     """
-
-    __slots__ = ()
 
     def _get_field_spec_from_dtype(self, recarr):
         """

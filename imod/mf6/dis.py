@@ -27,20 +27,19 @@ class StructuredDiscretization(Package):
         simulation. if the idomain value for a cell is -1, the cell does not
         exist in the simulation. Furthermore, the first existing cell above will
         be connected to the first existing cell below. This type of cell is
-        referred to as a "vertical pass through"cell.
+        referred to as a "vertical pass through" cell.
     """
 
-    __slots__ = ("top", "bottom", "idomain")
     _pkg_id = "dis"
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, top, bottom, idomain):
-        super().__init__()
-        self["idomain"] = idomain
-        self["bottom"] = bottom
-        self["top"] = top
+        super(__class__, self).__init__(locals())
+        self.dataset["idomain"] = idomain
+        self.dataset["top"] = top
+        self.dataset["bottom"] = bottom
 
     def _delrc(self, dx):
         """
@@ -55,16 +54,16 @@ class StructuredDiscretization(Package):
             raise ValueError(f"Unhandled type of {dx}")
 
     def render(self, directory, pkgname, globaltimes, binary):
-        disdirectory = directory / "dis"
+        disdirectory = directory / pkgname
         d = {}
-        x = self["idomain"].coords["x"]
-        y = self["idomain"].coords["y"]
+        x = self.dataset["idomain"].coords["x"]
+        y = self.dataset["idomain"].coords["y"]
         dx, xmin, _ = imod.util.coord_reference(x)
         dy, ymin, _ = imod.util.coord_reference(y)
 
         d["xorigin"] = xmin
         d["yorigin"] = ymin
-        d["nlay"] = self["idomain"].coords["layer"].size
+        d["nlay"] = self.dataset["idomain"].coords["layer"].size
         d["nrow"] = y.size
         d["ncol"] = x.size
         d["delr"] = self._delrc(np.abs(dx))

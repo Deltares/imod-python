@@ -1,8 +1,32 @@
-imod.flow  -  Create iMODFLOW model
------------------------------------
+.. currentmodule:: imod.flow
 
-.. automodule:: imod.flow
-    :members:
-    :imported-members:
-    :undoc-members:
-    :show-inheritance:
+iMODFLOW
+--------
+
+.. autosummary::
+    :toctree: generated/flow
+    
+    ImodflowModel
+    
+    Boundary
+    Top
+    Bottom
+    
+    PreconditionedConjugateGradientSolver
+    
+    ConstantHead
+    Drain
+    EvapoTranspiration
+    GeneralHeadBoundary
+    HorizontalHydraulicConductivity
+    HorizontalAnisotropy
+    HorizontalFlowBarrier
+    MetaSwap
+    Recharge
+    River
+    StartingHead
+    VerticalHydraulicConductivity
+    VerticalAnisotropy
+    StorageCoefficient
+    SpecificStorage
+    Well

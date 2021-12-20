@@ -11,7 +11,6 @@ class MassLoading(BoundaryCondition):
     concentration: xr.DataArray of floats
     """
 
-    __slots__ = ("concentration",)
     _pkg_id = "mal"
 
     def __init__(self, concentration):

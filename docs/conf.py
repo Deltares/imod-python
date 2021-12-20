@@ -38,11 +38,35 @@ version = ".".join(release.split(".")[:3]) + ".dev"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "sphinx.ext.todo",
     "sphinx.ext.napoleon",
+    "sphinx_gallery.gen_gallery",
 ]
+
+sphinx_gallery_conf = {
+    "examples_dirs": [
+        "../examples/user-guide",
+        # "../examples/data",
+        "../examples/mf6",
+        "../examples/imod-wq",
+        # "../examples/imodflow",
+        # "../examples/visualize",
+    ],  # path to your example scripts
+    "gallery_dirs": [
+        "user-guide",
+        # "examples/data",
+        "examples/mf6",
+        "examples/imod-wq",
+        # "examples/imodflow",
+        # "examples/visualize",
+    ],  # path to where to save gallery generated output
+    "filename_pattern": ".py",  # ".py",
+    "ignore_pattern": ".pytmp",
+    "abort_on_example_error": True,
+    "capture_repr": ("_repr_html_", "__repr__"),
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -77,7 +101,7 @@ pygments_style = "sphinx"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "pydata_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -89,6 +113,7 @@ html_theme = "sphinx_rtd_theme"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+html_css_files = ["theme-deltares.css"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -100,6 +125,9 @@ html_static_path = ["_static"]
 #
 # html_sidebars = {}
 
+# The name of an image file (relative to this directory) to place at the top
+# of the sidebar.
+html_logo = "_static/deltares-white.svg"
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
