@@ -3,15 +3,32 @@ Elder
 =====
 
 The classic 2D Elder problem demonstrates free convection.
+Traditionally this was created for heat transport, but we use
+a modified version for salt tranpsort.
+The conceptual model can be seen as a 2D sand box, 
+with on top a salt lake in the center and fresh lakes 
+on both the outer edges of the top row.
+
+More info about the theory behind the Elder problem:
+
+Simpson, J., & Clement, P. (2003). 
+Theoretical analysis of the worthiness of Henry and Elder 
+problems as benchmark of density-dependent groundwater flow models.
+*Advances in Water Resources, 1708*(02). 
+Retrieved from http://www.eng.auburn.edu/~clemept/publsihed_pdf/awrmat.pdf
 """
 
 # %%
+# We'll start with the following inputs
 
 import numpy as np
 import xarray as xr
 
 import imod
 
+import matplotlib.pyplot as plt
+
+# %%
 # Discretization
 nrow = 1
 ncol = 160
@@ -21,7 +38,8 @@ dz = 1.875
 dx = 3.75
 dy = -dx
 
-# setup ibound
+# %%
+# Setup ibound
 bnd = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 1.0),
     coords={
@@ -34,14 +52,17 @@ bnd = xr.DataArray(
     dims=("layer", "y", "x"),
 )
 
-bnd.plot()
+fig, ax = plt.subplots()
+bnd.plot(y="layer", yincrease=False, ax=ax)
 
 # set constant heads
 bnd[0, :, 0:40] = 0
 bnd[0, :, 121:160] = 0
 bnd[1, :, 0] = -1
 bnd[1, :, 159] = -1
-bnd.plot(y="layer", yincrease=False)
+
+fig, ax = plt.subplots()
+bnd.plot(y="layer", yincrease=False, ax=ax)
 
 # setup tops and bottoms
 top1D = xr.DataArray(
@@ -50,6 +71,7 @@ top1D = xr.DataArray(
 
 bot = top1D - dz
 top = nlay * dz
+
 # Define the icbund
 icbund = xr.DataArray(
     data=np.full((nlay, nrow, ncol), 1.0),
@@ -63,7 +85,9 @@ icbund = xr.DataArray(
 
 icbund[81, :, :] = -1
 icbund[0, :, 41:120] = -1
-icbund.plot(y="layer", yincrease=False)
+
+fig, ax = plt.subplots()
+icbund.plot(y="layer", yincrease=False, ax=ax)
 
 # Define the starting concentration
 sconc = xr.DataArray(
@@ -79,7 +103,8 @@ sconc = xr.DataArray(
 sconc[81, :, :] = 0
 sconc[0, :, 41:120] = 280.0
 
-sconc.plot(y="layer", yincrease=False)
+fig, ax = plt.subplots()
+sconc.plot(y="layer", yincrease=False, ax=ax)
 
 # Finally, we build the model.
 m = imod.wq.SeawatModel("Elder")
@@ -116,8 +141,10 @@ m.write(modeldir, resultdir_is_workdir=True)
 
 # Visualise results
 # head = imod.idf.open("Elder/results/head/*.idf")
-# head.plot(yincrease=False)
+# fig, ax = plt.subplots()
+# head.plot(yincrease=False, ax=ax)
 # conc = imod.idf.open("Elder/results/conc/*.idf")
-# conc.plot(levels=range(0, 35, 5), yincrease=False)
+# fig, ax = plt.subplots()
+# conc.plot(levels=range(0, 35, 5), yincrease=False, ax=ax)
 
 # %%
