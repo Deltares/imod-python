@@ -1,2 +1,2 @@
 # from .synthetic import
-# from .sample_data import
+from .sample_data import twri_output

@@ -1,7 +1,19 @@
-imod.util  -  Miscellaneous Utilities
--------------------------------------
+.. currentmodule:: imod.util
 
-.. automodule:: imod.util
-    :members:
-    :undoc-members:
-    :show-inheritance:
+Utilities
+---------
+
+.. autosummary::
+    :toctree: generated/util
+    
+    cd
+    ignore_warnings
+    to_datetime
+
+    coord_reference
+    spatial_reference
+    transform
+
+    ugrid2d_data
+    ugrid2d_topology
+    to_ugrid2d

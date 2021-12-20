@@ -6,7 +6,7 @@ This example illustrates how to setup a very simple unstructured groundwater
 model using the ``imod`` package and associated packages.
 
 In overview, we'll set the following steps:
-    
+
     * Create a triangular mesh for a disk geometry.
     * Create the xugrid UgridDataArrays containg the MODFLOW6 parameters.
     * Feed these arrays into the imod mf6 classes.
@@ -82,7 +82,6 @@ k = xu.full_like(idomain, 1.0)
 k33 = k.copy()
 rch_rate = xu.full_like(idomain.sel(layer=1), 0.001, dtype=float)
 bottom = idomain * xr.DataArray([5.0, 0.0], dims=["layer"])
-bottom = xu.UgridDataArray(bottom, grid)
 
 # %%
 # All the data above have been constants over the grid. For the constant head

@@ -1,35 +1,20 @@
 API Reference
 =============
 
-.. toctree::
-    :maxdepth: 1
-    :caption: File input/output
-
-    idf.rst
-    ipf.rst
-    rasterio.rst
-    tec.rst
+This page provides an auto-generated summary of imod's API.
 
 .. toctree::
-    :maxdepth: 1
-    :caption: Data preparation and evaluation
+  :maxdepth: 2
+  
+  io
+  prepare
+  select
+  evaluate
+  visualize
+  util
 
-    prepare.rst
-    select.rst
-    evaluate.rst
-    visualize.rst
-    util.rst
+  mf6
+  wq
+  flow
 
-.. toctree::
-    :maxdepth: 1
-    :caption: Defining a groundwater model
-
-    mf6.rst
-    wq.rst
-    flow.rst
-
-.. toctree::
-    :maxdepth: 1
-    :caption: Changelog
-
-    changelog.rst
+  changelog

@@ -27,13 +27,15 @@ dependencies:
   - pip
   - pip:
     - declxml
+    - pandamesh
+    - xugrid
   - pydata-sphinx-theme
   - pygeos
   - pyproj
   - pytest
   - pytest-benchmark
   - pytest-cov
-  - python>=3.7
+  - python>=3.7,<=3.8
   - pyvista
   - rasterio>=1.0
   - scipy

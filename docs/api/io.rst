@@ -1,0 +1,23 @@
+.. currentmodule:: imod
+
+Input/output
+------------
+
+.. autosummary::
+    :toctree: generated/idf
+
+    idf.open 
+    idf.open_dataset
+    idf.open_subdomains
+    idf.save
+    idf.header
+
+    ipf.read
+    ipf.read_associated
+    ipf.save
+    ipf.write
+    ipf.write_assoc
+    
+    rasterio.header
+    rasterio.open
+    rasterio.save

@@ -38,9 +38,9 @@ coordinates.
 Geopandas can read variety of file formats:
 """
 
-import geopandas as gpd
-import pandas as pd
-
+# import geopandas as gpd
+# import pandas as pd
+#
 # gdf_from_shp = gpd.read_file("../examples/data/2017-Waterschappen.shp")
 # gdf_from_shp.head()  # show the first five rows
 

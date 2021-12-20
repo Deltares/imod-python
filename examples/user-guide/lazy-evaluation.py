@@ -5,7 +5,7 @@ Lazy evaluation
 A powerful feature of xarray is `lazy evaluation`_. Lazy evaluation means that
 expressions are delayed until the results are needed. In a nutshell, lazy
 evaluation has the following advantages for us:
-    
+
     * Lazy evaluation frees us from having to load all data into memory in one
       go. We can work with larger-than-memory datasets without having to
       manually divide the datasets into smaller, manageable pieces.
@@ -18,8 +18,9 @@ with xarray, all data always exists in RAM memory, and computations are
 performed immediately. Typical cases of when results are needed is when data
 has to be visualized or when the data has to be saved to disk.
 
-We will explain these concepts with a number of examples. 
+We will explain these concepts with a number of examples.
 """
+# %%
 import dask.array
 import numpy as np
 import xarray as xr
@@ -95,12 +96,12 @@ eager_result.data
 # with xarray's delayed evaluation. This means that opening IDFs or MODFLOW6
 # will not load the data from the files into memory until they are needed.
 #
-# Let's open some example results:
+# Let's grab some example results, store them in a temporarily directory, and
+# open them:
 
-head = imod.mf6.open_hds(
-    r"c:\src\imod-python\examples\ex01-twri\GWF_1\GWF_1.hds",
-    r"c:\src\imod-python\examples\ex01-twri\GWF_1\dis.dis.grb",
-)
+result_dir = imod.util.temporary_directory()
+imod.data.twri_output(result_dir)
+head = imod.mf6.open_hds(result_dir / "twri.hds", result_dir / "twri.grb")
 
 # %%
 # All time steps are available, but not loaded. Instead, a graph of tasks has

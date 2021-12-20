@@ -5,7 +5,7 @@ TWRI
 This example has been converted from the `MODFLOW6 Example problems`_.  See the
 `description`_ and the `notebook`_ which uses `FloPy`_ to setup the model.
 
-This example is a modified version of the original MODFLOW example 
+This example is a modified version of the original MODFLOW example
 ("`Techniques of Water-Resources Investigation`_" (TWRI)) described in
 (`McDonald & Harbaugh, 1988`_) and duplicated in (`Harbaugh & McDonald, 1996`_).
 This problem is also is distributed with MODFLOW-2005 (`Harbaugh, 2005`_). The
@@ -13,7 +13,7 @@ problem has been modified from a quasi-3D problem, where confining beds are not
 explicitly simulated, to an equivalent three-dimensional problem.
 
 In overview, we'll set the following steps:
-    
+
     * Create a structured grid for a rectangular geometry.
     * Create the xarray DataArrays containg the MODFLOW6 parameters.
     * Feed these arrays into the imod mf6 classes.
@@ -26,8 +26,6 @@ In overview, we'll set the following steps:
 # %%
 # We'll start with the usual imports. As this is an simple (synthetic)
 # structured model, we can make due with few packages.
-
-import subprocess
 
 import numpy as np
 import xarray as xr
@@ -168,7 +166,10 @@ simulation.time_discretization(
 # %%
 # We'll create a new directory in which we will write and run the model.
 
+import pathlib
+
 modeldir = imod.util.temporary_directory()
+modeldir = pathlib.Path("ex01-twri")
 simulation.write(modeldir)
 
 # %%

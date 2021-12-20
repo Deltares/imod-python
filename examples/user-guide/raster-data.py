@@ -17,7 +17,7 @@ Typical examples of file formats containing raster dat are:
 * netCDF
 
 In groundwater modeling, data commonly stored in raster format are:
-    
+
 * Layer topology: the tops and bottoms of geohydrological layers
 * Layer properties: conductivity of aquifers and aquitards
 * Model output: heads or cell by cell flows

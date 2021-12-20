@@ -2,7 +2,6 @@ import pathlib
 
 import numpy as np
 import pandas as pd
-import xugrid as xu
 
 from imod.mf6.pkgbase import Package
 

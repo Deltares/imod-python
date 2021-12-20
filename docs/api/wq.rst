@@ -1,17 +1,41 @@
-imod.wq  -  Create Water Quality model
---------------------------------------
+.. currentmodule:: imod.wq
 
-.. automodule:: imod.wq
-    :members:
-    :imported-members:
-    :undoc-members:
-    :show-inheritance:
+iMOD-WQ
+-------
 
-.. automodule:: imod.wq.model
-    :members: Model
-    :undoc-members:
-    :show-inheritance:
+.. autosummary::
+    :toctree: generated/wq
+    
+    SeawatModel
 
-.. automodule:: imod.wq.pkgbase
-    :members:
-    :show-inheritance:
+    TimeDiscretization
+    OutputControl
+    PreconditionedConjugateGradientSolver
+    GeneralizedConjugateGradientSolver
+    ParallelKrylovFlowSolver
+    ParallelKrylovTransportSolver
+    
+    BasicFlow
+    ConstantHead
+    Drainage
+    EvapotranspirationTopLayer
+    EvapotranspirationLayers
+    EvapotranspirationHighestActive
+    GeneralHeadBoundary
+    LayerPropertyFlow
+    RechargeTopLayer
+    RechargeLayers
+    RechargeHighestActive
+    River
+    Well
+    
+    VariableDensityFlow
+
+    AdvectionTVD
+    AdvectionMOC
+    AdvectionModifiedMOC
+    AdvectionHybridMOC
+    AdvectionFiniteDifference
+    Dispersion
+    MassLoading
+    TimeVaryingConstantConcentration

@@ -1,5 +1,5 @@
-Tox
-===
+Automation with tox
+===================
 
 This package uses `tox`_ to automate code formatting, linting, and testing.
 tox builds an isolated environment for these steps. Because imod has a large
@@ -33,8 +33,8 @@ installation of the imod package and all its dependencies. Separating the
 testing and documentation building requires building two large identical
 environments.
 
-.. tox: https://tox.wiki/en/latest/index.html
-.. tox-conda: https://github.com/tox-dev/tox-conda
-.. isort: https://github.com/PyCQA/isort
-.. black: https://github.com/psf/black
-.. flake8: https://github.com/PyCQA/flake8
+.. _tox: https://tox.wiki/en/latest/index.html
+.. _tox-conda: https://github.com/tox-dev/tox-conda
+.. _isort: https://github.com/PyCQA/isort
+.. _black: https://github.com/psf/black
+.. _flake8: https://github.com/PyCQA/flake8

@@ -36,8 +36,6 @@ structures. Secondly, it will demonstrate how a modeling workflow is set up.
    :titlesonly:
    :hidden:
    
-   examples/index
- 
 .. _xarray: http://xarray.pydata.org
 .. _pandas: http://pandas.pydata.org
 .. _geopandas: http://geopandas.org

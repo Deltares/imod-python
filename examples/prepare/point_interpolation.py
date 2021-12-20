@@ -4,12 +4,13 @@ Interpolating points to a grid
 
 """
 
-import numpy as np
-import xarray as xr
-import imod
-import pandas as pd
-
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import xarray as xr
+
+import imod
 
 # Heads interpolation
 # --------------------

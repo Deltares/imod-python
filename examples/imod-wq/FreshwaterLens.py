@@ -3,7 +3,7 @@ Freshwater Lens
 ===============
 
 This 2D examples illustrates the growth of a fresh water lens in an initially
-fully saline domain. 
+fully saline domain.
 """
 
 # %%
