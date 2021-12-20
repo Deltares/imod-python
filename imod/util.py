@@ -20,7 +20,7 @@ import pathlib
 import re
 import tempfile
 import warnings
-from typing import Any, Dict, Sequence, Tuple, Union
+from typing import Any, Dict, List, Sequence, Tuple, Union
 
 import affine
 import cftime
@@ -692,7 +692,7 @@ def initialize_nested_dict(depth: int) -> collections.defaultdict:
         return collections.defaultdict(d)
 
 
-def set_nested(d: collections.defaultdict, keys: list[str], value: Any) -> None:
+def set_nested(d: collections.defaultdict, keys: List[str], value: Any) -> None:
     """
     Set in the deepest dict of a set of nested dictionaries, as created by the
     initialize_nested_dict function above.
