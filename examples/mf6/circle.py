@@ -16,6 +16,8 @@ In overview, we'll set the following steps:
     * Visualize the results.
 """
 
+# sphinx_gallery_thumbnail_number = -1
+
 # %%
 # We'll start with the following imports:
 
@@ -26,8 +28,6 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-
-# sphinx_gallery_thumbnail_number = -1
 
 # %%
 # Create a mesh
