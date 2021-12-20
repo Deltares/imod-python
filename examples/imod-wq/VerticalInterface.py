@@ -16,13 +16,12 @@ https://doi.org/10.1016/j.jhydrol.2003.10.007
 # %%
 # We'll start with the usual imports
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import xarray as xr
 
 import imod
-
-import matplotlib.pyplot as plt
 
 # sphinx_gallery_thumbnail_number = -1
 

@@ -7,13 +7,13 @@ groundwater environment.
 
 """
 
+import matplotlib.pyplot as plt
+
 # %%
 import numpy as np
 import xarray as xr
 
 import imod
-
-import matplotlib.pyplot as plt
 
 # sphinx_gallery_thumbnail_number = -1
 

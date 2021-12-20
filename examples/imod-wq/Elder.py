@@ -21,12 +21,11 @@ Retrieved from http://www.eng.auburn.edu/~clemept/publsihed_pdf/awrmat.pdf
 # %%
 # We'll start with the usual imports
 
+import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 
 import imod
-
-import matplotlib.pyplot as plt
 
 # %%
 # Discretization

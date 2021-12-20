@@ -6,14 +6,14 @@ This 2D examples illustrates the growth of a fresh water lens in an initially
 fully saline domain.
 """
 
+import matplotlib.pyplot as plt
+
 # %%
 # We'll start with the usual imports
 import numpy as np
 import xarray as xr
 
 import imod
-
-import matplotlib.pyplot as plt
 
 # sphinx_gallery_thumbnail_number = -1
 

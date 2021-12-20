@@ -13,6 +13,8 @@ Lessons from the HYDROCOIN variable-density groundwater benchmark problem.
 https://doi.org/10.1029/97WR01926
 """
 
+import matplotlib.pyplot as plt
+
 # %%
 # We'll start with the usual imports
 import numpy as np
@@ -20,8 +22,6 @@ import pandas as pd
 import xarray as xr
 
 import imod
-
-import matplotlib.pyplot as plt
 
 # sphinx_gallery_thumbnail_number = -1
 

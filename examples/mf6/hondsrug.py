@@ -21,13 +21,12 @@ In overview, the model features:
 # %% Import packages
 # We'll start with the usual imports, and an import from scipy.
 
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.ndimage.morphology
 import xarray as xr
 
 import imod
-
-import matplotlib.pyplot as plt
 
 # %%
 # Before starting to create the input data, we will create the groundwater
