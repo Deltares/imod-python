@@ -14,11 +14,9 @@
 #
 import pkg_resources
 
-import imod
-
 # -- Project information -----------------------------------------------------
 
-project = "imod-python"
+project = "iMOD Python"
 copyright = "Deltares"
 author = "Martijn Visser, Huite Bootsma"
 
@@ -51,7 +49,7 @@ sphinx_gallery_conf = {
         # "../examples/data",
         "../examples/mf6",
         "../examples/imod-wq",
-        # "../examples/imodflow",
+        "../examples/imodflow",
         # "../examples/visualize",
     ],  # path to your example scripts
     "gallery_dirs": [
@@ -59,10 +57,10 @@ sphinx_gallery_conf = {
         # "examples/data",
         "examples/mf6",
         "examples/imod-wq",
-        # "examples/imodflow",
+        "examples/imodflow",
         # "examples/visualize",
     ],  # path to where to save gallery generated output
-    "filename_pattern": ".py",  # ".py",
+    "filename_pattern": ".py",
     "ignore_pattern": ".pytmp",
     "abort_on_example_error": True,
     "capture_repr": ("_repr_html_", "__repr__"),
