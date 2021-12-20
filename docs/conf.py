@@ -66,6 +66,7 @@ sphinx_gallery_conf = {
     "ignore_pattern": ".pytmp",
     "abort_on_example_error": True,
     "capture_repr": ("_repr_html_", "__repr__"),
+    "remove_config_comments": True,  # remove sphinx config comments from the rendered example
 }
 
 # Add any paths that contain templates here, relative to this directory.
