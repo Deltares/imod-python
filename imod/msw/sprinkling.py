@@ -2,6 +2,7 @@ import pathlib
 
 import xarray as xr
 
+from imod.mf6 import Well
 from imod.msw.pkgbase import Package, VariableMetaData
 
 
@@ -28,14 +29,14 @@ class Sprinkling(Package):
         self,
         max_abstraction_groundwater: xr.DataArray,
         min_abstraction_groundwater: xr.DataArray,
-        layer: xr.DataArray,
+        well: Well,
         active: xr.DataArray,
     ):
         super().__init__()
         self.dataset["max_abstraction_groundwater"] = max_abstraction_groundwater
         self.dataset["min_abstraction_groundwater"] = min_abstraction_groundwater
-        self.dataset["layer"] = layer
         self.dataset["active"] = active
+        self.well = well
 
     def _render(self, file):
         # TODO: Resolve open questions then implement
