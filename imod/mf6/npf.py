@@ -6,6 +6,7 @@ from imod.mf6.pkgbase import Package
 class NodePropertyFlow(Package):
     """
     Node Property Flow package.
+
     In this package the hydraulic conductivity and rewetting in the model is
     specified. A single NPF Package is required for each GWF model.
     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=51

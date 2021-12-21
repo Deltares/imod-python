@@ -214,6 +214,8 @@ class Model(collections.UserDict):
 
 class SeawatModel(Model):
     """
+    iMOD-WQ SEAWAT model.
+
     Attributes
     ----------
     modelname : str
