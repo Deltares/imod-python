@@ -112,8 +112,7 @@ class Sprinkling(Package):
                         "max_abstraction_groundwater must to be defined for all wells."
                     )
 
-                layer_array += self.dataset["max_abstraction_groundwater"][row, column]
+                layer_array.append(
+                    self.dataset["max_abstraction_groundwater"][row, column]
+                )
         return np.array(layer_array)
-
-
-#

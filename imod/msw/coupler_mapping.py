@@ -116,10 +116,10 @@ class CouplerMapping(Package):
                     mod_id = (
                         layer * column_len * row_len + row * column_len + column + 1
                     )
-                    mod_id_array += mod_id
-                    svat_array += self.dataset["svat"][subunit, row, column]
+                    mod_id_array.append(mod_id)
+                    svat_array.append(self.dataset["svat"][subunit, row, column])
 
-                    layer_array += layer + 1
+                    layer_array.append(layer + 1)
 
         return (np.array(mod_id_array), np.array(svat_array), np.array(layer_array))
 
