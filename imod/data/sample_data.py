@@ -55,3 +55,8 @@ def hondsrug_drainage() -> xr.Dataset:
 def head_observations() -> pd.DataFrame:
     fname = REGISTRY.fetch("head-observations.csv")
     return pd.read_csv(fname)
+
+
+def fluxes() -> xr.Dataset:
+    fname = REGISTRY.fetch("fluxes.nc")
+    return xr.open_dataset(fname)

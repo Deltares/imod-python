@@ -1,5 +1,6 @@
 # from .synthetic import
 from .sample_data import (
+    fluxes,
     head_observations,
     hondsrug_drainage,
     hondsrug_initial,
