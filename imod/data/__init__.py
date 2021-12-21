@@ -1,5 +1,6 @@
 # from .synthetic import
 from .sample_data import (
+    ahn,
     fluxes,
     head_observations,
     hondsrug_drainage,
@@ -7,5 +8,6 @@ from .sample_data import (
     hondsrug_layermodel,
     hondsrug_meteorology,
     hondsrug_river,
+    lakes_shp,
     twri_output,
 )

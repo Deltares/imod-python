@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Union
 from zipfile import ZipFile
 
+import geopandas as gpd
 import pandas as pd
 import pkg_resources
 import pooch
@@ -60,3 +61,15 @@ def head_observations() -> pd.DataFrame:
 def fluxes() -> xr.Dataset:
     fname = REGISTRY.fetch("fluxes.nc")
     return xr.open_dataset(fname)
+
+
+def ahn() -> xr.Dataset:
+    fname = REGISTRY.fetch("ahn.nc")
+    return xr.open_dataset(fname)
+
+
+def lakes_shp(path: Union[str, Path]) -> gpd.GeoDataFrame:
+    fname_lakes_shp = REGISTRY.fetch("lakes_shp.zip")
+    with ZipFile(fname_lakes_shp) as archive:
+        archive.extractall(path)
+    return gpd.read_file(Path(path) / "lakes.shp")
