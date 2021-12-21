@@ -1,12 +1,12 @@
 import numpy as np
-import pandas as pd
 import pytest
 import xarray as xr
+import xugrid as xu
 
 import imod
 
 
-def make_twri_model():
+def make_twri_disv_model():
     nlay = 3
     nrow = 15
     ncol = 15
@@ -48,30 +48,46 @@ def make_twri_model():
     rch_rate = xr.full_like(idomain.sel(layer=1), 3.0e-8)
 
     # Well
-    layer = [3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    row = [5, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13]
-    column = [11, 6, 12, 8, 10, 12, 14, 8, 10, 12, 14, 8, 10, 12, 14]
-    rate = [
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-    ]
+    layer = np.array([3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+    row = np.array([5, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13])
+    column = np.array([11, 6, 12, 8, 10, 12, 14, 8, 10, 12, 14, 8, 10, 12, 14])
+    rate = np.array(
+        [
+            -5.0,
+            -5.0,
+            -5.0,
+            -5.0,
+            -5.0,
+            -5.0,
+            -5.0,
+            -5.0,
+            -5.0,
+            -5.0,
+            -5.0,
+            -5.0,
+            -5.0,
+            -5.0,
+            -5.0,
+        ]
+    )
+    cell2d = (row - 1) * ncol + column
+
+    # %%
+
+    grid = xu.Ugrid2d.from_structured(idomain)
+
+    def toface(da):
+        return imod.util.ugrid2d_data(da, grid.face_dimension)
+
+    idomain = xu.UgridDataArray(toface(idomain), grid)
+    head = xu.UgridDataArray(toface(head), grid)
+    elevation = xu.UgridDataArray(toface(elevation), grid).assign_coords(layer=1)
+    conductance = xu.UgridDataArray(toface(conductance), grid).assign_coords(layer=1)
+    rch_rate = xu.UgridDataArray(toface(rch_rate), grid).assign_coords(layer=1)
 
     # Create and fill the groundwater model.
     gwf_model = imod.mf6.GroundwaterFlowModel()
-    gwf_model["dis"] = imod.mf6.StructuredDiscretization(
+    gwf_model["dis"] = imod.mf6.VerticesDiscretization(
         top=200.0, bottom=bottom, idomain=idomain
     )
     gwf_model["chd"] = imod.mf6.ConstantHead(
@@ -96,24 +112,23 @@ def make_twri_model():
     )
     gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
     gwf_model["rch"] = imod.mf6.Recharge(rch_rate)
-    gwf_model["wel"] = imod.mf6.WellDisStructured(
-        layer=layer,
-        row=row,
-        column=column,
-        rate=rate,
-        print_input=True,
-        print_flows=True,
-        save_flows=True,
-    )
     gwf_model["sto"] = imod.mf6.SpecificStorage(
         specific_storage=1.0e-15,
         specific_yield=0.15,
         convertible=0,
         transient=False,
     )
+    gwf_model["wel"] = imod.mf6.WellDisVertices(
+        layer=layer,
+        cell2d=cell2d,
+        rate=rate,
+        print_input=True,
+        print_flows=True,
+        save_flows=True,
+    )
 
-    # Attach it to a simulation
-    simulation = imod.mf6.Modflow6Simulation("ex01-twri")
+    #  Attach it to a simulation
+    simulation = imod.mf6.Modflow6Simulation("ex01-twri-disv")
     simulation["GWF_1"] = gwf_model
     # Define solver settings
     simulation["solver"] = imod.mf6.Solution(
@@ -133,36 +148,10 @@ def make_twri_model():
     )
     # Collect time discretization
     simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
+
     return simulation
 
 
 @pytest.fixture(scope="session")
-def twri_model():
-    return make_twri_model()
-
-
-@pytest.fixture(scope="session")
-def transient_twri_model():
-    simulation = make_twri_model()
-    gwf_model = simulation["GWF_1"]
-    like = gwf_model["dis"]["idomain"].astype(float)
-    gwf_model["sto"] = imod.mf6.SpecificStorage(
-        specific_storage=xr.full_like(like, 1.0e-15),
-        specific_yield=xr.full_like(like, 0.15),
-        convertible=0,
-        transient=True,
-    )
-    simulation.time_discretization(times=pd.date_range("2000-01-01", " 2000-01-31"))
-    return simulation
-
-
-@pytest.mark.usefixtures("twri_model")
-@pytest.fixture(scope="session")
-def twri_result(tmpdir_factory):
-    # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
-    # directory between different testing modules.
-    modeldir = tmpdir_factory.mktemp("ex01-twri")
-    simulation = make_twri_model()
-    simulation.write(modeldir)
-    simulation.run()
-    return modeldir
+def twri_disv_model():
+    return make_twri_disv_model()

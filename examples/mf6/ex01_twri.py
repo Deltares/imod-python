@@ -135,7 +135,7 @@ gwf_model["sto"] = imod.mf6.SpecificStorage(
 )
 gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
 gwf_model["rch"] = imod.mf6.Recharge(rch_rate)
-gwf_model["wel"] = imod.mf6.Well(
+gwf_model["wel"] = imod.mf6.WellDisStructured(
     layer=well_layer,
     row=well_row,
     column=well_column,
