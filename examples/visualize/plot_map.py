@@ -50,7 +50,7 @@ import contextily as ctx
 
 src = ctx.providers.Stamen.TonerLite
 imod.visualize.plot_map(
-    surface_level
+    surface_level,
     colors,
     levels,
     basemap=src,
