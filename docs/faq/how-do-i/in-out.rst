@@ -2,7 +2,7 @@ Data In/Out
 -----------
 
 Import IDF file
-***************
+~~~~~~~~~~~~~~~
 
 With :func:`imod.idf.open`:
 
@@ -12,7 +12,7 @@ With :func:`imod.idf.open`:
 
 
 Import multiple IDF files
-*************************
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 With :func:`imod.idf.open`:
 
@@ -22,7 +22,7 @@ With :func:`imod.idf.open`:
     
 
 Import IPF file
-***************
+~~~~~~~~~~~~~~~
 
 With :func:`imod.ipf.read`:
 
@@ -32,14 +32,14 @@ With :func:`imod.ipf.read`:
     
 
 Import netCDF file as Dataset
-*****************************
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
     ds = xr.open_dataset("dataset.nc")
     
 Import a single netCDF variable as DataArray
-********************************************
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -47,7 +47,7 @@ Import a single netCDF variable as DataArray
     
 
 Convert structured data to UGRID netCDF
-***************************************
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 With :func:`imod.util.to_ugrid2d`:
 
@@ -56,7 +56,3 @@ With :func:`imod.util.to_ugrid2d`:
     ugrid_ds = imod.util.to_ugrid2d(da)
     ugrid_ds.to_netcdf("ds_ugrid.nc")
  
-Convert a layer model to UGRID
-******************************
-
-See :ref:`convert-layer-model-to-ugrid`.

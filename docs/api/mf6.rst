@@ -34,4 +34,5 @@ MODFLOW6
     SpecificStorage
     StorageCoefficient
     UnsaturatedZoneFlow
-    Well
+    WellDisStructured
+    WellDisVertices

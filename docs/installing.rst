@@ -58,7 +58,7 @@ Data provisioning for examples:
 Visualization:
 
 * `matplotlib <https://matplotlib.org/>`__
-* `pyvista https://docs.pyvista.org/`__
+* `pyvista <https://docs.pyvista.org/`__
   
 Installing these dependencies requires around 2.5 gigabyte of space.
  

@@ -2,7 +2,7 @@ Data modification
 -----------------
 
 If-then-else
-************
+~~~~~~~~~~~~
 
 Remove all values over 5.0:
 
@@ -51,7 +51,7 @@ Alternatively:
     ``xr.where(old < 5.0, old, 5.0)`` will fill the NaN values with 5.0
 
 Conditional evaluation
-**********************
+~~~~~~~~~~~~~~~~~~~~~~
 
 Let's say we want to select values between 5 and 10.
 
@@ -88,7 +88,7 @@ To check there are no NaNs anywhere, use "reductions" such as ``.all()`` or
     has_nodata = da.notnull().any()
 
 Arithmetic
-**********
+~~~~~~~~~~
 
 .. code-block:: python
 
@@ -97,7 +97,7 @@ Arithmetic
 Make sure the grids have the same spatial coordinates.
 
 Change cellsize (and extent)
-****************************
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Nearest neighbor:
 
@@ -114,7 +114,7 @@ Area weighted mean:
     out = regridder.regrid(source)
     
 Change time resolution
-**********************
+~~~~~~~~~~~~~~~~~~~~~~
 
 From e.g. hourly data to daily average:
 
@@ -126,7 +126,7 @@ See `xarray documentation on resampling`_.
 
 
 Select along a single layer
-***************************
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``sel()`` is "key" selection, this selects the layer named "1":
 
@@ -141,7 +141,7 @@ Select along a single layer
     da_firstlayer = da.isel(layer=0)
     
 Select part of the data
-***********************
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Generally, raster data is y-descending, so ``ymax`` comes before ``ymin``:
 
@@ -150,7 +150,7 @@ Generally, raster data is y-descending, so ``ymax`` comes before ``ymin``:
     da_selection = da.sel(x=slice(xmin, xmax), y=slice(ymax, ymin))
   
 Create an empty raster
-**********************
+~~~~~~~~~~~~~~~~~~~~~~
 
 For just a two dimensional x-y grid:
 
@@ -188,7 +188,7 @@ For a time varying 3d grid:
     )
 
 Fill/Interpolate nodata
-***********************
+~~~~~~~~~~~~~~~~~~~~~~~
 
 To do nearest neighbor interpolation:
 
@@ -213,9 +213,34 @@ model with constant conductivity):
 
     da = imod.prepare.laplace_interpolate(with_gaps)
     
+Rasterize polygon data
+~~~~~~~~~~~~~~~~~~~~~~
+
+A geopandas GeoDataFrame can be rasterized by providing a sample DataArray for
+``like`` in `:py:func:imod.prepare.rasterize`:
+
+.. code-block:: python
+
+   rasterized = imod.prepare.rasterize(
+       geodataframe,
+       column="column_name_in_geodataframe",
+       like=like,
+    ) 
+   
+For large vector datasets, reading the files into a geodataframe can take
+longer dan the rasterization step. To avoid this, it's possible to skip loading
+the data altogether with :py:func:`imod.prepare.gdal_rasterize`
+
+.. code-block:: python
+
+   rasterized = imod.prepare.gdal_rasterize(
+       path="path-to-vector-data.shp",
+       column="column_name_in_vector_data",
+       like=like,
+    ) 
 
 Smooth data
-***********
+~~~~~~~~~~~
 
 We can use a `convolution`_ to smooth:
 
@@ -226,7 +251,7 @@ We can use a `convolution`_ to smooth:
     da.values = scipy.ndimage.convolve(da.values, kernel)
 
 Zonal statistics
-****************
+~~~~~~~~~~~~~~~~
 
 To compute a mean:
 
@@ -247,7 +272,7 @@ To compute a sum:
     zonal stats`_ function.
 
 Force loading into memory / dask array to numpy array
-*****************************************************
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -260,21 +285,36 @@ Alternatively:
     da = da.load()
     
 Select a single variable from a dataset
-***************************************
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Select ``"kd"`` from dataset ``ds``:
 
 .. code-block:: python
 
     da_kd = ds["kd"]
+    
+Select points (from a vector dataset)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+    geometry = geodataframe.geometry
+    x = geometry.x
+    y = geometry.y
+    selection = imod.select.points_values(da, x=x, y=y)
+
+For time series analysis, converting into a pandas DataFrame may be useful:
+
+.. code-block:: python
+
+    df = selection.to_dataframe()
 
 Sum properties over layers
-**************************
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
     total_kd = da_kd.sum("layer")
-
 
 .. _xarray documentation on resampling: https://xarray.pydata.org/en/stable/user-guide/time-series.html#resampling-and-grouped-operations.
 .. _xarray documentation on interpolation of NaN values: https://xarray.pydata.org/en/stable/generated/xarray.DataArray.interpolate_na.html

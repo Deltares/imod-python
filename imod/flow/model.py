@@ -85,6 +85,8 @@ class Model(collections.UserDict):
 
 class ImodflowModel(Model):
     """
+    iMODFLOW model.
+
     Attributes
     ----------
     modelname : str

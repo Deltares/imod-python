@@ -8,6 +8,7 @@ from imod.mf6.pkgbase import Package
 
 class VerticesDiscretization(Package):
     """
+    Discretization by Vertices (DISV).
 
     Parameters
     ----------
