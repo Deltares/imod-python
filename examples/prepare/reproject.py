@@ -5,12 +5,12 @@ Reproject files
 In this example we will see how to reproject vector and raster datasets.
 
 """
+import matplotlib.pyplot as plt
+import pyproj
+
 # %%
 # We'll start with the imports
 import imod
-import pyproj
-
-import matplotlib.pyplot as plt
 
 # sphinx_gallery_thumbnail_number = -1
 
