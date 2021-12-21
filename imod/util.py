@@ -488,7 +488,6 @@ def ugrid2d_data(da: xr.DataArray, face_dim: str) -> xr.DataArray:
         raise ValueError('Last two dimensions of da must be ("y", "x")')
     dims = da.dims[:-2]
     coords = {k: da.coords[k] for k in dims}
-    coords[face_dim] = np.arange(da["y"].size * da["x"].size)
     return xr.DataArray(
         da.data.reshape(*da.shape[:-2], -1),
         coords=coords,
@@ -508,7 +507,9 @@ def _unstack_layers(ds: xr.Dataset) -> xr.Dataset:
             stacked = ds[variable]
             ds = ds.drop_vars(variable)
             for layer in stacked["layer"].values:
-                ds[f"{variable}_layer_{layer}"] = stacked.sel(layer=layer)
+                ds[f"{variable}_layer_{layer}"] = stacked.sel(layer=layer, drop=True)
+    if "layer" in ds.coords:
+        ds = ds.drop("layer")
     return ds
 
 
@@ -539,6 +540,12 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
 
     grid = xugrid.Ugrid2d.from_structured(data)
     ds = grid.dataset
+
+    # Set face coordinates; required by MDAL if face_coordinates in attrs.
+    attrs = grid.topology_attrs
+    name_x, name_y = attrs["face_coordinates"].split()
+    ds = ds.assign_coords({name_x: grid.face_x, name_y: grid.face_y})
+
     if isinstance(data, xr.Dataset):
         for variable in data.data_vars:
             ds[variable] = ugrid2d_data(data[variable], grid.face_dimension)
@@ -548,6 +555,12 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
                 'A name is required for the DataArray. It can be set with ``da.name = "..."`'
             )
         ds[data.name] = ugrid2d_data(data, grid.face_dimension)
+
+    # Make sure time is encoded as a float for MDAL
+    for var in ds.coords:
+        if np.issubdtype(ds[var].dtype, np.datetime64):
+            ds[var].encoding["dtype"] = np.float64
+
     return _unstack_layers(ds)
 
 
