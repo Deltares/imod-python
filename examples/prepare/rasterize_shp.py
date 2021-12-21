@@ -5,8 +5,9 @@ Rasterize shapefiles
 Importing the necessary packages:
 """
 
-import imod
 import matplotlib.pyplot as plt
+
+import imod
 
 # %%
 # Get the example shapes
