@@ -6,12 +6,13 @@ In this section we will plot flow velocities and streamlines for some model resu
 
 """
 
+import matplotlib.pyplot as plt
+import numpy as np
+import xarray as xr
+
 # %%
 # We'll start with the usual imports
 import imod
-import xarray as xr
-import numpy as np
-import matplotlib.pyplot as plt
 
 # sphinx_gallery_thumbnail_number = -1
 
