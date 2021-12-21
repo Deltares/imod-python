@@ -9,56 +9,116 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+[0.11.0] - 2021-12-21
+---------------------
+
 Fixed
 ~~~~~
--  :func:`imod.mf6.open_hds()` did not read the appropriate bytes from the
+
+-  :func:`imod.ipf.read` accepts list of file names.
+-  :func:`imod.mf6.open_hds` did not read the appropriate bytes from the
    heads file, apart for the first timestep. It will now read the right records.
 -  Use the appropriate array for modflow6 timestep duration: the
-   :meth:`imod.mf6.Model.write()` would write the timesteps multiplier in place
-   of of the duration array.
--  :func:`imod.util.to_ugrid2d()` has been added to convert a (structured) xarray
-   DataArray or Dataset to a quadrilateral UGRID dataset.
-
+   :meth:`imod.mf6.GroundwaterFlowModel.write` would write the timesteps
+   multiplier in place of the duration array.
+-  :meth:`imod.mf6.GroundwaterFlowModel.write` will now respect the layer
+   coordinate of DataArrays that had multiple coordinates, but were
+   discontinuous from 1; e.g. layers [1, 3, 5] would've been transformed to [1,
+   2, 3] incorrectly.
+-  :meth:`imod.mf6.Modflow6Simulation.write` will no longer change working directory
+   while writing model input -- this could lead to errors when multiple
+   processes are writing models in parallel.
+-  :func:`imod.prepare.laplace_interpolate` will no longer ZeroDivisionError
+   when given a value for ``ibound``.
+ 
 Added
 ~~~~~
--  :func:`imod.tec.read` can read labelled coordinates ``time``, ``z``, ``y``,
-   and ``x`` if present in the ``.tec`` file.
+
 -  :func:`imod.idf.open_subdomains` will now also accept iMOD-WQ output of
    multiple species runs.
--  :meth:`imod.wq.SeawatModel.to_netcdf()` has been added to write all model
+-  :meth:`imod.wq.SeawatModel.to_netcdf` has been added to write all model
    packages to netCDF files.
--  :func:`imod.mf6.open_cbc()` has been added to read the budget data of 
+-  :func:`imod.mf6.open_cbc` has been added to read the budget data of 
    structured (DIS) MODFLOW6 models. The data is read lazily into xarray
    DataArrays per timestep.
--  :func:`imod.visualize.streamfunction()` and :func:`imod.visualize.quiver()`
+-  :func:`imod.visualize.streamfunction` and :func:`imod.visualize.quiver`
    were added to plot a 2D representation of the groundwater flow field using
    either streamlines or quivers over a cross section plot 
-   (:func:`imod.visualize.cross_section()`). 
--  :func:`imod.evaluate.streamfunction_line()` and 
-   :func:`imod.evaluate.streamfunction_linestring()` were added to extract the
+   (:func:`imod.visualize.cross_section`). 
+-  :func:`imod.evaluate.streamfunction_line` and 
+   :func:`imod.evaluate.streamfunction_linestring` were added to extract the
    2D projected streamfunction of the 3D flow field for a given cross section. 
--  :func:`imod.evaluate.quiver_line()` and :func:`imod.evaluate.quiver_linestring()` 
+-  :func:`imod.evaluate.quiver_line` and :func:`imod.evaluate.quiver_linestring` 
    were added to extract the u and v components of the 3D flow field for a given
    cross section.
--  Added :meth:`imod.mf6.Model.write_qgis_project()` to write a QGIS project 
-   for easier inspection of model input in QGIS.
--  Added :meth:`imod.wq.Model.clip()` to clip a model to a provided extent.
+-  Added :meth:`imod.mf6.GroundwaterFlowModel.write_qgis_project` to write a
+   QGIS project for easier inspection of model input in QGIS.
+-  Added :meth:`imod.wq.SeawatModel.clip` to clip a model to a provided extent.
    Boundary conditions of clipped model can be automatically derived from parent
    model calculation results and are applied along the edges of the extent.
+-  Added :py:func:`imod.gen.read` and :py:func:`imod.gen.write` for reading
+   and writing binary iMOD GEN files to and from geopandas GeoDataFrames.
+-  Added :py:func:`imod.prepare.zonal_aggregate_raster` and
+   :py:func:`imod.prepare.zonal_aggregate_polygons` to efficiently compute zonal
+   aggregates for many polygons (e.g. the properties every individual ditch in
+   the Netherlands).
+-  Added :py:class:`imod.flow.ImodflowModel` to write to model iMODFLOW project
+   file.
+-  :meth:`imod.mf6.Simulation.write` now has a ``binary`` keyword. When set
+   to ``False``, all MODFLOW6 input is written to text rather than binary files.
+-  Added :class:`imod.mf6.DiscretizationVertices` to write MODFLOW6 DISV model
+   input.
+-  Packages for :class:`imod.mf6.GroundwaterFlowModel` will now accept
+   :class:`xugrid.UgridDataArray` objects for (DISV) unstructured grids, next to
+   :class:`xarray.DataArray` objects for structured (DIS) grids.
+-  Transient wells are now supported in :class:`imod.mf6.WellDisStructured` and
+   :class:`imod.mf6.WellDisVertices`.
+-  :func:`imod.util.to_ugrid2d` has been added to convert a (structured) xarray
+   DataArray or Dataset to a quadrilateral UGRID dataset.
+-  Functions created to create empty DataArrays with greater ease:
+   :func:`imod.util.empty_2d`, :func:`imod.util.empty_2d_transient`,
+   :func:`imod.util.empty_3d`, and :func:`imod.util.empty_3d_transient`.
+-  :func:`imod.util.where` has been added for easier if-then-else operations,
+   especially for preserving NaN nodata values.
+-  :meth:`imod.mf6.Simulation.run` has been added to more easily run a model,
+   especially in examples and tests.
+-  :func:`imod.mf6.open_cbc` and :func:`imod.mf6.open_hds` will automatically
+   return a ``xugrid.UgridDataArray`` for MODFLOW6 DISV model output.
 
 Changed
 ~~~~~~~
 
+-  Documentation overhaul: different theme, add sample data for examples, add
+   Frequently Asked Questions (FAQ) section, restructure API Reference. Examples
+   now ru
 -  Datetime columns in IPF associated files (via
-   :func:`imod.ipf.write_assoc()`) will not be placed within quotes, as this can
+   :func:`imod.ipf.write_assoc`) will not be placed within quotes, as this can
    break certain iMOD batch functions.
+-  :class:`imod.mf6.Well` has been renamed into :class:`imod.mf6.WellDisStructured`.
+-  :meth:`imod.mf6.GroundwaterFlowModel.write` will now write package names
+   into the simulation namefile.
+-  :func:`imod.mf6.open_cbc` will now return a dictionary with keys
+   ``flow-front-face, flow-lower-face, flow-right-face`` for the face flows,
+   rather than ``front-face-flow`` for better consistency.
+-  Switched to composition from inheritance for all model packages: all model
+   packages now contain an internal (xarray) Dataset, rather than inheriting
+   from the xarray Dataset.
+-  :class:`imod.mf6.SpecificStorage` or :class:`imod.mf6.StorageCoefficient` is
+   now mandatory for every MODFLOW6 model to avoid accidental steady-state
+   configuration.
+ 
+Removed
+~~~~~~~
+
+-  Module ``imod.tec`` for reading Tecplot files has been removed.  
 
 [0.10.1] - 2020-10-19
 ---------------------
 
 Changed
 ~~~~~~~
--  :meth:`imod.wq.SeawatModel.write()` now generates iMOD-WQ runfiles with
+
+-  :meth:`imod.wq.SeawatModel.write` now generates iMOD-WQ runfiles with
    more intelligent use of the "macro tokens". ``:`` is used exclusively for
    ranges; ``$`` is used to signify all layers. (This makes runfiles shorter,
    speeding up parsing, which takes a significant amount of time in the runfile
@@ -68,23 +128,25 @@ Changed
 
 Added
 ~~~~~
+
 -  :class:`imod.wq.MassLoading` and
    :class:`imod.wq.TimeVaryingConstantConcentration` have been added to allow
    additional concentration boundary conditions.
 -  IPF writing methods support an ``assoc_columns`` keyword to allow greater
    flexibility in including and renaming columns of the associated files.
--  Optional basemap plotting has been added to :meth:`imod.visualize.plot_map()`.
+-  Optional basemap plotting has been added to :meth:`imod.visualize.plot_map`.
 
 Fixed
 ~~~~~
+
 -  IO methods for IDF files will now correctly identify double precision IDFs.
    The correct record length identifier is 2295 rather than 2296 (2296 was a
    typo in the iMOD manual).
--  :meth:`imod.wq.SeawatModel.write()` will now write the correct path for
+-  :meth:`imod.wq.SeawatModel.write` will now write the correct path for
    recharge package concentration given in IDF files. It did not prepend the
    name of the package correctly (resulting in paths like
    ``concentration_l1.idf`` instead of ``rch/concentration_l1.idf``).
--  :meth:`imod.idf.save()` will simplify constant cellsize arrays to a scalar
+-  :meth:`imod.idf.save` will simplify constant cellsize arrays to a scalar
    value -- this greatly speeds up drawing in the iMOD-GUI.
 
 [0.10.0] - 2020-05-23
@@ -92,19 +154,21 @@ Fixed
 
 Changed
 ~~~~~~~
--  :meth:`imod.wq.SeawatModel.write()` no longer automatically appends the model
+
+-  :meth:`imod.wq.SeawatModel.write` no longer automatically appends the model
    name to the directory where the input is written. Instead, it simply writes
    to the directory as specified.
 -  :func:`imod.select.points_set_values` returns a new DataArray rather than
    mutating the input ``da``.
 -  :func:`imod.select.points_values` returns a DataArray with an index taken
    from the data of the first provided dimensions if it is a ``pandas.Series``.
--  :meth:`imod.wq.SeawatModel.write()` now writes a runfile with ``start_hour``
+-  :meth:`imod.wq.SeawatModel.write` now writes a runfile with ``start_hour``
    and ``start_minute`` (this results in output IDFs with datetime format
    ``"%Y%m%d%H%M"``).
 
 Added
 ~~~~~
+
 -  :meth:`from_file` constructors have been added to all `imod.wq.Package`.
    This allows loading directly package from a netCDF file (or any file supported by
    ``xarray.open_dataset``), or a path to a Zarr directory with suffix ".zarr" or ".zip".
@@ -134,6 +198,7 @@ Added
 
 Fixed
 ~~~~~
+
 -  :meth:`imod.prepare.Regridder` detects if the ``like`` DataArray is a subset
    along a dimension, in which case the dimension is not regridded.
 -  :meth:`imod.prepare.Regridder` now slices the ``source`` array accurately
@@ -159,6 +224,7 @@ Fixed
 
 Added
 ~~~~~
+
 -  IDF files representing data of arbitrary dimensionality can be opened and
    saved. This enables reading and writing files with more dimensions than just x,
    y, layer, and time.

@@ -62,7 +62,7 @@ Issues: https://gitlab.com/deltares/imod/imod-python/-/issues
    :titlesonly:
    :hidden:
 
-   installing
+   installation
    user-guide/index
    examples/index
    api/index

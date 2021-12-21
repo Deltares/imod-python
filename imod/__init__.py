@@ -5,6 +5,7 @@ from imod import (
     data,
     evaluate,
     flow,
+    gen,
     idf,
     ipf,
     mf6,
@@ -15,7 +16,6 @@ from imod import (
     visualize,
     wq,
 )
-from imod.data_formats import gen
 
 # version
 try:

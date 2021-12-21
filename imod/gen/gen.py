@@ -1,7 +1,7 @@
 import io
 import warnings
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Tuple, Union
 
 import geopandas as gpd
 import numpy as np
@@ -72,12 +72,12 @@ def from_rectangle(xy: np.ndarray) -> sg.Polygon:
     return sg.box(xy[0, 0], xy[0, 1], xy[1, 0], xy[1, 1])
 
 
-def to_circle(geometry: sg.Polygon) -> (np.ndarray, int):
+def to_circle(geometry: sg.Polygon) -> Tuple[np.ndarray, int]:
     xy = np.array([geometry.centroid.coords[0], geometry.exterior.coords[0]])
     return xy, 2
 
 
-def to_rectangle(geometry: sg.Polygon) -> (np.ndarray, int):
+def to_rectangle(geometry: sg.Polygon) -> Tuple[np.ndarray, int]:
     xy = np.array(geometry.exterior)
     if (geometry.area / geometry.minimum_rotated_rectangle.area) < 0.999:
         raise ValueError("Feature_type is rectangle, but geometry is not a rectangular")
@@ -85,16 +85,16 @@ def to_rectangle(geometry: sg.Polygon) -> (np.ndarray, int):
     return xy[[0, 2]], 2
 
 
-def to_polygon(geometry: sg.Polygon) -> (np.ndarray, int):
+def to_polygon(geometry: sg.Polygon) -> Tuple[np.ndarray, int]:
     xy = np.array(geometry.exterior)
     return xy, xy.shape[0]
 
 
-def to_point(geometry: sg.Point) -> (np.ndarray, int):
+def to_point(geometry: sg.Point) -> Tuple[np.ndarray, int]:
     return np.array(geometry), 1
 
 
-def to_line(geometry: sg.LineString) -> (np.ndarray, int):
+def to_line(geometry: sg.LineString) -> Tuple[np.ndarray, int]:
     xy = np.array(geometry)
     return xy, xy.shape[0]
 
@@ -206,7 +206,7 @@ def read(path: Union[str, Path]) -> gpd.GeoDataFrame:
 
 def vertices(
     geometry: Union[sg.Point, sg.Polygon, sg.LineString], ftype: str
-) -> (int, np.ndarray, int):
+) -> Tuple[int, np.ndarray, int]:
     """
     Infer from geometry, or convert from string, the feature type to the GEN
     expected Enum (int).

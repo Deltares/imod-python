@@ -4,7 +4,7 @@ Input/output
 ------------
 
 .. autosummary::
-    :toctree: generated/idf
+    :toctree: generated/io
 
     idf.open 
     idf.open_dataset
@@ -21,3 +21,6 @@ Input/output
     rasterio.header
     rasterio.open
     rasterio.save
+    
+    gen.read
+    gen.write

@@ -25,5 +25,7 @@ from imod.prepare.spatial import (
     polygonize,
     rasterize,
     rasterize_celltable,
+    zonal_aggregate_polygons,
+    zonal_aggregate_raster,
 )
 from imod.prepare.voxelize import Voxelizer

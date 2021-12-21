@@ -21,3 +21,6 @@ Prepare model input
     gdal_rasterize
     celltable
     rasterize_celltable
+    
+    zonal_aggregate_polygons
+    zonal_aggregate_raster

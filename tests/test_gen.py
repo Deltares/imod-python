@@ -45,7 +45,7 @@ def approximately_equal(a: sg.Polygon, b: sg.Polygon) -> bool:
 
 
 def test_gen_invalid_feature_string():
-    from imod.data_formats.gen.gen import vertices
+    from imod.gen.gen import vertices
 
     geom = TEST_GEOMETRIES["circle"]
     string = "cicle"
@@ -60,7 +60,7 @@ def test_gen_invalid_feature_string():
 
 
 def test_gen_invalid_feature_type():
-    from imod.data_formats.gen.gen import vertices
+    from imod.gen.gen import vertices
 
     geom = sg.MultiPoint(
         [
@@ -74,7 +74,7 @@ def test_gen_invalid_feature_type():
 
 
 def test_gen_shapely_gen_conversion():
-    from imod.data_formats.gen.gen import (
+    from imod.gen.gen import (
         from_circle,
         from_rectangle,
         to_circle,
