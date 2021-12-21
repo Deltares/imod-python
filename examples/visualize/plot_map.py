@@ -14,6 +14,8 @@ import numpy as np
 
 import imod
 
+# sphinx_gallery_thumbnail_number = -1
+
 # %%
 # Import the input data to plot:
 
