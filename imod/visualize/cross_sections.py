@@ -332,11 +332,10 @@ def streamfunction(da, ax, n_streamlines=10, kwargs_contour={}):
     # _meshcoords returns mesh edges, but useful here to allow 1D/2D
     # dimensions in da
     # go back to cell centers in 2D
-    X = np.vstack(da.shape[0] * [da.s])
-    Y = 0.5 * da.top + 0.5 * da.bottom
+    X = np.broadcast_to(da["s"].values, da.shape)
+    Y = (0.5 * da["top"] + 0.5 * da["bottom"]).values
     if Y.ndim == 1:
-        # promote to 2D
-        Y = xr.concat(da.shape[1] * [Y], dim=da.s)
+        Y = np.broadcast_to(Y[:, np.newaxis], da.shape)
 
     settings_contour = {
         "colors": "w",
