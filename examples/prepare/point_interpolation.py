@@ -10,13 +10,13 @@ model domain should be considered.
 
 """
 
+import matplotlib.pyplot as plt
+
 # %%
 # We'll start with the usual imports
 import numpy as np
 
 import imod
-
-import matplotlib.pyplot as plt
 
 # sphinx_gallery_thumbnail_number = -1
 

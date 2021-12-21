@@ -5,10 +5,10 @@ from pathlib import Path
 from typing import Union
 from zipfile import ZipFile
 
+import pandas as pd
 import pkg_resources
 import pooch
 import xarray as xr
-import pandas as pd
 
 REGISTRY = pooch.create(
     path=pooch.os_cache("imod"),
