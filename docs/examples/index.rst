@@ -23,3 +23,4 @@ convenient groundwater modeling.
    mf6/index.rst
    imodflow/index.rst
    imod-wq/index.rst
+   prepare/index.rst

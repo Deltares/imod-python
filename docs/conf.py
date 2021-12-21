@@ -50,6 +50,7 @@ sphinx_gallery_conf = {
         "../examples/mf6",
         "../examples/imod-wq",
         "../examples/imodflow",
+        "../examples/prepare",
         # "../examples/visualize",
     ],  # path to your example scripts
     "gallery_dirs": [
@@ -58,6 +59,7 @@ sphinx_gallery_conf = {
         "examples/mf6",
         "examples/imod-wq",
         "examples/imodflow",
+        "examples/prepare",
         # "examples/visualize",
     ],  # path to where to save gallery generated output
     "filename_pattern": ".py",

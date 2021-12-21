@@ -1,84 +1,133 @@
 """
-Interpolating points to a grid
-******************************
+Head point interpolation
+========================
+
+The starting heads to be used for a model could be based on the interpolation of
+x-y head measurements.
+
+TIP: In order to have better interpolation results, an area larger than the
+model domain should be considered.
 
 """
 
-from pathlib import Path
-
+# %%
+# We'll start with the usual imports
 import numpy as np
-import pandas as pd
-import xarray as xr
 
 import imod
 
-# Heads interpolation
-# --------------------
-#
-# The starting heads to be used for a model could be based on the
-# interpolation of x-y head
-# measurements. In order to have better interpolation results,
-# an area larger than the model domain should be considered.
-# The larger area to be used as reference is loaded
-# and used to create a base array filled with NaNs,
-# which will be later modified to include the heads interpolation.
-#
-# Using a larger area for the heads interpolation
+import matplotlib.pyplot as plt
 
-# TODO: Add data to pooch, and load in that manner.
-wdir = Path(
-    r"c:\Users\engelen\projects_wdir\imod-python\examples\data_betsy\drenthe_input"
-)
-# TODO: Add data to pooch, and load in that manner.
-idomain_larger = xr.open_dataarray(wdir / "idomain_larger.nc")
-like_2d_larger = xr.full_like(idomain_larger, np.nan).squeeze(drop="layer")
+# sphinx_gallery_thumbnail_number = -1
 
-like_2d_larger
 
 # %%
-# Head measurements information has been obtained from the Dinoloket website for the
-# case study area. This data consists on a .csv file
-# (read using Pandas
-# `pd.read_csv <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html#pandas.read_csv>`_
+# Head measurements information has been obtained from the Dinoloket website for
+# the case study area. This data consists on a .csv file (read using Pandas
+# `pd.read_csv
+# <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html#pandas.read_csv>`_
 # )
-# that contains the following columns:
-# `id`, `time`, `head`, `filt_top`, `filt_bot`, `elevation`, `x` and `y`.
-# For this example, all the measurements at different depths and
-# along time for a same id were averaged, to have one reference head value in each point.
+# that contains the following columns: `id`, `time`, `head`, `filt_top`,
+# `filt_bot`, `elevation`, `x` and `y`. For this example, all the measurements
+# at different depths and along time for a same id were averaged, to have one
+# reference head value in each point.
 
-heads = pd.read_csv(wdir / "dino_validatie_data.csv")
+heads = imod.data.head_observations()
+
 mean_heads = heads.groupby("id").mean()  # Calculating mean values by id
-x = mean_heads["x"]
-y = mean_heads["y"]
 
 mean_heads.head(5)
 
+
+# %%
+# Next we'll require a grid to interpolate on. iMOD Python has some useful
+# utility functions to generate an empty grid.
+
+xmin = 225_500.0
+xmax = 240_000.0
+ymin = 559_000.0
+ymax = 564_000.0
+dx = 100
+dy = -100
+
+grid = imod.util.empty_2d(dx, xmin, xmax, dy, ymin, ymax)
+
+# %%
+# Before we can select points in a grid, we first have to remove the points
+# outside the domain.
+
+points_outside_grid = (
+    (mean_heads["x"] < xmin)
+    | (mean_heads["x"] > xmax)
+    | (mean_heads["y"] < ymin)
+    | (mean_heads["y"] > ymax)
+)
+mean_heads_in_grid = mean_heads.loc[~points_outside_grid]
+
+mean_heads_in_grid.head(5)
+
+
 # %%
 # The previous head information needs to be assigned to the model grid.
-# imod-python has a tool called
-# `imod.select.points_set_values <https://imod.xyz/api/select.html#imod.select.points_set_values>`_,
-# which assigns values based on x-y coordinates to a previously defined array.
-# In this case, the array is the starting_heads_larger,
-# the values are the mean calculated heads and the x and y are the coordinates corresponding to the heads.
+# imod-python has a tool called `imod.select.points_set_values
+# <https://imod.xyz/api/select.html#imod.select.points_set_values>`_, which
+# assigns values based on x-y coordinates to a previously defined array. In this
+# case, the array is the starting_heads_larger, the values are the mean
+# calculated heads and the x and y are the coordinates corresponding to the
+# heads.
 
-starting_heads_larger = imod.select.points_set_values(
-    like_2d_larger, values=mean_heads["head"].to_list(), x=x.to_list(), y=y.to_list()
+x = mean_heads_in_grid["x"]
+y = mean_heads_in_grid["y"]
+
+heads_grid = imod.select.points_set_values(
+    grid,
+    values=mean_heads_in_grid["head"].to_list(),
+    x=x.to_list(),
+    y=y.to_list(),
 )
 
 # Plotting the points
-starting_heads_larger.plot.imshow()
+fig, ax = plt.subplots()
+heads_grid.plot.imshow(ax=ax)
 
 # %%
-# The previous information is still only available at certain points,
-# so it needs to be interpolated. The imod-python tool
-# `imod.prepare.laplace_interpolate <https://imod.xyz/api/prepare.html#imod.prepare.laplace_interpolate>`_
-# will be used to do an interpolation of the previously indicated head values.
-# It is possible to assign interpolation parameters such as
-# the number of iterations and the closing criteria.
+# The previous information is still only available at certain points, so it
+# needs to be interpolated. The iMOD Python tool
+# `imod.prepare.laplace_interpolate
+# <https://imod.xyz/api/prepare.html#imod.prepare.laplace_interpolate>`_ will be
+# used to do an interpolation of the previously indicated head values. It is
+# possible to assign interpolation parameters such as the number of iterations
+# and the closing criteria.
 
-interpolated_head_larger = imod.prepare.laplace_interpolate(
-    starting_heads_larger, close=0.001, mxiter=150, iter1=100
+interpolated_heads = imod.prepare.laplace_interpolate(
+    heads_grid, close=0.001, mxiter=150, iter1=100
 )
 
 # Plotting the interpolation results
-interpolated_head_larger.plot.imshow()
+fig, ax = plt.subplots()
+interpolated_heads.plot.imshow(ax=ax)
+
+# %%
+# It might be nice to have the locations of the boreholes plotted together with
+# the interpolation, so that we can better judge the quality of the
+# interpolation.
+#
+# One way to show this is to derive a grid with whether a cell contains an
+# observation. Consequently we can plot this as an overlay, setting cells
+# without an observation as transparent. ``imshow`` accepts a matrix with alpha
+# values as well, which allows us to set transparency per cell.
+
+# Derive grid with which cell has an observation
+is_observation = (~np.isnan(heads_grid)).astype(np.float64)
+
+fig, ax = plt.subplots()
+# Plot the interpolation results
+interpolated_heads.plot.imshow(ax=ax)
+
+# We'll plot on the same axis with transparency to use ``is_observation``
+# as overlay.
+is_observation.plot.imshow(
+    ax=ax, add_colorbar=False, cmap="gray_r", alpha=is_observation.values
+)
+
+# %%
