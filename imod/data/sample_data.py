@@ -8,6 +8,7 @@ from zipfile import ZipFile
 import pkg_resources
 import pooch
 import xarray as xr
+import pandas as pd
 
 REGISTRY = pooch.create(
     path=pooch.os_cache("imod"),
@@ -49,3 +50,8 @@ def hondsrug_river() -> xr.Dataset:
 def hondsrug_drainage() -> xr.Dataset:
     fname = REGISTRY.fetch("hondsrug-drainage.nc")
     return xr.open_dataset(fname)
+
+
+def head_observations() -> pd.DataFrame:
+    fname = REGISTRY.fetch("head-observations.csv")
+    return pd.read_csv(fname)

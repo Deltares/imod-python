@@ -6,4 +6,5 @@ from .sample_data import (
     hondsrug_meteorology,
     hondsrug_river,
     twri_output,
+    head_observations,
 )
