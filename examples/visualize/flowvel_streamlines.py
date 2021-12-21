@@ -49,7 +49,7 @@ fig, ax = plt.subplots()
 vx, vy, vz = imod.evaluate.flow_velocity(
     front=front, lower=lower, right=right, top_bot=top_bot, porosity=0.3
 )
-vz.sel(y=450050.0, method="nearest").plot(cmap="RdYlBu")
+vz.sel(y=450050.0, method="nearest").plot(cmap="RdYlBu", yincrease=False)
 
 plt.title("Vz")
 
