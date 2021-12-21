@@ -1,6 +1,26 @@
+from typing import Dict
+
 import numpy as np
+import xarray as xr
 
 from imod.mf6.pkgbase import BoundaryCondition
+
+
+def assign_dims(arg) -> Dict:
+    is_da = isinstance(arg, xr.DataArray)
+    if is_da and "time" in arg.coords:
+        if arg.ndim != 2:
+            raise ValueError("time varying variable: must be 2d")
+        if arg.dims[0] != "time":
+            arg = arg.transpose()
+        da = xr.DataArray(
+            data=arg.values, coords={"time": arg["time"]}, dims=["time", "index"]
+        )
+        return da
+    elif is_da:
+        return ("index", arg.values)
+    else:
+        return ("index", arg)
 
 
 class WellDisStructured(BoundaryCondition):
@@ -11,11 +31,11 @@ class WellDisStructured(BoundaryCondition):
 
     Parameters
     ----------
-    layer: int or list of int
-        Modellayer in which the well is located.
-    row: int or list of int
+    layer: list of int
+        Model layer in which the well is located.
+    row: list of int
         Row in which the well is located.
-    column: int or list of int
+    column: list of int
         Column in which the well is located.
     rate: float or list of floats
         is the volumetric well rate. A positive value indicates well
@@ -56,12 +76,10 @@ class WellDisStructured(BoundaryCondition):
         observations=None,
     ):
         super().__init__()
-        index = np.arange(len(layer))
-        self.dataset["index"] = index
-        self.dataset["layer"] = ("index", layer)
-        self.dataset["row"] = ("index", row)
-        self.dataset["column"] = ("index", column)
-        self.dataset["rate"] = ("index", rate)
+        self.dataset["layer"] = assign_dims(layer)
+        self.dataset["row"] = assign_dims(row)
+        self.dataset["column"] = assign_dims(column)
+        self.dataset["rate"] = assign_dims(rate)
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
@@ -91,9 +109,9 @@ class WellDisVertices(BoundaryCondition):
 
     Parameters
     ----------
-    layer: int or list of int
+    layer: list of int
         Modellayer in which the well is located.
-    cell2d: int or list of int
+    cell2d: list of int
         Cell in which the well is located.
     rate: float or list of floats
         is the volumetric well rate. A positive value indicates well
@@ -133,11 +151,9 @@ class WellDisVertices(BoundaryCondition):
         observations=None,
     ):
         super().__init__()
-        index = np.arange(len(layer))
-        self.dataset["index"] = index
-        self.dataset["layer"] = ("index", layer)
-        self.dataset["cell2d"] = ("index", cell2d)
-        self.dataset["rate"] = ("index", rate)
+        self.dataset["layer"] = assign_dims(layer)
+        self.dataset["cell2d"] = assign_dims(cell2d)
+        self.dataset["rate"] = assign_dims(rate)
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
