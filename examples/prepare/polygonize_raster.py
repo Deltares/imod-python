@@ -5,9 +5,10 @@ Polygonize raster
 iMOD Python also provides convenience functions to polygonize rasters.
 """
 
+import matplotlib.pyplot as plt
+
 # %%
 import imod
-import matplotlib.pyplot as plt
 
 # sphinx_gallery_thumbnail_number = -1
 
