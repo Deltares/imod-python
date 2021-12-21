@@ -10,8 +10,9 @@ customized plots.
 # %%
 # Import the necessary packages:
 
-import imod
 import numpy as np
+
+import imod
 
 # %%
 # Import the input data to plot:
