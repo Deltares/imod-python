@@ -46,15 +46,6 @@ Source code: https://gitlab.com/deltares/imod/imod-python
 
 Issues: https://gitlab.com/deltares/imod/imod-python/-/issues
 
-.. raw:: html
- 
-   <br/>
-   <a class="reference external image-reference" href="https://www.deltares.nl">
-      <img src="https://gitlab.com/deltares/imod/imod-python/-/raw/master/docs/_static/deltares.svg" style="height:60px;"/>
-      <br/>
-      <img src="https://gitlab.com/deltares/imod/imod-python/-/raw/master/docs/_static/enabling-delta-life.svg" style="height:60px;"/>
-   </a>
-
 .. _Deltares: https://www.deltares.nl
 .. _dask: https://dask.org/
 .. _xarray: http://xarray.pydata.org/
