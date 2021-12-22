@@ -49,7 +49,7 @@ def test_simple_model(fixed_format_parser):
     well_row = [1, 2, 3]
     well_column = [2, 2, 2]
     well_rate = [-5.0] * 3
-    well = mf6.Well(
+    well = mf6.WellDisStructured(
         layer=well_layer,
         row=well_row,
         column=well_column,

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod.mf6.wel import Well
+from imod.mf6.wel import WellDisStructured
 from imod.msw.pkgbase import Package, VariableMetaData
 
 
@@ -29,7 +29,7 @@ class CouplerMapping(Package):
         self,
         area: xr.DataArray,
         active: xr.DataArray,
-        well: Well = None,
+        well: WellDisStructured = None,
     ):
         super().__init__()
         self.dataset["area"] = area

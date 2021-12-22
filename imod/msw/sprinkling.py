@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod.mf6 import Well
+from imod.mf6 import WellDisStructured
 from imod.msw.pkgbase import Package, VariableMetaData
 
 
@@ -32,7 +32,7 @@ class Sprinkling(Package):
         max_abstraction_groundwater: xr.DataArray,
         max_abstraction_surfacewater: xr.DataArray,
         active: xr.DataArray,
-        well: Well,
+        well: WellDisStructured,
     ):
         super().__init__()
         self.dataset["max_abstraction_groundwater_m3_d"] = max_abstraction_groundwater
