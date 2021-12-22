@@ -129,7 +129,7 @@ To follow these steps, you need to be one of the maintainers for imod on both
 3. Locally, ``git fetch --tags`` and ``git pull``, verify you are on the commit
    you want to release, and that it is clean.
 
-4. Remove the ``build`` and ``dist`` folders if present.
+4. Remove the ``build``,  ``dist``, ``imod.egg-info`` folders if present.
 
 5. Create a source distribution under ``dist/`` with ``python -m build --sdist``
 
