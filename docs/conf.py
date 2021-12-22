@@ -8,11 +8,13 @@
 
 # -- Path setup --------------------------------------------------------------
 
+import pkg_resources
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import pkg_resources
+from sphinx_gallery.sorting import FileNameSortKey
 
 # -- Project information -----------------------------------------------------
 
@@ -67,6 +69,7 @@ sphinx_gallery_conf = {
     "abort_on_example_error": True,
     "capture_repr": ("_repr_html_", "__repr__"),
     "remove_config_comments": True,  # remove sphinx config comments from the rendered example
+    "within_subsection_order": FileNameSortKey,
 }
 
 # Add any paths that contain templates here, relative to this directory.

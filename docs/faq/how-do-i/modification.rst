@@ -217,7 +217,7 @@ Rasterize polygon data
 ~~~~~~~~~~~~~~~~~~~~~~
 
 A geopandas GeoDataFrame can be rasterized by providing a sample DataArray for
-``like`` in `:py:func:imod.prepare.rasterize`:
+``like`` in :py:func:`imod.prepare.rasterize`:
 
 .. code-block:: python
 

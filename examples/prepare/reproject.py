@@ -1,6 +1,6 @@
 """
-Reproject files
-===============
+Reproject data
+==============
 
 In this example we will see how to reproject vector and raster datasets.
 
