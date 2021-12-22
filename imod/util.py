@@ -496,11 +496,17 @@ def ugrid2d_data(da: xr.DataArray, face_dim: str) -> xr.DataArray:
     )
 
 
-def _unstack_layers(ds: xr.Dataset) -> xr.Dataset:
+def mdal_compliant_ugrid2d(ds: xr.Dataset) -> xr.Dataset:
     """
-    Unstack the layer dimensions, as MDAL does not have support for
-    UGRID-2D-layered datasets yet. Layers are stored as separate variables
-    instead for now.
+    Ensures the xarray Dataset will be written to a UGRID netCDF that will be
+    accepted by MDAL.
+
+    * Breaks down variables with a layer dimension into separate variables.
+    * Removes absent entries from the mesh topology attributes.
+    * Sets encoding to float for datetime variables.
+    * Convert face_node_connectivity to float and set _FillValue to NaN
+      (xarray).
+
     """
     for variable in ds.data_vars:
         if "layer" in ds[variable].dims:
@@ -510,6 +516,42 @@ def _unstack_layers(ds: xr.Dataset) -> xr.Dataset:
                 ds[f"{variable}_layer_{layer}"] = stacked.sel(layer=layer, drop=True)
     if "layer" in ds.coords:
         ds = ds.drop("layer")
+
+    # Find topology variables
+    for variable in ds.data_vars:
+        attrs = ds[variable].attrs
+        if attrs.get("cf_role") == "mesh_topology":
+            # Possible attributes:
+            #
+            # "cf_role"
+            # "long_name"
+            # "topology_dimension"
+            # "node_dimension": required
+            # "node_coordinates": required
+            # "edge_dimension": optional
+            # "edge_node_connectivity": optional
+            # "face_dimension": required
+            # "face_node_connectivity": required
+            # "max_face_nodes_dimension": required
+            # "face_coordinates": optional
+
+            edge_dim = attrs.get("edge_dimension")
+            if edge_dim and edge_dim not in ds.dims:
+                attrs.pop("edge_dimension")
+
+            face_coords = attrs.get("face_coordinates")
+            if face_coords and face_coords not in ds.coords:
+                attrs.pop("face_coordinates")
+
+            edge_nodes = attrs.get("edge_node_connectivity")
+            if edge_nodes and edge_nodes not in ds:
+                attrs.pop("edge_node_connectivity")
+
+    # Make sure time is encoded as a float for MDAL
+    for var in ds.coords:
+        if np.issubdtype(ds[var].dtype, np.datetime64):
+            ds[var].encoding["dtype"] = np.float64
+
     return ds
 
 
@@ -541,11 +583,6 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
     grid = xugrid.Ugrid2d.from_structured(data)
     ds = grid.dataset
 
-    # Set face coordinates; required by MDAL if face_coordinates in attrs.
-    attrs = grid.topology_attrs
-    name_x, name_y = attrs["face_coordinates"].split()
-    ds = ds.assign_coords({name_x: grid.face_x, name_y: grid.face_y})
-
     if isinstance(data, xr.Dataset):
         for variable in data.data_vars:
             ds[variable] = ugrid2d_data(data[variable], grid.face_dimension)
@@ -555,13 +592,7 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
                 'A name is required for the DataArray. It can be set with ``da.name = "..."`'
             )
         ds[data.name] = ugrid2d_data(data, grid.face_dimension)
-
-    # Make sure time is encoded as a float for MDAL
-    for var in ds.coords:
-        if np.issubdtype(ds[var].dtype, np.datetime64):
-            ds[var].encoding["dtype"] = np.float64
-
-    return _unstack_layers(ds)
+    return mdal_compliant_ugrid2d(ds)
 
 
 def is_divisor(numerator: FloatArray, denominator: float) -> bool:
@@ -740,7 +771,7 @@ def empty_2d(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (dx, dy)
+    cellsizes = (abs(dx), -abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size
@@ -787,7 +818,7 @@ def empty_3d(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (dx, dy)
+    cellsizes = (abs(dx), -abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size
@@ -840,7 +871,7 @@ def empty_2d_transient(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (dx, dy)
+    cellsizes = (abs(dx), -abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size
@@ -894,7 +925,7 @@ def empty_3d_transient(
         Filled with NaN.
     """
     bounds = (xmin, xmax, ymin, ymax)
-    cellsizes = (dx, dy)
+    cellsizes = (abs(dx), -abs(dy))
     coords = _xycoords(bounds, cellsizes)
     nrow = coords["y"].size
     ncol = coords["x"].size

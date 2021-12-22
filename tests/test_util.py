@@ -5,6 +5,7 @@ import re
 import affine
 import cftime
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 
@@ -407,6 +408,10 @@ def test_empty():
     assert np.allclose(da["x"], [0.5, 1.5])
     assert np.allclose(da["y"], [11.5, 10.5])
     assert da.dims == ("y", "x")
+    # Sign on dx, dy should be ignored
+    da = util.empty_2d(-1.0, 0.0, 2.0, 1.0, 10.0, 12.0)
+    assert np.allclose(da["x"], [0.5, 1.5])
+    assert np.allclose(da["y"], [11.5, 10.5])
 
     with pytest.raises(ValueError, match="layer must be 1d"):
         util.empty_3d(1.0, 0.0, 2.0, -1.0, 10.0, 12.0, [[1, 2]])
@@ -452,32 +457,168 @@ def test_where():
         util.where(False, 1, 0)
 
 
-def test_to_ugrid2d():
-    a = xr.DataArray(
-        np.ones((3, 2, 2)),
-        {"layer": [1, 2, 3], "y": [1.5, 0.5], "x": [0.5, 1.5]},
-        ["layer", "y", "x"],
-        name=None,
+def test_compliant_ugrid2d(write=False):
+    import xugrid
+
+    vertices = np.array(
+        [
+            [0.0, 0.0],  # 0
+            [1.0, 0.0],  # 1
+            [2.0, 0.0],  # 2
+            [0.0, 1.0],  # 3
+            [1.0, 1.0],  # 4
+            [2.0, 1.0],  # 5
+            [1.0, 2.0],  # 6
+        ]
     )
+    faces = np.array(
+        [
+            [0, 1, 4, 3],
+            [1, 2, 5, 4],
+            [3, 4, 6, -1],
+            [4, 5, 6, -1],
+        ]
+    )
+    grid = xugrid.Ugrid2d(
+        node_x=vertices[:, 0],
+        node_y=vertices[:, 1],
+        fill_value=-1,
+        face_node_connectivity=faces,
+    )
+    darray = xr.DataArray(
+        data=np.random.rand(5, 3, grid.n_face),
+        coords={"time": pd.date_range("2000-01-01", "2000-01-05"), "layer": [1, 2, 3]},
+        dims=["time", "layer", grid.face_dimension],
+    )
+    ugrid_ds = grid.dataset.copy()
+    ugrid_ds["a"] = darray
+    uds = util.mdal_compliant_ugrid2d(ugrid_ds)
+
+    assert isinstance(uds, xr.Dataset)
+    for i in range(1, 4):
+        assert f"a_layer_{i}" in uds
+
+    assert "mesh2d" in uds
+    assert "mesh2d_face_nodes" in uds
+    assert "mesh2d_node_x" in uds
+    assert "mesh2d_node_y" in uds
+    assert "mesh2d_nFaces" in uds.dims
+    assert "mesh2d_nNodes" in uds.dims
+    assert "mesh2d_nMax_face_nodes" in uds.dims
+    attrs = uds["mesh2d"].attrs
+    assert "edge_dimension" not in attrs
+    assert "face_coordinates" not in attrs
+    assert "edge_node_connectivity" not in attrs
+
+    assert uds["time"].encoding["dtype"] == np.float64
+
+    if write:
+        uds.to_netcdf("ugrid-mixed.nc")
+
+
+def test_to_ugrid2d(write=False):
+    a2d = util.empty_2d(
+        dx=1.0,
+        xmin=0.0,
+        xmax=2.0,
+        dy=1.0,
+        ymin=0.0,
+        ymax=2.0,
+    )
+
     with pytest.raises(TypeError, match="data must be xarray"):
-        util.to_ugrid2d(a.values)
+        util.to_ugrid2d(a2d.values)
     with pytest.raises(ValueError, match="A name is required"):
-        util.to_ugrid2d(a)
+        util.to_ugrid2d(a2d)
 
-    a.name = "a"
+    a2d.name = "a"
     with pytest.raises(ValueError, match="Last two dimensions of da"):
-        util.to_ugrid2d(a.transpose())
+        util.to_ugrid2d(a2d.transpose())
 
-    uds = util.to_ugrid2d(a)
+    uds = util.to_ugrid2d(a2d)
     assert isinstance(uds, xr.Dataset)
-    for i in range(1, 4):
-        assert f"a_layer_{i}" in uds
+    assert "a" in uds
 
+    assert "mesh2d" in uds
+    assert "mesh2d_face_nodes" in uds
+    assert "mesh2d_node_x" in uds
+    assert "mesh2d_node_y" in uds
+    assert "mesh2d_nFaces" in uds.dims
+    assert "mesh2d_nNodes" in uds.dims
+    assert "mesh2d_nMax_face_nodes" in uds.dims
+    attrs = uds["mesh2d"].attrs
+    assert "edge_dimension" not in attrs
+    assert "face_coordinates" not in attrs
+    assert "edge_node_connectivity" not in attrs
+
+    if write:
+        uds.to_netcdf("ugrid-a2d.nc")
+
+    # 2d Dataset
     ds = xr.Dataset()
-    ds["a"] = a
-    ds["b"] = a.copy()
+    ds["a"] = a2d
+    ds["b"] = a2d.copy()
     uds = util.to_ugrid2d(ds)
+    assert "a" in uds
+    assert "b" in uds
+    assert isinstance(uds, xr.Dataset)
+
+    if write:
+        uds.to_netcdf("ugrid-a2d-ds.nc")
+
+    # transient 2d
+    a2dt = util.empty_2d_transient(
+        dx=1.0,
+        xmin=0.0,
+        xmax=2.0,
+        dy=1.0,
+        ymin=0.0,
+        ymax=2.0,
+        time=pd.date_range("2000-01-01", "2000-01-05"),
+    )
+    a2dt.name = "a"
+    uds = util.to_ugrid2d(a2dt)
+    assert "a" in uds
+    assert uds["time"].encoding["dtype"] == np.float64
+
+    if write:
+        uds.to_netcdf("ugrid-a2dt.nc")
+
+    # 3d
+    a3d = util.empty_3d(
+        dx=1.0,
+        xmin=0.0,
+        xmax=2.0,
+        dy=1.0,
+        ymin=0.0,
+        ymax=2.0,
+        layer=[1, 2, 3],
+    )
+    a3d.name = "a"
+    uds = util.to_ugrid2d(a3d)
     assert isinstance(uds, xr.Dataset)
     for i in range(1, 4):
         assert f"a_layer_{i}" in uds
-        assert f"b_layer_{i}" in uds
+
+    if write:
+        uds.to_netcdf("ugrid-a3d.nc")
+
+    # transient 3d
+    a3dt = util.empty_3d_transient(
+        dx=1.0,
+        xmin=0.0,
+        xmax=2.0,
+        dy=1.0,
+        ymin=0.0,
+        ymax=2.0,
+        layer=[1, 2, 3],
+        time=pd.date_range("2000-01-01", "2000-01-05"),
+    )
+    a3dt.name = "a"
+    uds = util.to_ugrid2d(a3dt)
+    for i in range(1, 4):
+        assert f"a_layer_{i}" in uds
+    assert uds["time"].encoding["dtype"] == np.float64
+
+    if write:
+        uds.to_netcdf("ugrid-a3dt.nc")
