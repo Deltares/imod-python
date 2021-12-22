@@ -14,6 +14,15 @@ class NodeSvatMapping(Package):
     This class is responsible for the file `nodenr2svat.dxc`.
 
     Unlike imod.msw.CouplerMapping, this class does not include mapping to wells.
+
+    Parameters
+    ----------
+    area: array of floats (xr.DataArray)
+        Describes the area of SVAT units. This array must have a subunit coordinate
+        to describe different land uses.
+    active: array of bools (xr.DataArray)
+        Describes whether SVAT units are active or not.
+        This array must not have a subunit coordinate.
     """
 
     _file_name = "nodenr2svat.dxc"

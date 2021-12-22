@@ -13,6 +13,20 @@ class Sprinkling(Package):
     This contains the sprinkling capacities of links between SVAT units and groundwater/ surface water locations.
 
     This class is responsible for the file `scap_svat.inp`
+
+    Parameters
+    ----------
+    max_abstraction_groundwater: array of floats (xr.DataArray)
+        Describes the maximum abstraction of groundwater to SVAT units in m3 per day.
+        This array must not have a subunit coordinate.
+    max_abstraction_surfacewater: array of floats (xr.DataArray)
+        Describes the maximum abstraction of surfacewater to SVAT units in m3 per day.
+        This array must not have a subunit coordinate.
+    active: array of bools (xr.DataArray)
+        Describes whether SVAT units are active or not.
+        This array must not have a subunit coordinate.
+    well: WellDisStructured
+        Describes the sprinkling of SVAT units coming groundwater.
     """
 
     _file_name = "scap_svat.inp"

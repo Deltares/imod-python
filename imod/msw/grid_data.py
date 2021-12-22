@@ -12,6 +12,28 @@ class GridData(Package):
     This contains the grid data.
 
     This class is responsible for the file `area_svat.inp`
+
+    Parameters
+    ----------
+    area: array of floats (xr.DataArray)
+        Describes the area of SVAT units. This array must have a subunit coordinate
+        to describe different landuses.
+    landuse: array of integers (xr.DataArray)
+        Describes the landuse type of SVAT units.
+        This array must have a subunit coordinate.
+    rootzone_depth: array of floats (xr.DataArray)
+        Describes the rootzone depth of SVAT units.
+        This array must have a subunit coordinate to describe different landuses.
+    surface_elevation: array of floats (xr.DataArray)
+        Describes the surface elevation of SVAT units.
+        This array must have a subunit coordinate to describe different landuses.
+    soil_physical_unit: array of integers (xr.DataArray)
+        Describes the physical parameters of SVAT units.
+        These parameters will be looked up in a table according to the given integers.
+        This array must have a subunit coordinate to describe different landuses.
+    active: array of bools (xr.DataArray)
+        Describes whether SVAT units are active or not.
+        This array must not have a subunit coordinate.
     """
 
     _file_name = "area_svat.inp"

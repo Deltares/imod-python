@@ -79,6 +79,19 @@ class PrecipitationMapping(MeteoMapping):
     This contains the data to map precipitation grid cells to MetaSwap svats.
 
     This class is responsible for the file `svat2precgrid.inp`.
+
+    Parameters
+    ----------
+    area: array of floats (xr.DataArray)
+        Describes the area of SVAT units. This array must have a subunit coordinate
+        to describe different landuses.
+    active: array of bools (xr.DataArray)
+        Describes whether SVAT units are active or not.
+        This array must not have a subunit coordinate.
+    precipitation: array of floats (xr.DataArray)
+        Describes the precipitation data.
+        The extend of the grid must be larger than the MetaSvap grid.
+        The data must also be coarser than the MetaSvap grid.
     """
 
     _file_name = "svat2precgrid.inp"
@@ -105,6 +118,19 @@ class EvapotranspirationMapping(MeteoMapping):
     This contains the data to map evapotranspiration grid cells to MetaSwap svats.
 
     This class is responsible for the file `svat2etrefgrid.inp`.
+
+    Parameters
+    ----------
+    area: array of floats (xr.DataArray)
+        Describes the area of SVAT units. This array must have a subunit coordinate
+        to describe different landuses.
+    active: array of bools (xr.DataArray)
+        Describes whether SVAT units are active or not.
+        This array must not have a subunit coordinate.
+    evapotransporation: array of floats (xr.DataArray)
+        Describes the evapotransporation data.
+        The extend of the grid must be larger than the MetaSvap grid.
+        The data must also be coarser than the MetaSvap grid.
     """
 
     _file_name = "svat2etrefgrid.inp"

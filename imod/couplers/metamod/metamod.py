@@ -1,8 +1,20 @@
 from imod.couplers.metamod.node_svat_mapping import NodeSvatMapping
+from imod.mf6 import Modflow6Simulation
+from imod.msw import MetaSwapModel
 
 
 class MetaMod:
-    def __init__(self, msw_model, mf6_simulation):
+    """[summary]
+
+    Parameters
+    ----------
+    msw_model : MetaSwapModel
+        The MetaSwap model that should be coupled.
+    mf6_simulation : Modflow6Simulation
+        The Modflow6 simulation that should be coupled.
+    """
+
+    def __init__(self, msw_model: MetaSwapModel, mf6_simulation: Modflow6Simulation):
         self.msw_model = msw_model
         self.mf6_simulation = mf6_simulation
 
@@ -12,7 +24,6 @@ class MetaMod:
         self.write_exchanges(directory)
 
     def write_exchanges(self, directory):
-        # Grid mapping
         area = self.msw_model["grid_data"].dataset["area"]
         active = self.msw_model["grid_data"].dataset["active"]
         grid_mapping = NodeSvatMapping(area, active)

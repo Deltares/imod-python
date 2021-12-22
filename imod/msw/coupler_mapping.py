@@ -15,6 +15,17 @@ class CouplerMapping(Package):
     This class is responsible for the file `mod2svat.inp`.
 
     Unlike imod.metamod.NodeSvatMapping, this class also includes mapping to wells.
+
+    Parameters
+    ----------
+    area: array of floats (xr.DataArray)
+        Describes the area of SVAT units. This array must have a subunit coordinate
+        to describe different land uses.
+    active: array of bools (xr.DataArray)
+        Describes whether SVAT units are active or not.
+        This array must not have a subunit coordinate.
+    well: WellDisStructured (optional)
+        If given, this parameter describes sprinkling of SVAT units from MODFLOW cells.
     """
 
     _file_name = "mod2svat.inp"

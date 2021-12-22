@@ -12,6 +12,24 @@ class Infiltration(Package):
     This contains the infiltration data.
 
     This class is responsible for the file `infi_svat.inp`
+
+    Parameters
+    ----------
+    infiltration_capacity: array of floats (xr.DataArray)
+        Describes the infiltration capacity of SVAT units.
+        This array must have a subunit coordinate to describe different land uses.
+    downward_resistance: array of floats (xr.DataArray)
+        Describes the downward resisitance of SVAT units.
+        This array must not have a subunit coordinate.
+    upward_resistance: array of floats (xr.DataArray)
+        Describes the upward resistance of SVAT units.
+        This array must not have a subunit coordinate.
+    bottom_resistance: array of floats (xr.DataArray)
+        Describes the infiltration capacity of SVAT units.
+        This array must not have a subunit coordinate.
+    active: array of bools (xr.DataArray)
+        Describes whether SVAT units are active or not.
+        This array must not have a subunit coordinate.
     """
 
     _file_name = "infi_svat.inp"
