@@ -2,6 +2,7 @@ import pkg_resources
 
 # exports
 from imod import (
+    couplers,
     data,
     evaluate,
     flow,
