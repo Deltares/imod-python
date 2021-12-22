@@ -23,12 +23,12 @@ data:
   
 We currently support the following MODFLOW-based models:
 
-* `USGS MODFLOW 6`_ (:doc:`api/mf6`), structured (DIS) and discretization by
+* `USGS MODFLOW 6`_, structured (DIS) and discretization by
   vertices (DISV) grids only, and not all advanced stress packages yet (LAK,
   MAW, SFR, UZF)
-* `iMOD-WQ`_ (:doc:`api/wq`), which integrates SEAWAT (density-dependent
+* `iMOD-WQ`_, which integrates SEAWAT (density-dependent
   groundwater flow) and MT3DMS (multi-species reactive transport calculations)
-* `iMODFLOW`_ (:doc:`api/flow`)
+* `iMODFLOW`_
 
 This Python package is developed primarily by the Groundwater Management Group
 at `Deltares`_. It is used together with a broader set of open source tools and
@@ -40,7 +40,7 @@ standards for reproducible modeling and data analysis:
 * `Snakemake`_: workflow manager to turn a collection of scripts into a
   workflow.
 
-Documentation: https://imod.xyz/
+Documentation: https://deltares.gitlab.io/imod/imod-python/
 
 Source code: https://gitlab.com/deltares/imod/imod-python
 

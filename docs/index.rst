@@ -43,7 +43,7 @@ standards for reproducible modeling and data analysis:
 * `Snakemake`_: workflow manager to turn a collection of scripts into a
   workflow.
 
-Documentation: https://imod.xyz/
+Documentation: https://deltares.gitlab.io/imod/imod-python/
 
 Source code: https://gitlab.com/deltares/imod/imod-python
 
