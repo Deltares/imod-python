@@ -15,6 +15,7 @@ Typical examples of file formats containing raster dat are:
 * GeoTIFF
 * ESRII ASCII
 * netCDF
+* idf (iMOD 5 format)
 
 In groundwater modeling, data commonly stored in raster format are:
 
