@@ -31,23 +31,23 @@ class Sprinkling(Package):
         self,
         max_abstraction_groundwater: xr.DataArray,
         max_abstraction_surfacewater: xr.DataArray,
-        well: Well,
         active: xr.DataArray,
+        well: Well,
     ):
         super().__init__()
-        self.dataset["max_abstraction_groundwater"] = max_abstraction_groundwater
-        self.dataset["max_abstraction_surfacewater"] = max_abstraction_surfacewater
+        self.dataset["max_abstraction_groundwater_m3_d"] = max_abstraction_groundwater
+        self.dataset["max_abstraction_surfacewater_m3_d"] = max_abstraction_surfacewater
         self.dataset["active"] = active
         self.well = well
 
     def _render(self, file):
         # Preprocess input
         max_abstraction_groundwater_m3_d = self._get_preprocessed_array(
-            "max_abstraction_groundwater", self.dataset["active"]
+            "max_abstraction_groundwater_m3_d", self.dataset["active"]
         )
 
         max_abstraction_surfacewater_m3_d = self._get_preprocessed_array(
-            "max_abstraction_surfacewater", self.dataset["active"]
+            "max_abstraction_surfacewater_m3_d", self.dataset["active"]
         )
 
         # Generate remaining columns
@@ -94,25 +94,30 @@ class Sprinkling(Package):
             self._render(f)
 
     def _get_layer(self):
-        layer_array = []
-
+        # Build up well_dict
+        well_dict = {}
         well_row = self.well["row"]
         well_column = self.well["column"]
         well_layer = self.well["layer"]
-
         for row, column, layer in zip(well_row, well_column, well_layer):
             # Convert from 1-indexing to 0 indexing
-            row -= 1
-            column -= 1
-            layer -= 1
-
-            if self.dataset["active"][row, column]:
-                if np.isnan(self.dataset["max_abstraction_groundwater"][row, column]):
-                    raise ValueError(
-                        "max_abstraction_groundwater must to be defined for all wells."
-                    )
-
-                layer_array.append(
-                    self.dataset["max_abstraction_groundwater"][row, column]
+            key = (int(row) - 1, int(column) - 1)
+            if key in well_dict:
+                raise ValueError(
+                    "A single svat cannot be sprinkled by multiple groundwater cells."
                 )
-        return np.array(layer_array)
+
+            well_dict[key] = layer
+
+        # Build up layer_array
+        layer_list = []
+        row_len, column_len = self.dataset["max_abstraction_groundwater_m3_d"].shape
+
+        for column in range(column_len):
+            for row in range(row_len):
+                if self.dataset["active"][row, column] and not np.isnan(
+                    self.dataset["max_abstraction_groundwater_m3_d"][row, column]
+                ):
+                    layer_list.append(well_dict[(row, column)])
+
+        return np.array(layer_list)

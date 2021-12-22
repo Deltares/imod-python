@@ -94,9 +94,9 @@ class CouplerMapping(Package):
         return self.write_dataframe_fixed_width(file, dataframe)
 
     def _get_well_values(self):
-        mod_id_array = []
-        svat_array = []
-        layer_array = []
+        mod_id_list = []
+        svat_list = []
+        layer_list = []
 
         well_row = self.well["row"]
         well_column = self.well["column"]
@@ -116,12 +116,12 @@ class CouplerMapping(Package):
                     mod_id = (
                         layer * column_len * row_len + row * column_len + column + 1
                     )
-                    mod_id_array.append(mod_id)
-                    svat_array.append(self.dataset["svat"][subunit, row, column])
+                    mod_id_list.append(mod_id)
+                    svat_list.append(self.dataset["svat"][subunit, row, column])
 
-                    layer_array.append(layer + 1)
+                    layer_list.append(layer + 1)
 
-        return (np.array(mod_id_array), np.array(svat_array), np.array(layer_array))
+        return (np.array(mod_id_list), np.array(svat_list), np.array(layer_list))
 
     def write(self, directory):
         directory = pathlib.Path(directory)
