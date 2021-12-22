@@ -1,1 +1,1 @@
-from imod.couplers.metamod import MetaMod
+from imod.couplers.metamod.metamod import MetaMod
