@@ -9,6 +9,20 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+[0.11.1] - 2021-12-23
+---------------------
+
+Fixed
+~~~~~
+
+-  ``contextily``, ``geopandas``, ``pyvista``, ``rasterio``, and ``shapely``
+   are now fully optional dependencies. Import errors are only raised when
+   accessing functionality that requires their use.
+-  Include declxml as ``imod.declxml`` (should be internal use only!): declxml
+   is no longer maintained on the official repository:
+   https://github.com/gatkin/declxml. Furthermore, it has no conda feedstock,
+   which makes distribution via conda difficult.
+
 [0.11.0] - 2021-12-21
 ---------------------
 
@@ -30,7 +44,7 @@ Fixed
    processes are writing models in parallel.
 -  :func:`imod.prepare.laplace_interpolate` will no longer ZeroDivisionError
    when given a value for ``ibound``.
- 
+
 Added
 ~~~~~
 
@@ -38,17 +52,17 @@ Added
    multiple species runs.
 -  :meth:`imod.wq.SeawatModel.to_netcdf` has been added to write all model
    packages to netCDF files.
--  :func:`imod.mf6.open_cbc` has been added to read the budget data of 
+-  :func:`imod.mf6.open_cbc` has been added to read the budget data of
    structured (DIS) MODFLOW6 models. The data is read lazily into xarray
    DataArrays per timestep.
 -  :func:`imod.visualize.streamfunction` and :func:`imod.visualize.quiver`
    were added to plot a 2D representation of the groundwater flow field using
-   either streamlines or quivers over a cross section plot 
-   (:func:`imod.visualize.cross_section`). 
--  :func:`imod.evaluate.streamfunction_line` and 
+   either streamlines or quivers over a cross section plot
+   (:func:`imod.visualize.cross_section`).
+-  :func:`imod.evaluate.streamfunction_line` and
    :func:`imod.evaluate.streamfunction_linestring` were added to extract the
-   2D projected streamfunction of the 3D flow field for a given cross section. 
--  :func:`imod.evaluate.quiver_line` and :func:`imod.evaluate.quiver_linestring` 
+   2D projected streamfunction of the 3D flow field for a given cross section.
+-  :func:`imod.evaluate.quiver_line` and :func:`imod.evaluate.quiver_linestring`
    were added to extract the u and v components of the 3D flow field for a given
    cross section.
 -  Added :meth:`imod.mf6.GroundwaterFlowModel.write_qgis_project` to write a
@@ -106,11 +120,11 @@ Changed
 -  :class:`imod.mf6.SpecificStorage` or :class:`imod.mf6.StorageCoefficient` is
    now mandatory for every MODFLOW6 model to avoid accidental steady-state
    configuration.
- 
+
 Removed
 ~~~~~~~
 
--  Module ``imod.tec`` for reading Tecplot files has been removed.  
+-  Module ``imod.tec`` for reading Tecplot files has been removed.
 
 [0.10.1] - 2020-10-19
 ---------------------
@@ -187,7 +201,7 @@ Added
    :func:`imod.visualize.grid_3d` and :func:`imod.visualize.line_3d` have been
    added to produce ``pyvista`` meshes from ``xarray.DataArray``'s and
    ``shapely`` polygons, respectively.
-   :class:`imod.visualize.GridAnimation3D` and :class:`imod.visualize.StaticGridAnimation3D` 
+   :class:`imod.visualize.GridAnimation3D` and :class:`imod.visualize.StaticGridAnimation3D`
    have been added to setup 3D animations of DataArrays with transient data.
 -  Support for out of core computation by ``imod.prepare.Regridder`` if ``source``
    is chunked.
@@ -212,11 +226,11 @@ Fixed
 -  :func:`imod.visualize.plot_map` enforces decreasing ``y``, which ensures maps are not plotted
    upside down.
 -  :func:`imod.util.coord_reference` now returns a scalar cellsize if coordinate is equidistant.
--  :meth:`imod.prepare.Regridder.regrid` returns cellsizes as scalar when coordinates are 
+-  :meth:`imod.prepare.Regridder.regrid` returns cellsizes as scalar when coordinates are
    equidistant.
 -  Raise proper ValueError in :meth:`imod.prepare.Regridder.regrid` consistenly when the number
    of dimensions to regrid does not match the regridder dimensions.
--  When writing DataArrays that have size 1 in dimension ``x`` or ``y``: raise error if cellsize 
+-  When writing DataArrays that have size 1 in dimension ``x`` or ``y``: raise error if cellsize
    (``dx`` or ``dy``) is not specified; and actually use ``dy`` or ``dx`` when size is 1.
 
 [0.9.0] - 2020-01-19

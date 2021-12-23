@@ -7,14 +7,13 @@ import pandas as pd
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import imod
+from imod.util import MissingOptionalModule
 from imod.visualize import common
 
-# contextily is an optional dependency
 try:
     import contextily as ctx
 except ImportError:
-    ctx = None
-    pass
+    ctx = MissingOptionalModule("contextily")
 
 
 def read_imod_legend(path):
@@ -232,8 +231,6 @@ def plot_map(
 
     # Add basemap, if basemap is neither None nor False
     if add_basemap:
-        if ctx is None:
-            raise ImportError("Module contextily is required for adding basemaps")
 
         crs = "EPSG:28992"  # default Amersfoort/RDnew
         try:

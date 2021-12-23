@@ -55,7 +55,8 @@ try:
     if vtk.vtkVersion().GetVTKMajorVersion() < 9:
         raise ImportError("VTK version of 9.0 or higher required")
 except ImportError:
-    pass
+    pv = util.MissingOptionalModule("pyvista")
+    vtk = util.MissingOptionalModule("vtk")
 
 
 def exterior(da, n):
