@@ -1,9 +1,14 @@
 import numba
 import numpy as np
-import shapely.geometry as sg
 import xarray as xr
 
 import imod
+from imod.util import MissingOptionalModule
+
+try:
+    import shapely.geometry as sg
+except ImportError:
+    sg = MissingOptionalModule("shapely")
 
 
 @numba.njit

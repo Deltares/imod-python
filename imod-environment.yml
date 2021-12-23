@@ -17,19 +17,15 @@ dependencies:
   - python-graphviz
   - flopy
   - jinja2
-  - joblib
   - matplotlib
-  - nbstripout
+  - meshzoo
   - numba>=0.50
   - numpy
   - pandas
   - pooch
   - pip
   - pip:
-    - declxml
-    - meshzoo
     - pandamesh
-    - xugrid
   - pydata-sphinx-theme
   - pygeos
   - pyproj
@@ -41,6 +37,7 @@ dependencies:
   - rasterio>=1.0
   - scipy
   - setuptools_scm
+  - scooby<=0.5.7
   - sphinx
   - sphinx-gallery
   - toolz
@@ -48,4 +45,5 @@ dependencies:
   - twine
   - vtk>=9.0
   - xarray>=0.15
+  - xugrid
   - zarr

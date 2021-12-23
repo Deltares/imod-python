@@ -21,7 +21,7 @@ from . import array_io
 try:
     import rasterio
 except ImportError:
-    pass
+    rasterio = util.MissingOptionalModule("rasterio")
 
 
 # Based on this comment

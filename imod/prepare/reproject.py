@@ -3,6 +3,7 @@ import numpy as np
 import xarray as xr
 
 import imod
+from imod.util import MissingOptionalModule
 
 # since rasterio is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
@@ -10,7 +11,7 @@ try:
     import rasterio
     import rasterio.warp
 except ImportError:
-    pass
+    rasterio = MissingOptionalModule("rasterio")
 
 
 def _reproject_dst(source, src_crs, dst_crs, src_transform):

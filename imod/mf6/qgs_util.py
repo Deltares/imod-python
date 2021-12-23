@@ -9,7 +9,7 @@ from matplotlib import cm, colors
 
 import imod
 import imod.qgs as qgs
-from imod import declxml
+from imod import declxml as xml
 
 
 def _get_color_hexes_cmap(n, cmap_name="magma"):

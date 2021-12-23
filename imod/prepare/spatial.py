@@ -2,16 +2,15 @@ import pathlib
 from typing import Callable, Union
 
 import dask
-import geopandas as gpd
 import numba
 import numpy as np
 import pandas as pd
 import scipy.ndimage
-import shapely.geometry as sg
 import xarray as xr
 
 import imod
 from imod.prepare import common, pcg
+from imod.util import MissingOptionalModule
 
 # since rasterio is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
@@ -20,7 +19,7 @@ try:
     import rasterio.features
     import rasterio.warp
 except ImportError:
-    pass
+    rasterio = MissingOptionalModule("rasterio")
 
 
 def round_extent(extent, cellsize):
@@ -265,6 +264,9 @@ def polygonize(da):
     -------
     polygonized : geopandas.GeoDataFrame
     """
+    import geopandas as gpd
+    import shapely.geometry as sg
+
     if da.dims != ("y", "x"):
         raise ValueError('Dimensions must be ("y", "x")')
 

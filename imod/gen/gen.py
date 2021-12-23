@@ -3,11 +3,21 @@ import warnings
 from pathlib import Path
 from typing import Optional, Tuple, Union
 
-import geopandas as gpd
 import numpy as np
 import pandas as pd
-import shapely.geometry as sg
 from scipy.io import FortranFile, FortranFormattingError
+
+from imod.util import MissingOptionalModule
+
+try:
+    import shapely.geometry as sg
+except ImportError:
+    sg = MissingOptionalModule("shapely")
+
+try:
+    import geopandas as gpd
+except ImportError:
+    gpd = MissingOptionalModule("geopandas")
 
 
 # Unfortunately, the binary GEN files are written as Fortran Record files, so
