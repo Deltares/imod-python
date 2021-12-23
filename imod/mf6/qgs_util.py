@@ -1,7 +1,6 @@
 from itertools import product
 from xml.sax.saxutils import unescape
 
-import declxml as xml
 import numpy as np
 import pyproj
 
@@ -10,6 +9,7 @@ from matplotlib import cm, colors
 
 import imod
 import imod.qgs as qgs
+from imod import declxml
 
 
 def _get_color_hexes_cmap(n, cmap_name="magma"):

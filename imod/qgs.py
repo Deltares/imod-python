@@ -2,7 +2,7 @@ import abc
 from dataclasses import dataclass
 from typing import List, Optional, Union
 
-import declxml as xml
+from imod import declxml as xml
 
 
 class Aggregate(abc.ABC):

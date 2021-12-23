@@ -221,9 +221,8 @@ def test_make_processor(qgs_tree):
     # https://github.com/gatkin/declxml/issues/27
     # we cannot read the object from string itsself,
     # which would be preferred.
-    import declxml as xml
-
     import imod.qgs as qgs
+    from imod import declxml as xml
 
     processor = qgs.make_processor(qgs.Qgis)
     to_string = xml.serialize_to_string(processor, qgs_tree, indent="  ")
