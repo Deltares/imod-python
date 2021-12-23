@@ -9,7 +9,7 @@ from imod.couplers.metamod.pkgbase import Package, VariableMetaData
 
 class NodeSvatMapping(Package):
     """
-    This contains the data to map MODFLOW 6 cells to MetaSwap svats.
+    This contains the data to map MODFLOW 6 cells to MetaSWAP svats.
 
     This class is responsible for the file `nodenr2svat.dxc`.
 

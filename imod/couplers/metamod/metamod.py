@@ -9,7 +9,7 @@ class MetaMod:
     Parameters
     ----------
     msw_model : MetaSwapModel
-        The MetaSwap model that should be coupled.
+        The MetaSWAP model that should be coupled.
     mf6_simulation : Modflow6Simulation
         The Modflow6 simulation that should be coupled.
     """

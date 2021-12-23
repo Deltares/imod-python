@@ -10,7 +10,7 @@ from imod.msw.pkgbase import Package, VariableMetaData
 
 class CouplerMapping(Package):
     """
-    This contains the data to map MODFLOW 6 cells to MetaSwap svats.
+    This contains the data to map MODFLOW 6 cells to MetaSWAP svats.
 
     This class is responsible for the file `mod2svat.inp`.
 

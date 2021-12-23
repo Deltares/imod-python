@@ -1,5 +1,5 @@
 """
-Create a MetaSwap model.
+Create a MetaSWAP model.
 """
 
 from imod.msw.coupler_mapping import CouplerMapping

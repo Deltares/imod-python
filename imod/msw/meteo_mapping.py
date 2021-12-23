@@ -76,7 +76,7 @@ class MeteoMapping(Package):
 
 class PrecipitationMapping(MeteoMapping):
     """
-    This contains the data to map precipitation grid cells to MetaSwap svats.
+    This contains the data to map precipitation grid cells to MetaSWAP svats.
 
     This class is responsible for the file `svat2precgrid.inp`.
 
@@ -115,7 +115,7 @@ class PrecipitationMapping(MeteoMapping):
 
 class EvapotranspirationMapping(MeteoMapping):
     """
-    This contains the data to map evapotranspiration grid cells to MetaSwap svats.
+    This contains the data to map evapotranspiration grid cells to MetaSWAP svats.
 
     This class is responsible for the file `svat2etrefgrid.inp`.
 
