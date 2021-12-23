@@ -5,7 +5,8 @@ import pandas as pd
 import xarray as xr
 
 from imod.mf6 import WellDisStructured
-from imod.msw.pkgbase import Package, VariableMetaData
+from imod.msw.pkgbase import Package
+from imod.fixed_format import VariableMetaData
 
 
 class Sprinkling(Package):

@@ -4,7 +4,8 @@ from imod.msw import MetaSwapModel
 
 
 class MetaMod:
-    """[summary]
+    """
+    The MetaMod class creates the necessary input files for coupling MetaSWAP to MODFLOW 6.
 
     Parameters
     ----------

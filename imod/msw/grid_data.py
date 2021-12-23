@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from imod.msw.pkgbase import Package, VariableMetaData
+from imod.fixed_format import VariableMetaData
+from imod.msw.pkgbase import Package
 
 
 class GridData(Package):

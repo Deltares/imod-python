@@ -1,12 +1,10 @@
 import abc
 import os
-from dataclasses import dataclass
-from numbers import Number
 
 import numpy as np
 import xarray as xr
 
-from imod.util import format_fixed_width
+from imod.fixed_format import format_fixed_width
 
 
 class Package(abc.ABC):
@@ -81,11 +79,3 @@ class Package(abc.ABC):
         array = array[~np.isnan(array)]
 
         return array
-
-
-@dataclass
-class VariableMetaData:
-    column_width: int
-    min_value: Number
-    max_value: Number
-    dtype: type
