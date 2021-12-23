@@ -5,11 +5,17 @@ from pathlib import Path
 from typing import Union
 from zipfile import ZipFile
 
-import geopandas as gpd
 import pandas as pd
 import pkg_resources
 import pooch
 import xarray as xr
+
+from imod.util import MissingOptionalModule
+
+try:
+    import geopandas as gpd
+except ImportError:
+    gpd = MissingOptionalModule("geopandas")
 
 REGISTRY = pooch.create(
     path=pooch.os_cache("imod"),
@@ -68,7 +74,7 @@ def ahn() -> xr.Dataset:
     return xr.open_dataset(fname)
 
 
-def lakes_shp(path: Union[str, Path]) -> gpd.GeoDataFrame:
+def lakes_shp(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
     fname_lakes_shp = REGISTRY.fetch("lakes_shp.zip")
     with ZipFile(fname_lakes_shp) as archive:
         archive.extractall(path)
