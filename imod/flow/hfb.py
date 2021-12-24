@@ -1,4 +1,3 @@
-import geopandas as gpd
 import jinja2
 import numpy as np
 
@@ -103,6 +102,8 @@ class HorizontalFlowBarrier(Package):
             imod.gen.write(path, outdf)
 
     def save(self, directory):
+        import geopandas as gpd
+
         gdf = gpd.GeoDataFrame(self.dataset.to_dataframe())
         # Use _save_layers to keep the code consistent with the Wel implementation.
         self._save_layers(gdf, directory)

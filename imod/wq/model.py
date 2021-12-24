@@ -4,7 +4,6 @@ import pathlib
 import warnings
 
 import cftime
-import geopandas as gpd
 import jinja2
 import numpy as np
 import pandas as pd
@@ -871,12 +870,17 @@ class SeawatModel(Model):
                 & (extent.y <= ymax),
                 0,
             )
-        elif isinstance(extent, gpd.GeoDataFrame):
-            extent = imod.prepare.rasterize(extent, like=like)
         elif isinstance(extent, xr.DataArray):
             pass
         else:
-            raise ValueError("extent must be of type tuple, GeoDataFrame or DataArray")
+            import geopandas as gpd
+
+            if isinstance(extent, gpd.GeoDataFrame):
+                extent = imod.prepare.rasterize(extent, like=like)
+            else:
+                raise ValueError(
+                    "extent must be of type tuple, GeoDataFrame or DataArray"
+                )
 
         extent = xr.ones_like(like).where(extent > 0)
 

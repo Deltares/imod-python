@@ -2,7 +2,6 @@ from itertools import product
 from xml.sax.saxutils import unescape
 
 import numpy as np
-import pyproj
 
 # For creating colormap
 from matplotlib import cm, colors
@@ -171,6 +170,8 @@ def _create_qgis_tree(
         a tree-like object with all qgis settings, which can be saved to xml
 
     """
+    import pyproj
+
     # Find if "dis" should be taken (mf6) or "bas" (wq)
     for n in ["dis", "bas"]:
         if n in model.keys():

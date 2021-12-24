@@ -19,6 +19,33 @@ try:
 except ImportError:
     gpd = MissingOptionalModule("geopandas")
 
+# From the iMOD User Manual
+FLOAT_TYPE = np.float64
+INT_TYPE = np.int32
+HEADER_TYPE = np.int32
+CIRCLE = 1024
+POLYGON = 1025
+RECTANGLE = 1026
+POINT = 1027
+LINE = 1028
+MAX_NAME_WIDTH = 11
+
+# Map integer enumerators to strings
+GENTYPE_TO_NAME = {
+    CIRCLE: "circle",
+    POLYGON: "polygon",
+    RECTANGLE: "rectangle",
+    POINT: "point",
+    LINE: "line",
+}
+NAME_TO_GENTYPE = {v: k for k, v in GENTYPE_TO_NAME.items()}
+
+
+# Forward references, since shapely is optional
+Point = "shapely.geometry.Point"
+Polygon = "shapely.geometry.Polygon"
+LineString = "shapely.geometry.LineString"
+
 
 # Unfortunately, the binary GEN files are written as Fortran Record files, so
 # they cannot be read directly with e.g. numpy.fromfile (like direct access) The
@@ -69,25 +96,25 @@ def write_char_record(self, string: str):
 # The other shapely geometries can be generated directly from the vertices.
 
 
-def from_circle(xy: np.ndarray) -> sg.Polygon:
+def from_circle(xy: np.ndarray) -> Polygon:
     radius = np.sqrt(np.sum((xy[1] - xy[0]) ** 2))
     return sg.Point(xy[0]).buffer(radius)
 
 
-def from_point(xy: np.ndarray) -> sg.Polygon:
+def from_point(xy: np.ndarray) -> Polygon:
     return sg.Point(xy[0])
 
 
-def from_rectangle(xy: np.ndarray) -> sg.Polygon:
+def from_rectangle(xy: np.ndarray) -> Polygon:
     return sg.box(xy[0, 0], xy[0, 1], xy[1, 0], xy[1, 1])
 
 
-def to_circle(geometry: sg.Polygon) -> Tuple[np.ndarray, int]:
+def to_circle(geometry: Polygon) -> Tuple[np.ndarray, int]:
     xy = np.array([geometry.centroid.coords[0], geometry.exterior.coords[0]])
     return xy, 2
 
 
-def to_rectangle(geometry: sg.Polygon) -> Tuple[np.ndarray, int]:
+def to_rectangle(geometry: Polygon) -> Tuple[np.ndarray, int]:
     xy = np.array(geometry.exterior)
     if (geometry.area / geometry.minimum_rotated_rectangle.area) < 0.999:
         raise ValueError("Feature_type is rectangle, but geometry is not a rectangular")
@@ -95,72 +122,21 @@ def to_rectangle(geometry: sg.Polygon) -> Tuple[np.ndarray, int]:
     return xy[[0, 2]], 2
 
 
-def to_polygon(geometry: sg.Polygon) -> Tuple[np.ndarray, int]:
+def to_polygon(geometry: Polygon) -> Tuple[np.ndarray, int]:
     xy = np.array(geometry.exterior)
     return xy, xy.shape[0]
 
 
-def to_point(geometry: sg.Point) -> Tuple[np.ndarray, int]:
+def to_point(geometry: Point) -> Tuple[np.ndarray, int]:
     return np.array(geometry), 1
 
 
-def to_line(geometry: sg.LineString) -> Tuple[np.ndarray, int]:
+def to_line(geometry: LineString) -> Tuple[np.ndarray, int]:
     xy = np.array(geometry)
     return xy, xy.shape[0]
 
 
-# From the iMOD User Manual
-FLOAT_TYPE = np.float64
-INT_TYPE = np.int32
-HEADER_TYPE = np.int32
-CIRCLE = 1024
-POLYGON = 1025
-RECTANGLE = 1026
-POINT = 1027
-LINE = 1028
-MAX_NAME_WIDTH = 11
-
-# Map integer enumerators to strings
-GENTYPE_TO_NAME = {
-    CIRCLE: "circle",
-    POLYGON: "polygon",
-    RECTANGLE: "rectangle",
-    POINT: "point",
-    LINE: "line",
-}
-NAME_TO_GENTYPE = {v: k for k, v in GENTYPE_TO_NAME.items()}
-# From gen itype to shapely geometry:
-GENTYPE_TO_GEOM = {
-    CIRCLE: from_circle,
-    POLYGON: sg.Polygon,
-    RECTANGLE: from_rectangle,
-    POINT: from_point,
-    LINE: sg.LineString,
-}
-# Infer gentype on the basis of shapely type
-GEOM_TO_GENTYPE = {
-    sg.Polygon: POLYGON,
-    sg.Point: POINT,
-    sg.LineString: LINE,
-}
-# Checking names with actual geometry types
-NAME_TO_GEOM = {
-    "circle": sg.Polygon,
-    "rectangle": sg.Polygon,
-    "polygon": sg.Polygon,
-    "point": sg.Point,
-    "line": sg.LineString,
-}
-GENTYPE_TO_VERTICES = {
-    CIRCLE: to_circle,
-    RECTANGLE: to_rectangle,
-    POLYGON: to_polygon,
-    POINT: to_point,
-    LINE: to_line,
-}
-
-
-def read(path: Union[str, Path]) -> gpd.GeoDataFrame:
+def read(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
     """
     Read a binary GEN file to a geopandas GeoDataFrame.
 
@@ -172,6 +148,15 @@ def read(path: Union[str, Path]) -> gpd.GeoDataFrame:
     -------
     geodataframe: gpd.GeoDataFrame
     """
+    # From gen itype to shapely geometry:
+    GENTYPE_TO_GEOM = {
+        CIRCLE: from_circle,
+        POLYGON: sg.Polygon,
+        RECTANGLE: from_rectangle,
+        POINT: from_point,
+        LINE: sg.LineString,
+    }
+
     with warnings.catch_warnings(record=True):
         warnings.filterwarnings(
             "ignore", message="Given a dtype which is not unsigned."
@@ -215,7 +200,7 @@ def read(path: Union[str, Path]) -> gpd.GeoDataFrame:
 
 
 def vertices(
-    geometry: Union[sg.Point, sg.Polygon, sg.LineString], ftype: str
+    geometry: Union[Point, Polygon, LineString], ftype: str
 ) -> Tuple[int, np.ndarray, int]:
     """
     Infer from geometry, or convert from string, the feature type to the GEN
@@ -224,6 +209,28 @@ def vertices(
     Convert the geometry to the GEN expected vertices, and the number of
     vertices.
     """
+    # Checking names with actual geometry types
+    NAME_TO_GEOM = {
+        "circle": sg.Polygon,
+        "rectangle": sg.Polygon,
+        "polygon": sg.Polygon,
+        "point": sg.Point,
+        "line": sg.LineString,
+    }
+    GENTYPE_TO_VERTICES = {
+        CIRCLE: to_circle,
+        RECTANGLE: to_rectangle,
+        POLYGON: to_polygon,
+        POINT: to_point,
+        LINE: to_line,
+    }
+    # Infer gentype on the basis of shapely type
+    GEOM_TO_GENTYPE = {
+        sg.Polygon: POLYGON,
+        sg.Point: POINT,
+        sg.LineString: LINE,
+    }
+
     if ftype != "":
         # Start by checking whether the feature type matches the geometry
         try:
@@ -252,7 +259,7 @@ def vertices(
 
 def write(
     path: Union[str, Path],
-    geodataframe: gpd.GeoDataFrame,
+    geodataframe: "geopandas.GeoDataFrame",  # type: ignore # noqa
     feature_type: Optional[str] = None,
 ) -> None:
     """
