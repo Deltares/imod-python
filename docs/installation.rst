@@ -44,7 +44,7 @@ Spatial operations:
 * `numba_celltree <https://deltares.github.io/numba_celltree/>`__
 * `scipy <https://docs.scipy.org/doc/scipy/reference/>`__
 
-Geospatial libaries:
+Geospatial libaries (optional):
 
 * `geopandas <https://geopandas.org/en/stable/>`__
 * `pygeos <https://pygeos.readthedocs.io/en/stable/>`__
@@ -58,9 +58,11 @@ Data provisioning for examples:
 Visualization:
 
 * `matplotlib <https://matplotlib.org/>`__
-* `pyvista <https://docs.pyvista.org/`__
+* `pyvista <https://docs.pyvista.org/`__ (Optional)
   
-Installing these dependencies requires around 2.5 gigabyte of space.
+Installing all these dependencies requires around 2.5 gigabyte of space;
+Installing only the required dependencies (via pip) requires around 0.5
+gigabyte.
  
 Installing with mamba
 ---------------------
@@ -72,7 +74,7 @@ with the Mambaforge distribution::
   
 mamba will automatically find the appropriate versions of the dependencies and
 install them. Installing with mamba or conda will automatically download *all*
-optional dependencies.
+optional dependencies, and enable all functionality.
 
 Installing with conda
 ---------------------
