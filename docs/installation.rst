@@ -71,7 +71,8 @@ with the Mambaforge distribution::
   mamba install imod --channel conda-forge
   
 mamba will automatically find the appropriate versions of the dependencies and
-install them.
+install them. Installing with mamba or conda will automatically download *all*
+optional dependencies.
 
 Installing with conda
 ---------------------
@@ -90,9 +91,9 @@ Finally, you can also use the `pip package manager`_::
 
   pip install imod
   
-Given the long list of complex dependencies for imod, installing with ``pip``
-generally only result in a succesful install if all dependencies are already
-present in the conda environment (especially on Windows).
+Unlike installing with conda or mamba, installing with pip will not install
+all optional dependencies. This results in a far smaller installation, but
+it means that not all functionality is directly available.
 
 Refer to :doc:`../faq/python` in the FAQ section for background
 information on ``mamba``, ``conda``, and ``pip``.

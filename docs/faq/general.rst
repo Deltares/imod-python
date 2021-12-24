@@ -96,16 +96,29 @@ FloPy has only two required dependencies:
         numpy >= 1.15.0
         matplotlib >= 1.4.0
 
-imod has too many to count:
+imod has significantly more:
 
-.. literalinclude:: ../../imod-environment.yml
-   :language: yaml
-   :caption: imod-environment.yml
-
-Consequently, FloPy can be easily installed with just ``pip``; ``imod``
-requires the ``mamba`` or ``conda`` package managers to install correctly
-(especially on Windows).
-
+    install_requires =
+        affine
+        dask
+        cftime >=1
+        Jinja2
+        matplotlib
+        numba
+        numpy
+        pandas
+        pooch
+        tqdm
+        scipy
+        toolz
+        xarray >=0.15
+        xugrid
+        
+Many of these packages have binary dependencies, but both FloPy and imod can be
+installed via ``pip``. However, full functionality -- such as exporting to
+netCDF, reading and writing GIS formats, or 3D visualization -- involves more
+complex dependencies, which require the ``mamba`` or ``conda`` package managers
+to install correctly (especially on Windows).
  
 Large data
 ~~~~~~~~~~
