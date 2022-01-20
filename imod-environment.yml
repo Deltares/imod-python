@@ -19,6 +19,7 @@ dependencies:
   - jinja2
   - matplotlib
   - meshzoo
+  - netcdf4
   - numba>=0.50
   - numpy
   - pandas
