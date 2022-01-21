@@ -78,8 +78,8 @@ class Model(collections.UserDict):
             sel_dims = {k: v for k, v in dimensions.items() if k in pkg.dataset}
 
             if pkgname == "bas6":
-                # da.sel() unsets dimensions for scalars, this messes with bas6 package.
-                # because check_ibound is called upon initialization.
+                # da.sel() unsets dimensions for scalars, this messes with bas6
+                # package. because check_ibound is called upon initialization.
                 sel_dims = {
                     k: [v] if np.isscalar(v) else v for k, v in sel_dims.items()
                 }
