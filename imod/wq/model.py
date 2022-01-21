@@ -79,7 +79,7 @@ class Model(collections.UserDict):
 
             if pkgname == "bas6":
                 # da.sel() unsets dimensions for scalars, this messes with bas6
-                # package. because check_ibound is called upon initialization.
+                # package, because check_ibound is called upon initialization.
                 sel_dims = {
                     k: [v] if np.isscalar(v) else v for k, v in sel_dims.items()
                 }
