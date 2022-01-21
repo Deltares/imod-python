@@ -76,11 +76,18 @@ class Model(collections.UserDict):
         selmodel = type(self)(self.modelname, self.check)
         for pkgname, pkg in self.items():
             sel_dims = {k: v for k, v in dimensions.items() if k in pkg.dataset}
+
+            if pkgname == "bas6":
+                # da.sel() unsets dimensions for scalars, this messes with bas6 package.
+                # because check_ibound is called upon initialization.
+                sel_dims = {
+                    k: [v] if np.isscalar(v) else v for k, v in sel_dims.items()
+                }
             if len(sel_dims) == 0:
                 selmodel[pkgname] = pkg
             else:
                 if pkg._pkg_id != "wel":
-                    selmodel[pkgname].dataset = pkg.dataset.loc[sel_dims]
+                    selmodel[pkgname] = type(pkg)(**pkg.dataset.loc[sel_dims])
                 else:
                     df = pkg.dataset.to_dataframe().drop(columns="save_budget")
                     for k, v in sel_dims.items():
