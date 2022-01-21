@@ -274,7 +274,17 @@ m.write(directory=modeldir)
 # Run
 # ---
 #
-# You can run the model using the comand prompt and the iMODFLOW executable.
+# You can run the model using the comand prompt and the iMOD executables.
 # This is part of the iMOD v5 release, which can be downloaded here:
 # https://oss.deltares.nl/web/imod/download-imod5 .
-# This only works on Windows.
+# iMOD only works on Windows.
+#
+# To run your model, open up a command prompt
+# and run the following commands:
+#
+# .. code-block:: batch
+#
+#    cd c:\path\to\modeldir
+#    c:\path\to\imod\folder\iMOD_v5_3_X64R.EXE my_first_imodflow_model.ini
+#    c:\path\to\imod\folder\iMODFLOW_V5_3_METASWAP_SVN1977_X64R.EXE my_first_imodflow_model.nam
+#

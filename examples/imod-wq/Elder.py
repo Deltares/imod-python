@@ -171,6 +171,17 @@ m.write(modeldir, resultdir_is_workdir=True)
 # This is part of the iMOD v5 release, which can be downloaded here:
 # https://oss.deltares.nl/web/imod/download-imod5 .
 # This only works on Windows.
+#
+# To run your model, open up a command prompt
+# and run the following commands:
+#
+# .. code-block:: batch
+#
+#    cd c:\path\to\modeldir
+#    c:\path\to\imod\folder\iMOD-WQ_V5_3_SVN359_X64R.exe Elder.run
+#
+# Note that the version name of your executable might differ.
+#
 
 # %%
 # Visualise results
