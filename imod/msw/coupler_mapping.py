@@ -130,7 +130,6 @@ class CouplerMapping(Package):
                     )
                     mod_id_list.append(mod_id)
                     svat_list.append(self.dataset["svat"][subunit, row, column])
-
                     layer_list.append(layer + 1)
 
         return (np.array(mod_id_list), np.array(svat_list), np.array(layer_list))

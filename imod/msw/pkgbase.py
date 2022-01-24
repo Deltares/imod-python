@@ -69,8 +69,7 @@ class Package(abc.ABC):
             array = array.expand_dims(subunit=extend_subunits)
 
         # Apply mask
-        if mask is not None:
-            array = array.where(mask)
+        array = array.where(mask)
 
         # Convert to numpy array and flatten it
         array = array.to_numpy().ravel()
