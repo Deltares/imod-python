@@ -285,6 +285,11 @@ m.write(directory=modeldir)
 # .. code-block:: batch
 #
 #    cd c:\path\to\modeldir
-#    c:\path\to\imod\folder\iMOD_v5_3_X64R.EXE my_first_imodflow_model.ini
+#    c:\path\to\imod\folder\iMOD_v5_3_X64R.EXE config_run.ini
 #    c:\path\to\imod\folder\iMODFLOW_V5_3_METASWAP_SVN1977_X64R.EXE my_first_imodflow_model.nam
+#
+# .. note::
+#
+#    iMODFLOW requires you to change directory into the model directory
+#    before calling its executable. Otherwise the program will throw an error.
 #
