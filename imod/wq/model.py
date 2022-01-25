@@ -922,7 +922,7 @@ class SeawatModel(Model):
         # Clip model to extent, set outside extent to nodata or 0
         ml = self.sel(**clip_slices)
         for pck in ml.keys():
-            for d in ml[pck].data_vars:
+            for d in ml[pck].dataset.data_vars:
                 if d in ["ibound", "icbund"]:
                     ml[pck][d] = ml[pck][d].where(extentwithedge == 1, 0)
                 elif "x" in ml[pck][d].dims:
