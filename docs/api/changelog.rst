@@ -9,6 +9,10 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+- Hotfixes for :func:`imod.wq.model.SeawatModel.clip`, until `this merge request
+  <https://gitlab.com/deltares/imod/imod-python/-/merge_requests/111>` is
+  fulfilled. 
+
 [0.11.1] - 2021-12-23
 ---------------------
 
