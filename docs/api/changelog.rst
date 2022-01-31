@@ -12,6 +12,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 - Hotfixes for :func:`imod.wq.model.SeawatModel.clip`, until `this merge request
   <https://gitlab.com/deltares/imod/imod-python/-/merge_requests/111>` is
   fulfilled. 
+- :meth:`imod.flow.ImodflowModel.write` will set the timestring in the
+  projectfile to ``steady-state`` for ``BoundaryConditions`` without a time
+  dimension.
 
 [0.11.1] - 2021-12-23
 ---------------------
