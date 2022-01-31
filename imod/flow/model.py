@@ -395,6 +395,9 @@ class ImodflowModel(Model):
         # These are the strings atop each stress period in the projectfile
         times_composed.update({key: key for key in periods_composed.keys()})
 
+        # Add steady-state for packages without time specified
+        times_composed["steady-state"] = "steady-state"
+
         rendered = []
         ignored = ["dis"]
 

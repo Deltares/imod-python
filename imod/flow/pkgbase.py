@@ -623,7 +623,7 @@ class BoundaryCondition(Package, abc.ABC):
                 varname, directory, nlayer, time=None
             )
             values.append(composed_layers)
-            keys.append([self._pkg_id, "1", varname, system_index])
+            keys.append([self._pkg_id, "steady-state", varname, system_index])
 
         return keys, values
 
