@@ -13,6 +13,21 @@ The format is based on `Keep a Changelog`_, and this project adheres to
   <https://gitlab.com/deltares/imod/imod-python/-/merge_requests/111>` is
   fulfilled. 
 
+Fixed
+~~~~~
+
+- :func:`imod.evaluate.calculate_gxg` now correctly uses (March 14, March
+  28, April 14) to calculate GVG rather than (March 28, April 14, April 28).
+  
+Added
+~~~~~
+
+- :func:`imod.evaluate.calculate_gxg_points` has been added to compute GXG
+  values for time varying point data (i.e. loaded from IPF and presented as a
+  Pandas dataframe).
+- :func:`imod.evaluate.calculate_gxg` will return the number of years used
+  in the GxG calculation as separate variables in the output dataset.
+
 [0.11.1] - 2021-12-23
 ---------------------
 
