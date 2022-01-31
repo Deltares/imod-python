@@ -17,6 +17,7 @@ def test_recharge_no_time(three_days):
         "1": "2018-01-01 00:00:00",
         "2": "2018-01-02 00:00:00",
         "3": "2018-01-03 00:00:00",
+        "steady-state": "steady-state",
     }
 
     composition = rch.compose(
@@ -36,7 +37,7 @@ def test_recharge_no_time(three_days):
 
     compare = (
         "0001, (rch), 1, Recharge, ['rate']\n"
-        "2018-01-01 00:00:00\n"
+        "steady-state\n"
         "001, 001\n"
         '1, 1, 001, 1.000, 0.000, 10.0, ""'
     )

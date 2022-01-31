@@ -38,6 +38,16 @@ def periodic_constant_head(constant_head, three_days):
     return chd
 
 
+@pytest.fixture(scope="module")
+def steady_state_constant_head(basic_dis):
+    ibound, _, _ = basic_dis
+    x = ibound.x.values
+
+    head = ibound.where(ibound.x.isin([x[0], x[-1]]))
+
+    return ConstantHead(head=head)
+
+
 def test_constant_head(constant_head, get_render_dict, three_days):
     # Resolve in advance, so that comparisons have the same directory
     # See e.g. https://github.com/omarkohl/pytest-datafiles/issues/6
@@ -121,5 +131,33 @@ def test_periodic_constant_head(periodic_constant_head, get_render_dict, three_d
         1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}head_20180103000000_l3.idf"""
     )
     rendered = periodic_constant_head._render_projectfile(**to_render)
+
+    assert compare == rendered
+
+
+def test_steady_state_constant_head(steady_state_constant_head, get_render_dict):
+    # Resolve in advance, so that comparisons have the same directory
+    # See e.g. https://github.com/omarkohl/pytest-datafiles/issues/6
+
+    directory = str(pathlib.Path(".").resolve())
+
+    nlayer = len(steady_state_constant_head["layer"])
+
+    time_composed = {"steady-state": "steady-state"}
+
+    to_render = get_render_dict(steady_state_constant_head, directory, [], nlayer)
+    to_render["n_entry"] = nlayer
+    to_render["times"] = time_composed
+
+    compare = textwrap.dedent(
+        f"""\
+        0001, (chd), 1, ConstantHead, ['head']
+        steady-state
+        001, 003
+        1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}head_l1.idf
+        1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}head_l2.idf
+        1, 2, 003, 1.000, 0.000, -9999., {directory}{os.sep}head_l3.idf"""
+    )
+    rendered = steady_state_constant_head._render_projectfile(**to_render)
 
     assert compare == rendered

@@ -54,6 +54,7 @@ def test_group_rendered_no_time(constant_head_no_time, three_days):
         "1": "2018-01-01 00:00:00",
         "2": "2018-01-02 00:00:00",
         "3": "2018-01-03 00:00:00",
+        "steady-state": "steady-state",
     }
 
     group_composition = chd_group.compose(directory, times, nlayer)
@@ -74,7 +75,7 @@ def test_group_rendered_no_time(constant_head_no_time, three_days):
     compare = textwrap.dedent(
         f"""\
         0001, (chd), 1, ConstantHead, ['head']
-        2018-01-01 00:00:00
+        steady-state
         001, 006
         1, 2, 001, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_l1.idf
         1, 2, 002, 1.000, 0.000, -9999., {directory}{os.sep}primary{os.sep}head_l2.idf

@@ -17,6 +17,7 @@ def test_evapotranspiration_no_time(three_days):
         "1": "2018-01-01 00:00:00",
         "2": "2018-01-02 00:00:00",
         "3": "2018-01-03 00:00:00",
+        "steady-state": "steady-state",
     }
 
     composition = evt.compose(
@@ -36,7 +37,7 @@ def test_evapotranspiration_no_time(three_days):
 
     compare = (
         "0001, (evt), 1, EvapoTranspiration, ['rate', 'top_elevation', 'extinction_depth']\n"
-        "2018-01-01 00:00:00\n"
+        "steady-state\n"
         "003, 001\n"
         '1, 1, 001, 1.000, 0.000, 10.0, ""\n'
         '1, 1, 001, 1.000, 0.000, 0.0, ""\n'
