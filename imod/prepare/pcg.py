@@ -334,11 +334,11 @@ def cholesky_diagonal(
     fcr = 0.0
     fcv = 0.0
     if ir >= 0 and cd[ir] != 0.0:
-        cdcr = (f ** 2.0) / cd[ir]
+        cdcr = (f**2.0) / cd[ir]
     if ic >= 0 and cd[ic] != 0.0:
-        cdcc = (h ** 2.0) / cd[ic]
+        cdcc = (h**2.0) / cd[ic]
     if il >= 0 and cd[il] != 0.0:
-        cdcv = (s ** 2.0) / cd[il]
+        cdcv = (s**2.0) / cd[il]
 
     if ir >= 0:
         fv = cv[ir]

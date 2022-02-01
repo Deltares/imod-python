@@ -331,7 +331,7 @@ def disv_horizontal_index(
     xy = face_coordinates[edge_faces]
     dx = xy[:, 1, 0] - xy[:, 0, 0]
     dy = xy[:, 1, 1] - xy[:, 0, 1]
-    t = np.sqrt(dx ** 2 + dy ** 2)
+    t = np.sqrt(dx**2 + dy**2)
     u[is_connection] = dx / t
     v[is_connection] = dy / t
     return horizontal, u, v

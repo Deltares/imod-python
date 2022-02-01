@@ -88,7 +88,7 @@ def _draw_line(xs, ys, x0, x1, y0, y1, xmin, xmax, ymin, ymax):
 
     dx = x1 - x0
     dy = y1 - y0
-    length = np.sqrt(dx ** 2 + dy ** 2)
+    length = np.sqrt(dx**2 + dy**2)
     a_x = dx / length
     a_y = dy / length
     no_dx = dx == 0.0

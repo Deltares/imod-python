@@ -10,12 +10,12 @@ _PROCESSOR = xml.dictionary("root", [xml.string("value")])
 
 
 _VALUE = {
-    "value": u"Hello, 世界!",
+    "value": "Hello, 世界!",
 }
 
-_XML_STRING = u"""<root><value>Hello, 世界!</value></root>"""
+_XML_STRING = """<root><value>Hello, 世界!</value></root>"""
 
-_XML_STRING_INDENTED = u"""<?xml version="1.0" encoding="utf-8"?>
+_XML_STRING_INDENTED = """<?xml version="1.0" encoding="utf-8"?>
 <root>
     <value>Hello, 世界!</value>
 </root>

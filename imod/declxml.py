@@ -1441,7 +1441,7 @@ class _ProcessorState(object):
     def _location_to_string(location):
         # type: (ProcessorLocation) -> Text
         if location.array_index is not None:
-            location_str = u"{}[{}]".format(location.element_path, location.array_index)
+            location_str = "{}[{}]".format(location.element_path, location.array_index)
         else:
             location_str = location.element_path
 
