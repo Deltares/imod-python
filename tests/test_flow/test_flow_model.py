@@ -82,6 +82,7 @@ def model_no_output_control(model):
 
     return m
 
+
 @pytest.fixture(scope="module")
 def model_periodic_stress(model):
     m = deepcopy(model)
@@ -162,9 +163,11 @@ def test_write_model(model, tmp_path):
 
     assert len(symmetric_difference) == 0
 
+
 def test_write_model(model_no_output_control, tmp_path):
     with pytest.raises(ValueError):
         model_no_output_control.write(directory=tmp_path)
+
 
 def test_write_model_metaswap(model_metaswap, tmp_path):
     model_metaswap.write(directory=tmp_path)

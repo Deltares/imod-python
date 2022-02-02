@@ -22,12 +22,12 @@ from imod.flow.evt import EvapoTranspiration
 from imod.flow.ghb import GeneralHeadBoundary
 from imod.flow.hfb import HorizontalFlowBarrier
 from imod.flow.model import ImodflowModel
+from imod.flow.oc import OutputControl
 from imod.flow.rch import Recharge
 from imod.flow.riv import River
 from imod.flow.slv import PreconditionedConjugateGradientSolver
 from imod.flow.sto import SpecificStorage, StorageCoefficient
 from imod.flow.wel import Well
-from imod.flow.oc import OutputControl
 
 
 def write(path, model, name=None, runfile_parameters=None, output_packages=["shd"]):

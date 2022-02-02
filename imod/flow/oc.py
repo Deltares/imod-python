@@ -1,5 +1,6 @@
-from imod.flow.pkgbase import Package
 import numpy as np
+
+from imod.flow.pkgbase import Package
 
 
 class OutputControl(Package):
