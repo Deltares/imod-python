@@ -164,7 +164,7 @@ def test_write_model(model, tmp_path):
     assert len(symmetric_difference) == 0
 
 
-def test_write_model(model_no_output_control, tmp_path):
+def test_write_model_no_oc(model_no_output_control, tmp_path):
     with pytest.raises(ValueError):
         model_no_output_control.write(directory=tmp_path)
 
