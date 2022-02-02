@@ -52,6 +52,8 @@ def model(basic_dis, three_days, well_df):
     m["chd2"] = flow.ConstantHead(head=head)
 
     m["wel"] = flow.Well(**well_df)
+    m["oc"] = flow.OutputControl()
+
     m.time_discretization(times[-1])
 
     return m
@@ -72,6 +74,13 @@ def model_horizontal_flow_barrier(model, horizontal_flow_barrier_gdf):
 
     return m
 
+
+@pytest.fixture(scope="module")
+def model_no_output_control(model):
+    m = deepcopy(model)
+    m.pop("oc")
+
+    return m
 
 @pytest.fixture(scope="module")
 def model_periodic_stress(model):
@@ -113,6 +122,7 @@ def test_compose_all_packages(model, tmp_path):
             "khv",
             "kva",
             "sto",
+            "oc",
         ]
     )
 
@@ -152,6 +162,9 @@ def test_write_model(model, tmp_path):
 
     assert len(symmetric_difference) == 0
 
+def test_write_model(model_no_output_control, tmp_path):
+    with pytest.raises(ValueError):
+        model_no_output_control.write(directory=tmp_path)
 
 def test_write_model_metaswap(model_metaswap, tmp_path):
     model_metaswap.write(directory=tmp_path)
