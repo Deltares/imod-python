@@ -27,6 +27,7 @@ from imod.flow.riv import River
 from imod.flow.slv import PreconditionedConjugateGradientSolver
 from imod.flow.sto import SpecificStorage, StorageCoefficient
 from imod.flow.wel import Well
+from imod.flow.oc import OutputControl
 
 
 def write(path, model, name=None, runfile_parameters=None, output_packages=["shd"]):

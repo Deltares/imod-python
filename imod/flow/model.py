@@ -399,7 +399,7 @@ class ImodflowModel(Model):
         times_composed["steady-state"] = "steady-state"
 
         rendered = []
-        ignored = ["dis"]
+        ignored = ["dis", "oc"]
 
         for key, package in self.items():
             pkg_id = package._pkg_id
@@ -575,6 +575,11 @@ class ImodflowModel(Model):
         self[diskey].save(time_path)
 
         # Create and write INI file to configure conversion/simulation
+        ockey = self._get_pkgkey("oc")
+        bndkey = self._get_pkgkey("bnd")
+        nlayer = self[bndkey]["layer"].size
+        oc_configuration = self[ockey]._compose_oc_configuration(nlayer)
+
         config = IniFile(
             sim_type=2,
             function="runfile",
@@ -582,6 +587,8 @@ class ImodflowModel(Model):
             namfile_out=directory / (runfilepath.stem + ".nam"),
             iss=1,
             timfname=directory / time_path.name,
+            output_folder=result_dir,
+            **oc_configuration,
         )
         config_content = config.render()
 
