@@ -259,6 +259,12 @@ m["wel"] = flow.Well(**wel_df)
 
 m["hfb"] = flow.HorizontalFlowBarrier(**hfb_gdf)
 
+# %%
+# Specify output control; -1 specifies to save the output of interest for all layers.
+
+m["oc"] = flow.OutputControl(save_head=-1, save_flux=-1)
+
+# %%
 # imod-python wants you to provide the model endtime to your time_discretization!
 m.time_discretization(times[-1])
 
