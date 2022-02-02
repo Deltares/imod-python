@@ -578,7 +578,11 @@ class ImodflowModel(Model):
         ockey = self._get_pkgkey("oc")
         bndkey = self._get_pkgkey("bnd")
         nlayer = self[bndkey]["layer"].size
-        oc_configuration = self[ockey]._compose_oc_configuration(nlayer)
+
+        if ockey is None:
+            raise ValueError("No OutputControl was specified for the model")
+        else:
+            oc_configuration = self[ockey]._compose_oc_configuration(nlayer)
 
         config = IniFile(
             sim_type=2,
