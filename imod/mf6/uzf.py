@@ -267,7 +267,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         ds = self.dataset[list(self._package_data)]
 
-        layer = self._check_layer_presence(ds)
+        layer = ds["layer"].values
         arrdict = self._ds_to_arrdict(ds)
         recarr = super().to_sparse(arrdict, layer)
 

@@ -221,18 +221,6 @@ class Package(abc.ABC):
 
         return recarr
 
-    def _check_layer_presence(self, ds):
-        """
-        If layer present in coordinates and dimensions return layers,
-        if not return None
-        """
-
-        if "layer" in ds.coords:
-            layer = ds["layer"].values
-        else:
-            layer = None
-        return layer
-
     def _ds_to_arrdict(self, ds):
         arrdict = {}
         for datavar in ds.data_vars:
@@ -449,7 +437,7 @@ class BoundaryCondition(Package, abc.ABC):
         """
         Writes a modflow6 binary data file
         """
-        layer = self._check_layer_presence(ds)
+        layer = ds["layer"].values
         arrdict = self._ds_to_arrdict(ds)
         sparse_data = self.to_sparse(arrdict, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)

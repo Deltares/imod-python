@@ -52,7 +52,7 @@ def test_discontinuous_layer(drainage, tmp_path):
     drn = drainage
     drn["layer"] = [1, 3, 5]
     bin_ds = drn[list(drn._period_data)]
-    layer = drn._check_layer_presence(bin_ds).copy()
+    layer = bin_ds["layer"].values
     arrdict = drn._ds_to_arrdict(bin_ds)
     sparse_data = drn.to_sparse(arrdict, layer)
     assert np.array_equal(np.unique(sparse_data["layer"]), [1, 3, 5])

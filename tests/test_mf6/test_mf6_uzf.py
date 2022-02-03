@@ -87,7 +87,7 @@ def test_to_sparsedata():
     uzf.fill_stress_perioddata()
     bin_data = uzf[list(uzf._period_data)]
     arrdict = uzf._ds_to_arrdict(bin_data.isel(time=0))
-    layer = uzf._check_layer_presence(bin_data.isel(time=0))
+    layer = bin_data.isel(time=0)["layer"].values
     sparse_data = uzf.to_sparse(arrdict, layer)
     expected_iuzno = np.array([1, 2, 3, 4, 5, 6])
 
