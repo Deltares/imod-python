@@ -16,7 +16,7 @@ def dis_recarr(arrdict, layer, notnull):
     nrow = notnull.sum()
     recarr = np.empty(nrow, dtype=sparse_dtype)
     # Fill in the indices
-    if layer.size == 1:
+    if notnull.ndim == 2:
         recarr["row"], recarr["column"] = (np.argwhere(notnull) + 1).transpose()
         recarr["layer"] = layer
     else:

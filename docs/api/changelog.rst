@@ -9,6 +9,12 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Fixed
+~~~~~
+
+- :meth:`imod.mf6.GroundwaterFlowModel.write` will no longer error when a 3D
+  DataArray with a single layer is written. It will now accept both 2D and 3D
+  arrays with a single layer coordinate.
 - Hotfixes for :func:`imod.wq.model.SeawatModel.clip`, until `this merge request
   <https://gitlab.com/deltares/imod/imod-python/-/merge_requests/111>` is
   fulfilled. 

@@ -48,7 +48,7 @@ def test_write(drainage, tmp_path):
     assert block == block_expected
 
 
-def test_discontinuous_layer(drainage, tmp_path):
+def test_discontinuous_layer(drainage):
     drn = drainage
     drn["layer"] = [1, 3, 5]
     bin_ds = drn[list(drn._period_data)]
@@ -56,3 +56,23 @@ def test_discontinuous_layer(drainage, tmp_path):
     arrdict = drn._ds_to_arrdict(bin_ds)
     sparse_data = drn.to_sparse(arrdict, layer)
     assert np.array_equal(np.unique(sparse_data["layer"]), [1, 3, 5])
+
+
+def test_3d_singelayer():
+    # Introduced because of Issue #224
+    layer = [1]
+    y = np.arange(4.5, 0.0, -1.0)
+    x = np.arange(0.5, 5.0, 1.0)
+    elevation = xr.DataArray(
+        np.full((1, 5, 5), 1.0),
+        coords={"layer": layer, "y": y, "x": x, "dx": 1.0, "dy": -1.0},
+        dims=("layer", "y", "x"),
+    )
+    conductance = elevation.copy()
+    drn = imod.mf6.Drainage(elevation=elevation, conductance=conductance)
+
+    bin_ds = drn[list(drn._period_data)]
+    layer = bin_ds["layer"].values
+    arrdict = drn._ds_to_arrdict(bin_ds)
+    sparse_data = drn.to_sparse(arrdict, layer)
+    assert isinstance(sparse_data, np.ndarray)
