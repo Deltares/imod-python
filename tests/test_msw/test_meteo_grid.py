@@ -24,12 +24,12 @@ def test_meteo_grid():
         np.array(
             [
                 [[1.0, 1.0, 1.0],
-                [nan, nan, nan],
-                [1.0, 1.0, 1.0]],
+                 [nan, nan, nan],
+                 [1.0, 1.0, 1.0]],
 
                 [[2.0, 2.0, 1.0],
-                [nan, nan, nan],
-                [1.0, 2.0, 1.0]],
+                 [nan, nan, nan],
+                 [1.0, 2.0, 1.0]],
             ]
         ),
         dims=("time", "y", "x"),
@@ -82,12 +82,12 @@ def test_meteo_no_time_grid():
         np.array(
             [
                 [[1.0, 1.0, 1.0],
-                [nan, nan, nan],
-                [1.0, 1.0, 1.0]],
+                 [nan, nan, nan],
+                 [1.0, 1.0, 1.0]],
 
                 [[2.0, 2.0, 1.0],
-                [nan, nan, nan],
-                [1.0, 2.0, 1.0]],
+                 [nan, nan, nan],
+                 [1.0, 2.0, 1.0]],
             ]
         ),
         dims=("time", "y", "x"),
@@ -98,4 +98,4 @@ def test_meteo_no_time_grid():
     # fmt: on
 
     with pytest.raises(ValueError):
-        meteo_grid = MeteoGrid(precipitation, evapotranspiration)
+        MeteoGrid(precipitation, evapotranspiration)
