@@ -47,6 +47,7 @@ class NodeSvatMapping(Package):
     def _create_mod_id(self):
         self.dataset["mod_id"] = self.dataset["area"].copy()
         subunit_len, y_len, x_len = self.dataset["mod_id"].shape
+        # TODO: Vectorize this loop
         for subunit in range(subunit_len):
             for y in range(y_len):
                 for x in range(x_len):
@@ -54,13 +55,16 @@ class NodeSvatMapping(Package):
 
     def _render(self, file):
         # Produce values necessary for members without subunit coordinate
+        # TODO: notnull really necessary here? Isn't 'active' enough?
         mask = self.dataset["area"].where(self.dataset["active"]).notnull()
 
         # Generate columns and apply mask
         mod_id = self._get_preprocessed_array("mod_id", mask)
 
         # Generate remaining columns
+        # TODO: In GridData, svat is generated as np.arange(1, area.size + 1)
         svat = np.arange(1, mod_id.size + 1)
+        # TODO: Always stuck to layer 1? At least add to docstring!
         layer = np.full_like(svat, 1)
         free = pd.Series(["" for _ in range(mod_id.size)], dtype="string")
 
