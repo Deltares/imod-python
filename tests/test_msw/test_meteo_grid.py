@@ -1,13 +1,15 @@
-import tempfile
-import numpy as np
-from numpy import nan
-import xarray as xr
-import pandas as pd
-from pathlib import Path
-from imod.msw import MeteoGrid
-from numpy.testing import assert_equal
 import csv
+import tempfile
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
 import pytest
+import xarray as xr
+from numpy import nan
+from numpy.testing import assert_equal
+
+from imod.msw import MeteoGrid
 
 
 def test_meteo_grid():
@@ -64,7 +66,6 @@ def test_meteo_grid():
     assert_equal(results[2].values, np.array(expected_filenames, dtype=object))
     assert_equal(results[3].values, np.array(['"1.0"', '"3.0"'], dtype=object))
 
-    
     expected_filenames_no_quote = [f.replace('"', "") for f in expected_filenames]
     assert gridnames == expected_filenames_no_quote
 

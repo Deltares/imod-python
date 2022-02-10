@@ -1,11 +1,12 @@
-import pandas as pd
-import numpy as np
-from imod.msw.pkgbase import Package
-from imod import util
-import imod
 import csv
-
 import pathlib
+
+import numpy as np
+import pandas as pd
+
+import imod
+from imod import util
+from imod.msw.pkgbase import Package
 
 
 class MeteoGrid(Package):
