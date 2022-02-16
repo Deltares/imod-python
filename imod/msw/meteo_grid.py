@@ -7,6 +7,7 @@ import pandas as pd
 import imod
 from imod import util
 from imod.msw.pkgbase import Package
+from imod.msw.timeutil import to_metaswap_timeformat
 
 
 class MeteoGrid(Package):
@@ -92,22 +93,12 @@ class MeteoGrid(Package):
             return True
 
     def _compose_dataframe(self, times):
-        # TODO: Also support cftime
-        times = pd.DatetimeIndex(times)
-
         dataframe = pd.DataFrame(index=times)
 
-        # MetaSWAP requires a days since start year
-        days_since_start_year = times.day_of_year.astype(np.float64) - 1.0
-        # Behind the decimal is the time since start day
-        time_since_start_day = (
-            times.hour / 24 + times.minute / 1440 + times.second / 86400
-        )
+        year, time_since_start_year = to_metaswap_timeformat(times)
 
-        dataframe["time_since_start_year"] = (
-            days_since_start_year + time_since_start_day
-        )
-        dataframe["year"] = times.year
+        dataframe["time_since_start_year"] = time_since_start_year
+        dataframe["year"] = year
 
         for varname in self.dataset.data_vars:
             # If grid, we have to add the filename of the .asc written later
