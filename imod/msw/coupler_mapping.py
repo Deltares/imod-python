@@ -51,18 +51,13 @@ class CouplerMapping(Package):
         self.well = well
 
     def _create_svat(self):
-        self.dataset["svat"] = self.dataset["area"].copy()
-        subunit_len, y_len, x_len = self.dataset["svat"].shape
+        self.dataset["svat"] = xr.full_like(
+            self.dataset["area"], fill_value=0, dtype=np.int64
+        )
 
-        svat_index = 1
-        for subunit in range(subunit_len):
-            for y in range(y_len):
-                for x in range(x_len):
-                    if self.dataset["active"][y, x] and not np.isnan(
-                        self.dataset["area"][subunit, y, x]
-                    ):
-                        self.dataset["svat"][subunit, y, x] = svat_index
-                        svat_index += 1
+        valid = self.dataset["area"].notnull() & self.dataset["active"]
+        n_svat = valid.sum()
+        self.dataset["svat"].values[valid.values] = np.arange(1, n_svat + 1)
 
     def _create_mod_id_rch(self):
         self.dataset["mod_id_rch"] = self.dataset["area"].copy()
