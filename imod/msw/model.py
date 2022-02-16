@@ -60,6 +60,7 @@ class MetaSwapModel(Model):
     _template = jinja2.Template(
         """{%- for setting, value in settings.items()%}
         {{setting}} = {{value}}
+        {%- endfor%}
         """
     )
 
