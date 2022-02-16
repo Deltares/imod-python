@@ -60,6 +60,7 @@ class CouplerMapping(Package):
         self.dataset["svat"].values[valid.values] = np.arange(1, n_svat + 1)
 
     def _create_mod_id_rch(self):
+        # TODO: Vectorize this function
         self.dataset["mod_id_rch"] = self.dataset["area"].copy()
         subunit_len, y_len, x_len = self.dataset["mod_id_rch"].shape
         for subunit in range(subunit_len):
