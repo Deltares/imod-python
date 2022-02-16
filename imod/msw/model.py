@@ -1,7 +1,9 @@
 import collections
-import jinja2
 from copy import copy
 from pathlib import Path
+
+import jinja2
+
 from imod.msw.timeutil import to_metaswap_timeformat
 
 DEFAULT_SETTINGS = dict(

@@ -1,10 +1,12 @@
-from imod.msw.pkgbase import Package
-from imod.fixed_format import VariableMetaData
-from imod.util import spatial_reference
-import numpy as np
-import xarray as xr
 import pathlib
+
+import numpy as np
 import pandas as pd
+import xarray as xr
+
+from imod.fixed_format import VariableMetaData
+from imod.msw.pkgbase import Package
+from imod.util import spatial_reference
 
 
 class OutputControl(Package):
