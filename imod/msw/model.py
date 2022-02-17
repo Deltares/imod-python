@@ -5,6 +5,7 @@ from pathlib import Path
 import jinja2
 
 from imod.msw.timeutil import to_metaswap_timeformat
+from imod.msw.output_control import OutputControl
 
 DEFAULT_SETTINGS = dict(
     vegetation_mdl=1,
@@ -55,15 +56,23 @@ class MetaSwapModel(Model):
     - create time discretization
     - get reference time (idbg, iybg)
     - render para_sim.inp
+
+    # TODO:
+    - init_svat.inp: initial condition
+    - luse_svat.inp: lookup tables, provide default one
+    - fact_svat.inp: vegetation factors
+    - uscl_svat.inp: scaling factors
+    - sel_svat_csv.inp: Output control of dtgw output csv option
+
     """
 
     _pkg_id = "model"
+    _file_name = "para_sim.inp"
 
     _template = jinja2.Template(
-        """{%- for setting, value in settings.items()%}
-        {{setting}} = {{value}}
-        {%- endfor%}
-        """
+        "{%for setting, value in settings.items()%}"
+        "{{setting}} = {{value}}\n"
+        "{%endfor%}"
     )
 
     def __init__(self, unsaturated_database):
@@ -108,17 +117,31 @@ class MetaSwapModel(Model):
 
     def write(self, directory):
         """
-        Write packages
+        Write packages and simulation settings (PARA_SIM.INP).
+
+        Parameters
+        ----------
+        directory: Path or str
+            directory to write model in.
         """
+
+        # Force to Path
+        directory = Path(directory)
 
         year, time_since_start_year = self._get_starttime()
 
         self.simulation_settings["iybg"] = year
         self.simulation_settings["tdbg"] = time_since_start_year
 
-        # TODO:
-        # - Output control of all the svat_csv options
-        # - Output control of the idf
+        # Add OutputControl settings
+        for pkg in self.values():
+            if isinstance(pkg, OutputControl):
+                self.simulation_settings.update(pkg.get_settings())
+
+        filename = directory / self._file_name
+        with open(filename, "w") as f:
+            rendered = self._template.render(settings=self.simulation_settings)
+            f.write(rendered)
 
         # write package contents
         for pkgname in self:
