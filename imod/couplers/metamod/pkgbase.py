@@ -61,7 +61,7 @@ class Package(abc.ABC):
             for index, metadata in enumerate(self._metadata_dict.values()):
                 content = format_fixed_width(row[index + 1], metadata)
                 file.write(content)
-            file.write(os.linesep)
+            file.write("\n")
 
     def _get_preprocessed_array(self, varname, mask, extend_subunits=None):
         array = self.dataset[varname]
