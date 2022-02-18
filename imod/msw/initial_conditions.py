@@ -7,6 +7,7 @@ import xarray as xr
 
 import shutil
 from imod.msw.pkgbase import Package
+from imod.fixed_format import format_fixed_width, VariableMetaData
 
 
 class InitialConditionsEquilibrium(Package):
@@ -16,12 +17,13 @@ class InitialConditionsEquilibrium(Package):
 
     _file_name = "init_svat.inp"
     _option = "Equilibrium"
+    _metadata_dict = {}
 
     def __init__(self):
         super().__init__()
 
     def _render(self, file):
-        file.writeline(self._option)
+        file.write(self._option + "\n")
 
     def write(self, directory):
         directory = pathlib.Path(directory)
@@ -33,7 +35,7 @@ class InitialConditionsEquilibrium(Package):
 
 class InitialConditionsRootzonePressureHead(Package):
     """
-    Use the pF-value of the root zone pressure head
+    Use the pF-value of the root zone pressure head as initial condition.
 
     Parameters
     ----------
@@ -43,14 +45,20 @@ class InitialConditionsRootzonePressureHead(Package):
 
     _file_name = "init_svat.inp"
     _option = "Rootzone_pF"
+    _metadata_dict = {
+        "initial_pF": VariableMetaData(6, 0.0, 6.0, float),
+    }
 
     def __init__(self, initial_pF=2.2):
         super().__init__()
-        self.initial_pF = initial_pF
+        self.dataset["initial_pF"] = initial_pF
 
     def _render(self, file):
-        file.writeline(self._option)
-        file.writeline(self.initial_pF)
+        file.write(self._option + "\n")
+
+        dataframe = self.dataset.assign_coords(index=[0]).to_dataframe()
+
+        self.write_dataframe_fixed_width(file, dataframe)
 
     def write(self, directory):
         directory = pathlib.Path(directory)
@@ -72,12 +80,13 @@ class InitialConditionsPercolation(Package):
 
     _file_name = "init_svat.inp"
     _option = "MeteoInputP"
+    _metadata_dict = {}
 
     def __init__(self):
         super().__init__()
 
     def _render(self, file):
-        file.writeline(self._option)
+        file.write(self._option + "\n")
 
     def write(self, directory):
         directory = pathlib.Path(directory)
@@ -101,6 +110,7 @@ class InitialConditionsSavedState(Package):
 
     _file_name = "init_svat.inp"
     _option = "Saved_State"
+    _metadata_dict = {}
 
     def __init__(self, saved_state):
         super().__init__()
