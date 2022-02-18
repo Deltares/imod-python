@@ -10,3 +10,9 @@ from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMappi
 from imod.msw.model import MetaSwapModel
 from imod.msw.output_control import IdfOutputControl
 from imod.msw.sprinkling import Sprinkling
+from imod.msw.initial_conditions import (
+    InitialConditionsEquilibrium,
+    InitialConditionsPercolation,
+    InitialConditionsRootzonePressureHead,
+    InitialConditionsSavedState,
+)
