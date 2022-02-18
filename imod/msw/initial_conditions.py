@@ -1,13 +1,13 @@
 import pathlib
+import shutil
 from tkinter import Pack
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
-import shutil
+from imod.fixed_format import VariableMetaData, format_fixed_width
 from imod.msw.pkgbase import Package
-from imod.fixed_format import format_fixed_width, VariableMetaData
 
 
 class InitialConditionsEquilibrium(Package):

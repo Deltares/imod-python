@@ -1,12 +1,14 @@
+import tempfile
+from pathlib import Path
+
+import pytest
+
 from imod.msw import (
     InitialConditionsEquilibrium,
     InitialConditionsPercolation,
     InitialConditionsRootzonePressureHead,
     InitialConditionsSavedState,
 )
-import tempfile
-from pathlib import Path
-import pytest
 
 
 def test_initial_conditions_equilibrium():

@@ -4,8 +4,8 @@ from pathlib import Path
 
 import jinja2
 
-from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.output_control import OutputControl
+from imod.msw.timeutil import to_metaswap_timeformat
 
 DEFAULT_SETTINGS = dict(
     vegetation_mdl=1,
