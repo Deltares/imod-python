@@ -1,12 +1,7 @@
 import pathlib
 import shutil
-from tkinter import Pack
 
-import numpy as np
-import pandas as pd
-import xarray as xr
-
-from imod.fixed_format import VariableMetaData, format_fixed_width
+from imod.fixed_format import VariableMetaData
 from imod.msw.pkgbase import Package
 
 
