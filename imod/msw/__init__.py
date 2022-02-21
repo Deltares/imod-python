@@ -15,4 +15,5 @@ from imod.msw.meteo_grid import MeteoGrid
 from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMapping
 from imod.msw.model import MetaSwapModel
 from imod.msw.output_control import IdfOutputControl
+from imod.msw.ponding import Ponding
 from imod.msw.sprinkling import Sprinkling
