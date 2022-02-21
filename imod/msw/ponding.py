@@ -10,7 +10,7 @@ from imod.msw.pkgbase import Package
 class Ponding(Package):
     """
     Set ponding related parameters for MetaSWAP. This class is responsible for
-    the svat2swnr_roff.inp. Currently, we do not support ponds coupled to
+    the svat2swnr_roff.inp file. Currently, we do not support ponds coupled to
     SIMGRO's surface water module.
 
     Parameters
