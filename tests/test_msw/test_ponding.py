@@ -23,10 +23,11 @@ def test_simple_model(fixed_format_parser):
     ponding_depth = xr.DataArray(
         np.array(
             [
-                 [[0.5, 0.5, 0.5],
+                [[0.5, 0.5, 0.5],
                  [nan, nan, nan],
                  [1.0, 1.0, 1.0]],
-                 [[0.5, 0.5, 0.5],
+
+                [[0.5, 0.5, 0.5],
                  [1.0, 1.0, 1.0],
                  [nan, nan, nan]],
             ]
@@ -41,7 +42,8 @@ def test_simple_model(fixed_format_parser):
                 [[0.5, 0.5, 0.5],
                  [nan, nan, nan],
                  [1.0, 1.0, 1.0]],
-                 [[0.5, 0.5, 0.5],
+                
+                [[0.5, 0.5, 0.5],
                  [1.0, 1.0, 1.0],
                  [nan, nan, nan]],
             ]
