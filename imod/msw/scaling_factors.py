@@ -11,11 +11,11 @@ class ScalingFactors(Package):
     """
     This package allows you to do three things:
         1. Set scaling factors for some inputs in the soil physical database,
-        namely the soil moisture content and the saturated hydraulic
-        conductivity
-        2. Set a scaling factor for pressure head related parameters in
-        the landuse class lookup table (LUSE_SVAT.INP)
-        3. Set the depth of the perched watertable base
+           namely the soil moisture content and the saturated hydraulic
+           conductivity.
+        2. Set a scaling factor for pressure head related parameters in the
+           landuse class lookup table (LUSE_SVAT.INP).
+        3. Set the depth of the perched watertable base.
 
     This class is useful for sensitivity and uncertainty analyses, as well as
     model calibration. Scaling factors are multiplied with their corresponding
@@ -26,14 +26,16 @@ class ScalingFactors(Package):
     scale_soil_moisture: array of floats (xr.DataArray)
         Scaling factor which adjusts the saturated soil moisture content, the
         residual soil moisture content, and the soil moisture content of
-        macropores. This array must not have a subunit coordinate.
+        macropores. This array must have a subunit coordinate to describe
+        different landuses.
     scale_hydraulic_conductivity: array of floats (xr.DataArray)
         Scaling factor which adjusts the (vertical) saturated hydraulic
-        conductivity of the soil. This array must not have a subunit coordinate.
+        conductivity of the soil. This array must have a subunit coordinate to describe
+        different landuses.
     scale_pressure_head: array of floats (xr.DataArray)
         Scaling factor which adjusts the pressure head applied to the pressure
-        parameters defined in LUSE_SVAT.INP. This array must not have a subunit
-        coordinate.
+        parameters defined in LUSE_SVAT.INP. This array must have a subunit coordinate to describe
+        different landuses.
     depth_perched_water_table: array of floats (xr.DataArray)
         Sets the depth of the perched watertable base. If the groundwater depth
         exeeds this depth, the capillary rise is set to zero. This option has
@@ -42,9 +44,6 @@ class ScalingFactors(Package):
         presences of loam causing a perched watertable, it is advised to
         generate a new soil physical unit. This array must not have a subunit
         coordinate.
-    area: array of floats (xr.DataArray)
-        subunit coordinate, used to map all scaling factors to a all svats in a
-        grid cell.
     active: array of booleans (xr.DataArray)
         Describes whether SVAT units are active or not. This array must not have
         a subunit coordinate.
@@ -65,7 +64,6 @@ class ScalingFactors(Package):
         scale_hydraulic_conductivity,
         scale_pressure_head,
         depth_perched_water_table,
-        area,
         active,
     ):
         super().__init__()
@@ -73,17 +71,12 @@ class ScalingFactors(Package):
         self.dataset["scale_hydraulic_conductivity"] = scale_hydraulic_conductivity
         self.dataset["scale_pressure_head"] = scale_pressure_head
         self.dataset["depth_perched_water_table"] = depth_perched_water_table
-        self.dataset["area"] = area
         self.dataset["active"] = active
 
     def _render(self, file):
-        # Produce values necessary for members without subunit coordinate
-        extend_subunits = self.dataset["area"]["subunit"]
-        mask = self.dataset["area"].where(self.dataset["active"]).notnull()
-
-        # Generate columns for members without subunit coordinate
+        # Generate columns for members with subunit coordinate
         scale_soil_moisture = self._get_preprocessed_array(
-            "scale_soil_moisture", mask, extend_subunits=extend_subunits
+            "scale_soil_moisture", self.dataset["active"]
         )
 
         scale_hydraulic_conductivity = self._get_preprocessed_array(
@@ -94,8 +87,15 @@ class ScalingFactors(Package):
             "scale_pressure_head", self.dataset["active"]
         )
 
+        # Produce values necessary for members without subunit coordinate
+        extend_subunits = self.dataset["scale_soil_moisture"]["subunit"]
+        mask = (
+            self.dataset["scale_soil_moisture"].where(self.dataset["active"]).notnull()
+        )
+
+        # Generate columns for members without subunit coordinate
         depth_perched_water_table = self._get_preprocessed_array(
-            "depth_perched_water_table", self.dataset["active"]
+            "depth_perched_water_table", mask, extend_subunits=extend_subunits
         )
 
         # Generate remaining columns
