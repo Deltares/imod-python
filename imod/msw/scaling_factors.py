@@ -108,7 +108,7 @@ class ScalingFactors(Package):
                 "scale_soil_moisture": scale_soil_moisture,
                 "scale_hydraulic_conductivity": scale_hydraulic_conductivity,
                 "scale_pressure_head": scale_pressure_head,
-                "depth_perched_water_table ": depth_perched_water_table,
+                "depth_perched_water_table": depth_perched_water_table,
             }
         )
 
