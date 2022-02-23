@@ -9,11 +9,13 @@ from imod.msw.pkgbase import Package
 
 class ScalingFactors(Package):
     """
-    Defines scaling factors for some inputs in the soil physical database,
-    namely the soil moisture content and the saturated hydraulic conductivity.
-    Furthermore a scaling factor for pressure head related parameters in the
-    landuse class lookup table (LUSE_SVAT.INP) can be set. Finally, the depth of
-    the perched watertable base is set.
+    This package allows you to do three things:
+        1. Set scaling factors for some inputs in the soil physical database,
+        namely the soil moisture content and the saturated hydraulic
+        conductivity
+        2. Set a scaling factor for pressure head related parameters in
+        the landuse class lookup table (LUSE_SVAT.INP)
+        3. Set the depth of the perched watertable base
 
     This class is useful for sensitivity and uncertainty analyses, as well as
     model calibration. Scaling factors are multiplied with their corresponding
