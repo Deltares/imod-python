@@ -6,7 +6,6 @@ import xarray as xr
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
-from imod.fixed_format import format_fixed_width
 from imod.msw import Ponding
 
 
@@ -42,7 +41,6 @@ def test_simple_model(fixed_format_parser):
                 [[0.5, 0.5, 0.5],
                  [nan, nan, nan],
                  [1.0, 1.0, 1.0]],
-                
                 [[0.5, 0.5, 0.5],
                  [1.0, 1.0, 1.0],
                  [nan, nan, nan]],

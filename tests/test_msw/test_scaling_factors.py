@@ -6,7 +6,6 @@ import xarray as xr
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
-from imod.fixed_format import format_fixed_width
 from imod.msw import ScalingFactors
 
 
