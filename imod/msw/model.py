@@ -80,7 +80,7 @@ class MetaSwapModel(Model):
 
         self.simulation_settings = copy(DEFAULT_SETTINGS)
         self.simulation_settings[
-            "unsat_svat_path"
+            "unsa_svat_path"
         ] = self._render_unsaturated_database_path(unsaturated_database)
 
     def _render_unsaturated_database_path(self, unsaturated_database):
@@ -127,6 +127,7 @@ class MetaSwapModel(Model):
 
         # Force to Path
         directory = Path(directory)
+        directory.mkdir(exist_ok=True, parents=True)
 
         year, time_since_start_year = self._get_starttime()
 
