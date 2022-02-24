@@ -28,6 +28,9 @@ class Infiltration(Package):
     bottom_resistance: array of floats (xr.DataArray)
         Describes the infiltration capacity of SVAT units.
         This array must not have a subunit coordinate.
+    extra_storage_coefficient: array of floats (xr.DataArray)
+        Extra storage coefficient of phreatic layer.
+        This array must not have a subunit coordinate.
     active: array of bools (xr.DataArray)
         Describes whether SVAT units are active or not.
         This array must not have a subunit coordinate.
