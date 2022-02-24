@@ -37,8 +37,8 @@ class IdfOutputControl(OutputControl):
         "rows": VariableMetaData(10, 1, 9999999, int),
         "columns": VariableMetaData(10, 1, 9999999, int),
         # TODO: Check if x and y limits are properly set.
-        "y_coords": VariableMetaData(12, 0.0, 9999999.0, float),
-        "x_coords": VariableMetaData(12, 0.0, 9999999.0, float),
+        "y_coords": VariableMetaData(15, 0.0, 9999999.0, float),
+        "x_coords": VariableMetaData(15, 0.0, 9999999.0, float),
     }
 
     # TODO: Quote from IO manual: The x- and y-coordinates should increase with increasing col, row.
@@ -93,7 +93,7 @@ class IdfOutputControl(OutputControl):
             simgro_opt=-1,
             idf_per=1,
             idf_dx=dx,
-            idf_dy=dy,
+            idf_dy=np.abs(dy),
             idf_ncol=ncol,
             idf_nrow=nrow,
             idf_xmin=xmin,
