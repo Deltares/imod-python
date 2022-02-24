@@ -27,11 +27,11 @@ class GridData(Package):
         This array must have a subunit coordinate to describe different landuses.
     surface_elevation: array of floats (xr.DataArray)
         Describes the surface elevation of SVAT units.
-        This array must have a subunit coordinate to describe different landuses.
+        This array must not have a subunit coordinate.
     soil_physical_unit: array of integers (xr.DataArray)
         Describes the physical parameters of SVAT units.
         These parameters will be looked up in a table according to the given integers.
-        This array must have a subunit coordinate to describe different landuses.
+        This array must not have a subunit coordinate.
     active: array of bools (xr.DataArray)
         Describes whether SVAT units are active or not.
         This array must not have a subunit coordinate.
