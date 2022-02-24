@@ -18,7 +18,7 @@ def format_fixed_width(value, metadata):
     elif metadata.dtype == float:
         whole_number_digits = len(str(int(abs(value))))
         decimal_number_width = max(0, metadata.column_width - whole_number_digits - 2)
-        format_string = "{:" + f"+{metadata.column_width}.{decimal_number_width}f" + "}"
+        format_string = "{:" + f"{metadata.column_width}.{decimal_number_width}f" + "}"
     else:
         raise TypeError(f"dtype {metadata.dtype} is not supported")
 
