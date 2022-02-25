@@ -1,5 +1,6 @@
 import pathlib
 
+import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -7,8 +8,6 @@ import xarray as xr
 from imod.fixed_format import VariableMetaData
 from imod.msw.pkgbase import Package
 from imod.util import spatial_reference
-
-import jinja2
 
 
 class OutputControl(Package):
