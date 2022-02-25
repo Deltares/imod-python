@@ -26,7 +26,7 @@ class NodeSvatMapping(Package):
         This array must not have a subunit coordinate.
     """
 
-    #TODO: Do we always want to couple to identical grids?
+    # TODO: Do we always want to couple to identical grids?
 
     _file_name = "nodenr2svat.dxc"
     _metadata_dict = {

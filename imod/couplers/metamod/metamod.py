@@ -2,7 +2,7 @@ import shutil
 
 from imod.couplers.metamod.node_svat_mapping import NodeSvatMapping
 from imod.mf6 import Modflow6Simulation
-from imod.msw import MetaSwapModel, GridData
+from imod.msw import GridData, MetaSwapModel
 
 
 class MetaMod:
