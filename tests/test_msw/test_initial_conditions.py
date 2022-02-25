@@ -47,7 +47,7 @@ def test_initial_conditions_rootzone_pressure_head():
         with open(output_dir / ic._file_name) as f:
             lines = f.readlines()
 
-    assert lines == ["Rootzone_pF\n", "+2.200\n"]
+    assert lines == ["Rootzone_pF\n", " 2.200\n"]
 
 
 def test_initial_conditions_saved_state():
