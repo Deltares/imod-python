@@ -6,7 +6,7 @@ import xarray as xr
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
-from imod.msw import IdfOutputControl
+from imod.msw import IdfOutputControl, VariableOutputControl
 
 
 def grid():
@@ -41,6 +41,25 @@ def grid():
     )
     # fmt: on
     return area, active
+
+
+def test_var_oc(fixed_format_parser):
+    var_output_control = VariableOutputControl()
+
+    with tempfile.TemporaryDirectory() as output_dir:
+        output_dir = Path(output_dir)
+        var_output_control.write(output_dir)
+
+        results = fixed_format_parser(
+            output_dir / VariableOutputControl._file_name,
+            VariableOutputControl._metadata_dict,
+        )
+
+    variable_names = ["Pm", "Psgw", "Pssw", "qrun", "qdr", "qspgw", "qmodf", "ETact"]
+    expected_names = np.array(["{:10}".format(v) for v in variable_names])
+
+    assert_equal(results["variable"], expected_names)
+    assert_equal(results["option"], np.array([1, 1, 1, 1, 1, 1, 1, 1]))
 
 
 def test_idf_oc_write_simple_model(fixed_format_parser):
