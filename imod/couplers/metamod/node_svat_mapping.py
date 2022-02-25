@@ -47,11 +47,11 @@ class NodeSvatMapping(Package):
     def _create_mod_id(self):
         self.dataset["mod_id"] = self.dataset["area"].copy()
         subunit_len, y_len, x_len = self.dataset["mod_id"].shape
-        # TODO: Vectorize this loop
-        for subunit in range(subunit_len):
-            for y in range(y_len):
-                for x in range(x_len):
-                    self.dataset["mod_id"][subunit, y, x] = x + y * x_len + 1
+
+        mod_id = (np.arange(y_len * x_len) + 1).reshape(y_len, x_len)
+        self.dataset["mod_id"].values = np.broadcast_to(
+            mod_id, (subunit_len, y_len, x_len)
+        )
 
     def _render(self, file):
         # Produce values necessary for members without subunit coordinate
