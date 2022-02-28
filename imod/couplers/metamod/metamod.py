@@ -1,5 +1,6 @@
 import shutil
 
+from imod.couplers.metamod.rch_svat_mapping import RechargeSvatMapping
 from imod.couplers.metamod.node_svat_mapping import NodeSvatMapping
 from imod.mf6 import Modflow6Simulation
 from imod.msw import GridData, MetaSwapModel
@@ -48,9 +49,24 @@ class MetaMod:
         active = self.msw_model[grid_data_key].dataset["active"]
         grid_mapping = NodeSvatMapping(area, active)
         grid_mapping.write(directory)
-        # Copy nodenr2svat.dxc as rchindex2svat.dxc.
-        # This only works if no np.nan values were included in the
-        # array to create the Modflow6 package for rch_msw.
-        shutil.copy2(
-            directory / NodeSvatMapping._file_name, directory / "rchindex2svat.dxc"
-        )
+
+        gwf_names = [
+            key
+            for key, value in self.mf6_simulation.items()
+            if value._pkg_id == "model"
+        ]
+
+        # Assume only one groundwater flow model
+        # FUTURE: Support multiple groundwater flow models.
+        gwf_model = self.mf6_simulation[gwf_names[0]]
+
+        if "rch_msw" not in gwf_model.keys():
+            raise ValueError(
+                "No package named 'rch_msw' detected in Modflow 6 model. "
+                "iMOD_coupler requires a Recharge package with 'rch_msw' as name"
+            )
+
+        recharge = gwf_model["rch_msw"]
+
+        rch_mapping = RechargeSvatMapping(area, active, recharge)
+        rch_mapping.write(directory)
