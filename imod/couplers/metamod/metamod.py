@@ -1,5 +1,3 @@
-import shutil
-
 from imod.couplers.metamod.node_svat_mapping import NodeSvatMapping
 from imod.couplers.metamod.rch_svat_mapping import RechargeSvatMapping
 from imod.mf6 import Modflow6Simulation
