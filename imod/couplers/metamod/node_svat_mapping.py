@@ -10,7 +10,7 @@ from imod.fixed_format import VariableMetaData
 
 class NodeSvatMapping(Package):
     """
-    This contains the data to map MODFLOW 6 cells to MetaSWAP svats.
+    This contains the data to map MODFLOW 6 cells (user nodes) to MetaSWAP svats.
 
     This class is responsible for the file `nodenr2svat.dxc`.
 
@@ -27,6 +27,9 @@ class NodeSvatMapping(Package):
     """
 
     # TODO: Do we always want to couple to identical grids?
+
+    # TODO: Package checks:
+    #   - Make sure "area==np.nan" and "idomain==0" in the same cells.
 
     _file_name = "nodenr2svat.dxc"
     _metadata_dict = {
@@ -50,7 +53,10 @@ class NodeSvatMapping(Package):
         self.dataset["mod_id"] = self.dataset["area"].copy()
         subunit_len, y_len, x_len = self.dataset["mod_id"].shape
 
+        # TODO: Take idomain as input and refactor according to rch_svat_mapping
         mod_id = (np.arange(y_len * x_len) + 1).reshape(y_len, x_len)
+        # Copy grid along subunit dimension with broadcasting
+        # this is 500 times faster than calling np.stack([mod_id] * subunit_len, axis=0)
         self.dataset["mod_id"].values = np.broadcast_to(
             mod_id, (subunit_len, y_len, x_len)
         )
