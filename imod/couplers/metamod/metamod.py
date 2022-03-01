@@ -1,7 +1,10 @@
 from imod.couplers.metamod.node_svat_mapping import NodeSvatMapping
 from imod.couplers.metamod.rch_svat_mapping import RechargeSvatMapping
+from imod.couplers.metamod.wel_svat_mapping import WellSvatMapping
 from imod.mf6 import Modflow6Simulation
 from imod.msw import GridData, MetaSwapModel
+
+import warnings
 
 
 class MetaMod:
@@ -19,8 +22,6 @@ class MetaMod:
     # TODO:
     # - NodeSvatMapping: check with idomain if no coupling is done to inactive
     #   cells.
-    # - rchindex2svat.dxc
-    # - wellindex2svat.dxc
     # - a toml file
 
     def __init__(self, msw_model: MetaSwapModel, mf6_simulation: Modflow6Simulation):
@@ -68,3 +69,15 @@ class MetaMod:
 
         rch_mapping = RechargeSvatMapping(area, active, recharge)
         rch_mapping.write(directory)
+
+        if "wells_msw" in gwf_model.keys():
+            well = gwf_model["wells_msw"]
+
+            well_mapping = WellSvatMapping(area, active, well)
+            well_mapping.write(directory)
+        else:
+            warnings.warn(
+                "No package named 'wells_msw' detected, "
+                "no wells are coupled to MetaSWAP",
+                UserWarning,
+            )
