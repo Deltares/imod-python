@@ -54,7 +54,10 @@ class RechargeSvatMapping(Package):
 
         subunit_len, y_len, x_len = self.dataset["rch_id"].shape
 
-        # Call cumsum on
+        # Call cumsum on numpy array, as it computes a cumsum on the flattened
+        # array with axis=None. xarray preserves the grid if dim=None, but
+        # computes a cumsum sequentially across dimensions, yielding different
+        # results.
         rch_id = np.cumsum(self.dataset["rch_active"].values).reshape(y_len, x_len)
 
         # Copy grid along subunit dimension with broadcasting
