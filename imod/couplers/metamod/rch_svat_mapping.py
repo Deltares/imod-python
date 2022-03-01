@@ -47,28 +47,28 @@ class RechargeSvatMapping(Package):
         self.dataset["active"] = active
         self.dataset["rch_active"] = recharge.dataset["rate"].notnull()
         self._pkgcheck()
+        self._create_svat()
         self._create_rch_id()
 
+    def _create_svat(self):
+        self.dataset["svat"] = xr.full_like(
+            self.dataset["area"], fill_value=0, dtype=np.int64
+        )
+
+        valid = self.dataset["area"].notnull() & self.dataset["active"]
+        n_svat = valid.sum()
+        self.dataset["svat"].values[valid.values] = np.arange(1, n_svat + 1)
+
     def _create_rch_id(self):
-        self.dataset["rch_id"] = self.dataset["area"].copy()
-
-        subunit_len, y_len, x_len = self.dataset["rch_id"].shape
-
-        # Call cumsum on numpy array, as it computes a cumsum on the flattened
-        # array with axis=None. xarray preserves the grid if dim=None, but
-        # computes a cumsum sequentially across dimensions, yielding different
-        # results.
-        rch_id = np.cumsum(self.dataset["rch_active"].values).reshape(y_len, x_len)
-
-        # Copy grid along subunit dimension with broadcasting
-        # this is 500 times faster than calling np.stack([rch_id] * subunit_len, axis=0)
-        self.dataset["rch_id"].values = np.broadcast_to(
-            rch_id, (subunit_len, y_len, x_len)
+        self.dataset["rch_id"] = xr.full_like(
+            self.dataset["area"], fill_value=0, dtype=np.int64
         )
 
-        self.dataset["rch_id"] = self.dataset["rch_id"].where(
-            self.dataset["rch_active"]
-        )
+        subunit = self.dataset.coords["subunit"]
+        n_rch = self.dataset["rch_active"].sum()
+        valid = self.dataset["rch_active"].expand_dims(subunit=subunit)
+
+        self.dataset["rch_id"].values[valid.values] = np.arange(1, n_rch + 1)
 
     def _render(self, file):
         # Produce values necessary for members with subunit coordinate
@@ -76,10 +76,8 @@ class RechargeSvatMapping(Package):
 
         # Generate columns and apply mask
         rch_id = self._get_preprocessed_array("rch_id", mask)
+        svat = self._get_preprocessed_array("svat", mask)
 
-        # Generate remaining columns
-        # TODO: In GridData, svat is generated as np.arange(1, area.size + 1)
-        svat = np.arange(1, rch_id.size + 1)
         # TODO: Always stuck to layer 1? At least add to docstring!
         layer = np.full_like(svat, 1)
         free = pd.Series(["" for _ in range(rch_id.size)], dtype="string")

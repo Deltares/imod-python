@@ -66,9 +66,10 @@ class CouplerMapping(Package):
         """
         _, y_len, x_len = self.dataset["area"].shape
         subunit = self.dataset.coords["subunit"]
+        size = self.dataset["active"].size
 
-        mod_id_rch = xr.full_like(self.dataset["active"], fill_value=1, dtype=np.int64)
-        mod_id_rch.values = np.cumsum(mod_id_rch.values).reshape(y_len, x_len)
+        mod_id_rch = xr.full_like(self.dataset["active"], fill_value=0, dtype=np.int64)
+        mod_id_rch.values = np.arange(1, size + 1).reshape(y_len, x_len)
 
         self.dataset["mod_id_rch"] = mod_id_rch.expand_dims(subunit=subunit)
 
@@ -78,7 +79,7 @@ class CouplerMapping(Package):
 
         # Generate columns and apply mask
         mod_id = self._get_preprocessed_array("mod_id_rch", mask)
-        svat = np.arange(1, mod_id.size + 1)
+        svat = self._get_preprocessed_array("svat", mask)
         layer = np.full_like(svat, 1)
 
         # Get well values
