@@ -60,13 +60,17 @@ class CouplerMapping(Package):
         self.dataset["svat"].values[valid.values] = np.arange(1, n_svat + 1)
 
     def _create_mod_id_rch(self):
-        # TODO: Vectorize this function
-        self.dataset["mod_id_rch"] = self.dataset["area"].copy()
-        subunit_len, y_len, x_len = self.dataset["mod_id_rch"].shape
-        for subunit in range(subunit_len):
-            for y in range(y_len):
-                for x in range(x_len):
-                    self.dataset["mod_id_rch"][subunit, y, x] = y * x_len + x + 1
+        """
+        Create modflow indices for the recharge layer, which is where
+        infiltration will take place.
+        """
+        _, y_len, x_len = self.dataset["area"].shape
+        subunit = self.dataset.coords["subunit"]
+
+        mod_id_rch = xr.full_like(self.dataset["active"], fill_value=1, dtype=np.int64)
+        mod_id_rch.values = np.cumsum(mod_id_rch.values).reshape(y_len, x_len)
+
+        self.dataset["mod_id_rch"] = mod_id_rch.expand_dims(subunit=subunit)
 
     def _render(self, file):
         # Produce values necessary for members without subunit coordinate
@@ -102,33 +106,41 @@ class CouplerMapping(Package):
         return self.write_dataframe_fixed_width(file, dataframe)
 
     def _get_well_values(self):
-        mod_id_list = []
-        svat_list = []
-        layer_list = []
+        """
+        Get modflow indices, svats, and layer number for the wells
+        """
+        # Convert to Python's 0-based index
+        well_row = self.well["row"] - 1
+        well_column = self.well["column"] - 1
+        well_layer = self.well["layer"] - 1
 
-        well_row = self.well["row"]
-        well_column = self.well["column"]
-        well_layer = self.well["layer"]
+        _, row_len, column_len = self.dataset["svat"].shape
+        subunit = self.dataset.coords["subunit"]
 
-        subunit_len, row_len, column_len = self.dataset["svat"].shape
+        # Check where wells should be coupled to MetaSWAP
+        area_valid = ~np.isnan(self.dataset["area"][:, well_row, well_column])
+        msw_active = self.dataset["active"][well_row, well_column]
+        well_active = area_valid & msw_active
 
-        for row, column, layer in zip(well_row, well_column, well_layer):
-            # Convert from 1-indexing to 0 indexing
-            row -= 1
-            column -= 1
-            layer -= 1
-            for subunit in range(subunit_len):
-                if self.dataset["active"][row, column] and not np.isnan(
-                    self.dataset["area"][subunit, row, column]
-                ):
-                    mod_id = (
-                        layer * column_len * row_len + row * column_len + column + 1
-                    )
-                    mod_id_list.append(mod_id)
-                    svat_list.append(self.dataset["svat"][subunit, row, column])
-                    layer_list.append(layer + 1)
+        # Generate modflow indices for cells where wells are located.
+        mod_id = (
+            well_layer * column_len * row_len + well_row * column_len + well_column + 1
+        )
+        mod_id = mod_id.expand_dims(subunit=subunit)
+        mod_id_1d = mod_id.values[well_active.values]
 
-        return (np.array(mod_id_list), np.array(svat_list), np.array(layer_list))
+        # Generate svats
+        svat = self.dataset["svat"][:, well_row, well_column]
+        svat_1d = svat.values[well_active.values]
+
+        # Generate layers
+        layer = well_layer.expand_dims(subunit=subunit)
+        # Convert to Modflow's 1-based index. layer is readonly for some reason,
+        # so we cannot do += on it.
+        layer = layer + 1
+        layer_1d = layer.values[well_active.values]
+
+        return (mod_id_1d, svat_1d, layer_1d)
 
     def write(self, directory):
         directory = pathlib.Path(directory)
