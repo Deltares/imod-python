@@ -183,3 +183,56 @@ def test_simple_model_inactive_rch_error():
 
     with pytest.raises(ValueError):
         RechargeSvatMapping(area, active, recharge)
+
+
+def test_simple_model_rch_time_error():
+    """
+    Modflow 6 Recharge package against which is coupled should not contain a
+    time dimension, as mapping is constant in time.
+    """
+    x = [1.0, 2.0, 3.0]
+    y = [1.0, 2.0, 3.0]
+    subunit = [0, 1]
+    # fmt: off
+    area = xr.DataArray(
+        np.array(
+            [
+                [[0.5, 0.5, 0.5],
+                 [nan, nan, nan],
+                 [1.0, 1.0, 1.0]],
+
+                [[0.5, 0.5, 0.5],
+                 [1.0, 1.0, 1.0],
+                 [nan, nan, nan]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x}
+    )
+
+    active = xr.DataArray(
+        np.array(
+            [[False, True, False],
+             [False, True, False],
+             [False, True, False]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x}
+    )
+
+    rate = xr.DataArray(
+        np.array(
+            [
+                [[0.0, 0.0, 0.0],
+                 [0.0, 0.0, 0.0],
+                 [0.0, 0.0, 0.0]],
+            ]
+        ),
+        dims=("time", "y", "x"),
+        coords={"time": ["2000-01-01"], "y": y, "x": x}
+    )
+
+    # fmt: on
+    recharge = mf6.Recharge(rate)
+
+    with pytest.raises(ValueError):
+        RechargeSvatMapping(area, active, recharge)
