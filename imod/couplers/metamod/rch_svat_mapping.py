@@ -64,11 +64,16 @@ class RechargeSvatMapping(Package):
             self.dataset["area"], fill_value=0, dtype=np.int64
         )
 
+        n_subunit, _, _ = self.dataset["rch_id"].shape
+
         subunit = self.dataset.coords["subunit"]
         n_rch = self.dataset["rch_active"].sum()
         valid = self.dataset["rch_active"].expand_dims(subunit=subunit)
 
-        self.dataset["rch_id"].values[valid.values] = np.arange(1, n_rch + 1)
+        # recharge does not have a subunit dimension, so tile for n_subunits
+        rch_id = np.tile(np.arange(1, n_rch + 1), n_subunit)
+
+        self.dataset["rch_id"].values[valid.values] = rch_id
 
     def _render(self, file):
         # Produce values necessary for members with subunit coordinate
