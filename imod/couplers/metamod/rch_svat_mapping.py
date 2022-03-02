@@ -15,18 +15,21 @@ class RechargeSvatMapping(Package):
 
     This class is responsible for the file `rchindex2svat.dxc`.
 
-    Unlike imod.msw.CouplerMapping, this class does not include mapping to wells.
+    Unlike imod.msw.CouplerMapping, this class does not include mapping to
+    wells.
 
     Parameters
     ----------
     area: array of floats (xr.DataArray)
-        Describes the area of SVAT units. This array must have a subunit coordinate
-        to describe different land uses.
+        Describes the area of SVAT units. This array must have a subunit
+        coordinate to describe different land uses.
     active: array of bools (xr.DataArray)
-        Describes whether SVAT units are active or not.
-        This array must not have a subunit coordinate.
+        Describes whether SVAT units are active or not. This array must not have
+        a subunit coordinate.
     recharge: mf6.Recharge
-        Modflow 6 Recharge package to map to.
+        Modflow 6 Recharge package to map to. Note that the recharge rate should
+        be provided as a 2D grid with a (y, x) dimension. Package will throw an
+        error if a grid is provided with different dimensions.
     """
 
     # TODO: Do we always want to couple to identical grids?
@@ -102,12 +105,20 @@ class RechargeSvatMapping(Package):
         return self.write_dataframe_fixed_width(file, dataframe)
 
     def _pkgcheck(self):
+        rch_dims = self.dataset["rch_active"].dims
+        if rch_dims != ("y", "x"):
+            raise ValueError(
+                f"""Recharge grid can only have dimensions ('y', 'x'). Got
+                 {rch_dims} instead"""
+            )
+
         # Check if active msw cell inactive in recharge
         inactive_in_rch = self.dataset["active"] > self.dataset["rch_active"]
 
         if inactive_in_rch.any():
             raise ValueError(
-                "Active MetaSWAP cell detected in inactive cell in Modflow6 recharge"
+                """Active MetaSWAP cell detected in inactive cell in Modflow6
+                recharge"""
             )
 
     def write(self, directory):
