@@ -1,13 +1,13 @@
 import tempfile
 from pathlib import Path
-import pytest
 
 import numpy as np
+import pytest
 import xarray as xr
 from numpy import nan
 from numpy.testing import assert_equal
-from imod import mf6
 
+from imod import mf6
 from imod.couplers.metamod.rch_svat_mapping import RechargeSvatMapping
 
 

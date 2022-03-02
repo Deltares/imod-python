@@ -6,8 +6,7 @@ import xarray as xr
 from numpy import nan
 from numpy.testing import assert_equal
 
-from imod import mf6, msw
-
+from imod import mf6
 from imod.couplers.metamod.wel_svat_mapping import WellSvatMapping
 
 
