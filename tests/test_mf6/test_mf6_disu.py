@@ -97,7 +97,7 @@ def test_structured_connectivity_full():
 
 def test_from_structured(structured_dis):
     idomain, top, bottom = structured_dis
-    dis = disu.UnstructuredDiscretization.from_structured(top, bottom, idomain)
+    dis = disu.LowLevelUnstructuredDiscretization.from_structured(top, bottom, idomain)
     assert np.allclose(dis.dataset["xorigin"], 40.0)
     assert np.allclose(dis.dataset["yorigin"], 0.0)
     connectivity_checks(dis)
@@ -105,13 +105,13 @@ def test_from_structured(structured_dis):
     # Now disable some cells, create one pass-through
     idomain.values[1, 0, 1] = -1
     idomain.values[:, 0, 0] = 0
-    dis = disu.UnstructuredDiscretization.from_structured(top, bottom, idomain)
+    dis = disu.LowLevelUnstructuredDiscretization.from_structured(top, bottom, idomain)
     connectivity_checks(dis)
 
 
 def test_render(structured_dis):
     idomain, top, bottom = structured_dis
-    dis = disu.UnstructuredDiscretization.from_structured(top, bottom, idomain)
+    dis = disu.LowLevelUnstructuredDiscretization.from_structured(top, bottom, idomain)
 
     directory = pathlib.Path("mymodel")
     actual = dis.render(directory, "disu", None, True)
@@ -155,7 +155,7 @@ def test_render(structured_dis):
 
 def test_write(structured_dis, tmp_path):
     idomain, top, bottom = structured_dis
-    dis = disu.UnstructuredDiscretization.from_structured(top, bottom, idomain)
+    dis = disu.LowLevelUnstructuredDiscretization.from_structured(top, bottom, idomain)
     dis.write(tmp_path, "disu", None, True)
 
     assert (tmp_path / "disu.disu").exists

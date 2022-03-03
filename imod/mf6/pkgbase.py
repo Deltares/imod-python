@@ -416,7 +416,18 @@ class Package(abc.ABC):
 
         spatial_ds.to_netcdf(path)
         return has_dims
-
+        
+    def _to_disu(self, numbers):
+        structured = self.dataset.expand_dims("layer")
+        # Stack will automatically broadcast to layer
+        dataset = structured.stack(node=("layer", "y", "x"))
+        layers = structured["layer"].values
+        ncell_per_layer = structured["y"].size * structured["x"].size
+        offset = (layers - 1) * ncell_per_layer
+        index = np.add.outer(offset, np.arange(ncell_per_layer))
+        dataset = dataset.assign_coords(node=numbers[index])
+        return self.__class__(**dataset)
+ 
 
 class BoundaryCondition(Package, abc.ABC):
     """
@@ -455,10 +466,15 @@ class BoundaryCondition(Package, abc.ABC):
         """
         Writes a modflow6 binary data file
         """
-        layer = ds["layer"].values
+        if "layer" in ds:
+            layer = ds["layer"].values
+        else:
+            layer = None
+
         arrdict = self._ds_to_arrdict(ds)
         sparse_data = self.to_sparse(arrdict, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)
+
         if binary:
             self._write_binaryfile(outpath, sparse_data)
         else:

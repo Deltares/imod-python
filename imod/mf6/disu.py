@@ -58,7 +58,7 @@ def _structured_connectivity(idomain):
     return ii[:connection], jj[:connection]
 
 
-class UnstructuredDiscretization(Package):
+class LowLevelUnstructuredDiscretization(Package):
     """
     Unstructured Discretization (DISU).
 
@@ -253,7 +253,7 @@ class UnstructuredDiscretization(Package):
 
         # Set "node" and "nja" as the dimension in accordance with MODFLOW6.
         # Should probably be updated if we could move to UGRID3D...
-        return UnstructuredDiscretization(
+        return LowLevelUnstructuredDiscretization(
             xorigin=xmin,
             yorigin=ymin,
             top=xr.DataArray(top.values[active], dims=["node"]),
