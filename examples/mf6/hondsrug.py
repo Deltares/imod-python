@@ -497,7 +497,7 @@ transient = xr.DataArray(
 # -------------------------------------
 #
 # The data is assigned to the gwf_model variable by using
-# `imod.mf6.Storage <https://deltares.gitlab.io/imod/imod-python/api/mf6.html#imod.mf6.Storage`_.
+# `imod.mf6.Storage <https://deltares.gitlab.io/imod/imod-python/api/generated/mf6/imod.mf6.SpecificStorage.html>`_.
 # It is necessary to indicate the values of specific storage,
 # specific yield and if the layers are convertible.
 

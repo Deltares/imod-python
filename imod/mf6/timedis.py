@@ -20,7 +20,7 @@ class TimeDiscretization(Package):
     Discretization (TDIS) Package.
     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=17
 
-    Paremeters
+    Parameters
     ----------
     timestep_duration: float
         is the length of a stress period. (PERLEN)
