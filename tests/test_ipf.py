@@ -320,15 +320,17 @@ def test_save__assoc_itype1__layers(tmp_path):
     ipf.save(tmp_path / "save.ipf", df, itype=1, nodata=-999.0)
     assert (tmp_path / "save_l1.ipf").exists()
     assert (tmp_path / "save_l3.ipf").exists()
-    assert (tmp_path / "A1.txt").exists()
-    assert (tmp_path / "B2.txt").exists()
-    assert (tmp_path / "C3.txt").exists()
-    assert (tmp_path / "D4.txt").exists()
+    assert (tmp_path / "layer1" / "A1.txt").exists()
+    assert (tmp_path / "layer1" / "B2.txt").exists()
+    assert (tmp_path / "layer3" / "C3.txt").exists()
+    assert (tmp_path / "layer3" / "D4.txt").exists()
     df2 = ipf.read(tmp_path / "save_l*.ipf")
     df = df.sort_values(by="x")
     df2 = df2.sort_values(by="x")
     df2.index = df.index
-    pd.testing.assert_frame_equal(df, df2, check_like=True)
+    # Skip checking the ID column: the layer is inserted
+    columns = [col for col in df.columns if col != "id"]
+    pd.testing.assert_frame_equal(df[columns], df2[columns], check_like=True)
 
 
 def test_save__missing(nodata_ipf):
@@ -412,10 +414,10 @@ def test_save__assoc_itype1__layers__integerID(tmp_path):
     ipf.save(tmp_path / "save.ipf", df, itype=1, nodata=-999.0)
     assert (tmp_path / "save_l1.ipf").exists()
     assert (tmp_path / "save_l3.ipf").exists()
-    assert (tmp_path / "1.txt").exists()
-    assert (tmp_path / "2.txt").exists()
-    assert (tmp_path / "3.txt").exists()
-    assert (tmp_path / "4.txt").exists()
+    assert (tmp_path / "layer1" / "1.txt").exists()
+    assert (tmp_path / "layer1" / "2.txt").exists()
+    assert (tmp_path / "layer3" / "3.txt").exists()
+    assert (tmp_path / "layer3" / "4.txt").exists()
 
 
 def test_quoting(tmp_path):

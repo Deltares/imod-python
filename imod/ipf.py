@@ -655,6 +655,12 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=Non
         for layer, group in df.groupby("layer"):
             d["layer"] = layer
             fn = util.compose(d)
+
+            # If associated files are present, make sure the different
+            # layers do not overwrite each other!
+            if itype is not None:
+                group["id"] = f"layer{layer}/" + group["id"].astype(str)
+
             _compose_ipf(fn, group, itype, assoc_ext, nodata, assoc_columns)
     else:
         fn = util.compose(d)
