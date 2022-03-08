@@ -214,7 +214,7 @@ def read_associated(path, kwargs={}):
         itype_kwargs.update(kwargs)
         df = pd.read_csv(f, **itype_kwargs)
 
-    if itype == 1:
+    if nrow > 0 and itype == 1:
         time_column = colnames[0]
         len_date = len(df[time_column].iloc[0])
         if len_date == 14:
