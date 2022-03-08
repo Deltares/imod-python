@@ -22,6 +22,17 @@ Fixed
   projectfile to ``steady-state`` for ``BoundaryConditions`` without a time
   dimension.
 - Added :class:`imod.flow.OutputControl` as this was still missing.
+- :func:`imod.ipf.read` will no longer error when an associated files with 0
+  rows is read.
+
+Changed
+~~~~~~~
+
+- :func:`imod.ipf.save` will now store associated files in separate directories
+  named ``layer1``, ``layer2``, etc. The ID in the main IPF file is updated
+  accordingly. Previously, if IDs were shared between different layers, the
+  associated files would be overwritten as the IDs would result in the same
+  file name being used over and over.
 
 [0.11.1] - 2021-12-23
 ---------------------
