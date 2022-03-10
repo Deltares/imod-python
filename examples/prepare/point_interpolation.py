@@ -68,13 +68,12 @@ mean_heads_in_grid.head(5)
 
 
 # %%
-# The previous head information needs to be assigned to the model grid.
-# imod-python has a tool called `imod.select.points_set_values
-# <https://imod.xyz/api/select.html#imod.select.points_set_values>`_, which
-# assigns values based on x-y coordinates to a previously defined array. In this
-# case, the array is the starting_heads_larger, the values are the mean
-# calculated heads and the x and y are the coordinates corresponding to the
-# heads.
+# The previous head information needs to be assigned to the model grid. imod-python has a
+# tool called `imod.select.points_set_values
+# <https://deltares.gitlab.io/imod/imod-python/api/generated/select/imod.select.points_set_values>`_,
+# which assigns values based on x-y coordinates to a previously defined array. In this case,
+# the array is the starting_heads_larger, the values are the mean calculated heads and the x
+# and y are the coordinates corresponding to the heads.
 
 x = mean_heads_in_grid["x"]
 y = mean_heads_in_grid["y"]
@@ -91,13 +90,12 @@ fig, ax = plt.subplots()
 heads_grid.plot.imshow(ax=ax)
 
 # %%
-# The previous information is still only available at certain points, so it
-# needs to be interpolated. The iMOD Python tool
-# `imod.prepare.laplace_interpolate
-# <https://imod.xyz/api/prepare.html#imod.prepare.laplace_interpolate>`_ will be
-# used to do an interpolation of the previously indicated head values. It is
-# possible to assign interpolation parameters such as the number of iterations
-# and the closing criteria.
+# The previous information is still only available at certain points, so it needs to be
+# interpolated. The iMOD Python tool `imod.prepare.laplace_interpolate
+# <https://deltares.gitlab.io/imod/imod-python/api/generated/prepare/imod.prepare.laplace_interpolate>`_
+# will be used to do an interpolation of the previously indicated head values. It is
+# possible to assign interpolation parameters such as the number of iterations and the
+# closing criteria.
 
 interpolated_heads = imod.prepare.laplace_interpolate(
     heads_grid, close=0.001, mxiter=150, iter1=100

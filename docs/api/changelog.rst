@@ -303,11 +303,6 @@ Added
 -  More supported visualizations :mod:`imod.visualize`
 -  More extensive reading and writing of GDAL raster in :mod:`imod.rasterio`
 
-Changed
-~~~~~~~
-
--  The documentation moved to a custom domain name: https://imod.xyz/
-
 [0.7.1] - 2019-08-07
 --------------------
 
