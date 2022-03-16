@@ -15,7 +15,7 @@ class LanduseOptions(Package):
 
     Parameters
     ----------
-    names: array of strings (xr.DataArray)
+    landuse_name: array of strings (xr.DataArray)
         Names of land use
     vegetation_index: array of integers (xr.DataArray)
         Vegetation indices
@@ -106,14 +106,14 @@ class LanduseOptions(Package):
         "interception_capacity_per_LAI": VariableMetaData(8, 0.0, 10.0, float),
         "interception_intercept": VariableMetaData(8, 0.0, 1.0, float),
         # Gash interception: not supported
-        "pfree": VariableMetaData(8, 0.0, 1.0, float),
-        "pstem": VariableMetaData(8, 0.0, 1.0, float),
-        "scanopy": VariableMetaData(8, 0.0, 100.0, float),
-        "avprec": VariableMetaData(8, 0.0, 1000.0, float),
-        "avevap": VariableMetaData(8, 0.0, 100.0, float),
+        "pfree": VariableMetaData(8, None, None, str),
+        "pstem": VariableMetaData(8, None, None, str),
+        "scanopy": VariableMetaData(8, None, None, str),
+        "avprec": VariableMetaData(8, None, None, str),
+        "avevap": VariableMetaData(8, None, None, str),
         # Maas-Hoffman: not supported
-        "saltmax": VariableMetaData(8, 0.0, 100.0, float),
-        "saltslope": VariableMetaData(8, 0.0, 1.0, float),
+        "saltmax": VariableMetaData(8, None, None, str),
+        "saltslope": VariableMetaData(8, None, None, str),
     }
 
     _file_name = "luse_svat.inp"
