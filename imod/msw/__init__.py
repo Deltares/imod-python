@@ -18,3 +18,5 @@ from imod.msw.output_control import IdfOutputControl, VariableOutputControl
 from imod.msw.ponding import Ponding
 from imod.msw.scaling_factors import ScalingFactors
 from imod.msw.sprinkling import Sprinkling
+from imod.msw.vegetation import AnnualCropFactors
+from imod.msw.landuse import LanduseOptions
