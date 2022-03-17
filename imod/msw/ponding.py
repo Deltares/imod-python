@@ -25,7 +25,7 @@ class Ponding(Package):
         Runoff resistance of SVAT units in days. This array must have a subunit
         coordinate to describe different land uses.
     runon_resistance: array of floats (xr.DataArray)
-        Runoff resistance of SVAT units in days. This array must have a subunit
+        Runon resistance of SVAT units in days. This array must have a subunit
         coordinate to describe different land uses.
     active: array of booleans (xr.DataArray)
         Describes whether SVAT units are active or not. This array must not have
