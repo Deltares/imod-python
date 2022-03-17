@@ -11,6 +11,7 @@ from imod.msw.initial_conditions import (
     InitialConditionsRootzonePressureHead,
     InitialConditionsSavedState,
 )
+from imod.msw.landuse import LanduseOptions
 from imod.msw.meteo_grid import MeteoGrid
 from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMapping
 from imod.msw.model import MetaSwapModel
@@ -19,4 +20,3 @@ from imod.msw.ponding import Ponding
 from imod.msw.scaling_factors import ScalingFactors
 from imod.msw.sprinkling import Sprinkling
 from imod.msw.vegetation import AnnualCropFactors
-from imod.msw.landuse import LanduseOptions

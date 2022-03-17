@@ -1,9 +1,4 @@
 import pathlib
-from tkinter import Variable
-
-import numpy as np
-from sklearn.metrics import average_precision_score
-import xarray as xr
 
 from imod.fixed_format import VariableMetaData
 from imod.msw.pkgbase import Package
