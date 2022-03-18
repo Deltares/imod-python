@@ -4,6 +4,7 @@ import re
 
 import affine
 import cftime
+import dask
 import numpy as np
 import pandas as pd
 import pytest
@@ -622,3 +623,62 @@ def test_to_ugrid2d(write=False):
 
     if write:
         uds.to_netcdf("ugrid-a3dt.nc")
+
+
+def test_replace():
+    # replace scalar
+    da = xr.DataArray([0, 1, 2])
+    out = util.replace(da, 1, 10)
+    assert out.equals(xr.DataArray([0, 10, 2]))
+
+    # Replace NaN by scalar
+    da = xr.DataArray([np.nan, 1.0, 2.0])
+    out = util.replace(da, np.nan, 10.0)
+    assert out.equals(xr.DataArray([10.0, 1.0, 2.0]))
+
+    # replace two
+    da = xr.DataArray([0, 1, 2])
+    out = util.replace(da, [1, 2], [10, 20])
+    assert out.equals(xr.DataArray([0, 10, 20]))
+
+    # With a NaN in the data
+    da = xr.DataArray([np.nan, 1.0, 2.0])
+    out = util.replace(da, [1, 2], [10, 20])
+    assert out.equals(xr.DataArray([np.nan, 10.0, 20.0]))
+
+    # Replace a NaN value
+    da = xr.DataArray([np.nan, 1.0, 2.0])
+    out = util.replace(da, [np.nan, 2], [10, 20])
+    assert out.equals(xr.DataArray([10.0, 1.0, 20.0]))
+
+    # With non-present values in to_replace
+    da = xr.DataArray([np.nan, 1.0, 1.0, 2.0])
+    out = util.replace(da, [1.0, 2.0, 30.0], [10.0, 20.0, 30.0])
+    assert out.equals(xr.DataArray([np.nan, 10.0, 10.0, 20.0]))
+
+    # With a nan and non-present values
+    da = xr.DataArray([np.nan, 1.0, 1.0, 2.0])
+    out = util.replace(da, [np.nan, 1.0, 2.0, 30.0], 10.0)
+    assert out.equals(xr.DataArray([10.0, 10.0, 10.0, 10.0]))
+
+    # With a dask array
+    da = xr.DataArray(dask.array.full(3, 1.0))
+    out = util.replace(da, [1.0, 2.0], [10.0, 20.0])
+    assert isinstance(out.data, dask.array.Array)
+    assert out.equals(xr.DataArray([10.0, 10.0, 10.0]))
+
+    # scalar to_replace, non-scalar value
+    with pytest.raises(TypeError):
+        util.replace(da, 1.0, [10.0, 20.0])
+
+    # 2D arrays
+    with pytest.raises(ValueError):
+        util.replace(da, [[1.0, 2.0]], [[10.0, 20.0]])
+
+    # 1D to_replace, 2D value
+    with pytest.raises(ValueError):
+        util.replace(da, [1.0, 2.0], [[10.0, 20.0]])
+
+    # 1D, different size
+    with pytest.raises(ValueError):
+        util.replace(da, [1.0, 2.0], [10.0, 20.0, 30.0])

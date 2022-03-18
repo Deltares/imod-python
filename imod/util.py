@@ -991,6 +991,102 @@ def where(condition, if_true, if_false, keep_nan: bool = True) -> xr.DataArray:
     return new
 
 
+def replace(da: xr.DataArray, to_replace: Any, value: Any) -> xr.DataArray:
+    """
+    Replace values given in `to_replace` by `value`.
+
+    Parameters
+    ----------
+    da: xr.DataArray
+    to_replace: scalar or 1D array like
+        Which values to replace. If to_replace and value are both array like,
+        they must be the same length.
+    value: scalar or 1D array like
+        Value to replace any values matching `to_replace` with.
+
+    Returns
+    -------
+    xr.DataArray
+        DataArray after replacement.
+
+    Examples
+    --------
+
+    Replace values of 1.0 by 10.0, and 2.0 by 20.0:
+
+    >>> da = xr.DataArray([0.0, 1.0, 1.0, 2.0, 2.0])
+    >>> replaced = imod.util.replace(da, to_replace=[1.0, 2.0], value=[10.0, 20.0])
+
+    """
+    from xarray.core.utils import is_scalar
+
+    def _replace(
+        a: np.ndarray, to_replace: np.ndarray, value: np.ndarray
+    ) -> np.ndarray:
+        # Use np.unique to create an inverse index
+        flat = a.ravel()
+        uniques, index = np.unique(flat, return_inverse=True)
+        replaceable = np.isin(flat, to_replace)
+
+        # Create a replacement array in which there is a 1:1 relation between
+        # uniques and the replacement values, so that we can use the inverse index
+        # to select replacement values.
+        valid = np.isin(to_replace, uniques, assume_unique=True)
+        # Remove to_replace values that are not present in da. If no overlap
+        # exists between to_replace and the values in da, just return a copy.
+        if not valid.any():
+            return a.copy()
+        to_replace = to_replace[valid]
+        value = value[valid]
+
+        replacement = np.full_like(uniques, np.nan)
+        replacement[np.searchsorted(uniques, to_replace)] = value
+
+        out = flat.copy()
+        out[replaceable] = replacement[index[replaceable]]
+        return out.reshape(a.shape)
+
+    if is_scalar(to_replace):
+        if not is_scalar(value):
+            raise TypeError("if to_replace is scalar, then value must be a scalar")
+        if np.isnan(to_replace):
+            return da.fillna(value)
+        else:
+            return da.where(da != to_replace, other=value)
+    else:
+        to_replace = np.asarray(to_replace)
+        if to_replace.ndim != 1:
+            raise ValueError("to_replace must be 1D or scalar")
+        if is_scalar(value):
+            value = np.full_like(to_replace, value)
+        else:
+            value = np.asarray(value)
+            if to_replace.shape != value.shape:
+                raise ValueError(
+                    f"Replacement arrays must match in shape. "
+                    f"Expecting {to_replace.shape} got {value.shape} "
+                )
+
+    _, counts = np.unique(to_replace, return_counts=True)
+    if (counts > 1).any():
+        raise ValueError("to_replace contains duplicates")
+
+    # Replace NaN values separately, as they will show up as separate values
+    # from numpy.unique.
+    isnan = np.isnan(to_replace)
+    if isnan.any():
+        i = np.nonzero(isnan)[0]
+        da = da.fillna(value[i])
+
+    return xr.apply_ufunc(
+        _replace,
+        da,
+        kwargs={"to_replace": to_replace, "value": value},
+        dask="parallelized",
+        output_dtypes=[da.dtype],
+    )
+
+
 class MissingOptionalModule:
     """
     Presents a clear error for optional modules.
