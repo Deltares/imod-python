@@ -2,11 +2,12 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import xarray as xr
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
-from imod.msw import IdfOutputControl, VariableOutputControl
+from imod.msw import IdfOutputControl, VariableOutputControl, TimeOutputControl
 
 
 def grid():
@@ -60,6 +61,25 @@ def test_var_oc(fixed_format_parser):
 
     assert_equal(results["variable"], expected_names)
     assert_equal(results["option"], np.array([1, 1, 1, 1, 1, 1, 1, 1]))
+
+
+def test_time_oc(fixed_format_parser):
+    freq = "D"
+    times = pd.date_range(start="1/1/1971", end="1/3/1971", freq=freq)
+
+    time_output_control = TimeOutputControl(time=times)
+
+    with tempfile.TemporaryDirectory() as output_dir:
+        output_dir = Path(output_dir)
+        time_output_control.write(output_dir)
+
+        results = fixed_format_parser(
+            output_dir / TimeOutputControl._file_name, TimeOutputControl._metadata_dict
+        )
+
+    assert_almost_equal(results["time_since_start_year"], np.array([1.0, 2.0, 3.0]))
+    assert_equal(results["year"], [1971, 1971, 1971])
+    assert_equal(results["option"], [7, 7, 7])
 
 
 def test_idf_oc_write_simple_model(fixed_format_parser):
