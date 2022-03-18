@@ -6,6 +6,7 @@ import xarray as xr
 
 from imod.fixed_format import VariableMetaData
 from imod.msw.pkgbase import Package
+from imod.msw.timeutil import to_metaswap_timeformat
 from imod.util import spatial_reference
 
 
@@ -103,6 +104,51 @@ class VariableOutputControl(OutputControl):
         )
 
         dataframe = pd.DataFrame(data=dict(variable=variable, option=option))
+
+        self._check_range(dataframe)
+
+        return self.write_dataframe_fixed_width(file, dataframe)
+
+    def write(self, directory):
+        directory = pathlib.Path(directory)
+
+        filename = directory / self._file_name
+        with open(filename, "w") as f:
+            self._render(f)
+
+
+class TimeOutputControl(OutputControl):
+    """
+    Specify the accumulation periods which will be used to write output.
+
+    Parameters
+    ----------
+    time: xr.DataArray
+        Timesteps at which to write output.
+    """
+
+    _file_name = "tiop_sim.inp"
+    _settings = {}
+    _metadata_dict = {
+        "time_since_start_year": VariableMetaData(15, 0.0, 366.0, float),
+        "year": VariableMetaData(6, 1, 9999, int),
+        "option": VariableMetaData(6, 1, 7, int),
+    }
+
+    def __init__(self, time):
+        super().__init__()
+
+        self.dataset["times"] = time
+
+    def _render(self, file):
+
+        year, time_since_start_year = to_metaswap_timeformat(self.dataset["times"])
+
+        dataframe = pd.DataFrame(
+            data=dict(time_since_start_year=time_since_start_year, year=year)
+        )
+
+        dataframe["option"] = 7
 
         self._check_range(dataframe)
 
