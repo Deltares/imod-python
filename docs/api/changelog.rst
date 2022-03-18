@@ -33,6 +33,12 @@ Changed
   accordingly. Previously, if IDs were shared between different layers, the
   associated files would be overwritten as the IDs would result in the same
   file name being used over and over.
+  
+Added
+~~~~~
+
+- :func:`imod.util.replace` has been added to find and replace different values
+  in a DataArray.
 
 [0.11.1] - 2021-12-23
 ---------------------
