@@ -148,6 +148,7 @@ class TimeOutputControl(OutputControl):
             data=dict(time_since_start_year=time_since_start_year, year=year)
         )
 
+        dataframe["time_since_start_year"] += 1
         dataframe["option"] = 7
 
         self._check_range(dataframe)
