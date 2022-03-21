@@ -64,47 +64,48 @@ class GridData(Package):
         self.dataset["soil_physical_unit"] = soil_physical_unit
         self.dataset["active"] = active
 
-    def _render(self, file):
-        # Generate columns for members with subunit coordinate
-        area = self._get_preprocessed_array("area", self.dataset["active"])
-        landuse = self._get_preprocessed_array("landuse", self.dataset["active"])
-        rootzone_depth = self._get_preprocessed_array(
-            "rootzone_depth", self.dataset["active"]
-        )
+    def generate_index_array(self):
+        """
+        Generate index arrays to be used on other packages
+        """
+        area = self.dataset["area"]
+        active = self.dataset["active"]
 
-        # Produce values necessary for members without subunit coordinate
-        extend_subunits = self.dataset["area"]["subunit"]
-        mask = self.dataset["area"].where(self.dataset["active"]).notnull()
+        isactive = area.where(active).notnull()
 
-        # Generate columns for members without subunit coordinate
-        surface_elevation = self._get_preprocessed_array(
-            "surface_elevation", mask, extend_subunits=extend_subunits
-        )
-        soil_physical_unit = self._get_preprocessed_array(
-            "soil_physical_unit",
-            mask,
-            extend_subunits=extend_subunits,
-        )
+        index = isactive.values.ravel()
 
-        # Generate remaining columns
-        svat = np.arange(1, area.size + 1)
-        temp = pd.Series(["" for _ in range(area.size)], dtype="string")
-        soil_physical_unit_string = pd.Series(
-            ["" for _ in range(area.size)], dtype="string"
-        )
+        svat = xr.full_like(area, fill_value=0, dtype=np.int64)
+        svat.values[isactive.values] = np.arange(1, index.sum() + 1)
 
-        # Create DataFrame
+        return index, svat
+
+    def _index_da(self, da, index):
+        return da.values.ravel()[index]
+
+    def _render(self, file, index, svat):
+        data_dict = {"svat": svat.values.ravel()[index]}
+
+        subunit = svat.coords["subunit"]
+
+        not_expand = ["area", "landuse", "rootzone_depth"]
+
+        for var in not_expand:
+            data_dict[var] = self._index_da(self.dataset[var], index)
+
+        to_expand = ["surface_elevation", "soil_physical_unit"]
+
+        for var in to_expand:
+            da = self.dataset[var].expand_dims(subunit=subunit)
+            data_dict[var] = self._index_da(da, index)
+
+        # Filler
+        to_fill = ["soil_physical_unit_string", "temp"]
+        for var in to_fill:
+            data_dict[var] = ""
+
         dataframe = pd.DataFrame(
-            {
-                "svat": svat,
-                "area": area,
-                "surface_elevation": surface_elevation,
-                "temp": temp,
-                "soil_physical_unit": soil_physical_unit,
-                "soil_physical_unit_string": soil_physical_unit_string,
-                "landuse": landuse,
-                "rootzone_depth": rootzone_depth,
-            }
+            data=data_dict, columns=list(self._metadata_dict.keys())
         )
 
         self._check_range(dataframe)

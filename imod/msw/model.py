@@ -4,7 +4,9 @@ from pathlib import Path
 
 import jinja2
 
-from imod.msw.output_control import OutputControl
+from imod.msw.pkgbase import Package
+from imod.msw.output_control import IdfOutputControl
+from imod.msw.grid_data import GridData
 from imod.msw.timeutil import to_metaswap_timeformat
 
 DEFAULT_SETTINGS = dict(
@@ -48,22 +50,6 @@ class MetaSwapModel(Model):
     ----------
     unsaturated_database: Path-like or str
         Path to the MetaSWAP soil physical database folder.
-
-
-    STEPS
-    *****
-    - Get unsat_svat_path
-    - create time discretization
-    - get reference time (idbg, iybg)
-    - render para_sim.inp
-
-    # TODO:
-    - init_svat.inp: initial condition
-    - luse_svat.inp: lookup tables, provide default one
-    - fact_svat.inp: vegetation factors
-    - uscl_svat.inp: scaling factors
-    - sel_svat_csv.inp: Output control of dtgw output csv option
-
     """
 
     _pkg_id = "model"
@@ -115,6 +101,11 @@ class MetaSwapModel(Model):
 
         return year, time_since_start_year
 
+    def _get_pkg_key(self, pkg_type: Package):
+        for pkg_key, pkg in self.items():
+            if isinstance(pkg, pkg_type):
+                return pkg_key
+
     def write(self, directory):
         """
         Write packages and simulation settings (PARA_SIM.INP).
@@ -135,15 +126,17 @@ class MetaSwapModel(Model):
         self.simulation_settings["tdbg"] = time_since_start_year
 
         # Add OutputControl settings
-        for pkg in self.values():
-            if isinstance(pkg, OutputControl):
-                self.simulation_settings.update(pkg.get_settings())
+        idf_key = self._get_pkg_key(IdfOutputControl)
+        self.simulation_settings.update(self[idf_key].get_settings())
 
         filename = directory / self._file_name
         with open(filename, "w") as f:
             rendered = self._template.render(settings=self.simulation_settings)
             f.write(rendered)
 
+        grid_key = self._get_pkg_key(GridData)
+        index, svat = self[grid_key].generate_index_array()
+
         # write package contents
         for pkgname in self:
-            self[pkgname].write(directory)
+            self[pkgname].write(directory, index, svat)

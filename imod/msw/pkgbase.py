@@ -41,12 +41,12 @@ class Package(abc.ABC):
             f"You can create a new package with a selection by calling {__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
 
-    def write(self, directory):
+    def write(self, directory, index, svat):
         directory = pathlib.Path(directory)
 
         filename = directory / self._file_name
         with open(filename, "w") as f:
-            self._render(f)
+            self._render(f, index, svat)
 
     def _check_range(self, dataframe):
         for varname in dataframe:
