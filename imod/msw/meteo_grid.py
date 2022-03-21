@@ -1,13 +1,15 @@
 import csv
-import pathlib
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import xarray as xr
 
 import imod
 from imod import util
 from imod.msw.pkgbase import Package
 from imod.msw.timeutil import to_metaswap_timeformat
+from typing import Optional, Union
 
 
 class MeteoGrid(Package):
@@ -30,8 +32,9 @@ class MeteoGrid(Package):
     """
 
     _file_name = "mete_grid.inp"
+    _meteo_dirname = "meteo_grids"
 
-    def __init__(self, precipitation, evapotranspiration):
+    def __init__(self, precipitation: xr.DataArray, evapotranspiration: xr.DataArray):
         super().__init__()
 
         self.dataset["precipitation"] = precipitation
@@ -39,7 +42,7 @@ class MeteoGrid(Package):
 
         self._pkgcheck()
 
-    def write_free_format_file(self, path, dataframe):
+    def write_free_format_file(self, path: Union[str, Path], dataframe: pd.DataFrame):
         """
         Write free format file. The mete_grid.inp file is free format.
         """
@@ -63,7 +66,9 @@ class MeteoGrid(Package):
             path, header=False, quoting=csv.QUOTE_NONE, float_format="%.4f", index=False
         )
 
-    def _compose_filename(self, d, pattern=None):
+    def _compose_filename(
+        self, d: dict, directory: Path, pattern: Optional[str] = None
+    ):
         """
         Construct a filename, following the iMOD conventions.
 
@@ -81,10 +86,10 @@ class MeteoGrid(Package):
             Absolute path.
 
         """
-        return str(util.compose(d, pattern))
+        return str(directory / util.compose(d, pattern))
         # return str(util.compose(d, pattern).resolve())
 
-    def _is_grid(self, varname):
+    def _is_grid(self, varname: str):
         coords = self.dataset[varname].coords
 
         if "y" not in coords and "x" not in coords:
@@ -92,7 +97,7 @@ class MeteoGrid(Package):
         else:
             return True
 
-    def _compose_dataframe(self, times):
+    def _compose_dataframe(self, times: np.array):
         dataframe = pd.DataFrame(index=times)
 
         year, time_since_start_year = to_metaswap_timeformat(times)
@@ -100,13 +105,17 @@ class MeteoGrid(Package):
         dataframe["time_since_start_year"] = time_since_start_year
         dataframe["year"] = year
 
+        # Data dir is always relative to model dir, so don't use model directory
+        # here
+        data_dir = Path(".") / self._meteo_dirname
+
         for varname in self.dataset.data_vars:
-            # If grid, we have to add the filename of the .asc written later
-            # TODO: Check if MetaSWAP accepts relative paths
+            # If grid, we have to add the filename of the .asc to be written
             if self._is_grid(varname):
                 dataframe[varname] = [
                     self._compose_filename(
-                        dict(time=time, name=varname, extension=".asc")
+                        dict(time=time, name=varname, extension=".asc"),
+                        directory=data_dir,
                     )
                     for time in times
                 ]
@@ -115,7 +124,7 @@ class MeteoGrid(Package):
 
         return dataframe
 
-    def check_string_lengths(self, dataframe):
+    def check_string_lengths(self, dataframe: pd.DataFrame):
         """
         Check if strings lengths do not exceed 256 characters.
         With absolute paths this might be an issue.
@@ -138,7 +147,7 @@ class MeteoGrid(Package):
                 f"Encountered strings longer than 256 characters in columns: {too_long_columns}"
             )
 
-    def write(self, directory):
+    def write(self, directory: Union[str, Path]):
         """
         Write mete_grid.inp and accompanying ASCII grid files.
 
@@ -148,7 +157,7 @@ class MeteoGrid(Package):
             directory to write file in.
         """
 
-        directory = pathlib.Path(directory)
+        directory = Path(directory)
 
         times = self.dataset["time"].values
 
@@ -158,7 +167,7 @@ class MeteoGrid(Package):
         # Write grid data to ESRI ASCII files
         for varname in self.dataset.data_vars:
             if self._is_grid(varname):
-                path = (directory / varname).with_suffix(".asc")
+                path = (directory / self._meteo_dirname / varname).with_suffix(".asc")
                 imod.rasterio.save(path, self.dataset[varname], nodata=-9999.0)
 
     def _pkgcheck(self):
