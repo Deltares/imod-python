@@ -1,5 +1,6 @@
 import csv
 from pathlib import Path
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -9,7 +10,6 @@ import imod
 from imod import util
 from imod.msw.pkgbase import Package
 from imod.msw.timeutil import to_metaswap_timeformat
-from typing import Optional, Union
 
 
 class MeteoGrid(Package):

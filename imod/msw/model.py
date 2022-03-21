@@ -4,9 +4,9 @@ from pathlib import Path
 
 import jinja2
 
-from imod.msw.pkgbase import Package
-from imod.msw.output_control import IdfOutputControl
 from imod.msw.grid_data import GridData
+from imod.msw.output_control import IdfOutputControl
+from imod.msw.pkgbase import Package
 from imod.msw.timeutil import to_metaswap_timeformat
 
 DEFAULT_SETTINGS = dict(

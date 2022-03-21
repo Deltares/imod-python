@@ -7,7 +7,7 @@ import xarray as xr
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
-from imod.msw import IdfOutputControl, VariableOutputControl, TimeOutputControl
+from imod.msw import IdfOutputControl, TimeOutputControl, VariableOutputControl
 
 
 def grid():
