@@ -1,5 +1,3 @@
-import pathlib
-
 from imod.fixed_format import VariableMetaData
 from imod.msw.pkgbase import Package
 
@@ -187,13 +185,6 @@ class LanduseOptions(Package):
         dataframe = dataframe[list(self._metadata_dict.keys())]
 
         return self.write_dataframe_fixed_width(file, dataframe)
-
-    def write(self, directory):
-        directory = pathlib.Path(directory)
-
-        filename = directory / self._file_name
-        with open(filename, "w") as f:
-            self._render(f)
 
     def _pkgcheck(self):
         dims = self.dataset.dims

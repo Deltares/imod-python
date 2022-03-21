@@ -1,5 +1,3 @@
-import pathlib
-
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -142,10 +140,3 @@ class CouplerMapping(Package):
         layer_1d = layer.values[well_active.values]
 
         return (mod_id_1d, svat_1d, layer_1d)
-
-    def write(self, directory):
-        directory = pathlib.Path(directory)
-
-        filename = directory / self._file_name
-        with open(filename, "w") as f:
-            self._render(f)

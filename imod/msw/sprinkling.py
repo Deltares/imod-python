@@ -1,5 +1,3 @@
-import pathlib
-
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -100,13 +98,6 @@ class Sprinkling(Package):
         self._check_range(dataframe)
 
         return self.write_dataframe_fixed_width(file, dataframe)
-
-    def write(self, directory):
-        directory = pathlib.Path(directory)
-
-        filename = directory / self._file_name
-        with open(filename, "w") as f:
-            self._render(f)
 
     def _get_layer(self):
         # Build up well_dict

@@ -1,5 +1,3 @@
-import pathlib
-
 import numpy as np
 import xarray as xr
 
@@ -83,13 +81,6 @@ class AnnualCropFactors(Package):
         self._check_range(dataframe)
 
         return self.write_dataframe_fixed_width(file, dataframe)
-
-    def write(self, directory):
-        directory = pathlib.Path(directory)
-
-        filename = directory / self._file_name
-        with open(filename, "w") as f:
-            self._render(f)
 
     def _pkgcheck(self):
         dims = self.dataset.dims

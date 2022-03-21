@@ -20,13 +20,6 @@ class InitialConditionsEquilibrium(Package):
     def _render(self, file):
         file.write(self._option + "\n")
 
-    def write(self, directory):
-        directory = pathlib.Path(directory)
-
-        filename = directory / self._file_name
-        with open(filename, "w") as f:
-            self._render(f)
-
 
 class InitialConditionsRootzonePressureHead(Package):
     """
@@ -55,13 +48,6 @@ class InitialConditionsRootzonePressureHead(Package):
 
         self.write_dataframe_fixed_width(file, dataframe)
 
-    def write(self, directory):
-        directory = pathlib.Path(directory)
-
-        filename = directory / self._file_name
-        with open(filename, "w") as f:
-            self._render(f)
-
 
 class InitialConditionsPercolation(Package):
     """
@@ -82,13 +68,6 @@ class InitialConditionsPercolation(Package):
 
     def _render(self, file):
         file.write(self._option + "\n")
-
-    def write(self, directory):
-        directory = pathlib.Path(directory)
-
-        filename = directory / self._file_name
-        with open(filename, "w") as f:
-            self._render(f)
 
 
 class InitialConditionsSavedState(Package):
