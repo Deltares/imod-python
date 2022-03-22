@@ -2,6 +2,7 @@ import abc
 import pathlib
 
 import numpy as np
+import pandas as pd
 import xarray as xr
 
 from imod.fixed_format import format_fixed_width
@@ -81,3 +82,29 @@ class Package(abc.ABC):
         array = array[~np.isnan(array)]
 
         return array
+
+    def _index_da(self, da, index):
+        return da.values.ravel()[index]
+
+    def _render(self, file, index, svat):
+        data_dict = {"svat": svat.values.ravel()[index]}
+
+        subunit = svat.coords["subunit"]
+
+        for var in self._with_subunit:
+            data_dict[var] = self._index_da(self.dataset[var], index)
+
+        for var in self._without_subunit:
+            da = self.dataset[var].expand_dims(subunit=subunit)
+            data_dict[var] = self._index_da(da, index)
+
+        for var in self._to_fill:
+            data_dict[var] = ""
+
+        dataframe = pd.DataFrame(
+            data=data_dict, columns=list(self._metadata_dict.keys())
+        )
+
+        self._check_range(dataframe)
+
+        return self.write_dataframe_fixed_width(file, dataframe)

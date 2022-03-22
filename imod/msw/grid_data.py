@@ -46,6 +46,9 @@ class GridData(Package):
         "landuse": VariableMetaData(6, 1, 999999, int),
         "rootzone_depth": VariableMetaData(8, 0.0, 10.0, float),
     }
+    _with_subunit = ["area", "landuse", "rootzone_depth"]
+    _without_subunit = ["surface_elevation", "soil_physical_unit"]
+    _to_fill = ["soil_physical_unit_string", "temp"]
 
     def __init__(
         self,
@@ -79,35 +82,3 @@ class GridData(Package):
         svat.values[isactive.values] = np.arange(1, index.sum() + 1)
 
         return index, svat
-
-    def _index_da(self, da, index):
-        return da.values.ravel()[index]
-
-    def _render(self, file, index, svat):
-        data_dict = {"svat": svat.values.ravel()[index]}
-
-        subunit = svat.coords["subunit"]
-
-        not_expand = ["area", "landuse", "rootzone_depth"]
-
-        for var in not_expand:
-            data_dict[var] = self._index_da(self.dataset[var], index)
-
-        to_expand = ["surface_elevation", "soil_physical_unit"]
-
-        for var in to_expand:
-            da = self.dataset[var].expand_dims(subunit=subunit)
-            data_dict[var] = self._index_da(da, index)
-
-        # Filler
-        to_fill = ["soil_physical_unit_string", "temp"]
-        for var in to_fill:
-            data_dict[var] = ""
-
-        dataframe = pd.DataFrame(
-            data=data_dict, columns=list(self._metadata_dict.keys())
-        )
-
-        self._check_range(dataframe)
-
-        return self.write_dataframe_fixed_width(file, dataframe)
