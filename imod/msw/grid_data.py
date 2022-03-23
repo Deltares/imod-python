@@ -77,7 +77,7 @@ class GridData(Package):
 
         index = isactive.values.ravel()
 
-        svat = xr.full_like(area, fill_value=0, dtype=np.int64)
+        svat = xr.full_like(area, fill_value=0, dtype=np.int64).rename("svat")
         svat.values[isactive.values] = np.arange(1, index.sum() + 1)
 
         return index, svat
