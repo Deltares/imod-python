@@ -73,7 +73,7 @@ class AnnualCropFactors(Package):
 
         self._pkgcheck()
 
-    def _render(self, file):
+    def _render(self, file, *args):
         dataframe = self.dataset.to_dataframe(
             dim_order=("vegetation_index", "day_of_year")
         ).reset_index()

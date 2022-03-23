@@ -167,7 +167,7 @@ class LanduseOptions(Package):
         ] = interception_capacity_per_LAI
         self.dataset["interception_intercept"] = interception_intercept
 
-    def _render(self, file):
+    def _render(self, file, *args):
         dataframe = self.dataset.to_dataframe(
             dim_order=("landuse_index",)
         ).reset_index()

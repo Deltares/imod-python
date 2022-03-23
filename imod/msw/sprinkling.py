@@ -21,9 +21,6 @@ class Sprinkling(Package):
     max_abstraction_surfacewater: array of floats (xr.DataArray)
         Describes the maximum abstraction of surfacewater to SVAT units in m3 per day.
         This array must not have a subunit coordinate.
-    active: array of bools (xr.DataArray)
-        Describes whether SVAT units are active or not.
-        This array must not have a subunit coordinate.
     well: WellDisStructured
         Describes the sprinkling of SVAT units coming groundwater.
     """
@@ -40,90 +37,57 @@ class Sprinkling(Package):
         "trajectory": VariableMetaData(10, None, None, str),
     }
 
+    _with_subunit = []
+    _without_subunit = [
+        "max_abstraction_groundwater_m3_d",
+        "max_abstraction_surfacewater_m3_d",
+    ]
+
+    _to_fill = [
+        "max_abstraction_groundwater_mm_d",
+        "max_abstraction_surfacewater_mm_d",
+        "svat_groundwater",
+        "trajectory",
+    ]
+
     def __init__(
         self,
         max_abstraction_groundwater: xr.DataArray,
         max_abstraction_surfacewater: xr.DataArray,
-        active: xr.DataArray,
         well: WellDisStructured,
     ):
         super().__init__()
         self.dataset["max_abstraction_groundwater_m3_d"] = max_abstraction_groundwater
         self.dataset["max_abstraction_surfacewater_m3_d"] = max_abstraction_surfacewater
-        self.dataset["active"] = active
         self.well = well
 
-    def _render(self, file):
-        # Preprocess input
-        max_abstraction_groundwater_m3_d = self._get_preprocessed_array(
-            "max_abstraction_groundwater_m3_d", self.dataset["active"]
-        )
+    def _render(self, file, index, svat):
+        well_row = self.well["row"] - 1
+        well_column = self.well["column"] - 1
+        well_layer = self.well["layer"]
 
-        max_abstraction_surfacewater_m3_d = self._get_preprocessed_array(
-            "max_abstraction_surfacewater_m3_d", self.dataset["active"]
-        )
+        n_subunit, _, _ = svat.shape
 
-        # Generate remaining columns
-        svat = np.arange(1, max_abstraction_groundwater_m3_d.size + 1)
-        max_abstraction_groundwater_mm_d = pd.Series(
-            ["" for _ in range(max_abstraction_groundwater_m3_d.size)], dtype="string"
-        )
-        max_abstraction_surfacewater_mm_d = pd.Series(
-            ["" for _ in range(max_abstraction_groundwater_m3_d.size)], dtype="string"
-        )
-        svat_groundwater = pd.Series(
-            ["" for _ in range(max_abstraction_groundwater_m3_d.size)], dtype="string"
-        )
-        trajectory = pd.Series(
-            ["" for _ in range(max_abstraction_groundwater_m3_d.size)], dtype="string"
-        )
+        well_svat = svat.values[:, well_row, well_column]
+        well_active = well_svat != 0
 
-        # Get layer
-        layer = self._get_layer()
+        # Tile well_layers for each subunit
+        layer = np.tile(well_layer, (n_subunit, 1))
 
-        # Create DataFrame
+        data_dict = {"svat": well_svat[well_active], "layer": layer[well_active]}
+
+        for var in self._without_subunit:
+            well_arr = self.dataset[var].values[well_row, well_column]
+            well_arr = np.tile(well_arr, (n_subunit, 1))
+            data_dict[var] = well_arr[well_active]
+
+        for var in self._to_fill:
+            data_dict[var] = ""
+
         dataframe = pd.DataFrame(
-            {
-                "svat": svat,
-                "max_abstraction_groundwater_mm_d": max_abstraction_groundwater_mm_d,
-                "max_abstraction_surfacewater_mm_d": max_abstraction_surfacewater_mm_d,
-                "max_abstraction_groundwater_m3_d": max_abstraction_groundwater_m3_d,
-                "max_abstraction_surfacewater_m3_d": max_abstraction_surfacewater_m3_d,
-                "svat_groundwater": svat_groundwater,
-                "layer": layer,
-                "trajectory": trajectory,
-            }
+            data=data_dict, columns=list(self._metadata_dict.keys())
         )
 
         self._check_range(dataframe)
 
         return self.write_dataframe_fixed_width(file, dataframe)
-
-    def _get_layer(self):
-        # Build up well_dict
-        well_dict = {}
-        well_row = self.well["row"]
-        well_column = self.well["column"]
-        well_layer = self.well["layer"]
-        for row, column, layer in zip(well_row, well_column, well_layer):
-            # Convert from 1-indexing to 0 indexing
-            key = (int(row) - 1, int(column) - 1)
-            if key in well_dict:
-                raise ValueError(
-                    "A single svat cannot be sprinkled by multiple groundwater cells."
-                )
-
-            well_dict[key] = layer
-
-        # Build up layer_array
-        layer_list = []
-        row_len, column_len = self.dataset["max_abstraction_groundwater_m3_d"].shape
-
-        for column in range(column_len):
-            for row in range(row_len):
-                if self.dataset["active"][row, column] and not np.isnan(
-                    self.dataset["max_abstraction_groundwater_m3_d"][row, column]
-                ):
-                    layer_list.append(well_dict[(row, column)])
-
-        return np.array(layer_list)

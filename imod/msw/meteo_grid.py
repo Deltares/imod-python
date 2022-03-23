@@ -147,7 +147,7 @@ class MeteoGrid(Package):
                 f"Encountered strings longer than 256 characters in columns: {too_long_columns}"
             )
 
-    def write(self, directory: Union[str, Path]):
+    def write(self, directory: Union[str, Path], *args):
         """
         Write mete_grid.inp and accompanying ASCII grid files.
 

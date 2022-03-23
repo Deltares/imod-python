@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 
 from imod.fixed_format import VariableMetaData
@@ -25,9 +24,6 @@ class Ponding(Package):
     runon_resistance: array of floats (xr.DataArray)
         Runon resistance of SVAT units in days. This array must have a subunit
         coordinate to describe different land uses.
-    active: array of booleans (xr.DataArray)
-        Describes whether SVAT units are active or not. This array must not have
-        a subunit coordinate.
     """
 
     _file_name = "svat2swnr_roff.inp"
@@ -39,42 +35,26 @@ class Ponding(Package):
         "runon_resistance": VariableMetaData(8, 0.0, 1e6, float),
     }
 
-    def __init__(
-        self, ponding_depth, runon_resistance, runoff_resistance, active
-    ) -> None:
+    _with_subunit = ["ponding_depth", "runoff_resistance", "runon_resistance"]
+    _without_subunit = []
+    _to_fill = []
+
+    def __init__(self, ponding_depth, runon_resistance, runoff_resistance) -> None:
         super().__init__()
         self.dataset["ponding_depth"] = ponding_depth
         self.dataset["runon_resistance"] = runon_resistance
         self.dataset["runoff_resistance"] = runoff_resistance
-        self.dataset["active"] = active
 
-    def _render(self, file):
-        # Generate columns for members with subunit coordinate
-        ponding_depth = self._get_preprocessed_array(
-            "ponding_depth", self.dataset["active"]
-        )
+    def _render(self, file, index, svat):
+        data_dict = {"svat": svat.values.ravel()[index]}
 
-        runoff_resistance = self._get_preprocessed_array(
-            "runoff_resistance", self.dataset["active"]
-        )
+        for var in self._with_subunit:
+            data_dict[var] = self._index_da(self.dataset[var], index)
 
-        runon_resistance = self._get_preprocessed_array(
-            "runon_resistance", self.dataset["active"]
-        )
+        data_dict["swnr"] = 0
 
-        # Generate remaining columns
-        svat = np.arange(1, ponding_depth.size + 1)
-        swnr = np.zeros(ponding_depth.size)
-
-        # Create DataFrame
         dataframe = pd.DataFrame(
-            {
-                "svat": svat,
-                "swnr": swnr,
-                "ponding_depth": ponding_depth,
-                "runon_resistance": runon_resistance,
-                "runoff_resistance": runoff_resistance,
-            }
+            data=data_dict, columns=list(self._metadata_dict.keys())
         )
 
         self._check_range(dataframe)

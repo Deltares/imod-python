@@ -17,7 +17,7 @@ class InitialConditionsEquilibrium(Package):
     def __init__(self):
         super().__init__()
 
-    def _render(self, file):
+    def _render(self, file, *args):
         file.write(self._option + "\n")
 
 
@@ -41,7 +41,7 @@ class InitialConditionsRootzonePressureHead(Package):
         super().__init__()
         self.dataset["initial_pF"] = initial_pF
 
-    def _render(self, file):
+    def _render(self, file, *args):
         file.write(self._option + "\n")
 
         dataframe = self.dataset.assign_coords(index=[0]).to_dataframe()
@@ -66,7 +66,7 @@ class InitialConditionsPercolation(Package):
     def __init__(self):
         super().__init__()
 
-    def _render(self, file):
+    def _render(self, file, *args):
         file.write(self._option + "\n")
 
 
@@ -90,7 +90,7 @@ class InitialConditionsSavedState(Package):
         super().__init__()
         self.saved_state = saved_state
 
-    def write(self, directory):
+    def write(self, directory, *args):
         directory = pathlib.Path(directory)
         filename = directory / self._file_name
 

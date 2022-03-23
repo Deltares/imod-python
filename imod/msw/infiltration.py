@@ -1,5 +1,3 @@
-import numpy as np
-import pandas as pd
 import xarray as xr
 
 from imod.fixed_format import VariableMetaData
@@ -44,6 +42,15 @@ class Infiltration(Package):
         "extra_storage_coefficient": VariableMetaData(8, 0.01, 1.0, float),
     }
 
+    _with_subunit = ["infiltration_capacity"]
+    _without_subunit = [
+        "downward_resistance",
+        "upward_resistance",
+        "bottom_resistance",
+        "extra_storage_coefficient",
+    ]
+    _to_fill = []
+
     def __init__(
         self,
         infiltration_capacity: xr.DataArray,
@@ -51,7 +58,6 @@ class Infiltration(Package):
         upward_resistance: xr.DataArray,
         bottom_resistance: xr.DataArray,
         extra_storage_coefficient: xr.DataArray,
-        active: xr.DataArray,
     ):
         super().__init__()
         self.dataset["infiltration_capacity"] = infiltration_capacity
@@ -59,51 +65,3 @@ class Infiltration(Package):
         self.dataset["upward_resistance"] = upward_resistance
         self.dataset["bottom_resistance"] = bottom_resistance
         self.dataset["extra_storage_coefficient"] = extra_storage_coefficient
-        self.dataset["active"] = active
-
-    def _render(self, file):
-        # Generate columns for members with subunit coordinate
-        infiltration_capacity = self._get_preprocessed_array(
-            "infiltration_capacity", self.dataset["active"]
-        )
-
-        # Produce values necessary for members without subunit coordinate
-        extend_subunits = self.dataset["infiltration_capacity"]["subunit"]
-        mask = (
-            self.dataset["infiltration_capacity"]
-            .where(self.dataset["active"])
-            .notnull()
-        )
-
-        # Generate columns for members without subunit coordinate
-        downward_resistance = self._get_preprocessed_array(
-            "downward_resistance", mask, extend_subunits=extend_subunits
-        )
-        upward_resistance = self._get_preprocessed_array(
-            "upward_resistance", mask, extend_subunits=extend_subunits
-        )
-        bottom_resistance = self._get_preprocessed_array(
-            "bottom_resistance", mask, extend_subunits=extend_subunits
-        )
-        extra_storage_coefficient = self._get_preprocessed_array(
-            "extra_storage_coefficient", mask, extend_subunits=extend_subunits
-        )
-
-        # Generate remaining columns
-        svat = np.arange(1, infiltration_capacity.size + 1)
-
-        # Create DataFrame
-        dataframe = pd.DataFrame(
-            {
-                "svat": svat,
-                "infiltration_capacity": infiltration_capacity,
-                "downward_resistance": downward_resistance,
-                "upward_resistance": upward_resistance,
-                "bottom_resistance": bottom_resistance,
-                "extra_storage_coefficient": extra_storage_coefficient,
-            }
-        )
-
-        self._check_range(dataframe)
-
-        return self.write_dataframe_fixed_width(file, dataframe)

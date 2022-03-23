@@ -1,6 +1,3 @@
-import numpy as np
-import pandas as pd
-
 from imod.fixed_format import VariableMetaData
 from imod.msw.pkgbase import Package
 
@@ -42,9 +39,6 @@ class ScalingFactors(Package):
         presences of loam causing a perched watertable, it is advised to
         generate a new soil physical unit. This array must not have a subunit
         coordinate.
-    active: array of booleans (xr.DataArray)
-        Describes whether SVAT units are active or not. This array must not have
-        a subunit coordinate.
     """
 
     _file_name = "uscl_svat.inp"
@@ -56,60 +50,23 @@ class ScalingFactors(Package):
         "depth_perched_water_table": VariableMetaData(8, 0.1, 10.0, float),
     }
 
+    _with_subunit = [
+        "scale_soil_moisture",
+        "scale_hydraulic_conductivity",
+        "scale_pressure_head",
+    ]
+    _without_subunit = ["depth_perched_water_table"]
+    _to_fill = []
+
     def __init__(
         self,
         scale_soil_moisture,
         scale_hydraulic_conductivity,
         scale_pressure_head,
         depth_perched_water_table,
-        active,
     ):
         super().__init__()
         self.dataset["scale_soil_moisture"] = scale_soil_moisture
         self.dataset["scale_hydraulic_conductivity"] = scale_hydraulic_conductivity
         self.dataset["scale_pressure_head"] = scale_pressure_head
         self.dataset["depth_perched_water_table"] = depth_perched_water_table
-        self.dataset["active"] = active
-
-    def _render(self, file):
-        # Generate columns for members with subunit coordinate
-        scale_soil_moisture = self._get_preprocessed_array(
-            "scale_soil_moisture", self.dataset["active"]
-        )
-
-        scale_hydraulic_conductivity = self._get_preprocessed_array(
-            "scale_hydraulic_conductivity", self.dataset["active"]
-        )
-
-        scale_pressure_head = self._get_preprocessed_array(
-            "scale_pressure_head", self.dataset["active"]
-        )
-
-        # Produce values necessary for members without subunit coordinate
-        extend_subunits = self.dataset["scale_soil_moisture"]["subunit"]
-        mask = (
-            self.dataset["scale_soil_moisture"].where(self.dataset["active"]).notnull()
-        )
-
-        # Generate columns for members without subunit coordinate
-        depth_perched_water_table = self._get_preprocessed_array(
-            "depth_perched_water_table", mask, extend_subunits=extend_subunits
-        )
-
-        # Generate remaining columns
-        svat = np.arange(1, scale_soil_moisture.size + 1)
-
-        # Create DataFrame
-        dataframe = pd.DataFrame(
-            {
-                "svat": svat,
-                "scale_soil_moisture": scale_soil_moisture,
-                "scale_hydraulic_conductivity": scale_hydraulic_conductivity,
-                "scale_pressure_head": scale_pressure_head,
-                "depth_perched_water_table": depth_perched_water_table,
-            }
-        )
-
-        self._check_range(dataframe)
-
-        return self.write_dataframe_fixed_width(file, dataframe)

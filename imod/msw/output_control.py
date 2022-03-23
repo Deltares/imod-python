@@ -96,7 +96,7 @@ class VariableOutputControl(OutputControl):
         for key, value in kwargs.items():
             self.dataset[key] = int(value)
 
-    def _render(self, file):
+    def _render(self, file, *args):
         variable, option = zip(
             *[(var, self.dataset[var].values) for var in self.dataset.data_vars]
         )
@@ -131,7 +131,7 @@ class TimeOutputControl(OutputControl):
 
         self.dataset["times"] = time
 
-    def _render(self, file):
+    def _render(self, file, *args):
 
         year, time_since_start_year = to_metaswap_timeformat(self.dataset["times"])
 
@@ -160,26 +160,26 @@ class IdfOutputControl(OutputControl):
         "rows": VariableMetaData(10, 1, 9999999, int),
         "columns": VariableMetaData(10, 1, 9999999, int),
         # TODO: Check if x and y limits are properly set.
-        "y_coords": VariableMetaData(15, 0.0, 9999999.0, float),
-        "x_coords": VariableMetaData(15, 0.0, 9999999.0, float),
+        "y_grid": VariableMetaData(15, 0.0, 9999999.0, float),
+        "x_grid": VariableMetaData(15, 0.0, 9999999.0, float),
     }
+
+    _with_subunit = []
+    _without_subunit = ["rows", "columns", "y_grid", "x_grid"]
+    _to_fill = []
 
     # TODO: Quote from IO manual: The x- and y-coordinates should increase with increasing col, row.
     # But example works with decreasing y-coordinates?
 
-    def __init__(self, area, active, nodata):
+    def __init__(self, area, nodata):
         super().__init__()
 
         self.dataset["area"] = area
-        self.dataset["active"] = active
         self.dataset["nodata"] = nodata
 
         nrow = self.dataset.coords["y"].size
         ncol = self.dataset.coords["x"].size
 
-        # TODO: Refactor _get_preprocessed_array to accept a DataArray as
-        # argument insteat of a varname. Then this assigning becomes
-        # unnecessary.
         y_index = xr.DataArray(
             np.arange(1, nrow + 1), coords={"y": self.dataset.coords["y"]}, dims=("y",)
         )
@@ -223,43 +223,3 @@ class IdfOutputControl(OutputControl):
             idf_ymin=ymin,
             idf_nodata=nodata,
         )
-
-    def _render(self, file):
-        area = self._get_preprocessed_array("area", self.dataset["active"])
-        svat = np.arange(1, area.size + 1)
-
-        # Produce values necessary for members without subunit coordinate
-        extend_subunits = self.dataset["area"]["subunit"]
-        mask = self.dataset["area"].where(self.dataset["active"]).notnull()
-
-        # Generate columns for members without subunit coordinate
-        columns = self._get_preprocessed_array(
-            "columns", mask, extend_subunits=extend_subunits
-        )
-        # Generate rows for members without subunit coordinate
-        rows = self._get_preprocessed_array(
-            "rows", mask, extend_subunits=extend_subunits
-        )
-
-        x_coords = self._get_preprocessed_array(
-            "x_grid", mask, extend_subunits=extend_subunits
-        )
-
-        y_coords = self._get_preprocessed_array(
-            "y_grid", mask, extend_subunits=extend_subunits
-        )
-
-        # Create DataFrame
-        dataframe = pd.DataFrame(
-            {
-                "svat": svat,
-                "rows": rows,
-                "columns": columns,
-                "y_coords": y_coords,
-                "x_coords": x_coords,
-            }
-        )
-
-        self._check_range(dataframe)
-
-        return self.write_dataframe_fixed_width(file, dataframe)
