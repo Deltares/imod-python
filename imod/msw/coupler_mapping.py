@@ -4,6 +4,7 @@ import xarray as xr
 
 from imod.fixed_format import VariableMetaData
 from imod.mf6.wel import WellDisStructured
+from imod.mf6.dis import StructuredDiscretization
 from imod.msw.pkgbase import Package
 
 
@@ -35,76 +36,73 @@ class CouplerMapping(Package):
         "layer": VariableMetaData(5, 0, 9999, int),
     }
 
+    _with_subunit = ["mod_id"]
+    _without_subunit = []
+    _to_fill = ["free"]
+
     def __init__(
         self,
-        area: xr.DataArray,
-        active: xr.DataArray,
+        idomain: StructuredDiscretization,
         well: WellDisStructured = None,
     ):
         super().__init__()
-        self.dataset["area"] = area
-        self.dataset["active"] = active
-        self._create_mod_id_rch()
-        self._create_svat()
+
         self.well = well
+        idomain_top_layer = idomain.sel(layer=1, drop=True)
+        # Test if equal to 1, to ignore idomain == -1 as well.
+        # Don't assign to self.dataset, as grid extent might
+        # differ from svat
+        self.idomain_active = idomain_top_layer == 1.0
 
-    def _create_svat(self):
-        self.dataset["svat"] = xr.full_like(
-            self.dataset["area"], fill_value=0, dtype=np.int64
-        )
-
-        valid = self.dataset["area"].notnull() & self.dataset["active"]
-        n_svat = valid.sum()
-        self.dataset["svat"].values[valid.values] = np.arange(1, n_svat + 1)
-
-    def _create_mod_id_rch(self):
+    def _create_mod_id_rch(self, svat):
         """
         Create modflow indices for the recharge layer, which is where
         infiltration will take place.
         """
-        _, y_len, x_len = self.dataset["area"].shape
+        # self.dataset["mod_id"] = xr.full_like(svat, fill_value=0, dtype=np.int64)
+        # n_subunit, _, _ = svat.shape
         subunit = self.dataset.coords["subunit"]
-        size = self.dataset["active"].size
 
-        mod_id_rch = xr.full_like(self.dataset["active"], fill_value=0, dtype=np.int64)
-        mod_id_rch.values = np.arange(1, size + 1).reshape(y_len, x_len)
+        n_mod = self.idomain_active.sum()
+        mod_id = xr.full_like(self.idomain_active, fill_value=0, dtype=np.int64)
 
-        self.dataset["mod_id_rch"] = mod_id_rch.expand_dims(subunit=subunit)
+        ## idomain does not have a subunit dimension, so tile for n_subunits
+        # mod_id_1d = np.tile(np.arange(1, n_mod + 1), n_subunit)
+        mod_id_1d = np.arange(1, n_mod + 1)
 
-    def _render(self, file):
-        # Produce values necessary for members without subunit coordinate
-        mask = self.dataset["area"].where(self.dataset["active"]).notnull()
+        mod_id.values[self.idomain_active.values] = mod_id_1d
 
-        # Generate columns and apply mask
-        mod_id = self._get_preprocessed_array("mod_id_rch", mask)
-        svat = self._get_preprocessed_array("svat", mask)
-        layer = np.full_like(svat, 1)
+        self.dataset["mod_id"] = mod_id.reindex_like(svat).expand_dims(subunit=subunit)
+
+    def _render(self, file, index, svat):
+        self._create_mod_id_rch(svat)
+
+        data_dict = {"svat": svat.values.ravel()[index]}
+
+        data_dict["layer"] = np.full_like(data_dict["svat"], 1)
+
+        for var in self._with_subunit:
+            data_dict[var] = self._index_da(self.dataset[var], index)
 
         # Get well values
         if self.well:
-            mod_id_well, svat_well, layer_well = self._get_well_values()
-            mod_id = np.append(mod_id_well, mod_id)
-            svat = np.append(svat_well, svat)
-            layer = np.append(layer_well, layer)
+            mod_id_well, svat_well, layer_well = self._get_well_values(svat)
+            data_dict["mod_id"] = np.append(mod_id_well, data_dict["mod_id"])
+            data_dict["svat"] = np.append(svat_well, data_dict["svat"])
+            data_dict["layer"] = np.append(layer_well, data_dict["layer"])
 
-        # Generate remaining columns
-        free = pd.Series(["" for _ in range(mod_id.size)], dtype="string")
+        for var in self._to_fill:
+            data_dict[var] = ""
 
-        # Create DataFrame
         dataframe = pd.DataFrame(
-            {
-                "mod_id": mod_id,
-                "free": free,
-                "svat": svat,
-                "layer": layer,
-            }
+            data=data_dict, columns=list(self._metadata_dict.keys())
         )
 
         self._check_range(dataframe)
 
         return self.write_dataframe_fixed_width(file, dataframe)
 
-    def _get_well_values(self):
+    def _get_well_values(self, svat):
         """
         Get modflow indices, svats, and layer number for the wells
         """
@@ -113,30 +111,30 @@ class CouplerMapping(Package):
         well_column = self.well["column"] - 1
         well_layer = self.well["layer"] - 1
 
-        _, row_len, column_len = self.dataset["svat"].shape
-        subunit = self.dataset.coords["subunit"]
+        modflow_y = self.idomain_active.y[well_row.values]
+        modflow_x = self.idomain_active.x[well_column.values]
 
-        # Check where wells should be coupled to MetaSWAP
-        area_valid = ~np.isnan(self.dataset["area"][:, well_row, well_column])
-        msw_active = self.dataset["active"][well_row, well_column]
-        well_active = area_valid & msw_active
+        y_sel = xr.DataArray(data=modflow_y.values, dims=("index",))
+        x_sel = xr.DataArray(data=modflow_x.values, dims=("index",))
 
-        # Generate modflow indices for cells where wells are located.
-        mod_id = (
-            well_layer * column_len * row_len + well_row * column_len + well_column + 1
-        )
-        mod_id = mod_id.expand_dims(subunit=subunit)
-        mod_id_1d = mod_id.values[well_active.values]
+        subunit = svat.coords["subunit"]
 
-        # Generate svats
-        svat = self.dataset["svat"][:, well_row, well_column]
-        svat_1d = svat.values[well_active.values]
+        well_svat = svat.sel(y=y_sel, x=x_sel).values.ravel()
+        well_mod_id = self.dataset["mod_id"].sel(y=y_sel, x=x_sel).values.ravel()
 
-        # Generate layers
+        # alternatively:
+        # well_svat = svat[:, well_row, well_column]
+        # well_mod_id = self.dataset["mod_id"][:, well_row, well_column]
+
+        well_active = well_svat != 0
+
+        well_svat_1d = well_svat.values[well_active.values]
+        well_mod_id_1d = well_mod_id.values[well_active.values]
+
         layer = well_layer.expand_dims(subunit=subunit)
         # Convert to Modflow's 1-based index. layer is readonly for some reason,
         # so we cannot do += on it.
         layer = layer + 1
         layer_1d = layer.values[well_active.values]
 
-        return (mod_id_1d, svat_1d, layer_1d)
+        return (well_mod_id_1d, well_svat_1d, layer_1d)
