@@ -2,10 +2,9 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from imod import mf6
 from imod.fixed_format import VariableMetaData
 from imod.msw.pkgbase import Package
-
-from imod import mf6
 
 
 class Sprinkling(Package):
