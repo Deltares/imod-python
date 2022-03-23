@@ -38,26 +38,26 @@ class MetaMod:
         self.write_exchanges(directory / "Modflow6")
 
     def write_exchanges(self, directory):
+        gwf_names = [
+            key
+            for key, value in self.mf6_simulation.items()
+            if value._pkg_id == "model"
+        ]
+        # Assume only one groundwater flow model
+        # FUTURE: Support multiple groundwater flow models.
+        gwf_model = self.mf6_simulation[gwf_names[0]]
+
         grid_data_key = [
             pkgname
             for pkgname, pkg in self.msw_model.items()
             if isinstance(pkg, GridData)
         ][0]
 
-        area = self.msw_model[grid_data_key].dataset["area"]
-        active = self.msw_model[grid_data_key].dataset["active"]
-        grid_mapping = NodeSvatMapping(area, active)
-        grid_mapping.write(directory)
+        dis = gwf_model[gwf_model._get_pkgkey("dis")]
 
-        gwf_names = [
-            key
-            for key, value in self.mf6_simulation.items()
-            if value._pkg_id == "model"
-        ]
-
-        # Assume only one groundwater flow model
-        # FUTURE: Support multiple groundwater flow models.
-        gwf_model = self.mf6_simulation[gwf_names[0]]
+        index, svat = self.msw_model[grid_data_key].generate_index_array()
+        grid_mapping = NodeSvatMapping(svat, dis)
+        grid_mapping.write(directory, index, svat)
 
         if "rch_msw" not in gwf_model.keys():
             raise ValueError(
@@ -67,14 +67,14 @@ class MetaMod:
 
         recharge = gwf_model["rch_msw"]
 
-        rch_mapping = RechargeSvatMapping(area, active, recharge)
-        rch_mapping.write(directory)
+        rch_mapping = RechargeSvatMapping(svat, recharge)
+        rch_mapping.write(directory, index, svat)
 
         if "wells_msw" in gwf_model.keys():
             well = gwf_model["wells_msw"]
 
-            well_mapping = WellSvatMapping(area, active, well)
-            well_mapping.write(directory)
+            well_mapping = WellSvatMapping(svat, well)
+            well_mapping.write(directory, index, svat)
         else:
             warnings.warn(
                 "No package named 'wells_msw' detected, "

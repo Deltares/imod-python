@@ -1,6 +1,7 @@
 import abc
+import pathlib
 
-import numpy as np
+import pandas as pd
 import xarray as xr
 
 from imod.fixed_format import format_fixed_width
@@ -40,10 +41,6 @@ class Package(abc.ABC):
             f"You can create a new package with a selection by calling {__class__.__name__}(**{self._pkg_id}.dataset.sel(**selection))"
         )
 
-    @abc.abstractmethod
-    def write(self, directory):
-        return
-
     def _check_range(self, dataframe):
         for varname in dataframe:
             min_value = self._metadata_dict[varname].min_value
@@ -62,19 +59,29 @@ class Package(abc.ABC):
                 file.write(content)
             file.write("\n")
 
-    def _get_preprocessed_array(self, varname, mask, extend_subunits=None):
-        array = self.dataset[varname]
-        if extend_subunits is not None:
-            array = array.expand_dims(subunit=extend_subunits)
+    def _index_da(self, da, index):
+        return da.values.ravel()[index]
 
-        # Apply mask
-        if mask is not None:
-            array = array.where(mask)
+    def _render(self, file, index, svat):
+        data_dict = {"svat": svat.values.ravel()[index]}
 
-        # Convert to numpy array and flatten it
-        array = array.to_numpy().ravel()
+        for var in self._with_subunit:
+            data_dict[var] = self._index_da(self.dataset[var], index)
 
-        # Remove NaN values
-        array = array[~np.isnan(array)]
+        for var in self._to_fill:
+            data_dict[var] = ""
 
-        return array
+        dataframe = pd.DataFrame(
+            data=data_dict, columns=list(self._metadata_dict.keys())
+        )
+
+        self._check_range(dataframe)
+
+        return self.write_dataframe_fixed_width(file, dataframe)
+
+    def write(self, directory, index, svat):
+        directory = pathlib.Path(directory)
+
+        filename = directory / self._file_name
+        with open(filename, "w") as f:
+            self._render(f, index, svat)

@@ -1,7 +1,4 @@
-import pathlib
-
 import numpy as np
-import pandas as pd
 import xarray as xr
 
 from imod import mf6
@@ -20,12 +17,9 @@ class RechargeSvatMapping(Package):
 
     Parameters
     ----------
-    area: array of floats (xr.DataArray)
-        Describes the area of SVAT units. This array must have a subunit
-        coordinate to describe different land uses.
-    active: array of bools (xr.DataArray)
-        Describes whether SVAT units are active or not. This array must not have
-        a subunit coordinate.
+    svat: array of floats (xr.DataArray)
+        SVAT units. This array must have a subunit coordinate to describe
+        different land uses.
     recharge: mf6.Recharge
         Modflow 6 Recharge package to map to. Note that the recharge rate should
         be provided as a 2D grid with a (y, x) dimension. Package will throw an
@@ -42,29 +36,25 @@ class RechargeSvatMapping(Package):
         "layer": VariableMetaData(5, 0, 9999, int),
     }
 
-    def __init__(
-        self, area: xr.DataArray, active: xr.DataArray, recharge: mf6.Recharge
-    ):
+    _with_subunit = ["rch_id", "svat", "layer"]
+    _to_fill = ["free"]
+
+    def __init__(self, svat: xr.DataArray, recharge: mf6.Recharge):
         super().__init__()
-        self.dataset["area"] = area
-        self.dataset["active"] = active
-        self.dataset["rch_active"] = recharge.dataset["rate"].notnull()
+        self.dataset["svat"] = svat
+        self.dataset["layer"] = xr.full_like(svat, 1)
+        if "layer" in recharge.dataset.coords:
+            self.dataset["rch_active"] = (
+                recharge.dataset["rate"].drop("layer").notnull()
+            )
+        else:
+            self.dataset["rch_active"] = recharge.dataset["rate"].notnull()
         self._pkgcheck()
-        self._create_svat()
         self._create_rch_id()
-
-    def _create_svat(self):
-        self.dataset["svat"] = xr.full_like(
-            self.dataset["area"], fill_value=0, dtype=np.int64
-        )
-
-        valid = self.dataset["area"].notnull() & self.dataset["active"]
-        n_svat = valid.sum()
-        self.dataset["svat"].values[valid.values] = np.arange(1, n_svat + 1)
 
     def _create_rch_id(self):
         self.dataset["rch_id"] = xr.full_like(
-            self.dataset["area"], fill_value=0, dtype=np.int64
+            self.dataset["svat"], fill_value=0, dtype=np.int64
         )
 
         n_subunit, _, _ = self.dataset["rch_id"].shape
@@ -78,32 +68,6 @@ class RechargeSvatMapping(Package):
 
         self.dataset["rch_id"].values[valid.values] = rch_id
 
-    def _render(self, file):
-        # Produce values necessary for members with subunit coordinate
-        mask = self.dataset["area"].where(self.dataset["active"]).notnull()
-
-        # Generate columns and apply mask
-        rch_id = self._get_preprocessed_array("rch_id", mask)
-        svat = self._get_preprocessed_array("svat", mask)
-
-        # TODO: Always stuck to layer 1? At least add to docstring!
-        layer = np.full_like(svat, 1)
-        free = pd.Series(["" for _ in range(rch_id.size)], dtype="string")
-
-        # Create DataFrame
-        dataframe = pd.DataFrame(
-            {
-                "rch_id": rch_id,
-                "free": free,
-                "svat": svat,
-                "layer": layer,
-            }
-        )
-
-        self._check_range(dataframe)
-
-        return self.write_dataframe_fixed_width(file, dataframe)
-
     def _pkgcheck(self):
         rch_dims = self.dataset["rch_active"].dims
         if rch_dims != ("y", "x"):
@@ -113,17 +77,11 @@ class RechargeSvatMapping(Package):
             )
 
         # Check if active msw cell inactive in recharge
-        inactive_in_rch = self.dataset["active"] > self.dataset["rch_active"]
+        active = self.dataset["svat"] != 0
+        inactive_in_rch = active > self.dataset["rch_active"]
 
         if inactive_in_rch.any():
             raise ValueError(
                 """Active MetaSWAP cell detected in inactive cell in Modflow6
                 recharge"""
             )
-
-    def write(self, directory):
-        directory = pathlib.Path(directory)
-
-        filename = directory / self._file_name
-        with open(filename, "w") as f:
-            self._render(f)
