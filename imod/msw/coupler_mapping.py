@@ -3,9 +3,9 @@ import pandas as pd
 import xarray as xr
 
 from imod.fixed_format import VariableMetaData
-from imod.mf6.wel import WellDisStructured
-from imod.mf6.dis import StructuredDiscretization
 from imod.msw.pkgbase import Package
+
+from imod import mf6
 
 
 class CouplerMapping(Package):
@@ -38,8 +38,8 @@ class CouplerMapping(Package):
 
     def __init__(
         self,
-        modflow_dis: StructuredDiscretization,
-        well: WellDisStructured = None,
+        modflow_dis: mf6.StructuredDiscretization,
+        well: mf6.WellDisStructured = None,
     ):
         super().__init__()
 
@@ -76,7 +76,7 @@ class CouplerMapping(Package):
 
         # Get well values
         if self.well:
-            mod_id_well, svat_well, layer_well = self._get_well_values(svat)
+            mod_id_well, svat_well, layer_well = self._create_well_id(svat)
             data_dict["mod_id"] = np.append(mod_id_well, data_dict["mod_id"])
             data_dict["svat"] = np.append(svat_well, data_dict["svat"])
             data_dict["layer"] = np.append(layer_well, data_dict["layer"])
@@ -92,7 +92,7 @@ class CouplerMapping(Package):
 
         return self.write_dataframe_fixed_width(file, dataframe)
 
-    def _get_well_values(self, svat):
+    def _create_well_id(self, svat):
         """
         Get modflow indices, svats, and layer number for the wells
         """
