@@ -18,12 +18,8 @@ class CouplerMapping(Package):
 
     Parameters
     ----------
-    area: array of floats (xr.DataArray)
-        Describes the area of SVAT units. This array must have a subunit coordinate
-        to describe different land uses.
-    active: array of bools (xr.DataArray)
-        Describes whether SVAT units are active or not.
-        This array must not have a subunit coordinate.
+    modflow_dis: StructuredDiscretization
+        Modflow 6 structured discretization
     well: WellDisStructured (optional)
         If given, this parameter describes sprinkling of SVAT units from MODFLOW cells.
     """
@@ -42,13 +38,13 @@ class CouplerMapping(Package):
 
     def __init__(
         self,
-        idomain: StructuredDiscretization,
+        modflow_dis: StructuredDiscretization,
         well: WellDisStructured = None,
     ):
         super().__init__()
 
         self.well = well
-        idomain_top_layer = idomain.sel(layer=1, drop=True)
+        idomain_top_layer = modflow_dis["idomain"].sel(layer=1, drop=True)
         # Test if equal to 1, to ignore idomain == -1 as well.
         # Don't assign to self.dataset, as grid extent might
         # differ from svat
@@ -59,20 +55,14 @@ class CouplerMapping(Package):
         Create modflow indices for the recharge layer, which is where
         infiltration will take place.
         """
-        # self.dataset["mod_id"] = xr.full_like(svat, fill_value=0, dtype=np.int64)
-        # n_subunit, _, _ = svat.shape
-        subunit = self.dataset.coords["subunit"]
-
+        self.dataset["mod_id"] = xr.full_like(svat, fill_value=0, dtype=np.int64)
+        n_subunit, _, _ = svat.shape
         n_mod = self.idomain_active.sum()
-        mod_id = xr.full_like(self.idomain_active, fill_value=0, dtype=np.int64)
 
-        ## idomain does not have a subunit dimension, so tile for n_subunits
-        # mod_id_1d = np.tile(np.arange(1, n_mod + 1), n_subunit)
-        mod_id_1d = np.arange(1, n_mod + 1)
+        # idomain does not have a subunit dimension, so tile for n_subunits
+        mod_id_1d = np.tile(np.arange(1, n_mod + 1), n_subunit)
 
-        mod_id.values[self.idomain_active.values] = mod_id_1d
-
-        self.dataset["mod_id"] = mod_id.reindex_like(svat).expand_dims(subunit=subunit)
+        self.dataset["mod_id"].values[:, self.idomain_active.values] = mod_id_1d
 
     def _render(self, file, index, svat):
         self._create_mod_id_rch(svat)
@@ -109,32 +99,20 @@ class CouplerMapping(Package):
         # Convert to Python's 0-based index
         well_row = self.well["row"] - 1
         well_column = self.well["column"] - 1
-        well_layer = self.well["layer"] - 1
+        well_layer = self.well["layer"]
 
-        modflow_y = self.idomain_active.y[well_row.values]
-        modflow_x = self.idomain_active.x[well_column.values]
+        n_subunit, _, _ = svat.shape
 
-        y_sel = xr.DataArray(data=modflow_y.values, dims=("index",))
-        x_sel = xr.DataArray(data=modflow_x.values, dims=("index",))
-
-        subunit = svat.coords["subunit"]
-
-        well_svat = svat.sel(y=y_sel, x=x_sel).values.ravel()
-        well_mod_id = self.dataset["mod_id"].sel(y=y_sel, x=x_sel).values.ravel()
-
-        # alternatively:
-        # well_svat = svat[:, well_row, well_column]
-        # well_mod_id = self.dataset["mod_id"][:, well_row, well_column]
+        well_svat = svat.values[:, well_row, well_column]
+        well_mod_id = self.dataset["mod_id"].values[:, well_row, well_column]
 
         well_active = well_svat != 0
 
-        well_svat_1d = well_svat.values[well_active.values]
-        well_mod_id_1d = well_mod_id.values[well_active.values]
+        well_svat_1d = well_svat[well_active]
+        well_mod_id_1d = well_mod_id[well_active]
 
-        layer = well_layer.expand_dims(subunit=subunit)
-        # Convert to Modflow's 1-based index. layer is readonly for some reason,
-        # so we cannot do += on it.
-        layer = layer + 1
-        layer_1d = layer.values[well_active.values]
+        # Tile well_layers for each subunit
+        layer = np.tile(well_layer, (n_subunit, 1))
+        layer_1d = layer[well_active]
 
         return (well_mod_id_1d, well_svat_1d, layer_1d)
