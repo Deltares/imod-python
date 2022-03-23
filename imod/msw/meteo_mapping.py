@@ -18,20 +18,26 @@ class MeteoMapping(Package):
     def __init__(self):
         super().__init__()
 
-    def _render(self, file):
-        svat_grid = self.dataset["area"].where(self.dataset["active"])
+    def _render(self, file, index, svat):
+        data_dict = {"svat": svat.values.ravel()[index]}
 
-        # Create DataFrame
-        dataframe = self.grid_mapping(svat_grid, self.meteo)
+        row, column = self.grid_mapping(svat, self.meteo)
+
+        data_dict["row"] = row[index]
+        data_dict["column"] = column[index]
+
+        dataframe = pd.DataFrame(
+            data=data_dict, columns=list(self._metadata_dict.keys())
+        )
 
         self._check_range(dataframe)
 
         return self.write_dataframe_fixed_width(file, dataframe)
 
     @staticmethod
-    def grid_mapping(svat_grid: xr.DataArray, meteo_grid: xr.DataArray) -> pd.DataFrame:
-        flip_svat_x = svat_grid.indexes["x"].is_monotonic_decreasing
-        flip_svat_y = svat_grid.indexes["y"].is_monotonic_decreasing
+    def grid_mapping(svat: xr.DataArray, meteo_grid: xr.DataArray) -> pd.DataFrame:
+        flip_svat_x = svat.indexes["x"].is_monotonic_decreasing
+        flip_svat_y = svat.indexes["y"].is_monotonic_decreasing
         flip_meteo_x = meteo_grid.indexes["x"].is_monotonic_decreasing
         flip_meteo_y = meteo_grid.indexes["y"].is_monotonic_decreasing
         nrow = meteo_grid["y"].size
@@ -42,14 +48,9 @@ class MeteoMapping(Package):
         meteo_y = common._coord(meteo_grid, "y")
 
         # Create the SVAT grid
-        svat_grid_x = np.array([])
-        svat_grid_y = np.array([])
-        for subunits in svat_grid:
-            for rows in subunits:
-                for value in rows:
-                    if not np.isnan(value.values):
-                        svat_grid_x = np.append(svat_grid_x, value["x"].values)
-                        svat_grid_y = np.append(svat_grid_y, value["y"].values)
+        svat_grid_y, svat_grid_x = np.meshgrid(svat.y, svat.x)
+        svat_grid_y = svat_grid_y.ravel()
+        svat_grid_x = svat_grid_x.ravel()
 
         # Determine where the svats fit in within the cell boundaries of the meteo grid
         row = np.searchsorted(meteo_y, svat_grid_y)
@@ -67,10 +68,9 @@ class MeteoMapping(Package):
         if flip_meteo_x ^ flip_svat_x:
             column = (ncol + 1) - column
 
-        # Create svat column
-        svat = np.arange(1, svat_grid_x.size + 1)
+        n_subunit, _, _ = svat.shape
 
-        return pd.DataFrame({"svat": svat, "row": row, "column": column})
+        return np.tile(row, n_subunit), np.tile(column, n_subunit)
 
 
 class PrecipitationMapping(MeteoMapping):
@@ -81,12 +81,6 @@ class PrecipitationMapping(MeteoMapping):
 
     Parameters
     ----------
-    area: array of floats (xr.DataArray)
-        Describes the area of SVAT units. This array must have a subunit coordinate
-        to describe different landuses.
-    active: array of bools (xr.DataArray)
-        Describes whether SVAT units are active or not.
-        This array must not have a subunit coordinate.
     precipitation: array of floats (xr.DataArray)
         Describes the precipitation data.
         The extend of the grid must be larger than the MetaSvap grid.
@@ -102,13 +96,9 @@ class PrecipitationMapping(MeteoMapping):
 
     def __init__(
         self,
-        area: xr.DataArray,
-        active: xr.DataArray,
         precipitation: xr.DataArray,
     ):
         super().__init__()
-        self.dataset["area"] = area
-        self.dataset["active"] = active
         self.meteo = precipitation
 
 
@@ -120,12 +110,6 @@ class EvapotranspirationMapping(MeteoMapping):
 
     Parameters
     ----------
-    area: array of floats (xr.DataArray)
-        Describes the area of SVAT units. This array must have a subunit coordinate
-        to describe different landuses.
-    active: array of bools (xr.DataArray)
-        Describes whether SVAT units are active or not.
-        This array must not have a subunit coordinate.
     evapotransporation: array of floats (xr.DataArray)
         Describes the evapotransporation data.
         The extend of the grid must be larger than the MetaSvap grid.
@@ -141,11 +125,7 @@ class EvapotranspirationMapping(MeteoMapping):
 
     def __init__(
         self,
-        area: xr.DataArray,
-        active: xr.DataArray,
         evapotranspiration: xr.DataArray,
     ):
         super().__init__()
-        self.dataset["area"] = area
-        self.dataset["active"] = active
         self.meteo = evapotranspiration
