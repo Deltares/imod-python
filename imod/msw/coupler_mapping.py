@@ -43,11 +43,10 @@ class CouplerMapping(Package):
         super().__init__()
 
         self.well = well
-        idomain_top_layer = modflow_dis["idomain"].sel(layer=1, drop=True)
         # Test if equal to 1, to ignore idomain == -1 as well.
         # Don't assign to self.dataset, as grid extent might
         # differ from svat
-        self.idomain_active = idomain_top_layer == 1.0
+        self.idomain_active = modflow_dis["idomain"] == 1.0
 
     def _create_mod_id_rch(self, svat):
         """
@@ -56,12 +55,14 @@ class CouplerMapping(Package):
         """
         self.dataset["mod_id"] = xr.full_like(svat, fill_value=0, dtype=np.int64)
         n_subunit, _, _ = svat.shape
-        n_mod = self.idomain_active.sum()
+        idomain_top_active = self.idomain_active.sel(layer=1, drop=True)
+
+        n_mod_top = idomain_top_active.sum()
 
         # idomain does not have a subunit dimension, so tile for n_subunits
-        mod_id_1d = np.tile(np.arange(1, n_mod + 1), n_subunit)
+        mod_id_1d = np.tile(np.arange(1, n_mod_top + 1), (n_subunit, 1))
 
-        self.dataset["mod_id"].values[:, self.idomain_active.values] = mod_id_1d
+        self.dataset["mod_id"].values[:, idomain_top_active.values] = mod_id_1d
 
     def _render(self, file, index, svat):
         self._create_mod_id_rch(svat)
@@ -95,15 +96,21 @@ class CouplerMapping(Package):
         """
         Get modflow indices, svats, and layer number for the wells
         """
+        n_subunit, _, _ = svat.shape
+
         # Convert to Python's 0-based index
         well_row = self.well["row"] - 1
         well_column = self.well["column"] - 1
-        well_layer = self.well["layer"]
+        well_layer = self.well["layer"] - 1
 
-        n_subunit, _, _ = svat.shape
+        n_mod = self.idomain_active.sum()
+        mod_id = xr.full_like(self.idomain_active, 0, dtype=np.int64)
+        mod_id.values[self.idomain_active.values] = np.arange(1, n_mod + 1)
+
+        well_mod_id = mod_id[well_layer, well_row, well_column]
+        well_mod_id = np.tile(well_mod_id, (n_subunit, 1))
 
         well_svat = svat.values[:, well_row, well_column]
-        well_mod_id = self.dataset["mod_id"].values[:, well_row, well_column]
 
         well_active = well_svat != 0
 
@@ -111,7 +118,7 @@ class CouplerMapping(Package):
         well_mod_id_1d = well_mod_id[well_active]
 
         # Tile well_layers for each subunit
-        layer = np.tile(well_layer, (n_subunit, 1))
+        layer = np.tile(well_layer + 1, (n_subunit, 1))
         layer_1d = layer[well_active]
 
         return (well_mod_id_1d, well_svat_1d, layer_1d)
