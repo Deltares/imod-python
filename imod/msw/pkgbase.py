@@ -67,22 +67,6 @@ class Package(abc.ABC):
                 file.write(content)
             file.write("\n")
 
-    def _get_preprocessed_array(self, varname, mask, extend_subunits=None):
-        array = self.dataset[varname]
-        if extend_subunits is not None:
-            array = array.expand_dims(subunit=extend_subunits)
-
-        # Apply mask
-        array = array.where(mask)
-
-        # Convert to numpy array and flatten it
-        array = array.to_numpy().ravel()
-
-        # Remove NaN values
-        array = array[~np.isnan(array)]
-
-        return array
-
     def _index_da(self, da, index):
         return da.values.ravel()[index]
 
