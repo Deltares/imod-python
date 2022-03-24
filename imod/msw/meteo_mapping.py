@@ -48,7 +48,7 @@ class MeteoMapping(Package):
         meteo_y = common._coord(meteo_grid, "y")
 
         # Create the SVAT grid
-        svat_grid_y, svat_grid_x = np.meshgrid(svat.y, svat.x)
+        svat_grid_y, svat_grid_x = np.meshgrid(svat.y, svat.x, indexing="ij")
         svat_grid_y = svat_grid_y.ravel()
         svat_grid_x = svat_grid_x.ravel()
 
