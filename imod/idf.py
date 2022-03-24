@@ -696,6 +696,9 @@ def save(path, a, nodata=1.0e20, pattern=None, dtype=np.float32):
         Defaults to a value of 1.0e20.
     pattern : str
         Format string which defines how to create the filenames. See examples.
+    dtype : type, ``{np.float32, np.float64}``, default is ``np.float32``.
+        Whether to write single precision (``np.float32``) or double precision
+        (``np.float64``) IDF files.
 
     Example
     -------
