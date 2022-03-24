@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import xarray as xr
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis.strategies import floats
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
@@ -34,6 +34,7 @@ from imod.msw import GridData
         GridData._metadata_dict["soil_physical_unit"].max_value,
     ),
 )
+@settings(deadline=400)
 def test_write(
     fixed_format_parser,
     area,
@@ -51,9 +52,11 @@ def test_write(
         xr.DataArray(True),
     )
 
+    index, svat = grid_data.generate_index_array()
+
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        grid_data.write(output_dir)
+        grid_data.write(output_dir, index, svat)
 
         results = fixed_format_parser(
             output_dir / GridData._file_name, GridData._metadata_dict
@@ -182,9 +185,11 @@ def test_simple_model(fixed_format_parser):
         active,
     )
 
+    index, svat = grid_data.generate_index_array()
+
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        grid_data.write(output_dir)
+        grid_data.write(output_dir, index, svat)
 
         results = fixed_format_parser(
             output_dir / GridData._file_name, GridData._metadata_dict
