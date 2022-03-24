@@ -13,6 +13,7 @@ def test_simple_model(fixed_format_parser):
 
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
+    subunit = [0, 1]
     dx = 1.0
     dy = 1.0
     # fmt: off
@@ -34,15 +35,23 @@ def test_simple_model(fixed_format_parser):
         coords={"y": y, "x": x, "dx": dx, "dy": dy}
     )
 
-    active = xr.DataArray(
+    svat = xr.DataArray(
         np.array(
-            [[False, True, False],
-             [False, True, False],
-             [False, True, False]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+            [
+                [[0, 1, 0],
+                 [0, 0, 0],
+                 [0, 2, 0]],
+
+                [[0, 3, 0],
+                 [0, 4, 0],
+                 [0, 0, 0]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
     )
     # fmt: on
+    index = (svat != 0).values.ravel()
 
     # Well
     well_layer = [3, 2, 1]
@@ -59,24 +68,25 @@ def test_simple_model(fixed_format_parser):
     coupler_mapping = msw.Sprinkling(
         max_abstraction_groundwater,
         max_abstraction_surfacewater,
-        active,
         well,
     )
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        coupler_mapping.write(output_dir)
+        coupler_mapping.write(output_dir, index, svat)
 
         results = fixed_format_parser(
             output_dir / msw.Sprinkling._file_name,
             msw.Sprinkling._metadata_dict,
         )
 
-    assert_equal(results["svat"], np.array([1, 2, 3]))
+    assert_equal(results["svat"], np.array([1, 2, 3, 4]))
     assert_almost_equal(
-        results["max_abstraction_groundwater_m3_d"], np.array([100.0, 200.0, 300.0])
+        results["max_abstraction_groundwater_m3_d"],
+        np.array([100.0, 300.0, 100.0, 200.0]),
     )
     assert_almost_equal(
-        results["max_abstraction_surfacewater_m3_d"], np.array([100.0, 200.0, 300.0])
+        results["max_abstraction_surfacewater_m3_d"],
+        np.array([100.0, 300.0, 100.0, 200.0]),
     )
-    assert_equal(results["layer"], np.array([3, 2, 1]))
+    assert_equal(results["layer"], np.array([3, 1, 3, 2]))

@@ -13,10 +13,11 @@ from imod.msw import (
 
 def test_initial_conditions_equilibrium():
     ic = InitialConditionsEquilibrium()
+    dummy = None, None
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        ic.write(output_dir)
+        ic.write(output_dir, *dummy)
 
         with open(output_dir / ic._file_name) as f:
             lines = f.readlines()
@@ -26,10 +27,11 @@ def test_initial_conditions_equilibrium():
 
 def test_initial_conditions_percolation():
     ic = InitialConditionsPercolation()
+    dummy = None, None
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        ic.write(output_dir)
+        ic.write(output_dir, *dummy)
 
         with open(output_dir / ic._file_name) as f:
             lines = f.readlines()
@@ -39,10 +41,11 @@ def test_initial_conditions_percolation():
 
 def test_initial_conditions_rootzone_pressure_head():
     ic = InitialConditionsRootzonePressureHead(2.2)
+    dummy = None, None
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        ic.write(output_dir)
+        ic.write(output_dir, *dummy)
 
         with open(output_dir / ic._file_name) as f:
             lines = f.readlines()
@@ -51,6 +54,7 @@ def test_initial_conditions_rootzone_pressure_head():
 
 
 def test_initial_conditions_saved_state():
+    dummy = None, None
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
         with open(output_dir / "foo.out", "w") as f:
@@ -58,15 +62,16 @@ def test_initial_conditions_saved_state():
 
         ic = InitialConditionsSavedState(output_dir / "foo.out")
 
-        ic.write(output_dir)
+        ic.write(output_dir, *dummy)
 
         assert Path(output_dir / "init_svat.inp").exists()
 
 
 def test_initial_conditions_saved_state_no_file():
+    dummy = None, None
     ic = InitialConditionsSavedState(r"doesntexist.txt")
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
         with pytest.raises(FileNotFoundError):
-            ic.write(output_dir)
+            ic.write(output_dir, *dummy)

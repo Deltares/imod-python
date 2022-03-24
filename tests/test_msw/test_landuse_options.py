@@ -48,7 +48,7 @@ def test_landuse_options(fixed_format_parser):
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        lu_options.write(output_dir)
+        lu_options.write(output_dir, None, None)
 
         results = fixed_format_parser(
             output_dir / LanduseOptions._file_name, LanduseOptions._metadata_dict

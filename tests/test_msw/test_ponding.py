@@ -49,28 +49,33 @@ def test_simple_model(fixed_format_parser):
         dims=("subunit", "y", "x"),
         coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
     )
-
-    active = xr.DataArray(
+    svat = xr.DataArray(
         np.array(
-            [[False, True, False],
-             [False, True, False],
-             [False, True, False]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
-    )
+            [
+                [[0, 1, 0],
+                 [0, 0, 0],
+                 [0, 2, 0]],
 
+                [[0, 3, 0],
+                 [0, 4, 0],
+                 [0, 0, 0]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
     # fmt: on
+    index = (svat != 0).values.ravel()
 
     ponding = Ponding(
         ponding_depth=ponding_depth,
         runoff_resistance=runoff_resistance,
         runon_resistance=runoff_resistance,
-        active=active,
     )
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        ponding.write(output_dir)
+        ponding.write(output_dir, index, svat)
 
         results = fixed_format_parser(
             output_dir / Ponding._file_name, Ponding._metadata_dict

@@ -48,12 +48,14 @@ def test_write(
         xr.DataArray(upward_resistance),
         xr.DataArray(bottom_resistance),
         xr.DataArray(extra_storage_coefficient),
-        xr.DataArray(True),
     )
+
+    index = np.array([True])
+    svat = xr.DataArray(1).expand_dims(subunit=[0])
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        infiltration.write(output_dir)
+        infiltration.write(output_dir, index, svat)
 
         results = fixed_format_parser(
             output_dir / Infiltration._file_name, Infiltration._metadata_dict
@@ -169,15 +171,23 @@ def test_simple_model(fixed_format_parser):
         coords={"y": y, "x": x, "dx": dx, "dy": dy}
     )
 
-    active = xr.DataArray(
+    svat = xr.DataArray(
         np.array(
-            [[False, True, False],
-             [False, True, False],
-             [False, True, False]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+            [
+                [[0, 1, 0],
+                 [0, 0, 0],
+                 [0, 2, 0]],
+
+                [[0, 3, 0],
+                 [0, 4, 0],
+                 [0, 0, 0]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
     )
     # fmt: on
+    index = (svat != 0).values.ravel()
 
     infiltration = Infiltration(
         infiltration_capacity,
@@ -185,12 +195,11 @@ def test_simple_model(fixed_format_parser):
         upward_resistance,
         bottom_resistance,
         extra_storage_coefficient,
-        active,
     )
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        infiltration.write(output_dir)
+        infiltration.write(output_dir, index, svat)
 
         results = fixed_format_parser(
             output_dir / Infiltration._file_name, Infiltration._metadata_dict

@@ -43,29 +43,34 @@ def test_simple_model(fixed_format_parser):
         dims=("y", "x"),
         coords={"y": y, "x": x, "dx": dx, "dy": dy}
     )
-
-    active = xr.DataArray(
+    svat = xr.DataArray(
         np.array(
-            [[False, True, False],
-             [False, True, False],
-             [False, True, False]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
-    )
+            [
+                [[0, 1, 0],
+                 [0, 0, 0],
+                 [0, 2, 0]],
 
+                [[0, 3, 0],
+                 [0, 4, 0],
+                 [0, 0, 0]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
     # fmt: on
+    index = (svat != 0).values.ravel()
 
     scaling_factors = ScalingFactors(
         scale_soil_moisture=scale,
         scale_hydraulic_conductivity=scale,
         scale_pressure_head=scale,
         depth_perched_water_table=depth_perched_water_table,
-        active=active,
     )
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        scaling_factors.write(output_dir)
+        scaling_factors.write(output_dir, index, svat)
 
         results = fixed_format_parser(
             output_dir / ScalingFactors._file_name, ScalingFactors._metadata_dict

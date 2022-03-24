@@ -54,20 +54,23 @@ def test_meteo_grid():
         results = pd.read_csv(
             output_dir / "mete_grid.inp", header=None, quoting=csv.QUOTE_NONE
         )
-        gridnames = sorted([file.name for file in output_dir.glob("*.asc")])
+        gridnames = sorted([file.name for file in output_dir.glob("meteo_grids/*.asc")])
 
-    expected_filenames = [
-        '"precipitation_20000101000000.asc"',
-        '"precipitation_20000102000000.asc"',
+    expected_paths = [
+        '"meteo_grids\\precipitation_20000101000000.asc"',
+        '"meteo_grids\\precipitation_20000102000000.asc"',
     ]
 
     assert_equal(results[0].values, np.array([0.0, 1.0]))
     assert_equal(results[1].values, np.array([2000, 2000]))
-    assert_equal(results[2].values, np.array(expected_filenames, dtype=object))
+    assert_equal(results[2].values, np.array(expected_paths, dtype=object))
     assert_equal(results[3].values, np.array(['"1.0"', '"3.0"'], dtype=object))
 
-    expected_filenames_no_quote = [f.replace('"', "") for f in expected_filenames]
-    assert gridnames == expected_filenames_no_quote
+    # strip directory and quotes from filename
+    expected_filenames = [
+        f.replace('"', "").replace("meteo_grids\\", "") for f in expected_paths
+    ]
+    assert gridnames == expected_filenames
 
 
 def test_meteo_no_time_grid():

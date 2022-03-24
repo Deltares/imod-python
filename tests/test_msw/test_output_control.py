@@ -32,24 +32,34 @@ def grid():
         dims=("subunit", "y", "x"),
         coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
     )
-    active = xr.DataArray(
+
+    svat = xr.DataArray(
         np.array(
-            [[False, True, False, False],
-             [False, True, False, True],
-             [False, True, False, False]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x}
+            [
+                [[0, 1, 0, 0],
+                 [0, 0, 0, 0],
+                 [0, 2, 0, 0]],
+
+                [[0, 3, 0, 0],
+                 [0, 4, 0, 5],
+                 [0, 0, 0, 0]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
     )
     # fmt: on
-    return area, active
+    index = (svat != 0).values.ravel()
+    return area, index, svat
 
 
 def test_var_oc(fixed_format_parser):
+    dummy = None, None
     var_output_control = VariableOutputControl()
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        var_output_control.write(output_dir)
+        var_output_control.write(output_dir, *dummy)
 
         results = fixed_format_parser(
             output_dir / VariableOutputControl._file_name,
@@ -64,6 +74,7 @@ def test_var_oc(fixed_format_parser):
 
 
 def test_time_oc(fixed_format_parser):
+    dummy = None, None
     freq = "D"
     times = pd.date_range(start="1/1/1971", end="1/3/1971", freq=freq)
 
@@ -71,7 +82,7 @@ def test_time_oc(fixed_format_parser):
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        time_output_control.write(output_dir)
+        time_output_control.write(output_dir, *dummy)
 
         results = fixed_format_parser(
             output_dir / TimeOutputControl._file_name, TimeOutputControl._metadata_dict
@@ -83,14 +94,14 @@ def test_time_oc(fixed_format_parser):
 
 
 def test_idf_oc_write_simple_model(fixed_format_parser):
-    area, active = grid()
+    area, index, svat = grid()
     nodata = -9999.0
 
-    idf_output_control = IdfOutputControl(area, active, nodata)
+    idf_output_control = IdfOutputControl(area, nodata)
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        idf_output_control.write(output_dir)
+        idf_output_control.write(output_dir, index, svat)
 
         results = fixed_format_parser(
             output_dir / IdfOutputControl._file_name, IdfOutputControl._metadata_dict
@@ -99,15 +110,15 @@ def test_idf_oc_write_simple_model(fixed_format_parser):
     assert_equal(results["svat"], np.array([1, 2, 3, 4, 5]))
     assert_equal(results["rows"], np.array([1, 3, 1, 2, 2]))
     assert_equal(results["columns"], np.array([2, 2, 2, 2, 4]))
-    assert_almost_equal(results["y_coords"], np.array([1.0, 3.0, 1.0, 2.0, 2.0]))
-    assert_almost_equal(results["x_coords"], np.array([2.0, 2.0, 2.0, 2.0, 4.0]))
+    assert_almost_equal(results["y_grid"], np.array([1.0, 3.0, 1.0, 2.0, 2.0]))
+    assert_almost_equal(results["x_grid"], np.array([2.0, 2.0, 2.0, 2.0, 4.0]))
 
 
 def test_idf_oc_settings_simple_model():
-    area, active = grid()
+    area, _, _ = grid()
     nodata = -9999.0
 
-    idf_output_control = IdfOutputControl(area, active, nodata)
+    idf_output_control = IdfOutputControl(area, nodata)
 
     expected = dict(
         simgro_opt=-1,
