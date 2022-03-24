@@ -1,7 +1,9 @@
+from pathlib import Path
+
 import pytest
 from numpy.testing import assert_almost_equal, assert_equal
+
 from imod import msw
-from pathlib import Path
 
 
 @pytest.mark.usefixtures("msw_model")

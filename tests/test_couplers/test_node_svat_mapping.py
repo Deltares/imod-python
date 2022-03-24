@@ -5,8 +5,8 @@ import numpy as np
 import xarray as xr
 from numpy.testing import assert_equal
 
-from imod.couplers import metamod
 from imod import mf6
+from imod.couplers import metamod
 
 
 def test_simple_model(fixed_format_parser):
@@ -44,9 +44,7 @@ def test_simple_model(fixed_format_parser):
         idomain=xr.full_like(like, 1),
     )
 
-    grid_data = metamod.node_svat_mapping.NodeSvatMapping(
-        svat, dis
-    )
+    grid_data = metamod.node_svat_mapping.NodeSvatMapping(svat, dis)
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)

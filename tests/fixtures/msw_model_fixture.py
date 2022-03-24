@@ -1,11 +1,10 @@
 import numpy as np
+import pandas as pd
+import pytest
 import xarray as xr
 from numpy import nan
-import pandas as pd
 
-from imod import msw, mf6
-
-import pytest
+from imod import mf6, msw
 
 
 def make_msw_model():
