@@ -132,6 +132,6 @@ def test_idf_oc_settings_simple_model():
         idf_nodata=nodata,
     )
 
-    settings = idf_output_control.get_settings()
+    settings = idf_output_control.get_output_settings()
 
     assert expected == settings

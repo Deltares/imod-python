@@ -8,25 +8,11 @@ from imod.msw.timeutil import to_metaswap_timeformat
 from imod.util import spatial_reference
 
 
-class OutputControl(Package):
-    # TODO: Get list from Joachim which files we want to support, as there
-    # are a lot options, many of which we never use.
-
-    def __init__(self):
-        super().__init__()
-
-    def get_settings(self):
-        """
-        Return relevant settings for the PARA_SIM.INP file
-        """
-        return self._settings
-
-
 # I did not use long variable names here (e.g. "precipitation"), as MetaSWAP
 # uses these 2 to 4 character names to print its output to. This also has the
 # benefit that the user is able to set additional variable names via kwargs
 # (there are more than 130 possible variable names to choose from in MetaSWAP)
-class VariableOutputControl(OutputControl):
+class VariableOutputControl(Package):
     """
     Control which variables will be created as output. The variable names used
     in this class provide a condensed water balance. You can use additional
@@ -108,7 +94,7 @@ class VariableOutputControl(OutputControl):
         return self.write_dataframe_fixed_width(file, dataframe)
 
 
-class TimeOutputControl(OutputControl):
+class TimeOutputControl(Package):
     """
     Specify the accumulation periods which will be used to write output.
 
@@ -147,7 +133,7 @@ class TimeOutputControl(OutputControl):
         return self.write_dataframe_fixed_width(file, dataframe)
 
 
-class IdfOutputControl(OutputControl):
+class IdfOutputControl(Package):
     """
     Output control to generate IDFs.
 
@@ -196,7 +182,7 @@ class IdfOutputControl(OutputControl):
         self.dataset["x_grid"] = x_grid
         self.dataset["y_grid"] = y_grid
 
-    def get_settings(self):
+    def get_output_settings(self):
         grid = self.dataset["area"]
         dx, xmin, _, dy, ymin, _ = spatial_reference(grid)
         ncol = grid["x"].size

@@ -120,20 +120,22 @@ class MetaSwapModel(Model):
         directory = Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
 
+        # Add time settings
         year, time_since_start_year = self._get_starttime()
 
         self.simulation_settings["iybg"] = year
         self.simulation_settings["tdbg"] = time_since_start_year
 
-        # Add OutputControl settings
+        # Add IdfOutputControl settings
         idf_key = self._get_pkg_key(IdfOutputControl)
-        self.simulation_settings.update(self[idf_key].get_settings())
+        self.simulation_settings.update(self[idf_key].get_output_settings())
 
         filename = directory / self._file_name
         with open(filename, "w") as f:
             rendered = self._template.render(settings=self.simulation_settings)
             f.write(rendered)
 
+        # Get index and svat
         grid_key = self._get_pkg_key(GridData)
         index, svat = self[grid_key].generate_index_array()
 
