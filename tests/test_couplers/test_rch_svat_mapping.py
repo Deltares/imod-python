@@ -16,32 +16,25 @@ def test_simple_model(fixed_format_parser):
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
+    dx = 1.0
+    dy = 1.0
     # fmt: off
-    area = xr.DataArray(
+    svat = xr.DataArray(
         np.array(
             [
-                [[0.5, 0.5, 0.5],
-                 [nan, nan, nan],
-                 [1.0, 1.0, 1.0]],
+                [[0, 1, 0],
+                 [0, 0, 0],
+                 [0, 2, 0]],
 
-                [[0.5, 0.5, 0.5],
-                 [1.0, 1.0, 1.0],
-                 [nan, nan, nan]],
+                [[0, 3, 0],
+                 [0, 4, 0],
+                 [0, 0, 0]],
             ]
         ),
         dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x}
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
     )
-
-    active = xr.DataArray(
-        np.array(
-            [[False, True, False],
-             [False, True, False],
-             [False, True, False]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x}
-    )
-
+    index = (svat != 0).values.ravel()
     rate = xr.DataArray(
         np.array(
             [[0.0, 0.0, 0.0],
@@ -55,11 +48,11 @@ def test_simple_model(fixed_format_parser):
     # fmt: on
     recharge = mf6.Recharge(rate)
 
-    grid_data = RechargeSvatMapping(area, active, recharge)
+    grid_data = RechargeSvatMapping(svat, recharge)
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        grid_data.write(output_dir)
+        grid_data.write(output_dir, index, svat)
 
         results = fixed_format_parser(
             output_dir / RechargeSvatMapping._file_name,
@@ -79,31 +72,25 @@ def test_simple_model_inactive_rch(fixed_format_parser):
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
+    dx = 1.0
+    dy = 1.0
     # fmt: off
-    area = xr.DataArray(
+    svat = xr.DataArray(
         np.array(
             [
-                [[0.5, 0.5, 0.5],
-                 [nan, nan, nan],
-                 [1.0, 1.0, 1.0]],
+                [[0, 1, 0],
+                 [0, 0, 0],
+                 [0, 2, 0]],
 
-                [[0.5, 0.5, 0.5],
-                 [1.0, 1.0, 1.0],
-                 [nan, nan, nan]],
+                [[0, 3, 0],
+                 [0, 4, 0],
+                 [0, 0, 0]],
             ]
         ),
         dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x}
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
     )
-
-    active = xr.DataArray(
-        np.array(
-            [[False, True, False],
-             [False, True, False],
-             [False, True, False]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x}
-    )
+    index = (svat != 0).values.ravel()
 
     rate = xr.DataArray(
         np.array(
@@ -118,11 +105,11 @@ def test_simple_model_inactive_rch(fixed_format_parser):
     # fmt: on
     recharge = mf6.Recharge(rate)
 
-    grid_data = RechargeSvatMapping(area, active, recharge)
+    grid_data = RechargeSvatMapping(svat, recharge)
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        grid_data.write(output_dir)
+        grid_data.write(output_dir, index, svat)
 
         results = fixed_format_parser(
             output_dir / RechargeSvatMapping._file_name,
@@ -142,30 +129,23 @@ def test_simple_model_inactive_rch_error():
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
+    dx = 1.0
+    dy = 1.0
     # fmt: off
-    area = xr.DataArray(
+    svat = xr.DataArray(
         np.array(
             [
-                [[0.5, 0.5, 0.5],
-                 [nan, nan, nan],
-                 [1.0, 1.0, 1.0]],
+                [[0, 1, 0],
+                 [0, 0, 0],
+                 [0, 2, 0]],
 
-                [[0.5, 0.5, 0.5],
-                 [1.0, 1.0, 1.0],
-                 [nan, nan, nan]],
+                [[0, 3, 0],
+                 [0, 4, 0],
+                 [0, 0, 0]],
             ]
         ),
         dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x}
-    )
-
-    active = xr.DataArray(
-        np.array(
-            [[False, True, False],
-             [False, True, False],
-             [False, True, False]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
     )
 
     rate = xr.DataArray(
@@ -182,7 +162,7 @@ def test_simple_model_inactive_rch_error():
     recharge = mf6.Recharge(rate)
 
     with pytest.raises(ValueError):
-        RechargeSvatMapping(area, active, recharge)
+        RechargeSvatMapping(svat, recharge)
 
 
 def test_simple_model_rch_time_error():
@@ -193,30 +173,23 @@ def test_simple_model_rch_time_error():
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
+    dx = 1.0
+    dy = 1.0
     # fmt: off
-    area = xr.DataArray(
+    svat = xr.DataArray(
         np.array(
             [
-                [[0.5, 0.5, 0.5],
-                 [nan, nan, nan],
-                 [1.0, 1.0, 1.0]],
+                [[0, 1, 0],
+                 [0, 0, 0],
+                 [0, 2, 0]],
 
-                [[0.5, 0.5, 0.5],
-                 [1.0, 1.0, 1.0],
-                 [nan, nan, nan]],
+                [[0, 3, 0],
+                 [0, 4, 0],
+                 [0, 0, 0]],
             ]
         ),
         dims=("subunit", "y", "x"),
-        coords={"subunit": subunit, "y": y, "x": x}
-    )
-
-    active = xr.DataArray(
-        np.array(
-            [[False, True, False],
-             [False, True, False],
-             [False, True, False]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
     )
 
     rate = xr.DataArray(
@@ -235,4 +208,4 @@ def test_simple_model_rch_time_error():
     recharge = mf6.Recharge(rate)
 
     with pytest.raises(ValueError):
-        RechargeSvatMapping(area, active, recharge)
+        RechargeSvatMapping(svat, recharge)

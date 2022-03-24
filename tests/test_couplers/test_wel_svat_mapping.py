@@ -3,7 +3,6 @@ from pathlib import Path
 
 import numpy as np
 import xarray as xr
-from numpy import nan
 from numpy.testing import assert_equal
 
 from imod import mf6
@@ -18,31 +17,23 @@ def test_simple_model(fixed_format_parser):
     dx = 1.0
     dy = 1.0
     # fmt: off
-    area = xr.DataArray(
+    svat = xr.DataArray(
         np.array(
             [
-                [[0.5, 0.5, 0.5],
-                 [nan, nan, nan],
-                 [1.0, 1.0, 1.0]],
+                [[0, 1, 0],
+                 [0, 0, 0],
+                 [0, 2, 0]],
 
-                [[0.5, 0.5, 0.5],
-                 [1.0, 1.0, 1.0],
-                 [nan, nan, nan]],
+                [[0, 3, 0],
+                 [0, 4, 0],
+                 [0, 0, 0]],
             ]
         ),
         dims=("subunit", "y", "x"),
         coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
     )
-
-    active = xr.DataArray(
-        np.array(
-            [[False, True, False],
-             [False, True, False],
-             [False, True, False]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
-    )
     # fmt: on
+    index = (svat != 0).values.ravel()
 
     # Well
     well_layer = [3, 2, 1]
@@ -56,11 +47,11 @@ def test_simple_model(fixed_format_parser):
         rate=well_rate,
     )
 
-    coupler_mapping = WellSvatMapping(area, active, well)
+    coupler_mapping = WellSvatMapping(svat, well)
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        coupler_mapping.write(output_dir)
+        coupler_mapping.write(output_dir, index, svat)
 
         results = fixed_format_parser(
             output_dir / WellSvatMapping._file_name,
@@ -84,31 +75,23 @@ def test_simple_model_inactive(fixed_format_parser):
     dx = 1.0
     dy = 1.0
     # fmt: off
-    area = xr.DataArray(
+    svat = xr.DataArray(
         np.array(
             [
-                [[0.5, 0.5, 0.5],
-                 [nan, nan, nan],
-                 [1.0, 1.0, 1.0]],
+                [[0, 1, 0],
+                 [0, 0, 0],
+                 [0, 2, 0]],
 
-                [[0.5, 0.5, 0.5],
-                 [1.0, 1.0, 1.0],
-                 [nan, nan, nan]],
+                [[0, 3, 0],
+                 [0, 4, 0],
+                 [0, 0, 0]],
             ]
         ),
         dims=("subunit", "y", "x"),
         coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
     )
-
-    active = xr.DataArray(
-        np.array(
-            [[False, True, False],
-             [False, True, False],
-             [False, True, False]]),
-        dims=("y", "x"),
-        coords={"y": y, "x": x, "dx": dx, "dy": dy}
-    )
     # fmt: on
+    index = (svat != 0).values.ravel()
 
     # Well
     well_layer = [1, 3, 2, 1]
@@ -122,11 +105,11 @@ def test_simple_model_inactive(fixed_format_parser):
         rate=well_rate,
     )
 
-    coupler_mapping = WellSvatMapping(area, active, well)
+    coupler_mapping = WellSvatMapping(svat, well)
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
-        coupler_mapping.write(output_dir)
+        coupler_mapping.write(output_dir, index, svat)
 
         results = fixed_format_parser(
             output_dir / WellSvatMapping._file_name,
