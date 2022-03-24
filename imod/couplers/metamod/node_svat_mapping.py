@@ -66,6 +66,6 @@ class NodeSvatMapping(Package):
         n_mod = self.idomain_active.sum()
 
         # idomain does not have a subunit dimension, so tile for n_subunits
-        mod_id_1d = np.tile(np.arange(1, n_mod + 1), n_subunit)
+        mod_id_1d = np.tile(np.arange(1, n_mod + 1), (n_subunit, 1))
 
         self.dataset["mod_id"].values[:, self.idomain_active.values] = mod_id_1d

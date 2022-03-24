@@ -58,15 +58,12 @@ class RechargeSvatMapping(Package):
         )
 
         n_subunit, _, _ = self.dataset["rch_id"].shape
-
-        subunit = self.dataset.coords["subunit"]
         n_rch = self.dataset["rch_active"].sum()
-        valid = self.dataset["rch_active"].expand_dims(subunit=subunit)
 
         # recharge does not have a subunit dimension, so tile for n_subunits
-        rch_id = np.tile(np.arange(1, n_rch + 1), n_subunit)
+        rch_id = np.tile(np.arange(1, n_rch + 1), (n_subunit, 1))
 
-        self.dataset["rch_id"].values[valid.values] = rch_id
+        self.dataset["rch_id"].values[:, self.dataset["rch_active"].values] = rch_id
 
     def _pkgcheck(self):
         rch_dims = self.dataset["rch_active"].dims
