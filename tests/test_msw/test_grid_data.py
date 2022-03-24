@@ -94,6 +94,139 @@ def test_write(
     assert_equal(results["soil_physical_unit"][0], int(soil_physical_unit))
 
 
+def test_generate_index_array():
+    x = [1.0, 2.0, 3.0]
+    y = [1.0, 2.0, 3.0]
+    subunit = [0, 1]
+    dx = 1.0
+    dy = 1.0
+    # fmt: off
+    area = xr.DataArray(
+        np.array(
+            [
+                [[0.5, 0.5, 0.5],
+                 [nan, nan, nan],
+                 [1.0, 1.0, 1.0]],
+
+                [[0.5, 0.5, 0.5],
+                 [1.0, 1.0, 1.0],
+                 [nan, nan, nan]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
+    landuse = xr.DataArray(
+        np.array(
+            [
+                [[1.0, 1.0, 1.0],
+                 [nan, nan, nan],
+                 [1.0, 1.0, 1.0]],
+
+                [[2.0, 2.0, 2.0],
+                 [2.0, 2.0, 2.0],
+                 [nan, nan, nan]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
+    rootzone_depth = xr.DataArray(
+        np.array(
+            [
+                [[1.0, 1.0, 1.0],
+                 [nan, nan, nan],
+                 [1.0, 1.0, 1.0]],
+
+                [[1.0, 1.0, 1.0],
+                 [1.0, 1.0, 1.0],
+                 [nan, nan, nan]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
+
+    surface_elevation = xr.DataArray(
+        np.array(
+            [[1.0, 2.0, 3.0],
+             [4.0, 5.0, 6.0],
+             [7.0, 8.0, 9.0]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+    )
+
+    soil_physical_unit = xr.DataArray(
+        np.array(
+            [[1.0, 2.0, 3.0],
+             [4.0, 5.0, 6.0],
+             [7.0, 8.0, 9.0]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+    )
+
+    active = xr.DataArray(
+        np.array(
+            [[False, True, False],
+             [False, True, False],
+             [False, True, False]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x}
+    )
+    # fmt: on
+    grid_data = GridData(
+        area,
+        landuse,
+        rootzone_depth,
+        surface_elevation,
+        soil_physical_unit,
+        active,
+    )
+
+    index, svat = grid_data.generate_index_array()
+
+    index_expected = [
+        False,
+        True,
+        False,
+        False,
+        False,
+        False,
+        False,
+        True,
+        False,
+        False,
+        True,
+        False,
+        False,
+        True,
+        False,
+        False,
+        False,
+        False,
+    ]
+
+    # fmt: off
+    svat_expected = xr.DataArray(
+        np.array(
+            [
+                [[0, 1, 0],
+                 [0, 0, 0],
+                 [0, 2, 0]],
+
+                [[0, 3, 0],
+                 [0, 4, 0],
+                 [0, 0, 0]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
+    # fmt: on
+    assert_equal(index, np.array(index_expected))
+    assert_equal(svat.values, svat_expected.values)
+
+
 def test_simple_model(fixed_format_parser):
 
     x = [1.0, 2.0, 3.0]
