@@ -5,7 +5,12 @@ from imod.evaluate.constraints import (
     stability_constraint_advection,
     stability_constraint_wel,
 )
-from imod.evaluate.head import calculate_gxg, convert_pointwaterhead_freshwaterhead
+from imod.evaluate.head import (
+    calculate_gxg,
+    calculate_gxg_points,
+    convert_pointwaterhead_freshwaterhead,
+    old_calculate_gxg,
+)
 from imod.evaluate.streamfunction import (
     quiver_line,
     quiver_linestring,

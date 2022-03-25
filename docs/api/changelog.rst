@@ -43,6 +43,21 @@ Added
 - :func:`imod.util.replace` has been added to find and replace different values
   in a DataArray.
 
+Fixed
+~~~~~
+
+- :func:`imod.evaluate.calculate_gxg` now correctly uses (March 14, March
+  28, April 14) to calculate GVG rather than (March 28, April 14, April 28).
+  
+Added
+~~~~~
+
+- :func:`imod.evaluate.calculate_gxg_points` has been added to compute GXG
+  values for time varying point data (i.e. loaded from IPF and presented as a
+  Pandas dataframe).
+- :func:`imod.evaluate.calculate_gxg` will return the number of years used
+  in the GxG calculation as separate variables in the output dataset.
+
 [0.11.1] - 2021-12-23
 ---------------------
 
