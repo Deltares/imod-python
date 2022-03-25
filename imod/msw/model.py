@@ -214,6 +214,8 @@ class MetaSwapModel(Model):
             if isinstance(pkg, pkg_type):
                 return pkg_key
 
+        raise KeyError(f"Could not find package of type: {pkg_type}")
+
     def write(self, directory):
         """
         Write packages and simulation settings (PARA_SIM.INP).
