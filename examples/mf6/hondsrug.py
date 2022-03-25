@@ -23,6 +23,7 @@ In overview, the model features:
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import scipy.ndimage.morphology
 import xarray as xr
 
@@ -648,3 +649,34 @@ hds.sel(layer=5).isel(time=3).plot(ax=ax)
 
 fig, ax = plt.subplots()
 hds.sel(layer=slice(3, 5)).mean(dim="layer").isel(time=3).plot(ax=ax)
+
+# Assign dates to head
+# --------------------
+#
+# MODFLOW6 has no concept of a calendar, so the output is not labelled only
+# in terms of "time since start" in floating point numbers. For this model
+# the time unit is days and we can assign a date coordinate as follows:
+
+starttime = pd.to_datetime("2000-01-01")
+timedelta = pd.to_timedelta(hds["time"], "D")
+hds = hds.assign_coords(time=starttime + timedelta)
+
+# %%
+# Extract head at points
+# ----------------------
+#
+# A typical operation is to extract simulated heads at point locations to
+# compare them with measurements. In this example, we select the heads at
+# two points:
+
+x = [240_000.0, 244_000.0]
+y = [560_000.0, 562_000.0]
+selection = imod.select.points_values(hds, x=x, y=y)
+
+# %%
+# The result can be converted into a pandas dataframe for timeseries analysis,
+# or written to a variety of tabular file formats.
+
+dataframe = selection.to_dataframe().reset_index()
+dataframe = dataframe.rename(columns={"index": "id"})
+dataframe
