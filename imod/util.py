@@ -515,7 +515,7 @@ def mdal_compliant_ugrid2d(ds: xr.Dataset) -> xr.Dataset:
             for layer in stacked["layer"].values:
                 ds[f"{variable}_layer_{layer}"] = stacked.sel(layer=layer, drop=True)
     if "layer" in ds.coords:
-        ds = ds.drop("layer")
+        ds = ds.drop_vars("layer")
 
     # Find topology variables
     for variable in ds.data_vars:
@@ -1023,27 +1023,15 @@ def replace(da: xr.DataArray, to_replace: Any, value: Any) -> xr.DataArray:
     def _replace(
         a: np.ndarray, to_replace: np.ndarray, value: np.ndarray
     ) -> np.ndarray:
-        # Use np.unique to create an inverse index
-        flat = a.ravel()
-        uniques, index = np.unique(flat, return_inverse=True)
-        replaceable = np.isin(flat, to_replace)
+        flat = da.values.ravel()
 
-        # Create a replacement array in which there is a 1:1 relation between
-        # uniques and the replacement values, so that we can use the inverse index
-        # to select replacement values.
-        valid = np.isin(to_replace, uniques, assume_unique=True)
-        # Remove to_replace values that are not present in da. If no overlap
-        # exists between to_replace and the values in da, just return a copy.
-        if not valid.any():
-            return a.copy()
-        to_replace = to_replace[valid]
-        value = value[valid]
-
-        replacement = np.full_like(uniques, np.nan)
-        replacement[np.searchsorted(uniques, to_replace)] = value
+        sorter = np.argsort(to_replace)
+        insertion = np.searchsorted(to_replace, flat, sorter=sorter)
+        indices = np.take(sorter, insertion, mode="clip")
+        replaceable = to_replace[indices] == flat
 
         out = flat.copy()
-        out[replaceable] = replacement[index[replaceable]]
+        out[replaceable] = value[indices[replaceable]]
         return out.reshape(a.shape)
 
     if is_scalar(to_replace):
@@ -1071,8 +1059,6 @@ def replace(da: xr.DataArray, to_replace: Any, value: Any) -> xr.DataArray:
     if (counts > 1).any():
         raise ValueError("to_replace contains duplicates")
 
-    # Replace NaN values separately, as they will show up as separate values
-    # from numpy.unique.
     isnan = np.isnan(to_replace)
     if isnan.any():
         i = np.nonzero(isnan)[0]
