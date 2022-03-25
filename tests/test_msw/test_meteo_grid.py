@@ -8,6 +8,7 @@ import pytest
 import xarray as xr
 from numpy import nan
 from numpy.testing import assert_equal
+import os
 
 from imod.msw import MeteoGrid
 
@@ -57,8 +58,8 @@ def test_meteo_grid():
         gridnames = sorted([file.name for file in output_dir.glob("meteo_grids/*.asc")])
 
     expected_paths = [
-        '"meteo_grids\\precipitation_20000101000000.asc"',
-        '"meteo_grids\\precipitation_20000102000000.asc"',
+        '"meteo_grids' + os.path.sep + 'precipitation_20000101000000.asc"',
+        '"meteo_grids' + os.path.sep + 'precipitation_20000102000000.asc"',
     ]
 
     assert_equal(results[0].values, np.array([0.0, 1.0]))
@@ -68,7 +69,8 @@ def test_meteo_grid():
 
     # strip directory and quotes from filename
     expected_filenames = [
-        f.replace('"', "").replace("meteo_grids\\", "") for f in expected_paths
+        f.replace('"', "").replace("meteo_grids" + os.path.sep, "")
+        for f in expected_paths
     ]
     assert gridnames == expected_filenames
 
