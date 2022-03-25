@@ -3,11 +3,50 @@ from copy import copy
 from pathlib import Path
 
 import jinja2
+import textwrap
+
+import numpy as np
 
 from imod.msw.grid_data import GridData
-from imod.msw.output_control import IdfOutputControl
 from imod.msw.pkgbase import Package
 from imod.msw.timeutil import to_metaswap_timeformat
+
+from imod.msw.coupler_mapping import CouplerMapping
+from imod.msw.infiltration import Infiltration
+from imod.msw.initial_conditions import (
+    InitialConditionsEquilibrium,
+    InitialConditionsPercolation,
+    InitialConditionsRootzonePressureHead,
+    InitialConditionsSavedState,
+)
+from imod.msw.landuse import LanduseOptions
+from imod.msw.meteo_grid import MeteoGrid
+from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMapping
+from imod.msw.output_control import (
+    IdfOutputControl,
+    TimeOutputControl,
+)
+from imod.msw.vegetation import AnnualCropFactors
+
+REQUIRED_PACKAGES = [
+    GridData,
+    CouplerMapping,
+    Infiltration,
+    LanduseOptions,
+    MeteoGrid,
+    EvapotranspirationMapping,
+    PrecipitationMapping,
+    IdfOutputControl,
+    TimeOutputControl,
+    AnnualCropFactors,
+]
+
+INITIAL_CONDITIONS_PACKAGES = [
+    InitialConditionsEquilibrium,
+    InitialConditionsPercolation,
+    InitialConditionsRootzonePressureHead,
+    InitialConditionsSavedState,
+]
 
 DEFAULT_SETTINGS = dict(
     vegetation_mdl=1,
@@ -40,6 +79,11 @@ class Model(collections.UserDict):
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
+
+
+# TODO: add checks
+# 2. All landuse values in landuse grid, are they in the LandUse properties table?
+# 3. All vegetation_indices from landuse properties, do they have a AnnualCropGrowth index
 
 
 class MetaSwapModel(Model):
@@ -80,6 +124,70 @@ class MetaSwapModel(Model):
             # TODO: Test if this is how MetaSWAP accepts relative paths
             return f'"${unsaturated_database}\\"'
 
+    def _check_required_packages(self):
+        pkg_types_included = {type(pkg) for pkg in self.values()}
+        missing_packages = set(REQUIRED_PACKAGES) - pkg_types_included
+        if len(missing_packages) > 0:
+            raise ValueError(
+                f"Missing the following required packages: {missing_packages}"
+            )
+
+        initial_condition_set = pkg_types_included & set(INITIAL_CONDITIONS_PACKAGES)
+        if len(initial_condition_set) < 1:
+            raise ValueError(
+                textwrap.dedent(
+                    f"""Missing InitialCondition package, assign one of
+                     {INITIAL_CONDITIONS_PACKAGES}"""
+                )
+            )
+        elif len(initial_condition_set) > 1:
+            raise ValueError(
+                textwrap.dedent(
+                    f"""Multiple InitialConditions assigned, choose one of
+                     {initial_condition_set}"""
+                )
+            )
+
+    def _check_landuse_indices_in_lookup_options(self):
+        grid_key = self._get_pkg_key(GridData)
+        landuse_options_key = self._get_pkg_key(LanduseOptions)
+
+        indices_in_grid = set(np.unique(self[grid_key]["landuse"]))
+        indices_in_options = set(
+            self[landuse_options_key].dataset.coords["landuse_index"].values
+        )
+
+        missing_indices = indices_in_grid - indices_in_options
+
+        if len(missing_indices) > 0:
+            raise ValueError(
+                textwrap.dedent(
+                    f"""Found the following landuse indices in GridData which
+                     were not in LanduseOptions: {missing_indices}"""
+                )
+            )
+
+    def _check_vegetation_indices_in_annual_crop_factors(self):
+        landuse_options_key = self._get_pkg_key(LanduseOptions)
+        annual_crop_factors_key = self._get_pkg_key(AnnualCropFactors)
+
+        indices_in_options = set(
+            np.unique(self[landuse_options_key]["vegetation_index"])
+        )
+        indices_in_crop_factors = set(
+            self[annual_crop_factors_key].dataset.coords["vegetation_index"].values
+        )
+
+        missing_indices = indices_in_options - indices_in_crop_factors
+
+        if len(missing_indices) > 0:
+            raise ValueError(
+                textwrap.dedent(
+                    f"""Found the following vegetation indices in LanduseOptions
+                     which were not in AnnualCropGrowth: {missing_indices}"""
+                )
+            )
+
     def _get_starttime(self):
         """
         Loop over all packages to get the minimum time.
@@ -115,6 +223,11 @@ class MetaSwapModel(Model):
         directory: Path or str
             directory to write model in.
         """
+
+        # Model checks
+        self._check_required_packages()
+        self._check_vegetation_indices_in_annual_crop_factors()
+        self._check_landuse_indices_in_lookup_options()
 
         # Force to Path
         directory = Path(directory)
