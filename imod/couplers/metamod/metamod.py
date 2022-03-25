@@ -4,7 +4,7 @@ from imod.couplers.metamod.node_svat_mapping import NodeSvatMapping
 from imod.couplers.metamod.rch_svat_mapping import RechargeSvatMapping
 from imod.couplers.metamod.wel_svat_mapping import WellSvatMapping
 from imod.mf6 import Modflow6Simulation
-from imod.msw import GridData, MetaSwapModel
+from imod.msw import GridData, MetaSwapModel, Sprinkling
 
 
 class MetaMod:
@@ -70,14 +70,17 @@ class MetaMod:
         rch_mapping = RechargeSvatMapping(svat, recharge)
         rch_mapping.write(directory, index, svat)
 
-        if "wells_msw" in gwf_model.keys():
+        sprinkling_key = self.msw_model._get_pkg_key(Sprinkling, optional_package=True)
+
+        if (sprinkling_key is not None) and not ("wells_msw" in gwf_model.keys()):
+            raise ValueError(
+                "No package named 'wells_msw' found in Modflow 6 model, "
+                "but Sprinkling package found in MetaSWAP. "
+                "iMOD Coupler requires a Well Package named 'wells_msw' "
+                "to couple wells."
+            )
+        elif "wells_msw" in gwf_model.keys():
             well = gwf_model["wells_msw"]
 
             well_mapping = WellSvatMapping(svat, well)
             well_mapping.write(directory, index, svat)
-        else:
-            warnings.warn(
-                "No package named 'wells_msw' detected, "
-                "no wells are coupled to MetaSWAP",
-                UserWarning,
-            )
