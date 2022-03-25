@@ -31,6 +31,44 @@ def test_get_pkgkey(msw_model):
 
 
 @pytest.mark.usefixtures("msw_model")
+def test_check_required_packages(msw_model):
+    # Should not throw error
+    msw_model._check_required_packages()
+
+    # Remove essential package
+    msw_model.pop("grid")
+
+    with pytest.raises(ValueError):
+        msw_model._check_required_packages()
+
+
+@pytest.mark.usefixtures("msw_model")
+def test_check_vegetation_indices_in_annual_crop_factors(msw_model):
+    msw_model._check_vegetation_indices_in_annual_crop_factors()
+
+    # Remove one vegetation index from crop factors
+    msw_model["crop_factors"].dataset = msw_model["crop_factors"].dataset.sel(
+        vegetation_index=[1, 2]
+    )
+
+    with pytest.raises(ValueError):
+        msw_model._check_vegetation_indices_in_annual_crop_factors()
+
+
+@pytest.mark.usefixtures("msw_model")
+def test_check_landuse_indices_in_lookup_options(msw_model):
+    msw_model._check_landuse_indices_in_lookup_options()
+
+    # Remove one vegetation index from crop factors
+    msw_model["landuse_options"].dataset = msw_model["landuse_options"].dataset.sel(
+        landuse_index=[2, 3]
+    )
+
+    with pytest.raises(ValueError):
+        msw_model._check_landuse_indices_in_lookup_options()
+
+
+@pytest.mark.usefixtures("msw_model")
 def test_render_unsat_database_path(msw_model, tmp_path):
     rel_path = msw_model._render_unsaturated_database_path("./unsat_database")
 
