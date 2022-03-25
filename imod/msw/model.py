@@ -204,12 +204,13 @@ class MetaSwapModel(Model):
 
         return year, time_since_start_year
 
-    def _get_pkg_key(self, pkg_type: Package):
+    def _get_pkg_key(self, pkg_type: Package, optional_package: bool = False):
         for pkg_key, pkg in self.items():
             if isinstance(pkg, pkg_type):
                 return pkg_key
 
-        raise KeyError(f"Could not find package of type: {pkg_type}")
+        if not optional_package:
+            raise KeyError(f"Could not find package of type: {pkg_type}")
 
     def write(self, directory):
         """
