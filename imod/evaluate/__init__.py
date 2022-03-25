@@ -9,7 +9,6 @@ from imod.evaluate.head import (
     calculate_gxg,
     calculate_gxg_points,
     convert_pointwaterhead_freshwaterhead,
-    old_calculate_gxg,
 )
 from imod.evaluate.streamfunction import (
     quiver_line,
