@@ -199,6 +199,6 @@ def make_msw_model():
     return msw_model
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def msw_model():
     return make_msw_model()
