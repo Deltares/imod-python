@@ -1,4 +1,5 @@
 import csv
+import os
 import tempfile
 from pathlib import Path
 
@@ -8,7 +9,6 @@ import pytest
 import xarray as xr
 from numpy import nan
 from numpy.testing import assert_equal
-import os
 
 from imod.msw import MeteoGrid
 

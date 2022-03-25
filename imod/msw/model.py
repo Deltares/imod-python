@@ -1,17 +1,13 @@
 import collections
+import textwrap
 from copy import copy
 from pathlib import Path
 
 import jinja2
-import textwrap
-
 import numpy as np
 
-from imod.msw.grid_data import GridData
-from imod.msw.pkgbase import Package
-from imod.msw.timeutil import to_metaswap_timeformat
-
 from imod.msw.coupler_mapping import CouplerMapping
+from imod.msw.grid_data import GridData
 from imod.msw.infiltration import Infiltration
 from imod.msw.initial_conditions import (
     InitialConditionsEquilibrium,
@@ -22,10 +18,9 @@ from imod.msw.initial_conditions import (
 from imod.msw.landuse import LanduseOptions
 from imod.msw.meteo_grid import MeteoGrid
 from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMapping
-from imod.msw.output_control import (
-    IdfOutputControl,
-    TimeOutputControl,
-)
+from imod.msw.output_control import IdfOutputControl, TimeOutputControl
+from imod.msw.pkgbase import Package
+from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.vegetation import AnnualCropFactors
 
 REQUIRED_PACKAGES = [
