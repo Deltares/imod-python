@@ -33,12 +33,12 @@ dependencies:
   - pytest
   - pytest-benchmark
   - pytest-cov
-  - python>=3.7,<3.9
+  - python>=3.7,<3.11
   - pyvista
   - rasterio>=1.0
   - scipy
   - setuptools_scm
-  - scooby<=0.5.7
+  - scooby
   - sphinx
   - sphinx-gallery
   - toolz
