@@ -1,7 +1,3 @@
-"""
-Create a MetaSWAP model.
-"""
-
 from imod.msw.coupler_mapping import CouplerMapping
 from imod.msw.grid_data import GridData
 from imod.msw.infiltration import Infiltration
