@@ -28,6 +28,9 @@ Fixed
 Changed
 ~~~~~~~
 
+- Deprecate the current documentation URL: https://imod.xyz. For the coming
+  months, redirection is automatic to:
+  https://deltares.gitlab.io/imod/imod-python/.
 - :func:`imod.ipf.save` will now store associated files in separate directories
   named ``layer1``, ``layer2``, etc. The ID in the main IPF file is updated
   accordingly. Previously, if IDs were shared between different layers, the

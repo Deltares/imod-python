@@ -32,7 +32,7 @@ import imod
 # %%
 # Before starting to create the input data, we will create the groundwater
 # model variable (gwf_model) using `imod.mf6.GroundwaterFlowModel
-# <https://imod.xyz/api/mf6.html?highlight=groundwater%20flow%20model#imod.mf6.GroundwaterFlowModel>`_.
+# <https://deltares.gitlab.io/imod/imod-python/api/mf6.html?highlight=groundwater%20flow%20model#imod.mf6.GroundwaterFlowModel>`_.
 # The data from all the model packages will be added to this variable.
 
 gwf_model = imod.mf6.GroundwaterFlowModel()
@@ -58,7 +58,7 @@ bot = layermodel["bottom"]
 # The following step is to add the previously created discretization data to
 # the gwf_model variable.  This is done using the function
 # `imod.mf6.StructuredDiscretization
-# <https://imod.xyz/api/mf6.html?highlight=structured%20discretization#imod.mf6.StructuredDiscretization>`_.
+# <https://deltares.gitlab.io/imod/imod-python/api/mf6.html?highlight=structured%20discretization#imod.mf6.StructuredDiscretization>`_.
 # The data to include is the top of the model domain, the bottom of the layers,
 # and the idomain. All this information comes from the previously imported
 # tifs (now converted to `xarray.DataArray
@@ -99,7 +99,7 @@ k = layermodel["k"]
 #
 # The information for the NPF package is added to the gwf_model variable using
 # `imod.mf6.NodePropertyFlow
-# <https://imod.xyz/api/mf6.html?highlight=structured%20discretization#imod.mf6.NodePropertyFlow>`_.
+# <https://deltares.gitlab.io/imod/imod-python/api/mf6.html?highlight=structured%20discretization#imod.mf6.NodePropertyFlow>`_.
 # The information included is the icelltype value (equal to zero), the array
 # for  the hydraulic conductivity (considered to be the same for the horizontal
 # and vertical direction) and, optionally, the
@@ -107,7 +107,7 @@ k = layermodel["k"]
 # been activated.  For more details about the meaning of these variables and
 # other variables available to be used within this package, please refer to the
 # `documentation
-# <https://imod.xyz/api/mf6.html?highlight=structured%20discretization#imod.mf6.NodePropertyFlow>`_.
+# <https://deltares.gitlab.io/imod/imod-python/api/mf6.html?highlight=structured%20discretization#imod.mf6.NodePropertyFlow>`_.
 
 gwf_model["npf"] = imod.mf6.NodePropertyFlow(
     icelltype=0,
@@ -171,7 +171,7 @@ starting_head
 # ------------------------------------
 #
 # The function for indicating the initial conditions is
-# `imod.mf6.InitialConditions <https://imod.xyz/api/mf6.html?highlight=structured%20discretization#imod.mf6.InitialConditions>`_.
+# `imod.mf6.InitialConditions <https://deltares.gitlab.io/imod/imod-python/api/mf6.html?highlight=structured%20discretization#imod.mf6.InitialConditions>`_.
 # It is necessary to indicate the value(s) to be considered as the initial
 # (starting) head of the simulation.
 # In this case, this value is equal to the previously created starting_head array.
@@ -221,7 +221,7 @@ edge = outer_edge(xr.full_like(like_2d.drop("layer"), 1))
 # --------------------------------------
 #
 # To add the information to the CHD package within the gwf_model variable, the
-# `imod.mf6.ConstantHead <https://imod.xyz/api/mf6.html?highlight=structured%20discretization#imod.mf6.ConstantHead>`_
+# `imod.mf6.ConstantHead <https://deltares.gitlab.io/imod/imod-python/api/mf6.html?highlight=structured%20discretization#imod.mf6.ConstantHead>`_
 # function is used.
 # The required information is the head array for this boundary condition.
 # In this example, the starting_head array is selected where the idomain is > 0 (active)
@@ -395,7 +395,7 @@ rch_total.isel(layer=2, time=6).plot.imshow(ax=ax)
 # --------------------------------------
 #
 # The information for the RCH package is added with the function
-# `imod.mf6.Recharge <https://imod.xyz/api/mf6.html?highlight=structured%20discretization#imod.mf6.Recharge>`_.
+# `imod.mf6.Recharge <https://deltares.gitlab.io/imod/imod-python/api/mf6.html?highlight=structured%20discretization#imod.mf6.Recharge>`_.
 # It is required to insert the recharge flux rate, and it is optional
 # to include the print_input, print_flows and save_flows information.
 
@@ -427,7 +427,7 @@ pipe_cond
 # -------------------------------------
 #
 # To add the information to the DRN package within the gwf_model variable, the
-# `imod.mf6.Drainage <https://imod.xyz/api/mf6.html?highlight=structured%20discretization#imod.mf6.Drainage>`_
+# `imod.mf6.Drainage <https://deltares.gitlab.io/imod/imod-python/api/mf6.html?highlight=structured%20discretization#imod.mf6.Drainage>`_
 # function is used. It is required to add the previously created arrays for
 # the drain elevation and the drain conductance.
 # It is optional to insert the information for
@@ -517,7 +517,7 @@ gwf_model["sto"] = imod.mf6.SpecificStorage(
 # ------------------------------------
 #
 # The function
-# `imod.mf6.OutputControl <https://imod.xyz/api/mf6.html?highlight=structured%20discretization#imod.mf6.OutputControl>`_
+# `imod.mf6.OutputControl <https://deltares.gitlab.io/imod/imod-python/api/mf6.html?highlight=structured%20discretization#imod.mf6.OutputControl>`_
 # is used to store the information for this package.
 # It is possible to indicate if the heads and budget information is saved
 # at the end of each stress period (``last``),
@@ -547,7 +547,7 @@ gwf_model
 # --------------------------------------------
 #
 # The function
-# `imod.mf6.Modflow6Simulation <https://imod.xyz/api/mf6.html?highlight=structured%20discretization#imod.mf6.Modflow6Simulation>`_
+# `imod.mf6.Modflow6Simulation <https://deltares.gitlab.io/imod/imod-python/api/mf6.html?highlight=structured%20discretization#imod.mf6.Modflow6Simulation>`_
 # allows to assign models to a simulation (in this case, the gwf_model).
 
 simulation = imod.mf6.Modflow6Simulation("mf6-mipwa2-example")
@@ -558,7 +558,7 @@ simulation["GWF_1"] = gwf_model
 # ---------------
 #
 # The solver settings are indicated using
-# `imod.mf6.Solution <https://imod.xyz/api/mf6.html?highlight=structured%20discretization#imod.mf6.Solution>`_.
+# `imod.mf6.Solution <https://deltares.gitlab.io/imod/imod-python/api/mf6.html?highlight=structured%20discretization#imod.mf6.Solution>`_.
 # If the values are not indicated manually, the defaults values will be considered.
 
 simulation["solver"] = imod.mf6.Solution(
@@ -609,7 +609,7 @@ simulation.run()
 # --------------------
 #
 # The heads results are imported using
-# `imod.mf6.open_hds <https://imod.xyz/api/mf6.html?highlight=imod%20mf6%20open_hds#imod.mf6.open_hds>`_
+# `imod.mf6.open_hds <https://deltares.gitlab.io/imod/imod-python/api/mf6.html?highlight=imod%20mf6%20open_hds#imod.mf6.open_hds>`_
 # and indicating the location of the heads, as well as the DIS file.
 
 hds = imod.mf6.open_hds(

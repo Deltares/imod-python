@@ -122,9 +122,10 @@ To follow these steps, you need to be one of the maintainers for imod on both
    here <https://gitlab.com/deltares/imod/imod-python/-/releases>`_. To make a
    tag show up under releases, fill in the release notes in the UI. Since we
    keep changes in the :doc:`../api/changelog` only, just put ``See
-   https://imod.xyz/changelog.html`` in both the ``Message`` and ``Release
-   notes`` box. The tag name should be ``vx.y.z``, where x, y and z are version
-   numbers according to `Semantic Versioning <https://semver.org/>`_.
+   https://deltares.gitlab.io/imod/imod-python/api/changelog.html`` in both the
+   ``Message`` and ``Release notes`` box. The tag name should be ``vx.y.z``,
+   where x, y and z are version numbers according to `Semantic Versioning
+   <https://semver.org/>`_.
 
 3. Locally, ``git fetch --tags`` and ``git pull``, verify you are on the commit
    you want to release, and that it is clean.
