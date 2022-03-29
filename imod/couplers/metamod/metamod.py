@@ -5,6 +5,9 @@ from imod.mf6 import Modflow6Simulation
 from imod.msw import GridData, MetaSwapModel, Sprinkling
 
 import textwrap
+from pathlib import Path
+import tomli_w
+from typing import Union
 
 
 class MetaMod:
@@ -19,23 +22,118 @@ class MetaMod:
         The Modflow6 simulation that should be coupled.
     """
 
-    # TODO:
-    # - a toml file
+    _toml_name = "metamod.toml"
+    _modflow6_model_dir = "Modflow6"
+    _metaswap_model_dir = "MetaSWAP"
 
     def __init__(self, msw_model: MetaSwapModel, mf6_simulation: Modflow6Simulation):
         self.msw_model = msw_model
         self.mf6_simulation = mf6_simulation
 
-    def write(self, directory):
+    def write(
+        self,
+        directory: Union[str, Path],
+        modflow6_dll: Union[str, Path],
+        metaswap_dll: Union[str, Path],
+        metaswap_dll_dependency: Union[str, Path],
+    ):
+        """
+        Write MetaSWAP and Modflow 6 model with exchange files, as well as a
+        ``.toml`` file which configures the imod coupler run.
+
+        Parameters
+        ----------
+        directory: str or Path
+            Directory in which to write the coupled models
+        modflow6_dll: str or Path
+            Path to modflow6 .dll. You can obtain this library by downloading
+            `the last iMOD5 release
+            <https://oss.deltares.nl/web/imod/download-imod5>`_
+        metaswap_dll: str or Path
+            Path to metaswap .dll. You can obtain this library by downloading
+            `the last iMOD5 release
+            <https://oss.deltares.nl/web/imod/download-imod5>`_
+        metaswap_dll_dependency: str or Path
+            Directory with metaswap .dll dependencies. Directory should contain:
+            [fmpich2.dll, mpich2mpi.dll, mpich2nemesis.dll, TRANSOL.dll]. You
+            can obtain these by downloading `the last iMOD5 release
+            <https://oss.deltares.nl/web/imod/download-imod5>`_
+        """
+        # force to Path
+        directory = Path(directory)
         # For some reason the Modflow 6 model has to be written first, before
         # writing the MetaSWAP model. Else we get an Access Violation Error when
         # running the coupler.
-        self.mf6_simulation.write(directory / "Modflow6")
-        self.msw_model.write(directory / "MetaSWAP")
+        self.mf6_simulation.write(directory / self._modflow6_model_dir)
+        self.msw_model.write(directory / self._metaswap_model_dir)
         # Exchange files should be in Modflow 6 model directory
-        self.write_exchanges(directory / "Modflow6")
+        self.write_exchanges(directory / self._modflow6_model_dir)
 
-    def write_exchanges(self, directory):
+        self.write_toml(directory, modflow6_dll, metaswap_dll, metaswap_dll_dependency)
+
+    def write_toml(
+        self,
+        directory: Union[str, Path],
+        modflow6_dll: Union[str, Path],
+        metaswap_dll: Union[str, Path],
+        metaswap_dll_dependency: Union[str, Path],
+    ):
+        """
+        Write .toml file which configures the imod coupler run.
+
+        Parameters
+        ----------
+        directory: str or Path
+            Directory in which to write the .toml file.
+        modflow6_dll: str or Path
+            Path to modflow6 .dll. You can obtain this library by downloading
+            `the last iMOD5 release
+            <https://oss.deltares.nl/web/imod/download-imod5>`_
+        metaswap_dll: str or Path
+            Path to metaswap .dll. You can obtain this library by downloading
+            `the last iMOD5 release
+            <https://oss.deltares.nl/web/imod/download-imod5>`_
+        metaswap_dll_dependency: str or Path
+            Directory with metaswap .dll dependencies. Directory should contain:
+            [fmpich2.dll, mpich2mpi.dll, mpich2nemesis.dll, TRANSOL.dll]. You
+            can obtain these by downloading `the last iMOD5 release
+            <https://oss.deltares.nl/web/imod/download-imod5>`_
+        """
+        # force to Path
+        directory = Path(directory)
+
+        toml_path = directory / self._toml_name
+
+        coupler_toml = {
+            "timing": False,
+            "log_level": "INFO",
+            "kernels": {
+                "modflow6": {
+                    "dll": str(modflow6_dll),
+                    "model": f".\\{self._modflow6_model_dir}",
+                },
+                "metaswap": {
+                    "dll": str(metaswap_dll),
+                    "model": f".\\{self._metaswap_model_dir}",
+                    "dll_dependency": str(metaswap_dll_dependency),
+                },
+            },
+            "exchanges": [{"kernels": ["modflow6", "metaswap"]}],
+        }
+
+        with open(toml_path, "wb") as f:
+            tomli_w.dump(coupler_toml, f)
+
+    def write_exchanges(self, directory: Union[str, Path]):
+        """
+        Write exchange files (.dxc) which map MetaSWAP's svats to Modflow 6 node
+        numbers, recharge ids, and well ids.
+
+        Parameters
+        ----------
+        directory: str or Path
+            Directory where .dxc files are written.
+        """
         gwf_names = [
             key
             for key, value in self.mf6_simulation.items()
