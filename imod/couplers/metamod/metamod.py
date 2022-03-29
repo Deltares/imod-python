@@ -1,13 +1,14 @@
+import textwrap
+from pathlib import Path
+from typing import Union
+
+import tomli_w
+
 from imod.couplers.metamod.node_svat_mapping import NodeSvatMapping
 from imod.couplers.metamod.rch_svat_mapping import RechargeSvatMapping
 from imod.couplers.metamod.wel_svat_mapping import WellSvatMapping
 from imod.mf6 import Modflow6Simulation
 from imod.msw import GridData, MetaSwapModel, Sprinkling
-
-import textwrap
-from pathlib import Path
-import tomli_w
-from typing import Union
 
 
 class MetaMod:

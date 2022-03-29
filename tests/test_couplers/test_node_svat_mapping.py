@@ -2,13 +2,12 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
+import pytest
 import xarray as xr
 from numpy.testing import assert_equal
 
 from imod import mf6
 from imod.couplers import metamod
-
-import pytest
 
 
 def test_simple_model(fixed_format_parser):

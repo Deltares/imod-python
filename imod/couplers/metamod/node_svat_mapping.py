@@ -1,11 +1,11 @@
+import textwrap
+
 import numpy as np
 import xarray as xr
 
 from imod import mf6
 from imod.couplers.metamod.pkgbase import Package
 from imod.fixed_format import VariableMetaData
-
-import textwrap
 
 
 class NodeSvatMapping(Package):

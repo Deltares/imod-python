@@ -1,13 +1,13 @@
+import numpy as np
+import pytest
+from numpy.testing import assert_equal
+
 from imod.couplers.metamod import (
     MetaMod,
     NodeSvatMapping,
     RechargeSvatMapping,
     WellSvatMapping,
 )
-
-import pytest
-import numpy as np
-from numpy.testing import assert_equal
 
 # tomllib part of Python 3.11, else use tomli
 try:
