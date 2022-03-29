@@ -7,6 +7,107 @@ from numpy import nan
 from imod import mf6, msw
 
 
+def make_coupled_mf6_model():
+    x = [1.0, 2.0, 3.0]
+    y = [1.0, 2.0, 3.0]
+    dz = np.array([1, 10, 100])
+    layer = [1, 2, 3]
+    dx = 1.0
+    dy = 1.0
+
+    nlay = len(layer)
+    nrow = len(y)
+    ncol = len(x)
+
+    freq = "D"
+    times = pd.date_range(start="1/1/1971", end="1/3/1971", freq=freq)
+
+    idomain = xr.DataArray(
+        data=np.ones((nlay, nrow, ncol)),
+        dims=("layer", "y", "x"),
+        coords={"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},
+    )
+
+    top = 0.0
+    bottom = top - xr.DataArray(
+        np.cumsum(layer * dz), coords={"layer": layer}, dims="layer"
+    )
+
+    head = xr.full_like(idomain, np.nan)
+    head[..., 0] = -1.0
+    head[..., -1] = -1.0
+
+    head = head.expand_dims(time=times)
+
+    gwf_model = mf6.GroundwaterFlowModel()
+    gwf_model["dis"] = mf6.StructuredDiscretization(
+        idomain=idomain, top=top, bottom=bottom
+    )
+    gwf_model["chd"] = mf6.ConstantHead(
+        head, print_input=True, print_flows=True, save_flows=True
+    )
+
+    icelltype = xr.full_like(bottom, 0, dtype=int)
+    k = xr.DataArray(np.ones((nlay)), {"layer": layer}, ("layer",))
+    k33 = xr.DataArray(np.ones((nlay)), {"layer": layer}, ("layer",))
+    gwf_model["npf"] = mf6.NodePropertyFlow(
+        icelltype=icelltype,
+        k=k,
+        k33=k33,
+        variable_vertical_conductance=True,
+        dewatered=False,
+        perched=False,
+        save_flows=True,
+    )
+
+    gwf_model["ic"] = mf6.InitialConditions(head=0.5)
+    gwf_model["sto"] = mf6.SpecificStorage(1e-3, 0.1, True, 0)
+
+    recharge = xr.zeros_like(idomain.sel(layer=1))
+    recharge[:, 0] = np.nan
+    recharge[:, -1] = np.nan
+
+    gwf_model["rch_msw"] = mf6.Recharge(recharge)
+
+    gwf_model["oc"] = mf6.OutputControl(save_head="last", save_budget="last")
+
+    # Create wells
+    wel_layer = 3
+
+    ix = np.tile(np.arange(ncol) + 1, nrow)
+    iy = np.repeat(np.arange(nrow) + 1, ncol)
+    rate = np.zeros(ix.shape)
+    layer = np.full_like(ix, wel_layer)
+
+    gwf_model["wells_msw"] = mf6.WellDisStructured(
+        layer=layer, row=iy, column=ix, rate=rate
+    )
+
+    # Attach it to a simulation
+    simulation = mf6.Modflow6Simulation("test")
+    simulation["GWF_1"] = gwf_model
+    # Define solver settings
+    simulation["solver"] = mf6.Solution(
+        print_option="summary",
+        csv_output=False,
+        no_ptc=True,
+        outer_dvclose=1.0e-4,
+        outer_maximum=500,
+        under_relaxation=None,
+        inner_dvclose=1.0e-4,
+        inner_rclose=0.001,
+        inner_maximum=100,
+        linear_acceleration="cg",
+        scaling_method=None,
+        reordering_method=None,
+        relaxation_factor=0.97,
+    )
+    # Collect time discretization
+    simulation.time_discretization(times=times)
+
+    return simulation
+
+
 def make_msw_model():
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
@@ -197,6 +298,11 @@ def make_msw_model():
     msw_model["oc_time"] = msw.TimeOutputControl(time=times)
 
     return msw_model
+
+
+@pytest.fixture(scope="function")
+def coupled_mf6_model():
+    return make_coupled_mf6_model()
 
 
 @pytest.fixture(scope="function")
