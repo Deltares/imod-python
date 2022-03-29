@@ -5,6 +5,8 @@ from imod import mf6
 from imod.couplers.metamod.pkgbase import Package
 from imod.fixed_format import VariableMetaData
 
+import textwrap
+
 
 class NodeSvatMapping(Package):
     """
@@ -52,6 +54,7 @@ class NodeSvatMapping(Package):
         # Don't assign to self.dataset, as grid extent might
         # differ from svat
         self.idomain_active = idomain_top_layer == 1.0
+        self._pkgcheck()
         self._create_mod_id()
 
     def _create_mod_id(self):
@@ -69,3 +72,16 @@ class NodeSvatMapping(Package):
         mod_id_1d = np.tile(np.arange(1, n_mod + 1), (n_subunit, 1))
 
         self.dataset["mod_id"].values[:, self.idomain_active.values] = mod_id_1d
+
+    def _pkgcheck(self):
+        # Check if active msw cell inactive in recharge
+        active = self.dataset["svat"] != 0
+        inactive_in_idomain = active > self.idomain_active
+
+        if inactive_in_idomain.any():
+            raise ValueError(
+                textwrap.dedent(
+                    """Active MetaSWAP cell detected in inactive cell in
+                     Modflow6 idomain"""
+                )
+            )
