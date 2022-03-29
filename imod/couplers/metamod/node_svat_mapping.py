@@ -27,9 +27,6 @@ class NodeSvatMapping(Package):
         Modflow 6 structured discretization
     """
 
-    # TODO: Package checks:
-    #   - Make sure "area==np.nan" and "idomain==0" in the same cells.
-
     _file_name = "nodenr2svat.dxc"
     _metadata_dict = {
         "mod_id": VariableMetaData(10, 1, 9999999, int),
