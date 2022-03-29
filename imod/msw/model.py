@@ -2,6 +2,7 @@ import collections
 import textwrap
 from copy import copy
 from pathlib import Path
+from typing import Union
 
 import jinja2
 import numpy as np
@@ -74,11 +75,6 @@ class Model(collections.UserDict):
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
-
-
-# TODO: add checks
-# 2. All landuse values in landuse grid, are they in the LandUse properties table?
-# 3. All vegetation_indices from landuse properties, do they have a AnnualCropGrowth index
 
 
 class MetaSwapModel(Model):
@@ -212,9 +208,9 @@ class MetaSwapModel(Model):
         if not optional_package:
             raise KeyError(f"Could not find package of type: {pkg_type}")
 
-    def write(self, directory):
+    def write(self, directory: Union[str, Path]):
         """
-        Write packages and simulation settings (PARA_SIM.INP).
+        Write packages and simulation settings (para_sim.inp).
 
         Parameters
         ----------

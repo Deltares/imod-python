@@ -1,6 +1,8 @@
 import abc
-import pathlib
+from pathlib import Path
+from typing import Union
 
+import numpy as np
 import pandas as pd
 import xarray as xr
 
@@ -79,8 +81,19 @@ class Package(abc.ABC):
 
         return self.write_dataframe_fixed_width(file, dataframe)
 
-    def write(self, directory, index, svat):
-        directory = pathlib.Path(directory)
+    def write(self, directory: Union[str, Path], index: np.array, svat: xr.DataArray):
+        """
+        Write mapping to .dxc file.
+
+        Parameters
+        ----------
+        directory: str or Path
+            directory in which exchange file should be written
+        index: np.array
+
+        """
+        # Force to Path
+        directory = Path(directory)
 
         filename = directory / self._file_name
         with open(filename, "w") as f:
