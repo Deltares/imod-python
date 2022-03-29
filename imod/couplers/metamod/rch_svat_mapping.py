@@ -5,6 +5,8 @@ from imod import mf6
 from imod.couplers.metamod.pkgbase import Package
 from imod.fixed_format import VariableMetaData
 
+import textwrap
+
 
 class RechargeSvatMapping(Package):
     """
@@ -25,8 +27,6 @@ class RechargeSvatMapping(Package):
         be provided as a 2D grid with a (y, x) dimension. Package will throw an
         error if a grid is provided with different dimensions.
     """
-
-    # TODO: Do we always want to couple to identical grids?
 
     _file_name = "rchindex2svat.dxc"
     _metadata_dict = {
@@ -69,8 +69,10 @@ class RechargeSvatMapping(Package):
         rch_dims = self.dataset["rch_active"].dims
         if rch_dims != ("y", "x"):
             raise ValueError(
-                f"""Recharge grid can only have dimensions ('y', 'x'). Got
-                 {rch_dims} instead"""
+                textwrap.dedent(
+                    f"""Recharge grid can only have dimensions ('y', 'x'). Got
+                     {rch_dims} instead"""
+                )
             )
 
         # Check if active msw cell inactive in recharge
@@ -79,6 +81,8 @@ class RechargeSvatMapping(Package):
 
         if inactive_in_rch.any():
             raise ValueError(
-                """Active MetaSWAP cell detected in inactive cell in Modflow6
-                recharge"""
+                textwrap.dedent(
+                    """Active MetaSWAP cell detected in inactive cell in
+                     Modflow6 recharge"""
+                )
             )

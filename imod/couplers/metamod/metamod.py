@@ -4,6 +4,8 @@ from imod.couplers.metamod.wel_svat_mapping import WellSvatMapping
 from imod.mf6 import Modflow6Simulation
 from imod.msw import GridData, MetaSwapModel, Sprinkling
 
+import textwrap
+
 
 class MetaMod:
     """
@@ -18,8 +20,6 @@ class MetaMod:
     """
 
     # TODO:
-    # - NodeSvatMapping: check with idomain if no coupling is done to inactive
-    #   cells.
     # - a toml file
 
     def __init__(self, msw_model: MetaSwapModel, mf6_simulation: Modflow6Simulation):
@@ -57,10 +57,13 @@ class MetaMod:
         grid_mapping = NodeSvatMapping(svat, dis)
         grid_mapping.write(directory, index, svat)
 
+        # FUTURE: Not necessary after iMOD Coupler refactoring
         if "rch_msw" not in gwf_model.keys():
             raise ValueError(
-                "No package named 'rch_msw' detected in Modflow 6 model. "
-                "iMOD_coupler requires a Recharge package with 'rch_msw' as name"
+                textwrap.dedent(
+                    "No package named 'rch_msw' detected in Modflow 6 model. "
+                    "iMOD_coupler requires a Recharge package with 'rch_msw' as name"
+                )
             )
 
         recharge = gwf_model["rch_msw"]
@@ -70,12 +73,15 @@ class MetaMod:
 
         sprinkling_key = self.msw_model._get_pkg_key(Sprinkling, optional_package=True)
 
+        # FUTURE: Not necessary after iMOD Coupler refactoring
         if (sprinkling_key is not None) and not ("wells_msw" in gwf_model.keys()):
             raise ValueError(
-                "No package named 'wells_msw' found in Modflow 6 model, "
-                "but Sprinkling package found in MetaSWAP. "
-                "iMOD Coupler requires a Well Package named 'wells_msw' "
-                "to couple wells."
+                textwrap.dedent(
+                    "No package named 'wells_msw' found in Modflow 6 model, "
+                    "but Sprinkling package found in MetaSWAP. "
+                    "iMOD Coupler requires a Well Package named 'wells_msw' "
+                    "to couple wells."
+                )
             )
         elif "wells_msw" in gwf_model.keys():
             well = gwf_model["wells_msw"]
