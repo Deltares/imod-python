@@ -445,7 +445,8 @@ leaf_area_index = soil_cover * 3
 # %%
 # Vegetation factors are used to convert the Makkink reference
 # evapotranspiration to a potential evapotranspiration for a certain vegetation
-# type.
+# type. We'll specify some simple crop schemes for the three crops as vegetation
+# factors.
 
 vegetation_names = ["grass", "maize", "potatoes"]
 
