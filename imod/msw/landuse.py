@@ -66,7 +66,7 @@ class LanduseOptions(Package):
 
     _metadata_dict = {
         "landuse_index": VariableMetaData(6, 1, 999, int),
-        "landuse_name": VariableMetaData(19, None, None, str),
+        "landuse_name": VariableMetaData(20, None, None, str),
         "vegetation_index": VariableMetaData(6, 0.0, 1e6, int),
         # Jarvis stress
         # Columns 33-35 and 36-38, but both F6?
