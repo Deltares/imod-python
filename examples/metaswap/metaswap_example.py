@@ -6,9 +6,10 @@ This example illustrates how to setup a simple MetaSWAP model coupled to a
 Modflow 6 model model using the ``imod`` package and associated packages.
 
 Overview of steps made:
-* Create Modflow 6 model
-* Create MetaSWAP model
-* Write coupled models
+
+    * Create Modflow 6 model
+    * Create MetaSWAP model
+    * Write coupled models
 
 """
 
@@ -527,7 +528,9 @@ metamod = couplers.MetaMod(msw_model=msw_model, mf6_simulation=simulation)
 
 # %%
 # By providing a few necessary paths to the modflow and metaswap libraries
-# for iMOD Coupler, we can write the coupled models.
+# for iMOD Coupler, we can write the coupled models. You can download the
+# modflow and metaswap libraries as part of the `the last iMOD5 release
+# <https://oss.deltares.nl/web/imod/download-imod5>`_
 
 metamod_dir = imod.util.temporary_directory()
 mf6_dll = "./path/to/mf6.dll"
@@ -540,5 +543,6 @@ metamod.write(metamod_dir, mf6_dll, metaswap_dll, metaswap_dll_dependency)
 # Running the models
 # ------------------
 #
-# In order to run the models, make sure you install ``imod_coupler``.
-# https://github.com/Deltares/imod_coupler
+# In order to run the models, make sure you install ``imod_coupler``. `You can
+# find the installation instructions here.
+# <https://github.com/Deltares/imod_coupler>`_
