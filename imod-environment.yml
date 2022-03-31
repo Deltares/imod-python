@@ -44,7 +44,7 @@ dependencies:
   - sphinx-gallery
   - toolz
   - tomli>=1.1.0
-  - tomli_w
+  - tomli-w
   - tqdm
   - twine
   - vtk>=9.0
