@@ -43,13 +43,16 @@ def test_write(
     surface_elevation,
     soil_physical_unit,
 ):
+    like = xr.DataArray(
+        np.ones((2, 2)), coords=dict(x=[1.0, 2.0], y=[1.0, 2.0]), dims=("y", "x")
+    )
     grid_data = GridData(
-        xr.DataArray(area).expand_dims(subunit=[0]),
-        xr.DataArray(landuse).expand_dims(subunit=[0]),
-        xr.DataArray(rootzone_depth).expand_dims(subunit=[0]),
-        xr.DataArray(surface_elevation),
-        xr.DataArray(soil_physical_unit),
-        xr.DataArray(True),
+        (like * area).expand_dims(subunit=[0]),
+        xr.full_like(like, landuse, dtype=int).expand_dims(subunit=[0]),
+        (like * rootzone_depth).expand_dims(subunit=[0]),
+        (like * surface_elevation),
+        (like * soil_physical_unit),
+        xr.full_like(like, True, dtype=bool),
     )
 
     index, svat = grid_data.generate_index_array()
