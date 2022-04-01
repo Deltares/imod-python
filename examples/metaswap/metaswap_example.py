@@ -13,10 +13,10 @@ Overview of steps made:
 
 """
 
-# sphinx_gallery_thumbnail_number = -1
-
 # %%
 # We'll start with the following imports:
+
+# sphinx_gallery_thumbnail_number = -1
 
 from imod import mf6, msw, couplers
 import imod

@@ -11,6 +11,8 @@ LanduseOptions (luse_svat.inp) or AnnualGrowthFactors (fact_svat.inp).
 We'll start with the usual imports:
 """
 
+# sphinx_gallery_thumbnail_number = -1
+
 import imod
 import pandas as pd
 import xarray as xr
