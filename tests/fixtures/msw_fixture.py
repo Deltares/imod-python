@@ -1,6 +1,7 @@
 import pytest
 
-
+# Seperate function from the one in fixed_format module. This one fails if not
+# able to read value for tests.
 @pytest.fixture(scope="session")
 def fixed_format_parser():
     def function(file, metadata_dict):
