@@ -293,7 +293,7 @@ def make_msw_model():
     msw_model["mod2svat"] = msw.CouplerMapping(modflow_dis=dis, well=well)
 
     # %% Output Control
-    msw_model["oc_idf"] = msw.IdfOutputControl(area, -9999.0)
+    msw_model["oc_idf"] = msw.IdfMapping(area, -9999.0)
     msw_model["oc_var"] = msw.VariableOutputControl()
     msw_model["oc_time"] = msw.TimeOutputControl(time=times)
 

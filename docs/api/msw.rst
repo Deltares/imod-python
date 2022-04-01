@@ -12,7 +12,7 @@ MetaSWAP
     ScalingFactors
     Sprinkling
 
-    IdfOutputControl
+    IdfMapping
     TimeOutputControl
     VariableOutputControl
 

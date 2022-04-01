@@ -493,7 +493,7 @@ msw_model["crop_factors"] = msw.AnnualCropFactors(
 # Output Control
 # ``````````````
 
-msw_model["oc_idf"] = msw.IdfOutputControl(area, -9999.0)
+msw_model["oc_idf"] = msw.IdfMapping(area, -9999.0)
 msw_model["oc_var"] = msw.VariableOutputControl()
 msw_model["oc_time"] = msw.TimeOutputControl(time=times)
 

@@ -7,7 +7,7 @@ import xarray as xr
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
-from imod.msw import IdfOutputControl, TimeOutputControl, VariableOutputControl
+from imod.msw import IdfMapping, TimeOutputControl, VariableOutputControl
 
 
 def grid():
@@ -97,14 +97,14 @@ def test_idf_oc_write_simple_model(fixed_format_parser):
     area, index, svat = grid()
     nodata = -9999.0
 
-    idf_output_control = IdfOutputControl(area, nodata)
+    idf_output_control = IdfMapping(area, nodata)
 
     with tempfile.TemporaryDirectory() as output_dir:
         output_dir = Path(output_dir)
         idf_output_control.write(output_dir, index, svat)
 
         results = fixed_format_parser(
-            output_dir / IdfOutputControl._file_name, IdfOutputControl._metadata_dict
+            output_dir / IdfMapping._file_name, IdfMapping._metadata_dict
         )
 
     assert_equal(results["svat"], np.array([1, 2, 3, 4, 5]))
@@ -118,7 +118,7 @@ def test_idf_oc_settings_simple_model():
     area, _, _ = grid()
     nodata = -9999.0
 
-    idf_output_control = IdfOutputControl(area, nodata)
+    idf_output_control = IdfMapping(area, nodata)
 
     expected = dict(
         simgro_opt=-1,

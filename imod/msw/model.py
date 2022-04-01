@@ -9,6 +9,7 @@ import numpy as np
 
 from imod.msw.coupler_mapping import CouplerMapping
 from imod.msw.grid_data import GridData
+from imod.msw.idf_mapping import IdfMapping
 from imod.msw.infiltration import Infiltration
 from imod.msw.initial_conditions import (
     InitialConditionsEquilibrium,
@@ -19,7 +20,7 @@ from imod.msw.initial_conditions import (
 from imod.msw.landuse import LanduseOptions
 from imod.msw.meteo_grid import MeteoGrid
 from imod.msw.meteo_mapping import EvapotranspirationMapping, PrecipitationMapping
-from imod.msw.output_control import IdfOutputControl, TimeOutputControl
+from imod.msw.output_control import TimeOutputControl
 from imod.msw.pkgbase import Package
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.vegetation import AnnualCropFactors
@@ -32,7 +33,7 @@ REQUIRED_PACKAGES = [
     MeteoGrid,
     EvapotranspirationMapping,
     PrecipitationMapping,
-    IdfOutputControl,
+    IdfMapping,
     TimeOutputControl,
     AnnualCropFactors,
 ]
@@ -233,8 +234,8 @@ class MetaSwapModel(Model):
         self.simulation_settings["iybg"] = year
         self.simulation_settings["tdbg"] = time_since_start_year
 
-        # Add IdfOutputControl settings
-        idf_key = self._get_pkg_key(IdfOutputControl)
+        # Add IdfMapping settings
+        idf_key = self._get_pkg_key(IdfMapping)
         self.simulation_settings.update(self[idf_key].get_output_settings())
 
         filename = directory / self._file_name
