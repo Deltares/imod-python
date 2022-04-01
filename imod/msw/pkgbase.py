@@ -1,4 +1,5 @@
 import abc
+import textwrap
 from pathlib import Path
 from typing import Union
 
@@ -7,8 +8,6 @@ import pandas as pd
 import xarray as xr
 
 from imod.fixed_format import format_fixed_width
-
-import textwrap
 
 
 class Package(abc.ABC):
