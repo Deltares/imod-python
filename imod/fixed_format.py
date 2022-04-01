@@ -1,10 +1,10 @@
+import warnings
 from dataclasses import dataclass
 from numbers import Number
-from typing import Dict, Union
 from pathlib import Path
+from typing import Dict, Union
 
 import numpy as np
-import warnings
 
 
 @dataclass

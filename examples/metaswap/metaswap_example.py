@@ -18,11 +18,12 @@ Overview of steps made:
 
 # sphinx_gallery_thumbnail_number = -1
 
-from imod import mf6, msw, couplers
-import imod
 import numpy as np
-import xarray as xr
 import pandas as pd
+import xarray as xr
+
+import imod
+from imod import couplers, mf6, msw
 
 # %%
 # Modflow 6 model
