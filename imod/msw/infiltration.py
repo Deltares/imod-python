@@ -65,3 +65,5 @@ class Infiltration(Package):
         self.dataset["upward_resistance"] = upward_resistance
         self.dataset["bottom_resistance"] = bottom_resistance
         self.dataset["extra_storage_coefficient"] = extra_storage_coefficient
+
+        self._pkgcheck()

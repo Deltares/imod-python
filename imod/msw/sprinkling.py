@@ -61,6 +61,8 @@ class Sprinkling(Package):
         self.dataset["max_abstraction_surfacewater_m3_d"] = max_abstraction_surfacewater
         self.well = well
 
+        self._pkgcheck()
+
     def _render(self, file, index, svat):
         well_row = self.well["row"] - 1
         well_column = self.well["column"] - 1

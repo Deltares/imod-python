@@ -70,3 +70,5 @@ class ScalingFactors(Package):
         self.dataset["scale_hydraulic_conductivity"] = scale_hydraulic_conductivity
         self.dataset["scale_pressure_head"] = scale_pressure_head
         self.dataset["depth_perched_water_table"] = depth_perched_water_table
+
+        self._pkgcheck()

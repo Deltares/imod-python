@@ -1,4 +1,5 @@
 import csv
+import textwrap
 from pathlib import Path
 from typing import Optional, Union
 
@@ -172,5 +173,19 @@ class MeteoGrid(Package):
 
     def _pkgcheck(self):
         for varname in self.dataset.data_vars:
-            if "time" not in self.dataset[varname].coords:
-                raise ValueError(f"No time coordinate included in {varname}")
+            coords = self.dataset[varname].coords
+            if "time" not in coords:
+                raise ValueError(f"No 'time' coordinate included in {varname}")
+
+            allowed_dims = ["time", "y", "x"]
+
+            excess_dims = set(self.dataset[varname].dims) - set(allowed_dims)
+            if len(excess_dims) > 0:
+                raise ValueError(
+                    textwrap.dedent(
+                        f"""
+                        Received excess dims {excess_dims} in {self.__class__} for
+                        {varname}, please provide data with {allowed_dims}
+                        """
+                    )
+                )

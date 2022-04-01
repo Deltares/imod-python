@@ -8,6 +8,8 @@ import xarray as xr
 
 from imod.fixed_format import format_fixed_width
 
+import textwrap
+
 
 class Package(abc.ABC):
     """
@@ -93,3 +95,21 @@ class Package(abc.ABC):
         self._check_range(dataframe)
 
         return self.write_dataframe_fixed_width(file, dataframe)
+
+    def _pkgcheck(self):
+        for var in self._with_subunit:
+            if "subunit" not in self.dataset[var].coords:
+                raise ValueError(
+                    textwrap.dedent(
+                        f"""Variable '{var}' in {self.__class__} should contain
+                         'subunit' coordinate"""
+                    )
+                )
+        for var in self._without_subunit:
+            if "subunit" in self.dataset[var].coords:
+                raise ValueError(
+                    textwrap.dedent(
+                        f"""Variable '{var}' in {self.__class__} should not
+                         contain 'subunit' coordinate"""
+                    )
+                )

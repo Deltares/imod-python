@@ -4,6 +4,10 @@ import xarray as xr
 from imod.fixed_format import VariableMetaData
 from imod.msw.pkgbase import Package
 
+from imod.util import spatial_reference
+
+import warnings
+
 
 class GridData(Package):
     """
@@ -66,6 +70,8 @@ class GridData(Package):
         self.dataset["soil_physical_unit"] = soil_physical_unit
         self.dataset["active"] = active
 
+        self._pkgcheck()
+
     def generate_index_array(self):
         """
         Generate index arrays to be used on other packages
@@ -81,3 +87,24 @@ class GridData(Package):
         svat.values[isactive.values] = np.arange(1, index.sum() + 1)
 
         return index, svat
+
+    def _pkgcheck(self):
+        super()._pkgcheck()
+
+        dx, _, _, dy, _, _ = spatial_reference(self.dataset)
+
+        active = self.dataset["active"]
+
+        cell_area = active.astype(float) * dx * abs(dy)
+        total_area = self.dataset["area"].sum(dim="subunit")
+
+        unequal_area = (total_area != cell_area).values[active.values]
+
+        # Apparently all regional models intentionally provided area grids
+        # unequal to the cell area, to allow surface waters as workaround. Still
+        # useful to provide a UserWarning for this.
+        if np.any(unequal_area):
+            warnings.warn(
+                """Provided area grid with total areas unequal to cell area""",
+                UserWarning,
+            )

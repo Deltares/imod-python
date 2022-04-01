@@ -66,6 +66,8 @@ class CouplerMapping(Package):
 
     def _render(self, file, index, svat):
         self._create_mod_id_rch(svat)
+        # package check only possible after calling _create_mod_id_rch
+        self._pkgcheck()
 
         data_dict = {"svat": svat.values.ravel()[index]}
 

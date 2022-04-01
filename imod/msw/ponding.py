@@ -45,6 +45,8 @@ class Ponding(Package):
         self.dataset["runon_resistance"] = runon_resistance
         self.dataset["runoff_resistance"] = runoff_resistance
 
+        self._pkgcheck()
+
     def _render(self, file, index, svat):
         data_dict = {"svat": svat.values.ravel()[index]}
 
