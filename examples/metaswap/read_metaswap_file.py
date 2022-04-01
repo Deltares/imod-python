@@ -122,10 +122,24 @@ ds
 
 ds["albedo"]
 
-# %% 
+# %%
 # We use some basic xarray plotting functionality to get a general idea of
 # data for each landuse index
 
 xticks = ds.coords["landuse_index"]
 
 ds["feddes_p3h"].plot.step(where="mid", xticks=xticks)
+
+# %%
+# It is better to plot ordinal data on a bar chart. So in this case, we can
+# use matplotlib's bar function.
+#
+import matplotlib.pyplot as plt
+
+plt.bar(xticks, ds["feddes_p3h"].values)
+plt.xticks(xticks)
+plt.xlabel("landuse_index")
+plt.ylabel("feddes_p3h")
+
+
+# %%
