@@ -6,6 +6,8 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
+from .read_input import get_function_kwargnames, read_blockfile
+
 
 def dis_recarr(arrdict, layer, notnull):
     # Define the numpy structured array dtype
@@ -524,6 +526,33 @@ class BoundaryCondition(Package, abc.ABC):
             pkgname=pkgname,
             binary=binary,
         )
+
+    @classmethod
+    def open(cls, path, simroot, shape, coords, dims, globaltimes):
+        content = read_blockfile(
+            simroot / path,
+            simroot,
+            fields=cls._period_data,
+            shape=shape,
+            dims=dims,
+        )
+
+        period_index = content.pop("period_index")
+        period_data = content.pop("period_data")
+        coords = coords.copy()
+        coords["time"] = globaltimes[period_index]
+        dims = ("time",) + dims
+
+        for field, data in period_data.items():
+            content[field] = xr.DataArray(data, coords, dims)
+
+        filtered_content = {
+            k: v
+            for k, v in content.items()
+            if k in get_function_kwargnames(cls.__init__)
+        }
+
+        return cls(**filtered_content)
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):

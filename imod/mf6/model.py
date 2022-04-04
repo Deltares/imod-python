@@ -1,11 +1,15 @@
 import collections
 import pathlib
+from typing import Dict, Type, Union
 
 import cftime
 import jinja2
 import numpy as np
 
+from imod import mf6
 from imod.mf6 import qgs_util
+
+from .read_input import read_gwf_namefile
 
 
 class Model(collections.UserDict):
@@ -24,6 +28,31 @@ class GroundwaterFlowModel(Model):
     """
 
     _pkg_id = "model"
+
+    @staticmethod
+    def _PACKAGE_CLASSES() -> Dict[str, Type]:
+        return {
+            package._pkg_id: package
+            for package in (
+                mf6.ConstantHead,
+                mf6.StructuredDiscretization,
+                mf6.VerticesDiscretization,
+                mf6.Drainage,
+                mf6.Evapotranspiration,
+                mf6.GeneralHeadBoundary,
+                mf6.InitialConditions,
+                mf6.Solution,
+                mf6.NodePropertyFlow,
+                mf6.OutputControl,
+                mf6.Recharge,
+                mf6.River,
+                mf6.SpecificStorage,
+                mf6.Storage,
+                mf6.StorageCoefficient,
+                mf6.WellDisStructured,
+                mf6.WellDisVertices,
+            )
+        }
 
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -108,6 +137,76 @@ class GroundwaterFlowModel(Model):
             packages.append((key, path.as_posix(), pkgname))
         d["packages"] = packages
         return self._template.render(d)
+
+    @classmethod
+    def open(
+        cls,
+        path: Union[pathlib.Path, str],
+        simroot: pathlib.Path,
+        globaltimes: np.ndarray,
+    ):
+        content = read_gwf_namefile(simroot / path)
+        model = cls(**content)
+
+        # Search for the DIS/DISV/DISU package first. This provides us with
+        # the coordinates and dimensions to instantiate the other packages.
+        classes = cls._PACKAGE_CLASSES()
+        dis_packages = [
+            tup for tup in content["packages"] if tup[0] in ("dis6", "disv6", "disu6")
+        ]
+        packages = [
+            tup
+            for tup in content["packages"]
+            if tup[0] not in ("dis6", "disv6", "disu6")
+        ]
+
+        if len(dis_packages) > 1:
+            raise ValueError(f"More than one DIS/DISV/DISU package in {path}")
+
+        disftype, disfname, dispname = dis_packages[0]
+        diskey = disftype[:-1]
+        package = classes[diskey]
+        if dispname is None:
+            disname = diskey
+
+        dis_package = package.open(
+            disfname,
+            simroot,
+        )
+        model[disname] = dis_package
+        shape = dis_package["idomain"].shape
+        coords = dis_package["idomain"].coords
+        dims = dis_package["idomain"].dims
+
+        # Now read the rest of the packages.
+        seen = set()
+        for i, (ftype, fname, pname) in packages:
+
+            key = ftype[:-1]  # Remove the last number (riv6 -> riv).
+            package = classes[key]
+
+            # Fill in a name if none is given.
+            if pname is None:
+                pname = key
+
+            # Ensure a unique name is generated.
+            if pname in seen:
+                pkgname = f"{pname}_{i+1}"
+            else:
+                pkgname = pname
+            seen.add(pkgname)
+
+            # Create the package and add it to the model.
+            model[pkgname] = package.open(
+                fname,
+                simroot,
+                shape,
+                coords,
+                dims,
+                globaltimes,
+            )
+
+        return model
 
     def write(self, directory, modelname, globaltimes, binary=True):
         """

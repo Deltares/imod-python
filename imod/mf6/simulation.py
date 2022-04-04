@@ -1,12 +1,15 @@
 import collections
 import pathlib
 import subprocess
+from typing import Union
 
 import jinja2
 import numpy as np
 import xarray as xr
 
 import imod
+
+from .read_input import read_sim_namefile, read_tdis, tdis_time
 
 
 class Modflow6Simulation(collections.UserDict):
@@ -92,6 +95,39 @@ class Modflow6Simulation(collections.UserDict):
             raise ValueError("No numerical solution")
         d["solutiongroups"] = [[("ims6", f"{solvername}.ims", modelnames)]]
         return self._template.render(d)
+
+    @classmethod
+    def open(cls, path: Union[str, pathlib.Path]):
+        simroot = pathlib.Path(path)
+        name = simroot.stem
+        content = read_sim_namefile(path)
+
+        # Get the times from the time discretization file.
+        tdis_path = content["tdis6"]
+        tdis = read_tdis(tdis_path)
+        globaltimes = tdis_time(tdis)
+
+        # Initialize the simulation
+        simulation = cls(name=name, **content)
+
+        # Collect the models
+        MODEL_CLASSES = {
+            "gwf6": imod.mf6.GroundwaterFlowModel,
+        }
+        models = {}
+        for i, (ftype, fname, pname) in enumerate(content["models"]):
+            if pname is None:
+                modelname = f"{ftype}_{i+1}"
+            # Check for duplicate entry
+            elif pname in models:
+                modelname = f"{pname}_{i+1}"
+            else:
+                modelname = pname
+
+            _class = MODEL_CLASSES[ftype]
+            simulation[modelname] = _class.open(fname, simroot, globaltimes)
+
+        return simulation
 
     def write(self, directory=".", binary=True):
         # Check models for required content
