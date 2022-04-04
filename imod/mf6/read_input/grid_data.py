@@ -17,27 +17,54 @@ from .common import (
 )
 
 
-def advance_to_griddata_section(f: IO[str], section: str) -> None:
+def advance_to_griddata_section(f: IO[str]) -> Tuple[str, bool]:
     line = None
-    # Empty line is end-of-file
+    # Empty line is end-of-file.
+    # Should always exit early in while loop, err otherwise.
     while not end_of_file(line):
         line = f.readline()
         stripped = strip_line(line)
-        # Return if start has been found
-        if stripped == section:
-            return False
-        elif stripped == f"{section} layered":
-            return True
-        # Continue if line is empty
-        elif stripped == "":
+        if stripped == "":
             continue
-        # Raise if the line has (unexpected) content
+        elif "end" in stripped:
+            return None, False
+        elif "layered" in stripped:
+            layered = True
+            section = stripped.split()[0]
+            return section, layered
         else:
-            break
-    raise ValueError(f'"{section}" is not present in file {f.name}')
+            layered = False
+            section = stripped
+            return section, layered
+    raise ValueError(f"No end of griddata specified in {f.name}")
 
 
 def shape_to_max_rows(shape: Tuple[int], layered: bool) -> int:
+    """
+    Compute the number of rows to read in case the data is internal. In case
+    of DIS, the number of (table) rows equals the number of layers times the
+    number of (model) rows; a single row then contains ncolumn values.
+
+    A DISV does not have rows and columns, the number of rows is equal to the
+    number of layers.
+
+    In case of LAYERED, each layer is written on a separate row.
+
+    In case of DISU, all values are written one a single row, and LAYERED input
+    is not allowed.
+
+    Parameters
+    ----------
+    shape: Tuple[int]
+    layered: bool
+
+    Parameters
+    ----------
+    max_rows: int
+        Reduced number if layered is True.
+    read_shape: Tuple[int]
+        First dimension removed if layered is True.
+    """
     ndim = len(shape)
     if ndim == 3:
         nlayer, nrow, _ = shape
@@ -99,12 +126,22 @@ def read_array(
     """
     MODFLOW6 READARRAY functionality for grid data.
 
+    External files are lazily read using dask, constants are lazily allocated,
+    and internal values are eagerly read and then converted to dask arrays for
+    consistency.
+
     Parameters
     ----------
+    f: IO[str]
+    simroot: Path
+    dtype: type
+    max_rows: int
+        Number of rows to read in case of internal data values.
+    shape: Tuple[int]
 
     Returns
     -------
-    array: dask.array.Array
+    array: dask.array.Array of size ``shape``
     """
     firstline = f.readline()
     stripped = strip_line(firstline)
@@ -146,8 +183,9 @@ def read_griddata(
     """
     Read GRID DATA section.
 
-    Constants are lazily allocated; external files are lazily read.  Internal
-    arrays are eagerly read, but converted to a dask array for consistency.
+    External files are lazily read using dask, constants are lazily allocated,
+    and internal values are eagerly read and then converted to dask arrays for
+    consistency.
 
     Parameters
     ----------
@@ -165,12 +203,19 @@ def read_griddata(
 
     Returns
     -------
-    variables: Dict[str, xr.DataArray]
+    variables: Dict[str, dask.array.Array]
     """
     content = {}
-    for section, (dtype, compute_max_rows) in sections.items():
-        try:
-            layered = advance_to_griddata_section(f, section)
+    try:
+        section, layered = advance_to_griddata_section(f)
+        while section is not None:
+            try:
+                dtype, compute_max_rows = sections[section]
+            except KeyError:
+                raise ValueError(
+                    f"Unexpected section: {section}. "
+                    f"Expected one of: {', '.join(sections.keys())}"
+                )
             max_rows, read_shape = compute_max_rows(shape, layered)
             kwargs = {
                 "f": f,
@@ -191,7 +236,10 @@ def read_griddata(
 
             content[section] = data
 
-        except Exception as e:
-            raise type(e)(f"{e}\n Error reading {section} in {f.name}") from e
+            # Advance to next section
+            section, layered = advance_to_griddata_section(f)
+
+    except Exception as e:
+        raise type(e)(f"{e}\n Error reading {f.name}") from e
 
     return content

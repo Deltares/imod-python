@@ -98,7 +98,7 @@ class Modflow6Simulation(collections.UserDict):
 
     @classmethod
     def open(cls, path: Union[str, pathlib.Path]):
-        simroot = pathlib.Path(path)
+        simroot = pathlib.Path(path).parent
         name = simroot.stem
         content = read_sim_namefile(path)
 
@@ -108,7 +108,7 @@ class Modflow6Simulation(collections.UserDict):
         globaltimes = tdis_time(tdis)
 
         # Initialize the simulation
-        simulation = cls(name=name, **content)
+        simulation = cls(name=name)
 
         # Collect the models
         MODEL_CLASSES = {

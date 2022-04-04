@@ -70,7 +70,25 @@ def read_listinput(
     max_rows: int,
 ) -> List[dask.array.Array]:
     """
-    MODFLOW6 list input functionality.
+    MODFLOW6 list input reading functionality.
+
+    MODFLOW6 list input is "sparse": it consists of a cell id and a number of
+    values. Depending on whether the model is discretized according to DIS,
+    DISV, or DISU; this cell id may be a tuple of size 3, 2, or 1.
+
+    Parameters
+    ----------
+    f: IO[str]
+        File handle.
+    simroot: Path
+        Root path of simulation. Used for reading external files.
+    dtype: type
+
+    index_columns: Tuple[str]
+    fields: Tuple[str]
+    shape: Tuple[int]
+    max_rows: int
+
     """
     # Store position so week can move back in the file if data is stored
     # internally.

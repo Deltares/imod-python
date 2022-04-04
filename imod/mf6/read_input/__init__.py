@@ -63,7 +63,7 @@ def parse_package(stripped: str, fname: str) -> Tuple[str, str, str]:
     nwords = len(separated)
     if nwords == 2:
         ftype, fname = separated
-        pname = ftype
+        pname = ftype[:-1]  # split the number, e.g. riv6 -> riv
     elif nwords == 3:
         ftype, fname, pname = separated
     else:
@@ -129,6 +129,10 @@ def read_dis_blockfile(path: Path, simroot: Path) -> Dict[str, Any]:
 
 
 def tdis_time(tdis: Dict[str, Any]) -> np.ndarray:
+    """
+    Use start_date, time_units, and period duration to create datetime
+    timestaps for the stress periods.
+    """
     # https://numpy.org/doc/stable/reference/arrays.datetime.html#datetime-units
     TIME_UNITS = {
         "unknown": None,
@@ -138,7 +142,7 @@ def tdis_time(tdis: Dict[str, Any]) -> np.ndarray:
         "days": "D",
         "years": "Y",
     }
-    unit = TIME_UNITS.get(tdis["units"])
+    unit = TIME_UNITS.get(tdis["time_units"])
 
     start = None
     if "start_date_time" in tdis:
@@ -153,14 +157,14 @@ def tdis_time(tdis: Dict[str, Any]) -> np.ndarray:
         times = np.full(timedelta.size, start)
         times[1:] += timedelta[:-1]
     else:
-        possibilities = ",".join(list(TIME_UNITS.keys())[1:])
+        possibilities = ", ".join(list(TIME_UNITS.keys())[1:])
         warnings.warn(
-            "Cannot convert time coordinate to datetime. "
-            "Falling back to (unitless) floating point time coordinate. "
+            "Cannot convert time coordinate to datetime."
+            "Falling back to (unitless) floating point time coordinate.\n"
             f"time_units should be one of: {possibilities}; "
             "start_date_time should be according to ISO 8601."
         )
-        times = np.full(timedelta.size, 0.0)
+        times = np.full(cumulative_length.size, 0.0)
         times[1:] += cumulative_length[:-1]
 
     return times
@@ -201,6 +205,44 @@ def read_gwf_namefile(path: Path) -> Dict[str, Any]:
     return content
 
 
+def read_blockfile(
+    path: Path,
+    simroot: Path,
+    sections: Dict[str, Tuple[type, Callable]],
+    shape: Tuple[int],
+) -> Dict[str, Any]:
+    """
+    Read blockfile of a "standard" MODFLOW6 package: NPF, IC, etc.
+
+    External files are lazily read using dask, constants are lazily allocated,
+    and internal values are eagerly read and then converted to dask arrays for
+    consistency.
+
+    Parameters
+    ----------
+    path: Path
+    simroot: Path
+        Root path of the simulation, used for reading external files.
+    sections: Dict[str, Tuple[type, Callable]]
+        Contains for every array entry its type, and a function to compute from
+        shape the number of rows to read in case of internal values.
+    shape: Tuple[int]
+        DIS: 3-sized, DISV: 2-sized, DISU: 1-sized.
+
+    Returns
+    -------
+    content: Dict[str, Any]
+        Content of the block file. Grid data arrays are stored as dask arrays.
+    """
+    with open(path, "r") as f:
+        advance_to_header(f, "options")
+        content = read_key_value_block(f, parse_option)
+        advance_to_header(f, "griddata")
+        content["griddata"] = read_griddata(f, simroot, sections, shape)
+
+    return content
+
+
 def read_package_periods(
     f: IO[str],
     simroot: Path,
@@ -214,11 +256,30 @@ def read_package_periods(
     Read blockfile periods section of a "standard" MODFLOW6 package: RIV, DRN,
     GHB, etc.
 
+    External files are lazily read using dask and internal values are eagerly
+    read and then converted to dask arrays for consistency.
+
     Parameters
     ----------
     f: IO[str]
         File handle.
     simroot:
+        Root path of the simulation, used for reading external files.
+    dtype: dtype
+        Generally a numpy structured dtype.
+    fields: List[str]
+        The fields (generally np.float64) of the dtype.
+    index_columns: List[str]
+        The index columns (np.int32) of the dtype.
+    max_rows: int
+        Number of rows to read in case of internal values.
+    shape: Tuple[int]
+        DIS: 3-sized, DISV: 2-sized, DISU: 1-sized.
+
+    Returns
+    -------
+    period_index: np.ndarray of integers
+    variable_values: Dict[str, dask.array.Array]
     """
     periods = []
     dask_lists = defaultdict(list)
@@ -249,20 +310,37 @@ def read_package_periods(
         field: dask.array.stack(dask_list, axis=0)
         for field, dask_list in dask_lists.items()
     }
-    return periods, variable_values
+    return np.array(periods) - 1, variable_values
 
 
-def read_blockfile(
+def read_boundary_blockfile(
     path: Path,
     simroot: Path,
     fields: Tuple[str],
     shape: Tuple[int],
-    dims: Tuple[str],
 ) -> Dict[str, Any]:
     """
-    Read blockfile of a "standard" MODFLOW6 package: RIV, DRN, GHB, etc.
+    Read blockfile of a "standard" MODFLOW6 boundary condition package: RIV,
+    DRN, GHB, etc.
+
+    External files are lazily read using dask and internal values are eagerly
+    read and then converted to dask arrays for consistency.
+
+    Parameters
+    ----------
+    path: Path
+    simroot: Path
+        Root path of the simulation, used for reading external files.
+    fields: List[str]
+        The fields (generally np.float64) of the dtype.
+    shape: Tuple[int]
+        DIS: 3-sized, DISV: 2-sized, DISU: 1-sized.
+
+    Returns
+    -------
+    content: Dict[str, Any]
     """
-    ndim = len(dims)
+    ndim = len(shape)
     index_columns = {
         1: ("node",),
         2: ("layer", "cell2d"),
@@ -294,5 +372,53 @@ def read_blockfile(
     return content
 
 
-def get_function_kwargnames(f: Callable) -> List[str]:
-    return inspect.getfullargspec(f).args
+def read_sto_blockfile(
+    path: Path,
+    simroot: Path,
+    sections: Dict[str, Tuple[type, Callable]],
+    shape: Tuple[int],
+) -> Dict[str, Any]:
+    """
+    Read blockfile of MODFLOW6 Storage package.
+
+    Parameters
+    ----------
+    path: Path
+    simroot: Path
+        Root path of the simulation, used for reading external files.
+    sections: Dict[str, Tuple[type, Callable]]
+        Contains for every array entry its type, and a function to compute from
+        shape the number of rows to read in case of internal values.
+    shape: Tuple[int]
+        DIS: 3-sized, DISV: 2-sized, DISU: 1-sized.
+
+    Returns
+    -------
+    content: Dict[str, Any]
+        Content of the block file. Grid data arrays are stored as dask arrays.
+    """
+    with open(path, "r") as f:
+        advance_to_header(f, "options")
+        content = read_key_value_block(f, parse_option)
+        advance_to_header(f, "griddata")
+        content["griddata"] = read_griddata(f, simroot, sections, shape)
+
+        periods = {}
+        key = advance_to_period(f)
+        while key is not None:
+            entry = read_key_value_block(f, parse_option)
+            value = next(iter(entry.keys()))
+            if value == "steady-state":
+                value = False
+            elif value == "transient":
+                value = True
+            else:
+                raise ValueError(
+                    f'Expected "steady-state" or "transient". Received: {value}'
+                )
+            periods[key] = value
+            key = advance_to_period(f)
+
+        content["periods"] = periods
+
+    return content

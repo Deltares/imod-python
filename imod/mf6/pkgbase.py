@@ -1,12 +1,14 @@
 import abc
+import inspect
 import pathlib
+from typing import Any, Dict
 
 import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
 
-from .read_input import get_function_kwargnames, read_blockfile
+from .read_input import read_blockfile, read_boundary_blockfile, shape_to_max_rows
 
 
 def dis_recarr(arrdict, layer, notnull):
@@ -352,6 +354,51 @@ class Package(abc.ABC):
                             path = pkgdirectory / f"{key}.dat"
                             self.write_text_griddata(path, da, dtype)
 
+    @classmethod
+    def filter_and_rename(cls, content: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Filter content for keywords that are required by the ``__init__`` function
+        of a class.
+
+        Rename keywords to the expected form for the class, as given by
+        ``_keyword_map``.
+
+        Arguments
+        ---------
+        init: Callable
+            __init__ of the
+        """
+        inverse_keywords = {v: k for k, v in cls._keyword_map.items()}
+        init_kwargs = inspect.getfullargspec(cls.__init__).args
+
+        filtered = {}
+        for key, value in content.items():
+            newkey = inverse_keywords.get(key, key)
+            if newkey in init_kwargs:
+                filtered[newkey] = value
+
+        return filtered
+
+    @classmethod
+    def open(cls, path, simroot, shape, coords, dims, globaltimes):
+        sections = {
+            cls._keyword_map.get(field, field): (dtype, shape_to_max_rows)
+            for field, dtype in cls._grid_data.items()
+        }
+        content = read_blockfile(
+            simroot / path,
+            simroot=simroot,
+            sections=sections,
+            shape=shape,
+        )
+
+        griddata = content.pop("griddata")
+        for field, data in griddata.items():
+            content[field] = xr.DataArray(data, coords, dims)
+
+        filtered_content = cls.filter_and_rename(content)
+        return cls(**filtered_content)
+
     def _netcdf_path(self, directory, pkgname):
         """create path for netcdf, this function is also used to create paths to use inside the qgis projectfiles"""
         return directory / pkgname / f"{self._pkg_id}.nc"
@@ -529,12 +576,11 @@ class BoundaryCondition(Package, abc.ABC):
 
     @classmethod
     def open(cls, path, simroot, shape, coords, dims, globaltimes):
-        content = read_blockfile(
+        content = read_boundary_blockfile(
             simroot / path,
             simroot,
             fields=cls._period_data,
             shape=shape,
-            dims=dims,
         )
 
         period_index = content.pop("period_index")
@@ -546,12 +592,7 @@ class BoundaryCondition(Package, abc.ABC):
         for field, data in period_data.items():
             content[field] = xr.DataArray(data, coords, dims)
 
-        filtered_content = {
-            k: v
-            for k, v in content.items()
-            if k in get_function_kwargnames(cls.__init__)
-        }
-
+        filtered_content = cls.filter_and_rename(content)
         return cls(**filtered_content)
 
 
