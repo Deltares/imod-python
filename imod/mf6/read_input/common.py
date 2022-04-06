@@ -17,15 +17,37 @@ def strip_line(line: str) -> str:
     return before.strip().lower()
 
 
-def find_entry(line: str, entry: str, type: type) -> str:
+def flatten(iterable: Any) -> List[Any]:
+    out = []
+    for part in iterable:
+        out.extend(part)
+    return out
+
+
+def split_line(line: str) -> List[str]:
+    # Maybe check: https://stackoverflow.com/questions/36165050/python-equivalent-of-fortran-list-directed-input
+    # Split on comma and whitespace, like a FORTRAN read would do.
+    return flatten([part.split(",") for part in line.split()])
+
+
+def to_float(string: str) -> float:
+    # Fortran float may contain d (e.g. 1.0d0), Python only accepts e.
+    string = string.replace("d", "e")
+    # Fortran may specify exponents without a letter, e.g. 1.0+1 for 1.0e+1
+    if "e" not in string:
+        string = string[0] + string.replace("+", "e+").replace("-", "e-")
+    return float(string)
+
+
+def find_entry(line: str, entry: str, cast: Callable) -> str:
     if entry not in line:
         return None
     else:
         _, after = line.split(entry)
-        return type(after.split()[0])
+        return cast(after.split()[0])
 
 
-def read_internal(f: IO[str], max_rows: int, dtype: type) -> np.ndarray:
+def read_internal(f: IO[str], dtype: type, max_rows: int) -> np.ndarray:
     return np.loadtxt(
         fname=f,
         dtype=dtype,
@@ -33,19 +55,66 @@ def read_internal(f: IO[str], max_rows: int, dtype: type) -> np.ndarray:
     )
 
 
-def read_external_binaryfile(path: Path, dtype: type) -> np.ndarray:
+def read_external_binaryfile(path: Path, dtype: type, max_rows: int) -> np.ndarray:
     return np.fromfile(
         file=path,
         dtype=dtype,
+        count=max_rows,
         sep="",
     )
 
 
-def read_external_textfile(path: Path, dtype: type) -> np.ndarray:
-    return np.loadtxt(
-        fname=path,
-        dtype=dtype,
-    )
+def read_fortran_deflated_text_array(
+    path: Path, dtype: type, max_rows: int
+) -> np.ndarray:
+    """
+    The Fortran read intrinsic is capable of parsing arrays in many forms.
+    One of those is:
+
+        1.0
+        2*2.0
+        3.0
+
+    Which should be interpreted as: [1.0, 2.0, 2.0, 3.0]
+
+    This function attempts this.
+    """
+    out = np.empty(max_rows, dtype)
+    with open(path, "r") as f:
+        lines = [line.strip() for line in f]
+
+    iterable_lines = iter(lines)
+    start = 0
+    while start < max_rows:
+
+        line = next(iterable_lines)
+        if "*" in line:
+            n, value = line.split("*")
+            n = int(n)
+            value = dtype(value)
+        else:
+            n = 1
+            value = dtype(line)
+
+        end = start + n
+        out[start:end] = value
+        start = end
+
+    return out
+
+
+def read_external_textfile(path: Path, dtype: type, max_rows: int) -> np.ndarray:
+    try:
+        return np.loadtxt(
+            fname=path,
+            dtype=dtype,
+            max_rows=max_rows,
+        )
+    except ValueError as e:
+        if str(e).startswith("could not convert string to float"):
+            return read_fortran_deflated_text_array(path, dtype, max_rows)
+        else:
+            raise e
 
 
 def advance_to_header(f: IO[str], section) -> None:
@@ -54,7 +123,7 @@ def advance_to_header(f: IO[str], section) -> None:
     # Empty line is end-of-file
     while not end_of_file(line):
         line = f.readline()
-        stripped = line.strip().lower()
+        stripped = strip_line(line)
         # Return if start has been found
         if stripped == start:
             return
@@ -111,19 +180,19 @@ def read_iterable_block(f: IO[str], parse: Callable) -> List[Any]:
     raise ValueError(f'"end" of block is not present in file {fname}')
 
 
-def parse_option(stripped: str, fname: str) -> Tuple[str, str]:
+def parse_option(stripped: str, fname: str) -> Tuple[str, Any]:
     separated = stripped.split()
     nwords = len(separated)
-    if nwords == 1:
+    if nwords == 0:
+        raise ValueError(f"Cannot parse {stripped} in {fname}")
+    elif nwords == 1:
         key = separated[0]
         value = True
     elif nwords == 2:
         key, value = separated
     else:
-        raise ValueError(
-            "More than two words found in block:"
-            f"{','.join(separated)} in file {fname}"
-        )
+        key = separated[0]
+        value = separated[1:]
     return key, value
 
 

@@ -1,11 +1,10 @@
 """
 Utilities for reading MODFLOW6 input files.
 """
-import inspect
 import warnings
 from collections import defaultdict
 from pathlib import Path
-from typing import IO, Any, Callable, Dict, List, Tuple
+from typing import IO, Any, Callable, Dict, List, Tuple, Union
 
 import dask.array
 import numpy as np
@@ -17,13 +16,16 @@ from .common import (
     parse_option,
     read_iterable_block,
     read_key_value_block,
+    split_line,
+    to_float,
 )
 from .grid_data import read_griddata, shape_to_max_rows
 from .list_input import read_listinput
 
 
 def parse_model(stripped: str, fname: str) -> Tuple[str, str, str]:
-    separated = stripped.split()
+    """Parse model entry in the simulation name file."""
+    separated = split_line(stripped)
     nwords = len(separated)
     if nwords == 3:
         return separated
@@ -35,7 +37,8 @@ def parse_model(stripped: str, fname: str) -> Tuple[str, str, str]:
 
 
 def parse_exchange(stripped: str, fname: str) -> Tuple[str, str, str, str]:
-    separated = stripped.split()
+    """Parse exchange entry in the simulation name file."""
+    separated = split_line(stripped)
     nwords = len(separated)
     if nwords == 4:
         return separated
@@ -47,7 +50,11 @@ def parse_exchange(stripped: str, fname: str) -> Tuple[str, str, str, str]:
 
 
 def parse_solutiongroup(stripped: str, fname: str) -> Tuple[str, str]:
-    separated = stripped.split()
+    """Parse solution group entry iyn the simulation name file."""
+    separated = split_line(stripped)
+    if "mxiter" in stripped:
+        return separated
+
     nwords = len(separated)
     if nwords > 2:
         return separated[0], separated[1], separated[2:]
@@ -59,7 +66,8 @@ def parse_solutiongroup(stripped: str, fname: str) -> Tuple[str, str]:
 
 
 def parse_package(stripped: str, fname: str) -> Tuple[str, str, str]:
-    separated = stripped.split()
+    """Parse package entry in model name file."""
+    separated = split_line(stripped)
     nwords = len(separated)
     if nwords == 2:
         ftype, fname = separated
@@ -75,10 +83,11 @@ def parse_package(stripped: str, fname: str) -> Tuple[str, str, str]:
 
 
 def parse_tdis_perioddata(stripped: str, fname: str) -> Tuple[float, int, float]:
-    separated = stripped.split()
+    """Parse a single period data entry in the time discretization file."""
+    separated = split_line(stripped)
     nwords = len(separated)
-    if nwords == 3:
-        return float(separated[0]), int(separated[1]), float(separated[2])
+    if nwords >= 3:
+        return to_float(separated[0]), int(separated[1]), to_float(separated[2])
     else:
         raise ValueError(
             "perlen, nstp, tsmult expected. Received instead: "
@@ -87,6 +96,7 @@ def parse_tdis_perioddata(stripped: str, fname: str) -> Tuple[float, int, float]
 
 
 def read_tdis(path: Path) -> Dict[str, Any]:
+    """Read and parse the content of the time discretization file."""
     with open(path, "r") as f:
         advance_to_header(f, "options")
         content = read_key_value_block(f, parse_option)
@@ -98,20 +108,30 @@ def read_tdis(path: Path) -> Dict[str, Any]:
 
 
 def read_dis_blockfile(path: Path, simroot: Path) -> Dict[str, Any]:
-    def delr_max_rows(shape, layered) -> Tuple[int, int]:
+    """Read and parse structured discretization file."""
+    ROW = 1
+    COLUMN = 2
+
+    def delr_max_rows(shape, layered) -> Tuple[int, Tuple[int]]:
         if layered:
             raise ValueError(f"DELR section in {path} is LAYERED")
-        return 1, shape[2]
+        return 1, (shape[COLUMN],)
 
-    def delc_max_rows(shape, layered) -> int:
+    def delc_max_rows(shape, layered) -> Tuple[int, Tuple[int]]:
         if layered:
             raise ValueError(f"DELC section in {path} is LAYERED")
-        return 1, shape[1]
+        return 1, (shape[ROW],)
+
+    def top_max_rows(shape, layered) -> Tuple[int, Tuple[int]]:
+        if layered:
+            raise ValueError(f"TOP section in {path} is LAYERED")
+        _, nrow, ncolumn = shape
+        return nrow, (nrow, ncolumn)
 
     sections = {
         "delr": (np.float64, delr_max_rows),
         "delc": (np.float64, delc_max_rows),
-        "top": (np.float64, shape_to_max_rows),
+        "top": (np.float64, top_max_rows),
         "botm": (np.float64, shape_to_max_rows),
         "idomain": (np.int32, shape_to_max_rows),
     }
@@ -171,6 +191,7 @@ def tdis_time(tdis: Dict[str, Any]) -> np.ndarray:
 
 
 def read_solver(path: Path) -> Dict[str, str]:
+    """Read and parse content of solver config file (IMS)."""
     with open(path, "r") as f:
         advance_to_header(f, "options")
         options = read_key_value_block(f, parse_option)
@@ -182,6 +203,7 @@ def read_solver(path: Path) -> Dict[str, str]:
 
 
 def read_sim_namefile(path: Path) -> Dict[str, str]:
+    """Read and parse content of simulation name file."""
     with open(path, "r") as f:
         advance_to_header(f, "options")
         content = read_key_value_block(f, parse_option)
@@ -197,6 +219,7 @@ def read_sim_namefile(path: Path) -> Dict[str, str]:
 
 
 def read_gwf_namefile(path: Path) -> Dict[str, Any]:
+    """Read and parse content of groundwater flow name file."""
     with open(path, "r") as f:
         advance_to_header(f, "options")
         content = read_key_value_block(f, parse_option)
@@ -246,15 +269,15 @@ def read_blockfile(
 def read_package_periods(
     f: IO[str],
     simroot: Path,
-    dtype: type,
-    fields: Tuple[str],
+    dtype: Union[type, np.dtype],
     index_columns: Tuple[str],
+    fields: Tuple[str],
     max_rows: int,
     shape: Tuple[int],
 ) -> Tuple[List[int], Dict[str, dask.array.Array]]:
     """
-    Read blockfile periods section of a "standard" MODFLOW6 package: RIV, DRN,
-    GHB, etc.
+    Read blockfile periods section of a "standard" MODFLOW6 boundary
+    conditions: RIV, DRN, GHB, etc.
 
     External files are lazily read using dask and internal values are eagerly
     read and then converted to dask arrays for consistency.
@@ -265,12 +288,12 @@ def read_package_periods(
         File handle.
     simroot:
         Root path of the simulation, used for reading external files.
-    dtype: dtype
+    dtype: Union[type, np.dtype]
         Generally a numpy structured dtype.
-    fields: List[str]
-        The fields (generally np.float64) of the dtype.
-    index_columns: List[str]
+    index_columns: Tuple[str]
         The index columns (np.int32) of the dtype.
+    fields: Tuple[str]
+        The fields (generally np.float64) of the dtype.
     max_rows: int
         Number of rows to read in case of internal values.
     shape: Tuple[int]
@@ -331,7 +354,7 @@ def read_boundary_blockfile(
     path: Path
     simroot: Path
         Root path of the simulation, used for reading external files.
-    fields: List[str]
+    fields: Tuple[str]
         The fields (generally np.float64) of the dtype.
     shape: Tuple[int]
         DIS: 3-sized, DISV: 2-sized, DISU: 1-sized.
@@ -348,23 +371,41 @@ def read_boundary_blockfile(
     }.get(ndim)
     if index_columns is None:
         raise ValueError(f"Length of dimensions should be 1, 2, or 3. Received: {ndim}")
-
-    dtype = np.dtype(
-        [(column, np.int32) for column in index_columns]
-        + [(field, np.float64) for field in fields]
-    )
+    dtype_fields = [(column, np.int32) for column in index_columns] + [
+        (field, np.float64) for field in fields
+    ]
 
     with open(path, "r") as f:
         advance_to_header(f, "options")
         content = read_key_value_block(f, parse_option)
+
+        # Create the dtype from the required variables, and with potential
+        # auxiliary variables.
+        auxiliary = content.pop("auxiliary", None)
+        if auxiliary:
+            # Make sure it's iterable in case of a single value
+            if isinstance(auxiliary, str):
+                auxiliary = (auxiliary,)
+            for aux in auxiliary:
+                dtype_fields.append((aux, np.float64))
+
+        boundnames = content.pop("boundnames", False)
+        if boundnames:
+            dtype_fields.append(("boundnames", str))
+
+        # Create np.dtype, make fields and columns immutable.
+        index_columns = tuple(index_columns)
+        fields = tuple(fields)
+        dtype = np.dtype(dtype_fields)
+
         advance_to_header(f, "dimensions")
         dimensions = read_key_value_block(f, parse_dimension)
         content["period_index"], content["period_data"] = read_package_periods(
             f=f,
             simroot=simroot,
             dtype=dtype,
-            fields=fields,
             index_columns=index_columns,
+            fields=fields,
             max_rows=dimensions["maxbound"],
             shape=shape,
         )

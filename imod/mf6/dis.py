@@ -68,15 +68,20 @@ class StructuredDiscretization(Package):
         ymin = float(content.get("yorigin", 0.0))
         dx = griddata.pop("delr")
         dy = griddata.pop("delc")
-        coords = {
-            "layer": np.arange(1, nlay + 1),
-            "y": ((ymin + np.cumsum(dy)) - 0.5 * dx)[::-1],
-            "x": (xmin + np.cumsum(dx)) - 0.5 * dx,
-        }
-        dims = ("layer", "y", "x")
+        x = (xmin + np.cumsum(dx)) - 0.5 * dx
+        y = ((ymin + np.cumsum(dy)) - 0.5 * dy)[::-1]
 
+        # Top is a 2D array unlike the others
+        top = xr.DataArray(
+            data=griddata.pop("top"),
+            coords={"y": y, "x": x},
+            dims=("y", "x"),
+        )
+
+        coords = {"layer": np.arange(1, nlay + 1), "y": y, "x": x}
+        dims = ("layer", "y", "x")
         inverse_keywords = {v: k for k, v in cls._keyword_map.items()}
-        variables = {}
+        variables = {"top": top}
         for key, value in griddata.items():
             invkey = inverse_keywords.get(key, key)
             variables[invkey] = xr.DataArray(

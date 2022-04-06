@@ -191,15 +191,18 @@ class GroundwaterFlowModel(Model):
             else:
                 pkgname = pname
 
-            # Create the package and add it to the model.
-            model[pkgname] = package.open(
-                path=fname,
-                simroot=simroot,
-                shape=shape,
-                coords=coords,
-                dims=dims,
-                globaltimes=globaltimes,
-            )
+            try:
+                # Create the package and add it to the model.
+                model[pkgname] = package.open(
+                    path=fname,
+                    simroot=simroot,
+                    shape=shape,
+                    coords=coords,
+                    dims=dims,
+                    globaltimes=globaltimes,
+                )
+            except Exception as e:
+                raise type(e)(f"{e}\n Error reading {fname}") from e
 
         return model
 

@@ -13,7 +13,9 @@ from .common import (
     read_external_binaryfile,
     read_external_textfile,
     read_internal,
+    split_line,
     strip_line,
+    to_float,
 )
 
 
@@ -30,7 +32,7 @@ def advance_to_griddata_section(f: IO[str]) -> Tuple[str, bool]:
             return None, False
         elif "layered" in stripped:
             layered = True
-            section = stripped.split()[0]
+            section = split_line(stripped)[0]
             return section, layered
         else:
             layered = False
@@ -39,7 +41,7 @@ def advance_to_griddata_section(f: IO[str]) -> Tuple[str, bool]:
     raise ValueError(f"No end of griddata specified in {f.name}")
 
 
-def shape_to_max_rows(shape: Tuple[int], layered: bool) -> int:
+def shape_to_max_rows(shape: Tuple[int], layered: bool) -> Tuple[int, Tuple[int]]:
     """
     Compute the number of rows to read in case the data is internal. In case
     of DIS, the number of (table) rows equals the number of layers times the
@@ -58,7 +60,7 @@ def shape_to_max_rows(shape: Tuple[int], layered: bool) -> int:
     shape: Tuple[int]
     layered: bool
 
-    Parameters
+    Returns
     ----------
     max_rows: int
         Reduced number if layered is True.
@@ -103,16 +105,17 @@ def constant(value: Any, shape: Tuple[int], dtype: type) -> dask.array.Array:
 def read_internal_griddata(
     f: IO[str], dtype: type, shape: Tuple[int], max_rows: int
 ) -> np.ndarray:
-    return read_internal(f, max_rows, dtype).reshape(shape)
+    return read_internal(f=f, dtype=dtype, max_rows=max_rows).reshape(shape)
 
 
 def read_external_griddata(
     path: Path, dtype: type, shape: Tuple[int], binary: bool
 ) -> np.ndarray:
+    max_rows = np.product(shape)
     if binary:
-        a = read_external_binaryfile(path, dtype)
+        a = read_external_binaryfile(path, dtype, max_rows)
     else:
-        a = read_external_textfile(path, dtype)
+        a = read_external_textfile(path, dtype, max_rows)
     return a.reshape(shape)
 
 
@@ -145,18 +148,18 @@ def read_array(
     """
     firstline = f.readline()
     stripped = strip_line(firstline)
-    separated = stripped.split()
+    separated = split_line(stripped)
     first = separated[0]
 
     if first == "constant":
         factor = None
         array = constant(separated[1], shape, dtype)
     elif first == "internal":
-        factor = find_entry(stripped, "factor", float)
+        factor = find_entry(stripped, "factor", to_float)
         a = read_internal_griddata(f, dtype, shape, max_rows)
         array = dask.array.from_array(a)
     elif first == "open/close":
-        factor = find_entry(stripped, "factor", float)
+        factor = find_entry(stripped, "factor", to_float)
         fname = separated[1]
         binary = "(binary)" in stripped
         path = simroot / fname
