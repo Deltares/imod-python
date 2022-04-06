@@ -50,6 +50,17 @@ def disv_recarr(arrdict, layer, notnull):
     return recarr
 
 
+def disu_recarr(arrdict, layer, notnull):
+    index_spec = [("node", np.int32)]
+    field_spec = [(key, np.float64) for key in arrdict]
+    sparse_dtype = np.dtype(index_spec + field_spec)
+    # Initialize the structured array
+    nrow = notnull.sum()
+    recarr = np.empty(nrow, dtype=sparse_dtype)
+    recarr["node"] = np.argwhere(notnull) + 1
+    return recarr
+
+
 class Package(abc.ABC):
     """
     Package is used to share methods for specific packages with no time
@@ -210,7 +221,11 @@ class Package(abc.ABC):
         notnull = ~np.isnan(data)
 
         if isinstance(self.dataset, xr.Dataset):
-            recarr = dis_recarr(arrdict, layer, notnull)
+            # TODO
+            if ("node" in self.dataset.dims) or ("nja" in self.dataset.dims):
+                recarr = disu_recarr(arrdict, layer, notnull)
+            else:
+                recarr = dis_recarr(arrdict, layer, notnull)
         elif isinstance(self.dataset, xu.UgridDataset):
             recarr = disv_recarr(arrdict, layer, notnull)
         else:
@@ -291,7 +306,10 @@ class Package(abc.ABC):
     @staticmethod
     def _is_xy_data(obj):
         if isinstance(obj, (xr.DataArray, xr.Dataset)):
-            xy = "x" in obj.dims and "y" in obj.dims
+            # TODO
+            xy = ("x" in obj.dims and "y" in obj.dims) or (
+                "node" in obj.dims or "nja" in obj.dims
+            )
         elif isinstance(obj, (xu.UgridDataArray, xu.UgridDataset)):
             xy = obj.ugrid.grid.face_dimension in obj.dims
         else:
@@ -447,7 +465,18 @@ class Package(abc.ABC):
 
         spatial_ds.to_netcdf(path)
         return has_dims
-
+        
+    def _to_disu(self, numbers):
+        structured = self.dataset.expand_dims("layer")
+        # Stack will automatically broadcast to layer
+        dataset = structured.stack(node=("layer", "y", "x"))
+        layers = structured["layer"].values
+        ncell_per_layer = structured["y"].size * structured["x"].size
+        offset = (layers - 1) * ncell_per_layer
+        index = np.add.outer(offset, np.arange(ncell_per_layer))
+        dataset = dataset.assign_coords(node=numbers[index])
+        return self.__class__(**dataset)
+ 
 
 class BoundaryCondition(Package, abc.ABC):
     """
@@ -486,10 +515,15 @@ class BoundaryCondition(Package, abc.ABC):
         """
         Writes a modflow6 binary data file
         """
-        layer = ds["layer"].values
+        if "layer" in ds:
+            layer = ds["layer"].values
+        else:
+            layer = None
+
         arrdict = self._ds_to_arrdict(ds)
         sparse_data = self.to_sparse(arrdict, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)
+
         if binary:
             self._write_binaryfile(outpath, sparse_data)
         else:
