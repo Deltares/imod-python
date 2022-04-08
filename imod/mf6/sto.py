@@ -19,7 +19,7 @@ class Storage(Package):
 class StorageBase(Package):
     def _render(self, directory, pkgname, globaltimes, binary):
         d = {}
-        stodirectory = directory / "sto"
+        stodirectory = directory / pkgname
         for varname in self._grid_data.keys():
             key = self._keyword_map.get(varname, varname)
             layered, value = self._compose_values(
@@ -135,7 +135,7 @@ class SpecificStorage(StorageBase):
         self.dataset["transient"] = transient
 
     def render(self, directory, pkgname, globaltimes, binary):
-        d = self._render(directory, globaltimes, binary)
+        d = self._render(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
 
@@ -204,6 +204,6 @@ class StorageCoefficient(StorageBase):
         self.dataset["transient"] = transient
 
     def render(self, directory, pkgname, globaltimes, binary):
-        d = self._render(directory, globaltimes, binary)
+        d = self._render(directory, pkgname, globaltimes, binary)
         d["storagecoefficient"] = True
         return self._template.render(d)
