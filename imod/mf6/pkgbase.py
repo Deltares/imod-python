@@ -166,12 +166,17 @@ class Package(abc.ABC):
 
     def _valid(self, value):
         """
-        Filters values that are None, False, or a numpy.bool_ False.
+        Filters values that are None, False, np.nan, or a numpy.bool_ False.
         Needs to be this specific, since 0.0 and 0 are valid values, but are
         equal to a boolean False.
+
+        Intercepting single NaNs is practical because xarray replaces None by
+        NaN when writing.
         """
         # Test singletons
         if value is False or value is None:
+            return False
+        elif isinstance(value, float) and np.isnan(value):
             return False
         # Test numpy bool (not singleton)
         elif isinstance(value, np.bool_) and not value:
@@ -226,6 +231,7 @@ class Package(abc.ABC):
                 recarr = disu_recarr(arrdict, layer, notnull)
             else:
                 recarr = dis_recarr(arrdict, layer, notnull)
+
         elif isinstance(self.dataset, xu.UgridDataset):
             recarr = disv_recarr(arrdict, layer, notnull)
         else:
@@ -465,7 +471,7 @@ class Package(abc.ABC):
 
         spatial_ds.to_netcdf(path)
         return has_dims
-        
+
     def _to_disu(self, numbers):
         structured = self.dataset.expand_dims("layer")
         # Stack will automatically broadcast to layer
@@ -476,7 +482,7 @@ class Package(abc.ABC):
         index = np.add.outer(offset, np.arange(ncell_per_layer))
         dataset = dataset.assign_coords(node=numbers[index])
         return self.__class__(**dataset)
- 
+
 
 class BoundaryCondition(Package, abc.ABC):
     """
