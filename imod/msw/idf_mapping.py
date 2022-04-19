@@ -68,9 +68,6 @@ class IdfMapping(Package):
 
         nodata = self.dataset["nodata"].values
 
-        # TODO: Check if netcdf_per is also required, as manual seems a bit vague
-        # about this. "To activate the idf-option the netcdf_per parameter in
-        # PARA_SIM.INP must be set to 1." Could be a typo.
         return dict(
             simgro_opt=-1,
             idf_per=1,
