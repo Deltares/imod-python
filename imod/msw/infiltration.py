@@ -13,23 +13,26 @@ class Infiltration(MetaSwapPackage):
     Parameters
     ----------
     infiltration_capacity: array of floats (xr.DataArray)
-        Describes the infiltration capacity of SVAT units.
-        This array must have a subunit coordinate to describe different land uses.
+        Describes the infiltration capacity of SVAT units. This array must have
+        a subunit coordinate to describe different land uses.
     downward_resistance: array of floats (xr.DataArray)
-        Describes the downward resisitance of SVAT units.
-        This array must not have a subunit coordinate.
+        Describes the downward resisitance of SVAT units. Set to -9999.0 to make
+        MetaSWAP ignore this resistance. This array must not have a subunit
+        coordinate.
     upward_resistance: array of floats (xr.DataArray)
-        Describes the upward resistance of SVAT units.
-        This array must not have a subunit coordinate.
+        Describes the upward resistance of SVAT units. Set to -9999.0 to make
+        MetaSWAP ignore this resistance. This array must not have a subunit
+        coordinate.
     bottom_resistance: array of floats (xr.DataArray)
-        Describes the infiltration capacity of SVAT units.
-        This array must not have a subunit coordinate.
+        Describes the infiltration capacity of SVAT units. Set to -9999.0 to
+        make MetaSWAP ignore this resistance. This array must not have a subunit
+        coordinate.
     extra_storage_coefficient: array of floats (xr.DataArray)
-        Extra storage coefficient of phreatic layer.
-        This array must not have a subunit coordinate.
+        Extra storage coefficient of phreatic layer. This array must not have a
+        subunit coordinate.
     active: array of bools (xr.DataArray)
-        Describes whether SVAT units are active or not.
-        This array must not have a subunit coordinate.
+        Describes whether SVAT units are active or not. This array must not have
+        a subunit coordinate.
     """
 
     _file_name = "infi_svat.inp"
