@@ -4,11 +4,11 @@ import numpy as np
 import xarray as xr
 
 from imod import mf6
-from imod.couplers.metamod.pkgbase import Package
+from imod.couplers.metamod.mappingbase import MetaModMapping
 from imod.fixed_format import VariableMetaData
 
 
-class NodeSvatMapping(Package):
+class NodeSvatMapping(MetaModMapping):
     """
     This contains the data to map MODFLOW 6 cells (user nodes) to MetaSWAP
     svats.

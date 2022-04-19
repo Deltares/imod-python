@@ -9,9 +9,9 @@ import xarray as xr
 from imod.fixed_format import format_fixed_width
 
 
-class Package(abc.ABC):
+class MetaModMapping(abc.ABC):
     """
-    Package is used to share methods for specific packages with no time
+    MetaModMapping is used to share methods for specific packages with no time
     component.
 
     It is not meant to be used directly, only to inherit from, to implement new

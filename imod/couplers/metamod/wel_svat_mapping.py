@@ -3,11 +3,11 @@ import pandas as pd
 import xarray as xr
 
 from imod import mf6
-from imod.couplers.metamod.pkgbase import Package
+from imod.couplers.metamod.mappingbase import MetaModMapping
 from imod.fixed_format import VariableMetaData
 
 
-class WellSvatMapping(Package):
+class WellSvatMapping(MetaModMapping):
     """
     This contains the data to map MODFLOW 6 recharge cells to MetaSWAP svats.
 

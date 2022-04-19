@@ -4,11 +4,11 @@ import numpy as np
 import xarray as xr
 
 from imod import mf6
-from imod.couplers.metamod.pkgbase import Package
+from imod.couplers.metamod.mappingbase import MetaModMapping
 from imod.fixed_format import VariableMetaData
 
 
-class RechargeSvatMapping(Package):
+class RechargeSvatMapping(MetaModMapping):
     """
     This contains the data to map MODFLOW 6 recharge cells to MetaSWAP svats.
 
@@ -24,8 +24,8 @@ class RechargeSvatMapping(Package):
         different land uses.
     recharge: mf6.Recharge
         Modflow 6 Recharge package to map to. Note that the recharge rate should
-        be provided as a 2D grid with a (y, x) dimension. Package will throw an
-        error if a grid is provided with different dimensions.
+        be provided as a 2D grid with a (y, x) dimension. MetaModMapping will
+        throw an error if a grid is provided with different dimensions.
     """
 
     _file_name = "rchindex2svat.dxc"
