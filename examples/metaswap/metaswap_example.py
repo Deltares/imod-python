@@ -29,7 +29,7 @@ from imod import couplers, mf6, msw
 # Modflow 6 model
 # ---------------
 #
-# We'll start off creating the groundwater model:
+# Next, we initiate the Modflow 6 groundwater model:
 
 gwf_model = mf6.GroundwaterFlowModel()
 
@@ -37,7 +37,7 @@ gwf_model = mf6.GroundwaterFlowModel()
 # Create grid
 # ```````````
 #
-# Create the Modflow 6 grid.
+# We'll then define the Modflow 6 grid.
 # It consists of 3 layers of 9 by 9 cells rasters.
 
 shape = nlay, nrow, ncol = 3, 9, 9
@@ -63,7 +63,7 @@ bottom = top - xr.DataArray(
     np.cumsum(layer * dz), coords={"layer": layer}, dims="layer"
 )
 
-# %% Assign the grid to the Modflow6 model.
+# %% Once the grid is defined, assign it to the Modflow6 model.
 
 gwf_model["dis"] = mf6.StructuredDiscretization(idomain=idomain, top=top, bottom=bottom)
 
@@ -74,7 +74,7 @@ gwf_model["dis"] = mf6.StructuredDiscretization(idomain=idomain, top=top, bottom
 # Hydraulic conductivity
 # ''''''''''''''''''''''
 # Assign the node property flow package, which specifies the hydraulic conductivities.
-# The middle layer is a resistant layer.
+# The middle layer is an aquitard.
 
 k = xr.DataArray([10.0, 0.1, 10.0], {"layer": layer}, ("layer",))
 k33 = xr.DataArray([1.0, 0.01, 1.0], {"layer": layer}, ("layer",))
@@ -111,7 +111,7 @@ gwf_model["oc"] = mf6.OutputControl(save_head="last", save_budget="last")
 #
 # Constant head
 # '''''''''''''
-# Create constant head cells at the most left and right columns of the grid,
+# We'll create constant head cells at the most left and right columns of the grid,
 # representing two ditches.
 
 head = xr.full_like(idomain, np.nan)
@@ -156,7 +156,7 @@ recharge.plot()
 #
 # We'll create a dummy well package as well. imod.mf6.WellDisStructured needs
 # its input data provided as long tables instead of grids to so therefore we'll
-# create 1d arrays by respectively calling ``np.tile`` on the column indices,
+# create 1d arrays by calling ``np.tile`` on the column indices,
 # and ``np.repeat`` on the row indices.
 
 wel_layer = 3
@@ -171,12 +171,12 @@ gwf_model["wells_msw"] = mf6.WellDisStructured(
 )
 
 # %%
-# Attach the groundwater model it to a Modflow 6 simulation
+# Initiate a Modflow 6 simulatation and attach the groundwater model to it.
 
 simulation = mf6.Modflow6Simulation("test")
 simulation["GWF_1"] = gwf_model
 
-# Define solver settings, we'll use a preset that is sufficient for this example
+# Define solver settings, we'll use a preset that is sufficient for this example.
 
 simulation["solver"] = mf6.SolutionPresetSimple(
     print_option="summary", csv_output=False, no_ptc=True
@@ -197,7 +197,11 @@ times
 # MetaSWAP model
 # --------------
 #
-# We'll initiate a MetaSwapModel. Important is
+# The next step is initating a ``MetaSwapModel``. Critical is setting the right
+# path to MetaSWAP's soil physical database, which contains the lookup table
+# with the soil physical relationships. Without access to this database MetaSWAP
+# cannot functino. To download the full database, please contact
+# ``--add-link-here--``.
 
 msw_model = msw.MetaSwapModel(unsaturated_database="./path/to/unsaturated/database")
 
@@ -206,7 +210,7 @@ msw_model = msw.MetaSwapModel(unsaturated_database="./path/to/unsaturated/databa
 #
 # We'll start off specifying the grids required for MetaSWAP. The x,y values
 # of this grid should be identical as the Modflow6 model, but it should
-# not have a layer dimensions.
+# not have a layer dimension.
 
 msw_grid = idomain.sel(layer=1, drop=True)
 
@@ -221,10 +225,15 @@ active[..., -1] = False
 
 active
 
-# %%
-# Another crucial grid is the "area" grid. The area grid denotes the area in
-# each cell, for each "subunit". A subunit represent a seperate landuse
-# in the grid. We'll create a grid with two seperate land uses.
+# %% Another crucial grid is the "area" grid. The area grid denotes the area in
+# each cell, for each "subunit". A subunit represent a separate landuse in the
+# grid. We'll create a grid with two separate land uses.
+#
+# Each grid which specifies parameters related to landuse (e.g. landuse,
+# rootzone_depth, ponding depth) requires a subunit dimension. In contrast,
+# grids specifying parameters not induced by landuse (e.g. soil type, elevation,
+# precipitation) cannot contain a subunit dimension.
+
 subunit = [0, 1]
 
 total_cell_area = abs(dx * dy)
@@ -268,8 +277,9 @@ landuse
 # ``````````
 #
 # Define soil type classes. These will be looked up in MetaSWAP's giant lookup
-# table, which is provided with the program. In previous examples we set values
-# in our DataArray using numpy indexing. But we can also use xarray's
+# table for the national Staring series describing Dutch soils. To download the
+# full database, please contact ``--add-link-here--``. In previous examples we
+# set values in our DataArray using numpy indexing. But we can also use xarray's
 # ``where()`` method to set values.
 
 slt = xr.full_like(msw_grid, 1, dtype=np.int16)
@@ -335,7 +345,7 @@ msw_model["ponding"] = msw.Ponding(
 #
 # Scaling factors can be defined to adapt some parameters in the soil physical
 # database. With this you can investigate the sensitivity of parameters in soil
-# physical database. Furtermore, with this package you can specify the depth of
+# physical database. Furthermore, with this package you can specify the depth of
 # the perched water table.
 
 msw_model["scaling"] = msw.ScalingFactors(
@@ -348,6 +358,9 @@ msw_model["scaling"] = msw.ScalingFactors(
 # %%
 # Infiltration Factors
 # ````````````````````
+#
+# Set the infiltration parameters. We set the resistances to -9999.0, which
+# makes MetaSWAP ignore them.
 
 msw_model["infiltration"] = msw.Infiltration(
     infiltration_capacity=xr.full_like(area, 1.0),
@@ -362,7 +375,10 @@ msw_model["infiltration"] = msw.Infiltration(
 # ```````````````
 #
 # The landuse option class constructs a lookup table which is used to map
-# landuse indices to a set of parameters.
+# landuse indices to a set of parameters. In this example, 3 stands for
+# potatoes. This means that for every cell in the ``landuse`` grid with a 3, the
+# parameters for a crop with ``vegetation_index == 3`` are associate, which in this
+# case are potatoes.
 
 vegetation_index = [1, 2, 3]
 names = ["grassland", "maize", "potatoes"]
@@ -413,7 +429,7 @@ msw_model["landuse_options"] = msw.LanduseOptions(
 #
 # Crop growth tables are specified as a two-dimensional array, with the day of
 # year as one dimension, and the vegetation index on the other. In the vegetation
-# factors, we'll show hot to bring some distinction between different crops.
+# factors, we'll show how to bring some distinction between different crops.
 #
 # We'll start off specifiying the coordinates:
 
@@ -432,7 +448,9 @@ soil_cover = xr.DataArray(
 )
 
 # %%
-# The simplest soil cover specification is a step function:
+# The simplest soil cover specification is a step function. In this case soil
+# cover equals 1.0 for days 133 to 255 (mind Python's 0-based index here), and
+# for the rest of the days it equals zero.
 
 soil_cover[132:254, :] = 1.0
 
@@ -447,7 +465,8 @@ leaf_area_index = soil_cover * 3
 # Vegetation factors are used to convert the Makkink reference
 # evapotranspiration to a potential evapotranspiration for a certain vegetation
 # type. We'll specify some simple crop schemes for the three crops as vegetation
-# factors.
+# factors. Mind that the vegetation factor array has two dimensions:
+# ``day_of_year`` and ``vegetation_index``
 
 vegetation_names = ["grass", "maize", "potatoes"]
 
@@ -524,7 +543,7 @@ msw_model["sprinkling"] = msw.Sprinkling(
 # ---------------
 #
 # The MetaSWAP model and Modflow 6 simulation are provided to the MetaMod class,
-# which takes care of mapping the two models.
+# which takes care of connecting (= "mapping") the two models.
 
 metamod = couplers.MetaMod(msw_model=msw_model, mf6_simulation=simulation)
 
