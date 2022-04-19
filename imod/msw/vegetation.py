@@ -2,10 +2,10 @@ import numpy as np
 import xarray as xr
 
 from imod.fixed_format import VariableMetaData
-from imod.msw.pkgbase import Package
+from imod.msw.pkgbase import MetaSwapPackage
 
 
-class AnnualCropFactors(Package):
+class AnnualCropFactors(MetaSwapPackage):
     """
     For each vegetation type specify a yearly trend in vegetation factors and
     interception characteristics. These are used if WOFOST is not used.

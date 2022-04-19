@@ -10,10 +10,9 @@ import xarray as xr
 from imod.fixed_format import format_fixed_width
 
 
-class Package(abc.ABC):
+class MetaSwapPackage(abc.ABC):
     """
-    Package is used to share methods for specific packages with no time
-    component.
+    MetaSwapPackage is used to share methods for Metaswap packages.
 
     It is not meant to be used directly, only to inherit from, to implement new
     packages.

@@ -1,8 +1,8 @@
 from imod.fixed_format import VariableMetaData
-from imod.msw.pkgbase import Package
+from imod.msw.pkgbase import MetaSwapPackage
 
 
-class LanduseOptions(Package):
+class LanduseOptions(MetaSwapPackage):
     """
     Land use options. This object is responsible for luse_svat.inp
 

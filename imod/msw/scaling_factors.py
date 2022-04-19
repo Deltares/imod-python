@@ -1,8 +1,8 @@
 from imod.fixed_format import VariableMetaData
-from imod.msw.pkgbase import Package
+from imod.msw.pkgbase import MetaSwapPackage
 
 
-class ScalingFactors(Package):
+class ScalingFactors(MetaSwapPackage):
     """
     This package allows you to do three things:
         1. Set scaling factors for some inputs in the soil physical database,

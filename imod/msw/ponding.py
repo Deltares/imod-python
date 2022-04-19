@@ -1,10 +1,10 @@
 import pandas as pd
 
 from imod.fixed_format import VariableMetaData
-from imod.msw.pkgbase import Package
+from imod.msw.pkgbase import MetaSwapPackage
 
 
-class Ponding(Package):
+class Ponding(MetaSwapPackage):
     """
     Set ponding related parameters for MetaSWAP. This class is responsible for
     the svat2swnr_roff.inp file. Currently, we do not support ponds coupled to

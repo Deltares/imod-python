@@ -4,10 +4,10 @@ import xarray as xr
 
 from imod import mf6
 from imod.fixed_format import VariableMetaData
-from imod.msw.pkgbase import Package
+from imod.msw.pkgbase import MetaSwapPackage
 
 
-class Sprinkling(Package):
+class Sprinkling(MetaSwapPackage):
     """
     This contains the sprinkling capacities of links between SVAT units and groundwater/ surface water locations.
 

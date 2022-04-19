@@ -4,10 +4,10 @@ import xarray as xr
 
 from imod import mf6
 from imod.fixed_format import VariableMetaData
-from imod.msw.pkgbase import Package
+from imod.msw.pkgbase import MetaSwapPackage
 
 
-class CouplerMapping(Package):
+class CouplerMapping(MetaSwapPackage):
     """
     This contains the data to map MODFLOW 6 cells to MetaSWAP svats.
 

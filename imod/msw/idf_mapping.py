@@ -2,11 +2,11 @@ import numpy as np
 import xarray as xr
 
 from imod.fixed_format import VariableMetaData
-from imod.msw.pkgbase import Package
+from imod.msw.pkgbase import MetaSwapPackage
 from imod.util import spatial_reference
 
 
-class IdfMapping(Package):
+class IdfMapping(MetaSwapPackage):
     """
     Mapping for IDFs.
 

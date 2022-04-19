@@ -2,11 +2,11 @@ import numpy as np
 import xarray as xr
 
 from imod.fixed_format import VariableMetaData
-from imod.msw.pkgbase import Package
+from imod.msw.pkgbase import MetaSwapPackage
 from imod.util import spatial_reference
 
 
-class GridData(Package):
+class GridData(MetaSwapPackage):
     """
     This contains the grid data.
 

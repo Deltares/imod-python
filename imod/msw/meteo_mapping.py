@@ -3,11 +3,11 @@ import pandas as pd
 import xarray as xr
 
 from imod.fixed_format import VariableMetaData
-from imod.msw.pkgbase import Package
+from imod.msw.pkgbase import MetaSwapPackage
 from imod.prepare import common
 
 
-class MeteoMapping(Package):
+class MeteoMapping(MetaSwapPackage):
     """
     This class provides common methods for creating mappings between
     meteorological data and MetaSWAP grids. It should not be instantiated

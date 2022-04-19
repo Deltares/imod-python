@@ -1,7 +1,7 @@
 import pandas as pd
 
 from imod.fixed_format import VariableMetaData
-from imod.msw.pkgbase import Package
+from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.timeutil import to_metaswap_timeformat
 
 
@@ -9,7 +9,7 @@ from imod.msw.timeutil import to_metaswap_timeformat
 # uses these 2 to 4 character names to print its output to. This also has the
 # benefit that the user is able to set additional variable names via kwargs
 # (there are more than 130 possible variable names to choose from in MetaSWAP)
-class VariableOutputControl(Package):
+class VariableOutputControl(MetaSwapPackage):
     """
     Control which variables will be created as output. The variable names used
     in this class provide a condensed water balance. You can use additional
@@ -91,7 +91,7 @@ class VariableOutputControl(Package):
         return self.write_dataframe_fixed_width(file, dataframe)
 
 
-class TimeOutputControl(Package):
+class TimeOutputControl(MetaSwapPackage):
     """
     Specify the accumulation periods which will be used to write output.
 

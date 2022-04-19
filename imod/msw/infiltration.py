@@ -1,10 +1,10 @@
 import xarray as xr
 
 from imod.fixed_format import VariableMetaData
-from imod.msw.pkgbase import Package
+from imod.msw.pkgbase import MetaSwapPackage
 
 
-class Infiltration(Package):
+class Infiltration(MetaSwapPackage):
     """
     This contains the infiltration data.
 
