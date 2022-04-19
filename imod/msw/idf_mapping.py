@@ -63,8 +63,8 @@ class IdfMapping(Package):
 
         # If non-equidistant, spatial_reference returned a 1d array instead of
         # float
-        if (type(dx) is np.ndarray) or (type(dy) is np.ndarray):
-            raise ValueError("MetaSWAP can only write equidistant IDF grids")
+        if (not np.isscalar(dx)) or (not np.isscalar(dy)):
+            raise ValueError("MetaSWAP only supports equidistant grids")
 
         nodata = self.dataset["nodata"].values
 
