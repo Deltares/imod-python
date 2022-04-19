@@ -88,7 +88,6 @@ class MeteoGrid(MetaSwapPackage):
 
         """
         return str(directory / util.compose(d, pattern))
-        # return str(util.compose(d, pattern).resolve())
 
     def _is_grid(self, varname: str):
         coords = self.dataset[varname].coords
