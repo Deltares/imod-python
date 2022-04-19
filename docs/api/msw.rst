@@ -31,6 +31,3 @@ MetaSWAP
     CouplerMapping
 
     MetaSwapModel
-
-
-
