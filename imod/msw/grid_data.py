@@ -1,5 +1,3 @@
-import warnings
-
 import numpy as np
 import xarray as xr
 
@@ -97,13 +95,11 @@ class GridData(Package):
         cell_area = active.astype(float) * dx * abs(dy)
         total_area = self.dataset["area"].sum(dim="subunit")
 
-        unequal_area = (total_area != cell_area).values[active.values]
-
         # Apparently all regional models intentionally provided area grids
-        # unequal to the cell area, to allow surface waters as workaround. Still
-        # useful to provide a UserWarning for this.
+        # smaller than cell area, to allow surface waters as workaround.
+        unequal_area = (total_area > cell_area).values[active.values]
+
         if np.any(unequal_area):
-            warnings.warn(
-                """Provided area grid with total areas unequal to cell area""",
-                UserWarning,
+            raise ValueError(
+                "Provided area grid with total areas larger than cell area"
             )
