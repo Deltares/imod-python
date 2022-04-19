@@ -49,9 +49,10 @@ class LanduseOptions(MetaSwapPackage):
         Choose interception model. 0=Rutter, 1=Von Hoyningen. NOTE: option
         2=GASH, but this is not supported by MetaSWAP v8.1.0.3 and lower
     interception_capacity_per_LAI: array of floats (xr.DataArray)
-        interception capacity (mm/LAI) # Rutter and Von Hoyningen the same???
+        Interception capacity (mm/LAI) will be set for both Rutter and Von
+        Hoyningen.
     interception_intercept: array of floats (xr.DataArray)
-        intercept of the interception evaporation curve. Pun unintended.
+        Intercept of the interception evaporation curve. Pun unintended.
 
     Notes
     -----
