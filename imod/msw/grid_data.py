@@ -90,6 +90,9 @@ class GridData(Package):
 
         dx, _, _, dy, _, _ = spatial_reference(self.dataset)
 
+        if (not np.isscalar(dx)) or (not np.isscalar(dy)):
+            raise ValueError("MetaSWAP only supports equidistant grids")
+
         active = self.dataset["active"]
 
         cell_area = active.astype(float) * dx * abs(dy)
