@@ -24,7 +24,7 @@ from imod.msw.pkgbase import MetaSwapPackage
 from imod.msw.timeutil import to_metaswap_timeformat
 from imod.msw.vegetation import AnnualCropFactors
 
-REQUIRED_PACKAGES = [
+REQUIRED_PACKAGES = (
     GridData,
     CouplerMapping,
     Infiltration,
@@ -35,14 +35,14 @@ REQUIRED_PACKAGES = [
     IdfMapping,
     TimeOutputControl,
     AnnualCropFactors,
-]
+)
 
-INITIAL_CONDITIONS_PACKAGES = [
+INITIAL_CONDITIONS_PACKAGES = (
     InitialConditionsEquilibrium,
     InitialConditionsPercolation,
     InitialConditionsRootzonePressureHead,
     InitialConditionsSavedState,
-]
+)
 
 DEFAULT_SETTINGS = dict(
     vegetation_mdl=1,
@@ -139,7 +139,7 @@ class MetaSwapModel(Model):
         grid_key = self._get_pkg_key(GridData)
         landuse_options_key = self._get_pkg_key(LanduseOptions)
 
-        indices_in_grid = set(np.unique(self[grid_key]["landuse"]))
+        indices_in_grid = set(self[grid_key]["landuse"].values.ravel())
         indices_in_options = set(
             self[landuse_options_key].dataset.coords["landuse_index"].values
         )
