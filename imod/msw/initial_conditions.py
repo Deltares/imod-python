@@ -8,6 +8,8 @@ from imod.msw.pkgbase import MetaSwapPackage
 class InitialConditionsEquilibrium(MetaSwapPackage):
     """
     Use an equilibrium profile to initialize the model.
+
+    This class is responsible for the file `init_svat.inp`
     """
 
     _file_name = "init_svat.inp"
@@ -24,6 +26,8 @@ class InitialConditionsEquilibrium(MetaSwapPackage):
 class InitialConditionsRootzonePressureHead(MetaSwapPackage):
     """
     Use the pF-value of the root zone pressure head as initial condition.
+
+    This class is responsible for the file `init_svat.inp`
 
     Parameters
     ----------
@@ -56,7 +60,9 @@ class InitialConditionsPercolation(MetaSwapPackage):
     This type of initialization is normally done separately from the actual run,
     using a specially prepared meteo-input file. After letting the model reach
     near equilibrium by letting it run for a number of years, the saved state is
-    used for the initialization of subsequent runs
+    used for the initialization of subsequent runs.
+
+    This class is responsible for the file `init_svat.inp`
     """
 
     _file_name = "init_svat.inp"
@@ -73,6 +79,8 @@ class InitialConditionsPercolation(MetaSwapPackage):
 class InitialConditionsSavedState(MetaSwapPackage):
     """
     Use saved state of a previous MetaSWAP run as initial condition.
+
+    This class is responsible for the file `init_svat.inp`
 
     Parameters
     ----------
