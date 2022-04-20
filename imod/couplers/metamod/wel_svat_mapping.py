@@ -9,11 +9,9 @@ from imod.fixed_format import VariableMetaData
 
 class WellSvatMapping(MetaModMapping):
     """
-    This contains the data to map MODFLOW 6 recharge cells to MetaSWAP svats.
+    This contains the data to map MODFLOW 6 well cells to MetaSWAP svats.
 
-    This class is responsible for the file `rchindex2svat.dxc`.
-
-    Unlike imod.msw.CouplerMapping, this class does not include mapping to wells.
+    This class is responsible for the file `wellindex2svat.dxc`.
 
     Parameters
     ----------
