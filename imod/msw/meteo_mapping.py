@@ -75,16 +75,19 @@ class MeteoMapping(MetaSwapPackage):
 
 class PrecipitationMapping(MeteoMapping):
     """
-    This contains the data to map precipitation grid cells to MetaSWAP svats.
+    This contains the data to connect precipitation grid cells to MetaSWAP
+    svats. The precipitation grid does not have to be equal to the metaswap
+    grid: connections between the precipitation cells to svats will be
+    established using a nearest neighbour lookup.
 
     This class is responsible for the file `svat2precgrid.inp`.
 
     Parameters
     ----------
     precipitation: array of floats (xr.DataArray)
-        Describes the precipitation data.
-        The extend of the grid must be larger than the MetaSvap grid.
-        The data must also be coarser than the MetaSvap grid.
+        Describes the precipitation data. The extend of the grid must be larger
+        than the MetaSvap grid. The data must also be coarser than the MetaSvap
+        grid.
     """
 
     _file_name = "svat2precgrid.inp"
@@ -104,16 +107,19 @@ class PrecipitationMapping(MeteoMapping):
 
 class EvapotranspirationMapping(MeteoMapping):
     """
-    This contains the data to map evapotranspiration grid cells to MetaSWAP svats.
+    This contains the data to connect evapotranspiration grid cells to MetaSWAP
+    svats. The evapotranspiration grid does not have to be equal to the metaswap
+    grid: connections between the evapotranspiration cells to svats will be
+    established using a nearest neighbour lookup.
 
     This class is responsible for the file `svat2etrefgrid.inp`.
 
     Parameters
     ----------
     evapotransporation: array of floats (xr.DataArray)
-        Describes the evapotransporation data.
-        The extend of the grid must be larger than the MetaSvap grid.
-        The data must also be coarser than the MetaSvap grid.
+        Describes the evapotransporation data. The extend of the grid must be
+        larger than the MetaSvap grid. The data must also be coarser than the
+        MetaSvap grid.
     """
 
     _file_name = "svat2etrefgrid.inp"

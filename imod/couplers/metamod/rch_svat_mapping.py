@@ -8,7 +8,8 @@ from imod.fixed_format import VariableMetaData
 
 class RechargeSvatMapping(MetaModMapping):
     """
-    This contains the data to map MODFLOW 6 recharge cells to MetaSWAP svats.
+    This contains the data to connect MODFLOW 6 recharge cells to MetaSWAP
+    svats.
 
     This class is responsible for the file `rchindex2svat.dxc`.
 
@@ -18,9 +19,9 @@ class RechargeSvatMapping(MetaModMapping):
         SVAT units. This array must have a subunit coordinate to describe
         different land uses.
     recharge: mf6.Recharge
-        Modflow 6 Recharge package to map to. Note that the recharge rate should
-        be provided as a 2D grid with a (y, x) dimension. MetaModMapping will
-        throw an error if a grid is provided with different dimensions.
+        Modflow 6 Recharge package to connect to. Note that the recharge rate
+        should be provided as a 2D grid with a (y, x) dimension. MetaModMapping
+        will throw an error if a grid is provided with different dimensions.
     """
 
     _file_name = "rchindex2svat.dxc"

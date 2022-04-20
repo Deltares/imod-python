@@ -9,18 +9,18 @@ from imod.msw.pkgbase import MetaSwapPackage
 
 class CouplerMapping(MetaSwapPackage):
     """
-    This contains the data to map MODFLOW 6 cells to MetaSWAP svats.
+    This contains the data to connect MODFLOW 6 cells to MetaSWAP svats.
 
-    This class is responsible for the file `mod2svat.inp`.
-
-    Unlike imod.metamod.NodeSvatMapping, this class also includes mapping to wells.
+    This class is responsible for the file `mod2svat.inp`. It also includes
+    connection to wells.
 
     Parameters
     ----------
     modflow_dis: StructuredDiscretization
         Modflow 6 structured discretization
     well: WellDisStructured (optional)
-        If given, this parameter describes sprinkling of SVAT units from MODFLOW cells.
+        If given, this parameter describes sprinkling of SVAT units from MODFLOW
+        cells.
     """
 
     _file_name = "mod2svat.inp"

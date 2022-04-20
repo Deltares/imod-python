@@ -8,13 +8,10 @@ from imod.fixed_format import VariableMetaData
 
 class NodeSvatMapping(MetaModMapping):
     """
-    This contains the data to map MODFLOW 6 cells (user nodes) to MetaSWAP
+    This contains the data to connect MODFLOW 6 cells (user nodes) to MetaSWAP
     svats.
 
     This class is responsible for the file `nodenr2svat.dxc`.
-
-    Unlike imod.msw.CouplerMapping, this class does not include mapping to
-    wells.
 
     Parameters
     ----------

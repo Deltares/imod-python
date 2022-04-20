@@ -9,7 +9,7 @@ from imod.fixed_format import VariableMetaData
 
 class WellSvatMapping(MetaModMapping):
     """
-    This contains the data to map MODFLOW 6 well cells to MetaSWAP svats.
+    This contains the data to connect MODFLOW 6 well cells to MetaSWAP svats.
 
     This class is responsible for the file `wellindex2svat.dxc`.
 
@@ -19,7 +19,7 @@ class WellSvatMapping(MetaModMapping):
         SVAT units. This array must have a subunit coordinate to describe
         different land uses.
     well: mf6.Well
-        Modflow 6 Well package to map to.
+        Modflow 6 Well package to connect to.
     """
 
     # TODO: Do we always want to couple to identical grids?
