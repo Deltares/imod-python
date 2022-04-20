@@ -11,6 +11,8 @@ from numpy.testing import assert_almost_equal, assert_equal
 from imod.msw.fixed_format import format_fixed_width
 from imod.msw import GridData
 
+import pytest
+
 
 @given(
     floats(
@@ -341,3 +343,192 @@ def test_simple_model(fixed_format_parser):
     assert_equal(results["soil_physical_unit"], np.array([2, 8, 2, 5]))
     assert_equal(results["landuse"], np.array([1, 1, 2, 2]))
     assert_almost_equal(results["rootzone_depth"], np.array([1.0, 1.0, 1.0, 1.0]))
+
+
+def test_area_grid_exceeds_cell_area():
+    """
+    Test where provided area grid exceeds total cell area, should throw error.
+    """
+    x = [1.0, 2.0, 3.0]
+    y = [1.0, 2.0, 3.0]
+    subunit = [0, 1]
+    dx = 1.0
+    dy = 1.0
+    # fmt: off
+    area = xr.DataArray(
+        np.array(
+            [
+                [[0.5, 0.5, 0.5],
+                 [1.0, 1.0, 1.0],
+                 [1.0, 1.0, 1.0]],
+
+                [[0.5, 0.5, 0.5],
+                 [1.0, 1.0, 1.0],
+                 [nan, nan, nan]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
+    landuse = xr.DataArray(
+        np.array(
+            [
+                [[1.0, 1.0, 1.0],
+                 [nan, nan, nan],
+                 [1.0, 1.0, 1.0]],
+
+                [[2.0, 2.0, 2.0],
+                 [2.0, 2.0, 2.0],
+                 [nan, nan, nan]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
+    rootzone_depth = xr.DataArray(
+        np.array(
+            [
+                [[1.0, 1.0, 1.0],
+                 [nan, nan, nan],
+                 [1.0, 1.0, 1.0]],
+
+                [[1.0, 1.0, 1.0],
+                 [1.0, 1.0, 1.0],
+                 [nan, nan, nan]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
+
+    surface_elevation = xr.DataArray(
+        np.array(
+            [[1.0, 2.0, 3.0],
+             [4.0, 5.0, 6.0],
+             [7.0, 8.0, 9.0]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+    )
+
+    soil_physical_unit = xr.DataArray(
+        np.array(
+            [[1.0, 2.0, 3.0],
+             [4.0, 5.0, 6.0],
+             [7.0, 8.0, 9.0]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+    )
+
+    active = xr.DataArray(
+        np.array(
+            [[False, True, False],
+             [False, True, False],
+             [False, True, False]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x}
+    )
+    # fmt: on
+    with pytest.raises(ValueError):
+        GridData(
+            area,
+            landuse,
+            rootzone_depth,
+            surface_elevation,
+            soil_physical_unit,
+            active,
+        )
+
+
+def test_non_equidistant():
+    """
+    Test where provided grid is non-equidistant, should throw error.
+    """
+    x = [1.0, 2.0, 5.0]
+    y = [1.0, 2.0, 5.0]
+    subunit = [0, 1]
+    dx = [1.0, 1.0, 5.0]
+    dy = [1.0, 1.0, 5.0]
+    # fmt: off
+
+    area = xr.DataArray(
+        np.array(
+            [
+                [[0.5, 0.5, 0.5],
+                 [nan, nan, nan],
+                 [1.0, 1.0, 1.0]],
+
+                [[0.5, 0.5, 0.5],
+                 [1.0, 1.0, 1.0],
+                 [nan, nan, nan]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": ("x", dx), "dy": ("y", dy)}
+    )
+    landuse = xr.DataArray(
+        np.array(
+            [
+                [[1.0, 1.0, 1.0],
+                 [nan, nan, nan],
+                 [1.0, 1.0, 1.0]],
+
+                [[2.0, 2.0, 2.0],
+                 [2.0, 2.0, 2.0],
+                 [nan, nan, nan]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": ("x", dx), "dy": ("y", dy)}
+    )
+    rootzone_depth = xr.DataArray(
+        np.array(
+            [
+                [[1.0, 1.0, 1.0],
+                 [nan, nan, nan],
+                 [1.0, 1.0, 1.0]],
+
+                [[1.0, 1.0, 1.0],
+                 [1.0, 1.0, 1.0],
+                 [nan, nan, nan]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": ("x", dx), "dy": ("y", dy)}
+    )
+
+    surface_elevation = xr.DataArray(
+        np.array(
+            [[1.0, 2.0, 3.0],
+             [4.0, 5.0, 6.0],
+             [7.0, 8.0, 9.0]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x, "dx": ("x", dx), "dy": ("y", dy)}
+    )
+
+    soil_physical_unit = xr.DataArray(
+        np.array(
+            [[1.0, 2.0, 3.0],
+             [4.0, 5.0, 6.0],
+             [7.0, 8.0, 9.0]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x, "dx": ("x", dx), "dy": ("y", dy)}
+    )
+
+    active = xr.DataArray(
+        np.array(
+            [[False, True, False],
+             [False, True, False],
+             [False, True, False]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x}
+    )
+    # fmt: on
+    with pytest.raises(ValueError):
+        GridData(
+            area,
+            landuse,
+            rootzone_depth,
+            surface_elevation,
+            soil_physical_unit,
+            active,
+        )
