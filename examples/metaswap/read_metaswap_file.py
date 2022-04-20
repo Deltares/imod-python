@@ -91,7 +91,7 @@ input_file = directory / "luse_svat.inp"
 # package. You can access it by calling <pkg>._metadata_dict. This function
 # returns stores your data in a dictionary.
 
-from imod.fixed_format import fixed_format_parser
+from imod.msw.fixed_format import fixed_format_parser
 
 # Store the pkg in this variable for brevity
 pkg = imod.msw.LanduseOptions
