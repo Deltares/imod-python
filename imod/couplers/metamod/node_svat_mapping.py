@@ -60,10 +60,12 @@ class NodeSvatMapping(MetaModMapping):
         n_subunit, _, _ = self.dataset["svat"].shape
         n_mod = self.idomain_active.sum()
 
+        idomain_active = self.idomain_active.values
+
         # idomain does not have a subunit dimension, so tile for n_subunits
         mod_id_1d = np.tile(np.arange(1, n_mod + 1), (n_subunit, 1))
 
-        self.dataset["mod_id"].values[:, self.idomain_active.values] = mod_id_1d
+        self.dataset["mod_id"].values[:, idomain_active] = mod_id_1d
 
     def _pkgcheck(self):
         # Check if active msw cell inactive in recharge
