@@ -8,7 +8,7 @@ from imod.util import spatial_reference
 
 class GridData(MetaSwapPackage):
     """
-    This contains the grid data.
+    This contains the grid data of MetaSWAP.
 
     This class is responsible for the file `area_svat.inp`
 
