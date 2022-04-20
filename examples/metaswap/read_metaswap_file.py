@@ -13,11 +13,12 @@ We'll start with the usual imports:
 
 # sphinx_gallery_thumbnail_number = -1
 
+import os
+
 import pandas as pd
 import xarray as xr
 
 import imod
-import os
 
 # %%
 # Creating an example file

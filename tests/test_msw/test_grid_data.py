@@ -2,16 +2,15 @@ import tempfile
 from pathlib import Path
 
 import numpy as np
+import pytest
 import xarray as xr
 from hypothesis import given, settings
 from hypothesis.strategies import floats
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
 
-from imod.msw.fixed_format import format_fixed_width
 from imod.msw import GridData
-
-import pytest
+from imod.msw.fixed_format import format_fixed_width
 
 
 @given(
