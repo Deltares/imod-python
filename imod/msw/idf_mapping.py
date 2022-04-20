@@ -8,7 +8,7 @@ from imod.util import spatial_reference
 
 class IdfMapping(MetaSwapPackage):
     """
-    Mapping for IDFs.
+    Describes svat location in the IDF grid.
 
     Note that MetaSWAP can only write equidistant grids.
     """
@@ -18,7 +18,6 @@ class IdfMapping(MetaSwapPackage):
         "svat": VariableMetaData(10, 1, 9999999, int),
         "rows": VariableMetaData(10, 1, 9999999, int),
         "columns": VariableMetaData(10, 1, 9999999, int),
-        # TODO: Check if x and y limits are properly set.
         "y_grid": VariableMetaData(15, 0.0, 9999999.0, float),
         "x_grid": VariableMetaData(15, 0.0, 9999999.0, float),
     }
@@ -27,8 +26,9 @@ class IdfMapping(MetaSwapPackage):
     _without_subunit = ("rows", "columns", "y_grid", "x_grid")
     _to_fill = ()
 
-    # TODO: Quote from IO manual: The x- and y-coordinates should increase with increasing col, row.
-    # But example works with decreasing y-coordinates?
+    # NOTE that it is stated in the IO manual: "The x- and y-coordinates should
+    # increase with increasing col, row." But the example works with decreasing
+    # y-coordinates.
 
     def __init__(self, area, nodata):
         super().__init__()
