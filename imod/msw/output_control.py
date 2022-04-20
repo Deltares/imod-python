@@ -94,7 +94,10 @@ class VariableOutputControl(MetaSwapPackage):
 
 class TimeOutputControl(MetaSwapPackage):
     """
-    Specify the accumulation periods which will be used to write output.
+    Specify the accumulation periods which will be used to write output. For
+    example, say the model computes on a daily timestep, but timesteps two days
+    apart are specified, the summed fluxes of each two days are written by
+    MetaSWAP.
 
     Parameters
     ----------
