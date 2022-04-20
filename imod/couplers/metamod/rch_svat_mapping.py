@@ -12,9 +12,6 @@ class RechargeSvatMapping(MetaModMapping):
 
     This class is responsible for the file `rchindex2svat.dxc`.
 
-    Unlike imod.msw.CouplerMapping, this class does not include mapping to
-    wells.
-
     Parameters
     ----------
     svat: array of floats (xr.DataArray)
