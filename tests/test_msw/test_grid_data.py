@@ -344,6 +344,104 @@ def test_simple_model(fixed_format_parser):
     assert_almost_equal(results["rootzone_depth"], np.array([1.0, 1.0, 1.0, 1.0]))
 
 
+def test_simple_model_1_subunit(fixed_format_parser):
+
+    x = [1.0, 2.0, 3.0]
+    y = [1.0, 2.0, 3.0]
+    subunit = [0]
+    dx = 1.0
+    dy = 1.0
+    # fmt: off
+    area = xr.DataArray(
+        np.array(
+            [
+                [[0.5, 0.5, 0.5],
+                 [0.7, 0.7, 0.7],
+                 [1.0, 1.0, 1.0]],
+
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
+    landuse = xr.DataArray(
+        np.array(
+            [
+                [[1.0, 1.0, 1.0],
+                 [1.0, 1.0, 1.0],
+                 [1.0, 1.0, 1.0]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
+    rootzone_depth = xr.DataArray(
+        np.array(
+            [
+                [[1.0, 1.0, 1.0],
+                 [1.0, 1.0, 1.0],
+                 [1.0, 1.0, 1.0]],
+            ]
+        ),
+        dims=("subunit", "y", "x"),
+        coords={"subunit": subunit, "y": y, "x": x, "dx": dx, "dy": dy}
+    )
+
+    surface_elevation = xr.DataArray(
+        np.array(
+            [[1.0, 2.0, 3.0],
+             [4.0, 5.0, 6.0],
+             [7.0, 8.0, 9.0]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+    )
+
+    soil_physical_unit = xr.DataArray(
+        np.array(
+            [[1.0, 2.0, 3.0],
+             [4.0, 5.0, 6.0],
+             [7.0, 8.0, 9.0]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x, "dx": dx, "dy": dy}
+    )
+
+    active = xr.DataArray(
+        np.array(
+            [[False, True, False],
+             [False, True, False],
+             [False, True, False]]),
+        dims=("y", "x"),
+        coords={"y": y, "x": x}
+    )
+    # fmt: on
+
+    grid_data = GridData(
+        area,
+        landuse,
+        rootzone_depth,
+        surface_elevation,
+        soil_physical_unit,
+        active,
+    )
+
+    index, svat = grid_data.generate_index_array()
+
+    with tempfile.TemporaryDirectory() as output_dir:
+        output_dir = Path(output_dir)
+        grid_data.write(output_dir, index, svat)
+
+        results = fixed_format_parser(
+            output_dir / GridData._file_name, GridData._metadata_dict
+        )
+
+    assert_equal(results["svat"], np.array([1, 2, 3]))
+    assert_almost_equal(results["area"], np.array([0.5, 0.7, 1.0]))
+    assert_almost_equal(results["surface_elevation"], np.array([2.0, 5.0, 8.0]))
+    assert_equal(results["soil_physical_unit"], np.array([2, 5, 8]))
+    assert_equal(results["landuse"], np.array([1, 1, 1]))
+    assert_almost_equal(results["rootzone_depth"], np.array([1.0, 1.0, 1.0]))
+
+
 def test_area_grid_exceeds_cell_area():
     """
     Test where provided area grid exceeds total cell area, should throw error.
