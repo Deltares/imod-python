@@ -13,7 +13,8 @@ class VariableOutputControl(MetaSwapPackage):
     """
     Control which variables will be created as output. The variable names used
     in this class provide a condensed water balance. You can use additional
-    keyword arguments to set more variables. For all possibilities see the
+    keyword arguments to set more variables by using their specific name, e.g.
+    `vcr = True` for the water balance error. For all possibilities see the
     SIMGRO Input and Output description.
 
     All budgets will be written in m unit to in `.idf` files and to mm unit in
