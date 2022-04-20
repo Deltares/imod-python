@@ -32,8 +32,8 @@ class WellSvatMapping(MetaModMapping):
         "layer": VariableMetaData(5, 0, 9999, int),
     }
 
-    _with_subunit = ["wel_id", "svat", "layer"]
-    _to_fill = ["free"]
+    _with_subunit = ("wel_id", "svat", "layer")
+    _to_fill = ("free",)
 
     def __init__(self, svat: xr.DataArray, well: mf6.WellDisStructured):
         super().__init__()

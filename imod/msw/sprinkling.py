@@ -38,18 +38,18 @@ class Sprinkling(MetaSwapPackage):
         "trajectory": VariableMetaData(10, None, None, str),
     }
 
-    _with_subunit = []
-    _without_subunit = [
+    _with_subunit = ()
+    _without_subunit = (
         "max_abstraction_groundwater_m3_d",
         "max_abstraction_surfacewater_m3_d",
-    ]
+    )
 
-    _to_fill = [
+    _to_fill = (
         "max_abstraction_groundwater_mm_d",
         "max_abstraction_surfacewater_mm_d",
         "svat_groundwater",
         "trajectory",
-    ]
+    )
 
     def __init__(
         self,

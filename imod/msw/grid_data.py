@@ -46,9 +46,9 @@ class GridData(MetaSwapPackage):
         "landuse": VariableMetaData(6, 1, 999999, int),
         "rootzone_depth": VariableMetaData(8, 0.0, 10.0, float),
     }
-    _with_subunit = ["area", "landuse", "rootzone_depth"]
-    _without_subunit = ["surface_elevation", "soil_physical_unit"]
-    _to_fill = ["soil_physical_unit_string", "temp"]
+    _with_subunit = ("area", "landuse", "rootzone_depth")
+    _without_subunit = ("surface_elevation", "soil_physical_unit")
+    _to_fill = ("soil_physical_unit_string", "temp")
 
     def __init__(
         self,

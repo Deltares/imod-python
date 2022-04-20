@@ -45,14 +45,14 @@ class Infiltration(MetaSwapPackage):
         "extra_storage_coefficient": VariableMetaData(8, 0.01, 1.0, float),
     }
 
-    _with_subunit = ["infiltration_capacity"]
-    _without_subunit = [
+    _with_subunit = ("infiltration_capacity",)
+    _without_subunit = (
         "downward_resistance",
         "upward_resistance",
         "bottom_resistance",
         "extra_storage_coefficient",
-    ]
-    _to_fill = []
+    )
+    _to_fill = ()
 
     def __init__(
         self,

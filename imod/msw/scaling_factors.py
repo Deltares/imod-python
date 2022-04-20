@@ -50,13 +50,13 @@ class ScalingFactors(MetaSwapPackage):
         "depth_perched_water_table": VariableMetaData(8, 0.1, 10.0, float),
     }
 
-    _with_subunit = [
+    _with_subunit = (
         "scale_soil_moisture",
         "scale_hydraulic_conductivity",
         "scale_pressure_head",
-    ]
-    _without_subunit = ["depth_perched_water_table"]
-    _to_fill = []
+    )
+    _without_subunit = ("depth_perched_water_table",)
+    _to_fill = ()
 
     def __init__(
         self,

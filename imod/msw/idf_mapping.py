@@ -23,9 +23,9 @@ class IdfMapping(MetaSwapPackage):
         "x_grid": VariableMetaData(15, 0.0, 9999999.0, float),
     }
 
-    _with_subunit = []
-    _without_subunit = ["rows", "columns", "y_grid", "x_grid"]
-    _to_fill = []
+    _with_subunit = ()
+    _without_subunit = ("rows", "columns", "y_grid", "x_grid")
+    _to_fill = ()
 
     # TODO: Quote from IO manual: The x- and y-coordinates should increase with increasing col, row.
     # But example works with decreasing y-coordinates?

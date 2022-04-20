@@ -32,8 +32,8 @@ class RechargeSvatMapping(MetaModMapping):
         "layer": VariableMetaData(5, 0, 9999, int),
     }
 
-    _with_subunit = ["rch_id", "svat", "layer"]
-    _to_fill = ["free"]
+    _with_subunit = ("rch_id", "svat", "layer")
+    _to_fill = ("free",)
 
     def __init__(self, svat: xr.DataArray, recharge: mf6.Recharge):
         super().__init__()

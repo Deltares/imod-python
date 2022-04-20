@@ -31,9 +31,9 @@ class CouplerMapping(MetaSwapPackage):
         "layer": VariableMetaData(5, 0, 9999, int),
     }
 
-    _with_subunit = ["mod_id"]
-    _without_subunit = []
-    _to_fill = ["free"]
+    _with_subunit = ("mod_id",)
+    _without_subunit = ()
+    _to_fill = ("free",)
 
     def __init__(
         self,

@@ -35,9 +35,9 @@ class Ponding(MetaSwapPackage):
         "runon_resistance": VariableMetaData(8, 0.0, 1e6, float),
     }
 
-    _with_subunit = ["ponding_depth", "runoff_resistance", "runon_resistance"]
-    _without_subunit = []
-    _to_fill = []
+    _with_subunit = ("ponding_depth", "runoff_resistance", "runon_resistance")
+    _without_subunit = ()
+    _to_fill = ()
 
     def __init__(self, ponding_depth, runon_resistance, runoff_resistance) -> None:
         super().__init__()
