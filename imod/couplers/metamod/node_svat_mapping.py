@@ -57,7 +57,8 @@ class NodeSvatMapping(MetaModMapping):
         self.dataset["mod_id"] = xr.full_like(
             self.dataset["svat"], fill_value=0, dtype=np.int64
         )
-        n_subunit, _, _ = self.dataset["svat"].shape
+
+        n_subunit = self.dataset["subunit"].size
         n_mod = self.idomain_active.sum()
 
         idomain_active = self.idomain_active.values

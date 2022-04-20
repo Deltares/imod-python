@@ -54,7 +54,7 @@ class CouplerMapping(MetaSwapPackage):
         infiltration will take place.
         """
         self.dataset["mod_id"] = xr.full_like(svat, fill_value=0, dtype=np.int64)
-        n_subunit, _, _ = svat.shape
+        n_subunit = svat["subunit"].size
         idomain_top_active = self.idomain_active.sel(layer=1, drop=True)
 
         n_mod_top = idomain_top_active.sum()
@@ -98,7 +98,7 @@ class CouplerMapping(MetaSwapPackage):
         """
         Get modflow indices, svats, and layer number for the wells
         """
-        n_subunit, _, _ = svat.shape
+        n_subunit = svat["subunit"].size
 
         # Convert to Python's 0-based index
         well_row = self.well["row"] - 1

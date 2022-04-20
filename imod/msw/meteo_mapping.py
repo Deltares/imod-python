@@ -68,7 +68,7 @@ class MeteoMapping(MetaSwapPackage):
         if flip_meteo_x ^ flip_svat_x:
             column = (ncol + 1) - column
 
-        n_subunit, _, _ = svat.shape
+        n_subunit = svat["subunit"].size
 
         return np.tile(row, n_subunit), np.tile(column, n_subunit)
 

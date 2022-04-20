@@ -53,7 +53,7 @@ class RechargeSvatMapping(MetaModMapping):
             self.dataset["svat"], fill_value=0, dtype=np.int64
         )
 
-        n_subunit, _, _ = self.dataset["rch_id"].shape
+        n_subunit = self.dataset["subunit"].size
         n_rch = self.dataset["rch_active"].sum()
 
         rch_active = self.dataset["rch_active"].values

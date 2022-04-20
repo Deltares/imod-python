@@ -69,7 +69,7 @@ class Sprinkling(MetaSwapPackage):
         well_column = self.well["column"] - 1
         well_layer = self.well["layer"]
 
-        n_subunit, _, _ = svat.shape
+        n_subunit = svat["subunit"].size
 
         well_svat = svat.values[:, well_row, well_column]
         well_active = well_svat != 0
