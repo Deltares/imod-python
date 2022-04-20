@@ -17,6 +17,7 @@ import pandas as pd
 import xarray as xr
 
 import imod
+import os
 
 # %%
 # Creating an example file
@@ -69,9 +70,9 @@ landuse_options = imod.msw.LanduseOptions(
 # %%
 # Just to create an example file, we'll write landuse_options into a
 # luse_svat.inp file in a temporary directory
-import tempfile
 
-directory = tempfile.gettempdir()
+directory = imod.util.temporary_directory()
+os.makedirs(directory)
 
 landuse_options.write(directory, None, None)
 
@@ -81,9 +82,7 @@ landuse_options.write(directory, None, None)
 #
 # We'll construct the path to the luse_svat.inp file first
 
-from pathlib import Path
-
-input_file = Path(directory) / "luse_svat.inp"
+input_file = directory / "luse_svat.inp"
 
 # %%
 # iMOD Python has a ``fixed_format_parser`` to parse MetaSWAP's .inp files.
