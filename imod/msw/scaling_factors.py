@@ -1,4 +1,4 @@
-from imod.fixed_format import VariableMetaData
+from imod.msw.fixed_format import VariableMetaData
 from imod.msw.pkgbase import MetaSwapPackage
 
 
