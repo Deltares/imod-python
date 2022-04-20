@@ -1,5 +1,3 @@
-import textwrap
-
 import numpy as np
 import xarray as xr
 
@@ -69,10 +67,8 @@ class RechargeSvatMapping(MetaModMapping):
         rch_dims = self.dataset["rch_active"].dims
         if rch_dims != ("y", "x"):
             raise ValueError(
-                textwrap.dedent(
-                    f"""Recharge grid can only have dimensions ('y', 'x'). Got
-                     {rch_dims} instead"""
-                )
+                "Recharge grid can only have dimensions ('y', 'x'). Got "
+                f"{rch_dims} instead"
             )
 
         # Check if active msw cell inactive in recharge
@@ -81,8 +77,5 @@ class RechargeSvatMapping(MetaModMapping):
 
         if inactive_in_rch.any():
             raise ValueError(
-                textwrap.dedent(
-                    """Active MetaSWAP cell detected in inactive cell in
-                     Modflow6 recharge"""
-                )
+                "Active MetaSWAP cell detected in inactive cell in Modflow6 recharge"
             )

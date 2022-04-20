@@ -1,5 +1,3 @@
-import textwrap
-
 import numpy as np
 import xarray as xr
 
@@ -77,8 +75,5 @@ class NodeSvatMapping(MetaModMapping):
 
         if inactive_in_idomain.any():
             raise ValueError(
-                textwrap.dedent(
-                    """Active MetaSWAP cell detected in inactive cell in
-                     Modflow6 idomain"""
-                )
+                "Active MetaSWAP cell detected in inactive cell in Modflow6 idomain"
             )

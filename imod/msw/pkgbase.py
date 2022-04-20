@@ -1,5 +1,4 @@
 import abc
-import textwrap
 from pathlib import Path
 from typing import Union
 
@@ -98,16 +97,12 @@ class MetaSwapPackage(abc.ABC):
         for var in self._with_subunit:
             if "subunit" not in self.dataset[var].coords:
                 raise ValueError(
-                    textwrap.dedent(
-                        f"""Variable '{var}' in {self.__class__} should contain
-                         'subunit' coordinate"""
-                    )
+                    f"Variable '{var}' in {self.__class__} should contain "
+                    "'subunit' coordinate"
                 )
         for var in self._without_subunit:
             if "subunit" in self.dataset[var].coords:
                 raise ValueError(
-                    textwrap.dedent(
-                        f"""Variable '{var}' in {self.__class__} should not
-                         contain 'subunit' coordinate"""
-                    )
+                    f"Variable '{var}' in {self.__class__} should not "
+                    "contain 'subunit' coordinate"
                 )

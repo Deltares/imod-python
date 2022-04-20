@@ -1,4 +1,3 @@
-import textwrap
 from pathlib import Path
 from typing import Union
 
@@ -159,10 +158,8 @@ class MetaMod:
         # FUTURE: Not necessary after iMOD Coupler refactoring
         if "rch_msw" not in gwf_model.keys():
             raise ValueError(
-                textwrap.dedent(
-                    "No package named 'rch_msw' detected in Modflow 6 model. "
-                    "iMOD_coupler requires a Recharge package with 'rch_msw' as name"
-                )
+                "No package named 'rch_msw' detected in Modflow 6 model. "
+                "iMOD_coupler requires a Recharge package with 'rch_msw' as name"
             )
 
         recharge = gwf_model["rch_msw"]
@@ -175,12 +172,10 @@ class MetaMod:
         # FUTURE: Not necessary after iMOD Coupler refactoring
         if (sprinkling_key is not None) and not ("wells_msw" in gwf_model.keys()):
             raise ValueError(
-                textwrap.dedent(
-                    "No package named 'wells_msw' found in Modflow 6 model, "
-                    "but Sprinkling package found in MetaSWAP. "
-                    "iMOD Coupler requires a Well Package named 'wells_msw' "
-                    "to couple wells."
-                )
+                "No package named 'wells_msw' found in Modflow 6 model, "
+                "but Sprinkling package found in MetaSWAP. "
+                "iMOD Coupler requires a Well Package named 'wells_msw' "
+                "to couple wells."
             )
         elif "wells_msw" in gwf_model.keys():
             well = gwf_model["wells_msw"]

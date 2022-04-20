@@ -1,5 +1,4 @@
 import collections
-import textwrap
 from copy import copy
 from pathlib import Path
 from typing import Union
@@ -127,17 +126,13 @@ class MetaSwapModel(Model):
         initial_condition_set = pkg_types_included & set(INITIAL_CONDITIONS_PACKAGES)
         if len(initial_condition_set) < 1:
             raise ValueError(
-                textwrap.dedent(
-                    f"""Missing InitialCondition package, assign one of
-                     {INITIAL_CONDITIONS_PACKAGES}"""
-                )
+                "Missing InitialCondition package, assign one of "
+                f"{INITIAL_CONDITIONS_PACKAGES}"
             )
         elif len(initial_condition_set) > 1:
             raise ValueError(
-                textwrap.dedent(
-                    f"""Multiple InitialConditions assigned, choose one of
-                     {initial_condition_set}"""
-                )
+                "Multiple InitialConditions assigned, choose one of "
+                f"{initial_condition_set}"
             )
 
     def _check_landuse_indices_in_lookup_options(self):
@@ -153,10 +148,8 @@ class MetaSwapModel(Model):
 
         if len(missing_indices) > 0:
             raise ValueError(
-                textwrap.dedent(
-                    f"""Found the following landuse indices in GridData which
-                     were not in LanduseOptions: {missing_indices}"""
-                )
+                "Found the following landuse indices in GridData which "
+                f"were not in LanduseOptions: {missing_indices}"
             )
 
     def _check_vegetation_indices_in_annual_crop_factors(self):
@@ -174,10 +167,8 @@ class MetaSwapModel(Model):
 
         if len(missing_indices) > 0:
             raise ValueError(
-                textwrap.dedent(
-                    f"""Found the following vegetation indices in LanduseOptions
-                     which were not in AnnualCropGrowth: {missing_indices}"""
-                )
+                "Found the following vegetation indices in LanduseOptions "
+                f"which were not in AnnualCropGrowth: {missing_indices}"
             )
 
     def _get_starttime(self):

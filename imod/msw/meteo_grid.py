@@ -1,5 +1,4 @@
 import csv
-import textwrap
 from pathlib import Path
 from typing import Optional, Union
 
@@ -181,10 +180,6 @@ class MeteoGrid(MetaSwapPackage):
             excess_dims = set(self.dataset[varname].dims) - set(allowed_dims)
             if len(excess_dims) > 0:
                 raise ValueError(
-                    textwrap.dedent(
-                        f"""
-                        Received excess dims {excess_dims} in {self.__class__} for
-                        {varname}, please provide data with {allowed_dims}
-                        """
-                    )
+                    f"Received excess dims {excess_dims} in {self.__class__} for "
+                    f"{varname}, please provide data with {allowed_dims}"
                 )
