@@ -174,6 +174,8 @@ class MetaSwapModel(Model):
     def _get_starttime(self):
         """
         Loop over all packages to get the minimum time.
+
+        MetaSWAP requires a starttime in its simulation settings (para_sim.inp)
         """
 
         starttimes = []
