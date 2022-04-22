@@ -124,7 +124,9 @@ def test_metamod_write_exhange_no_sprinkling(
         RechargeSvatMapping._metadata_dict,
     )
 
-    assert (output_dir / WellSvatMapping._file_name).exists() == False
+    well_dxc_written = (output_dir / WellSvatMapping._file_name).exists()
+
+    assert well_dxc_written is False
 
     assert_equal(nodes_dxc["mod_id"], np.array([2, 8, 2, 5]))
     assert_equal(nodes_dxc["svat"], np.array([1, 2, 3, 4]))
