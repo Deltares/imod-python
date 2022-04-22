@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Union, Optional
 
-import os
 import tomli_w
 
 from imod.couplers.metamod.node_svat_mapping import NodeSvatMapping
