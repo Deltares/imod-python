@@ -139,8 +139,7 @@ head.isel(layer=0).plot()
 # ........
 #
 # We'll start off with the recharge package, which has no recharge cells
-# at the location of our ditches. With iMOD Coupler v 0.9.0 or older, this
-# package needs to be named ``rch_msw``
+# at the location of our ditches.
 
 recharge = xr.zeros_like(idomain.sel(layer=1))
 recharge[:, 0] = np.nan
@@ -538,14 +537,21 @@ msw_model["sprinkling"] = msw.Sprinkling(
     well=gwf_model["wells_msw"],
 )
 
-# %%
-# Coupler mapping
+# %% Coupler mapping
 # ---------------
 #
 # The MetaSWAP model and Modflow 6 simulation are provided to the MetaMod class,
-# which takes care of connecting (= "mapping") the two models.
+# which takes care of connecting (= "mapping") the two models. Make sure to
+# provide the keys of the dummy Modflow 6 boundary conditions where MetaSWAP is
+# coupled to, so iMOD Python knows where to look: It is technically possible to
+# define multiple WEL and RCH packages in Modflow 6.
 
-metamod = couplers.MetaMod(msw_model=msw_model, mf6_simulation=simulation)
+metamod = couplers.MetaMod(
+    msw_model=msw_model,
+    mf6_simulation=simulation,
+    mf6_rch_pkgkey="rch_msw",
+    mf6_wel_pkgkey="wells_msw",
+)
 
 # %%
 # By providing a few necessary paths to the modflow and metaswap libraries
