@@ -199,8 +199,8 @@ times
 # The next step is initating a ``MetaSwapModel``. Critical is setting the right
 # path to MetaSWAP's soil physical database, which contains the lookup table
 # with the soil physical relationships. Without access to this database MetaSWAP
-# cannot functino. To download the full database, please contact
-# ``--add-link-here--``.
+# cannot function. `The full database can be downloaded here.
+# <http://www.nhi.nu/nl/index.php/data/nhi-lhm/invoer/onverzadigde-zone/>`_
 
 msw_model = msw.MetaSwapModel(unsaturated_database="./path/to/unsaturated/database")
 
@@ -224,7 +224,8 @@ active[..., -1] = False
 
 active
 
-# %% Another crucial grid is the "area" grid. The area grid denotes the area in
+# %%
+# Another crucial grid is the "area" grid. The area grid denotes the area in
 # each cell, for each "subunit". A subunit represent a separate landuse in the
 # grid. We'll create a grid with two separate land uses.
 #
@@ -276,10 +277,11 @@ landuse
 # ``````````
 #
 # Define soil type classes. These will be looked up in MetaSWAP's giant lookup
-# table for the national Staring series describing Dutch soils. To download the
-# full database, please contact ``--add-link-here--``. In previous examples we
-# set values in our DataArray using numpy indexing. But we can also use xarray's
-# ``where()`` method to set values.
+# table for the national Staring series describing Dutch soils. `The full
+# database can be downloaded here.
+# <http://www.nhi.nu/nl/index.php/data/nhi-lhm/invoer/onverzadigde-zone/>` In
+# previous examples we set values in our DataArray using numpy indexing. But we
+# can also use xarray's ``where()`` method to set values.
 
 slt = xr.full_like(msw_grid, 1, dtype=np.int16)
 # Set all cells on the right half to 2.
@@ -537,7 +539,8 @@ msw_model["sprinkling"] = msw.Sprinkling(
     well=gwf_model["wells_msw"],
 )
 
-# %% Coupler mapping
+# %%
+# Coupler mapping
 # ---------------
 #
 # The MetaSWAP model and Modflow 6 simulation are provided to the MetaMod class,
