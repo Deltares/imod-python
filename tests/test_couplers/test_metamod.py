@@ -16,7 +16,6 @@ except ModuleNotFoundError:
     import tomli as tomllib
 
 
-@pytest.mark.usefixtures("msw_model", "coupled_mf6_model")
 def test_metamod_write(msw_model, coupled_mf6_model, tmp_path):
     output_dir = tmp_path / "metamod"
 
@@ -43,7 +42,6 @@ def test_metamod_write(msw_model, coupled_mf6_model, tmp_path):
     assert len(list(output_dir.rglob(r"*.wel"))) == 1
 
 
-@pytest.mark.usefixtures("msw_model", "coupled_mf6_model")
 def test_metamod_write_exhange(
     msw_model, coupled_mf6_model, fixed_format_parser, tmp_path
 ):
@@ -91,7 +89,6 @@ def test_metamod_write_exhange(
     assert_equal(wel_dxc["layer"], np.array([3, 3, 3, 3]))
 
 
-@pytest.mark.usefixtures("msw_model", "coupled_mf6_model")
 def test_metamod_write_exhange_no_sprinkling(
     msw_model, coupled_mf6_model, fixed_format_parser, tmp_path
 ):
@@ -137,7 +134,6 @@ def test_metamod_write_exhange_no_sprinkling(
     assert_equal(rch_dxc["layer"], np.array([1, 1, 1, 1]))
 
 
-@pytest.mark.usefixtures("msw_model", "coupled_mf6_model")
 def test_metamod_write_toml(msw_model, coupled_mf6_model, tmp_path):
     output_dir = tmp_path
     output_dir.mkdir(exist_ok=True, parents=True)
@@ -190,7 +186,6 @@ def test_metamod_write_toml(msw_model, coupled_mf6_model, tmp_path):
     assert toml_dict == dict_expected
 
 
-@pytest.mark.usefixtures("msw_model", "coupled_mf6_model")
 def test_metamod_get_coupling_dict(msw_model, coupled_mf6_model, tmp_path):
     output_dir = tmp_path / "exchanges"
 
@@ -220,7 +215,6 @@ def test_metamod_get_coupling_dict(msw_model, coupled_mf6_model, tmp_path):
     assert dict_expected == coupled_dict
 
 
-@pytest.mark.usefixtures("msw_model", "coupled_mf6_model")
 def test_metamod_get_coupling_dict_no_sprinkling(
     msw_model, coupled_mf6_model, tmp_path
 ):
@@ -253,7 +247,6 @@ def test_metamod_get_coupling_dict_no_sprinkling(
     assert dict_expected == coupled_dict
 
 
-@pytest.mark.usefixtures("msw_model", "coupled_mf6_model")
 def test_metamod_init_no_sprinkling_fail(msw_model, coupled_mf6_model):
 
     # Remove sprinkling package
@@ -268,7 +261,6 @@ def test_metamod_init_no_sprinkling_fail(msw_model, coupled_mf6_model):
         )
 
 
-@pytest.mark.usefixtures("msw_model", "coupled_mf6_model")
 def test_metamod_init_no_mf6_well_fail(msw_model, coupled_mf6_model):
 
     with pytest.raises(ValueError):
@@ -280,7 +272,6 @@ def test_metamod_init_no_mf6_well_fail(msw_model, coupled_mf6_model):
         )
 
 
-@pytest.mark.usefixtures("msw_model", "coupled_mf6_model")
 def test_metamod_init_no_mf6_well_fail2(msw_model, coupled_mf6_model):
 
     with pytest.raises(ValueError):
@@ -292,7 +283,6 @@ def test_metamod_init_no_mf6_well_fail2(msw_model, coupled_mf6_model):
         )
 
 
-@pytest.mark.usefixtures("msw_model", "coupled_mf6_model")
 def test_metamod_init_no_mf6_rch_fail(msw_model, coupled_mf6_model):
 
     with pytest.raises(ValueError):

@@ -6,7 +6,6 @@ from numpy.testing import assert_almost_equal, assert_equal
 from imod import msw
 
 
-@pytest.mark.usefixtures("msw_model")
 def test_msw_model_write(msw_model, tmp_path):
     output_dir = tmp_path / "metaswap"
     msw_model.write(output_dir)
@@ -15,7 +14,6 @@ def test_msw_model_write(msw_model, tmp_path):
     assert len(list(output_dir.rglob(r"*.asc"))) == 4
 
 
-@pytest.mark.usefixtures("msw_model")
 def test_get_starttime(msw_model):
     year, time_since_start_year = msw_model._get_starttime()
 
@@ -23,14 +21,12 @@ def test_get_starttime(msw_model):
     assert_almost_equal(time_since_start_year, 0.0)
 
 
-@pytest.mark.usefixtures("msw_model")
 def test_get_pkgkey(msw_model):
     pkg_id = msw_model._get_pkg_key(msw.GridData)
 
     assert pkg_id == "grid"
 
 
-@pytest.mark.usefixtures("msw_model")
 def test_check_required_packages(msw_model):
     # Should not throw error
     msw_model._check_required_packages()
@@ -42,7 +38,6 @@ def test_check_required_packages(msw_model):
         msw_model._check_required_packages()
 
 
-@pytest.mark.usefixtures("msw_model")
 def test_check_vegetation_indices_in_annual_crop_factors(msw_model):
     msw_model._check_vegetation_indices_in_annual_crop_factors()
 
@@ -55,7 +50,6 @@ def test_check_vegetation_indices_in_annual_crop_factors(msw_model):
         msw_model._check_vegetation_indices_in_annual_crop_factors()
 
 
-@pytest.mark.usefixtures("msw_model")
 def test_check_landuse_indices_in_lookup_options(msw_model):
     msw_model._check_landuse_indices_in_lookup_options()
 
@@ -68,7 +62,6 @@ def test_check_landuse_indices_in_lookup_options(msw_model):
         msw_model._check_landuse_indices_in_lookup_options()
 
 
-@pytest.mark.usefixtures("msw_model")
 def test_render_unsat_database_path(msw_model, tmp_path):
     rel_path = msw_model._render_unsaturated_database_path("./unsat_database")
 
