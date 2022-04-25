@@ -6,7 +6,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
-transportPackages = ["adv"]
+transportPackages = ["adv", "dsp"]
 
 def dis_recarr(arrdict, layer, notnull):
     # Define the numpy structured array dtype
