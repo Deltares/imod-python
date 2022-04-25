@@ -73,8 +73,9 @@ gwf_model["dis"] = mf6.StructuredDiscretization(idomain=idomain, top=top, bottom
 #
 # Hydraulic conductivity
 # ''''''''''''''''''''''
-# Assign the node property flow package, which specifies the hydraulic conductivities.
-# The middle layer is an aquitard.
+#
+# Assign the node property flow package, which specifies the hydraulic
+# conductivities. The middle layer is an aquitard.
 
 k = xr.DataArray([10.0, 0.1, 10.0], {"layer": layer}, ("layer",))
 k33 = xr.DataArray([1.0, 0.01, 1.0], {"layer": layer}, ("layer",))
@@ -88,9 +89,13 @@ gwf_model["npf"] = mf6.NodePropertyFlow(
 # %%
 # Storage
 # '''''''
+#
+# Cells are set to non-convertible (convertible = 0). This is a requirement for
+# MetaSWAP, because, once coupled, MetaSWAP is responsible for computing the
+# storage coefficient instead of Modflow.
 
 gwf_model["sto"] = mf6.SpecificStorage(
-    specific_storage=1e-3, specific_yield=0.1, transient=True, convertible=0
+    specific_storage=1e-3, specific_yield=0.0, transient=True, convertible=0
 )
 
 # %%
