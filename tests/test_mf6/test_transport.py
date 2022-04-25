@@ -18,7 +18,16 @@ def test_advection_():
     expected = 'begin options\n  scheme upstream\n\nend options'
     assert actual == expected
     
+def test_advection_default():
 
+    a = imod.mf6.Advection() #call constructor without parameters
+
+    directory = pathlib.Path("mymodel")
+    globaltimes = [np.datetime64("2000-01-01")]    
+    actual = a.render(directory, "adv", globaltimes, True)
+    expected = 'begin options\n  scheme upstream\n\nend options'
+    assert actual == expected
+    
 def test_transport_():
     m = imod.mf6.model.GroundwaterTransportModel()
     a = imod.mf6.Advection(AdvectionSchemes.upstream)
