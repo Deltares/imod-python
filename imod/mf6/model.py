@@ -24,7 +24,7 @@ class ModflowModel(Model):
     Contains data and writes consistent model input files
     """
     _pkg_id = "model"
-
+    _mandatoryPackages = []
     def __init__(self):
         super().__init__()
 
@@ -54,7 +54,7 @@ class ModflowModel(Model):
         dispresent = "dis" in pkg_ids or "disv" in pkg_ids or "disu" in pkg_ids
         if not dispresent:
             raise ValueError(f"No dis/disv/disu package found in model {modelkey}")
-        for required in ["npf", "ic", "oc", "sto"]:
+        for required in self._mandatoryPackages:
             if required not in pkg_ids:
                 raise ValueError(f"No {required} package found in model {modelkey}")
         return 
@@ -121,6 +121,7 @@ class ModflowModel(Model):
 class GroundwaterFlowModel(ModflowModel):
 
     def __init__(self, newton=False, under_relaxation=False):
+        self._mandatoryPackages = ["npf", "ic", "oc", "sto"]
         super().__init__()
         self.newton = newton
         self.under_relaxation = under_relaxation
@@ -190,12 +191,21 @@ class GroundwaterFlowModel(ModflowModel):
         )
         qgs_util._write_qgis_projectfile(qgs_tree, directory / ("qgis_proj" + ext))
 
-
-
-
 class GroundwaterTransportModel(ModflowModel):
     def __init__(self):
         super().__init__()
         self._initialize_template()
 
-    
+    def render(self, modelname):
+        """Render model namefile"""
+        dir_for_render = pathlib.Path(modelname)
+        d = {}
+        packages = []
+        for pkgname, pkg in self.items():
+            # Add the six to the package id
+            pkg_id = pkg._pkg_id
+            key = f"{pkg_id}6"
+            path = dir_for_render / f"{pkgname}.{pkg_id}"
+            packages.append((key, path.as_posix(), pkgname))
+        d["packages"] = packages
+        return self._template.render(d)   
