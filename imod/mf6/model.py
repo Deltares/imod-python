@@ -18,23 +18,21 @@ class Model(collections.UserDict):
             self[k] = v
 
 
-class GroundwaterFlowModel(Model):
+
+class ModflowModel(Model):
     """
     Contains data and writes consistent model input files
     """
-
     _pkg_id = "model"
+
+    def __init__(self):
+        super().__init__()
+
 
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         self._template = env.get_template("gwf-nam.j2")
-
-    def __init__(self, newton=False, under_relaxation=False):
-        super().__init__()
-        self.newton = newton
-        self.under_relaxation = under_relaxation
-        self._initialize_template()
 
     def _get_pkgkey(self, pkg_id):
         """
@@ -48,7 +46,7 @@ class GroundwaterFlowModel(Model):
         elif nkey == 1:
             return key[0]
         else:
-            return None
+            return None    
 
     def _check_for_required_packages(self, modelkey: str) -> None:
         # Check for mandatory packages
@@ -59,7 +57,14 @@ class GroundwaterFlowModel(Model):
         for required in ["npf", "ic", "oc", "sto"]:
             if required not in pkg_ids:
                 raise ValueError(f"No {required} package found in model {modelkey}")
-        return
+        return 
+
+    def _yield_times(self):
+        modeltimes = []
+        for pkg in self.values():
+            if "time" in pkg.dataset.coords:
+                modeltimes.append(pkg.dataset["time"].values)
+        return modeltimes                       
 
     def _use_cftime(self):
         """
@@ -88,26 +93,6 @@ class GroundwaterFlowModel(Model):
             else:
                 raise ValueError("Use either cftime or numpy.datetime64[ns].")
 
-    def _yield_times(self):
-        modeltimes = []
-        for pkg in self.values():
-            if "time" in pkg.dataset.coords:
-                modeltimes.append(pkg.dataset["time"].values)
-        return modeltimes
-
-    def render(self, modelname):
-        """Render model namefile"""
-        dir_for_render = pathlib.Path(modelname)
-        d = {"newton": self.newton, "under_relaxation": self.under_relaxation}
-        packages = []
-        for pkgname, pkg in self.items():
-            # Add the six to the package id
-            pkg_id = pkg._pkg_id
-            key = f"{pkg_id}6"
-            path = dir_for_render / f"{pkgname}.{pkg_id}"
-            packages.append((key, path.as_posix(), pkgname))
-        d["packages"] = packages
-        return self._template.render(d)
 
     def write(self, directory, modelname, globaltimes, binary=True):
         """
@@ -131,7 +116,31 @@ class GroundwaterFlowModel(Model):
                 pkgname=pkgname,
                 globaltimes=globaltimes,
                 binary=binary,
-            )
+            )                
+
+class GroundwaterFlowModel(ModflowModel):
+
+    def __init__(self, newton=False, under_relaxation=False):
+        super().__init__()
+        self.newton = newton
+        self.under_relaxation = under_relaxation
+        self._initialize_template()
+
+
+    def render(self, modelname):
+        """Render model namefile"""
+        dir_for_render = pathlib.Path(modelname)
+        d = {"newton": self.newton, "under_relaxation": self.under_relaxation}
+        packages = []
+        for pkgname, pkg in self.items():
+            # Add the six to the package id
+            pkg_id = pkg._pkg_id
+            key = f"{pkg_id}6"
+            path = dir_for_render / f"{pkgname}.{pkg_id}"
+            packages.append((key, path.as_posix(), pkgname))
+        d["packages"] = packages
+        return self._template.render(d)
+
 
     def write_qgis_project(self, directory, crs, aggregate_layers=False):
         """
@@ -180,3 +189,13 @@ class GroundwaterFlowModel(Model):
             self, pkgnames, data_paths, data_vars_ls, crs
         )
         qgs_util._write_qgis_projectfile(qgs_tree, directory / ("qgis_proj" + ext))
+
+
+
+
+class GroundwaterTransportModel(ModflowModel):
+    def __init__(self):
+        super().__init__()
+        self._initialize_template()
+
+    
