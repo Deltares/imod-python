@@ -52,6 +52,7 @@ sphinx_gallery_conf = {
         "../examples/mf6",
         "../examples/imod-wq",
         "../examples/imodflow",
+        "../examples/metaswap",
         "../examples/prepare",
         "../examples/visualize",
     ],  # path to your example scripts
@@ -61,6 +62,7 @@ sphinx_gallery_conf = {
         "examples/mf6",
         "examples/imod-wq",
         "examples/imodflow",
+        "examples/metaswap",
         "examples/prepare",
         "examples/visualize",
     ],  # path to where to save gallery generated output
