@@ -23,14 +23,13 @@ class Advection(Package):
     _pkg_id = "adv"
     _template = Package._initialize_template(_pkg_id)
     _defaultScheme = AdvectionSchemes.upstream    
-    _schemeToString= {}
  
 
     def __init__(self, scheme=_defaultScheme):     
         super().__init__()
-         
-        self._schemeToString[AdvectionSchemes.upstream] = 'upstream'
-        self._schemeToString[AdvectionSchemes.central] = 'central'
-        self._schemeToString[AdvectionSchemes.TVD] = 'TVD'   
-        self.dataset["scheme"] = self._schemeToString[scheme] 
+        schemeToString={}
+        schemeToString[AdvectionSchemes.upstream] = 'upstream'
+        schemeToString[AdvectionSchemes.central] = 'central'
+        schemeToString[AdvectionSchemes.TVD] = 'TVD'   
+        self.dataset["scheme"] = schemeToString[scheme] 
     
