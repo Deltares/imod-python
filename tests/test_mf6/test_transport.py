@@ -67,12 +67,47 @@ def test_difdisp_default():
 
         ath1
           constant 10
-
-
-      end griddata
-      '''
-    )
+      end griddata''')
+      
     assert actual == expected
 
 
-test_difdisp_default()
+def test_difdisp_options():
+  directory = pathlib.Path("mymodel")
+  globaltimes = [np.datetime64("2000-01-01")]      
+  dd = imod.mf6.DifDisp(1e-4, 1, 10, 1,2,3) 
+  dd.SetXT3DOff(True)
+  dd.SetXT3DRhs(True)
+  m = imod.mf6.model.GroundwaterTransportModel()
+  m["dsp"] = dd
+  actual =dd.render(directory, "dsp", globaltimes, True)
+  expected=textwrap.dedent(
+      '''\
+      begin options
+       XT3D_OFF
+       XT3D_RHS
+      end options
+
+      begin griddata
+        diffc
+          constant 0.0001
+
+        alh
+          constant 1
+
+        ath1
+          constant 10
+
+        alv
+          constant 1
+
+        ath2
+          constant 2
+
+        atv
+          constant 3
+      end griddata''')
+      
+   
+  print(actual)
+  assert actual == expected
