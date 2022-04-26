@@ -32,9 +32,9 @@ class DifDisp(Package):
         dspdirectory = directory / "dsp"
 
         if (self._xt3d_off ):
-            self.dataset["XT3D_OFF"]=self._xt3d_off
+            d["XT3D_OFF"]=self._xt3d_off
         if (self._xt3d_rhs ):
-            self.dataset["XT3D_RHS"]=self._xt3d_rhs
+            d["XT3D_RHS"]=self._xt3d_rhs
 
         for varname in ["diffc", "alh", "ath1", "alv", "ath2", "atv"]:
             if varname in self.dataset.keys():
