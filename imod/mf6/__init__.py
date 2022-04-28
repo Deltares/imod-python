@@ -27,5 +27,5 @@ from imod.mf6.sto import SpecificStorage, Storage, StorageCoefficient
 from imod.mf6.timedis import TimeDiscretization
 from imod.mf6.uzf import UnsaturatedZoneFlow
 from imod.mf6.wel import WellDisStructured, WellDisVertices
-from imod.mf6.adv import Advection
-from imod.mf6.dsp import DifDisp
+from imod.mf6.adv import AdvectionUpstream, AdvectionCentral, AdvectionTVD
+from imod.mf6.dsp import Dispersion
