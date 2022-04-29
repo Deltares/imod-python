@@ -17,7 +17,7 @@ def test_advection_central():
 
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")] 
-    a = imod.mf6.AdvectionUpstream()
+    a = imod.mf6.AdvectionCentral()
     actual = a.render(directory, "adv", globaltimes, True)
     expected = 'begin options\n  scheme central\n\nend options'
     assert actual == expected

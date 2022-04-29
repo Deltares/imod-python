@@ -1,8 +1,6 @@
 begin options
-{% if XT3D_OFF is defined %} XT3D_OFF
-{% endif %}
-{%- if XT3D_RHS is defined %} XT3D_RHS
-{% endif -%}
+{% if XT3D_OFF is defined %} XT3D_OFF{% endif %}
+{% if XT3D_RHS is defined %} XT3D_RHS{% endif %}
 end options
 
 begin griddata
@@ -21,9 +19,9 @@ begin griddata
 {% if ath2 is defined %}
   ath2{% if ath2_layered %} layered{% endif %}
 {% for x in ath2 %}    {{x}}
-{% endfor %}{% endif -%}
+{% endfor %}{% endif %}
 {% if atv is defined %}
   atv{% if atv_layered %} layered{% endif %}
 {% for x in atv %}    {{x}}
-{% endfor %}{% endif -%}
+{% endfor %}{% endif %}
 end griddata
