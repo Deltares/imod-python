@@ -108,7 +108,10 @@ def make_coupled_mf6_model():
     return simulation
 
 
-def make_msw_model():
+def make_msw_model(unsaturated_database=None):
+    if unsaturated_database is None:
+        unsaturated_database = "./unsat_database"
+
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
@@ -205,7 +208,7 @@ def make_msw_model():
     )
 
     # %% Initiate model
-    msw_model = msw.MetaSwapModel(unsaturated_database="./unsat_database")
+    msw_model = msw.MetaSwapModel(unsaturated_database=unsaturated_database)
     msw_model["grid"] = msw.GridData(
         area,
         xr.full_like(area, 1, dtype=int),
@@ -306,5 +309,5 @@ def coupled_mf6_model():
 
 
 @pytest.fixture(scope="function")
-def msw_model():
-    return make_msw_model()
+def msw_model(unsaturated_database=None):
+    return make_msw_model(unsaturated_database)
