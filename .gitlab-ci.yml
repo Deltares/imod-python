@@ -39,7 +39,7 @@ build:
     - python -m pytest --verbose test_visualize/test_visualize_pyvista.py
     - export NUMBA_DISABLE_JIT=1
     - python -m pytest --verbose --cov=imod --cov-config=.coveragerc
-    - cd ../docs
+    - cd ../../docs
     - make html
     - cd ..
   artifacts:
