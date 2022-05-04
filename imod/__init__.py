@@ -2,6 +2,7 @@ import pkg_resources
 
 # exports
 from imod import (
+    couplers,
     data,
     evaluate,
     flow,
@@ -9,6 +10,7 @@ from imod import (
     idf,
     ipf,
     mf6,
+    msw,
     prepare,
     rasterio,
     select,

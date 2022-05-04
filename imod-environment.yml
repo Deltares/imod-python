@@ -16,6 +16,7 @@ dependencies:
   - graphviz
   - python-graphviz
   - flopy
+  - hypothesis
   - jinja2
   - matplotlib
   - meshzoo
@@ -26,7 +27,7 @@ dependencies:
   - pooch
   - pip
   - pip:
-    - pandamesh
+      - pandamesh
   - pydata-sphinx-theme
   - pygeos
   - pyproj
@@ -42,6 +43,8 @@ dependencies:
   - sphinx
   - sphinx-gallery
   - toolz
+  - tomli>=1.1.0
+  - tomli-w
   - tqdm
   - twine
   - vtk>=9.0
