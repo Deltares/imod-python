@@ -12,10 +12,7 @@ class AdvectionUpstream(Package):
         pass
 
     def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
-        d["scheme"] = "upstream"
-        return self._template.render(d)
-
+        return self._template.render({"scheme": "upstream"})
 
 
 class AdvectionCentral(Package):
@@ -26,22 +23,16 @@ class AdvectionCentral(Package):
         pass
 
     def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
-        d["scheme"] = "central"
-        return self._template.render(d)
+        return self._template.render({"scheme": "central"})
 
 
 class AdvectionTVD(Package):
 
     _pkg_id = "adv"
     _template = Package._initialize_template(_pkg_id)
- 
 
-    def __init__(self):     
-       pass
+    def __init__(self):
+        pass
 
     def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
-        d["scheme"] = "TVD"
-        return self._template.render(d) 
-    
+        return self._template.render({"scheme": "TVD"})
