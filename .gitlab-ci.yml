@@ -31,19 +31,19 @@ build:
     - chmod +x mf6
     - mv mf6 /opt/conda/envs/imod/bin
     # Run tests
-    - cd tests
+    - cd imod/tests
     - python -m pytest --cache-clear
     - python -m pytest --verbose test_regrid.py
     - python -m pytest --verbose test_visualize/test_visualize_pyvista.py
     - export NUMBA_DISABLE_JIT=1
-    - python -m pytest --verbose --cov=imod
+    - python -m pytest --verbose --cov=imod --cov-config=.coveragerc
     - cd ../docs
     - make html
     - cd ..
   artifacts:
     paths:
       - docs/_build/html/
-      - tests/coverage.xml 
+      - imod/tests/coverage.xml 
     expire_in: 1 week
 
 pages:
