@@ -41,3 +41,4 @@ def test_render():
         """
     )
     assert expected == actual
+test_render()

@@ -7,7 +7,8 @@ import textwrap
 def test_dispersion_default():
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]      
-    disp = imod.mf6.Dispersion(False, False, 1e-4, 1, 10) 
+    disp = imod.mf6.Dispersion( 1e-4, 1, 10 ) 
+    disp.dataset["junk"] = 9
     actual =disp.render(directory, "dsp", globaltimes, True)
     expected=textwrap.dedent(
       '''\
@@ -35,7 +36,7 @@ def test_dispersion_default():
 def test_dispersion_options():
   directory = pathlib.Path("mymodel")
   globaltimes = [np.datetime64("2000-01-01")]      
-  disp= imod.mf6.Dispersion(True, True, 1e-4, 1, 10, 1,2,3) 
+  disp= imod.mf6.Dispersion( 1e-4, 1, 10, 1,2,3, True, True) 
   actual =disp.render(directory, "dsp", globaltimes, True)
   expected=textwrap.dedent(
       '''\
@@ -69,3 +70,6 @@ def test_dispersion_options():
    
   print(actual)
   assert actual == expected
+
+test_dispersion_default()
+test_dispersion_options()
