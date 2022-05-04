@@ -1,33 +1,24 @@
 import collections
 import pathlib
-
+import abc
 import cftime
 import jinja2
 import numpy as np
 
 from imod.mf6 import qgs_util
 
+class Modflow6Model(collections.UserDict, abc.ABC):
+    """
+    Contains data and writes consistent model input files
+    """
 
-class Model(collections.UserDict):
     def __setitem__(self, key, value):
         # TODO: Add packagecheck
         super().__setitem__(key, value)
 
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).items():
-            self[k] = v
-
-
-
-class ModflowModel(Model):
-    """
-    Contains data and writes consistent model input files
-    """
-    _pkg_id = "model"
-    _mandatoryPackages = []
-    def __init__(self):
-        super().__init__()
-
+            self[k] = v    
 
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -54,7 +45,7 @@ class ModflowModel(Model):
         dispresent = "dis" in pkg_ids or "disv" in pkg_ids or "disu" in pkg_ids
         if not dispresent:
             raise ValueError(f"No dis/disv/disu package found in model {modelkey}")
-        for required in self._mandatoryPackages:
+        for required in self._mandatory_packages:
             if required not in pkg_ids:
                 raise ValueError(f"No {required} package found in model {modelkey}")
         return 
@@ -118,10 +109,11 @@ class ModflowModel(Model):
                 binary=binary,
             )                
 
-class GroundwaterFlowModel(ModflowModel):
+class GroundwaterFlowModel(Modflow6Model):
+    _pkg_id = "model"
+    _mandatory_packages = ("npf", "ic", "oc", "sto")
 
     def __init__(self, newton=False, under_relaxation=False):
-        self._mandatoryPackages = ["npf", "ic", "oc", "sto"]
         super().__init__()
         self.newton = newton
         self.under_relaxation = under_relaxation
@@ -191,7 +183,7 @@ class GroundwaterFlowModel(ModflowModel):
         )
         qgs_util._write_qgis_projectfile(qgs_tree, directory / ("qgis_proj" + ext))
 
-class GroundwaterTransportModel(ModflowModel):
+class GroundwaterTransportModel(Modflow6Model):
     def __init__(self):
         super().__init__()
         self._initialize_template()

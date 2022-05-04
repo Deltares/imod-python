@@ -1,11 +1,10 @@
 import numpy as np
-import pathlib
 import textwrap
 import imod
 import imod.mf6.model
 
 
-def test_transportModel_rendering():
+def test_transport_model_rendering():
   
   adv = imod.mf6.AdvectionCentral() 
   disp= imod.mf6.Dispersion(True, True, 1e-4, 1, 10, 1,2,3) 
@@ -24,6 +23,3 @@ def test_transportModel_rendering():
       end packages
       ''')
   assert actual == expected
-
-
-test_transportModel_rendering()
