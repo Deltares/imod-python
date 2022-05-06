@@ -35,7 +35,7 @@ def to_float(string: str) -> float:
     string = string.replace("d", "e")
     # Fortran may specify exponents without a letter, e.g. 1.0+1 for 1.0e+1
     if "e" not in string:
-        string = string[0] + string.replace("+", "e+").replace("-", "e-")
+        string = string.replace("+", "e+").replace("-", "e-")
     return float(string)
 
 
