@@ -159,7 +159,7 @@ def test_metamod_write_toml(msw_model, coupled_mf6_model, tmp_path):
         output_dir, "./modflow6.dll", "./metaswap.dll", "./metaswap", coupling_dict
     )
 
-    with open(output_dir / "metamod.toml", mode="rb") as f:
+    with open(output_dir / "imod_coupler.toml", mode="rb") as f:
         toml_dict = tomllib.load(f)
 
     dict_expected = {

@@ -28,7 +28,7 @@ class MetaMod:
         coupled.
     """
 
-    _toml_name = "metamod.toml"
+    _toml_name = "imod_coupler.toml"
     _modflow6_model_dir = "Modflow6"
     _metaswap_model_dir = "MetaSWAP"
 
