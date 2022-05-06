@@ -280,7 +280,8 @@ def read_imeth6_budgets_dense(
     # Allocates a dense array for the entire domain
     out = np.zeros(size, dtype=np.float64)
     table = read_imeth6_budgets(cbc_path, count, dtype, pos)
-    out[table["id1"]] = table["budget"]
+    id1 = table["id1"] - 1  # Convert to 0 based index
+    out[id1] = table["budget"]
     return out.reshape(shape)
 
 
