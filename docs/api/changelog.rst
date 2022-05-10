@@ -15,7 +15,7 @@ Fixed
 - :meth:`imod.mf6.GroundwaterFlowModel.write` will no longer error when a 3D
   DataArray with a single layer is written. It will now accept both 2D and 3D
   arrays with a single layer coordinate.
-- Hotfixes for :func:`imod.wq.model.SeawatModel.clip`, until `this merge request
+- Hotfixes for :meth:`imod.wq.model.SeawatModel.clip`, until `this merge request
   <https://gitlab.com/deltares/imod/imod-python/-/merge_requests/111>` is
   fulfilled. 
 - :meth:`imod.flow.ImodflowModel.write` will set the timestring in the
@@ -24,6 +24,8 @@ Fixed
 - Added :class:`imod.flow.OutputControl` as this was still missing.
 - :func:`imod.ipf.read` will no longer error when an associated files with 0
   rows is read.
+- :func:`imod.evaluate.calculate_gxg` now correctly uses (March 14, March
+  28, April 14) to calculate GVG rather than (March 28, April 14, April 28).
 
 Changed
 ~~~~~~~
@@ -36,22 +38,15 @@ Changed
   accordingly. Previously, if IDs were shared between different layers, the
   associated files would be overwritten as the IDs would result in the same
   file name being used over and over.
-  
+
 Added
 ~~~~~
 
+- Added support to write MetaSWAP models, :class:`imod.msw.MetaSwapModel`.
+- Addes support to write coupled MetaSWAP and Modflow6 simulations,
+  :class:`imod.couplers.MetaMod`
 - :func:`imod.util.replace` has been added to find and replace different values
   in a DataArray.
-
-Fixed
-~~~~~
-
-- :func:`imod.evaluate.calculate_gxg` now correctly uses (March 14, March
-  28, April 14) to calculate GVG rather than (March 28, April 14, April 28).
-  
-Added
-~~~~~
-
 - :func:`imod.evaluate.calculate_gxg_points` has been added to compute GXG
   values for time varying point data (i.e. loaded from IPF and presented as a
   Pandas dataframe).
