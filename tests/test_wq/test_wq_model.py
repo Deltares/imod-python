@@ -240,6 +240,31 @@ def cftime_model(basicmodel):
     return m_cf
 
 
+@pytest.fixture(scope="function")
+def model_different_names(basicmodel):
+    m = basicmodel
+
+    m_other_name = imod.wq.SeawatModel("test_model_different_names")
+    m_other_name["_bas6"] = m["bas6"]
+    m_other_name["_lpf"] = m["lpf"]
+    m_other_name["_ghb"] = m["ghb"]
+    m_other_name["_chd"] = m["chd"]
+    m_other_name["_riv"] = m["riv"]
+    m_other_name["_wel"] = m["wel"]
+    m_other_name["_rch"] = m["rch"]
+    m_other_name["_evt"] = m["evt"]
+    m_other_name["_pcg"] = m["pcg"]
+    m_other_name["_btn"] = m["btn"]
+    m_other_name["_adv"] = m["adv"]
+    m_other_name["_dsp"] = m["dsp"]
+    m_other_name["_vdf"] = m["vdf"]
+    m_other_name["_gcg"] = m["gcg"]
+    m_other_name["_oc"] = m["oc"]
+    m_other_name["_mal"] = m["mal"]
+    m_other_name["_tvc"] = m["tvc"]
+    return m_other_name
+
+
 def test_get_pkgkey(basicmodel):
     m = basicmodel
     for key, package in m.items():
@@ -675,6 +700,15 @@ def test_write(basicmodel, tmp_path):
     m.time_discretization("2000-01-06")
     m.write(directory=tmp_path, result_dir=tmp_path / "results")
     # TODO: more rigorous testing
+
+
+def test_write_pkgname_is_not_pkg_id(model_different_names, tmp_path):
+    """
+    Test if model with pkgnames which differ from _pkg_id writes without error.
+    """
+    m = model_different_names
+    m.time_discretization("2000-01-06")
+    m.write(directory=tmp_path, result_dir=tmp_path / "results")
 
 
 def test_write__stress_repeats(basicmodel, tmp_path):
