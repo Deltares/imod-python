@@ -17,10 +17,11 @@ a very powerful feature, though slightly hidden.
 # ``imod.wq.SeawatModel`` also supports this. Wel'll start off with the usual
 # imports:
 
-import imod
 import numpy as np
 import pandas as pd
 import xarray as xr
+
+import imod
 
 # %%
 # We can discretize a simulation as follows, this creates a
