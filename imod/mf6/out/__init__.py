@@ -151,10 +151,12 @@ def open_hds_like(
     # TODO: check shape with hds metadata.
     if isinstance(like, xr.DataArray):
         d = dis.grid_info(like)
+        d["name"] = "head"
         return dis.open_hds(path, d, dry_nan)
 
     elif isinstance(like, xu.UgridDataArray):
         d = disv.grid_info(like)
+        d["name"] = "head"
         return disv.open_hds(path, d, dry_nan)
 
     else:
