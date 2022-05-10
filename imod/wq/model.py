@@ -350,13 +350,12 @@ class SeawatModel(Model):
         - Additional times can be provided to force shorter stress periods & more detailed output
         - Every stress has to be defined on the first stress period (this is a modflow requirement)
 
-        Or visually (every letter a date in the time axes)::
+        Or visually (every letter a date in the time axes):
 
-            recharge a - b - c - d - e - f
-            river    g - - - - h - - - - j
-            times    - - - - - - - - - - - i
-
-            model    a - b - c h d - e - f i
+        >>> recharge a - b - c - d - e - f
+        >>> river    g - - - - h - - - - j
+        >>> times    - - - - - - - - - - - i
+        >>> model    a - b - c h d - e - f i
 
         with the stress periods defined between these dates. I.e. the model times are the set of all times you include in the model.
 
@@ -366,6 +365,11 @@ class SeawatModel(Model):
             Times to add to the time discretization. At least one single time
             should be given, which will be used as the ending time of the
             simulation.
+
+        Note
+        ----
+        To set the other parameters of the TimeDiscretization object, you have
+        to set these to the object after calling this function.
 
         Examples
         --------

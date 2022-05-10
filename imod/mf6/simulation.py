@@ -30,19 +30,45 @@ class Modflow6Simulation(collections.UserDict):
 
     def time_discretization(self, times):
         """
-        Collect all unique times from boundary conditions and insert times from argument as well.
+        Collect all unique times from model packages and additional given
+        `times`. These unique times are used as stress periods in the model. All
+        stress packages must have the same starting time. Function creates
+        TimeDiscretization object which is set to self["time_discretization"]
 
-        Function creates TimeDiscretization object which is set to self["time_discretization"]
+        The time discretization in imod-python works as follows:
+
+        - The datetimes of all packages you send in are always respected
+        - Subsequently, the input data you use is always included fully as well
+        - All times are treated as starting times for the stress: a stress is
+          always applied until the next specified date
+        - For this reason, a final time is required to determine the length of
+          the last stress period
+        - Additional times can be provided to force shorter stress periods &
+          more detailed output
+        - Every stress has to be defined on the first stress period (this is a
+          modflow requirement)
+
+        Or visually (every letter a date in the time axes):
+
+        >>> recharge a - b - c - d - e - f
+        >>> river    g - - - - h - - - - j
+        >>> times    - - - - - - - - - - - i
+        >>> model    a - b - c h d - e - f i
+
+        with the stress periods defined between these dates. I.e. the model
+        times are the set of all times you include in the model.
 
         Parameters
         ----------
-        times : xr.DataArray of datetime-likes
-            times to be inserted into model time discretization.
+        times : str, datetime; or iterable of str, datetimes.
+            Times to add to the time discretization. At least one single time
+            should be given, which will be used as the ending time of the
+            simulation.
 
         Note
         ----
-        To set the other parameters of the TimeDiscretization object,
-        you have to set these to the object after calling this function.
+        To set the other parameters of the TimeDiscretization object, you have
+        to set these to the object after calling this function.
 
         Example
         -------
