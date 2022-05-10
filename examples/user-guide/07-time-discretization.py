@@ -95,7 +95,7 @@ simulation_bc["time_discretization"].dataset
 
 # %%
 # Notice that iMOD Python figured out that the two boundary conditions, both
-# with two timesteps, should lead to three stress periods! %%
+# with two timesteps, should lead to three stress periods!
 #
 # Specifying extra settings
 # -------------------------
@@ -113,3 +113,7 @@ simulation_bc["time_discretization"].dataset["timestep_multiplier"] = 1.5
 simulation_bc["time_discretization"].dataset["n_timesteps"] = xr.DataArray(
     data=[2, 4, 4], dims=("time",), coords={"time": times}
 )
+
+simulation_bc["time_discretization"].dataset
+
+# %%
