@@ -130,7 +130,7 @@ def read_hds_timestep(
         f.seek(pos)
         a1d = np.empty(nlayer * ncells_per_layer, dtype=np.float64)
         for k in range(nlayer):
-            f.seek(52, 1)  # skip kstp, kper, pertime
+            f.seek(52, 1)  # skip header
             a1d[k * ncells_per_layer : (k + 1) * ncells_per_layer] = np.fromfile(
                 f, np.float64, ncells_per_layer
             )
