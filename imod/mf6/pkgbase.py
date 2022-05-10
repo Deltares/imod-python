@@ -57,7 +57,8 @@ def disu_recarr(arrdict, layer, notnull):
     # Initialize the structured array
     nrow = notnull.sum()
     recarr = np.empty(nrow, dtype=sparse_dtype)
-    recarr["node"] = np.argwhere(notnull) + 1
+    # Argwhere returns an index_array with dims (N, a.ndims)
+    recarr["node"] = (np.argwhere(notnull) + 1)[:, 0]
     return recarr
 
 
@@ -369,14 +370,15 @@ class Package(abc.ABC):
                 pkgdirectory.mkdir(exist_ok=True, parents=True)
                 for varname, dtype in self._grid_data.items():
                     key = self._keyword_map.get(varname, varname)
-                    da = self.dataset[varname]
-                    if self._is_xy_data(da):
-                        if binary:
-                            path = pkgdirectory / f"{key}.bin"
-                            self.write_binary_griddata(path, da, dtype)
-                        else:
-                            path = pkgdirectory / f"{key}.dat"
-                            self.write_text_griddata(path, da, dtype)
+                    if varname in self.dataset:
+                        da = self.dataset[varname]
+                        if self._is_xy_data(da):
+                            if binary:
+                                path = pkgdirectory / f"{key}.bin"
+                                self.write_binary_griddata(path, da, dtype)
+                            else:
+                                path = pkgdirectory / f"{key}.dat"
+                                self.write_text_griddata(path, da, dtype)
 
     @classmethod
     def filter_and_rename(cls, content: Dict[str, Any]) -> Dict[str, Any]:
@@ -472,16 +474,49 @@ class Package(abc.ABC):
         spatial_ds.to_netcdf(path)
         return has_dims
 
-    def _to_disu(self, numbers):
-        structured = self.dataset.expand_dims("layer")
+    def _dis_to_disu(self, cell_ids=None):
+        structured = self.dataset
+        if "layer" not in structured.coords:
+            raise ValueError("layer coordinate is required")
+        if "layer" not in structured.dims:
+            structured = self.dataset.expand_dims("layer")
+
         # Stack will automatically broadcast to layer
         dataset = structured.stack(node=("layer", "y", "x"))
         layers = structured["layer"].values
         ncell_per_layer = structured["y"].size * structured["x"].size
         offset = (layers - 1) * ncell_per_layer
-        index = np.add.outer(offset, np.arange(ncell_per_layer))
-        dataset = dataset.assign_coords(node=numbers[index])
+        index = np.add.outer(offset, np.arange(ncell_per_layer)).ravel()
+
+        if cell_ids is not None:
+            node = cell_ids[index]
+        else:
+            node = index
+
+        dataset = dataset.assign_coords(node=node)
         return self.__class__(**dataset)
+
+    def to_disu(self, cell_ids=None):
+        """
+        Parameters
+        ----------
+        cell_ids: np.ndarray of integers, optional.
+            DISU cell IDs. Should contain values of -1 for inactive cells.
+
+        Returns
+        -------
+        disu_package: Any
+            Package in DISU form.
+        """
+        if isinstance(self.dataset, xr.Dataset):
+            return self._dis_to_disu(cell_ids)
+        elif isinstance(self.dataset.xu.UgridDataset):
+            raise NotImplementedError
+        else:
+            raise TypeError(
+                "Expected xarray.Dataset or xugrid.UgridDataset. "
+                f"Found: {type(self.dataset)}"
+            )
 
 
 class BoundaryCondition(Package, abc.ABC):

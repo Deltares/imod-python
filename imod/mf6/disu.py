@@ -66,28 +66,29 @@ class LowLevelUnstructuredDiscretization(Package):
     ----------
     xorigin: float
     yorigin: float
-    top: array of floats (xr.DataArray)
-    bottom: array of floats (xr.DataArray)
-    area: array of floats (xr.DataArray)
-    iac: array of integers
-    ja: array of integers
-    ihc: array of integers
-    cl12: array of floats
-    hwva: array of floats
+    top: xr.DataArray of floats
+    bot: xr.DataArray of floats
+    area: xr.DataArray of floats
+    iac: xr.DataArray of integers
+    ja: xr.DataArray of integers
+    ihc: xr.DataArray of integers
+    cl12: xr.DataArray of floats
+    hwva: xr.DataArray of floats
     """
 
     _pkg_id = "disu"
     _grid_data = {
         "top": np.float64,
-        "bottom": np.float64,
+        "bot": np.float64,
         "area": np.float64,
         "iac": np.int32,
         "ja": np.int32,
         "ihc": np.int32,
         "cl12": np.float64,
         "hwva": np.float64,
+        "idomain": np.int32,
     }
-    _keyword_map = {"bottom": "bot"}
+    _keyword_map = {}
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(
@@ -95,25 +96,28 @@ class LowLevelUnstructuredDiscretization(Package):
         xorigin,
         yorigin,
         top,
-        bottom,
+        bot,
         area,
         iac,
         ja,
         ihc,
         cl12,
         hwva,
+        idomain=None,
     ):
         super().__init__(locals())
         self.dataset["xorigin"] = xorigin
         self.dataset["yorigin"] = yorigin
         self.dataset["top"] = top
-        self.dataset["bottom"] = bottom
+        self.dataset["bot"] = bot
         self.dataset["area"] = area
         self.dataset["iac"] = iac
         self.dataset["ja"] = ja
         self.dataset["ihc"] = ihc
         self.dataset["cl12"] = cl12
         self.dataset["hwva"] = hwva
+        if idomain is not None:
+            self.dataset["idomain"] = idomain
 
     def render(self, directory, pkgname, globaltimes, binary):
         disdirectory = directory / pkgname
@@ -126,45 +130,38 @@ class LowLevelUnstructuredDiscretization(Package):
         d["nja"] = int(self.dataset["iac"].sum())
 
         # Grid data
-        d["top"] = self._compose_values(
-            self.dataset["top"], disdirectory, "top", binary=binary
-        )[1][0]
-        d["bot"] = self._compose_values(
-            self["bottom"], disdirectory, "bot", binary=binary
-        )[1][0]
-        d["area"] = self._compose_values(
-            self["area"], disdirectory, "area", binary=binary
-        )[1][0]
-
-        # Connection data
-        d["iac"] = self._compose_values(
-            self["iac"], disdirectory, "iac", binary=binary
-        )[1][0]
-        d["ja"] = self._compose_values(self["ja"], disdirectory, "ja", binary=binary)[
-            1
-        ][0]
-        d["ihc"] = self._compose_values(
-            self["ihc"], disdirectory, "ihc", binary=binary
-        )[1][0]
-        d["cl12"] = self._compose_values(
-            self["cl12"], disdirectory, "cl12", binary=binary
-        )[1][0]
-        d["hwva"] = self._compose_values(
-            self["hwva"], disdirectory, "hwva", binary=binary
-        )[1][0]
+        for varname in self._grid_data:
+            if varname in self.dataset:
+                key = self._keyword_map.get(varname, varname)
+                d[varname] = self._compose_values(
+                    self.dataset[varname], disdirectory, key, binary=binary
+                )[1][0]
 
         return self._template.render(d)
 
     @staticmethod
-    def from_structured(
+    def from_dis(
         top,
         bottom,
         idomain,
+        reduce_nodes=False,
     ):
+        """
+        Parameters
+        ----------
+        reduce_nodes: bool, optional. Default: False.
+            Reduces the node numbering, discards cells when idomain <= 0.
+
+        Returns
+        -------
+        disu: LowLevelUnstructuredDiscretization
+        cell_ids: ndarray of integers.
+            Only provided if ``reduce_nodes`` is ``True``.
+        """
         x = idomain.coords["x"]
         y = idomain.coords["y"]
         layer = idomain.coords["layer"]
-        active = idomain.values > 0
+        active = idomain.values.ravel() > 0
 
         ncolumn = x.size
         nrow = y.size
@@ -174,17 +171,19 @@ class LowLevelUnstructuredDiscretization(Package):
         dx, xmin, _ = imod.util.coord_reference(x)
         dy, ymin, _ = imod.util.coord_reference(y)
 
-        # MODFLOW6 expects the ja values to contain the cell number first
-        # while the row should be otherwise sorted ascending.
-        # scipy.spare.csr_matrix will sort the values ascending, but
-        # would not put the cell number first. To ensure this, we use
-        # the values as well as i and j; we sort on the zeros (thereby ensuring
-        # it results as a first value per column), but the actual value
-        # is the (negative) cell number (in v).
+        # MODFLOW6 expects the ja values to contain the cell number first while
+        # the row should be otherwise sorted ascending. scipy.spare.csr_matrix
+        # will sort the values ascending, but would not put the cell number
+        # first. To ensure this, we use the values as well as i and j; we sort
+        # on the zeros (thereby ensuring it results as a first value per
+        # column), but the actual value is the (negative) cell number (in v).
         ii, jj = _structured_connectivity(idomain)
         ii += 1
         jj += 1
-        nodes = np.arange(1, size + 1, dtype=np.int32)[active.ravel()]
+        nodes = np.arange(1, size + 1, dtype=np.int32)
+        if reduce_nodes:
+            nodes = nodes[active.ravel()]
+
         zeros = np.zeros_like(nodes)
         i = np.concatenate([nodes, ii, jj])
         j = np.concatenate([zeros, jj, ii])
@@ -194,16 +193,25 @@ class LowLevelUnstructuredDiscretization(Package):
         # This entry does not require data in ihc, cl12, hwva.
         is_node = csr.data < 0
 
-        # Constructing the CSR matrix will have sorted all the values are
-        # required by MODFLOW6. However, we're using the original structured
-        # numbering, which includes inactive cells.
-        # For MODFLOW6, we use the reduced numbering, excluding all inactive
-        # cells. This means getting rid of empty rows (iac), generating (via
-        # cumsum) new numbers, and extracting them in the right order.
         nnz = csr.getnnz(axis=1)
-        iac = nnz[nnz > 0]
-        ja_index = np.abs(csr.data) - 1  # Get rid of negative values temporarily.
-        ja = active.ravel().cumsum()[ja_index]
+        if reduce_nodes:
+            # Constructing the CSR matrix will have sorted all the values are
+            # required by MODFLOW6. However, we're using the original structured
+            # numbering, which includes inactive cells.
+            # For MODFLOW6, we use the reduced numbering if reduce_nodes is True,
+            # excluding all inactive cells. This means getting rid of empty rows
+            # (iac), generating (via cumsum) new numbers, and extracting them in
+            # the right order.
+            iac = nnz[nnz > 0]
+            ja_index = np.abs(csr.data) - 1  # Get rid of negative values temporarily.
+            ja = active.cumsum()[ja_index]
+        else:
+            # In this case, inactive cells are included as well. They have no
+            # connections to other cells and form empty rows (0 in iac), but
+            # are still included. There is no need to update the cell numbers
+            # in this case.
+            iac = nnz[1:]  # Cell 0 does not exist.
+            ja = csr.data
 
         # From CSR back to COO form
         # connectivity for every cell: n -> m
@@ -253,15 +261,36 @@ class LowLevelUnstructuredDiscretization(Package):
 
         # Set "node" and "nja" as the dimension in accordance with MODFLOW6.
         # Should probably be updated if we could move to UGRID3D...
-        return LowLevelUnstructuredDiscretization(
-            xorigin=xmin,
-            yorigin=ymin,
-            top=xr.DataArray(top.values[active], dims=["node"]),
-            bottom=xr.DataArray(bottom.values[active], dims=["node"]),
-            area=xr.DataArray(area[active.ravel()], dims=["node"]),
-            iac=xr.DataArray(iac, dims=["node"]),
-            ja=xr.DataArray(ja, dims=["nja"]),
-            ihc=xr.DataArray(ihc, dims=["nja"]),
-            cl12=xr.DataArray(cl12, dims=["nja"]),
-            hwva=xr.DataArray(hwva, dims=["nja"]),
-        )
+        if reduce_nodes:
+            # If we reduce nodes, we should only take active cells from top,
+            # bottom, area. There is no need to include an idomain: all defined
+            # cells are active.
+            disu = LowLevelUnstructuredDiscretization(
+                xorigin=xmin,
+                yorigin=ymin,
+                top=xr.DataArray(top.values.ravel()[active], dims=["node"]),
+                bot=xr.DataArray(bottom.values.ravel()[active], dims=["node"]),
+                area=xr.DataArray(area[active], dims=["node"]),
+                iac=xr.DataArray(iac, dims=["node"]),
+                ja=xr.DataArray(ja, dims=["nja"]),
+                ihc=xr.DataArray(ihc, dims=["nja"]),
+                cl12=xr.DataArray(cl12, dims=["nja"]),
+                hwva=xr.DataArray(hwva, dims=["nja"]),
+            )
+            cell_ids = np.cumsum(active) - 1
+            cell_ids[~active] = -1
+            return disu, cell_ids
+        else:
+            return LowLevelUnstructuredDiscretization(
+                xorigin=xmin,
+                yorigin=ymin,
+                top=xr.DataArray(top.values.ravel(), dims=["node"]),
+                bot=xr.DataArray(bottom.values.ravel(), dims=["node"]),
+                area=xr.DataArray(area, dims=["node"]),
+                iac=xr.DataArray(iac, dims=["node"]),
+                ja=xr.DataArray(ja, dims=["nja"]),
+                ihc=xr.DataArray(ihc, dims=["nja"]),
+                cl12=xr.DataArray(cl12, dims=["nja"]),
+                hwva=xr.DataArray(hwva, dims=["nja"]),
+                idomain=xr.DataArray(active.astype(np.int32), dims=["node"]),
+            )
