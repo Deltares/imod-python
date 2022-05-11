@@ -12,6 +12,7 @@ def remove_dir_content(path: str) -> None:
 
 
 remove_dir_content("examples/imod-wq")
+remove_dir_content("examples/metaswap")
 remove_dir_content("examples/imodflow")
 remove_dir_content("examples/mf6")
 remove_dir_content("examples/prepare")

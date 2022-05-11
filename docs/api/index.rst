@@ -16,5 +16,7 @@ This page provides an auto-generated summary of imod's API.
   mf6
   wq
   flow
+  msw
+  metamod
 
   changelog
