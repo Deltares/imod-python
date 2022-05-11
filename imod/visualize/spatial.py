@@ -81,6 +81,8 @@ def plot_map(
     kwargs_basemap={},
     figsize=None,
     return_cbar=False,
+    fig=None,
+    ax=None,
 ):
     """
     Parameters
@@ -129,6 +131,10 @@ def plot_map(
         This is used in plt.subplots(figsize)
     return_cbar : boolean, optional
         Return the matplotlib.Colorbar instance. Defaults to False.
+    fig : matplotlib.figure, optional
+        If provided, figure to which to add the map
+    ax : matplot.ax, optional
+        If provided, axis to which to add the map
 
     Returns
     -------
@@ -192,8 +198,17 @@ def plot_map(
         whiten_triangles = kwargs_colorbar.pop("whiten_triangles", True)
         settings_cbar.update(kwargs_colorbar)
 
-    # Make figure
-    fig, ax = plt.subplots(figsize=figsize)
+    # If not provided, make figure and axes
+    # Catch case first where no figure provided, but ax was provided
+    if fig is None and ax is not None:
+        raise ValueError(
+            "Axes provided, yet no figure is provided. "
+            "Please provide a figure as well."
+        )
+    if fig is None:
+        fig = plt.figure(figsize=figsize)
+    if ax is None:
+        ax = plt.axes()
 
     # Make sure x is increasing, y is decreasing
     raster = raster.copy(deep=False)
