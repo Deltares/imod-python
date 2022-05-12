@@ -531,7 +531,9 @@ def write(path, a, nodata=1.0e20, dtype=np.float32):
         Nodata value in the saved IDF files. Xarray uses nan values to represent
         nodata, but these tend to work unreliably in iMOD(FLOW).
         Defaults to a value of 1.0e20.
-
+    dtype : type, ``{np.float32, np.float64}``, default is ``np.float32``.
+        Whether to write single precision (``np.float32``) or double precision
+        (``np.float64``) IDF files.
     """
     if not isinstance(a, xr.DataArray):
         raise TypeError("Data to write must be an xarray.DataArray")
