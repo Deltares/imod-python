@@ -6,7 +6,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
-transportPackages = ["adv", "dsp"]
+TRANSPORT_PACKAGES = ["adv", "dsp"]
 
 def dis_recarr(arrdict, layer, notnull):
     # Define the numpy structured array dtype
@@ -182,7 +182,7 @@ class Package(abc.ABC):
             fname = "sln-ims.j2"
         elif pkg_id == "tdis":
             fname = "sim-tdis.j2"
-        elif pkg_id in transportPackages:
+        elif pkg_id in TRANSPORT_PACKAGES:
             fname = f"gwt-{pkg_id}.j2"
         else:
             fname = f"gwf-{pkg_id}.j2"
