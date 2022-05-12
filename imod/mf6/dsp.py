@@ -8,7 +8,7 @@ class Dispersion(Package):
 
     Parameters
     ----------
-    diffusion_coefficient: xu.UgridDataArray
+    diffusion_coefficient: xr.DataArray
         effective molecular diffusion coefficient (DIFFC) 
     longitudinal_horizontal: xu.UgridDataArray
         longitudinal dispersivity in horizontal direction. If flow is strictly
@@ -17,7 +17,7 @@ class Dispersion(Package):
         longitudinal dispersivity is a function of both ALH and ALV. If
         mechanical dispersion is represented (by specifying any dispersivity
         values) then this array is required. (ALH) 
-    transverse_horizontal1: xu.UgridDataArray
+    transverse_horizontal1: xr.DataArray
         transverse dispersivity in horizontal direction. This is the transverse
         dispersivity value
          for the second ellipsoid axis. If flow is strictly horizontal and
@@ -25,21 +25,21 @@ class Dispersion(Package):
          value controls spreading in the y direction. If mechanical dispersion
          is represented (by specifying any dispersivity values) then this array
          is required. (ATH1) 
-    longitudinal_vertical: xu.UgridDataArray, optional
+    longitudinal_vertical: xr.DataArray, optional
         longitudinal dispersivity in vertical direction. If flow is strictly
         vertical, then this is the longitudinal dispsersivity value that will be
         used. If flow is not strictly horizontal or strictly vertical, then the
         longitudinal dispersivity is a function of both ALH and ALV. If this
         value is not specified and mechanical dispersion is represented, then
         this array is set equal to ALH. (ALV)          
-    transverse_horizontal2: xu.UgridDataArray, optional
+    transverse_horizontal2: xr.DataArray, optional
         transverse dispersivity in horizontal direction. This is the transverse
         dispersivity value for the third ellipsoid axis. If flow is strictly
         horizontal and directed in the x direction (along a row for a regular
         grid), then this value controls spreading in the z direction. If this
         value is not specified and mechanical dispersion is represented, then
         this array is set equal to ATH1. (ATH2) 
-    tranverse_vertical: xu.UgridDataArray, optional
+    tranverse_vertical: xr.DataArray, optional
         transverse dispersivity when flow is in vertical direction. If flow is
         strictly vertical and directed in the z direction, then this value
         controls spreading in the x and y directions. If this value is not
