@@ -80,7 +80,7 @@ idomain = xu.UgridDataArray(
     grid=grid,
 )
 icelltype = xu.full_like(idomain, 0)
-k = xu.full_like(idomain, 1.0)
+k = xu.full_like(idomain, 1.0, dtype=float)
 k33 = k.copy()
 rch_rate = xu.full_like(idomain.sel(layer=1), 0.001, dtype=float)
 bottom = idomain * xr.DataArray([5.0, 0.0], dims=["layer"])
@@ -93,7 +93,7 @@ bottom = idomain * xr.DataArray([5.0, 0.0], dims=["layer"])
 chd_location = xu.zeros_like(idomain.sel(layer=2), dtype=bool).ugrid.binary_dilation(
     border_value=True
 )
-constant_head = xu.full_like(idomain.sel(layer=2), 1.0).where(chd_location)
+constant_head = xu.full_like(idomain.sel(layer=2), 1.0, dtype=float).where(chd_location)
 
 fig, ax = plt.subplots()
 constant_head.ugrid.plot(ax=ax)
