@@ -164,6 +164,8 @@ class StorageCoefficient(Package):
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
 
+        self._pkgcheck()
+
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         stodirectory = directory / "sto"
