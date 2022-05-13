@@ -9,6 +9,7 @@ import xarray as xr
 import imod
 
 
+@pytest.fixture(scope="function")
 def test_data():
     shape = nlay, nrow, ncol = 2, 2, 2
     dx, dy = 10, -10
@@ -47,43 +48,44 @@ def test_data():
     return d
 
 
-def test_landflag():
-    d = test_data()
+def test_wrong_dtype(test_data):
+    test_data["kv_sat"] = test_data["kv_sat"].astype(np.int32)
+    with pytest.raises(TypeError):
+        imod.mf6.UnsaturatedZoneFlow(**test_data)
+
+
+def test_landflag(test_data):
     expected = np.ones((2, 2, 2))
     expected[:, 0, 0] = 0
-    uzf = imod.mf6.UnsaturatedZoneFlow(**d)
+    uzf = imod.mf6.UnsaturatedZoneFlow(**test_data)
     assert np.all(uzf["landflag"].values == expected)
 
 
-def test_iuzno():
-    d = test_data()
+def test_iuzno(test_data):
     expected = np.array([[[0, 1], [2, 3]], [[0, 4], [5, 6]]])
-    uzf = imod.mf6.UnsaturatedZoneFlow(**d)
+    uzf = imod.mf6.UnsaturatedZoneFlow(**test_data)
     assert np.all(uzf["iuzno"].values == expected)
 
 
-def test_ivertcon():
-    d = test_data()
+def test_ivertcon(test_data):
     expected = np.array([[[0, 4], [5, 6]], [[0, 0], [0, 0]]])
-    uzf = imod.mf6.UnsaturatedZoneFlow(**d)
+    uzf = imod.mf6.UnsaturatedZoneFlow(**test_data)
     assert np.all(uzf["ivertcon"].values == expected)
 
 
-def test_checkoptions():
-    d = test_data()
-    uzf = imod.mf6.UnsaturatedZoneFlow(**d)
+def test_checkoptions(test_data):
+    uzf = imod.mf6.UnsaturatedZoneFlow(**test_data)
     assert bool(uzf["simulate_et"]) is True
     assert bool(uzf["linear_gwet"]) is True
     assert bool(uzf["simulate_gwseep"]) is False
-    d.pop("extinction_depth")
+    test_data.pop("extinction_depth")
 
     with pytest.raises(ValueError):
-        uzf = imod.mf6.UnsaturatedZoneFlow(**d)
+        uzf = imod.mf6.UnsaturatedZoneFlow(**test_data)
 
 
-def test_to_sparsedata():
-    d = test_data()
-    uzf = imod.mf6.UnsaturatedZoneFlow(**d)
+def test_to_sparsedata(test_data):
+    uzf = imod.mf6.UnsaturatedZoneFlow(**test_data)
     uzf.fill_stress_perioddata()
     bin_data = uzf[list(uzf._period_data)]
     arrdict = uzf._ds_to_arrdict(bin_data.isel(time=0))
@@ -102,25 +104,22 @@ def test_to_sparsedata():
     assert len(sparse_data) == 6
 
 
-def test_fill_perioddata():
-    d = test_data()
-    uzf = imod.mf6.UnsaturatedZoneFlow(**d)
+def test_fill_perioddata(test_data):
+    uzf = imod.mf6.UnsaturatedZoneFlow(**test_data)
     assert uzf["root_potential"].item() is None
     uzf.fill_stress_perioddata()
     assert np.all(uzf["root_potential"] == xr.full_like(uzf["kv_sat"], 0.0))
 
 
-def test_packagedata():
-    d = test_data()
-    uzf = imod.mf6.UnsaturatedZoneFlow(**d)
+def test_packagedata(test_data):
+    uzf = imod.mf6.UnsaturatedZoneFlow(**test_data)
     packagedata = uzf._package_data_to_sparse()
     assert len(packagedata.dtype) == 12
     assert len(packagedata) == 6
 
 
-def test_render():
-    d = test_data()
-    uzf = imod.mf6.UnsaturatedZoneFlow(**d)
+def test_render(test_data):
+    uzf = imod.mf6.UnsaturatedZoneFlow(**test_data)
     directory = pathlib.Path("mymodel")
     globaltimes = pd.date_range("2018-01-01", periods=4, freq="H")
     actual = uzf.render(directory, "uzf", globaltimes, True)
