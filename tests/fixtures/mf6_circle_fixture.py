@@ -24,14 +24,14 @@ def make_circle_model():
         grid=grid,
     )
     icelltype = xu.full_like(idomain, 0)
-    k = xu.full_like(idomain, 1.0)
+    k = xu.full_like(idomain, 1.0, dtype=np.float64)
     k33 = k.copy()
-    rch_rate = xu.full_like(idomain.sel(layer=1), 0.001, dtype=float)
-    bottom = idomain * xr.DataArray([5.0, 0.0], dims=["layer"])
-    chd_location = xu.zeros_like(
-        idomain.sel(layer=2), dtype=bool
-    ).ugrid.binary_dilation(border_value=True)
-    constant_head = xu.full_like(idomain.sel(layer=2), 1.0).where(chd_location)
+    rch_rate = xu.full_like(k.sel(layer=1), 0.001, dtype=float)
+    bottom = k * xr.DataArray([5.0, 0.0], dims=["layer"])
+    chd_location = xu.zeros_like(k.sel(layer=2), dtype=bool).ugrid.binary_dilation(
+        border_value=True
+    )
+    constant_head = xu.full_like(k.sel(layer=2), 1.0).where(chd_location)
 
     gwf_model = imod.mf6.GroundwaterFlowModel()
     gwf_model["disv"] = imod.mf6.VerticesDiscretization(
