@@ -35,14 +35,14 @@ def test_simple_model(fixed_format_parser):
     # fmt: on
     index = (svat != 0).values.ravel()
 
-    like = xr.full_like(svat.sel(subunit=1, drop=True), 1.0).expand_dims(
+    like = xr.full_like(svat.sel(subunit=1, drop=True), 1.0, dtype=float).expand_dims(
         layer=[1, 2, 3]
     )
 
     dis = mf6.StructuredDiscretization(
         top=xr.full_like(like, 1.0),
         bottom=xr.full_like(like, 0.0),
-        idomain=xr.full_like(like, 1),
+        idomain=xr.full_like(like, 1, dtype=int),
     )
 
     grid_data = metamod.node_svat_mapping.NodeSvatMapping(svat, dis)
@@ -82,14 +82,14 @@ def test_simple_model_1_subunit(fixed_format_parser):
     # fmt: on
     index = (svat != 0).values.ravel()
 
-    like = xr.full_like(svat.sel(subunit=0, drop=True), 1.0).expand_dims(
+    like = xr.full_like(svat.sel(subunit=0, drop=True), 1.0, dtype=float).expand_dims(
         layer=[1, 2, 3]
     )
 
     dis = mf6.StructuredDiscretization(
         top=xr.full_like(like, 1.0),
         bottom=xr.full_like(like, 0.0),
-        idomain=xr.full_like(like, 1),
+        idomain=xr.full_like(like, 1, dtype=int),
     )
 
     grid_data = metamod.node_svat_mapping.NodeSvatMapping(svat, dis)
@@ -132,11 +132,11 @@ def test_inactive_idomain_in_svat():
     )
     # fmt: on
 
-    like = xr.full_like(svat.sel(subunit=1, drop=True), 1.0).expand_dims(
+    like = xr.full_like(svat.sel(subunit=1, drop=True), 1.0, dtype=float).expand_dims(
         layer=[1, 2, 3]
     )
 
-    idomain = xr.full_like(like, 1)
+    idomain = xr.full_like(like, 1, dtype=int)
     idomain[:, 1, :] = 0
 
     dis = mf6.StructuredDiscretization(
