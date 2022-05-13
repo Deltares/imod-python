@@ -26,16 +26,18 @@ def make_twri_disv_model():
     coords = {"layer": layer, "y": y, "x": x}
 
     # Discretization data
-    idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
+    like = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
+    idomain = like.astype(np.int8)
+
     bottom = xr.DataArray([-200.0, -300.0, -450.0], {"layer": layer}, ("layer",))
 
     # Constant head
-    head = xr.full_like(idomain, np.nan).sel(layer=[1, 2])
+    head = xr.full_like(like, np.nan).sel(layer=[1, 2])
     head[..., 0] = 0.0
 
     # Drainage
-    elevation = xr.full_like(idomain.sel(layer=1), np.nan)
-    conductance = xr.full_like(idomain.sel(layer=1), np.nan)
+    elevation = xr.full_like(like.sel(layer=1), np.nan)
+    conductance = xr.full_like(like.sel(layer=1), np.nan)
     elevation[7, 1:10] = np.array([0.0, 0.0, 10.0, 20.0, 30.0, 50.0, 70.0, 90.0, 100.0])
     conductance[7, 1:10] = 1.0
 
@@ -45,7 +47,7 @@ def make_twri_disv_model():
     k33 = xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",))
 
     # Recharge
-    rch_rate = xr.full_like(idomain.sel(layer=1), 3.0e-8)
+    rch_rate = xr.full_like(like.sel(layer=1), 3.0e-8)
 
     # Well
     layer = np.array([3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])

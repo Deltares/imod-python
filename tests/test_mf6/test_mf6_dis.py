@@ -25,7 +25,7 @@ def test_render():
     y = np.arange(ymax, ymin, dy) + 0.5 * dy
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
     coords = {"layer": layer, "y": y, "x": x}
-    idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
+    idomain = xr.DataArray(np.ones(shape, dtype=np.int8), coords=coords, dims=dims)
     bottom = xr.DataArray([-200.0, -350.0, -450.0], {"layer": layer}, ("layer",))
 
     directory = pathlib.Path("mymodel")
