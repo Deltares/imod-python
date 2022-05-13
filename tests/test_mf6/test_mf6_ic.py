@@ -1,6 +1,7 @@
 import pathlib
-import pytest
 import textwrap
+
+import pytest
 
 import imod
 
