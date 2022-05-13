@@ -48,6 +48,14 @@ def test_write(drainage, tmp_path):
     assert block == block_expected
 
 
+def test_wrong_dtype(drainage):
+    drn = drainage
+    with pytest.raises(TypeError):
+        imod.mf6.Drainage(
+            elevation=drn["elevation"].astype(np.int32), conductance=drn["conductance"]
+        )
+
+
 def test_discontinuous_layer(drainage):
     drn = drainage
     drn["layer"] = [1, 3, 5]

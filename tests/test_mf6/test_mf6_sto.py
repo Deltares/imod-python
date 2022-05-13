@@ -170,3 +170,23 @@ def test_storage_deprecation_warning(sy_layered, convertible):
             transient=True,
             convertible=convertible,
         )
+
+
+def test_wrong_dtype_sc(sy_layered, convertible):
+    with pytest.raises(TypeError):
+        imod.mf6.StorageCoefficient(
+            storage_coefficient=0,
+            specific_yield=sy_layered,
+            transient=True,
+            convertible=convertible,
+        )
+
+
+def test_wrong_dtype_ss(sy_layered, convertible):
+    with pytest.raises(TypeError):
+        imod.mf6.SpecificStorage(
+            specific_storage=0,
+            specific_yield=sy_layered,
+            transient=True,
+            convertible=convertible,
+        )

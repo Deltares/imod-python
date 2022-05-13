@@ -1,4 +1,5 @@
 import pathlib
+import pytest
 import textwrap
 
 import numpy as np
@@ -26,3 +27,8 @@ def test_render():
         """
     )
     assert actual == expected
+
+
+def test_wrong_dtype():
+    with pytest.raises(TypeError):
+        imod.mf6.River(stage=1, conductance=10.0, bottom_elevation=-1.0)
