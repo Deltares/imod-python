@@ -1,6 +1,7 @@
 import collections
 import pathlib
 import subprocess
+import warnings
 
 import jinja2
 import numpy as np
@@ -29,6 +30,14 @@ class Modflow6Simulation(collections.UserDict):
             self[k] = v
 
     def time_discretization(self, times):
+        warnings.warn(
+            f"{self.__class__.__name__}.time_discretization() will be deprecated. "
+            f"In the future call {self.__class__.__name__}.create_time_discretization().",
+            PendingDeprecationWarning,
+        )
+        self.create_time_discretization(additonal_times=times)
+
+    def create_time_discretization(self, additional_times):
         """
         Collect all unique times from model packages and additional given
         `times`. These unique times are used as stress periods in the model. All
@@ -60,7 +69,7 @@ class Modflow6Simulation(collections.UserDict):
 
         Parameters
         ----------
-        times : str, datetime; or iterable of str, datetimes.
+        additional_times : str, datetime; or iterable of str, datetimes.
             Times to add to the time discretization. At least one single time
             should be given, which will be used as the ending time of the
             simulation.
@@ -81,7 +90,10 @@ class Modflow6Simulation(collections.UserDict):
             [model._use_cftime() for model in self.values() if model._pkg_id == "model"]
         )
 
-        times = [imod.wq.timeutil.to_datetime(time, self.use_cftime) for time in times]
+        times = [
+            imod.wq.timeutil.to_datetime(time, self.use_cftime)
+            for time in additional_times
+        ]
         for model in self.values():
             if model._pkg_id == "model":
                 times.extend(model._yield_times())

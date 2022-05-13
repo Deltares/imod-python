@@ -336,6 +336,14 @@ class SeawatModel(Model):
                 raise ValueError("Use either cftime or numpy.datetime64[ns].")
 
     def time_discretization(self, times):
+        warnings.warn(
+            f"{self.__class__.__name__}.time_discretization() will be deprecated. "
+            f"In the future call {self.__class__.__name__}.create_time_discretization().",
+            PendingDeprecationWarning,
+        )
+        self.create_time_discretization(additonal_times=times)
+
+    def create_time_discretization(self, additional_times):
         """
         Collect all unique times from model packages and additional given `times`. These
         unique times are used as stress periods in the model. All stress packages must
@@ -388,15 +396,17 @@ class SeawatModel(Model):
         """
 
         # Make sure it's an iterable
-        if not isinstance(times, (np.ndarray, list, tuple, pd.DatetimeIndex)):
-            times = [times]
+        if not isinstance(
+            additional_times, (np.ndarray, list, tuple, pd.DatetimeIndex)
+        ):
+            additional_times = [additional_times]
 
         # Loop through all packages, check if cftime is required.
         self.use_cftime = self._use_cftime()
         # use_cftime is None if you no datetimes are present in packages
         # use_cftime is False if np.datetimes present in packages
         # use_cftime is True if cftime.datetime present in packages
-        for time in times:
+        for time in additional_times:
             if issubclass(type(time), cftime.datetime):
                 if self.use_cftime is None:
                     self.use_cftime = True
@@ -408,7 +418,9 @@ class SeawatModel(Model):
         if self.use_cftime is None:
             self.use_cftime = False
 
-        times = [timeutil.to_datetime(time, self.use_cftime) for time in times]
+        times = [
+            timeutil.to_datetime(time, self.use_cftime) for time in additional_times
+        ]
         first_times = {}  # first time per package
         for key, pkg in self.items():
             if self._hastime(pkg):
