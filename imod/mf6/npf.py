@@ -176,6 +176,18 @@ class NodePropertyFlow(Package):
     """
 
     _pkg_id = "npf"
+
+    _expected_dtypes = {
+        "icelltype": np.integer,
+        "k": np.floating,
+        "rewet_layer": np.floating,
+        "k22": np.floating,
+        "k33": np.floating,
+        "angle1": np.floating,
+        "angle2": np.floating,
+        "angle3": np.floating,
+    }
+
     _grid_data = {
         "icelltype": np.int32,
         "k": np.float64,
@@ -249,6 +261,8 @@ class NodePropertyFlow(Package):
         self.dataset["dewatered"] = dewatered
         self.dataset["perched"] = perched
         self.dataset["save_specific_discharge"] = save_specific_discharge
+
+        self._pkgcheck()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

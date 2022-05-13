@@ -1,3 +1,4 @@
+import numpy as np
 from imod.mf6.pkgbase import BoundaryCondition
 
 
@@ -31,6 +32,7 @@ class Drainage(BoundaryCondition):
 
     _pkg_id = "drn"
     # has to be ordered as in the list
+    _expected_dtypes = {"elevation": np.floating, "conductance": np.floating}
     _period_data = ("elevation", "conductance")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
@@ -51,3 +53,5 @@ class Drainage(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+
+        self._pkgcheck()

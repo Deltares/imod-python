@@ -25,6 +25,7 @@ class InitialConditions(Package):
     """
 
     _pkg_id = "ic"
+    _expected_dtypes = {"head": np.floating}
     _grid_data = {"head": np.float64}
     _keyword_map = {"head": "strt"}
     _template = Package._initialize_template(_pkg_id)
@@ -32,6 +33,8 @@ class InitialConditions(Package):
     def __init__(self, head):
         super().__init__(locals())
         self.dataset["head"] = head
+
+        self._pkgcheck()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

@@ -1,3 +1,4 @@
+import numpy as np
 from imod.mf6.pkgbase import BoundaryCondition
 
 
@@ -36,6 +37,7 @@ class Recharge(BoundaryCondition):
     _pkg_id = "rch"
     _period_data = ("rate",)
     _keyword_map = {}
+    _expected_dtypes = {"rate": np.floating}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
@@ -52,3 +54,5 @@ class Recharge(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+
+        self._pkgcheck()

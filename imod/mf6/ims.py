@@ -1,3 +1,4 @@
+import numpy as np
 from imod.mf6.pkgbase import Package
 
 
@@ -333,6 +334,22 @@ class Solution(Package):
 
     _pkg_id = "ims"
     _keyword_map = {}
+    _expected_dtypes = {
+        "outer_dvclose": np.floating,
+        "outer_maximum": np.integer,
+        "inner_maximum": np.integer,
+        "inner_dvclose": np.floating,
+        "inner_rclose": np.floating,
+        "under_relaxation_theta": np.floating,
+        "under_relaxation_kappa": np.floating,
+        "under_relaxation_gamma": np.floating,
+        "under_relaxation_momentum": np.floating,
+        "backtracking_number": np.integer,
+        "backtracking_tolerance": np.floating,
+        "backtracking_reduction_factor": np.floating,
+        "backtracking_residual_limit": np.floating,
+        "number_orthogonalizations": np.integer,
+    }
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(
@@ -389,6 +406,8 @@ class Solution(Package):
         self.dataset["print_option"] = print_option
         self.dataset["csv_output"] = csv_output
         self.dataset["no_ptc"] = no_ptc
+
+        self._pkgcheck()
 
 
 def SolutionPresetSimple(print_option, csv_output, no_ptc):

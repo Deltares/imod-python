@@ -38,11 +38,19 @@ class TimeDiscretization(Package):
     _keyword_map = {}
     _template = Package._initialize_template(_pkg_id)
 
+    _expected_dtypes = {
+        "timestep_duration": np.floating,
+        "n_timesteps": np.integer,
+        "timestep_multiplier": np.floating,
+    }
+
     def __init__(self, timestep_duration, n_timesteps=1, timestep_multiplier=1.0):
         super().__init__()
         self.dataset["timestep_duration"] = timestep_duration
         self.dataset["n_timesteps"] = n_timesteps
         self.dataset["timestep_multiplier"] = timestep_multiplier
+
+        self._pkgcheck()
 
     def render(self):
         start_date_time = iso8601(self.dataset["time"].values[0])

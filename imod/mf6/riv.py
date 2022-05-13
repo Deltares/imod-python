@@ -1,3 +1,4 @@
+import numpy as np
 from imod.mf6.pkgbase import BoundaryCondition
 
 
@@ -35,6 +36,11 @@ class River(BoundaryCondition):
     _pkg_id = "riv"
     _period_data = ("stage", "conductance", "bottom_elevation")
     _keyword_map = {}
+    _expected_dtypes = {
+        "stage": np.floating,
+        "conductance": np.floating,
+        "bottom_elevation": np.floating,
+    }
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
@@ -55,3 +61,5 @@ class River(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+
+        self._pkgcheck()
