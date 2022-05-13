@@ -54,6 +54,11 @@ class SpecificStorage(Package):
         "specific_yield": "sy",
         "convertible": "iconvert",
     }
+    _expected_dtypes = {
+        "specific_storage": np.floating,
+        "specific_yield": np.floating,
+        "convertible": np.integer,
+    }
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, specific_storage, specific_yield, transient, convertible):
@@ -62,6 +67,8 @@ class SpecificStorage(Package):
         self.dataset["specific_yield"] = specific_yield
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
+
+        self._pkgcheck()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
@@ -142,6 +149,11 @@ class StorageCoefficient(Package):
         "storage_coefficient": "ss",
         "specific_yield": "sy",
         "convertible": "iconvert",
+    }
+    _expected_dtypes = {
+        "storage_coefficient": np.floating,
+        "specific_yield": np.floating,
+        "convertible": np.integer,
     }
     _template = Package._initialize_template(_pkg_id)
 

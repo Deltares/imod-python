@@ -1,3 +1,4 @@
+import numpy as np
 from imod.mf6.pkgbase import BoundaryCondition
 
 
@@ -48,6 +49,13 @@ class Evapotranspiration(BoundaryCondition):
     """
 
     _pkg_id = "evt"
+    _expected_dtypes = {
+        "surface": np.floating,
+        "rate": np.floating,
+        "depth": np.floating,
+        "proportion_depth": np.floating,
+        "proportion_rate": np.floating,
+    }
     _period_data = ("surface", "rate", "depth", "proportion_depth", "proportion_rate")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
@@ -81,6 +89,8 @@ class Evapotranspiration(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+
+        self._pkgcheck()
 
         # TODO: add write logic for transforming proportion rate and depth to
         # the right shape in the binary file.

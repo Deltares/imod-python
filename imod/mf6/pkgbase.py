@@ -399,6 +399,21 @@ class Package(abc.ABC):
         spatial_ds.to_netcdf(path)
         return has_dims
 
+    def _check_types(self):
+        for varname, expected_subclass in self._expected_dtypes.items():
+            da = self.dataset[varname]
+            if da.values[()] is not None:  # Only check if was specified
+                if not issubclass(da.dtype.type, expected_subclass):
+                    raise TypeError(
+                        f"Unexpected data type for {varname} "
+                        f"in {self.__class__.__name__} package. "
+                        f"Expected subclass of {expected_subclass.__name__}, "
+                        f"instead got {da.dtype.type.__name__}."
+                    )
+
+    def _pkgcheck(self):
+        self._check_types()
+
 
 class BoundaryCondition(Package, abc.ABC):
     """

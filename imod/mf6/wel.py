@@ -64,6 +64,13 @@ class WellDisStructured(BoundaryCondition):
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
+    _expected_dtypes = {
+        "layer": np.integer,
+        "row": np.integer,
+        "column": np.integer,
+        "rate": np.floating,
+    }
+
     def __init__(
         self,
         layer,
@@ -84,6 +91,8 @@ class WellDisStructured(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+
+        self._pkgcheck()
 
     def to_sparse(self, arrdict, layer):
         spec = []
