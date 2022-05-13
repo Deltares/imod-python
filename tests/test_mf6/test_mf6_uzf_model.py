@@ -74,6 +74,7 @@ def uzf_model():
     uzf_units = idomain.sel(
         layer=slice(1, 4)
     ).copy()  # Copy because sel returns a view.
+
     window = 3
 
     for i, r in enumerate(range(int(ncol / window))):
