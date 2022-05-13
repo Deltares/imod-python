@@ -71,7 +71,9 @@ def uzf_model():
     )
 
     # Create unsaturated zone
-    uzf_units = idomain.sel(layer=slice(1, 4))
+    uzf_units = idomain.sel(
+        layer=slice(1, 4)
+    ).copy()  # Copy because sel returns a view.
     window = 3
 
     for i, r in enumerate(range(int(ncol / window))):
@@ -79,8 +81,7 @@ def uzf_model():
         end = start + window + 1
         uzf_units[..., slice(start, end)] = i + 1
 
-    uzf_units = uzf_units * idomain
-    uzf_units = uzf_units.where(uzf_units != 0)
+    uzf_units = uzf_units.where(idomain != 0)
 
     # Create data unsaturated zone
     uds = {}
