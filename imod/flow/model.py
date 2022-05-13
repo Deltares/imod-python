@@ -257,7 +257,9 @@ class ImodflowModel(Model):
         if self.use_cftime is None:
             self.use_cftime = False
 
-        times = [timeutil.to_datetime(time, self.use_cftime) for time in times]
+        times = [
+            timeutil.to_datetime(time, self.use_cftime) for time in additional_times
+        ]
         times, first_times = insert_unique_package_times(self.items(), times)
 
         # Check if every transient package commences at the same time.
