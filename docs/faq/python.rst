@@ -120,7 +120,7 @@ into (see below), we do not consider the full Anaconda installer attractive.
   Since April 2020, Anaconda has `changed`_ their `Terms of Service`_, limiting
   use of the anaconda repository to commercial users. If you worry you fall in
   the category of commercial users, we recommend installing Miniforge or
-  Mambafore instead. The change has negligible consequences for imod users, as
+  Mambaforge instead. The change has negligible consequences for imod users, as
   we've long fully relied on the community led `conda-forge`_ channel.
 
 You can find the Miniforge homepage and the Miniforge and Mambaforge installers
