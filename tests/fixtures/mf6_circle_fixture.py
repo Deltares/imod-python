@@ -73,7 +73,7 @@ def make_circle_model():
         reordering_method=None,
         relaxation_factor=0.97,
     )
-    simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
+    simulation.create_time_discretization(additional_times=["2000-01-01", "2000-01-02"])
     return simulation
 
 

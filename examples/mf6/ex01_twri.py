@@ -165,8 +165,8 @@ simulation["solver"] = imod.mf6.Solution(
     relaxation_factor=0.97,
 )
 # Collect time discretization
-simulation.time_discretization(
-    times=["2000-01-01", "2000-01-02", "2000-01-03", "2000-01-04"]
+simulation.create_time_discretization(
+    additional_times=["2000-01-01", "2000-01-02", "2000-01-03", "2000-01-04"]
 )
 
 # %%

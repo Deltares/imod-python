@@ -147,7 +147,7 @@ simulation["solver"] = imod.mf6.Solution(
     reordering_method=None,
     relaxation_factor=0.97,
 )
-simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
+simulation.create_time_discretization(additional_times=["2000-01-01", "2000-01-02"])
 
 # %%
 # We'll create a new directory in which we will write and run the model.

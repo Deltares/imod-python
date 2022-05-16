@@ -584,8 +584,8 @@ simulation["solver"] = imod.mf6.Solution(
 #
 # The time discretization of this model is 6 years.
 
-simulation.time_discretization(
-    times=["2009-12-30T23:59:59.000000000", "2015-12-31T00:00:00.000000000"]
+simulation.create_time_discretization(
+    additional_times=["2009-12-30T23:59:59.000000000", "2015-12-31T00:00:00.000000000"]
 )
 
 # %%

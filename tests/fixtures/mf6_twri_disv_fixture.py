@@ -149,7 +149,7 @@ def make_twri_disv_model():
         relaxation_factor=0.97,
     )
     # Collect time discretization
-    simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
+    simulation.create_time_discretization(additional_times=["2000-01-01", "2000-01-02"])
 
     return simulation
 

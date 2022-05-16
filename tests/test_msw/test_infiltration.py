@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import xarray as xr
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis.strategies import floats
 from numpy import nan
 from numpy.testing import assert_almost_equal, assert_equal
@@ -34,6 +34,7 @@ from imod.msw.fixed_format import format_fixed_width
         Infiltration._metadata_dict["extra_storage_coefficient"].max_value,
     ),
 )
+@settings(deadline=None)
 def test_write(
     fixed_format_parser,
     infiltration_capacity,
