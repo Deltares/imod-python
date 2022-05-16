@@ -183,6 +183,9 @@ def test_open_cbc__dis(twri_result):
             assert isinstance(array, xr.DataArray)
             assert isinstance(array.data, dask.array.Array)
 
+            # Test if no errors are thrown if the array is loaded into memory
+            array.load()
+
 
 @pytest.mark.usefixtures("circle_result")
 def test_open_cbc__disv(circle_result):
@@ -206,3 +209,6 @@ def test_open_cbc__disv(circle_result):
                 assert array.dims[-1] == array.ugrid.grid.edge_dimension
             assert isinstance(array, xu.UgridDataArray)
             assert isinstance(array.data, dask.array.Array)
+
+            # Test if no errors are thrown if the array is loaded into memory
+            array.load()

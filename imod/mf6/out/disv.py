@@ -244,7 +244,7 @@ def open_imeth6_budgets(
     time = np.empty(len(header_list), dtype=np.float64)
     for i, header in enumerate(header_list):
         time[i] = header.totim
-        a = dask.delayed(cbc.read_imeth6_budgets)(
+        a = dask.delayed(cbc.read_imeth6_budgets_dense)(
             cbc_path, header.nlist, dtype, header.pos, size, shape
         )
         x = dask.array.from_delayed(a, shape=shape, dtype=np.float64)
