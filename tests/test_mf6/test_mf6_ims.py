@@ -1,5 +1,7 @@
 import textwrap
 
+import pytest
+
 import imod
 
 
@@ -8,7 +10,7 @@ def test_render():
         print_option="summary",
         csv_output=False,
         no_ptc=True,
-        outer_dvclose=1.0 - 4,
+        outer_dvclose=1.0e-4,
         outer_maximum=500,
         under_relaxation=None,
         inner_dvclose=1.0e-4,
@@ -27,7 +29,7 @@ def test_render():
         end options
 
         begin nonlinear
-          outer_dvclose -3.0
+          outer_dvclose 0.0001
           outer_maximum 500
         end nonlinear
 
@@ -41,3 +43,22 @@ def test_render():
         """
     )
     assert expected == actual
+
+
+def test_wrong_dtype():
+    with pytest.raises(TypeError):
+        imod.mf6.Solution(
+            print_option="summary",
+            csv_output=False,
+            no_ptc=True,
+            outer_dvclose=4,
+            outer_maximum=500,
+            under_relaxation=None,
+            inner_dvclose=1.0e-4,
+            inner_rclose=0.001,
+            inner_maximum=100,
+            linear_acceleration="cg",
+            scaling_method=None,
+            reordering_method=None,
+            relaxation_factor=0.97,
+        )

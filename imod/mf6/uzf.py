@@ -1,7 +1,11 @@
 import numpy as np
 import xarray as xr
 
-from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition
+from imod.mf6.pkgbase import (
+    AdvancedBoundaryCondition,
+    BoundaryCondition,
+    VariableMetaData,
+)
 
 
 class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
@@ -27,7 +31,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         is the epsilon exponent of the UZF cell.
     infiltration_rate: array of floats (xr.DataArray)
         defines the applied infiltration rate of the UZF cell (LT -1).
-    ET_pot: array of floats (xr.DataArray, optional)
+    et_pot: array of floats (xr.DataArray, optional)
         defines the potential evapotranspiration rate of the UZF cell and specified
         GWF cell. Evapotranspiration is first removed from the unsaturated zone and any remaining
         potential evapotranspiration is applied to the saturated zone. If IVERTCON is greater than zero
@@ -99,6 +103,21 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         "root_potential",
         "root_activity",
     )
+
+    _metadata_dict = {
+        "surface_depression_depth": VariableMetaData(np.floating),
+        "kv_sat": VariableMetaData(np.floating),
+        "theta_res": VariableMetaData(np.floating),
+        "theta_sat": VariableMetaData(np.floating),
+        "theta_init": VariableMetaData(np.floating),
+        "epsilon": VariableMetaData(np.floating),
+        "infiltration_rate": VariableMetaData(np.floating),
+        "et_pot": VariableMetaData(np.floating),
+        "extinction_depth": VariableMetaData(np.floating),
+        "extinction_theta": VariableMetaData(np.floating),
+        "root_potential": VariableMetaData(np.floating),
+        "root_activity": VariableMetaData(np.floating),
+    }
 
     _package_data = (
         "surface_depression_depth",
@@ -187,6 +206,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         self.dataset["iuzno"].name = "uzf_number"
 
         self.dataset["ivertcon"] = self._determine_vertical_connection(self["iuzno"])
+
+        self._pkgcheck()
 
     def fill_stress_perioddata(self):
         """Modflow6 requires something to be filled in the stress perioddata,
