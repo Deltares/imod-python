@@ -16,6 +16,7 @@ from imod.mf6.ims import (
     SolutionPresetSimple,
 )
 from imod.mf6.model import GroundwaterFlowModel
+from imod.mf6.model import GroundwaterTransportModel
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.oc import OutputControl
 from imod.mf6.out import open_cbc, open_hds, read_cbc_headers, read_grb
@@ -26,3 +27,5 @@ from imod.mf6.sto import SpecificStorage, Storage, StorageCoefficient
 from imod.mf6.timedis import TimeDiscretization
 from imod.mf6.uzf import UnsaturatedZoneFlow
 from imod.mf6.wel import WellDisStructured, WellDisVertices
+from imod.mf6.adv import AdvectionUpstream, AdvectionCentral, AdvectionTVD
+from imod.mf6.dsp import Dispersion

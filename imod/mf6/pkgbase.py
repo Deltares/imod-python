@@ -6,6 +6,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
+TRANSPORT_PACKAGES = ["adv", "dsp"]
 
 def dis_recarr(arrdict, layer, notnull):
     # Define the numpy structured array dtype
@@ -181,6 +182,8 @@ class Package(abc.ABC):
             fname = "sln-ims.j2"
         elif pkg_id == "tdis":
             fname = "sim-tdis.j2"
+        elif pkg_id in TRANSPORT_PACKAGES:
+            fname = f"gwt-{pkg_id}.j2"
         else:
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
@@ -278,11 +281,26 @@ class Package(abc.ABC):
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
-        for k, v in self.dataset.data_vars.items():  # pylint:disable=no-member
-            value = v.values[()]
-            if self._valid(value):  # skip None and False
-                d[k] = value
+        if directory is None:
+            pkg_directory = self._pkg_id
+        else:
+            pkg_directory = directory / self._pkg_id
+        for varname in self.dataset.data_vars:
+            key = self._keyword_map.get(varname, varname)
+
+            if hasattr(self, "_grid_data") and varname in self._grid_data:
+                layered, value = self._compose_values(
+                    self.dataset[varname], pkg_directory , key, binary=binary
+                )
+                if self._valid(value):  # skip False or None
+                    d[f"{key}_layered"], d[key] = layered, value
+            else:
+                value = self[varname].values[()]
+                if self._valid(value):  # skip False or None
+                    d[key] = value
+
         return self._template.render(d)
+
 
     @staticmethod
     def _is_xy_data(obj):
