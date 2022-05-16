@@ -152,7 +152,9 @@ def transient_twri_model():
         convertible=0,
         transient=True,
     )
-    simulation.create_time_discretization(additional_times=pd.date_range("2000-01-01", " 2000-01-31"))
+    simulation.create_time_discretization(
+        additional_times=pd.date_range("2000-01-01", " 2000-01-31")
+    )
     return simulation
 
 
