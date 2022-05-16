@@ -10,7 +10,7 @@ Model
     :toctree: generated/flow
     
     ImodflowModel
-    ImodflowModel.time_discretization
+    ImodflowModel.create_time_discretization
 
 Grid
 ----

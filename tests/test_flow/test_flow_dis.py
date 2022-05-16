@@ -33,7 +33,7 @@ def time_discretization_cftime(three_days):
     return TimeDiscretization(timestep_duration=timestep_duration, endtime=times[-1])
 
 
-def test_time_discretization(time_discretization):
+def test_create_time_discretization(time_discretization):
     rendered = time_discretization._render()
 
     compare = (
@@ -43,7 +43,7 @@ def test_time_discretization(time_discretization):
     assert rendered == compare
 
 
-def test_time_discretization_cftime(time_discretization_cftime):
+def test_create_time_discretization_cftime(time_discretization_cftime):
     first_time = time_discretization_cftime.dataset["time"].values[0]
 
     # Double check if we really are going to test cftimes next

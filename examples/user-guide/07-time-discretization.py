@@ -12,10 +12,10 @@ a very powerful feature, though slightly hidden.
 # Basics
 # ------
 #
-# To demonstrate the ``time_discretization()`` method, we first have to
+# To demonstrate the ``create_time_discretization()`` method, we first have to
 # create a Model object. In this case we'll use a Modflow 6 simulation, but the
-# ``imod.wq.SeawatModel`` also supports this. Wel'll start off with the usual
-# imports:
+# ``imod.wq.SeawatModel`` and imod.flow.ImodflowModel also support this. Wel'll
+# start off with the usual imports:
 
 import numpy as np
 import pandas as pd
@@ -28,7 +28,9 @@ import imod
 # TimeDiscretization object under the key ``"time_discretization"``.
 
 simulation = imod.mf6.Modflow6Simulation("example")
-simulation.time_discretization(times=["2000-01-01", "2000-01-02", "2000-01-04"])
+simulation.create_time_discretization(
+    additional_times=["2000-01-01", "2000-01-02", "2000-01-04"]
+)
 
 simulation["time_discretization"]
 
@@ -53,7 +55,7 @@ simulation["time_discretization"].dataset["timestep_duration"]
 # Boundary Conditions
 # -------------------
 #
-# The ``time_discretization`` method become especially useful if we add boundary
+# The ``create_time_discretization`` method becomes especially useful if we add boundary
 # conditions to our groundwater model. We'll first still have to initialize a
 # groundwater flow model though:
 
@@ -90,7 +92,7 @@ endtime = pd.to_datetime(["2000-01-06"])
 simulation_bc = imod.mf6.Modflow6Simulation("example_bc")
 simulation_bc["gwf_1"] = gwf_model
 
-simulation_bc.time_discretization(times=endtime)
+simulation_bc.create_time_discretization(additional_times=endtime)
 
 simulation_bc["time_discretization"].dataset
 

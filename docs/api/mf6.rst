@@ -20,7 +20,7 @@ Model objects & methods
     :toctree: generated/mf6
 
     Modflow6Simulation
-    Modflow6Simulation.time_discretization
+    Modflow6Simulation.create_time_discretization
     GroundwaterFlowModel
 
 Discretization

@@ -82,7 +82,7 @@ class Modflow6Simulation(collections.UserDict):
         Example
         -------
         >>> simulation = imod.mf6.Modflow6Simulation("example")
-        >>> simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
+        >>> simulation.create_time_discretization(times=["2000-01-01", "2000-01-02"])
         >>> # Set number of timesteps
         >>> simulation["time_discretization"]["n_timesteps"] = 5
         """

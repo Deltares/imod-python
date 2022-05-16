@@ -103,7 +103,7 @@ def simple_model():
         relaxation_factor=0.97,
     )
     # Collect time discretization
-    simulation.time_discretization(times=time)
+    simulation.create_time_discretization(additional_times=time)
 
     return simulation
 

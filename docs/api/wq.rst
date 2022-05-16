@@ -10,7 +10,7 @@ Model
     :toctree: generated/wq
     
     SeawatModel
-    SeawatModel.time_discretization
+    SeawatModel.create_time_discretization
 
 Settings
 --------

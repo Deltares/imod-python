@@ -100,7 +100,7 @@ class ImodflowModel(Model):
     >>> m = Imodflow("example")
     >>> m["riv"] = River(...)
     >>> # ...etc.
-    >>> m.time_discretization(endtime)
+    >>> m.create_time_discretization(endtime)
     >>> m.write()
     """
 
@@ -222,15 +222,15 @@ class ImodflowModel(Model):
         --------
         Add a single time:
 
-        >>> m.time_discretization("2001-01-01")
+        >>> m.create_time_discretization("2001-01-01")
 
         Add a daterange:
 
-        >>> m.time_discretization(pd.daterange("2000-01-01", "2001-01-01"))
+        >>> m.create_time_discretization(pd.daterange("2000-01-01", "2001-01-01"))
 
         Add a list of times:
 
-        >>> m.time_discretization(["2000-01-01", "2001-01-01"])
+        >>> m.create_time_discretization(["2000-01-01", "2001-01-01"])
 
         """
 
