@@ -1,12 +1,11 @@
 import abc
 import pathlib
+from dataclasses import dataclass
 
 import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
-
-from dataclasses import dataclass
 
 
 def dis_recarr(arrdict, layer, notnull):
