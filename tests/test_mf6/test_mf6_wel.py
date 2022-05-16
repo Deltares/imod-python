@@ -121,3 +121,20 @@ def test_render_transient():
     )
     actual = wel.render(directory, "well", globaltimes, True)
     assert actual == expected
+
+
+def test_wrong_dtype():
+    layer = np.array([3, 2, 2])
+    row = np.array([5, 4, 6])
+    column = np.array([11, 6, 12])
+    rate = np.full(3, 5)
+    with pytest.raises(TypeError):
+        imod.mf6.WellDisStructured(
+            layer=layer,
+            row=row,
+            column=column,
+            rate=rate,
+            print_input=False,
+            print_flows=False,
+            save_flows=False,
+        )

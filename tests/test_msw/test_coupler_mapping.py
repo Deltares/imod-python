@@ -46,14 +46,14 @@ def test_simple_model_with_sprinkling(fixed_format_parser):
         rate=well_rate,
     )
 
-    like = xr.full_like(svat.sel(subunit=1, drop=True), 1.0).expand_dims(
+    like = xr.full_like(svat.sel(subunit=1, drop=True), 1.0, dtype=float).expand_dims(
         layer=[1, 2, 3]
     )
 
     dis = mf6.StructuredDiscretization(
         top=xr.full_like(like, 1.0),
         bottom=xr.full_like(like, 0.0),
-        idomain=xr.full_like(like, 1),
+        idomain=xr.full_like(like, 1, dtype=np.int32),
     )
 
     coupler_mapping = msw.CouplerMapping(dis, well)
@@ -106,14 +106,14 @@ def test_simple_model_with_sprinkling_1_subunit(fixed_format_parser):
         rate=well_rate,
     )
 
-    like = xr.full_like(svat.sel(subunit=0, drop=True), 1.0).expand_dims(
+    like = xr.full_like(svat.sel(subunit=0, drop=True), 1.0, dtype=float).expand_dims(
         layer=[1, 2, 3]
     )
 
     dis = mf6.StructuredDiscretization(
-        top=xr.full_like(like, 1.0),
+        top=xr.full_like(like, 1.032),
         bottom=xr.full_like(like, 0.0),
-        idomain=xr.full_like(like, 1),
+        idomain=xr.full_like(like, 1, dtype=np.int32),
     )
 
     coupler_mapping = msw.CouplerMapping(dis, well)
@@ -158,14 +158,14 @@ def test_simple_model_without_sprinkling(fixed_format_parser):
     # fmt: on
     index = (svat != 0).values.ravel()
 
-    like = xr.full_like(svat.sel(subunit=1, drop=True), 1.0).expand_dims(
+    like = xr.full_like(svat.sel(subunit=1, drop=True), 1.0, dtype=float).expand_dims(
         layer=[1, 2, 3]
     )
 
     dis = mf6.StructuredDiscretization(
         top=xr.full_like(like, 1.0),
         bottom=xr.full_like(like, 0.0),
-        idomain=xr.full_like(like, 1),
+        idomain=xr.full_like(like, 1, dtype=np.int32),
     )
 
     coupler_mapping = msw.CouplerMapping(dis)

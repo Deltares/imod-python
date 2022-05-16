@@ -1,6 +1,7 @@
 import textwrap
 
 import pandas as pd
+import pytest
 import xarray as xr
 
 import imod
@@ -8,7 +9,7 @@ import imod
 
 def test_render():
     timestep_duration = xr.DataArray(
-        data=[0.001, 7, 365],
+        data=[0.001, 7.0, 365.0],
         coords={"time": pd.date_range("2000-01-01", "2000-01-03")},
         dims=["time"],
     )
@@ -35,3 +36,15 @@ def test_render():
         """
     )
     assert actual == expected
+
+
+def test_wrong_dtype():
+    timestep_duration = xr.DataArray(
+        data=[1, 7, 365],
+        coords={"time": pd.date_range("2000-01-01", "2000-01-03")},
+        dims=["time"],
+    )
+    with pytest.raises(TypeError):
+        imod.mf6.TimeDiscretization(
+            timestep_duration, n_timesteps=2, timestep_multiplier=1.1
+        )

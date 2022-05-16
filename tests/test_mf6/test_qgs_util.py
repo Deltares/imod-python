@@ -31,12 +31,15 @@ def simple_model():
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
     coords = {"layer": layer, "y": y, "x": x}
 
-    idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
+    like = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
+    idomain = like.astype(np.int32)
     idomain[:, slice(0, 3), slice(0, 3)] = 0
 
     top = 0.0
     bottom = xr.DataArray(
-        np.cumsum(layer * -1 * dz), coords={"layer": layer}, dims="layer"
+        np.cumsum(layer.astype(np.float64) * -1 * dz),
+        coords={"layer": layer},
+        dims="layer",
     )
 
     gwf_model["dis"] = imod.mf6.StructuredDiscretization(
@@ -44,7 +47,7 @@ def simple_model():
     )
 
     # Create constant head
-    head = xr.full_like(idomain, 0.0)
+    head = xr.full_like(like, 0.0)
     head[..., 0] = -2.0
     head[..., -1] = -2.0
     head = head.where(idomain == 1)
@@ -55,7 +58,7 @@ def simple_model():
     )
 
     # Create nodeproperty flow
-    icelltype = xr.full_like(bottom, 0).astype(np.int32)
+    icelltype = xr.full_like(idomain, 0)
     k = 10.0
     k33 = 1.0
     gwf_model["npf"] = imod.mf6.NodePropertyFlow(
@@ -74,9 +77,9 @@ def simple_model():
     gwf_model["ic"] = imod.mf6.InitialConditions(head=shd)
 
     # Storage
-    Ss = xr.full_like(idomain, 1e-5)
-    Sy = xr.full_like(idomain, 0.1)
-    iconvert = xr.full_like(idomain, 0).astype(np.int8)
+    Ss = xr.full_like(like, 1e-5)
+    Sy = xr.full_like(like, 0.1)
+    iconvert = xr.full_like(idomain, 0)
 
     gwf_model["sto"] = imod.mf6.SpecificStorage(Ss, Sy, True, iconvert)
 

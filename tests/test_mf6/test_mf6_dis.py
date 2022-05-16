@@ -2,12 +2,14 @@ import pathlib
 import textwrap
 
 import numpy as np
+import pytest
 import xarray as xr
 
 import imod
 
 
-def test_render():
+@pytest.fixture(scope="function")
+def idomain_and_bottom():
     nlay = 3
     nrow = 15
     ncol = 15
@@ -25,8 +27,14 @@ def test_render():
     y = np.arange(ymax, ymin, dy) + 0.5 * dy
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
     coords = {"layer": layer, "y": y, "x": x}
-    idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
+    idomain = xr.DataArray(np.ones(shape, dtype=np.int8), coords=coords, dims=dims)
     bottom = xr.DataArray([-200.0, -350.0, -450.0], {"layer": layer}, ("layer",))
+
+    return idomain, bottom
+
+
+def test_render(idomain_and_bottom):
+    idomain, bottom = idomain_and_bottom
 
     directory = pathlib.Path("mymodel")
     dis = imod.mf6.StructuredDiscretization(top=200.0, bottom=bottom, idomain=idomain)
@@ -61,3 +69,12 @@ def test_render():
         """
     )
     assert actual == expected
+
+
+def test_wrong_dtype(idomain_and_bottom):
+    idomain, bottom = idomain_and_bottom
+
+    with pytest.raises(TypeError):
+        imod.mf6.StructuredDiscretization(
+            top=200.0, bottom=bottom, idomain=idomain.astype(np.float64)
+        )

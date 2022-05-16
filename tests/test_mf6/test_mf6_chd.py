@@ -98,3 +98,10 @@ def test_from_file(head, tmp_path):
         """
     )
     assert actual == expected
+
+
+def test_wrong_dtype(head):
+    with pytest.raises(TypeError):
+        imod.mf6.ConstantHead(
+            head.astype(np.int16), print_input=True, print_flows=True, save_flows=True
+        )

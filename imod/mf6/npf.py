@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import Package
+from imod.mf6.pkgbase import Package, VariableMetaData
 
 
 class NodePropertyFlow(Package):
@@ -176,6 +176,18 @@ class NodePropertyFlow(Package):
     """
 
     _pkg_id = "npf"
+
+    _metadata_dict = {
+        "icelltype": VariableMetaData(np.integer),
+        "k": VariableMetaData(np.floating),
+        "rewet_layer": VariableMetaData(np.floating),
+        "k22": VariableMetaData(np.floating),
+        "k33": VariableMetaData(np.floating),
+        "angle1": VariableMetaData(np.floating),
+        "angle2": VariableMetaData(np.floating),
+        "angle3": VariableMetaData(np.floating),
+    }
+
     _grid_data = {
         "icelltype": np.int32,
         "k": np.float64,
@@ -249,6 +261,8 @@ class NodePropertyFlow(Package):
         self.dataset["dewatered"] = dewatered
         self.dataset["perched"] = perched
         self.dataset["save_specific_discharge"] = save_specific_discharge
+
+        self._pkgcheck()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

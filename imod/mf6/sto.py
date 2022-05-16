@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import Package
+from imod.mf6.pkgbase import Package, VariableMetaData
 
 
 class Storage(Package):
@@ -54,6 +54,11 @@ class SpecificStorage(Package):
         "specific_yield": "sy",
         "convertible": "iconvert",
     }
+    _metadata_dict = {
+        "specific_storage": VariableMetaData(np.floating),
+        "specific_yield": VariableMetaData(np.floating),
+        "convertible": VariableMetaData(np.integer),
+    }
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, specific_storage, specific_yield, transient, convertible):
@@ -62,6 +67,8 @@ class SpecificStorage(Package):
         self.dataset["specific_yield"] = specific_yield
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
+
+        self._pkgcheck()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
@@ -143,6 +150,13 @@ class StorageCoefficient(Package):
         "specific_yield": "sy",
         "convertible": "iconvert",
     }
+    _metadata_dict = {
+        "storage_coefficient": VariableMetaData(np.floating),
+        "specific_yield": VariableMetaData(np.floating),
+        "convertible": VariableMetaData(
+            np.integer,
+        ),
+    }
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, storage_coefficient, specific_yield, transient, convertible):
@@ -151,6 +165,8 @@ class StorageCoefficient(Package):
         self.dataset["specific_yield"] = specific_yield
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
+
+        self._pkgcheck()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

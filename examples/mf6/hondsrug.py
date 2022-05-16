@@ -47,7 +47,7 @@ gwf_model = imod.mf6.GroundwaterFlowModel()
 # We'll load the data from the examples that come with this package.
 
 layermodel = imod.data.hondsrug_layermodel()
-idomain = layermodel["idomain"]
+idomain = layermodel["idomain"].astype(int)
 top = layermodel["top"]
 bot = layermodel["bottom"]
 
@@ -163,7 +163,8 @@ interpolated_head.plot.imshow(ax=ax)
 # The final result is an starting_heads xarray where all layers have the 2d interpolated_head information.
 
 # Assign interpolated head values to the all the model layers
-starting_head = xr.full_like(idomain, np.nan).combine_first(interpolated_head)
+like_3d = xr.full_like(idomain, np.nan, dtype=float)
+starting_head = like_3d.combine_first(interpolated_head)
 starting_head
 
 # %%
