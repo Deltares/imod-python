@@ -31,9 +31,9 @@ class Modflow6Simulation(collections.UserDict):
 
     def time_discretization(self, times):
         warnings.warn(
-            f"{self.__class__.__name__}.time_discretization() will be deprecated. "
+            f"{self.__class__.__name__}.time_discretization() is deprecated. "
             f"In the future call {self.__class__.__name__}.create_time_discretization().",
-            PendingDeprecationWarning,
+            DeprecationWarning,
         )
         self.create_time_discretization(additonal_times=times)
 
