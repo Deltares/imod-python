@@ -1,7 +1,7 @@
 import numpy as np
 
 import imod
-from imod.mf6.pkgbase import Package
+from imod.mf6.pkgbase import Package, VariableMetaData
 
 
 class StructuredDiscretization(Package):
@@ -31,10 +31,10 @@ class StructuredDiscretization(Package):
     """
 
     _pkg_id = "dis"
-    _expected_dtypes = {
-        "top": np.floating,
-        "bottom": np.floating,
-        "idomain": np.integer,
+    _metadata_dict = {
+        "top": VariableMetaData(np.floating),
+        "bottom": VariableMetaData(np.floating),
+        "idomain": VariableMetaData(np.integer),
     }
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
     _keyword_map = {"bottom": "botm"}

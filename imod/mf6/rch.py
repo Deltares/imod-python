@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
 
 
 class Recharge(BoundaryCondition):
@@ -38,7 +38,7 @@ class Recharge(BoundaryCondition):
     _pkg_id = "rch"
     _period_data = ("rate",)
     _keyword_map = {}
-    _expected_dtypes = {"rate": np.floating}
+    _metadata_dict = {"rate": VariableMetaData(np.floating)}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(

@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
 
 
 class Drainage(BoundaryCondition):
@@ -33,7 +33,10 @@ class Drainage(BoundaryCondition):
 
     _pkg_id = "drn"
     # has to be ordered as in the list
-    _expected_dtypes = {"elevation": np.floating, "conductance": np.floating}
+    _metadata_dict = {
+        "elevation": VariableMetaData(np.floating),
+        "conductance": VariableMetaData(np.floating),
+    }
     _period_data = ("elevation", "conductance")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)

@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import Package
+from imod.mf6.pkgbase import Package, VariableMetaData
 
 
 class NodePropertyFlow(Package):
@@ -177,15 +177,15 @@ class NodePropertyFlow(Package):
 
     _pkg_id = "npf"
 
-    _expected_dtypes = {
-        "icelltype": np.integer,
-        "k": np.floating,
-        "rewet_layer": np.floating,
-        "k22": np.floating,
-        "k33": np.floating,
-        "angle1": np.floating,
-        "angle2": np.floating,
-        "angle3": np.floating,
+    _metadata_dict = {
+        "icelltype": VariableMetaData(np.integer),
+        "k": VariableMetaData(np.floating),
+        "rewet_layer": VariableMetaData(np.floating),
+        "k22": VariableMetaData(np.floating),
+        "k33": VariableMetaData(np.floating),
+        "angle1": VariableMetaData(np.floating),
+        "angle2": VariableMetaData(np.floating),
+        "angle3": VariableMetaData(np.floating),
     }
 
     _grid_data = {

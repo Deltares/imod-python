@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
 
 
 class River(BoundaryCondition):
@@ -37,10 +37,10 @@ class River(BoundaryCondition):
     _pkg_id = "riv"
     _period_data = ("stage", "conductance", "bottom_elevation")
     _keyword_map = {}
-    _expected_dtypes = {
-        "stage": np.floating,
-        "conductance": np.floating,
-        "bottom_elevation": np.floating,
+    _metadata_dict = {
+        "stage": VariableMetaData(np.floating),
+        "conductance": VariableMetaData(np.floating),
+        "bottom_elevation": VariableMetaData(np.floating),
     }
     _template = BoundaryCondition._initialize_template(_pkg_id)
 

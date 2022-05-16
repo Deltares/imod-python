@@ -1,7 +1,11 @@
 import numpy as np
 import xarray as xr
 
-from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition
+from imod.mf6.pkgbase import (
+    AdvancedBoundaryCondition,
+    BoundaryCondition,
+    VariableMetaData,
+)
 
 
 class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
@@ -100,19 +104,19 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         "root_activity",
     )
 
-    _expected_dtypes = {
-        "surface_depression_depth": np.floating,
-        "kv_sat": np.floating,
-        "theta_res": np.floating,
-        "theta_sat": np.floating,
-        "theta_init": np.floating,
-        "epsilon": np.floating,
-        "infiltration_rate": np.floating,
-        "et_pot": np.floating,
-        "extinction_depth": np.floating,
-        "extinction_theta": np.floating,
-        "root_potential": np.floating,
-        "root_activity": np.floating,
+    _metadata_dict = {
+        "surface_depression_depth": VariableMetaData(np.floating),
+        "kv_sat": VariableMetaData(np.floating),
+        "theta_res": VariableMetaData(np.floating),
+        "theta_sat": VariableMetaData(np.floating),
+        "theta_init": VariableMetaData(np.floating),
+        "epsilon": VariableMetaData(np.floating),
+        "infiltration_rate": VariableMetaData(np.floating),
+        "et_pot": VariableMetaData(np.floating),
+        "extinction_depth": VariableMetaData(np.floating),
+        "extinction_theta": VariableMetaData(np.floating),
+        "root_potential": VariableMetaData(np.floating),
+        "root_activity": VariableMetaData(np.floating),
     }
 
     _package_data = (

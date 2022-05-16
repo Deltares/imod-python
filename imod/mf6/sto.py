@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import Package
+from imod.mf6.pkgbase import Package, VariableMetaData
 
 
 class Storage(Package):
@@ -54,10 +54,10 @@ class SpecificStorage(Package):
         "specific_yield": "sy",
         "convertible": "iconvert",
     }
-    _expected_dtypes = {
-        "specific_storage": np.floating,
-        "specific_yield": np.floating,
-        "convertible": np.integer,
+    _metadata_dict = {
+        "specific_storage": VariableMetaData(np.floating),
+        "specific_yield": VariableMetaData(np.floating),
+        "convertible": VariableMetaData(np.integer),
     }
     _template = Package._initialize_template(_pkg_id)
 
@@ -150,10 +150,12 @@ class StorageCoefficient(Package):
         "specific_yield": "sy",
         "convertible": "iconvert",
     }
-    _expected_dtypes = {
-        "storage_coefficient": np.floating,
-        "specific_yield": np.floating,
-        "convertible": np.integer,
+    _metadata_dict = {
+        "storage_coefficient": VariableMetaData(np.floating),
+        "specific_yield": VariableMetaData(np.floating),
+        "convertible": VariableMetaData(
+            np.integer,
+        ),
     }
     _template = Package._initialize_template(_pkg_id)
 

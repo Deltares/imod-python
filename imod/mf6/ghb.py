@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
 
 
 class GeneralHeadBoundary(BoundaryCondition):
@@ -37,7 +37,10 @@ class GeneralHeadBoundary(BoundaryCondition):
 
     _pkg_id = "ghb"
     _period_data = ("head", "conductance")
-    _expected_dtypes = {"head": np.floating, "conductance": np.floating}
+    _metadata_dict = {
+        "head": VariableMetaData(np.floating),
+        "conductance": VariableMetaData(np.floating),
+    }
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 

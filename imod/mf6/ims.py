@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import Package
+from imod.mf6.pkgbase import Package, VariableMetaData
 
 
 class Solution(Package):
@@ -335,21 +335,21 @@ class Solution(Package):
 
     _pkg_id = "ims"
     _keyword_map = {}
-    _expected_dtypes = {
-        "outer_dvclose": np.floating,
-        "outer_maximum": np.integer,
-        "inner_maximum": np.integer,
-        "inner_dvclose": np.floating,
-        "inner_rclose": np.floating,
-        "under_relaxation_theta": np.floating,
-        "under_relaxation_kappa": np.floating,
-        "under_relaxation_gamma": np.floating,
-        "under_relaxation_momentum": np.floating,
-        "backtracking_number": np.integer,
-        "backtracking_tolerance": np.floating,
-        "backtracking_reduction_factor": np.floating,
-        "backtracking_residual_limit": np.floating,
-        "number_orthogonalizations": np.integer,
+    _metadata_dict = {
+        "outer_dvclose": VariableMetaData(np.floating),
+        "outer_maximum": VariableMetaData(np.integer),
+        "inner_maximum": VariableMetaData(np.integer),
+        "inner_dvclose": VariableMetaData(np.floating),
+        "inner_rclose": VariableMetaData(np.floating),
+        "under_relaxation_theta": VariableMetaData(np.floating),
+        "under_relaxation_kappa": VariableMetaData(np.floating),
+        "under_relaxation_gamma": VariableMetaData(np.floating),
+        "under_relaxation_momentum": VariableMetaData(np.floating),
+        "backtracking_number": VariableMetaData(np.integer),
+        "backtracking_tolerance": VariableMetaData(np.floating),
+        "backtracking_reduction_factor": VariableMetaData(np.floating),
+        "backtracking_residual_limit": VariableMetaData(np.floating),
+        "number_orthogonalizations": VariableMetaData(np.integer),
     }
     _template = Package._initialize_template(_pkg_id)
 

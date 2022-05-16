@@ -1,7 +1,7 @@
 import cftime
 import numpy as np
 
-from imod.mf6.pkgbase import Package
+from imod.mf6.pkgbase import Package, VariableMetaData
 
 
 def iso8601(datetime):
@@ -38,10 +38,10 @@ class TimeDiscretization(Package):
     _keyword_map = {}
     _template = Package._initialize_template(_pkg_id)
 
-    _expected_dtypes = {
-        "timestep_duration": np.floating,
-        "n_timesteps": np.integer,
-        "timestep_multiplier": np.floating,
+    _metadata_dict = {
+        "timestep_duration": VariableMetaData(np.floating),
+        "n_timesteps": VariableMetaData(np.integer),
+        "timestep_multiplier": VariableMetaData(np.floating),
     }
 
     def __init__(self, timestep_duration, n_timesteps=1, timestep_multiplier=1.0):

@@ -6,6 +6,8 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
+from dataclasses import dataclass
+
 
 def dis_recarr(arrdict, layer, notnull):
     # Define the numpy structured array dtype
@@ -44,6 +46,19 @@ def disv_recarr(arrdict, layer, notnull):
         recarr["cell2d"] = icell2d + 1
         recarr["layer"] = layer[ilayer]
     return recarr
+
+
+@dataclass
+class VariableMetaData:
+    """
+    Dataclass to store metadata of a variable.
+
+    Currently purely used to store datatypes, but can be later expanded to store
+    minimimum and maximum values of variables, keyword maps, and period/package
+    data flags.
+    """
+
+    dtype: type
 
 
 class Package(abc.ABC):
@@ -400,14 +415,15 @@ class Package(abc.ABC):
         return has_dims
 
     def _check_types(self):
-        for varname, expected_subclass in self._expected_dtypes.items():
+        for varname, metadata in self._metadata_dict.items():
+            expected_dtype = metadata.dtype
             da = self.dataset[varname]
             if da.values[()] is not None:  # Only check if was specified
-                if not issubclass(da.dtype.type, expected_subclass):
+                if not issubclass(da.dtype.type, expected_dtype):
                     raise TypeError(
                         f"Unexpected data type for {varname} "
                         f"in {self.__class__.__name__} package. "
-                        f"Expected subclass of {expected_subclass.__name__}, "
+                        f"Expected subclass of {expected_dtype.__name__}, "
                         f"instead got {da.dtype.type.__name__}."
                     )
 

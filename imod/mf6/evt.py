@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
 
 
 class Evapotranspiration(BoundaryCondition):
@@ -50,12 +50,12 @@ class Evapotranspiration(BoundaryCondition):
     """
 
     _pkg_id = "evt"
-    _expected_dtypes = {
-        "surface": np.floating,
-        "rate": np.floating,
-        "depth": np.floating,
-        "proportion_depth": np.floating,
-        "proportion_rate": np.floating,
+    _metadata_dict = {
+        "surface": VariableMetaData(np.floating),
+        "rate": VariableMetaData(np.floating),
+        "depth": VariableMetaData(np.floating),
+        "proportion_depth": VariableMetaData(np.floating),
+        "proportion_rate": VariableMetaData(np.floating),
     }
     _period_data = ("surface", "rate", "depth", "proportion_depth", "proportion_rate")
     _keyword_map = {}
