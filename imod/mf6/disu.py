@@ -14,8 +14,8 @@ def _number(k, i, j, nrow, ncolumn):
     return k * (nrow * ncolumn) + i * ncolumn + j
 
 
-# @nb.njit
-def _structured_connectivity(idomain):
+@nb.njit
+def _structured_connectivity(idomain: IntArray):
     nlayer, nrow, ncolumn = idomain.shape
     # Pre-allocate: structured connectivity implies maximum of 8 neighbors
     nconnection = idomain.size * 8
@@ -177,7 +177,7 @@ class LowLevelUnstructuredDiscretization(Package):
         # first. To ensure this, we use the values as well as i and j; we sort
         # on the zeros (thereby ensuring it results as a first value per
         # column), but the actual value is the (negative) cell number (in v).
-        ii, jj = _structured_connectivity(idomain)
+        ii, jj = _structured_connectivity(idomain.values)
         ii += 1
         jj += 1
         nodes = np.arange(1, size + 1, dtype=np.int32)
