@@ -81,13 +81,19 @@ def plot_map(
     kwargs_basemap={},
     figsize=None,
     return_cbar=False,
+    fig=None,
+    ax=None,
 ):
     """
+    Plot raster on a map with optional vector overlays and basemap.
+
     Parameters
     ----------
     raster : xr.DataArray
         2D grid to plot.
-    colors : list of str, list of RGBA/RGBA tuples, colormap name (str), or LinearSegmentedColormap
+    colors : list of str, list of RGBA/RGBA tuples, colormap name (str), or
+        LinearSegmentedColormap.
+
         If list, it should be a Matplotlib acceptable list of colors. Length N.
         Accepts both tuples of (R, G, B) and hexidecimal (e.g. `#7ec0ee`).
 
@@ -99,43 +105,47 @@ def plot_map(
         `matplotlib.cm.get_cmap('jet')` as input. This function will not alter
         the colormap, so add under- and over-colors yourself.
 
-        Looking for good colormaps? Try: http://colorbrewer2.org/
-        Choose a colormap, and use the HEX JS array.
+        Looking for good colormaps? Try: http://colorbrewer2.org/ Choose a
+        colormap, and use the HEX JS array.
     levels : listlike of floats or integers
         Boundaries between the legend colors/classes. Length: N - 1.
     overlays : list of dicts, optional
-        Dicts contain geodataframe (key is "gdf"), and the keyword arguments
-        for plotting the geodataframe.
+        Dicts contain geodataframe (key is "gdf"), and the keyword arguments for
+        plotting the geodataframe.
     basemap : bool or contextily._providers.TileProvider, optional
         When `True` or a `contextily._providers.TileProvider` object: plot a
-        basemap as a background for the plot and make the raster translucent.
-        If `basemap=True`, then `CartoDB.Positron` is used as the default provider.
-        If not set explicitly through kwargs_basemap, plot_map() will try and infer
-        the crs from the raster or overlays, or fall back to EPSG:28992 (Amersfoort/RDnew).
+        basemap as a background for the plot and make the raster translucent. If
+        `basemap=True`, then `CartoDB.Positron` is used as the default provider.
+        If not set explicitly through kwargs_basemap, plot_map() will try and
+        infer the crs from the raster or overlays, or fall back to EPSG:28992
+        (Amersfoort/RDnew).
 
         *Requires contextily*
 
     kwargs_raster : dict of keyword arguments, optional
         These arguments are forwarded to ax.imshow()
     kwargs_colorbar : dict of keyword arguments, optional
-        These arguments are forwarded to fig.colorbar(). The key label can be used to label
-        the colorbar. Key whiten_triangles can be set to False to alter the default behavior
-        of coloring the min / max triangles of the colorbar white if the value is not present
-        in the map.
+        These arguments are forwarded to fig.colorbar(). The key label can be
+        used to label the colorbar. Key whiten_triangles can be set to False to
+        alter the default behavior of coloring the min / max triangles of the
+        colorbar white if the value is not present in the map.
     kwargs_basemap : dict of keyword arguments, optional
-        Except for "alpha", these arguments are forwarded to contextily.add_basemap().
-        Parameter "alpha" controls the transparency of raster.
+        Except for "alpha", these arguments are forwarded to
+        contextily.add_basemap(). Parameter "alpha" controls the transparency of
+        raster.
     figsize : tuple of two floats or integers, optional
         This is used in plt.subplots(figsize)
     return_cbar : boolean, optional
         Return the matplotlib.Colorbar instance. Defaults to False.
+    fig : matplotlib.figure, optional
+        If provided, figure to which to add the map
+    ax : matplot.ax, optional
+        If provided, axis to which to add the map
 
     Returns
     -------
-    fig : matplotlib.figure
-    ax : matplotlig.ax
-    if return_cbar == True:
-    cbar : matplotlib.Colorbar
+    fig : matplotlib.figure ax : matplotlig.ax if return_cbar == True: cbar :
+    matplotlib.Colorbar
 
     Examples
     --------
@@ -192,8 +202,17 @@ def plot_map(
         whiten_triangles = kwargs_colorbar.pop("whiten_triangles", True)
         settings_cbar.update(kwargs_colorbar)
 
-    # Make figure
-    fig, ax = plt.subplots(figsize=figsize)
+    # If not provided, make figure and axes
+    # Catch case first where no figure provided, but ax was provided
+    if fig is None and ax is not None:
+        raise ValueError(
+            "Axes provided, yet no figure is provided. "
+            "Please provide a figure as well."
+        )
+    if fig is None:
+        fig = plt.figure(figsize=figsize)
+    if ax is None:
+        ax = plt.axes()
 
     # Make sure x is increasing, y is decreasing
     raster = raster.copy(deep=False)

@@ -96,6 +96,59 @@ def test_plot_map():
     assert isinstance(ax, plt.Axes)
 
 
+def test_plot_map_fig_ax_provided():
+    fig_in, ax_in = plt.subplots()
+    fig, ax = imod.visualize.spatial.plot_map(
+        raster=xr.DataArray(
+            np.random.randn(2, 3),
+            coords={"x": [0.5, 1.5], "y": [1.5, 0.5, -0.5]},
+            dims=("x", "y"),
+        ),
+        colors=["#ff0000", "#00ff00", "#0000ff"],
+        levels=[0.2, 0.8],
+        fig=fig_in,
+        ax=ax_in,
+    )
+
+    assert fig_in == fig
+    assert ax_in == ax
+    assert isinstance(fig, plt.Figure)
+    assert isinstance(ax, plt.Axes)
+
+
+def test_plot_map_fig_provided():
+    fig_in, ax_in = plt.subplots()
+    fig, ax = imod.visualize.spatial.plot_map(
+        raster=xr.DataArray(
+            np.random.randn(2, 3),
+            coords={"x": [0.5, 1.5], "y": [1.5, 0.5, -0.5]},
+            dims=("x", "y"),
+        ),
+        colors=["#ff0000", "#00ff00", "#0000ff"],
+        levels=[0.2, 0.8],
+        fig=fig_in,
+    )
+    assert fig_in == fig
+    assert ax_in != ax
+    assert isinstance(fig, plt.Figure)
+    assert isinstance(ax, plt.Axes)
+
+
+def test_plot_map_ax_provided():
+    _, ax_in = plt.subplots()
+    with pytest.raises(ValueError):
+        imod.visualize.spatial.plot_map(
+            raster=xr.DataArray(
+                np.random.randn(2, 3),
+                coords={"x": [0.5, 1.5], "y": [1.5, 0.5, -0.5]},
+                dims=("x", "y"),
+            ),
+            colors=["#ff0000", "#00ff00", "#0000ff"],
+            levels=[0.2, 0.8],
+            ax=ax_in,
+        )
+
+
 def test_plot_map_basemap():
     fig, ax = imod.visualize.spatial.plot_map(
         raster=xr.DataArray(
