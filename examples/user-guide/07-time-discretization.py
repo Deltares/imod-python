@@ -3,8 +3,8 @@ Model time discretization
 =========================
 
 iMOD Python provides nice functionality to discretize your models into stress
-periods, depending on the timesteps you assigned your boundary conditions. It is
-a very powerful feature, though slightly hidden.
+periods, depending on the timesteps you assigned your boundary conditions. This
+functionality is activated with the ``create_time_discretization()`` method.
 
 """
 
