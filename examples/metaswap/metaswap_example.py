@@ -192,7 +192,7 @@ simulation["solver"] = mf6.SolutionPresetSimple(
 freq = "D"
 times = pd.date_range(start="1/1/1971", end="1/3/1971", freq=freq)
 
-simulation.time_discretization(times=times)
+simulation.create_time_discretization(additional_times=times)
 
 times
 
