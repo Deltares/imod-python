@@ -54,7 +54,7 @@ def model(basic_dis, three_days, well_df):
     m["wel"] = flow.Well(**well_df)
     m["oc"] = flow.OutputControl()
 
-    m.time_discretization(times[-1])
+    m.create_time_discretization(times[-1])
 
     return m
 

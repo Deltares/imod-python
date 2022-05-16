@@ -266,7 +266,7 @@ m["oc"] = flow.OutputControl(save_head=-1, save_flux=-1)
 
 # %%
 # imod-python wants you to provide the model endtime to your time_discretization!
-m.time_discretization(times[-1])
+m.create_time_discretization(additional_times=times[-1])
 
 # %%
 # Now we write the model

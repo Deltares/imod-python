@@ -103,7 +103,7 @@ def make_coupled_mf6_model():
         relaxation_factor=0.97,
     )
     # Collect time discretization
-    simulation.time_discretization(times=times)
+    simulation.create_time_discretization(additional_times=times)
 
     return simulation
 
