@@ -41,7 +41,7 @@ def get_data_array(dimensions, globaltimes):
 
 @pytest.fixture(scope="session")
 def head_fc():
-
+    
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     # Constant head
