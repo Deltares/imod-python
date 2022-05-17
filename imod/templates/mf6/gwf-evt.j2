@@ -1,7 +1,7 @@
 begin options
 {% if fixed_cell is defined %}  fixed_cell
 {% endif %}
-{%- if auxiliary is defined %}  auxiliary{% for aux in auxiliary %} {{aux}}{% endfor %}
+{%- if auxiliary is defined %}  auxiliary{% for aux in auxiliary %} {{aux}} {% endfor %}
 {% endif %}
 {%- if auxmultname is defined %}  auxmultname {{auxmultname}}
 {% endif %}
