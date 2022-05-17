@@ -1,5 +1,5 @@
 begin options
-{% if auxiliary is defined %}  auxiliary {{auxiliary}}
+{% if auxiliary is defined %}  auxiliary{% for aux in auxiliary %} {{aux}} {% endfor %}
 {% endif %}
 {%- if auxmultname is defined %}  auxmultname {{auxmultname}}
 {% endif %}
