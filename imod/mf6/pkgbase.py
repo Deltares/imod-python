@@ -246,10 +246,10 @@ class Package(abc.ABC):
                 raise ValueError(
                     f"{datavar} in {ds._pkg_id} package cannot be a scalar"
                 )
-            if datavar == "concentration":
-                if "species" in ds["concentration"].dims:
+            if datavar == "boundary_concentration":
+                if "species" in ds["boundary_concentration"].dims:
                     for species in ds["species"].values:
-                        arrdict[species] = ds["concentration"].sel(species=species).values
+                        arrdict[species] = ds["boundary_concentration"].sel(species=species).values
             else:
                 arrdict[datavar] = ds[datavar].values
         return arrdict
@@ -455,7 +455,7 @@ class Package(abc.ABC):
     def _get_auxiliary_varname(self):
             result = []
             if "species" in self.dataset.dims:
-                for val in self.dataset["concentration"]["species"].values:
+                for val in self.dataset["boundary_concentration"]["species"].values:
                     result.append(val)
             return result
 
