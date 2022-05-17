@@ -92,7 +92,6 @@ def rate_fc():
     elevation = xr.full_like(idomain, np.nan)
     return elevation
 
-
 @pytest.fixture(scope="session")
 def proportion_rate_fc():
 
@@ -102,12 +101,13 @@ def proportion_rate_fc():
     proportion_rate = xr.full_like(idomain, np.nan)
     return proportion_rate
 
-
 @pytest.fixture(scope="session")
 def proportion_depth_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     # Constant head
+    proportion_rate = xr.full_like(idomain, np.nan)
+    return proportion_rate    
     proportion_rate = xr.full_like(idomain, np.nan)
     return proportion_rate
