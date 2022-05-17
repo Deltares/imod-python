@@ -110,11 +110,16 @@ def make_coupled_mf6_model():
 
 
 def make_msw_model():
+    unsaturated_database = "./unsat_database"
+
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
     dx = 1.0
     dy = 1.0
+
+    nrow = len(y)
+    ncol = len(x)
 
     freq = "D"
     times = pd.date_range(start="1/1/1971", end="1/3/1971", freq=freq)
@@ -184,17 +189,16 @@ def make_msw_model():
     )
     lu = xr.ones_like(vegetation_index_da, dtype=float)
 
-    # %% Wells
-    well_layer = [3, 2, 1]
-    well_row = [1, 2, 3]
-    well_column = [2, 2, 2]
-    well_rate = [-5.0] * 3
-    well = mf6.WellDisStructured(
-        layer=well_layer,
-        row=well_row,
-        column=well_column,
-        rate=well_rate,
-    )
+    # %% Well
+
+    wel_layer = 3
+
+    ix = np.tile(np.arange(ncol) + 1, nrow)
+    iy = np.repeat(np.arange(nrow) + 1, ncol)
+    rate = np.zeros(ix.shape)
+    layer = np.full_like(ix, wel_layer)
+
+    well = mf6.WellDisStructured(layer=layer, row=iy, column=ix, rate=rate)
 
     # %% Modflow 6
     idomain = xr.full_like(msw_grid, 1, dtype=int).expand_dims(layer=[1, 2, 3])
@@ -202,7 +206,7 @@ def make_msw_model():
     dis = mf6.StructuredDiscretization(top=1.0, bottom=0.0, idomain=idomain)
 
     # %% Initiate model
-    msw_model = msw.MetaSwapModel(unsaturated_database="./unsat_database")
+    msw_model = msw.MetaSwapModel(unsaturated_database=unsaturated_database)
     msw_model["grid"] = msw.GridData(
         area,
         xr.full_like(area, 1, dtype=int),
