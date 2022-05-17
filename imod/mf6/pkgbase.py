@@ -246,7 +246,12 @@ class Package(abc.ABC):
                 raise ValueError(
                     f"{datavar} in {ds._pkg_id} package cannot be a scalar"
                 )
-            arrdict[datavar] = ds[datavar].values
+            if datavar == "concentration":
+                if "species" in ds["concentration"].dims:
+                    for species in ds["species"].values:
+                        arrdict[species] = ds["concentration"].sel(species=species).values
+            else:
+                arrdict[datavar] = ds[datavar].values
         return arrdict
 
     def write_binary_griddata(self, outpath, da, dtype):
@@ -447,6 +452,12 @@ class Package(abc.ABC):
     def _pkgcheck(self):
         self._check_types()
 
+    def _get_auxiliary_varname(self):
+            result = []
+            if "species" in self.dataset.dims:
+                for val in self.dataset["concentration"]["species"].values:
+                    result.append(val)
+            return result
 
 class BoundaryCondition(Package, abc.ABC):
     """
@@ -534,6 +545,8 @@ class BoundaryCondition(Package, abc.ABC):
         # construct the rest (dict for render)
         d = self.get_options(d)
         d["maxbound"] = self._max_active_n()
+        if len(self._get_auxiliary_varname()) > 0:
+            d["auxiliary"]=self._get_auxiliary_varname()        
         return self._template.render(d)
 
     def write_perioddata(self, directory, pkgname, binary):
