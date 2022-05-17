@@ -17,11 +17,11 @@ class Recharge(BoundaryCondition):
         program by the surface area of the cell to calculate the volumetric
         recharge rate. A time-series name may be specified.
     boundary_concentration: array of floats (xr.DataArray, optional)
-        if this flow package is used in simulations also involving transport, then this array is used
-        as the  concentration for inflow over this boundary.
+        if this flow package is used in simulations also involving transport, then this array is used 
+        as the  concentration for inflow over this boundary. 
     transport_boundary_type: ({"AUX", "AUXMIXED"}, optional)
-        if this flow package is used in simulations also involving transport, then this keyword specifies
-        how outflow over this boundary is computed.
+        if this flow package is used in simulations also involving transport, then this keyword specifies 
+        how outflow over this boundary is computed.           
     print_input: ({True, False}, optional)
         keyword to indicate that the list of recharge information will be
         written to the listing file immediately after it is read.
@@ -50,8 +50,8 @@ class Recharge(BoundaryCondition):
     def __init__(
         self,
         rate,
-        boundary_concentration=None,
-        transport_boundary_type=None,
+        boundary_concentration =None,
+        transport_boundary_type =None,           
         print_input=False,
         print_flows=False,
         save_flows=False,
@@ -60,7 +60,7 @@ class Recharge(BoundaryCondition):
         super().__init__(locals())
         self.dataset["rate"] = rate
         self.dataset["boundary_concentration"] = boundary_concentration
-        self.dataset["transport_boundary_type"] = transport_boundary_type
+        self.dataset["transport_boundary_type"] = transport_boundary_type              
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows

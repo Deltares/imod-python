@@ -94,7 +94,7 @@ class Evapotranspiration(BoundaryCondition):
         self.dataset["proportion_rate"] = proportion_rate
         self.dataset["proportion_depth"] = proportion_depth
         self.dataset["boundary_concentration"] = boundary_concentration
-        self.dataset["transport_boundary_type"] = transport_boundary_type
+        self.dataset["transport_boundary_type"] = transport_boundary_type         
         self.dataset["fixed_cell"] = fixed_cell
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
