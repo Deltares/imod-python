@@ -14,6 +14,12 @@ class Drainage(BoundaryCondition):
         elevation of the drain. (elev)
     conductance: array of floats (xr.DataArray)
         is the conductance of the drain. (cond)
+    boundary_concentration: array of floats (xr.DataArray, optional)
+        if this flow package is used in simulations also involving transport, then this array is used 
+        as the  concentration for inflow over this boundary. 
+    transport_boundary_type: ({"AUX", "AUXMIXED"}, optional)
+        if this flow package is used in simulations also involving transport, then this keyword specifies 
+        how outflow over this boundary is computed.                      
     print_input: ({True, False}, optional)
         keyword to indicate that the list of drain information will be written
         to the listing file immediately after it is read. Default is False.
@@ -45,6 +51,8 @@ class Drainage(BoundaryCondition):
         self,
         elevation,
         conductance,
+        boundary_concentration =None,
+        transport_boundary_type =None,
         print_input=False,
         print_flows=False,
         save_flows=False,
@@ -53,6 +61,8 @@ class Drainage(BoundaryCondition):
         super().__init__(locals())
         self.dataset["elevation"] = elevation
         self.dataset["conductance"] = conductance
+        self.dataset["boundary_concentration"] = boundary_concentration
+        self.dataset["transport_boundary_type"] = transport_boundary_type        
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
