@@ -130,13 +130,14 @@ def setup_mf6_basic_simulation_imod():
     coords = {"layer": layer, "y": y, "x": x}
 
     # Discretization data
-    idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
+    like = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
+    idomain = like.astype(np.int32)
     bottom = xr.DataArray(
         np.linspace(-height / nlay, -height, nlay), {"layer": layer}, ("layer",)
     )
 
     # Constant head
-    head = xr.full_like(idomain, np.nan)
+    head = xr.full_like(like, np.nan)
     # set all side edges to h1
     head[:, [0, -1], :] = h1
     head[:, :, [0, -1]] = h1
@@ -168,7 +169,7 @@ def setup_mf6_basic_simulation_imod():
     )
 
     # Collect time discretization
-    simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
+    simulation.create_time_discretization(additional_times=["2000-01-01", "2000-01-02"])
     return simulation
 
 

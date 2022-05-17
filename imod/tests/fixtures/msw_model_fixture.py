@@ -22,18 +22,19 @@ def make_coupled_mf6_model():
     freq = "D"
     times = pd.date_range(start="1/1/1971", end="1/3/1971", freq=freq)
 
-    idomain = xr.DataArray(
+    like = xr.DataArray(
         data=np.ones((nlay, nrow, ncol)),
         dims=("layer", "y", "x"),
         coords={"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy},
     )
+    idomain = like.astype(np.int32)
 
     top = 0.0
     bottom = top - xr.DataArray(
         np.cumsum(layer * dz), coords={"layer": layer}, dims="layer"
     )
 
-    head = xr.full_like(idomain, np.nan)
+    head = xr.full_like(like, np.nan)
     head[..., 0] = -1.0
     head[..., -1] = -1.0
 
@@ -63,7 +64,7 @@ def make_coupled_mf6_model():
     gwf_model["ic"] = mf6.InitialConditions(head=0.5)
     gwf_model["sto"] = mf6.SpecificStorage(1e-3, 0.1, True, 0)
 
-    recharge = xr.zeros_like(idomain.sel(layer=1))
+    recharge = xr.zeros_like(idomain.sel(layer=1), dtype=float)
     recharge[:, 0] = np.nan
     recharge[:, -1] = np.nan
 
@@ -103,7 +104,7 @@ def make_coupled_mf6_model():
         relaxation_factor=0.97,
     )
     # Collect time discretization
-    simulation.time_discretization(times=times)
+    simulation.create_time_discretization(additional_times=times)
 
     return simulation
 
@@ -200,13 +201,9 @@ def make_msw_model():
     well = mf6.WellDisStructured(layer=layer, row=iy, column=ix, rate=rate)
 
     # %% Modflow 6
-    idomain = xr.full_like(msw_grid, 1.0).expand_dims(layer=[1, 2, 3])
+    idomain = xr.full_like(msw_grid, 1, dtype=int).expand_dims(layer=[1, 2, 3])
 
-    dis = mf6.StructuredDiscretization(
-        top=xr.full_like(idomain, 1.0),
-        bottom=xr.full_like(idomain, 0.0),
-        idomain=idomain.astype(int),
-    )
+    dis = mf6.StructuredDiscretization(top=1.0, bottom=0.0, idomain=idomain)
 
     # %% Initiate model
     msw_model = msw.MetaSwapModel(unsaturated_database=unsaturated_database)

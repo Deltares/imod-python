@@ -1,6 +1,8 @@
 import pathlib
 import textwrap
 
+import pytest
+
 import imod
 
 
@@ -20,3 +22,8 @@ def test_render():
         """
     )
     assert actual == expected
+
+
+def test_wrong_dtype():
+    with pytest.raises(TypeError):
+        imod.mf6.InitialConditions(head=0)

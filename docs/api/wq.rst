@@ -1,12 +1,22 @@
 .. currentmodule:: imod.wq
 
 iMOD-WQ
--------
+=======
+
+Model
+-----
 
 .. autosummary::
     :toctree: generated/wq
     
     SeawatModel
+    SeawatModel.create_time_discretization
+
+Settings
+--------
+
+.. autosummary::
+    :toctree: generated/wq
 
     TimeDiscretization
     OutputControl
@@ -14,7 +24,13 @@ iMOD-WQ
     GeneralizedConjugateGradientSolver
     ParallelKrylovFlowSolver
     ParallelKrylovTransportSolver
-    
+
+Flow
+----
+
+.. autosummary::
+    :toctree: generated/wq
+
     BasicFlow
     ConstantHead
     Drainage
@@ -28,8 +44,13 @@ iMOD-WQ
     RechargeHighestActive
     River
     Well
-    
     VariableDensityFlow
+
+Transport
+---------
+
+.. autosummary::
+    :toctree: generated/wq
 
     AdvectionTVD
     AdvectionMOC

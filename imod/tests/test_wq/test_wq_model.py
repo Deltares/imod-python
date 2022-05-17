@@ -1,7 +1,6 @@
 import os
 import pathlib
 import textwrap
-from copy import deepcopy
 
 import cftime
 import numpy as np
@@ -13,7 +12,7 @@ import imod
 import imod.wq
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def basicmodel():
 
     # Basic flow
@@ -168,7 +167,7 @@ def basicmodel():
     return m
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def notime_model(basicmodel):
     m = basicmodel
 
@@ -188,7 +187,7 @@ def notime_model(basicmodel):
     return m_notime
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def cftime_model(basicmodel):
     m = basicmodel
     ibound = m["bas6"]["ibound"]
@@ -241,6 +240,31 @@ def cftime_model(basicmodel):
     return m_cf
 
 
+@pytest.fixture(scope="function")
+def model_different_names(basicmodel):
+    m = basicmodel
+
+    m_other_name = imod.wq.SeawatModel("test_model_different_names")
+    m_other_name["_bas6"] = m["bas6"]
+    m_other_name["_lpf"] = m["lpf"]
+    m_other_name["_ghb"] = m["ghb"]
+    m_other_name["_chd"] = m["chd"]
+    m_other_name["_riv"] = m["riv"]
+    m_other_name["_wel"] = m["wel"]
+    m_other_name["_rch"] = m["rch"]
+    m_other_name["_evt"] = m["evt"]
+    m_other_name["_pcg"] = m["pcg"]
+    m_other_name["_btn"] = m["btn"]
+    m_other_name["_adv"] = m["adv"]
+    m_other_name["_dsp"] = m["dsp"]
+    m_other_name["_vdf"] = m["vdf"]
+    m_other_name["_gcg"] = m["gcg"]
+    m_other_name["_oc"] = m["oc"]
+    m_other_name["_mal"] = m["mal"]
+    m_other_name["_tvc"] = m["tvc"]
+    return m_other_name
+
+
 def test_get_pkgkey(basicmodel):
     m = basicmodel
     for key, package in m.items():
@@ -248,18 +272,17 @@ def test_get_pkgkey(basicmodel):
 
 
 def test_timediscretization(basicmodel):
-    # deepcopy to prevent side-effects to the fixture
-    # m.time_discretization() changes the basicmodel object if not deepcopied.
-    m = deepcopy(basicmodel)
-    m.time_discretization("2000-01-06")
+    # m.create_time_discretization() changes the basicmodel object if not deepcopied.
+    m = basicmodel
+    m.create_time_discretization("2000-01-06")
     assert np.allclose(
         m["time_discretization"]["timestep_duration"].values, np.full(5, 1.0)
     )
 
 
 def test_render_gen(basicmodel):
-    m = deepcopy(basicmodel)
-    m.time_discretization("2000-01-06")
+    m = basicmodel
+    m.create_time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
     modelname = m.modelname
@@ -290,8 +313,8 @@ def test_render_gen(basicmodel):
 
 
 def test_render_pkg__gcg(basicmodel):
-    m = deepcopy(basicmodel)
-    m.time_discretization("2000-01-06")
+    m = basicmodel
+    m.create_time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
     directory = pathlib.Path(".")
@@ -313,8 +336,8 @@ def test_render_pkg__gcg(basicmodel):
 
 
 def test_render_pkg__evt(basicmodel):
-    m = deepcopy(basicmodel)
-    m.time_discretization("2000-01-06")
+    m = basicmodel
+    m.create_time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
     directory = pathlib.Path(".")
@@ -347,8 +370,8 @@ def test_render_pkg__evt(basicmodel):
 
 
 def test_render_pkg__rch(basicmodel):
-    m = deepcopy(basicmodel)
-    m.time_discretization("2000-01-06")
+    m = basicmodel
+    m.create_time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
     directory = pathlib.Path(".")
@@ -371,8 +394,8 @@ def test_render_pkg__rch(basicmodel):
 
 
 def test_render_dis(basicmodel):
-    m = deepcopy(basicmodel)
-    m.time_discretization("2000-01-06")
+    m = basicmodel
+    m.create_time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
     directory = pathlib.Path(".")
@@ -402,8 +425,8 @@ def test_render_dis(basicmodel):
 
 
 def test_render_groups__ghb_riv_wel(basicmodel):
-    m = deepcopy(basicmodel)
-    m.time_discretization("2000-01-06")
+    m = basicmodel
+    m.create_time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
     directory = pathlib.Path(".")
@@ -459,7 +482,7 @@ def test_render_groups__ghb_riv_wel(basicmodel):
 
 
 def test_render_groups__double_gbh(basicmodel):
-    m = deepcopy(basicmodel)
+    m = basicmodel
     ghbhead = m["ghb"]["head"].copy()
     m["ghb2"] = imod.wq.GeneralHeadBoundary(
         head=ghbhead,
@@ -467,7 +490,7 @@ def test_render_groups__double_gbh(basicmodel):
         density=ghbhead.copy(),
         save_budget=False,
     )
-    m.time_discretization("2000-01-06")
+    m.create_time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
     directory = pathlib.Path(".")
@@ -477,7 +500,7 @@ def test_render_groups__double_gbh(basicmodel):
 
 
 def test_render_flowsolver(basicmodel):
-    m = deepcopy(basicmodel)
+    m = basicmodel
     directory = pathlib.Path(".")
 
     compare = textwrap.dedent(
@@ -497,8 +520,8 @@ def test_render_flowsolver(basicmodel):
 
 
 def test_render_btn(basicmodel):
-    m = deepcopy(basicmodel)
-    m.time_discretization("2000-01-06")
+    m = basicmodel
+    m.create_time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
     directory = pathlib.Path(".")
@@ -524,8 +547,8 @@ def test_render_btn(basicmodel):
 
 
 def test_render_ssm_rch_evt_mal_tvc(basicmodel):
-    m = deepcopy(basicmodel)
-    m.time_discretization("2000-01-06")
+    m = basicmodel
+    m.create_time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
     directory = pathlib.Path(".")
@@ -548,11 +571,11 @@ def test_render_ssm_rch_evt_mal_tvc(basicmodel):
 
 def test_render_ssm_rch_constant(basicmodel):
     # Make sure it only writes crch for layers in which recharge are constant.
-    m = deepcopy(basicmodel)
+    m = basicmodel
     m["rch"] = imod.wq.RechargeHighestActive(
         rate=0.001, concentration=0.15, save_budget=False
     )
-    m.time_discretization("2000-01-06")
+    m.create_time_discretization("2000-01-06")
     diskey = m._get_pkgkey("dis")
     globaltimes = m[diskey]["time"].values
     directory = pathlib.Path(".")
@@ -590,7 +613,7 @@ def test_render_ssm_rch_constant(basicmodel):
 
 
 def test_render_transportsolver(basicmodel):
-    m = deepcopy(basicmodel)
+    m = basicmodel
     directory = pathlib.Path(".")
 
     compare = textwrap.dedent(
@@ -607,24 +630,24 @@ def test_render_transportsolver(basicmodel):
 
 
 def test_render(basicmodel):
-    m = deepcopy(basicmodel)
-    m.time_discretization("2000-01-06")
+    m = basicmodel
+    m.create_time_discretization("2000-01-06")
     d = pathlib.Path(".")
     r = pathlib.Path("results")
     _ = m.render(d, r, False)
 
 
 def test_render_cf(cftime_model):
-    m_cf = deepcopy(cftime_model)
-    m_cf.time_discretization("2000-01-06")
+    m_cf = cftime_model
+    m_cf.create_time_discretization("2000-01-06")
     d = pathlib.Path(".")
     r = pathlib.Path("results")
     _ = m_cf.render(d, r, False)
 
 
 def test_render_notime(notime_model):
-    m = deepcopy(notime_model)
-    m.time_discretization(times=["2000-01-01", "2000-01-06"])
+    m = notime_model
+    m.create_time_discretization(additional_times=["2000-01-01", "2000-01-06"])
     d = pathlib.Path(".")
     r = pathlib.Path("results")
     _ = m.render(d, r, False)
@@ -644,7 +667,7 @@ def test_mxsscount_incongruent_icbund(basicmodel):
     This test mutates the basicmodel provided by the fixture!
     """
 
-    m = deepcopy(basicmodel)
+    m = basicmodel
     m["bas6"]["ibound"][1:, ...] = -1.0
     m["btn"]["icbund"][...] = 0.0
 
@@ -654,7 +677,7 @@ def test_mxsscount_incongruent_icbund(basicmodel):
 
 
 def test_highest_active_recharge(basicmodel):
-    m = deepcopy(basicmodel)
+    m = basicmodel
     n_sinkssources = m._bas_btn_rch_evt_mal_tvc_sinkssources()
     assert np.array_equal(m["rch"]._ssm_layers, np.array([1]))
     assert n_sinkssources == 25 + 25 + 25 + 25
@@ -673,15 +696,24 @@ def test_highest_active_recharge(basicmodel):
 
 
 def test_write(basicmodel, tmp_path):
-    m = deepcopy(basicmodel)
-    m.time_discretization("2000-01-06")
+    m = basicmodel
+    m.create_time_discretization("2000-01-06")
     m.write(directory=tmp_path, result_dir=tmp_path / "results")
     # TODO: more rigorous testing
 
 
+def test_write_pkgname_is_not_pkg_id(model_different_names, tmp_path):
+    """
+    Test if model with pkgnames which differ from _pkg_id writes without error.
+    """
+    m = model_different_names
+    m.create_time_discretization("2000-01-06")
+    m.write(directory=tmp_path, result_dir=tmp_path / "results")
+
+
 def test_write__stress_repeats(basicmodel, tmp_path):
     # fictitious stress_repeats
-    m = deepcopy(basicmodel)
+    m = basicmodel
 
     # Remove last timestep of recharge package
     m["rch"] = imod.wq.RechargeHighestActive(
@@ -693,7 +725,7 @@ def test_write__stress_repeats(basicmodel, tmp_path):
     }
     m["rch"].repeat_stress(rate=stress_repeats)
 
-    m.time_discretization("2000-01-06")
+    m.create_time_discretization("2000-01-06")
 
     m.write(directory=tmp_path, result_dir=tmp_path / "results")
 
@@ -711,26 +743,26 @@ def test_write__error_stress_time_not_first(basicmodel):
     In this case, the WEL package isn't specified for the first stress period.
     This should raise an error.
     """
-    m = deepcopy(basicmodel)
+    m = basicmodel
     datetimes = pd.date_range("2000-01-01", "2000-01-05")[1:]
     # WEL
     welly = np.arange(4.5, 0.0, -1.0)[1:]
     wellx = np.arange(0.5, 5.0, 1.0)[1:]
     m["wel"] = imod.wq.Well(id_name="well", x=wellx, y=welly, rate=5.0, time=datetimes)
     with pytest.raises(ValueError):
-        m.time_discretization("2000-01-06")
+        m.create_time_discretization("2000-01-06")
 
 
 def test_write_result_dir(basicmodel, tmp_path):
-    m = deepcopy(basicmodel)
-    m.time_discretization("2000-01-06")
+    m = basicmodel
+    m.create_time_discretization("2000-01-06")
     m.write(directory=tmp_path, result_dir=tmp_path / "results")
     # TODO: more rigorous testing
 
 
 def test_write_result_dir_is_workdir(basicmodel, tmp_path):
-    m = deepcopy(basicmodel)
-    m.time_discretization("2000-01-06")
+    m = basicmodel
+    m.create_time_discretization("2000-01-06")
 
     m.write(
         directory=tmp_path, result_dir=tmp_path / "results", resultdir_is_workdir=True

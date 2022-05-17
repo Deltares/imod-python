@@ -135,17 +135,14 @@ constant_head = xr.full_like(idomain, np.nan)
 constant_head.values[0, 0, :] = constant_head_values
 
 # Node properties
-icelltype = xr.full_like(idomain, 0.0)
-k = xr.full_like(idomain, 1.0)
-k33 = xr.full_like(idomain, 1.0)
-icelltype = 0.0  # check if this works
+icelltype = 0  # check if this works
 k = 1.0  # check if this works
 k33 = 1.0  # check if this works
 
 # Create and fill the groundwater model.
 gwf_model = imod.mf6.GroundwaterFlowModel()
 gwf_model["dis"] = imod.mf6.StructuredDiscretization(
-    top=0.0, bottom=bottom, idomain=idomain
+    top=0.0, bottom=bottom, idomain=idomain.astype(np.int8)
 )
 gwf_model["chd"] = imod.mf6.ConstantHead(
     constant_head, print_input=True, print_flows=True, save_flows=False
@@ -176,7 +173,7 @@ simulation["solver"] = imod.mf6.Solution(
     print_option="all",
 )
 # Collect time discretization
-simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
+simulation.create_time_discretization(additional_times=["2000-01-01", "2000-01-02"])
 # end of simulation
 
 

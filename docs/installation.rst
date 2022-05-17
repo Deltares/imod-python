@@ -67,14 +67,24 @@ gigabyte.
 Installing with mamba
 ---------------------
 
-You can install imod using the `mamba package manager`_ that comes
-with the Mambaforge distribution::
+You can install ``imod`` using the `mamba package manager`_ that comes with the
+Mambaforge distribution. We advice to install ``imod`` in a seperate ``conda``
+environment, as you can simply delete these in case they break. Not doing so
+will install imod and its dependencies in your base environment, which requires
+a reinstall of Mambaforge in case this environment breaks::
 
-  mamba install imod --channel conda-forge
+  mamba create -n imodenv
+  mamba install -n imodenv imod --channel conda-forge
   
-mamba will automatically find the appropriate versions of the dependencies and
-install them. Installing with mamba or conda will automatically download *all*
-optional dependencies, and enable all functionality.
+``mamba`` will automatically find the appropriate versions of the dependencies
+and in this case install them in the ``imodenv`` environment. Installing with
+mamba or conda will automatically download *all* optional dependencies, and
+enable all functionality.
+
+To run scripts using ``imod``, you first have to activate the ``imodenv``
+environment::
+
+  conda activate imodenv
 
 Installing with conda
 ---------------------
@@ -84,7 +94,13 @@ will also infer the appropriate versions of the dependencies and install them.
 However, it generally takes around a factor 5 longer to do so, but may be
 worthwhile if mamba is unstable or buggy::
 
-  conda install imod --channel conda-forge
+  conda create -n imodenv
+  conda install -n imodenv imod --channel conda-forge
+
+To run scripts using ``imod``, you first have to activate the ``imodenv``
+environment::
+
+  conda activate imodenv
 
 Installing with pip
 -------------------

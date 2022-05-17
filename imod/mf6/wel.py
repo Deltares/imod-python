@@ -3,7 +3,7 @@ from typing import Dict
 import numpy as np
 import xarray as xr
 
-from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
 
 
 def assign_dims(arg) -> Dict:
@@ -64,6 +64,13 @@ class WellDisStructured(BoundaryCondition):
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
+    _metadata_dict = {
+        "layer": VariableMetaData(np.integer),
+        "row": VariableMetaData(np.integer),
+        "column": VariableMetaData(np.integer),
+        "rate": VariableMetaData(np.floating),
+    }
+
     def __init__(
         self,
         layer,
@@ -84,6 +91,8 @@ class WellDisStructured(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+
+        self._pkgcheck()
 
     def to_sparse(self, arrdict, layer):
         spec = []

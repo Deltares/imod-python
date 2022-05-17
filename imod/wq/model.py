@@ -77,7 +77,7 @@ class Model(collections.UserDict):
         for pkgname, pkg in self.items():
             sel_dims = {k: v for k, v in dimensions.items() if k in pkg.dataset}
 
-            if pkgname == "bas6":
+            if pkg._pkg_id == "bas6":
                 # da.sel() unsets dimensions for scalars, this messes with bas6
                 # package, because check_ibound is called upon initialization.
                 sel_dims = {
@@ -235,7 +235,7 @@ class SeawatModel(Model):
     >>> m = SeawatModel("example")
     >>> m["riv"] = River(...)
     >>> # ...etc.
-    >>> m.time_discretization(endtime)
+    >>> m.create_time_discretization(endtime)
     >>> m.write()
     """
 
@@ -336,6 +336,14 @@ class SeawatModel(Model):
                 raise ValueError("Use either cftime or numpy.datetime64[ns].")
 
     def time_discretization(self, times):
+        warnings.warn(
+            f"{self.__class__.__name__}.time_discretization() is deprecated. "
+            f"In the future call {self.__class__.__name__}.create_time_discretization().",
+            DeprecationWarning,
+        )
+        self.create_time_discretization(additonal_times=times)
+
+    def create_time_discretization(self, additional_times):
         """
         Collect all unique times from model packages and additional given `times`. These
         unique times are used as stress periods in the model. All stress packages must
@@ -350,13 +358,12 @@ class SeawatModel(Model):
         - Additional times can be provided to force shorter stress periods & more detailed output
         - Every stress has to be defined on the first stress period (this is a modflow requirement)
 
-        Or visually (every letter a date in the time axes)::
+        Or visually (every letter a date in the time axes):
 
-            recharge a - b - c - d - e - f
-            river    g - - - - h - - - - j
-            times    - - - - - - - - - - - i
-
-            model    a - b - c h d - e - f i
+        >>> recharge a - b - c - d - e - f
+        >>> river    g - - - - h - - - - j
+        >>> times    - - - - - - - - - - - i
+        >>> model    a - b - c h d - e - f i
 
         with the stress periods defined between these dates. I.e. the model times are the set of all times you include in the model.
 
@@ -367,32 +374,39 @@ class SeawatModel(Model):
             should be given, which will be used as the ending time of the
             simulation.
 
+        Note
+        ----
+        To set the other parameters of the TimeDiscretization object, you have
+        to set these to the object after calling this function.
+
         Examples
         --------
         Add a single time:
 
-        >>> m.time_discretization("2001-01-01")
+        >>> m.create_time_discretization("2001-01-01")
 
         Add a daterange:
 
-        >>> m.time_discretization(pd.daterange("2000-01-01", "2001-01-01"))
+        >>> m.create_time_discretization(pd.daterange("2000-01-01", "2001-01-01"))
 
         Add a list of times:
 
-        >>> m.time_discretization(["2000-01-01", "2001-01-01"])
+        >>> m.create_time_discretization(["2000-01-01", "2001-01-01"])
 
         """
 
         # Make sure it's an iterable
-        if not isinstance(times, (np.ndarray, list, tuple, pd.DatetimeIndex)):
-            times = [times]
+        if not isinstance(
+            additional_times, (np.ndarray, list, tuple, pd.DatetimeIndex)
+        ):
+            additional_times = [additional_times]
 
         # Loop through all packages, check if cftime is required.
         self.use_cftime = self._use_cftime()
         # use_cftime is None if you no datetimes are present in packages
         # use_cftime is False if np.datetimes present in packages
         # use_cftime is True if cftime.datetime present in packages
-        for time in times:
+        for time in additional_times:
             if issubclass(type(time), cftime.datetime):
                 if self.use_cftime is None:
                     self.use_cftime = True
@@ -404,7 +418,9 @@ class SeawatModel(Model):
         if self.use_cftime is None:
             self.use_cftime = False
 
-        times = [timeutil.to_datetime(time, self.use_cftime) for time in times]
+        times = [
+            timeutil.to_datetime(time, self.use_cftime) for time in additional_times
+        ]
         first_times = {}  # first time per package
         for key, pkg in self.items():
             if self._hastime(pkg):
