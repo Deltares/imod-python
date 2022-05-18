@@ -16,7 +16,7 @@ def test_transport_model_rendering():
         """\
       begin options
       end options
-      
+
       begin packages
         dsp6 transport/dsp.dsp dsp
         adv6 transport/adv.adv adv
