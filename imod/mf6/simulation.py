@@ -35,7 +35,7 @@ class Modflow6Simulation(collections.UserDict):
             f"In the future call {self.__class__.__name__}.create_time_discretization().",
             DeprecationWarning,
         )
-        self.create_time_discretization(additonal_times=times)
+        self.create_time_discretization(additional_times=times)
 
     def create_time_discretization(self, additional_times):
         """
