@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import Package
+from imod.mf6.pkgbase import Package, VariableMetaData
 
 
 class Dispersion(Package):
@@ -56,6 +56,14 @@ class Dispersion(Package):
 
     _pkg_id = "dsp"
     _template = Package._initialize_template(_pkg_id)
+    _metadata_dict = {
+        "diffusion_coefficient": VariableMetaData(np.floating),
+        "longitudinal_horizontal": VariableMetaData(np.floating),
+        "transversal_horizontal1":  VariableMetaData(np.floating),
+        "longitudinal_vertical": VariableMetaData( np.floating),
+        "transversal_horizontal2":  VariableMetaData(np.floating),
+        "transversal_vertical":  VariableMetaData(np.floating),
+    }
     _grid_data = {
         "diffusion_coefficient": np.float64,
         "longitudinal_horizontal": np.float64,
@@ -91,9 +99,8 @@ class Dispersion(Package):
         self.dataset["diffusion_coefficient"] = diffusion_coefficient
         self.dataset["longitudinal_horizontal"] = longitudinal_horizontal
         self.dataset["transversal_horizontal1"] = transversal_horizontal1
-        if longitudinal_vertical is not None:
-            self.dataset["longitudinal_vertical"] = longitudinal_vertical
-        if transversal_horizontal2 is not None:
-            self.dataset["transversal_horizontal2"] = transversal_horizontal2
-        if transversal_vertical is not None:
-            self.dataset["transversal_vertical"] = transversal_vertical
+        self.dataset["longitudinal_vertical"] = longitudinal_vertical
+        self.dataset["transversal_horizontal2"] = transversal_horizontal2
+        self.dataset["transversal_vertical"] = transversal_vertical
+
+        self._pkgcheck()
