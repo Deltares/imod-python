@@ -6,7 +6,6 @@ from imod.mf6.adv import AdvectionCentral, AdvectionTVD, AdvectionUpstream
 from imod.mf6.chd import ConstantHead
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
-from imod.mf6.dsp import Dispersion
 from imod.mf6.drn import Drainage
 from imod.mf6.dsp import Dispersion
 from imod.mf6.evt import Evapotranspiration
