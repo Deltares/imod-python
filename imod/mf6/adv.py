@@ -5,13 +5,13 @@ from imod.mf6.pkgbase import Package
     It supports 3 ways of doing this. Each of those has its own wrapper class. These numerical schemes differ in how much
     numerical dispersion they cause, how much oscillations, and how timestep and grid size affect stability.
     Central-in-space weighting is not often used because it can result in spurious oscillations in the simulated concentrations.
-    Upstream weigthing is a fast alternative, and TVD is a more expensive and more robust alternative. 
+    Upstream weigthing is a fast alternative, and TVD is a more expensive and more robust alternative.
 """
 
 
 """'
-    The upstream weighting (first order upwind) scheme sets the concentration at the cellface between 2 adjacent cells equal to the concentration 
-    in the cell where the flow comes from. surpresses oscilations.   
+    The upstream weighting (first order upwind) scheme sets the concentration at the cellface between 2 adjacent cells equal to the concentration
+    in the cell where the flow comes from. surpresses oscilations.
 """
 
 
@@ -46,7 +46,7 @@ class AdvectionCentral(Package):
 
 
 """
-   An implicit second order TVD scheme. More exensive than upstream weighting but more robust. 
+   An implicit second order TVD scheme. More exensive than upstream weighting but more robust.
 """
 
 
