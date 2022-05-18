@@ -323,7 +323,7 @@ class Package(abc.ABC):
                 if self._valid(value):  # skip False or None
                     d[key] = value
 
-        return self._template.render(d)
+        return self._template.render(d)        
 
     @staticmethod
     def _is_xy_data(obj):
