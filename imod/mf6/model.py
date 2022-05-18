@@ -84,17 +84,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
 
     def _render(self, modelname: str, **kwargs):
-        d = {"newton": self.newton, "under_relaxation": self.under_relaxation}
-        packages = []
-        for pkgname, pkg in self.items():
-            # Add the six to the package id
-            pkg_id = pkg._pkg_id
-            key = f"{pkg_id}6"
-            path = dir_for_render / f"{pkgname}.{pkg_id}"
-            packages.append((key, path.as_posix(), pkgname))
-        d["packages"] = packages
-        return self._template.render(d)
-
     def write(self, directory, modelname, globaltimes, binary=True):
         """
         Write model namefile
@@ -133,15 +122,7 @@ class GroundwaterFlowModel(Modflow6Model):
     def render(self, modelname: str):
         """Render model namefile"""
         return self._render(
-            modelname, newton=self.newton, under_relaxation=self.under_relaxation
-        )
-
-            pkg_id = pkg._pkg_id
-            key = f"{pkg_id}6"
-            path = dir_for_render / f"{pkgname}.{pkg_id}"
-            packages.append((key, path.as_posix(), pkgname))
-        d["packages"] = packages
-        return self._template.render(d)
+            modelname, newton=self.newton, under_relaxation=self.under_relaxation        )
 
     def write_qgis_project(self, directory, crs, aggregate_layers=False):
         """
