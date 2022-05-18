@@ -24,5 +24,3 @@ def test_transport_model_rendering():
       """
     )
     assert actual == expected
-    )
-    assert actual == expected
