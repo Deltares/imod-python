@@ -298,12 +298,14 @@ class Package(abc.ABC):
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
-
+        if directory is None:
+            pkg_directory = self._pkg_id
+        else:
+            pkg_directory = directory / self._pkg_id
         for varname in self.dataset.data_vars:
             key = self._keyword_map.get(varname, varname)
 
             if hasattr(self, "_grid_data") and varname in self._grid_data:
-                pkg_directory = directory / self._pkg_id
                 layered, value = self._compose_values(
                     self.dataset[varname], pkg_directory, key, binary=binary
                 )
@@ -314,7 +316,7 @@ class Package(abc.ABC):
                 if self._valid(value):  # skip False or None
                     d[key] = value
 
-        return self._template.render(d)
+        return self._template.render(d)        
 
     @staticmethod
     def _is_xy_data(obj):
