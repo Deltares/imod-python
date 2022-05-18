@@ -141,7 +141,7 @@ class GroundwaterFlowModel(Modflow6Model):
             path = dir_for_render / f"{pkgname}.{pkg_id}"
             packages.append((key, path.as_posix(), pkgname))
         d["packages"] = packages
-        return self._template.render(d)     
+        return self._template.render(d)
 
     def write_qgis_project(self, directory, crs, aggregate_layers=False):
         """

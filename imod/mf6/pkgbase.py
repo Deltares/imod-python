@@ -10,8 +10,6 @@ import xugrid as xu
 TRANSPORT_PACKAGES = ("adv", "dsp")
 
 
-TRANSPORT_PACKAGES = ["adv", "dsp"]
-
 def dis_recarr(arrdict, layer, notnull):
     # Define the numpy structured array dtype
     index_spec = [("layer", np.int32), ("row", np.int32), ("column", np.int32)]
@@ -202,7 +200,7 @@ class Package(abc.ABC):
         elif pkg_id in TRANSPORT_PACKAGES:
             fname = f"gwt-{pkg_id}.j2"
         else:
-            fname = f"gwf-{pkg_id}.j2"            
+            fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
 
     def write_blockfile(self, directory, pkgname, globaltimes, binary):
@@ -316,7 +314,7 @@ class Package(abc.ABC):
                 if self._valid(value):  # skip False or None
                     d[key] = value
 
-        return self._template.render(d)        
+        return self._template.render(d)
 
     @staticmethod
     def _is_xy_data(obj):
