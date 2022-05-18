@@ -59,10 +59,10 @@ class Dispersion(Package):
     _metadata_dict = {
         "diffusion_coefficient": VariableMetaData(np.floating),
         "longitudinal_horizontal": VariableMetaData(np.floating),
-        "transversal_horizontal1":  VariableMetaData(np.floating),
-        "longitudinal_vertical": VariableMetaData( np.floating),
-        "transversal_horizontal2":  VariableMetaData(np.floating),
-        "transversal_vertical":  VariableMetaData(np.floating),
+        "transversal_horizontal1": VariableMetaData(np.floating),
+        "longitudinal_vertical": VariableMetaData(np.floating),
+        "transversal_horizontal2": VariableMetaData(np.floating),
+        "transversal_vertical": VariableMetaData(np.floating),
     }
     _grid_data = {
         "diffusion_coefficient": np.float64,
