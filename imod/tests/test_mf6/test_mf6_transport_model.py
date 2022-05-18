@@ -1,7 +1,4 @@
 import textwrap
-
-import numpy as np
-
 import imod
 import imod.mf6.model
 
