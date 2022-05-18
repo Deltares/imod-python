@@ -27,7 +27,8 @@ def flatten(iterable: Any) -> List[Any]:
 def split_line(line: str) -> List[str]:
     # Maybe check: https://stackoverflow.com/questions/36165050/python-equivalent-of-fortran-list-directed-input
     # Split on comma and whitespace, like a FORTRAN read would do.
-    return flatten([part.split(",") for part in line.split()])
+    flat = flatten([part.split(",") for part in line.split()])
+    return [part for part in flat if part != ""]
 
 
 def to_float(string: str) -> float:
@@ -137,6 +138,22 @@ def advance_to_header(f: IO[str], section) -> None:
     raise ValueError(f'"{start}" is not present in file {f.name}')
 
 
+def parse_option(stripped: str, fname: str) -> Tuple[str, Any]:
+    separated = stripped.split()
+    nwords = len(separated)
+    if nwords == 0:
+        raise ValueError(f"Cannot parse option in {fname}")
+    elif nwords == 1:
+        key = separated[0]
+        value = True
+    elif nwords == 2:
+        key, value = separated
+    else:
+        key = separated[0]
+        value = separated[1:]
+    return key, value
+
+
 def read_key_value_block(f: IO[str], parse: Callable) -> Dict[str, str]:
     fname = f.name
     content = {}
@@ -178,22 +195,6 @@ def read_iterable_block(f: IO[str], parse: Callable) -> List[Any]:
 
     # Also raise if no further content is found
     raise ValueError(f'"end" of block is not present in file {fname}')
-
-
-def parse_option(stripped: str, fname: str) -> Tuple[str, Any]:
-    separated = stripped.split()
-    nwords = len(separated)
-    if nwords == 0:
-        raise ValueError(f"Cannot parse {stripped} in {fname}")
-    elif nwords == 1:
-        key = separated[0]
-        value = True
-    elif nwords == 2:
-        key, value = separated
-    else:
-        key = separated[0]
-        value = separated[1:]
-    return key, value
 
 
 def parse_dimension(stripped: str, fname: str) -> Tuple[str, int]:

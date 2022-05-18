@@ -167,7 +167,7 @@ def read_array(
         array = dask.array.from_delayed(a, shape=shape, dtype=dtype)
     else:
         raise ValueError(
-            'Expected "constant", "internal" or "open/close". Received instead: '
+            'Expected "constant", "internal", or "open/close". Received instead: '
             f"{stripped}"
         )
 
