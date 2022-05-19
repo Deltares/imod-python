@@ -1,8 +1,7 @@
-import ast
-import os
+import as
 import os
 from glob import glob
-import os
+
 
 def check_ast(node: ast.AST, path: str):
     ok = True
