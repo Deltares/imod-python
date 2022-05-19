@@ -280,37 +280,6 @@ def read_imeth6_budgets_dense(
     # Allocates a dense array for the entire domain
     out = np.zeros(size, dtype=np.float64)
     table = read_imeth6_budgets(cbc_path, count, dtype, pos)
-    out[table["id1"]] = table["budget"]
+    id1 = table["id1"] - 1  # Convert to 0 based index
+    out[id1] = table["budget"]
     return out.reshape(shape)
-
-
-def open_imeth6_budgets(
-    cbc_path: FilePath, header_list: List[Imeth6Header]
-) -> List[Any]:  # List[dask.delayed.Delayed]:
-    """
-    Open the data for an imeth==6 budget section. Data is read lazily per
-    timestep.
-
-    Does not convert the data to something that can be stored in a DataArray
-    immediately. Rather returns a delayed numpy structured array.
-
-    Parameters
-    ----------
-    cbc_path: str, pathlib.Path
-    header_list: List[Imeth6Header]
-
-    Returns
-    -------
-    List of dask Delayed structured arrays.
-    """
-    dtype = np.dtype(
-        [("id1", np.int32), ("id2", np.int32), ("budget", np.float64)]
-        + [(name, np.float64) for name in header_list[0].auxtxt]
-    )
-
-    dask_list = []
-    for header in header_list:
-        x = dask.delayed(read_imeth6_budgets)(cbc_path, header.nlist, dtype, header.pos)
-        dask_list.append(x)
-
-    return dask_list

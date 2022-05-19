@@ -56,7 +56,7 @@ y = np.arange(ymax, ymin, dy) + 0.5 * dy
 x = np.arange(xmin, xmax, dx) + 0.5 * dx
 coords = {"layer": layer, "y": y, "x": x}
 
-idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
+idomain = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
 
 top = 0.0
 bottom = top - xr.DataArray(
@@ -119,7 +119,7 @@ gwf_model["oc"] = mf6.OutputControl(save_head="last", save_budget="last")
 # We'll create constant head cells at the most left and right columns of the grid,
 # representing two ditches.
 
-head = xr.full_like(idomain, np.nan)
+head = xr.full_like(idomain, np.nan, dtype=float)
 head[0, :, 0] = -1.0
 head[0, :, -1] = -1.0
 
@@ -146,7 +146,7 @@ head.isel(layer=0).plot()
 # We'll start off with the recharge package, which has no recharge cells
 # at the location of our ditches.
 
-recharge = xr.zeros_like(idomain.sel(layer=1))
+recharge = xr.zeros_like(idomain.sel(layer=1), dtype=float)
 recharge[:, 0] = np.nan
 recharge[:, -1] = np.nan
 
@@ -192,7 +192,7 @@ simulation["solver"] = mf6.SolutionPresetSimple(
 freq = "D"
 times = pd.date_range(start="1/1/1971", end="1/3/1971", freq=freq)
 
-simulation.time_discretization(times=times)
+simulation.create_time_discretization(additional_times=times)
 
 times
 
@@ -216,7 +216,7 @@ msw_model = msw.MetaSwapModel(unsaturated_database="./path/to/unsaturated/databa
 # of this grid should be identical as the Modflow6 model, but it should
 # not have a layer dimension.
 
-msw_grid = idomain.sel(layer=1, drop=True)
+msw_grid = idomain.sel(layer=1, drop=True).astype(float)
 
 # %%
 # We do not want MetaSWAP cells in the cells where the ditches are located in

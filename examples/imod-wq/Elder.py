@@ -155,7 +155,7 @@ m["gcg"] = imod.wq.GeneralizedConjugateGradientSolver(
     lump_dispersion=True,
 )
 m["oc"] = imod.wq.OutputControl(save_head_idf=True, save_concentration_idf=True)
-m.time_discretization(times=["2000-01-01T00:00", "2020-01-01T00:00"])
+m.create_time_discretization(additional_times=["2000-01-01T00:00", "2020-01-01T00:00"])
 
 # %%
 # Now we write the model

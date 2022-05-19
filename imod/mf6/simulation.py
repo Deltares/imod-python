@@ -2,6 +2,7 @@ import collections
 import pathlib
 import subprocess
 from typing import Union
+import warnings
 
 import jinja2
 import numpy as np
@@ -32,25 +33,59 @@ class Modflow6Simulation(collections.UserDict):
             self[k] = v
 
     def time_discretization(self, times):
-        """
-        Collect all unique times from boundary conditions and insert times from argument as well.
+        warnings.warn(
+            f"{self.__class__.__name__}.time_discretization() is deprecated. "
+            f"In the future call {self.__class__.__name__}.create_time_discretization().",
+            DeprecationWarning,
+        )
+        self.create_time_discretization(additional_times=times)
 
-        Function creates TimeDiscretization object which is set to self["time_discretization"]
+    def create_time_discretization(self, additional_times):
+        """
+        Collect all unique times from model packages and additional given
+        `times`. These unique times are used as stress periods in the model. All
+        stress packages must have the same starting time. Function creates
+        TimeDiscretization object which is set to self["time_discretization"]
+
+        The time discretization in imod-python works as follows:
+
+        - The datetimes of all packages you send in are always respected
+        - Subsequently, the input data you use is always included fully as well
+        - All times are treated as starting times for the stress: a stress is
+          always applied until the next specified date
+        - For this reason, a final time is required to determine the length of
+          the last stress period
+        - Additional times can be provided to force shorter stress periods &
+          more detailed output
+        - Every stress has to be defined on the first stress period (this is a
+          modflow requirement)
+
+        Or visually (every letter a date in the time axes):
+
+        >>> recharge a - b - c - d - e - f
+        >>> river    g - - - - h - - - - j
+        >>> times    - - - - - - - - - - - i
+        >>> model    a - b - c h d - e - f i
+
+        with the stress periods defined between these dates. I.e. the model
+        times are the set of all times you include in the model.
 
         Parameters
         ----------
-        times : xr.DataArray of datetime-likes
-            times to be inserted into model time discretization.
+        additional_times : str, datetime; or iterable of str, datetimes.
+            Times to add to the time discretization. At least one single time
+            should be given, which will be used as the ending time of the
+            simulation.
 
         Note
         ----
-        To set the other parameters of the TimeDiscretization object,
-        you have to set these to the object after calling this function.
+        To set the other parameters of the TimeDiscretization object, you have
+        to set these to the object after calling this function.
 
         Example
         -------
         >>> simulation = imod.mf6.Modflow6Simulation("example")
-        >>> simulation.time_discretization(times=["2000-01-01", "2000-01-02"])
+        >>> simulation.create_time_discretization(times=["2000-01-01", "2000-01-02"])
         >>> # Set number of timesteps
         >>> simulation["time_discretization"]["n_timesteps"] = 5
         """
@@ -58,7 +93,10 @@ class Modflow6Simulation(collections.UserDict):
             [model._use_cftime() for model in self.values() if model._pkg_id == "model"]
         )
 
-        times = [imod.wq.timeutil.to_datetime(time, self.use_cftime) for time in times]
+        times = [
+            imod.wq.timeutil.to_datetime(time, self.use_cftime)
+            for time in additional_times
+        ]
         for model in self.values():
             if model._pkg_id == "model":
                 times.extend(model._yield_times())

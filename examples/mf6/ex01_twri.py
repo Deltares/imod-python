@@ -69,21 +69,21 @@ coords = {"layer": layer, "y": y, "x": x}
 # * uniform recharge on the top layer
 # * a number of wells scattered throughout the model.
 
-idomain = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
+idomain = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
 bottom = xr.DataArray([-200.0, -300.0, -450.0], {"layer": layer}, ("layer",))
 
 # Constant head
-constant_head = xr.full_like(idomain, np.nan).sel(layer=[1, 2])
+constant_head = xr.full_like(idomain, np.nan, dtype=float).sel(layer=[1, 2])
 constant_head[..., 0] = 0.0
 
 # Drainage
-elevation = xr.full_like(idomain.sel(layer=1), np.nan)
-conductance = xr.full_like(idomain.sel(layer=1), np.nan)
+elevation = xr.full_like(idomain.sel(layer=1), np.nan, dtype=float)
+conductance = xr.full_like(idomain.sel(layer=1), np.nan, dtype=float)
 elevation[7, 1:10] = np.array([0.0, 0.0, 10.0, 20.0, 30.0, 50.0, 70.0, 90.0, 100.0])
 conductance[7, 1:10] = 1.0
 
 # Recharge
-rch_rate = xr.full_like(idomain.sel(layer=1), 3.0e-8)
+rch_rate = xr.full_like(idomain.sel(layer=1), 3.0e-8, dtype=float)
 
 # Well
 well_layer = [3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
@@ -165,8 +165,8 @@ simulation["solver"] = imod.mf6.Solution(
     relaxation_factor=0.97,
 )
 # Collect time discretization
-simulation.time_discretization(
-    times=["2000-01-01", "2000-01-02", "2000-01-03", "2000-01-04"]
+simulation.create_time_discretization(
+    additional_times=["2000-01-01", "2000-01-02", "2000-01-03", "2000-01-04"]
 )
 
 # %%

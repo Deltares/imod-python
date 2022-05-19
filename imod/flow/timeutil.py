@@ -3,7 +3,7 @@ This module contains time related functions and can be potentially merged with
 imod.wq's timutil.py (also used a lot in flow), to a generic set of utilities.
 
 This utility was made because a similar logic that was contained in
-ImodflowModel.time_discretization was required in PkgGroup, hence
+ImodflowModel.create_time_discretization was required in PkgGroup, hence
 insert_unique_package_times.  Containing this function in model.py, however,
 results in a circular import with PkgGroups; contain the function in PkgGroups
 felt out of place.

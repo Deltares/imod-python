@@ -1,4 +1,6 @@
-from imod.mf6.pkgbase import Package
+import numpy as np
+
+from imod.mf6.pkgbase import Package, VariableMetaData
 
 
 class Solution(Package):
@@ -333,6 +335,22 @@ class Solution(Package):
 
     _pkg_id = "ims"
     _keyword_map = {}
+    _metadata_dict = {
+        "outer_dvclose": VariableMetaData(np.floating),
+        "outer_maximum": VariableMetaData(np.integer),
+        "inner_maximum": VariableMetaData(np.integer),
+        "inner_dvclose": VariableMetaData(np.floating),
+        "inner_rclose": VariableMetaData(np.floating),
+        "under_relaxation_theta": VariableMetaData(np.floating),
+        "under_relaxation_kappa": VariableMetaData(np.floating),
+        "under_relaxation_gamma": VariableMetaData(np.floating),
+        "under_relaxation_momentum": VariableMetaData(np.floating),
+        "backtracking_number": VariableMetaData(np.integer),
+        "backtracking_tolerance": VariableMetaData(np.floating),
+        "backtracking_reduction_factor": VariableMetaData(np.floating),
+        "backtracking_residual_limit": VariableMetaData(np.floating),
+        "number_orthogonalizations": VariableMetaData(np.integer),
+    }
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(
@@ -389,6 +407,8 @@ class Solution(Package):
         self.dataset["print_option"] = print_option
         self.dataset["csv_output"] = csv_output
         self.dataset["no_ptc"] = no_ptc
+
+        self._pkgcheck()
 
 
 def SolutionPresetSimple(print_option, csv_output, no_ptc):

@@ -2,6 +2,7 @@ import abc
 import inspect
 import pathlib
 from typing import Any, Dict
+from dataclasses import dataclass
 
 import jinja2
 import numpy as np
@@ -60,6 +61,17 @@ def disu_recarr(arrdict, layer, notnull):
     # Argwhere returns an index_array with dims (N, a.ndims)
     recarr["node"] = (np.argwhere(notnull) + 1)[:, 0]
     return recarr
+@dataclass
+class VariableMetaData:
+    """
+    Dataclass to store metadata of a variable.
+
+    Currently purely used to store datatypes, but can be later expanded to store
+    minimimum and maximum values of variables, keyword maps, and period/package
+    data flags.
+    """
+
+    dtype: type
 
 
 class Package(abc.ABC):
@@ -517,6 +529,21 @@ class Package(abc.ABC):
                 "Expected xarray.Dataset or xugrid.UgridDataset. "
                 f"Found: {type(self.dataset)}"
             )
+    def _check_types(self):
+        for varname, metadata in self._metadata_dict.items():
+            expected_dtype = metadata.dtype
+            da = self.dataset[varname]
+            if da.values[()] is not None:  # Only check if was specified
+                if not issubclass(da.dtype.type, expected_dtype):
+                    raise TypeError(
+                        f"Unexpected data type for {varname} "
+                        f"in {self.__class__.__name__} package. "
+                        f"Expected subclass of {expected_dtype.__name__}, "
+                        f"instead got {da.dtype.type.__name__}."
+                    )
+
+    def _pkgcheck(self):
+        self._check_types()
 
 
 class BoundaryCondition(Package, abc.ABC):

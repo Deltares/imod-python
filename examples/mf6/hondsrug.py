@@ -47,7 +47,7 @@ gwf_model = imod.mf6.GroundwaterFlowModel()
 # We'll load the data from the examples that come with this package.
 
 layermodel = imod.data.hondsrug_layermodel()
-idomain = layermodel["idomain"]
+idomain = layermodel["idomain"].astype(int)
 top = layermodel["top"]
 bot = layermodel["bottom"]
 
@@ -163,7 +163,8 @@ interpolated_head.plot.imshow(ax=ax)
 # The final result is an starting_heads xarray where all layers have the 2d interpolated_head information.
 
 # Assign interpolated head values to the all the model layers
-starting_head = xr.full_like(idomain, np.nan).combine_first(interpolated_head)
+like_3d = xr.full_like(idomain, np.nan, dtype=float)
+starting_head = like_3d.combine_first(interpolated_head)
 starting_head
 
 # %%
@@ -583,8 +584,8 @@ simulation["solver"] = imod.mf6.Solution(
 #
 # The time discretization of this model is 6 years.
 
-simulation.time_discretization(
-    times=["2009-12-30T23:59:59.000000000", "2015-12-31T00:00:00.000000000"]
+simulation.create_time_discretization(
+    additional_times=["2009-12-30T23:59:59.000000000", "2015-12-31T00:00:00.000000000"]
 )
 
 # %%
