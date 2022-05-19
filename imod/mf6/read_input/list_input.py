@@ -38,6 +38,7 @@ def read_text_listinput(
 ) -> np.ndarray:
     # This function is over three times faster than:
     # recarr = np.loadtxt(path, dtype, max_rows=max_rows)
+    # I guess MODFLOW6 will also accept comma delimited?
     d = {key: value[0] for key, value in dtype.fields.items()}
     df = pd.read_csv(
         path,
@@ -138,8 +139,11 @@ def read_listinput(
         x = dask.delayed(read_external_listinput, nout=nout)(
             path, dtype, index_columns, fields, shape, binary, max_rows
         )
+
+        fieldtypes = [dtype.fields[field][0] for field in fields]
         variable_values = [
-            dask.array.from_delayed(a, shape=shape, dtype=dtype) for a in x
+            dask.array.from_delayed(a, shape=shape, dtype=dt)
+            for a, dt in zip(x, fieldtypes)
         ]
     else:
         # Move file position back one line, and try reading internal values.

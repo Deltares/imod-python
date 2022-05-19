@@ -117,5 +117,57 @@ def test_read_array(tmp_path):
         assert a.shape == shape
 
     assert np.allclose(top, 200.0)
-    assert np.allclose(idomain, 1.0)
+    assert np.allclose(idomain, 1)
     assert np.allclose(botm, 1.0)
+
+
+def test_read_griddata(tmp_path):
+    blockfile_path = tmp_path / "blockfile.txt"
+    external_path = tmp_path / "external.dat"
+    external_binary_path = tmp_path / "external.bin"
+
+    content = "\n".join(
+        [
+            "top",
+            "  constant 200.0",
+            "idomain",
+            "  open/close external.dat",
+            "botm",
+            "  open/close external.bin (binary)",
+            "end",
+        ]
+    )
+    with open(blockfile_path, "w") as f:
+        f.write(content)
+
+    sections = {
+        "top": (np.float64, gd.shape_to_max_rows),
+        "idomain": (np.int32, gd.shape_to_max_rows),
+        "botm": (np.float64, gd.shape_to_max_rows),
+    }
+    shape = (3, 4, 5)
+    a = np.ones(shape, dtype=np.int32)
+    a.tofile(external_path, sep=" ")
+    b = np.ones(shape, dtype=np.float64)
+    b.tofile(external_binary_path)
+
+    with open(blockfile_path) as f:
+        d = gd.read_griddata(f, tmp_path, sections, shape)
+
+    for key in ("top", "idomain", "botm"):
+        assert key in d
+        a = d[key]
+        assert isinstance(a, dask.array.Array)
+        assert a.shape == shape
+
+    assert np.allclose(d["top"], 200.0)
+    assert np.allclose(d["idomain"], 1)
+    assert np.allclose(d["botm"], 1.0)
+
+    dummy_path = tmp_path / "dummy.txt"
+    with open(dummy_path, "w") as f:
+        f.write("\n")
+
+    with open(dummy_path) as f:
+        with pytest.raises(ValueError, match="Error reading"):
+            d = gd.read_griddata(f, tmp_path, sections, shape)
