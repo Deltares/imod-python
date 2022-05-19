@@ -28,7 +28,7 @@ def test_render(concentration_fc):
     expected = textwrap.dedent(
         """\
         begin options
-          auxiliary salinity  temperature 
+          auxiliary salinity temperature
         end options
 
         begin dimensions
