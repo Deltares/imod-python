@@ -1,6 +1,7 @@
 import ast
-from glob import glob
 import os
+from glob import glob
+
 
 def check_ast(node: ast.AST, path: str):
     ok = True
@@ -29,7 +30,9 @@ def test_check_modules():
     paths = glob(test_directory + "/../**/*.py")
     ok = True
     for path in paths:
-        if test_directory in os.path.realpath(path):  #if it's a test we don't care. this very file contains print statements itself. 
+        if test_directory in os.path.realpath(
+            path
+        ):  # if it's a test we don't care. this very file contains print statements itself.
             continue
         with open(path) as f:
             content = f.read()
