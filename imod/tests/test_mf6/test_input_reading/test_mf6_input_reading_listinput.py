@@ -1,3 +1,5 @@
+import textwrap
+
 import dask.array
 import numpy as np
 
@@ -109,13 +111,13 @@ def test_recarr_to_dense__disu():
 def test_read_text_listinput(tmp_path):
     dtype = DIS_DTYPE
     path = tmp_path / "listinput.dat"
-    content = "\n".join(
-        [
-            "# layer row column head conductance",
-            "1 1 1 1.0 10.0",
-            "2 1 1 2.0 10.0",
-            "3 1 1 3.0 10.0",
-        ]
+    content = textwrap.dedent(
+        """\
+        # layer row column head conductance
+        1 1 1 1.0 10.0
+        2 1 1 2.0 10.0
+        3 1 1 3.0 10.0
+        """
     )
 
     with open(path, "w") as f:

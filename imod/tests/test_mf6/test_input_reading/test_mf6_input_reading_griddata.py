@@ -1,3 +1,5 @@
+import textwrap
+
 import dask.array
 import numpy as np
 import pytest
@@ -7,14 +9,12 @@ from imod.mf6.read_input import grid_data as gd
 
 def test_advance_to_griddata_section(tmp_path):
     path = tmp_path / "griddata.txt"
-    content = "\n".join(
-        [
-            "",
-            " idomain",
-            "   open/close GWF_1/dis/idomain.dat",
-            " botm layered",
-            "",
-        ]
+    content = textwrap.dedent(
+        """\
+          idomain
+            open/close GWF_1/dis/idomain.dat",
+          botm layered
+        """
     )
 
     with open(path, "w") as f:
@@ -81,16 +81,16 @@ def test_read_array(tmp_path):
     external_path = tmp_path / "external.dat"
     external_binary_path = tmp_path / "external.bin"
 
-    content = "\n".join(
-        [
-            "top",
-            "  constant 200.0",
-            "idomain",
-            "  open/close external.dat",
-            "botm",
-            "  open/close external.bin (binary)",
-            "abc",
-        ]
+    content = textwrap.dedent(
+        """\
+        top
+          constant 200.0
+        idomain
+          open/close external.dat
+        botm
+          open/close external.bin (binary)
+        abc
+        """
     )
     with open(blockfile_path, "w") as f:
         f.write(content)
@@ -126,17 +126,18 @@ def test_read_griddata(tmp_path):
     external_path = tmp_path / "external.dat"
     external_binary_path = tmp_path / "external.bin"
 
-    content = "\n".join(
-        [
-            "top",
-            "  constant 200.0",
-            "idomain",
-            "  open/close external.dat",
-            "botm",
-            "  open/close external.bin (binary)",
-            "end",
-        ]
+    content = textwrap.dedent(
+        """\
+        top
+          constant 200.0
+        idomain
+          open/close external.dat
+        botm
+          open/close external.bin (binary)
+        end
+        """
     )
+
     with open(blockfile_path, "w") as f:
         f.write(content)
 

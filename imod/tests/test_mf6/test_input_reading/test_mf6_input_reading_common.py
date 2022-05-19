@@ -1,3 +1,5 @@
+import textwrap
+
 import numpy as np
 import pytest
 
@@ -126,17 +128,16 @@ def test_read_external_textfile(tmp_path):
 
 def test_advance_to_header(tmp_path):
     path = tmp_path / "header.txt"
-    content = "\n".join(
-        [
-            "",
-            "begin options",
-            "1",
-            "end options\n",
-            "\n",
-            "begin griddata",
-            "2",
-            "end griddata",
-        ]
+    content = textwrap.dedent(
+        """\
+        begin options
+        1
+        end options
+
+        begin griddata
+        2
+        end griddata
+        """
     )
     with open(path, "w") as f:
         f.write(content)
@@ -213,12 +214,12 @@ def test_read_iterable_block(tmp_path):
     ]
 
     path2 = tmp_path / "iterable-values-unterminated.txt"
-    content = "\n".join(
-        [
-            "1.0 1 1.0",
-            "1.0 1 1.0",
-            "1.0 1 1.0",
-        ]
+    content = textwrap.dedent(
+        """\
+        1.0 1 1.0
+        1.0 1 1.0
+        1.0 1 1.0
+        """
     )
     with open(path2, "w") as f:
         f.write(content)
@@ -233,15 +234,16 @@ def test_parse_dimension():
 
 def test_advance_to_period(tmp_path):
     path = tmp_path / "period.txt"
-    content = "\n".join(
-        [
-            "" "  begin period 1",
-            "2",
-        ]
+    content = textwrap.dedent(
+        """\
+
+        begin period 1
+        2
+        """
     )
     with open(path, "w") as f:
         f.write(content)
 
     with open(path) as f:
         cm.advance_to_period(f)
-        assert f.readline() == "2"
+        assert f.readline() == "2\n"
