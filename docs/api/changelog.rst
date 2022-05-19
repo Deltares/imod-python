@@ -16,7 +16,7 @@ Fixed
   DataArray with a single layer is written. It will now accept both 2D and 3D
   arrays with a single layer coordinate.
 - Hotfixes for :meth:`imod.wq.model.SeawatModel.clip`, until `this merge request
-  <https://gitlab.com/deltares/imod/imod-python/-/merge_requests/111>` is
+  <https://gitlab.com/deltares/imod/imod-python/-/merge_requests/111>`_ is
   fulfilled. 
 - :meth:`imod.flow.ImodflowModel.write` will set the timestring in the
   projectfile to ``steady-state`` for ``BoundaryConditions`` without a time
@@ -26,6 +26,7 @@ Fixed
   rows is read.
 - :func:`imod.evaluate.calculate_gxg` now correctly uses (March 14, March
   28, April 14) to calculate GVG rather than (March 28, April 14, April 28).
+- :func:`imod.mf6.out.open_cbc` now correctly loads boundary fluxes.
 
 Changed
 ~~~~~~~
@@ -38,6 +39,19 @@ Changed
   accordingly. Previously, if IDs were shared between different layers, the
   associated files would be overwritten as the IDs would result in the same
   file name being used over and over.
+- :meth:`imod.flow.ImodflowModel.time_discretization`,
+  :meth:`imod.wq.SeawatModel.time_discretization`,
+  :meth:`imod.mf6.Simulation.time_discretization`,
+  are renamed to:
+  :meth:`imod.flow.ImodflowModel.create_time_discretization`,
+  :meth:`imod.wq.SeawatModel.create_time_discretization`,
+  :meth:`imod.mf6.Simulation.create_time_discretization`,
+- Moved tests inside `imod` directory, added an entry point for pytest fixtures.
+  Running the tests now requires an editable install, and also existing
+  installations have to be reinstalled to run the tests.
+- The ``imod.mf6`` model packages now all run type checks on input. This is a
+  breaking change for scripts which provide input with an incorrect dtype.
+  
 
 Added
 ~~~~~
@@ -52,6 +66,12 @@ Added
   Pandas dataframe).
 - :func:`imod.evaluate.calculate_gxg` will return the number of years used
   in the GxG calculation as separate variables in the output dataset.
+- :func:`imod.visualize.spatial.plot_map` now accepts a `fix` and `ax` argument,
+  to enable adding maps to existing axes.
+- :meth:`imod.flow.ImodflowModel.create_time_discretization`,
+  :meth:`imod.wq.SeawatModel.create_time_discretization`,
+  :meth:`imod.mf6.Simulation.create_time_discretization`, now have a
+  documentation section.
 
 [0.11.1] - 2021-12-23
 ---------------------
