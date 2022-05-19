@@ -29,11 +29,6 @@ def structured_dis():
 
 
 def connectivity_checks(dis):
-    def check_symmetry(i, j, v):
-        order0 = np.lexsort((j, i))
-        order1 = np.lexsort((i, j))
-        assert np.allclose(v[order0], v[order1])
-
     ncell = dis.dataset["node"].size
     i = np.repeat(np.arange(1, ncell + 1), dis.dataset["iac"].values) - 1
     j = dis.dataset["ja"].values - 1
@@ -42,25 +37,20 @@ def connectivity_checks(dis):
     hwva = dis.dataset["hwva"].values
     cl12 = dis.dataset["cl12"].values
 
-    node = i == j
-    connection = i != j
+    # The node number itself is marked by a negative number.
+    connection = j > 0
     vertical = (ihc == 0) & connection
 
     assert dis.dataset["iac"].values.sum() == j.size
     assert i.min() == 0
-    assert j.min() == 0
     assert i.max() == ncell - 1
     assert j.max() == ncell - 1
-    assert (diff[node] == 0).all()
     assert (diff[connection] > 0).all()
-    assert (cl12[node] == 0).all()
     assert (cl12[connection] != 0).all()
-    assert (hwva[node] == 0).all()
     assert (hwva[connection] != 0).all()
     assert (diff[vertical] > 1).all()
     assert np.allclose(cl12[vertical], 7.5)
     assert np.allclose(hwva[vertical], 200.0)
-    check_symmetry(i, j, hwva)
 
 
 def test_cell_number():
@@ -97,7 +87,7 @@ def test_structured_connectivity_full():
 
 def test_from_structured(structured_dis):
     idomain, top, bottom = structured_dis
-    dis = disu.LowLevelUnstructuredDiscretization.from_structured(top, bottom, idomain)
+    dis = disu.LowLevelUnstructuredDiscretization.from_dis(top, bottom, idomain)
     assert np.allclose(dis.dataset["xorigin"], 40.0)
     assert np.allclose(dis.dataset["yorigin"], 0.0)
     connectivity_checks(dis)
@@ -105,13 +95,13 @@ def test_from_structured(structured_dis):
     # Now disable some cells, create one pass-through
     idomain.values[1, 0, 1] = -1
     idomain.values[:, 0, 0] = 0
-    dis = disu.LowLevelUnstructuredDiscretization.from_structured(top, bottom, idomain)
+    dis = disu.LowLevelUnstructuredDiscretization.from_dis(top, bottom, idomain)
     connectivity_checks(dis)
 
 
 def test_render(structured_dis):
     idomain, top, bottom = structured_dis
-    dis = disu.LowLevelUnstructuredDiscretization.from_structured(top, bottom, idomain)
+    dis = disu.LowLevelUnstructuredDiscretization.from_dis(top, bottom, idomain)
 
     directory = pathlib.Path("mymodel")
     actual = dis.render(directory, "disu", None, True)
@@ -135,6 +125,8 @@ def test_render(structured_dis):
             open/close mymodel/disu/bot.bin (binary)
           area
             open/close mymodel/disu/area.bin (binary)
+          idomain
+            open/close mymodel/disu/idomain.bin (binary)
         end griddata
 
         begin connectiondata
@@ -150,12 +142,14 @@ def test_render(structured_dis):
             open/close mymodel/disu/hwva.bin (binary)
         end connectiondata"""
     )
+    print(actual)
+    print(expected)
     assert actual == expected
 
 
 def test_write(structured_dis, tmp_path):
     idomain, top, bottom = structured_dis
-    dis = disu.LowLevelUnstructuredDiscretization.from_structured(top, bottom, idomain)
+    dis = disu.LowLevelUnstructuredDiscretization.from_dis(top, bottom, idomain)
     dis.write(tmp_path, "disu", None, True)
 
     assert (tmp_path / "disu.disu").exists
