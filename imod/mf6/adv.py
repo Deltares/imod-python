@@ -9,7 +9,7 @@ from imod.mf6.pkgbase import Package
 """
 
 
-"""'
+"""
     The upstream weighting (first order upwind) scheme sets the concentration at the cellface between 2 adjacent cells equal to the concentration
     in the cell where the flow comes from. surpresses oscilations.
 """
@@ -29,7 +29,7 @@ class AdvectionUpstream(Package):
 """
     The central-in-space weighting scheme is based on a simple distance-weighted linear interpolation
     between the center of cell n and the center of cell m to calculate solute concentration at the shared face
-    between cell n and cell m. Although “central-in-space” is a misnomer for grids without equal spacing between
+    between cell n and cell m. Although central-in-space is a misnomer for grids without equal spacing between
     connected cells, it is retained here for consistency with nomenclature used by other MODFLOW-based transport programs, such as MT3D.
 """
 
