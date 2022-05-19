@@ -25,11 +25,11 @@ def check_ast(node: ast.AST, path: str):
 
 
 def test_check_modules():
-    thisDirectory = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
-    paths = glob(thisDirectory + "/../**/*.py")
+    test_directory = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
+    paths = glob(test_directory + "/../**/*.py")
     ok = True
     for path in paths:
-        if thisDirectory in os.path.realpath(path):  #if it's a test we don't care. this file contains print statements itself. 
+        if test_directory in os.path.realpath(path):  #if it's a test we don't care. this very file contains print statements itself. 
             continue
         with open(path) as f:
             content = f.read()
