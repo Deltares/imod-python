@@ -10,6 +10,15 @@ from .fixtures.flow_basic_fixture import (
     well_df,
 )
 from .fixtures.mf6_circle_fixture import circle_model, circle_result
+from .fixtures.mf6_flow_with_tranpsort_fixture import (
+    concentration_fc,
+    conductance_fc,
+    elevation_fc,
+    head_fc,
+    proportion_depth_fc,
+    proportion_rate_fc,
+    rate_fc,
+)
 from .fixtures.mf6_twri_disv_fixture import twri_disv_model
 from .fixtures.mf6_twri_fixture import transient_twri_model, twri_model, twri_result
 from .fixtures.msw_fixture import fixed_format_parser

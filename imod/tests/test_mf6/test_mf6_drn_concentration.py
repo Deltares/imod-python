@@ -7,8 +7,12 @@ import pytest
 import imod
 
 
-@pytest.mark.usefixtures("head_fc", "concentration_fc")
-def test_render(head_fc, concentration_fc):
+@pytest.mark.usefixtures("concentration_fc", "elevation_fc", "conductance_fc")
+def test_render(
+    concentration_fc,
+    elevation_fc,
+    conductance_fc,
+):
     directory = pathlib.Path("mymodel")
     globaltimes = [
         np.datetime64("2000-01-01"),
@@ -16,24 +20,19 @@ def test_render(head_fc, concentration_fc):
         np.datetime64("2000-01-03"),
     ]
 
-    chd = imod.mf6.ConstantHead(
-        head_fc,
-        concentration_fc,
-        "AUX",
-        print_input=True,
-        print_flows=True,
-        save_flows=True,
+    drn = imod.mf6.Drainage(
+        elevation=elevation_fc,
+        conductance=conductance_fc,
+        boundary_concentration=concentration_fc,
+        transport_boundary_type="AUX",
     )
 
-    actual = chd.render(directory, "chd", globaltimes, False)
+    actual = drn.render(directory, "drn", globaltimes, False)
 
     expected = textwrap.dedent(
         """\
         begin options
-          auxiliary salinity temperature
-          print_input
-          print_flows
-          save_flows
+          auxiliary salinity  temperature 
         end options
 
         begin dimensions
@@ -41,13 +40,13 @@ def test_render(head_fc, concentration_fc):
         end dimensions
 
         begin period 1
-          open/close mymodel/chd/chd-0.dat
+          open/close mymodel/drn/drn-0.dat
         end period
         begin period 2
-          open/close mymodel/chd/chd-1.dat
+          open/close mymodel/drn/drn-1.dat
         end period
         begin period 3
-          open/close mymodel/chd/chd-2.dat
+          open/close mymodel/drn/drn-2.dat
         end period
         """
     )

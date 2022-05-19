@@ -27,11 +27,11 @@ class Evapotranspiration(BoundaryCondition):
         is the proportion of the ET extinction depth at the bottom of a segment
         (dimensionless). A timeseries name may be specified. (pxdp)
     boundary_concentration: array of floats (xr.DataArray, optional)
-        if this flow package is used in simulations also involving transport, then this array is used 
-        as the  concentration for inflow over this boundary. 
+        if this flow package is used in simulations also involving transport, then this array is used
+        as the  concentration for inflow over this boundary.
     transport_boundary_type: ({"AUX", "AUXMIXED"}, optional)
-        if this flow package is used in simulations also involving transport, then this keyword specifies 
-        how outflow over this boundary is computed.    
+        if this flow package is used in simulations also involving transport, then this keyword specifies
+        how outflow over this boundary is computed.
     fixed_cell: array of floats (xr.DataArray)
         indicates that evapotranspiration will not be reassigned to a cell
         underlying the cell specified in the list if the specified cell is
@@ -74,8 +74,8 @@ class Evapotranspiration(BoundaryCondition):
         depth,
         proportion_rate,
         proportion_depth,
-        boundary_concentration =None,
-        transport_boundary_type =None,             
+        boundary_concentration=None,
+        transport_boundary_type=None,
         fixed_cell=False,
         print_input=False,
         print_flows=False,
@@ -94,7 +94,7 @@ class Evapotranspiration(BoundaryCondition):
         self.dataset["proportion_rate"] = proportion_rate
         self.dataset["proportion_depth"] = proportion_depth
         self.dataset["boundary_concentration"] = boundary_concentration
-        self.dataset["transport_boundary_type"] = transport_boundary_type         
+        self.dataset["transport_boundary_type"] = transport_boundary_type
         self.dataset["fixed_cell"] = fixed_cell
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
