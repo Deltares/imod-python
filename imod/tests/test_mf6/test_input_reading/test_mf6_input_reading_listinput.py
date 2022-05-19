@@ -177,7 +177,7 @@ def test_read_binary_listinput(tmp_path):
 
 def test_read_listinput(tmp_path):
     dtype = DIS_DTYPE
-    path = "package-binary.txt"
+    path = tmp_path / "package-binary.txt"
     content = "\n".join(
         [
             "open/close listinput.bin (binary)",
