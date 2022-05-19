@@ -1,8 +1,8 @@
 import abc
 import inspect
 import pathlib
-from typing import Any, Dict
 from dataclasses import dataclass
+from typing import Any, Dict
 
 import jinja2
 import numpy as np
@@ -61,6 +61,8 @@ def disu_recarr(arrdict, layer, notnull):
     # Argwhere returns an index_array with dims (N, a.ndims)
     recarr["node"] = (np.argwhere(notnull) + 1)[:, 0]
     return recarr
+
+
 @dataclass
 class VariableMetaData:
     """
@@ -529,6 +531,7 @@ class Package(abc.ABC):
                 "Expected xarray.Dataset or xugrid.UgridDataset. "
                 f"Found: {type(self.dataset)}"
             )
+
     def _check_types(self):
         for varname, metadata in self._metadata_dict.items():
             expected_dtype = metadata.dtype

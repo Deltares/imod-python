@@ -1,8 +1,8 @@
 import collections
 import pathlib
 import subprocess
-from typing import Union
 import warnings
+from typing import Union
 
 import jinja2
 import numpy as np
