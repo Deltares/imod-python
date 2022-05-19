@@ -31,11 +31,11 @@ class ConstantHead(BoundaryCondition):
         be written to the listing file immediately after it is read. Default is
         False.
     boundary_concentration: array of floats (xr.DataArray, optional)
-        if this flow package is used in simulations also involving transport, then this array is used 
-        as the  concentration for inflow over this boundary. 
+        if this flow package is used in simulations also involving transport, then this array is used
+        as the  concentration for inflow over this boundary.
     transport_boundary_type: ({"AUX", "AUXMIXED"}, optional)
-        if this flow package is used in simulations also involving transport, then this keyword specifies 
-        how outflow over this boundary is computed.                 
+        if this flow package is used in simulations also involving transport, then this keyword specifies
+        how outflow over this boundary is computed.
     print_flows: ({True, False}, optional)
         Indicates that the list of constant head flow rates will be printed to
         the listing file for every stress period time step in which "BUDGET
@@ -59,8 +59,8 @@ class ConstantHead(BoundaryCondition):
     def __init__(
         self,
         head,
-        boundary_concentration =None,
-        transport_boundary_type =None,             
+        boundary_concentration=None,
+        transport_boundary_type=None,
         print_input=False,
         print_flows=False,
         save_flows=False,
@@ -69,7 +69,7 @@ class ConstantHead(BoundaryCondition):
         super().__init__(locals())
         self.dataset["head"] = head
         self.dataset["boundary_concentration"] = boundary_concentration
-        self.dataset["transport_boundary_type"] = transport_boundary_type            
+        self.dataset["transport_boundary_type"] = transport_boundary_type
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows

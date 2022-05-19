@@ -250,7 +250,9 @@ class Package(abc.ABC):
             if datavar == "boundary_concentration":
                 if "species" in ds["boundary_concentration"].dims:
                     for species in ds["species"].values:
-                        arrdict[species] = ds["boundary_concentration"].sel(species=species).values
+                        arrdict[species] = (
+                            ds["boundary_concentration"].sel(species=species).values
+                        )
             else:
                         )
             else:
@@ -456,11 +458,12 @@ class Package(abc.ABC):
         self._check_types()
 
     def _get_auxiliary_varname(self):
-            result = []
-            if "species" in self.dataset.dims:
-                for val in self.dataset["boundary_concentration"]["species"].values:
-                    result.append(val)
-            return result
+        result = []
+        if "species" in self.dataset.dims:
+            for val in self.dataset["boundary_concentration"]["species"].values:
+                result.append(val)
+        return result
+
 
 
 class BoundaryCondition(Package, abc.ABC):
@@ -550,7 +553,7 @@ class BoundaryCondition(Package, abc.ABC):
         d = self.get_options(d)
         d["maxbound"] = self._max_active_n()
         if len(self._get_auxiliary_varname()) > 0:
-            d["auxiliary"]=self._get_auxiliary_varname()        
+            d["auxiliary"] = self._get_auxiliary_varname()
         return self._template.render(d)
 
     def write_perioddata(self, directory, pkgname, binary):
