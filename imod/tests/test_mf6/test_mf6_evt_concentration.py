@@ -19,9 +19,9 @@ def test_render(concentration_fc, proportion_rate_fc, proportion_depth_fc):
     ]
 
     evt = imod.mf6.Evapotranspiration(
-        surface=25,
+        surface=25.0,
         rate=1e-3,
-        depth=1,
+        depth=1.0,
         proportion_rate=proportion_rate_fc,
         proportion_depth=proportion_depth_fc,
         boundary_concentration=concentration_fc,
@@ -33,7 +33,7 @@ def test_render(concentration_fc, proportion_rate_fc, proportion_depth_fc):
     expected = textwrap.dedent(
         """\
         begin options
-          auxiliary salinity  temperature
+          auxiliary salinity temperature
 
         end options
 
