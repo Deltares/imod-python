@@ -1,6 +1,6 @@
 import ast
 from glob import glob
-
+import os
 
 def check_ast(node: ast.AST, path: str):
     ok = True
@@ -25,9 +25,12 @@ def check_ast(node: ast.AST, path: str):
 
 
 def test_check_modules():
-    paths = glob("../imod/**/*.py")
+    thisDirectory = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
+    paths = glob(thisDirectory + "/../**/*.py")
     ok = True
     for path in paths:
+        if thisDirectory in os.path.realpath(path):  #if it's a test we don't care. this file contains print statements itself. 
+            continue
         with open(path) as f:
             content = f.read()
             try:
