@@ -2,6 +2,7 @@ import re
 import sys
 import textwrap
 
+import dask.array
 import numpy as np
 import pytest
 import xarray as xr
@@ -460,3 +461,27 @@ def test_simulation_write_errors(twri_model, tmp_path):
     expected_message = "No sto package found in model GWF_1"
     with pytest.raises(ValueError, match=re.escape(expected_message)):
         simulation.write(modeldir, binary=True)
+
+
+@pytest.mark.usefixtures("transient_twri_model")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
+def test_simulation_write_and_open(transient_twri_model, tmp_path):
+    simulation = transient_twri_model
+    modeldir = tmp_path / "ex01-twri-transient-binary"
+    simulation.write(modeldir, binary=True)
+
+    back = imod.mf6.Modflow6Simulation.open(modeldir / "mfsim.nam")
+    assert isinstance(back, imod.mf6.Modflow6Simulation)
+
+    gwf = back["gwf_1"]
+    for name in ["chd", "drn", "ic", "npf", "rch", "sto"]:
+        assert name in gwf
+
+    chd = gwf["chd"]
+    assert isinstance(chd, imod.mf6.ConstantHead)
+    assert tuple(chd.dataset["head"].dims) == ("time", "layer", "y", "x")
+    assert isinstance(chd.dataset["head"].data, dask.array.Array)
+
+    head = chd["head"].dropna("layer", how="all").isel(time=0, drop=True).compute()
+    original = simulation["GWF_1"]["chd"]["head"]
+    assert head.equals(original)

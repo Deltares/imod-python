@@ -55,7 +55,7 @@ class StorageBase(Package):
             "sy": (np.float64, shape_to_max_rows),
         }
         content = read_sto_blockfile(
-            path=path,
+            path=simroot / path,
             simroot=simroot,
             sections=sections,
             shape=shape,

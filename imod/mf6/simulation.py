@@ -141,7 +141,7 @@ class Modflow6Simulation(collections.UserDict):
         content = read_sim_namefile(path)
 
         # Get the times from the time discretization file.
-        tdis_path = content["tdis6"]
+        tdis_path = simroot / content["tdis6"]
         tdis = read_tdis(tdis_path)
         globaltimes = tdis_time(tdis)
 
