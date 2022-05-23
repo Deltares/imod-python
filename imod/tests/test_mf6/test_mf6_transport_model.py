@@ -1,7 +1,9 @@
 import textwrap
+
+import pytest
+
 import imod
 import imod.mf6.model
-import pytest
 
 
 def test_transport_model_rendering():
@@ -25,8 +27,10 @@ def test_transport_model_rendering():
     )
     assert actual == expected
 
+
 @pytest.mark.usefixtures("flow_model_with_concentration")
 def test_transportwith_flowmodel(flow_model_with_concentration):
-  m = imod.mf6.model.GroundwaterTransportModel(flow_model_with_concentration, "salinity")
-  assert(m["ssm"] != None)
-
+    m = imod.mf6.model.GroundwaterTransportModel(
+        flow_model_with_concentration, "salinity"
+    )
+    assert m["ssm"] is not None

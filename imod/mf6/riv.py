@@ -1,7 +1,7 @@
 import numpy as np
+import xarray as xr
 
 from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
-import xarray as xr
 
 
 class River(BoundaryCondition):
