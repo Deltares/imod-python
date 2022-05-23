@@ -18,6 +18,7 @@ from .fixtures.mf6_flow_with_tranpsort_fixture import (
     proportion_depth_fc,
     proportion_rate_fc,
     rate_fc,
+    flow_model_with_concentration
 )
 from .fixtures.mf6_twri_disv_fixture import twri_disv_model
 from .fixtures.mf6_twri_fixture import transient_twri_model, twri_model, twri_result

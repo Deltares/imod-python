@@ -1,7 +1,7 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
-
+import xarray as xr
 
 class River(BoundaryCondition):
     """
@@ -67,10 +67,9 @@ class River(BoundaryCondition):
         self.dataset["conductance"] = conductance
         self.dataset["bottom_elevation"] = bottom_elevation
         self.dataset["boundary_concentration"] = boundary_concentration
-        self.dataset["transport_boundary_type"] = transport_boundary_type
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
-
+        self.string_data["transport_boundary_type"] = transport_boundary_type
         self._pkgcheck()

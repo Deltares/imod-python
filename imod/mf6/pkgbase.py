@@ -7,7 +7,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
-TRANSPORT_PACKAGES = ["adv", "dsp"]
+TRANSPORT_PACKAGES = ["adv", "dsp", "ssm"]
 
 
 def dis_recarr(arrdict, layer, notnull):
@@ -588,7 +588,7 @@ class BoundaryCondition(Package, abc.ABC):
             pkgname=pkgname,
             binary=binary,
         )
-
+    string_data ={}
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     """

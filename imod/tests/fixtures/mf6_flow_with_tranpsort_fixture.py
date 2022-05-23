@@ -1,6 +1,12 @@
 import numpy as np
 import pytest
 import xarray as xr
+from imod.mf6 import GroundwaterFlowModel
+from imod.mf6 import NodePropertyFlow
+from imod.mf6 import SpecificStorage
+from imod.mf6 import InitialConditions
+from imod.mf6 import OutputControl
+from imod.mf6 import River
 
 globaltimes = [
     np.datetime64("2000-01-01"),
@@ -111,3 +117,37 @@ def proportion_depth_fc():
     # Constant head
     proportion_rate = xr.full_like(idomain, np.nan)
     return proportion_rate
+
+
+@pytest.fixture(scope="session")
+def flow_model_with_concentration():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+    cellType = xr.full_like(idomain, 1,dtype=np.int32)
+    k = xr.full_like(idomain, 10.0)
+    k33 = xr.full_like(idomain, 10.0)
+    gwf_model = GroundwaterFlowModel()
+
+    gwf_model["npf"] = NodePropertyFlow(
+        icelltype= cellType,
+        k=k,
+        k33=k33,
+    )
+
+    gwf_model["sto"] = SpecificStorage(
+        specific_storage=1.0e-5,
+        specific_yield=0.15,
+        transient=False,
+        convertible=0,
+    )
+    gwf_model["ic"] = InitialConditions(head=0.0)
+    gwf_model["oc"] = OutputControl(save_head="all", save_budget="all")
+    gwf_model["riv-1"] =River(
+        stage=1.0,
+        conductance=10.0,
+        bottom_elevation=-1.0,
+        boundary_concentration=concentration_fc,
+        transport_boundary_type="AUX",
+    )
+
+    return gwf_model

@@ -62,10 +62,9 @@ class Drainage(BoundaryCondition):
         self.dataset["elevation"] = elevation
         self.dataset["conductance"] = conductance
         self.dataset["boundary_concentration"] = boundary_concentration
-        self.dataset["transport_boundary_type"] = transport_boundary_type
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
-
+        self.string_data["transport_boundary_type"] = transport_boundary_type
         self._pkgcheck()

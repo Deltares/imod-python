@@ -7,7 +7,7 @@ import jinja2
 import numpy as np
 
 from imod.mf6 import qgs_util
-
+import imod.mf6.ssm
 
 class Modflow6Model(collections.UserDict, abc.ABC):
     def __setitem__(self, key, value):
@@ -181,9 +181,12 @@ class GroundwaterFlowModel(Modflow6Model):
 
 
 class GroundwaterTransportModel(Modflow6Model):
-    def __init__(self):
+    def __init__(self, flowModel=None):
         super().__init__()
         self._initialize_template()
+        if flowModel is not None:
+            self["ssm"] = Transport_Sink_Sources(flowModel)
+
 
     def render(self, modelname):
         """Render model namefile"""
