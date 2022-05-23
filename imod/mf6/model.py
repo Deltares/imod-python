@@ -9,6 +9,7 @@ import numpy as np
 from imod.mf6 import qgs_util
 import imod.mf6.ssm
 
+
 class Modflow6Model(collections.UserDict, abc.ABC):
     def __setitem__(self, key, value):
         # TODO: Add packagecheck
@@ -186,7 +187,6 @@ class GroundwaterTransportModel(Modflow6Model):
         self._initialize_template()
         if flowModel is not None:
             self["ssm"] = Transport_Sink_Sources(flowModel)
-
 
     def render(self, modelname):
         """Render model namefile"""

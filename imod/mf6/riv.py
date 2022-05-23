@@ -3,6 +3,7 @@ import numpy as np
 from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
 import xarray as xr
 
+
 class River(BoundaryCondition):
     """
     River package.

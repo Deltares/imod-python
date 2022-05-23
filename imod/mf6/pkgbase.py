@@ -588,7 +588,9 @@ class BoundaryCondition(Package, abc.ABC):
             pkgname=pkgname,
             binary=binary,
         )
-    string_data ={}
+
+    string_data = {}
+
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     """
