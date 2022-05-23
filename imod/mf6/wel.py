@@ -5,6 +5,8 @@ import xarray as xr
 
 from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
 
+from .read_input import read_boundary_blockfile
+
 
 def assign_dims(arg) -> Dict:
     is_da = isinstance(arg, xr.DataArray)
@@ -108,6 +110,30 @@ class WellDisStructured(BoundaryCondition):
         for key, arr in arrdict.items():
             recarr[key] = arr
         return recarr
+
+    @classmethod
+    def open(cls, path, simroot, shape, coords, dims, globaltimes):
+        # read_boundary_blockfile calls:
+        # read_package_periods, which calls:
+        # read_listinput, which transforms recarrays to dense arrays by default.
+        content = read_boundary_blockfile(
+            simroot / path,
+            simroot,
+            fields=("rate",),
+            shape=shape,
+            sparse_to_dense=False,
+        )
+
+        period_index = content.pop("period_index")
+        period_data = content.pop("period_data")
+        coords = {"time": globaltimes[period_index]}
+        dims = ("time", "index")
+
+        for field, data in period_data.items():
+            content[field] = xr.DataArray(data, coords, dims)
+
+        filtered_content = cls.filter_and_rename(content)
+        return cls(**filtered_content)
 
 
 class WellDisVertices(BoundaryCondition):

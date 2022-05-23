@@ -11,6 +11,16 @@ import pandas as pd
 from .common import read_external_binaryfile, split_line, strip_line
 
 
+def field_values(
+    recarr: np.ndarray,
+    fields: Tuple[str],
+):
+    """
+    Return the record array columns as a list of separate arrays.
+    """
+    return [recarr[field] for field in fields]
+
+
 def recarr_to_dense(
     recarr: np.ndarray,
     index_columns: Tuple[str],
@@ -24,9 +34,9 @@ def recarr_to_dense(
     # MODFLOW6 is 1-based, Python is 0-based
     indices = [recarr[column] - 1 for column in index_columns]
     variables = []
-    for field in fields:
+    for column in field_values(recarr, fields):
         data = np.full(shape, np.nan)
-        data[indices] = recarr[field]
+        data[indices] = column
         variables.append(data)
     return variables
 
@@ -59,10 +69,14 @@ def read_internal_listinput(
     fields: Tuple[str],
     shape: Tuple[int],
     max_rows: int,
+    sparse_to_dense: bool,
 ) -> List[np.ndarray]:
     # recarr = read_internal(f, max_rows, dtype)
     recarr = read_text_listinput(f, dtype, max_rows)
-    return recarr_to_dense(recarr, index_columns, fields, shape)
+    if sparse_to_dense:
+        return recarr_to_dense(recarr, index_columns, fields, shape)
+    else:
+        return field_values(recarr, index_columns + fields)
 
 
 def read_external_listinput(
@@ -73,6 +87,7 @@ def read_external_listinput(
     shape: Tuple[int],
     binary: bool,
     max_rows: int,
+    sparse_to_dense: bool,
 ) -> List[np.ndarray]:
     """
     Read external list input, separate and reshape to a dense array form.
@@ -81,7 +96,10 @@ def read_external_listinput(
         recarr = read_external_binaryfile(path, dtype, max_rows)
     else:
         recarr = read_text_listinput(path, dtype, max_rows)
-    return recarr_to_dense(recarr, index_columns, fields, shape)
+    if sparse_to_dense:
+        return recarr_to_dense(recarr, index_columns, fields, shape)
+    else:
+        return field_values(recarr, index_columns + fields)
 
 
 def read_listinput(
@@ -92,6 +110,7 @@ def read_listinput(
     fields: Tuple[str],
     shape: Tuple[int],
     max_rows: int,
+    sparse_to_dense: bool = True,
 ) -> List[dask.array.Array]:
     """
     MODFLOW6 list input reading functionality.
@@ -111,6 +130,7 @@ def read_listinput(
     fields: Tuple[str]
     shape: Tuple[int]
     max_rows: int
+    sparse_to_dense: bool
 
     Returns
     -------
@@ -127,6 +147,13 @@ def read_listinput(
     separated = split_line(stripped)
     first = separated[0]
 
+    nout = len(fields)
+    fieldtypes = [dtype.fields[field][0] for field in fields]
+    if not sparse_to_dense:
+        shape = (max_rows,)
+        nout += len(index_columns)
+        fieldtypes = [dtype.fields[field][0] for field in index_columns] + fieldtypes
+
     if first == "open/close":
         fname = separated[1]
         path = simroot / fname
@@ -135,12 +162,9 @@ def read_listinput(
         if binary and "boundnames" in dtype.fields:
             raise ValueError("(BINARY) does not support BOUNDNAMES")
 
-        nout = len(fields)
         x = dask.delayed(read_external_listinput, nout=nout)(
-            path, dtype, index_columns, fields, shape, binary, max_rows
+            path, dtype, index_columns, fields, shape, binary, max_rows, sparse_to_dense
         )
-
-        fieldtypes = [dtype.fields[field][0] for field in fields]
         variable_values = [
             dask.array.from_delayed(a, shape=shape, dtype=dt)
             for a, dt in zip(x, fieldtypes)
@@ -148,7 +172,9 @@ def read_listinput(
     else:
         # Move file position back one line, and try reading internal values.
         f.seek(position)
-        x = read_internal_listinput(f, dtype, index_columns, fields, shape, max_rows)
+        x = read_internal_listinput(
+            f, dtype, index_columns, fields, shape, max_rows, sparse_to_dense
+        )
         variable_values = [dask.array.from_array(a) for a in x]
 
     return variable_values

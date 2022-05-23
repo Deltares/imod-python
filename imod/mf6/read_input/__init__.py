@@ -274,6 +274,7 @@ def read_package_periods(
     fields: Tuple[str],
     max_rows: int,
     shape: Tuple[int],
+    sparse_to_dense: bool = True,
 ) -> Tuple[List[int], Dict[str, dask.array.Array]]:
     """
     Read blockfile periods section of a "standard" MODFLOW6 boundary
@@ -308,6 +309,11 @@ def read_package_periods(
     dask_lists = defaultdict(list)
     key = advance_to_period(f)
 
+    if sparse_to_dense:
+        variables = fields
+    else:
+        variables = index_columns + fields
+
     while key is not None:
         # Read the recarrays, already separated into dense arrays.
         variable_values = read_listinput(
@@ -318,11 +324,12 @@ def read_package_periods(
             index_columns=index_columns,
             max_rows=max_rows,
             shape=shape,
+            sparse_to_dense=sparse_to_dense,
         )
 
         # Group them by field (e.g. cond, head, etc.)
-        for field, values in zip(fields, variable_values):
-            dask_lists[field].append(values)
+        for var, values in zip(variables, variable_values):
+            dask_lists[var].append(values)
 
         # Store number and advance to next period
         periods.append(key)
@@ -341,6 +348,7 @@ def read_boundary_blockfile(
     simroot: Path,
     fields: Tuple[str],
     shape: Tuple[int],
+    sparse_to_dense: bool = True,
 ) -> Dict[str, Any]:
     """
     Read blockfile of a "standard" MODFLOW6 boundary condition package: RIV,
@@ -358,6 +366,10 @@ def read_boundary_blockfile(
         The fields (generally np.float64) of the dtype.
     shape: Tuple[int]
         DIS: 3-sized, DISV: 2-sized, DISU: 1-sized.
+    sparse_to_dense: bool, default: True
+        Whether to convert "sparse" COO (cell id) data into "dense" grid form
+        (with implicit location). False for packages such as Well, which are
+        not usually in grid form.
 
     Returns
     -------
@@ -408,6 +420,7 @@ def read_boundary_blockfile(
             fields=fields,
             max_rows=dimensions["maxbound"],
             shape=shape,
+            sparse_to_dense=sparse_to_dense,
         )
 
     return content

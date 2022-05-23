@@ -463,18 +463,19 @@ def test_simulation_write_errors(twri_model, tmp_path):
         simulation.write(modeldir, binary=True)
 
 
+@pytest.mark.parametrize("binary", [True, False])
 @pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
-def test_simulation_write_and_open(transient_twri_model, tmp_path):
+def test_simulation_write_and_open(transient_twri_model, tmp_path, binary):
     simulation = transient_twri_model
     modeldir = tmp_path / "ex01-twri-transient-binary"
-    simulation.write(modeldir, binary=True)
+    simulation.write(modeldir, binary=binary)
 
     back = imod.mf6.Modflow6Simulation.open(modeldir / "mfsim.nam")
     assert isinstance(back, imod.mf6.Modflow6Simulation)
 
     gwf = back["gwf_1"]
-    for name in ["chd", "drn", "ic", "npf", "rch", "sto"]:
+    for name in ["chd", "drn", "ic", "npf", "rch", "sto", "wel"]:
         assert name in gwf
 
     chd = gwf["chd"]

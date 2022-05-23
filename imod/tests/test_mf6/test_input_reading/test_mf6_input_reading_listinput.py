@@ -132,6 +132,7 @@ def test_read_text_listinput(tmp_path):
             fields=["head", "conductance"],
             max_rows=3,
             shape=(3, 4, 5),
+            sparse_to_dense=True,
         )
     assert isinstance(variables, list)
     assert len(variables) == 2
@@ -144,6 +145,7 @@ def test_read_text_listinput(tmp_path):
         shape=(3, 4, 5),
         binary=False,
         max_rows=3,
+        sparse_to_dense=True,
     )
     assert isinstance(variables, list)
     assert len(variables) == 2
@@ -170,6 +172,7 @@ def test_read_binary_listinput(tmp_path):
         shape=(3, 4, 5),
         binary=True,
         max_rows=3,
+        sparse_to_dense=True,
     )
     assert isinstance(variables, list)
     assert len(variables) == 2
@@ -217,3 +220,23 @@ def test_read_listinput(tmp_path):
         assert notnull[0, 0, 0]
         assert notnull[1, 0, 0]
         assert notnull[2, 0, 0]
+
+    # Test another round, this time without converting from COO to a dense
+    # form.
+    with open(path) as f:
+        variables = li.read_listinput(
+            f,
+            tmp_path,
+            dtype,
+            index_columns=["layer", "row", "column"],
+            fields=["head", "conductance"],
+            shape=(3, 4, 5),
+            max_rows=3,
+            sparse_to_dense=False,
+        )
+
+    assert len(variables) == 5
+    for a in variables:
+        assert isinstance(a, dask.array.Array)
+        assert a.shape == (3,)
+        assert np.isfinite(a).all()
