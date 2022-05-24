@@ -46,22 +46,38 @@ class MobileStorage(Package):
         Type of sorption, if any
     """
 
+    _grid_data = {
+        "porosity": np.float64,
+        "decay": np.float64,
+        "decay_sorbed": np.float64,
+        "bulk_density": np.float64,
+        "distcoef": np.float64,
+        "sp2": np.float64,
+    }
     _pkg_id = "mst"
+    _template = Package._initialize_template(_pkg_id)
     _keyword_map = {}
-    _metadata_dict = {"rate": VariableMetaData(np.floating)}
+    _metadata_dict = {
+        "porosity": VariableMetaData(np.floating),
+        "decay": VariableMetaData(np.floating),
+        "decay_sorbed": VariableMetaData(np.floating),
+        "bulk_density": VariableMetaData(np.floating),
+        "distcoef": VariableMetaData(np.floating),
+        "sp2": VariableMetaData(np.floating),
+    }
 
     def __init__(
         self,
         porosity,
-        decay = None,
-        decay_sorbed = None,
-        bulk_density = None,
-        distcoef = None,
-        sp2 = None,
+        decay=None,
+        decay_sorbed=None,
+        bulk_density=None,
+        distcoef=None,
+        sp2=None,
         save_flows=False,
-        first_order_decay = False,
-        zero_order_decay = False,
-        sorption = "Linear"
+        first_order_decay=False,
+        zero_order_decay=False,
+        sorption=None,
     ):
         super().__init__(locals())
         self.dataset["porosity"] = porosity
@@ -74,6 +90,7 @@ class MobileStorage(Package):
         self.dataset["save_flows"] = save_flows
         self.dataset["first_order_decay"] = first_order_decay
         self.dataset["zero_order_decay"] = zero_order_decay
-        self.dataset["sorption"] = sorption
+        if sorption is not None:
+            self.string_data["sorption"] = sorption
 
         self._pkgcheck()
