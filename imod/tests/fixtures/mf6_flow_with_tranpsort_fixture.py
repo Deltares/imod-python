@@ -87,7 +87,6 @@ def elevation_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    # Constant head
     elevation = xr.full_like(idomain, np.nan)
     return elevation
 
@@ -97,7 +96,6 @@ def rate_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    # Constant head
     elevation = xr.full_like(idomain, np.nan)
     return elevation
 
@@ -107,7 +105,6 @@ def proportion_rate_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    # Constant head
     proportion_rate = xr.full_like(idomain, np.nan)
     return proportion_rate
 
@@ -117,40 +114,53 @@ def proportion_depth_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    # Constant head
     proportion_rate = xr.full_like(idomain, np.nan)
     return proportion_rate
 
-
 @pytest.fixture(scope="session")
-def flow_model_with_concentration():
+def decay_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
-    cellType = xr.full_like(idomain, 1, dtype=np.int32)
-    k = xr.full_like(idomain, 10.0)
-    k33 = xr.full_like(idomain, 10.0)
-    gwf_model = GroundwaterFlowModel()
 
-    gwf_model["npf"] = NodePropertyFlow(
-        icelltype=cellType,
-        k=k,
-        k33=k33,
-    )
+    decay = xr.full_like(idomain, np.nan)
+    return decay
 
-    gwf_model["sto"] = SpecificStorage(
-        specific_storage=1.0e-5,
-        specific_yield=0.15,
-        transient=False,
-        convertible=0,
-    )
-    gwf_model["ic"] = InitialConditions(head=0.0)
-    gwf_model["oc"] = OutputControl(save_head="all", save_budget="all")
-    gwf_model["riv-1"] = River(
-        stage=1.0,
-        conductance=10.0,
-        bottom_elevation=-1.0,
-        concentration=concentration_fc,
-        concentration_boundary_type="AUX",
-    )
+@pytest.fixture(scope="session")
+def decay_sorbed_fc():
 
-    return gwf_model
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    decay = xr.full_like(idomain, np.nan)
+    return decay
+
+@pytest.fixture(scope="session")
+def bulk_density_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    bulk_density = xr.full_like(idomain, np.nan)
+    return bulk_density
+
+@pytest.fixture(scope="session")
+def sp2_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    sp2 = xr.full_like(idomain, np.nan)
+    return sp2
+
+@pytest.fixture(scope="session")
+def distcoef_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    distcoef = xr.full_like(idomain, np.nan)
+    return distcoef
+
+@pytest.fixture(scope="session")
+def porosity_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    porosity = xr.full_like(idomain, np.nan)
+    return porosity
