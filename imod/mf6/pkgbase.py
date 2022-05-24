@@ -7,7 +7,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
-TRANSPORT_PACKAGES = ("adv", "dsp")
+TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst")
 
 
 def dis_recarr(arrdict, layer, notnull):
@@ -320,7 +320,8 @@ class Package(abc.ABC):
                 value = self[varname].values[()]
                 if self._valid(value):  # skip False or None
                     d[key] = value
-
+        for keyname, value in self.string_data.items():
+            d[keyname] = value
         return self._template.render(d)
 
     @staticmethod
@@ -453,6 +454,8 @@ class Package(abc.ABC):
 
     def _pkgcheck(self):
         self._check_types()
+
+    string_data = {}
 
 
 class BoundaryCondition(Package, abc.ABC):
