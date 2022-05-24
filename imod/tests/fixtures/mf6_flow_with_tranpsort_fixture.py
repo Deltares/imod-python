@@ -2,6 +2,15 @@ import numpy as np
 import pytest
 import xarray as xr
 
+from imod.mf6 import (
+    GroundwaterFlowModel,
+    InitialConditions,
+    NodePropertyFlow,
+    OutputControl,
+    River,
+    SpecificStorage,
+)
+
 globaltimes = [
     np.datetime64("2000-01-01"),
     np.datetime64("2000-01-02"),
@@ -78,7 +87,6 @@ def elevation_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    # Constant head
     elevation = xr.full_like(idomain, np.nan)
     return elevation
 
@@ -88,7 +96,6 @@ def rate_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    # Constant head
     elevation = xr.full_like(idomain, np.nan)
     return elevation
 
@@ -98,7 +105,6 @@ def proportion_rate_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    # Constant head
     proportion_rate = xr.full_like(idomain, np.nan)
     return proportion_rate
 
@@ -108,6 +114,53 @@ def proportion_depth_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    # Constant head
     proportion_rate = xr.full_like(idomain, np.nan)
     return proportion_rate
+
+@pytest.fixture(scope="session")
+def decay_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    decay = xr.full_like(idomain, np.nan)
+    return decay
+
+@pytest.fixture(scope="session")
+def decay_sorbed_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    decay = xr.full_like(idomain, np.nan)
+    return decay
+
+@pytest.fixture(scope="session")
+def bulk_density_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    bulk_density = xr.full_like(idomain, np.nan)
+    return bulk_density
+
+@pytest.fixture(scope="session")
+def sp2_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    sp2 = xr.full_like(idomain, np.nan)
+    return sp2
+
+@pytest.fixture(scope="session")
+def distcoef_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    distcoef = xr.full_like(idomain, np.nan)
+    return distcoef
+
+@pytest.fixture(scope="session")
+def porosity_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    porosity = xr.full_like(idomain, np.nan)
+    return porosity
