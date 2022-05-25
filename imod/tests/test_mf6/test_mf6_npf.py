@@ -68,3 +68,43 @@ def test_wrong_dtype():
             perched=True,
             save_flows=True,
         )
+
+
+def test_to_disu():
+    layer = [1, 2, 3]
+    template = xr.full_like(
+        imod.util.empty_3d(10.0, 0.0, 100.0, 10.0, 0.0, 100.0, layer), 1, dtype=np.int32
+    )
+    icelltype = xr.DataArray([1, 0, 0], {"layer": layer}, ("layer",)) * template
+    k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": layer}, ("layer",)) * template
+    k33 = (
+        xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",)) * template
+    )
+
+    npf = imod.mf6.NodePropertyFlow(
+        icelltype=icelltype,
+        k=k,
+        k33=k33,
+        variable_vertical_conductance=True,
+        dewatered=True,
+        perched=True,
+        save_flows=True,
+    )
+
+    disu_npf = npf.to_disu()
+    assert np.array_equal(disu_npf.dataset["node"], np.arange(300))
+
+    # Test again, with partially active domain
+    active = xr.full_like(template, True, dtype=bool)
+    active[:, :, 0] = False
+    n_active = active.sum()
+    cell_ids = np.full((3, 10, 10), -1)
+    cell_ids[active.values] = np.arange(n_active)
+    cell_ids = cell_ids.ravel()
+
+    disu_npf = npf.to_disu(cell_ids)
+    assert np.array_equal(disu_npf.dataset["node"], np.arange(270))
+
+    with pytest.raises(TypeError, match="cell_ids should be integer"):
+        cell_ids = np.arange(3 * 5 * 5, dtype=np.float64)
+        npf.to_disu(cell_ids)

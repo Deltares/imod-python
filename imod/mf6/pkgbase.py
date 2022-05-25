@@ -327,7 +327,9 @@ class Package(abc.ABC):
     @staticmethod
     def _is_xy_data(obj):
         if isinstance(obj, (xr.DataArray, xr.Dataset)):
-            # TODO
+            # "nja" is not really xy_data: arguably the method name should be
+            # changed. This method is exclusively used whether the contents of
+            # the object should be written to an external file.
             xy = ("x" in obj.dims and "y" in obj.dims) or (
                 "node" in obj.dims or "nja" in obj.dims
             )
@@ -490,6 +492,8 @@ class Package(abc.ABC):
 
     def _dis_to_disu(self, cell_ids=None):
         structured = self.dataset
+        if cell_ids is not None and not np.issubdtype(cell_ids.dtype, np.integer):
+            raise TypeError(f"cell_ids should be integer, received: {cell_ids.dtype}")
         if "layer" not in structured.coords:
             raise ValueError("layer coordinate is required")
         if "layer" not in structured.dims:
@@ -503,14 +507,20 @@ class Package(abc.ABC):
         index = np.add.outer(offset, np.arange(ncell_per_layer)).ravel()
 
         if cell_ids is not None:
+            # node has the shape of index, i.e. one value for every cell in DIS
+            # form, including no data padding, which are values of -1.
             node = cell_ids[index]
+            # Create a subselection without the inactive cells.
+            active = [node != -1]
+            dataset = dataset.isel(node=index[active])
+            dataset = dataset.assign_coords(node=node[active])
         else:
-            node = index
+            dataset = dataset.assign_coords(node=index)
 
-        dataset = dataset.assign_coords(node=node)
         return self.__class__(**dataset)
 
     def to_disu(self, cell_ids=None):
+
         """
         Parameters
         ----------
