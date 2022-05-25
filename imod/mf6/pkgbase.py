@@ -266,7 +266,7 @@ class Package(abc.ABC):
         for datavar in ds.data_vars:
             if ds[datavar].shape == ():
                 raise ValueError(
-                    f"{datavar} in {ds._pkg_id} package cannot be a scalar"
+                    f"{datavar} in {self._pkg_id} package cannot be a scalar"
                 )
             arrdict[datavar] = ds[datavar].values
         return arrdict
