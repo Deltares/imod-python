@@ -1,6 +1,5 @@
 import pathlib
 import textwrap
-from turtle import st
 
 import pytest
 

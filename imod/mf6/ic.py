@@ -38,15 +38,15 @@ class InitialConditions(Package):
         if start is None:
             start = head
             warnings.warn(
-                f"The use of the head argument in this constructor is deprecated. "
-                f"In the future use the start argument.",
+                "The use of the head argument in this constructor is deprecated. "
+                "In the future use the start argument.",
                 DeprecationWarning,
             )
             if head is None:
-                raise ValueError(f"start and head arguments cannot both be None")
+                raise ValueError("start and head arguments cannot both be None")
         else:
             if head is not None:
-                raise ValueError(f"start and head arguments cannot both be defined")
+                raise ValueError("start and head arguments cannot both be defined")
 
         self.dataset["start"] = start
 
