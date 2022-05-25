@@ -1,5 +1,7 @@
-import numpy as np
 import warnings
+
+import numpy as np
+
 from imod.mf6.pkgbase import Package, VariableMetaData
 
 
@@ -40,6 +42,12 @@ class InitialConditions(Package):
                 f"In the future use the start argument.",
                 DeprecationWarning,
             )
+            if head is None:
+                raise ValueError(f"start and head arguments cannot both be None")
+        else:
+            if head is not None:
+                raise ValueError(f"start and head arguments cannot both be defined")
+
         self.dataset["start"] = start
 
         self._pkgcheck()

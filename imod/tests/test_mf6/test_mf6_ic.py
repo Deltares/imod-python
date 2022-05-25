@@ -1,5 +1,6 @@
 import pathlib
 import textwrap
+from turtle import st
 
 import pytest
 
@@ -33,3 +34,11 @@ def test_wrong_dtype():
 
     with pytest.raises(TypeError):
         imod.mf6.InitialConditions(start=0)
+
+
+def test_wrong_arguments():
+    with pytest.raises(ValueError):
+        imod.mf6.InitialConditions()
+
+    with pytest.raises(ValueError):
+        imod.mf6.InitialConditions(head=0.0, start=1.0)
