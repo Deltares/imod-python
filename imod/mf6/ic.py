@@ -1,5 +1,5 @@
 import numpy as np
-
+import warnings
 from imod.mf6.pkgbase import Package, VariableMetaData
 
 
@@ -25,14 +25,22 @@ class InitialConditions(Package):
     """
 
     _pkg_id = "ic"
-    _metadata_dict = {"head": VariableMetaData(np.floating)}
-    _grid_data = {"head": np.float64}
-    _keyword_map = {"head": "strt"}
+    _metadata_dict = {"start": VariableMetaData(np.floating)}
+    _grid_data = {"start": np.float64}
+    _keyword_map = {"start": "strt"}
     _template = Package._initialize_template(_pkg_id)
 
-    def __init__(self, head):
+    def __init__(self, start=None, head=None):
+
         super().__init__(locals())
-        self.dataset["head"] = head
+        if start is None:
+            start = head
+            warnings.warn(
+                f"The use of the head argument in this constructor is deprecated. "
+                f"In the future use the start argument.",
+                DeprecationWarning,
+            )
+        self.dataset["start"] = start
 
         self._pkgcheck()
 
@@ -40,6 +48,6 @@ class InitialConditions(Package):
         d = {}
         icdirectory = directory / "ic"
         d["layered"], d["strt"] = self._compose_values(
-            self["head"], icdirectory, "strt", binary=binary
+            self["start"], icdirectory, "strt", binary=binary
         )
         return self._template.render(d)
