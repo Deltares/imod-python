@@ -1,0 +1,25 @@
+begin options
+{% if xt3d_off is defined %}  xt3d_off
+{% endif %}
+{%- if xt3d_rhs is defined %}  xt3d_rhs
+{% endif -%}
+end options
+
+begin griddata
+  diffc{% if diffc_layered %} layered{% endif %}
+{% for x in diffc %}    {{x}}
+{% endfor %}  alh{% if alh_layered %} layered{% endif %}
+{% for x in alh %}    {{x}}
+{% endfor %}  ath1{% if ath1_layered %} layered{% endif %}
+{% for x in ath1 %}    {{x}}
+{% endfor %}{% if alv is defined %}  alv{% if alv_layered %} layered{% endif %}
+{% for x in alv %}    {{x}}
+{% endfor -%}
+{% endif -%}{% if ath2 is defined %}  ath2{% if ath2_layered %} layered{% endif %}
+{% for x in ath2 %}    {{x}}
+{% endfor -%}
+{% endif -%}{% if atv is defined %}  atv{% if atv_layered %} layered{% endif %}
+{% for x in atv %}    {{x}}
+{% endfor -%}
+{% endif -%}
+end griddata

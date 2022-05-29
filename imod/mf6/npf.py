@@ -261,24 +261,4 @@ class NodePropertyFlow(Package):
         self.dataset["dewatered"] = dewatered
         self.dataset["perched"] = perched
         self.dataset["save_specific_discharge"] = save_specific_discharge
-
         self._pkgcheck()
-
-    def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
-        npfdirectory = directory / "npf"
-        for varname in self.dataset.data_vars:
-            key = self._keyword_map.get(varname, varname)
-
-            if varname in self._grid_data:
-                layered, value = self._compose_values(
-                    self.dataset[varname], npfdirectory, key, binary=binary
-                )
-                if self._valid(value):  # skip False or None
-                    d[f"{key}_layered"], d[key] = layered, value
-            else:
-                value = self[varname].values[()]
-                if self._valid(value):  # skip False or None
-                    d[key] = value
-
-        return self._template.render(d)
