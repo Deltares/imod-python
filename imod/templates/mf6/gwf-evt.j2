@@ -1,7 +1,7 @@
 begin options
 {% if fixed_cell is defined %}  fixed_cell
 {% endif %}
-{%- if auxiliary is defined %}  auxiliary {{auxiliary}}
+{%- if auxiliary is defined %}  auxiliary{% for aux in auxiliary %} {{aux}}{% endfor %}
 {% endif %}
 {%- if auxmultname is defined %}  auxmultname {{auxmultname}}
 {% endif %}
@@ -18,14 +18,15 @@ begin options
 {%- if obs_filerecord is defined %}  obs6 filein {{obs6_filename}}
 {% endif %}
 {%- if surf_rate_specified is defined %}  surf_rate_specified
-{% endif -%}
+{% endif %}
 end options
 
 begin dimensions
   maxbound {{maxbound}}
-  nseg {{nseg}}
+  nseg{%- if nseg is defined %} {{nseg}}{% endif %}
 end dimensions
 
-{% for i, path in periods.items() %}begin period {{i}}
+{% for i, path in periods.items() %}
+begin period {{i}}
   open/close {{path}}{% if binary %} (binary){% endif %}
 end period{% endfor %}

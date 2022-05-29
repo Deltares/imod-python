@@ -7,6 +7,8 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
+TRANSPORT_PACKAGES = ["adv", "dsp", "ssm"]
+
 
 def dis_recarr(arrdict, layer, notnull):
     # Define the numpy structured array dtype
@@ -195,6 +197,8 @@ class Package(abc.ABC):
             fname = "sln-ims.j2"
         elif pkg_id == "tdis":
             fname = "sim-tdis.j2"
+        elif pkg_id in TRANSPORT_PACKAGES:
+            fname = f"gwt-{pkg_id}.j2"
         else:
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
@@ -242,7 +246,14 @@ class Package(abc.ABC):
                 raise ValueError(
                     f"{datavar} in {self._pkg_id} package cannot be a scalar"
                 )
-            arrdict[datavar] = ds[datavar].values
+            if datavar == "boundary_concentration":
+                if "species" in ds["boundary_concentration"].dims:
+                    for species in ds["species"].values:
+                        arrdict[species] = (
+                            ds["boundary_concentration"].sel(species=species).values
+                        )
+            else:
+                arrdict[datavar] = ds[datavar].values
         return arrdict
 
     def write_binary_griddata(self, outpath, da, dtype):
@@ -292,10 +303,24 @@ class Package(abc.ABC):
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
-        for k, v in self.dataset.data_vars.items():  # pylint:disable=no-member
-            value = v.values[()]
-            if self._valid(value):  # skip None and False
-                d[k] = value
+        if directory is None:
+            pkg_directory = self._pkg_id
+        else:
+            pkg_directory = directory / self._pkg_id
+        for varname in self.dataset.data_vars:
+            key = self._keyword_map.get(varname, varname)
+
+            if hasattr(self, "_grid_data") and varname in self._grid_data:
+                layered, value = self._compose_values(
+                    self.dataset[varname], pkg_directory, key, binary=binary
+                )
+                if self._valid(value):  # skip False or None
+                    d[f"{key}_layered"], d[key] = layered, value
+            else:
+                value = self[varname].values[()]
+                if self._valid(value):  # skip False or None
+                    d[key] = value
+
         return self._template.render(d)
 
     @staticmethod
@@ -429,6 +454,13 @@ class Package(abc.ABC):
     def _pkgcheck(self):
         self._check_types()
 
+    def _get_auxiliary_varname(self):
+        result = []
+        if "species" in self.dataset.dims:
+            for val in self.dataset["boundary_concentration"]["species"].values:
+                result.append(val)
+        return result
+
 
 class BoundaryCondition(Package, abc.ABC):
     """
@@ -516,6 +548,8 @@ class BoundaryCondition(Package, abc.ABC):
         # construct the rest (dict for render)
         d = self.get_options(d)
         d["maxbound"] = self._max_active_n()
+        if len(self._get_auxiliary_varname()) > 0:
+            d["auxiliary"] = self._get_auxiliary_varname()
         return self._template.render(d)
 
     def write_perioddata(self, directory, pkgname, binary):
@@ -554,6 +588,8 @@ class BoundaryCondition(Package, abc.ABC):
             pkgname=pkgname,
             binary=binary,
         )
+
+    string_data = {}
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
