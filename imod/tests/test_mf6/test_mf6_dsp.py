@@ -16,21 +16,15 @@ def test_dispersion_default():
     expected = textwrap.dedent(
         """\
       begin options
-
-
       end options
 
       begin griddata
         diffc
           constant 0.0001
-
         alh
           constant 1.0
-
         ath1
           constant 10.0
-
-
       end griddata"""
     )
 
@@ -45,32 +39,24 @@ def test_dispersion_options():
     expected = textwrap.dedent(
         """\
       begin options
-       XT3D_OFF
-       XT3D_RHS
+       xt3d_off
+       xt3d_rhs
       end options
 
       begin griddata
         diffc
           constant 0.0001
-
         alh
           constant 1.0
-
         ath1
           constant 10.0
-
         alv
           constant 1.0
-
         ath2
           constant 2.0
-
-
         atv
           constant 3.0
-
       end griddata"""
     )
 
-    print(actual)
     assert actual == expected

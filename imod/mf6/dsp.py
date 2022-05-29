@@ -92,8 +92,8 @@ class Dispersion(Package):
         xt3d_rhs=False,
     ):
         super().__init__(locals())
-        self.dataset["XT3D_OFF"] = xt3d_off
-        self.dataset["XT3D_RHS"] = xt3d_rhs
+        self.dataset["xt3d_off"] = xt3d_off
+        self.dataset["xt3d_rhs"] = xt3d_rhs
         self.dataset["diffusion_coefficient"] = diffusion_coefficient
         self.dataset["longitudinal_horizontal"] = longitudinal_horizontal
         self.dataset["transversal_horizontal1"] = transversal_horizontal1
