@@ -1,9 +1,9 @@
 """
 Create Water Quality model.
 
-Create an :class:'imod.wq.SeawatModel' and add desired packages to the model
-(e.g. :class:'imod.wq.Well', :class:'imod.wq.Dispersion'). See :doc:'/examples'
-and :doc:'/model' for workflow documentation.
+Create an :class:`imod.wq.SeawatModel` and add desired packages to the model
+(e.g. :class:`imod.wq.Well`, :class:`imod.wq.Dispersion`). See :doc:`/examples`
+and :doc:`/model` for workflow documentation.
 """
 
 # make classes directly available under imod.wq
