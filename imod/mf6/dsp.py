@@ -10,8 +10,8 @@ class Dispersion(Package):
     Parameters
     ----------
     diffusion_coefficient: xr.DataArray
-        effective molecular diffusion coefficient (DIFFC)
-    longitudinal_horizontal: xu.UgridDataArray
+        effective molecular diffusion coefficient. (DIFFC)
+    longitudinal_horizontal: xr.DataArray
         longitudinal dispersivity in horizontal direction. If flow is strictly
         horizontal, then this is the longitudinal dispersivity that will be
         used. If flow is not strictly horizontal or strictly vertical, then the
@@ -20,12 +20,11 @@ class Dispersion(Package):
         values) then this array is required. (ALH)
     transverse_horizontal1: xr.DataArray
         transverse dispersivity in horizontal direction. This is the transverse
-        dispersivity value
-         for the second ellipsoid axis. If flow is strictly horizontal and
-         directed in the x direction (along a row for a regular grid), then this
-         value controls spreading in the y direction. If mechanical dispersion
-         is represented (by specifying any dispersivity values) then this array
-         is required. (ATH1)
+        dispersivity value for the second ellipsoid axis. If flow is strictly
+        horizontal and directed in the x direction (along a row for a regular
+        grid), then this value controls spreading in the y direction.
+        If mechanical dispersion is represented (by specifying any dispersivity
+        values) then this array is required. (ATH1)
     longitudinal_vertical: xr.DataArray, optional
         longitudinal dispersivity in vertical direction. If flow is strictly
         vertical, then this is the longitudinal dispsersivity value that will be
@@ -51,7 +50,7 @@ class Dispersion(Package):
         approximation. (XT3D_OFF)
     xt3d_rhs: bool, optional
         add xt3d terms to right-hand side, when possible. This option uses less
-        memory, but may require more iterations.  (XT3D_RHS)
+        memory, but may require more iterations. (XT3D_RHS)
     """
 
     _pkg_id = "dsp"
@@ -72,7 +71,6 @@ class Dispersion(Package):
         "transversal_horizontal2": np.float64,
         "transversal_vertical": np.float64,
     }
-
     _keyword_map = {
         "diffusion_coefficient": "diffc",
         "longitudinal_horizontal": "alh",
@@ -102,5 +100,4 @@ class Dispersion(Package):
         self.dataset["longitudinal_vertical"] = longitudinal_vertical
         self.dataset["transversal_horizontal2"] = transversal_horizontal2
         self.dataset["transversal_vertical"] = transversal_vertical
-
         self._pkgcheck()
