@@ -66,8 +66,9 @@ class River(BoundaryCondition):
         self.dataset["stage"] = stage
         self.dataset["conductance"] = conductance
         self.dataset["bottom_elevation"] = bottom_elevation
-        self.dataset["concentration"] = concentration
-        self.dataset["concentration_boundary_type"] = concentration_boundary_type
+        if concentration is not None:
+            self.dataset["concentration"] = concentration
+            self.dataset["concentration_boundary_type"] = concentration_boundary_type
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
