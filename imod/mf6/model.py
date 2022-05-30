@@ -1,3 +1,4 @@
+import abc
 import collections
 import pathlib
 
@@ -8,7 +9,7 @@ import numpy as np
 from imod.mf6 import qgs_util
 
 
-class Model(collections.UserDict):
+class Modflow6Model(collections.UserDict, abc.ABC):
     def __setitem__(self, key, value):
         # TODO: Add packagecheck
         super().__setitem__(key, value)
@@ -17,24 +18,10 @@ class Model(collections.UserDict):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
-
-class GroundwaterFlowModel(Model):
-    """
-    Contains data and writes consistent model input files
-    """
-
-    _pkg_id = "model"
-
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         self._template = env.get_template("gwf-nam.j2")
-
-    def __init__(self, newton=False, under_relaxation=False):
-        super().__init__()
-        self.newton = newton
-        self.under_relaxation = under_relaxation
-        self._initialize_template()
 
     def _get_pkgkey(self, pkg_id):
         """
@@ -95,10 +82,9 @@ class GroundwaterFlowModel(Model):
                 modeltimes.append(pkg.dataset["time"].values)
         return modeltimes
 
-    def render(self, modelname):
-        """Render model namefile"""
+    def _render(self, modelname: str, **kwargs):
         dir_for_render = pathlib.Path(modelname)
-        d = {"newton": self.newton, "under_relaxation": self.under_relaxation}
+        d = kwargs
         packages = []
         for pkgname, pkg in self.items():
             # Add the six to the package id
@@ -132,6 +118,23 @@ class GroundwaterFlowModel(Model):
                 globaltimes=globaltimes,
                 binary=binary,
             )
+
+
+class GroundwaterFlowModel(Modflow6Model):
+    _pkg_id = "model"
+    _mandatory_packages = ("npf", "ic", "oc", "sto")
+
+    def __init__(self, newton=False, under_relaxation=False):
+        super().__init__()
+        self.newton = newton
+        self.under_relaxation = under_relaxation
+        self._initialize_template()
+
+    def render(self, modelname: str):
+        """Render model namefile"""
+        return self._render(
+            modelname, newton=self.newton, under_relaxation=self.under_relaxation
+        )
 
     def write_qgis_project(self, directory, crs, aggregate_layers=False):
         """
@@ -180,3 +183,13 @@ class GroundwaterFlowModel(Model):
             self, pkgnames, data_paths, data_vars_ls, crs
         )
         qgs_util._write_qgis_projectfile(qgs_tree, directory / ("qgis_proj" + ext))
+
+
+class GroundwaterTransportModel(Modflow6Model):
+    def __init__(self):
+        super().__init__()
+        self._initialize_template()
+
+    def render(self, modelname: str):
+        """Render model namefile"""
+        return self._render(modelname)
