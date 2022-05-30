@@ -15,9 +15,13 @@ class InitialConditions(Package):
     Parameters
     ----------
     head: array of floats (xr.DataArray)
-        is the initial (starting) head—that is, head at the beginning of the GWF
-        Model simulation. STRT must be specified for all simulations, including
-        steady-state simulations. One value is read for every model cell. For
+        for backwards compatibility this argument is maintained, but please use
+        the start-argument instead.
+    start: array of floats (xr.DataArray)
+        is the initial (starting) head or concentration—that is, the simulation's
+        initial state.
+        STRT must be specified for all simulations, including steady-state simulations.
+        One value is read for every model cell. For
         simulations in which the first stress period is steady state, the values
         used for STRT generally do not affect the simulation (exceptions may
         occur if cells go dry and (or) rewet). The execution time, however, will
@@ -38,8 +42,7 @@ class InitialConditions(Package):
         if start is None:
             start = head
             warnings.warn(
-                "The use of the head argument in this constructor is deprecated. "
-                "In the future use the start argument.",
+                'The keyword argument "head" is deprecated. Please use the start argument.',
                 DeprecationWarning,
             )
             if head is None:
