@@ -45,9 +45,12 @@ class OutputControl(Package):
     _keyword_map = {}
     _template = Package._initialize_template(_pkg_id)
 
-    def __init__(self, save_head=None, save_budget=None):
+    def __init__(self, save_head=None, save_budget=None, save_concentration=None):
         super().__init__()
+        if save_head is not None and save_concentration is not None:
+            raise ValueError("save_head and save_concentration cannot both be defined.")
         self.dataset["save_head"] = save_head
+        self.dataset["save_concentration"] = save_concentration
         self.dataset["save_budget"] = save_budget
 
     def _get_ocsetting(self, setting):
@@ -71,6 +74,8 @@ class OutputControl(Package):
         modelname = directory.stem
         if self.dataset["save_head"].values[()] is not None:
             d["headfile"] = (directory / f"{modelname}.hds").as_posix()
+        if self.dataset["save_concentration"].values[()] is not None:
+            d["concentrationfile"] = (directory / f"{modelname}.ucn").as_posix()
         if self.dataset["save_budget"].values[()] is not None:
             d["budgetfile"] = (directory / f"{modelname}.cbc").as_posix()
 
