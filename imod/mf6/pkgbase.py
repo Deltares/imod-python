@@ -10,7 +10,6 @@ import xugrid as xu
 TRANSPORT_PACKAGES = ("adv", "dsp")
 
 
-
 def dis_recarr(arrdict, layer, notnull):
     # Define the numpy structured array dtype
     index_spec = [("layer", np.int32), ("row", np.int32), ("column", np.int32)]
@@ -254,8 +253,6 @@ class Package(abc.ABC):
                             ds["concentration"].sel(species=species).values
                         )
             else:
-                        )
-            else:
                 arrdict[datavar] = ds[datavar].values
         return arrdict
 
@@ -463,7 +460,6 @@ class Package(abc.ABC):
             for val in self.dataset["concentration"]["species"].values:
                 result.append(val)
         return result
-
 
 
 class BoundaryCondition(Package, abc.ABC):
