@@ -82,7 +82,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 modeltimes.append(pkg.dataset["time"].values)
         return modeltimes
 
-
     def _render(self, modelname: str, **kwargs):
     def write(self, directory, modelname, globaltimes, binary=True):
         """
