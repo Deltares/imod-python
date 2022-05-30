@@ -24,8 +24,8 @@ def test_render(concentration_fc, proportion_rate_fc, proportion_depth_fc):
         depth=1.0,
         proportion_rate=proportion_rate_fc,
         proportion_depth=proportion_depth_fc,
-        boundary_concentration=concentration_fc,
-        transport_boundary_type="AUX",
+        concentration=concentration_fc,
+        concentration_boundary_type="AUX",
     )
 
     actual = evt.render(directory, "evt", globaltimes, False)
