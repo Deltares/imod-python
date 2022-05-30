@@ -34,7 +34,6 @@ def test_render(concentration_fc, proportion_rate_fc, proportion_depth_fc):
         """\
         begin options
           auxiliary salinity temperature
-
         end options
 
         begin dimensions

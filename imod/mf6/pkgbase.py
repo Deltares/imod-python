@@ -454,13 +454,6 @@ class Package(abc.ABC):
     def _pkgcheck(self):
         self._check_types()
 
-    def _get_auxiliary_varname(self):
-        result = []
-        if "species" in self.dataset.dims:
-            for val in self.dataset["concentration"]["species"].values:
-                result.append(val)
-        return result
-
 
 class BoundaryCondition(Package, abc.ABC):
     """
@@ -548,8 +541,15 @@ class BoundaryCondition(Package, abc.ABC):
         # construct the rest (dict for render)
         d = self.get_options(d)
         d["maxbound"] = self._max_active_n()
-        if len(self._get_auxiliary_varname()) > 0:
-            d["auxiliary"] = self._get_auxiliary_varname()
+
+        if "concentration" in self.dataset.data_vars:
+            if "species" in self.dataset["concentration"].coords:
+                d["auxiliary"] = self.dataset["species"].values
+            else:
+                raise ValueError(
+                    "Boundary concentration requires a species coordinate."
+                )
+
         return self._template.render(d)
 
     def write_perioddata(self, directory, pkgname, binary):
