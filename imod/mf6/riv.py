@@ -18,6 +18,12 @@ class River(BoundaryCondition):
         is the riverbed hydraulic conductance.
     bottom_elevation: array of floats (xr.DataArray)
         is the elevation of the bottom of the riverbed.
+    concentration: array of floats (xr.DataArray, optional)
+        if this flow package is used in simulations also involving transport, then this array is used
+        as the  concentration for inflow over this boundary.
+    concentration_boundary_type: ({"AUX", "AUXMIXED"}, optional)
+        if this flow package is used in simulations also involving transport, then this keyword specifies
+        how outflow over this boundary is computed.
     print_input: ({True, False}, optional)
         keyword to indicate that the list of drain information will be written
         to the listing file immediately after it is read. Default is False.
@@ -49,6 +55,8 @@ class River(BoundaryCondition):
         stage,
         conductance,
         bottom_elevation,
+        concentration=None,
+        concentration_boundary_type="aux",
         print_input=False,
         print_flows=False,
         save_flows=False,
@@ -58,6 +66,9 @@ class River(BoundaryCondition):
         self.dataset["stage"] = stage
         self.dataset["conductance"] = conductance
         self.dataset["bottom_elevation"] = bottom_elevation
+        if concentration is not None:
+            self.dataset["concentration"] = concentration
+            self.dataset["concentration_boundary_type"] = concentration_boundary_type
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows

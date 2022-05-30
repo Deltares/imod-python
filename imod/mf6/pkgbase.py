@@ -246,7 +246,14 @@ class Package(abc.ABC):
                 raise ValueError(
                     f"{datavar} in {self._pkg_id} package cannot be a scalar"
                 )
-            arrdict[datavar] = ds[datavar].values
+            if datavar == "concentration":
+                if "species" in ds["concentration"].dims:
+                    for species in ds["species"].values:
+                        arrdict[species] = (
+                            ds["concentration"].sel(species=species).values
+                        )
+            else:
+                arrdict[datavar] = ds[datavar].values
         return arrdict
 
     def write_binary_griddata(self, outpath, da, dtype):
@@ -296,12 +303,14 @@ class Package(abc.ABC):
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
-
+        if directory is None:
+            pkg_directory = self._pkg_id
+        else:
+            pkg_directory = directory / self._pkg_id
         for varname in self.dataset.data_vars:
             key = self._keyword_map.get(varname, varname)
 
             if hasattr(self, "_grid_data") and varname in self._grid_data:
-                pkg_directory = directory / self._pkg_id
                 layered, value = self._compose_values(
                     self.dataset[varname], pkg_directory, key, binary=binary
                 )
@@ -532,6 +541,15 @@ class BoundaryCondition(Package, abc.ABC):
         # construct the rest (dict for render)
         d = self.get_options(d)
         d["maxbound"] = self._max_active_n()
+
+        if "concentration" in self.dataset.data_vars:
+            if "species" in self.dataset["concentration"].coords:
+                d["auxiliary"] = self.dataset["species"].values
+            else:
+                raise ValueError(
+                    "Boundary concentration requires a species coordinate."
+                )
+
         return self._template.render(d)
 
     def write_perioddata(self, directory, pkgname, binary):

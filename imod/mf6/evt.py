@@ -26,6 +26,12 @@ class Evapotranspiration(BoundaryCondition):
     proportion_depth: array of floats (xr.DataArray)
         is the proportion of the ET extinction depth at the bottom of a segment
         (dimensionless). A timeseries name may be specified. (pxdp)
+    concentration: array of floats (xr.DataArray, optional)
+        if this flow package is used in simulations also involving transport, then this array is used
+        as the  concentration for inflow over this boundary.
+    concentration_boundary_type: ({"AUX", "AUXMIXED"}, optional)
+        if this flow package is used in simulations also involving transport, then this keyword specifies
+        how outflow over this boundary is computed.
     fixed_cell: array of floats (xr.DataArray)
         indicates that evapotranspiration will not be reassigned to a cell
         underlying the cell specified in the list if the specified cell is
@@ -68,6 +74,8 @@ class Evapotranspiration(BoundaryCondition):
         depth,
         proportion_rate,
         proportion_depth,
+        concentration=None,
+        concentration_boundary_type="auxmixed",
         fixed_cell=False,
         print_input=False,
         print_flows=False,
@@ -85,6 +93,9 @@ class Evapotranspiration(BoundaryCondition):
             )
         self.dataset["proportion_rate"] = proportion_rate
         self.dataset["proportion_depth"] = proportion_depth
+        if concentration is not None:
+            self.dataset["concentration"] = concentration
+            self.dataset["concentration_boundary_type"] = concentration_boundary_type
         self.dataset["fixed_cell"] = fixed_cell
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
