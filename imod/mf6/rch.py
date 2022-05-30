@@ -16,6 +16,12 @@ class Recharge(BoundaryCondition):
         is the recharge flux rate (LT −1). This rate is multiplied inside the
         program by the surface area of the cell to calculate the volumetric
         recharge rate. A time-series name may be specified.
+    concentration: array of floats (xr.DataArray, optional)
+        if this flow package is used in simulations also involving transport, then this array is used
+        as the  concentration for inflow over this boundary.
+    concentration_boundary_type: ({"AUX", "AUXMIXED"}, optional)
+        if this flow package is used in simulations also involving transport, then this keyword specifies
+        how outflow over this boundary is computed.
     print_input: ({True, False}, optional)
         keyword to indicate that the list of recharge information will be
         written to the listing file immediately after it is read.
@@ -44,6 +50,8 @@ class Recharge(BoundaryCondition):
     def __init__(
         self,
         rate,
+        concentration=None,
+        concentration_boundary_type="auxmixed",
         print_input=False,
         print_flows=False,
         save_flows=False,
@@ -51,6 +59,9 @@ class Recharge(BoundaryCondition):
     ):
         super().__init__(locals())
         self.dataset["rate"] = rate
+        if concentration is not None:
+            self.dataset["concentration"] = concentration
+            self.dataset["concentration_boundary_type"] = concentration_boundary_type
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
