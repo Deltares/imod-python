@@ -454,6 +454,15 @@ class Package(abc.ABC):
     def _pkgcheck(self):
         self._check_types()
 
+    def period_data(self):
+        result = []
+        result += self._period_data
+        if hasattr(self, "_auxiliary_data"):
+            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
+                if  aux_var_name in self.dataset.keys():
+                    for s in self.dataset[aux_var_name].coords[aux_var_dimensions].values:
+                        result.append(s)
+        return result
 
 class BoundaryCondition(Package, abc.ABC):
     """
@@ -470,7 +479,7 @@ class BoundaryCondition(Package, abc.ABC):
         Determine the maximum active number of cells that are active
         during a stress period.
         """
-        da = self.dataset[self._period_data[0]]
+        da = self.dataset[self.period_data()[0]]
         if "time" in da.coords:
             nmax = int(da.groupby("time").count(xr.ALL_DIMS).max())
         else:
@@ -521,7 +530,7 @@ class BoundaryCondition(Package, abc.ABC):
 
     def get_options(self, d, not_options=None):
         if not_options is None:
-            not_options = self._period_data
+            not_options = self.period_data()
 
         for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
@@ -534,7 +543,7 @@ class BoundaryCondition(Package, abc.ABC):
     def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {"binary": binary}
-        bin_ds = self[list(self._period_data)]
+        bin_ds = self[self.period_data()]
         d["periods"] = self.period_paths(
             directory, pkgname, globaltimes, bin_ds, binary
         )
@@ -553,7 +562,7 @@ class BoundaryCondition(Package, abc.ABC):
         return self._template.render(d)
 
     def write_perioddata(self, directory, pkgname, binary):
-        bin_ds = self[list(self._period_data)]
+        bin_ds = self[self.period_data()]
 
         if binary:
             ext = "bin"
@@ -588,7 +597,11 @@ class BoundaryCondition(Package, abc.ABC):
             pkgname=pkgname,
             binary=binary,
         )
-
+    def add_periodic_auxiliary_variable(self):
+        if hasattr(self, "_auxiliary_data"):
+            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
+                for s in self.dataset[aux_var_name].coords[aux_var_dimensions].values:
+                    self.dataset[s]= self.dataset[aux_var_name].sel({aux_var_dimensions:s})
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     """

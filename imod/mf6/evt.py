@@ -66,6 +66,7 @@ class Evapotranspiration(BoundaryCondition):
     _period_data = ("surface", "rate", "depth", "proportion_depth", "proportion_rate")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
+    _auxiliary_data = {"concentration": "species"}
 
     def __init__(
         self,
@@ -96,6 +97,7 @@ class Evapotranspiration(BoundaryCondition):
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
+            self.add_periodic_auxiliary_variable()
         self.dataset["fixed_cell"] = fixed_cell
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows

@@ -46,6 +46,7 @@ class Drainage(BoundaryCondition):
     _period_data = ("elevation", "conductance")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
+    _auxiliary_data = {"concentration": "species"}
 
     def __init__(
         self,
@@ -64,6 +65,7 @@ class Drainage(BoundaryCondition):
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
+            self.add_periodic_auxiliary_variable()
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
