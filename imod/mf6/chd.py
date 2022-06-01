@@ -51,9 +51,10 @@ class ConstantHead(BoundaryCondition):
     """
 
     _pkg_id = "chd"
-    _period_data = ("head",)
-    _metadata_dict = {"head": VariableMetaData(np.floating)}
     _keyword_map = {}
+    _period_data = ("head",)
+    _auxiliary_data = {"concentration": "species"}
+    _metadata_dict = {"head": VariableMetaData(np.floating)}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
@@ -73,9 +74,12 @@ class ConstantHead(BoundaryCondition):
             self.string_data[
                 "concentration_boundary_type"
             ] = concentration_boundary_type
+            self.add_periodic_auxiliary_variable()
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
         self._pkgcheck()
+
+

@@ -108,8 +108,6 @@ def test_wrong_dtype(head):
 
 
 pytest.mark.usefixtures("head_fc", "concentration_fc")
-
-
 def test_render_concentration(head_fc, concentration_fc):
     directory = pathlib.Path("mymodel")
     globaltimes = [
