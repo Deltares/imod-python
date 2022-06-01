@@ -175,4 +175,4 @@ def test_write_concentration_period_data(head_fc, concentration_fc):
       chd.write(output_dir,"chd", globaltimes, False)
       with open(output_dir + "\\chd\\chd-0.dat", "r") as f:
         data = f.read()
-        assert data.count("2") == 1755
+        assert data.count("2") == 1755  #the number 2 is in the concentration data, and in the cell indices.
