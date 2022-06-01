@@ -460,10 +460,13 @@ class Package(abc.ABC):
         result += self._period_data
         if hasattr(self, "_auxiliary_data"):
             for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
-                if  aux_var_name in self.dataset.keys():
-                    for s in self.dataset[aux_var_name].coords[aux_var_dimensions].values:
+                if aux_var_name in self.dataset.keys():
+                    for s in (
+                        self.dataset[aux_var_name].coords[aux_var_dimensions].values
+                    ):
                         result.append(s)
         return result
+
 
 class BoundaryCondition(Package, abc.ABC):
     """
@@ -598,11 +601,15 @@ class BoundaryCondition(Package, abc.ABC):
             pkgname=pkgname,
             binary=binary,
         )
+
     def add_periodic_auxiliary_variable(self):
         if hasattr(self, "_auxiliary_data"):
             for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
                 for s in self.dataset[aux_var_name].coords[aux_var_dimensions].values:
-                    self.dataset[s]= self.dataset[aux_var_name].sel({aux_var_dimensions:s})
+                    self.dataset[s] = self.dataset[aux_var_name].sel(
+                        {aux_var_dimensions: s}
+                    )
+
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     """

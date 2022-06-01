@@ -109,6 +109,8 @@ def test_wrong_dtype(head):
 
 
 pytest.mark.usefixtures("head_fc", "concentration_fc")
+
+
 def test_render_concentration(head_fc, concentration_fc):
     directory = pathlib.Path("mymodel")
     globaltimes = [
@@ -154,15 +156,18 @@ def test_render_concentration(head_fc, concentration_fc):
     )
     assert actual == expected
 
+
 pytest.mark.usefixtures("head_fc", "concentration_fc")
+
+
 def test_write_concentration_period_data(head_fc, concentration_fc):
     globaltimes = [
         np.datetime64("2000-01-01"),
         np.datetime64("2000-01-02"),
         np.datetime64("2000-01-03"),
     ]
-    head_fc[:]= 1
-    concentration_fc[:]=2
+    head_fc[:] = 1
+    concentration_fc[:] = 2
     chd = imod.mf6.ConstantHead(
         head_fc,
         concentration_fc,
@@ -172,7 +177,9 @@ def test_write_concentration_period_data(head_fc, concentration_fc):
         save_flows=True,
     )
     with tempfile.TemporaryDirectory() as output_dir:
-      chd.write(output_dir,"chd", globaltimes, False)
-      with open(output_dir + "\\chd\\chd-0.dat", "r") as f:
-        data = f.read()
-        assert data.count("2") == 1755  #the number 2 is in the concentration data, and in the cell indices.
+        chd.write(output_dir, "chd", globaltimes, False)
+        with open(output_dir + "\\chd\\chd-0.dat", "r") as f:
+            data = f.read()
+            assert (
+                data.count("2") == 1755
+            )  # the number 2 is in the concentration data, and in the cell indices.

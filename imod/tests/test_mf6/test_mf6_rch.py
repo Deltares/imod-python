@@ -77,14 +77,16 @@ def test_wrong_dtype():
 
 
 pytest.mark.usefixtures("rate_fc", "concentration_fc")
+
+
 def test_write_concentration_period_data(rate_fc, concentration_fc):
     globaltimes = [
         np.datetime64("2000-01-01"),
         np.datetime64("2000-01-02"),
         np.datetime64("2000-01-03"),
     ]
-    rate_fc[:]= 1
-    concentration_fc[:]=2
+    rate_fc[:] = 1
+    concentration_fc[:] = 2
 
     rch = imod.mf6.Recharge(
         rate=rate_fc,
@@ -92,7 +94,9 @@ def test_write_concentration_period_data(rate_fc, concentration_fc):
         concentration_boundary_type="AUX",
     )
     with tempfile.TemporaryDirectory() as output_dir:
-      rch.write(output_dir,"rch", globaltimes, False)
-      with open(output_dir + "\\rch\\rch-0.dat", "r") as f:
-        data = f.read()
-        assert data.count("2") == 1755  #the number 2 is in the concentration data, and in the cell indices.
+        rch.write(output_dir, "rch", globaltimes, False)
+        with open(output_dir + "\\rch\\rch-0.dat", "r") as f:
+            data = f.read()
+            assert (
+                data.count("2") == 1755
+            )  # the number 2 is in the concentration data, and in the cell indices.

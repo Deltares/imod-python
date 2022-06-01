@@ -81,5 +81,3 @@ class ConstantHead(BoundaryCondition):
         self.dataset["observations"] = observations
 
         self._pkgcheck()
-
-
