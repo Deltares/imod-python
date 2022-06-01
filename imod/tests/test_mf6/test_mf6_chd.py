@@ -1,4 +1,5 @@
 import pathlib
+import tempfile
 import textwrap
 
 import numpy as np
@@ -152,3 +153,26 @@ def test_render_concentration(head_fc, concentration_fc):
         """
     )
     assert actual == expected
+
+pytest.mark.usefixtures("head_fc", "concentration_fc")
+def test_write_concentration_period_data(head_fc, concentration_fc):
+    globaltimes = [
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-01-02"),
+        np.datetime64("2000-01-03"),
+    ]
+    head_fc[:]= 1
+    concentration_fc[:]=2
+    chd = imod.mf6.ConstantHead(
+        head_fc,
+        concentration_fc,
+        "AUX",
+        print_input=True,
+        print_flows=True,
+        save_flows=True,
+    )
+    with tempfile.TemporaryDirectory() as output_dir:
+      chd.write(output_dir,"chd", globaltimes, False)
+      with open(output_dir + "\\chd\\chd-0.dat", "r") as f:
+        data = f.read()
+        assert data.count("2") == 1755
