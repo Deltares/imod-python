@@ -246,11 +246,12 @@ class Package(abc.ABC):
                 raise ValueError(
                     f"{datavar} in {self._pkg_id} package cannot be a scalar"
                 )
-            if datavar == "concentration":
-                if "species" in ds["concentration"].dims:
-                    for species in ds["species"].values:
-                        arrdict[species] = (
-                            ds["concentration"].sel(species=species).values
+            auxiliary_vars = self.get_auxiliary_variable_names()  #returns something like {"concentration": "species"}
+            if datavar in  auxiliary_vars.keys():                 #if datavar is concentration
+                if auxiliary_vars[datavar] in ds[datavar].dims:   #if this concentration array has the species dimension
+                    for s in ds[datavar].values:                  #loop over species
+                        arrdict[s] = (
+                            ds[datavar].sel({auxiliary_vars[datavar]:s}).values  #store species array under its species name
                         )
             else:
                 arrdict[datavar] = ds[datavar].values
@@ -467,6 +468,21 @@ class Package(abc.ABC):
         return result
 
 
+    def add_periodic_auxiliary_variable(self):
+        if hasattr(self, "_auxiliary_data"):
+            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
+                for s in self.dataset[aux_var_name].coords[aux_var_dimensions].values:
+                    self.dataset[s] = self.dataset[aux_var_name].sel(
+                        {aux_var_dimensions: s}
+                    )
+
+    def get_auxiliary_variable_names(self):
+        result = {}
+        if hasattr(self, "_auxiliary_data"):
+            result.update(self._auxiliary_data)
+        return result
+
+
 class BoundaryCondition(Package, abc.ABC):
     """
     BoundaryCondition is used to share methods for specific stress packages with a time component.
@@ -554,13 +570,16 @@ class BoundaryCondition(Package, abc.ABC):
         d = self.get_options(d)
         d["maxbound"] = self._max_active_n()
 
-        if "concentration" in self.dataset.data_vars:
-            if "species" in self.dataset["concentration"].coords:
-                d["auxiliary"] = self.dataset["species"].values
-            else:
-                raise ValueError(
-                    "Boundary concentration requires a species coordinate."
-                )
+        #now we should add the auxiliary variable names to d
+        auxiliaries = self.get_auxiliary_variable_names()  #returns someting like {"concentration": "species"}
+        for auxvar in auxiliaries.keys():                  #loop over the types of auxiliary variables (currently just 1)
+            if auxvar in self.dataset.data_vars:           #if "concentration" is a variable of this dataset
+                if auxiliaries[auxvar] in self.dataset[auxvar].coords:   #if our concentration dataset has the species coordinate
+                    d["auxiliary"] = self.dataset[ auxiliaries[auxvar]].values   #assign the species names list to d
+                else:
+                    raise ValueError(
+                        "Boundary concentration requires a species coordinate."
+                    )
 
         return self._template.render(d)
 
@@ -600,14 +619,6 @@ class BoundaryCondition(Package, abc.ABC):
             pkgname=pkgname,
             binary=binary,
         )
-
-    def add_periodic_auxiliary_variable(self):
-        if hasattr(self, "_auxiliary_data"):
-            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
-                for s in self.dataset[aux_var_name].coords[aux_var_dimensions].values:
-                    self.dataset[s] = self.dataset[aux_var_name].sel(
-                        {aux_var_dimensions: s}
-                    )
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
