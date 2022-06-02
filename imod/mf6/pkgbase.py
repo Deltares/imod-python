@@ -587,13 +587,13 @@ class BoundaryCondition(Package, abc.ABC):
             # if "concentration" is a variable of this dataset
             if auxvar in self.dataset.data_vars:
 
-                 # if our concentration dataset has the species coordinate
-                if  auxiliaries[auxvar] in self.dataset[auxvar].coords:
+                # if our concentration dataset has the species coordinate
+                if auxiliaries[auxvar] in self.dataset[auxvar].coords:
 
                     # assign the species names list to d
                     d["auxiliary"] = self.dataset[auxiliaries[auxvar]].values
                 else:
-                    #the error message is more specific than the code at this point.
+                    # the error message is more specific than the code at this point.
                     raise ValueError(
                         "Boundary concentration requires a species coordinate."
                     )
