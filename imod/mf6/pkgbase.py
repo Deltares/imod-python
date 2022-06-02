@@ -246,12 +246,18 @@ class Package(abc.ABC):
                 raise ValueError(
                     f"{datavar} in {self._pkg_id} package cannot be a scalar"
                 )
-            auxiliary_vars = self.get_auxiliary_variable_names()  #returns something like {"concentration": "species"}
-            if datavar in  auxiliary_vars.keys():                 #if datavar is concentration
-                if auxiliary_vars[datavar] in ds[datavar].dims:   #if this concentration array has the species dimension
-                    for s in ds[datavar].values:                  #loop over species
+            auxiliary_vars = (
+                self.get_auxiliary_variable_names()
+            )  # returns something like {"concentration": "species"}
+            if datavar in auxiliary_vars.keys():  # if datavar is concentration
+                if (
+                    auxiliary_vars[datavar] in ds[datavar].dims
+                ):  # if this concentration array has the species dimension
+                    for s in ds[datavar].values:  # loop over species
                         arrdict[s] = (
-                            ds[datavar].sel({auxiliary_vars[datavar]:s}).values  #store species array under its species name
+                            ds[datavar]
+                            .sel({auxiliary_vars[datavar]: s})
+                            .values  # store species array under its species name
                         )
             else:
                 arrdict[datavar] = ds[datavar].values
@@ -468,7 +474,6 @@ class Package(abc.ABC):
                         result.append(s)
         return result
 
-
     def add_periodic_auxiliary_variable(self):
         if hasattr(self, "_auxiliary_data"):
             for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
@@ -571,13 +576,24 @@ class BoundaryCondition(Package, abc.ABC):
         d = self.get_options(d)
         d["maxbound"] = self._max_active_n()
 
-        #now we should add the auxiliary variable names to d
-        auxiliaries = self.get_auxiliary_variable_names()  #returns someting like {"concentration": "species"}
-        for auxvar in auxiliaries.keys():                  #loop over the types of auxiliary variables (currently just 1)
-            if auxvar in self.dataset.data_vars:           #if "concentration" is a variable of this dataset
-                if auxiliaries[auxvar] in self.dataset[auxvar].coords:   #if our concentration dataset has the species coordinate
-                    d["auxiliary"] = self.dataset[ auxiliaries[auxvar]].values   #assign the species names list to d
+        # now we should add the auxiliary variable names to d
+        auxiliaries = (
+            self.get_auxiliary_variable_names()
+        )  # returns someting like {"concentration": "species"}
+
+        # loop over the types of auxiliary variables (for esxample concentration
+        for auxvar in auxiliaries.keys():
+
+            # if "concentration" is a variable of this dataset
+            if auxvar in self.dataset.data_vars:
+
+                 # if our concentration dataset has the species coordinate
+                if  auxiliaries[auxvar] in self.dataset[auxvar].coords:
+
+                    # assign the species names list to d
+                    d["auxiliary"] = self.dataset[auxiliaries[auxvar]].values
                 else:
+                    #the error message is more specific than the code at this point.
                     raise ValueError(
                         "Boundary concentration requires a species coordinate."
                     )
