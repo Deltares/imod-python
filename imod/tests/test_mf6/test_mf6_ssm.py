@@ -20,7 +20,6 @@ def test_transport_model_rendering(flow_model_with_concentration):
 
         begin sources
             # pname          srctype           auxname
-
             riv-1   AUX   salinity
         end sources"""
     )

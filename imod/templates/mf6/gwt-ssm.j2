@@ -4,8 +4,7 @@ begin options
 end options
 
 begin sources
-    # pname          srctype           auxname
-{% for name, srctype in flowboundaries.items() %}
+    # pname          srctype           auxname{% for name, srctype in flowboundaries.items() %}
     {{name}}   {{srctype}}   {{auxname}}
 {%- endfor %}
 end sources

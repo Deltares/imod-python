@@ -186,11 +186,11 @@ class GroundwaterFlowModel(Modflow6Model):
 
 
 class GroundwaterTransportModel(Modflow6Model):
-    def __init__(self, flowModel=None, state_variable_name=None):
+    def __init__(self, flow_model, state_variable_name):
         super().__init__()
         self._initialize_template()
-        if flowModel is not None:
-            self["ssm"] = ssm.Transport_Sink_Sources(flowModel, state_variable_name)
+        if flow_model is not None:
+            self["ssm"] = ssm.Transport_Sink_Sources(flow_model, state_variable_name)
 
     def render(self, modelname: str):
         """Render model namefile"""
