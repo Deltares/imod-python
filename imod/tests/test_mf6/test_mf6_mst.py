@@ -123,7 +123,7 @@ def test_wrong_decay_order(
     porosity_fc, decay_fc, decay_sorbed_fc, bulk_density_fc, distcoef_fc, sp2_fc
 ):
     with pytest.raises(ValueError):
-        m = MobileStorage(
+        MobileStorage(
             porosity_fc,
             decay=decay_fc,
             decay_sorbed=decay_sorbed_fc,
