@@ -14,6 +14,7 @@ from .fixtures.mf6_flow_with_tranpsort_fixture import (
     concentration_fc,
     conductance_fc,
     elevation_fc,
+    flow_model_with_concentration,
     head_fc,
     proportion_depth_fc,
     proportion_rate_fc,
