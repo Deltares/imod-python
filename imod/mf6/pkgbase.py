@@ -136,6 +136,7 @@ class Package(abc.ABC):
         return return_cls
 
     def __init__(self, allargs=None):
+        self.string_data = {}
         if allargs is not None:
             for arg in allargs.values():
                 if isinstance(arg, xu.UgridDataArray):
