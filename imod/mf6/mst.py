@@ -1,3 +1,5 @@
+import string
+
 import numpy as np
 
 from imod.mf6.pkgbase import Package, VariableMetaData
@@ -36,11 +38,8 @@ class MobileStorage(Package):
         Indicates that recharge flow terms will be written to the file specified
         with "BUDGET FILEOUT" in Output Control.
         Default is False.
-    first_order_decay: ({ True, False}, optional)
-        Indicates that first-order decay will occur. Requires decay to be specified
-        (decay_sorbed too if sorption is active)
-    zero_order_decay: ({ True, False}, optional)
-        Indicates that zero-order decay will occur. Requires decay to be specified
+    decay_order: ({ first, zero}, optional)
+        Indicates wheter decay is first-order or zero-order decay. Requires decay to be specified
         (decay_sorbed too if sorption is active)
     sorption: ({Linear, Freundlich, Langmuir}, optional)
         Type of sorption, if any
@@ -75,8 +74,7 @@ class MobileStorage(Package):
         distcoef=None,
         sp2=None,
         save_flows=False,
-        first_order_decay=False,
-        zero_order_decay=False,
+        decay_order: string = "first",
         sorption=None,
     ):
         super().__init__(locals())
@@ -88,8 +86,12 @@ class MobileStorage(Package):
         self.dataset["sp2"] = sp2
 
         self.dataset["save_flows"] = save_flows
-        self.dataset["first_order_decay"] = first_order_decay
-        self.dataset["zero_order_decay"] = zero_order_decay
+        if decay_order.lower().strip() == "zero":
+            self.dataset["zero_order_decay"] = decay
+        elif decay_order.lower().strip() == "first":
+            self.dataset["first_order_decay"] = decay
+        elif decay_order is not None:
+            raise ValueError("decay_order should be \"first\" or \"zero\" when present")
         if sorption is not None:
             self.string_data["sorption"] = sorption
 
