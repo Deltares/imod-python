@@ -87,7 +87,6 @@ def elevation_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    # Constant head
     elevation = xr.full_like(idomain, np.nan)
     return elevation
 
@@ -97,7 +96,6 @@ def rate_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    # Constant head
     elevation = xr.full_like(idomain, np.nan)
     return elevation
 
@@ -107,7 +105,6 @@ def proportion_rate_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    # Constant head
     proportion_rate = xr.full_like(idomain, np.nan)
     return proportion_rate
 
@@ -117,9 +114,62 @@ def proportion_depth_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    # Constant head
     proportion_rate = xr.full_like(idomain, np.nan)
     return proportion_rate
+
+
+@pytest.fixture(scope="session")
+def porosity_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    porosity_fc = xr.full_like(idomain, np.nan)
+    return porosity_fc
+
+
+@pytest.fixture(scope="session")
+def decay_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    decay_fc = xr.full_like(idomain, np.nan)
+    return decay_fc
+
+
+@pytest.fixture(scope="session")
+def decay_sorbed_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    decay_sorbed_fc = xr.full_like(idomain, np.nan)
+    return decay_sorbed_fc
+
+
+@pytest.fixture(scope="session")
+def bulk_density_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    bulk_density_fc = xr.full_like(idomain, np.nan)
+    return bulk_density_fc
+
+
+@pytest.fixture(scope="session")
+def distcoef_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    distcoef_fc = xr.full_like(idomain, np.nan)
+    return distcoef_fc
+
+
+@pytest.fixture(scope="session")
+def sp2_fc():
+
+    idomain = get_data_array(grid_dimensions(), globaltimes)
+
+    sp2_fc = xr.full_like(idomain, np.nan)
+    return sp2_fc
 
 
 @pytest.fixture(scope="session")
