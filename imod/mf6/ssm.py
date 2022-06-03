@@ -1,13 +1,11 @@
 from imod.mf6.pkgbase import BoundaryCondition
-
+from typing import Dict
 
 class Transport_Sink_Sources(BoundaryCondition):
     _pkg_id = "ssm"
-    _flow_boundary_packages = None
     _template = BoundaryCondition._initialize_template(_pkg_id)
-    _aux_variable_name = ""
 
-    def __init__(self, flow_packages, aux_variable_name):
+    def __init__(self, flow_packages: Dict[str, BoundaryCondition], aux_variable_name: str):
         self._flow_boundary_packages = flow_packages
         self._aux_variable_name = aux_variable_name
 
