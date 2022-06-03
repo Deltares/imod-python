@@ -119,18 +119,17 @@ def test_render_zero_order_decay(
     assert actual == expected
 
 
-
 def test_wrong_decay_order(
     porosity_fc, decay_fc, decay_sorbed_fc, bulk_density_fc, distcoef_fc, sp2_fc
 ):
     with pytest.raises(ValueError):
-      m = MobileStorage(
-          porosity_fc,
-          decay=decay_fc,
-          decay_sorbed=decay_sorbed_fc,
-          bulk_density=bulk_density_fc,
-          distcoef=distcoef_fc,
-          sp2=sp2_fc,
-          sorption="Langmuir",
-          decay_order="second",
-      )
+        m = MobileStorage(
+            porosity_fc,
+            decay=decay_fc,
+            decay_sorbed=decay_sorbed_fc,
+            bulk_density=bulk_density_fc,
+            distcoef=distcoef_fc,
+            sp2=sp2_fc,
+            sorption="Langmuir",
+            decay_order="second",
+        )
