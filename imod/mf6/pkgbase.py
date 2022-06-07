@@ -478,7 +478,8 @@ class Package(abc.ABC):
     def add_periodic_auxiliary_variable(self):
         if hasattr(self, "_auxiliary_data"):
             for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
-                for s in self.dataset[aux_var_name].coords[aux_var_dimensions].values:
+                aux_coords = self.dataset[aux_var_name].coords[aux_var_dimensions].values
+                for s in aux_coords:
                     self.dataset[s] = self.dataset[aux_var_name].sel(
                         {aux_var_dimensions: s}
                     )
@@ -582,7 +583,7 @@ class BoundaryCondition(Package, abc.ABC):
             self.get_auxiliary_variable_names()
         )  # returns someting like {"concentration": "species"}
 
-        # loop over the types of auxiliary variables (for esxample concentration
+        # loop over the types of auxiliary variables (for example concentration)
         for auxvar in auxiliaries.keys():
 
             # if "concentration" is a variable of this dataset
@@ -596,7 +597,7 @@ class BoundaryCondition(Package, abc.ABC):
                 else:
                     # the error message is more specific than the code at this point.
                     raise ValueError(
-                        "Boundary concentration requires a species coordinate."
+                        f"{aux_var_name} requires a {auxiliaries[auxvar]} coordinate."
                     )
 
         return self._template.render(d)
