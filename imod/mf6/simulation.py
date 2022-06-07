@@ -135,6 +135,7 @@ class Modflow6Simulation(collections.UserDict):
         d["solutiongroups"] = [[("ims6", f"{solvername}.ims", modelnames)]]
         return self._template.render(d)
 
+
     def write(self, directory=".", binary=True):
         # Check models for required content
         for key, model in self.items():
@@ -201,19 +202,21 @@ class Modflow6Simulation(collections.UserDict):
         result = []
         flowmodels = self.get_models_of_type("gwf6")
         transportmodels = self.get_models_of_type("gwt6")
+        counter = 0
         if len(flowmodels) == 1 and len(transportmodels) > 0:
             exchange_type = "GWF6-GWT6"
             modelname_a = list(flowmodels.keys())[0]
-            for counter, key in enumerate(transportmodels.keys()):
+            for key in transportmodels.keys():
                 filename = "simulation{}.exg".format(counter)
                 modelname_b = key
+                counter = counter + 1
                 result.append((exchange_type, filename, modelname_a, modelname_b))
         return result
 
     def get_models_of_type(self, modeltype):
-        result = {}
-        for key, value in self.items():
-            if value._pkg_id == "model":
-                if value._model_type == modeltype:
-                    result[key] = value
-        return result
+            result = {}
+            for key, value in self.items():
+                if value._pkg_id == "model":
+                    if value._model_type == modeltype:
+                        result[key] = value
+            return result
