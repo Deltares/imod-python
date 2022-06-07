@@ -136,6 +136,7 @@ class Package(abc.ABC):
         return return_cls
 
     def __init__(self, allargs=None):
+        self.string_data = {}
         if allargs is not None:
             for arg in allargs.values():
                 if isinstance(arg, xu.UgridDataArray):
@@ -246,11 +247,18 @@ class Package(abc.ABC):
                 raise ValueError(
                     f"{datavar} in {self._pkg_id} package cannot be a scalar"
                 )
-            if datavar == "concentration":
-                if "species" in ds["concentration"].dims:
-                    for species in ds["species"].values:
-                        arrdict[species] = (
-                            ds["concentration"].sel(species=species).values
+            auxiliary_vars = (
+                self.get_auxiliary_variable_names()
+            )  # returns something like {"concentration": "species"}
+            if datavar in auxiliary_vars.keys():  # if datavar is concentration
+                if (
+                    auxiliary_vars[datavar] in ds[datavar].dims
+                ):  # if this concentration array has the species dimension
+                    for s in ds[datavar].values:  # loop over species
+                        arrdict[s] = (
+                            ds[datavar]
+                            .sel({auxiliary_vars[datavar]: s})
+                            .values  # store species array under its species name
                         )
             else:
                 arrdict[datavar] = ds[datavar].values
@@ -455,7 +463,34 @@ class Package(abc.ABC):
     def _pkgcheck(self):
         self._check_types()
 
-    string_data = {}
+    def period_data(self):
+        result = []
+        result += self._period_data
+        if hasattr(self, "_auxiliary_data"):
+            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
+                if aux_var_name in self.dataset.keys():
+                    for s in (
+                        self.dataset[aux_var_name].coords[aux_var_dimensions].values
+                    ):
+                        result.append(s)
+        return result
+
+    def add_periodic_auxiliary_variable(self):
+        if hasattr(self, "_auxiliary_data"):
+            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
+                aux_coords = (
+                    self.dataset[aux_var_name].coords[aux_var_dimensions].values
+                )
+                for s in aux_coords:
+                    self.dataset[s] = self.dataset[aux_var_name].sel(
+                        {aux_var_dimensions: s}
+                    )
+
+    def get_auxiliary_variable_names(self):
+        result = {}
+        if hasattr(self, "_auxiliary_data"):
+            result.update(self._auxiliary_data)
+        return result
 
 
 class BoundaryCondition(Package, abc.ABC):
@@ -473,7 +508,7 @@ class BoundaryCondition(Package, abc.ABC):
         Determine the maximum active number of cells that are active
         during a stress period.
         """
-        da = self.dataset[self._period_data[0]]
+        da = self.dataset[self.period_data()[0]]
         if "time" in da.coords:
             nmax = int(da.groupby("time").count(xr.ALL_DIMS).max())
         else:
@@ -524,7 +559,7 @@ class BoundaryCondition(Package, abc.ABC):
 
     def get_options(self, d, not_options=None):
         if not_options is None:
-            not_options = self._period_data
+            not_options = self.period_data()
 
         for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
@@ -537,7 +572,7 @@ class BoundaryCondition(Package, abc.ABC):
     def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {"binary": binary}
-        bin_ds = self[list(self._period_data)]
+        bin_ds = self[self.period_data()]
         d["periods"] = self.period_paths(
             directory, pkgname, globaltimes, bin_ds, binary
         )
@@ -545,18 +580,32 @@ class BoundaryCondition(Package, abc.ABC):
         d = self.get_options(d)
         d["maxbound"] = self._max_active_n()
 
-        if "concentration" in self.dataset.data_vars:
-            if "species" in self.dataset["concentration"].coords:
-                d["auxiliary"] = self.dataset["species"].values
-            else:
-                raise ValueError(
-                    "Boundary concentration requires a species coordinate."
-                )
+        # now we should add the auxiliary variable names to d
+        auxiliaries = (
+            self.get_auxiliary_variable_names()
+        )  # returns someting like {"concentration": "species"}
+
+        # loop over the types of auxiliary variables (for example concentration)
+        for auxvar in auxiliaries.keys():
+
+            # if "concentration" is a variable of this dataset
+            if auxvar in self.dataset.data_vars:
+
+                # if our concentration dataset has the species coordinate
+                if auxiliaries[auxvar] in self.dataset[auxvar].coords:
+
+                    # assign the species names list to d
+                    d["auxiliary"] = self.dataset[auxiliaries[auxvar]].values
+                else:
+                    # the error message is more specific than the code at this point.
+                    raise ValueError(
+                        f"{auxvar} requires a {auxiliaries[auxvar]} coordinate."
+                    )
 
         return self._template.render(d)
 
     def write_perioddata(self, directory, pkgname, binary):
-        bin_ds = self[list(self._period_data)]
+        bin_ds = self[self.period_data()]
 
         if binary:
             ext = "bin"
@@ -591,8 +640,6 @@ class BoundaryCondition(Package, abc.ABC):
             pkgname=pkgname,
             binary=binary,
         )
-
-    string_data = {}
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
