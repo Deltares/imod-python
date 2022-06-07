@@ -580,7 +580,7 @@ class BoundaryCondition(Package, abc.ABC):
             self.get_auxiliary_variable_names()
         )  # returns someting like {"concentration": "species"}
 
-        # loop over the types of auxiliary variables (for esxample concentration
+        # loop over the types of auxiliary variables (for example concentration)
         for auxvar in auxiliaries.keys():
 
             # if "concentration" is a variable of this dataset
