@@ -10,6 +10,8 @@ from imod.mf6 import qgs_util, ssm
 
 
 class Modflow6Model(collections.UserDict, abc.ABC):
+
+    _pkg_id = "model"
     def __setitem__(self, key, value):
         # TODO: Add packagecheck
         super().__setitem__(key, value)
@@ -43,7 +45,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         dispresent = "dis" in pkg_ids or "disv" in pkg_ids or "disu" in pkg_ids
         if not dispresent:
             raise ValueError(f"No dis/disv/disu package found in model {modelkey}")
-        for required in ["npf", "ic", "oc", "sto"]:
+        for required in self._mandatory_packages:
             if required not in pkg_ids:
                 raise ValueError(f"No {required} package found in model {modelkey}")
         return
@@ -119,10 +121,18 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 binary=binary,
             )
 
+    def take_discretization_from_model(self, other):
+        # Check for mandatory packages
+        discretization_ids = ("dis", "disv", "disu")
+        flow_pkg_ids = set([pkg._pkg_id for pkg in other.values()])
+        for id in discretization_ids:
+            if id in flow_pkg_ids:
+                self[id] = other[id]
+
 
 class GroundwaterFlowModel(Modflow6Model):
-    _pkg_id = "model"
     _mandatory_packages = ("npf", "ic", "oc", "sto")
+    _model_type = "gwf6"
 
     def __init__(self, newton=False, under_relaxation=False):
         super().__init__()
@@ -186,6 +196,10 @@ class GroundwaterFlowModel(Modflow6Model):
 
 
 class GroundwaterTransportModel(Modflow6Model):
+
+    _mandatory_packages = ("mst", "dsp", "oc", "ic")
+    _model_type = "gwt6"
+
     def __init__(self, flow_model, state_variable_name):
         super().__init__()
         self._initialize_template()

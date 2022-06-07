@@ -160,7 +160,7 @@ simulation.create_time_discretization(additional_times=simtimes)
 transport_model = imod.mf6.model.GroundwaterTransportModel(gwf_model, "salinity")
 transport_model["dsp"] = imod.mf6.Dispersion(1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, False, False)
 transport_model["adv"] = imod.mf6.AdvectionUpstream()
-transport_model["ic"] = imod.mf6.InitialConditions(start=1.0)
+transport_model["ic"] = imod.mf6.InitialConditions(start=0.0)
 transport_model["mst"] = imod.mf6.MobileStorage(0.3)
 transport_model["oc"] = imod.mf6.OutputControl(save_concentration="all", save_budget="last")
 transport_model.take_discretization_from_model(gwf_model)
@@ -197,7 +197,7 @@ head = imod.mf6.out.open_hds(
 )
 head
 
-sim_concentration = imod.mf6.out.open_hds(
+sim_concentration = imod.mf6.out.open_conc(
     modeldir / "GWT_1/GWT_1.ucn",
     modeldir / "GWF_1/disv.disv.grb",
 )
@@ -238,7 +238,7 @@ ds["v"] = cbc["flow-horizontal-face-y"]
 # provided by xarray and xugrid:
 
 fig, ax = plt.subplots()
-sim_concentration.isel(time=90, layer=0).ugrid.plot(ax=ax)
+sim_concentration.isel(time=15, layer=0).ugrid.plot(ax=ax)
 ax.set_aspect(1)
 
 # %%

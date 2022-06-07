@@ -1,6 +1,7 @@
+from threading import local
 from typing import Dict
 
-from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.pkgbase import BoundaryCondition, Package
 
 
 class Transport_Sink_Sources(BoundaryCondition):
@@ -8,8 +9,9 @@ class Transport_Sink_Sources(BoundaryCondition):
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
-        self, flow_packages: Dict[str, BoundaryCondition], aux_variable_name: str
+        self, flow_packages: Dict[str, Package], aux_variable_name: str
     ):
+        super().__init__()
         self.flow_boundary_packages = flow_packages
         self.aux_variable_name = aux_variable_name
 

@@ -117,19 +117,24 @@ class Modflow6Simulation(collections.UserDict):
         solvername = None
         models = []
         modelnames = []
+
         for key, value in self.items():
             if value._pkg_id == "tdis":
                 d["tdis6"] = f"{key}.tdis"
             elif value._pkg_id == "model":
-                models.append(("gwf6", f"{key}/{key}.nam", key))
+                models.append((value._model_type, f"{key}/{key}.nam", key))
                 modelnames.append(key)
             elif value._pkg_id == "ims":
                 solvername = key
         d["models"] = models
+        if len(models) > 1:
+            d["exchanges"] = self.get_exchange_relationships()
+
         if solvername is None:
             raise ValueError("No numerical solution")
         d["solutiongroups"] = [[("ims6", f"{solvername}.ims", modelnames)]]
         return self._template.render(d)
+
 
     def write(self, directory=".", binary=True):
         # Check models for required content
@@ -192,3 +197,26 @@ class Modflow6Simulation(collections.UserDict):
                     value.write_qgis_project(
                         key, crs, aggregate_layers=aggregate_layers
                     )
+
+    def get_exchange_relationships(self):
+        result = []
+        flowmodels = self.get_models_of_type("gwf6")
+        transportmodels = self.get_models_of_type("gwt6")
+        counter = 0
+        if len(flowmodels) == 1 and len(transportmodels) > 0:
+            exchange_type = "GWF6-GWT6"
+            modelname_a = list(flowmodels.keys())[0]
+            for key in transportmodels.keys():
+                filename = "simulation{}.exg".format(counter)
+                modelname_b = key
+                counter = counter + 1
+                result.append((exchange_type, filename, modelname_a, modelname_b))
+        return result
+
+    def get_models_of_type(self, modeltype):
+            result = {}
+            for key, value in self.items():
+                if value._pkg_id == "model":
+                    if value._model_type == modeltype:
+                        result[key] = value
+            return result

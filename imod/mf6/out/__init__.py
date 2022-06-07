@@ -125,6 +125,33 @@ def open_hds(
     _open = _get_function(_OPEN_HDS, distype)
     return _open(hds_path, grb_content, dry_nan)
 
+def open_conc(
+    ucn_path: FilePath, grb_path: FilePath, dry_nan: bool = False
+) -> Union[xr.DataArray, xu.UgridDataArray]:
+    """
+    Open modflow6 heads (.hds) file.
+
+    The data is lazily read per timestep and automatically converted into
+    DataArrays. The conversion is done via the information stored in the Binary
+    Grid file (GRB).
+
+    Parameters
+    ----------
+    hds_path: Union[str, pathlib.Path]
+    grb_path: Union[str, pathlib.Path]
+    dry_nan: bool, default value: False.
+        Whether to convert dry values to NaN.
+
+    Returns
+    -------
+    concentration: Union[xr.DataArray, xu.UgridDataArray]
+    """
+    grb_content = read_grb(grb_path)
+    grb_content["name"] = "concentration"
+    distype = grb_content["distype"]
+    _open = _get_function(_OPEN_HDS, distype)
+    return _open(ucn_path, grb_content, dry_nan)
+
 
 def open_hds_like(
     path: FilePath,
