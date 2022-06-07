@@ -178,7 +178,7 @@ def test_write_concentration_period_data(head_fc, concentration_fc):
     )
     with tempfile.TemporaryDirectory() as output_dir:
         chd.write(output_dir, "chd", globaltimes, False)
-        with open(output_dir + "\\chd\\chd-0.dat", "r") as f:
+        with open(output_dir + "/chd/chd-0.dat", "r") as f:
             data = f.read()
             assert (
                 data.count("2") == 1755
