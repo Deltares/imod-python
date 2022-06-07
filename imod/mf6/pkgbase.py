@@ -476,7 +476,8 @@ class Package(abc.ABC):
     def add_periodic_auxiliary_variable(self):
         if hasattr(self, "_auxiliary_data"):
             for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
-                for s in self.dataset[aux_var_name].coords[aux_var_dimensions].values:
+                aux_coords = self.dataset[aux_var_name].coords[aux_var_dimensions].values
+                for s in aux_coords:
                     self.dataset[s] = self.dataset[aux_var_name].sel(
                         {aux_var_dimensions: s}
                     )
