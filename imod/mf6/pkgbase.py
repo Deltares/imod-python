@@ -594,7 +594,7 @@ class BoundaryCondition(Package, abc.ABC):
                 else:
                     # the error message is more specific than the code at this point.
                     raise ValueError(
-                        "Boundary concentration requires a species coordinate."
+                        f"{aux_var_name} requires a {auxiliaries[auxvar]} coordinate."
                     )
 
         return self._template.render(d)
