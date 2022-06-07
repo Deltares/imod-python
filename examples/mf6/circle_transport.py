@@ -16,19 +16,22 @@ In overview, we'll set the following steps:
 # %%
 # We'll start with the following imports:
 
+from datetime import date, timedelta
+
 import matplotlib.pyplot as plt
 import meshzoo
 import numpy as np
 import xarray as xr
 import xugrid as xu
-from datetime import timedelta, date
+
 import imod
 
 
-#helper function for creating iterable with all dates between two dates
+# helper function for creating iterable with all dates between two dates
 def daterange(date1, date2):
-    for n in range(int ((date2 - date1).days)+1):
+    for n in range(int((date2 - date1).days) + 1):
         yield date1 + timedelta(n)
+
 
 # %%
 # Create a mesh
@@ -63,7 +66,7 @@ bottom = idomain * xr.DataArray([5.0, 0.0], dims=["layer"])
 # we need a recharge rate for the fluid and a recharge rate for the solute.
 # The fluid recharge rate is volumetric and per unit area, so the unit is Length/time
 # The solute recharge rate is the concentration of solute in the recharge, and has concentration units.
-rch_rate = xu.full_like(idomain.sel(layer=1), 0.1, dtype=float)
+rch_rate = xu.full_like(idomain.sel(layer=1), 0.001, dtype=float)
 rch_concentration = xu.full_like(rch_rate, 1.0)
 rch_concentration = rch_concentration.expand_dims(species=["salinity"])
 
@@ -76,16 +79,14 @@ rch_concentration = rch_concentration.expand_dims(species=["salinity"])
 # concentration that was computed for it.
 #
 # In this example we set the prescribed head value to 1 and the external concentration to 1 as well.
+# the boundary only operates on the top layer.
 
-chd_location = xu.zeros_like(idomain.sel(layer=2), dtype=bool).ugrid.binary_dilation(
+chd_location = xu.zeros_like(idomain.sel(layer=1), dtype=bool).ugrid.binary_dilation(
     border_value=True
 )
-constant_head = xu.full_like(idomain.sel(layer=2), 1.0, dtype=float).where(chd_location)
+constant_head = xu.full_like(idomain, 1.0, dtype=float).where(chd_location)
 constant_concentration = xu.full_like(constant_head, 1)
 constant_concentration = constant_concentration.expand_dims(species=["salinity"])
-
-
-
 
 
 # %%
@@ -99,7 +100,11 @@ gwf_model["disv"] = imod.mf6.VerticesDiscretization(
     top=10.0, bottom=bottom, idomain=idomain
 )
 gwf_model["chd"] = imod.mf6.ConstantHead(
-    constant_head, concentration=constant_concentration, print_input=True, print_flows=True, save_flows=True
+    constant_head,
+    concentration=constant_concentration,
+    print_input=True,
+    print_flows=True,
+    save_flows=True,
 )
 gwf_model["ic"] = imod.mf6.InitialConditions(head=0.0)
 gwf_model["npf"] = imod.mf6.NodePropertyFlow(
@@ -115,7 +120,9 @@ gwf_model["sto"] = imod.mf6.SpecificStorage(
     convertible=0,
 )
 gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
-gwf_model["rch"] = imod.mf6.Recharge(rch_rate, concentration=rch_concentration, print_flows=True, save_flows=True)
+gwf_model["rch"] = imod.mf6.Recharge(
+    rch_rate, concentration=rch_concentration, print_flows=True, save_flows=True
+)
 
 simulation = imod.mf6.Modflow6Simulation("circle")
 simulation["GWF_1"] = gwf_model
@@ -134,7 +141,7 @@ simulation["solver"] = imod.mf6.Solution(
     reordering_method=None,
     relaxation_factor=0.97,
 )
-simtimes = daterange(date(2000, 1,1), date(2000, 10,10))
+simtimes = daterange(date(2000, 1, 1), date(2000, 10, 10))
 simulation.create_time_discretization(additional_times=simtimes)
 
 
@@ -151,15 +158,19 @@ transport_model.take_discretization_from_model(gwf_model)
 # Now we define some transport packages for simulating the physical processes of  advection, molecular
 # diffusion and mechanical dispersion.
 # This example is transient, and the volume available for storage is the porosity, in this case 0.3
-transport_model["dsp"] = imod.mf6.Dispersion(1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, False, False)
+transport_model["dsp"] = imod.mf6.Dispersion(
+    1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, False, False
+)
 transport_model["adv"] = imod.mf6.AdvectionUpstream()
 transport_model["mst"] = imod.mf6.MobileStorage(0.3)
 
 # Now we define initial conditions (0) and output options for the transport simulation
 transport_model["ic"] = imod.mf6.InitialConditions(start=0.0)
-transport_model["oc"] = imod.mf6.OutputControl(save_concentration="all", save_budget="last")
+transport_model["oc"] = imod.mf6.OutputControl(
+    save_concentration="all", save_budget="last"
+)
 
-#assign the transport model to the simulation
+# assign the transport model to the simulation
 simulation["GWT_1"] = transport_model
 
 
@@ -199,9 +210,9 @@ sim_concentration = imod.mf6.out.open_conc(
 # provided by xarray and xugrid:
 
 fig, ax = plt.subplots()
-sim_concentration.isel(time=15, layer=0).ugrid.plot(ax=ax)
+sim_concentration.isel(time=33, layer=0).ugrid.plot(ax=ax)
 ax.set_aspect(1)
 
 # %%
-# As would be expected from our model input, we observe the initial water (without solute) slowly
+# we observe the initial water (without solute) slowly
 # being flushed out by water coming in from the recharge with a concentration of 1.

@@ -135,7 +135,6 @@ class Modflow6Simulation(collections.UserDict):
         d["solutiongroups"] = [[("ims6", f"{solvername}.ims", modelnames)]]
         return self._template.render(d)
 
-
     def write(self, directory=".", binary=True):
         # Check models for required content
         for key, model in self.items():
@@ -214,9 +213,9 @@ class Modflow6Simulation(collections.UserDict):
         return result
 
     def get_models_of_type(self, modeltype):
-            result = {}
-            for key, value in self.items():
-                if value._pkg_id == "model":
-                    if value._model_type == modeltype:
-                        result[key] = value
-            return result
+        result = {}
+        for key, value in self.items():
+            if value._pkg_id == "model":
+                if value._model_type == modeltype:
+                    result[key] = value
+        return result

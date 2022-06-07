@@ -12,6 +12,7 @@ from imod.mf6 import qgs_util, ssm
 class Modflow6Model(collections.UserDict, abc.ABC):
 
     _pkg_id = "model"
+
     def __setitem__(self, key, value):
         # TODO: Add packagecheck
         super().__setitem__(key, value)
