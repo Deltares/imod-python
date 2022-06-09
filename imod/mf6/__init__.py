@@ -17,7 +17,7 @@ from imod.mf6.ims import (
     SolutionPresetModerate,
     SolutionPresetSimple,
 )
-from imod.mf6.model import GroundwaterFlowModel
+from imod.mf6.model import GroundwaterFlowModel, GroundwaterTransportModel
 from imod.mf6.mst import MobileStorage
 from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.oc import OutputControl
