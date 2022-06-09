@@ -131,12 +131,15 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 self[newkey]= package
 
 
-    def generate_unique_key(self, base):
-        if base is None or base == "":
-            base = "a"
-        if base in self.keys():
-            base = self.generate_unique_key(base + "x")
-        return base
+    def generate_unique_key(self, suggested_key):
+         # operates on a dictionary. If the suggested key is not in use, then the suggested key is the return value of
+         # the function. if it is in use, characters are appended until a unique key is obtained.
+        result = suggested_key
+        if result is None or result == "":
+            result = "a"
+        if result in self.keys():
+            result = self.generate_unique_key(result + "X")
+        return result
 
 
 
