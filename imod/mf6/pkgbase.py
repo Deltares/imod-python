@@ -312,9 +312,9 @@ class Package(abc.ABC):
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         if directory is None:
-            pkg_directory = self._pkg_id
+            pkg_directory = pkgname
         else:
-            pkg_directory = directory / self._pkg_id
+            pkg_directory = directory / pkgname
         for varname in self.dataset.data_vars:
             key = self._keyword_map.get(varname, varname)
 
