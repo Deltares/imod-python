@@ -488,8 +488,11 @@ def ugrid2d_data(da: xr.DataArray, face_dim: str) -> xr.DataArray:
         raise ValueError('Last two dimensions of da must be ("y", "x")')
     dims = da.dims[:-2]
     coords = {k: da.coords[k] for k in dims}
+    # Account for xugrid.Ugrid2d.from_structured() making all coordinates
+    # monotonically increasing
+    da_flipped = da.sel(y=slice(None, None, -1))
     return xr.DataArray(
-        da.data.reshape(*da.shape[:-2], -1),
+        da_flipped.data.reshape(*da.shape[:-2], -1),
         coords=coords,
         dims=[*dims, face_dim],
         name=da.name,
