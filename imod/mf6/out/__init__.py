@@ -138,7 +138,7 @@ def open_conc(
 
     Parameters
     ----------
-    hds_path: Union[str, pathlib.Path]
+    ucn_path: Union[str, pathlib.Path]
     grb_path: Union[str, pathlib.Path]
     dry_nan: bool, default value: False.
         Whether to convert dry values to NaN.
