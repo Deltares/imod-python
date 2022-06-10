@@ -130,7 +130,7 @@ def open_conc(
     ucn_path: FilePath, grb_path: FilePath, dry_nan: bool = False
 ) -> Union[xr.DataArray, xu.UgridDataArray]:
     """
-    Open modflow6 heads (.hds) file.
+    Open Modflow6 "Unformatted Concentration" (.ucn) file.
 
     The data is lazily read per timestep and automatically converted into
     DataArrays. The conversion is done via the information stored in the Binary
