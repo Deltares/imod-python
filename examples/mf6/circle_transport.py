@@ -149,7 +149,7 @@ simulation.create_time_discretization(additional_times=simtimes)
 # Write the transport  model
 # ---------------
 #
-# the transport model needs as input the flow field inside the domain computed by the flow model.
+# The transport model needs as input the flow field inside the domain computed by the flow model.
 # It also needs the fluxes over the boundary. It uses the same discretization as the flow model.
 # create a transport model for salinity, give it the flow model, and tell it to use the same discretization.
 transport_model = imod.mf6.model.GroundwaterTransportModel(gwf_model, "salinity")
