@@ -1,11 +1,8 @@
 import textwrap
 
-import xarray as xr
-
 import imod
-from imod.mf6.adv import AdvectionCentral
 import imod.mf6.model
-import numpy as np
+from imod.mf6.adv import AdvectionCentral
 
 
 def test_transport_model_rendering():
@@ -29,9 +26,12 @@ def test_transport_model_rendering():
     )
     assert actual == expected
 
-def test_assign_flow_discretization(basic_dis,):
 
-    #define a grid
+def test_assign_flow_discretization(
+    basic_dis,
+):
+
+    # define a grid
     idomain, _, bottom = basic_dis
 
     gwf_model = imod.mf6.GroundwaterFlowModel()
@@ -39,21 +39,24 @@ def test_assign_flow_discretization(basic_dis,):
         top=200.0, bottom=bottom, idomain=idomain
     )
 
-    #define a transport model, with the key "dis" not in use
+    # define a transport model, with the key "dis" not in use
     tpt_model = imod.mf6.model.GroundwaterTransportModel(gwf_model, "None")
     tpt_model["advection"] = AdvectionCentral()
 
-    #let the transport model take the discretization from the flow model
+    # let the transport model take the discretization from the flow model
     tpt_model.take_discretization_from_model(gwf_model)
 
-    #check that the discretization was added to the transport model
-    assert len(tpt_model.keys())==3
+    # check that the discretization was added to the transport model
+    assert len(tpt_model.keys()) == 3
     assert "dis" in tpt_model.keys()
-    assert isinstance( tpt_model["dis"], imod.mf6.StructuredDiscretization)
+    assert isinstance(tpt_model["dis"], imod.mf6.StructuredDiscretization)
 
-def test_assign_flow_discretization2(basic_dis,):
 
-    #define a grid
+def test_assign_flow_discretization2(
+    basic_dis,
+):
+
+    # define a grid
     idomain, _, bottom = basic_dis
 
     gwf_model = imod.mf6.GroundwaterFlowModel()
@@ -61,14 +64,14 @@ def test_assign_flow_discretization2(basic_dis,):
         top=200.0, bottom=bottom, idomain=idomain
     )
 
-    #define a transport model, with the key "dis" in use
+    # define a transport model, with the key "dis" in use
     tpt_model = imod.mf6.model.GroundwaterTransportModel(gwf_model, "None")
     tpt_model["dis"] = AdvectionCentral()
 
-    #let the transport model take the discretization from the flow model
+    # let the transport model take the discretization from the flow model
     tpt_model.take_discretization_from_model(gwf_model)
 
-    #check that the discretization was added to the transport model
-    assert len(tpt_model.keys())==3
+    # check that the discretization was added to the transport model
+    assert len(tpt_model.keys()) == 3
     assert "disX" in tpt_model.keys()
-    assert  isinstance( tpt_model["disX"], imod.mf6.StructuredDiscretization)
+    assert isinstance(tpt_model["disX"], imod.mf6.StructuredDiscretization)
