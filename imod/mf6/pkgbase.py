@@ -465,7 +465,8 @@ class Package(abc.ABC):
 
     def period_data(self):
         result = []
-        result += self._period_data
+        if hasattr(self, "_period_data"):
+            result += self._period_data
         if hasattr(self, "_auxiliary_data"):
             for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
                 if aux_var_name in self.dataset.keys():
@@ -605,6 +606,8 @@ class BoundaryCondition(Package, abc.ABC):
         return self._template.render(d)
 
     def write_perioddata(self, directory, pkgname, binary):
+        if len(self.period_data()) == 0:
+            return
         bin_ds = self[self.period_data()]
 
         if binary:
