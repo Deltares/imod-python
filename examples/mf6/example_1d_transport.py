@@ -6,14 +6,30 @@ import imod.mf6
 import imod.util
 from datetime import date, timedelta
 
-# helper function for creating iterable with all dates between two dates
+
+#this example is taken from https://modflow6-examples.readthedocs.io/en/master/_examples/ex-gwt-mt3dms-p01.html
+# as explained there, the setup is a simple 1d homogeneous aquifer with a steady state flow field of constant
+# velocity.
+# The benchmark consists of 4 transport problems that are modeled using this flow field. Here we have modeled these 4
+# transport problems as a single simulation with multiple species.
+# In all cases the initial concentration in the domain is zero, but water entering the domain has a concentration of 1.
+# species_a is transported with zero diffusion or dispersion and the concentration distribution should show a sharp front, but due to the numerical method
+# we see some smearing, which is expected.
+# species_b has a sizeable dispersivity and hence shows more smearing than species_a but the same centre of mass
+# species_c has linear sorption and therefore the concentration doesn't enter the domain as far as species_a or species_b,
+# but the front of the solute plume has the same overall shape as for species_a or species_b
+# species_d has linear sorption and first order decay, and this changes the shape of the front of the solute plume
+
+# helper function for creating iterable given starting date and number of days
 def daterange(date1, numberdays):
     for n in range(numberdays):
         yield date1 + timedelta(n)
 
 
-
+#helper function for creating a transport model that simulates advection, dispersion (but zero molecular diffusion),
+#First order decay is modeled if the decay parameter is not zero.
 def create_transport_model (flowmodel, speciesname, dispersivity, retardation, decay):
+
 
     rhobulk = 1150.0
     porosity = 0.25
@@ -22,6 +38,9 @@ def create_transport_model (flowmodel, speciesname, dispersivity, retardation, d
     tpt_model["advection"] = imod.mf6.AdvectionUpstream()
     tpt_model["Dispersion"] = imod.mf6.Dispersion(diffusion_coefficient=0.0,longitudinal_horizontal=dispersivity,transversal_horizontal1=0.0,xt3d_off=False, xt3d_rhs=False)
 
+
+    # compute the sorption coefficient based on the desired retardation factor and the bulk density.
+    # because of this, the exact value of bulk density does not matter for the solution.
     if retardation != 1.0:
         sorption = "linear"
         kd = (
@@ -30,7 +49,6 @@ def create_transport_model (flowmodel, speciesname, dispersivity, retardation, d
     else:
         sorption = None
         kd = 1.0
-
 
     tpt_model["storage"] = imod.mf6.MobileStorage(porosity=porosity, decay=decay,decay_sorbed=decay, bulk_density=rhobulk,distcoef=kd,decay_order="first", sorption=sorption )
 
@@ -65,19 +83,6 @@ grid_dims = ("layer", "y", "x" )
 grid_coords = {"layer": layer, "y": y, "x": x }
 grid_shape = (nlay, nrow, ncol)
 
-
-
-# %%
-# Create DataArrays
-# -----------------
-#
-# Now that we have the grid coordinates setup, we can start defining model
-# parameters. The model is characterized by:
-#
-# * a constant head boundary on the left
-# * a single drain in the center left of the model
-# * uniform recharge on the top layer
-# * a number of wells scattered throughout the model.
 
 grid = xr.DataArray(np.ones(grid_shape, dtype=int), coords=grid_coords, dims=grid_dims)
 
