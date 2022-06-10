@@ -205,7 +205,7 @@ class Modflow6Simulation(collections.UserDict):
         if len(flowmodels) == 1 and len(transportmodels) > 0:
             exchange_type = "GWF6-GWT6"
             modelname_a = list(flowmodels.keys())[0]
-            for key in transportmodels.keys():
+            for counter, key in enumerate(transportmodels.keys()):
                 filename = "simulation{}.exg".format(counter)
                 modelname_b = key
                 counter = counter + 1
