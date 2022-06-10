@@ -530,9 +530,9 @@ def line_3d(polygon, z=0.0):
 
 class GridAnimation3D:
     """
-    Class to easily setup 3D animations for transient data.
-    Use the ``imod.visualize.StaticGridAnimation3D`` when the location of the
-    displayed cells is constant over time: it will render much faster.
+    Class to easily setup 3D animations for transient data. Use the
+    ``imod.visualize.StaticGridAnimation3D`` when the location of the displayed
+    cells is constant over time: it will render much faster.
 
     You can iteratively add or change settings to the plotter, until you're
     satisfied. Call the ``.peek()`` method to take a look. When satisfied, call
@@ -543,13 +543,19 @@ class GridAnimation3D:
     ----------
     da : xr.DataArray
         The dataarray with transient data. Must contain a "time" dimension.
-    vertical_exaggeration : float, defaults to 30.0
-    mesh_kwargs : dict
+    vertical_exaggeration : float, defaults to 30.0 mesh_kwargs : dict
         keyword arguments that are forwarded to the pyvista mesh representing
-        "da". If "stitle" is given as one of the arguments, the special keyword "timestamp"
-        can be used to render the plotted time as part of the title. See example.
+        "da". If "stitle" is given as one of the arguments, the special keyword
+        "timestamp" can be used to render the plotted time as part of the title.
+        See example. For a full list of kwargs supported, see the
+        `plotter.add_mesh
+        <https://docs.pyvista.org/api/plotting/_autosummary/pyvista.Plotter.add_mesh.html#pyvista.Plotter.add_mesh>`_
+        method documentation.
     plotter_kwargs : dict
-        keyword arguments that are forwarded to the pyvista plotter.
+        keyword arguments that are forwarded to the pyvista plotter. For a full
+        list of of kwargs supported, see the `Plotter constructor
+        <https://docs.pyvista.org/api/plotting/_autosummary/pyvista.Plotter.html>`_
+        documention.
 
     Examples
     --------
@@ -558,7 +564,8 @@ class GridAnimation3D:
 
     >>> animation = imod.visualize.GridAnimation3D(concentration, mesh_kwargs=dict(cmap="jet"))
 
-    Check what it looks like (if a window pops up: press "q" instead of the X to return):
+    Check what it looks like (if a window pops up: press "q" instead of the X to
+    return):
 
     >>> animation.peek()
 
@@ -572,14 +579,16 @@ class GridAnimation3D:
 
     >>> animation.write("example.mp4")
 
-    If you've made some changes that don't look good, call ``.reset()`` to start over:
+    If you've made some changes that don't look good, call ``.reset()`` to start
+    over:
 
     >>> animation.reset()
 
-    Note that ``.reset()`` is automatically called when the animation has finished writing.
+    Note that ``.reset()`` is automatically called when the animation has
+    finished writing.
 
-    You can use "stitle" in mesh_kwargs in conjunction with the "timestamp" keyword to print
-    a formatted timestamp in the animation:
+    You can use "stitle" in mesh_kwargs in conjunction with the "timestamp"
+    keyword to print a formatted timestamp in the animation:
 
     >>> animation = imod.visualize.GridAnimation3D(concentration, mesh_kwargs=dict(stitle="Concentration on {timestamp:%Y-%m-%d}"))
     """
