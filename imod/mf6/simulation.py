@@ -207,7 +207,6 @@ class Modflow6Simulation(collections.UserDict):
             for counter, key in enumerate(transportmodels.keys()):
                 filename = "simulation{}.exg".format(counter)
                 modelname_b = key
-                counter = counter + 1
                 result.append((exchange_type, filename, modelname_a, modelname_b))
         return result
 
