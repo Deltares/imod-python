@@ -53,6 +53,7 @@ class MobileStorage(Package):
         "distcoef": np.float64,
         "sp2": np.float64,
     }
+
     _pkg_id = "mst"
     _template = Package._initialize_template(_pkg_id)
     _keyword_map = {}
