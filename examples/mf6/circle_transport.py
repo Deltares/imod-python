@@ -166,9 +166,6 @@ transport_model["mst"] = imod.mf6.MobileStorage(0.3)
 
 # Now we define initial conditions (0) and output options for the transport simulation
 transport_model["ic"] = imod.mf6.InitialConditions(start=0.0)
-
-# Now we define initial conditions (0) and output options for the transport simulation
-transport_model["ic"] = imod.mf6.InitialConditions(start=0.0)
 transport_model["oc"] = imod.mf6.OutputControl(
     save_concentration="all", save_budget="last"
 )
