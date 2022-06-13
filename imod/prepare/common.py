@@ -306,7 +306,11 @@ def _set_scalar_cellsizes(da):
         dx_string = f"d{dim}"
         if dx_string in da.coords:
             dx = da.coords[dx_string]
-            dx_scalar = dx[0].values  # Ensure no leftover coordinates in scalar
+            # Ensure no leftover coordinates in scalar
+            if dx.ndim == 0:  # Catch case where dx already is a scalar
+                dx_scalar = dx.values[()]
+            else:
+                dx_scalar = dx.values[0]
             if np.allclose(dx, dx_scalar):
                 da = da.assign_coords({dx_string: dx_scalar})
     return da
