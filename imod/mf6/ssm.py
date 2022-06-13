@@ -9,7 +9,6 @@ class Transport_Sink_Sources(BoundaryCondition):
 
     def __init__(self, flow_packages: Dict[str, Package], aux_variable_name: str):
 
-
         super().__init__()
         self.flow_boundary_packages = flow_packages
         self.aux_variable_name = aux_variable_name

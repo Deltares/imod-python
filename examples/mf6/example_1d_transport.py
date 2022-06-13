@@ -11,7 +11,8 @@
 # but the front of the solute plume has the same overall shape as for species_a or species_b
 # species_d has linear sorption and first order decay, and this changes the shape of the front of the solute plume
 
-import pathlib
+
+import tempfile
 from datetime import date, timedelta
 
 import matplotlib
@@ -163,39 +164,39 @@ simulation["solver"] = imod.mf6.Solution(
 simtimes = daterange(date(2000, 1, 1), 2000)
 simulation.create_time_discretization(additional_times=simtimes)
 
-tempdir = pathlib.Path("C:\\Users\\slooten\\AppData\\Local\\Temp\\tmpu_n9ntjm")
+with tempfile.TemporaryDirectory() as tempdir:
 
-simulation.write(tempdir, False)
-simulation.run()
+    simulation.write(tempdir, False)
+    simulation.run()
 
-# open the concentration results
-sim_concentration_a = imod.mf6.out.open_conc(
-    tempdir / "tpt_a/tpt_a.ucn",
-    tempdir / "flowmodel/discretization.dis.grb",
-)
-sim_concentration_b = imod.mf6.out.open_conc(
-    tempdir / "tpt_b/tpt_b.ucn",
-    tempdir / "flowmodel/discretization.dis.grb",
-)
-sim_concentration_c = imod.mf6.out.open_conc(
-    tempdir / "tpt_c/tpt_c.ucn",
-    tempdir / "flowmodel/discretization.dis.grb",
-)
-sim_concentration_d = imod.mf6.out.open_conc(
-    tempdir / "tpt_d/tpt_d.ucn",
-    tempdir / "flowmodel/discretization.dis.grb",
-)
-final_a = sim_concentration_a.sel(time=1999, y=15)
-final_b = sim_concentration_b.sel(time=1999, y=15)
-final_c = sim_concentration_c.sel(time=1999, y=15)
-final_d = sim_concentration_d.sel(time=1999, y=15)
+    # open the concentration results
+    sim_concentration_a = imod.mf6.out.open_conc(
+        tempdir / "tpt_a/tpt_a.ucn",
+        tempdir / "flowmodel/discretization.dis.grb",
+    )
+    sim_concentration_b = imod.mf6.out.open_conc(
+        tempdir / "tpt_b/tpt_b.ucn",
+        tempdir / "flowmodel/discretization.dis.grb",
+    )
+    sim_concentration_c = imod.mf6.out.open_conc(
+        tempdir / "tpt_c/tpt_c.ucn",
+        tempdir / "flowmodel/discretization.dis.grb",
+    )
+    sim_concentration_d = imod.mf6.out.open_conc(
+        tempdir / "tpt_d/tpt_d.ucn",
+        tempdir / "flowmodel/discretization.dis.grb",
+    )
+    final_a = sim_concentration_a.sel(time=1999, y=15)
+    final_b = sim_concentration_b.sel(time=1999, y=15)
+    final_c = sim_concentration_c.sel(time=1999, y=15)
+    final_d = sim_concentration_d.sel(time=1999, y=15)
 
-matplotlib.pyplot.scatter(list(range(0, 101, 1)), final_a.values, label="a")
-matplotlib.pyplot.scatter(list(range(0, 101, 1)), final_b.values, label="b")
-matplotlib.pyplot.scatter(list(range(0, 101, 1)), final_c.values, label="c")
-matplotlib.pyplot.scatter(list(range(0, 101, 1)), final_d.values, label="d")
-matplotlib.pyplot.xlabel("cell index")
-matplotlib.pyplot.ylabel("concentration")
-matplotlib.pyplot.legend(loc="upper right")
+    matplotlib.pyplot.scatter(list(range(0, 101, 1)), final_a.values, label="a")
+    matplotlib.pyplot.scatter(list(range(0, 101, 1)), final_b.values, label="b")
+    matplotlib.pyplot.scatter(list(range(0, 101, 1)), final_c.values, label="c")
+    matplotlib.pyplot.scatter(list(range(0, 101, 1)), final_d.values, label="d")
+    matplotlib.pyplot.xlabel("cell index")
+    matplotlib.pyplot.ylabel("concentration")
+    matplotlib.pyplot.legend(loc="upper right")
 
-input()
+    input()
