@@ -26,7 +26,7 @@ def basic_dis():
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
     coords = {"layer": layer, "y": y, "x": x}
 
-    ibound = xr.DataArray(np.ones(shape), coords=coords, dims=dims)
+    ibound = xr.DataArray(np.ones(shape, dtype=np.int32), coords=coords, dims=dims)
 
     surface = 0.0
     interfaces = np.insert((surface - np.cumsum(dz)), 0, surface)

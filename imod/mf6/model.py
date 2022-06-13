@@ -125,10 +125,20 @@ class Modflow6Model(collections.UserDict, abc.ABC):
     def take_discretization_from_model(self, other):
         # Check for mandatory packages
         discretization_ids = ("dis", "disv", "disu")
-        flow_pkg_ids = set([pkg._pkg_id for pkg in other.values()])
-        for id in discretization_ids:
-            if id in flow_pkg_ids:
-                self[id] = other[id]
+        for key, package in other.items():
+            if package._pkg_id in discretization_ids:
+                newkey = self.generate_unique_key(key)
+                self[newkey] = package
+
+    def generate_unique_key(self, suggested_key):
+        # operates on a dictionary. If the suggested key is not in use, then the suggested key is the return value of
+        # the function. if it is in use, characters are appended until a unique key is obtained.
+        result = suggested_key
+        if result is None or result == "":
+            result = "a"
+        if result in self.keys():
+            result = self.generate_unique_key(result + "X")
+        return result
 
 
 class GroundwaterFlowModel(Modflow6Model):
