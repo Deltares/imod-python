@@ -26,6 +26,7 @@ import xarray as xr
 import imod.mf6
 import imod.util
 
+
 # %%
 # helper function for creating a transport model that simulates advection, dispersion (but zero molecular diffusion),
 # First order decay is modeled if the decay parameter is not zero.
@@ -70,6 +71,7 @@ def create_transport_model(flowmodel, speciesname, dispersivity, retardation, de
     tpt_model.take_discretization_from_model(flowmodel)
     return tpt_model
 
+
 # %%
 # helper function for creating iterable given starting date and number of days
 def daterange(date1, numberdays):
@@ -77,9 +79,8 @@ def daterange(date1, numberdays):
         yield date1 + timedelta(n)
 
 
-
 # %%
-#setup discretization
+# setup discretization
 nlay = 1
 nrow = 2
 ncol = 101
@@ -174,7 +175,6 @@ simtimes = daterange(date(2000, 1, 1), 2000)
 simulation.create_time_discretization(additional_times=simtimes)
 
 
-
 # %%
 # run the simulation and
 with tempfile.TemporaryDirectory() as tempdir:
@@ -184,7 +184,7 @@ with tempfile.TemporaryDirectory() as tempdir:
 
     # open the concentration results
     sim_concentration_a = imod.mf6.out.open_conc(
-        tempdir +  "/tpt_a/tpt_a.ucn",
+        tempdir + "/tpt_a/tpt_a.ucn",
         tempdir + "/flowmodel/discretization.dis.grb",
     )
     sim_concentration_b = imod.mf6.out.open_conc(
