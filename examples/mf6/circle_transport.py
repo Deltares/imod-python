@@ -1,6 +1,6 @@
 """
-Circle
-======
+Circle (transport)
+==================
 
 This example illustrates how to setup a very simple unstructured groundwater
 transport model using the ``imod`` package and associated packages.
