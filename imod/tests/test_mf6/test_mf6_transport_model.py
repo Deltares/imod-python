@@ -87,6 +87,7 @@ def test_assign_flow_discretization2(basic_dis, concentration_fc):
     assert "disX" in tpt_model.keys()
     assert isinstance(tpt_model["disX"], imod.mf6.StructuredDiscretization)
 
+
 @pytest.mark.usefixtures("twri_model")
 def test_flowmodel_validation(twri_model):
     # initialize transport with a flow model without concentration data

@@ -244,19 +244,23 @@ class GroundwaterTransportModel(Modflow6Model):
                         else:
                             msg = "package {0} does not contain auxiliary variable {1}".format(
                                 package_key,
-                                state_variable_name,)
+                                state_variable_name,
+                            )
                             warnings.warn(msg)
                     else:
                         msg = "package {0} does not contain coordinate {1} in dataset {2}".format(
-                            package_key,
-                            aux_var_coord,
-                            aux_var)
+                            package_key, aux_var_coord, aux_var
+                        )
                         warnings.warn(msg)
                 else:
-                    msg = "package {0} does not contain {1}".format( package_key, aux_var)
+                    msg = "package {0} does not contain {1}".format(
+                        package_key, aux_var
+                    )
                     warnings.warn(msg)
                 validated = validated and package_is_valid
 
         validated = validated and any_boundary_found
         if not validated:
-            raise ValueError("flow model does not contain {0}".format( state_variable_name))
+            raise ValueError(
+                "flow model does not contain {0}".format(state_variable_name)
+            )
