@@ -179,7 +179,7 @@ def tdis_time(tdis: Dict[str, Any]) -> np.ndarray:
     else:
         possibilities = ", ".join(list(TIME_UNITS.keys())[1:])
         warnings.warn(
-            "Cannot convert time coordinate to datetime."
+            "Cannot convert time coordinate to datetime. "
             "Falling back to (unitless) floating point time coordinate. \n"
             f"time_units should be one of: {possibilities}.\n"
             "start_date_time should be according to ISO 8601."
