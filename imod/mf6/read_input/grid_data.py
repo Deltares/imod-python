@@ -172,7 +172,8 @@ def read_array(
         )
 
     if factor is not None:
-        array = array * factor
+        # Cast the factor as well to make sure type is preserved.
+        array = array * dtype(factor)
 
     return array
 
