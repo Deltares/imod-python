@@ -1,5 +1,7 @@
 import textwrap
 
+import pytest
+
 import imod
 import imod.mf6.model
 from imod.mf6.adv import AdvectionCentral
@@ -27,9 +29,7 @@ def test_transport_model_rendering():
     assert actual == expected
 
 
-def test_assign_flow_discretization(
-    basic_dis,
-):
+def test_assign_flow_discretization(basic_dis, concentration_fc):
 
     # define a grid
     idomain, _, bottom = basic_dis
@@ -38,9 +38,16 @@ def test_assign_flow_discretization(
     gwf_model["dis"] = imod.mf6.StructuredDiscretization(
         top=200.0, bottom=bottom, idomain=idomain
     )
+    gwf_model["riv-1"] = imod.mf6.River(
+        stage=1.0,
+        conductance=10.0,
+        bottom_elevation=-1.0,
+        concentration=concentration_fc,
+        concentration_boundary_type="AUX",
+    )
 
     # define a transport model, with the key "dis" not in use
-    tpt_model = imod.mf6.model.GroundwaterTransportModel(gwf_model, "None")
+    tpt_model = imod.mf6.model.GroundwaterTransportModel(gwf_model, "salinity")
     tpt_model["advection"] = AdvectionCentral()
 
     # let the transport model take the discretization from the flow model
@@ -52,9 +59,7 @@ def test_assign_flow_discretization(
     assert isinstance(tpt_model["dis"], imod.mf6.StructuredDiscretization)
 
 
-def test_assign_flow_discretization2(
-    basic_dis,
-):
+def test_assign_flow_discretization2(basic_dis, concentration_fc):
 
     # define a grid
     idomain, _, bottom = basic_dis
@@ -63,9 +68,15 @@ def test_assign_flow_discretization2(
     gwf_model["dis"] = imod.mf6.StructuredDiscretization(
         top=200.0, bottom=bottom, idomain=idomain
     )
-
+    gwf_model["riv-1"] = imod.mf6.River(
+        stage=1.0,
+        conductance=10.0,
+        bottom_elevation=-1.0,
+        concentration=concentration_fc,
+        concentration_boundary_type="AUX",
+    )
     # define a transport model, with the key "dis" in use
-    tpt_model = imod.mf6.model.GroundwaterTransportModel(gwf_model, "None")
+    tpt_model = imod.mf6.model.GroundwaterTransportModel(gwf_model, "salinity")
     tpt_model["dis"] = AdvectionCentral()
 
     # let the transport model take the discretization from the flow model
@@ -75,3 +86,10 @@ def test_assign_flow_discretization2(
     assert len(tpt_model.keys()) == 3
     assert "disX" in tpt_model.keys()
     assert isinstance(tpt_model["disX"], imod.mf6.StructuredDiscretization)
+
+
+def test_flowmodel_validation(twri_model):
+    # initialize transport with a flow model without concentration data
+    flow_model = twri_model["GWF_1"]
+    with pytest.raises(ValueError):
+        imod.mf6.model.GroundwaterTransportModel(flow_model, "salinity")
