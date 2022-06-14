@@ -293,10 +293,10 @@ def _check_monotonic(dxs, dim):
 def _set_cellsizes(da, dims):
     for dim in dims:
         dx_string = f"d{dim}"
-        if dx_string not in da:
-            dx, _, _ = imod.util.coord_reference(da[dim])
+        if dx_string not in da.coords:
+            dx, _, _ = imod.util.coord_reference(da.coords[dim])
             if isinstance(dx, (int, float)):
-                dx = np.full(da[dim].size, dx)
+                dx = np.full(da.coords[dim].size, dx)
             da = da.assign_coords({dx_string: (dim, dx)})
     return da
 
@@ -304,10 +304,15 @@ def _set_cellsizes(da, dims):
 def _set_scalar_cellsizes(da):
     for dim in da.dims:
         dx_string = f"d{dim}"
-        if dx_string in da:
-            dx = da[dx_string]
-            if np.allclose(dx, dx[0]):
-                da = da.assign_coords({dx_string: dx[0]})
+        if dx_string in da.coords:
+            dx = da.coords[dx_string]
+            # Ensure no leftover coordinates in scalar
+            if dx.ndim == 0:  # Catch case where dx already is a scalar
+                dx_scalar = dx.values[()]
+            else:
+                dx_scalar = dx.values[0]
+            if np.allclose(dx, dx_scalar):
+                da = da.assign_coords({dx_string: dx_scalar})
     return da
 
 
