@@ -59,3 +59,15 @@ class Drainage(BoundaryCondition):
         self.dataset["observations"] = observations
 
         self._pkgcheck()
+
+    def _pkgcheck(self):
+        self._check_conductance_zero()
+
+        super()._pkgcheck()
+
+    def _check_conductance_zero(self):
+        conductance_zero = self.dataset["conductance"] == 0.0
+        if conductance_zero.any():
+            raise ValueError(
+                f"Detected conductance with value 0. in {self.__class__.__name__}"
+            )
