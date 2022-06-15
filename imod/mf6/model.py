@@ -258,6 +258,7 @@ class GroundwaterTransportModel(Modflow6Model):
                     warnings.warn(msg)
                 validated = validated and package_is_valid
 
-        validated = validated and any_boundary_found
+        if not any_boundary_found:
+            raise ValueError(f"flow model does not contain boundary conditions")
         if not validated:
             raise ValueError(f"flow model does not contain {state_variable_name}")
