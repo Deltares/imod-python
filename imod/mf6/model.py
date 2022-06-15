@@ -1,12 +1,13 @@
 import abc
 import collections
 import pathlib
+import warnings
 
 import cftime
 import jinja2
 import numpy as np
 
-from imod.mf6 import qgs_util, ssm
+from imod.mf6 import pkgbase, qgs_util, ssm
 
 
 class Modflow6Model(collections.UserDict, abc.ABC):
@@ -215,8 +216,49 @@ class GroundwaterTransportModel(Modflow6Model):
         super().__init__()
         self._initialize_template()
         if flow_model is not None:
+            self.validate_flow_model(
+                flow_model, "concentration", "species", state_variable_name
+            )
             self["ssm"] = ssm.Transport_Sink_Sources(flow_model, state_variable_name)
 
     def render(self, modelname: str):
         """Render model namefile"""
         return self._render(modelname)
+
+    def validate_flow_model(
+        self, flow_model, aux_var, aux_var_coord, state_variable_name
+    ):
+        validated = True
+        any_boundary_found = False
+        for package_key, package in flow_model.items():
+            if isinstance(package, pkgbase.BoundaryCondition):
+                package_is_valid = False
+                any_boundary_found = True
+                if aux_var in package.dataset:
+                    if aux_var_coord in package.dataset[aux_var].coords:
+                        if (
+                            state_variable_name
+                            in package.dataset[aux_var][aux_var_coord]
+                        ):
+                            package_is_valid = True
+                        else:
+                            msg = (
+                                f"package {package_key} does not contain "
+                                f"auxiliary variable {state_variable_name}."
+                            )
+                            warnings.warn(msg)
+                    else:
+                        msg = (
+                            f"package {package_key} does not contain coordinate "
+                            f"{aux_var_coord} in dataset {aux_var}"
+                        )
+                        warnings.warn(msg)
+                else:
+                    msg = f"package {package_key} does not contain {aux_var}"
+                    warnings.warn(msg)
+                validated = validated and package_is_valid
+
+        if not any_boundary_found:
+            raise ValueError("flow model does not contain boundary conditions")
+        if not validated:
+            raise ValueError(f"flow model does not contain {state_variable_name}")
