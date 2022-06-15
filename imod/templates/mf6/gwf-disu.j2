@@ -41,6 +41,7 @@ begin connectiondata
     {{cl12}}
   hwva
     {{hwva}}
-{%- if angldegx is defined %}  angldegx
-    {angldegx}{% endif %}
+{% if angldegx is defined %}  angldegx
+    {{angldegx}}
+{% endif -%}
 end connectiondata

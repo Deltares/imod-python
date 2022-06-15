@@ -74,6 +74,7 @@ class LowLevelUnstructuredDiscretization(Package):
     ihc: xr.DataArray of integers
     cl12: xr.DataArray of floats
     hwva: xr.DataArray of floats
+    angldegx: xr.DataArray of floats
     """
 
     _pkg_id = "disu"
@@ -87,6 +88,7 @@ class LowLevelUnstructuredDiscretization(Package):
         "cl12": np.float64,
         "hwva": np.float64,
         "idomain": np.int32,
+        "angldegx": np.float64,
     }
     _keyword_map = {}
     _template = Package._initialize_template(_pkg_id)
@@ -103,7 +105,7 @@ class LowLevelUnstructuredDiscretization(Package):
         ihc,
         cl12,
         hwva,
-        angledegx,
+        angldegx,
         idomain=None,
     ):
         super().__init__(locals())
@@ -117,7 +119,7 @@ class LowLevelUnstructuredDiscretization(Package):
         self.dataset["ihc"] = ihc
         self.dataset["cl12"] = cl12
         self.dataset["hwva"] = hwva
-        self.dataset["angledegx"] = angledegx
+        self.dataset["angldegx"] = angldegx
         if idomain is not None:
             self.dataset["idomain"] = idomain
 
@@ -253,7 +255,7 @@ class LowLevelUnstructuredDiscretization(Package):
         ihc = is_horizontal.astype(np.int32)
         cl12 = np.zeros_like(ihc, dtype=np.float64)
         hwva = np.zeros_like(ihc, dtype=np.float64)
-        angledegx = np.zeros_like(ihc, dtype=np.float64)
+        angldegx = np.zeros_like(ihc, dtype=np.float64)
         # Fill.
         cl12[is_x] = 0.5 * dxx[index_x]  # cell center to vertical face
         cl12[is_y] = 0.5 * dyy[index_y]  # cell center to vertical face
@@ -261,7 +263,7 @@ class LowLevelUnstructuredDiscretization(Package):
         hwva[is_x] = dyy[index_x]  # width
         hwva[is_y] = dxx[index_y]  # width
         hwva[is_vertical] = area[index_v]  # area
-        angledegx[is_y] = 90.0  # angle between connection normal and x-axis.
+        angldegx[is_y] = 90.0  # angle between connection normal and x-axis.
 
         # Set "node" and "nja" as the dimension in accordance with MODFLOW6.
         # Should probably be updated if we could move to UGRID3D...
@@ -280,7 +282,7 @@ class LowLevelUnstructuredDiscretization(Package):
                 ihc=xr.DataArray(ihc, dims=["nja"]),
                 cl12=xr.DataArray(cl12, dims=["nja"]),
                 hwva=xr.DataArray(hwva, dims=["nja"]),
-                angledegx=xr.DataArray(angledegx, dims=["nja"]),
+                angldegx=xr.DataArray(angldegx, dims=["nja"]),
             )
             cell_ids = np.cumsum(active) - 1
             cell_ids[~active] = -1
@@ -297,6 +299,6 @@ class LowLevelUnstructuredDiscretization(Package):
                 ihc=xr.DataArray(ihc, dims=["nja"]),
                 cl12=xr.DataArray(cl12, dims=["nja"]),
                 hwva=xr.DataArray(hwva, dims=["nja"]),
-                angledegx=xr.DataArray(angledegx, dims=["nja"]),
+                angldegx=xr.DataArray(angldegx, dims=["nja"]),
                 idomain=xr.DataArray(active.astype(np.int32), dims=["node"]),
             )
