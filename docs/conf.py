@@ -115,6 +115,9 @@ html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
 html_css_files = ["theme-deltares.css"]
 
+# Set
+html_context = {"default_mode": "light"}
+
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
@@ -124,9 +127,15 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "Deltares",
-            "url": "https://deltares.nl/en/",
+            "url": "https://www.deltares.nl/en/",
             "icon": "_static/deltares-white.svg",
             "type": "local",
+        },
+        {
+            "name": "GitLab",
+            "url": "https://gitlab.com/deltares/imod/imod-python",
+            "icon": "fab fa-gitlab",
+            "type": "fontawesome",
         },
     ],
 }

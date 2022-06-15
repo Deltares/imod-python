@@ -592,9 +592,11 @@ simulation.create_time_discretization(
 # Run the model
 # -------------
 #
-# Run the model using the MODFLOW 6 executable which has been
-# previously copied in the model folder.
-# The subprocess.run function is used for this.
+# .. note::
+#
+#   The following lines assume the ``mf6`` executable is available on your PATH.
+#   :ref:`The Modflow 6 examples introduction <mf6-introduction>` shortly
+#   describes how to add it to yours.
 
 modeldir = imod.util.temporary_directory()
 simulation.write(modeldir)
