@@ -257,5 +257,5 @@ class GroundwaterTransportModel(Modflow6Model):
         validated = validated and any_boundary_found
         if not validated:
             raise ValueError(
-                "flow model does not contain {0}".format(state_variable_name)
+                f"flow model does not contain {state_variable_name}"
             )
