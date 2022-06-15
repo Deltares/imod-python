@@ -1,6 +1,6 @@
 """
-Circle
-======
+Circle (transport)
+==================
 
 This example illustrates how to setup a very simple unstructured groundwater
 transport model using the ``imod`` package and associated packages.
@@ -72,7 +72,6 @@ rch_concentration = rch_concentration.expand_dims(species=["salinity"])
 
 
 # %%
-#
 # unlike a recharge boundary, with a prescribed head boundary you don't know a priori whether
 # water will flow in over the boundary or leave across the boundary. If water flows into the model
 # over the boundary, it carries a prescribed solute concentration. if it leaves, it leaves with the
@@ -80,7 +79,6 @@ rch_concentration = rch_concentration.expand_dims(species=["salinity"])
 #
 # In this example we set the prescribed head value to 1 and the external concentration to 1 as well.
 # the boundary only operates on the top layer.
-
 chd_location = xu.zeros_like(idomain.sel(layer=1), dtype=bool).ugrid.binary_dilation(
     border_value=True
 )
