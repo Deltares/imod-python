@@ -1,16 +1,30 @@
-# this example is taken from https://modflow6-examples.readthedocs.io/en/master/_examples/ex-gwt-mt3dms-p01.html
-# as explained there, the setup is a simple 1d homogeneous aquifer with a steady state flow field of constant
-# velocity.
-# The benchmark consists of 4 transport problems that are modeled using this flow field. Here we have modeled these 4
-# transport problems as a single simulation with multiple species.
-# In all cases the initial concentration in the domain is zero, but water entering the domain has a concentration of 1.
-# species_a is transported with zero diffusion or dispersion and the concentration distribution should show a sharp front, but due to the numerical method
-# we see some smearing, which is expected.
-# species_b has a sizeable dispersivity and hence shows more smearing than species_a but the same centre of mass
-# species_c has linear sorption and therefore the concentration doesn't enter the domain as far as species_a or species_b,
-# but the front of the solute plume has the same overall shape as for species_a or species_b
-# species_d has linear sorption and first order decay, and this changes the shape of the front of the solute plume
+"""
+1d benchmarks that have an analytical solution (transport)
+==========================================================
 
+this example is taken from
+https://modflow6-examples.readthedocs.io/en/master/_examples/ex-gwt-mt3dms-p01.html
+as explained there, the setup is a simple 1d homogeneous aquifer with a steady
+state flow field of constant velocity. The benchmark consists of 4 transport
+problems that are modeled using this flow field. Here we have modeled these 4
+transport problems as a single simulation with multiple species. In all cases
+the initial concentration in the domain is zero, but water entering the domain
+has a concentration of 1.
+
+species_a is transported with zero diffusion or dispersion and the concentration
+distribution should show a sharp front, but due to the numerical method we see
+some smearing, which is expected.
+
+species_b has a sizeable dispersivity and hence shows more smearing than
+species_a but the same centre of mass
+
+species_c has linear sorption and therefore the concentration doesn't enter the
+domain as far as species_a or species_b, but the front of the solute plume has
+the same overall shape as for species_a or species_b
+
+species_d has linear sorption and first order decay, and this changes the shape
+of the front of the solute plume
+"""
 
 import tempfile
 from datetime import date, timedelta
@@ -23,6 +37,7 @@ import imod.mf6
 import imod.util
 
 
+# %%
 # helper function for creating a transport model that simulates advection, dispersion (but zero molecular diffusion),
 # First order decay is modeled if the decay parameter is not zero.
 def create_transport_model(flowmodel, speciesname, dispersivity, retardation, decay):
@@ -39,7 +54,7 @@ def create_transport_model(flowmodel, speciesname, dispersivity, retardation, de
         xt3d_off=False,
         xt3d_rhs=False,
     )
-
+    # %%
     # compute the sorption coefficient based on the desired retardation factor and the bulk density.
     # because of this, the exact value of bulk density does not matter for the solution.
     if retardation != 1.0:
@@ -67,12 +82,15 @@ def create_transport_model(flowmodel, speciesname, dispersivity, retardation, de
     return tpt_model
 
 
+# %%
 # helper function for creating iterable given starting date and number of days
 def daterange(date1, numberdays):
     for n in range(numberdays):
         yield date1 + timedelta(n)
 
 
+# %%
+# setup discretization
 nlay = 1
 nrow = 2
 ncol = 101
@@ -95,13 +113,12 @@ bottom = xr.full_like(grid, -1.0, dtype=float)
 
 gwf_model = imod.mf6.GroundwaterFlowModel()
 gwf_model["ic"] = imod.mf6.InitialConditions(0.0)
-
-# Constant head
+# %%
+# create data array for  Constant head boundary. One for the constant head and one for the associated concentration
 constant_head = xr.full_like(grid, np.nan, dtype=float)
 constant_head[..., 0] = 60.0
 constant_head[..., 100] = 0.0
 
-# Constant head associated concentration
 constant_conc = xr.full_like(grid, np.nan, dtype=float)
 constant_conc[..., 0] = 1.0
 constant_conc[..., 100] = 0.0
@@ -111,7 +128,8 @@ constant_conc = constant_conc.expand_dims(
 
 gwf_model["edges_bc"] = imod.mf6.ConstantHead(constant_head, constant_conc)
 
-# hydraulic conductivity
+# %%
+# add other flow packages
 kxx = xr.full_like(grid, 1.0, dtype=float)
 gwf_model["darcy_flow"] = imod.mf6.NodePropertyFlow(
     icelltype=1,
@@ -122,7 +140,6 @@ gwf_model["darcy_flow"] = imod.mf6.NodePropertyFlow(
     perched=True,
 )
 
-# discretization
 gwf_model["discretization"] = imod.mf6.StructuredDiscretization(
     top=0.0,
     bottom=bottom,
@@ -137,10 +154,13 @@ gwf_model["storage"] = imod.mf6.SpecificStorage(
     transient=False,
     convertible=0,
 )
-
+# %%
+# create simulation
 simulation = imod.mf6.Modflow6Simulation("1d_tpt_benchmark")
 simulation["flowmodel"] = gwf_model
 
+# %%
+# add 4 transport simulations
 simulation["tpt_a"] = create_transport_model(gwf_model, "species_a", 0.0, 1.0, 0.0)
 simulation["tpt_b"] = create_transport_model(gwf_model, "species_b", 10.0, 1.0, 0.0)
 simulation["tpt_c"] = create_transport_model(gwf_model, "species_c", 10.0, 5.0, 0.0)
@@ -164,6 +184,9 @@ simulation["solver"] = imod.mf6.Solution(
 simtimes = daterange(date(2000, 1, 1), 2000)
 simulation.create_time_discretization(additional_times=simtimes)
 
+
+# %%
+# run the simulation and
 with tempfile.TemporaryDirectory() as tempdir:
 
     simulation.write(tempdir, False)
@@ -171,20 +194,20 @@ with tempfile.TemporaryDirectory() as tempdir:
 
     # open the concentration results
     sim_concentration_a = imod.mf6.out.open_conc(
-        tempdir / "tpt_a/tpt_a.ucn",
-        tempdir / "flowmodel/discretization.dis.grb",
+        tempdir + "/tpt_a/tpt_a.ucn",
+        tempdir + "/flowmodel/discretization.dis.grb",
     )
     sim_concentration_b = imod.mf6.out.open_conc(
-        tempdir / "tpt_b/tpt_b.ucn",
-        tempdir / "flowmodel/discretization.dis.grb",
+        tempdir + "/tpt_b/tpt_b.ucn",
+        tempdir + "/flowmodel/discretization.dis.grb",
     )
     sim_concentration_c = imod.mf6.out.open_conc(
-        tempdir / "tpt_c/tpt_c.ucn",
-        tempdir / "flowmodel/discretization.dis.grb",
+        tempdir + "/tpt_c/tpt_c.ucn",
+        tempdir + "/flowmodel/discretization.dis.grb",
     )
     sim_concentration_d = imod.mf6.out.open_conc(
-        tempdir / "tpt_d/tpt_d.ucn",
-        tempdir / "flowmodel/discretization.dis.grb",
+        tempdir + "/tpt_d/tpt_d.ucn",
+        tempdir + "/flowmodel/discretization.dis.grb",
     )
     final_a = sim_concentration_a.sel(time=1999, y=15)
     final_b = sim_concentration_b.sel(time=1999, y=15)
@@ -198,5 +221,3 @@ with tempfile.TemporaryDirectory() as tempdir:
     matplotlib.pyplot.xlabel("cell index")
     matplotlib.pyplot.ylabel("concentration")
     matplotlib.pyplot.legend(loc="upper right")
-
-    input()
