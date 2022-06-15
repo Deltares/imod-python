@@ -246,9 +246,8 @@ class GroundwaterTransportModel(Modflow6Model):
                                    f"auxiliary variable {state_variable_name}.")
                             warnings.warn(msg)
                     else:
-                        msg = "package {0} does not contain coordinate {1} in dataset {2}".format(
-                            package_key, aux_var_coord, aux_var
-                        )
+                        msg = (f"package {package_key} does not contain coordinate "
+                               f"{aux_var_coord} in dataset {aux_var}")
                         warnings.warn(msg)
                 else:
                     msg = "package {0} does not contain {1}".format(
