@@ -2,18 +2,28 @@
 1d benchmarks that have an analytical solution (transport)
 ==========================================================
 
-this example is taken from https://modflow6-examples.readthedocs.io/en/master/_examples/ex-gwt-mt3dms-p01.html
-as explained there, the setup is a simple 1d homogeneous aquifer with a steady state flow field of constant
-velocity.
-The benchmark consists of 4 transport problems that are modeled using this flow field. Here we have modeled these 4
-transport problems as a single simulation with multiple species.
-In all cases the initial concentration in the domain is zero, but water entering the domain has a concentration of 1.
-species_a is transported with zero diffusion or dispersion and the concentration distribution should show a sharp front, but due to the numerical method
-we see some smearing, which is expected.
-species_b has a sizeable dispersivity and hence shows more smearing than species_a but the same centre of mass
-species_c has linear sorption and therefore the concentration doesn't enter the domain as far as species_a or species_b,
-but the front of the solute plume has the same overall shape as for species_a or species_b
-species_d has linear sorption and first order decay, and this changes the shape of the front of the solute plume
+this example is taken from
+https://modflow6-examples.readthedocs.io/en/master/_examples/ex-gwt-mt3dms-p01.html
+as explained there, the setup is a simple 1d homogeneous aquifer with a steady
+state flow field of constant velocity. The benchmark consists of 4 transport
+problems that are modeled using this flow field. Here we have modeled these 4
+transport problems as a single simulation with multiple species. In all cases
+the initial concentration in the domain is zero, but water entering the domain
+has a concentration of 1.
+
+species_a is transported with zero diffusion or dispersion and the concentration
+distribution should show a sharp front, but due to the numerical method we see
+some smearing, which is expected.
+
+species_b has a sizeable dispersivity and hence shows more smearing than
+species_a but the same centre of mass
+
+species_c has linear sorption and therefore the concentration doesn't enter the
+domain as far as species_a or species_b, but the front of the solute plume has
+the same overall shape as for species_a or species_b
+
+species_d has linear sorption and first order decay, and this changes the shape
+of the front of the solute plume
 """
 
 import tempfile
