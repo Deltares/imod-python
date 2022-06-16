@@ -414,6 +414,8 @@ class Package(abc.ABC):
         return has_dims
 
     def _check_types(self):
+        """Check that data types of grid data are correct."""
+
         for varname, metadata in self._metadata_dict.items():
             expected_dtype = metadata.dtype
             da = self.dataset[varname]
@@ -427,6 +429,11 @@ class Package(abc.ABC):
                     )
 
     def _check_dims(self):
+        """
+        Check that dimensions are all monotonically increasing, or decreasing
+        in the case of ``y``.
+        """
+
         variables = list(self._metadata_dict.keys())
         # If no variables to check return
         if not variables:
@@ -586,6 +593,10 @@ class BoundaryCondition(Package, abc.ABC):
         )
 
     def _check_all_nan(self):
+        """
+        Check if not grids with only nans are provided, as MAXBOUND cannot be 0.
+        """
+
         variables = list(self._metadata_dict.keys())
 
         all_nan = np.isnan(self.dataset[variables]).all()
@@ -598,8 +609,8 @@ class BoundaryCondition(Package, abc.ABC):
 
     def _check_layer_present(self):
         """
-        Check if layer is present, and sometimes xarray broadcasts an empty
-        layer dimension.
+        Check if layer is present, sometimes xarray broadcasts an empty layer
+        dimension.
         """
         variables = list(self._metadata_dict.keys())
 

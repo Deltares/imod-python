@@ -72,6 +72,8 @@ class River(BoundaryCondition):
         super()._pkgcheck()
 
     def _check_conductance_zero(self):
+        """Check if conductance is zero, modflow 6 doesn't accept this."""
+
         conductance_zero = self.dataset["conductance"] == 0.0
         if conductance_zero.any():
             raise ValueError(
@@ -79,6 +81,8 @@ class River(BoundaryCondition):
             )
 
     def _check_bottom_above_stage(self):
+        """Check if river bottom not above river stage"""
+
         bottom_above_stage = self.dataset["bottom_elevation"] > self.dataset["stage"]
 
         if bottom_above_stage.any():
