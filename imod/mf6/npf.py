@@ -223,7 +223,7 @@ class NodePropertyFlow(Package):
         angle1=None,
         angle2=None,
         angle3=None,
-        cell_averaging="harmonic",
+        cell_averaging=None,
         save_flows=False,
         starting_head_as_confined_thickness=False,
         variable_vertical_conductance=False,
@@ -252,7 +252,7 @@ class NodePropertyFlow(Package):
         self.dataset["angle1"] = angle1
         self.dataset["angle2"] = angle2
         self.dataset["angle3"] = angle3
-        self.dataset["cell_averaging"] = cell_averaging
+        self.dataset["alternative_cell_averaging"] = cell_averaging
         self.dataset["save_flows"] = save_flows
         self.dataset[
             "starting_head_as_confined_thickness"

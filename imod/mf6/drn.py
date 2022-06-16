@@ -64,7 +64,7 @@ class Drainage(BoundaryCondition):
         self.dataset["conductance"] = conductance
         if concentration is not None:
             self.dataset["concentration"] = concentration
-            self.string_data[
+            self.dataset[
                 "concentration_boundary_type"
             ] = concentration_boundary_type
             self.add_periodic_auxiliary_variable()

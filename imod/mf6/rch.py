@@ -62,7 +62,7 @@ class Recharge(BoundaryCondition):
         self.dataset["rate"] = rate
         if concentration is not None:
             self.dataset["concentration"] = concentration
-            self.string_data[
+            self.dataset[
                 "concentration_boundary_type"
             ] = concentration_boundary_type
             self.add_periodic_auxiliary_variable()

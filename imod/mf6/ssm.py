@@ -19,9 +19,9 @@ class Transport_Sink_Sources(BoundaryCondition):
         for flowpack_name, flowpack in self.flow_boundary_packages.items():
             if not isinstance(flowpack, BoundaryCondition):
                 continue
-            flow_packages_data[flowpack_name] = flowpack.string_data[
+            flow_packages_data[flowpack_name] = flowpack.dataset[
                 "concentration_boundary_type"
-            ]
+            ].values[()]
         d["flowboundaries"] = flow_packages_data
         d["auxname"] = self.aux_variable_name
         return self._template.render(d)
