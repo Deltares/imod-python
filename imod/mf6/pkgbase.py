@@ -599,10 +599,9 @@ class BoundaryCondition(Package, abc.ABC):
 
         variables = list(self._metadata_dict.keys())
 
-        all_nan = np.isnan(self.dataset[variables]).all()
-
         for var in variables:
-            if all_nan[var]:
+            all_nan = np.isnan(self.dataset[var]).all()
+            if all_nan:
                 raise ValueError(
                     f"Provided grid with only nans for {var} in {self.__class__.__name__}."
                 )
@@ -634,8 +633,10 @@ class BoundaryCondition(Package, abc.ABC):
 
         dims = list(self.dataset.dims.keys())
 
-        stacked = self.dataset[variables].to_stacked_array("z", dims, name="stacked")
-        n_nan_variables = np.isnan(stacked).sum(dim="z")
+        stacked = self.dataset[variables].to_stacked_array(
+            "var_dim", dims, name="stacked"
+        )
+        n_nan_variables = np.isnan(stacked).sum(dim="var_dim")
         inconsistent_nan = (n_nan_variables > 0) & (n_nan_variables < len(variables))
 
         if inconsistent_nan.any():
