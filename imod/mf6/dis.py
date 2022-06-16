@@ -86,3 +86,16 @@ class StructuredDiscretization(Package):
         )
 
         return self._template.render(d)
+
+    def _check_bottom_above_top(self):
+        """Check if bottom not above top"""
+
+        bottom_above_top = self.dataset["bottom"] > self.dataset["top"]
+
+        if bottom_above_top.any():
+            raise ValueError(f"Bottom above top in {self.__class__.__name__}.")
+
+    def _pkgcheck(self):
+        self._check_bottom_above_top(self)
+
+        super()._pkgcheck()
