@@ -70,7 +70,7 @@ class GeneralHeadBoundary(BoundaryCondition):
 
     def _check_conductance_zero(self):
         """Check if conductance is zero, modflow 6 doesn't accept this."""
-        
+
         conductance_zero = self.dataset["conductance"] == 0.0
         if conductance_zero.any():
             raise ValueError(
