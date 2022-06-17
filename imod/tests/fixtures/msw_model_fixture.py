@@ -9,11 +9,11 @@ from imod import mf6, msw
 
 def make_coupled_mf6_model():
     x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
+    y = [3.0, 2.0, 1.0]
     dz = np.array([1, 10, 100])
     layer = [1, 2, 3]
     dx = 1.0
-    dy = 1.0
+    dy = -1.0
 
     nlay = len(layer)
     nrow = len(y)
@@ -113,10 +113,10 @@ def make_msw_model():
     unsaturated_database = "./unsat_database"
 
     x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
+    y = [3.0, 2.0, 1.0]
     subunit = [0, 1]
     dx = 1.0
-    dy = 1.0
+    dy = -1.0
 
     nrow = len(y)
     ncol = len(x)
