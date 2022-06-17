@@ -77,7 +77,7 @@ class River(BoundaryCondition):
         conductance_zero = self.dataset["conductance"] == 0.0
         if conductance_zero.any():
             raise ValueError(
-                f"Detected conductance with value 0. in {self.__class__.__name__}"
+                f"Detected conductance with value 0.0 in {self.__class__.__name__}"
             )
 
     def _check_bottom_above_stage(self):

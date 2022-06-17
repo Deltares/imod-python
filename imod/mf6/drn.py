@@ -71,5 +71,5 @@ class Drainage(BoundaryCondition):
         conductance_zero = self.dataset["conductance"] == 0.0
         if conductance_zero.any():
             raise ValueError(
-                f"Detected conductance with value 0. in {self.__class__.__name__}"
+                f"Detected conductance with value 0.0 in {self.__class__.__name__}"
             )
