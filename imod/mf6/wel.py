@@ -109,6 +109,13 @@ class WellDisStructured(BoundaryCondition):
             recarr[key] = arr
         return recarr
 
+    def _pkgcheck(self):
+        """
+        Because data is structured in a different way for the well package, we
+        override Boundary.pkgcheck to only check data types.
+        """
+        self._check_types()
+
 
 class WellDisVertices(BoundaryCondition):
     """
@@ -149,6 +156,12 @@ class WellDisVertices(BoundaryCondition):
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
+    _metadata_dict = {
+        "layer": VariableMetaData(np.integer),
+        "cell2d": VariableMetaData(np.integer),
+        "rate": VariableMetaData(np.floating),
+    }
+
     def __init__(
         self,
         layer,
@@ -182,3 +195,10 @@ class WellDisVertices(BoundaryCondition):
         for key, arr in arrdict.items():
             recarr[key] = arr
         return recarr
+
+    def _pkgcheck(self):
+        """
+        Because data is structured in a different way for the well package, we
+        override Boundary.pkgcheck to only check data types.
+        """
+        self._check_types()
