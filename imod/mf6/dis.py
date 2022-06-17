@@ -96,6 +96,6 @@ class StructuredDiscretization(Package):
             raise ValueError(f"Bottom above top in {self.__class__.__name__}.")
 
     def _pkgcheck(self):
-        self._check_bottom_above_top(self)
+        self._check_bottom_above_top()
 
         super()._pkgcheck()
