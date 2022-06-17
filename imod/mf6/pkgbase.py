@@ -413,20 +413,37 @@ class Package(abc.ABC):
         spatial_ds.to_netcdf(path)
         return has_dims
 
+    def _get_vars_to_check(self):
+        """
+        Helper function to get all variables which were not set to None
+        """
+        variables = []
+        for var in self._metadata_dict.keys():
+            if (  # Filter optional variables not filled in
+                self.dataset[var].size != 1
+            ) or (
+                self.dataset[var] != None  # noqa: E711
+            ):
+                variables.append(var)
+
+        return variables
+
     def _check_types(self):
         """Check that data types of grid data are correct."""
 
-        for varname, metadata in self._metadata_dict.items():
-            expected_dtype = metadata.dtype
+        variables = self._get_vars_to_check()
+
+        for varname in variables:
+            expected_dtype = self._metadata_dict[varname].dtype
             da = self.dataset[varname]
-            if da.values[()] is not None:  # Only check if was specified
-                if not issubclass(da.dtype.type, expected_dtype):
-                    raise TypeError(
-                        f"Unexpected data type for {varname} "
-                        f"in {self.__class__.__name__} package. "
-                        f"Expected subclass of {expected_dtype.__name__}, "
-                        f"instead got {da.dtype.type.__name__}."
-                    )
+
+            if not issubclass(da.dtype.type, expected_dtype):
+                raise TypeError(
+                    f"Unexpected data type for {varname} "
+                    f"in {self.__class__.__name__} package. "
+                    f"Expected subclass of {expected_dtype.__name__}, "
+                    f"instead got {da.dtype.type.__name__}."
+                )
 
     def _check_dims(self):
         """
@@ -434,32 +451,24 @@ class Package(abc.ABC):
         in the case of ``y``.
         """
 
-        variables = list(self._metadata_dict.keys())
+        variables = self._get_vars_to_check()
         # If no variables to check return
-        if not variables:
+        if len(variables) == 0:
             return
 
         ds = self.dataset[variables]
 
-        if not ds.indexes["y"].is_monotonic_decreasing:
-            raise ValueError(
-                f"y-coordinate in {self.__class__.__name__} not monotonically decreasing"
-            )
+        for dim in ["x", "layer", "time"]:
+            if dim in ds.indexes:
+                if not ds.indexes[dim].is_monotonic_increasing:
+                    raise ValueError(
+                        f"{dim} coordinate in {self.__class__.__name__} not monotonically increasing"
+                    )
 
-        if not ds.indexes["x"].is_monotonic_increasing:
-            raise ValueError(
-                f"x-coordinate in {self.__class__.__name__} not monotonically increasing"
-            )
-
-        if not ds.indexes["layer"].is_monotonic_increasing:
-            raise ValueError(
-                f"layer coordinate in {self.__class__.__name__} not monotonically increasing"
-            )
-
-        if "time" in ds.indexes:
-            if not ds.indexes["time"].is_monotonic_increasing:
+        if "y" in ds.indexes:
+            if not ds.indexes["y"].is_monotonic_decreasing:
                 raise ValueError(
-                    f"time coordinate in {self.__class__.__name__} not monotonically increasing"
+                    f"y coordinate in {self.__class__.__name__} not monotonically decreasing"
                 )
 
     def _pkgcheck(self):
@@ -597,7 +606,7 @@ class BoundaryCondition(Package, abc.ABC):
         Check if not grids with only nans are provided, as MAXBOUND cannot be 0.
         """
 
-        variables = list(self._metadata_dict.keys())
+        variables = self._get_vars_to_check()
 
         for var in variables:
             all_nan = np.isnan(self.dataset[var]).all()
@@ -608,49 +617,65 @@ class BoundaryCondition(Package, abc.ABC):
 
     def _check_layer_present(self):
         """
-        Check if layer is present, sometimes xarray broadcasts an empty layer
-        dimension.
+        Check if layer is present.
         """
-        variables = list(self._metadata_dict.keys())
+        excepted_pkgs = ["uzf", "rch"]
 
-        for var in variables:
-            if "layer" not in self.dataset[var].dims:
+        variables = self._get_vars_to_check()
+
+        if self._pkg_id not in excepted_pkgs:
+            for var in variables:
+                if "layer" not in self.dataset[var].coords:
+                    raise ValueError(
+                        f"Missing layer in {var} in {self.__class__.__name__}."
+                    )
+
+    def _check_zero_dims(self):
+        """
+        Check if dim occurs with size zero. Sometimes xarray broadcasts empty
+        dimensions. It also is possible to create DataArrays with a dim of size
+        zero.
+        """
+        for dim in self.dataset.dims:
+            if self.dataset.dims[dim] == 0:
                 raise ValueError(
-                    f"Missing layer in {var} in {self.__class__.__name__}."
+                    f"Provided dimension {dim} in {self.__class__.__name__} with size 0"
                 )
 
-        if self.dataset.dims["layer"] == 0:
-            raise ValueError(
-                f"Provided layer dimension in {self.__class__.__name__} with size 0."
-            )
-
-    def _check_variables_consistent(self):
+    def _check_nan_consistent(self):
         """
         Check that not some cells in a grid of one var have ``np.nan``, whereas
         cells in another grid have data defined in that cell.
         """
-        variables = list(self._metadata_dict.keys())
+        variables = self._get_vars_to_check()
 
-        dims = list(self.dataset.dims.keys())
 
-        stacked = self.dataset[variables].to_stacked_array(
-            "var_dim", dims, name="stacked"
-        )
+        ds = self.dataset[variables]
+
+        # Advanced Boundary Conditions can contain a mix of static data and
+        # transient data (with a time dimension). ds.to_stacked_array cannot
+        # handle this, therefore select the first timestep.
+        if isinstance(self, AdvancedBoundaryCondition) and ("time" in ds.dims):
+            ds = ds.isel(time=0)
+
+        dims = list(ds.dims.keys())
+        stacked = ds.to_stacked_array("var_dim", dims, name="stacked")
         n_nan_variables = np.isnan(stacked).sum(dim="var_dim")
         inconsistent_nan = (n_nan_variables > 0) & (n_nan_variables < len(variables))
 
         if inconsistent_nan.any():
             raise ValueError(
                 f"Detected inconsistent data in {self.__class__.__name__}, "
-                f"some variables contain nan, but others did not."
+                f"some variables contain nan, but others do not."
             )
 
     def _pkgcheck(self):
-        self._check_variables_consistent()
-        self._check_all_nan()
-        self._check_layer_present()
-
         super()._pkgcheck()
+
+        self._check_layer_present()
+        self._check_zero_dims()
+        self._check_all_nan()
+        self._check_nan_consistent()
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
