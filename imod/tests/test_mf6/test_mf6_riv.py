@@ -104,7 +104,7 @@ def test_check_layer2():
     da[:, 1, 1] = np.nan
 
     with pytest.raises(
-        ValueError, match="Provided layer dimension in River with size 0"
+        ValueError, match="Provided dimension layer in River with size 0"
     ):
         imod.mf6.River(stage=da, conductance=da, bottom_elevation=da - 1.0)
 
