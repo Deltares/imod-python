@@ -649,7 +649,6 @@ class BoundaryCondition(Package, abc.ABC):
         """
         variables = self._get_vars_to_check()
 
-
         ds = self.dataset[variables]
 
         # Advanced Boundary Conditions can contain a mix of static data and

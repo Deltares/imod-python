@@ -3,9 +3,9 @@ import textwrap
 
 import numpy as np
 import pytest
+import xarray as xr
 
 import imod
-import xarray as xr
 
 
 @pytest.fixture(scope="function")
