@@ -136,7 +136,7 @@ class Modflow6Simulation(collections.UserDict):
         for key, model in self.items():
             # skip timedis, exchanges
             if model._pkg_id == "model":
-                model._check_for_required_packages(key)
+                model._model_checks(key)
 
         directory = pathlib.Path(directory)
         directory.mkdir(exist_ok=True, parents=True)

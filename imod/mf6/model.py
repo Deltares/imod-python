@@ -125,7 +125,7 @@ class GroundwaterFlowModel(Model):
         d["packages"] = packages
         return self._template.render(d)
 
-    def _check_nan_in_active_cell(self):
+    def _check_nan_in_active_cell(self, modelkey: str):
         """Check if nan is present in active cells"""
         diskey = self._get_diskey()
 
@@ -137,18 +137,18 @@ class GroundwaterFlowModel(Model):
 
         for pkgkey in pkgkeys_to_check:
             pkg = self[pkgkey]
-            variables = pkg._metadata_dict.keys()
+            variables = pkg._get_vars_to_check()
 
             for var in variables:
                 nan_in_active = np.isnan(pkg.dataset[var]) & active
                 if nan_in_active.any():
                     pkgname = pkg.__class__.__name__
                     raise ValueError(
-                        f"Detected value with np.nan in active model domain "
-                        f"in {pkgname} for variable: {var}."
+                        f"Detected value with np.nan in active domain of model "
+                        f"{modelkey} in {pkgname} for variable: {var}."
                     )
 
-    def _check_river_bottom_below_model_bottom(self):
+    def _check_river_bottom_below_model_bottom(self, modelkey: str):
         """
         Check if river bottom not below model bottom. Modflow 6 throws an
         error if this occurs.
@@ -164,22 +164,24 @@ class GroundwaterFlowModel(Model):
             riv = self[rivkey]
             riv_below_bottom = riv.dataset["bottom_elevation"] < bottom
             if riv_below_bottom.any():
-                raise ValueError(f"River bottom below model bottom for pkg '{rivkey}'")
+                raise ValueError(
+                    f"River bottom below model bottom for pkg '{rivkey}' "
+                    f"in model '{modelkey}'"
+                )
 
-    def _model_checks(self):
+    def _model_checks(self, modelkey: str):
         """
         Check model integrity (called before writing)
         """
-        self._check_for_required_packages()
-        self._check_nan_in_active_cell()
-        self._check_river_bottom_below_model_bottom()
+        self._check_for_required_packages(modelkey)
+        self._check_nan_in_active_cell(modelkey)
+        self._check_river_bottom_below_model_bottom(modelkey)
 
     def write(self, directory, modelname, globaltimes, binary=True):
         """
         Write model namefile
         Write packages
         """
-        self._model_checks()
 
         workdir = pathlib.Path(directory)
         modeldirectory = workdir / modelname
