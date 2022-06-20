@@ -51,7 +51,7 @@ def disv_recarr(arrdict, layer, notnull):
     return recarr
 
 
-def disu_recarr(arrdict, layer, notnull):
+def disu_recarr(arrdict, node, notnull):
     index_spec = [("node", np.int32)]
     field_spec = [(key, np.float64) for key in arrdict]
     sparse_dtype = np.dtype(index_spec + field_spec)
@@ -59,7 +59,11 @@ def disu_recarr(arrdict, layer, notnull):
     nrow = notnull.sum()
     recarr = np.empty(nrow, dtype=sparse_dtype)
     # Argwhere returns an index_array with dims (N, a.ndims)
-    recarr["node"] = (np.argwhere(notnull) + 1)[:, 0]
+    index = np.argwhere(notnull)[:, 0]
+    if node is None:
+        recarr["node"] = index + 1
+    else:
+        recarr["node"] = node[index] + 1
     return recarr
 
 
@@ -598,6 +602,10 @@ class BoundaryCondition(Package, abc.ABC):
         """
         if "layer" in ds:
             layer = ds["layer"].values
+        # TODO: change layer argument name to cell_id or something?
+        # Also forward the node number in case of DISU input.
+        elif "node" in ds:
+            layer = ds["node"].values
         else:
             layer = None
 
