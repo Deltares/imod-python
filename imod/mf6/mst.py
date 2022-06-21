@@ -94,6 +94,6 @@ class MobileStorage(Package):
         elif decay_order is not None:
             raise ValueError('decay_order should be "first" or "zero" when present')
         if sorption is not None:
-            self.string_data["sorption"] = sorption
+            self.dataset["sorption"] = sorption
 
         self._pkgcheck()
