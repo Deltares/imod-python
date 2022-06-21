@@ -136,7 +136,6 @@ class Package(abc.ABC):
         return return_cls
 
     def __init__(self, allargs=None):
-        self.string_data = {}
         if allargs is not None:
             for arg in allargs.values():
                 if isinstance(arg, xu.UgridDataArray):
@@ -328,8 +327,6 @@ class Package(abc.ABC):
                 value = self[varname].values[()]
                 if self._valid(value):  # skip False or None
                     d[key] = value
-        for keyname, value in self.string_data.items():
-            d[keyname] = value
         return self._template.render(d)
 
     @staticmethod
