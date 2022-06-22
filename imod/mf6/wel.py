@@ -63,6 +63,7 @@ class WellDisStructured(BoundaryCondition):
     _period_data = ("layer", "row", "column", "rate")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
+    _auxiliary_data = {"concentration": "species"}
 
     _metadata_dict = {
         "layer": VariableMetaData(np.integer),
@@ -77,6 +78,8 @@ class WellDisStructured(BoundaryCondition):
         row,
         column,
         rate,
+        concentration=None,
+        concentration_boundary_type="aux",
         print_input=False,
         print_flows=False,
         save_flows=False,
@@ -91,7 +94,10 @@ class WellDisStructured(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
-
+        if concentration is not None:
+            self.dataset["concentration"] = concentration
+            self.dataset["concentration_boundary_type"] = concentration_boundary_type
+            self.add_periodic_auxiliary_variable()
         self._pkgcheck()
 
     def to_sparse(self, arrdict, layer):
@@ -148,12 +154,15 @@ class WellDisVertices(BoundaryCondition):
     _period_data = ("layer", "cell2d", "rate")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
+    _auxiliary_data = {"concentration": "species"}
 
     def __init__(
         self,
         layer,
         cell2d,
         rate,
+        concentration=None,
+        concentration_boundary_type="aux",
         print_input=False,
         print_flows=False,
         save_flows=False,
@@ -167,6 +176,10 @@ class WellDisVertices(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+        if concentration is not None:
+            self.dataset["concentration"] = concentration
+            self.dataset["concentration_boundary_type"] = concentration_boundary_type
+            self.add_periodic_auxiliary_variable()
 
     def to_sparse(self, arrdict, layer):
         spec = []
