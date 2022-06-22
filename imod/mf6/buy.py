@@ -15,10 +15,6 @@ class Buoyancy(Package):
     denseref: real, optional
         fluid reference density used in the equation of state. This value is set to
         1000 if not specified as an option.
-    density: optional
-        keyword to specify that record corresponds to density.
-    fileout: string, optional
-        keyword to specify that an output filename is expected next.
     densityfile:
         name of the binary output file to write density information. The density
         file has the same format as the head file. Density values will be written to
@@ -43,7 +39,6 @@ class Buoyancy(Package):
         super().__init__(locals())
         self.dataset["hhformulation_rhs"] = hhformulation_rhs
         self.dataset["denseref"] = denseref
-        self.dataset["density"] = density
         self.dataset["densityfile"] = densityfile
         self.dataset["nrhospecies"] = 0
 
@@ -75,8 +70,6 @@ class Buoyancy(Package):
             d["hhformulation_rhs"] = self.dataset["hhformulation_rhs"].values[()]
         if self.dataset["denseref"].values[()] is not None:
             d["denseref"] = self.dataset["denseref"].values[()]
-        if self.dataset["density"].values[()] is not None:
-            d["density"] = self.dataset["density"].values[()]
         if self.dataset["densityfile"].values[()] is not None:
             d["densityfile"] = self.dataset["densityfile"].values[()]
         d["nrhospecies"] = self.dataset["nrhospecies"].values[()]
