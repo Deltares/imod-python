@@ -78,7 +78,7 @@ gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
 # %%
 # Now let's make the boundary conditions. We have a constant head on the right and
 # prescribed flow on the right.
-constant_head = xr.full_like(idomain, np.nan, dtype=float).isel(x=[x[-1]])
+constant_head = xr.full_like(idomain, np.nan, dtype=float).sel(x=[x[-1]])
 heads =np.arange(0, 1.025, 1.025/nlay)[np.newaxis]  #create 1d vector with desired values. add an axis to make it a 2d row vector with 1 column
 constant_head[..., 0] = heads.T                     #transpose the 2d vector so that it becomes a column vector, now it fits the layout of constant_head
 gwf_model["right_boundary"] = imod.mf6.ConstantHead(
