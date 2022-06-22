@@ -33,7 +33,6 @@ class Buoyancy(Package):
         self,
         hhformulation_rhs: bool = None,
         denseref: float = None,
-        density=None,
         densityfile: str = None,
     ):
         super().__init__(locals())
