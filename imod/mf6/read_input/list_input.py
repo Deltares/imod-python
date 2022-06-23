@@ -53,6 +53,7 @@ def read_text_listinput(
     df = pd.read_csv(
         path,
         header=None,
+        index_col=False,
         dtype=d,
         names=d.keys(),
         delim_whitespace=True,
