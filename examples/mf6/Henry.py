@@ -29,22 +29,23 @@ ncol = 80
 shape = (nlay, nrow, ncol)
 
 dx = 2/80
-dy = 1
+dy = -1
 xmin = 0.0
-xmax = dx * ncol
+xmax = 2
 ymin = 0.0
 ymax = 1
 dims = ("layer", "y", "x")
 
-layer = np.arange(0, 40, 1)
-y = np.arange(ymin, ymax,  dy) + 0.5 * dy
+layer = np.arange(1, 41, 1)
+y = np.arange(ymax, ymin,  dy) + 0.5 * dy
 x = np.arange(xmin, xmax, dx) + 0.5 * dx
 
 # %%
 # notice we are adding also a dy coordinate. This is used to determine the width of
 # the cells in the y direction, because it has only 1 element.
 dy = 1
-coords = {"layer": layer, "y": y, "x": x, "dy": dy}
+dx = 0.025
+coords = {"layer": layer, "y": y, "x": x, "dy": dy, "dx": dx}
 
 idomain = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
 
@@ -60,7 +61,7 @@ gwf_model["dis"] = imod.mf6.StructuredDiscretization(
 )
 
 gwf_model["npf"] = imod.mf6.NodePropertyFlow(
-    icelltype=idomain,
+    icelltype=0,
     k=864.0,
     k33=864.0,
 )
@@ -78,9 +79,9 @@ gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
 # %%
 # Now let's make the boundary conditions. We have a constant head on the right and
 # prescribed flow on the right.
-constant_head = xr.full_like(idomain, np.nan, dtype=float).sel(x=[x[-1]])
-heads =np.arange(0, 1.025, 1.025/nlay)[np.newaxis]  #create 1d vector with desired values. add an axis to make it a 2d row vector with 1 column
-constant_head[..., 0] = heads.T                     #transpose the 2d vector so that it becomes a column vector, now it fits the layout of constant_head
+constant_head = xr.full_like(idomain, np.nan, dtype=float)
+heads =np.arange(1.025, 0, -1.025/nlay)[np.newaxis]  #create 1d vector with desired values. add an axis to make it a 2d row vector with 1 column
+constant_head[..., ncol-1] = heads.T                     #transpose the 2d vector so that it becomes a column vector, now it fits the layout of constant_head
 gwf_model["right_boundary"] = imod.mf6.ConstantHead(
     constant_head, print_input=True, print_flows=True, save_flows=True
 )
@@ -148,5 +149,6 @@ with imod.util.temporary_directory() as modeldir:
 # Visualize the results
 # ---------------------
 
-    head.isel(layer=0, time=0).plot.contourf()
+    head.isel(y=0, time=0).plot.contourf()
+    i=0
 
