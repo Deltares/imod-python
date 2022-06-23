@@ -1,11 +1,15 @@
 import collections
 import pathlib
+from typing import Dict, Type, Union
 
 import cftime
 import jinja2
 import numpy as np
 
+from imod import mf6
 from imod.mf6 import qgs_util
+
+from .read_input import read_gwf_namefile
 
 
 class Model(collections.UserDict):
@@ -24,6 +28,40 @@ class GroundwaterFlowModel(Model):
     """
 
     _pkg_id = "model"
+
+    @staticmethod
+    def _PACKAGE_CLASSES(distype: str) -> Dict[str, Type]:
+        # DIS dependent packages do not have a completely topology description
+        # to a Python equivalent. These are packages such as:
+        #
+        # * Well
+        # * Multi-Aquifer Well
+        # * Horizontal Flow Barrier
+        # * Stream Flow Routing
+        #
+        # Instead, they are returned in a lower level form, directly related to
+        # the MODFLOW6 input.
+        dis_dependent = {
+            "dis": (mf6.WellDisStructured,),
+            "disv": (mf6.WellDisVertices,),
+        }
+
+        # mf6.OutputControl is skipped
+        # mf6.StorageCoefficient handled by SpecificStorage
+        packages = dis_dependent[distype] + (
+            mf6.ConstantHead,
+            mf6.StructuredDiscretization,
+            mf6.VerticesDiscretization,
+            mf6.Drainage,
+            mf6.Evapotranspiration,
+            mf6.GeneralHeadBoundary,
+            mf6.InitialConditions,
+            mf6.NodePropertyFlow,
+            mf6.Recharge,
+            mf6.River,
+            mf6.SpecificStorage,
+        )
+        return {package._pkg_id: package for package in packages}
 
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -108,6 +146,77 @@ class GroundwaterFlowModel(Model):
             packages.append((key, path.as_posix(), pkgname))
         d["packages"] = packages
         return self._template.render(d)
+
+    @classmethod
+    def open(
+        cls,
+        path: Union[pathlib.Path, str],
+        simroot: pathlib.Path,
+        globaltimes: np.ndarray,
+    ):
+        content = read_gwf_namefile(simroot / path)
+        model = cls(
+            newton=content.get("newton", False),
+            under_relaxation=content.get("under_relaxation", False),
+        )
+
+        # Search for the DIS/DISV/DISU package first. This provides us with
+        # the coordinates and dimensions to instantiate the other packages.
+        dis_packages = [
+            tup for tup in content["packages"] if tup[0] in ("dis6", "disv6", "disu6")
+        ]
+        if len(dis_packages) != 1:
+            raise ValueError(f"Exactly one DIS/DISV/DISU package required in {path}")
+
+        disftype, disfname, dispname = dis_packages[0]
+        diskey = disftype[:-1]
+
+        classes = cls._PACKAGE_CLASSES(diskey)
+        package = classes[diskey]
+        dis_package = package.open(
+            disfname,
+            simroot,
+        )
+        model[dispname] = dis_package
+        shape = dis_package["idomain"].shape
+        coords = dict(dis_package["idomain"].coords)
+        dims = dis_package["idomain"].dims
+
+        # Non-dis packages
+        packages = [
+            tup
+            for tup in content["packages"]
+            if tup[0] not in ("dis6", "disv6", "disu6")
+        ]
+        # Make sure names are unique by counting first, and appending numbers
+        # if they are not unique.
+        occurence = collections.Counter([tup[2] for tup in packages])
+        counter = collections.defaultdict(int)
+        for ftype, fname, pname in packages:
+            key = ftype[:-1]
+            package = classes.get(key)
+            if package is None:
+                continue
+            if occurence[pname] > 1:
+                pkgname = f"{pname}_{counter[pname]}"
+                counter[pname] += 1
+            else:
+                pkgname = pname
+
+            try:
+                # Create the package and add it to the model.
+                model[pkgname] = package.open(
+                    path=fname,
+                    simroot=simroot,
+                    shape=shape,
+                    coords=coords,
+                    dims=dims,
+                    globaltimes=globaltimes,
+                )
+            except Exception as e:
+                raise type(e)(f"{e}\n Error reading {fname}") from e
+
+        return model
 
     def write(self, directory, modelname, globaltimes, binary=True):
         """

@@ -1,6 +1,12 @@
+from pathlib import Path
+from typing import Tuple
+
 import numpy as np
+import xarray as xr
 
 from imod.mf6.pkgbase import Package, VariableMetaData
+
+from .read_input import read_sto_blockfile, shape_to_max_rows
 
 
 class Storage(Package):
@@ -10,7 +16,72 @@ class Storage(Package):
         )
 
 
-class SpecificStorage(Package):
+class StorageBase(Package):
+    def _render(self, directory, pkgname, globaltimes, binary):
+        d = {}
+        stodirectory = directory / pkgname
+        for varname in self._grid_data.keys():
+            key = self._keyword_map.get(varname, varname)
+            layered, value = self._compose_values(
+                self[varname], stodirectory, key, binary=binary
+            )
+            if self._valid(value):  # skip False or None
+                d[f"{key}_layered"], d[key] = layered, value
+
+        periods = {}
+        if "time" in self.dataset["transient"].coords:
+            package_times = self.dataset["transient"].coords["time"].values
+            starts = np.searchsorted(globaltimes, package_times) + 1
+            for i, s in enumerate(starts):
+                periods[s] = self.dataset["transient"].isel(time=i).values[()]
+        else:
+            periods[1] = self.dataset["transient"].values[()]
+
+        d["periods"] = periods
+        return d
+
+    @staticmethod
+    def open(
+        path: Path,
+        simroot: Path,
+        shape: Tuple[int],
+        coords: Tuple[str],
+        dims: Tuple[str],
+        globaltimes: np.ndarray,
+    ):
+        sections = {
+            "iconvert": (np.int32, shape_to_max_rows),
+            "ss": (np.float64, shape_to_max_rows),
+            "sy": (np.float64, shape_to_max_rows),
+        }
+        content = read_sto_blockfile(
+            path=simroot / path,
+            simroot=simroot,
+            sections=sections,
+            shape=shape,
+        )
+
+        griddata = content.pop("griddata")
+        for field, data in griddata.items():
+            content[field] = xr.DataArray(data, coords, dims)
+        periods = content.pop("periods")
+        content["transient"] = xr.DataArray(
+            list(periods.values()),
+            coords={"time": globaltimes[list(periods.keys())]},
+            dims=("time",),
+        )
+
+        storagecoefficient = content.pop("storagecoefficient", False)
+        if storagecoefficient:
+            cls = StorageCoefficient
+        else:
+            cls = SpecificStorage
+
+        filtered_content = cls.filter_and_rename(content)
+        return cls(**filtered_content)
+
+
+class SpecificStorage(StorageBase):
     """
     Storage Package with specific storage.
 
@@ -71,34 +142,14 @@ class SpecificStorage(Package):
         self._pkgcheck()
 
     def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
-        stodirectory = directory / "sto"
-        for varname in ["specific_storage", "specific_yield", "convertible"]:
-            key = self._keyword_map.get(varname, varname)
-            layered, value = self._compose_values(
-                self[varname], stodirectory, key, binary=binary
-            )
-            if self._valid(value):  # skip False or None
-                d[f"{key}_layered"], d[key] = layered, value
-
-        periods = {}
-        if "time" in self.dataset["transient"].coords:
-            package_times = self.dataset["transient"].coords["time"].values
-            starts = np.searchsorted(globaltimes, package_times) + 1
-            for i, s in enumerate(starts):
-                periods[s] = self.dataset["transient"].isel(time=i).values[()]
-        else:
-            periods[1] = self.dataset["transient"].values[()]
-
-        d["periods"] = periods
-
+        d = self._render(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
 
-class StorageCoefficient(Package):
+class StorageCoefficient(StorageBase):
     """
-    Storage Package with a storage coefficient.  Be careful,
-    this is not the same as the specific storage.
+    Storage Package with a storage coefficient. Be careful, this is not the
+    same as the specific storage.
 
     From wikipedia (https://en.wikipedia.org/wiki/Specific_storage):
 
@@ -169,26 +220,6 @@ class StorageCoefficient(Package):
         self._pkgcheck()
 
     def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
-        stodirectory = directory / "sto"
-        for varname in ["storage_coefficient", "specific_yield", "convertible"]:
-            key = self._keyword_map.get(varname, varname)
-            layered, value = self._compose_values(
-                self[varname], stodirectory, key, binary=binary
-            )
-            if self._valid(value):  # skip False or None
-                d[f"{key}_layered"], d[key] = layered, value
-
-        periods = {}
-        if "time" in self.dataset["transient"].coords:
-            package_times = self.dataset["transient"].coords["time"].values
-            starts = np.searchsorted(globaltimes, package_times) + 1
-            for i, s in enumerate(starts):
-                periods[s] = self.dataset["transient"].isel(time=i).values[()]
-        else:
-            periods[1] = self.dataset["transient"].values[()]
-
-        d["periods"] = periods
+        d = self._render(directory, pkgname, globaltimes, binary)
         d["storagecoefficient"] = True
-
         return self._template.render(d)

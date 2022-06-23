@@ -1,49 +1,47 @@
 begin options
-{%- if length_units is defined -%}  length_units {{length_units}}{%- endif -%}
-{%- if nogrb is defined -%}  nogrb{%- endif -%}
-{%- if xorigin is defined -%}  xorigin {{xorigin}}{%- endif -%}
-{%- if yorigin is defined -%}  yorigin {{yorigin}}{%- endif -%}
-{%- if angrot is defined -%}  angrot {{angrot}}{%- endif -%}
+{% if length_units is defined %}  length_units {{length_units}}
+{% endif %}
+{%- if nogrb is defined %}  nogrb
+{% endif %}
+{%- if xorigin is defined %}  xorigin {{xorigin}}
+{% endif %}
+{%- if yorigin is defined %}  yorigin {{yorigin}}
+{% endif %}
+{%- if angrot is defined %}  angrot {{angrot}}
+{% endif -%}
 end options
 
 begin dimensions
   nodes {{nodes}}
   nja {{nja}}
-{%- if nvert is defined -%}  nvert {{nvert}}{%- endif -%}
+{%- if nvert is defined %}  nvert {{nvert}}
+{% endif %}
 end dimensions
 
 begin griddata
   top
-    {top}
+    {{top}}
   bot
-    {bot}
+    {{bot}}
   area
-    {area}
+    {{area}}
+{% if idomain is defined %}  idomain
+    {{idomain}}
+{% endif -%}
 end griddata
 
 begin connectiondata
   iac
-    {iac}
+    {{iac}}
   ja
-    {ja}
+    {{ja}}
   ihc
-    {ihc}
+    {{ihc}}
   cl12
-    {cl12}
+    {{cl12}}
   hwva
-    {hwva}
-{%- if angldegx is defined -%}  angldegx
-    {angldegx}{%- endif -%}
+    {{hwva}}
+{% if angldegx is defined %}  angldegx
+    {{angldegx}}
+{% endif -%}
 end connectiondata
-
-begin vertices
-  {{iv}} {{xv}} {{yv}}
-  {{iv}} {{xv}} {{yv}}
-  ...
-end vertices
-
-begin cell2d
-  {{icell2d}} {{xc}} {{yc}} {{ncvert}} {{icvert(ncvert)}}
-  {{icell2d}} {{xc}} {{yc}} {{ncvert}} {{icvert(ncvert)}}
-  ...
-end cell2d

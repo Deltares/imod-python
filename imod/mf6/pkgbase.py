@@ -1,11 +1,15 @@
 import abc
+import inspect
 import pathlib
 from dataclasses import dataclass
+from typing import Any, Dict
 
 import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
+
+from .read_input import read_blockfile, read_boundary_blockfile, shape_to_max_rows
 
 
 def dis_recarr(arrdict, layer, notnull):
@@ -44,6 +48,22 @@ def disv_recarr(arrdict, layer, notnull):
         ilayer, icell2d = np.argwhere(notnull).transpose()
         recarr["cell2d"] = icell2d + 1
         recarr["layer"] = layer[ilayer]
+    return recarr
+
+
+def disu_recarr(arrdict, node, notnull):
+    index_spec = [("node", np.int32)]
+    field_spec = [(key, np.float64) for key in arrdict]
+    sparse_dtype = np.dtype(index_spec + field_spec)
+    # Initialize the structured array
+    nrow = notnull.sum()
+    recarr = np.empty(nrow, dtype=sparse_dtype)
+    # Argwhere returns an index_array with dims (N, a.ndims)
+    index = np.argwhere(notnull)[:, 0]
+    if node is None:
+        recarr["node"] = index + 1
+    else:
+        recarr["node"] = node[index] + 1
     return recarr
 
 
@@ -165,12 +185,17 @@ class Package(abc.ABC):
 
     def _valid(self, value):
         """
-        Filters values that are None, False, or a numpy.bool_ False.
+        Filters values that are None, False, np.nan, or a numpy.bool_ False.
         Needs to be this specific, since 0.0 and 0 are valid values, but are
         equal to a boolean False.
+
+        Intercepting single NaNs is practical because xarray replaces None by
+        NaN when writing.
         """
         # Test singletons
         if value is False or value is None:
+            return False
+        elif isinstance(value, float) and np.isnan(value):
             return False
         # Test numpy bool (not singleton)
         elif isinstance(value, np.bool_) and not value:
@@ -225,7 +250,12 @@ class Package(abc.ABC):
         notnull = ~np.isnan(data)
 
         if isinstance(self.dataset, xr.Dataset):
-            recarr = dis_recarr(arrdict, layer, notnull)
+            # TODO
+            if ("node" in self.dataset.dims) or ("nja" in self.dataset.dims):
+                recarr = disu_recarr(arrdict, layer, notnull)
+            else:
+                recarr = dis_recarr(arrdict, layer, notnull)
+
         elif isinstance(self.dataset, xu.UgridDataset):
             recarr = disv_recarr(arrdict, layer, notnull)
         else:
@@ -306,7 +336,12 @@ class Package(abc.ABC):
     @staticmethod
     def _is_xy_data(obj):
         if isinstance(obj, (xr.DataArray, xr.Dataset)):
-            xy = "x" in obj.dims and "y" in obj.dims
+            # "nja" is not really xy_data: arguably the method name should be
+            # changed. This method is exclusively used whether the contents of
+            # the object should be written to an external file.
+            xy = ("x" in obj.dims and "y" in obj.dims) or (
+                "node" in obj.dims or "nja" in obj.dims
+            )
         elif isinstance(obj, (xu.UgridDataArray, xu.UgridDataset)):
             xy = obj.ugrid.grid.face_dimension in obj.dims
         else:
@@ -360,14 +395,60 @@ class Package(abc.ABC):
                 pkgdirectory.mkdir(exist_ok=True, parents=True)
                 for varname, dtype in self._grid_data.items():
                     key = self._keyword_map.get(varname, varname)
-                    da = self.dataset[varname]
-                    if self._is_xy_data(da):
-                        if binary:
-                            path = pkgdirectory / f"{key}.bin"
-                            self.write_binary_griddata(path, da, dtype)
-                        else:
-                            path = pkgdirectory / f"{key}.dat"
-                            self.write_text_griddata(path, da, dtype)
+                    if varname in self.dataset:
+                        da = self.dataset[varname]
+                        if self._is_xy_data(da):
+                            if binary:
+                                path = pkgdirectory / f"{key}.bin"
+                                self.write_binary_griddata(path, da, dtype)
+                            else:
+                                path = pkgdirectory / f"{key}.dat"
+                                self.write_text_griddata(path, da, dtype)
+
+    @classmethod
+    def filter_and_rename(cls, content: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Filter content for keywords that are required by the ``__init__`` function
+        of a class.
+
+        Rename keywords to the expected form for the class, as given by
+        ``_keyword_map``.
+
+        Arguments
+        ---------
+        init: Callable
+            __init__ of the
+        """
+        inverse_keywords = {v: k for k, v in cls._keyword_map.items()}
+        init_kwargs = inspect.getfullargspec(cls.__init__).args
+
+        filtered = {}
+        for key, value in content.items():
+            newkey = inverse_keywords.get(key, key)
+            if newkey in init_kwargs:
+                filtered[newkey] = value
+
+        return filtered
+
+    @classmethod
+    def open(cls, path, simroot, shape, coords, dims, globaltimes):
+        sections = {
+            cls._keyword_map.get(field, field): (dtype, shape_to_max_rows)
+            for field, dtype in cls._grid_data.items()
+        }
+        content = read_blockfile(
+            simroot / path,
+            simroot=simroot,
+            sections=sections,
+            shape=shape,
+        )
+
+        griddata = content.pop("griddata")
+        for field, data in griddata.items():
+            content[field] = xr.DataArray(data, coords, dims)
+
+        filtered_content = cls.filter_and_rename(content)
+        return cls(**filtered_content)
 
     def _netcdf_path(self, directory, pkgname):
         """create path for netcdf, this function is also used to create paths to use inside the qgis projectfiles"""
@@ -417,6 +498,58 @@ class Package(abc.ABC):
 
         spatial_ds.to_netcdf(path)
         return has_dims
+
+    def _dis_to_disu(self, cell_ids=None):
+        structured = self.dataset
+        if cell_ids is not None and not np.issubdtype(cell_ids.dtype, np.integer):
+            raise TypeError(f"cell_ids should be integer, received: {cell_ids.dtype}")
+        if "layer" not in structured.coords:
+            raise ValueError("layer coordinate is required")
+        if "layer" not in structured.dims:
+            structured = self.dataset.expand_dims("layer")
+
+        # Stack will automatically broadcast to layer
+        dataset = structured.stack(node=("layer", "y", "x"))
+        layers = structured["layer"].values
+        ncell_per_layer = structured["y"].size * structured["x"].size
+        offset = (layers - 1) * ncell_per_layer
+        index = np.add.outer(offset, np.arange(ncell_per_layer)).ravel()
+
+        if cell_ids is not None:
+            # node has the shape of index, i.e. one value for every cell in DIS
+            # form, including no data padding, which are values of -1.
+            node = cell_ids[index]
+            # Create a subselection without the inactive cells.
+            active = [node != -1]
+            dataset = dataset.isel(node=index[active])
+            dataset = dataset.assign_coords(node=node[active])
+        else:
+            dataset = dataset.assign_coords(node=index)
+
+        return self.__class__(**dataset)
+
+    def to_disu(self, cell_ids=None):
+
+        """
+        Parameters
+        ----------
+        cell_ids: np.ndarray of integers, optional.
+            DISU cell IDs. Should contain values of -1 for inactive cells.
+
+        Returns
+        -------
+        disu_package: Any
+            Package in DISU form.
+        """
+        if isinstance(self.dataset, xr.Dataset):
+            return self._dis_to_disu(cell_ids)
+        elif isinstance(self.dataset.xu.UgridDataset):
+            raise NotImplementedError
+        else:
+            raise TypeError(
+                "Expected xarray.Dataset or xugrid.UgridDataset. "
+                f"Found: {type(self.dataset)}"
+            )
 
     def _check_types(self):
         for varname, metadata in self._metadata_dict.items():
@@ -472,10 +605,19 @@ class BoundaryCondition(Package, abc.ABC):
         """
         Writes a modflow6 binary data file
         """
-        layer = ds["layer"].values
+        if "layer" in ds:
+            layer = ds["layer"].values
+        # TODO: change layer argument name to cell_id or something?
+        # Also forward the node number in case of DISU input.
+        elif "node" in ds:
+            layer = ds["node"].values
+        else:
+            layer = None
+
         arrdict = self._ds_to_arrdict(ds)
         sparse_data = self.to_sparse(arrdict, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)
+
         if binary:
             self._write_binaryfile(outpath, sparse_data)
         else:
@@ -559,6 +701,27 @@ class BoundaryCondition(Package, abc.ABC):
             pkgname=pkgname,
             binary=binary,
         )
+
+    @classmethod
+    def open(cls, path, simroot, shape, coords, dims, globaltimes):
+        content = read_boundary_blockfile(
+            simroot / path,
+            simroot,
+            fields=cls._period_data,
+            shape=shape,
+        )
+
+        period_index = content.pop("period_index")
+        period_data = content.pop("period_data")
+        coords = coords.copy()
+        coords["time"] = globaltimes[period_index]
+        dims = ("time",) + dims
+
+        for field, data in period_data.items():
+            content[field] = xr.DataArray(data, coords, dims)
+
+        filtered_content = cls.filter_and_rename(content)
+        return cls(**filtered_content)
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):

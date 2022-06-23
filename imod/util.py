@@ -1073,6 +1073,38 @@ def replace(da: xr.DataArray, to_replace: Any, value: Any) -> xr.DataArray:
     )
 
 
+def reshape(da: xr.DataArray, coords: Dict[str, Any]):
+    """
+    Gives a new shape and coordinates to a DataArray without changing its data.
+
+    Parameters
+    ----------
+    da: xr.DataArray
+    coords: dict
+        Coordinates of the reshaped DataArray. The key order determines
+        dimension order of the reshaped array. The sizes of the values
+        determines the size of the dimensions. Scalar values are expanded into
+        size 1 arrays. Multi-dimensional coordinate values are not allowed.
+
+    Returns
+    -------
+    reshaped: xr.DataArray
+
+    See also
+    --------
+    DataArray.stack
+    DataArray.unstack
+    """
+    coords = {k: np.atleast_1d(v) for k, v in coords.items()}
+    shape = [v.size for v in coords.values()]
+    for key, value in coords.items():
+        if value.ndim != 1:
+            raise ValueError(
+                f"{key} has ndim {value.ndim}. Can only reshape with 1D coordinates."
+            )
+    return xr.DataArray(da.data.reshape(shape), coords=coords, dims=list(coords.keys()))
+
+
 class MissingOptionalModule:
     """
     Presents a clear error for optional modules.

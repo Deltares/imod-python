@@ -74,11 +74,11 @@ def read_times(
     """
     times = np.empty(ntime, dtype=np.float64)
 
-    # Compute how much to skip to the next timestamp
-    start_of_header = 16
-    rest_of_header = 28
+    # Compute how much to skip to the next timestamp.
+    start_of_header = 16  # KSTP(4), KPER(4), PERTIM(8)
+    rest_of_header = 28  # TEXT(16), NCOL(4), NROW(4), ILAY(4)
     data_single_layer = nrow * ncol * 8
-    header = 52
+    header = 52  # start_of_header + TOTIM(8) + rest_of_header
     nskip = (
         rest_of_header
         + data_single_layer
@@ -117,6 +117,7 @@ def read_hds_timestep(
 def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool) -> xr.DataArray:
     nlayer, nrow, ncol = d["nlayer"], d["nrow"], d["ncol"]
     filesize = os.path.getsize(path)
+    # 52 is header size; 8 is size of double.
     ntime = filesize // (nlayer * (52 + (nrow * ncol * 8)))
     times = read_times(path, ntime, nlayer, nrow, ncol)
     coords = d["coords"]

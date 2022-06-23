@@ -1,12 +1,14 @@
+import os
 import struct
 from typing import Any, BinaryIO, Dict, List
 
+import dask
 import numpy as np
 import xarray as xr
 import xugrid as xu
 
 from . import cbc
-from .common import FilePath, _grb_text
+from .common import FilePath, _grb_text, _to_nan
 
 
 def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
@@ -58,17 +60,48 @@ def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
 
 
 def read_times(path: FilePath, ntime: int, ncell: int):
-    raise NotImplementedError
+    """
+    Reads all total simulation times.
+    """
+    times = np.empty(ntime, dtype=np.float64)
+
+    # Compute how much to skip to the next timestamp
+    start_of_header = 16  # KSTP(4), KPER(4), PERTIM(8)
+    rest_of_header = 28  # TEXT(16), NCOL(4), NROW(4), ILAY(4)
+    data = ncell * 8
+    nskip = rest_of_header + data + start_of_header
+    with open(path, "rb") as f:
+        f.seek(start_of_header)
+        for i in range(ntime):
+            times[i] = struct.unpack("d", f.read(8))[0]
+            f.seek(nskip, 1)
+    return times
 
 
-def read_hds_timestep(
-    path: FilePath, nlayer: int, ncell_per_layer: int, dry_nan: bool, pos: int
-):
-    raise NotImplementedError
+def read_hds_timestep(path: FilePath, ncell: int, dry_nan: bool, pos: int):
+    with open(path, "rb") as f:
+        f.seek(pos + 52)
+        a1d = np.fromfile(f, np.float64, ncell)
+    return _to_nan(a1d, dry_nan)
 
 
 def open_hds(path: FilePath, d: Dict[str, Any], dry_nan: bool) -> xr.DataArray:
-    raise NotImplementedError
+    ncell = d["ncell"]
+    filesize = os.path.getsize(path)
+    ntime = filesize // (52 + ncell * 8)
+    times = read_times(path, ntime, ncell)
+    coords = d["coords"]
+    coords["time"] = times
+
+    dask_list = []
+    for i in range(ntime):
+        pos = i * (52 + ncell * 8)
+        a = dask.delayed(read_hds_timestep)(path, ncell, dry_nan, pos)
+        x = dask.array.from_delayed(a, shape=(ncell,), dtype=np.float64)
+        dask_list.append(x)
+
+    daskarr = dask.array.stack(dask_list, axis=0)
+    return xr.DataArray(daskarr, coords, ("time", "node"), name=d["name"])
 
 
 def open_imeth1_budgets(

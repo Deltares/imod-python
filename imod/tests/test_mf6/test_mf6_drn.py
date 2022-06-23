@@ -84,3 +84,23 @@ def test_3d_singelayer():
     arrdict = drn._ds_to_arrdict(bin_ds)
     sparse_data = drn.to_sparse(arrdict, layer)
     assert isinstance(sparse_data, np.ndarray)
+
+
+def test_to_disu(drainage):
+    drn = drainage
+    disu_drn = drn.to_disu()
+    assert tuple(disu_drn["conductance"].dims) == ("node",)
+    assert np.array_equal(disu_drn.dataset["node"], np.arange(75))
+
+    drn["layer"] = [1, 3, 5]
+    disu_drn = drn.to_disu()
+    expected = np.concatenate([np.arange(25), np.arange(50, 75), np.arange(100, 125)])
+    assert np.array_equal(disu_drn.dataset["node"], expected)
+
+    onelayer = imod.mf6.Drainage(**drainage.dataset.isel(layer=0))
+    disu_drn = onelayer.to_disu()
+    assert np.array_equal(disu_drn.dataset["node"], np.arange(25))
+
+    nolayer = imod.mf6.Drainage(**drainage.dataset.isel(layer=0, drop=True))
+    with pytest.raises(ValueError, match="layer coordinate is required"):
+        nolayer.to_disu()

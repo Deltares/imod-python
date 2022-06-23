@@ -1,7 +1,12 @@
+from pathlib import Path
+
 import numpy as np
+import xarray as xr
 
 import imod
 from imod.mf6.pkgbase import Package, VariableMetaData
+
+from .read_input import read_dis_blockfile
 
 
 class StructuredDiscretization(Package):
@@ -59,6 +64,40 @@ class StructuredDiscretization(Package):
             return f"internal\n    {arrstr}"
         else:
             raise ValueError(f"Unhandled type of {dx}")
+
+    @classmethod
+    def open(cls, path: str, simroot: Path) -> "StructuredDiscretization":
+        content = read_dis_blockfile(simroot / path, simroot)
+        nlay = content["nlay"]
+
+        griddata = content["griddata"]
+        xmin = float(content.get("xorigin", 0.0))
+        ymin = float(content.get("yorigin", 0.0))
+        dx = griddata.pop("delr")
+        dy = griddata.pop("delc")
+        x = (xmin + np.cumsum(dx)) - 0.5 * dx
+        y = ((ymin + np.cumsum(dy)) - 0.5 * dy)[::-1]
+
+        # Top is a 2D array unlike the others
+        top = xr.DataArray(
+            data=griddata.pop("top"),
+            coords={"y": y, "x": x},
+            dims=("y", "x"),
+        )
+
+        coords = {"layer": np.arange(1, nlay + 1), "y": y, "x": x}
+        dims = ("layer", "y", "x")
+        inverse_keywords = {v: k for k, v in cls._keyword_map.items()}
+        variables = {"top": top}
+        for key, value in griddata.items():
+            invkey = inverse_keywords.get(key, key)
+            variables[invkey] = xr.DataArray(
+                value,
+                coords,
+                dims,
+            )
+
+        return cls(**variables)
 
     def render(self, directory, pkgname, globaltimes, binary):
         disdirectory = directory / pkgname
