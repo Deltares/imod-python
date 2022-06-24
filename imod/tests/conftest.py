@@ -28,5 +28,9 @@ from .fixtures.mf6_flow_with_tranpsort_fixture import (
 )
 from .fixtures.mf6_twri_disv_fixture import twri_disv_model
 from .fixtures.mf6_twri_fixture import transient_twri_model, twri_model, twri_result
+from .fixtures.mf6_welltest_fixture import (
+    well_test_data_stationary,
+    well_test_data_transient,
+)
 from .fixtures.msw_fixture import fixed_format_parser
 from .fixtures.msw_model_fixture import coupled_mf6_model, msw_model
