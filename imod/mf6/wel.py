@@ -40,6 +40,12 @@ class WellDisStructured(BoundaryCondition):
     rate: float or list of floats
         is the volumetric well rate. A positive value indicates well
         (injection) and a negative value indicates discharge (extraction) (q).
+    concentration: array of floats (xr.DataArray, optional)
+        if this flow package is used in simulations also involving transport, then this array is used
+        as the  concentration for inflow over this boundary.
+    concentration_boundary_type: ({"AUX", "AUXMIXED"}, optional)
+        if this flow package is used in simulations also involving transport, then this keyword specifies
+        how outflow over this boundary is computed.
     print_input: ({True, False}, optional)
         keyword to indicate that the list of well information will be written to
         the listing file immediately after it is read.
@@ -63,6 +69,7 @@ class WellDisStructured(BoundaryCondition):
     _period_data = ("layer", "row", "column", "rate")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
+    _auxiliary_data = {"concentration": "species"}
 
     _metadata_dict = {
         "layer": VariableMetaData(np.integer),
@@ -77,6 +84,8 @@ class WellDisStructured(BoundaryCondition):
         row,
         column,
         rate,
+        concentration=None,
+        concentration_boundary_type="aux",
         print_input=False,
         print_flows=False,
         save_flows=False,
@@ -91,7 +100,10 @@ class WellDisStructured(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
-
+        if concentration is not None:
+            self.dataset["concentration"] = concentration
+            self.dataset["concentration_boundary_type"] = concentration_boundary_type
+            self.add_periodic_auxiliary_variable()
         self._pkgcheck()
 
     def to_sparse(self, arrdict, layer):
@@ -112,8 +124,8 @@ class WellDisStructured(BoundaryCondition):
 
 class WellDisVertices(BoundaryCondition):
     """
-    WEL package for discretization by vertices (DISV) models.
-    Any number of WEL Packages can be specified for a single groundwater flow model.
+    WEL package for discretization by vertices (DISV) models. Any number of WEL
+    Packages can be specified for a single groundwater flow model.
     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=63
 
     Parameters
@@ -123,23 +135,27 @@ class WellDisVertices(BoundaryCondition):
     cell2d: list of int
         Cell in which the well is located.
     rate: float or list of floats
-        is the volumetric well rate. A positive value indicates well
-        (injection) and a negative value indicates discharge (extraction) (q).
+        is the volumetric well rate. A positive value indicates well (injection)
+        and a negative value indicates discharge (extraction) (q).
+    concentration: array of floats (xr.DataArray, optional)
+        if this flow package is used in simulations also involving transport,
+        then this array is used as the  concentration for inflow over this
+        boundary.
+    concentration_boundary_type: ({"AUX", "AUXMIXED"}, optional)
+        if this flow package is used in simulations also involving transport,
+        then this keyword specifies how outflow over this boundary is computed.
     print_input: ({True, False}, optional)
         keyword to indicate that the list of well information will be written to
-        the listing file immediately after it is read.
-        Default is False.
+        the listing file immediately after it is read. Default is False.
     print_flows: ({True, False}, optional)
         Indicates that the list of well flow rates will be printed to the
         listing file for every stress period time step in which "BUDGET PRINT"
-        is specified in Output Control. If there is no Output Control option
-        and PRINT FLOWS is specified, then flow rates are printed for the last
-        time step of each stress period.
-        Default is False.
+        is specified in Output Control. If there is no Output Control option and
+        PRINT FLOWS is specified, then flow rates are printed for the last time
+        step of each stress period. Default is False.
     save_flows: ({True, False}, optional)
         Indicates that well flow terms will be written to the file specified
-        with "BUDGET FILEOUT" in Output Control.
-        Default is False.
+        with "BUDGET FILEOUT" in Output Control. Default is False.
     observations: [Not yet supported.]
         Default is None.
     """
@@ -148,12 +164,15 @@ class WellDisVertices(BoundaryCondition):
     _period_data = ("layer", "cell2d", "rate")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
+    _auxiliary_data = {"concentration": "species"}
 
     def __init__(
         self,
         layer,
         cell2d,
         rate,
+        concentration=None,
+        concentration_boundary_type="aux",
         print_input=False,
         print_flows=False,
         save_flows=False,
@@ -167,6 +186,10 @@ class WellDisVertices(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+        if concentration is not None:
+            self.dataset["concentration"] = concentration
+            self.dataset["concentration_boundary_type"] = concentration_boundary_type
+            self.add_periodic_auxiliary_variable()
 
     def to_sparse(self, arrdict, layer):
         spec = []
