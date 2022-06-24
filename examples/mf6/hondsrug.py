@@ -47,8 +47,13 @@ gwf_model = imod.mf6.GroundwaterFlowModel()
 # We'll load the data from the examples that come with this package.
 
 layermodel = imod.data.hondsrug_layermodel()
+
+# Make sure that the idomain is provided as integers
 idomain = layermodel["idomain"].astype(int)
-top = layermodel["top"]
+
+# We only need to provide the data from layer 1 for the top
+top = layermodel["top"].sel(layer=1)
+
 bot = layermodel["bottom"]
 
 # %%
@@ -653,6 +658,7 @@ hds.sel(layer=5).isel(time=3).plot(ax=ax)
 fig, ax = plt.subplots()
 hds.sel(layer=slice(3, 5)).mean(dim="layer").isel(time=3).plot(ax=ax)
 
+# %%
 # Assign dates to head
 # --------------------
 #
