@@ -81,6 +81,24 @@ class TimeDiscretization(Package):
 
         return self._template.render(d)
 
+    def _structured_grid_dim_check(self, da):
+        if da.ndim == 0:
+            return  # Scalar, no check necessary
+        elif da.ndim == 1:
+            if da.dims != ("time",):
+                raise ValueError(
+                    f"1D DataArray dims can only be ('time',). "
+                    f"Instead got {da.dims} for {da.name} in the "
+                    f"{self.__class__.__name__} package. "
+                )
+        else:
+            raise ValueError(
+                f"Exceeded accepted amount of dimensions for "
+                f"for {da.name} in the "
+                f"{self.__class__.__name__} package. "
+                f"Got {da.dims}. Can be at max ('time', )."
+            )
+
     def write(self, directory, name):
         timedis_content = self.render()
         timedis_path = directory / f"{name}.tdis"

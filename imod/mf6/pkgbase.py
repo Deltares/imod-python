@@ -445,7 +445,79 @@ class Package(abc.ABC):
                     f"instead got {da.dtype.type.__name__}."
                 )
 
-    def _check_dims(self):
+    def _unstructured_grid_dim_check(self, da):
+        """
+        Check dimension integrity of unstructured grid,
+        no time dimension is accepted, data is assumed static.
+        """
+        if da.ndim == 0:
+            return  # Scalar, no check necessary
+        elif da.ndim == 1:
+            face_dim = da.ugrid.grid.face_dimension
+            if (face_dim not in da.dims) and ("layer" not in da.dims):
+                raise ValueError(
+                    f"Face dimension '{face_dim}' or dimension 'layer' "
+                    f"not found in 1D UgridDataArray. "
+                    f"Instead got {da.dims} for {da.name} in the "
+                    f"{self.__class__.__name__} package. "
+                )
+        elif da.ndim == 2:
+            face_dim = da.ugrid.grid.face_dimension
+            if da.dims != ("layer", face_dim):
+                raise ValueError(
+                    f"2D grid should have dimensions ('layer', {face_dim})"
+                    f"Instead got {da.dims} for {da.name} in the "
+                    f"{self.__class__.__name__} package. "
+                )
+
+    def _structured_grid_dim_check(self, da):
+        """
+        Check dimension integrity of structured grid,
+        no time dimension is accepted, data is assumed static.
+        """
+        if da.ndim == 0:
+            return  # Scalar, no check necessary
+        elif da.ndim == 1:
+            if "layer" not in da.dims:
+                raise ValueError(
+                    f"1D DataArray dims can only be ('layer',). "
+                    f"Instead got {da.dims} for {da.name} in the "
+                    f"{self.__class__.__name__} package. "
+                )
+        elif da.ndim == 2:
+            if da.dims != ("y", "x"):
+                raise ValueError(
+                    f"2D grid should have dimensions ('y', 'x'). "
+                    f"Instead, got {da.dims} for {da.name} in the "
+                    f"{self.__class__.__name__} package. "
+                )
+        elif da.ndim == 3:
+            if da.dims != ("layer", "y", "x"):
+                raise ValueError(
+                    f"3D grid should have dimensions ('layer', 'y', 'x'). "
+                    f"Instead, got {da.dims} for {da.name} in the "
+                    f"{self.__class__.__name__} package. "
+                )
+        else:
+            raise ValueError(
+                f"Exceeded accepted amount of dimensions for "
+                f"for {da.name} in the "
+                f"{self.__class__.__name__} package. "
+                f"Got {da.dims}. Can be at max ('layer', 'y', 'x')."
+            )
+
+    def _check_dim_integrity(self):
+
+        variables = self._get_vars_to_check()
+
+        for var in variables:
+            da = self.dataset[var]
+            if isinstance(da, (xr.DataArray, xr.Dataset)):
+                self._structured_grid_dim_check(da)
+            elif isinstance(da, (xu.UgridDataArray, xu.UgridDataset)):
+                self._unstructured_grid_dim_check(da)
+
+    def _check_dim_monotonicity(self):
         """
         Check that dimensions are all monotonically increasing, or decreasing
         in the case of ``y``.
@@ -473,7 +545,8 @@ class Package(abc.ABC):
 
     def _pkgcheck(self):
         self._check_types()
-        self._check_dims()
+        self._check_dim_monotonicity()
+        self._check_dim_integrity()
 
 
 class BoundaryCondition(Package, abc.ABC):
@@ -615,20 +688,90 @@ class BoundaryCondition(Package, abc.ABC):
                     f"Provided grid with only nans for {var} in {self.__class__.__name__}."
                 )
 
-    def _check_layer_present(self):
+    def _unstructured_grid_dim_check(self, da):
         """
-        Check if layer is present.
+        Check dimension integrity of unstructured grid,
+        no time dimension is accepted, data is assumed static.
         """
-        excepted_pkgs = ["uzf", "rch"]
+        if da.ndim < 1:
+            raise ValueError(
+                f"Boundary conditions should be specified as spatial grids. "
+                f"Instead, got {da.dims} for {da.name} in the "
+                f"{self.__class__.__name__} package. "
+            )
+        elif da.ndim == 1:
+            face_dim = da.ugrid.grid.face_dimension
+            if face_dim not in da.dims:
+                raise ValueError(
+                    f"Face dimension '{face_dim}' not found in "
+                    f"1D UgridDataArray. "
+                    f"Instead got {da.dims} for {da.name} in the "
+                    f"{self.__class__.__name__} package. "
+                )
+        elif da.ndim == 2:
+            face_dim = da.ugrid.grid.face_dimension
+            if (da.dims != ("layer", face_dim)) and (da.dims != ("time", face_dim)):
+                raise ValueError(
+                    f"2D grid should have dimensions ('layer', {face_dim}) "
+                    f"or ('time', {face_dim}). "
+                    f"Instead got {da.dims} for {da.name} in the "
+                    f"{self.__class__.__name__} package. "
+                )
+        elif da.ndim == 3:
+            face_dim = da.ugrid.grid.face_dimension
+            if da.dims != ("time", "layer", {face_dim}):
+                raise ValueError(
+                    f"3D grid should have dimensions ('time', 'layer', {face_dim}) "
+                    f"Instead got {da.dims} for {da.name} in the "
+                    f"{self.__class__.__name__} package. "
+                )
 
-        variables = self._get_vars_to_check()
-
-        if self._pkg_id not in excepted_pkgs:
-            for var in variables:
-                if "layer" not in self.dataset[var].coords:
-                    raise ValueError(
-                        f"Missing layer in {var} in {self.__class__.__name__}."
-                    )
+    def _structured_grid_dim_check(self, da):
+        """
+        Check dimension integrity of structured grid
+        """
+        if da.ndim < 2:
+            raise ValueError(
+                f"Boundary conditions should be specified as spatial grids. "
+                f"Instead, got {da.dims} for {da.name} in the "
+                f"{self.__class__.__name__} package. "
+            )
+        elif da.ndim == 2:
+            if da.dims != ("y", "x"):
+                raise ValueError(
+                    f"2D grid should have dimensions ('y', 'x'). "
+                    f"Instead, got {da.dims} for {da.name} in the "
+                    f"{self.__class__.__name__} package. "
+                )
+            if "layer" not in da.coords:
+                raise ValueError(
+                    f"No 'layer' coordinate assigned to {da.name} "
+                    f"in the {self.__class__.__name__} package. "
+                    f"2D grids still require a 'layer' coordinate. "
+                    f"You can assign one with `da.assign_coordinate(layer=1)`"
+                )
+        elif da.ndim == 3:
+            if (da.dims != ("layer", "y", "x")) and (da.dims != ("time", "y", "x")):
+                raise ValueError(
+                    f"3D grid should have dimensions ('layer', 'y', 'x') "
+                    f"or ('time', 'y', 'x'). "
+                    f"Instead, got {da.dims} for {da.name} in the "
+                    f"{self.__class__.__name__} package. "
+                )
+        elif da.ndim == 4:
+            if da.dims != ("time", "layer", "y", "x"):
+                raise ValueError(
+                    f"4D grid should have dimensions ('time', 'layer', 'y', 'x'). "
+                    f"Instead, got {da.dims} for {da.name} in the "
+                    f"{self.__class__.__name__} package. "
+                )
+        else:
+            raise ValueError(
+                f"Exceeded accepted amount of dimensions for "
+                f"for {da.name} in the "
+                f"{self.__class__.__name__} package. "
+                f"Got {da.dims}. Can be at max ('time', 'layer', 'y', 'x')."
+            )
 
     def _check_zero_dims(self):
         """
@@ -671,7 +814,6 @@ class BoundaryCondition(Package, abc.ABC):
     def _pkgcheck(self):
         super()._pkgcheck()
 
-        self._check_layer_present()
         self._check_zero_dims()
         self._check_all_nan()
         self._check_nan_consistent()

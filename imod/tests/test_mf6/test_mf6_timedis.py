@@ -48,3 +48,16 @@ def test_wrong_dtype():
         imod.mf6.TimeDiscretization(
             timestep_duration, n_timesteps=2, timestep_multiplier=1.1
         )
+
+
+def test_wrong_dims():
+    timestep_duration = xr.DataArray(
+        data=[[0.001, 7.0, 365.0]],
+        coords={"time": pd.date_range("2000-01-01", "2000-01-03"), "layer": [1]},
+        dims=["layer", "time"],
+    )
+
+    with pytest.raises(ValueError):
+        imod.mf6.TimeDiscretization(
+            timestep_duration, n_timesteps=2, timestep_multiplier=1.1
+        )

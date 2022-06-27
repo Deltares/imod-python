@@ -6,6 +6,7 @@ import pytest
 import xarray as xr
 
 import imod
+import re
 
 
 @pytest.fixture(scope="function")
@@ -80,13 +81,18 @@ def test_check_layer(riv_dict):
     """
     Test for error thrown if variable has no layer dim
     """
-    riv_dict["stage"] = riv_dict["stage"].sel(layer=2)
+    riv_dict["stage"] = riv_dict["stage"].sel(layer=2, drop=True)
 
-    with pytest.raises(ValueError, match="Missing layer in stage in River."):
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "No 'layer' coordinate assigned to stage in the River package. 2D grids still require a 'layer' coordinate. You can assign one with `da.assign_coordinate(layer=1)`"
+        ),
+    ):
         imod.mf6.River(**riv_dict)
 
 
-def test_check_layer2():
+def test_check_dimsize_zero():
     """
     Test that error is thrown for layer dim size 0.
     """
@@ -132,7 +138,7 @@ def test_check_bottom_above_stage(riv_dict):
         imod.mf6.River(**riv_dict)
 
 
-def test_check_dims(riv_dict):
+def test_check_dim_monotonicity(riv_dict):
     """
     Test if dimensions are monotonically increasing or, in case of the y coord,
     decreasing

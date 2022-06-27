@@ -42,7 +42,7 @@ def test_simple_model(fixed_format_parser):
              [0.0, 0.0, 0.0]],
         ),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"layer": 1, "y": y, "x": x}
     )
 
     # fmt: on
@@ -91,7 +91,7 @@ def test_simple_model_1_subunit(fixed_format_parser):
              [0.0, 0.0, 0.0]],
         ),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"layer": 1, "y": y, "x": x}
     )
 
     # fmt: on
@@ -148,7 +148,7 @@ def test_simple_model_inactive_rch(fixed_format_parser):
              [nan, 0.0, 0.0]],
         ),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"layer": 1, "y": y, "x": x}
     )
 
     # fmt: on
@@ -204,7 +204,7 @@ def test_simple_model_inactive_rch_error():
              [nan, nan, 0.0]],
         ),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"layer": 1, "y": y, "x": x}
     )
 
     # fmt: on
@@ -250,7 +250,7 @@ def test_simple_model_rch_time_error():
             ]
         ),
         dims=("time", "y", "x"),
-        coords={"time": ["2000-01-01"], "y": y, "x": x}
+        coords={"time": ["2000-01-01"], "layer": 1, "y": y, "x": x}
     )
 
     # fmt: on
