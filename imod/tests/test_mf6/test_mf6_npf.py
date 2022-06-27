@@ -1,4 +1,5 @@
 import pathlib
+import re
 import textwrap
 
 import numpy as np
@@ -61,6 +62,37 @@ def test_wrong_dtype():
     with pytest.raises(TypeError):
         imod.mf6.NodePropertyFlow(
             icelltype=icelltype.astype(np.float64),
+            k=k,
+            k33=k33,
+            variable_vertical_conductance=True,
+            dewatered=True,
+            perched=True,
+            save_flows=True,
+        )
+
+
+def test_wrong_dim():
+    layer = np.array([1, 2, 3])
+    icelltype = xr.DataArray(
+        [[1, 0, 0]],
+        {"time": [1], "layer": layer},
+        (
+            "time",
+            "layer",
+        ),
+    )
+    k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": layer}, ("layer",))
+    k33 = xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",))
+
+    expected_message = re.escape(
+        "2D grid should have dimensions ('y', 'x'). "
+        "Instead, got ('time', 'layer') for icelltype in the "
+        "NodePropertyFlow package."
+    )
+
+    with pytest.raises(ValueError, match=expected_message):
+        imod.mf6.NodePropertyFlow(
+            icelltype=icelltype,
             k=k,
             k33=k33,
             variable_vertical_conductance=True,
