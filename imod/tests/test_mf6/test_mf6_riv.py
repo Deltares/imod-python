@@ -1,4 +1,5 @@
 import pathlib
+import re
 import textwrap
 
 import numpy as np
@@ -6,7 +7,6 @@ import pytest
 import xarray as xr
 
 import imod
-import re
 
 
 @pytest.fixture(scope="function")

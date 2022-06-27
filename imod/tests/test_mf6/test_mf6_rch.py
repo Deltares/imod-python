@@ -1,11 +1,11 @@
 import pathlib
+import re
 import textwrap
 
 import numpy as np
-import xarray as xr
 import pytest
+import xarray as xr
 
-import re
 import imod
 
 
@@ -170,6 +170,8 @@ def test_no_layer_coord(rch_dict):
 def test_scalar():
     with pytest.raises(
         ValueError,
-        match=re.escape("Boundary conditions should be specified as spatial grids. Instead, got () for rate in the Recharge package. "),
+        match=re.escape(
+            "Boundary conditions should be specified as spatial grids. Instead, got () for rate in the Recharge package. "
+        ),
     ):
         imod.mf6.Recharge(rate=0.001)
