@@ -4,7 +4,7 @@ from imod.mf6.pkgbase import Package
 class Buoyancy(Package):
     """
         Buoyancy package. This package must be included when performing variable
-        denisty simulation.
+        density simulation.
 
         Parameters
         ----------
