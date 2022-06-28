@@ -5,6 +5,9 @@ class Buoyancy(Package):
     """
         Buoyancy package. This package must be included when performing variable
         denisty simulation.
+        This package is to be used as follows: first initialize the package, and then
+        call a function to add dependencies on species concentration, once for
+        each species that affects density. The dependency of density on each species is linear.
 
         Parameters
         ----------
@@ -22,6 +25,23 @@ class Buoyancy(Package):
         settings for controlling head output are contained in the Output Control
         option.
 
+    Examples
+        --------
+        Initialize the Buoyancy package. We use an option to keep the flow matrix symmetric,
+        and a freshwater density of 996 g/l. We also specify an output file for density.  :
+
+        >>> buy = imod.mf6.Buoyancy(
+             hhformulation_rhs=True, denseref=996, densityfile="density_out.dat"
+        )
+
+        Second, we add dependencies on one or more species. We must provide the reference
+        concentration ( this is the concentration at which the freshwater density provided above
+        was measured) and also the derivative of density to species concentration. This slope is assumed to
+        be constant across the concentration range. For each dependency we must also provide the name of the species,
+        and of the transport model that governs this species.
+
+        >>> buy.add_species_dependency(0.7, 4, "gwt-1", "salinity")
+        >>> buy.add_species_dependency(-0.375, 25, "gwt-2", "temperature")
 
     """
 
