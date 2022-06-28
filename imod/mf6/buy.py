@@ -4,7 +4,7 @@ from imod.mf6.pkgbase import Package
 class Buoyancy(Package):
     """
         Buoyancy package. This package must be included when performing variable
-        denisty simulation.
+        density simulation.
         This package is to be used as follows: first initialize the package, and then
         call a function to add dependencies on species concentration, once for
         each species that affects density. The dependency of density on each species is linear.
