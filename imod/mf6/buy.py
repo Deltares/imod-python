@@ -51,7 +51,7 @@ class Buoyancy(Package):
 
     def __init__(
         self,
-        hhformulation_rhs: bool = None,
+        hhformulation_rhs: bool = False,
         denseref: float = None,
         densityfile: str = None,
     ):
@@ -88,7 +88,6 @@ class Buoyancy(Package):
         for varname in ["hhformulation_rhs", "denseref", "densityfile", "nrhospecies"]:
             if self._valid(self.dataset[varname].values[()]):
                 d[varname] = self.dataset[varname].values[()]
-        d["nrhospecies"] = self.dataset["nrhospecies"].values[()]
 
 
         return self._template.render(d)
