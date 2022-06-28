@@ -89,5 +89,4 @@ class Buoyancy(Package):
             if self._valid(self.dataset[varname].values[()]):
                 d[varname] = self.dataset[varname].values[()]
 
-
         return self._template.render(d)
