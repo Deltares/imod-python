@@ -87,7 +87,7 @@ class Buoyancy(Package):
         d["dependencies"] = self.dependencies
         for varname in ["hhformulation_rhs", "denseref", "densityfile", "nrhospecies"]:
             if self._valid(self.dataset[varname].values[()]):
-            d["densityfile"] = self.dataset["densityfile"].values[()]
+                d[varname] = self.dataset[varname].values[()]
         d["nrhospecies"] = self.dataset["nrhospecies"].values[()]
 
 
