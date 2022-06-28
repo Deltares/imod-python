@@ -3,6 +3,7 @@ Create a structured Modflow 6 model.
 """
 
 from imod.mf6.adv import AdvectionCentral, AdvectionTVD, AdvectionUpstream
+from imod.mf6.buy import Buoyancy
 from imod.mf6.chd import ConstantHead
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
