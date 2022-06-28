@@ -85,12 +85,8 @@ class Buoyancy(Package):
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         d["dependencies"] = self.dependencies
-        if self.dataset["hhformulation_rhs"].values[()] is not None:
-            if self.dataset["hhformulation_rhs"].values[()] !=False:
-                d["hhformulation_rhs"] = self.dataset["hhformulation_rhs"].values[()]
-
-        for varname in ["denseref", "densityfile", "nrhospecies"]:
-            if self.dataset[varname].values[()] is not None:
+        for varname in ["hhformulation_rhs", "denseref", "densityfile", "nrhospecies"]:
+            if self._valid(self.dataset[varname].values[()]):
                 d[varname] = self.dataset[varname].values[()]
 
         return self._template.render(d)
