@@ -4,7 +4,7 @@ from imod.mf6.pkgbase import Package
 class Buoyancy(Package):
     """
         Buoyancy package. This package must be included when performing variable
-        denisty simulation.
+        density simulation.
         This package is to be used as follows: first initialize the package, and then
         call a function to add dependencies on species concentration, once for
         each species that affects density. The dependency of density on each species is linear.
@@ -51,7 +51,7 @@ class Buoyancy(Package):
 
     def __init__(
         self,
-        hhformulation_rhs: bool = None,
+        hhformulation_rhs: bool = False,
         denseref: float = None,
         densityfile: str = None,
     ):
@@ -86,11 +86,11 @@ class Buoyancy(Package):
         d = {}
         d["dependencies"] = self.dependencies
         if self.dataset["hhformulation_rhs"].values[()] is not None:
-            d["hhformulation_rhs"] = self.dataset["hhformulation_rhs"].values[()]
-        if self.dataset["denseref"].values[()] is not None:
-            d["denseref"] = self.dataset["denseref"].values[()]
-        if self.dataset["densityfile"].values[()] is not None:
-            d["densityfile"] = self.dataset["densityfile"].values[()]
-        d["nrhospecies"] = self.dataset["nrhospecies"].values[()]
+            if self.dataset["hhformulation_rhs"].values[()] !=False:
+                d["hhformulation_rhs"] = self.dataset["hhformulation_rhs"].values[()]
+
+        for varname in ["denseref", "densityfile", "nrhospecies"]:
+            if self.dataset[varname].values[()] is not None:
+                d[varname] = self.dataset[varname].values[()]
 
         return self._template.render(d)
