@@ -129,7 +129,9 @@ class GroundwaterFlowModel(Model):
         """Check if nan is present in active cells"""
         diskey = self._get_diskey()
 
-        active = self[diskey]["idomain"] == 1
+        # "If the IDOMAIN value for a cell is 1 or greater, the cell exists in
+        # the simulation"
+        active = self[diskey]["idomain"] >= 1
 
         pkg_ids_to_check = ["npf", "ic", "sto"]
         pkgkeys_to_check = [self._get_pkgkey(pkg_id) for pkg_id in pkg_ids_to_check]
