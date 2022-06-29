@@ -47,7 +47,7 @@ def test_buoyancy_package_full():
     begin options
         hhformulation_rhs
         denseref 993
-        densityfile fileout density_out.dat
+        density fileout density_out.dat
     end options
 
     begin dimensions
