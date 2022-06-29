@@ -62,6 +62,8 @@ min_concentration =  0.0
 max_density = 1025.0
 min_density = 1000.0
 
+layer_thickness = 1/nlay
+
 # %%
 # notice we are adding also a dy coordinate. This is used to determine the width of
 # the cells in the y direction, because it has only 1 element.
@@ -71,8 +73,8 @@ coords = {"layer": layer, "y": y, "x": x, "dy": dy, "dx": dx}
 idomain = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
 
 top = xr.full_like(idomain.sel(layer=1), 1.0,  dtype=np.floating)
-bottom_level_of_top_layer = 1.-1./nlay
-bottom = xr.DataArray(np.arange(bottom_level_of_top_layer,0,-bottom_level_of_top_layer/40), {"layer": layer}, ("layer",))
+bottom_level_of_top_layer = 1.-layer_thickness
+bottom = xr.DataArray(np.arange(bottom_level_of_top_layer,-layer_thickness,-layer_thickness), {"layer": layer}, ("layer",))
 
 # %%
 # Now make the flow model. We'll start with the non-boundary condition packages
@@ -103,12 +105,13 @@ gwf_model["oc"] = imod.mf6.OutputControl(save_head="last", save_budget="last")
 constant_head = xr.full_like(idomain, np.nan, dtype=float)
 inflow_concentration =  xr.full_like(idomain, np.nan, dtype=float)
 
+depth_cell_centers = 1 - (np.arange(bottom_level_of_top_layer,-layer_thickness,-layer_thickness) + layer_thickness/2)
+head_cellcentres = depth_cell_centers*(max_density - min_density) / min_density
 
-h_below = (max_density - min_density) / min_density
 
-heads =np.arange(0, h_below,  h_below/nlay)[np.newaxis]  #create 1d vector with desired values. add an axis to make it a 2d row vector with 1 column
-constant_head[..., ncol-1] = heads.T                     #transpose the 2d vector so that it becomes a column vector, now it fits the layout of constant_head
-conc = np.full_like(heads.T, max_concentration)
+head_cellcentres = head_cellcentres[np.newaxis]  #create 1d vector with desired values. add an axis to make it a 2d row vector with 1 column
+constant_head[..., ncol-1] = head_cellcentres.T                     #transpose the 2d vector so that it becomes a column vector, now it fits the layout of constant_head
+conc = np.full_like(head_cellcentres.T, max_concentration)
 inflow_concentration[..., ncol-1] = conc
 inflow_concentration = inflow_concentration.expand_dims(species=["salinity"])
 
@@ -144,9 +147,9 @@ porosity = 0.35
 tpt_model = imod.mf6.GroundwaterTransportModel(gwf_model, "salinity")
 tpt_model["advection"] = imod.mf6.AdvectionTVD()
 tpt_model["Dispersion"] = imod.mf6.Dispersion(
-    diffusion_coefficient= 0.57024 ,
-    longitudinal_horizontal=0.0,
-    transversal_horizontal1=0.0,
+    diffusion_coefficient= 0.0 ,
+    longitudinal_horizontal=0.1,
+    transversal_horizontal1=0.01,
     xt3d_off=False,
     xt3d_rhs=False,
 )
@@ -188,7 +191,7 @@ simulation["solver"] = imod.mf6.Solution(
 )
 # Collect time discretization
 #simtimes = daterange(datetime(2000, 1, 1,0,0,0), 5000, 0.001 )
-simtimes = list(daterange_expanding(datetime(2000, 1, 1,0,0,0), 500, 0.0001,0.001, 1.01 ))
+simtimes = list(daterange_expanding(datetime(2000, 1, 1,0,0,0), 500, 0.001,0.001, 1.0 ))
 nrtimes = len(simtimes) -2
 simulation.create_time_discretization(additional_times=simtimes)
 
@@ -239,7 +242,7 @@ with imod.util.temporary_directory() as someDir:
 # %%
 # Visualize the results (to get the plot right, invert the coordinate axis of layer)
 # ---------------------
-    layer2 = list(np.arange(41, 1, -1))
+    layer2 = list(np.arange(40, 0, -1))
 
     concentration = concentration.assign_coords(layer=layer2)
 
