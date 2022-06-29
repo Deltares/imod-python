@@ -677,16 +677,18 @@ class BoundaryCondition(Package, abc.ABC):
     def _check_all_nan(self):
         """
         Check if not grids with only nans are provided, as MAXBOUND cannot be 0.
+
+        ``self._max_active_n()`` only determines maxbound based on the first
+        variable in period_data. However, ``self._check_nan_consistent()``
+        checks if nans are inconsistent amongst variables, so this catches the
+        case where an all nan grid is provided for only one variable.
         """
 
-        variables = self._get_vars_to_check()
-
-        for var in variables:
-            all_nan = np.isnan(self.dataset[var]).all()
-            if all_nan:
-                raise ValueError(
-                    f"Provided grid with only nans for {var} in {self.__class__.__name__}."
-                )
+        maxbound = self._max_active_n()
+        if maxbound == 0:
+            raise ValueError(
+                f"Provided grid with only nans in {self.__class__.__name__}."
+            )
 
     def _unstructured_grid_dim_check(self, da):
         """
