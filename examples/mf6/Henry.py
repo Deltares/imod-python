@@ -20,6 +20,7 @@ In overview, we'll set the following steps:
 # structured model, we can make due with few packages.
 
 from datetime import date, datetime, timedelta
+import pathlib
 import numpy as np
 import xarray as xr
 
@@ -46,19 +47,25 @@ nrow = 1
 ncol = 80
 shape = (nlay, nrow, ncol)
 
-dx = 2/80
-xmin = 0.0
+
 xmax = 2
+xmin = 0.0
+dx = ( xmax - xmin)/ncol
 dims = ("layer", "y", "x")
 
 layer = np.arange(1, 41, 1)
 y = np.array([0.5])
 x = np.arange(xmin, xmax, dx) + 0.5 * dx
 
+max_concentration = 35.0
+min_concentration =  0.0
+max_density = 1025.0
+min_density = 1000.0
+
 # %%
 # notice we are adding also a dy coordinate. This is used to determine the width of
 # the cells in the y direction, because it has only 1 element.
-dy = 1
+dy = -1
 coords = {"layer": layer, "y": y, "x": x, "dy": dy, "dx": dx}
 
 idomain = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
@@ -82,7 +89,7 @@ gwf_model["npf"] = imod.mf6.NodePropertyFlow(
 gwf_model["sto"] = imod.mf6.SpecificStorage(
     specific_storage=1.0e-4,
     specific_yield=0.15,
-    transient=True,
+    transient=False,
     convertible=0,
 )
 
@@ -96,9 +103,12 @@ gwf_model["oc"] = imod.mf6.OutputControl(save_head="last", save_budget="last")
 constant_head = xr.full_like(idomain, np.nan, dtype=float)
 inflow_concentration =  xr.full_like(idomain, np.nan, dtype=float)
 
-heads =np.arange(0.025, 0, -0.025/nlay)[np.newaxis]  #create 1d vector with desired values. add an axis to make it a 2d row vector with 1 column
+
+h_below = (max_density - min_density) / min_density
+
+heads =np.arange(0, h_below,  h_below/nlay)[np.newaxis]  #create 1d vector with desired values. add an axis to make it a 2d row vector with 1 column
 constant_head[..., ncol-1] = heads.T                     #transpose the 2d vector so that it becomes a column vector, now it fits the layout of constant_head
-conc = np.full_like(heads.T, 1)
+conc = np.full_like(heads.T, max_concentration)
 inflow_concentration[..., ncol-1] = conc
 inflow_concentration = inflow_concentration.expand_dims(species=["salinity"])
 
@@ -115,7 +125,7 @@ flux_concentration = xr.DataArray(
             cell=(range(0, nlay))
         ),
     )
-flux_concentration[...]=0
+flux_concentration[...]=min_concentration
 flux_concentration=flux_concentration.expand_dims(species=["salinity"])
 
 wellrows = np.full_like(layer, 1, dtype=np.int32)
@@ -123,9 +133,10 @@ wellcolumns = np.full_like(layer, 1, dtype=np.int32)
 gwf_model["left_boundary"] = imod.mf6.WellDisStructured(layer=layer, row=wellrows, column=wellcolumns, rate=flux, concentration= flux_concentration, concentration_boundary_type="AUX" )
 
 gwf_model["buoyancy"] = imod.mf6.Buoyancy(
-    hhformulation_rhs=True, denseref=1000, densityfile="density_out.dat"
+    denseref=min_density, densityfile="density_out.dat"
 )
-gwf_model["buoyancy"].add_species_dependency(25, 0, "transport", "salinity")
+slope = (max_density - min_density)/( max_concentration - min_concentration)
+gwf_model["buoyancy"].add_species_dependency(slope, min_concentration, "transport", "salinity")
 
 
 porosity = 0.35
@@ -133,7 +144,7 @@ porosity = 0.35
 tpt_model = imod.mf6.GroundwaterTransportModel(gwf_model, "salinity")
 tpt_model["advection"] = imod.mf6.AdvectionTVD()
 tpt_model["Dispersion"] = imod.mf6.Dispersion(
-    diffusion_coefficient=0.57024,
+    diffusion_coefficient= 0.57024 ,
     longitudinal_horizontal=0.0,
     transversal_horizontal1=0.0,
     xt3d_off=False,
@@ -145,7 +156,7 @@ tpt_model["storage"] = imod.mf6.MobileStorage(
     porosity=porosity,
 )
 
-tpt_model["ic"] = imod.mf6.InitialConditions(start=0.001)
+tpt_model["ic"] = imod.mf6.InitialConditions(start=max_concentration)
 tpt_model["oc"] = imod.mf6.OutputControl(
     save_concentration="last", save_budget="last"
 )
@@ -166,17 +177,18 @@ simulation["solver"] = imod.mf6.Solution(
     outer_dvclose=1.0e-6,
     outer_maximum=500,
     under_relaxation=None,
-    inner_dvclose=1.0e-5,
-    inner_rclose=0.001,
+    inner_dvclose=1.0e-6,
+    inner_rclose=1.0e-5,
+    rclose_option='STRICT',
     inner_maximum=100,
     linear_acceleration="bicgstab",
     scaling_method=None,
     reordering_method=None,
-    relaxation_factor=0.97,
+    relaxation_factor=0.9,
 )
 # Collect time discretization
 #simtimes = daterange(datetime(2000, 1, 1,0,0,0), 5000, 0.001 )
-simtimes = list(daterange_expanding(datetime(2000, 1, 1,0,0,0), 500, 0.001,1, 1.02 ))
+simtimes = list(daterange_expanding(datetime(2000, 1, 1,0,0,0), 500, 0.0001,0.001, 1.01 ))
 nrtimes = len(simtimes) -2
 simulation.create_time_discretization(additional_times=simtimes)
 
@@ -184,8 +196,8 @@ simulation.create_time_discretization(additional_times=simtimes)
 
 # %%
 # We'll create a new directory in which we will write and run the model.
-
-with imod.util.temporary_directory() as modeldir:
+modeldir = pathlib.Path('C:\\Users\\slooten\\AppData\\Local\\Temp\\tmp9z4kdut2')
+with imod.util.temporary_directory() as someDir:
     simulation.write(modeldir,binary=False)
 
 # %%
@@ -225,11 +237,14 @@ with imod.util.temporary_directory() as modeldir:
     )
 
 # %%
-# Visualize the results
+# Visualize the results (to get the plot right, invert the coordinate axis of layer)
 # ---------------------
+    layer2 = list(np.arange(41, 1, -1))
 
+    concentration = concentration.assign_coords(layer=layer2)
 
-    density.isel(y=0, time=nrtimes).plot.contourf()
+    concentration.isel(y=0, time=10).plot.contourf()
+    concentration.isel(y=0, time=nrtimes).plot.contourf()
 
     i=0
 
