@@ -61,9 +61,7 @@ def test_all_nan(riv_dict):
     # Use where to set everything to np.nan
     riv_dict["stage"] = riv_dict["stage"].where(False)
 
-    with pytest.raises(
-        ValueError, match="Provided grid with only nans for stage in River."
-    ):
+    with pytest.raises(ValueError, match="Provided grid with only nans in River."):
         imod.mf6.River(**riv_dict)
 
 
