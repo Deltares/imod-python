@@ -88,13 +88,11 @@ class River(BoundaryCondition):
 
         bottom = dis.dataset["bottom"]
 
-        rivkeys = [pkgname for pkgname, pkg in self.items() if pkg._pkg_id == "riv"]
-
-        for rivkey in rivkeys:
-            riv = self[rivkey]
-            riv_below_bottom = riv.dataset["bottom_elevation"] < bottom
-            if riv_below_bottom.any():
-                raise ValueError(f"River bottom below model bottom for pkg '{rivkey}'.")
+        riv_below_bottom = self.dataset["bottom_elevation"] < bottom
+        if riv_below_bottom.any():
+            raise ValueError(
+                f"River bottom below model bottom for in '{self.__class__.__name__}'."
+            )
 
     def _pkgcheck_at_write(self, dis):
         self._check_river_bottom_below_model_bottom(self, dis)
