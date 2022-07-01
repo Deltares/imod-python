@@ -125,59 +125,17 @@ class GroundwaterFlowModel(Model):
         d["packages"] = packages
         return self._template.render(d)
 
-    def _check_nan_in_active_cell(self, modelkey: str):
-        """Check if nan is present in active cells"""
-        diskey = self._get_diskey()
-
-        # "If the IDOMAIN value for a cell is 1 or greater, the cell exists in
-        # the simulation"
-        active = self[diskey]["idomain"] >= 1
-
-        pkg_ids_to_check = ["npf", "ic", "sto"]
-        pkgkeys_to_check = [self._get_pkgkey(pkg_id) for pkg_id in pkg_ids_to_check]
-        pkgkeys_to_check.append(diskey)
-
-        for pkgkey in pkgkeys_to_check:
-            pkg = self[pkgkey]
-            variables = pkg._get_vars_to_check()
-
-            for var in variables:
-                nan_in_active = np.isnan(pkg.dataset[var]) & active
-                if nan_in_active.any():
-                    pkgname = pkg.__class__.__name__
-                    raise ValueError(
-                        f"Detected value with np.nan in active domain of model "
-                        f"{modelkey} in {pkgname} for variable: {var}."
-                    )
-
-    def _check_river_bottom_below_model_bottom(self, modelkey: str):
-        """
-        Check if river bottom not below model bottom. Modflow 6 throws an
-        error if this occurs.
-        """
-
-        diskey = self._get_diskey()
-
-        bottom = self[diskey].dataset["bottom"]
-
-        rivkeys = [pkgname for pkgname, pkg in self.items() if pkg._pkg_id == "riv"]
-
-        for rivkey in rivkeys:
-            riv = self[rivkey]
-            riv_below_bottom = riv.dataset["bottom_elevation"] < bottom
-            if riv_below_bottom.any():
-                raise ValueError(
-                    f"River bottom below model bottom for pkg '{rivkey}' "
-                    f"in model '{modelkey}'"
-                )
-
     def _model_checks(self, modelkey: str):
         """
         Check model integrity (called before writing)
         """
+        diskey = self._get_diskey()
+        dis = self[diskey]
+
         self._check_for_required_packages(modelkey)
-        self._check_nan_in_active_cell(modelkey)
-        self._check_river_bottom_below_model_bottom(modelkey)
+
+        for pkgname, pkg in self.items():
+            pkg._pkgcheck_at_write(dis)
 
     def write(self, directory, modelname, globaltimes, binary=True):
         """

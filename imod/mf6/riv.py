@@ -79,3 +79,24 @@ class River(BoundaryCondition):
             raise ValueError(
                 f"Bottom elevation above stage in {self.__class__.__name__}."
             )
+
+    def _check_river_bottom_below_model_bottom(self, dis):
+        """
+        Check if river bottom not below model bottom. Modflow 6 throws an
+        error if this occurs.
+        """
+
+        bottom = dis.dataset["bottom"]
+
+        rivkeys = [pkgname for pkgname, pkg in self.items() if pkg._pkg_id == "riv"]
+
+        for rivkey in rivkeys:
+            riv = self[rivkey]
+            riv_below_bottom = riv.dataset["bottom_elevation"] < bottom
+            if riv_below_bottom.any():
+                raise ValueError(f"River bottom below model bottom for pkg '{rivkey}'.")
+
+    def _pkgcheck_at_write(self, dis):
+        self._check_river_bottom_below_model_bottom(self, dis)
+
+        self._pkgcheck_at_write(dis)

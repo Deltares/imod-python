@@ -588,6 +588,25 @@ class Package(abc.ABC):
         self._check_dim_monotonicity()
         self._check_dim_integrity()
 
+    def _pkgcheck_at_write(self, dis):
+        self._check_nan_in_active_cell(dis)
+
+    def _check_nan_in_active_cell(self, dis):
+        if hasattr(self, "_grid_data") and self._grid_data:
+
+            active = dis["idomain"] >= 1
+
+            variables = self._get_vars_to_check()
+
+            for var in variables:
+                nan_in_active = np.isnan(self.dataset[var]) & active
+                if nan_in_active.any():
+                    pkgname = self.__class__.__name__
+                    raise ValueError(
+                        f"Detected value with np.nan in active domain "
+                        f"in {pkgname} for variable: {var}."
+                    )
+
 
 class BoundaryCondition(Package, abc.ABC):
     """
