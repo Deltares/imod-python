@@ -695,8 +695,7 @@ class BoundaryCondition(Package, abc.ABC):
 
     def _unstructured_grid_dim_check(self, da):
         """
-        Check dimension integrity of unstructured grid,
-        no time dimension is accepted, data is assumed static.
+        Check dimension integrity of unstructured grid
         """
         pkgcheck.unstructured_boundary_condition_dim_check(self.__class__.__name__, da)
 
