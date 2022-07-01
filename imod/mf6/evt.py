@@ -91,7 +91,7 @@ class Evapotranspiration(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
-        self._pkgcheck()
+        self._pkgcheck_at_init()
 
         # TODO: add write logic for transforming proportion rate and depth to
         # the right shape in the binary file.

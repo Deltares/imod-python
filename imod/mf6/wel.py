@@ -92,7 +92,7 @@ class WellDisStructured(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
-        self._pkgcheck()
+        self._pkgcheck_at_init()
 
     def to_sparse(self, arrdict, layer):
         spec = []
@@ -109,7 +109,7 @@ class WellDisStructured(BoundaryCondition):
             recarr[key] = arr
         return recarr
 
-    def _pkgcheck(self):
+    def _pkgcheck_at_init(self):
         """
         Because data is structured in a different way for the well package, we
         override Boundary.pkgcheck to only check data types.
@@ -196,7 +196,7 @@ class WellDisVertices(BoundaryCondition):
             recarr[key] = arr
         return recarr
 
-    def _pkgcheck(self):
+    def _pkgcheck_at_init(self):
         """
         Because data is structured in a different way for the well package, we
         override Boundary.pkgcheck to only check data types.

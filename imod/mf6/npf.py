@@ -262,7 +262,7 @@ class NodePropertyFlow(Package):
         self.dataset["perched"] = perched
         self.dataset["save_specific_discharge"] = save_specific_discharge
 
-        self._pkgcheck()
+        self._pkgcheck_at_init()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

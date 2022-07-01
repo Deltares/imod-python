@@ -46,7 +46,7 @@ class StructuredDiscretization(Package):
         self.dataset["top"] = top
         self.dataset["bottom"] = bottom
 
-        self._pkgcheck()
+        self._pkgcheck_at_init()
 
     def _delrc(self, dx):
         """
@@ -95,7 +95,7 @@ class StructuredDiscretization(Package):
         if bottom_above_top.any():
             raise ValueError(f"Bottom above top in {self.__class__.__name__}.")
 
-    def _pkgcheck(self):
+    def _pkgcheck_at_init(self):
         self._check_bottom_above_top()
 
-        super()._pkgcheck()
+        super()._pkgcheck_at_init()

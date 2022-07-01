@@ -582,7 +582,7 @@ class Package(abc.ABC):
                     f"y coordinate in {self.__class__.__name__} not monotonically decreasing"
                 )
 
-    def _pkgcheck(self):
+    def _pkgcheck_at_init(self):
         self._check_types()
         self._check_range()
         self._check_dim_monotonicity()
@@ -853,8 +853,8 @@ class BoundaryCondition(Package, abc.ABC):
                 f"some variables contain nan, but others do not."
             )
 
-    def _pkgcheck(self):
-        super()._pkgcheck()
+    def _pkgcheck_at_init(self):
+        super()._pkgcheck_at_init()
 
         self._check_zero_dims()
         self._check_all_nan()

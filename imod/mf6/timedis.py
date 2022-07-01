@@ -50,7 +50,7 @@ class TimeDiscretization(Package):
         self.dataset["n_timesteps"] = n_timesteps
         self.dataset["timestep_multiplier"] = timestep_multiplier
 
-        self._pkgcheck()
+        self._pkgcheck_at_init()
 
     def render(self):
         start_date_time = iso8601(self.dataset["time"].values[0])

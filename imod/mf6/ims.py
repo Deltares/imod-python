@@ -408,7 +408,7 @@ class Solution(Package):
         self.dataset["csv_output"] = csv_output
         self.dataset["no_ptc"] = no_ptc
 
-        self._pkgcheck()
+        self._pkgcheck_at_init()
 
 
 def SolutionPresetSimple(print_option, csv_output, no_ptc):

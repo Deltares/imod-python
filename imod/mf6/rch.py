@@ -56,4 +56,4 @@ class Recharge(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
-        self._pkgcheck()
+        self._pkgcheck_at_init()

@@ -63,12 +63,12 @@ class River(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
-        self._pkgcheck()
+        self._pkgcheck_at_init()
 
-    def _pkgcheck(self):
+    def _pkgcheck_at_init(self):
         self._check_bottom_above_stage()
 
-        super()._pkgcheck()
+        super()._pkgcheck_at_init()
 
     def _check_bottom_above_stage(self):
         """Check if river bottom not above river stage"""

@@ -34,7 +34,7 @@ class InitialConditions(Package):
         super().__init__(locals())
         self.dataset["head"] = head
 
-        self._pkgcheck()
+        self._pkgcheck_at_init()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

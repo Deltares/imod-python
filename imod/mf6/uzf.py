@@ -207,7 +207,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         self.dataset["ivertcon"] = self._determine_vertical_connection(self["iuzno"])
 
-        self._pkgcheck()
+        self._pkgcheck_at_init()
 
     def fill_stress_perioddata(self):
         """Modflow6 requires something to be filled in the stress perioddata,

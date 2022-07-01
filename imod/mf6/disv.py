@@ -33,7 +33,7 @@ class VerticesDiscretization(Package):
         self.dataset["top"] = top
         self.dataset["bottom"] = bottom
 
-        self._pkgcheck()
+        self._pkgcheck_at_init()
 
     def render(self, directory, pkgname, binary):
         disdirectory = directory / pkgname
