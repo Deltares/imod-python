@@ -218,3 +218,42 @@ def test_wrong_value_sc(sy_layered, convertible):
             transient=True,
             convertible=convertible,
         )
+
+
+def test_check_nan_in_active_cell(sy_layered, convertible, idomain):
+    top = idomain.sel(layer=1)
+    bottom = idomain - xr.DataArray(
+        data=[1.0, 2.0], dims=("layer",), coords={"layer": [2, 3]}
+    )
+
+    dis = imod.mf6.StructuredDiscretization(
+        top=top, bottom=bottom, idomain=idomain.astype(int)
+    )
+
+    storage_coefficient = idomain * 0.1
+
+    sto = imod.mf6.StorageCoefficient(
+        storage_coefficient=storage_coefficient,
+        specific_yield=sy_layered,
+        transient=True,
+        convertible=convertible,
+    )
+
+    sto._check_nan_in_active_cell(dis)
+
+    test_msg = (
+        "Detected value with np.nan in active domain "
+        "in StorageCoefficient for variable: storage_coefficient."
+    )
+
+    with pytest.raises(ValueError, match=test_msg):
+        storage_coefficient[1, 1, 1] = np.nan
+
+        sto = imod.mf6.StorageCoefficient(
+            storage_coefficient=storage_coefficient,
+            specific_yield=sy_layered,
+            transient=True,
+            convertible=convertible,
+        )
+
+        sto._check_nan_in_active_cell(dis)

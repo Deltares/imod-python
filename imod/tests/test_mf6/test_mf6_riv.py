@@ -10,22 +10,40 @@ import imod
 
 
 @pytest.fixture(scope="function")
-def riv_dict():
+def make_da():
     x = [5.0, 15.0, 25.0]
     y = [25.0, 15.0, 5.0]
     layer = [2, 3]
     dx = 10.0
     dy = -10.0
 
-    da = xr.DataArray(
+    return xr.DataArray(
         data=np.ones((2, 3, 3), dtype=float),
         dims=("layer", "y", "x"),
         coords=dict(layer=layer, y=y, x=x, dx=dx, dy=dy),
     )
 
+
+@pytest.fixture(scope="function")
+def dis_dict(make_da):
+    da = make_da
+    bottom = da - xr.DataArray(
+        data=[1.0, 2.0], dims=("layer",), coords={"layer": [2, 3]}
+    )
+
+    return dict(idomain=da.astype(int), top=da.sel(layer=2), bottom=bottom * 2)
+
+
+@pytest.fixture(scope="function")
+def riv_dict(make_da):
+    da = make_da
     da[:, 1, 1] = np.nan
 
-    return dict(stage=da, conductance=da, bottom_elevation=da - 1.0)
+    bottom = da - xr.DataArray(
+        data=[1.0, 2.0], dims=("layer",), coords={"layer": [2, 3]}
+    )
+
+    return dict(stage=da, conductance=da, bottom_elevation=bottom)
 
 
 def test_render(riv_dict):
@@ -138,6 +156,22 @@ def test_check_bottom_above_stage(riv_dict):
 
     with pytest.raises(ValueError, match="Bottom elevation above stage in River."):
         imod.mf6.River(**riv_dict)
+
+
+def test_check_riv_bottom_above_dis_bottom(riv_dict, dis_dict):
+    """
+    Check that river bottom not above dis bottom.
+    """
+
+    river = imod.mf6.River(**riv_dict)
+    dis = imod.mf6.StructuredDiscretization(**dis_dict)
+
+    river._check_river_bottom_below_model_bottom(dis)
+
+    dis["bottom"] += 2.0
+
+    with pytest.raises(ValueError):
+        river._check_river_bottom_below_model_bottom(dis)
 
 
 def test_check_dim_monotonicity(riv_dict):
