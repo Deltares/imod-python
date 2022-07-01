@@ -879,6 +879,24 @@ class BoundaryCondition(Package, abc.ABC):
         self._check_all_nan()
         self._check_nan_consistent()
 
+    def _check_boundary_outside_active_domain(self, dis):
+        active = dis["idomain"] >= 1
+
+        # Check only one var, _check_nan_consistent covered inconsistent vars
+        var = self._get_vars_to_check()[0]
+
+        da = self.dataset[var]
+
+        if (~np.isnan(da) & ~active).any():
+            raise ValueError(
+                f"Detected {self.__class__.__name__} cell outside active model domain"
+            )
+
+    def _pkgcheck_at_write(self, dis):
+        self._check_boundary_outside_active_domain(dis)
+
+        super()._pkgcheck_at_write(dis)
+
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     """

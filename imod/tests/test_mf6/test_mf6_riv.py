@@ -174,6 +174,24 @@ def test_check_riv_bottom_above_dis_bottom(riv_dict, dis_dict):
         river._check_river_bottom_below_model_bottom(dis)
 
 
+def test_check_boundary_outside_active_domain(riv_dict, dis_dict):
+    """
+    Check that river bottom not above dis bottom.
+    """
+
+    river = imod.mf6.River(**riv_dict)
+    dis = imod.mf6.StructuredDiscretization(**dis_dict)
+
+    river._check_boundary_outside_active_domain(dis)
+
+    with pytest.raises(
+        ValueError, match="Detected River cell outside active model domain"
+    ):
+        dis["idomain"][0, 0, 0] = 0
+
+        river._check_boundary_outside_active_domain(dis)
+
+
 def test_check_dim_monotonicity(riv_dict):
     """
     Test if dimensions are monotonically increasing or, in case of the y coord,
