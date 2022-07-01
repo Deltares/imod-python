@@ -55,8 +55,8 @@ class SpecificStorage(Package):
         "convertible": "iconvert",
     }
     _metadata_dict = {
-        "specific_storage": VariableMetaData(np.floating),
-        "specific_yield": VariableMetaData(np.floating),
+        "specific_storage": VariableMetaData(np.floating, not_less_than=0.0),
+        "specific_yield": VariableMetaData(np.floating, not_less_than=0.0),
         "convertible": VariableMetaData(np.integer),
     }
     _template = Package._initialize_template(_pkg_id)
@@ -123,7 +123,7 @@ class StorageCoefficient(Package):
     Parameters
     ----------
     storage_coefficient: array of floats (xr.DataArray)
-        Is specific storage. Storage coefficient values must be greater than
+        Is storage coefficient. Storage coefficient values must be greater than
         or equal to 0. (ss)
     specific_yield: array of floats (xr.DataArray)
         Is specific yield. Specific yield values must be greater than or
@@ -151,8 +151,8 @@ class StorageCoefficient(Package):
         "convertible": "iconvert",
     }
     _metadata_dict = {
-        "storage_coefficient": VariableMetaData(np.floating),
-        "specific_yield": VariableMetaData(np.floating),
+        "storage_coefficient": VariableMetaData(np.floating, not_less_than=0.0),
+        "specific_yield": VariableMetaData(np.floating, not_less_than=0.0),
         "convertible": VariableMetaData(
             np.integer,
         ),

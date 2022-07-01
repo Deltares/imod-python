@@ -1,6 +1,9 @@
 import abc
+import dataclasses
+import operator
 import pathlib
 from dataclasses import dataclass
+from typing import Optional, Union
 
 import jinja2
 import numpy as np
@@ -52,12 +55,15 @@ class VariableMetaData:
     """
     Dataclass to store metadata of a variable.
 
-    Currently purely used to store datatypes, but can be later expanded to store
-    minimimum and maximum values of variables, keyword maps, and period/package
-    data flags.
+    Currently purely used to store datatypes and value limits, and can be later
+    expanded to store keyword maps, and period/package data flags.
     """
 
     dtype: type
+    not_less_than: Optional[Union[int, float]] = None
+    not_less_equal_than: Optional[Union[int, float]] = None
+    not_greater_than: Optional[Union[int, float]] = None
+    not_greater_equal_than: Optional[Union[int, float]] = None
 
 
 class Package(abc.ABC):
@@ -428,6 +434,39 @@ class Package(abc.ABC):
 
         return variables
 
+    def _check_range(self):
+        """
+        Check if variables are within the appropriate range.
+        First check all variables construct an error message with all the erronous , raise error.
+        """
+        variables = self._get_vars_to_check()
+        pkgname = self.__class__.__name__
+
+        range_operators = {
+            "not_less_than": (operator.lt, "less than"),
+            "not_less_equal_than": (operator.le, "less or equal than"),
+            "not_greater_than": (operator.gt, "greater than"),
+            "not_greater_equal_than": (operator.ge, "greater or equal than"),
+        }
+
+        raise_error = False
+        msg = f"Detected incorrect values in {pkgname}: \n"
+
+        for varname in variables:
+            var_metadata_dict = dataclasses.asdict(self._metadata_dict[varname])
+
+            for key, (operator_func, msg_operator) in range_operators.items():
+                bound = var_metadata_dict[key]
+
+                if (bound is not None) and (
+                    operator_func(self.dataset[varname], bound).any()
+                ):
+                    raise_error = True
+                    msg += f"- {varname} in {pkgname}: values {msg_operator} {bound} detected. \n"
+
+        if raise_error:
+            raise ValueError(msg)
+
     def _check_types(self):
         """Check that data types of grid data are correct."""
 
@@ -545,6 +584,7 @@ class Package(abc.ABC):
 
     def _pkgcheck(self):
         self._check_types()
+        self._check_range()
         self._check_dim_monotonicity()
         self._check_dim_integrity()
 

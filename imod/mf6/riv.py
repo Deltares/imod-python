@@ -39,7 +39,7 @@ class River(BoundaryCondition):
     _keyword_map = {}
     _metadata_dict = {
         "stage": VariableMetaData(np.floating),
-        "conductance": VariableMetaData(np.floating),
+        "conductance": VariableMetaData(np.floating, not_less_equal_than=0.0),
         "bottom_elevation": VariableMetaData(np.floating),
     }
     _template = BoundaryCondition._initialize_template(_pkg_id)
@@ -66,19 +66,9 @@ class River(BoundaryCondition):
         self._pkgcheck()
 
     def _pkgcheck(self):
-        self._check_conductance_zero()
         self._check_bottom_above_stage()
 
         super()._pkgcheck()
-
-    def _check_conductance_zero(self):
-        """Check if conductance is zero, modflow 6 doesn't accept this."""
-
-        conductance_zero = self.dataset["conductance"] == 0.0
-        if conductance_zero.any():
-            raise ValueError(
-                f"Detected conductance with value 0.0 in {self.__class__.__name__}"
-            )
 
     def _check_bottom_above_stage(self):
         """Check if river bottom not above river stage"""

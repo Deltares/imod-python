@@ -106,10 +106,10 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
     _metadata_dict = {
         "surface_depression_depth": VariableMetaData(np.floating),
-        "kv_sat": VariableMetaData(np.floating),
-        "theta_res": VariableMetaData(np.floating),
-        "theta_sat": VariableMetaData(np.floating),
-        "theta_init": VariableMetaData(np.floating),
+        "kv_sat": VariableMetaData(np.floating, not_less_equal_than=0.0),
+        "theta_res": VariableMetaData(np.floating, not_less_than=0.0),
+        "theta_sat": VariableMetaData(np.floating, not_less_than=0.0),
+        "theta_init": VariableMetaData(np.floating, not_less_than=0.0),
         "epsilon": VariableMetaData(np.floating),
         "infiltration_rate": VariableMetaData(np.floating),
         "et_pot": VariableMetaData(np.floating),

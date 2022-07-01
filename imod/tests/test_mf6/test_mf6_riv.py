@@ -120,7 +120,11 @@ def test_check_zero_conductance(riv_dict):
     riv_dict["conductance"] = riv_dict["conductance"] * 0.0
 
     with pytest.raises(
-        ValueError, match="Detected conductance with value 0.0 in River"
+        ValueError,
+        match=(
+            "Detected incorrect values in River: \n"
+            "- conductance in River: values less or equal than 0.0 detected. \n"
+        ),
     ):
         imod.mf6.River(**riv_dict)
 

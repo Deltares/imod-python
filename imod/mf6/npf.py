@@ -179,10 +179,10 @@ class NodePropertyFlow(Package):
 
     _metadata_dict = {
         "icelltype": VariableMetaData(np.integer),
-        "k": VariableMetaData(np.floating),
+        "k": VariableMetaData(np.floating, not_less_equal_than=0.0),
         "rewet_layer": VariableMetaData(np.floating),
-        "k22": VariableMetaData(np.floating),
-        "k33": VariableMetaData(np.floating),
+        "k22": VariableMetaData(np.floating, not_less_equal_than=0.0),
+        "k33": VariableMetaData(np.floating, not_less_equal_than=0.0),
         "angle1": VariableMetaData(np.floating),
         "angle2": VariableMetaData(np.floating),
         "angle3": VariableMetaData(np.floating),

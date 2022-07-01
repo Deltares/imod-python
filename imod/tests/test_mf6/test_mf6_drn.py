@@ -59,7 +59,11 @@ def test_check_conductance_zero(drainage):
     drainage["conductance"] = drainage["conductance"] * 0.0
 
     with pytest.raises(
-        ValueError, match="Detected conductance with value 0.0 in Drainage"
+        ValueError,
+        match=(
+            "Detected incorrect values in Drainage: \n"
+            "- conductance in Drainage: values less or equal than 0.0 detected. \n"
+        ),
     ):
         imod.mf6.Drainage(**drainage)
 

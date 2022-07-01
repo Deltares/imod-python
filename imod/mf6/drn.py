@@ -35,7 +35,7 @@ class Drainage(BoundaryCondition):
     # has to be ordered as in the list
     _metadata_dict = {
         "elevation": VariableMetaData(np.floating),
-        "conductance": VariableMetaData(np.floating),
+        "conductance": VariableMetaData(np.floating, not_less_equal_than=0.0),
     }
     _period_data = ("elevation", "conductance")
     _keyword_map = {}
@@ -59,17 +59,3 @@ class Drainage(BoundaryCondition):
         self.dataset["observations"] = observations
 
         self._pkgcheck()
-
-    def _pkgcheck(self):
-        self._check_conductance_zero()
-
-        super()._pkgcheck()
-
-    def _check_conductance_zero(self):
-        """Check if conductance is zero, modflow 6 doesn't accept this."""
-
-        conductance_zero = self.dataset["conductance"] == 0.0
-        if conductance_zero.any():
-            raise ValueError(
-                f"Detected conductance with value 0.0 in {self.__class__.__name__}"
-            )

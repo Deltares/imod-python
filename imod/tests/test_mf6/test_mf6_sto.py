@@ -190,3 +190,31 @@ def test_wrong_dtype_ss(sy_layered, convertible):
             transient=True,
             convertible=convertible,
         )
+
+
+def test_wrong_value_ss(sy_layered, convertible):
+    test_msg = (
+        "Detected incorrect values in SpecificStorage: \n"
+        "- specific_storage in SpecificStorage: values less than 0.0 detected. \n"
+    )
+    with pytest.raises(ValueError, match=test_msg):
+        imod.mf6.SpecificStorage(
+            specific_storage=-0.1,
+            specific_yield=sy_layered,
+            transient=True,
+            convertible=convertible,
+        )
+
+
+def test_wrong_value_sc(sy_layered, convertible):
+    test_msg = (
+        "Detected incorrect values in StorageCoefficient: \n"
+        "- storage_coefficient in StorageCoefficient: values less than 0.0 detected. \n"
+    )
+    with pytest.raises(ValueError, match=test_msg):
+        imod.mf6.StorageCoefficient(
+            storage_coefficient=-0.1,
+            specific_yield=sy_layered,
+            transient=True,
+            convertible=convertible,
+        )
