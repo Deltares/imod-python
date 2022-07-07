@@ -95,6 +95,6 @@ class River(BoundaryCondition):
             )
 
     def _pkgcheck_at_write(self, dis):
-        self._check_river_bottom_below_model_bottom(self, dis)
+        self._check_river_bottom_below_model_bottom(dis)
 
-        self._pkgcheck_at_write(dis)
+        super()._pkgcheck_at_write(dis)
