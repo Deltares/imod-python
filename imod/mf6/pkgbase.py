@@ -7,7 +7,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
-TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst")
+TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist")
 
 
 def dis_recarr(arrdict, layer, notnull):

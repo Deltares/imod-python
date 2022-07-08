@@ -5,6 +5,7 @@ Create a structured Modflow 6 model.
 from imod.mf6.adv import AdvectionCentral, AdvectionTVD, AdvectionUpstream
 from imod.mf6.buy import Buoyancy
 from imod.mf6.chd import ConstantHead
+from imod.mf6.cnc import ConstantConcentration
 from imod.mf6.dis import StructuredDiscretization
 from imod.mf6.disv import VerticesDiscretization
 from imod.mf6.drn import Drainage
@@ -30,3 +31,4 @@ from imod.mf6.sto import SpecificStorage, Storage, StorageCoefficient
 from imod.mf6.timedis import TimeDiscretization
 from imod.mf6.uzf import UnsaturatedZoneFlow
 from imod.mf6.wel import WellDisStructured, WellDisVertices
+from imod.mf6.ist import ImmobileStorage
