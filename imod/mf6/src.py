@@ -1,5 +1,5 @@
 import numpy as np
-from imod.mf6.pkgbase import DisStructuredBoundaryCondition, DisVerticesBoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import DisStructuredBoundaryCondition, DisVerticesBoundaryCondition, VariableMetaData, Package
 
 
 class MassSourceLoadingDisStructured(DisStructuredBoundaryCondition):
@@ -11,27 +11,26 @@ class MassSourceLoadingDisStructured(DisStructuredBoundaryCondition):
     Parameters
     ----------
     layer: list of int
-        Model layer in which the well is located.
+        Model layer in which the mass source is located.
     row: list of int
-        Row in which the well is located.
+        Row in which the mass source is located.
     column: list of int
-        Column in which the well is located.
+        Column in which the mass source is located.
     smassrate: float or list of floats
         is the mass source loading rate. A positive value indicates addition of solute mass and a
         negative value indicates removal of solute mass.
     print_input: ({True, False}, optional)
-        keyword to indicate that the list of well information will be written to
-        the listing file immediately after it is read.
+        keyword to indicate that the list of mass source information will be written to the listing
+        file immediately after it is read.
         Default is False.
     print_flows: ({True, False}, optional)
-        Indicates that the list of well flow rates will be printed to the
-        listing file for every stress period time step in which "BUDGET PRINT"
-        is specified in Output Control. If there is no Output Control option
-        and PRINT FLOWS is specified, then flow rates are printed for the last
-        time step of each stress period.
+        keyword to indicate that the list of mass source flow rates will be printed to the listing
+        file for every stress period time step in which “BUDGET PRINT” is specified in Output Control. If
+        there is no Output Control option and “PRINT FLOWS” is specified, then flow rates are printed for
+        the last time step of each stress period
         Default is False.
     save_flows: ({True, False}, optional)
-        Indicates that well flow terms will be written to the file specified
+        Indicates that the mass source flow terms will be written to the file specified
         with "BUDGET FILEOUT" in Output Control.
         Default is False.
     observations: [Not yet supported.]
@@ -94,18 +93,17 @@ class MassSourceLoadingDisVertices(DisVerticesBoundaryCondition):
         is the mass source loading rate. A positive value indicates addition of solute mass and a
         negative value indicates removal of solute mass.
     print_input: ({True, False}, optional)
-        keyword to indicate that the list of well information will be written to
-        the listing file immediately after it is read.
+        keyword to indicate that the list of mass source information will be written to the listing
+        file immediately after it is read.
         Default is False.
     print_flows: ({True, False}, optional)
-        Indicates that the list of well flow rates will be printed to the
-        listing file for every stress period time step in which "BUDGET PRINT"
-        is specified in Output Control. If there is no Output Control option
-        and PRINT FLOWS is specified, then flow rates are printed for the last
-        time step of each stress period.
+        keyword to indicate that the list of mass source flow rates will be printed to the listing
+        file for every stress period time step in which “BUDGET PRINT” is specified in Output Control. If
+        there is no Output Control option and “PRINT FLOWS” is specified, then flow rates are printed for
+        the last time step of each stress period
         Default is False.
     save_flows: ({True, False}, optional)
-        Indicates that well flow terms will be written to the file specified
+        Indicates that the mass source flow terms will be written to the file specified
         with "BUDGET FILEOUT" in Output Control.
         Default is False.
     observations: [Not yet supported.]

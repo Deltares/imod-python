@@ -32,3 +32,4 @@ from imod.mf6.timedis import TimeDiscretization
 from imod.mf6.uzf import UnsaturatedZoneFlow
 from imod.mf6.wel import WellDisStructured, WellDisVertices
 from imod.mf6.ist import ImmobileStorage
+from imod.mf6.src import MassSourceLoadingDisVertices, MassSourceLoadingDisStructured

@@ -8,7 +8,7 @@ import xarray as xr
 import xugrid as xu
 from typing import Dict
 
-TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist")
+TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
 
 def dis_recarr(arrdict, layer, notnull):
