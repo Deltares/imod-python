@@ -1,9 +1,9 @@
-
-from dataclasses import dataclass
+import warnings
 
 import numpy as np
+
 from imod.mf6.pkgbase import Package, VariableMetaData
-import warnings
+
 
 class ImmobileStorage(Package):
     """
@@ -63,6 +63,7 @@ class ImmobileStorage(Package):
         in dimensions of length cubed per mass. distcoef will have no effect on simulation results
         unless the SORPTION keyword is specified in the options block.
     """
+
     _pkg_id = "ist"
     _template = Package._initialize_template(_pkg_id)
     _grid_data = {
@@ -100,20 +101,20 @@ class ImmobileStorage(Package):
         mobile_immobile_mass_transfer_rate,
         save_flows: bool = None,
         budgetbinfile: str = None,
-        budgetcsvfile: str  = None,
-        sorption: bool =  False,
-        first_order_decay: bool =  False,
-        zero_order_decay: bool =  False,
+        budgetcsvfile: str = None,
+        sorption: bool = False,
+        first_order_decay: bool = False,
+        zero_order_decay: bool = False,
         cimfile: str = "cim.dat",
         columns: int = 7,
-        width: int  = 10,
-        digits: int  = 7,
-        format: str  = "EXPONENTIAL",
-        initial_immobile_concentration  = None,
+        width: int = 10,
+        digits: int = 7,
+        format: str = "EXPONENTIAL",
+        initial_immobile_concentration=None,
         decay=None,
         decay_sorbed=None,
         bulk_density=None,
-        distribution_coefficient=None
+        distribution_coefficient=None,
     ):
         super().__init__(locals())
         self.dataset["save_flows"] = save_flows
@@ -127,8 +128,10 @@ class ImmobileStorage(Package):
         self.dataset["width"] = width
         self.dataset["digits"] = digits
         self.dataset["format"] = format
-        self.dataset["initial_immobile_concentration"]= initial_immobile_concentration
-        self.dataset["mobile_immobile_mass_transfer_rate"]=mobile_immobile_mass_transfer_rate
+        self.dataset["initial_immobile_concentration"] = initial_immobile_concentration
+        self.dataset[
+            "mobile_immobile_mass_transfer_rate"
+        ] = mobile_immobile_mass_transfer_rate
         self.dataset["immobile_porosity"] = immobile_porosity
         self.dataset["decay"] = decay
         self.dataset["decay_sorbed"] = decay_sorbed
@@ -153,6 +156,5 @@ class ImmobileStorage(Package):
                         "if first_order_decay is active or if zero_order_decay is active, and sorption is active, decay_sorbed must be provided.",
                         FutureWarning,
                     )
-
 
         self._pkgcheck()

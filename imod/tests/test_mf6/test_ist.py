@@ -1,9 +1,12 @@
 import pathlib
 import textwrap
-import xarray as xr
+
 import numpy as np
 import pytest
+import xarray as xr
+
 import imod
+
 
 @pytest.fixture(scope="function")
 def grid_array():
@@ -28,15 +31,21 @@ def grid_array():
 
     return idomain
 
+
 def test_ist_simple(grid_array):
     grid = grid_array
     immobile_porosity = xr.full_like(grid, dtype=np.float64, fill_value=0.1)
-    mobile_immobile_mass_transfer_rate =  xr.full_like(grid, dtype=np.float64, fill_value=88.0)
-    ist = imod.mf6.ImmobileStorage(immobile_porosity=immobile_porosity, mobile_immobile_mass_transfer_rate=mobile_immobile_mass_transfer_rate)
+    mobile_immobile_mass_transfer_rate = xr.full_like(
+        grid, dtype=np.float64, fill_value=88.0
+    )
+    ist = imod.mf6.ImmobileStorage(
+        immobile_porosity=immobile_porosity,
+        mobile_immobile_mass_transfer_rate=mobile_immobile_mass_transfer_rate,
+    )
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    actual=ist.render(directory,"ist", globaltimes, False)
-    expected  = textwrap.dedent(
+    actual = ist.render(directory, "ist", globaltimes, False)
+    expected = textwrap.dedent(
         """\
         begin options
           CIM FILEOUT cim.dat
@@ -56,32 +65,38 @@ def test_ist_simple(grid_array):
 def test_ist_elaborate(grid_array):
     grid = grid_array
     immobile_porosity = xr.full_like(grid, dtype=np.float64, fill_value=0.1)
-    initial_immobile_concentration= xr.full_like(grid, dtype=np.float64, fill_value=0.2)
-    decay= xr.full_like(grid, dtype=np.float64, fill_value=0.3)
-    decay_sorbed= xr.full_like(grid, dtype=np.float64, fill_value=0.4)
+    initial_immobile_concentration = xr.full_like(
+        grid, dtype=np.float64, fill_value=0.2
+    )
+    decay = xr.full_like(grid, dtype=np.float64, fill_value=0.3)
+    decay_sorbed = xr.full_like(grid, dtype=np.float64, fill_value=0.4)
     bulk_density = xr.full_like(grid, dtype=np.float64, fill_value=0.5)
-    distribution_coefficient= xr.full_like(grid, dtype=np.float64, fill_value=0.6)
+    distribution_coefficient = xr.full_like(grid, dtype=np.float64, fill_value=0.6)
 
-    mobile_immobile_mass_transfer_rate =  xr.full_like(grid, dtype=np.float64, fill_value=88.0)
-    ist = imod.mf6.ImmobileStorage(immobile_porosity=immobile_porosity,
-      mobile_immobile_mass_transfer_rate=mobile_immobile_mass_transfer_rate,
-      save_flows=False,
-      budgetbinfile='mybudgetfile.txt',
-      budgetcsvfile='budgetcsvfile.csv',
-      sorption=True,
-      first_order_decay=True,
-      zero_order_decay= False,
-      cimfile='cim.txt',
-      initial_immobile_concentration=initial_immobile_concentration,
-      decay=decay,
-      decay_sorbed=decay_sorbed,
-      bulk_density=bulk_density,
-      distribution_coefficient=  distribution_coefficient   )
+    mobile_immobile_mass_transfer_rate = xr.full_like(
+        grid, dtype=np.float64, fill_value=88.0
+    )
+    ist = imod.mf6.ImmobileStorage(
+        immobile_porosity=immobile_porosity,
+        mobile_immobile_mass_transfer_rate=mobile_immobile_mass_transfer_rate,
+        save_flows=False,
+        budgetbinfile="mybudgetfile.txt",
+        budgetcsvfile="budgetcsvfile.csv",
+        sorption=True,
+        first_order_decay=True,
+        zero_order_decay=False,
+        cimfile="cim.txt",
+        initial_immobile_concentration=initial_immobile_concentration,
+        decay=decay,
+        decay_sorbed=decay_sorbed,
+        bulk_density=bulk_density,
+        distribution_coefficient=distribution_coefficient,
+    )
 
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    actual=ist.render(directory,"ist", globaltimes, False)
-    expected  = textwrap.dedent(
+    actual = ist.render(directory, "ist", globaltimes, False)
+    expected = textwrap.dedent(
         """\
         begin options
           BUDGET FILEOUT mybudgetfile.txt

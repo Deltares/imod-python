@@ -57,6 +57,7 @@ def head_fc():
     head = xr.full_like(idomain, np.nan)
     return head
 
+
 @pytest.fixture(scope="session")
 def concentration_fc():
 
@@ -65,6 +66,7 @@ def concentration_fc():
 
     concentration = xr.full_like(idomain, np.nan)
     return concentration
+
 
 @pytest.fixture(scope="session")
 def conductance_fc():

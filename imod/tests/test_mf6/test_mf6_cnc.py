@@ -39,6 +39,7 @@ def concentration_steadystate():
 
     return concentration
 
+
 @pytest.fixture()
 def concentration_transient():
     nlay = 3
@@ -50,7 +51,7 @@ def concentration_transient():
         np.datetime64("2000-01-02"),
         np.datetime64("2000-01-03"),
     ]
-    shape = (ntimes,nlay, nrow, ncol)
+    shape = (ntimes, nlay, nrow, ncol)
 
     dx = 5000.0
     dy = -5000.0
@@ -58,7 +59,7 @@ def concentration_transient():
     xmax = dx * ncol
     ymin = 0.0
     ymax = abs(dy) * nrow
-    dims = ("time","layer", "y", "x")
+    dims = ("time", "layer", "y", "x")
 
     layer = np.array([1, 2, 3])
     y = np.arange(ymax, ymin, dy) + 0.5 * dy
@@ -74,6 +75,7 @@ def concentration_transient():
     concentration[..., 0] = 0.0
 
     return concentration
+
 
 def test_render(concentration_steadystate):
     directory = pathlib.Path("mymodel")
@@ -99,7 +101,6 @@ def test_render(concentration_steadystate):
         begin period 1
           open/close mymodel/cnc/cnc.bin (binary)
         end period"""
-
     )
     assert actual == expected
 

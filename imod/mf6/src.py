@@ -1,5 +1,11 @@
 import numpy as np
-from imod.mf6.pkgbase import DisStructuredBoundaryCondition, DisVerticesBoundaryCondition, VariableMetaData, Package
+
+from imod.mf6.pkgbase import (
+    DisStructuredBoundaryCondition,
+    DisVerticesBoundaryCondition,
+    Package,
+    VariableMetaData,
+)
 
 
 class MassSourceLoadingDisStructured(DisStructuredBoundaryCondition):
@@ -62,17 +68,14 @@ class MassSourceLoadingDisStructured(DisStructuredBoundaryCondition):
     ):
         super().__init__()
         self.dataset["layer"] = self.assign_dims(layer)
-        self.dataset["row"] =  self.assign_dims(row)
-        self.dataset["column"] =  self.assign_dims(column)
-        self.dataset["rate"] =  self.assign_dims(rate)
+        self.dataset["row"] = self.assign_dims(row)
+        self.dataset["column"] = self.assign_dims(column)
+        self.dataset["rate"] = self.assign_dims(rate)
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
         self._pkgcheck()
-
-
-
 
 
 class MassSourceLoadingDisVertices(DisVerticesBoundaryCondition):
@@ -126,12 +129,10 @@ class MassSourceLoadingDisVertices(DisVerticesBoundaryCondition):
         observations=None,
     ):
         super().__init__()
-        self.dataset["layer"] =  self.assign_dims(layer)
-        self.dataset["cell2d"] =  self.assign_dims(cell2d)
-        self.dataset["rate"] =  self.assign_dims(rate)
+        self.dataset["layer"] = self.assign_dims(layer)
+        self.dataset["cell2d"] = self.assign_dims(cell2d)
+        self.dataset["rate"] = self.assign_dims(rate)
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
-
-

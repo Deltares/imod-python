@@ -1,10 +1,8 @@
 import pathlib
-import tempfile
 import textwrap
 
 import numpy as np
 import pytest
-import xarray as xr
 
 import imod
 
@@ -112,5 +110,3 @@ def test_render_mass_source_transient(well_test_data_transient):
     )
     actual = src.render(directory, "src", globaltimes, True)
     assert actual == expected
-
-

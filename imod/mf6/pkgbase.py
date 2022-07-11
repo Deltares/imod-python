@@ -1,12 +1,12 @@
 import abc
 import pathlib
 from dataclasses import dataclass
+from typing import Dict
 
 import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
-from typing import Dict
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
@@ -642,7 +642,6 @@ class BoundaryCondition(Package, abc.ABC):
             binary=binary,
         )
 
-
     def assign_dims(self, arg) -> Dict:
         is_da = isinstance(arg, xr.DataArray)
         if is_da and "time" in arg.coords:
@@ -658,6 +657,7 @@ class BoundaryCondition(Package, abc.ABC):
             return ("index", arg.values)
         else:
             return ("index", arg)
+
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     """
@@ -706,8 +706,8 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         self.write_perioddata(directory, pkgname, binary=False)
         self.write_packagedata(directory, pkgname, binary=False)
 
-class DisStructuredBoundaryCondition (BoundaryCondition):
 
+class DisStructuredBoundaryCondition(BoundaryCondition):
     def to_sparse(self, arrdict, layer):
         spec = []
         for key in arrdict:
@@ -722,6 +722,7 @@ class DisStructuredBoundaryCondition (BoundaryCondition):
         for key, arr in arrdict.items():
             recarr[key] = arr
         return recarr
+
 
 class DisVerticesBoundaryCondition(BoundaryCondition):
     def to_sparse(self, arrdict, layer):
