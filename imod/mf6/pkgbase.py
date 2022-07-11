@@ -659,22 +659,6 @@ class BoundaryCondition(Package, abc.ABC):
         else:
             return ("index", arg)
 
-    def to_sparse(self, arrdict, layer):
-        spec = []
-        for key in arrdict:
-            if key in ["layer", "row", "column"]:
-                spec.append((key, np.int32))
-            else:
-                spec.append((key, np.float64))
-
-        sparse_dtype = np.dtype(spec)
-        nrow = next(iter(arrdict.values())).size
-        recarr = np.empty(nrow, dtype=sparse_dtype)
-        for key, arr in arrdict.items():
-            recarr[key] = arr
-        return recarr
-
-
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     """
     Class dedicated to advanced boundary conditions, since MF6 does not support

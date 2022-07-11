@@ -57,16 +57,6 @@ def head_fc():
     head = xr.full_like(idomain, np.nan)
     return head
 
-
-@pytest.fixture(scope="session")
-def concentration_fc():
-
-    idomain = get_data_array(grid_dimensions(), globaltimes)
-    idomain = idomain.expand_dims(species=["salinity", "temperature"])
-
-    concentration = xr.full_like(idomain, np.nan)
-    return concentration
-
 @pytest.fixture(scope="session")
 def concentration_fc():
 
