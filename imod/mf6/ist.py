@@ -7,6 +7,13 @@ from imod.mf6.pkgbase import Package, VariableMetaData
 
 class ImmobileStorage(Package):
     """
+
+    The Immobile Storage and Transfer package represents an immobile fraction of groundwater.
+    Any number of IST Packages can be specified for a single GWT model. This allows
+    the user to specify triple porosity systems, or systems with as many immobile domains as necessary.
+
+    Parameters
+    ----------
     save_flows: ({True, False}, optional)
         Indicates that drain flow terms will be written to the file specified
         with "BUDGET FILEOUT" in Output Control. Default is False.
