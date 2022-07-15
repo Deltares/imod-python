@@ -1,3 +1,5 @@
+import xarray as xr
+
 from imod.mf6.pkgbase import Package
 
 
@@ -51,41 +53,53 @@ class Buoyancy(Package):
 
     def __init__(
         self,
+        reference_density: float,
+        modelname: xr.DataArray,
+        reference_concentration: xr.DataArray,
+        density_concentration_slope: xr.DataArray,
         hhformulation_rhs: bool = False,
-        denseref: float = None,
         densityfile: str = None,
     ):
         super().__init__(locals())
+        self.dataset["reference_density"] = reference_density
+        self.dataset["modelname"] = modelname
+        self.dataset["reference_concentration"] = reference_concentration
+        self.dataset["density_concentration_slope"] = density_concentration_slope
         self.dataset["hhformulation_rhs"] = hhformulation_rhs
-        self.dataset["denseref"] = denseref
         self.dataset["densityfile"] = densityfile
-        self.dataset["nrhospecies"] = 0
 
         self.dependencies = []
         self._pkgcheck()
 
-    def add_species_dependency(
-        self,
-        d_rho_dc: float,
-        reference_concentration: float,
-        modelname: str,
-        speciesname: str,
-    ):
-        self.dataset["nrhospecies"] += 1
-        self.dependencies.append(
-            {
-                "ispec": self.dataset["nrhospecies"].values[()],
-                "modelname": modelname,
-                "speciesname": speciesname,
-                "slope": d_rho_dc,
-                "reference_conc": reference_concentration,
-            }
-        )
-
     def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
-        d["dependencies"] = self.dependencies
-        for varname in ["hhformulation_rhs", "denseref", "densityfile", "nrhospecies"]:
+        # Ensure modelname and species are iterable dimensions in case of a
+        # single species and/or single modelname.
+        ds = self.dataset.copy()
+        if "species" not in ds.dims:
+            ds = ds.expand_dims("species")
+
+        packagedata = []
+        for i, species in enumerate(ds["species"].values):
+            species_ds = ds.sel(species=species)
+            variables = (
+                "density_concentration_slope",
+                "reference_concentration",
+                "modelname",
+            )
+            values = []
+            for var in variables:
+                value = species_ds[var].values[()]
+                if not self._valid(value):
+                    raise ValueError(f"Invalid value of {var} for {species}: {value}")
+                values.append(values)
+            packagedata.append((i + 1, *values, species))
+
+        d = {
+            "nrhospecies": self.dataset.coords["species"].size,
+            "packagedata": packagedata,
+        }
+
+        for varname in ["hhformulation_rhs", "reference_density", "densityfile"]:
             if self._valid(self.dataset[varname].values[()]):
                 d[varname] = self.dataset[varname].values[()]
 
