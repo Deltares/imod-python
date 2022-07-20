@@ -134,7 +134,7 @@ class Package(abc.ABC):
             return_cls.dataset = xr.open_zarr(str(path), **kwargs)
         else:
             return_cls.dataset = xr.open_dataset(path, **kwargs)
-
+        return_cls.remove_nans_from_dataset()
         return return_cls
 
     def __init__(self, allargs=None):
@@ -329,7 +329,6 @@ class Package(abc.ABC):
                 value = self[varname].values[()]
                 if self._valid(value):  # skip False or None
                     d[key] = value
-        self.remove_nans_from_dictionary(d)
         return self._template.render(d)
 
     @staticmethod
@@ -492,20 +491,12 @@ class Package(abc.ABC):
             result.update(self._auxiliary_data)
         return result
 
-    def remove_nans_from_dictionary(self, dictionary):
-
-        keys_to_remove = []
-        for key, value in dictionary.items():
-            if isinstance(value, numbers.Number):
-                if math.isnan(value):
-                    keys_to_remove.append(key)
-            if isinstance(value, list):
-                if len(value) > 0:
-                    if isinstance(value[0], str):
-                        if value[0] == "constant nan":
-                            keys_to_remove.append(key)
-        for k in keys_to_remove:
-            dictionary.pop(k)
+    def remove_nans_from_dataset(self):
+        for key, value in self.dataset.items():
+            if isinstance(value, xr.core.dataarray.DataArray):
+                if isinstance(value.values[()], numbers.Number):
+                    if math.isnan(value.values[()]):
+                        self.dataset[key] = None
 
 
 class BoundaryCondition(Package, abc.ABC):
