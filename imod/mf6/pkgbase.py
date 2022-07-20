@@ -1,4 +1,6 @@
 import abc
+import math
+import numbers
 import pathlib
 from dataclasses import dataclass
 
@@ -327,6 +329,7 @@ class Package(abc.ABC):
                 value = self[varname].values[()]
                 if self._valid(value):  # skip False or None
                     d[key] = value
+        self.remove_nans_from_dictionary(d)
         return self._template.render(d)
 
     @staticmethod
@@ -377,7 +380,6 @@ class Package(abc.ABC):
 
     def write(self, directory, pkgname, globaltimes, binary):
         directory = pathlib.Path(directory)
-
         self.write_blockfile(directory, pkgname, globaltimes, binary=binary)
 
         if hasattr(self, "_grid_data"):
@@ -489,6 +491,21 @@ class Package(abc.ABC):
         if hasattr(self, "_auxiliary_data"):
             result.update(self._auxiliary_data)
         return result
+
+    def remove_nans_from_dictionary(self, dictionary):
+
+        keys_to_remove = []
+        for key, value in dictionary.items():
+            if isinstance(value, numbers.Number):
+                if math.isnan(value):
+                    keys_to_remove.append(key)
+            if isinstance(value, list):
+                if len(value) > 0:
+                    if isinstance(value[0], str):
+                        if value[0] == "constant nan":
+                            keys_to_remove.append(key)
+        for k in keys_to_remove:
+            dictionary.pop(k)
 
 
 class BoundaryCondition(Package, abc.ABC):
