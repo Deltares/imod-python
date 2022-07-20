@@ -11,6 +11,8 @@ from imod.mf6.pkgbase import Package
 
 def are_dir_trees_equal(dir1, dir2):
     """
+    from: https://stackoverflow.com/questions/4187564/recursively-compare-two-directories-to-ensure-they-have-the-same-files-and-subdi
+
     Compare two directories recursively. Files in each directory are
     assumed to be equal if their names and contents are equal.
 
@@ -42,6 +44,12 @@ def are_dir_trees_equal(dir1, dir2):
     return True
 
 
+"""
+helper function that check for one instance of a package if it has attributes
+that are not metadata or inherited form packagebase
+"""
+
+
 def check_package_does_not_have_nonstandard_attributes(instance):
     props_of_baseclass = [a for a in dir(Package) if not a.startswith("__")]
     allowed_props = [
@@ -62,6 +70,12 @@ def check_package_does_not_have_nonstandard_attributes(instance):
                 assert False
 
 
+"""
+Tests that all packages have the _pkg_id attribute.
+This test should be expanded to test for metadata
+"""
+
+
 def test_packages_have_expected_attributes():
     for cls in Package.__subclasses__():
         # skip other base classes such as BoundaryCondition
@@ -72,6 +86,13 @@ def test_packages_have_expected_attributes():
             assert cls._pkg_id != ""
 
 
+"""
+test that packages don't have attributes that are not present in packagebase, except
+some that contain metadata. Packages should be set up in such a way that all their data is
+in the dataset, so that they can be serialized and deserialized from netcdf files.
+"""
+
+
 def test_packages_do_not_have_nonstandard_attributes():
     for cls in Package.__subclasses__():
         # skip other base classes such as BoundaryCondition
@@ -79,6 +100,11 @@ def test_packages_do_not_have_nonstandard_attributes():
             instances_of_class = ic.get_instances(cls)
             for instance in instances_of_class:
                 check_package_does_not_have_nonstandard_attributes(instance)
+
+
+"""
+test that packages will consistently produce the same text rendering.
+"""
 
 
 def test_packages_render_same_text_twice():
@@ -93,6 +119,12 @@ def test_packages_render_same_text_twice():
                     text1 = instance.render(modeldir, "test", globaltimes, False)
                     text2 = instance.render(modeldir, "test", globaltimes, False)
                     assert text1 == text2
+
+
+"""
+test that packages can be saved to netcdf and loaded from netcdf. Saving and loading
+should not affect the rendered text.
+"""
 
 
 def test_package_load_save():

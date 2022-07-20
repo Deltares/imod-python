@@ -3,6 +3,10 @@ import xarray as xr
 
 import imod
 
+"""
+helper function for creating an xarray dataset of a given type
+"""
+
 
 def get_xarray(dtype):
     shape = nlay, nrow, ncol = 3, 9, 9
@@ -22,6 +26,11 @@ def get_xarray(dtype):
 
     ibound = xr.DataArray(np.ones(shape, dtype=dtype), coords=coords, dims=dims)
     return ibound
+
+
+"""
+this function creates zero, one or more instances of a given package type for testing purposes
+"""
 
 
 def get_instances(cls):
