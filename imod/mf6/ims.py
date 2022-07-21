@@ -19,6 +19,9 @@ class Solution(Package):
 
     Parameters
     ----------
+    model_names: list of str
+        Which models to solve in this solution. Only models of the same type
+        (GWF or GWT) should be added to the same solution.
     outer_dvclose: float
         real value defining the head change criterion for convergence of the
         outer (nonlinear) iterations, in units of length. When the maximum
@@ -355,6 +358,7 @@ class Solution(Package):
 
     def __init__(
         self,
+        model_names,
         outer_dvclose,
         outer_maximum,
         inner_maximum,
@@ -382,6 +386,7 @@ class Solution(Package):
         no_ptc=False,
     ):
         super().__init__()
+        self.dataset["model_names"] = model_names
         self.dataset["outer_dvclose"] = outer_dvclose
         self.dataset["outer_maximum"] = outer_maximum
         self.dataset["under_relaxation"] = under_relaxation

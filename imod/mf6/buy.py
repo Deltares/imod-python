@@ -5,21 +5,32 @@ from imod.mf6.pkgbase import Package
 
 class Buoyancy(Package):
     """
-        Buoyancy package. This package must be included when performing variable
-        density simulation.
-        This package is to be used as follows: first initialize the package, and then
-        call a function to add dependencies on species concentration, once for
-        each species that affects density. The dependency of density on each species is linear.
+    Buoyancy package. This package must be included when performing variable
+    density simulation.
 
-        Parameters
-        ----------
-    hhformulation_rhs:  bool, optional
-        use the variable-density hydraulic head formulation and add off-diagonal
-        terms to the right-hand. This option will prevent the BUY Package from
-        adding asymmetric terms to the flow matrix.
-    denseref: real, optional
-        fluid reference density used in the equation of state. This value is set to
-        1000 if not specified as an option.
+    Note that ``reference_density`` is a single value, but
+    ``density_concentration_slope``, ``reference_concentration`` and
+    ``modelname`` require an entry for every active species, marked by a
+    species coordinate. Please refer to the examples.
+
+    Parameters
+    ----------
+    reference_density: float,
+        fluid reference density used in the equation of state.
+    density_concentration_slope: xr.DataArray of floats
+        Slope of the (linear) density concentration line used in the density
+        equation of state.
+    reference_concentration: xr.DataArray of floats
+        Reference concentration used in the density equation of
+        state.
+    modelname: xr.DataArray of strings,
+        Name of the GroundwaterTransport (GWT) model used for the
+        concentrations.
+    hhformulation_rhs: bool, optional.
+        use the variable-density hydraulic head formulation and add
+        off-diagonal terms to the right-hand. This option will prevent the BUY
+        Package from adding asymmetric terms to the flow matrix. Default value
+        is ``False``.
     densityfile:
         name of the binary output file to write density information. The density
         file has the same format as the head file. Density values will be written to
@@ -28,23 +39,31 @@ class Buoyancy(Package):
         option.
 
     Examples
-        --------
-        Initialize the Buoyancy package. We use an option to keep the flow matrix symmetric,
-        and a freshwater density of 996 g/l. We also specify an output file for density.  :
+    --------
 
-        >>> buy = imod.mf6.Buoyancy(
-             hhformulation_rhs=True, denseref=996, densityfile="density_out.dat"
-        )
+    The buoyancy input for a single species called "salinity", which is
+    simulated by a GWT model called "gwt-1" are specified as follows:
 
-        Second, we add dependencies on one or more species. We must provide the reference
-        concentration ( this is the concentration at which the freshwater density provided above
-        was measured) and also the derivative of density to species concentration. This slope is assumed to
-        be constant across the concentration range. For each dependency we must also provide the name of the species,
-        and of the transport model that governs this species.
+    >>> buy = imod.mf6.Buoyance(
+    ...     reference_density=1000.0,
+    ...     density_concentration_slope=xr.DataArray(0.025, coords={"species": "salinity"}),
+    ...     reference_concentration=xr.DataArray(0.0, coords={"species": "salinity"}),
+    ...     modelname=xr.DataArray("gwt-1", coords={"species": "salinity"})
+    ...     )
+    ... )
 
-        >>> buy.add_species_dependency(0.7, 4, "gwt-1", "salinity")
-        >>> buy.add_species_dependency(-0.375, 25, "gwt-2", "temperature")
+    Multiple species can be specified by presenting multiple values with an
+    associated species coordinate. Two species, called "c1" and "c2", simulated
+    by the GWT models "gwt-1" and "gwt-2" are specified as:
 
+    >>> coords = {"species": ["c1", "c2"]}
+    >>> buy = imod.mf6.Buoyance(
+    ...     reference_density=1000.0,
+    ...     density_concentration_slope=xr.DataArray([0.025, 0.01], coords=coords)
+    ...     reference_concentration=xr.DataArray([0.0, 0.0], coords=coords)
+    ...     modelname=xr.DataArray(["gwt-1", "gwt-2"], coords=coords)
+    ...     )
+    ... )
     """
 
     _pkg_id = "buy"
@@ -54,17 +73,17 @@ class Buoyancy(Package):
     def __init__(
         self,
         reference_density: float,
-        modelname: xr.DataArray,
-        reference_concentration: xr.DataArray,
         density_concentration_slope: xr.DataArray,
+        reference_concentration: xr.DataArray,
+        modelname: xr.DataArray,
         hhformulation_rhs: bool = False,
         densityfile: str = None,
     ):
         super().__init__(locals())
         self.dataset["reference_density"] = reference_density
-        self.dataset["modelname"] = modelname
-        self.dataset["reference_concentration"] = reference_concentration
         self.dataset["density_concentration_slope"] = density_concentration_slope
+        self.dataset["reference_concentration"] = reference_concentration
+        self.dataset["modelname"] = modelname
         self.dataset["hhformulation_rhs"] = hhformulation_rhs
         self.dataset["densityfile"] = densityfile
 
@@ -72,26 +91,25 @@ class Buoyancy(Package):
         self._pkgcheck()
 
     def render(self, directory, pkgname, globaltimes, binary):
-        # Ensure modelname and species are iterable dimensions in case of a
-        # single species and/or single modelname.
+        # Ensure species is an iterable dimensions in case of a single species.
         ds = self.dataset.copy()
         if "species" not in ds.dims:
             ds = ds.expand_dims("species")
 
         packagedata = []
+        variables = (
+            "density_concentration_slope",
+            "reference_concentration",
+            "modelname",
+        )  # This order matters!
         for i, species in enumerate(ds["species"].values):
             species_ds = ds.sel(species=species)
-            variables = (
-                "density_concentration_slope",
-                "reference_concentration",
-                "modelname",
-            )
             values = []
             for var in variables:
                 value = species_ds[var].values[()]
                 if not self._valid(value):
                     raise ValueError(f"Invalid value of {var} for {species}: {value}")
-                values.append(values)
+                values.append(value)
             packagedata.append((i + 1, *values, species))
 
         d = {
@@ -100,7 +118,8 @@ class Buoyancy(Package):
         }
 
         for varname in ["hhformulation_rhs", "reference_density", "densityfile"]:
-            if self._valid(self.dataset[varname].values[()]):
-                d[varname] = self.dataset[varname].values[()]
+            value = self.dataset[varname].values[()]
+            if self._valid(value):
+                d[varname] = value
 
         return self._template.render(d)
