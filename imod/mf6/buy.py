@@ -1,6 +1,22 @@
+from typing import Sequence
+
+import numpy as np
 import xarray as xr
 
 from imod.mf6.pkgbase import Package
+
+
+def assign_index(arg):
+    if isinstance(arg, xr.DataArray):
+        arg = arg.values
+    elif not isinstance(arg, (np.ndarray, list, tuple)):
+        raise TypeError("should be a tuple, list, or numpy array")
+
+    arr = np.array(arg)
+    if arr.ndim != 1:
+        raise ValueError("should be 1D")
+
+    return xr.DataArray(arr, dims=("index",))
 
 
 class Buoyancy(Package):
@@ -10,22 +26,24 @@ class Buoyancy(Package):
 
     Note that ``reference_density`` is a single value, but
     ``density_concentration_slope``, ``reference_concentration`` and
-    ``modelname`` require an entry for every active species, marked by a
-    species coordinate. Please refer to the examples.
+    ``modelname`` require an entry for every active species. Please refer to
+    the examples.
 
     Parameters
     ----------
     reference_density: float,
         fluid reference density used in the equation of state.
-    density_concentration_slope: xr.DataArray of floats
+    density_concentration_slope: sequence of floats
         Slope of the (linear) density concentration line used in the density
         equation of state.
-    reference_concentration: xr.DataArray of floats
+    reference_concentration: sequence of floats
         Reference concentration used in the density equation of
         state.
-    modelname: xr.DataArray of strings,
+    modelname: sequence of strings,
         Name of the GroundwaterTransport (GWT) model used for the
         concentrations.
+    species: sequence of str,
+        Name of the species used to calculate a density value.
     hhformulation_rhs: bool, optional.
         use the variable-density hydraulic head formulation and add
         off-diagonal terms to the right-hand. This option will prevent the BUY
@@ -46,10 +64,10 @@ class Buoyancy(Package):
 
     >>> buy = imod.mf6.Buoyance(
     ...     reference_density=1000.0,
-    ...     density_concentration_slope=xr.DataArray(0.025, coords={"species": "salinity"}),
-    ...     reference_concentration=xr.DataArray(0.0, coords={"species": "salinity"}),
-    ...     modelname=xr.DataArray("gwt-1", coords={"species": "salinity"})
-    ...     )
+    ...     density_concentration_slope=[0.025],
+    ...     reference_concentration=[0.0],
+    ...     modelname=["gwt-1"],
+    ...     species=["salinity"],
     ... )
 
     Multiple species can be specified by presenting multiple values with an
@@ -59,10 +77,10 @@ class Buoyancy(Package):
     >>> coords = {"species": ["c1", "c2"]}
     >>> buy = imod.mf6.Buoyance(
     ...     reference_density=1000.0,
-    ...     density_concentration_slope=xr.DataArray([0.025, 0.01], coords=coords)
-    ...     reference_concentration=xr.DataArray([0.0, 0.0], coords=coords)
-    ...     modelname=xr.DataArray(["gwt-1", "gwt-2"], coords=coords)
-    ...     )
+    ...     density_concentration_slope=[0.025, 0.01],
+    ...     reference_concentration=[0.0, 0.0],
+    ...     modelname=["gwt-1", "gwt-2"],
+    ...     species=["c1", "c2"],
     ... )
     """
 
@@ -73,17 +91,22 @@ class Buoyancy(Package):
     def __init__(
         self,
         reference_density: float,
-        density_concentration_slope: xr.DataArray,
-        reference_concentration: xr.DataArray,
-        modelname: xr.DataArray,
+        density_concentration_slope: Sequence[float],
+        reference_concentration: Sequence[float],
+        modelname: Sequence[str],
+        species: Sequence[str],
         hhformulation_rhs: bool = False,
         densityfile: str = None,
     ):
         super().__init__(locals())
         self.dataset["reference_density"] = reference_density
-        self.dataset["density_concentration_slope"] = density_concentration_slope
-        self.dataset["reference_concentration"] = reference_concentration
-        self.dataset["modelname"] = modelname
+        # Assign a shared index: this also forces equal lenghts
+        self.dataset["density_concentration_slope"] = assign_index(
+            density_concentration_slope
+        )
+        self.dataset["reference_concentration"] = assign_index(reference_concentration)
+        self.dataset["modelname"] = assign_index(modelname)
+        self.dataset["species"] = assign_index(species)
         self.dataset["hhformulation_rhs"] = hhformulation_rhs
         self.dataset["densityfile"] = densityfile
 
@@ -91,29 +114,21 @@ class Buoyancy(Package):
         self._pkgcheck()
 
     def render(self, directory, pkgname, globaltimes, binary):
-        # Ensure species is an iterable dimensions in case of a single species.
-        ds = self.dataset.copy()
-        if "species" not in ds.dims:
-            ds = ds.expand_dims("species")
-
+        ds = self.dataset
         packagedata = []
-        variables = (
-            "density_concentration_slope",
-            "reference_concentration",
-            "modelname",
-        )  # This order matters!
-        for i, species in enumerate(ds["species"].values):
-            species_ds = ds.sel(species=species)
-            values = []
-            for var in variables:
-                value = species_ds[var].values[()]
-                if not self._valid(value):
-                    raise ValueError(f"Invalid value of {var} for {species}: {value}")
-                values.append(value)
-            packagedata.append((i + 1, *values, species))
+
+        for i, (a, b, c, d) in enumerate(
+            zip(
+                ds["density_concentration_slope"].values,
+                ds["reference_concentration"].values,
+                ds["modelname"].values,
+                ds["species"].values,
+            )
+        ):
+            packagedata.append((i + 1, a, b, c, d))
 
         d = {
-            "nrhospecies": self.dataset.coords["species"].size,
+            "nrhospecies": self.dataset["species"].size,
             "packagedata": packagedata,
         }
 

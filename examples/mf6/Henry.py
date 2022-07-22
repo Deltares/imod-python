@@ -111,7 +111,7 @@ gwf_model["oc"] = imod.mf6.OutputControl(save_head="last", save_budget="last")
 ghb_head = xr.ones_like(idomain, dtype=float)
 ghb_head[:, :, :-1] = np.nan
 
-ghb_conc = xr.full_like(idomain, max_concentration)
+ghb_conc = xr.full_like(idomain, max_concentration, dtype=float)
 ghb_conc[:, :, :-1] = np.nan
 ghb_conc = ghb_conc.expand_dims(species=["salinity"])
 
@@ -154,11 +154,10 @@ gwf_model["left_boundary"] = imod.mf6.WellDisStructured(
 slope = (max_density - min_density) / (max_concentration - min_concentration)
 gwf_model["buoyancy"] = imod.mf6.Buoyancy(
     reference_density=min_density,
-    modelname=xr.DataArray("transport", coords={"species": "salinity"}),
-    reference_concentration=xr.DataArray(
-        min_concentration, coords={"species": "salinity"}
-    ),
-    density_concentration_slope=xr.DataArray(slope, coords={"species": "salinity"}),
+    modelname=["transport"],
+    reference_concentration=[min_concentration],
+    density_concentration_slope=[slope],
+    species=["salinity"],
 )
 
 # %%
@@ -167,9 +166,9 @@ gwf_model["buoyancy"] = imod.mf6.Buoyancy(
 # control. Sinks and sources are automatically determined based on packages
 # provided in the flow model.
 
-tpt_model = imod.mf6.GroundwaterTransportModel(gwf_model, "salinity")
-tpt_model["advection"] = imod.mf6.AdvectionTVD()
-tpt_model["Dispersion"] = imod.mf6.Dispersion(
+gwt_model = imod.mf6.GroundwaterTransportModel(gwf_model, "salinity")
+gwt_model["advection"] = imod.mf6.AdvectionTVD()
+gwt_model["dispersion"] = imod.mf6.Dispersion(
     diffusion_coefficient=0.57024,
     longitudinal_horizontal=0.1,
     transversal_horizontal1=0.01,
@@ -177,12 +176,12 @@ tpt_model["Dispersion"] = imod.mf6.Dispersion(
     xt3d_rhs=False,
 )
 
-tpt_model["storage"] = imod.mf6.MobileStorage(
+gwt_model["storage"] = imod.mf6.MobileStorage(
     porosity=porosity,
 )
-tpt_model["ic"] = imod.mf6.InitialConditions(start=max_concentration)
-tpt_model["oc"] = imod.mf6.OutputControl(save_concentration="last", save_budget="last")
-tpt_model.take_discretization_from_model(gwf_model)
+gwt_model["ic"] = imod.mf6.InitialConditions(start=max_concentration)
+gwt_model["oc"] = imod.mf6.OutputControl(save_concentration="last", save_budget="last")
+gwt_model.take_discretization_from_model(gwf_model)
 
 # %%
 # now let's define a simulation using the flow and transport models.
@@ -191,7 +190,7 @@ tpt_model.take_discretization_from_model(gwf_model)
 simulation = imod.mf6.Modflow6Simulation("henry")
 
 simulation["flow"] = gwf_model
-simulation["transport"] = tpt_model
+simulation["transport"] = gwt_model
 
 # %%
 # Define solver settings. We need to define separate solutions for the flow and
@@ -200,7 +199,7 @@ simulation["transport"] = tpt_model
 # units from the flow model.
 
 simulation["flow_solver"] = imod.mf6.Solution(
-    model_names=["flow"],
+    modelnames=["flow"],
     print_option="summary",
     csv_output=False,
     no_ptc=True,
@@ -216,7 +215,7 @@ simulation["flow_solver"] = imod.mf6.Solution(
     relaxation_factor=0.97,
 )
 simulation["transport_solver"] = imod.mf6.Solution(
-    model_names=["transport"],
+    modelnames=["transport"],
     print_option="summary",
     csv_output=False,
     no_ptc=True,
@@ -247,6 +246,8 @@ simulation.write(modeldir, binary=False)
 # %%
 # Run the model
 # -------------
+#
+# This takes about 20 seconds.
 #
 # .. note::
 #

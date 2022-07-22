@@ -123,7 +123,7 @@ class Modflow6Simulation(collections.UserDict):
             elif value._pkg_id == "model":
                 models.append((value._model_type, f"{key}/{key}.nam", key))
             elif value._pkg_id == "ims":
-                slnnames = value["model_names"].values
+                slnnames = value["modelnames"].values
                 modeltypes = set()
                 for name in slnnames:
                     try:

@@ -19,7 +19,7 @@ class Solution(Package):
 
     Parameters
     ----------
-    model_names: list of str
+    modelnames: list of str
         Which models to solve in this solution. Only models of the same type
         (GWF or GWT) should be added to the same solution.
     outer_dvclose: float
@@ -358,7 +358,7 @@ class Solution(Package):
 
     def __init__(
         self,
-        model_names,
+        modelnames,
         outer_dvclose,
         outer_maximum,
         inner_maximum,
@@ -386,7 +386,7 @@ class Solution(Package):
         no_ptc=False,
     ):
         super().__init__()
-        self.dataset["model_names"] = model_names
+        self.dataset["modelnames"] = modelnames
         self.dataset["outer_dvclose"] = outer_dvclose
         self.dataset["outer_maximum"] = outer_maximum
         self.dataset["under_relaxation"] = under_relaxation
@@ -416,8 +416,9 @@ class Solution(Package):
         self._pkgcheck()
 
 
-def SolutionPresetSimple(print_option, csv_output, no_ptc):
+def SolutionPresetSimple(modelnames, print_option, csv_output, no_ptc):
     solution = Solution(
+        modelnames=modelnames,
         print_option=print_option,
         csv_output=csv_output,
         no_ptc=no_ptc,
@@ -447,8 +448,9 @@ def SolutionPresetSimple(print_option, csv_output, no_ptc):
     return solution
 
 
-def SolutionPresetModerate(print_option, csv_output, no_ptc):
+def SolutionPresetModerate(modelnames, print_option, csv_output, no_ptc):
     solution = Solution(
+        modelnames=modelnames,
         print_option=print_option,
         csv_output=csv_output,
         no_ptc=no_ptc,
@@ -478,8 +480,9 @@ def SolutionPresetModerate(print_option, csv_output, no_ptc):
     return solution
 
 
-def SolutionPresetComplex(print_option, csv_output, no_ptc):
+def SolutionPresetComplex(modelnames, print_option, csv_output, no_ptc):
     solution = Solution(
+        modelnames=modelnames,
         print_option=print_option,
         csv_output=csv_output,
         no_ptc=no_ptc,
