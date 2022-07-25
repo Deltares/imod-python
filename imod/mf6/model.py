@@ -10,7 +10,12 @@ from imod.mf6 import qgs_util
 
 class Model(collections.UserDict):
     def __setitem__(self, key, value):
-        # TODO: Add packagecheck
+        if len(key) > 16:
+            raise KeyError(
+                f"Received key with more than 16 characters: '{key}'"
+                "Modflow 6 has a character limit of 16."
+            )
+
         super().__setitem__(key, value)
 
     def update(self, *args, **kwargs):
