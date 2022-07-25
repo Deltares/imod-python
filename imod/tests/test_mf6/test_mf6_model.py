@@ -1,8 +1,9 @@
-import imod
-import pytest
-
-import xarray as xr
 import numpy as np
+import pytest
+import xarray as xr
+
+import imod
+
 
 # Duplicate from test_mf6_dis.py
 # Probably move to fixtures
