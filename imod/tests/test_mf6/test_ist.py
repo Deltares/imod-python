@@ -39,6 +39,7 @@ def test_ist_simple(grid_array):
         grid, dtype=np.float64, fill_value=88.0
     )
     ist = imod.mf6.ImmobileStorage(
+        initial_immobile_concentration=0.0,
         immobile_porosity=immobile_porosity,
         mobile_immobile_mass_transfer_rate=mobile_immobile_mass_transfer_rate,
     )
@@ -53,6 +54,8 @@ def test_ist_simple(grid_array):
         end options
 
         begin griddata
+          cim
+            constant 0.0
           thetaim
             open/close mymodel/ist/thetaim.dat
           zetaim
@@ -77,6 +80,7 @@ def test_ist_elaborate(grid_array):
         grid, dtype=np.float64, fill_value=88.0
     )
     ist = imod.mf6.ImmobileStorage(
+        initial_immobile_concentration=initial_immobile_concentration,
         immobile_porosity=immobile_porosity,
         mobile_immobile_mass_transfer_rate=mobile_immobile_mass_transfer_rate,
         save_flows=False,
@@ -86,7 +90,6 @@ def test_ist_elaborate(grid_array):
         first_order_decay=True,
         zero_order_decay=False,
         cimfile="cim.txt",
-        initial_immobile_concentration=initial_immobile_concentration,
         decay=decay,
         decay_sorbed=decay_sorbed,
         bulk_density=bulk_density,

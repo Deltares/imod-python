@@ -5,11 +5,12 @@ from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
 
 class ConstantConcentration(BoundaryCondition):
     """
-    Constant-Concentration package.
+    Constant Concentration package.
+
     Parameters
     ----------
     concentration: array of floats (xr.DataArray)
-        Is the concentration at the boundary.
+        Concentration of the boundary.
     print_input: ({True, False}, optional)
         keyword to indicate that the list of constant head information will
         be written to the listing file immediately after it is read. Default is
@@ -48,5 +49,4 @@ class ConstantConcentration(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
-
         self._pkgcheck()
