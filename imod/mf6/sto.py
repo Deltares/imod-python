@@ -4,6 +4,8 @@ from imod.mf6.pkgbase import Package, VariableMetaData
 
 
 class Storage(Package):
+    _pkg_id = "sto_deprecated"
+
     def __init__(*args, **kwargs):
         raise NotImplementedError(
             r"Storage package has been removed. Use SpecificStorage or StorageCoefficient instead."

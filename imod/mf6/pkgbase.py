@@ -1,4 +1,6 @@
 import abc
+import math
+import numbers
 import pathlib
 from dataclasses import dataclass
 
@@ -132,7 +134,7 @@ class Package(abc.ABC):
             return_cls.dataset = xr.open_zarr(str(path), **kwargs)
         else:
             return_cls.dataset = xr.open_dataset(path, **kwargs)
-
+        return_cls.remove_nans_from_dataset()
         return return_cls
 
     def __init__(self, allargs=None):
@@ -377,7 +379,6 @@ class Package(abc.ABC):
 
     def write(self, directory, pkgname, globaltimes, binary):
         directory = pathlib.Path(directory)
-
         self.write_blockfile(directory, pkgname, globaltimes, binary=binary)
 
         if hasattr(self, "_grid_data"):
@@ -489,6 +490,13 @@ class Package(abc.ABC):
         if hasattr(self, "_auxiliary_data"):
             result.update(self._auxiliary_data)
         return result
+
+    def remove_nans_from_dataset(self):
+        for key, value in self.dataset.items():
+            if isinstance(value, xr.core.dataarray.DataArray):
+                if isinstance(value.values[()], numbers.Number):
+                    if math.isnan(value.values[()]):
+                        self.dataset[key] = None
 
 
 class BoundaryCondition(Package, abc.ABC):
