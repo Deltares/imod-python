@@ -166,9 +166,10 @@ gwf_model["buoyancy"] = imod.mf6.Buoyancy(
 # control. Sinks and sources are automatically determined based on packages
 # provided in the flow model.
 
-gwt_model = imod.mf6.GroundwaterTransportModel(gwf_model, "salinity")
-gwt_model["advection"] = imod.mf6.AdvectionTVD()
-gwt_model["dispersion"] = imod.mf6.Dispersion(
+gwt_model = imod.mf6.GroundwaterTransportModel()
+gwt_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(gwf_model, "salinity")
+gwt_model["adv"] = imod.mf6.AdvectionTVD()
+gwt_model["dsp"] = imod.mf6.Dispersion(
     diffusion_coefficient=0.57024,
     longitudinal_horizontal=0.1,
     transversal_horizontal1=0.01,
@@ -176,12 +177,12 @@ gwt_model["dispersion"] = imod.mf6.Dispersion(
     xt3d_rhs=False,
 )
 
-gwt_model["storage"] = imod.mf6.MobileStorage(
+gwt_model["mst"] = imod.mf6.MobileStorageTransfer(
     porosity=porosity,
 )
 gwt_model["ic"] = imod.mf6.InitialConditions(start=max_concentration)
 gwt_model["oc"] = imod.mf6.OutputControl(save_concentration="last", save_budget="last")
-gwt_model.take_discretization_from_model(gwf_model)
+gwt_model["dis"] = gwf_model["dis"]
 
 # %%
 # now let's define a simulation using the flow and transport models.

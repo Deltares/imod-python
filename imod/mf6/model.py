@@ -190,57 +190,30 @@ class GroundwaterFlowModel(Modflow6Model):
 
 
 class GroundwaterTransportModel(Modflow6Model):
-
+    """
+    The GroundwaterTransportModel (GWT) simulates transport of a single solute
+    species flowing in groundwater.
+    """
     _mandatory_packages = ("mst", "dsp", "oc", "ic")
     _model_type = "gwt6"
-
-    def __init__(self, flow_model, state_variable_name):
+    
+    def __init__(
+        self,
+        print_input: bool=False,
+        print_flows: bool=False,
+        save_flows: bool=False,
+    ):
         super().__init__()
+        self.print_input = print_input
+        self.print_flows = print_flows
+        self.save_flows = save_flows
         self._initialize_template()
-        if flow_model is not None:
-            self.validate_flow_model(
-                flow_model, "concentration", "species", state_variable_name
-            )
-            self["ssm"] = ssm.SourceSinkMixing(flow_model, state_variable_name)
 
     def render(self, modelname: str):
         """Render model namefile"""
-        return self._render(modelname)
-
-    def validate_flow_model(
-        self, flow_model, aux_var, aux_var_coord, state_variable_name
-    ):
-        validated = True
-        any_boundary_found = False
-        for package_key, package in flow_model.items():
-            if isinstance(package, pkgbase.BoundaryCondition):
-                package_is_valid = False
-                any_boundary_found = True
-                if aux_var in package.dataset:
-                    if aux_var_coord in package.dataset[aux_var].coords:
-                        if (
-                            state_variable_name
-                            in package.dataset[aux_var][aux_var_coord]
-                        ):
-                            package_is_valid = True
-                        else:
-                            msg = (
-                                f"package {package_key} does not contain "
-                                f"auxiliary variable {state_variable_name}."
-                            )
-                            warnings.warn(msg)
-                    else:
-                        msg = (
-                            f"package {package_key} does not contain coordinate "
-                            f"{aux_var_coord} in dataset {aux_var}"
-                        )
-                        warnings.warn(msg)
-                else:
-                    msg = f"package {package_key} does not contain {aux_var}"
-                    warnings.warn(msg)
-                validated = validated and package_is_valid
-
-        if not any_boundary_found:
-            raise ValueError("flow model does not contain boundary conditions")
-        if not validated:
-            raise ValueError(f"flow model does not contain {state_variable_name}")
+        return self._render(
+            modelname,
+            print_input = self.print_input,
+            print_flows = self.print_flows,
+            save_flows = self.save_flows,
+        )

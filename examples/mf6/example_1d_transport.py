@@ -73,7 +73,7 @@ def create_transport_model(flowmodel, speciesname, dispersivity, retardation, de
         sorption = None
         kd = 1.0
 
-    tpt_model["mst"] = imod.mf6.MobileStorage(
+    tpt_model["mst"] = imod.mf6.MobileStorageTransfer(
         porosity=porosity,
         decay=decay,
         decay_sorbed=decay,
@@ -87,7 +87,7 @@ def create_transport_model(flowmodel, speciesname, dispersivity, retardation, de
     tpt_model["oc"] = imod.mf6.OutputControl(
         save_concentration="all", save_budget="last"
     )
-    tpt_model.take_discretization_from_model(flowmodel)
+    tpt_model["dis"] = flowmodel["dis"]
     return tpt_model
 
 

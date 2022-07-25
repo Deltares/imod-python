@@ -152,7 +152,7 @@ simulation.create_time_discretization(additional_times=simtimes)
 # It also needs the fluxes over the boundary. It uses the same discretization as the flow model.
 # Create a transport model for salinity, give it the flow model, and tell it to use the same discretization.
 transport_model = imod.mf6.model.GroundwaterTransportModel(gwf_model, "salinity")
-transport_model.take_discretization_from_model(gwf_model)
+transport_model["disv"] = gwf_model["disv"]
 
 # Now we define some transport packages for simulating the physical processes of  advection, molecular
 # diffusion and mechanical dispersion.
@@ -161,7 +161,7 @@ transport_model["dsp"] = imod.mf6.Dispersion(
     1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, False, False
 )
 transport_model["adv"] = imod.mf6.AdvectionUpstream()
-transport_model["mst"] = imod.mf6.MobileStorage(0.3)
+transport_model["mst"] = imod.mf6.MobileStorageTransfer(0.3)
 
 # Now we define initial conditions (0) and output options for the transport simulation
 transport_model["ic"] = imod.mf6.InitialConditions(start=0.0)
