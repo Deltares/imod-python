@@ -180,8 +180,8 @@ simulation["flow_solver"] = imod.mf6.Solution(
     reordering_method=None,
     relaxation_factor=0.97,
 )
-simulation[f"transport_solver"] = imod.mf6.Solution(
-    modelnames=[f"tpt_a", "tpt_b", "tpt_c", "tpt_d"],
+simulation["transport_solver"] = imod.mf6.Solution(
+    modelnames=["tpt_a", "tpt_b", "tpt_c", "tpt_d"],
     print_option="summary",
     csv_output=False,
     no_ptc=True,
@@ -221,7 +221,6 @@ for species in ["a", "b", "c", "d"]:
 concentration = xr.concat(concentrations, dim="species")
 
 # %%
-
 # Visualize the last concentration profiles of the model run for the different
 # species.
 

@@ -132,7 +132,7 @@ class Modflow6Simulation(collections.UserDict):
                         raise KeyError(f"model {name} of {key} not found")
                 if len(modeltypes) > 1:
                     raise ValueError(
-                        f"Only a single type of model allowed in a solution"
+                        "Only a single type of model allowed in a solution"
                     )
                 solutiongroups.append(("ims6", f"{key}.ims", slnnames))
 
