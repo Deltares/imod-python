@@ -1,23 +1,54 @@
+from typing import Sequence
+
+import numpy as np
+import xarray as xr
+
 from imod.mf6.pkgbase import Package
+
+
+def assign_index(arg):
+    if isinstance(arg, xr.DataArray):
+        arg = arg.values
+    elif not isinstance(arg, (np.ndarray, list, tuple)):
+        raise TypeError("should be a tuple, list, or numpy array")
+
+    arr = np.array(arg)
+    if arr.ndim != 1:
+        raise ValueError("should be 1D")
+
+    return xr.DataArray(arr, dims=("index",))
 
 
 class Buoyancy(Package):
     """
-        Buoyancy package. This package must be included when performing variable
-        density simulation.
-        This package is to be used as follows: first initialize the package, and then
-        call a function to add dependencies on species concentration, once for
-        each species that affects density. The dependency of density on each species is linear.
+    Buoyancy package. This package must be included when performing variable
+    density simulation.
 
-        Parameters
-        ----------
-    hhformulation_rhs:  bool, optional
-        use the variable-density hydraulic head formulation and add off-diagonal
-        terms to the right-hand. This option will prevent the BUY Package from
-        adding asymmetric terms to the flow matrix.
-    denseref: real, optional
-        fluid reference density used in the equation of state. This value is set to
-        1000 if not specified as an option.
+    Note that ``reference_density`` is a single value, but
+    ``density_concentration_slope``, ``reference_concentration`` and
+    ``modelname`` require an entry for every active species. Please refer to
+    the examples.
+
+    Parameters
+    ----------
+    reference_density: float,
+        fluid reference density used in the equation of state.
+    density_concentration_slope: sequence of floats
+        Slope of the (linear) density concentration line used in the density
+        equation of state.
+    reference_concentration: sequence of floats
+        Reference concentration used in the density equation of
+        state.
+    modelname: sequence of strings,
+        Name of the GroundwaterTransport (GWT) model used for the
+        concentrations.
+    species: sequence of str,
+        Name of the species used to calculate a density value.
+    hhformulation_rhs: bool, optional.
+        use the variable-density hydraulic head formulation and add
+        off-diagonal terms to the right-hand. This option will prevent the BUY
+        Package from adding asymmetric terms to the flow matrix. Default value
+        is ``False``.
     densityfile:
         name of the binary output file to write density information. The density
         file has the same format as the head file. Density values will be written to
@@ -26,23 +57,31 @@ class Buoyancy(Package):
         option.
 
     Examples
-        --------
-        Initialize the Buoyancy package. We use an option to keep the flow matrix symmetric,
-        and a freshwater density of 996 g/l. We also specify an output file for density.  :
+    --------
 
-        >>> buy = imod.mf6.Buoyancy(
-             hhformulation_rhs=True, denseref=996, densityfile="density_out.dat"
-        )
+    The buoyancy input for a single species called "salinity", which is
+    simulated by a GWT model called "gwt-1" are specified as follows:
 
-        Second, we add dependencies on one or more species. We must provide the reference
-        concentration ( this is the concentration at which the freshwater density provided above
-        was measured) and also the derivative of density to species concentration. This slope is assumed to
-        be constant across the concentration range. For each dependency we must also provide the name of the species,
-        and of the transport model that governs this species.
+    >>> buy = imod.mf6.Buoyance(
+    ...     reference_density=1000.0,
+    ...     density_concentration_slope=[0.025],
+    ...     reference_concentration=[0.0],
+    ...     modelname=["gwt-1"],
+    ...     species=["salinity"],
+    ... )
 
-        >>> buy.add_species_dependency(0.7, 4, "gwt-1", "salinity")
-        >>> buy.add_species_dependency(-0.375, 25, "gwt-2", "temperature")
+    Multiple species can be specified by presenting multiple values with an
+    associated species coordinate. Two species, called "c1" and "c2", simulated
+    by the GWT models "gwt-1" and "gwt-2" are specified as:
 
+    >>> coords = {"species": ["c1", "c2"]}
+    >>> buy = imod.mf6.Buoyance(
+    ...     reference_density=1000.0,
+    ...     density_concentration_slope=[0.025, 0.01],
+    ...     reference_concentration=[0.0, 0.0],
+    ...     modelname=["gwt-1", "gwt-2"],
+    ...     species=["c1", "c2"],
+    ... )
     """
 
     _pkg_id = "buy"
@@ -51,42 +90,51 @@ class Buoyancy(Package):
 
     def __init__(
         self,
+        reference_density: float,
+        density_concentration_slope: Sequence[float],
+        reference_concentration: Sequence[float],
+        modelname: Sequence[str],
+        species: Sequence[str],
         hhformulation_rhs: bool = False,
-        denseref: float = None,
         densityfile: str = None,
     ):
         super().__init__(locals())
+        self.dataset["reference_density"] = reference_density
+        # Assign a shared index: this also forces equal lenghts
+        self.dataset["density_concentration_slope"] = assign_index(
+            density_concentration_slope
+        )
+        self.dataset["reference_concentration"] = assign_index(reference_concentration)
+        self.dataset["modelname"] = assign_index(modelname)
+        self.dataset["species"] = assign_index(species)
         self.dataset["hhformulation_rhs"] = hhformulation_rhs
-        self.dataset["denseref"] = denseref
         self.dataset["densityfile"] = densityfile
-        self.dataset["nrhospecies"] = 0
 
         self.dependencies = []
         self._pkgcheck()
 
-    def add_species_dependency(
-        self,
-        d_rho_dc: float,
-        reference_concentration: float,
-        modelname: str,
-        speciesname: str,
-    ):
-        self.dataset["nrhospecies"] += 1
-        self.dependencies.append(
-            {
-                "ispec": self.dataset["nrhospecies"].values[()],
-                "modelname": modelname,
-                "speciesname": speciesname,
-                "slope": d_rho_dc,
-                "reference_conc": reference_concentration,
-            }
-        )
-
     def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
-        d["dependencies"] = self.dependencies
-        for varname in ["hhformulation_rhs", "denseref", "densityfile", "nrhospecies"]:
-            if self._valid(self.dataset[varname].values[()]):
-                d[varname] = self.dataset[varname].values[()]
+        ds = self.dataset
+        packagedata = []
+
+        for i, (a, b, c, d) in enumerate(
+            zip(
+                ds["density_concentration_slope"].values,
+                ds["reference_concentration"].values,
+                ds["modelname"].values,
+                ds["species"].values,
+            )
+        ):
+            packagedata.append((i + 1, a, b, c, d))
+
+        d = {
+            "nrhospecies": self.dataset["species"].size,
+            "packagedata": packagedata,
+        }
+
+        for varname in ["hhformulation_rhs", "reference_density", "densityfile"]:
+            value = self.dataset[varname].values[()]
+            if self._valid(value):
+                d[varname] = value
 
         return self._template.render(d)

@@ -31,8 +31,8 @@ def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
     xorigin = struct.unpack("d", f.read(8))[0]
     yorigin = struct.unpack("d", f.read(8))[0]
     f.seek(8, 1)  # skip angrot
-    delr = np.fromfile(f, np.float64, nrow)
-    delc = np.fromfile(f, np.float64, ncol)
+    delr = np.fromfile(f, np.float64, ncol)
+    delc = np.fromfile(f, np.float64, nrow)
     top_np = np.reshape(np.fromfile(f, np.float64, nrow * ncol), (nrow, ncol))
     bottom_np = np.reshape(np.fromfile(f, np.float64, ncells), (nlayer, nrow, ncol))
     ia = np.fromfile(f, np.int32, ncells + 1)
@@ -40,8 +40,8 @@ def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
     idomain_np = np.reshape(np.fromfile(f, np.int32, ncells), (nlayer, nrow, ncol))
     icelltype_np = np.reshape(np.fromfile(f, np.int32, ncells), (nlayer, nrow, ncol))
 
-    bounds = (xorigin, xorigin + delc.sum(), yorigin, yorigin + delr.sum())
-    coords = imod.util._xycoords(bounds, (delc, -delr))
+    bounds = (xorigin, xorigin + delr.sum(), yorigin, yorigin + delc.sum())
+    coords = imod.util._xycoords(bounds, (delr, -delc))
     top = xr.DataArray(top_np, coords, ("y", "x"), name="top")
     coords["layer"] = np.arange(1, nlayer + 1)
     dims = ("layer", "y", "x")

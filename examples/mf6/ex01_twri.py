@@ -150,6 +150,7 @@ simulation = imod.mf6.Modflow6Simulation("ex01-twri")
 simulation["GWF_1"] = gwf_model
 # Define solver settings
 simulation["solver"] = imod.mf6.Solution(
+    modelnames=["GWF_1"],
     print_option="summary",
     csv_output=False,
     no_ptc=True,

@@ -563,6 +563,7 @@ simulation["GWF_1"] = gwf_model
 # If the values are not indicated manually, the defaults values will be considered.
 
 simulation["solver"] = imod.mf6.Solution(
+    modelnames=["GWF_1"],
     print_option="summary",
     csv_output=False,
     no_ptc=True,
