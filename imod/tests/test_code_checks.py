@@ -34,13 +34,17 @@ def test_check_modules():
             path
         ):  # if it's a test we don't care. this very file contains print statements itself.
             continue
-        with open(path) as f:
-            content = f.read()
-            try:
-                tree = ast.parse(content)
-                module_ok = check_ast(tree, path)
-                ok = ok and module_ok
-            except Exception as e:
-                print(f"parsing error in {path}, with error: {e}.")
-                ok = False
+        try:
+            with open(path) as f:
+                content = f.read()
+                try:
+                    tree = ast.parse(content)
+                    module_ok = check_ast(tree, path)
+                    ok = ok and module_ok
+                except Exception as e:
+                    print(f"parsing error in {path}, with error: {e}.")
+                    ok = False
+        except Exception as e:
+            print(f"error reading {path}, with error: {e}")
+            ok = False
     assert ok

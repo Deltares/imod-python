@@ -1,13 +1,14 @@
 import abc
 import pathlib
 from dataclasses import dataclass
+from typing import Dict
 
 import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
 
-TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst")
+TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
 
 def dis_recarr(arrdict, layer, notnull):
@@ -641,6 +642,22 @@ class BoundaryCondition(Package, abc.ABC):
             binary=binary,
         )
 
+    def assign_dims(self, arg) -> Dict:
+        is_da = isinstance(arg, xr.DataArray)
+        if is_da and "time" in arg.coords:
+            if arg.ndim != 2:
+                raise ValueError("time varying variable: must be 2d")
+            if arg.dims[0] != "time":
+                arg = arg.transpose()
+            da = xr.DataArray(
+                data=arg.values, coords={"time": arg["time"]}, dims=["time", "index"]
+            )
+            return da
+        elif is_da:
+            return ("index", arg.values)
+        else:
+            return ("index", arg)
+
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     """
@@ -688,3 +705,37 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         self.write_blockfile(directory, pkgname, globaltimes, binary=False)
         self.write_perioddata(directory, pkgname, binary=False)
         self.write_packagedata(directory, pkgname, binary=False)
+
+
+class DisStructuredBoundaryCondition(BoundaryCondition):
+    def to_sparse(self, arrdict, layer):
+        spec = []
+        for key in arrdict:
+            if key in ["layer", "row", "column"]:
+                spec.append((key, np.int32))
+            else:
+                spec.append((key, np.float64))
+
+        sparse_dtype = np.dtype(spec)
+        nrow = next(iter(arrdict.values())).size
+        recarr = np.empty(nrow, dtype=sparse_dtype)
+        for key, arr in arrdict.items():
+            recarr[key] = arr
+        return recarr
+
+
+class DisVerticesBoundaryCondition(BoundaryCondition):
+    def to_sparse(self, arrdict, layer):
+        spec = []
+        for key in arrdict:
+            if key in ["layer", "cell2d"]:
+                spec.append((key, np.int32))
+            else:
+                spec.append((key, np.float64))
+
+        sparse_dtype = np.dtype(spec)
+        nrow = next(iter(arrdict.values())).size
+        recarr = np.empty(nrow, dtype=sparse_dtype)
+        for key, arr in arrdict.items():
+            recarr[key] = arr
+        return recarr

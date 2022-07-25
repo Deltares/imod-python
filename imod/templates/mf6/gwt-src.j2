@@ -1,10 +1,4 @@
 begin options
-{% if auxiliary is defined %}  auxiliary{% for aux in auxiliary %} {{aux}}{% endfor %}
-{% endif %}
-{%- if auxmultname is defined %}  auxmultname {{auxmultname}}
-{% endif %}
-{%- if boundnames is defined %}  boundnames
-{% endif %}
 {%- if print_input is defined %}  print_input
 {% endif %}
 {%- if print_flows is defined %}  print_flows
@@ -15,8 +9,6 @@ begin options
 {% endif %}
 {%- if obs_filerecord is defined %}  obs6 filein {{obs6_filename}}
 {% endif %}
-{%- if mover is defined %}  mover
-{% endif -%}
 end options
 
 begin dimensions
@@ -25,4 +17,5 @@ end dimensions
 
 {% for i, path in periods.items() %}begin period {{i}}
   open/close {{path}}{% if binary %} (binary){% endif %}
-end period{% endfor %}
+end period
+{% endfor %}

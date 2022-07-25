@@ -1,29 +1,13 @@
-from typing import Dict
-
 import numpy as np
-import xarray as xr
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
-
-
-def assign_dims(arg) -> Dict:
-    is_da = isinstance(arg, xr.DataArray)
-    if is_da and "time" in arg.coords:
-        if arg.ndim != 2:
-            raise ValueError("time varying variable: must be 2d")
-        if arg.dims[0] != "time":
-            arg = arg.transpose()
-        da = xr.DataArray(
-            data=arg.values, coords={"time": arg["time"]}, dims=["time", "index"]
-        )
-        return da
-    elif is_da:
-        return ("index", arg.values)
-    else:
-        return ("index", arg)
+from imod.mf6.pkgbase import (
+    DisStructuredBoundaryCondition,
+    DisVerticesBoundaryCondition,
+    VariableMetaData,
+)
 
 
-class WellDisStructured(BoundaryCondition):
+class WellDisStructured(DisStructuredBoundaryCondition):
     """
     WEL package for structured discretization (DIS) models .
     Any number of WEL Packages can be specified for a single groundwater flow model.
@@ -68,7 +52,7 @@ class WellDisStructured(BoundaryCondition):
     _pkg_id = "wel"
     _period_data = ("layer", "row", "column", "rate")
     _keyword_map = {}
-    _template = BoundaryCondition._initialize_template(_pkg_id)
+    _template = DisStructuredBoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
 
     _metadata_dict = {
@@ -92,10 +76,10 @@ class WellDisStructured(BoundaryCondition):
         observations=None,
     ):
         super().__init__()
-        self.dataset["layer"] = assign_dims(layer)
-        self.dataset["row"] = assign_dims(row)
-        self.dataset["column"] = assign_dims(column)
-        self.dataset["rate"] = assign_dims(rate)
+        self.dataset["layer"] = self.assign_dims(layer)
+        self.dataset["row"] = self.assign_dims(row)
+        self.dataset["column"] = self.assign_dims(column)
+        self.dataset["rate"] = self.assign_dims(rate)
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
@@ -106,23 +90,8 @@ class WellDisStructured(BoundaryCondition):
             self.add_periodic_auxiliary_variable()
         self._pkgcheck()
 
-    def to_sparse(self, arrdict, layer):
-        spec = []
-        for key in arrdict:
-            if key in ["layer", "row", "column"]:
-                spec.append((key, np.int32))
-            else:
-                spec.append((key, np.float64))
 
-        sparse_dtype = np.dtype(spec)
-        nrow = next(iter(arrdict.values())).size
-        recarr = np.empty(nrow, dtype=sparse_dtype)
-        for key, arr in arrdict.items():
-            recarr[key] = arr
-        return recarr
-
-
-class WellDisVertices(BoundaryCondition):
+class WellDisVertices(DisVerticesBoundaryCondition):
     """
     WEL package for discretization by vertices (DISV) models. Any number of WEL
     Packages can be specified for a single groundwater flow model.
@@ -163,7 +132,7 @@ class WellDisVertices(BoundaryCondition):
     _pkg_id = "wel"
     _period_data = ("layer", "cell2d", "rate")
     _keyword_map = {}
-    _template = BoundaryCondition._initialize_template(_pkg_id)
+    _template = DisVerticesBoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
 
     def __init__(
@@ -179,9 +148,9 @@ class WellDisVertices(BoundaryCondition):
         observations=None,
     ):
         super().__init__()
-        self.dataset["layer"] = assign_dims(layer)
-        self.dataset["cell2d"] = assign_dims(cell2d)
-        self.dataset["rate"] = assign_dims(rate)
+        self.dataset["layer"] = self.assign_dims(layer)
+        self.dataset["cell2d"] = self.assign_dims(cell2d)
+        self.dataset["rate"] = self.assign_dims(rate)
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
@@ -190,18 +159,3 @@ class WellDisVertices(BoundaryCondition):
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
             self.add_periodic_auxiliary_variable()
-
-    def to_sparse(self, arrdict, layer):
-        spec = []
-        for key in arrdict:
-            if key in ["layer", "cell2d"]:
-                spec.append((key, np.int32))
-            else:
-                spec.append((key, np.float64))
-
-        sparse_dtype = np.dtype(spec)
-        nrow = next(iter(arrdict.values())).size
-        recarr = np.empty(nrow, dtype=sparse_dtype)
-        for key, arr in arrdict.items():
-            recarr[key] = arr
-        return recarr

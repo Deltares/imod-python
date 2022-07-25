@@ -114,25 +114,33 @@ class Modflow6Simulation(collections.UserDict):
     def render(self):
         """Renders simulation namefile"""
         d = {}
-        solvername = None
         models = []
-        modelnames = []
+        solutiongroups = []
 
         for key, value in self.items():
             if value._pkg_id == "tdis":
                 d["tdis6"] = f"{key}.tdis"
             elif value._pkg_id == "model":
                 models.append((value._model_type, f"{key}/{key}.nam", key))
-                modelnames.append(key)
             elif value._pkg_id == "ims":
-                solvername = key
+                slnnames = value["modelnames"].values
+                modeltypes = set()
+                for name in slnnames:
+                    try:
+                        modeltypes.add(type(self[name]))
+                    except KeyError:
+                        raise KeyError(f"model {name} of {key} not found")
+                if len(modeltypes) > 1:
+                    raise ValueError(
+                        "Only a single type of model allowed in a solution"
+                    )
+                solutiongroups.append(("ims6", f"{key}.ims", slnnames))
+
         d["models"] = models
         if len(models) > 1:
             d["exchanges"] = self.get_exchange_relationships()
 
-        if solvername is None:
-            raise ValueError("No numerical solution")
-        d["solutiongroups"] = [[("ims6", f"{solvername}.ims", modelnames)]]
+        d["solutiongroups"] = [solutiongroups]
         return self._template.render(d)
 
     def write(self, directory=".", binary=True):
@@ -205,7 +213,7 @@ class Modflow6Simulation(collections.UserDict):
             exchange_type = "GWF6-GWT6"
             modelname_a = list(flowmodels.keys())[0]
             for counter, key in enumerate(transportmodels.keys()):
-                filename = "simulation{}.exg".format(counter)
+                filename = f"simulation{counter}.exg"
                 modelname_b = key
                 result.append((exchange_type, filename, modelname_a, modelname_b))
         return result

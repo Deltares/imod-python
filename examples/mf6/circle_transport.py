@@ -124,7 +124,8 @@ gwf_model["rch"] = imod.mf6.Recharge(
 
 simulation = imod.mf6.Modflow6Simulation("circle")
 simulation["GWF_1"] = gwf_model
-simulation["solver"] = imod.mf6.Solution(
+simulation["flow_solver"] = imod.mf6.Solution(
+    modelnames=["GWF_1"],
     print_option="summary",
     csv_output=False,
     no_ptc=True,
@@ -170,7 +171,22 @@ transport_model["oc"] = imod.mf6.OutputControl(
 
 # assign the transport model to the simulation
 simulation["GWT_1"] = transport_model
-
+simulation["transport_solver"] = imod.mf6.Solution(
+    modelnames=["GWT_1"],
+    print_option="summary",
+    csv_output=False,
+    no_ptc=True,
+    outer_dvclose=1.0e-4,
+    outer_maximum=500,
+    under_relaxation=None,
+    inner_dvclose=1.0e-4,
+    inner_rclose=0.001,
+    inner_maximum=100,
+    linear_acceleration="bicgstab",
+    scaling_method=None,
+    reordering_method=None,
+    relaxation_factor=0.97,
+)
 
 # %%
 # We'll create a new directory in which we will write and run the model.

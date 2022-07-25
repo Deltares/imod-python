@@ -183,7 +183,7 @@ simulation["GWF_1"] = gwf_model
 # Define solver settings, we'll use a preset that is sufficient for this example.
 
 simulation["solver"] = mf6.SolutionPresetSimple(
-    print_option="summary", csv_output=False, no_ptc=True
+    modelnames=["GWF_1"], print_option="summary", csv_output=False, no_ptc=True
 )
 
 # %%
