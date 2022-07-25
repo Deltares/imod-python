@@ -133,6 +133,7 @@ gwf_model["rch"] = imod.mf6.Recharge(rch_rate)
 simulation = imod.mf6.Modflow6Simulation("circle")
 simulation["GWF_1"] = gwf_model
 simulation["solver"] = imod.mf6.Solution(
+    modelnames=["GWF_1"],
     print_option="summary",
     csv_output=False,
     no_ptc=True,

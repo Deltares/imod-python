@@ -164,6 +164,7 @@ simulation = imod.mf6.Modflow6Simulation("mfsim")
 simulation["pbc"] = gwf_model
 # Define solver settings
 simulation["solver"] = imod.mf6.Solution(
+    modelnames=["pbc"],
     outer_dvclose=1.0e-5,
     outer_maximum=50,
     inner_dvclose=1.0e-6,

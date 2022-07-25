@@ -51,7 +51,10 @@ Changed
   installations have to be reinstalled to run the tests.
 - The ``imod.mf6`` model packages now all run type checks on input. This is a
   breaking change for scripts which provide input with an incorrect dtype.
-  
+- :class:`imod.mf6.Solution` now requires a `model_names` argument to specify
+  which models should be solved in a single numerical solution. This is
+  required to simulate groundwater flow and transport as they should be
+  in separate solutions.
 
 Added
 ~~~~~

@@ -1,0 +1,39 @@
+begin options
+{% if save_flows is defined %}  save_flows
+{% endif %}
+{%- if budgetfile is defined %}  BUDGET FILEOUT {{budgetfile}}
+{% endif -%}
+{%- if budgetcsvfile is defined %}  BUDGETCSV FILEOUT {{budgetcsvfile}}
+{% endif -%}
+{%- if sorption is defined %}  sorption
+{% endif -%}
+{%- if first_order_decay is defined %}  first_order_decay
+{% endif -%}
+{%- if zero_order_decay is defined %}  zero_order_decay
+{% endif -%}
+{%- if cimfile is defined %}  CIM FILEOUT {{cimfile}}
+  PRINT_FORMAT COLUMNS {{columns}} WIDTH {{width}} DIGITS {{digits}} {{format}}
+{% endif -%}
+end options
+
+begin griddata
+{% if cim is defined %}  cim{% if cim_layered %} layered{% endif %}
+{% for x in cim %}    {{x}}
+{% endfor -%}{% endif %}  thetaim{% if thetaim_layered %} layered{% endif %}
+{% for x in thetaim %}    {{x}}
+{% endfor %}  zetaim{% if zetaim_layered %} layered{% endif %}
+{% for x in zetaim %}    {{x}}
+{% endfor -%}
+{% if decay is defined %}  decay{% if decay_layered %} layered{% endif %}
+{% for x in decay %}    {{x}}
+{% endfor -%}{% endif -%}
+{% if decay_sorbed is defined %}  decay_sorbed{% if decay_sorbed_layered %} layered{% endif %}
+{% for x in decay_sorbed %}    {{x}}
+{% endfor -%}{% endif -%}
+{% if bulk_density is defined %}  bulk_density{% if bulk_density_layered %} layered{% endif %}
+{% for x in bulk_density %}    {{x}}
+{% endfor -%}{% endif -%}
+{% if distcoef is defined %}  distcoef{% if distcoef_layered %} layered{% endif %}
+{% for x in distcoef %}    {{x}}
+{% endfor -%}{% endif -%}
+end griddata

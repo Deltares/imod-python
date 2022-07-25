@@ -127,7 +127,7 @@ class NodePropertyFlow(Package):
         Default is None.
     alternative_cell_averaging : str
         Method calculating horizontal cell connection conductance.
-        Options: {"LOGARITHMIC”, “AMT-LMK”, or “AMT-HMK"}
+        Options: {"LOGARITHMIC", "AMT-LMK", or "AMT-HMK"}
         Default: uses harmonic mean for averaging
     save_flows: ({True, False}, optional)
         keyword to indicate that cell-by-cell flow terms will be written to the
