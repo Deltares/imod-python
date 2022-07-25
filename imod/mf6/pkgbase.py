@@ -180,6 +180,11 @@ class Package(abc.ABC):
         # Test numpy bool (not singleton)
         elif isinstance(value, np.bool_) and not value:
             return False
+        # When dumping to netCDF and reading back, None will have been
+        # converted into a NaN. Only check NaN if it's a floating type to avoid
+        # TypeErrors.
+        elif np.issubdtype(type(value), np.floating) and np.isnan(value):
+            return False
         else:
             return True
 
