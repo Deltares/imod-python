@@ -51,7 +51,7 @@ def test_assign_flow_discretization(basic_dis, concentration_fc):
     tpt_model["advection"] = AdvectionCentral()
 
     # let the transport model take the discretization from the flow model
-    tpt_model.take_discretization_from_model(gwf_model)
+    tpt_model["dis"] = gwf_model["dis"]
 
     # check that the discretization was added to the transport model
     assert len(tpt_model.keys()) == 3
@@ -77,10 +77,10 @@ def test_assign_flow_discretization2(basic_dis, concentration_fc):
     )
     # define a transport model, with the key "dis" in use
     tpt_model = imod.mf6.model.GroundwaterTransportModel(gwf_model, "salinity")
-    tpt_model["dis"] = AdvectionCentral()
+    tpt_model["adv"] = AdvectionCentral()
 
     # let the transport model take the discretization from the flow model
-    tpt_model.take_discretization_from_model(gwf_model)
+    tpt_model["dis"] = gwf_model["dis"]
 
     # check that the discretization was added to the transport model
     assert len(tpt_model.keys()) == 3
