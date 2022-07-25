@@ -28,7 +28,7 @@ from imod.mf6.out import open_cbc, open_hds, read_cbc_headers, read_grb
 from imod.mf6.rch import Recharge
 from imod.mf6.riv import River
 from imod.mf6.simulation import Modflow6Simulation
-from imod.mf6.src import MassSourceLoadingDisStructured, MassSourceLoadingDisVertices
+from imod.mf6.src import MassSourceLoading
 from imod.mf6.sto import SpecificStorage, Storage, StorageCoefficient
 from imod.mf6.timedis import TimeDiscretization
 from imod.mf6.uzf import UnsaturatedZoneFlow
