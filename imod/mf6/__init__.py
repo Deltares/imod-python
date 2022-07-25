@@ -29,6 +29,7 @@ from imod.mf6.rch import Recharge
 from imod.mf6.riv import River
 from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.src import MassSourceLoading
+from imod.mf6.ssm import Transport_Sink_Sources
 from imod.mf6.sto import SpecificStorage, Storage, StorageCoefficient
 from imod.mf6.timedis import TimeDiscretization
 from imod.mf6.uzf import UnsaturatedZoneFlow
