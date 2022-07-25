@@ -219,7 +219,7 @@ class GroundwaterTransportModel(Modflow6Model):
             self.validate_flow_model(
                 flow_model, "concentration", "species", state_variable_name
             )
-            self["ssm"] = ssm.Transport_Sink_Sources(flow_model, state_variable_name)
+            self["ssm"] = ssm.SourceSinkMixing(flow_model, state_variable_name)
 
     def render(self, modelname: str):
         """Render model namefile"""

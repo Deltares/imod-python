@@ -3,7 +3,7 @@ import numpy as np
 from imod.mf6.pkgbase import Package, VariableMetaData
 
 
-class ImmobileStorage(Package):
+class ImmobileStorageTransfer(Package):
     """
     The Immobile Storage and Transfer (IST) package represents an immobile
     fraction of groundwater. Any number of IST Packages can be specified for a

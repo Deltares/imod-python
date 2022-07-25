@@ -5,7 +5,7 @@ import numpy as np
 from imod.mf6.pkgbase import Package, VariableMetaData
 
 
-class MobileStorage(Package):
+class MobileStorageTransfer(Package):
     """
     Mobile Storage.
 

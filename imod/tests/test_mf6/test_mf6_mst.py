@@ -4,13 +4,13 @@ import textwrap
 import numpy as np
 import pytest
 
-from imod.mf6.mst import MobileStorage
+from imod.mf6.mst import MobileStorageTransfer
 
 
 def test_render_simple():
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    m = MobileStorage(0.3)
+    m = MobileStorageTransfer(0.3)
     actual = m.render(directory, "mst", globaltimes, True)
     expected = textwrap.dedent(
         """\
@@ -39,7 +39,7 @@ def test_render_first_order_decay(
 ):
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    m = MobileStorage(
+    m = MobileStorageTransfer(
         porosity_fc,
         decay=decay_fc,
         decay_sorbed=decay_sorbed_fc,
@@ -81,7 +81,7 @@ def test_render_zero_order_decay(
 ):
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    m = MobileStorage(
+    m = MobileStorageTransfer(
         porosity_fc,
         decay=decay_fc,
         decay_sorbed=decay_sorbed_fc,
@@ -123,7 +123,7 @@ def test_wrong_decay_order(
     porosity_fc, decay_fc, decay_sorbed_fc, bulk_density_fc, distcoef_fc, sp2_fc
 ):
     with pytest.raises(ValueError):
-        MobileStorage(
+        MobileStorageTransfer(
             porosity_fc,
             decay=decay_fc,
             decay_sorbed=decay_sorbed_fc,

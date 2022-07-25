@@ -38,7 +38,7 @@ def test_ist_simple(grid_array):
     mobile_immobile_mass_transfer_rate = xr.full_like(
         grid, dtype=np.float64, fill_value=88.0
     )
-    ist = imod.mf6.ImmobileStorage(
+    ist = imod.mf6.ImmobileStorageTransfer(
         initial_immobile_concentration=0.0,
         immobile_porosity=immobile_porosity,
         mobile_immobile_mass_transfer_rate=mobile_immobile_mass_transfer_rate,
@@ -79,7 +79,7 @@ def test_ist_elaborate(grid_array):
     mobile_immobile_mass_transfer_rate = xr.full_like(
         grid, dtype=np.float64, fill_value=88.0
     )
-    ist = imod.mf6.ImmobileStorage(
+    ist = imod.mf6.ImmobileStorageTransfer(
         initial_immobile_concentration=initial_immobile_concentration,
         immobile_porosity=immobile_porosity,
         mobile_immobile_mass_transfer_rate=mobile_immobile_mass_transfer_rate,

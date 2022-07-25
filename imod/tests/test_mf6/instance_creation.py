@@ -80,8 +80,8 @@ def get_instances(cls):
                 relaxation_factor=0.97,
             )
         ]
-    if cls.__name__ == imod.mf6.MobileStorage.__name__:
-        return [imod.mf6.MobileStorage(0.35, 0.01, 0.02, 1300.0, 0.1)]
+    if cls.__name__ == imod.mf6.MobileStorageTransfer.__name__:
+        return [imod.mf6.MobileStorageTransfer(0.35, 0.01, 0.02, 1300.0, 0.1)]
     if cls.__name__ == imod.mf6.NodePropertyFlow.__name__:
         return [
             imod.mf6.NodePropertyFlow(get_xarray(np.int32), 3.0, True, 32.0, 34.0, 7)

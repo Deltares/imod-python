@@ -3,7 +3,7 @@ from typing import Dict
 from imod.mf6.pkgbase import BoundaryCondition, Package
 
 
-class Transport_Sink_Sources(BoundaryCondition):
+class SourceSinkMixing(BoundaryCondition):
     _pkg_id = "ssm"
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
