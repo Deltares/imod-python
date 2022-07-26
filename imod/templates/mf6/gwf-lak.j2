@@ -23,6 +23,6 @@ end dimensions
 
 begin packagedata
 {% for n in range(0, nlakes) %}
-  {{ lakes[n].lakeno}}  {{ lakes[n].strt }}  {{ lakes[n].boundname }}
+  {{ lakes[n].number}}  {{ lakes[n].starting_stage }}  {{ lakes[n].boundname }}
 {% endfor %}
 end packagedata

@@ -79,3 +79,4 @@ connection_length.data = [-1,-2,-3,-4,-5,-6]
 
 
 lake = Lake(lake_numbers, starting_stages, bed_elevations,boundnames,  )
+lake.render(None,None, None, False)
