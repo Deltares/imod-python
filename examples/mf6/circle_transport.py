@@ -37,7 +37,7 @@ def daterange(date1, date2):
 # Create a mesh
 # -------------
 #
-# as explained in circle.py we first generate a grid and a hydraulic conductivity array
+# As explained in circle.py we first generate a grid and a hydraulic conductivity array
 
 nodes, triangles = meshzoo.disk(6, 6)
 nodes *= 1000.0
@@ -61,24 +61,29 @@ k33 = k.copy()
 bottom = idomain * xr.DataArray([5.0, 0.0], dims=["layer"])
 
 # %%
-# Create arrays for recharge process
-# ---------------------
-# we need a recharge rate for the fluid and a recharge rate for the solute.
-# The fluid recharge rate is volumetric and per unit area, so the unit is Length/time
-# The solute recharge rate is the concentration of solute in the recharge, and has concentration units.
+# Recharge
+# --------
+#
+# We need a recharge rate for the fluid and a recharge rate for the solute. The
+# fluid recharge rate is volumetric and per unit area, so the unit is
+# length/time. The solute recharge rate is the concentration of solute in the
+# recharge, and has concentration units.
+
 rch_rate = xu.full_like(idomain.sel(layer=1), 0.001, dtype=float)
 rch_concentration = xu.full_like(rch_rate, 1.0)
 rch_concentration = rch_concentration.expand_dims(species=["salinity"])
 
 
 # %%
-# unlike a recharge boundary, with a prescribed head boundary you don't know a priori whether
-# water will flow in over the boundary or leave across the boundary. If water flows into the model
-# over the boundary, it carries a prescribed solute concentration. if it leaves, it leaves with the
-# concentration that was computed for it.
+# Unlike a recharge boundary, with a prescribed head boundary we don't know a
+# priori whether water will flow in over the boundary or leave across the
+# boundary. If water flows into the model over the boundary, it carries a
+# prescribed solute concentration. If it leaves, it leaves with the
+# concentration that was computed for the cell.
 #
-# In this example we set the prescribed head value to 1 and the external concentration to 1 as well.
-# the boundary only operates on the top layer.
+# In this example we set the prescribed head value to 1 and the external
+# concentration to 1.0 as well. The boundary only operates on the top layer.
+
 chd_location = xu.zeros_like(idomain.sel(layer=1), dtype=bool).ugrid.binary_dilation(
     border_value=True
 )
@@ -88,10 +93,10 @@ constant_concentration = constant_concentration.expand_dims(species=["salinity"]
 
 
 # %%
-# Write the flow  model
-# ---------------
+# Add flow model to simulation
+# ----------------------------
 #
-# see the circle.py example for more comments.
+# See the circle.py example for more information.
 
 gwf_model = imod.mf6.GroundwaterFlowModel()
 gwf_model["disv"] = imod.mf6.VerticesDiscretization(
@@ -145,12 +150,14 @@ simulation.create_time_discretization(additional_times=simtimes)
 
 
 # %%
-# Write the transport  model
-# ---------------
+# Add transport model to simulation
+# ---------------------------------
 #
-# The transport model needs as input the flow field inside the domain computed by the flow model.
-# It also needs the fluxes over the boundary. It uses the same discretization as the flow model.
-# Create a transport model for salinity, give it the flow model, and tell it to use the same discretization.
+# The transport model requires the flow field inside the domain computed by the
+# flow model. It also needs the fluxes over the boundary. It uses the same
+# discretization as the flow model. Here we create a transport model for
+# salinity, derive sources and sinks based from the flow model, and tell it to
+# use the same discretization.
 
 transport_model = imod.mf6.GroundwaterTransportModel()
 transport_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(
@@ -158,22 +165,27 @@ transport_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(
 )
 transport_model["disv"] = gwf_model["disv"]
 
-# Now we define some transport packages for simulating the physical processes of  advection, molecular
-# diffusion and mechanical dispersion.
-# This example is transient, and the volume available for storage is the porosity, in this case 0.3
+# %%
+# Now we define some transport packages for simulating the physical processes
+# of advection, mechanical dispersion, and molecular diffusion dispersion. This
+# example is transient, and the volume available for storage is the porosity,
+# in this case 0.3.
+
 transport_model["dsp"] = imod.mf6.Dispersion(
     1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, False, False
 )
 transport_model["adv"] = imod.mf6.AdvectionUpstream()
 transport_model["mst"] = imod.mf6.MobileStorageTransfer(0.3)
 
-# Now we define initial conditions (0) and output options for the transport simulation
+# %%
+# Now we define initial conditions (0.0) and output options for the transport
+# simulation, and assign the transport model to the simulation as well.
+
 transport_model["ic"] = imod.mf6.InitialConditions(start=0.0)
 transport_model["oc"] = imod.mf6.OutputControl(
     save_concentration="all", save_budget="last"
 )
 
-# assign the transport model to the simulation
 simulation["GWT_1"] = transport_model
 simulation["transport_solver"] = imod.mf6.Solution(
     modelnames=["GWT_1"],
@@ -213,7 +225,6 @@ simulation.run()
 # Open the results
 # ----------------
 
-# open the concentration results
 sim_concentration = imod.mf6.out.open_conc(
     modeldir / "GWT_1/GWT_1.ucn",
     modeldir / "GWF_1/disv.disv.grb",
@@ -232,5 +243,5 @@ sim_concentration.isel(time=33, layer=0).ugrid.plot(ax=ax)
 ax.set_aspect(1)
 
 # %%
-# we observe the initial water (without solute) slowly
-# being flushed out by water coming in from the recharge with a concentration of 1.
+# We observe the initial water (without solute) slowly being flushed out by
+# water coming in from the recharge with a concentration of 1.0.
