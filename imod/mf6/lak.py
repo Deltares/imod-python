@@ -81,7 +81,7 @@ class Lake(AdvancedBoundaryCondition):
     _pkg_id = "lak"
     _template = Package._initialize_template(_pkg_id)
 
-    def __init__(self,lake_number, starting_stage,bed_elevation,boundname ):
+    def __init__(self, lake_number, starting_stage, bed_elevation, boundname ):
 
         #dimensions:
         #   implicit
@@ -148,15 +148,23 @@ class Lake(AdvancedBoundaryCondition):
                 length_conversion=None
         '''
         nlakes = lake_number.size
-        lakelist = []
+        self.lakelist = []
         for i in range (0, nlakes):
             lake = LakeLake()
-            lake.boundname = boundname[i]
-            lake.lake_bed_elevation = bed_elevation[i]
-            lake.number = lake_number[i]
-            lake.starting_stage = starting_stage[i]
-            lakelist.append(lake)
+            lake.boundname = boundname.values[i]
+            lake.lake_bed_elevation = bed_elevation.values[i]
+            lake.number = lake_number.values[i]
+            lake.starting_stage = starting_stage.values[i]
+            self.lakelist.append(lake)
 
 
     def _package_data_to_sparse(self):
         i = 0
+
+
+    def render(self, directory, pkgname, globaltimes, binary):
+        d = {}
+        d["lakes"]= self.lakelist
+        d["nlakes"]=3
+        return self._template.render(d)
+
