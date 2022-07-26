@@ -165,7 +165,7 @@ def setup_mf6_basic_simulation_imod():
     simulation["gwf"] = gwf_model
     # Define solver settings
     simulation["solver"] = imod.mf6.SolutionPresetSimple(
-        print_option="summary", csv_output=False, no_ptc=True
+        modelnames=["gwf"], print_option="summary", csv_output=False, no_ptc=True
     )
 
     # Collect time discretization

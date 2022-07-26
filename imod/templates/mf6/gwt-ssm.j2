@@ -1,0 +1,11 @@
+begin options
+{% if print_flows is defined %}  print_flows
+{% endif %}
+{%- if save_flows is defined %}  save_flows
+{% endif -%}
+end options
+
+begin sources
+{% for name, srctype, auxname in sources %}  {{name}} {{srctype}} {{auxname}}
+{%- endfor %}
+end sources

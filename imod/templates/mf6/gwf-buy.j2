@@ -1,0 +1,17 @@
+begin options
+{%- if hhformulation_rhs is defined %}
+  hhformulation_rhs{% endif %}
+{%- if reference_density is defined %}
+  denseref {{reference_density}}{% endif %}
+{%- if densityfile is defined %}
+  density fileout {{densityfile}}{% endif %}
+end options
+
+begin dimensions
+  nrhospecies {{nrhospecies}}
+end dimensions
+
+begin packagedata
+{%- for irhospec, drhodc, crhoref, modelname, auxspeciesname in packagedata %}
+  {{irhospec}} {{drhodc}} {{crhoref}} {{modelname}} {{auxspeciesname}}{% endfor %}
+end packagedata

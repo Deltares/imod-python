@@ -1,0 +1,30 @@
+begin options
+{%- if print_flows is defined %}    print_flows{%- endif -%}
+{%- if first_order_decay is defined %}
+    FIRST_ORDER_DECAY{% endif %}
+{%- if zero_order_decay is defined %}
+    ZERO_ORDER_DECAY{% endif %}
+{%- if sorption is defined %}
+    SORPTION  {{sorption}}{% endif %}
+end options
+
+
+begin griddata
+  porosity{% if porosity_layered %} layered{% endif %}
+{% for x in porosity %}    {{x}}{% endfor %}{%- if decay is defined %}
+  decay{% if decay_layered %} layered{% endif %}
+{% for x in decay %}    {{x}}{% endfor %}
+{%- endif %}{%- if decay_sorbed is defined %}
+  decay_sorbed{% if decay_sorbed_layered %} layered{% endif %}
+{% for x in decay_sorbed %}    {{x}}{% endfor %}
+{%- endif %}{%- if bulk_density is defined %}
+  bulk_density{% if bulk_density_layered %} layered{% endif %}
+{% for x in bulk_density %}    {{x}}{% endfor %}
+{%- endif %}{%- if distcoef is defined %}
+  distcoef{% if distcoef_layered %} layered{% endif %}
+{% for x in distcoef %}    {{x}}{% endfor %}
+{%- endif %}{%- if sp2 is defined %}
+  sp2{% if sp2_layered %} layered{% endif %}
+{% for x in sp2 %}    {{x}}{% endfor %}
+{%- endif %}
+end griddata

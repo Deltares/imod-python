@@ -30,6 +30,12 @@ class ConstantHead(BoundaryCondition):
         keyword to indicate that the list of constant head information will
         be written to the listing file immediately after it is read. Default is
         False.
+    concentration: array of floats (xr.DataArray, optional)
+        if this flow package is used in simulations also involving transport, then this array is used
+        as the  concentration for inflow over this boundary.
+    concentration_boundary_type: ({"AUX", "AUXMIXED"}, optional)
+        if this flow package is used in simulations also involving transport, then this keyword specifies
+        how outflow over this boundary is computed.
     print_flows: ({True, False}, optional)
         Indicates that the list of constant head flow rates will be printed to
         the listing file for every stress period time step in which "BUDGET
@@ -45,14 +51,17 @@ class ConstantHead(BoundaryCondition):
     """
 
     _pkg_id = "chd"
-    _period_data = ("head",)
-    _metadata_dict = {"head": VariableMetaData(np.floating)}
     _keyword_map = {}
+    _period_data = ("head",)
+    _auxiliary_data = {"concentration": "species"}
+    _metadata_dict = {"head": VariableMetaData(np.floating)}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
         self,
         head,
+        concentration=None,
+        concentration_boundary_type="aux",
         print_input=False,
         print_flows=False,
         save_flows=False,
@@ -60,6 +69,10 @@ class ConstantHead(BoundaryCondition):
     ):
         super().__init__(locals())
         self.dataset["head"] = head
+        if concentration is not None:
+            self.dataset["concentration"] = concentration
+            self.dataset["concentration_boundary_type"] = concentration_boundary_type
+            self.add_periodic_auxiliary_variable()
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows

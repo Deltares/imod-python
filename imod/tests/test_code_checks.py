@@ -1,4 +1,5 @@
 import ast
+import os
 from glob import glob
 
 
@@ -25,16 +26,25 @@ def check_ast(node: ast.AST, path: str):
 
 
 def test_check_modules():
-    paths = glob("../imod/**/*.py")
+    test_directory = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
+    paths = glob(test_directory + "/../**/*.py")
     ok = True
     for path in paths:
-        with open(path) as f:
-            content = f.read()
-            try:
-                tree = ast.parse(content)
-                module_ok = check_ast(tree, path)
-                ok = ok and module_ok
-            except Exception as e:
-                print(f"parsing error in {path}, with error: {e}.")
-                ok = False
+        if test_directory in os.path.realpath(
+            path
+        ):  # if it's a test we don't care. this very file contains print statements itself.
+            continue
+        try:
+            with open(path) as f:
+                content = f.read()
+                try:
+                    tree = ast.parse(content)
+                    module_ok = check_ast(tree, path)
+                    ok = ok and module_ok
+                except Exception as e:
+                    print(f"parsing error in {path}, with error: {e}.")
+                    ok = False
+        except Exception as e:
+            print(f"error reading {path}, with error: {e}")
+            ok = False
     assert ok

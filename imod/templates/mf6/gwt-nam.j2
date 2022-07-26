@@ -1,0 +1,15 @@
+begin options
+{% if listing_file is defined %}  list {{listing_file}}
+{% endif %}
+{%- if print_input is defined %}  print_input
+{% endif %}
+{%- if print_flows is defined %}  print_flows
+{% endif %}
+{%- if save_flows is defined %}  save_flows
+{% endif -%}
+end options
+
+begin packages
+{% for (ftype, fname, pkgname) in packages%}  {{ftype}} {{fname}} {{pkgname}}
+{% endfor -%}
+end packages
