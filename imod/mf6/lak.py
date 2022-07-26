@@ -7,10 +7,6 @@ class LakeLake:
         self.boundname = ""
         self.starting_stage = 0
         self.lake_bed_elevation = 0
-
-class Lake(AdvancedBoundaryCondition):
-    _pkg_id = "lak"
-    _template = Package._initialize_template(_pkg_id)
 """
     Parameters
     ----------
@@ -81,19 +77,20 @@ class Lake(AdvancedBoundaryCondition):
         dims: (time, lake)
 
     """
-    def __init__(
-        self,
-#dimensions:
-#   implicit
-#package data: dimension nr of lakes
-        lake_number,
-        starting_stage,
-        bed_elevation,
+class Lake(AdvancedBoundaryCondition):
+    _pkg_id = "lak"
+    _template = Package._initialize_template(_pkg_id)
+
+    def __init__(self,lake_number, starting_stage,bed_elevation,boundname ):
+
+        #dimensions:
+        #   implicit
+        #package data: dimension nr of lakes
         #nlakeconn : number of connections of this lake. we should be able to compute this from the
         #connection data specified below
         #aux: the auxiliary variables for this lake. These should exist if we solve with transport.
-        boundname, #name of the lake
-        ):
+        #name of the lake
+
         '''
         # connection data
         lake_no,  # either an array of n(i) cellindices for i lakes, or an array of size idomain with a lake number or a NaN in each cell
@@ -161,5 +158,5 @@ class Lake(AdvancedBoundaryCondition):
             lakelist.append(lake)
 
 
-
-
+    def _package_data_to_sparse(self):
+        i = 0
