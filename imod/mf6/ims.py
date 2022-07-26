@@ -416,7 +416,9 @@ class Solution(Package):
         self._pkgcheck()
 
 
-def SolutionPresetSimple(modelnames, print_option, csv_output, no_ptc):
+def SolutionPresetSimple(
+    modelnames, print_option="summary", csv_output=False, no_ptc=False
+):
     solution = Solution(
         modelnames=modelnames,
         print_option=print_option,
@@ -448,7 +450,9 @@ def SolutionPresetSimple(modelnames, print_option, csv_output, no_ptc):
     return solution
 
 
-def SolutionPresetModerate(modelnames, print_option, csv_output, no_ptc):
+def SolutionPresetModerate(
+    modelnames, print_option="summary", csv_output=False, no_ptc=False
+):
     solution = Solution(
         modelnames=modelnames,
         print_option=print_option,
@@ -480,7 +484,9 @@ def SolutionPresetModerate(modelnames, print_option, csv_output, no_ptc):
     return solution
 
 
-def SolutionPresetComplex(modelnames, print_option, csv_output, no_ptc):
+def SolutionPresetComplex(
+    modelnames, print_option="summary", csv_output=False, no_ptc=False
+):
     solution = Solution(
         modelnames=modelnames,
         print_option=print_option,
