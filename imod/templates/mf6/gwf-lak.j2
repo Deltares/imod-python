@@ -22,29 +22,7 @@ begin dimensions
 end dimensions
 
 begin packagedata
-  {{lakeno}} {{strt}} {{nlakeconn}} {%- if aux is defined -%}{{aux(naux)}}{%- endif -%} {%- if boundname is defined -%}{{boundname}}{%- endif -%}
-  {{lakeno}} {{strt}} {{nlakeconn}} {%- if aux is defined -%}{{aux(naux)}}{%- endif -%} {%- if boundname is defined -%}{{boundname}}{%- endif -%}
-  ...
+{% for n =0, nlakes %}
+  {{ lakes[n].lakeno}}  {{ lakes[n].strt }}  {{ lakes[n].boundname }}
+{% endfor %}
 end packagedata
-
-begin connectiondata
-  {{lakeno}} {{iconn}} {{cellid(ncelldim)}} {{claktype}} {{bedleak}} {{belev}} {{telev}} {{connlen}} {{connwidth}}
-  {{lakeno}} {{iconn}} {{cellid(ncelldim)}} {{claktype}} {{bedleak}} {{belev}} {{telev}} {{connlen}} {{connwidth}}
-  ...
-end connectiondata
-
-begin tables
-  {{lakeno}} tab6 filein {{tab6_filename}}
-  {{lakeno}} tab6 filein {{tab6_filename}}
-  ...
-end tables
-
-begin outlets
-  {{outletno}} {{lakein}} {{lakeout}} {{couttype}} {{invert}} {{width}} {{rough}} {{slope}}
-  {{outletno}} {{lakein}} {{lakeout}} {{couttype}} {{invert}} {{width}} {{rough}} {{slope}}
-  ...
-end outlets
-
-{% for i, path in periods.items() %}begin period {{i}}
-  open/close {{path}} (binary)
-end period{% endfor %}
