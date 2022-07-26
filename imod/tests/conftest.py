@@ -10,7 +10,7 @@ from .fixtures.flow_basic_fixture import (
     well_df,
 )
 from .fixtures.mf6_circle_fixture import circle_model, circle_result
-from .fixtures.mf6_flow_with_tranpsort_fixture import (
+from .fixtures.mf6_flow_with_transport_fixture import (
     bulk_density_fc,
     concentration_fc,
     conductance_fc,

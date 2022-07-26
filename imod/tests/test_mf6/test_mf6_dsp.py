@@ -5,7 +5,6 @@ import numpy as np
 import xarray as xr
 
 import imod
-import imod.mf6.model
 
 
 def test_dispersion_default():

@@ -53,7 +53,8 @@ def create_transport_model(flowmodel, speciesname, dispersivity, retardation, de
     rhobulk = 1150.0
     porosity = 0.25
 
-    tpt_model = imod.mf6.GroundwaterTransportModel(flowmodel, speciesname)
+    tpt_model = imod.mf6.GroundwaterTransportModel()
+    tpt_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(flowmodel, speciesname)
     tpt_model["adv"] = imod.mf6.AdvectionUpstream()
     tpt_model["dsp"] = imod.mf6.Dispersion(
         diffusion_coefficient=0.0,

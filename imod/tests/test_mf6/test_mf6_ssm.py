@@ -11,7 +11,7 @@ from imod.mf6.ssm import SourceSinkMixing
 def test_transport_model_rendering(flow_model_with_concentration):
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
-    m = SourceSinkMixing(flow_model_with_concentration, "salinity")
+    m = SourceSinkMixing.from_flow_model(flow_model_with_concentration, "salinity")
     actual = m.render(directory, "river", globaltimes, True)
     expected = textwrap.dedent(
         """\
@@ -19,8 +19,7 @@ def test_transport_model_rendering(flow_model_with_concentration):
         end options
 
         begin sources
-            # pname          srctype           auxname
-            riv-1   AUX   salinity
+          riv-1 AUX salinity
         end sources"""
     )
     assert actual == expected

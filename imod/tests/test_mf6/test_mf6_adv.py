@@ -3,7 +3,6 @@ import pathlib
 import numpy as np
 
 import imod
-import imod.mf6.model
 
 
 def test_advection_upstream():

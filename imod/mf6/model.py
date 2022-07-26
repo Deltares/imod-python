@@ -1,13 +1,12 @@
 import abc
 import collections
 import pathlib
-import warnings
 
 import cftime
 import jinja2
 import numpy as np
 
-from imod.mf6 import pkgbase, qgs_util, ssm
+from imod.mf6 import qgs_util
 
 
 class Modflow6Model(collections.UserDict, abc.ABC):
@@ -22,10 +21,10 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
-    def _initialize_template(self):
+    def _initialize_template(self, name: str):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
-        self._template = env.get_template("gwf-nam.j2")
+        self._template = env.get_template(name)
 
     def _get_pkgkey(self, pkg_id):
         """
@@ -86,9 +85,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 modeltimes.append(pkg.dataset["time"].values)
         return modeltimes
 
-    def _render(self, modelname: str, **kwargs):
+    def render(self, modelname: str):
         dir_for_render = pathlib.Path(modelname)
-        d = kwargs
+        d = {k: v for k, v in self.options.items() if not (v is None or v is False)}
         packages = []
         for pkgname, pkg in self.items():
             # Add the six to the package id
@@ -128,17 +127,26 @@ class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
     _model_type = "gwf6"
 
-    def __init__(self, newton=False, under_relaxation=False):
+    def __init__(
+        self,
+        listing_file: str = None,
+        print_input: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
+        newton: bool = False,
+        under_relaxation: bool = False,
+    ):
         super().__init__()
-        self.newton = newton
-        self.under_relaxation = under_relaxation
-        self._initialize_template()
-
-    def render(self, modelname: str):
-        """Render model namefile"""
-        return self._render(
-            modelname, newton=self.newton, under_relaxation=self.under_relaxation
-        )
+        # TODO: probably replace by a pydantic BaseModel
+        self.options = {
+            "listing_file": listing_file,
+            "print_input": print_input,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+            "newton": newton,
+            "under_relaxation": under_relaxation,
+        }
+        self._initialize_template("gwf-nam.j2")
 
     def write_qgis_project(self, directory, crs, aggregate_layers=False):
         """
@@ -194,26 +202,22 @@ class GroundwaterTransportModel(Modflow6Model):
     The GroundwaterTransportModel (GWT) simulates transport of a single solute
     species flowing in groundwater.
     """
+
     _mandatory_packages = ("mst", "dsp", "oc", "ic")
     _model_type = "gwt6"
-    
+
     def __init__(
         self,
-        print_input: bool=False,
-        print_flows: bool=False,
-        save_flows: bool=False,
+        listing_file: str = None,
+        print_input: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
     ):
         super().__init__()
-        self.print_input = print_input
-        self.print_flows = print_flows
-        self.save_flows = save_flows
-        self._initialize_template()
-
-    def render(self, modelname: str):
-        """Render model namefile"""
-        return self._render(
-            modelname,
-            print_input = self.print_input,
-            print_flows = self.print_flows,
-            save_flows = self.save_flows,
-        )
+        self.options = {
+            "listing_file": listing_file,
+            "print_input": print_input,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+        }
+        self._initialize_template("gwt-nam.j2")

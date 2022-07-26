@@ -194,7 +194,7 @@ def flow_model_with_concentration(concentration_fc):
         transient=False,
         convertible=0,
     )
-    gwf_model["ic"] = InitialConditions(head=0.0)
+    gwf_model["ic"] = InitialConditions(start=0.0)
     gwf_model["oc"] = OutputControl(save_head="all", save_budget="all")
     gwf_model["riv-1"] = River(
         stage=1.0,

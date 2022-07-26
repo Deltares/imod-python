@@ -1,5 +1,5 @@
 """
-Create a structured Modflow 6 model.
+Create a Modflow 6 model.
 """
 
 from imod.mf6.adv import AdvectionCentral, AdvectionTVD, AdvectionUpstream
