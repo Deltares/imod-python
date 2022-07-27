@@ -1,29 +1,9 @@
+from multiprocessing import connection
 import numpy as np
 
 from imod.mf6.pkgbase import Package, AdvancedBoundaryCondition
-class LakeLake:
-    def __init__(self):
-        self.number = 0
-        self.boundname = ""
-        self.starting_stage = 0
-        self.lake_bed_elevation = 0
-"""
-    Parameters
-    ----------
-    lake_number: xr.DataArray of floats
-        dims: (layer, y, x)
-    lake_type: xr.DataArray of floats
-        dims: (y, x)
-    bed_leak: xr.DataArray of floats
-        dims: (y, x)
-    bottom_elevation: xr.DataArray of floats
-        dims: (y, x)
-    top_elevation: xr.DataArray of floats
-        dims: (y, x)
-    connection_width: xr.DataArray of floats
-        dims: (y, x)
-    connection_length: xr.DataArray of floats
-        dims: (y, x)
+
+'''
     stage: xr.DataArray of floats
         dims: lake, n_segment
     volume: xr.DataArray of floats
@@ -76,44 +56,11 @@ class LakeLake:
     slope: xr.DataArray of floats
         dims: (time, lake)
 
-    """
-class Lake(AdvancedBoundaryCondition):
-    _pkg_id = "lak"
-    _template = Package._initialize_template(_pkg_id)
-
-    def __init__(self, lake_number, starting_stage, bed_elevation, boundname ):
-
-        #dimensions:
-        #   implicit
-        #package data: dimension nr of lakes
-        #nlakeconn : number of connections of this lake. we should be able to compute this from the
-        #connection data specified below
-        #aux: the auxiliary variables for this lake. These should exist if we solve with transport.
-        #name of the lake
-
-        '''
-        # connection data
-        lake_no,  # either an array of n(i) cellindices for i lakes, or an array of size idomain with a lake number or a NaN in each cell
-        cell_id,  # cell indices- either row, col, lay; or cell id depending on discretization
-        connection_type, # = claktype. Tye of connection. "horizontal", "vertical", "embedded"
-        bed_leak,  # >= s0 or None
-        bottom_elevation,  #ony used for horizontal connections
-        top_elevation,  #ony used for horizontal connections
-        connection_width, #only for  HORIZONTAL, EMBEDDEDH, or EMBEDDEDV
-        connection_length, #only for  HORIZONTAL, EMBEDDEDH, or EMBEDDEDV
-
 
         # table data
                 lakeno,   # nrtables. integer value that defines the lake number associated with the specified TABLES data on the line. LAKENO must be greater than zero and less than or equal to NLAKES. The program will terminate with an error if table information for a lake is specified more than once or the number of specified tables is less than NTABLES.
                 filename, # nrtables. filename containing table
-        # outlets
-                lakein, #(nroutlets)
-                lakeout, #(nroutlets)
-                couttype,# "specfied", "manning", "weir"
-                invert,
-                roughness,
-                width,
-                slope,
+
         #time series
                 iper, #index of starting stress period
                 number_ts, #index of lake or outlet
@@ -146,25 +93,190 @@ class Lake(AdvancedBoundaryCondition):
                 ts6_filename =None,
                 time_conversion=None,
                 length_conversion=None
-        '''
-        nlakes = lake_number.size
-        self.lakelist = []
-        for i in range (0, nlakes):
-            lake = LakeLake()
-            lake.boundname = boundname.values[i]
-            lake.lake_bed_elevation = bed_elevation.values[i]
-            lake.number = lake_number.values[i]
-            lake.starting_stage = starting_stage.values[i]
-            self.lakelist.append(lake)
+'''
+class LakeLake:
+    def __init__(self):
+        self.number = 0
+        self.boundname = ""
+        self.starting_stage = 0
+        self.lake_bed_elevation = 0
 
+'''
+# connection data
+        lake_no,  # either an array of n(i) cellindices for i lakes, or an array of size idomain with a lake number or a NaN in each cell
+        cell_id,  # cell indices- either row, col, lay; or cell id depending on discretization
+        connection_type, # = claktype. Tye of connection. "horizontal", "vertical", "embedded"
+        bed_leak,  # >= s0 or None
+        bottom_elevation,  #ony used for horizontal connections
+        top_elevation,  #ony used for horizontal connections
+        connection_width, #only for  HORIZONTAL, EMBEDDEDH, or EMBEDDEDV
+        connection_length, #only for  HORIZONTAL, EMBEDDEDH, or EMBEDDEDV
+'''
+class LakeConnection:
+    def __init__(self):
+        self.lake_no = 0
+        self.cell_id = 0
+        self.connection_type = ""
+        self.bed_leak =0
+        self.bottom_elevation = 0
+        self.top_elevation = 0
+        self.connection_width = 0
+        self.connection_length = 0
+
+'''
+        # outlets
+                lakein, #(nroutlets)
+                lakeout, #(nroutlets)
+                couttype,# "specfied", "manning", "weir"
+                invert,
+                roughness,
+                width,
+                slope,
+'''
+class LakeOutlet:
+    def __init__(self):
+        self.lakein = 0
+        self.lakeout = 0
+        self.couttype = 0
+        self.invert = 0
+        self.roughness = 0
+        self.width = 0
+        self.slope = 0
+
+class Lake(AdvancedBoundaryCondition):
+    _pkg_id = "lak"
+    _template = Package._initialize_template(_pkg_id)
+
+    def __init__(
+        #lake
+        self, l_number, l_starting_stage, l_bed_elevation, l_boundname,
+        #connection
+        c_lake_no, c_cell_id, c_type, c_bed_leak, c_bottom_elevation, c_top_elevation, c_width, c_length,
+        #outlet
+        o_lakein = None, o_lakeout= None, o_couttype= None, o_invert= None, o_roughness= None, o_width= None, o_slope= None,
+        #options
+        print_input=False,
+        print_stage =False,
+        print_flows=False,
+        save_flows=False,
+        stagefile =None,
+        budgetfile=None,
+        budgetcsvfile =None,
+        package_convergence_filename =None,
+        ts6_filename =None,
+        time_conversion=None,
+        length_conversion=None
+     ):
+
+
+
+        super().__init__(locals())
+        self.dataset["l_boundname"] = l_boundname
+        self.dataset["l_bed_elevation"] = l_bed_elevation
+        self.dataset["l_number"] = l_number
+        self.dataset["l_starting_stage"] = l_starting_stage
+
+        self.dataset["c_lake_no"] = c_lake_no
+        self.dataset["c_cell_id"] = c_cell_id
+        self.dataset["c_type"] = c_type
+        self.dataset["c_bed_leak"] = c_bed_leak
+        self.dataset["c_bottom_elevation"] = c_bottom_elevation
+        self.dataset["c_top_elevation"] = c_top_elevation
+        self.dataset["c_width"] = c_width
+        self.dataset["c_length"] = c_length
+
+        if o_lakein is not None:
+            self.dataset["o_lakein"] = o_lakein
+            self.dataset["o_lakeout"] = o_lakeout
+            self.dataset["o_couttype"] = o_couttype
+            self.dataset["o_invert"] = o_invert
+            self.dataset["o_roughness"] = o_roughness
+            self.dataset["o_width"] = o_width
+            self.dataset["o_slope"] = o_slope
+
+        self.dataset["print_input"]=print_input,
+        self.dataset["print_stage"] =print_stage,
+        self.dataset["print_flows"]=print_flows,
+        self.dataset["save_flows"]=save_flows,
+
+        self.dataset["stagefile"] =stagefile,
+        self.dataset["budgetfile"]=budgetfile,
+        self.dataset["budgetcsvfile"] =budgetcsvfile,
+        self.dataset["package_convergence_filename"] =package_convergence_filename,
+        self.dataset["ts6_filename"] =ts6_filename,
+        self.dataset["time_conversion"]=time_conversion,
+        self.dataset["length_conversion"]=length_conversion
 
     def _package_data_to_sparse(self):
         i = 0
 
 
     def render(self, directory, pkgname, globaltimes, binary):
+
+
+
         d = {}
-        d["lakes"]= self.lakelist
-        d["nlakes"]=3
+        d["print_input"] = self.dataset["print_input"]
+        d["print_stage"] = self.dataset["print_stage"]
+        d["print_flows"] = self.dataset["print_flows"]
+        d["save_flows"] = self.dataset["save_flows"]
+
+        d["stagefile"] = self.dataset["stagefile"]
+        d["budgetfile"] = self.dataset["budgetfile"]
+        d["budgetcsvfile"] = self.dataset["budgetcsvfile"]
+        d["package_convergence_filename"] = self.dataset["package_convergence_filename"]
+        d["ts6_filename"] = self.dataset["ts6_filename"]
+        d["time_conversion"] = self.dataset["time_conversion"]
+        d["length_conversion"] = self.dataset["length_conversion"]
+
+        lakelist, connectionlist, outletlist = self.get_structures_from_arrays()
+        d["lakes"]= lakelist
+        d["connections"]= connectionlist
+        d["outlets"]= outletlist
+        d["nlakes"]= len(lakelist)
+        d["nconnect"] = len(connectionlist)
+        d["noutlet"] = len(outletlist)
+        d["ntables"] = 0
         return self._template.render(d)
+
+    def get_structures_from_arrays(self):
+        lakelist = []
+        nlakes = self.dataset["l_number"].size
+        for i in range (0, nlakes):
+            lake = LakeLake()
+            lake.boundname = self.dataset["l_boundname"].values[i]
+            lake.lake_bed_elevation = self.dataset["l_bed_elevation"].values[i]
+            lake.number = self.dataset["l_number"].values[i]
+            lake.starting_stage = self.dataset["l_starting_stage"].values[i]
+            lakelist.append(lake)
+
+        connectionlist = []
+        nconnect = self.dataset["c_lake_no"].size
+        for i in range (0, nconnect):
+            connection = LakeConnection()
+            connection.lake_no= self.dataset["c_lake_no"].values[i]
+            connection.cell_id =  self.dataset["c_cell_id"].values[i]
+            connection.connection_type = self.dataset["c_type"].values[i]
+            connection.bed_leak = self.dataset["c_bed_leak"].values[i]
+            connection.bottom_elevation = self.dataset["c_bottom_elevation"].values[i]
+            connection.top_elevation = self.dataset["c_top_elevation"].values[i]
+            connection.connection_width = self.dataset["c_width"].values[i]
+            connection.connection_length = self.dataset["c_length"].values[i]
+            connectionlist.append(connection)
+
+        outletlist = []
+        if ("o_lakein" in  self.dataset.keys()):
+            noutlet = self.dataset["o_lakein"].size
+            for i in range(0, noutlet):
+                outlet = LakeOutlet()
+                outlet.lakein = self.dataset["o_lakein"].values[i]
+                outlet.lakeout = self.dataset["o_lakeout"].values[i]
+                outlet.couttype = self.dataset["o_couttype"].values[i]
+                outlet.invert = self.dataset["o_invert"].values[i]
+                outlet.roughness = self.dataset["o_roughness"].values[i]
+                outlet.width = self.dataset["o_width"].values[i]
+                outlet.slope = self.dataset["o_slope"].values[i]
+                outletlist.append(outlet)
+
+        return lakelist, connectionlist, outletlist
 
