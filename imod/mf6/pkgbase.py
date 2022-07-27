@@ -3,7 +3,7 @@ import dataclasses
 import operator
 import pathlib
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Dict, List, Optional, Union
 
 import jinja2
 import numpy as np
@@ -11,6 +11,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod.mf6.pkgcheck as pkgcheck
+from imod.schemata import ValidationError
 
 
 def dis_recarr(arrdict, layer, notnull):
@@ -371,6 +372,19 @@ class Package(abc.ABC):
                         else:
                             path = pkgdirectory / f"{key}.dat"
                             self.write_text_griddata(path, da, dtype)
+
+    def _validate(self, schemata: Dict, **kwargs) -> Dict[str, List[ValidationError]]:
+        errors = {}
+        for variable, var_schemata in schemata.items():
+            var_errors = [
+                schema.validate(self.dataset[variable], **kwargs)
+                for schema in var_schemata
+            ]
+            var_errors = [error for error in errors if error is not None]
+            if len(var_errors) > 0:
+                errors[variable] = var_errors
+
+        return errors
 
     def _netcdf_path(self, directory, pkgname):
         """create path for netcdf, this function is also used to create paths to use inside the qgis projectfiles"""

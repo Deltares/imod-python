@@ -2,6 +2,13 @@ import numpy as np
 
 import imod
 from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.schemata import (
+    AllValueSchema,
+    AnyValueSchema,
+    DimsSchema,
+    DTypeSchema,
+    NoDataSchema,
+)
 
 
 class StructuredDiscretization(Package):
@@ -31,6 +38,24 @@ class StructuredDiscretization(Package):
     """
 
     _pkg_id = "dis"
+    _init_schemata = {
+        "top": [DTypeSchema(np.floating), DimsSchema("layer", "y", "x")],
+        "bottom": [DTypeSchema(np.floating), DimsSchema("y", "x") | DimsSchema()],
+        "idomain": [
+            DTypeSchema(np.integer),
+            DimsSchema("layer", "y", "x") | DimsSchema("layer"),
+        ],
+    }
+    _write_schemata = {
+        "idomain": (AnyValueSchema(">", 0),),
+        "top": (
+            AllValueSchema(">", "bottom"),
+            NoDataSchema(other="idomain", is_other_nodata=(">", 0)),
+            # No need to check coords: dataset ensures they align with idomain.
+        ),
+        "bottom": (NoDataSchema(other="idomain", is_other_nodata=(">", 0)),),
+    }
+
     _metadata_dict = {
         "top": VariableMetaData(np.floating),
         "bottom": VariableMetaData(np.floating),
@@ -47,6 +72,7 @@ class StructuredDiscretization(Package):
         self.dataset["bottom"] = bottom
 
         self._pkgcheck_at_init()
+        self._validate(self._init_schemata)
 
     def _delrc(self, dx):
         """
@@ -99,3 +125,8 @@ class StructuredDiscretization(Package):
         self._check_bottom_above_top()
 
         super()._pkgcheck_at_init()
+
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["bottom"] = self["bottom"]
+        super()._validate(schemata, **kwargs)

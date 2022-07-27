@@ -1,6 +1,13 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.schemata import (
+    AllValueSchema,
+    DimsSchema,
+    DTypeSchema,
+    NoDataSchema,
+    OtherCoordsSchema,
+)
 
 
 class River(BoundaryCondition):
@@ -37,6 +44,22 @@ class River(BoundaryCondition):
     _pkg_id = "riv"
     _period_data = ("stage", "conductance", "bottom_elevation")
     _keyword_map = {}
+    _init_schemata = {
+        "stage": [DTypeSchema(np.floating), DimsSchema("layer", "y", "x")],
+        "conductance": [DTypeSchema(np.floating), DimsSchema("layer", "y", "x")],
+        "bottom_elevation": [DTypeSchema(np.floating), DimsSchema("layer", "y", "x")],
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+        "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+    _write_schemata = {
+        "stage": [
+            AllValueSchema(">=", "bottom_elevation"),
+            OtherCoordsSchema("idomain"),
+        ],
+        "conductance": [NoDataSchema("stage"), AllValueSchema(">", 0.0)],
+        "bottom_elevation": [NoDataSchema("stage")],
+    }
+
     _metadata_dict = {
         "stage": VariableMetaData(np.floating),
         "conductance": VariableMetaData(np.floating, not_less_equal_than=0.0),
