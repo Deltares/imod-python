@@ -67,7 +67,8 @@ connection_type  = xr.full_like(connection_array_layout, fill_value=0, dtype=np.
 connection_type.data = ["vertical", "vertical", "vertical", "horizontal", "horizontal", "embeddedv"]
 connection_bed_leak  = xr.full_like(connection_array_layout, fill_value=0, dtype=np.float32)
 connection_bed_leak.data  = [0.2, 0.3, 0.4, -1,-1,-1]
-
+connection_cell_id  = xr.full_like(connection_array_layout, fill_value=0, dtype=np.int32)
+connection_cell_id.data  = [1,2,3,4,5,6]
 connection_bottom_elevation  = xr.full_like(connection_array_layout, fill_value=0, dtype=np.float32)
 connection_bottom_elevation.data = [-1,-2,-3,-4,-5,-6]
 connection_top_elevation  = xr.full_like(connection_array_layout, fill_value=0, dtype=np.float32)
@@ -78,5 +79,6 @@ connection_length  = xr.full_like(connection_array_layout, fill_value=0, dtype=n
 connection_length.data = [-1,-2,-3,-4,-5,-6]
 
 
-lake = Lake(lake_numbers, starting_stages, bed_elevations,boundnames,  )
+lake = Lake(lake_numbers, starting_stages, bed_elevations,boundnames, connection_lake_number,connection_cell_id,connection_type,  connection_bed_leak,
+connection_bottom_elevation, connection_top_elevation, connection_width, connection_length)
 lake.render(None,None, None, False)

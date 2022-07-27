@@ -26,3 +26,15 @@ begin packagedata
   {{ lakes[n].number}}  {{ lakes[n].starting_stage }}  {{ lakes[n].boundname }}
 {% endfor %}
 end packagedata
+
+begin connectiondata
+{% for n in range(0, nconnect) %}
+  {{connections[n].lake_no}}  {{connections[n].cell_id }} {{ connections[n].connection_type }}  {{ connections[n].bed_leak}} {{connections[n].bottom_elevation  }}  {{ connections[n].c_top_elevation }}  {{connections[n].connection_width  }} {{connections[n].connection_length }}
+{% endfor %}
+end connectiondata
+
+begin outlets
+{% for n in range(0, noutlet) %}
+  {{outlets[n].lakein}} {{outlets[n].lakeout}} {{outlets[n].couttype}} {{outlets[n].invert}} {{outlets[n].roughness}} {{outlets[n].width}} {{outlets[n].slope}}
+{% endfor %}
+end outlets
