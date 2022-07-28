@@ -1,6 +1,3 @@
-from multiprocessing import connection
-import numpy as np
-
 from imod.mf6.pkgbase import Package, AdvancedBoundaryCondition
 
 '''
@@ -167,9 +164,6 @@ class Lake(AdvancedBoundaryCondition):
         time_conversion=None,
         length_conversion=None
      ):
-
-
-
         super().__init__(locals())
         self.dataset["l_boundname"] = l_boundname
         self.dataset["l_bed_elevation"] = l_bed_elevation
@@ -212,9 +206,6 @@ class Lake(AdvancedBoundaryCondition):
 
 
     def render(self, directory, pkgname, globaltimes, binary):
-
-
-
         d = {}
         d["print_input"] = self.dataset["print_input"]
         d["print_stage"] = self.dataset["print_stage"]
