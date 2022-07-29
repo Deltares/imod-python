@@ -112,7 +112,9 @@ class LakeLake:
 class LakeConnection:
     def __init__(self):
         self.lake_no = 0
-        self.cell_id = 0
+        self.cell_id_row_or_index = 0
+        self.cell_id_col = 0
+        self.cell_id_layer = 0
         self.connection_type = ""
         self.bed_leak =0
         self.bottom_elevation = 0
@@ -143,12 +145,12 @@ class LakeOutlet:
 class Lake(AdvancedBoundaryCondition):
     _pkg_id = "lak"
     _template = Package._initialize_template(_pkg_id)
-
+    _metadata_dict = {}
     def __init__(
         #lake
         self, l_number, l_starting_stage, l_bed_elevation, l_boundname,
         #connection
-        c_lake_no, c_cell_id, c_type, c_bed_leak, c_bottom_elevation, c_top_elevation, c_width, c_length,
+        c_lake_no, c_cell_id_row_or_index, c_cell_id_col, c_cell_id_layer,  c_type, c_bed_leak, c_bottom_elevation, c_top_elevation, c_width, c_length,
         #outlet
         o_lakein = None, o_lakeout= None, o_couttype= None, o_invert= None, o_roughness= None, o_width= None, o_slope= None,
         #options
@@ -171,7 +173,9 @@ class Lake(AdvancedBoundaryCondition):
         self.dataset["l_starting_stage"] = l_starting_stage
 
         self.dataset["c_lake_no"] = c_lake_no
-        self.dataset["c_cell_id"] = c_cell_id
+        self.dataset["c_cell_id_row_or_index"] = c_cell_id_row_or_index
+        self.dataset["c_cell_id_col"] = c_cell_id_col
+        self.dataset["c_cell_id_layer"] = c_cell_id_layer
         self.dataset["c_type"] = c_type
         self.dataset["c_bed_leak"] = c_bed_leak
         self.dataset["c_bottom_elevation"] = c_bottom_elevation
@@ -188,31 +192,43 @@ class Lake(AdvancedBoundaryCondition):
             self.dataset["o_width"] = o_width
             self.dataset["o_slope"] = o_slope
 
-        self.dataset["print_input"]=print_input,
-        self.dataset["print_stage"] =print_stage,
-        self.dataset["print_flows"]=print_flows,
-        self.dataset["save_flows"]=save_flows,
+        self.dataset["print_input"]=print_input
+        self.dataset["print_stage"] =print_stage
+        self.dataset["print_flows"]=print_flows
+        self.dataset["save_flows"]=save_flows
 
-        self.dataset["stagefile"] =stagefile,
-        self.dataset["budgetfile"]=budgetfile,
-        self.dataset["budgetcsvfile"] =budgetcsvfile,
-        self.dataset["package_convergence_filename"] =package_convergence_filename,
-        self.dataset["ts6_filename"] =ts6_filename,
-        self.dataset["time_conversion"]=time_conversion,
+        self.dataset["stagefile"] =stagefile
+        self.dataset["budgetfile"]=budgetfile
+        self.dataset["budgetcsvfile"] =budgetcsvfile
+        self.dataset["package_convergence_filename"] =package_convergence_filename
+        self.dataset["ts6_filename"] =ts6_filename
+        self.dataset["time_conversion"]=time_conversion
         self.dataset["length_conversion"]=length_conversion
+        self._pkgcheck()
 
     def _package_data_to_sparse(self):
         i = 0
 
+    def get_value_from_dataset(self, dataset):
+        if dataset is None:
+            return None
+        return dataset.values[()]
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
-        d["print_input"] = self.dataset["print_input"]
-        d["print_stage"] = self.dataset["print_stage"]
-        d["print_flows"] = self.dataset["print_flows"]
-        d["save_flows"] = self.dataset["save_flows"]
 
-        d["stagefile"] = self.dataset["stagefile"]
+
+        if self.get_value_from_dataset(self.dataset["print_input"]):
+            d["print_input"] = self.get_value_from_dataset(self.dataset["print_input"])
+        if self.get_value_from_dataset(self.dataset["print_stage"]):
+            d["print_stage"] =  self.get_value_from_dataset(self.dataset["print_stage"])
+        if self.get_value_from_dataset(self.dataset["print_flows"]):
+            d["print_flows"] =  self.get_value_from_dataset(self.dataset["print_flows"])
+        if self.get_value_from_dataset(self.dataset["save_flows"]) :
+            d["save_flows"] =  self.get_value_from_dataset(self.dataset["save_flows"])
+
+        if self.get_value_from_dataset(self.dataset["stagefile"]):
+            d["stagefile"] = self.dataset["stagefile"]
         d["budgetfile"] = self.dataset["budgetfile"]
         d["budgetcsvfile"] = self.dataset["budgetcsvfile"]
         d["package_convergence_filename"] = self.dataset["package_convergence_filename"]
@@ -246,7 +262,12 @@ class Lake(AdvancedBoundaryCondition):
         for i in range (0, nconnect):
             connection = LakeConnection()
             connection.lake_no= self.dataset["c_lake_no"].values[i]
-            connection.cell_id =  self.dataset["c_cell_id"].values[i]
+            connection.cell_id_row_or_index =  self.dataset["c_cell_id_row_or_index"].values[i]
+            connection.cell_id_col=None
+            if self.dataset["c_cell_id_col"].values[()] is not None :
+                connection.cell_id_col=  self.dataset["c_cell_id_col"].values[i]
+            connection.cell_id_layer=  self.dataset["c_cell_id_layer"].values[i]
+
             connection.connection_type = self.dataset["c_type"].values[i]
             connection.bed_leak = self.dataset["c_bed_leak"].values[i]
             connection.bottom_elevation = self.dataset["c_bottom_elevation"].values[i]
