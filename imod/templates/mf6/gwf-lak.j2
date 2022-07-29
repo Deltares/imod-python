@@ -1,18 +1,32 @@
 begin options
-{%- if auxiliary is defined -%}  auxiliary {{auxiliary(naux)}}{%- endif -%}
-{%- if boundnames is defined -%}  boundnames{%- endif -%}
-{%- if print_input is defined -%}  print_input{%- endif -%}
-{%- if print_stage is defined -%}  print_stage{%- endif -%}
-{%- if print_flows is defined -%}  print_flows{%- endif -%}
-{%- if save_flows is defined -%}  save_flows{%- endif -%}
-{%- if stage_filerecord is defined -%}  stage fileout {{stagefile}}{%- endif -%}
-{%- if budget_filerecord is defined -%}  budget fileout {{budgetfile}}{%- endif -%}
-{%- if ts_filerecord is defined -%}  ts6 filein {{ts6_filename}}{%- endif -%}
-{%- if obs_filerecord is defined -%}  obs6 filein {{obs6_filename}}{%- endif -%}
-{%- if mover is defined -%}  mover{%- endif -%}
-{%- if surfdep is defined -%}  surfdep {{surfdep}}{%- endif -%}
-{%- if time_conversion is defined -%}  time_conversion {{time_conversion}}{%- endif -%}
-{%- if length_conversion is defined -%}  length_conversion {{length_conversion}}{%- endif -%}
+{% if auxiliary is defined %}  auxiliary{% for aux in auxiliary %} {{aux}}{% endfor %}
+{% endif %}
+{%- if boundnames is defined -%}  boundnames
+{% endif -%}
+{%- if print_input is defined -%}  print_input
+{% endif -%}
+{%- if print_stage is defined -%}  print_stage
+{% endif -%}
+{%- if print_flows is defined -%}  print_flows
+{% endif -%}
+{%- if save_flows is defined -%}  save_flows
+{% endif -%}
+{%- if stage_filerecord is defined -%}stage fileout {{stagefile}}
+{% endif -%}
+{%- if budget_filerecord is defined -%}  budget fileout {{budgetfile}}
+{% endif -%}
+{%- if ts_filerecord is defined -%}  ts6 filein {{ts6_filename}}
+{% endif -%}
+{%- if obs_filerecord is defined -%}  obs6 filein {{obs6_filename}}
+{% endif -%}
+{%- if mover is defined -%}  mover
+{% endif -%}
+{%- if surfdep is defined -%}  surfdep {{surfdep}}
+{% endif -%}
+{%- if time_conversion is defined -%}  time_conversion {{time_conversion}}
+{% endif -%}
+{%- if length_conversion is defined -%}  length_conversion {{length_conversion}}
+{% endif -%}
 end options
 
 begin dimensions
@@ -29,7 +43,7 @@ end packagedata
 
 begin connectiondata
 {% for n in range(0, nconnect) %}
-  {{connections[n].lake_no}}  {{connections[n].cell_id }} {{ connections[n].connection_type }}  {{ connections[n].bed_leak}} {{connections[n].bottom_elevation  }}  {{ connections[n].c_top_elevation }}  {{connections[n].connection_width  }} {{connections[n].connection_length }}
+  {{connections[n].lake_no}} {{connections[n].cell_id_row_or_index}} {%- if ts_filerecord is defined %} {{connections[n].cell_id_col}} {%- endif %} {{connections[n].cell_id_layer}} {{ connections[n].connection_type }}  {{ connections[n].bed_leak}} {{connections[n].bottom_elevation  }}  {{ connections[n].c_top_elevation }}  {{connections[n].connection_width  }} {{connections[n].connection_length }}
 {% endfor %}
 end connectiondata
 
