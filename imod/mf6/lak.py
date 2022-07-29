@@ -209,32 +209,19 @@ class Lake(AdvancedBoundaryCondition):
     def _package_data_to_sparse(self):
         i = 0
 
-    def get_value_from_dataset(self, dataset):
-        if dataset is None:
-            return None
-        return dataset.values[()]
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
 
+        for var in ("print_input","print_stage", "print_flows", "save_flows"):
+            value = self[var].values[()]
+            if self._valid(value):
+                d[var] = value
 
-        if self.get_value_from_dataset(self.dataset["print_input"]):
-            d["print_input"] = self.get_value_from_dataset(self.dataset["print_input"])
-        if self.get_value_from_dataset(self.dataset["print_stage"]):
-            d["print_stage"] =  self.get_value_from_dataset(self.dataset["print_stage"])
-        if self.get_value_from_dataset(self.dataset["print_flows"]):
-            d["print_flows"] =  self.get_value_from_dataset(self.dataset["print_flows"])
-        if self.get_value_from_dataset(self.dataset["save_flows"]) :
-            d["save_flows"] =  self.get_value_from_dataset(self.dataset["save_flows"])
-
-        if self.get_value_from_dataset(self.dataset["stagefile"]):
-            d["stagefile"] = self.dataset["stagefile"]
-        d["budgetfile"] = self.dataset["budgetfile"]
-        d["budgetcsvfile"] = self.dataset["budgetcsvfile"]
-        d["package_convergence_filename"] = self.dataset["package_convergence_filename"]
-        d["ts6_filename"] = self.dataset["ts6_filename"]
-        d["time_conversion"] = self.dataset["time_conversion"]
-        d["length_conversion"] = self.dataset["length_conversion"]
+        for var in ("stagefile", "budgetfile","budgetcsvfile", "package_convergence_filename", "ts6_filename","time_conversion", "length_conversion" ):
+            value = self[var].values[()]
+            if self._valid(value):
+                d[var] = value
 
         lakelist, connectionlist, outletlist = self.get_structures_from_arrays()
         d["lakes"]= lakelist
