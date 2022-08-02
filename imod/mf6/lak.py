@@ -146,6 +146,8 @@ class Lake(AdvancedBoundaryCondition):
     _pkg_id = "lak"
     _template = Package._initialize_template(_pkg_id)
     _metadata_dict = {}
+
+
     def __init__(
         #lake
         self, l_number, l_starting_stage, l_bed_elevation, l_boundname,
