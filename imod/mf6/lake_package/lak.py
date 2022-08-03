@@ -1,3 +1,4 @@
+from asyncio import staggered
 from imod.mf6.pkgbase import Package, AdvancedBoundaryCondition
 
 '''
@@ -91,7 +92,7 @@ from imod.mf6.pkgbase import Package, AdvancedBoundaryCondition
                 time_conversion=None,
                 length_conversion=None
 '''
-class LakeLake:
+class Lake_internal:
     def __init__(self):
         self.number = 0
         self.boundname = ""
@@ -109,7 +110,7 @@ class LakeLake:
         connection_width, #only for  HORIZONTAL, EMBEDDEDH, or EMBEDDEDV
         connection_length, #only for  HORIZONTAL, EMBEDDEDH, or EMBEDDEDV
 '''
-class LakeConnection:
+class Connection_internal:
     def __init__(self):
         self.lake_no = 0
         self.cell_id_row_or_index = 0
@@ -132,7 +133,7 @@ class LakeConnection:
                 width,
                 slope,
 '''
-class LakeOutlet:
+class Outlet_internal:
     def __init__(self):
         self.lakein = 0
         self.lakeout = 0
@@ -141,6 +142,18 @@ class LakeOutlet:
         self.roughness = 0
         self.width = 0
         self.slope = 0
+
+class LakeTable:
+    def __init__(self, stage, volume, surface, exchange_surface = None):
+        self.stage = stage
+        self.volume = volume
+        self.surface = surface
+        self.exchange_surface = exchange_surface
+
+
+
+
+
 
 class Lake(AdvancedBoundaryCondition):
     _pkg_id = "lak"
@@ -239,7 +252,7 @@ class Lake(AdvancedBoundaryCondition):
         lakelist = []
         nlakes = self.dataset["l_number"].size
         for i in range (0, nlakes):
-            lake = LakeLake()
+            lake = Lake_internal()
             lake.boundname = self.dataset["l_boundname"].values[i]
             lake.lake_bed_elevation = self.dataset["l_bed_elevation"].values[i]
             lake.number = self.dataset["l_number"].values[i]
@@ -249,7 +262,7 @@ class Lake(AdvancedBoundaryCondition):
         connectionlist = []
         nconnect = self.dataset["c_lake_no"].size
         for i in range (0, nconnect):
-            connection = LakeConnection()
+            connection = Connection_internal()
             connection.lake_no= self.dataset["c_lake_no"].values[i]
             connection.cell_id_row_or_index =  self.dataset["c_cell_id_row_or_index"].values[i]
             connection.cell_id_col=None
@@ -269,7 +282,7 @@ class Lake(AdvancedBoundaryCondition):
         if ("o_lakein" in  self.dataset.keys()):
             noutlet = self.dataset["o_lakein"].size
             for i in range(0, noutlet):
-                outlet = LakeOutlet()
+                outlet = Outlet_internal()
                 outlet.lakein = self.dataset["o_lakein"].values[i]
                 outlet.lakeout = self.dataset["o_lakeout"].values[i]
                 outlet.couttype = self.dataset["o_couttype"].values[i]
