@@ -1,5 +1,6 @@
-from asyncio import staggered
+import imp
 from imod.mf6.pkgbase import Package, AdvancedBoundaryCondition
+from imod.mf6.lake_package import lake_api
 
 '''
     stage: xr.DataArray of floats
@@ -220,6 +221,11 @@ class Lake(AdvancedBoundaryCondition):
         self.dataset["time_conversion"]=time_conversion
         self.dataset["length_conversion"]=length_conversion
         self._pkgcheck()
+
+
+
+
+
 
     def _package_data_to_sparse(self):
         i = 0
