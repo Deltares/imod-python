@@ -1,7 +1,6 @@
 
 import numpy as np
 import xarray as xr
-from imod.mf6.pkgbase import AdvancedBoundaryCondition
 
 from imod.mf6.lake_package.lak import Lake
 
