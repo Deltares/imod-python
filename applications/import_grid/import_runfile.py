@@ -1,4 +1,5 @@
 from datetime import datetime
+import string
 
 start_time_dependent_data = "PACKAGES FOR EACH LAYER AND STRESS-PERIOD"
 
@@ -11,16 +12,29 @@ class stress_period:
         self.arg4 = int(components[3])
         self.arg5 = int(components[4])
         self.packageData = {}
+    @classmethod
+    def is_stress_period_header(cls, string):
+        if string.count(",") != 4:
+            return False
+        components = string.split(",")
+        try:
+            datetime.strptime(components[2], '%Y%m%d')
+        except ValueError:
+            return False
+        return True
 
     @classmethod
     def read_stress_period(cls, linenr, data):
         result = stress_period(data[linenr])
         linenr = result.readstress_period_data(linenr, data)
+        return linenr, result
 
     def readstress_period_data(self, linenr, data):
         linenr+=1
-        package, linener = self.read_one_package( linenr, data)
-        self.packageData[package.name] = package
+        while package_data_one_stress_period.is_package_header(data[linenr]):
+            package, linenr = self.read_one_package( linenr, data)
+            self.packageData[package.name] = package
+            linenr+=1
         return linenr
 
     def read_one_package(self, linenr, data):
@@ -42,11 +56,13 @@ class package_data_one_stress_period:
         return string.count(",") == 1 and string.count("(") == 1 and string.count(")") == 1
 
     def read(self, data, linenr):
-        while not self.is_package_header(data[linenr]):
+        done = False
+        while not done:
             for _ in range(0, self.number):
                 linenr+=1
                 f = bcfile.read_bc_file_indirection(data[linenr])
                 self.files.append(f)
+            done = self.is_package_header(data[linenr+1]) or stress_period.is_stress_period_header(data[linenr+1]) or data[linenr+1].strip()==""
         return linenr
 
 
@@ -69,6 +85,8 @@ class bcfile:
 
 
 def read_time_dependent_data(runfilepath):
+    stressperiods = []
+
     with open(runfilepath, "r") as f:
         data = f.readlines()
 
@@ -76,11 +94,13 @@ def read_time_dependent_data(runfilepath):
         while data[linenr].strip() != start_time_dependent_data:
             linenr+=1
 
-        while linenr < len(data):
-            linenr+=1
-            sp = stress_period.read_stress_period(linenr,data)
+        linenr+=1
+        stressperiod_number = int(data[1].split()[2])
+        for _ in range (0,stressperiod_number):
+            linenr, sp  = stress_period.read_stress_period(linenr,data)
+            stressperiods.append(sp)
 
-        i=0
+    return stressperiods
 
 
 

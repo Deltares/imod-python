@@ -190,13 +190,24 @@ def create_K(grid):
 
 
 
-def create_chd(grid):
+def create_chd(grid, stress_periods):
     idf_files = get_idf_filepaths(basedir+relative_paths["IBOUND"], "IBOUND")
     assert len(idf_files)==1
     ibound =idf.open(idf_files[0])
+    idomain = grid.dataset["idomain"]
+    nr_periods = [ period.packageData["CHD"].number > 0 for period in stress_periods].count(True)
+    periods_start = [ period.timestamp for period in stress_periods if  period.packageData["CHD"].number > 0]
 
-    chd_mf5 =import_array(basedir, "CHD", "CHD")
-    i=1
+    chd_dims = ["time"] + list(idomain.dims)
+    chd_coords = {  "time": periods_start,
+                "layer": idomain.coords["layer"].to_numpy(),
+                  "y": idomain.coords["y"].to_numpy(),
+                  "x": idomain.coords["x"].to_numpy(),
+             }
+    chd = xarray.DataArray(coords= chd_coords, dims = chd_dims)
+    return chd
+
+
 
 def merge_among_layer_dim(array1, array2):
     '''
@@ -237,6 +248,6 @@ k_new = create_K(grid)
 k_new.to_netcdf(output_dir + "knew.nc")
 icelltype = xarray.full_like(k_new["K"], 1, dtype=np.int32)
 npf = mf6.NodePropertyFlow(icelltype=icelltype, k= k_new["K"], k33=k_new["K33"])
-import_runfile.read_time_dependent_data(basedir +relative_paths["RUNFILE"] )
-chd =create_chd(grid)
+stress_periods = import_runfile.read_time_dependent_data(basedir +relative_paths["RUNFILE"] )
+chd = create_chd(grid, stress_periods)
 i=0
