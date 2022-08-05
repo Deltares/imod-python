@@ -8,14 +8,18 @@ import xarray
 from imod import idf, mf6
 import re
 from pathlib import Path
+import import_runfile
 
 relative_paths = { "BOT": "BOT\\VERSION_1\\",
  "TOP":"TOP\\VERSION_1\\" ,
  "KD":"KDW\\VERSION_1",
  "ANI":"ANI\\VERSION_1",
  "VCW": "VCW\\VERSION_1",
+ "IBOUND": "BND\\VERSION_1",
+ "RUNFILE": "Modeldatabase.run"
   }
 output_dir = "d:\\tmp\\"
+
 def get_idf_filepaths(dir, basename):
     '''
     returns a list of idf files present in a directory, specifically those that have a name starting with basename
@@ -155,7 +159,7 @@ def create_K(grid):
     c = import_array(basedir, "VCW", "C")
 
     k_xx_aquifer = kd*(1.0/mf5_heigths_aquifers)
-    k_xx_aquitard = xarray.zeros_like(c)
+    k_xx_aquitard = xarray.full_like(c, fill_value=1e-10, dtype=np.float32)
 
     k_zz_aquifer = k_xx_aquifer.copy(deep=True)
     k_zz_aquitard = mf5_heigths_aquitards*(1.0/c)
@@ -183,6 +187,16 @@ def create_K(grid):
 
     k_new = k_xx_new.merge(k_zz_new)
     return k_new
+
+
+
+def create_chd(grid):
+    idf_files = get_idf_filepaths(basedir+relative_paths["IBOUND"], "IBOUND")
+    assert len(idf_files)==1
+    ibound =idf.open(idf_files[0])
+
+    chd_mf5 =import_array(basedir, "CHD", "CHD")
+    i=1
 
 def merge_among_layer_dim(array1, array2):
     '''
@@ -221,7 +235,8 @@ bots =import_array(basedir, "BOT", "BOT")
 grid = create_mf6_grid(tops, bots)
 k_new = create_K(grid)
 k_new.to_netcdf(output_dir + "knew.nc")
-heigths = grid.dataset["top"] - grid.dataset["bottom"]
-heigths.to_netcdf(output_dir + "heigths.nc")
-
+icelltype = xarray.full_like(k_new["K"], 1, dtype=np.int32)
+npf = mf6.NodePropertyFlow(icelltype=icelltype, k= k_new["K"], k33=k_new["K33"])
+import_runfile.read_time_dependent_data(basedir +relative_paths["RUNFILE"] )
+chd =create_chd(grid)
 i=0
