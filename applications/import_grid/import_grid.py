@@ -204,7 +204,35 @@ def create_chd(grid, stress_periods):
                   "y": idomain.coords["y"].to_numpy(),
                   "x": idomain.coords["x"].to_numpy(),
              }
+
+
     chd = xarray.DataArray(coords= chd_coords, dims = chd_dims)
+    chd.values.fill(np.nan)
+
+
+    ibound.assign_coords(x= chd.coords["x"])
+    ibound.assign_coords(y= chd.coords["y"])
+
+    iperiod = 0
+    for period in  stress_periods:
+        if "CHD" in  period.packageData.keys():
+            if period.packageData["CHD"].number > 0:
+                for file in period.packageData["CHD"].files:
+                    mf5_layer = file.layer
+                    mf6_layer = mf5_layer*2 -1
+                    chdlayer = idf.open(file.filepath)
+                    chdlayer = chdlayer.squeeze()
+                    chdlayer =chdlayer.assign_coords(y= chd.coords["y"])
+                    chdlayer =chdlayer.assign_coords(x= chd.coords["x"])
+                    chd[{"layer":mf6_layer -1, "time":iperiod}] = chdlayer
+                    chd[{"layer":mf6_layer -1, "time":iperiod}] = chd[{"layer":mf6_layer -1, "time":iperiod}].where(ibound < 0)
+
+
+        iperiod+=1
+
+
+
+
     return chd
 
 
