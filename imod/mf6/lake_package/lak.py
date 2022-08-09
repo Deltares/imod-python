@@ -279,7 +279,7 @@ class Lake(AdvancedBoundaryCondition):
         d["outlets"] = outletlist
         d["nlakes"] = len(lakelist)
         d["nconnect"] = len(connectionlist)
-        d["noutlet"] = len(outletlist)
+        d["noutlets"] = len(outletlist)
         d["ntables"] = 0
         return self._template.render(d)
 
@@ -333,3 +333,7 @@ class Lake(AdvancedBoundaryCondition):
                 outletlist.append(outlet)
 
         return lakelist, connectionlist, outletlist
+
+
+    def _package_data_to_sparse(self):
+        return

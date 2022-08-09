@@ -1,10 +1,5 @@
-from turtle import st
-from types import NotImplementedType
-
 import numpy as np
 import xarray as xr
-from matplotlib.pyplot import fill
-
 from imod.mf6.lake_package import lake_api
 
 
