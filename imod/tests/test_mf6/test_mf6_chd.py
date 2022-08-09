@@ -68,6 +68,7 @@ def test_render(head):
     )
     assert actual == expected
 
+
 def test_render2(head):
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
@@ -93,6 +94,7 @@ def test_render2(head):
         """
     )
     assert actual == expected
+
 
 def test_from_file(head, tmp_path):
     directory = pathlib.Path("mymodel")
