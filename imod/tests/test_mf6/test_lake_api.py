@@ -1,9 +1,12 @@
 from turtle import st
 from types import NotImplementedType
-from matplotlib.pyplot import fill
-import xarray as xr
+
 import numpy as np
+import xarray as xr
+from matplotlib.pyplot import fill
+
 from imod.mf6.lake_package import lake_api
+
 
 def create_idomain(nlay, nrow, ncol):
     nlay = 3

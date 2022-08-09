@@ -1,7 +1,9 @@
 
 import itertools
-import xarray as xr
+
 import numpy as np
+import xarray as xr
+
 '''
 This source file contains an interface to the lake package
 '''

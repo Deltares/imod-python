@@ -4,7 +4,6 @@ import xarray as xr
 
 from imod.mf6.lake_package.lak import Lake
 
-
 shape = nlay, nrow, ncol = 3, 9, 9
 
 dx = 10.0
