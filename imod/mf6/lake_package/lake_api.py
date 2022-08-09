@@ -2,13 +2,17 @@
 import itertools
 import xarray as xr
 import numpy as np
-
+'''
+This source file contains an interface to the lake package
+'''
 
 connection_types = { "HORIZONTAL": 0, "VERTICAL": 1, "EMBEDDEDH": 2, "EMBEDDEDV": 3}
 missing_values = { 'float32': np.nan , 'int32': -6789012, }
 
 
 class LakeLake:
+    '''
+    '''
     def __init__(self, starting_stage: float, boundname: str, connectionType, bed_leak,top_elevation, bot_elevation,
         connection_length, connection_width, laketable, status, stage, rainfall, evaporation, runoff, inflow, withdrawal,
         auxiliary):
@@ -91,12 +95,16 @@ class OutletSpecified(OutletBase):
         super().__init__(outletNumber,lakeIn,lakeOut )
         self.rate = rate
 
+class LakeTable:
+    def __init__(self, stage, volume, surface, exchange_surface = None):
+        self.stage = stage
+        self.volume = volume
+        self.surface = surface
+        self.exchange_surface = exchange_surface
+
 def from_lakes_and_outlets( list_of_lakes, list_of_outlets = []):
 
     nrlakes = len(list_of_lakes)
-    nroutlets = len(list_of_outlets)
-    nrtables = sum(1 for lake in list_of_lakes if lake.laketable is not None)
-
 
     dimensions = ["lake_nr"]
     coordinates = {"lake_nr": np.arange(0,nrlakes)}
