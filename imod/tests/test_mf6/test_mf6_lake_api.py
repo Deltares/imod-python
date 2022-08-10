@@ -3,7 +3,7 @@ import textwrap
 import numpy as np
 import xarray as xr
 
-from imod.mf6.lake_package import lake_api, lak
+from imod.mf6.lake_package import lak, lake_api
 
 
 def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
