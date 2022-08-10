@@ -172,7 +172,6 @@ def lake_list_connection_prop_to_xarray_1d(list_of_lakes, propertyname):
     nrlakes = len(list_of_lakes)
     result_as_list = []
     for i in range(0, nrlakes):
-        list_of_lakes[i].lake_number = i + 1
         connection_prop = vars(list_of_lakes[i])[propertyname]
         _, _, _, prop_current_lake = LakeLake.get_1d_array(connection_prop)
         result_as_list += prop_current_lake
@@ -208,12 +207,13 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[]):
     layer = []
 
     for i in range(0, nrlakes):
-
+        list_of_lakes[i].lake_number = i + 1
         layer, y, x, ctype = LakeLake.get_1d_array(list_of_lakes[i].connectionType)
         row += x
         col += y
         layer += layer
         lakenumber += [list_of_lakes[i].lake_number] * len(ctype)
+
     l_boundname = lake_list_lake_prop_to_xarray_1d(list_of_lakes, "boundname")
     l_starting_stage = lake_list_lake_prop_to_xarray_1d(list_of_lakes, "starting_stage")
     l_lakenr = list_1d_to_xarray_1d(list(range(1, nrlakes + 1)), "lake_nr")
