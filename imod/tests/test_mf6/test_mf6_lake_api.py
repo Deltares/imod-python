@@ -1,13 +1,16 @@
-import numpy as np
-import xarray as xr
-from imod.mf6.lake_package import lake_api
 import textwrap
 
+import numpy as np
+import xarray as xr
+
+from imod.mf6.lake_package import lake_api
+
+
 def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
-    '''
+    """
     creates an array similar in dimensions/coords to idomain, but with value NaN (orr the missing value for integers)
     everywhere, except in the cells contained in list "lake_cells". In those cells, the output array has value fillvalue.
-    '''
+    """
     result = xr.full_like(
         idomain, fill_value=lake_api.missing_values[np.dtype(dtype).name], dtype=dtype
     )
@@ -17,9 +20,7 @@ def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
 
 
 def create_lakelake(idomain, starting_stage, boundname, lake_cells):
-    '''
-
-    '''
+    """ """
 
     connectionType = create_gridcovering_array(
         idomain, lake_cells, lake_api.connection_types["HORIZONTAL"], np.int32
@@ -50,13 +51,16 @@ def create_lakelake(idomain, starting_stage, boundname, lake_cells):
     )
     return result
 
+
 def test_lake_api(basic_dis):
-    idomain,_,_ = basic_dis
+    idomain, _, _ = basic_dis
 
-    outlet1 = lake_api.OutletManning(1, "Naardermeer", "Ijsselmeer",23,24,25,26)
-    outlet2 = lake_api.OutletManning(2, "Ijsselmeer", "Naardermeer", 27,28,29,30)
+    outlet1 = lake_api.OutletManning(1, "Naardermeer", "Ijsselmeer", 23, 24, 25, 26)
+    outlet2 = lake_api.OutletManning(2, "Ijsselmeer", "Naardermeer", 27, 28, 29, 30)
 
-    lake1 = create_lakelake(idomain, 11, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)])
+    lake1 = create_lakelake(
+        idomain, 11, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)]
+    )
     lake2 = create_lakelake(
         idomain, 15, "Ijsselmeer", [(1, 5, 5), (1, 5, 6), (1, 6, 6)]
     )
@@ -91,6 +95,7 @@ def test_lake_api(basic_dis):
           1 2 MANNING 23 25 24 26
           2 1 MANNING 27 29 28 30
         end outlets
-        """)
+        """
+    )
 
     assert actual == expected
