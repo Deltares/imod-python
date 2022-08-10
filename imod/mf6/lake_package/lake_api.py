@@ -7,7 +7,7 @@ from imod import mf6
 This source file contains an interface to the lake package
 """
 
-connection_types = {"HORIZONTAL": 0, "VERTICAL": 1, "EMBEDDEDH": 2, "EMBEDDEDV": 3}
+
 missing_values = {
     "float32": np.nan,
     "int32": -6789012,
@@ -15,7 +15,35 @@ missing_values = {
 
 
 class LakeLake:
-    """ """
+    """
+    This class is used to initialize the lake package. It contains data relevant to 1 lake.
+    The input needed to create an instance of this consists of a few scalars( name, starting stage)
+    , some xarray data-arrays, and timeseries.
+    The xarray data-arrays should be of the same size as the grid, and contain missing values in all
+    locations where the lake does not exist ( similar to the input of the chd package)
+
+
+    parameters:
+
+        starting_stage: float,
+        boundname: str,
+        connectionType: xr.DataArray of integers.
+        bed_leak,
+        top_elevation,
+        bot_elevation,
+        connection_length,
+        connection_width,
+        laketable,
+        status,
+        stage,
+        rainfall,
+        evaporation,
+        runoff,
+        inflow,
+        withdrawal,
+        auxiliary,
+
+    """
 
     def __init__(
         self,
