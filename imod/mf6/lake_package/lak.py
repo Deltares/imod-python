@@ -334,6 +334,5 @@ class Lake(AdvancedBoundaryCondition):
 
         return lakelist, connectionlist, outletlist
 
-
     def _package_data_to_sparse(self):
         return

@@ -1,9 +1,7 @@
-import itertools
-from termios import VQUIT
-from imod import mf6
-
 import numpy as np
 import xarray as xr
+
+from imod import mf6
 
 """
 This source file contains an interface to the lake package
@@ -104,6 +102,7 @@ class OutletBase:
         self.roughness = -1
         self.slope = -1
 
+
 class OutletManning(OutletBase):
     def __init__(
         self,
@@ -137,11 +136,13 @@ class OutletWeir(OutletBase):
         self.width = width
         self.couttype = "WEIR"
 
+
 class OutletSpecified(OutletBase):
     def __init__(self, outletNumber: int, lakeIn: str, lakeOut: str, rate):
         super().__init__(outletNumber, lakeIn, lakeOut)
         self.rate = rate
         self.couttype = "SPECIFIED"
+
 
 class LakeTable:
     def __init__(self, stage, volume, surface, exchange_surface=None):
@@ -149,20 +150,23 @@ class LakeTable:
         self.volume = volume
         self.surface = surface
         self.exchange_surface = exchange_surface
+
+
 def list_1d_to_xarray_1d(list, dimension_name):
     nr_elem = len(list)
-    dimensions= [dimension_name]
-    coordinates = {dimension_name: range(0,nr_elem)}
-    result = xr.DataArray(dims=dimensions, coords= coordinates)
+    dimensions = [dimension_name]
+    coordinates = {dimension_name: range(0, nr_elem)}
+    result = xr.DataArray(dims=dimensions, coords=coordinates)
     result.values = list
     return result
 
 
 def outlet_list_prop_to_xarray_1d(list_of_outlets, propertyname, dimension_name):
-    result_list =[]
+    result_list = []
     for outlet in list_of_outlets:
         result_list.append(vars(outlet)[propertyname])
     return list_1d_to_xarray_1d(result_list, dimension_name)
+
 
 def lake_list_connection_prop_to_xarray_1d(list_of_lakes, propertyname):
     nrlakes = len(list_of_lakes)
@@ -174,14 +178,16 @@ def lake_list_connection_prop_to_xarray_1d(list_of_lakes, propertyname):
         result_as_list += prop_current_lake
     return list_1d_to_xarray_1d(result_as_list, "connection_nr")
 
+
 def lake_list_lake_prop_to_xarray_1d(list_of_lakes, propertyname):
     nrlakes = len(list_of_lakes)
     result_as_list = [vars(list_of_lakes[i])[propertyname] for i in range(0, nrlakes)]
     return list_1d_to_xarray_1d(result_as_list, "lake_nr")
 
+
 def map_names_to_lake_numbers(list_of_lakes, list_of_lakenames):
-    result = [-1]*len(list_of_lakenames)
-    for i in range (0, len(list_of_lakenames)):
+    result = [-1] * len(list_of_lakenames)
+    for i in range(0, len(list_of_lakenames)):
         lakename = list_of_lakenames[i]
         for j in range(0, len(list_of_lakes)):
             if list_of_lakes[j].boundname == lakename:
@@ -190,7 +196,6 @@ def map_names_to_lake_numbers(list_of_lakes, list_of_lakenames):
         else:
             raise ValueError("could not find a lake with name {}".format(lakename))
     return result
-
 
 
 def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[]):
@@ -204,37 +209,47 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[]):
 
     for i in range(0, nrlakes):
 
-        layer, y, x, ctype = LakeLake.get_1d_array(
-            list_of_lakes[i].connectionType
-        )
+        layer, y, x, ctype = LakeLake.get_1d_array(list_of_lakes[i].connectionType)
         row += x
         col += y
         layer += layer
-        lakenumber+= [list_of_lakes[i].lake_number]* len(ctype)
+        lakenumber += [list_of_lakes[i].lake_number] * len(ctype)
     l_boundname = lake_list_lake_prop_to_xarray_1d(list_of_lakes, "boundname")
     l_starting_stage = lake_list_lake_prop_to_xarray_1d(list_of_lakes, "starting_stage")
-    l_lakenr = list_1d_to_xarray_1d(list(range(1, nrlakes+1)), "lake_nr")
+    l_lakenr = list_1d_to_xarray_1d(list(range(1, nrlakes + 1)), "lake_nr")
     c_lakenumber = list_1d_to_xarray_1d(lakenumber, "connection_nr")
     c_row = list_1d_to_xarray_1d(row, "connection_nr")
     c_col = list_1d_to_xarray_1d(col, "connection_nr")
     c_layer = list_1d_to_xarray_1d(layer, "connection_nr")
     c_type = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "connectionType")
     c_bed_leak = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "bed_leak")
-    c_bottom_elevation  = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "bottom_elevation")
-    c_top_elevation   = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "top_elevation")
+    c_bottom_elevation = lake_list_connection_prop_to_xarray_1d(
+        list_of_lakes, "bottom_elevation"
+    )
+    c_top_elevation = lake_list_connection_prop_to_xarray_1d(
+        list_of_lakes, "top_elevation"
+    )
     c_width = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "connection_width")
-    c_length = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "connection_length")
-    o_lakein_str = outlet_list_prop_to_xarray_1d(list_of_outlets, "lake_in", "outlet_nr")
-    o_lakeout_str =  outlet_list_prop_to_xarray_1d(list_of_outlets, "lake_out", "outlet_nr")
+    c_length = lake_list_connection_prop_to_xarray_1d(
+        list_of_lakes, "connection_length"
+    )
+    o_lakein_str = outlet_list_prop_to_xarray_1d(
+        list_of_outlets, "lake_in", "outlet_nr"
+    )
+    o_lakeout_str = outlet_list_prop_to_xarray_1d(
+        list_of_outlets, "lake_out", "outlet_nr"
+    )
     o_lakein = map_names_to_lake_numbers(list_of_lakes, o_lakein_str)
     o_lakeout = map_names_to_lake_numbers(list_of_lakes, o_lakeout_str)
     o_couttype = outlet_list_prop_to_xarray_1d(list_of_outlets, "couttype", "outlet_nr")
     o_invert = outlet_list_prop_to_xarray_1d(list_of_outlets, "invert", "outlet_nr")
-    o_roughness= outlet_list_prop_to_xarray_1d(list_of_outlets, "roughness", "outlet_nr")
+    o_roughness = outlet_list_prop_to_xarray_1d(
+        list_of_outlets, "roughness", "outlet_nr"
+    )
     o_width = outlet_list_prop_to_xarray_1d(list_of_outlets, "width", "outlet_nr")
     o_slope = outlet_list_prop_to_xarray_1d(list_of_outlets, "slope", "outlet_nr")
 
-    result = mf6.Lake(        # lake
+    result = mf6.Lake(  # lake
         l_lakenr,
         l_starting_stage,
         l_boundname,
@@ -256,10 +271,6 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[]):
         o_invert,
         o_roughness,
         o_width,
-        o_slope)
+        o_slope,
+    )
     return result
-
-
-
-
-

@@ -1,10 +1,10 @@
-from cmath import exp
 import textwrap
+
 import numpy as np
 import xarray as xr
 
 from imod.mf6.lake_package.lak import Lake
-import pytest
+
 
 def test_lake_rendering(basic_dis):
 
@@ -34,7 +34,7 @@ def test_lake_rendering(basic_dis):
     starting_stages.data = lake_starting_stages
 
     lake_numbers = xr.full_like(lake_array_layout, fill_value=0, dtype=np.int32)
-    lake_numbers.data = np.arange(1, nlake+1)
+    lake_numbers.data = np.arange(1, nlake + 1)
 
     # create 6 connections
     """
@@ -88,13 +88,14 @@ def test_lake_rendering(basic_dis):
         connection_array_layout, fill_value=0, dtype=np.float32
     )
     connection_top_elevation.data = [0, 0.1, -0.1, 0.2, -0.2, 0]
-    connection_width = xr.full_like(connection_array_layout, fill_value=0, dtype=np.float32)
+    connection_width = xr.full_like(
+        connection_array_layout, fill_value=0, dtype=np.float32
+    )
     connection_width.data = [-1, -2, -3, -4, -5, -6]
     connection_length = xr.full_like(
         connection_array_layout, fill_value=0, dtype=np.float32
     )
     connection_length.data = [-1, -2, -3, -4, -5, -6]
-
 
     lake = Lake(
         lake_numbers,
@@ -140,5 +141,6 @@ def test_lake_rendering(basic_dis):
 
         begin outlets
         end outlets
-        """)
+        """
+    )
     assert actual == expected
