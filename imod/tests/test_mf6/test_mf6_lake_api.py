@@ -1,32 +1,13 @@
 import numpy as np
 import xarray as xr
 from imod.mf6.lake_package import lake_api
-
-
-def create_idomain(nlay, nrow, ncol):
-    nlay = 3
-    nrow = 15
-    ncol = 15
-    shape = (nlay, nrow, ncol)
-
-    dx = 25.0
-    dy = -25.0
-    xmin = 0.0
-    xmax = dx * ncol
-    ymin = 0.0
-    ymax = abs(dy) * nrow
-    dims = ("layer", "y", "x")
-
-    layer = np.array([1, 2, 3])
-    y = np.arange(ymax, ymin, dy) + 0.5 * dy
-    x = np.arange(xmin, xmax, dx) + 0.5 * dx
-    coords = {"layer": layer, "y": y, "x": x}
-
-    # Discretization data
-    return xr.DataArray(np.ones(shape, dtype=np.int8), coords=coords, dims=dims)
-
+import textwrap
 
 def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
+    '''
+    creates an array similar in dimensions/coords to idomain, but with value NaN (orr the missing value for integers)
+    everywhere, except in the cells contained in list "lake_cells". In those cells, the output array has value fillvalue.
+    '''
     result = xr.full_like(
         idomain, fill_value=lake_api.missing_values[np.dtype(dtype).name], dtype=dtype
     )
@@ -36,6 +17,10 @@ def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
 
 
 def create_lakelake(idomain, starting_stage, boundname, lake_cells):
+    '''
+
+    '''
+
     connectionType = create_gridcovering_array(
         idomain, lake_cells, lake_api.connection_types["HORIZONTAL"], np.int32
     )
@@ -65,48 +50,47 @@ def create_lakelake(idomain, starting_stage, boundname, lake_cells):
     )
     return result
 
+def test_lake_api(basic_dis):
+    idomain,_,_ = basic_dis
 
-def concatenate_xr_dataArrays(object_list, propertyName, lead_coord, dtype):
-    outputArray_size = 0
-    index_in_out_array = 0
+    outlet1 = lake_api.OutletManning(1, "Naardermeer", "Ijsselmeer",23,24,25,26)
+    outlet2 = lake_api.OutletManning(2, "Ijsselmeer", "Naardermeer", 27,28,29,30)
 
-    for object in object_list:
-        for property, value in vars(object).items():
-            if property == propertyName:
-                outputArray_size += len(value.coords[lead_coord])
-    dims = lead_coord
-    coords = {lead_coord: list(range(0, outputArray_size))}
-    shape = [outputArray_size]
-    outputArray = xr.DataArray(np.zeros(shape, dtype=dtype), dims=dims, coords=coords)
+    lake1 = create_lakelake(idomain, 11, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)])
+    lake2 = create_lakelake(
+        idomain, 15, "Ijsselmeer", [(1, 5, 5), (1, 5, 6), (1, 6, 6)]
+    )
+    lake_package = lake_api.from_lakes_and_outlets([lake1, lake2], [outlet1, outlet2])
+    actual = lake_package.render(None, None, None, False)
+    expected = textwrap.dedent(
+        """\
+        begin options
+        end options
 
-    for object in object_list:
-        for property, value in vars(object).items():
-            if property == propertyName:
-                nrvalues = len(value.coords[lead_coord])
-                for ivalue in range(0, nrvalues):
-                    outputArray.values[index_in_out_array] = value.data[ivalue]
-                    index_in_out_array += 1
+        begin dimensions
+          nlakes 2
+          noutlets 2
+          ntables 0
+        end dimensions
 
-    return outputArray
+        begin packagedata
+          1  11  Naardermeer
+          2  15  Ijsselmeer
+        end packagedata
 
+        begin connectiondata
+          0 1 5 0.0  0.2 0.4    0.6 0.5
+          0 1 6 0.0  0.2 0.4    0.6 0.5
+          0 1 6 0.0  0.2 0.4    0.6 0.5
+          1 1 5 0.0  0.2 0.4    0.6 0.5
+          1 1 6 0.0  0.2 0.4    0.6 0.5
+          1 1 6 0.0  0.2 0.4    0.6 0.5
+        end connectiondata
 
-nconnect = 10
-dimensions = ["connection_nr"]
-coordinates = {"connection_nr": np.arange(0, nconnect)}
-rate1 = xr.DataArray(
-    np.ones(nconnect, dtype=np.float32), coords=coordinates, dims=dimensions
-)
-rate2 = xr.DataArray(
-    np.zeros(nconnect, dtype=np.float32), coords=coordinates, dims=dimensions
-)
-outlet1 = lake_api.OutletSpecified(1, 1, 2, rate1)
-outlet2 = lake_api.OutletSpecified(2, 2, 1, rate2)
+        begin outlets
+          1 2 MANNING 23 25 24 26
+          2 1 MANNING 27 29 28 30
+        end outlets
+        """)
 
-result = concatenate_xr_dataArrays([outlet1, outlet2], "rate", "connection_nr", float)
-
-idomain = create_idomain(4, 10, 10)
-lake1 = create_lakelake(idomain, 11, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)])
-lake2 = create_lakelake(
-    idomain, 15, "Ijsselmeer", [(1, 12, 12), (1, 12, 13), (1, 13, 13)]
-)
-lake_api.from_lakes_and_outlets([lake1, lake2])
+    assert actual == expected
