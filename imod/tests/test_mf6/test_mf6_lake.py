@@ -64,7 +64,7 @@ def test_lake_rendering(basic_dis):
         connection_types["VERTICAL"],
         connection_types["HORIZONTAL"],
         connection_types["HORIZONTAL"],
-        connection_types["EMBEDDEDV"]
+        connection_types["EMBEDDEDV"],
     ]
     connection_bed_leak = xr.full_like(
         connection_array_layout, fill_value=0, dtype=np.float32
