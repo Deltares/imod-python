@@ -83,12 +83,12 @@ def test_lake_api(basic_dis):
         end packagedata
 
         begin connectiondata
-          0 1 5 0.0  0.2 0.4    0.6 0.5
-          0 1 6 0.0  0.2 0.4    0.6 0.5
-          0 1 6 0.0  0.2 0.4    0.6 0.5
           1 1 5 0.0  0.2 0.4    0.6 0.5
           1 1 6 0.0  0.2 0.4    0.6 0.5
           1 1 6 0.0  0.2 0.4    0.6 0.5
+          2 1 5 0.0  0.2 0.4    0.6 0.5
+          2 1 6 0.0  0.2 0.4    0.6 0.5
+          2 1 6 0.0  0.2 0.4    0.6 0.5
         end connectiondata
 
         begin outlets
