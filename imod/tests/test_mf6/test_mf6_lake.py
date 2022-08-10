@@ -3,7 +3,7 @@ import textwrap
 import numpy as np
 import xarray as xr
 
-from imod.mf6.lake_package.lak import Lake
+from imod.mf6.lake_package.lak import Lake, connection_types
 
 
 def test_lake_rendering(basic_dis):
@@ -59,12 +59,12 @@ def test_lake_rendering(basic_dis):
     connection_lake_number.data = [1, 1, 1, 2, 2, 3]
     connection_type = xr.full_like(connection_array_layout, fill_value=0, dtype=np.str0)
     connection_type.data = [
-        "vertical",
-        "vertical",
-        "vertical",
-        "horizontal",
-        "horizontal",
-        "embeddedv",
+        connection_types["VERTICAL"],
+        connection_types["VERTICAL"],
+        connection_types["VERTICAL"],
+        connection_types["HORIZONTAL"],
+        connection_types["HORIZONTAL"],
+        connection_types["EMBEDDEDV"]
     ]
     connection_bed_leak = xr.full_like(
         connection_array_layout, fill_value=0, dtype=np.float32
@@ -125,18 +125,18 @@ def test_lake_rendering(basic_dis):
         end dimensions
 
         begin packagedata
-          1  1.0  Ijsselmeer
-          2  2.0  Vinkeveense plas
-          3  3.0  Reeuwijkse plas
+          1  1.0  3  Ijsselmeer
+          2  2.0  2  Vinkeveense plas
+          3  3.0  1  Reeuwijkse plas
         end packagedata
 
         begin connectiondata
-          1 3 1 vertical  0.2 -1    -1 -1
-          1 4 1 vertical  0.3 -2    -2 -2
-          1 3 2 vertical  0.4 -3    -3 -3
-          2 17 1 horizontal  -1.0 -4    -4 -4
-          2 18 1 horizontal  -1.0 -5    -5 -5
-          3 23 1 embeddedv  -1.0 -6    -6 -6
+          1 1 3 1 VERTICAL  0.2 -1    -1 -1
+          1 2 4 1 VERTICAL  0.3 -2    -2 -2
+          1 3 3 2 VERTICAL  0.4 -3    -3 -3
+          2 1 17 1 HORIZONTAL  -1.0 -4    -4 -4
+          2 2 18 1 HORIZONTAL  -1.0 -5    -5 -5
+          3 1 23 1 EMBEDDEDV  -1.0 -6    -6 -6
         end connectiondata
 
         begin outlets

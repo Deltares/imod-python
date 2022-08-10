@@ -1,5 +1,6 @@
 from imod.mf6.pkgbase import AdvancedBoundaryCondition, Package
 
+connection_types = {"HORIZONTAL": 0, "VERTICAL": 1, "EMBEDDEDH": 2, "EMBEDDEDV": 3}
 
 class Lake_internal:
     """
@@ -11,6 +12,7 @@ class Lake_internal:
         self.number = 0
         self.boundname = ""
         self.starting_stage = 0
+        self.nconn = 0
 
 
 class Connection_internal:
@@ -21,6 +23,7 @@ class Connection_internal:
 
     def __init__(self):
         self.lake_no = 0
+        self.connection_nr = 0
         self.cell_id_row_or_index = 0
         self.cell_id_col = 0
         self.cell_id_layer = 0
@@ -310,7 +313,9 @@ class Lake(AdvancedBoundaryCondition):
                 connection.cell_id_col = self.dataset["c_cell_id_col"].values[i]
             connection.cell_id_layer = self.dataset["c_cell_id_layer"].values[i]
 
-            connection.connection_type = self.dataset["c_type"].values[i]
+            key = [k for k, v in connection_types.items() if v ==self.dataset["c_type"].values[i]][0]
+            connection.connection_type = key
+
             connection.bed_leak = self.dataset["c_bed_leak"].values[i]
             connection.bottom_elevation = self.dataset["c_bottom_elevation"].values[i]
             connection.top_elevation = self.dataset["c_top_elevation"].values[i]
@@ -331,6 +336,23 @@ class Lake(AdvancedBoundaryCondition):
                 outlet.width = self.dataset["o_width"].values[i]
                 outlet.slope = self.dataset["o_slope"].values[i]
                 outletlist.append(outlet)
+
+        #count connections per lake. FIll in the nconn attribute of the lake.
+        #also fill in the connection number (of each connection in each lake)
+        connections_per_lake = {}
+        for i in range(1, nlakes+1):
+            connections_per_lake[i] = 0
+        for c in connectionlist:
+            lakenumber = c.lake_no
+            for i in range(0, nlakes):
+                if lakelist[i].number == lakenumber:
+                    connections_per_lake[lakenumber] =  connections_per_lake[lakenumber]+ 1
+                    lakelist[i].nconn +=1
+                    c.connection_nr = connections_per_lake[lakenumber]
+                    break
+            else:
+                raise ValueError("could not find lake with lake number specified for connection")
+
 
         return lakelist, connectionlist, outletlist
 
