@@ -65,9 +65,10 @@ class StorageBase(Package):
         for field, data in griddata.items():
             content[field] = xr.DataArray(data, coords, dims)
         periods = content.pop("periods")
+        time_index = np.fromiter(periods.keys(), dtype=int) - 1
         content["transient"] = xr.DataArray(
             list(periods.values()),
-            coords={"time": globaltimes[list(periods.keys())]},
+            coords={"time": globaltimes[time_index]},
             dims=("time",),
         )
 
