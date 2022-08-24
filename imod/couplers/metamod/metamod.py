@@ -177,7 +177,6 @@ class MetaMod:
         coupler_toml = {
             "timing": False,
             "log_level": "INFO",
-            "log_file": "imod_coupler.log",
             "driver_type": "metamod",
             "driver": {
                 "kernels": {

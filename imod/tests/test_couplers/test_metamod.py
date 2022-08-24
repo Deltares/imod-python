@@ -165,7 +165,6 @@ def test_metamod_write_toml(msw_model, coupled_mf6_model, tmp_path):
     dict_expected = {
         "timing": False,
         "log_level": "INFO",
-        "log_file": "imod_coupler.log",
         "driver_type": "metamod",
         "driver": {
             "kernels": {
