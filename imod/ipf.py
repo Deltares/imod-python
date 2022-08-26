@@ -10,6 +10,7 @@ import csv
 import glob
 import io
 import pathlib
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -19,10 +20,15 @@ from imod import util
 
 def _infer_delimwhitespace(line, ncol):
     n_elem = len(next(csv.reader([line])))
-    if n_elem == ncol:
+    if n_elem == 1:
+        return True
+    elif n_elem == ncol:
         return False
     else:
-        return True
+        warnings.warn(
+            f"Inconsistent IPF: header states {ncol} columns, first line contains {n_elem}"
+        )
+        return False
 
 
 # Maybe look at dask dataframes, if we run into very large tabular datasets:
@@ -64,7 +70,19 @@ def _read(path, kwargs={}, assoc_kwargs={}):
 
         position = f.tell()
         line = f.readline()
-        delim_whitespace = _infer_delimwhitespace(line, ncol)
+
+        n_elem = len(next(csv.reader([line])))
+        if n_elem == 1:
+            delim_whitespace = True
+        elif n_elem == ncol:
+            delim_whitespace = False
+        else:
+            warnings.warn(
+                f"Inconsistent IPF: header states {ncol} columns, first line contains {n_elem}"
+            )
+            delim_whitespace = False
+            colnames += [f"__unnamed_column{i}__" for i in range(n_elem - ncol)]
+
         f.seek(position)
 
         ipf_kwargs = {
@@ -159,13 +177,15 @@ def read_associated(path, kwargs={}):
         # TODO: find out whether this can be replace by csv.reader
         # the challenge lies in replacing the pd.notnull for nodata values.
         # is otherwise quite a bit faster for such a header block.
-        metadata = pd.read_csv(
-            io.StringIO(lines),
-            delim_whitespace=delim_whitespace,
-            header=None,
-            nrows=ncol,
-            skipinitialspace=True,
-        )
+        metadata_kwargs = {
+            "delim_whitespace": delim_whitespace,
+            "header": None,
+            "nrows": ncol,
+            "skipinitialspace": True,
+        }
+        metadata_kwargs.update(kwargs)
+        metadata = pd.read_csv(io.StringIO(lines), **metadata_kwargs)
+
         # header description possibly includes nodata
         usecols = np.arange(ncol)[pd.notnull(metadata[0])]
         metadata = metadata.iloc[usecols, :]
