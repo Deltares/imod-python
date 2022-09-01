@@ -178,3 +178,12 @@ def test_gen_column_truncation(tmp_path):
     back = imod.gen.read(path)
     assert (back[b] == a).all()
     assert (back[a[:MAX_NAME_WIDTH]] == a).all()
+
+
+def test_gen_empty_column(tmp_path):
+    geom = TEST_GEOMETRIES["point"]
+    df = pd.DataFrame()
+    gdf = gpd.GeoDataFrame(df, geometry=[geom])
+    gdf["empty"] = None
+    path = tmp_path / f"empty-column.gen"
+    imod.gen.write(path, gdf)
