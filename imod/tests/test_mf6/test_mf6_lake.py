@@ -132,12 +132,12 @@ def test_lake_rendering(basic_dis):
         end packagedata
 
         begin connectiondata
-          1 1 3 1 VERTICAL  0.2 -1    -1 -1
-          1 2 4 1 VERTICAL  0.3 -2    -2 -2
-          1 3 3 2 VERTICAL  0.4 -3    -3 -3
-          2 1 17 1 HORIZONTAL  -1.0 -4    -4 -4
-          2 2 18 1 HORIZONTAL  -1.0 -5    -5 -5
-          3 1 23 1 EMBEDDEDV  -1.0 -6    -6 -6
+          1 1 3 1 VERTICAL  0.2 -1.0    -1.0 -1.0
+          1 2 4 1 VERTICAL  0.3 -2.0    -2.0 -2.0
+          1 3 3 2 VERTICAL  0.4 -3.0    -3.0 -3.0
+          2 1 17 1 HORIZONTAL  -1.0 -4.0    -4.0 -4.0
+          2 2 18 1 HORIZONTAL  -1.0 -5.0    -5.0 -5.0
+          3 1 23 1 EMBEDDEDV  -1.0 -6.0    -6.0 -6.0
         end connectiondata
 
         begin outlets
