@@ -181,6 +181,13 @@ def test_has_dim():
 
 
 @pytest.mark.parametrize("kind", [(imod.rasterio, "tif"), (imod.idf, "idf")])
+def test_save__dims_error(test_da, tmp_path, kind):
+    module, ext = kind
+    with pytest.raises(ValueError, match="Last two dimensions of DataArray to save"):
+        module.save(tmp_path / f"test.{ext}", test_da.transpose())
+
+
+@pytest.mark.parametrize("kind", [(imod.rasterio, "tif"), (imod.idf, "idf")])
 def test_saveopen__steady(test_da, tmp_path, kind):
     module, ext = kind
     first = test_da.copy().assign_coords(layer=1)
