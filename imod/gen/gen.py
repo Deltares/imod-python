@@ -47,41 +47,32 @@ Polygon = "shapely.geometry.Polygon"
 LineString = "shapely.geometry.LineString"
 
 
-# Unfortunately, the binary GEN files are written as Fortran Record files, so
-# they cannot be read directly with e.g. numpy.fromfile (like direct access) The
-# scipy FortranFile is mostly adequate, it just misses a method to read char
-# records (always ascii encoded; note all ascii is valid utf-8, but not vice
-# versa). Reading and writing methods are monkeypatched here.
-#
-# https://mail.python.org/pipermail/python-dev/2008-January/076194.html
-def monkeypatch_method(cls):
-    def decorator(func):
-        setattr(cls, func.__name__, func)
-        return func
+class MyFortranFile(FortranFile):
+    """
+    Unfortunately, the binary GEN files are written as Fortran Record files, so
+    they cannot be read directly with e.g. numpy.fromfile (like direct access)
+    The scipy FortranFile is mostly adequate, it just misses a method to read
+    char records (always ascii encoded; note all ascii is valid utf-8, but not
+    vice versa). Those are added here.
+    """
 
-    return decorator
+    def read_char_record(self):
+        first_size = self._read_size(eof_ok=True)
+        string = self._fp.read(first_size).decode("utf-8")
+        if len(string) != first_size:
+            raise FortranFormattingError("End of file in the middle of a record")
+        second_size = self._read_size(eof_ok=True)
+        if first_size != second_size:
+            raise IOError("Sizes do not agree in the header and footer for this record")
+        return string
 
-
-@monkeypatch_method(FortranFile)
-def read_char_record(self):
-    first_size = self._read_size(eof_ok=True)
-    string = self._fp.read(first_size).decode("utf-8")
-    if len(string) != first_size:
-        raise FortranFormattingError("End of file in the middle of a record")
-    second_size = self._read_size(eof_ok=True)
-    if first_size != second_size:
-        raise IOError("Sizes do not agree in the header and footer for this record")
-    return string
-
-
-@monkeypatch_method(FortranFile)
-def write_char_record(self, string: str):
-    total_size = len(string)
-    bytes_string = string.encode("ascii")
-    nb = np.array([total_size], dtype=self._header_dtype)
-    nb.tofile(self._fp)
-    self._fp.write(bytes_string)
-    nb.tofile(self._fp)
+    def write_char_record(self, string: str):
+        total_size = len(string)
+        bytes_string = string.encode("ascii")
+        nb = np.array([total_size], dtype=self._header_dtype)
+        nb.tofile(self._fp)
+        self._fp.write(bytes_string)
+        nb.tofile(self._fp)
 
 
 # The binary GEN file has some idiosyncratic geometries:
@@ -161,7 +152,7 @@ def read(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ignore # 
         warnings.filterwarnings(
             "ignore", message="Given a dtype which is not unsigned."
         )
-        with FortranFile(path, mode="r", header_dtype=HEADER_TYPE) as f:
+        with MyFortranFile(path, mode="r", header_dtype=HEADER_TYPE) as f:
             f.read_reals(dtype=FLOAT_TYPE)  # Skip the bounding box
             n_feature, n_column = f.read_ints(dtype=INT_TYPE)
             if n_column > 0:
@@ -286,11 +277,11 @@ def write(
     None
         Writes file.
     """
-    df = pd.DataFrame(geodataframe.drop(columns="geometry")).astype("string")
+    df = pd.DataFrame(geodataframe.drop(columns="geometry")).astype("string").fillna("")
     if feature_type is not None:
         types = df.pop(feature_type).str.lower()
     else:  # Create a dummy iterator
-        types = ("" for i in range(len(df)))
+        types = ("" for _ in range(len(df)))
 
     n_feature, n_column = df.shape
     # Truncate column names to 11 chars, then make everything at least 11 chars
@@ -306,7 +297,7 @@ def write(
         warnings.filterwarnings(
             "ignore", message="Given a dtype which is not unsigned."
         )
-        with FortranFile(path, mode="w", header_dtype=HEADER_TYPE) as f:
+        with MyFortranFile(path, mode="w", header_dtype=HEADER_TYPE) as f:
             f.write_record(geodataframe.total_bounds.astype(FLOAT_TYPE))
             f.write_record(np.array([n_feature, n_column], dtype=INT_TYPE))
             if n_column > 0:
