@@ -83,7 +83,7 @@ def test_lake_rendering(basic_dis):
     connection_bottom_elevation = xr.full_like(
         connection_array_layout, fill_value=0, dtype=np.float32
     )
-    connection_bottom_elevation.data = [-1, -2, -3, -4, -5, -6]
+    connection_bottom_elevation.data = [-1.0, -2.0, -3.0, -4.0, -5.0, -6.0]
     connection_top_elevation = xr.full_like(
         connection_array_layout, fill_value=0, dtype=np.float32
     )
@@ -91,11 +91,11 @@ def test_lake_rendering(basic_dis):
     connection_width = xr.full_like(
         connection_array_layout, fill_value=0, dtype=np.float32
     )
-    connection_width.data = [-1, -2, -3, -4, -5, -6]
+    connection_width.data = [-1.0, -2.0, -3.0, -4.0, -5.0, -6.0]
     connection_length = xr.full_like(
         connection_array_layout, fill_value=0, dtype=np.float32
     )
-    connection_length.data = [-1, -2, -3, -4, -5, -6]
+    connection_length.data = [-1.0, -2.0, -3.0, -4.0, -5.0, -6.0]
 
     lake = Lake(
         lake_numbers,
