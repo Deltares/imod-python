@@ -108,7 +108,7 @@ def test_helper_function_get_1d_array(basic_dis):
     assert row == [2,3,3]
     assert col == [2,2,3]
     assert layer == [1,1,1]
-    assert values == [0.4,0.4,0.4]
+    assert values[0] == values[1] == values[2] ==  np.float32(0.4)
 
 
 def test_helper_function_list_1d_to_xarray_1d():
