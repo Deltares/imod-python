@@ -47,7 +47,6 @@ def create_lakelake(idomain, starting_stage, boundname, lake_cells):
         None,
         None,
         None,
-        None,
     )
     return result
 
@@ -55,14 +54,14 @@ def create_lakelake(idomain, starting_stage, boundname, lake_cells):
 def test_lake_api(basic_dis):
     idomain, _, _ = basic_dis
 
-    outlet1 = lake_api.OutletManning(1, "Naardermeer", "Ijsselmeer", 23, 24, 25, 26)
-    outlet2 = lake_api.OutletManning(2, "Ijsselmeer", "Naardermeer", 27, 28, 29, 30)
+    outlet1 = lake_api.OutletManning(1, "Naardermeer", "Ijsselmeer", 23.0, 24.0, 25.0, 26.0)
+    outlet2 = lake_api.OutletManning(2, "Ijsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
 
     lake1 = create_lakelake(
-        idomain, 11, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)]
+        idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)]
     )
     lake2 = create_lakelake(
-        idomain, 15, "Ijsselmeer", [(1, 5, 5), (1, 5, 6), (1, 6, 6)]
+        idomain, 15.0, "Ijsselmeer", [(1, 5, 5), (1, 5, 6), (1, 6, 6)]
     )
     lake_package = lake_api.from_lakes_and_outlets([lake1, lake2], [outlet1, outlet2])
     actual = lake_package.render(None, None, None, False)
@@ -78,22 +77,22 @@ def test_lake_api(basic_dis):
         end dimensions
 
         begin packagedata
-          1  11  3  Naardermeer
-          2  15  3  Ijsselmeer
+          1  11.0  3  Naardermeer
+          2  15.0  3  Ijsselmeer
         end packagedata
 
         begin connectiondata
-          1 1 1 5 HORIZONTAL  0.2 0.4    0.6 0.5
-          1 2 1 6 HORIZONTAL  0.2 0.4    0.6 0.5
-          1 3 1 6 HORIZONTAL  0.2 0.4    0.6 0.5
-          2 1 1 5 HORIZONTAL  0.2 0.4    0.6 0.5
-          2 2 1 6 HORIZONTAL  0.2 0.4    0.6 0.5
-          2 3 1 6 HORIZONTAL  0.2 0.4    0.6 0.5
+          1 1 1 2 2 HORIZONTAL  0.2 0.4    0.6 0.5
+          1 2 1 2 3 HORIZONTAL  0.2 0.4    0.6 0.5
+          1 3 1 3 3 HORIZONTAL  0.2 0.4    0.6 0.5
+          2 1 1 5 5 HORIZONTAL  0.2 0.4    0.6 0.5
+          2 2 1 5 6 HORIZONTAL  0.2 0.4    0.6 0.5
+          2 3 1 6 6 HORIZONTAL  0.2 0.4    0.6 0.5
         end connectiondata
 
         begin outlets
-          1 2 MANNING 23 25 24 26
-          2 1 MANNING 27 29 28 30
+          1 2 MANNING 23.0 25.0 24.0 26.0
+          2 1 MANNING 27.0 29.0 28.0 30.0
         end outlets
         """
     )
