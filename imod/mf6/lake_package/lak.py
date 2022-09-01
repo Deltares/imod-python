@@ -349,7 +349,8 @@ class Lake(AdvancedBoundaryCondition):
             connectionlist.append(connection)
 
         outletlist = []
-        if self.dataset["o_lakein"].values[()] != None:
+
+        if self._valid(self.dataset["o_lakein"].values[()] ):
             noutlet = self.dataset["o_lakein"].size
             for i in range(0, noutlet):
                 outlet = Outlet_internal()
