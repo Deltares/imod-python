@@ -36,15 +36,16 @@ def test_lake_rendering(basic_dis):
     lake_numbers = xr.full_like(lake_array_layout, fill_value=0, dtype=np.int32)
     lake_numbers.data = np.arange(1, nlake + 1)
 
-    # create 6 connections
+    # create 6 connections. we assume an unstructured grid, so there are 2 indexes per cell (index and layer)
+    # instead of the usual 3 ( row, col, layer)
     """
     connection_nr  lake_nr cell_id connection_type bed_leak bottom_elevation top_elevation connection_width connection_length
-    1               1      3,4,1     vertical        0.2        -1              0             0.1             0.2
-    2               1      4,4,1     vertical        0.3        -2              0.1           0.2             0.3
-    3               1      3,5,1     vertical        0.4        -3              -0.1          0.3             0.4
-    4               2      17,4,1    horizontal     None        -4              0.2           0.5             0.6
-    5               2      18,4,1    horizontal     None        -5              -0.2          0.6             0.7
-    6               3      23,25,1   embeddedv      None        -6              0             0.7             0.8
+    1               1      3,1     vertical        0.2        -1              0             0.1             0.2
+    2               1      4,1     vertical        0.3        -2              0.1           0.2             0.3
+    3               1      3,2     vertical        0.4        -3              -0.1          0.3             0.4
+    4               2      17,1    horizontal     None        -4              0.2           0.5             0.6
+    5               2      18,1    horizontal     None        -5              -0.2          0.6             0.7
+    6               3      23,1   embeddedv      None        -6              0             0.7             0.8
     """
 
     nconnect = 6

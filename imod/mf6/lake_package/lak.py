@@ -254,14 +254,13 @@ class Lake(AdvancedBoundaryCondition):
         self.dataset["c_width"] = c_width
         self.dataset["c_length"] = c_length
 
-        if o_lakein is not None:
-            self.dataset["o_lakein"] = o_lakein
-            self.dataset["o_lakeout"] = o_lakeout
-            self.dataset["o_couttype"] = o_couttype
-            self.dataset["o_invert"] = o_invert
-            self.dataset["o_roughness"] = o_roughness
-            self.dataset["o_width"] = o_width
-            self.dataset["o_slope"] = o_slope
+        self.dataset["o_lakein"] = o_lakein
+        self.dataset["o_lakeout"] = o_lakeout
+        self.dataset["o_couttype"] = o_couttype
+        self.dataset["o_invert"] = o_invert
+        self.dataset["o_roughness"] = o_roughness
+        self.dataset["o_width"] = o_width
+        self.dataset["o_slope"] = o_slope
 
         self.dataset["print_input"] = print_input
         self.dataset["print_stage"] = print_stage
@@ -350,7 +349,7 @@ class Lake(AdvancedBoundaryCondition):
             connectionlist.append(connection)
 
         outletlist = []
-        if "o_lakein" in self.dataset.keys():
+        if self.dataset["o_lakein"].values[()] != None:
             noutlet = self.dataset["o_lakein"].size
             for i in range(0, noutlet):
                 outlet = Outlet_internal()
