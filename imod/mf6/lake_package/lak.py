@@ -1,5 +1,6 @@
-from imod.mf6.pkgbase import AdvancedBoundaryCondition, Package, VariableMetaData
 import numpy as np
+
+from imod.mf6.pkgbase import AdvancedBoundaryCondition, Package, VariableMetaData
 
 connection_types = {"HORIZONTAL": 0, "VERTICAL": 1, "EMBEDDEDH": 2, "EMBEDDEDV": 3}
 
@@ -178,27 +179,28 @@ class Lake(AdvancedBoundaryCondition):
 
     _pkg_id = "lak"
     _template = Package._initialize_template(_pkg_id)
-    _metadata_dict = {"l_number": VariableMetaData(np.integer),
-                    "l_starting_stage": VariableMetaData(np.floating),
-                    "l_boundname": VariableMetaData(np.str0),
-                    "c_lake_no": VariableMetaData(np.integer),
-                    "c_cell_id_row_or_index": VariableMetaData(np.integer),
-                    "c_cell_id_col": VariableMetaData(np.integer),
-                    "c_cell_id_layer": VariableMetaData(np.integer),
-                    "c_type": VariableMetaData(np.integer),
-                    "c_bed_leak": VariableMetaData(np.floating),
-                    "c_bottom_elevation": VariableMetaData(np.floating),
-                    "c_top_elevation": VariableMetaData(np.floating),
-                    "c_width": VariableMetaData(np.floating),
-                    "c_length": VariableMetaData(np.floating),
-                    "o_lakein": VariableMetaData(np.integer),
-                    "o_lakeout": VariableMetaData(np.integer),
-                    "o_couttype": VariableMetaData(np.str0),
-                    "o_invert": VariableMetaData(np.floating),
-                    "o_roughness": VariableMetaData(np.floating),
-                    "o_width": VariableMetaData(np.floating),
-                    "o_slope": VariableMetaData(np.floating),
-                     }
+    _metadata_dict = {
+        "l_number": VariableMetaData(np.integer),
+        "l_starting_stage": VariableMetaData(np.floating),
+        "l_boundname": VariableMetaData(np.str0),
+        "c_lake_no": VariableMetaData(np.integer),
+        "c_cell_id_row_or_index": VariableMetaData(np.integer),
+        "c_cell_id_col": VariableMetaData(np.integer),
+        "c_cell_id_layer": VariableMetaData(np.integer),
+        "c_type": VariableMetaData(np.integer),
+        "c_bed_leak": VariableMetaData(np.floating),
+        "c_bottom_elevation": VariableMetaData(np.floating),
+        "c_top_elevation": VariableMetaData(np.floating),
+        "c_width": VariableMetaData(np.floating),
+        "c_length": VariableMetaData(np.floating),
+        "o_lakein": VariableMetaData(np.integer),
+        "o_lakeout": VariableMetaData(np.integer),
+        "o_couttype": VariableMetaData(np.str0),
+        "o_invert": VariableMetaData(np.floating),
+        "o_roughness": VariableMetaData(np.floating),
+        "o_width": VariableMetaData(np.floating),
+        "o_slope": VariableMetaData(np.floating),
+    }
 
     def __init__(
         # lake
@@ -350,7 +352,7 @@ class Lake(AdvancedBoundaryCondition):
 
         outletlist = []
 
-        if self._valid(self.dataset["o_lakein"].values[()] ):
+        if self._valid(self.dataset["o_lakein"].values[()]):
             noutlet = self.dataset["o_lakein"].size
             for i in range(0, noutlet):
                 outlet = Outlet_internal()
