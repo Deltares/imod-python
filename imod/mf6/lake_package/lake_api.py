@@ -4,7 +4,9 @@ import xarray as xr
 from imod import mf6
 
 """
-This source file contains an interface to the lake package
+This source file contains an interface to the lake package.
+Usage: create instances of the LakeLake class, and optionally instances of the Outlets class,
+and use the method "from_lakes_and_outlets" to create a lake package.
 """
 
 
@@ -21,6 +23,8 @@ class LakeLake:
     , some xarray data-arrays, and timeseries.
     The xarray data-arrays should be of the same size as the grid, and contain missing values in all
     locations where the lake does not exist ( similar to the input of the chd package)
+    The missing value that you should use depends on the datatype and is contained in the missing_values
+    dictionary.
 
 
     parameters:
@@ -28,20 +32,19 @@ class LakeLake:
         starting_stage: float,
         boundname: str,
         connectionType: xr.DataArray of integers.
-        bed_leak,
-        top_elevation,
-        bot_elevation,
-        connection_length,
-        connection_width,
-        laketable,
+        bed_leak: xr.DataArray of reals.
+        top_elevation: xr.DataArray of reals.
+        bot_elevation: xr.DataArray of reals.
+        connection_length: xr.DataArray of reals.
+        connection_width: xr.DataArray of reals.
         status,
-        stage,
-        rainfall,
-        evaporation,
-        runoff,
-        inflow,
-        withdrawal,
-        auxiliary,
+        stage: timeseries of real numbers
+        rainfall: timeseries of real numbers
+        evaporation: timeseries of real numbers
+        runoff: timeseries of real numbers
+        inflow: timeseries of real numbers
+        withdrawal: timeseries of real numbers
+        auxiliary: timeseries of real numbers
 
     """
 
@@ -55,7 +58,6 @@ class LakeLake:
         bot_elevation,
         connection_length,
         connection_width,
-        laketable,
         status,
         stage,
         rainfall,
@@ -75,9 +77,6 @@ class LakeLake:
         self.connection_length = connection_length
         self.connection_width = connection_width
 
-        # table for this lake
-        self.laketable = (laketable,)
-
         # timeseries
         self.status = (status,)
         self.stage = (stage,)
@@ -90,6 +89,12 @@ class LakeLake:
 
     @classmethod
     def get_subdomain_indices(cls, whole_domain_coords, subdomain_coords):
+        '''
+        returns a vector of indices of the (real world) coordinates of subdomain_coords
+        in whole_domain_coords.
+        Example: if whole_domain_cords is (1.1, 2.2, 3.3, 4.4) and subdomain_cords is (2.2,3.3)
+        then this function returns (1,2)
+        '''
         result = []
         list_whole_domain_coords = list(whole_domain_coords)
         for i in range(0, len(subdomain_coords)):
@@ -98,7 +103,13 @@ class LakeLake:
 
     @classmethod
     def get_1d_array(cls, grid_array):
+        '''
+        this method takes as input an xarray defined over the whole domain. It has missing values
+        on the locations where the lake does not exist. This function returns 4 1d arrays of equal length.
+        They contain the row, column, layer and data values respectively, only at those locations where the values are not missing.
+        '''
         dummy = grid_array.sel()
+
         dummy = dummy.where(dummy != missing_values[grid_array.dtype.name], drop=True)
         x_indexes = cls.get_subdomain_indices(grid_array.x, dummy.x)
         y_indexes = cls.get_subdomain_indices(grid_array.y, dummy.y)
@@ -109,7 +120,7 @@ class LakeLake:
 
         dummy = dummy.stack(z=("x", "y", "layer"))
         dummy = dummy.dropna("z")
-
+        dummy = dummy.astype(grid_array.dtype)
         x_values = list(dummy.z.x.values)
         y_values = list(dummy.z.y.values)
         layer_values = list(dummy.z.layer.values)
@@ -120,6 +131,9 @@ class LakeLake:
 
 
 class OutletBase:
+    '''
+    Base class for the different kinds of outlets
+    '''
     def __init__(self, outletNumber: int, lakeIn: str, lakeOut: str):
         self.outletNumber = outletNumber
         self.lake_in = lakeIn
@@ -132,15 +146,18 @@ class OutletBase:
 
 
 class OutletManning(OutletBase):
+    '''
+    This class represents a Manning Outlet
+    '''
     def __init__(
         self,
         outletNumber: int,
         lakeIn: str,
         lakeOut: str,
-        invert,
-        width,
-        roughness,
-        slope,
+        invert: np.floating,
+        width: np.floating,
+        roughness: np.floating,
+        slope: np.floating
     ):
         super().__init__(outletNumber, lakeIn, lakeOut)
         self.invert = invert
@@ -156,8 +173,8 @@ class OutletWeir(OutletBase):
         outletNumber: int,
         lakeIn: str,
         lakeOut: str,
-        invert,
-        width,
+        invert: np.floating,
+        width: np.floating,
     ):
         super().__init__(outletNumber, lakeIn, lakeOut)
         self.invert = invert
@@ -166,18 +183,10 @@ class OutletWeir(OutletBase):
 
 
 class OutletSpecified(OutletBase):
-    def __init__(self, outletNumber: int, lakeIn: str, lakeOut: str, rate):
+    def __init__(self, outletNumber: int, lakeIn: str, lakeOut: str, rate: np.floating):
         super().__init__(outletNumber, lakeIn, lakeOut)
         self.rate = rate
         self.couttype = "SPECIFIED"
-
-
-class LakeTable:
-    def __init__(self, stage, volume, surface, exchange_surface=None):
-        self.stage = stage
-        self.volume = volume
-        self.surface = surface
-        self.exchange_surface = exchange_surface
 
 
 def list_1d_to_xarray_1d(list, dimension_name):
@@ -236,10 +245,10 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[]):
 
     for i in range(0, nrlakes):
         list_of_lakes[i].lake_number = i + 1
-        layer, y, x, ctype = LakeLake.get_1d_array(list_of_lakes[i].connectionType)
+        lyr, y, x, ctype = LakeLake.get_1d_array(list_of_lakes[i].connectionType)
         row += x
         col += y
-        layer += layer
+        layer += lyr
         lakenumber += [list_of_lakes[i].lake_number] * len(ctype)
 
     l_boundname = lake_list_lake_prop_to_xarray_1d(list_of_lakes, "boundname")
