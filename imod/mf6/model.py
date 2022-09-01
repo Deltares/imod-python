@@ -15,6 +15,10 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def __setitem__(self, key, value):
         # TODO: Add packagecheck
+        if len(key) > 16:
+            raise KeyError(
+                "MODFLOW6 does not support package names longer than 16 characters."
+            )
         super().__setitem__(key, value)
 
     def update(self, *args, **kwargs):

@@ -6,6 +6,15 @@ import imod
 from imod.mf6.adv import AdvectionCentral
 
 
+def test_long_package_name():
+    m = imod.mf6.GroundwaterTransportModel()
+    with pytest.raises(
+        KeyError,
+        match="MODFLOW6 does not support package names longer than 16 characters.",
+    ):
+        m["my_very_long_package_name"] = imod.mf6.AdvectionCentral()
+
+
 def test_transport_model_rendering():
     adv = imod.mf6.AdvectionCentral()
     disp = imod.mf6.Dispersion(1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, True, True)
