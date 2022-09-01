@@ -42,6 +42,9 @@ def _regrid_layers(src, dst, src_top, dst_top, src_bot, dst_bot, method):
                     st = src_t[jj]
                     sb = src_b[jj]
 
+                    if np.isnan(st) or np.isnan(sb):
+                        continue
+
                     overlap = common._overlap((db, dt), (sb, st))
                     if overlap == 0:
                         continue
