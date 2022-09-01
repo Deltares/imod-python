@@ -89,12 +89,12 @@ class LakeLake:
 
     @classmethod
     def get_subdomain_indices(cls, whole_domain_coords, subdomain_coords):
-        '''
+        """
         returns a vector of indices of the (real world) coordinates of subdomain_coords
         in whole_domain_coords.
         Example: if whole_domain_cords is (1.1, 2.2, 3.3, 4.4) and subdomain_cords is (2.2,3.3)
         then this function returns (1,2)
-        '''
+        """
         result = []
         list_whole_domain_coords = list(whole_domain_coords)
         for i in range(0, len(subdomain_coords)):
@@ -103,11 +103,11 @@ class LakeLake:
 
     @classmethod
     def get_1d_array(cls, grid_array):
-        '''
+        """
         this method takes as input an xarray defined over the whole domain. It has missing values
         on the locations where the lake does not exist. This function returns 4 1d arrays of equal length.
         They contain the row, column, layer and data values respectively, only at those locations where the values are not missing.
-        '''
+        """
         dummy = grid_array.sel()
 
         dummy = dummy.where(dummy != missing_values[grid_array.dtype.name], drop=True)
@@ -129,9 +129,10 @@ class LakeLake:
 
 
 class OutletBase:
-    '''
+    """
     Base class for the different kinds of outlets
-    '''
+    """
+
     def __init__(self, outletNumber: int, lakeIn: str, lakeOut: str):
         self.outletNumber = outletNumber
         self.lake_in = lakeIn
@@ -144,9 +145,10 @@ class OutletBase:
 
 
 class OutletManning(OutletBase):
-    '''
+    """
     This class represents a Manning Outlet
-    '''
+    """
+
     def __init__(
         self,
         outletNumber: int,
@@ -155,7 +157,7 @@ class OutletManning(OutletBase):
         invert: np.floating,
         width: np.floating,
         roughness: np.floating,
-        slope: np.floating
+        slope: np.floating,
     ):
         super().__init__(outletNumber, lakeIn, lakeOut)
         self.invert = invert
@@ -188,11 +190,11 @@ class OutletSpecified(OutletBase):
 
 
 def list_1d_to_xarray_1d(list, dimension_name):
-    '''
+    """
     This function creates a 1-dimensional xarray.DataArray with values
     equal to those in the input list. The coordinates are the indexes in the list.
     The dimension name is passed as a function argument.
-    '''
+    """
     nr_elem = len(list)
     dimensions = [dimension_name]
     coordinates = {dimension_name: range(0, nr_elem)}
@@ -202,13 +204,13 @@ def list_1d_to_xarray_1d(list, dimension_name):
 
 
 def outlet_list_prop_to_xarray_1d(list_of_outlets, propertyname, dimension_name):
-    '''
+    """
     given the list of outlets and the name of a property, it creates an xarray.DataArray with
     all the properties appended in one list.
     For example, if outlet_1 has a slope of 3.0 and outlet_2 has a slope of 4.0, it returns an 1d xarray.DataArray
     containing the values (3.0, 4.0)
     The sole dimension is given the name dimension_name, and the coordinates are the indexes.
-    '''
+    """
     result_list = []
     for outlet in list_of_outlets:
         result_list.append(vars(outlet)[propertyname])
@@ -216,14 +218,14 @@ def outlet_list_prop_to_xarray_1d(list_of_outlets, propertyname, dimension_name)
 
 
 def lake_list_connection_prop_to_xarray_1d(list_of_lakes, propertyname):
-    '''
+    """
     given the list of lakes and the name of a property, it creates an xarray.DataArray with
     all the properties appended in one list.
     This function is specifically for those properties that are lists (in practice, the connection properties)
     For example, if lake_1 has 2 connections with tops of  (3.0, 4.0) and lake_2 has 2 connections with tops of  (6.0, 7.0) , it returns an 1d xarray.DataArray
     containing the values (3.0, 4.0, 6.0,7.0)
     The sole dimension is given the name dimension_name, and the coordinates are the indexes.
-    '''
+    """
     nrlakes = len(list_of_lakes)
     result_as_list = []
     for i in range(0, nrlakes):
@@ -234,27 +236,27 @@ def lake_list_connection_prop_to_xarray_1d(list_of_lakes, propertyname):
 
 
 def lake_list_lake_prop_to_xarray_1d(list_of_lakes, propertyname):
-    '''
+    """
     given the list of lakes and the name of a property, it creates an xarray.DataArray with
     all the properties appended in one list.
     This function is specifically for those properties that are scalars (in practice, the properties of the lake itself)
     For example, if lake_1 has a starting_stage of (3.0) and lake_2 has a starting_stage  of  (6.0) , it returns an 1d xarray.DataArray
     containing the values (3.0,6.0)
     The sole dimension is given the name dimension_name, and the coordinates are the indexes.
-    '''
+    """
     nrlakes = len(list_of_lakes)
     result_as_list = [vars(list_of_lakes[i])[propertyname] for i in range(0, nrlakes)]
     return list_1d_to_xarray_1d(result_as_list, "lake_nr")
 
 
 def map_names_to_lake_numbers(list_of_lakes, list_of_lakenames):
-    '''
+    """
     given a list of lakes, and a list of lakenames, it generates a list of the indexes of the lakenames
     in the list of lakes.
     For example, if lake_1.name = "Naardermeer" and lake_2.name = "Ijsselmeer"
     and we get the list_of_lakenames = ("Naardermeer", "Naardermeer", "Ijsselmeer")
     then the return value is (0,0,1)
-    '''
+    """
 
     result = [-1] * len(list_of_lakenames)
     for i in range(0, len(list_of_lakenames)):
@@ -269,9 +271,9 @@ def map_names_to_lake_numbers(list_of_lakes, list_of_lakenames):
 
 
 def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[]):
-    '''
+    """
     this function creates a lake_package given a list of lakes and optionally a list of outlets.
-    '''
+    """
     nrlakes = len(list_of_lakes)
 
     lakenumber = []

@@ -6,7 +6,6 @@ import xarray as xr
 from imod.mf6.lake_package import lak, lake_api
 
 
-
 def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
     """
     creates an array similar in dimensions/coords to idomain, but with value NaN (orr the missing value for integers)
@@ -53,8 +52,12 @@ def create_lakelake(idomain, starting_stage, boundname, lake_cells):
 def test_lake_api(basic_dis):
     idomain, _, _ = basic_dis
 
-    outlet1 = lake_api.OutletManning(1, "Naardermeer", "Ijsselmeer", 23.0, 24.0, 25.0, 26.0)
-    outlet2 = lake_api.OutletManning(2, "Ijsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
+    outlet1 = lake_api.OutletManning(
+        1, "Naardermeer", "Ijsselmeer", 23.0, 24.0, 25.0, 26.0
+    )
+    outlet2 = lake_api.OutletManning(
+        2, "Ijsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0
+    )
 
     lake1 = create_lakelake(
         idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)]
@@ -105,15 +108,15 @@ def test_helper_function_get_1d_array(basic_dis):
         idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)]
     )
     row, col, layer, values = lake1.get_1d_array(lake1.bottom_elevation)
-    assert row == [2,3,3]
-    assert col == [2,2,3]
-    assert layer == [1,1,1]
-    assert values[0] == values[1] == values[2] ==  np.float32(0.4)
+    assert row == [2, 3, 3]
+    assert col == [2, 2, 3]
+    assert layer == [1, 1, 1]
+    assert values[0] == values[1] == values[2] == np.float32(0.4)
 
 
 def test_helper_function_list_1d_to_xarray_1d():
-    result = lake_api.list_1d_to_xarray_1d([23,24,25,26], "velocity")
-    assert result.dims == ('velocity',)
+    result = lake_api.list_1d_to_xarray_1d([23, 24, 25, 26], "velocity")
+    assert result.dims == ("velocity",)
     assert result.values[0] == 23
     assert result.values[1] == 24
     assert result.values[2] == 25
@@ -121,11 +124,18 @@ def test_helper_function_list_1d_to_xarray_1d():
 
 
 def test_helper_function_outlet_list_prop_to_xarray_1d():
-    outlet1 = lake_api.OutletManning(1, "Naardermeer", "Ijsselmeer", 23.0, 24.0, 25.0, 26.0)
-    outlet2 = lake_api.OutletManning(2, "Ijsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
-    result = lake_api.outlet_list_prop_to_xarray_1d([outlet1, outlet2], "lake_in", "lakeIn")
-    assert result.values[0] == 'Naardermeer'
-    assert result.values[1] == 'Ijsselmeer'
+    outlet1 = lake_api.OutletManning(
+        1, "Naardermeer", "Ijsselmeer", 23.0, 24.0, 25.0, 26.0
+    )
+    outlet2 = lake_api.OutletManning(
+        2, "Ijsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0
+    )
+    result = lake_api.outlet_list_prop_to_xarray_1d(
+        [outlet1, outlet2], "lake_in", "lakeIn"
+    )
+    assert result.values[0] == "Naardermeer"
+    assert result.values[1] == "Ijsselmeer"
+
 
 def test_helper_function_lake_list_connection_prop_to_xarray_1d(basic_dis):
     idomain, _, _ = basic_dis
@@ -135,9 +145,12 @@ def test_helper_function_lake_list_connection_prop_to_xarray_1d(basic_dis):
     lake2 = create_lakelake(
         idomain, 15.0, "Ijsselmeer", [(1, 5, 5), (1, 5, 6), (1, 6, 6)]
     )
-    result = lake_api.lake_list_connection_prop_to_xarray_1d([lake1, lake2], "bottom_elevation")
+    result = lake_api.lake_list_connection_prop_to_xarray_1d(
+        [lake1, lake2], "bottom_elevation"
+    )
     assert result.dims == ("connection_nr",)
     assert result.values.min() == result.values.max() == np.float32(0.4)
+
 
 def test_helper_function_lake_list_lake_prop_to_xarray_1d(basic_dis):
     idomain, _, _ = basic_dis
@@ -151,4 +164,3 @@ def test_helper_function_lake_list_lake_prop_to_xarray_1d(basic_dis):
     assert result.values[0] == 11.0
     assert result.values[1] == 15.0
     assert result.dims == ("lake_nr",)
-
