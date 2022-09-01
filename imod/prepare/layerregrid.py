@@ -129,6 +129,8 @@ class LayerRegridder:
             destination_bottom,
             destination_top,
         ]:
+            if not isinstance(da, xr.DataArray):
+                raise TypeError("All arguments must be DataArrays.")
             if not da.dims == ("layer", "y", "x"):
                 raise ValueError(
                     "Dimensions for top, bottom, and source have to be exactly"

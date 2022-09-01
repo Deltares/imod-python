@@ -549,6 +549,11 @@ class Regridder(object):
         result : xr.DataArray
             Regridded result.
         """
+        if not isinstance(source, xr.DataArray):
+            raise TypeError("source must be a DataArray")
+        if not isinstance(like, xr.DataArray):
+            raise TypeError("like must be a DataArray")
+
         # Don't mutate source; src stands for source, dst for destination
         src = source.copy(deep=False)
         like = like.copy(deep=False)
