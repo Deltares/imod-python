@@ -85,6 +85,11 @@ def _save(path, a, nodata, pattern, dtype, write):
     """
     if not isinstance(a, xr.DataArray):
         raise TypeError("Data to save must be an xarray.DataArray")
+    if a.dims[-2:] != ("y", "x"):
+        raise ValueError(
+            'Last two dimensions of DataArray to save must be ("y", "x"), '
+            f"found: {a.dims}"
+        )
 
     path = pathlib.Path(path)
 
