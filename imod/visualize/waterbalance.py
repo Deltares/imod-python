@@ -118,11 +118,12 @@ def waterbalance_barchart(
     _draw_bars(
         ax=ax, x=r1, df=df[inflows], labels=inflows, barwidth=barwidth, colors=incolors
     )
+    # Draw outflows
     _draw_bars(
         ax=ax,
         x=r2,
         df=df[outflows],
-        labels=inflows,
+        labels=outflows,
         barwidth=barwidth,
         colors=outcolors,
     )
