@@ -294,7 +294,7 @@ def _merge_subdomains(pathlists, use_cftime, pattern):
     return out
 
 
-def open_subdomains(path, use_cftime=False):
+def open_subdomains(path, use_cftime=False, pattern=None):
     """
     Combine IDF files of multiple subdomains.
 
@@ -302,7 +302,7 @@ def open_subdomains(path, use_cftime=False):
     ----------
     path : str, Path or list
     use_cftime : bool, optional
-    pattern : str, regex pattern, optional
+    pattern : regex pattern, optional
 
     Returns
     -------
@@ -316,14 +316,18 @@ def open_subdomains(path, use_cftime=False):
     if n == 0:
         raise FileNotFoundError(f"Could not find any files matching {path}")
 
-    pattern = re.compile(
-        r"[\w-]+_(?P<time>[0-9-]+)_l(?P<layer>[0-9]+)_p(?P<subdomain>[0-9]{3})",
-        re.IGNORECASE,
-    )
-    pattern_species = re.compile(
-        r"[\w-]+_c(?P<species>[0-9]+)_(?P<time>[0-9-]+)_l(?P<layer>[0-9]+)_p(?P<subdomain>[0-9]{3})",
-        re.IGNORECASE,
-    )
+    if pattern is None:
+        pattern = re.compile(
+            r"[\w-]+_(?P<time>[0-9-]+)_l(?P<layer>[0-9]+)_p(?P<subdomain>[0-9]{3})",
+            re.IGNORECASE,
+        )
+        pattern_species = re.compile(
+            r"[\w-]+_c(?P<species>[0-9]+)_(?P<time>[0-9-]+)_l(?P<layer>[0-9]+)_p(?P<subdomain>[0-9]{3})",
+            re.IGNORECASE,
+        )
+    else:
+        pattern_species = None
+
     # There are no real benefits to itertools.groupby in this case, as there's
     # no benefit to using a (lazy) iterator in this case
     grouped_by_time = collections.defaultdict(
@@ -334,12 +338,15 @@ def open_subdomains(path, use_cftime=False):
     layers = []
     numbers = []
     species = []
-    has_species = False
-    for i, p in enumerate(paths):
-        if not i:
-            if pattern_species.search(paths[0]) is not None:
-                has_species = True
-                pattern = pattern_species
+
+    # Check if species are present:
+    if pattern_species and pattern_species.search(paths[0]) is not None:
+        has_species = True
+        pattern = pattern_species
+    else:
+        has_species = False
+
+    for p in paths:
         search = pattern.search(p)
         timestr = search["time"]
         layer = int(search["layer"])
