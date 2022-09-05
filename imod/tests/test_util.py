@@ -491,7 +491,7 @@ def test_compliant_ugrid2d(write=False):
         coords={"time": pd.date_range("2000-01-01", "2000-01-05"), "layer": [1, 2, 3]},
         dims=["time", "layer", grid.face_dimension],
     )
-    ugrid_ds = grid.to_dataset.copy()
+    ugrid_ds = grid.to_dataset().copy()
     ugrid_ds["a"] = darray
     uds = util.mdal_compliant_ugrid2d(ugrid_ds)
 
@@ -507,9 +507,7 @@ def test_compliant_ugrid2d(write=False):
     assert "mesh2d_nNodes" in uds.dims
     assert "mesh2d_nMax_face_nodes" in uds.dims
     attrs = uds["mesh2d"].attrs
-    assert "edge_dimension" not in attrs
     assert "face_coordinates" not in attrs
-    assert "edge_node_connectivity" not in attrs
 
     assert uds["time"].encoding["dtype"] == np.float64
 
@@ -548,9 +546,7 @@ def test_to_ugrid2d(write=False):
     assert "mesh2d_nNodes" in uds.dims
     assert "mesh2d_nMax_face_nodes" in uds.dims
     attrs = uds["mesh2d"].attrs
-    assert "edge_dimension" not in attrs
     assert "face_coordinates" not in attrs
-    assert "edge_node_connectivity" not in attrs
 
     if write:
         uds.to_netcdf("ugrid-a2d.nc")
