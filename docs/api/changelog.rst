@@ -12,6 +12,18 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Fixed
 ~~~~~
 
+Changed
+~~~~~~~
+
+Added
+~~~~~
+
+[0.11.4] - 2022-09-05
+---------------------
+
+Fixed
+~~~~~
+
 - :meth:`imod.mf6.GroundwaterFlowModel.write` will no longer error when a 3D
   DataArray with a single layer is written. It will now accept both 2D and 3D
   arrays with a single layer coordinate.
@@ -27,6 +39,9 @@ Fixed
 - :func:`imod.evaluate.calculate_gxg` now correctly uses (March 14, March
   28, April 14) to calculate GVG rather than (March 28, April 14, April 28).
 - :func:`imod.mf6.out.open_cbc` now correctly loads boundary fluxes.
+- :meth:`imod.prepare.LayerRegridder.regrid` will now correctly skip values
+  if ``top_source`` or ``bottom_source`` are NaN.
+- :func:`imod.gen.write` no longer errors on dataframes with empty columns.
 
 Changed
 ~~~~~~~
@@ -55,6 +70,9 @@ Changed
   which models should be solved in a single numerical solution. This is
   required to simulate groundwater flow and transport as they should be
   in separate solutions.
+- When writing MODFLOW6 input option blocks, a NaN value is now recognized as
+  an alternative to None (and the entry will not be included in the options
+  block).
 
 Added
 ~~~~~
@@ -75,6 +93,11 @@ Added
   :meth:`imod.wq.SeawatModel.create_time_discretization`,
   :meth:`imod.mf6.Simulation.create_time_discretization`, now have a
   documentation section.
+- :class:`imod.mf6.GroundwaterTransportModel` has been added with associated
+  simple classes to allow creation of solute transport models. Advanced
+  boundary conditions such as LAK or UZF are not yet supported.
+- :class:`imod.mf6.Buoyancy` has been added to simulate density dependent
+  groundwater flow.
 
 [0.11.1] - 2021-12-23
 ---------------------
