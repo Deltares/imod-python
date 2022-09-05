@@ -142,7 +142,7 @@ class Package(abc.ABC):
         if allargs is not None:
             for arg in allargs.values():
                 if isinstance(arg, xu.UgridDataArray):
-                    self.dataset = xu.UgridDataset(grid=arg.ugrid.grid)
+                    self.dataset = xu.UgridDataset(grids=arg.ugrid.grid)
                     return
         self.dataset = xr.Dataset()
 

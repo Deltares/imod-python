@@ -185,5 +185,5 @@ def test_gen_empty_column(tmp_path):
     df = pd.DataFrame()
     gdf = gpd.GeoDataFrame(df, geometry=[geom])
     gdf["empty"] = None
-    path = tmp_path / f"empty-column.gen"
+    path = tmp_path / "empty-column.gen"
     imod.gen.write(path, gdf)

@@ -204,7 +204,7 @@ print(cbc.keys())
 #
 # We'll create a dataset for the horizontal flows for further analysis.
 
-ds = xu.UgridDataset(grid=grid)
+ds = xu.UgridDataset(grids=grid)
 ds["u"] = cbc["flow-horizontal-face-x"]
 ds["v"] = cbc["flow-horizontal-face-y"]
 
@@ -213,8 +213,10 @@ ds["v"] = cbc["flow-horizontal-face-y"]
 # ---------------------
 #
 # We can quickly and easily visualize the output with the plotting functions
-# provided by xarray and xugrid:
+# provided by xarray and xugrid. We'll add some some edge coordinates to the
+# dataset so that they can be used to place the arrows in the quiver plot.
 
+ds = ds.ugrid.assign_edge_coords()
 fig, ax = plt.subplots()
 head.isel(time=0, layer=0).ugrid.plot(ax=ax)
 ds.isel(time=0, layer=0).plot.quiver(
