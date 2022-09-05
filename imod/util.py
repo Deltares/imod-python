@@ -581,7 +581,7 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
         raise TypeError("data must be xarray.DataArray or xr.Dataset")
 
     grid = xugrid.Ugrid2d.from_structured(data)
-    ds = grid.dataset
+    ds = grid.to_dataset()
 
     if isinstance(data, xr.Dataset):
         for variable in data.data_vars:

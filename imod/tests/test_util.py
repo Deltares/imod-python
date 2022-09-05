@@ -491,7 +491,7 @@ def test_compliant_ugrid2d(write=False):
         coords={"time": pd.date_range("2000-01-01", "2000-01-05"), "layer": [1, 2, 3]},
         dims=["time", "layer", grid.face_dimension],
     )
-    ugrid_ds = grid.dataset.copy()
+    ugrid_ds = grid.to_dataset.copy()
     ugrid_ds["a"] = darray
     uds = util.mdal_compliant_ugrid2d(ugrid_ds)
 
