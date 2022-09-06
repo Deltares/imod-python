@@ -11,6 +11,8 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 Fixed
 ~~~~~
+- :meth:`imod.mf6.Modflow6Simulation.write` with ``binary=False`` no longer
+  results in invalid MODFLOW6 input for 2D grid data, such as DIS top.
 
 Changed
 ~~~~~~~

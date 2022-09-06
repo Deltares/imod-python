@@ -21,6 +21,7 @@ Model objects & methods
 
     Modflow6Simulation
     Modflow6Simulation.create_time_discretization
+    Modflow6Simulation.write
     GroundwaterFlowModel
 
 Discretization

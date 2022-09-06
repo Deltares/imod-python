@@ -314,7 +314,11 @@ class Package(abc.ABC):
             # "reshape" a long row with "word wrap"; they cannot as easily
             # ignore newlines.
             fmt = self._number_format(dtype)
-            np.savetxt(fname=f, X=da.values.reshape((1, -1)), fmt=fmt)
+            data = da.values
+            if data.ndim > 2:
+                np.savetxt(fname=f, X=da.values.reshape((1, -1)), fmt=fmt)
+            else:
+                np.savetxt(fname=f, X=da.values, fmt=fmt)
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
