@@ -46,12 +46,13 @@ Model settings
     SolutionPresetModerate
     SolutionPresetComplex
 
-Boundary Conditions
--------------------
+Flow Packages
+-------------
 
 .. autosummary::
     :toctree: generated/mf6
 
+    Buoyancy
     ConstantHead
     Drainage
     Evapotranspiration
@@ -65,3 +66,19 @@ Boundary Conditions
     UnsaturatedZoneFlow
     WellDisStructured
     WellDisVertices
+
+Transport Packages
+------------------
+
+.. autosummary::
+    :toctree: generated/mf6
+
+   AdvectionCentral
+   AdvectionTVD
+   AdvectionUpstream
+   ConstantConcentration
+   Dispersion
+   ImmobileStorageTransfer
+   MobileStorageTransfer
+   MassSourceLoading
+   
