@@ -314,15 +314,23 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[]):
     o_lakeout_str = outlet_list_prop_to_xarray_1d(
         list_of_outlets, "lake_out", "outlet_nr"
     )
-    o_lakein = map_names_to_lake_numbers(list_of_lakes, o_lakein_str)
-    o_lakeout = map_names_to_lake_numbers(list_of_lakes, o_lakeout_str)
-    o_couttype = outlet_list_prop_to_xarray_1d(list_of_outlets, "couttype", "outlet_nr")
-    o_invert = outlet_list_prop_to_xarray_1d(list_of_outlets, "invert", "outlet_nr")
-    o_roughness = outlet_list_prop_to_xarray_1d(
-        list_of_outlets, "roughness", "outlet_nr"
-    )
-    o_width = outlet_list_prop_to_xarray_1d(list_of_outlets, "width", "outlet_nr")
-    o_slope = outlet_list_prop_to_xarray_1d(list_of_outlets, "slope", "outlet_nr")
+    o_lakein = None
+    o_lakeout = None
+    o_couttype = None
+    o_invert = None
+    o_roughness = None
+    o_width = None
+    o_slope = None
+    if len(list_of_outlets) > 0:
+        o_lakein = map_names_to_lake_numbers(list_of_lakes, o_lakein_str)
+        o_lakeout = map_names_to_lake_numbers(list_of_lakes, o_lakeout_str)
+        o_couttype = outlet_list_prop_to_xarray_1d(list_of_outlets, "couttype", "outlet_nr")
+        o_invert = outlet_list_prop_to_xarray_1d(list_of_outlets, "invert", "outlet_nr")
+        o_roughness = outlet_list_prop_to_xarray_1d(
+            list_of_outlets, "roughness", "outlet_nr"
+        )
+        o_width = outlet_list_prop_to_xarray_1d(list_of_outlets, "width", "outlet_nr")
+        o_slope = outlet_list_prop_to_xarray_1d(list_of_outlets, "slope", "outlet_nr")
 
     result = mf6.Lake(  # lake
         l_lakenr,

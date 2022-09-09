@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import AdvancedBoundaryCondition, Package, VariableMetaData
+from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition, Package, VariableMetaData
 
 connection_types = {"HORIZONTAL": 0, "VERTICAL": 1, "EMBEDDEDH": 2, "EMBEDDEDV": 3}
 
@@ -54,7 +54,7 @@ class Outlet_internal:
         self.slope = 0
 
 
-class Lake(AdvancedBoundaryCondition):
+class Lake(BoundaryCondition):
     """
     Lake (LAK) Package
 
@@ -388,4 +388,6 @@ class Lake(AdvancedBoundaryCondition):
         return lakelist, connectionlist, outletlist
 
     def _package_data_to_sparse(self):
+        return
+    def fill_stress_perioddata(self):
         return
