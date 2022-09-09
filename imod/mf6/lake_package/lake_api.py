@@ -324,7 +324,9 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[]):
     if len(list_of_outlets) > 0:
         o_lakein = map_names_to_lake_numbers(list_of_lakes, o_lakein_str)
         o_lakeout = map_names_to_lake_numbers(list_of_lakes, o_lakeout_str)
-        o_couttype = outlet_list_prop_to_xarray_1d(list_of_outlets, "couttype", "outlet_nr")
+        o_couttype = outlet_list_prop_to_xarray_1d(
+            list_of_outlets, "couttype", "outlet_nr"
+        )
         o_invert = outlet_list_prop_to_xarray_1d(list_of_outlets, "invert", "outlet_nr")
         o_roughness = outlet_list_prop_to_xarray_1d(
             list_of_outlets, "roughness", "outlet_nr"
