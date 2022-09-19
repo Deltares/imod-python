@@ -416,7 +416,7 @@ def _define_slices(src, like):
     return dst_expanded_slices, dst_chunks_shape
 
 
-def _sel_chunks(da, expanded_slices):
+def _sel_chunks(da, dims, expanded_slices):
     """
     Using the slices created with the functions above, use xarray's index
     selection methods to create a list of "like" DataArrays which are used
@@ -428,7 +428,7 @@ def _sel_chunks(da, expanded_slices):
     das = []
     for dim_slices in expanded_slices:
         slice_dict = {}
-        for dim, dim_slice in zip(da.dims, dim_slices):
+        for dim, dim_slice in zip(dims, dim_slices):
             slice_dict[dim] = dim_slice
         das.append(da.isel(**slice_dict))
     return das
