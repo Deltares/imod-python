@@ -484,7 +484,7 @@ class Regridder(object):
 
     def _delayed_regrid(self, src, like, fill_value, info):
         """
-        Deal with chunks in dimensions that will NOT be regridded. 
+        Deal with chunks in dimensions that will NOT be regridded.
         """
         if len(info.add_dims) == 0:
             return self._chunked_regrid(src, like, fill_value)
@@ -515,7 +515,7 @@ class Regridder(object):
 
     def _chunked_regrid(self, src, like, fill_value):
         """
-        Deal with chunks in dimensions that will be regridded. 
+        Deal with chunks in dimensions that will be regridded.
         """
         like_expanded_slices, shape_chunks = common._define_slices(src, like)
         like_das = common._sel_chunks(like, like.dims, like_expanded_slices)
