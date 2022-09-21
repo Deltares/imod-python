@@ -271,10 +271,12 @@ class Package(
                     d["layer"] = layer
                     values[layer] = self._compose_path(d, pattern=pattern)
                 else:
+                    dim_sel = {}
                     if "layer" in da.dims:
-                        values[layer] = da.sel(layer=layer).values[()]
-                    else:
-                        values[layer] = da.values[()]
+                        dim_sel["layer"] = layer
+                    if "time" in da.dims:
+                        dim_sel["time"] = time
+                    values[layer] = da.sel(**dim_sel).values[()]
 
         return values
 

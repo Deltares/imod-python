@@ -13,6 +13,8 @@ Fixed
 ~~~~~
 - :meth:`imod.mf6.Modflow6Simulation.write` with ``binary=False`` no longer
   results in invalid MODFLOW6 input for 2D grid data, such as DIS top.
+- :meth:`imod.flow.ImodflowModel.write` no longer writes incorrect projectfiles
+  for non-grid values with a time and layer dimension.
 
 Changed
 ~~~~~~~
