@@ -1,4 +1,3 @@
-from cmath import exp
 import textwrap
 
 import numpy as np
@@ -20,10 +19,12 @@ def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
     return result
 
 
-def create_lakelake(idomain, starting_stage, boundname, lake_cells, rainfall = None, inflow = None):
-    '''
+def create_lakelake(
+    idomain, starting_stage, boundname, lake_cells, rainfall=None, inflow=None
+):
+    """
     creates a LakeLake object with a specified starting stage, location, and optionally time dependent rainfall and inflow
-    '''
+    """
     connectionType = create_gridcovering_array(
         idomain, lake_cells, lak.connection_types["HORIZONTAL"], np.int32
     )
@@ -52,10 +53,13 @@ def create_lakelake(idomain, starting_stage, boundname, lake_cells, rainfall = N
     )
     return result
 
-def create_lakelake_transient(idomain, starting_stage, boundname, lake_cells, rainfall, inflow):
-    '''
+
+def create_lakelake_transient(
+    idomain, starting_stage, boundname, lake_cells, rainfall, inflow
+):
+    """
     helper function that creates a lake package with time-dependent data
-    '''
+    """
     connectionType = create_gridcovering_array(
         idomain, lake_cells, lak.connection_types["HORIZONTAL"], np.int32
     )
@@ -202,12 +206,17 @@ def test_helper_function_lake_list_lake_prop_to_xarray_1d(basic_dis):
     assert result.dims == ("lake_nr",)
 
 
-
 def test_lake_rendering_transient(basic_dis):
     idomain, _, _ = basic_dis
-    times_rainfall = [np.datetime64("2000-01-01"), np.datetime64("2000-03-01"), np.datetime64("2000-05-01")]
+    times_rainfall = [
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-03-01"),
+        np.datetime64("2000-05-01"),
+    ]
     rainfall = xr.DataArray(
-        np.full((len(times_rainfall)), 5.0), coords={"time": times_rainfall}, dims=["time"]
+        np.full((len(times_rainfall)), 5.0),
+        coords={"time": times_rainfall},
+        dims=["time"],
     )
     times_inflow = [np.datetime64("2000-02-01"), np.datetime64("2000-04-01")]
     inflow = xr.DataArray(
@@ -215,26 +224,39 @@ def test_lake_rendering_transient(basic_dis):
     )
 
     lake1 = create_lakelake(
-        idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)], rainfall, inflow
+        idomain,
+        11.0,
+        "Naardermeer",
+        [(1, 2, 2), (1, 2, 3), (1, 3, 3)],
+        rainfall,
+        inflow,
     )
-    lake2 = create_lakelake(
-        idomain, 11.0, "Ijsselmeer", [(1, 4, 4)], rainfall, inflow
-    )
-    times_invert = [np.datetime64("2000-01-01"), np.datetime64("2000-03-01"), np.datetime64("2000-05-01")]
+    lake2 = create_lakelake(idomain, 11.0, "Ijsselmeer", [(1, 4, 4)], rainfall, inflow)
+    times_invert = [
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-03-01"),
+        np.datetime64("2000-05-01"),
+    ]
     invert = xr.DataArray(
-        np.full((len(times_invert)), 3.0), coords={"time": times_rainfall}, dims=["time"]
+        np.full((len(times_invert)), 3.0),
+        coords={"time": times_rainfall},
+        dims=["time"],
     )
     outlet1 = lake_api.OutletManning(
         1, "Naardermeer", "Ijsselmeer", invert, 24.0, 25.0, 26.0
     )
     lake_package = lake_api.from_lakes_and_outlets([lake1, lake2], [outlet1])
-    global_times = np.array([np.datetime64("1999-01-01"),
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-02-01"),
-        np.datetime64("2000-03-01"),
-        np.datetime64("2000-04-01"),
-        np.datetime64("2000-05-01") ])
-    actual = lake_package.render(None,None, global_times, False)
+    global_times = np.array(
+        [
+            np.datetime64("1999-01-01"),
+            np.datetime64("2000-01-01"),
+            np.datetime64("2000-02-01"),
+            np.datetime64("2000-03-01"),
+            np.datetime64("2000-04-01"),
+            np.datetime64("2000-05-01"),
+        ]
+    )
+    actual = lake_package.render(None, None, global_times, False)
     expected = textwrap.dedent(
         """\
         begin options
@@ -290,16 +312,22 @@ def test_lake_rendering_transient(basic_dis):
           1  invert 3.0
         end period
         """
-        )
-    assert actual== expected
+    )
+    assert actual == expected
 
 
 def test_lakelake_get_times(basic_dis):
     idomain, _, _ = basic_dis
 
-    times_rainfall = [np.datetime64("2000-01-01"), np.datetime64("2000-03-01"), np.datetime64("2000-05-01")]
+    times_rainfall = [
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-03-01"),
+        np.datetime64("2000-05-01"),
+    ]
     rainfall = xr.DataArray(
-        np.full((len(times_rainfall)), 5.0), coords={"time": times_rainfall}, dims=["time"]
+        np.full((len(times_rainfall)), 5.0),
+        coords={"time": times_rainfall},
+        dims=["time"],
     )
 
     lake1 = create_lakelake(
@@ -310,14 +338,18 @@ def test_lakelake_get_times(basic_dis):
     assert returned_times == times_rainfall
 
 
-
-
 def test_lakeapi_get_timeseries(basic_dis):
     idomain, _, _ = basic_dis
 
-    times_rainfall = [np.datetime64("2000-01-01"), np.datetime64("2000-03-01"), np.datetime64("2000-05-01")]
+    times_rainfall = [
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-03-01"),
+        np.datetime64("2000-05-01"),
+    ]
     rainfall = xr.DataArray(
-        np.full((len(times_rainfall)), 5.0), coords={"time": times_rainfall}, dims=["time"]
+        np.full((len(times_rainfall)), 5.0),
+        coords={"time": times_rainfall},
+        dims=["time"],
     )
     times_inflow = [np.datetime64("2000-02-01"), np.datetime64("2000-04-01")]
     inflow = xr.DataArray(
@@ -325,14 +357,19 @@ def test_lakeapi_get_timeseries(basic_dis):
     )
 
     lake1 = create_lakelake(
-        idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)], rainfall, inflow
+        idomain,
+        11.0,
+        "Naardermeer",
+        [(1, 2, 2), (1, 2, 3), (1, 3, 3)],
+        rainfall,
+        inflow,
     )
     times = lake_api.collect_all_times([lake1], [])
-    rainfall_ts = lake_api.create_timeseries([lake1],times, "rainfall")
+    rainfall_ts = lake_api.create_timeseries([lake1], times, "rainfall")
     assert len(rainfall_ts.coords["time"].values) == 5
     assert len(rainfall_ts.coords["index"].values) == 1
     assert rainfall_ts.values[0] == 5
-    assert np.isnan(rainfall_ts.values[1] )
+    assert np.isnan(rainfall_ts.values[1])
     assert rainfall_ts.values[2] == 5
-    assert np.isnan(rainfall_ts.values[3] )
+    assert np.isnan(rainfall_ts.values[3])
     assert rainfall_ts.values[4] == 5

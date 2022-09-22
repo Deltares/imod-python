@@ -25,8 +25,9 @@ import numpy as np
 import xarray as xr
 
 import imod
-from  imod.mf6.lake_package import lake_api
 import imod.mf6.lake_package.lak as lak
+from imod.mf6.lake_package import lake_api
+
 
 def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
     """
@@ -34,11 +35,12 @@ def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
     everywhere, except in the cells contained in list "lake_cells". In those cells, the output array has value fillvalue.
     """
     result = xr.full_like(
-        idomain, fill_value= lake_api.missing_values[np.dtype(dtype).name], dtype=dtype
+        idomain, fill_value=lake_api.missing_values[np.dtype(dtype).name], dtype=dtype
     )
     for cell in lake_cells:
         result.values[cell[0], cell[1], cell[2]] = fillvalue
     return result
+
 
 def create_lakelake(idomain, starting_stage, boundname, lake_cells, rainfall):
     connectionType = create_gridcovering_array(
@@ -68,6 +70,7 @@ def create_lakelake(idomain, starting_stage, boundname, lake_cells, rainfall):
         None,
     )
     return result
+
 
 # %%
 # Create grid coordinates
@@ -167,29 +170,33 @@ simulation["solver"] = imod.mf6.Solution(
     relaxation_factor=0.97,
 )
 
-times_rainfall = [np.datetime64("2000-01-01"), np.datetime64("2000-03-01"), np.datetime64("2000-05-01")]
+times_rainfall = [
+    np.datetime64("2000-01-01"),
+    np.datetime64("2000-03-01"),
+    np.datetime64("2000-05-01"),
+]
 rainfall = xr.DataArray(
     np.full((len(times_rainfall)), 5.0), coords={"time": times_rainfall}, dims=["time"]
 )
-lake_cells = [(1,3,3)]
+lake_cells = [(1, 3, 3)]
 
-lake =  create_lakelake(idomain, 0.3, "Naardermeer", lake_cells, rainfall)
+lake = create_lakelake(idomain, 0.3, "Naardermeer", lake_cells, rainfall)
 
-gwf_model["lake"] = lake_api.from_lakes_and_outlets([lake],
-        print_input=True,
-        print_stage=True,
-        print_flows=True,
-        save_flows=True,
-        stagefile= modeldir / "GWF_1/stagefile.lak",
-        budgetcsvfile=modeldir / "GWF_1/budgetcsvfile.lak",
-        package_convergence_filename=modeldir / "GWF_1/convergence.lak",)
+gwf_model["lake"] = lake_api.from_lakes_and_outlets(
+    [lake],
+    print_input=True,
+    print_stage=True,
+    print_flows=True,
+    save_flows=True,
+    stagefile=modeldir / "GWF_1/stagefile.lak",
+    budgetcsvfile=modeldir / "GWF_1/budgetcsvfile.lak",
+    package_convergence_filename=modeldir / "GWF_1/convergence.lak",
+)
 
 # Collect time discretization
 simulation.create_time_discretization(
     additional_times=["2000-01-01", "2000-01-02", "2000-01-03", "2013-06-04"]
 )
-
-
 
 
 simulation.write(modeldir)
@@ -221,4 +228,4 @@ head = imod.mf6.open_hds(
 # ---------------------
 
 head.isel(layer=0, time=4).plot.contourf()
-i=0
+i = 0

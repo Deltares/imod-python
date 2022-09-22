@@ -54,18 +54,19 @@ class Outlet_internal:
         self.slope = 0
 
 
-
 class Period_internal:
     """
     The Period_internal class is used for rendering the lake package in jinja.
     There is no point in instantiating this class as a user.
     """
+
     def __init__(self, period_number):
         self.period_number = period_number
         self.nr_values = 0
         self.lake_or_outlet_number = []
         self.series_name = []
         self.value = []
+
 
 class Lake(BoundaryCondition):
     """
@@ -262,8 +263,20 @@ class Lake(BoundaryCondition):
         "ts_width": VariableMetaData(np.floating),
         "ts_slope": VariableMetaData(np.floating),
     }
-    _period_data = ("ts_status" ,"ts_stage","ts_rainfall","ts_evaporation","ts_runoff","ts_inflow","ts_withdrawal"
-        ,"ts_rate", "ts_invert", "ts_rough", "ts_width", "ts_slope")
+    _period_data = (
+        "ts_status",
+        "ts_stage",
+        "ts_rainfall",
+        "ts_evaporation",
+        "ts_runoff",
+        "ts_inflow",
+        "ts_withdrawal",
+        "ts_rate",
+        "ts_invert",
+        "ts_rough",
+        "ts_width",
+        "ts_slope",
+    )
 
     def __init__(
         # lake
@@ -282,7 +295,6 @@ class Lake(BoundaryCondition):
         c_top_elevation,
         c_width,
         c_length,
-
         # outlet
         o_lakein=None,
         o_lakeout=None,
@@ -291,8 +303,7 @@ class Lake(BoundaryCondition):
         o_roughness=None,
         o_width=None,
         o_slope=None,
-
-        #time series (lake)
+        # time series (lake)
         ts_status=None,
         ts_stage=None,
         ts_rainfall=None,
@@ -301,14 +312,12 @@ class Lake(BoundaryCondition):
         ts_inflow=None,
         ts_withdrawal=None,
         ts_auxiliary=None,
-
-        #time series (outlet)
+        # time series (outlet)
         ts_rate=None,
         ts_invert=None,
         ts_rough=None,
         ts_width=None,
         ts_slope=None,
-
         # options
         print_input=False,
         print_stage=False,
@@ -345,17 +354,17 @@ class Lake(BoundaryCondition):
         self.dataset["o_width"] = o_width
         self.dataset["o_slope"] = o_slope
 
-        self.dataset["ts_status"] =ts_status
-        self.dataset["ts_stage"] =ts_stage
-        self.dataset["ts_rainfall"] =ts_rainfall
-        self.dataset["ts_evaporation"] =ts_evaporation
-        self.dataset["ts_runoff"] =ts_runoff
-        self.dataset["ts_inflow"] =ts_inflow
-        self.dataset["ts_withdrawal"] =ts_withdrawal
-        self.dataset["ts_auxiliary"] =ts_auxiliary
+        self.dataset["ts_status"] = ts_status
+        self.dataset["ts_stage"] = ts_stage
+        self.dataset["ts_rainfall"] = ts_rainfall
+        self.dataset["ts_evaporation"] = ts_evaporation
+        self.dataset["ts_runoff"] = ts_runoff
+        self.dataset["ts_inflow"] = ts_inflow
+        self.dataset["ts_withdrawal"] = ts_withdrawal
+        self.dataset["ts_auxiliary"] = ts_auxiliary
 
         self.dataset["ts_rate"] = ts_rate
-        self.dataset["ts_invert"] =ts_invert
+        self.dataset["ts_invert"] = ts_invert
         self.dataset["ts_rough"] = ts_rough
         self.dataset["ts_width"] = ts_width
         self.dataset["ts_slope"] = ts_slope
@@ -402,10 +411,12 @@ class Lake(BoundaryCondition):
         d["noutlets"] = len(outletlist)
         d["ntables"] = 0
 
-        d["periods"]=[]
-        any_timeseries = any([self._valid(self.dataset[name].values[()]) for name in self._period_data])
+        d["periods"] = []
+        any_timeseries = any(
+            [self._valid(self.dataset[name].values[()]) for name in self._period_data]
+        )
         if any_timeseries:
-            d["periods"] = self.create_period_data_block( globaltimes)
+            d["periods"] = self.create_period_data_block(globaltimes)
         d["nperiod"] = len(d["periods"])
 
         return self._template.render(d)
@@ -489,24 +500,30 @@ class Lake(BoundaryCondition):
         return lakelist, connectionlist, outletlist
 
     def create_period_data_block(self, globaltimes):
-        period_data_list ={}
+        period_data_list = {}
 
         for timeseries_name in self._period_data:
             if self._valid(self.dataset[timeseries_name].values[()]):
                 timeseries = self.dataset[timeseries_name]
                 timeseries_times = [t for t in timeseries.coords["time"].values]
-                timeseries_indexes =  [i for i in timeseries.coords["index"].values]
+                timeseries_indexes = [i for i in timeseries.coords["index"].values]
                 for itime in timeseries_times:
-                    iperiod = np.where(globaltimes==itime)[0][0] + 1
+                    iperiod = np.where(globaltimes == itime)[0][0] + 1
 
                     for index in timeseries_indexes:
-                        object_specific_data = timeseries.sel(time=itime,index=index).values[()]
+                        object_specific_data = timeseries.sel(
+                            time=itime, index=index
+                        ).values[()]
                         if not np.isnan(object_specific_data):
                             if iperiod not in period_data_list:
                                 period_data_list[iperiod] = Period_internal(iperiod)
                             period_data_list[iperiod].nr_values += 1
-                            period_data_list[iperiod].lake_or_outlet_number.append(index)
-                            period_data_list[iperiod].series_name.append(timeseries_name[3:])
+                            period_data_list[iperiod].lake_or_outlet_number.append(
+                                index
+                            )
+                            period_data_list[iperiod].series_name.append(
+                                timeseries_name[3:]
+                            )
                             period_data_list[iperiod].value.append(object_specific_data)
         keys = [x for x in period_data_list.keys()]
         keys = sorted(keys)
@@ -514,5 +531,3 @@ class Lake(BoundaryCondition):
 
     def write_perioddata(self, directory, pkgname, binary):
         pass
-
-

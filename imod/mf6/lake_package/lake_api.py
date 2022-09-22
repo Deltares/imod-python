@@ -1,4 +1,3 @@
-from time import time_ns
 import numpy as np
 import xarray as xr
 
@@ -16,49 +15,55 @@ missing_values = {
     "int32": -6789012,
 }
 
+
 class LakeApi_Base:
-    '''
+    """
     Base class for lake and outlet object.
-    '''
+    """
+
     def __init__(self, number):
         self.object_number = number
 
     def get_times(self, timeseries_name):
-        '''
+        """
         returns the times associated with the timeseries that has name "timeseries_name"
-        '''
+        """
         times = []
         if hasattr(self, timeseries_name):
-            ts =getattr(self, timeseries_name)
-            if type(ts)  == xr.DataArray:
+            ts = getattr(self, timeseries_name)
+            if type(ts) == xr.DataArray:
                 tstimes = [x for x in ts.coords["time"].values]
                 times.extend(tstimes)
         return sorted(set(times))
 
     def has_transient_data(self, timeseries_name):
-        '''
+        """
         returns true if this object has transient data for a property with a given name
         (outlets can have either a scalar or a timeseries for some properties)
-        '''
+        """
         if hasattr(self, timeseries_name):
-            ts =getattr(self, timeseries_name)
-            if type(ts)  == xr.DataArray:
+            ts = getattr(self, timeseries_name)
+            if type(ts) == xr.DataArray:
                 return True
         return False
 
-
     def add_timeseries_to_dataarray(self, timeseries_name, dataarray):
-        '''
+        """
         adds the timeseries of this lake or outlet to a data-array containing this timeseries for
         all lakes or outlets
-        '''
+        """
         current_object_data = dataarray.sel(index=self.object_number)
         if hasattr(self, timeseries_name):
-            ts =getattr(self, timeseries_name)
+            ts = getattr(self, timeseries_name)
             if ts is not None:
-                index_of_object = dataarray.coords["index"].values.tolist().index(self.object_number)
-                dataarray[{"index":index_of_object}]= current_object_data.combine_first(ts)
+                index_of_object = (
+                    dataarray.coords["index"].values.tolist().index(self.object_number)
+                )
+                dataarray[
+                    {"index": index_of_object}
+                ] = current_object_data.combine_first(ts)
         return dataarray
+
 
 class LakeLake(LakeApi_Base):
     """
@@ -91,7 +96,17 @@ class LakeLake(LakeApi_Base):
         auxiliary: timeseries of real numbers
 
     """
-    timeseries_names = ["status", "stage", "rainfall", "evaporation", "runoff", "inflow", "withdrawal", "auxiliary"]
+
+    timeseries_names = [
+        "status",
+        "stage",
+        "rainfall",
+        "evaporation",
+        "runoff",
+        "inflow",
+        "withdrawal",
+        "auxiliary",
+    ]
 
     def __init__(
         self,
@@ -112,7 +127,7 @@ class LakeLake(LakeApi_Base):
         withdrawal,
         auxiliary,
     ):
-        super().__init__( -1)
+        super().__init__(-1)
         self.starting_stage = starting_stage
         self.boundname = boundname
         self.connectionType = connectionType
@@ -177,10 +192,11 @@ class OutletBase(LakeApi_Base):
     """
     Base class for the different kinds of outlets
     """
+
     timeseries_names = ["rate", "invert", "rough", "width", "slope"]
 
     def __init__(self, outletNumber: int, lakeIn: str, lakeOut: str):
-        super().__init__( outletNumber)
+        super().__init__(outletNumber)
         self.lake_in = lakeIn
         self.lake_out = lakeOut
         self.couttype = ""
@@ -320,17 +336,20 @@ def map_names_to_lake_numbers(list_of_lakes, list_of_lakenames):
     return result
 
 
-def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[],
-        print_input=False,
-        print_stage=False,
-        print_flows=False,
-        save_flows=False,
-        stagefile=None,
-        budgetfile=None,
-        budgetcsvfile=None,
-        package_convergence_filename=None,
-        time_conversion=None,
-        length_conversion=None):
+def from_lakes_and_outlets(
+    list_of_lakes,
+    list_of_outlets=[],
+    print_input=False,
+    print_stage=False,
+    print_flows=False,
+    save_flows=False,
+    stagefile=None,
+    budgetfile=None,
+    budgetcsvfile=None,
+    package_convergence_filename=None,
+    time_conversion=None,
+    length_conversion=None,
+):
     """
     this function creates a lake_package given a list of lakes and optionally a list of outlets.
     """
@@ -393,21 +412,21 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[],
         )
         o_width = outlet_list_prop_to_xarray_1d(list_of_outlets, "width", "outlet_nr")
         o_slope = outlet_list_prop_to_xarray_1d(list_of_outlets, "slope", "outlet_nr")
-    ts_times =collect_all_times(list_of_lakes, list_of_outlets)
-    ts_status = create_timeseries(list_of_lakes,ts_times, "status")
-    ts_stage = create_timeseries(list_of_lakes,ts_times,"stage")
-    ts_rainfall = create_timeseries(list_of_lakes,ts_times,"rainfall")
-    ts_evaporation = create_timeseries(list_of_lakes,ts_times,"evaporation")
-    ts_runoff = create_timeseries(list_of_lakes,ts_times,"runoff")
-    ts_inflow = create_timeseries(list_of_lakes,ts_times,"inflow")
-    ts_withdrawal  = create_timeseries(list_of_lakes,ts_times,"withdrwawal")
-    ts_auxiliary  = create_timeseries(list_of_lakes,ts_times,"auxiliary")
+    ts_times = collect_all_times(list_of_lakes, list_of_outlets)
+    ts_status = create_timeseries(list_of_lakes, ts_times, "status")
+    ts_stage = create_timeseries(list_of_lakes, ts_times, "stage")
+    ts_rainfall = create_timeseries(list_of_lakes, ts_times, "rainfall")
+    ts_evaporation = create_timeseries(list_of_lakes, ts_times, "evaporation")
+    ts_runoff = create_timeseries(list_of_lakes, ts_times, "runoff")
+    ts_inflow = create_timeseries(list_of_lakes, ts_times, "inflow")
+    ts_withdrawal = create_timeseries(list_of_lakes, ts_times, "withdrwawal")
+    ts_auxiliary = create_timeseries(list_of_lakes, ts_times, "auxiliary")
 
     ts_rate = create_timeseries(list_of_outlets, ts_times, "rate")
     ts_invert = create_timeseries(list_of_outlets, ts_times, "invert")
     ts_rough = create_timeseries(list_of_outlets, ts_times, "rough")
-    ts_width= create_timeseries(list_of_outlets, ts_times, "width")
-    ts_slope= create_timeseries(list_of_outlets, ts_times, "slope")
+    ts_width = create_timeseries(list_of_outlets, ts_times, "width")
+    ts_slope = create_timeseries(list_of_outlets, ts_times, "slope")
 
     result = mf6.Lake(  # lake
         l_lakenr,
@@ -432,17 +451,17 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[],
         o_roughness,
         o_width,
         o_slope,
-        #timeseries (lake)
+        # timeseries (lake)
         ts_status,
         ts_stage,
         ts_rainfall,
-        ts_evaporation ,
+        ts_evaporation,
         ts_runoff,
         ts_inflow,
         ts_withdrawal,
-        ts_auxiliary ,
-        #timeseries (outlet)
-        ts_rate ,
+        ts_auxiliary,
+        # timeseries (outlet)
+        ts_rate,
         ts_invert,
         ts_rough,
         ts_width,
@@ -457,17 +476,19 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[],
         budgetcsvfile,
         package_convergence_filename,
         time_conversion,
-        length_conversion)
+        length_conversion,
+    )
 
     return result
 
-def collect_all_times(  list_of_lakes, list_of_outlets):
-    '''
+
+def collect_all_times(list_of_lakes, list_of_outlets):
+    """
     all timeseries we pass to the lake package must have the same time discretization-otherwise the coordinates
     of the lake-package do not match. So in this function we collect all the time coordinates of all the lakes and
     outlets.
-    '''
-    times=[]
+    """
+    times = []
 
     for timeseries_name in LakeLake.timeseries_names:
         for lake in list_of_lakes:
@@ -481,23 +502,30 @@ def collect_all_times(  list_of_lakes, list_of_outlets):
 
     return sorted(set(times))
 
-def create_timeseries( list_of_lakes_or_outlets, ts_times,  timeseries_name):
-    '''
+
+def create_timeseries(list_of_lakes_or_outlets, ts_times, timeseries_name):
+    """
     In this function we create a dataarray with a given time coorridnate axis. We add all
     the timeseries of lakes or outlets with the given name. We also create a dimension to
     specify the lake or outlet number.
-    '''
-    if not any(lake_or_outlet.has_transient_data(timeseries_name) for lake_or_outlet in list_of_lakes_or_outlets):
+    """
+    if not any(
+        lake_or_outlet.has_transient_data(timeseries_name)
+        for lake_or_outlet in list_of_lakes_or_outlets
+    ):
         return None
 
     object_numbers = []
     for lake_or_outlet in list_of_lakes_or_outlets:
         object_numbers.append(lake_or_outlet.object_number)
 
-    dataarray = xr.DataArray( dims=("time", "index"), coords={"time": ts_times, "index": object_numbers},name = timeseries_name)
+    dataarray = xr.DataArray(
+        dims=("time", "index"),
+        coords={"time": ts_times, "index": object_numbers},
+        name=timeseries_name,
+    )
     for lake_or_outlet in list_of_lakes_or_outlets:
-        dataarray = lake_or_outlet.add_timeseries_to_dataarray(timeseries_name, dataarray)
+        dataarray = lake_or_outlet.add_timeseries_to_dataarray(
+            timeseries_name, dataarray
+        )
     return dataarray
-
-
-
