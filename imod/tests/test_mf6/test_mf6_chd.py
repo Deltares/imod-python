@@ -69,6 +69,33 @@ def test_render(head):
     assert actual == expected
 
 
+def test_render2(head):
+    directory = pathlib.Path("mymodel")
+    globaltimes = [np.datetime64("2000-01-01")]
+
+    chd = imod.mf6.ConstantHead(
+        head, print_input=False, print_flows=False, save_flows=True
+    )
+    actual = chd.render(directory, "chd", globaltimes, True)
+
+    expected = textwrap.dedent(
+        """\
+        begin options
+          save_flows
+        end options
+
+        begin dimensions
+          maxbound 30
+        end dimensions
+
+        begin period 1
+          open/close mymodel/chd/chd.bin (binary)
+        end period
+        """
+    )
+    assert actual == expected
+
+
 def test_from_file(head, tmp_path):
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
