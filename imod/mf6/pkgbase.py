@@ -472,6 +472,10 @@ class Package(abc.ABC):
         self._check_types()
 
     def period_data(self):
+        '''
+        This function creates a list of the array names that have period data.
+        For constant head, this would be ['head'] or ['head', 'concentration_1',...]
+        '''
         result = []
         if hasattr(self, "_period_data"):
             result += self._period_data

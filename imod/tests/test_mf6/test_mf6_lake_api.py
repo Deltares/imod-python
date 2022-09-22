@@ -1,3 +1,4 @@
+from cmath import exp
 import textwrap
 
 import numpy as np
@@ -19,7 +20,7 @@ def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
     return result
 
 
-def create_lakelake(idomain, starting_stage, boundname, lake_cells):
+def create_lakelake(idomain, starting_stage, boundname, lake_cells, rainfall = None, inflow = None):
     connectionType = create_gridcovering_array(
         idomain, lake_cells, lak.connection_types["HORIZONTAL"], np.int32
     )
@@ -39,10 +40,39 @@ def create_lakelake(idomain, starting_stage, boundname, lake_cells):
         connection_width,
         None,
         None,
+        rainfall,
         None,
         None,
+        inflow,
         None,
         None,
+    )
+    return result
+
+def create_lakelake_transient(idomain, starting_stage, boundname, lake_cells, rainfall, inflow):
+    connectionType = create_gridcovering_array(
+        idomain, lake_cells, lak.connection_types["HORIZONTAL"], np.int32
+    )
+    bed_leak = create_gridcovering_array(idomain, lake_cells, 0.2, np.float32)
+    top_elevation = create_gridcovering_array(idomain, lake_cells, 0.3, np.float32)
+    bot_elevation = create_gridcovering_array(idomain, lake_cells, 0.4, np.float32)
+    connection_length = create_gridcovering_array(idomain, lake_cells, 0.5, np.float32)
+    connection_width = create_gridcovering_array(idomain, lake_cells, 0.6, np.float32)
+    result = lake_api.LakeLake(
+        starting_stage,
+        boundname,
+        connectionType,
+        bed_leak,
+        top_elevation,
+        bot_elevation,
+        connection_length,
+        connection_width,
+        None,
+        None,
+        rainfall,
+        None,
+        None,
+        inflow,
         None,
         None,
     )
@@ -164,3 +194,133 @@ def test_helper_function_lake_list_lake_prop_to_xarray_1d(basic_dis):
     assert result.values[0] == 11.0
     assert result.values[1] == 15.0
     assert result.dims == ("lake_nr",)
+
+
+
+def test_lake_rendering_transient(basic_dis):
+    idomain, _, _ = basic_dis
+    times_rainfall = [np.datetime64("2000-01-01"), np.datetime64("2000-03-01"), np.datetime64("2000-05-01")]
+    rainfall = xr.DataArray(
+        np.full((len(times_rainfall)), 5.0), coords={"time": times_rainfall}, dims=["time"]
+    )
+    times_inflow = [np.datetime64("2000-02-01"), np.datetime64("2000-04-01")]
+    inflow = xr.DataArray(
+        np.full((len(times_inflow)), 4.0), coords={"time": times_inflow}, dims=["time"]
+    )
+
+    lake1 = create_lakelake(
+        idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)], rainfall, inflow
+    )
+    lake2 = create_lakelake(
+        idomain, 11.0, "Ijsselmeer", [(1, 4, 4)], rainfall, inflow
+    )
+    times_invert = [np.datetime64("2000-01-01"), np.datetime64("2000-03-01"), np.datetime64("2000-05-01")]
+    invert = xr.DataArray(
+        np.full((len(times_invert)), 3.0), coords={"time": times_rainfall}, dims=["time"]
+    )
+    outlet1 = lake_api.OutletManning(
+        1, "Naardermeer", "Ijsselmeer", invert, 24.0, 25.0, 26.0
+    )
+    lake_package = lake_api.from_lakes_and_outlets([lake1, lake2], [outlet1])
+    global_times = np.array([np.datetime64("1999-01-01"),
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-02-01"),
+        np.datetime64("2000-03-01"),
+        np.datetime64("2000-04-01"),
+        np.datetime64("2000-05-01") ])
+    actual = lake_package.render(None,None, global_times, False)
+    expected = textwrap.dedent(
+        """\
+        begin options
+        end options
+
+        begin dimensions
+          nlakes 2
+          noutlets 1
+          ntables 0
+        end dimensions
+
+        begin packagedata
+          1  11.0  3  Naardermeer
+          2  11.0  1  Ijsselmeer
+        end packagedata
+
+        begin connectiondata
+          1 1 1 2 2 HORIZONTAL  0.2 0.4  0.3  0.6 0.5
+          1 2 1 2 3 HORIZONTAL  0.2 0.4  0.3  0.6 0.5
+          1 3 1 3 3 HORIZONTAL  0.2 0.4  0.3  0.6 0.5
+          2 1 1 4 4 HORIZONTAL  0.2 0.4  0.3  0.6 0.5
+        end connectiondata
+
+        begin outlets
+          1 2 MANNING 0.0 25.0 24.0 26.0
+        end outlets
+
+        begin period 2
+          1  rainfall 5.0
+          2  rainfall 5.0
+          1  invert 3.0
+        end period
+
+        begin period 3
+          1  inflow 4.0
+          2  inflow 4.0
+        end period
+
+        begin period 4
+          1  rainfall 5.0
+          2  rainfall 5.0
+          1  invert 3.0
+        end period
+
+        begin period 5
+          1  inflow 4.0
+          2  inflow 4.0
+        end period
+
+        begin period 6
+          1  rainfall 5.0
+          2  rainfall 5.0
+          1  invert 3.0
+        end period
+        """
+        )
+    assert actual== expected
+
+
+def test_lakelake_get_times(basic_dis):
+    idomain, _, _ = basic_dis
+
+    times_rainfall = [np.datetime64("2000-01-01"), np.datetime64("2000-03-01"), np.datetime64("2000-05-01")]
+    rainfall = xr.DataArray(
+        np.full((len(times_rainfall)), 5.0), coords={"time": times_rainfall}, dims=["time"]
+    )
+    times_inflow = [np.datetime64("2000-02-01"), np.datetime64("2000-04-01")]
+    inflow = xr.DataArray(
+        np.full((len(times_inflow)), 4.0), coords={"time": times_inflow}, dims=["time"]
+    )
+
+    lake1 = create_lakelake(
+        idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)], rainfall, inflow
+    )
+    times = lake1.get_times("rainfall") +  lake1.get_times("inflow")
+
+
+
+def test_lakeapi_get_timeseries(basic_dis):
+    idomain, _, _ = basic_dis
+
+    times_rainfall = [np.datetime64("2000-01-01"), np.datetime64("2000-03-01"), np.datetime64("2000-05-01")]
+    rainfall = xr.DataArray(
+        np.full((len(times_rainfall)), 5.0), coords={"time": times_rainfall}, dims=["time"]
+    )
+    times_inflow = [np.datetime64("2000-02-01"), np.datetime64("2000-04-01")]
+    inflow = xr.DataArray(
+        np.full((len(times_inflow)), 4.0), coords={"time": times_inflow}, dims=["time"]
+    )
+
+    lake1 = create_lakelake(
+        idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)], rainfall, inflow
+    )
+    times = lake_api.collect_all_times([lake1], [])
+    lake_api.create_timeseries([lake1],times, "rainfall")

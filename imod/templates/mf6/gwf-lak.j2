@@ -11,15 +11,13 @@ begin options
 {% endif -%}
 {%- if save_flows is defined -%}  save_flows
 {% endif -%}
-{%- if stage_filerecord is defined -%}stage fileout {{stagefile}}
+{%- if stagefile is defined -%}stage fileout {{stagefile}}
 {% endif -%}
-{%- if budget_filerecord is defined -%}  budget fileout {{budgetfile}}
+{%- if budgetfile is defined -%}  budget fileout {{budgetfile}}
 {% endif -%}
-{%- if ts_filerecord is defined -%}  ts6 filein {{ts6_filename}}
+{%- if budgetcsv is defined -%}  budgetcsv fileout  {{budgetcsvfile}}
 {% endif -%}
-{%- if obs_filerecord is defined -%}  obs6 filein {{obs6_filename}}
-{% endif -%}
-{%- if mover is defined -%}  mover
+{%- if package_convergence_filename is defined -%} package_convergence fileout {{package_convergence_filename}}
 {% endif -%}
 {%- if surfdep is defined -%}  surfdep {{surfdep}}
 {% endif -%}
@@ -47,4 +45,12 @@ end connectiondata
 begin outlets{% for n in range(0, noutlets) %}
   {{outlets[n].lakein}} {{outlets[n].lakeout}} {{outlets[n].couttype}} {{outlets[n].invert}} {{outlets[n].roughness}} {{outlets[n].width}} {{outlets[n].slope}}{% endfor %}
 end outlets
+{% endif -%}
+
+{% if nperiod > 0 -%}
+{% for iperiod in range(0, nperiod) %}
+begin period {{periods[iperiod].period_number}}{% for ivalue in range(0, periods[iperiod].nr_values) %}
+  {{periods[iperiod].lake_or_outlet_number[ivalue]}}  {{periods[iperiod].series_name[ivalue]}} {{periods[iperiod].value[ivalue]}}{% endfor %}
+end period
+{% endfor -%}
 {% endif -%}
