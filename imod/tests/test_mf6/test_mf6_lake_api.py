@@ -21,6 +21,9 @@ def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
 
 
 def create_lakelake(idomain, starting_stage, boundname, lake_cells, rainfall = None, inflow = None):
+    '''
+    creates a LakeLake object with a specified starting stage, location, and optionally time dependent rainfall and inflow
+    '''
     connectionType = create_gridcovering_array(
         idomain, lake_cells, lak.connection_types["HORIZONTAL"], np.int32
     )
@@ -50,6 +53,9 @@ def create_lakelake(idomain, starting_stage, boundname, lake_cells, rainfall = N
     return result
 
 def create_lakelake_transient(idomain, starting_stage, boundname, lake_cells, rainfall, inflow):
+    '''
+    helper function that creates a lake package with time-dependent data
+    '''
     connectionType = create_gridcovering_array(
         idomain, lake_cells, lak.connection_types["HORIZONTAL"], np.int32
     )
@@ -295,15 +301,14 @@ def test_lakelake_get_times(basic_dis):
     rainfall = xr.DataArray(
         np.full((len(times_rainfall)), 5.0), coords={"time": times_rainfall}, dims=["time"]
     )
-    times_inflow = [np.datetime64("2000-02-01"), np.datetime64("2000-04-01")]
-    inflow = xr.DataArray(
-        np.full((len(times_inflow)), 4.0), coords={"time": times_inflow}, dims=["time"]
-    )
 
     lake1 = create_lakelake(
-        idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)], rainfall, inflow
+        idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)], rainfall
     )
-    times = lake1.get_times("rainfall") +  lake1.get_times("inflow")
+    returned_times = lake1.get_times("rainfall")
+
+    assert returned_times == times_rainfall
+
 
 
 
@@ -323,4 +328,11 @@ def test_lakeapi_get_timeseries(basic_dis):
         idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)], rainfall, inflow
     )
     times = lake_api.collect_all_times([lake1], [])
-    lake_api.create_timeseries([lake1],times, "rainfall")
+    rainfall_ts = lake_api.create_timeseries([lake1],times, "rainfall")
+    assert len(rainfall_ts.coords["time"].values) == 5
+    assert len(rainfall_ts.coords["index"].values) == 1
+    assert rainfall_ts.values[0] == 5
+    assert np.isnan(rainfall_ts.values[1] )
+    assert rainfall_ts.values[2] == 5
+    assert np.isnan(rainfall_ts.values[3] )
+    assert rainfall_ts.values[4] == 5
