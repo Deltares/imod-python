@@ -32,19 +32,19 @@ class LakeLake:
         starting_stage: float,
         boundname: str,
         connectionType: xr.DataArray of integers.
-        bed_leak: xr.DataArray of reals.
-        top_elevation: xr.DataArray of reals.
-        bot_elevation: xr.DataArray of reals.
-        connection_length: xr.DataArray of reals.
-        connection_width: xr.DataArray of reals.
+        bed_leak: xr.DataArray of floats.
+        top_elevation: xr.DataArray of floats.
+        bot_elevation: xr.DataArray of floats.
+        connection_length: xr.DataArray of floats.
+        connection_width: xr.DataArray of floats.
         status,
-        stage: timeseries of real numbers
-        rainfall: timeseries of real numbers
-        evaporation: timeseries of real numbers
-        runoff: timeseries of real numbers
-        inflow: timeseries of real numbers
-        withdrawal: timeseries of real numbers
-        auxiliary: timeseries of real numbers
+        stage: timeseries of float numbers
+        rainfall: timeseries of float numbers
+        evaporation: timeseries of float numbers
+        runoff: timeseries of float numbers
+        inflow: timeseries of float numbers
+        withdrawal: timeseries of float numbers
+        auxiliary: timeseries of float numbers
 
     """
 

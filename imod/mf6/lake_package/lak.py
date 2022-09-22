@@ -82,22 +82,22 @@ class Lake(BoundaryCondition):
     c_type: array of strings (xr.DataArray)- dimension number of connections
         indicates if connection is horizontal, vertical, embeddedH or embeddedV
     c_bed_leak: array of floats (xr.DataArray)- dimension number of connections
-        real value that defines the bed leakance for the lake-GWF connection.
+        defines the bed leakance for the lake-GWF connection.
         BEDLEAK must be greater than or equal to zero or specified to be np.nan. If BEDLEAK is specified to
         be np.nan, the lake-GWF connection conductance is solely a function of aquifer properties in the
         connected GWF cell and lakebed sediments are assumed to be absent.
     c_bottom_elevation: array of floats (xr.DataArray, optional)- dimension number of connections
-        real value that defines the bottom elevation for a HORIZONTAL lake-GWF connection.
+        defines the bottom elevation for a HORIZONTAL lake-GWF connection.
         If not provided, will be set to the bottom elevation of the cell it is connected to.
     c_top_elevation:array of floats (xr.DataArray, optional)- dimension number of connections
-        real value that defines the top elevation for a HORIZONTAL lake-GWF connection.
+        defines the top elevation for a HORIZONTAL lake-GWF connection.
         If not provided, will be set to the top elevation of the cell it is connected to.
     c_width: array of floats (xr.DataArray, optional)
-        real value that defines the connection face width for a HORIZONTAL lake-GWF connection.
+        defines the connection face width for a HORIZONTAL lake-GWF connection.
         connwidth must be greater than zero for a HORIZONTAL lake-GWF connection. Any value can be
         specified if claktype is VERTICAL, EMBEDDEDH, or EMBEDDEDV. If not set, will be set to dx or dy.
     c_length: array of floats (xr.DataArray, optional)
-        real value that defines the distance between the connected GWF cellid node and the lake
+        defines the distance between the connected GWF cellid node and the lake
         for a HORIZONTAL, EMBEDDEDH, or EMBEDDEDV lake-GWF connection. connlen must be greater than
         zero for a HORIZONTAL, EMBEDDEDH, or EMBEDDEDV lake-GWF connection. Any value can be specified
         if claktype is VERTICAL. If not set, will be set to dx or dy.
@@ -117,17 +117,17 @@ class Lake(BoundaryCondition):
         flow. MANNING–character keyword to indicate the outlet is defined using Manning’s equation.
         WEIR–character keyword to indicate the outlet is defined using a sharp weir equation.
     o_invert: array of floats (xr.DataArray, optional):
-        real or character value that defines the invert elevation for the lake outlet. A specified
+        float or character value that defines the invert elevation for the lake outlet. A specified
         INVERT value is only used for active lakes if outlet_type for lake outlet OUTLETNO is not
         SPECIFIED.
     o_roughness: array of floats (xr.DataArray, optional)
-        real value that defines the roughness coefficient for the lake outlet. Any value can be specified
+        defines the roughness coefficient for the lake outlet. Any value can be specified
         if outlet_type is not MANNING.
     o_width: array of floats (xr.DataArray, optional)
-        real or character value that defines the width of the lake outlet. A specified WIDTH value is
+        float or character value that defines the width of the lake outlet. A specified WIDTH value is
         only used for active lakes if outlet_type for lake outlet OUTLETNO is not SPECIFIED.
     o_slope: array of floats (xr.DataArray, optional)
-        real or character value that defines the bed slope for the lake outlet. A specified SLOPE value is
+        float or character value that defines the bed slope for the lake outlet. A specified SLOPE value is
         only used for active lakes if outlet_type for lake outlet OUTLETNO is MANNING.
 
     print_input: ({True, False}, optional)
@@ -170,7 +170,7 @@ class Lake(BoundaryCondition):
         or years in the simulation, respectively. CONVTIME does not need to be specified if no lake
         outlets are specified or TIME_UNITS are seconds.,
     length_conversion: float
-        real value that is used in converting outlet flow terms that use Manning’s equation or gravitational
+        float value that is used in converting outlet flow terms that use Manning’s equation or gravitational
         acceleration to consistent length units. LENGTH_CONVERSION should be set to 3.28081, 1.0, and 100.0
         when using length units (LENGTH_UNITS) of feet, meters, or centimeters in the simulation,
         respectively. LENGTH_CONVERSION does not need to be specified if no lake outlets are specified or
