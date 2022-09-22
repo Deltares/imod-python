@@ -17,10 +17,16 @@ missing_values = {
 }
 
 class LakeApi_Base:
+    '''
+    Base class for lake and outlet object.
+    '''
     def __init__(self, number):
         self.object_number = number
 
     def get_times(self, timeseries_name):
+        '''
+        returns the times associated with the timeseries that has name "timeseries_name"
+        '''
         times = []
         if hasattr(self, timeseries_name):
             ts =getattr(self, timeseries_name)
@@ -30,6 +36,10 @@ class LakeApi_Base:
         return sorted(set(times))
 
     def has_transient_data(self, timeseries_name):
+        '''
+        returns true if this object has transient data for a property with a given name
+        (outlets can have either a scalar or a timeseries for some properties)
+        '''
         if hasattr(self, timeseries_name):
             ts =getattr(self, timeseries_name)
             if type(ts)  == xr.DataArray:
@@ -38,6 +48,10 @@ class LakeApi_Base:
 
 
     def add_timeseries_to_dataarray(self, timeseries_name, dataarray):
+        '''
+        adds the timeseries of this lake or outlet to a data-array containing this timeseries for
+        all lakes or outlets
+        '''
         current_object_data = dataarray.sel(index=self.object_number)
         if hasattr(self, timeseries_name):
             ts =getattr(self, timeseries_name)
@@ -315,7 +329,6 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[],
         budgetfile=None,
         budgetcsvfile=None,
         package_convergence_filename=None,
-        ts6_filename=None,
         time_conversion=None,
         length_conversion=None):
     """
@@ -449,6 +462,11 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[],
     return result
 
 def collect_all_times(  list_of_lakes, list_of_outlets):
+    '''
+    all timeseries we pass to the lake package must have the same time discretization-otherwise the coordinates
+    of the lake-package do not match. So in this function we collect all the time coordinates of all the lakes and
+    outlets.
+    '''
     times=[]
 
     for timeseries_name in LakeLake.timeseries_names:
@@ -464,7 +482,11 @@ def collect_all_times(  list_of_lakes, list_of_outlets):
     return sorted(set(times))
 
 def create_timeseries( list_of_lakes_or_outlets, ts_times,  timeseries_name):
-
+    '''
+    In this function we create a dataarray with a given time coorridnate axis. We add all
+    the timeseries of lakes or outlets with the given name. We also create a dimension to
+    specify the lake or outlet number.
+    '''
     if not any(lake_or_outlet.has_transient_data(timeseries_name) for lake_or_outlet in list_of_lakes_or_outlets):
         return None
 
