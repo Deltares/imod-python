@@ -18,7 +18,9 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.mf6.lake_package.lake_api import OutletManning, from_lakes_and_outlets
 from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition, Package
+from imod.tests.test_mf6.test_mf6_lake_api import create_lakelake
 
 ALL_PACKAGES = [
     item
@@ -46,6 +48,74 @@ PACKAGE_ATTRIBUTES = {
 }
 BOUNDARY_ATTRIBUTES = PACKAGE_ATTRIBUTES.union({"_period_data", "_auxiliary_data"})
 ADV_BOUNDARY_ATTRIBUTES = BOUNDARY_ATTRIBUTES.union({"_package_data"})
+
+GLOBAL_TIMES = np.array(
+    [
+        np.datetime64("1999-01-01"),
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-02-01"),
+        np.datetime64("2000-03-01"),
+        np.datetime64("2000-04-01"),
+        np.datetime64("2000-05-01"),
+    ]
+)
+
+
+def create_mf6_lake_package():
+    shape = nlay, nrow, ncol = 3, 9, 9
+
+    dx = 10.0
+    dy = -10.0
+    xmin = 0.0
+    xmax = dx * ncol
+    ymin = 0.0
+    ymax = abs(dy) * nrow
+    dims = ("layer", "y", "x")
+
+    layer = np.arange(1, nlay + 1)
+    y = np.arange(ymax, ymin, dy) + 0.5 * dy
+    x = np.arange(xmin, xmax, dx) + 0.5 * dx
+    coords = {"layer": layer, "y": y, "x": x}
+
+    idomain = xr.DataArray(np.ones(shape, dtype=np.int32), coords=coords, dims=dims)
+
+    times_rainfall = [
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-03-01"),
+        np.datetime64("2000-05-01"),
+    ]
+    rainfall = xr.DataArray(
+        np.full((len(times_rainfall)), 5.0),
+        coords={"time": times_rainfall},
+        dims=["time"],
+    )
+    times_inflow = [np.datetime64("2000-02-01"), np.datetime64("2000-04-01")]
+    inflow = xr.DataArray(
+        np.full((len(times_inflow)), 4.0), coords={"time": times_inflow}, dims=["time"]
+    )
+
+    lake1 = create_lakelake(
+        idomain,
+        11.0,
+        "Naardermeer",
+        [(1, 2, 2), (1, 2, 3), (1, 3, 3)],
+        rainfall,
+        inflow,
+    )
+    lake2 = create_lakelake(idomain, 11.0, "Ijsselmeer", [(1, 4, 4)], rainfall, inflow)
+    times_invert = [
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-03-01"),
+        np.datetime64("2000-05-01"),
+    ]
+    invert = xr.DataArray(
+        np.full((len(times_invert)), 3.0),
+        coords={"time": times_rainfall},
+        dims=["time"],
+    )
+    outlet1 = OutletManning(1, "Naardermeer", "Ijsselmeer", invert, 24.0, 25.0, 26.0)
+    lake_package = from_lakes_and_outlets([lake1, lake2], [outlet1])
+    return lake_package
 
 
 def get_darray(dtype):
@@ -94,6 +164,7 @@ ALL_INSTANCES = [
     imod.mf6.SpecificStorage(0.001, 0.1, True, get_darray(np.int32)),
     imod.mf6.StorageCoefficient(0.001, 0.1, True, get_darray(np.int32)),
     # TODO imod.mf6.TimeDiscretization(10.0, 23, 1.02),
+    create_mf6_lake_package(),
 ]
 
 
@@ -134,10 +205,10 @@ def test_adv_boundary_class_attributes(pkg_class):
 
 @pytest.mark.parametrize("instance", ALL_INSTANCES)
 def test_render_twice(instance, tmp_path):
-    globaltimes = [np.datetime64("2000-01-01")]
+
     modeldir = tmp_path / "testdir"
-    text1 = instance.render(modeldir, "test", globaltimes, False)
-    text2 = instance.render(modeldir, "test", globaltimes, False)
+    text1 = instance.render(modeldir, "test", GLOBAL_TIMES, False)
+    text2 = instance.render(modeldir, "test", GLOBAL_TIMES, False)
     assert text1 == text2
 
 
