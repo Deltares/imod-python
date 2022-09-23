@@ -147,7 +147,9 @@ class OutletManning(OutletBase):
     """
     This class represents a Manning Outlet
     """
+
     _couttype = "manning"
+
     def __init__(
         self,
         outlet_number: int,
@@ -167,6 +169,7 @@ class OutletManning(OutletBase):
 
 class OutletWeir(OutletBase):
     _couttype = "weir"
+
     def __init__(
         self,
         outlet_number: int,
@@ -179,9 +182,13 @@ class OutletWeir(OutletBase):
         self.invert = invert
         self.width = width
 
+
 class OutletSpecified(OutletBase):
     _couttype = "specified"
-    def __init__(self, outlet_number: int, lake_in: str, lake_out: str, rate: np.floating):
+
+    def __init__(
+        self, outlet_number: int, lake_in: str, lake_out: str, rate: np.floating
+    ):
         super().__init__(outlet_number, lake_in, lake_out)
         self.rate = rate
 
