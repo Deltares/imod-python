@@ -136,7 +136,7 @@ class Lake(BoundaryCondition):
         False.
     print_stage: ({True, False}, optional)
         Keyword to indicate that the list of lake stages will be printed to the listing file for every
-        stress period in which “HEAD PRINT” is specified in Output Control. If there is no Output Control
+        stress period in which "HEAD PRINT" is specified in Output Control. If there is no Output Control
         option and PRINT_STAGE is specified, then stages are printed for the last time step of each
         stress period.
     print_flows: ({True, False}, optional)
@@ -162,7 +162,7 @@ class Lake(BoundaryCondition):
         name of the comma spaced values output file to write package convergence information.
     ts6_filename: String, optional
         defines a time-series file defining time series that can be used to assign time-varying values.
-        See the “Time-Variable Input” section for instructions on using the time-series capability.
+        See the "Time-Variable Input" section for instructions on using the time-series capability.
     time_conversion: float
         value that is used in converting outlet flow terms that use Manning’s equation or gravitational
         acceleration to consistent time units. TIME_CONVERSION should be set to 1.0, 60.0, 3,600.0,

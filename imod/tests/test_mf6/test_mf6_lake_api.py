@@ -93,8 +93,8 @@ def test_lake_api(basic_dis):
         end connectiondata
 
         begin outlets
-          1 2 MANNING 23.0 25.0 24.0 26.0
-          2 1 MANNING 27.0 29.0 28.0 30.0
+          1 2 manning 23.0 25.0 24.0 26.0
+          2 1 manning 27.0 29.0 28.0 30.0
         end outlets
         """
     )

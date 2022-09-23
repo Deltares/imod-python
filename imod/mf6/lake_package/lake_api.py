@@ -137,7 +137,6 @@ class OutletBase:
         self.outlet_number = outlet_number
         self.lake_in = lake_in
         self.lake_out = lake_out
-        self.couttype = ""
         self.invert = -1
         self.width = -1
         self.roughness = -1
@@ -148,7 +147,7 @@ class OutletManning(OutletBase):
     """
     This class represents a Manning Outlet
     """
-
+    _couttype = "manning"
     def __init__(
         self,
         outlet_number: int,
@@ -164,10 +163,10 @@ class OutletManning(OutletBase):
         self.width = width
         self.roughness = roughness
         self.slope = slope
-        self.couttype = "MANNING"
 
 
 class OutletWeir(OutletBase):
+    _couttype = "weir"
     def __init__(
         self,
         outlet_number: int,
@@ -179,14 +178,12 @@ class OutletWeir(OutletBase):
         super().__init__(outlet_number, lake_in, lake_out)
         self.invert = invert
         self.width = width
-        self.couttype = "WEIR"
-
 
 class OutletSpecified(OutletBase):
+    _couttype = "specified"
     def __init__(self, outlet_number: int, lake_in: str, lake_out: str, rate: np.floating):
         super().__init__(outlet_number, lake_in, lake_out)
         self.rate = rate
-        self.couttype = "SPECIFIED"
 
 
 def list_1d_to_xarray_1d(list, dimension_name):
@@ -213,7 +210,10 @@ def outlet_list_prop_to_xarray_1d(list_of_outlets, propertyname, dimension_name)
     """
     result_list = []
     for outlet in list_of_outlets:
-        result_list.append(vars(outlet)[propertyname])
+        if propertyname in outlet.__dict__.keys():
+            result_list.append(vars(outlet)[propertyname])
+        else:
+            result_list.append(getattr(outlet, propertyname))
     return list_1d_to_xarray_1d(result_list, dimension_name)
 
 
@@ -325,7 +325,7 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[]):
         o_lakein = map_names_to_lake_numbers(list_of_lakes, o_lakein_str)
         o_lakeout = map_names_to_lake_numbers(list_of_lakes, o_lakeout_str)
         o_couttype = outlet_list_prop_to_xarray_1d(
-            list_of_outlets, "couttype", "outlet_nr"
+            list_of_outlets, "_couttype", "outlet_nr"
         )
         o_invert = outlet_list_prop_to_xarray_1d(list_of_outlets, "invert", "outlet_nr")
         o_roughness = outlet_list_prop_to_xarray_1d(
