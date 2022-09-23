@@ -9,13 +9,6 @@ Usage: create instances of the LakeLake class, and optionally instances of the O
 and use the method "from_lakes_and_outlets" to create a lake package.
 """
 
-
-missing_values = {
-    "float32": np.nan,
-    "int32": -6789012,
-}
-
-
 class LakeLake:
     """
     This class is used to initialize the lake package. It contains data relevant to 1 lake.
@@ -23,9 +16,6 @@ class LakeLake:
     , some xarray data-arrays, and timeseries.
     The xarray data-arrays should be of the same size as the grid, and contain missing values in all
     locations where the lake does not exist ( similar to the input of the chd package)
-    The missing value that you should use depends on the datatype and is contained in the missing_values
-    dictionary.
-
 
     parameters:
 
@@ -110,7 +100,7 @@ class LakeLake:
         """
         dummy = grid_array.sel()
 
-        dummy = dummy.where(dummy != missing_values[grid_array.dtype.name], drop=True)
+        dummy = dummy.where(dummy.notnull(), drop=True)
         x_indexes = cls.get_subdomain_indices(grid_array.x, dummy.x)
         y_indexes = cls.get_subdomain_indices(grid_array.y, dummy.y)
         layer_indexes = cls.get_subdomain_indices(grid_array.layer, dummy.layer)
@@ -120,11 +110,11 @@ class LakeLake:
 
         dummy = dummy.stack(z=("x", "y", "layer"))
         dummy = dummy.dropna("z")
-        dummy = dummy.astype(grid_array.dtype)
-        x_values = list(dummy.z.x.values)
-        y_values = list(dummy.z.y.values)
-        layer_values = list(dummy.z.layer.values)
-        array_values = list(dummy.values)
+
+        x_values = dummy.z.x.values
+        y_values = dummy.z.y.values
+        layer_values = dummy.z.layer.values
+        array_values = dummy.values
         return x_values, y_values, layer_values, array_values
 
 
@@ -193,10 +183,10 @@ class OutletSpecified(OutletBase):
         self.rate = rate
 
 
-def list_1d_to_xarray_1d(list, dimension_name):
+def nparray_to_xarray_1d(list, dimension_name):
     """
     This function creates a 1-dimensional xarray.DataArray with values
-    equal to those in the input list. The coordinates are the indexes in the list.
+    equal to those in the numpy array. The coordinates are the indexes in the list.
     The dimension name is passed as a function argument.
     """
     nr_elem = len(list)
@@ -221,7 +211,7 @@ def outlet_list_prop_to_xarray_1d(list_of_outlets, propertyname, dimension_name)
             result_list.append(vars(outlet)[propertyname])
         else:
             result_list.append(getattr(outlet, propertyname))
-    return list_1d_to_xarray_1d(result_list, dimension_name)
+    return nparray_to_xarray_1d(result_list, dimension_name)
 
 
 def lake_list_connection_prop_to_xarray_1d(list_of_lakes, propertyname):
@@ -234,12 +224,12 @@ def lake_list_connection_prop_to_xarray_1d(list_of_lakes, propertyname):
     The sole dimension is given the name dimension_name, and the coordinates are the indexes.
     """
     nrlakes = len(list_of_lakes)
-    result_as_list = []
+    result = np.array([])
     for i in range(0, nrlakes):
         connection_prop = vars(list_of_lakes[i])[propertyname]
         _, _, _, prop_current_lake = LakeLake.get_1d_array(connection_prop)
-        result_as_list += prop_current_lake
-    return list_1d_to_xarray_1d(result_as_list, "connection_nr")
+        result = np.append(result, prop_current_lake)
+    return nparray_to_xarray_1d(result, "connection_nr")
 
 
 def lake_list_lake_prop_to_xarray_1d(list_of_lakes, propertyname):
@@ -253,7 +243,7 @@ def lake_list_lake_prop_to_xarray_1d(list_of_lakes, propertyname):
     """
     nrlakes = len(list_of_lakes)
     result_as_list = [vars(list_of_lakes[i])[propertyname] for i in range(0, nrlakes)]
-    return list_1d_to_xarray_1d(result_as_list, "lake_nr")
+    return nparray_to_xarray_1d(result_as_list, "lake_nr")
 
 
 def map_names_to_lake_numbers(list_of_lakes, list_of_lakenames):
@@ -283,26 +273,26 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[]):
     """
     nrlakes = len(list_of_lakes)
 
-    lakenumber = []
-    row = []
-    col = []
-    layer = []
+    lakenumber = np.array([])
+    row = np.array([])
+    col =np.array([])
+    layer = np.array([])
 
     for i in range(0, nrlakes):
         list_of_lakes[i].lake_number = i + 1
         lyr, y, x, ctype = LakeLake.get_1d_array(list_of_lakes[i].connection_type)
-        row += x
-        col += y
-        layer += lyr
-        lakenumber += [list_of_lakes[i].lake_number] * len(ctype)
+        row = np.append(row , x)
+        col = np.append(col, y)
+        layer = np.append(layer , lyr)
+        lakenumber = np.append(lakenumber , [list_of_lakes[i].lake_number] * len(ctype))
 
     l_boundname = lake_list_lake_prop_to_xarray_1d(list_of_lakes, "boundname")
     l_starting_stage = lake_list_lake_prop_to_xarray_1d(list_of_lakes, "starting_stage")
-    l_lakenr = list_1d_to_xarray_1d(list(range(1, nrlakes + 1)), "lake_nr")
-    c_lakenumber = list_1d_to_xarray_1d(lakenumber, "connection_nr")
-    c_row = list_1d_to_xarray_1d(row, "connection_nr")
-    c_col = list_1d_to_xarray_1d(col, "connection_nr")
-    c_layer = list_1d_to_xarray_1d(layer, "connection_nr")
+    l_lakenr = nparray_to_xarray_1d(list(range(1, nrlakes + 1)), "lake_nr")
+    c_lakenumber = nparray_to_xarray_1d(lakenumber, "connection_nr")
+    c_row = nparray_to_xarray_1d(row, "connection_nr")
+    c_col = nparray_to_xarray_1d(col, "connection_nr")
+    c_layer = nparray_to_xarray_1d(layer, "connection_nr")
     c_type = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "connection_type")
     c_bed_leak = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "bed_leak")
     c_bottom_elevation = lake_list_connection_prop_to_xarray_1d(

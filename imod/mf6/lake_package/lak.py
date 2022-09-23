@@ -67,17 +67,17 @@ class Lake(BoundaryCondition):
     l_boundname:  array of strings (xr.DataArray)- dimension number of lakes:
         name of the lake
 
-    c_lake_no: array of integers (xr.DataArray)- dimension number of connections
+    c_lake_no: array of floats (xr.DataArray)- dimension number of connections
         lake number for the current lake-to-aquifer connection.
-    c_cell_id_row_or_index: array of integers (xr.DataArray)- dimension number of connections
+    c_cell_id_row_or_index: array of floats (xr.DataArray)- dimension number of connections
         in case of a structured grid: gridrow number of aquifer cell for current lake-to aquifer connection
         in case of an unstructured grid: cell index of aquifer cell for current lake-to aquifer connection
 
-    c_cell_id_col: array of integers (xr.DataArray)- dimension number of connections
+    c_cell_id_col: array of floats (xr.DataArray)- dimension number of connections
         in case of a structured grid: grid-column number of aquifer cell for current lake-to aquifer connection
         in case of an unstructured grid: not used. set this argument to None
 
-    c_cell_id_layer: array of integers (xr.DataArray)- dimension number of connections
+    c_cell_id_layer: array of floats (xr.DataArray)- dimension number of connections
          gridrow number of aquifer cell for current lake-to aquifer connection
     c_type: array of strings (xr.DataArray)- dimension number of connections
         indicates if connection is horizontal, vertical, embeddedH or embeddedV
@@ -183,11 +183,11 @@ class Lake(BoundaryCondition):
         "l_number": VariableMetaData(np.integer),
         "l_starting_stage": VariableMetaData(np.floating),
         "l_boundname": VariableMetaData(np.str0),
-        "c_lake_no": VariableMetaData(np.integer),
-        "c_cell_id_row_or_index": VariableMetaData(np.integer),
-        "c_cell_id_col": VariableMetaData(np.integer),
-        "c_cell_id_layer": VariableMetaData(np.integer),
-        "c_type": VariableMetaData(np.integer),
+        "c_lake_no": VariableMetaData(np.floating),
+        "c_cell_id_row_or_index":  VariableMetaData(np.floating),
+        "c_cell_id_col":  VariableMetaData(np.floating),
+        "c_cell_id_layer": VariableMetaData(np.floating),
+        "c_type":  VariableMetaData(np.floating),
         "c_bed_leak": VariableMetaData(np.floating),
         "c_bottom_elevation": VariableMetaData(np.floating),
         "c_top_elevation": VariableMetaData(np.floating),
@@ -327,14 +327,14 @@ class Lake(BoundaryCondition):
         nconnect = self.dataset["c_lake_no"].size
         for i in range(0, nconnect):
             connection = _Connection()
-            connection.lake_no = self.dataset["c_lake_no"].values[i]
-            connection.cell_id_row_or_index = self.dataset[
+            connection.lake_no = int(self.dataset["c_lake_no"].values[i])
+            connection.cell_id_row_or_index = int(self.dataset[
                 "c_cell_id_row_or_index"
-            ].values[i]
+            ].values[i])
             connection.cell_id_col = None
             if self.dataset["c_cell_id_col"].values[()] is not None:
-                connection.cell_id_col = self.dataset["c_cell_id_col"].values[i]
-            connection.cell_id_layer = self.dataset["c_cell_id_layer"].values[i]
+                connection.cell_id_col = int(self.dataset["c_cell_id_col"].values[i])
+            connection.cell_id_layer = int( self.dataset["c_cell_id_layer"].values[i])
 
             key = [
                 k
@@ -356,8 +356,8 @@ class Lake(BoundaryCondition):
             noutlet = self.dataset["o_lakein"].size
             for i in range(0, noutlet):
                 outlet = _Outlet()
-                outlet.lake_in = self.dataset["o_lakein"].values[i]
-                outlet.lake_out = self.dataset["o_lakeout"].values[i]
+                outlet.lake_in = int(self.dataset["o_lakein"].values[i])
+                outlet.lake_out = int(self.dataset["o_lakeout"].values[i])
                 outlet.couttype = self.dataset["o_couttype"].values[i]
                 outlet.invert = self.dataset["o_invert"].values[i]
                 outlet.roughness = self.dataset["o_roughness"].values[i]
