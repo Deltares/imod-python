@@ -45,6 +45,6 @@ end connectiondata
 
 {% if noutlets > 0 -%}
 begin outlets{% for n in range(0, noutlets) %}
-  {{outlets[n].lakein}} {{outlets[n].lakeout}} {{outlets[n].couttype}} {{outlets[n].invert}} {{outlets[n].roughness}} {{outlets[n].width}} {{outlets[n].slope}}{% endfor %}
+  {{outlets[n].lake_in}} {{outlets[n].lake_out}} {{outlets[n].couttype}} {{outlets[n].invert}} {{outlets[n].roughness}} {{outlets[n].width}} {{outlets[n].slope}}{% endfor %}
 end outlets
 {% endif -%}

@@ -31,7 +31,7 @@ class LakeLake:
 
         starting_stage: float,
         boundname: str,
-        connectionType: xr.DataArray of integers.
+        connection_type: xr.DataArray of integers.
         bed_leak: xr.DataArray of floats.
         top_elevation: xr.DataArray of floats.
         bot_elevation: xr.DataArray of floats.
@@ -52,7 +52,7 @@ class LakeLake:
         self,
         starting_stage: float,
         boundname: str,
-        connectionType,
+        connection_type,
         bed_leak,
         top_elevation,
         bot_elevation,
@@ -70,7 +70,7 @@ class LakeLake:
         self.lake_number = -1
         self.starting_stage = starting_stage
         self.boundname = boundname
-        self.connectionType = connectionType
+        self.connection_type = connection_type
         self.bed_leak = bed_leak
         self.top_elevation = top_elevation
         self.bottom_elevation = bot_elevation
@@ -133,10 +133,10 @@ class OutletBase:
     Base class for the different kinds of outlets
     """
 
-    def __init__(self, outletNumber: int, lakeIn: str, lakeOut: str):
-        self.outletNumber = outletNumber
-        self.lake_in = lakeIn
-        self.lake_out = lakeOut
+    def __init__(self, outlet_number: int, lake_in: str, lake_out: str):
+        self.outlet_number = outlet_number
+        self.lake_in = lake_in
+        self.lake_out = lake_out
         self.couttype = ""
         self.invert = -1
         self.width = -1
@@ -151,15 +151,15 @@ class OutletManning(OutletBase):
 
     def __init__(
         self,
-        outletNumber: int,
-        lakeIn: str,
-        lakeOut: str,
+        outlet_number: int,
+        lake_in: str,
+        lake_out: str,
         invert: np.floating,
         width: np.floating,
         roughness: np.floating,
         slope: np.floating,
     ):
-        super().__init__(outletNumber, lakeIn, lakeOut)
+        super().__init__(outlet_number, lake_in, lake_out)
         self.invert = invert
         self.width = width
         self.roughness = roughness
@@ -170,21 +170,21 @@ class OutletManning(OutletBase):
 class OutletWeir(OutletBase):
     def __init__(
         self,
-        outletNumber: int,
-        lakeIn: str,
-        lakeOut: str,
+        outlet_number: int,
+        lake_in: str,
+        lake_out: str,
         invert: np.floating,
         width: np.floating,
     ):
-        super().__init__(outletNumber, lakeIn, lakeOut)
+        super().__init__(outlet_number, lake_in, lake_out)
         self.invert = invert
         self.width = width
         self.couttype = "WEIR"
 
 
 class OutletSpecified(OutletBase):
-    def __init__(self, outletNumber: int, lakeIn: str, lakeOut: str, rate: np.floating):
-        super().__init__(outletNumber, lakeIn, lakeOut)
+    def __init__(self, outlet_number: int, lake_in: str, lake_out: str, rate: np.floating):
+        super().__init__(outlet_number, lake_in, lake_out)
         self.rate = rate
         self.couttype = "SPECIFIED"
 
@@ -283,7 +283,7 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[]):
 
     for i in range(0, nrlakes):
         list_of_lakes[i].lake_number = i + 1
-        lyr, y, x, ctype = LakeLake.get_1d_array(list_of_lakes[i].connectionType)
+        lyr, y, x, ctype = LakeLake.get_1d_array(list_of_lakes[i].connection_type)
         row += x
         col += y
         layer += lyr
@@ -296,7 +296,7 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[]):
     c_row = list_1d_to_xarray_1d(row, "connection_nr")
     c_col = list_1d_to_xarray_1d(col, "connection_nr")
     c_layer = list_1d_to_xarray_1d(layer, "connection_nr")
-    c_type = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "connectionType")
+    c_type = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "connection_type")
     c_bed_leak = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "bed_leak")
     c_bottom_elevation = lake_list_connection_prop_to_xarray_1d(
         list_of_lakes, "bottom_elevation"

@@ -14,7 +14,7 @@ def test_lake_rendering(basic_dis):
 
     # create 3 lakes
 
-    lakenames = ["Ijsselmeer", "Vinkeveense plas", "Reeuwijkse plas"]
+    lakenames = ["Ijsselmeer", "Vinkeveense_plas", "Reeuwijkse_plas"]
     lake_starting_stages = [1.0, 2.0, 3.0]
     lake_bed_elevations = [2, 3, 4]
     nlake = 3
@@ -127,8 +127,8 @@ def test_lake_rendering(basic_dis):
 
         begin packagedata
           1  1.0  3  Ijsselmeer
-          2  2.0  2  Vinkeveense plas
-          3  3.0  1  Reeuwijkse plas
+          2  2.0  2  Vinkeveense_plas
+          3  3.0  1  Reeuwijkse_plas
         end packagedata
 
         begin connectiondata

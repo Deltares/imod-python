@@ -20,7 +20,7 @@ def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
 
 
 def create_lakelake(idomain, starting_stage, boundname, lake_cells):
-    connectionType = create_gridcovering_array(
+    connection_type = create_gridcovering_array(
         idomain, lake_cells, lak.connection_types["HORIZONTAL"], np.int32
     )
     bed_leak = create_gridcovering_array(idomain, lake_cells, 0.2, np.float32)
@@ -31,7 +31,7 @@ def create_lakelake(idomain, starting_stage, boundname, lake_cells):
     result = lake_api.LakeLake(
         starting_stage,
         boundname,
-        connectionType,
+        connection_type,
         bed_leak,
         top_elevation,
         bot_elevation,
@@ -53,17 +53,17 @@ def test_lake_api(basic_dis):
     idomain, _, _ = basic_dis
 
     outlet1 = lake_api.OutletManning(
-        1, "Naardermeer", "Ijsselmeer", 23.0, 24.0, 25.0, 26.0
+        1, "Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0
     )
     outlet2 = lake_api.OutletManning(
-        2, "Ijsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0
+        2, "IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0
     )
 
     lake1 = create_lakelake(
         idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)]
     )
     lake2 = create_lakelake(
-        idomain, 15.0, "Ijsselmeer", [(1, 5, 5), (1, 5, 6), (1, 6, 6)]
+        idomain, 15.0, "IJsselmeer", [(1, 5, 5), (1, 5, 6), (1, 6, 6)]
     )
     lake_package = lake_api.from_lakes_and_outlets([lake1, lake2], [outlet1, outlet2])
     actual = lake_package.render(None, None, None, False)
@@ -80,7 +80,7 @@ def test_lake_api(basic_dis):
 
         begin packagedata
           1  11.0  3  Naardermeer
-          2  15.0  3  Ijsselmeer
+          2  15.0  3  IJsselmeer
         end packagedata
 
         begin connectiondata
@@ -125,16 +125,16 @@ def test_helper_function_list_1d_to_xarray_1d():
 
 def test_helper_function_outlet_list_prop_to_xarray_1d():
     outlet1 = lake_api.OutletManning(
-        1, "Naardermeer", "Ijsselmeer", 23.0, 24.0, 25.0, 26.0
+        1, "Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0
     )
     outlet2 = lake_api.OutletManning(
-        2, "Ijsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0
+        2, "IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0
     )
     result = lake_api.outlet_list_prop_to_xarray_1d(
         [outlet1, outlet2], "lake_in", "lakeIn"
     )
     assert result.values[0] == "Naardermeer"
-    assert result.values[1] == "Ijsselmeer"
+    assert result.values[1] == "IJsselmeer"
 
 
 def test_helper_function_lake_list_connection_prop_to_xarray_1d(basic_dis):
@@ -143,7 +143,7 @@ def test_helper_function_lake_list_connection_prop_to_xarray_1d(basic_dis):
         idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)]
     )
     lake2 = create_lakelake(
-        idomain, 15.0, "Ijsselmeer", [(1, 5, 5), (1, 5, 6), (1, 6, 6)]
+        idomain, 15.0, "IJsselmeer", [(1, 5, 5), (1, 5, 6), (1, 6, 6)]
     )
     result = lake_api.lake_list_connection_prop_to_xarray_1d(
         [lake1, lake2], "bottom_elevation"
@@ -158,7 +158,7 @@ def test_helper_function_lake_list_lake_prop_to_xarray_1d(basic_dis):
         idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)]
     )
     lake2 = create_lakelake(
-        idomain, 15.0, "Ijsselmeer", [(1, 5, 5), (1, 5, 6), (1, 6, 6)]
+        idomain, 15.0, "IJsselmeer", [(1, 5, 5), (1, 5, 6), (1, 6, 6)]
     )
     result = lake_api.lake_list_lake_prop_to_xarray_1d([lake1, lake2], "starting_stage")
     assert result.values[0] == 11.0

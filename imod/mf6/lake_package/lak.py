@@ -5,7 +5,7 @@ from imod.mf6.pkgbase import BoundaryCondition, Package, VariableMetaData
 connection_types = {"HORIZONTAL": 0, "VERTICAL": 1, "EMBEDDEDH": 2, "EMBEDDEDV": 3}
 
 
-class Lake_internal:
+class _Lake:
     """
     The Lake_internal class is used for rendering the lake package in jinja.
     There is no point in instantiating this class as a user.
@@ -18,7 +18,7 @@ class Lake_internal:
         self.nconn = 0
 
 
-class Connection_internal:
+class _Connection:
     """
     The Connection_internal class is used for rendering the lake package in jinja.
     There is no point in instantiating this class as a user.
@@ -38,15 +38,15 @@ class Connection_internal:
         self.connection_length = 0
 
 
-class Outlet_internal:
+class _Outlet:
     """
     The Outlet_internal class is used for rendering the lake package in jinja.
     There is no point in instantiating this class as a user.
     """
 
     def __init__(self):
-        self.lakein = 0
-        self.lakeout = 0
+        self.lake_in = 0
+        self.lake_out = 0
         self.couttype = 0
         self.invert = 0
         self.roughness = 0
@@ -317,7 +317,7 @@ class Lake(BoundaryCondition):
         lakelist = []
         nlakes = self.dataset["l_number"].size
         for i in range(0, nlakes):
-            lake = Lake_internal()
+            lake = _Lake()
             lake.boundname = self.dataset["l_boundname"].values[i]
             lake.number = self.dataset["l_number"].values[i]
             lake.starting_stage = self.dataset["l_starting_stage"].values[i]
@@ -326,7 +326,7 @@ class Lake(BoundaryCondition):
         connectionlist = []
         nconnect = self.dataset["c_lake_no"].size
         for i in range(0, nconnect):
-            connection = Connection_internal()
+            connection = _Connection()
             connection.lake_no = self.dataset["c_lake_no"].values[i]
             connection.cell_id_row_or_index = self.dataset[
                 "c_cell_id_row_or_index"
@@ -355,9 +355,9 @@ class Lake(BoundaryCondition):
         if self._valid(self.dataset["o_lakein"].values[()]):
             noutlet = self.dataset["o_lakein"].size
             for i in range(0, noutlet):
-                outlet = Outlet_internal()
-                outlet.lakein = self.dataset["o_lakein"].values[i]
-                outlet.lakeout = self.dataset["o_lakeout"].values[i]
+                outlet = _Outlet()
+                outlet.lake_in = self.dataset["o_lakein"].values[i]
+                outlet.lake_out = self.dataset["o_lakeout"].values[i]
                 outlet.couttype = self.dataset["o_couttype"].values[i]
                 outlet.invert = self.dataset["o_invert"].values[i]
                 outlet.roughness = self.dataset["o_roughness"].values[i]
