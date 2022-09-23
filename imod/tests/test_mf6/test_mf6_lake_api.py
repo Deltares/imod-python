@@ -11,9 +11,7 @@ def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
     creates an array similar in dimensions/coords to idomain, but with value NaN (orr the missing value for integers)
     everywhere, except in the cells contained in list "lake_cells". In those cells, the output array has value fillvalue.
     """
-    result = xr.full_like(
-        idomain, fill_value=np.nan, dtype=dtype
-    )
+    result = xr.full_like(idomain, fill_value=np.nan, dtype=dtype)
     for cell in lake_cells:
         result.values[cell[0], cell[1], cell[2]] = fillvalue
     return result
@@ -108,10 +106,11 @@ def test_helper_function_get_1d_array(basic_dis):
         idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)]
     )
     row, col, layer, values = lake1.get_1d_array(lake1.bottom_elevation)
-    assert np.array_equal(row ,np.array([2,3,3]))
-    assert np.array_equal(col ,np.array( [2, 2, 3]))
-    assert np.array_equal(layer , np.array( [1, 1, 1]))
-    assert np.array_equal(values, np.array([0.4,0.4,0.4]))
+    assert np.array_equal(row, np.array([2, 3, 3]))
+    assert np.array_equal(col, np.array([2, 2, 3]))
+    assert np.array_equal(layer, np.array([1, 1, 1]))
+    assert np.array_equal(values, np.array([0.4, 0.4, 0.4]))
+
 
 def test_helper_function_nparray_to_xarray_1d():
     result = lake_api.nparray_to_xarray_1d([23, 24, 25, 26], "velocity")

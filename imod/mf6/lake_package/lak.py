@@ -184,10 +184,10 @@ class Lake(BoundaryCondition):
         "l_starting_stage": VariableMetaData(np.floating),
         "l_boundname": VariableMetaData(np.str0),
         "c_lake_no": VariableMetaData(np.floating),
-        "c_cell_id_row_or_index":  VariableMetaData(np.floating),
-        "c_cell_id_col":  VariableMetaData(np.floating),
+        "c_cell_id_row_or_index": VariableMetaData(np.floating),
+        "c_cell_id_col": VariableMetaData(np.floating),
         "c_cell_id_layer": VariableMetaData(np.floating),
-        "c_type":  VariableMetaData(np.floating),
+        "c_type": VariableMetaData(np.floating),
         "c_bed_leak": VariableMetaData(np.floating),
         "c_bottom_elevation": VariableMetaData(np.floating),
         "c_top_elevation": VariableMetaData(np.floating),
@@ -328,13 +328,13 @@ class Lake(BoundaryCondition):
         for i in range(0, nconnect):
             connection = _Connection()
             connection.lake_no = int(self.dataset["c_lake_no"].values[i])
-            connection.cell_id_row_or_index = int(self.dataset[
-                "c_cell_id_row_or_index"
-            ].values[i])
+            connection.cell_id_row_or_index = int(
+                self.dataset["c_cell_id_row_or_index"].values[i]
+            )
             connection.cell_id_col = None
             if self.dataset["c_cell_id_col"].values[()] is not None:
                 connection.cell_id_col = int(self.dataset["c_cell_id_col"].values[i])
-            connection.cell_id_layer = int( self.dataset["c_cell_id_layer"].values[i])
+            connection.cell_id_layer = int(self.dataset["c_cell_id_layer"].values[i])
 
             key = [
                 k

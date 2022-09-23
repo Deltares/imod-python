@@ -9,6 +9,7 @@ Usage: create instances of the LakeLake class, and optionally instances of the O
 and use the method "from_lakes_and_outlets" to create a lake package.
 """
 
+
 class LakeLake:
     """
     This class is used to initialize the lake package. It contains data relevant to 1 lake.
@@ -275,16 +276,16 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[]):
 
     lakenumber = np.array([])
     row = np.array([])
-    col =np.array([])
+    col = np.array([])
     layer = np.array([])
 
     for i in range(0, nrlakes):
         list_of_lakes[i].lake_number = i + 1
         lyr, y, x, ctype = LakeLake.get_1d_array(list_of_lakes[i].connection_type)
-        row = np.append(row , x)
+        row = np.append(row, x)
         col = np.append(col, y)
-        layer = np.append(layer , lyr)
-        lakenumber = np.append(lakenumber , [list_of_lakes[i].lake_number] * len(ctype))
+        layer = np.append(layer, lyr)
+        lakenumber = np.append(lakenumber, [list_of_lakes[i].lake_number] * len(ctype))
 
     l_boundname = lake_list_lake_prop_to_xarray_1d(list_of_lakes, "boundname")
     l_starting_stage = lake_list_lake_prop_to_xarray_1d(list_of_lakes, "starting_stage")
