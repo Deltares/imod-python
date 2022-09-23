@@ -10,7 +10,7 @@ def test_lake_rendering(basic_dis):
 
     ibound, _, _ = basic_dis
 
-    lake = xr.full_like(ibound, dtype=np.float32, fill_value=0.0)
+    lake = xr.full_like(ibound, dtype=np.float64, fill_value=0.0)
 
     # create 3 lakes
 
@@ -22,19 +22,19 @@ def test_lake_rendering(basic_dis):
     coordinates = {"lake_name": lakenames}
 
     lake_array_layout = xr.DataArray(
-        np.ones(nlake, dtype=np.float32), coords=coordinates, dims=dimensions
+        np.ones(nlake, dtype=np.float64), coords=coordinates, dims=dimensions
     )
-    bed_elevations = xr.full_like(lake_array_layout, fill_value=0, dtype=np.float32)
+    bed_elevations = xr.full_like(lake_array_layout, fill_value=0, dtype=np.float64)
     bed_elevations.data = lake_bed_elevations
 
     boundnames = xr.full_like(lake_array_layout, fill_value="", dtype=np.str0)
     boundnames.data = lakenames
 
-    starting_stages = xr.full_like(lake_array_layout, fill_value=0, dtype=np.float32)
+    starting_stages = xr.full_like(lake_array_layout, fill_value=0, dtype=np.float64)
     starting_stages.data = lake_starting_stages
 
-    lake_numbers = xr.full_like(lake_array_layout, fill_value=0, dtype=np.int32)
-    lake_numbers.data = np.arange(1, nlake + 1)
+    lake_numbers = xr.full_like(lake_array_layout, fill_value=0, dtype=np.int64)
+    lake_numbers.data =  np.arange(1, nlake + 1)
 
     # create 6 connections. we assume an unstructured grid, so there are 2 indexes per cell (index and layer)
     # instead of the usual 3 ( row, col, layer)
@@ -52,49 +52,49 @@ def test_lake_rendering(basic_dis):
     dimensions = ["connection_nr"]
     coordinates = {"connection_nr": np.arange(0, nconnect)}
     connection_array_layout = xr.DataArray(
-        np.ones(nconnect, dtype=np.float32), coords=coordinates, dims=dimensions
+        np.ones(nconnect, dtype=np.float64), coords=coordinates, dims=dimensions
     )
     connection_lake_number = xr.full_like(
-        connection_array_layout, fill_value=0, dtype=np.int32
+        connection_array_layout, fill_value=0, dtype=np.float64
     )
-    connection_lake_number.data = [1, 1, 1, 2, 2, 3]
-    connection_type = xr.full_like(connection_array_layout, fill_value=0, dtype=np.str0)
-    connection_type.data = [
+    connection_lake_number.data = np.float64([1, 1, 1, 2, 2, 3])
+    connection_type = xr.full_like(connection_array_layout, fill_value=0, dtype=np.float64)
+    connection_type.data =  np.float64([
         connection_types["vertical"],
         connection_types["vertical"],
         connection_types["vertical"],
         connection_types["horizontal"],
         connection_types["horizontal"],
         connection_types["embeddedv"],
-    ]
+    ])
     connection_bed_leak = xr.full_like(
-        connection_array_layout, fill_value=0, dtype=np.float32
+        connection_array_layout, fill_value=0, dtype=np.float64
     )
     connection_bed_leak.data = [0.2, 0.3, 0.4, -1, -1, -1]
 
     connection_cell_id_index = xr.full_like(
-        connection_array_layout, fill_value=0, dtype=np.int32
+        connection_array_layout, fill_value=0, dtype=np.float64
     )
-    connection_cell_id_index.data = [3, 4, 3, 17, 18, 23]
+    connection_cell_id_index.data = np.float64([3, 4, 3, 17, 18, 23])
     connection_cell_id_layer = xr.full_like(
-        connection_array_layout, fill_value=0, dtype=np.int32
+        connection_array_layout, fill_value=0, dtype=np.float64
     )
-    connection_cell_id_layer.data = [1, 1, 2, 1, 1, 1]
+    connection_cell_id_layer.data = np.float64([1, 1, 2, 1, 1, 1])
 
     connection_bottom_elevation = xr.full_like(
-        connection_array_layout, fill_value=0, dtype=np.float32
+        connection_array_layout, fill_value=0, dtype=np.float64
     )
     connection_bottom_elevation.data = [-1.0, -2.0, -3.0, -4.0, -5.0, -6.0]
     connection_top_elevation = xr.full_like(
-        connection_array_layout, fill_value=0, dtype=np.float32
+        connection_array_layout, fill_value=0, dtype=np.float64
     )
     connection_top_elevation.data = [0, 0.1, -0.1, 0.2, -0.2, 0]
     connection_width = xr.full_like(
-        connection_array_layout, fill_value=0, dtype=np.float32
+        connection_array_layout, fill_value=0, dtype=np.float64
     )
     connection_width.data = [-1.0, -2.0, -3.0, -4.0, -5.0, -6.0]
     connection_length = xr.full_like(
-        connection_array_layout, fill_value=0, dtype=np.float32
+        connection_array_layout, fill_value=0, dtype=np.float64
     )
     connection_length.data = [-1.0, -2.0, -3.0, -4.0, -5.0, -6.0]
 
