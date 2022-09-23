@@ -36,7 +36,7 @@ begin dimensions
 end dimensions
 
 begin packagedata{% for n in range(0, nlakes) %}
-  {{ lakes[n].number}}  {{ lakes[n].starting_stage }}  {{ lakes[n].nconn}}  {{ lakes[n].boundname }}{% endfor %}
+  {{ lakes.number[n]}}  {{ lakes.starting_stage[n] }}  {{ lakes.nconn[n]}}  {{ lakes.boundname[n] }}{% endfor %}
 end packagedata
 
 begin connectiondata{% for n in range(0, nconnect) %}

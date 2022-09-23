@@ -1,3 +1,4 @@
+import collections
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, Package, VariableMetaData
@@ -5,17 +6,7 @@ from imod.mf6.pkgbase import BoundaryCondition, Package, VariableMetaData
 connection_types = {"horizontal": 0, "vertical": 1, "embeddedh": 2, "embeddedv": 3}
 
 
-class _Lake:
-    """
-    The Lake_internal class is used for rendering the lake package in jinja.
-    There is no point in instantiating this class as a user.
-    """
 
-    def __init__(self):
-        self.number = 0
-        self.boundname = ""
-        self.starting_stage = 0
-        self.nconn = 0
 
 
 class _Connection:
@@ -303,7 +294,7 @@ class Lake(BoundaryCondition):
         d["lakes"] = lakelist
         d["connections"] = connectionlist
         d["outlets"] = outletlist
-        d["nlakes"] = len(lakelist)
+        d["nlakes"] = len(lakelist.boundname)
         d["nconnect"] = len(connectionlist)
         d["noutlets"] = len(outletlist)
         d["ntables"] = 0
@@ -314,14 +305,11 @@ class Lake(BoundaryCondition):
         This function fills structs representing lakes, connections and outlets for the purpose of rendering
         this package with a jinja template.
         """
-        lakelist = []
-        nlakes = self.dataset["l_number"].size
-        for i in range(0, nlakes):
-            lake = _Lake()
-            lake.boundname = self.dataset["l_boundname"].values[i]
-            lake.number = self.dataset["l_number"].values[i]
-            lake.starting_stage = self.dataset["l_starting_stage"].values[i]
-            lakelist.append(lake)
+        nlakes=len(self.dataset["l_boundname"].values)
+        LakeList =  collections.namedtuple("lakelist", ["number", "boundname", "starting_stage", "nconn"])
+        nconn = [0]*nlakes
+        lakelist= LakeList( self.dataset["l_number"].values,self.dataset["l_boundname"].values, self.dataset["l_starting_stage"].values ,nconn)
+
 
         connectionlist = []
         nconnect = self.dataset["c_lake_no"].size
@@ -373,11 +361,11 @@ class Lake(BoundaryCondition):
         for c in connectionlist:
             lakenumber = c.lake_no
             for i in range(0, nlakes):
-                if lakelist[i].number == lakenumber:
+                if lakelist.number[i] == lakenumber:
                     connections_per_lake[lakenumber] = (
                         connections_per_lake[lakenumber] + 1
                     )
-                    lakelist[i].nconn += 1
+                    lakelist.nconn[i] += 1
                     c.connection_nr = connections_per_lake[lakenumber]
                     break
             else:
