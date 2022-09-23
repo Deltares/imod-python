@@ -60,12 +60,12 @@ def test_lake_rendering(basic_dis):
     connection_lake_number.data = [1, 1, 1, 2, 2, 3]
     connection_type = xr.full_like(connection_array_layout, fill_value=0, dtype=np.str0)
     connection_type.data = [
-        connection_types["VERTICAL"],
-        connection_types["VERTICAL"],
-        connection_types["VERTICAL"],
-        connection_types["HORIZONTAL"],
-        connection_types["HORIZONTAL"],
-        connection_types["EMBEDDEDV"],
+        connection_types["vertical"],
+        connection_types["vertical"],
+        connection_types["vertical"],
+        connection_types["horizontal"],
+        connection_types["horizontal"],
+        connection_types["embeddedv"],
     ]
     connection_bed_leak = xr.full_like(
         connection_array_layout, fill_value=0, dtype=np.float32
@@ -132,12 +132,12 @@ def test_lake_rendering(basic_dis):
         end packagedata
 
         begin connectiondata
-          1 1 3 1 VERTICAL  0.2 -1.0  0.0  -1.0 -1.0
-          1 2 4 1 VERTICAL  0.3 -2.0  0.1  -2.0 -2.0
-          1 3 3 2 VERTICAL  0.4 -3.0  -0.1  -3.0 -3.0
-          2 1 17 1 HORIZONTAL  -1.0 -4.0  0.2  -4.0 -4.0
-          2 2 18 1 HORIZONTAL  -1.0 -5.0  -0.2  -5.0 -5.0
-          3 1 23 1 EMBEDDEDV  -1.0 -6.0  0.0  -6.0 -6.0
+          1 1 3 1 vertical  0.2 -1.0  0.0  -1.0 -1.0
+          1 2 4 1 vertical  0.3 -2.0  0.1  -2.0 -2.0
+          1 3 3 2 vertical  0.4 -3.0  -0.1  -3.0 -3.0
+          2 1 17 1 horizontal  -1.0 -4.0  0.2  -4.0 -4.0
+          2 2 18 1 horizontal  -1.0 -5.0  -0.2  -5.0 -5.0
+          3 1 23 1 embeddedv  -1.0 -6.0  0.0  -6.0 -6.0
         end connectiondata
 
         """

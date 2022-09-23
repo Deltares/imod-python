@@ -2,7 +2,7 @@ import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, Package, VariableMetaData
 
-connection_types = {"HORIZONTAL": 0, "VERTICAL": 1, "EMBEDDEDH": 2, "EMBEDDEDV": 3}
+connection_types = {"horizontal": 0, "vertical": 1, "embeddedh": 2, "embeddedv": 3}
 
 
 class _Lake:
@@ -87,20 +87,20 @@ class Lake(BoundaryCondition):
         be np.nan, the lake-GWF connection conductance is solely a function of aquifer properties in the
         connected GWF cell and lakebed sediments are assumed to be absent.
     c_bottom_elevation: array of floats (xr.DataArray, optional)- dimension number of connections
-        defines the bottom elevation for a HORIZONTAL lake-GWF connection.
+        defines the bottom elevation for a horizontal lake-GWF connection.
         If not provided, will be set to the bottom elevation of the cell it is connected to.
     c_top_elevation:array of floats (xr.DataArray, optional)- dimension number of connections
-        defines the top elevation for a HORIZONTAL lake-GWF connection.
+        defines the top elevation for a horizontal lake-GWF connection.
         If not provided, will be set to the top elevation of the cell it is connected to.
     c_width: array of floats (xr.DataArray, optional)
-        defines the connection face width for a HORIZONTAL lake-GWF connection.
-        connwidth must be greater than zero for a HORIZONTAL lake-GWF connection. Any value can be
-        specified if claktype is VERTICAL, EMBEDDEDH, or EMBEDDEDV. If not set, will be set to dx or dy.
+        defines the connection face width for a horizontal lake-GWF connection.
+        connwidth must be greater than zero for a horizontal lake-GWF connection. Any value can be
+        specified if claktype is vertical, embeddedh, or embeddedv. If not set, will be set to dx or dy.
     c_length: array of floats (xr.DataArray, optional)
         defines the distance between the connected GWF cellid node and the lake
-        for a HORIZONTAL, EMBEDDEDH, or EMBEDDEDV lake-GWF connection. connlen must be greater than
-        zero for a HORIZONTAL, EMBEDDEDH, or EMBEDDEDV lake-GWF connection. Any value can be specified
-        if claktype is VERTICAL. If not set, will be set to dx or dy.
+        for a horizontal, embeddedh, or embeddedv lake-GWF connection. connlen must be greater than
+        zero for a horizontal, embeddedh, or embeddedv lake-GWF connection. Any value can be specified
+        if claktype is vertical. If not set, will be set to dx or dy.
 
 
     o_lakein: array of integers (xr.DataArray, optional)

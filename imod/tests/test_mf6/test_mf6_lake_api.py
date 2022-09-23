@@ -21,7 +21,7 @@ def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
 
 def create_lakelake(idomain, starting_stage, boundname, lake_cells):
     connection_type = create_gridcovering_array(
-        idomain, lake_cells, lak.connection_types["HORIZONTAL"], np.int32
+        idomain, lake_cells, lak.connection_types["horizontal"], np.int32
     )
     bed_leak = create_gridcovering_array(idomain, lake_cells, 0.2, np.float32)
     top_elevation = create_gridcovering_array(idomain, lake_cells, 0.3, np.float32)
@@ -84,12 +84,12 @@ def test_lake_api(basic_dis):
         end packagedata
 
         begin connectiondata
-          1 1 1 2 2 HORIZONTAL  0.2 0.4  0.3  0.6 0.5
-          1 2 1 2 3 HORIZONTAL  0.2 0.4  0.3  0.6 0.5
-          1 3 1 3 3 HORIZONTAL  0.2 0.4  0.3  0.6 0.5
-          2 1 1 5 5 HORIZONTAL  0.2 0.4  0.3  0.6 0.5
-          2 2 1 5 6 HORIZONTAL  0.2 0.4  0.3  0.6 0.5
-          2 3 1 6 6 HORIZONTAL  0.2 0.4  0.3  0.6 0.5
+          1 1 1 2 2 horizontal  0.2 0.4  0.3  0.6 0.5
+          1 2 1 2 3 horizontal  0.2 0.4  0.3  0.6 0.5
+          1 3 1 3 3 horizontal  0.2 0.4  0.3  0.6 0.5
+          2 1 1 5 5 horizontal  0.2 0.4  0.3  0.6 0.5
+          2 2 1 5 6 horizontal  0.2 0.4  0.3  0.6 0.5
+          2 3 1 6 6 horizontal  0.2 0.4  0.3  0.6 0.5
         end connectiondata
 
         begin outlets
