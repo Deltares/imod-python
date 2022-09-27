@@ -446,3 +446,30 @@ def test_quoting(tmp_path):
     #   and will infer the wrong type when seeing quotes...
     assert firstrow == '1.0,3.0,2000-01-01,"abc",1\n'
     assert secondrow == '2.0,4.0,2000-01-02,"d e f",2\n'
+
+
+def test_alternative_quotes_assoc(tmp_path):
+    # Include the quotes in the metadata!
+    path = tmp_path / "alternative-quotes.txt"
+    with open(path, "w") as f:
+        f.writelines(
+            [
+                "3\n",  # nrow
+                "3,2\n",  # ncol, itype
+                "'column_A', -9999.9\n",
+                "'column_B', -9999.9\n",
+                "'column_C', -9999.9\n",
+                "1.0, 1.0, 1.0\n" "2.0, 2.0, -9999.9\n" "3.0, -9999.9, 3.0\n",
+            ]
+        )
+
+    expected = pd.DataFrame.from_dict(
+        {
+            "column_A": [1.0, 2.0, 3.0],
+            "column_B": [1.0, 2.0, np.nan],
+            "column_C": [1.0, np.nan, 3.0],
+        }
+    )
+
+    assoc_df = ipf.read_associated(path, kwargs={"quotechar": "'"})
+    pd.testing.assert_frame_equal(assoc_df, expected, check_like=True)
