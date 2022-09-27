@@ -35,6 +35,9 @@ def _write_chunks(a, pattern, d, nodata, dtype, write):
         if extradims:
             stacked = a.stack(idf=extradims)
             for coordvals, a_yx in list(stacked.groupby("idf")):
+                # Groupby sometimes returns an extra 1-sized "idf" dim
+                if "idf" in a_yx.dims:
+                    a_yx = a_yx.squeeze("idf")
                 # set the right layer/timestep/etc in the dict to make the filename
                 d.update(dict(zip(extradims, coordvals)))
                 fn = util.compose(d, pattern)
