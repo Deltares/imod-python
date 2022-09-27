@@ -292,3 +292,28 @@ def test_nodata(test_da, tmp_path):
         a = np.fromfile(f, np.float32, size)
 
     assert not np.isnan(a).any()
+
+
+def test_save_open_arbitrary_4D(tmp_path):
+    da = xr.DataArray(
+        data=np.ones((5, 3, 3, 2)),
+        coords={
+            "bndvalue": np.arange(5.0),
+            "porosity": ["0low", "1mid", "2high"],
+            "y": [2.5, 1.5, 0.5],
+            "x": [0.0, 2.0],
+        },
+        dims=["bndvalue", "porosity", "y", "x"],
+    )
+
+    idf.save(
+        tmp_path / "interface", da, pattern="{name}_{bndvalue:0f}_{porosity}{extension}"
+    )
+    back = idf.open(tmp_path / "interface*.idf", pattern="{name}_{bndvalue}_{porosity}")
+
+    # Test whether it has worked properly, value testing is annoying:
+    # coordinates may be shuffled since IDF doesn't provide any conventions
+    # here.
+    assert isinstance(back, xr.DataArray)
+    # Might get shuffled dimensions for the same reason.
+    assert set(da.dims) == set(back.dims)
