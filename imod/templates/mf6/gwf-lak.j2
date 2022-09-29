@@ -40,11 +40,11 @@ begin packagedata{% for n in range(0, nlakes) %}
 end packagedata
 
 begin connectiondata{% for n in range(0, nconnect) %}
-  {{connections[n].lake_no}} {{connections[n].connection_nr}} {{connections[n].cell_id_row_or_index}} {%- if connections[n].cell_id_col is not none %} {{connections[n].cell_id_col}} {%- endif %} {{connections[n].cell_id_layer}} {{ connections[n].connection_type }}  {{ connections[n].bed_leak}} {{connections[n].bottom_elevation  }}  {{ connections[n].top_elevation }}  {{connections[n].connection_width  }} {{connections[n].connection_length }}{% endfor %}
+  {{connections.lake_no[n]}} {{connections.connection_nr[n]}} {{connections.cell_id_row_or_index[n]}} {%- if connections.cell_id_col is not none %} {{connections.cell_id_col[n]}} {%- endif %} {{connections.cell_id_layer[n]}} {{ connections.connection_type[n] }}  {{ connections.bed_leak[n]}} {{connections.bottom_elevation[n]  }}  {{ connections.top_elevation[n] }}  {{connections.connection_width[n]  }} {{connections.connection_length[n] }}{% endfor %}
 end connectiondata
 
 {% if noutlets > 0 -%}
 begin outlets{% for n in range(0, noutlets) %}
-  {{outlets[n].lake_in}} {{outlets[n].lake_out}} {{outlets[n].couttype}} {{outlets[n].invert}} {{outlets[n].roughness}} {{outlets[n].width}} {{outlets[n].slope}}{% endfor %}
+  {{outlets.lake_in[n]}} {{outlets.lake_out[n]}} {{outlets.couttype[n]}} {{outlets.invert[n]}} {{outlets.roughness[n]}} {{outlets.width[n]}} {{outlets.slope[n]}}{% endfor %}
 end outlets
 {% endif -%}

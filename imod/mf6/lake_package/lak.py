@@ -4,30 +4,7 @@ import numpy as np
 from imod.mf6.pkgbase import BoundaryCondition, Package, VariableMetaData
 
 connection_types = {"horizontal": 0, "vertical": 1, "embeddedh": 2, "embeddedv": 3}
-
-
-
-
-
-class _Connection:
-    """
-    The Connection_internal class is used for rendering the lake package in jinja.
-    There is no point in instantiating this class as a user.
-    """
-
-    def __init__(self):
-        self.lake_no = 0
-        self.connection_nr = 0
-        self.cell_id_row_or_index = 0
-        self.cell_id_col = 0
-        self.cell_id_layer = 0
-        self.connection_type = ""
-        self.bed_leak = 0
-        self.bottom_elevation = 0
-        self.top_elevation = 0
-        self.connection_width = 0
-        self.connection_length = 0
-
+inverse_connection_types = {v: k for k, v in connection_types.items()}
 
 class _Outlet:
     """
@@ -310,55 +287,44 @@ class Lake(BoundaryCondition):
         nconn = [0]*nlakes
         lakelist= LakeList( self.dataset["l_number"].values,self.dataset["l_boundname"].values, self.dataset["l_starting_stage"].values ,nconn)
 
+        ConnectionList =  collections.namedtuple("connectionlist", ["lake_no", "cell_id_row_or_index", "cell_id_col", "cell_id_layer", "connection_type", "bed_leak", "bottom_elevation", "top_elevation", "connection_width", "connection_length"])
+        clakeno = self.dataset["c_lake_no"].values.astype(int)
+        ccellid = self.dataset["c_cell_id_row_or_index"].values.astype(int)
+        ccelcol = None
+        if self.dataset["c_cell_id_col"].values[()] is not None:
+            ccelcol = self.dataset["c_cell_id_col"].values.astype(int)
+        ccellayer = self.dataset["c_cell_id_layer"].values.astype(int)
 
-        connectionlist = []
-        nconnect = self.dataset["c_lake_no"].size
-        for i in range(0, nconnect):
-            connection = _Connection()
-            connection.lake_no = int(self.dataset["c_lake_no"].values[i])
-            connection.cell_id_row_or_index = int(
-                self.dataset["c_cell_id_row_or_index"].values[i]
-            )
-            connection.cell_id_col = None
-            if self.dataset["c_cell_id_col"].values[()] is not None:
-                connection.cell_id_col = int(self.dataset["c_cell_id_col"].values[i])
-            connection.cell_id_layer = int(self.dataset["c_cell_id_layer"].values[i])
+        cbed_leak = self.dataset["c_bed_leak"].values
+        cbottom_elevation = self.dataset["c_bottom_elevation"].values
+        ctop_elevation = self.dataset["c_top_elevation"].values
+        cwidth = self.dataset["c_width"].values
+        clength = self.dataset["c_length"].values
+        ctype = np.vectorize(inverse_connection_types.get)(self.dataset["c_type"].values)
+        connectionlist = ConnectionList(
+           clakeno ,ccellid,ccelcol, ccellayer,ctype,cbed_leak, cbottom_elevation,ctop_elevation,cwidth,clength)
+        nconnection = len(connectionlist[0])
 
-            key = [
-                k
-                for k, v in connection_types.items()
-                if v == self.dataset["c_type"].values[i]
-            ][0]
-            connection.connection_type = key
-
-            connection.bed_leak = self.dataset["c_bed_leak"].values[i]
-            connection.bottom_elevation = self.dataset["c_bottom_elevation"].values[i]
-            connection.top_elevation = self.dataset["c_top_elevation"].values[i]
-            connection.connection_width = self.dataset["c_width"].values[i]
-            connection.connection_length = self.dataset["c_length"].values[i]
-            connectionlist.append(connection)
-
-        outletlist = []
-
+        OutletList =  collections.namedtuple("outletlist", ["lake_in", "lake_out", "couttype", "invert", "roughness", "width", "slope"])
+        clakeno = self.dataset["c_lake_no"].values.astype(int)
+        outletlist = None
         if self._valid(self.dataset["o_lakein"].values[()]):
-            noutlet = self.dataset["o_lakein"].size
-            for i in range(0, noutlet):
-                outlet = _Outlet()
-                outlet.lake_in = int(self.dataset["o_lakein"].values[i])
-                outlet.lake_out = int(self.dataset["o_lakeout"].values[i])
-                outlet.couttype = self.dataset["o_couttype"].values[i]
-                outlet.invert = self.dataset["o_invert"].values[i]
-                outlet.roughness = self.dataset["o_roughness"].values[i]
-                outlet.width = self.dataset["o_width"].values[i]
-                outlet.slope = self.dataset["o_slope"].values[i]
-                outletlist.append(outlet)
+            outletlist = OutletList(self.dataset["o_lakein"].values.astype(int),
+                self.dataset["o_lakeout"].values.astype(int),
+                self.dataset["o_couttype"].values,
+                self.dataset["o_invert"].values,
+                self.dataset["o_roughness"].values,
+                self.dataset["o_width"].values,
+                self.dataset["o_slope"].values )
+
+
 
         # count connections per lake. FIll in the nconn attribute of the lake.
         # also fill in the connection number (of each connection in each lake)
         connections_per_lake = {}
         for i in range(1, nlakes + 1):
             connections_per_lake[i] = 0
-        for c in connectionlist:
+        for iconnection in range(0,nconnection):
             lakenumber = c.lake_no
             for i in range(0, nlakes):
                 if lakelist.number[i] == lakenumber:
