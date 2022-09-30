@@ -13,7 +13,7 @@ def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
     """
     result = xr.full_like(idomain, fill_value=np.nan, dtype=dtype)
     for cell in lake_cells:
-        result.values[cell[0], cell[1], cell[2]] = fillvalue
+        result[{"layer":cell[0] -1, "y":cell[1]-1,"x":cell[2]-1}]= fillvalue
     return result
 
 

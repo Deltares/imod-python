@@ -79,20 +79,6 @@ class LakeLake:
         self.auxiliar = auxiliary
 
     @classmethod
-    def get_subdomain_indices(cls, whole_domain_coords, subdomain_coords):
-        """
-        returns a vector of indices of the (real world) coordinates of subdomain_coords
-        in whole_domain_coords.
-        Example: if whole_domain_cords is (1.1, 2.2, 3.3, 4.4) and subdomain_cords is (2.2,3.3)
-        then this function returns (1,2)
-        """
-        result = []
-        list_whole_domain_coords = list(whole_domain_coords)
-        for i in range(0, len(subdomain_coords)):
-            result.append(list_whole_domain_coords.index(subdomain_coords[i]))
-        return result
-
-    @classmethod
     def get_1d_array(cls, grid_array):
         """
         this method takes as input an xarray defined over the whole domain. It has missing values
@@ -101,20 +87,15 @@ class LakeLake:
         """
         dummy = grid_array.sel()
 
+        dummy.coords["x"]= np.arange(1, len(dummy.x)+1)
+        dummy.coords["y"]= np.arange(1, len(dummy.y)+1)
         dummy = dummy.where(dummy.notnull(), drop=True)
-        x_indexes = cls.get_subdomain_indices(grid_array.x, dummy.x)
-        y_indexes = cls.get_subdomain_indices(grid_array.y, dummy.y)
-        layer_indexes = cls.get_subdomain_indices(grid_array.layer, dummy.layer)
-        dummy = dummy.assign_coords(
-            {"x": x_indexes, "y": y_indexes, "layer": layer_indexes}
-        )
-
         dummy = dummy.stack(z=("x", "y", "layer"))
         dummy = dummy.dropna("z")
 
-        x_values = dummy.z.x.values
-        y_values = dummy.z.y.values
-        layer_values = dummy.z.layer.values
+        x_values = dummy.x.values
+        y_values = dummy.y.values
+        layer_values = dummy.layer.values
         array_values = dummy.values
         return x_values, y_values, layer_values, array_values
 
