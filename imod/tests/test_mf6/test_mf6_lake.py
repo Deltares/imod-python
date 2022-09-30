@@ -34,7 +34,7 @@ def test_lake_rendering(basic_dis):
     starting_stages.data = lake_starting_stages
 
     lake_numbers = xr.full_like(lake_array_layout, fill_value=0, dtype=np.int64)
-    lake_numbers.data =  np.arange(1, nlake + 1)
+    lake_numbers.data = np.arange(1, nlake + 1)
 
     # create 6 connections. we assume an unstructured grid, so there are 2 indexes per cell (index and layer)
     # instead of the usual 3 ( row, col, layer)
@@ -58,15 +58,19 @@ def test_lake_rendering(basic_dis):
         connection_array_layout, fill_value=0, dtype=np.float64
     )
     connection_lake_number.data = np.float64([1, 1, 1, 2, 2, 3])
-    connection_type = xr.full_like(connection_array_layout, fill_value=0, dtype=np.float64)
-    connection_type.data =  np.float64([
-        connection_types["vertical"],
-        connection_types["vertical"],
-        connection_types["vertical"],
-        connection_types["horizontal"],
-        connection_types["horizontal"],
-        connection_types["embeddedv"],
-    ])
+    connection_type = xr.full_like(
+        connection_array_layout, fill_value=0, dtype=np.float64
+    )
+    connection_type.data = np.float64(
+        [
+            connection_types["vertical"],
+            connection_types["vertical"],
+            connection_types["vertical"],
+            connection_types["horizontal"],
+            connection_types["horizontal"],
+            connection_types["embeddedv"],
+        ]
+    )
     connection_bed_leak = xr.full_like(
         connection_array_layout, fill_value=0, dtype=np.float64
     )

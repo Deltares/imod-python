@@ -1,4 +1,5 @@
 import collections
+
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, Package, VariableMetaData
@@ -264,20 +265,41 @@ class Lake(BoundaryCondition):
         d["ntables"] = 0
         return self._template.render(d)
 
-
     def get_structures_from_arrays(self):
         """
         This function fills structs representing lakes, connections and outlets for the purpose of rendering
         this package with a jinja template.
         """
-        nlakes=len(self.dataset["l_boundname"].values)
-        LakeList =  collections.namedtuple("lakelist", ["number", "boundname", "starting_stage", "nconn"])
-        nconn = [0]*nlakes
-        lakelist= LakeList( self.dataset["l_number"].values,self.dataset["l_boundname"].values, self.dataset["l_starting_stage"].values ,nconn)
+        nlakes = len(self.dataset["l_boundname"].values)
+        LakeList = collections.namedtuple(
+            "lakelist", ["number", "boundname", "starting_stage", "nconn"]
+        )
+        nconn = [0] * nlakes
+        lakelist = LakeList(
+            self.dataset["l_number"].values,
+            self.dataset["l_boundname"].values,
+            self.dataset["l_starting_stage"].values,
+            nconn,
+        )
 
-        ConnectionList =  collections.namedtuple("connectionlist", ["lake_no","connection_nr", "cell_id_row_or_index", "cell_id_col", "cell_id_layer", "connection_type", "bed_leak", "bottom_elevation", "top_elevation", "connection_width", "connection_length"])
+        ConnectionList = collections.namedtuple(
+            "connectionlist",
+            [
+                "lake_no",
+                "connection_nr",
+                "cell_id_row_or_index",
+                "cell_id_col",
+                "cell_id_layer",
+                "connection_type",
+                "bed_leak",
+                "bottom_elevation",
+                "top_elevation",
+                "connection_width",
+                "connection_length",
+            ],
+        )
         clakeno = self.dataset["c_lake_no"].values.astype(int)
-        conn_number = [0]*len(clakeno)
+        conn_number = [0] * len(clakeno)
         ccellid = self.dataset["c_cell_id_row_or_index"].values.astype(int)
         ccelcol = None
         if self.dataset["c_cell_id_col"].values[()] is not None:
@@ -289,27 +311,51 @@ class Lake(BoundaryCondition):
         ctop_elevation = self.dataset["c_top_elevation"].values
         cwidth = self.dataset["c_width"].values
         clength = self.dataset["c_length"].values
-        ctype = np.vectorize(inverse_connection_types.get)(self.dataset["c_type"].values)
+        ctype = np.vectorize(inverse_connection_types.get)(
+            self.dataset["c_type"].values
+        )
         connectionlist = ConnectionList(
-           clakeno ,conn_number, ccellid,ccelcol, ccellayer,ctype,cbed_leak, cbottom_elevation,ctop_elevation,cwidth,clength)
-
+            clakeno,
+            conn_number,
+            ccellid,
+            ccelcol,
+            ccellayer,
+            ctype,
+            cbed_leak,
+            cbottom_elevation,
+            ctop_elevation,
+            cwidth,
+            clength,
+        )
 
         self.fill_in_connection_number(lakelist, connectionlist)
 
-        OutletList =  collections.namedtuple("outletlist", ["lake_in", "lake_out", "couttype", "invert", "roughness", "width", "slope"])
+        OutletList = collections.namedtuple(
+            "outletlist",
+            [
+                "lake_in",
+                "lake_out",
+                "couttype",
+                "invert",
+                "roughness",
+                "width",
+                "slope",
+            ],
+        )
         clakeno = self.dataset["c_lake_no"].values.astype(int)
         outletlist = None
         if self._valid(self.dataset["o_lakein"].values[()]):
-            outletlist = OutletList(self.dataset["o_lakein"].values.astype(int),
+            outletlist = OutletList(
+                self.dataset["o_lakein"].values.astype(int),
                 self.dataset["o_lakeout"].values.astype(int),
                 self.dataset["o_couttype"].values,
                 self.dataset["o_invert"].values,
                 self.dataset["o_roughness"].values,
                 self.dataset["o_width"].values,
-                self.dataset["o_slope"].values )
+                self.dataset["o_slope"].values,
+            )
 
         return lakelist, connectionlist, outletlist
-
 
     def fill_in_connection_number(self, lakelist, connectionlist):
 
@@ -322,13 +368,13 @@ class Lake(BoundaryCondition):
         nr_connections = len(connection_numbers)
         connection_lake_number = connectionlist.lake_no
 
-        for i in range(0, nr_lakes ):
+        for i in range(0, nr_lakes):
             connections_per_lake[i] = 0
 
-        for iconnection in range(0,nr_connections):
+        for iconnection in range(0, nr_connections):
             lakenumber = connection_lake_number[iconnection]
-            connections_per_lake[lakenumber-1] += 1
-            connection_numbers[iconnection] = connections_per_lake[lakenumber-1]
+            connections_per_lake[lakenumber - 1] += 1
+            connection_numbers[iconnection] = connections_per_lake[lakenumber - 1]
 
         return
 

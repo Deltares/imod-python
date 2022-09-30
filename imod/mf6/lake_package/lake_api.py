@@ -87,8 +87,8 @@ class LakeLake:
         """
         dummy = grid_array.sel()
 
-        dummy.coords["x"]= np.arange(1, len(dummy.x)+1)
-        dummy.coords["y"]= np.arange(1, len(dummy.y)+1)
+        dummy.coords["x"] = np.arange(1, len(dummy.x) + 1)
+        dummy.coords["y"] = np.arange(1, len(dummy.y) + 1)
         dummy = dummy.where(dummy.notnull(), drop=True)
         dummy = dummy.stack(z=("x", "y", "layer"))
         dummy = dummy.dropna("z")
