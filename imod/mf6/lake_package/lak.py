@@ -6,21 +6,6 @@ from imod.mf6.pkgbase import BoundaryCondition, Package, VariableMetaData
 connection_types = {"horizontal": 0, "vertical": 1, "embeddedh": 2, "embeddedv": 3}
 inverse_connection_types = {v: k for k, v in connection_types.items()}
 
-class _Outlet:
-    """
-    The Outlet_internal class is used for rendering the lake package in jinja.
-    There is no point in instantiating this class as a user.
-    """
-
-    def __init__(self):
-        self.lake_in = 0
-        self.lake_out = 0
-        self.couttype = 0
-        self.invert = 0
-        self.roughness = 0
-        self.width = 0
-        self.slope = 0
-
 
 class Lake(BoundaryCondition):
     """
@@ -272,10 +257,13 @@ class Lake(BoundaryCondition):
         d["connections"] = connectionlist
         d["outlets"] = outletlist
         d["nlakes"] = len(lakelist.boundname)
-        d["nconnect"] = len(connectionlist)
-        d["noutlets"] = len(outletlist)
+        d["nconnect"] = len(connectionlist.lake_no)
+        d["noutlets"] = 0
+        if outletlist is not None:
+            d["noutlets"] = len(outletlist.lake_in)
         d["ntables"] = 0
         return self._template.render(d)
+
 
     def get_structures_from_arrays(self):
         """
@@ -287,8 +275,9 @@ class Lake(BoundaryCondition):
         nconn = [0]*nlakes
         lakelist= LakeList( self.dataset["l_number"].values,self.dataset["l_boundname"].values, self.dataset["l_starting_stage"].values ,nconn)
 
-        ConnectionList =  collections.namedtuple("connectionlist", ["lake_no", "cell_id_row_or_index", "cell_id_col", "cell_id_layer", "connection_type", "bed_leak", "bottom_elevation", "top_elevation", "connection_width", "connection_length"])
+        ConnectionList =  collections.namedtuple("connectionlist", ["lake_no","connection_nr", "cell_id_row_or_index", "cell_id_col", "cell_id_layer", "connection_type", "bed_leak", "bottom_elevation", "top_elevation", "connection_width", "connection_length"])
         clakeno = self.dataset["c_lake_no"].values.astype(int)
+        conn_number = [0]*len(clakeno)
         ccellid = self.dataset["c_cell_id_row_or_index"].values.astype(int)
         ccelcol = None
         if self.dataset["c_cell_id_col"].values[()] is not None:
@@ -302,8 +291,10 @@ class Lake(BoundaryCondition):
         clength = self.dataset["c_length"].values
         ctype = np.vectorize(inverse_connection_types.get)(self.dataset["c_type"].values)
         connectionlist = ConnectionList(
-           clakeno ,ccellid,ccelcol, ccellayer,ctype,cbed_leak, cbottom_elevation,ctop_elevation,cwidth,clength)
-        nconnection = len(connectionlist[0])
+           clakeno ,conn_number, ccellid,ccelcol, ccellayer,ctype,cbed_leak, cbottom_elevation,ctop_elevation,cwidth,clength)
+
+
+        self.fill_in_connection_number(lakelist, connectionlist)
 
         OutletList =  collections.namedtuple("outletlist", ["lake_in", "lake_out", "couttype", "invert", "roughness", "width", "slope"])
         clakeno = self.dataset["c_lake_no"].values.astype(int)
@@ -317,29 +308,29 @@ class Lake(BoundaryCondition):
                 self.dataset["o_width"].values,
                 self.dataset["o_slope"].values )
 
+        return lakelist, connectionlist, outletlist
 
+
+    def fill_in_connection_number(self, lakelist, connectionlist):
 
         # count connections per lake. FIll in the nconn attribute of the lake.
         # also fill in the connection number (of each connection in each lake)
-        connections_per_lake = {}
-        for i in range(1, nlakes + 1):
-            connections_per_lake[i] = 0
-        for iconnection in range(0,nconnection):
-            lakenumber = c.lake_no
-            for i in range(0, nlakes):
-                if lakelist.number[i] == lakenumber:
-                    connections_per_lake[lakenumber] = (
-                        connections_per_lake[lakenumber] + 1
-                    )
-                    lakelist.nconn[i] += 1
-                    c.connection_nr = connections_per_lake[lakenumber]
-                    break
-            else:
-                raise ValueError(
-                    "could not find lake with lake number specified for connection"
-                )
+        connections_per_lake = lakelist.nconn
+        nr_lakes = len(connections_per_lake)
 
-        return lakelist, connectionlist, outletlist
+        connection_numbers = connectionlist.connection_nr
+        nr_connections = len(connection_numbers)
+        connection_lake_number = connectionlist.lake_no
+
+        for i in range(0, nr_lakes ):
+            connections_per_lake[i] = 0
+
+        for iconnection in range(0,nr_connections):
+            lakenumber = connection_lake_number[iconnection]
+            connections_per_lake[lakenumber-1] += 1
+            connection_numbers[iconnection] = connections_per_lake[lakenumber-1]
+
+        return
 
     def _package_data_to_sparse(self):
         return
