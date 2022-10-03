@@ -13,73 +13,73 @@ class Lake(BoundaryCondition):
 
     Parameters
     ----------
-    l_number: array of integers (xr.DataArray)- dimension number of lakes:
+    lake_number: array of integers (xr.DataArray)- dimension number of lakes:
         integer used as identifier for the lake.
-    l_starting_stage: array of floats (xr.DataArray)- dimension number of lakes:
+    lake_starting_stage: array of floats (xr.DataArray)- dimension number of lakes:
         starting lake stage.
-    l_boundname:  array of strings (xr.DataArray)- dimension number of lakes:
+    lake_boundname:  array of strings (xr.DataArray)- dimension number of lakes:
         name of the lake
 
-    c_lake_no: array of floats (xr.DataArray)- dimension number of connections
+    connection_lake_no: array of floats (xr.DataArray)- dimension number of connections
         lake number for the current lake-to-aquifer connection.
-    c_cell_id_row_or_index: array of floats (xr.DataArray)- dimension number of connections
+    connection_cell_id_row_or_index: array of floats (xr.DataArray)- dimension number of connections
         in case of a structured grid: gridrow number of aquifer cell for current lake-to aquifer connection
         in case of an unstructured grid: cell index of aquifer cell for current lake-to aquifer connection
 
-    c_cell_id_col: array of floats (xr.DataArray)- dimension number of connections
+    connection_cell_id_col: array of floats (xr.DataArray)- dimension number of connections
         in case of a structured grid: grid-column number of aquifer cell for current lake-to aquifer connection
         in case of an unstructured grid: not used. set this argument to None
 
-    c_cell_id_layer: array of floats (xr.DataArray)- dimension number of connections
+    connection_cell_id_layer: array of floats (xr.DataArray)- dimension number of connections
          gridrow number of aquifer cell for current lake-to aquifer connection
-    c_type: array of strings (xr.DataArray)- dimension number of connections
+    connection_type: array of strings (xr.DataArray)- dimension number of connections
         indicates if connection is horizontal, vertical, embeddedH or embeddedV
-    c_bed_leak: array of floats (xr.DataArray)- dimension number of connections
+    connection_bed_leak: array of floats (xr.DataArray)- dimension number of connections
         defines the bed leakance for the lake-GWF connection.
         BEDLEAK must be greater than or equal to zero or specified to be np.nan. If BEDLEAK is specified to
         be np.nan, the lake-GWF connection conductance is solely a function of aquifer properties in the
         connected GWF cell and lakebed sediments are assumed to be absent.
-    c_bottom_elevation: array of floats (xr.DataArray, optional)- dimension number of connections
+    connection_bottom_elevation: array of floats (xr.DataArray, optional)- dimension number of connections
         defines the bottom elevation for a horizontal lake-GWF connection.
         If not provided, will be set to the bottom elevation of the cell it is connected to.
-    c_top_elevation:array of floats (xr.DataArray, optional)- dimension number of connections
+    connection_top_elevation:array of floats (xr.DataArray, optional)- dimension number of connections
         defines the top elevation for a horizontal lake-GWF connection.
         If not provided, will be set to the top elevation of the cell it is connected to.
-    c_width: array of floats (xr.DataArray, optional)
+    connection_width: array of floats (xr.DataArray, optional)
         defines the connection face width for a horizontal lake-GWF connection.
         connwidth must be greater than zero for a horizontal lake-GWF connection. Any value can be
         specified if claktype is vertical, embeddedh, or embeddedv. If not set, will be set to dx or dy.
-    c_length: array of floats (xr.DataArray, optional)
+    connection_length: array of floats (xr.DataArray, optional)
         defines the distance between the connected GWF cellid node and the lake
         for a horizontal, embeddedh, or embeddedv lake-GWF connection. connlen must be greater than
         zero for a horizontal, embeddedh, or embeddedv lake-GWF connection. Any value can be specified
         if claktype is vertical. If not set, will be set to dx or dy.
 
 
-    o_lakein: array of integers (xr.DataArray, optional)
+    outlet_lakein: array of integers (xr.DataArray, optional)
         integer defining the lake number that outlet is connected to. Must be
         greater than zero.
-    o_lakeout: array of integers (xr.DataArray, optional)
+    outlet_lakeout: array of integers (xr.DataArray, optional)
          integer value that defines the lake number that outlet discharge from lake outlet OUTLETNO
         is routed to. Must be greater than or equal to zero.
         If zero, outlet discharge from lake outlet OUTLETNO is discharged to an external
         boundary.
-    o_couttype: array of string (xr.DataArray, optional)
+    outlet_couttype: array of string (xr.DataArray, optional)
         character string that defines the outlet type for the outlet OUTLETNO. Possible
         strings include: SPECIFIED–character keyword to indicate the outlet is defined as a specified
         flow. MANNING–character keyword to indicate the outlet is defined using Manning’s equation.
         WEIR–character keyword to indicate the outlet is defined using a sharp weir equation.
-    o_invert: array of floats (xr.DataArray, optional):
+    outlet_invert: array of floats (xr.DataArray, optional):
         float or character value that defines the invert elevation for the lake outlet. A specified
         INVERT value is only used for active lakes if outlet_type for lake outlet OUTLETNO is not
         SPECIFIED.
-    o_roughness: array of floats (xr.DataArray, optional)
+    outlet_roughness: array of floats (xr.DataArray, optional)
         defines the roughness coefficient for the lake outlet. Any value can be specified
         if outlet_type is not MANNING.
-    o_width: array of floats (xr.DataArray, optional)
+    outlet_width: array of floats (xr.DataArray, optional)
         float or character value that defines the width of the lake outlet. A specified WIDTH value is
         only used for active lakes if outlet_type for lake outlet OUTLETNO is not SPECIFIED.
-    o_slope: array of floats (xr.DataArray, optional)
+    outlet_slope: array of floats (xr.DataArray, optional)
         float or character value that defines the bed slope for the lake outlet. A specified SLOPE value is
         only used for active lakes if outlet_type for lake outlet OUTLETNO is MANNING.
 
@@ -133,26 +133,26 @@ class Lake(BoundaryCondition):
     _pkg_id = "lak"
     _template = Package._initialize_template(_pkg_id)
     _metadata_dict = {
-        "l_number": VariableMetaData(np.integer),
-        "l_starting_stage": VariableMetaData(np.floating),
-        "l_boundname": VariableMetaData(np.str0),
-        "c_lake_no": VariableMetaData(np.floating),
-        "c_cell_id_row_or_index": VariableMetaData(np.floating),
-        "c_cell_id_col": VariableMetaData(np.floating),
-        "c_cell_id_layer": VariableMetaData(np.floating),
-        "c_type": VariableMetaData(np.floating),
-        "c_bed_leak": VariableMetaData(np.floating),
-        "c_bottom_elevation": VariableMetaData(np.floating),
-        "c_top_elevation": VariableMetaData(np.floating),
-        "c_width": VariableMetaData(np.floating),
-        "c_length": VariableMetaData(np.floating),
-        "o_lakein": VariableMetaData(np.integer),
-        "o_lakeout": VariableMetaData(np.integer),
-        "o_couttype": VariableMetaData(np.str0),
-        "o_invert": VariableMetaData(np.floating),
-        "o_roughness": VariableMetaData(np.floating),
-        "o_width": VariableMetaData(np.floating),
-        "o_slope": VariableMetaData(np.floating),
+        "lake_number": VariableMetaData(np.integer),
+        "lake_starting_stage": VariableMetaData(np.floating),
+        "lake_boundname": VariableMetaData(np.str0),
+        "connection_lake_no": VariableMetaData(np.floating),
+        "connection_cell_id_row_or_index": VariableMetaData(np.floating),
+        "connection_cell_id_col": VariableMetaData(np.floating),
+        "connection_cell_id_layer": VariableMetaData(np.floating),
+        "connection_type": VariableMetaData(np.floating),
+        "connection_bed_leak": VariableMetaData(np.floating),
+        "connection_bottom_elevation": VariableMetaData(np.floating),
+        "connection_top_elevation": VariableMetaData(np.floating),
+        "connection_width": VariableMetaData(np.floating),
+        "connection_length": VariableMetaData(np.floating),
+        "outlet_lakein": VariableMetaData(np.integer),
+        "outlet_lakeout": VariableMetaData(np.integer),
+        "outlet_couttype": VariableMetaData(np.str0),
+        "outlet_invert": VariableMetaData(np.floating),
+        "outlet_roughness": VariableMetaData(np.floating),
+        "outlet_width": VariableMetaData(np.floating),
+        "outlet_slope": VariableMetaData(np.floating),
     }
 
     connection_types = {"horizontal": 0, "vertical": 1, "embeddedh": 2, "embeddedv": 3}
@@ -161,28 +161,28 @@ class Lake(BoundaryCondition):
     def __init__(
         # lake
         self,
-        l_number,
-        l_starting_stage,
-        l_boundname,
+        lake_number,
+        lake_starting_stage,
+        lake_boundname,
         # connection
-        c_lake_no,
-        c_cell_id_row_or_index,
-        c_cell_id_col,
-        c_cell_id_layer,
-        c_type,
-        c_bed_leak,
-        c_bottom_elevation,
-        c_top_elevation,
-        c_width,
-        c_length,
+        connection_lake_no,
+        connection_cell_id_row_or_index,
+        connection_cell_id_col,
+        connection_cell_id_layer,
+        connection_type,
+        connection_bed_leak,
+        connection_bottom_elevation,
+        connection_top_elevation,
+        connection_width,
+        connection_length,
         # outlet
-        o_lakein=None,
-        o_lakeout=None,
-        o_couttype=None,
-        o_invert=None,
-        o_roughness=None,
-        o_width=None,
-        o_slope=None,
+        outlet_lakein=None,
+        outlet_lakeout=None,
+        outlet_couttype=None,
+        outlet_invert=None,
+        outlet_roughness=None,
+        outlet_width=None,
+        outlet_slope=None,
         # options
         print_input=False,
         print_stage=False,
@@ -197,28 +197,28 @@ class Lake(BoundaryCondition):
         length_conversion=None,
     ):
         super().__init__(locals())
-        self.dataset["l_boundname"] = l_boundname
-        self.dataset["l_number"] = l_number
-        self.dataset["l_starting_stage"] = l_starting_stage
+        self.dataset["lake_boundname"] = lake_boundname
+        self.dataset["lake_number"] = lake_number
+        self.dataset["lake_starting_stage"] = lake_starting_stage
 
-        self.dataset["c_lake_no"] = c_lake_no
-        self.dataset["c_cell_id_row_or_index"] = c_cell_id_row_or_index
-        self.dataset["c_cell_id_col"] = c_cell_id_col
-        self.dataset["c_cell_id_layer"] = c_cell_id_layer
-        self.dataset["c_type"] = c_type
-        self.dataset["c_bed_leak"] = c_bed_leak
-        self.dataset["c_bottom_elevation"] = c_bottom_elevation
-        self.dataset["c_top_elevation"] = c_top_elevation
-        self.dataset["c_width"] = c_width
-        self.dataset["c_length"] = c_length
+        self.dataset["connection_lake_no"] = connection_lake_no
+        self.dataset["connection_cell_id_row_or_index"] = connection_cell_id_row_or_index
+        self.dataset["connection_cell_id_col"] = connection_cell_id_col
+        self.dataset["connection_cell_id_layer"] = connection_cell_id_layer
+        self.dataset["connection_type"] = connection_type
+        self.dataset["connection_bed_leak"] = connection_bed_leak
+        self.dataset["connection_bottom_elevation"] = connection_bottom_elevation
+        self.dataset["connection_top_elevation"] = connection_top_elevation
+        self.dataset["connection_width"] = connection_width
+        self.dataset["connection_length"] = connection_length
 
-        self.dataset["o_lakein"] = o_lakein
-        self.dataset["o_lakeout"] = o_lakeout
-        self.dataset["o_couttype"] = o_couttype
-        self.dataset["o_invert"] = o_invert
-        self.dataset["o_roughness"] = o_roughness
-        self.dataset["o_width"] = o_width
-        self.dataset["o_slope"] = o_slope
+        self.dataset["outlet_lakein"] = outlet_lakein
+        self.dataset["outlet_lakeout"] = outlet_lakeout
+        self.dataset["outlet_couttype"] = outlet_couttype
+        self.dataset["outlet_invert"] = outlet_invert
+        self.dataset["outlet_roughness"] = outlet_roughness
+        self.dataset["outlet_width"] = outlet_width
+        self.dataset["outlet_slope"] = outlet_slope
 
         self.dataset["print_input"] = print_input
         self.dataset["print_stage"] = print_stage
@@ -272,15 +272,15 @@ class Lake(BoundaryCondition):
         This function fills structs representing lakes, connections and outlets for the purpose of rendering
         this package with a jinja template.
         """
-        nlakes = len(self.dataset["l_boundname"].values)
+        nlakes = len(self.dataset["lake_boundname"].values)
         LakeList = collections.namedtuple(
             "lakelist", ["number", "boundname", "starting_stage", "nconn"]
         )
         nconn = [0] * nlakes
         lakelist = LakeList(
-            self.dataset["l_number"].values,
-            self.dataset["l_boundname"].values,
-            self.dataset["l_starting_stage"].values,
+            self.dataset["lake_number"].values,
+            self.dataset["lake_boundname"].values,
+            self.dataset["lake_starting_stage"].values,
             nconn,
         )
 
@@ -300,21 +300,21 @@ class Lake(BoundaryCondition):
                 "connection_length",
             ],
         )
-        clakeno = self.dataset["c_lake_no"].values.astype(int)
+        clakeno = self.dataset["connection_lake_no"].values.astype(int)
         conn_number = [0] * len(clakeno)
-        ccellid = self.dataset["c_cell_id_row_or_index"].values.astype(int)
+        ccellid = self.dataset["connection_cell_id_row_or_index"].values.astype(int)
         ccelcol = None
-        if self.dataset["c_cell_id_col"].values[()] is not None:
-            ccelcol = self.dataset["c_cell_id_col"].values.astype(int)
-        ccellayer = self.dataset["c_cell_id_layer"].values.astype(int)
+        if self.dataset["connection_cell_id_col"].values[()] is not None:
+            ccelcol = self.dataset["connection_cell_id_col"].values.astype(int)
+        ccellayer = self.dataset["connection_cell_id_layer"].values.astype(int)
 
-        cbed_leak = self.dataset["c_bed_leak"].values
-        cbottom_elevation = self.dataset["c_bottom_elevation"].values
-        ctop_elevation = self.dataset["c_top_elevation"].values
-        cwidth = self.dataset["c_width"].values
-        clength = self.dataset["c_length"].values
+        cbed_leak = self.dataset["connection_bed_leak"].values
+        cbottom_elevation = self.dataset["connection_bottom_elevation"].values
+        ctop_elevation = self.dataset["connection_top_elevation"].values
+        cwidth = self.dataset["connection_width"].values
+        clength = self.dataset["connection_length"].values
         ctype = np.vectorize(self.inverse_connection_types.get)(
-            self.dataset["c_type"].values
+            self.dataset["connection_type"].values
         )
         connectionlist = ConnectionList(
             clakeno,
@@ -344,17 +344,17 @@ class Lake(BoundaryCondition):
                 "slope",
             ],
         )
-        clakeno = self.dataset["c_lake_no"].values.astype(int)
+        clakeno = self.dataset["connection_lake_no"].values.astype(int)
         outletlist = None
-        if self._valid(self.dataset["o_lakein"].values[()]):
+        if self._valid(self.dataset["outlet_lakein"].values[()]):
             outletlist = OutletList(
-                self.dataset["o_lakein"].values.astype(int),
-                self.dataset["o_lakeout"].values.astype(int),
-                self.dataset["o_couttype"].values,
-                self.dataset["o_invert"].values,
-                self.dataset["o_roughness"].values,
-                self.dataset["o_width"].values,
-                self.dataset["o_slope"].values,
+                self.dataset["outlet_lakein"].values.astype(int),
+                self.dataset["outlet_lakeout"].values.astype(int),
+                self.dataset["outlet_couttype"].values,
+                self.dataset["outlet_invert"].values,
+                self.dataset["outlet_roughness"].values,
+                self.dataset["outlet_width"].values,
+                self.dataset["outlet_slope"].values,
             )
 
         return lakelist, connectionlist, outletlist

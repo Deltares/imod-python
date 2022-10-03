@@ -3,7 +3,7 @@ import textwrap
 import numpy as np
 import xarray as xr
 
-from imod.mf6.lake_package.lak import Lake, connection_types
+from imod.mf6.lake_package.lak import Lake
 
 
 def test_lake_rendering(basic_dis):
@@ -63,12 +63,12 @@ def test_lake_rendering(basic_dis):
     )
     connection_type.data = np.float64(
         [
-            connection_types["vertical"],
-            connection_types["vertical"],
-            connection_types["vertical"],
-            connection_types["horizontal"],
-            connection_types["horizontal"],
-            connection_types["embeddedv"],
+            Lake.connection_types["vertical"],
+            Lake.connection_types["vertical"],
+            Lake.connection_types["vertical"],
+            Lake.connection_types["horizontal"],
+            Lake.connection_types["horizontal"],
+            Lake.connection_types["embeddedv"],
         ]
     )
     connection_bed_leak = xr.full_like(

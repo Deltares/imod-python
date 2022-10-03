@@ -268,73 +268,73 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[]):
         layer = np.append(layer, lyr)
         lakenumber = np.append(lakenumber, [list_of_lakes[i].lake_number] * len(ctype))
 
-    l_boundname = lake_list_lake_prop_to_xarray_1d(list_of_lakes, "boundname")
-    l_starting_stage = lake_list_lake_prop_to_xarray_1d(list_of_lakes, "starting_stage")
-    l_lakenr = nparray_to_xarray_1d(list(range(1, nrlakes + 1)), "lake_nr")
-    c_lakenumber = nparray_to_xarray_1d(lakenumber, "connection_nr")
-    c_row = nparray_to_xarray_1d(row, "connection_nr")
-    c_col = nparray_to_xarray_1d(col, "connection_nr")
-    c_layer = nparray_to_xarray_1d(layer, "connection_nr")
-    c_type = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "connection_type")
-    c_bed_leak = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "bed_leak")
-    c_bottom_elevation = lake_list_connection_prop_to_xarray_1d(
+    lake_boundname = lake_list_lake_prop_to_xarray_1d(list_of_lakes, "boundname")
+    lake_starting_stage = lake_list_lake_prop_to_xarray_1d(list_of_lakes, "starting_stage")
+    lake_lakenr = nparray_to_xarray_1d(list(range(1, nrlakes + 1)), "lake_nr")
+    connection_lakenumber = nparray_to_xarray_1d(lakenumber, "connection_nr")
+    connection_row = nparray_to_xarray_1d(row, "connection_nr")
+    connection_col = nparray_to_xarray_1d(col, "connection_nr")
+    connection_layer = nparray_to_xarray_1d(layer, "connection_nr")
+    connection_type = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "connection_type")
+    connection_bed_leak = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "bed_leak")
+    connection_bottom_elevation = lake_list_connection_prop_to_xarray_1d(
         list_of_lakes, "bottom_elevation"
     )
-    c_top_elevation = lake_list_connection_prop_to_xarray_1d(
+    connection_top_elevation = lake_list_connection_prop_to_xarray_1d(
         list_of_lakes, "top_elevation"
     )
-    c_width = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "connection_width")
-    c_length = lake_list_connection_prop_to_xarray_1d(
+    connection_width = lake_list_connection_prop_to_xarray_1d(list_of_lakes, "connection_width")
+    connection_length = lake_list_connection_prop_to_xarray_1d(
         list_of_lakes, "connection_length"
     )
-    o_lakein_str = outlet_list_prop_to_xarray_1d(
+    outlet_lakein_str = outlet_list_prop_to_xarray_1d(
         list_of_outlets, "lake_in", "outlet_nr"
     )
-    o_lakeout_str = outlet_list_prop_to_xarray_1d(
+    outlet_lakeout_str = outlet_list_prop_to_xarray_1d(
         list_of_outlets, "lake_out", "outlet_nr"
     )
-    o_lakein = None
-    o_lakeout = None
-    o_couttype = None
-    o_invert = None
-    o_roughness = None
-    o_width = None
-    o_slope = None
+    outlet_lakein = None
+    outlet_lakeout = None
+    outlet_couttype = None
+    outlet_invert = None
+    outlet_roughness = None
+    outlet_width = None
+    outlet_slope = None
     if len(list_of_outlets) > 0:
-        o_lakein = map_names_to_lake_numbers(list_of_lakes, o_lakein_str)
-        o_lakeout = map_names_to_lake_numbers(list_of_lakes, o_lakeout_str)
-        o_couttype = outlet_list_prop_to_xarray_1d(
+        outlet_lakein = map_names_to_lake_numbers(list_of_lakes, outlet_lakein_str)
+        outlet_lakeout = map_names_to_lake_numbers(list_of_lakes, outlet_lakeout_str)
+        outlet_couttype = outlet_list_prop_to_xarray_1d(
             list_of_outlets, "_couttype", "outlet_nr"
         )
-        o_invert = outlet_list_prop_to_xarray_1d(list_of_outlets, "invert", "outlet_nr")
-        o_roughness = outlet_list_prop_to_xarray_1d(
+        outlet_invert = outlet_list_prop_to_xarray_1d(list_of_outlets, "invert", "outlet_nr")
+        outlet_roughness = outlet_list_prop_to_xarray_1d(
             list_of_outlets, "roughness", "outlet_nr"
         )
-        o_width = outlet_list_prop_to_xarray_1d(list_of_outlets, "width", "outlet_nr")
-        o_slope = outlet_list_prop_to_xarray_1d(list_of_outlets, "slope", "outlet_nr")
+        outlet_width = outlet_list_prop_to_xarray_1d(list_of_outlets, "width", "outlet_nr")
+        outlet_slope = outlet_list_prop_to_xarray_1d(list_of_outlets, "slope", "outlet_nr")
 
     result = mf6.Lake(  # lake
-        l_lakenr,
-        l_starting_stage,
-        l_boundname,
+        lake_lakenr,
+        lake_starting_stage,
+        lake_boundname,
         # connection
-        c_lakenumber,
-        c_row,
-        c_col,
-        c_layer,
-        c_type,
-        c_bed_leak,
-        c_bottom_elevation,
-        c_top_elevation,
-        c_width,
-        c_length,
+        connection_lakenumber,
+        connection_row,
+        connection_col,
+        connection_layer,
+        connection_type,
+        connection_bed_leak,
+        connection_bottom_elevation,
+        connection_top_elevation,
+        connection_width,
+        connection_length,
         # outlet
-        o_lakein,
-        o_lakeout,
-        o_couttype,
-        o_invert,
-        o_roughness,
-        o_width,
-        o_slope,
+        outlet_lakein,
+        outlet_lakeout,
+        outlet_couttype,
+        outlet_invert,
+        outlet_roughness,
+        outlet_width,
+        outlet_slope,
     )
     return result
