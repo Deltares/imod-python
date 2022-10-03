@@ -2,8 +2,9 @@ import textwrap
 
 import numpy as np
 import xarray as xr
-import imod.mf6.lake_package.lake_api as lp
+
 import imod
+import imod.mf6.lake_package.lake_api as lp
 
 
 def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
@@ -50,12 +51,8 @@ def create_lakelake(idomain, starting_stage, boundname, lake_cells):
 def test_lake_api(basic_dis):
     idomain, _, _ = basic_dis
 
-    outlet1 = lp.OutletManning(
-        1, "Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0
-    )
-    outlet2 = lp.OutletManning(
-        2, "IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0
-    )
+    outlet1 = lp.OutletManning(1, "Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
+    outlet2 = lp.OutletManning(2, "IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
 
     lake1 = create_lakelake(
         idomain, 11.0, "Naardermeer", [(1, 2, 2), (1, 2, 3), (1, 3, 3)]
@@ -122,15 +119,9 @@ def test_helper_function_nparray_to_xarray_1d():
 
 
 def test_helper_function_outlet_list_prop_to_xarray_1d():
-    outlet1 = lp.OutletManning(
-        1, "Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0
-    )
-    outlet2 = lp.OutletManning(
-        2, "IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0
-    )
-    result = lp.outlet_list_prop_to_xarray_1d(
-        [outlet1, outlet2], "lake_in", "lakeIn"
-    )
+    outlet1 = lp.OutletManning(1, "Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
+    outlet2 = lp.OutletManning(2, "IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
+    result = lp.outlet_list_prop_to_xarray_1d([outlet1, outlet2], "lake_in", "lakeIn")
     assert result.values[0] == "Naardermeer"
     assert result.values[1] == "IJsselmeer"
 

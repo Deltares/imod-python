@@ -5,8 +5,6 @@ import numpy as np
 from imod.mf6.pkgbase import BoundaryCondition, Package, VariableMetaData
 
 
-
-
 class Lake(BoundaryCondition):
     """
     Lake (LAK) Package
@@ -202,7 +200,9 @@ class Lake(BoundaryCondition):
         self.dataset["lake_starting_stage"] = lake_starting_stage
 
         self.dataset["connection_lake_no"] = connection_lake_no
-        self.dataset["connection_cell_id_row_or_index"] = connection_cell_id_row_or_index
+        self.dataset[
+            "connection_cell_id_row_or_index"
+        ] = connection_cell_id_row_or_index
         self.dataset["connection_cell_id_col"] = connection_cell_id_col
         self.dataset["connection_cell_id_layer"] = connection_cell_id_layer
         self.dataset["connection_type"] = connection_type
