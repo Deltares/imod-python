@@ -236,16 +236,12 @@ def map_names_to_lake_numbers(list_of_lakes, list_of_lakenames):
     and we get the list_of_lakenames = ("Naardermeer", "Naardermeer", "Ijsselmeer")
     then the return value is (0,0,1)
     """
+    lake_name_to_number = {}
+    for j in range(0, len(list_of_lakes)):
+        lake_name_to_number[list_of_lakes[j].boundname] = list_of_lakes[j].lake_number
 
-    result = [-1] * len(list_of_lakenames)
-    for i in range(0, len(list_of_lakenames)):
-        lakename = list_of_lakenames[i]
-        for j in range(0, len(list_of_lakes)):
-            if list_of_lakes[j].boundname == lakename:
-                result[i] = list_of_lakes[j].lake_number
-                break
-        else:
-            raise ValueError("could not find a lake with name {}".format(lakename))
+    result = [lake_name_to_number[lake_name] for lake_name in list_of_lakenames.values]
+
     return result
 
 
