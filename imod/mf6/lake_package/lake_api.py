@@ -165,17 +165,17 @@ class OutletSpecified(OutletBase):
         self.rate = rate
 
 
-def nparray_to_xarray_1d(list, dimension_name):
+def nparray_to_xarray_1d(numpy_array_1d, dimension_name):
     """
     This function creates a 1-dimensional xarray.DataArray with values
-    equal to those in the numpy array. The coordinates are the indexes in the list.
+    equal to those in the numpy array. The coordinates are the indexes in the array.
     The dimension name is passed as a function argument.
     """
-    nr_elem = len(list)
+    nr_elem = len(numpy_array_1d)
     dimensions = [dimension_name]
     coordinates = {dimension_name: range(0, nr_elem)}
     result = xr.DataArray(dims=dimensions, coords=coordinates)
-    result.values = list
+    result.values = numpy_array_1d
     return result
 
 
