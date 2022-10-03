@@ -4,8 +4,7 @@ import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, Package, VariableMetaData
 
-connection_types = {"horizontal": 0, "vertical": 1, "embeddedh": 2, "embeddedv": 3}
-inverse_connection_types = {v: k for k, v in connection_types.items()}
+
 
 
 class Lake(BoundaryCondition):
@@ -155,6 +154,9 @@ class Lake(BoundaryCondition):
         "o_width": VariableMetaData(np.floating),
         "o_slope": VariableMetaData(np.floating),
     }
+
+    connection_types = {"horizontal": 0, "vertical": 1, "embeddedh": 2, "embeddedv": 3}
+    inverse_connection_types = {v: k for k, v in connection_types.items()}
 
     def __init__(
         # lake
@@ -311,7 +313,7 @@ class Lake(BoundaryCondition):
         ctop_elevation = self.dataset["c_top_elevation"].values
         cwidth = self.dataset["c_width"].values
         clength = self.dataset["c_length"].values
-        ctype = np.vectorize(inverse_connection_types.get)(
+        ctype = np.vectorize(self.inverse_connection_types.get)(
             self.dataset["c_type"].values
         )
         connectionlist = ConnectionList(

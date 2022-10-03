@@ -2,8 +2,8 @@ import textwrap
 
 import numpy as np
 import xarray as xr
-
-from imod.mf6.lake_package import lak, lake_api
+import imod.mf6.lake_package.lake_api as lp
+import imod
 
 
 def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
@@ -19,14 +19,14 @@ def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
 
 def create_lakelake(idomain, starting_stage, boundname, lake_cells):
     connection_type = create_gridcovering_array(
-        idomain, lake_cells, lak.connection_types["horizontal"], np.float64
+        idomain, lake_cells, imod.mf6.Lake.connection_types["horizontal"], np.float64
     )
     bed_leak = create_gridcovering_array(idomain, lake_cells, 0.2, np.float64)
     top_elevation = create_gridcovering_array(idomain, lake_cells, 0.3, np.float64)
     bot_elevation = create_gridcovering_array(idomain, lake_cells, 0.4, np.float64)
     connection_length = create_gridcovering_array(idomain, lake_cells, 0.5, np.float64)
     connection_width = create_gridcovering_array(idomain, lake_cells, 0.6, np.float64)
-    result = lake_api.LakeLake(
+    result = lp.LakeLake(
         starting_stage,
         boundname,
         connection_type,
@@ -50,10 +50,10 @@ def create_lakelake(idomain, starting_stage, boundname, lake_cells):
 def test_lake_api(basic_dis):
     idomain, _, _ = basic_dis
 
-    outlet1 = lake_api.OutletManning(
+    outlet1 = lp.OutletManning(
         1, "Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0
     )
-    outlet2 = lake_api.OutletManning(
+    outlet2 = lp.OutletManning(
         2, "IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0
     )
 
@@ -63,7 +63,7 @@ def test_lake_api(basic_dis):
     lake2 = create_lakelake(
         idomain, 15.0, "IJsselmeer", [(1, 5, 5), (1, 5, 6), (1, 6, 6)]
     )
-    lake_package = lake_api.from_lakes_and_outlets([lake1, lake2], [outlet1, outlet2])
+    lake_package = lp.from_lakes_and_outlets([lake1, lake2], [outlet1, outlet2])
     actual = lake_package.render(None, None, None, False)
     expected = textwrap.dedent(
         """\
@@ -113,7 +113,7 @@ def test_helper_function_get_1d_array(basic_dis):
 
 
 def test_helper_function_nparray_to_xarray_1d():
-    result = lake_api.nparray_to_xarray_1d([23, 24, 25, 26], "velocity")
+    result = lp.nparray_to_xarray_1d([23, 24, 25, 26], "velocity")
     assert result.dims == ("velocity",)
     assert result.values[0] == 23
     assert result.values[1] == 24
@@ -122,13 +122,13 @@ def test_helper_function_nparray_to_xarray_1d():
 
 
 def test_helper_function_outlet_list_prop_to_xarray_1d():
-    outlet1 = lake_api.OutletManning(
+    outlet1 = lp.OutletManning(
         1, "Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0
     )
-    outlet2 = lake_api.OutletManning(
+    outlet2 = lp.OutletManning(
         2, "IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0
     )
-    result = lake_api.outlet_list_prop_to_xarray_1d(
+    result = lp.outlet_list_prop_to_xarray_1d(
         [outlet1, outlet2], "lake_in", "lakeIn"
     )
     assert result.values[0] == "Naardermeer"
@@ -143,7 +143,7 @@ def test_helper_function_lake_list_connection_prop_to_xarray_1d(basic_dis):
     lake2 = create_lakelake(
         idomain, 15.0, "IJsselmeer", [(1, 5, 5), (1, 5, 6), (1, 6, 6)]
     )
-    result = lake_api.lake_list_connection_prop_to_xarray_1d(
+    result = lp.lake_list_connection_prop_to_xarray_1d(
         [lake1, lake2], "bottom_elevation"
     )
     assert result.dims == ("connection_nr",)
@@ -158,7 +158,7 @@ def test_helper_function_lake_list_lake_prop_to_xarray_1d(basic_dis):
     lake2 = create_lakelake(
         idomain, 15.0, "IJsselmeer", [(1, 5, 5), (1, 5, 6), (1, 6, 6)]
     )
-    result = lake_api.lake_list_lake_prop_to_xarray_1d([lake1, lake2], "starting_stage")
+    result = lp.lake_list_lake_prop_to_xarray_1d([lake1, lake2], "starting_stage")
     assert result.values[0] == 11.0
     assert result.values[1] == 15.0
     assert result.dims == ("lake_nr",)
