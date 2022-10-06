@@ -1,6 +1,8 @@
+import pathlib
 import collections
 
 import numpy as np
+import pandas as pd
 
 from imod.mf6.pkgbase import BoundaryCondition, Package, VariableMetaData
 
@@ -266,6 +268,91 @@ class Lake(BoundaryCondition):
             d["noutlets"] = len(outletlist.lake_in)
         d["ntables"] = 0
         return self._template.render(d)
+        
+    def _render(self, directory, pkgname, globaltimes, binary):
+        d = {}
+        for var in (
+            "print_input",
+            "print_stage",
+            "print_flows",
+            "save_flows",
+            "stagefile",
+            "budgetfile",
+            "budgetcsvfile",
+            "package_convergence_filename",
+            "ts6_filename",
+            "time_conversion",
+            "length_conversion",
+        ):
+            value = self[var].values[()]
+            if self._valid(value):
+                d[var] = value
+
+        packagedata = []
+        for lakeno in self.dataset["lakeno"]: 
+            nconn = (self.dataset["lakenr"] == lakeno).sum().values[()]
+            name = self.dataset["name"].sel(lakeno=lakeno).values[()]
+            starting_stage = self.dataset["starting_stage"].sel(lakeno=lakeno).values[()]
+            packagedata.append(lakeno, starting_stage, nconn, name)
+        d["packagedata"] = packagedata
+        
+        return self._template.render(d)
+        
+    def _connection_dataframe(self) -> pd.DataFrame:
+        connection_vars = [
+            "lake_no",
+            "connection_number",
+            "cell_id_row_or_index",
+            "cell_id_col",
+            "cell_id_layer",
+            "connection_type",
+            "bed_leak",
+            "bottom_elevation",
+            "top_elevation",
+            "connection_width",
+            "connection_length",
+        ],
+        return self.dataset[connection_vars].to_dataframe()
+        
+    def _outlet_dataframe(self) -> pd.DataFrame:
+        outlet_vars = [
+            "lake_in",
+            "lake_out",
+            "couttype",
+            "invert",
+            "roughness",
+            "width",
+            "slope",
+        ]
+        return self.dataset[outlet_vars].to_dataframe()
+        
+    def write_blockfile(self, directory, pkgname, globaltimes, binary):
+        renderdir = pathlib.Path(directory.stem)
+        content = self.render(
+            directory=renderdir,
+            pkgname=pkgname,
+            globaltimes=globaltimes,
+            binary=binary,
+        )
+        filename = directory / f"{pkgname}.{self._pkg_id}"
+        with open(filename, "w") as f:
+            f.write(content)
+            f.write("\n\n")
+            
+            f.write("begin connectiondata")
+            self._connection_dataframe().to_csv(
+                f, header=False, sep=" ", line_terminator="\n",
+            )
+            f.write("end connectiondata")
+
+            f.write("begin outlets")
+            self._outlet_dataframe().to_csv(
+                f, header=False, sep=" ", line_terminator="\n",
+            )
+            f.write("end outlets")
+        
+        return
+
 
     def get_structures_from_arrays(self):
         """
@@ -288,7 +375,7 @@ class Lake(BoundaryCondition):
             "connectionlist",
             [
                 "lake_no",
-                "connection_nr",
+                "connection_number",
                 "cell_id_row_or_index",
                 "cell_id_col",
                 "cell_id_layer",
@@ -366,7 +453,7 @@ class Lake(BoundaryCondition):
         connections_per_lake = lakelist.nconn
         nr_lakes = len(connections_per_lake)
 
-        connection_numbers = connectionlist.connection_nr
+        connection_numbers = connectionlist.connection_number
         nr_connections = len(connection_numbers)
         connection_lake_number = connectionlist.lake_no
 
