@@ -1,24 +1,26 @@
+"""
+This source file contains an interface to the lake package.
+Usage: create instances of the LakeData class, and optionally instances of the Outlets class,
+and use the method "from_lakes_and_outlets" to create a lake package.
+"""
 import numpy as np
 import xarray as xr
 
 from imod import mf6
 
-"""
-This source file contains an interface to the lake package.
-Usage: create instances of the LakeLake class, and optionally instances of the Outlets class,
-and use the method "from_lakes_and_outlets" to create a lake package.
-"""
 
-
-class LakeLake:
+class LakeData:
     """
-    This class is used to initialize the lake package. It contains data relevant to 1 lake.
-    The input needed to create an instance of this consists of a few scalars( name, starting stage)
-    , some xarray data-arrays, and timeseries.
-    The xarray data-arrays should be of the same size as the grid, and contain missing values in all
-    locations where the lake does not exist ( similar to the input of the chd package)
+    This class is used to initialize the lake package. It contains data
+    relevant to one lake. The input needed to create an instance of this
+    consists of a few scalars (name, starting stage), some xarray data-arrays,
+    and time series. The xarray data-arrays should be of the same size as the
+    grid, and contain missing values in all locations where the lake does not
+    exist (similar to the input of the other grid based packages, such a
+    ConstantHead, River, GeneralHeadBounandary, etc.).
 
-    parameters:
+    Parameters
+    ----------
 
         starting_stage: float,
         boundname: str,
@@ -44,19 +46,19 @@ class LakeLake:
         starting_stage: float,
         boundname: str,
         connection_type,
-        bed_leak,
-        top_elevation,
-        bot_elevation,
-        connection_length,
-        connection_width,
-        status,
-        stage,
-        rainfall,
-        evaporation,
-        runoff,
-        inflow,
-        withdrawal,
-        auxiliary,
+        bed_leak=None,
+        top_elevation=None,
+        bot_elevation=None,
+        connection_length=None,
+        connection_width=None,
+        status=None,
+        stage=None,
+        rainfall=None,
+        evaporation=None,
+        runoff=None,
+        inflow=None,
+        withdrawal=None,
+        auxiliary=None,
     ):
         self.lake_number = -1
         self.starting_stage = starting_stage
@@ -117,7 +119,8 @@ class OutletBase:
 
 class OutletManning(OutletBase):
     """
-    This class represents a Manning Outlet
+    Lake outlet which discharges via a rectangular outlet that uses Manning's
+    equation.
     """
 
     _couttype = "manning"
@@ -140,6 +143,10 @@ class OutletManning(OutletBase):
 
 
 class OutletWeir(OutletBase):
+    """
+    Lake outlet which discharges via a sharp-crested weir.
+    """
+
     _couttype = "weir"
 
     def __init__(
@@ -156,6 +163,10 @@ class OutletWeir(OutletBase):
 
 
 class OutletSpecified(OutletBase):
+    """
+    Lake outlet which discharges a specified outflow.
+    """
+
     _couttype = "specified"
 
     def __init__(
@@ -209,7 +220,7 @@ def lake_list_connection_prop_to_xarray_1d(list_of_lakes, propertyname):
     result = np.array([])
     for i in range(0, nrlakes):
         connection_prop = vars(list_of_lakes[i])[propertyname]
-        _, _, _, prop_current_lake = LakeLake.get_1d_array(connection_prop)
+        _, _, _, prop_current_lake = LakeData.get_1d_array(connection_prop)
         result = np.append(result, prop_current_lake)
     return nparray_to_xarray_1d(result, "connection_nr")
 
@@ -258,7 +269,7 @@ def from_lakes_and_outlets(list_of_lakes, list_of_outlets=[]):
 
     for i in range(0, nrlakes):
         list_of_lakes[i].lake_number = i + 1
-        lyr, y, x, ctype = LakeLake.get_1d_array(list_of_lakes[i].connection_type)
+        lyr, y, x, ctype = LakeData.get_1d_array(list_of_lakes[i].connection_type)
         row = np.append(row, x)
         col = np.append(col, y)
         layer = np.append(layer, lyr)

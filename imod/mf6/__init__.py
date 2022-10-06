@@ -22,7 +22,7 @@ from imod.mf6.ims import (
 from imod.mf6.ist import ImmobileStorageTransfer
 from imod.mf6.lake_package.lak import Lake
 from imod.mf6.lake_package.lake_api import (
-    LakeLake,
+    LakeData,
     OutletManning,
     OutletSpecified,
     OutletWeir,
