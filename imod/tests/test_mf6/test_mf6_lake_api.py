@@ -121,7 +121,7 @@ def test_helper_function_lake_list_connection_prop_to_xarray_1d(
     result = lp.lake_list_connection_prop_to_xarray_1d(
         [naardermeer, ijsselmeer], "bottom_elevation"
     )
-    assert result.dims == ("connection_nr",)
+    assert result.dims == ("connection_number",)
     assert result.values.min() == result.values.max() == 0.4
 
 
@@ -131,4 +131,4 @@ def test_helper_function_lake_list_lake_prop_to_xarray_1d(naardermeer, ijsselmee
     )
     assert result.values[0] == 11.0
     assert result.values[1] == 15.0
-    assert result.dims == ("lake_nr",)
+    assert result.dims == ("lake_number",)

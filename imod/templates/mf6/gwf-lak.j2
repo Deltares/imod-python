@@ -40,7 +40,7 @@ begin packagedata{% for n in range(0, nlakes) %}
 end packagedata
 
 begin connectiondata{% for n in range(0, nconnect) %}
-  {{connections.lake_no[n]}} {{connections.connection_nr[n]}} {{connections.cell_id_row_or_index[n]}} {%- if connections.cell_id_col is not none %} {{connections.cell_id_col[n]}} {%- endif %} {{connections.cell_id_layer[n]}} {{ connections.connection_type[n] }}  {{ connections.bed_leak[n]}} {{connections.bottom_elevation[n]  }}  {{ connections.top_elevation[n] }}  {{connections.connection_width[n]  }} {{connections.connection_length[n] }}{% endfor %}
+  {{connections.lake_no[n]}} {{connections.connection_number[n]}} {{connections.cell_id_row_or_index[n]}} {%- if connections.cell_id_col is not none %} {{connections.cell_id_col[n]}} {%- endif %} {{connections.cell_id_layer[n]}} {{ connections.connection_type[n] }}  {{ connections.bed_leak[n]}} {{connections.bottom_elevation[n]  }}  {{ connections.top_elevation[n] }}  {{connections.connection_width[n]  }} {{connections.connection_length[n] }}{% endfor %}
 end connectiondata
 
 {% if noutlets > 0 -%}

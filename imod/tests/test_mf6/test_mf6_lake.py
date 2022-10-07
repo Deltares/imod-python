@@ -39,7 +39,7 @@ def test_lake_rendering(basic_dis):
     # create 6 connections. we assume an unstructured grid, so there are 2 indexes per cell (index and layer)
     # instead of the usual 3 ( row, col, layer)
     """
-    connection_nr  lake_nr cell_id connection_type bed_leak bottom_elevation top_elevation connection_width connection_length
+    connection_number  lake_nr cell_id connection_type bed_leak bottom_elevation top_elevation connection_width connection_length
     1               1      3,1     vertical        0.2        -1              0             0.1             0.2
     2               1      4,1     vertical        0.3        -2              0.1           0.2             0.3
     3               1      3,2     vertical        0.4        -3              -0.1          0.3             0.4
@@ -49,8 +49,8 @@ def test_lake_rendering(basic_dis):
     """
 
     nconnect = 6
-    dimensions = ["connection_nr"]
-    coordinates = {"connection_nr": np.arange(0, nconnect)}
+    dimensions = ["connection_number"]
+    coordinates = {"connection_number": np.arange(0, nconnect)}
     connection_array_layout = xr.DataArray(
         np.ones(nconnect, dtype=np.float64), coords=coordinates, dims=dimensions
     )
