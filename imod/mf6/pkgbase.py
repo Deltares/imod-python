@@ -2,6 +2,7 @@ import abc
 import dataclasses
 import operator
 import pathlib
+from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Union
 
@@ -374,16 +375,13 @@ class Package(abc.ABC):
                             self.write_text_griddata(path, da, dtype)
 
     def _validate(self, schemata: Dict, **kwargs) -> Dict[str, List[ValidationError]]:
-        errors = {}
+        errors = defaultdict(list)
         for variable, var_schemata in schemata.items():
-            var_errors = [
-                schema.validate(self.dataset[variable], **kwargs)
-                for schema in var_schemata
-            ]
-            var_errors = [error for error in errors if error is not None]
-            if len(var_errors) > 0:
-                errors[variable] = var_errors
-
+            for schema in var_schemata:
+                try:
+                    schema.validate(self.dataset[variable], **kwargs)
+                except ValidationError as e:
+                    errors[variable].append(e)
         return errors
 
     def _netcdf_path(self, directory, pkgname):

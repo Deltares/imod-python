@@ -89,10 +89,16 @@ class SchemaUnion:
         self.schemata = tuple(args)
 
     def validate(self, obj: Any, **kwargs):
-        errors = [schema.validate(obj, **kwargs) for schema in self.schemata]
-        if not any(error is None for error in errors):
+        errors = []
+        for schema in self.schemata:
+            try:
+                schema.validate(obj, **kwargs)
+            except ValidationError as e:
+                errors.append(e)
+
+        if len(errors) == len(self.schemata):  # All schemata failed
             message = "\n".join(str(error) for error in errors)
-            return ValidationError(f"No option succeeded: {message}")
+            raise ValidationError(f"No option succeeded: {message}")
 
     def __or__(self, other):
         return SchemaUnion(*self.schemata, other)
@@ -119,7 +125,7 @@ class DTypeSchema(BaseSchema):
             Dtype of the DataArray.
         """
         if not np.issubdtype(obj.dtype, self.dtype):
-            return ValidationError(f"dtype {obj.dtype} != {self.dtype}")
+            raise ValidationError(f"dtype {obj.dtype} != {self.dtype}")
 
 
 class DimsSchema(BaseSchema):
@@ -134,13 +140,15 @@ class DimsSchema(BaseSchema):
             Dimensions of the DataArray. `None` may be used as a wildcard value.
         """
         if len(self.dims) != len(obj.dims):
-            return ValidationError(
+            raise ValidationError(
                 f"length of dims does not match: {len(obj.dims)} != {len(self.dims)}"
             )
 
+        # TODO: Add check for dims with size 0 on object
+
         for i, (actual, expected) in enumerate(zip(obj.dims, self.dims)):
             if expected is not None and actual != expected:
-                return ValidationError(
+                raise ValidationError(
                     f"dim mismatch in axis {i}: {actual} != {expected}"
                 )
 
@@ -157,13 +165,13 @@ class ShapeSchema(BaseSchema):
             Shape of the DataArray. `None` may be used as a wildcard value.
         """
         if len(self.shape) != len(obj.shape):
-            return ValidationError(
+            raise ValidationError(
                 f"number of dimensions in shape ({len(obj.shape)}) o!= da.ndim ({len(self.shape)})"
             )
 
         for i, (actual, expected) in enumerate(zip(obj.shape, self.shape)):
             if expected is not None and actual != expected:
-                return ValidationError(
+                raise ValidationError(
                     f"shape mismatch in axis {i}: {actual} != {expected}"
                 )
 
@@ -191,16 +199,16 @@ class CoordsSchema(BaseSchema):
         if self.require_all_keys:
             missing_keys = set(self.coords) - set(coords)
             if missing_keys:
-                return ValidationError(f"coords has missing keys: {missing_keys}")
+                raise ValidationError(f"coords has missing keys: {missing_keys}")
 
         if not self.allow_extra_keys:
             extra_keys = set(coords) - set(self.coords)
             if extra_keys:
-                return ValidationError(f"coords has extra keys: {extra_keys}")
+                raise ValidationError(f"coords has extra keys: {extra_keys}")
 
         for key, da_schema in self.coords.items():
             if key not in coords:
-                return ValidationError(f"key {key} not in coords")
+                raise ValidationError(f"key {key} not in coords")
             else:
                 da_schema.validate(coords[key])
 
@@ -244,7 +252,7 @@ class AllValueSchema(ValueSchema):
             other_obj = self.other
         condition = self.operator(obj, other_obj)
         if not condition.all():
-            return ValidationError(
+            raise ValidationError(
                 f"values exceed condition: {self.operator_str} {self.other}"
             )
 
@@ -257,7 +265,7 @@ class AnyValueSchema(ValueSchema):
             other_obj = self.other
         condition = self.operator(obj, other_obj)
         if not condition.any():
-            return ValidationError(
+            raise ValidationError(
                 f"no values exceed condition: {self.operator_str} {self.other}"
             )
 
@@ -287,4 +295,4 @@ class NoDataSchema(BaseSchema):
         valid = self.is_nodata(obj)
         other_valid = self.is_other_nodata(other_obj)
         if (valid ^ other_valid).any():
-            return ValidationError(f"nodata is not aligned with {self.other}")
+            raise ValidationError(f"nodata is not aligned with {self.other}")
