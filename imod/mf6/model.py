@@ -6,6 +6,7 @@ import jinja2
 import numpy as np
 
 from imod.mf6 import qgs_util
+from imod.mf6.validation import validation_model_error_message
 from imod.schemata import ValidationError
 
 
@@ -161,13 +162,8 @@ class GroundwaterFlowModel(Model):
                 errors[pkgname] = pkg_errors
 
         if len(errors) > 0:
-            messages = []
-            for name, pkg_errors in errors.items():
-                messages.append(name)
-                for var, var_errors in pkg_errors.items():
-                    messages.append(var)
-                    messages.extend(str(error) for error in var_errors)
-            raise ValidationError("\n" + "\n".join(messages))
+            message = validation_model_error_message(errors)
+            raise ValidationError(message)
 
     def write(self, directory, modelname, globaltimes, binary=True):
         """
