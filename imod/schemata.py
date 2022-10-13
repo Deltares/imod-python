@@ -246,7 +246,7 @@ class ValueSchema(BaseSchema, abc.ABC):
 
 class AllValueSchema(ValueSchema):
     def validate(self, obj: xr.DataArray, **kwargs):
-        if isinstance(str, self.other):
+        if isinstance(self.other, str):
             other_obj = kwargs[self.other]
         else:
             other_obj = self.other
@@ -259,7 +259,7 @@ class AllValueSchema(ValueSchema):
 
 class AnyValueSchema(ValueSchema):
     def validate(self, obj: xr.DataArray, **kwargs):
-        if isinstance(str, self.other):
+        if isinstance(self.other, str):
             other_obj = kwargs[self.other]
         else:
             other_obj = self.other
