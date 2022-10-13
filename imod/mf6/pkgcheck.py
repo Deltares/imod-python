@@ -81,7 +81,7 @@ def unstructured_boundary_condition_dim_check(pkgname, da):
             )
     elif da.ndim == 3:
         face_dim = da.ugrid.grid.face_dimension
-        if da.dims != ("time", "layer", {face_dim}):
+        if da.dims != ("time", "layer", face_dim):
             raise ValueError(
                 f"3D grid should have dimensions ('time', 'layer', {face_dim}) "
                 + msg_end
