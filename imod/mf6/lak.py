@@ -1,15 +1,261 @@
+"""
+This source file contains the Lake Package and interface objects to the lake
+package. Usage: create instances of the LakeData class, and optionally
+instances of the Outlets class, and use the method "from_lakes_and_outlets" to
+create a lake package.
+"""
+
 import pathlib
-import collections
+from collections import defaultdict
 
 import numpy as np
 import pandas as pd
+import xarray as xr
 
+from imod import mf6
 from imod.mf6.pkgbase import BoundaryCondition, Package, VariableMetaData
+
+
+class LakeData(Package):
+    """
+    This class is used to initialize the lake package. It contains data
+    relevant to one lake. The input needed to create an instance of this
+    consists of a few scalars (name, starting stage), some xarray data-arrays,
+    and time series. The xarray data-arrays should be of the same size as the
+    grid, and contain missing values in all locations where the lake does not
+    exist (similar to the input of the other grid based packages, such a
+    ConstantHead, River, GeneralHeadBounandary, etc.).
+
+    Parameters
+    ----------
+
+    starting_stage: float,
+    boundname: str,
+    connection_type: xr.DataArray of integers.
+    bed_leak: xr.DataArray of floats.
+    top_elevation: xr.DataArray of floats.
+    bot_elevation: xr.DataArray of floats.
+    connection_length: xr.DataArray of floats.
+    connection_width: xr.DataArray of floats.
+    status,
+    stage: timeseries of float numbers
+    rainfall: timeseries of float numbers
+    evaporation: timeseries of float numbers
+    runoff: timeseries of float numbers
+    inflow: timeseries of float numbers
+    withdrawal: timeseries of float numbers
+    auxiliary: timeseries of float numbers
+
+    """
+
+    def __init__(
+        self,
+        starting_stage: float,
+        boundname: str,
+        connection_type,
+        bed_leak=None,
+        top_elevation=None,
+        bot_elevation=None,
+        connection_length=None,
+        connection_width=None,
+        status=None,
+        stage=None,
+        rainfall=None,
+        evaporation=None,
+        runoff=None,
+        inflow=None,
+        withdrawal=None,
+        auxiliary=None,
+    ):
+        super().__init__(locals())
+        self.dataset["starting_stage"] = starting_stage
+        self.dataset["boundname"] = boundname
+        self.dataset["connection_type"] = connection_type
+        self.dataset["bed_leak"] = bed_leak
+        self.dataset["top_elevation"] = top_elevation
+        self.dataset["bottom_elevation"] = bot_elevation
+        self.dataset["connection_length"] = connection_length
+        self.dataset["connection_width"] = connection_width
+
+        # timeseries data
+        self.dataset["status"] = status
+        self.dataset["stage"] = stage
+        self.dataset["rainfall"] = rainfall
+        self.dataset["evaporation"] = evaporation
+        self.dataset["runoff"] = runoff
+        self.dataset["inflow"] = inflow
+        self.dataset["withdrawal"] = withdrawal
+        self.dataset["auxiliary"] = auxiliary
+
+
+class OutletBase:
+    """
+    Base class for the different kinds of outlets
+    """
+
+    def __init__(self, outlet_number: int, lakein: str, lakeout: str):
+        self.dataset = xr.Dataset()
+        self.dataset["outlet_number"] = outlet_number
+        self.dataset["lakein"] = lakein
+        self.dataset["lakeout"] = lakeout
+        self.dataset["invert"] = None
+        self.dataset["width"] = None
+        self.dataset["roughness"] = None
+        self.dataset["slope"] = None
+
+
+class OutletManning(OutletBase):
+    """
+    Lake outlet which discharges via a rectangular outlet that uses Manning's
+    equation.
+    """
+
+    _couttype = "manning"
+
+    def __init__(
+        self,
+        outlet_number: int,
+        lakein: str,
+        lakeout: str,
+        invert: np.floating,
+        width: np.floating,
+        roughness: np.floating,
+        slope: np.floating,
+    ):
+        super().__init__(outlet_number, lakein, lakeout)
+        self.dataset["invert"] = invert
+        self.dataset["width"] = width
+        self.dataset["roughness"] = roughness
+        self.dataset["slope"] = slope
+
+
+class OutletWeir(OutletBase):
+    """
+    Lake outlet which discharges via a sharp-crested weir.
+    """
+
+    _couttype = "weir"
+
+    def __init__(
+        self,
+        outlet_number: int,
+        lakein: str,
+        lakeout: str,
+        invert: np.floating,
+        width: np.floating,
+    ):
+        super().__init__(outlet_number, lakein, lakeout)
+        self.dataset["invert"] = invert
+        self.dataset["width"] = width
+
+
+class OutletSpecified(OutletBase):
+    """
+    Lake outlet which discharges a specified outflow.
+    """
+
+    _couttype = "specified"
+
+    def __init__(
+        self, outlet_number: int, lakein: str, lakeout: str, rate: np.floating
+    ):
+        super().__init__(outlet_number, lakein, lakeout)
+        self.dataset["rate"] = rate
+
+
+def create_connection_data(lakes):
+    connection_vars = [
+        "bed_leak",
+        "top_elevation",
+        "bottom_elevation",
+        "connection_length",
+        "connection_width",
+    ]
+
+    # This will create a statically sized array of strings (dtype="<U10")
+    claktype_string = np.array(
+        [
+            "horizontal",  # 0
+            "vertical",  # 1
+            "embeddedh",  # 2
+            "embeddedv",  # 3
+        ]
+    )
+
+    connection_data = defaultdict(list)
+    cell_ids = []
+    for lake in lakes:
+        notnull = lake["connection_type"].notnull()
+        indices = np.argwhere(notnull.values)
+        xr_indices = {
+            dim: xr.DataArray(index, dims=("cell_id",))
+            for dim, index in zip(notnull.dims, indices.T)
+        }
+
+        # There should be no nodata values in connection_type, so we can use it to index.
+        type_numeric = lake.dataset["connection_type"].isel(**xr_indices).astype(int)
+        type_string = claktype_string[[type_numeric]]
+        connection_data["connection_type"].append(type_string)
+
+        selection = lake.dataset[connection_vars].isel(**xr_indices)
+        for var, da in selection.items():
+            if not var.startswith("connection_"):
+                var = f"connection_{var}"
+            connection_data[var].append(da.values)
+
+        cell_id = xr.DataArray(
+            data=indices,
+            coords={"celldim": list(xr_indices.keys())},
+            dims=("boundary", "celldim"),
+        )
+        cell_ids.append(cell_id)
+
+    connection_data = {
+        k: ("boundary", np.concatenate(v)) for k, v in connection_data.items()
+    }
+    # Offset by one since MODFLOW is 1-based!
+    connection_data["connection_cell_id"] = xr.concat(cell_ids, dim="boundary") + 1
+    return connection_data
+
+
+def create_outlet_data(outlets, name_to_number):
+    outlet_vars = [
+        "invert",
+        "roughness",
+        "width",
+        "slope",
+    ]
+    outlet_data = defaultdict(list)
+    for outlet in outlets:
+        outlet_data["outlet_couttype"].append(outlet._couttype)
+
+        # Convert names to numbers
+        for var in ("lakein", "lakeout"):
+            name = outlet.dataset[var].item()
+            try:
+                number = name_to_number[name]
+            except KeyError:
+                names = ", ".join(name_to_number.keys())
+                raise KeyError(
+                    f"Outlet lake name {name} not found among lake names: {names}"
+                )
+            outlet_data[f"outlet_{var}"].append(number)
+
+        # For other values: fill in NaN if not applicable.
+        for var in outlet_vars:
+            if var in outlet.dataset:
+                value = outlet.dataset[var].item()
+            else:
+                value = np.nan
+            outlet_data[f"outlet_{var}"].append(value)
+
+    outlet_data = {k: ("outlet", v) for k, v in outlet_data.items()}
+    return outlet_data
 
 
 class Lake(BoundaryCondition):
     """
-    Lake (LAK) Package
+    Lake (LAK) Package.
 
     Parameters
     ----------
@@ -20,18 +266,10 @@ class Lake(BoundaryCondition):
     lake_boundname:  array of strings (xr.DataArray)- dimension number of lakes:
         name of the lake
 
-    connection_lake_no: array of floats (xr.DataArray)- dimension number of connections
+    connection_lake_number: array of floats (xr.DataArray)- dimension number of connections
         lake number for the current lake-to-aquifer connection.
-    connection_cell_id_row_or_index: array of floats (xr.DataArray)- dimension number of connections
-        in case of a structured grid: gridrow number of aquifer cell for current lake-to aquifer connection
-        in case of an unstructured grid: cell index of aquifer cell for current lake-to aquifer connection
+    connection_cell_id: array of integers (xr.DataArray)- dimension number of connections
 
-    connection_cell_id_col: array of floats (xr.DataArray)- dimension number of connections
-        in case of a structured grid: grid-column number of aquifer cell for current lake-to aquifer connection
-        in case of an unstructured grid: not used. set this argument to None
-
-    connection_cell_id_layer: array of floats (xr.DataArray)- dimension number of connections
-         gridrow number of aquifer cell for current lake-to aquifer connection
     connection_type: array of strings (xr.DataArray)- dimension number of connections
         indicates if connection is horizontal, vertical, embeddedH or embeddedV
     connection_bed_leak: array of floats (xr.DataArray)- dimension number of connections
@@ -136,11 +374,9 @@ class Lake(BoundaryCondition):
         "lake_number": VariableMetaData(np.integer),
         "lake_starting_stage": VariableMetaData(np.floating),
         "lake_boundname": VariableMetaData(np.str0),
-        "connection_lake_no": VariableMetaData(np.floating),
-        "connection_cell_id_row_or_index": VariableMetaData(np.floating),
-        "connection_cell_id_col": VariableMetaData(np.floating),
-        "connection_cell_id_layer": VariableMetaData(np.floating),
-        "connection_type": VariableMetaData(np.floating),
+        "connection_lake_number": VariableMetaData(np.integer),
+        "connection_cell_id": VariableMetaData(np.integer),
+        "connection_type": VariableMetaData(np.str0),
         "connection_bed_leak": VariableMetaData(np.floating),
         "connection_bottom_elevation": VariableMetaData(np.floating),
         "connection_top_elevation": VariableMetaData(np.floating),
@@ -165,10 +401,8 @@ class Lake(BoundaryCondition):
         lake_starting_stage,
         lake_boundname,
         # connection
-        connection_lake_no,
-        connection_cell_id_row_or_index,
-        connection_cell_id_col,
-        connection_cell_id_layer,
+        connection_lake_number,
+        connection_cell_id,
         connection_type,
         connection_bed_leak,
         connection_bottom_elevation,
@@ -201,12 +435,8 @@ class Lake(BoundaryCondition):
         self.dataset["lake_number"] = lake_number
         self.dataset["lake_starting_stage"] = lake_starting_stage
 
-        self.dataset["connection_lake_no"] = connection_lake_no
-        self.dataset[
-            "connection_cell_id_row_or_index"
-        ] = connection_cell_id_row_or_index
-        self.dataset["connection_cell_id_col"] = connection_cell_id_col
-        self.dataset["connection_cell_id_layer"] = connection_cell_id_layer
+        self.dataset["connection_lake_number"] = connection_lake_number
+        self.dataset["connection_cell_id"] = connection_cell_id
         self.dataset["connection_type"] = connection_type
         self.dataset["connection_bed_leak"] = connection_bed_leak
         self.dataset["connection_bottom_elevation"] = connection_bottom_elevation
@@ -236,40 +466,48 @@ class Lake(BoundaryCondition):
         self.dataset["length_conversion"] = length_conversion
         self._pkgcheck()
 
-    def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
+    @staticmethod
+    def from_lakes_and_outlets(lakes, outlets=None):
+        package_content = {}
+        name_to_number = {
+            lake["boundname"].item(): i + 1 for i, lake in enumerate(lakes)
+        }
 
-        for var in ("print_input", "print_stage", "print_flows", "save_flows"):
-            value = self[var].values[()]
-            if self._valid(value):
-                d[var] = value
+        # Package data
+        lake_numbers = list(name_to_number.values())
+        n_connection = [lake["connection_type"].count() for lake in lakes]
+        package_content["lake_starting_stage"] = (
+            "lake",
+            [lake["starting_stage"].item() for lake in lakes],
+        )
+        package_content["lake_number"] = ("lake", lake_numbers)
+        package_content["lake_boundname"] = ("lake", list(name_to_number.keys()))
 
-        for var in (
-            "stagefile",
-            "budgetfile",
-            "budgetcsvfile",
-            "package_convergence_filename",
-            "ts6_filename",
-            "time_conversion",
-            "length_conversion",
+        # Connection data
+        package_content["connection_lake_number"] = (
+            "boundary",
+            np.repeat(lake_numbers, n_connection),
+        )
+        connection_data = create_connection_data(lakes)
+        package_content.update(connection_data)
+
+        if outlets is not None:
+            outlet_data = create_outlet_data(outlets, name_to_number)
+            package_content.update(outlet_data)
+
+        return mf6.Lake(**package_content)
+
+    def _has_outlets(self):
+        # item() will not work here if the object is an array.
+        # .values[()] will simply return the full numpy array.
+        outlet_lakein = self.dataset["outlet_lakein"].values[()]
+        if outlet_lakein is None or (
+            np.isscalar(outlet_lakein) and np.isnan(outlet_lakein)
         ):
-            value = self[var].values[()]
-            if self._valid(value):
-                d[var] = value
+            return False
+        return True
 
-        lakelist, connectionlist, outletlist = self.get_structures_from_arrays()
-        d["lakes"] = lakelist
-        d["connections"] = connectionlist
-        d["outlets"] = outletlist
-        d["nlakes"] = len(lakelist.boundname)
-        d["nconnect"] = len(connectionlist.lake_no)
-        d["noutlets"] = 0
-        if outletlist is not None:
-            d["noutlets"] = len(outletlist.lake_in)
-        d["ntables"] = 0
-        return self._template.render(d)
-        
-    def _render(self, directory, pkgname, globaltimes, binary):
+    def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         for var in (
             "print_input",
@@ -284,48 +522,63 @@ class Lake(BoundaryCondition):
             "time_conversion",
             "length_conversion",
         ):
-            value = self[var].values[()]
+            value = self[var].item()
             if self._valid(value):
                 d[var] = value
 
+        d["nlakes"] = len(self.dataset["lake_number"])
+        if self._has_outlets():
+            d["noutlets"] = len(self.dataset["outlet_lakein"])
+        else:
+            d["noutlets"] = 0
+        d["ntables"] = 0
+
         packagedata = []
-        for lakeno in self.dataset["lakeno"]: 
-            nconn = (self.dataset["lakenr"] == lakeno).sum().values[()]
-            name = self.dataset["name"].sel(lakeno=lakeno).values[()]
-            starting_stage = self.dataset["starting_stage"].sel(lakeno=lakeno).values[()]
-            packagedata.append(lakeno, starting_stage, nconn, name)
+        for name, number, stage in zip(
+            self.dataset["lake_boundname"],
+            self.dataset["lake_number"],
+            self.dataset["lake_starting_stage"],
+        ):
+            nconn = (self.dataset["connection_lake_number"] == number).sum()
+            row = tuple(a.item() for a in (number, stage, nconn, name))
+            packagedata.append(row)
         d["packagedata"] = packagedata
-        
+
         return self._template.render(d)
-        
+
     def _connection_dataframe(self) -> pd.DataFrame:
         connection_vars = [
-            "lake_no",
-            "connection_number",
-            "cell_id_row_or_index",
-            "cell_id_col",
-            "cell_id_layer",
+            "connection_lake_number",
             "connection_type",
-            "bed_leak",
-            "bottom_elevation",
-            "top_elevation",
+            "connection_bed_leak",
+            "connection_bottom_elevation",
+            "connection_top_elevation",
             "connection_width",
             "connection_length",
-        ],
-        return self.dataset[connection_vars].to_dataframe()
-        
+        ]
+        data_df = self.dataset[connection_vars].to_dataframe()
+        data_df["iconn"] = np.arange(1, len(data_df) + 1)
+        cell_id_df = self.dataset["connection_cell_id"].to_pandas()
+        order = (
+            ["connection_lake_number", "iconn"]
+            + list(cell_id_df.columns)
+            + connection_vars[1:]
+        )
+        return pd.concat([data_df, cell_id_df], axis=1)[order]
+
     def _outlet_dataframe(self) -> pd.DataFrame:
         outlet_vars = [
-            "lake_in",
-            "lake_out",
-            "couttype",
-            "invert",
-            "roughness",
-            "width",
-            "slope",
+            "outlet_lakein",
+            "outlet_lakeout",
+            "outlet_couttype",
+            "outlet_invert",
+            "outlet_roughness",
+            "outlet_width",
+            "outlet_slope",
         ]
-        return self.dataset[outlet_vars].to_dataframe()
-        
+        df = self.dataset[outlet_vars].to_dataframe()
+        return df
+
     def write_blockfile(self, directory, pkgname, globaltimes, binary):
         renderdir = pathlib.Path(directory.stem)
         content = self.render(
@@ -337,133 +590,28 @@ class Lake(BoundaryCondition):
         filename = directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
-            f.write("\n\n")
-            
-            f.write("begin connectiondata")
+            f.write("\n")
+
+            f.write("begin connectiondata\n")
             self._connection_dataframe().to_csv(
-                f, header=False, sep=" ", line_terminator="\n",
+                f,
+                index=False,
+                header=False,
+                sep=" ",
+                line_terminator="\n",
             )
-            f.write("end connectiondata")
+            f.write("end connectiondata\n\n")
 
-            f.write("begin outlets")
-            self._outlet_dataframe().to_csv(
-                f, header=False, sep=" ", line_terminator="\n",
-            )
+            f.write("begin outlets\n")
+            if self._has_outlets():
+                self._outlet_dataframe().to_csv(
+                    f,
+                    index=False,
+                    header=False,
+                    sep=" ",
+                    line_terminator="\n",
+                )
             f.write("end outlets")
-        
-        return
-
-
-    def get_structures_from_arrays(self):
-        """
-        This function fills structs representing lakes, connections and outlets for the purpose of rendering
-        this package with a jinja template.
-        """
-        nlakes = len(self.dataset["lake_boundname"].values)
-        LakeList = collections.namedtuple(
-            "lakelist", ["number", "boundname", "starting_stage", "nconn"]
-        )
-        nconn = [0] * nlakes
-        lakelist = LakeList(
-            self.dataset["lake_number"].values,
-            self.dataset["lake_boundname"].values,
-            self.dataset["lake_starting_stage"].values,
-            nconn,
-        )
-
-        ConnectionList = collections.namedtuple(
-            "connectionlist",
-            [
-                "lake_no",
-                "connection_number",
-                "cell_id_row_or_index",
-                "cell_id_col",
-                "cell_id_layer",
-                "connection_type",
-                "bed_leak",
-                "bottom_elevation",
-                "top_elevation",
-                "connection_width",
-                "connection_length",
-            ],
-        )
-        clakeno = self.dataset["connection_lake_no"].values.astype(int)
-        conn_number = [0] * len(clakeno)
-        ccellid = self.dataset["connection_cell_id_row_or_index"].values.astype(int)
-        ccelcol = None
-        if self.dataset["connection_cell_id_col"].values[()] is not None:
-            ccelcol = self.dataset["connection_cell_id_col"].values.astype(int)
-        ccellayer = self.dataset["connection_cell_id_layer"].values.astype(int)
-
-        cbed_leak = self.dataset["connection_bed_leak"].values
-        cbottom_elevation = self.dataset["connection_bottom_elevation"].values
-        ctop_elevation = self.dataset["connection_top_elevation"].values
-        cwidth = self.dataset["connection_width"].values
-        clength = self.dataset["connection_length"].values
-        ctype = np.vectorize(self.inverse_connection_types.get)(
-            self.dataset["connection_type"].values
-        )
-        connectionlist = ConnectionList(
-            clakeno,
-            conn_number,
-            ccellid,
-            ccelcol,
-            ccellayer,
-            ctype,
-            cbed_leak,
-            cbottom_elevation,
-            ctop_elevation,
-            cwidth,
-            clength,
-        )
-
-        self.fill_in_connection_number(lakelist, connectionlist)
-
-        OutletList = collections.namedtuple(
-            "outletlist",
-            [
-                "lake_in",
-                "lake_out",
-                "couttype",
-                "invert",
-                "roughness",
-                "width",
-                "slope",
-            ],
-        )
-        clakeno = self.dataset["connection_lake_no"].values.astype(int)
-        outletlist = None
-        if self._valid(self.dataset["outlet_lakein"].values[()]):
-            outletlist = OutletList(
-                self.dataset["outlet_lakein"].values.astype(int),
-                self.dataset["outlet_lakeout"].values.astype(int),
-                self.dataset["outlet_couttype"].values,
-                self.dataset["outlet_invert"].values,
-                self.dataset["outlet_roughness"].values,
-                self.dataset["outlet_width"].values,
-                self.dataset["outlet_slope"].values,
-            )
-
-        return lakelist, connectionlist, outletlist
-
-    def fill_in_connection_number(self, lakelist, connectionlist):
-
-        # count connections per lake. FIll in the nconn attribute of the lake.
-        # also fill in the connection number (of each connection in each lake)
-        connections_per_lake = lakelist.nconn
-        nr_lakes = len(connections_per_lake)
-
-        connection_numbers = connectionlist.connection_number
-        nr_connections = len(connection_numbers)
-        connection_lake_number = connectionlist.lake_no
-
-        for i in range(0, nr_lakes):
-            connections_per_lake[i] = 0
-
-        for iconnection in range(0, nr_connections):
-            lakenumber = connection_lake_number[iconnection]
-            connections_per_lake[lakenumber - 1] += 1
-            connection_numbers[iconnection] = connections_per_lake[lakenumber - 1]
 
         return
 
