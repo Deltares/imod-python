@@ -7,6 +7,7 @@ from typing import Dict
 
 import jinja2
 import numpy as np
+import pandas as pd
 import xarray as xr
 import xugrid as xu
 
@@ -405,6 +406,20 @@ class Package(abc.ABC):
                         else:
                             path = pkgdirectory / f"{key}.dat"
                             self.write_text_griddata(path, da, dtype)
+
+    def _write_table_section(
+        self, f, dataframe: pd.DataFrame, title: str, index: bool = False
+    ) -> None:
+        f.write(f"begin {title}\n")
+        dataframe.to_csv(
+            f,
+            index=index,
+            header=False,
+            sep=" ",
+            line_terminator="\n",
+        )
+        f.write(f"end {title}\n")
+        return
 
     def _netcdf_path(self, directory, pkgname):
         """create path for netcdf, this function is also used to create paths to use inside the qgis projectfiles"""
