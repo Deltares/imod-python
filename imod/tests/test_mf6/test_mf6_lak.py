@@ -156,7 +156,8 @@ def test_lake_write(tmp_path, naardermeer, ijsselmeer):
         begin outlets
         1 2 manning 23.0 25.0 24.0 26.0
         2 1 manning 27.0 29.0 28.0 30.0
-        end outlets"""
+        end outlets
+        """
     )
     assert actual == expected
 
@@ -264,8 +265,6 @@ def test_lake_write_disv_three_lakes(basic_dis, tmp_path):
         2 5 1 18 horizontal -1.0 -5.0 -0.2 -5.0 -5.0
         3 6 1 23 embeddedv -1.0 -6.0 0.0 -6.0 -6.0
         end connectiondata
-
-        begin outlets
-        end outlets"""
+        """
     )
     assert actual == expected

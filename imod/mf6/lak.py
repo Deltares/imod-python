@@ -391,9 +391,6 @@ class Lake(BoundaryCondition):
         "outlet_slope": VariableMetaData(np.floating),
     }
 
-    connection_types = {"horizontal": 0, "vertical": 1, "embeddedh": 2, "embeddedv": 3}
-    inverse_connection_types = {v: k for k, v in connection_types.items()}
-
     def __init__(
         # lake
         self,
@@ -592,26 +589,15 @@ class Lake(BoundaryCondition):
             f.write(content)
             f.write("\n")
 
-            f.write("begin connectiondata\n")
-            self._connection_dataframe().to_csv(
+            self._write_table_section(
                 f,
-                index=False,
-                header=False,
-                sep=" ",
-                line_terminator="\n",
+                self._connection_dataframe(),
+                "connectiondata",
             )
-            f.write("end connectiondata\n\n")
 
-            f.write("begin outlets\n")
             if self._has_outlets():
-                self._outlet_dataframe().to_csv(
-                    f,
-                    index=False,
-                    header=False,
-                    sep=" ",
-                    line_terminator="\n",
-                )
-            f.write("end outlets")
+                f.write("\n")
+                self._write_table_section(f, self._outlet_dataframe(), "outlets")
 
         return
 
