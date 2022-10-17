@@ -20,6 +20,7 @@ from imod.mf6.ims import (
     SolutionPresetSimple,
 )
 from imod.mf6.ist import ImmobileStorageTransfer
+from imod.mf6.lak import Lake, LakeData, OutletManning, OutletSpecified, OutletWeir
 from imod.mf6.model import GroundwaterFlowModel, GroundwaterTransportModel
 from imod.mf6.mst import MobileStorageTransfer
 from imod.mf6.npf import NodePropertyFlow

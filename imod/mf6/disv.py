@@ -87,15 +87,14 @@ class VerticesDiscretization(Package):
             f.write(content)
             f.write("\n\n")
 
-            f.write("begin vertices\n")
-            self._verts_dataframe().to_csv(
-                f, header=False, sep=" ", line_terminator="\n"
+            self._write_table_section(
+                f,
+                self._verts_dataframe(),
+                "vertices",
+                index=True,
             )
-            f.write("end vertices\n\n")
+            f.write("\n")
 
-            f.write("begin cell2d\n")
-            self._cell2d_dataframe().to_csv(
-                f, header=False, sep=" ", line_terminator="\n"
-            )
-            f.write("end cell2d\n")
+            self._write_table_section(f, self._cell2d_dataframe(), "cell2d", index=True)
+
         return
