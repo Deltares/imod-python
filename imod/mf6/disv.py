@@ -4,6 +4,14 @@ import numpy as np
 import pandas as pd
 
 from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.schemata import (
+    AllValueSchema,
+    AnyValueSchema,
+    DimsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+)
 
 
 class VerticesDiscretization(Package):
@@ -18,6 +26,34 @@ class VerticesDiscretization(Package):
     """
 
     _pkg_id = "disv"
+
+    _init_schemata = {
+        "top": [
+            DTypeSchema(np.floating),
+            DimsSchema("{face_dim}") | DimsSchema(),
+            IndexesSchema(),
+        ],
+        "bottom": [
+            DTypeSchema(np.floating),
+            DimsSchema("layer", "{face_dim}") | DimsSchema("layer"),
+            IndexesSchema(),
+        ],
+        "idomain": [
+            DTypeSchema(np.integer),
+            DimsSchema("layer", "{face_dim}") | DimsSchema("layer"),
+            IndexesSchema(),
+        ],
+    }
+    _write_schemata = {
+        "idomain": (AnyValueSchema(">", 0),),
+        "top": (
+            AllValueSchema(">", "bottom"),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            # No need to check coords: dataset ensures they align with idomain.
+        ),
+        "bottom": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
+    }
+
     _metadata_dict = {
         "top": VariableMetaData(np.floating),
         "bottom": VariableMetaData(np.floating),
@@ -33,6 +69,7 @@ class VerticesDiscretization(Package):
         self.dataset["top"] = top
         self.dataset["bottom"] = bottom
 
+        self._validate_at_init()
         self._pkgcheck_at_init()
 
     def render(self, directory, pkgname, binary):

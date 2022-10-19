@@ -3,6 +3,7 @@ import collections
 import numpy as np
 
 from imod.mf6.pkgbase import Package
+from imod.schemata import DTypeSchema
 
 
 class OutputControl(Package):
@@ -45,10 +46,21 @@ class OutputControl(Package):
     _keyword_map = {}
     _template = Package._initialize_template(_pkg_id)
 
+    _init_schemata = {
+        "save_head": [
+            DTypeSchema(np.integer) | DTypeSchema(str) | DTypeSchema(object),
+        ],
+        "save_budget": [
+            DTypeSchema(np.integer) | DTypeSchema(str) | DTypeSchema(object),
+        ],
+    }
+
     def __init__(self, save_head=None, save_budget=None):
         super().__init__()
         self.dataset["save_head"] = save_head
         self.dataset["save_budget"] = save_budget
+
+        self._validate_at_init()
 
     def _get_ocsetting(self, setting):
         """Get oc setting based on its type. If integers return f'frequency {setting}', if"""

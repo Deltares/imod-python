@@ -34,10 +34,11 @@ validation xarray library becomes.
 import abc
 import operator
 from functools import partial
-from typing import Any, Callable, Dict, Mapping, Tuple, Union
+from typing import Any, Callable, Dict, Tuple, Union
 
 import numpy as np
 import xarray as xr
+import xugrid as xu
 from numpy.typing import DTypeLike  # noqa: F401
 
 DimsT = Tuple[Union[str, None]]
@@ -53,6 +54,14 @@ OPERATORS = {
     ">=": operator.ge,
     ">": operator.gt,
 }
+
+
+def partial_operator(op, value):
+    # partial doesn't allow us to insert the 1st arg on call, and
+    # operators don't work with kwargs, so resort to lambda to swap
+    # args a and b around.
+    # https://stackoverflow.com/a/37468215
+    return partial(lambda b, a: OPERATORS[op](a, b), value)
 
 
 class ValidationError(Exception):
@@ -97,8 +106,8 @@ class SchemaUnion:
                 errors.append(e)
 
         if len(errors) == len(self.schemata):  # All schemata failed
-            message = "\n".join(str(error) for error in errors)
-            raise ValidationError(f"No option succeeded: {message}")
+            message = "\n\t" + "\n\t".join(str(error) for error in errors)
+            raise ValidationError(f"No option succeeded:{message}")
 
     def __or__(self, other):
         return SchemaUnion(*self.schemata, other)
@@ -124,6 +133,10 @@ class DTypeSchema(BaseSchema):
         dtype : Any
             Dtype of the DataArray.
         """
+        # If scalar with value None (optional variable basically)
+        if (len(obj.shape) == 0) & (~obj.notnull()).all():
+            return
+
         if not np.issubdtype(obj.dtype, self.dtype):
             raise ValidationError(f"dtype {obj.dtype} != {self.dtype}")
 
@@ -132,38 +145,82 @@ class DimsSchema(BaseSchema):
     def __init__(self, *dims: DimsT) -> None:
         self.dims = dims
 
-    def validate(self, obj: xr.DataArray, **kwargs) -> None:
+    def _fill_in_face_dim(self, obj: Union[xr.DataArray, xu.UgridDataArray]):
+        """
+        Return dims with a filled in face dim if necessary.
+        """
+        if "{face_dim}" in self.dims and isinstance(obj, xu.UgridDataArray):
+            return tuple(
+                (
+                    obj.ugrid.grid.face_dimension if i == "{face_dim}" else i
+                    for i in self.dims
+                )
+            )
+        else:
+            return self.dims
+
+    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs) -> None:
         """Validate dimensions
         Parameters
         ----------
         dims : Tuple[Union[str, None]]
             Dimensions of the DataArray. `None` may be used as a wildcard value.
         """
-        if len(self.dims) != len(obj.dims):
+        dims = self._fill_in_face_dim(obj)
+
+        if len(dims) != len(obj.dims):
             raise ValidationError(
-                f"length of dims does not match: {len(obj.dims)} != {len(self.dims)}"
+                f"length of dims does not match: {len(obj.dims)} != {len(dims)}"
             )
 
-        # TODO: Add check for dims with size 0 on object
-
-        for i, (actual, expected) in enumerate(zip(obj.dims, self.dims)):
+        for i, (actual, expected) in enumerate(zip(obj.dims, dims)):
             if expected is not None and actual != expected:
                 raise ValidationError(
                     f"dim mismatch in axis {i}: {actual} != {expected}"
                 )
 
 
-class ShapeSchema(BaseSchema):
-    def __init__(self, shape: ShapeT) -> None:
-        self.shape = shape
+class IndexesSchema(BaseSchema):
+    """
+    Verify indexes, check if no dims with zero size are included and that
+    indexes are monotonic
+    """
+
+    def __init__(self) -> None:
+        pass
 
     def validate(self, obj: xr.DataArray, **kwargs) -> None:
-        """Validate shape
+        for dim in obj.dims:
+            if len(obj.indexes[dim]) == 0:
+                raise ValidationError(f"provided dimension {dim} with size 0")
+
+        for dim in obj.dims:
+            if dim == "y":
+                if not obj.indexes[dim].is_monotonic_decreasing:
+                    raise ValidationError(
+                        f"coord {dim} which is not monotonically decreasing"
+                    )
+
+            else:
+                if not obj.indexes[dim].is_monotonic_increasing:
+                    raise ValidationError(
+                        f"coord {dim} which is not monotonically increasing"
+                    )
+
+
+class ShapeSchema(BaseSchema):
+    def __init__(self, shape: ShapeT) -> None:
+        """
+        Validate shape
+
         Parameters
         ----------
         shape : ShapeT
             Shape of the DataArray. `None` may be used as a wildcard value.
         """
+        self.shape = shape
+
+    def validate(self, obj: xr.DataArray, **kwargs) -> None:
         if len(self.shape) != len(obj.shape):
             raise ValidationError(
                 f"number of dimensions in shape ({len(obj.shape)}) o!= da.ndim ({len(self.shape)})"
@@ -177,9 +234,18 @@ class ShapeSchema(BaseSchema):
 
 
 class CoordsSchema(BaseSchema):
+    """
+    Validate coords
+
+    Parameters
+    ----------
+    coords : dict_like
+        coords of the DataArray. `None` may be used as a wildcard value.
+    """
+
     def __init__(
         self,
-        coords: Mapping[str, Any],
+        coords: Tuple[str],
         require_all_keys: bool = True,
         allow_extra_keys: bool = True,
     ) -> None:
@@ -188,13 +254,8 @@ class CoordsSchema(BaseSchema):
         self.allow_extra_keys = allow_extra_keys
 
     def validate(self, obj: xr.DataArray, **kwargs) -> None:
-        """Validate coords
-        Parameters
-        ----------
-        coords : dict_like
-            coords of the DataArray. `None` may be used as a wildcard value.
-        """
-        coords = obj.coords
+
+        coords = list(obj.coords.keys())
 
         if self.require_all_keys:
             missing_keys = set(self.coords) - set(coords)
@@ -206,11 +267,9 @@ class CoordsSchema(BaseSchema):
             if extra_keys:
                 raise ValidationError(f"coords has extra keys: {extra_keys}")
 
-        for key, da_schema in self.coords.items():
+        for key in self.coords:
             if key not in coords:
                 raise ValidationError(f"key {key} not in coords")
-            else:
-                da_schema.validate(coords[key])
 
 
 class OtherCoordsSchema(BaseSchema):
@@ -226,8 +285,9 @@ class OtherCoordsSchema(BaseSchema):
 
     def validate(self, obj: xr.DataArray, **kwargs):
         other_obj = kwargs[self.other]
+        other_coords = list(other_obj.coords.keys())
         return CoordsSchema(
-            other_obj.coords,
+            other_coords,
             self.require_all_keys,
             self.allow_extra_keys,
         ).validate(obj)
@@ -251,6 +311,7 @@ class AllValueSchema(ValueSchema):
         else:
             other_obj = self.other
         condition = self.operator(obj, other_obj)
+        condition = condition | np.isnan(obj)  # ignore nan by setting to True
         if not condition.all():
             raise ValidationError(
                 f"values exceed condition: {self.operator_str} {self.other}"
@@ -264,6 +325,7 @@ class AnyValueSchema(ValueSchema):
         else:
             other_obj = self.other
         condition = self.operator(obj, other_obj)
+        condition = condition | ~np.isnan(obj)  # ignore nan by setting to False
         if not condition.any():
             raise ValidationError(
                 f"no values exceed condition: {self.operator_str} {self.other}"
@@ -273,26 +335,67 @@ class AnyValueSchema(ValueSchema):
 class NoDataSchema(BaseSchema):
     def __init__(
         self,
+        is_notnull: Union[Callable, Tuple[str, Any]] = xr.DataArray.notnull,
+    ):
+
+        if isinstance(is_notnull, tuple):
+            op, value = is_notnull
+            self.is_notnull = partial_operator(op, value)
+        else:
+            self.is_notnull = is_notnull
+
+
+class AllNoDataSchema(NoDataSchema):
+    def validate(self, obj: xr.DataArray, **kwargs):
+        valid = self.is_notnull(obj)
+        if ~valid.any():
+            raise ValidationError("all nodata")
+
+
+class NoDataComparisonSchema(BaseSchema):
+    def __init__(
+        self,
         other: str,
-        is_nodata: Union[Callable, Tuple[str, Any]] = xr.DataArray.notnull,
-        is_other_nodata: Union[Callable, Tuple[str, Any]] = xr.DataArray.notnull,
+        is_notnull: Union[Callable, Tuple[str, Any]] = xr.DataArray.notnull,
+        is_other_notnull: Union[Callable, Tuple[str, Any]] = xr.DataArray.notnull,
     ):
         self.other = other
-        if isinstance(is_nodata, tuple):
-            op, value = is_nodata
-            self.is_nodata = partial(OPERATORS[op], value)
+        if isinstance(is_notnull, tuple):
+            op, value = is_notnull
+            self.is_notnull = partial_operator(op, value)
         else:
-            self.is_nodata = is_nodata
+            self.is_notnull = is_notnull
 
-        if isinstance(is_other_nodata, tuple):
-            op, value = is_other_nodata
-            self.is_nodata = partial(OPERATORS[op], value)
+        if isinstance(is_other_notnull, tuple):
+            op, value = is_other_notnull
+            self.is_other_notnull = partial_operator(op, value)
         else:
-            self.is_other_nodata = is_other_nodata
+            self.is_other_notnull = is_other_notnull
+
+
+class IdentityNoDataSchema(NoDataComparisonSchema):
+    """
+    Checks that the NoData values are located at exactly the same locations.
+    """
 
     def validate(self, obj: xr.DataArray, **kwargs):
         other_obj = kwargs[self.other]
-        valid = self.is_nodata(obj)
-        other_valid = self.is_other_nodata(other_obj)
+        valid = self.is_notnull(obj)
+        other_valid = self.is_other_notnull(other_obj)
         if (valid ^ other_valid).any():
             raise ValidationError(f"nodata is not aligned with {self.other}")
+
+
+class AllInsideNoDataSchema(NoDataComparisonSchema):
+    """
+    Checks that that notnull values all occur within other.
+    """
+
+    def validate(self, obj: xr.DataArray, **kwargs):
+        other_obj = kwargs[self.other]
+        valid = self.is_notnull(obj)
+        other_valid = self.is_other_notnull(other_obj)
+        if (valid & ~other_valid).any():
+            print(valid)
+            print(other_valid)
+            raise ValidationError(f"data values found at nodata values of {self.other}")

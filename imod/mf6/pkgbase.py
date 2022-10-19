@@ -12,6 +12,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod.mf6.pkgcheck as pkgcheck
+from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
 
 
@@ -147,7 +148,7 @@ class Package(abc.ABC):
         if allargs is not None:
             for arg in allargs.values():
                 if isinstance(arg, xu.UgridDataArray):
-                    self.dataset = xu.UgridDataset(grid=arg.ugrid.grid)
+                    self.dataset = xu.UgridDataset(grids=arg.ugrid.grid)
                     return
         self.dataset = xr.Dataset()
 
@@ -537,6 +538,12 @@ class Package(abc.ABC):
         ds = self.dataset[variables]
 
         pkgcheck.check_dim_monotonicity(self.__class__.__name__, ds)
+
+    def _validate_at_init(self):
+        errors = self._validate(self._init_schemata)
+        if len(errors) > 0:
+            message = validation_pkg_error_message(errors)
+            raise ValidationError(message)
 
     def _pkgcheck_at_init(self):
         self._check_types()

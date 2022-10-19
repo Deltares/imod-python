@@ -5,6 +5,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 @pytest.fixture(scope="function")
@@ -51,21 +52,27 @@ def test_write(drainage, tmp_path):
 def test_wrong_dtype(drainage):
     drainage["elevation"] = drainage["elevation"].astype(np.int32)
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         imod.mf6.Drainage(**drainage)
 
 
 def test_check_conductance_zero(drainage):
     drainage["conductance"] = drainage["conductance"] * 0.0
 
-    with pytest.raises(
-        ValueError,
-        match=(
-            "Detected incorrect values in Drainage: \n"
-            "- conductance in Drainage: values less or equal than 0.0 detected. \n"
-        ),
-    ):
-        imod.mf6.Drainage(**drainage)
+    idomain = drainage["elevation"].astype(np.int16)
+    top = 1.0
+    bottom = top - idomain.coords["layer"]
+
+    dis = imod.mf6.StructuredDiscretization(top=1.0, bottom=bottom, idomain=idomain)
+
+    drn = imod.mf6.Drainage(**drainage)
+
+    errors = drn._validate(drn._write_schemata, **dis.dataset)
+
+    assert len(errors) == 1
+
+    for var, error in errors.items():
+        assert var == "conductance"
 
 
 def test_discontinuous_layer(drainage):

@@ -1,6 +1,16 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.schemata import (
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
+    AllValueSchema,
+    DimsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
+)
 
 
 class GeneralHeadBoundary(BoundaryCondition):
@@ -37,6 +47,30 @@ class GeneralHeadBoundary(BoundaryCondition):
 
     _pkg_id = "ghb"
     _period_data = ("head", "conductance")
+
+    _init_schemata = {
+        "head": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+        ],
+        "conductance": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+        ],
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+        "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+    _write_schemata = {
+        "head": [
+            OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
+        "conductance": [IdentityNoDataSchema("head"), AllValueSchema(">", 0.0)],
+    }
+
     _metadata_dict = {
         "head": VariableMetaData(np.floating),
         "conductance": VariableMetaData(np.floating, not_less_equal_than=0.0),
@@ -61,4 +95,12 @@ class GeneralHeadBoundary(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
+        self._validate_at_init()
         self._pkgcheck_at_init()
+
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["head"] = self["head"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors

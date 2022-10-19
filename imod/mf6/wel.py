@@ -4,6 +4,7 @@ import numpy as np
 import xarray as xr
 
 from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.schemata import DTypeSchema
 
 
 def assign_dims(arg) -> Dict:
@@ -64,6 +65,13 @@ class WellDisStructured(BoundaryCondition):
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
+    _init_schemata = {
+        "layer": [DTypeSchema(np.integer)],
+        "row": [DTypeSchema(np.integer)],
+        "column": [DTypeSchema(np.integer)],
+        "rate": [DTypeSchema(np.floating)],
+    }
+
     _metadata_dict = {
         "layer": VariableMetaData(np.integer),
         "row": VariableMetaData(np.integer),
@@ -92,6 +100,7 @@ class WellDisStructured(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
+        self._validate_at_init()
         self._pkgcheck_at_init()
 
     def to_sparse(self, arrdict, layer):
@@ -156,6 +165,12 @@ class WellDisVertices(BoundaryCondition):
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
+    _init_schemata = {
+        "layer": [DTypeSchema(np.integer)],
+        "cell2d": [DTypeSchema(np.integer)],
+        "rate": [DTypeSchema(np.floating)],
+    }
+
     _metadata_dict = {
         "layer": VariableMetaData(np.integer),
         "cell2d": VariableMetaData(np.integer),
@@ -180,6 +195,9 @@ class WellDisVertices(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+
+        self._validate_at_init()
+        self._pkgcheck_at_init()
 
     def to_sparse(self, arrdict, layer):
         spec = []

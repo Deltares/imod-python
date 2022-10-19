@@ -6,6 +6,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 @pytest.fixture()
@@ -41,6 +42,18 @@ def sy_layered(idomain):
 @pytest.fixture()
 def convertible(idomain):
     return xr.full_like(idomain, 0, dtype=int)
+
+
+@pytest.fixture(scope="function")
+def dis(idomain):
+    top = idomain.sel(layer=1)
+    bottom = idomain - xr.DataArray(
+        data=[1.0, 2.0], dims=("layer",), coords={"layer": [2, 3]}
+    )
+
+    return imod.mf6.StructuredDiscretization(
+        top=top, bottom=bottom, idomain=idomain.astype(int)
+    )
 
 
 def test_render_specific_storage(sy_layered, convertible):
@@ -173,7 +186,7 @@ def test_storage_deprecation_warning(sy_layered, convertible):
 
 
 def test_wrong_dtype_sc(sy_layered, convertible):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         imod.mf6.StorageCoefficient(
             storage_coefficient=0,
             specific_yield=sy_layered,
@@ -183,7 +196,7 @@ def test_wrong_dtype_sc(sy_layered, convertible):
 
 
 def test_wrong_dtype_ss(sy_layered, convertible):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         imod.mf6.SpecificStorage(
             specific_storage=0,
             specific_yield=sy_layered,
@@ -192,45 +205,40 @@ def test_wrong_dtype_ss(sy_layered, convertible):
         )
 
 
-def test_wrong_value_ss(sy_layered, convertible):
-    test_msg = (
-        "Detected incorrect values in SpecificStorage: \n"
-        "- specific_storage in SpecificStorage: values less than 0.0 detected. \n"
-    )
-    with pytest.raises(ValueError, match=test_msg):
-        imod.mf6.SpecificStorage(
-            specific_storage=-0.1,
-            specific_yield=sy_layered,
-            transient=True,
-            convertible=convertible,
-        )
-
-
-def test_wrong_value_sc(sy_layered, convertible):
-    test_msg = (
-        "Detected incorrect values in StorageCoefficient: \n"
-        "- storage_coefficient in StorageCoefficient: values less than 0.0 detected. \n"
-    )
-    with pytest.raises(ValueError, match=test_msg):
-        imod.mf6.StorageCoefficient(
-            storage_coefficient=-0.1,
-            specific_yield=sy_layered,
-            transient=True,
-            convertible=convertible,
-        )
-
-
-def test_check_nan_in_active_cell(sy_layered, convertible, idomain):
-    top = idomain.sel(layer=1)
-    bottom = idomain - xr.DataArray(
-        data=[1.0, 2.0], dims=("layer",), coords={"layer": [2, 3]}
+def test_wrong_value_ss(sy_layered, convertible, dis):
+    sto = imod.mf6.SpecificStorage(
+        specific_storage=-0.1,
+        specific_yield=sy_layered,
+        transient=True,
+        convertible=convertible,
     )
 
-    dis = imod.mf6.StructuredDiscretization(
-        top=top, bottom=bottom, idomain=idomain.astype(int)
+    errors = sto._validate(sto._write_schemata, **dis.dataset)
+
+    assert len(errors) == 1
+
+    for var, error in errors.items():
+        assert var == "specific_storage"
+
+
+def test_wrong_value_sc(sy_layered, convertible, dis):
+    sto = imod.mf6.StorageCoefficient(
+        storage_coefficient=-0.1,
+        specific_yield=sy_layered,
+        transient=True,
+        convertible=convertible,
     )
 
-    storage_coefficient = idomain * 0.1
+    errors = sto._validate(sto._write_schemata, **dis.dataset)
+
+    assert len(errors) == 1
+
+    for var, error in errors.items():
+        assert var == "storage_coefficient"
+
+
+def test_check_nan_in_active_cell(sy_layered, convertible, dis):
+    storage_coefficient = dis["idomain"] * 0.1
 
     sto = imod.mf6.StorageCoefficient(
         storage_coefficient=storage_coefficient,
@@ -239,21 +247,22 @@ def test_check_nan_in_active_cell(sy_layered, convertible, idomain):
         convertible=convertible,
     )
 
-    sto._check_nan_in_active_cell(dis)
+    errors = sto._validate(sto._write_schemata, **dis.dataset)
 
-    test_msg = (
-        "Detected value with np.nan in active domain "
-        "in StorageCoefficient for variable: storage_coefficient."
+    assert len(errors) == 0
+
+    storage_coefficient[1, 1, 1] = np.nan
+
+    sto = imod.mf6.StorageCoefficient(
+        storage_coefficient=storage_coefficient,
+        specific_yield=sy_layered,
+        transient=True,
+        convertible=convertible,
     )
 
-    with pytest.raises(ValueError, match=test_msg):
-        storage_coefficient[1, 1, 1] = np.nan
+    errors = sto._validate(sto._write_schemata, **dis.dataset)
 
-        sto = imod.mf6.StorageCoefficient(
-            storage_coefficient=storage_coefficient,
-            specific_yield=sy_layered,
-            transient=True,
-            convertible=convertible,
-        )
+    assert len(errors) == 1
 
-        sto._check_nan_in_active_cell(dis)
+    for var, error in errors.items():
+        assert var == "storage_coefficient"

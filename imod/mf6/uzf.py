@@ -6,6 +6,16 @@ from imod.mf6.pkgbase import (
     BoundaryCondition,
     VariableMetaData,
 )
+from imod.schemata import (
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
+    AllValueSchema,
+    DimsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
+)
 
 
 class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
@@ -103,6 +113,79 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         "root_potential",
         "root_activity",
     )
+
+    _init_schemata = {
+        "surface_depression_depth": [
+            DTypeSchema(np.floating),
+            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+        ],
+        "kv_sat": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+        ],
+        "theta_res": [
+            DTypeSchema(np.floating),
+            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+        ],
+        "theta_sat": [
+            DTypeSchema(np.floating),
+            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+        ],
+        "theta_init": [
+            DTypeSchema(np.floating),
+            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+        ],
+        "epsilon": [
+            DTypeSchema(np.floating),
+            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+        ],
+        "infiltration_rate": [
+            DTypeSchema(np.floating),
+            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+        ],
+        "et_pot": [
+            DTypeSchema(np.floating),
+            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+        ],
+        "extinction_depth": [
+            DTypeSchema(np.floating),
+            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+        ],
+        "extinction_theta": [
+            DTypeSchema(np.floating),
+            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+        ],
+        "root_potential": [
+            DTypeSchema(np.floating),
+            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+        ],
+        "root_activity": [
+            DTypeSchema(np.floating),
+            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+        ],
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+        "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+    _write_schemata = {
+        "kv_sat": [
+            AllValueSchema(">", 0.0),
+            OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
+        "surface_depression_depth": [IdentityNoDataSchema("kv_sat")],
+        "theta_res": [IdentityNoDataSchema("kv_sat"), AllValueSchema(">=", 0.0)],
+        "theta_sat": [IdentityNoDataSchema("kv_sat"), AllValueSchema(">=", 0.0)],
+        "theta_init": [IdentityNoDataSchema("kv_sat"), AllValueSchema(">=", 0.0)],
+        "epsilon": [IdentityNoDataSchema("kv_sat")],
+        "infiltration_rate": [IdentityNoDataSchema("kv_sat")],
+        "et_pot": [IdentityNoDataSchema("kv_sat")],
+        "extinction_depth": [IdentityNoDataSchema("kv_sat")],
+        "extinction_theta": [IdentityNoDataSchema("kv_sat")],
+        "root_potential": [IdentityNoDataSchema("kv_sat")],
+        "root_activity": [IdentityNoDataSchema("kv_sat")],
+    }
 
     _metadata_dict = {
         "surface_depression_depth": VariableMetaData(np.floating),

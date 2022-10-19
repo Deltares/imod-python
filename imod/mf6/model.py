@@ -149,6 +149,7 @@ class GroundwaterFlowModel(Model):
         dis = self[diskey]
         # We'll use the idomain for checking dims, shape, nodata.
         idomain = dis["idomain"]
+        bottom = dis["bottom"]
 
         errors = {}
         for pkgname, pkg in self.items():
@@ -157,6 +158,7 @@ class GroundwaterFlowModel(Model):
             pkg_errors = pkg._validate(
                 schemata={**pkg._init_schemata, **pkg.write_schemata},
                 idomain=idomain,
+                bottom=bottom,
             )
             if len(pkg_errors) > 0:
                 errors[pkgname] = pkg_errors

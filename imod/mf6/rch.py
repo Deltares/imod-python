@@ -1,6 +1,15 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.schemata import (
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
+    CoordsSchema,
+    DimsSchema,
+    DTypeSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
+)
 
 
 class Recharge(BoundaryCondition):
@@ -38,6 +47,28 @@ class Recharge(BoundaryCondition):
     _pkg_id = "rch"
     _period_data = ("rate",)
     _keyword_map = {}
+
+    _init_schemata = {
+        "rate": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            DimsSchema("time", "layer", "y", "x")
+            | DimsSchema("layer", "y", "x")
+            | DimsSchema("time", "y", "x")
+            | DimsSchema("y", "x"),
+        ],
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+        "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+    _write_schemata = {
+        "rate": [
+            OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
+    }
+
     _metadata_dict = {"rate": VariableMetaData(np.floating)}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
@@ -56,4 +87,5 @@ class Recharge(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
+        self._validate_at_init()
         self._pkgcheck_at_init()

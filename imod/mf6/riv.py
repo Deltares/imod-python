@@ -2,10 +2,14 @@ import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
 from imod.schemata import (
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
     AllValueSchema,
+    CoordsSchema,
     DimsSchema,
     DTypeSchema,
-    NoDataSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
     OtherCoordsSchema,
 )
 
@@ -44,10 +48,37 @@ class River(BoundaryCondition):
     _pkg_id = "riv"
     _period_data = ("stage", "conductance", "bottom_elevation")
     _keyword_map = {}
+
+    _dims_schema_union = (
+        DimsSchema("time", "layer", "y", "x")
+        | DimsSchema("layer", "y", "x")
+        | DimsSchema("time", "y", "x")
+        | DimsSchema("y", "x")
+        | DimsSchema("time", "layer", "{face_dim}")
+        | DimsSchema("layer", "{face_dim}")
+        | DimsSchema("time", "{face_dim}")
+        | DimsSchema("{face_dim}")
+    )
+
     _init_schemata = {
-        "stage": [DTypeSchema(np.floating), DimsSchema("layer", "y", "x")],
-        "conductance": [DTypeSchema(np.floating), DimsSchema("layer", "y", "x")],
-        "bottom_elevation": [DTypeSchema(np.floating), DimsSchema("layer", "y", "x")],
+        "stage": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            _dims_schema_union,
+        ],
+        "conductance": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            _dims_schema_union,
+        ],
+        "bottom_elevation": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            _dims_schema_union,
+        ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
     }
@@ -55,9 +86,15 @@ class River(BoundaryCondition):
         "stage": [
             AllValueSchema(">=", "bottom_elevation"),
             OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ],
-        "conductance": [NoDataSchema("stage"), AllValueSchema(">", 0.0)],
-        "bottom_elevation": [NoDataSchema("stage")],
+        "conductance": [IdentityNoDataSchema("stage"), AllValueSchema(">", 0.0)],
+        "bottom_elevation": [
+            IdentityNoDataSchema("stage"),
+            # Check river bottom above layer bottom, else Modflow throws error.
+            AllValueSchema(">", "bottom"),
+        ],
     }
 
     _metadata_dict = {
@@ -86,7 +123,7 @@ class River(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
-        self._pkgcheck_at_init()
+        self._validate_at_init()
 
     def _pkgcheck_at_init(self):
         self._check_bottom_above_stage()
@@ -121,3 +158,11 @@ class River(BoundaryCondition):
         self._check_river_bottom_below_model_bottom(dis)
 
         super()._pkgcheck_at_write(dis)
+
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["stage"] = self["stage"]
+        kwargs["bottom_elevation"] = self["bottom_elevation"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors

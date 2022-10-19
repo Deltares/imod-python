@@ -1,6 +1,15 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.schemata import (
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
+    DimsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
+)
 
 
 class Evapotranspiration(BoundaryCondition):
@@ -50,6 +59,47 @@ class Evapotranspiration(BoundaryCondition):
     """
 
     _pkg_id = "evt"
+    _init_schemata = {
+        "surface": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            DimsSchema("time", "y", "x") | DimsSchema("y", "x"),
+        ],
+        "rate": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            DimsSchema("time", "y", "x") | DimsSchema("y", "x"),
+        ],
+        "depth": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            DimsSchema("time", "y", "x") | DimsSchema("y", "x"),
+        ],
+        "proportion_rate": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            DimsSchema("time", "y", "x") | DimsSchema("y", "x"),
+        ],
+        "proportion_depth": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            DimsSchema("time", "y", "x") | DimsSchema("y", "x"),
+        ],
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+        "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+    _write_schemata = {
+        "surface": [
+            OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
+        "rate": [IdentityNoDataSchema("surface")],
+        "depth": [IdentityNoDataSchema("surface")],
+        "proportion_rate": [IdentityNoDataSchema("surface")],
+        "proportion_depth": [IdentityNoDataSchema("surface")],
+    }
+
     _metadata_dict = {
         "surface": VariableMetaData(np.floating),
         "rate": VariableMetaData(np.floating),
@@ -91,7 +141,15 @@ class Evapotranspiration(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
+        self._validate_at_init()
         self._pkgcheck_at_init()
 
         # TODO: add write logic for transforming proportion rate and depth to
         # the right shape in the binary file.
+
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["surface"] = self["surface"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors

@@ -4,6 +4,7 @@ import textwrap
 import pytest
 
 import imod
+from imod.schemata import ValidationError
 
 
 def test_render():
@@ -25,5 +26,5 @@ def test_render():
 
 
 def test_wrong_dtype():
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         imod.mf6.InitialConditions(head=0)
