@@ -1,0 +1,27 @@
+begin options
+{% if digits is defined %}  digits {{digits}}
+{% endif %}
+{%- if print_input is defined %}  print_input
+{% endif %}
+end options
+
+{% if head is defined %}
+begin continous fileout {{head_file}} {% if head_binary is defined %} [binary] {% endif %}
+{% for name, cell_ids in head %}
+  {{name}} head{% for cell_id in cell_ids %} {{cell_id}}{% endfor %}
+{% endfor -%}
+{% endif %}
+
+{% if drawdown is defined %}
+begin continous fileout {{drawdown_file}} {% if drawdrown_binary is defined %} [binary] {% endif %}
+{% for name, cell_ids in drawdown %}
+  {{name}} drawdown {{cell_id}}
+{% endfor -%}
+{% endif %}
+
+{% if flow_ja_face is defined %}
+begin continous fileout {{drawdown_file}} {% if flow_ja_face_binary is defined %} [binary] {% endif %}
+{% for name, cell_ids1, cell_ids2 in flow_ja_face %}
+  {{name}} flow-ja-face {{cell_id1}} {{cell_id2}}
+{% endfor -%}
+{% endif %}
