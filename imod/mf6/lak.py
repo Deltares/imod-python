@@ -13,10 +13,10 @@ import pandas as pd
 import xarray as xr
 
 from imod import mf6
-from imod.mf6.pkgbase import BoundaryCondition, Package, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition, PackageBase, Package, VariableMetaData
 
 
-class LakeData(Package):
+class LakeData(PackageBase):
     """
     This class is used to initialize the lake package. It contains data
     relevant to one lake. The input needed to create an instance of this
@@ -67,7 +67,7 @@ class LakeData(Package):
         withdrawal=None,
         auxiliary=None,
     ):
-        super().__init__(locals())
+        super().__init__()
         self.dataset["starting_stage"] = starting_stage
         self.dataset["boundname"] = boundname
         self.dataset["connection_type"] = connection_type
