@@ -71,10 +71,6 @@ class PackageBase(abc.ABC):
     This class is used for storing a collection of Xarray dataArrays or ugrid-DataArrays
     in a dataset. A load-from-file method is also provided. Storing to file is done by calling
     object.dataset.to_netcdf(...)
-
-    Currently purely used to store datatypes, but can be later expanded to store
-    minimimum and maximum values of variables, keyword maps, and period/package
-    data flags.
     """
 
     def __init__(self, allargs=None):
