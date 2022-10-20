@@ -65,7 +65,17 @@ class VariableMetaData:
 
     dtype: type
 
+
 class PackageBase(abc.ABC):
+    """
+    This class is used for storing a collection of Xarray dataArrays or ugrid-DataArrays
+    in a dataset. A load-from-file method is also provided. Storing to file is done by calling
+    object.dataset.to_netcdf(...)
+
+    Currently purely used to store datatypes, but can be later expanded to store
+    minimimum and maximum values of variables, keyword maps, and period/package
+    data flags.
+    """
 
     def __init__(self, allargs=None):
         if allargs is not None:
@@ -85,7 +95,7 @@ class PackageBase(abc.ABC):
     def from_file(cls, path, **kwargs):
         """
         Loads an imod mf6 package from a file (currently only netcdf and zarr are supported).
-        Note that it is expected that this file was saved with imod.mf6.Package.dataset.to_netcdf(),
+        Note that it is expected that this file was saved with imod.mf6.PackageBase.dataset.to_netcdf(),
         as the checks upon package initialization are not done again!
 
         Parameters
@@ -141,13 +151,13 @@ class PackageBase(abc.ABC):
         return_cls.remove_nans_from_dataset()
         return return_cls
 
-
     def remove_nans_from_dataset(self):
         for key, value in self.dataset.items():
             if isinstance(value, xr.core.dataarray.DataArray):
                 if isinstance(value.values[()], numbers.Number):
                     if math.isnan(value.values[()]):
                         self.dataset[key] = None
+
 
 class Package(PackageBase, abc.ABC):
     """
@@ -161,8 +171,6 @@ class Package(PackageBase, abc.ABC):
     <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=16>`_,
     not the list input which is used in :class:`BoundaryCondition`.
     """
-
-
 
     def __init__(self, allargs=None):
         super().__init__(allargs)
@@ -529,6 +537,7 @@ class Package(PackageBase, abc.ABC):
         if hasattr(self, "_auxiliary_data"):
             result.update(self._auxiliary_data)
         return result
+
 
 class BoundaryCondition(Package, abc.ABC):
     """

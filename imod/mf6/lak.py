@@ -13,7 +13,7 @@ import pandas as pd
 import xarray as xr
 
 from imod import mf6
-from imod.mf6.pkgbase import BoundaryCondition, PackageBase, Package, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase, VariableMetaData
 
 
 class LakeData(PackageBase):
