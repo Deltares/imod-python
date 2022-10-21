@@ -194,7 +194,7 @@ def create_connection_data(lakes):
 
         # There should be no nodata values in connection_type, so we can use it to index.
         type_numeric = lake.dataset["connection_type"].isel(**xr_indices).astype(int)
-        type_string = claktype_string[[type_numeric]]
+        type_string = claktype_string[type_numeric]
         connection_data["connection_type"].append(type_string)
 
         selection = lake.dataset[connection_vars].isel(**xr_indices)
@@ -211,7 +211,7 @@ def create_connection_data(lakes):
         cell_ids.append(cell_id)
 
     connection_data = {
-        k: ("boundary", np.concatenate(v)) for k, v in connection_data.items()
+        k: xr.DataArray(data=np.concatenate(v), dims=["boundary"]) for k, v in connection_data.items()
     }
     # Offset by one since MODFLOW is 1-based!
     connection_data["connection_cell_id"] = xr.concat(cell_ids, dim="boundary") + 1
@@ -249,7 +249,9 @@ def create_outlet_data(outlets, name_to_number):
                 value = np.nan
             outlet_data[f"outlet_{var}"].append(value)
 
-    outlet_data = {k: ("outlet", v) for k, v in outlet_data.items()}
+    outlet_data = {
+        k: xr.DataArray(data=v, dims=["outlet"]) for k, v in outlet_data.items()
+    }
     return outlet_data
 
 
@@ -473,17 +475,19 @@ class Lake(BoundaryCondition):
         # Package data
         lake_numbers = list(name_to_number.values())
         n_connection = [lake["connection_type"].count() for lake in lakes]
-        package_content["lake_starting_stage"] = (
-            "lake",
-            [lake["starting_stage"].item() for lake in lakes],
+        package_content["lake_starting_stage"] = xr.DataArray(
+            data=[lake["starting_stage"].item() for lake in lakes],
+            dims=["lake"],
         )
-        package_content["lake_number"] = ("lake", lake_numbers)
-        package_content["lake_boundname"] = ("lake", list(name_to_number.keys()))
+        package_content["lake_number"] = xr.DataArray(data=lake_numbers, dims=["lake"])
+        package_content["lake_boundname"] = xr.DataArray(
+            list(name_to_number.keys()), dims=["lake"]
+        )
 
         # Connection data
-        package_content["connection_lake_number"] = (
-            "boundary",
-            np.repeat(lake_numbers, n_connection),
+        package_content["connection_lake_number"] = xr.DataArray(
+            data=np.repeat(lake_numbers, n_connection),
+            dims=["boundary"],
         )
         connection_data = create_connection_data(lakes)
         package_content.update(connection_data)
