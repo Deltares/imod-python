@@ -157,8 +157,8 @@ def test_get_values(test_da_nonequidistant):
     x = [0.45, 1.45, 2.4]
     y = [2.25, 1.25, 0.5]
     actual = imod.select.points_values(test_da_nonequidistant, x=x, y=y)
-    actual = actual.drop("dx")
-    actual = actual.drop("dy")
+    actual = actual.drop_vars("dx")
+    actual = actual.drop_vars("dy")
     data = [0, 5, 10]
     expected = xr.DataArray(
         data,
@@ -172,8 +172,8 @@ def test_get_values__index(test_da_nonequidistant):
     x = pd.Series(data=[0.45, 1.45, 2.4], index=[11, 12, 13])
     y = [2.25, 1.25, 0.5]
     actual = imod.select.points_values(test_da_nonequidistant, x=x, y=y)
-    actual = actual.drop("dx")
-    actual = actual.drop("dy")
+    actual = actual.drop_vars("dx")
+    actual = actual.drop_vars("dy")
     data = [0, 5, 10]
     expected = xr.DataArray(
         data,
@@ -187,8 +187,8 @@ def test_get_values__scalar(test_da_nonequidistant):
     x = 0.45
     y = 2.25
     actual = imod.select.points_values(test_da_nonequidistant, x=x, y=y)
-    actual = actual.drop("dx")
-    actual = actual.drop("dy")
+    actual = actual.drop_vars("dx")
+    actual = actual.drop_vars("dy")
     data = [0]
     expected = xr.DataArray(
         data,

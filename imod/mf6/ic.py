@@ -40,13 +40,13 @@ class InitialConditions(Package):
 
         super().__init__(locals())
         if start is None:
+            if head is None:
+                raise ValueError("start and head arguments cannot both be None")
             start = head
             warnings.warn(
                 'The keyword argument "head" is deprecated. Please use the start argument.',
                 DeprecationWarning,
             )
-            if head is None:
-                raise ValueError("start and head arguments cannot both be None")
         else:
             if head is not None:
                 raise ValueError("start and head arguments cannot both be defined")

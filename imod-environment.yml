@@ -37,6 +37,7 @@ dependencies:
   - python>=3.7,<3.11
   - pyvista
   - rasterio>=1.0
+  - rioxarray
   - scipy
   - setuptools_scm
   - scooby
