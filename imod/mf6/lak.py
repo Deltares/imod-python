@@ -193,7 +193,9 @@ def create_connection_data(lakes):
         }
 
         # There should be no nodata values in connection_type, so we can use it to index.
-        type_numeric = lake.dataset["connection_type"].isel(**xr_indices).astype(int)
+        type_numeric = (
+            lake.dataset["connection_type"].isel(**xr_indices).astype(int).values
+        )
         type_string = claktype_string[type_numeric]
         connection_data["connection_type"].append(type_string)
 
