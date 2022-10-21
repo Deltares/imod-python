@@ -55,6 +55,13 @@ def lake_package(naardermeer, ijsselmeer):
     return Lake.from_lakes_and_outlets([naardermeer, ijsselmeer], [outlet1, outlet2])
 
 
+def test_alternative_constructor(naardermeer, ijsselmeer):
+    outlet1 = OutletManning(1, "Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
+    outlet2 = OutletManning(2, "IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
+    actual = Lake.from_lakes_and_outlets([naardermeer, ijsselmeer], [outlet1, outlet2])
+    assert isinstance(actual, Lake)
+
+
 def write_and_read(package, path, filename) -> str:
     package.write(path, filename, None, False)
     with open(path / f"{filename}.lak") as f:
