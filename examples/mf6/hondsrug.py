@@ -215,7 +215,7 @@ like_2d
 # Using the previously created function and the 2d template,
 # the outer edge is defined for this example.
 
-edge = outer_edge(xr.full_like(like_2d.drop("layer"), 1))
+edge = outer_edge(xr.full_like(like_2d.drop_vars("layer"), 1))
 
 # %%
 # Adding information to the CHD package

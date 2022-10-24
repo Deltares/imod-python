@@ -102,7 +102,7 @@ def plot_map(
         given min respectivly max level.
 
         If LinearSegmentedColormap, you can use something like
-        `matplotlib.cm.get_cmap('jet')` as input. This function will not alter
+        `matplotlib.colormaps['jet']` as input. This function will not alter
         the colormap, so add under- and over-colors yourself.
 
         Looking for good colormaps? Try: http://colorbrewer2.org/ Choose a
@@ -327,7 +327,7 @@ def _colorscale(a_yx, levels, cmap, quantile_colorscale):
 
     # Interpolate colormap to nlevels
     if isinstance(cmap, str):
-        cmap = matplotlib.cm.get_cmap(cmap)
+        cmap = matplotlib.colormaps[cmap]
     # cmap is a callable object
     cmap = matplotlib.colors.ListedColormap(cmap(np.linspace(0.0, 1.0, nlevels)))
 
