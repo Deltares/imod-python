@@ -28,7 +28,7 @@ dependencies:
   - pip
   - pip:
       - pandamesh
-  - pydata-sphinx-theme
+  - pydata-sphinx-theme=0.10.1
   - pygeos
   - pyproj
   - pytest
