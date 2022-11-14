@@ -19,7 +19,6 @@ In overview, we'll set the following steps:
 from datetime import date, timedelta
 
 import matplotlib.pyplot as plt
-import meshzoo
 import numpy as np
 import xarray as xr
 import xugrid as xu
@@ -39,11 +38,9 @@ def daterange(date1, date2):
 #
 # As explained in circle.py we first generate a grid and a hydraulic conductivity array
 
-nodes, triangles = meshzoo.disk(6, 6)
-nodes *= 1000.0
-grid = xu.Ugrid2d(*nodes.T, -1, triangles)
+grid = imod.data.circle()
 
-nface = len(triangles)
+nface = grid.n_face
 nlayer = 2
 
 idomain = xu.UgridDataArray(
