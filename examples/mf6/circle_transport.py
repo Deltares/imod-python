@@ -41,7 +41,7 @@ k_value = 10.0
 #
 # As explained in circle.py we first generate a grid and a hydraulic conductivity array
 
-grid = imod.data.circle()
+grid = imod.data.circle().tesselate_centroidal_voronoi()
 
 nface = grid.n_face
 nlayer = 15
@@ -289,3 +289,5 @@ ax.set_aspect(1)
 
 fig, ax = plt.subplots()
 sim_concentration.isel(time=-1).ugrid.sel(y=0).plot.contourf(yincrease=False)
+
+# %%
