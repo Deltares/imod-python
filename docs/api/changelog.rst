@@ -19,6 +19,8 @@ Fixed
 Changed
 ~~~~~~~
 
+- Removed ``meshzoo`` dependency.
+
 Added
 ~~~~~
 

@@ -5,10 +5,12 @@ from pathlib import Path
 from typing import Union
 from zipfile import ZipFile
 
+import numpy as np
 import pandas as pd
 import pkg_resources
 import pooch
 import xarray as xr
+import xugrid as xu
 
 from imod.util import MissingOptionalModule
 
@@ -79,3 +81,13 @@ def lakes_shp(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: igno
     with ZipFile(fname_lakes_shp) as archive:
         archive.extractall(path)
     return gpd.read_file(Path(path) / "lakes.shp")
+
+
+def circle() -> xu.Ugrid2d:
+    fname_nodes = REGISTRY.fetch("circle-nodes.txt")
+    fname_triangles = REGISTRY.fetch("circle-triangles.txt")
+
+    nodes = np.loadtxt(fname_nodes)
+    triangles = np.loadtxt(fname_triangles, dtype=np.int32)
+
+    return xu.Ugrid2d(*nodes.T, -1, triangles)
