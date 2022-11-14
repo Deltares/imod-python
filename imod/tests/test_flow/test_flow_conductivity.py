@@ -3,8 +3,10 @@ import textwrap
 
 from imod.flow import (
     HorizontalHydraulicConductivity,
+    Transmissivity,
     VerticalAnisotropy,
     VerticalHydraulicConductivity,
+    VerticalResistance,
 )
 
 
@@ -82,5 +84,57 @@ def test_vertical_anisotropy(basic_dis, get_render_dict):
     )
 
     rendered = anisotropy._render_projectfile(**to_render)
+
+    assert rendered == compare
+
+
+def test_transmissivity(basic_dis, get_render_dict):
+    # Resolve in advance, so that comparisons have the same directory
+    # See e.g. https://github.com/omarkohl/pytest-datafiles/issues/6
+    directory = str(pathlib.Path(".").resolve())
+
+    ibound, _, _ = basic_dis
+    transmissivity = Transmissivity(transmissivity=10.0)
+    nlayer = len(ibound["layer"])
+
+    to_render = get_render_dict(transmissivity, directory, None, nlayer)
+    to_render["n_entry"] = nlayer
+
+    compare = textwrap.dedent(
+        '''\
+        0001, (kdw), 1, Transmissivity, ['transmissivity']
+        001, 003
+        1, 1, 001, 1.000, 0.000, 10.0, ""
+        1, 1, 002, 1.000, 0.000, 10.0, ""
+        1, 1, 003, 1.000, 0.000, 10.0, ""'''
+    )
+
+    rendered = transmissivity._render_projectfile(**to_render)
+
+    assert rendered == compare
+
+
+def test_vertical_resistance(basic_dis, get_render_dict):
+    # Resolve in advance, so that comparisons have the same directory
+    # See e.g. https://github.com/omarkohl/pytest-datafiles/issues/6
+    directory = str(pathlib.Path(".").resolve())
+
+    ibound, _, _ = basic_dis
+    vertical_resistance = VerticalResistance(resistance=20.0)
+    nlayer = len(ibound["layer"])
+
+    to_render = get_render_dict(vertical_resistance, directory, None, nlayer)
+    to_render["n_entry"] = nlayer
+
+    compare = textwrap.dedent(
+        '''\
+        0001, (vcw), 1, VerticalResistance, ['resistance']
+        001, 003
+        1, 1, 001, 1.000, 0.000, 20.0, ""
+        1, 1, 002, 1.000, 0.000, 20.0, ""
+        1, 1, 003, 1.000, 0.000, 20.0, ""'''
+    )
+
+    rendered = vertical_resistance._render_projectfile(**to_render)
 
     assert rendered == compare

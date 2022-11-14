@@ -13,8 +13,10 @@ from imod.flow.cap import MetaSwap
 from imod.flow.chd import ConstantHead
 from imod.flow.conductivity import (
     HorizontalHydraulicConductivity,
+    Transmissivity,
     VerticalAnisotropy,
     VerticalHydraulicConductivity,
+    VerticalResistance,
 )
 from imod.flow.dis import TimeDiscretization
 from imod.flow.drn import Drain
