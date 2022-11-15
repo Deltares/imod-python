@@ -133,7 +133,7 @@ gwf_model["sto"] = imod.mf6.SpecificStorage(
     transient=False,
     convertible=0,
 )
-gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
+gwf_model["oc"] = imod.mf6.OutputControl(save_head="last", save_budget="last")
 gwf_model["rch"] = imod.mf6.Recharge(
     rch_rate, concentration=rch_concentration, print_flows=True, save_flows=True
 )
@@ -219,7 +219,7 @@ transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity)
 
 transport_model["ic"] = imod.mf6.InitialConditions(start=max_concentration)
 transport_model["oc"] = imod.mf6.OutputControl(
-    save_concentration="all", save_budget="last"
+    save_concentration="last", save_budget="last"
 )
 
 simulation["transport"] = transport_model
@@ -266,10 +266,31 @@ sim_concentration = imod.mf6.out.open_conc(
     modeldir / "flow/disv.disv.grb",
 ).compute()
 
-sim_head = imod.mf6.out.open_conc(
+sim_head = imod.mf6.out.open_hds(
     modeldir / "flow/flow.hds",
     modeldir / "flow/disv.disv.grb",
 ).compute()
+
+# %%
+# Assign coordinates to output
+# ----------------------------
+#
+# The model output does not feature very useful coordinate values for ``time``
+# and ``z``, therefore it is best to assign these to the datasets for more
+# understandable plots.
+#
+# First we have to compute values for a z coordinate. The
+interfaces = np.concatenate([[top], bottom.values])
+z = (interfaces[:-1] + interfaces[1:]) / 2
+
+z
+
+# %%
+# Assign these new coordinate values to the dataset
+coords = dict(time=simtimes[1:], z=("layer", z))
+
+sim_head = sim_head.assign_coords(**coords)
+sim_concentration = sim_concentration.assign_coords(**coords)
 
 
 # %%
@@ -280,7 +301,7 @@ sim_head = imod.mf6.out.open_conc(
 # provided by xarray and xugrid:
 
 fig, ax = plt.subplots()
-sim_concentration.isel(time=-1, layer=0).ugrid.plot(ax=ax)
+sim_head.isel(time=-1, layer=0).ugrid.plot(ax=ax)
 ax.set_aspect(1)
 
 # %%
@@ -288,6 +309,8 @@ ax.set_aspect(1)
 # water coming in from the recharge with a concentration of 1.0.
 
 fig, ax = plt.subplots()
-sim_concentration.isel(time=-1).ugrid.sel(y=0).plot.contourf(yincrease=False)
+sim_concentration.isel(time=-1).ugrid.sel(y=0).plot.contourf(
+    ax=ax, x="x", y="z", cmap="RdYlBu_r"
+)
 
 # %%
