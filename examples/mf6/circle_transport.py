@@ -187,7 +187,12 @@ simulation["flow_solver"] = imod.mf6.Solution(
     relaxation_factor=0.97,
 )
 
-# %% Set the
+# %%
+# Set the timesteps, we want output each year, so we specify stress periods
+# which last 1 year. However, timesteps of 1 year yield unstable results, so we
+# set ``n_timesteps`` to 10, which sets the amount of timesteps within a stress
+# period.
+
 simtimes = pd.date_range(start="2000-01-01", end="2030-01-01", freq="As")
 simulation.create_time_discretization(additional_times=simtimes)
 simulation["time_discretization"]["n_timesteps"] = 10
@@ -335,8 +340,8 @@ sim_head.isel(time=-1, layer=0).ugrid.plot(ax=ax)
 ax.set_aspect(1)
 
 # %%
-# We observe the initial water (without solute) slowly being flushed out by
-# water coming in from the recharge with a concentration of 1.0.
+# We can draw a crossection through the center by selecting y=0, for which we
+# can plot the contours as follows:
 
 fig, ax = plt.subplots()
 sim_concentration.isel(time=-1).ugrid.sel(y=0).plot.contourf(
