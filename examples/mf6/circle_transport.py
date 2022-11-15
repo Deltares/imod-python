@@ -1,6 +1,6 @@
 """
-Circle (transport)
-==================
+Freshwater lens (circle)
+========================
 
 This example illustrates how to setup a very simple unstructured groundwater
 transport model using the ``imod`` package and associated packages.
@@ -13,49 +13,85 @@ In overview, we'll set the following steps:
     * Visualize the results.
 """
 
+# sphinx_gallery_thumbnail_number = -1
+
 # %%
 # We'll start with the following imports:
 
-from datetime import date, timedelta
-
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import xarray as xr
 import xugrid as xu
 
 import imod
 
+# %%
+# Parameters
+# ----------
 
-# helper function for creating iterable with all dates between two dates
-def daterange(date1, date2):
-    for n in range(int((date2 - date1).days) + 1):
-        yield date1 + timedelta(n)
-
+porosity = 0.10
+max_concentration = 35.0
+min_concentration = 0.0
+max_density = 1025.0
+min_density = 1000.0
+k_value = 10.0
 
 # %%
 # Create a mesh
 # -------------
 #
-# As explained in circle.py we first generate a grid and a hydraulic conductivity array
+# The first steps consists of generating a mesh. In this example, we'll use data
+# included with iMOD Python for a circular mesh. Note that this is a `Ugrid2D
+# object. <https://deltares.github.io/xugrid/api/xugrid.Ugrid2d.html>`_
+# For more information on working with unstructured grids see the
+# `Xugrid documentation <https://deltares.github.io/xugrid/index.html>`_
 
-grid = imod.data.circle()
+grid_triangles = imod.data.circle()
+
+fig, ax = plt.subplots()
+xu.plot.line(grid_triangles)
+ax.set_aspect(1)
+
+# %%
+# However a triangular grid has the issue that the direction of the fluxes
+# between cell centres is not perpendicular to the cell vertices. The default
+# formulation of Modflow 6 does not account for this, which causes mass balance
+# errors. The XT3D formulation is able to account for this, but the last version
+# of Modflow 6 (6.3 at time of writing) does not support this in combination
+# with the Buoyancy package and using XT3D comes with an extra, significant
+# computational burden. It is therefore easier to use a voronoi grid, for which
+# `Xugrid <https://deltares.github.io/xugrid/index.html>`_ has a very convenient
+# method.
+
+grid = grid_triangles.tesselate_centroidal_voronoi()
+
+fig, ax = plt.subplots()
+xu.plot.line(grid)
+ax.set_aspect(1)
+
+# %%
+# Create arrays
 
 nface = grid.n_face
-nlayer = 2
+nlayer = 15
+
+layer = np.arange(nlayer, dtype=int) + 1
 
 idomain = xu.UgridDataArray(
     xr.DataArray(
         np.ones((nlayer, nface), dtype=np.int32),
-        coords={"layer": [1, 2]},
+        coords={"layer": layer},
         dims=["layer", grid.face_dimension],
     ),
     grid=grid,
 )
 icelltype = xu.full_like(idomain, 0)
-k = xu.full_like(idomain, 1.0, dtype=float)
+k = xu.full_like(idomain, k_value, dtype=float)
 k33 = k.copy()
 
-bottom = idomain * xr.DataArray([5.0, 0.0], dims=["layer"])
+top = 0.0
+bottom = xr.DataArray(top - (layer * 10.0), dims=["layer"])
 
 # %%
 # Recharge
@@ -67,7 +103,7 @@ bottom = idomain * xr.DataArray([5.0, 0.0], dims=["layer"])
 # recharge, and has concentration units.
 
 rch_rate = xu.full_like(idomain.sel(layer=1), 0.001, dtype=float)
-rch_concentration = xu.full_like(rch_rate, 1.0)
+rch_concentration = xu.full_like(rch_rate, min_concentration)
 rch_concentration = rch_concentration.expand_dims(species=["salinity"])
 
 
@@ -78,14 +114,21 @@ rch_concentration = rch_concentration.expand_dims(species=["salinity"])
 # prescribed solute concentration. If it leaves, it leaves with the
 # concentration that was computed for the cell.
 #
-# In this example we set the prescribed head value to 1 and the external
-# concentration to 1.0 as well. The boundary only operates on the top layer.
+# In this example we set the prescribed head value to 0.0 and the external
+# concentration to 35.0 as well. The boundary only operates on the top layer.
 
 chd_location = xu.zeros_like(idomain.sel(layer=1), dtype=bool).ugrid.binary_dilation(
     border_value=True
 )
-constant_head = xu.full_like(idomain, 1.0, dtype=float).where(chd_location)
-constant_concentration = xu.full_like(constant_head, 1)
+constant_head = xu.full_like(idomain, 0.0, dtype=float).where(chd_location)
+# Approximate face area
+face_area = (1000.0 / 6) ** 2 * 0.5
+
+conductance = xu.full_like(idomain, face_area * k_value, dtype=float).where(
+    chd_location
+)
+
+constant_concentration = xu.full_like(constant_head, max_concentration)
 constant_concentration = constant_concentration.expand_dims(species=["salinity"])
 
 
@@ -97,10 +140,11 @@ constant_concentration = constant_concentration.expand_dims(species=["salinity"]
 
 gwf_model = imod.mf6.GroundwaterFlowModel()
 gwf_model["disv"] = imod.mf6.VerticesDiscretization(
-    top=10.0, bottom=bottom, idomain=idomain
+    top=top, bottom=bottom, idomain=idomain
 )
-gwf_model["chd"] = imod.mf6.ConstantHead(
+gwf_model["ghb"] = imod.mf6.GeneralHeadBoundary(
     constant_head,
+    conductance=conductance,
     concentration=constant_concentration,
     print_input=True,
     print_flows=True,
@@ -119,15 +163,15 @@ gwf_model["sto"] = imod.mf6.SpecificStorage(
     transient=False,
     convertible=0,
 )
-gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
+gwf_model["oc"] = imod.mf6.OutputControl(save_head="last", save_budget="last")
 gwf_model["rch"] = imod.mf6.Recharge(
     rch_rate, concentration=rch_concentration, print_flows=True, save_flows=True
 )
 
 simulation = imod.mf6.Modflow6Simulation("circle")
-simulation["GWF_1"] = gwf_model
+simulation["flow"] = gwf_model
 simulation["flow_solver"] = imod.mf6.Solution(
-    modelnames=["GWF_1"],
+    modelnames=["flow"],
     print_option="summary",
     csv_output=False,
     no_ptc=True,
@@ -142,9 +186,27 @@ simulation["flow_solver"] = imod.mf6.Solution(
     reordering_method=None,
     relaxation_factor=0.97,
 )
-simtimes = daterange(date(2000, 1, 1), date(2000, 10, 10))
-simulation.create_time_discretization(additional_times=simtimes)
 
+# %% Set the
+simtimes = pd.date_range(start="2000-01-01", end="2030-01-01", freq="As")
+simulation.create_time_discretization(additional_times=simtimes)
+simulation["time_discretization"]["n_timesteps"] = 10
+
+# %%
+# Buoyancy
+# --------
+# Since we are solving a variable density problem, we need to add the buoyancy
+# package. It will use the species "salinity" that we are simulating with a
+# transport model defined below.
+
+slope = (max_density - min_density) / (max_concentration - min_concentration)
+gwf_model["buoyancy"] = imod.mf6.Buoyancy(
+    reference_density=min_density,
+    modelname=["transport"],
+    reference_concentration=[min_concentration],
+    density_concentration_slope=[slope],
+    species=["salinity"],
+)
 
 # %%
 # Add transport model to simulation
@@ -166,26 +228,33 @@ transport_model["disv"] = gwf_model["disv"]
 # Now we define some transport packages for simulating the physical processes
 # of advection, mechanical dispersion, and molecular diffusion dispersion. This
 # example is transient, and the volume available for storage is the porosity,
-# in this case 0.3.
+# in this case 0.10.
+
+al = 0.001
 
 transport_model["dsp"] = imod.mf6.Dispersion(
-    1e-4, 1.0, 10.0, 1.0, 2.0, 3.0, False, False
+    diffusion_coefficient=1e-4,
+    longitudinal_horizontal=al,
+    transversal_horizontal1=al * 0.1,
+    transversal_vertical=al * 0.01,
+    xt3d_off=False,
+    xt3d_rhs=False,
 )
 transport_model["adv"] = imod.mf6.AdvectionUpstream()
-transport_model["mst"] = imod.mf6.MobileStorageTransfer(0.3)
+transport_model["mst"] = imod.mf6.MobileStorageTransfer(porosity)
 
 # %%
 # Now we define initial conditions (0.0) and output options for the transport
 # simulation, and assign the transport model to the simulation as well.
 
-transport_model["ic"] = imod.mf6.InitialConditions(start=0.0)
+transport_model["ic"] = imod.mf6.InitialConditions(start=max_concentration)
 transport_model["oc"] = imod.mf6.OutputControl(
-    save_concentration="all", save_budget="last"
+    save_concentration="last", save_budget="last"
 )
 
-simulation["GWT_1"] = transport_model
+simulation["transport"] = transport_model
 simulation["transport_solver"] = imod.mf6.Solution(
-    modelnames=["GWT_1"],
+    modelnames=["transport"],
     print_option="summary",
     csv_output=False,
     no_ptc=True,
@@ -223,9 +292,35 @@ simulation.run()
 # ----------------
 
 sim_concentration = imod.mf6.out.open_conc(
-    modeldir / "GWT_1/GWT_1.ucn",
-    modeldir / "GWF_1/disv.disv.grb",
-)
+    modeldir / "transport/transport.ucn",
+    modeldir / "flow/disv.disv.grb",
+).compute()
+
+sim_head = imod.mf6.out.open_hds(
+    modeldir / "flow/flow.hds",
+    modeldir / "flow/disv.disv.grb",
+).compute()
+
+# %%
+# Assign coordinates to output
+# ----------------------------
+#
+# The model output does not feature very useful coordinate values for ``time``
+# and ``z``, therefore it is best to assign these to the datasets for more
+# understandable plots.
+#
+# First we have to compute values for a z coordinate. The
+interfaces = np.concatenate([[top], bottom.values])
+z = (interfaces[:-1] + interfaces[1:]) / 2
+
+z
+
+# %%
+# Assign these new coordinate values to the dataset
+coords = dict(time=simtimes[1:], z=("layer", z))
+
+sim_head = sim_head.assign_coords(**coords)
+sim_concentration = sim_concentration.assign_coords(**coords)
 
 
 # %%
@@ -236,9 +331,16 @@ sim_concentration = imod.mf6.out.open_conc(
 # provided by xarray and xugrid:
 
 fig, ax = plt.subplots()
-sim_concentration.isel(time=33, layer=0).ugrid.plot(ax=ax)
+sim_head.isel(time=-1, layer=0).ugrid.plot(ax=ax)
 ax.set_aspect(1)
 
 # %%
 # We observe the initial water (without solute) slowly being flushed out by
 # water coming in from the recharge with a concentration of 1.0.
+
+fig, ax = plt.subplots()
+sim_concentration.isel(time=-1).ugrid.sel(y=0).plot.contourf(
+    ax=ax, x="x", y="z", cmap="RdYlBu_r"
+)
+
+# %%
