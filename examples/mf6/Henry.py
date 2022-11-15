@@ -26,6 +26,9 @@ which is represented by a Well package. The right boundary is in direct contact
 with hydrostatic seawater with a density of 1025 kg m:sup:`-3`. This is
 represented by a General Head Boundary package.
 """
+
+# sphinx_gallery_thumbnail_number = -1
+
 # %%
 # We'll start with the usual imports. As this is a simple (synthetic)
 # structured model, we can make due with few packages.
@@ -264,11 +267,11 @@ simulation.run()
 #
 # We'll open the head and concentration files.
 
-head = imod.mf6.open_hds(
+head = imod.mf6.out.open_hds(
     modeldir / "flow/flow.hds",
     modeldir / "flow/dis.dis.grb",
 )
-conc = imod.mf6.open_hds(
+conc = imod.mf6.out.open_conc(
     modeldir / "transport/transport.ucn",
     modeldir / "flow/dis.dis.grb",
 )
@@ -283,6 +286,6 @@ head.isel(y=0, time=-1).plot.contourf(yincrease=False)
 # We can check the concentration to see that a fresh-saline interface has been
 # formed:
 
-conc.isel(y=0, time=-1).plot.contourf(yincrease=False)
+conc.isel(y=0, time=-1).plot.contourf(yincrease=False, cmap="RdYlBu_r")
 
 # %%
