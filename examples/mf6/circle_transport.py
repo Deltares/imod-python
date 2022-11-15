@@ -1,6 +1,6 @@
 """
-Circle (transport)
-==================
+Freshwater lens (circle)
+========================
 
 This example illustrates how to setup a very simple unstructured groundwater
 transport model using the ``imod`` package and associated packages.
@@ -12,6 +12,8 @@ In overview, we'll set the following steps:
     * Run the simulation.
     * Visualize the results.
 """
+
+# sphinx_gallery_thumbnail_number = -1
 
 # %%
 # We'll start with the following imports:
@@ -39,9 +41,37 @@ k_value = 10.0
 # Create a mesh
 # -------------
 #
-# As explained in circle.py we first generate a grid and a hydraulic conductivity array
+# The first steps consists of generating a mesh. In this example, we'll use data
+# included with iMOD Python for a circular mesh. Note that this is a `Ugrid2D
+# object. <https://deltares.github.io/xugrid/api/xugrid.Ugrid2d.html>`_
+# For more information on working with unstructured grids see the
+# `Xugrid documentation <https://deltares.github.io/xugrid/index.html>`_
 
-grid = imod.data.circle().tesselate_centroidal_voronoi()
+grid_triangles = imod.data.circle()
+
+fig, ax = plt.subplots()
+xu.plot.line(grid_triangles)
+ax.set_aspect(1)
+
+# %%
+# However a triangular grid has the issue that the direction of the fluxes
+# between cell centres is not perpendicular to the cell vertices. The default
+# formulation of Modflow 6 does not account for this, which causes mass balance
+# errors. The XT3D formulation is able to account for this, but the last version
+# of Modflow 6 (6.3 at time of writing) does not support this in combination
+# with the Buoyancy package and using XT3D comes with an extra, significant
+# computational burden. It is therefore easier to use a voronoi grid, for which
+# `Xugrid <https://deltares.github.io/xugrid/index.html>`_ has a very convenient
+# method.
+
+grid = grid_triangles.tesselate_centroidal_voronoi()
+
+fig, ax = plt.subplots()
+xu.plot.line(grid)
+ax.set_aspect(1)
+
+# %%
+# Create arrays
 
 nface = grid.n_face
 nlayer = 15
@@ -198,9 +228,9 @@ transport_model["disv"] = gwf_model["disv"]
 # Now we define some transport packages for simulating the physical processes
 # of advection, mechanical dispersion, and molecular diffusion dispersion. This
 # example is transient, and the volume available for storage is the porosity,
-# in this case 0.3.
+# in this case 0.10.
 
-al = 0.0001
+al = 0.001
 
 transport_model["dsp"] = imod.mf6.Dispersion(
     diffusion_coefficient=1e-4,
