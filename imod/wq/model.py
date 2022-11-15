@@ -605,6 +605,16 @@ class SeawatModel(Model):
 
         return n_extra
 
+    def _render_anihfb(self, modelname, directory, nlayer):
+        out = ""
+        for key in ("ani", "hfb"):
+            pkgkey = self._get_pkgkey(key)
+            if pkgkey is not None:
+                out += self[pkgkey]._render(
+                    modelname=modelname, directory=directory / pkgkey, nlayer=nlayer
+                )
+        return out
+
     def render(self, directory, result_dir, writehelp):
         """
         Render the runfile as a string, package by package.
@@ -636,6 +646,13 @@ class SeawatModel(Model):
                 )
             )
 
+        # ani and hfb packages
+        content.append(
+            self._render_anihfb(
+                modelname=self.modelname, directory=directory, nlayer=nlayer
+            )
+        )
+
         # multi-system package group: chd, drn, ghb, riv, wel
         modflowcontent, ssm_content, n_sinkssources = self._render_groups(
             directory=directory, globaltimes=globaltimes
@@ -666,7 +683,7 @@ class SeawatModel(Model):
                 directory=directory, globaltimes=globaltimes, nlayer=nlayer
             )
         )
-        for key in ("vdf", "adv", "dsp", "ani", "hfb"):
+        for key in ("vdf", "adv", "dsp"):
             content.append(
                 self._render_pkg(
                     key=key, directory=directory, globaltimes=globaltimes, nlayer=nlayer
