@@ -666,7 +666,7 @@ class SeawatModel(Model):
                 directory=directory, globaltimes=globaltimes, nlayer=nlayer
             )
         )
-        for key in ("vdf", "adv", "dsp"):
+        for key in ("vdf", "adv", "dsp", "ani", "hfb"):
             content.append(
                 self._render_pkg(
                     key=key, directory=directory, globaltimes=globaltimes, nlayer=nlayer
@@ -793,7 +793,7 @@ class SeawatModel(Model):
             if (
                 "x" in pkg.dataset.coords
                 and "y" in pkg.dataset.coords
-                or pkg._pkg_id == "wel"
+                or pkg._pkg_id in ("wel", "ani", "hfb")
             ):
                 try:
                     pkg.save(directory=directory / pkgname)
