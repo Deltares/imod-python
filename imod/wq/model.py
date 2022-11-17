@@ -607,7 +607,7 @@ class SeawatModel(Model):
 
     def _render_anihfb(self, modelname, directory, nlayer):
         out = ""
-        for key in ("ani", "hfb"):
+        for key in ("ani", "hfb6"):
             pkgkey = self._get_pkgkey(key)
             if pkgkey is not None:
                 out += self[pkgkey]._render(
@@ -810,7 +810,7 @@ class SeawatModel(Model):
             if (
                 "x" in pkg.dataset.coords
                 and "y" in pkg.dataset.coords
-                or pkg._pkg_id in ("wel", "ani", "hfb")
+                or pkg._pkg_id in ("wel", "ani", "hfb6")
             ):
                 try:
                     pkg.save(directory=directory / pkgname)

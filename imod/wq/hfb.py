@@ -16,9 +16,9 @@ class HorizontalFlowBarrier(Package):
         responsible for consistency with model.
     """
 
-    _pkg_id = "hfb"
+    _pkg_id = "hfb6"
 
-    _template = "[hfb]\n" "    hfbfile = {hfbfile}\n\n"
+    _template = "[hfb6]\n" "    hfbfile = {hfbfile}\n\n"
 
     def __init__(
         self,
