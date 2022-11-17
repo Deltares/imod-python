@@ -101,9 +101,7 @@ class HorizontalAnisotropy(Package):
     ):
         super().__init__()
         self["factor"] = factor
-        self["factor"] = self["factor"].fillna(1.0)
         self["angle"] = angle
-        self["angle"] = self["angle"].fillna(0.0)
 
     def _render(self, modelname, directory, nlayer):
         # write ani file
@@ -123,9 +121,22 @@ class HorizontalAnisotropy(Package):
         assumes _render() to have run previously"""
         directory.mkdir(exist_ok=True)  # otherwise handled by idf.save
 
-        def _write(path, a, nodata=1.0e20, dtype=np.float32):
-            if not np.all(a == a[0][0]):
-                return np.savetxt(path, a, fmt="%.5f", delimiter=" ")
+        nodata_val = {"factor": 1.0, "angle": 0.0}
+
+        def _check_all_equal(da):
+            return np.all(np.isnan(da)) or np.all(
+                da.values[~np.isnan(da)] == da.values[~np.isnan(da)][0]
+            )
+
+        def _write(path, da, nodata=1.0e20, dtype=np.float32):
+            if not _check_all_equal(da):
+                dx, xmin, xmax, dy, ymin, ymax = imod.util.spatial_reference(da)
+                ncol, nrow = da.shape
+                footer = f" DIMENSIONS\n{ncol}\n{nrow}\n{xmin}\n{ymin}\n{xmax}\n{ymax}\n{nodata}\n0\n{dx}\n{dx}"
+                a = np.nan_to_num(da.values, nan=nodata)
+                return np.savetxt(
+                    path, a, fmt="%.5f", delimiter=" ", footer=footer, comments=""
+                )
             else:
                 # write single value to ani file
                 pass
@@ -133,16 +144,10 @@ class HorizontalAnisotropy(Package):
         for name, da in self.dataset.data_vars.items():  # pylint: disable=no-member
             if "y" in da.coords and "x" in da.coords:
                 path = pathlib.Path(directory).joinpath(f"{name}.arr")
-                if name == "factor":
-                    nodata = 1.0
-                elif name == "angle":
-                    nodata = 0.0
-                else:
-                    nodata = 1.0e20
                 imod.array_io.writing._save(
                     path,
                     da,
-                    nodata=nodata,
+                    nodata=nodata_val[name],
                     pattern=None,
                     dtype=np.float32,
                     write=_write,
@@ -154,14 +159,18 @@ class HorizontalAnisotropy(Package):
                 for prm in ["factor", "angle"]:
                     da = self.dataset[prm]
                     if "layer" in da.coords and "y" in da.coords and "x" in da.coords:
-                        a = da.sel(layer=l).values
-                        if not np.all(a == a[0][0]):
+                        a = da.sel(layer=l)
+                        if not _check_all_equal(a):
                             f.write(
                                 f"open/close {self.rendir.as_posix()}/{prm}_l{float(l):.0f}.arr 1.0D0 (FREE) -1 {prm}_l{float(l):.0f}\n"
                             )
                         else:
+                            if np.all(np.isnan(a)):
+                                val = nodata_val[prm]
+                            else:
+                                val = a[~np.isnan()][0]
                             f.write(
-                                f"constant {float(a[0][0]):.5f} {prm}_l{float(l):.0f}\n"
+                                f"constant {float(val):.5f} {prm}_l{float(l):.0f}\n"
                             )
                     else:
                         f.write(
