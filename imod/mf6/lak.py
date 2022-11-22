@@ -257,6 +257,19 @@ def create_outlet_data(outlets, name_to_number):
     }
     return outlet_data
 
+class Period_internal:
+    """
+    The Period_internal class is used for rendering the lake package in jinja.
+    There is no point in instantiating this class as a user.
+    """
+
+    def __init__(self, period_number):
+        self.period_number = period_number
+        self.nr_values = 0
+        self.lake_or_outlet_number = []
+        self.series_name = []
+        self.value = []
+
 
 class Lake(BoundaryCondition):
     """
@@ -326,6 +339,46 @@ class Lake(BoundaryCondition):
         float or character value that defines the bed slope for the lake outlet. A specified SLOPE value is
         only used for active lakes if outlet_type for lake outlet OUTLETNO is MANNING.
 
+
+        #time series (lake)
+    ts_status: array of strings (xr.DataArray, optional)
+        timeserie used to indicate lake status. Can be ACTIVE, INACTIVE, or CONSTANT.
+        By default, STATUS is ACTIVE.
+    ts_stage: array of floats (xr.DataArray, optional)
+        timeserie used to specify the stage of the lake. The specified STAGE is only applied if
+        the lake is a constant stage lake
+    ts_rainfall: array of floats (xr.DataArray, optional)
+        timeserie used to specify the rainfall rate (LT-1) for the lake. Value must be greater than or equal to zero.
+    ts_evaporation: array of floats (xr.DataArray, optional)
+        timeserie used to specify the  the maximum evaporation rate (LT-1) for the lake. Value must be greater than or equal to zero. I
+    ts_runoff: array of floats (xr.DataArray, optional)
+        timeserie used to specify the  the runoff rate (L3 T-1) for the lake. Value must be greater than or equal to zero.
+    ts_inflow: array of floats (xr.DataArray, optional)
+        timeserie used to specify the volumetric inflow rate (L3 T-1) for the lake. Value must be greater than or equal to zero.
+    ts_withdrawal: array of floats (xr.DataArray, optional)
+        timeserie used to specify the maximum withdrawal rate (L3 T-1) for the lake. Value must be greater than or equal to zero.
+    ts_auxiliary: array of floats (xr.DataArray, optional)
+        timeserie used to specify value of auxiliary variables of the lake
+
+    #time series (outlet)
+    ts_rate: array of floats (xr.DataArray, optional)
+        timeserie used to specify the extraction rate for the lake outflow. A positive value indicates
+        inflow and a negative value indicates outflow from the lake. RATE only applies to active
+         (IBOUND > 0) lakes. A specified RATE is only applied if COUTTYPE for the OUTLETNO is SPECIFIED
+    ts_invert: array of floats (xr.DataArray, optional)
+        timeserie used to specify  the invert elevation for the lake outlet. A specified INVERT value is only used for
+        active lakes if COUTTYPE for lake outlet OUTLETNO is not SPECIFIED.
+    ts_rough: array of floats (xr.DataArray, optional)
+        timeserie used to specify defines the roughness coefficient for the lake outlet. Any value can be
+        specified if COUTTYPE is not MANNING.
+    ts_width: array of floats (xr.DataArray, optional)
+        timeserie used to specify  the width of the lake outlet. A specified WIDTH value is only used for active lakes if
+        COUTTYPE for lake outlet OUTLETNO is not SPECIFIED.
+    ts_slope: array of floats (xr.DataArray, optional)
+        timeserie used to specify the bed slope for the lake outlet. A specified SLOPE value is only used for active lakes
+        if COUTTYPE for lake outlet OUTLETNO is MANNING.
+
+
     print_input: ({True, False}, optional)
         keyword to indicate that the list of constant head information will
         be written to the listing file immediately after it is read. Default is
@@ -394,7 +447,34 @@ class Lake(BoundaryCondition):
         "outlet_roughness": VariableMetaData(np.floating),
         "outlet_width": VariableMetaData(np.floating),
         "outlet_slope": VariableMetaData(np.floating),
+        "ts_status": VariableMetaData(np.str0),
+        "ts_stage": VariableMetaData(np.floating),
+        "ts_rainfall": VariableMetaData(np.floating),
+        "ts_evaporation": VariableMetaData(np.floating),
+        "ts_runoff": VariableMetaData(np.floating),
+        "ts_inflow": VariableMetaData(np.floating),
+        "ts_withdrawal": VariableMetaData(np.floating),
+        "ts_rate": VariableMetaData(np.floating),
+        "ts_invert": VariableMetaData(np.floating),
+        "ts_rough": VariableMetaData(np.floating),
+        "ts_width": VariableMetaData(np.floating),
+        "ts_slope": VariableMetaData(np.floating),        
     }
+    _period_data = (
+        "ts_status",
+        "ts_stage",
+        "ts_rainfall",
+        "ts_evaporation",
+        "ts_runoff",
+        "ts_inflow",
+        "ts_withdrawal",
+        "ts_rate",
+        "ts_invert",
+        "ts_rough",
+        "ts_width",
+        "ts_slope",
+    )
+
 
     def __init__(
         # lake
@@ -419,6 +499,21 @@ class Lake(BoundaryCondition):
         outlet_roughness=None,
         outlet_width=None,
         outlet_slope=None,
+        # time series (lake)
+        ts_status=None,
+        ts_stage=None,
+        ts_rainfall=None,
+        ts_evaporation=None,
+        ts_runoff=None,
+        ts_inflow=None,
+        ts_withdrawal=None,
+        ts_auxiliary=None,
+        # time series (outlet)
+        ts_rate=None,
+        ts_invert=None,
+        ts_rough=None,
+        ts_width=None,
+        ts_slope=None,        
         # options
         print_input=False,
         print_stage=False,
@@ -466,6 +561,22 @@ class Lake(BoundaryCondition):
         self.dataset["ts6_filename"] = ts6_filename
         self.dataset["time_conversion"] = time_conversion
         self.dataset["length_conversion"] = length_conversion
+
+        self.dataset["ts_status"] = ts_status
+        self.dataset["ts_stage"] = ts_stage
+        self.dataset["ts_rainfall"] = ts_rainfall
+        self.dataset["ts_evaporation"] = ts_evaporation
+        self.dataset["ts_runoff"] = ts_runoff
+        self.dataset["ts_inflow"] = ts_inflow
+        self.dataset["ts_withdrawal"] = ts_withdrawal
+        self.dataset["ts_auxiliary"] = ts_auxiliary
+
+        self.dataset["ts_rate"] = ts_rate
+        self.dataset["ts_invert"] = ts_invert
+        self.dataset["ts_rough"] = ts_rough
+        self.dataset["ts_width"] = ts_width
+        self.dataset["ts_slope"] = ts_slope
+
         self._pkgcheck()
 
     @staticmethod
@@ -548,6 +659,14 @@ class Lake(BoundaryCondition):
             packagedata.append(row)
         d["packagedata"] = packagedata
 
+        d["periods"] = []
+        any_timeseries = any(
+            [self._valid(self.dataset[name].values[()]) for name in self._period_data]
+        )
+        if any_timeseries:
+            d["periods"] = self.create_period_data_block(globaltimes)
+        d["nperiod"] = len(d["periods"])        
+
         return self._template.render(d)
 
     def _connection_dataframe(self) -> pd.DataFrame:
@@ -607,6 +726,37 @@ class Lake(BoundaryCondition):
                 self._write_table_section(f, self._outlet_dataframe(), "outlets")
 
         return
+
+
+    def create_period_data_block(self, globaltimes):
+        period_data_list = {}
+
+        for timeseries_name in self._period_data:
+            if self._valid(self.dataset[timeseries_name].values[()]):
+                timeseries = self.dataset[timeseries_name]
+                timeseries_times = [t for t in timeseries.coords["time"].values]
+                timeseries_indexes = [i for i in timeseries.coords["index"].values]
+                for itime in timeseries_times:
+                    iperiod = np.where(globaltimes == itime)[0][0] + 1
+
+                    for index in timeseries_indexes:
+                        object_specific_data = timeseries.sel(
+                            time=itime, index=index
+                        ).values[()]
+                        if not np.isnan(object_specific_data):
+                            if iperiod not in period_data_list:
+                                period_data_list[iperiod] = Period_internal(iperiod)
+                            period_data_list[iperiod].nr_values += 1
+                            period_data_list[iperiod].lake_or_outlet_number.append(
+                                index
+                            )
+                            period_data_list[iperiod].series_name.append(
+                                timeseries_name[3:]
+                            )
+                            period_data_list[iperiod].value.append(object_specific_data)
+        keys = [x for x in period_data_list.keys()]
+        keys = sorted(keys)
+        return [period_data_list[k] for k in keys]        
 
     def _package_data_to_sparse(self):
         return
