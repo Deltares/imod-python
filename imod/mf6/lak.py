@@ -207,7 +207,7 @@ def create_connection_data(lakes):
 
         cell_id = xr.DataArray(
             data=indices,
-            coords={"celldim": list(xr_indices.keys())},mamba install "pytest<7.1"
+            coords={"celldim": list(xr_indices.keys())},
             dims=("boundary", "celldim"),
         )
         cell_ids.append(cell_id)
@@ -781,4 +781,6 @@ class Lake(BoundaryCondition):
         return
 
     def fill_stress_perioddata(self):
+        return
+    def write_perioddata(self, directory, pkgname, binary):
         return
