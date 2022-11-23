@@ -15,8 +15,57 @@ import xarray as xr
 from imod import mf6
 from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase, VariableMetaData
 
+class LakeApi_Base(PackageBase):
+    """
+    Base class for lake and outlet object.
+    """
 
-class LakeData(PackageBase):
+    def __init__(self, number):
+        super().__init__()
+        self.object_number = number
+
+    def get_times(self, timeseries_name):
+        """
+        returns the times associated with the timeseries that has name "timeseries_name"
+        """
+        times = []
+        vars = [k for k in self.dataset.keys()]  
+        if timeseries_name in vars:              
+            ts = self.dataset[timeseries_name]
+            tstimes = [x for x in ts.coords["time"].values]
+            times.extend(tstimes)
+        return sorted(set(times))
+
+    def has_transient_data(self, timeseries_name):
+        """
+        returns true if this object has transient data for a property with a given name
+        (outlets can have either a scalar or a timeseries for some properties)
+        """
+        vars = [k for k in self.dataset.keys()]
+        if timeseries_name in vars:
+            ts = self.dataset[timeseries_name]
+            if type(ts) == xr.DataArray:
+                if "time"in ts.coords:
+                    return True
+        return False
+
+    def add_timeseries_to_dataarray(self, timeseries_name, dataarray):
+        """
+        adds the timeseries of this lake or outlet to a data-array containing this timeseries for
+        all lakes or outlets
+        """
+        current_object_data = dataarray.sel(index=self.object_number)
+        if hasattr(self, timeseries_name):
+            ts = getattr(self, timeseries_name)
+            if ts is not None:
+                index_of_object = (
+                    dataarray.coords["index"].values.tolist().index(self.object_number)
+                )
+                dataarray[
+                    {"index": index_of_object}
+                ] = current_object_data.combine_first(ts)
+        return dataarray
+class LakeData(LakeApi_Base):
     """
     This class is used to initialize the lake package. It contains data
     relevant to one lake. The input needed to create an instance of this
@@ -47,7 +96,16 @@ class LakeData(PackageBase):
     auxiliary: timeseries of float numbers
 
     """
-
+    timeseries_names = [
+        "status",
+        "stage",
+        "rainfall",
+        "evaporation",
+        "runoff",
+        "inflow",
+        "withdrawal",
+        "auxiliary",
+    ]
     def __init__(
         self,
         starting_stage: float,
@@ -67,7 +125,7 @@ class LakeData(PackageBase):
         withdrawal=None,
         auxiliary=None,
     ):
-        super().__init__()
+        super().__init__(-1)
         self.dataset["starting_stage"] = starting_stage
         self.dataset["boundname"] = boundname
         self.dataset["connection_type"] = connection_type
@@ -88,14 +146,18 @@ class LakeData(PackageBase):
         self.dataset["auxiliary"] = auxiliary
 
 
-class OutletBase:
+class OutletBase(LakeApi_Base):
     """
     Base class for the different kinds of outlets
     """
 
+    timeseries_names = ["rate", "invert", "rough", "width", "slope"]
+
     def __init__(self, outlet_number: int, lakein: str, lakeout: str):
+        super().__init__(-1)        
         self.dataset = xr.Dataset()
         self.dataset["outlet_number"] = outlet_number
+        self.object_number = outlet_number
         self.dataset["lakein"] = lakein
         self.dataset["lakeout"] = lakeout
         self.dataset["invert"] = None
@@ -162,6 +224,24 @@ class OutletSpecified(OutletBase):
         super().__init__(outlet_number, lakein, lakeout)
         self.dataset["rate"] = rate
 
+def collect_all_times(list_of_lakes, list_of_outlets):
+    """
+    all timeseries we pass to the lake package must have the same time discretization-otherwise the coordinates
+    of the lake-package do not match. So in this function we collect all the time coordinates of all the lakes and
+    outlets.
+    """
+    times = []
+
+    for timeseries_name in LakeData.timeseries_names:
+        for lake in list_of_lakes:
+            if lake.has_transient_data(timeseries_name):
+                times.extend(lake.get_times(timeseries_name))
+
+    for timeseries_name in OutletBase.timeseries_names:
+        for outlet in list_of_outlets:
+            if outlet.has_transient_data(timeseries_name):
+                times.extend(outlet.get_times(timeseries_name))
+    return sorted(set(times))
 
 def create_connection_data(lakes):
     connection_vars = [
@@ -246,8 +326,11 @@ def create_outlet_data(outlets, name_to_number):
 
         # For other values: fill in NaN if not applicable.
         for var in outlet_vars:
-            if var in outlet.dataset:
-                value = outlet.dataset[var].item()
+            if var in outlet.dataset   :
+                if "time" in outlet.dataset[var].dims:
+                    value = 0
+                else:
+                    value = outlet.dataset[var].item()
             else:
                 value = np.nan
             outlet_data[f"outlet_{var}"].append(value)
@@ -257,6 +340,33 @@ def create_outlet_data(outlets, name_to_number):
     }
     return outlet_data
 
+
+def create_timeseries(list_of_lakes_or_outlets, ts_times, timeseries_name):
+    """
+    In this function we create a dataarray with a given time coorridnate axis. We add all
+    the timeseries of lakes or outlets with the given name. We also create a dimension to
+    specify the lake or outlet number.
+    """
+    if not any(
+        lake_or_outlet.has_transient_data(timeseries_name)
+        for lake_or_outlet in list_of_lakes_or_outlets
+    ):
+        return None
+
+    object_numbers = []
+    for lake_or_outlet in list_of_lakes_or_outlets:
+        object_numbers.append(lake_or_outlet.object_number)
+
+    dataarray = xr.DataArray(
+        dims=("time", "index"),
+        coords={"time": ts_times, "index": object_numbers},
+        name=timeseries_name,
+    )
+    for lake_or_outlet in list_of_lakes_or_outlets:
+        dataarray = lake_or_outlet.add_timeseries_to_dataarray(
+            timeseries_name, dataarray
+        )
+    return dataarray
 
 class Period_internal:
     """
@@ -598,6 +708,8 @@ class Lake(BoundaryCondition):
         name_to_number = {
             lake["boundname"].item(): i + 1 for i, lake in enumerate(lakes)
         }
+        for lake in lakes:
+            lake.object_number = name_to_number[lake["boundname"].values[()]]
 
         # Package data
         lake_numbers = list(name_to_number.values())
@@ -618,6 +730,22 @@ class Lake(BoundaryCondition):
         )
         connection_data = create_connection_data(lakes)
         package_content.update(connection_data)
+
+        ts_times = collect_all_times(lakes, outlets)
+        package_content["ts_status"]  = create_timeseries(lakes, ts_times, "status")
+        package_content["ts_stage"]  = create_timeseries(lakes, ts_times, "stage")
+        package_content["ts_rainfall"]  = create_timeseries(lakes, ts_times, "rainfall")
+        package_content["ts_evaporation"]  = create_timeseries(lakes, ts_times, "evaporation")
+        package_content["ts_runoff"]  = create_timeseries(lakes, ts_times, "runoff")
+        package_content["ts_inflow"]  = create_timeseries(lakes, ts_times, "inflow")
+        package_content["ts_withdrawal"]  = create_timeseries(lakes, ts_times, "withdrwawal")
+        package_content["ts_auxiliary"]  = create_timeseries(lakes, ts_times, "auxiliary")
+
+        package_content["ts_rate"] = create_timeseries(outlets, ts_times, "rate")
+        package_content["ts_invert"] = create_timeseries(outlets, ts_times, "invert")
+        package_content["ts_rough"]= create_timeseries(outlets, ts_times, "rough")
+        package_content["ts_width"] = create_timeseries(outlets, ts_times, "width")
+        package_content["ts_slope"] = create_timeseries(outlets, ts_times, "slope")
 
         if outlets is not None:
             outlet_data = create_outlet_data(outlets, name_to_number)
