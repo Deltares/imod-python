@@ -398,6 +398,13 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
 
 def test_lake_rendering_transient(basic_dis):
     idomain, _, _ = basic_dis
+
+    is_lake1 = xr.full_like(idomain, False, dtype=bool)
+    is_lake1[1, 2, 2] = True
+    is_lake1[1, 2,3] = True
+    is_lake1[1, 3, 3] = True
+    is_lake2 = xr.full_like(idomain, False, dtype=bool)
+    is_lake2 [1, 4, 4]= True
     times_rainfall = [
         np.datetime64("2000-01-01"),
         np.datetime64("2000-03-01"),
@@ -414,14 +421,14 @@ def test_lake_rendering_transient(basic_dis):
     )
 
     lake1 = create_lake_data(
-        idomain,
+        is_lake1,
         11.0,
         "Naardermeer",
-        [(1, 2, 2), (1, 2, 3), (1, 3, 3)],
-        rainfall=rainfall,
-        inflow= inflow
+       
+        rainfall,
+        inflow
     )
-    lake2 = create_lake_data(idomain, 11.0, "Ijsselmeer", [(1, 4, 4)], rainfall, inflow)
+    lake2 = create_lake_data(is_lake2, 11.0, "Ijsselmeer", rainfall, inflow)
     times_invert = [
         np.datetime64("2000-01-01"),
         np.datetime64("2000-03-01"),
@@ -435,7 +442,7 @@ def test_lake_rendering_transient(basic_dis):
     outlet1 = OutletManning(
         1, "Naardermeer", "Ijsselmeer", invert, 24.0, 25.0, 26.0
     )
-    lake_package = from_lakes_and_outlets([lake1, lake2], [outlet1])
+    lake_package = Lake.from_lakes_and_outlets([lake1, lake2], [outlet1])
     global_times = np.array(
         [
             np.datetime64("1999-01-01"),
