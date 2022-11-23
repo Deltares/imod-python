@@ -366,6 +366,7 @@ def create_outlet_data(outlets, name_to_number):
     }
     return outlet_data
 
+
 class Period_internal:
     """
     The Period_internal class is used for rendering the lake package in jinja.
@@ -612,7 +613,6 @@ class Lake(BoundaryCondition):
         "ts_slope",
     )
 
-
     def __init__(
         # lake
         self,
@@ -853,7 +853,7 @@ class Lake(BoundaryCondition):
         )
         if any_timeseries:
             d["periods"] = self.create_period_data_block(globaltimes)
-        d["nperiod"] = len(d["periods"])        
+        d["nperiod"] = len(d["periods"])
 
         return self._template.render(d)
 
@@ -930,7 +930,6 @@ class Lake(BoundaryCondition):
 
             return
 
-
     def create_period_data_block(self, globaltimes):
         period_data_list = {}
 
@@ -959,7 +958,7 @@ class Lake(BoundaryCondition):
                             period_data_list[iperiod].value.append(object_specific_data)
         keys = [x for x in period_data_list.keys()]
         keys = sorted(keys)
-        return [period_data_list[k] for k in keys]        
+        return [period_data_list[k] for k in keys]
 
     def _write_period_section(self, f, globaltimes):
         class Period_internal:
@@ -1035,5 +1034,6 @@ class Lake(BoundaryCondition):
 
     def write_perioddata(self, directory, pkgname, binary):
         return
+
     def write_perioddata(self, directory, pkgname, binary):
         return
