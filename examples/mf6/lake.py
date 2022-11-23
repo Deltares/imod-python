@@ -33,9 +33,7 @@ def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
     creates an array similar in dimensions/coords to idomain, but with value NaN (orr the missing value for integers)
     everywhere, except in the cells contained in list "lake_cells". In those cells, the output array has value fillvalue.
     """
-    result = xr.full_like(
-        idomain, fill_value=np.nan, dtype=dtype
-    )
+    result = xr.full_like(idomain, fill_value=np.nan, dtype=dtype)
     for cell in lake_cells:
         result.values[cell[0], cell[1], cell[2]] = fillvalue
     return result

@@ -26,7 +26,7 @@ def create_lake_data(is_lake, starting_stage, name, rainfall=None, inflow=None):
         connection_length=connection_length,
         connection_width=connection_width,
         rainfall=rainfall,
-        inflow=inflow
+        inflow=inflow,
     )
 
 
@@ -47,7 +47,11 @@ def ijsselmeer(basic_dis):
     is_lake[0, 4, 4] = True
     is_lake[0, 4, 5] = True
     is_lake[0, 5, 5] = True
-    return create_lake_data(is_lake, starting_stage=15.0, name="IJsselmeer",)
+    return create_lake_data(
+        is_lake,
+        starting_stage=15.0,
+        name="IJsselmeer",
+    )
 
 
 @pytest.fixture(scope="function")
@@ -279,17 +283,15 @@ def test_lake_write_disv_three_lakes(basic_dis, tmp_path):
     assert actual == expected
 
 
-
-
 def test_lake_rendering_transient(basic_dis):
     idomain, _, _ = basic_dis
 
     is_lake1 = xr.full_like(idomain, False, dtype=bool)
     is_lake1[1, 2, 2] = True
-    is_lake1[1, 2,3] = True
+    is_lake1[1, 2, 3] = True
     is_lake1[1, 3, 3] = True
     is_lake2 = xr.full_like(idomain, False, dtype=bool)
-    is_lake2 [1, 4, 4]= True
+    is_lake2[1, 4, 4] = True
     times_rainfall = [
         np.datetime64("2000-01-01"),
         np.datetime64("2000-03-01"),
@@ -305,14 +307,7 @@ def test_lake_rendering_transient(basic_dis):
         np.full((len(times_inflow)), 4.0), coords={"time": times_inflow}, dims=["time"]
     )
 
-    lake1 = create_lake_data(
-        is_lake1,
-        11.0,
-        "Naardermeer",
-       
-        rainfall,
-        inflow
-    )
+    lake1 = create_lake_data(is_lake1, 11.0, "Naardermeer", rainfall, inflow)
     lake2 = create_lake_data(is_lake2, 11.0, "Ijsselmeer", rainfall, inflow)
     times_invert = [
         np.datetime64("2000-01-01"),
@@ -324,9 +319,7 @@ def test_lake_rendering_transient(basic_dis):
         coords={"time": times_rainfall},
         dims=["time"],
     )
-    outlet1 = OutletManning(
-        1, "Naardermeer", "Ijsselmeer", invert, 24.0, 25.0, 26.0
-    )
+    outlet1 = OutletManning(1, "Naardermeer", "Ijsselmeer", invert, 24.0, 25.0, 26.0)
     lake_package = Lake.from_lakes_and_outlets([lake1, lake2], [outlet1])
     global_times = np.array(
         [
@@ -396,5 +389,3 @@ def test_lake_rendering_transient(basic_dis):
         """
     )
     assert actual == expected
-
-

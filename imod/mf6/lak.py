@@ -257,6 +257,7 @@ def create_outlet_data(outlets, name_to_number):
     }
     return outlet_data
 
+
 class Period_internal:
     """
     The Period_internal class is used for rendering the lake package in jinja.
@@ -458,7 +459,7 @@ class Lake(BoundaryCondition):
         "ts_invert": VariableMetaData(np.floating),
         "ts_rough": VariableMetaData(np.floating),
         "ts_width": VariableMetaData(np.floating),
-        "ts_slope": VariableMetaData(np.floating),        
+        "ts_slope": VariableMetaData(np.floating),
     }
     _period_data = (
         "ts_status",
@@ -474,7 +475,6 @@ class Lake(BoundaryCondition):
         "ts_width",
         "ts_slope",
     )
-
 
     def __init__(
         # lake
@@ -513,7 +513,7 @@ class Lake(BoundaryCondition):
         ts_invert=None,
         ts_rough=None,
         ts_width=None,
-        ts_slope=None,        
+        ts_slope=None,
         # options
         print_input=False,
         print_stage=False,
@@ -580,7 +580,9 @@ class Lake(BoundaryCondition):
         self._pkgcheck()
 
     @staticmethod
-    def from_lakes_and_outlets(lakes, outlets=None, 
+    def from_lakes_and_outlets(
+        lakes,
+        outlets=None,
         print_input=False,
         print_stage=False,
         print_flows=False,
@@ -590,7 +592,8 @@ class Lake(BoundaryCondition):
         budgetcsvfile=None,
         package_convergence_filename=None,
         time_conversion=None,
-        length_conversion=None,):
+        length_conversion=None,
+    ):
         package_content = {}
         name_to_number = {
             lake["boundname"].item(): i + 1 for i, lake in enumerate(lakes)
@@ -621,12 +624,12 @@ class Lake(BoundaryCondition):
             package_content.update(outlet_data)
         package_content["print_input"] = print_input
         package_content["print_stage"] = print_stage
-        package_content["print_flows"]=print_flows
-        package_content["save_flows"]=save_flows
-        package_content["stagefile"]=stagefile
-        package_content["budgetfile"]=budgetfile
-        package_content["budgetcsvfile"]= budgetcsvfile
-        package_content["package_convergence_filename"]=package_convergence_filename
+        package_content["print_flows"] = print_flows
+        package_content["save_flows"] = save_flows
+        package_content["stagefile"] = stagefile
+        package_content["budgetfile"] = budgetfile
+        package_content["budgetcsvfile"] = budgetcsvfile
+        package_content["package_convergence_filename"] = package_convergence_filename
         package_content["time_conversion"] = time_conversion
         package_content["length_conversion"] = length_conversion
         return mf6.Lake(**package_content)
@@ -684,7 +687,7 @@ class Lake(BoundaryCondition):
         )
         if any_timeseries:
             d["periods"] = self.create_period_data_block(globaltimes)
-        d["nperiod"] = len(d["periods"])        
+        d["nperiod"] = len(d["periods"])
 
         return self._template.render(d)
 
@@ -746,7 +749,6 @@ class Lake(BoundaryCondition):
 
         return
 
-
     def create_period_data_block(self, globaltimes):
         period_data_list = {}
 
@@ -775,12 +777,13 @@ class Lake(BoundaryCondition):
                             period_data_list[iperiod].value.append(object_specific_data)
         keys = [x for x in period_data_list.keys()]
         keys = sorted(keys)
-        return [period_data_list[k] for k in keys]        
+        return [period_data_list[k] for k in keys]
 
     def _package_data_to_sparse(self):
         return
 
     def fill_stress_perioddata(self):
         return
+
     def write_perioddata(self, directory, pkgname, binary):
         return
