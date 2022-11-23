@@ -313,7 +313,7 @@ def create_connection_data(lakes):
 
         cell_id = xr.DataArray(
             data=indices,
-            coords={"celldim": list(xr_indices.keys())},
+            coords={"celldim": list(xr_indices.keys())},mamba install "pytest<7.1"
             dims=("boundary", "celldim"),
         )
         cell_ids.append(cell_id)

@@ -392,3 +392,117 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
         """
     )
     assert actual == expected
+
+
+
+
+def test_lake_rendering_transient(basic_dis):
+    idomain, _, _ = basic_dis
+    times_rainfall = [
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-03-01"),
+        np.datetime64("2000-05-01"),
+    ]
+    rainfall = xr.DataArray(
+        np.full((len(times_rainfall)), 5.0),
+        coords={"time": times_rainfall},
+        dims=["time"],
+    )
+    times_inflow = [np.datetime64("2000-02-01"), np.datetime64("2000-04-01")]
+    inflow = xr.DataArray(
+        np.full((len(times_inflow)), 4.0), coords={"time": times_inflow}, dims=["time"]
+    )
+
+    lake1 = create_lake_data(
+        idomain,
+        11.0,
+        "Naardermeer",
+        [(1, 2, 2), (1, 2, 3), (1, 3, 3)],
+        rainfall=rainfall,
+        inflow= inflow
+    )
+    lake2 = create_lake_data(idomain, 11.0, "Ijsselmeer", [(1, 4, 4)], rainfall, inflow)
+    times_invert = [
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-03-01"),
+        np.datetime64("2000-05-01"),
+    ]
+    invert = xr.DataArray(
+        np.full((len(times_invert)), 3.0),
+        coords={"time": times_rainfall},
+        dims=["time"],
+    )
+    outlet1 = OutletManning(
+        1, "Naardermeer", "Ijsselmeer", invert, 24.0, 25.0, 26.0
+    )
+    lake_package = from_lakes_and_outlets([lake1, lake2], [outlet1])
+    global_times = np.array(
+        [
+            np.datetime64("1999-01-01"),
+            np.datetime64("2000-01-01"),
+            np.datetime64("2000-02-01"),
+            np.datetime64("2000-03-01"),
+            np.datetime64("2000-04-01"),
+            np.datetime64("2000-05-01"),
+        ]
+    )
+    actual = lake_package.render(None, None, global_times, False)
+    expected = textwrap.dedent(
+        """\
+        begin options
+        end options
+
+        begin dimensions
+          nlakes 2
+          noutlets 1
+          ntables 0
+        end dimensions
+
+        begin packagedata
+          1  11.0  3  Naardermeer
+          2  11.0  1  Ijsselmeer
+        end packagedata
+
+        begin connectiondata
+          1 1 1 2 2 HORIZONTAL  0.2 0.4  0.3  0.6 0.5
+          1 2 1 2 3 HORIZONTAL  0.2 0.4  0.3  0.6 0.5
+          1 3 1 3 3 HORIZONTAL  0.2 0.4  0.3  0.6 0.5
+          2 1 1 4 4 HORIZONTAL  0.2 0.4  0.3  0.6 0.5
+        end connectiondata
+
+        begin outlets
+          1 2 MANNING 0.0 25.0 24.0 26.0
+        end outlets
+
+        begin period 2
+          1  rainfall 5.0
+          2  rainfall 5.0
+          1  invert 3.0
+        end period
+
+        begin period 3
+          1  inflow 4.0
+          2  inflow 4.0
+        end period
+
+        begin period 4
+          1  rainfall 5.0
+          2  rainfall 5.0
+          1  invert 3.0
+        end period
+
+        begin period 5
+          1  inflow 4.0
+          2  inflow 4.0
+        end period
+
+        begin period 6
+          1  rainfall 5.0
+          2  rainfall 5.0
+          1  invert 3.0
+        end period
+        """
+    )
+    assert actual == expected
+
+
