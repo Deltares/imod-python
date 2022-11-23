@@ -207,7 +207,7 @@ def create_connection_data(lakes):
 
         cell_id = xr.DataArray(
             data=indices,
-            coords={"celldim": list(xr_indices.keys())},
+            coords={"celldim": list(xr_indices.keys())},mamba install "pytest<7.1"
             dims=("boundary", "celldim"),
         )
         cell_ids.append(cell_id)
@@ -580,7 +580,17 @@ class Lake(BoundaryCondition):
         self._pkgcheck()
 
     @staticmethod
-    def from_lakes_and_outlets(lakes, outlets=None):
+    def from_lakes_and_outlets(lakes, outlets=None, 
+        print_input=False,
+        print_stage=False,
+        print_flows=False,
+        save_flows=False,
+        stagefile=None,
+        budgetfile=None,
+        budgetcsvfile=None,
+        package_convergence_filename=None,
+        time_conversion=None,
+        length_conversion=None,):
         package_content = {}
         name_to_number = {
             lake["boundname"].item(): i + 1 for i, lake in enumerate(lakes)
@@ -609,7 +619,16 @@ class Lake(BoundaryCondition):
         if outlets is not None:
             outlet_data = create_outlet_data(outlets, name_to_number)
             package_content.update(outlet_data)
-
+        package_content["print_input"] = print_input
+        package_content["print_stage"] = print_stage
+        package_content["print_flows"]=print_flows
+        package_content["save_flows"]=save_flows
+        package_content["stagefile"]=stagefile
+        package_content["budgetfile"]=budgetfile
+        package_content["budgetcsvfile"]= budgetcsvfile
+        package_content["package_convergence_filename"]=package_convergence_filename
+        package_content["time_conversion"] = time_conversion
+        package_content["length_conversion"] = length_conversion
         return mf6.Lake(**package_content)
 
     def _has_outlets(self):

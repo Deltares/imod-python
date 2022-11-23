@@ -42,15 +42,16 @@ def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
 
 
 def create_lakelake(idomain, starting_stage, boundname, lake_cells, rainfall):
+    HORIZONTAL = 0
     connectionType = create_gridcovering_array(
-        idomain, lake_cells, lak.connection_types["HORIZONTAL"], np.int32
+        idomain, lake_cells, HORIZONTAL, np.int32
     )
     bed_leak = create_gridcovering_array(idomain, lake_cells, 0.2, np.float32)
     top_elevation = create_gridcovering_array(idomain, lake_cells, 0.4, np.float32)
     bot_elevation = create_gridcovering_array(idomain, lake_cells, 0.1, np.float32)
     connection_length = create_gridcovering_array(idomain, lake_cells, 0.5, np.float32)
     connection_width = create_gridcovering_array(idomain, lake_cells, 0.6, np.float32)
-    result = lak.LakeLake(
+    result = lak.LakeData(
         starting_stage,
         boundname,
         connectionType,
@@ -181,7 +182,7 @@ lake_cells = [(1, 3, 3)]
 
 lake = create_lakelake(idomain, 0.3, "Naardermeer", lake_cells, rainfall)
 
-gwf_model["lake"] = lake_api.from_lakes_and_outlets(
+gwf_model["lake"] = lak.Lake.from_lakes_and_outlets(
     [lake],
     print_input=True,
     print_stage=True,
