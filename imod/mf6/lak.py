@@ -55,8 +55,8 @@ class LakeApi_Base(PackageBase):
         all lakes or outlets
         """
         current_object_data = dataarray.sel(index=self.object_number)
-        if hasattr(self, timeseries_name):
-            ts = getattr(self, timeseries_name)
+        if  timeseries_name in self.dataset:
+            ts =self.dataset[timeseries_name]
             if ts is not None:
                 index_of_object = (
                     dataarray.coords["index"].values.tolist().index(self.object_number)
@@ -316,19 +316,19 @@ def create_outlet_data(outlets, name_to_number):
         for var in ("lakein", "lakeout"):
             name = outlet.dataset[var].item()
             try:
-                number = name_to_number[name]
+                lake_number = name_to_number[name]
             except KeyError:
                 names = ", ".join(name_to_number.keys())
                 raise KeyError(
                     f"Outlet lake name {name} not found among lake names: {names}"
                 )
-            outlet_data[f"outlet_{var}"].append(number)
+            outlet_data[f"outlet_{var}"].append(lake_number)
 
         # For other values: fill in NaN if not applicable.
         for var in outlet_vars:
             if var in outlet.dataset   :
                 if "time" in outlet.dataset[var].dims:
-                    value = 0
+                    value = 0.0
                 else:
                     value = outlet.dataset[var].item()
             else:
