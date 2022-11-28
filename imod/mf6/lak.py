@@ -7,13 +7,16 @@ create a lake package.
 
 import pathlib
 from collections import defaultdict
+import textwrap
 
 import numpy as np
 import pandas as pd
 import xarray as xr
-
+import jinja2
 from imod import mf6
 from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase, VariableMetaData
+
+
 
 class LakeApi_Base(PackageBase):
     """
@@ -368,18 +371,6 @@ def create_timeseries(list_of_lakes_or_outlets, ts_times, timeseries_name):
         )
     return dataarray
 
-class Period_internal:
-    """
-    The Period_internal class is used for rendering the lake package in jinja.
-    There is no point in instantiating this class as a user.
-    """
-
-    def __init__(self, period_number):
-        self.period_number = period_number
-        self.nr_values = 0
-        self.lake_or_outlet_number = []
-        self.series_name = []
-        self.value = []
 
 
 class Lake(BoundaryCondition):
@@ -772,6 +763,11 @@ class Lake(BoundaryCondition):
             return False
         return True
 
+    def _has_timeseries(self):
+        return  any(
+            [self._valid(self.dataset[name].values[()]) for name in self._period_data]
+        )        
+
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         for var in (
@@ -808,14 +804,6 @@ class Lake(BoundaryCondition):
             row = tuple(a.item() for a in (number, stage, nconn, name))
             packagedata.append(row)
         d["packagedata"] = packagedata
-
-        d["periods"] = []
-        any_timeseries = any(
-            [self._valid(self.dataset[name].values[()]) for name in self._period_data]
-        )
-        if any_timeseries:
-            d["periods"] = self.create_period_data_block(globaltimes)
-        d["nperiod"] = len(d["periods"])
 
         return self._template.render(d)
 
@@ -875,16 +863,35 @@ class Lake(BoundaryCondition):
                 f.write("\n")
                 self._write_table_section(f, self._outlet_dataframe(), "outlets")
 
-        return
+            if self._has_timeseries():
+                self._write_period_section(f, globaltimes)
 
-    def create_period_data_block(self, globaltimes):
-        period_data_list = {}
+            return
+
+    def _write_period_section(self, f, globaltimes):
+
+        class Period_internal:
+            """
+            The Period_internal class is used for rendering the lake package in jinja.
+            There is no point in instantiating this class as a user.
+            """
+
+            def __init__(self, period_number):
+                self.period_number = period_number
+                self.nr_values = 0
+                self.lake_or_outlet_number = []
+                self.series_name = []
+                self.value = []
+
+        period_data_list = []
+        for period_index in range(len(globaltimes)):
+            period_data_list.append(Period_internal(period_index+1))
 
         for timeseries_name in self._period_data:
             if self._valid(self.dataset[timeseries_name].values[()]):
                 timeseries = self.dataset[timeseries_name]
-                timeseries_times = [t for t in timeseries.coords["time"].values]
-                timeseries_indexes = [i for i in timeseries.coords["index"].values]
+                timeseries_times = np.array(timeseries.coords["time"].values)
+                timeseries_indexes = np.array(timeseries.coords["index"].values)
                 for itime in timeseries_times:
                     iperiod = np.where(globaltimes == itime)[0][0] + 1
 
@@ -893,19 +900,35 @@ class Lake(BoundaryCondition):
                             time=itime, index=index
                         ).values[()]
                         if not np.isnan(object_specific_data):
-                            if iperiod not in period_data_list:
-                                period_data_list[iperiod] = Period_internal(iperiod)
-                            period_data_list[iperiod].nr_values += 1
-                            period_data_list[iperiod].lake_or_outlet_number.append(
+                            iperiod_index = iperiod -1
+
+                            period_data_list[iperiod_index].nr_values += 1
+                            period_data_list[iperiod_index].lake_or_outlet_number.append(
                                 index
                             )
-                            period_data_list[iperiod].series_name.append(
+                            period_data_list[iperiod_index].series_name.append(
                                 timeseries_name[3:]
                             )
-                            period_data_list[iperiod].value.append(object_specific_data)
-        keys = [x for x in period_data_list.keys()]
-        keys = sorted(keys)
-        return [period_data_list[k] for k in keys]
+                            period_data_list[iperiod_index].value.append(object_specific_data)
+
+        _template = jinja2.Template(textwrap.dedent("""
+        {% if nperiod > 0 -%}
+        {% for iperiod in range(0, nperiod) %}
+        {% if periods[iperiod].nr_values > 0 -%}
+        begin period {{periods[iperiod].period_number}}{% for ivalue in range(0, periods[iperiod].nr_values) %}
+          {{periods[iperiod].lake_or_outlet_number[ivalue]}}  {{periods[iperiod].series_name[ivalue]}} {{periods[iperiod].value[ivalue]}}{% endfor %}
+        end period
+        {% endif -%}
+        {% endfor -%}
+        {% endif -%}"""
+        ) )
+
+        d={}
+        d["nperiod"] = len(period_data_list)
+        d["periods"] = period_data_list
+
+        period_block = _template.render(d)
+        f.write(period_block)
 
     def _package_data_to_sparse(self):
         return

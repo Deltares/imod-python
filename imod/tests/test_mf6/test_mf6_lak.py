@@ -69,8 +69,8 @@ def test_alternative_constructor(naardermeer, ijsselmeer):
     assert isinstance(actual, Lake)
 
 
-def write_and_read(package, path, filename) -> str:
-    package.write(path, filename, None, False)
+def write_and_read(package, path, filename, globaltimes = None) -> str:
+    package.write(path, filename, globaltimes, False)
     with open(path / f"{filename}.lak") as f:
         actual = f.read()
     return actual
@@ -284,7 +284,7 @@ def test_lake_write_disv_three_lakes(basic_dis, tmp_path):
     assert actual == expected
 
 
-def test_lake_rendering_transient(basic_dis):
+def test_lake_rendering_transient(basic_dis, tmp_path):
     idomain, _, _ = basic_dis
 
     is_lake1 = xr.full_like(idomain, False, dtype=bool)
@@ -332,7 +332,7 @@ def test_lake_rendering_transient(basic_dis):
             np.datetime64("2000-05-01"),
         ]
     )
-    actual = lake_package.render(None, None, global_times, False)
+    actual =write_and_read(lake_package, tmp_path, "lake-test", global_times) 
     expected = textwrap.dedent(
         """\
         begin options
