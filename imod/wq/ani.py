@@ -1,7 +1,8 @@
-import numpy as np
 import pathlib
 import re
 import shutil
+
+import numpy as np
 
 import imod
 from imod.wq.pkgbase import Package
