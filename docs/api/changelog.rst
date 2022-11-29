@@ -15,6 +15,8 @@ Fixed
   results in invalid MODFLOW6 input for 2D grid data, such as DIS top.
 - :meth:`imod.flow.ImodflowModel.write` no longer writes incorrect projectfiles
   for non-grid values with a time and layer dimension.
+- :func:`imod.evaluate.interpolate_value_boundaries`: Fix edge case when
+  successive values in z direction are exactly equal to the boundary value.
 
 Changed
 ~~~~~~~
