@@ -156,14 +156,14 @@ class HorizontalAnisotropy(Package):
 
         # save anifile with data stored during _render
         with open(directory / self.anifile, "w") as f:
-            for l in range(1, self.nlayer + 1):
+            for lay in range(1, self.nlayer + 1):
                 for prm in ["factor", "angle"]:
                     da = self.dataset[prm]
                     if "layer" in da.coords and "y" in da.coords and "x" in da.coords:
-                        a = da.sel(layer=l)
+                        a = da.sel(layer=lay)
                         if not _check_all_equal(a):
                             f.write(
-                                f"open/close {self.rendir.as_posix()}/{prm}_l{float(l):.0f}.arr 1.0D0 (FREE) -1 {prm}_l{float(l):.0f}\n"
+                                f"open/close {self.rendir.as_posix()}/{prm}_l{float(lay):.0f}.arr 1.0D0 (FREE) -1 {prm}_l{float(lay):.0f}\n"
                             )
                         else:
                             if np.all(np.isnan(a)):
@@ -171,11 +171,11 @@ class HorizontalAnisotropy(Package):
                             else:
                                 val = a[~np.isnan()][0]
                             f.write(
-                                f"constant {float(val):.5f} {prm}_l{float(l):.0f}\n"
+                                f"constant {float(val):.5f} {prm}_l{float(lay):.0f}\n"
                             )
                     else:
                         f.write(
-                            f"constant {float(self.dataset[prm].values):.5f} {prm}_l{float(l):.0f}\n"
+                            f"constant {float(self.dataset[prm].values):.5f} {prm}_l{float(lay):.0f}\n"
                         )
 
     def _pkgcheck(self, ibound=None):
