@@ -337,53 +337,53 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
         """\
         begin options
         end options
-        
+
         begin dimensions
           nlakes 2
           noutlets 1
           ntables 0
         end dimensions
-        
+
         begin packagedata
           1 11.0 3 Naardermeer
           2 11.0 1 Ijsselmeer
         end packagedata
-        
+
         begin connectiondata
         1 1 1 2 2 horizontal 0.2 0.4 0.3 0.6 0.5
         1 2 1 2 3 horizontal 0.2 0.4 0.3 0.6 0.5
         1 3 1 3 3 horizontal 0.2 0.4 0.3 0.6 0.5
         2 1 1 4 4 horizontal 0.2 0.4 0.3 0.6 0.5
         end connectiondata
-        
+
         begin outlets
         1 2 manning 0.0 25.0 24.0 26.0
         end outlets
-        
-        
-        
+
+
+
         begin period 2
           1  rainfall 5.0
           2  rainfall 5.0
           1  invert 3.0
         end period
-        
+
         begin period 3
           1  inflow 4.0
           2  inflow 4.0
         end period
-        
+
         begin period 4
           1  rainfall 5.0
           2  rainfall 5.0
           1  invert 3.0
         end period
-        
+
         begin period 5
           1  inflow 4.0
           2  inflow 4.0
         end period
-        
+
         begin period 6
           1  rainfall 5.0
           2  rainfall 5.0
