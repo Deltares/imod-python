@@ -8,13 +8,12 @@ create a lake package.
 import pathlib
 import textwrap
 from collections import defaultdict
-import textwrap
 
 import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
-import jinja2
+
 from imod import mf6
 from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase, VariableMetaData
 
@@ -248,24 +247,6 @@ class OutletSpecified(OutletBase):
         super().__init__(outlet_number, lakein, lakeout)
         self.dataset["rate"] = rate
 
-def collect_all_times(list_of_lakes, list_of_outlets):
-    """
-    all timeseries we pass to the lake package must have the same time discretization-otherwise the coordinates
-    of the lake-package do not match. So in this function we collect all the time coordinates of all the lakes and
-    outlets.
-    """
-    times = []
-
-    for timeseries_name in LakeData.timeseries_names:
-        for lake in list_of_lakes:
-            if lake.has_transient_data(timeseries_name):
-                times.extend(lake.get_times(timeseries_name))
-
-    for timeseries_name in OutletBase.timeseries_names:
-        for outlet in list_of_outlets:
-            if outlet.has_transient_data(timeseries_name):
-                times.extend(outlet.get_times(timeseries_name))
-    return sorted(set(times))
 
 def collect_all_times(list_of_lakes, list_of_outlets):
     """
@@ -372,7 +353,7 @@ def create_outlet_data(outlets, name_to_number):
 
         # For other values: fill in NaN if not applicable.
         for var in outlet_vars:
-            if var in outlet.dataset   :
+            if var in outlet.dataset:
                 if "time" in outlet.dataset[var].dims:
                     value = 0.0
                 else:
@@ -413,7 +394,6 @@ def create_timeseries(list_of_lakes_or_outlets, ts_times, timeseries_name):
             timeseries_name, dataarray
         )
     return dataarray
-
 
 
 def create_timeseries(list_of_lakes_or_outlets, ts_times, timeseries_name):
