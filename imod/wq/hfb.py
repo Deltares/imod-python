@@ -19,7 +19,7 @@ class HorizontalFlowBarrier(Package):
 
     _pkg_id = "hfb6"
 
-    _template = "[hfb6]\n" "    hfbfile = {hfbfile}\n\n"
+    _template = "[hfb6]\n" "    hfbfile = {hfbfile}\n"
 
     def __init__(
         self,

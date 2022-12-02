@@ -605,15 +605,14 @@ class SeawatModel(Model):
 
         return n_extra
 
-    def _render_anihfb(self, modelname, directory, nlayer):
-        out = ""
-        for key in ("ani", "hfb6"):
-            pkgkey = self._get_pkgkey(key)
-            if pkgkey is not None:
-                out += self[pkgkey]._render(
-                    modelname=modelname, directory=directory / pkgkey, nlayer=nlayer
-                )
-        return out
+    def _render_anihfb(self, key, modelname, directory, nlayer):
+        pkgkey = self._get_pkgkey(key)
+        if pkgkey is not None:
+            return self[pkgkey]._render(
+                modelname=modelname, directory=directory / pkgkey, nlayer=nlayer
+            )
+        else:
+            return ""
 
     def render(self, directory, result_dir, writehelp):
         """
@@ -647,11 +646,15 @@ class SeawatModel(Model):
             )
 
         # ani and hfb packages
-        content.append(
-            self._render_anihfb(
-                modelname=self.modelname, directory=directory, nlayer=nlayer
+        for key in ("ani", "hfb6"):
+            content.append(
+                self._render_anihfb(
+                    key=key,
+                    modelname=self.modelname,
+                    directory=directory,
+                    nlayer=nlayer,
+                )
             )
-        )
 
         # multi-system package group: chd, drn, ghb, riv, wel
         modflowcontent, ssm_content, n_sinkssources = self._render_groups(

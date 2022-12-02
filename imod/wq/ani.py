@@ -24,7 +24,7 @@ class HorizontalAnisotropyFile(Package):
 
     _pkg_id = "ani"
 
-    _template = "[ani]\n" "    anifile = {anifile}\n\n"
+    _template = "[ani]\n" "    anifile = {anifile}\n"
 
     def __init__(
         self,
@@ -93,7 +93,7 @@ class HorizontalAnisotropy(Package):
 
     _pkg_id = "ani"
 
-    _template = "[ani]\n" "    anifile = {anifile}\n\n"
+    _template = "[ani]\n" "    anifile = {anifile}\n"
 
     def __init__(
         self,
