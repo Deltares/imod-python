@@ -85,14 +85,15 @@ class Model(collections.UserDict):
 
 class ImodflowModel(Model):
     """
-    iMODFLOW model.
+    Class representing iMODFLOW model input. Running it requires iMOD5.
+
+    `Download iMOD5 here <https://oss.deltares.nl/web/imod/download-imod5>`_
 
     Attributes
     ----------
-    modelname : str
-    check : str, optional
-        When to perform model checks {None, "defer", "eager"}.
-        Defaults to "defer".
+    modelname : str check : str, optional
+        When to perform model checks {None, "defer", "eager"}. Defaults to
+        "defer".
 
     Examples
     --------
@@ -525,8 +526,8 @@ class ImodflowModel(Model):
             directory. Because iMOD-wq generates a number of files in its
             working directory, it may be advantageous to set the working
             directory to a different path than the runfile location.
-        convert_setting: str
-            Setting to type of object to convert the projectfile to in the
+        convert_to: str
+            The type of object to convert the projectfile to in the
             configuration ini file. Should be one of ``["mf2005_namfile",
             "mf6_namfile", "runfile"]``.
 
@@ -542,8 +543,19 @@ class ImodflowModel(Model):
 
         >>> model.write(directory="input", result_dir="output")
 
-        And in the runfile, a value of ``../../output`` will be written for
-        result_dir.
+        And in the ``config_run.ini``, a value of ``../../output`` will be
+        written for ``result_dir``. This ``config_run.ini`` has to be called
+        with iMOD 5 to convert the model projectfile to a Modflow 2005 namfile.
+        To specify a conversion to a runfile, run:
+
+        >>> model.write(directory="input", convert_to="runfile")
+
+        You can then run the following command to convert the projectfile to a runfile:
+
+        >>> path/to/iMOD5.exe ./input/config_run.ini
+
+        `Download iMOD5 here <https://oss.deltares.nl/web/imod/download-imod5>`_
+
         """
 
         allowed_conversion_settings = ["mf2005_namfile", "mf6_namfile", "runfile"]
