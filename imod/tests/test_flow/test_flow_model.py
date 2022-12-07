@@ -288,3 +288,47 @@ def test_write_model_periodic(model_periodic_stress, tmp_path):
     symmetric_difference = files_directories ^ set(os.listdir(tmp_path))
 
     assert len(symmetric_difference) == 0
+
+
+def test_convert_to_runfile(model_periodic_stress, tmp_path):
+    model_periodic_stress.write(directory=tmp_path, convert_to="runfile")
+
+    # Test if inifile at least has the right amount of lines
+    inifile = tmp_path / "config_run.ini"
+    with open(inifile) as f:
+        text = f.read()
+
+    assert "runfile_out" in text
+    assert "sim_type=1" in text
+    assert ".run"
+
+
+def test_convert_to_mf2005(model_periodic_stress, tmp_path):
+    model_periodic_stress.write(directory=tmp_path, convert_to="mf2005_namfile")
+
+    # Test if inifile at least has the right amount of lines
+    inifile = tmp_path / "config_run.ini"
+    with open(inifile) as f:
+        text = f.read()
+
+    assert "namfile_out" in text
+    assert "sim_type=2" in text
+    assert ".nam" in text
+
+
+def test_convert_to_mf6(model_periodic_stress, tmp_path):
+    model_periodic_stress.write(directory=tmp_path, convert_to="mf6_namfile")
+
+    # Test if inifile at least has the right amount of lines
+    inifile = tmp_path / "config_run.ini"
+    with open(inifile) as f:
+        text = f.read()
+
+    assert "namfile_out" in text
+    assert "sim_type=3" in text
+    assert ".nam" in text
+
+
+def test_wrong_convert_setting(model_periodic_stress, tmp_path):
+    with pytest.raises(ValueError):
+        model_periodic_stress.write(directory=tmp_path, convert_to="failure")
