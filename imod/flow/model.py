@@ -85,14 +85,15 @@ class Model(collections.UserDict):
 
 class ImodflowModel(Model):
     """
-    iMODFLOW model.
+    Class representing iMODFLOW model input. Running it requires iMOD5.
+
+    `Download iMOD5 here <https://oss.deltares.nl/web/imod/download-imod5>`_
 
     Attributes
     ----------
-    modelname : str
-    check : str, optional
-        When to perform model checks {None, "defer", "eager"}.
-        Defaults to "defer".
+    modelname : str check : str, optional
+        When to perform model checks {None, "defer", "eager"}. Defaults to
+        "defer".
 
     Examples
     --------
@@ -506,7 +507,7 @@ class ImodflowModel(Model):
         directory=pathlib.Path("."),
         result_dir=None,
         resultdir_is_workdir=False,
-        render_projectfile=True,
+        convert_to="mf2005_namfile",
     ):
         """
         Writes model input files.
@@ -519,14 +520,16 @@ class ImodflowModel(Model):
         result_dir : str, pathlib.Path
             Path to directory in which output will be written when running the
             model. Is written as the value of the ``result_dir`` key in the
-            runfile.
-
-            See the examples.
+            runfile. See the examples.
         resultdir_is_workdir: boolean, optional
             Wether the set all input paths in the runfile relative to the output
-            directory. Because iMOD-wq generates a number of files in its working
-            directory, it may be advantageous to set the working directory to
-            a different path than the runfile location.
+            directory. Because iMOD-wq generates a number of files in its
+            working directory, it may be advantageous to set the working
+            directory to a different path than the runfile location.
+        convert_to: str
+            The type of object to convert the projectfile to in the
+            configuration ini file. Should be one of ``["mf2005_namfile",
+            "mf6_namfile", "runfile"]``.
 
         Returns
         -------
@@ -540,9 +543,30 @@ class ImodflowModel(Model):
 
         >>> model.write(directory="input", result_dir="output")
 
-        And in the runfile, a value of ``../../output`` will be written for
-        result_dir.
+        And in the ``config_run.ini``, a value of ``../../output`` will be
+        written for ``result_dir``. This ``config_run.ini`` has to be called
+        with iMOD 5 to convert the model projectfile to a Modflow 2005 namfile.
+        To specify a conversion to a runfile, run:
+
+        >>> model.write(directory="input", convert_to="runfile")
+
+        You can then run the following command to convert the projectfile to a runfile:
+
+        >>> path/to/iMOD5.exe ./input/config_run.ini
+
+        `Download iMOD5 here <https://oss.deltares.nl/web/imod/download-imod5>`_
+
         """
+
+        allowed_conversion_settings = ["mf2005_namfile", "mf6_namfile", "runfile"]
+        if convert_to not in allowed_conversion_settings:
+            raise ValueError(
+                f"Got convert_setting: '{convert_to}', should be one of: {allowed_conversion_settings}"
+            )
+
+        # Currently only supported, no runfile can be directly written by iMOD Python
+        # TODO: Add runfile support
+        render_projectfile = True
 
         # TODO: Find a cleaner way to pack and unpack these paths
         (
@@ -596,14 +620,26 @@ class ImodflowModel(Model):
         else:
             oc_configuration = self[ockey]._compose_oc_configuration(nlayer)
 
+        outfilepath = directory / runfilepath
+
+        RUNFILE_OPTIONS = {
+            "mf2005_namfile": dict(
+                sim_type=2, namfile_out=outfilepath.with_suffix(".nam")
+            ),
+            "runfile": dict(sim_type=1, runfile_out=outfilepath.with_suffix(".run")),
+            "mf6_namfile": dict(
+                sim_type=3, namfile_out=outfilepath.with_suffix(".nam")
+            ),
+        }
+
+        conversion_settings = RUNFILE_OPTIONS[convert_to]
+
         config = IniFile(
-            sim_type=2,
-            function="runfile",
             prjfile_in=directory / runfilepath.name,
-            namfile_out=directory / (runfilepath.stem + ".nam"),
             iss=1,
             timfname=directory / time_path.name,
             output_folder=result_dir,
+            **conversion_settings,
             **oc_configuration,
         )
         config_content = config.render()

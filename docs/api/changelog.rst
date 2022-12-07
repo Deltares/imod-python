@@ -26,6 +26,10 @@ Changed
 Added
 ~~~~~
 
+- :meth:`imod.flow.ImodflowModel.write` now supports writing a
+  ``config_run.ini`` to convert the projectfile to a runfile or modflow 6
+  namfile with iMOD5.
+
 [0.11.4] - 2022-09-05
 ---------------------
 
