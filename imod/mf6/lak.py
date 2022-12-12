@@ -373,26 +373,20 @@ def create_timeseries(list_of_lakes_or_outlets, ts_times, timeseries_name):
     the timeseries of lakes or outlets with the given name. We also create a dimension to
     specify the lake or outlet number.
     """
-    if not any(
-        lake_or_outlet.has_transient_data(timeseries_name)
-        for lake_or_outlet in list_of_lakes_or_outlets
-    ):
-        return None
+    indices = range(1, len(list_of_lakes_or_outlets)+1)
 
-    object_numbers = []
-    for lake_or_outlet in list_of_lakes_or_outlets:
-        object_numbers.append(lake_or_outlet.object_number)
-
-    dataarray = xr.DataArray(
+    result =  xr.DataArray(
         dims=("time", "index"),
-        coords={"time": ts_times, "index": object_numbers},
-        name=timeseries_name,
-    )
+        coords={"time": ts_times, "index": indices},
+        name=timeseries_name,)
+
+
     for lake_or_outlet in list_of_lakes_or_outlets:
-        dataarray = lake_or_outlet.add_timeseries_to_dataarray(
-            timeseries_name, dataarray
-        )
-    return dataarray
+        if lake_or_outlet.has_transient_data(timeseries_name):
+            result = lake_or_outlet.add_timeseries_to_dataarray(
+                timeseries_name, result
+            )
+    return result
 
 
 class Lake(BoundaryCondition):
@@ -700,7 +694,7 @@ class Lake(BoundaryCondition):
         self.dataset["ts_width"] = ts_width
         self.dataset["ts_slope"] = ts_slope
 
-        self._pkgcheck()
+        #self._pkgcheck()
 
     @staticmethod
     def from_lakes_and_outlets(
@@ -926,6 +920,14 @@ class Lake(BoundaryCondition):
         for period_index in range(len(globaltimes)):
             period_data_list.append(Period_internal(period_index + 1))
 
+        g=0
+        period_data_name_list = [ tssname for tssname in self._period_data]
+        timeseries_dataset = self.dataset[period_data_name_list]
+        timeseries_times = self.dataset.coords["time"]
+        iperiods = np.searchsorted(globaltimes, timeseries_times) + 1
+        for iperiod, (_, period_data) in zip(iperiods, timeseries_dataset.groupby("time")):
+            g=g+1
+    # do stuff
         for timeseries_name in self._period_data:
             if self._valid(self.dataset[timeseries_name].values[()]):
                 timeseries = self.dataset[timeseries_name]
