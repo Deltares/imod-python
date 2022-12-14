@@ -635,6 +635,7 @@ class ImodflowModel(Model):
         conversion_settings = RUNFILE_OPTIONS[convert_to]
 
         config = IniFile(
+            function="runfile",
             prjfile_in=directory / runfilepath.name,
             iss=1,
             timfname=directory / time_path.name,

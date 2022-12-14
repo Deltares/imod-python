@@ -298,6 +298,7 @@ def test_convert_to_runfile(model_periodic_stress, tmp_path):
     with open(inifile) as f:
         text = f.read()
 
+    assert "function=runfile" in text
     assert "runfile_out" in text
     assert "sim_type=1" in text
     assert ".run"
@@ -311,6 +312,7 @@ def test_convert_to_mf2005(model_periodic_stress, tmp_path):
     with open(inifile) as f:
         text = f.read()
 
+    assert "function=runfile" in text
     assert "namfile_out" in text
     assert "sim_type=2" in text
     assert ".nam" in text
@@ -324,6 +326,7 @@ def test_convert_to_mf6(model_periodic_stress, tmp_path):
     with open(inifile) as f:
         text = f.read()
 
+    assert "function=runfile" in text
     assert "namfile_out" in text
     assert "sim_type=3" in text
     assert ".nam" in text
