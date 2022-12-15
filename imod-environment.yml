@@ -39,6 +39,7 @@ dependencies:
   - scipy
   - setuptools_scm
   - scooby
+  - shapely>=1.8
   - sphinx
   - sphinx-gallery
   - toolz
