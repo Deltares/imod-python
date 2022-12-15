@@ -8,7 +8,7 @@ stages:
 before_script:
   - conda install mamba
   # Avoid tox version with broken tox-conda.
-  - pip install "tox>=3.8.1, <4"
+  - mamba install "tox>=3.8.1, <4"
   
 lint:
   stage: lint
