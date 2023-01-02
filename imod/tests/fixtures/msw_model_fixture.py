@@ -201,9 +201,16 @@ def make_msw_model():
     well = mf6.WellDisStructured(layer=layer, row=iy, column=ix, rate=rate)
 
     # %% Modflow 6
-    idomain = xr.full_like(msw_grid, 1, dtype=int).expand_dims(layer=[1, 2, 3])
+    dz = np.array([1, 10, 100])
+    layer = [1, 2, 3]
 
-    dis = mf6.StructuredDiscretization(top=1.0, bottom=0.0, idomain=idomain)
+    top = 0.0
+    bottom = top - xr.DataArray(
+        np.cumsum(layer * dz), coords={"layer": layer}, dims="layer"
+    )
+
+    idomain = xr.full_like(msw_grid, 1, dtype=int).expand_dims(layer=layer)
+    dis = mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
 
     # %% Initiate model
     msw_model = msw.MetaSwapModel(unsaturated_database=unsaturated_database)
