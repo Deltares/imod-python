@@ -145,23 +145,23 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         ],
         "et_pot": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA,
+            BC_DIMS_SCHEMA | DimsSchema(),  # optional var
         ],
         "extinction_depth": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA,
+            BC_DIMS_SCHEMA | DimsSchema(),  # optional var
         ],
         "extinction_theta": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA,
+            BC_DIMS_SCHEMA | DimsSchema(),  # optional var
         ],
         "root_potential": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA,
+            BC_DIMS_SCHEMA | DimsSchema(),  # optional var
         ],
         "root_activity": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA,
+            BC_DIMS_SCHEMA | DimsSchema(),  # optional var
         ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
@@ -273,6 +273,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         self.dataset["iuzno"].name = "uzf_number"
 
         self.dataset["ivertcon"] = self._determine_vertical_connection(self["iuzno"])
+
+        self._validate_at_init()
 
     def fill_stress_perioddata(self):
         """Modflow6 requires something to be filled in the stress perioddata,

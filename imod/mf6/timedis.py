@@ -2,7 +2,7 @@ import cftime
 import numpy as np
 
 from imod.mf6.pkgbase import Package
-from imod.schemata import DTypeSchema
+from imod.schemata import DimsSchema, DTypeSchema
 
 
 def iso8601(datetime):
@@ -40,9 +40,12 @@ class TimeDiscretization(Package):
     _template = Package._initialize_template(_pkg_id)
 
     _init_schemata = {
-        "timestep_duration": DTypeSchema(np.floating),
-        "n_timesteps": DTypeSchema(np.integer),
-        "timestep_multiplier": DTypeSchema(np.floating),
+        "timestep_duration": [DimsSchema("time"), DTypeSchema(np.floating)],
+        "n_timesteps": [DimsSchema("time") | DimsSchema(), DTypeSchema(np.integer)],
+        "timestep_multiplier": [
+            DimsSchema("time") | DimsSchema(),
+            DTypeSchema(np.floating),
+        ],
     }
 
     def __init__(self, timestep_duration, n_timesteps=1, timestep_multiplier=1.0):
@@ -50,6 +53,8 @@ class TimeDiscretization(Package):
         self.dataset["timestep_duration"] = timestep_duration
         self.dataset["n_timesteps"] = n_timesteps
         self.dataset["timestep_multiplier"] = timestep_multiplier
+
+        self._validate_at_init()
 
     def render(self):
         start_date_time = iso8601(self.dataset["time"].values[0])
