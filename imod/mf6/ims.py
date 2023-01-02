@@ -20,6 +20,9 @@ class Solution(Package):
 
     Parameters
     ----------
+    modelnames: list of str
+        Which models to solve in this solution. Only models of the same type
+        (GWF or GWT) should be added to the same solution.
     outer_dvclose: float
         real value defining the head change criterion for convergence of the
         outer (nonlinear) iterations, in units of length. When the maximum
@@ -357,6 +360,7 @@ class Solution(Package):
 
     def __init__(
         self,
+        modelnames,
         outer_dvclose,
         outer_maximum,
         inner_maximum,
@@ -384,6 +388,7 @@ class Solution(Package):
         no_ptc=False,
     ):
         super().__init__()
+        self.dataset["modelnames"] = modelnames
         self.dataset["outer_dvclose"] = outer_dvclose
         self.dataset["outer_maximum"] = outer_maximum
         self.dataset["under_relaxation"] = under_relaxation
@@ -413,8 +418,11 @@ class Solution(Package):
         self._validate_at_init()
 
 
-def SolutionPresetSimple(print_option, csv_output, no_ptc):
+def SolutionPresetSimple(
+    modelnames, print_option="summary", csv_output=False, no_ptc=False
+):
     solution = Solution(
+        modelnames=modelnames,
         print_option=print_option,
         csv_output=csv_output,
         no_ptc=no_ptc,
@@ -444,8 +452,11 @@ def SolutionPresetSimple(print_option, csv_output, no_ptc):
     return solution
 
 
-def SolutionPresetModerate(print_option, csv_output, no_ptc):
+def SolutionPresetModerate(
+    modelnames, print_option="summary", csv_output=False, no_ptc=False
+):
     solution = Solution(
+        modelnames=modelnames,
         print_option=print_option,
         csv_output=csv_output,
         no_ptc=no_ptc,
@@ -475,8 +486,11 @@ def SolutionPresetModerate(print_option, csv_output, no_ptc):
     return solution
 
 
-def SolutionPresetComplex(print_option, csv_output, no_ptc):
+def SolutionPresetComplex(
+    modelnames, print_option="summary", csv_output=False, no_ptc=False
+):
     solution = Solution(
+        modelnames=modelnames,
         print_option=print_option,
         csv_output=csv_output,
         no_ptc=no_ptc,

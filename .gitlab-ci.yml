@@ -6,7 +6,9 @@ stages:
   - publish
 
 before_script:
-  - conda install mamba tox
+  - conda install mamba
+  # Avoid tox version with broken tox-conda.
+  - mamba install "tox>=3.8.1, <4"
   
 lint:
   stage: lint

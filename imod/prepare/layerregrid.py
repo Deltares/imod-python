@@ -42,6 +42,9 @@ def _regrid_layers(src, dst, src_top, dst_top, src_bot, dst_bot, method):
                     st = src_t[jj]
                     sb = src_b[jj]
 
+                    if np.isnan(st) or np.isnan(sb):
+                        continue
+
                     overlap = common._overlap((db, dt), (sb, st))
                     if overlap == 0:
                         continue
@@ -126,6 +129,8 @@ class LayerRegridder:
             destination_bottom,
             destination_top,
         ]:
+            if not isinstance(da, xr.DataArray):
+                raise TypeError("All arguments must be DataArrays.")
             if not da.dims == ("layer", "y", "x"):
                 raise ValueError(
                     "Dimensions for top, bottom, and source have to be exactly"

@@ -1,10 +1,11 @@
 import abc
 import dataclasses
+import math
+import numbers
 import operator
 import pathlib
 from collections import defaultdict
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Union
+from typing import Dict, List
 
 import jinja2
 import numpy as np
@@ -13,6 +14,8 @@ import xugrid as xu
 
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
+
+TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
 
 def dis_recarr(arrdict, layer, notnull):
@@ -124,7 +127,7 @@ class Package(abc.ABC):
             return_cls.dataset = xr.open_zarr(str(path), **kwargs)
         else:
             return_cls.dataset = xr.open_dataset(path, **kwargs)
-
+        return_cls.remove_nans_from_dataset()
         return return_cls
 
     def __init__(self, allargs=None):
@@ -169,6 +172,11 @@ class Package(abc.ABC):
         # Test numpy bool (not singleton)
         elif isinstance(value, np.bool_) and not value:
             return False
+        # When dumping to netCDF and reading back, None will have been
+        # converted into a NaN. Only check NaN if it's a floating type to avoid
+        # TypeErrors.
+        elif np.issubdtype(type(value), np.floating) and np.isnan(value):
+            return False
         else:
             return True
 
@@ -189,6 +197,8 @@ class Package(abc.ABC):
             fname = "sln-ims.j2"
         elif pkg_id == "tdis":
             fname = "sim-tdis.j2"
+        elif pkg_id in TRANSPORT_PACKAGES:
+            fname = f"gwt-{pkg_id}.j2"
         else:
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
@@ -236,7 +246,21 @@ class Package(abc.ABC):
                 raise ValueError(
                     f"{datavar} in {self._pkg_id} package cannot be a scalar"
                 )
-            arrdict[datavar] = ds[datavar].values
+            auxiliary_vars = (
+                self.get_auxiliary_variable_names()
+            )  # returns something like {"concentration": "species"}
+            if datavar in auxiliary_vars.keys():  # if datavar is concentration
+                if (
+                    auxiliary_vars[datavar] in ds[datavar].dims
+                ):  # if this concentration array has the species dimension
+                    for s in ds[datavar].values:  # loop over species
+                        arrdict[s] = (
+                            ds[datavar]
+                            .sel({auxiliary_vars[datavar]: s})
+                            .values  # store species array under its species name
+                        )
+            else:
+                arrdict[datavar] = ds[datavar].values
         return arrdict
 
     def write_binary_griddata(self, outpath, da, dtype):
@@ -282,14 +306,31 @@ class Package(abc.ABC):
             # "reshape" a long row with "word wrap"; they cannot as easily
             # ignore newlines.
             fmt = self._number_format(dtype)
-            np.savetxt(fname=f, X=da.values.reshape((1, -1)), fmt=fmt)
+            data = da.values
+            if data.ndim > 2:
+                np.savetxt(fname=f, X=da.values.reshape((1, -1)), fmt=fmt)
+            else:
+                np.savetxt(fname=f, X=da.values, fmt=fmt)
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
-        for k, v in self.dataset.data_vars.items():  # pylint:disable=no-member
-            value = v.values[()]
-            if self._valid(value):  # skip None and False
-                d[k] = value
+        if directory is None:
+            pkg_directory = pkgname
+        else:
+            pkg_directory = directory / pkgname
+        for varname in self.dataset.data_vars:
+            key = self._keyword_map.get(varname, varname)
+
+            if hasattr(self, "_grid_data") and varname in self._grid_data:
+                layered, value = self._compose_values(
+                    self.dataset[varname], pkg_directory, key, binary=binary
+                )
+                if self._valid(value):  # skip False or None
+                    d[f"{key}_layered"], d[key] = layered, value
+            else:
+                value = self[varname].values[()]
+                if self._valid(value):  # skip False or None
+                    d[key] = value
         return self._template.render(d)
 
     @staticmethod
@@ -340,7 +381,6 @@ class Package(abc.ABC):
 
     def write(self, directory, pkgname, globaltimes, binary):
         directory = pathlib.Path(directory)
-
         self.write_blockfile(directory, pkgname, globaltimes, binary=binary)
 
         if hasattr(self, "_grid_data"):
@@ -471,6 +511,43 @@ class Package(abc.ABC):
             message = validation_pkg_error_message(errors)
             raise ValidationError(message)
 
+    def period_data(self):
+        result = []
+        if hasattr(self, "_period_data"):
+            result += self._period_data
+        if hasattr(self, "_auxiliary_data"):
+            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
+                if aux_var_name in self.dataset.keys():
+                    for s in (
+                        self.dataset[aux_var_name].coords[aux_var_dimensions].values
+                    ):
+                        result.append(s)
+        return result
+
+    def add_periodic_auxiliary_variable(self):
+        if hasattr(self, "_auxiliary_data"):
+            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
+                aux_coords = (
+                    self.dataset[aux_var_name].coords[aux_var_dimensions].values
+                )
+                for s in aux_coords:
+                    self.dataset[s] = self.dataset[aux_var_name].sel(
+                        {aux_var_dimensions: s}
+                    )
+
+    def get_auxiliary_variable_names(self):
+        result = {}
+        if hasattr(self, "_auxiliary_data"):
+            result.update(self._auxiliary_data)
+        return result
+
+    def remove_nans_from_dataset(self):
+        for key, value in self.dataset.items():
+            if isinstance(value, xr.core.dataarray.DataArray):
+                if isinstance(value.values[()], numbers.Number):
+                    if math.isnan(value.values[()]):
+                        self.dataset[key] = None
+
 
 class BoundaryCondition(Package, abc.ABC):
     """
@@ -487,7 +564,7 @@ class BoundaryCondition(Package, abc.ABC):
         Determine the maximum active number of cells that are active
         during a stress period.
         """
-        da = self.dataset[self._period_data[0]]
+        da = self.dataset[self.period_data()[0]]
         if "time" in da.coords:
             nmax = int(da.groupby("time").count(xr.ALL_DIMS).max())
         else:
@@ -538,7 +615,7 @@ class BoundaryCondition(Package, abc.ABC):
 
     def get_options(self, d, not_options=None):
         if not_options is None:
-            not_options = self._period_data
+            not_options = self.period_data()
 
         for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
@@ -551,17 +628,42 @@ class BoundaryCondition(Package, abc.ABC):
     def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {"binary": binary}
-        bin_ds = self[list(self._period_data)]
+        bin_ds = self[self.period_data()]
         d["periods"] = self.period_paths(
             directory, pkgname, globaltimes, bin_ds, binary
         )
         # construct the rest (dict for render)
         d = self.get_options(d)
         d["maxbound"] = self._max_active_n()
+
+        # now we should add the auxiliary variable names to d
+        auxiliaries = (
+            self.get_auxiliary_variable_names()
+        )  # returns someting like {"concentration": "species"}
+
+        # loop over the types of auxiliary variables (for example concentration)
+        for auxvar in auxiliaries.keys():
+
+            # if "concentration" is a variable of this dataset
+            if auxvar in self.dataset.data_vars:
+
+                # if our concentration dataset has the species coordinate
+                if auxiliaries[auxvar] in self.dataset[auxvar].coords:
+
+                    # assign the species names list to d
+                    d["auxiliary"] = self.dataset[auxiliaries[auxvar]].values
+                else:
+                    # the error message is more specific than the code at this point.
+                    raise ValueError(
+                        f"{auxvar} requires a {auxiliaries[auxvar]} coordinate."
+                    )
+
         return self._template.render(d)
 
     def write_perioddata(self, directory, pkgname, binary):
-        bin_ds = self[list(self._period_data)]
+        if len(self.period_data()) == 0:
+            return
+        bin_ds = self[self.period_data()]
 
         if binary:
             ext = "bin"
@@ -596,6 +698,22 @@ class BoundaryCondition(Package, abc.ABC):
             pkgname=pkgname,
             binary=binary,
         )
+
+    def assign_dims(self, arg) -> Dict:
+        is_da = isinstance(arg, xr.DataArray)
+        if is_da and "time" in arg.coords:
+            if arg.ndim != 2:
+                raise ValueError("time varying variable: must be 2d")
+            if arg.dims[0] != "time":
+                arg = arg.transpose()
+            da = xr.DataArray(
+                data=arg.values, coords={"time": arg["time"]}, dims=["time", "index"]
+            )
+            return da
+        elif is_da:
+            return ("index", arg.values)
+        else:
+            return ("index", arg)
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
@@ -644,3 +762,37 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         self.write_blockfile(directory, pkgname, globaltimes, binary=False)
         self.write_perioddata(directory, pkgname, binary=False)
         self.write_packagedata(directory, pkgname, binary=False)
+
+
+class DisStructuredBoundaryCondition(BoundaryCondition):
+    def to_sparse(self, arrdict, layer):
+        spec = []
+        for key in arrdict:
+            if key in ["layer", "row", "column"]:
+                spec.append((key, np.int32))
+            else:
+                spec.append((key, np.float64))
+
+        sparse_dtype = np.dtype(spec)
+        nrow = next(iter(arrdict.values())).size
+        recarr = np.empty(nrow, dtype=sparse_dtype)
+        for key, arr in arrdict.items():
+            recarr[key] = arr
+        return recarr
+
+
+class DisVerticesBoundaryCondition(BoundaryCondition):
+    def to_sparse(self, arrdict, layer):
+        spec = []
+        for key in arrdict:
+            if key in ["layer", "cell2d"]:
+                spec.append((key, np.int32))
+            else:
+                spec.append((key, np.float64))
+
+        sparse_dtype = np.dtype(spec)
+        nrow = next(iter(arrdict.values())).size
+        recarr = np.empty(nrow, dtype=sparse_dtype)
+        for key, arr in arrdict.items():
+            recarr[key] = arr
+        return recarr

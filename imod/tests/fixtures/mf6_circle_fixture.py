@@ -1,4 +1,3 @@
-import meshzoo
 import numpy as np
 import pytest
 import xarray as xr
@@ -8,11 +7,11 @@ import imod
 
 
 def make_circle_model():
-    nodes, triangles = meshzoo.disk(6, 6)
-    nodes *= 1000.0
-    grid = xu.Ugrid2d(*nodes.T, -1, triangles)
 
-    nface = len(triangles)
+    grid = imod.data.circle()
+
+    nface = grid.n_face
+
     nlayer = 2
 
     idomain = xu.UgridDataArray(
@@ -59,6 +58,7 @@ def make_circle_model():
     simulation = imod.mf6.Modflow6Simulation("circle")
     simulation["GWF_1"] = gwf_model
     simulation["solver"] = imod.mf6.Solution(
+        modelnames=["GWF_1"],
         print_option="summary",
         csv_output=False,
         no_ptc=True,

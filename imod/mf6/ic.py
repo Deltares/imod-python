@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 
 from imod.mf6.pkgbase import Package
@@ -21,9 +23,13 @@ class InitialConditions(Package):
     Parameters
     ----------
     head: array of floats (xr.DataArray)
-        is the initial (starting) head—that is, head at the beginning of the GWF
-        Model simulation. STRT must be specified for all simulations, including
-        steady-state simulations. One value is read for every model cell. For
+        for backwards compatibility this argument is maintained, but please use
+        the start-argument instead.
+    start: array of floats (xr.DataArray)
+        is the initial (starting) head or concentration—that is, the simulation's
+        initial state.
+        STRT must be specified for all simulations, including steady-state simulations.
+        One value is read for every model cell. For
         simulations in which the first stress period is steady state, the values
         used for STRT generally do not affect the simulation (exceptions may
         occur if cells go dry and (or) rewet). The execution time, however, will
@@ -38,22 +44,39 @@ class InitialConditions(Package):
     _template = Package._initialize_template(_pkg_id)
 
     _init_schemata = {
-        "head": [
+        "start": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
         ],
     }
     _write_schemata = {
-        "head": [
+        "start": [
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
             OtherCoordsSchema("idomain"),
         ],
     }
 
-    def __init__(self, head):
+    _grid_data = {"start": np.float64}
+    _keyword_map = {"start": "strt"}
+    _template = Package._initialize_template(_pkg_id)
+
+    def __init__(self, start=None, head=None):
+
         super().__init__(locals())
-        self.dataset["head"] = head
+        if start is None:
+            start = head
+            warnings.warn(
+                'The keyword argument "head" is deprecated. Please use the start argument.',
+                DeprecationWarning,
+            )
+            if head is None:
+                raise ValueError("start and head arguments cannot both be None")
+        else:
+            if head is not None:
+                raise ValueError("start and head arguments cannot both be defined")
+
+        self.dataset["start"] = start
 
         self._validate_at_init()
 
@@ -61,6 +84,6 @@ class InitialConditions(Package):
         d = {}
         icdirectory = directory / "ic"
         d["layered"], d["strt"] = self._compose_values(
-            self["head"], icdirectory, "strt", binary=binary
+            self["start"], icdirectory, "strt", binary=binary
         )
         return self._template.render(d)

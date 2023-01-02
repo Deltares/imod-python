@@ -4,7 +4,7 @@ Elder
 
 The classic 2D Elder problem demonstrates free convection.
 Traditionally this was created for heat transport, but we use
-a modified version for salt tranpsort.
+a modified version for salt transport.
 The conceptual model can be seen as a 2D sand box,
 with on top a salt lake in the center and fresh lakes
 on both the outer edges of the top row.

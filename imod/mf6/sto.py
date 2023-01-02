@@ -11,6 +11,8 @@ from imod.schemata import (
 
 
 class Storage(Package):
+    _pkg_id = "sto_deprecated"
+
     def __init__(*args, **kwargs):
         raise NotImplementedError(
             r"Storage package has been removed. Use SpecificStorage or StorageCoefficient instead."

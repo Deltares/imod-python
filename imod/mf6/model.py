@@ -1,3 +1,4 @@
+import abc
 import collections
 import pathlib
 
@@ -10,7 +11,10 @@ from imod.mf6.validation import validation_model_error_message
 from imod.schemata import ValidationError
 
 
-class Model(collections.UserDict):
+class Modflow6Model(collections.UserDict, abc.ABC):
+
+    _pkg_id = "model"
+
     def __setitem__(self, key, value):
         if len(key) > 16:
             raise KeyError(
@@ -24,24 +28,10 @@ class Model(collections.UserDict):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
-
-class GroundwaterFlowModel(Model):
-    """
-    Contains data and writes consistent model input files
-    """
-
-    _pkg_id = "model"
-
-    def _initialize_template(self):
+    def _initialize_template(self, name: str):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
-        self._template = env.get_template("gwf-nam.j2")
-
-    def __init__(self, newton=False, under_relaxation=False):
-        super().__init__()
-        self.newton = newton
-        self.under_relaxation = under_relaxation
-        self._initialize_template()
+        self._template = env.get_template(name)
 
     def _get_diskey(self):
         dis_pkg_ids = ["dis", "disv", "disu"]
@@ -79,7 +69,7 @@ class GroundwaterFlowModel(Model):
         dispresent = "dis" in pkg_ids or "disv" in pkg_ids or "disu" in pkg_ids
         if not dispresent:
             raise ValueError(f"No dis/disv/disu package found in model {modelkey}")
-        for required in ["npf", "ic", "oc", "sto"]:
+        for required in self._mandatory_packages:
             if required not in pkg_ids:
                 raise ValueError(f"No {required} package found in model {modelkey}")
         return
@@ -118,10 +108,9 @@ class GroundwaterFlowModel(Model):
                 modeltimes.append(pkg.dataset["time"].values)
         return modeltimes
 
-    def render(self, modelname):
-        """Render model namefile"""
+    def render(self, modelname: str):
         dir_for_render = pathlib.Path(modelname)
-        d = {"newton": self.newton, "under_relaxation": self.under_relaxation}
+        d = {k: v for k, v in self.options.items() if not (v is None or v is False)}
         packages = []
         for pkgname, pkg in self.items():
             # Add the six to the package id
@@ -188,6 +177,32 @@ class GroundwaterFlowModel(Model):
                 binary=binary,
             )
 
+
+class GroundwaterFlowModel(Modflow6Model):
+    _mandatory_packages = ("npf", "ic", "oc", "sto")
+    _model_type = "gwf6"
+
+    def __init__(
+        self,
+        listing_file: str = None,
+        print_input: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
+        newton: bool = False,
+        under_relaxation: bool = False,
+    ):
+        super().__init__()
+        # TODO: probably replace by a pydantic BaseModel
+        self.options = {
+            "listing_file": listing_file,
+            "print_input": print_input,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+            "newton": newton,
+            "under_relaxation": under_relaxation,
+        }
+        self._initialize_template("gwf-nam.j2")
+
     def write_qgis_project(self, directory, crs, aggregate_layers=False):
         """
         Write qgis projectfile and accompanying netcdf files that can be read in qgis.
@@ -235,3 +250,29 @@ class GroundwaterFlowModel(Model):
             self, pkgnames, data_paths, data_vars_ls, crs
         )
         qgs_util._write_qgis_projectfile(qgs_tree, directory / ("qgis_proj" + ext))
+
+
+class GroundwaterTransportModel(Modflow6Model):
+    """
+    The GroundwaterTransportModel (GWT) simulates transport of a single solute
+    species flowing in groundwater.
+    """
+
+    _mandatory_packages = ("mst", "dsp", "oc", "ic")
+    _model_type = "gwt6"
+
+    def __init__(
+        self,
+        listing_file: str = None,
+        print_input: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
+    ):
+        super().__init__()
+        self.options = {
+            "listing_file": listing_file,
+            "print_input": print_input,
+            "print_flows": print_flows,
+            "save_flows": save_flows,
+        }
+        self._initialize_template("gwt-nam.j2")

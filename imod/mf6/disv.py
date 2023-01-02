@@ -99,13 +99,13 @@ class VerticesDiscretization(Package):
         df = pd.DataFrame(grid.face_coordinates)
         df.index += 1
         # modflow requires clockwise; ugrid requires ccw
-        face_nodes = grid.face_node_connectivity[:, ::-1] + 1
+        face_nodes = grid.face_node_connectivity[:, ::-1]
         df[2] = (face_nodes != grid.fill_value).sum(axis=1)
         for i, column in enumerate(face_nodes.T):
             # Use extension array to write empty values
             # Should be more effcient than mixed column?
             df[3 + i] = pd.arrays.IntegerArray(
-                values=column,
+                values=column + 1,
                 mask=(column == grid.fill_value),
             )
         return df

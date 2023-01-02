@@ -1,0 +1,28 @@
+begin options
+{% if auxiliary is defined %}  auxiliary {{auxiliary}}
+{% endif %}
+{%- if auxmultname is defined %}  auxmultname {{auxmultname}}
+{% endif %}
+{%- if boundnames is defined %}  boundnames
+{% endif %}
+{%- if print_input is defined %}  print_input
+{% endif %}
+{%- if print_flows is defined %}  print_flows
+{% endif %}
+{%- if save_flows is defined %}  save_flows
+{% endif %}
+{%- if ts_filerecord is defined %}  ts6 filein {{ts6_filename}}
+{% endif %}
+{%- if obs_filerecord is defined %}  obs6 filein {{obs6_filename}}
+{% endif %}
+{%- if mover is defined %}  mover
+{% endif -%}
+end options
+
+begin dimensions
+  maxbound {{maxbound}}
+end dimensions
+
+{% for i, path in periods.items() %}begin period {{i}}
+  open/close {{path}}{% if binary %} (binary){% endif %}
+end period{% endfor %}

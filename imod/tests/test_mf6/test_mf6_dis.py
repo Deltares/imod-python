@@ -79,3 +79,29 @@ def test_wrong_dtype(idomain_and_bottom):
         imod.mf6.StructuredDiscretization(
             top=200.0, bottom=bottom, idomain=idomain.astype(np.float64)
         )
+
+
+def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
+    idomain, bottom = idomain_and_bottom
+    top = xr.full_like(idomain.isel(layer=0), 200.0, dtype=float)
+    bottom = bottom * xr.ones_like(idomain, dtype=float)
+
+    dis = imod.mf6.StructuredDiscretization(top=top, bottom=bottom, idomain=idomain)
+    # 2D data should be rows and colums; 3D should be a single row.
+    # https://gitlab.com/deltares/imod/imod-python/-/issues/270
+    directory = tmp_path / "dis_griddata"
+    directory.mkdir()
+    dis.write(
+        directory=directory,
+        pkgname="dis",
+        globaltimes=[],
+        binary=False,
+    )
+
+    with open(directory / "dis/top.dat") as f:
+        top_content = f.readlines()
+    assert len(top_content) == 15
+
+    with open(directory / "dis/botm.dat") as f:
+        bottom_content = f.readlines()
+    assert len(bottom_content) == 1

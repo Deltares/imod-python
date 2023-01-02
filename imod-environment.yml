@@ -19,7 +19,6 @@ dependencies:
   - hypothesis
   - jinja2
   - matplotlib
-  - meshzoo
   - netcdf4
   - numba>=0.50
   - numpy
@@ -28,7 +27,7 @@ dependencies:
   - pip
   - pip:
       - pandamesh
-  - pydata-sphinx-theme
+  - pydata-sphinx-theme=0.10.1
   - pygeos
   - pyproj
   - pytest
@@ -40,6 +39,7 @@ dependencies:
   - scipy
   - setuptools_scm
   - scooby
+  - shapely>=1.8
   - sphinx
   - sphinx-gallery
   - toolz
@@ -49,5 +49,5 @@ dependencies:
   - twine
   - vtk>=9.0
   - xarray>=0.15
-  - xugrid
+  - xugrid>=0.1.6
   - zarr

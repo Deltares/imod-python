@@ -27,6 +27,10 @@ class OutputControl(Package):
         String or integer indicating output control for cell budgets (.cbc)
         If string, should be one of ["first", "last", "all"].
         If integer, interpreted as frequency.
+    save_head : {string, integer}, or xr.DataArray of {string, integer}, optional
+        String or integer indicating output control for concentration file (.ucn)
+        If string, should be one of ["first", "last", "all"].
+        If integer, interpreted as frequency.
 
     Examples
     --------
@@ -38,7 +42,7 @@ class OutputControl(Package):
     >>> time = [np.datetime64("2000-01-01"), np.datetime64("2000-01-02")]
     >>> data = np.array(["last", 5], dtype="object")
     >>> save_head = xr.DataArray(data, coords={"time": time}, dims=("time"))
-    >>> oc = imod.mf6.OutputControl(save_head=save_head, save_budget=None)
+    >>> oc = imod.mf6.OutputControl(save_head=save_head, save_budget=None, save_concentration=None)
 
     """
 
@@ -53,11 +57,17 @@ class OutputControl(Package):
         "save_budget": [
             DTypeSchema(np.integer) | DTypeSchema(str) | DTypeSchema(object),
         ],
+        "save_concentration": [
+            DTypeSchema(np.integer) | DTypeSchema(str) | DTypeSchema(object),
+        ],
     }
 
-    def __init__(self, save_head=None, save_budget=None):
+    def __init__(self, save_head=None, save_budget=None, save_concentration=None):
         super().__init__()
+        if save_head is not None and save_concentration is not None:
+            raise ValueError("save_head and save_concentration cannot both be defined.")
         self.dataset["save_head"] = save_head
+        self.dataset["save_concentration"] = save_concentration
         self.dataset["save_budget"] = save_budget
 
         self._validate_at_init()
@@ -83,6 +93,8 @@ class OutputControl(Package):
         modelname = directory.stem
         if self.dataset["save_head"].values[()] is not None:
             d["headfile"] = (directory / f"{modelname}.hds").as_posix()
+        if self.dataset["save_concentration"].values[()] is not None:
+            d["concentrationfile"] = (directory / f"{modelname}.ucn").as_posix()
         if self.dataset["save_budget"].values[()] is not None:
             d["budgetfile"] = (directory / f"{modelname}.cbc").as_posix()
 

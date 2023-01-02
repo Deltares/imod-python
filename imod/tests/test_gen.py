@@ -36,8 +36,8 @@ def approximately_equal(a: sg.Polygon, b: sg.Polygon) -> bool:
     """
     return (
         np.allclose(
-            np.array(a.centroid),
-            np.array(b.centroid),
+            np.array(a.centroid.coords),
+            np.array(b.centroid.coords),
         )
         and np.isclose(a.area, b.area)
         and np.allclose(a.bounds, b.bounds)
@@ -91,7 +91,7 @@ def test_gen_shapely_gen_conversion():
     assert approximately_equal(geom, from_rectangle(to_rectangle(geom)[0]))
 
     geom = TEST_GEOMETRIES["point"]
-    assert geom.equals(sg.Point(to_point(geom)[0]))
+    assert geom.equals(sg.Point(to_point(geom)[0][0]))
 
     geom = TEST_GEOMETRIES["line"]
     assert geom.equals(sg.LineString(to_line(geom)[0]))
@@ -178,3 +178,12 @@ def test_gen_column_truncation(tmp_path):
     back = imod.gen.read(path)
     assert (back[b] == a).all()
     assert (back[a[:MAX_NAME_WIDTH]] == a).all()
+
+
+def test_gen_empty_column(tmp_path):
+    geom = TEST_GEOMETRIES["point"]
+    df = pd.DataFrame()
+    gdf = gpd.GeoDataFrame(df, geometry=[geom])
+    gdf["empty"] = None
+    path = tmp_path / "empty-column.gen"
+    imod.gen.write(path, gdf)

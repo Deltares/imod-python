@@ -482,17 +482,49 @@ class Regridder(object):
             )
             return dst
 
+    def _delayed_regrid(self, src, like, fill_value, info):
+        """
+        Deal with chunks in dimensions that will NOT be regridded.
+        """
+        if len(info.add_dims) == 0:
+            return self._chunked_regrid(src, like, fill_value)
+
+        src_dim_slices = []
+        shape_chunks = []
+        for dim, chunksize in zip(src.dims, src.chunks):
+            if dim in info.add_dims:
+                end = np.cumsum(chunksize)
+                start = end - chunksize
+                src_dim_slices.append([slice(s, e) for s, e in zip(start, end)])
+                shape_chunks.append(len(chunksize))
+
+        src_expanded_slices = np.stack(
+            [a.ravel() for a in np.meshgrid(*src_dim_slices, indexing="ij")], axis=-1
+        )
+        src_das = common._sel_chunks(src, info.add_dims, src_expanded_slices)
+        n_das = len(src_das)
+        np_collection = np.full(n_das, None)
+
+        for i, src_da in enumerate(src_das):
+            np_collection[i] = self._chunked_regrid(src_da, like, fill_value)
+
+        shape_chunks = shape_chunks + [1] * len(info.regrid_dims)
+        reshaped_collection = np.reshape(np_collection, shape_chunks).tolist()
+        data = dask.array.block(reshaped_collection)
+        return data
+
     def _chunked_regrid(self, src, like, fill_value):
+        """
+        Deal with chunks in dimensions that will be regridded.
+        """
         like_expanded_slices, shape_chunks = common._define_slices(src, like)
-        like_das = common._sel_chunks(like, like_expanded_slices)
+        like_das = common._sel_chunks(like, like.dims, like_expanded_slices)
         n_das = len(like_das)
         np_collection = np.full(n_das, None)
 
         # Regridder should compute first chunk once
         # so numba has compiled the necessary functions for subsequent chunks
-        i = 0
-        while i < n_das:
-            dst_da = like_das[i]
+        for i, dst_da in enumerate(like_das):
             chunk_src = common._slice_src(src, dst_da, self.extra_overlap)
             info = self._regrid_info(chunk_src, dst_da)
 
@@ -521,7 +553,6 @@ class Regridder(object):
                 )
 
             np_collection[i] = dask_array
-            i += 1
 
         # Determine the shape of the chunks, and reshape so dask.block does the right thing
         reshaped_collection = np.reshape(np_collection, shape_chunks).tolist()
@@ -549,6 +580,11 @@ class Regridder(object):
         result : xr.DataArray
             Regridded result.
         """
+        if not isinstance(source, xr.DataArray):
+            raise TypeError("source must be a DataArray")
+        if not isinstance(like, xr.DataArray):
+            raise TypeError("like must be a DataArray")
+
         # Don't mutate source; src stands for source, dst for destination
         src = source.copy(deep=False)
         like = like.copy(deep=False)
@@ -586,7 +622,7 @@ class Regridder(object):
             # can still be determined.
             src = common._set_cellsizes(src, info.regrid_dims)
             like = common._set_cellsizes(like, info.regrid_dims)
-            data = self._chunked_regrid(src, like, fill_value)
+            data = self._delayed_regrid(src, like, fill_value, info)
 
         dst = xr.DataArray(data=data, coords=info.dst_da_coords, dims=info.dst_dims)
         # Replace equidistant cellsize arrays by scalar values

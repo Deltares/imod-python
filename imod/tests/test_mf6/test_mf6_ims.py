@@ -8,6 +8,7 @@ from imod.schemata import ValidationError
 
 def test_render():
     ims = imod.mf6.Solution(
+        modelnames=["GWF_1"],
         print_option="summary",
         csv_output=False,
         no_ptc=True,
@@ -49,6 +50,7 @@ def test_render():
 def test_wrong_dtype():
     with pytest.raises(ValidationError):
         imod.mf6.Solution(
+            modelnames=["GWF_1"],
             print_option="summary",
             csv_output=False,
             no_ptc=True,

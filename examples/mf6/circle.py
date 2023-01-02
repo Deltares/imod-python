@@ -22,7 +22,6 @@ In overview, we'll set the following steps:
 # We'll start with the following imports:
 
 import matplotlib.pyplot as plt
-import meshzoo
 import numpy as np
 import xarray as xr
 import xugrid as xu
@@ -33,18 +32,19 @@ import imod
 # Create a mesh
 # -------------
 #
-# The first steps consists of generating a mesh. In this example, our geometry
-# is so simple that we don't need complex mesh generators. Instead we will use
-# ``meshzoo``, which can generate a number of meshes for simple domains such as
-# triangles, rectangles, regular polygons, or disks.
-#
-# We can use the nodes and the cell node connectivity directly to initialize a
-# xugrid Ugrid2d object, and we'll create a quick plot to take a look at the
-# grid.
+# The first steps consists of generating a mesh. In this example, we'll use data
+# included with iMOD Python for a circular mesh. Note that this is a `Ugrid2D
+# object. <https://deltares.github.io/xugrid/api/xugrid.Ugrid2d.html>`_
+# For more information on working with unstructured grids see the
+# `Xugrid documentation <https://deltares.github.io/xugrid/index.html>`_
 
-nodes, triangles = meshzoo.disk(6, 6)
-nodes *= 1000.0
-grid = xu.Ugrid2d(*nodes.T, -1, triangles)
+grid = imod.data.circle()
+
+grid
+
+
+# %%
+# We can plot this object as follows:
 
 fig, ax = plt.subplots()
 xu.plot.line(grid, ax=ax)
@@ -68,7 +68,7 @@ ax.set_aspect(1)
 # groundwater; with small flows in the center and larger flows as the recharge
 # accumulates while the groundwater flows towards the exterior boundary.
 
-nface = len(triangles)
+nface = grid.n_face
 nlayer = 2
 
 idomain = xu.UgridDataArray(
@@ -133,6 +133,7 @@ gwf_model["rch"] = imod.mf6.Recharge(rch_rate)
 simulation = imod.mf6.Modflow6Simulation("circle")
 simulation["GWF_1"] = gwf_model
 simulation["solver"] = imod.mf6.Solution(
+    modelnames=["GWF_1"],
     print_option="summary",
     csv_output=False,
     no_ptc=True,
@@ -212,8 +213,10 @@ ds["v"] = cbc["flow-horizontal-face-y"]
 # ---------------------
 #
 # We can quickly and easily visualize the output with the plotting functions
-# provided by xarray and xugrid:
+# provided by xarray and xugrid. We'll add some some edge coordinates to the
+# dataset so that they can be used to place the arrows in the quiver plot.
 
+ds = ds.ugrid.assign_edge_coords()
 fig, ax = plt.subplots()
 head.isel(time=0, layer=0).ugrid.plot(ax=ax)
 ds.isel(time=0, layer=0).plot.quiver(

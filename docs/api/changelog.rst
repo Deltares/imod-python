@@ -9,6 +9,38 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+
+[0.11.5] - 2022-12-15
+---------------------
+
+Fixed
+~~~~~
+
+- :meth:`imod.mf6.Modflow6Simulation.write` with ``binary=False`` no longer
+  results in invalid MODFLOW6 input for 2D grid data, such as DIS top.
+- :meth:`imod.flow.ImodflowModel.write` no longer writes incorrect projectfiles
+  for non-grid values with a time and layer dimension.
+- :func:`imod.evaluate.interpolate_value_boundaries`: Fix edge case when
+  successive values in z direction are exactly equal to the boundary value.
+
+Changed
+~~~~~~~
+
+- Removed ``meshzoo`` dependency.
+- Minor changes to :mod:`imod.gen.gen` backend, to support `Shapely 2.0
+  <https://shapely.readthedocs.io/en/latest/release/2.x.html>`_ , Shapely
+  version above equal v1.8 is now required.
+
+Added
+~~~~~
+
+- :meth:`imod.flow.ImodflowModel.write` now supports writing a
+  ``config_run.ini`` to convert the projectfile to a runfile or modflow 6
+  namfile with iMOD5.
+
+[0.11.4] - 2022-09-05
+---------------------
+
 Fixed
 ~~~~~
 
@@ -27,6 +59,9 @@ Fixed
 - :func:`imod.evaluate.calculate_gxg` now correctly uses (March 14, March
   28, April 14) to calculate GVG rather than (March 28, April 14, April 28).
 - :func:`imod.mf6.out.open_cbc` now correctly loads boundary fluxes.
+- :meth:`imod.prepare.LayerRegridder.regrid` will now correctly skip values
+  if ``top_source`` or ``bottom_source`` are NaN.
+- :func:`imod.gen.write` no longer errors on dataframes with empty columns.
 
 Changed
 ~~~~~~~
@@ -51,7 +86,13 @@ Changed
   installations have to be reinstalled to run the tests.
 - The ``imod.mf6`` model packages now all run type checks on input. This is a
   breaking change for scripts which provide input with an incorrect dtype.
-  
+- :class:`imod.mf6.Solution` now requires a `model_names` argument to specify
+  which models should be solved in a single numerical solution. This is
+  required to simulate groundwater flow and transport as they should be
+  in separate solutions.
+- When writing MODFLOW6 input option blocks, a NaN value is now recognized as
+  an alternative to None (and the entry will not be included in the options
+  block).
 
 Added
 ~~~~~
@@ -72,6 +113,11 @@ Added
   :meth:`imod.wq.SeawatModel.create_time_discretization`,
   :meth:`imod.mf6.Simulation.create_time_discretization`, now have a
   documentation section.
+- :class:`imod.mf6.GroundwaterTransportModel` has been added with associated
+  simple classes to allow creation of solute transport models. Advanced
+  boundary conditions such as LAK or UZF are not yet supported.
+- :class:`imod.mf6.Buoyancy` has been added to simulate density dependent
+  groundwater flow.
 
 [0.11.1] - 2021-12-23
 ---------------------

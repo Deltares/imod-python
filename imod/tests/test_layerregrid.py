@@ -146,3 +146,29 @@ def test_layerregridder__mode(test_da):
         dims,
     )
     assert actual.identical(expected)
+
+
+def test_layerregridder_topbot_nan():
+    layerregridder = imod.prepare.LayerRegridder(method="mean")
+    coords = {"x": [0.5], "y": [0.5], "layer": [1, 2, 3, 4]}
+    dims = ("layer", "y", "x")
+    shape = (4, 1, 1)
+    source = xr.DataArray(np.ones(shape), coords, dims)
+    top_src = xr.DataArray(
+        np.array([np.nan, np.nan, 2.0, 1.0]).reshape(shape), coords, dims
+    )
+    bottom_src = xr.DataArray(
+        np.array([np.nan, np.nan, 1.0, 0.0]).reshape(shape), coords, dims
+    )
+    top_dst = xr.DataArray(
+        np.array([4.0, 3.0, 2.0, np.nan]).reshape(shape), coords, dims
+    )
+    bottom_dst = xr.DataArray(
+        np.array([np.nan, 2.0, 1.0, np.nan]).reshape(shape), coords, dims
+    )
+    actual = layerregridder.regrid(source, top_src, bottom_src, top_dst, bottom_dst)
+
+    expected = xr.DataArray(
+        np.array([np.nan, np.nan, 1.0, np.nan]).reshape(shape), coords, dims
+    )
+    assert actual.identical(expected)

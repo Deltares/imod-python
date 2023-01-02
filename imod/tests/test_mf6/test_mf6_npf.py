@@ -24,6 +24,7 @@ def test_render():
         dewatered=True,
         perched=True,
         save_flows=True,
+        cell_averaging="AMT-HMK",
     )
     directory = pathlib.Path("mymodel")
     actual = npf.render(directory, "npf", None, True)
@@ -31,6 +32,7 @@ def test_render():
         """\
         begin options
           save_flows
+          alternative_cell_averaging AMT-HMK
           variablecv dewatered
           perched
         end options

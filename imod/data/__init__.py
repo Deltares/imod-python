@@ -1,6 +1,7 @@
 # from .synthetic import
 from .sample_data import (
     ahn,
+    circle,
     fluxes,
     head_observations,
     hondsrug_drainage,

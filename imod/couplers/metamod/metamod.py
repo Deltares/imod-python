@@ -50,7 +50,7 @@ class MetaMod:
         mf6_rch_pkgkey = self.mf6_rch_pkgkey
         mf6_wel_pkgkey = self.mf6_wel_pkgkey
 
-        gwf_names = self._get_gwf_model_names()
+        gwf_names = self._get_gwf_modelnames()
 
         # Assume only one groundwater flow model
         # FUTURE: Support multiple groundwater flow models.
@@ -177,7 +177,6 @@ class MetaMod:
         coupler_toml = {
             "timing": False,
             "log_level": "INFO",
-            "log_file": "imod_coupler.log",
             "driver_type": "metamod",
             "driver": {
                 "kernels": {
@@ -198,7 +197,7 @@ class MetaMod:
         with open(toml_path, "wb") as f:
             tomli_w.dump(coupler_toml, f)
 
-    def _get_gwf_model_names(self):
+    def _get_gwf_modelnames(self):
         """
         Get names of gwf models in mf6 simulation
         """
@@ -235,7 +234,7 @@ class MetaMod:
 
         coupling_dict = {}
 
-        gwf_names = self._get_gwf_model_names()
+        gwf_names = self._get_gwf_modelnames()
 
         # Assume only one groundwater flow model
         # FUTURE: Support multiple groundwater flow models.
@@ -281,7 +280,7 @@ class MetaMod:
             coupled.
         """
 
-        gwf_names = self._get_gwf_model_names()
+        gwf_names = self._get_gwf_modelnames()
 
         # Assume only one groundwater flow model
         # FUTURE: Support multiple groundwater flow models.
