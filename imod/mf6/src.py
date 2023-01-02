@@ -1,6 +1,13 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, Package, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition, Package
+from imod.mf6.validation import PKG_DIMS_SCHEMA
+from imod.schemata import (
+    AllValueSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+)
 
 
 class MassSourceLoading(BoundaryCondition):
@@ -38,8 +45,18 @@ class MassSourceLoading(BoundaryCondition):
     _period_data = ("rate",)
     _keyword_map = {}
 
-    _metadata_dict = {
-        "rate": VariableMetaData(np.floating),
+    _init_schemata = {
+        "rate": (
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        )
+    }
+
+    _write_schemata = {
+        "rate": [
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
     }
 
     def __init__(
@@ -56,4 +73,3 @@ class MassSourceLoading(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
-        self._pkgcheck()

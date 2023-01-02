@@ -228,7 +228,7 @@ class NodePropertyFlow(Package):
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
         ],
-        "cell_averaging": [DTypeSchema(str)],
+        "alternative_cell_averaging": [DTypeSchema(str)],
         "save_flows": [DTypeSchema(np.bool_)],
         "starting_head_as_confined_thickness": [DTypeSchema(np.bool_)],
         "variable_vertical_conductance": [DTypeSchema(np.bool_)],

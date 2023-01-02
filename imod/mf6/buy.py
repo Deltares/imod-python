@@ -4,6 +4,7 @@ import numpy as np
 import xarray as xr
 
 from imod.mf6.pkgbase import Package
+from imod.schemata import DTypeSchema
 
 
 def assign_index(arg):
@@ -88,6 +89,12 @@ class Buoyancy(Package):
     _template = Package._initialize_template(_pkg_id)
     _metadata_dict = {}
 
+    _init_schemata = {
+        "reference_density": [DTypeSchema(np.floating)],
+        "density_concentration_slope": [DTypeSchema(np.floating)],
+        "reference_concentration": [DTypeSchema(np.floating)],
+    }
+
     def __init__(
         self,
         reference_density: float,
@@ -111,7 +118,7 @@ class Buoyancy(Package):
         self.dataset["densityfile"] = densityfile
 
         self.dependencies = []
-        self._pkgcheck()
+        self._validate_at_init()
 
     def render(self, directory, pkgname, globaltimes, binary):
         ds = self.dataset

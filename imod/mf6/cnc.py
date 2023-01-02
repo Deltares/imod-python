@@ -1,6 +1,16 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.validation import BC_DIMS_SCHEMA
+from imod.schemata import (
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
+    AllValueSchema,
+    CoordsSchema,
+    DTypeSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
+)
 
 
 class ConstantConcentration(BoundaryCondition):
@@ -32,8 +42,24 @@ class ConstantConcentration(BoundaryCondition):
     _pkg_id = "cnc"
     _keyword_map = {}
     _period_data = ("concentration",)
-    _metadata_dict = {"concentration": VariableMetaData(np.floating)}
     _template = BoundaryCondition._initialize_template(_pkg_id)
+
+    _init_schemata = {
+        "concentration": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
+        ],
+    }
+    _write_schemata = {
+        "concentration": [
+            OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            AllValueSchema(">=", 0.0),
+        ]
+    }
 
     def __init__(
         self,
