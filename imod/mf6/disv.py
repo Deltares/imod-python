@@ -3,7 +3,7 @@ import pathlib
 import numpy as np
 import pandas as pd
 
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
 from imod.schemata import (
     AllValueSchema,
     AnyValueSchema,
@@ -54,11 +54,6 @@ class VerticesDiscretization(Package):
         "bottom": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
     }
 
-    _metadata_dict = {
-        "top": VariableMetaData(np.floating),
-        "bottom": VariableMetaData(np.floating),
-        "idomain": VariableMetaData(np.integer),
-    }
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
@@ -70,7 +65,6 @@ class VerticesDiscretization(Package):
         self.dataset["bottom"] = bottom
 
         self._validate_at_init()
-        self._pkgcheck_at_init()
 
     def render(self, directory, pkgname, binary):
         disdirectory = directory / pkgname

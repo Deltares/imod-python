@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
 from imod.mf6.validation import BC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -71,10 +71,6 @@ class Drainage(BoundaryCondition):
         "conductance": [IdentityNoDataSchema("elevation"), AllValueSchema(">", 0.0)],
     }
 
-    _metadata_dict = {
-        "elevation": VariableMetaData(np.floating),
-        "conductance": VariableMetaData(np.floating, not_less_equal_than=0.0),
-    }
     _period_data = ("elevation", "conductance")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)

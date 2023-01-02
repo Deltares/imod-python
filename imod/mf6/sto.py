@@ -1,10 +1,9 @@
 import numpy as np
 
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
-    DimsSchema,
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
@@ -96,11 +95,6 @@ class SpecificStorage(Package):
         ),
     }
 
-    _metadata_dict = {
-        "specific_storage": VariableMetaData(np.floating, not_less_than=0.0),
-        "specific_yield": VariableMetaData(np.floating, not_less_than=0.0),
-        "convertible": VariableMetaData(np.integer),
-    }
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, specific_storage, specific_yield, transient, convertible):
@@ -223,13 +217,6 @@ class StorageCoefficient(Package):
         ),
     }
 
-    _metadata_dict = {
-        "storage_coefficient": VariableMetaData(np.floating, not_less_than=0.0),
-        "specific_yield": VariableMetaData(np.floating, not_less_than=0.0),
-        "convertible": VariableMetaData(
-            np.integer,
-        ),
-    }
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, storage_coefficient, specific_yield, transient, convertible):

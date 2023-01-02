@@ -141,9 +141,6 @@ class GroundwaterFlowModel(Model):
 
         self._check_for_required_packages(modelkey)
 
-        for pkgname, pkg in self.items():
-            pkg._pkgcheck_at_write(dis)
-
     def validate(self) -> None:
         diskey = self._get_diskey()
         dis = self[diskey]

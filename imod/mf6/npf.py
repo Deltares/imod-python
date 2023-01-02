@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -259,17 +259,6 @@ class NodePropertyFlow(Package):
         "angle3": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))),
     }
 
-    _metadata_dict = {
-        "icelltype": VariableMetaData(np.integer),
-        "k": VariableMetaData(np.floating, not_less_equal_than=0.0),
-        "rewet_layer": VariableMetaData(np.floating),
-        "k22": VariableMetaData(np.floating, not_less_equal_than=0.0),
-        "k33": VariableMetaData(np.floating, not_less_equal_than=0.0),
-        "angle1": VariableMetaData(np.floating),
-        "angle2": VariableMetaData(np.floating),
-        "angle3": VariableMetaData(np.floating),
-    }
-
     _grid_data = {
         "icelltype": np.int32,
         "k": np.float64,
@@ -345,7 +334,6 @@ class NodePropertyFlow(Package):
         self.dataset["save_specific_discharge"] = save_specific_discharge
 
         self._validate_at_init()
-        self._pkgcheck_at_init()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
 from imod.mf6.validation import BC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -72,7 +72,6 @@ class ConstantHead(BoundaryCondition):
         ]
     }
 
-    _metadata_dict = {"head": VariableMetaData(np.floating)}
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
@@ -92,4 +91,3 @@ class ConstantHead(BoundaryCondition):
         self.dataset["observations"] = observations
 
         self._validate_at_init()
-        self._pkgcheck_at_init()

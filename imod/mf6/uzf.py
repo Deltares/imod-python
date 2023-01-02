@@ -1,11 +1,7 @@
 import numpy as np
 import xarray as xr
 
-from imod.mf6.pkgbase import (
-    AdvancedBoundaryCondition,
-    BoundaryCondition,
-    VariableMetaData,
-)
+from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition
 from imod.mf6.validation import BC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -190,21 +186,6 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         "root_activity": [IdentityNoDataSchema("kv_sat")],
     }
 
-    _metadata_dict = {
-        "surface_depression_depth": VariableMetaData(np.floating),
-        "kv_sat": VariableMetaData(np.floating, not_less_equal_than=0.0),
-        "theta_res": VariableMetaData(np.floating, not_less_than=0.0),
-        "theta_sat": VariableMetaData(np.floating, not_less_than=0.0),
-        "theta_init": VariableMetaData(np.floating, not_less_than=0.0),
-        "epsilon": VariableMetaData(np.floating),
-        "infiltration_rate": VariableMetaData(np.floating),
-        "et_pot": VariableMetaData(np.floating),
-        "extinction_depth": VariableMetaData(np.floating),
-        "extinction_theta": VariableMetaData(np.floating),
-        "root_potential": VariableMetaData(np.floating),
-        "root_activity": VariableMetaData(np.floating),
-    }
-
     _package_data = (
         "surface_depression_depth",
         "kv_sat",
@@ -292,8 +273,6 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         self.dataset["iuzno"].name = "uzf_number"
 
         self.dataset["ivertcon"] = self._determine_vertical_connection(self["iuzno"])
-
-        self._pkgcheck_at_init()
 
     def fill_stress_perioddata(self):
         """Modflow6 requires something to be filled in the stress perioddata,
@@ -433,3 +412,10 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             recarr[key] = arr[notnull].astype(np.float64)
 
         return recarr
+
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["kv_sat"] = self["kv_sat"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors

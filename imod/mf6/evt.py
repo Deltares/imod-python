@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
 from imod.mf6.validation import BC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -107,13 +107,6 @@ class Evapotranspiration(BoundaryCondition):
         "proportion_depth": [IdentityNoDataSchema("surface")],
     }
 
-    _metadata_dict = {
-        "surface": VariableMetaData(np.floating),
-        "rate": VariableMetaData(np.floating),
-        "depth": VariableMetaData(np.floating),
-        "proportion_depth": VariableMetaData(np.floating),
-        "proportion_rate": VariableMetaData(np.floating),
-    }
     _period_data = ("surface", "rate", "depth", "proportion_depth", "proportion_rate")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
@@ -149,7 +142,6 @@ class Evapotranspiration(BoundaryCondition):
         self.dataset["observations"] = observations
 
         self._validate_at_init()
-        self._pkgcheck_at_init()
 
         # TODO: add write logic for transforming proportion rate and depth to
         # the right shape in the binary file.

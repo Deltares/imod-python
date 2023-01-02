@@ -1,7 +1,7 @@
 import numpy as np
 
 import imod
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
 from imod.schemata import (
     AllValueSchema,
     AnyValueSchema,
@@ -66,11 +66,6 @@ class StructuredDiscretization(Package):
         "bottom": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
     }
 
-    _metadata_dict = {
-        "top": VariableMetaData(np.floating),
-        "bottom": VariableMetaData(np.floating),
-        "idomain": VariableMetaData(np.integer),
-    }
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
@@ -121,19 +116,6 @@ class StructuredDiscretization(Package):
         )
 
         return self._template.render(d)
-
-    def _check_bottom_above_top(self):
-        """Check if bottom not above top"""
-
-        bottom_above_top = self.dataset["bottom"] > self.dataset["top"]
-
-        if bottom_above_top.any():
-            raise ValueError(f"Bottom above top in {self.__class__.__name__}.")
-
-    def _pkgcheck_at_init(self):
-        self._check_bottom_above_top()
-
-        super()._pkgcheck_at_init()
 
     def _validate(self, schemata, **kwargs):
         # Insert additional kwargs

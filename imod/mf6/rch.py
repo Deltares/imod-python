@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
 from imod.mf6.validation import BC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -67,7 +67,6 @@ class Recharge(BoundaryCondition):
         ],
     }
 
-    _metadata_dict = {"rate": VariableMetaData(np.floating)}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
@@ -86,4 +85,3 @@ class Recharge(BoundaryCondition):
         self.dataset["observations"] = observations
 
         self._validate_at_init()
-        self._pkgcheck_at_init()

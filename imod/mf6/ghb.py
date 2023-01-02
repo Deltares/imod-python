@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
 from imod.mf6.validation import BC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -75,10 +75,6 @@ class GeneralHeadBoundary(BoundaryCondition):
         "conductance": [IdentityNoDataSchema("head"), AllValueSchema(">", 0.0)],
     }
 
-    _metadata_dict = {
-        "head": VariableMetaData(np.floating),
-        "conductance": VariableMetaData(np.floating, not_less_equal_than=0.0),
-    }
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
@@ -100,7 +96,6 @@ class GeneralHeadBoundary(BoundaryCondition):
         self.dataset["observations"] = observations
 
         self._validate_at_init()
-        self._pkgcheck_at_init()
 
     def _validate(self, schemata, **kwargs):
         # Insert additional kwargs

@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
 from imod.mf6.validation import BC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -87,11 +87,6 @@ class River(BoundaryCondition):
         ],
     }
 
-    _metadata_dict = {
-        "stage": VariableMetaData(np.floating),
-        "conductance": VariableMetaData(np.floating, not_less_equal_than=0.0),
-        "bottom_elevation": VariableMetaData(np.floating),
-    }
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
@@ -114,40 +109,6 @@ class River(BoundaryCondition):
         self.dataset["observations"] = observations
 
         self._validate_at_init()
-
-    def _pkgcheck_at_init(self):
-        self._check_bottom_above_stage()
-
-        super()._pkgcheck_at_init()
-
-    def _check_bottom_above_stage(self):
-        """Check if river bottom not above river stage"""
-
-        bottom_above_stage = self.dataset["bottom_elevation"] > self.dataset["stage"]
-
-        if bottom_above_stage.any():
-            raise ValueError(
-                f"Bottom elevation above stage in {self.__class__.__name__}."
-            )
-
-    def _check_river_bottom_below_model_bottom(self, dis):
-        """
-        Check if river bottom not below model bottom. Modflow 6 throws an
-        error if this occurs.
-        """
-
-        bottom = dis.dataset["bottom"]
-
-        riv_below_bottom = self.dataset["bottom_elevation"] < bottom
-        if riv_below_bottom.any():
-            raise ValueError(
-                f"River bottom below model bottom for in '{self.__class__.__name__}'."
-            )
-
-    def _pkgcheck_at_write(self, dis):
-        self._check_river_bottom_below_model_bottom(dis)
-
-        super()._pkgcheck_at_write(dis)
 
     def _validate(self, schemata, **kwargs):
         # Insert additional kwargs

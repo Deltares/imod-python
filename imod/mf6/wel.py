@@ -3,7 +3,7 @@ from typing import Dict
 import numpy as np
 import xarray as xr
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
 from imod.schemata import DTypeSchema
 
 
@@ -72,13 +72,6 @@ class WellDisStructured(BoundaryCondition):
         "rate": [DTypeSchema(np.floating)],
     }
 
-    _metadata_dict = {
-        "layer": VariableMetaData(np.integer),
-        "row": VariableMetaData(np.integer),
-        "column": VariableMetaData(np.integer),
-        "rate": VariableMetaData(np.floating),
-    }
-
     def __init__(
         self,
         layer,
@@ -101,7 +94,6 @@ class WellDisStructured(BoundaryCondition):
         self.dataset["observations"] = observations
 
         self._validate_at_init()
-        self._pkgcheck_at_init()
 
     def to_sparse(self, arrdict, layer):
         spec = []
@@ -117,13 +109,6 @@ class WellDisStructured(BoundaryCondition):
         for key, arr in arrdict.items():
             recarr[key] = arr
         return recarr
-
-    def _pkgcheck_at_init(self):
-        """
-        Because data is structured in a different way for the well package, we
-        override Boundary.pkgcheck to only check data types.
-        """
-        self._check_types()
 
 
 class WellDisVertices(BoundaryCondition):
@@ -171,12 +156,6 @@ class WellDisVertices(BoundaryCondition):
         "rate": [DTypeSchema(np.floating)],
     }
 
-    _metadata_dict = {
-        "layer": VariableMetaData(np.integer),
-        "cell2d": VariableMetaData(np.integer),
-        "rate": VariableMetaData(np.floating),
-    }
-
     def __init__(
         self,
         layer,
@@ -197,7 +176,6 @@ class WellDisVertices(BoundaryCondition):
         self.dataset["observations"] = observations
 
         self._validate_at_init()
-        self._pkgcheck_at_init()
 
     def to_sparse(self, arrdict, layer):
         spec = []
@@ -213,10 +191,3 @@ class WellDisVertices(BoundaryCondition):
         for key, arr in arrdict.items():
             recarr[key] = arr
         return recarr
-
-    def _pkgcheck_at_init(self):
-        """
-        Because data is structured in a different way for the well package, we
-        override Boundary.pkgcheck to only check data types.
-        """
-        self._check_types()
