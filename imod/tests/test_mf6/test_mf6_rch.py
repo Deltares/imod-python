@@ -180,10 +180,14 @@ def test_scalar():
         * rate
         \t- coords has missing keys: {'layer'}
         \t- No option succeeded:
-        \tlength of dims does not match: 0 != 4
-        \tlength of dims does not match: 0 != 3
-        \tlength of dims does not match: 0 != 3
-        \tlength of dims does not match: 0 != 2"""
+        \tdim mismatch: tested for ('time', 'layer', 'y', 'x'), got ()
+        \tdim mismatch: tested for ('layer', 'y', 'x'), got ()
+        \tdim mismatch: tested for ('time', 'layer', '{face_dim}'), got ()
+        \tdim mismatch: tested for ('layer', '{face_dim}'), got ()
+        \tdim mismatch: tested for ('time', 'y', 'x'), got ()
+        \tdim mismatch: tested for ('y', 'x'), got ()
+        \tdim mismatch: tested for ('time', '{face_dim}'), got ()
+        \tdim mismatch: tested for ('{face_dim}',), got ()"""
     )
     with pytest.raises(ValidationError, match=re.escape(message)):
         imod.mf6.Recharge(rate=0.001)

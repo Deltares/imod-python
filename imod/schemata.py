@@ -168,16 +168,14 @@ class DimsSchema(BaseSchema):
         """
         dims = self._fill_in_face_dim(obj)
 
-        if len(dims) != len(obj.dims):
-            raise ValidationError(
-                f"length of dims does not match: {len(obj.dims)} != {len(dims)}"
-            )
+        # Force to tuple for error message print
+        expected = tuple(dims)
+        actual = tuple(obj.dims)
 
-        for i, (actual, expected) in enumerate(zip(obj.dims, dims)):
-            if expected is not None and actual != expected:
-                raise ValidationError(
-                    f"dim mismatch in axis {i}: {actual} != {expected}"
-                )
+        different_dims = set(actual) ^ set(expected)
+
+        if len(different_dims) != 0:
+            raise ValidationError(f"dim mismatch: tested for {expected}, got {actual}")
 
 
 class IndexesSchema(BaseSchema):
