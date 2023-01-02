@@ -7,6 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 @pytest.fixture(scope="function")
@@ -101,7 +102,7 @@ def test_render_transient(rch_dict_transient):
 
 def test_wrong_dtype(rch_dict):
     rch_dict["rate"] = rch_dict["rate"].astype(np.int32)
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         imod.mf6.Recharge(**rch_dict)
 
 
@@ -159,19 +160,34 @@ def test_transient_no_layer_dim(rch_dict_transient):
 
 
 def test_no_layer_coord(rch_dict):
+    message = textwrap.dedent(
+        """
+        * rate
+        \t- coords has missing keys: {'layer'}"""
+    )
+
     rch_dict["rate"] = rch_dict["rate"].sel(layer=1, drop=True)
     with pytest.raises(
-        ValueError,
-        match="No 'layer' coordinate assigned to rate in the Recharge package. 2D grids still require a 'layer' coordinate.",
+        ValidationError,
+        match=re.escape(message),
     ):
         imod.mf6.Recharge(**rch_dict)
 
 
 def test_scalar():
-    with pytest.raises(
-        ValueError,
-        match=re.escape(
-            "Boundary conditions should be specified as spatial grids. Instead, got () for rate in the Recharge package. "
-        ),
-    ):
+    message = textwrap.dedent(
+        """
+        * rate
+        \t- coords has missing keys: {'layer'}
+        \t- No option succeeded:
+        \tdim mismatch: tested for ('time', 'layer', 'y', 'x'), got ()
+        \tdim mismatch: tested for ('layer', 'y', 'x'), got ()
+        \tdim mismatch: tested for ('time', 'layer', '{face_dim}'), got ()
+        \tdim mismatch: tested for ('layer', '{face_dim}'), got ()
+        \tdim mismatch: tested for ('time', 'y', 'x'), got ()
+        \tdim mismatch: tested for ('y', 'x'), got ()
+        \tdim mismatch: tested for ('time', '{face_dim}'), got ()
+        \tdim mismatch: tested for ('{face_dim}',), got ()"""
+    )
+    with pytest.raises(ValidationError, match=re.escape(message)):
         imod.mf6.Recharge(rate=0.001)

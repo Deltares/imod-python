@@ -6,6 +6,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 @pytest.fixture()
@@ -101,7 +102,7 @@ def test_from_file(head, tmp_path):
 
 
 def test_wrong_dtype(head):
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         imod.mf6.ConstantHead(
             head.astype(np.int16), print_input=True, print_flows=True, save_flows=True
         )

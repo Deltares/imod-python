@@ -7,6 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 def test_render():
@@ -59,7 +60,7 @@ def test_wrong_dtype():
     k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": layer}, ("layer",))
     k33 = xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",))
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         imod.mf6.NodePropertyFlow(
             icelltype=icelltype.astype(np.float64),
             k=k,
@@ -84,13 +85,17 @@ def test_wrong_dim():
     k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": layer}, ("layer",))
     k33 = xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",))
 
-    expected_message = re.escape(
-        "2D grid should have dimensions ('y', 'x'). "
-        "Instead, got ('time', 'layer') for icelltype in the "
-        "NodePropertyFlow package."
+    message = textwrap.dedent(
+        """
+        * icelltype
+        \t- No option succeeded:
+        \tdim mismatch: tested for ('layer', 'y', 'x'), got ('time', 'layer')
+        \tdim mismatch: tested for ('layer', '{face_dim}'), got ('time', 'layer')
+        \tdim mismatch: tested for ('layer',), got ('time', 'layer')
+        \tdim mismatch: tested for (), got ('time', 'layer')"""
     )
 
-    with pytest.raises(ValueError, match=expected_message):
+    with pytest.raises(ValidationError, match=re.escape(message)):
         imod.mf6.NodePropertyFlow(
             icelltype=icelltype,
             k=k,

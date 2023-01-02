@@ -6,6 +6,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 def test_render():
@@ -128,7 +129,7 @@ def test_wrong_dtype():
     row = np.array([5, 4, 6])
     column = np.array([11, 6, 12])
     rate = np.full(3, 5)
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         imod.mf6.WellDisStructured(
             layer=layer,
             row=row,

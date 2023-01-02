@@ -1,6 +1,14 @@
 import numpy as np
 
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
+from imod.mf6.validation import PKG_DIMS_SCHEMA
+from imod.schemata import (
+    AllValueSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
+)
 
 
 class NodePropertyFlow(Package):
@@ -177,15 +185,78 @@ class NodePropertyFlow(Package):
 
     _pkg_id = "npf"
 
-    _metadata_dict = {
-        "icelltype": VariableMetaData(np.integer),
-        "k": VariableMetaData(np.floating, not_less_equal_than=0.0),
-        "rewet_layer": VariableMetaData(np.floating),
-        "k22": VariableMetaData(np.floating, not_less_equal_than=0.0),
-        "k33": VariableMetaData(np.floating, not_less_equal_than=0.0),
-        "angle1": VariableMetaData(np.floating),
-        "angle2": VariableMetaData(np.floating),
-        "angle3": VariableMetaData(np.floating),
+    _init_schemata = {
+        "icelltype": [
+            DTypeSchema(np.integer),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "k": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "rewet_layer": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "k22": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "k33": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "angle1": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "angle2": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "angle3": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "cell_averaging": [DTypeSchema(str)],
+        "save_flows": [DTypeSchema(np.bool_)],
+        "starting_head_as_confined_thickness": [DTypeSchema(np.bool_)],
+        "variable_vertical_conductance": [DTypeSchema(np.bool_)],
+        "dewatered": [DTypeSchema(np.bool_)],
+        "perched": [DTypeSchema(np.bool_)],
+        "save_specific_discharge": [DTypeSchema(np.bool_)],
+    }
+
+    _write_schemata = {
+        "k": (
+            AllValueSchema(">", 0.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            OtherCoordsSchema("idomain"),
+        ),
+        "rewet_layer": (
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))
+        ),
+        "k22": (
+            AllValueSchema(">", 0.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            # No need to check coords: dataset ensures they align with idomain.
+        ),
+        "k33": (
+            AllValueSchema(">", 0.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            # No need to check coords: dataset ensures they align with idomain.
+        ),
+        "angle1": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))),
+        "angle2": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))),
+        "angle3": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))),
     }
 
     _grid_data = {
@@ -262,7 +333,7 @@ class NodePropertyFlow(Package):
         self.dataset["perched"] = perched
         self.dataset["save_specific_discharge"] = save_specific_discharge
 
-        self._pkgcheck_at_init()
+        self._validate_at_init()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

@@ -1,6 +1,18 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.validation import BC_DIMS_SCHEMA
+from imod.schemata import (
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
+    AllValueSchema,
+    CoordsSchema,
+    DimsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
+)
 
 
 class River(BoundaryCondition):
@@ -37,11 +49,44 @@ class River(BoundaryCondition):
     _pkg_id = "riv"
     _period_data = ("stage", "conductance", "bottom_elevation")
     _keyword_map = {}
-    _metadata_dict = {
-        "stage": VariableMetaData(np.floating),
-        "conductance": VariableMetaData(np.floating, not_less_equal_than=0.0),
-        "bottom_elevation": VariableMetaData(np.floating),
+
+    _init_schemata = {
+        "stage": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
+        ],
+        "conductance": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
+        ],
+        "bottom_elevation": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
+        ],
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+        "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
     }
+    _write_schemata = {
+        "stage": [
+            AllValueSchema(">=", "bottom_elevation"),
+            OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
+        "conductance": [IdentityNoDataSchema("stage"), AllValueSchema(">", 0.0)],
+        "bottom_elevation": [
+            IdentityNoDataSchema("stage"),
+            # Check river bottom above layer bottom, else Modflow throws error.
+            AllValueSchema(">", "bottom"),
+        ],
+    }
+
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
@@ -63,38 +108,12 @@ class River(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
-        self._pkgcheck_at_init()
+        self._validate_at_init()
 
-    def _pkgcheck_at_init(self):
-        self._check_bottom_above_stage()
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["stage"] = self["stage"]
+        kwargs["bottom_elevation"] = self["bottom_elevation"]
+        errors = super()._validate(schemata, **kwargs)
 
-        super()._pkgcheck_at_init()
-
-    def _check_bottom_above_stage(self):
-        """Check if river bottom not above river stage"""
-
-        bottom_above_stage = self.dataset["bottom_elevation"] > self.dataset["stage"]
-
-        if bottom_above_stage.any():
-            raise ValueError(
-                f"Bottom elevation above stage in {self.__class__.__name__}."
-            )
-
-    def _check_river_bottom_below_model_bottom(self, dis):
-        """
-        Check if river bottom not below model bottom. Modflow 6 throws an
-        error if this occurs.
-        """
-
-        bottom = dis.dataset["bottom"]
-
-        riv_below_bottom = self.dataset["bottom_elevation"] < bottom
-        if riv_below_bottom.any():
-            raise ValueError(
-                f"River bottom below model bottom for in '{self.__class__.__name__}'."
-            )
-
-    def _pkgcheck_at_write(self, dis):
-        self._check_river_bottom_below_model_bottom(dis)
-
-        super()._pkgcheck_at_write(dis)
+        return errors

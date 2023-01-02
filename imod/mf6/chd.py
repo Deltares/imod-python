@@ -1,6 +1,15 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.validation import BC_DIMS_SCHEMA
+from imod.schemata import (
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
+    CoordsSchema,
+    DTypeSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
+)
 
 
 class ConstantHead(BoundaryCondition):
@@ -46,7 +55,23 @@ class ConstantHead(BoundaryCondition):
 
     _pkg_id = "chd"
     _period_data = ("head",)
-    _metadata_dict = {"head": VariableMetaData(np.floating)}
+
+    _init_schemata = {
+        "head": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
+        ],
+    }
+    _write_schemata = {
+        "head": [
+            OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ]
+    }
+
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
@@ -65,4 +90,4 @@ class ConstantHead(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
-        self._pkgcheck_at_init()
+        self._validate_at_init()

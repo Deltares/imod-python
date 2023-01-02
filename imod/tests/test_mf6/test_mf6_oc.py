@@ -7,6 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 def test_render_string():
@@ -80,13 +81,22 @@ def test_render_int():
 
 
 def test_render_bool_fail():
-    oc = imod.mf6.OutputControl(save_head=True, save_budget=False)
-    directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]
+    message = textwrap.dedent(
+        """
+        * save_head
+        \t- No option succeeded:
+        \tdtype bool != <class 'numpy.integer'>
+        \tdtype bool != <U0
+        \tdtype bool != object
+        * save_budget
+        \t- No option succeeded:
+        \tdtype bool != <class 'numpy.integer'>
+        \tdtype bool != <U0
+        \tdtype bool != object"""
+    )
 
-    expected_message = "Output Control setting should be either integer or string in ['first', 'last', 'all'], instead got True"
-    with pytest.raises(TypeError, match=re.escape(expected_message)):
-        _ = oc.render(directory, "outputcontrol", globaltimes, True)
+    with pytest.raises(ValidationError, match=re.escape(message)):
+        imod.mf6.OutputControl(save_head=True, save_budget=False)
 
 
 def test_render_string_fail():

@@ -3,7 +3,8 @@ from typing import Dict
 import numpy as np
 import xarray as xr
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
+from imod.schemata import DTypeSchema
 
 
 def assign_dims(arg) -> Dict:
@@ -64,11 +65,11 @@ class WellDisStructured(BoundaryCondition):
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
-    _metadata_dict = {
-        "layer": VariableMetaData(np.integer),
-        "row": VariableMetaData(np.integer),
-        "column": VariableMetaData(np.integer),
-        "rate": VariableMetaData(np.floating),
+    _init_schemata = {
+        "layer": [DTypeSchema(np.integer)],
+        "row": [DTypeSchema(np.integer)],
+        "column": [DTypeSchema(np.integer)],
+        "rate": [DTypeSchema(np.floating)],
     }
 
     def __init__(
@@ -92,7 +93,7 @@ class WellDisStructured(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
-        self._pkgcheck_at_init()
+        self._validate_at_init()
 
     def to_sparse(self, arrdict, layer):
         spec = []
@@ -108,13 +109,6 @@ class WellDisStructured(BoundaryCondition):
         for key, arr in arrdict.items():
             recarr[key] = arr
         return recarr
-
-    def _pkgcheck_at_init(self):
-        """
-        Because data is structured in a different way for the well package, we
-        override Boundary.pkgcheck to only check data types.
-        """
-        self._check_types()
 
 
 class WellDisVertices(BoundaryCondition):
@@ -156,10 +150,10 @@ class WellDisVertices(BoundaryCondition):
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
-    _metadata_dict = {
-        "layer": VariableMetaData(np.integer),
-        "cell2d": VariableMetaData(np.integer),
-        "rate": VariableMetaData(np.floating),
+    _init_schemata = {
+        "layer": [DTypeSchema(np.integer)],
+        "cell2d": [DTypeSchema(np.integer)],
+        "rate": [DTypeSchema(np.floating)],
     }
 
     def __init__(
@@ -181,6 +175,8 @@ class WellDisVertices(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
+        self._validate_at_init()
+
     def to_sparse(self, arrdict, layer):
         spec = []
         for key in arrdict:
@@ -195,10 +191,3 @@ class WellDisVertices(BoundaryCondition):
         for key, arr in arrdict.items():
             recarr[key] = arr
         return recarr
-
-    def _pkgcheck_at_init(self):
-        """
-        Because data is structured in a different way for the well package, we
-        override Boundary.pkgcheck to only check data types.
-        """
-        self._check_types()

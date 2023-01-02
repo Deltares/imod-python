@@ -7,6 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 @pytest.fixture(scope="function")
@@ -28,10 +29,10 @@ def make_da():
 def dis_dict(make_da):
     da = make_da
     bottom = da - xr.DataArray(
-        data=[1.0, 2.0], dims=("layer",), coords={"layer": [2, 3]}
+        data=[1.5, 2.5], dims=("layer",), coords={"layer": [2, 3]}
     )
 
-    return dict(idomain=da.astype(int), top=da.sel(layer=2), bottom=bottom * 2)
+    return dict(idomain=da.astype(int), top=da.sel(layer=2), bottom=bottom)
 
 
 @pytest.fixture(scope="function")
@@ -71,26 +72,32 @@ def test_render(riv_dict):
 def test_wrong_dtype(riv_dict):
     riv_dict["stage"] = riv_dict["stage"].astype(int)
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         imod.mf6.River(**riv_dict)
 
 
-def test_all_nan(riv_dict):
+def test_all_nan(riv_dict, dis_dict):
     # Use where to set everything to np.nan
-    riv_dict["stage"] = riv_dict["stage"].where(False)
+    for var in ["stage", "conductance", "bottom_elevation"]:
+        riv_dict[var] = riv_dict[var].where(False)
 
-    with pytest.raises(ValueError, match="Provided grid with only nans in River."):
-        imod.mf6.River(**riv_dict)
+    river = imod.mf6.River(**riv_dict)
+
+    errors = river._validate(river._write_schemata, **dis_dict)
+
+    assert len(errors) == 1
+
+    for var, var_errors in errors.items():
+        assert var == "stage"
 
 
-def test_inconsistent_nan(riv_dict):
+def test_inconsistent_nan(riv_dict, dis_dict):
     riv_dict["stage"][:, 1, 2] = np.nan
+    river = imod.mf6.River(**riv_dict)
 
-    with pytest.raises(
-        ValueError,
-        match="Detected inconsistent data in River, some variables contain nan, but others do not.",
-    ):
-        imod.mf6.River(**riv_dict)
+    errors = river._validate(river._write_schemata, **dis_dict)
+
+    assert len(errors) == 1
 
 
 def test_check_layer(riv_dict):
@@ -99,11 +106,15 @@ def test_check_layer(riv_dict):
     """
     riv_dict["stage"] = riv_dict["stage"].sel(layer=2, drop=True)
 
+    message = textwrap.dedent(
+        """
+        * stage
+        \t- coords has missing keys: {'layer'}"""
+    )
+
     with pytest.raises(
-        ValueError,
-        match=re.escape(
-            "No 'layer' coordinate assigned to stage in the River package. 2D grids still require a 'layer' coordinate. You can assign one with `da.assign_coordinate(layer=1)`"
-        ),
+        ValidationError,
+        match=re.escape(message),
     ):
         imod.mf6.River(**riv_dict)
 
@@ -125,37 +136,49 @@ def test_check_dimsize_zero():
 
     da[:, 1, 1] = np.nan
 
-    with pytest.raises(
-        ValueError, match="Provided dimension layer in River with size 0"
-    ):
+    message = textwrap.dedent(
+        """
+        * stage
+        \t- provided dimension layer with size 0
+        * conductance
+        \t- provided dimension layer with size 0
+        * bottom_elevation
+        \t- provided dimension layer with size 0"""
+    )
+
+    with pytest.raises(ValidationError, match=re.escape(message)):
         imod.mf6.River(stage=da, conductance=da, bottom_elevation=da - 1.0)
 
 
-def test_check_zero_conductance(riv_dict):
+def test_check_zero_conductance(riv_dict, dis_dict):
     """
     Test for zero conductance
     """
     riv_dict["conductance"] = riv_dict["conductance"] * 0.0
 
-    with pytest.raises(
-        ValueError,
-        match=(
-            "Detected incorrect values in River: \n"
-            "- conductance in River: values less or equal than 0.0 detected. \n"
-        ),
-    ):
-        imod.mf6.River(**riv_dict)
+    river = imod.mf6.River(**riv_dict)
+
+    errors = river._validate(river._write_schemata, **dis_dict)
+
+    assert len(errors) == 1
+    for var, var_errors in errors.items():
+        assert var == "conductance"
 
 
-def test_check_bottom_above_stage(riv_dict):
+def test_check_bottom_above_stage(riv_dict, dis_dict):
     """
     Check that river bottom is not above stage.
     """
 
     riv_dict["bottom_elevation"] = riv_dict["bottom_elevation"] + 10.0
 
-    with pytest.raises(ValueError, match="Bottom elevation above stage in River."):
-        imod.mf6.River(**riv_dict)
+    river = imod.mf6.River(**riv_dict)
+
+    errors = river._validate(river._write_schemata, **dis_dict)
+
+    assert len(errors) == 1
+    for var, var_errors in errors.items():
+        assert var == "stage"
 
 
 def test_check_riv_bottom_above_dis_bottom(riv_dict, dis_dict):
@@ -164,32 +187,34 @@ def test_check_riv_bottom_above_dis_bottom(riv_dict, dis_dict):
     """
 
     river = imod.mf6.River(**riv_dict)
-    dis = imod.mf6.StructuredDiscretization(**dis_dict)
 
-    river._check_river_bottom_below_model_bottom(dis)
+    river._validate(river._write_schemata, **dis_dict)
 
-    dis["bottom"] += 2.0
+    dis_dict["bottom"] += 2.0
 
-    with pytest.raises(ValueError):
-        river._check_river_bottom_below_model_bottom(dis)
+    errors = river._validate(river._write_schemata, **dis_dict)
+
+    assert len(errors) == 1
+    for var, var_errors in errors.items():
+        assert var == "bottom_elevation"
 
 
 def test_check_boundary_outside_active_domain(riv_dict, dis_dict):
     """
-    Check that river bottom not above dis bottom.
+    Check that river not outside idomain
     """
 
     river = imod.mf6.River(**riv_dict)
-    dis = imod.mf6.StructuredDiscretization(**dis_dict)
 
-    river._check_boundary_outside_active_domain(dis)
+    errors = river._validate(river._write_schemata, **dis_dict)
 
-    with pytest.raises(
-        ValueError, match="Detected River cell outside active model domain"
-    ):
-        dis["idomain"][0, 0, 0] = 0
+    assert len(errors) == 0
 
-        river._check_boundary_outside_active_domain(dis)
+    dis_dict["idomain"][0, 0, 0] = 0
+
+    errors = river._validate(river._write_schemata, **dis_dict)
+
+    assert len(errors) == 1
 
 
 def test_check_dim_monotonicity(riv_dict):
@@ -199,17 +224,41 @@ def test_check_dim_monotonicity(riv_dict):
     """
     riv_ds = xr.merge([riv_dict])
 
-    with pytest.raises(
-        ValueError, match="y coordinate in River not monotonically decreasing"
-    ):
+    message = textwrap.dedent(
+        """
+        * stage
+        \t- coord y which is not monotonically decreasing
+        * conductance
+        \t- coord y which is not monotonically decreasing
+        * bottom_elevation
+        \t- coord y which is not monotonically decreasing"""
+    )
+
+    with pytest.raises(ValidationError, match=re.escape(message)):
         imod.mf6.River(**riv_ds.sel(y=slice(None, None, -1)))
 
-    with pytest.raises(
-        ValueError, match="x coordinate in River not monotonically increasing"
-    ):
+    message = textwrap.dedent(
+        """
+        * stage
+        \t- coord x which is not monotonically increasing
+        * conductance
+        \t- coord x which is not monotonically increasing
+        * bottom_elevation
+        \t- coord x which is not monotonically increasing"""
+    )
+
+    with pytest.raises(ValidationError, match=re.escape(message)):
         imod.mf6.River(**riv_ds.sel(x=slice(None, None, -1)))
 
-    with pytest.raises(
-        ValueError, match="layer coordinate in River not monotonically increasing"
-    ):
+    message = textwrap.dedent(
+        """
+        * stage
+        \t- coord layer which is not monotonically increasing
+        * conductance
+        \t- coord layer which is not monotonically increasing
+        * bottom_elevation
+        \t- coord layer which is not monotonically increasing"""
+    )
+
+    with pytest.raises(ValidationError, match=re.escape(message)):
         imod.mf6.River(**riv_ds.sel(layer=slice(None, None, -1)))

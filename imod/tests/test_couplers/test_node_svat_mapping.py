@@ -40,7 +40,7 @@ def test_simple_model(fixed_format_parser):
     )
 
     dis = mf6.StructuredDiscretization(
-        top=xr.full_like(like, 1.0),
+        top=1.0,
         bottom=xr.full_like(like, 0.0),
         idomain=xr.full_like(like, 1, dtype=int),
     )
@@ -87,7 +87,7 @@ def test_simple_model_1_subunit(fixed_format_parser):
     )
 
     dis = mf6.StructuredDiscretization(
-        top=xr.full_like(like, 1.0),
+        top=1.0,
         bottom=xr.full_like(like, 0.0),
         idomain=xr.full_like(like, 1, dtype=int),
     )
@@ -140,7 +140,7 @@ def test_inactive_idomain_in_svat():
     idomain[:, 1, :] = 0
 
     dis = mf6.StructuredDiscretization(
-        top=xr.full_like(like, 1.0),
+        top=1.0,
         bottom=xr.full_like(like, 0.0),
         idomain=idomain,
     )

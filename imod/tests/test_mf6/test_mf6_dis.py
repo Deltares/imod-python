@@ -6,6 +6,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 @pytest.fixture(scope="function")
@@ -74,7 +75,7 @@ def test_render(idomain_and_bottom):
 def test_wrong_dtype(idomain_and_bottom):
     idomain, bottom = idomain_and_bottom
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         imod.mf6.StructuredDiscretization(
             top=200.0, bottom=bottom, idomain=idomain.astype(np.float64)
         )

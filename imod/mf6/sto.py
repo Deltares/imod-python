@@ -1,6 +1,13 @@
 import numpy as np
 
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
+from imod.mf6.validation import PKG_DIMS_SCHEMA
+from imod.schemata import (
+    AllValueSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+)
 
 
 class Storage(Package):
@@ -54,11 +61,40 @@ class SpecificStorage(Package):
         "specific_yield": "sy",
         "convertible": "iconvert",
     }
-    _metadata_dict = {
-        "specific_storage": VariableMetaData(np.floating, not_less_than=0.0),
-        "specific_yield": VariableMetaData(np.floating, not_less_than=0.0),
-        "convertible": VariableMetaData(np.integer),
+
+    _init_schemata = {
+        "convertible": [
+            DTypeSchema(np.integer),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "specific_storage": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "specific_yield": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
     }
+
+    _write_schemata = {
+        "convertible": (
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            # No need to check coords: dataset ensures they align with idomain.
+        ),
+        "specific_storage": (
+            AllValueSchema(">", 0.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+        "specific_yield": (
+            AllValueSchema(">", 0.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+    }
+
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, specific_storage, specific_yield, transient, convertible):
@@ -68,7 +104,7 @@ class SpecificStorage(Package):
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
 
-        self._pkgcheck_at_init()
+        self._validate_at_init()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
@@ -150,13 +186,37 @@ class StorageCoefficient(Package):
         "specific_yield": "sy",
         "convertible": "iconvert",
     }
-    _metadata_dict = {
-        "storage_coefficient": VariableMetaData(np.floating, not_less_than=0.0),
-        "specific_yield": VariableMetaData(np.floating, not_less_than=0.0),
-        "convertible": VariableMetaData(
-            np.integer,
+
+    _init_schemata = {
+        "convertible": [
+            DTypeSchema(np.integer),
+            PKG_DIMS_SCHEMA,
+        ],
+        "storage_coefficient": [
+            DTypeSchema(np.floating),
+            PKG_DIMS_SCHEMA,
+        ],
+        "specific_yield": [
+            DTypeSchema(np.floating),
+            PKG_DIMS_SCHEMA,
+        ],
+    }
+
+    _write_schemata = {
+        "convertible": (
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            # No need to check coords: dataset ensures they align with idomain.
+        ),
+        "storage_coefficient": (
+            AllValueSchema(">", 0.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+        "specific_yield": (
+            AllValueSchema(">", 0.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
     }
+
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, storage_coefficient, specific_yield, transient, convertible):
@@ -166,7 +226,7 @@ class StorageCoefficient(Package):
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
 
-        self._pkgcheck_at_init()
+        self._validate_at_init()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

@@ -1,6 +1,14 @@
 import numpy as np
 
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
+from imod.mf6.validation import PKG_DIMS_SCHEMA
+from imod.schemata import (
+    DimsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
+)
 
 
 class InitialConditions(Package):
@@ -25,16 +33,29 @@ class InitialConditions(Package):
     """
 
     _pkg_id = "ic"
-    _metadata_dict = {"head": VariableMetaData(np.floating)}
     _grid_data = {"head": np.float64}
     _keyword_map = {"head": "strt"}
     _template = Package._initialize_template(_pkg_id)
+
+    _init_schemata = {
+        "head": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+    }
+    _write_schemata = {
+        "head": [
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            OtherCoordsSchema("idomain"),
+        ],
+    }
 
     def __init__(self, head):
         super().__init__(locals())
         self.dataset["head"] = head
 
-        self._pkgcheck_at_init()
+        self._validate_at_init()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

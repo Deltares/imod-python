@@ -1,6 +1,18 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.validation import BC_DIMS_SCHEMA
+from imod.schemata import (
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
+    AllValueSchema,
+    CoordsSchema,
+    DimsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
+)
 
 
 class Drainage(BoundaryCondition):
@@ -32,11 +44,33 @@ class Drainage(BoundaryCondition):
     """
 
     _pkg_id = "drn"
+
     # has to be ordered as in the list
-    _metadata_dict = {
-        "elevation": VariableMetaData(np.floating),
-        "conductance": VariableMetaData(np.floating, not_less_equal_than=0.0),
+    _init_schemata = {
+        "elevation": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
+        ],
+        "conductance": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
+        ],
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+        "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
     }
+    _write_schemata = {
+        "elevation": [
+            OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
+        "conductance": [IdentityNoDataSchema("elevation"), AllValueSchema(">", 0.0)],
+    }
+
     _period_data = ("elevation", "conductance")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
@@ -58,4 +92,11 @@ class Drainage(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
-        self._pkgcheck_at_init()
+        self._validate_at_init()
+
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["elevation"] = self["elevation"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors

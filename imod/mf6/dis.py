@@ -1,7 +1,15 @@
 import numpy as np
 
 import imod
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
+from imod.schemata import (
+    AllValueSchema,
+    AnyValueSchema,
+    DimsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+)
 
 
 class StructuredDiscretization(Package):
@@ -31,11 +39,33 @@ class StructuredDiscretization(Package):
     """
 
     _pkg_id = "dis"
-    _metadata_dict = {
-        "top": VariableMetaData(np.floating),
-        "bottom": VariableMetaData(np.floating),
-        "idomain": VariableMetaData(np.integer),
+    _init_schemata = {
+        "top": [
+            DTypeSchema(np.floating),
+            DimsSchema("y", "x") | DimsSchema(),
+            IndexesSchema(),
+        ],
+        "bottom": [
+            DTypeSchema(np.floating),
+            DimsSchema("layer", "y", "x") | DimsSchema("layer"),
+            IndexesSchema(),
+        ],
+        "idomain": [
+            DTypeSchema(np.integer),
+            DimsSchema("layer", "y", "x") | DimsSchema("layer"),
+            IndexesSchema(),
+        ],
     }
+    _write_schemata = {
+        "idomain": (AnyValueSchema(">", 0),),
+        "top": (
+            AllValueSchema(">", "bottom"),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            # No need to check coords: dataset ensures they align with idomain.
+        ),
+        "bottom": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
+    }
+
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
@@ -46,7 +76,7 @@ class StructuredDiscretization(Package):
         self.dataset["top"] = top
         self.dataset["bottom"] = bottom
 
-        self._pkgcheck_at_init()
+        self._validate_at_init()
 
     def _delrc(self, dx):
         """
@@ -87,15 +117,9 @@ class StructuredDiscretization(Package):
 
         return self._template.render(d)
 
-    def _check_bottom_above_top(self):
-        """Check if bottom not above top"""
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["bottom"] = self["bottom"]
+        errors = super()._validate(schemata, **kwargs)
 
-        bottom_above_top = self.dataset["bottom"] > self.dataset["top"]
-
-        if bottom_above_top.any():
-            raise ValueError(f"Bottom above top in {self.__class__.__name__}.")
-
-    def _pkgcheck_at_init(self):
-        self._check_bottom_above_top()
-
-        super()._pkgcheck_at_init()
+        return errors

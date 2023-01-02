@@ -6,6 +6,8 @@ import jinja2
 import numpy as np
 
 from imod.mf6 import qgs_util
+from imod.mf6.validation import validation_model_error_message
+from imod.schemata import ValidationError
 
 
 class Model(collections.UserDict):
@@ -139,15 +141,34 @@ class GroundwaterFlowModel(Model):
 
         self._check_for_required_packages(modelkey)
 
+    def validate(self) -> None:
+        diskey = self._get_diskey()
+        dis = self[diskey]
+        # We'll use the idomain for checking dims, shape, nodata.
+        idomain = dis["idomain"]
+        bottom = dis["bottom"]
+
+        errors = {}
         for pkgname, pkg in self.items():
-            pkg._pkgcheck_at_write(dis)
+            # Check for all schemata when writing. Types and dimensions
+            # may have been changed after initialization...
+            pkg_errors = pkg._validate(
+                schemata={**pkg._init_schemata, **pkg.write_schemata},
+                idomain=idomain,
+                bottom=bottom,
+            )
+            if len(pkg_errors) > 0:
+                errors[pkgname] = pkg_errors
+
+        if len(errors) > 0:
+            message = validation_model_error_message(errors)
+            raise ValidationError(message)
 
     def write(self, directory, modelname, globaltimes, binary=True):
         """
         Write model namefile
         Write packages
         """
-
         workdir = pathlib.Path(directory)
         modeldirectory = workdir / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)

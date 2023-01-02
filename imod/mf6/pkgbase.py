@@ -2,15 +2,17 @@ import abc
 import dataclasses
 import operator
 import pathlib
+from collections import defaultdict
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Dict, List, Optional, Union
 
 import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
 
-import imod.mf6.pkgcheck as pkgcheck
+from imod.mf6.validation import validation_pkg_error_message
+from imod.schemata import ValidationError
 
 
 def dis_recarr(arrdict, layer, notnull):
@@ -50,22 +52,6 @@ def disv_recarr(arrdict, layer, notnull):
         recarr["cell2d"] = icell2d + 1
         recarr["layer"] = layer[ilayer]
     return recarr
-
-
-@dataclass
-class VariableMetaData:
-    """
-    Dataclass to store metadata of a variable.
-
-    Currently purely used to store datatypes and value limits, and can be later
-    expanded to store keyword maps, and period/package data flags.
-    """
-
-    dtype: type
-    not_less_than: Optional[Union[int, float]] = None
-    not_less_equal_than: Optional[Union[int, float]] = None
-    not_greater_than: Optional[Union[int, float]] = None
-    not_greater_equal_than: Optional[Union[int, float]] = None
 
 
 class Package(abc.ABC):
@@ -145,7 +131,7 @@ class Package(abc.ABC):
         if allargs is not None:
             for arg in allargs.values():
                 if isinstance(arg, xu.UgridDataArray):
-                    self.dataset = xu.UgridDataset(grid=arg.ugrid.grid)
+                    self.dataset = xu.UgridDataset(grids=arg.ugrid.grid)
                     return
         self.dataset = xr.Dataset()
 
@@ -372,6 +358,16 @@ class Package(abc.ABC):
                             path = pkgdirectory / f"{key}.dat"
                             self.write_text_griddata(path, da, dtype)
 
+    def _validate(self, schemata: Dict, **kwargs) -> Dict[str, List[ValidationError]]:
+        errors = defaultdict(list)
+        for variable, var_schemata in schemata.items():
+            for schema in var_schemata:
+                try:
+                    schema.validate(self.dataset[variable], **kwargs)
+                except ValidationError as e:
+                    errors[variable].append(e)
+        return errors
+
     def _netcdf_path(self, directory, pkgname):
         """create path for netcdf, this function is also used to create paths to use inside the qgis projectfiles"""
         return directory / pkgname / f"{self._pkg_id}.nc"
@@ -469,87 +465,11 @@ class Package(abc.ABC):
         if raise_error:
             raise ValueError(msg)
 
-    def _check_types(self):
-        """Check that data types of grid data are correct."""
-
-        variables = self._get_vars_to_check()
-
-        for varname in variables:
-            expected_dtype = self._metadata_dict[varname].dtype
-            da = self.dataset[varname]
-
-            if not issubclass(da.dtype.type, expected_dtype):
-                raise TypeError(
-                    f"Unexpected data type for {varname} "
-                    f"in {self.__class__.__name__} package. "
-                    f"Expected subclass of {expected_dtype.__name__}, "
-                    f"instead got {da.dtype.type.__name__}."
-                )
-
-    def _unstructured_grid_dim_check(self, da):
-        """
-        Check dimension integrity of unstructured grid,
-        no time dimension is accepted, data is assumed static.
-        """
-        pkgcheck.unstructured_package_dim_check(self.__class__.__name__, da)
-
-    def _structured_grid_dim_check(self, da):
-        """
-        Check dimension integrity of structured grid,
-        no time dimension is accepted, data is assumed static.
-        """
-        pkgcheck.structured_package_dim_check(self.__class__.__name__, da)
-
-    def _check_dim_integrity(self):
-
-        variables = self._get_vars_to_check()
-
-        for var in variables:
-            da = self.dataset[var]
-            if isinstance(da, (xr.DataArray, xr.Dataset)):
-                self._structured_grid_dim_check(da)
-            elif isinstance(da, (xu.UgridDataArray, xu.UgridDataset)):
-                self._unstructured_grid_dim_check(da)
-
-    def _check_dim_monotonicity(self):
-        """
-        Check that dimensions are all monotonically increasing, or decreasing
-        in the case of ``y``.
-        """
-
-        variables = self._get_vars_to_check()
-        # If no variables to check return
-        if len(variables) == 0:
-            return
-
-        ds = self.dataset[variables]
-
-        pkgcheck.check_dim_monotonicity(self.__class__.__name__, ds)
-
-    def _pkgcheck_at_init(self):
-        self._check_types()
-        self._check_range()
-        self._check_dim_monotonicity()
-        self._check_dim_integrity()
-
-    def _pkgcheck_at_write(self, dis):
-        self._check_nan_in_active_cell(dis)
-
-    def _check_nan_in_active_cell(self, dis):
-        if hasattr(self, "_grid_data") and self._grid_data:
-
-            active = dis["idomain"] >= 1
-
-            variables = self._get_vars_to_check()
-
-            for var in variables:
-                nan_in_active = np.isnan(self.dataset[var]) & active
-                if nan_in_active.any():
-                    pkgname = self.__class__.__name__
-                    raise ValueError(
-                        f"Detected value with np.nan in active domain "
-                        f"in {pkgname} for variable: {var}."
-                    )
+    def _validate_at_init(self):
+        errors = self._validate(self._init_schemata)
+        if len(errors) > 0:
+            message = validation_pkg_error_message(errors)
+            raise ValidationError(message)
 
 
 class BoundaryCondition(Package, abc.ABC):
@@ -676,97 +596,6 @@ class BoundaryCondition(Package, abc.ABC):
             pkgname=pkgname,
             binary=binary,
         )
-
-    def _check_all_nan(self):
-        """
-        Check if not grids with only nans are provided, as MAXBOUND cannot be 0.
-
-        ``self._max_active_n()`` only determines maxbound based on the first
-        variable in period_data. However, ``self._check_nan_consistent()``
-        checks if nans are inconsistent amongst variables, so this catches the
-        case where an all nan grid is provided for only one variable.
-        """
-
-        maxbound = self._max_active_n()
-        if maxbound == 0:
-            raise ValueError(
-                f"Provided grid with only nans in {self.__class__.__name__}."
-            )
-
-    def _unstructured_grid_dim_check(self, da):
-        """
-        Check dimension integrity of unstructured grid
-        """
-        pkgcheck.unstructured_boundary_condition_dim_check(self.__class__.__name__, da)
-
-    def _structured_grid_dim_check(self, da):
-        """
-        Check dimension integrity of structured grid
-        """
-        pkgcheck.structured_boundary_condition_dim_check(self.__class__.__name__, da)
-
-    def _check_zero_dims(self):
-        """
-        Check if dim occurs with size zero. Sometimes xarray broadcasts empty
-        dimensions. It also is possible to create DataArrays with a dim of size
-        zero.
-        """
-        for dim in self.dataset.dims:
-            if self.dataset.dims[dim] == 0:
-                raise ValueError(
-                    f"Provided dimension {dim} in {self.__class__.__name__} with size 0"
-                )
-
-    def _check_nan_consistent(self):
-        """
-        Check that not some cells in a grid of one var have ``np.nan``, whereas
-        cells in another grid have data defined in that cell.
-        """
-        variables = self._get_vars_to_check()
-
-        ds = self.dataset[variables]
-
-        # Advanced Boundary Conditions can contain a mix of static data and
-        # transient data (with a time dimension). ds.to_stacked_array cannot
-        # handle this, therefore select the first timestep.
-        if isinstance(self, AdvancedBoundaryCondition) and ("time" in ds.dims):
-            ds = ds.isel(time=0)
-
-        dims = list(ds.dims.keys())
-        stacked = ds.to_stacked_array("var_dim", dims, name="stacked")
-        n_nan_variables = np.isnan(stacked).sum(dim="var_dim")
-        inconsistent_nan = (n_nan_variables > 0) & (n_nan_variables < len(variables))
-
-        if inconsistent_nan.any():
-            raise ValueError(
-                f"Detected inconsistent data in {self.__class__.__name__}, "
-                f"some variables contain nan, but others do not."
-            )
-
-    def _pkgcheck_at_init(self):
-        super()._pkgcheck_at_init()
-
-        self._check_zero_dims()
-        self._check_all_nan()
-        self._check_nan_consistent()
-
-    def _check_boundary_outside_active_domain(self, dis):
-        active = dis["idomain"] >= 1
-
-        # Check only one var, _check_nan_consistent covered inconsistent vars
-        var = self._get_vars_to_check()[0]
-
-        da = self.dataset[var]
-
-        if (~np.isnan(da) & ~active).any():
-            raise ValueError(
-                f"Detected {self.__class__.__name__} cell outside active model domain"
-            )
-
-    def _pkgcheck_at_write(self, dis):
-        self._check_boundary_outside_active_domain(dis)
-
-        super()._pkgcheck_at_write(dis)
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
