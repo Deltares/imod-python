@@ -1,10 +1,11 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.validation import BC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
-    DimsSchema,
+    CoordsSchema,
     DTypeSchema,
     IndexesSchema,
     OtherCoordsSchema,
@@ -59,7 +60,8 @@ class ConstantHead(BoundaryCondition):
         "head": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
         ],
     }
     _write_schemata = {

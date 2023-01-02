@@ -1,10 +1,12 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.validation import BC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
     AllValueSchema,
+    CoordsSchema,
     DimsSchema,
     DTypeSchema,
     IdentityNoDataSchema,
@@ -42,17 +44,20 @@ class Drainage(BoundaryCondition):
     """
 
     _pkg_id = "drn"
+
     # has to be ordered as in the list
     _init_schemata = {
         "elevation": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
         ],
         "conductance": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
         ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],

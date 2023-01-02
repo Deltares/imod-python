@@ -109,9 +109,7 @@ def test_check_layer(riv_dict):
     message = textwrap.dedent(
         """
         * stage
-        \t- No option succeeded:
-        \tlength of dims does not match: 2 != 4
-        \tlength of dims does not match: 2 != 3"""
+        \t- coords has missing keys: {'layer'}"""
     )
 
     with pytest.raises(

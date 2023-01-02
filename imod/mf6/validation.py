@@ -1,3 +1,27 @@
+from imod.schemata import DimsSchema
+
+# Template schemata to avoid code duplication
+PKG_DIMS_SCHEMA = (
+    DimsSchema("layer", "y", "x")
+    | DimsSchema("layer", "{face_dim}")
+    | DimsSchema("layer")
+    | DimsSchema()
+)
+
+BC_DIMS_SCHEMA = (
+    DimsSchema("time", "layer", "y", "x")
+    | DimsSchema("layer", "y", "x")
+    | DimsSchema("time", "layer", "{face_dim}")
+    | DimsSchema("layer", "{face_dim}")
+    # Layer dim not necessary, as long as there is a layer coordinate
+    # present
+    | DimsSchema("time", "y", "x")
+    | DimsSchema("y", "x")
+    | DimsSchema("time", "{face_dim}")
+    | DimsSchema("{face_dim}")
+)
+
+
 def validation_model_error_message(model_errors):
     messages = []
     for name, pkg_errors in model_errors.items():

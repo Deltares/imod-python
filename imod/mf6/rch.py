@@ -1,6 +1,7 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.validation import BC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -53,10 +54,7 @@ class Recharge(BoundaryCondition):
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
-            DimsSchema("time", "layer", "y", "x")
-            | DimsSchema("layer", "y", "x")
-            | DimsSchema("time", "y", "x")
-            | DimsSchema("y", "x"),
+            BC_DIMS_SCHEMA,
         ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],

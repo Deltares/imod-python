@@ -90,6 +90,7 @@ def test_wrong_dim():
         * icelltype
         \t- No option succeeded:
         \tlength of dims does not match: 2 != 3
+        \tdim mismatch in axis 0: time != layer
         \tlength of dims does not match: 2 != 1
         \tlength of dims does not match: 2 != 0"""
     )

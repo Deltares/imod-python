@@ -1,6 +1,7 @@
 import numpy as np
 
 from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
     DimsSchema,
@@ -66,17 +67,17 @@ class SpecificStorage(Package):
         "convertible": [
             DTypeSchema(np.integer),
             IndexesSchema(),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer") | DimsSchema(),
+            PKG_DIMS_SCHEMA,
         ],
         "specific_storage": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer") | DimsSchema(),
+            PKG_DIMS_SCHEMA,
         ],
         "specific_yield": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer") | DimsSchema(),
+            PKG_DIMS_SCHEMA,
         ],
     }
 
@@ -195,15 +196,15 @@ class StorageCoefficient(Package):
     _init_schemata = {
         "convertible": [
             DTypeSchema(np.integer),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer") | DimsSchema(),
+            PKG_DIMS_SCHEMA,
         ],
         "storage_coefficient": [
             DTypeSchema(np.floating),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer") | DimsSchema(),
+            PKG_DIMS_SCHEMA,
         ],
         "specific_yield": [
             DTypeSchema(np.floating),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer") | DimsSchema(),
+            PKG_DIMS_SCHEMA,
         ],
     }
 

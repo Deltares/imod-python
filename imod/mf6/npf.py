@@ -1,9 +1,9 @@
 import numpy as np
 
 from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
-    DimsSchema,
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
@@ -189,42 +189,42 @@ class NodePropertyFlow(Package):
         "icelltype": [
             DTypeSchema(np.integer),
             IndexesSchema(),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer") | DimsSchema(),
+            PKG_DIMS_SCHEMA,
         ],
         "k": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer") | DimsSchema(),
+            PKG_DIMS_SCHEMA,
         ],
         "rewet_layer": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer") | DimsSchema(),
+            PKG_DIMS_SCHEMA,
         ],
         "k22": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer") | DimsSchema(),
+            PKG_DIMS_SCHEMA,
         ],
         "k33": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer") | DimsSchema(),
+            PKG_DIMS_SCHEMA,
         ],
         "angle1": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer") | DimsSchema(),
+            PKG_DIMS_SCHEMA,
         ],
         "angle2": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer") | DimsSchema(),
+            PKG_DIMS_SCHEMA,
         ],
         "angle3": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer") | DimsSchema(),
+            PKG_DIMS_SCHEMA,
         ],
         "cell_averaging": [DTypeSchema(str)],
         "save_flows": [DTypeSchema(np.bool_)],

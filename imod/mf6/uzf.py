@@ -6,10 +6,12 @@ from imod.mf6.pkgbase import (
     BoundaryCondition,
     VariableMetaData,
 )
+from imod.mf6.validation import BC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
     AllValueSchema,
+    CoordsSchema,
     DimsSchema,
     DTypeSchema,
     IdentityNoDataSchema,
@@ -117,52 +119,53 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     _init_schemata = {
         "surface_depression_depth": [
             DTypeSchema(np.floating),
-            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+            BC_DIMS_SCHEMA,
         ],
         "kv_sat": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
         ],
         "theta_res": [
             DTypeSchema(np.floating),
-            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+            BC_DIMS_SCHEMA,
         ],
         "theta_sat": [
             DTypeSchema(np.floating),
-            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+            BC_DIMS_SCHEMA,
         ],
         "theta_init": [
             DTypeSchema(np.floating),
-            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+            BC_DIMS_SCHEMA,
         ],
         "epsilon": [
             DTypeSchema(np.floating),
-            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+            BC_DIMS_SCHEMA,
         ],
         "infiltration_rate": [
             DTypeSchema(np.floating),
-            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+            BC_DIMS_SCHEMA,
         ],
         "et_pot": [
             DTypeSchema(np.floating),
-            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+            BC_DIMS_SCHEMA,
         ],
         "extinction_depth": [
             DTypeSchema(np.floating),
-            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+            BC_DIMS_SCHEMA,
         ],
         "extinction_theta": [
             DTypeSchema(np.floating),
-            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+            BC_DIMS_SCHEMA,
         ],
         "root_potential": [
             DTypeSchema(np.floating),
-            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+            BC_DIMS_SCHEMA,
         ],
         "root_activity": [
             DTypeSchema(np.floating),
-            DimsSchema("time", "layer", "y", "x") | DimsSchema("layer", "y", "x"),
+            BC_DIMS_SCHEMA,
         ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],

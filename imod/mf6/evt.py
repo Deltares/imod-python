@@ -1,9 +1,11 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.validation import BC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
+    CoordsSchema,
     DimsSchema,
     DTypeSchema,
     IdentityNoDataSchema,
@@ -63,27 +65,32 @@ class Evapotranspiration(BoundaryCondition):
         "surface": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("time", "y", "x") | DimsSchema("y", "x"),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
         ],
         "rate": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("time", "y", "x") | DimsSchema("y", "x"),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
         ],
         "depth": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("time", "y", "x") | DimsSchema("y", "x"),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
         ],
         "proportion_rate": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("time", "y", "x") | DimsSchema("y", "x"),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
         ],
         "proportion_depth": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("time", "y", "x") | DimsSchema("y", "x"),
+            CoordsSchema(("layer",)),
+            BC_DIMS_SCHEMA,
         ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],

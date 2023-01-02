@@ -1,6 +1,7 @@
 import numpy as np
 
 from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     DimsSchema,
     DTypeSchema,
@@ -41,7 +42,7 @@ class InitialConditions(Package):
         "head": [
             DTypeSchema(np.floating),
             IndexesSchema(),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer") | DimsSchema(),
+            PKG_DIMS_SCHEMA,
         ],
     }
     _write_schemata = {
