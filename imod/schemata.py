@@ -183,18 +183,25 @@ class DimsSchema(BaseSchema):
 class IndexesSchema(BaseSchema):
     """
     Verify indexes, check if no dims with zero size are included and that
-    indexes are monotonic
+    indexes are monotonic. Skips unstructured grid dimensions.
     """
 
     def __init__(self) -> None:
         pass
 
-    def validate(self, obj: xr.DataArray, **kwargs) -> None:
-        for dim in obj.dims:
+    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs) -> None:
+        dims_to_validate = list(obj.dims)
+
+        # Remove face dim from list to validate, as it has no ``indexes``
+        # attribute.
+        if isinstance(obj, xu.UgridDataArray):
+            dims_to_validate.remove(obj.ugrid.grid.face_dimension)
+
+        for dim in dims_to_validate:
             if len(obj.indexes[dim]) == 0:
                 raise ValidationError(f"provided dimension {dim} with size 0")
 
-        for dim in obj.dims:
+        for dim in dims_to_validate:
             if dim == "y":
                 if not obj.indexes[dim].is_monotonic_decreasing:
                     raise ValidationError(
