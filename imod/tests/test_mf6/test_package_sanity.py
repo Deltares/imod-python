@@ -41,6 +41,8 @@ PACKAGE_ATTRIBUTES = {
     "_template",
     "_keyword_map",
     "_metadata_dict",
+    "_init_schemata",
+    "_write_schemata",
     "_grid_data",
     "dataset",
 }
