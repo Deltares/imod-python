@@ -156,6 +156,7 @@ def test_transient_no_layer_dim(rch_dict_transient):
         end period
         begin period 2
           open/close mymodel/recharge/rch-1.bin (binary)
+        end period
         """
     )
 
