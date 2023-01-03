@@ -62,6 +62,8 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         "rate": [DTypeSchema(np.floating)],
     }
 
+    _write_schemata = {}
+
     def __init__(
         self,
         layer,
@@ -141,6 +143,8 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         "cell2d": [DTypeSchema(np.integer)],
         "rate": [DTypeSchema(np.floating)],
     }
+
+    _write_schemata = {}
 
     def __init__(
         self,

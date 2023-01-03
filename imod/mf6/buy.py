@@ -95,6 +95,8 @@ class Buoyancy(Package):
         "reference_concentration": [DTypeSchema(np.floating)],
     }
 
+    _write_schemata = {}
+
     def __init__(
         self,
         reference_density: float,

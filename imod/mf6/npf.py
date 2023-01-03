@@ -9,7 +9,6 @@ from imod.schemata import (
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
-    OtherCoordsSchema,
 )
 
 
@@ -241,10 +240,9 @@ class NodePropertyFlow(Package):
         "k": (
             AllValueSchema(">", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
-            OtherCoordsSchema("idomain"),
         ),
         "rewet_layer": (
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
         "k22": (
             AllValueSchema(">", 0.0),
@@ -256,9 +254,9 @@ class NodePropertyFlow(Package):
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
             # No need to check coords: dataset ensures they align with idomain.
         ),
-        "angle1": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))),
-        "angle2": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))),
-        "angle3": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))),
+        "angle1": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
+        "angle2": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
+        "angle3": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
     }
 
     _grid_data = {

@@ -140,7 +140,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             # Check for all schemata when writing. Types and dimensions
             # may have been changed after initialization...
             pkg_errors = pkg._validate(
-                schemata={**pkg._init_schemata, **pkg.write_schemata},
+                schemata={**pkg._init_schemata, **pkg._write_schemata},
                 idomain=idomain,
                 bottom=bottom,
             )
@@ -159,6 +159,8 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         workdir = pathlib.Path(directory)
         modeldirectory = workdir / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
+
+        self.validate()
 
         # write model namefile
         namefile_content = self.render(modelname)

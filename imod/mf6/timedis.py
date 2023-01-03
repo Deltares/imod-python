@@ -48,6 +48,8 @@ class TimeDiscretization(Package):
         ],
     }
 
+    _write_schemata = {}
+
     def __init__(self, timestep_duration, n_timesteps=1, timestep_multiplier=1.0):
         super().__init__()
         self.dataset["timestep_duration"] = timestep_duration

@@ -62,6 +62,8 @@ class OutputControl(Package):
         ],
     }
 
+    _write_schemata = {}
+
     def __init__(self, save_head=None, save_budget=None, save_concentration=None):
         super().__init__()
         if save_head is not None and save_concentration is not None:
