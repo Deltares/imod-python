@@ -75,4 +75,5 @@ class ConstantConcentration(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
-        self._pkgcheck()
+
+        self._validate_at_init()

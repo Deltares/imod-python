@@ -244,4 +244,5 @@ class ImmobileStorageTransfer(Package):
         self.dataset["width"] = width
         self.dataset["digits"] = digits
         self.dataset["format"] = format
-        self._pkgcheck()
+
+        self._validate_at_init()
