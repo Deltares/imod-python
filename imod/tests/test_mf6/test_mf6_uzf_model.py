@@ -123,11 +123,7 @@ def uzf_model():
     gwf_model["ic"] = imod.mf6.InitialConditions(head=shd)
 
     # Storage
-    Ss = xr.full_like(like, 1e-5)
-    Sy = xr.full_like(like, 0.1)
-    iconvert = xr.full_like(idomain, 0)
-
-    gwf_model["sto"] = imod.mf6.SpecificStorage(Ss, Sy, True, iconvert)
+    gwf_model["sto"] = imod.mf6.SpecificStorage(1e-5, 0.1, True, 0)
 
     # Set output control
     gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
