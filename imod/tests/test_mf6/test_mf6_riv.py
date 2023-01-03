@@ -266,19 +266,19 @@ def test_check_dim_monotonicity(riv_dict):
 
 
 @pytest.mark.usefixtures("concentration_fc")
-def test_render_concentration(concentration_fc):
+def test_render_concentration(riv_dict, concentration_fc):
+
+    riv_ds = xr.merge([riv_dict])
+
+    concentration = concentration_fc.sel(
+        layer=[2, 3], time=np.datetime64("2000-01-01"), drop=True
+    )
+    riv_ds["concentration"] = concentration.where(~np.isnan(riv_ds["stage"]))
+
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
 
-    riv = imod.mf6.River(
-        stage=1.0,
-        conductance=10.0,
-        bottom_elevation=-1.0,
-        concentration=concentration_fc.sel(
-            time=np.datetime64("2000-01-01")
-        ).reset_coords(drop=True),
-        concentration_boundary_type="AUX",
-    )
+    riv = imod.mf6.River(concentration_boundary_type="AUX", **riv_ds)
     actual = riv.render(directory, "riv", globaltimes, False)
 
     expected = textwrap.dedent(
@@ -288,7 +288,7 @@ def test_render_concentration(concentration_fc):
         end options
 
         begin dimensions
-          maxbound 1
+          maxbound 16
         end dimensions
 
         begin period 1

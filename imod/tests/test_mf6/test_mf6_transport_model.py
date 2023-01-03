@@ -1,5 +1,6 @@
 import textwrap
 
+import numpy as np
 import pytest
 
 import imod
@@ -10,7 +11,7 @@ def test_long_package_name():
     m = imod.mf6.GroundwaterTransportModel()
     with pytest.raises(
         KeyError,
-        match="MODFLOW6 does not support package names longer than 16 characters.",
+        match="Received key with more than 16 characters: 'my_very_long_package_name'Modflow 6 has a character limit of 16.",
     ):
         m["my_very_long_package_name"] = imod.mf6.AdvectionCentral()
 
@@ -42,15 +43,18 @@ def test_assign_flow_discretization(basic_dis, concentration_fc):
     # define a grid
     idomain, _, bottom = basic_dis
 
+    like = idomain.sel(layer=1).astype(np.float32)
+    concentration = concentration_fc.sel(layer=1)
+
     gwf_model = imod.mf6.GroundwaterFlowModel()
     gwf_model["dis"] = imod.mf6.StructuredDiscretization(
         top=200.0, bottom=bottom, idomain=idomain
     )
     gwf_model["riv-1"] = imod.mf6.River(
-        stage=1.0,
-        conductance=10.0,
-        bottom_elevation=-1.0,
-        concentration=concentration_fc,
+        stage=like,
+        conductance=like,
+        bottom_elevation=like - 2.0,
+        concentration=concentration,
         concentration_boundary_type="AUX",
     )
 
