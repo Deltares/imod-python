@@ -64,6 +64,17 @@ def partial_operator(op, value):
     return partial(lambda b, a: OPERATORS[op](a, b), value)
 
 
+def scalar_None(obj):
+    """
+    Test if object is a scalar None DataArray, which is the default value for optional
+    variables.
+    """
+    if not isinstance(obj, (xr.DataArray, xu.UgridDataArray)):
+        return False
+    else:
+        return (len(obj.shape) == 0) & (~obj.notnull()).all()
+
+
 class ValidationError(Exception):
     pass
 
@@ -127,14 +138,15 @@ class DTypeSchema(BaseSchema):
             self.dtype = np.dtype(dtype)
 
     def validate(self, obj: xr.DataArray, **kwargs) -> None:
-        """Validate dtype
+        """
+        Validate dtype
+
         Parameters
         ----------
         dtype : Any
             Dtype of the DataArray.
         """
-        # If scalar with value None (optional variable basically)
-        if (len(obj.shape) == 0) & (~obj.notnull()).all():
+        if scalar_None(obj):
             return
 
         if not np.issubdtype(obj.dtype, self.dtype):
@@ -315,6 +327,10 @@ class AllValueSchema(ValueSchema):
             other_obj = kwargs[self.other]
         else:
             other_obj = self.other
+
+        if scalar_None(obj) or scalar_None(other_obj):
+            return
+
         condition = self.operator(obj, other_obj)
         condition = condition | np.isnan(obj)  # ignore nan by setting to True
         if not condition.all():
@@ -329,6 +345,10 @@ class AnyValueSchema(ValueSchema):
             other_obj = kwargs[self.other]
         else:
             other_obj = self.other
+
+        if scalar_None(obj) or scalar_None(other_obj):
+            return
+
         condition = self.operator(obj, other_obj)
         condition = condition | ~np.isnan(obj)  # ignore nan by setting to False
         if not condition.any():
@@ -381,14 +401,24 @@ class NoDataComparisonSchema(BaseSchema):
 class IdentityNoDataSchema(NoDataComparisonSchema):
     """
     Checks that the NoData values are located at exactly the same locations.
+
+    Tests only if if all dimensions of the other object are present in the
+    object. So tests if "stage" with `{time, layer, y, x}` compared to "idomain"
+    `{layer, y, x}` but doesn't test if "k" with `{layer}` is comperated to
+    "idomain" `{layer, y, x}`
     """
 
     def validate(self, obj: xr.DataArray, **kwargs):
         other_obj = kwargs[self.other]
-        valid = self.is_notnull(obj)
-        other_valid = self.is_other_notnull(other_obj)
-        if (valid ^ other_valid).any():
-            raise ValidationError(f"nodata is not aligned with {self.other}")
+
+        # Only test if object has all dimensions in other object.
+        missing_dims = set(other_obj.dims) - set(obj.dims)
+
+        if len(missing_dims) == 0:
+            valid = self.is_notnull(obj)
+            other_valid = self.is_other_notnull(other_obj)
+            if (valid ^ other_valid).any():
+                raise ValidationError(f"nodata is not aligned with {self.other}")
 
 
 class AllInsideNoDataSchema(NoDataComparisonSchema):
@@ -400,7 +430,6 @@ class AllInsideNoDataSchema(NoDataComparisonSchema):
         other_obj = kwargs[self.other]
         valid = self.is_notnull(obj)
         other_valid = self.is_other_notnull(other_obj)
+
         if (valid & ~other_valid).any():
-            print(valid)
-            print(other_valid)
             raise ValidationError(f"data values found at nodata values of {self.other}")
