@@ -1,12 +1,13 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, Package
-from imod.mf6.validation import PKG_DIMS_SCHEMA
+from imod.mf6.validation import BC_DIMS_SCHEMA
 from imod.schemata import (
-    AllValueSchema,
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
     DTypeSchema,
-    IdentityNoDataSchema,
     IndexesSchema,
+    OtherCoordsSchema,
 )
 
 
@@ -49,13 +50,15 @@ class MassSourceLoading(BoundaryCondition):
         "rate": (
             DTypeSchema(np.floating),
             IndexesSchema(),
-            PKG_DIMS_SCHEMA,
+            BC_DIMS_SCHEMA,
         )
     }
 
     _write_schemata = {
         "rate": [
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ],
     }
 
