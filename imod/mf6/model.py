@@ -125,8 +125,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         """
         Check model integrity (called before writing)
         """
-        diskey = self._get_diskey()
-        dis = self[diskey]
 
         self._check_for_required_packages(modelkey)
 

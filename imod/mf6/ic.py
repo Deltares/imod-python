@@ -5,7 +5,6 @@ import numpy as np
 from imod.mf6.pkgbase import Package
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
-    DimsSchema,
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
