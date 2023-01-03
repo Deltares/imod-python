@@ -90,7 +90,6 @@ class WellDisStructured(DisStructuredBoundaryCondition):
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
             self.add_periodic_auxiliary_variable()
-        self._pkgcheck()
 
 
 class WellDisVertices(DisVerticesBoundaryCondition):
