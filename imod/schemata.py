@@ -377,12 +377,22 @@ class AllNoDataSchema(NoDataSchema):
             raise ValidationError("all nodata")
 
 
+def _notnull(obj):
+    """
+    Helper function; does the same as xr.DataArray.notnull. This function is to
+    avoid an issue where xr.DataArray.notnull() returns ordinary numpy arrays
+    for instances of xu.UgridDataArray.
+    """
+
+    return ~np.isnan(obj)
+
+
 class NoDataComparisonSchema(BaseSchema):
     def __init__(
         self,
         other: str,
-        is_notnull: Union[Callable, Tuple[str, Any]] = xr.DataArray.notnull,
-        is_other_notnull: Union[Callable, Tuple[str, Any]] = xr.DataArray.notnull,
+        is_notnull: Union[Callable, Tuple[str, Any]] = _notnull,
+        is_other_notnull: Union[Callable, Tuple[str, Any]] = _notnull,
     ):
         self.other = other
         if isinstance(is_notnull, tuple):
