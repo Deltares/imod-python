@@ -27,8 +27,8 @@ class Buoyancy(Package):
 
     Note that ``reference_density`` is a single value, but
     ``density_concentration_slope``, ``reference_concentration`` and
-    ``modelname`` require an entry for every active species. Please refer to
-    the examples.
+    ``modelname`` require an entry for every active species. Please refer to the
+    examples.
 
     Parameters
     ----------
@@ -38,24 +38,26 @@ class Buoyancy(Package):
         Slope of the (linear) density concentration line used in the density
         equation of state.
     reference_concentration: sequence of floats
-        Reference concentration used in the density equation of
-        state.
+        Reference concentration used in the density equation of state.
     modelname: sequence of strings,
         Name of the GroundwaterTransport (GWT) model used for the
         concentrations.
     species: sequence of str,
         Name of the species used to calculate a density value.
     hhformulation_rhs: bool, optional.
-        use the variable-density hydraulic head formulation and add
-        off-diagonal terms to the right-hand. This option will prevent the BUY
-        Package from adding asymmetric terms to the flow matrix. Default value
-        is ``False``.
+        use the variable-density hydraulic head formulation and add off-diagonal
+        terms to the right-hand. This option will prevent the BUY Package from
+        adding asymmetric terms to the flow matrix. Default value is ``False``.
     densityfile:
         name of the binary output file to write density information. The density
-        file has the same format as the head file. Density values will be written to
-        the density file whenever heads are written to the binary head file. The
-        settings for controlling head output are contained in the Output Control
-        option.
+        file has the same format as the head file. Density values will be
+        written to the density file whenever heads are written to the binary
+        head file. The settings for controlling head output are contained in the
+        Output Control option.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
 
     Examples
     --------
@@ -106,6 +108,7 @@ class Buoyancy(Package):
         species: Sequence[str],
         hhformulation_rhs: bool = False,
         densityfile: str = None,
+        validate=True,
     ):
         super().__init__(locals())
         self.dataset["reference_density"] = reference_density
@@ -120,7 +123,8 @@ class Buoyancy(Package):
         self.dataset["densityfile"] = densityfile
 
         self.dependencies = []
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()
 
     def render(self, directory, pkgname, globaltimes, binary):
         ds = self.dataset

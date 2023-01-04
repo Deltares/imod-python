@@ -205,6 +205,24 @@ def test_wrong_dtype_ss(sy_layered, convertible):
         )
 
 
+def test_validate_false(sy_layered, convertible):
+    imod.mf6.SpecificStorage(
+        specific_storage=0,
+        specific_yield=sy_layered,
+        transient=True,
+        convertible=convertible,
+        validate=False,
+    )
+
+    imod.mf6.StorageCoefficient(
+        storage_coefficient=0,
+        specific_yield=sy_layered,
+        transient=True,
+        convertible=convertible,
+        validate=False,
+    )
+
+
 def test_wrong_value_ss(sy_layered, convertible, dis):
     sto = imod.mf6.SpecificStorage(
         specific_storage=-0.1,

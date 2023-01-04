@@ -37,7 +37,7 @@ class Modflow6Simulation(collections.UserDict):
         )
         self.create_time_discretization(additional_times=times)
 
-    def create_time_discretization(self, additional_times):
+    def create_time_discretization(self, additional_times, validate=True):
         """
         Collect all unique times from model packages and additional given
         `times`. These unique times are used as stress periods in the model. All
@@ -108,7 +108,7 @@ class Modflow6Simulation(collections.UserDict):
             duration, coords={"time": np.array(times)[:-1]}, dims=("time",)
         )
         self["time_discretization"] = imod.mf6.TimeDiscretization(
-            timestep_duration=timestep_duration
+            timestep_duration=timestep_duration, validate=validate
         )
 
     def render(self):
@@ -143,7 +143,7 @@ class Modflow6Simulation(collections.UserDict):
         d["solutiongroups"] = [solutiongroups]
         return self._template.render(d)
 
-    def write(self, directory=".", binary=True):
+    def write(self, directory=".", binary=True, validate=True):
         # Check models for required content
         for key, model in self.items():
             # skip timedis, exchanges
@@ -172,6 +172,7 @@ class Modflow6Simulation(collections.UserDict):
                     modelname=key,
                     globaltimes=globaltimes,
                     binary=binary,
+                    validate=validate,
                 )
             elif value._pkg_id == "ims":
                 value.write(

@@ -99,14 +99,17 @@ class SpecificStorage(Package):
 
     _template = Package._initialize_template(_pkg_id)
 
-    def __init__(self, specific_storage, specific_yield, transient, convertible):
+    def __init__(
+        self, specific_storage, specific_yield, transient, convertible, validate=True
+    ):
         super().__init__(locals())
         self.dataset["specific_storage"] = specific_storage
         self.dataset["specific_yield"] = specific_yield
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
 
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
@@ -175,6 +178,10 @@ class StorageCoefficient(Package):
         head is below cell top. (iconvert)
     transient: ({True, False})
         Boolean to indicate if the model is transient or steady-state.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "sto"
@@ -221,14 +228,17 @@ class StorageCoefficient(Package):
 
     _template = Package._initialize_template(_pkg_id)
 
-    def __init__(self, storage_coefficient, specific_yield, transient, convertible):
+    def __init__(
+        self, storage_coefficient, specific_yield, transient, convertible, validate=True
+    ):
         super().__init__(locals())
         self.dataset["storage_coefficient"] = storage_coefficient
         self.dataset["specific_yield"] = specific_yield
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
 
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

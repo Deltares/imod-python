@@ -23,6 +23,10 @@ class VerticesDiscretization(Package):
     top: array of floats (xu.UgridDataArray)
     bottom: array of floats (xu.UgridDataArray)
     idomain: array of integers (xu.UgridDataArray)
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "disv"
@@ -58,13 +62,14 @@ class VerticesDiscretization(Package):
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
 
-    def __init__(self, top, bottom, idomain):
+    def __init__(self, top, bottom, idomain, validate=True):
         super().__init__(locals())
         self.dataset["idomain"] = idomain
         self.dataset["top"] = top
         self.dataset["bottom"] = bottom
 
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()
 
     def render(self, directory, pkgname, binary):
         disdirectory = directory / pkgname

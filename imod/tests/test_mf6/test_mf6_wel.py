@@ -132,6 +132,24 @@ def test_wrong_dtype():
         )
 
 
+def test_validate_false():
+    layer = np.array([3, 2, 2])
+    row = np.array([5, 4, 6])
+    column = np.array([11, 6, 12])
+    rate = np.full(3, 5)
+
+    imod.mf6.WellDisStructured(
+        layer=layer,
+        row=row,
+        column=column,
+        rate=rate,
+        print_input=False,
+        print_flows=False,
+        save_flows=False,
+        validate=False,
+    )
+
+
 def test_render_concentration_dis_structured_constant_time(well_test_data_stationary):
     layer, row, column, rate, injection_concentration = well_test_data_stationary
 

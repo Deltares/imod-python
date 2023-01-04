@@ -36,6 +36,10 @@ class StructuredDiscretization(Package):
         exist in the simulation. Furthermore, the first existing cell above will
         be connected to the first existing cell below. This type of cell is
         referred to as a "vertical pass through" cell.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "dis"
@@ -70,13 +74,14 @@ class StructuredDiscretization(Package):
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
 
-    def __init__(self, top, bottom, idomain):
+    def __init__(self, top, bottom, idomain, validate=True):
         super(__class__, self).__init__(locals())
         self.dataset["idomain"] = idomain
         self.dataset["top"] = top
         self.dataset["bottom"] = bottom
 
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()
 
     def _delrc(self, dx):
         """

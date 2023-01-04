@@ -182,6 +182,10 @@ class NodePropertyFlow(Package):
         specified for the GWF Exchange as an auxiliary variable. disu package
         has not been implemented yet.
         Default is False.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "npf"
@@ -302,6 +306,7 @@ class NodePropertyFlow(Package):
         dewatered=False,
         perched=False,
         save_specific_discharge=False,
+        validate=True,
     ):
         super().__init__(locals())
         # check rewetting
@@ -342,4 +347,5 @@ class NodePropertyFlow(Package):
         self.dataset["perched"] = perched
         self.dataset["save_specific_discharge"] = save_specific_discharge
 
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()

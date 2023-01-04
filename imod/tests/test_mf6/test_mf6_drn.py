@@ -57,6 +57,13 @@ def test_wrong_dtype(drainage):
         imod.mf6.Drainage(**drainage)
 
 
+def test_validate_false(drainage):
+
+    drainage["elevation"] = drainage["elevation"].astype(np.int32)
+
+    imod.mf6.Drainage(validate=False, **drainage)
+
+
 def test_check_conductance_zero(drainage):
     drainage["conductance"] = drainage["conductance"] * 0.0
 

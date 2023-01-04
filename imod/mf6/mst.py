@@ -50,6 +50,10 @@ class MobileStorageTransfer(Package):
         (decay_sorbed too if sorption is active)
     sorption: ({Linear, Freundlich, Langmuir}, optional)
         Type of sorption, if any
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _grid_data = {
@@ -101,6 +105,7 @@ class MobileStorageTransfer(Package):
         save_flows=False,
         decay_order: string = "first",
         sorption=None,
+        validate=True,
     ):
         super().__init__(locals())
         self.dataset["porosity"] = porosity
@@ -120,4 +125,5 @@ class MobileStorageTransfer(Package):
         if sorption is not None:
             self.dataset["sorption"] = sorption
 
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()

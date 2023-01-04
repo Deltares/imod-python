@@ -47,6 +47,10 @@ class Drainage(BoundaryCondition):
         with "BUDGET FILEOUT" in Output Control. Default is False.
     observations: [Not yet supported.]
         Default is None.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "drn"
@@ -92,6 +96,7 @@ class Drainage(BoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
+        validate=True,
     ):
         super().__init__(locals())
         self.dataset["elevation"] = elevation
@@ -105,7 +110,8 @@ class Drainage(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()
 
     def _validate(self, schemata, **kwargs):
         # Insert additional kwargs

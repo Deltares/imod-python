@@ -100,6 +100,10 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         TODO: We could allow the user to either use xarray DataArrays to specify BCS or
         use a pd.DataFrame and use the MF6 timeseries files to read input. The latter could
         save memory for laterally large-scale models, through efficient use of the UZF cell identifiers.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _period_data = (
@@ -223,6 +227,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         observations=None,
         water_mover=None,
         timeseries=None,
+        validate=True,
     ):
         super().__init__(locals())
         # Package data
@@ -274,7 +279,8 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         self.dataset["ivertcon"] = self._determine_vertical_connection(self["iuzno"])
 
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()
 
     def fill_stress_perioddata(self):
         """Modflow6 requires something to be filled in the stress perioddata,

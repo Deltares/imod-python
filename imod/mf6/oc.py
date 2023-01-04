@@ -31,6 +31,10 @@ class OutputControl(Package):
         String or integer indicating output control for concentration file (.ucn)
         If string, should be one of ["first", "last", "all"].
         If integer, interpreted as frequency.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
 
     Examples
     --------
@@ -64,7 +68,13 @@ class OutputControl(Package):
 
     _write_schemata = {}
 
-    def __init__(self, save_head=None, save_budget=None, save_concentration=None):
+    def __init__(
+        self,
+        save_head=None,
+        save_budget=None,
+        save_concentration=None,
+        validate=True,
+    ):
         super().__init__()
         if save_head is not None and save_concentration is not None:
             raise ValueError("save_head and save_concentration cannot both be defined.")
@@ -72,7 +82,8 @@ class OutputControl(Package):
         self.dataset["save_concentration"] = save_concentration
         self.dataset["save_budget"] = save_budget
 
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()
 
     def _get_ocsetting(self, setting):
         """Get oc setting based on its type. If integers return f'frequency {setting}', if"""

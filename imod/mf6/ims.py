@@ -335,6 +335,10 @@ class Solution(Package):
         SolutionPresetSimple: No Default
         SolutionPresetModerate: No Default
         SolutionPresetComplex: No Default
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "ims"
@@ -386,6 +390,7 @@ class Solution(Package):
         print_option="summary",
         csv_output=False,
         no_ptc=False,
+        validate=True,
     ):
         super().__init__()
         self.dataset["modelnames"] = modelnames
@@ -415,7 +420,8 @@ class Solution(Package):
         self.dataset["csv_output"] = csv_output
         self.dataset["no_ptc"] = no_ptc
 
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()
 
 
 def SolutionPresetSimple(

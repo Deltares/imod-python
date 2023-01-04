@@ -265,6 +265,16 @@ def test_check_dim_monotonicity(riv_dict):
         imod.mf6.River(**riv_ds.sel(layer=slice(None, None, -1)))
 
 
+def test_validate_false(riv_dict):
+    """
+    Test turning off validation
+    """
+
+    riv_ds = xr.merge([riv_dict])
+
+    imod.mf6.River(validate=False, **riv_ds.sel(layer=slice(None, None, -1)))
+
+
 @pytest.mark.usefixtures("concentration_fc")
 def test_render_concentration(riv_dict, concentration_fc):
 

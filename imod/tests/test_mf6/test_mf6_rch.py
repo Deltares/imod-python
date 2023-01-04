@@ -238,6 +238,10 @@ def test_scalar():
         imod.mf6.Recharge(rate=0.001)
 
 
+def test_validate_false():
+    imod.mf6.Recharge(rate=0.001, validate=False)
+
+
 @pytest.mark.usefixtures("rate_fc", "concentration_fc")
 def test_write_concentration_period_data(rate_fc, concentration_fc):
     globaltimes = [

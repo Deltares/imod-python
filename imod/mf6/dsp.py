@@ -53,6 +53,10 @@ class Dispersion(Package):
     xt3d_rhs: bool, optional
         add xt3d terms to right-hand side, when possible. This option uses less
         memory, but may require more iterations. (XT3D_RHS)
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "dsp"
@@ -139,6 +143,7 @@ class Dispersion(Package):
         transversal_vertical=None,
         xt3d_off=False,
         xt3d_rhs=False,
+        validate=True,
     ):
         super().__init__(locals())
         self.dataset["xt3d_off"] = xt3d_off
@@ -150,4 +155,5 @@ class Dispersion(Package):
         self.dataset["transversal_horizontal2"] = transversal_horizontal2
         self.dataset["transversal_vertical"] = transversal_vertical
 
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()

@@ -1,6 +1,7 @@
 import abc
 import collections
 import pathlib
+from copy import deepcopy
 
 import cftime
 import jinja2
@@ -128,7 +129,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         self._check_for_required_packages(modelkey)
 
-    def validate(self) -> None:
+    def _validate(self) -> None:
         diskey = self._get_diskey()
         dis = self[diskey]
         # We'll use the idomain for checking dims, shape, nodata.
@@ -139,8 +140,14 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for pkgname, pkg in self.items():
             # Check for all schemata when writing. Types and dimensions
             # may have been changed after initialization...
+
+            # Concatenate write and init schemata.
+            schemata = deepcopy(pkg._init_schemata)
+            for key, value in pkg._write_schemata.items():
+                schemata[key] += value
+
             pkg_errors = pkg._validate(
-                schemata={**pkg._init_schemata, **pkg._write_schemata},
+                schemata=schemata,
                 idomain=idomain,
                 bottom=bottom,
             )
@@ -151,7 +158,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             message = validation_model_error_message(errors)
             raise ValidationError(message)
 
-    def write(self, directory, modelname, globaltimes, binary=True):
+    def write(self, directory, modelname, globaltimes, binary=True, validate=True):
         """
         Write model namefile
         Write packages
@@ -160,7 +167,8 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         modeldirectory = workdir / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
 
-        self.validate()
+        if validate:
+            self._validate()
 
         # write model namefile
         namefile_content = self.render(modelname)

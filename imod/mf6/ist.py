@@ -91,6 +91,10 @@ class ImmobileStorageTransfer(Package):
         number of digits to use for writing a number.
     format: (str, optional) default exponential
         One of {"exponential", "fixed", "general", "scientific"}.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "ist"
@@ -200,6 +204,7 @@ class ImmobileStorageTransfer(Package):
         width: int = 10,
         digits: int = 7,
         format: str = "EXPONENTIAL",
+        validate: bool = True,
     ):
 
         # is True fails on a np.bool_ True.
@@ -245,4 +250,5 @@ class ImmobileStorageTransfer(Package):
         self.dataset["digits"] = digits
         self.dataset["format"] = format
 
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()

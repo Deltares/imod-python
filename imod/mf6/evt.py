@@ -64,6 +64,10 @@ class Evapotranspiration(BoundaryCondition):
         Default is False.
     observations: [Not yet supported.]
         Default is None.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "evt"
@@ -132,6 +136,7 @@ class Evapotranspiration(BoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
+        validate=True,
     ):
         super().__init__(locals())
         self.dataset["surface"] = surface
@@ -154,7 +159,8 @@ class Evapotranspiration(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()
 
         # TODO: add write logic for transforming proportion rate and depth to
         # the right shape in the binary file.

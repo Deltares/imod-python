@@ -30,6 +30,10 @@ class InitialConditions(Package):
         be less if STRT includes hydraulic heads that are close to the
         steadystate solution. A head value lower than the cell bottom can be
         provided if a cell should start as dry. (strt)
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "ic"
@@ -54,7 +58,7 @@ class InitialConditions(Package):
     _keyword_map = {"start": "strt"}
     _template = Package._initialize_template(_pkg_id)
 
-    def __init__(self, start=None, head=None):
+    def __init__(self, start=None, head=None, validate=True):
 
         super().__init__(locals())
         if start is None:
@@ -71,7 +75,8 @@ class InitialConditions(Package):
 
         self.dataset["start"] = start
 
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

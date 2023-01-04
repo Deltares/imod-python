@@ -47,6 +47,10 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         Default is False.
     observations: [Not yet supported.]
         Default is None.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "wel"
@@ -76,6 +80,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
+        validate=True,
     ):
         super().__init__()
         self.dataset["layer"] = self.assign_dims(layer)
@@ -87,11 +92,13 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
-        self._validate_at_init()
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
             self.add_periodic_auxiliary_variable()
+
+        if validate:
+            self._validate_at_init()
 
 
 class WellDisVertices(DisVerticesBoundaryCondition):
@@ -130,6 +137,10 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         with "BUDGET FILEOUT" in Output Control. Default is False.
     observations: [Not yet supported.]
         Default is None.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "wel"
@@ -157,6 +168,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
+        validate=True,
     ):
         super().__init__()
         self.dataset["layer"] = self.assign_dims(layer)
@@ -167,9 +179,10 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
 
-        self._validate_at_init()
-
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
             self.add_periodic_auxiliary_variable()
+
+        if validate:
+            self._validate_at_init()

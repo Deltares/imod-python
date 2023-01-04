@@ -33,6 +33,10 @@ class TimeDiscretization(Package):
         a time step is calculated by multiplying the length of the previous time
         step by timestep_multiplier (TSMULT).
         Default value: 1.0
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "tdis"
@@ -50,13 +54,16 @@ class TimeDiscretization(Package):
 
     _write_schemata = {}
 
-    def __init__(self, timestep_duration, n_timesteps=1, timestep_multiplier=1.0):
+    def __init__(
+        self, timestep_duration, n_timesteps=1, timestep_multiplier=1.0, validate=True
+    ):
         super().__init__()
         self.dataset["timestep_duration"] = timestep_duration
         self.dataset["n_timesteps"] = n_timesteps
         self.dataset["timestep_multiplier"] = timestep_multiplier
 
-        self._validate_at_init()
+        if validate:
+            self._validate_at_init()
 
     def render(self):
         start_date_time = iso8601(self.dataset["time"].values[0])
