@@ -5,11 +5,42 @@ from imod.mf6.pkgbase import Package
 from imod.schemata import (
     AllValueSchema,
     AnyValueSchema,
+    BaseSchema,
     DimsSchema,
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
+    ValidationError,
 )
+
+
+class DisBottomSchema(BaseSchema):
+    """
+    Custom schema for the bottoms as these require some additional logic,
+    because of how Modflow 6 computes cell thicknesses.
+    """
+
+    def __init__(self, other):
+        self.other = other
+
+    def validate(self, bottom, **kwargs):
+        active = kwargs["idomain"] == 1
+
+        # Check if zero thicknesses occur in active cells. The difference across
+        # layers is a "negative thickness"
+        thickness = bottom.diff(dim="layer") * -1.0
+        if thickness.where(active) <= 0.0:
+            raise ValidationError("found thickness <= 0.0")
+
+        # To compute thicknesses properly, Modflow 6 requires bottom data in the
+        # layer above the active cell in question.
+        overlaying_top_inactive = np.isnan(
+            bottom.shift(
+                layer=1, fill_value=9999.0
+            )  # use fill_value to make layer 1 not nan
+        )
+        if (overlaying_top_inactive & active).any():
+            raise ValidationError("inactive bottom above active cell")
 
 
 class StructuredDiscretization(Package):
@@ -64,10 +95,12 @@ class StructuredDiscretization(Package):
         "idomain": (AnyValueSchema(">", 0),),
         "top": (
             AllValueSchema(">", "bottom"),
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
             # No need to check coords: dataset ensures they align with idomain.
         ),
-        "bottom": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
+        "bottom": (
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            DisBottomSchema(other="idomain"),
+        ),
     }
 
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
