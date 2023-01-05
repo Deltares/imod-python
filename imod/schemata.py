@@ -331,8 +331,10 @@ class AllValueSchema(ValueSchema):
         if scalar_None(obj) or scalar_None(other_obj):
             return
 
+        ignore = np.isnan(obj) | np.isnan(other_obj)  # ignore nan by setting to True
+
         condition = self.operator(obj, other_obj)
-        condition = condition | np.isnan(obj)  # ignore nan by setting to True
+        condition = condition | ignore
         if not condition.all():
             raise ValidationError(
                 f"values exceed condition: {self.operator_str} {self.other}"
@@ -349,8 +351,10 @@ class AnyValueSchema(ValueSchema):
         if scalar_None(obj) or scalar_None(other_obj):
             return
 
+        ignore = ~np.isnan(obj) | ~np.isnan(other_obj)  # ignore nan by setting to False
+
         condition = self.operator(obj, other_obj)
-        condition = condition | ~np.isnan(obj)  # ignore nan by setting to False
+        condition = condition | ignore
         if not condition.any():
             raise ValidationError(
                 f"no values exceed condition: {self.operator_str} {self.other}"
