@@ -114,22 +114,22 @@ class Dispersion(Package):
 
     _write_schemata = {
         "diffusion_coefficient": (
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
         "longitudinal_horizontal": (
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
         "transversal_horizontal1": (
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
         "longitudinal_vertical": (
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
         "transversal_horizontal2": (
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
         "transversal_vertical": (
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
     }
 
