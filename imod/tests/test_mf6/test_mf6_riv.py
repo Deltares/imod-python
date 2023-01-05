@@ -103,7 +103,7 @@ def test_inconsistent_nan(riv_dict, dis_dict):
 
 def test_check_layer(riv_dict):
     """
-    Test for error thrown if variable has no layer dim
+    Test for error thrown if variable has no layer coord
     """
     riv_dict["stage"] = riv_dict["stage"].sel(layer=2, drop=True)
 
