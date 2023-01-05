@@ -21,6 +21,19 @@ BC_DIMS_SCHEMA = (
     | DimsSchema("{face_dim}")
 )
 
+CONC_DIMS_SCHEMA = (
+    DimsSchema("species", "time", "layer", "y", "x")
+    | DimsSchema("species", "layer", "y", "x")
+    | DimsSchema("species", "time", "layer", "{face_dim}")
+    | DimsSchema("species", "layer", "{face_dim}")
+    # Layer dim not necessary, as long as there is a layer coordinate
+    # present
+    | DimsSchema("species", "time", "y", "x")
+    | DimsSchema("species", "y", "x")
+    | DimsSchema("species", "time", "{face_dim}")
+    | DimsSchema("species", "{face_dim}")
+)
+
 
 def validation_model_error_message(model_errors):
     messages = []

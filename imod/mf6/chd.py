@@ -1,12 +1,14 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition
-from imod.mf6.validation import BC_DIMS_SCHEMA
+from imod.mf6.validation import BC_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
+    AllValueSchema,
     CoordsSchema,
     DTypeSchema,
+    IdentityNoDataSchema,
     IndexesSchema,
     OtherCoordsSchema,
 )
@@ -74,13 +76,20 @@ class ConstantHead(BoundaryCondition):
             CoordsSchema(("layer",)),
             BC_DIMS_SCHEMA,
         ],
+        "concentration": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            CONC_DIMS_SCHEMA,
+        ],
     }
     _write_schemata = {
         "head": [
             OtherCoordsSchema("idomain"),
             AllNoDataSchema(),  # Check for all nan, can occur while clipping
             AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
-        ]
+        ],
+        "concentration": [IdentityNoDataSchema("head"), AllValueSchema(">=", 0.0)],
     }
 
     _keyword_map = {}

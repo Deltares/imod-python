@@ -141,6 +141,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             # Check for all schemata when writing. Types and dimensions
             # may have been changed after initialization...
 
+            if pkgname in ["adv"]:
+                continue  # some packages can be skipped
+
             # Concatenate write and init schemata.
             schemata = deepcopy(pkg._init_schemata)
             for key, value in pkg._write_schemata.items():

@@ -1,7 +1,7 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition
-from imod.mf6.validation import BC_DIMS_SCHEMA
+from imod.mf6.validation import BC_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -79,6 +79,18 @@ class River(BoundaryCondition):
             CoordsSchema(("layer",)),
             BC_DIMS_SCHEMA,
         ],
+        "concentration": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(
+                (
+                    "species",
+                    "layer",
+                )
+            ),
+            CONC_DIMS_SCHEMA,
+        ],
+        "print_input": [DTypeSchema(np.bool_), DimsSchema()],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
     }
@@ -95,6 +107,7 @@ class River(BoundaryCondition):
             # Check river bottom above layer bottom, else Modflow throws error.
             AllValueSchema(">", "bottom"),
         ],
+        "concentration": [IdentityNoDataSchema("stage"), AllValueSchema(">=", 0.0)],
     }
 
     _template = BoundaryCondition._initialize_template(_pkg_id)

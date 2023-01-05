@@ -64,6 +64,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         "row": [DTypeSchema(np.integer)],
         "column": [DTypeSchema(np.integer)],
         "rate": [DTypeSchema(np.floating)],
+        "concentration": [DTypeSchema(np.floating)],
     }
 
     _write_schemata = {}
@@ -153,6 +154,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         "layer": [DTypeSchema(np.integer)],
         "cell2d": [DTypeSchema(np.integer)],
         "rate": [DTypeSchema(np.floating)],
+        "concentration": [DTypeSchema(np.floating)],
     }
 
     _write_schemata = {}

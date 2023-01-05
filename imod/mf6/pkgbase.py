@@ -402,10 +402,13 @@ class Package(abc.ABC):
         errors = defaultdict(list)
         for variable, var_schemata in schemata.items():
             for schema in var_schemata:
-                try:
-                    schema.validate(self.dataset[variable], **kwargs)
-                except ValidationError as e:
-                    errors[variable].append(e)
+                if (
+                    variable in self.dataset.keys()
+                ):  # concentration only added to dataset if specified
+                    try:
+                        schema.validate(self.dataset[variable], **kwargs)
+                    except ValidationError as e:
+                        errors[variable].append(e)
         return errors
 
     def _netcdf_path(self, directory, pkgname):

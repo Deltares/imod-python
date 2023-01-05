@@ -1,13 +1,15 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition
-from imod.mf6.validation import BC_DIMS_SCHEMA
+from imod.mf6.validation import BC_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
+    AllValueSchema,
     CoordsSchema,
     DimsSchema,
     DTypeSchema,
+    IdentityNoDataSchema,
     IndexesSchema,
     OtherCoordsSchema,
 )
@@ -66,6 +68,17 @@ class Recharge(BoundaryCondition):
             CoordsSchema(("layer",)),
             BC_DIMS_SCHEMA,
         ],
+        "concentration": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(
+                (
+                    "species",
+                    "layer",
+                )
+            ),
+            CONC_DIMS_SCHEMA,
+        ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
     }
@@ -75,6 +88,7 @@ class Recharge(BoundaryCondition):
             AllNoDataSchema(),  # Check for all nan, can occur while clipping
             AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ],
+        "concentration": [IdentityNoDataSchema("head"), AllValueSchema(">=", 0.0)],
     }
 
     _template = BoundaryCondition._initialize_template(_pkg_id)
