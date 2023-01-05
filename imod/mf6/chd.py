@@ -120,3 +120,10 @@ class ConstantHead(BoundaryCondition):
 
         if validate:
             self._validate_at_init()
+
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["head"] = self["head"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors

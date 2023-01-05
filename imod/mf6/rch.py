@@ -88,7 +88,7 @@ class Recharge(BoundaryCondition):
             AllNoDataSchema(),  # Check for all nan, can occur while clipping
             AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ],
-        "concentration": [IdentityNoDataSchema("head"), AllValueSchema(">=", 0.0)],
+        "concentration": [IdentityNoDataSchema("rate"), AllValueSchema(">=", 0.0)],
     }
 
     _template = BoundaryCondition._initialize_template(_pkg_id)
@@ -118,3 +118,10 @@ class Recharge(BoundaryCondition):
 
         if validate:
             self._validate_at_init()
+
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["rate"] = self["rate"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors
