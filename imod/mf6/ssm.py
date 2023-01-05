@@ -2,6 +2,7 @@ import numpy as np
 
 from imod.mf6 import GroundwaterFlowModel
 from imod.mf6.pkgbase import BoundaryCondition
+from imod.schemata import DTypeSchema
 
 
 def with_index_dim(array_like):
@@ -26,6 +27,16 @@ class SourceSinkMixing(BoundaryCondition):
     _pkg_id = "ssm"
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
+    _init_schemata = {
+        "package_names": [DTypeSchema(np.str_)],
+        "concentration_boundary_type": [DTypeSchema(np.str_)],
+        "auxiliary_variable_name": [DTypeSchema(np.str_)],
+        "print_flows": [DTypeSchema(np.bool_)],
+        "save_flows": [DTypeSchema(np.bool_)],
+    }
+
+    _write_schemata = {}
+
     def __init__(
         self,
         package_names,
@@ -46,6 +57,8 @@ class SourceSinkMixing(BoundaryCondition):
         )
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
+
+        self._validate_at_init()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {
