@@ -37,6 +37,7 @@ from functools import partial
 from typing import Any, Callable, Dict, Tuple, Union
 
 import numpy as np
+import scipy
 import xarray as xr
 import xugrid as xu
 from numpy.typing import DTypeLike  # noqa: F401
@@ -300,7 +301,7 @@ class OtherCoordsSchema(BaseSchema):
         self.require_all_keys = require_all_keys
         self.allow_extra_keys = allow_extra_keys
 
-    def validate(self, obj: xr.DataArray, **kwargs):
+    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
         other_obj = kwargs[self.other]
         other_coords = list(other_obj.coords.keys())
         return CoordsSchema(
@@ -322,7 +323,7 @@ class ValueSchema(BaseSchema, abc.ABC):
 
 
 class AllValueSchema(ValueSchema):
-    def validate(self, obj: xr.DataArray, **kwargs):
+    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
         if isinstance(self.other, str):
             other_obj = kwargs[self.other]
         else:
@@ -342,7 +343,7 @@ class AllValueSchema(ValueSchema):
 
 
 class AnyValueSchema(ValueSchema):
-    def validate(self, obj: xr.DataArray, **kwargs):
+    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
         if isinstance(self.other, str):
             other_obj = kwargs[self.other]
         else:
@@ -361,10 +362,20 @@ class AnyValueSchema(ValueSchema):
             )
 
 
+def _notnull(obj):
+    """
+    Helper function; does the same as xr.DataArray.notnull. This function is to
+    avoid an issue where xr.DataArray.notnull() returns ordinary numpy arrays
+    for instances of xu.UgridDataArray.
+    """
+
+    return ~np.isnan(obj)
+
+
 class NoDataSchema(BaseSchema):
     def __init__(
         self,
-        is_notnull: Union[Callable, Tuple[str, Any]] = xr.DataArray.notnull,
+        is_notnull: Union[Callable, Tuple[str, Any]] = _notnull,
     ):
 
         if isinstance(is_notnull, tuple):
@@ -375,20 +386,10 @@ class NoDataSchema(BaseSchema):
 
 
 class AllNoDataSchema(NoDataSchema):
-    def validate(self, obj: xr.DataArray, **kwargs):
+    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
         valid = self.is_notnull(obj)
         if ~valid.any():
             raise ValidationError("all nodata")
-
-
-def _notnull(obj):
-    """
-    Helper function; does the same as xr.DataArray.notnull. This function is to
-    avoid an issue where xr.DataArray.notnull() returns ordinary numpy arrays
-    for instances of xu.UgridDataArray.
-    """
-
-    return ~np.isnan(obj)
 
 
 class NoDataComparisonSchema(BaseSchema):
@@ -422,7 +423,7 @@ class IdentityNoDataSchema(NoDataComparisonSchema):
     "idomain" `{layer, y, x}`
     """
 
-    def validate(self, obj: xr.DataArray, **kwargs):
+    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
         other_obj = kwargs[self.other]
 
         # Only test if object has all dimensions in other object.
@@ -440,10 +441,47 @@ class AllInsideNoDataSchema(NoDataComparisonSchema):
     Checks that that notnull values all occur within other.
     """
 
-    def validate(self, obj: xr.DataArray, **kwargs):
+    def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
         other_obj = kwargs[self.other]
         valid = self.is_notnull(obj)
         other_valid = self.is_other_notnull(other_obj)
 
         if (valid & ~other_valid).any():
             raise ValidationError(f"data values found at nodata values of {self.other}")
+
+
+class ActiveCellsConnectedSchema(BaseSchema):
+    """
+    Check if active cells are connected, to avoid isolated islands which can
+    cause convergence issues, if they don't have a head boundary condition, but
+    do have a specified flux.
+
+    Note
+    ----
+    This schema only works for structured grids.
+    """
+
+    def __init__(
+        self,
+        is_notnull: Union[Callable, Tuple[str, Any]] = _notnull,
+    ):
+
+        if isinstance(is_notnull, tuple):
+            op, value = is_notnull
+            self.is_notnull = partial_operator(op, value)
+        else:
+            self.is_notnull = is_notnull
+
+    def validate(self, obj: xr.DataArray, **kwargs):
+        if isinstance(obj, xu.UgridDataArray):
+            raise TypeError(
+                f"Schema {self.__name__} only works for structured grids, received xu.UgridDataArray."
+            )
+
+        active = self.is_notnull(obj)
+
+        _, nlabels = scipy.ndimage.label(active)
+        if nlabels > 1:
+            raise ValidationError(
+                f"{nlabels} disconnected areas detected in model domain"
+            )

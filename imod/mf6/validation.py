@@ -1,6 +1,13 @@
-from imod.schemata import DimsSchema
+"""
+This module contains specific validation utilities for Modflow 6.
+"""
 
-# Template schemata to avoid code duplication
+import numpy as np
+import xarray as xr
+
+from imod.schemata import DimsSchema, NoDataComparisonSchema, ValidationError
+
+# %% Template schemata to avoid code duplication
 PKG_DIMS_SCHEMA = (
     DimsSchema("layer", "y", "x")
     | DimsSchema("layer", "{face_dim}")
@@ -35,6 +42,39 @@ CONC_DIMS_SCHEMA = (
 )
 
 
+# %% Custom schemata for Modflow 6
+class DisBottomSchema(NoDataComparisonSchema):
+    """
+    Custom schema for the bottoms as these require some additional logic,
+    because of how Modflow 6 computes cell thicknesses.
+    """
+
+    def validate(self, obj: xr.DataArray, **kwargs):
+        other_obj = kwargs[self.other]
+
+        active = self.is_other_notnull(other_obj)
+        bottom = obj
+
+        # Only check for multi-layered models
+        if bottom.coords["layer"].size > 1:
+            # Check if zero thicknesses occur in active cells. The difference across
+            # layers is a "negative thickness"
+            thickness = bottom.diff(dim="layer") * -1.0
+            if (thickness.where(active) <= 0.0).any():
+                raise ValidationError("found thickness <= 0.0")
+
+            # To compute thicknesses properly, Modflow 6 requires bottom data in the
+            # layer above the active cell in question.
+            overlaying_top_inactive = np.isnan(
+                bottom.shift(
+                    layer=1, fill_value=9999.0
+                )  # use fill_value to make layer 1 not nan
+            )
+            if (overlaying_top_inactive & active).any():
+                raise ValidationError("inactive bottom above active cell")
+
+
+# %% Custom utility functions
 def validation_model_error_message(model_errors):
     messages = []
     for name, pkg_errors in model_errors.items():

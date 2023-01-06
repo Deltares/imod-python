@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from imod.mf6.pkgbase import Package
+from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
     AllValueSchema,
     AnyValueSchema,
@@ -55,7 +56,7 @@ class VerticesDiscretization(Package):
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
             # No need to check coords: dataset ensures they align with idomain.
         ),
-        "bottom": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
+        "bottom": (DisBottomSchema(other="idomain"),),
     }
 
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
