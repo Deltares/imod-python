@@ -88,11 +88,11 @@ class SpecificStorage(Package):
             # No need to check coords: dataset ensures they align with idomain.
         ),
         "specific_storage": (
-            AllValueSchema(">", 0.0),
+            AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
         "specific_yield": (
-            AllValueSchema(">", 0.0),
+            AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
     }
