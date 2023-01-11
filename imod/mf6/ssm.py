@@ -22,6 +22,7 @@ class SourceSinkMixing(BoundaryCondition):
     auxiliary_variable_name: array_like of str
     print_flows: bool
     save_flows: bool
+    validate: bool
     """
 
     _pkg_id = "ssm"
@@ -44,6 +45,7 @@ class SourceSinkMixing(BoundaryCondition):
         auxiliary_variable_name,
         print_flows: bool = False,
         save_flows: bool = False,
+        validate: bool = True,
     ):
         super().__init__()
         # By sharing the index, this will raise an error if lengths do not
@@ -57,7 +59,7 @@ class SourceSinkMixing(BoundaryCondition):
         )
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
-        self._validate_init_schemata()
+        self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {
