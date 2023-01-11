@@ -41,7 +41,6 @@ class LakeApi_Base(PackageBase):
         return False
 
 
-
 class LakeData(LakeApi_Base):
     """
     This class is used to initialize the lake package. It contains data
@@ -73,6 +72,7 @@ class LakeData(LakeApi_Base):
     auxiliary: timeseries of float numbers
 
     """
+
     timeseries_names = [
         "status",
         "stage",
@@ -83,7 +83,6 @@ class LakeData(LakeApi_Base):
         "withdrawal",
         "auxiliary",
     ]
-    
 
     timeseries_names = [
         "status",
@@ -954,14 +953,10 @@ class Lake(BoundaryCondition):
         period_block = _template.render(d)
         f.write(period_block)
 
-       
     def _package_data_to_sparse(self):
         return
 
     def fill_stress_perioddata(self):
-        return
-
-    def write_perioddata(self, directory, pkgname, binary):
         return
 
     def write_perioddata(self, directory, pkgname, binary):
