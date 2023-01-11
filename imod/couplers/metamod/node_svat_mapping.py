@@ -42,10 +42,9 @@ class NodeSvatMapping(MetaModMapping):
         self.dataset["svat"] = svat
         self.dataset["layer"] = xr.full_like(svat, 1)
         idomain_top_layer = modflow_dis["idomain"].sel(layer=1, drop=True)
-        # Test if equal to 1, to ignore idomain == -1 as well.
-        # Don't assign to self.dataset, as grid extent might
-        # differ from svat
-        self.idomain_active = idomain_top_layer == 1.0
+        # Test if equal to or larger than 1, to ignore idomain == -1 as well.
+        # Don't assign to self.dataset, as grid extent might differ from svat
+        self.idomain_active = idomain_top_layer >= 1
         self._pkgcheck()
         self._create_mod_id()
 
@@ -69,7 +68,7 @@ class NodeSvatMapping(MetaModMapping):
         self.dataset["mod_id"].values[:, idomain_active] = mod_id_1d
 
     def _pkgcheck(self):
-        # Check if active msw cell inactive in recharge
+        # Check if active msw cell inactive in idomain
         active = self.dataset["svat"] != 0
         inactive_in_idomain = active > self.idomain_active
 

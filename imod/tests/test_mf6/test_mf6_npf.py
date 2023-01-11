@@ -1,4 +1,5 @@
 import pathlib
+import re
 import textwrap
 
 import numpy as np
@@ -6,6 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 def test_render():
@@ -60,9 +62,62 @@ def test_wrong_dtype():
     k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": layer}, ("layer",))
     k33 = xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",))
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         imod.mf6.NodePropertyFlow(
             icelltype=icelltype.astype(np.float64),
+            k=k,
+            k33=k33,
+            variable_vertical_conductance=True,
+            dewatered=True,
+            perched=True,
+            save_flows=True,
+        )
+
+
+def test_validate_false():
+    layer = np.array([1, 2, 3])
+    icelltype = xr.DataArray([1, 0, 0], {"layer": layer}, ("layer",))
+    k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": layer}, ("layer",))
+    k33 = xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",))
+
+    imod.mf6.NodePropertyFlow(
+        icelltype=icelltype.astype(np.float64),
+        k=k,
+        k33=k33,
+        variable_vertical_conductance=True,
+        dewatered=True,
+        perched=True,
+        save_flows=True,
+        validate=False,
+    )
+
+
+def test_wrong_dim():
+    layer = np.array([1, 2, 3])
+    icelltype = xr.DataArray(
+        [[1, 0, 0]],
+        {"time": [1], "layer": layer},
+        (
+            "time",
+            "layer",
+        ),
+    )
+    k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": layer}, ("layer",))
+    k33 = xr.DataArray([2.0e-8, 2.0e-8, 2.0e-8], {"layer": layer}, ("layer",))
+
+    message = textwrap.dedent(
+        """
+        * icelltype
+        \t- No option succeeded:
+        \tdim mismatch: expected ('layer', 'y', 'x'), got ('time', 'layer')
+        \tdim mismatch: expected ('layer', '{face_dim}'), got ('time', 'layer')
+        \tdim mismatch: expected ('layer',), got ('time', 'layer')
+        \tdim mismatch: expected (), got ('time', 'layer')"""
+    )
+
+    with pytest.raises(ValidationError, match=re.escape(message)):
+        imod.mf6.NodePropertyFlow(
+            icelltype=icelltype,
             k=k,
             k33=k33,
             variable_vertical_conductance=True,

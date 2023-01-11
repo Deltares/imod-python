@@ -2,7 +2,9 @@ import warnings
 
 import numpy as np
 
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
+from imod.mf6.validation import PKG_DIMS_SCHEMA
+from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
 
 
 class InitialConditions(Package):
@@ -28,15 +30,35 @@ class InitialConditions(Package):
         be less if STRT includes hydraulic heads that are close to the
         steadystate solution. A head value lower than the cell bottom can be
         provided if a cell should start as dry. (strt)
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "ic"
-    _metadata_dict = {"start": VariableMetaData(np.floating)}
+    _grid_data = {"head": np.float64}
+    _keyword_map = {"head": "strt"}
+    _template = Package._initialize_template(_pkg_id)
+
+    _init_schemata = {
+        "start": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+    }
+    _write_schemata = {
+        "start": [
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
+    }
+
     _grid_data = {"start": np.float64}
     _keyword_map = {"start": "strt"}
     _template = Package._initialize_template(_pkg_id)
 
-    def __init__(self, start=None, head=None):
+    def __init__(self, start=None, head=None, validate: bool = True):
 
         super().__init__(locals())
         if start is None:
@@ -52,8 +74,7 @@ class InitialConditions(Package):
                 raise ValueError("start and head arguments cannot both be defined")
 
         self.dataset["start"] = start
-
-        self._pkgcheck()
+        self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

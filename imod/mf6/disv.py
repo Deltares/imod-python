@@ -3,7 +3,16 @@ import pathlib
 import numpy as np
 import pandas as pd
 
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
+from imod.mf6.validation import DisBottomSchema
+from imod.schemata import (
+    AllValueSchema,
+    AnyValueSchema,
+    DimsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+)
 
 
 class VerticesDiscretization(Package):
@@ -15,25 +24,51 @@ class VerticesDiscretization(Package):
     top: array of floats (xu.UgridDataArray)
     bottom: array of floats (xu.UgridDataArray)
     idomain: array of integers (xu.UgridDataArray)
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "disv"
-    _metadata_dict = {
-        "top": VariableMetaData(np.floating),
-        "bottom": VariableMetaData(np.floating),
-        "idomain": VariableMetaData(np.integer),
+
+    _init_schemata = {
+        "top": [
+            DTypeSchema(np.floating),
+            DimsSchema("{face_dim}") | DimsSchema(),
+            IndexesSchema(),
+        ],
+        "bottom": [
+            DTypeSchema(np.floating),
+            DimsSchema("layer", "{face_dim}") | DimsSchema("layer"),
+            IndexesSchema(),
+        ],
+        "idomain": [
+            DTypeSchema(np.integer),
+            DimsSchema("layer", "{face_dim}") | DimsSchema("layer"),
+            IndexesSchema(),
+        ],
     }
+    _write_schemata = {
+        "idomain": (AnyValueSchema(">", 0),),
+        "top": (
+            AllValueSchema(">", "bottom"),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            # No need to check coords: dataset ensures they align with idomain.
+        ),
+        "bottom": (DisBottomSchema(other="idomain"),),
+    }
+
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
 
-    def __init__(self, top, bottom, idomain):
+    def __init__(self, top, bottom, idomain, validate: bool = True):
         super().__init__(locals())
         self.dataset["idomain"] = idomain
         self.dataset["top"] = top
         self.dataset["bottom"] = bottom
-
-        self._pkgcheck()
+        self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, binary):
         disdirectory = directory / pkgname

@@ -7,6 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 @pytest.fixture(scope="function")
@@ -50,7 +51,7 @@ def test_data():
 
 def test_wrong_dtype(test_data):
     test_data["kv_sat"] = test_data["kv_sat"].astype(np.int32)
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         imod.mf6.UnsaturatedZoneFlow(**test_data)
 
 

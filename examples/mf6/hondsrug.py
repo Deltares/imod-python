@@ -47,9 +47,17 @@ gwf_model = imod.mf6.GroundwaterFlowModel()
 # We'll load the data from the examples that come with this package.
 
 layermodel = imod.data.hondsrug_layermodel()
+
+# Make sure that the idomain is provided as integers
 idomain = layermodel["idomain"].astype(int)
-top = layermodel["top"]
+
+# We only need to provide the data for the top as a 2D array. Modflow 6 will
+# compare the top against the uppermost active bottom cell.
+top = layermodel["top"].max(dim="layer")
+
 bot = layermodel["bottom"]
+
+top.plot.imshow()
 
 # %%
 # Adding information to the DIS package
@@ -162,9 +170,12 @@ interpolated_head.plot.imshow(ax=ax)
 # option.
 # The final result is an starting_heads xarray where all layers have the 2d interpolated_head information.
 
-# Assign interpolated head values to the all the model layers
+# Assign interpolated head values to all the model layers
 like_3d = xr.full_like(idomain, np.nan, dtype=float)
 starting_head = like_3d.combine_first(interpolated_head)
+# Consequently ensure no data is specified in inactive cells:
+starting_head = starting_head.where(idomain == 1)
+
 starting_head
 
 # %%
@@ -478,8 +489,6 @@ sy = xr.DataArray(
     {"layer": layer},
     ("layer",),
 )
-conv = xr.full_like(idomain, 0, dtype=int)
-
 times_sto = [
     np.datetime64("2009-12-30T23:59:59.000000000"),
     np.datetime64("2009-12-31T00:00:00.000000000"),
@@ -504,7 +513,7 @@ transient = xr.DataArray(
 # specific yield and if the layers are convertible.
 
 gwf_model["sto"] = imod.mf6.SpecificStorage(
-    specific_storage=ss, specific_yield=sy, transient=transient, convertible=conv
+    specific_storage=ss, specific_yield=sy, transient=transient, convertible=0
 )
 
 # %%
@@ -600,7 +609,7 @@ simulation.create_time_discretization(
 #   describes how to add it to yours.
 
 modeldir = imod.util.temporary_directory()
-simulation.write(modeldir)
+simulation.write(modeldir, binary=False, validate=False)
 simulation.run()
 
 # %%
@@ -654,6 +663,7 @@ hds.sel(layer=5).isel(time=3).plot(ax=ax)
 fig, ax = plt.subplots()
 hds.sel(layer=slice(3, 5)).mean(dim="layer").isel(time=3).plot(ax=ax)
 
+# %%
 # Assign dates to head
 # --------------------
 #

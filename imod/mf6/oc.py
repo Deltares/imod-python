@@ -3,6 +3,7 @@ import collections
 import numpy as np
 
 from imod.mf6.pkgbase import Package
+from imod.schemata import DTypeSchema
 
 
 class OutputControl(Package):
@@ -26,6 +27,14 @@ class OutputControl(Package):
         String or integer indicating output control for cell budgets (.cbc)
         If string, should be one of ["first", "last", "all"].
         If integer, interpreted as frequency.
+    save_head : {string, integer}, or xr.DataArray of {string, integer}, optional
+        String or integer indicating output control for concentration file (.ucn)
+        If string, should be one of ["first", "last", "all"].
+        If integer, interpreted as frequency.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
 
     Examples
     --------
@@ -37,7 +46,7 @@ class OutputControl(Package):
     >>> time = [np.datetime64("2000-01-01"), np.datetime64("2000-01-02")]
     >>> data = np.array(["last", 5], dtype="object")
     >>> save_head = xr.DataArray(data, coords={"time": time}, dims=("time"))
-    >>> oc = imod.mf6.OutputControl(save_head=save_head, save_budget=None)
+    >>> oc = imod.mf6.OutputControl(save_head=save_head, save_budget=None, save_concentration=None)
 
     """
 
@@ -45,13 +54,34 @@ class OutputControl(Package):
     _keyword_map = {}
     _template = Package._initialize_template(_pkg_id)
 
-    def __init__(self, save_head=None, save_budget=None, save_concentration=None):
+    _init_schemata = {
+        "save_head": [
+            DTypeSchema(np.integer) | DTypeSchema(str) | DTypeSchema(object),
+        ],
+        "save_budget": [
+            DTypeSchema(np.integer) | DTypeSchema(str) | DTypeSchema(object),
+        ],
+        "save_concentration": [
+            DTypeSchema(np.integer) | DTypeSchema(str) | DTypeSchema(object),
+        ],
+    }
+
+    _write_schemata = {}
+
+    def __init__(
+        self,
+        save_head=None,
+        save_budget=None,
+        save_concentration=None,
+        validate: bool = True,
+    ):
         super().__init__()
         if save_head is not None and save_concentration is not None:
             raise ValueError("save_head and save_concentration cannot both be defined.")
         self.dataset["save_head"] = save_head
         self.dataset["save_concentration"] = save_concentration
         self.dataset["save_budget"] = save_budget
+        self._validate_init_schemata(validate)
 
     def _get_ocsetting(self, setting):
         """Get oc setting based on its type. If integers return f'frequency {setting}', if"""

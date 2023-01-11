@@ -1,10 +1,18 @@
 import numpy as np
 import xarray as xr
 
-from imod.mf6.pkgbase import (
-    AdvancedBoundaryCondition,
-    BoundaryCondition,
-    VariableMetaData,
+from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition
+from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
+from imod.schemata import (
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
+    AllValueSchema,
+    CoordsSchema,
+    DimsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
 )
 
 
@@ -92,6 +100,10 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         TODO: We could allow the user to either use xarray DataArrays to specify BCS or
         use a pd.DataFrame and use the MF6 timeseries files to read input. The latter could
         save memory for laterally large-scale models, through efficient use of the UZF cell identifiers.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _period_data = (
@@ -104,19 +116,78 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         "root_activity",
     )
 
-    _metadata_dict = {
-        "surface_depression_depth": VariableMetaData(np.floating),
-        "kv_sat": VariableMetaData(np.floating),
-        "theta_res": VariableMetaData(np.floating),
-        "theta_sat": VariableMetaData(np.floating),
-        "theta_init": VariableMetaData(np.floating),
-        "epsilon": VariableMetaData(np.floating),
-        "infiltration_rate": VariableMetaData(np.floating),
-        "et_pot": VariableMetaData(np.floating),
-        "extinction_depth": VariableMetaData(np.floating),
-        "extinction_theta": VariableMetaData(np.floating),
-        "root_potential": VariableMetaData(np.floating),
-        "root_activity": VariableMetaData(np.floating),
+    _init_schemata = {
+        "surface_depression_depth": [
+            DTypeSchema(np.floating),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+        "kv_sat": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+        "theta_res": [
+            DTypeSchema(np.floating),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+        "theta_sat": [
+            DTypeSchema(np.floating),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+        "theta_init": [
+            DTypeSchema(np.floating),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+        "epsilon": [
+            DTypeSchema(np.floating),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+        "infiltration_rate": [
+            DTypeSchema(np.floating),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+        "et_pot": [
+            DTypeSchema(np.floating),
+            BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+        ],
+        "extinction_depth": [
+            DTypeSchema(np.floating),
+            BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+        ],
+        "extinction_theta": [
+            DTypeSchema(np.floating),
+            BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+        ],
+        "root_potential": [
+            DTypeSchema(np.floating),
+            BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+        ],
+        "root_activity": [
+            DTypeSchema(np.floating),
+            BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
+        ],
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+        "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
+    }
+    _write_schemata = {
+        "kv_sat": [
+            AllValueSchema(">", 0.0),
+            OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
+        "surface_depression_depth": [IdentityNoDataSchema("kv_sat")],
+        "theta_res": [IdentityNoDataSchema("kv_sat"), AllValueSchema(">=", 0.0)],
+        "theta_sat": [IdentityNoDataSchema("kv_sat"), AllValueSchema(">=", 0.0)],
+        "theta_init": [IdentityNoDataSchema("kv_sat"), AllValueSchema(">=", 0.0)],
+        "epsilon": [IdentityNoDataSchema("kv_sat")],
+        "infiltration_rate": [IdentityNoDataSchema("kv_sat")],
+        "et_pot": [IdentityNoDataSchema("kv_sat")],
+        "extinction_depth": [IdentityNoDataSchema("kv_sat")],
+        "extinction_theta": [IdentityNoDataSchema("kv_sat")],
+        "root_potential": [IdentityNoDataSchema("kv_sat")],
+        "root_activity": [IdentityNoDataSchema("kv_sat")],
     }
 
     _package_data = (
@@ -156,6 +227,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         observations=None,
         water_mover=None,
         timeseries=None,
+        validate: bool = True,
     ):
         super().__init__(locals())
         # Package data
@@ -201,13 +273,11 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         # Additonal indices for Packagedata
         self.dataset["landflag"] = self._determine_landflag(kv_sat)
-
         self.dataset["iuzno"] = self._create_uzf_numbers(self["landflag"])
         self.dataset["iuzno"].name = "uzf_number"
-
         self.dataset["ivertcon"] = self._determine_vertical_connection(self["iuzno"])
 
-        self._pkgcheck()
+        self._validate_init_schemata(validate)
 
     def fill_stress_perioddata(self):
         """Modflow6 requires something to be filled in the stress perioddata,
@@ -347,3 +417,10 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             recarr[key] = arr[notnull].astype(np.float64)
 
         return recarr
+
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["kv_sat"] = self["kv_sat"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors

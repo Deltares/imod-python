@@ -123,7 +123,7 @@ def porosity_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    porosity_fc = xr.full_like(idomain, np.nan)
+    porosity_fc = xr.full_like(idomain, np.nan).isel(time=0)
     return porosity_fc
 
 
@@ -132,7 +132,7 @@ def decay_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    decay_fc = xr.full_like(idomain, np.nan)
+    decay_fc = xr.full_like(idomain, np.nan).isel(time=0)
     return decay_fc
 
 
@@ -141,7 +141,7 @@ def decay_sorbed_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    decay_sorbed_fc = xr.full_like(idomain, np.nan)
+    decay_sorbed_fc = xr.full_like(idomain, np.nan).isel(time=0)
     return decay_sorbed_fc
 
 
@@ -150,7 +150,7 @@ def bulk_density_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    bulk_density_fc = xr.full_like(idomain, np.nan)
+    bulk_density_fc = xr.full_like(idomain, np.nan).isel(time=0)
     return bulk_density_fc
 
 
@@ -159,7 +159,7 @@ def distcoef_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    distcoef_fc = xr.full_like(idomain, np.nan)
+    distcoef_fc = xr.full_like(idomain, np.nan).isel(time=0)
     return distcoef_fc
 
 
@@ -168,7 +168,7 @@ def sp2_fc():
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    sp2_fc = xr.full_like(idomain, np.nan)
+    sp2_fc = xr.full_like(idomain, np.nan).isel(time=0)
     return sp2_fc
 
 
@@ -177,9 +177,18 @@ def sp2_fc():
 def flow_model_with_concentration(concentration_fc):
 
     idomain = get_data_array(grid_dimensions(), globaltimes)
-    cellType = xr.full_like(idomain, 1, dtype=np.int32)
-    k = xr.full_like(idomain, 10.0)
-    k33 = xr.full_like(idomain, 10.0)
+    cellType = xr.full_like(idomain.isel(time=0), 1, dtype=np.int32)
+    k = xr.full_like(idomain.isel(time=0), 10.0)
+    k33 = xr.full_like(idomain.isel(time=0), 10.0)
+
+    # River
+    riv_dict = dict(
+        stage=idomain.sel(layer=1),
+        conductance=idomain.sel(layer=1),
+        bottom_elevation=idomain.sel(layer=1) - 1.0,
+        concentration=concentration_fc.sel(layer=1),
+    )
+
     gwf_model = GroundwaterFlowModel()
 
     gwf_model["npf"] = NodePropertyFlow(
@@ -197,11 +206,8 @@ def flow_model_with_concentration(concentration_fc):
     gwf_model["ic"] = InitialConditions(start=0.0)
     gwf_model["oc"] = OutputControl(save_head="all", save_budget="all")
     gwf_model["riv-1"] = River(
-        stage=1.0,
-        conductance=10.0,
-        bottom_elevation=-1.0,
-        concentration=concentration_fc,
         concentration_boundary_type="AUX",
+        **riv_dict,
     )
 
     return gwf_model

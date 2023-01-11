@@ -128,7 +128,9 @@ conductance = xu.full_like(idomain, face_area * k_value, dtype=float).where(
     chd_location
 )
 
-constant_concentration = xu.full_like(constant_head, max_concentration)
+constant_concentration = xu.full_like(constant_head, max_concentration).where(
+    chd_location
+)
 constant_concentration = constant_concentration.expand_dims(species=["salinity"])
 
 

@@ -5,6 +5,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 def test_render():
@@ -44,7 +45,35 @@ def test_wrong_dtype():
         coords={"time": pd.date_range("2000-01-01", "2000-01-03")},
         dims=["time"],
     )
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         imod.mf6.TimeDiscretization(
             timestep_duration, n_timesteps=2, timestep_multiplier=1.1
         )
+
+
+def test_wrong_dims():
+    timestep_duration = xr.DataArray(
+        data=[[0.001, 7.0, 365.0]],
+        coords={"time": pd.date_range("2000-01-01", "2000-01-03"), "layer": [1]},
+        dims=["layer", "time"],
+    )
+
+    with pytest.raises(ValidationError):
+        imod.mf6.TimeDiscretization(
+            timestep_duration, n_timesteps=2, timestep_multiplier=1.1
+        )
+
+
+def test_validate_false():
+    timestep_duration = xr.DataArray(
+        data=[[0.001, 7.0, 365.0]],
+        coords={"time": pd.date_range("2000-01-01", "2000-01-03"), "layer": [1]},
+        dims=["layer", "time"],
+    )
+
+    imod.mf6.TimeDiscretization(
+        timestep_duration,
+        n_timesteps=2,
+        timestep_multiplier=1.1,
+        validate=False,
+    )

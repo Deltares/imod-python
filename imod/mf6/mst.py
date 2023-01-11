@@ -2,7 +2,14 @@ import string
 
 import numpy as np
 
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
+from imod.mf6.validation import PKG_DIMS_SCHEMA
+from imod.schemata import (
+    AllValueSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+)
 
 
 class MobileStorageTransfer(Package):
@@ -43,6 +50,10 @@ class MobileStorageTransfer(Package):
         (decay_sorbed too if sorption is active)
     sorption: ({Linear, Freundlich, Langmuir}, optional)
         Type of sorption, if any
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _grid_data = {
@@ -57,13 +68,30 @@ class MobileStorageTransfer(Package):
     _pkg_id = "mst"
     _template = Package._initialize_template(_pkg_id)
     _keyword_map = {}
-    _metadata_dict = {
-        "porosity": VariableMetaData(np.floating),
-        "decay": VariableMetaData(np.floating),
-        "decay_sorbed": VariableMetaData(np.floating),
-        "bulk_density": VariableMetaData(np.floating),
-        "distcoef": VariableMetaData(np.floating),
-        "sp2": VariableMetaData(np.floating),
+    _init_schemata = {
+        "porosity": [DTypeSchema(np.floating), IndexesSchema(), PKG_DIMS_SCHEMA],
+        "decay": [DTypeSchema(np.floating), IndexesSchema(), PKG_DIMS_SCHEMA],
+        "decay_sorbed": [DTypeSchema(np.floating), IndexesSchema(), PKG_DIMS_SCHEMA],
+        "bulk_density": [DTypeSchema(np.floating), IndexesSchema(), PKG_DIMS_SCHEMA],
+        "distcoef": [DTypeSchema(np.floating), IndexesSchema(), PKG_DIMS_SCHEMA],
+        "sp2": [DTypeSchema(np.floating), IndexesSchema(), PKG_DIMS_SCHEMA],
+    }
+
+    _write_schemata = {
+        "porosity": (
+            AllValueSchema(">=", 0.0),
+            AllValueSchema("<", 1.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+        "decay": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
+        "decay_sorbed": (
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+        "bulk_density": (
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+        "distcoef": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
+        "sp2": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
     }
 
     def __init__(
@@ -77,6 +105,7 @@ class MobileStorageTransfer(Package):
         save_flows=False,
         decay_order: string = "first",
         sorption=None,
+        validate: bool = True,
     ):
         super().__init__(locals())
         self.dataset["porosity"] = porosity
@@ -96,4 +125,4 @@ class MobileStorageTransfer(Package):
         if sorption is not None:
             self.dataset["sorption"] = sorption
 
-        self._pkgcheck()
+        self._validate_init_schemata(validate)

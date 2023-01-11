@@ -43,11 +43,10 @@ class CouplerMapping(MetaSwapPackage):
         super().__init__()
 
         self.well = well
-        # Test if equal to 1, to ignore idomain == -1 as well.
-        # Don't assign to self.dataset, as grid extent might
-        # differ from svat when MetaSWAP only covers part of the
-        # Modflow grid domain.
-        self.idomain_active = modflow_dis["idomain"] == 1.0
+        # Test if equal or larger than 1, to ignore idomain == -1 as well. Don't
+        # assign to self.dataset, as grid extent might differ from svat when
+        # MetaSWAP only covers part of the Modflow grid domain.
+        self.idomain_active = modflow_dis["idomain"] >= 1
 
     def _create_mod_id_rch(self, svat):
         """

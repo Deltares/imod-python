@@ -1,6 +1,18 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
+from imod.schemata import (
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
+    AllValueSchema,
+    CoordsSchema,
+    DimsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
+)
 
 
 class GeneralHeadBoundary(BoundaryCondition):
@@ -39,14 +51,52 @@ class GeneralHeadBoundary(BoundaryCondition):
         Default is False.
     observations: [Not yet supported.]
         Default is None.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "ghb"
     _period_data = ("head", "conductance")
-    _metadata_dict = {
-        "head": VariableMetaData(np.floating),
-        "conductance": VariableMetaData(np.floating),
+
+    _init_schemata = {
+        "head": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+        "conductance": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+        "concentration": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(
+                (
+                    "species",
+                    "layer",
+                )
+            ),
+            CONC_DIMS_SCHEMA,
+        ],
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+        "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
     }
+    _write_schemata = {
+        "head": [
+            OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
+        "conductance": [IdentityNoDataSchema("head"), AllValueSchema(">", 0.0)],
+        "concentration": [IdentityNoDataSchema("head"), AllValueSchema(">=", 0.0)],
+    }
+
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
@@ -61,6 +111,7 @@ class GeneralHeadBoundary(BoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
+        validate: bool = True,
     ):
         super().__init__(locals())
         self.dataset["head"] = head
@@ -73,5 +124,11 @@ class GeneralHeadBoundary(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+        self._validate_init_schemata(validate)
 
-        self._pkgcheck()
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["head"] = self["head"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors

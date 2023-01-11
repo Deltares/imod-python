@@ -1,6 +1,17 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
+from imod.schemata import (
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
+    AllValueSchema,
+    CoordsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
+)
 
 
 class ConstantHead(BoundaryCondition):
@@ -48,13 +59,41 @@ class ConstantHead(BoundaryCondition):
         specified with "BUDGET FILEOUT" in Output Control. Default is False.
     observations: [Not yet supported.]
         Default is None.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "chd"
     _keyword_map = {}
     _period_data = ("head",)
+
+    _init_schemata = {
+        "head": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+        "concentration": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            CONC_DIMS_SCHEMA,
+        ],
+    }
+    _write_schemata = {
+        "head": [
+            OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
+        "concentration": [IdentityNoDataSchema("head"), AllValueSchema(">=", 0.0)],
+    }
+
+    _keyword_map = {}
     _auxiliary_data = {"concentration": "species"}
-    _metadata_dict = {"head": VariableMetaData(np.floating)}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     def __init__(
@@ -66,6 +105,7 @@ class ConstantHead(BoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
+        validate: bool = True,
     ):
         super().__init__(locals())
         self.dataset["head"] = head
@@ -77,5 +117,11 @@ class ConstantHead(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+        self._validate_init_schemata(validate)
 
-        self._pkgcheck()
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["head"] = self["head"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors
