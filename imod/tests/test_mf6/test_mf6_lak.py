@@ -5,10 +5,22 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-from imod.mf6.lak import Lake, LakeData, OutletManning  # , OutletSpecified, OutletWeir
+from imod.mf6.lak import Lake, LakeData, OutletManning, OutletSpecified, OutletWeir
 
 
-def create_lake_data(is_lake, starting_stage, name, rainfall=None, inflow=None):
+def create_lake_data(
+    is_lake,
+    starting_stage,
+    name,
+    status=None,
+    stage=None,
+    rainfall=None,
+    evaporation=None,
+    runoff=None,
+    inflow=None,
+    withdrawal=None,
+    auxiliary=None,
+):
     HORIZONTAL = 0
     connection_type = xr.full_like(is_lake, HORIZONTAL, dtype=np.float64).where(is_lake)
     bed_leak = xr.full_like(is_lake, 0.2, dtype=np.float64).where(is_lake)
@@ -25,8 +37,14 @@ def create_lake_data(is_lake, starting_stage, name, rainfall=None, inflow=None):
         bot_elevation=bot_elevation,
         connection_length=connection_length,
         connection_width=connection_width,
+        status=status,
+        stage=stage,
         rainfall=rainfall,
+        evaporation=evaporation,
+        runoff=runoff,
         inflow=inflow,
+        withdrawal=withdrawal,
+        auxiliary=auxiliary,
     )
 
 
@@ -308,8 +326,12 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
         np.full((len(times_inflow)), 4.0), coords={"time": times_inflow}, dims=["time"]
     )
 
-    lake1 = create_lake_data(is_lake1, 11.0, "Naardermeer", rainfall, inflow)
-    lake2 = create_lake_data(is_lake2, 11.0, "Ijsselmeer", rainfall, inflow)
+    lake1 = create_lake_data(
+        is_lake1, 11.0, "Naardermeer", rainfall=rainfall, inflow=inflow
+    )
+    lake2 = create_lake_data(
+        is_lake2, 11.0, "IJsselmeer", rainfall=rainfall, inflow=inflow
+    )
     times_invert = [
         np.datetime64("2000-01-01"),
         np.datetime64("2000-03-01"),
@@ -320,7 +342,7 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
         coords={"time": times_rainfall},
         dims=["time"],
     )
-    outlet1 = OutletManning(1, "Naardermeer", "Ijsselmeer", invert, 24.0, 25.0, 26.0)
+    outlet1 = OutletManning(1, "Naardermeer", "IJsselmeer", invert, 24.0, 25.0, 26.0)
     lake_package = Lake.from_lakes_and_outlets([lake1, lake2], [outlet1])
     global_times = np.array(
         [
@@ -346,7 +368,7 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
 
         begin packagedata
           1 11.0 3 Naardermeer
-          2 11.0 1 Ijsselmeer
+          2 11.0 1 IJsselmeer
         end packagedata
 
         begin connectiondata
@@ -359,7 +381,6 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
         begin outlets
         1 2 manning 0.0 25.0 24.0 26.0
         end outlets
-
 
 
         begin period 2
@@ -389,6 +410,194 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
           2  rainfall 5.0
           1  invert 3.0
         end period
-        """
+    """
+    )
+    assert actual == expected
+
+
+def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
+    idomain, _, _ = basic_dis
+
+    is_lake1 = xr.full_like(idomain, False, dtype=bool)
+    is_lake1[1, 2, 2] = True
+    is_lake1[1, 2, 3] = True
+    is_lake1[1, 3, 3] = True
+    is_lake2 = xr.full_like(idomain, False, dtype=bool)
+    is_lake2[1, 4, 4] = True
+    times_of_numeric_timeseries = [
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-03-01"),
+        np.datetime64("2000-05-01"),
+    ]
+    numeric = xr.DataArray(
+        np.full((len(times_of_numeric_timeseries)), 5.0),
+        coords={"time": times_of_numeric_timeseries},
+        dims=["time"],
+    )
+    times_of_status_timeseries = [
+        np.datetime64("2000-02-01"),
+        np.datetime64("2000-04-01"),
+    ]
+    status = xr.DataArray(
+        np.full((len(times_of_status_timeseries)), "ACTIVE"),
+        coords={"time": times_of_status_timeseries},
+        dims=["time"],
+    )
+    times_of_outlet1 = [
+        np.datetime64("2000-02-01"),
+        np.datetime64("2000-04-01"),
+    ]
+    times_of_outlet2 = [
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-05-01"),
+    ]
+
+    rate = xr.DataArray(
+        np.full((len(times_of_outlet1)), 0.6),
+        coords={"time": times_of_outlet1},
+        dims=["time"],
+    )
+    invert = xr.DataArray(
+        np.full((len(times_of_outlet2)), 0.3),
+        coords={"time": times_of_outlet2},
+        dims=["time"],
+    )
+    outlet1 = OutletManning(1, "Naardermeer", "IJsselmeer", invert, 2, 3, 4)
+    outlet2 = OutletSpecified(2, "IJsselmeer", "Naardermeer", rate)
+    outlet3 = OutletWeir(3, "IJsselmeer", "Naardermeer", invert, numeric)
+
+    lake_with_status = create_lake_data(
+        is_lake1,
+        11.0,
+        "Naardermeer",
+        status=status,
+        stage=numeric,
+        rainfall=numeric,
+        evaporation=numeric,
+        runoff=numeric,
+        inflow=numeric,
+        withdrawal=numeric,
+    )
+    lake_without_status = create_lake_data(
+        is_lake2,
+        11.0,
+        "IJsselmeer",
+        stage=numeric,
+        rainfall=numeric,
+        evaporation=numeric,
+        runoff=numeric,
+        inflow=numeric,
+        withdrawal=numeric,
+        auxiliary=numeric,
+    )
+    lake_package = Lake.from_lakes_and_outlets(
+        [lake_with_status, lake_without_status], [outlet1, outlet2, outlet3]
+    )
+    global_times = np.array(
+        [
+            np.datetime64("1999-01-01"),
+            np.datetime64("2000-01-01"),
+            np.datetime64("2000-02-01"),
+            np.datetime64("2000-03-01"),
+            np.datetime64("2000-04-01"),
+            np.datetime64("2000-05-01"),
+        ]
+    )
+    actual = write_and_read(lake_package, tmp_path, "lake-test", global_times)
+
+    expected = textwrap.dedent(
+        """\
+        begin options
+        end options
+
+        begin dimensions
+          nlakes 2
+          noutlets 3
+          ntables 0
+        end dimensions
+
+        begin packagedata
+          1 11.0 3 Naardermeer
+          2 11.0 1 IJsselmeer
+        end packagedata
+
+        begin connectiondata
+        1 1 1 2 2 horizontal 0.2 0.4 0.3 0.6 0.5
+        1 2 1 2 3 horizontal 0.2 0.4 0.3 0.6 0.5
+        1 3 1 3 3 horizontal 0.2 0.4 0.3 0.6 0.5
+        2 1 1 4 4 horizontal 0.2 0.4 0.3 0.6 0.5
+        end connectiondata
+
+        begin outlets
+        1 2 manning 0.0 3 2 4
+        2 1 specified    
+        2 1 weir 0.0  0.0 
+        end outlets
+
+
+        begin period 2
+          1  stage 5.0
+          2  stage 5.0
+          1  rainfall 5.0
+          2  rainfall 5.0
+          1  evaporation 5.0
+          2  evaporation 5.0
+          1  runoff 5.0
+          2  runoff 5.0
+          1  inflow 5.0
+          2  inflow 5.0
+          1  withdrawal 5.0
+          2  withdrawal 5.0
+          2  auxiliary 5.0
+          1  invert 0.3
+          3  invert 0.3
+          3  width 5.0
+        end period
+
+        begin period 3
+          1  status ACTIVE
+          2  rate 0.6
+        end period
+
+        begin period 4
+          1  stage 5.0
+          2  stage 5.0
+          1  rainfall 5.0
+          2  rainfall 5.0
+          1  evaporation 5.0
+          2  evaporation 5.0
+          1  runoff 5.0
+          2  runoff 5.0
+          1  inflow 5.0
+          2  inflow 5.0
+          1  withdrawal 5.0
+          2  withdrawal 5.0
+          2  auxiliary 5.0
+        end period
+
+        begin period 5
+          1  status ACTIVE
+          2  rate 0.6
+        end period
+
+        begin period 6
+          1  stage 5.0
+          2  stage 5.0
+          1  rainfall 5.0
+          2  rainfall 5.0
+          1  evaporation 5.0
+          2  evaporation 5.0
+          1  runoff 5.0
+          2  runoff 5.0
+          1  inflow 5.0
+          2  inflow 5.0
+          1  withdrawal 5.0
+          2  withdrawal 5.0
+          2  auxiliary 5.0
+          1  invert 0.3
+          3  invert 0.3
+          3  width 5.0
+        end period
+    """
     )
     assert actual == expected

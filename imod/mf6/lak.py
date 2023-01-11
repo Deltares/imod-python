@@ -27,18 +27,6 @@ class LakeApi_Base(PackageBase):
         super().__init__()
         self.object_number = number
 
-    def get_times(self, timeseries_name):
-        """
-        returns the times associated with the timeseries that has name "timeseries_name"
-        """
-        times = []
-        vars = [k for k in self.dataset.keys()]
-        if timeseries_name in vars:
-            ts = self.dataset[timeseries_name]
-            tstimes = [x for x in ts.coords["time"].values]
-            times.extend(tstimes)
-        return sorted(set(times))
-
     def has_transient_data(self, timeseries_name):
         """
         returns true if this object has transient data for a property with a given name
@@ -51,23 +39,6 @@ class LakeApi_Base(PackageBase):
                 if "time" in ts.coords:
                     return True
         return False
-
-    def add_timeseries_to_dataarray(self, timeseries_name, dataarray):
-        """
-        adds the timeseries of this lake or outlet to a data-array containing this timeseries for
-        all lakes or outlets
-        """
-        current_object_data = dataarray.sel(index=self.object_number)
-        if timeseries_name in self.dataset:
-            ts = self.dataset[timeseries_name]
-            if ts is not None:
-                index_of_object = (
-                    dataarray.coords["index"].values.tolist().index(self.object_number)
-                )
-                dataarray[
-                    {"index": index_of_object}
-                ] = current_object_data.combine_first(ts)
-        return dataarray
 
 
 class LakeData(LakeApi_Base):
@@ -201,10 +172,10 @@ class OutletManning(OutletBase):
         outlet_number: int,
         lakein: str,
         lakeout: str,
-        invert: np.floating,
-        width: np.floating,
-        roughness: np.floating,
-        slope: np.floating,
+        invert,
+        width,
+        roughness,
+        slope,
     ):
         super().__init__(outlet_number, lakein, lakeout)
         self.dataset["invert"] = invert
@@ -220,14 +191,7 @@ class OutletWeir(OutletBase):
 
     _couttype = "weir"
 
-    def __init__(
-        self,
-        outlet_number: int,
-        lakein: str,
-        lakeout: str,
-        invert: np.floating,
-        width: np.floating,
-    ):
+    def __init__(self, outlet_number: int, lakein: str, lakeout: str, invert, width):
         super().__init__(outlet_number, lakein, lakeout)
         self.dataset["invert"] = invert
         self.dataset["width"] = width
@@ -240,31 +204,9 @@ class OutletSpecified(OutletBase):
 
     _couttype = "specified"
 
-    def __init__(
-        self, outlet_number: int, lakein: str, lakeout: str, rate: np.floating
-    ):
+    def __init__(self, outlet_number: int, lakein: str, lakeout: str, rate):
         super().__init__(outlet_number, lakein, lakeout)
         self.dataset["rate"] = rate
-
-
-def collect_all_times(list_of_lakes, list_of_outlets):
-    """
-    all timeseries we pass to the lake package must have the same time discretization-otherwise the coordinates
-    of the lake-package do not match. So in this function we collect all the time coordinates of all the lakes and
-    outlets.
-    """
-    times = []
-
-    for timeseries_name in LakeData.timeseries_names:
-        for lake in list_of_lakes:
-            if lake.has_transient_data(timeseries_name):
-                times.extend(lake.get_times(timeseries_name))
-
-    for timeseries_name in OutletBase.timeseries_names:
-        for outlet in list_of_outlets:
-            if outlet.has_transient_data(timeseries_name):
-                times.extend(outlet.get_times(timeseries_name))
-    return sorted(set(times))
 
 
 def create_connection_data(lakes):
@@ -367,26 +309,34 @@ def create_outlet_data(outlets, name_to_number):
     return outlet_data
 
 
-def create_timeseries(list_of_lakes_or_outlets, ts_times, timeseries_name):
+def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
     """
     In this function we create a dataarray with a given time coorridnate axis. We add all
     the timeseries of lakes or outlets with the given name. We also create a dimension to
     specify the lake or outlet number.
     """
-    indices = range(1, len(list_of_lakes_or_outlets)+1)
+    if list_of_lakes_or_outlets is None:
+        return None
 
-    result =  xr.DataArray(
-        dims=("time", "index"),
-        coords={"time": ts_times, "index": indices},
-        name=timeseries_name,)
-
-
+    list_of_dataarrays = []
+    list_of_indices = []
+    index = 1
     for lake_or_outlet in list_of_lakes_or_outlets:
         if lake_or_outlet.has_transient_data(timeseries_name):
-            result = lake_or_outlet.add_timeseries_to_dataarray(
-                timeseries_name, result
-            )
-    return result
+            ts_lake = lake_or_outlet.dataset[timeseries_name]
+            list_of_dataarrays.append(ts_lake)
+            list_of_indices.append(index)
+        index = index + 1
+    if len(list_of_dataarrays) == 0:
+        return None
+    fill_value = ""
+    if pd.api.types.is_numeric_dtype(list_of_dataarrays[0].dtype):
+        fill_value = np.nan
+    out = xr.concat(
+        list_of_dataarrays, join="outer", dim="index", fill_value=fill_value
+    )
+    out = out.assign_coords(index=list_of_indices)
+    return out
 
 
 class Lake(BoundaryCondition):
@@ -578,7 +528,7 @@ class Lake(BoundaryCondition):
         "ts_width": VariableMetaData(np.floating),
         "ts_slope": VariableMetaData(np.floating),
     }
-    _period_data = (
+    _period_data_lakes = (
         "ts_status",
         "ts_stage",
         "ts_rainfall",
@@ -586,12 +536,17 @@ class Lake(BoundaryCondition):
         "ts_runoff",
         "ts_inflow",
         "ts_withdrawal",
+        "ts_auxiliary",
+    )
+    _period_data_outlets = (
         "ts_rate",
         "ts_invert",
         "ts_rough",
         "ts_width",
         "ts_slope",
     )
+
+    _period_data = _period_data_lakes + _period_data_outlets
 
     def __init__(
         # lake
@@ -649,6 +604,13 @@ class Lake(BoundaryCondition):
         self.dataset["lake_number"] = lake_number
         self.dataset["lake_starting_stage"] = lake_starting_stage
 
+        nr_indices = lake_number.data.max()
+        if outlet_lakein is not None:
+            nroutlets = len(outlet_lakein.data)
+            nr_indices = max(nr_indices, nroutlets)
+
+        self.dataset = self.dataset.assign_coords(index=range(1, nr_indices + 1, 1))
+
         self.dataset["connection_lake_number"] = connection_lake_number
         self.dataset["connection_cell_id"] = connection_cell_id
         self.dataset["connection_type"] = connection_type
@@ -694,7 +656,7 @@ class Lake(BoundaryCondition):
         self.dataset["ts_width"] = ts_width
         self.dataset["ts_slope"] = ts_slope
 
-        #self._pkgcheck()
+        # self._pkgcheck()
 
     @staticmethod
     def from_lakes_and_outlets(
@@ -737,28 +699,13 @@ class Lake(BoundaryCondition):
         )
         connection_data = create_connection_data(lakes)
         package_content.update(connection_data)
+        for ts_name in Lake._period_data_lakes:
+            shortname = ts_name[3:]
+            package_content[ts_name] = concatenate_timeseries(lakes, shortname)
 
-        ts_times = collect_all_times(lakes, outlets)
-        package_content["ts_status"] = create_timeseries(lakes, ts_times, "status")
-        package_content["ts_stage"] = create_timeseries(lakes, ts_times, "stage")
-        package_content["ts_rainfall"] = create_timeseries(lakes, ts_times, "rainfall")
-        package_content["ts_evaporation"] = create_timeseries(
-            lakes, ts_times, "evaporation"
-        )
-        package_content["ts_runoff"] = create_timeseries(lakes, ts_times, "runoff")
-        package_content["ts_inflow"] = create_timeseries(lakes, ts_times, "inflow")
-        package_content["ts_withdrawal"] = create_timeseries(
-            lakes, ts_times, "withdrwawal"
-        )
-        package_content["ts_auxiliary"] = create_timeseries(
-            lakes, ts_times, "auxiliary"
-        )
-
-        package_content["ts_rate"] = create_timeseries(outlets, ts_times, "rate")
-        package_content["ts_invert"] = create_timeseries(outlets, ts_times, "invert")
-        package_content["ts_rough"] = create_timeseries(outlets, ts_times, "rough")
-        package_content["ts_width"] = create_timeseries(outlets, ts_times, "width")
-        package_content["ts_slope"] = create_timeseries(outlets, ts_times, "slope")
+        for ts_name in Lake._period_data_outlets:
+            shortname = ts_name[3:]
+            package_content[ts_name] = concatenate_timeseries(outlets, shortname)
 
         if outlets is not None:
             outlet_data = create_outlet_data(outlets, name_to_number)
@@ -786,9 +733,11 @@ class Lake(BoundaryCondition):
         return True
 
     def _has_timeseries(self):
-        return any(
-            [self._valid(self.dataset[name].values[()]) for name in self._period_data]
-        )
+        for name in self._period_data:
+            if "time" in self.dataset[name].coords:
+                if len(self.dataset[name].coords["time"]) > 0:
+                    return True
+        return False
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
@@ -917,42 +866,31 @@ class Lake(BoundaryCondition):
                 self.value = []
 
         period_data_list = []
-        for period_index in range(len(globaltimes)):
-            period_data_list.append(Period_internal(period_index + 1))
 
-        g=0
-        period_data_name_list = [ tssname for tssname in self._period_data]
+        period_data_name_list = [tssname for tssname in self._period_data]
         timeseries_dataset = self.dataset[period_data_name_list]
         timeseries_times = self.dataset.coords["time"]
         iperiods = np.searchsorted(globaltimes, timeseries_times) + 1
-        for iperiod, (_, period_data) in zip(iperiods, timeseries_dataset.groupby("time")):
-            g=g+1
-    # do stuff
-        for timeseries_name in self._period_data:
-            if self._valid(self.dataset[timeseries_name].values[()]):
-                timeseries = self.dataset[timeseries_name]
-                timeseries_times = np.array(timeseries.coords["time"].values)
-                timeseries_indexes = np.array(timeseries.coords["index"].values)
-                for itime in timeseries_times:
-                    iperiod = np.where(globaltimes == itime)[0][0] + 1
+        for iperiod, (_, period_data) in zip(
+            iperiods, timeseries_dataset.groupby("time")
+        ):
+            period_data_list.append(Period_internal(iperiod))
+            for tssname in self._period_data:
+                if len(period_data[tssname].dims) > 0:
+                    for index in period_data.coords["index"].values:
 
-                    for index in timeseries_indexes:
-                        object_specific_data = timeseries.sel(
-                            time=itime, index=index
-                        ).values[()]
-                        if not np.isnan(object_specific_data):
-                            iperiod_index = iperiod - 1
+                        value = period_data[tssname].sel(index=index).values[()]
+                        isvalid = False
+                        if isinstance(value, str):
+                            isvalid = value != ""
+                        else:
+                            isvalid = ~np.isnan(value)
 
-                            period_data_list[iperiod_index].nr_values += 1
-                            period_data_list[
-                                iperiod_index
-                            ].lake_or_outlet_number.append(index)
-                            period_data_list[iperiod_index].series_name.append(
-                                timeseries_name[3:]
-                            )
-                            period_data_list[iperiod_index].value.append(
-                                object_specific_data
-                            )
+                        if isvalid:
+                            period_data_list[-1].nr_values += 1
+                            period_data_list[-1].lake_or_outlet_number.append(index)
+                            period_data_list[-1].series_name.append(tssname[3:])
+                            period_data_list[-1].value.append(value)
 
         _template = jinja2.Template(
             textwrap.dedent(
