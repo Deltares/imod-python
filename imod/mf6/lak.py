@@ -84,17 +84,6 @@ class LakeData(LakeApi_Base):
         "auxiliary",
     ]
 
-    timeseries_names = [
-        "status",
-        "stage",
-        "rainfall",
-        "evaporation",
-        "runoff",
-        "inflow",
-        "withdrawal",
-        "auxiliary",
-    ]
-
     def __init__(
         self,
         starting_stage: float,
