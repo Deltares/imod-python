@@ -177,12 +177,12 @@ def test_lake_write(tmp_path, naardermeer, ijsselmeer):
         end packagedata
 
         begin connectiondata
-        1 1 0 1 1 horizontal 0.2 0.4 0.3 0.6 0.5
-        1 2 0 1 2 horizontal 0.2 0.4 0.3 0.6 0.5
-        1 3 0 2 2 horizontal 0.2 0.4 0.3 0.6 0.5
-        2 1 0 4 4 horizontal 0.2 0.4 0.3 0.6 0.5
-        2 2 0 4 5 horizontal 0.2 0.4 0.3 0.6 0.5
-        2 3 0 5 5 horizontal 0.2 0.4 0.3 0.6 0.5
+        1 1 1 2 2 horizontal 0.2 0.4 0.3 0.6 0.5
+        1 2 1 2 3 horizontal 0.2 0.4 0.3 0.6 0.5
+        1 3 1 3 3 horizontal 0.2 0.4 0.3 0.6 0.5
+        2 1 1 5 5 horizontal 0.2 0.4 0.3 0.6 0.5
+        2 2 1 5 6 horizontal 0.2 0.4 0.3 0.6 0.5
+        2 3 1 6 6 horizontal 0.2 0.4 0.3 0.6 0.5
         end connectiondata
 
         begin outlets
@@ -372,10 +372,10 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
         end packagedata
 
         begin connectiondata
-        1 1 1 2 2 horizontal 0.2 0.4 0.3 0.6 0.5
-        1 2 1 2 3 horizontal 0.2 0.4 0.3 0.6 0.5
-        1 3 1 3 3 horizontal 0.2 0.4 0.3 0.6 0.5
-        2 1 1 4 4 horizontal 0.2 0.4 0.3 0.6 0.5
+        1 1 2 3 3 horizontal 0.2 0.4 0.3 0.6 0.5
+        1 2 2 3 4 horizontal 0.2 0.4 0.3 0.6 0.5
+        1 3 2 4 4 horizontal 0.2 0.4 0.3 0.6 0.5
+        2 1 2 5 5 horizontal 0.2 0.4 0.3 0.6 0.5
         end connectiondata
 
         begin outlets
@@ -522,10 +522,10 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
         end packagedata
 
         begin connectiondata
-        1 1 1 2 2 horizontal 0.2 0.4 0.3 0.6 0.5
-        1 2 1 2 3 horizontal 0.2 0.4 0.3 0.6 0.5
-        1 3 1 3 3 horizontal 0.2 0.4 0.3 0.6 0.5
-        2 1 1 4 4 horizontal 0.2 0.4 0.3 0.6 0.5
+        1 1 2 3 3 horizontal 0.2 0.4 0.3 0.6 0.5
+        1 2 2 3 4 horizontal 0.2 0.4 0.3 0.6 0.5
+        1 3 2 4 4 horizontal 0.2 0.4 0.3 0.6 0.5
+        2 1 2 5 5 horizontal 0.2 0.4 0.3 0.6 0.5
         end connectiondata
 
         begin outlets

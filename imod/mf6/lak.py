@@ -253,8 +253,9 @@ def create_connection_data(lakes):
                 var = f"connection_{var}"
             connection_data[var].append(da.values)
 
+        # Offset by one since MODFLOW is 1-based!
         cell_id = xr.DataArray(
-            data=indices,
+            data=indices+1,
             coords={"celldim": list(xr_indices.keys())},
             dims=("boundary", "celldim"),
         )
@@ -264,7 +265,7 @@ def create_connection_data(lakes):
         k: xr.DataArray(data=np.concatenate(v), dims=["boundary"])
         for k, v in connection_data.items()
     }
-    # Offset by one since MODFLOW is 1-based!
+
     connection_data["connection_cell_id"] = xr.concat(cell_ids, dim="boundary")
     return connection_data
 
