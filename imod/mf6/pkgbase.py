@@ -435,8 +435,8 @@ class Package(PackageBase, abc.ABC):
             sep=" ",
             line_terminator="\n",
         )
-        trimmedblocklist = [line.strip() for line in block.splitlines()]
-        trimmedblock = "\n".join(map(str, trimmedblocklist)) + "\n"
+        trimmedlines = [line.strip() for line in block.splitlines()]
+        trimmedblock = "\n".join(map(str, trimmedlines)) + "\n"
         f.write(trimmedblock)
         f.write(f"end {title}\n")
         return
