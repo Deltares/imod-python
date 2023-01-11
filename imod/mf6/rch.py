@@ -1,7 +1,7 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition
-from imod.mf6.validation import BC_DIMS_SCHEMA, CONC_DIMS_SCHEMA
+from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -66,7 +66,7 @@ class Recharge(BoundaryCondition):
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
-            BC_DIMS_SCHEMA,
+            BOUNDARY_DIMS_SCHEMA,
         ],
         "concentration": [
             DTypeSchema(np.floating),
@@ -103,7 +103,7 @@ class Recharge(BoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
-        validate=True,
+        validate: bool = True,
     ):
         super().__init__(locals())
         self.dataset["rate"] = rate
@@ -115,9 +115,7 @@ class Recharge(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
-
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):
         # Insert additional kwargs

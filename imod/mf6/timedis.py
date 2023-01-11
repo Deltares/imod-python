@@ -55,15 +55,17 @@ class TimeDiscretization(Package):
     _write_schemata = {}
 
     def __init__(
-        self, timestep_duration, n_timesteps=1, timestep_multiplier=1.0, validate=True
+        self,
+        timestep_duration,
+        n_timesteps=1,
+        timestep_multiplier=1.0,
+        validate: bool = True,
     ):
         super().__init__()
         self.dataset["timestep_duration"] = timestep_duration
         self.dataset["n_timesteps"] = n_timesteps
         self.dataset["timestep_multiplier"] = timestep_multiplier
-
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)
 
     def render(self):
         start_date_time = iso8601(self.dataset["time"].values[0])

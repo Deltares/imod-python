@@ -390,7 +390,7 @@ class Solution(Package):
         print_option="summary",
         csv_output=False,
         no_ptc=False,
-        validate=True,
+        validate: bool = True,
     ):
         super().__init__()
         self.dataset["modelnames"] = modelnames
@@ -419,9 +419,7 @@ class Solution(Package):
         self.dataset["print_option"] = print_option
         self.dataset["csv_output"] = csv_output
         self.dataset["no_ptc"] = no_ptc
-
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)
 
 
 def SolutionPresetSimple(

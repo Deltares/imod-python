@@ -1,7 +1,7 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition, Package
-from imod.mf6.validation import BC_DIMS_SCHEMA
+from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -54,7 +54,7 @@ class MassSourceLoading(BoundaryCondition):
         "rate": (
             DTypeSchema(np.floating),
             IndexesSchema(),
-            BC_DIMS_SCHEMA,
+            BOUNDARY_DIMS_SCHEMA,
         )
     }
 
@@ -73,7 +73,7 @@ class MassSourceLoading(BoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
-        validate=True,
+        validate: bool = True,
     ):
         super().__init__()
         self.dataset["rate"] = rate
@@ -81,6 +81,4 @@ class MassSourceLoading(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
-
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)

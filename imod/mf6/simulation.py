@@ -37,7 +37,7 @@ class Modflow6Simulation(collections.UserDict):
         )
         self.create_time_discretization(additional_times=times)
 
-    def create_time_discretization(self, additional_times, validate=True):
+    def create_time_discretization(self, additional_times, validate: bool = True):
         """
         Collect all unique times from model packages and additional given
         `times`. These unique times are used as stress periods in the model. All
@@ -143,7 +143,7 @@ class Modflow6Simulation(collections.UserDict):
         d["solutiongroups"] = [solutiongroups]
         return self._template.render(d)
 
-    def write(self, directory=".", binary=True, validate=True):
+    def write(self, directory=".", binary=True, validate: bool = True):
         # Check models for required content
         for key, model in self.items():
             # skip timedis, exchanges

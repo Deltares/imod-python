@@ -108,7 +108,7 @@ class Buoyancy(Package):
         species: Sequence[str],
         hhformulation_rhs: bool = False,
         densityfile: str = None,
-        validate=True,
+        validate: bool = True,
     ):
         super().__init__(locals())
         self.dataset["reference_density"] = reference_density
@@ -121,10 +121,8 @@ class Buoyancy(Package):
         self.dataset["species"] = assign_index(species)
         self.dataset["hhformulation_rhs"] = hhformulation_rhs
         self.dataset["densityfile"] = densityfile
-
         self.dependencies = []
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
         ds = self.dataset

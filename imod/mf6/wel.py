@@ -81,7 +81,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
-        validate=True,
+        validate: bool = True,
     ):
         super().__init__()
         self.dataset["layer"] = self.assign_dims(layer)
@@ -98,8 +98,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
             self.add_periodic_auxiliary_variable()
 
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)
 
 
 class WellDisVertices(DisVerticesBoundaryCondition):
@@ -170,7 +169,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
-        validate=True,
+        validate: bool = True,
     ):
         super().__init__()
         self.dataset["layer"] = self.assign_dims(layer)
@@ -186,5 +185,4 @@ class WellDisVertices(DisVerticesBoundaryCondition):
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
             self.add_periodic_auxiliary_variable()
 
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)

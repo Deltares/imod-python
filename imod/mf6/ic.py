@@ -58,7 +58,7 @@ class InitialConditions(Package):
     _keyword_map = {"start": "strt"}
     _template = Package._initialize_template(_pkg_id)
 
-    def __init__(self, start=None, head=None, validate=True):
+    def __init__(self, start=None, head=None, validate: bool = True):
 
         super().__init__(locals())
         if start is None:
@@ -74,9 +74,7 @@ class InitialConditions(Package):
                 raise ValueError("start and head arguments cannot both be defined")
 
         self.dataset["start"] = start
-
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

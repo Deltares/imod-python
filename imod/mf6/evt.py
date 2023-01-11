@@ -1,7 +1,7 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition
-from imod.mf6.validation import BC_DIMS_SCHEMA
+from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -76,31 +76,31 @@ class Evapotranspiration(BoundaryCondition):
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
-            BC_DIMS_SCHEMA,
+            BOUNDARY_DIMS_SCHEMA,
         ],
         "rate": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
-            BC_DIMS_SCHEMA,
+            BOUNDARY_DIMS_SCHEMA,
         ],
         "depth": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
-            BC_DIMS_SCHEMA,
+            BOUNDARY_DIMS_SCHEMA,
         ],
         "proportion_rate": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
-            BC_DIMS_SCHEMA,
+            BOUNDARY_DIMS_SCHEMA,
         ],
         "proportion_depth": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
-            BC_DIMS_SCHEMA,
+            BOUNDARY_DIMS_SCHEMA,
         ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
@@ -136,7 +136,7 @@ class Evapotranspiration(BoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
-        validate=True,
+        validate: bool = True,
     ):
         super().__init__(locals())
         self.dataset["surface"] = surface
@@ -158,9 +158,7 @@ class Evapotranspiration(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
-
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)
 
         # TODO: add write logic for transforming proportion rate and depth to
         # the right shape in the binary file.

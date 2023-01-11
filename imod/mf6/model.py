@@ -161,7 +161,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             message = validation_model_error_message(errors)
             raise ValidationError(message)
 
-    def write(self, directory, modelname, globaltimes, binary=True, validate=True):
+    def write(
+        self, directory, modelname, globaltimes, binary=True, validate: bool = True
+    ):
         """
         Write model namefile
         Write packages
@@ -169,9 +171,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         workdir = pathlib.Path(directory)
         modeldirectory = workdir / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
-
-        if validate:
-            self._validate()
+        self._validate_init_schemata(validate)
 
         # write model namefile
         namefile_content = self.render(modelname)

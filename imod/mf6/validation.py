@@ -8,7 +8,6 @@ import xugrid as xu
 
 from imod.schemata import DimsSchema, NoDataComparisonSchema, ValidationError
 
-# %% Template schemata to avoid code duplication
 PKG_DIMS_SCHEMA = (
     DimsSchema("layer", "y", "x")
     | DimsSchema("layer", "{face_dim}")
@@ -16,13 +15,12 @@ PKG_DIMS_SCHEMA = (
     | DimsSchema()
 )
 
-BC_DIMS_SCHEMA = (
+BOUNDARY_DIMS_SCHEMA = (
     DimsSchema("time", "layer", "y", "x")
     | DimsSchema("layer", "y", "x")
     | DimsSchema("time", "layer", "{face_dim}")
     | DimsSchema("layer", "{face_dim}")
-    # Layer dim not necessary, as long as there is a layer coordinate
-    # present
+    # Layer dim not necessary, as long as there is a layer coordinate present.
     | DimsSchema("time", "y", "x")
     | DimsSchema("y", "x")
     | DimsSchema("time", "{face_dim}")
@@ -34,8 +32,7 @@ CONC_DIMS_SCHEMA = (
     | DimsSchema("species", "layer", "y", "x")
     | DimsSchema("species", "time", "layer", "{face_dim}")
     | DimsSchema("species", "layer", "{face_dim}")
-    # Layer dim not necessary, as long as there is a layer coordinate
-    # present
+    # Layer dim not necessary, as long as there is a layer coordinate present.
     | DimsSchema("species", "time", "y", "x")
     | DimsSchema("species", "y", "x")
     | DimsSchema("species", "time", "{face_dim}")
@@ -43,7 +40,6 @@ CONC_DIMS_SCHEMA = (
 )
 
 
-# %% Custom schemata for Modflow 6
 class DisBottomSchema(NoDataComparisonSchema):
     """
     Custom schema for the bottoms as these require some additional logic,
@@ -70,16 +66,11 @@ class DisBottomSchema(NoDataComparisonSchema):
 
             # To compute thicknesses properly, Modflow 6 requires bottom data in the
             # layer above the active cell in question.
-            overlaying_top_inactive = np.isnan(
-                bottom.shift(
-                    layer=1, fill_value=9999.0
-                )  # use fill_value to make layer 1 not nan
-            )
+            overlaying_top_inactive = np.isnan(bottom).shift(layer=1, fill_value=False)
             if (overlaying_top_inactive & active).any():
                 raise ValidationError("inactive bottom above active cell")
 
 
-# %% Custom utility functions
 def validation_model_error_message(model_errors):
     messages = []
     for name, pkg_errors in model_errors.items():

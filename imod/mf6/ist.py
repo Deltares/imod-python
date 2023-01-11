@@ -249,6 +249,4 @@ class ImmobileStorageTransfer(Package):
         self.dataset["width"] = width
         self.dataset["digits"] = digits
         self.dataset["format"] = format
-
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)

@@ -79,14 +79,12 @@ class StructuredDiscretization(Package):
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
 
-    def __init__(self, top, bottom, idomain, validate=True):
+    def __init__(self, top, bottom, idomain, validate: bool = True):
         super(__class__, self).__init__(locals())
         self.dataset["idomain"] = idomain
         self.dataset["top"] = top
         self.dataset["bottom"] = bottom
-
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)
 
     def _delrc(self, dx):
         """

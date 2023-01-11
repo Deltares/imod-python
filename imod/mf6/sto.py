@@ -100,7 +100,12 @@ class SpecificStorage(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(
-        self, specific_storage, specific_yield, transient, convertible, validate=True
+        self,
+        specific_storage,
+        specific_yield,
+        transient,
+        convertible,
+        validate: bool = True,
     ):
         super().__init__(locals())
         self.dataset["specific_storage"] = specific_storage
@@ -108,8 +113,7 @@ class SpecificStorage(Package):
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
 
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
@@ -229,16 +233,19 @@ class StorageCoefficient(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(
-        self, storage_coefficient, specific_yield, transient, convertible, validate=True
+        self,
+        storage_coefficient,
+        specific_yield,
+        transient,
+        convertible,
+        validate: bool = True,
     ):
         super().__init__(locals())
         self.dataset["storage_coefficient"] = storage_coefficient
         self.dataset["specific_yield"] = specific_yield
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
-
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}

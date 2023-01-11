@@ -1,8 +1,6 @@
 import abc
-import dataclasses
 import math
 import numbers
-import operator
 import pathlib
 from collections import defaultdict
 from typing import Dict, List
@@ -411,6 +409,21 @@ class Package(abc.ABC):
                         errors[variable].append(e)
         return errors
 
+    def _validate_init_schemata(self, validate: bool):
+        """
+        Run the "cheap" schema validations.
+
+        The expensive validations are run during writing. Some are only
+        available then: e.g. idomain to determine active part of domain.
+        """
+        if not validate:
+            return
+        errors = self._validate(self._init_schemata)
+        if len(errors) > 0:
+            message = validation_pkg_error_message(errors)
+            raise ValidationError(message)
+        return
+
     def _netcdf_path(self, directory, pkgname):
         """create path for netcdf, this function is also used to create paths to use inside the qgis projectfiles"""
         return directory / pkgname / f"{self._pkg_id}.nc"
@@ -474,45 +487,6 @@ class Package(abc.ABC):
                 variables.append(var)
 
         return variables
-
-    def _check_range(self):
-        """
-        Check if variables are within the appropriate range.
-        First check all variables construct an error message with all the erronous , raise error.
-        """
-        variables = self._get_vars_to_check()
-        pkgname = self.__class__.__name__
-
-        range_operators = {
-            "not_less_than": (operator.lt, "less than"),
-            "not_less_equal_than": (operator.le, "less or equal than"),
-            "not_greater_than": (operator.gt, "greater than"),
-            "not_greater_equal_than": (operator.ge, "greater or equal than"),
-        }
-
-        raise_error = False
-        msg = f"Detected incorrect values in {pkgname}: \n"
-
-        for varname in variables:
-            var_metadata_dict = dataclasses.asdict(self._metadata_dict[varname])
-
-            for key, (operator_func, msg_operator) in range_operators.items():
-                bound = var_metadata_dict[key]
-
-                if (bound is not None) and (
-                    operator_func(self.dataset[varname], bound).any()
-                ):
-                    raise_error = True
-                    msg += f"- {varname} in {pkgname}: values {msg_operator} {bound} detected. \n"
-
-        if raise_error:
-            raise ValueError(msg)
-
-    def _validate_at_init(self):
-        errors = self._validate(self._init_schemata)
-        if len(errors) > 0:
-            message = validation_pkg_error_message(errors)
-            raise ValidationError(message)
 
     def period_data(self):
         result = []

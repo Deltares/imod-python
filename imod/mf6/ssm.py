@@ -57,8 +57,7 @@ class SourceSinkMixing(BoundaryCondition):
         )
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
-
-        self._validate_at_init()
+        self._validate_init_schemata()
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {

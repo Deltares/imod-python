@@ -105,7 +105,7 @@ class MobileStorageTransfer(Package):
         save_flows=False,
         decay_order: string = "first",
         sorption=None,
-        validate=True,
+        validate: bool = True,
     ):
         super().__init__(locals())
         self.dataset["porosity"] = porosity
@@ -125,5 +125,4 @@ class MobileStorageTransfer(Package):
         if sorption is not None:
             self.dataset["sorption"] = sorption
 
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)

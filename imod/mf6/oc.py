@@ -73,7 +73,7 @@ class OutputControl(Package):
         save_head=None,
         save_budget=None,
         save_concentration=None,
-        validate=True,
+        validate: bool = True,
     ):
         super().__init__()
         if save_head is not None and save_concentration is not None:
@@ -81,9 +81,7 @@ class OutputControl(Package):
         self.dataset["save_head"] = save_head
         self.dataset["save_concentration"] = save_concentration
         self.dataset["save_budget"] = save_budget
-
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)
 
     def _get_ocsetting(self, setting):
         """Get oc setting based on its type. If integers return f'frequency {setting}', if"""

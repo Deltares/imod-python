@@ -143,7 +143,7 @@ class Dispersion(Package):
         transversal_vertical=None,
         xt3d_off=False,
         xt3d_rhs=False,
-        validate=True,
+        validate: bool = True,
     ):
         super().__init__(locals())
         self.dataset["xt3d_off"] = xt3d_off
@@ -154,6 +154,4 @@ class Dispersion(Package):
         self.dataset["longitudinal_vertical"] = longitudinal_vertical
         self.dataset["transversal_horizontal2"] = transversal_horizontal2
         self.dataset["transversal_vertical"] = transversal_vertical
-
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)

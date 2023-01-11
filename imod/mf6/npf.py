@@ -306,7 +306,7 @@ class NodePropertyFlow(Package):
         dewatered=False,
         perched=False,
         save_specific_discharge=False,
-        validate=True,
+        validate: bool = True,
     ):
         super().__init__(locals())
         # check rewetting
@@ -346,6 +346,4 @@ class NodePropertyFlow(Package):
         self.dataset["dewatered"] = dewatered
         self.dataset["perched"] = perched
         self.dataset["save_specific_discharge"] = save_specific_discharge
-
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)

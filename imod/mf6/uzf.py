@@ -2,7 +2,7 @@ import numpy as np
 import xarray as xr
 
 from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition
-from imod.mf6.validation import BC_DIMS_SCHEMA
+from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
@@ -119,53 +119,53 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
     _init_schemata = {
         "surface_depression_depth": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA,
+            BOUNDARY_DIMS_SCHEMA,
         ],
         "kv_sat": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
-            BC_DIMS_SCHEMA,
+            BOUNDARY_DIMS_SCHEMA,
         ],
         "theta_res": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA,
+            BOUNDARY_DIMS_SCHEMA,
         ],
         "theta_sat": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA,
+            BOUNDARY_DIMS_SCHEMA,
         ],
         "theta_init": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA,
+            BOUNDARY_DIMS_SCHEMA,
         ],
         "epsilon": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA,
+            BOUNDARY_DIMS_SCHEMA,
         ],
         "infiltration_rate": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA,
+            BOUNDARY_DIMS_SCHEMA,
         ],
         "et_pot": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA | DimsSchema(),  # optional var
+            BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
         ],
         "extinction_depth": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA | DimsSchema(),  # optional var
+            BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
         ],
         "extinction_theta": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA | DimsSchema(),  # optional var
+            BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
         ],
         "root_potential": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA | DimsSchema(),  # optional var
+            BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
         ],
         "root_activity": [
             DTypeSchema(np.floating),
-            BC_DIMS_SCHEMA | DimsSchema(),  # optional var
+            BOUNDARY_DIMS_SCHEMA | DimsSchema(),  # optional var
         ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
@@ -227,7 +227,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         observations=None,
         water_mover=None,
         timeseries=None,
-        validate=True,
+        validate: bool = True,
     ):
         super().__init__(locals())
         # Package data
@@ -273,14 +273,11 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         # Additonal indices for Packagedata
         self.dataset["landflag"] = self._determine_landflag(kv_sat)
-
         self.dataset["iuzno"] = self._create_uzf_numbers(self["landflag"])
         self.dataset["iuzno"].name = "uzf_number"
-
         self.dataset["ivertcon"] = self._determine_vertical_connection(self["iuzno"])
 
-        if validate:
-            self._validate_at_init()
+        self._validate_init_schemata(validate)
 
     def fill_stress_perioddata(self):
         """Modflow6 requires something to be filled in the stress perioddata,

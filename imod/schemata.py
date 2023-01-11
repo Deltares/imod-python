@@ -229,7 +229,7 @@ class IndexesSchema(BaseSchema):
 class ShapeSchema(BaseSchema):
     def __init__(self, shape: ShapeT) -> None:
         """
-        Validate shape
+        Validate shape.
 
         Parameters
         ----------
@@ -253,7 +253,7 @@ class ShapeSchema(BaseSchema):
 
 class CoordsSchema(BaseSchema):
     """
-    Validate coords
+    Validate presence of coords.
 
     Parameters
     ----------
@@ -291,6 +291,10 @@ class CoordsSchema(BaseSchema):
 
 
 class OtherCoordsSchema(BaseSchema):
+    """
+    Validate whether coordinates match those of other.
+    """
+
     def __init__(
         self,
         other: str,
@@ -312,6 +316,10 @@ class OtherCoordsSchema(BaseSchema):
 
 
 class ValueSchema(BaseSchema, abc.ABC):
+    """
+    Base class for AllValueSchema or AnyValueSchema.
+    """
+
     def __init__(
         self,
         operator: str,
@@ -323,6 +331,14 @@ class ValueSchema(BaseSchema, abc.ABC):
 
 
 class AllValueSchema(ValueSchema):
+    """
+    Validate whether all values pass a condition.
+
+    E.g. if operator is ">":
+
+    assert (values > threshold).all()
+    """
+
     def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
         if isinstance(self.other, str):
             other_obj = kwargs[self.other]
@@ -343,6 +359,14 @@ class AllValueSchema(ValueSchema):
 
 
 class AnyValueSchema(ValueSchema):
+    """
+    Validate whether any value passes a condition.
+
+    E.g. if operator is ">":
+
+    assert (values > threshold).any()
+    """
+
     def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
         if isinstance(self.other, str):
             other_obj = kwargs[self.other]
@@ -386,6 +410,10 @@ class NoDataSchema(BaseSchema):
 
 
 class AllNoDataSchema(NoDataSchema):
+    """
+    Fails when all data is NoData.
+    """
+
     def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
         valid = self.is_notnull(obj)
         if ~valid.any():
@@ -393,6 +421,10 @@ class AllNoDataSchema(NoDataSchema):
 
 
 class NoDataComparisonSchema(BaseSchema):
+    """
+    Base class for IdentityNoDataSchema and AllInsideNoDataSchema.
+    """
+
     def __init__(
         self,
         other: str,
@@ -438,7 +470,7 @@ class IdentityNoDataSchema(NoDataComparisonSchema):
 
 class AllInsideNoDataSchema(NoDataComparisonSchema):
     """
-    Checks that that notnull values all occur within other.
+    Checks that all notnull values all occur within the notnull values of other.
     """
 
     def validate(self, obj: Union[xr.DataArray, xu.UgridDataArray], **kwargs):
@@ -474,7 +506,8 @@ class ActiveCellsConnectedSchema(BaseSchema):
 
     def validate(self, obj: xr.DataArray, **kwargs):
         if isinstance(obj, xu.UgridDataArray):
-            raise TypeError(
+            # TODO: https://deltares.github.io/xugrid/api/xugrid.UgridDataArrayAccessor.connected_components.html
+            raise NotImplementedError(
                 f"Schema {self.__name__} only works for structured grids, received xu.UgridDataArray."
             )
 
