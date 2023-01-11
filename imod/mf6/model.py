@@ -171,7 +171,8 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         workdir = pathlib.Path(directory)
         modeldirectory = workdir / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
-        self._validate_init_schemata(validate)
+        if validate:
+            self._validate()
 
         # write model namefile
         namefile_content = self.render(modelname)
