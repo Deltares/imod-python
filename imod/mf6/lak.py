@@ -340,34 +340,6 @@ def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
     return out
 
 
-def create_timeseries(list_of_lakes_or_outlets, ts_times, timeseries_name):
-    """
-    In this function we create a dataarray with a given time coorridnate axis. We add all
-    the timeseries of lakes or outlets with the given name. We also create a dimension to
-    specify the lake or outlet number.
-    """
-    if not any(
-        lake_or_outlet.has_transient_data(timeseries_name)
-        for lake_or_outlet in list_of_lakes_or_outlets
-    ):
-        return None
-
-    object_numbers = []
-    for lake_or_outlet in list_of_lakes_or_outlets:
-        object_numbers.append(lake_or_outlet.object_number)
-
-    dataarray = xr.DataArray(
-        dims=("time", "index"),
-        coords={"time": ts_times, "index": object_numbers},
-        name=timeseries_name,
-    )
-    for lake_or_outlet in list_of_lakes_or_outlets:
-        dataarray = lake_or_outlet.add_timeseries_to_dataarray(
-            timeseries_name, dataarray
-        )
-    return dataarray
-
-
 class Lake(BoundaryCondition):
     """
     Lake (LAK) Package.
