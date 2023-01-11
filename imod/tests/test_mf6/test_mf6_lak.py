@@ -530,8 +530,8 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
 
         begin outlets
         1 2 manning 0.0 3 2 4
-        2 1 specified    
-        2 1 weir 0.0  0.0 
+        2 1 specified
+        2 1 weir 0.0  0.0
         end outlets
 
 

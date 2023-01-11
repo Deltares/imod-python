@@ -429,13 +429,15 @@ class Package(PackageBase, abc.ABC):
         self, f, dataframe: pd.DataFrame, title: str, index: bool = False
     ) -> None:
         f.write(f"begin {title}\n")
-        dataframe.to_csv(
-            f,
+        block = dataframe.to_csv(
             index=index,
             header=False,
             sep=" ",
             line_terminator="\n",
         )
+        trimmedblocklist = [line.strip() for line in block.splitlines()]
+        trimmedblock = "\n".join(map(str, trimmedblocklist)) + "\n"
+        f.write(trimmedblock)
         f.write(f"end {title}\n")
         return
 
