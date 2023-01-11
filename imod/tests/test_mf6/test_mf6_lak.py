@@ -706,6 +706,6 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
           2  rainfall 5.0
           1  invert 3.0
         end period
-        """
+    """
     )
     assert actual == expected
