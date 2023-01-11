@@ -17,6 +17,9 @@ def _interpolate_value_boundaries_z1d(values, z, dz, threshold, out):
                 if (n % 2 == 0 and values[k, i, j] >= threshold) or (
                     n % 2 == 1 and values[k, i, j] <= threshold
                 ):  # exceeding (n even) or falling below threshold (n odd)
+                    if values[k, i, j] == values[k - 1, i, j]:
+                        # edge case: subsequent values equal threshold result in ZeroDivisionError
+                        continue
                     if not np.isnan(values[k - 1, i, j]):
                         # interpolate z coord of threshold
                         out[n, i, j] = z[k - 1] + (threshold - values[k - 1, i, j]) * (
@@ -42,6 +45,9 @@ def _interpolate_value_boundaries_z3d(values, z, dz, threshold, out):
                 if (n % 2 == 0 and values[k, i, j] >= threshold) or (
                     n % 2 == 1 and values[k, i, j] <= threshold
                 ):  # exceeding (n even) or falling below threshold (n odd)
+                    if values[k, i, j] == values[k - 1, i, j]:
+                        # edge case: subsequent values equal threshold result in ZeroDivisionError
+                        continue
                     if not np.isnan(values[k - 1, i, j]):
                         # interpolate z coord of threshold
                         out[n, i, j] = z[k - 1, i, j] + (
@@ -69,6 +75,10 @@ def _interpolate_value_boundaries_z3ddz1d(values, z, dz, threshold, out):
                 if (n % 2 == 0 and values[k, i, j] >= threshold) or (
                     n % 2 == 1 and values[k, i, j] <= threshold
                 ):  # exceeding (n even) or falling below threshold (n odd)
+                    # if (values[k, i, j] == threshold) and (values[k - 1, i, j] == threshold):
+                    if values[k, i, j] == values[k - 1, i, j]:
+                        # edge case: subsequent values equal threshold result in ZeroDivisionError
+                        continue
                     if not np.isnan(values[k - 1, i, j]):
                         # interpolate z coord of threshold
                         out[n, i, j] = z[k - 1, i, j] + (
@@ -111,18 +121,25 @@ def interpolate_value_boundaries(values, z, threshold):
 
     values = values.load()
     out = xr.full_like(values, np.nan)
+    # if z.dz is a scalar, conform to z
+    # TODO: broadcast dz to z, so _interpolate_value_boundaries_z3ddz1d is superfluous?
+    if len(z.dz.dims) == 0:
+        dz = np.ones_like(z) * z.dz.values
+    else:
+        dz = z.dz.values
+
     if len(z.dims) == 1:
         _interpolate_value_boundaries_z1d(
-            values.values, z.values, z.dz.values, threshold, out.values
+            values.values, z.values, dz, threshold, out.values
         )
     else:
-        if len(z.dz.dims) == 1:
+        if len(z.dz.dims) <= 1:
             _interpolate_value_boundaries_z3ddz1d(
-                values.values, z.values, z.dz.values, threshold, out.values
+                values.values, z.values, dz, threshold, out.values
             )
         else:
             _interpolate_value_boundaries_z3d(
-                values.values, z.values, z.dz.values, threshold, out.values
+                values.values, z.values, dz, threshold, out.values
             )
     out = out.rename({"layer": "boundary"})
     out = out.dropna(dim="boundary", how="all")

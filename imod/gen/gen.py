@@ -106,7 +106,7 @@ def to_circle(geometry: Polygon) -> Tuple[np.ndarray, int]:
 
 
 def to_rectangle(geometry: Polygon) -> Tuple[np.ndarray, int]:
-    xy = np.array(geometry.exterior)
+    xy = np.array(geometry.exterior.coords)
     if (geometry.area / geometry.minimum_rotated_rectangle.area) < 0.999:
         raise ValueError("Feature_type is rectangle, but geometry is not a rectangular")
     # First and third vertex will give (left, right) and (lower, upper)
@@ -114,16 +114,16 @@ def to_rectangle(geometry: Polygon) -> Tuple[np.ndarray, int]:
 
 
 def to_polygon(geometry: Polygon) -> Tuple[np.ndarray, int]:
-    xy = np.array(geometry.exterior)
+    xy = np.array(geometry.exterior.coords)
     return xy, xy.shape[0]
 
 
 def to_point(geometry: Point) -> Tuple[np.ndarray, int]:
-    return np.array(geometry), 1
+    return np.array(geometry.coords), 1
 
 
 def to_line(geometry: LineString) -> Tuple[np.ndarray, int]:
-    xy = np.array(geometry)
+    xy = np.array(geometry.coords)
     return xy, xy.shape[0]
 
 
