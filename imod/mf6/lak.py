@@ -255,7 +255,7 @@ def create_connection_data(lakes):
 
         # Offset by one since MODFLOW is 1-based!
         cell_id = xr.DataArray(
-            data=indices+1,
+            data=indices + 1,
             coords={"celldim": list(xr_indices.keys())},
             dims=("boundary", "celldim"),
         )
