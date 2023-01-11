@@ -109,10 +109,10 @@ def test_wrong_dim():
         """
         * icelltype
         \t- No option succeeded:
-        \tdim mismatch: tested for ('layer', 'y', 'x'), got ('time', 'layer')
-        \tdim mismatch: tested for ('layer', '{face_dim}'), got ('time', 'layer')
-        \tdim mismatch: tested for ('layer',), got ('time', 'layer')
-        \tdim mismatch: tested for (), got ('time', 'layer')"""
+        \tdim mismatch: expected ('layer', 'y', 'x'), got ('time', 'layer')
+        \tdim mismatch: expected ('layer', '{face_dim}'), got ('time', 'layer')
+        \tdim mismatch: expected ('layer',), got ('time', 'layer')
+        \tdim mismatch: expected (), got ('time', 'layer')"""
     )
 
     with pytest.raises(ValidationError, match=re.escape(message)):

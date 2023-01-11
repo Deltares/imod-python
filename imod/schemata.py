@@ -188,7 +188,7 @@ class DimsSchema(BaseSchema):
         different_dims = set(actual) ^ set(expected)
 
         if len(different_dims) != 0:
-            raise ValidationError(f"dim mismatch: tested for {expected}, got {actual}")
+            raise ValidationError(f"dim mismatch: expected {expected}, got {actual}")
 
 
 class IndexesSchema(BaseSchema):
