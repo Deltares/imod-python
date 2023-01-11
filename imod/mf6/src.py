@@ -1,6 +1,14 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, Package, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition, Package
+from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
+from imod.schemata import (
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
+    DTypeSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
+)
 
 
 class MassSourceLoading(BoundaryCondition):
@@ -31,6 +39,10 @@ class MassSourceLoading(BoundaryCondition):
         Default is False.
     observations: [Not yet supported.]
         Default is None.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "src"
@@ -38,8 +50,20 @@ class MassSourceLoading(BoundaryCondition):
     _period_data = ("rate",)
     _keyword_map = {}
 
-    _metadata_dict = {
-        "rate": VariableMetaData(np.floating),
+    _init_schemata = {
+        "rate": (
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            BOUNDARY_DIMS_SCHEMA,
+        )
+    }
+
+    _write_schemata = {
+        "rate": [
+            OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
     }
 
     def __init__(
@@ -49,6 +73,7 @@ class MassSourceLoading(BoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
+        validate: bool = True,
     ):
         super().__init__()
         self.dataset["rate"] = rate
@@ -56,4 +81,4 @@ class MassSourceLoading(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
-        self._pkgcheck()
+        self._validate_init_schemata(validate)

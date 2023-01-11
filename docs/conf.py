@@ -138,6 +138,10 @@ html_theme_options = {
             "type": "fontawesome",
         },
     ],
+    "logo": {
+        "image_light": "imod-python-logo.svg",
+        "image_dark": "imod-python-logo.svg",
+    },
 }
 
 # Custom sidebar templates, must be a dictionary that maps document names

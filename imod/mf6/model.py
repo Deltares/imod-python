@@ -1,12 +1,15 @@
 import abc
 import collections
 import pathlib
+from copy import deepcopy
 
 import cftime
 import jinja2
 import numpy as np
 
 from imod.mf6 import qgs_util
+from imod.mf6.validation import validation_model_error_message
+from imod.schemata import ValidationError
 
 
 class Modflow6Model(collections.UserDict, abc.ABC):
@@ -14,11 +17,12 @@ class Modflow6Model(collections.UserDict, abc.ABC):
     _pkg_id = "model"
 
     def __setitem__(self, key, value):
-        # TODO: Add packagecheck
         if len(key) > 16:
             raise KeyError(
-                "MODFLOW6 does not support package names longer than 16 characters."
+                f"Received key with more than 16 characters: '{key}'"
+                "Modflow 6 has a character limit of 16."
             )
+
         super().__setitem__(key, value)
 
     def update(self, *args, **kwargs):
@@ -29,6 +33,22 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         self._template = env.get_template(name)
+
+    def _get_diskey(self):
+        dis_pkg_ids = ["dis", "disv", "disu"]
+
+        diskeys = [
+            self._get_pkgkey(pkg_id)
+            for pkg_id in dis_pkg_ids
+            if self._get_pkgkey(pkg_id) is not None
+        ]
+
+        if len(diskeys) > 1:
+            raise ValueError(f"Found multiple discretizations {diskeys}")
+        elif len(diskeys) == 0:
+            raise ValueError("No model discretization found")
+        else:
+            return diskeys[0]
 
     def _get_pkgkey(self, pkg_id):
         """
@@ -102,7 +122,48 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         d["packages"] = packages
         return self._template.render(d)
 
-    def write(self, directory, modelname, globaltimes, binary=True):
+    def _model_checks(self, modelkey: str):
+        """
+        Check model integrity (called before writing)
+        """
+
+        self._check_for_required_packages(modelkey)
+
+    def _validate(self) -> None:
+        diskey = self._get_diskey()
+        dis = self[diskey]
+        # We'll use the idomain for checking dims, shape, nodata.
+        idomain = dis["idomain"]
+        bottom = dis["bottom"]
+
+        errors = {}
+        for pkgname, pkg in self.items():
+            # Check for all schemata when writing. Types and dimensions
+            # may have been changed after initialization...
+
+            if pkgname in ["adv"]:
+                continue  # some packages can be skipped
+
+            # Concatenate write and init schemata.
+            schemata = deepcopy(pkg._init_schemata)
+            for key, value in pkg._write_schemata.items():
+                schemata[key] += value
+
+            pkg_errors = pkg._validate(
+                schemata=schemata,
+                idomain=idomain,
+                bottom=bottom,
+            )
+            if len(pkg_errors) > 0:
+                errors[pkgname] = pkg_errors
+
+        if len(errors) > 0:
+            message = validation_model_error_message(errors)
+            raise ValidationError(message)
+
+    def write(
+        self, directory, modelname, globaltimes, binary=True, validate: bool = True
+    ):
         """
         Write model namefile
         Write packages
@@ -110,6 +171,8 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         workdir = pathlib.Path(directory)
         modeldirectory = workdir / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
+        if validate:
+            self._validate()
 
         # write model namefile
         namefile_content = self.render(modelname)

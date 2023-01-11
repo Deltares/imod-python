@@ -102,7 +102,7 @@ dx = 10.0
 xmin = 0.0
 xmax = dx * ncol
 layer = [1]
-y = [0.5, 1.5]
+y = [1.5, 0.5]
 x = np.arange(xmin, xmax, dx) + 0.5 * dx
 
 grid_dims = ("layer", "y", "x")

@@ -1,6 +1,13 @@
 import numpy as np
 
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
+from imod.mf6.validation import PKG_DIMS_SCHEMA
+from imod.schemata import (
+    AllValueSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+)
 
 
 class ImmobileStorageTransfer(Package):
@@ -84,6 +91,10 @@ class ImmobileStorageTransfer(Package):
         number of digits to use for writing a number.
     format: (str, optional) default exponential
         One of {"exponential", "fixed", "general", "scientific"}.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "ist"
@@ -98,15 +109,6 @@ class ImmobileStorageTransfer(Package):
         "distribution_coefficient": np.float64,
     }
 
-    _metadata_dict = {
-        "initial_immobile_concentration": VariableMetaData(np.floating),
-        "immobile_porosity": VariableMetaData(np.floating),
-        "mobile_immobile_mass_transfer_rate": VariableMetaData(np.floating),
-        "decay": VariableMetaData(np.floating),
-        "decay_sorbed": VariableMetaData(np.floating),
-        "bulk_density": VariableMetaData(np.floating),
-        "distribution_coefficient": VariableMetaData(np.floating),
-    }
     _keyword_map = {
         "initial_immobile_concentration": "cim",
         "immobile_porosity": "thetaim",
@@ -115,6 +117,71 @@ class ImmobileStorageTransfer(Package):
         "decay_sorbed": "decay_sorbed",
         "bulk_density": "bulk_density",
         "distribution_coefficient": "distcoef",
+    }
+
+    _init_schemata = {
+        "initial_immobile_concentration": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "immobile_porosity": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "mobile_immobile_mass_transfer_rate": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "decay": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "decay_sorbed": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "bulk_density": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "distribution_coefficient": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+    }
+
+    _write_schemata = {
+        "initial_immobile_concentration": [
+            AllValueSchema(">", 0.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
+        "immobile_porosity": [
+            AllValueSchema(">=", 0.0),
+            AllValueSchema("<", 1.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
+        "mobile_immobile_mass_transfer_rate": [
+            AllValueSchema(">=", 0.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
+        "decay": [IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))],
+        "decay_sorbed": [
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))
+        ],
+        "bulk_density": [
+            AllValueSchema(">", 0.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
+        "distribution_coefficient": [
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0))
+        ],
     }
 
     def __init__(
@@ -137,6 +204,7 @@ class ImmobileStorageTransfer(Package):
         width: int = 10,
         digits: int = 7,
         format: str = "EXPONENTIAL",
+        validate: bool = True,
     ):
 
         # is True fails on a np.bool_ True.
@@ -181,4 +249,4 @@ class ImmobileStorageTransfer(Package):
         self.dataset["width"] = width
         self.dataset["digits"] = digits
         self.dataset["format"] = format
-        self._pkgcheck()
+        self._validate_init_schemata(validate)

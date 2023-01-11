@@ -1,7 +1,17 @@
 import numpy as np
 
 import imod
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
+from imod.mf6.validation import DisBottomSchema
+from imod.schemata import (
+    ActiveCellsConnectedSchema,
+    AllValueSchema,
+    AnyValueSchema,
+    DimsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+)
 
 
 class StructuredDiscretization(Package):
@@ -28,25 +38,53 @@ class StructuredDiscretization(Package):
         exist in the simulation. Furthermore, the first existing cell above will
         be connected to the first existing cell below. This type of cell is
         referred to as a "vertical pass through" cell.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "dis"
-    _metadata_dict = {
-        "top": VariableMetaData(np.floating),
-        "bottom": VariableMetaData(np.floating),
-        "idomain": VariableMetaData(np.integer),
+    _init_schemata = {
+        "top": [
+            DTypeSchema(np.floating),
+            DimsSchema("y", "x") | DimsSchema(),
+            IndexesSchema(),
+        ],
+        "bottom": [
+            DTypeSchema(np.floating),
+            DimsSchema("layer", "y", "x") | DimsSchema("layer"),
+            IndexesSchema(),
+        ],
+        "idomain": [
+            DTypeSchema(np.integer),
+            DimsSchema("layer", "y", "x") | DimsSchema("layer"),
+            IndexesSchema(),
+        ],
     }
+    _write_schemata = {
+        "idomain": (
+            ActiveCellsConnectedSchema(is_notnull=(">", 0)),
+            AnyValueSchema(">", 0),
+        ),
+        "top": (
+            AllValueSchema(">", "bottom"),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            # No need to check coords: dataset ensures they align with idomain.
+        ),
+        "bottom": (DisBottomSchema(other="idomain"),),
+    }
+
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
 
-    def __init__(self, top, bottom, idomain):
+    def __init__(self, top, bottom, idomain, validate: bool = True):
         super(__class__, self).__init__(locals())
         self.dataset["idomain"] = idomain
         self.dataset["top"] = top
         self.dataset["bottom"] = bottom
-
-        self._pkgcheck()
+        self._validate_init_schemata(validate)
 
     def _delrc(self, dx):
         """
@@ -86,3 +124,10 @@ class StructuredDiscretization(Package):
         )
 
         return self._template.render(d)
+
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["bottom"] = self["bottom"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors

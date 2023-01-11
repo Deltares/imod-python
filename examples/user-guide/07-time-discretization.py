@@ -14,8 +14,16 @@ functionality is activated with the ``create_time_discretization()`` method.
 #
 # To demonstrate the ``create_time_discretization()`` method, we first have to
 # create a Model object. In this case we'll use a Modflow 6 simulation, but the
-# ``imod.wq.SeawatModel`` and imod.flow.ImodflowModel also support this. Wel'll
-# start off with the usual imports:
+# ``imod.wq.SeawatModel`` and imod.flow.ImodflowModel also support this.
+#
+# .. note::
+#
+#    The simulation created in this example misses some mandatory packes, so is
+#    not able to write a functional simulation. It is purely intended to describe
+#    the workings of the ``time_discretization`` method. For a fully functional
+#    Modflow 6 model, see the examples in :ref:`mf6-introduction`.
+#
+# Wel'll start off with the usual imports:
 
 import numpy as np
 import pandas as pd
@@ -62,10 +70,26 @@ simulation["time_discretization"].dataset["timestep_duration"]
 gwf_model = imod.mf6.GroundwaterFlowModel()
 
 # %%
+# We'll create a dummy grid, which is used to provide an appropriate grid to
+# the boundary condition packages.
+
+template_data = np.ones((2, 1, 2, 2))
+
+layer = [1]
+y = [1.5, 0.5]
+x = [0.5, 1.5]
+
+dims = ("time", "layer", "y", "x")
+
+# %%
 # Next, we can assign a Constant Head boundary with two timesteps:
 
 chd_times = pd.to_datetime(["2000-01-01", "2000-01-04"])
-chd_data = xr.DataArray(data=np.ones((2,)), dims=("time",), coords={"time": chd_times})
+chd_data = xr.DataArray(
+    data=template_data,
+    dims=dims,
+    coords={"time": chd_times, "layer": layer, "y": y, "x": x},
+)
 
 gwf_model["chd"] = imod.mf6.ConstantHead(head=chd_data)
 
@@ -76,7 +100,11 @@ gwf_model["chd"].dataset
 # the ConstantHead boundary:
 
 rch_times = pd.to_datetime(["2000-01-01", "2000-01-02"])
-rch_data = xr.DataArray(data=np.ones((2,)), dims=("time",), coords={"time": rch_times})
+rch_data = xr.DataArray(
+    data=template_data,
+    dims=dims,
+    coords={"time": rch_times, "layer": layer, "y": y, "x": x},
+)
 
 gwf_model["rch"] = imod.mf6.Recharge(rate=rch_data)
 

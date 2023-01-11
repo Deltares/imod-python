@@ -14,10 +14,10 @@ from imod.couplers.metamod.rch_svat_mapping import RechargeSvatMapping
 def test_simple_model(fixed_format_parser):
 
     x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
+    y = [3.0, 2.0, 1.0]
     subunit = [0, 1]
     dx = 1.0
-    dy = 1.0
+    dy = -1.0
     # fmt: off
     svat = xr.DataArray(
         np.array(
@@ -42,7 +42,7 @@ def test_simple_model(fixed_format_parser):
              [0.0, 0.0, 0.0]],
         ),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"layer": 1, "y": y, "x": x}
     )
 
     # fmt: on
@@ -67,10 +67,10 @@ def test_simple_model(fixed_format_parser):
 def test_simple_model_1_subunit(fixed_format_parser):
 
     x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
+    y = [3.0, 2.0, 1.0]
     subunit = [0]
     dx = 1.0
-    dy = 1.0
+    dy = -1.0
     # fmt: off
     svat = xr.DataArray(
         np.array(
@@ -91,7 +91,7 @@ def test_simple_model_1_subunit(fixed_format_parser):
              [0.0, 0.0, 0.0]],
         ),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"layer": 1, "y": y, "x": x}
     )
 
     # fmt: on
@@ -119,10 +119,10 @@ def test_simple_model_inactive_rch(fixed_format_parser):
     well. This changes the numbering of rch_id.
     """
     x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
+    y = [3.0, 2.0, 1.0]
     subunit = [0, 1]
     dx = 1.0
-    dy = 1.0
+    dy = -1.0
     # fmt: off
     svat = xr.DataArray(
         np.array(
@@ -148,7 +148,7 @@ def test_simple_model_inactive_rch(fixed_format_parser):
              [nan, 0.0, 0.0]],
         ),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"layer": 1, "y": y, "x": x}
     )
 
     # fmt: on
@@ -176,10 +176,10 @@ def test_simple_model_inactive_rch_error():
     should raise an error.
     """
     x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
+    y = [3.0, 2.0, 1.0]
     subunit = [0, 1]
     dx = 1.0
-    dy = 1.0
+    dy = -1.0
     # fmt: off
     svat = xr.DataArray(
         np.array(
@@ -204,7 +204,7 @@ def test_simple_model_inactive_rch_error():
              [nan, nan, 0.0]],
         ),
         dims=("y", "x"),
-        coords={"y": y, "x": x}
+        coords={"layer": 1, "y": y, "x": x}
     )
 
     # fmt: on
@@ -220,10 +220,10 @@ def test_simple_model_rch_time_error():
     time dimension, as mapping is constant in time.
     """
     x = [1.0, 2.0, 3.0]
-    y = [1.0, 2.0, 3.0]
+    y = [3.0, 2.0, 1.0]
     subunit = [0, 1]
     dx = 1.0
-    dy = 1.0
+    dy = -1.0
     # fmt: off
     svat = xr.DataArray(
         np.array(
@@ -250,7 +250,7 @@ def test_simple_model_rch_time_error():
             ]
         ),
         dims=("time", "y", "x"),
-        coords={"time": ["2000-01-01"], "y": y, "x": x}
+        coords={"time": ["2000-01-01"], "layer": 1, "y": y, "x": x}
     )
 
     # fmt: on

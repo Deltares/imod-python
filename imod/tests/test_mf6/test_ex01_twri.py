@@ -7,6 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 @pytest.mark.usefixtures("twri_model")
@@ -447,6 +448,36 @@ def test_simulation_write_storage(transient_twri_model, tmp_path):
     modeldir = tmp_path / "ex01-twri-transient"
     simulation.write(modeldir, binary=True)
     simulation.run()
+
+
+@pytest.mark.usefixtures("transient_twri_model")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
+def test_simulation_wrong_dtype(transient_twri_model, tmp_path):
+    simulation = transient_twri_model
+
+    # Make input in wrong dtype
+    simulation["GWF_1"]["rch"].dataset["rate"] = (
+        simulation["GWF_1"]["rch"].dataset["rate"].astype(np.int16)
+    )
+
+    modeldir = tmp_path / "ex01-twri-transient"
+
+    with pytest.raises(ValidationError):
+        simulation.write(modeldir, binary=True)
+
+
+@pytest.mark.usefixtures("transient_twri_model")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
+def test_simulation_validate_false(transient_twri_model, tmp_path):
+    simulation = transient_twri_model
+
+    # Make input in wrong dtype
+    simulation["GWF_1"]["rch"].dataset["rate"] = (
+        simulation["GWF_1"]["rch"].dataset["rate"].astype(np.int16)
+    )
+
+    modeldir = tmp_path / "ex01-twri-transient"
+    simulation.write(modeldir, binary=True, validate=False)
 
 
 @pytest.mark.usefixtures("twri_model")

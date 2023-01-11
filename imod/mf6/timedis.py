@@ -1,7 +1,8 @@
 import cftime
 import numpy as np
 
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
+from imod.schemata import DimsSchema, DTypeSchema
 
 
 def iso8601(datetime):
@@ -32,25 +33,39 @@ class TimeDiscretization(Package):
         a time step is calculated by multiplying the length of the previous time
         step by timestep_multiplier (TSMULT).
         Default value: 1.0
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "tdis"
     _keyword_map = {}
     _template = Package._initialize_template(_pkg_id)
 
-    _metadata_dict = {
-        "timestep_duration": VariableMetaData(np.floating),
-        "n_timesteps": VariableMetaData(np.integer),
-        "timestep_multiplier": VariableMetaData(np.floating),
+    _init_schemata = {
+        "timestep_duration": [DimsSchema("time"), DTypeSchema(np.floating)],
+        "n_timesteps": [DimsSchema("time") | DimsSchema(), DTypeSchema(np.integer)],
+        "timestep_multiplier": [
+            DimsSchema("time") | DimsSchema(),
+            DTypeSchema(np.floating),
+        ],
     }
 
-    def __init__(self, timestep_duration, n_timesteps=1, timestep_multiplier=1.0):
+    _write_schemata = {}
+
+    def __init__(
+        self,
+        timestep_duration,
+        n_timesteps=1,
+        timestep_multiplier=1.0,
+        validate: bool = True,
+    ):
         super().__init__()
         self.dataset["timestep_duration"] = timestep_duration
         self.dataset["n_timesteps"] = n_timesteps
         self.dataset["timestep_multiplier"] = timestep_multiplier
-
-        self._pkgcheck()
+        self._validate_init_schemata(validate)
 
     def render(self):
         start_date_time = iso8601(self.dataset["time"].values[0])
@@ -80,6 +95,24 @@ class TimeDiscretization(Package):
         d["perioddata"] = perioddata
 
         return self._template.render(d)
+
+    def _structured_grid_dim_check(self, da):
+        if da.ndim == 0:
+            return  # Scalar, no check necessary
+        elif da.ndim == 1:
+            if da.dims != ("time",):
+                raise ValueError(
+                    f"1D DataArray dims can only be ('time',). "
+                    f"Instead got {da.dims} for {da.name} in the "
+                    f"{self.__class__.__name__} package. "
+                )
+        else:
+            raise ValueError(
+                f"Exceeded accepted amount of dimensions for "
+                f"for {da.name} in the "
+                f"{self.__class__.__name__} package. "
+                f"Got {da.dims}. Can be at max ('time', )."
+            )
 
     def write(self, directory, name):
         timedis_content = self.render()

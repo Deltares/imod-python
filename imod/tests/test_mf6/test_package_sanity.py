@@ -41,6 +41,8 @@ PACKAGE_ATTRIBUTES = {
     "_template",
     "_keyword_map",
     "_metadata_dict",
+    "_init_schemata",
+    "_write_schemata",
     "_grid_data",
     "dataset",
 }
@@ -82,7 +84,7 @@ ALL_INSTANCES = [
         species=["salinity", "temperature"],
     ),
     imod.mf6.StructuredDiscretization(
-        get_darray(np.float32), get_darray(np.float32), get_darray(np.int32)
+        2.0, get_darray(np.float32), get_darray(np.int32)
     ),
     # TODO: VerticesDiscretization(),
     imod.mf6.Dispersion(1e-4, 10.0, 10.0, 5.0, 2.0, 4.0, False, True),

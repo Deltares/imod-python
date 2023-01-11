@@ -1,6 +1,17 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
+from imod.schemata import (
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
+    CoordsSchema,
+    DimsSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
+)
 
 
 class Evapotranspiration(BoundaryCondition):
@@ -53,16 +64,59 @@ class Evapotranspiration(BoundaryCondition):
         Default is False.
     observations: [Not yet supported.]
         Default is None.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "evt"
-    _metadata_dict = {
-        "surface": VariableMetaData(np.floating),
-        "rate": VariableMetaData(np.floating),
-        "depth": VariableMetaData(np.floating),
-        "proportion_depth": VariableMetaData(np.floating),
-        "proportion_rate": VariableMetaData(np.floating),
+    _init_schemata = {
+        "surface": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+        "rate": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+        "depth": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+        "proportion_rate": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+        "proportion_depth": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+        "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
+        "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
     }
+    _write_schemata = {
+        "surface": [
+            OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ],
+        "rate": [IdentityNoDataSchema("surface")],
+        "depth": [IdentityNoDataSchema("surface")],
+        "proportion_rate": [IdentityNoDataSchema("surface")],
+        "proportion_depth": [IdentityNoDataSchema("surface")],
+    }
+
     _period_data = ("surface", "rate", "depth", "proportion_depth", "proportion_rate")
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
@@ -82,6 +136,7 @@ class Evapotranspiration(BoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
+        validate: bool = True,
     ):
         super().__init__(locals())
         self.dataset["surface"] = surface
@@ -103,8 +158,14 @@ class Evapotranspiration(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
-
-        self._pkgcheck()
+        self._validate_init_schemata(validate)
 
         # TODO: add write logic for transforming proportion rate and depth to
         # the right shape in the binary file.
+
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["surface"] = self["surface"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors
