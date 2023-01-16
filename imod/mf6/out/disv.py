@@ -68,7 +68,7 @@ def read_grb(f: BinaryIO, ntxt: int, lentxt: int) -> Dict[str, Any]:
     grid = xu.Ugrid2d(vertices[:, 0], vertices[:, 1], -1, face_nodes)
     facedim = grid.face_dimension
 
-    top = xu.UgridDataArray(xr.DataArray(top_np, dims=[facedim], name="top"), grid)
+    top = xr.DataArray(top_np, dims=[facedim], name="top")
     coords = {"layer": np.arange(1, nlayer + 1)}
     dims = ("layer", facedim)
     bottom = xr.DataArray(bottom_np, coords, dims, name="bottom")
