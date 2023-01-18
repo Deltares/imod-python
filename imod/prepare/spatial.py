@@ -972,10 +972,10 @@ def zonal_aggregate_raster(
         of aggregation.
     column : str
         column name of path, integer IDs defining zones.
-    resolution : float
-        cellsize at which the rasterization of polygons and sampling occurs
     raster : xarray.DataArray
         Raster data from which to sample and aggregate data
+    resolution : float
+        cellsize at which the rasterization of polygons and sampling occurs
     method : Union[str, Callable]
         Aggregation method.
         Anything that is acceptable by a pandas groupby aggregate:
@@ -1050,15 +1050,15 @@ def zonal_aggregate_polygons(
         column name of path_a. Defines zones of aggregation.
     column_b : str
         column name of path_b. Data to aggregate.
+    like : xarray.DataArray with dims ("y", "x")
+        Example DataArray of where the cells will be located. Used only for its
+        x and y coordinates.
     resolution : float
         cellsize at which the rasterization, sampling, and area measurement occur.
     method: Union[str, Callable]
         Aggregation method.
         Anything that is acceptable by a pandas groupby aggregate:
         https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.DataFrameGroupBy.aggregate.html
-    like : xarray.DataArray with dims ("y", "x")
-        Example DataArray of where the cells will be located. Used only for its
-        x and y coordinates.
     chunksize : int, optional
         The size of the chunksize. Used for both x and y dimension.
 
