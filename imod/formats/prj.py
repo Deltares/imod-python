@@ -161,17 +161,26 @@ def tokenize(line: str) -> List[str]:
     return tokens
 
 
-def parse_blockheader(lines: List[str]) -> Tuple[int, str, bool, int, int]:
+def parse_blockheader(lines: List[str]) -> Tuple[int, str, bool]:
+    no_result = None, None, None
     line = next(lines)
+
+    # Skip if it's an empty line.
+    if len(line) == 0:
+        return no_result
+
     first = line[0].lower()
-    if first == "periods":
-        return 1, "periods", 1
-
-    n = int(first)
-    key = line[1].lower()
-    active = bool(line[2])
-
-    return n, key, active
+    if first in ("periods", "species"):
+        return 1, first, 1
+    # The line must contain atleast nper, key, active.
+    elif len(line) >= 3:
+        n = int(first)
+        key = line[1].lower()
+        active = bool(line[2])
+        return n, key, active
+    # It's a comment or something.
+    else:
+        return no_result
 
 
 def parse_time(lines: List[str]) -> str:
@@ -296,15 +305,15 @@ def parse_pcgblock(lines):
 
 
 def parse_periodsblock(lines):
-    if lines.finished:
-        return None
-
-    line = next(lines)
-    # TODO: How to terminate?
-    # This assumes it's the last block.
     periods = {}
     while not lines.finished:
-        alias = next(line[0])
+        line = next(lines)
+        # Stop if we encounter an empty line.
+        if len(line) == 0:
+            break
+        # Read the alias
+        alias = line[0]
+        # Now read the time associated with it.
         start = parse_time(lines)
         periods[alias] = start
     return periods
@@ -314,7 +323,13 @@ def parse_block(lines: LineInterator, content: Dict[str, Any]) -> None:
     """
     Mutates content dict.
     """
-    n, key, active = parse_blockheader(lines)
+    n = key = active = None
+
+    # A project file may contain any number of lines outside of a "topic"
+    # block. parse_blockheader will return triple None in that case.
+    while key is None and not lines.finished:
+        n, key, active = parse_blockheader(lines)
+
     if key in KEYS:
         if n != 1:
             raise ValueError(f"Expected N=1 for {key}, read: {n}")
@@ -392,16 +407,8 @@ def read(path: FilePath) -> Dict[str, Any]:
     with open(path) as f:
         lines = f.readlines()
 
-    line_tokens = []
-    for line in lines:
-        tokens = tokenize(line)
-        if tokens:
-            # Skip empty lines.
-            # TODO: The empty lines may be required to identify sections.
-            line_tokens.append(tokenize(line))
-
+    lines = LineInterator([tokenize(line) for line in lines])
     content = {}
-    lines = LineInterator(line_tokens)
     while not lines.finished:
         parse_block(lines, content)
 
