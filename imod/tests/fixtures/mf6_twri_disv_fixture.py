@@ -102,7 +102,7 @@ def make_twri_disv_model():
         print_flows=True,
         save_flows=True,
     )
-    gwf_model["ic"] = imod.mf6.InitialConditions(start=0.0)
+    gwf_model["ic"] = imod.mf6.InitialConditions(head=0.0)
     gwf_model["npf"] = imod.mf6.NodePropertyFlow(
         icelltype=icelltype,
         k=k,

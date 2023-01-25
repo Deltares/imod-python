@@ -24,7 +24,7 @@ def test_render():
         dewatered=True,
         perched=True,
         save_flows=True,
-        alternative_cell_averaging="AMT-HMK",
+        cell_averaging="AMT-HMK",
     )
     directory = pathlib.Path("mymodel")
     actual = npf.render(directory, "npf", None, True)

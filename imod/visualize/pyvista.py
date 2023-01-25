@@ -488,7 +488,7 @@ def grid_3d(
 
     grid = pv.UnstructuredGrid(cells, cell_type, points)
     grid.points[:, -1] *= vertical_exaggeration
-    grid.cell_data["values"] = values
+    grid.cell_arrays["values"] = values
 
     if return_index:
         return grid, indices
@@ -680,7 +680,7 @@ class StaticGridAnimation3D(GridAnimation3D):
         )
 
     def _update(self, da):
-        self.mesh.cell_data["values"] = da.values.ravel()[self.indices]
+        self.mesh.cell_arrays["values"] = da.values.ravel()[self.indices]
 
 
 def velocity_field(

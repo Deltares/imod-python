@@ -61,7 +61,7 @@ def make_coupled_mf6_model():
         save_flows=True,
     )
 
-    gwf_model["ic"] = mf6.InitialConditions(start=0.5)
+    gwf_model["ic"] = mf6.InitialConditions(head=0.5)
     gwf_model["sto"] = mf6.SpecificStorage(1e-3, 0.1, True, 0)
 
     recharge = xr.zeros_like(idomain.sel(layer=1), dtype=float)

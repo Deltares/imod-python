@@ -119,11 +119,11 @@ def _get_driver(path):
 def _limitations(riods, path):
     if riods.count != 1:
         raise NotImplementedError(
-            f"Cannot open multi-band grid: {path}. Try rioxarray.open_rasterio() instead."
+            f"Cannot open multi-band grid: {path}. Try xarray.open_rasterio() instead."
         )
     if not riods.transform.is_rectilinear:
         raise NotImplementedError(
-            f"Cannot open non-rectilinear grid: {path}. Try rioxarray.open_rasterio() instead."
+            f"Cannot open non-rectilinear grid: {path}. Try xarray.open_rasterio() instead."
         )
 
 
@@ -132,7 +132,7 @@ def header(path, pattern):
 
     # TODO:
     # Check bands, rotation, etc.
-    # Raise NotImplementedErrors and point to rioxarray.open_rasterio
+    # Raise NotImplementedErrors and point to xr.open_rasterio
     with rasterio.open(path, "r") as riods:
         _limitations(riods, path)
         attrs["nrow"] = riods.height

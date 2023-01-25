@@ -58,7 +58,7 @@ def test_stability_constraint_advection(test_da):
     dt_z = (test_da.T * np.array([0.3, 0.6, np.nan])).T.assign_coords(
         {"direction": "z"}
     )
-    dtref = (1 / (1 / dt_x + 1 / dt_y + 1 / dt_z)).drop_vars("direction")
+    dtref = (1 / (1 / dt_x + 1 / dt_y + 1 / dt_z)).drop("direction")
 
     assert dtref.round(5).equals(dt.round(5))
     assert dt_x.round(5).equals(dt_xyz.sel(direction="x").round(5))

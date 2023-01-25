@@ -23,7 +23,7 @@ def _cmapnorm_from_colorslevels(colors, levels):
                 autmatically add distinctive colors for pixels lower or high than the given
                 min respectively max level.
                 If LinearSegmentedColormap, you can use something like
-                `matplotlib.colormaps['jet']` as input. This function will not alter
+                `matplotlib.cm.get_cmap('jet')` as input. This function will not alter
                 the colormap, so add under- and over-colors yourself.
 
         Looking for good colormaps? Try: http://colorbrewer2.org/
@@ -52,8 +52,8 @@ def _cmapnorm_from_colorslevels(colors, levels):
         if isinstance(colors, str):
             # Use given cmap, but fix the under and over colors
             # The colormap (probably) does not have a nice under and over color.
-            # So we cant use `cmap = matplotlib.colormap[colors]`
-            cmap = matplotlib.colormaps[colors]
+            # So we cant use `cmap = matplotlib.cm.get_cmap(colors)`
+            cmap = matplotlib.cm.get_cmap(colors)
             colors = cmap(np.linspace(0, 1, nlevels + 1))
 
         # Validate number of colors vs number of levels

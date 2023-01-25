@@ -39,7 +39,7 @@ def make_circle_model():
     gwf_model["chd"] = imod.mf6.ConstantHead(
         constant_head, print_input=True, print_flows=True, save_flows=True
     )
-    gwf_model["ic"] = imod.mf6.InitialConditions(start=0.0)
+    gwf_model["ic"] = imod.mf6.InitialConditions(head=0.0)
     gwf_model["npf"] = imod.mf6.NodePropertyFlow(
         icelltype=icelltype,
         k=k,

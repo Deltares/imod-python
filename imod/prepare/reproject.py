@@ -1,6 +1,5 @@
 import affine
 import numpy as np
-import rioxarray  # noqa # pylint: disable=unused-import
 import xarray as xr
 
 import imod
@@ -15,7 +14,7 @@ except ImportError:
     rasterio = MissingOptionalModule("rasterio")
 
 
-def _reproject_dst(source, src_crs, dst_crs, src_transform, nodata):
+def _reproject_dst(source, src_crs, dst_crs, src_transform):
     """
     Prepares destination transform Affine and DataArray for projection.
     """
@@ -29,7 +28,7 @@ def _reproject_dst(source, src_crs, dst_crs, src_transform, nodata):
         np.arange(dst_width) + 0.5, np.arange(dst_height) + 0.5
     )
     dst = xr.DataArray(
-        data=np.full((dst_height, dst_width), nodata, source.dtype),
+        data=np.zeros((dst_height, dst_width), source.dtype),
         coords={"y": y[:, 0], "x": x[0, :]},
         dims=("y", "x"),
     )
@@ -129,12 +128,12 @@ def reproject(
     Open a single band raster, and reproject to RD new coordinate system (EPSG:28992), without explicitly specifying ``src_crs``.
     ``src_crs`` is taken from ``a.attrs``, so the raster file has to include coordinate system metadata for this to work.
 
-    >>> a = rioxarray.open_rasterio("example.tif").squeeze("band")
+    >>> a = xr.open_rasterio("example.tif").squeeze("band")
     >>> c = imod.rasterio.reproject(source=a, use_src_attrs=True, dst_crs="EPSG:28992")
 
     In case of a rotated ``source``, provide ``src_transform`` directly or ``use_src_attrs=True`` to rely on generated attributes:
 
-    >>> rotated = rioxarray.open_rasterio("rotated_example.tif").squeeze("band")
+    >>> rotated = xr.open_rasterio("rotated_example.tif").squeeze("band")
     >>> c = imod.rasterio.reproject(source=rotated, dst_crs="EPSG:28992", reproject_kwargs={"src_transform":affine.Affine(...)})
     >>> c = imod.rasterio.reproject(source=rotated, dst_crs="EPSG:28992", use_src_attrs=True)
     """
@@ -148,11 +147,10 @@ def reproject(
                 "reproject does not support dimensions other than ``x`` and ``y`` for ``like``."
             )
     if use_src_attrs:  # only provided when reproject is necessary
-        src_crs = source.rio.crs
-
+        src_crs = source.attrs["crs"]
         if isinstance(src_crs, str):
             if "epsg:" in src_crs.lower():
-                # Workaround for rioxarray.open_rasterio generation proj4 strings
+                # Workaround for xr.open_rasterio generation proj4 strings
                 # https://github.com/mapbox/rasterio/issues/1809
                 epsg_code = src_crs.lower().split("epsg:")[-1]
                 src_crs = rasterio.crs.CRS.from_epsg(epsg_code)
@@ -164,7 +162,7 @@ def reproject(
             raise ValueError(
                 f"Invalid src_crs: {src_crs}. Must be either str or rasterio.crs.CRS object"
             )
-        src_nodata = source.rio.nodata
+        src_nodata = source.attrs.get("nodatavals", [None])[0]
 
     resampling_methods = {e.name: e for e in rasterio.enums.Resampling}
 
@@ -209,7 +207,7 @@ def reproject(
     elif src_crs and dst_crs:
         if use_src_attrs:
             # TODO: modify if/when xarray uses affine by default for transform
-            src_transform = affine.Affine(*source.rio.transform()[:6])
+            src_transform = affine.Affine(*source.attrs["transform"][:6])
         elif "src_transform" in reproject_kwargs.keys():
             src_transform = reproject_kwargs.pop("src_transform")
         else:
@@ -217,13 +215,11 @@ def reproject(
 
         # If no like is provided, just reproject to different coordinate system
         if like is None:
-            dst_transform, dst = _reproject_dst(
-                source, src_crs, dst_crs, src_transform, src_nodata
-            )
+            dst_transform, dst = _reproject_dst(source, src_crs, dst_crs, src_transform)
         else:
             dst_transform = imod.util.transform(like)
             dst = xr.DataArray(
-                data=np.full(like.shape, src_nodata, source.dtype),
+                data=np.zeros(like.shape, source.dtype),
                 coords={"y": like.y, "x": like.x},
                 dims=("y", "x"),
             )
