@@ -442,6 +442,7 @@ class Package(PackageBase, abc.ABC):
             message = validation_pkg_error_message(errors)
             raise ValidationError(message)
         return
+ 
 
     def _netcdf_path(self, directory, pkgname):
         """create path for netcdf, this function is also used to create paths to use inside the qgis projectfiles"""

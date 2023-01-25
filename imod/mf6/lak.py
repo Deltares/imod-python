@@ -874,3 +874,19 @@ class Lake(BoundaryCondition):
 
     def write_perioddata(self, directory, pkgname, binary):
         return
+
+    def _write_table_section(
+        self, f, dataframe: pd.DataFrame, title: str, index: bool = False
+    ) -> None:
+        f.write(f"begin {title}\n")
+        block = dataframe.to_csv(
+            index=index,
+            header=False,
+            sep=" ",
+            line_terminator="\n",
+        )
+        trimmedlines = [line.strip() for line in block.splitlines()]
+        trimmedblock = "\n".join(map(str, trimmedlines)) + "\n"
+        f.write(trimmedblock)
+        f.write(f"end {title}\n")
+        return               
