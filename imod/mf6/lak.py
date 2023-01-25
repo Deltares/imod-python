@@ -26,19 +26,6 @@ class LakeApi_Base(PackageBase):
     def __init__(self):
         super().__init__()
 
-    def has_transient_data(self, timeseries_name):
-        """
-        returns true if this object has transient data for a property with a given name
-        (outlets can have either a scalar or a timeseries for some properties)
-        """
-        vars = [k for k in self.dataset.keys()]
-        if timeseries_name in vars:
-            ts = self.dataset[timeseries_name]
-            if type(ts) == xr.DataArray:
-                if "time" in ts.coords:
-                    return True
-        return False
-
 
 class LakeData(LakeApi_Base):
     """
@@ -317,12 +304,13 @@ def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
 
     list_of_dataarrays = []
     list_of_indices = []
-    index = 1
-    for lake_or_outlet in list_of_lakes_or_outlets:
-        if lake_or_outlet.has_transient_data(timeseries_name):
-            ts_lake = lake_or_outlet.dataset[timeseries_name]
-            list_of_dataarrays.append(ts_lake)
-            list_of_indices.append(index)
+    for index, lake_or_outlet in enumerate(list_of_lakes_or_outlets):
+        if timeseries_name in lake_or_outlet.dataset:
+            da = lake_or_outlet.dataset[timeseries_name]
+            if "time" in da.coords:
+                list_of_dataarrays.append(da)
+                list_of_indices.append(index + 1)
+
         index = index + 1
     if len(list_of_dataarrays) == 0:
         return None
