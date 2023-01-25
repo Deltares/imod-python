@@ -6,8 +6,10 @@ create a lake package.
 """
 
 import pathlib
+import textwrap
 from collections import defaultdict
 
+import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -16,7 +18,16 @@ from imod import mf6
 from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase, VariableMetaData
 
 
-class LakeData(PackageBase):
+class LakeApi_Base(PackageBase):
+    """
+    Base class for lake and outlet object.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+
+class LakeData(LakeApi_Base):
     """
     This class is used to initialize the lake package. It contains data
     relevant to one lake. The input needed to create an instance of this
@@ -48,6 +59,17 @@ class LakeData(PackageBase):
 
     """
 
+    timeseries_names = [
+        "status",
+        "stage",
+        "rainfall",
+        "evaporation",
+        "runoff",
+        "inflow",
+        "withdrawal",
+        "auxiliary",
+    ]
+
     def __init__(
         self,
         starting_stage: float,
@@ -78,24 +100,41 @@ class LakeData(PackageBase):
         self.dataset["connection_width"] = connection_width
 
         # timeseries data
-        self.dataset["status"] = status
-        self.dataset["stage"] = stage
-        self.dataset["rainfall"] = rainfall
-        self.dataset["evaporation"] = evaporation
-        self.dataset["runoff"] = runoff
-        self.dataset["inflow"] = inflow
-        self.dataset["withdrawal"] = withdrawal
-        self.dataset["auxiliary"] = auxiliary
+
+        times = []
+        timeseries_dict = {
+            "status": status,
+            "stage": stage,
+            "rainfall": rainfall,
+            "evaporation": evaporation,
+            "runoff": runoff,
+            "inflow": inflow,
+            "withdrawal": withdrawal,
+            "auxiliary": auxiliary,
+        }
+        for _, timeseries in timeseries_dict.items():
+            if timeseries is not None:
+                if "time" in timeseries.coords:
+                    times.extend([x for x in timeseries.coords["time"].values])
+        times = sorted(set(times))
+        self.dataset.assign_coords({"time": times})
+        for ts_name, ts_object in timeseries_dict.items():
+            if ts_object is not None:
+                self.dataset[ts_name] = ts_object.reindex({"time": times})
+            else:
+                self.dataset[ts_name] = None
 
 
-class OutletBase:
+class OutletBase(LakeApi_Base):
     """
     Base class for the different kinds of outlets
     """
 
-    def __init__(self, outlet_number: int, lakein: str, lakeout: str):
+    timeseries_names = ["rate", "invert", "rough", "width", "slope"]
+
+    def __init__(self, lakein: str, lakeout: str):
+        super().__init__()
         self.dataset = xr.Dataset()
-        self.dataset["outlet_number"] = outlet_number
         self.dataset["lakein"] = lakein
         self.dataset["lakeout"] = lakeout
         self.dataset["invert"] = None
@@ -114,15 +153,14 @@ class OutletManning(OutletBase):
 
     def __init__(
         self,
-        outlet_number: int,
         lakein: str,
         lakeout: str,
-        invert: np.floating,
-        width: np.floating,
-        roughness: np.floating,
-        slope: np.floating,
+        invert,
+        width,
+        roughness,
+        slope,
     ):
-        super().__init__(outlet_number, lakein, lakeout)
+        super().__init__(lakein, lakeout)
         self.dataset["invert"] = invert
         self.dataset["width"] = width
         self.dataset["roughness"] = roughness
@@ -136,15 +174,8 @@ class OutletWeir(OutletBase):
 
     _couttype = "weir"
 
-    def __init__(
-        self,
-        outlet_number: int,
-        lakein: str,
-        lakeout: str,
-        invert: np.floating,
-        width: np.floating,
-    ):
-        super().__init__(outlet_number, lakein, lakeout)
+    def __init__(self, lakein: str, lakeout: str, invert, width):
+        super().__init__(lakein, lakeout)
         self.dataset["invert"] = invert
         self.dataset["width"] = width
 
@@ -156,10 +187,8 @@ class OutletSpecified(OutletBase):
 
     _couttype = "specified"
 
-    def __init__(
-        self, outlet_number: int, lakein: str, lakeout: str, rate: np.floating
-    ):
-        super().__init__(outlet_number, lakein, lakeout)
+    def __init__(self, lakein: str, lakeout: str, rate):
+        super().__init__(lakein, lakeout)
         self.dataset["rate"] = rate
 
 
@@ -186,7 +215,9 @@ def create_connection_data(lakes):
     cell_ids = []
     for lake in lakes:
         notnull = lake["connection_type"].notnull()
-        indices = np.argwhere(notnull.values)
+        indices = np.argwhere(
+            notnull.values
+        )  # -1 to convert mf6's 1 based indexing to np's 0-based indexing
         xr_indices = {
             dim: xr.DataArray(index, dims=("cell_id",))
             for dim, index in zip(notnull.dims, indices.T)
@@ -205,8 +236,9 @@ def create_connection_data(lakes):
                 var = f"connection_{var}"
             connection_data[var].append(da.values)
 
+        # Offset by one since MODFLOW is 1-based!
         cell_id = xr.DataArray(
-            data=indices,
+            data=indices + 1,
             coords={"celldim": list(xr_indices.keys())},
             dims=("boundary", "celldim"),
         )
@@ -216,8 +248,8 @@ def create_connection_data(lakes):
         k: xr.DataArray(data=np.concatenate(v), dims=["boundary"])
         for k, v in connection_data.items()
     }
-    # Offset by one since MODFLOW is 1-based!
-    connection_data["connection_cell_id"] = xr.concat(cell_ids, dim="boundary") + 1
+
+    connection_data["connection_cell_id"] = xr.concat(cell_ids, dim="boundary")
     return connection_data
 
 
@@ -236,18 +268,21 @@ def create_outlet_data(outlets, name_to_number):
         for var in ("lakein", "lakeout"):
             name = outlet.dataset[var].item()
             try:
-                number = name_to_number[name]
+                lake_number = name_to_number[name]
             except KeyError:
                 names = ", ".join(name_to_number.keys())
                 raise KeyError(
                     f"Outlet lake name {name} not found among lake names: {names}"
                 )
-            outlet_data[f"outlet_{var}"].append(number)
+            outlet_data[f"outlet_{var}"].append(lake_number)
 
         # For other values: fill in NaN if not applicable.
         for var in outlet_vars:
             if var in outlet.dataset:
-                value = outlet.dataset[var].item()
+                if "time" in outlet.dataset[var].dims:
+                    value = 0.0
+                else:
+                    value = outlet.dataset[var].item()
             else:
                 value = np.nan
             outlet_data[f"outlet_{var}"].append(value)
@@ -256,6 +291,37 @@ def create_outlet_data(outlets, name_to_number):
         k: xr.DataArray(data=v, dims=["outlet"]) for k, v in outlet_data.items()
     }
     return outlet_data
+
+
+def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
+    """
+    In this function we create a dataarray with a given time coorridnate axis. We add all
+    the timeseries of lakes or outlets with the given name. We also create a dimension to
+    specify the lake or outlet number.
+    """
+    if list_of_lakes_or_outlets is None:
+        return None
+
+    list_of_dataarrays = []
+    list_of_indices = []
+    for index, lake_or_outlet in enumerate(list_of_lakes_or_outlets):
+        if timeseries_name in lake_or_outlet.dataset:
+            da = lake_or_outlet.dataset[timeseries_name]
+            if "time" in da.coords:
+                list_of_dataarrays.append(da)
+                list_of_indices.append(index + 1)
+
+        index = index + 1
+    if len(list_of_dataarrays) == 0:
+        return None
+    fill_value = np.nan
+    if not pd.api.types.is_numeric_dtype(list_of_dataarrays[0].dtype):
+        fill_value = ""
+    out = xr.concat(
+        list_of_dataarrays, join="outer", dim="index", fill_value=fill_value
+    )
+    out = out.assign_coords(index=list_of_indices)
+    return out
 
 
 class Lake(BoundaryCondition):
@@ -326,6 +392,46 @@ class Lake(BoundaryCondition):
         float or character value that defines the bed slope for the lake outlet. A specified SLOPE value is
         only used for active lakes if outlet_type for lake outlet OUTLETNO is MANNING.
 
+
+        #time series (lake)
+    ts_status: array of strings (xr.DataArray, optional)
+        timeserie used to indicate lake status. Can be ACTIVE, INACTIVE, or CONSTANT.
+        By default, STATUS is ACTIVE.
+    ts_stage: array of floats (xr.DataArray, optional)
+        timeserie used to specify the stage of the lake. The specified STAGE is only applied if
+        the lake is a constant stage lake
+    ts_rainfall: array of floats (xr.DataArray, optional)
+        timeserie used to specify the rainfall rate (LT-1) for the lake. Value must be greater than or equal to zero.
+    ts_evaporation: array of floats (xr.DataArray, optional)
+        timeserie used to specify the  the maximum evaporation rate (LT-1) for the lake. Value must be greater than or equal to zero. I
+    ts_runoff: array of floats (xr.DataArray, optional)
+        timeserie used to specify the  the runoff rate (L3 T-1) for the lake. Value must be greater than or equal to zero.
+    ts_inflow: array of floats (xr.DataArray, optional)
+        timeserie used to specify the volumetric inflow rate (L3 T-1) for the lake. Value must be greater than or equal to zero.
+    ts_withdrawal: array of floats (xr.DataArray, optional)
+        timeserie used to specify the maximum withdrawal rate (L3 T-1) for the lake. Value must be greater than or equal to zero.
+    ts_auxiliary: array of floats (xr.DataArray, optional)
+        timeserie used to specify value of auxiliary variables of the lake
+
+    #time series (outlet)
+    ts_rate: array of floats (xr.DataArray, optional)
+        timeserie used to specify the extraction rate for the lake outflow. A positive value indicates
+        inflow and a negative value indicates outflow from the lake. RATE only applies to active
+         (IBOUND > 0) lakes. A specified RATE is only applied if COUTTYPE for the OUTLETNO is SPECIFIED
+    ts_invert: array of floats (xr.DataArray, optional)
+        timeserie used to specify  the invert elevation for the lake outlet. A specified INVERT value is only used for
+        active lakes if COUTTYPE for lake outlet OUTLETNO is not SPECIFIED.
+    ts_rough: array of floats (xr.DataArray, optional)
+        timeserie used to specify defines the roughness coefficient for the lake outlet. Any value can be
+        specified if COUTTYPE is not MANNING.
+    ts_width: array of floats (xr.DataArray, optional)
+        timeserie used to specify  the width of the lake outlet. A specified WIDTH value is only used for active lakes if
+        COUTTYPE for lake outlet OUTLETNO is not SPECIFIED.
+    ts_slope: array of floats (xr.DataArray, optional)
+        timeserie used to specify the bed slope for the lake outlet. A specified SLOPE value is only used for active lakes
+        if COUTTYPE for lake outlet OUTLETNO is MANNING.
+
+
     print_input: ({True, False}, optional)
         keyword to indicate that the list of constant head information will
         be written to the listing file immediately after it is read. Default is
@@ -394,7 +500,38 @@ class Lake(BoundaryCondition):
         "outlet_roughness": VariableMetaData(np.floating),
         "outlet_width": VariableMetaData(np.floating),
         "outlet_slope": VariableMetaData(np.floating),
+        "ts_status": VariableMetaData(np.str0),
+        "ts_stage": VariableMetaData(np.floating),
+        "ts_rainfall": VariableMetaData(np.floating),
+        "ts_evaporation": VariableMetaData(np.floating),
+        "ts_runoff": VariableMetaData(np.floating),
+        "ts_inflow": VariableMetaData(np.floating),
+        "ts_withdrawal": VariableMetaData(np.floating),
+        "ts_rate": VariableMetaData(np.floating),
+        "ts_invert": VariableMetaData(np.floating),
+        "ts_rough": VariableMetaData(np.floating),
+        "ts_width": VariableMetaData(np.floating),
+        "ts_slope": VariableMetaData(np.floating),
     }
+    _period_data_lakes = (
+        "ts_status",
+        "ts_stage",
+        "ts_rainfall",
+        "ts_evaporation",
+        "ts_runoff",
+        "ts_inflow",
+        "ts_withdrawal",
+        "ts_auxiliary",
+    )
+    _period_data_outlets = (
+        "ts_rate",
+        "ts_invert",
+        "ts_rough",
+        "ts_width",
+        "ts_slope",
+    )
+
+    _period_data = _period_data_lakes + _period_data_outlets
 
     def __init__(
         # lake
@@ -419,6 +556,21 @@ class Lake(BoundaryCondition):
         outlet_roughness=None,
         outlet_width=None,
         outlet_slope=None,
+        # time series (lake)
+        ts_status=None,
+        ts_stage=None,
+        ts_rainfall=None,
+        ts_evaporation=None,
+        ts_runoff=None,
+        ts_inflow=None,
+        ts_withdrawal=None,
+        ts_auxiliary=None,
+        # time series (outlet)
+        ts_rate=None,
+        ts_invert=None,
+        ts_rough=None,
+        ts_width=None,
+        ts_slope=None,
         # options
         print_input=False,
         print_stage=False,
@@ -436,6 +588,13 @@ class Lake(BoundaryCondition):
         self.dataset["lake_boundname"] = lake_boundname
         self.dataset["lake_number"] = lake_number
         self.dataset["lake_starting_stage"] = lake_starting_stage
+
+        nr_indices = lake_number.data.max()
+        if outlet_lakein is not None:
+            nroutlets = len(outlet_lakein.data)
+            nr_indices = max(nr_indices, nroutlets)
+
+        self.dataset = self.dataset.assign_coords(index=range(1, nr_indices + 1, 1))
 
         self.dataset["connection_lake_number"] = connection_lake_number
         self.dataset["connection_cell_id"] = connection_cell_id
@@ -466,10 +625,39 @@ class Lake(BoundaryCondition):
         self.dataset["ts6_filename"] = ts6_filename
         self.dataset["time_conversion"] = time_conversion
         self.dataset["length_conversion"] = length_conversion
-        self._pkgcheck()
+
+        self.dataset["ts_status"] = ts_status
+        self.dataset["ts_stage"] = ts_stage
+        self.dataset["ts_rainfall"] = ts_rainfall
+        self.dataset["ts_evaporation"] = ts_evaporation
+        self.dataset["ts_runoff"] = ts_runoff
+        self.dataset["ts_inflow"] = ts_inflow
+        self.dataset["ts_withdrawal"] = ts_withdrawal
+        self.dataset["ts_auxiliary"] = ts_auxiliary
+
+        self.dataset["ts_rate"] = ts_rate
+        self.dataset["ts_invert"] = ts_invert
+        self.dataset["ts_rough"] = ts_rough
+        self.dataset["ts_width"] = ts_width
+        self.dataset["ts_slope"] = ts_slope
+
+        # self._pkgcheck()
 
     @staticmethod
-    def from_lakes_and_outlets(lakes, outlets=None):
+    def from_lakes_and_outlets(
+        lakes,
+        outlets=None,
+        print_input=False,
+        print_stage=False,
+        print_flows=False,
+        save_flows=False,
+        stagefile=None,
+        budgetfile=None,
+        budgetcsvfile=None,
+        package_convergence_filename=None,
+        time_conversion=None,
+        length_conversion=None,
+    ):
         package_content = {}
         name_to_number = {
             lake["boundname"].item(): i + 1 for i, lake in enumerate(lakes)
@@ -477,7 +665,7 @@ class Lake(BoundaryCondition):
 
         # Package data
         lake_numbers = list(name_to_number.values())
-        n_connection = [lake["connection_type"].count() for lake in lakes]
+        n_connection = [lake["connection_type"].count().values[()] for lake in lakes]
         package_content["lake_starting_stage"] = xr.DataArray(
             data=[lake["starting_stage"].item() for lake in lakes],
             dims=["lake"],
@@ -494,11 +682,27 @@ class Lake(BoundaryCondition):
         )
         connection_data = create_connection_data(lakes)
         package_content.update(connection_data)
+        for ts_name in Lake._period_data_lakes:
+            shortname = ts_name[3:]
+            package_content[ts_name] = concatenate_timeseries(lakes, shortname)
+
+        for ts_name in Lake._period_data_outlets:
+            shortname = ts_name[3:]
+            package_content[ts_name] = concatenate_timeseries(outlets, shortname)
 
         if outlets is not None:
             outlet_data = create_outlet_data(outlets, name_to_number)
             package_content.update(outlet_data)
-
+        package_content["print_input"] = print_input
+        package_content["print_stage"] = print_stage
+        package_content["print_flows"] = print_flows
+        package_content["save_flows"] = save_flows
+        package_content["stagefile"] = stagefile
+        package_content["budgetfile"] = budgetfile
+        package_content["budgetcsvfile"] = budgetcsvfile
+        package_content["package_convergence_filename"] = package_convergence_filename
+        package_content["time_conversion"] = time_conversion
+        package_content["length_conversion"] = length_conversion
         return mf6.Lake(**package_content)
 
     def _has_outlets(self):
@@ -510,6 +714,13 @@ class Lake(BoundaryCondition):
         ):
             return False
         return True
+
+    def _has_timeseries(self):
+        for name in self._period_data:
+            if "time" in self.dataset[name].coords:
+                if len(self.dataset[name].coords["time"]) > 0:
+                    return True
+        return False
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
@@ -550,6 +761,16 @@ class Lake(BoundaryCondition):
 
         return self._template.render(d)
 
+    def _get_iconn(self, lake_numbers_per_connection):
+        iconn = np.full_like(lake_numbers_per_connection, dtype=np.int_, fill_value=0)
+        maxlake = lake_numbers_per_connection.max()
+        connections_per_lake = np.zeros(maxlake + 1)
+        for i in range(np.size(lake_numbers_per_connection)):
+            lakeno = lake_numbers_per_connection[i]
+            connections_per_lake[lakeno] += 1
+            iconn[i] = connections_per_lake[lakeno]
+        return iconn
+
     def _connection_dataframe(self) -> pd.DataFrame:
         connection_vars = [
             "connection_lake_number",
@@ -561,7 +782,9 @@ class Lake(BoundaryCondition):
             "connection_length",
         ]
         data_df = self.dataset[connection_vars].to_dataframe()
-        data_df["iconn"] = np.arange(1, len(data_df) + 1)
+        lake_numbers_per_connection = self.dataset["connection_lake_number"].values
+
+        data_df["iconn"] = self._get_iconn(lake_numbers_per_connection)
         cell_id_df = self.dataset["connection_cell_id"].to_pandas()
         order = (
             ["connection_lake_number", "iconn"]
@@ -606,10 +829,79 @@ class Lake(BoundaryCondition):
                 f.write("\n")
                 self._write_table_section(f, self._outlet_dataframe(), "outlets")
 
-        return
+            if self._has_timeseries():
+                self._write_period_section(f, globaltimes)
+
+            return
+
+    def _write_period_section(self, f, globaltimes):
+        class Period_internal:
+            """
+            The Period_internal class is used for rendering the lake package in jinja.
+            There is no point in instantiating this class as a user.
+            """
+
+            def __init__(self, period_number):
+                self.period_number = period_number
+                self.nr_values = 0
+                self.lake_or_outlet_number = []
+                self.series_name = []
+                self.value = []
+
+        period_data_list = []
+
+        period_data_name_list = [tssname for tssname in self._period_data]
+        timeseries_dataset = self.dataset[period_data_name_list]
+        timeseries_times = self.dataset.coords["time"]
+        iperiods = np.searchsorted(globaltimes, timeseries_times) + 1
+        for iperiod, (_, period_data) in zip(
+            iperiods, timeseries_dataset.groupby("time")
+        ):
+            period_data_list.append(Period_internal(iperiod))
+            for tssname in self._period_data:
+                if len(period_data[tssname].dims) > 0:
+                    for index in period_data.coords["index"].values:
+
+                        value = period_data[tssname].sel(index=index).values[()]
+                        isvalid = False
+                        if isinstance(value, str):
+                            isvalid = value != ""
+                        else:
+                            isvalid = ~np.isnan(value)
+
+                        if isvalid:
+                            period_data_list[-1].nr_values += 1
+                            period_data_list[-1].lake_or_outlet_number.append(index)
+                            period_data_list[-1].series_name.append(tssname[3:])
+                            period_data_list[-1].value.append(value)
+
+        _template = jinja2.Template(
+            textwrap.dedent(
+                """
+        {% if nperiod > 0 -%}
+        {% for iperiod in range(0, nperiod) %}
+        {% if periods[iperiod].nr_values > 0 -%}
+        begin period {{periods[iperiod].period_number}}{% for ivalue in range(0, periods[iperiod].nr_values) %}
+          {{periods[iperiod].lake_or_outlet_number[ivalue]}}  {{periods[iperiod].series_name[ivalue]}} {{periods[iperiod].value[ivalue]}}{% endfor %}
+        end period
+        {% endif -%}
+        {% endfor -%}
+        {% endif -%}"""
+            )
+        )
+
+        d = {}
+        d["nperiod"] = len(period_data_list)
+        d["periods"] = period_data_list
+
+        period_block = _template.render(d)
+        f.write(period_block)
 
     def _package_data_to_sparse(self):
         return
 
     def fill_stress_perioddata(self):
+        return
+
+    def write_perioddata(self, directory, pkgname, binary):
         return
