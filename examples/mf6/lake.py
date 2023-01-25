@@ -39,7 +39,7 @@ def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
     return result
 
 
-def create_lakelake(idomain, starting_stage, boundname, lake_cells, rainfall):
+def create_lakeData(idomain, starting_stage, boundname, lake_cells, rainfall):
     HORIZONTAL = 0
     connectionType = create_gridcovering_array(
         idomain, lake_cells, HORIZONTAL, np.int32
@@ -178,7 +178,7 @@ rainfall = xr.DataArray(
 )
 lake_cells = [(1, 3, 3)]
 
-lake = create_lakelake(idomain, 0.3, "Naardermeer", lake_cells, rainfall)
+lake = create_lakeData(idomain, 0.3, "Naardermeer", lake_cells, rainfall)
 
 gwf_model["lake"] = lak.Lake.from_lakes_and_outlets(
     [lake],
