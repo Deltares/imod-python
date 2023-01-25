@@ -7,7 +7,6 @@ from typing import Dict, List
 
 import jinja2
 import numpy as np
-import pandas as pd
 import xarray as xr
 import xugrid as xu
 
@@ -56,32 +55,24 @@ def disv_recarr(arrdict, layer, notnull):
     return recarr
 
 
-class PackageBase(abc.ABC):
+class Package(abc.ABC):
     """
-    This class is used for storing a collection of Xarray dataArrays or ugrid-DataArrays
-    in a dataset. A load-from-file method is also provided. Storing to file is done by calling
-    object.dataset.to_netcdf(...)
+    Package is used to share methods for specific packages with no time
+    component.
+
+    It is not meant to be used directly, only to inherit from, to implement new
+    packages.
+
+    This class only supports `array input
+    <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=16>`_,
+    not the list input which is used in :class:`BoundaryCondition`.
     """
-
-    def __init__(self, allargs=None):
-        if allargs is not None:
-            for arg in allargs.values():
-                if isinstance(arg, xu.UgridDataArray):
-                    self.dataset = xu.UgridDataset(grids=arg.ugrid.grid)
-                    return
-        self.dataset = xr.Dataset()
-
-    def __getitem__(self, key):
-        return self.dataset.__getitem__(key)
-
-    def __setitem__(self, key, value):
-        self.dataset.__setitem__(key, value)
 
     @classmethod
     def from_file(cls, path, **kwargs):
         """
         Loads an imod mf6 package from a file (currently only netcdf and zarr are supported).
-        Note that it is expected that this file was saved with imod.mf6.PackageBase.dataset.to_netcdf(),
+        Note that it is expected that this file was saved with imod.mf6.Package.dataset.to_netcdf(),
         as the checks upon package initialization are not done again!
 
         Parameters
@@ -137,29 +128,19 @@ class PackageBase(abc.ABC):
         return_cls.remove_nans_from_dataset()
         return return_cls
 
-    def remove_nans_from_dataset(self):
-        for key, value in self.dataset.items():
-            if isinstance(value, xr.core.dataarray.DataArray):
-                if isinstance(value.values[()], numbers.Number):
-                    if math.isnan(value.values[()]):
-                        self.dataset[key] = None
-
-
-class Package(PackageBase, abc.ABC):
-    """
-    Package is used to share methods for specific packages with no time
-    component.
-
-    It is not meant to be used directly, only to inherit from, to implement new
-    packages.
-
-    This class only supports `array input
-    <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=16>`_,
-    not the list input which is used in :class:`BoundaryCondition`.
-    """
-
     def __init__(self, allargs=None):
-        super().__init__(allargs)
+        if allargs is not None:
+            for arg in allargs.values():
+                if isinstance(arg, xu.UgridDataArray):
+                    self.dataset = xu.UgridDataset(grids=arg.ugrid.grid)
+                    return
+        self.dataset = xr.Dataset()
+
+    def __getitem__(self, key):
+        return self.dataset.__getitem__(key)
+
+    def __setitem__(self, key, value):
+        self.dataset.__setitem__(key, value)
 
     def isel(self):
         raise NotImplementedError(
@@ -442,7 +423,6 @@ class Package(PackageBase, abc.ABC):
             message = validation_pkg_error_message(errors)
             raise ValidationError(message)
         return
- 
 
     def _netcdf_path(self, directory, pkgname):
         """create path for netcdf, this function is also used to create paths to use inside the qgis projectfiles"""
@@ -537,6 +517,13 @@ class Package(PackageBase, abc.ABC):
         if hasattr(self, "_auxiliary_data"):
             result.update(self._auxiliary_data)
         return result
+
+    def remove_nans_from_dataset(self):
+        for key, value in self.dataset.items():
+            if isinstance(value, xr.core.dataarray.DataArray):
+                if isinstance(value.values[()], numbers.Number):
+                    if math.isnan(value.values[()]):
+                        self.dataset[key] = None
 
 
 class BoundaryCondition(Package, abc.ABC):
