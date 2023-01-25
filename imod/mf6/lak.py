@@ -15,7 +15,7 @@ import pandas as pd
 import xarray as xr
 
 from imod import mf6
-from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase
 
 
 class LakeApi_Base(PackageBase):
@@ -481,38 +481,7 @@ class Lake(BoundaryCondition):
 
     _pkg_id = "lak"
     _template = Package._initialize_template(_pkg_id)
-    _metadata_dict = {
-        "lake_number": VariableMetaData(np.integer),
-        "lake_starting_stage": VariableMetaData(np.floating),
-        "lake_boundname": VariableMetaData(np.str0),
-        "connection_lake_number": VariableMetaData(np.integer),
-        "connection_cell_id": VariableMetaData(np.integer),
-        "connection_type": VariableMetaData(np.str0),
-        "connection_bed_leak": VariableMetaData(np.floating),
-        "connection_bottom_elevation": VariableMetaData(np.floating),
-        "connection_top_elevation": VariableMetaData(np.floating),
-        "connection_width": VariableMetaData(np.floating),
-        "connection_length": VariableMetaData(np.floating),
-        "outlet_lakein": VariableMetaData(np.integer),
-        "outlet_lakeout": VariableMetaData(np.integer),
-        "outlet_couttype": VariableMetaData(np.str0),
-        "outlet_invert": VariableMetaData(np.floating),
-        "outlet_roughness": VariableMetaData(np.floating),
-        "outlet_width": VariableMetaData(np.floating),
-        "outlet_slope": VariableMetaData(np.floating),
-        "ts_status": VariableMetaData(np.str0),
-        "ts_stage": VariableMetaData(np.floating),
-        "ts_rainfall": VariableMetaData(np.floating),
-        "ts_evaporation": VariableMetaData(np.floating),
-        "ts_runoff": VariableMetaData(np.floating),
-        "ts_inflow": VariableMetaData(np.floating),
-        "ts_withdrawal": VariableMetaData(np.floating),
-        "ts_rate": VariableMetaData(np.floating),
-        "ts_invert": VariableMetaData(np.floating),
-        "ts_rough": VariableMetaData(np.floating),
-        "ts_width": VariableMetaData(np.floating),
-        "ts_slope": VariableMetaData(np.floating),
-    }
+    
     _period_data_lakes = (
         "ts_status",
         "ts_stage",
