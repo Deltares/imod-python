@@ -1,6 +1,7 @@
 import numpy as np
 
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
+from imod.schemata import DTypeSchema
 
 
 class Solution(Package):
@@ -334,25 +335,30 @@ class Solution(Package):
         SolutionPresetSimple: No Default
         SolutionPresetModerate: No Default
         SolutionPresetComplex: No Default
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "ims"
     _keyword_map = {}
-    _metadata_dict = {
-        "outer_dvclose": VariableMetaData(np.floating),
-        "outer_maximum": VariableMetaData(np.integer),
-        "inner_maximum": VariableMetaData(np.integer),
-        "inner_dvclose": VariableMetaData(np.floating),
-        "inner_rclose": VariableMetaData(np.floating),
-        "under_relaxation_theta": VariableMetaData(np.floating),
-        "under_relaxation_kappa": VariableMetaData(np.floating),
-        "under_relaxation_gamma": VariableMetaData(np.floating),
-        "under_relaxation_momentum": VariableMetaData(np.floating),
-        "backtracking_number": VariableMetaData(np.integer),
-        "backtracking_tolerance": VariableMetaData(np.floating),
-        "backtracking_reduction_factor": VariableMetaData(np.floating),
-        "backtracking_residual_limit": VariableMetaData(np.floating),
-        "number_orthogonalizations": VariableMetaData(np.integer),
+
+    _init_schemata = {
+        "outer_dvclose": [DTypeSchema(np.floating)],
+        "outer_maximum": [DTypeSchema(np.integer)],
+        "inner_maximum": [DTypeSchema(np.integer)],
+        "inner_dvclose": [DTypeSchema(np.floating)],
+        "inner_rclose": [DTypeSchema(np.floating)],
+        "under_relaxation_theta": [DTypeSchema(np.floating)],
+        "under_relaxation_kappa": [DTypeSchema(np.floating)],
+        "under_relaxation_gamma": [DTypeSchema(np.floating)],
+        "under_relaxation_momentum": [DTypeSchema(np.floating)],
+        "backtracking_number": [DTypeSchema(np.integer)],
+        "backtracking_tolerance": [DTypeSchema(np.floating)],
+        "backtracking_reduction_factor": [DTypeSchema(np.floating)],
+        "backtracking_residual_limit": [DTypeSchema(np.floating)],
+        "number_orthogonalizations": [DTypeSchema(np.integer)],
     }
     _template = Package._initialize_template(_pkg_id)
 
@@ -384,6 +390,7 @@ class Solution(Package):
         print_option="summary",
         csv_output=False,
         no_ptc=False,
+        validate: bool = True,
     ):
         super().__init__()
         self.dataset["modelnames"] = modelnames
@@ -412,8 +419,7 @@ class Solution(Package):
         self.dataset["print_option"] = print_option
         self.dataset["csv_output"] = csv_output
         self.dataset["no_ptc"] = no_ptc
-
-        self._pkgcheck()
+        self._validate_init_schemata(validate)
 
 
 def SolutionPresetSimple(

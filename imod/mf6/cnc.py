@@ -1,6 +1,16 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition, VariableMetaData
+from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
+from imod.schemata import (
+    AllInsideNoDataSchema,
+    AllNoDataSchema,
+    AllValueSchema,
+    CoordsSchema,
+    DTypeSchema,
+    IndexesSchema,
+    OtherCoordsSchema,
+)
 
 
 class ConstantConcentration(BoundaryCondition):
@@ -27,13 +37,33 @@ class ConstantConcentration(BoundaryCondition):
         specified with "BUDGET FILEOUT" in Output Control. Default is False.
     observations: [Not yet supported.]
         Default is None.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "cnc"
     _keyword_map = {}
     _period_data = ("concentration",)
-    _metadata_dict = {"concentration": VariableMetaData(np.floating)}
     _template = BoundaryCondition._initialize_template(_pkg_id)
+
+    _init_schemata = {
+        "concentration": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            CoordsSchema(("layer",)),
+            BOUNDARY_DIMS_SCHEMA,
+        ],
+    }
+    _write_schemata = {
+        "concentration": [
+            OtherCoordsSchema("idomain"),
+            AllNoDataSchema(),  # Check for all nan, can occur while clipping
+            AllInsideNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            AllValueSchema(">=", 0.0),
+        ]
+    }
 
     def __init__(
         self,
@@ -42,6 +72,7 @@ class ConstantConcentration(BoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
+        validate: bool = True,
     ):
         super().__init__(locals())
         self.dataset["concentration"] = concentration
@@ -49,4 +80,4 @@ class ConstantConcentration(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
-        self._pkgcheck()
+        self._validate_init_schemata(validate)

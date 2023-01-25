@@ -1,6 +1,8 @@
 import numpy as np
 
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
+from imod.mf6.validation import PKG_DIMS_SCHEMA
+from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
 
 
 class Dispersion(Package):
@@ -51,18 +53,14 @@ class Dispersion(Package):
     xt3d_rhs: bool, optional
         add xt3d terms to right-hand side, when possible. This option uses less
         memory, but may require more iterations. (XT3D_RHS)
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "dsp"
     _template = Package._initialize_template(_pkg_id)
-    _metadata_dict = {
-        "diffusion_coefficient": VariableMetaData(np.floating),
-        "longitudinal_horizontal": VariableMetaData(np.floating),
-        "transversal_horizontal1": VariableMetaData(np.floating),
-        "longitudinal_vertical": VariableMetaData(np.floating),
-        "transversal_horizontal2": VariableMetaData(np.floating),
-        "transversal_vertical": VariableMetaData(np.floating),
-    }
     _grid_data = {
         "diffusion_coefficient": np.float64,
         "longitudinal_horizontal": np.float64,
@@ -79,6 +77,61 @@ class Dispersion(Package):
         "transversal_horizontal2": "ath2",
         "transversal_vertical": "atv",
     }
+    _init_schemata = {
+        "diffusion_coefficient": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "longitudinal_horizontal": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "transversal_horizontal1": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "longitudinal_vertical": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "transversal_horizontal2": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "transversal_vertical": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "xt3d_off": [DTypeSchema(np.bool_)],
+        "xt3d_rhs": [DTypeSchema(np.bool_)],
+    }
+
+    _write_schemata = {
+        "diffusion_coefficient": (
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+        "longitudinal_horizontal": (
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+        "transversal_horizontal1": (
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+        "longitudinal_vertical": (
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+        "transversal_horizontal2": (
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+        "transversal_vertical": (
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+    }
 
     def __init__(
         self,
@@ -90,6 +143,7 @@ class Dispersion(Package):
         transversal_vertical=None,
         xt3d_off=False,
         xt3d_rhs=False,
+        validate: bool = True,
     ):
         super().__init__(locals())
         self.dataset["xt3d_off"] = xt3d_off
@@ -100,4 +154,4 @@ class Dispersion(Package):
         self.dataset["longitudinal_vertical"] = longitudinal_vertical
         self.dataset["transversal_horizontal2"] = transversal_horizontal2
         self.dataset["transversal_vertical"] = transversal_vertical
-        self._pkgcheck()
+        self._validate_init_schemata(validate)

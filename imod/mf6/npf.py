@@ -2,7 +2,14 @@ import warnings
 
 import numpy as np
 
-from imod.mf6.pkgbase import Package, VariableMetaData
+from imod.mf6.pkgbase import Package
+from imod.mf6.validation import PKG_DIMS_SCHEMA
+from imod.schemata import (
+    AllValueSchema,
+    DTypeSchema,
+    IdentityNoDataSchema,
+    IndexesSchema,
+)
 
 
 class NodePropertyFlow(Package):
@@ -175,19 +182,85 @@ class NodePropertyFlow(Package):
         specified for the GWF Exchange as an auxiliary variable. disu package
         has not been implemented yet.
         Default is False.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "npf"
 
-    _metadata_dict = {
-        "icelltype": VariableMetaData(np.integer),
-        "k": VariableMetaData(np.floating),
-        "rewet_layer": VariableMetaData(np.floating),
-        "k22": VariableMetaData(np.floating),
-        "k33": VariableMetaData(np.floating),
-        "angle1": VariableMetaData(np.floating),
-        "angle2": VariableMetaData(np.floating),
-        "angle3": VariableMetaData(np.floating),
+    _init_schemata = {
+        "icelltype": [
+            DTypeSchema(np.integer),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "k": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "rewet_layer": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "k22": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "k33": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "angle1": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "angle2": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "angle3": [
+            DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ],
+        "alternative_cell_averaging": [DTypeSchema(str)],
+        "save_flows": [DTypeSchema(np.bool_)],
+        "starting_head_as_confined_thickness": [DTypeSchema(np.bool_)],
+        "variable_vertical_conductance": [DTypeSchema(np.bool_)],
+        "dewatered": [DTypeSchema(np.bool_)],
+        "perched": [DTypeSchema(np.bool_)],
+        "save_specific_discharge": [DTypeSchema(np.bool_)],
+    }
+
+    _write_schemata = {
+        "k": (
+            AllValueSchema(">", 0.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+        "rewet_layer": (
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+        "k22": (
+            AllValueSchema(">", 0.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            # No need to check coords: dataset ensures they align with idomain.
+        ),
+        "k33": (
+            AllValueSchema(">", 0.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            # No need to check coords: dataset ensures they align with idomain.
+        ),
+        "angle1": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
+        "angle2": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
+        "angle3": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
     }
 
     _grid_data = {
@@ -233,6 +306,7 @@ class NodePropertyFlow(Package):
         dewatered=False,
         perched=False,
         save_specific_discharge=False,
+        validate: bool = True,
     ):
         super().__init__(locals())
         # check rewetting
@@ -272,4 +346,4 @@ class NodePropertyFlow(Package):
         self.dataset["dewatered"] = dewatered
         self.dataset["perched"] = perched
         self.dataset["save_specific_discharge"] = save_specific_discharge
-        self._pkgcheck()
+        self._validate_init_schemata(validate)

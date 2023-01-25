@@ -6,6 +6,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 @pytest.fixture(scope="function")
@@ -74,10 +75,84 @@ def test_render(idomain_and_bottom):
 def test_wrong_dtype(idomain_and_bottom):
     idomain, bottom = idomain_and_bottom
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         imod.mf6.StructuredDiscretization(
             top=200.0, bottom=bottom, idomain=idomain.astype(np.float64)
         )
+
+
+def test_bottom_exceeding_itself(idomain_and_bottom):
+    idomain, bottom = idomain_and_bottom
+
+    bottom[2] = 100
+
+    dis = imod.mf6.StructuredDiscretization(top=200.0, bottom=bottom, idomain=idomain)
+
+    errors = dis._validate(dis._write_schemata, idomain=idomain)
+    assert len(errors) == 1
+    for var, var_errors in errors.items():
+        assert var == "bottom"
+
+
+def test_top_exceeding_bottom(idomain_and_bottom):
+    idomain, bottom = idomain_and_bottom
+
+    dis = imod.mf6.StructuredDiscretization(top=-400.0, bottom=bottom, idomain=idomain)
+    errors = dis._validate(dis._write_schemata, idomain=idomain)
+    assert len(errors) == 1
+    for var, var_errors in errors.items():
+        assert var == "top"
+
+
+def test_overlaying_bottom_inactive(idomain_and_bottom):
+    """
+    To compute thicknesses properly, Modflow 6 requires bottom data in the
+    layer above the active cell in question.
+    """
+    idomain, bottom = idomain_and_bottom
+
+    # Broadcast bottom to full 3D grid.
+    bottom = bottom.where(idomain == 1)
+
+    # Deactivate cell in layer 1.
+    idomain[0, 7, 7] = 0
+
+    # No error: bottom in layer 1 required for thickness layer 2
+    dis = imod.mf6.StructuredDiscretization(top=200.0, bottom=bottom, idomain=idomain)
+    errors = dis._validate(dis._write_schemata, idomain=idomain)
+    assert len(errors) == 0
+
+    # Now deactivate bottom in 0,7,7 as well
+    bottom[0, 7, 7] = np.nan
+
+    # Error: Thickness in layer 2 cannot be computed.
+    dis = imod.mf6.StructuredDiscretization(top=200.0, bottom=bottom, idomain=idomain)
+    errors = dis._validate(dis._write_schemata, idomain=idomain)
+    assert len(errors) == 1
+    for var, var_errors in errors.items():
+        assert var == "bottom"
+
+
+def test_disconnected_idomain(idomain_and_bottom):
+    """
+    Test if no disconnected arrays occur
+    """
+
+    idomain, bottom = idomain_and_bottom
+
+    # Inactive edge, no error
+    idomain[:, 0, :] = 0
+    dis = imod.mf6.StructuredDiscretization(top=200.0, bottom=bottom, idomain=idomain)
+    errors = dis._validate(dis._write_schemata, idomain=idomain)
+    assert len(errors) == 0
+
+    # Split in the middle, should throw error
+    idomain[:, 7, :] = 0
+    dis = imod.mf6.StructuredDiscretization(top=200.0, bottom=bottom, idomain=idomain)
+    errors = dis._validate(dis._write_schemata, idomain=idomain)
+    assert len(errors) == 1
+    for var, var_errors in errors.items():
+        assert var == "idomain"
 
 
 def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):

@@ -6,6 +6,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 @pytest.fixture(scope="function")
@@ -20,12 +21,12 @@ def drainage():
     )
     conductance = elevation.copy()
 
-    drn = imod.mf6.Drainage(elevation=elevation, conductance=conductance)
+    drn = dict(elevation=elevation, conductance=conductance)
     return drn
 
 
 def test_write(drainage, tmp_path):
-    drn = drainage
+    drn = imod.mf6.Drainage(**drainage)
     drn.write(tmp_path, "mydrn", [1], True)
     dir_for_render = tmp_path.stem
     block_expected = textwrap.dedent(
@@ -50,15 +51,40 @@ def test_write(drainage, tmp_path):
 
 
 def test_wrong_dtype(drainage):
-    drn = drainage
-    with pytest.raises(TypeError):
-        imod.mf6.Drainage(
-            elevation=drn["elevation"].astype(np.int32), conductance=drn["conductance"]
-        )
+    drainage["elevation"] = drainage["elevation"].astype(np.int32)
+
+    with pytest.raises(ValidationError):
+        imod.mf6.Drainage(**drainage)
+
+
+def test_validate_false(drainage):
+
+    drainage["elevation"] = drainage["elevation"].astype(np.int32)
+
+    imod.mf6.Drainage(validate=False, **drainage)
+
+
+def test_check_conductance_zero(drainage):
+    drainage["conductance"] = drainage["conductance"] * 0.0
+
+    idomain = drainage["elevation"].astype(np.int16)
+    top = 1.0
+    bottom = top - idomain.coords["layer"]
+
+    dis = imod.mf6.StructuredDiscretization(top=1.0, bottom=bottom, idomain=idomain)
+
+    drn = imod.mf6.Drainage(**drainage)
+
+    errors = drn._validate(drn._write_schemata, **dis.dataset)
+
+    assert len(errors) == 1
+
+    for var, error in errors.items():
+        assert var == "conductance"
 
 
 def test_discontinuous_layer(drainage):
-    drn = drainage
+    drn = imod.mf6.Drainage(**drainage)
     drn["layer"] = [1, 3, 5]
     bin_ds = drn[list(drn._period_data)]
     layer = bin_ds["layer"].values

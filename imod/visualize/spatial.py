@@ -144,7 +144,7 @@ def plot_map(
 
     Returns
     -------
-    fig : matplotlib.figure ax : matplotlig.ax if return_cbar == True: cbar :
+    fig : matplotlib.figure ax : matplotlib.ax if return_cbar == True: cbar :
     matplotlib.Colorbar
 
     Examples

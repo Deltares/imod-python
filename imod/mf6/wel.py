@@ -3,8 +3,8 @@ import numpy as np
 from imod.mf6.pkgbase import (
     DisStructuredBoundaryCondition,
     DisVerticesBoundaryCondition,
-    VariableMetaData,
 )
+from imod.schemata import DTypeSchema
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
@@ -47,6 +47,10 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         Default is False.
     observations: [Not yet supported.]
         Default is None.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "wel"
@@ -55,12 +59,15 @@ class WellDisStructured(DisStructuredBoundaryCondition):
     _template = DisStructuredBoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
 
-    _metadata_dict = {
-        "layer": VariableMetaData(np.integer),
-        "row": VariableMetaData(np.integer),
-        "column": VariableMetaData(np.integer),
-        "rate": VariableMetaData(np.floating),
+    _init_schemata = {
+        "layer": [DTypeSchema(np.integer)],
+        "row": [DTypeSchema(np.integer)],
+        "column": [DTypeSchema(np.integer)],
+        "rate": [DTypeSchema(np.floating)],
+        "concentration": [DTypeSchema(np.floating)],
     }
+
+    _write_schemata = {}
 
     def __init__(
         self,
@@ -74,6 +81,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
+        validate: bool = True,
     ):
         super().__init__()
         self.dataset["layer"] = self.assign_dims(layer)
@@ -84,11 +92,13 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
             self.add_periodic_auxiliary_variable()
-        self._pkgcheck()
+
+        self._validate_init_schemata(validate)
 
 
 class WellDisVertices(DisVerticesBoundaryCondition):
@@ -127,6 +137,10 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         with "BUDGET FILEOUT" in Output Control. Default is False.
     observations: [Not yet supported.]
         Default is None.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "wel"
@@ -134,6 +148,15 @@ class WellDisVertices(DisVerticesBoundaryCondition):
     _keyword_map = {}
     _template = DisVerticesBoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
+
+    _init_schemata = {
+        "layer": [DTypeSchema(np.integer)],
+        "cell2d": [DTypeSchema(np.integer)],
+        "rate": [DTypeSchema(np.floating)],
+        "concentration": [DTypeSchema(np.floating)],
+    }
+
+    _write_schemata = {}
 
     def __init__(
         self,
@@ -146,6 +169,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         print_flows=False,
         save_flows=False,
         observations=None,
+        validate: bool = True,
     ):
         super().__init__()
         self.dataset["layer"] = self.assign_dims(layer)
@@ -155,7 +179,10 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
             self.add_periodic_auxiliary_variable()
+
+        self._validate_init_schemata(validate)

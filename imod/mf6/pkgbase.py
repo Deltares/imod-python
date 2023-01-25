@@ -2,14 +2,17 @@ import abc
 import math
 import numbers
 import pathlib
-from dataclasses import dataclass
-from typing import Dict
+from collections import defaultdict
+from typing import Dict, List
 
 import jinja2
 import numpy as np
 import pandas as pd
 import xarray as xr
 import xugrid as xu
+
+from imod.mf6.validation import validation_pkg_error_message
+from imod.schemata import ValidationError
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
@@ -51,19 +54,6 @@ def disv_recarr(arrdict, layer, notnull):
         recarr["cell2d"] = icell2d + 1
         recarr["layer"] = layer[ilayer]
     return recarr
-
-
-@dataclass
-class VariableMetaData:
-    """
-    Dataclass to store metadata of a variable.
-
-    Currently purely used to store datatypes, but can be later expanded to store
-    minimimum and maximum values of variables, keyword maps, and period/package
-    data flags.
-    """
-
-    dtype: type
 
 
 class PackageBase(abc.ABC):
@@ -425,20 +415,32 @@ class Package(PackageBase, abc.ABC):
                             path = pkgdirectory / f"{key}.dat"
                             self.write_text_griddata(path, da, dtype)
 
-    def _write_table_section(
-        self, f, dataframe: pd.DataFrame, title: str, index: bool = False
-    ) -> None:
-        f.write(f"begin {title}\n")
-        block = dataframe.to_csv(
-            index=index,
-            header=False,
-            sep=" ",
-            line_terminator="\n",
-        )
-        trimmedlines = [line.strip() for line in block.splitlines()]
-        trimmedblock = "\n".join(map(str, trimmedlines)) + "\n"
-        f.write(trimmedblock)
-        f.write(f"end {title}\n")
+    def _validate(self, schemata: Dict, **kwargs) -> Dict[str, List[ValidationError]]:
+        errors = defaultdict(list)
+        for variable, var_schemata in schemata.items():
+            for schema in var_schemata:
+                if (
+                    variable in self.dataset.keys()
+                ):  # concentration only added to dataset if specified
+                    try:
+                        schema.validate(self.dataset[variable], **kwargs)
+                    except ValidationError as e:
+                        errors[variable].append(e)
+        return errors
+
+    def _validate_init_schemata(self, validate: bool):
+        """
+        Run the "cheap" schema validations.
+
+        The expensive validations are run during writing. Some are only
+        available then: e.g. idomain to determine active part of domain.
+        """
+        if not validate:
+            return
+        errors = self._validate(self._init_schemata)
+        if len(errors) > 0:
+            message = validation_pkg_error_message(errors)
+            raise ValidationError(message)
         return
 
     def _netcdf_path(self, directory, pkgname):
@@ -490,21 +492,20 @@ class Package(PackageBase, abc.ABC):
         spatial_ds.to_netcdf(path)
         return has_dims
 
-    def _check_types(self):
-        for varname, metadata in self._metadata_dict.items():
-            expected_dtype = metadata.dtype
-            da = self.dataset[varname]
-            if da.values[()] is not None:  # Only check if was specified
-                if not issubclass(da.dtype.type, expected_dtype):
-                    raise TypeError(
-                        f"Unexpected data type for {varname} "
-                        f"in {self.__class__.__name__} package. "
-                        f"Expected subclass of {expected_dtype.__name__}, "
-                        f"instead got {da.dtype.type.__name__}."
-                    )
+    def _get_vars_to_check(self):
+        """
+        Helper function to get all variables which were not set to None
+        """
+        variables = []
+        for var in self._metadata_dict.keys():
+            if (  # Filter optional variables not filled in
+                self.dataset[var].size != 1
+            ) or (
+                self.dataset[var] != None  # noqa: E711
+            ):
+                variables.append(var)
 
-    def _pkgcheck(self):
-        self._check_types()
+        return variables
 
     def period_data(self):
         result = []

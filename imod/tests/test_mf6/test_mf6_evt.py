@@ -8,9 +8,15 @@ import imod
 
 
 @pytest.mark.usefixtures(
-    "concentration_fc", "proportion_rate_fc", "proportion_depth_fc"
+    "rate_fc",
+    "elevation_fc",
+    "concentration_fc",
+    "proportion_rate_fc",
+    "proportion_depth_fc",
 )
-def test_render(concentration_fc, proportion_rate_fc, proportion_depth_fc):
+def test_render(
+    rate_fc, elevation_fc, concentration_fc, proportion_rate_fc, proportion_depth_fc
+):
     directory = pathlib.Path("mymodel")
     globaltimes = [
         np.datetime64("2000-01-01"),
@@ -19,9 +25,9 @@ def test_render(concentration_fc, proportion_rate_fc, proportion_depth_fc):
     ]
 
     evt = imod.mf6.Evapotranspiration(
-        surface=25.0,
-        rate=1e-3,
-        depth=1.0,
+        surface=elevation_fc,
+        rate=rate_fc,
+        depth=elevation_fc,
         proportion_rate=proportion_rate_fc,
         proportion_depth=proportion_depth_fc,
         concentration=concentration_fc,
@@ -37,7 +43,7 @@ def test_render(concentration_fc, proportion_rate_fc, proportion_depth_fc):
         end options
 
         begin dimensions
-          maxbound 1
+          maxbound 0
           nseg
         end dimensions
 
