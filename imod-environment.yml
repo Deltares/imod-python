@@ -30,7 +30,7 @@ dependencies:
   - pydata-sphinx-theme=0.10.1
   - pygeos
   - pyproj
-  - pytest<7.1
+  - pytest
   - pytest-benchmark
   - pytest-cov
   - python>=3.7,<3.11
