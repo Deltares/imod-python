@@ -23,9 +23,8 @@ class LakeApi_Base(PackageBase):
     Base class for lake and outlet object.
     """
 
-    def __init__(self, number):
+    def __init__(self):
         super().__init__()
-        self.object_number = number
 
     def has_transient_data(self, timeseries_name):
         """
@@ -103,7 +102,7 @@ class LakeData(LakeApi_Base):
         withdrawal=None,
         auxiliary=None,
     ):
-        super().__init__(-1)
+        super().__init__()
         self.dataset["starting_stage"] = starting_stage
         self.dataset["boundname"] = boundname
         self.dataset["connection_type"] = connection_type
@@ -146,11 +145,9 @@ class OutletBase(LakeApi_Base):
 
     timeseries_names = ["rate", "invert", "rough", "width", "slope"]
 
-    def __init__(self, outlet_number: int, lakein: str, lakeout: str):
-        super().__init__(-1)
+    def __init__(self, lakein: str, lakeout: str):
+        super().__init__()
         self.dataset = xr.Dataset()
-        self.dataset["outlet_number"] = outlet_number
-        self.object_number = outlet_number
         self.dataset["lakein"] = lakein
         self.dataset["lakeout"] = lakeout
         self.dataset["invert"] = None
@@ -169,7 +166,6 @@ class OutletManning(OutletBase):
 
     def __init__(
         self,
-        outlet_number: int,
         lakein: str,
         lakeout: str,
         invert,
@@ -177,7 +173,7 @@ class OutletManning(OutletBase):
         roughness,
         slope,
     ):
-        super().__init__(outlet_number, lakein, lakeout)
+        super().__init__(lakein, lakeout)
         self.dataset["invert"] = invert
         self.dataset["width"] = width
         self.dataset["roughness"] = roughness
@@ -191,8 +187,8 @@ class OutletWeir(OutletBase):
 
     _couttype = "weir"
 
-    def __init__(self, outlet_number: int, lakein: str, lakeout: str, invert, width):
-        super().__init__(outlet_number, lakein, lakeout)
+    def __init__(self, lakein: str, lakeout: str, invert, width):
+        super().__init__(lakein, lakeout)
         self.dataset["invert"] = invert
         self.dataset["width"] = width
 
@@ -204,8 +200,8 @@ class OutletSpecified(OutletBase):
 
     _couttype = "specified"
 
-    def __init__(self, outlet_number: int, lakein: str, lakeout: str, rate):
-        super().__init__(outlet_number, lakein, lakeout)
+    def __init__(self, lakein: str, lakeout: str, rate):
+        super().__init__(lakein, lakeout)
         self.dataset["rate"] = rate
 
 
@@ -330,9 +326,9 @@ def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
         index = index + 1
     if len(list_of_dataarrays) == 0:
         return None
-    fill_value = ""
-    if pd.api.types.is_numeric_dtype(list_of_dataarrays[0].dtype):
-        fill_value = np.nan
+    fill_value = np.nan
+    if not pd.api.types.is_numeric_dtype(list_of_dataarrays[0].dtype):
+        fill_value = ""
     out = xr.concat(
         list_of_dataarrays, join="outer", dim="index", fill_value=fill_value
     )
@@ -678,8 +674,6 @@ class Lake(BoundaryCondition):
         name_to_number = {
             lake["boundname"].item(): i + 1 for i, lake in enumerate(lakes)
         }
-        for lake in lakes:
-            lake.object_number = name_to_number[lake["boundname"].values[()]]
 
         # Package data
         lake_numbers = list(name_to_number.values())

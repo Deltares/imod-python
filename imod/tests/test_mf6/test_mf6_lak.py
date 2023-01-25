@@ -74,14 +74,14 @@ def ijsselmeer(basic_dis):
 
 @pytest.fixture(scope="function")
 def lake_package(naardermeer, ijsselmeer):
-    outlet1 = OutletManning(1, "Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
-    outlet2 = OutletManning(2, "IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
+    outlet1 = OutletManning("Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
+    outlet2 = OutletManning("IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
     return Lake.from_lakes_and_outlets([naardermeer, ijsselmeer], [outlet1, outlet2])
 
 
 def test_alternative_constructor(naardermeer, ijsselmeer):
-    outlet1 = OutletManning(1, "Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
-    outlet2 = OutletManning(2, "IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
+    outlet1 = OutletManning("Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
+    outlet2 = OutletManning("IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
     actual = Lake.from_lakes_and_outlets([naardermeer, ijsselmeer], [outlet1, outlet2])
     _ = actual.render(None, None, None, False)
     assert isinstance(actual, Lake)
@@ -153,8 +153,8 @@ def test_lake_outlet_dataframe(lake_package):
 
 
 def test_lake_write(tmp_path, naardermeer, ijsselmeer):
-    outlet1 = OutletManning(1, "Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
-    outlet2 = OutletManning(2, "IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
+    outlet1 = OutletManning("Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
+    outlet2 = OutletManning("IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
 
     lake_package = Lake.from_lakes_and_outlets(
         [naardermeer, ijsselmeer], [outlet1, outlet2]
@@ -342,7 +342,7 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
         coords={"time": times_rainfall},
         dims=["time"],
     )
-    outlet1 = OutletManning(1, "Naardermeer", "IJsselmeer", invert, 24.0, 25.0, 26.0)
+    outlet1 = OutletManning("Naardermeer", "IJsselmeer", invert, 24.0, 25.0, 26.0)
     lake_package = Lake.from_lakes_and_outlets([lake1, lake2], [outlet1])
     global_times = np.array(
         [
@@ -462,9 +462,9 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
         coords={"time": times_of_outlet2},
         dims=["time"],
     )
-    outlet1 = OutletManning(1, "Naardermeer", "IJsselmeer", invert, 2, 3, 4)
-    outlet2 = OutletSpecified(2, "IJsselmeer", "Naardermeer", rate)
-    outlet3 = OutletWeir(3, "IJsselmeer", "Naardermeer", invert, numeric)
+    outlet1 = OutletManning("Naardermeer", "IJsselmeer", invert, 2, 3, 4)
+    outlet2 = OutletSpecified("IJsselmeer", "Naardermeer", rate)
+    outlet3 = OutletWeir("IJsselmeer", "Naardermeer", invert, numeric)
 
     lake_with_status = create_lake_data(
         is_lake1,
