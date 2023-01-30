@@ -9,6 +9,13 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Added
+~~~~~
+
+- Added an extra argument in :meth:`imod.couplers.metamod.MetaMod.write` named
+  ``modflow6_write_kwargs``, which can be used to provide keyword arguments to
+  the writing of the Modflow 6 Simulation.
+
 
 [0.11.5] - 2022-12-15
 ---------------------
@@ -37,6 +44,10 @@ Added
 - :meth:`imod.flow.ImodflowModel.write` now supports writing a
   ``config_run.ini`` to convert the projectfile to a runfile or modflow 6
   namfile with iMOD5.
+- Added validation of Modflow6 Flow and Transport models. Incorrect model input
+  will now throw a ``ValidationError``. To turn off the validation, set
+  ``validate=False`` upon package initialization and/or when calling
+  :meth:`imod.mf6.Modflow6Simulation.write`.
 
 [0.11.4] - 2022-09-05
 ---------------------
