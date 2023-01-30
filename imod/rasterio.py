@@ -252,17 +252,7 @@ def open(path, use_cftime=False, pattern=None):
     remember. The website https://regex101.com is a nice help. Alternatively,
     the most pragmatic solution may be to just rename your files.
     """
-
-    if isinstance(path, list):
-        return array_io.reading._load(path, use_cftime, pattern, _read, header)
-    elif isinstance(path, pathlib.Path):
-        path = str(path)
-
-    paths = [pathlib.Path(p) for p in glob.glob(path)]
-    n = len(paths)
-    if n == 0:
-        raise FileNotFoundError(f"Could not find any files matching {path}")
-    return array_io.reading._load(paths, use_cftime, pattern, _read, header)
+    return array_io.reading._open(path, use_cftime, pattern, header, _read)
 
 
 def write(path, da, driver=None, nodata=np.nan, dtype=None):

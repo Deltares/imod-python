@@ -1,4 +1,5 @@
 import collections
+import glob
 import itertools
 import pathlib
 
@@ -277,11 +278,9 @@ def _dask(path, attrs=None, pattern=None, _read=None, header=None):
     return x, attrs
 
 
-def _load(paths, use_cftime, pattern, _read, header):
+def _load(paths, use_cftime, _read, headers):
     """Combine a list of paths to IDFs to a single xarray.DataArray"""
     # this function also works for single IDFs
-
-    headers = [header(p, pattern) for p in paths]
     names = [h["name"] for h in headers]
     _all_equal(names, "names")
 
@@ -330,3 +329,16 @@ def _load(paths, use_cftime, pattern, _read, header):
         out.attrs["nodata"] = first_attrs["nodata"]
 
     return out
+
+
+def _open(path, use_cftime, pattern, header, _read):
+    if isinstance(path, pathlib.Path):
+        path = str(path)
+    if not isinstance(path, list):
+        paths = [pathlib.Path(p) for p in glob.glob(path)]
+
+    headers = [header(p, pattern) for p in paths]
+    n = len(paths)
+    if n == 0:
+        raise FileNotFoundError(f"Could not find any files matching {path}")
+    return _load(paths, use_cftime, _read, headers)
