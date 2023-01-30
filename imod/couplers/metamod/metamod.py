@@ -90,6 +90,7 @@ class MetaMod:
         modflow6_dll: Union[str, Path],
         metaswap_dll: Union[str, Path],
         metaswap_dll_dependency: Union[str, Path],
+        modflow6_write_kwargs: Optional[dict] = {},
     ):
         """
         Write MetaSWAP and Modflow 6 model with exchange files, as well as a
@@ -112,13 +113,21 @@ class MetaMod:
             [fmpich2.dll, mpich2mpi.dll, mpich2nemesis.dll, TRANSOL.dll]. You
             can obtain these by downloading `the last iMOD5 release
             <https://oss.deltares.nl/web/imod/download-imod5>`_
+        modflow6_write_kwargs: dict
+            Optional dictionary with keyword arguments for the writing of
+            Modflow6 models. You can use this for example to turn off the
+            validation at writing (``validation=False``) or to write text files
+            (``binary=False``)
         """
         # force to Path
         directory = Path(directory)
         # For some reason the Modflow 6 model has to be written first, before
         # writing the MetaSWAP model. Else we get an Access Violation Error when
         # running the coupler.
-        self.mf6_simulation.write(directory / self._modflow6_model_dir)
+        self.mf6_simulation.write(
+            directory / self._modflow6_model_dir,
+            **modflow6_write_kwargs,
+        )
         self.msw_model.write(directory / self._metaswap_model_dir)
 
         # Write exchange files
