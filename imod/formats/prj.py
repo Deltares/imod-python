@@ -64,7 +64,7 @@ DATE_KEYS = {
 }
 
 
-class LineInterator:
+class LineIterator:
     """
     Like iter(lines), but we can go back and we check if we're finished.
     """
@@ -120,8 +120,9 @@ def tokenize(line: str) -> List[str]:
     since we expect:
 
     * Package names: unquoted character strings.
-    * File paths: will not contain commas, may contain whitespace if quoted.
-    * Integers for counts and settings.
+    * File paths: will not contain commas, no single apostrophe, nor a single
+      quote symbol, may contain whitespace if quoted. * Integers for counts and
+      settings.
     * Floats for addition and multiplication values.
     * Simple character strings for period names (summer, winter). These
       technically could contain commas if quoted, which is very unlikely.
@@ -147,79 +148,109 @@ def tokenize(line: str) -> List[str]:
     Examples
     --------
 
+    Raise ValueError, due to missing closing quotation. (Can be enabled
+    shlex.split(s, posix=False)):
+
     >> tokenize("That's life")
-    >> ["That's", "life"]
 
     >> tokenize("That 's life'")
-    >> ["That", "'s life"]
+    >> ["That", "s life"]
 
     >> tokenize("That,'s life'")
-    >> ["That", "'s life"]
+    >> ["That", "s life"]
     """
     values = [v.strip() for v in line.split(",")]
     tokens = list(chain.from_iterable(shlex.split(v) for v in values))
     return tokens
 
 
+def wrap_error_message(exception, description, lines):
+    lines.back()
+    content = next(lines)
+    number = lines.count + 1
+    raise type(exception)(
+        f"{exception}\n"
+        f"Failed to parse {description} for line {number} with content:\n{content}"
+    )
+
+
 def parse_blockheader(lines: List[str]) -> Tuple[int, str, bool]:
-    no_result = None, None, None
-    line = next(lines)
+    try:
+        no_result = None, None, None
+        line = next(lines)
 
-    # Skip if it's an empty line.
-    if len(line) == 0:
-        return no_result
+        # Skip if it's an empty line.
+        if len(line) == 0:
+            return no_result
 
-    first = line[0].lower()
-    if first in ("periods", "species"):
-        return 1, first, 1
-    # The line must contain atleast nper, key, active.
-    elif len(line) >= 3:
-        n = int(first)
-        key = line[1].lower()
-        active = bool(line[2])
-        return n, key, active
-    # It's a comment or something.
-    else:
-        return no_result
+        first = line[0].lower()
+        if first in ("periods", "species"):
+            return 1, first, True
+        # The line must contain atleast nper, key, active.
+        elif len(line) >= 3:
+            n = int(first)
+            key = line[1].lower()
+            active = bool(int(line[2]))
+            return n, key, active
+        # It's a comment or something.
+        else:
+            return no_result
+    except Exception as e:
+        wrap_error_message(e, "block header", lines)
 
 
 def parse_time(lines: List[str]) -> str:
-    line = next(lines)
-    date = line[0].lower()
+    try:
+        line = next(lines)
+        date = line[0].lower()
 
-    if date == "steady-state":
-        return date
+        if date == "steady-state":
+            return date
 
-    elif len(line) > 2:
-        time = line[1]
-    else:
-        time = "00:00:00"
-    return f"{date} {time}"
+        elif len(line) > 1:
+            time = line[1]
+        else:
+            time = "00:00:00"
+        return f"{date} {time}"
+    except Exception as e:
+        wrap_error_message(e, "date time", lines)
 
 
-def parse_blockline(lines, time: None):
-    line = next(lines)
-    content = {
-        "active": bool(line[0]),
-        "is_constant": bool(line[1]),
-        "layer": int(line[2]),
-        "factor": float(line[3]),
-        "addition": float(line[4]),
-        "constant": float(line[5]),
-        "filename": line[6],
-    }
-    if time is not None:
-        content["time"] = time
-    return content
+def parse_blockline(lines, time=None):
+    try:
+        line = next(lines)
+        content = {
+            "active": bool(line[0]),
+            "is_constant": int(line[1]),
+            "layer": int(line[2]),
+            "factor": float(line[3]),
+            "addition": float(line[4]),
+            "constant": float(line[5]),
+        }
+        if content["is_constant"] == 2:
+            content["path"] = line[6]
+        if time is not None:
+            content["time"] = time
+        return content
+    except Exception as e:
+        wrap_error_message(e, "entries", lines)
+
+
+def read_nsub_nsystem(lines):
+    try:
+        line = next(lines)
+        n_entry = int(line[0])
+        n_system = int(line[1])
+        return n_entry, n_system
+    except Exception as e:
+        wrap_error_message(e, "number of sub-entries and number of systems", lines)
 
 
 def parse_notimeblock(
     lines: List[str],
     fields: List[str],
 ) -> Dict[str, Dict[str, List]]:
-    line = next(lines)
-    n_entry = int(line[0])
-    n_system = int(line[1])
+    n_entry, n_system = read_nsub_nsystem(lines)
 
     if len(fields) != n_entry:
         raise ValueError(
@@ -228,6 +259,7 @@ def parse_notimeblock(
     content = {
         field: [parse_blockline(lines) for _ in range(n_system)] for field in fields
     }
+    content["n_system"] = n_system
     return content
 
 
@@ -241,10 +273,7 @@ def parse_timeblock(
     for _ in range(n):
         time = parse_time(lines)
         content["time"].append(time)
-
-        line = next(lines)
-        n_entry = int(line[0])
-        n_system = int(line[1])
+        n_entry, n_system = read_nsub_nsystem(lines)
 
         if n_fields != n_entry:
             raise ValueError(
@@ -260,66 +289,74 @@ def parse_timeblock(
 
 
 def parse_pcgblock(lines):
-    line = next(lines)
+    try:
+        line = next(lines)
 
-    # TODO: which are optional? How many to expect?
-    # Check for an empty line to terminate the block?
-    types = {
-        "mxiter": int,
-        "iter1": int,
-        "hclose": float,
-        "rclose": float,
-        "relax": float,
-        "npcond": int,
-        "iprpcg": int,
-        "mutpcg": int,
-        "damppcg": float,
-        "damppcgt": float,
-        "iqerror": int,
-        "qerror": float,
-    }
+        # TODO: which are optional? How many to expect?
+        # Check for an empty line to terminate the block?
+        types = {
+            "mxiter": int,
+            "iter1": int,
+            "hclose": float,
+            "rclose": float,
+            "relax": float,
+            "npcond": int,
+            "iprpcg": int,
+            "mutpcg": int,
+            "damppcg": float,
+            "damppcgt": float,
+            "iqerror": int,
+            "qerror": float,
+        }
 
-    if len(line) == 2:
-        # TODO: not clear what's allowed:
-        # MXITER= 250  # This one's confirmed okay.
-        # MXITER = 250  # This generates three entries.
-        # MXITER =250  # This generates two entries, but other grouping.
-        pcglines = line + [next(line) for _ in range(11)]
+        if len(line) == 2:
+            # TODO: not clear what's allowed:
+            # MXITER= 250  # This one's confirmed okay.
+            # MXITER = 250  # This generates three entries.
+            # MXITER =250  # This generates two entries, but other grouping.
+            pcglines = line + [next(line) for _ in range(11)]
 
-        content = {}
-        for line in pcglines:
-            key = line[0].strip("=").lower()
-            value = types[key](line[1])
-            content[key] = value
+            content = {}
+            for line in pcglines:
+                key = line[0].strip("=").lower()
+                value = types[key](line[1])
+                content[key] = value
 
-    elif len(line) == 12:
-        line_iterator = iter(line)
-        content = {k: valuetype(next(line_iterator)) for k, valuetype in types.items()}
+        elif len(line) == 12:
+            line_iterator = iter(line)
+            content = {
+                k: valuetype(next(line_iterator)) for k, valuetype in types.items()
+            }
 
-    else:
-        raise ValueError(
-            "Cannot read PCG section. Expected 12 KEY= VALUE pairs, or 12 values."
-        )
+        else:
+            raise ValueError(
+                f"Expected 12 KEY= VALUE pairs, or 12 values. Found {len(line)}"
+            )
 
-    return content
+        return content
+    except Exception as e:
+        wrap_error_message(e, "PCG entry", lines)
 
 
 def parse_periodsblock(lines):
-    periods = {}
-    while not lines.finished:
-        line = next(lines)
-        # Stop if we encounter an empty line.
-        if len(line) == 0:
-            break
-        # Read the alias
-        alias = line[0]
-        # Now read the time associated with it.
-        start = parse_time(lines)
-        periods[alias] = start
-    return periods
+    try:
+        periods = {}
+        while not lines.finished:
+            line = next(lines)
+            # Stop if we encounter an empty line.
+            if len(line) == 0:
+                break
+            # Read the alias
+            alias = line[0]
+            # Now read the time associated with it.
+            start = parse_time(lines)
+            periods[alias] = start
+        return periods
+    except Exception as e:
+        wrap_error_message(e, "periods data block", lines)
 
 
-def parse_block(lines: LineInterator, content: Dict[str, Any]) -> None:
+def parse_block(lines: LineIterator, content: Dict[str, Any]) -> None:
     """
     Mutates content dict.
     """
@@ -330,32 +367,40 @@ def parse_block(lines: LineInterator, content: Dict[str, Any]) -> None:
     while key is None and not lines.finished:
         n, key, active = parse_blockheader(lines)
 
-    if key in KEYS:
-        if n != 1:
-            raise ValueError(f"Expected N=1 for {key}, read: {n}")
-        fields = KEYS[key]
-        blockcontent = parse_notimeblock(lines, fields)
-    elif key in DATE_KEYS:
-        fields = DATE_KEYS[key]
-        blockcontent = parse_timeblock(lines, fields, n)
-    elif key == "(pcg)":
-        blockcontent = parse_pcgblock(lines)
-    elif key == "periods":
-        blockcontent = parse_periodsblock(lines)
-    else:
-        other = ("(pcg)", "(gcg)", "(vdf)")
-        options = tuple(KEYS.keys()) + tuple(DATE_KEYS.keys()) + other
-        raise ValueError(f"Expected one of {options}, received: {key}")
+    try:
+        if key in KEYS:
+            if n != 1:
+                raise ValueError(f"Expected N=1 for {key}, read: {n}")
+            fields = KEYS[key]
+            blockcontent = parse_notimeblock(lines, fields)
+        elif key in DATE_KEYS:
+            fields = DATE_KEYS[key]
+            blockcontent = parse_timeblock(lines, fields, n)
+        elif key == "(pcg)":
+            blockcontent = parse_pcgblock(lines)
+        elif key == "periods":
+            blockcontent = parse_periodsblock(lines)
+        else:
+            other = ("(pcg)", "(gcg)", "(vdf)")
+            options = tuple(KEYS.keys()) + tuple(DATE_KEYS.keys()) + other
+            lines.back()
+            line = next(lines)
+            raise ValueError(
+                f"Failed to recognize header keyword: {key}. Expected one of keywords {options}"
+                f"\nErrored in line with entries:\n{line}"
+            )
+
+    except Exception as e:
+        raise type(e)(f"{e}\nError occured for keyword: {key}")
 
     if blockcontent is not None:
         blockcontent["active"] = active
 
-    strippedkey = key[1:-1]
-    content[strippedkey] = blockcontent
+    content[key] = blockcontent
     return
 
 
-def read(path: FilePath) -> Dict[str, Any]:
+def read_projectfile(path: FilePath) -> Dict[str, Any]:
     """
     Read an iMOD project file into a collection of nested dictionaries.
 
@@ -388,7 +433,7 @@ def read(path: FilePath) -> Dict[str, Any]:
     │   ├── factor: float
     │   ├── addition: float
     │   ├── constant: float
-    │   ├── filename: str
+    │   ├── path: str
     │   └── time: str
     │
     ├── 1  # Second entry in list
@@ -407,9 +452,85 @@ def read(path: FilePath) -> Dict[str, Any]:
     with open(path) as f:
         lines = f.readlines()
 
-    lines = LineInterator([tokenize(line) for line in lines])
+    lines = LineIterator([tokenize(line) for line in lines])
     content = {}
     while not lines.finished:
         parse_block(lines, content)
 
     return content
+
+
+def open_package_idf(block_content, variables):
+    import imod
+
+    das = {}
+    for variable in variables:
+        variable_content = block_content[variable]
+        paths = []
+        headers = []
+        for entry in variable_content:
+            path = entry["path"]
+            header = imod.idf.header(path, pattern="{name}")
+            header["name"] = variable
+            header["dims"] = ["layer"]
+            header["layer"] = entry["layer"]
+            paths.append(path)
+            headers.append(header)
+
+        das[variable] = imod.array_io.reading._load(
+            paths, use_cftime=False, _read=imod.idf._read, headers=headers
+        )
+
+    return das
+
+
+def open_boundary_condition_idf(block_content, variables):
+    import imod
+
+    # TODO
+    # Groupby time, but not by layer.
+    # Every layer is a separate system!
+    # Use n_system
+    das = {}
+    for variable in variables:
+        variable_content = block_content[variable]
+        paths = []
+        headers = []
+        for entry in variable_content:
+            path = entry["path"]
+            header = imod.idf.header(path, pattern="{name}")
+            header["name"] = variable
+            header["layer"] = entry["layer"]
+
+            datetime = entry["time"]
+            if datetime == "steady-state":
+                header["dims"] = ["layer"]
+            else:
+                header["dims"] = ["time", "layer"]
+                header["time"] = datetime.strptime("%Y-%m-%d %H:%M:%S")
+
+            paths.append(path)
+            headers.append(header)
+
+        das[variable] = imod.array_io.reading._load(
+            paths, use_cftime=False, _read=imod.idf._read, headers=headers
+        )
+
+    return das
+
+
+def open_projectfile(path):
+    content = read_projectfile(path)
+    data = {}
+    for key, block_content in content.items():
+        if key in ("(hfb)", "(wel)"):
+            continue
+        if key in KEYS:
+            variables = KEYS[key]
+            das = open_package_idf(block_content, variables)
+        elif key in DATE_KEYS:
+            variables = DATE_KEYS[key]
+            das = open_boundary_condition_idf(block_content, variables)
+        strippedkey = key[1:-1]
+        data[strippedkey] = das
+    return data
