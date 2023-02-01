@@ -279,7 +279,7 @@ def polygonize(da):
 
     geometries = []
     colvalues = []
-    for (geom, colval) in shapes:
+    for geom, colval in shapes:
         geometries.append(sg.Polygon(geom["coordinates"][0]))
         colvalues.append(colval)
 

@@ -74,7 +74,6 @@ def test_evapotranspiration_mapping_simple(fixed_format_parser):
 
 
 def test_evapotranspiration_mapping_negative_dx(fixed_format_parser):
-
     x_meteo = [3.5, 1.5, -0.5]
     y_meteo = [0.5, 2.5, 4.5]
     subunit_meteo = [0, 1]

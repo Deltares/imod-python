@@ -7,7 +7,6 @@ from imod import ipf
 
 @pytest.fixture(scope="module")
 def write_basic_ipf():
-
     # factory function seems easiest way to parameterize tests
     def _write_basic_ipf(path, delim):
         ipfstring = (

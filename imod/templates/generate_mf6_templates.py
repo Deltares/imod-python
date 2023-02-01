@@ -152,7 +152,6 @@ def write_block(vardict, block):
 
 
 if __name__ == "__main__":
-
     # path to mf6ivar directory and output directory
     mf6ivar_dir = pathlib.Path("d:/repo/imod/modflow6/doc/mf6io/mf6ivar")
     j2dir = pathlib.Path(__file__).resolve().parent / "mf6"

@@ -363,7 +363,6 @@ class Package(abc.ABC):
                 path = (directory / f"{name}.dat").as_posix()
                 values.append(f"open/close {path}")
         else:
-
             if "layer" in da.dims:
                 layered = True
                 for layer in da.coords["layer"]:
@@ -620,13 +619,10 @@ class BoundaryCondition(Package, abc.ABC):
 
         # loop over the types of auxiliary variables (for example concentration)
         for auxvar in auxiliaries.keys():
-
             # if "concentration" is a variable of this dataset
             if auxvar in self.dataset.data_vars:
-
                 # if our concentration dataset has the species coordinate
                 if auxiliaries[auxvar] in self.dataset[auxvar].coords:
-
                     # assign the species names list to d
                     d["auxiliary"] = self.dataset[auxiliaries[auxvar]].values
                 else:

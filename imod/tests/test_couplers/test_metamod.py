@@ -247,7 +247,6 @@ def test_metamod_get_coupling_dict_no_sprinkling(
 
 
 def test_metamod_init_no_sprinkling_fail(msw_model, coupled_mf6_model):
-
     # Remove sprinkling package
     msw_model.pop("sprinkling")
 
@@ -261,7 +260,6 @@ def test_metamod_init_no_sprinkling_fail(msw_model, coupled_mf6_model):
 
 
 def test_metamod_init_no_mf6_well_fail(msw_model, coupled_mf6_model):
-
     with pytest.raises(ValueError):
         MetaMod(
             msw_model,
@@ -272,7 +270,6 @@ def test_metamod_init_no_mf6_well_fail(msw_model, coupled_mf6_model):
 
 
 def test_metamod_init_no_mf6_well_fail2(msw_model, coupled_mf6_model):
-
     with pytest.raises(ValueError):
         MetaMod(
             msw_model,
@@ -283,7 +280,6 @@ def test_metamod_init_no_mf6_well_fail2(msw_model, coupled_mf6_model):
 
 
 def test_metamod_init_no_mf6_rch_fail(msw_model, coupled_mf6_model):
-
     with pytest.raises(ValueError):
         MetaMod(
             msw_model,

@@ -12,7 +12,6 @@ from imod.couplers.metamod.rch_svat_mapping import RechargeSvatMapping
 
 
 def test_simple_model(fixed_format_parser):
-
     x = [1.0, 2.0, 3.0]
     y = [3.0, 2.0, 1.0]
     subunit = [0, 1]
@@ -65,7 +64,6 @@ def test_simple_model(fixed_format_parser):
 
 
 def test_simple_model_1_subunit(fixed_format_parser):
-
     x = [1.0, 2.0, 3.0]
     y = [3.0, 2.0, 1.0]
     subunit = [0]

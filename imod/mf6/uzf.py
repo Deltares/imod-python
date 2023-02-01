@@ -302,7 +302,6 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         root_potential,
         root_activity,
     ):
-
         simulate_et = [x is not None for x in [et_pot, extinction_depth]]
         unsat_etae = [
             x is not None for x in [air_entry_potential, root_potential, root_activity]

@@ -206,7 +206,6 @@ class ImmobileStorageTransfer(Package):
         format: str = "EXPONENTIAL",
         validate: bool = True,
     ):
-
         # is True fails on a np.bool_ True.
         if sorption:
             if bulk_density is None or distribution_coefficient is None:

@@ -13,7 +13,6 @@ from imod.schemata import ValidationError
 
 
 class Modflow6Model(collections.UserDict, abc.ABC):
-
     _pkg_id = "model"
 
     def __setitem__(self, key, value):

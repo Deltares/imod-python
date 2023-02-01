@@ -14,7 +14,6 @@ import imod.wq
 
 @pytest.fixture(scope="function")
 def basicmodel():
-
     # Basic flow
     layer = np.arange(1, 4)
     z = np.arange(25.0, 0.0, -10.0)

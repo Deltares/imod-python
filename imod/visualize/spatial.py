@@ -250,7 +250,6 @@ def plot_map(
 
     # Add basemap, if basemap is neither None nor False
     if add_basemap:
-
         crs = "EPSG:28992"  # default Amersfoort/RDnew
         try:
             crs = _crs2string(kwargs_basemap.pop("crs"))

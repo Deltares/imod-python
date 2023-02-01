@@ -8,21 +8,18 @@ from .helpers import assert_can_roundtrip_xml_value
 
 @attr.s
 class _BookWithDefaults(object):
-
     title = attr.ib(default=None)
     author = attr.ib(default=None)
 
 
 @attr.s
 class _BookWithNoDefaults(object):
-
     title = attr.ib()
     author = attr.ib()
 
 
 @attr.s(frozen=True)
 class _FrozenBook(object):
-
     title = attr.ib(default=None)
     author = attr.ib(default=None)
 
