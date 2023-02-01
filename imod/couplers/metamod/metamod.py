@@ -90,7 +90,7 @@ class MetaMod:
         modflow6_dll: Union[str, Path],
         metaswap_dll: Union[str, Path],
         metaswap_dll_dependency: Union[str, Path],
-        modflow6_write_kwargs: Optional[dict] = {},
+        modflow6_write_kwargs: Optional[dict] = None,
     ):
         """
         Write MetaSWAP and Modflow 6 model with exchange files, as well as a
@@ -119,6 +119,10 @@ class MetaMod:
             validation at writing (``validation=False``) or to write text files
             (``binary=False``)
         """
+
+        if modflow6_write_kwargs is None:
+            modflow6_write_kwargs = {}
+
         # force to Path
         directory = Path(directory)
         # For some reason the Modflow 6 model has to be written first, before
