@@ -9,13 +9,23 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+[0.11.6] - 2023-02-01
+---------------------
+
 Added
 ~~~~~
 
-- Added an extra argument in :meth:`imod.couplers.metamod.MetaMod.write` named
-  ``modflow6_write_kwargs``, which can be used to provide keyword arguments to
-  the writing of the Modflow 6 Simulation.
+- Added an extra optional argument in
+  :meth:`imod.couplers.metamod.MetaMod.write` named ``modflow6_write_kwargs``,
+  which can be used to provide keyword arguments to the writing of the Modflow 6
+  Simulation.
 
+
+Fixed
+~~~~~
+
+- :func:`imod.mf6.out.disv.read_grb` Remove repeated construction of
+  ``UgridDataArray`` for ``top``
 
 [0.11.5] - 2022-12-15
 ---------------------
