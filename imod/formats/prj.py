@@ -7,6 +7,11 @@ from itertools import chain
 from os import PathLike
 from typing import Any, Dict, List, Tuple, Union
 
+import numpy as np
+import xarray as xr
+
+import imod
+
 FilePath = Union[str, "PathLike[str]"]
 
 
@@ -29,7 +34,6 @@ KEYS = {
     "(ibs)": (None),
     "(pwt)": (None),
     "(sft)": (None),
-    "(cap)": (None),
     "(obs)": (None),
     "(cbi)": (None),
     "(sco)": (None),
@@ -62,6 +66,35 @@ DATE_KEYS = {
     "(fde)": (None,),
     "(tvc)": (None,),
 }
+
+METASWAP_VARS = (
+    "boundary",
+    "landuse",
+    "rootzone_thickness",
+    "soil_physical_unit",
+    "meteo_station_number",
+    "surface_elevation",
+    "artificial_recharge",
+    "artifical_recharge_layer",
+    "artificial_recharge_capacity",
+    "wetted_area",
+    "urban_area",
+    "urban_ponding_depth",
+    "rural_ponding_depth",
+    "urban_runoff_resistance",
+    "rural_runoff_resistance",
+    "urban_runon_resistance",
+    "rural_runon_resistance",
+    "urban_infiltration_capacity",
+    "rural_infiltration_capacity",
+    "perched_water_table_level",
+    "soil_moisture_fraction",
+    "conductivitiy_factor",
+    "plot_number",
+    "steering_location",
+    "plot_drainage_level",
+    "plot_drainage_resistance",
+)
 
 
 class LineIterator:
@@ -164,7 +197,9 @@ def tokenize(line: str) -> List[str]:
     return tokens
 
 
-def wrap_error_message(exception, description, lines):
+def wrap_error_message(
+    exception: Exception, description: str, lines: LineIterator
+) -> None:
     lines.back()
     content = next(lines)
     number = lines.count + 1
@@ -174,7 +209,7 @@ def wrap_error_message(exception, description, lines):
     )
 
 
-def parse_blockheader(lines: List[str]) -> Tuple[int, str, bool]:
+def parse_blockheader(lines: LineIterator) -> Tuple[int, str, str]:
     try:
         no_result = None, None, None
         line = next(lines)
@@ -190,7 +225,7 @@ def parse_blockheader(lines: List[str]) -> Tuple[int, str, bool]:
         elif len(line) >= 3:
             n = int(first)
             key = line[1].lower()
-            active = bool(int(line[2]))
+            active = line[2]
             return n, key, active
         # It's a comment or something.
         else:
@@ -199,7 +234,7 @@ def parse_blockheader(lines: List[str]) -> Tuple[int, str, bool]:
         wrap_error_message(e, "block header", lines)
 
 
-def parse_time(lines: List[str]) -> str:
+def parse_time(lines: LineIterator) -> str:
     try:
         line = next(lines)
         date = line[0].lower()
@@ -216,7 +251,7 @@ def parse_time(lines: List[str]) -> str:
         wrap_error_message(e, "date time", lines)
 
 
-def parse_blockline(lines, time=None):
+def parse_blockline(lines: LineIterator, time: str = None) -> Dict[str, Any]:
     try:
         line = next(lines)
         content = {
@@ -236,7 +271,7 @@ def parse_blockline(lines, time=None):
         wrap_error_message(e, "entries", lines)
 
 
-def read_nsub_nsystem(lines):
+def read_nsub_nsystem(lines: LineIterator) -> Tuple[int, int]:
     try:
         line = next(lines)
         n_entry = int(line[0])
@@ -247,9 +282,9 @@ def read_nsub_nsystem(lines):
 
 
 def parse_notimeblock(
-    lines: List[str],
+    lines: LineIterator,
     fields: List[str],
-) -> Dict[str, Dict[str, List]]:
+) -> Dict[str, Any]:
     n_entry, n_system = read_nsub_nsystem(lines)
 
     if len(fields) != n_entry:
@@ -263,11 +298,36 @@ def parse_notimeblock(
     return content
 
 
+def parse_capblock(
+    lines: LineIterator,
+) -> Dict[str, Any]:
+    fields = METASWAP_VARS
+    n_entry, n_system = read_nsub_nsystem(lines)
+
+    if n_entry == 21:
+        # Remove layer entry.
+        fields = list(fields[:22]).pop(8)
+    elif n_entry == 22:
+        fields = fields[:22]
+    elif n_entry == 26:
+        pass
+    else:
+        raise ValueError(
+            f"Expected NSYSTEM entry of 21, 22, or 26 for {fields}, read: {n_entry}"
+        )
+
+    content = {
+        field: [parse_blockline(lines) for _ in range(n_system)] for field in fields
+    }
+    content["n_system"] = n_system
+    return content
+
+
 def parse_timeblock(
     lines: List[str],
     fields: List[str],
     n: int,
-) -> Dict[str, List[Dict]]:
+) -> Dict[str, Any]:
     n_fields = len(fields)
     content = defaultdict(list)
     for _ in range(n):
@@ -285,10 +345,11 @@ def parse_timeblock(
                 [parse_blockline(lines, time) for _ in range(n_system)]
             )
 
+    content["n_system"] = n_system
     return content
 
 
-def parse_pcgblock(lines):
+def parse_pcgblock(lines: LineIterator) -> Dict[str, Any]:
     try:
         line = next(lines)
 
@@ -309,28 +370,23 @@ def parse_pcgblock(lines):
             "qerror": float,
         }
 
-        if len(line) == 2:
-            # TODO: not clear what's allowed:
-            # MXITER= 250  # This one's confirmed okay.
-            # MXITER = 250  # This generates three entries.
-            # MXITER =250  # This generates two entries, but other grouping.
-            pcglines = line + [next(line) for _ in range(11)]
-
-            content = {}
-            for line in pcglines:
-                key = line[0].strip("=").lower()
-                value = types[key](line[1])
-                content[key] = value
-
-        elif len(line) == 12:
+        if len(line) == 12:
             line_iterator = iter(line)
             content = {
                 k: valuetype(next(line_iterator)) for k, valuetype in types.items()
             }
-
+        elif any("=" in s for s in line):
+            pcglines = [line] + [next(lines) for _ in range(11)]
+            content = {}
+            for line in pcglines:
+                # undo separation, partition on equality sign instead.
+                line = "".join(line)
+                key, _, value = line.lower().partition("=")
+                value = types[key](value)
+                content[key] = value
         else:
             raise ValueError(
-                f"Expected 12 KEY= VALUE pairs, or 12 values. Found {len(line)}"
+                f"Expected 12 KEY = VALUE pairs, or 12 values. Found {len(line)}"
             )
 
         return content
@@ -338,7 +394,7 @@ def parse_pcgblock(lines):
         wrap_error_message(e, "PCG entry", lines)
 
 
-def parse_periodsblock(lines):
+def parse_periodsblock(lines: LineIterator) -> Dict[str, str]:
     try:
         periods = {}
         while not lines.finished:
@@ -354,6 +410,11 @@ def parse_periodsblock(lines):
         return periods
     except Exception as e:
         wrap_error_message(e, "periods data block", lines)
+
+
+def parse_extrablock(lines: LineIterator, n: int) -> Dict[str, List[str]]:
+    """Parse the MetaSWAP "extra files" block"""
+    return {"paths": [next(lines) for _ in range(n)]}
 
 
 def parse_block(lines: LineIterator, content: Dict[str, Any]) -> None:
@@ -376,18 +437,23 @@ def parse_block(lines: LineIterator, content: Dict[str, Any]) -> None:
         elif key in DATE_KEYS:
             fields = DATE_KEYS[key]
             blockcontent = parse_timeblock(lines, fields, n)
+        elif key == "(cap)":
+            blockcontent = parse_capblock(lines)
         elif key == "(pcg)":
             blockcontent = parse_pcgblock(lines)
         elif key == "periods":
             blockcontent = parse_periodsblock(lines)
+        elif key == "extra":
+            blockcontent = parse_extrablock(lines, n)
         else:
             other = ("(pcg)", "(gcg)", "(vdf)")
             options = tuple(KEYS.keys()) + tuple(DATE_KEYS.keys()) + other
             lines.back()
             line = next(lines)
+            number = lines.count + 1
             raise ValueError(
                 f"Failed to recognize header keyword: {key}. Expected one of keywords {options}"
-                f"\nErrored in line with entries:\n{line}"
+                f"\nErrored in line {number} with entries:\n{line}"
             )
 
     except Exception as e:
@@ -460,9 +526,7 @@ def read_projectfile(path: FilePath) -> Dict[str, Any]:
     return content
 
 
-def open_package_idf(block_content, variables):
-    import imod
-
+def open_package_idf(block_content, variables) -> List[xr.DataArray]:
     das = {}
     for variable in variables:
         variable_content = block_content[variable]
@@ -481,56 +545,138 @@ def open_package_idf(block_content, variables):
             paths, use_cftime=False, _read=imod.idf._read, headers=headers
         )
 
-    return das
+    return [das]
 
 
-def open_boundary_condition_idf(block_content, variables):
-    import imod
+def process_boundary_condition_entry(entry: Dict):
+    coords = {}
+    datetime = entry["time"]
+    if datetime == "steady-state":
+        time = None
+    else:
+        time = datetime.strptime("%Y-%m-%d %H:%M:%S")
+        coords["time"] = time
+        dims = dims + ("time",)
 
-    # TODO
-    # Groupby time, but not by layer.
-    # Every layer is a separate system!
-    # Use n_system
-    das = {}
+    # 0 signifies that the layer must be determined on the basis of
+    # bottom elevation and stage.
+    layer = entry["layer"]
+    if layer == 0:
+        dims = ()
+        layer is None
+    else:
+        coords["layer"] = layer
+        dims = ("layer",)
+
+    if "path" not in entry:
+        path = None
+        header = {"coords": coords}
+        value = entry["constant"]
+    else:
+        path = entry["path"]
+        header = imod.idf.header(path, pattern="{name}")
+        value = None
+
+    header["dims"] = dims
+    if layer is not None:
+        header["layer"] = layer
+    if time is not None:
+        header["time"] = time
+
+    return path, header, value
+
+
+def merge_coords(headers):
+    coords = defaultdict(list)
+    for header in headers:
+        for key, value in header["coords"].items():
+            coords[key].append(value)
+    return {k: np.unique(coords[k]) for k in coords}
+
+
+def open_boundary_condition_idf(
+    block_content, variables
+) -> List[Dict[str, xr.DataArray]]:
+    n_system = block_content["n_system"]
+    n_time = len(block_content["time"])
+    n_total = n_system * n_time
+
+    das = [{} for _ in range(n_system)]
     for variable in variables:
         variable_content = block_content[variable]
-        paths = []
-        headers = []
-        for entry in variable_content:
-            path = entry["path"]
-            header = imod.idf.header(path, pattern="{name}")
+
+        n = len(variable_content)
+        if n != n_total:
+            raise ValueError(
+                f"Expected n_time * n_system = {n_time} * {n_system} = "
+                f"{n_total} entries for variable {variable}. Received: {n}"
+            )
+
+        # Group the paths and headers by system.
+        system_paths = defaultdict(list)
+        system_headers = defaultdict(list)
+        system_values = defaultdict(list)
+        for i, entry in enumerate(variable_content):
+            path, header, value = process_boundary_condition_entry(entry)
             header["name"] = variable
-            header["layer"] = entry["layer"]
+            key = i % n_system
+            system_paths[key].append(path)
+            system_headers[key].append(header)
+            system_values[key].append(value)
 
-            datetime = entry["time"]
-            if datetime == "steady-state":
-                header["dims"] = ["layer"]
+        # Concat one system at a time.
+        for i, (paths, headers, values) in enumerate(
+            zip(system_paths.values(), system_headers.values(), system_values.values())
+        ):
+            none_paths = [p is None for p in paths]
+            if all(none_paths):
+                coords = merge_coords(headers)
+                da = xr.DataArray(values, dims=headers[0]["dims"], coords=coords)
+            elif any(none_paths):
+                raise NotImplementedError(
+                    "Entries for a system should either all provide a constant, "
+                    "or all provide a filename."
+                )
             else:
-                header["dims"] = ["time", "layer"]
-                header["time"] = datetime.strptime("%Y-%m-%d %H:%M:%S")
-
-            paths.append(path)
-            headers.append(header)
-
-        das[variable] = imod.array_io.reading._load(
-            paths, use_cftime=False, _read=imod.idf._read, headers=headers
-        )
+                da = imod.array_io.reading._load(
+                    paths, use_cftime=False, _read=imod.idf._read, headers=headers
+                )
+            das[i][variable] = da
 
     return das
+
+
+def read_package_gen(block_content):
+    return [imod.gen.read(entry["path"]) for entry in block_content["gen"]]
+
+
+def read_package_ipf(block_content):
+    return [imod.ipf.read(entry["path"]) for entry in block_content["ipf"]]
 
 
 def open_projectfile(path):
     content = read_projectfile(path)
-    data = {}
+    prj_data = {}
     for key, block_content in content.items():
-        if key in ("(hfb)", "(wel)"):
-            continue
-        if key in KEYS:
-            variables = KEYS[key]
-            das = open_package_idf(block_content, variables)
-        elif key in DATE_KEYS:
-            variables = DATE_KEYS[key]
-            das = open_boundary_condition_idf(block_content, variables)
-        strippedkey = key[1:-1]
-        data[strippedkey] = das
-    return data
+        try:
+            if key == "(hfb)":
+                data = read_package_gen(block_content)
+            elif key == "(wel)":
+                data = read_package_ipf(block_content)
+            elif key in KEYS:
+                variables = KEYS[key]
+                data = open_package_idf(block_content, variables)
+            elif key in DATE_KEYS:
+                variables = DATE_KEYS[key]
+                data = open_boundary_condition_idf(block_content, variables)
+        except Exception as e:
+            raise type(e)(f"{e}. Errored while opening/reading data entries for: {key}")
+
+        strippedkey = key.strip("(").strip(")")
+        if len(data) > 1:
+            for i, da in enumerate(data):
+                prj_data[f"{strippedkey}-{i+1}"] = da
+        else:
+            prj_data[strippedkey] = data[0]
+
+    return prj_data
