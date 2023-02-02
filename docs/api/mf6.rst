@@ -73,12 +73,11 @@ Transport Packages
 .. autosummary::
     :toctree: generated/mf6
 
-   AdvectionCentral
-   AdvectionTVD
-   AdvectionUpstream
-   ConstantConcentration
-   Dispersion
-   ImmobileStorageTransfer
-   MobileStorageTransfer
-   MassSourceLoading
-   
+    AdvectionCentral
+    AdvectionTVD
+    AdvectionUpstream
+    ConstantConcentration
+    Dispersion
+    ImmobileStorageTransfer
+    MobileStorageTransfer
+    MassSourceLoading
