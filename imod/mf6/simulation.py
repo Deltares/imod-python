@@ -144,6 +144,22 @@ class Modflow6Simulation(collections.UserDict):
         return self._template.render(d)
 
     def write(self, directory=".", binary=True, validate: bool = True):
+        """
+        Write Modflow6 simulation, including assigned groundwater flow and
+        transport models.
+
+        Parameters
+        ----------
+        directory: str, pathlib.Path
+            Directory to write Modflow 6 simulation to.
+        binary: ({True, False}, optional)
+            Whether to write time-dependent input for stress packages as binary
+            files, which are smaller in size, or more human-readable text files.
+        validate: ({True, False}, optional)
+            Whether to validate the Modflow6 simulation, including models, at
+            write. If True, erronous model input will throw a
+            ``ValidationError``.
+        """
         # Check models for required content
         for key, model in self.items():
             # skip timedis, exchanges
