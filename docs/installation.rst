@@ -152,8 +152,8 @@ You can use ``pip`` to install the latest source from Gitlab::
 Alternatively, you can clone the git repository locally and install from there::
 
   git clone https://gitlab.com/deltares/imod/imod-python.git
-  cd imod
-  pip install .
+  cd imod-python
+  pip install -e .
 
 .. _Verde's: https://www.fatiando.org/verde/latest/install.html
 .. _Deltaforge: https://deltares.github.io/deltaforge/
