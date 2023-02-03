@@ -9,6 +9,13 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Fixed
+~~~~~
+
+- :func:`imod.evaluate.budget.flow_velocity` now properly computes velocity by
+  dividing by the porosity. Before, this function computed the Darcian velocity.
+
+
 [0.11.6] - 2023-02-01
 ---------------------
 
