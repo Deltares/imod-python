@@ -252,7 +252,7 @@ which happens automatically within CI.
 At this point, everything should be ready to run the tests on the Docker image.
 
 .. _Contributing to xarray guide: https://xarray.pydata.org/en/latest/contributing.html
-.. _pages: https://gitlab.com/deltares/imod/imod-python/issues
+.. _pages: https://gitlab.com/deltares/imod/imod-python/-/issues/
 .. _this stackoverflow article: https://stackoverflow.com/help/mcve
 .. _the extensive manual online: https://git-scm.com/doc
 .. _handbook: https://guides.github.com/introduction/git-handbook/
