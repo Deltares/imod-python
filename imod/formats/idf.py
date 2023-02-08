@@ -19,8 +19,7 @@ import numpy as np
 import xarray as xr
 
 from imod import util
-
-from . import array_io
+from imod.formats import array_io
 
 # Make sure we can still use the built-in function...
 f_open = open

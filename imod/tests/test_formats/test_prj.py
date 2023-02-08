@@ -9,7 +9,7 @@ import shapely.geometry as sg
 import xarray as xr
 
 import imod
-from imod.formats import prj
+from imod.formats.prj import prj
 
 
 def test_tokenize():
@@ -455,11 +455,11 @@ class TestProjectFile:
         imod.ipf.save(basepath / "wells_l2.ipf", df)
 
     def test_read_projectfile(self):
-        content = prj.read_projectfile(self.prj_path)
+        content = imod.prj.read_projectfile(self.prj_path)
         assert isinstance(content, dict)
 
     def test_open_projectfile_data(self):
-        content = prj.open_projectfile_data(self.prj_path)
+        content = imod.prj.open_projectfile_data(self.prj_path)
         assert isinstance(content, dict)
         assert isinstance(content["ghb"]["conductance"], xr.DataArray)
         assert isinstance(content["ghb"]["head"], xr.DataArray)

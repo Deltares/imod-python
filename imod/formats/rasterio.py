@@ -12,8 +12,7 @@ import warnings
 import numpy as np
 
 from imod import util
-
-from . import array_io
+from imod.formats import array_io
 
 # since rasterio is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency

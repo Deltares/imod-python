@@ -6,8 +6,9 @@ import rasterio
 import xarray as xr
 
 import imod
-from imod import array_io, util
-from imod.array_io import reading
+from imod import util
+from imod.formats import array_io
+from imod.formats.array_io import reading
 
 
 @pytest.fixture(scope="module", params=[np.float32, np.float64])

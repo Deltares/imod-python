@@ -513,7 +513,7 @@ def _create_dataarray(
             "or all provide a file path."
         )
     else:
-        da = imod.array_io.reading._load(
+        da = imod.formats.array_io.reading._load(
             paths, use_cftime=False, _read=imod.idf._read, headers=headers
         )
     return da
