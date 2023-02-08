@@ -3,6 +3,7 @@ Utilities for parsing a project file.
 """
 import shlex
 from collections import defaultdict
+from datetime import datetime
 from itertools import chain
 from os import PathLike
 from typing import Any, Dict, List, Tuple, Union
@@ -220,7 +221,7 @@ def parse_blockheader(lines: LineIterator) -> Tuple[int, str, str]:
 
         first = line[0].lower()
         if first in ("periods", "species"):
-            return 1, first, True
+            return 1, first, None
         # The line must contain atleast nper, key, active.
         elif len(line) >= 3:
             n = int(first)
@@ -459,7 +460,7 @@ def parse_block(lines: LineIterator, content: Dict[str, Any]) -> None:
     except Exception as e:
         raise type(e)(f"{e}\nError occurred for keyword: {key}")
 
-    if blockcontent is not None:
+    if blockcontent is not None and active is not None:
         blockcontent["active"] = active
 
     content[key] = blockcontent
@@ -533,36 +534,80 @@ def read_projectfile(path: FilePath) -> Dict[str, Any]:
     return content
 
 
+def process_package_entry(entry: Dict):
+    coords = {"layer": entry["layer"]}
+    dims = ("layer",)
+
+    if "path" not in entry:
+        path = None
+        header = {"coords": coords}
+        value = entry["constant"]
+    else:
+        path = entry["path"]
+        header = imod.idf.header(path, pattern="{name}")
+        value = None
+
+    header["dims"] = dims
+    return path, header, value
+
+
+def merge_coords(headers):
+    coords = defaultdict(list)
+    for header in headers:
+        for key, value in header["coords"].items():
+            coords[key].append(value)
+    return {k: np.unique(coords[k]) for k in coords}
+
+
+def create_dataarray(paths, headers, values) -> xr.DataArray:
+    """
+    Create a DataArray from a list of IDF paths, or from a constant value.
+    """
+    none_paths = [p is None for p in paths]
+    if all(none_paths):
+        coords = merge_coords(headers)
+        da = xr.DataArray(values, dims=headers[0]["dims"], coords=coords)
+    elif any(none_paths):
+        raise NotImplementedError(
+            "Entries for a system should either all provide a constant, "
+            "or all provide a file path."
+        )
+    else:
+        da = imod.array_io.reading._load(
+            paths, use_cftime=False, _read=imod.idf._read, headers=headers
+        )
+    return da
+
+
 def open_package_idf(block_content, variables) -> List[xr.DataArray]:
     das = {}
     for variable in variables:
         variable_content = block_content[variable]
         paths = []
         headers = []
+        values = []
         for entry in variable_content:
-            path = entry["path"]
-            header = imod.idf.header(path, pattern="{name}")
+            path, header, value = process_package_entry(entry)
             header["name"] = variable
             header["dims"] = ["layer"]
             header["layer"] = entry["layer"]
             paths.append(path)
             headers.append(header)
+            values.append(value)
 
-        das[variable] = imod.array_io.reading._load(
-            paths, use_cftime=False, _read=imod.idf._read, headers=headers
-        )
+        das[variable] = create_dataarray(paths, headers, values)
 
     return [das]
 
 
 def process_boundary_condition_entry(entry: Dict):
     coords = {}
-    datetime = entry["time"]
-    if datetime == "steady-state":
+    time = entry["time"]
+    if time == "steady-state":
         time = None
         dims = ()
     else:
-        time = datetime.strptime("%Y-%m-%d %H:%M:%S")
+        time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
         coords["time"] = time
         dims = ("time",)
 
@@ -591,14 +636,6 @@ def process_boundary_condition_entry(entry: Dict):
         header["time"] = time
 
     return path, header, value
-
-
-def merge_coords(headers):
-    coords = defaultdict(list)
-    for header in headers:
-        for key, value in header["coords"].items():
-            coords[key].append(value)
-    return {k: np.unique(coords[k]) for k in coords}
 
 
 def open_boundary_condition_idf(
@@ -635,20 +672,7 @@ def open_boundary_condition_idf(
         for i, (paths, headers, values) in enumerate(
             zip(system_paths.values(), system_headers.values(), system_values.values())
         ):
-            none_paths = [p is None for p in paths]
-            if all(none_paths):
-                coords = merge_coords(headers)
-                da = xr.DataArray(values, dims=headers[0]["dims"], coords=coords)
-            elif any(none_paths):
-                raise NotImplementedError(
-                    "Entries for a system should either all provide a constant, "
-                    "or all provide a filename."
-                )
-            else:
-                da = imod.array_io.reading._load(
-                    paths, use_cftime=False, _read=imod.idf._read, headers=headers
-                )
-            das[i][variable] = da
+            das[i][variable] = create_dataarray(paths, headers, values)
 
     return das
 
@@ -670,7 +694,19 @@ def open_projectfile(path):
                 data = read_package_gen(block_content)
             elif key == "(wel)":
                 data = read_package_ipf(block_content)
-            elif key in KEYS or key == "(cap)":
+            elif key == "(cap)":
+                variables = set(METASWAP_VARS).intersection(block_content.keys())
+                data = open_package_idf(block_content, variables)
+            elif key in ("extra", "(pcg)"):
+                data = [block_content]
+            elif key in ("periods"):
+                data = [
+                    {
+                        key: datetime.strptime(time, "%d-%m-%Y %H:%M:%S")
+                        for key, time in block_content.items()
+                    }
+                ]
+            elif key in KEYS:
                 variables = KEYS[key]
                 data = open_package_idf(block_content, variables)
             elif key in DATE_KEYS:

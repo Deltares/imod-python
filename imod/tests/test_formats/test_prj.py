@@ -1,7 +1,12 @@
 import re
 import textwrap
+from datetime import datetime
 
+import geopandas as gpd
+import pandas as pd
 import pytest
+import shapely.geometry as sg
+import xarray as xr
 
 import imod
 from imod.formats import prj
@@ -97,8 +102,8 @@ def test_parseblockheader():
             ["species"],
         ]
     )
-    assert prj.parse_blockheader(lines) == (1, "periods", True)
-    assert prj.parse_blockheader(lines) == (1, "species", True)
+    assert prj.parse_blockheader(lines) == (1, "periods", None)
+    assert prj.parse_blockheader(lines) == (1, "species", None)
 
     lines = prj.LineIterator(
         [
@@ -310,11 +315,6 @@ def test_read_error(tmp_path):
 class TestProjectFile:
     @pytest.fixture(autouse=True)
     def setup(self, tmp_path_factory):
-        import geopandas as gpd
-        import pandas as pd
-        import shapely.geometry as sg
-        import xarray as xr
-
         # Try for maximum inconsistency...
         # Single and double quotes
         # General "comment-y" things after input, etc.
@@ -339,7 +339,7 @@ class TestProjectFile:
             1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
             1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
             1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
-            1,2, 001, 1.0, 0.0, -999.9900,"{basepath}]a.idf"
+            1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/a.idf"
             1,1, 001, 1.0, 0.0,  1.0     ,''  # runof resistance urban area
             1,1, 001, 1.0, 0.0,  1.0     ,''  # runof resistance rural area
             1,1, 001, 1.0, 0.0,  1.0     ,''  # runon resistance urban area
@@ -459,3 +459,15 @@ class TestProjectFile:
     def test_open_projectfile_data(self):
         content = prj.open_projectfile(self.prj_path)
         assert isinstance(content, dict)
+        assert isinstance(content["ghb"]["conductance"], xr.DataArray)
+        assert isinstance(content["ghb"]["head"], xr.DataArray)
+        assert isinstance(content["cap"]["landuse"], xr.DataArray)
+        assert isinstance(content["wel-1"], pd.DataFrame)
+        assert isinstance(content["wel-2"], pd.DataFrame)
+        assert isinstance(content["hfb-1"], gpd.GeoDataFrame)
+        assert isinstance(content["hfb-2"], gpd.GeoDataFrame)
+        assert isinstance(content["pcg"], dict)
+        assert content["periods"] == {
+            "summer": datetime(1900, 4, 1),
+            "winter": datetime(1900, 10, 1),
+        }
