@@ -6,7 +6,6 @@ raster formats.
 Currently only :func:`imod.rasterio.write` is implemented.
 """
 
-import glob
 import pathlib
 import warnings
 

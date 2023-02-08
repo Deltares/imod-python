@@ -255,7 +255,7 @@ def parse_blockline(lines: LineIterator, time: str = None) -> Dict[str, Any]:
     try:
         line = next(lines)
         content = {
-            "active": bool(line[0]),
+            "active": bool(int(line[0])),
             "is_constant": int(line[1]),
             "layer": int(line[2]),
             "factor": float(line[3]),
@@ -271,7 +271,7 @@ def parse_blockline(lines: LineIterator, time: str = None) -> Dict[str, Any]:
         wrap_error_message(e, "entries", lines)
 
 
-def read_nsub_nsystem(lines: LineIterator) -> Tuple[int, int]:
+def parse_nsub_nsystem(lines: LineIterator) -> Tuple[int, int]:
     try:
         line = next(lines)
         n_entry = int(line[0])
@@ -285,11 +285,11 @@ def parse_notimeblock(
     lines: LineIterator,
     fields: List[str],
 ) -> Dict[str, Any]:
-    n_entry, n_system = read_nsub_nsystem(lines)
+    n_entry, n_system = parse_nsub_nsystem(lines)
 
     if len(fields) != n_entry:
         raise ValueError(
-            f"Expected NSYSTEM entry of {len(fields)} for {fields}, read: {n_entry}"
+            f"Expected NSUB entry of {len(fields)} for {fields}, read: {n_entry}"
         )
     content = {
         field: [parse_blockline(lines) for _ in range(n_system)] for field in fields
@@ -302,7 +302,7 @@ def parse_capblock(
     lines: LineIterator,
 ) -> Dict[str, Any]:
     fields = METASWAP_VARS
-    n_entry, n_system = read_nsub_nsystem(lines)
+    n_entry, n_system = parse_nsub_nsystem(lines)
 
     if n_entry == 21:
         # Remove layer entry.
@@ -313,7 +313,7 @@ def parse_capblock(
         pass
     else:
         raise ValueError(
-            f"Expected NSYSTEM entry of 21, 22, or 26 for {fields}, read: {n_entry}"
+            f"Expected NSUB entry of 21, 22, or 26 for {fields}, read: {n_entry}"
         )
 
     content = {
@@ -321,6 +321,11 @@ def parse_capblock(
     }
     content["n_system"] = n_system
     return content
+
+
+def parse_extrablock(lines: LineIterator, n: int) -> Dict[str, List[str]]:
+    """Parse the MetaSWAP "extra files" block"""
+    return {"paths": [next(lines) for _ in range(n)]}
 
 
 def parse_timeblock(
@@ -333,11 +338,11 @@ def parse_timeblock(
     for _ in range(n):
         time = parse_time(lines)
         content["time"].append(time)
-        n_entry, n_system = read_nsub_nsystem(lines)
+        n_entry, n_system = parse_nsub_nsystem(lines)
 
         if n_fields != n_entry:
             raise ValueError(
-                f"Expected NSYSTEM entry of {n_fields} for {fields}, read: {n_entry}"
+                f"Expected NSUB entry of {n_fields} for {fields}, read: {n_entry}"
             )
 
         for field in fields:
@@ -412,11 +417,6 @@ def parse_periodsblock(lines: LineIterator) -> Dict[str, str]:
         wrap_error_message(e, "periods data block", lines)
 
 
-def parse_extrablock(lines: LineIterator, n: int) -> Dict[str, List[str]]:
-    """Parse the MetaSWAP "extra files" block"""
-    return {"paths": [next(lines) for _ in range(n)]}
-
-
 def parse_block(lines: LineIterator, content: Dict[str, Any]) -> None:
     """
     Mutates content dict.
@@ -457,7 +457,7 @@ def parse_block(lines: LineIterator, content: Dict[str, Any]) -> None:
             )
 
     except Exception as e:
-        raise type(e)(f"{e}\nError occured for keyword: {key}")
+        raise type(e)(f"{e}\nError occurred for keyword: {key}")
 
     if blockcontent is not None:
         blockcontent["active"] = active
@@ -518,7 +518,14 @@ def read_projectfile(path: FilePath) -> Dict[str, Any]:
     with open(path) as f:
         lines = f.readlines()
 
-    lines = LineIterator([tokenize(line) for line in lines])
+    tokenized = []
+    for i, line in enumerate(lines):
+        try:
+            tokenized.append(tokenize(line))
+        except Exception as e:
+            raise type(e)(f"{e}\nError occurred in line {i}")
+
+    lines = LineIterator(tokenized)
     content = {}
     while not lines.finished:
         parse_block(lines, content)
@@ -553,20 +560,20 @@ def process_boundary_condition_entry(entry: Dict):
     datetime = entry["time"]
     if datetime == "steady-state":
         time = None
+        dims = ()
     else:
         time = datetime.strptime("%Y-%m-%d %H:%M:%S")
         coords["time"] = time
-        dims = dims + ("time",)
+        dims = ("time",)
 
     # 0 signifies that the layer must be determined on the basis of
     # bottom elevation and stage.
     layer = entry["layer"]
     if layer == 0:
-        dims = ()
         layer is None
     else:
         coords["layer"] = layer
-        dims = ("layer",)
+        dims = dims + ("layer",)
 
     if "path" not in entry:
         path = None
@@ -663,12 +670,14 @@ def open_projectfile(path):
                 data = read_package_gen(block_content)
             elif key == "(wel)":
                 data = read_package_ipf(block_content)
-            elif key in KEYS:
+            elif key in KEYS or key == "(cap)":
                 variables = KEYS[key]
                 data = open_package_idf(block_content, variables)
             elif key in DATE_KEYS:
                 variables = DATE_KEYS[key]
                 data = open_boundary_condition_idf(block_content, variables)
+            else:
+                raise ValueError("Unsupported key")
         except Exception as e:
             raise type(e)(f"{e}. Errored while opening/reading data entries for: {key}")
 
