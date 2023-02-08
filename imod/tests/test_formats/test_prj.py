@@ -13,28 +13,28 @@ from imod.formats import prj
 
 
 def test_tokenize():
-    assert prj.tokenize("a b c") == ["a", "b", "c"]
-    assert prj.tokenize("a,b,c") == ["a", "b", "c"]
-    assert prj.tokenize("a, b, c") == ["a", "b", "c"]
-    assert prj.tokenize("a, 'b', c") == ["a", "b", "c"]
-    assert prj.tokenize("a, 'b d', c") == ["a", "b d", "c"]
+    assert prj._tokenize("a b c") == ["a", "b", "c"]
+    assert prj._tokenize("a,b,c") == ["a", "b", "c"]
+    assert prj._tokenize("a, b, c") == ["a", "b", "c"]
+    assert prj._tokenize("a, 'b', c") == ["a", "b", "c"]
+    assert prj._tokenize("a, 'b d', c") == ["a", "b d", "c"]
 
     # We don't expect commas in our quoted strings since they're paths:
     with pytest.raises(ValueError, match="No closing quotation"):
-        prj.tokenize("a, 'b,d', c")
+        prj._tokenize("a, 'b,d', c")
 
     # From the examples:
     with pytest.raises(ValueError, match="No closing quotation"):
-        prj.tokenize("That's life")
-    assert prj.tokenize("That 's life'") == ["That", "s life"]
-    assert prj.tokenize("That,'s life'") == ["That", "s life"]
-    assert prj.tokenize("Thats life") == ["Thats", "life"]
+        prj._tokenize("That's life")
+    assert prj._tokenize("That 's life'") == ["That", "s life"]
+    assert prj._tokenize("That,'s life'") == ["That", "s life"]
+    assert prj._tokenize("Thats life") == ["Thats", "life"]
 
 
 class TestLineIterator:
     @pytest.fixture(autouse=True)
     def setup(self):
-        self.lines = prj.LineIterator(
+        self.lines = prj._LineIterator(
             [
                 ["This", "is", "the", "first", "line"],
                 ["this", "is", "the", "second"],
@@ -75,7 +75,7 @@ class TestLineIterator:
 
 @pytest.mark.parametrize("error_type", [ValueError, TypeError])
 def test_wrap_error_message(error_type):
-    lines = prj.LineIterator([["one"], ["two"], ["three"]])
+    lines = prj._LineIterator([["one"], ["two"], ["three"]])
     exc = error_type("something wrong")
     expected = re.escape(
         "something wrong\n"
@@ -83,71 +83,71 @@ def test_wrap_error_message(error_type):
         "['one']"
     )
     with pytest.raises(error_type, match=expected):
-        prj.wrap_error_message(exc, "test content", lines)
+        prj._wrap_error_message(exc, "test content", lines)
 
 
 def test_parseblockheader():
-    lines = prj.LineIterator(
+    lines = prj._LineIterator(
         [
             ["abc", "def"],
             [],
         ]
     )
-    assert prj.parse_blockheader(lines) == (None, None, None)
-    assert prj.parse_blockheader(lines) == (None, None, None)
+    assert prj._parse_blockheader(lines) == (None, None, None)
+    assert prj._parse_blockheader(lines) == (None, None, None)
 
-    lines = prj.LineIterator(
+    lines = prj._LineIterator(
         [
             ["periods"],
             ["species"],
         ]
     )
-    assert prj.parse_blockheader(lines) == (1, "periods", None)
-    assert prj.parse_blockheader(lines) == (1, "species", None)
+    assert prj._parse_blockheader(lines) == (1, "periods", None)
+    assert prj._parse_blockheader(lines) == (1, "species", None)
 
-    lines = prj.LineIterator(
+    lines = prj._LineIterator(
         [
             ["001", "(RIV)", "1"],
             ["002", "(GHB)", "0"],
             ["003", "(DRN)", "1", "extra", "content"],
         ]
     )
-    assert prj.parse_blockheader(lines) == (1, "(riv)", "1")
-    assert prj.parse_blockheader(lines) == (2, "(ghb)", "0")
-    assert prj.parse_blockheader(lines) == (3, "(drn)", "1")
+    assert prj._parse_blockheader(lines) == (1, "(riv)", "1")
+    assert prj._parse_blockheader(lines) == (2, "(ghb)", "0")
+    assert prj._parse_blockheader(lines) == (3, "(drn)", "1")
 
     # Test error wrapping
-    lines = prj.LineIterator([["a", "b", "c"]])
+    lines = prj._LineIterator([["a", "b", "c"]])
     with pytest.raises(ValueError, match="Failed to parse block header"):
-        prj.parse_blockheader(lines)
+        prj._parse_blockheader(lines)
 
 
 def test_parse_time():
-    lines = prj.LineIterator(
+    lines = prj._LineIterator(
         [
             ["steady-state"],
             ["2000-01-01"],
             ["2000-01-01", "12:01:02"],
         ]
     )
-    assert prj.parse_time(lines) == "steady-state"
-    assert prj.parse_time(lines) == "2000-01-01 00:00:00"
-    assert prj.parse_time(lines) == "2000-01-01 12:01:02"
+    assert prj._parse_time(lines) == "steady-state"
+    assert prj._parse_time(lines) == "2000-01-01 00:00:00"
+    assert prj._parse_time(lines) == "2000-01-01 12:01:02"
 
-    lines = prj.LineIterator([1, 2, 3])
+    lines = prj._LineIterator([1, 2, 3])
     with pytest.raises(TypeError, match="Failed to parse date time"):
-        prj.parse_time(lines)
+        prj._parse_time(lines)
 
 
 def test_parse_blockline():
-    lines = prj.LineIterator(
+    lines = prj._LineIterator(
         [
             ["1", "2", "001", "1.0", "0.0", "-999.99", "ibound.idf"],
             ["0", "2", "012", "2.0", "3.0", "-999.99", "ibound.idf"],
             ["1", "1", "012", "2.0", "3.0", "-999.99", "ibound.idf"],
         ]
     )
-    actual = prj.parse_blockline(lines)
+    actual = prj._parse_blockline(lines)
     expected = {
         "active": True,
         "is_constant": 2,
@@ -159,34 +159,34 @@ def test_parse_blockline():
     }
     assert actual == expected
 
-    actual = prj.parse_blockline(lines, "2000-01-01 00:00:00")
+    actual = prj._parse_blockline(lines, "2000-01-01 00:00:00")
     assert actual["time"] == "2000-01-01 00:00:00"
     assert not actual["active"]
 
-    actual = prj.parse_blockline(lines, "2000-01-01 00:00:00")
+    actual = prj._parse_blockline(lines, "2000-01-01 00:00:00")
     assert "path" not in actual
 
-    lines = prj.LineIterator(
+    lines = prj._LineIterator(
         [["1", "2", "001"]],
     )
     with pytest.raises(IndexError, match="Failed to parse entries"):
-        prj.parse_blockline(lines)
+        prj._parse_blockline(lines)
 
 
 def test_parse_nsub_nsystem():
-    lines = prj.LineIterator([["5", "2"]])
-    assert prj.parse_nsub_nsystem(lines) == (5, 2)
+    lines = prj._LineIterator([["5", "2"]])
+    assert prj._parse_nsub_nsystem(lines) == (5, 2)
 
-    lines = prj.LineIterator([["5"]])
+    lines = prj._LineIterator([["5"]])
     with pytest.raises(
         IndexError, match="Failed to parse number of sub-entries and number of systems"
     ):
-        prj.parse_nsub_nsystem(lines)
+        prj._parse_nsub_nsystem(lines)
 
 
-def parse_notimeblock():
+def test_parse_notimeblock():
     fields = ["conductance", "head"]
-    lines = prj.LineIterator(
+    lines = prj._LineIterator(
         [
             ["3", "1"],
             ["a", "b", "c"],
@@ -194,36 +194,36 @@ def parse_notimeblock():
     )
     with pytest.raises(
         ValueError,
-        match="Expected NSYSTEM entry of 2 for ['conductance', 'head'], read: 3",
+        match=re.escape("Expected NSUB entry of 2 for ['conductance', 'head'], read: 3"),
     ):
-        prj.parse_notimeblock(lines, fields)
+        prj._parse_notimeblock(lines, fields)
 
-    lines = prj.LineIterator(
+    lines = prj._LineIterator(
         [
             ["2", "1"],
             ["1", "2", "001", "1.0", "0.0", "-999.99", "cond.idf"],
             ["1", "2", "001", "2.0", "3.0", "-999.99", "head.idf"],
         ]
     )
-    actual = parse_notimeblock(lines, fields)
+    actual = prj._parse_notimeblock(lines, fields)
     assert actual["n_system"] == 1
-    assert actual["conductance"]["path"] == "cond.idf"
-    assert actual["head"]["path"] == "head.idf"
+    assert actual["conductance"][0]["path"] == "cond.idf"
+    assert actual["head"][0]["path"] == "head.idf"
 
 
-def parse_capblock():
-    lines = prj.LineIterator(
+def test_parse_capblock():
+    lines = prj._LineIterator(
         [
             ["3", "1"],
             ["a", "b", "c"],
         ]
     )
-    with pytest.raises(ValueError, match="Expected NSYSTEM entry of 21, 22, or 26"):
-        prj.parse_notimeblock(lines)
+    with pytest.raises(ValueError, match="Expected NSUB entry of 21, 22, or 26"):
+        prj._parse_capblock(lines)
 
 
 def test_parse_pcgblock():
-    lines = prj.LineIterator(
+    lines = prj._LineIterator(
         ["50,100,0.10000E-02,100.00,0.98000,1,1,0,1.0000,1.0000,0,0.10000".split(",")]
     )
     expected = {
@@ -240,10 +240,10 @@ def test_parse_pcgblock():
         "iqerror": 0,
         "qerror": 0.1,
     }
-    actual = prj.parse_pcgblock(lines)
+    actual = prj._parse_pcgblock(lines)
     assert actual == expected
 
-    lines = prj.LineIterator(
+    lines = prj._LineIterator(
         # Try the different spacings...
         [
             ["mxiter=50"],
@@ -260,27 +260,27 @@ def test_parse_pcgblock():
             ["qerror=0.1"],
         ]
     )
-    actual = prj.parse_pcgblock(lines)
+    actual = prj._parse_pcgblock(lines)
     assert actual == expected
 
-    lines = prj.LineIterator(
+    lines = prj._LineIterator(
         ["50,100,0.10000E-02,100.00,0.98000,1,1,0,1.0000,1.0000".split(",")]
     )
     with pytest.raises(ValueError, match="Failed to parse PCG entry"):
-        prj.parse_pcgblock(lines)
+        prj._parse_pcgblock(lines)
 
 
-def test_parse_block():
-    lines = prj.LineIterator([["1", "(bla)", "1"]])
+def test__parse_block():
+    lines = prj._LineIterator([["1", "(bla)", "1"]])
     content = {}
     with pytest.raises(
         ValueError, match=re.escape("Failed to recognize header keyword: (bla)")
     ):
-        prj.parse_block(lines, content)
+        prj._parse_block(lines, content)
 
 
-def test_parse_periodsblock():
-    lines = prj.LineIterator(
+def test__parse_periodsblock():
+    lines = prj._LineIterator(
         [
             ["summer"],
             ["01-04-1900", "00:00:00"],
@@ -289,7 +289,7 @@ def test_parse_periodsblock():
             [],
         ]
     )
-    assert prj.parse_periodsblock(lines) == {
+    assert prj._parse_periodsblock(lines) == {
         "summer": "01-04-1900 00:00:00",
         "winter": "01-10-1900 00:00:00",
     }
@@ -457,7 +457,7 @@ class TestProjectFile:
         assert isinstance(content, dict)
 
     def test_open_projectfile_data(self):
-        content = prj.open_projectfile(self.prj_path)
+        content = prj.open_projectfile_data(self.prj_path)
         assert isinstance(content, dict)
         assert isinstance(content["ghb"]["conductance"], xr.DataArray)
         assert isinstance(content["ghb"]["head"], xr.DataArray)

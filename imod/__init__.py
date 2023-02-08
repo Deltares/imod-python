@@ -18,6 +18,7 @@ from imod import (
     visualize,
     wq,
 )
+from imod.formats import prj
 
 # version
 try:

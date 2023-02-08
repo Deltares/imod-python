@@ -6,9 +6,11 @@ from collections import defaultdict
 from datetime import datetime
 from itertools import chain
 from os import PathLike
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Sequence, Tuple, Union
 
+import geopandas as gpd
 import numpy as np
+import pandas as pd
 import xarray as xr
 
 import imod
@@ -98,7 +100,7 @@ METASWAP_VARS = (
 )
 
 
-class LineIterator:
+class _LineIterator:
     """
     Like iter(lines), but we can go back and we check if we're finished.
     """
@@ -125,7 +127,7 @@ class LineIterator:
         return (self.count + 1) >= self.length
 
 
-def tokenize(line: str) -> List[str]:
+def _tokenize(line: str) -> List[str]:
     """
     A value separator in Fortran list-directed input is:
 
@@ -185,12 +187,12 @@ def tokenize(line: str) -> List[str]:
     Raise ValueError, due to missing closing quotation. (Can be enabled
     shlex.split(s, posix=False)):
 
-    >> tokenize("That's life")
+    >> _tokenize("That's life")
 
-    >> tokenize("That 's life'")
+    >> _tokenize("That 's life'")
     >> ["That", "s life"]
 
-    >> tokenize("That,'s life'")
+    >> _tokenize("That,'s life'")
     >> ["That", "s life"]
     """
     values = [v.strip() for v in line.split(",")]
@@ -198,8 +200,8 @@ def tokenize(line: str) -> List[str]:
     return tokens
 
 
-def wrap_error_message(
-    exception: Exception, description: str, lines: LineIterator
+def _wrap_error_message(
+    exception: Exception, description: str, lines: _LineIterator
 ) -> None:
     lines.back()
     content = next(lines)
@@ -210,7 +212,7 @@ def wrap_error_message(
     )
 
 
-def parse_blockheader(lines: LineIterator) -> Tuple[int, str, str]:
+def _parse_blockheader(lines: _LineIterator) -> Tuple[int, str, str]:
     try:
         no_result = None, None, None
         line = next(lines)
@@ -232,10 +234,10 @@ def parse_blockheader(lines: LineIterator) -> Tuple[int, str, str]:
         else:
             return no_result
     except Exception as e:
-        wrap_error_message(e, "block header", lines)
+        _wrap_error_message(e, "block header", lines)
 
 
-def parse_time(lines: LineIterator) -> str:
+def _parse_time(lines: _LineIterator) -> str:
     try:
         line = next(lines)
         date = line[0].lower()
@@ -249,10 +251,10 @@ def parse_time(lines: LineIterator) -> str:
             time = "00:00:00"
         return f"{date} {time}"
     except Exception as e:
-        wrap_error_message(e, "date time", lines)
+        _wrap_error_message(e, "date time", lines)
 
 
-def parse_blockline(lines: LineIterator, time: str = None) -> Dict[str, Any]:
+def _parse_blockline(lines: _LineIterator, time: str = None) -> Dict[str, Any]:
     try:
         line = next(lines)
         content = {
@@ -269,41 +271,41 @@ def parse_blockline(lines: LineIterator, time: str = None) -> Dict[str, Any]:
             content["time"] = time
         return content
     except Exception as e:
-        wrap_error_message(e, "entries", lines)
+        _wrap_error_message(e, "entries", lines)
 
 
-def parse_nsub_nsystem(lines: LineIterator) -> Tuple[int, int]:
+def _parse_nsub_nsystem(lines: _LineIterator) -> Tuple[int, int]:
     try:
         line = next(lines)
         n_entry = int(line[0])
         n_system = int(line[1])
         return n_entry, n_system
     except Exception as e:
-        wrap_error_message(e, "number of sub-entries and number of systems", lines)
+        _wrap_error_message(e, "number of sub-entries and number of systems", lines)
 
 
-def parse_notimeblock(
-    lines: LineIterator,
+def _parse_notimeblock(
+    lines: _LineIterator,
     fields: List[str],
 ) -> Dict[str, Any]:
-    n_entry, n_system = parse_nsub_nsystem(lines)
+    n_entry, n_system = _parse_nsub_nsystem(lines)
 
     if len(fields) != n_entry:
         raise ValueError(
             f"Expected NSUB entry of {len(fields)} for {fields}, read: {n_entry}"
         )
     content = {
-        field: [parse_blockline(lines) for _ in range(n_system)] for field in fields
+        field: [_parse_blockline(lines) for _ in range(n_system)] for field in fields
     }
     content["n_system"] = n_system
     return content
 
 
-def parse_capblock(
-    lines: LineIterator,
+def _parse_capblock(
+    lines: _LineIterator,
 ) -> Dict[str, Any]:
     fields = METASWAP_VARS
-    n_entry, n_system = parse_nsub_nsystem(lines)
+    n_entry, n_system = _parse_nsub_nsystem(lines)
 
     if n_entry == 21:
         # Remove layer entry.
@@ -318,18 +320,18 @@ def parse_capblock(
         )
 
     content = {
-        field: [parse_blockline(lines) for _ in range(n_system)] for field in fields
+        field: [_parse_blockline(lines) for _ in range(n_system)] for field in fields
     }
     content["n_system"] = n_system
     return content
 
 
-def parse_extrablock(lines: LineIterator, n: int) -> Dict[str, List[str]]:
+def _parse_extrablock(lines: _LineIterator, n: int) -> Dict[str, List[str]]:
     """Parse the MetaSWAP "extra files" block"""
     return {"paths": [next(lines) for _ in range(n)]}
 
 
-def parse_timeblock(
+def _parse_timeblock(
     lines: List[str],
     fields: List[str],
     n: int,
@@ -337,9 +339,9 @@ def parse_timeblock(
     n_fields = len(fields)
     content = defaultdict(list)
     for _ in range(n):
-        time = parse_time(lines)
+        time = _parse_time(lines)
         content["time"].append(time)
-        n_entry, n_system = parse_nsub_nsystem(lines)
+        n_entry, n_system = _parse_nsub_nsystem(lines)
 
         if n_fields != n_entry:
             raise ValueError(
@@ -348,14 +350,14 @@ def parse_timeblock(
 
         for field in fields:
             content[field].extend(
-                [parse_blockline(lines, time) for _ in range(n_system)]
+                [_parse_blockline(lines, time) for _ in range(n_system)]
             )
 
     content["n_system"] = n_system
     return content
 
 
-def parse_pcgblock(lines: LineIterator) -> Dict[str, Any]:
+def _parse_pcgblock(lines: _LineIterator) -> Dict[str, Any]:
     try:
         line = next(lines)
 
@@ -397,10 +399,10 @@ def parse_pcgblock(lines: LineIterator) -> Dict[str, Any]:
 
         return content
     except Exception as e:
-        wrap_error_message(e, "PCG entry", lines)
+        _wrap_error_message(e, "PCG entry", lines)
 
 
-def parse_periodsblock(lines: LineIterator) -> Dict[str, str]:
+def _parse_periodsblock(lines: _LineIterator) -> Dict[str, str]:
     try:
         periods = {}
         while not lines.finished:
@@ -411,41 +413,41 @@ def parse_periodsblock(lines: LineIterator) -> Dict[str, str]:
             # Read the alias
             alias = line[0]
             # Now read the time associated with it.
-            start = parse_time(lines)
+            start = _parse_time(lines)
             periods[alias] = start
         return periods
     except Exception as e:
-        wrap_error_message(e, "periods data block", lines)
+        _wrap_error_message(e, "periods data block", lines)
 
 
-def parse_block(lines: LineIterator, content: Dict[str, Any]) -> None:
+def _parse_block(lines: _LineIterator, content: Dict[str, Any]) -> None:
     """
     Mutates content dict.
     """
     n = key = active = None
 
     # A project file may contain any number of lines outside of a "topic"
-    # block. parse_blockheader will return triple None in that case.
+    # block. _parse_blockheader will return triple None in that case.
     while key is None and not lines.finished:
-        n, key, active = parse_blockheader(lines)
+        n, key, active = _parse_blockheader(lines)
 
     try:
         if key in KEYS:
             if n != 1:
                 raise ValueError(f"Expected N=1 for {key}, read: {n}")
             fields = KEYS[key]
-            blockcontent = parse_notimeblock(lines, fields)
+            blockcontent = _parse_notimeblock(lines, fields)
         elif key in DATE_KEYS:
             fields = DATE_KEYS[key]
-            blockcontent = parse_timeblock(lines, fields, n)
+            blockcontent = _parse_timeblock(lines, fields, n)
         elif key == "(cap)":
-            blockcontent = parse_capblock(lines)
+            blockcontent = _parse_capblock(lines)
         elif key == "(pcg)":
-            blockcontent = parse_pcgblock(lines)
+            blockcontent = _parse_pcgblock(lines)
         elif key == "periods":
-            blockcontent = parse_periodsblock(lines)
+            blockcontent = _parse_periodsblock(lines)
         elif key == "extra":
-            blockcontent = parse_extrablock(lines, n)
+            blockcontent = _parse_extrablock(lines, n)
         else:
             other = ("(pcg)", "(gcg)", "(vdf)")
             options = tuple(KEYS.keys()) + tuple(DATE_KEYS.keys()) + other
@@ -465,6 +467,170 @@ def parse_block(lines: LineIterator, content: Dict[str, Any]) -> None:
 
     content[key] = blockcontent
     return
+
+
+def _process_package_entry(entry: Dict):
+    """
+    The iMOD project file supports constants in lieu of IDFs.
+    """
+    coords = {"layer": entry["layer"]}
+    dims = ("layer",)
+
+    if "path" not in entry:
+        path = None
+        header = {"coords": coords}
+        value = entry["constant"]
+    else:
+        path = entry["path"]
+        header = imod.idf.header(path, pattern="{name}")
+        value = None
+
+    header["dims"] = dims
+    return path, header, value
+
+
+def _merge_coords(headers: List[Dict[str, Any]]) -> Dict[str, np.ndarray]:
+    coords = defaultdict(list)
+    for header in headers:
+        for key, value in header["coords"].items():
+            coords[key].append(value)
+    return {k: np.unique(coords[k]) for k in coords}
+
+
+def _create_dataarray(
+    paths: List[str], headers: List[Dict[str, Any]], values: List[float]
+) -> xr.DataArray:
+    """
+    Create a DataArray from a list of IDF paths, or from constant values.
+    """
+    none_paths = [p is None for p in paths]
+    if all(none_paths):
+        coords = _merge_coords(headers)
+        da = xr.DataArray(values, dims=headers[0]["dims"], coords=coords)
+    elif any(none_paths):
+        raise NotImplementedError(
+            "Entries for a system should either all provide a constant, "
+            "or all provide a file path."
+        )
+    else:
+        da = imod.array_io.reading._load(
+            paths, use_cftime=False, _read=imod.idf._read, headers=headers
+        )
+    return da
+
+
+def _open_package_idf(
+    block_content: Dict[str, Any], variables: Sequence[str]
+) -> List[xr.DataArray]:
+    das = {}
+    for variable in variables:
+        variable_content = block_content[variable]
+        paths = []
+        headers = []
+        values = []
+        for entry in variable_content:
+            path, header, value = _process_package_entry(entry)
+            header["name"] = variable
+            header["dims"] = ["layer"]
+            header["layer"] = entry["layer"]
+            paths.append(path)
+            headers.append(header)
+            values.append(value)
+
+        das[variable] = _create_dataarray(paths, headers, values)
+
+    return [das]
+
+
+def _process_boundary_condition_entry(entry: Dict):
+    """
+    The iMOD project file supports constants in lieu of IDFs.
+    """
+    coords = {}
+    time = entry["time"]
+    if time == "steady-state":
+        time = None
+        dims = ()
+    else:
+        time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
+        coords["time"] = time
+        dims = ("time",)
+
+    # 0 signifies that the layer must be determined on the basis of
+    # bottom elevation and stage.
+    layer = entry["layer"]
+    if layer == 0:
+        layer is None
+    else:
+        coords["layer"] = layer
+        dims = dims + ("layer",)
+
+    if "path" not in entry:
+        path = None
+        header = {"coords": coords}
+        value = entry["constant"]
+    else:
+        path = entry["path"]
+        header = imod.idf.header(path, pattern="{name}")
+        value = None
+
+    header["dims"] = dims
+    if layer is not None:
+        header["layer"] = layer
+    if time is not None:
+        header["time"] = time
+
+    return path, header, value
+
+
+def _open_boundary_condition_idf(
+    block_content, variables
+) -> List[Dict[str, xr.DataArray]]:
+    """
+    Read the variables specified from block_content.
+    """
+    n_system = block_content["n_system"]
+    n_time = len(block_content["time"])
+    n_total = n_system * n_time
+
+    das = [{} for _ in range(n_system)]
+    for variable in variables:
+        variable_content = block_content[variable]
+
+        n = len(variable_content)
+        if n != n_total:
+            raise ValueError(
+                f"Expected n_time * n_system = {n_time} * {n_system} = "
+                f"{n_total} entries for variable {variable}. Received: {n}"
+            )
+
+        # Group the paths and headers by system.
+        system_paths = defaultdict(list)
+        system_headers = defaultdict(list)
+        system_values = defaultdict(list)
+        for i, entry in enumerate(variable_content):
+            path, header, value = _process_boundary_condition_entry(entry)
+            header["name"] = variable
+            key = i % n_system
+            system_paths[key].append(path)
+            system_headers[key].append(header)
+            system_values[key].append(value)
+
+        # Concat one system at a time.
+        for i, (paths, headers, values) in enumerate(
+            zip(system_paths.values(), system_headers.values(), system_values.values())
+        ):
+            das[i][variable] = _create_dataarray(paths, headers, values)
+
+    return das
+ 
+
+def _read_package_gen(block_content: Dict[str, Any]) -> List[gpd.GeoDataFrame]:
+    return [imod.gen.read(entry["path"]) for entry in block_content["gen"]]
+
+
+def _read_package_ipf(block_content: Dict[str, Any]) -> List[pd.DataFrame]:
+    return [imod.ipf.read(entry["path"]) for entry in block_content["ipf"]]
 
 
 def read_projectfile(path: FilePath) -> Dict[str, Any]:
@@ -522,181 +688,53 @@ def read_projectfile(path: FilePath) -> Dict[str, Any]:
     tokenized = []
     for i, line in enumerate(lines):
         try:
-            tokenized.append(tokenize(line))
+            tokenized.append(_tokenize(line))
         except Exception as e:
             raise type(e)(f"{e}\nError occurred in line {i}")
 
-    lines = LineIterator(tokenized)
+    lines = _LineIterator(tokenized)
     content = {}
     while not lines.finished:
-        parse_block(lines, content)
+        _parse_block(lines, content)
 
     return content
 
 
-def process_package_entry(entry: Dict):
-    coords = {"layer": entry["layer"]}
-    dims = ("layer",)
-
-    if "path" not in entry:
-        path = None
-        header = {"coords": coords}
-        value = entry["constant"]
-    else:
-        path = entry["path"]
-        header = imod.idf.header(path, pattern="{name}")
-        value = None
-
-    header["dims"] = dims
-    return path, header, value
-
-
-def merge_coords(headers):
-    coords = defaultdict(list)
-    for header in headers:
-        for key, value in header["coords"].items():
-            coords[key].append(value)
-    return {k: np.unique(coords[k]) for k in coords}
-
-
-def create_dataarray(paths, headers, values) -> xr.DataArray:
+def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
     """
-    Create a DataArray from a list of IDF paths, or from a constant value.
+    Read the contents of an iMOD project file and read/open the data present in
+    it:
+    
+    * IDF data is lazily loaded into xarray.DataArrays.
+    * GEN data is eagerly loaded into geopandas.GeoDataFrames
+    * IPF data is eagerly loaded into pandas.DataFrames
+    * Non-file based entries (such as the PCG settings) are kept as a dictionary.
+    
+    When multiple systems are present, they are numbered starting from one, e.g.:
+
+    * drn-1
+    * drn-2
+    
+    Parameters
+    ----------
+    path: pathlib.Path or str.
+
+    Returns
+    -------
+    data: Dict[str, Any]
+    Keys are the iMOD project file "topics", without parentheses.
     """
-    none_paths = [p is None for p in paths]
-    if all(none_paths):
-        coords = merge_coords(headers)
-        da = xr.DataArray(values, dims=headers[0]["dims"], coords=coords)
-    elif any(none_paths):
-        raise NotImplementedError(
-            "Entries for a system should either all provide a constant, "
-            "or all provide a file path."
-        )
-    else:
-        da = imod.array_io.reading._load(
-            paths, use_cftime=False, _read=imod.idf._read, headers=headers
-        )
-    return da
-
-
-def open_package_idf(block_content, variables) -> List[xr.DataArray]:
-    das = {}
-    for variable in variables:
-        variable_content = block_content[variable]
-        paths = []
-        headers = []
-        values = []
-        for entry in variable_content:
-            path, header, value = process_package_entry(entry)
-            header["name"] = variable
-            header["dims"] = ["layer"]
-            header["layer"] = entry["layer"]
-            paths.append(path)
-            headers.append(header)
-            values.append(value)
-
-        das[variable] = create_dataarray(paths, headers, values)
-
-    return [das]
-
-
-def process_boundary_condition_entry(entry: Dict):
-    coords = {}
-    time = entry["time"]
-    if time == "steady-state":
-        time = None
-        dims = ()
-    else:
-        time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
-        coords["time"] = time
-        dims = ("time",)
-
-    # 0 signifies that the layer must be determined on the basis of
-    # bottom elevation and stage.
-    layer = entry["layer"]
-    if layer == 0:
-        layer is None
-    else:
-        coords["layer"] = layer
-        dims = dims + ("layer",)
-
-    if "path" not in entry:
-        path = None
-        header = {"coords": coords}
-        value = entry["constant"]
-    else:
-        path = entry["path"]
-        header = imod.idf.header(path, pattern="{name}")
-        value = None
-
-    header["dims"] = dims
-    if layer is not None:
-        header["layer"] = layer
-    if time is not None:
-        header["time"] = time
-
-    return path, header, value
-
-
-def open_boundary_condition_idf(
-    block_content, variables
-) -> List[Dict[str, xr.DataArray]]:
-    n_system = block_content["n_system"]
-    n_time = len(block_content["time"])
-    n_total = n_system * n_time
-
-    das = [{} for _ in range(n_system)]
-    for variable in variables:
-        variable_content = block_content[variable]
-
-        n = len(variable_content)
-        if n != n_total:
-            raise ValueError(
-                f"Expected n_time * n_system = {n_time} * {n_system} = "
-                f"{n_total} entries for variable {variable}. Received: {n}"
-            )
-
-        # Group the paths and headers by system.
-        system_paths = defaultdict(list)
-        system_headers = defaultdict(list)
-        system_values = defaultdict(list)
-        for i, entry in enumerate(variable_content):
-            path, header, value = process_boundary_condition_entry(entry)
-            header["name"] = variable
-            key = i % n_system
-            system_paths[key].append(path)
-            system_headers[key].append(header)
-            system_values[key].append(value)
-
-        # Concat one system at a time.
-        for i, (paths, headers, values) in enumerate(
-            zip(system_paths.values(), system_headers.values(), system_values.values())
-        ):
-            das[i][variable] = create_dataarray(paths, headers, values)
-
-    return das
-
-
-def read_package_gen(block_content):
-    return [imod.gen.read(entry["path"]) for entry in block_content["gen"]]
-
-
-def read_package_ipf(block_content):
-    return [imod.ipf.read(entry["path"]) for entry in block_content["ipf"]]
-
-
-def open_projectfile(path):
     content = read_projectfile(path)
     prj_data = {}
     for key, block_content in content.items():
         try:
             if key == "(hfb)":
-                data = read_package_gen(block_content)
+                data = _read_package_gen(block_content)
             elif key == "(wel)":
-                data = read_package_ipf(block_content)
+                data = _read_package_ipf(block_content)
             elif key == "(cap)":
                 variables = set(METASWAP_VARS).intersection(block_content.keys())
-                data = open_package_idf(block_content, variables)
+                data = _open_package_idf(block_content, variables)
             elif key in ("extra", "(pcg)"):
                 data = [block_content]
             elif key in ("periods"):
@@ -708,10 +746,10 @@ def open_projectfile(path):
                 ]
             elif key in KEYS:
                 variables = KEYS[key]
-                data = open_package_idf(block_content, variables)
+                data = _open_package_idf(block_content, variables)
             elif key in DATE_KEYS:
                 variables = DATE_KEYS[key]
-                data = open_boundary_condition_idf(block_content, variables)
+                data = _open_boundary_condition_idf(block_content, variables)
             else:
                 raise ValueError("Unsupported key")
         except Exception as e:
