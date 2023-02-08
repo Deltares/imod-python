@@ -103,9 +103,7 @@ def stability_constraint_advection(front, lower, right, top_bot, porosity=0.3, R
     top_bot = top_bot.sel(x=right.x, y=right.y, layer=right.layer)
 
     # Compute flow velocities
-    qs_x, qs_y, qs_z = imod.evaluate.flow_velocity(
-        front, lower, right, top_bot, porosity
-    )
+    v_x, v_y, v_z = imod.evaluate.flow_velocity(front, lower, right, top_bot, porosity)
 
     if "dz" not in top_bot:
         top_bot["dz"] = top_bot["top"] - top_bot["bot"]
@@ -115,9 +113,9 @@ def stability_constraint_advection(front, lower, right, top_bot, porosity=0.3, R
         raise ValueError("All dz values should be positive")
 
     # absolute velocities (m/d)
-    abs_v_x = np.abs(qs_x / porosity)
-    abs_v_y = np.abs(qs_y / porosity)
-    abs_v_z = np.abs(qs_z / porosity)
+    abs_v_x = np.abs(v_x)
+    abs_v_y = np.abs(v_y)
+    abs_v_z = np.abs(v_z)
 
     # dt of constituents (d), set zero velocities to nans
     dt_x = R / (abs_v_x.where(abs_v_x > 0) / top_bot.dx)
