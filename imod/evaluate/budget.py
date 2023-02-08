@@ -370,4 +370,8 @@ def flow_velocity(
 
     # Divide flux (m3/d) by area (m2) -> (m/d)
     # Flip direction around for x (right)
-    return (-right / A_x, front / A_y, lower / A_z)
+    return (
+        -right / (A_x * porosity),
+        front / (A_y * porosity),
+        lower / (A_z * porosity),
+    )
