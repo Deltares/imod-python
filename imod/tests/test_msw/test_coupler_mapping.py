@@ -9,7 +9,6 @@ from imod import mf6, msw
 
 
 def test_simple_model_with_sprinkling(fixed_format_parser):
-
     x = [1.0, 2.0, 3.0]
     y = [3.0, 2.0, 1.0]
     subunit = [0, 1]
@@ -73,7 +72,6 @@ def test_simple_model_with_sprinkling(fixed_format_parser):
 
 
 def test_simple_model_with_sprinkling_1_subunit(fixed_format_parser):
-
     x = [1.0, 2.0, 3.0]
     y = [3.0, 2.0, 1.0]
     subunit = [0]
@@ -133,7 +131,6 @@ def test_simple_model_with_sprinkling_1_subunit(fixed_format_parser):
 
 
 def test_simple_model_without_sprinkling(fixed_format_parser):
-
     x = [1.0, 2.0, 3.0]
     y = [3.0, 2.0, 1.0]
     subunit = [0, 1]

@@ -119,7 +119,6 @@ class TimeOutputControl(MetaSwapPackage):
         self.dataset["times"] = time
 
     def _render(self, file, *args):
-
         year, time_since_start_year = to_metaswap_timeformat(self.dataset["times"])
 
         dataframe = pd.DataFrame(

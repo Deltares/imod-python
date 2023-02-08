@@ -7,7 +7,6 @@ import imod
 
 
 def make_circle_model():
-
     grid = imod.data.circle()
 
     nface = grid.n_face

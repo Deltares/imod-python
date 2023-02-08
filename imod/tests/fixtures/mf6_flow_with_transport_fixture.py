@@ -50,7 +50,6 @@ def get_data_array(dimensions, globaltimes):
 
 @pytest.fixture(scope="session")
 def head_fc():
-
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     # Constant head
@@ -60,7 +59,6 @@ def head_fc():
 
 @pytest.fixture(scope="session")
 def concentration_fc():
-
     idomain = get_data_array(grid_dimensions(), globaltimes)
     idomain = idomain.expand_dims(species=["salinity", "temperature"])
 
@@ -84,7 +82,6 @@ def conductance_fc():
 
 @pytest.fixture(scope="session")
 def elevation_fc():
-
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     elevation = xr.full_like(idomain, np.nan)
@@ -93,7 +90,6 @@ def elevation_fc():
 
 @pytest.fixture(scope="session")
 def rate_fc():
-
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     elevation = xr.full_like(idomain, np.nan)
@@ -102,7 +98,6 @@ def rate_fc():
 
 @pytest.fixture(scope="session")
 def proportion_rate_fc():
-
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     proportion_rate = xr.full_like(idomain, np.nan)
@@ -111,7 +106,6 @@ def proportion_rate_fc():
 
 @pytest.fixture(scope="session")
 def proportion_depth_fc():
-
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     proportion_rate = xr.full_like(idomain, np.nan)
@@ -120,7 +114,6 @@ def proportion_depth_fc():
 
 @pytest.fixture(scope="session")
 def porosity_fc():
-
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     porosity_fc = xr.full_like(idomain, np.nan).isel(time=0)
@@ -129,7 +122,6 @@ def porosity_fc():
 
 @pytest.fixture(scope="session")
 def decay_fc():
-
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     decay_fc = xr.full_like(idomain, np.nan).isel(time=0)
@@ -138,7 +130,6 @@ def decay_fc():
 
 @pytest.fixture(scope="session")
 def decay_sorbed_fc():
-
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     decay_sorbed_fc = xr.full_like(idomain, np.nan).isel(time=0)
@@ -147,7 +138,6 @@ def decay_sorbed_fc():
 
 @pytest.fixture(scope="session")
 def bulk_density_fc():
-
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     bulk_density_fc = xr.full_like(idomain, np.nan).isel(time=0)
@@ -156,7 +146,6 @@ def bulk_density_fc():
 
 @pytest.fixture(scope="session")
 def distcoef_fc():
-
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     distcoef_fc = xr.full_like(idomain, np.nan).isel(time=0)
@@ -165,7 +154,6 @@ def distcoef_fc():
 
 @pytest.fixture(scope="session")
 def sp2_fc():
-
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     sp2_fc = xr.full_like(idomain, np.nan).isel(time=0)
@@ -175,7 +163,6 @@ def sp2_fc():
 @pytest.fixture(scope="session")
 @pytest.mark.usefixtures("concentration_fc")
 def flow_model_with_concentration(concentration_fc):
-
     idomain = get_data_array(grid_dimensions(), globaltimes)
     cellType = xr.full_like(idomain.isel(time=0), 1, dtype=np.int32)
     k = xr.full_like(idomain.isel(time=0), 10.0)

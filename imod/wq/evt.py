@@ -60,7 +60,6 @@ class Evapotranspiration(BoundaryCondition, abc.ABC):
 
 
 class EvapotranspirationTopLayer(Evapotranspiration):
-
     _option = 1
 
     def __init__(

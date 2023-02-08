@@ -57,6 +57,7 @@ Transport
     AdvectionModifiedMOC
     AdvectionHybridMOC
     AdvectionFiniteDifference
+    BasicTransport
     Dispersion
     MassLoading
     TimeVaryingConstantConcentration

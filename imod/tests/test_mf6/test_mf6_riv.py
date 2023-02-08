@@ -277,7 +277,6 @@ def test_validate_false(riv_dict):
 
 @pytest.mark.usefixtures("concentration_fc")
 def test_render_concentration(riv_dict, concentration_fc):
-
     riv_ds = xr.merge([riv_dict])
 
     concentration = concentration_fc.sel(

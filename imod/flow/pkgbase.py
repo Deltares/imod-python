@@ -672,9 +672,9 @@ class TopBoundaryCondition(BoundaryCondition, abc.ABC):
         composition_first_layer = util.initialize_nested_dict(5)
 
         # Loop over nested dict, it is not pretty
-        for (a, aa) in composition[self._pkg_id].items():
-            for (b, bb) in aa.items():
-                for (c, cc) in bb.items():
+        for a, aa in composition[self._pkg_id].items():
+            for b, bb in aa.items():
+                for c, cc in bb.items():
                     composition_first_layer[a][b][c][1] = cc[1]
         return composition_first_layer
 
@@ -684,7 +684,6 @@ class TopBoundaryCondition(BoundaryCondition, abc.ABC):
         globaltimes,
         nlayer,
     ):
-
         composition = super().compose(
             directory,
             globaltimes,
