@@ -194,7 +194,9 @@ def test_parse_notimeblock():
     )
     with pytest.raises(
         ValueError,
-        match=re.escape("Expected NSUB entry of 2 for ['conductance', 'head'], read: 3"),
+        match=re.escape(
+            "Expected NSUB entry of 2 for ['conductance', 'head'], read: 3"
+        ),
     ):
         prj._parse_notimeblock(lines, fields)
 

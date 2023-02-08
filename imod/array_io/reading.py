@@ -334,7 +334,10 @@ def _load(paths, use_cftime, _read, headers):
 def _open(path, use_cftime, pattern, header, _read):
     if isinstance(path, pathlib.Path):
         path = str(path)
-    if not isinstance(path, list):
+
+    if isinstance(path, list):
+        paths = path
+    else:
         paths = [pathlib.Path(p) for p in glob.glob(path)]
 
     headers = [header(p, pattern) for p in paths]

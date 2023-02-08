@@ -254,10 +254,11 @@ def open(path, use_cftime=False, pattern=None):
 
 
 def _merge_subdomains(pathlists, use_cftime, pattern):
-    das = [
-        array_io.reading._load(pathlist, use_cftime, pattern, _read, header)
-        for pathlist in pathlists.values()
-    ]
+    das = []
+    for paths in pathlists.values():
+        headers = [header(p, pattern) for p in paths]
+        das.append(array_io.reading._load(paths, use_cftime, _read, headers))
+
     x = np.unique(np.concatenate([da.x.values for da in das]))
     y = np.unique(np.concatenate([da.y.values for da in das]))
 
@@ -388,6 +389,7 @@ def open_subdomains(path, use_cftime=False, pattern=None):
         np.concatenate([coords["x"] for coords in subdomain_coords])
     )
     coords["layer"] = np.array(sorted(set(layers)))
+
     times = [util.to_datetime(timestr) for timestr in timestrings]
     times, use_cftime = util._convert_datetimes(times, use_cftime)
     if use_cftime:
@@ -395,6 +397,7 @@ def open_subdomains(path, use_cftime=False, pattern=None):
         coords["time"] = xr.CFTimeIndex(np.unique(times))
     else:
         coords["time"] = np.unique(times)
+
     if has_species:
         coords["species"] = np.array(sorted(set(species)))
         shape = (

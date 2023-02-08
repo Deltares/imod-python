@@ -623,7 +623,7 @@ def _open_boundary_condition_idf(
             das[i][variable] = _create_dataarray(paths, headers, values)
 
     return das
- 
+
 
 def _read_package_gen(block_content: Dict[str, Any]) -> List[gpd.GeoDataFrame]:
     return [imod.gen.read(entry["path"]) for entry in block_content["gen"]]
@@ -704,17 +704,17 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
     """
     Read the contents of an iMOD project file and read/open the data present in
     it:
-    
+
     * IDF data is lazily loaded into xarray.DataArrays.
     * GEN data is eagerly loaded into geopandas.GeoDataFrames
     * IPF data is eagerly loaded into pandas.DataFrames
     * Non-file based entries (such as the PCG settings) are kept as a dictionary.
-    
+
     When multiple systems are present, they are numbered starting from one, e.g.:
 
     * drn-1
     * drn-2
-    
+
     Parameters
     ----------
     path: pathlib.Path or str.
