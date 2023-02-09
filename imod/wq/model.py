@@ -605,6 +605,15 @@ class SeawatModel(Model):
 
         return n_extra
 
+    def _render_anihfb(self, key, modelname, directory, nlayer):
+        pkgkey = self._get_pkgkey(key)
+        if pkgkey is not None:
+            return self[pkgkey]._render(
+                modelname=modelname, directory=directory / pkgkey, nlayer=nlayer
+            )
+        else:
+            return ""
+
     def render(self, directory, result_dir, writehelp):
         """
         Render the runfile as a string, package by package.
@@ -633,6 +642,17 @@ class SeawatModel(Model):
             content.append(
                 self._render_pkg(
                     key=key, directory=directory, globaltimes=globaltimes, nlayer=nlayer
+                )
+            )
+
+        # ani and hfb packages
+        for key in ("ani", "hfb6"):
+            content.append(
+                self._render_anihfb(
+                    key=key,
+                    modelname=self.modelname,
+                    directory=directory,
+                    nlayer=nlayer,
                 )
             )
 
@@ -793,7 +813,7 @@ class SeawatModel(Model):
             if (
                 "x" in pkg.dataset.coords
                 and "y" in pkg.dataset.coords
-                or pkg._pkg_id == "wel"
+                or pkg._pkg_id in ("wel", "ani", "hfb6")
             ):
                 try:
                     pkg.save(directory=directory / pkgname)
