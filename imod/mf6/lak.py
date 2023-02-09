@@ -17,6 +17,13 @@ import xarray as xr
 from imod import mf6
 from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase
 
+from imod.schemata import DTypeSchema, AnyValueSchema, CoordsSchema
+
+_lake_input_schema = [
+        DTypeSchema(np.int_),
+        AnyValueSchema(">", 0),
+        CoordsSchema(("lake",)),
+        ]
 
 class LakeApi_Base(PackageBase):
     """
@@ -477,6 +484,10 @@ class Lake(BoundaryCondition):
         when using length units (LENGTH_UNITS) of feet, meters, or centimeters in the simulation,
         respectively. LENGTH_CONVERSION does not need to be specified if no lake outlets are specified or
         LENGTH_UNITS are meters.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.        
     """
 
     _pkg_id = "lak"
@@ -501,6 +512,13 @@ class Lake(BoundaryCondition):
     )
 
     _period_data = _period_data_lakes + _period_data_outlets
+
+
+    _init_schemata = {
+        "lake_number": _lake_input_schema,
+        "lake_starting_stage":_lake_input_schema,
+        "lake_boundname": _lake_input_schema
+    }    
 
     def __init__(
         # lake
@@ -552,6 +570,7 @@ class Lake(BoundaryCondition):
         ts6_filename=None,
         time_conversion=None,
         length_conversion=None,
+        validate = True,
     ):
         super().__init__(locals())
         self.dataset["lake_boundname"] = lake_boundname
@@ -610,7 +629,7 @@ class Lake(BoundaryCondition):
         self.dataset["ts_width"] = ts_width
         self.dataset["ts_slope"] = ts_slope
 
-        # self._pkgcheck()
+        self._validate_init_schemata(validate)
 
     @staticmethod
     def from_lakes_and_outlets(
