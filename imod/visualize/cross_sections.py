@@ -80,9 +80,9 @@ def _meshcoords(da, continuous=True):
         C = np.full((nrow - 1, ncol - 1), np.nan)
         C[:, 0::2] = data
     else:
-        _, ncol = Y.shape
-        C = np.full((nrow, ncol - 1), np.nan)
-        C[:, 0::2] = data
+        nrow, ncol = Y.shape
+        C = np.full((nrow - 1, ncol - 1), np.nan)
+        C[0::2, 0::2] = data
 
     return X, Y, C, nodata
 
@@ -106,7 +106,7 @@ def _plot_aquitards(aquitards, ax, kwargs_aquitards):
     C_aq = C_aq.astype(np.float64)
     for j, i in enumerate(range(0, X_aq.shape[0] - 1, 2)):
         Y_i = Y_aq[i : i + 2]
-        C_i = C_aq[j]
+        C_i = C_aq[i]
         C_i[C_i == 0.0] = np.nan
         nodata = np.repeat(np.isnan(C_i[0::2]), 2)
         Y_i[:, nodata] = np.nan
@@ -243,7 +243,10 @@ def cross_section(
         fig, ax = plt.subplots()
 
     # Plot raster
-    X, Y, C, nodata = _meshcoords(da, continuous=True)
+    continuous = not (
+        da["top"].shape == da["bottom"].shape
+    )  # allow quasi-3d schematisations
+    X, Y, C, nodata = _meshcoords(da, continuous=continuous)
     ax1 = ax.pcolormesh(X, Y, C, **settings_pcmesh)
     # Plot aquitards if applicable
     if aquitards is not None:
@@ -262,9 +265,9 @@ def cross_section(
             ax1.cmap.set_under("#FFFFFF")
 
     # Add colorbar
-    divider = make_axes_locatable(ax)
-    cbar_ax = divider.append_axes("right", size="5%", pad="5%")
-    fig.colorbar(ax1, cax=cbar_ax, **settings_cbar)
+    # divider = make_axes_locatable(ax)
+    # cbar_ax = divider.append_axes("right", size="5%", pad="5%")
+    # fig.colorbar(ax1, cax=cbar_ax, **settings_cbar)
 
     if not return_cmap_norm:
         return fig, ax
