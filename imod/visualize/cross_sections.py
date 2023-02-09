@@ -265,9 +265,9 @@ def cross_section(
             ax1.cmap.set_under("#FFFFFF")
 
     # Add colorbar
-    # divider = make_axes_locatable(ax)
-    # cbar_ax = divider.append_axes("right", size="5%", pad="5%")
-    # fig.colorbar(ax1, cax=cbar_ax, **settings_cbar)
+    divider = make_axes_locatable(ax)
+    cbar_ax = divider.append_axes("right", size="5%", pad="5%")
+    fig.colorbar(ax1, cax=cbar_ax, **settings_cbar)
 
     if not return_cmap_norm:
         return fig, ax
