@@ -625,12 +625,27 @@ def _open_boundary_condition_idf(
     return das
 
 
-def _read_package_gen(block_content: Dict[str, Any]) -> List[gpd.GeoDataFrame]:
-    return [imod.gen.read(entry["path"]) for entry in block_content["gen"]]
+def _read_package_gen(block_content: Dict[str, Any]) -> List[Dict[str, Any]]:
+    out = []
+    for entry in block_content["gen"]:
+        d = {
+            "geodataframe": imod.gen.read(entry["path"]),
+            "layer": entry["layer"],
+        }
+        out.append(d)
+    return out
 
 
-def _read_package_ipf(block_content: Dict[str, Any]) -> List[pd.DataFrame]:
-    return [imod.ipf.read(entry["path"]) for entry in block_content["ipf"]]
+def _read_package_ipf(block_content: Dict[str, Any]) -> List[Dict[str, Any]]:
+    out = []
+    for entry in block_content["ipf"]:
+        d = {
+            "dataframe": imod.ipf.read(entry["path"]),
+            "layer": entry["layer"],
+            "time": entry["time"],
+        }
+        out.append(d)
+    return out
 
 
 def read_projectfile(path: FilePath) -> Dict[str, Any]:

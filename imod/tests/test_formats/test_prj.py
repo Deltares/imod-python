@@ -464,10 +464,10 @@ class TestProjectFile:
         assert isinstance(content["ghb"]["conductance"], xr.DataArray)
         assert isinstance(content["ghb"]["head"], xr.DataArray)
         assert isinstance(content["cap"]["landuse"], xr.DataArray)
-        assert isinstance(content["wel-1"], pd.DataFrame)
-        assert isinstance(content["wel-2"], pd.DataFrame)
-        assert isinstance(content["hfb-1"], gpd.GeoDataFrame)
-        assert isinstance(content["hfb-2"], gpd.GeoDataFrame)
+        assert isinstance(content["wel-1"]["dataframe"], pd.DataFrame)
+        assert isinstance(content["wel-2"]["dataframe"], pd.DataFrame)
+        assert isinstance(content["hfb-1"]["geodataframe"], gpd.GeoDataFrame)
+        assert isinstance(content["hfb-2"]["geodataframe"], gpd.GeoDataFrame)
         assert isinstance(content["pcg"], dict)
         assert content["periods"] == {
             "summer": datetime(1900, 4, 1),
