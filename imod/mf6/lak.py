@@ -481,7 +481,7 @@ class Lake(BoundaryCondition):
 
     _pkg_id = "lak"
     _template = Package._initialize_template(_pkg_id)
-    
+
     _period_data_lakes = (
         "ts_status",
         "ts_stage",
@@ -830,7 +830,6 @@ class Lake(BoundaryCondition):
             for tssname in self._period_data:
                 if len(period_data[tssname].dims) > 0:
                     for index in period_data.coords["index"].values:
-
                         value = period_data[tssname].sel(index=index).values[()]
                         isvalid = False
                         if isinstance(value, str):
@@ -889,4 +888,4 @@ class Lake(BoundaryCondition):
         trimmedblock = "\n".join(map(str, trimmedlines)) + "\n"
         f.write(trimmedblock)
         f.write(f"end {title}\n")
-        return               
+        return

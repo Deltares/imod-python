@@ -54,17 +54,19 @@ def disv_recarr(arrdict, layer, notnull):
         recarr["layer"] = layer[ilayer]
     return recarr
 
+
 class PackageBase(abc.ABC):
     """
     This class is used for storing a collection of Xarray dataArrays or ugrid-DataArrays
     in a dataset. A load-from-file method is also provided. Storing to file is done by calling
-    object.dataset.to_netcdf(...)    
+    object.dataset.to_netcdf(...)
     """
+
     def __getitem__(self, key):
         return self.dataset.__getitem__(key)
 
     def __setitem__(self, key, value):
-        self.dataset.__setitem__(key, value)    
+        self.dataset.__setitem__(key, value)
 
     @classmethod
     def from_file(cls, path, **kwargs):
@@ -126,13 +128,13 @@ class PackageBase(abc.ABC):
         return_cls.remove_nans_from_dataset()
         return return_cls
 
-
     def remove_nans_from_dataset(self):
         for key, value in self.dataset.items():
             if isinstance(value, xr.core.dataarray.DataArray):
                 if isinstance(value.values[()], numbers.Number):
                     if math.isnan(value.values[()]):
-                        self.dataset[key] = None        
+                        self.dataset[key] = None
+
 
 class Package(PackageBase, abc.ABC):
     """
@@ -147,8 +149,6 @@ class Package(PackageBase, abc.ABC):
     not the list input which is used in :class:`BoundaryCondition`.
     """
 
-
-
     def __init__(self, allargs=None):
         if allargs is not None:
             for arg in allargs.values():
@@ -156,8 +156,6 @@ class Package(PackageBase, abc.ABC):
                     self.dataset = xu.UgridDataset(grids=arg.ugrid.grid)
                     return
         self.dataset = xr.Dataset()
-
-
 
     def isel(self):
         raise NotImplementedError(
@@ -533,7 +531,6 @@ class Package(PackageBase, abc.ABC):
         if hasattr(self, "_auxiliary_data"):
             result.update(self._auxiliary_data)
         return result
-
 
 
 class BoundaryCondition(Package, abc.ABC):
