@@ -19,8 +19,7 @@ import numpy as np
 import xarray as xr
 
 from imod import util
-
-from . import array_io
+from imod.formats import array_io
 
 # Make sure we can still use the built-in function...
 f_open = open
@@ -250,24 +249,15 @@ def open(path, use_cftime=False, pattern=None):
     remember. The website https://regex101.com is a nice help. Alternatively,
     the most pragmatic solution may be to just rename your files.
     """
-
-    if isinstance(path, list):
-        return array_io.reading._load(path, use_cftime, pattern, _read, header)
-    elif isinstance(path, pathlib.Path):
-        path = str(path)
-
-    paths = [pathlib.Path(p) for p in glob.glob(path)]
-    n = len(paths)
-    if n == 0:
-        raise FileNotFoundError(f"Could not find any files matching {path}")
-    return array_io.reading._load(paths, use_cftime, pattern, _read, header)
+    return array_io.reading._open(path, use_cftime, pattern, header, _read)
 
 
 def _merge_subdomains(pathlists, use_cftime, pattern):
-    das = [
-        array_io.reading._load(pathlist, use_cftime, pattern, _read, header)
-        for pathlist in pathlists.values()
-    ]
+    das = []
+    for paths in pathlists.values():
+        headers = [header(p, pattern) for p in paths]
+        das.append(array_io.reading._load(paths, use_cftime, _read, headers))
+
     x = np.unique(np.concatenate([da.x.values for da in das]))
     y = np.unique(np.concatenate([da.y.values for da in das]))
 
@@ -398,6 +388,7 @@ def open_subdomains(path, use_cftime=False, pattern=None):
         np.concatenate([coords["x"] for coords in subdomain_coords])
     )
     coords["layer"] = np.array(sorted(set(layers)))
+
     times = [util.to_datetime(timestr) for timestr in timestrings]
     times, use_cftime = util._convert_datetimes(times, use_cftime)
     if use_cftime:
@@ -405,6 +396,7 @@ def open_subdomains(path, use_cftime=False, pattern=None):
         coords["time"] = xr.CFTimeIndex(np.unique(times))
     else:
         coords["time"] = np.unique(times)
+
     if has_species:
         coords["species"] = np.array(sorted(set(species)))
         shape = (

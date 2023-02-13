@@ -9,12 +9,22 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Added
+~~~~~
+
+- :func:`imod.prj.read_projectfile` to read the contents of a project file into
+  a Python dictionary.
+- :func:`imod.prj.open_projectfile_data` to read/open the data that is pointed
+  to in a project file.
+
 Fixed
 ~~~~~
 
+Changed
+~~~~~~~
+
 - :func:`imod.evaluate.budget.flow_velocity` now properly computes velocity by
   dividing by the porosity. Before, this function computed the Darcian velocity.
-
 
 [0.11.6] - 2023-02-01
 ---------------------
@@ -26,7 +36,6 @@ Added
   :meth:`imod.couplers.metamod.MetaMod.write` named ``modflow6_write_kwargs``,
   which can be used to provide keyword arguments to the writing of the Modflow 6
   Simulation.
-
 
 Fixed
 ~~~~~
@@ -42,8 +51,8 @@ Fixed
 
 - :meth:`imod.mf6.Modflow6Simulation.write` with ``binary=False`` no longer
   results in invalid MODFLOW6 input for 2D grid data, such as DIS top.
-- :meth:`imod.flow.ImodflowModel.write` no longer writes incorrect projectfiles
-  for non-grid values with a time and layer dimension.
+- :meth:`imod.flow.ImodflowModel.write` no longer writes incorrect project
+  files for non-grid values with a time and layer dimension.
 - :func:`imod.evaluate.interpolate_value_boundaries`: Fix edge case when
   successive values in z direction are exactly equal to the boundary value.
 
