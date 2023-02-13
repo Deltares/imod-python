@@ -19,19 +19,16 @@ from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase
 
 from imod.schemata import DTypeSchema, AnyValueSchema, CoordsSchema
 
-_lake_input_schema = [
+schema_1darray_postivite_int = [
         DTypeSchema(np.int_),
         AnyValueSchema(">", 0),
-        CoordsSchema(("lake",)),
         ]
-
-_connection_input_schema =[]
-
-_outlet_input_schema =[]
-
-_ts_lake_input_schema = []
-
-_ts_outlet_input_schema = []
+schema_1darray_str = [
+        DTypeSchema(np.str_),
+        ]
+schema_1darray_float = [
+        DTypeSchema(np.float_),
+        ]      
 
 class LakeApi_Base(PackageBase):
     """
@@ -523,17 +520,16 @@ class Lake(BoundaryCondition):
 
 
     _init_schemata = {
-        "lake_number": _lake_input_schema,
-        "lake_starting_stage":_lake_input_schema,
-        "lake_boundname": _lake_input_schema,
-        "connection_lake_number":_connection_input_schema,
-        "connection_cell_id":_connection_input_schema,
-        "connection_type":_connection_input_schema,
-        "connection_bed_leak":_connection_input_schema,
-        "connection_bottom_elevation":_connection_input_schema,
-        "connection_top_elevation":_connection_input_schema,
-        "connection_width":_connection_input_schema,
-        "connection_length":_connection_input_schema,   
+        "lake_number": schema_1darray_postivite_int,
+        "lake_starting_stage":schema_1darray_float,
+        "lake_boundname": schema_1darray_str,
+        "connection_lake_number":schema_1darray_postivite_int,
+        "connection_type":schema_1darray_str,
+        "connection_bed_leak":schema_1darray_float,
+        "connection_bottom_elevation":schema_1darray_float,
+        "connection_top_elevation":schema_1darray_float,
+        "connection_width":schema_1darray_float,
+        "connection_length":schema_1darray_float,   
 
         "outlet_lakein":_outlet_input_schema,   
         "outlet_lakeout":_outlet_input_schema,
@@ -695,11 +691,10 @@ class Lake(BoundaryCondition):
         n_connection = [lake["connection_type"].count().values[()] for lake in lakes]
         package_content["lake_starting_stage"] = xr.DataArray(
             data=[lake["starting_stage"].item() for lake in lakes],
-            dims=["lake"],
         )
-        package_content["lake_number"] = xr.DataArray(data=lake_numbers, dims=["lake"])
+        package_content["lake_number"] = xr.DataArray(data=lake_numbers)
         package_content["lake_boundname"] = xr.DataArray(
-            list(name_to_number.keys()), dims=["lake"]
+            list(name_to_number.keys())
         )
 
         # Connection data
