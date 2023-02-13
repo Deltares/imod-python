@@ -45,7 +45,7 @@ def disv_recarr(arrdict, layer, notnull):
     nrow = notnull.sum()
     recarr = np.empty(nrow, dtype=sparse_dtype)
     # Fill in the indices
-    if layer.size == 1:
+    if notnull.ndim == 1 and layer.size == 1:
         recarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
         recarr["layer"] = layer
     else:
@@ -105,13 +105,6 @@ class Package(abc.ABC):
         Refer to the xarray documentation for the possible keyword arguments.
         """
 
-        # Throw error if user tries to use old functionality
-        if "cache" in kwargs:
-            if kwargs["cache"] is not None:
-                raise NotImplementedError(
-                    "Caching functionality in pkg.from_file() is removed."
-                )
-
         path = pathlib.Path(path)
 
         # See https://stackoverflow.com/a/2169191
@@ -122,9 +115,14 @@ class Package(abc.ABC):
 
         if path.suffix in (".zip", ".zarr"):
             # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
-            return_cls.dataset = xr.open_zarr(str(path), **kwargs)
+            dataset = xr.open_zarr(str(path), **kwargs)
         else:
-            return_cls.dataset = xr.open_dataset(path, **kwargs)
+            dataset = xr.open_dataset(path, **kwargs)
+
+        if dataset.ugrid_roles.topology: 
+            dataset = xu.UgridDataset(dataset)
+
+        return_cls.dataset = dataset 
         return_cls.remove_nans_from_dataset()
         return return_cls
 
