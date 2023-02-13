@@ -181,12 +181,17 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         # write package contents
         for pkgname, pkg in self.items():
-            pkg.write(
-                directory=modeldirectory,
-                pkgname=pkgname,
-                globaltimes=globaltimes,
-                binary=binary,
-            )
+            try:
+                pkg.write(
+                    directory=modeldirectory,
+                    pkgname=pkgname,
+                    globaltimes=globaltimes,
+                    binary=binary,
+                )
+            except Exception as e:
+                raise type(e)(
+                    f"{e}\nError occured while writing {pkgname}"
+                )
 
 
 class GroundwaterFlowModel(Modflow6Model):
