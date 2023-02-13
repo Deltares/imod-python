@@ -4,11 +4,27 @@ Installing
 Which Python?
 -------------
 
-You'll need **Python 3.7 or greater**.
+You'll need **Python 3.7 or greater**. 
 
-We recommend using the `Mambaforge`_ Python distribution. This installs Python
-and the ``mamba`` package manager. `Miniforge`_ and `Miniconda`_ will install
-Python and the ``conda`` package manager. Differences to note, in a nutshell:
+The recommended way to install Python depends on your experience: Are you new to
+the Python packaging ecosystem or already got experience with it? If you already
+know what ``conda`` and ``pip`` are, and are able to install tedious packages
+GIS packages yourself without issue, you are *experienced*. If you have no idea
+what the previous sentence was about, you are *new*.
+
+New
+^^^
+
+We recommend new users to install iMOD Python using the `Deltaforge_` Python
+distribution. 
+
+Experienced
+^^^^^^^^^^^
+
+For experienced users, who want to be in control of packages installed, we
+recommend using the `Mambaforge`_ Python distribution. This installs Python and
+the ``mamba`` package manager. `Miniforge`_ and `Miniconda`_ will install Python
+and the ``conda`` package manager. Differences to note, in a nutshell:
 
 * ``mamba`` is much faster than ``conda``, but has identical commands. 
 * Mambaforge and miniforge are community driven installers, installing by
@@ -63,7 +79,17 @@ Visualization:
 Installing all these dependencies requires around 2.5 gigabyte of space;
 Installing only the required dependencies (via pip) requires around 0.5
 gigabyte.
- 
+
+Installing with Deltaforge
+--------------------------
+
+Deltaforge is an installer of Deltares python packages, including iMOD Python,
+and their dependencies. This makes it possible to install iMOD Python without
+much knowledge about the Python package management system. The download links
+are listed `here. <https://deltares.github.io/deltaforge/index.html#where>`__ and
+instructions are located `here.
+<https://download.deltares.nl/en/download/imod-viewer/>`__
+
 Installing with mamba
 ---------------------
 
@@ -126,10 +152,11 @@ You can use ``pip`` to install the latest source from Gitlab::
 Alternatively, you can clone the git repository locally and install from there::
 
   git clone https://gitlab.com/deltares/imod/imod-python.git
-  cd imod
-  pip install .
+  cd imod-python
+  pip install -e .
 
 .. _Verde's: https://www.fatiando.org/verde/latest/install.html
+.. _Deltaforge: https://deltares.github.io/deltaforge/
 .. _Miniconda: https://docs.conda.io/en/latest/miniconda.html
 .. _Mambaforge: https://github.com/conda-forge/miniforge#mambaforge
 .. _Miniforge: https://github.com/conda-forge/miniforge

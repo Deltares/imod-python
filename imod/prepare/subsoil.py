@@ -43,7 +43,7 @@ def build_lookup_table(df, lithoclass, lithostrat, kcolumn):
 @numba.njit
 def _check_litho_strat_combinations(lithostrat, lithology, lookup_table):
     missing = [(0, 0)]  # for type inference
-    for (strat, litho) in zip(lithostrat.flatten(), lithology.flatten()):
+    for strat, litho in zip(lithostrat.flatten(), lithology.flatten()):
         if np.isnan(lookup_table[strat, litho]):
             missing.append((strat, litho))
     return missing[1:]

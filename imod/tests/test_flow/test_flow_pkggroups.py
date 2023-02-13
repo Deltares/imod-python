@@ -155,7 +155,6 @@ def test_group_rendered_mixed_time_no_time(
 
 
 def test_group_rendered(constant_head, three_days):
-
     chd1 = constant_head
     chd2 = deepcopy(constant_head)
     d = {"primary": chd1, "secondary": chd2}
@@ -220,7 +219,6 @@ def test_group_rendered(constant_head, three_days):
 
 
 def test_group_synchronize_times_rendered(constant_head, three_days):
-
     chd1 = constant_head
     chd2 = ConstantHead(head=2.0)
     d = {"primary": chd1, "secondary": chd2}

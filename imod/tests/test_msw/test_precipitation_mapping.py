@@ -75,7 +75,6 @@ def test_precipitation_mapping_simple(fixed_format_parser):
 
 
 def test_precipitation_mapping_negative_dy(fixed_format_parser):
-
     x_meteo = [-0.5, 1.5, 3.5]
     y_meteo = [4.5, 2.5, 0.5]
     subunit_meteo = [0, 1]

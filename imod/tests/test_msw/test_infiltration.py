@@ -113,7 +113,6 @@ def test_write(
 
 
 def test_simple_model(fixed_format_parser):
-
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]

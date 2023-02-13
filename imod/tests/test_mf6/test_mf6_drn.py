@@ -58,7 +58,6 @@ def test_wrong_dtype(drainage):
 
 
 def test_validate_false(drainage):
-
     drainage["elevation"] = drainage["elevation"].astype(np.int32)
 
     imod.mf6.Drainage(validate=False, **drainage)

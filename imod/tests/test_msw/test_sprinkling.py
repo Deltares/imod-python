@@ -10,7 +10,6 @@ from imod import mf6, msw
 
 
 def test_simple_model(fixed_format_parser):
-
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
@@ -93,7 +92,6 @@ def test_simple_model(fixed_format_parser):
 
 
 def test_simple_model_1_subunit(fixed_format_parser):
-
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0]

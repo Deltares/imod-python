@@ -44,7 +44,6 @@ def test_write(
     surface_elevation,
     soil_physical_unit,
 ):
-
     # An error will be thrown if dx * dy exceeds the total area specified.
     # Therefore we have to ensure that dx * dy exceeds
     # GridData._metadata_dict["area"].max_value, which is 1e6. So a dx and dy of
@@ -236,7 +235,6 @@ def test_generate_index_array():
 
 
 def test_simple_model(fixed_format_parser):
-
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0, 1]
@@ -345,7 +343,6 @@ def test_simple_model(fixed_format_parser):
 
 
 def test_simple_model_1_subunit(fixed_format_parser):
-
     x = [1.0, 2.0, 3.0]
     y = [1.0, 2.0, 3.0]
     subunit = [0]

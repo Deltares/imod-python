@@ -87,7 +87,6 @@ def get_render_dict():
     """
 
     def _get_render_dict(package, directory, globaltimes, nlayer, system_index=1):
-
         composition = package.compose(
             directory,
             globaltimes,

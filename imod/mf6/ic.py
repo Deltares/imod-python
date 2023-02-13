@@ -59,7 +59,6 @@ class InitialConditions(Package):
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(self, start=None, head=None, validate: bool = True):
-
         super().__init__(locals())
         if start is None:
             start = head

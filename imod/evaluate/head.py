@@ -280,7 +280,8 @@ def calculate_gxg(
     Load the heads, and calculate groundwater characteristics after the year 2000:
 
     >>> import imod
-    >>> heads = imod.idf.open("head*.idf").sel(time=heads.time.dt.year >= 2000)
+    >>> heads = imod.idf.open("head*.idf")
+    >>> heads = heads.sel(time=heads.time.dt.year >= 2000, layer=1)
     >>> gxg = imod.evaluate.calculate_gxg(heads)
 
     Transform to meters below surface level by substracting from surface level:

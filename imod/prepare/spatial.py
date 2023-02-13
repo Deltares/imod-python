@@ -279,7 +279,7 @@ def polygonize(da):
 
     geometries = []
     colvalues = []
-    for (geom, colval) in shapes:
+    for geom, colval in shapes:
         geometries.append(sg.Polygon(geom["coordinates"][0]))
         colvalues.append(colval)
 
@@ -994,14 +994,14 @@ def zonal_aggregate_raster(
 
     >>> import imod
     >>> surface_level = imod.rasterio.open("surface_level.tif")
-    >>> df = imod.prepare.spatial.overlay_raster_intersection(
+    >>> df = imod.prepare.spatial.zonal_aggregate_raster(
     >>>    "water-bodies.shp", "id", 1.0, surface_level, "mean"
     >>> )
 
     For some functions, like the mode, a function should be passed instead:
 
     >>> import pandas as pd
-    >>> df = imod.prepare.spatial.overlay_raster_intersection(
+    >>> df = imod.prepare.spatial.zonal_aggregate_raster(
     >>>    "water-bodies.shp", "id", 1.0, surface_level, pd.Series.mode
     >>> )
     """

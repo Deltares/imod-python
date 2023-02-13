@@ -6,7 +6,6 @@ import imod
 
 
 def test_advection_upstream():
-
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
     a = imod.mf6.AdvectionUpstream()
@@ -16,7 +15,6 @@ def test_advection_upstream():
 
 
 def test_advection_central():
-
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
     a = imod.mf6.AdvectionCentral()
@@ -26,7 +24,6 @@ def test_advection_central():
 
 
 def test_advection_TVD():
-
     directory = pathlib.Path("mymodel")
     globaltimes = [np.datetime64("2000-01-01")]
     a = imod.mf6.AdvectionTVD()

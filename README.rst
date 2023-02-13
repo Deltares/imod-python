@@ -44,7 +44,7 @@ Documentation: https://deltares.gitlab.io/imod/imod-python/
 
 Source code: https://gitlab.com/deltares/imod/imod-python
 
-Issues: https://gitlab.com/deltares/imod/imod-python/-/issues
+Issues: https://gitlab.com/deltares/imod/imod-python/-/issues/
 
 .. _Deltares: https://www.deltares.nl
 .. _dask: https://dask.org/

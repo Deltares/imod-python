@@ -88,7 +88,7 @@ class TimeDiscretization(Package):
 
         # Zip through the arrays
         perioddata = []
-        for (perlen, nstp, tsmult) in zip(
+        for perlen, nstp, tsmult in zip(
             timestep_duration, n_timesteps, timestep_multiplier
         ):
             perioddata.append((perlen, nstp, tsmult))

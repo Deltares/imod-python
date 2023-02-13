@@ -272,7 +272,6 @@ class CoordsSchema(BaseSchema):
         self.allow_extra_keys = allow_extra_keys
 
     def validate(self, obj: xr.DataArray, **kwargs) -> None:
-
         coords = list(obj.coords.keys())
 
         if self.require_all_keys:
@@ -401,7 +400,6 @@ class NoDataSchema(BaseSchema):
         self,
         is_notnull: Union[Callable, Tuple[str, Any]] = _notnull,
     ):
-
         if isinstance(is_notnull, tuple):
             op, value = is_notnull
             self.is_notnull = partial_operator(op, value)
@@ -497,7 +495,6 @@ class ActiveCellsConnectedSchema(BaseSchema):
         self,
         is_notnull: Union[Callable, Tuple[str, Any]] = _notnull,
     ):
-
         if isinstance(is_notnull, tuple):
             op, value = is_notnull
             self.is_notnull = partial_operator(op, value)
