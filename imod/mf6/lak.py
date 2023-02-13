@@ -25,6 +25,14 @@ _lake_input_schema = [
         CoordsSchema(("lake",)),
         ]
 
+_connection_input_schema =[]
+
+_outlet_input_schema =[]
+
+_ts_lake_input_schema = []
+
+_ts_outlet_input_schema = []
+
 class LakeApi_Base(PackageBase):
     """
     Base class for lake and outlet object.
@@ -517,7 +525,38 @@ class Lake(BoundaryCondition):
     _init_schemata = {
         "lake_number": _lake_input_schema,
         "lake_starting_stage":_lake_input_schema,
-        "lake_boundname": _lake_input_schema
+        "lake_boundname": _lake_input_schema,
+        "connection_lake_number":_connection_input_schema,
+        "connection_cell_id":_connection_input_schema,
+        "connection_type":_connection_input_schema,
+        "connection_bed_leak":_connection_input_schema,
+        "connection_bottom_elevation":_connection_input_schema,
+        "connection_top_elevation":_connection_input_schema,
+        "connection_width":_connection_input_schema,
+        "connection_length":_connection_input_schema,   
+
+        "outlet_lakein":_outlet_input_schema,   
+        "outlet_lakeout":_outlet_input_schema,
+        "outlet_couttype":_outlet_input_schema,
+        "outlet_invert":_outlet_input_schema,
+        "outlet_roughness":_outlet_input_schema,
+        "outlet_width":_outlet_input_schema,
+        "outlet_slope":_outlet_input_schema,
+
+        "ts_status":_ts_lake_input_schema,
+        "ts_stage" :_ts_lake_input_schema,
+        "ts_rainfall" :_ts_lake_input_schema,
+        "ts_evaporation" :_ts_lake_input_schema,
+        "ts_runoff" :_ts_lake_input_schema,
+        "ts_inflow" :_ts_lake_input_schema,
+        "ts_withdrawal" :_ts_lake_input_schema,
+        "ts_auxiliary" :_ts_lake_input_schema,   
+
+        "ts_rate" : _ts_outlet_input_schema,
+        "ts_invert" : _ts_outlet_input_schema,
+        "ts_rough" : _ts_outlet_input_schema,
+        "ts_width" : _ts_outlet_input_schema,
+        "ts_slope" : _ts_outlet_input_schema,
     }    
 
     def __init__(
