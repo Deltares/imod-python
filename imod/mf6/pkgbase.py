@@ -56,7 +56,6 @@ def disv_recarr(arrdict, layer, notnull):
 
 
 class PackageBase(abc.ABC):
-
     def __init__(self, allargs=None):
         if allargs is not None:
             for arg in allargs.values():
