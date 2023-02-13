@@ -56,6 +56,15 @@ def disv_recarr(arrdict, layer, notnull):
 
 
 class PackageBase(abc.ABC):
+
+    def __init__(self, allargs=None):
+        if allargs is not None:
+            for arg in allargs.values():
+                if isinstance(arg, xu.UgridDataArray):
+                    self.dataset = xu.UgridDataset(grids=arg.ugrid.grid)
+                    return
+        self.dataset = xr.Dataset()
+
     """
     This class is used for storing a collection of Xarray dataArrays or ugrid-DataArrays
     in a dataset. A load-from-file method is also provided. Storing to file is done by calling
@@ -150,12 +159,7 @@ class Package(PackageBase, abc.ABC):
     """
 
     def __init__(self, allargs=None):
-        if allargs is not None:
-            for arg in allargs.values():
-                if isinstance(arg, xu.UgridDataArray):
-                    self.dataset = xu.UgridDataset(grids=arg.ugrid.grid)
-                    return
-        self.dataset = xr.Dataset()
+        super().__init__(allargs)
 
     def isel(self):
         raise NotImplementedError(
