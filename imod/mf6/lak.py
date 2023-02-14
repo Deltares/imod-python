@@ -19,25 +19,41 @@ from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase
 
 from imod.schemata import DTypeSchema, AnyValueSchema, CoordsSchema, DimsSchema
 
-schema_1darray_postivite_int = [
-        DTypeSchema(np.int_),
-        AnyValueSchema(">", 0),
-        DimsSchema()        
-        ]
-schema_1darray_str = [
-        DTypeSchema(np.str_),
-        DimsSchema()            
-        ]
-schema_1darray_float = [
-        DTypeSchema(np.float_),
-        DimsSchema()            
-        ]  
-    
+connection_dimension_name = "boundary"
+outlet_dimension_name = "outlet"
+lake_dimension_name = "lake"
 
-schema_ndarray_time = [
-        DTypeSchema(np.float_),
-        DimsSchema("index", "time")            
-        ]  
+schema_1darray_lake_postivite_int = [
+    DTypeSchema(np.int_),
+    AnyValueSchema(">", 0),
+    DTypeSchema(np.int_),
+    DimsSchema(lake_dimension_name),
+]
+schema_1darray_lake_str = [DTypeSchema(np.str_), DimsSchema(lake_dimension_name)]
+schema_1darray_lake_float = [DTypeSchema(np.float_), DimsSchema(lake_dimension_name)]
+schema_1darray_boundary_float = [
+    DTypeSchema(np.float_),
+    DimsSchema(connection_dimension_name),
+]
+schema_1darray_boundary_str = [
+    DTypeSchema(np.str),
+    DimsSchema(connection_dimension_name),
+]
+schema_1darray_boundary_int = [
+    DTypeSchema(np.int_),
+    DimsSchema(connection_dimension_name),
+]
+schema_1darray_outlet_int = [DTypeSchema(np.int_), DimsSchema(outlet_dimension_name)]
+schema_1darray_outlet_float = [
+    DTypeSchema(np.float_),
+    DimsSchema(outlet_dimension_name),
+]
+schema_1darray_outlet_str = [DTypeSchema(np.str_), DimsSchema(outlet_dimension_name)]
+
+schema_ndarray_time = [DTypeSchema(np.float_), DimsSchema("index", "time")]
+
+schema_ndarray_str_time = [DTypeSchema(np.str_), DimsSchema("index", "time")]
+
 
 class LakeApi_Base(PackageBase):
     """
@@ -141,7 +157,12 @@ class LakeData(LakeApi_Base):
         self.dataset.assign_coords({"time": times})
         for ts_name, ts_object in timeseries_dict.items():
             if ts_object is not None:
-                self.dataset[ts_name] = ts_object.reindex({"time": times})
+                fillvalue = np.nan
+                if "<U" in ts_object.dtype.str:
+                    fillvalue = ""
+                self.dataset[ts_name] = ts_object.reindex(
+                    {"time": times}, fill_value=fillvalue
+                )
             else:
                 self.dataset[ts_name] = None
 
@@ -261,16 +282,18 @@ def create_connection_data(lakes):
         cell_id = xr.DataArray(
             data=indices + 1,
             coords={"celldim": list(xr_indices.keys())},
-            dims=("boundary", "celldim"),
+            dims=(connection_dimension_name, "celldim"),
         )
         cell_ids.append(cell_id)
 
     connection_data = {
-        k: xr.DataArray(data=np.concatenate(v), dims=["boundary"])
+        k: xr.DataArray(data=np.concatenate(v), dims=[connection_dimension_name])
         for k, v in connection_data.items()
     }
 
-    connection_data["connection_cell_id"] = xr.concat(cell_ids, dim="boundary")
+    connection_data["connection_cell_id"] = xr.concat(
+        cell_ids, dim=connection_dimension_name
+    )
     return connection_data
 
 
@@ -304,6 +327,8 @@ def create_outlet_data(outlets, name_to_number):
                     value = 0.0
                 else:
                     value = outlet.dataset[var].item()
+                if value is None:
+                    value = np.nan
             else:
                 value = np.nan
             outlet_data[f"outlet_{var}"].append(value)
@@ -501,7 +526,7 @@ class Lake(BoundaryCondition):
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
-        provided in the wrong manner. Defaults to True.        
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "lak"
@@ -527,42 +552,38 @@ class Lake(BoundaryCondition):
 
     _period_data = _period_data_lakes + _period_data_outlets
 
-
     _init_schemata = {
-        "lake_number": schema_1darray_postivite_int,
-        "lake_starting_stage":schema_1darray_float,
-        "lake_boundname": schema_1darray_str,
-        "connection_lake_number":schema_1darray_postivite_int,
-        "connection_type":schema_1darray_str,
-        "connection_bed_leak":schema_1darray_float,
-        "connection_bottom_elevation":schema_1darray_float,
-        "connection_top_elevation":schema_1darray_float,
-        "connection_width":schema_1darray_float,
-        "connection_length":schema_1darray_float,   
-
-        "outlet_lakein":schema_1darray_postivite_int,
-        "outlet_lakeout":schema_1darray_postivite_int,
-        "outlet_couttype":schema_1darray_str,
-        "outlet_invert":schema_1darray_float,
-        "outlet_roughness":schema_1darray_float,
-        "outlet_width":schema_1darray_float,
-        "outlet_slope":schema_1darray_float,
-
-        "ts_status": schema_ndarray_time,
-        "ts_stage" : schema_ndarray_time,
-        "ts_rainfall" : schema_ndarray_time,
-        "ts_evaporation" : schema_ndarray_time,
-        "ts_runoff" : schema_ndarray_time,
-        "ts_inflow" : schema_ndarray_time,
-        "ts_withdrawal" : schema_ndarray_time,
-        "ts_auxiliary" : schema_ndarray_time,   
-
-        "ts_rate" :  schema_ndarray_time,
-        "ts_invert" : schema_ndarray_time,
-        "ts_rough" : schema_ndarray_time,
-        "ts_width" : schema_ndarray_time,
-        "ts_slope" : schema_ndarray_time,
-    }    
+        "lake_number": schema_1darray_lake_postivite_int,
+        "lake_starting_stage": schema_1darray_lake_float,
+        "lake_boundname": schema_1darray_lake_str,
+        "connection_lake_number": schema_1darray_boundary_int,
+        "connection_type": schema_1darray_boundary_str,
+        "connection_bed_leak": schema_1darray_boundary_float,
+        "connection_bottom_elevation": schema_1darray_boundary_float,
+        "connection_top_elevation": schema_1darray_boundary_float,
+        "connection_width": schema_1darray_boundary_float,
+        "connection_length": schema_1darray_boundary_float,
+        "outlet_lakein": schema_1darray_outlet_int,
+        "outlet_lakeout": schema_1darray_outlet_int,
+        "outlet_couttype": schema_1darray_outlet_str,
+        "outlet_invert": schema_1darray_outlet_float,
+        "outlet_roughness": schema_1darray_outlet_float,
+        "outlet_width": schema_1darray_outlet_float,
+        "outlet_slope": schema_1darray_outlet_float,
+        "ts_status": schema_ndarray_str_time,
+        "ts_stage": schema_ndarray_time,
+        "ts_rainfall": schema_ndarray_time,
+        "ts_evaporation": schema_ndarray_time,
+        "ts_runoff": schema_ndarray_time,
+        "ts_inflow": schema_ndarray_time,
+        "ts_withdrawal": schema_ndarray_time,
+        "ts_auxiliary": schema_ndarray_time,
+        "ts_rate": schema_ndarray_time,
+        "ts_invert": schema_ndarray_time,
+        "ts_rough": schema_ndarray_time,
+        "ts_width": schema_ndarray_time,
+        "ts_slope": schema_ndarray_time,
+    }
 
     def __init__(
         # lake
@@ -614,7 +635,7 @@ class Lake(BoundaryCondition):
         ts6_filename=None,
         time_conversion=None,
         length_conversion=None,
-        validate = True,
+        validate=True,
     ):
         super().__init__(locals())
         self.dataset["lake_boundname"] = lake_boundname
@@ -659,6 +680,9 @@ class Lake(BoundaryCondition):
         self.dataset["length_conversion"] = length_conversion
 
         self.dataset["ts_status"] = ts_status
+        self.dataset["ts_status"] = self._replace_nans_by_spaces(
+            self.dataset["ts_status"]
+        )
         self.dataset["ts_stage"] = ts_stage
         self.dataset["ts_rainfall"] = ts_rainfall
         self.dataset["ts_evaporation"] = ts_evaporation
@@ -700,16 +724,19 @@ class Lake(BoundaryCondition):
         n_connection = [lake["connection_type"].count().values[()] for lake in lakes]
         package_content["lake_starting_stage"] = xr.DataArray(
             data=[lake["starting_stage"].item() for lake in lakes],
+            dims=[lake_dimension_name],
         )
-        package_content["lake_number"] = xr.DataArray(data=lake_numbers)
+        package_content["lake_number"] = xr.DataArray(
+            data=lake_numbers, dims=[lake_dimension_name]
+        )
         package_content["lake_boundname"] = xr.DataArray(
-            list(name_to_number.keys())
+            list(name_to_number.keys()), dims=[lake_dimension_name]
         )
 
         # Connection data
         package_content["connection_lake_number"] = xr.DataArray(
             data=np.repeat(lake_numbers, n_connection),
-            dims=["boundary"],
+            dims=[connection_dimension_name],
         )
         connection_data = create_connection_data(lakes)
         package_content.update(connection_data)
@@ -752,6 +779,14 @@ class Lake(BoundaryCondition):
                 if len(self.dataset[name].coords["time"]) > 0:
                     return True
         return False
+
+    @classmethod
+    def _replace_nans_by_spaces(cls, x: xr.DataArray) ->  xr.DataArray:
+        # to detect nan's we cannot use np.isnan because that works only on numeric types.
+        # instead we use the property that any equality check is false for nan's
+        idx = np.where(x != x)
+        x[idx[0][:]] = ""
+        return x.astype(np.str)
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
