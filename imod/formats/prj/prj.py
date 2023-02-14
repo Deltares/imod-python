@@ -591,7 +591,7 @@ def _open_boundary_condition_idf(
     n_time = len(block_content["time"])
     n_total = n_system * n_time
 
-    das = [{}] * n_system
+    das = [{} for _ in range(n_system)]
     for variable in variables:
         variable_content = block_content[variable]
 
@@ -623,11 +623,18 @@ def _open_boundary_condition_idf(
     return das
 
 
-def _read_package_gen(block_content: Dict[str, Any]) -> List[Dict[str, Any]]:
+def _read_package_gen(
+    block_content: Dict[str, Any], has_topbot: bool
+) -> List[Dict[str, Any]]:
     out = []
     for entry in block_content["gen"]:
+        gdf = imod.gen.read(entry["path"])
+        if has_topbot:
+            gdf["resistance"] = entry["factor"] * entry["addition"]
+        else:
+            gdf["multiplier"] = entry["factor"] * entry["addition"]
         d = {
-            "geodataframe": imod.gen.read(entry["path"]),
+            "geodataframe": gdf,
             "layer": entry["layer"],
         }
         out.append(d)
@@ -738,11 +745,12 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
     Keys are the iMOD project file "topics", without parentheses.
     """
     content = read_projectfile(path)
+    has_topbot = "(top)" in content and "(bot)" in content
     prj_data = {}
     for key, block_content in content.items():
         try:
             if key == "(hfb)":
-                data = _read_package_gen(block_content)
+                data = _read_package_gen(block_content, has_topbot)
             elif key == "(wel)":
                 data = _read_package_ipf(block_content)
             elif key == "(cap)":
