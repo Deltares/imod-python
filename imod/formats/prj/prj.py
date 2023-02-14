@@ -8,9 +8,7 @@ from itertools import chain
 from os import PathLike
 from typing import Any, Dict, List, Sequence, Tuple, Union
 
-import geopandas as gpd
 import numpy as np
-import pandas as pd
 import xarray as xr
 
 import imod
