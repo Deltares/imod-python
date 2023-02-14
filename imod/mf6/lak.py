@@ -43,16 +43,16 @@ schema_1darray_boundary_int = [
     DTypeSchema(np.int_),
     DimsSchema(connection_dimension_name),
 ]
-schema_1darray_outlet_int = [DTypeSchema(np.int_), DimsSchema(outlet_dimension_name)]
-schema_1darray_outlet_float = [
+schema_optional_1darray_outlet_int = [DTypeSchema(np.int_), DimsSchema(outlet_dimension_name)| DimsSchema()]
+schema_optional_1darray_outlet_float = [
     DTypeSchema(np.float_),
-    DimsSchema(outlet_dimension_name),
+    DimsSchema(outlet_dimension_name)| DimsSchema(),
 ]
-schema_1darray_outlet_str = [DTypeSchema(np.str_), DimsSchema(outlet_dimension_name)]
+schema_optional_1darray_outlet_str = [DTypeSchema(np.str_), DimsSchema(outlet_dimension_name)| DimsSchema()]
 
-schema_ndarray_time = [DTypeSchema(np.float_), DimsSchema("index", "time")]
+schema_optional_ndarray_time = [DTypeSchema(np.float_), DimsSchema("index", "time") | DimsSchema()]
 
-schema_ndarray_str_time = [DTypeSchema(np.str_), DimsSchema("index", "time")]
+schema_optional_ndarray_str_time = [DTypeSchema(np.str_), DimsSchema("index", "time")| DimsSchema()]
 
 
 class LakeApi_Base(PackageBase):
@@ -158,7 +158,7 @@ class LakeData(LakeApi_Base):
         for ts_name, ts_object in timeseries_dict.items():
             if ts_object is not None:
                 fillvalue = np.nan
-                if "<U" in ts_object.dtype.str:
+                if not pd.api.types.is_numeric_dtype( ts_object.dtype):
                     fillvalue = ""
                 self.dataset[ts_name] = ts_object.reindex(
                     {"time": times}, fill_value=fillvalue
@@ -563,26 +563,26 @@ class Lake(BoundaryCondition):
         "connection_top_elevation": schema_1darray_boundary_float,
         "connection_width": schema_1darray_boundary_float,
         "connection_length": schema_1darray_boundary_float,
-        "outlet_lakein": schema_1darray_outlet_int,
-        "outlet_lakeout": schema_1darray_outlet_int,
-        "outlet_couttype": schema_1darray_outlet_str,
-        "outlet_invert": schema_1darray_outlet_float,
-        "outlet_roughness": schema_1darray_outlet_float,
-        "outlet_width": schema_1darray_outlet_float,
-        "outlet_slope": schema_1darray_outlet_float,
-        "ts_status": schema_ndarray_str_time,
-        "ts_stage": schema_ndarray_time,
-        "ts_rainfall": schema_ndarray_time,
-        "ts_evaporation": schema_ndarray_time,
-        "ts_runoff": schema_ndarray_time,
-        "ts_inflow": schema_ndarray_time,
-        "ts_withdrawal": schema_ndarray_time,
-        "ts_auxiliary": schema_ndarray_time,
-        "ts_rate": schema_ndarray_time,
-        "ts_invert": schema_ndarray_time,
-        "ts_rough": schema_ndarray_time,
-        "ts_width": schema_ndarray_time,
-        "ts_slope": schema_ndarray_time,
+        "outlet_lakein": schema_optional_1darray_outlet_int,
+        "outlet_lakeout": schema_optional_1darray_outlet_int,
+        "outlet_couttype": schema_optional_1darray_outlet_str,
+        "outlet_invert": schema_optional_1darray_outlet_float,
+        "outlet_roughness": schema_optional_1darray_outlet_float,
+        "outlet_width": schema_optional_1darray_outlet_float,
+        "outlet_slope": schema_optional_1darray_outlet_float,
+        "ts_status": schema_optional_ndarray_str_time,
+        "ts_stage": schema_optional_ndarray_time,
+        "ts_rainfall": schema_optional_ndarray_time,
+        "ts_evaporation": schema_optional_ndarray_time,
+        "ts_runoff": schema_optional_ndarray_time,
+        "ts_inflow": schema_optional_ndarray_time,
+        "ts_withdrawal": schema_optional_ndarray_time,
+        "ts_auxiliary": schema_optional_ndarray_time,
+        "ts_rate": schema_optional_ndarray_time,
+        "ts_invert": schema_optional_ndarray_time,
+        "ts_rough": schema_optional_ndarray_time,
+        "ts_width": schema_optional_ndarray_time,
+        "ts_slope": schema_optional_ndarray_time,
     }
 
     def __init__(
@@ -680,9 +680,10 @@ class Lake(BoundaryCondition):
         self.dataset["length_conversion"] = length_conversion
 
         self.dataset["ts_status"] = ts_status
-        self.dataset["ts_status"] = self._replace_nans_by_spaces(
-            self.dataset["ts_status"]
-        )
+        if ts_status is not None:
+            self.dataset["ts_status"] = self._replace_nans_by_spaces(
+                self.dataset["ts_status"]
+            )
         self.dataset["ts_stage"] = ts_stage
         self.dataset["ts_rainfall"] = ts_rainfall
         self.dataset["ts_evaporation"] = ts_evaporation

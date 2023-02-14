@@ -220,7 +220,7 @@ def test_lake_write_disv_three_lakes(basic_dis, tmp_path):
     lake_numbers = lake_like.copy(data=[1, 2, 3])
 
     connection_like = xr.DataArray(
-        data=np.ones(6, dtype=np.float64), dims=("connection",)
+        data=np.ones(6, dtype=np.float64), dims=("boundary",)
     )
     connection_lake_number = connection_like.copy(data=[1, 1, 1, 2, 2, 3])
     connection_type = connection_like.copy(
@@ -244,7 +244,7 @@ def test_lake_write_disv_three_lakes(basic_dis, tmp_path):
             [1, 23],
         ],
         coords={"celldim": ["layer", "cell2d"]},
-        dims=("connection", "celldim"),
+        dims=("boundary", "celldim"),
     )
     connection_bottom_elevation = connection_like.copy(
         data=[-1.0, -2.0, -3.0, -4.0, -5.0, -6.0]
@@ -529,7 +529,7 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
         end connectiondata
 
         begin outlets
-        1 2 manning 0.0 3 2 4
+        1 2 manning 0.0 3.0 2.0 4.0
         2 1 specified
         2 1 weir 0.0  0.0
         end outlets
