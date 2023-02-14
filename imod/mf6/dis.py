@@ -58,7 +58,7 @@ class StructuredDiscretization(Package):
         ],
         "idomain": [
             DTypeSchema(np.integer),
-            DimsSchema("layer", "y", "x") | DimsSchema("layer"),
+            DimsSchema("layer", "y", "x"),
             IndexesSchema(),
         ],
     }

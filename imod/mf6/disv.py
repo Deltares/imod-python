@@ -45,7 +45,7 @@ class VerticesDiscretization(Package):
         ],
         "idomain": [
             DTypeSchema(np.integer),
-            DimsSchema("layer", "{face_dim}") | DimsSchema("layer"),
+            DimsSchema("layer", "{face_dim}"),
             IndexesSchema(),
         ],
     }
