@@ -17,18 +17,27 @@ import xarray as xr
 from imod import mf6
 from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase
 
-from imod.schemata import DTypeSchema, AnyValueSchema, CoordsSchema
+from imod.schemata import DTypeSchema, AnyValueSchema, CoordsSchema, DimsSchema
 
 schema_1darray_postivite_int = [
         DTypeSchema(np.int_),
         AnyValueSchema(">", 0),
+        DimsSchema()        
         ]
 schema_1darray_str = [
         DTypeSchema(np.str_),
+        DimsSchema()            
         ]
 schema_1darray_float = [
         DTypeSchema(np.float_),
-        ]      
+        DimsSchema()            
+        ]  
+    
+
+schema_ndarray_time = [
+        DTypeSchema(np.float_),
+        DimsSchema("index", "time")            
+        ]  
 
 class LakeApi_Base(PackageBase):
     """
@@ -531,28 +540,28 @@ class Lake(BoundaryCondition):
         "connection_width":schema_1darray_float,
         "connection_length":schema_1darray_float,   
 
-        "outlet_lakein":_outlet_input_schema,   
-        "outlet_lakeout":_outlet_input_schema,
-        "outlet_couttype":_outlet_input_schema,
-        "outlet_invert":_outlet_input_schema,
-        "outlet_roughness":_outlet_input_schema,
-        "outlet_width":_outlet_input_schema,
-        "outlet_slope":_outlet_input_schema,
+        "outlet_lakein":schema_1darray_postivite_int,
+        "outlet_lakeout":schema_1darray_postivite_int,
+        "outlet_couttype":schema_1darray_str,
+        "outlet_invert":schema_1darray_float,
+        "outlet_roughness":schema_1darray_float,
+        "outlet_width":schema_1darray_float,
+        "outlet_slope":schema_1darray_float,
 
-        "ts_status":_ts_lake_input_schema,
-        "ts_stage" :_ts_lake_input_schema,
-        "ts_rainfall" :_ts_lake_input_schema,
-        "ts_evaporation" :_ts_lake_input_schema,
-        "ts_runoff" :_ts_lake_input_schema,
-        "ts_inflow" :_ts_lake_input_schema,
-        "ts_withdrawal" :_ts_lake_input_schema,
-        "ts_auxiliary" :_ts_lake_input_schema,   
+        "ts_status": schema_ndarray_time,
+        "ts_stage" : schema_ndarray_time,
+        "ts_rainfall" : schema_ndarray_time,
+        "ts_evaporation" : schema_ndarray_time,
+        "ts_runoff" : schema_ndarray_time,
+        "ts_inflow" : schema_ndarray_time,
+        "ts_withdrawal" : schema_ndarray_time,
+        "ts_auxiliary" : schema_ndarray_time,   
 
-        "ts_rate" : _ts_outlet_input_schema,
-        "ts_invert" : _ts_outlet_input_schema,
-        "ts_rough" : _ts_outlet_input_schema,
-        "ts_width" : _ts_outlet_input_schema,
-        "ts_slope" : _ts_outlet_input_schema,
+        "ts_rate" :  schema_ndarray_time,
+        "ts_invert" : schema_ndarray_time,
+        "ts_rough" : schema_ndarray_time,
+        "ts_width" : schema_ndarray_time,
+        "ts_slope" : schema_ndarray_time,
     }    
 
     def __init__(
