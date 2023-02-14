@@ -119,10 +119,10 @@ class Package(abc.ABC):
         else:
             dataset = xr.open_dataset(path, **kwargs)
 
-        if dataset.ugrid_roles.topology: 
+        if dataset.ugrid_roles.topology:
             dataset = xu.UgridDataset(dataset)
 
-        return_cls.dataset = dataset 
+        return_cls.dataset = dataset
         return_cls.remove_nans_from_dataset()
         return return_cls
 
