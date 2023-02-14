@@ -189,9 +189,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                     binary=binary,
                 )
             except Exception as e:
-                raise type(e)(
-                    f"{e}\nError occured while writing {pkgname}"
-                )
+                raise type(e)(f"{e}\nError occured while writing {pkgname}")
 
 
 class GroundwaterFlowModel(Modflow6Model):
