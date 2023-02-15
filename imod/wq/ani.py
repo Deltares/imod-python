@@ -3,7 +3,6 @@ import numpy as np
 import imod
 from imod.wq.pkgbase import Package
 
-
 FLOAT_FORMAT = "%.18G"
 
 
@@ -15,9 +14,7 @@ def _write_arr(path, da, nodata=1.0e20, *_):
     ncol, nrow = da.shape
     footer = f" DIMENSIONS\n{ncol}\n{nrow}\n{xmin}\n{ymin}\n{xmax}\n{ymax}\n{nodata}\n0\n{dx}\n{dx}"
     a = np.nan_to_num(da.values, nan=nodata)
-    np.savetxt(
-        path, a, fmt=FLOAT_FORMAT, delimiter=" ", footer=footer, comments=""
-    )
+    np.savetxt(path, a, fmt=FLOAT_FORMAT, delimiter=" ", footer=footer, comments="")
     return
 
 
@@ -55,12 +52,12 @@ class HorizontalAnisotropy(Package):
         # and how many layers: store this info for later use in save
         d = {"anifile": (directory / "horizontal_anistropy.ani").as_posix()}
         return self._template.format(**d)
-    
+
     def _render_anifile(self, directory):
         """
         Unfortunately, the iMOD-WQ anisotropy works through an .ANI file, which
         then refers to .ARR files rather than a single indirection.
-        
+
         So the runfile section points to the .ANI file, which in turn points to
         the .ARR files, or contains constants.
         """
@@ -78,11 +75,9 @@ class HorizontalAnisotropy(Package):
                     value = da.item()
                     if np.isnan(value):
                         value = nodata
-                    content.append(
-                        f"constant {value:FLOAT_FORMAT} {varname}_l{layer}"
-                    )
+                    content.append(f"constant {value:FLOAT_FORMAT} {varname}_l{layer}")
         return "\n".join(content)
-    
+
     def save(self, directory):
         ani_content = self._render_anifile(directory)
         path = (directory / "horizontal_anistropy.ani").as_posix()

@@ -486,7 +486,7 @@ class SeawatModel(Model):
         d["package_set"] = package_set
         d["start_date"] = start_date
         return self._gen_template.render(d)
-    
+
     def _render_required_pkg(self, key, directory, globaltimes, nlayer):
         """
         Rendering method for straightforward packages
