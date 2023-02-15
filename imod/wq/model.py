@@ -486,19 +486,22 @@ class SeawatModel(Model):
         d["package_set"] = package_set
         d["start_date"] = start_date
         return self._gen_template.render(d)
-
-    def _render_pkg(self, key, directory, globaltimes, nlayer):
+    
+    def _render_required_pkg(self, key, directory, globaltimes, nlayer):
         """
         Rendering method for straightforward packages
         """
-        # Get name of pkg, e.g. lookup "recharge" for rch _pkg_id
         pkgkey = self._get_pkgkey(key)
         if pkgkey is None:
-            # Maybe do enum look for full package name?
-            if (key == "rch") or (key == "evt"):  # since recharge is optional
-                return ""
-            else:
-                raise ValueError(f"No {key} package provided.")
+            raise ValueError(f"No {key} package provided.")
+        return self[pkgkey]._render(
+            directory=directory / pkgkey, globaltimes=globaltimes, nlayer=nlayer
+        )
+
+    def _render_optional_pkg(self, key, directory, globaltimes, nlayer):
+        pkgkey = self._get_pkgkey(key)
+        if pkgkey is None:
+            return ""
         return self[pkgkey]._render(
             directory=directory / pkgkey, globaltimes=globaltimes, nlayer=nlayer
         )
@@ -638,21 +641,16 @@ class SeawatModel(Model):
             )
         )
         # Modflow
-        for key in ("bas6", "oc", "lpf", "rch", "evt"):
+        for key in ("bas6", "oc", "lpf"):
             content.append(
-                self._render_pkg(
+                self._render_required_pkg(
                     key=key, directory=directory, globaltimes=globaltimes, nlayer=nlayer
                 )
             )
-
-        # ani and hfb packages
-        for key in ("ani", "hfb6"):
+        for key in ("rch", "evt", "ani", "hfb"):
             content.append(
-                self._render_anihfb(
-                    key=key,
-                    modelname=self.modelname,
-                    directory=directory,
-                    nlayer=nlayer,
+                self._render_optional_pkg(
+                    key=key, directory=directory, globaltimes=globaltimes, nlayer=nlayer
                 )
             )
 
