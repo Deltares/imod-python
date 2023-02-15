@@ -8,6 +8,10 @@ import xarray as xr
 from imod.mf6.lak import Lake, LakeData, OutletManning, OutletSpecified, OutletWeir
 
 
+def create_xarray_1d(content, dimname):
+    return xr.DataArray(content, dims=dimname)
+
+
 def create_lake_data(
     is_lake,
     starting_stage,

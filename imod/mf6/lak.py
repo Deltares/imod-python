@@ -17,42 +17,23 @@ import xarray as xr
 from imod import mf6
 from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase
 
-from imod.schemata import DTypeSchema, AnyValueSchema, CoordsSchema, DimsSchema
+from imod.schemata import DTypeSchema, AnyValueSchema, AllValueSchema, DimsSchema
 
 connection_dimension_name = "boundary"
 outlet_dimension_name = "outlet"
 lake_dimension_name = "lake"
 
-schema_1darray_lake_postivite_int = [
-    DTypeSchema(np.int_),
-    AnyValueSchema(">", 0),
-    DTypeSchema(np.int_),
-    DimsSchema(lake_dimension_name),
-]
-schema_1darray_lake_str = [DTypeSchema(np.str_), DimsSchema(lake_dimension_name)]
-schema_1darray_lake_float = [DTypeSchema(np.float_), DimsSchema(lake_dimension_name)]
-schema_1darray_boundary_float = [
-    DTypeSchema(np.float_),
-    DimsSchema(connection_dimension_name),
-]
-schema_1darray_boundary_str = [
-    DTypeSchema(np.str),
-    DimsSchema(connection_dimension_name),
-]
-schema_1darray_boundary_int = [
-    DTypeSchema(np.int_),
-    DimsSchema(connection_dimension_name),
-]
-schema_optional_1darray_outlet_int = [DTypeSchema(np.int_), DimsSchema(outlet_dimension_name)| DimsSchema()]
-schema_optional_1darray_outlet_float = [
-    DTypeSchema(np.float_),
-    DimsSchema(outlet_dimension_name)| DimsSchema(),
-]
-schema_optional_1darray_outlet_str = [DTypeSchema(np.str_), DimsSchema(outlet_dimension_name)| DimsSchema()]
 
-schema_optional_ndarray_time = [DTypeSchema(np.float_), DimsSchema("index", "time") | DimsSchema()]
+def create_array_schema(data_type, dimension_name):
+    return [DTypeSchema(data_type), DimsSchema(dimension_name)]
 
-schema_optional_ndarray_str_time = [DTypeSchema(np.str_), DimsSchema("index", "time")| DimsSchema()]
+def create_optional_array_schema(data_type, dimension_names):
+    return [DTypeSchema(data_type), DimsSchema(*dimension_names) | DimsSchema()]
+
+
+write_schema_postivite_values = [
+    AllValueSchema(">", 0),
+]
 
 
 class LakeApi_Base(PackageBase):
@@ -158,7 +139,7 @@ class LakeData(LakeApi_Base):
         for ts_name, ts_object in timeseries_dict.items():
             if ts_object is not None:
                 fillvalue = np.nan
-                if not pd.api.types.is_numeric_dtype( ts_object.dtype):
+                if not pd.api.types.is_numeric_dtype(ts_object.dtype):
                     fillvalue = ""
                 self.dataset[ts_name] = ts_object.reindex(
                     {"time": times}, fill_value=fillvalue
@@ -553,36 +534,73 @@ class Lake(BoundaryCondition):
     _period_data = _period_data_lakes + _period_data_outlets
 
     _init_schemata = {
-        "lake_number": schema_1darray_lake_postivite_int,
-        "lake_starting_stage": schema_1darray_lake_float,
-        "lake_boundname": schema_1darray_lake_str,
-        "connection_lake_number": schema_1darray_boundary_int,
-        "connection_type": schema_1darray_boundary_str,
-        "connection_bed_leak": schema_1darray_boundary_float,
-        "connection_bottom_elevation": schema_1darray_boundary_float,
-        "connection_top_elevation": schema_1darray_boundary_float,
-        "connection_width": schema_1darray_boundary_float,
-        "connection_length": schema_1darray_boundary_float,
-        "outlet_lakein": schema_optional_1darray_outlet_int,
-        "outlet_lakeout": schema_optional_1darray_outlet_int,
-        "outlet_couttype": schema_optional_1darray_outlet_str,
-        "outlet_invert": schema_optional_1darray_outlet_float,
-        "outlet_roughness": schema_optional_1darray_outlet_float,
-        "outlet_width": schema_optional_1darray_outlet_float,
-        "outlet_slope": schema_optional_1darray_outlet_float,
-        "ts_status": schema_optional_ndarray_str_time,
-        "ts_stage": schema_optional_ndarray_time,
-        "ts_rainfall": schema_optional_ndarray_time,
-        "ts_evaporation": schema_optional_ndarray_time,
-        "ts_runoff": schema_optional_ndarray_time,
-        "ts_inflow": schema_optional_ndarray_time,
-        "ts_withdrawal": schema_optional_ndarray_time,
-        "ts_auxiliary": schema_optional_ndarray_time,
-        "ts_rate": schema_optional_ndarray_time,
-        "ts_invert": schema_optional_ndarray_time,
-        "ts_rough": schema_optional_ndarray_time,
-        "ts_width": schema_optional_ndarray_time,
-        "ts_slope": schema_optional_ndarray_time,
+        "lake_number": create_array_schema(np.int, lake_dimension_name),
+        "lake_starting_stage": create_array_schema(np.float_, lake_dimension_name),
+        "lake_boundname": create_array_schema(str, lake_dimension_name),
+        "connection_lake_number": create_array_schema(
+            int, connection_dimension_name
+        ),
+        "connection_type": create_array_schema(str, connection_dimension_name),
+        "connection_bed_leak": create_array_schema(
+            np.float_, connection_dimension_name
+        ),
+        "connection_bottom_elevation": create_array_schema(
+            np.float_, connection_dimension_name
+        ),
+        "connection_top_elevation": create_array_schema(
+            np.float_, connection_dimension_name
+        ),
+        "connection_width": create_array_schema(
+            np.float_, connection_dimension_name
+        ),
+        "connection_length": create_array_schema(
+            np.float_, connection_dimension_name
+        ),
+        "outlet_lakein": create_optional_array_schema(
+            np.int_, (outlet_dimension_name,)
+        ),
+        "outlet_lakeout": create_optional_array_schema(
+            np.int_, (outlet_dimension_name,)
+        ),
+        "outlet_couttype": create_optional_array_schema(
+            str, (outlet_dimension_name,)
+        ),
+        "outlet_invert": create_optional_array_schema(
+            np.float_, (outlet_dimension_name,)
+        ),
+        "outlet_roughness":  create_optional_array_schema(
+            np.float_, (outlet_dimension_name,)
+        ),
+        "outlet_width": create_optional_array_schema(
+            np.float_, (outlet_dimension_name,)
+        ),
+        "outlet_slope":  create_optional_array_schema(
+            np.float_, (outlet_dimension_name,)
+        ),
+        "ts_status": create_optional_array_schema(str, ("index", "time")),
+        "ts_stage": create_optional_array_schema(np.float_, ("index", "time")),
+        "ts_rainfall": create_optional_array_schema(np.float_, ("index", "time")),
+        "ts_evaporation": create_optional_array_schema(np.float_, ("index", "time")),
+        "ts_runoff": create_optional_array_schema(np.float_, ("index", "time")),
+        "ts_inflow": create_optional_array_schema(np.float_, ("index", "time")),
+        "ts_withdrawal": create_optional_array_schema(np.float_, ("index", "time")),
+        "ts_auxiliary": create_optional_array_schema(np.float_, ("index", "time")),
+        "ts_rate": create_optional_array_schema(np.float_, ("index", "time")),
+        "ts_invert": create_optional_array_schema(np.float_, ("index", "time")),
+        "ts_rough": create_optional_array_schema(np.float_, ("index", "time")),
+        "ts_width": create_optional_array_schema(np.float_, ("index", "time")),
+        "ts_slope": create_optional_array_schema(np.float_, ("index", "time")),
+    }
+
+    write_schemata = {
+        "lake_number": write_schema_postivite_values,
+        "connection_lake_number": write_schema_postivite_values,
+        "connection_cell_id": write_schema_postivite_values,        
+        "connection_width": write_schema_postivite_values,
+        "connection_length": write_schema_postivite_values,
+        "outlet_lakein": write_schema_postivite_values,
+        "outlet_lakeout": write_schema_postivite_values,
+        "outlet_width": write_schema_postivite_values,
     }
 
     def __init__(
@@ -642,7 +660,7 @@ class Lake(BoundaryCondition):
         self.dataset["lake_number"] = lake_number
         self.dataset["lake_starting_stage"] = lake_starting_stage
 
-        nr_indices = lake_number.data.max()
+        nr_indices = int(lake_number.data.max())
         if outlet_lakein is not None:
             nroutlets = len(outlet_lakein.data)
             nr_indices = max(nr_indices, nroutlets)
@@ -681,7 +699,7 @@ class Lake(BoundaryCondition):
 
         self.dataset["ts_status"] = ts_status
         if ts_status is not None:
-            self.dataset["ts_status"] = self._replace_nans_by_spaces(
+            self.dataset["ts_status"] = self._convert_to_string_dataarray(
                 self.dataset["ts_status"]
             )
         self.dataset["ts_stage"] = ts_stage
@@ -782,9 +800,13 @@ class Lake(BoundaryCondition):
         return False
 
     @classmethod
-    def _replace_nans_by_spaces(cls, x: xr.DataArray) ->  xr.DataArray:
-        # to detect nan's we cannot use np.isnan because that works only on numeric types.
+    def _convert_to_string_dataarray(cls, x: xr.DataArray) -> xr.DataArray:
+        # when adding a string dataarray to a dataset with more coordinates, the 
+        # values for coordinates in the dataset that are not present in the dataarray
+        # are set to NaN, and the dataarray type changes to obj (because it now has both strings and NaNs)
+        # This function can be used to convert such a dataarray back to string type. to detect nan's we cannot use np.isnan because that works only on numeric types.
         # instead we use the property that any equality check is false for nan's
+
         idx = np.where(x != x)
         x[idx[0][:]] = ""
         return x.astype(np.str)
