@@ -16,8 +16,7 @@ import xarray as xr
 
 from imod import mf6
 from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase
-
-from imod.schemata import DTypeSchema, AnyValueSchema, AllValueSchema, DimsSchema
+from imod.schemata import AllValueSchema, AnyValueSchema, DimsSchema, DTypeSchema
 
 connection_dimension_name = "boundary"
 outlet_dimension_name = "outlet"
@@ -26,6 +25,7 @@ lake_dimension_name = "lake"
 
 def create_array_schema(data_type, dimension_name):
     return [DTypeSchema(data_type), DimsSchema(dimension_name)]
+
 
 def create_optional_array_schema(data_type, dimension_names):
     return [DTypeSchema(data_type), DimsSchema(*dimension_names) | DimsSchema()]
@@ -537,9 +537,7 @@ class Lake(BoundaryCondition):
         "lake_number": create_array_schema(np.int, lake_dimension_name),
         "lake_starting_stage": create_array_schema(np.float_, lake_dimension_name),
         "lake_boundname": create_array_schema(str, lake_dimension_name),
-        "connection_lake_number": create_array_schema(
-            int, connection_dimension_name
-        ),
+        "connection_lake_number": create_array_schema(int, connection_dimension_name),
         "connection_type": create_array_schema(str, connection_dimension_name),
         "connection_bed_leak": create_array_schema(
             np.float_, connection_dimension_name
@@ -550,31 +548,25 @@ class Lake(BoundaryCondition):
         "connection_top_elevation": create_array_schema(
             np.float_, connection_dimension_name
         ),
-        "connection_width": create_array_schema(
-            np.float_, connection_dimension_name
-        ),
-        "connection_length": create_array_schema(
-            np.float_, connection_dimension_name
-        ),
+        "connection_width": create_array_schema(np.float_, connection_dimension_name),
+        "connection_length": create_array_schema(np.float_, connection_dimension_name),
         "outlet_lakein": create_optional_array_schema(
             np.int_, (outlet_dimension_name,)
         ),
         "outlet_lakeout": create_optional_array_schema(
             np.int_, (outlet_dimension_name,)
         ),
-        "outlet_couttype": create_optional_array_schema(
-            str, (outlet_dimension_name,)
-        ),
+        "outlet_couttype": create_optional_array_schema(str, (outlet_dimension_name,)),
         "outlet_invert": create_optional_array_schema(
             np.float_, (outlet_dimension_name,)
         ),
-        "outlet_roughness":  create_optional_array_schema(
+        "outlet_roughness": create_optional_array_schema(
             np.float_, (outlet_dimension_name,)
         ),
         "outlet_width": create_optional_array_schema(
             np.float_, (outlet_dimension_name,)
         ),
-        "outlet_slope":  create_optional_array_schema(
+        "outlet_slope": create_optional_array_schema(
             np.float_, (outlet_dimension_name,)
         ),
         "ts_status": create_optional_array_schema(str, ("index", "time")),
@@ -595,7 +587,7 @@ class Lake(BoundaryCondition):
     write_schemata = {
         "lake_number": write_schema_postivite_values,
         "connection_lake_number": write_schema_postivite_values,
-        "connection_cell_id": write_schema_postivite_values,        
+        "connection_cell_id": write_schema_postivite_values,
         "connection_width": write_schema_postivite_values,
         "connection_length": write_schema_postivite_values,
         "outlet_lakein": write_schema_postivite_values,
@@ -801,7 +793,7 @@ class Lake(BoundaryCondition):
 
     @classmethod
     def _convert_to_string_dataarray(cls, x: xr.DataArray) -> xr.DataArray:
-        # when adding a string dataarray to a dataset with more coordinates, the 
+        # when adding a string dataarray to a dataset with more coordinates, the
         # values for coordinates in the dataset that are not present in the dataarray
         # are set to NaN, and the dataarray type changes to obj (because it now has both strings and NaNs)
         # This function can be used to convert such a dataarray back to string type. to detect nan's we cannot use np.isnan because that works only on numeric types.

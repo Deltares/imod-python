@@ -7,9 +7,9 @@ import xarray as xr
 
 from imod.mf6.lak import (
     Lake,
+    connection_dimension_name,
     lake_dimension_name,
     outlet_dimension_name,
-    connection_dimension_name,
 )
 from imod.schemata import ValidationError
 
@@ -190,12 +190,36 @@ def test_lake_write_validation_sign_mismatch():
 
     errors = lake._validate(Lake.write_schemata)
 
-    assert str(errors["lake_number"]) =="[ValidationError('values exceed condition: > 0')]"
-    assert str(errors["connection_lake_number"]) == "[ValidationError('values exceed condition: > 0')]"
-    assert str(errors["connection_cell_id"]) == "[ValidationError('values exceed condition: > 0')]"    
-    assert str(errors["connection_width"]) == "[ValidationError('values exceed condition: > 0')]"
-    assert str(errors["connection_length"]) == "[ValidationError('values exceed condition: > 0')]"
-    assert str(errors["outlet_lakein"]) == "[ValidationError('values exceed condition: > 0')]"
-    assert str(errors["outlet_lakeout"]) == "[ValidationError('values exceed condition: > 0')]"    
-    assert str(errors["outlet_width"]) == "[ValidationError('values exceed condition: > 0')]"   
-    assert len(errors)==8
+    assert (
+        str(errors["lake_number"])
+        == "[ValidationError('values exceed condition: > 0')]"
+    )
+    assert (
+        str(errors["connection_lake_number"])
+        == "[ValidationError('values exceed condition: > 0')]"
+    )
+    assert (
+        str(errors["connection_cell_id"])
+        == "[ValidationError('values exceed condition: > 0')]"
+    )
+    assert (
+        str(errors["connection_width"])
+        == "[ValidationError('values exceed condition: > 0')]"
+    )
+    assert (
+        str(errors["connection_length"])
+        == "[ValidationError('values exceed condition: > 0')]"
+    )
+    assert (
+        str(errors["outlet_lakein"])
+        == "[ValidationError('values exceed condition: > 0')]"
+    )
+    assert (
+        str(errors["outlet_lakeout"])
+        == "[ValidationError('values exceed condition: > 0')]"
+    )
+    assert (
+        str(errors["outlet_width"])
+        == "[ValidationError('values exceed condition: > 0')]"
+    )
+    assert len(errors) == 8
