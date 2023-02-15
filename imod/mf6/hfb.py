@@ -44,16 +44,16 @@ def edge_to_cell(notnull, arrdict, layer, idomain, grid):
 
 def dis_recarr(arrdict, layer, notnull, idomain, grid):
     # Define the numpy structured array dtype
-    index_spec = [
+    field_spec = [
         ("layer_1", np.int32),
         ("row_1", np.int32),
         ("column_1", np.int32),
         ("layer_2", np.int32),
         ("row_2", np.int32),
         ("column_2", np.int32),
+        ("resistance", np.float64),
     ]
-    field_spec = [(key, np.float64) for key in arrdict]
-    sparse_dtype = np.dtype(index_spec + field_spec)
+    sparse_dtype = np.dtype(field_spec)
     # Find the indices
     layer, cell2d, c = edge_to_cell(notnull, arrdict, layer, idomain, grid)
     shape = (idomain["y"].size, idomain["x"].size)
@@ -73,14 +73,14 @@ def dis_recarr(arrdict, layer, notnull, idomain, grid):
 
 def disv_recarr(arrdict, layer, notnull, idomain, grid):
     # Define the numpy structured array dtype
-    index_spec = [
+    field_spec = [
         ("layer_1", np.int32),
         ("cell2d_1", np.int32),
         ("layer_2", np.int32),
         ("cell2d_2", np.int32),
+        ("resistance", np.float64),
     ]
-    field_spec = [(key, np.float64) for key in arrdict]
-    sparse_dtype = np.dtype(index_spec + field_spec)
+    sparse_dtype = np.dtype(field_spec)
     # Initialize the structured array
     layer, cell2d, c = edge_to_cell(notnull, arrdict, layer, idomain, grid)
     # Set the indices
