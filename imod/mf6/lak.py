@@ -16,7 +16,7 @@ import xarray as xr
 
 from imod import mf6
 from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase
-from imod.schemata import AllValueSchema, AnyValueSchema, DimsSchema, DTypeSchema
+from imod.schemata import AllValueSchema,  DimsSchema, DTypeSchema
 
 connection_dimension_name = "boundary"
 outlet_dimension_name = "outlet"
