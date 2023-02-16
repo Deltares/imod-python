@@ -1,7 +1,5 @@
 import textwrap
 
-import numpy as np
-import pandas as pd
 import pytest
 import xarray as xr
 
@@ -35,7 +33,7 @@ def test_lake_init_validation_dim_mismatch():
     connection_length = xr.DataArray([1.0], dims="dim_0")
 
     with pytest.raises(ValidationError) as error:
-        lake = Lake(
+        _ = Lake(
             lake_numbers,
             lake_starting_stage,
             lake_boundname,
@@ -96,7 +94,7 @@ def test_lake_init_validation_type_mismatch():
     connection_length = xr.DataArray([1], dims=connection_dimension_name)
 
     with pytest.raises(ValidationError) as error:
-        lake = Lake(
+        _ = Lake(
             lake_numbers,
             lake_starting_stage,
             lake_boundname,
