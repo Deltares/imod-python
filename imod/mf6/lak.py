@@ -584,7 +584,7 @@ class Lake(BoundaryCondition):
         "ts_slope": create_optional_array_schema(np.float_, ("index", "time")),
     }
 
-    write_schemata = {
+    _write_schemata = {
         "lake_number": write_schema_postivite_values,
         "connection_lake_number": write_schema_postivite_values,
         "connection_cell_id": write_schema_postivite_values,

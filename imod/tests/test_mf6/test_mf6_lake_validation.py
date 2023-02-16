@@ -186,7 +186,7 @@ def test_lake_write_validation_sign_mismatch():
         outlet_slope,
     )
 
-    errors = lake._validate(Lake.write_schemata)
+    errors = lake._validate(Lake._write_schemata)
 
     assert (
         str(errors["lake_number"])
