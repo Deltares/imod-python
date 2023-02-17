@@ -146,7 +146,10 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             # Concatenate write and init schemata.
             schemata = deepcopy(pkg._init_schemata)
             for key, value in pkg._write_schemata.items():
-                schemata[key] += value
+                if key not in schemata.keys():
+                    schemata[key] = value
+                else:
+                    schemata[key] += value
 
             pkg_errors = pkg._validate(
                 schemata=schemata,
