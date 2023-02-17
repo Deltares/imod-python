@@ -176,7 +176,7 @@ times_rainfall = [
 rainfall = xr.DataArray(
     np.full((len(times_rainfall)), 5.0), coords={"time": times_rainfall}, dims=["time"]
 )
-lake_cells = [(1, 3, 3)]
+lake_cells = [(0, 3, 3)]
 
 lake = create_lakeData(idomain, 0.3, "Naardermeer", lake_cells, rainfall)
 
