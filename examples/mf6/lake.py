@@ -28,27 +28,27 @@ import imod
 import imod.mf6.lak as lak
 
 
-def create_gridcovering_array(idomain, lake_cells, fillvalue, dtype):
+def create_gridcovering_array(idomain, lake_cells, initial_value, dtype):
     """
     creates an array similar in dimensions/coords to idomain, but with value NaN (orr the missing value for integers)
     everywhere, except in the cells contained in list "lake_cells". In those cells, the output array has value fillvalue.
     """
     result = xr.full_like(idomain, fill_value=np.nan, dtype=dtype)
     for cell in lake_cells:
-        result.values[cell[0], cell[1], cell[2]] = fillvalue
+        result.values[cell[0], cell[1], cell[2]] = initial_value
     return result
 
 
 def create_lakeData(idomain, starting_stage, boundname, lake_cells, rainfall):
     HORIZONTAL = 0
     connectionType = create_gridcovering_array(
-        idomain, lake_cells, HORIZONTAL, np.int32
+        idomain, lake_cells, HORIZONTAL, np.float_
     )
-    bed_leak = create_gridcovering_array(idomain, lake_cells, 0.2, np.float32)
-    top_elevation = create_gridcovering_array(idomain, lake_cells, 0.4, np.float32)
-    bot_elevation = create_gridcovering_array(idomain, lake_cells, 0.1, np.float32)
-    connection_length = create_gridcovering_array(idomain, lake_cells, 0.5, np.float32)
-    connection_width = create_gridcovering_array(idomain, lake_cells, 0.6, np.float32)
+    bed_leak = create_gridcovering_array(idomain, lake_cells, 0.2, np.float_)
+    top_elevation = create_gridcovering_array(idomain, lake_cells, 0.4, np.float_)
+    bot_elevation = create_gridcovering_array(idomain, lake_cells, 0.1, np.float_)
+    connection_length = create_gridcovering_array(idomain, lake_cells, 0.5, np.float_)
+    connection_width = create_gridcovering_array(idomain, lake_cells, 0.6, np.float_)
     result = lak.LakeData(
         starting_stage,
         boundname,
@@ -176,7 +176,7 @@ times_rainfall = [
 rainfall = xr.DataArray(
     np.full((len(times_rainfall)), 5.0), coords={"time": times_rainfall}, dims=["time"]
 )
-lake_cells = [(1, 3, 3)]
+lake_cells = [(0, 3, 3)]
 
 lake = create_lakeData(idomain, 0.3, "Naardermeer", lake_cells, rainfall)
 
