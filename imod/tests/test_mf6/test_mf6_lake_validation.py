@@ -3,12 +3,7 @@ import textwrap
 import pytest
 import xarray as xr
 
-from imod.mf6.lak import (
-    Lake,
-    CONNECTION_DIM,
-    LAKE_DIM,
-    OUTLET_DIM,
-)
+from imod.mf6.lak import CONNECTION_DIM, LAKE_DIM, OUTLET_DIM, Lake
 from imod.schemata import ValidationError
 
 

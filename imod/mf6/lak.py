@@ -535,7 +535,10 @@ class Lake(BoundaryCondition):
         ],
         "connection_width": [DTypeSchema(np.floating), DimsSchema(CONNECTION_DIM)],
         "connection_length": [DTypeSchema(np.floating), DimsSchema(CONNECTION_DIM)],
-        "outlet_lakein": [DTypeSchema(np.integer), DimsSchema(OUTLET_DIM)| DimsSchema()] ,
+        "outlet_lakein": [
+            DTypeSchema(np.integer),
+            DimsSchema(OUTLET_DIM) | DimsSchema(),
+        ],
         "outlet_lakeout": [
             DTypeSchema(np.integer),
             DimsSchema(OUTLET_DIM) | DimsSchema(),

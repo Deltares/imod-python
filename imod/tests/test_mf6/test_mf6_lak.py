@@ -6,13 +6,13 @@ import pytest
 import xarray as xr
 
 from imod.mf6.lak import (
+    CONNECTION_DIM,
+    LAKE_DIM,
     Lake,
     LakeData,
     OutletManning,
     OutletSpecified,
     OutletWeir,
-    LAKE_DIM,
-    CONNECTION_DIM,
 )
 
 
