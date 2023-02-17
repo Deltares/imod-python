@@ -6,6 +6,7 @@ import xarray as xr
 from imod.mf6.lak import CONNECTION_DIM, LAKE_DIM, OUTLET_DIM, Lake
 from imod.schemata import ValidationError
 
+import numpy as np
 
 def test_lake_init_validation_dim_mismatch():
     # this setup contains input errors in the dimension name of the different arrays
@@ -71,8 +72,8 @@ def test_lake_init_validation_dim_mismatch():
 def test_lake_init_validation_type_mismatch():
     # this setup contains input errors in the data type of the different arrays
     lake_numbers = xr.DataArray([1.0], dims=LAKE_DIM)
-    lake_starting_stage = xr.DataArray([1], dims=LAKE_DIM)
-    lake_boundname = xr.DataArray([3], dims=LAKE_DIM)
+    lake_starting_stage = xr.DataArray(np.array([1], dtype = np.integer), dims=LAKE_DIM, )
+    lake_boundname = xr.DataArray(np.array([3], dtype = np.integer), dims=LAKE_DIM)
     connection_lake_number = xr.DataArray([4.2], dims=CONNECTION_DIM)
     connection_cell_id = xr.DataArray(
         data=[
@@ -81,12 +82,12 @@ def test_lake_init_validation_type_mismatch():
         coords={"celldim": ["layer", "cell2d"]},
         dims=("boundary", "celldim"),
     )
-    connection_type = xr.DataArray([3], dims=CONNECTION_DIM)
-    connection_bed_leak = xr.DataArray([1], dims=CONNECTION_DIM)
-    connection_bottom_elevation = xr.DataArray([1], dims=CONNECTION_DIM)
-    connection_top_elevation = xr.DataArray([1], dims=CONNECTION_DIM)
-    connection_width = xr.DataArray([1], dims=CONNECTION_DIM)
-    connection_length = xr.DataArray([1], dims=CONNECTION_DIM)
+    connection_type = xr.DataArray(np.array([3], dtype = np.integer), dims=CONNECTION_DIM)
+    connection_bed_leak = xr.DataArray(np.array([1], dtype = np.integer), dims=CONNECTION_DIM)
+    connection_bottom_elevation = xr.DataArray(np.array([1], dtype = np.integer), dims=CONNECTION_DIM)
+    connection_top_elevation = xr.DataArray(np.array([1], dtype = np.integer), dims=CONNECTION_DIM)
+    connection_width = xr.DataArray(np.array([1], dtype = np.integer), dims=CONNECTION_DIM)
+    connection_length = xr.DataArray(np.array([1], dtype = np.integer), dims=CONNECTION_DIM)
 
     with pytest.raises(ValidationError) as error:
         _ = Lake(
@@ -102,6 +103,7 @@ def test_lake_init_validation_type_mismatch():
             connection_width,
             connection_length,
         )
+            
     expected = textwrap.dedent(
         """
         * lake_number
