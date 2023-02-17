@@ -18,22 +18,9 @@ from imod import mf6
 from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase
 from imod.schemata import AllValueSchema, DimsSchema, DTypeSchema
 
-connection_dimension_name = "boundary"
-outlet_dimension_name = "outlet"
-lake_dimension_name = "lake"
-
-
-def create_array_schema(data_type, dimension_name):
-    return [DTypeSchema(data_type), DimsSchema(dimension_name)]
-
-
-def create_optional_array_schema(data_type, dimension_names):
-    return [DTypeSchema(data_type), DimsSchema(*dimension_names) | DimsSchema()]
-
-
-write_schema_postivite_values = [
-    AllValueSchema(">", 0),
-]
+CONNECTION_DIM = "connection_dim"
+OUTLET_DIM = "outlet_dim"
+LAKE_DIM = "lake_dim"
 
 
 class LakeApi_Base(PackageBase):
@@ -263,18 +250,16 @@ def create_connection_data(lakes):
         cell_id = xr.DataArray(
             data=indices + 1,
             coords={"celldim": list(xr_indices.keys())},
-            dims=(connection_dimension_name, "celldim"),
+            dims=(CONNECTION_DIM, "celldim"),
         )
         cell_ids.append(cell_id)
 
     connection_data = {
-        k: xr.DataArray(data=np.concatenate(v), dims=[connection_dimension_name])
+        k: xr.DataArray(data=np.concatenate(v), dims=[CONNECTION_DIM])
         for k, v in connection_data.items()
     }
 
-    connection_data["connection_cell_id"] = xr.concat(
-        cell_ids, dim=connection_dimension_name
-    )
+    connection_data["connection_cell_id"] = xr.concat(cell_ids, dim=CONNECTION_DIM)
     return connection_data
 
 
@@ -315,7 +300,7 @@ def create_outlet_data(outlets, name_to_number):
             outlet_data[f"outlet_{var}"].append(value)
 
     outlet_data = {
-        k: xr.DataArray(data=v, dims=["outlet"]) for k, v in outlet_data.items()
+        k: xr.DataArray(data=v, dims=[OUTLET_DIM]) for k, v in outlet_data.items()
     }
     return outlet_data
 
@@ -534,65 +519,104 @@ class Lake(BoundaryCondition):
     _period_data = _period_data_lakes + _period_data_outlets
 
     _init_schemata = {
-        "lake_number": create_array_schema(np.int, lake_dimension_name),
-        "lake_starting_stage": create_array_schema(np.float_, lake_dimension_name),
-        "lake_boundname": create_array_schema(str, lake_dimension_name),
-        "connection_lake_number": create_array_schema(int, connection_dimension_name),
-        "connection_type": create_array_schema(str, connection_dimension_name),
-        "connection_bed_leak": create_array_schema(
-            np.float_, connection_dimension_name
-        ),
-        "connection_bottom_elevation": create_array_schema(
-            np.float_, connection_dimension_name
-        ),
-        "connection_top_elevation": create_array_schema(
-            np.float_, connection_dimension_name
-        ),
-        "connection_width": create_array_schema(np.float_, connection_dimension_name),
-        "connection_length": create_array_schema(np.float_, connection_dimension_name),
-        "outlet_lakein": create_optional_array_schema(
-            np.int_, (outlet_dimension_name,)
-        ),
-        "outlet_lakeout": create_optional_array_schema(
-            np.int_, (outlet_dimension_name,)
-        ),
-        "outlet_couttype": create_optional_array_schema(str, (outlet_dimension_name,)),
-        "outlet_invert": create_optional_array_schema(
-            np.float_, (outlet_dimension_name,)
-        ),
-        "outlet_roughness": create_optional_array_schema(
-            np.float_, (outlet_dimension_name,)
-        ),
-        "outlet_width": create_optional_array_schema(
-            np.float_, (outlet_dimension_name,)
-        ),
-        "outlet_slope": create_optional_array_schema(
-            np.float_, (outlet_dimension_name,)
-        ),
-        "ts_status": create_optional_array_schema(str, ("index", "time")),
-        "ts_stage": create_optional_array_schema(np.float_, ("index", "time")),
-        "ts_rainfall": create_optional_array_schema(np.float_, ("index", "time")),
-        "ts_evaporation": create_optional_array_schema(np.float_, ("index", "time")),
-        "ts_runoff": create_optional_array_schema(np.float_, ("index", "time")),
-        "ts_inflow": create_optional_array_schema(np.float_, ("index", "time")),
-        "ts_withdrawal": create_optional_array_schema(np.float_, ("index", "time")),
-        "ts_auxiliary": create_optional_array_schema(np.float_, ("index", "time")),
-        "ts_rate": create_optional_array_schema(np.float_, ("index", "time")),
-        "ts_invert": create_optional_array_schema(np.float_, ("index", "time")),
-        "ts_rough": create_optional_array_schema(np.float_, ("index", "time")),
-        "ts_width": create_optional_array_schema(np.float_, ("index", "time")),
-        "ts_slope": create_optional_array_schema(np.float_, ("index", "time")),
+        "lake_number": [DTypeSchema(np.integer), DimsSchema(LAKE_DIM)],
+        "lake_starting_stage": [DTypeSchema(np.floating), DimsSchema(LAKE_DIM)],
+        "lake_boundname": [DTypeSchema(str), DimsSchema(LAKE_DIM)],
+        "connection_lake_number": [DTypeSchema(np.integer), DimsSchema(CONNECTION_DIM)],
+        "connection_type": [DTypeSchema(str), DimsSchema(CONNECTION_DIM)],
+        "connection_bed_leak": [DTypeSchema(np.floating), DimsSchema(CONNECTION_DIM)],
+        "connection_bottom_elevation": [
+            DTypeSchema(np.floating),
+            DimsSchema(CONNECTION_DIM),
+        ],
+        "connection_top_elevation": [
+            DTypeSchema(np.floating),
+            DimsSchema(CONNECTION_DIM),
+        ],
+        "connection_width": [DTypeSchema(np.floating), DimsSchema(CONNECTION_DIM)],
+        "connection_length": [DTypeSchema(np.floating), DimsSchema(CONNECTION_DIM)],
+        "outlet_lakein": [DTypeSchema(np.integer), DimsSchema(OUTLET_DIM)| DimsSchema()] ,
+        "outlet_lakeout": [
+            DTypeSchema(np.integer),
+            DimsSchema(OUTLET_DIM) | DimsSchema(),
+        ],
+        "outlet_couttype": [DTypeSchema(str), DimsSchema(OUTLET_DIM) | DimsSchema()],
+        "outlet_invert": [
+            DTypeSchema(np.floating),
+            DimsSchema(OUTLET_DIM) | DimsSchema(),
+        ],
+        "outlet_roughness": [
+            DTypeSchema(np.floating),
+            DimsSchema(OUTLET_DIM) | DimsSchema(),
+        ],
+        "outlet_width": [
+            DTypeSchema(np.floating),
+            DimsSchema(OUTLET_DIM) | DimsSchema(),
+        ],
+        "outlet_slope": [
+            DTypeSchema(np.floating),
+            DimsSchema(OUTLET_DIM) | DimsSchema(),
+        ],
+        "ts_status": [DTypeSchema(str), DimsSchema("index", "time") | DimsSchema()],
+        "ts_stage": [
+            DTypeSchema(np.floating),
+            DimsSchema("index", "time") | DimsSchema(),
+        ],
+        "ts_rainfall": [
+            DTypeSchema(np.floating),
+            DimsSchema("index", "time") | DimsSchema(),
+        ],
+        "ts_evaporation": [
+            DTypeSchema(np.floating),
+            DimsSchema("index", "time") | DimsSchema(),
+        ],
+        "ts_runoff": [
+            DTypeSchema(np.floating),
+            DimsSchema("index", "time") | DimsSchema(),
+        ],
+        "ts_inflow": [
+            DTypeSchema(np.floating),
+            DimsSchema("index", "time") | DimsSchema(),
+        ],
+        "ts_withdrawal": [
+            DTypeSchema(np.floating),
+            DimsSchema("index", "time") | DimsSchema(),
+        ],
+        "ts_auxiliary": [
+            DTypeSchema(np.floating),
+            DimsSchema("index", "time") | DimsSchema(),
+        ],
+        "ts_rate": [
+            DTypeSchema(np.floating),
+            DimsSchema("index", "time") | DimsSchema(),
+        ],
+        "ts_invert": [
+            DTypeSchema(np.floating),
+            DimsSchema("index", "time") | DimsSchema(),
+        ],
+        "ts_rough": [
+            DTypeSchema(np.floating),
+            DimsSchema("index", "time") | DimsSchema(),
+        ],
+        "ts_width": [
+            DTypeSchema(np.floating),
+            DimsSchema("index", "time") | DimsSchema(),
+        ],
+        "ts_slope": [
+            DTypeSchema(np.floating),
+            DimsSchema("index", "time") | DimsSchema(),
+        ],
     }
 
     _write_schemata = {
-        "lake_number": write_schema_postivite_values,
-        "connection_lake_number": write_schema_postivite_values,
-        "connection_cell_id": write_schema_postivite_values,
-        "connection_width": write_schema_postivite_values,
-        "connection_length": write_schema_postivite_values,
-        "outlet_lakein": write_schema_postivite_values,
-        "outlet_lakeout": write_schema_postivite_values,
-        "outlet_width": write_schema_postivite_values,
+        "lake_number": [AllValueSchema(">", 0)],
+        "connection_lake_number": [AllValueSchema(">", 0)],
+        "connection_cell_id": [AllValueSchema(">", 0)],
+        "connection_width": [AllValueSchema(">", 0)],
+        "connection_length": [AllValueSchema(">", 0)],
+        "outlet_lakein": [AllValueSchema(">", 0)],
+        "outlet_lakeout": [AllValueSchema(">", 0)],
+        "outlet_width": [AllValueSchema(">", 0)],
     }
 
     def __init__(
@@ -652,7 +676,7 @@ class Lake(BoundaryCondition):
         self.dataset["lake_number"] = lake_number
         self.dataset["lake_starting_stage"] = lake_starting_stage
 
-        nr_indices = int(lake_number.data.max())
+        nr_indices = int(self.dataset["lake_number"].data.max())
         if outlet_lakein is not None:
             nroutlets = len(outlet_lakein.data)
             nr_indices = max(nr_indices, nroutlets)
@@ -735,19 +759,19 @@ class Lake(BoundaryCondition):
         n_connection = [lake["connection_type"].count().values[()] for lake in lakes]
         package_content["lake_starting_stage"] = xr.DataArray(
             data=[lake["starting_stage"].item() for lake in lakes],
-            dims=[lake_dimension_name],
+            dims=[LAKE_DIM],
         )
         package_content["lake_number"] = xr.DataArray(
-            data=lake_numbers, dims=[lake_dimension_name]
+            data=lake_numbers, dims=[LAKE_DIM]
         )
         package_content["lake_boundname"] = xr.DataArray(
-            list(name_to_number.keys()), dims=[lake_dimension_name]
+            list(name_to_number.keys()), dims=[LAKE_DIM]
         )
 
         # Connection data
         package_content["connection_lake_number"] = xr.DataArray(
             data=np.repeat(lake_numbers, n_connection),
-            dims=[connection_dimension_name],
+            dims=[CONNECTION_DIM],
         )
         connection_data = create_connection_data(lakes)
         package_content.update(connection_data)
@@ -843,7 +867,9 @@ class Lake(BoundaryCondition):
         return self._template.render(d)
 
     def _get_iconn(self, lake_numbers_per_connection):
-        iconn = np.full_like(lake_numbers_per_connection, dtype=np.int_, fill_value=0)
+        iconn = np.full_like(
+            lake_numbers_per_connection, dtype=np.integer, fill_value=0
+        )
         maxlake = lake_numbers_per_connection.max()
         connections_per_lake = np.zeros(maxlake + 1)
         for i in range(np.size(lake_numbers_per_connection)):

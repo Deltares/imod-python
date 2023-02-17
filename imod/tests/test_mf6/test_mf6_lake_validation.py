@@ -5,9 +5,9 @@ import xarray as xr
 
 from imod.mf6.lak import (
     Lake,
-    connection_dimension_name,
-    lake_dimension_name,
-    outlet_dimension_name,
+    CONNECTION_DIM,
+    LAKE_DIM,
+    OUTLET_DIM,
 )
 from imod.schemata import ValidationError
 
@@ -23,7 +23,7 @@ def test_lake_init_validation_dim_mismatch():
             [-1, -3],
         ],
         coords={"celldim": ["layer", "cell2d"]},
-        dims=("boundary", "celldim"),
+        dims=(CONNECTION_DIM, "celldim"),
     )
     connection_type = xr.DataArray(["vertical"], dims="dim_0")
     connection_bed_leak = xr.DataArray([1.0], dims="dim_0")
@@ -50,35 +50,35 @@ def test_lake_init_validation_dim_mismatch():
     expected = textwrap.dedent(
         """
         * lake_number
-        \t- dim mismatch: expected ('lake',), got ('dim_0',)
+        \t- dim mismatch: expected ('lake_dim',), got ('dim_0',)
         * lake_starting_stage
-        \t- dim mismatch: expected ('lake',), got ('dim_0',)
+        \t- dim mismatch: expected ('lake_dim',), got ('dim_0',)
         * lake_boundname
-        \t- dim mismatch: expected ('lake',), got ('dim_0',)
+        \t- dim mismatch: expected ('lake_dim',), got ('dim_0',)
         * connection_lake_number
-        \t- dim mismatch: expected ('boundary',), got ('dim_0',)
+        \t- dim mismatch: expected ('connection_dim',), got ('dim_0',)
         * connection_type
-        \t- dim mismatch: expected ('boundary',), got ('dim_0',)
+        \t- dim mismatch: expected ('connection_dim',), got ('dim_0',)
         * connection_bed_leak
-        \t- dim mismatch: expected ('boundary',), got ('dim_0',)
+        \t- dim mismatch: expected ('connection_dim',), got ('dim_0',)
         * connection_bottom_elevation
-        \t- dim mismatch: expected ('boundary',), got ('dim_0',)
+        \t- dim mismatch: expected ('connection_dim',), got ('dim_0',)
         * connection_top_elevation
-        \t- dim mismatch: expected ('boundary',), got ('dim_0',)
+        \t- dim mismatch: expected ('connection_dim',), got ('dim_0',)
         * connection_width
-        \t- dim mismatch: expected ('boundary',), got ('dim_0',)
+        \t- dim mismatch: expected ('connection_dim',), got ('dim_0',)
         * connection_length
-        \t- dim mismatch: expected ('boundary',), got ('dim_0',)"""
+        \t- dim mismatch: expected ('connection_dim',), got ('dim_0',)"""
     )
     assert str(error.value) == expected
 
 
 def test_lake_init_validation_type_mismatch():
     # this setup contains input errors in the data type of the different arrays
-    lake_numbers = xr.DataArray([1.0], dims=lake_dimension_name)
-    lake_starting_stage = xr.DataArray([1], dims=lake_dimension_name)
-    lake_boundname = xr.DataArray([3], dims=lake_dimension_name)
-    connection_lake_number = xr.DataArray([4.2], dims=connection_dimension_name)
+    lake_numbers = xr.DataArray([1.0], dims=LAKE_DIM)
+    lake_starting_stage = xr.DataArray([1], dims=LAKE_DIM)
+    lake_boundname = xr.DataArray([3], dims=LAKE_DIM)
+    connection_lake_number = xr.DataArray([4.2], dims=CONNECTION_DIM)
     connection_cell_id = xr.DataArray(
         data=[
             [1.0, 3.0],
@@ -86,12 +86,12 @@ def test_lake_init_validation_type_mismatch():
         coords={"celldim": ["layer", "cell2d"]},
         dims=("boundary", "celldim"),
     )
-    connection_type = xr.DataArray([3], dims=connection_dimension_name)
-    connection_bed_leak = xr.DataArray([1], dims=connection_dimension_name)
-    connection_bottom_elevation = xr.DataArray([1], dims=connection_dimension_name)
-    connection_top_elevation = xr.DataArray([1], dims=connection_dimension_name)
-    connection_width = xr.DataArray([1], dims=connection_dimension_name)
-    connection_length = xr.DataArray([1], dims=connection_dimension_name)
+    connection_type = xr.DataArray([3], dims=CONNECTION_DIM)
+    connection_bed_leak = xr.DataArray([1], dims=CONNECTION_DIM)
+    connection_bottom_elevation = xr.DataArray([1], dims=CONNECTION_DIM)
+    connection_top_elevation = xr.DataArray([1], dims=CONNECTION_DIM)
+    connection_width = xr.DataArray([1], dims=CONNECTION_DIM)
+    connection_length = xr.DataArray([1], dims=CONNECTION_DIM)
 
     with pytest.raises(ValidationError) as error:
         _ = Lake(
@@ -110,34 +110,34 @@ def test_lake_init_validation_type_mismatch():
     expected = textwrap.dedent(
         """
         * lake_number
-        \t- dtype float64 != int32
+        \t- dtype float64 != <class 'numpy.integer'>
         * lake_starting_stage
-        \t- dtype int32 != float64
+        \t- dtype int32 != <class 'numpy.floating'>
         * lake_boundname
         \t- dtype int32 != <U0
         * connection_lake_number
-        \t- dtype float64 != int32
+        \t- dtype float64 != <class 'numpy.integer'>
         * connection_type
         \t- dtype int32 != <U0
         * connection_bed_leak
-        \t- dtype int32 != float64
+        \t- dtype int32 != <class 'numpy.floating'>
         * connection_bottom_elevation
-        \t- dtype int32 != float64
+        \t- dtype int32 != <class 'numpy.floating'>
         * connection_top_elevation
-        \t- dtype int32 != float64
+        \t- dtype int32 != <class 'numpy.floating'>
         * connection_width
-        \t- dtype int32 != float64
+        \t- dtype int32 != <class 'numpy.floating'>
         * connection_length
-        \t- dtype int32 != float64"""
+        \t- dtype int32 != <class 'numpy.floating'>"""
     )
     assert str(error.value) == expected
 
 
 def test_lake_write_validation_sign_mismatch():
-    lake_numbers = xr.DataArray([-1], dims=lake_dimension_name)
-    lake_starting_stage = xr.DataArray([1.0], dims=lake_dimension_name)
-    lake_boundname = xr.DataArray(["lake1"], dims=lake_dimension_name)
-    connection_lake_number = xr.DataArray([-1], dims=connection_dimension_name)
+    lake_numbers = xr.DataArray([-1], dims=LAKE_DIM)
+    lake_starting_stage = xr.DataArray([1.0], dims=LAKE_DIM)
+    lake_boundname = xr.DataArray(["lake1"], dims=LAKE_DIM)
+    connection_lake_number = xr.DataArray([-1], dims=CONNECTION_DIM)
     connection_cell_id = xr.DataArray(
         data=[
             [-1, -3],
@@ -145,23 +145,23 @@ def test_lake_write_validation_sign_mismatch():
         coords={"celldim": ["layer", "cell2d"]},
         dims=("boundary", "celldim"),
     )
-    connection_type = xr.DataArray(["vertical"], dims=connection_dimension_name)
-    connection_bed_leak = xr.DataArray([1.0], dims=connection_dimension_name)
-    connection_bottom_elevation = xr.DataArray([1.0], dims=connection_dimension_name)
-    connection_top_elevation = xr.DataArray([1.0], dims=connection_dimension_name)
-    connection_width = xr.DataArray([-1.0], dims=connection_dimension_name)
-    connection_length = xr.DataArray([-1.0], dims=connection_dimension_name)
+    connection_type = xr.DataArray(["vertical"], dims=CONNECTION_DIM)
+    connection_bed_leak = xr.DataArray([1.0], dims=CONNECTION_DIM)
+    connection_bottom_elevation = xr.DataArray([1.0], dims=CONNECTION_DIM)
+    connection_top_elevation = xr.DataArray([1.0], dims=CONNECTION_DIM)
+    connection_width = xr.DataArray([-1.0], dims=CONNECTION_DIM)
+    connection_length = xr.DataArray([-1.0], dims=CONNECTION_DIM)
 
-    connection_width = xr.DataArray([-1.0], dims=connection_dimension_name)
-    connection_length = xr.DataArray([-1.0], dims=connection_dimension_name)
+    connection_width = xr.DataArray([-1.0], dims=CONNECTION_DIM)
+    connection_length = xr.DataArray([-1.0], dims=CONNECTION_DIM)
 
-    outlet_lakein = xr.DataArray([-1], dims=outlet_dimension_name)
-    outlet_lakeout = xr.DataArray([-1], dims=outlet_dimension_name)
-    outlet_couttype = xr.DataArray(["manning"], dims=outlet_dimension_name)
-    outlet_invert = xr.DataArray([-1.0], dims=outlet_dimension_name)
-    outlet_roughness = xr.DataArray([-1.0], dims=outlet_dimension_name)
-    outlet_width = xr.DataArray([-1.0], dims=outlet_dimension_name)
-    outlet_slope = xr.DataArray([-1.0], dims=outlet_dimension_name)
+    outlet_lakein = xr.DataArray([-1], dims=OUTLET_DIM)
+    outlet_lakeout = xr.DataArray([-1], dims=OUTLET_DIM)
+    outlet_couttype = xr.DataArray(["manning"], dims=OUTLET_DIM)
+    outlet_invert = xr.DataArray([-1.0], dims=OUTLET_DIM)
+    outlet_roughness = xr.DataArray([-1.0], dims=OUTLET_DIM)
+    outlet_width = xr.DataArray([-1.0], dims=OUTLET_DIM)
+    outlet_slope = xr.DataArray([-1.0], dims=OUTLET_DIM)
 
     # this setup contains input errors in the data type of the different arrays
 

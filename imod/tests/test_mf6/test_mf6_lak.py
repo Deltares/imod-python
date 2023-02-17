@@ -5,7 +5,15 @@ import pandas as pd
 import pytest
 import xarray as xr
 
-from imod.mf6.lak import Lake, LakeData, OutletManning, OutletSpecified, OutletWeir
+from imod.mf6.lak import (
+    Lake,
+    LakeData,
+    OutletManning,
+    OutletSpecified,
+    OutletWeir,
+    LAKE_DIM,
+    CONNECTION_DIM,
+)
 
 
 def create_xarray_1d(content, dimname):
@@ -26,12 +34,14 @@ def create_lake_data(
     auxiliary=None,
 ):
     HORIZONTAL = 0
-    connection_type = xr.full_like(is_lake, HORIZONTAL, dtype=np.float64).where(is_lake)
-    bed_leak = xr.full_like(is_lake, 0.2, dtype=np.float64).where(is_lake)
-    top_elevation = xr.full_like(is_lake, 0.3, dtype=np.float64).where(is_lake)
-    bot_elevation = xr.full_like(is_lake, 0.4, dtype=np.float64).where(is_lake)
-    connection_length = xr.full_like(is_lake, 0.5, dtype=np.float64).where(is_lake)
-    connection_width = xr.full_like(is_lake, 0.6, dtype=np.float64).where(is_lake)
+    connection_type = xr.full_like(is_lake, HORIZONTAL, dtype=np.floating).where(
+        is_lake
+    )
+    bed_leak = xr.full_like(is_lake, 0.2, dtype=np.floating).where(is_lake)
+    top_elevation = xr.full_like(is_lake, 0.3, dtype=np.floating).where(is_lake)
+    bot_elevation = xr.full_like(is_lake, 0.4, dtype=np.floating).where(is_lake)
+    connection_length = xr.full_like(is_lake, 0.5, dtype=np.floating).where(is_lake)
+    connection_width = xr.full_like(is_lake, 0.6, dtype=np.floating).where(is_lake)
     return LakeData(
         starting_stage=starting_stage,
         boundname=name,
@@ -198,7 +208,7 @@ def test_lake_write(tmp_path, naardermeer, ijsselmeer):
     assert actual == expected
 
 
-def test_lake_write_disv_three_lakes(basic_dis, tmp_path):
+def test_lake_write_disv_three_lakes(tmp_path):
     """
     Create 6 connections.
 
@@ -213,10 +223,7 @@ def test_lake_write_disv_three_lakes(basic_dis, tmp_path):
     5                        2     18,1     horizontal     None        -5              -0.2          0.6             0.7
     6                        3     23,1     embeddedv      None        -6              0             0.7             0.8
     """
-
-    ibound, _, _ = basic_dis
-
-    lake_like = xr.DataArray(np.ones(3, dtype=np.float64), dims=("lake"))
+    lake_like = xr.DataArray(np.ones(3, dtype=np.floating), dims=LAKE_DIM)
     boundnames = lake_like.copy(
         data=["IJsselmeer", "Vinkeveense_plas", "Reeuwijkse_plas"]
     )
@@ -224,7 +231,7 @@ def test_lake_write_disv_three_lakes(basic_dis, tmp_path):
     lake_numbers = lake_like.copy(data=[1, 2, 3])
 
     connection_like = xr.DataArray(
-        data=np.ones(6, dtype=np.float64), dims=("boundary",)
+        data=np.ones(6, dtype=np.floating), dims=(CONNECTION_DIM,)
     )
     connection_lake_number = connection_like.copy(data=[1, 1, 1, 2, 2, 3])
     connection_type = connection_like.copy(
@@ -248,7 +255,7 @@ def test_lake_write_disv_three_lakes(basic_dis, tmp_path):
             [1, 23],
         ],
         coords={"celldim": ["layer", "cell2d"]},
-        dims=("boundary", "celldim"),
+        dims=(CONNECTION_DIM, "celldim"),
     )
     connection_bottom_elevation = connection_like.copy(
         data=[-1.0, -2.0, -3.0, -4.0, -5.0, -6.0]
