@@ -1,4 +1,4 @@
-.. currentmodule:: imod
+.. currentmodule:: imod.formats
 
 Input/output
 ------------
