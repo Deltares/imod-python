@@ -628,7 +628,7 @@ def _read_package_gen(
 ) -> List[Dict[str, Any]]:
     out = []
     for entry in block_content["gen"]:
-        gdf = imod.gen.read(entry["path"])
+        gdf = imod.gen.read_ascii(entry["path"])
         if has_topbot:
             gdf["resistance"] = entry["factor"] * entry["addition"]
         else:

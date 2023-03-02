@@ -1,7 +1,7 @@
 import io
 import warnings
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -10,15 +10,92 @@ from scipy.io import FortranFile, FortranFormattingError
 from imod.util import MissingOptionalModule
 
 try:
+    import shapely
     import shapely.geometry as sg
 except ImportError:
     sg = MissingOptionalModule("shapely")
+    shapely = MissingOptionalModule("shapely")
 
 try:
     import geopandas as gpd
 except ImportError:
     gpd = MissingOptionalModule("geopandas")
 
+
+# ASCII text format:
+# ------------------
+
+
+def parse_ascii_points(lines: List[str]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
+    n = len(lines) - 1
+    fid = np.empty(n, dtype=int)
+    x = np.empty(n, dtype=float)
+    y = np.empty(n, dtype=float)
+    for i, line in enumerate(lines[:-1]):
+        fid[i], x[i], y[i] = line.split(",")
+
+    points = gpd.points_from_xy(x=x, y=y)
+    return gpd.GeoDataFrame(data={"id": fid}, geometry=points)
+
+
+def parse_ascii_segments(lines: List[str]):
+    end = [i for i, line in enumerate(lines) if line == "end"][:-1]
+    start = [-1] + end[:-1]
+    features = [lines[s + 1 : e] for s, e in zip(start, end)]
+
+    n_feature = len(features)
+    n_vertex = [len(f) - 1 for f in features]
+
+    fid = np.empty(n_feature, dtype=int)
+    is_polygon = np.empty(n_feature, dtype=bool)
+    indices = np.repeat(np.arange(n_feature), n_vertex)
+
+    vertex_coords = []
+    for i, feature in enumerate(features):
+        fid[i] = feature[0]
+        coords = np.loadtxt(feature[1:], delimiter=",")
+        is_polygon[i] = (coords[0] == coords[-1]).all()
+        vertex_coords.append(coords)
+
+    coordinates = np.vstack(vertex_coords)
+    polygon = is_polygon.any()
+    if polygon != is_polygon.all():
+        raise ValueError("Some features are linestrings, some are polygons")
+
+    if polygon:
+        rings = shapely.linearrings(coordinates, indices=indices)
+        geometry = shapely.polygons(rings)
+    else:
+        geometry = shapely.linestrings(coordinates, indices=indices)
+
+    return gpd.GeoDataFrame(data={"id": fid}, geometry=geometry)
+
+
+def read_ascii(path: Union[Path, str]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
+    """
+    Read a text ASCII GEN file to a geopandas GeoDataFrame.
+
+    Parameters
+    ----------
+    path: Union[str, Path]
+
+    Returns
+    -------
+    geodataframe: gpd.GeoDataFrame
+    """
+    # From gen itype to shapely geometry:
+    with open(path, "r") as f:
+        lines = [line.lower().strip() for line in f.readlines()]
+
+    if len(lines[0].split(",")) == 3:
+        return parse_ascii_points(lines)
+
+    return parse_ascii_segments(lines)
+
+
+# Binary format:
+# --------------
+#
 # From the iMOD User Manual
 FLOAT_TYPE = np.float64
 INT_TYPE = np.int32

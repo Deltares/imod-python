@@ -16,6 +16,7 @@ Added
   a Python dictionary.
 - :func:`imod.prj.open_projectfile_data` to read/open the data that is pointed
   to in a project file.
+- :func:`imod.gen.read_ascii` to read the geometry stored in ASCII text .gen files.
 
 Fixed
 ~~~~~
