@@ -26,6 +26,12 @@ Changed
 
 - :func:`imod.evaluate.budget.flow_velocity` now properly computes velocity by
   dividing by the porosity. Before, this function computed the Darcian velocity.
+- :func:`imod.ipf.save` will error on duplicate IDs for associated files if a
+  ``"layer"`` column is present. As a dataframe is automatically broken down
+  into a single IPF per layer, associated files for the first layer would be
+  overwritten by the second, and so forth.
+- :func:`imod.wq.Well.save` will now write time varying data to associated
+  files for extration rate and concentration.
 
 [0.11.6] - 2023-02-01
 ---------------------

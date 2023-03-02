@@ -150,9 +150,7 @@ class Model(collections.UserDict):
                     directory / pattern.format(pkgname=pkgname), **kwargs
                 )
             except Exception as e:
-                raise RuntimeError(
-                    "Package {pkgname} can not be written to NetCDF"
-                ) from e
+                raise type(e)("{e}\nPackage {pkgname} can not be written to NetCDF")
 
     def write_qgis_project(self, directory, crs, filename=None, aggregate_layers=False):
         """
