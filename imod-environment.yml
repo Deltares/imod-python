@@ -28,7 +28,6 @@ dependencies:
   - pip:
       - pandamesh
   - pydata-sphinx-theme
-  - pygeos
   - pyproj
   - pytest
   - pytest-benchmark
@@ -39,7 +38,7 @@ dependencies:
   - scipy
   - setuptools_scm
   - scooby
-  - shapely>=1.8
+  - shapely>=2.0
   - sphinx=5
   - sphinx-gallery
   - toolz
