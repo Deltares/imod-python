@@ -72,7 +72,7 @@ class SingularTargetRegridderWeightsCache:
             if method is not None:
                 kwargs["method"] = method
             regridder = cls(**kwargs)
-            self.weights[key] = regridder.regrid_weights
+            self.weights[key] = regridder.weights
 
     def regrid(
         self,
@@ -85,8 +85,7 @@ class SingularTargetRegridderWeightsCache:
                 raise ValueError("original2d must be provided for constant values")
             source = source * xr.ones_like(original2d)
 
-        ugrid_source = xu.UgridDataArray.from_structured(source)
-        kwargs = {"source": ugrid_source, "target": self.target}
+        kwargs = {"target": self.target}
         if method == "barycentric":
             cls = xu.BarycentricInterpolator
         elif method == "conductance":
@@ -99,14 +98,27 @@ class SingularTargetRegridderWeightsCache:
         x, y = xy_hash(source)
         key = (x, y, cls)
         if key in self.weights:
-            weights = self.weights[key]
-            kwargs["weights"] = weights
-            regridder = cls(**kwargs)
+            kwargs["weights"] = self.weights[key]
+            regridder = cls.from_weights(**kwargs)
+            # Avoid creation of a UgridDataArray here
+            dims = source.dims[:-2]
+            coords = {k: source.coords[k] for k in dims}
+            facedim = "mesh2d_nFace"
+            face_source = xr.DataArray(
+                source.data.reshape(*source.shape[:-2], -1),
+                coords=coords,
+                dims=[*dims, facedim],
+                name=source.name,
+            )
+            return xu.UgridDataArray(
+                regridder.regrid_dataarray(face_source, (facedim,)),
+                regridder._target.ugrid_topology,
+            )
         else:
+            ugrid_source = xu.UgridDataArray.from_structured(source)
+            kwargs["source"] = ugrid_source
             regridder = cls(**kwargs)
-            return regridder.regrid(source)
-
-        return regridder.regrid(ugrid_source)
+            return regridder.regrid(ugrid_source)
 
 
 def create_idomain(active):
@@ -315,32 +327,122 @@ def create_ic(cache, model, key, value, active, **kwargs):
     return
 
 
-def create_hfb(cache, model, key, value, active, **kwargs):
+def multi_layer_hfb(
+    snapped: xu.UgridDataset,
+    dataframe: gpd.GeoDataFrame,
+    top: xu.UgridDataArray,
+    bottom: xu.UgridDataArray,
+    k: xu.UgridDataArray,
+) -> xu.UgridDataArray:
+    """
+    Assign horizontal flow barriers to layers.
+
+    Reduce the effective resistance by fraction of overlap with the layer
+    thickness.
+    """
+
+    def mean_left_and_right(uda, left, right):
+        facedim = uda.ugrid.grid.face_dimension
+        uda_left = uda.ugrid.obj.isel({facedim: left})
+        uda_right = uda.ugrid.obj.isel({facedim: right})
+        return xr.concat((uda_left, uda_right), dim="two").mean("two")
+
+    def line_z(snapped, dataframe):
+        line_index = snapped["line_index"].values
+        line_index = line_index[~np.isnan(line_index)].astype(int)
+        coordinates, index = shapely.get_coordinates(
+            dataframe.iloc[line_index].geometry, include_z=True, return_index=True
+        )
+        grouped = pd.DataFrame({"index": index, "z": coordinates[:, 2]}).groupby(
+            "index"
+        )
+        zmin = grouped["z"].min().values
+        zmax = grouped["z"].max().values
+        return zmin, zmax
+
+    def vectorized_overlap(bounds_a, bounds_b):
+        """
+        Vectorized overlap computation.
+
+        Compare with:
+
+        overlap = max(0, min(a[1], b[1]) - max(a[0], b[0]))
+        """
+        return np.maximum(
+            0.0,
+            np.minimum(bounds_a[..., 1], bounds_b[..., 1])
+            - np.maximum(bounds_a[..., 0], bounds_b[..., 0]),
+        )
+
+    def effective_resistance(snapped, dataframe, top, bottom, k):
+        left, right = snapped.ugrid.grid.edge_face_connectivity[edge_index].T
+        top_mean = mean_left_and_right(top, left, right)
+        bottom_mean = mean_left_and_right(bottom, left, right)
+        k_mean = mean_left_and_right(k, left, right)
+
+        n_layer, n_edge = top_mean.shape
+        layer_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
+        layer_bounds[..., 0] = bottom_mean.values.T
+        layer_bounds[..., 1] = top_mean.values.T
+
+        zmin, zmax = line_z(snapped, dataframe)
+        hfb_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
+        hfb_bounds[..., 0] = zmin[:, np.newaxis]
+        hfb_bounds[..., 1] = zmax[:, np.newaxis]
+
+        overlap = vectorized_overlap(hfb_bounds, layer_bounds)
+        height = layer_bounds[..., 1] - layer_bounds[..., 0]
+        fraction = (overlap / height).T
+
+        line_index = snapped["line_index"].values
+        resistance = dataframe.iloc[line_index]["resistance"].values[np.newaxis, :]
+        c_aquifer = 1.0 / k_mean
+        c_total = 1.0 / (fraction / resistance) + ((1.0 - fraction) / c_aquifer)
+        return c_total
+
+    edge_index = np.argwhere(snapped["resistance"].notnull().values).ravel()
+    c_total = effective_resistance(snapped, dataframe, top, bottom, k)
+
+    notnull = c_total.notnull().values
+    layer, edge_subset = np.nonzero(notnull)
+    edge_subset_index = edge_index[edge_subset]
+    resistance_layered = (
+        xr.ones_like(top["layer"]) * xu.full_like(snapped["resistance"], np.nan)
+    ).compute()
+    resistance_layered.values[layer, edge_subset_index] = c_total.values[notnull]
+    resistance_layered = resistance_layered.dropna("layer", how="all")
+
+    return resistance_layered
+
+
+def create_hfb(cache, model, key, value, active, top, bottom, k, **kwargs):
     target = cache.target
-    data = value["geodataframe"]
+    dataframe = value["geodataframe"]
     layer = value["layer"]
 
-    coordinates, index = shapely.get_coordinates(data.geometry, return_index=True)
+    coordinates, index = shapely.get_coordinates(dataframe.geometry, return_index=True)
     df = pd.DataFrame({"index": index, "x": coordinates[:, 0], "y": coordinates[:, 1]})
     df = df.drop_duplicates().reset_index(drop=True)
     indices = np.repeat(np.arange(len(df) // 2), 2)
     linestrings = shapely.linestrings(df["x"], y=df["y"], indices=indices)
     lines = gpd.GeoDataFrame(geometry=linestrings)
 
-    if "resistance" in data:
-        lines["resistance"] = data["resistance"]
-    elif "multiplier" in data:
-        lines["resistance"] = -1.0 * data["resistance"]
+    if "resistance" in dataframe:
+        lines["resistance"] = dataframe["resistance"]
+    elif "multiplier" in dataframe:
+        lines["resistance"] = -1.0 * dataframe["resistance"]
     else:
         raise ValueError(
-            "Expected resistance or multiplier in HFB data, "
-            f"received instead: {list(data.keys())}"
+            "Expected resistance or multiplier in HFB dataframe, "
+            f"received instead: {list(dataframe.keys())}"
         )
     snapped, _ = xu.snap_to_grid(lines, grid=target, max_snap_distance=0.5)
 
     resistance = snapped["resistance"]
     if layer != 0:
         resistance = resistance.assign_coords(layer=layer)
+    else:
+        resistance = multi_layer_hfb(snapped, dataframe, top, bottom, k)
 
     model[key] = imod.mf6.HorizontalFlowBarrier(
         resistance=resistance,
@@ -397,6 +499,7 @@ def convert_to_disv(projectfile_data, target):
         active=active,
         original2d=original2d,
     )
+    k = npf["k"]
     model["npf"] = npf
     model["disv"] = disv
 
@@ -424,6 +527,7 @@ def convert_to_disv(projectfile_data, target):
                     original2d=original2d,
                     top=top,
                     bottom=bottom,
+                    k=k,
                 )
             except Exception as e:
                 raise type(e)(f"{e}\nduring conversion of {key}")
