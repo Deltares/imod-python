@@ -1,5 +1,5 @@
 import pickle
-from collections import Counter, defaultdict
+from collections import Counter
 from typing import Optional, Tuple
 
 import geopandas as gpd
@@ -12,7 +12,22 @@ import xugrid as xu
 import imod
 
 
-def xy_hash(da: xr.DataArray) -> Tuple[int]:
+def vectorized_overlap(bounds_a, bounds_b):
+    """
+    Vectorized overlap computation.
+
+    Compare with:
+
+    overlap = max(0, min(a[1], b[1]) - max(a[0], b[0]))
+    """
+    return np.maximum(
+        0.0,
+        np.minimum(bounds_a[..., 1], bounds_b[..., 1])
+        - np.maximum(bounds_a[..., 0], bounds_b[..., 0]),
+    )
+
+
+def hash_xy(da: xr.DataArray) -> Tuple[int]:
     """
     Create a unique identifier based on the x and y coordinates of a DataArray.
     """
@@ -45,6 +60,7 @@ class SingularTargetRegridderWeightsCache:
                 xydims = set(("x", "y"))
 
                 if isinstance(da, xr.DataArray) and xydims.issubset(da.dims):
+                    # for initial condition, constant head, general head boundary
                     if variable == "head":
                         cls = xu.BarycentricInterpolator
                         method = None
@@ -55,7 +71,7 @@ class SingularTargetRegridderWeightsCache:
                         cls = xu.OverlapRegridder
                         method = "mean"
 
-                    x, y = xy_hash(da)
+                    x, y = hash_xy(da)
                     key = (x, y, cls)
                     keys.append(key)
                     sources[key] = da
@@ -95,7 +111,7 @@ class SingularTargetRegridderWeightsCache:
             cls = xu.OverlapRegridder
             kwargs["method"] = method
 
-        x, y = xy_hash(source)
+        x, y = hash_xy(source)
         key = (x, y, cls)
         if key in self.weights:
             kwargs["weights"] = self.weights[key]
@@ -142,10 +158,12 @@ def create_disv(
     bottom,
 ):
     top = top.compute()
-    disv_top = cache.regrid(top)
-    disv_bottom = cache.regrid(bottom)
+    disv_top = cache.regrid(top).compute()
+    disv_bottom = cache.regrid(bottom).compute()
     thickness = disv_top - disv_bottom
-    active = thickness > 0  # TODO larger than a specific value for round off?
+    active = (
+        thickness > 0
+    ).compute()  # TODO larger than a specific value for round off?
     idomain = create_idomain(active)
     disv = imod.mf6.VerticesDiscretization(
         top=disv_top.sel(layer=1),
@@ -245,6 +263,33 @@ def create_riv(
     bottom,
     **kwargs,
 ):
+    def assign_to_layer(conductance, stage, elevation, top, bottom):
+        """
+        Assign river boundary to multiple layers. Distribute the conductance based
+        on the vertical degree of overlap.
+        """
+        active = conductance > 0.0
+        conductance = conductance.where(active)
+        stage = stage.where(active)
+        elevation = elevation.where(active)
+        bottom = bottom.where(bottom <= stage, other=stage)
+
+        water_top = stage.where(stage <= top)
+        water_bottom = elevation.where(elevation >= bottom)
+        fraction = (water_top - water_bottom) / (stage - elevation)
+        fraction = fraction.where(~(fraction == 0.0), other=1.0)
+        location = xu.ones_like(fraction).where(fraction.notnull())
+
+        layered_conductance = fraction * conductance
+        layered_stage = location * stage
+        layered_elevation = location * elevation
+
+        return (
+            layered_conductance,
+            layered_stage,
+            layered_elevation,
+        )
+
     conductance = value["conductance"]
     stage = value["stage"]
     bottom_elevation = value["bottom_elevation"]
@@ -343,36 +388,23 @@ def multi_layer_hfb(
 
     def mean_left_and_right(uda, left, right):
         facedim = uda.ugrid.grid.face_dimension
-        uda_left = uda.ugrid.obj.isel({facedim: left})
-        uda_right = uda.ugrid.obj.isel({facedim: right})
+        uda_left = uda.ugrid.obj.isel({facedim: left}).drop_vars(facedim)
+        uda_right = uda.ugrid.obj.isel({facedim: right}).drop_vars(facedim)
         return xr.concat((uda_left, uda_right), dim="two").mean("two")
 
-    def line_z(snapped, dataframe):
+    def extract_dataframe_data(snapped, dataframe):
         line_index = snapped["line_index"].values
         line_index = line_index[~np.isnan(line_index)].astype(int)
+        sample = dataframe.iloc[line_index]
         coordinates, index = shapely.get_coordinates(
-            dataframe.iloc[line_index].geometry, include_z=True, return_index=True
+            sample.geometry, include_z=True, return_index=True
         )
         grouped = pd.DataFrame({"index": index, "z": coordinates[:, 2]}).groupby(
             "index"
         )
         zmin = grouped["z"].min().values
         zmax = grouped["z"].max().values
-        return zmin, zmax
-
-    def vectorized_overlap(bounds_a, bounds_b):
-        """
-        Vectorized overlap computation.
-
-        Compare with:
-
-        overlap = max(0, min(a[1], b[1]) - max(a[0], b[0]))
-        """
-        return np.maximum(
-            0.0,
-            np.minimum(bounds_a[..., 1], bounds_b[..., 1])
-            - np.maximum(bounds_a[..., 0], bounds_b[..., 0]),
-        )
+        return zmin, zmax, sample["resistance"].values
 
     def effective_resistance(snapped, dataframe, top, bottom, k):
         left, right = snapped.ugrid.grid.edge_face_connectivity[edge_index].T
@@ -385,19 +417,21 @@ def multi_layer_hfb(
         layer_bounds[..., 0] = bottom_mean.values.T
         layer_bounds[..., 1] = top_mean.values.T
 
-        zmin, zmax = line_z(snapped, dataframe)
+        zmin, zmax, resistance = extract_dataframe_data(snapped, dataframe)
         hfb_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
         hfb_bounds[..., 0] = zmin[:, np.newaxis]
         hfb_bounds[..., 1] = zmax[:, np.newaxis]
 
         overlap = vectorized_overlap(hfb_bounds, layer_bounds)
         height = layer_bounds[..., 1] - layer_bounds[..., 0]
+        # Avoid runtime warnings when diving by 0:
+        height[height <= 0] = np.nan
         fraction = (overlap / height).T
 
-        line_index = snapped["line_index"].values
-        resistance = dataframe.iloc[line_index]["resistance"].values[np.newaxis, :]
+        resistance = resistance[np.newaxis, :]
         c_aquifer = 1.0 / k_mean
-        c_total = 1.0 / (fraction / resistance) + ((1.0 - fraction) / c_aquifer)
+        inverse_c = (fraction / resistance) + ((1.0 - fraction) / c_aquifer)
+        c_total = 1.0 / inverse_c
         return c_total
 
     edge_index = np.argwhere(snapped["resistance"].notnull().values).ravel()
@@ -444,26 +478,37 @@ def create_hfb(cache, model, key, value, active, top, bottom, k, **kwargs):
     else:
         resistance = multi_layer_hfb(snapped, dataframe, top, bottom, k)
 
-    model[key] = imod.mf6.HorizontalFlowBarrier(
+    model[key] = imod.mf6.HorizontalFlowBarrierResistance(
         resistance=resistance,
         idomain=active.astype(int),
     )
     return
 
 
-def merge_hfbs(hfbs):
-    c_per_layer = defaultdict(list)
-    idomain = hfbs[0]["idomain"]
-    for hfb in hfbs:
-        resistance = hfb["resistance"].expand_dims("layer")
-        for layer, da in resistance.groupby("layer"):
-            c_per_layer[layer].append(da)
-
-    merged_c = xr.concat([xr.merge(v) for v in c_per_layer.values()], dim="layer")
-    merged_c = xu.UgridDataArray(
-        merged_c["resistance"], grid=hfbs[0].dataset.ugrid.grid
+def merge_hfbs(hfbs, idomain):
+    first = hfbs[0]
+    grid = first.dataset.ugrid.grid
+    layer = idomain["layer"].values
+    n_layer = layer.size
+    n_edge = grid.n_edge
+    c_merged = xr.DataArray(
+        data=np.zeros((n_layer, n_edge), dtype=float),
+        dims=("layer", grid.edge_dimension),
+        coords={"layer": layer},
     )
-    return imod.mf6.HorizontalFlowBarrier(resistance=merged_c, idomain=idomain)
+
+    for hfb in hfbs:
+        resistance = hfb["resistance"].fillna(0.0)
+        if "layer" not in resistance.dims:
+            resistance = resistance.expand_dims("layer")
+        for layer, da in resistance.groupby("layer"):
+            c_merged.values[layer - 1, :] += da.values
+
+    final_c = xu.UgridDataArray(
+        c_merged.where(c_merged > 0).dropna("layer", how="all"),
+        grid,
+    )
+    return imod.mf6.HorizontalFlowBarrierResistance(resistance=final_c, idomain=idomain)
 
 
 PKG_CONVERSION = {
@@ -499,7 +544,8 @@ def convert_to_disv(projectfile_data, target):
         active=active,
         original2d=original2d,
     )
-    k = npf["k"]
+    idomain = disv["idomain"].compute()
+    k = npf["k"].compute()
     model["npf"] = npf
     model["disv"] = disv
 
@@ -511,13 +557,10 @@ def convert_to_disv(projectfile_data, target):
         pkg = key.split("-")[0]
         try:
             # conversion will update model
-            conversion = PKG_CONVERSION[pkg]
-
-            if pkg == "hfb":
-                continue
+            convert = PKG_CONVERSION[pkg]
 
             try:
-                conversion(
+                convert(
                     cache=weights_cache,
                     model=model,
                     key=key,
@@ -540,6 +583,6 @@ def convert_to_disv(projectfile_data, target):
     hfb_keys = [key for key in model.keys() if key.split("-")[0] == "hfb"]
     hfbs = [model.pop(key) for key in hfb_keys]
     if hfbs:
-        model["hfb"] = merge_hfbs(hfbs)
+        model["hfb"] = merge_hfbs(hfbs, idomain)
 
     return model
