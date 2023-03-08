@@ -322,6 +322,17 @@ def create_riv(
         conductance=(1.0 - disv_inff) * disv_cond,
         elevation=disv_stage,
     )
+
+    if repeats is not None and timesteps is not None:
+        startyear = timesteps[0].year
+        endyear = timesteps[1].year
+        timemap = {}
+        for year in range(startyear, endyear):
+            for date in repeats:
+                timemap[date.replace(year=year)] = date
+        riv.repeat_stress(**timemap)
+        drn.repeat_stress(**timemap)
+
     model[key] = riv
     model[f"{key}-drn"] = drn
     return
@@ -357,11 +368,12 @@ def create_wel(
     x, y, rate = columns[:3]
     xy = np.column_stack([dataframe[x], dataframe[y]])
     cell2d = target.locate_points(xy)
-    model[key] = imod.mf6.WellDisVertices(
+    pkg = imod.mf6.WellDisVertices(
         layer=np.full_like(cell2d, layer),
         cell2d=cell2d,
         rate=dataframe[rate],
     )
+    model[key] = pkg
     return
 
 
@@ -522,7 +534,7 @@ PKG_CONVERSION = {
 }
 
 
-def convert_to_disv(projectfile_data, target):
+def convert_to_disv(projectfile_data, target, repeat_stress=None, timesteps=None):
     data = projectfile_data.copy()
     model = imod.mf6.GroundwaterFlowModel()
 
@@ -558,6 +570,7 @@ def convert_to_disv(projectfile_data, target):
         try:
             # conversion will update model
             convert = PKG_CONVERSION[pkg]
+            repeat = repeat_stress.get(key)
 
             try:
                 convert(

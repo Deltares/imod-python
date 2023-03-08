@@ -131,7 +131,7 @@ def test_parse_time():
         ]
     )
     assert prj._parse_time(lines) == "steady-state"
-    assert prj._parse_time(lines) == "2000-01-01 00:00:00"
+    assert prj._parse_time(lines) == "2000-01-01"
     assert prj._parse_time(lines) == "2000-01-01 12:01:02"
 
     lines = prj._LineIterator([1, 2, 3])
@@ -474,8 +474,9 @@ class TestProjectFile:
         assert isinstance(content, dict)
 
     def test_open_projectfile_data(self):
-        content = imod.prj.open_projectfile_data(self.prj_path)
+        content, repeats = imod.prj.open_projectfile_data(self.prj_path)
         assert isinstance(content, dict)
+        assert isinstance(repeats, dict)
         assert isinstance(content["ghb"]["conductance"], xr.DataArray)
         assert isinstance(content["ghb"]["head"], xr.DataArray)
         assert isinstance(content["cap"]["landuse"], xr.DataArray)
