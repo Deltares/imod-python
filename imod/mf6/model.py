@@ -106,6 +106,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for pkg in self.values():
             if "time" in pkg.dataset.coords:
                 modeltimes.append(pkg.dataset["time"].values)
+            repeat_stress = pkg.dataset.get("repeat_stress")
+            if repeat_stress is not None and repeat_stress.values[()] is not None:
+                modeltimes.append(repeat_stress.isel(repeat_items=0).values)
         return modeltimes
 
     def render(self, modelname: str):

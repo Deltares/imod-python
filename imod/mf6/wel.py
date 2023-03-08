@@ -51,6 +51,14 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
         provided in the wrong manner. Defaults to True.
+    repeat_stress: Optional[xr.DataArray] of datetimes
+        Used to repeat data for e.g. repeating stress periods such as
+        seasonality without duplicating the values. The DataArray should have
+        dimensions ``("repeat", "repeat_items")``. The ``repeat_items``
+        dimension should have size 2: the first value is the "key", the second
+        value is the "value". For the "key" datetime, the data of the "value"
+        datetime will be used. Can also be set with a dictionary using the
+        ``set_repeat_stress`` method.
     """
 
     _pkg_id = "wel"
@@ -82,6 +90,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         save_flows=False,
         observations=None,
         validate: bool = True,
+        repeat_stress=None,
     ):
         super().__init__()
         self.dataset["layer"] = self.assign_dims(layer)
