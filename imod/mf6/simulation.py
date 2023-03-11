@@ -130,7 +130,7 @@ class Modflow6Simulation(collections.UserDict):
 
         for key, value in self.items():
             if isinstance(value, Modflow6Model):
-                models.append((value._model_type, f"{key}/{key}.nam", key))
+                models.append((value._model_id, f"{key}/{key}.nam", key))
             elif value._pkg_id == "tdis":
                 d["tdis6"] = f"{key}.tdis"
             elif value._pkg_id == "ims":
@@ -228,9 +228,10 @@ class Modflow6Simulation(collections.UserDict):
         toml_content = collections.defaultdict(dict)
         for key, value in self.items():
             if isinstance(value, Modflow6Model):
-                toml_content[value._modeltype][key] = value.dump(
-                    directory, key, validate
-                )
+                model_toml_path = value.dump(directory, key, validate)
+                toml_content[value._model_id][key] = model_toml_path.relative_to(
+                    directory
+                ).as_posix()
             else:
                 path = f"{key}.nc"
                 value.dataset.to_netcdf(directory / path)
@@ -250,14 +251,15 @@ class Modflow6Simulation(collections.UserDict):
             "ims": imod.mf6.Solution,
         }
 
-        path = pathlib.Path(toml_path)
-        with open(path, "rb") as f:
+        toml_path = pathlib.Path(toml_path)
+        with open(toml_path, "rb") as f:
             toml_content = tomli.load(f)
 
-        simulation = Modflow6Simulation(name=path.stem)
+        simulation = Modflow6Simulation(name=toml_path.stem)
         for str_id, entry in toml_content.items():
             item_cls = classes[str_id]
-            for name, path in entry.items():
+            for name, filename in entry.items():
+                path = toml_path.parent / filename
                 simulation[name] = item_cls.from_file(path)
 
         return simulation
@@ -291,5 +293,5 @@ class Modflow6Simulation(collections.UserDict):
         return {
             k: v
             for k, v in self.items
-            if isinstance(v, Modflow6Model) and (v._model_type == modeltype)
+            if isinstance(v, Modflow6Model) and (v._model_id == modeltype)
         }

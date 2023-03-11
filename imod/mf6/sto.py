@@ -1,3 +1,5 @@
+import abc
+
 import numpy as np
 
 from imod.mf6.pkgbase import Package
@@ -19,7 +21,43 @@ class Storage(Package):
         )
 
 
-class SpecificStorage(Package):
+class StorageBase(Package, abc.ABC):
+    @classmethod
+    def _from_file(cls, path, **kwargs):
+        dataset = cls._open_dataset(path, **kwargs)
+        if "specific_storage" in dataset:
+            pkg_cls = SpecificStorage
+        else:
+            pkg_cls = StorageCoefficient
+        instance = pkg_cls.__new__(cls)
+        instance.dataset = dataset
+        return instance
+
+    def _render_dict(self, directory, pkgname, globaltimes, binary):
+        d = {}
+        stodirectory = directory / "sto"
+        for varname in self._grid_data:
+            key = self._keyword_map.get(varname, varname)
+            layered, value = self._compose_values(
+                self[varname], stodirectory, key, binary=binary
+            )
+            if self._valid(value):  # skip False or None
+                d[f"{key}_layered"], d[key] = layered, value
+
+        periods = {}
+        if "time" in self.dataset["transient"].coords:
+            package_times = self.dataset["transient"].coords["time"].values
+            starts = np.searchsorted(globaltimes, package_times) + 1
+            for i, s in enumerate(starts):
+                periods[s] = self.dataset["transient"].isel(time=i).values[()]
+        else:
+            periods[1] = self.dataset["transient"].values[()]
+
+        d["periods"] = periods
+        return d
+
+
+class SpecificStorage(StorageBase):
     """
     Storage Package with specific storage.
 
@@ -116,31 +154,11 @@ class SpecificStorage(Package):
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
-        stodirectory = directory / "sto"
-        for varname in ["specific_storage", "specific_yield", "convertible"]:
-            key = self._keyword_map.get(varname, varname)
-            layered, value = self._compose_values(
-                self[varname], stodirectory, key, binary=binary
-            )
-            if self._valid(value):  # skip False or None
-                d[f"{key}_layered"], d[key] = layered, value
-
-        periods = {}
-        if "time" in self.dataset["transient"].coords:
-            package_times = self.dataset["transient"].coords["time"].values
-            starts = np.searchsorted(globaltimes, package_times) + 1
-            for i, s in enumerate(starts):
-                periods[s] = self.dataset["transient"].isel(time=i).values[()]
-        else:
-            periods[1] = self.dataset["transient"].values[()]
-
-        d["periods"] = periods
-
+        d = self._render_dict(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
 
-class StorageCoefficient(Package):
+class StorageCoefficient(StorageBase):
     """
     Storage Package with a storage coefficient.  Be careful,
     this is not the same as the specific storage.
@@ -248,26 +266,6 @@ class StorageCoefficient(Package):
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
-        stodirectory = directory / "sto"
-        for varname in ["storage_coefficient", "specific_yield", "convertible"]:
-            key = self._keyword_map.get(varname, varname)
-            layered, value = self._compose_values(
-                self[varname], stodirectory, key, binary=binary
-            )
-            if self._valid(value):  # skip False or None
-                d[f"{key}_layered"], d[key] = layered, value
-
-        periods = {}
-        if "time" in self.dataset["transient"].coords:
-            package_times = self.dataset["transient"].coords["time"].values
-            starts = np.searchsorted(globaltimes, package_times) + 1
-            for i, s in enumerate(starts):
-                periods[s] = self.dataset["transient"].isel(time=i).values[()]
-        else:
-            periods[1] = self.dataset["transient"].values[()]
-
-        d["periods"] = periods
+        d = self._render_dict(directory, pkgname, globaltimes, binary)
         d["storagecoefficient"] = True
-
         return self._template.render(d)

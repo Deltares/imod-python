@@ -247,7 +247,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
-    _model_type = "gwf6"
+    _model_id = "gwf6"
 
     def __init__(
         self,
@@ -326,7 +326,7 @@ class GroundwaterTransportModel(Modflow6Model):
     """
 
     _mandatory_packages = ("mst", "dsp", "oc", "ic")
-    _model_type = "gwt6"
+    _model_id = "gwt6"
 
     def __init__(
         self,
