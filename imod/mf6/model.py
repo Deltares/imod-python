@@ -6,15 +6,17 @@ from copy import deepcopy
 import cftime
 import jinja2
 import numpy as np
+import tomli
+import tomli_w
+import xugrid as xu
 
+import imod
 from imod.mf6 import qgs_util
 from imod.mf6.validation import validation_model_error_message
 from imod.schemata import ValidationError
 
 
 class Modflow6Model(collections.UserDict, abc.ABC):
-    _pkg_id = "model"
-
     def __setitem__(self, key, value):
         if len(key) > 16:
             raise KeyError(
@@ -165,7 +167,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def write(
         self, directory, modelname, globaltimes, binary=True, validate: bool = True
-    ):
+    ) -> None:
         """
         Write model namefile
         Write packages
@@ -193,6 +195,54 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 )
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkgname}")
+
+        return
+
+    def dump(self, directory, modelname, validate: bool = True):
+        modeldirectory = pathlib.Path(directory) / modelname
+        modeldirectory.mkdir(exist_ok=True, parents=True)
+        if validate:
+            self._validate()
+
+        toml_content = collections.defaultdict(dict)
+        for pkgname, pkg in self.items():
+            pkg_path = f"{pkgname}.nc"
+            toml_content[pkg._pkg_id][pkgname] = pkg_path
+            dataset = pkg.dataset
+            if isinstance(dataset, xu.UgridDataset):
+                pkg.dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
+            else:
+                pkg.dataset.to_netcdf(modeldirectory / pkg_path)
+
+        toml_path = modeldirectory / f"{modelname}.toml"
+        with open(toml_path, "wb") as f:
+            tomli_w.dump(toml_content, f)
+
+        return toml_path
+
+    @classmethod
+    def from_file(cls, toml_path):
+        pkg_classes = {
+            pkg_cls._pkg_id: pkg_cls
+            for pkg_cls in imod.mf6.__dict__.values()
+            if hasattr(pkg_cls, "_pkg_id")
+        }
+        # Make sure these use the general classes, not the aliases:
+        pkg_classes["adv"] = imod.mf6.adv.Advection
+        pkg_classes["ims"] = imod.mf6.Solution
+
+        toml_path = pathlib.Path(toml_path)
+        with open(toml_path, "rb") as f:
+            toml_content = tomli.load(f)
+
+        parentdir = toml_path.parent
+        instance = cls()
+        for pkg_id, entry in toml_content.items():
+            for pkgname, path in entry.items():
+                pkg_cls = pkg_classes[pkg_id]
+                instance[pkgname] = pkg_cls.from_file(parentdir / path)
+
+        return instance
 
 
 class GroundwaterFlowModel(Modflow6Model):

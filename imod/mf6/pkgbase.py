@@ -104,15 +104,7 @@ class Package(abc.ABC):
 
         Refer to the xarray documentation for the possible keyword arguments.
         """
-
         path = pathlib.Path(path)
-
-        # See https://stackoverflow.com/a/2169191
-        # We expect the data in the netcdf has been saved a a package
-        # thus the checks run by __init__ and __setitem__ do not have
-        # to be called again.
-        return_cls = cls.__new__(cls)
-
         if path.suffix in (".zip", ".zarr"):
             # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
             dataset = xr.open_zarr(str(path), **kwargs)
@@ -122,9 +114,14 @@ class Package(abc.ABC):
         if dataset.ugrid_roles.topology:
             dataset = xu.UgridDataset(dataset)
 
-        return_cls.dataset = dataset
-        return_cls.remove_nans_from_dataset()
-        return return_cls
+        # Replace NaNs by None
+        for key, value in dataset.items():
+            stripped_value = value.values[()]
+            if isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value):
+                dataset[key] = None
+
+        instance = cls(**dataset)
+        return instance
 
     def __init__(self, allargs=None):
         if allargs is not None:
@@ -514,13 +511,6 @@ class Package(abc.ABC):
         if hasattr(self, "_auxiliary_data"):
             result.update(self._auxiliary_data)
         return result
-
-    def remove_nans_from_dataset(self):
-        for key, value in self.dataset.items():
-            stripped_value = value.values[()]
-            if isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value):
-                self.dataset[key] = None
-        return
 
 
 class BoundaryCondition(Package, abc.ABC):

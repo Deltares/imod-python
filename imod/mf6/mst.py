@@ -1,5 +1,3 @@
-import string
-
 import numpy as np
 
 from imod.mf6.pkgbase import Package
@@ -45,11 +43,12 @@ class MobileStorageTransfer(Package):
         Indicates that recharge flow terms will be written to the file specified
         with "BUDGET FILEOUT" in Output Control.
         Default is False.
-    decay_order: ({ first, zero}, optional)
-        Indicates wheter decay is first-order or zero-order decay. Requires decay to be specified
-        (decay_sorbed too if sorption is active)
-    sorption: ({Linear, Freundlich, Langmuir}, optional)
-        Type of sorption, if any
+    first_order_decay: bool, optional
+        Requires decay to be specified
+    second_order_decay: bool, optional
+        Requires decay to be specified
+    sorption: ({linear, freundlich, langmuir}, optional)
+        Type of sorption, if any.
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
@@ -103,10 +102,15 @@ class MobileStorageTransfer(Package):
         distcoef=None,
         sp2=None,
         save_flows=False,
-        decay_order: string = "first",
+        zero_order_decay=False,
+        first_order_decay=False,
         sorption=None,
         validate: bool = True,
     ):
+        if zero_order_decay and first_order_decay:
+            raise ValueError(
+                "zero_order_decay and first_order_decay may not both be True"
+            )
         super().__init__(locals())
         self.dataset["porosity"] = porosity
         self.dataset["decay"] = decay
@@ -114,15 +118,8 @@ class MobileStorageTransfer(Package):
         self.dataset["bulk_density"] = bulk_density
         self.dataset["distcoef"] = distcoef
         self.dataset["sp2"] = sp2
-
         self.dataset["save_flows"] = save_flows
-        if decay_order.lower().strip() == "zero":
-            self.dataset["zero_order_decay"] = decay
-        elif decay_order.lower().strip() == "first":
-            self.dataset["first_order_decay"] = decay
-        elif decay_order is not None:
-            raise ValueError('decay_order should be "first" or "zero" when present')
-        if sorption is not None:
-            self.dataset["sorption"] = sorption
-
+        self.dataset["sorption"] = sorption
+        self.dataset["zero_order_decay"] = zero_order_decay
+        self.dataset["first_order_decay"] = first_order_decay
         self._validate_init_schemata(validate)

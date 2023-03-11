@@ -11,24 +11,31 @@ robust alternative.
 from imod.mf6.pkgbase import Package
 
 
-class AdvectionUpstream(Package):
+class Advection(Package):
+    _pkg_id = "adv"
+    _template = Package._initialize_template(_pkg_id)
+
+    def __init__(self, scheme):
+        super().__init__()
+        self.dataset["scheme"] = scheme
+
+    def render(self, directory, pkgname, globaltimes, binary):
+        scheme = self.dataset["scheme"].item()
+        return self._template.render({"scheme": scheme})
+
+
+class AdvectionUpstream(Advection):
     """
     The upstream weighting (first order upwind) scheme sets the concentration
     at the cellface between two adjacent cells equal to the concentration in
     the cell where the flow comes from. It surpresses oscillations.
     """
 
-    _pkg_id = "adv"
-    _template = Package._initialize_template(_pkg_id)
-
     def __init__(self):
-        super().__init__()
-
-    def render(self, directory, pkgname, globaltimes, binary):
-        return self._template.render({"scheme": "upstream"})
+        super().__init__(scheme="upstream")
 
 
-class AdvectionCentral(Package):
+class AdvectionCentral(Advection):
     """
     The central-in-space weighting scheme is based on a simple
     distance-weighted linear interpolation between the center of cell n and the
@@ -39,27 +46,15 @@ class AdvectionCentral(Package):
     programs, such as MT3D.
     """
 
-    _pkg_id = "adv"
-    _template = Package._initialize_template(_pkg_id)
-
     def __init__(self):
-        super().__init__()
-
-    def render(self, directory, pkgname, globaltimes, binary):
-        return self._template.render({"scheme": "central"})
+        super().__init__(scheme="central")
 
 
-class AdvectionTVD(Package):
+class AdvectionTVD(Advection):
     """
     An implicit second order TVD scheme. More expensive than upstream
     weighting but more robust.
     """
 
-    _pkg_id = "adv"
-    _template = Package._initialize_template(_pkg_id)
-
     def __init__(self):
-        super().__init__()
-
-    def render(self, directory, pkgname, globaltimes, binary):
-        return self._template.render({"scheme": "TVD"})
+        super().__init__(scheme="TVD")

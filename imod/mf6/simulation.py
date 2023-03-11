@@ -5,9 +5,16 @@ import warnings
 
 import jinja2
 import numpy as np
+import tomli
+import tomli_w
 import xarray as xr
 
 import imod
+from imod.mf6.model import (
+    GroundwaterFlowModel,
+    GroundwaterTransportModel,
+    Modflow6Model,
+)
 
 
 class Modflow6Simulation(collections.UserDict):
@@ -87,7 +94,11 @@ class Modflow6Simulation(collections.UserDict):
         >>> simulation["time_discretization"]["n_timesteps"] = 5
         """
         self.use_cftime = any(
-            [model._use_cftime() for model in self.values() if model._pkg_id == "model"]
+            [
+                model._use_cftime()
+                for model in self.values()
+                if isinstance(model, Modflow6Model)
+            ]
         )
 
         times = [
@@ -95,7 +106,7 @@ class Modflow6Simulation(collections.UserDict):
             for time in additional_times
         ]
         for model in self.values():
-            if model._pkg_id == "model":
+            if isinstance(model, Modflow6Model):
                 times.extend(model._yield_times())
 
         # np.unique also sorts
@@ -118,10 +129,10 @@ class Modflow6Simulation(collections.UserDict):
         solutiongroups = []
 
         for key, value in self.items():
-            if value._pkg_id == "tdis":
-                d["tdis6"] = f"{key}.tdis"
-            elif value._pkg_id == "model":
+            if isinstance(value, Modflow6Model):
                 models.append((value._model_type, f"{key}/{key}.nam", key))
+            elif value._pkg_id == "tdis":
+                d["tdis6"] = f"{key}.tdis"
             elif value._pkg_id == "ims":
                 slnnames = value["modelnames"].values
                 modeltypes = set()
@@ -163,7 +174,7 @@ class Modflow6Simulation(collections.UserDict):
         # Check models for required content
         for key, model in self.items():
             # skip timedis, exchanges
-            if model._pkg_id == "model":
+            if isinstance(model, Modflow6Model):
                 model._model_checks(key)
 
         directory = pathlib.Path(directory)
@@ -182,7 +193,7 @@ class Modflow6Simulation(collections.UserDict):
         globaltimes = self["time_discretization"]["time"].values
         for key, value in self.items():
             # skip timedis, exchanges
-            if value._pkg_id == "model":
+            if isinstance(value, Modflow6Model):
                 value.write(
                     directory=directory,
                     modelname=key,
@@ -210,6 +221,47 @@ class Modflow6Simulation(collections.UserDict):
                     f"{result.returncode}, and error message:\n\n{result.stdout.decode()} "
                 )
 
+    def dump(self, directory=".", validate: bool = True) -> None:
+        directory = pathlib.Path(directory)
+        directory.mkdir(parents=True, exist_ok=True)
+
+        toml_content = collections.defaultdict(dict)
+        for key, value in self.items():
+            if isinstance(value, Modflow6Model):
+                toml_content[value._modeltype][key] = value.dump(
+                    directory, key, validate
+                )
+            else:
+                path = f"{key}.nc"
+                value.dataset.to_netcdf(directory / path)
+                toml_content[value._pkg_id][key] = path
+
+        with open(directory / f"{self.name}.toml", "wb") as f:
+            tomli_w.dump(toml_content, f)
+
+        return
+
+    @staticmethod
+    def from_file(toml_path):
+        classes = {
+            "gwf6": GroundwaterFlowModel,
+            "gwt6": GroundwaterTransportModel,
+            "tdis": imod.mf6.TimeDiscretization,
+            "ims": imod.mf6.Solution,
+        }
+
+        path = pathlib.Path(toml_path)
+        with open(path, "rb") as f:
+            toml_content = tomli.load(f)
+
+        simulation = Modflow6Simulation(name=path.stem)
+        for str_id, entry in toml_content.items():
+            item_cls = classes[str_id]
+            for name, path in entry.items():
+                simulation[name] = item_cls.from_file(path)
+
+        return simulation
+
     def write_qgis_project(self, crs, directory=".", aggregate_layers=False):
         directory = pathlib.Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
@@ -217,7 +269,7 @@ class Modflow6Simulation(collections.UserDict):
         with imod.util.cd(directory):
             for key, value in self.items():
                 # skip timedis, exchanges
-                if value._pkg_id == "model":
+                if isinstance(value, Modflow6Model):
                     value.write_qgis_project(
                         key, crs, aggregate_layers=aggregate_layers
                     )
@@ -236,9 +288,8 @@ class Modflow6Simulation(collections.UserDict):
         return result
 
     def get_models_of_type(self, modeltype):
-        result = {}
-        for key, value in self.items():
-            if value._pkg_id == "model":
-                if value._model_type == modeltype:
-                    result[key] = value
-        return result
+        return {
+            k: v
+            for k, v in self.items
+            if isinstance(v, Modflow6Model) and (v._model_type == modeltype)
+        }
