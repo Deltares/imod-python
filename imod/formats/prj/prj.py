@@ -536,40 +536,49 @@ def _open_package_idf(
     return [das]
 
 
-def _process_time(time: str):
+def _process_time(time: str, yearfirst: bool = True):
     if time == "steady-state":
         time = None
     else:
-        if len(time) == 19:
-            time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
-        elif len(time) == 10:
-            time = datetime.strptime(time, "%Y-%m-%d")
+        if yearfirst:
+            if len(time) == 19:
+                time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
+            elif len(time) == 10:
+                time = datetime.strptime(time, "%Y-%m-%d")
+            else:
+                raise ValueError(
+                    f"time data {time} does not match format "
+                    '"%Y-%m-%d %H:%M:%S" or "%Y-%m-%d"'
+                )
         else:
-            raise ValueError(
-                f"time data {time} does not match format "
-                '"%Y-%m-%d %H:%M:%S" or "%Y-%m-%d"'
-            )
+            if len(time) == 19:
+                time = datetime.strptime(time, "%d-%m-%Y %H:%M:%S")
+            elif len(time) == 10:
+                time = datetime.strptime(time, "%d-%m-%Y")
+            else:
+                raise ValueError(
+                    f"time data {time} does not match format "
+                    '"%d-%m-%Y %H:%M:%S" or "%d-%m-%Y"'
+                )
     return time
 
 
-def _process_boundary_condition_entry(entry: Dict, periods: Dict[str, datetime]):
+def _process_boundary_condition_entry(entry: Dict):
     """
     The iMOD project file supports constants in lieu of IDFs.
-    """
-    coords = {}
-    repeats = []
-    timestring = entry["time"]
-    time = periods.get(timestring)
 
-    if time is None:
-        time = _process_time(timestring)
-        if time is None:
-            dims = ()
-        else:
-            coords["time"] = time
-            dims = ("time",)
+    Also process repeated stress periods (on a yearly basis): substitute the
+    original date here.
+    """
+
+    coords = {}
+    timestring = entry["time"]
+    time = _process_time(timestring)
+    if time is not None:
+        coords["time"] = time
+        dims = ("time",)
     else:
-        repeats.append(time)
+        dims = ()
 
     # 0 signifies that the layer must be determined on the basis of
     # bottom elevation and stage.
@@ -595,7 +604,7 @@ def _process_boundary_condition_entry(entry: Dict, periods: Dict[str, datetime])
     if time is not None:
         header["time"] = time
 
-    return path, header, value, repeats
+    return path, header, value
 
 
 def _open_boundary_condition_idf(
@@ -625,15 +634,17 @@ def _open_boundary_condition_idf(
         system_values = defaultdict(list)
         all_repeats = set()
         for i, entry in enumerate(variable_content):
-            path, header, value, repeats = _process_boundary_condition_entry(
-                entry, periods
-            )
+            repeat = periods.get(entry["time"])
+            if repeat is not None:
+                all_repeats.add(repeat)
+                continue
+
+            path, header, value = _process_boundary_condition_entry(entry)
             header["name"] = variable
             key = i % n_system
             system_paths[key].append(path)
             system_headers[key].append(header)
             system_values[key].append(value)
-            all_repeats.update(repeats)
 
         # Concat one system at a time.
         for i, (paths, headers, values) in enumerate(
@@ -668,7 +679,7 @@ def _read_package_ipf(
     out = []
     repeats = []
     for entry in block_content["ipf"]:
-        timestring = time["entry"]
+        timestring = entry["time"]
         time = periods.get(timestring)
         if time is None:
             time = _process_time(timestring)
@@ -776,11 +787,14 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
     Keys are the iMOD project file "topics", without parentheses.
     """
     content = read_projectfile(path)
-    periods_block = content.pop("(periods)", None)
+    periods_block = content.pop("periods", None)
     if periods_block is None:
-        periods = {key: _process_time(time) for key, time in periods_block}
-    else:
         periods = {}
+    else:
+        periods = {
+            key: _process_time(time, yearfirst=False)
+            for key, time in periods_block.items()
+        }
 
     has_topbot = "(top)" in content and "(bot)" in content
     prj_data = {}
@@ -820,13 +834,16 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
             prj_data[strippedkey] = data[0]
             repeat_stress[strippedkey] = repeats
 
-    repeat_stress = {k: v for k, v in repeat_stress.items() if v is not None}
+    repeat_stress = {k: v for k, v in repeat_stress.items() if v}
     return prj_data, repeat_stress
 
 
 def read_timfile(path: FilePath) -> List[Dict]:
     def parsetime(time: str) -> datetime:
-        return datetime.strptime(time, "%Y%m%d%h%M%s")
+        # Check for steady-state:
+        if time == "00000000000000":
+            return None
+        return datetime.strptime(time, "%Y%m%d%H%M%S")
 
     with open(path, "r") as f:
         lines = f.readlines()
@@ -835,15 +852,17 @@ def read_timfile(path: FilePath) -> List[Dict]:
     # time, isave, nstp, tmult
     casters = {
         "time": parsetime,
-        "save": bool,
-        "n_timesteps": int,
+        "save": lambda x: bool(int(x)),
+        "n_timestep": int,
         "timestep_multiplier": float,
     }
     content = []
     for line in lines:
-        entry = {
-            k: cast(s.strip()) for s, (k, cast) in zip(line.split(","), casters.items())
-        }
+        stripped = line.strip()
+        if stripped == "":
+            continue
+        parts = stripped.split(",")
+        entry = {k: cast(s.strip()) for s, (k, cast) in zip(parts, casters.items())}
         content.append(entry)
 
     return content

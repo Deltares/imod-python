@@ -1,6 +1,8 @@
+import itertools
 import pickle
 from collections import Counter
-from typing import Optional, Tuple
+from datetime import datetime
+from typing import Dict, List, Optional, Tuple
 
 import geopandas as gpd
 import numpy as np
@@ -137,13 +139,16 @@ class SingularTargetRegridderWeightsCache:
             return regridder.regrid(ugrid_source)
 
 
-def create_idomain(active):
+def create_idomain(thickness):
     """
     Find cells that should get a passthrough value: IDOMAIN = -1.
 
     We may find them by forward and back-filling: if they are filled in both, they
     contain active cells in both directions, and the value should be set to -1.
     """
+    active = (
+        thickness > 0
+    ).compute()  # TODO larger than a specific value for round off?
     ones = xu.ones_like(active, dtype=float).where(active)
     passthrough = ones.ffill("layer").notnull() & ones.bfill("layer").notnull()
     idomain = ones.combine_first(
@@ -161,15 +166,13 @@ def create_disv(
     disv_top = cache.regrid(top).compute()
     disv_bottom = cache.regrid(bottom).compute()
     thickness = disv_top - disv_bottom
-    active = (
-        thickness > 0
-    ).compute()  # TODO larger than a specific value for round off?
-    idomain = create_idomain(active)
+    idomain = create_idomain(thickness)
     disv = imod.mf6.VerticesDiscretization(
         top=disv_top.sel(layer=1),
         bottom=disv_bottom,
         idomain=idomain,
     )
+    active = idomain > 0
     return disv, disv_top, disv_bottom, active
 
 
@@ -202,6 +205,7 @@ def create_chd(
     ibound,
     active,
     original2d,
+    repeat,
     **kwargs,
 ):
     head = value["head"]
@@ -217,7 +221,11 @@ def create_chd(
         method="barycentric",
         original2d=original2d,
     ).where(active & is_constant_head)
-    model[key] = imod.mf6.ConstantHead(head=constant_head)
+
+    chd = imod.mf6.ConstantHead(head=constant_head)
+    if repeat is not None:
+        chd.set_repeat_stress(repeat)
+    model[key] = chd
     return
 
 
@@ -230,6 +238,7 @@ def create_drn(
     top,
     bottom,
     original2d,
+    repeat,
     **kwargs,
 ):
     conductance = value["conductance"]
@@ -245,10 +254,13 @@ def create_drn(
     location = location.where((disv_elev >= bottom) & (disv_elev < top)).where(active)
     disv_cond = (location * disv_cond).dropna("layer", how="all")
     disv_elev = (location * disv_elev).dropna("layer", how="all")
-    model[key] = imod.mf6.Drainage(
+
+    drn = imod.mf6.Drainage(
         elevation=disv_elev,
         conductance=disv_cond,
     )
+    if repeat is not None:
+        model[key] = drn.set_repeat_stress(repeat)
     return
 
 
@@ -261,33 +273,69 @@ def create_riv(
     original2d,
     top,
     bottom,
+    repeat,
     **kwargs,
 ):
-    def assign_to_layer(conductance, stage, elevation, top, bottom):
+    def finish(uda):
+        """
+        Set dimension order, and drop empty layers.
+        """
+        facedim = uda.ugrid.grid.face_dimension
+        if "time" in uda.dims:
+            dims = ("time", "layer", facedim)
+        else:
+            dims = ("layer", facedim)
+        return uda.transpose(*dims).dropna("layer", how="all")
+
+    def assign_to_layer(
+        conductance, stage, elevation, infiltration_factor, top, bottom, active
+    ):
         """
         Assign river boundary to multiple layers. Distribute the conductance based
         on the vertical degree of overlap.
+
+        Parameters
+        ----------
+        conductance
+        stage:
+            water stage
+        elevation:
+            bottom elevation of the river
+        infiltration_factor
+            factor (generally <1) to reduce infiltration conductance compared
+            to drainage conductance.
+        top:
+            layer model top elevation
+        bottom:
+            layer model bottom elevation
+        active:
+            active or inactive cells (idomain > 0)
         """
-        active = conductance > 0.0
-        conductance = conductance.where(active)
-        stage = stage.where(active)
-        elevation = elevation.where(active)
-        bottom = bottom.where(bottom <= stage, other=stage)
+        valid = conductance > 0.0
+        conductance = conductance.where(valid)
+        stage = stage.where(valid)
+        elevation = elevation.where(valid)
+        elevation = elevation.where(elevation <= stage, other=stage)
 
         water_top = stage.where(stage <= top)
-        water_bottom = elevation.where(elevation >= bottom)
-        fraction = (water_top - water_bottom) / (stage - elevation)
+        water_bottom = elevation.where(elevation > bottom)
+        layer_height = top - bottom
+        layer_height = layer_height.where(active)  # avoid 0 thickness layers
+        fraction = (water_top - water_bottom) / layer_height
+        # Set values of 0.0 to 1.0, but do not change NaN values:
         fraction = fraction.where(~(fraction == 0.0), other=1.0)
-        location = xu.ones_like(fraction).where(fraction.notnull())
+        location = xu.ones_like(fraction).where(fraction.notnull() & active)
 
-        layered_conductance = fraction * conductance
-        layered_stage = location * stage
-        layered_elevation = location * elevation
+        layered_conductance = finish(conductance * fraction)
+        layered_stage = finish(stage * location)
+        layered_elevation = finish(elevation * location)
+        infiltration_factor = finish(infiltration_factor * location)
 
         return (
             layered_conductance,
             layered_stage,
             layered_elevation,
+            infiltration_factor,
         )
 
     conductance = value["conductance"]
@@ -295,23 +343,24 @@ def create_riv(
     bottom_elevation = value["bottom_elevation"]
     infiltration_factor = value["infiltration_factor"]
 
-    disv_cond = cache.regrid(
+    disv_cond_2d = cache.regrid(
         conductance,
         method="conductance",
         original2d=original2d,
     )
-    disv_elev = cache.regrid(bottom_elevation, original2d=original2d)
-    disv_stage = cache.regrid(stage, original2d=original2d)
-    # River may contain values where the stage < bottom.
-    disv_elev = disv_elev.where(disv_stage >= disv_elev, other=disv_stage)
-    disv_inff = cache.regrid(infiltration_factor, original2d=original2d)
+    disv_elev_2d = cache.regrid(bottom_elevation, original2d=original2d)
+    disv_stage_2d = cache.regrid(stage, original2d=original2d)
+    disv_inff_2d = cache.regrid(infiltration_factor, original2d=original2d)
 
-    location = xu.ones_like(active, dtype=float)
-    location = location.where((disv_elev >= bottom) & (disv_elev < top)).where(active)
-    disv_cond = (location * disv_cond).dropna("layer", how="all")
-    disv_elev = (location * disv_elev).dropna("layer", how="all")
-    disv_stage = (location * disv_stage).dropna("layer", how="all")
-    disv_inff = (location * disv_inff).dropna("layer", how="all")
+    disv_cond, disv_stage, disv_elev, disv_inff = assign_to_layer(
+        conductance=disv_cond_2d,
+        stage=disv_stage_2d,
+        elevation=disv_elev_2d,
+        infiltration_factor=disv_inff_2d,
+        top=top,
+        bottom=bottom,
+        active=active,
+    )
 
     riv = imod.mf6.River(
         stage=disv_stage,
@@ -323,15 +372,9 @@ def create_riv(
         elevation=disv_stage,
     )
 
-    if repeats is not None and timesteps is not None:
-        startyear = timesteps[0].year
-        endyear = timesteps[1].year
-        timemap = {}
-        for year in range(startyear, endyear):
-            for date in repeats:
-                timemap[date.replace(year=year)] = date
-        riv.repeat_stress(**timemap)
-        drn.repeat_stress(**timemap)
+    if repeat is not None:
+        riv.set_repeat_stress(repeat)
+        drn.set_repeat_stress(repeat)
 
     model[key] = riv
     model[f"{key}-drn"] = drn
@@ -345,11 +388,15 @@ def create_rch(
     value,
     active,
     original2d,
+    repeat,
     **kwargs,
 ):
     rate = value["rate"] * 0.001
     disv_rate = cache.regrid(rate, original2d=original2d).where(active)
-    model[key] = imod.mf6.Recharge(rate=disv_rate)
+    rch = imod.mf6.Recharge(rate=disv_rate)
+    if repeat is not None:
+        rch.set_repeat_stress(repeat)
+    model[key] = rch
     return
 
 
@@ -358,6 +405,7 @@ def create_wel(
     model,
     key,
     value,
+    repeat,
     **kwargs,
 ):
     target = cache.target
@@ -368,12 +416,15 @@ def create_wel(
     x, y, rate = columns[:3]
     xy = np.column_stack([dataframe[x], dataframe[y]])
     cell2d = target.locate_points(xy)
-    pkg = imod.mf6.WellDisVertices(
+
+    wel = imod.mf6.WellDisVertices(
         layer=np.full_like(cell2d, layer),
         cell2d=cell2d,
         rate=dataframe[rate],
     )
-    model[key] = pkg
+    if repeat is not None:
+        wel.set_repeat_stress(repeat)
+    model[key] = wel
     return
 
 
@@ -534,7 +585,28 @@ PKG_CONVERSION = {
 }
 
 
-def convert_to_disv(projectfile_data, target, repeat_stress=None, timesteps=None):
+def expand_repetitions(
+    repeat_stress: List[datetime], times: List[datetime]
+) -> Dict[datetime, datetime]:
+    first = times[0]
+    last = times[-1]
+    expanded = {}
+    for date, year in itertools.product(
+        range(first.year, last.year + 1), repeat_stress
+    ):
+        newdate = date.replace(year=year)
+        if newdate < last:
+            expanded[newdate] = date
+    return expanded
+
+
+def convert_to_disv(projectfile_data, target, repeat_stress=None, times=None):
+    if times is None:
+        if repeat_stress is not None:
+            raise ValueError("times is required when repeat_stress is given")
+    else:
+        times = sorted(times)
+
     data = projectfile_data.copy()
     model = imod.mf6.GroundwaterFlowModel()
 
@@ -570,7 +642,12 @@ def convert_to_disv(projectfile_data, target, repeat_stress=None, timesteps=None
         try:
             # conversion will update model
             convert = PKG_CONVERSION[pkg]
-            repeat = repeat_stress.get(key)
+            if repeat_stress is None:
+                repeat = None
+            else:
+                repeat = repeat_stress.get(key)
+                if repeat is not None:
+                    repeat = expand_repetitions(repeat, times)
 
             try:
                 convert(
@@ -584,6 +661,7 @@ def convert_to_disv(projectfile_data, target, repeat_stress=None, timesteps=None
                     top=top,
                     bottom=bottom,
                     k=k,
+                    repeat=repeat,
                 )
             except Exception as e:
                 raise type(e)(f"{e}\nduring conversion of {key}")
