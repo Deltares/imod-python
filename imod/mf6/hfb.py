@@ -40,7 +40,7 @@ def edge_to_cell(notnull, arrdict, layer, idomain, grid):
 
     # Skip the exterior edges (marked with a fill value).
     cell2d = cell2d[valid]
-    c = arrdict["resistance"][notnull][valid]
+    c = arrdict["hydraulic_characteristic"][notnull][valid]
     return layer, cell2d, c
 
 
@@ -53,7 +53,7 @@ def dis_recarr(arrdict, layer, notnull, idomain, grid):
         ("layer_2", np.int32),
         ("row_2", np.int32),
         ("column_2", np.int32),
-        ("resistance", np.float64),
+        ("hydraulic_characteristic", np.float64),
     ]
     sparse_dtype = np.dtype(field_spec)
     # Find the indices
@@ -69,7 +69,7 @@ def dis_recarr(arrdict, layer, notnull, idomain, grid):
     recarr["column_1"] = column_1 + 1
     recarr["row_2"] = row_2 + 1
     recarr["column_2"] = column_2 + 1
-    recarr["resistance"] = c
+    recarr["hydraulic_characteristic"] = c
     return recarr
 
 
@@ -80,7 +80,7 @@ def disv_recarr(arrdict, layer, notnull, idomain, grid):
         ("cell2d_1", np.int32),
         ("layer_2", np.int32),
         ("cell2d_2", np.int32),
-        ("resistance", np.float64),
+        ("hydraulic_characteristic", np.float64),
     ]
     sparse_dtype = np.dtype(field_spec)
     # Initialize the structured array
@@ -91,7 +91,7 @@ def disv_recarr(arrdict, layer, notnull, idomain, grid):
     recarr["layer_2"] = recarr["layer_1"]
     recarr["cell2d_1"] = cell2d[:, 0] + 1
     recarr["cell2d_2"] = cell2d[:, 1] + 1
-    recarr["resistance"] = c
+    recarr["hydraulic_characteristic"] = c
     return recarr
 
 
@@ -176,6 +176,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(AbstractHorizontalFlowBarrier
         hydraulic_characteristic,
         idomain,
         print_input=False,
+        validate: bool = True,
     ):
         super().__init__(locals())
         self.dataset["hydraulic_characteristic"] = hydraulic_characteristic
