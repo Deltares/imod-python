@@ -68,35 +68,6 @@ class Package(abc.ABC):
     not the list input which is used in :class:`BoundaryCondition`.
     """
 
-    @staticmethod
-    def _open_dataset(path, **kwargs):
-        path = pathlib.Path(path)
-        if path.suffix in (".zip", ".zarr"):
-            # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
-            dataset = xr.open_zarr(str(path), **kwargs)
-        else:
-            dataset = xr.open_dataset(path, **kwargs)
-
-        if dataset.ugrid_roles.topology:
-            dataset = xu.UgridDataset(dataset)
-
-        # Replace NaNs by None
-        for key, value in dataset.items():
-            stripped_value = value.values[()]
-            if isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value):
-                dataset[key] = None
-
-        return dataset
-
-    @classmethod
-    def _from_file(cls, path, **kwargs):
-        # Keep this private so we can overload this without overloading the
-        # public docstring.
-        dataset = cls._open_dataset(path, **kwargs)
-        instance = cls.__new__(cls)
-        instance.dataset = dataset
-        return instance
-
     @classmethod
     def from_file(cls, path, **kwargs):
         """
@@ -133,7 +104,25 @@ class Package(abc.ABC):
 
         Refer to the xarray documentation for the possible keyword arguments.
         """
-        return cls._from_file(path, **kwargs)
+        path = pathlib.Path(path)
+        if path.suffix in (".zip", ".zarr"):
+            # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
+            dataset = xr.open_zarr(str(path), **kwargs)
+        else:
+            dataset = xr.open_dataset(path, **kwargs)
+
+        if dataset.ugrid_roles.topology:
+            dataset = xu.UgridDataset(dataset)
+
+        # Replace NaNs by None
+        for key, value in dataset.items():
+            stripped_value = value.values[()]
+            if isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value):
+                dataset[key] = None
+
+        instance = cls.__new__(cls)
+        instance.dataset = dataset
+        return instance
 
     def __init__(self, allargs=None):
         if allargs is not None:

@@ -227,15 +227,16 @@ class Modflow6Simulation(collections.UserDict):
 
         toml_content = collections.defaultdict(dict)
         for key, value in self.items():
+            cls_name = type(value).__name__
             if isinstance(value, Modflow6Model):
                 model_toml_path = value.dump(directory, key, validate)
-                toml_content[value._model_id][key] = model_toml_path.relative_to(
+                toml_content[cls_name][key] = model_toml_path.relative_to(
                     directory
                 ).as_posix()
             else:
                 path = f"{key}.nc"
                 value.dataset.to_netcdf(directory / path)
-                toml_content[value._pkg_id][key] = path
+                toml_content[cls_name][key] = path
 
         with open(directory / f"{self.name}.toml", "wb") as f:
             tomli_w.dump(toml_content, f)
@@ -245,10 +246,13 @@ class Modflow6Simulation(collections.UserDict):
     @staticmethod
     def from_file(toml_path):
         classes = {
-            "gwf6": GroundwaterFlowModel,
-            "gwt6": GroundwaterTransportModel,
-            "tdis": imod.mf6.TimeDiscretization,
-            "ims": imod.mf6.Solution,
+            item_cls.__name__: item_cls
+            for item_cls in (
+                GroundwaterFlowModel,
+                GroundwaterTransportModel,
+                imod.mf6.TimeDiscretization,
+                imod.mf6.Solution,
+            )
         }
 
         toml_path = pathlib.Path(toml_path)
@@ -256,8 +260,8 @@ class Modflow6Simulation(collections.UserDict):
             toml_content = tomli.load(f)
 
         simulation = Modflow6Simulation(name=toml_path.stem)
-        for str_id, entry in toml_content.items():
-            item_cls = classes[str_id]
+        for key, entry in toml_content.items():
+            item_cls = classes[key]
             for name, filename in entry.items():
                 path = toml_path.parent / filename
                 simulation[name] = item_cls.from_file(path)

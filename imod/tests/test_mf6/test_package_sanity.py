@@ -22,8 +22,8 @@ from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition, Packa
 
 ALL_PACKAGES = [
     item
-    for _, item in inspect.getmembers(imod.mf6)
-    if inspect.isclass(item) and issubclass(item, Package)
+    for _, item in inspect.getmembers(imod.mf6, inspect.isclass)
+    if issubclass(item, Package)
 ]
 PACKAGES = [x for x in ALL_PACKAGES if not issubclass(x, BoundaryCondition)]
 BOUNDARY_PACKAGES = [

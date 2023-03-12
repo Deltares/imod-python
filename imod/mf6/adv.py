@@ -23,18 +23,6 @@ class Advection(Package):
         scheme = self.dataset["scheme"].item()
         return self._template.render({"scheme": scheme})
 
-    @classmethod
-    def _from_file(cls, path, **kwargs):
-        classes = {
-            "upstream": AdvectionUpstream,
-            "central": AdvectionCentral,
-            "tvd": AdvectionTVD,
-        }
-        pkg_kwargs = cls._open_dataset(path, **kwargs)
-        scheme = pkg_kwargs["scheme"].item().lower()
-        adv_cls = classes[scheme]
-        return adv_cls()
-
 
 class AdvectionUpstream(Advection):
     """

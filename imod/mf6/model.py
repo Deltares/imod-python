@@ -1,5 +1,6 @@
 import abc
 import collections
+import inspect
 import pathlib
 from copy import deepcopy
 
@@ -12,6 +13,7 @@ import xugrid as xu
 
 import imod
 from imod.mf6 import qgs_util
+from imod.mf6.pkgbase import Package
 from imod.mf6.validation import validation_model_error_message
 from imod.schemata import ValidationError
 
@@ -207,7 +209,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         toml_content = collections.defaultdict(dict)
         for pkgname, pkg in self.items():
             pkg_path = f"{pkgname}.nc"
-            toml_content[pkg._pkg_id][pkgname] = pkg_path
+            toml_content[type(pkg).__name__][pkgname] = pkg_path
             dataset = pkg.dataset
             if isinstance(dataset, xu.UgridDataset):
                 pkg.dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
@@ -223,13 +225,10 @@ class Modflow6Model(collections.UserDict, abc.ABC):
     @classmethod
     def from_file(cls, toml_path):
         pkg_classes = {
-            pkg_cls._pkg_id: pkg_cls
-            for pkg_cls in imod.mf6.__dict__.values()
-            if hasattr(pkg_cls, "_pkg_id")
+            name: pkg_cls
+            for name, pkg_cls in inspect.getmembers(imod.mf6, inspect.isclass)
+            if issubclass(pkg_cls, Package)
         }
-        # Make sure these use the general classes, not the aliases:
-        pkg_classes["adv"] = imod.mf6.adv.Advection
-        pkg_classes["ims"] = imod.mf6.Solution
 
         toml_path = pathlib.Path(toml_path)
         with open(toml_path, "rb") as f:
@@ -237,9 +236,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         parentdir = toml_path.parent
         instance = cls()
-        for pkg_id, entry in toml_content.items():
+        for key, entry in toml_content.items():
             for pkgname, path in entry.items():
-                pkg_cls = pkg_classes[pkg_id]
+                pkg_cls = pkg_classes[key]
                 instance[pkgname] = pkg_cls.from_file(parentdir / path)
 
         return instance

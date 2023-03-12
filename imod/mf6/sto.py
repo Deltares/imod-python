@@ -22,20 +22,9 @@ class Storage(Package):
 
 
 class StorageBase(Package, abc.ABC):
-    @classmethod
-    def _from_file(cls, path, **kwargs):
-        dataset = cls._open_dataset(path, **kwargs)
-        if "specific_storage" in dataset:
-            pkg_cls = SpecificStorage
-        else:
-            pkg_cls = StorageCoefficient
-        instance = pkg_cls.__new__(cls)
-        instance.dataset = dataset
-        return instance
-
     def _render_dict(self, directory, pkgname, globaltimes, binary):
         d = {}
-        stodirectory = directory / "sto"
+        stodirectory = directory / pkgname
         for varname in self._grid_data:
             key = self._keyword_map.get(varname, varname)
             layered, value = self._compose_values(
