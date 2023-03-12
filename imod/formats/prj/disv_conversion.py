@@ -161,8 +161,24 @@ def create_disv(
     cache,
     top,
     bottom,
+    ibound,
 ):
+    if top.dims == ("layer",):
+        if ibound.dims != ("layer", "y", "x"):
+            raise ValueError(
+                "Either ibound or top must have dimensions (layer, y, x) to "
+                "derive model extent. Both may not be provided as constants."
+            )
+        top = top * xr.ones_like(ibound)
+        original2d = ibound.isel(layer=0, drop=True)
+    else:
+        original2d = top.isel(layer=0, drop=True)
+
+    if bottom.dims == ("layer",):
+        bottom = bottom * xr.ones_like(ibound)
+
     top = top.compute()
+    bottom = bottom.compute()
     disv_top = cache.regrid(top).compute()
     disv_bottom = cache.regrid(bottom).compute()
     thickness = disv_top - disv_bottom
@@ -173,7 +189,7 @@ def create_disv(
         idomain=idomain,
     )
     active = idomain > 0
-    return disv, disv_top, disv_bottom, active
+    return disv, disv_top, disv_bottom, active, original2d
 
 
 def create_npf(
@@ -260,7 +276,43 @@ def create_drn(
         conductance=disv_cond,
     )
     if repeat is not None:
-        model[key] = drn.set_repeat_stress(repeat)
+        drn.set_repeat_stress(repeat)
+    model[key] = drn
+    return
+
+
+def create_ghb(
+    cache,
+    model,
+    key,
+    value,
+    active,
+    original2d,
+    repeat,
+    **kwargs,
+):
+    conductance = value["conductance"]
+    head = value["head"]
+
+    disv_cond = cache.regrid(
+        conductance,
+        method="conductance",
+        original2d=original2d,
+    )
+    disv_head = cache.regrid(
+        head,
+        method="barycentric",
+        original2d=original2d,
+    )
+    valid = active & disv_cond.notnull() & disv_head.notnull()
+
+    ghb = imod.mf6.GeneralHeadBoundary(
+        conductance=disv_cond.where(valid),
+        head=disv_head.where(valid),
+    )
+    if repeat is not None:
+        ghb.set_repeat_stress(repeat)
+    model[key] = ghb
     return
 
 
@@ -415,7 +467,7 @@ def create_wel(
     columns = dataframe.columns
     x, y, rate = columns[:3]
     xy = np.column_stack([dataframe[x], dataframe[y]])
-    cell2d = target.locate_points(xy)
+    cell2d = target.locate_points(xy) + 1
 
     wel = imod.mf6.WellDisVertices(
         layer=np.full_like(cell2d, layer),
@@ -577,6 +629,7 @@ def merge_hfbs(hfbs, idomain):
 PKG_CONVERSION = {
     "chd": create_chd,
     "drn": create_drn,
+    "ghb": create_ghb,
     "hfb": create_hfb,
     "shd": create_ic,
     "rch": create_rch,
@@ -592,7 +645,7 @@ def expand_repetitions(
     last = times[-1]
     expanded = {}
     for date, year in itertools.product(
-        range(first.year, last.year + 1), repeat_stress
+        repeat_stress, range(first.year, last.year + 1)
     ):
         newdate = date.replace(year=year)
         if newdate < last:
@@ -614,12 +667,13 @@ def convert_to_disv(projectfile_data, target, repeat_stress=None, times=None):
     weights_cache = SingularTargetRegridderWeightsCache(data, target, cache_size=5)
 
     # Mandatory packages first.
-    disv, top, bottom, active = create_disv(
+    ibound = data["bnd"]["ibound"].compute()
+    disv, top, bottom, active, original2d = create_disv(
         cache=weights_cache,
         top=data["top"]["top"],
         bottom=data["bot"]["bottom"],
+        ibound=ibound,
     )
-    original2d = data["bot"]["bottom"].sel(layer=1)
 
     npf = create_npf(
         cache=weights_cache,
@@ -633,41 +687,40 @@ def convert_to_disv(projectfile_data, target, repeat_stress=None, times=None):
     model["npf"] = npf
     model["disv"] = disv
 
-    ibound = data["bnd"]["ibound"]
     new_ibound = weights_cache.regrid(source=ibound, method="minimum")
 
     # Boundary conditions, one by one.
     for key, value in data.items():
         pkg = key.split("-")[0]
+        convert = PKG_CONVERSION.get(pkg)
+        # Skip unsupported packages
+        if convert is None:
+            continue
+
+        if repeat_stress is None:
+            repeat = None
+        else:
+            repeat = repeat_stress.get(key)
+            if repeat is not None:
+                repeat = expand_repetitions(repeat, times)
+
         try:
-            # conversion will update model
-            convert = PKG_CONVERSION[pkg]
-            if repeat_stress is None:
-                repeat = None
-            else:
-                repeat = repeat_stress.get(key)
-                if repeat is not None:
-                    repeat = expand_repetitions(repeat, times)
-
-            try:
-                convert(
-                    cache=weights_cache,
-                    model=model,
-                    key=key,
-                    value=value,
-                    ibound=new_ibound,
-                    active=active,
-                    original2d=original2d,
-                    top=top,
-                    bottom=bottom,
-                    k=k,
-                    repeat=repeat,
-                )
-            except Exception as e:
-                raise type(e)(f"{e}\nduring conversion of {key}")
-
-        except KeyError:
-            pass
+            # conversion will update model instance
+            convert(
+                cache=weights_cache,
+                model=model,
+                key=key,
+                value=value,
+                ibound=new_ibound,
+                active=active,
+                original2d=original2d,
+                top=top,
+                bottom=bottom,
+                k=k,
+                repeat=repeat,
+            )
+        except Exception as e:
+            raise type(e)(f"{e}\nduring conversion of {key}")
 
     # Treat hfb's separately: they must be merged into one,
     # as MODFLOW6 only supports a single HFB.
