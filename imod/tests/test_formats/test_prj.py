@@ -29,6 +29,7 @@ def test_tokenize():
     assert prj._tokenize("That 's life'") == ["That", "s life"]
     assert prj._tokenize("That,'s life'") == ["That", "s life"]
     assert prj._tokenize("Thats life") == ["Thats", "life"]
+    assert prj._tokenize(r"windows\slash") == ["windows/slash"]
 
 
 class TestLineIterator:

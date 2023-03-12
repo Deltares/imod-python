@@ -193,7 +193,7 @@ def _tokenize(line: str) -> List[str]:
     >> _tokenize("That,'s life'")
     >> ["That", "s life"]
     """
-    values = [v.strip() for v in line.split(",")]
+    values = [v.strip().replace("\\", "/") for v in line.split(",")]
     tokens = list(chain.from_iterable(shlex.split(v) for v in values))
     return tokens
 
@@ -500,7 +500,9 @@ def _create_dataarray(
     none_paths = [p is None for p in paths]
     if all(none_paths):
         coords = _merge_coords(headers)
-        da = xr.DataArray(values, dims=headers[0]["dims"], coords=coords)
+        firstdims = headers[0]["dims"]
+        shape = [len(coord) for coord in coords.values()]
+        da = xr.DataArray(np.reshape(values, shape), dims=firstdims, coords=coords)
     elif any(none_paths):
         raise NotImplementedError(
             "Entries for a system should either all provide a constant, "
@@ -563,22 +565,30 @@ def _process_time(time: str, yearfirst: bool = True):
     return time
 
 
-def _process_boundary_condition_entry(entry: Dict):
+def _process_boundary_condition_entry(entry: Dict, periods: Dict[str, datetime]):
     """
     The iMOD project file supports constants in lieu of IDFs.
 
     Also process repeated stress periods (on a yearly basis): substitute the
     original date here.
     """
-
     coords = {}
     timestring = entry["time"]
-    time = _process_time(timestring)
+
+    # Resolve repeating periods first:
+    time = periods.get(timestring)
     if time is not None:
-        coords["time"] = time
-        dims = ("time",)
+        repeat = time
     else:
+        # this resolves e.g. "steady-state"
+        time = _process_time(timestring)
+        repeat = None
+
+    if time is None:
         dims = ()
+    else:
+        dims = ("time",)
+        coords["time"] = time
 
     # 0 signifies that the layer must be determined on the basis of
     # bottom elevation and stage.
@@ -604,7 +614,7 @@ def _process_boundary_condition_entry(entry: Dict):
     if time is not None:
         header["time"] = time
 
-    return path, header, value
+    return path, header, value, repeat
 
 
 def _open_boundary_condition_idf(
@@ -634,17 +644,16 @@ def _open_boundary_condition_idf(
         system_values = defaultdict(list)
         all_repeats = set()
         for i, entry in enumerate(variable_content):
-            repeat = periods.get(entry["time"])
-            if repeat is not None:
-                all_repeats.add(repeat)
-                continue
-
-            path, header, value = _process_boundary_condition_entry(entry)
+            path, header, value, repeat = _process_boundary_condition_entry(
+                entry, periods
+            )
             header["name"] = variable
             key = i % n_system
             system_paths[key].append(path)
             system_headers[key].append(header)
             system_values[key].append(value)
+            if repeat:
+                all_repeats.add(repeat)
 
         # Concat one system at a time.
         for i, (paths, headers, values) in enumerate(
