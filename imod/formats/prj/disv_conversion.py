@@ -1,3 +1,7 @@
+"""
+Most of the functionality here attempts to replicate what iMOD does with
+project files.
+"""
 import itertools
 import pickle
 from collections import Counter
@@ -139,6 +143,25 @@ class SingularTargetRegridderWeightsCache:
             return regridder.regrid(ugrid_source)
 
 
+def raise_on_layer(value, variable: str):
+    da = value[variable]
+    if "layer" in da.dims:
+        raise ValueError(f"{variable} should not be ass")
+    return da
+
+
+def finish(uda):
+    """
+    Set dimension order, and drop empty layers.
+    """
+    facedim = uda.ugrid.grid.face_dimension
+    if "time" in uda.dims:
+        dims = ("time", "layer", facedim)
+    else:
+        dims = ("layer", facedim)
+    return uda.transpose(*dims).dropna("layer", how="all")
+
+
 def create_idomain(thickness):
     """
     Find cells that should get a passthrough value: IDOMAIN = -1.
@@ -257,8 +280,8 @@ def create_drn(
     repeat,
     **kwargs,
 ):
-    conductance = value["conductance"]
-    elevation = value["elevation"]
+    conductance = raise_on_layer(value, "conductance")
+    elevation = raise_on_layer(value, "elevation")
 
     disv_cond = cache.regrid(
         conductance,
@@ -267,7 +290,7 @@ def create_drn(
     )
     disv_elev = cache.regrid(elevation, original2d=original2d)
     location = xu.ones_like(active, dtype=float)
-    location = location.where((disv_elev >= bottom) & (disv_elev < top)).where(active)
+    location = location.where((disv_elev > bottom) & (disv_elev <= top)).where(active)
     disv_cond = (location * disv_cond).dropna("layer", how="all")
     disv_elev = (location * disv_elev).dropna("layer", how="all")
 
@@ -328,17 +351,6 @@ def create_riv(
     repeat,
     **kwargs,
 ):
-    def finish(uda):
-        """
-        Set dimension order, and drop empty layers.
-        """
-        facedim = uda.ugrid.grid.face_dimension
-        if "time" in uda.dims:
-            dims = ("time", "layer", facedim)
-        else:
-            dims = ("layer", facedim)
-        return uda.transpose(*dims).dropna("layer", how="all")
-
     def assign_to_layer(
         conductance, stage, elevation, infiltration_factor, top, bottom, active
     ):
@@ -390,10 +402,10 @@ def create_riv(
             infiltration_factor,
         )
 
-    conductance = value["conductance"]
-    stage = value["stage"]
-    bottom_elevation = value["bottom_elevation"]
-    infiltration_factor = value["infiltration_factor"]
+    conductance = raise_on_layer(value, "conductance")
+    stage = raise_on_layer(value, "stage")
+    bottom_elevation = raise_on_layer(value, "bottom_elevation")
+    infiltration_factor = raise_on_layer(value, "infiltration_factor")
 
     disv_cond_2d = cache.regrid(
         conductance,
@@ -443,13 +455,40 @@ def create_rch(
     repeat,
     **kwargs,
 ):
-    rate = value["rate"] * 0.001
+    rate = raise_on_layer(value, "rate") * 0.001
     disv_rate = cache.regrid(rate, original2d=original2d).where(active)
+    # Find highest active layer
+    highest = active["layer"] == active["layer"].where(active).max()
+    location = highest.where(highest)
+    disv_rate = finish(disv_rate * location)
     rch = imod.mf6.Recharge(rate=disv_rate)
     if repeat is not None:
         rch.set_repeat_stress(repeat)
     model[key] = rch
     return
+
+
+def create_sto(
+    cache,
+    storage_coefficient,
+    active,
+    original2d,
+    transient,
+):
+    if storage_coefficient is None:
+        disv_coef = 0.0
+    else:
+        disv_coef = cache.regrid(storage_coefficient, original2d=original2d).where(
+            active
+        )
+
+    sto = imod.mf6.StorageCoefficient(
+        storage_coefficient=disv_coef,
+        specific_yield=0.0,
+        transient=transient,
+        convertible=0,
+    )
+    return sto
 
 
 def create_wel(
@@ -654,6 +693,42 @@ def expand_repetitions(
 
 
 def convert_to_disv(projectfile_data, target, repeat_stress=None, times=None):
+    """
+    Convert the contents of a project file to a MODFLOW6 DISV model.
+
+    Note: the times argument is used to expand repeated stress periods. The
+    total set of stress periods is defined by the dates of the boundary
+    conditions, as well as the times provided in repeat_stress: if a boundary
+    condition contains a stress period that precedes the first entry in times,
+    the boundary condition datetime is used as the first time.
+
+    The times argument is not used when repeat_stress is not provided.
+
+    The returned model is steady-state if none of the packages contain a time
+    dimension. The model is transient if any of the packages contain a time
+    dimension. This can be changed by setting the "transient" value in the
+    storage package of the returned model. Storage coefficient input is
+    required for a transient model.
+
+    Parameters
+    ----------
+    projectfile_data: dict
+        Dictionary with the projectfile topics as keys, and the data
+        as xarray.DataArray, pandas.DataFrame, or geopandas.GeoDataFrame.
+    target: xu.Ugrid2d
+        The unstructured target topology. All data is transformed to match this
+        topology.
+    repeat_stress: dict of dict of string to datetime, optional
+        This dict contains contains, per topic, the period alias (a string) to
+        its datetime.
+    times: list of datetimes, optional
+        The stress period times. Required when repeat_stress is given.
+
+    Returns
+    -------
+    disv_model: imod.mf6.GroundwaterFlowModel
+
+    """
     if times is None:
         if repeat_stress is not None:
             raise ValueError("times is required when repeat_stress is given")
@@ -682,12 +757,15 @@ def convert_to_disv(projectfile_data, target, repeat_stress=None, times=None):
         active=active,
         original2d=original2d,
     )
-    idomain = disv["idomain"].compute()
-    k = npf["k"].compute()
+
     model["npf"] = npf
     model["disv"] = disv
+    model["oc"] = imod.mf6.OutputControl(save_head="all")
 
-    new_ibound = weights_cache.regrid(source=ibound, method="minimum")
+    # Used in other package construction:
+    idomain = disv["idomain"].compute()
+    k = npf["k"].compute()
+    new_ibound = weights_cache.regrid(source=ibound, method="minimum").compute()
 
     # Boundary conditions, one by one.
     for key, value in data.items():
@@ -728,5 +806,22 @@ def convert_to_disv(projectfile_data, target, repeat_stress=None, times=None):
     hfbs = [model.pop(key) for key in hfb_keys]
     if hfbs:
         model["hfb"] = merge_hfbs(hfbs, idomain)
+
+    transient = any("time" in pkg.dataset.dims for pkg in model.values())
+    sto_entry = data.get("sto")
+    if sto_entry is None:
+        if transient:
+            raise ValueError("storage input is required for a transient run")
+        storage_coefficient = None
+    else:
+        storage_coefficient = sto_entry["storage_coefficient"]
+
+    model["sto"] = create_sto(
+        cache=weights_cache,
+        storage_coefficient=storage_coefficient,
+        active=active,
+        original2d=original2d,
+        transient=transient,
+    )
 
     return model

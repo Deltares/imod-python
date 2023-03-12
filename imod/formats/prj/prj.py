@@ -491,27 +491,50 @@ def _merge_coords(headers: List[Dict[str, Any]]) -> Dict[str, np.ndarray]:
     return {k: np.unique(coords[k]) for k in coords}
 
 
+def _create_datarray_from_paths(paths: List[str], headers: List[Dict[str, Any]]):
+    da = imod.formats.array_io.reading._load(
+        paths, use_cftime=False, _read=imod.idf._read, headers=headers
+    )
+    return da
+
+
+def _create_dataarray_from_values(values: List[float], headers: List[Dict[str, Any]]):
+    coords = _merge_coords(headers)
+    firstdims = headers[0]["dims"]
+    shape = [len(coord) for coord in coords.values()]
+    da = xr.DataArray(np.reshape(values, shape), dims=firstdims, coords=coords)
+    return da
+
+
 def _create_dataarray(
     paths: List[str], headers: List[Dict[str, Any]], values: List[float]
 ) -> xr.DataArray:
     """
     Create a DataArray from a list of IDF paths, or from constant values.
     """
-    none_paths = [p is None for p in paths]
-    if all(none_paths):
-        coords = _merge_coords(headers)
-        firstdims = headers[0]["dims"]
-        shape = [len(coord) for coord in coords.values()]
-        da = xr.DataArray(np.reshape(values, shape), dims=firstdims, coords=coords)
-    elif any(none_paths):
-        raise NotImplementedError(
-            "Entries for a system should either all provide a constant, "
-            "or all provide a file path."
-        )
-    else:
-        da = imod.formats.array_io.reading._load(
-            paths, use_cftime=False, _read=imod.idf._read, headers=headers
-        )
+    values_valid = []
+    paths_valid = []
+    headers_paths = []
+    headers_values = []
+    for path, header, value in zip(paths, headers, values):
+        if path is None:
+            headers_values.append(header)
+            values_valid.append(value)
+        else:
+            headers_paths.append(header)
+            paths_valid.append(path)
+
+    if paths_valid and values_valid:
+        dap = _create_datarray_from_paths(paths_valid, headers_paths)
+        dav = _create_dataarray_from_values(values_valid, headers_values)
+        dap.name = "tmp"
+        dav.name = "tmp"
+        da = xr.merge((dap, dav), join="outer")["tmp"]
+    elif paths_valid:
+        da = _create_datarray_from_paths(paths_valid, headers_paths)
+    elif values_valid:
+        da = _create_dataarray_from_values(values_valid, headers_values)
+
     return da
 
 
@@ -593,7 +616,7 @@ def _process_boundary_condition_entry(entry: Dict, periods: Dict[str, datetime])
     # 0 signifies that the layer must be determined on the basis of
     # bottom elevation and stage.
     layer = entry["layer"]
-    if layer == 0:
+    if layer <= 0:
         layer is None
     else:
         coords["layer"] = layer

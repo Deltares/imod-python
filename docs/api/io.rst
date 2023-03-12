@@ -28,3 +28,5 @@ Input/output
     
     prj.read_projectfile
     prj.open_projectfile_data
+    prj.read_timfile
+    prj.convert_to_disv
