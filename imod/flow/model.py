@@ -557,6 +557,7 @@ class ImodflowModel(Model):
         `Download iMOD5 here <https://oss.deltares.nl/web/imod/download-imod5>`_
 
         """
+        directory = pathlib.Path(directory)
 
         allowed_conversion_settings = ["mf2005_namfile", "mf6_namfile", "runfile"]
         if convert_to not in allowed_conversion_settings:
