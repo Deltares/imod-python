@@ -85,7 +85,7 @@ def read_ascii(path: Union[Path, str]) -> "geopandas.GeoDataFrame":  # type: ign
     """
     # From gen itype to shapely geometry:
     with open(path, "r") as f:
-        lines = [line.lower().strip() for line in f.readlines()]
+        lines = [line.lower().strip() for line in f.readlines() if line.strip() != ""]
 
     if len(lines[0].split(",")) == 3:
         return parse_ascii_points(lines)
@@ -204,7 +204,7 @@ def to_line(geometry: LineString) -> Tuple[np.ndarray, int]:
     return xy, xy.shape[0]
 
 
-def read(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
+def read_binary(path: Union[str, Path]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
     """
     Read a binary GEN file to a geopandas GeoDataFrame.
 
@@ -323,6 +323,33 @@ def vertices(
 
     xy, n_vertex = GENTYPE_TO_VERTICES[ftype](geometry)
     return ftype, xy, n_vertex
+
+
+def read(path):
+    """
+    Read a GEN file to a geopandas GeoDataFrame. The function first tries to
+    read as binary, if this fails, it tries to read the gen file as ASCII.
+
+    If certain that a GEN file is ascii or binary, the user is adviced to use
+    the respective functions :func:`imod.gen.gen.read_asci` or
+    :func:`imod.gen.gen.read_binary`.
+
+    Parameters
+    ----------
+    path: Union[str, Path]
+
+    Returns
+    -------
+    geodataframe: gpd.GeoDataFrame
+    """
+
+    try:
+        return read_binary(path)
+    except Exception:
+        try:
+            return read_ascii(path)
+        except Exception as e:
+            raise type(e)(f'{e}\nWhile reading GEN file "{path}"')
 
 
 def write(
