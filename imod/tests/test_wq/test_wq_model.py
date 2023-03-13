@@ -68,6 +68,7 @@ def basicmodel():
     # WEL
     welly = np.arange(4.5, 0.0, -1.0)
     wellx = np.arange(0.5, 5.0, 1.0)
+    id_name = [f"well_{i}" for i in range(wellx.size)]
 
     # DSP
     longitudinal = ibound.copy()
@@ -112,7 +113,7 @@ def basicmodel():
         density=head.copy(),
         save_budget=False,
     )
-    m["wel"] = imod.wq.Well(id_name="well", x=wellx, y=welly, rate=5.0, time=datetimes)
+    m["wel"] = imod.wq.Well(id_name=id_name, x=wellx, y=welly, rate=5.0, time=datetimes)
     m["rch"] = imod.wq.RechargeHighestActive(
         rate=rate, concentration=rate.copy(), save_budget=False
     )
@@ -458,13 +459,9 @@ def test_render_groups__ghb_riv_wel(basicmodel):
 
         [wel]
             mwelsys = 1
-            mxactw = 3
+            mxactw = 15
             iwelcb = 0
-            wel_p1_s1_l? = wel/wel_20000101000000.ipf
-            wel_p2_s1_l? = wel/wel_20000102000000.ipf
-            wel_p3_s1_l? = wel/wel_20000103000000.ipf
-            wel_p4_s1_l? = wel/wel_20000104000000.ipf
-            wel_p5_s1_l? = wel/wel_20000105000000.ipf"""
+            wel_p?_s1_l$ = wel/rate.ipf"""
     )
 
     ssm_compare = """
@@ -475,7 +472,7 @@ def test_render_groups__ghb_riv_wel(basicmodel):
         directory=directory, globaltimes=globaltimes
     )
 
-    assert n_sinkssources == 153
+    assert n_sinkssources == 165
     assert content == compare
     assert ssm_content == ssm_compare
 
@@ -495,7 +492,7 @@ def test_render_groups__double_gbh(basicmodel):
     directory = pathlib.Path(".")
 
     n_sinkssources = m._render_groups(directory=directory, globaltimes=globaltimes)[2]
-    assert n_sinkssources == 203
+    assert n_sinkssources == 215
 
 
 def test_render_flowsolver(basicmodel):

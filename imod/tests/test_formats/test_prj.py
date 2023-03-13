@@ -423,6 +423,7 @@ class TestProjectFile:
         with open(self.prj_path, "w") as f:
             f.write(filecontent)
 
+        # Write first GEN as binary
         geom = sg.LineString(
             [
                 [0.0, 0.0],
@@ -432,7 +433,21 @@ class TestProjectFile:
         )
         gdf = gpd.GeoDataFrame(pd.DataFrame(), geometry=[geom, geom])
         imod.gen.write(basepath / "first.gen", gdf)
-        imod.gen.write(basepath / "second.gen", gdf)
+
+        # Write second GEN as ASCII
+        gen_content = textwrap.dedent(
+            """
+        1
+          1.0, 0.0
+          1.0, 1.0
+          2.0, 0.0
+        END
+        END
+        """
+        )
+        gdf = gpd.GeoDataFrame(pd.DataFrame(), geometry=[geom, geom])
+        with open(basepath / "second.gen", "w") as f:
+            f.write(gen_content)
 
         da = xr.DataArray(
             data=[[0.0, 1.0], [2.0, 3.0]],

@@ -110,7 +110,7 @@ class BasicFlow(Package):
             d["name"] = "top"
             d["directory"] = directory
             d["extension"] = ".idf"
-            value = self._compose(d)
+            value = self._compose_path(d)
         else:
             if not da.shape == ():
                 raise ValueError("Top should either be 2d or a scalar value")
