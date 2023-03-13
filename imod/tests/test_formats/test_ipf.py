@@ -430,12 +430,18 @@ def test_unique_ids_per_layer(tmp_path):
             "layer": [1, 3, 1, 3],
         }
     )
-    with pytest.raises(ValueError, match="Multiple layer values for a single ID detected. Unique IDs are required for each layer."):
+    with pytest.raises(
+        ValueError,
+        match="Multiple layer values for a single ID detected. Unique IDs are required for each layer.",
+    ):
         ipf.save(tmp_path / "save.ipf", df, nodata=-999.0)
 
     # With time
     df["time"] = pd.to_datetime("2000-01-01")
-    with pytest.raises(ValueError, match="Multiple layer values for a single ID detected. Unique IDs are required for each layer."):
+    with pytest.raises(
+        ValueError,
+        match="Multiple layer values for a single ID detected. Unique IDs are required for each layer.",
+    ):
         ipf.save(tmp_path / "save.ipf", df, nodata=-999.0)
 
 
