@@ -656,9 +656,9 @@ class ImodflowModel(Model):
                 try:
                     pkg.save(directory=directory / pkgname)
                 except Exception as error:
-                    raise RuntimeError(
-                        f"An error occured during saving of package: {pkgname}."
-                    ) from error
+                    raise type(error)(
+                        f"{error}/nAn error occured during saving of package: {pkgname}."
+                    )
 
     def _check_top_bottom(self):
         """Check whether bottom of a layer does not exceed a top somewhere."""
