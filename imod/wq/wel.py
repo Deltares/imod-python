@@ -4,8 +4,6 @@ import jinja2
 import numpy as np
 
 import imod
-from imod import util
-from imod.wq import timeutil
 from imod.wq.pkgbase import BoundaryCondition
 
 
@@ -218,6 +216,8 @@ class Well(BoundaryCondition):
         return
 
     def save(self, directory):
+        directory = Path(directory)
+
         all_species = [None]
         if "concentration" in self.dataset.data_vars:
             if "species" in self.dataset["concentration"].coords:
@@ -235,7 +235,7 @@ class Well(BoundaryCondition):
                     ds = self.dataset
 
                 df = ds.to_dataframe().rename(columns={"id_name": "id"})
-                name = f"concentration"
+                name = "concentration"
                 if species is not None:
                     name = f"{name}_c{species}"
                 self._save_layers(df, directory, name, "concentration")
