@@ -104,7 +104,8 @@ class LakeData(LakeApi_Base):
         self.dataset["bottom_elevation"] = bot_elevation
         self.dataset["connection_length"] = connection_length
         self.dataset["connection_width"] = connection_width
-        self.dataset["lake_table"] = lake_table
+        if lake_table is not None:
+            self.dataset["lake_table"] = lake_table.to_array()
 
         # timeseries data
 
@@ -336,6 +337,12 @@ def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
     )
     out = out.assign_coords(index=list_of_indices)
     return out
+
+    
+def _add_lake_tables( lakes):
+    for lake in lakes:
+        pass
+
 
 
 class Lake(BoundaryCondition):
@@ -662,6 +669,8 @@ class Lake(BoundaryCondition):
         ts_rough=None,
         ts_width=None,
         ts_slope=None,
+        # lake tables
+        lake_tables = None,
         # options
         print_input=False,
         print_stage=False,
@@ -801,6 +810,7 @@ class Lake(BoundaryCondition):
         package_content["package_convergence_filename"] = package_convergence_filename
         package_content["time_conversion"] = time_conversion
         package_content["length_conversion"] = length_conversion
+        _add_lake_tables( lakes)
         return mf6.Lake(**package_content)
 
     def _has_outlets(self):

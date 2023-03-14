@@ -2,7 +2,7 @@
 import xarray as xr
 import pytest
 import numpy as np
-    
+
 from imod.mf6.lak import (
     Lake,
     LakeData,
@@ -10,35 +10,60 @@ from imod.mf6.lak import (
 
 )
 
+def create_lake_table(number_rows, starting_stage, starting_sarea, starting_volume):
+    rownumbers = range(0,number_rows)
+    lake_table = xr.Dataset( coords={"row": rownumbers})
+    lake_table["stage"] = xr.DataArray(coords= {"row": rownumbers}, data=[float (i) for i in range(starting_stage, starting_stage+number_rows)])
+    lake_table["volume"] = xr.DataArray(coords= {"row": rownumbers},data=[float (i) for i in range(starting_volume, starting_volume+number_rows)])
+    lake_table["sarea"] = xr.DataArray(coords= {"row": rownumbers}, data=[float (i) for i in range(starting_sarea, starting_sarea+number_rows)])   
+    return lake_table
+
 @pytest.fixture(scope="function")
 def naardermeer(basic_dis):
-    idomain, _, _ = basic_dis
-    is_lake = xr.full_like(idomain, False, dtype=bool)
-    is_lake[0, 1, 1] = True
-    is_lake[0, 1, 2] = True
-    is_lake[0, 2, 2] = True
-    return create_lake_data(is_lake, starting_stage=11.0, name="Naardermeer")
-
+    def _naardermeer(has_lake_table=False):    
+        idomain, _, _ = basic_dis
+        is_lake = xr.full_like(idomain, False, dtype=bool)
+        is_lake[0, 1, 1] = True
+        is_lake[0, 1, 2] = True
+        is_lake[0, 2, 2] = True
+        lake_table = create_lake_table(3, 5, 5, 5)    
+        if has_lake_table:
+              lake_table = create_lake_table(3, 5, 5, 5)
+        return  create_lake_data(
+                is_lake,
+                starting_stage=11.0,
+                name="Naardermeer",
+                lake_table = lake_table
+            )
+    return _naardermeer            
 
 @pytest.fixture(scope="function")
 def ijsselmeer(basic_dis):
-    idomain, _, _ = basic_dis
-    is_lake = xr.full_like(idomain, False, dtype=bool)
-    is_lake[0, 4, 4] = True
-    is_lake[0, 4, 5] = True
-    is_lake[0, 5, 5] = True
-    return create_lake_data(
-        is_lake,
-        starting_stage=15.0,
-        name="IJsselmeer",
-    )
+    def _ijsselmeer(has_lake_table=False):
+        idomain, _, _ = basic_dis
+        is_lake = xr.full_like(idomain, False, dtype=bool)
+        is_lake[0, 4, 4] = True
+        is_lake[0, 4, 5] = True
+        is_lake[0, 5, 5] = True
+        lake_table = None
+        if has_lake_table:
+            lake_table = create_lake_table(3, 5, 5, 5)
+        return  create_lake_data(
+                is_lake,
+                starting_stage=15.0,
+                name="IJsselmeer",
+                lake_table = lake_table
+            )
+    return _ijsselmeer
 
 
 @pytest.fixture(scope="function")
 def lake_package(naardermeer, ijsselmeer):
     outlet1 = OutletManning("Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
     outlet2 = OutletManning("IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
-    return Lake.from_lakes_and_outlets([naardermeer, ijsselmeer], [outlet1, outlet2])
+    return Lake.from_lakes_and_outlets([naardermeer(), ijsselmeer()], [outlet1, outlet2])
+
+
 
 
 def create_lake_data(
@@ -53,6 +78,7 @@ def create_lake_data(
     inflow=None,
     withdrawal=None,
     auxiliary=None,
+    lake_table=None
 ):
     HORIZONTAL = 0
     connection_type = xr.full_like(is_lake, HORIZONTAL, dtype=np.floating).where(
@@ -80,6 +106,7 @@ def create_lake_data(
         inflow=inflow,
         withdrawal=withdrawal,
         auxiliary=auxiliary,
+        lake_table=lake_table
     )
 
 

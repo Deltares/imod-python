@@ -20,7 +20,7 @@ import imod.tests.fixtures.mf6_lake_package_fixture as mf_lake
 def test_alternative_constructor(naardermeer, ijsselmeer):
     outlet1 = OutletManning("Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
     outlet2 = OutletManning("IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
-    actual = Lake.from_lakes_and_outlets([naardermeer, ijsselmeer], [outlet1, outlet2])
+    actual = Lake.from_lakes_and_outlets([naardermeer(), ijsselmeer()], [outlet1, outlet2])
     _ = actual.render(None, None, None, False)
     assert isinstance(actual, Lake)
 
@@ -95,7 +95,7 @@ def test_lake_write(tmp_path, naardermeer, ijsselmeer):
     outlet2 = OutletManning("IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
 
     lake_package = Lake.from_lakes_and_outlets(
-        [naardermeer, ijsselmeer], [outlet1, outlet2]
+        [naardermeer(), ijsselmeer()], [outlet1, outlet2]
     )
     actual = write_and_read(lake_package, tmp_path, "lake-test")
     expected = textwrap.dedent(
