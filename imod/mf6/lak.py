@@ -93,6 +93,7 @@ class LakeData(LakeApi_Base):
         inflow=None,
         withdrawal=None,
         auxiliary=None,
+        lake_table=None
     ):
         super().__init__()
         self.dataset["starting_stage"] = starting_stage
@@ -103,6 +104,7 @@ class LakeData(LakeApi_Base):
         self.dataset["bottom_elevation"] = bot_elevation
         self.dataset["connection_length"] = connection_length
         self.dataset["connection_width"] = connection_width
+        self.dataset["lake_table"] = lake_table
 
         # timeseries data
 
