@@ -43,9 +43,9 @@ class MobileStorageTransfer(Package):
         Indicates that recharge flow terms will be written to the file specified
         with "BUDGET FILEOUT" in Output Control.
         Default is False.
-    first_order_decay: bool, optional
+    zero_order_decay: bool, optional
         Requires decay to be specified
-    second_order_decay: bool, optional
+    first_order_decay: bool, optional
         Requires decay to be specified
     sorption: ({linear, freundlich, langmuir}, optional)
         Type of sorption, if any.
@@ -74,6 +74,8 @@ class MobileStorageTransfer(Package):
         "bulk_density": [DTypeSchema(np.floating), IndexesSchema(), PKG_DIMS_SCHEMA],
         "distcoef": [DTypeSchema(np.floating), IndexesSchema(), PKG_DIMS_SCHEMA],
         "sp2": [DTypeSchema(np.floating), IndexesSchema(), PKG_DIMS_SCHEMA],
+        "zero_order_decay": [DTypeSchema(np.bool_)],
+        "first_order_decay": [DTypeSchema(np.bool_)],
     }
 
     _write_schemata = {
@@ -102,8 +104,8 @@ class MobileStorageTransfer(Package):
         distcoef=None,
         sp2=None,
         save_flows=False,
-        zero_order_decay=False,
-        first_order_decay=False,
+        zero_order_decay: bool = False,
+        first_order_decay: bool = False,
         sorption=None,
         validate: bool = True,
     ):
