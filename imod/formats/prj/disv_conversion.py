@@ -146,7 +146,7 @@ class SingularTargetRegridderWeightsCache:
 def raise_on_layer(value, variable: str):
     da = value[variable]
     if "layer" in da.dims:
-        raise ValueError(f"{variable} should not be ass")
+        raise ValueError(f"{variable} should not be assigned a layer")
     return da
 
 
