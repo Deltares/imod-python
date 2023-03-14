@@ -101,6 +101,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+        self.dataset["repeat_stress"] = repeat_stress
 
         if concentration is not None:
             self.dataset["concentration"] = concentration
