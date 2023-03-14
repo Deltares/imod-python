@@ -45,7 +45,7 @@ def approximately_equal(a: sg.Polygon, b: sg.Polygon) -> bool:
 
 
 def test_gen_invalid_feature_string():
-    from imod.gen.gen import vertices
+    from imod.formats.gen.gen import vertices
 
     geom = TEST_GEOMETRIES["circle"]
     string = "cicle"
@@ -60,7 +60,7 @@ def test_gen_invalid_feature_string():
 
 
 def test_gen_invalid_feature_type():
-    from imod.gen.gen import vertices
+    from imod.formats.gen.gen import vertices
 
     geom = sg.MultiPoint(
         [
@@ -74,7 +74,7 @@ def test_gen_invalid_feature_type():
 
 
 def test_gen_shapely_gen_conversion():
-    from imod.gen.gen import (
+    from imod.formats.gen.gen import (
         from_circle,
         from_rectangle,
         to_circle,
@@ -187,3 +187,153 @@ def test_gen_empty_column(tmp_path):
     gdf["empty"] = None
     path = tmp_path / "empty-column.gen"
     imod.gen.write(path, gdf)
+
+
+def test_parse_ascii_points():
+    from imod.formats.gen.gen import parse_ascii_points
+
+    lines = [
+        "1, 0.0, 0.0",
+        "2, 1.0, 0.0",
+        "3, 2.0, 0.0",
+        "10, 0.0, 1.0",
+        "11, 0.0, 2.0",
+        "END",
+    ]
+    gdf = parse_ascii_points(lines)
+    assert isinstance(gdf, gpd.GeoDataFrame)
+    assert (gdf.geometry.geom_type == "Point").all()
+    assert np.array_equal(gdf["id"], [1, 2, 3, 10, 11])
+
+
+def test_parse_ascii_segment_linestrings():
+    from imod.formats.gen.gen import parse_ascii_segments
+
+    lines = [
+        "1",
+        "0.0, 0.0",
+        "1.0, 1.0",
+        "end",
+        "2",
+        "0.0, 0.0",
+        "1.0, 1.0",
+        "2.0, 3.0",
+        "end",
+        "end",
+    ]
+    gdf = parse_ascii_segments(lines)
+    assert isinstance(gdf, gpd.GeoDataFrame)
+    assert (gdf.geometry.geom_type == "LineString").all()
+    assert not gdf.geometry.has_z.any()
+    assert np.array_equal(gdf["id"], [1, 2])
+
+
+def test_parse_ascii_segment_polygon():
+    from imod.formats.gen.gen import parse_ascii_segments
+
+    lines = [
+        "1",
+        "0.0, 0.0",
+        "1.0, 1.0",
+        "2.0, 2.0",
+        "0.0, 0.0",
+        "end",
+        "2",
+        "0.0, 0.0",
+        "1.0, 1.0",
+        "2.0, 3.0",
+        "0.0, 0.0",
+        "end",
+        "end",
+    ]
+    gdf = parse_ascii_segments(lines)
+    assert isinstance(gdf, gpd.GeoDataFrame)
+    assert (gdf.geometry.geom_type == "Polygon").all()
+    assert not gdf.geometry.has_z.any()
+    assert np.array_equal(gdf["id"], [1, 2])
+
+
+def test_parse_ascii_segment_linestrings3d():
+    from imod.formats.gen.gen import parse_ascii_segments
+
+    lines = [
+        "1",
+        "0.0, 0.0, 10.0",
+        "1.0, 1.0, 10.0",
+        "end",
+        "2",
+        "0.0, 0.0, 10.0",
+        "1.0, 1.0, 10.0",
+        "2.0, 3.0, 10.0",
+        "end",
+        "end",
+    ]
+    gdf = parse_ascii_segments(lines)
+    assert isinstance(gdf, gpd.GeoDataFrame)
+    assert (gdf.geometry.geom_type == "LineString").all()
+    assert gdf.geometry.has_z.all()
+    assert np.array_equal(gdf["id"], [1, 2])
+
+
+def test_parse_ascii_segment_mixed_topology_error():
+    from imod.formats.gen.gen import parse_ascii_segments
+
+    with pytest.raises(ValueError, match="Some features are linestrings"):
+        lines = [
+            "1",
+            "0.0, 0.0",
+            "1.0, 1.0",
+            "end",
+            "2",
+            "0.0, 0.0",
+            "1.0, 1.0",
+            "2.0, 3.0",
+            "0.0, 0.0",
+            "end",
+            "end",
+        ]
+        parse_ascii_segments(lines)
+
+
+def test_read_ascii(tmp_path):
+    from imod.formats.gen.gen import read_ascii
+
+    lines = [
+        "1, 0.0, 0.0",
+        "2, 1.0, 0.0",
+        "3, 2.0, 0.0",
+        "10, 0.0, 1.0",
+        "11, 0.0, 2.0",
+        "END",
+    ]
+    path = tmp_path / "ascii-points.gen"
+    with open(path, "w") as f:
+        f.write("\n".join(lines))
+
+    gdf = read_ascii(path)
+    assert isinstance(gdf, gpd.GeoDataFrame)
+    assert (gdf.geometry.geom_type == "Point").all()
+    assert np.array_equal(gdf["id"], [1, 2, 3, 10, 11])
+
+    lines = [
+        "1",
+        "0.0, 0.0, 10.0",
+        "1.0, 1.0, 10.0",
+        "END",
+        "2",
+        "0.0, 0.0, 10.0",
+        "1.0, 1.0, 10.0",
+        "2.0, 3.0, 10.0",
+        "end",
+        "END",
+    ]
+
+    path = tmp_path / "ascii-segments.gen"
+    with open(path, "w") as f:
+        f.write("\n".join(lines))
+
+    gdf = read_ascii(path)
+    assert isinstance(gdf, gpd.GeoDataFrame)
+    assert (gdf.geometry.geom_type == "LineString").all()
+    assert gdf.geometry.has_z.all()
+    assert np.array_equal(gdf["id"], [1, 2])

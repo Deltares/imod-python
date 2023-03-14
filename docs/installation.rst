@@ -63,7 +63,7 @@ Spatial operations:
 Geospatial libaries (optional):
 
 * `geopandas <https://geopandas.org/en/stable/>`__
-* `pygeos <https://pygeos.readthedocs.io/en/stable/>`__
+* `shapely <https://shapely.readthedocs.io/en/stable/manual.html>`__
 * `pyproj <https://pyproj4.github.io/pyproj/stable/>`__
 * `rasterio <https://rasterio.readthedocs.io/en/latest/>`__
 

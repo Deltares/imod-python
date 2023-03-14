@@ -169,6 +169,13 @@ class DimsSchema(BaseSchema):
                     for i in self.dims
                 )
             )
+        elif "{edge_dim}" in self.dims and isinstance(obj, xu.UgridDataArray):
+            return tuple(
+                (
+                    obj.ugrid.grid.edge_dimension if i == "{edge_dim}" else i
+                    for i in self.dims
+                )
+            )
         else:
             return self.dims
 
@@ -206,7 +213,10 @@ class IndexesSchema(BaseSchema):
         # Remove face dim from list to validate, as it has no ``indexes``
         # attribute.
         if isinstance(obj, xu.UgridDataArray):
-            dims_to_validate.remove(obj.ugrid.grid.face_dimension)
+            ugrid_dims = obj.ugrid.grid.dimensions
+            dims_to_validate = [
+                dim for dim in dims_to_validate if dim not in ugrid_dims
+            ]
 
         for dim in dims_to_validate:
             if len(obj.indexes[dim]) == 0:

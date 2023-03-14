@@ -6,15 +6,13 @@ raster formats.
 Currently only :func:`imod.rasterio.write` is implemented.
 """
 
-import glob
 import pathlib
 import warnings
 
 import numpy as np
 
 from imod import util
-
-from . import array_io
+from imod.formats import array_io
 
 # since rasterio is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
@@ -252,17 +250,7 @@ def open(path, use_cftime=False, pattern=None):
     remember. The website https://regex101.com is a nice help. Alternatively,
     the most pragmatic solution may be to just rename your files.
     """
-
-    if isinstance(path, list):
-        return array_io.reading._load(path, use_cftime, pattern, _read, header)
-    elif isinstance(path, pathlib.Path):
-        path = str(path)
-
-    paths = [pathlib.Path(p) for p in glob.glob(path)]
-    n = len(paths)
-    if n == 0:
-        raise FileNotFoundError(f"Could not find any files matching {path}")
-    return array_io.reading._load(paths, use_cftime, pattern, _read, header)
+    return array_io.reading._open(path, use_cftime, pattern, header, _read)
 
 
 def write(path, da, driver=None, nodata=np.nan, dtype=None):

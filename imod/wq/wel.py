@@ -1,10 +1,29 @@
+from pathlib import Path
+
 import jinja2
 import numpy as np
 
 import imod
-from imod import util
-from imod.wq import timeutil
 from imod.wq.pkgbase import BoundaryCondition
+
+
+def _column_order(df, variable):
+    """
+    Return ordered columns, and associated timeseries columns.
+    """
+    if "time" in df:
+        assoc_columns = ["time", variable]
+        if "layer" in df:
+            columns = ["x", "y", "id", "time", "layer", variable]
+        else:
+            columns = ["x", "y", "id", "time", variable]
+    else:
+        assoc_columns = None
+        if "layer" in df:
+            columns = ["x", "y", variable, "layer"]
+        else:
+            columns = ["x", "y", variable]
+    return columns, assoc_columns
 
 
 class Well(BoundaryCondition):
@@ -110,9 +129,9 @@ class Well(BoundaryCondition):
                 for layer in np.unique(self.dataset["layer"]):
                     layer = int(layer)
                     d["layer"] = layer
-                    values[layer] = self._compose(d)
+                    values[layer] = self._compose_path(d)
             else:
-                values["?"] = self._compose(d)
+                values["$"] = self._compose_path(d)
 
         else:
             d["time"] = time
@@ -122,9 +141,9 @@ class Well(BoundaryCondition):
                 select = np.argwhere((self.dataset["time"] == time).values)
                 for layer in np.unique(self.dataset["layer"].values[select]):
                     d["layer"] = layer
-                    values[layer] = self._compose(d)
+                    values[layer] = self._compose_path(d)
             else:
-                values["?"] = self._compose(d)
+                values["?"] = self._compose_path(d)
 
         if "layer" in self.dataset:
             # Compose does not accept non-integers, so use 0, then replace
@@ -143,51 +162,18 @@ class Well(BoundaryCondition):
 
     def _compose_values_time(self, directory, name, globaltimes, nlayer):
         # TODO: rename to _compose_values_timelayer?
-        values = {}
-        if "time" in self.dataset:
-            self_times = np.unique(self.dataset["time"].values)
-            if "stress_repeats" in self.dataset.attrs:
-                stress_repeats_keys = np.array(
-                    list(self.dataset.attrs["stress_repeats"].keys())
-                )
-                stress_repeats_values = np.array(
-                    list(self.dataset.attrs["stress_repeats"].values())
-                )
-                package_times, inds = np.unique(
-                    np.concatenate([self_times, stress_repeats_keys]), return_index=True
-                )
-                # Times to write in the runfile
-                runfile_times = np.concatenate([self_times, stress_repeats_values])[
-                    inds
-                ]
-            else:
-                runfile_times = package_times = self_times
-
-            starts_ends = timeutil.forcing_starts_ends(package_times, globaltimes)
-
-            for time, start_end in zip(runfile_times, starts_ends):
-                # Check whether any range occurs in the input.
-                # If does does, compress should be False
-                compress = not (":" in start_end)
-                values[start_end] = self._compose_values_layer(
-                    directory, nlayer=nlayer, name=name, time=time, compress=compress
-                )
-        else:  # for all periods
-            values["?"] = self._compose_values_layer(
-                directory, nlayer=nlayer, name=name
-            )
+        values = {"?": self._compose_values_layer(directory, nlayer=nlayer, name=name)}
         return values
 
     def _render(self, directory, globaltimes, system_index, nlayer):
         d = {"system_index": system_index}
-        name = directory.stem
-        d["wels"] = self._compose_values_time(directory, name, globaltimes, nlayer)
+        d["wels"] = self._compose_values_time(directory, "rate", globaltimes, nlayer)
         return self._template.render(d)
 
     def _render_ssm(self, directory, globaltimes, nlayer):
         if "concentration" in self.dataset.data_vars:
             d = {"pkg_id": self._pkg_id}
-            name = f"{directory.stem}-concentration"
+            name = "concentration"
             if "species" in self.dataset["concentration"].coords:
                 concentration = {}
                 for species in self.dataset["concentration"]["species"].values:
@@ -205,92 +191,63 @@ class Well(BoundaryCondition):
         else:
             return ""
 
-    def _save_layers(self, df, directory, time=None):
-        d = {"directory": directory, "name": directory.stem, "extension": ".ipf"}
-        d["directory"].mkdir(exist_ok=True, parents=True)
-
-        if time is not None:
-            d["time"] = time
-
-        if "layer" in df:
-            for layer, layerdf in df.groupby("layer"):
-                d["layer"] = layer
-                # Ensure right order
-                outdf = layerdf[["x", "y", "rate", "id_name"]]
-                path = self._compose(d)
-                imod.ipf.write(path, outdf)
-        else:
-            outdf = df[["x", "y", "rate", "id_name"]]
-            path = self._compose(d)
-            imod.ipf.write(path, outdf)
-
-    @staticmethod
-    def _save_layers_concentration(df, directory, name, time=None):
+    def _save_layers(self, df, directory, name, variable):
         d = {"directory": directory, "name": name, "extension": ".ipf"}
         d["directory"].mkdir(exist_ok=True, parents=True)
 
-        if time is not None:
-            d["time"] = time
+        if "time" in df:
+            itype = "timeseries"
+        else:
+            itype = None
 
+        columns, assoc_columns = _column_order(df, variable)
+        path = self._compose_path(d)
+        df = df[columns]
         if "layer" in df:
             for layer, layerdf in df.groupby("layer"):
-                d["layer"] = layer
-                # Ensure right order
-                outdf = layerdf[["x", "y", "concentration", "id_name"]]
-                path = util.compose(d)
-                imod.ipf.write(path, outdf)
+                # Ensure different IDs per layer are not overwritten.
+                layerdf["id"] = f"{name}_l{layer}/" + layerdf["id"].astype(str)
+                imod.ipf.save(
+                    path=path, df=layerdf, itype=itype, assoc_columns=assoc_columns
+                )
         else:
-            outdf = df[["x", "y", "concentration", "id_name"]]
-            path = util.compose(d)
-            imod.ipf.write(path, outdf)
+            imod.ipf.save(path=path, df=df, itype=itype, assoc_columns=assoc_columns)
+
+        return
 
     def save(self, directory):
+        directory = Path(directory)
+
         all_species = [None]
         if "concentration" in self.dataset.data_vars:
             if "species" in self.dataset["concentration"].coords:
                 all_species = self.dataset["concentration"]["species"].values
 
-        # Loop over species if applicable
-        for species in all_species:
-            if species is not None:
-                ds = self.dataset.sel(species=species)
-            else:
-                ds = self.dataset
+        df = self.dataset.to_dataframe().rename(columns={"id_name": "id"})
+        self._save_layers(df, directory, "rate", "rate")
 
-            if "time" in ds:
-                for time, timeda in ds.groupby("time"):
-                    timedf = timeda.to_dataframe()
-                    self._save_layers(timedf, directory, time=time)
-                    if "concentration" in ds.data_vars:
-                        name = f"{directory.stem}-concentration"
-                        if species is not None:
-                            name = f"{name}_c{species}"
-                        self._save_layers_concentration(
-                            timedf, directory, name, time=time
-                        )
-            else:
-                self._save_layers(ds.to_dataframe(), directory)
-                if "concentration" in ds.data_vars:
-                    name = f"{directory.stem}-concentration"
-                    if species is not None:
-                        name = f"{name}_c{species}"
-                    self._save_layers_concentration(timedf, directory, name)
+        # Loop over species if applicable
+        if "concentration" in self.dataset:
+            for species in all_species:
+                if species is not None:
+                    ds = self.dataset.sel(species=species)
+                else:
+                    ds = self.dataset
+
+                df = ds.to_dataframe().rename(columns={"id_name": "id"})
+                name = "concentration"
+                if species is not None:
+                    name = f"{name}_c{species}"
+                self._save_layers(df, directory, name, "concentration")
+
+        return
 
     def _pkgcheck(self, ibound=None):
         # TODO: implement
         pass
 
     def repeat_stress(self, stress_repeats, use_cftime=False):
-        # To ensure consistency, it isn't possible to use differing stress_repeatss
-        # between rate and concentration: the number of points might change
-        # between stress periods, and isn't especially easy to check.
-        if "time" not in self.dataset:
-            raise ValueError(
-                "This Wel package does not have time, cannot add stress_repeats."
-            )
-        # Replace both key and value by the right datetime type
-        d = {
-            timeutil.to_datetime(k, use_cftime): timeutil.to_datetime(v, use_cftime)
-            for k, v in stress_repeats.items()
-        }
-        self.dataset.attrs["stress_repeats"] = d
+        raise NotImplementedError(
+            "Well does not support repeated stresses: time-varying data is "
+            "saved into associated IPF files. Set explicit timeseries intead."
+        )

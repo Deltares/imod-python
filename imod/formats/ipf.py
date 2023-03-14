@@ -606,9 +606,9 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=Non
     Saves the contents of a pandas DataFrame to one or more IPF files, and
     associated (TXT) files.
 
-    Can write multiple IPF files if one of the columns is named "layer".
-    In turn, multiple associated (TXT) files may written for each of these IPF
-    files.
+    Can write multiple IPF files if one of the columns is named "layer". In
+    turn, multiple associated (TXT) files may written for each of these IPF
+    files. Note that the ID must be unique for each layer. See the examples.
 
     Parameters
     ----------
@@ -641,6 +641,23 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=Non
     -------
     None
         Writes files.
+
+    Examples
+    --------
+    To write a single IPF without associated timeseries or boreholes:
+
+    >>> imod.ipf.save("static-data.ipf", df)
+
+    To write timeseries data:
+
+    >>> imod.ipf.save("transient-data.ipf", df, itype="timeseries")
+
+    If a ``"layer"`` column is present, make sure the ID is unique per layer:
+
+    >>> df["id"] = df["id"].str.cat(df["layer"], sep="_")
+    >>> imod.ipf.save("layered.ipf", df, itype="timeseries")
+
+    An error will be raised otherwise.
     """
 
     path = pathlib.Path(path)
@@ -659,15 +676,21 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=Non
 
     df.columns = colnames
     if "layer" in colnames:
+        if "time" in colnames:
+            groupcols = ["time", "id"]
+        else:
+            groupcols = "id"
+
+        n_layer_per_id = df.groupby(groupcols)["layer"].nunique()
+        if (n_layer_per_id > 1).any():
+            raise ValueError(
+                "Multiple layer values for a single ID detected. "
+                "Unique IDs are required for each layer."
+            )
+
         for layer, group in df.groupby("layer"):
             d["layer"] = layer
             fn = util.compose(d)
-
-            # If associated files are present, make sure the different
-            # layers do not overwrite each other!
-            if itype is not None:
-                group["id"] = f"layer{layer}/" + group["id"].astype(str)
-
             _compose_ipf(fn, group, itype, assoc_ext, nodata, assoc_columns)
     else:
         fn = util.compose(d)
