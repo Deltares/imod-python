@@ -35,6 +35,10 @@ Changed
   overwritten by the second, and so forth.
 - :meth:`imod.wq.Well.save` will now write time varying data to associated
   files for extration rate and concentration.
+- Choosing ``method="geometric_mean"`` in the Regridder will now result in NaN
+  values in the regridded result if a geometric mean is computed over negative
+  values; in general, a geometric mean should only be computed over physical
+  quantities with a "true zero" (e.g. conductivity, but not elevation).
 
 [0.11.6] - 2023-02-01
 ---------------------
