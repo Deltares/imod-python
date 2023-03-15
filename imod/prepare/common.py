@@ -504,13 +504,13 @@ def geometric_mean(values, weights):
     for i in range(values.size):
         w = weights[i] / normsum
         v = values[i]
-        if np.isnan(v) or v == 0:
-            continue
-        elif v < 0:
-            return np.nan
-        if w > 0:
+        # Skip if v == 0, v is NaN or w == 0 (no contribution)
+        if v > 0 and w > 0:
             v_agg += w * np.log(abs(v))
             w_sum += w
+        # Do not reduce over negative values: would require complex numbers.
+        elif v < 0:
+            return np.nan
 
     if w_sum == 0:
         return np.nan
