@@ -47,7 +47,7 @@ def ijsselmeer(basic_dis):
         is_lake[0, 5, 5] = True
         lake_table = None
         if has_lake_table:
-            lake_table = create_lake_table(3, 5, 5, 5)
+            lake_table = create_lake_table(6, 8, 9, 10)
         return  create_lake_data(
                 is_lake,
                 starting_stage=15.0,
