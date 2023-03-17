@@ -296,6 +296,6 @@ class Modflow6Simulation(collections.UserDict):
     def get_models_of_type(self, modeltype):
         return {
             k: v
-            for k, v in self.items
+            for k, v in self.items()
             if isinstance(v, Modflow6Model) and (v._model_id == modeltype)
         }
