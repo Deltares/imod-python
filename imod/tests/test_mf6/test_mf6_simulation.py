@@ -16,10 +16,9 @@ def test_twri_roundtrip(twri_model, tmpdir_factory):
     roundtrip(twri_model, tmpdir_factory, "twri")
 
 
-# TODO: causes a bizarre validation error: rch-rate is dtyped np.int16?!
-# @pytest.mark.usefixtures("transient_twri_model")
-# def test_twri_transient_roundtrip(transient_twri_model, tmpdir_factory):
-#    roundtrip(transient_twri_model, tmpdir_factory, "twri_transient")
+@pytest.mark.usefixtures("transient_twri_model")
+def test_twri_transient_roundtrip(transient_twri_model, tmpdir_factory):
+    roundtrip(transient_twri_model, tmpdir_factory, "twri_transient")
 
 
 @pytest.mark.usefixtures("twri_disv_model")
