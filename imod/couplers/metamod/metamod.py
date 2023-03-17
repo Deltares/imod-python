@@ -7,6 +7,7 @@ from imod.couplers.metamod.node_svat_mapping import NodeSvatMapping
 from imod.couplers.metamod.rch_svat_mapping import RechargeSvatMapping
 from imod.couplers.metamod.wel_svat_mapping import WellSvatMapping
 from imod.mf6 import Modflow6Simulation
+from imod.mf6.model import Modflow6Model
 from imod.msw import GridData, MetaSwapModel, Sprinkling
 
 
@@ -217,7 +218,7 @@ class MetaMod:
         return [
             key
             for key, value in self.mf6_simulation.items()
-            if value._pkg_id == "model"
+            if isinstance(value, Modflow6Model)
         ]
 
     def _get_coupling_dict(

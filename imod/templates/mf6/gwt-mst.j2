@@ -1,13 +1,12 @@
 begin options
 {%- if print_flows is defined %}    print_flows{%- endif -%}
 {%- if first_order_decay is defined %}
-    FIRST_ORDER_DECAY{% endif %}
+  first_order_decay{% endif %}
 {%- if zero_order_decay is defined %}
-    ZERO_ORDER_DECAY{% endif %}
+  zero_order_decay{% endif %}
 {%- if sorption is defined %}
-    SORPTION  {{sorption}}{% endif %}
+  sorption {{sorption}}{% endif %}
 end options
-
 
 begin griddata
   porosity{% if porosity_layered %} layered{% endif %}

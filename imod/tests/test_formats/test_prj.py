@@ -29,6 +29,7 @@ def test_tokenize():
     assert prj._tokenize("That 's life'") == ["That", "s life"]
     assert prj._tokenize("That,'s life'") == ["That", "s life"]
     assert prj._tokenize("Thats life") == ["Thats", "life"]
+    assert prj._tokenize(r"windows\slash") == ["windows/slash"]
 
 
 class TestLineIterator:
@@ -131,7 +132,7 @@ def test_parse_time():
         ]
     )
     assert prj._parse_time(lines) == "steady-state"
-    assert prj._parse_time(lines) == "2000-01-01 00:00:00"
+    assert prj._parse_time(lines) == "2000-01-01"
     assert prj._parse_time(lines) == "2000-01-01 12:01:02"
 
     lines = prj._LineIterator([1, 2, 3])
@@ -314,6 +315,19 @@ def test_read_error(tmp_path):
         prj.read_projectfile(path)
 
 
+def test_process_time():
+    expected = datetime(2000, 1, 1, 0, 0, 0)
+    assert prj._process_time("2000-01-01") == expected
+    assert prj._process_time("2000-01-01 00:00:00") == expected
+    assert prj._process_time("01-01-2000", yearfirst=False) == expected
+    assert prj._process_time("01-01-2000 00:00:00", yearfirst=False) == expected
+
+    with pytest.raises(ValueError, match="time data"):
+        prj._process_time("2000-01-01 00:00")
+    with pytest.raises(ValueError, match="time data"):
+        prj._process_time("2000-01-01 00:00", yearfirst=False)
+
+
 class TestProjectFile:
     @pytest.fixture(autouse=True)
     def setup(self, tmp_path_factory):
@@ -390,6 +404,17 @@ class TestProjectFile:
              1,2, 001, 1.0, 0.0, -999.9900 ,"{basepath}/wells_l1.ipf"
              1,2, 002, 1.0, 0.0, -999.9900 ,"{basepath}/wells_l2.ipf"
 
+            003,(RCH),1
+            1900-01-01
+            001,001
+             1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/rch.idf",
+            summer
+            001,001
+             1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/rch.idf",
+            winter
+            001,001
+             1,2, 001, 1.0, 0.0, -999.9900,"{basepath}/rch.idf",
+
             0001,(HFB),1, Horizontal Flow Barrier,[HFB]
             001,002
              1,2, 000, 100000.0, 1.0, -999.9900 ,"{basepath}/first.gen"
@@ -408,7 +433,6 @@ class TestProjectFile:
              DAMPPCGT=1.000000
              IQERROR= 0
              QERROR=  0.1000000
-
 
             Periods
             summer
@@ -455,6 +479,7 @@ class TestProjectFile:
             dims=["y", "x"],
         )
         imod.idf.save(basepath / "a", da)
+        imod.idf.save(basepath / "rch", da)
         imod.idf.save(basepath / "cond", da)
         imod.idf.save(basepath / "head", da)
 
@@ -474,17 +499,45 @@ class TestProjectFile:
         assert isinstance(content, dict)
 
     def test_open_projectfile_data(self):
-        content = imod.prj.open_projectfile_data(self.prj_path)
+        content, repeats = imod.prj.open_projectfile_data(self.prj_path)
         assert isinstance(content, dict)
+        assert isinstance(repeats, dict)
         assert isinstance(content["ghb"]["conductance"], xr.DataArray)
         assert isinstance(content["ghb"]["head"], xr.DataArray)
+        assert isinstance(content["rch"]["rate"], xr.DataArray)
         assert isinstance(content["cap"]["landuse"], xr.DataArray)
         assert isinstance(content["wel-1"]["dataframe"], pd.DataFrame)
         assert isinstance(content["wel-2"]["dataframe"], pd.DataFrame)
         assert isinstance(content["hfb-1"]["geodataframe"], gpd.GeoDataFrame)
         assert isinstance(content["hfb-2"]["geodataframe"], gpd.GeoDataFrame)
         assert isinstance(content["pcg"], dict)
-        assert content["periods"] == {
-            "summer": datetime(1900, 4, 1),
-            "winter": datetime(1900, 10, 1),
-        }
+        assert set(repeats["rch"]) == set([datetime(1900, 4, 1), datetime(1900, 10, 1)])
+
+
+def test_read_timfile(tmp_path):
+    content = textwrap.dedent(
+        """
+    00000000000000, 1
+    20200101010000, 0
+    20200102020000, 1, 2
+    20200103030000, 1, 2, 3.0
+    """
+    )
+
+    path = tmp_path / "mytimes.tim"
+    with open(path, "w") as f:
+        f.write(content)
+
+    timcontent = imod.prj.read_timfile(path)
+    expected = [
+        {"time": None, "save": True},
+        {"time": datetime(2020, 1, 1, 1, 0, 0), "save": False},
+        {"time": datetime(2020, 1, 2, 2, 0, 0), "save": True, "n_timestep": 2},
+        {
+            "time": datetime(2020, 1, 3, 3, 0, 0),
+            "save": True,
+            "n_timestep": 2,
+            "timestep_multiplier": 3.0,
+        },
+    ]
+    assert timcontent == expected

@@ -1,20 +1,24 @@
 import abc
 import collections
+import inspect
 import pathlib
 from copy import deepcopy
 
 import cftime
 import jinja2
 import numpy as np
+import tomli
+import tomli_w
+import xugrid as xu
 
+import imod
 from imod.mf6 import qgs_util
+from imod.mf6.pkgbase import Package
 from imod.mf6.validation import validation_model_error_message
 from imod.schemata import ValidationError
 
 
 class Modflow6Model(collections.UserDict, abc.ABC):
-    _pkg_id = "model"
-
     def __setitem__(self, key, value):
         if len(key) > 16:
             raise KeyError(
@@ -106,6 +110,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for pkg in self.values():
             if "time" in pkg.dataset.coords:
                 modeltimes.append(pkg.dataset["time"].values)
+            repeat_stress = pkg.dataset.get("repeat_stress")
+            if repeat_stress is not None and repeat_stress.values[()] is not None:
+                modeltimes.append(repeat_stress.isel(repeat_items=0).values)
         return modeltimes
 
     def render(self, modelname: str):
@@ -162,7 +169,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def write(
         self, directory, modelname, globaltimes, binary=True, validate: bool = True
-    ):
+    ) -> None:
         """
         Write model namefile
         Write packages
@@ -191,10 +198,55 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkgname}")
 
+        return
+
+    def dump(self, directory, modelname, validate: bool = True):
+        modeldirectory = pathlib.Path(directory) / modelname
+        modeldirectory.mkdir(exist_ok=True, parents=True)
+        if validate:
+            self._validate()
+
+        toml_content = collections.defaultdict(dict)
+        for pkgname, pkg in self.items():
+            pkg_path = f"{pkgname}.nc"
+            toml_content[type(pkg).__name__][pkgname] = pkg_path
+            dataset = pkg.dataset
+            if isinstance(dataset, xu.UgridDataset):
+                pkg.dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
+            else:
+                pkg.dataset.to_netcdf(modeldirectory / pkg_path)
+
+        toml_path = modeldirectory / f"{modelname}.toml"
+        with open(toml_path, "wb") as f:
+            tomli_w.dump(toml_content, f)
+
+        return toml_path
+
+    @classmethod
+    def from_file(cls, toml_path):
+        pkg_classes = {
+            name: pkg_cls
+            for name, pkg_cls in inspect.getmembers(imod.mf6, inspect.isclass)
+            if issubclass(pkg_cls, Package)
+        }
+
+        toml_path = pathlib.Path(toml_path)
+        with open(toml_path, "rb") as f:
+            toml_content = tomli.load(f)
+
+        parentdir = toml_path.parent
+        instance = cls()
+        for key, entry in toml_content.items():
+            for pkgname, path in entry.items():
+                pkg_cls = pkg_classes[key]
+                instance[pkgname] = pkg_cls.from_file(parentdir / path)
+
+        return instance
+
 
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
-    _model_type = "gwf6"
+    _model_id = "gwf6"
 
     def __init__(
         self,
@@ -273,7 +325,7 @@ class GroundwaterTransportModel(Modflow6Model):
     """
 
     _mandatory_packages = ("mst", "dsp", "oc", "ic")
-    _model_type = "gwt6"
+    _model_id = "gwt6"
 
     def __init__(
         self,

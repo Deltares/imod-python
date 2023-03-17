@@ -1,5 +1,4 @@
 import abc
-import math
 import numbers
 import pathlib
 from collections import defaultdict
@@ -10,6 +9,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
+import imod
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
 
@@ -104,15 +104,7 @@ class Package(abc.ABC):
 
         Refer to the xarray documentation for the possible keyword arguments.
         """
-
         path = pathlib.Path(path)
-
-        # See https://stackoverflow.com/a/2169191
-        # We expect the data in the netcdf has been saved a a package
-        # thus the checks run by __init__ and __setitem__ do not have
-        # to be called again.
-        return_cls = cls.__new__(cls)
-
         if path.suffix in (".zip", ".zarr"):
             # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
             dataset = xr.open_zarr(str(path), **kwargs)
@@ -122,9 +114,15 @@ class Package(abc.ABC):
         if dataset.ugrid_roles.topology:
             dataset = xu.UgridDataset(dataset)
 
-        return_cls.dataset = dataset
-        return_cls.remove_nans_from_dataset()
-        return return_cls
+        # Replace NaNs by None
+        for key, value in dataset.items():
+            stripped_value = value.values[()]
+            if isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value):
+                dataset[key] = None
+
+        instance = cls.__new__(cls)
+        instance.dataset = dataset
+        return instance
 
     def __init__(self, allargs=None):
         if allargs is not None:
@@ -515,13 +513,6 @@ class Package(abc.ABC):
             result.update(self._auxiliary_data)
         return result
 
-    def remove_nans_from_dataset(self):
-        for key, value in self.dataset.items():
-            if isinstance(value, xr.core.dataarray.DataArray):
-                if isinstance(value.values[()], numbers.Number):
-                    if math.isnan(value.values[()]):
-                        self.dataset[key] = None
-
 
 class BoundaryCondition(Package, abc.ABC):
     """
@@ -532,6 +523,27 @@ class BoundaryCondition(Package, abc.ABC):
     This class only supports `list input <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=19>`_,
     not the array input which is used in :class:`Package`.
     """
+
+    def set_repeat_stress(self, times) -> None:
+        """
+        Set repeat stresses: re-use data of earlier periods.
+
+        Parameters
+        ----------
+        times: Dict of datetime-like to datetime-like.
+            The data of the value datetime is used for the key datetime.
+        """
+        keys = [
+            imod.wq.timeutil.to_datetime(key, use_cftime=False) for key in times.keys()
+        ]
+        values = [
+            imod.wq.timeutil.to_datetime(value, use_cftime=False)
+            for value in times.values()
+        ]
+        self.dataset["repeat_stress"] = xr.DataArray(
+            data=np.column_stack((keys, values)),
+            dims=("repeat", "repeat_items"),
+        )
 
     def _max_active_n(self):
         """
@@ -579,12 +591,24 @@ class BoundaryCondition(Package, abc.ABC):
         if "time" in bin_ds:  # one of bin_ds has time
             package_times = bin_ds.coords["time"].values
             starts = np.searchsorted(globaltimes, package_times) + 1
-            for i, s in enumerate(starts):
+            for i, start in enumerate(starts):
                 path = directory / pkgname / f"{self._pkg_id}-{i}.{ext}"
-                periods[s] = path.as_posix()
+                periods[start] = path.as_posix()
+
+            repeat_stress = self.dataset.get("repeat_stress")
+            if repeat_stress is not None and repeat_stress.values[()] is not None:
+                keys = repeat_stress.isel(repeat_items=0).values
+                values = repeat_stress.isel(repeat_items=1).values
+                repeat_starts = np.searchsorted(globaltimes, keys) + 1
+                values_index = np.searchsorted(globaltimes, values) + 1
+                for i, start in zip(values_index, repeat_starts):
+                    periods[start] = periods[i]
+                # Now make sure the periods are sorted by key.
+                periods = dict(sorted(periods.items()))
         else:
             path = directory / pkgname / f"{self._pkg_id}.{ext}"
             periods[1] = path.as_posix()
+
         return periods
 
     def get_options(self, d, not_options=None):

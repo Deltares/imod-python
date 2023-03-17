@@ -22,8 +22,8 @@ from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition, Packa
 
 ALL_PACKAGES = [
     item
-    for _, item in inspect.getmembers(imod.mf6)
-    if inspect.isclass(item) and issubclass(item, Package)
+    for _, item in inspect.getmembers(imod.mf6, inspect.isclass)
+    if issubclass(item, Package)
 ]
 PACKAGES = [x for x in ALL_PACKAGES if not issubclass(x, BoundaryCondition)]
 BOUNDARY_PACKAGES = [
@@ -73,9 +73,7 @@ def get_darray(dtype):
 
 
 ALL_INSTANCES = [
-    imod.mf6.AdvectionUpstream(),
-    imod.mf6.AdvectionCentral(),
-    imod.mf6.AdvectionTVD(),
+    imod.mf6.adv.Advection("upstream"),
     imod.mf6.Buoyancy(
         reference_density=1000.0,
         reference_concentration=[4.0, 25.0],
@@ -89,7 +87,7 @@ ALL_INSTANCES = [
     # TODO: VerticesDiscretization(),
     imod.mf6.Dispersion(1e-4, 10.0, 10.0, 5.0, 2.0, 4.0, False, True),
     imod.mf6.InitialConditions(start=get_darray(np.float32)),
-    imod.mf6.SolutionPresetSimple(["gwf-1"]),
+    imod.mf6.SolutionPresetSimple(modelnames=["gwf-1"]),
     imod.mf6.MobileStorageTransfer(0.35, 0.01, 0.02, 1300.0, 0.1),
     imod.mf6.NodePropertyFlow(get_darray(np.int32), 3.0, True, 32.0, 34.0, 7),
     # TODO imod.mf6.OutputControl(),
