@@ -10,13 +10,17 @@ from imod.mf6.lak import (
 
 )
 
-def create_lake_table(number_rows, starting_stage, starting_sarea, starting_volume):
+def create_lake_table(number_rows, starting_stage, starting_sarea, starting_volume,starting_barea=None):
     rownumbers = range(0,number_rows)
     lake_table = xr.Dataset( coords={"row": rownumbers})
     lake_table["stage"] = xr.DataArray(coords= {"row": rownumbers}, data=[float (i) for i in range(starting_stage, starting_stage+number_rows)])
     lake_table["volume"] = xr.DataArray(coords= {"row": rownumbers},data=[float (i) for i in range(starting_volume, starting_volume+number_rows)])
     lake_table["sarea"] = xr.DataArray(coords= {"row": rownumbers}, data=[float (i) for i in range(starting_sarea, starting_sarea+number_rows)])   
-    return lake_table
+    if starting_barea is not None:
+        lake_table["barea"] = xr.DataArray(coords= {"row": rownumbers}, data=[float (i) for i in range(starting_barea, starting_barea+number_rows)])     
+    lake_table_array =  lake_table.to_array()
+    lake_table_array = lake_table_array.rename({"variable":"column"})
+    return lake_table_array
 
 @pytest.fixture(scope="function")
 def naardermeer(basic_dis):
@@ -26,9 +30,9 @@ def naardermeer(basic_dis):
         is_lake[0, 1, 1] = True
         is_lake[0, 1, 2] = True
         is_lake[0, 2, 2] = True
-        lake_table = create_lake_table(3, 5, 5, 5)    
+        lake_table = None
         if has_lake_table:
-              lake_table = create_lake_table(3, 5, 5, 5)
+              lake_table = create_lake_table(3, 4, 5, 6)
         return  create_lake_data(
                 is_lake,
                 starting_stage=11.0,
@@ -108,5 +112,12 @@ def create_lake_data(
         auxiliary=auxiliary,
         lake_table=lake_table
     )
+
+def write_and_read(package, path, filename, globaltimes=None) -> str:
+    package.write(path, filename, globaltimes, False)
+    with open(path / f"{filename}.lak") as f:
+        actual = f.read()
+    return actual
+
 
 

@@ -107,7 +107,7 @@ class LakeData(LakeApi_Base):
 
         self.dataset["lake_table"] = None
         if lake_table is not None:
-            self.dataset["lake_table"] = lake_table.to_array()
+            self.dataset["lake_table"] = lake_table
 
         # timeseries data
 
@@ -353,19 +353,11 @@ def join_lake_tables(lake_numbers,  lakes):
     for i in range(nr_lakes):
         if lakes[i]["lake_table"] is not None:
            lake_number = lake_numbers[i]
-           lakes[i]["lake_table"] = lakes[i]["lake_table"].expand_dims(dim = {"lake_number":[lake_number]})
-           lake_tables.append(lakes[i]["lake_table"])
+           lakes[i]["lake_table"] = lakes[i]["lake_table"].expand_dims(dim = {"lake_nr":[lake_number]})
+           lake_tables.append(lakes[i]["lake_table"].copy(deep=True))
         
-    return xr.combine_by_coords(lake_tables)
-    
-                                    
-    
-
-
-
-    
-
-    
+    result = xr.merge(lake_tables, compat='no_conflicts')
+    return result["lake_table"]
 
 
 
@@ -475,6 +467,9 @@ class Lake(BoundaryCondition):
     ts_slope: array of floats (xr.DataArray, optional)
         timeserie used to specify the bed slope for the lake outlet. A specified SLOPE value is only used for active lakes
         if COUTTYPE for lake outlet OUTLETNO is MANNING.
+
+    lake_tables:  array of floats (xr.DataArray, optional)
+        the array contains the lake tables- for those lakes that have them
 
 
     print_input: ({True, False}, optional)
@@ -770,6 +765,8 @@ class Lake(BoundaryCondition):
         self.dataset["ts_width"] = ts_width
         self.dataset["ts_slope"] = ts_slope
 
+        self.dataset["lake_tables"] = lake_tables
+
         self._validate_init_schemata(validate)
 
     @staticmethod
@@ -834,7 +831,7 @@ class Lake(BoundaryCondition):
         package_content["package_convergence_filename"] = package_convergence_filename
         package_content["time_conversion"] = time_conversion
         package_content["length_conversion"] = length_conversion
-        join_lake_tables(lake_numbers, lakes)
+        package_content["lake_tables"] = join_lake_tables(lake_numbers, lakes)
         return mf6.Lake(**package_content)
 
     def _has_outlets(self):
@@ -846,6 +843,14 @@ class Lake(BoundaryCondition):
         ):
             return False
         return True
+    
+    def _has_tables(self):
+        # item() will not work here if the object is an array.
+        # .values[()] will simply return the full numpy array.
+        tables = self.dataset["lake_tables"].values[()]
+        if any([ pd.api.types.is_numeric_dtype(t) for t in tables  ]):
+            return True
+        return False    
 
     def _has_timeseries(self):
         for name in self._period_data:
@@ -886,11 +891,10 @@ class Lake(BoundaryCondition):
                 d[var] = value
 
         d["nlakes"] = len(self.dataset["lake_number"])
+        d["noutlets"] = 0
         if self._has_outlets():
             d["noutlets"] = len(self.dataset["outlet_lakein"])
-        else:
-            d["noutlets"] = 0
-        d["ntables"] = 0
+
 
         packagedata = []
         for name, number, stage in zip(
@@ -970,6 +974,9 @@ class Lake(BoundaryCondition):
                 self._connection_dataframe(),
                 "connectiondata",
             )
+            if self._has_tables():
+                lake_number_to_filename = self._write_laketable_filelist_section(f)
+                self._write_laketable_files(directory, lake_number_to_filename)
 
             if self._has_outlets():
                 f.write("\n")
@@ -1046,10 +1053,54 @@ class Lake(BoundaryCondition):
         return
 
     def fill_stress_perioddata(self):
+        #this function is called from packagebase and should do nothing in this context
         return
 
     def write_perioddata(self, directory, pkgname, binary):
+        #this function is called from packagebase and should do nothing in this context        
         return
+    
+    def _write_laketable_filelist_section(self, f,):
+
+        lake_number_to_lake_table_filename = {}
+        f.write("tables  \n") 
+        for name, number in zip(
+            self.dataset["lake_boundname"],
+            self.dataset["lake_number"],
+        ):
+            lake_number = number.values[()]
+            lake_name = name.values[()]
+
+            if lake_number in self.dataset["lake_tables"].coords["lake_nr"].values:
+                table_file = lake_name + ".ltbl"
+                f.write(f"   {lake_number}  TAB6 FILEIN {table_file}\n")
+                lake_number_to_lake_table_filename[lake_number] = table_file
+        return lake_number_to_lake_table_filename
+
+
+    def _write_laketable_files(self, directory,  lake_number_to_filename):
+        for num, file in lake_number_to_filename.items():
+            table = self.dataset["lake_tables"].sel({"lake_nr":num,})
+            ncol = 3
+            stage_col = table.sel({"column":"stage"})
+            if "barea" in table.coords["column"]:
+                ncol = 4
+            nrow = stage_col.where(pd.api.types.is_numeric_dtype).count().values[()]
+
+            fullpath_laketable = directory /file 
+            with open(fullpath_laketable, "w") as table_file:
+                table_file.write("BEGIN DIMENSIONS\n")
+                table_file.write(f"NROW {nrow}\n")
+                table_file.write(f"NCOL {ncol}\n")     
+                table_file.write("END DIMENSIONS\n") 
+                table_file.write("begin table\n") 
+
+                table_dataframe = pd.DataFrame(table.transpose())
+                string_table = table_dataframe.iloc[range(nrow), range(ncol)].to_string( header=False, index=False)
+                table_file.write(string_table)
+                table_file.write("end table\n")                 
+                                     
+
 
     def _write_table_section(
         self, f, dataframe: pd.DataFrame, title: str, index: bool = False

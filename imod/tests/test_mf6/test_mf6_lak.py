@@ -25,11 +25,6 @@ def test_alternative_constructor(naardermeer, ijsselmeer):
     assert isinstance(actual, Lake)
 
 
-def write_and_read(package, path, filename, globaltimes=None) -> str:
-    package.write(path, filename, globaltimes, False)
-    with open(path / f"{filename}.lak") as f:
-        actual = f.read()
-    return actual
 
 
 def test_lake_render(lake_package):
@@ -97,7 +92,7 @@ def test_lake_write(tmp_path, naardermeer, ijsselmeer):
     lake_package = Lake.from_lakes_and_outlets(
         [naardermeer(), ijsselmeer()], [outlet1, outlet2]
     )
-    actual = write_and_read(lake_package, tmp_path, "lake-test")
+    actual = mf_lake.write_and_read(lake_package, tmp_path, "lake-test")
     expected = textwrap.dedent(
         """\
         begin options
@@ -206,7 +201,7 @@ def test_lake_write_disv_three_lakes(tmp_path):
         connection_length,
     )
 
-    actual = write_and_read(lake, tmp_path, "lake-test")
+    actual = mf_lake.write_and_read(lake, tmp_path, "lake-test")
     expected = textwrap.dedent(
         """\
         begin options
@@ -289,7 +284,7 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
             np.datetime64("2000-05-01"),
         ]
     )
-    actual = write_and_read(lake_package, tmp_path, "lake-test", global_times)
+    actual = mf_lake.write_and_read(lake_package, tmp_path, "lake-test", global_times)
     expected = textwrap.dedent(
         """\
         begin options
@@ -438,7 +433,7 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
             np.datetime64("2000-05-01"),
         ]
     )
-    actual = write_and_read(lake_package, tmp_path, "lake-test", global_times)
+    actual = mf_lake.write_and_read(lake_package, tmp_path, "lake-test", global_times)
 
     expected = textwrap.dedent(
         """\
