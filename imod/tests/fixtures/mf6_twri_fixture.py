@@ -138,12 +138,12 @@ def make_twri_model():
     return simulation
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def twri_model():
     return make_twri_model()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def transient_twri_model():
     simulation = make_twri_model()
     gwf_model = simulation["GWF_1"]
@@ -161,7 +161,7 @@ def transient_twri_model():
 
 
 @pytest.mark.usefixtures("twri_model")
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def twri_result(tmpdir_factory):
     # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
     # directory between different testing modules.

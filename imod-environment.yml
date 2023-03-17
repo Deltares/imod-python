@@ -48,5 +48,5 @@ dependencies:
   - twine
   - vtk>=9.0
   - xarray>=0.15
-  - xugrid>=0.1.6
+  - xugrid>=0.3.0
   - zarr

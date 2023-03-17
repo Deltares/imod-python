@@ -70,3 +70,14 @@ def test_key_assign():
 
     with pytest.raises(KeyError):
         gwf_model["way-too-long-key-name"] = imod.mf6.InitialConditions(head=0.0)
+
+
+def roundtrip(model, tmp_path):
+    model.dump(tmp_path, "test")
+    back = type(model).from_file(tmp_path / "test/test.toml")
+    assert isinstance(back, type(model))
+
+
+@pytest.mark.usefixtures("circle_model")
+def test_circle_roundtrip(circle_model, tmp_path):
+    roundtrip(circle_model["GWF_1"], tmp_path)

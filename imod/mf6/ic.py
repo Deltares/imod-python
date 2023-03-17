@@ -77,7 +77,7 @@ class InitialConditions(Package):
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
-        icdirectory = directory / "ic"
+        icdirectory = directory / pkgname
         d["layered"], d["strt"] = self._compose_values(
             self["start"], icdirectory, "strt", binary=binary
         )

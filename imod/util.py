@@ -535,7 +535,17 @@ def mdal_compliant_ugrid2d(ds: xr.Dataset) -> xr.Dataset:
             # "max_face_nodes_dimension": required
             # "face_coordinates": optional
 
+            node_dim = attrs.get("node_dimension")
             edge_dim = attrs.get("edge_dimension")
+            face_dim = attrs.get("face_dimension")
+
+            # Drop the coordinates on the UGRID dimensions
+            to_drop = []
+            for dim in (node_dim, edge_dim, face_dim):
+                if dim is not None and dim in ds.coords:
+                    to_drop.append(dim)
+            ds = ds.drop_vars(to_drop)
+
             if edge_dim and edge_dim not in ds.dims:
                 attrs.pop("edge_dimension")
 
@@ -548,6 +558,7 @@ def mdal_compliant_ugrid2d(ds: xr.Dataset) -> xr.Dataset:
                 attrs.pop("edge_node_connectivity")
 
     # Make sure time is encoded as a float for MDAL
+    # TODO: MDAL requires all data variables to be float (this excludes the UGRID topology data)
     for var in ds.coords:
         if np.issubdtype(ds[var].dtype, np.datetime64):
             ds[var].encoding["dtype"] = np.float64

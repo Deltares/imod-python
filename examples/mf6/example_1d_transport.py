@@ -80,7 +80,7 @@ def create_transport_model(flowmodel, speciesname, dispersivity, retardation, de
         decay_sorbed=decay,
         bulk_density=rhobulk,
         distcoef=kd,
-        decay_order="first",
+        first_order_decay=True,
         sorption=sorption,
     )
 
