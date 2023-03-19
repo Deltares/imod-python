@@ -1,4 +1,5 @@
 import collections
+import os
 from pathlib import Path
 
 import numpy as np
@@ -119,14 +120,19 @@ class OutputControl(Package):
             save = self.dataset[f"save_{part}"].values[()]
             if save is not None:
                 varname = f"{part}_file"
-                filename = self.dataset[varname].values[()]
-                if filename is None:
+                filepath = self.dataset[varname].values[()]
+                if filepath is None:
                     d[varname] = (directory / f"{modelname}.{ext}").as_posix()
                 else:
-                    d[varname] = Path(filename).relative_to(directory.parent).as_posix()
+                    # Get path relative to the simulation name file.
+                    filepath = Path(filepath)
+                    path = Path(os.path.relpath(filepath, directory))
+                    # Make sure the directory exists, otherwise mf6 will not run.
+                    filepath.parent.mkdir(parents=True, exist_ok=True)
+                    d[varname] = path.as_posix()
 
         periods = collections.defaultdict(dict)
-        for datavar in self.dataset.data_vars:
+        for datavar in ("save_head", "save_concentration", "save_budget"):
             if self.dataset[datavar].values[()] is None:
                 continue
             key = datavar.replace("_", " ")
