@@ -9,6 +9,15 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Added
+~~~~~
+
+- :class:`imod.mf6.OutputControl` now takes parameters ``head_file``,
+  ``concentration_file``, and ``budget_file`` to specify where to store
+  MODFLOW6 output files.
+- :func:`imod.util.from_mdal_compliant_ugrid2d` to "restack" the variables that
+  have have been "unstacked" in :func:`imod.util.mdal_compliant_ugrid2d`.
+
 [0.12.0] - 2023-03-17
 ---------------------
 

@@ -1,4 +1,5 @@
 import collections
+from pathlib import Path
 
 import numpy as np
 
@@ -73,6 +74,9 @@ class OutputControl(Package):
         save_head=None,
         save_budget=None,
         save_concentration=None,
+        head_file=None,
+        budget_file=None,
+        concentration_file=None,
         validate: bool = True,
     ):
         super().__init__()
@@ -81,6 +85,9 @@ class OutputControl(Package):
         self.dataset["save_head"] = save_head
         self.dataset["save_concentration"] = save_concentration
         self.dataset["save_budget"] = save_budget
+        self.dataset["head_file"] = head_file
+        self.dataset["budget_file"] = budget_file
+        self.dataset["concentration_file"] = concentration_file
         self._validate_init_schemata(validate)
 
     def _get_ocsetting(self, setting):
@@ -102,12 +109,21 @@ class OutputControl(Package):
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         modelname = directory.stem
-        if self.dataset["save_head"].values[()] is not None:
-            d["headfile"] = (directory / f"{modelname}.hds").as_posix()
-        if self.dataset["save_concentration"].values[()] is not None:
-            d["concentrationfile"] = (directory / f"{modelname}.ucn").as_posix()
-        if self.dataset["save_budget"].values[()] is not None:
-            d["budgetfile"] = (directory / f"{modelname}.cbc").as_posix()
+
+        pairs = (
+            ("head", "hds"),
+            ("concentration", "ucn"),
+            ("budget", "cbc"),
+        )
+        for part, ext in pairs:
+            save = self.dataset[f"save_{part}"].values[()]
+            if save is not None:
+                varname = f"{part}_file"
+                filename = self.dataset[varname].values[()]
+                if filename is None:
+                    d[varname] = (directory / f"{modelname}.{ext}").as_posix()
+                else:
+                    d[varname] = Path(filename).relative_to(directory.parent).as_posix()
 
         periods = collections.defaultdict(dict)
         for datavar in self.dataset.data_vars:

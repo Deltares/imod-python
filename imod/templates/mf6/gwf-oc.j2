@@ -1,9 +1,9 @@
 begin options
-{% if budgetfile is defined %}  budget fileout {{budgetfile}}
+{% if budget_file is defined %}  budget fileout {{budget_file}}
 {% endif %}
-{%- if headfile is defined %}  head fileout {{headfile}}
+{%- if head_file is defined %}  head fileout {{head_file}}
 {% endif %}
-{%- if concentrationfile is defined %}  concentration fileout {{concentrationfile}}
+{%- if concentration_file is defined %}  concentration fileout {{concentration_file}}
 {% endif %}
 {%- if headprintrecord is defined %}  head print_format columns {{columns}} width {{width}} digits {{digits}} {{format}}
 {% endif -%}
