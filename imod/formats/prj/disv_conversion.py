@@ -254,14 +254,17 @@ def create_chd(
         ibound = ibound.sel(layer=layer)
         active = active.sel(layer=layer)
 
-    is_constant_head = ibound < 0
-    constant_head = cache.regrid(
+    disv_head = cache.regrid(
         head,
         method="barycentric",
         original2d=original2d,
-    ).where(active & is_constant_head)
+    )
+    valid = active & (ibound < 0)
 
-    chd = imod.mf6.ConstantHead(head=constant_head)
+    if not valid.any():
+        return
+
+    chd = imod.mf6.ConstantHead(head=disv_head.where(valid))
     if repeat is not None:
         chd.set_repeat_stress(repeat)
     model[key] = chd
@@ -289,10 +292,14 @@ def create_drn(
         original2d=original2d,
     )
     disv_elev = cache.regrid(elevation, original2d=original2d)
+    valid = active & (disv_cond > 0) & disv_elev.notnull()
     location = xu.ones_like(active, dtype=float)
-    location = location.where((disv_elev > bottom) & (disv_elev <= top)).where(active)
+    location = location.where((disv_elev > bottom) & (disv_elev <= top)).where(valid)
     disv_cond = (location * disv_cond).dropna("layer", how="all")
     disv_elev = (location * disv_elev).dropna("layer", how="all")
+
+    if disv_cond.isnull().all():
+        return
 
     drn = imod.mf6.Drainage(
         elevation=disv_elev,
@@ -327,7 +334,7 @@ def create_ghb(
         method="barycentric",
         original2d=original2d,
     )
-    valid = active & disv_cond.notnull() & disv_head.notnull()
+    valid = active & (disv_cond > 0.0) & disv_head.notnull()
 
     ghb = imod.mf6.GeneralHeadBoundary(
         conductance=disv_cond.where(valid),
@@ -426,6 +433,9 @@ def create_riv(
         active=active,
     )
 
+    if disv_cond.isnull().all():
+        return
+
     riv = imod.mf6.River(
         stage=disv_stage,
         conductance=disv_cond * disv_inff,
@@ -461,6 +471,11 @@ def create_rch(
     highest = active["layer"] == active["layer"].where(active).max()
     location = highest.where(highest)
     disv_rate = finish(disv_rate * location)
+
+    # Skip if there's no data
+    if disv_rate.isnull().all():
+        return
+
     rch = imod.mf6.Recharge(rate=disv_rate)
     if repeat is not None:
         rch.set_repeat_stress(repeat)
@@ -496,6 +511,7 @@ def create_wel(
     model,
     key,
     value,
+    active,
     repeat,
     **kwargs,
 ):
@@ -506,12 +522,18 @@ def create_wel(
     columns = dataframe.columns
     x, y, rate = columns[:3]
     xy = np.column_stack([dataframe[x], dataframe[y]])
-    cell2d = target.locate_points(xy) + 1
+    cell2d = target.locate_points(xy)
+    valid = (cell2d >= 0) & active.values[layer - 1, cell2d]
 
+    # Skip if no wells are located inside cells
+    if not valid.any():
+        return
+
+    cell2d = cell2d[valid] + 1
     wel = imod.mf6.WellDisVertices(
         layer=np.full_like(cell2d, layer),
         cell2d=cell2d,
-        rate=dataframe[rate],
+        rate=dataframe.loc[valid, rate],
     )
     if repeat is not None:
         wel.set_repeat_stress(repeat)
@@ -627,6 +649,9 @@ def create_hfb(cache, model, key, value, active, top, bottom, k, **kwargs):
     snapped, _ = xu.snap_to_grid(lines, grid=target, max_snap_distance=0.5)
 
     resistance = snapped["resistance"]
+    if resistance.isnull().all():
+        return
+
     if layer != 0:
         resistance = resistance.assign_coords(layer=layer)
     else:
