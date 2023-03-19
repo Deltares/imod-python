@@ -200,7 +200,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         return
 
-    def dump(self, directory, modelname, validate: bool = True):
+    def dump(
+        self, directory, modelname, validate: bool = True, mdal_compliant: bool = False
+    ):
         modeldirectory = pathlib.Path(directory) / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
         if validate:
@@ -212,7 +214,12 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             toml_content[type(pkg).__name__][pkgname] = pkg_path
             dataset = pkg.dataset
             if isinstance(dataset, xu.UgridDataset):
-                pkg.dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
+                if mdal_compliant:
+                    dataset = pkg.dataset.ugrid.to_dataset()
+                    mdal_dataset = imod.util.mdal_compliant_ugrid2d(dataset)
+                    mdal_dataset.to_netcdf(modeldirectory / pkg_path)
+                else:
+                    pkg.dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
             else:
                 pkg.dataset.to_netcdf(modeldirectory / pkg_path)
 

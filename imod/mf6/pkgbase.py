@@ -113,6 +113,7 @@ class Package(abc.ABC):
 
         if dataset.ugrid_roles.topology:
             dataset = xu.UgridDataset(dataset)
+            dataset = imod.util.from_mdal_compliant_ugrid2d(dataset)
 
         # Replace NaNs by None
         for key, value in dataset.items():
