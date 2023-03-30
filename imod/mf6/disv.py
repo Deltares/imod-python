@@ -107,7 +107,7 @@ class VerticesDiscretization(Package):
         df[2] = (face_nodes != grid.fill_value).sum(axis=1)
         for i, column in enumerate(face_nodes.T):
             # Use extension array to write empty values
-            # Should be more effcient than mixed column?
+            # Should be more efficient than mixed column?
             df[3 + i] = pd.arrays.IntegerArray(
                 values=column + 1,
                 mask=(column == grid.fill_value),
