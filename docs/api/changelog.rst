@@ -18,6 +18,13 @@ Added
 - :func:`imod.util.from_mdal_compliant_ugrid2d` to "restack" the variables that
   have have been "unstacked" in :func:`imod.util.mdal_compliant_ugrid2d`.
 
+Fixed
+~~~~~
+
+- :meth:`imod.wq.bas.BasicFlow.thickness` returns a DataArray with the correct
+  dimension order again. This confusingly resulted in an error when writing the
+  :class:`imod.wq.btn.BasicTransport` package.
+
 [0.12.0] - 2023-03-17
 ---------------------
 
