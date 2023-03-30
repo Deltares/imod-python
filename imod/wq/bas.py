@@ -196,7 +196,10 @@ class BasicFlow(Package):
             ],
             dim="layer",
         )
-        return th
+
+        # Concat results in wrong dimension order (y, x, layer), transpose to
+        # fix dimension order.
+        return th.transpose("layer", "y", "x")
 
     def _pkgcheck(self, ibound=None):
         if (self["top"] < self["bottom"]).any():
