@@ -71,7 +71,7 @@ class VerticesDiscretization(Package):
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, binary):
-        disdirectory = directory / pkgname
+        disdirectory = pathlib.Path(directory.stem) / pkgname
         d = {}
         grid = self.dataset.ugrid.grid
         d["xorigin"] = grid.node_x.min()

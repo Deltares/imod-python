@@ -1,6 +1,7 @@
 import re
 import sys
 import textwrap
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -20,7 +21,7 @@ def test_dis_render(twri_model, tmp_path):
         globaltimes=None,
         binary=True,
     )
-    path = tmp_path.as_posix()
+    path = Path(tmp_path.stem).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -73,7 +74,7 @@ def test_chd_render(twri_model, tmp_path):
         globaltimes=globaltimes,
         binary=True,
     )
-    path = tmp_path.as_posix()
+    path = Path(tmp_path.stem).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -114,7 +115,7 @@ def test_drn_render(twri_model, tmp_path):
         globaltimes=globaltimes,
         binary=True,
     )
-    path = tmp_path.as_posix()
+    path = Path(tmp_path.stem).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -216,6 +217,8 @@ def test_oc_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
     oc = simulation["GWF_1"]["oc"]
+
+    # An absolute path should be maintained in the fileout entries!
     path = tmp_path.as_posix()
     actual = oc.render(
         directory=tmp_path, pkgname="oc", globaltimes=globaltimes, binary=True
@@ -237,6 +240,25 @@ def test_oc_render(twri_model, tmp_path):
     oc.write(directory=tmp_path, pkgname="oc", globaltimes=globaltimes, binary=True)
     assert (tmp_path / "oc.oc").is_file()
 
+    path = Path(tmp_path.stem)
+    actual = oc.render(
+        directory=path, pkgname="oc", globaltimes=globaltimes, binary=True
+    )
+    expected = textwrap.dedent(
+        f"""\
+            begin options
+              budget fileout {path}/{path}.cbc
+              head fileout {path}/{path}.hds
+            end options
+
+            begin period 1
+              save head all
+              save budget all
+            end period
+            """
+    )
+    assert actual == expected
+
 
 @pytest.mark.usefixtures("twri_model")
 def test_rch_render(twri_model, tmp_path):
@@ -249,7 +271,7 @@ def test_rch_render(twri_model, tmp_path):
         globaltimes=globaltimes,
         binary=True,
     )
-    path = tmp_path.as_posix()
+    path = Path(tmp_path.stem).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -287,7 +309,7 @@ def test_wel_render(twri_model, tmp_path):
         globaltimes=globaltimes,
         binary=True,
     )
-    path = tmp_path.as_posix()
+    path = Path(tmp_path.stem).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -362,8 +384,8 @@ def test_gwfmodel_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
-    actual = gwfmodel.render(tmp_path)
-    path = tmp_path.as_posix()
+    path = Path(tmp_path.stem).as_posix()
+    actual = gwfmodel.render(path)
     expected = textwrap.dedent(
         f"""\
             begin options

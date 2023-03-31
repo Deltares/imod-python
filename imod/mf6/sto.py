@@ -1,4 +1,5 @@
 import abc
+import pathlib
 
 import numpy as np
 
@@ -24,7 +25,7 @@ class Storage(Package):
 class StorageBase(Package, abc.ABC):
     def _render_dict(self, directory, pkgname, globaltimes, binary):
         d = {}
-        stodirectory = directory / pkgname
+        stodirectory = pathlib.Path(directory.stem) / pkgname
         for varname in self._grid_data:
             key = self._keyword_map.get(varname, varname)
             layered, value = self._compose_values(
