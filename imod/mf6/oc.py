@@ -124,9 +124,13 @@ class OutputControl(Package):
                 if filepath is None:
                     d[varname] = (directory / f"{modelname}.{ext}").as_posix()
                 else:
-                    # Get path relative to the simulation name file.
                     filepath = Path(filepath)
-                    path = Path(os.path.relpath(filepath, directory))
+                    if filepath.is_absolute():
+                        path = filepath
+                    else:
+                        # Get path relative to the simulation name file.
+                        sim_directory = directory.parent
+                        path = Path(os.path.relpath(filepath, sim_directory))
                     # Make sure the directory exists, otherwise mf6 will not run.
                     filepath.parent.mkdir(parents=True, exist_ok=True)
                     d[varname] = path.as_posix()
