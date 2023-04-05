@@ -27,6 +27,8 @@ Fixed
 - Fixed bug in :class:`imod.mf6.dis.StructuredDiscretization` and
   :class:`imod.mf6.dis.VerticesDiscretization` where 
   ``inactive bottom above active cell`` was incorrectly raised.
+- :meth:`imod.mf6.Package.from_file` converts saved booleans back to
+   booleans, because ``xarray`` stores them as integer.
 
 [0.12.0] - 2023-03-17
 ---------------------
