@@ -116,11 +116,18 @@ class Package(abc.ABC):
             dataset = xu.UgridDataset(dataset)
             dataset = imod.util.from_mdal_compliant_ugrid2d(dataset)
 
-        # Replace NaNs by None
         for key, value in dataset.items():
             stripped_value = value.values[()]
+            # Replace NaNs by None
             if isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value):
                 dataset[key] = None
+            # Convert scalar np.int8 to boolean
+            elif (
+                (stripped_value.dtype == np.int8)
+                and (stripped_value.size == 1)
+                and np.isin(value.values[()], [0, 1])
+            ):
+                dataset[key] = bool(stripped_value)
 
         instance = cls.__new__(cls)
         instance.dataset = dataset
