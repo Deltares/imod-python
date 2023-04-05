@@ -24,6 +24,9 @@ Fixed
 - :meth:`imod.wq.bas.BasicFlow.thickness` returns a DataArray with the correct
   dimension order again. This confusingly resulted in an error when writing the
   :class:`imod.wq.btn.BasicTransport` package.
+- Fixed bug in :class:`imod.mf6.dis.StructuredDiscretization` and
+  :class:`imod.mf6.dis.VerticesDiscretization` where 
+  ``inactive bottom above active cell`` was incorrectly raised.
 
 [0.12.0] - 2023-03-17
 ---------------------
