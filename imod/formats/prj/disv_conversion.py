@@ -436,22 +436,30 @@ def create_riv(
     if disv_cond.isnull().all():
         return
 
-    riv = imod.mf6.River(
-        stage=disv_stage,
-        conductance=disv_cond * disv_inff,
-        bottom_elevation=disv_elev,
-    )
+    # The infiltration factor may be 0. In that case, we need only create a DRN
+    # package.
     drn = imod.mf6.Drainage(
         conductance=(1.0 - disv_inff) * disv_cond,
         elevation=disv_stage,
     )
+    if repeat is not None:
+        drn.set_repeat_stress(repeat)
+    model[f"{key}-drn"] = drn
 
+    riv_cond = disv_cond * disv_inff
+    riv_valid = riv_cond > 0.0
+    if not riv_valid.any():
+        return
+
+    riv = imod.mf6.River(
+        stage=disv_stage.where(riv_valid),
+        conductance=riv_cond.where(riv_valid),
+        bottom_elevation=disv_elev.where(riv_valid),
+    )
     if repeat is not None:
         riv.set_repeat_stress(repeat)
-        drn.set_repeat_stress(repeat)
-
     model[key] = riv
-    model[f"{key}-drn"] = drn
+
     return
 
 

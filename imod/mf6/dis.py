@@ -1,3 +1,5 @@
+import pathlib
+
 import numpy as np
 
 import imod
@@ -99,7 +101,7 @@ class StructuredDiscretization(Package):
             raise ValueError(f"Unhandled type of {dx}")
 
     def render(self, directory, pkgname, globaltimes, binary):
-        disdirectory = directory / pkgname
+        disdirectory = pathlib.Path(directory.stem) / pkgname
         d = {}
         x = self.dataset["idomain"].coords["x"]
         y = self.dataset["idomain"].coords["y"]

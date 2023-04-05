@@ -2,8 +2,9 @@ import abc
 import numbers
 import pathlib
 from collections import defaultdict
-from typing import Dict, List
+from typing import Any, Dict, List
 
+import cftime
 import jinja2
 import numpy as np
 import xarray as xr
@@ -199,9 +200,8 @@ class Package(abc.ABC):
         return env.get_template(fname)
 
     def write_blockfile(self, directory, pkgname, globaltimes, binary):
-        renderdir = pathlib.Path(directory.stem)
         content = self.render(
-            directory=renderdir,
+            directory=directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
             binary=binary,
@@ -312,7 +312,8 @@ class Package(abc.ABC):
         if directory is None:
             pkg_directory = pkgname
         else:
-            pkg_directory = directory / pkgname
+            pkg_directory = pathlib.Path(directory.stem) / pkgname
+
         for varname in self.dataset.data_vars:
             key = self._keyword_map.get(varname, varname)
 
@@ -514,14 +515,95 @@ class Package(abc.ABC):
             result.update(self._auxiliary_data)
         return result
 
+    def copy(self) -> Any:
+        # All state should be contained in the dataset.
+        return type(self)(**self.dataset.copy())
+
+    def clip_domain(
+        self, layer: slice = None, x: slice = None, y: slice = None
+    ) -> "Package":
+        """
+        Clip a variable along the specified dimensions.
+
+        Accepts only start and end dimensions, provided as ``slice``.
+
+        Parameters
+        ----------
+        layer: slice
+        x: slice
+        y: slice
+
+        Returns
+        -------
+        clipped : Package
+        """
+
+        def check_if_slice(key, value):
+            if value is None:
+                return slice(None, None)
+            elif not isinstance(value, slice):
+                raise TypeError(
+                    f"Expected slice for {key}. " f"Received: {type(value).__name__}"
+                )
+            return value
+
+        layer = check_if_slice("layer", layer)
+        x = check_if_slice("x", x)
+        y = check_if_slice("y", y)
+
+        if isinstance(self.dataset, xu.UgridDataset):
+            clipped = self.dataset.ugrid.sel(x=x, y=y).sel(layer=layer)
+        else:
+            clipped = self.dataset.sel(layer=layer, x=x, y=y)
+
+        return clipped
+
+    def mask(self, domain: xr.DataArray) -> Any:
+        """
+        Mask values outside of domain.
+
+        Floating values outside of the condition are set to NaN (nodata).
+        Integer values outside of the condition are set to 0 (inactive in
+        MODFLOW terms).
+
+        Parameters
+        ----------
+        domain: xr.DataArray of bools
+            The condition. Preserve values where True, discard where False.
+
+        Returns
+        -------
+        masked: Package
+            The package with part masked.
+        """
+        masked = {}
+        for var, da in self.dataset.data_vars.items():
+            if set(domain.dims).issubset(da.dims):
+                # Check if this should be: np.issubdtype(da.dtype, np.floating)
+                if issubclass(da.dtype, numbers.Real):
+                    masked[var] = da.where(domain, other=np.nan)
+                elif issubclass(da.dtype, numbers.Integral):
+                    masked[var] = da.where(domain, other=0)
+                else:
+                    raise TypeError(
+                        f"Expected dtype float or integer. Received instead: {da.dtype}"
+                    )
+            else:
+                masked[var] = da
+
+        return type(self)(**masked)
+
 
 class BoundaryCondition(Package, abc.ABC):
     """
-    BoundaryCondition is used to share methods for specific stress packages with a time component.
+    BoundaryCondition is used to share methods for specific stress packages
+    with a time component.
 
-    It is not meant to be used directly, only to inherit from, to implement new packages.
+    It is not meant to be used directly, only to inherit from, to implement new
+    packages.
 
-    This class only supports `list input <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=19>`_,
+    This class only supports `list input
+    <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=19>`_,
     not the array input which is used in :class:`Package`.
     """
 
@@ -583,6 +665,8 @@ class BoundaryCondition(Package, abc.ABC):
             self._write_textfile(outpath, sparse_data)
 
     def period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
+        pkg_directory = pathlib.Path(directory.stem) / pkgname
+
         if binary:
             ext = "bin"
         else:
@@ -593,7 +677,7 @@ class BoundaryCondition(Package, abc.ABC):
             package_times = bin_ds.coords["time"].values
             starts = np.searchsorted(globaltimes, package_times) + 1
             for i, start in enumerate(starts):
-                path = directory / pkgname / f"{self._pkg_id}-{i}.{ext}"
+                path = pkg_directory / f"{self._pkg_id}-{i}.{ext}"
                 periods[start] = path.as_posix()
 
             repeat_stress = self.dataset.get("repeat_stress")
@@ -607,7 +691,7 @@ class BoundaryCondition(Package, abc.ABC):
                 # Now make sure the periods are sorted by key.
                 periods = dict(sorted(periods.items()))
         else:
-            path = directory / pkgname / f"{self._pkg_id}.{ext}"
+            path = pkg_directory / f"{self._pkg_id}.{ext}"
             periods[1] = path.as_posix()
 
         return periods
@@ -710,6 +794,54 @@ class BoundaryCondition(Package, abc.ABC):
             return ("index", arg.values)
         else:
             return ("index", arg)
+
+    def clip_domain(
+        self,
+        time: slice = None,
+        layer: slice = None,
+        x: slice = None,
+        y: slice = None,
+    ) -> "BoundaryCondition":
+        """
+        Clip a variable along the specified dimensions.
+
+        Accepts only start and end dimensions, provided as ``slice``.
+
+        Parameters
+        ----------
+        time: slice
+        layer: slice
+        x: slice
+        y: slice
+
+        Returns
+        -------
+        clipped : BoundaryCondition
+        """
+        if "time" in self.dataset.coords and time is not None:
+            if not isinstance(time, slice):
+                raise TypeError(
+                    f"Expected slice for time, " f"received: {type(time).__name__}"
+                )
+
+            use_cftime = isinstance(self.dataset["time"][0], cftime.datetime)
+            selection = self.dataset.sel(time=time)
+            # time_sel.start included? Otherwise, concat
+            if (
+                imod.wq.timeutil.to_datetime(time.start, use_cftime)
+                not in selection.time
+            ):
+                start = self.dataset.sel(time=time.start, method="ffill")
+                # Is this required?
+                # start["time"] = imod.wq.timeutil.to_datetime(start, use_cftime)
+                selection = xr.concat(
+                    [start, selection], dim="time", data_vars="minimal"
+                )
+            # TODO: bfill
+        else:
+            selection = self.dataset
+
+        return super(selection, selection).clip(layer=layer, x=x, y=y)
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):

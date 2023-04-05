@@ -200,3 +200,75 @@ def test_wrong_arguments_concentration():
         imod.mf6.OutputControl(
             save_concentration=save_concentration, save_head=save_head
         )
+
+
+def test_fileout_none():
+    # Default value (None): write it in the model directory
+    oc = imod.mf6.OutputControl(save_concentration="first", save_budget="last")
+    directory = pathlib.Path("mymodel")
+    globaltimes = [np.datetime64("2000-01-01")]
+    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    expected = textwrap.dedent(
+        """\
+        begin options
+          budget fileout mymodel/mymodel.cbc
+          concentration fileout mymodel/mymodel.ucn
+        end options
+
+        begin period 1
+          save concentration first
+          save budget last
+        end period
+        """
+    )
+    assert actual == expected
+
+
+def test_fileout_abs(tmp_path):
+    # Absolute path: keep the absolute path.
+    oc = imod.mf6.OutputControl(save_concentration="first", save_budget="last")
+    directory = pathlib.Path("mymodel")
+    globaltimes = [np.datetime64("2000-01-01")]
+    outpath = tmp_path / "output" / "mymodel.cbc"
+    oc["budget_file"] = outpath
+    actual = oc.render(directory, "outputcontrol", globaltimes, True)
+    expected = textwrap.dedent(
+        f"""\
+        begin options
+          budget fileout {outpath.as_posix()}
+          concentration fileout mymodel/mymodel.ucn
+        end options
+
+        begin period 1
+          save concentration first
+          save budget last
+        end period
+        """
+    )
+    assert actual == expected
+
+
+def test_fileout_relative(tmp_path):
+    oc = imod.mf6.OutputControl(save_concentration="first", save_budget="last")
+    globaltimes = [np.datetime64("2000-01-01")]
+    directory = pathlib.Path("input/gwf")
+    # Relative path, resolve to simulation name file.
+    # Also check that the output dir has been created.
+    with imod.util.cd(tmp_path):
+        oc["budget_file"] = "output/gwf.cbc"
+        actual = oc.render(directory, "outputcontrol", globaltimes, True)
+        expected = textwrap.dedent(
+            """\
+            begin options
+              budget fileout ../output/gwf.cbc
+              concentration fileout input/gwf/gwf.ucn
+            end options
+
+            begin period 1
+              save concentration first
+              save budget last
+            end period
+            """
+        )
+        assert actual == expected
+        assert (tmp_path / "output").exists()

@@ -218,7 +218,7 @@ ds["v"] = cbc["flow-horizontal-face-y"]
 
 ds = ds.ugrid.assign_edge_coords()
 fig, ax = plt.subplots()
-head.isel(time=0, layer=0).ugrid.plot(ax=ax)
+head.isel(time=0, layer=0).compute().ugrid.plot(ax=ax)
 ds.isel(time=0, layer=0).plot.quiver(
     x="mesh2d_edge_x", y="mesh2d_edge_y", u="u", v="v", color="white"
 )
