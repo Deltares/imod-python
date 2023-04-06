@@ -809,6 +809,13 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
     * drn-1
     * drn-2
 
+    Xarray requires valid dates for the time coordinate. Aliases such as
+    "summer" and "winter" that are associated with dates in the project file
+    Periods block cannot be used in the time coordinate. Hence, this function
+    will instead insert the dates associated with the aliases, with the year
+    replaced by 1899; as the iMOD calendar starts at 1900, this ensures that
+    the repeats are always first and that no date collisions will occur.
+
     Parameters
     ----------
     path: pathlib.Path or str.
@@ -823,8 +830,10 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
     if periods_block is None:
         periods = {}
     else:
+        # Set the year of a repeat date to 1899: this ensures it falls outside
+        # of the iMOD calendar. Collisions are then always avoided.
         periods = {
-            key: _process_time(time, yearfirst=False)
+            key: _process_time(time, yearfirst=False).replace(year=1899)
             for key, time in periods_block.items()
         }
 
