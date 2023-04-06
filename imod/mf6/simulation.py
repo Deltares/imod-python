@@ -299,3 +299,15 @@ class Modflow6Simulation(collections.UserDict):
             for k, v in self.items()
             if isinstance(v, Modflow6Model) and (v._model_id == modeltype)
         }
+
+    def clip_domain(
+        self,
+        time: slice = None,
+        layer: slice = None,
+        x: slice = None,
+        y: slice = None,
+    ):
+        clipped = type(self)(name=self.name)
+        for key, value in self.items():
+            clipped[key] = value.clip_domain(time=time, layer=layer, x=x, y=y)
+        return clipped

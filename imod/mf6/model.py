@@ -250,6 +250,18 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         return instance
 
+    def clip_domain(
+        self,
+        time: slice = None,
+        layer: slice = None,
+        x: slice = None,
+        y: slice = None,
+    ):
+        clipped = type(self)(**self.options)
+        for key, pkg in self.items():
+            clipped[key] = pkg.clip_domain(time=time, layer=layer, x=x, y=y)
+        return clipped
+
 
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
@@ -265,7 +277,6 @@ class GroundwaterFlowModel(Modflow6Model):
         under_relaxation: bool = False,
     ):
         super().__init__()
-        # TODO: probably replace by a pydantic BaseModel
         self.options = {
             "listing_file": listing_file,
             "print_input": print_input,

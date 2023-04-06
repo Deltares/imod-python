@@ -520,22 +520,27 @@ class Package(abc.ABC):
         return type(self)(**self.dataset.copy())
 
     def clip_domain(
-        self, layer: slice = None, x: slice = None, y: slice = None
-    ) -> "Package":
+        self,
+        time: slice = None,
+        layer: slice = None,
+        x: slice = None,
+        y: slice = None,
+    ) -> "BoundaryCondition":
         """
         Clip a variable along the specified dimensions.
 
-        Accepts only start and end dimensions, provided as ``slice``.
+        Accepts only a start and end for a dimensions, provided as ``slice``.
 
         Parameters
         ----------
+        time: slice
         layer: slice
         x: slice
         y: slice
 
         Returns
         -------
-        clipped : Package
+        clipped : BoundaryCondition
         """
 
         def check_if_slice(key, value):
@@ -547,16 +552,46 @@ class Package(abc.ABC):
                 )
             return value
 
+        time = check_if_slice("time", time)
         layer = check_if_slice("layer", layer)
         x = check_if_slice("x", x)
         y = check_if_slice("y", y)
 
-        if isinstance(self.dataset, xu.UgridDataset):
-            clipped = self.dataset.ugrid.sel(x=x, y=y).sel(layer=layer)
-        else:
-            clipped = self.dataset.sel(layer=layer, x=x, y=y)
+        selection = self.dataset
+        if "time" in selection and time is not None:
+            if not isinstance(time, slice):
+                raise TypeError(
+                    f"Expected slice for time, " f"received: {type(time).__name__}"
+                )
 
-        return clipped
+            use_cftime = isinstance(selection["time"][0], cftime.datetime)
+            selection = selection.sel(time=time)
+
+            # time.start included? Otherwise, concat.
+            time_start = imod.wq.timeutil.to_datetime(time.start, use_cftime)
+            first_time = selection["time"].values[0]
+            if time_start != first_time:
+                if time_start < first_time:
+                    method = "bfill"
+                else:
+                    method = "ffil"
+                start = self.dataset.sel(time=time_start, method=method)
+                # Overwrite the coordinate with the starting time.
+                start["time"] = time_start
+                # Now concatenate, start in front of the selection.
+                selection = xr.concat(
+                    [start, selection], dim="time", data_vars="minimal"
+                )
+
+        if "layer" in selection.coords:
+            selection = selection.sel(layer=layer)
+
+        if isinstance(selection, xu.UgridDataset):
+            selection = selection.ugrid.sel(x=x, y=y).sel(layer=layer)
+        elif ("x" in selection.coords) and ("y" in selection.coords):
+            selection = selection.sel(x=x, y=y)
+
+        return selection
 
     def mask(self, domain: xr.DataArray) -> Any:
         """
@@ -794,54 +829,6 @@ class BoundaryCondition(Package, abc.ABC):
             return ("index", arg.values)
         else:
             return ("index", arg)
-
-    def clip_domain(
-        self,
-        time: slice = None,
-        layer: slice = None,
-        x: slice = None,
-        y: slice = None,
-    ) -> "BoundaryCondition":
-        """
-        Clip a variable along the specified dimensions.
-
-        Accepts only start and end dimensions, provided as ``slice``.
-
-        Parameters
-        ----------
-        time: slice
-        layer: slice
-        x: slice
-        y: slice
-
-        Returns
-        -------
-        clipped : BoundaryCondition
-        """
-        if "time" in self.dataset.coords and time is not None:
-            if not isinstance(time, slice):
-                raise TypeError(
-                    f"Expected slice for time, " f"received: {type(time).__name__}"
-                )
-
-            use_cftime = isinstance(self.dataset["time"][0], cftime.datetime)
-            selection = self.dataset.sel(time=time)
-            # time_sel.start included? Otherwise, concat
-            if (
-                imod.wq.timeutil.to_datetime(time.start, use_cftime)
-                not in selection.time
-            ):
-                start = self.dataset.sel(time=time.start, method="ffill")
-                # Is this required?
-                # start["time"] = imod.wq.timeutil.to_datetime(start, use_cftime)
-                selection = xr.concat(
-                    [start, selection], dim="time", data_vars="minimal"
-                )
-            # TODO: bfill
-        else:
-            selection = self.dataset
-
-        return super(selection, selection).clip(layer=layer, x=x, y=y)
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
