@@ -227,3 +227,27 @@ def test_repeat_stress(
     )
     actual = drn.render(directory, "drn", globaltimes, False)
     assert actual == expected
+
+
+def test_clip_domain(drainage):
+    drn = imod.mf6.Drainage(**drainage)
+
+    selection = drn.clip_domain()
+    assert isinstance(selection, imod.mf6.Drainage)
+    assert selection.dataset.identical(drn.dataset)
+
+    selection = drn.clip_domain(x=slice(None, None))
+    assert isinstance(selection, imod.mf6.Drainage)
+    assert selection.dataset.identical(drn.dataset)
+
+    selection = drn.clip_domain(layer=slice(1, 2), y=slice(4.0, 1.0), x=slice(1.0, 4.0))
+    assert isinstance(selection, imod.mf6.Drainage)
+    assert selection["conductance"].dims == ("layer", "y", "x")
+    assert selection["conductance"].shape == (2, 3, 3)
+
+    with pytest.raises(TypeError, match="Expected slice for layer. Received: int"):
+        drn.clip_domain(layer=1)
+    with pytest.raises(TypeError, match="Expected slice for x. Received: float"):
+        drn.clip_domain(x=1.0)
+    with pytest.raises(TypeError, match="Expected slice for y. Received: float"):
+        drn.clip_domain(y=1.0)

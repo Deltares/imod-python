@@ -590,8 +590,11 @@ class Package(abc.ABC):
             selection = selection.ugrid.sel(x=x, y=y).sel(layer=layer)
         elif ("x" in selection.coords) and ("y" in selection.coords):
             selection = selection.sel(x=x, y=y)
-
-        return selection
+            
+        cls = type(self)
+        new = cls.__new__(cls)
+        new.dataset = selection
+        return new
 
     def mask(self, domain: xr.DataArray) -> Any:
         """
