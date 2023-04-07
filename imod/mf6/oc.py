@@ -122,18 +122,19 @@ class OutputControl(Package):
                 varname = f"{part}_file"
                 filepath = self.dataset[varname].values[()]
                 if filepath is None:
-                    d[varname] = (directory / f"{modelname}.{ext}").as_posix()
+                    filepath = directory / f"{modelname}.{ext}"
                 else:
                     filepath = Path(filepath)
-                    if filepath.is_absolute():
-                        path = filepath
-                    else:
-                        # Get path relative to the simulation name file.
-                        sim_directory = directory.parent
-                        path = Path(os.path.relpath(filepath, sim_directory))
-                    # Make sure the directory exists, otherwise mf6 will not run.
-                    filepath.parent.mkdir(parents=True, exist_ok=True)
-                    d[varname] = path.as_posix()
+
+                if filepath.is_absolute():
+                    path = filepath
+                else:
+                    # Get path relative to the simulation name file.
+                    sim_directory = directory.parent
+                    path = Path(os.path.relpath(filepath, sim_directory))
+                # Make sure the directory exists, otherwise mf6 will not run.
+                filepath.parent.mkdir(parents=True, exist_ok=True)
+                d[varname] = path.as_posix()
 
         periods = collections.defaultdict(dict)
         for datavar in ("save_head", "save_concentration", "save_budget"):

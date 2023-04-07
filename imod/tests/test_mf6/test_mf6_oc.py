@@ -261,7 +261,7 @@ def test_fileout_relative(tmp_path):
             """\
             begin options
               budget fileout ../output/gwf.cbc
-              concentration fileout input/gwf/gwf.ucn
+              concentration fileout gwf/gwf.ucn
             end options
 
             begin period 1
