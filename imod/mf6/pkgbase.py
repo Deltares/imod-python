@@ -519,78 +519,88 @@ class Package(abc.ABC):
         # All state should be contained in the dataset.
         return type(self)(**self.dataset.copy())
 
-    def clip_domain(
+    def slice_domain(
         self,
-        time: slice = None,
-        layer: slice = None,
-        x: slice = None,
-        y: slice = None,
-    ) -> "BoundaryCondition":
+        time_min=None,
+        time_max=None,
+        layer_min=None,
+        layer_max=None,
+        x_min=None,
+        x_max=None,
+        y_min=None,
+        y_max=None,
+    ) -> "Package":
         """
-        Clip a variable along the specified dimensions.
+        Slice a package along the specified dimensions.
 
-        Accepts only a start and end for a dimensions, provided as ``slice``.
+        Slicing intervals may be half-bounded, by providing None:
+
+        * To select 500.0 <= x <= 1000.0:
+          ``slice_domain(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``slice_domain(x_min=None, x_max=1000.0)``
+          or ``slice_domain(x_max=1000.0)``.
+        * To select x >= 500.0: ``slice_domain(x_min = 500.0, x_max=None.0)``
+          or ``slice_domain(x_min=1000.0)``.
 
         Parameters
         ----------
-        time: slice
-        layer: slice
-        x: slice
-        y: slice
+        time_min: optional
+        time_max: optional
+        layer_min: optional, int
+        layer_max: optional, int
+        x_min: optional, float
+        x_min: optional, float
+        y_max: optional, float
+        y_max: optional, float
 
         Returns
         -------
-        clipped : BoundaryCondition
+        sliced : Package
         """
-
-        def check_if_slice(key, value):
-            if value is None:
-                return slice(None, None)
-            elif not isinstance(value, slice):
-                raise TypeError(
-                    f"Expected slice for {key}. " f"Received: {type(value).__name__}"
-                )
-            return value
-
-        time = check_if_slice("time", time)
-        layer = check_if_slice("layer", layer)
-        x = check_if_slice("x", x)
-        y = check_if_slice("y", y)
-
         selection = self.dataset
-        if "time" in selection and time is not None:
-            if not isinstance(time, slice):
-                raise TypeError(
-                    f"Expected slice for time, " f"received: {type(time).__name__}"
-                )
-
+        if "time" in selection:
             use_cftime = isinstance(selection["time"][0], cftime.datetime)
-            selection = selection.sel(time=time)
+            selection = selection.sel(time=slice(time_min, time_max))
 
-            # time.start included? Otherwise, concat.
-            time_start = imod.wq.timeutil.to_datetime(time.start, use_cftime)
-            first_time = selection["time"].values[0]
-            if time_start != first_time:
-                if time_start < first_time:
+            # If the first time matches exactly, xarray will have done thing we
+            # wanted and our work with the time dimension is finished.
+            time_start = imod.wq.timeutil.to_datetime(time_min, use_cftime)
+            if time_start != selection["time"].values[0]:
+                # If the first time is before the original time, we need to
+                # backfill; otherwise, we need to ffill the first timestamp.
+                if time_start < self.dataset["time"].values[0]:
                     method = "bfill"
                 else:
-                    method = "ffil"
-                start = self.dataset.sel(time=time_start, method=method)
-                # Overwrite the coordinate with the starting time.
-                start["time"] = time_start
-                # Now concatenate, start in front of the selection.
+                    method = "ffill"
+                # Index with a list rather than a scalar to preserve the time
+                # dimension.
+                start = self.dataset.sel(time=[time_start], method=method)
+                start["time"] = [time_start]
                 selection = xr.concat(
                     [start, selection], dim="time", data_vars="minimal"
                 )
 
         if "layer" in selection.coords:
-            selection = selection.sel(layer=layer)
+            layer_slice = slice(layer_min, layer_max)
+            # Cannot select if it's not a dimension!
+            if "layer" not in selection.dims:
+                selection = (
+                    selection.expand_dims("layer")
+                    .sel(layer=layer_slice)
+                    .squeeze("layer")
+                )
+            else:
+                selection = selection.sel(layer=layer_slice)
 
+        x_slice = slice(x_min, x_max)
+        y_slice = slice(y_min, y_max)
         if isinstance(selection, xu.UgridDataset):
-            selection = selection.ugrid.sel(x=x, y=y).sel(layer=layer)
+            selection = selection.ugrid.sel(x=x_slice, y=y_slice)
         elif ("x" in selection.coords) and ("y" in selection.coords):
-            selection = selection.sel(x=x, y=y)
-            
+            if selection.indexes["y"].is_monotonic_decreasing:
+                y_slice = slice(y_max, y_min)
+            selection = selection.sel(x=x_slice, y=y_slice)
+
         cls = type(self)
         new = cls.__new__(cls)
         new.dataset = selection

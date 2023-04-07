@@ -300,14 +300,47 @@ class Modflow6Simulation(collections.UserDict):
             if isinstance(v, Modflow6Model) and (v._model_id == modeltype)
         }
 
-    def clip_domain(
+    def slice_domain(
         self,
-        time: slice = None,
-        layer: slice = None,
-        x: slice = None,
-        y: slice = None,
+        time_min=None,
+        time_max=None,
+        layer_min=None,
+        layer_max=None,
+        x_min=None,
+        x_max=None,
+        y_min=None,
+        y_max=None,
     ):
-        clipped = type(self)(name=self.name)
+        """
+        Slice a package along the specified dimensions.
+
+        Slicing intervals may be half-bounded, by providing None:
+
+        * To select 500.0 <= x <= 1000.0:
+          ``slice_domain(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``slice_domain(x_min=None, x_max=1000.0)``
+          or ``slice_domain(x_max=1000.0)``.
+        * To select x >= 500.0: ``slice_domain(x_min = 500.0, x_max=None.0)``
+          or ``slice_domain(x_min=1000.0)``.
+
+        Parameters
+        ----------
+        time_min: optional
+        time_max: optional
+        layer_min: optional, int
+        layer_max: optional, int
+        x_min: optional, float
+        x_min: optional, float
+        y_max: optional, float
+        y_max: optional, float
+
+        Returns
+        -------
+        sliced : Simulation
+        """
+        kwargs = locals()
+        kwargs.pop("self")
+        sliced = type(self)(name=self.name)
         for key, value in self.items():
-            clipped[key] = value.clip_domain(time=time, layer=layer, x=x, y=y)
-        return clipped
+            sliced[key] = value.slice_domain(**kwargs)
+        return sliced

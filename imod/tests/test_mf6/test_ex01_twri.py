@@ -513,3 +513,23 @@ def test_simulation_write_errors(twri_model, tmp_path):
     expected_message = "No sto package found in model GWF_1"
     with pytest.raises(ValueError, match=re.escape(expected_message)):
         simulation.write(modeldir, binary=True)
+
+
+@pytest.mark.usefixtures("transient_twri_model")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
+def test_slice_and_run(transient_twri_model, tmp_path):
+    # TODO: bring back well once slicing is implemented...
+    transient_twri_model["GWF_1"].pop("wel")
+    simulation = transient_twri_model.slice_domain(
+        time_min="2000-01-10",
+        time_max="2000-01-20",
+        layer_min=1,
+        layer_max=2,
+        x_min=None,
+        x_max=65_000.0,
+        y_min=10_000.0,
+        y_max=65_000.0,
+    )
+    modeldir = tmp_path / "ex01-twri-transient-slice"
+    simulation.write(modeldir, binary=True)
+    simulation.run()
