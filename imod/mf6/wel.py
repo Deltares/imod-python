@@ -163,7 +163,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
                 )
 
         # The super method will select in the time dimension without issues.
-        new = super().clip_domain(time_min=time_min, time_max=time_max)
+        new = super().slice_domain(time_min=time_min, time_max=time_max)
         return new
 
 
@@ -306,5 +306,5 @@ class WellDisVertices(DisVerticesBoundaryCondition):
                 )
 
         # The super method will select in the time dimension without issues.
-        new = super().clip_domain(time_min=time_min, time_max=time_max)
+        new = super().slice_domain(time_min=time_min, time_max=time_max)
         return new

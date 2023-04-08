@@ -519,6 +519,53 @@ class Package(abc.ABC):
         # All state should be contained in the dataset.
         return type(self)(**self.dataset.copy())
 
+    @staticmethod
+    def _slice_repeat_stress(dataset, selection, time_start, time_end):
+        """
+        Selection may remove the original data which are repeated.
+        These should be re-inserted at the first occuring "key".
+        Next, remove these keys as they've been "promoted" to regular
+        timestamps with data.
+        """
+        # First, "pop" and filter.
+        keys, values = selection["repeat_stress"].values.T
+        selection = selection.drop_vars("repeat_stress")
+        keep = (keys >= time_start) & (keys <= time_end)
+        new_keys = keys[keep]
+        new_values = values[keep]
+        # Now detect which "value" entries have gone missing
+        unique_values, index = np.unique(new_values, return_index=True)
+        missing = ~np.isin(unique_values, selection["time"].values)
+        # Create a new dataset containing these entries, and merge into the
+        # selection.
+        to_insert = index[missing]
+        insert_keys = new_keys[to_insert]
+        insert_values = new_values[to_insert]
+        insert_dataset = dataset.sel(time=insert_values).drop_vars("repeat_stress")
+        insert_dataset["time"] = insert_keys
+
+        # TODO: hopefully remove this when Ugrid can be used as Index.
+        try:
+            selection = xr.concat(
+                (selection, insert_dataset), dim="time", data_vars="minimal"
+            ).sortby("time")
+        except TypeError:
+            selection = xu.concat(
+                (selection, insert_dataset), dim="time", data_vars="minimal"
+            ).sortby("time")
+
+        # Update the key-value pairs. Discard keys that have been "promoted".
+        keep = np.in1d(new_keys, insert_keys, assume_unique=True, invert=True)
+        new_keys = new_keys[keep]
+        new_values = new_values[keep]
+        # Set the values to their new source.
+        new_values = insert_keys[np.searchsorted(insert_values, new_values)]
+        selection["repeat_stress"] = xr.DataArray(
+            data=np.column_stack((new_keys, new_values)),
+            dims=("repeat", "repeat_items"),
+        )
+        return selection
+
     def slice_domain(
         self,
         time_min=None,
@@ -560,12 +607,19 @@ class Package(abc.ABC):
         selection = self.dataset
         if "time" in selection:
             use_cftime = isinstance(selection["time"][0], cftime.datetime)
-            selection = selection.sel(time=slice(time_min, time_max))
+            time_start = imod.wq.timeutil.to_datetime(time_min, use_cftime)
+            time_end = imod.wq.timeutil.to_datetime(time_max, use_cftime)
+            selection = selection.sel(time=slice(time_start, time_end))
+
+            # The selection might return a 0-sized dimension.
+            if selection["time"].size > 0:
+                first_time = selection["time"].values[0]
+            else:
+                first_time = None
 
             # If the first time matches exactly, xarray will have done thing we
             # wanted and our work with the time dimension is finished.
-            time_start = imod.wq.timeutil.to_datetime(time_min, use_cftime)
-            if time_start != selection["time"].values[0]:
+            if time_start != first_time:
                 # If the first time is before the original time, we need to
                 # backfill; otherwise, we need to ffill the first timestamp.
                 if time_start < self.dataset["time"].values[0]:
@@ -576,8 +630,22 @@ class Package(abc.ABC):
                 # dimension.
                 start = self.dataset.sel(time=[time_start], method=method)
                 start["time"] = [time_start]
-                selection = xr.concat(
-                    [start, selection], dim="time", data_vars="minimal"
+
+                # TODO: hopefully remove this when Ugrid can be used as Index.
+                try:
+                    selection = xr.concat(
+                        [start, selection], dim="time", data_vars="minimal"
+                    )
+                except TypeError:
+                    selection = xu.concat(
+                        [start, selection], dim="time", data_vars="minimal"
+                    )
+
+            if "repeat_stress" in selection.data_vars and self._valid(
+                selection.get("repeat_stress").values[()]
+            ):
+                selection = self._slice_repeat_stress(
+                    self.dataset, selection, time_start, time_end
                 )
 
         if "layer" in selection.coords:
