@@ -288,11 +288,18 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         -------
         sliced : Modflow6Model
         """
-        kwargs = locals()
-        kwargs.pop("self")
         sliced = type(self)(**self.options)
         for key, pkg in self.items():
-            sliced[key] = pkg.slice_domain(**kwargs)
+            sliced[key] = pkg.slice_domain(
+                time_min=time_min,
+                time_max=time_max,
+                layer_min=layer_min,
+                layer_max=layer_max,
+                x_min=x_min,
+                x_max=x_max,
+                y_min=y_min,
+                y_max=y_max,
+            )
         return sliced
 
 

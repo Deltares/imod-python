@@ -338,9 +338,16 @@ class Modflow6Simulation(collections.UserDict):
         -------
         sliced : Simulation
         """
-        kwargs = locals()
-        kwargs.pop("self")
         sliced = type(self)(name=self.name)
         for key, value in self.items():
-            sliced[key] = value.slice_domain(**kwargs)
+            sliced[key] = value.slice_domain(
+                time_min=time_min,
+                time_max=time_max,
+                layer_min=layer_min,
+                layer_max=layer_max,
+                x_min=x_min,
+                x_max=x_max,
+                y_min=y_min,
+                y_max=y_max,
+            )
         return sliced
