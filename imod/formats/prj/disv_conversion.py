@@ -491,6 +491,49 @@ def create_rch(
     return
 
 
+def create_evt(
+    cache,
+    model,
+    key,
+    value,
+    active,
+    original2d,
+    repeat,
+    **kwargs,
+):
+    # Find highest active layer
+    highest = active["layer"] == active["layer"].where(active).max()
+    location = highest.where(highest)
+
+    surface = raise_on_layer(value, "surface")
+    disv_surface = cache.regrid(surface, original2d=original2d).where(active)
+    disv_surface = finish(disv_surface * location)
+
+    rate = raise_on_layer(value, "rate") * 0.001
+    disv_rate = cache.regrid(rate, original2d=original2d).where(active)
+    disv_rate = finish(disv_rate * location)
+
+    depth = raise_on_layer(value, "depth")
+    disv_depth = cache.regrid(depth, original2d=original2d).where(active)
+    disv_depth = finish(disv_depth * location)
+
+    # At depth 1.0, the rate is 0.0.
+    proportion_depth = xu.ones_like(disv_surface).where(disv_surface.notnull())
+    proportion_rate = xu.zeros_like(disv_surface).where(disv_surface.notnull())
+
+    evt = imod.mf6.Evapotranspiration(
+        surface=disv_surface,
+        rate=disv_rate,
+        depth=disv_depth,
+        proportion_rate=proportion_rate,
+        proportion_depth=proportion_depth,
+    )
+    if repeat is not None:
+        evt.set_repeat_stress(repeat)
+    model[key] = evt
+    return
+
+
 def create_sto(
     cache,
     storage_coefficient,
@@ -701,6 +744,7 @@ def merge_hfbs(hfbs, idomain):
 PKG_CONVERSION = {
     "chd": create_chd,
     "drn": create_drn,
+    "evt": create_evt,
     "ghb": create_ghb,
     "hfb": create_hfb,
     "shd": create_ic,
@@ -711,31 +755,31 @@ PKG_CONVERSION = {
 
 
 def expand_repetitions(
-    repeat_stress: List[datetime], times: List[datetime]
+    repeat_stress: List[datetime], time_min: datetime, time_max: datetime
 ) -> Dict[datetime, datetime]:
-    first = times[0]
-    last = times[-1]
     expanded = {}
     for date, year in itertools.product(
-        repeat_stress, range(first.year, last.year + 1)
+        repeat_stress, range(time_min.year, time_max.year + 1)
     ):
         newdate = date.replace(year=year)
-        if newdate < last:
+        if newdate < time_max:
             expanded[newdate] = date
     return expanded
 
 
-def convert_to_disv(projectfile_data, target, repeat_stress=None, times=None):
+def convert_to_disv(
+    projectfile_data, target, time_min=None, time_max=None, repeat_stress=None
+):
     """
     Convert the contents of a project file to a MODFLOW6 DISV model.
 
-    Note: the times argument is used to expand repeated stress periods. The
-    total set of stress periods is defined by the dates of the boundary
-    conditions, as well as the times provided in repeat_stress: if a boundary
-    condition contains a stress period that precedes the first entry in times,
-    the boundary condition datetime is used as the first time.
+    The ``time_min`` and ``time_max`` are **both** required when
+    ``repeat_stress`` is given. The entries in the Periods section of the
+    project file will be expanded to yearly repeats between ``time_min`` and
+    ``time_max``.
 
-    The times argument is not used when repeat_stress is not provided.
+    Additionally, ``time_min`` and ``time_max`` may be used to slice the input
+    to a specific time domain.
 
     The returned model is steady-state if none of the packages contain a time
     dimension. The model is transient if any of the packages contain a time
@@ -751,22 +795,26 @@ def convert_to_disv(projectfile_data, target, repeat_stress=None, times=None):
     target: xu.Ugrid2d
         The unstructured target topology. All data is transformed to match this
         topology.
+    time_min: datetime, optional
+        Minimum starting time of a stress.
+        Required when ``repeat_stress`` is provided.
+    time_max: datetime, optional
+        Maximum starting time of a stress.
+        Required when ``repeat_stress`` is provided.
     repeat_stress: dict of dict of string to datetime, optional
         This dict contains contains, per topic, the period alias (a string) to
         its datetime.
-    times: list of datetimes, optional
-        The stress period times. Required when repeat_stress is given.
 
     Returns
     -------
     disv_model: imod.mf6.GroundwaterFlowModel
 
     """
-    if times is None:
+    if time_min is None or time_max is None:
         if repeat_stress is not None:
-            raise ValueError("times is required when repeat_stress is given")
-    else:
-        times = sorted(times)
+            raise ValueError(
+                "time_min and time_max are required when repeat_stress is given"
+            )
 
     data = projectfile_data.copy()
     model = imod.mf6.GroundwaterFlowModel()
@@ -813,7 +861,7 @@ def convert_to_disv(projectfile_data, target, repeat_stress=None, times=None):
         else:
             repeat = repeat_stress.get(key)
             if repeat is not None:
-                repeat = expand_repetitions(repeat, times)
+                repeat = expand_repetitions(repeat, time_min, time_max)
 
         try:
             # conversion will update model instance
@@ -841,6 +889,9 @@ def convert_to_disv(projectfile_data, target, repeat_stress=None, times=None):
         model["hfb"] = merge_hfbs(hfbs, idomain)
 
     transient = any("time" in pkg.dataset.dims for pkg in model.values())
+    if transient and (time_min is not None or time_max is not None):
+        model = model.slice_domain(time_min=time_min, time_max=time_max)
+
     sto_entry = data.get("sto")
     if sto_entry is None:
         if transient:

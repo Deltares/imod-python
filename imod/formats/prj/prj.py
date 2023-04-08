@@ -52,7 +52,7 @@ KEYS = {
 DATE_KEYS = {
     "(uzf)": (None,),
     "(rch)": ("rate",),
-    "(evt)": ("rate", "extinction_depth"),
+    "(evt)": ("rate", "surface", "depth"),
     "(drn)": ("conductance", "elevation"),
     "(olf)": ("elevation",),
     "(riv)": ("conductance", "stage", "bottom_elevation", "infiltration_factor"),
