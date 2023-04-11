@@ -155,11 +155,8 @@ def finish(uda):
     Set dimension order, and drop empty layers.
     """
     facedim = uda.ugrid.grid.face_dimension
-    if "time" in uda.dims:
-        dims = ("time", "layer", facedim)
-    else:
-        dims = ("layer", facedim)
-    return uda.transpose(*dims).dropna("layer", how="all")
+    dims = ("time", "layer", facedim)
+    return uda.transpose(*dims, missing_dims="ignore").dropna("layer", how="all")
 
 
 def create_idomain(thickness):
@@ -259,7 +256,7 @@ def create_chd(
         method="barycentric",
         original2d=original2d,
     )
-    valid = active & (ibound < 0)
+    valid = (ibound < 0) & active
 
     if not valid.any():
         return
@@ -292,11 +289,11 @@ def create_drn(
         original2d=original2d,
     )
     disv_elev = cache.regrid(elevation, original2d=original2d)
-    valid = active & (disv_cond > 0) & disv_elev.notnull()
+    valid = (disv_cond > 0) & disv_elev.notnull() & active
     location = xu.ones_like(active, dtype=float)
     location = location.where((disv_elev > bottom) & (disv_elev <= top)).where(valid)
-    disv_cond = (location * disv_cond).dropna("layer", how="all")
-    disv_elev = (location * disv_elev).dropna("layer", how="all")
+    disv_cond = finish(location * disv_cond)
+    disv_elev = finish(location * disv_elev)
 
     if disv_cond.isnull().all():
         return
@@ -334,7 +331,7 @@ def create_ghb(
         method="barycentric",
         original2d=original2d,
     )
-    valid = active & (disv_cond > 0.0) & disv_head.notnull()
+    valid = (disv_cond > 0.0) & disv_head.notnull() & active
 
     ghb = imod.mf6.GeneralHeadBoundary(
         conductance=disv_cond.where(valid),
@@ -563,6 +560,9 @@ def create_wel(
     key,
     value,
     active,
+    top,
+    bottom,
+    k,
     repeat,
     **kwargs,
 ):
@@ -570,24 +570,58 @@ def create_wel(
     dataframe = value["dataframe"]
     layer = value["layer"]
 
-    columns = dataframe.columns
-    x, y, rate = columns[:3]
-    xy = np.column_stack([dataframe[x], dataframe[y]])
+    if layer <= 0:
+        dataframe = imod.prepare.assign_wells(
+            wells=dataframe,
+            top=top,
+            bottom=bottom,
+            k=k,
+            minimum_thickness=0.01,
+            minimum_k=1.0,
+        )
+    else:
+        dataframe["index"] = np.arange(len(dataframe))
+        dataframe["layer"] = layer
+
+    first = dataframe.groupby("index").first()
+    xy = np.column_stack([first["x"], first["y"]])
     cell2d = target.locate_points(xy)
     valid = (cell2d >= 0) & active.values[layer - 1, cell2d]
+    well_layer = np.full_like(cell2d, layer)
 
+    cell2d = cell2d[valid] + 1
     # Skip if no wells are located inside cells
     if not valid.any():
         return
 
-    cell2d = cell2d[valid] + 1
+    if "time" in dataframe.columns:
+        # Ensure the well data is rectangular.
+        time = np.unique(dataframe["time"].values)
+        dataframe = dataframe.set_index("time")
+        # First ffill, then bfill!
+        dfs = [df.reindex(time).ffill().bfill() for _, df in dataframe.groupby("index")]
+        rate = (
+            pd.concat(dfs)
+            .reset_index()
+            .set_index(["time", "index"])["rate"]
+            .to_xarray()
+        )
+    else:
+        rate = xr.DataArray(
+            dataframe["rate"], coords={"index": dataframe["index"]}, dims=["index"]
+        )
+
+    # Don't forget to remove the out-of-bounds points.
+    rate = rate.where(xr.DataArray(valid, dims=["index"]), drop=True)
+
     wel = imod.mf6.WellDisVertices(
-        layer=np.full_like(cell2d, layer),
+        layer=well_layer,
         cell2d=cell2d,
-        rate=dataframe.loc[valid, rate],
+        rate=rate,
     )
     if repeat is not None:
         wel.set_repeat_stress(repeat)
+
     model[key] = wel
     return
 
@@ -810,10 +844,17 @@ def convert_to_disv(
     disv_model: imod.mf6.GroundwaterFlowModel
 
     """
-    if time_min is None or time_max is None:
-        if repeat_stress is not None:
+    if repeat_stress is not None:
+        if time_min is None or time_max is None:
             raise ValueError(
                 "time_min and time_max are required when repeat_stress is given"
+            )
+
+    for arg in (time_min, time_max):
+        if arg is not None and not isinstance(arg, datetime):
+            raise TypeError(
+                "time_min and time_max must be datetime.datetime. "
+                f"Received: {type(arg).__name__}"
             )
 
     data = projectfile_data.copy()
@@ -890,7 +931,7 @@ def convert_to_disv(
 
     transient = any("time" in pkg.dataset.dims for pkg in model.values())
     if transient and (time_min is not None or time_max is not None):
-        model = model.slice_domain(time_min=time_min, time_max=time_max)
+        model = model.clip_box(time_min=time_min, time_max=time_max)
 
     sto_entry = data.get("sto")
     if sto_entry is None:

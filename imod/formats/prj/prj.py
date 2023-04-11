@@ -6,9 +6,11 @@ from collections import defaultdict
 from datetime import datetime
 from itertools import chain
 from os import PathLike
+from pathlib import Path
 from typing import Any, Dict, List, Sequence, Tuple, Union
 
 import numpy as np
+import pandas as pd
 import xarray as xr
 
 import imod
@@ -712,15 +714,44 @@ def _read_package_ipf(
     repeats = []
     for entry in block_content["ipf"]:
         timestring = entry["time"]
+        layer = entry["layer"]
         time = periods.get(timestring)
         if time is None:
             time = _process_time(timestring)
         else:
             repeats.append(time)
 
+        # Ensure the columns are identifiable.
+        path = Path(entry["path"])
+        ipf_df, indexcol, ext = imod.ipf._read_ipf(path)
+        if indexcol == 0:
+            # No associated files
+            columns = ("x", "y", "rate")
+            if layer <= 0:
+                df = ipf_df.iloc[:, :5]
+                columns = columns + ("top", "bottom")
+            else:
+                df = ipf_df.iloc[:, :3]
+            df.columns = columns
+        else:
+            dfs = []
+            for row in ipf_df.itertuples():
+                filename = row[indexcol]
+                path_assoc = path.parent.joinpath(f"{filename}.{ext}")
+                df_assoc = imod.ipf.read_associated(path_assoc).iloc[:, :2]
+                df_assoc.columns = ["time", "rate"]
+                df_assoc["x"] = row[1]
+                df_assoc["y"] = row[2]
+                df_assoc["id"] = path_assoc.stem
+                if layer <= 0:
+                    df_assoc["top"] = row[4]
+                    df_assoc["bottom"] = row[5]
+                dfs.append(df_assoc)
+            df = pd.concat(dfs, ignore_index=True, sort=False)
+
         d = {
-            "dataframe": imod.ipf.read(entry["path"]),
-            "layer": entry["layer"],
+            "dataframe": df,
+            "layer": layer,
             "time": time,
         }
         out.append(d)
