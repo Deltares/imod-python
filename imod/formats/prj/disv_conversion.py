@@ -584,10 +584,10 @@ def create_wel(
         dataframe["layer"] = layer
 
     first = dataframe.groupby("index").first()
+    well_layer = first["layer"].values
     xy = np.column_stack([first["x"], first["y"]])
     cell2d = target.locate_points(xy)
-    valid = (cell2d >= 0) & active.values[layer - 1, cell2d]
-    well_layer = np.full_like(cell2d, layer)
+    valid = (cell2d >= 0) & active.values[well_layer - 1, cell2d]
 
     cell2d = cell2d[valid] + 1
     # Skip if no wells are located inside cells
