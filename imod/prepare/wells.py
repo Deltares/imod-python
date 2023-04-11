@@ -150,7 +150,9 @@ def assign_wells(
         },
     )
     df = df.loc[(df["overlap"] >= minimum_thickness) & (df["k"] >= minimum_k)]
-    df["rate"] = df["transmissivity"] / df.groupby("id")["transmissivity"].agg("sum")
+    df["rate"] = df["transmissivity"] / df.groupby("id")["transmissivity"].transform(
+        "sum"
+    )
     # Create a unique index for every id-layer combination.
     df["index"] = np.arange(len(df))
     df = df.reset_index()
