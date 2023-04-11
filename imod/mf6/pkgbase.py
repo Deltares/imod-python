@@ -520,7 +520,12 @@ class Package(abc.ABC):
         return type(self)(**self.dataset.copy())
 
     @staticmethod
-    def _slice_repeat_stress(dataset, selection, time_start, time_end):
+    def _clip_repeat_stress(
+        repeat_stress: xr.DataArray,
+        time,
+        time_start,
+        time_end,
+    ):
         """
         Selection may remove the original data which are repeated.
         These should be re-inserted at the first occuring "key".
@@ -528,31 +533,20 @@ class Package(abc.ABC):
         timestamps with data.
         """
         # First, "pop" and filter.
-        keys, values = selection["repeat_stress"].values.T
-        selection = selection.drop_vars("repeat_stress")
+        keys, values = repeat_stress.values.T
         keep = (keys >= time_start) & (keys <= time_end)
         new_keys = keys[keep]
         new_values = values[keep]
         # Now detect which "value" entries have gone missing
-        unique_values, index = np.unique(new_values, return_index=True)
-        missing = ~np.isin(unique_values, selection["time"].values)
-        # Create a new dataset containing these entries, and merge into the
-        # selection.
-        to_insert = index[missing]
-        insert_keys = new_keys[to_insert]
-        insert_values = new_values[to_insert]
-        insert_dataset = dataset.sel(time=insert_values).drop_vars("repeat_stress")
-        insert_dataset["time"] = insert_keys
-
-        # TODO: hopefully remove this when Ugrid can be used as Index.
-        try:
-            selection = xr.concat(
-                (selection, insert_dataset), dim="time", data_vars="minimal"
-            ).sortby("time")
-        except TypeError:
-            selection = xu.concat(
-                (selection, insert_dataset), dim="time", data_vars="minimal"
-            ).sortby("time")
+        insert_values, index = np.unique(new_values, return_index=True)
+        insert_keys = new_keys[index]
+        # Setup indexer
+        indexer = xr.DataArray(
+            data=np.arange(time.size),
+            coords={"time": time},
+            dims=("time",),
+        ).sel(time=insert_values)
+        indexer["time"] = insert_keys
 
         # Update the key-value pairs. Discard keys that have been "promoted".
         keep = np.in1d(new_keys, insert_keys, assume_unique=True, invert=True)
@@ -560,11 +554,47 @@ class Package(abc.ABC):
         new_values = new_values[keep]
         # Set the values to their new source.
         new_values = insert_keys[np.searchsorted(insert_values, new_values)]
-        selection["repeat_stress"] = xr.DataArray(
+        repeat_stress = xr.DataArray(
             data=np.column_stack((new_keys, new_values)),
             dims=("repeat", "repeat_items"),
         )
-        return selection
+        return indexer, repeat_stress
+
+    @staticmethod
+    def _clip_time_indexer(
+        time,
+        time_start,
+        time_end,
+    ):
+        original = xr.DataArray(
+            data=np.arange(time.size),
+            coords={"time": time},
+            dims=("time",),
+        )
+        indexer = original.sel(time=slice(time_start, time_end))
+
+        # The selection might return a 0-sized dimension.
+        if indexer.size > 0:
+            first_time = indexer["time"].values[0]
+        else:
+            first_time = None
+
+        # If the first time matches exactly, xarray will have done thing we
+        # wanted and our work with the time dimension is finished.
+        if time_start != first_time:
+            # If the first time is before the original time, we need to
+            # backfill; otherwise, we need to ffill the first timestamp.
+            if time_start < time[0]:
+                method = "bfill"
+            else:
+                method = "ffill"
+            # Index with a list rather than a scalar to preserve the time
+            # dimension.
+            first = original.sel(time=[time_start], method=method)
+            first["time"] = [time_start]
+            indexer = xr.concat([first, indexer], dim="time")
+
+        return indexer
 
     def clip_box(
         self,
@@ -606,47 +636,31 @@ class Package(abc.ABC):
         """
         selection = self.dataset
         if "time" in selection:
-            use_cftime = isinstance(selection["time"][0], cftime.datetime)
+            time = selection["time"].values
+            use_cftime = isinstance(time[0], cftime.datetime)
             time_start = imod.wq.timeutil.to_datetime(time_min, use_cftime)
             time_end = imod.wq.timeutil.to_datetime(time_max, use_cftime)
-            selection = selection.sel(time=slice(time_start, time_end))
 
-            # The selection might return a 0-sized dimension.
-            if selection["time"].size > 0:
-                first_time = selection["time"].values[0]
-            else:
-                first_time = None
-
-            # If the first time matches exactly, xarray will have done thing we
-            # wanted and our work with the time dimension is finished.
-            if time_start != first_time:
-                # If the first time is before the original time, we need to
-                # backfill; otherwise, we need to ffill the first timestamp.
-                if time_start < self.dataset["time"].values[0]:
-                    method = "bfill"
-                else:
-                    method = "ffill"
-                # Index with a list rather than a scalar to preserve the time
-                # dimension.
-                start = self.dataset.sel(time=[time_start], method=method)
-                start["time"] = [time_start]
-
-                # TODO: hopefully remove this when Ugrid can be used as Index.
-                try:
-                    selection = xr.concat(
-                        [start, selection], dim="time", data_vars="minimal"
-                    )
-                except TypeError:
-                    selection = xu.concat(
-                        [start, selection], dim="time", data_vars="minimal"
-                    )
+            indexer = self._clip_time_indexer(
+                time=time,
+                time_start=time_start,
+                time_end=time_end,
+            )
 
             if "repeat_stress" in selection.data_vars and self._valid(
-                selection.get("repeat_stress").values[()]
+                selection["repeat_stress"].values[()]
             ):
-                selection = self._slice_repeat_stress(
-                    self.dataset, selection, time_start, time_end
+                repeat_indexer, repeat_stress = self._clip_repeat_stress(
+                    repeat_stress=selection["repeat_stress"],
+                    time=time,
+                    time_start=time_start,
+                    time_end=time_end,
                 )
+                selection = selection.drop_vars("repeat_stress")
+                selection["repeat_stress"] = repeat_stress
+                indexer = repeat_indexer.combine_first(indexer).astype(int)
+
+            selection = selection.drop_vars("time").isel(time=indexer)
 
         if "layer" in selection.coords:
             layer_slice = slice(layer_min, layer_max)
