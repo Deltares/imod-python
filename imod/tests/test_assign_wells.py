@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from pandas.testing import assert_frame_equal
 
 import imod.prepare.wells as prepwel
 
@@ -64,9 +65,9 @@ class TestAssignWell:
         bottom = ones.copy()
         bottom[0] = 0.0
         bottom[1] = -10.0
-        kh = ones.copy()
-        kh[0] = 10.0
-        kh[1] = 20.0
+        k = ones.copy()
+        k[0] = 10.0
+        k[1] = 20.0
 
         wells = pd.DataFrame(
             {
@@ -82,14 +83,14 @@ class TestAssignWell:
         self.wells = wells
         self.top = top
         self.bottom = bottom
-        self.kh = kh
+        self.k = k
 
     def test_locate_wells__no_kh(self):
         id_in_bounds, xy_top, xy_bottom, xy_kh = prepwel.locate_wells(
             wells=self.wells,
             top=self.top,
             bottom=self.bottom,
-            kh=None,
+            k=None,
         )
 
         assert np.array_equal(id_in_bounds, [1, 2, 3])
@@ -102,7 +103,7 @@ class TestAssignWell:
             wells=self.wells,
             top=self.top,
             bottom=self.bottom,
-            kh=self.kh,
+            k=self.k,
         )
 
         assert np.array_equal(id_in_bounds, [1, 2, 3])
@@ -116,18 +117,18 @@ class TestAssignWell:
         with pytest.raises(ValueError, match="bottom grid does not match"):
             small_bottom = self.bottom.sel(y=slice(2.0, 0.0))
             prepwel.locate_wells(self.wells, self.top, small_bottom, None)
-        with pytest.raises(ValueError, match="kh grid does not match"):
-            small_kh = self.kh.sel(y=slice(2.0, 0.0))
+        with pytest.raises(ValueError, match="k grid does not match"):
+            small_kh = self.k.sel(y=slice(2.0, 0.0))
             prepwel.locate_wells(self.wells, self.top, self.bottom, small_kh)
 
     def test_assign_wells_errors(self):
         with pytest.raises(ValueError, match="Columns are missing"):
             wells = pd.DataFrame({"id": [1], "x": [1.0], "y": [1.0]})
-            prepwel.assign_wells(wells, self.top, self.bottom, self.kh)
+            prepwel.assign_wells(wells, self.top, self.bottom, self.k)
         with pytest.raises(TypeError, match="top, bottom, and optionally"):
             prepwel.assign_wells(self.wells, self.top, self.bottom.values)
         with pytest.raises(TypeError, match="top, bottom, and optionally"):
-            prepwel.assign_wells(self.wells, self.top.values, self.bottom, self.kh)
+            prepwel.assign_wells(self.wells, self.top.values, self.bottom, self.k)
 
     def test_assign_wells__no_kh(self):
         actual = prepwel.assign_wells(
@@ -138,65 +139,71 @@ class TestAssignWell:
         assert isinstance(actual, pd.DataFrame)
         expected = pd.DataFrame(
             {
+                "index": [0, 1, 2, 3],
                 "id": [1, 2, 3, 3],
                 "layer": [1, 1, 1, 2],
                 "bottom": [4.0, 2.0, -1.0, -1.0],
                 "overlap": [1.0, 2.0, 3.0, 1.0],
                 "rate": [1.0, 10.0, 75.0, 25.0],
                 "top": [5.0, 4.0, 3.0, 3.0],
+                "k": [1.0, 1.0, 1.0, 1.0],
                 "transmissivity": [1.0, 2.0, 3.0, 1.0],
                 "x": [0.6, 1.1, 2.3, 2.3],
                 "y": [0.6, 1.1, 2.3, 2.3],
             }
         )
-        assert actual.equals(expected)
+        assert_frame_equal(actual, expected, check_like=True)
 
     def test_assign_wells(self):
         actual = prepwel.assign_wells(
             wells=self.wells,
             top=self.top,
             bottom=self.bottom,
-            kh=self.kh,
+            k=self.k,
         )
         assert isinstance(actual, pd.DataFrame)
         expected = pd.DataFrame(
             {
+                "index": [0, 1, 2, 3],
                 "id": [1, 2, 3, 3],
                 "layer": [1, 1, 1, 2],
                 "bottom": [4.0, 2.0, -1.0, -1.0],
                 "overlap": [1.0, 2.0, 3.0, 1.0],
                 "rate": [1.0, 10.0, 60.0, 40.0],
                 "top": [5.0, 4.0, 3.0, 3.0],
+                "k": [10.0, 10.0, 10.0, 20.0],
                 "transmissivity": [10.0, 20.0, 30.0, 20.0],
                 "x": [0.6, 1.1, 2.3, 2.3],
                 "y": [0.6, 1.1, 2.3, 2.3],
             }
         )
-        assert actual.equals(expected)
+        assert_frame_equal(actual, expected, check_like=True)
 
     def test_assign_wells_minimum_thickness(self):
         actual = prepwel.assign_wells(
             wells=self.wells,
             top=self.top,
             bottom=self.bottom,
-            kh=self.kh,
-            minimum_thickness=1.0,
+            k=self.k,
+            minimum_thickness=1.01,
         )
         assert isinstance(actual, pd.DataFrame)
         expected = pd.DataFrame(
             {
+                "index": [0, 1],
                 "id": [2, 3],
                 "layer": [1, 1],
                 "bottom": [2.0, -1.0],
                 "overlap": [2.0, 3.0],
                 "rate": [10.0, 100.0],
                 "top": [4.0, 3.0],
+                "k": [10.0, 10.0],
                 "transmissivity": [20.0, 30.0],
                 "x": [1.1, 2.3],
                 "y": [1.1, 2.3],
             }
         )
-        assert actual.equals(expected)
+        assert_frame_equal(actual, expected, check_like=True)
 
     def test_assign_wells_transient_rate(self):
         wells_xr = self.wells.to_xarray()
@@ -212,7 +219,7 @@ class TestAssignWell:
             wells=transient_wells,
             top=self.top,
             bottom=self.bottom,
-            kh=self.kh,
+            k=self.k,
         )
         assert np.array_equal(actual["id"], np.repeat([1, 2, 3, 3], 5))
 
@@ -220,7 +227,7 @@ class TestAssignWell:
             wells=transient_wells,
             top=self.top,
             bottom=self.bottom,
-            kh=self.kh,
-            minimum_thickness=1.0,
+            k=self.k,
+            minimum_thickness=1.01,
         )
         assert np.array_equal(actual["id"], np.repeat([2, 3], 5))

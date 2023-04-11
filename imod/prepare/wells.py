@@ -45,23 +45,23 @@ def locate_wells(
     wells: pd.DataFrame,
     top: Union[xr.DataArray, xu.UgridDataArray],
     bottom: Union[xr.DataArray, xu.UgridDataArray],
-    kh: Union[xr.DataArray, xu.UgridDataArray, None],
+    k: Union[xr.DataArray, xu.UgridDataArray, None],
 ):
-    # Default to a xy_kh value of 1.0: weigh every layer equally.
-    xy_kh = 1.0
+    # Default to a xy_k value of 1.0: weigh every layer equally.
+    xy_k = 1.0
     first = wells.groupby("id").first()
     x = first["x"].to_numpy()
     y = first["y"].to_numpy()
     if isinstance(top, xu.UgridDataArray):
         xy_top = top.ugrid.sel_points(x=x, y=y)
         xy_bottom = bottom.ugrid.sel_points(x=x, y=y)
-        if kh is not None:
-            xy_kh = kh.ugrid.sel_points(x=x, y=y)
+        if k is not None:
+            xy_k = k.ugrid.sel_points(x=x, y=y)
     elif isinstance(top, xr.DataArray):
         xy_top = imod.select.points_values(top, x=x, y=y, out_of_bounds="ignore")
         xy_bottom = imod.select.points_values(bottom, x=x, y=y, out_of_bounds="ignore")
-        if kh is not None:
-            xy_kh = imod.select.points_values(kh, x=x, y=y, out_of_bounds="ignore")
+        if k is not None:
+            xy_k = imod.select.points_values(k, x=x, y=y, out_of_bounds="ignore")
     else:
         raise TypeError(
             "top and bottom should be DataArray or UgridDataArray, received: "
@@ -72,25 +72,25 @@ def locate_wells(
     index = xy_top["index"]
     if not np.array_equal(xy_bottom["index"], index):
         raise ValueError("bottom grid does not match top grid")
-    if kh is not None and not np.array_equal(xy_kh["index"], index):
-        raise ValueError("kh grid does not match top grid")
+    if k is not None and not np.array_equal(xy_k["index"], index):
+        raise ValueError("k grid does not match top grid")
     id_in_bounds = first.index[index]
 
-    return id_in_bounds, xy_top, xy_bottom, xy_kh
+    return id_in_bounds, xy_top, xy_bottom, xy_k
 
 
 def assign_wells(
     wells: pd.DataFrame,
     top: Union[xr.DataArray, xu.UgridDataArray],
     bottom: Union[xr.DataArray, xu.UgridDataArray],
-    kh: Optional[Union[xr.DataArray, xu.UgridDataArray]] = None,
-    minimum_thickness: Optional[float] = 0.0,
-    minimum_transmissivity: Optional[float] = 0.0,
+    k: Optional[Union[xr.DataArray, xu.UgridDataArray]] = None,
+    minimum_thickness: Optional[float] = 0.05,
+    minimum_k: Optional[float] = 1.0,
 ) -> pd.DataFrame:
     """
-    Distribute well pumping rate according to filter length when ``kh=None``,
-    or filter transmissivity. Minimum thickness and minimum tranmissivity
-    should be set to avoid placing wells in clay layers.
+    Distribute well pumping rate according to filter length when ``k=None``, or
+    filter transmissivity. Minimum thickness and minimum k should be
+    set to avoid placing wells in clay layers.
 
     Wells located outside of the grid are removed.
 
@@ -102,10 +102,11 @@ def assign_wells(
         Top of the model layers.
     bottom: xr.DataArray or xu.UgridDataArray
         Bottom of the model layers.
-    kh: xr.DataArray or xu.UgridDataArray, optional
+    k: xr.DataArray or xu.UgridDataArray, optional
         Horizontal conductivity of the model layers.
-    minimum_thickness: float, optional
-    minimum_tranmissivity: float, optional
+    minimum_thickness: float, optional, default: 0.01
+    minimum_k: float, optional, default: 1.0
+        Minimum conductivity
 
     Returns
     -------
@@ -119,23 +120,23 @@ def assign_wells(
     if missing:
         raise ValueError(f"Columns are missing in wells dataframe: {missing}")
 
-    types = [type(arg) for arg in (top, bottom, kh) if arg is not None]
+    types = [type(arg) for arg in (top, bottom, k) if arg is not None]
     if len(set(types)) != 1:
         members = ",".join([t.__name__ for t in types])
         raise TypeError(
-            "top, bottom, and optionally kh should be of the same type, "
+            "top, bottom, and optionally k should be of the same type, "
             f"received: {members}"
         )
 
-    id_in_bounds, xy_top, xy_bottom, xy_kh = locate_wells(wells, top, bottom, kh)
+    id_in_bounds, xy_top, xy_bottom, xy_k = locate_wells(wells, top, bottom, k)
     wells_in_bounds = wells.set_index("id").loc[id_in_bounds].reset_index()
     first = wells_in_bounds.groupby("id").first()
     overlap = compute_overlap(first, xy_top, xy_bottom)
 
-    if kh is None:
-        transmissivity = overlap * 1.0
+    if k is None:
+        k = 1.0
     else:
-        transmissivity = overlap * xy_kh.values.ravel()
+        k = xy_k.values.ravel()
 
     # Distribute rate according to transmissivity.
     n_layer, n_well = xy_top.shape
@@ -144,14 +145,14 @@ def assign_wells(
         data={
             "layer": np.repeat(top["layer"], n_well),
             "overlap": overlap,
-            "transmissivity": transmissivity,
+            "k": k,
+            "transmissivity": overlap * k,
         },
     )
-    df = df.loc[
-        (df["overlap"] > minimum_thickness)
-        & (df["transmissivity"] > minimum_transmissivity)
-    ]
+    df = df.loc[(df["overlap"] >= minimum_thickness) & (df["k"] >= minimum_k)]
     df["rate"] = df["transmissivity"] / df.groupby("id")["transmissivity"].agg("sum")
+    # Create a unique index for every id-layer combination.
+    df["index"] = np.arange(len(df))
     df = df.reset_index()
 
     # Get rid of those that are removed because of minimum thickness or
@@ -160,7 +161,9 @@ def assign_wells(
 
     # Use pandas multi-index broadcasting.
     # Maintain all other columns as-is.
+    wells_in_bounds["index"] = 1  # N.B. integer!
     wells_in_bounds["overlap"] = 1.0
+    wells_in_bounds["k"] = 1.0
     wells_in_bounds["transmissivity"] = 1.0
     columns = list(set(wells_in_bounds.columns).difference(df))
     if "time" in wells_in_bounds:
@@ -168,7 +171,7 @@ def assign_wells(
         columns.remove("time")
     else:
         indexes = "id"
-    df[columns] = 1
+    df[columns] = 1  # N.B. integer!
 
     assigned = (
         wells_in_bounds.set_index(indexes) * df.set_index(["id", "layer"])
