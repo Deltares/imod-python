@@ -235,7 +235,7 @@ ax.set_aspect(1)
 # We may also quickly setup a smaller model. We'll select half of the original
 # domain.
 
-half_simulation = simulation.slice_domain(x_max=0.0)
+half_simulation = simulation.clip_box(x_max=0.0)
 
 # %%
 # Let's run the model, read the results, and visualize.

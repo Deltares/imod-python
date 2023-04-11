@@ -105,7 +105,7 @@ def test_get_indices__nonequidistant(test_da_nonequidistant):
     x = [4.0, 0.0]
     y = [2.5, 0.0]
     with pytest.raises(ValueError):
-        _ = imod.select.points_indices(test_da_nonequidistant, x=x, y=y)
+        imod.select.points_indices(test_da_nonequidistant, x=x, y=y)
 
 
 def test_get_indices__equidistant(test_da):
@@ -177,7 +177,7 @@ def test_get_values__index(test_da_nonequidistant):
     data = [0, 5, 10]
     expected = xr.DataArray(
         data,
-        coords={"index": [11, 12, 13], "x": ("index", x), "y": ("index", y)},
+        coords={"index": [0, 1, 2], "x": ("index", x), "y": ("index", y)},
         dims=["index"],
     )
     assert actual.identical(expected)

@@ -250,7 +250,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         return instance
 
-    def slice_domain(
+    def clip_box(
         self,
         time_min=None,
         time_max=None,
@@ -262,16 +262,16 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         y_max=None,
     ):
         """
-        Slice a package along the specified dimensions.
+        Clip a model by a bounding box (time, layer, y, x).
 
         Slicing intervals may be half-bounded, by providing None:
 
         * To select 500.0 <= x <= 1000.0:
-          ``slice_domain(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``slice_domain(x_min=None, x_max=1000.0)``
-          or ``slice_domain(x_max=1000.0)``.
-        * To select x >= 500.0: ``slice_domain(x_min = 500.0, x_max=None.0)``
-          or ``slice_domain(x_min=1000.0)``.
+          ``clip_box(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
+          or ``clip_box(x_max=1000.0)``.
+        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
+          or ``clip_box(x_min=1000.0)``.
 
         Parameters
         ----------
@@ -290,7 +290,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         """
         sliced = type(self)(**self.options)
         for key, pkg in self.items():
-            sliced[key] = pkg.slice_domain(
+            sliced[key] = pkg.clip_box(
                 time_min=time_min,
                 time_max=time_max,
                 layer_min=layer_min,

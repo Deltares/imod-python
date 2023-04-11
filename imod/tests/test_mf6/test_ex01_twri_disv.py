@@ -37,7 +37,7 @@ def test_simulation_write_and_run(twri_disv_model, tmp_path):
 def test_slice_and_run(twri_disv_model, tmp_path):
     # TODO: bring back well once slicing is implemented...
     twri_disv_model["GWF_1"].pop("wel")
-    simulation = twri_disv_model.slice_domain(
+    simulation = twri_disv_model.clip_box(
         layer_min=1,
         layer_max=2,
         x_min=None,

@@ -266,20 +266,20 @@ def test_write_concentration_period_data(rate_fc, concentration_fc):
             )  # the number 2 is in the concentration data, and in the cell indices.
 
 
-def test_slice_domain(rch_dict):
+def test_clip_box(rch_dict):
     rch = imod.mf6.Recharge(**rch_dict)
 
-    selection = rch.slice_domain()
+    selection = rch.clip_box()
     assert isinstance(selection, imod.mf6.Recharge)
     assert selection.dataset.identical(rch.dataset)
 
-    selection = rch.slice_domain(x_min=10.0, x_max=20.0, y_min=10.0, y_max=20.0)
+    selection = rch.clip_box(x_min=10.0, x_max=20.0, y_min=10.0, y_max=20.0)
     assert selection["rate"].dims == ("layer", "y", "x")
     assert selection["rate"].shape == (1, 1, 1)
 
     # No layer dim
     rch_dict["rate"] = rch_dict["rate"].sel(layer=1, drop=False)
     rch = imod.mf6.Recharge(**rch_dict)
-    selection = rch.slice_domain(x_min=10.0, x_max=20.0, y_min=10.0, y_max=20.0)
+    selection = rch.clip_box(x_min=10.0, x_max=20.0, y_min=10.0, y_max=20.0)
     assert selection["rate"].dims == ("y", "x")
     assert selection["rate"].shape == (1, 1)

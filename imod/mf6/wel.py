@@ -110,7 +110,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
 
         self._validate_init_schemata(validate)
 
-    def slice_domain(
+    def clip_box(
         self,
         time_min=None,
         time_max=None,
@@ -122,16 +122,16 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         y_max=None,
     ) -> "WellDisStructured":
         """
-        Slice a package along the specified dimensions.
+        Clip a package by a bounding box (time, layer, y, x).
 
         Slicing intervals may be half-bounded, by providing None:
 
         * To select 500.0 <= x <= 1000.0:
-          ``slice_domain(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``slice_domain(x_min=None, x_max=1000.0)``
-          or ``slice_domain(x_max=1000.0)``.
-        * To select x >= 500.0: ``slice_domain(x_min = 500.0, x_max=None.0)``
-          or ``slice_domain(x_min=1000.0)``.
+          ``clip_box(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
+          or ``clip_box(x_max=1000.0)``.
+        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
+          or ``clip_box(x_min=1000.0)``.
 
         Parameters
         ----------
@@ -158,12 +158,10 @@ class WellDisStructured(DisStructuredBoundaryCondition):
             y_max,
         ):
             if arg is not None:
-                raise NotImplementedError(
-                    "Can only slice_domain in time for Well packages"
-                )
+                raise NotImplementedError("Can only clip_box in time for Well packages")
 
         # The super method will select in the time dimension without issues.
-        new = super().slice_domain(time_min=time_min, time_max=time_max)
+        new = super().clip_box(time_min=time_min, time_max=time_max)
         return new
 
 
@@ -253,7 +251,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
 
         self._validate_init_schemata(validate)
 
-    def slice_domain(
+    def clip_box(
         self,
         time_min=None,
         time_max=None,
@@ -265,16 +263,16 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         y_max=None,
     ) -> "WellDisStructured":
         """
-        Slice a package along the specified dimensions.
+        Clip a package by a bounding box (time, layer, y, x).
 
         Slicing intervals may be half-bounded, by providing None:
 
         * To select 500.0 <= x <= 1000.0:
-          ``slice_domain(x_min=500.0, x_max=1000.0)``.
-        * To select x <= 1000.0: ``slice_domain(x_min=None, x_max=1000.0)``
-          or ``slice_domain(x_max=1000.0)``.
-        * To select x >= 500.0: ``slice_domain(x_min = 500.0, x_max=None.0)``
-          or ``slice_domain(x_min=1000.0)``.
+          ``clip_box(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
+          or ``clip_box(x_max=1000.0)``.
+        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
+          or ``clip_box(x_min=1000.0)``.
 
         Parameters
         ----------
@@ -301,10 +299,8 @@ class WellDisVertices(DisVerticesBoundaryCondition):
             y_max,
         ):
             if arg is not None:
-                raise NotImplementedError(
-                    "Can only slice_domain in time for Well packages"
-                )
+                raise NotImplementedError("Can only clip_box in time for Well packages")
 
         # The super method will select in the time dimension without issues.
-        new = super().slice_domain(time_min=time_min, time_max=time_max)
+        new = super().clip_box(time_min=time_min, time_max=time_max)
         return new

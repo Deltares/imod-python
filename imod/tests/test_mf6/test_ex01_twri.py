@@ -520,7 +520,7 @@ def test_simulation_write_errors(twri_model, tmp_path):
 def test_slice_and_run(transient_twri_model, tmp_path):
     # TODO: bring back well once slicing is implemented...
     transient_twri_model["GWF_1"].pop("wel")
-    simulation = transient_twri_model.slice_domain(
+    simulation = transient_twri_model.clip_box(
         time_min="2000-01-10",
         time_max="2000-01-20",
         layer_min=1,

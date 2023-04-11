@@ -251,18 +251,18 @@ def test_repeat_stress(
     assert actual == expected
 
 
-def test_slice_domain(drainage):
+def test_clip_box(drainage):
     drn = imod.mf6.Drainage(**drainage)
 
-    selection = drn.slice_domain()
+    selection = drn.clip_box()
     assert isinstance(selection, imod.mf6.Drainage)
     assert selection.dataset.identical(drn.dataset)
 
-    selection = drn.slice_domain(x_min=None, x_max=None)
+    selection = drn.clip_box(x_min=None, x_max=None)
     assert isinstance(selection, imod.mf6.Drainage)
     assert selection.dataset.identical(drn.dataset)
 
-    selection = drn.slice_domain(
+    selection = drn.clip_box(
         layer_min=1,
         layer_max=2,
         y_min=1.0,
@@ -275,11 +275,11 @@ def test_slice_domain(drainage):
     assert selection["conductance"].shape == (2, 3, 3)
 
 
-def test_slice_domain_transient(transient_drainage):
+def test_clip_box_transient(transient_drainage):
     drn = imod.mf6.Drainage(**transient_drainage)
 
     # First test the standard case: clip into existing times.
-    selection = drn.slice_domain(time_min="2001-01-01", time_max="2004-01-01")
+    selection = drn.clip_box(time_min="2001-01-01", time_max="2004-01-01")
     expected = np.array(
         [
             "2001-01-01T00:00:00.000000000",
@@ -295,7 +295,7 @@ def test_slice_domain_transient(transient_drainage):
     assert np.array_equal(selection.dataset["time"], expected)
 
     # Now test a succesfull forward fill.
-    selection = drn.slice_domain(time_min="2000-06-01", time_max="2002-06-01")
+    selection = drn.clip_box(time_min="2000-06-01", time_max="2002-06-01")
     expected = np.array(
         [
             "2000-06-01T00:00:00.000000000",
@@ -308,7 +308,7 @@ def test_slice_domain_transient(transient_drainage):
     assert (selection["conductance"].sel(time="2000-06-01") == 1.0).all()
 
     # And a backfill.
-    selection = drn.slice_domain(time_min="1990-06-01", time_max="2002-06-01")
+    selection = drn.clip_box(time_min="1990-06-01", time_max="2002-06-01")
     expected = np.array(
         [
             "1990-06-01T00:00:00.000000000",
