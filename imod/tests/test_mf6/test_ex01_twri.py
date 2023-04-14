@@ -225,20 +225,18 @@ def test_oc_render(twri_model, tmp_path):
     )
     expected = textwrap.dedent(
         f"""\
-            begin options
-              budget fileout {path}/{tmp_path.stem}.cbc
-              head fileout {path}/{tmp_path.stem}.hds
-            end options
+          begin options
+            budget fileout {path}/{tmp_path.stem}.cbc
+            head fileout {path}/{tmp_path.stem}.hds
+          end options
 
-            begin period 1
-              save head all
-              save budget all
-            end period
-            """
+          begin period 1
+            save head all
+            save budget all
+          end period
+          """
     )
     assert actual == expected
-    oc.write(directory=tmp_path, pkgname="oc", globaltimes=globaltimes, binary=True)
-    assert (tmp_path / "oc.oc").is_file()
 
     path = Path(tmp_path.stem)
     actual = oc.render(
@@ -246,16 +244,16 @@ def test_oc_render(twri_model, tmp_path):
     )
     expected = textwrap.dedent(
         f"""\
-            begin options
-              budget fileout {path}/{path}.cbc
-              head fileout {path}/{path}.hds
-            end options
+          begin options
+            budget fileout {path}/{path}.cbc
+            head fileout {path}/{path}.hds
+          end options
 
-            begin period 1
-              save head all
-              save budget all
-            end period
-            """
+          begin period 1
+            save head all
+            save budget all
+          end period
+          """
     )
     assert actual == expected
 

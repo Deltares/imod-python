@@ -29,7 +29,7 @@ def test_render(src_rate):
         save_flows=False,
     )
     directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     actual = src.render(directory, "src", globaltimes, True)
     expected = textwrap.dedent(
         """\
@@ -49,11 +49,14 @@ def test_render(src_rate):
 
 
 def test_render_mass_source_transient(src_rate):
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-02-01"),
-        np.datetime64("2000-03-01"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-02-01",
+            "2000-03-01",
+        ],
+        dtype="datetime64[ns]",
+    )
     rate = xr.concat(
         [
             src_rate.assign_coords(time=globaltimes[0]),
@@ -69,11 +72,14 @@ def test_render_mass_source_transient(src_rate):
         save_flows=False,
     )
     directory = pathlib.Path("mymodel")
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-02-01"),
-        np.datetime64("2000-03-01"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-02-01",
+            "2000-03-01",
+        ],
+        dtype="datetime64[ns]",
+    )
     actual = src.render(directory, "src", globaltimes, True)
     expected = textwrap.dedent(
         """\

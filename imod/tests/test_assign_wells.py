@@ -141,7 +141,7 @@ class TestAssignWell:
             {
                 "index": [0, 1, 2, 3],
                 "id": [1, 2, 3, 3],
-                "layer": [1, 1, 1, 2],
+                "layer": np.array([1, 1, 1, 2], dtype=np.int32),
                 "bottom": [4.0, 2.0, -1.0, -1.0],
                 "overlap": [1.0, 2.0, 3.0, 1.0],
                 "rate": [1.0, 10.0, 75.0, 25.0],
@@ -166,7 +166,7 @@ class TestAssignWell:
             {
                 "index": [0, 1, 2, 3],
                 "id": [1, 2, 3, 3],
-                "layer": [1, 1, 1, 2],
+                "layer": np.array([1, 1, 1, 2], dtype=np.int32),
                 "bottom": [4.0, 2.0, -1.0, -1.0],
                 "overlap": [1.0, 2.0, 3.0, 1.0],
                 "rate": [1.0, 10.0, 60.0, 40.0],
@@ -177,6 +177,7 @@ class TestAssignWell:
                 "y": [0.6, 1.1, 2.3, 2.3],
             }
         )
+        expected["layer"] = expected["layer"].astype(np.int32)
         assert_frame_equal(actual, expected, check_like=True)
 
     def test_assign_wells_minimum_thickness(self):
@@ -203,6 +204,7 @@ class TestAssignWell:
                 "y": [1.1, 2.3],
             }
         )
+        expected["layer"] = expected["layer"].astype(np.int32)
         assert_frame_equal(actual, expected, check_like=True)
 
     def test_assign_wells_transient_rate(self):

@@ -11,11 +11,14 @@ from imod.mf6 import (
     SpecificStorage,
 )
 
-globaltimes = [
-    np.datetime64("2000-01-01"),
-    np.datetime64("2000-01-02"),
-    np.datetime64("2000-01-03"),
-]
+globaltimes = np.array(
+    [
+        "2000-01-01",
+        "2000-01-02",
+        "2000-01-03",
+    ],
+    dtype="datetime64[ns]",
+)
 
 
 class grid_dimensions:
@@ -68,11 +71,14 @@ def concentration_fc():
 
 @pytest.fixture(scope="session")
 def conductance_fc():
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-01-02"),
-        np.datetime64("2000-01-03"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ],
+        dtype="datetime64[ns]",
+    )
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     # Constant head

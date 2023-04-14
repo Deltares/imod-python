@@ -141,11 +141,14 @@ def test_render_concentration(
     conductance_fc,
 ):
     directory = pathlib.Path("mymodel")
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-01-02"),
-        np.datetime64("2000-01-03"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ],
+        dtype="datetime64[ns]",
+    )
 
     drn = imod.mf6.Drainage(
         elevation=elevation_fc,
@@ -186,13 +189,16 @@ def test_repeat_stress(
     conductance_fc,
 ):
     directory = pathlib.Path("mymodel")
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-01-02"),
-        np.datetime64("2000-01-03"),
-        np.datetime64("2000-01-04"),
-        np.datetime64("2000-01-05"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+            "2000-01-04",
+            "2000-01-05",
+        ],
+        dtype="datetime64[ns]",
+    )
 
     repeat_stress = xr.DataArray(
         [
