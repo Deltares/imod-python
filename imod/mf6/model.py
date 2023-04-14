@@ -286,11 +286,11 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         Returns
         -------
-        sliced : Modflow6Model
+        clipped : Modflow6Model
         """
-        sliced = type(self)(**self.options)
+        clipped = type(self)(**self.options)
         for key, pkg in self.items():
-            sliced[key] = pkg.clip_box(
+            clipped[key] = pkg.clip_box(
                 time_min=time_min,
                 time_max=time_max,
                 layer_min=layer_min,
@@ -300,7 +300,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 y_min=y_min,
                 y_max=y_max,
             )
-        return sliced
+        return clipped
 
 
 class GroundwaterFlowModel(Modflow6Model):

@@ -632,7 +632,7 @@ class Package(abc.ABC):
 
         Returns
         -------
-        sliced : Package
+        clipped: Package
         """
         selection = self.dataset
         if "time" in selection:

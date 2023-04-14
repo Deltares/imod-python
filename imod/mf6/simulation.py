@@ -336,11 +336,11 @@ class Modflow6Simulation(collections.UserDict):
 
         Returns
         -------
-        sliced : Simulation
+        clipped : Simulation
         """
-        sliced = type(self)(name=self.name)
+        clipped = type(self)(name=self.name)
         for key, value in self.items():
-            sliced[key] = value.clip_box(
+            clipped[key] = value.clip_box(
                 time_min=time_min,
                 time_max=time_max,
                 layer_min=layer_min,
@@ -350,4 +350,4 @@ class Modflow6Simulation(collections.UserDict):
                 y_min=y_min,
                 y_max=y_max,
             )
-        return sliced
+        return clipped

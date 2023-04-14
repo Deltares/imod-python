@@ -287,7 +287,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
 
         Returns
         -------
-        sliced : Package
+        clipped: Package
         """
         # TODO: include x and y values.
         for arg in (
