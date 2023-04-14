@@ -19,6 +19,7 @@ dependencies:
   - hypothesis
   - jinja2
   - matplotlib
+  - modflow6
   - netcdf4
   - numba>=0.50
   - numpy
@@ -35,6 +36,7 @@ dependencies:
   - python>=3.7,<3.11
   - pyvista
   - rasterio>=1.0
+  - rioxarray
   - scipy
   - setuptools_scm
   - scooby

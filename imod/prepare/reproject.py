@@ -137,6 +137,9 @@ def reproject(
     >>> c = imod.rasterio.reproject(source=rotated, dst_crs="EPSG:28992", reproject_kwargs={"src_transform":affine.Affine(...)})
     >>> c = imod.rasterio.reproject(source=rotated, dst_crs="EPSG:28992", use_src_attrs=True)
     """
+    # Make sure the rio accessor is avaible.
+    import rioxarray  # noqa pylint: F401
+
     if not source.dims == ("y", "x"):
         raise ValueError(
             "reproject does not support dimensions other than ``x`` and ``y`` for ``source``."
