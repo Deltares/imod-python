@@ -147,7 +147,7 @@ gwf_model["dis"] = imod.mf6.StructuredDiscretization(
 gwf_model["chd"] = imod.mf6.ConstantHead(
     constant_head, print_input=True, print_flows=True, save_flows=False
 )
-gwf_model["ic"] = imod.mf6.InitialConditions(head=1.0)
+gwf_model["ic"] = imod.mf6.InitialConditions(start=1.0)
 gwf_model["npf"] = imod.mf6.NodePropertyFlow(
     icelltype=icelltype,
     k=k,

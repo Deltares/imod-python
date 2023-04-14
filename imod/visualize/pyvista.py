@@ -41,7 +41,7 @@ from typing import Optional, Tuple
 import numba
 import numpy as np
 import pandas as pd
-import scipy.ndimage.morphology
+import scipy.ndimage
 import tqdm
 import xarray as xr
 

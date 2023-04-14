@@ -128,12 +128,12 @@ def reproject(
     Open a single band raster, and reproject to RD new coordinate system (EPSG:28992), without explicitly specifying ``src_crs``.
     ``src_crs`` is taken from ``a.attrs``, so the raster file has to include coordinate system metadata for this to work.
 
-    >>> a = xr.open_rasterio("example.tif").squeeze("band")
+    >>> a = rioxarray.open_rasterio("example.tif").squeeze("band")
     >>> c = imod.rasterio.reproject(source=a, use_src_attrs=True, dst_crs="EPSG:28992")
 
     In case of a rotated ``source``, provide ``src_transform`` directly or ``use_src_attrs=True`` to rely on generated attributes:
 
-    >>> rotated = xr.open_rasterio("rotated_example.tif").squeeze("band")
+    >>> rotated = rioxarray.open_rasterio("rotated_example.tif").squeeze("band")
     >>> c = imod.rasterio.reproject(source=rotated, dst_crs="EPSG:28992", reproject_kwargs={"src_transform":affine.Affine(...)})
     >>> c = imod.rasterio.reproject(source=rotated, dst_crs="EPSG:28992", use_src_attrs=True)
     """
@@ -147,10 +147,14 @@ def reproject(
                 "reproject does not support dimensions other than ``x`` and ``y`` for ``like``."
             )
     if use_src_attrs:  # only provided when reproject is necessary
-        src_crs = source.attrs["crs"]
+        try:
+            src_crs = source.attrs["crs"]
+        except KeyError:
+            src_crs = source.rio.crs
+
         if isinstance(src_crs, str):
             if "epsg:" in src_crs.lower():
-                # Workaround for xr.open_rasterio generation proj4 strings
+                # Workaround for rioxarray.open_rasterio generation proj4 strings
                 # https://github.com/mapbox/rasterio/issues/1809
                 epsg_code = src_crs.lower().split("epsg:")[-1]
                 src_crs = rasterio.crs.CRS.from_epsg(epsg_code)
@@ -162,7 +166,13 @@ def reproject(
             raise ValueError(
                 f"Invalid src_crs: {src_crs}. Must be either str or rasterio.crs.CRS object"
             )
-        src_nodata = source.attrs.get("nodatavals", [None])[0]
+
+        if "nodatavals" in source.attrs:
+            src_nodata = source.attrs["nodatavals"][0]
+        else:
+            rio_nodata = source.rio.nodata
+            if rio_nodata is not None:
+                src_nodata = rio_nodata
 
     resampling_methods = {e.name: e for e in rasterio.enums.Resampling}
 
@@ -207,7 +217,10 @@ def reproject(
     elif src_crs and dst_crs:
         if use_src_attrs:
             # TODO: modify if/when xarray uses affine by default for transform
-            src_transform = affine.Affine(*source.attrs["transform"][:6])
+            try:
+                src_transform = affine.Affine(*source.attrs["transform"][:6])
+            except KeyError:
+                src_transform = source.rio.transform()
         elif "src_transform" in reproject_kwargs.keys():
             src_transform = reproject_kwargs.pop("src_transform")
         else:

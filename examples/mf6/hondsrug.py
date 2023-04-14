@@ -24,7 +24,7 @@ In overview, the model features:
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import scipy.ndimage.morphology
+import scipy.ndimage
 import xarray as xr
 
 import imod
@@ -208,7 +208,7 @@ gwf_model["ic"] = imod.mf6.InitialConditions(starting_head)
 
 def outer_edge(da):
     data = da.copy()
-    from_edge = scipy.ndimage.morphology.binary_erosion(data)
+    from_edge = scipy.ndimage.binary_erosion(data)
     is_edge = (data == 1) & (from_edge == 0)
     return is_edge.astype(bool)
 
@@ -226,7 +226,7 @@ like_2d
 # Using the previously created function and the 2d template,
 # the outer edge is defined for this example.
 
-edge = outer_edge(xr.full_like(like_2d.drop("layer"), 1))
+edge = outer_edge(xr.full_like(like_2d.drop_vars("layer"), 1))
 
 # %%
 # Adding information to the CHD package

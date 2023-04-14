@@ -385,6 +385,9 @@ def create_riv(
         elevation = elevation.where(valid)
         elevation = elevation.where(elevation <= stage, other=stage)
 
+        # TODO: this removes too much when the stage is higher than the top...
+        # Instead: just cut through all layers until the bottom elevation.
+        # Then, assign a transmissivity weighted conductance.
         water_top = stage.where(stage <= top)
         water_bottom = elevation.where(elevation > bottom)
         layer_height = top - bottom
@@ -415,7 +418,7 @@ def create_riv(
         conductance,
         method="conductance",
         original2d=original2d,
-    )
+    ).compute()
     disv_elev_2d = cache.regrid(bottom_elevation, original2d=original2d)
     disv_stage_2d = cache.regrid(stage, original2d=original2d)
     disv_inff_2d = cache.regrid(infiltration_factor, original2d=original2d)

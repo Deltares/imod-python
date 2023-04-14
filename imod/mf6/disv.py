@@ -124,13 +124,13 @@ class VerticesDiscretization(Package):
 
             f.write("begin vertices\n")
             self._verts_dataframe().to_csv(
-                f, header=False, sep=" ", line_terminator="\n"
+                f, header=False, sep=" ", lineterminator="\n"
             )
             f.write("end vertices\n\n")
 
             f.write("begin cell2d\n")
             self._cell2d_dataframe().to_csv(
-                f, header=False, sep=" ", line_terminator="\n"
+                f, header=False, sep=" ", lineterminator="\n"
             )
             f.write("end cell2d\n")
         return
