@@ -28,6 +28,12 @@ build:
     # Do editable install as pytest expects that
     # https://github.com/scikit-hep/pyhf/issues/1456
     - pip install -e .
+    # download mf6 binary and move it to the env's bin which is in the path
+    # see https://gitlab.com/deltares/imod/imod-python/snippets/1893049
+    - curl -O -L https://gitlab.com/deltares/imod/imod-python/uploads/a8ed27675150689c6acd425239531a5e/mf6.gz
+    - gunzip mf6.gz
+    - chmod +x mf6
+    - mv mf6 /opt/conda/envs/imod/bin
     # Run tests
     - cd imod/tests
     - python -m pytest --cache-clear

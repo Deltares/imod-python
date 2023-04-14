@@ -19,7 +19,6 @@ dependencies:
   - hypothesis
   - jinja2
   - matplotlib
-  - modflow6
   - netcdf4
   - numba>=0.50
   - numpy
