@@ -24,7 +24,7 @@ def get_examples():
 
 
 @pytest.mark.examples
-@pytest.mark.skipif(on_gitlab_ci())
+@pytest.mark.skipif(on_gitlab_ci(), reason="Examples are run during docs build")
 @pytest.mark.parametrize("example", get_examples())
 def test_example(example):
     subprocess.run([sys.executable, example], check=True)
