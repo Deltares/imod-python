@@ -25,7 +25,7 @@ def _outer_edge(da):
     # Number the faces by their id
     for unique_id in unique_ids:
         data = (da == unique_id).values
-        from_edge = ~scipy.ndimage.morphology.binary_dilation(~data)
+        from_edge = ~scipy.ndimage.binary_dilation(~data)
         is_edge = (data == 1) & (from_edge == 0)
         faces[is_edge] = unique_id
     return xr.DataArray(faces, da.coords, da.dims)

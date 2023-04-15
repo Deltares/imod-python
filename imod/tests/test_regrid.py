@@ -2,6 +2,7 @@ import os
 
 import numba
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 
@@ -302,7 +303,7 @@ def test_regrid_mean1d__with_time():
     values = np.full((4, 3), [1.0, 2.0, 3.0])
     src_x = np.array([2.5, 1.5, 0.5])
     dst_x = np.array([2.0, 0.5])
-    time = np.arange("2001-01-01", "2001-01-05", dtype=np.datetime64)
+    time = pd.date_range("2001-01-01", "2001-01-04")
     coords = {"time": time, "x": src_x, "dx": ("x", np.array([-1.0, -1.0, -1.0]))}
     like_coords = {"x": dst_x, "dx": ("x", np.array([-2.0, -1.0]))}
     source = xr.DataArray(values, coords, ["time", "x"])

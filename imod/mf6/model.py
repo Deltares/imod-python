@@ -250,6 +250,58 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         return instance
 
+    def clip_box(
+        self,
+        time_min=None,
+        time_max=None,
+        layer_min=None,
+        layer_max=None,
+        x_min=None,
+        x_max=None,
+        y_min=None,
+        y_max=None,
+    ):
+        """
+        Clip a model by a bounding box (time, layer, y, x).
+
+        Slicing intervals may be half-bounded, by providing None:
+
+        * To select 500.0 <= x <= 1000.0:
+          ``clip_box(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
+          or ``clip_box(x_max=1000.0)``.
+        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
+          or ``clip_box(x_min=1000.0)``.
+
+        Parameters
+        ----------
+        time_min: optional
+        time_max: optional
+        layer_min: optional, int
+        layer_max: optional, int
+        x_min: optional, float
+        x_min: optional, float
+        y_max: optional, float
+        y_max: optional, float
+
+        Returns
+        -------
+        clipped : Modflow6Model
+        """
+        clipped = type(self)(**self.options)
+        for key, pkg in self.items():
+            clipped[key] = pkg.clip_box(
+                time_min=time_min,
+                time_max=time_max,
+                layer_min=layer_min,
+                layer_max=layer_max,
+                x_min=x_min,
+                x_max=x_max,
+                y_min=y_min,
+                y_max=y_max,
+            )
+        return clipped
+
 
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
@@ -265,7 +317,6 @@ class GroundwaterFlowModel(Modflow6Model):
         under_relaxation: bool = False,
     ):
         super().__init__()
-        # TODO: probably replace by a pydantic BaseModel
         self.options = {
             "listing_file": listing_file,
             "print_input": print_input,

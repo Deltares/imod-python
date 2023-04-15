@@ -1,10 +1,10 @@
 from itertools import product
 from xml.sax.saxutils import unescape
 
-import numpy as np
-
 # For creating colormap
-from matplotlib import cm, colors
+import matplotlib
+import numpy as np
+from matplotlib import colors
 
 import imod
 import imod.qgs as qgs
@@ -12,7 +12,7 @@ from imod import declxml as xml
 
 
 def _get_color_hexes_cmap(n, cmap_name="magma"):
-    cmap = cm.get_cmap(cmap_name, n)
+    cmap = matplotlib.colormaps[cmap_name].resampled(n)
     return [colors.rgb2hex(cmap(i)[:3]) for i in range(cmap.N)]
 
 

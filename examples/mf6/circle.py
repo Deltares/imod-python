@@ -114,7 +114,7 @@ gwf_model["disv"] = imod.mf6.VerticesDiscretization(
 gwf_model["chd"] = imod.mf6.ConstantHead(
     constant_head, print_input=True, print_flows=True, save_flows=True
 )
-gwf_model["ic"] = imod.mf6.InitialConditions(head=0.0)
+gwf_model["ic"] = imod.mf6.InitialConditions(start=0.0)
 gwf_model["npf"] = imod.mf6.NodePropertyFlow(
     icelltype=icelltype,
     k=k,
@@ -227,3 +227,28 @@ ax.set_aspect(1)
 # %%
 # As would be expected from our model input, we observe circular groundwater
 # mounding and increasing flows as we move from the center to the exterior.
+
+# %%
+# Slice the model domain
+# ----------------------
+#
+# We may also quickly setup a smaller model. We'll select half of the original
+# domain.
+
+half_simulation = simulation.clip_box(x_max=0.0)
+
+# %%
+# Let's run the model, read the results, and visualize.
+
+modeldir = imod.util.temporary_directory()
+half_simulation.write(modeldir)
+half_simulation.run()
+head = imod.mf6.out.open_hds(
+    modeldir / "GWF_1/GWF_1.hds",
+    modeldir / "GWF_1/disv.disv.grb",
+)
+
+fig, ax = plt.subplots()
+head.isel(time=0, layer=0).compute().ugrid.plot(ax=ax)
+ax.set_aspect(1)
+# %%

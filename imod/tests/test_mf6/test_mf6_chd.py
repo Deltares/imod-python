@@ -43,7 +43,7 @@ def head():
 
 def test_render(head):
     directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
 
     chd = imod.mf6.ConstantHead(
         head, print_input=True, print_flows=True, save_flows=True
@@ -72,7 +72,7 @@ def test_render(head):
 
 def test_from_file(head, tmp_path):
     directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
 
     chd = imod.mf6.ConstantHead(
         head, print_input=True, print_flows=True, save_flows=True
@@ -114,11 +114,14 @@ pytest.mark.usefixtures("head_fc", "concentration_fc")
 
 def test_render_concentration(head_fc, concentration_fc):
     directory = pathlib.Path("mymodel")
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-01-02"),
-        np.datetime64("2000-01-03"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ],
+        dtype="datetime64[ns]",
+    )
 
     chd = imod.mf6.ConstantHead(
         head_fc,
@@ -162,11 +165,14 @@ pytest.mark.usefixtures("head_fc", "concentration_fc")
 
 
 def test_write_concentration_period_data(head_fc, concentration_fc):
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-01-02"),
-        np.datetime64("2000-01-03"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ],
+        dtype="datetime64[ns]",
+    )
     head_fc[:] = 1
     concentration_fc[:] = 2
     chd = imod.mf6.ConstantHead(

@@ -66,7 +66,7 @@ def test_render_specific_storage(sy_layered, convertible):
     )
 
     directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     actual = sto.render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
@@ -94,7 +94,7 @@ def test_render_specific_storage(sy_layered, convertible):
 
 def test_render_specific_storage_three_periods(sy_layered, convertible):
     # again but starting with two steady-state periods, followed by a transient stress period
-    times = [np.datetime64("2000-01-01"), np.datetime64("2000-01-03")]
+    times = np.array(["2000-01-01", "2000-01-03"], dtype="datetime64[ns]")
     transient = xr.DataArray([False, True], {"time": times}, ("time",))
 
     sto = imod.mf6.SpecificStorage(
@@ -105,11 +105,14 @@ def test_render_specific_storage_three_periods(sy_layered, convertible):
     )
 
     directory = pathlib.Path("mymodel")
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-01-02"),
-        np.datetime64("2000-01-03"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ],
+        dtype="datetime64[ns]",
+    )
     actual = sto.render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\
@@ -148,7 +151,7 @@ def test_render_storage_coefficient(sy_layered, convertible):
     )
 
     directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     actual = sto.render(directory, "sto", globaltimes, True)
     expected = textwrap.dedent(
         """\

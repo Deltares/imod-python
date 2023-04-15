@@ -1,5 +1,6 @@
+import warnings
+
 import numpy as np
-import pandas as pd
 import xarray as xr
 
 import imod
@@ -66,6 +67,26 @@ def points_in_bounds(da, **points):
     return in_bounds
 
 
+def check_points_in_bounds(da, points, out_of_bounds):
+    inside = points_in_bounds(da, **points)
+    # Error handling
+    msg = "Not all points are located within the bounds of the DataArray"
+    if not inside.all():
+        if out_of_bounds == "raise":
+            raise ValueError(msg)
+        elif out_of_bounds == "warn":
+            warnings.warn(msg)
+        elif out_of_bounds == "ignore":
+            points = {dim: x[inside] for dim, x in points.items()}
+        else:
+            raise ValueError(
+                f"Unrecognized option {out_of_bounds} for out_of_bounds, "
+                "should be one of: error, warn, ignore."
+            )
+
+    return points, inside
+
+
 def _get_indices_1d(da, coordname, x):
     x = np.atleast_1d(x)
     x_decreasing = da.indexes[coordname].is_monotonic_decreasing
@@ -98,17 +119,25 @@ def _get_indices_1d(da, coordname, x):
     return ixs
 
 
-def points_indices(da, **points):
+def points_indices(da, out_of_bounds="raise", **points):
     """
     Get the indices for points as defined by the arrays x and y.
 
-    This function will raise a ValueError if the points fall outside of the
-    bounds of the DataArray to avoid undefined behavior. Use the
-    ``imod.select.points_in_bounds`` function to detect these points.
+    Not all points may be located in the bounds of the DataArray. By default,
+    this function raises an error. This behavior can be controlled with the
+    ``out_of_bounds`` argument. If ``out_of_bounds`` is set to "warn" or
+    "ignore", out of bounds point are removed. Which points have been removed
+    is visible in the ``index`` coordinate of the resulting selection.
 
     Parameters
     ----------
     da : xr.DataArray
+    out_of_bounds : {"raise", "warn", "ignore"}, default: "raise"
+        What to do if the points are not located in the bounds of the
+        DataArray:
+        - "raise": raise an exception
+        - "warn": raise a warning, and ignore the missing points
+        - "ignore": ignore the missing points
     points : keyword arguments of coordinates and values
 
     Returns
@@ -144,31 +173,34 @@ def points_indices(da, **points):
     The ``imod.select.points_set_values()`` function will take care of the
     dimensions.
     """
-    inside = points_in_bounds(da, **points)
-    # Error handling
-    if not inside.all():
-        raise ValueError("Not all points are within the bounds of the DataArray")
-
+    points, inside = check_points_in_bounds(da, points, out_of_bounds)
+    index = np.arange(len(inside))[inside]
     indices = {}
     for coordname, value in points.items():
         ind_da = xr.DataArray(_get_indices_1d(da, coordname, value), dims=["index"])
-        ind_da["index"] = np.arange(ind_da.size)
+        ind_da["index"] = index
         indices[coordname] = ind_da
 
     return indices
 
 
-def points_values(da, **points):
+def points_values(da, out_of_bounds="error", **points):
     """
     Get values from specified points.
 
     This function will raise a ValueError if the points fall outside of the
-    bounds of the DataArray to avoid undefined behavior. Use the
+    bounds of the DataArray to avoid ambiguous behavior. Use the
     ``imod.select.points_in_bounds`` function to detect these points.
 
     Parameters
     ----------
     da : xr.DataArray
+    out_of_bounds : {"raise", "warn", "ignore"}, default: "raise"
+        What to do if the points are not located in the bounds of the
+        DataArray:
+        - "raise": raise an exception
+        - "warn": raise a warning, and ignore the missing points
+        - "ignore": ignore the missing points
     points : keyword arguments of coordinate=values
         keyword arguments specifying coordinate and values.
     Returns
@@ -190,33 +222,32 @@ def points_values(da, **points):
         # contents must be iterable
         iterable_points[coordname] = np.atleast_1d(value)
 
-    indices = imod.select.points.points_indices(da, **iterable_points)
+    indices = imod.select.points.points_indices(
+        da, out_of_bounds=out_of_bounds, **iterable_points
+    )
     selection = da.isel(**indices)
-
-    # Fetch a value from the dictionary, try to extract a meaningful index
-    sample_dim = next(iter(points.values()))
-    if isinstance(sample_dim, pd.Series):
-        selection.coords["index"] = sample_dim.index.values
-    else:
-        sample_dim = next(iter(iterable_points.values()))
-        selection.coords["index"] = np.arange(len(sample_dim))
 
     return selection
 
 
-def points_set_values(da, values, **points):
+def points_set_values(da, values, out_of_bounds="raise", **points):
     """
     Set values at specified points.
 
     This function will raise a ValueError if the points fall outside of the
-    bounds of the DataArray to avoid undefined behavior. Use the
+    bounds of the DataArray to avoid ambiguous behavior. Use the
     ``imod.select.points_in_bounds`` function to detect these points.
 
     Parameters
     ----------
     da : xr.DataArray
     values : (int, float) or array of (int, float)
-
+    out_of_bounds : {"raise", "warn", "ignore"}, default: "raise"
+        What to do if the points are not located in the bounds of the
+        DataArray:
+        - "raise": raise an exception
+        - "warn": raise a warning, and ignore the missing points
+        - "ignore": ignore the missing points
     points : keyword arguments of coordinate=values
         keyword arguments specifying coordinate and values.
 
@@ -234,20 +265,19 @@ def points_set_values(da, values, **points):
     >>> out = imod.select.points_set_values(da, values, x=x, y=y)
 
     """
-    # Avoid side-effects just in case
-    # Load into memory, so values can be set efficiently via numpy indexing.
-    da = da.copy(deep=True).load()
-
-    inside = points_in_bounds(da, **points)
-    # Error handling
-    if not inside.all():
-        raise ValueError("Not all points are within the bounds of the DataArray")
-    if not isinstance(values, (int, float)):  # then it might be an array
+    points, inside = check_points_in_bounds(da, points, out_of_bounds)
+    if not isinstance(values, (bool, float, int, str)):  # then it might be an array
         if len(values) != len(inside):
             raise ValueError(
                 "Shape of ``values`` does not match shape of coordinates."
                 f"Shape of values: {values.shape}; shape of coordinates: {inside.shape}."
             )
+        # Make sure a list or tuple is indexable by inside.
+        values = np.atleast_1d(values)[inside]
+
+    # Avoid side-effects just in case
+    # Load into memory, so values can be set efficiently via numpy indexing.
+    da = da.copy(deep=True).load()
 
     sel_indices = {}
     for coordname in points.keys():

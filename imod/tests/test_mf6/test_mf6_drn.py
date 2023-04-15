@@ -2,6 +2,7 @@ import pathlib
 import textwrap
 
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
 
@@ -20,6 +21,27 @@ def drainage():
         dims=("layer", "y", "x"),
     )
     conductance = elevation.copy()
+
+    drn = dict(elevation=elevation, conductance=conductance)
+    return drn
+
+
+@pytest.fixture(scope="function")
+def transient_drainage():
+    layer = np.arange(1, 4)
+    y = np.arange(4.5, 0.0, -1.0)
+    x = np.arange(0.5, 5.0, 1.0)
+    elevation = xr.DataArray(
+        np.full((3, 5, 5), 1.0),
+        coords={"layer": layer, "y": y, "x": x, "dx": 1.0, "dy": -1.0},
+        dims=("layer", "y", "x"),
+    )
+    time_multiplier = xr.DataArray(
+        data=np.arange(1.0, 7.0, 1.0),
+        coords={"time": pd.date_range("2000-01-01", "2005-01-01", freq="YS")},
+        dims=("time",),
+    )
+    conductance = time_multiplier * elevation
 
     drn = dict(elevation=elevation, conductance=conductance)
     return drn
@@ -119,11 +141,14 @@ def test_render_concentration(
     conductance_fc,
 ):
     directory = pathlib.Path("mymodel")
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-01-02"),
-        np.datetime64("2000-01-03"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ],
+        dtype="datetime64[ns]",
+    )
 
     drn = imod.mf6.Drainage(
         elevation=elevation_fc,
@@ -164,13 +189,16 @@ def test_repeat_stress(
     conductance_fc,
 ):
     directory = pathlib.Path("mymodel")
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-01-02"),
-        np.datetime64("2000-01-03"),
-        np.datetime64("2000-01-04"),
-        np.datetime64("2000-01-05"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+            "2000-01-04",
+            "2000-01-05",
+        ],
+        dtype="datetime64[ns]",
+    )
 
     repeat_stress = xr.DataArray(
         [
@@ -227,3 +255,75 @@ def test_repeat_stress(
     )
     actual = drn.render(directory, "drn", globaltimes, False)
     assert actual == expected
+
+
+def test_clip_box(drainage):
+    drn = imod.mf6.Drainage(**drainage)
+
+    selection = drn.clip_box()
+    assert isinstance(selection, imod.mf6.Drainage)
+    assert selection.dataset.identical(drn.dataset)
+
+    selection = drn.clip_box(x_min=None, x_max=None)
+    assert isinstance(selection, imod.mf6.Drainage)
+    assert selection.dataset.identical(drn.dataset)
+
+    selection = drn.clip_box(
+        layer_min=1,
+        layer_max=2,
+        y_min=1.0,
+        y_max=4.0,
+        x_min=1.0,
+        x_max=4.0,
+    )
+    assert isinstance(selection, imod.mf6.Drainage)
+    assert selection["conductance"].dims == ("layer", "y", "x")
+    assert selection["conductance"].shape == (2, 3, 3)
+
+
+def test_clip_box_transient(transient_drainage):
+    drn = imod.mf6.Drainage(**transient_drainage)
+
+    # First test the standard case: clip into existing times.
+    selection = drn.clip_box(time_min="2001-01-01", time_max="2004-01-01")
+    expected = np.array(
+        [
+            "2001-01-01T00:00:00.000000000",
+            "2002-01-01T00:00:00.000000000",
+            "2003-01-01T00:00:00.000000000",
+            "2004-01-01T00:00:00.000000000",
+        ],
+        dtype="datetime64[ns]",
+    )
+    assert isinstance(selection, imod.mf6.Drainage)
+    assert selection["elevation"].dims == ("layer", "y", "x")
+    assert selection["conductance"].dims == ("time", "layer", "y", "x")
+    assert np.array_equal(selection.dataset["time"], expected)
+
+    # Now test a succesfull forward fill.
+    selection = drn.clip_box(time_min="2000-06-01", time_max="2002-06-01")
+    expected = np.array(
+        [
+            "2000-06-01T00:00:00.000000000",
+            "2001-01-01T00:00:00.000000000",
+            "2002-01-01T00:00:00.000000000",
+        ],
+        dtype="datetime64[ns]",
+    )
+    assert np.array_equal(selection.dataset["time"], expected)
+    assert (selection["conductance"].sel(time="2000-06-01") == 1.0).all()
+
+    # And a backfill.
+    selection = drn.clip_box(time_min="1990-06-01", time_max="2002-06-01")
+    expected = np.array(
+        [
+            "1990-06-01T00:00:00.000000000",
+            "2000-01-01T00:00:00.000000000",
+            "2001-01-01T00:00:00.000000000",
+            "2002-01-01T00:00:00.000000000",
+        ],
+        dtype="datetime64[ns]",
+    )
+    assert np.array_equal(selection.dataset["time"].values, expected)
+    assert (selection["conductance"].sel(time="1990-06-01") == 1.0).all()
+    assert (selection["conductance"].sel(time="2000-01-01") == 1.0).all()

@@ -4,6 +4,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.testing import assert_frame_equal
 
 
 @pytest.fixture(scope="module")
@@ -38,7 +39,7 @@ def test_stability_constraint_wel(test_da):
 
     wel_dt = imod.evaluate.stability_constraint_wel(wel, top_bot, porosity=0.3, R=1.0)
 
-    pd.testing.assert_frame_equal(wel_ref, wel_dt)
+    assert_frame_equal(wel_ref, wel_dt)
 
 
 def test_stability_constraint_advection(test_da):
@@ -58,7 +59,7 @@ def test_stability_constraint_advection(test_da):
     dt_z = (test_da.T * np.array([0.3, 0.6, np.nan])).T.assign_coords(
         {"direction": "z"}
     )
-    dtref = (1 / (1 / dt_x + 1 / dt_y + 1 / dt_z)).drop("direction")
+    dtref = (1 / (1 / dt_x + 1 / dt_y + 1 / dt_z)).drop_vars("direction")
 
     assert dtref.round(5).equals(dt.round(5))
     assert dt_x.round(5).equals(dt_xyz.sel(direction="x").round(5))

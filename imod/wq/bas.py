@@ -1,6 +1,6 @@
 import jinja2
 import numpy as np
-import scipy.ndimage.morphology
+import scipy.ndimage
 import xarray as xr
 
 from imod import util

@@ -155,11 +155,8 @@ def finish(uda):
     Set dimension order, and drop empty layers.
     """
     facedim = uda.ugrid.grid.face_dimension
-    if "time" in uda.dims:
-        dims = ("time", "layer", facedim)
-    else:
-        dims = ("layer", facedim)
-    return uda.transpose(*dims).dropna("layer", how="all")
+    dims = ("time", "layer", facedim)
+    return uda.transpose(*dims, missing_dims="ignore").dropna("layer", how="all")
 
 
 def create_idomain(thickness):
@@ -259,7 +256,7 @@ def create_chd(
         method="barycentric",
         original2d=original2d,
     )
-    valid = active & (ibound < 0)
+    valid = (ibound < 0) & active
 
     if not valid.any():
         return
@@ -292,11 +289,11 @@ def create_drn(
         original2d=original2d,
     )
     disv_elev = cache.regrid(elevation, original2d=original2d)
-    valid = active & (disv_cond > 0) & disv_elev.notnull()
+    valid = (disv_cond > 0) & disv_elev.notnull() & active
     location = xu.ones_like(active, dtype=float)
     location = location.where((disv_elev > bottom) & (disv_elev <= top)).where(valid)
-    disv_cond = (location * disv_cond).dropna("layer", how="all")
-    disv_elev = (location * disv_elev).dropna("layer", how="all")
+    disv_cond = finish(location * disv_cond)
+    disv_elev = finish(location * disv_elev)
 
     if disv_cond.isnull().all():
         return
@@ -334,7 +331,7 @@ def create_ghb(
         method="barycentric",
         original2d=original2d,
     )
-    valid = active & (disv_cond > 0.0) & disv_head.notnull()
+    valid = (disv_cond > 0.0) & disv_head.notnull() & active
 
     ghb = imod.mf6.GeneralHeadBoundary(
         conductance=disv_cond.where(valid),
@@ -388,6 +385,9 @@ def create_riv(
         elevation = elevation.where(valid)
         elevation = elevation.where(elevation <= stage, other=stage)
 
+        # TODO: this removes too much when the stage is higher than the top...
+        # Instead: just cut through all layers until the bottom elevation.
+        # Then, assign a transmissivity weighted conductance.
         water_top = stage.where(stage <= top)
         water_bottom = elevation.where(elevation > bottom)
         layer_height = top - bottom
@@ -418,7 +418,7 @@ def create_riv(
         conductance,
         method="conductance",
         original2d=original2d,
-    )
+    ).compute()
     disv_elev_2d = cache.regrid(bottom_elevation, original2d=original2d)
     disv_stage_2d = cache.regrid(stage, original2d=original2d)
     disv_inff_2d = cache.regrid(infiltration_factor, original2d=original2d)
@@ -491,6 +491,49 @@ def create_rch(
     return
 
 
+def create_evt(
+    cache,
+    model,
+    key,
+    value,
+    active,
+    original2d,
+    repeat,
+    **kwargs,
+):
+    # Find highest active layer
+    highest = active["layer"] == active["layer"].where(active).max()
+    location = highest.where(highest)
+
+    surface = raise_on_layer(value, "surface")
+    disv_surface = cache.regrid(surface, original2d=original2d).where(active)
+    disv_surface = finish(disv_surface * location)
+
+    rate = raise_on_layer(value, "rate") * 0.001
+    disv_rate = cache.regrid(rate, original2d=original2d).where(active)
+    disv_rate = finish(disv_rate * location)
+
+    depth = raise_on_layer(value, "depth")
+    disv_depth = cache.regrid(depth, original2d=original2d).where(active)
+    disv_depth = finish(disv_depth * location)
+
+    # At depth 1.0, the rate is 0.0.
+    proportion_depth = xu.ones_like(disv_surface).where(disv_surface.notnull())
+    proportion_rate = xu.zeros_like(disv_surface).where(disv_surface.notnull())
+
+    evt = imod.mf6.Evapotranspiration(
+        surface=disv_surface,
+        rate=disv_rate,
+        depth=disv_depth,
+        proportion_rate=proportion_rate,
+        proportion_depth=proportion_depth,
+    )
+    if repeat is not None:
+        evt.set_repeat_stress(repeat)
+    model[key] = evt
+    return
+
+
 def create_sto(
     cache,
     storage_coefficient,
@@ -520,6 +563,9 @@ def create_wel(
     key,
     value,
     active,
+    top,
+    bottom,
+    k,
     repeat,
     **kwargs,
 ):
@@ -527,24 +573,58 @@ def create_wel(
     dataframe = value["dataframe"]
     layer = value["layer"]
 
-    columns = dataframe.columns
-    x, y, rate = columns[:3]
-    xy = np.column_stack([dataframe[x], dataframe[y]])
-    cell2d = target.locate_points(xy)
-    valid = (cell2d >= 0) & active.values[layer - 1, cell2d]
+    if layer <= 0:
+        dataframe = imod.prepare.assign_wells(
+            wells=dataframe,
+            top=top,
+            bottom=bottom,
+            k=k,
+            minimum_thickness=0.01,
+            minimum_k=1.0,
+        )
+    else:
+        dataframe["index"] = np.arange(len(dataframe))
+        dataframe["layer"] = layer
 
+    first = dataframe.groupby("index").first()
+    well_layer = first["layer"].values
+    xy = np.column_stack([first["x"], first["y"]])
+    cell2d = target.locate_points(xy)
+    valid = (cell2d >= 0) & active.values[well_layer - 1, cell2d]
+
+    cell2d = cell2d[valid] + 1
     # Skip if no wells are located inside cells
     if not valid.any():
         return
 
-    cell2d = cell2d[valid] + 1
+    if "time" in dataframe.columns:
+        # Ensure the well data is rectangular.
+        time = np.unique(dataframe["time"].values)
+        dataframe = dataframe.set_index("time")
+        # First ffill, then bfill!
+        dfs = [df.reindex(time).ffill().bfill() for _, df in dataframe.groupby("index")]
+        rate = (
+            pd.concat(dfs)
+            .reset_index()
+            .set_index(["time", "index"])["rate"]
+            .to_xarray()
+        )
+    else:
+        rate = xr.DataArray(
+            dataframe["rate"], coords={"index": dataframe["index"]}, dims=["index"]
+        )
+
+    # Don't forget to remove the out-of-bounds points.
+    rate = rate.where(xr.DataArray(valid, dims=["index"]), drop=True)
+
     wel = imod.mf6.WellDisVertices(
-        layer=np.full_like(cell2d, layer),
+        layer=well_layer,
         cell2d=cell2d,
-        rate=dataframe.loc[valid, rate],
+        rate=rate,
     )
     if repeat is not None:
         wel.set_repeat_stress(repeat)
+
     model[key] = wel
     return
 
@@ -701,6 +781,7 @@ def merge_hfbs(hfbs, idomain):
 PKG_CONVERSION = {
     "chd": create_chd,
     "drn": create_drn,
+    "evt": create_evt,
     "ghb": create_ghb,
     "hfb": create_hfb,
     "shd": create_ic,
@@ -711,31 +792,31 @@ PKG_CONVERSION = {
 
 
 def expand_repetitions(
-    repeat_stress: List[datetime], times: List[datetime]
+    repeat_stress: List[datetime], time_min: datetime, time_max: datetime
 ) -> Dict[datetime, datetime]:
-    first = times[0]
-    last = times[-1]
     expanded = {}
     for date, year in itertools.product(
-        repeat_stress, range(first.year, last.year + 1)
+        repeat_stress, range(time_min.year, time_max.year + 1)
     ):
         newdate = date.replace(year=year)
-        if newdate < last:
+        if newdate < time_max:
             expanded[newdate] = date
     return expanded
 
 
-def convert_to_disv(projectfile_data, target, repeat_stress=None, times=None):
+def convert_to_disv(
+    projectfile_data, target, time_min=None, time_max=None, repeat_stress=None
+):
     """
     Convert the contents of a project file to a MODFLOW6 DISV model.
 
-    Note: the times argument is used to expand repeated stress periods. The
-    total set of stress periods is defined by the dates of the boundary
-    conditions, as well as the times provided in repeat_stress: if a boundary
-    condition contains a stress period that precedes the first entry in times,
-    the boundary condition datetime is used as the first time.
+    The ``time_min`` and ``time_max`` are **both** required when
+    ``repeat_stress`` is given. The entries in the Periods section of the
+    project file will be expanded to yearly repeats between ``time_min`` and
+    ``time_max``.
 
-    The times argument is not used when repeat_stress is not provided.
+    Additionally, ``time_min`` and ``time_max`` may be used to slice the input
+    to a specific time domain.
 
     The returned model is steady-state if none of the packages contain a time
     dimension. The model is transient if any of the packages contain a time
@@ -751,22 +832,33 @@ def convert_to_disv(projectfile_data, target, repeat_stress=None, times=None):
     target: xu.Ugrid2d
         The unstructured target topology. All data is transformed to match this
         topology.
+    time_min: datetime, optional
+        Minimum starting time of a stress.
+        Required when ``repeat_stress`` is provided.
+    time_max: datetime, optional
+        Maximum starting time of a stress.
+        Required when ``repeat_stress`` is provided.
     repeat_stress: dict of dict of string to datetime, optional
         This dict contains contains, per topic, the period alias (a string) to
         its datetime.
-    times: list of datetimes, optional
-        The stress period times. Required when repeat_stress is given.
 
     Returns
     -------
     disv_model: imod.mf6.GroundwaterFlowModel
 
     """
-    if times is None:
-        if repeat_stress is not None:
-            raise ValueError("times is required when repeat_stress is given")
-    else:
-        times = sorted(times)
+    if repeat_stress is not None:
+        if time_min is None or time_max is None:
+            raise ValueError(
+                "time_min and time_max are required when repeat_stress is given"
+            )
+
+    for arg in (time_min, time_max):
+        if arg is not None and not isinstance(arg, datetime):
+            raise TypeError(
+                "time_min and time_max must be datetime.datetime. "
+                f"Received: {type(arg).__name__}"
+            )
 
     data = projectfile_data.copy()
     model = imod.mf6.GroundwaterFlowModel()
@@ -813,7 +905,7 @@ def convert_to_disv(projectfile_data, target, repeat_stress=None, times=None):
         else:
             repeat = repeat_stress.get(key)
             if repeat is not None:
-                repeat = expand_repetitions(repeat, times)
+                repeat = expand_repetitions(repeat, time_min, time_max)
 
         try:
             # conversion will update model instance
@@ -841,6 +933,9 @@ def convert_to_disv(projectfile_data, target, repeat_stress=None, times=None):
         model["hfb"] = merge_hfbs(hfbs, idomain)
 
     transient = any("time" in pkg.dataset.dims for pkg in model.values())
+    if transient and (time_min is not None or time_max is not None):
+        model = model.clip_box(time_min=time_min, time_max=time_max)
+
     sto_entry = data.get("sto")
     if sto_entry is None:
         if transient:
