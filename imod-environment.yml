@@ -22,7 +22,7 @@ dependencies:
   - netcdf4
   - numba>=0.50
   - numpy
-  - pandas
+  - pandas<2.0  # TODO: unpin when newer xarray on conda-forge
   - pooch
   - pip
   - pip:
