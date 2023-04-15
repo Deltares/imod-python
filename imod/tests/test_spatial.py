@@ -6,9 +6,9 @@ import pandas as pd
 import pytest
 import shapely.geometry as sg
 import xarray as xr
-from pandas.testing import assert_frame_equal
 
 import imod
+from imod.testing import assert_frame_equal
 
 
 @pytest.fixture(scope="module")
@@ -197,7 +197,7 @@ def test_private_celltable(test_shapefile):
     expected["area"] = [1.0]
 
     actual = imod.prepare.spatial._celltable(test_shapefile, "values", 1.0, like)
-    pd.testing.assert_frame_equal(actual, expected, check_dtype=False)
+    assert_frame_equal(actual, expected, check_dtype=False)
 
 
 def test_celltable(test_shapefile):
@@ -212,7 +212,7 @@ def test_celltable(test_shapefile):
     expected["area"] = [1.0]
 
     actual = imod.prepare.spatial.celltable(test_shapefile, "values", 1.0, like)
-    pd.testing.assert_frame_equal(actual, expected, check_dtype=False)
+    assert_frame_equal(actual, expected, check_dtype=False)
 
     # test resolution error:
     with pytest.raises(ValueError):
@@ -261,7 +261,7 @@ def test_zonal_aggregate_raster(tmp_path):
         ),
     ]
     gdf = gpd.GeoDataFrame(geometry=geometries)
-    gdf["id"] = np.array([1, 2], dtype=np.int32)
+    gdf["id"] = [1, 2]
     path = tmp_path / "two-zones1.shp"
     gdf.to_file(path)
 
@@ -274,7 +274,7 @@ def test_zonal_aggregate_raster(tmp_path):
     )
     expected = pd.DataFrame.from_dict(
         {
-            "id": np.array([1, 2], dtype=np.int32),
+            "id": [1, 2],
             "area": [2.0, 2.0],
             "my-raster": [0.0, 1.0],
         }
@@ -313,7 +313,7 @@ def test_zonal_aggregate_raster(tmp_path):
     )
     expected = pd.DataFrame.from_dict(
         {
-            "id": np.array([1, 2], dtype=np.int32),
+            "id": [1, 2],
             "area": [1.0, 3.0],
             "aggregated": [0.0, 2.0 / 3.0],
         }
@@ -329,7 +329,7 @@ def test_zonal_aggregate_raster(tmp_path):
     )
     expected = pd.DataFrame.from_dict(
         {
-            "id": np.array([1, 2], dtype=np.int32),
+            "id": [1, 2],
             "area": [1.0, 3.0],
             "aggregated": [0.0, 1.0],
         }
@@ -380,7 +380,7 @@ def test_zonal_aggregate_polygons(tmp_path):
         ),
     ]
     gdf_a = gpd.GeoDataFrame(geometry=geometries_a)
-    gdf_a["id_a"] = np.array([1, 2], dtype=np.int32)
+    gdf_a["id_a"] = [1, 2]
     gdf_a["data_a"] = [3, 4]
     path_a = tmp_path / "two-zones_a.shp"
     gdf_a.to_file(path_a)
@@ -396,7 +396,7 @@ def test_zonal_aggregate_polygons(tmp_path):
     )
     expected = pd.DataFrame.from_dict(
         {
-            "id_a": np.array([1, 2], dtype=np.int32),
+            "id_a": [1, 2],
             "area": [2.0, 2.0],
             "data_a": [3.0, 4.0],
         }
@@ -437,7 +437,7 @@ def test_zonal_aggregate_polygons(tmp_path):
     )
     expected = pd.DataFrame.from_dict(
         {
-            "id_a": np.array([1, 2], dtype=np.int32),
+            "id_a": [1, 2],
             "area": [2.0, 2.0],
             "data_b": [3.5, 3.5],
         }
