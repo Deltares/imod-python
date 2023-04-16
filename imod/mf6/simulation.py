@@ -221,7 +221,9 @@ class Modflow6Simulation(collections.UserDict):
                     f"{result.returncode}, and error message:\n\n{result.stdout.decode()} "
                 )
 
-    def dump(self, directory=".", validate: bool = True) -> None:
+    def dump(
+        self, directory=".", validate: bool = True, mdal_compliant: bool = False
+    ) -> None:
         directory = pathlib.Path(directory)
         directory.mkdir(parents=True, exist_ok=True)
 
@@ -229,7 +231,7 @@ class Modflow6Simulation(collections.UserDict):
         for key, value in self.items():
             cls_name = type(value).__name__
             if isinstance(value, Modflow6Model):
-                model_toml_path = value.dump(directory, key, validate)
+                model_toml_path = value.dump(directory, key, validate, mdal_compliant)
                 toml_content[cls_name][key] = model_toml_path.relative_to(
                     directory
                 ).as_posix()
