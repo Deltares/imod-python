@@ -501,19 +501,20 @@ def create_evt(
     repeat,
     **kwargs,
 ):
+    surface = raise_on_layer(value, "surface")
+    rate = raise_on_layer(value, "rate") * 0.001
+    depth = raise_on_layer(value, "depth")
+
     # Find highest active layer
     highest = active["layer"] == active["layer"].where(active).max()
     location = highest.where(highest)
 
-    surface = raise_on_layer(value, "surface")
     disv_surface = cache.regrid(surface, original2d=original2d).where(active)
     disv_surface = finish(disv_surface * location)
 
-    rate = raise_on_layer(value, "rate") * 0.001
     disv_rate = cache.regrid(rate, original2d=original2d).where(active)
     disv_rate = finish(disv_rate * location)
 
-    depth = raise_on_layer(value, "depth")
     disv_depth = cache.regrid(depth, original2d=original2d).where(active)
     disv_depth = finish(disv_depth * location)
 
@@ -795,8 +796,9 @@ def expand_repetitions(
     repeat_stress: List[datetime], time_min: datetime, time_max: datetime
 ) -> Dict[datetime, datetime]:
     expanded = {}
-    for date, year in itertools.product(
-        repeat_stress, range(time_min.year, time_max.year + 1)
+    for year, date in itertools.product(
+        range(time_min.year, time_max.year + 1),
+        repeat_stress,
     ):
         newdate = date.replace(year=year)
         if newdate < time_max:

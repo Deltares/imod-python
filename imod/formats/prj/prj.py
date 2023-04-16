@@ -686,7 +686,8 @@ def _open_boundary_condition_idf(
         ):
             das[i][variable] = _create_dataarray(paths, headers, values)
 
-    return das, list(all_repeats)
+    repeats = sorted(all_repeats)
+    return das, repeats
 
 
 def _read_package_gen(
@@ -755,6 +756,8 @@ def _read_package_ipf(
             "time": time,
         }
         out.append(d)
+
+    repeats = sorted(repeats)
     return out, repeats
 
 
