@@ -25,7 +25,8 @@ def create_lake_table(
     lake_table["sarea"] = xr.DataArray(
         coords={"row": rownumbers},
         data=[float(i) for i in range(starting_sarea, starting_sarea + number_rows)],
-    )
+    )    
+
     if starting_barea is not None:
         lake_table["barea"] = xr.DataArray(
             coords={"row": rownumbers},
@@ -48,7 +49,7 @@ def naardermeer(basic_dis):
         is_lake[0, 2, 2] = True
         lake_table = None
         if has_lake_table:
-            lake_table = create_lake_table(3, 4, 5, 6)
+            lake_table = create_lake_table(3, 10, 20, 30)
         return create_lake_data(
             is_lake, starting_stage=11.0, name="Naardermeer", lake_table=lake_table
         )
@@ -66,7 +67,7 @@ def ijsselmeer(basic_dis):
         is_lake[0, 5, 5] = True
         lake_table = None
         if has_lake_table:
-            lake_table = create_lake_table(6, 8, 9, 10)
+            lake_table = create_lake_table(6, 8, 9, 10 , 11)
         return create_lake_data(
             is_lake, starting_stage=15.0, name="IJsselmeer", lake_table=lake_table
         )

@@ -1103,13 +1103,28 @@ class Lake(BoundaryCondition):
                     "lake_nr": num,
                 }
             )
-            ncol = 3
+
             stage_col = table.sel({"column": "stage"})
-            if "barea" in table.coords["column"]:
-                ncol = 4
             nrow = stage_col.where(pd.api.types.is_numeric_dtype).count().values[()]
 
             fullpath_laketable = directory / file
+
+
+            #check if the barea column is present for this table (and not filled with nan's)
+            has_barea_column = "barea" in table.coords["column"]
+            if has_barea_column:
+                barea_column = table.sel({"column": "barea"})
+                has_barea_column = barea_column.where(pd.api.types.is_numeric_dtype).count().values[()] > 0
+
+            if not has_barea_column:
+                ncol = 3
+                table_dataframe = pd.DataFrame(table.sel({"column": ["stage", "sarea", "volume"]}).transpose())
+            else:
+                ncol = 4
+                table_dataframe = pd.DataFrame(table.sel({"column": ["stage", "sarea", "volume", "barea"]}).transpose())
+            
+
+
             with open(fullpath_laketable, "w") as table_file:
                 table_file.write("BEGIN DIMENSIONS\n")
                 table_file.write(f"NROW {nrow}\n")
@@ -1117,12 +1132,11 @@ class Lake(BoundaryCondition):
                 table_file.write("END DIMENSIONS\n")
                 table_file.write("begin table\n")
 
-                table_dataframe = pd.DataFrame(table.transpose())
                 string_table = table_dataframe.iloc[range(nrow), range(ncol)].to_string(
                     header=False, index=False
                 )
                 table_file.write(string_table)
-                table_file.write("end table\n")
+                table_file.write("\nend table")
 
     def _write_table_section(
         self, f, dataframe: pd.DataFrame, title: str, index: bool = False

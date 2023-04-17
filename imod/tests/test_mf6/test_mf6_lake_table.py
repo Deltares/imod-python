@@ -77,10 +77,10 @@ def test_mf6_laketable_reference(naardermeer, ijsselmeer, tmp_path):
         NCOL 3
         END DIMENSIONS
         begin table
-        4.0 6.0 5.0
-        5.0 7.0 6.0
-        6.0 8.0 7.0end table
-        """
+        10.0 20.0 30.0
+        11.0 21.0 31.0
+        12.0 22.0 32.0
+        end table"""
         )
     assert actual_table_naardermeer == expected_table_naardermeer
 
@@ -90,15 +90,15 @@ def test_mf6_laketable_reference(naardermeer, ijsselmeer, tmp_path):
             """\
         BEGIN DIMENSIONS
         NROW 6
-        NCOL 3
+        NCOL 4
         END DIMENSIONS
         begin table
-         8.0 10.0  9.0
-         9.0 11.0 10.0
-        10.0 12.0 11.0
-        11.0 13.0 12.0
-        12.0 14.0 13.0
-        13.0 15.0 14.0end table
-        """
+         8.0  9.0 10.0 11.0
+         9.0 10.0 11.0 12.0
+        10.0 11.0 12.0 13.0
+        11.0 12.0 13.0 14.0
+        12.0 13.0 14.0 15.0
+        13.0 14.0 15.0 16.0
+        end table"""
         )
     assert actual_table_ijsselmeer == expected_table_ijsselmeer
