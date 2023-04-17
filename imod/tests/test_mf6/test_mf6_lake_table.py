@@ -5,28 +5,34 @@ import pathlib
 import imod.tests.fixtures.mf6_lake_package_fixture as mf_lake
 import textwrap
 
-@pytest.mark.usefixtures("naardermeer", "ijsselmeer")
 
+@pytest.mark.usefixtures("naardermeer", "ijsselmeer")
 def test_mf6_write_number_tables(naardermeer, ijsselmeer, tmp_path):
     directory = pathlib.Path("mymodel")
-    lake_package_2lakes = Lake.from_lakes_and_outlets([naardermeer(has_lake_table=True), ijsselmeer(has_lake_table=True)])
+    lake_package_2lakes = Lake.from_lakes_and_outlets(
+        [naardermeer(has_lake_table=True), ijsselmeer(has_lake_table=True)]
+    )
     actual = mf_lake.write_and_read(lake_package_2lakes, tmp_path, "lake-test")
     assert "ntables 2" in actual
 
-
-    lake_package_1lakes = Lake.from_lakes_and_outlets([naardermeer(has_lake_table=False), ijsselmeer(has_lake_table=True)])
+    lake_package_1lakes = Lake.from_lakes_and_outlets(
+        [naardermeer(has_lake_table=False), ijsselmeer(has_lake_table=True)]
+    )
     actual = mf_lake.write_and_read(lake_package_1lakes, tmp_path, "lake-test")
     assert "ntables 1" in actual
 
-    lake_package_0lakes = Lake.from_lakes_and_outlets([naardermeer(has_lake_table=False), ijsselmeer(has_lake_table=False)])
+    lake_package_0lakes = Lake.from_lakes_and_outlets(
+        [naardermeer(has_lake_table=False), ijsselmeer(has_lake_table=False)]
+    )
     actual = mf_lake.write_and_read(lake_package_0lakes, tmp_path, "lake-test")
     assert "ntables 0" in actual
 
 
-
 def test_mf6_laketable_reference(naardermeer, ijsselmeer, tmp_path):
 
-    lake_package_2lakes = Lake.from_lakes_and_outlets([naardermeer(has_lake_table=True), ijsselmeer(has_lake_table=True)])
+    lake_package_2lakes = Lake.from_lakes_and_outlets(
+        [naardermeer(has_lake_table=True), ijsselmeer(has_lake_table=True)]
+    )
     actual = mf_lake.write_and_read(lake_package_2lakes, tmp_path, "lake-test")
     expected = textwrap.dedent(
         """\
@@ -64,8 +70,8 @@ def test_mf6_laketable_reference(naardermeer, ijsselmeer, tmp_path):
 
     with open(tmp_path / "Naardermeer.ltbl", "r") as f:
         actual_table_naardermeer = f.read()
-        expected_table_naardermeer  = textwrap.dedent(
-        """\
+        expected_table_naardermeer = textwrap.dedent(
+            """\
         BEGIN DIMENSIONS
         NROW 3
         NCOL 3
@@ -80,8 +86,8 @@ def test_mf6_laketable_reference(naardermeer, ijsselmeer, tmp_path):
 
     with open(tmp_path / "IJsselmeer.ltbl", "r") as f:
         actual_table_ijsselmeer = f.read()
-        expected_table_ijsselmeer  = textwrap.dedent(
-        """\
+        expected_table_ijsselmeer = textwrap.dedent(
+            """\
         BEGIN DIMENSIONS
         NROW 6
         NCOL 3

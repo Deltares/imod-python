@@ -93,7 +93,7 @@ class LakeData(LakeApi_Base):
         inflow=None,
         withdrawal=None,
         auxiliary=None,
-        lake_table=None
+        lake_table=None,
     ):
         super().__init__()
         self.dataset["starting_stage"] = starting_stage
@@ -340,25 +340,28 @@ def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
     out = out.assign_coords(index=list_of_indices)
     return out
 
-    
-def join_lake_tables(lake_numbers,  lakes):
+
+def join_lake_tables(lake_numbers, lakes):
     nr_lakes = len(lakes)
     assert len(lake_numbers) == nr_lakes
 
-    any_lake_table = any([  not array_is_none(lake["lake_table"] ) for lake in lakes])
+    any_lake_table = any([not array_is_none(lake["lake_table"]) for lake in lakes])
     if not any_lake_table:
         return None
 
     lake_tables = []
     for i in range(nr_lakes):
         if lakes[i]["lake_table"] is not None:
-           if lakes[i]["lake_table"].values[()] is not None:
-            lake_number = lake_numbers[i]
-            lakes[i]["lake_table"] = lakes[i]["lake_table"].expand_dims(dim = {"lake_nr":[lake_number]})
-            lake_tables.append(lakes[i]["lake_table"].copy(deep=True))
-        
-    result = xr.merge(lake_tables, compat='no_conflicts')
+            if lakes[i]["lake_table"].values[()] is not None:
+                lake_number = lake_numbers[i]
+                lakes[i]["lake_table"] = lakes[i]["lake_table"].expand_dims(
+                    dim={"lake_nr": [lake_number]}
+                )
+                lake_tables.append(lakes[i]["lake_table"].copy(deep=True))
+
+    result = xr.merge(lake_tables, compat="no_conflicts")
     return result["lake_table"]
+
 
 def array_is_none(array):
     if array is None:
@@ -366,7 +369,6 @@ def array_is_none(array):
     if array.values[()] is None:
         return True
     return False
-
 
 
 class Lake(BoundaryCondition):
@@ -697,7 +699,7 @@ class Lake(BoundaryCondition):
         ts_width=None,
         ts_slope=None,
         # lake tables
-        lake_tables = None,
+        lake_tables=None,
         # options
         print_input=False,
         print_stage=False,
@@ -851,16 +853,16 @@ class Lake(BoundaryCondition):
         ):
             return False
         return True
-    
+
     def _has_tables(self):
         # item() will not work here if the object is an array.
         # .values[()] will simply return the full numpy array.
         tables = self.dataset["lake_tables"].values[()]
         if tables is None:
             return False
-        if any([ pd.api.types.is_numeric_dtype(t) for t in tables  ]):
+        if any([pd.api.types.is_numeric_dtype(t) for t in tables]):
             return True
-        return False    
+        return False
 
     def _has_timeseries(self):
         for name in self._period_data:
@@ -1066,17 +1068,20 @@ class Lake(BoundaryCondition):
         return
 
     def fill_stress_perioddata(self):
-        #this function is called from packagebase and should do nothing in this context
+        # this function is called from packagebase and should do nothing in this context
         return
 
     def write_perioddata(self, directory, pkgname, binary):
-        #this function is called from packagebase and should do nothing in this context        
+        # this function is called from packagebase and should do nothing in this context
         return
-    
-    def _write_laketable_filelist_section(self, f,):
+
+    def _write_laketable_filelist_section(
+        self,
+        f,
+    ):
 
         lake_number_to_lake_table_filename = {}
-        f.write("\nbegin tables\n") 
+        f.write("\nbegin tables\n")
         for name, number in zip(
             self.dataset["lake_boundname"],
             self.dataset["lake_number"],
@@ -1088,33 +1093,36 @@ class Lake(BoundaryCondition):
                 table_file = lake_name + ".ltbl"
                 f.write(f"   {lake_number}  TAB6 FILEIN {table_file}\n")
                 lake_number_to_lake_table_filename[lake_number] = table_file
-        f.write("end tables\n") 
+        f.write("end tables\n")
         return lake_number_to_lake_table_filename
 
-
-    def _write_laketable_files(self, directory,  lake_number_to_filename):
+    def _write_laketable_files(self, directory, lake_number_to_filename):
         for num, file in lake_number_to_filename.items():
-            table = self.dataset["lake_tables"].sel({"lake_nr":num,})
+            table = self.dataset["lake_tables"].sel(
+                {
+                    "lake_nr": num,
+                }
+            )
             ncol = 3
-            stage_col = table.sel({"column":"stage"})
+            stage_col = table.sel({"column": "stage"})
             if "barea" in table.coords["column"]:
                 ncol = 4
             nrow = stage_col.where(pd.api.types.is_numeric_dtype).count().values[()]
 
-            fullpath_laketable = directory /file 
+            fullpath_laketable = directory / file
             with open(fullpath_laketable, "w") as table_file:
                 table_file.write("BEGIN DIMENSIONS\n")
                 table_file.write(f"NROW {nrow}\n")
-                table_file.write(f"NCOL {ncol}\n")     
-                table_file.write("END DIMENSIONS\n") 
-                table_file.write("begin table\n") 
+                table_file.write(f"NCOL {ncol}\n")
+                table_file.write("END DIMENSIONS\n")
+                table_file.write("begin table\n")
 
                 table_dataframe = pd.DataFrame(table.transpose())
-                string_table = table_dataframe.iloc[range(nrow), range(ncol)].to_string( header=False, index=False)
+                string_table = table_dataframe.iloc[range(nrow), range(ncol)].to_string(
+                    header=False, index=False
+                )
                 table_file.write(string_table)
-                table_file.write("end table\n")                 
-                                     
-
+                table_file.write("end table\n")
 
     def _write_table_section(
         self, f, dataframe: pd.DataFrame, title: str, index: bool = False

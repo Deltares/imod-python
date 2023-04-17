@@ -14,17 +14,17 @@ from imod.mf6.lak import (
 )
 
 import imod.tests.fixtures.mf6_lake_package_fixture as mf_lake
+
+
 @pytest.mark.usefixtures("naardermeer", "ijsselmeer")
-
-
 def test_alternative_constructor(naardermeer, ijsselmeer):
     outlet1 = OutletManning("Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
     outlet2 = OutletManning("IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
-    actual = Lake.from_lakes_and_outlets([naardermeer(), ijsselmeer()], [outlet1, outlet2])
+    actual = Lake.from_lakes_and_outlets(
+        [naardermeer(), ijsselmeer()], [outlet1, outlet2]
+    )
     _ = actual.render(None, None, None, False)
     assert isinstance(actual, Lake)
-
-
 
 
 def test_lake_render(lake_package):
