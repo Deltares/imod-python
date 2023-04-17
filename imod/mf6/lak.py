@@ -345,19 +345,27 @@ def join_lake_tables(lake_numbers,  lakes):
     nr_lakes = len(lakes)
     assert len(lake_numbers) == nr_lakes
 
-    any_lake_table = any([lake["lake_table"] is not None for lake in lakes])
+    any_lake_table = any([  not array_is_none(lake["lake_table"] ) for lake in lakes])
     if not any_lake_table:
         return None
 
     lake_tables = []
     for i in range(nr_lakes):
         if lakes[i]["lake_table"] is not None:
-           lake_number = lake_numbers[i]
-           lakes[i]["lake_table"] = lakes[i]["lake_table"].expand_dims(dim = {"lake_nr":[lake_number]})
-           lake_tables.append(lakes[i]["lake_table"].copy(deep=True))
+           if lakes[i]["lake_table"].values[()] is not None:
+            lake_number = lake_numbers[i]
+            lakes[i]["lake_table"] = lakes[i]["lake_table"].expand_dims(dim = {"lake_nr":[lake_number]})
+            lake_tables.append(lakes[i]["lake_table"].copy(deep=True))
         
     result = xr.merge(lake_tables, compat='no_conflicts')
     return result["lake_table"]
+
+def array_is_none(array):
+    if array is None:
+        return True
+    if array.values[()] is None:
+        return True
+    return False
 
 
 
@@ -848,6 +856,8 @@ class Lake(BoundaryCondition):
         # item() will not work here if the object is an array.
         # .values[()] will simply return the full numpy array.
         tables = self.dataset["lake_tables"].values[()]
+        if tables is None:
+            return False
         if any([ pd.api.types.is_numeric_dtype(t) for t in tables  ]):
             return True
         return False    
@@ -895,6 +905,9 @@ class Lake(BoundaryCondition):
         if self._has_outlets():
             d["noutlets"] = len(self.dataset["outlet_lakein"])
 
+        d["ntables"] = 0
+        if self._has_tables():
+            d["ntables"] = len(self.dataset["lake_tables"].coords["lake_nr"])
 
         packagedata = []
         for name, number, stage in zip(
@@ -1063,7 +1076,7 @@ class Lake(BoundaryCondition):
     def _write_laketable_filelist_section(self, f,):
 
         lake_number_to_lake_table_filename = {}
-        f.write("tables  \n") 
+        f.write("\nbegin tables\n") 
         for name, number in zip(
             self.dataset["lake_boundname"],
             self.dataset["lake_number"],
@@ -1075,6 +1088,7 @@ class Lake(BoundaryCondition):
                 table_file = lake_name + ".ltbl"
                 f.write(f"   {lake_number}  TAB6 FILEIN {table_file}\n")
                 lake_number_to_lake_table_filename[lake_number] = table_file
+        f.write("end tables\n") 
         return lake_number_to_lake_table_filename
 
 
