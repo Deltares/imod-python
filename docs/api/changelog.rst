@@ -12,6 +12,28 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 Added
 ~~~~~
 
+- :class:`imod.mf6.OutputControl` now takes parameters ``head_file``,
+  ``concentration_file``, and ``budget_file`` to specify where to store
+  MODFLOW6 output files.
+- :func:`imod.util.from_mdal_compliant_ugrid2d` to "restack" the variables that
+  have have been "unstacked" in :func:`imod.util.mdal_compliant_ugrid2d`.
+
+Fixed
+~~~~~
+
+- :meth:`imod.wq.bas.BasicFlow.thickness` returns a DataArray with the correct
+  dimension order again. This confusingly resulted in an error when writing the
+  :class:`imod.wq.btn.BasicTransport` package.
+- Fixed bug in :class:`imod.mf6.dis.StructuredDiscretization` and
+  :class:`imod.mf6.dis.VerticesDiscretization` where 
+  ``inactive bottom above active cell`` was incorrectly raised.
+
+[0.12.0] - 2023-03-17
+---------------------
+
+Added
+~~~~~
+
 - :func:`imod.prj.read_projectfile` to read the contents of a project file into
   a Python dictionary.
 - :func:`imod.prj.open_projectfile_data` to read/open the data that is pointed
@@ -35,6 +57,10 @@ Changed
   overwritten by the second, and so forth.
 - :meth:`imod.wq.Well.save` will now write time varying data to associated
   files for extration rate and concentration.
+- Choosing ``method="geometric_mean"`` in the Regridder will now result in NaN
+  values in the regridded result if a geometric mean is computed over negative
+  values; in general, a geometric mean should only be computed over physical
+  quantities with a "true zero" (e.g. conductivity, but not elevation).
 
 [0.11.6] - 2023-02-01
 ---------------------

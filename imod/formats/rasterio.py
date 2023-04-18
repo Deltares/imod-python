@@ -117,11 +117,11 @@ def _get_driver(path):
 def _limitations(riods, path):
     if riods.count != 1:
         raise NotImplementedError(
-            f"Cannot open multi-band grid: {path}. Try xarray.open_rasterio() instead."
+            f"Cannot open multi-band grid: {path}. Try rioxarray instead."
         )
     if not riods.transform.is_rectilinear:
         raise NotImplementedError(
-            f"Cannot open non-rectilinear grid: {path}. Try xarray.open_rasterio() instead."
+            f"Cannot open non-rectilinear grid: {path}. Try rioxarray instead."
         )
 
 
@@ -130,7 +130,7 @@ def header(path, pattern):
 
     # TODO:
     # Check bands, rotation, etc.
-    # Raise NotImplementedErrors and point to xr.open_rasterio
+    # Raise NotImplementedErrors and point to rioxarray.open_rasterio
     with rasterio.open(path, "r") as riods:
         _limitations(riods, path)
         attrs["nrow"] = riods.height
@@ -282,7 +282,7 @@ def write(path, da, driver=None, nodata=np.nan, dtype=None):
     >>> imod.rasterio.write("example.asc", da)
     """
     # Not directly related to iMOD, but provides a missing link, together
-    # with xarray.open_rasterio.
+    # with xioxarray.
     # Note that this function can quickly become dstdated as
     # the xarray rasterio connection matures, see for instance:
     # https://github.com/pydata/xarray/issues/1736

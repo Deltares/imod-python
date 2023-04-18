@@ -1,6 +1,6 @@
 import jinja2
 import numpy as np
-import scipy.ndimage.morphology
+import scipy.ndimage
 import xarray as xr
 
 from imod import util
@@ -196,7 +196,10 @@ class BasicFlow(Package):
             ],
             dim="layer",
         )
-        return th
+
+        # Concat results in wrong dimension order (y, x, layer), transpose to
+        # fix dimension order.
+        return th.transpose("layer", "y", "x", missing_dims="ignore")
 
     def _pkgcheck(self, ibound=None):
         if (self["top"] < self["bottom"]).any():

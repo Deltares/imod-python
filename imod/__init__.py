@@ -10,6 +10,7 @@ from imod import (
     msw,
     prepare,
     select,
+    testing,
     util,
     visualize,
     wq,

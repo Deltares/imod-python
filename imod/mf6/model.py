@@ -1,20 +1,24 @@
 import abc
 import collections
+import inspect
 import pathlib
 from copy import deepcopy
 
 import cftime
 import jinja2
 import numpy as np
+import tomli
+import tomli_w
+import xugrid as xu
 
+import imod
 from imod.mf6 import qgs_util
+from imod.mf6.pkgbase import Package
 from imod.mf6.validation import validation_model_error_message
 from imod.schemata import ValidationError
 
 
 class Modflow6Model(collections.UserDict, abc.ABC):
-    _pkg_id = "model"
-
     def __setitem__(self, key, value):
         if len(key) > 16:
             raise KeyError(
@@ -106,6 +110,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for pkg in self.values():
             if "time" in pkg.dataset.coords:
                 modeltimes.append(pkg.dataset["time"].values)
+            repeat_stress = pkg.dataset.get("repeat_stress")
+            if repeat_stress is not None and repeat_stress.values[()] is not None:
+                modeltimes.append(repeat_stress.isel(repeat_items=0).values)
         return modeltimes
 
     def render(self, modelname: str):
@@ -165,7 +172,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def write(
         self, directory, modelname, globaltimes, binary=True, validate: bool = True
-    ):
+    ) -> None:
         """
         Write model namefile
         Write packages
@@ -194,10 +201,114 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkgname}")
 
+        return
+
+    def dump(
+        self, directory, modelname, validate: bool = True, mdal_compliant: bool = False
+    ):
+        modeldirectory = pathlib.Path(directory) / modelname
+        modeldirectory.mkdir(exist_ok=True, parents=True)
+        if validate:
+            self._validate()
+
+        toml_content = collections.defaultdict(dict)
+        for pkgname, pkg in self.items():
+            pkg_path = f"{pkgname}.nc"
+            toml_content[type(pkg).__name__][pkgname] = pkg_path
+            dataset = pkg.dataset
+            if isinstance(dataset, xu.UgridDataset):
+                if mdal_compliant:
+                    dataset = pkg.dataset.ugrid.to_dataset()
+                    mdal_dataset = imod.util.mdal_compliant_ugrid2d(dataset)
+                    mdal_dataset.to_netcdf(modeldirectory / pkg_path)
+                else:
+                    pkg.dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
+            else:
+                pkg.dataset.to_netcdf(modeldirectory / pkg_path)
+
+        toml_path = modeldirectory / f"{modelname}.toml"
+        with open(toml_path, "wb") as f:
+            tomli_w.dump(toml_content, f)
+
+        return toml_path
+
+    @classmethod
+    def from_file(cls, toml_path):
+        pkg_classes = {
+            name: pkg_cls
+            for name, pkg_cls in inspect.getmembers(imod.mf6, inspect.isclass)
+            if issubclass(pkg_cls, Package)
+        }
+
+        toml_path = pathlib.Path(toml_path)
+        with open(toml_path, "rb") as f:
+            toml_content = tomli.load(f)
+
+        parentdir = toml_path.parent
+        instance = cls()
+        for key, entry in toml_content.items():
+            for pkgname, path in entry.items():
+                pkg_cls = pkg_classes[key]
+                instance[pkgname] = pkg_cls.from_file(parentdir / path)
+
+        return instance
+
+    def clip_box(
+        self,
+        time_min=None,
+        time_max=None,
+        layer_min=None,
+        layer_max=None,
+        x_min=None,
+        x_max=None,
+        y_min=None,
+        y_max=None,
+    ):
+        """
+        Clip a model by a bounding box (time, layer, y, x).
+
+        Slicing intervals may be half-bounded, by providing None:
+
+        * To select 500.0 <= x <= 1000.0:
+          ``clip_box(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
+          or ``clip_box(x_max=1000.0)``.
+        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
+          or ``clip_box(x_min=1000.0)``.
+
+        Parameters
+        ----------
+        time_min: optional
+        time_max: optional
+        layer_min: optional, int
+        layer_max: optional, int
+        x_min: optional, float
+        x_min: optional, float
+        y_max: optional, float
+        y_max: optional, float
+
+        Returns
+        -------
+        clipped : Modflow6Model
+        """
+        clipped = type(self)(**self.options)
+        for key, pkg in self.items():
+            clipped[key] = pkg.clip_box(
+                time_min=time_min,
+                time_max=time_max,
+                layer_min=layer_min,
+                layer_max=layer_max,
+                x_min=x_min,
+                x_max=x_max,
+                y_min=y_min,
+                y_max=y_max,
+            )
+        return clipped
+
 
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
-    _model_type = "gwf6"
+    _model_id = "gwf6"
 
     def __init__(
         self,
@@ -209,7 +320,6 @@ class GroundwaterFlowModel(Modflow6Model):
         under_relaxation: bool = False,
     ):
         super().__init__()
-        # TODO: probably replace by a pydantic BaseModel
         self.options = {
             "listing_file": listing_file,
             "print_input": print_input,
@@ -276,7 +386,7 @@ class GroundwaterTransportModel(Modflow6Model):
     """
 
     _mandatory_packages = ("mst", "dsp", "oc", "ic")
-    _model_type = "gwt6"
+    _model_id = "gwt6"
 
     def __init__(
         self,
