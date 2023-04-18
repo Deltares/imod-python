@@ -1,4 +1,6 @@
 import collections
+import os
+from pathlib import Path
 
 import numpy as np
 
@@ -73,6 +75,9 @@ class OutputControl(Package):
         save_head=None,
         save_budget=None,
         save_concentration=None,
+        head_file=None,
+        budget_file=None,
+        concentration_file=None,
         validate: bool = True,
     ):
         super().__init__()
@@ -81,6 +86,9 @@ class OutputControl(Package):
         self.dataset["save_head"] = save_head
         self.dataset["save_concentration"] = save_concentration
         self.dataset["save_budget"] = save_budget
+        self.dataset["head_file"] = head_file
+        self.dataset["budget_file"] = budget_file
+        self.dataset["concentration_file"] = concentration_file
         self._validate_init_schemata(validate)
 
     def _get_ocsetting(self, setting):
@@ -102,15 +110,32 @@ class OutputControl(Package):
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         modelname = directory.stem
-        if self.dataset["save_head"].values[()] is not None:
-            d["headfile"] = (directory / f"{modelname}.hds").as_posix()
-        if self.dataset["save_concentration"].values[()] is not None:
-            d["concentrationfile"] = (directory / f"{modelname}.ucn").as_posix()
-        if self.dataset["save_budget"].values[()] is not None:
-            d["budgetfile"] = (directory / f"{modelname}.cbc").as_posix()
+
+        pairs = (
+            ("head", "hds"),
+            ("concentration", "ucn"),
+            ("budget", "cbc"),
+        )
+        for part, ext in pairs:
+            save = self.dataset[f"save_{part}"].values[()]
+            if save is not None:
+                varname = f"{part}_file"
+                filepath = self.dataset[varname].values[()]
+                if filepath is None:
+                    filepath = directory / f"{modelname}.{ext}"
+                else:
+                    filepath = Path(filepath)
+
+                if filepath.is_absolute():
+                    path = filepath
+                else:
+                    # Get path relative to the simulation name file.
+                    sim_directory = directory.parent
+                    path = Path(os.path.relpath(filepath, sim_directory))
+                d[varname] = path.as_posix()
 
         periods = collections.defaultdict(dict)
-        for datavar in self.dataset.data_vars:
+        for datavar in ("save_head", "save_concentration", "save_budget"):
             if self.dataset[datavar].values[()] is None:
                 continue
             key = datavar.replace("_", " ")
@@ -128,3 +153,15 @@ class OutputControl(Package):
         d["periods"] = periods
 
         return self._template.render(d)
+
+    def write(self, directory, pkgname, globaltimes, binary):
+        # We need to overload the write here to ensure the output directory is
+        # created in advance for MODFLOW6.
+        super().write(directory, pkgname, globaltimes, binary)
+
+        for datavar in ("head_file", "concentration_file", "budget_file"):
+            path = self.dataset[datavar].values[()]
+            if path is not None:
+                filepath = Path(path)
+                filepath.parent.mkdir(parents=True, exist_ok=True)
+        return

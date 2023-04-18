@@ -187,14 +187,10 @@ class DimsSchema(BaseSchema):
             Dimensions of the DataArray. `None` may be used as a wildcard value.
         """
         dims = self._fill_in_face_dim(obj)
-
         # Force to tuple for error message print
         expected = tuple(dims)
         actual = tuple(obj.dims)
-
-        different_dims = set(actual) ^ set(expected)
-
-        if len(different_dims) != 0:
+        if actual != expected:
             raise ValidationError(f"dim mismatch: expected {expected}, got {actual}")
 
 
@@ -363,7 +359,7 @@ class AllValueSchema(ValueSchema):
         condition = condition | ignore
         if not condition.all():
             raise ValidationError(
-                f"values exceed condition: {self.operator_str} {self.other}"
+                f"not all values comply with criterion: {self.operator_str} {self.other}"
             )
 
 
@@ -391,7 +387,7 @@ class AnyValueSchema(ValueSchema):
         condition = condition | ignore
         if not condition.any():
             raise ValidationError(
-                f"no values exceed condition: {self.operator_str} {self.other}"
+                f"not a single value complies with criterion: {self.operator_str} {self.other}"
             )
 
 

@@ -1,4 +1,5 @@
 import numpy as np
+import xarray as xr
 
 from imod.mf6.pkgbase import Package
 from imod.schemata import DTypeSchema
@@ -393,7 +394,12 @@ class Solution(Package):
         validate: bool = True,
     ):
         super().__init__()
-        self.dataset["modelnames"] = modelnames
+        self.dataset = xr.Dataset()
+        # Make sure the modelnames are set as a variable rather than dimension:
+        if isinstance(modelnames, xr.DataArray):
+            self.dataset["modelnames"] = modelnames
+        else:
+            self.dataset["modelnames"] = ("model", modelnames)
         self.dataset["outer_dvclose"] = outer_dvclose
         self.dataset["outer_maximum"] = outer_maximum
         self.dataset["under_relaxation"] = under_relaxation

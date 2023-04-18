@@ -1,3 +1,5 @@
+import pathlib
+
 import numpy as np
 import xarray as xr
 
@@ -388,7 +390,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
             list(self._period_data) + list(self._package_data) + ["iuzno" + "ivertcon"]
         )
         d = self.get_options(d, not_options=not_options)
-        path = directory / pkgname / f"{self._pkg_id}-pkgdata.dat"
+        path = pathlib.Path(directory.stem) / pkgname / f"{self._pkg_id}-pkgdata.dat"
         d["packagedata"] = path.as_posix()
         d["nuzfcells"] = self._max_active_n()
         return self._template.render(d)

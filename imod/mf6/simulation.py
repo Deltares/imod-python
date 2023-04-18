@@ -5,9 +5,16 @@ import warnings
 
 import jinja2
 import numpy as np
+import tomli
+import tomli_w
 import xarray as xr
 
 import imod
+from imod.mf6.model import (
+    GroundwaterFlowModel,
+    GroundwaterTransportModel,
+    Modflow6Model,
+)
 
 
 class Modflow6Simulation(collections.UserDict):
@@ -87,7 +94,11 @@ class Modflow6Simulation(collections.UserDict):
         >>> simulation["time_discretization"]["n_timesteps"] = 5
         """
         self.use_cftime = any(
-            [model._use_cftime() for model in self.values() if model._pkg_id == "model"]
+            [
+                model._use_cftime()
+                for model in self.values()
+                if isinstance(model, Modflow6Model)
+            ]
         )
 
         times = [
@@ -95,7 +106,7 @@ class Modflow6Simulation(collections.UserDict):
             for time in additional_times
         ]
         for model in self.values():
-            if model._pkg_id == "model":
+            if isinstance(model, Modflow6Model):
                 times.extend(model._yield_times())
 
         # np.unique also sorts
@@ -118,10 +129,10 @@ class Modflow6Simulation(collections.UserDict):
         solutiongroups = []
 
         for key, value in self.items():
-            if value._pkg_id == "tdis":
+            if isinstance(value, Modflow6Model):
+                models.append((value._model_id, f"{key}/{key}.nam", key))
+            elif value._pkg_id == "tdis":
                 d["tdis6"] = f"{key}.tdis"
-            elif value._pkg_id == "model":
-                models.append((value._model_type, f"{key}/{key}.nam", key))
             elif value._pkg_id == "ims":
                 slnnames = value["modelnames"].values
                 modeltypes = set()
@@ -163,7 +174,7 @@ class Modflow6Simulation(collections.UserDict):
         # Check models for required content
         for key, model in self.items():
             # skip timedis, exchanges
-            if model._pkg_id == "model":
+            if isinstance(model, Modflow6Model):
                 model._model_checks(key)
 
         directory = pathlib.Path(directory)
@@ -182,7 +193,7 @@ class Modflow6Simulation(collections.UserDict):
         globaltimes = self["time_discretization"]["time"].values
         for key, value in self.items():
             # skip timedis, exchanges
-            if value._pkg_id == "model":
+            if isinstance(value, Modflow6Model):
                 value.write(
                     directory=directory,
                     modelname=key,
@@ -210,6 +221,55 @@ class Modflow6Simulation(collections.UserDict):
                     f"{result.returncode}, and error message:\n\n{result.stdout.decode()} "
                 )
 
+    def dump(
+        self, directory=".", validate: bool = True, mdal_compliant: bool = False
+    ) -> None:
+        directory = pathlib.Path(directory)
+        directory.mkdir(parents=True, exist_ok=True)
+
+        toml_content = collections.defaultdict(dict)
+        for key, value in self.items():
+            cls_name = type(value).__name__
+            if isinstance(value, Modflow6Model):
+                model_toml_path = value.dump(directory, key, validate, mdal_compliant)
+                toml_content[cls_name][key] = model_toml_path.relative_to(
+                    directory
+                ).as_posix()
+            else:
+                path = f"{key}.nc"
+                value.dataset.to_netcdf(directory / path)
+                toml_content[cls_name][key] = path
+
+        with open(directory / f"{self.name}.toml", "wb") as f:
+            tomli_w.dump(toml_content, f)
+
+        return
+
+    @staticmethod
+    def from_file(toml_path):
+        classes = {
+            item_cls.__name__: item_cls
+            for item_cls in (
+                GroundwaterFlowModel,
+                GroundwaterTransportModel,
+                imod.mf6.TimeDiscretization,
+                imod.mf6.Solution,
+            )
+        }
+
+        toml_path = pathlib.Path(toml_path)
+        with open(toml_path, "rb") as f:
+            toml_content = tomli.load(f)
+
+        simulation = Modflow6Simulation(name=toml_path.stem)
+        for key, entry in toml_content.items():
+            item_cls = classes[key]
+            for name, filename in entry.items():
+                path = toml_path.parent / filename
+                simulation[name] = item_cls.from_file(path)
+
+        return simulation
+
     def write_qgis_project(self, crs, directory=".", aggregate_layers=False):
         directory = pathlib.Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
@@ -217,7 +277,7 @@ class Modflow6Simulation(collections.UserDict):
         with imod.util.cd(directory):
             for key, value in self.items():
                 # skip timedis, exchanges
-                if value._pkg_id == "model":
+                if isinstance(value, Modflow6Model):
                     value.write_qgis_project(
                         key, crs, aggregate_layers=aggregate_layers
                     )
@@ -236,9 +296,60 @@ class Modflow6Simulation(collections.UserDict):
         return result
 
     def get_models_of_type(self, modeltype):
-        result = {}
+        return {
+            k: v
+            for k, v in self.items()
+            if isinstance(v, Modflow6Model) and (v._model_id == modeltype)
+        }
+
+    def clip_box(
+        self,
+        time_min=None,
+        time_max=None,
+        layer_min=None,
+        layer_max=None,
+        x_min=None,
+        x_max=None,
+        y_min=None,
+        y_max=None,
+    ):
+        """
+        Clip a simulation by a bounding box (time, layer, y, x).
+
+        Slicing intervals may be half-bounded, by providing None:
+
+        * To select 500.0 <= x <= 1000.0:
+          ``clip_box(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
+          or ``clip_box(x_max=1000.0)``.
+        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
+          or ``clip_box(x_min=1000.0)``.
+
+        Parameters
+        ----------
+        time_min: optional
+        time_max: optional
+        layer_min: optional, int
+        layer_max: optional, int
+        x_min: optional, float
+        x_min: optional, float
+        y_max: optional, float
+        y_max: optional, float
+
+        Returns
+        -------
+        clipped : Simulation
+        """
+        clipped = type(self)(name=self.name)
         for key, value in self.items():
-            if value._pkg_id == "model":
-                if value._model_type == modeltype:
-                    result[key] = value
-        return result
+            clipped[key] = value.clip_box(
+                time_min=time_min,
+                time_max=time_max,
+                layer_min=layer_min,
+                layer_max=layer_max,
+                x_min=x_min,
+                x_max=x_max,
+                y_min=y_min,
+                y_max=y_max,
+            )
+        return clipped

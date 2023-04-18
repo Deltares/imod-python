@@ -57,6 +57,9 @@ Flow Packages
     Drainage
     Evapotranspiration
     GeneralHeadBoundary
+    HorizontalFlowBarrierHydraulicCharacteristic
+    HorizontalFlowBarrierMultiplier
+    HorizontalFlowBarrierResistance
     InitialConditions
     NodePropertyFlow
     Recharge

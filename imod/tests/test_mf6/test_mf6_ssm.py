@@ -11,7 +11,7 @@ from imod.schemata import ValidationError
 @pytest.mark.usefixtures("flow_model_with_concentration")
 def test_transport_model_rendering(flow_model_with_concentration):
     directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     m = SourceSinkMixing.from_flow_model(flow_model_with_concentration, "salinity")
     actual = m.render(directory, "river", globaltimes, True)
     expected = textwrap.dedent(

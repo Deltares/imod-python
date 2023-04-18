@@ -28,7 +28,7 @@ import dateutil
 import numpy as np
 import pandas as pd
 import xarray as xr
-import xugrid
+import xugrid as xu
 
 try:
     Pattern = re._pattern_type
@@ -496,18 +496,25 @@ def ugrid2d_data(da: xr.DataArray, face_dim: str) -> xr.DataArray:
     )
 
 
-def mdal_compliant_ugrid2d(ds: xr.Dataset) -> xr.Dataset:
+def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
     """
     Ensures the xarray Dataset will be written to a UGRID netCDF that will be
     accepted by MDAL.
 
-    * Breaks down variables with a layer dimension into separate variables.
+    * Unstacks variables with a layer dimension into separate variables.
     * Removes absent entries from the mesh topology attributes.
     * Sets encoding to float for datetime variables.
-    * Convert face_node_connectivity to float and set _FillValue to NaN
-      (xarray).
+
+    Parameters
+    ----------
+    dataset: xarray.Dataset
+
+    Returns
+    -------
+    unstacked: xr.Dataset
 
     """
+    ds = dataset.copy()
     for variable in ds.data_vars:
         if "layer" in ds[variable].dims:
             stacked = ds[variable]
@@ -535,7 +542,17 @@ def mdal_compliant_ugrid2d(ds: xr.Dataset) -> xr.Dataset:
             # "max_face_nodes_dimension": required
             # "face_coordinates": optional
 
+            node_dim = attrs.get("node_dimension")
             edge_dim = attrs.get("edge_dimension")
+            face_dim = attrs.get("face_dimension")
+
+            # Drop the coordinates on the UGRID dimensions
+            to_drop = []
+            for dim in (node_dim, edge_dim, face_dim):
+                if dim is not None and dim in ds.coords:
+                    to_drop.append(dim)
+            ds = ds.drop_vars(to_drop)
+
             if edge_dim and edge_dim not in ds.dims:
                 attrs.pop("edge_dimension")
 
@@ -548,11 +565,64 @@ def mdal_compliant_ugrid2d(ds: xr.Dataset) -> xr.Dataset:
                 attrs.pop("edge_node_connectivity")
 
     # Make sure time is encoded as a float for MDAL
+    # TODO: MDAL requires all data variables to be float (this excludes the UGRID topology data)
     for var in ds.coords:
         if np.issubdtype(ds[var].dtype, np.datetime64):
             ds[var].encoding["dtype"] = np.float64
 
     return ds
+
+
+def from_mdal_compliant_ugrid2d(dataset: xu.UgridDataset):
+    """
+    Undo some of the changes of ``mdal_compliant_ugrid2d``: re-stack the
+    layers.
+
+    Parameters
+    ----------
+    dataset: xugrid.UgridDataset
+
+    Returns
+    -------
+    restacked: xugrid.UgridDataset
+
+    """
+    ds = dataset.ugrid.obj
+    pattern = re.compile(r"(\w+)_layer_(\d+)")
+    matches = [(variable, pattern.search(variable)) for variable in ds.data_vars]
+    matches = [(variable, match) for (variable, match) in matches if match is not None]
+    if not matches:
+        return dataset
+
+    # First deal with the variables that may remain untouched.
+    other_vars = set(ds.data_vars).difference([variable for (variable, _) in matches])
+    restacked = ds[list(other_vars)]
+
+    # Next group by name, which will be the output dataset variable name.
+    grouped = collections.defaultdict(list)
+    for variable, match in matches:
+        name, layer = match.groups()
+        da = ds[variable]
+        grouped[name].append(da.assign_coords(layer=int(layer)))
+
+    # Concatenate, and make sure the dimension order is natural.
+    ugrid_dims = set([dim for grid in dataset.ugrid.grids for dim in grid.dimensions])
+    for variable, das in grouped.items():
+        da = xr.concat(sorted(das, key=lambda da: da["layer"]), dim="layer")
+        newdims = list(da.dims)
+        newdims.remove("layer")
+        # If it's a spatial dataset, the layer should be second last.
+        if ugrid_dims.intersection(newdims):
+            newdims.insert(-1, "layer")
+        # If not, the layer should be last.
+        else:
+            newdims.append("layer")
+        if tuple(newdims) != da.dims:
+            da = da.transpose(*newdims)
+
+        restacked[variable] = da
+
+    return xu.UgridDataset(restacked, grids=dataset.ugrid.grids)
 
 
 def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
@@ -580,7 +650,7 @@ def to_ugrid2d(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
     if not isinstance(data, (xr.DataArray, xr.Dataset)):
         raise TypeError("data must be xarray.DataArray or xr.Dataset")
 
-    grid = xugrid.Ugrid2d.from_structured(data)
+    grid = xu.Ugrid2d.from_structured(data)
     ds = grid.to_dataset()
 
     if isinstance(data, xr.Dataset):

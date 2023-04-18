@@ -8,7 +8,7 @@ from imod.schemata import ValidationError
 
 
 def test_render():
-    ic_head = imod.mf6.InitialConditions(head=0.0)
+    ic_head = imod.mf6.InitialConditions(start=0.0)
     ic_start = imod.mf6.InitialConditions(start=0.0)
     directory = pathlib.Path("mymodel")
     actual_head = ic_head.render(directory, "ic", None, True)

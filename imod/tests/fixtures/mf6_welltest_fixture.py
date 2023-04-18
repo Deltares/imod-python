@@ -20,7 +20,7 @@ def well_test_data_transient():
     layer = np.array([3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
     row = np.array([5, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13])
     column = np.array([11, 6, 12, 8, 10, 12, 14, 8, 10, 12, 14, 8, 10, 12, 14])
-    times = [np.datetime64("2000-01-01"), np.datetime64("2000-02-01")]
+    times = np.array(["2000-01-01", "2000-02-01"], dtype="datetime64[ns]")
     rate = xr.DataArray(
         np.full((2, 15), 5.0), coords={"time": times}, dims=["time", "index"]
     )

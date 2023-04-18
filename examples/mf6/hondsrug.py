@@ -24,7 +24,7 @@ In overview, the model features:
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import scipy.ndimage.morphology
+import scipy.ndimage
 import xarray as xr
 
 import imod
@@ -208,7 +208,7 @@ gwf_model["ic"] = imod.mf6.InitialConditions(starting_head)
 
 def outer_edge(da):
     data = da.copy()
-    from_edge = scipy.ndimage.morphology.binary_erosion(data)
+    from_edge = scipy.ndimage.binary_erosion(data)
     is_edge = (data == 1) & (from_edge == 0)
     return is_edge.astype(bool)
 
@@ -489,15 +489,18 @@ sy = xr.DataArray(
     {"layer": layer},
     ("layer",),
 )
-times_sto = [
-    np.datetime64("2009-12-30T23:59:59.000000000"),
-    np.datetime64("2009-12-31T00:00:00.000000000"),
-    np.datetime64("2010-12-31T00:00:00.000000000"),
-    np.datetime64("2011-12-31T00:00:00.000000000"),
-    np.datetime64("2012-12-31T00:00:00.000000000"),
-    np.datetime64("2013-12-31T00:00:00.000000000"),
-    np.datetime64("2014-12-31T00:00:00.000000000"),
-]
+times_sto = np.array(
+    [
+        "2009-12-30T23:59:59.00",
+        "2009-12-31T00:00:00.00",
+        "2010-12-31T00:00:00.00",
+        "2011-12-31T00:00:00.00",
+        "2012-12-31T00:00:00.00",
+        "2013-12-31T00:00:00.00",
+        "2014-12-31T00:00:00.00",
+    ],
+    dtype="datetime64[ns]",
+)
 
 transient = xr.DataArray(
     [False, True, True, True, True, True, True], {"time": times_sto}, ("time",)

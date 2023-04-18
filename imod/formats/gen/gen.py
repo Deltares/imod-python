@@ -331,7 +331,7 @@ def read(path):
     read as binary, if this fails, it tries to read the gen file as ASCII.
 
     If certain that a GEN file is ascii or binary, the user is adviced to use
-    the respective functions :func:`imod.gen.gen.read_asci` or
+    the respective functions :func:`imod.gen.gen.read_ascii` or
     :func:`imod.gen.gen.read_binary`.
 
     Parameters

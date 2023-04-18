@@ -9,6 +9,7 @@ from .fixtures.flow_basic_fixture import (
     two_days,
     well_df,
 )
+from .fixtures.flow_example_fixture import imodflow_model
 from .fixtures.mf6_circle_fixture import circle_model, circle_result
 from .fixtures.mf6_flow_with_transport_fixture import (
     bulk_density_fc,
