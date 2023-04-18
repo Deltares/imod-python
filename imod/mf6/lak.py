@@ -355,7 +355,7 @@ def join_lake_tables(lake_numbers, lakes):
 
     lake_tables = []
     for i in range(nr_lakes):
-        if not xarray_is_none(lakes[i]["lake_table"] ):
+        if not xarray_is_none(lakes[i]["lake_table"]):
             lake_number = lake_numbers[i]
             lakes[i]["lake_table"] = lakes[i]["lake_table"].expand_dims(
                 dim={"laketable_lake_nr": [lake_number]}
