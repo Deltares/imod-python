@@ -342,10 +342,14 @@ def concatenate_timeseries(list_of_lakes_or_outlets, timeseries_name):
 
 
 def join_lake_tables(lake_numbers, lakes):
+    """
+    merges all the lake tables into a single dataarray. The lake number corresponding to each table
+    is added in a new dimension
+    """
     nr_lakes = len(lakes)
     assert len(lake_numbers) == nr_lakes
 
-    any_lake_table = any([not array_is_none(lake["lake_table"]) for lake in lakes])
+    any_lake_table = any([not xarray_is_none(lake["lake_table"]) for lake in lakes])
     if not any_lake_table:
         return None
 
@@ -355,7 +359,7 @@ def join_lake_tables(lake_numbers, lakes):
             if lakes[i]["lake_table"].values[()] is not None:
                 lake_number = lake_numbers[i]
                 lakes[i]["lake_table"] = lakes[i]["lake_table"].expand_dims(
-                    dim={"lake_nr": [lake_number]}
+                    dim={"laketable_lake_nr": [lake_number]}
                 )
                 lake_tables.append(lakes[i]["lake_table"].copy(deep=True))
 
@@ -363,7 +367,11 @@ def join_lake_tables(lake_numbers, lakes):
     return result["lake_table"]
 
 
-def array_is_none(array):
+def xarray_is_none(array):
+    """
+    when the None value is appended as a dataarray it gets converted to an array with zero values.
+    This function checks if a value is either of these two.
+    """
     if array is None:
         return True
     if array.values[()] is None:
@@ -909,7 +917,7 @@ class Lake(BoundaryCondition):
 
         d["ntables"] = 0
         if self._has_tables():
-            d["ntables"] = len(self.dataset["lake_tables"].coords["lake_nr"])
+            d["ntables"] = len(self.dataset["lake_tables"].coords["laketable_lake_nr"])
 
         packagedata = []
         for name, number, stage in zip(
@@ -1093,7 +1101,10 @@ class Lake(BoundaryCondition):
             lake_number = number.values[()]
             lake_name = name.values[()]
 
-            if lake_number in self.dataset["lake_tables"].coords["lake_nr"].values:
+            if (
+                lake_number
+                in self.dataset["lake_tables"].coords["laketable_lake_nr"].values
+            ):
                 table_file = lake_name + ".ltbl"
                 f.write(f"   {lake_number}  TAB6 FILEIN {table_file}\n")
                 lake_number_to_lake_table_filename[lake_number] = table_file
@@ -1108,7 +1119,7 @@ class Lake(BoundaryCondition):
         for num, file in lake_number_to_filename.items():
             table = self.dataset["lake_tables"].sel(
                 {
-                    "lake_nr": num,
+                    "laketable_lake_nr": num,
                 }
             )
 
