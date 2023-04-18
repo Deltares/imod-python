@@ -1079,7 +1079,6 @@ class Lake(BoundaryCondition):
         self,
         f,
     ):
-
         lake_number_to_lake_table_filename = {}
         f.write("\nbegin tables\n")
         for name, number in zip(

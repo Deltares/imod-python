@@ -31,7 +31,6 @@ def test_mf6_write_number_tables(naardermeer, ijsselmeer, tmp_path):
 
 
 def test_mf6_laketable_reference(naardermeer, ijsselmeer, tmp_path):
-
     lake_package_2lakes = Lake.from_lakes_and_outlets(
         [naardermeer(has_lake_table=True), ijsselmeer(has_lake_table=True)]
     )
