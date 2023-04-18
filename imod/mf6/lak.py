@@ -347,7 +347,6 @@ def join_lake_tables(lake_numbers, lakes):
     is added in a new dimension
     """
     nr_lakes = len(lakes)
-    assert len(lake_numbers) == nr_lakes
 
     any_lake_table = any([not xarray_is_none(lake["lake_table"]) for lake in lakes])
     if not any_lake_table:
