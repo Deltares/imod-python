@@ -2,8 +2,10 @@ import textwrap
 
 import numpy as np
 import pandas as pd
-import xarray as xr
 import pytest
+import xarray as xr
+
+import imod.tests.fixtures.mf6_lake_package_fixture as mf_lake
 from imod.mf6.lak import (
     CONNECTION_DIM,
     LAKE_DIM,
@@ -12,8 +14,6 @@ from imod.mf6.lak import (
     OutletSpecified,
     OutletWeir,
 )
-
-import imod.tests.fixtures.mf6_lake_package_fixture as mf_lake
 
 
 @pytest.mark.usefixtures("naardermeer", "ijsselmeer")

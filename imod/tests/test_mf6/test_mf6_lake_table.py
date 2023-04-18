@@ -1,9 +1,11 @@
+import pathlib
+import textwrap
+
 import pytest
 import xarray as xr
-from imod.mf6.lak import Lake
-import pathlib
+
 import imod.tests.fixtures.mf6_lake_package_fixture as mf_lake
-import textwrap
+from imod.mf6.lak import Lake
 
 
 @pytest.mark.usefixtures("naardermeer", "ijsselmeer")

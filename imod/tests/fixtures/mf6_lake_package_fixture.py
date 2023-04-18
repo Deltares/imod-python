@@ -1,12 +1,8 @@
-import xarray as xr
-import pytest
 import numpy as np
+import pytest
+import xarray as xr
 
-from imod.mf6.lak import (
-    Lake,
-    LakeData,
-    OutletManning,
-)
+from imod.mf6.lak import Lake, LakeData, OutletManning
 
 
 def create_lake_table(
@@ -25,7 +21,7 @@ def create_lake_table(
     lake_table["sarea"] = xr.DataArray(
         coords={"row": rownumbers},
         data=[float(i) for i in range(starting_sarea, starting_sarea + number_rows)],
-    )    
+    )
 
     if starting_barea is not None:
         lake_table["barea"] = xr.DataArray(
@@ -67,7 +63,7 @@ def ijsselmeer(basic_dis):
         is_lake[0, 5, 5] = True
         lake_table = None
         if has_lake_table:
-            lake_table = create_lake_table(6, 8, 9, 10 , 11)
+            lake_table = create_lake_table(6, 8, 9, 10, 11)
         return create_lake_data(
             is_lake, starting_stage=15.0, name="IJsselmeer", lake_table=lake_table
         )

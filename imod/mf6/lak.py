@@ -1109,21 +1109,27 @@ class Lake(BoundaryCondition):
 
             fullpath_laketable = directory / file
 
-
-            #check if the barea column is present for this table (and not filled with nan's)
+            # check if the barea column is present for this table (and not filled with nan's)
             has_barea_column = "barea" in table.coords["column"]
             if has_barea_column:
                 barea_column = table.sel({"column": "barea"})
-                has_barea_column = barea_column.where(pd.api.types.is_numeric_dtype).count().values[()] > 0
+                has_barea_column = (
+                    barea_column.where(pd.api.types.is_numeric_dtype).count().values[()]
+                    > 0
+                )
 
             if not has_barea_column:
                 ncol = 3
-                table_dataframe = pd.DataFrame(table.sel({"column": ["stage", "sarea", "volume"]}).transpose())
+                table_dataframe = pd.DataFrame(
+                    table.sel({"column": ["stage", "sarea", "volume"]}).transpose()
+                )
             else:
                 ncol = 4
-                table_dataframe = pd.DataFrame(table.sel({"column": ["stage", "sarea", "volume", "barea"]}).transpose())
-            
-
+                table_dataframe = pd.DataFrame(
+                    table.sel(
+                        {"column": ["stage", "sarea", "volume", "barea"]}
+                    ).transpose()
+                )
 
             with open(fullpath_laketable, "w") as table_file:
                 table_file.write("BEGIN DIMENSIONS\n")

@@ -26,6 +26,7 @@ from .fixtures.mf6_flow_with_transport_fixture import (
     rate_fc,
     sp2_fc,
 )
+from .fixtures.mf6_lake_package_fixture import ijsselmeer, lake_package, naardermeer
 from .fixtures.mf6_twri_disv_fixture import twri_disv_model
 from .fixtures.mf6_twri_fixture import transient_twri_model, twri_model, twri_result
 from .fixtures.mf6_welltest_fixture import (
@@ -34,5 +35,3 @@ from .fixtures.mf6_welltest_fixture import (
 )
 from .fixtures.msw_fixture import fixed_format_parser
 from .fixtures.msw_model_fixture import coupled_mf6_model, msw_model
-
-from .fixtures.mf6_lake_package_fixture import naardermeer, ijsselmeer, lake_package
