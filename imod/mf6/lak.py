@@ -361,7 +361,7 @@ def join_lake_tables(lake_numbers, lakes):
                 lakes[i]["lake_table"] = lakes[i]["lake_table"].expand_dims(
                     dim={"laketable_lake_nr": [lake_number]}
                 )
-                lake_tables.append(lakes[i]["lake_table"].copy(deep=True))
+                lake_tables.append(lakes[i]["lake_table"])
 
     result = xr.merge(lake_tables, compat="no_conflicts")
     return result["lake_table"]
