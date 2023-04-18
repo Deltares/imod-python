@@ -355,13 +355,12 @@ def join_lake_tables(lake_numbers, lakes):
 
     lake_tables = []
     for i in range(nr_lakes):
-        if lakes[i]["lake_table"] is not None:
-            if lakes[i]["lake_table"].values[()] is not None:
-                lake_number = lake_numbers[i]
-                lakes[i]["lake_table"] = lakes[i]["lake_table"].expand_dims(
-                    dim={"laketable_lake_nr": [lake_number]}
-                )
-                lake_tables.append(lakes[i]["lake_table"])
+        if not xarray_is_none(lakes[i]["lake_table"] ):
+            lake_number = lake_numbers[i]
+            lakes[i]["lake_table"] = lakes[i]["lake_table"].expand_dims(
+                dim={"laketable_lake_nr": [lake_number]}
+            )
+            lake_tables.append(lakes[i]["lake_table"])
 
     result = xr.merge(lake_tables, compat="no_conflicts")
     return result["lake_table"]
@@ -862,7 +861,7 @@ class Lake(BoundaryCondition):
             return False
         return True
 
-    def _has_tables(self):
+    def _has_laketables(self):
         # item() will not work here if the object is an array.
         # .values[()] will simply return the full numpy array.
         tables = self.dataset["lake_tables"].values[()]
@@ -916,7 +915,7 @@ class Lake(BoundaryCondition):
             d["noutlets"] = len(self.dataset["outlet_lakein"])
 
         d["ntables"] = 0
-        if self._has_tables():
+        if self._has_laketables():
             d["ntables"] = len(self.dataset["lake_tables"].coords["laketable_lake_nr"])
 
         packagedata = []
@@ -997,7 +996,7 @@ class Lake(BoundaryCondition):
                 self._connection_dataframe(),
                 "connectiondata",
             )
-            if self._has_tables():
+            if self._has_laketables():
                 lake_number_to_filename = self._write_laketable_filelist_section(f)
                 self._write_laketable_files(directory, lake_number_to_filename)
 
