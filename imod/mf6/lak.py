@@ -1079,6 +1079,11 @@ class Lake(BoundaryCondition):
         self,
         f,
     ):
+        """
+        Writes a section of the lake package input file which lists the referenced laketable files.
+        Returns a dictionary with as key the lake number and as value the laketable filename- for those
+        lakes that have a laketable.
+        """
         lake_number_to_lake_table_filename = {}
         f.write("\nbegin tables\n")
         for name, number in zip(
@@ -1096,6 +1101,10 @@ class Lake(BoundaryCondition):
         return lake_number_to_lake_table_filename
 
     def _write_laketable_files(self, directory, lake_number_to_filename):
+        """
+        writes a laketable file, containing a table which specifies the relation between stage,
+        volume and area for one single lake.
+        """
         for num, file in lake_number_to_filename.items():
             table = self.dataset["lake_tables"].sel(
                 {
@@ -1103,10 +1112,9 @@ class Lake(BoundaryCondition):
                 }
             )
 
+            # count number of rows
             stage_col = table.sel({"column": "stage"})
             nrow = stage_col.where(pd.api.types.is_numeric_dtype).count().values[()]
-
-            fullpath_laketable = directory / file
 
             # check if the barea column is present for this table (and not filled with nan's)
             has_barea_column = "barea" in table.coords["column"]
@@ -1130,6 +1138,8 @@ class Lake(BoundaryCondition):
                     ).transpose()
                 )
 
+            # write lake table to file
+            fullpath_laketable = directory / file
             with open(fullpath_laketable, "w") as table_file:
                 table_file.write("BEGIN DIMENSIONS\n")
                 table_file.write(f"NROW {nrow}\n")
@@ -1146,6 +1156,9 @@ class Lake(BoundaryCondition):
     def _write_table_section(
         self, f, dataframe: pd.DataFrame, title: str, index: bool = False
     ) -> None:
+        """
+        writes a dataframe to file. Used for the connection data and for the outlet data.
+        """
         f.write(f"begin {title}\n")
         block = dataframe.to_csv(
             index=index,
