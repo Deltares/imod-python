@@ -8,28 +8,31 @@ from imod.mf6.lak import Lake, LakeData, OutletManning
 def create_lake_table(
     number_rows, starting_stage, starting_sarea, starting_volume, starting_barea=None
 ):
-    rownumbers = range(0, number_rows)
+    """
+    creates a lake table. The mandatory columns are stage, area and volume. Optionally a barea column
+    is present. The number of rows of the table is an input argument. The first row of the table will
+    have the starting values specified in the input arguments. Each next row will have the values of the
+    previous row, plus one.
+    """
+    rownumbers = np.arange(number_rows)
+
     lake_table = xr.Dataset(coords={"row": rownumbers})
+    stage_data = (rownumbers + starting_stage).astype(np.float64)
+    volume_data = (rownumbers + starting_volume).astype(np.float64)
+    sarea_data = (rownumbers + starting_sarea).astype(np.float64)
+
     lake_table["stage"] = xr.DataArray(
         coords={"row": rownumbers},
-        data=[float(i) for i in range(starting_stage, starting_stage + number_rows)],
+        data=stage_data,
     )
-    lake_table["volume"] = xr.DataArray(
-        coords={"row": rownumbers},
-        data=[float(i) for i in range(starting_volume, starting_volume + number_rows)],
-    )
-    lake_table["sarea"] = xr.DataArray(
-        coords={"row": rownumbers},
-        data=[float(i) for i in range(starting_sarea, starting_sarea + number_rows)],
-    )
+    lake_table["volume"] = xr.DataArray(coords={"row": rownumbers}, data=volume_data)
+
+    lake_table["sarea"] = xr.DataArray(coords={"row": rownumbers}, data=sarea_data)
 
     if starting_barea is not None:
-        lake_table["barea"] = xr.DataArray(
-            coords={"row": rownumbers},
-            data=[
-                float(i) for i in range(starting_barea, starting_barea + number_rows)
-            ],
-        )
+        barea_data = (rownumbers + starting_barea).astype(np.float64)
+        lake_table["barea"] = xr.DataArray(coords={"row": rownumbers}, data=barea_data)
+
     lake_table_array = lake_table.to_array()
     lake_table_array = lake_table_array.rename({"variable": "column"})
     return lake_table_array

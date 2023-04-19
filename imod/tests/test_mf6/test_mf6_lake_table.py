@@ -91,8 +91,8 @@ def test_mf6_laketable_reference(naardermeer, ijsselmeer, tmp_path):
         NCOL 4
         END DIMENSIONS
         begin table
-         8.0  9.0 10.0 11.0
-         9.0 10.0 11.0 12.0
+        8.0 9.0 10.0 11.0
+        9.0 10.0 11.0 12.0
         10.0 11.0 12.0 13.0
         11.0 12.0 13.0 14.0
         12.0 13.0 14.0 15.0

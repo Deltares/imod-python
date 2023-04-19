@@ -104,10 +104,7 @@ class LakeData(LakeApi_Base):
         self.dataset["bottom_elevation"] = bot_elevation
         self.dataset["connection_length"] = connection_length
         self.dataset["connection_width"] = connection_width
-
-        self.dataset["lake_table"] = None
-        if lake_table is not None:
-            self.dataset["lake_table"] = lake_table
+        self.dataset["lake_table"] = lake_table
 
         # timeseries data
 
@@ -348,13 +345,13 @@ def join_lake_tables(lake_numbers, lakes):
     """
     nr_lakes = len(lakes)
 
-    any_lake_table = any([not xarray_is_none(lake["lake_table"]) for lake in lakes])
+    any_lake_table = any([not da_is_none(lake["lake_table"]) for lake in lakes])
     if not any_lake_table:
         return None
 
     lake_tables = []
     for i in range(nr_lakes):
-        if not xarray_is_none(lakes[i]["lake_table"]):
+        if not da_is_none(lakes[i]["lake_table"]):
             lake_number = lake_numbers[i]
             lakes[i]["lake_table"] = lakes[i]["lake_table"].expand_dims(
                 dim={"laketable_lake_nr": [lake_number]}
@@ -365,16 +362,11 @@ def join_lake_tables(lake_numbers, lakes):
     return result["lake_table"]
 
 
-def xarray_is_none(array):
+def da_is_none(array):
     """
     when the None value is appended as a dataarray it gets converted to an array with zero values.
-    This function checks if a value is either of these two.
     """
-    if array is None:
-        return True
-    if array.values[()] is None:
-        return True
-    return False
+    return array is None or array.values[()] is None
 
 
 class Lake(BoundaryCondition):
@@ -1114,7 +1106,22 @@ class Lake(BoundaryCondition):
         writes a laketable file, containing a table which specifies the relation between stage,
         volume and area for one single lake.
         """
+
+        _template = jinja2.Template(
+            textwrap.dedent(
+            """\
+            BEGIN DIMENSIONS
+            NROW {{nrow}}
+            NCOL {{ncol}}
+            END DIMENSIONS
+            begin table
+            {{table}}end table
+            """
+            ))
+
+
         for num, file in lake_number_to_filename.items():
+            d = {}
             table = self.dataset["lake_tables"].sel(
                 {
                     "laketable_lake_nr": num,
@@ -1123,7 +1130,7 @@ class Lake(BoundaryCondition):
 
             # count number of rows
             stage_col = table.sel({"column": "stage"})
-            nrow = stage_col.where(pd.api.types.is_numeric_dtype).count().values[()]
+            d["nrow"] = stage_col.where(pd.api.types.is_numeric_dtype).count().values[()]
 
             # check if the barea column is present for this table (and not filled with nan's)
             has_barea_column = "barea" in table.coords["column"]
@@ -1134,33 +1141,25 @@ class Lake(BoundaryCondition):
                     > 0
                 )
 
-            if not has_barea_column:
-                ncol = 3
-                table_dataframe = pd.DataFrame(
-                    table.sel({"column": ["stage", "sarea", "volume"]}).transpose()
-                )
-            else:
-                ncol = 4
-                table_dataframe = pd.DataFrame(
-                    table.sel(
-                        {"column": ["stage", "sarea", "volume", "barea"]}
-                    ).transpose()
-                )
+            columns = ["stage", "sarea", "volume"]
+            if has_barea_column:
+                columns.append("barea")
+            d["ncol"] =len(columns)
+            table_dataframe = pd.DataFrame(
+                table.sel({"column": columns}).transpose()
+            )
 
-            # write lake table to file
+            string_table = table_dataframe.iloc[range(d["nrow"]), range(d["ncol"])].to_csv(
+                header=False, index=False, sep=" ", line_terminator="\n",
+            )
+          
+            
+            d["table"] =string_table
+                        # write lake table to file
             fullpath_laketable = directory / file
-            with open(fullpath_laketable, "w") as table_file:
-                table_file.write("BEGIN DIMENSIONS\n")
-                table_file.write(f"NROW {nrow}\n")
-                table_file.write(f"NCOL {ncol}\n")
-                table_file.write("END DIMENSIONS\n")
-                table_file.write("begin table\n")
-
-                string_table = table_dataframe.iloc[range(nrow), range(ncol)].to_string(
-                    header=False, index=False
-                )
-                table_file.write(string_table)
-                table_file.write("\nend table")
+            laketable_file = _template.render(d)
+            with open(fullpath_laketable, "w") as f:
+                f.write(laketable_file)
 
     def _write_table_section(
         self, f, dataframe: pd.DataFrame, title: str, index: bool = False
