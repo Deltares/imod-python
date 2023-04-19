@@ -5,107 +5,26 @@ import pandas as pd
 import pytest
 import xarray as xr
 
+import imod.tests.fixtures.mf6_lake_package_fixture as mf_lake
 from imod.mf6.lak import (
     CONNECTION_DIM,
     LAKE_DIM,
     Lake,
-    LakeData,
     OutletManning,
     OutletSpecified,
     OutletWeir,
 )
 
 
-def create_xarray_1d(content, dimname):
-    return xr.DataArray(content, dims=dimname)
-
-
-def create_lake_data(
-    is_lake,
-    starting_stage,
-    name,
-    status=None,
-    stage=None,
-    rainfall=None,
-    evaporation=None,
-    runoff=None,
-    inflow=None,
-    withdrawal=None,
-    auxiliary=None,
-):
-    HORIZONTAL = 0
-    connection_type = xr.full_like(is_lake, HORIZONTAL, dtype=np.floating).where(
-        is_lake
-    )
-    bed_leak = xr.full_like(is_lake, 0.2, dtype=np.floating).where(is_lake)
-    top_elevation = xr.full_like(is_lake, 0.3, dtype=np.floating).where(is_lake)
-    bot_elevation = xr.full_like(is_lake, 0.4, dtype=np.floating).where(is_lake)
-    connection_length = xr.full_like(is_lake, 0.5, dtype=np.floating).where(is_lake)
-    connection_width = xr.full_like(is_lake, 0.6, dtype=np.floating).where(is_lake)
-    return LakeData(
-        starting_stage=starting_stage,
-        boundname=name,
-        connection_type=connection_type,
-        bed_leak=bed_leak,
-        top_elevation=top_elevation,
-        bot_elevation=bot_elevation,
-        connection_length=connection_length,
-        connection_width=connection_width,
-        status=status,
-        stage=stage,
-        rainfall=rainfall,
-        evaporation=evaporation,
-        runoff=runoff,
-        inflow=inflow,
-        withdrawal=withdrawal,
-        auxiliary=auxiliary,
-    )
-
-
-@pytest.fixture(scope="function")
-def naardermeer(basic_dis):
-    idomain, _, _ = basic_dis
-    is_lake = xr.full_like(idomain, False, dtype=bool)
-    is_lake[0, 1, 1] = True
-    is_lake[0, 1, 2] = True
-    is_lake[0, 2, 2] = True
-    return create_lake_data(is_lake, starting_stage=11.0, name="Naardermeer")
-
-
-@pytest.fixture(scope="function")
-def ijsselmeer(basic_dis):
-    idomain, _, _ = basic_dis
-    is_lake = xr.full_like(idomain, False, dtype=bool)
-    is_lake[0, 4, 4] = True
-    is_lake[0, 4, 5] = True
-    is_lake[0, 5, 5] = True
-    return create_lake_data(
-        is_lake,
-        starting_stage=15.0,
-        name="IJsselmeer",
-    )
-
-
-@pytest.fixture(scope="function")
-def lake_package(naardermeer, ijsselmeer):
-    outlet1 = OutletManning("Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
-    outlet2 = OutletManning("IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
-    return Lake.from_lakes_and_outlets([naardermeer, ijsselmeer], [outlet1, outlet2])
-
-
+@pytest.mark.usefixtures("naardermeer", "ijsselmeer")
 def test_alternative_constructor(naardermeer, ijsselmeer):
     outlet1 = OutletManning("Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
     outlet2 = OutletManning("IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
-    actual = Lake.from_lakes_and_outlets([naardermeer, ijsselmeer], [outlet1, outlet2])
+    actual = Lake.from_lakes_and_outlets(
+        [naardermeer(), ijsselmeer()], [outlet1, outlet2]
+    )
     _ = actual.render(None, None, None, False)
     assert isinstance(actual, Lake)
-
-
-def write_and_read(package, path, filename, globaltimes=None) -> str:
-    package.write(path, filename, globaltimes, False)
-    with open(path / f"{filename}.lak") as f:
-        actual = f.read()
-    return actual
 
 
 def test_lake_render(lake_package):
@@ -171,9 +90,9 @@ def test_lake_write(tmp_path, naardermeer, ijsselmeer):
     outlet2 = OutletManning("IJsselmeer", "Naardermeer", 27.0, 28.0, 29.0, 30.0)
 
     lake_package = Lake.from_lakes_and_outlets(
-        [naardermeer, ijsselmeer], [outlet1, outlet2]
+        [naardermeer(), ijsselmeer()], [outlet1, outlet2]
     )
-    actual = write_and_read(lake_package, tmp_path, "lake-test")
+    actual = mf_lake.write_and_read(lake_package, tmp_path, "lake-test")
     expected = textwrap.dedent(
         """\
         begin options
@@ -282,7 +201,7 @@ def test_lake_write_disv_three_lakes(tmp_path):
         connection_length,
     )
 
-    actual = write_and_read(lake, tmp_path, "lake-test")
+    actual = mf_lake.write_and_read(lake, tmp_path, "lake-test")
     expected = textwrap.dedent(
         """\
         begin options
@@ -337,10 +256,10 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
         np.full((len(times_inflow)), 4.0), coords={"time": times_inflow}, dims=["time"]
     )
 
-    lake1 = create_lake_data(
+    lake1 = mf_lake.create_lake_data(
         is_lake1, 11.0, "Naardermeer", rainfall=rainfall, inflow=inflow
     )
-    lake2 = create_lake_data(
+    lake2 = mf_lake.create_lake_data(
         is_lake2, 11.0, "IJsselmeer", rainfall=rainfall, inflow=inflow
     )
     times_invert = [
@@ -365,7 +284,7 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
             np.datetime64("2000-05-01"),
         ]
     )
-    actual = write_and_read(lake_package, tmp_path, "lake-test", global_times)
+    actual = mf_lake.write_and_read(lake_package, tmp_path, "lake-test", global_times)
     expected = textwrap.dedent(
         """\
         begin options
@@ -477,7 +396,7 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
     outlet2 = OutletSpecified("IJsselmeer", "Naardermeer", rate)
     outlet3 = OutletWeir("IJsselmeer", "Naardermeer", invert, numeric)
 
-    lake_with_status = create_lake_data(
+    lake_with_status = mf_lake.create_lake_data(
         is_lake1,
         11.0,
         "Naardermeer",
@@ -489,7 +408,7 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
         inflow=numeric,
         withdrawal=numeric,
     )
-    lake_without_status = create_lake_data(
+    lake_without_status = mf_lake.create_lake_data(
         is_lake2,
         11.0,
         "IJsselmeer",
@@ -514,7 +433,7 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
             np.datetime64("2000-05-01"),
         ]
     )
-    actual = write_and_read(lake_package, tmp_path, "lake-test", global_times)
+    actual = mf_lake.write_and_read(lake_package, tmp_path, "lake-test", global_times)
 
     expected = textwrap.dedent(
         """\
