@@ -1119,7 +1119,9 @@ class Lake(BoundaryCondition):
 
             # count number of rows
             stage_col = table.sel({"column": "stage"})
-            d["nrow"] = stage_col.where(pd.api.types.is_numeric_dtype).count().values[()]
+            d["nrow"] = (
+                stage_col.where(pd.api.types.is_numeric_dtype).count().values[()]
+            )
 
             # check if the barea column is present for this table (and not filled with nan's)
             has_barea_column = "barea" in table.coords["column"]
@@ -1133,18 +1135,20 @@ class Lake(BoundaryCondition):
             columns = ["stage", "sarea", "volume"]
             if has_barea_column:
                 columns.append("barea")
-            d["ncol"] =len(columns)
-            table_dataframe = pd.DataFrame(
-                table.sel({"column": columns}).transpose()
+            d["ncol"] = len(columns)
+            table_dataframe = pd.DataFrame(table.sel({"column": columns}).transpose())
+
+            string_table = table_dataframe.iloc[
+                range(d["nrow"]), range(d["ncol"])
+            ].to_csv(
+                header=False,
+                index=False,
+                sep=" ",
+                line_terminator="\n",
             )
 
-            string_table = table_dataframe.iloc[range(d["nrow"]), range(d["ncol"])].to_csv(
-                header=False, index=False, sep=" ", line_terminator="\n",
-            )
-          
-            
-            d["table"] =string_table
-                        # write lake table to file
+            d["table"] = string_table
+            # write lake table to file
             fullpath_laketable = directory / file
             laketable_file = template.render(d)
             with open(fullpath_laketable, "w") as f:
