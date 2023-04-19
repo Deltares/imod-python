@@ -40,10 +40,8 @@ def create_gridcovering_array(idomain, lake_cells, initial_value, dtype):
 
 
 def create_lakeData(idomain, starting_stage, boundname, lake_cells, rainfall):
-    HORIZONTAL = 0
-    connectionType = create_gridcovering_array(
-        idomain, lake_cells, HORIZONTAL, np.float_
-    )
+    VERTICAL = 1
+    connectionType = create_gridcovering_array(idomain, lake_cells, VERTICAL, np.float_)
     bed_leak = create_gridcovering_array(idomain, lake_cells, 0.2, np.float_)
     top_elevation = create_gridcovering_array(idomain, lake_cells, 0.4, np.float_)
     bot_elevation = create_gridcovering_array(idomain, lake_cells, 0.1, np.float_)
