@@ -1082,8 +1082,19 @@ class Lake(BoundaryCondition):
         Returns a dictionary with as key the lake number and as value the laketable filename- for those
         lakes that have a laketable.
         """
+        template = jinja2.Template(
+            textwrap.dedent(
+                """\
+                
+                begin tables{% for lakenumber, lakefile in file_dict.items() %}
+                  {{lakenumber}} TAB6 FILEIN {{lakefile}}{% endfor %}
+                end tables\n
+                """)
+            )
+
         lake_number_to_lake_table_filename = {}
-        f.write("\nbegin tables\n")
+        d={}
+
         for name, number in zip(
             self.dataset["lake_boundname"],
             self.dataset["lake_number"],
@@ -1096,9 +1107,12 @@ class Lake(BoundaryCondition):
                 in self.dataset["lake_tables"].coords["laketable_lake_nr"].values
             ):
                 table_file = lake_name + ".ltbl"
-                f.write(f"   {lake_number}  TAB6 FILEIN {table_file}\n")
                 lake_number_to_lake_table_filename[lake_number] = table_file
-        f.write("end tables\n")
+
+        d["file_dict"] = lake_number_to_lake_table_filename
+        tables_block = template.render(d)
+        f.write(tables_block)
+
         return lake_number_to_lake_table_filename
 
     def _write_laketable_files(self, directory, lake_number_to_filename):

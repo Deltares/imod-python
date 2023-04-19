@@ -58,8 +58,8 @@ def test_mf6_laketable_reference(naardermeer, ijsselmeer, tmp_path):
         end connectiondata
 
         begin tables
-           1  TAB6 FILEIN Naardermeer.ltbl
-           2  TAB6 FILEIN IJsselmeer.ltbl
+          1 TAB6 FILEIN Naardermeer.ltbl
+          2 TAB6 FILEIN IJsselmeer.ltbl
         end tables
         """
     )
