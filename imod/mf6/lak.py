@@ -1107,18 +1107,7 @@ class Lake(BoundaryCondition):
         volume and area for one single lake.
         """
 
-        _template = jinja2.Template(
-            textwrap.dedent(
-            """\
-            BEGIN DIMENSIONS
-            NROW {{nrow}}
-            NCOL {{ncol}}
-            END DIMENSIONS
-            begin table
-            {{table}}end table
-            """
-            ))
-
+        template = Package._initialize_template("laketable")
 
         for num, file in lake_number_to_filename.items():
             d = {}
@@ -1157,7 +1146,7 @@ class Lake(BoundaryCondition):
             d["table"] =string_table
                         # write lake table to file
             fullpath_laketable = directory / file
-            laketable_file = _template.render(d)
+            laketable_file = template.render(d)
             with open(fullpath_laketable, "w") as f:
                 f.write(laketable_file)
 
