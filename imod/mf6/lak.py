@@ -1084,8 +1084,7 @@ class Lake(BoundaryCondition):
         """
         template = jinja2.Template(
             textwrap.dedent(
-                """\
-                
+                """\n\
                 begin tables{% for lakenumber, lakefile in file_dict.items() %}
                   {{lakenumber}} TAB6 FILEIN {{lakefile}}{% endfor %}
                 end tables\n
