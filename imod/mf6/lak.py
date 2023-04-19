@@ -1089,11 +1089,12 @@ class Lake(BoundaryCondition):
                 begin tables{% for lakenumber, lakefile in file_dict.items() %}
                   {{lakenumber}} TAB6 FILEIN {{lakefile}}{% endfor %}
                 end tables\n
-                """)
+                """
             )
+        )
 
         lake_number_to_lake_table_filename = {}
-        d={}
+        d = {}
 
         for name, number in zip(
             self.dataset["lake_boundname"],
