@@ -16,9 +16,11 @@ import inspect
 import numpy as np
 import pytest
 import xarray as xr
-
+import pandas as pd
 import imod
 from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition, Package
+from inspect import signature
+import xugrid as xu
 
 ALL_PACKAGES = [
     item
@@ -71,6 +73,26 @@ def get_darray(dtype):
     da = xr.DataArray(np.ones(shape, dtype=dtype), coords=coords, dims=dims)
     return da
 
+def get_vertices_discretization():
+    grid = imod.data.circle()
+
+    nface = grid.n_face
+
+    nlayer = 2
+
+    idomain = xu.UgridDataArray(
+        xr.DataArray(
+            np.ones((nlayer, nface), dtype=np.int32),
+            coords={"layer": [1, 2]},
+            dims=["layer", grid.face_dimension],
+        ),
+        grid=grid,
+    )    
+    k = xu.full_like(idomain, 1.0, dtype=np.float64)    
+    bottom = k * xr.DataArray([5.0, 0.0], dims=["layer"])
+    return imod.mf6.VerticesDiscretization(
+        top=10.0, bottom=bottom, idomain=idomain
+    )
 
 ALL_INSTANCES = [
     imod.mf6.adv.Advection("upstream"),
@@ -84,16 +106,20 @@ ALL_INSTANCES = [
     imod.mf6.StructuredDiscretization(
         2.0, get_darray(np.float32), get_darray(np.int32)
     ),
-    # TODO: VerticesDiscretization(),
+    get_vertices_discretization(),
     imod.mf6.Dispersion(1e-4, 10.0, 10.0, 5.0, 2.0, 4.0, False, True),
     imod.mf6.InitialConditions(start=get_darray(np.float32)),
     imod.mf6.SolutionPresetSimple(modelnames=["gwf-1"]),
     imod.mf6.MobileStorageTransfer(0.35, 0.01, 0.02, 1300.0, 0.1),
     imod.mf6.NodePropertyFlow(get_darray(np.int32), 3.0, True, 32.0, 34.0, 7),
-    # TODO imod.mf6.OutputControl(),
+    imod.mf6.OutputControl(),
     imod.mf6.SpecificStorage(0.001, 0.1, True, get_darray(np.int32)),
     imod.mf6.StorageCoefficient(0.001, 0.1, True, get_darray(np.int32)),
-    # TODO imod.mf6.TimeDiscretization(10.0, 23, 1.02),
+    imod.mf6.TimeDiscretization(xr.DataArray(
+        data=[0.001, 7.0, 365.0],
+        coords={"time": pd.date_range("2000-01-01", "2000-01-03")},
+        dims=["time"], ), 23, 1.02),
+   
 ]
 
 
@@ -136,8 +162,19 @@ def test_adv_boundary_class_attributes(pkg_class):
 def test_render_twice(instance, tmp_path):
     globaltimes = [np.datetime64("2000-01-01")]
     modeldir = tmp_path / "testdir"
-    text1 = instance.render(modeldir, "test", globaltimes, False)
-    text2 = instance.render(modeldir, "test", globaltimes, False)
+
+    sig = signature(instance.render)
+    if len(sig.parameters) == 0:
+        text1 = instance.render()
+        text2 = instance.render()
+    elif len(sig.parameters) == 3:
+        text1 = instance.render(modeldir, "test", False)
+        text2 = instance.render(modeldir, "test", False)
+    elif len(sig.parameters) ==4:
+        text1 = instance.render(modeldir, "test", globaltimes, False)
+        text2 = instance.render(modeldir, "test", globaltimes, False)
+    else:
+        assert False #unexpected nr of arguments
     assert text1 == text2
 
 
