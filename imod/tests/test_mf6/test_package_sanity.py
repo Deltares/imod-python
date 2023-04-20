@@ -12,15 +12,19 @@ Hence:
   None is turned into numpy NaN).
 """
 import inspect
+from inspect import signature
 
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
-import pandas as pd
+import xugrid as xu
+
 import imod
 from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition, Package
-from inspect import signature
-import xugrid as xu
+import pathlib
+
+from imod.tests.fixtures.package_sanity_instances import PACKAGE_INSTANCES, BOUNDARY_INSTANCES
 
 ALL_PACKAGES = [
     item
@@ -50,77 +54,6 @@ PACKAGE_ATTRIBUTES = {
 }
 BOUNDARY_ATTRIBUTES = PACKAGE_ATTRIBUTES.union({"_period_data", "_auxiliary_data"})
 ADV_BOUNDARY_ATTRIBUTES = BOUNDARY_ATTRIBUTES.union({"_package_data"})
-
-
-def get_darray(dtype):
-    """
-    helper function for creating an xarray dataset of a given type
-    """
-    shape = nlay, nrow, ncol = 3, 9, 9
-    dx = 10.0
-    dy = -10.0
-    xmin = 0.0
-    xmax = dx * ncol
-    ymin = 0.0
-    ymax = abs(dy) * nrow
-    dims = ("layer", "y", "x")
-
-    layer = np.arange(1, nlay + 1)
-    y = np.arange(ymax, ymin, dy) + 0.5 * dy
-    x = np.arange(xmin, xmax, dx) + 0.5 * dx
-    coords = {"layer": layer, "y": y, "x": x}
-
-    da = xr.DataArray(np.ones(shape, dtype=dtype), coords=coords, dims=dims)
-    return da
-
-def get_vertices_discretization():
-    grid = imod.data.circle()
-
-    nface = grid.n_face
-
-    nlayer = 2
-
-    idomain = xu.UgridDataArray(
-        xr.DataArray(
-            np.ones((nlayer, nface), dtype=np.int32),
-            coords={"layer": [1, 2]},
-            dims=["layer", grid.face_dimension],
-        ),
-        grid=grid,
-    )    
-    k = xu.full_like(idomain, 1.0, dtype=np.float64)    
-    bottom = k * xr.DataArray([5.0, 0.0], dims=["layer"])
-    return imod.mf6.VerticesDiscretization(
-        top=10.0, bottom=bottom, idomain=idomain
-    )
-
-ALL_INSTANCES = [
-    imod.mf6.adv.Advection("upstream"),
-    imod.mf6.Buoyancy(
-        reference_density=1000.0,
-        reference_concentration=[4.0, 25.0],
-        density_concentration_slope=[0.7, -0.375],
-        modelname=["gwt-1", "gwt-2"],
-        species=["salinity", "temperature"],
-    ),
-    imod.mf6.StructuredDiscretization(
-        2.0, get_darray(np.float32), get_darray(np.int32)
-    ),
-    get_vertices_discretization(),
-    imod.mf6.Dispersion(1e-4, 10.0, 10.0, 5.0, 2.0, 4.0, False, True),
-    imod.mf6.InitialConditions(start=get_darray(np.float32)),
-    imod.mf6.SolutionPresetSimple(modelnames=["gwf-1"]),
-    imod.mf6.MobileStorageTransfer(0.35, 0.01, 0.02, 1300.0, 0.1),
-    imod.mf6.NodePropertyFlow(get_darray(np.int32), 3.0, True, 32.0, 34.0, 7),
-    imod.mf6.OutputControl(),
-    imod.mf6.SpecificStorage(0.001, 0.1, True, get_darray(np.int32)),
-    imod.mf6.StorageCoefficient(0.001, 0.1, True, get_darray(np.int32)),
-    imod.mf6.TimeDiscretization(xr.DataArray(
-        data=[0.001, 7.0, 365.0],
-        coords={"time": pd.date_range("2000-01-01", "2000-01-03")},
-        dims=["time"], ), 23, 1.02),
-   
-]
 
 
 def check_attributes(pkg_class, allowed_attributes):
@@ -158,12 +91,12 @@ def test_adv_boundary_class_attributes(pkg_class):
     check_attributes(pkg_class, ADV_BOUNDARY_ATTRIBUTES)
 
 
-@pytest.mark.parametrize("instance", ALL_INSTANCES)
+@pytest.mark.parametrize("instance", PACKAGE_INSTANCES +  BOUNDARY_INSTANCES)
 def test_render_twice(instance, tmp_path):
     globaltimes = [np.datetime64("2000-01-01")]
     modeldir = tmp_path / "testdir"
 
-    sig = signature(instance.render)
+    sig = inspect.signature(instance.render)
     if len(sig.parameters) == 0:
         text1 = instance.render()
         text2 = instance.render()
@@ -178,7 +111,7 @@ def test_render_twice(instance, tmp_path):
     assert text1 == text2
 
 
-@pytest.mark.parametrize("instance", ALL_INSTANCES)
+@pytest.mark.parametrize("instance", PACKAGE_INSTANCES +  BOUNDARY_INSTANCES)
 def test_save_and_load(instance, tmp_path):
     pkg_class = type(instance)
     path = tmp_path / f"{instance._pkg_id}.nc"
