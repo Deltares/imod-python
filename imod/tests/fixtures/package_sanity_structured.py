@@ -10,7 +10,10 @@ import xugrid as xu
 import imod
 from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition, Package
 import pathlib
-def get_darray(dtype):
+from imod.tests.fixtures.mf6_flow_with_transport_fixture import rate_fc, proportion_rate_fc, proportion_depth_fc,elevation_fc
+
+
+def get_structured_grid_array(dtype, value =1):
     """
     helper function for creating an xarray dataset of a given type
     """
@@ -28,7 +31,7 @@ def get_darray(dtype):
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
     coords = {"layer": layer, "y": y, "x": x}
 
-    da = xr.DataArray(np.ones(shape, dtype=dtype), coords=coords, dims=dims)
+    da = xr.DataArray(np.ones(shape, dtype=dtype)* value, coords=coords, dims=dims)
     return da
 
 def get_vertices_discretization():
@@ -145,8 +148,32 @@ def conductance_fc():
     # Constant head
     conductance = xr.full_like(idomain, np.nan)
     return conductance
+'''
+def evapotranspiration():
+    
+    directory = pathlib.Path("mymodel")
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ],
+        dtype="datetime64[ns]",
+    )
 
-PACKAGE_INSTANCES = [
+    evt = imod.mf6.Evapotranspiration(
+        surface=elevation_fc(),
+        rate= rate_fc(),
+        depth=elevation_fc(),
+        proportion_rate=proportion_rate_fc(),
+        proportion_depth=proportion_depth_fc(),
+        concentration= constant_concentration(),
+        concentration_boundary_type="AUX",
+    )
+    return evt
+'''
+
+GRIDLESS_PACKAGES = [
     imod.mf6.adv.Advection("upstream"),
     imod.mf6.Buoyancy(
         reference_density=1000.0,
@@ -155,27 +182,36 @@ PACKAGE_INSTANCES = [
         modelname=["gwt-1", "gwt-2"],
         species=["salinity", "temperature"],
     ),
-    imod.mf6.StructuredDiscretization(
-        2.0, get_darray(np.float32), get_darray(np.int32)
-    ),
-    get_vertices_discretization(),
-    imod.mf6.Dispersion(1e-4, 10.0, 10.0, 5.0, 2.0, 4.0, False, True),
-    imod.mf6.InitialConditions(start=get_darray(np.float32)),
-    imod.mf6.SolutionPresetSimple(modelnames=["gwf-1"]),
-    imod.mf6.MobileStorageTransfer(0.35, 0.01, 0.02, 1300.0, 0.1),
-    imod.mf6.NodePropertyFlow(get_darray(np.int32), 3.0, True, 32.0, 34.0, 7),
     imod.mf6.OutputControl(),
-    imod.mf6.SpecificStorage(0.001, 0.1, True, get_darray(np.int32)),
-    imod.mf6.StorageCoefficient(0.001, 0.1, True, get_darray(np.int32)),
+    imod.mf6.SolutionPresetSimple(modelnames=["gwf-1"]),
     imod.mf6.TimeDiscretization(xr.DataArray(
         data=[0.001, 7.0, 365.0],
         coords={"time": pd.date_range("2000-01-01", "2000-01-03")},
         dims=["time"], ), 23, 1.02),
-   
 ]
 
-BOUNDARY_INSTANCES =[
+STRUCTURED_GRID_PACKAGES =[
+
+    imod.mf6.StructuredDiscretization(
+        2.0, get_structured_grid_array(np.float32), get_structured_grid_array(np.int32)
+    ),
+    get_vertices_discretization(),
+    imod.mf6.Dispersion(1e-4, 10.0, 10.0, 5.0, 2.0, 4.0, False, True),
+    imod.mf6.InitialConditions(start=get_structured_grid_array(np.float32)),
+
+    imod.mf6.MobileStorageTransfer(0.35, 0.01, 0.02, 1300.0, 0.1),
+    imod.mf6.NodePropertyFlow(get_structured_grid_array(np.int32), 3.0, True, 32.0, 34.0, 7),
+
+    imod.mf6.SpecificStorage(0.001, 0.1, True, get_structured_grid_array(np.int32)),
+    imod.mf6.StorageCoefficient(0.001, 0.1, True, get_structured_grid_array(np.int32)),
+    
+   ]
+
+
+
+STRUCTURED_GRID_BOUNDARY_INSTANCES =[
     constant_concentration(),
     constant_head(),
     drainage()
 ]
+ALL_PACKAGE_INSTANCES=GRIDLESS_PACKAGES+STRUCTURED_GRID_PACKAGES+STRUCTURED_GRID_BOUNDARY_INSTANCES

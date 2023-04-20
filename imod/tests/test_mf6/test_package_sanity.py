@@ -22,9 +22,8 @@ import xugrid as xu
 
 import imod
 from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition, Package
-import pathlib
 
-from imod.tests.fixtures.package_sanity_instances import PACKAGE_INSTANCES, BOUNDARY_INSTANCES
+from imod.tests.fixtures.package_sanity_structured import ALL_PACKAGE_INSTANCES
 
 ALL_PACKAGES = [
     item
@@ -91,7 +90,7 @@ def test_adv_boundary_class_attributes(pkg_class):
     check_attributes(pkg_class, ADV_BOUNDARY_ATTRIBUTES)
 
 
-@pytest.mark.parametrize("instance", PACKAGE_INSTANCES +  BOUNDARY_INSTANCES)
+@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
 def test_render_twice(instance, tmp_path):
     globaltimes = [np.datetime64("2000-01-01")]
     modeldir = tmp_path / "testdir"
@@ -111,7 +110,7 @@ def test_render_twice(instance, tmp_path):
     assert text1 == text2
 
 
-@pytest.mark.parametrize("instance", PACKAGE_INSTANCES +  BOUNDARY_INSTANCES)
+@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
 def test_save_and_load(instance, tmp_path):
     pkg_class = type(instance)
     path = tmp_path / f"{instance._pkg_id}.nc"
