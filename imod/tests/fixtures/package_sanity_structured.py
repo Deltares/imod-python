@@ -55,7 +55,7 @@ def get_vertices_discretization():
         top=10.0, bottom=bottom, idomain=idomain
     )
 
-def state():
+def boundary_array():
     idomain = get_structured_grid_array(np.float64)
 
     # Constant cocnentration
@@ -63,22 +63,6 @@ def state():
     concentration[...] = np.nan
     concentration[..., 0] = 0.0
     return concentration
-
-def constant_concentration():
-    concentration = state()
-
-    return imod.mf6.ConstantConcentration(
-        concentration, print_input=True, print_flows=True, save_flows=True
-    )
-
-def constant_head():
-    head = state()
-
-    return imod.mf6.ConstantHead(
-        head, print_input=True, print_flows=True, save_flows=True
-    )
-
-
 
 def drainage():
     globaltimes = np.array(
@@ -179,8 +163,12 @@ STRUCTURED_GRID_PACKAGES =[
 
 
 STRUCTURED_GRID_BOUNDARY_INSTANCES =[
-    constant_concentration(),
-    constant_head(),
+    imod.mf6.ConstantConcentration(
+        boundary_array(), print_input=True, print_flows=True, save_flows=True
+    ),
+    imod.mf6.ConstantHead(
+        boundary_array(), print_input=True, print_flows=True, save_flows=True
+    ),
     drainage()
 ]
 ALL_PACKAGE_INSTANCES=GRIDLESS_PACKAGES+STRUCTURED_GRID_PACKAGES+STRUCTURED_GRID_BOUNDARY_INSTANCES
