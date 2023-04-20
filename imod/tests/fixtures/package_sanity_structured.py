@@ -10,7 +10,6 @@ import xugrid as xu
 import imod
 from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition, Package
 import pathlib
-from imod.tests.fixtures.mf6_flow_with_transport_fixture import rate_fc, proportion_rate_fc, proportion_depth_fc,elevation_fc
 
 
 def get_structured_grid_array(dtype, value =1):
@@ -63,8 +62,16 @@ def boundary_array():
     concentration[...] = np.nan
     concentration[..., 0] = 0.0
     return concentration
+def concentration_array():
+    idomain = get_structured_grid_array(np.float64)
 
-def drainage():
+    # Constant cocnentration
+    concentration = xr.full_like(idomain, np.nan)
+    concentration[..., 0] = 0.0
+    concentration =concentration.expand_dims(species =["Na"])  
+    return concentration
+
+def repeat_stress():
     globaltimes = np.array(
         [
             "2000-01-01",
@@ -82,25 +89,8 @@ def drainage():
         ],
         dims=("repeat", "repeat_items"),
     )   
+    return repeat_stress
     
-    return imod.mf6.Drainage(
-        elevation=elevation_fc(),
-        conductance=conductance_fc(),
-        repeat_stress=repeat_stress,
-    )
-
-
-def elevation_fc():
-    idomain =  get_structured_grid_array(np.float64)
-
-    elevation = xr.full_like(idomain, np.nan)
-    return elevation
-def conductance_fc():
-    idomain = get_structured_grid_array(np.float64)
-
-    # Constant head
-    conductance = xr.full_like(idomain, np.nan)
-    return conductance
 '''
 def evapotranspiration():
     
@@ -169,6 +159,22 @@ STRUCTURED_GRID_BOUNDARY_INSTANCES =[
     imod.mf6.ConstantHead(
         boundary_array(), print_input=True, print_flows=True, save_flows=True
     ),
-    drainage()
+    imod.mf6.Drainage(
+        elevation=get_structured_grid_array(np.float64, 4),
+        conductance=get_structured_grid_array(np.float64,1e-3),
+        repeat_stress=repeat_stress(),
+    ),
+    imod.mf6.Evapotranspiration(surface=get_structured_grid_array(np.float64,3),
+                                rate=  get_structured_grid_array(np.float64,2),
+                                depth=   get_structured_grid_array(np.float64,1),
+                                proportion_rate=  get_structured_grid_array(np.float64,0.2),
+                                proportion_depth= get_structured_grid_array(np.float64,0.2),
+                                concentration =  concentration_array(),
+                                concentration_boundary_type = "auxmixed",
+                                fixed_cell= True       
+    ),
+    imod.mf6.GeneralHeadBoundary(head=get_structured_grid_array(np.float64,3),
+                                 conductance=get_structured_grid_array(np.float64,0.33))
+
 ]
 ALL_PACKAGE_INSTANCES=GRIDLESS_PACKAGES+STRUCTURED_GRID_PACKAGES+STRUCTURED_GRID_BOUNDARY_INSTANCES
