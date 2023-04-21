@@ -52,11 +52,8 @@ lake_layer = 1
 lake_x = x[4:7]
 lake_y = y[4:7]
 is_lake = xr.full_like(idomain, fill_value=False, dtype=bool)
-for ix in range(2):
-    for iy in range(2):
-        is_lake.loc[{"layer": lake_layer, "x": lake_x[ix], "y": lake_y[iy]}] = True
-
-
+is_lake.loc[{"layer": lake_layer, "x": lake_x, "y": lake_y}] = True
+is_lake.sel(layer=1).plot.imshow()
 # %% Specify lake data
 
 VERTICAL = 1
@@ -226,4 +223,3 @@ head = imod.mf6.open_hds(
 # ---------------------
 
 head.isel(layer=0, time=4).plot.contourf()
-i = 0
