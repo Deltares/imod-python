@@ -23,6 +23,7 @@ In overview, we'll set the following steps:
 
 import numpy as np
 import xarray as xr
+
 import imod
 import imod.mf6.lak as lak
 
@@ -46,20 +47,20 @@ coords = {"layer": layer, "y": y, "x": x}
 
 idomain = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
 
-#%% Define lake location
+# %% Define lake location
 lake_layer = 1
 lake_x = x[4:7]
 lake_y = y[4:7]
-is_lake = xr.full_like(idomain, fill_value= False, dtype=bool)
+is_lake = xr.full_like(idomain, fill_value=False, dtype=bool)
 for ix in range(2):
     for iy in range(2):
-        is_lake.loc[{"layer": lake_layer, "x":lake_x[ix], "y":lake_y[iy]}]= True
+        is_lake.loc[{"layer": lake_layer, "x": lake_x[ix], "y": lake_y[iy]}] = True
 
 
-#%% Specify lake data
+# %% Specify lake data
 
 VERTICAL = 1
-connectionType = xr.where(is_lake, VERTICAL, np.nan) 
+connectionType = xr.where(is_lake, VERTICAL, np.nan)
 bed_leak = xr.where(is_lake, 0.2, np.nan)
 top_elevation = xr.where(is_lake, 0.4, np.nan)
 bot_elevation = xr.where(is_lake, 0.1, np.nan)
@@ -73,29 +74,30 @@ times_rainfall = [
 ]
 
 rainfall = xr.DataArray(
-    np.full((len(times_rainfall)),0.001), coords={"time": times_rainfall}, dims=["time"]
+    np.full((len(times_rainfall)), 0.001),
+    coords={"time": times_rainfall},
+    dims=["time"],
 )
 
 
 lake = lak.LakeData(
-        10.0,
-        "Nieuwkoopse_plas",
-        connectionType,
-        bed_leak,
-        top_elevation,
-        bot_elevation,
-        connection_length,
-        connection_width,
-        None,
-        None,
-        rainfall,
-        None,
-        None,
-        None,
-        None,
-        None,
+    10.0,
+    "Nieuwkoopse_plas",
+    connectionType,
+    bed_leak,
+    top_elevation,
+    bot_elevation,
+    connection_length,
+    connection_width,
+    None,
+    None,
+    rainfall,
+    None,
+    None,
+    None,
+    None,
+    None,
 )
-
 
 
 # %%
@@ -104,7 +106,6 @@ lake = lak.LakeData(
 #
 # The first steps consist of setting up the grid -- first the number of layer,
 # rows, and columns. Cell sizes are constant throughout the model.
-
 
 
 # %%
