@@ -174,7 +174,19 @@ STRUCTURED_GRID_BOUNDARY_INSTANCES =[
                                 fixed_cell= True       
     ),
     imod.mf6.GeneralHeadBoundary(head=get_structured_grid_array(np.float64,3),
-                                 conductance=get_structured_grid_array(np.float64,0.33))
+                                 conductance=get_structured_grid_array(np.float64,0.33)),
 
+    imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(
+        hydraulic_characteristic= get_structured_grid_array(np.float64,0.33),
+        idomain=get_structured_grid_array(np.int,1),
+        print_input=True),
+    imod.mf6.HorizontalFlowBarrierMultiplier(        
+        multiplier= get_structured_grid_array(np.float64,0.33),
+        idomain=get_structured_grid_array(np.int,1),
+        print_input=True),
+    imod.mf6.HorizontalFlowBarrierResistance(
+        resistance= get_structured_grid_array(np.float64,0.33),
+        idomain=get_structured_grid_array(np.int,1),
+        print_input=True),
 ]
 ALL_PACKAGE_INSTANCES=GRIDLESS_PACKAGES+STRUCTURED_GRID_PACKAGES+STRUCTURED_GRID_BOUNDARY_INSTANCES
