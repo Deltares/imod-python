@@ -50,8 +50,10 @@ idomain = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
 lake_layer = 1
 lake_x = x[4:7]
 lake_y = y[4:7]
-
-is_lake = (idomain.coords["layer"] == lake_layer) & (idomain.coords["x"] == lake_x) & (idomain.coords["y"] == lake_y)
+is_lake = xr.full_like(idomain, fill_value= False, dtype=bool)
+for ix in range(2):
+    for iy in range(2):
+        is_lake.loc[{"layer": lake_layer, "x":lake_x[ix], "y":lake_y[iy]}]= True
 
 
 #%% Specify lake data
@@ -76,7 +78,7 @@ rainfall = xr.DataArray(
 
 
 lake = lak.LakeData(
-        10,
+        10.0,
         "Nieuwkoopse_plas",
         connectionType,
         bed_leak,
