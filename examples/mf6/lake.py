@@ -23,57 +23,8 @@ In overview, we'll set the following steps:
 
 import numpy as np
 import xarray as xr
-
 import imod
 import imod.mf6.lak as lak
-
-
-def create_gridcovering_array(idomain, lake_cells, initial_value, dtype):
-    """
-    creates an array similar in dimensions/coords to idomain, but with value NaN (orr the missing value for integers)
-    everywhere, except in the cells contained in list "lake_cells". In those cells, the output array has value fillvalue.
-    """
-    result = xr.full_like(idomain, fill_value=np.nan, dtype=dtype)
-    for cell in lake_cells:
-        result.values[cell[0], cell[1], cell[2]] = initial_value
-    return result
-
-
-def create_lakeData(idomain, starting_stage, boundname, lake_cells, rainfall):
-    VERTICAL = 1
-    connectionType = create_gridcovering_array(idomain, lake_cells, VERTICAL, np.float_)
-    bed_leak = create_gridcovering_array(idomain, lake_cells, 0.2, np.float_)
-    top_elevation = create_gridcovering_array(idomain, lake_cells, 0.4, np.float_)
-    bot_elevation = create_gridcovering_array(idomain, lake_cells, 0.1, np.float_)
-    connection_length = create_gridcovering_array(idomain, lake_cells, 0.5, np.float_)
-    connection_width = create_gridcovering_array(idomain, lake_cells, 0.6, np.float_)
-    result = lak.LakeData(
-        starting_stage,
-        boundname,
-        connectionType,
-        bed_leak,
-        top_elevation,
-        bot_elevation,
-        connection_length,
-        connection_width,
-        None,
-        None,
-        rainfall,
-        None,
-        None,
-        None,
-        None,
-        None,
-    )
-    return result
-
-
-# %%
-# Create grid coordinates
-# -----------------------
-#
-# The first steps consist of setting up the grid -- first the number of layer,
-# rows, and columns. Cell sizes are constant throughout the model.
 
 nlay = 3
 nrow = 15
@@ -93,6 +44,67 @@ y = np.arange(ymax, ymin, dy) + 0.5 * dy
 x = np.arange(xmin, xmax, dx) + 0.5 * dx
 coords = {"layer": layer, "y": y, "x": x}
 
+idomain = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
+
+#%% Define lake location
+lake_layer = 1
+lake_x = x[4:7]
+lake_y = y[4:7]
+
+is_lake = (idomain.coords["layer"] == lake_layer) & (idomain.coords["x"] == lake_x) & (idomain.coords["y"] == lake_y)
+
+
+#%% Specify lake data
+
+VERTICAL = 1
+connectionType = xr.where(is_lake, VERTICAL, np.nan) 
+bed_leak = xr.where(is_lake, 0.2, np.nan)
+top_elevation = xr.where(is_lake, 0.4, np.nan)
+bot_elevation = xr.where(is_lake, 0.1, np.nan)
+connection_length = xr.where(is_lake, 0.5, np.nan)
+connection_width = xr.where(is_lake, 0.6, np.nan)
+
+times_rainfall = [
+    np.datetime64("2000-01-01"),
+    np.datetime64("2000-03-01"),
+    np.datetime64("2000-05-01"),
+]
+
+rainfall = xr.DataArray(
+    np.full((len(times_rainfall)),0.001), coords={"time": times_rainfall}, dims=["time"]
+)
+
+
+lake = lak.LakeData(
+        10,
+        "Nieuwkoopse_plas",
+        connectionType,
+        bed_leak,
+        top_elevation,
+        bot_elevation,
+        connection_length,
+        connection_width,
+        None,
+        None,
+        rainfall,
+        None,
+        None,
+        None,
+        None,
+        None,
+)
+
+
+
+# %%
+# Create grid coordinates
+# -----------------------
+#
+# The first steps consist of setting up the grid -- first the number of layer,
+# rows, and columns. Cell sizes are constant throughout the model.
+
+
+
 # %%
 # We'll create a new directory in which we will write and run the model.
 modeldir = imod.util.temporary_directory()
@@ -108,7 +120,6 @@ modeldir = imod.util.temporary_directory()
 # * a single drain in the center left of the model
 # * uniform recharge on the top layer
 
-idomain = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
 bottom = xr.DataArray([-200.0, -300.0, -450.0], {"layer": layer}, ("layer",))
 
 # Constant head
@@ -165,18 +176,6 @@ simulation["solver"] = imod.mf6.Solution(
     reordering_method=None,
     relaxation_factor=0.97,
 )
-
-times_rainfall = [
-    np.datetime64("2000-01-01"),
-    np.datetime64("2000-03-01"),
-    np.datetime64("2000-05-01"),
-]
-rainfall = xr.DataArray(
-    np.full((len(times_rainfall)), 5.0), coords={"time": times_rainfall}, dims=["time"]
-)
-lake_cells = [(0, 3, 3)]
-
-lake = create_lakeData(idomain, 0.3, "Naardermeer", lake_cells, rainfall)
 
 gwf_model["lake"] = lak.Lake.from_lakes_and_outlets(
     [lake],
