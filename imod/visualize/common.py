@@ -53,7 +53,7 @@ def _cmapnorm_from_colorslevels(colors, levels):
             # Use given cmap, but fix the under and over colors
             # The colormap (probably) does not have a nice under and over color.
             # So we cant use `cmap = matplotlib.cm.get_cmap(colors)`
-            cmap = matplotlib.cm.get_cmap(colors)
+            cmap = matplotlib.colormaps[colors]
             colors = cmap(np.linspace(0, 1, nlevels + 1))
 
         # Validate number of colors vs number of levels

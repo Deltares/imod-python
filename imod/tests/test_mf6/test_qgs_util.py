@@ -74,7 +74,7 @@ def simple_model():
     # Create initial conditions
     shd = -2.0
 
-    gwf_model["ic"] = imod.mf6.InitialConditions(head=shd)
+    gwf_model["ic"] = imod.mf6.InitialConditions(start=shd)
 
     # Storage
     Ss = xr.full_like(like, 1e-5)

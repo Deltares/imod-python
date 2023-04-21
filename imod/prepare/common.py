@@ -334,7 +334,7 @@ def _coord(da, dim):
             dxs = dx
         _check_monotonic(dxs, dim)
 
-    else:  # undefined -> equidistant
+    else:  # not defined -> equidistant
         if da[dim].size == 1:
             raise ValueError(
                 f"DataArray has size 1 along {dim}, so cellsize must be provided"

@@ -52,8 +52,6 @@ def test_gwfmodel_render(circle_model, tmp_path):
             end packages
             """
     )
-    print(actual)
-    print(expected)
     assert actual == expected
     gwfmodel.write(tmp_path, "GWF_1", globaltimes)
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()

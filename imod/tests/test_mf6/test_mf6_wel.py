@@ -22,7 +22,7 @@ def test_render(well_test_data_stationary):
         save_flows=False,
     )
     directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     actual = wel.render(directory, "well", globaltimes, True)
     expected = textwrap.dedent(
         """\
@@ -76,11 +76,14 @@ def test_render_transient(well_test_data_transient):
         save_flows=False,
     )
     directory = pathlib.Path("mymodel")
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-02-01"),
-        np.datetime64("2000-03-01"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-02-01",
+            "2000-03-01",
+        ],
+        dtype="datetime64[ns]",
+    )
     actual = wel.render(directory, "well", globaltimes, True)
     expected = textwrap.dedent(
         """\
@@ -174,7 +177,7 @@ def test_render_concentration_dis_structured_constant_time(well_test_data_statio
         save_flows=False,
     )
     directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     actual = wel.render(directory, "well", globaltimes, True)
     expected = textwrap.dedent(
         """\
@@ -225,7 +228,7 @@ def test_render_concentration_dis_vertices_constant_time(well_test_data_stationa
         print_flows=False,
         save_flows=False,
     )
-    globaltimes = [np.datetime64("2000-01-01")]
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
 
     with tempfile.TemporaryDirectory() as output_dir:
         wel.write(output_dir, "wel", globaltimes, False)

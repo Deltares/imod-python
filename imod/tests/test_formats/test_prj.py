@@ -511,7 +511,7 @@ class TestProjectFile:
         assert isinstance(content["hfb-1"]["geodataframe"], gpd.GeoDataFrame)
         assert isinstance(content["hfb-2"]["geodataframe"], gpd.GeoDataFrame)
         assert isinstance(content["pcg"], dict)
-        assert set(repeats["rch"]) == set([datetime(1900, 4, 1), datetime(1900, 10, 1)])
+        assert set(repeats["rch"]) == set([datetime(1899, 4, 1), datetime(1899, 10, 1)])
 
 
 def test_read_timfile(tmp_path):

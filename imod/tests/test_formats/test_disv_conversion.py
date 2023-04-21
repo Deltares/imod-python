@@ -28,13 +28,14 @@ def test_convert_to_disv(imodflow_model, tmp_path, create_grid):
 
     data, repeats = imod.prj.open_projectfile_data(tmp_path / "imodflow/imodflow.prj")
     tim_data = imod.prj.read_timfile(tmp_path / "imodflow/time_discretization.tim")
-    times = [d["time"] for d in tim_data]
+    times = sorted([d["time"] for d in tim_data])
     target = create_grid(data["bnd"]["ibound"])
 
     disv_model = imod.prj.convert_to_disv(
         projectfile_data=data,
         target=target,
-        times=times,
+        time_min=times[0],
+        time_max=times[-1],
         repeat_stress=repeats,
     )
 
@@ -56,7 +57,7 @@ def test_convert_to_disv(imodflow_model, tmp_path, create_grid):
         reordering_method=None,
         relaxation_factor=0.97,
     )
-    simulation.create_time_discretization(["2018-12-01"])
+    simulation.create_time_discretization(times)
 
     modeldir = tmp_path / "disv"
     simulation.write(modeldir)

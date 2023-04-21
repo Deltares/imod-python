@@ -29,3 +29,4 @@ from imod.prepare.spatial import (
     zonal_aggregate_raster,
 )
 from imod.prepare.voxelize import Voxelizer
+from imod.prepare.wells import assign_wells

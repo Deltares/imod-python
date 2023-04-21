@@ -9,7 +9,7 @@ from imod.mf6.mst import MobileStorageTransfer
 
 def test_render_simple():
     directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     m = MobileStorageTransfer(0.3)
     actual = m.render(directory, "mst", globaltimes, True)
     expected = textwrap.dedent(
@@ -37,7 +37,7 @@ def test_render_first_order_decay(
     porosity_fc, decay_fc, decay_sorbed_fc, bulk_density_fc, distcoef_fc, sp2_fc
 ):
     directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     m = MobileStorageTransfer(
         porosity_fc,
         decay=decay_fc,

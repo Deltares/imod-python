@@ -148,7 +148,29 @@ Generally, raster data is y-descending, so ``ymax`` comes before ``ymin``:
 .. code-block:: python
 
     da_selection = da.sel(x=slice(xmin, xmax), y=slice(ymax, ymin))
-  
+    
+Get a single value (e.g. a summary statistic)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When computing an aggregation such as a mean, xarray will return a single
+valued DataArray. To get an ordinary Python scalar (for example a single
+integer or float), use ``.item()``:
+
+.. code-block:: python
+   
+    single_value = da.mean().item()
+ 
+Increase the extent of a raster
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use another raster with appropriate extent, and use ``align``:
+
+.. code-block:: python
+
+    small_aligned, big_aligned = xr.align(small, big, join="outer")
+    
+Make sure the cell size is the same, or the result will be non-equidistant.
+
 Create an empty raster
 ~~~~~~~~~~~~~~~~~~~~~~
 
