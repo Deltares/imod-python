@@ -1,8 +1,22 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
+import xugrid as xu
 
 import imod
+
+
+def locate_points_unstructured(uda, **points):
+    # Unstructured grids always require to be tested both on x and y coordinates
+    # to see if points are within bounds.
+    for coord in ["x", "y"]:
+        if coord not in points.keys():
+            raise KeyError(
+                f"Missing {coord} in point coordinates."
+                "Unstructured grids require both an x and y coordinate to locate points."
+            )
+    xy = np.column_stack([points["x"], points["y"]])
+    return uda.ugrid.grid.locate_points(xy)
 
 
 def points_in_bounds(da, **points):
@@ -55,13 +69,18 @@ def points_in_bounds(da, **points):
         msg = "\n".join([f"{coord}: {shape}" for coord, shape in shapes.items()])
         raise ValueError(f"Shapes of coordinates do match each other:\n{msg}")
 
-    # Re-use shape state from loop above
-    in_bounds = np.full(shape, True)
-    for key, x in points.items():
-        da_x = da.coords[key]
-        _, xmin, xmax = imod.util.coord_reference(da_x)
-        # Inplace bitwise operator
-        in_bounds &= (x >= xmin) & (x < xmax)
+    if isinstance(da, xu.UgridDataArray):
+        index = locate_points_unstructured(da, **points)
+        # locate_points makes cells outside grid -1
+        in_bounds = index > 0
+    else:
+        # Re-use shape state from loop above
+        in_bounds = np.full(shape, True)
+        for key, x in points.items():
+            da_x = da.coords[key]
+            _, xmin, xmax = imod.util.coord_reference(da_x)
+            # Inplace bitwise operator
+            in_bounds &= (x >= xmin) & (x < xmax)
 
     return in_bounds
 
@@ -144,16 +163,25 @@ def points_indices(da, **points):
     The ``imod.select.points_set_values()`` function will take care of the
     dimensions.
     """
+    # TODO: Skip points_in_bounds for unstructured grids and throw error later.
     inside = points_in_bounds(da, **points)
     # Error handling
     if not inside.all():
         raise ValueError("Not all points are within the bounds of the DataArray")
 
     indices = {}
-    for coordname, value in points.items():
-        ind_da = xr.DataArray(_get_indices_1d(da, coordname, value), dims=["index"])
-        ind_da["index"] = np.arange(ind_da.size)
-        indices[coordname] = ind_da
+    if isinstance(da, xu.UgridDataArray):
+        ind_arr = locate_points_unstructured(da, **points)
+        ind_da = xr.DataArray(
+            ind_arr, coords={"index": np.arange(ind_arr.size)}, dims=("index",)
+        )
+        face_dim = da.ugrid.grid.face_dimension
+        indices[face_dim] = ind_da
+    else:
+        for coordname, value in points.items():
+            ind_da = xr.DataArray(_get_indices_1d(da, coordname, value), dims=["index"])
+            ind_da["index"] = np.arange(ind_da.size)
+            indices[coordname] = ind_da
 
     return indices
 
@@ -185,7 +213,7 @@ def points_values(da, **points):
     """
     iterable_points = {}
     for coordname, value in points.items():
-        if coordname not in da.coords:
+        if not isinstance(da, xu.UgridDataArray) and (coordname not in da.coords):
             raise ValueError(f'DataArray has no coordinate "{coordname}"')
         # contents must be iterable
         iterable_points[coordname] = np.atleast_1d(value)
