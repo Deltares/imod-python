@@ -1,18 +1,32 @@
 begin options
-{%- if auxiliary is defined -%}  auxiliary {{auxiliary(naux)}}{%- endif -%}
-{%- if boundnames is defined -%}  boundnames{%- endif -%}
-{%- if print_input is defined -%}  print_input{%- endif -%}
-{%- if print_stage is defined -%}  print_stage{%- endif -%}
-{%- if print_flows is defined -%}  print_flows{%- endif -%}
-{%- if save_flows is defined -%}  save_flows{%- endif -%}
-{%- if stage_filerecord is defined -%}  stage fileout {{stagefile}}{%- endif -%}
-{%- if budget_filerecord is defined -%}  budget fileout {{budgetfile}}{%- endif -%}
-{%- if ts_filerecord is defined -%}  ts6 filein {{ts6_filename}}{%- endif -%}
-{%- if obs_filerecord is defined -%}  obs6 filein {{obs6_filename}}{%- endif -%}
-{%- if mover is defined -%}  mover{%- endif -%}
-{%- if surfdep is defined -%}  surfdep {{surfdep}}{%- endif -%}
-{%- if time_conversion is defined -%}  time_conversion {{time_conversion}}{%- endif -%}
-{%- if length_conversion is defined -%}  length_conversion {{length_conversion}}{%- endif -%}
+{% if auxiliary is defined %}  auxiliary{% for aux in auxiliary %} {{aux}}{% endfor %}
+{% endif %}
+{%- if boundnames is defined -%}  boundnames
+{% endif -%}
+{%- if print_input is defined -%}  print_input
+{% endif -%}
+{%- if print_stage is defined -%}  print_stage
+{% endif -%}
+{%- if print_flows is defined -%}  print_flows
+{% endif -%}
+{%- if save_flows is defined -%}  save_flows
+{% endif -%}
+{%- if stage_filerecord is defined -%}stage fileout {{stagefile}}
+{% endif -%}
+{%- if budget_filerecord is defined -%}  budget fileout {{budgetfile}}
+{% endif -%}
+{%- if ts_filerecord is defined -%}  ts6 filein {{ts6_filename}}
+{% endif -%}
+{%- if obs_filerecord is defined -%}  obs6 filein {{obs6_filename}}
+{% endif -%}
+{%- if mover is defined -%}  mover
+{% endif -%}
+{%- if surfdep is defined -%}  surfdep {{surfdep}}
+{% endif -%}
+{%- if time_conversion is defined -%}  time_conversion {{time_conversion}}
+{% endif -%}
+{%- if length_conversion is defined -%}  length_conversion {{length_conversion}}
+{% endif -%}
 end options
 
 begin dimensions
@@ -21,30 +35,6 @@ begin dimensions
   ntables {{ntables}}
 end dimensions
 
-begin packagedata
-  {{lakeno}} {{strt}} {{nlakeconn}} {%- if aux is defined -%}{{aux(naux)}}{%- endif -%} {%- if boundname is defined -%}{{boundname}}{%- endif -%}
-  {{lakeno}} {{strt}} {{nlakeconn}} {%- if aux is defined -%}{{aux(naux)}}{%- endif -%} {%- if boundname is defined -%}{{boundname}}{%- endif -%}
-  ...
+begin packagedata{% for number, stage, nconn, name in packagedata %}
+  {{number}} {{stage}} {{nconn}} {{name}}{% endfor %}
 end packagedata
-
-begin connectiondata
-  {{lakeno}} {{iconn}} {{cellid(ncelldim)}} {{claktype}} {{bedleak}} {{belev}} {{telev}} {{connlen}} {{connwidth}}
-  {{lakeno}} {{iconn}} {{cellid(ncelldim)}} {{claktype}} {{bedleak}} {{belev}} {{telev}} {{connlen}} {{connwidth}}
-  ...
-end connectiondata
-
-begin tables
-  {{lakeno}} tab6 filein {{tab6_filename}}
-  {{lakeno}} tab6 filein {{tab6_filename}}
-  ...
-end tables
-
-begin outlets
-  {{outletno}} {{lakein}} {{lakeout}} {{couttype}} {{invert}} {{width}} {{rough}} {{slope}}
-  {{outletno}} {{lakein}} {{lakeout}} {{couttype}} {{invert}} {{width}} {{rough}} {{slope}}
-  ...
-end outlets
-
-{% for i, path in periods.items() %}begin period {{i}}
-  open/close {{path}} (binary)
-end period{% endfor %}

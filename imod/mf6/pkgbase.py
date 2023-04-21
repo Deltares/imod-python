@@ -56,18 +56,26 @@ def disv_recarr(arrdict, layer, notnull):
     return recarr
 
 
-class Package(abc.ABC):
-    """
-    Package is used to share methods for specific packages with no time
-    component.
+class PackageBase(abc.ABC):
+    def __init__(self, allargs=None):
+        if allargs is not None:
+            for arg in allargs.values():
+                if isinstance(arg, xu.UgridDataArray):
+                    self.dataset = xu.UgridDataset(grids=arg.ugrid.grid)
+                    return
+        self.dataset = xr.Dataset()
 
-    It is not meant to be used directly, only to inherit from, to implement new
-    packages.
-
-    This class only supports `array input
-    <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=16>`_,
-    not the list input which is used in :class:`BoundaryCondition`.
     """
+    This class is used for storing a collection of Xarray dataArrays or ugrid-DataArrays
+    in a dataset. A load-from-file method is also provided. Storing to file is done by calling
+    object.dataset.to_netcdf(...)
+    """
+
+    def __getitem__(self, key):
+        return self.dataset.__getitem__(key)
+
+    def __setitem__(self, key, value):
+        self.dataset.__setitem__(key, value)
 
     @classmethod
     def from_file(cls, path, **kwargs):
@@ -126,19 +134,22 @@ class Package(abc.ABC):
         instance.dataset = dataset
         return instance
 
+
+class Package(PackageBase, abc.ABC):
+    """
+    Package is used to share methods for specific packages with no time
+    component.
+
+    It is not meant to be used directly, only to inherit from, to implement new
+    packages.
+
+    This class only supports `array input
+    <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=16>`_,
+    not the list input which is used in :class:`BoundaryCondition`.
+    """
+
     def __init__(self, allargs=None):
-        if allargs is not None:
-            for arg in allargs.values():
-                if isinstance(arg, xu.UgridDataArray):
-                    self.dataset = xu.UgridDataset(grids=arg.ugrid.grid)
-                    return
-        self.dataset = xr.Dataset()
-
-    def __getitem__(self, key):
-        return self.dataset.__getitem__(key)
-
-    def __setitem__(self, key, value):
-        self.dataset.__setitem__(key, value)
+        super().__init__(allargs)
 
     def isel(self):
         raise NotImplementedError(
