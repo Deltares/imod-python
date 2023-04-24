@@ -17,6 +17,9 @@ Added
   MODFLOW6 output files.
 - :func:`imod.util.from_mdal_compliant_ugrid2d` to "restack" the variables that
   have have been "unstacked" in :func:`imod.util.mdal_compliant_ugrid2d`.
+- Added support for the Modflow6 Lake package
+- :func:`imod.select.points_in_bounds`, :func:`imod.select.points_indices`,
+  :func:`imod.select.points_values` now support unstructured grids.
 
 Fixed
 ~~~~~
