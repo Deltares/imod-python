@@ -7,14 +7,15 @@ import xugrid as xu
 import imod
 
 
-def locate_points_unstructured(uda, **points):
+def get_unstructured_cell2d_from_xy(uda, **points):
     # Unstructured grids always require to be tested both on x and y coordinates
     # to see if points are within bounds.
     for coord in ["x", "y"]:
         if coord not in points.keys():
             raise KeyError(
                 f"Missing {coord} in point coordinates."
-                "Unstructured grids require both an x and y coordinate to locate points."
+                "Unstructured grids require both an x and y coordinate"
+                "to get cell indices."
             )
     xy = np.column_stack([points["x"], points["y"]])
     return uda.ugrid.grid.locate_points(xy)
@@ -71,17 +72,20 @@ def points_in_bounds(da, **points):
         raise ValueError(f"Shapes of coordinates do match each other:\n{msg}")
 
     if isinstance(da, xu.UgridDataArray):
-        index = locate_points_unstructured(da, **points)
-        # locate_points makes cells outside grid -1
+        index = get_unstructured_cell2d_from_xy(da, **points)
+        # xu.Ugrid2d.locate_points makes cells outside grid -1
         in_bounds = index > 0
+        points.pop("x")
+        points.pop("y")
     else:
         # Re-use shape state from loop above
         in_bounds = np.full(shape, True)
-        for key, x in points.items():
-            da_x = da.coords[key]
-            _, xmin, xmax = imod.util.coord_reference(da_x)
-            # Inplace bitwise operator
-            in_bounds &= (x >= xmin) & (x < xmax)
+
+    for key, x in points.items():
+        da_x = da.coords[key]
+        _, xmin, xmax = imod.util.coord_reference(da_x)
+        # Inplace bitwise operator
+        in_bounds &= (x >= xmin) & (x < xmax)
 
     return in_bounds
 
@@ -195,19 +199,19 @@ def points_indices(da, out_of_bounds="raise", **points):
     points, inside = check_points_in_bounds(da, points, out_of_bounds)
 
     indices = {}
+    index = np.arange(len(inside))[inside]
     if isinstance(da, xu.UgridDataArray):
-        ind_arr = locate_points_unstructured(da, **points)
-        ind_da = xr.DataArray(
-            ind_arr, coords={"index": np.arange(ind_arr.size)}, dims=("index",)
-        )
+        ind_arr = get_unstructured_cell2d_from_xy(da, **points)
+        ind_da = xr.DataArray(ind_arr, coords={"index": index}, dims=("index",))
         face_dim = da.ugrid.grid.face_dimension
         indices[face_dim] = ind_da
-    else:
-        index = np.arange(len(inside))[inside]
-        for coordname, value in points.items():
-            ind_da = xr.DataArray(_get_indices_1d(da, coordname, value), dims=["index"])
-            ind_da["index"] = index
-            indices[coordname] = ind_da
+        points.pop("x")
+        points.pop("y")
+
+    for coordname, value in points.items():
+        ind_arr = _get_indices_1d(da, coordname, value)
+        ind_da = xr.DataArray(ind_arr, coords={"index": index}, dims=("index",))
+        indices[coordname] = ind_da
 
     return indices
 
