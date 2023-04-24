@@ -2,8 +2,23 @@ import warnings
 
 import numpy as np
 import xarray as xr
+import xugrid as xu
 
 import imod
+
+
+def get_unstructured_cell2d_from_xy(uda, **points):
+    # Unstructured grids always require to be tested both on x and y coordinates
+    # to see if points are within bounds.
+    for coord in ["x", "y"]:
+        if coord not in points.keys():
+            raise KeyError(
+                f"Missing {coord} in point coordinates."
+                "Unstructured grids require both an x and y coordinate"
+                "to get cell indices."
+            )
+    xy = np.column_stack([points["x"], points["y"]])
+    return uda.ugrid.grid.locate_points(xy)
 
 
 def points_in_bounds(da, **points):
@@ -56,8 +71,16 @@ def points_in_bounds(da, **points):
         msg = "\n".join([f"{coord}: {shape}" for coord, shape in shapes.items()])
         raise ValueError(f"Shapes of coordinates do match each other:\n{msg}")
 
-    # Re-use shape state from loop above
-    in_bounds = np.full(shape, True)
+    if isinstance(da, xu.UgridDataArray):
+        index = get_unstructured_cell2d_from_xy(da, **points)
+        # xu.Ugrid2d.locate_points makes cells outside grid -1
+        in_bounds = index > 0
+        points.pop("x")
+        points.pop("y")
+    else:
+        # Re-use shape state from loop above
+        in_bounds = np.full(shape, True)
+
     for key, x in points.items():
         da_x = da.coords[key]
         _, xmin, xmax = imod.util.coord_reference(da_x)
@@ -174,11 +197,20 @@ def points_indices(da, out_of_bounds="raise", **points):
     dimensions.
     """
     points, inside = check_points_in_bounds(da, points, out_of_bounds)
-    index = np.arange(len(inside))[inside]
+
     indices = {}
+    index = np.arange(len(inside))[inside]
+    if isinstance(da, xu.UgridDataArray):
+        ind_arr = get_unstructured_cell2d_from_xy(da, **points)
+        ind_da = xr.DataArray(ind_arr, coords={"index": index}, dims=("index",))
+        face_dim = da.ugrid.grid.face_dimension
+        indices[face_dim] = ind_da
+        points.pop("x")
+        points.pop("y")
+
     for coordname, value in points.items():
-        ind_da = xr.DataArray(_get_indices_1d(da, coordname, value), dims=["index"])
-        ind_da["index"] = index
+        ind_arr = _get_indices_1d(da, coordname, value)
+        ind_da = xr.DataArray(ind_arr, coords={"index": index}, dims=("index",))
         indices[coordname] = ind_da
 
     return indices
@@ -217,7 +249,7 @@ def points_values(da, out_of_bounds="error", **points):
     """
     iterable_points = {}
     for coordname, value in points.items():
-        if coordname not in da.coords:
+        if not isinstance(da, xu.UgridDataArray) and (coordname not in da.coords):
             raise ValueError(f'DataArray has no coordinate "{coordname}"')
         # contents must be iterable
         iterable_points[coordname] = np.atleast_1d(value)

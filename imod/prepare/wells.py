@@ -47,26 +47,22 @@ def locate_wells(
     bottom: Union[xr.DataArray, xu.UgridDataArray],
     k: Union[xr.DataArray, xu.UgridDataArray, None],
 ):
+    if not isinstance(top, (xu.UgridDataArray, xr.DataArray)):
+        raise TypeError(
+            "top and bottom should be DataArray or UgridDataArray, received: "
+            f"{type(top).__name__}"
+        )
+
     # Default to a xy_k value of 1.0: weigh every layer equally.
     xy_k = 1.0
     first = wells.groupby("id").first()
     x = first["x"].to_numpy()
     y = first["y"].to_numpy()
-    if isinstance(top, xu.UgridDataArray):
-        xy_top = top.ugrid.sel_points(x=x, y=y)
-        xy_bottom = bottom.ugrid.sel_points(x=x, y=y)
-        if k is not None:
-            xy_k = k.ugrid.sel_points(x=x, y=y)
-    elif isinstance(top, xr.DataArray):
-        xy_top = imod.select.points_values(top, x=x, y=y, out_of_bounds="ignore")
-        xy_bottom = imod.select.points_values(bottom, x=x, y=y, out_of_bounds="ignore")
-        if k is not None:
-            xy_k = imod.select.points_values(k, x=x, y=y, out_of_bounds="ignore")
-    else:
-        raise TypeError(
-            "top and bottom should be DataArray or UgridDataArray, received: "
-            f"{type(top).__name__}"
-        )
+
+    xy_top = imod.select.points_values(top, x=x, y=y, out_of_bounds="ignore")
+    xy_bottom = imod.select.points_values(bottom, x=x, y=y, out_of_bounds="ignore")
+    if k is not None:
+        xy_k = imod.select.points_values(k, x=x, y=y, out_of_bounds="ignore")
 
     # Discard out-of-bounds wells.
     index = xy_top["index"]
