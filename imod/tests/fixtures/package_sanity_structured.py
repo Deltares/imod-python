@@ -15,6 +15,8 @@ import pathlib
 def get_grid_array(is_unstructured, dtype, value =1):
     """
     helper function for creating an xarray dataset of a given type
+    Depending on the is_unstructured input parameter, it will create an array for a
+    structured grid or for an unstructured grid.
     """
 
     if not is_unstructured:
@@ -54,7 +56,7 @@ def get_grid_array(is_unstructured, dtype, value =1):
 
 def get_vertices_discretization():
    
-    idomain = get_grid_array(True, np.float64, value =1)
+    idomain = get_grid_array(True, int, value =1)
     bottom = idomain * xr.DataArray([5.0, 0.0], dims=["layer"])
     return imod.mf6.VerticesDiscretization(
         top=10.0, bottom=bottom, idomain=idomain
@@ -86,51 +88,6 @@ def concentration_array( is_unstructured):
     concentration =concentration.expand_dims(species =["Na"])  
     return concentration
 
-def repeat_stress():
-    globaltimes = np.array(
-        [
-            "2000-01-01",
-            "2000-01-02",
-            "2000-01-03",
-            "2000-01-04",
-            "2000-01-05",
-        ],
-        dtype="datetime64[ns]",
-    )
-    repeat_stress = xr.DataArray(
-        [
-            [globaltimes[3], globaltimes[0]],
-            [globaltimes[4], globaltimes[1]],
-        ],
-        dims=("repeat", "repeat_items"),
-    )   
-    return repeat_stress
-    
-'''
-def evapotranspiration():
-    
-    directory = pathlib.Path("mymodel")
-    globaltimes = np.array(
-        [
-            "2000-01-01",
-            "2000-01-02",
-            "2000-01-03",
-        ],
-        dtype="datetime64[ns]",
-    )
-
-    evt = imod.mf6.Evapotranspiration(
-        surface=elevation_fc(),
-        rate= rate_fc(),
-        depth=elevation_fc(),
-        proportion_rate=proportion_rate_fc(),
-        proportion_depth=proportion_depth_fc(),
-        concentration= constant_concentration(),
-        concentration_boundary_type="AUX",
-    )
-    return evt
-'''
-
 GRIDLESS_PACKAGES = [
     imod.mf6.adv.Advection("upstream"),
     imod.mf6.Buoyancy(
@@ -159,7 +116,7 @@ def create_instance_packages(is_unstructured):
         imod.mf6.NodePropertyFlow(get_grid_array(is_unstructured,np.int32), 3.0, True, 32.0, 34.0, 7),
 
         imod.mf6.SpecificStorage(0.001, 0.1, True, get_grid_array(is_unstructured,np.int32)),
-        imod.mf6.StorageCoefficient(0.001, 0.1, True, get_grid_array(is_unstructured,np.int32)),
+        imod.mf6.StorageCoefficient(0.001, 0.1, True, get_grid_array(is_unstructured,np.int32)),       
    ]
 
 def create_instance_boundary_condition_packages(is_unstructured):
@@ -172,16 +129,13 @@ def create_instance_boundary_condition_packages(is_unstructured):
     ),
     imod.mf6.Drainage(
         elevation=get_grid_array(is_unstructured, np.float64, 4),
-        conductance=get_grid_array(is_unstructured, np.float64,1e-3),
-        repeat_stress=repeat_stress(),
+        conductance=get_grid_array(is_unstructured, np.float64,1e-3)
     ),
     imod.mf6.Evapotranspiration(surface=get_grid_array(is_unstructured, np.float64,3),
                                 rate=  get_grid_array(is_unstructured, np.float64,2),
                                 depth=   get_grid_array(is_unstructured, np.float64,1),
                                 proportion_rate=  get_grid_array(is_unstructured, np.float64,0.2),
                                 proportion_depth= get_grid_array(is_unstructured, np.float64,0.2),
-                                concentration =  concentration_array(is_unstructured),
-                                concentration_boundary_type = "auxmixed",
                                 fixed_cell= True       
     ),
     imod.mf6.GeneralHeadBoundary(head=get_grid_array(is_unstructured, np.float64,3),
