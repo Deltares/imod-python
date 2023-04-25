@@ -12,61 +12,76 @@ from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition, Packa
 import pathlib
 
 
-def get_structured_grid_array(dtype, value =1):
+def get_grid_array(is_unstructured, dtype, value =1):
     """
     helper function for creating an xarray dataset of a given type
     """
-    shape = nlay, nrow, ncol = 3, 9, 9
-    dx = 10.0
-    dy = -10.0
-    xmin = 0.0
-    xmax = dx * ncol
-    ymin = 0.0
-    ymax = abs(dy) * nrow
-    dims = ("layer", "y", "x")
 
-    layer = np.arange(1, nlay + 1)
-    y = np.arange(ymax, ymin, dy) + 0.5 * dy
-    x = np.arange(xmin, xmax, dx) + 0.5 * dx
-    coords = {"layer": layer, "y": y, "x": x}
+    if not is_unstructured:
+        shape = nlay, nrow, ncol = 3, 9, 9
+        dx = 10.0
+        dy = -10.0
+        xmin = 0.0
+        xmax = dx * ncol
+        ymin = 0.0
+        ymax = abs(dy) * nrow
+        dims = ("layer", "y", "x")
 
-    da = xr.DataArray(np.ones(shape, dtype=dtype)* value, coords=coords, dims=dims)
-    return da
+        layer = np.arange(1, nlay + 1)
+        y = np.arange(ymax, ymin, dy) + 0.5 * dy
+        x = np.arange(xmin, xmax, dx) + 0.5 * dx
+        coords = {"layer": layer, "y": y, "x": x}
+
+        da = xr.DataArray(np.ones(shape, dtype=dtype)* value, coords=coords, dims=dims)
+        return da
+    else:
+        grid = imod.data.circle() 
+
+        nface = grid.n_face
+
+        nlayer = 2
+
+        idomain = xu.UgridDataArray(
+            xr.DataArray(
+                np.ones((nlayer, nface), dtype=dtype)* value,
+                coords={"layer": [1, 2]},
+                dims=["layer", grid.face_dimension],
+            ),
+            grid=grid,
+        )    
+        return idomain
+    
 
 def get_vertices_discretization():
-    grid = imod.data.circle()
-
-    nface = grid.n_face
-
-    nlayer = 2
-
-    idomain = xu.UgridDataArray(
-        xr.DataArray(
-            np.ones((nlayer, nface), dtype=np.int32),
-            coords={"layer": [1, 2]},
-            dims=["layer", grid.face_dimension],
-        ),
-        grid=grid,
-    )    
-    k = xu.full_like(idomain, 1.0, dtype=np.float64)    
-    bottom = k * xr.DataArray([5.0, 0.0], dims=["layer"])
+   
+    idomain = get_grid_array(True, np.float64, value =1)
+    bottom = idomain * xr.DataArray([5.0, 0.0], dims=["layer"])
     return imod.mf6.VerticesDiscretization(
         top=10.0, bottom=bottom, idomain=idomain
     )
 
-def boundary_array():
-    idomain = get_structured_grid_array(np.float64)
+def boundary_array( is_unstructured):
+    idomain = get_grid_array(is_unstructured, np.float64)
 
     # Constant cocnentration
-    concentration = xr.full_like(idomain, np.nan)
+    if is_unstructured:
+        concentration = xu.full_like(idomain, np.nan)
+    else:
+        concentration = xr.full_like(idomain, np.nan)        
+        
     concentration[...] = np.nan
     concentration[..., 0] = 0.0
     return concentration
-def concentration_array():
-    idomain = get_structured_grid_array(np.float64)
+
+def concentration_array( is_unstructured):
+    idomain = get_grid_array( is_unstructured, np.float64)
 
     # Constant cocnentration
-    concentration = xr.full_like(idomain, np.nan)
+    # Constant cocnentration
+    if is_unstructured:
+        concentration = xu.full_like(idomain, np.nan)
+    else:
+        concentration = xr.full_like(idomain, np.nan)   
     concentration[..., 0] = 0.0
     concentration =concentration.expand_dims(species =["Na"])  
     return concentration
@@ -133,70 +148,63 @@ GRIDLESS_PACKAGES = [
         dims=["time"], ), 23, 1.02),
 ]
 
-STRUCTURED_GRID_PACKAGES =[
 
-    imod.mf6.StructuredDiscretization(
-        2.0, get_structured_grid_array(np.float32), get_structured_grid_array(np.int32)
-    ),
-    get_vertices_discretization(),
-    imod.mf6.Dispersion(1e-4, 10.0, 10.0, 5.0, 2.0, 4.0, False, True),
-    imod.mf6.InitialConditions(start=get_structured_grid_array(np.float32)),
+def create_instance_packages(is_unstructured):
+    return [
+        
+        imod.mf6.Dispersion(1e-4, 10.0, 10.0, 5.0, 2.0, 4.0, False, True),
+        imod.mf6.InitialConditions(start=get_grid_array(is_unstructured,np.float32)),
 
-    imod.mf6.MobileStorageTransfer(0.35, 0.01, 0.02, 1300.0, 0.1),
-    imod.mf6.NodePropertyFlow(get_structured_grid_array(np.int32), 3.0, True, 32.0, 34.0, 7),
+        imod.mf6.MobileStorageTransfer(0.35, 0.01, 0.02, 1300.0, 0.1),
+        imod.mf6.NodePropertyFlow(get_grid_array(is_unstructured,np.int32), 3.0, True, 32.0, 34.0, 7),
 
-    imod.mf6.SpecificStorage(0.001, 0.1, True, get_structured_grid_array(np.int32)),
-    imod.mf6.StorageCoefficient(0.001, 0.1, True, get_structured_grid_array(np.int32)),
-    
+        imod.mf6.SpecificStorage(0.001, 0.1, True, get_grid_array(is_unstructured,np.int32)),
+        imod.mf6.StorageCoefficient(0.001, 0.1, True, get_grid_array(is_unstructured,np.int32)),
    ]
 
-
-
-STRUCTURED_GRID_BOUNDARY_INSTANCES =[
+def create_instance_boundary_condition_packages(is_unstructured):
+    return  [
     imod.mf6.ConstantConcentration(
-        boundary_array(), print_input=True, print_flows=True, save_flows=True
+        boundary_array(is_unstructured), print_input=True, print_flows=True, save_flows=True
     ),
     imod.mf6.ConstantHead(
-        boundary_array(), print_input=True, print_flows=True, save_flows=True
+        boundary_array(is_unstructured), print_input=True, print_flows=True, save_flows=True
     ),
     imod.mf6.Drainage(
-        elevation=get_structured_grid_array(np.float64, 4),
-        conductance=get_structured_grid_array(np.float64,1e-3),
+        elevation=get_grid_array(is_unstructured, np.float64, 4),
+        conductance=get_grid_array(is_unstructured, np.float64,1e-3),
         repeat_stress=repeat_stress(),
     ),
-    imod.mf6.Evapotranspiration(surface=get_structured_grid_array(np.float64,3),
-                                rate=  get_structured_grid_array(np.float64,2),
-                                depth=   get_structured_grid_array(np.float64,1),
-                                proportion_rate=  get_structured_grid_array(np.float64,0.2),
-                                proportion_depth= get_structured_grid_array(np.float64,0.2),
-                                concentration =  concentration_array(),
+    imod.mf6.Evapotranspiration(surface=get_grid_array(is_unstructured, np.float64,3),
+                                rate=  get_grid_array(is_unstructured, np.float64,2),
+                                depth=   get_grid_array(is_unstructured, np.float64,1),
+                                proportion_rate=  get_grid_array(is_unstructured, np.float64,0.2),
+                                proportion_depth= get_grid_array(is_unstructured, np.float64,0.2),
+                                concentration =  concentration_array(is_unstructured),
                                 concentration_boundary_type = "auxmixed",
                                 fixed_cell= True       
     ),
-    imod.mf6.GeneralHeadBoundary(head=get_structured_grid_array(np.float64,3),
-                                 conductance=get_structured_grid_array(np.float64,0.33)),
+    imod.mf6.GeneralHeadBoundary(head=get_grid_array(is_unstructured, np.float64,3),
+                                 conductance=get_grid_array(is_unstructured, np.float64,0.33)),
 
     imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(
-        hydraulic_characteristic= get_structured_grid_array(np.float64,0.33),
-        idomain=get_structured_grid_array(np.int,1),
+        hydraulic_characteristic= get_grid_array(is_unstructured, np.float64,0.33),
+        idomain=get_grid_array(is_unstructured, int,1),
         print_input=True),
     imod.mf6.HorizontalFlowBarrierMultiplier(        
-        multiplier= get_structured_grid_array(np.float64,0.33),
-        idomain=get_structured_grid_array(np.int,1),
+        multiplier= get_grid_array(is_unstructured, np.float64,0.33),
+        idomain=get_grid_array(is_unstructured, int,1),
         print_input=True),
     imod.mf6.HorizontalFlowBarrierResistance(
-        resistance= get_structured_grid_array(np.float64,0.33),
-        idomain=get_structured_grid_array(np.int,1),
+        resistance= get_grid_array(is_unstructured, np.float64,0.33),
+        idomain=get_grid_array(is_unstructured, int,1),
         print_input=True),
-    imod.mf6.MassSourceLoading(
-        rate= get_structured_grid_array(np.float64,0.33),
-    ),
     imod.mf6.Recharge(
-        rate= get_structured_grid_array(np.float64,0.33),
+        rate= get_grid_array(is_unstructured, np.float64,0.33),
     ),
-    imod.mf6.River(stage=get_structured_grid_array(np.float64,0.33),
-                   conductance=get_structured_grid_array(np.float64,0.33),
-                   bottom_elevation=get_structured_grid_array(np.float64,0.33)),
+    imod.mf6.River(stage=get_grid_array(is_unstructured, np.float64,0.33),
+                   conductance=get_grid_array(is_unstructured, np.float64,0.33),
+                   bottom_elevation=get_grid_array(is_unstructured, np.float64,0.33)),
     imod.mf6.SourceSinkMixing(package_names=["a", "b"], concentration_boundary_type=["a", "b"],auxiliary_variable_name=["a", "b"]),
     imod.mf6.WellDisStructured(
         layer= [3, 2, 1],
@@ -205,4 +213,24 @@ STRUCTURED_GRID_BOUNDARY_INSTANCES =[
         rate=[-5.0] * 3,
     )
     ]
-ALL_PACKAGE_INSTANCES=GRIDLESS_PACKAGES+STRUCTURED_GRID_PACKAGES+STRUCTURED_GRID_BOUNDARY_INSTANCES
+''' imod.mf6.MassSourceLoading(
+    rate= get_grid_array(is_unstructured, np.float64,0.33),
+),''',
+
+STRUCTURED_GRID_PACKAGES =[
+    imod.mf6.StructuredDiscretization(
+        2.0, get_grid_array(False, np.float32), get_grid_array(False, np.int32)
+    ), 
+    imod.mf6.WellDisStructured(
+        layer= [3, 2, 1],
+        row=[1, 2, 3],
+        column= [2, 2, 2],
+        rate=[-5.0] * 3,
+    )] +[* create_instance_packages(is_unstructured=False),*create_instance_boundary_condition_packages(False)]
+
+
+UNSTRUCTURED_GRID_PACKAGES =  [get_vertices_discretization()] + [*create_instance_packages(is_unstructured=True)
+,  *create_instance_boundary_condition_packages(True)]
+
+
+ALL_PACKAGE_INSTANCES=GRIDLESS_PACKAGES+STRUCTURED_GRID_PACKAGES+UNSTRUCTURED_GRID_PACKAGES
