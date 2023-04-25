@@ -188,5 +188,21 @@ STRUCTURED_GRID_BOUNDARY_INSTANCES =[
         resistance= get_structured_grid_array(np.float64,0.33),
         idomain=get_structured_grid_array(np.int,1),
         print_input=True),
-]
+    imod.mf6.MassSourceLoading(
+        rate= get_structured_grid_array(np.float64,0.33),
+    ),
+    imod.mf6.Recharge(
+        rate= get_structured_grid_array(np.float64,0.33),
+    ),
+    imod.mf6.River(stage=get_structured_grid_array(np.float64,0.33),
+                   conductance=get_structured_grid_array(np.float64,0.33),
+                   bottom_elevation=get_structured_grid_array(np.float64,0.33)),
+    imod.mf6.SourceSinkMixing(package_names=["a", "b"], concentration_boundary_type=["a", "b"],auxiliary_variable_name=["a", "b"]),
+    imod.mf6.WellDisStructured(
+        layer= [3, 2, 1],
+        row=[1, 2, 3],
+        column= [2, 2, 2],
+        rate=[-5.0] * 3,
+    )
+    ]
 ALL_PACKAGE_INSTANCES=GRIDLESS_PACKAGES+STRUCTURED_GRID_PACKAGES+STRUCTURED_GRID_BOUNDARY_INSTANCES
