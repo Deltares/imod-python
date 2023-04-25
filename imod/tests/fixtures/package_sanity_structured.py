@@ -12,7 +12,7 @@ from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition, Packa
 import pathlib
 
 
-def get_grid_array(is_unstructured, dtype, value =1):
+def get_grid_array(is_unstructured, dtype, value =1, include_time = False):
     """
     helper function for creating an xarray dataset of a given type
     Depending on the is_unstructured input parameter, it will create an array for a
@@ -20,34 +20,50 @@ def get_grid_array(is_unstructured, dtype, value =1):
     """
 
     if not is_unstructured:
-        shape = nlay, nrow, ncol = 3, 9, 9
+        if include_time:
+            shape =  ntime,nlay, nrow, ncol =1, 3, 9, 9
+            dims = ("time", "layer", "y", "x")
+        else:
+            shape = nlay,  nrow, ncol = 3, 9, 9
+            dims = ( "layer", "y", "x")
+
         dx = 10.0
         dy = -10.0
         xmin = 0.0
         xmax = dx * ncol
         ymin = 0.0
         ymax = abs(dy) * nrow
-        dims = ("layer", "y", "x")
 
         layer = np.arange(1, nlay + 1)
         y = np.arange(ymax, ymin, dy) + 0.5 * dy
         x = np.arange(xmin, xmax, dx) + 0.5 * dx
-        coords = {"layer": layer, "y": y, "x": x}
+        time =["2000-01-01"]
+        if include_time:        
+            coords = {"time": time,"layer": layer, "y": y, "x": x}
+        else:
+            coords = {"layer": layer, "y": y, "x": x}
 
         da = xr.DataArray(np.ones(shape, dtype=dtype)* value, coords=coords, dims=dims)
         return da
     else:
+
         grid = imod.data.circle() 
-
         nface = grid.n_face
-
         nlayer = 2
+
+        if include_time:
+            dims = ("time", "layer", grid.face_dimension)
+            shape =(1, nlayer, nface)
+        else:
+            dims = ( "layer", grid.face_dimension)
+            shape = (nlayer, nface)
+
 
         idomain = xu.UgridDataArray(
             xr.DataArray(
-                np.ones((nlayer, nface), dtype=dtype)* value,
+                np.ones(shape, dtype=dtype)* value,
                 coords={"layer": [1, 2]},
-                dims=["layer", grid.face_dimension],
+                dims=dims,
             ),
             grid=grid,
         )    
@@ -67,23 +83,16 @@ def boundary_array( is_unstructured):
 
     # Constant cocnentration
     if is_unstructured:
-        concentration = xu.full_like(idomain, np.nan)
+        boundary_array = xu.full_like(idomain, np.nan)
     else:
-        concentration = xr.full_like(idomain, np.nan)        
+        boundary_array = xr.full_like(idomain, np.nan)        
         
-    concentration[...] = np.nan
-    concentration[..., 0] = 0.0
-    return concentration
+    boundary_array[...] = np.nan
+    boundary_array[..., 0] = 0.0
+    return boundary_array
 
 def concentration_array( is_unstructured):
-    idomain = get_grid_array( is_unstructured, np.float64)
-
-    # Constant cocnentration
-    # Constant cocnentration
-    if is_unstructured:
-        concentration = xu.full_like(idomain, np.nan)
-    else:
-        concentration = xr.full_like(idomain, np.nan)   
+    concentration = get_grid_array( is_unstructured, np.float64,value=np.nan)
     concentration[..., 0] = 0.0
     concentration =concentration.expand_dims(species =["Na"])  
     return concentration
@@ -165,11 +174,9 @@ def create_instance_boundary_condition_packages(is_unstructured):
         row=[1, 2, 3],
         column= [2, 2, 2],
         rate=[-5.0] * 3,
-    )
+    ),
     ]
-''' imod.mf6.MassSourceLoading(
-    rate= get_grid_array(is_unstructured, np.float64,0.33),
-),''',
+
 
 STRUCTURED_GRID_PACKAGES =[
     imod.mf6.StructuredDiscretization(
@@ -188,3 +195,7 @@ UNSTRUCTURED_GRID_PACKAGES =  [get_vertices_discretization()] + [*create_instanc
 
 
 ALL_PACKAGE_INSTANCES=GRIDLESS_PACKAGES+STRUCTURED_GRID_PACKAGES+UNSTRUCTURED_GRID_PACKAGES
+
+
+kk = ''''   imod.mf6.MassSourceLoading(
+        rate=get_grid_array(is_unstructured, np.float64,0.33, False))'''
