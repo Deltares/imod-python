@@ -8,7 +8,7 @@ import imod
 """
 This file is used to create instances of imod packages for testing purposes.
 The main usage is importing ALL_PACKAGE_INSTANCES into a test- this list contains an instance of
-each packages and boundary condition in mf6. 
+each packages and boundary condition in mf6.
 """
 
 
