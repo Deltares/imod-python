@@ -401,7 +401,8 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         self._validate_init_schemata(validate)
 
         warnings.warn(
-            f"{self.__name__} is deprecated. Please move to using the imod.mf6.Well package",
+            f"{self.__name__} is deprecated and will be removed in the v1.0 release."
+            "Please adapt your code to use the imod.mf6.Well package",
             DeprecationWarning,
         )
 
@@ -547,7 +548,8 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         self._validate_init_schemata(validate)
 
         warnings.warn(
-            f"{self.__name__} is deprecated. Please move to using the imod.mf6.Well package",
+            f"{self.__name__} is deprecated and will be removed in the v1.0 release."
+            "Please adapt your code to use the imod.mf6.Well package",
             DeprecationWarning,
         )
 
