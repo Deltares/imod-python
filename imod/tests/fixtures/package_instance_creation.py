@@ -80,10 +80,27 @@ def create_vertices_discretization():
 
 
 def create_instance_packages(is_unstructured):
+    """
+    creates instances of those modflow packages that are not boundary conditions.
+
+    """
     return [
-        imod.mf6.Dispersion(1e-4, 10.0, 10.0, 5.0, 2.0, 4.0, False, True),
+        imod.mf6.Dispersion(
+            diffusion_coefficient=get_grid_da(is_unstructured, np.float32, 1e-4),
+            longitudinal_horizontal=get_grid_da(is_unstructured, np.float32, 10),
+            transversal_horizontal1=get_grid_da(is_unstructured, np.float32, 10),
+            longitudinal_vertical=get_grid_da(is_unstructured, np.float32, 5),
+            transversal_horizontal2=get_grid_da(is_unstructured, np.float32, 2),
+            transversal_vertical=get_grid_da(is_unstructured, np.float32, 4),
+        ),
         imod.mf6.InitialConditions(start=get_grid_da(is_unstructured, np.float32)),
-        imod.mf6.MobileStorageTransfer(0.35, 0.01, 0.02, 1300.0, 0.1),
+        imod.mf6.MobileStorageTransfer(
+            porosity=get_grid_da(is_unstructured, np.float32, 0.35),
+            decay=get_grid_da(is_unstructured, np.float32, 0.01),
+            decay_sorbed=get_grid_da(is_unstructured, np.float32, 0.02),
+            bulk_density=get_grid_da(is_unstructured, np.float32, 1300),
+            distcoef=get_grid_da(is_unstructured, np.float32, 0.1),
+        ),
         imod.mf6.NodePropertyFlow(
             get_grid_da(is_unstructured, np.int32), 3.0, True, 32.0, 34.0, 7
         ),
