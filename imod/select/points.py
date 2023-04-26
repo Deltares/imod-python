@@ -38,6 +38,16 @@ def _check_points(points):
         raise ValueError(f"Shapes of coordinates do match each other:\n{msg}")
 
 
+def _arr_like_points(points, fill_value):
+    """
+    Return array with the same shape as the first array provided in points.
+    """
+    first_value = next(iter(points.values()))
+    shape = np.atleast_1d(first_value).shape
+
+    return np.full(shape, fill_value)
+
+
 def points_in_bounds(da, **points):
     """
     Returns whether points specified by keyword arguments fall within the bounds
@@ -76,10 +86,7 @@ def points_in_bounds(da, **points):
 
     _check_points(points)
 
-    first_value = next(iter(points.values()))
-    shape = np.atleast_1d(first_value).shape
-
-    in_bounds = np.full(shape, True)
+    in_bounds = _arr_like_points(points, True)
 
     if isinstance(da, xu.UgridDataArray):
         index = get_unstructured_cell2d_from_xy(da, **points)
