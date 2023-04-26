@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+import xugrid as xu
 
 import imod
 
@@ -31,37 +32,58 @@ def test_da_nonequidistant():
     return xr.DataArray(data, **kwargs)
 
 
+@pytest.fixture(scope="module")
+def test_uda(test_da):
+    grid = xu.Ugrid2d.from_structured(test_da)
+
+    da = xr.DataArray(
+        data=[1.0, 2.0] * 6,
+        dims=[grid.face_dimension],
+    )
+    return xu.UgridDataArray(da, grid)
+
+
+@pytest.fixture(scope="module")
+def test_uda_elevation():
+    elevation = xu.data.elevation_nl()
+    return xu.concat(
+        [elevation, elevation - 10.0, elevation - 20.0], dim="z"
+    ).assign_coords(z=[0.0, -10.0, -20.0])
+
+
 def xy_indices(indices):
     """A little helper function to return tuples of np.arrays"""
     return indices["y"].values, indices["x"].values
 
 
-def test_in_bounds(test_da_nonequidistant):
-    x = 2.0
-    y = 2.0
-    expected = np.array([True])
-    actual = imod.select.points_in_bounds(test_da_nonequidistant, x=x, y=y)
-    assert (expected == actual).all()
+# TODO: Use Pytest cases for this
+def test_in_bounds(test_da_nonequidistant, test_uda):
+    for case in [test_da_nonequidistant, test_uda]:
+        x = 2.0
+        y = 2.0
+        expected = np.array([True])
+        actual = imod.select.points_in_bounds(case, x=x, y=y)
+        assert (expected == actual).all()
 
-    x = -2.0
-    y = 2.0
-    expected = np.array([False])
-    actual = imod.select.points_in_bounds(test_da_nonequidistant, x=x, y=y)
-    assert (expected == actual).all()
+        x = -2.0
+        y = 2.0
+        expected = np.array([False])
+        actual = imod.select.points_in_bounds(case, x=x, y=y)
+        assert (expected == actual).all()
 
-    # Lower inclusive
-    x = 0.0
-    y = 0.0
-    expected = np.array([True])
-    actual = imod.select.points_in_bounds(test_da_nonequidistant, x=x, y=y)
-    assert (expected == actual).all()
+        # Lower inclusive
+        x = 0.0
+        y = 0.0
+        expected = np.array([True])
+        actual = imod.select.points_in_bounds(case, x=x, y=y)
+        assert (expected == actual).all()
 
-    # Upper exclusive
-    x = 4.0
-    y = 3.0
-    expected = np.array([False])
-    actual = imod.select.points_in_bounds(test_da_nonequidistant, x=x, y=y)
-    assert (expected == actual).all()
+        # Upper exclusive
+        x = 4.0
+        y = 3.0
+        expected = np.array([False])
+        actual = imod.select.points_in_bounds(case, x=x, y=y)
+        assert (expected == actual).all()
 
 
 def test_get_indices__nonequidistant(test_da_nonequidistant):
@@ -114,6 +136,69 @@ def test_get_indices__equidistant(test_da):
     expected = (np.array([0]), np.array([3]))
     actual = imod.select.points_indices(test_da, x=x, y=y)
     assert expected == xy_indices(actual)
+
+
+def test_get_indices__unstructured(test_uda):
+    x = 3.0
+    y = 2.5
+    expected = np.array([3])
+    indices = imod.select.points_indices(test_uda, x=x, y=y)
+    actual = indices["mesh2d_nFaces"].values
+    assert expected == actual
+
+    # Upper exclusive
+    x = 4.0
+    y = 2.5
+    with pytest.raises(ValueError):
+        actual = imod.select.points_indices(test_uda, x=x, y=y)
+
+
+def test_get_values__unstructured(test_uda):
+    x = 3.0
+    y = 2.5
+    expected = np.array([3])
+    indices = imod.select.points_values(test_uda, x=x, y=y)
+    actual = indices["mesh2d_nFaces"].values
+    assert expected == actual
+
+
+def test_get_indices__uda_elevation(test_uda_elevation):
+    """
+    Test for layered unstructured grid, x and y need to be looked up on
+    Ugrid2d, whereas z should be looked in the regular coordinates.
+
+    Point 3 is outside the grid and should be removed.
+    """
+    x = np.array([30_000.0, 31_000.0, 30_000.0, 1.0, 31_000.0])
+    y = np.array([400_000.0, 390_000.0, 400_000.0, 1.0, 390_000.0])
+    z = np.array([-1.0, -2.0, -15.0, 1.0, -23.0])
+
+    points_indices = imod.select.points_indices(
+        test_uda_elevation, x=x, y=y, z=z, out_of_bounds="ignore"
+    )
+
+    data_expected = {}
+    data_expected["mesh2d_nFaces"] = np.array([2033, 2063, 2033, 2063])
+    data_expected["z"] = np.array([0, 0, 1, 2])
+
+    assert list(points_indices.keys()) == ["mesh2d_nFaces", "z"]
+    for key in points_indices.keys():
+        index = points_indices[key].coords["index"]
+        np.testing.assert_equal(index, np.array([0, 1, 2, 4]))
+        np.testing.assert_equal(points_indices[key], data_expected[key])
+
+
+def test_get_values__uda_elevation(test_uda_elevation):
+    x = np.array([30_000.0, 31_000.0, 30_000.0, 1.0, 31_000.0])
+    y = np.array([400_000.0, 390_000.0, 400_000.0, 1.0, 390_000.0])
+    z = np.array([-1.0, -2.0, -15.0, 1.0, -23.0])
+
+    points_values = imod.select.points_values(
+        test_uda_elevation, x=x, y=y, z=z, out_of_bounds="ignore"
+    )
+    data_expected = np.array([3.04, -0.74, -6.96, -20.74])
+
+    np.testing.assert_allclose(points_values, data_expected)
 
 
 def test_set_values(test_da_nonequidistant):

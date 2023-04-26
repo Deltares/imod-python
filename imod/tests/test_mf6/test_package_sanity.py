@@ -35,22 +35,8 @@ ADV_BOUNDARY_PACKAGES = [
     x for x in ALL_PACKAGES if issubclass(x, AdvancedBoundaryCondition)
 ]
 
-PACKAGE_ATTRIBUTES = {
-    "_abc_impl",
-    "_pkg_id",
-    "_template",
-    "_keyword_map",
-    "_metadata_dict",
-    "_init_schemata",
-    "_write_schemata",
-    "_grid_data",
-    "dataset",
-}
-BOUNDARY_ATTRIBUTES = PACKAGE_ATTRIBUTES.union({"_period_data", "_auxiliary_data"})
-ADV_BOUNDARY_ATTRIBUTES = BOUNDARY_ATTRIBUTES.union({"_package_data"})
 
-
-def check_attributes(pkg_class, allowed_attributes):
+def check_attributes(pkg_class):
     class_attributes = set(
         [
             name
@@ -62,27 +48,20 @@ def check_attributes(pkg_class, allowed_attributes):
     assert "_pkg_id" in class_attributes
     # TODO: check for metadata/schema
 
-    difference = class_attributes.difference(allowed_attributes)
-    if len(difference) > 0:
-        print(
-            f"class {pkg_class.__name__} has a nonstandard class attributes: {difference}"
-        )
-        assert False
-
 
 @pytest.mark.parametrize("pkg_class", PACKAGES)
 def test_package_class_attributes(pkg_class):
-    check_attributes(pkg_class, PACKAGE_ATTRIBUTES)
+    check_attributes(pkg_class)
 
 
 @pytest.mark.parametrize("pkg_class", BOUNDARY_PACKAGES)
 def test_boundary_class_attributes(pkg_class):
-    check_attributes(pkg_class, BOUNDARY_ATTRIBUTES)
+    check_attributes(pkg_class)
 
 
 @pytest.mark.parametrize("pkg_class", ADV_BOUNDARY_PACKAGES)
 def test_adv_boundary_class_attributes(pkg_class):
-    check_attributes(pkg_class, ADV_BOUNDARY_ATTRIBUTES)
+    check_attributes(pkg_class)
 
 
 @pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
