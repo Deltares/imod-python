@@ -4,7 +4,7 @@ Module to store (prototype) low-level modflow6 package base classes.
 These are closer to the Modflow 6 data model, with a cellid,
 instead of x, y coordinates.
 
-We plan to split up the present attributes of the classes in pkgbase.py 
+We plan to split up the present attributes of the classes in pkgbase.py
 (Package and BoundaryCondition) into low-level and high-level classes.
 """
 
