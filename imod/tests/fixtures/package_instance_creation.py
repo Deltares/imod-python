@@ -82,7 +82,6 @@ def create_vertices_discretization():
 def create_instance_packages(is_unstructured):
     """
     creates instances of those modflow packages that are not boundary conditions.
-
     """
     return [
         imod.mf6.Dispersion(
@@ -114,6 +113,9 @@ def create_instance_packages(is_unstructured):
 
 
 def create_instance_boundary_condition_packages(is_unstructured):
+    """
+    creates instances of those modflow packages that are boundary conditions.
+    """
     return [
         imod.mf6.ConstantConcentration(
             get_grid_da(is_unstructured, np.float32, 2),
