@@ -12,17 +12,12 @@ Hence:
   None is turned into numpy NaN).
 """
 import inspect
-from inspect import signature
 
 import numpy as np
-import pandas as pd
 import pytest
-import xarray as xr
-import xugrid as xu
 
 import imod
 from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition, Package
-
 from imod.tests.fixtures.package_sanity_structured import ALL_PACKAGE_INSTANCES
 
 ALL_PACKAGES = [
@@ -102,11 +97,11 @@ def test_render_twice(instance, tmp_path):
     elif len(sig.parameters) == 3:
         text1 = instance.render(modeldir, "test", False)
         text2 = instance.render(modeldir, "test", False)
-    elif len(sig.parameters) ==4:
+    elif len(sig.parameters) == 4:
         text1 = instance.render(modeldir, "test", globaltimes, False)
         text2 = instance.render(modeldir, "test", globaltimes, False)
     else:
-        assert False #unexpected nr of arguments
+        assert False  # unexpected nr of arguments
     assert text1 == text2
 
 
