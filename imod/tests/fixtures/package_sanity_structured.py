@@ -11,41 +11,34 @@ import imod
 from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition, Package
 import pathlib
 
-
-def get_grid_array(is_unstructured, dtype, value =1, include_time = False):
-    """
-    helper function for creating an xarray dataset of a given type
-    Depending on the is_unstructured input parameter, it will create an array for a
-    structured grid or for an unstructured grid.
-    """
-
-    if not is_unstructured:
-        if include_time:
-            shape =  ntime,nlay, nrow, ncol =1, 3, 9, 9
-            dims = ("time", "layer", "y", "x")
-        else:
-            shape = nlay,  nrow, ncol = 3, 9, 9
-            dims = ( "layer", "y", "x")
-
-        dx = 10.0
-        dy = -10.0
-        xmin = 0.0
-        xmax = dx * ncol
-        ymin = 0.0
-        ymax = abs(dy) * nrow
-
-        layer = np.arange(1, nlay + 1)
-        y = np.arange(ymax, ymin, dy) + 0.5 * dy
-        x = np.arange(xmin, xmax, dx) + 0.5 * dx
-        time =["2000-01-01"]
-        if include_time:        
-            coords = {"time": time,"layer": layer, "y": y, "x": x}
-        else:
-            coords = {"layer": layer, "y": y, "x": x}
-
-        da = xr.DataArray(np.ones(shape, dtype=dtype)* value, coords=coords, dims=dims)
-        return da
+def get_structured_grid_array(dtype, value =1, include_time = False):
+    if include_time:
+        shape =  ntime,nlay, nrow, ncol =1, 3, 9, 9
+        dims = ("time", "layer", "y", "x")
     else:
+        shape = nlay,  nrow, ncol = 3, 9, 9
+        dims = ( "layer", "y", "x")
+
+    dx = 10.0
+    dy = -10.0
+    xmin = 0.0
+    xmax = dx * ncol
+    ymin = 0.0
+    ymax = abs(dy) * nrow
+
+    layer = np.arange(1, nlay + 1)
+    y = np.arange(ymax, ymin, dy) + 0.5 * dy
+    x = np.arange(xmin, xmax, dx) + 0.5 * dx
+    time =["2000-01-01"]
+    if include_time:        
+        coords = {"time": time,"layer": layer, "y": y, "x": x}
+    else:
+        coords = {"layer": layer, "y": y, "x": x}
+
+    da = xr.DataArray(np.ones(shape, dtype=dtype)* value, coords=coords, dims=dims)
+    return da
+
+def get_unstructured_grid_array(dtype, value =1, include_time = False):
 
         grid = imod.data.circle() 
         nface = grid.n_face
@@ -68,6 +61,18 @@ def get_grid_array(is_unstructured, dtype, value =1, include_time = False):
             grid=grid,
         )    
         return idomain
+
+def get_grid_array(is_unstructured, dtype, value =1, include_time = False):
+    """
+    helper function for creating an xarray dataset of a given type
+    Depending on the is_unstructured input parameter, it will create an array for a
+    structured grid or for an unstructured grid.
+    """
+
+    if is_unstructured:
+        return get_unstructured_grid_array( dtype, value, include_time)
+    else:
+        return get_structured_grid_array(dtype, value, include_time) 
     
 
 def get_vertices_discretization():
@@ -79,21 +84,12 @@ def get_vertices_discretization():
     )
 
 def boundary_array( is_unstructured):
-    idomain = get_grid_array(is_unstructured, np.float64)
-
-    # Constant cocnentration
-    if is_unstructured:
-        boundary_array = xu.full_like(idomain, np.nan)
-    else:
-        boundary_array = xr.full_like(idomain, np.nan)        
-        
-    boundary_array[...] = np.nan
+    boundary_array = get_grid_array(is_unstructured, np.float64, np.nan)
     boundary_array[..., 0] = 0.0
     return boundary_array
 
-def concentration_array( is_unstructured):
-    concentration = get_grid_array( is_unstructured, np.float64,value=np.nan)
-    concentration[..., 0] = 0.0
+def concentration_boundary_array( is_unstructured):
+    concentration = boundary_array( is_unstructured)
     concentration =concentration.expand_dims(species =["Na"])  
     return concentration
 
