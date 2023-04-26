@@ -18,7 +18,7 @@ import pytest
 
 import imod
 from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition, Package
-from imod.tests.fixtures.package_sanity_structured import ALL_PACKAGE_INSTANCES
+from imod.tests.fixtures.package_instance_creation import ALL_PACKAGE_INSTANCES
 
 ALL_PACKAGES = [
     item

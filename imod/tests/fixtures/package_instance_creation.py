@@ -5,8 +5,17 @@ import xugrid as xu
 
 import imod
 
+"""
+This file is used to create instances of imod packages for testing purposes.
+The main usage is importing ALL_PACKAGE_INSTANCES into a test- this list contains an instance of
+each packages and boundary condition in mf6. 
+"""
 
-def get_structured_grid_array(dtype, value=1):
+
+def get_structured_grid_da(dtype, value=1):
+    """
+    This function creates a dataarray with scalar values for a grid of 3 layers and 9 rows and columns.
+    """
     shape = nlay, nrow, ncol = 3, 9, 9
     dims = ("layer", "y", "x")
 
@@ -26,7 +35,10 @@ def get_structured_grid_array(dtype, value=1):
     return da
 
 
-def get_unstructured_grid_array(dtype, value=1, include_time=False):
+def get_unstructured_grid_da(dtype, value=1):
+    """
+    This function creates an xugrid dataarray with scalar values for an unstructured grid
+    """
     grid = imod.data.circle()
     nface = grid.n_face
     nlayer = 2
@@ -45,7 +57,7 @@ def get_unstructured_grid_array(dtype, value=1, include_time=False):
     return idomain
 
 
-def get_grid_array(is_unstructured, dtype, value=1):
+def get_grid_da(is_unstructured, dtype, value=1):
     """
     helper function for creating an xarray dataset of a given type
     Depending on the is_unstructured input parameter, it will create an array for a
@@ -53,65 +65,33 @@ def get_grid_array(is_unstructured, dtype, value=1):
     """
 
     if is_unstructured:
-        return get_unstructured_grid_array(dtype, value)
+        return get_unstructured_grid_da(dtype, value)
     else:
-        return get_structured_grid_array(dtype, value)
+        return get_structured_grid_da(dtype, value)
 
 
-def get_vertices_discretization():
-    idomain = get_grid_array(True, int, value=1)
+def create_vertices_discretization():
+    """
+    return imod.mf6.VerticesDiscretization object
+    """
+    idomain = get_grid_da(True, int, value=1)
     bottom = idomain * xr.DataArray([5.0, 0.0], dims=["layer"])
     return imod.mf6.VerticesDiscretization(top=10.0, bottom=bottom, idomain=idomain)
-
-
-def boundary_array(is_unstructured):
-    boundary_array = get_grid_array(is_unstructured, np.float64, np.nan)
-    boundary_array[..., 0] = 0.0
-    return boundary_array
-
-
-def concentration_boundary_array(is_unstructured):
-    concentration = boundary_array(is_unstructured)
-    concentration = concentration.expand_dims(species=["Na"])
-    return concentration
-
-
-GRIDLESS_PACKAGES = [
-    imod.mf6.adv.Advection("upstream"),
-    imod.mf6.Buoyancy(
-        reference_density=1000.0,
-        reference_concentration=[4.0, 25.0],
-        density_concentration_slope=[0.7, -0.375],
-        modelname=["gwt-1", "gwt-2"],
-        species=["salinity", "temperature"],
-    ),
-    imod.mf6.OutputControl(),
-    imod.mf6.SolutionPresetSimple(modelnames=["gwf-1"]),
-    imod.mf6.TimeDiscretization(
-        xr.DataArray(
-            data=[0.001, 7.0, 365.0],
-            coords={"time": pd.date_range("2000-01-01", "2000-01-03")},
-            dims=["time"],
-        ),
-        23,
-        1.02,
-    ),
-]
 
 
 def create_instance_packages(is_unstructured):
     return [
         imod.mf6.Dispersion(1e-4, 10.0, 10.0, 5.0, 2.0, 4.0, False, True),
-        imod.mf6.InitialConditions(start=get_grid_array(is_unstructured, np.float32)),
+        imod.mf6.InitialConditions(start=get_grid_da(is_unstructured, np.float32)),
         imod.mf6.MobileStorageTransfer(0.35, 0.01, 0.02, 1300.0, 0.1),
         imod.mf6.NodePropertyFlow(
-            get_grid_array(is_unstructured, np.int32), 3.0, True, 32.0, 34.0, 7
+            get_grid_da(is_unstructured, np.int32), 3.0, True, 32.0, 34.0, 7
         ),
         imod.mf6.SpecificStorage(
-            0.001, 0.1, True, get_grid_array(is_unstructured, np.int32)
+            0.001, 0.1, True, get_grid_da(is_unstructured, np.int32)
         ),
         imod.mf6.StorageCoefficient(
-            0.001, 0.1, True, get_grid_array(is_unstructured, np.int32)
+            0.001, 0.1, True, get_grid_da(is_unstructured, np.int32)
         ),
     ]
 
@@ -119,55 +99,55 @@ def create_instance_packages(is_unstructured):
 def create_instance_boundary_condition_packages(is_unstructured):
     return [
         imod.mf6.ConstantConcentration(
-            boundary_array(is_unstructured),
+            get_grid_da(is_unstructured, np.float32, 2),
             print_input=True,
             print_flows=True,
             save_flows=True,
         ),
         imod.mf6.ConstantHead(
-            boundary_array(is_unstructured),
+            get_grid_da(is_unstructured, np.float32, 2),
             print_input=True,
             print_flows=True,
             save_flows=True,
         ),
         imod.mf6.Drainage(
-            elevation=get_grid_array(is_unstructured, np.float64, 4),
-            conductance=get_grid_array(is_unstructured, np.float64, 1e-3),
+            elevation=get_grid_da(is_unstructured, np.float64, 4),
+            conductance=get_grid_da(is_unstructured, np.float64, 1e-3),
         ),
         imod.mf6.Evapotranspiration(
-            surface=get_grid_array(is_unstructured, np.float64, 3),
-            rate=get_grid_array(is_unstructured, np.float64, 2),
-            depth=get_grid_array(is_unstructured, np.float64, 1),
-            proportion_rate=get_grid_array(is_unstructured, np.float64, 0.2),
-            proportion_depth=get_grid_array(is_unstructured, np.float64, 0.2),
+            surface=get_grid_da(is_unstructured, np.float64, 3),
+            rate=get_grid_da(is_unstructured, np.float64, 2),
+            depth=get_grid_da(is_unstructured, np.float64, 1),
+            proportion_rate=get_grid_da(is_unstructured, np.float64, 0.2),
+            proportion_depth=get_grid_da(is_unstructured, np.float64, 0.2),
             fixed_cell=True,
         ),
         imod.mf6.GeneralHeadBoundary(
-            head=get_grid_array(is_unstructured, np.float64, 3),
-            conductance=get_grid_array(is_unstructured, np.float64, 0.33),
+            head=get_grid_da(is_unstructured, np.float64, 3),
+            conductance=get_grid_da(is_unstructured, np.float64, 0.33),
         ),
         imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(
-            hydraulic_characteristic=get_grid_array(is_unstructured, np.float64, 0.33),
-            idomain=get_grid_array(is_unstructured, int, 1),
+            hydraulic_characteristic=get_grid_da(is_unstructured, np.float64, 0.33),
+            idomain=get_grid_da(is_unstructured, int, 1),
             print_input=True,
         ),
         imod.mf6.HorizontalFlowBarrierMultiplier(
-            multiplier=get_grid_array(is_unstructured, np.float64, 0.33),
-            idomain=get_grid_array(is_unstructured, int, 1),
+            multiplier=get_grid_da(is_unstructured, np.float64, 0.33),
+            idomain=get_grid_da(is_unstructured, int, 1),
             print_input=True,
         ),
         imod.mf6.HorizontalFlowBarrierResistance(
-            resistance=get_grid_array(is_unstructured, np.float64, 0.33),
-            idomain=get_grid_array(is_unstructured, int, 1),
+            resistance=get_grid_da(is_unstructured, np.float64, 0.33),
+            idomain=get_grid_da(is_unstructured, int, 1),
             print_input=True,
         ),
         imod.mf6.Recharge(
-            rate=get_grid_array(is_unstructured, np.float64, 0.33),
+            rate=get_grid_da(is_unstructured, np.float64, 0.33),
         ),
         imod.mf6.River(
-            stage=get_grid_array(is_unstructured, np.float64, 0.33),
-            conductance=get_grid_array(is_unstructured, np.float64, 0.33),
-            bottom_elevation=get_grid_array(is_unstructured, np.float64, 0.33),
+            stage=get_grid_da(is_unstructured, np.float64, 0.33),
+            conductance=get_grid_da(is_unstructured, np.float64, 0.33),
+            bottom_elevation=get_grid_da(is_unstructured, np.float64, 0.33),
         ),
         imod.mf6.SourceSinkMixing(
             package_names=["a", "b"],
@@ -179,7 +159,7 @@ def create_instance_boundary_condition_packages(is_unstructured):
 
 STRUCTURED_GRID_PACKAGES = [
     imod.mf6.StructuredDiscretization(
-        2.0, get_grid_array(False, np.float32), get_grid_array(False, np.int32)
+        2.0, get_grid_da(False, np.float32), get_grid_da(False, np.int32)
     ),
     imod.mf6.WellDisStructured(
         layer=[3, 2, 1],
@@ -204,13 +184,34 @@ UNSTRUCTURED_GRID_PACKAGES = (
             save_flows=False,
         )
     ]
-    + [get_vertices_discretization()]
+    + [create_vertices_discretization()]
     + [
         *create_instance_packages(is_unstructured=True),
         *create_instance_boundary_condition_packages(True),
     ]
 )
 
+GRIDLESS_PACKAGES = [
+    imod.mf6.adv.Advection("upstream"),
+    imod.mf6.Buoyancy(
+        reference_density=1000.0,
+        reference_concentration=[4.0, 25.0],
+        density_concentration_slope=[0.7, -0.375],
+        modelname=["gwt-1", "gwt-2"],
+        species=["salinity", "temperature"],
+    ),
+    imod.mf6.OutputControl(),
+    imod.mf6.SolutionPresetSimple(modelnames=["gwf-1"]),
+    imod.mf6.TimeDiscretization(
+        xr.DataArray(
+            data=[0.001, 7.0, 365.0],
+            coords={"time": pd.date_range("2000-01-01", "2000-01-03")},
+            dims=["time"],
+        ),
+        23,
+        1.02,
+    ),
+]
 
 ALL_PACKAGE_INSTANCES = (
     GRIDLESS_PACKAGES + STRUCTURED_GRID_PACKAGES + UNSTRUCTURED_GRID_PACKAGES
