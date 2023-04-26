@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-
+import imod
+import xugrid as xu
 import imod.tests.fixtures.mf6_lake_package_fixture as mf_lake
 from imod.mf6.lak import (
     CONNECTION_DIM,
@@ -531,3 +532,19 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
     """
     )
     assert actual == expected
+
+def test_lake_rendering_unstructured(tmp_path):
+    grid = imod.data.circle()
+
+    nface = grid.n_face
+
+    nlayer = 2
+
+    idomain = xu.UgridDataArray(
+        xr.DataArray(
+            np.ones((nlayer, nface), dtype=np.int32),
+            coords={"layer": [1, 2]},
+            dims=["layer", grid.face_dimension],
+        ),
+        grid=grid,
+    )
