@@ -33,8 +33,7 @@ class Mf6Bc(BoundaryCondition):
     # TODO: Rename to `to_struct_array`
     # NOTE: This function should be part of Mf6Pkg, now defined here,
     #   to ensure function is overrided.
-    def to_sparse(self):
-        ds = self.dataset
+    def to_sparse(self, ds):
         data_vars = [var for var in ds.data_vars if var != "cellid"]
         cellid_names = ds.coords["nmax_cellid"].values
         nrow = ds.coords["ncellid"].size
@@ -55,7 +54,7 @@ class Mf6Bc(BoundaryCondition):
         """
         Writes a modflow6 binary data file
         """
-        sparse_data = self.to_sparse()
+        sparse_data = self.to_sparse(ds)
         outpath.parent.mkdir(exist_ok=True, parents=True)
         if binary:
             self._write_binaryfile(outpath, sparse_data)
