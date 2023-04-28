@@ -35,10 +35,21 @@ class Mf6Wel(Mf6Bc):
     }
     _write_schemata = {}
 
-    def __init__(self, cellid, rate):
+    def __init__(
+        self,
+        cellid,
+        rate,
+        concentration = None,
+        concentration_boundary_type="aux",
+    ):
         super().__init__()
         self.dataset["cellid"] = cellid
         self.dataset["rate"] = rate
+
+        if concentration is not None:
+            self.dataset["concentration"] = concentration
+            self.dataset["concentration_boundary_type"] = concentration_boundary_type
+            self.add_periodic_auxiliary_variable()
 
 
 class Well(BoundaryCondition):
@@ -100,6 +111,7 @@ class Well(BoundaryCondition):
         ``set_repeat_stress`` method.
     """
 
+    _auxiliary_data = {"concentration": "species"}
     _init_schemata = {
         "screen_top": [DTypeSchema(np.floating)],
         "screen_bottom": [DTypeSchema(np.floating)],
@@ -108,7 +120,6 @@ class Well(BoundaryCondition):
         "rate": [DTypeSchema(np.floating)],
         "concentration": [DTypeSchema(np.floating)],
     }
-
     _write_schemata = {}
 
     def __init__(
@@ -333,12 +344,17 @@ class Well(BoundaryCondition):
         df_for_cellid = wells_assigned.groupby("index").first()
         ds["cellid"] = self.create_cellid(df_for_cellid, top)
 
-        rate = wells_assigned["rate"].to_xarray()
+        data_vars = ["rate"]
+        if "concentration" in wells_assigned.columns:
+            data_vars.append("concentration")
+
+        ds_vars = wells_assigned[data_vars].to_xarray()
         # Carefully rename the dimension and set coordinates before
         # assigning to dataset.
-        rate = rate.rename(**{"index": "ncellid"})  # .rename_dims() for ds
-        rate = rate.assign_coords(**{"ncellid": ds.coords["ncellid"].values})
-        ds["rate"] = rate
+        d_rename = {"index": "ncellid"}
+        ds_vars = ds_vars.rename_dims(**d_rename).rename_vars(**d_rename)
+        ds_vars = ds_vars.assign_coords(**{"ncellid": ds.coords["ncellid"].values})
+        ds = ds.assign(**dict(ds_vars.items()))
 
         ds = self.remove_inactive(ds, active)
 
