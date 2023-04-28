@@ -1,6 +1,8 @@
 import warnings
+from typing import Union
 
 import numpy as np
+import pandas as pd
 import xarray as xr
 import xugrid as xu
 
@@ -212,8 +214,38 @@ class Well(BoundaryCondition):
 
         return new
 
-    def create_cellid(self, df, to_grid):
-        """ """
+    def create_cellid(
+        self,
+        df: pd.DataFrame,
+        to_grid: Union[xr.DataArray, xu.UgridDataArray],
+    ) -> xr.DataArray:
+        """
+
+        Create DataArray with Modflow6 cell indices based on x, y coordinates
+        in a dataframe. For structured grid this DataArray contains 3 columns:
+        ``layer, row, column``. For unstructured grids, this contains 2 columns:
+        ``layer, cell2d``.
+
+        Note
+        ----
+        The "layer" coordinate should already be provided in the dataframe.
+        To determine the layer coordinate based on screen depts, look at
+        :func:`imod.prepare.wells.assign_wells`.
+
+        Parameters
+        ----------
+        df: pd.Dataframe
+            Dataframe with cell locations in a "x" and "y" column.
+            Should contain a "layer" column as well.
+        to_grid: {xr.DataArray, xu.UgridDataArray}
+            Grid to map the points to based on their x and y coordinates.
+
+        Returns
+        -------
+        cellid : xr.DataArray
+            2D DataArray with a ``ncellid`` rows and 3 to 2 columns, depending
+            on whether on a structured or unstructured grid."""
+
         x = df["x"].values
         y = df["y"].values
         layer = df["layer"].values
@@ -275,6 +307,8 @@ class Well(BoundaryCondition):
         When well screens hit multiple layers, groundwater extractions are
         distributed based on layer transmissivities.
         """
+        has_time = "time" in self.dataset.coords
+
         wells_df = self.dataset.to_dataframe()
         wells_df = wells_df.rename(
             columns={
@@ -283,15 +317,28 @@ class Well(BoundaryCondition):
             }
         )
 
+        # Unset multi-index, because assign_wells cannot deal with
+        # multi-indices which is returned by self.dataset.to_dataframe() in
+        # case of a "time" coordinate.
+        wells_df = wells_df.reset_index()
         # TODO: Accept user-defined layers as well
         wells_assigned = assign_wells(wells_df, top, bottom, k)
+        if has_time:
+            # Set multi-index back again.
+            wells_assigned = wells_assigned.set_index(["index", "time"]).sort_index()
 
         ds = xr.Dataset()
-        ds["cellid"] = self.create_cellid(wells_assigned, top)
-        rate = wells_assigned["rate"].values
-        ds["rate"] = xr.DataArray(
-            data=rate, coords={"ncellid": ds.coords["ncellid"].values}
-        )
+        # Groupby index and select first, to unset any duplicate records
+        # introduced by the multi-indexed "time" dimension.
+        df_for_cellid = wells_assigned.groupby("index").first()
+        ds["cellid"] = self.create_cellid(df_for_cellid, top)
+
+        rate = wells_assigned["rate"].to_xarray()
+        # Carefully rename the dimension and set coordinates before
+        # assigning to dataset.
+        rate = rate.rename(**{"index": "ncellid"})  # .rename_dims() for ds
+        rate = rate.assign_coords(**{"ncellid": ds.coords["ncellid"].values})
+        ds["rate"] = rate
 
         ds = self.remove_inactive(ds, active)
 
