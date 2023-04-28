@@ -283,6 +283,7 @@ class Well(BoundaryCondition):
             }
         )
 
+        # TODO: Accept user-defined layers as well
         wells_assigned = assign_wells(wells_df, top, bottom, k)
 
         ds = xr.Dataset()
@@ -401,7 +402,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         self._validate_init_schemata(validate)
 
         warnings.warn(
-            f"{self.__name__} is deprecated and will be removed in the v1.0 release."
+            f"{self.__class__.__name__} is deprecated and will be removed in the v1.0 release."
             "Please adapt your code to use the imod.mf6.Well package",
             DeprecationWarning,
         )
@@ -548,7 +549,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         self._validate_init_schemata(validate)
 
         warnings.warn(
-            f"{self.__name__} is deprecated and will be removed in the v1.0 release."
+            f"{self.__class__.__name__} is deprecated and will be removed in the v1.0 release."
             "Please adapt your code to use the imod.mf6.Well package",
             DeprecationWarning,
         )
