@@ -46,7 +46,7 @@ def get_unstructured_grid_da(dtype, value=1):
     dims = ("layer", grid.face_dimension)
     shape = (nlayer, nface)
 
-    idomain = xu.UgridDataArray(
+    uda = xu.UgridDataArray(
         xr.DataArray(
             np.ones(shape, dtype=dtype) * value,
             coords={"layer": [1, 2]},
@@ -54,7 +54,7 @@ def get_unstructured_grid_da(dtype, value=1):
         ),
         grid=grid,
     )
-    return idomain
+    return uda
 
 
 def get_grid_da(is_unstructured, dtype, value=1):
