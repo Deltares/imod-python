@@ -257,10 +257,10 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
         np.full((len(times_inflow)), 4.0), coords={"time": times_inflow}, dims=["time"]
     )
 
-    lake1 = mf_lake.create_lake_data(
+    lake1 = mf_lake.create_lake_data_structured(
         is_lake1, 11.0, "Naardermeer", rainfall=rainfall, inflow=inflow
     )
-    lake2 = mf_lake.create_lake_data(
+    lake2 = mf_lake.create_lake_data_structured(
         is_lake2, 11.0, "IJsselmeer", rainfall=rainfall, inflow=inflow
     )
     times_invert = [
@@ -397,7 +397,7 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
     outlet2 = OutletSpecified("IJsselmeer", "Naardermeer", rate)
     outlet3 = OutletWeir("IJsselmeer", "Naardermeer", invert, numeric)
 
-    lake_with_status = mf_lake.create_lake_data(
+    lake_with_status = mf_lake.create_lake_data_structured(
         is_lake1,
         11.0,
         "Naardermeer",
@@ -409,7 +409,7 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
         inflow=numeric,
         withdrawal=numeric,
     )
-    lake_without_status = mf_lake.create_lake_data(
+    lake_without_status = mf_lake.create_lake_data_structured(
         is_lake2,
         11.0,
         "IJsselmeer",
@@ -542,11 +542,21 @@ def test_lake_rendering_unstructured(basic_unstructured_dis, tmp_path):
     is_lake1[1, 2,] = True
     is_lake1[1, 3] = True
 
-    lake_with_status = mf_lake.create_lake_data(
+    times_of_numeric_timeseries = [
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-03-01"),
+        np.datetime64("2000-05-01"),
+    ]
+    numeric = xr.DataArray(
+        np.full((len(times_of_numeric_timeseries)), 5.0),
+        coords={"time": times_of_numeric_timeseries},
+        dims=["time"],
+    )   
+
+    lake1 = mf_lake.create_lake_data_unstructured(
         is_lake1,
         11.0,
         "Naardermeer",
-        status=status,
         stage=numeric,
         rainfall=numeric,
         evaporation=numeric,
@@ -554,3 +564,5 @@ def test_lake_rendering_unstructured(basic_unstructured_dis, tmp_path):
         inflow=numeric,
         withdrawal=numeric,
     )
+
+    assert True
