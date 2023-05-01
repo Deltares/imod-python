@@ -533,18 +533,24 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
     )
     assert actual == expected
 
-def test_lake_rendering_unstructured(tmp_path):
-    grid = imod.data.circle()
+def test_lake_rendering_unstructured(basic_unstructured_dis, tmp_path):
 
-    nface = grid.n_face
+    idomain, _, _ = basic_unstructured_dis
 
-    nlayer = 2
+    is_lake1 = xu.full_like(idomain, False, dtype=bool)
+    is_lake1[1, 2] = True
+    is_lake1[1, 2,] = True
+    is_lake1[1, 3] = True
 
-    idomain = xu.UgridDataArray(
-        xr.DataArray(
-            np.ones((nlayer, nface), dtype=np.int32),
-            coords={"layer": [1, 2]},
-            dims=["layer", grid.face_dimension],
-        ),
-        grid=grid,
+    lake_with_status = mf_lake.create_lake_data(
+        is_lake1,
+        11.0,
+        "Naardermeer",
+        status=status,
+        stage=numeric,
+        rainfall=numeric,
+        evaporation=numeric,
+        runoff=numeric,
+        inflow=numeric,
+        withdrawal=numeric,
     )
