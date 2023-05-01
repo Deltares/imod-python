@@ -82,6 +82,9 @@ def lake_package(naardermeer, ijsselmeer):
         [naardermeer(), ijsselmeer()], [outlet1, outlet2]
     )
 
+@pytest.fixture(scope="function")
+def lake_table():
+    return create_lake_table(5,2.1,3.1415, 100)
 
 def create_lake_data_structured(
     is_lake,

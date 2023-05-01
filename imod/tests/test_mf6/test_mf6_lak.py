@@ -16,7 +16,6 @@ from imod.mf6.lak import (
     OutletWeir,
 )
 
-
 @pytest.mark.usefixtures("naardermeer", "ijsselmeer")
 def test_alternative_constructor(naardermeer, ijsselmeer):
     outlet1 = OutletManning("Naardermeer", "IJsselmeer", 23.0, 24.0, 25.0, 26.0)
@@ -533,7 +532,7 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
     )
     assert actual == expected
 
-def test_lake_rendering_unstructured(basic_unstructured_dis, tmp_path):
+def test_lake_rendering_unstructured(basic_unstructured_dis,  tmp_path, lake_table):
 
     idomain, _, _ = basic_unstructured_dis
 
@@ -563,6 +562,75 @@ def test_lake_rendering_unstructured(basic_unstructured_dis, tmp_path):
         runoff=numeric,
         inflow=numeric,
         withdrawal=numeric,
+        lake_table= lake_table
     )
 
-    assert True
+    lake_package = Lake.from_lakes_and_outlets(
+        [lake1], []
+    )
+
+    global_times = np.array(
+        [
+            np.datetime64("1999-01-01"),
+            np.datetime64("2000-01-01"),
+            np.datetime64("2000-02-01"),
+            np.datetime64("2000-03-01"),
+            np.datetime64("2000-04-01"),
+            np.datetime64("2000-05-01"),
+        ]
+    )    
+    actual = mf_lake.write_and_read(lake_package, tmp_path, "lake-test", global_times)
+    expected = textwrap.dedent(
+    """\
+    begin options
+    end options
+    
+    begin dimensions
+      nlakes 1
+      noutlets 0
+      ntables 1
+    end dimensions
+    
+    begin packagedata
+      1 11.0 2 Naardermeer
+    end packagedata
+    
+    begin connectiondata
+    1 1 2 3 horizontal 0.2 0.4 0.3 0.6 0.5
+    1 2 2 4 horizontal 0.2 0.4 0.3 0.6 0.5
+    end connectiondata
+
+    begin tables
+      1 TAB6 FILEIN Naardermeer.ltbl
+    end tables
+    
+    
+    begin period 2
+      1  stage 5.0
+      1  rainfall 5.0
+      1  evaporation 5.0
+      1  runoff 5.0
+      1  inflow 5.0
+      1  withdrawal 5.0
+    end period
+    
+    begin period 4
+      1  stage 5.0
+      1  rainfall 5.0
+      1  evaporation 5.0
+      1  runoff 5.0
+      1  inflow 5.0
+      1  withdrawal 5.0
+    end period
+    
+    begin period 6
+      1  stage 5.0
+      1  rainfall 5.0
+      1  evaporation 5.0
+      1  runoff 5.0
+      1  inflow 5.0
+      1  withdrawal 5.0
+    end period
+    """
+    )
+    assert actual == expected
