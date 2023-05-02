@@ -6,8 +6,8 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-[Unreleased]
-------------
+[0.13.0] - 2023-05-02
+---------------------
 
 Added
 ~~~~~
@@ -20,6 +20,9 @@ Added
 - Added support for the Modflow6 Lake package
 - :func:`imod.select.points_in_bounds`, :func:`imod.select.points_indices`,
   :func:`imod.select.points_values` now support unstructured grids.
+- Added support for the Modflow 6 Lake package: :class:`imod.mf6.Lake`,
+  :class:`imod.mf6.LakeData`, :class:`imod.mf6.OutletManning`, :class:`OutletSpecified`,
+  :class:`OutletWeir`. See the examples for an application of the Lake package.
 
 Fixed
 ~~~~~
