@@ -590,59 +590,59 @@ def test_lake_rendering_unstructured(basic_unstructured_dis, tmp_path, lake_tabl
     actual = mf_lake.write_and_read(lake_package, tmp_path, "lake-test", global_times)
     expected = textwrap.dedent(
         """\
-        begin options
-        end options
+    begin options
+    end options
 
-        begin dimensions
-        nlakes 1
-        noutlets 1
-        ntables 1
-        end dimensions
+    begin dimensions
+      nlakes 1
+      noutlets 1
+      ntables 1
+    end dimensions
 
-        begin packagedata
-        1 11.0 2 Naardermeer
-        end packagedata
+    begin packagedata
+      1 11.0 2 Naardermeer
+    end packagedata
 
-        begin connectiondata
-        1 1 2 3 horizontal 0.2 0.4 0.3 0.6 0.5
-        1 2 2 4 horizontal 0.2 0.4 0.3 0.6 0.5
-        end connectiondata
+    begin connectiondata
+    1 1 2 3 horizontal 0.2 0.4 0.3 0.6 0.5
+    1 2 2 4 horizontal 0.2 0.4 0.3 0.6 0.5
+    end connectiondata
 
-        begin tables
-        1 TAB6 FILEIN Naardermeer.ltbl
-        end tables
+    begin tables
+      1 TAB6 FILEIN Naardermeer.ltbl
+    end tables
 
-        begin outlets
-        1 0 manning 3.0 3.0 2.0 4.0
-        end outlets
+    begin outlets
+    1 0 manning 3.0 3.0 2.0 4.0
+    end outlets
 
 
-        begin period 2
-        1  stage 5.0
-        1  rainfall 5.0
-        1  evaporation 5.0
-        1  runoff 5.0
-        1  inflow 5.0
-        1  withdrawal 5.0
-        end period
+    begin period 2
+      1  stage 5.0
+      1  rainfall 5.0
+      1  evaporation 5.0
+      1  runoff 5.0
+      1  inflow 5.0
+      1  withdrawal 5.0
+    end period
 
-        begin period 4
-        1  stage 5.0
-        1  rainfall 5.0
-        1  evaporation 5.0
-        1  runoff 5.0
-        1  inflow 5.0
-        1  withdrawal 5.0
-        end period
+    begin period 4
+      1  stage 5.0
+      1  rainfall 5.0
+      1  evaporation 5.0
+      1  runoff 5.0
+      1  inflow 5.0
+      1  withdrawal 5.0
+    end period
 
-        begin period 6
-        1  stage 5.0
-        1  rainfall 5.0
-        1  evaporation 5.0
-        1  runoff 5.0
-        1  inflow 5.0
-        1  withdrawal 5.0
-        end period
-        """
+    begin period 6
+      1  stage 5.0
+      1  rainfall 5.0
+      1  evaporation 5.0
+      1  runoff 5.0
+      1  inflow 5.0
+      1  withdrawal 5.0
+    end period
+    """
     )
     assert actual == expected
