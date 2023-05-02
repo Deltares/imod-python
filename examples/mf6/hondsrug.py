@@ -516,7 +516,11 @@ transient = xr.DataArray(
 # specific yield and if the layers are convertible.
 
 gwf_model["sto"] = imod.mf6.SpecificStorage(
-    specific_storage=ss, specific_yield=sy, transient=transient, convertible=0
+    specific_storage=ss,
+    specific_yield=sy,
+    transient=transient,
+    convertible=0,
+    save_flows=True,
 )
 
 # %%
