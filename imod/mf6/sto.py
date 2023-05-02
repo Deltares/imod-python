@@ -101,21 +101,21 @@ class SpecificStorage(StorageBase):
     }
 
     _init_schemata = {
-        "convertible": [
+        "convertible": (
             DTypeSchema(np.integer),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
-        ],
-        "specific_storage": [
+        ),
+        "specific_storage": (
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
-        ],
-        "specific_yield": [
+        ),
+        "specific_yield": (
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
-        ],
+        ),
         "save_flows": (DTypeSchema(np.bool_), DimsSchema()),
     }
 
@@ -222,18 +222,18 @@ class StorageCoefficient(StorageBase):
     }
 
     _init_schemata = {
-        "convertible": [
+        "convertible": (
             DTypeSchema(np.integer),
             PKG_DIMS_SCHEMA,
-        ],
-        "storage_coefficient": [
+        ),
+        "storage_coefficient": (
             DTypeSchema(np.floating),
             PKG_DIMS_SCHEMA,
-        ],
-        "specific_yield": [
+        ),
+        "specific_yield": (
             DTypeSchema(np.floating),
             PKG_DIMS_SCHEMA,
-        ],
+        ),
         "save_flows": (DTypeSchema(np.bool_), DimsSchema()),
     }
 
