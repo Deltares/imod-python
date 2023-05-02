@@ -1,17 +1,17 @@
-import geopandas as gpd
 import numpy as np
-import pandas as pd
 import pytest
 import xarray as xr
-import imod
 import xugrid as xu
+
+import imod
+
 
 @pytest.fixture(scope="module")
 def basic_unstructured_dis():
     """Basic model discretization"""
 
     grid_triangles = imod.data.circle()
-    grid = grid_triangles.tesselate_centroidal_voronoi()    
+    grid = grid_triangles.tesselate_centroidal_voronoi()
 
     nface = grid.n_face
     nlayer = 15
@@ -27,6 +27,6 @@ def basic_unstructured_dis():
         grid=grid,
     )
     top = 0.0
-    bottom = xr.DataArray(top - (layer * 10.0), dims=["layer"])    
+    bottom = xr.DataArray(top - (layer * 10.0), dims=["layer"])
 
     return idomain, top, bottom

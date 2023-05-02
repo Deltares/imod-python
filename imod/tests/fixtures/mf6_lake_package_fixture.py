@@ -1,9 +1,10 @@
 import numpy as np
 import pytest
 import xarray as xr
+import xugrid as xu
 
 from imod.mf6.lak import Lake, LakeData, OutletManning
-import xugrid as xu
+
 
 def create_lake_table(
     number_rows, starting_stage, starting_sarea, starting_volume, starting_barea=None
@@ -82,9 +83,11 @@ def lake_package(naardermeer, ijsselmeer):
         [naardermeer(), ijsselmeer()], [outlet1, outlet2]
     )
 
+
 @pytest.fixture(scope="function")
 def lake_table():
-    return create_lake_table(5,2.1,3.1415, 100)
+    return create_lake_table(5, 2.1, 3.1415, 100)
+
 
 def create_lake_data_structured(
     is_lake,
@@ -135,6 +138,7 @@ def write_and_read(package, path, filename, globaltimes=None) -> str:
     with open(path / f"{filename}.lak") as f:
         actual = f.read()
     return actual
+
 
 def create_lake_data_unstructured(
     is_lake,

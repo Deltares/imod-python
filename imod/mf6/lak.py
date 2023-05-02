@@ -102,8 +102,14 @@ class LakeData(LakeApi_Base):
         self.dataset["bed_leak"] = (bed_leak.dims, bed_leak.values)
         self.dataset["top_elevation"] = (top_elevation.dims, top_elevation.values)
         self.dataset["bottom_elevation"] = (bot_elevation.dims, bot_elevation.values)
-        self.dataset["connection_length"] = (connection_length.dims, connection_length.values)
-        self.dataset["connection_width"] =  (connection_width.dims, connection_width.values)
+        self.dataset["connection_length"] = (
+            connection_length.dims,
+            connection_length.values,
+        )
+        self.dataset["connection_width"] = (
+            connection_width.dims,
+            connection_width.values,
+        )
         self.dataset["lake_table"] = lake_table
 
         # timeseries data
@@ -279,13 +285,18 @@ def create_outlet_data(outlets, name_to_number):
         # Convert names to numbers
         for var in ("lakein", "lakeout"):
             name = outlet.dataset[var].item()
-            try:
-                lake_number = name_to_number[name]
-            except KeyError:
-                names = ", ".join(name_to_number.keys())
-                raise KeyError(
-                    f"Outlet lake name {name} not found among lake names: {names}"
-                )
+            if (
+                var == "lakeout" and name == ""
+            ):  # the outlet lakeout can be outside of the model
+                lake_number = 0
+            else:
+                try:
+                    lake_number = name_to_number[name]
+                except KeyError:
+                    names = ", ".join(name_to_number.keys())
+                    raise KeyError(
+                        f"Outlet lake name {name} not found among lake names: {names}"
+                    )
             outlet_data[f"outlet_{var}"].append(lake_number)
 
         # For other values: fill in NaN if not applicable.
