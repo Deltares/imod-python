@@ -4,6 +4,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+import imod.tests.fixtures.mf6_lake_package_fixture as mf_lake
 
 """
 This file is used to create instances of imod packages for testing purposes.
@@ -68,6 +69,34 @@ def get_grid_da(is_unstructured, dtype, value=1):
         return get_unstructured_grid_da(dtype, value)
     else:
         return get_structured_grid_da(dtype, value)
+
+
+def create_lake_package(is_unstructured):
+    is_lake1 = get_grid_da(is_unstructured, bool, False)
+    times_of_numeric_timeseries = [
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-03-01"),
+        np.datetime64("2000-05-01"),
+    ]
+    numeric = xr.DataArray(
+        np.full((len(times_of_numeric_timeseries)), 5.0),
+        coords={"time": times_of_numeric_timeseries},
+        dims=["time"],
+    )
+    if is_unstructured:
+        is_lake1[1, 0] = True
+        is_lake1[1, 1] = True
+        lake1 = mf_lake.create_lake_data_unstructured(
+            is_lake1, 11.0, "Naardermeer", stage=numeric
+        )
+    else:
+        is_lake1[1, 1, 0] = True
+        is_lake1[1, 1, 1] = True
+        lake1 = mf_lake.create_lake_data_structured(
+            is_lake1, 11.0, "Naardermeer", stage=numeric
+        )
+    outlet1 = imod.mf6.OutletManning("Naardermeer", "", 3.0, 2.0, 3.0, 4.0)
+    return imod.mf6.Lake.from_lakes_and_outlets([lake1], [outlet1])
 
 
 def create_vertices_discretization():
@@ -173,6 +202,7 @@ def create_instance_boundary_condition_packages(is_unstructured):
             concentration_boundary_type=["a", "b"],
             auxiliary_variable_name=["a", "b"],
         ),
+        create_lake_package(is_unstructured),
     ]
 
 
