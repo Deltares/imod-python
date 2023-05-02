@@ -7,6 +7,7 @@ from imod.mf6.pkgbase import Package
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
+    DimsSchema,
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
@@ -78,6 +79,9 @@ class SpecificStorage(StorageBase):
         used. >0 indicates confined storage is used when head is above cell top
         and a mixed formulation of unconfined and confined storage is used when
         head is below cell top. (iconvert)
+    save_flows: ({True, False}, optional)
+        Indicates that storage flow terms will be written to the file specified
+        with "BUDGET FILEOUT" in Output Control. Default is False.
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
@@ -112,6 +116,7 @@ class SpecificStorage(StorageBase):
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
         ],
+        "save_flows": (DTypeSchema(np.bool_), DimsSchema()),
     }
 
     _write_schemata = {
@@ -137,6 +142,7 @@ class SpecificStorage(StorageBase):
         specific_yield,
         transient,
         convertible,
+        save_flows: bool = False,
         validate: bool = True,
     ):
         super().__init__(locals())
@@ -144,7 +150,7 @@ class SpecificStorage(StorageBase):
         self.dataset["specific_yield"] = specific_yield
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
-
+        self.dataset["save_flows"] = save_flows
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
@@ -194,6 +200,9 @@ class StorageCoefficient(StorageBase):
         used. >0 indicates confined storage is used when head is above cell top
         and a mixed formulation of unconfined and confined storage is used when
         head is below cell top. (iconvert)
+    save_flows: ({True, False}, optional)
+        Indicates that storage flow terms will be written to the file specified
+        with "BUDGET FILEOUT" in Output Control. Default is False.
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
@@ -225,6 +234,7 @@ class StorageCoefficient(StorageBase):
             DTypeSchema(np.floating),
             PKG_DIMS_SCHEMA,
         ],
+        "save_flows": (DTypeSchema(np.bool_), DimsSchema()),
     }
 
     _write_schemata = {
@@ -250,6 +260,7 @@ class StorageCoefficient(StorageBase):
         specific_yield,
         transient,
         convertible,
+        save_flows: bool = False,
         validate: bool = True,
     ):
         super().__init__(locals())
@@ -257,6 +268,7 @@ class StorageCoefficient(StorageBase):
         self.dataset["specific_yield"] = specific_yield
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
+        self.dataset["save_flows"] = save_flows
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
