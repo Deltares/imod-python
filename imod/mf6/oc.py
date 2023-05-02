@@ -29,7 +29,7 @@ class OutputControl(Package):
         String or integer indicating output control for cell budgets (.cbc)
         If string, should be one of ["first", "last", "all"].
         If integer, interpreted as frequency.
-    save_head : {string, integer}, or xr.DataArray of {string, integer}, optional
+    save_concentration : {string, integer}, or xr.DataArray of {string, integer}, optional
         String or integer indicating output control for concentration file (.ucn)
         If string, should be one of ["first", "last", "all"].
         If integer, interpreted as frequency.
