@@ -39,7 +39,7 @@ class Mf6Wel(Mf6Bc):
         self,
         cellid,
         rate,
-        concentration = None,
+        concentration=None,
         concentration_boundary_type="aux",
     ):
         super().__init__()
@@ -158,7 +158,7 @@ class Well(BoundaryCondition):
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            self.add_periodic_auxiliary_variable()
+            # self.add_periodic_auxiliary_variable()
 
         self._validate_init_schemata(validate)
 
@@ -208,7 +208,10 @@ class Well(BoundaryCondition):
             be able to deal with min and max values equal to None, which
             should be ignored.
             """
-            return da == da.clip(min=min, max=max)
+            if min is None and max is None:
+                return True
+            else:
+                return da == da.clip(min=min, max=max)
 
         # The super method will select in the time dimension without issues.
         new = super().clip_box(time_min=time_min, time_max=time_max)
