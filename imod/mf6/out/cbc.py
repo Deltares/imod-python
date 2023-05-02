@@ -116,7 +116,13 @@ def read_cbc_headers(
         while f.tell() < filesize:
             header = read_common_cbc_header(f)
             if header["imeth"] == 1:
-                datasize = header["ndim1"] * 8
+                datasize = (
+                    # Multiply by -1 because ndim3 is negative in this case
+                    header["ndim1"]
+                    * header["ndim2"]
+                    * header["ndim3"]
+                    * -1
+                ) * 8
                 header["pos"] = f.tell()
                 key = header["text"]
                 headers[key].append(Imeth1Header(**header))
@@ -179,8 +185,9 @@ def open_imeth1_budgets(
     time = np.empty(len(header_list), dtype=np.float64)
     for i, header in enumerate(header_list):
         time[i] = header.totim
-        a = dask.delayed(read_imeth1_budgets)(cbc_path, header.ndim1, header.pos)
-        x = dask.array.from_delayed(a, shape=(header.ndim1,), dtype=np.float64)
+        count = header.ndim1 * header.ndim2 * header.ndim3 * -1
+        a = dask.delayed(read_imeth1_budgets)(cbc_path, count, header.pos)
+        x = dask.array.from_delayed(a, shape=(count,), dtype=np.float64)
         dask_list.append(x)
 
     return xr.DataArray(
