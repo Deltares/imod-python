@@ -24,6 +24,19 @@ class Storage(Package):
 
 
 class StorageBase(Package, abc.ABC):
+    def get_options(self, d):
+        # Skip both variables in grid_data and "transient".
+        not_options = list(self._grid_data.keys())
+        not_options += "transient"
+
+        for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
+            if varname in not_options:
+                continue
+            v = self.dataset[varname].values[()]
+            if self._valid(v):  # skip None and False
+                d[varname] = v
+        return d
+
     def _render_dict(self, directory, pkgname, globaltimes, binary):
         d = {}
         stodirectory = pathlib.Path(directory.stem) / pkgname
@@ -45,6 +58,9 @@ class StorageBase(Package, abc.ABC):
             periods[1] = self.dataset["transient"].values[()]
 
         d["periods"] = periods
+
+        d = self.get_options(d)
+
         return d
 
 
