@@ -153,6 +153,7 @@ def transient_twri_model():
         specific_yield=xr.full_like(like, 0.15),
         convertible=0,
         transient=True,
+        save_flows=True,
     )
     simulation.create_time_discretization(
         additional_times=pd.date_range("2000-01-01", " 2000-01-31")
