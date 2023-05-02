@@ -70,14 +70,18 @@ class SpecificStorage(StorageBase):
         Is specific yield. Specific yield values must be greater than or
         equal to 0. Specific yield does not have to be specified if there are no
         convertible cells (convertible=0 in every cell). (sy)
+    transient: ({True, False})
+        Boolean to indicate if the model is transient or steady-state.
     convertible: array of int (xr.DataArray)
         Is a flag for each cell that specifies whether or not a cell is
         convertible for the storage calculation. 0 indicates confined storage is
         used. >0 indicates confined storage is used when head is above cell top
         and a mixed formulation of unconfined and confined storage is used when
         head is below cell top. (iconvert)
-    transient: ({True, False})
-        Boolean to indicate if the model is transient or steady-state.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "sto"
@@ -182,14 +186,14 @@ class StorageCoefficient(StorageBase):
         Is specific yield. Specific yield values must be greater than or
         equal to 0. Specific yield does not have to be specified if there are no
         convertible cells (convertible=0 in every cell). (sy)
+    transient: ({True, False})
+        Boolean to indicate if the model is transient or steady-state.
     convertible: array of int (xr.DataArray)
         Is a flag for each cell that specifies whether or not a cell is
         convertible for the storage calculation. 0 indicates confined storage is
         used. >0 indicates confined storage is used when head is above cell top
         and a mixed formulation of unconfined and confined storage is used when
         head is below cell top. (iconvert)
-    transient: ({True, False})
-        Boolean to indicate if the model is transient or steady-state.
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
