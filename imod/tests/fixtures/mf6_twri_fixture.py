@@ -171,3 +171,15 @@ def twri_result(tmpdir_factory):
     simulation.write(modeldir)
     simulation.run()
     return modeldir
+
+
+@pytest.mark.usefixtures("transient_twri_model")
+@pytest.fixture(scope="function")
+def transient_twri_result(tmpdir_factory, transient_twri_model):
+    # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
+    # directory between different testing modules.
+    modeldir = tmpdir_factory.mktemp("ex01-twri-transient")
+    simulation = transient_twri_model
+    simulation.write(modeldir)
+    simulation.run()
+    return modeldir

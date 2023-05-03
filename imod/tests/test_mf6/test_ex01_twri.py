@@ -469,6 +469,22 @@ def test_simulation_write_storage(transient_twri_model, tmp_path):
     simulation.write(modeldir, binary=True)
     simulation.run()
 
+    cbc = imod.mf6.open_cbc(
+        modeldir / "GWF_1/GWF_1.cbc", modeldir / "GWF_1/dis.dis.grb"
+    )
+
+    # Test if storage fluxes properly read
+    assert "sto-ss" in cbc.keys()
+    sto_ss = cbc["sto-ss"]
+
+    assert isinstance(sto_ss, xr.DataArray)
+    assert sto_ss.dims == ("time", "layer", "y", "x")
+    assert sto_ss.shape == (30, 3, 15, 15)
+
+    meanflux_layer = sto_ss.groupby("layer").mean(dim=xr.ALL_DIMS).compute()
+    mean_answer = np.array([-1.993060e-05, -2.536776e-06, -3.110719e-06])
+    np.testing.assert_allclose(meanflux_layer.values, mean_answer, rtol=2e-7)
+
 
 @pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
