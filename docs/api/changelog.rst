@@ -6,6 +6,21 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+Unreleased
+----------
+
+Added
+~~~~~
+
+- :class:`imod.mf6.SpecificStorage` and :class:`imod.mf6.StorageCoefficient` 
+  now have a ``save_flow`` argument.
+
+Fixed
+~~~~~
+
+- :func:`imod.mf6.open_cbc` can now read storage fluxes without error.
+
+
 [0.13.0] - 2023-05-02
 ---------------------
 
