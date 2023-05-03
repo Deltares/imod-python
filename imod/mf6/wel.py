@@ -1,5 +1,5 @@
 import warnings
-from typing import Union
+from typing import Dict, Union
 
 import numpy as np
 import pandas as pd
@@ -7,10 +7,10 @@ import xarray as xr
 import xugrid as xu
 
 from imod.mf6.pkgbase import (
-    BoundaryCondition,
     DisStructuredBoundaryCondition,
     DisVerticesBoundaryCondition,
 )
+from imod.mf6.pkgbase_highlevel import TimeDependentPackage
 from imod.mf6.pkgbase_lowlevel import Mf6TimeVaryingPkg
 from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
@@ -52,7 +52,7 @@ class Mf6Wel(Mf6TimeVaryingPkg):
             self.add_periodic_auxiliary_variable()
 
 
-class Well(BoundaryCondition):
+class Well(TimeDependentPackage):
     """
     Agnostic WEL package, which accepts x, y and a top and bottom of the well screens.
 
@@ -163,6 +163,22 @@ class Well(BoundaryCondition):
             # self.add_periodic_auxiliary_variable()
 
         self._validate_init_schemata(validate)
+
+    def assign_dims(self, arg) -> Dict:
+        is_da = isinstance(arg, xr.DataArray)
+        if is_da and "time" in arg.coords:
+            if arg.ndim != 2:
+                raise ValueError("time varying variable: must be 2d")
+            if arg.dims[0] != "time":
+                arg = arg.transpose()
+            da = xr.DataArray(
+                data=arg.values, coords={"time": arg["time"]}, dims=["time", "index"]
+            )
+            return da
+        elif is_da:
+            return ("index", arg.values)
+        else:
+            return ("index", arg)
 
     def clip_box(
         self,

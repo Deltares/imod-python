@@ -279,3 +279,130 @@ class Mf6TimeVaryingPkg(Mf6Pkg):
         header = " ".join(list(fields.keys()))
         with open(outpath, "w") as f:
             np.savetxt(fname=f, X=sparse_data, fmt=fmt, header=header)
+
+    def _max_active_n(self):
+        """
+        Determine the maximum active number of cells that are active
+        during a stress period.
+        """
+        da = self.dataset[self.period_data()[0]]
+        if "time" in da.coords:
+            nmax = int(da.groupby("time").count(xr.ALL_DIMS).max())
+        else:
+            nmax = int(da.count())
+        return nmax
+
+    def period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
+        pkg_directory = pathlib.Path(directory.stem) / pkgname
+
+        if binary:
+            ext = "bin"
+        else:
+            ext = "dat"
+
+        periods = {}
+        if "time" in bin_ds:  # one of bin_ds has time
+            package_times = bin_ds.coords["time"].values
+            starts = np.searchsorted(globaltimes, package_times) + 1
+            for i, start in enumerate(starts):
+                path = pkg_directory / f"{self._pkg_id}-{i}.{ext}"
+                periods[start] = path.as_posix()
+
+            repeat_stress = self.dataset.get("repeat_stress")
+            if repeat_stress is not None and repeat_stress.values[()] is not None:
+                keys = repeat_stress.isel(repeat_items=0).values
+                values = repeat_stress.isel(repeat_items=1).values
+                repeat_starts = np.searchsorted(globaltimes, keys) + 1
+                values_index = np.searchsorted(globaltimes, values) + 1
+                for i, start in zip(values_index, repeat_starts):
+                    periods[start] = periods[i]
+                # Now make sure the periods are sorted by key.
+                periods = dict(sorted(periods.items()))
+        else:
+            path = pkg_directory / f"{self._pkg_id}.{ext}"
+            periods[1] = path.as_posix()
+
+        return periods
+
+    def get_options(self, d, not_options=None):
+        if not_options is None:
+            not_options = self.period_data()
+
+        for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
+            if varname in not_options:
+                continue
+            v = self.dataset[varname].values[()]
+            if self._valid(v):  # skip None and False
+                d[varname] = v
+        return d
+
+    def render(self, directory, pkgname, globaltimes, binary):
+        """Render fills in the template only, doesn't write binary data"""
+        d = {"binary": binary}
+        bin_ds = self[self.period_data()]
+        d["periods"] = self.period_paths(
+            directory, pkgname, globaltimes, bin_ds, binary
+        )
+        # construct the rest (dict for render)
+        d = self.get_options(d)
+        d["maxbound"] = self._max_active_n()
+
+        # now we should add the auxiliary variable names to d
+        auxiliaries = (
+            self.get_auxiliary_variable_names()
+        )  # returns someting like {"concentration": "species"}
+
+        # loop over the types of auxiliary variables (for example concentration)
+        for auxvar in auxiliaries.keys():
+            # if "concentration" is a variable of this dataset
+            if auxvar in self.dataset.data_vars:
+                # if our concentration dataset has the species coordinate
+                if auxiliaries[auxvar] in self.dataset[auxvar].coords:
+                    # assign the species names list to d
+                    d["auxiliary"] = self.dataset[auxiliaries[auxvar]].values
+                else:
+                    # the error message is more specific than the code at this point.
+                    raise ValueError(
+                        f"{auxvar} requires a {auxiliaries[auxvar]} coordinate."
+                    )
+
+        return self._template.render(d)
+
+    def write_perioddata(self, directory, pkgname, binary):
+        if len(self.period_data()) == 0:
+            return
+        bin_ds = self[self.period_data()]
+
+        if binary:
+            ext = "bin"
+        else:
+            ext = "dat"
+
+        if "time" in bin_ds:  # one of bin_ds has time
+            for i in range(len(self.dataset.time)):
+                path = directory / pkgname / f"{self._pkg_id}-{i}.{ext}"
+                self.write_datafile(
+                    path, bin_ds.isel(time=i), binary=binary
+                )  # one timestep
+        else:
+            path = directory / pkgname / f"{self._pkg_id}.{ext}"
+            self.write_datafile(path, bin_ds, binary=binary)
+
+    def write(self, directory, pkgname, globaltimes, binary):
+        """
+        writes the blockfile and binary data
+
+        directory is modelname
+        """
+        directory = pathlib.Path(directory)
+        self.write_blockfile(
+            directory=directory,
+            pkgname=pkgname,
+            globaltimes=globaltimes,
+            binary=binary,
+        )
+        self.write_perioddata(
+            directory=directory,
+            pkgname=pkgname,
+            binary=binary,
+        )
