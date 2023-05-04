@@ -117,7 +117,8 @@ def read_cbc_headers(
             header = read_common_cbc_header(f)
             if header["imeth"] == 1:
                 datasize = (
-                    # Multiply by -1 because ndim3 is negative in this case
+                    # Multiply by -1 because ndim3 is stored as a negative for some reason.
+                    # (ndim3 is the integer size of the third dimension)
                     header["ndim1"]
                     * header["ndim2"]
                     * header["ndim3"]
