@@ -166,15 +166,15 @@ def open_imeth1_budgets(
     nlayer = grb_content["nlayer"]
     nrow = grb_content["nrow"]
     ncol = grb_content["ncol"]
-    coords = grb_content["coords"]
     budgets = cbc.open_imeth1_budgets(cbc_path, header_list)
-    coords["time"] = budgets["time"]
+    # Merge dictionaries
+    coords = grb_content["coords"] | {"time": budgets["time"]}
 
     return xr.DataArray(
         data=budgets.data.reshape((budgets["time"].size, nlayer, nrow, ncol)),
         coords=coords,
         dims=("time", "layer", "y", "x"),
-        name=None,
+        name=budgets.name,
     )
 
 
