@@ -98,7 +98,6 @@ def create_lake_package(is_unstructured):
     outlet1 = imod.mf6.OutletManning("Naardermeer", "", 3.0, 2.0, 3.0, 4.0)
     return imod.mf6.Lake.from_lakes_and_outlets([lake1], [outlet1])
 
-
 def create_vertices_discretization():
     """
     return imod.mf6.VerticesDiscretization object
@@ -216,6 +215,12 @@ STRUCTURED_GRID_PACKAGES = [
         column=[2, 2, 2],
         rate=[-5.0] * 3,
     ),
+    imod.mf6.MassSourceLoading(
+        rate=get_grid_da(False, np.float64, 0.33),
+        print_input=True,
+        print_flows=False,
+        save_flows=False,
+    )
 ] + [
     *create_instance_packages(is_unstructured=False),
     *create_instance_boundary_condition_packages(False),
