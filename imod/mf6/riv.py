@@ -37,16 +37,16 @@ class River(BoundaryCondition):
         if this flow package is used in simulations also involving transport, then this keyword specifies
         how outflow over this boundary is computed.
     print_input: ({True, False}, optional)
-        keyword to indicate that the list of drain information will be written
+        keyword to indicate that the list of river information will be written
         to the listing file immediately after it is read. Default is False.
     print_flows: ({True, False}, optional)
-        Indicates that the list of drain flow rates will be printed to the
+        Indicates that the list of river flow rates will be printed to the
         listing file for every stress period time step in which "BUDGET PRINT"
         is specified in Output Control. If there is no Output Control option and
         PRINT FLOWS is specified, then flow rates are printed for the last time
         step of each stress period. Default is False.
     save_flows: ({True, False}, optional)
-        Indicates that drain flow terms will be written to the file specified
+        Indicates that river flow terms will be written to the file specified
         with "BUDGET FILEOUT" in Output Control. Default is False.
     observations: [Not yet supported.]
         Default is None.

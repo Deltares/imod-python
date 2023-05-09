@@ -6,8 +6,23 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
-[Unreleased]
-------------
+[0.13.1] - 2023-05-05
+---------------------
+
+Added
+~~~~~
+
+- :class:`imod.mf6.SpecificStorage` and :class:`imod.mf6.StorageCoefficient` 
+  now have a ``save_flow`` argument.
+
+Fixed
+~~~~~
+
+- :func:`imod.mf6.open_cbc` can now read storage fluxes without error.
+
+
+[0.13.0] - 2023-05-02
+---------------------
 
 Added
 ~~~~~
@@ -20,6 +35,9 @@ Added
 - Added support for the Modflow6 Lake package
 - :func:`imod.select.points_in_bounds`, :func:`imod.select.points_indices`,
   :func:`imod.select.points_values` now support unstructured grids.
+- Added support for the Modflow 6 Lake package: :class:`imod.mf6.Lake`,
+  :class:`imod.mf6.LakeData`, :class:`imod.mf6.OutletManning`, :class:`OutletSpecified`,
+  :class:`OutletWeir`. See the examples for an application of the Lake package.
 
 Fixed
 ~~~~~

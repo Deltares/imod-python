@@ -35,7 +35,12 @@ from .fixtures.mf6_lake_package_fixture import (
     naardermeer,
 )
 from .fixtures.mf6_twri_disv_fixture import twri_disv_model
-from .fixtures.mf6_twri_fixture import transient_twri_model, twri_model, twri_result
+from .fixtures.mf6_twri_fixture import (
+    transient_twri_model,
+    transient_twri_result,
+    twri_model,
+    twri_result,
+)
 from .fixtures.mf6_welltest_fixture import (
     well_test_data_stationary,
     well_test_data_transient,

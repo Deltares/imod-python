@@ -74,6 +74,25 @@ def test_read_cbc_headers(twri_result):
         assert isinstance(headers["chd"][0], imod.mf6.out.cbc.Imeth6Header)
 
 
+@pytest.mark.usefixtures("transient_twri_result")
+def test_read_cbc_headers__transient(transient_twri_result):
+    modeldir = transient_twri_result
+    with imod.util.cd(modeldir):
+        headers = imod.mf6.read_cbc_headers("GWF_1/GWF_1.cbc")
+        assert isinstance(headers, dict)
+        assert sorted(headers.keys()) == [
+            "chd",
+            "drn",
+            "flow-ja-face",
+            "sto-ss",
+            "wel",
+        ]
+        assert isinstance(headers["chd"], list)
+        assert isinstance(headers["flow-ja-face"][0], imod.mf6.out.cbc.Imeth1Header)
+        assert isinstance(headers["chd"][0], imod.mf6.out.cbc.Imeth6Header)
+        assert isinstance(headers["sto-ss"][0], imod.mf6.out.cbc.Imeth1Header)
+
+
 def test_dis_indices():
     # Note: ia and ja use 1-based indexing as produced by modflow6!
     # Cell numbering, top-view:
@@ -180,6 +199,30 @@ def test_open_cbc__dis(twri_result):
         ]
         for array in cbc.values():
             assert array.shape == (1, 3, 15, 15)
+            assert isinstance(array, xr.DataArray)
+            assert isinstance(array.data, dask.array.Array)
+
+            # Test if no errors are thrown if the array is loaded into memory
+            array.load()
+
+
+@pytest.mark.usefixtures("transient_twri_result")
+def test_open_cbc__dis_transient(transient_twri_result):
+    modeldir = transient_twri_result
+    with imod.util.cd(modeldir):
+        cbc = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/dis.dis.grb")
+        assert isinstance(cbc, dict)
+        assert sorted(cbc.keys()) == [
+            "chd",
+            "drn",
+            "flow-front-face",
+            "flow-lower-face",
+            "flow-right-face",
+            "sto-ss",
+            "wel",
+        ]
+        for array in cbc.values():
+            assert array.shape == (30, 3, 15, 15)
             assert isinstance(array, xr.DataArray)
             assert isinstance(array.data, dask.array.Array)
 
