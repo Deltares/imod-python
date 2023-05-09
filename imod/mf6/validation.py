@@ -6,6 +6,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
+from imod.mf6.statusinfo import StatusInfo
 from imod.schemata import DimsSchema, NoDataComparisonSchema, ValidationError
 
 PKG_DIMS_SCHEMA = (
@@ -71,13 +72,14 @@ class DisBottomSchema(NoDataComparisonSchema):
                 raise ValidationError("inactive bottom above active cell")
 
 
-def validation_model_error_message(model_errors):
-    messages = []
+def validation_model_error_message(model_errors) -> StatusInfo:
+    statusinfo = StatusInfo()
     for name, pkg_errors in model_errors.items():
         pkg_header = f"{name}\n" + len(name) * "-" + "\n"
-        messages.append(pkg_header)
-        messages.append(validation_pkg_error_message(pkg_errors))
-    return "\n" + "\n".join(messages)
+        pkg_error = validation_pkg_error_message(pkg_errors)
+        statusinfo.add_error(pkg_header + pkg_error)
+
+    return statusinfo
 
 
 def validation_pkg_error_message(pkg_errors):

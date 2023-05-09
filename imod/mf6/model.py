@@ -15,8 +15,8 @@ from jinja2 import Template
 import imod
 from imod.mf6 import qgs_util
 from imod.mf6.pkgbase import Package
+from imod.mf6.statusinfo import StatusInfo
 from imod.mf6.validation import validation_model_error_message
-from imod.schemata import ValidationError
 
 
 def initialize_template(name: str) -> Template:
@@ -148,8 +148,15 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         self._check_for_required_packages(modelkey)
 
-    def _validate(self) -> None:
-        diskey = self.__get_diskey()
+    def _validate(self) -> StatusInfo:
+        statusinfo = StatusInfo()
+
+        try:
+            diskey = self.__get_diskey()
+        except Exception as e:
+            statusinfo.add_error(str(e))
+            return statusinfo
+
         dis = self[diskey]
         # We'll use the idomain for checking dims, shape, nodata.
         idomain = dis["idomain"]
@@ -180,12 +187,13 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 errors[pkgname] = pkg_errors
 
         if len(errors) > 0:
-            message = validation_model_error_message(errors)
-            raise ValidationError(message)
+            statusinfo += validation_model_error_message(errors)
+
+        return statusinfo
 
     def write(
         self, directory, modelname, globaltimes, binary=True, validate: bool = True
-    ) -> None:
+    ) -> StatusInfo:
         """
         Write model namefile
         Write packages
@@ -194,7 +202,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         modeldirectory = workdir / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
         if validate:
-            self._validate()
+            statusinfo = self._validate()
+            if statusinfo.has_errors():
+                return statusinfo
 
         # write model namefile
         namefile_content = self.render(modelname)
@@ -214,7 +224,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkgname}")
 
-        return
+        return StatusInfo()
 
     def dump(
         self, directory, modelname, validate: bool = True, mdal_compliant: bool = False
@@ -222,7 +232,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         modeldirectory = pathlib.Path(directory) / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
         if validate:
-            self._validate()
+            statusinfo = self._validate()
+            if statusinfo.has_errors():
+                return
 
         toml_content = collections.defaultdict(dict)
         for pkgname, pkg in self.items():
