@@ -158,7 +158,6 @@ class Well(BoundaryCondition):
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            # self.add_periodic_auxiliary_variable()
 
         self._validate_init_schemata(validate)
 
@@ -321,8 +320,6 @@ class Well(BoundaryCondition):
         When well screens hit multiple layers, groundwater extractions are
         distributed based on layer transmissivities.
         """
-        has_time = "time" in self.dataset.coords
-
         wells_df = self.dataset.to_dataframe()
         wells_df = wells_df.rename(
             columns={
@@ -330,6 +327,7 @@ class Well(BoundaryCondition):
                 "screen_bottom": "bottom",
             }
         )
+        index_names = wells_df.index.names
 
         # Unset multi-index, because assign_wells cannot deal with
         # multi-indices which is returned by self.dataset.to_dataframe() in
@@ -337,9 +335,8 @@ class Well(BoundaryCondition):
         wells_df = wells_df.reset_index()
         # TODO: Accept user-defined layers as well
         wells_assigned = assign_wells(wells_df, top, bottom, k)
-        if has_time:
-            # Set multi-index back again.
-            wells_assigned = wells_assigned.set_index(["index", "time"]).sort_index()
+        # Set multi-index again
+        wells_assigned = wells_assigned.set_index(index_names).sort_index()
 
         ds = xr.Dataset()
         # Groupby index and select first, to unset any duplicate records
@@ -352,13 +349,18 @@ class Well(BoundaryCondition):
             data_vars.append("concentration")
 
         ds_vars = wells_assigned[data_vars].to_xarray()
+        # "rate" variable in conversion from multi-indexed DataFrame to xarray
+        # DataArray results in duplicated values for "rate" along dimension
+        # "species". Select first species to reduce this again.
+        if "species" in index_names:
+            ds_vars["rate"] = ds_vars["rate"].isel(species=0)
         # Carefully rename the dimension and set coordinates before
         # assigning to dataset.
         d_rename = {"index": "ncellid"}
         ds_vars = ds_vars.rename_dims(**d_rename).rename_vars(**d_rename)
         ds_vars = ds_vars.assign_coords(**{"ncellid": ds.coords["ncellid"].values})
         ds = ds.assign(**dict(ds_vars.items()))
-
+        # Remove inactive cells
         ds = self.remove_inactive(ds, active)
 
         return Mf6Wel(**ds)
