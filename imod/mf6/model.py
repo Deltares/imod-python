@@ -10,6 +10,7 @@ import numpy as np
 import tomli
 import tomli_w
 import xugrid as xu
+from jinja2 import Template
 
 import imod
 from imod.mf6 import qgs_util
@@ -18,7 +19,24 @@ from imod.mf6.validation import validation_model_error_message
 from imod.schemata import ValidationError
 
 
+def initialize_template(name: str) -> Template:
+    loader = jinja2.PackageLoader("imod", "templates/mf6")
+    env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
+    return env.get_template(name)
+
+
 class Modflow6Model(collections.UserDict, abc.ABC):
+    _mandatory_packages = None
+    _model_id = ""
+
+    def __init__(self, **kwargs):
+        collections.UserDict.__init__(self)
+        for k, v in kwargs.items():
+            self[k] = v
+
+        self._options = {}
+        self._template = None
+
     def __setitem__(self, key, value):
         if len(key) > 16:
             raise KeyError(
@@ -32,12 +50,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
-    def _initialize_template(self, name: str):
-        loader = jinja2.PackageLoader("imod", "templates/mf6")
-        env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
-        self._template = env.get_template(name)
-
-    def _get_diskey(self):
+    def __get_diskey(self):
         dis_pkg_ids = ["dis", "disv", "disu"]
 
         diskeys = [
@@ -117,7 +130,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def render(self, modelname: str):
         dir_for_render = pathlib.Path(modelname)
-        d = {k: v for k, v in self.options.items() if not (v is None or v is False)}
+        d = {k: v for k, v in self._options.items() if not (v is None or v is False)}
         packages = []
         for pkgname, pkg in self.items():
             # Add the six to the package id
@@ -136,7 +149,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         self._check_for_required_packages(modelkey)
 
     def _validate(self) -> None:
-        diskey = self._get_diskey()
+        diskey = self.__get_diskey()
         dis = self[diskey]
         # We'll use the idomain for checking dims, shape, nodata.
         idomain = dis["idomain"]
@@ -291,7 +304,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         -------
         clipped : Modflow6Model
         """
-        clipped = type(self)(**self.options)
+        clipped = type(self)(**self._options)
         for key, pkg in self.items():
             clipped[key] = pkg.clip_box(
                 time_min=time_min,
@@ -320,7 +333,7 @@ class GroundwaterFlowModel(Modflow6Model):
         under_relaxation: bool = False,
     ):
         super().__init__()
-        self.options = {
+        self._options = {
             "listing_file": listing_file,
             "print_input": print_input,
             "print_flows": print_flows,
@@ -328,7 +341,7 @@ class GroundwaterFlowModel(Modflow6Model):
             "newton": newton,
             "under_relaxation": under_relaxation,
         }
-        self._initialize_template("gwf-nam.j2")
+        self._template = initialize_template("gwf-nam.j2")
 
     def write_qgis_project(self, directory, crs, aggregate_layers=False):
         """
@@ -341,9 +354,6 @@ class GroundwaterFlowModel(Modflow6Model):
 
         crs : str, int,
             anything that can be converted to a pyproj.crs.CRS
-
-        filename : Optional, str
-            name of qgis projectfile.
 
         aggregate_layers : Optional, bool
             If True, aggregate layers by taking the mean, i.e. ds.mean(dim="layer")
@@ -396,10 +406,11 @@ class GroundwaterTransportModel(Modflow6Model):
         save_flows: bool = False,
     ):
         super().__init__()
-        self.options = {
+        self._options = {
             "listing_file": listing_file,
             "print_input": print_input,
             "print_flows": print_flows,
             "save_flows": save_flows,
         }
-        self._initialize_template("gwt-nam.j2")
+
+        self._template = initialize_template("gwt-nam.j2")
