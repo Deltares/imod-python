@@ -9,6 +9,7 @@ from .fixtures.flow_basic_fixture import (
     two_days,
     well_df,
 )
+from .fixtures.flow_basic_unstructured_fixture import basic_unstructured_dis
 from .fixtures.flow_example_fixture import imodflow_model
 from .fixtures.mf6_circle_fixture import circle_model, circle_result
 from .fixtures.mf6_flow_with_transport_fixture import (
@@ -27,7 +28,12 @@ from .fixtures.mf6_flow_with_transport_fixture import (
     rate_fc,
     sp2_fc,
 )
-from .fixtures.mf6_lake_package_fixture import ijsselmeer, lake_package, naardermeer
+from .fixtures.mf6_lake_package_fixture import (
+    ijsselmeer,
+    lake_package,
+    lake_table,
+    naardermeer,
+)
 from .fixtures.mf6_twri_disv_fixture import twri_disv_model
 from .fixtures.mf6_twri_fixture import (
     transient_twri_model,

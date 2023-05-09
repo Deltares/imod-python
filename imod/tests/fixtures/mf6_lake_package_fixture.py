@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 import xarray as xr
+import xugrid as xu
 
 from imod.mf6.lak import Lake, LakeData, OutletManning
 
@@ -49,7 +50,7 @@ def naardermeer(basic_dis):
         lake_table = None
         if has_lake_table:
             lake_table = create_lake_table(3, 10, 20, 30)
-        return create_lake_data(
+        return create_lake_data_structured(
             is_lake, starting_stage=11.0, name="Naardermeer", lake_table=lake_table
         )
 
@@ -67,7 +68,7 @@ def ijsselmeer(basic_dis):
         lake_table = None
         if has_lake_table:
             lake_table = create_lake_table(6, 8, 9, 10, 11)
-        return create_lake_data(
+        return create_lake_data_structured(
             is_lake, starting_stage=15.0, name="IJsselmeer", lake_table=lake_table
         )
 
@@ -83,7 +84,12 @@ def lake_package(naardermeer, ijsselmeer):
     )
 
 
-def create_lake_data(
+@pytest.fixture(scope="function")
+def lake_table():
+    return create_lake_table(5, 2.1, 3.1415, 100)
+
+
+def create_lake_data_structured(
     is_lake,
     starting_stage,
     name,
@@ -132,3 +138,47 @@ def write_and_read(package, path, filename, globaltimes=None) -> str:
     with open(path / f"{filename}.lak") as f:
         actual = f.read()
     return actual
+
+
+def create_lake_data_unstructured(
+    is_lake,
+    starting_stage,
+    name,
+    status=None,
+    stage=None,
+    rainfall=None,
+    evaporation=None,
+    runoff=None,
+    inflow=None,
+    withdrawal=None,
+    auxiliary=None,
+    lake_table=None,
+):
+    HORIZONTAL = 0
+    connection_type = xu.full_like(is_lake, HORIZONTAL, dtype=np.floating).where(
+        is_lake
+    )
+    bed_leak = xu.full_like(is_lake, 0.2, dtype=np.floating).where(is_lake)
+    top_elevation = xu.full_like(is_lake, 0.3, dtype=np.floating).where(is_lake)
+    bot_elevation = xu.full_like(is_lake, 0.4, dtype=np.floating).where(is_lake)
+    connection_length = xu.full_like(is_lake, 0.5, dtype=np.floating).where(is_lake)
+    connection_width = xu.full_like(is_lake, 0.6, dtype=np.floating).where(is_lake)
+    return LakeData(
+        starting_stage=starting_stage,
+        boundname=name,
+        connection_type=connection_type,
+        bed_leak=bed_leak,
+        top_elevation=top_elevation,
+        bot_elevation=bot_elevation,
+        connection_length=connection_length,
+        connection_width=connection_width,
+        status=status,
+        stage=stage,
+        rainfall=rainfall,
+        evaporation=evaporation,
+        runoff=runoff,
+        inflow=inflow,
+        withdrawal=withdrawal,
+        auxiliary=auxiliary,
+        lake_table=lake_table,
+    )

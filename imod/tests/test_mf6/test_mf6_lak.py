@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+import xugrid as xu
 
 import imod.tests.fixtures.mf6_lake_package_fixture as mf_lake
 from imod.mf6.lak import (
@@ -256,10 +257,10 @@ def test_lake_rendering_transient(basic_dis, tmp_path):
         np.full((len(times_inflow)), 4.0), coords={"time": times_inflow}, dims=["time"]
     )
 
-    lake1 = mf_lake.create_lake_data(
+    lake1 = mf_lake.create_lake_data_structured(
         is_lake1, 11.0, "Naardermeer", rainfall=rainfall, inflow=inflow
     )
-    lake2 = mf_lake.create_lake_data(
+    lake2 = mf_lake.create_lake_data_structured(
         is_lake2, 11.0, "IJsselmeer", rainfall=rainfall, inflow=inflow
     )
     times_invert = [
@@ -396,7 +397,7 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
     outlet2 = OutletSpecified("IJsselmeer", "Naardermeer", rate)
     outlet3 = OutletWeir("IJsselmeer", "Naardermeer", invert, numeric)
 
-    lake_with_status = mf_lake.create_lake_data(
+    lake_with_status = mf_lake.create_lake_data_structured(
         is_lake1,
         11.0,
         "Naardermeer",
@@ -408,7 +409,7 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
         inflow=numeric,
         withdrawal=numeric,
     )
-    lake_without_status = mf_lake.create_lake_data(
+    lake_without_status = mf_lake.create_lake_data_structured(
         is_lake2,
         11.0,
         "IJsselmeer",
@@ -528,6 +529,120 @@ def test_lake_rendering_transient_all_timeseries(basic_dis, tmp_path):
           3  invert 0.3
           3  width 5.0
         end period
+    """
+    )
+    assert actual == expected
+
+
+def test_lake_rendering_unstructured(basic_unstructured_dis, tmp_path, lake_table):
+    """
+    This test builds a lake package on an unstructured grid. It uses an outlet that only has a lakein; the
+    lakeout is to an external boundary and the lakeout name is an empty string .
+    """
+    idomain, _, _ = basic_unstructured_dis
+
+    is_lake1 = xu.full_like(idomain, False, dtype=bool)
+    is_lake1[1, 2] = True
+    is_lake1[
+        1,
+        2,
+    ] = True
+    is_lake1[1, 3] = True
+
+    times_of_numeric_timeseries = [
+        np.datetime64("2000-01-01"),
+        np.datetime64("2000-03-01"),
+        np.datetime64("2000-05-01"),
+    ]
+    numeric = xr.DataArray(
+        np.full((len(times_of_numeric_timeseries)), 5.0),
+        coords={"time": times_of_numeric_timeseries},
+        dims=["time"],
+    )
+
+    lake1 = mf_lake.create_lake_data_unstructured(
+        is_lake1,
+        11.0,
+        "Naardermeer",
+        stage=numeric,
+        rainfall=numeric,
+        evaporation=numeric,
+        runoff=numeric,
+        inflow=numeric,
+        withdrawal=numeric,
+        lake_table=lake_table,
+    )
+
+    # this outlet only has an input lake. THe output lake is external and hence an empty string is passed as its name.
+    outlet1 = OutletManning("Naardermeer", "", 3.0, 2.0, 3.0, 4.0)
+    lake_package = Lake.from_lakes_and_outlets([lake1], [outlet1])
+
+    global_times = np.array(
+        [
+            np.datetime64("1999-01-01"),
+            np.datetime64("2000-01-01"),
+            np.datetime64("2000-02-01"),
+            np.datetime64("2000-03-01"),
+            np.datetime64("2000-04-01"),
+            np.datetime64("2000-05-01"),
+        ]
+    )
+    actual = mf_lake.write_and_read(lake_package, tmp_path, "lake-test", global_times)
+    expected = textwrap.dedent(
+        """\
+    begin options
+    end options
+
+    begin dimensions
+      nlakes 1
+      noutlets 1
+      ntables 1
+    end dimensions
+
+    begin packagedata
+      1 11.0 2 Naardermeer
+    end packagedata
+
+    begin connectiondata
+    1 1 2 3 horizontal 0.2 0.4 0.3 0.6 0.5
+    1 2 2 4 horizontal 0.2 0.4 0.3 0.6 0.5
+    end connectiondata
+
+    begin tables
+      1 TAB6 FILEIN Naardermeer.ltbl
+    end tables
+
+    begin outlets
+    1 0 manning 3.0 3.0 2.0 4.0
+    end outlets
+
+
+    begin period 2
+      1  stage 5.0
+      1  rainfall 5.0
+      1  evaporation 5.0
+      1  runoff 5.0
+      1  inflow 5.0
+      1  withdrawal 5.0
+    end period
+
+    begin period 4
+      1  stage 5.0
+      1  rainfall 5.0
+      1  evaporation 5.0
+      1  runoff 5.0
+      1  inflow 5.0
+      1  withdrawal 5.0
+    end period
+
+    begin period 6
+      1  stage 5.0
+      1  rainfall 5.0
+      1  evaporation 5.0
+      1  runoff 5.0
+      1  inflow 5.0
+      1  withdrawal 5.0
+    end period
     """
     )
     assert actual == expected
