@@ -148,6 +148,10 @@ class Package(PackageBase, abc.ABC):
     not the list input which is used in :class:`BoundaryCondition`.
     """
 
+    _pkg_id = ""
+    _init_schemata = {}
+    _write_schemata = {}
+
     def __init__(self, allargs=None):
         super().__init__(allargs)
 
