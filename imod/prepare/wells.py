@@ -164,11 +164,13 @@ def assign_wells(
     wells_in_bounds["k"] = 1.0
     wells_in_bounds["transmissivity"] = 1.0
     columns = list(set(wells_in_bounds.columns).difference(df))
-    if "time" in wells_in_bounds:
-        indexes = ["id", "time"]
-        columns.remove("time")
-    else:
-        indexes = "id"
+
+    indexes = ["id"]
+    for dim in ["species", "time"]:
+        if dim in wells_in_bounds:
+            indexes.append(dim)
+            columns.remove(dim)
+
     df[columns] = 1  # N.B. integer!
 
     assigned = (
