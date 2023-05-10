@@ -129,9 +129,9 @@ class Well(BoundaryCondition):
         y,
         x,
         rate,
-        id=None,
         concentration=None,
         concentration_boundary_type="aux",
+        id=None,
         print_input=False,
         print_flows=False,
         save_flows=False,
@@ -319,7 +319,18 @@ class Well(BoundaryCondition):
         Based on the model grid and top and bottoms, cellids are determined.
         When well screens hit multiple layers, groundwater extractions are
         distributed based on layer transmissivities.
+
+        Parameters
+        ----------
+
         """
+        # Ensure top, bottom & k
+        # are broadcasted to 3d grid
+        like = xr.ones_like(active)
+        top = like * top
+        bottom = like * bottom
+        k = like * k
+
         wells_df = self.dataset.to_dataframe()
         wells_df = wells_df.rename(
             columns={
@@ -331,7 +342,7 @@ class Well(BoundaryCondition):
 
         # Unset multi-index, because assign_wells cannot deal with
         # multi-indices which is returned by self.dataset.to_dataframe() in
-        # case of a "time" coordinate.
+        # case of a "time" and "species" coordinate.
         wells_df = wells_df.reset_index()
         # TODO: Accept user-defined layers as well
         wells_assigned = assign_wells(wells_df, top, bottom, k)
