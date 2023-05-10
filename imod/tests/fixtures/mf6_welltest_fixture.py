@@ -1,6 +1,59 @@
 import numpy as np
+import pandas as pd
 import pytest
 import xarray as xr
+
+
+@pytest.fixture(scope="session")
+def well_high_lvl_test_data_stationary():
+    screen_top = [0.0, 0.0, 0.0, 0.0, -6.0, -6.0, -6.0, -6.0]
+    screen_bottom = [-2.0, -2.0, -2.0, -2.0, -20.0, -20.0, -20.0, -20.0]
+    # fmt: off
+    y = [83.0, 77.0, 82.0, 71.0, 62.0, 52.0, 66.0, 59.0]
+    x = [81.0, 82.0, 75.0, 77.0, 68.0, 64.0, 52.0, 51.0]
+    # fmt: on
+    rate = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    rate_wel = xr.DataArray(rate, dims=("index",))
+
+    da_species = xr.DataArray(
+        [10, 23],
+        coords={"species": ["salinity", "temparature"]},
+        dims=("species",),
+    )
+
+    concentration = da_species * rate_wel
+
+    return screen_top, screen_bottom, y, x, rate_wel, concentration
+
+
+@pytest.fixture(scope="session")
+def well_high_lvl_test_data_transient():
+    screen_top = [0.0, 0.0, 0.0, 0.0, -6.0, -6.0, -6.0, -6.0]
+    screen_bottom = [-2.0, -2.0, -2.0, -2.0, -20.0, -20.0, -20.0, -20.0]
+    # fmt: off
+    y = [83.0, 77.0, 82.0, 71.0, 62.0, 52.0, 66.0, 59.0]
+    x = [81.0, 82.0, 75.0, 77.0, 68.0, 64.0, 52.0, 51.0]
+    # fmt: on
+    rate = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    globaltimes = pd.date_range("2000-01-01", "2000-01-06")
+    weltimes = globaltimes[:-1]
+
+    rate_time = xr.DataArray(
+        np.arange(len(weltimes)) + 1, coords={"time": weltimes}, dims=("time",)
+    )
+    rate_cells = xr.DataArray(rate, dims=("index",))
+    rate_wel = rate_time * rate_cells
+
+    da_species = xr.DataArray(
+        [10, 23],
+        coords={"species": ["salinity", "temparature"]},
+        dims=("species",),
+    )
+
+    concentration = da_species * rate_wel
+
+    return screen_top, screen_bottom, y, x, rate_wel, concentration
 
 
 @pytest.fixture(scope="session")

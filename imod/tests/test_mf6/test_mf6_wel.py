@@ -10,7 +10,128 @@ import imod
 from imod.schemata import ValidationError
 
 
-def test_render(well_test_data_stationary):
+def test_to_mf6_pkg__high_lvl_stationary(basic_dis, well_high_lvl_test_data_stationary):
+    # Arrange
+    ibound, top, bottom = basic_dis
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
+    active = ibound == 1
+    k = xr.ones_like(ibound)
+
+    nmax_cellid_expected = np.array(["layer", "row", "column"])
+    cellid_expected = np.array(
+        [
+            [1, 1, 9],
+            [1, 2, 9],
+            [1, 1, 8],
+            [1, 2, 8],
+            [2, 3, 7],
+            [2, 4, 7],
+            [2, 3, 6],
+            [2, 4, 6],
+        ],
+        dtype=np.int64,
+    )
+    rate_expected = np.array(np.ones((8,), dtype=np.float32))
+
+    # Act
+    mf6_wel = wel.to_mf6_pkg(active, top, bottom, k)
+    mf6_ds = mf6_wel.dataset
+
+    # Assert
+    assert dict(mf6_ds.dims) == {
+        "ncellid": 8,
+        "nmax_cellid": 3,
+        "species": 2,
+    }
+    np.testing.assert_equal(mf6_ds.coords["nmax_cellid"].values, nmax_cellid_expected)
+    np.testing.assert_equal(mf6_ds["cellid"].values, cellid_expected)
+    np.testing.assert_equal(mf6_ds["rate"].values, rate_expected)
+
+
+def test_to_mf6_pkg__high_lvl_multilevel(basic_dis, well_high_lvl_test_data_stationary):
+    # Arrange
+    ibound, top, bottom = basic_dis
+    screen_top, _, y, x, rate_wel, concentration = well_high_lvl_test_data_stationary
+    screen_bottom = [-20.0] * 8
+    wel = imod.mf6.Well(screen_top, screen_bottom, y, x, rate_wel, concentration)
+    active = ibound == 1
+    k = xr.ones_like(ibound)
+
+    nmax_cellid_expected = np.array(["layer", "row", "column"])
+    cellid_expected = np.array(
+        [
+            [1, 1, 9],
+            [1, 2, 9],
+            [1, 1, 8],
+            [1, 2, 8],
+            [2, 1, 9],
+            [2, 2, 9],
+            [2, 1, 8],
+            [2, 2, 8],
+            [2, 3, 7],
+            [2, 4, 7],
+            [2, 3, 6],
+            [2, 4, 6],
+        ],
+        dtype=np.int64,
+    )
+    rate_expected = np.array([0.25] * 4 + [0.75] * 4 + [1.0] * 4)
+
+    # Act
+    mf6_wel = wel.to_mf6_pkg(active, top, bottom, k)
+    mf6_ds = mf6_wel.dataset
+
+    # Assert
+    assert dict(mf6_ds.dims) == {
+        "ncellid": 12,
+        "nmax_cellid": 3,
+        "species": 2,
+    }
+    np.testing.assert_equal(mf6_ds.coords["nmax_cellid"].values, nmax_cellid_expected)
+    np.testing.assert_equal(mf6_ds["cellid"].values, cellid_expected)
+    np.testing.assert_equal(mf6_ds["rate"].values, rate_expected)
+
+
+def test_to_mf6_pkg__high_lvl_transient(basic_dis, well_high_lvl_test_data_transient):
+    # Arrange
+    ibound, top, bottom = basic_dis
+    wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
+    active = ibound == 1
+    k = xr.ones_like(ibound)
+
+    nmax_cellid_expected = np.array(["layer", "row", "column"])
+    cellid_expected = np.array(
+        [
+            [1, 1, 9],
+            [1, 2, 9],
+            [1, 1, 8],
+            [1, 2, 8],
+            [2, 3, 7],
+            [2, 4, 7],
+            [2, 3, 6],
+            [2, 4, 6],
+        ],
+        dtype=np.int64,
+    )
+    rate_expected = np.outer(np.ones((8,), dtype=np.float32), np.arange(5) + 1)
+
+    # Act
+    mf6_wel = wel.to_mf6_pkg(active, top, bottom, k)
+    mf6_ds = mf6_wel.dataset
+
+    # Assert
+    assert dict(mf6_wel.dataset.dims) == {
+        "ncellid": 8,
+        "time": 5,
+        "nmax_cellid": 3,
+        "species": 2,
+    }
+    np.testing.assert_equal(mf6_ds.coords["nmax_cellid"].values, nmax_cellid_expected)
+    np.testing.assert_equal(mf6_ds["cellid"].values, cellid_expected)
+    np.testing.assert_equal(mf6_ds["rate"].values, rate_expected)
+
+
+def test_render__stationary(well_test_data_stationary):
     layer, row, column, rate, _ = well_test_data_stationary
     wel = imod.mf6.WellDisStructured(
         layer=layer,
@@ -52,7 +173,7 @@ def test_render(well_test_data_stationary):
     assert actual == expected
 
 
-def test_render_transient(well_test_data_transient):
+def test_render__transient(well_test_data_transient):
     layer, row, column, times, rate, _ = well_test_data_transient
 
     with pytest.raises(ValueError, match="time varying variable: must be 2d"):
@@ -153,7 +274,7 @@ def test_validate_false():
     )
 
 
-def test_render_concentration_dis_structured_constant_time(well_test_data_stationary):
+def test_render__concentration_dis_structured_constant_time(well_test_data_stationary):
     layer, row, column, rate, injection_concentration = well_test_data_stationary
 
     concentration = xr.DataArray(
@@ -205,7 +326,7 @@ def test_render_concentration_dis_structured_constant_time(well_test_data_statio
             )  # check salinity and temperature was written to period data
 
 
-def test_render_concentration_dis_vertices_constant_time(well_test_data_stationary):
+def test_render__concentration_dis_vertices_constant_time(well_test_data_stationary):
     layer, row, column, rate, injection_concentration = well_test_data_stationary
 
     concentration = xr.DataArray(
@@ -239,7 +360,7 @@ def test_render_concentration_dis_vertices_constant_time(well_test_data_stationa
             )  # check salinity and temperature was written to period data
 
 
-def test_render_concentration_dis_vertices_transient(well_test_data_transient):
+def test_render__concentration_dis_vertices_transient(well_test_data_transient):
     layer, row, column, time, rate, injection_concentration = well_test_data_transient
 
     concentration = xr.DataArray(
