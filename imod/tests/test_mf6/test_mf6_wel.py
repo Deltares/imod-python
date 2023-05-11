@@ -49,6 +49,11 @@ def test_to_mf6_pkg__high_lvl_stationary(basic_dis, well_high_lvl_test_data_stat
 
 
 def test_to_mf6_pkg__high_lvl_multilevel(basic_dis, well_high_lvl_test_data_stationary):
+    """
+    Test with stationary wells where the first 4 well screens extend over 2 layers.
+    Rates are distributed based on the fraction of the screen length in each layer.
+    In this case: The first layer should get 0.25, the second 0.75.
+    """
     # Arrange
     ibound, top, bottom = basic_dis
     screen_top, _, y, x, rate_wel, concentration = well_high_lvl_test_data_stationary
