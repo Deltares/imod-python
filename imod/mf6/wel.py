@@ -11,7 +11,7 @@ from imod.mf6.pkgbase import (
     DisStructuredBoundaryCondition,
     DisVerticesBoundaryCondition,
 )
-from imod.mf6.pkgbase_lowlevel import Mf6Bc
+from imod.mf6.pkgbase_lowlevel import Mf6Bc, remove_inactive
 from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
 from imod.select.points import points_indices
@@ -292,38 +292,6 @@ class Well(BoundaryCondition):
 
         return cellid
 
-    # TODO: Move method to Mf6Bc in pkgbase_lowlvl
-    def remove_inactive(self, ds: xr.Dataset, active: xr.DataArray) -> xr.Dataset:
-        """
-        Drop list-based input cells in inactive cells.
-
-        Parameters
-        ----------
-        ds: xr.Dataset
-            Dataset with list-based input. Needs "cellid" variable.
-        active: xr.DataArray
-            Grid with active cells.
-        """
-
-        def unstack_columns(a):
-            # Unstack columns:
-            # https://stackoverflow.com/questions/64097426/is-there-unstack-in-numpy
-            # Make sure to use tuples, since these get the special treatment
-            # which we require for the indexing:
-            # https://numpy.org/doc/stable/user/basics.indexing.html#dealing-with-variable-numbers-of-indices-within-programs
-            return tuple(np.moveaxis(a, -1, 0))
-
-        if "cellid" not in ds.data_vars:
-            raise ValueError("Missing 'cellid' in dataset")
-        if "ncellid" not in ds.dims:
-            raise ValueError("Missing 'ncellid' dimension in dataset")
-
-        a = ds["cellid"].values - 1
-        cellid_indexes = unstack_columns(a)
-        valid = active.values[cellid_indexes]
-
-        return ds.loc[{"ncellid": valid}]
-
     def to_mf6_pkg(self, active, top, bottom, k) -> Mf6Wel:
         """
         Write package to Modflow 6 package.
@@ -385,7 +353,7 @@ class Well(BoundaryCondition):
         # Remove wells defined in inactive cells
         # Cells outside grid have already been
         # removed in assign_wells.
-        ds = self.remove_inactive(ds, active)
+        ds = remove_inactive(ds, active)
 
         return Mf6Wel(**ds)
 

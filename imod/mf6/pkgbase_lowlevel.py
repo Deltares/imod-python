@@ -9,6 +9,7 @@ We plan to split up the present attributes of the classes in pkgbase.py
 """
 
 import numpy as np
+import xarray as xr
 
 from imod.mf6.pkgbase import BoundaryCondition
 
@@ -68,3 +69,35 @@ class Mf6Bc(BoundaryCondition):
         """
         # return cls.__new__(cls)
         raise NotImplementedError("from_file not implemented")
+
+
+def remove_inactive(ds: xr.Dataset, active: xr.DataArray) -> xr.Dataset:
+    """
+    Drop list-based input cells in inactive cells.
+
+    Parameters
+    ----------
+    ds: xr.Dataset
+        Dataset with list-based input. Needs "cellid" variable.
+    active: xr.DataArray
+        Grid with active cells.
+    """
+
+    def unstack_columns(a):
+        # Unstack columns:
+        # https://stackoverflow.com/questions/64097426/is-there-unstack-in-numpy
+        # Make sure to use tuples, since these get the special treatment
+        # which we require for the indexing:
+        # https://numpy.org/doc/stable/user/basics.indexing.html#dealing-with-variable-numbers-of-indices-within-programs
+        return tuple(np.moveaxis(a, -1, 0))
+
+    if "cellid" not in ds.data_vars:
+        raise ValueError("Missing variable 'cellid' in dataset")
+    if "ncellid" not in ds.dims:
+        raise ValueError("Missing dimension 'ncellid' in dataset")
+
+    a = ds["cellid"].values - 1
+    cellid_indexes = unstack_columns(a)
+    valid = active.values[cellid_indexes]
+
+    return ds.loc[{"ncellid": valid}]
