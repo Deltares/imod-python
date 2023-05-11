@@ -292,10 +292,17 @@ class Well(BoundaryCondition):
 
         return cellid
 
-    def remove_inactive(self, ds, active):
+    # TODO: Move method to Mf6Bc in pkgbase_lowlvl
+    def remove_inactive(self, ds: xr.Dataset, active: xr.DataArray) -> xr.Dataset:
         """
-        Drop wells in inactive cells. Cells outside grid have already been
-        removed in assign_wells
+        Drop list-based input cells in inactive cells.
+
+        Parameters
+        ----------
+        ds: xr.Dataset
+            Dataset with list-based input. Needs "cellid" variable.
+        active: xr.DataArray
+            Grid with active cells.
         """
 
         def unstack_columns(a):
@@ -305,6 +312,11 @@ class Well(BoundaryCondition):
             # which we require for the indexing:
             # https://numpy.org/doc/stable/user/basics.indexing.html#dealing-with-variable-numbers-of-indices-within-programs
             return tuple(np.moveaxis(a, -1, 0))
+
+        if "cellid" not in ds.data_vars:
+            raise ValueError("Missing 'cellid' in dataset")
+        if "ncellid" not in ds.dims:
+            raise ValueError("Missing 'ncellid' dimension in dataset")
 
         a = ds["cellid"].values - 1
         cellid_indexes = unstack_columns(a)
@@ -344,7 +356,6 @@ class Well(BoundaryCondition):
         # multi-indices which is returned by self.dataset.to_dataframe() in
         # case of a "time" and "species" coordinate.
         wells_df = wells_df.reset_index()
-        # TODO: Accept user-defined layers as well
         wells_assigned = assign_wells(wells_df, top, bottom, k)
         # Set multi-index again
         wells_assigned = wells_assigned.set_index(index_names).sort_index()
@@ -371,7 +382,9 @@ class Well(BoundaryCondition):
         ds_vars = ds_vars.rename_dims(**d_rename).rename_vars(**d_rename)
         ds_vars = ds_vars.assign_coords(**{"ncellid": ds.coords["ncellid"].values})
         ds = ds.assign(**dict(ds_vars.items()))
-        # Remove inactive cells
+        # Remove wells defined in inactive cells
+        # Cells outside grid have already been
+        # removed in assign_wells.
         ds = self.remove_inactive(ds, active)
 
         return Mf6Wel(**ds)
