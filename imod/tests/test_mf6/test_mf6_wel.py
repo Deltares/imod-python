@@ -157,22 +157,22 @@ def test_clip_box__high_lvl_transient(well_high_lvl_test_data_transient):
     wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
 
     # Act & Assert
-    ## Test clipping x & y without specified time
+    # Test clipping x & y without specified time
     ds = wel.clip_box(x_min=52.0, x_max=76.0, y_max=67.0).dataset
     assert dict(ds.dims) == {"index": 3, "time": 5, "species": 2}
 
-    ## Test clipping with z
+    # Test clipping with z
     ds = wel.clip_box(z_max=-2.0).dataset
     assert dict(ds.dims) == {"index": 4, "time": 5, "species": 2}
     ds = wel.clip_box(z_min=-8.0).dataset
     assert dict(ds.dims) == {"index": 4, "time": 5, "species": 2}
 
-    ## Test clipping with specified time
+    # Test clipping with specified time
     timestr = "2000-01-03"
     ds = wel.clip_box(x_min=52.0, x_max=76.0, y_max=67.0, time_min=timestr).dataset
     assert dict(ds.dims) == {"index": 3, "time": 3, "species": 2}
 
-    ## Test clipping with specified time inbetween timesteps
+    # Test clipping with specified time inbetween timesteps
     timestr = "2000-01-03 18:00:00"
     ds = wel.clip_box(x_min=52.0, x_max=76.0, y_max=67.0, time_min=timestr).dataset
     assert dict(ds.dims) == {"index": 3, "time": 3, "species": 2}
