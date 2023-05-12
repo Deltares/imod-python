@@ -136,6 +136,51 @@ def test_to_mf6_pkg__high_lvl_transient(basic_dis, well_high_lvl_test_data_trans
     np.testing.assert_equal(mf6_ds["rate"].values, rate_expected)
 
 
+def test_clip_box__high_lvl_stationary(well_high_lvl_test_data_stationary):
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
+
+    # Test clipping x & y without specified time
+    ds = wel.clip_box(x_min=52.0, x_max=76.0, y_max=67.0).dataset
+    assert dict(ds.dims) == {"index": 3, "species": 2}
+
+    # Test clipping with z
+    ds = wel.clip_box(z_max=-2.0).dataset
+    assert dict(ds.dims) == {"index": 4, "species": 2}
+    ds = wel.clip_box(z_min=-8.0).dataset
+    assert dict(ds.dims) == {"index": 4, "species": 2}
+
+
+def test_clip_box__high_lvl_transient(well_high_lvl_test_data_transient):
+    wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
+
+    # Test clipping x & y without specified time
+    ds = wel.clip_box(x_min=52.0, x_max=76.0, y_max=67.0).dataset
+    assert dict(ds.dims) == {"index": 3, "time": 5, "species": 2}
+
+    # Test clipping with z
+    ds = wel.clip_box(z_max=-2.0).dataset
+    assert dict(ds.dims) == {"index": 4, "time": 5, "species": 2}
+    ds = wel.clip_box(z_min=-8.0).dataset
+    assert dict(ds.dims) == {"index": 4, "time": 5, "species": 2}
+
+    # Test clipping with specified time
+    timestr = "2000-01-03"
+    ds = wel.clip_box(x_min=52.0, x_max=76.0, y_max=67.0, time_min=timestr).dataset
+    assert dict(ds.dims) == {"index": 3, "time": 3, "species": 2}
+
+    # Test clipping with specified time inbetween timesteps
+    timestr = "2000-01-03 18:00:00"
+    ds = wel.clip_box(x_min=52.0, x_max=76.0, y_max=67.0, time_min=timestr).dataset
+    assert dict(ds.dims) == {"index": 3, "time": 3, "species": 2}
+    ds_first_time = ds.isel(time=0)
+    assert ds_first_time.coords["time"] == np.datetime64(timestr)
+    np.testing.assert_allclose(ds_first_time["rate"].values, np.array([3.0, 3.0, 3.0]))
+    np.testing.assert_allclose(
+        ds_first_time["concentration"].values,
+        np.array([[30.0, 30.0, 30.0], [69.0, 69.0, 69.0]]),
+    )
+
+
 def test_render__stationary(well_test_data_stationary):
     layer, row, column, rate, _ = well_test_data_stationary
     wel = imod.mf6.WellDisStructured(
