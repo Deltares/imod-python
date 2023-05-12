@@ -5,6 +5,61 @@ import xarray as xr
 
 
 @pytest.fixture(scope="session")
+def mf6wel_test_data_stationary():
+    cellid_values = np.array(
+        [
+            [1, 1, 9],
+            [1, 2, 9],
+            [1, 1, 8],
+            [1, 2, 8],
+            [2, 3, 7],
+            [2, 4, 7],
+            [2, 3, 6],
+            [2, 4, 6],
+        ],
+    )
+    coords = {"ncellid": np.arange(8) + 1, "nmax_cellid": ["layer", "row", "column"]}
+    cellid = xr.DataArray(cellid_values, coords=coords, dims=("ncellid", "nmax_cellid"))
+    rate = xr.DataArray(
+        [1.0] * 8, coords={"ncellid": np.arange(8) + 1}, dims=("ncellid",)
+    )
+    return cellid, rate
+
+
+@pytest.fixture(scope="session")
+def mf6wel_test_data_transient():
+    cellid_values = np.array(
+        [
+            [1, 1, 9],
+            [1, 2, 9],
+            [1, 1, 8],
+            [1, 2, 8],
+            [2, 3, 7],
+            [2, 4, 7],
+            [2, 3, 6],
+            [2, 4, 6],
+        ],
+    )
+    coords = {"ncellid": np.arange(8) + 1, "nmax_cellid": ["layer", "row", "column"]}
+    cellid = xr.DataArray(cellid_values, coords=coords, dims=("ncellid", "nmax_cellid"))
+
+    rate = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    globaltimes = pd.date_range("2000-01-01", "2000-01-06")
+    weltimes = globaltimes[:-1]
+
+    rate_time = xr.DataArray(
+        np.arange(len(weltimes)) + 1, coords={"time": weltimes}, dims=("time",)
+    )
+    rate_cells = xr.DataArray(
+        rate, coords={"ncellid": np.arange(8) + 1}, dims=("ncellid",)
+    )
+    rate_wel = rate_time * rate_cells
+
+    return cellid, rate_wel
+
+
+@pytest.fixture(scope="session")
 def well_high_lvl_test_data_stationary():
     screen_top = [0.0, 0.0, 0.0, 0.0, -6.0, -6.0, -6.0, -6.0]
     screen_bottom = [-2.0, -2.0, -2.0, -2.0, -20.0, -20.0, -20.0, -20.0]
