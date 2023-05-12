@@ -185,6 +185,35 @@ def test_clip_box__high_lvl_transient(well_high_lvl_test_data_transient):
     )
 
 
+def test_create_cellid(basic_dis, well_high_lvl_test_data_stationary):
+    # Arrange
+    ibound, _, _ = basic_dis
+    _, _, y, x, _, _ = well_high_lvl_test_data_stationary
+    layer = [1, 1, 1, 1, 2, 2, 2, 2]
+
+    nmax_cellid_expected = np.array(["layer", "row", "column"])
+    cellid_expected = np.array(
+        [
+            [1, 1, 9],
+            [1, 2, 9],
+            [1, 1, 8],
+            [1, 2, 8],
+            [2, 3, 7],
+            [2, 4, 7],
+            [2, 3, 6],
+            [2, 4, 6],
+        ],
+        dtype=np.int64,
+    )
+
+    # Act
+    cellid = imod.mf6.wel.create_cellid(ibound, x, y, layer)
+
+    # Assert
+    np.testing.assert_array_equal(cellid, cellid_expected)
+    np.testing.assert_equal(cellid.coords["nmax_cellid"].values, nmax_cellid_expected)
+
+
 def test_render__stationary(well_test_data_stationary):
     layer, row, column, rate, _ = well_test_data_stationary
     wel = imod.mf6.WellDisStructured(
