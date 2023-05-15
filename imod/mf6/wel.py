@@ -110,6 +110,8 @@ class Well(BoundaryCondition):
         ``set_repeat_stress`` method.
     """
 
+    _pkg_id = "wel"
+
     _auxiliary_data = {"concentration": "species"}
     _init_schemata = {
         "screen_top": [DTypeSchema(np.floating)],
