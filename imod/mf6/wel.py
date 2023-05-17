@@ -10,7 +10,7 @@ from imod.mf6.pkgbase import (
     DisStructuredBoundaryCondition,
     DisVerticesBoundaryCondition,
 )
-from imod.mf6.pkgbase_lowlevel import Mf6Bc, remove_inactive
+from imod.mf6.pkgbase_mf6 import Mf6BoundaryCondition, remove_inactive
 from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
 from imod.select.points import points_indices
@@ -19,12 +19,12 @@ from imod.select.points import points_indices
 # FUTURE: There was an idea to autogenerate these object.
 # This was relevant:
 # https://github.com/Deltares/xugrid/blob/main/xugrid/core/wrap.py#L90
-class Mf6Wel(Mf6Bc):
+class Mf6Wel(Mf6BoundaryCondition):
     _pkg_id = "wel"
 
     _period_data = ("cellid", "rate")
     _keyword_map = {}
-    _template = Mf6Bc._initialize_template(_pkg_id)
+    _template = Mf6BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
 
     _init_schemata = {
