@@ -37,8 +37,8 @@ def test_circle_roundtrip(circle_model, tmpdir_factory):
     roundtrip(circle_model, tmpdir_factory, "circle")
 
 
-class TestSimulation:
-    def test_write_when_called_with_default_arguments_then_writes_expected_files(
+class TestModflow6Simulation:
+    def test_write_with_default_arguments_writes_expected_files(
         self, tmpdir_factory
     ):
         # Arrange.
@@ -53,7 +53,7 @@ class TestSimulation:
         # Assert.
         assert os.path.exists(os.path.join(tmp_path, "mfsim.nam"))
 
-    def test_write_when_modflow6model_has_errors_then_raises_exception(
+    def test_write_modflow6model_has_errors_raises_exception(
         self, tmpdir_factory
     ):
         # Arrange.

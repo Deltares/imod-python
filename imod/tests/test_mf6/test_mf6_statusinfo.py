@@ -2,7 +2,7 @@ from imod.mf6.statusinfo import StatusInfo, NestedStatusInfo
 
 
 class TestStatusInfo:
-    def test_add_error_when_message_is_added_then_has_error_returns_true(self):
+    def test_errors_add_message_has_error(self):
         # Arrange.
         status_info = StatusInfo()
 
@@ -13,7 +13,7 @@ class TestStatusInfo:
         assert status_info.has_errors()
         assert len(status_info.errors) == 1
 
-    def test_add_error_when_multiple_messages_are_added_then_error_property_contains_multiple_messages(
+    def test_errors_add_three_messages_has_three_messages(
         self,
     ):
         # Arrange.
@@ -30,7 +30,7 @@ class TestStatusInfo:
 
 
 class TestNestedStatusInfo:
-    def test_errors_returns_all_nested_errors(self):
+    def test_errors_multiple_children_and_grandchildren_flatten_nested_errors(self):
         # Arrange.
         root = NestedStatusInfo()
         child1 = NestedStatusInfo()

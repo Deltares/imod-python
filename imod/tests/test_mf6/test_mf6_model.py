@@ -65,7 +65,7 @@ def test_checks_required_pkgs(idomain_and_bottom):
     gwf_model.pop("dis")
 
     with pytest.raises(
-        ValueError, match="No dis/disv/disu package found in model GWF_1"
+            ValueError, match="No dis/disv/disu package found in model GWF_1"
     ):
         gwf_model._check_for_required_packages("GWF_1")
 
@@ -90,9 +90,7 @@ def test_circle_roundtrip(circle_model, tmp_path):
 
 
 class TestModel:
-    def test_write_when_called_with_valid_model_returns_without_errors(
-        self, tmpdir_factory
-    ):
+    def test_write_valid_model_without_error(self, tmpdir_factory):
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
@@ -116,9 +114,7 @@ class TestModel:
         # Assert.
         assert not status.has_errors()
 
-    def test_write_when_called_without_discretization_package_returns_with_error(
-        self, tmpdir_factory
-    ):
+    def test_write_without_dis_pkg_return_error(self, tmpdir_factory):
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
@@ -137,9 +133,7 @@ class TestModel:
         # Assert.
         assert status.has_errors()
 
-    def test_write_when_called_with_invalid_package_returns_with_error(
-        self, tmpdir_factory
-    ):
+    def test_write_with_invalid_pkg_returns_error(self, tmpdir_factory):
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
@@ -166,9 +160,7 @@ class TestModel:
         # Assert.
         assert status.has_errors()
 
-    def test_write_when_called_with_two_invalid_packages_returns_with_both_error(
-        self, tmpdir_factory
-    ):
+    def test_write_with_two_invalid_pkg_returns_two_errors(self, tmpdir_factory):
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"

@@ -3,7 +3,6 @@ from typing import List
 
 
 class StatusInfoBase(ABC):
-
     def __init__(self, title: str = ""):
         self.__title: str = title
 
@@ -32,6 +31,8 @@ class StatusInfoBase(ABC):
 class StatusInfo(StatusInfoBase):
     """
     This class can be used to collect any status messages.
+    In its current state, the object is limited to error messages.
+    But this can be extended later with e.g. warnings.
     """
 
     def __init__(self, title: str = ""):
@@ -50,7 +51,7 @@ class StatusInfo(StatusInfoBase):
 
     def to_string(self) -> str:
         header = self.title + ":" + "\n"
-        indented_errors = '{1}{0}'.format("\n".join(self.errors), "\t* ")
+        indented_errors = "{1}{0}".format("\n".join(self.errors), "\t* ")
         return header + indented_errors
 
 
@@ -79,7 +80,7 @@ class NestedStatusInfo(StatusInfoBase):
                 return True
         return False
 
-    def to_string(self, level: int = 0) -> str:
+    def to_string(self) -> str:
         string = ""
         for child in self.__children:
             string += "\n* " + child.to_string()
