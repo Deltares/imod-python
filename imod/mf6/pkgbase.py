@@ -13,6 +13,8 @@ import xugrid as xu
 import imod
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
+import copy
+from imod.mf6.regridding_tools import RegridderInstancesCollection
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
@@ -737,6 +739,19 @@ class Package(PackageBase, abc.ABC):
                 masked[var] = da
 
         return type(self)(**masked)
+    
+    def regrid_like(self, targetgrid, regridder_types=None):
+        regridder_collection = RegridderInstancesCollection()
+        chosen_regridder_types = copy.deepcopy(self._regrid_method)
+        if regridder_types is not None:
+            chosen_regridder_types.update(regridder_types)
+
+        new_package = copy.deepcopy(self)
+
+        for source_dataarray_name, regridder_typename in chosen_regridder_types.items():
+            regridder = regridder_collection.get_regridder(regridder_typename, self.dataset[source_dataarray_name], targetgrid)
+            new_package[source_dataarray_name] = regridder.regrid_array(self.dataset[source_dataarray_name])
+        return new_package
 
 
 class BoundaryCondition(Package, abc.ABC):

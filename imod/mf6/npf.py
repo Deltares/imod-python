@@ -284,6 +284,18 @@ class NodePropertyFlow(Package):
     }
     _template = Package._initialize_template(_pkg_id)
 
+    _regrid_method = {
+        "icelltype": "BarycentricInterpolator",
+        "k":  "BarycentricInterpolator",
+        "rewet_layer":  "BarycentricInterpolator",
+        "k22": "BarycentricInterpolator",
+        "k33": "BarycentricInterpolator",
+        "angle1": "BarycentricInterpolator",
+        "angle2": "BarycentricInterpolator",
+        "angle3": "BarycentricInterpolator",
+    }
+
+
     def __init__(
         self,
         icelltype,
