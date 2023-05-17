@@ -1,7 +1,7 @@
-from imod.mf6.statusinfo import StatusInfo
+from imod.mf6.statusinfo import StatusInfo, NestedStatusInfo
 
 
-class TestSimulation:
+class TestStatusInfo:
     def test_add_error_when_message_is_added_then_has_error_returns_true(self):
         # Arrange.
         status_info = StatusInfo()
@@ -28,17 +28,29 @@ class TestSimulation:
         assert status_info.has_errors()
         assert len(status_info.errors) == 3
 
-    def test_iadd_when_adding_two_objects_then_second_object_is_added_to_first(self):
-        # Arrange.
-        status_info1 = StatusInfo()
-        status_info2 = StatusInfo()
 
-        status_info1.add_error("error message 1")
-        status_info2.add_error("error message 2")
+class TestNestedStatusInfo:
+    def test_errors_returns_all_nested_errors(self):
+        # Arrange.
+        root = NestedStatusInfo()
+        child1 = NestedStatusInfo()
+        child2 = StatusInfo()
+        grand_child1 = NestedStatusInfo()
+        grand_child2 = StatusInfo()
+
+        root.add(child1)
+        root.add(child2)
+
+        child1.add(grand_child1)
+        child1.add(grand_child2)
+
+        child2.add_error("test error1")
+        grand_child2.add_error("test error2")
 
         # Act.
-        status_info1 += status_info2
+        has_errors = root.has_errors()
+        errors = root.errors
 
         # Assert.
-        assert len(status_info1.errors) == 2
-        assert len(status_info2.errors) == 1
+        assert has_errors
+        assert len(errors) == 2

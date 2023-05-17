@@ -1,12 +1,13 @@
 """
 This module contains specific validation utilities for Modflow 6.
 """
+from typing import Dict, List
 
 import numpy as np
 import xarray as xr
 import xugrid as xu
 
-from imod.mf6.statusinfo import StatusInfo
+from imod.mf6.statusinfo import StatusInfo, NestedStatusInfo, StatusInfoBase
 from imod.schemata import DimsSchema, NoDataComparisonSchema, ValidationError
 
 PKG_DIMS_SCHEMA = (
@@ -72,19 +73,22 @@ class DisBottomSchema(NoDataComparisonSchema):
                 raise ValidationError("inactive bottom above active cell")
 
 
-def validation_model_error_message(model_errors) -> StatusInfo:
-    statusinfo = StatusInfo()
-    for name, pkg_errors in model_errors.items():
-        pkg_header = f"{name}\n" + len(name) * "-" + "\n"
-        pkg_error = validation_pkg_error_message(pkg_errors)
-        statusinfo.add_error(pkg_header + pkg_error)
-
-    return statusinfo
-
-
 def validation_pkg_error_message(pkg_errors):
     messages = []
     for var, var_errors in pkg_errors.items():
         messages.append(f"* {var}")
         messages.extend(f"\t- {error}" for error in var_errors)
     return "\n" + "\n".join(messages)
+
+
+def pkg_errors_to_status_info(
+    pkg_name: str, pkg_errors: Dict[str, List[ValidationError]]
+) -> StatusInfoBase:
+    pkg_status_info = NestedStatusInfo(f"{pkg_name} package")
+    for var_name, var_errors in pkg_errors.items():
+        var_status_info = StatusInfo(var_name)
+        for var_error in var_errors:
+            var_status_info.add_error(str(var_error))
+        pkg_status_info.add(var_status_info)
+
+    return pkg_status_info

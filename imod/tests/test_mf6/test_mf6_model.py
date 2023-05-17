@@ -8,6 +8,7 @@ from jinja2 import Template
 import imod
 from imod.mf6.model import Modflow6Model
 from imod.mf6.pkgbase import Package
+from imod.schemata import ValidationError
 
 
 # Duplicate from test_mf6_dis.py
@@ -147,7 +148,9 @@ class TestModel:
 
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
-        discretization_mock._validate.return_value = {"test_var": "error_string"}
+        discretization_mock._validate.return_value = {
+            "test_var": [ValidationError("error_string")]
+        }
 
         sut["dis"] = discretization_mock
 
@@ -174,11 +177,15 @@ class TestModel:
 
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
-        discretization_mock._validate.return_value = {"test1_var": "error_string1"}
+        discretization_mock._validate.return_value = {
+            "test1_var": [ValidationError("error_string1")]
+        }
 
         package_mock = MagicMock(spec_set=Package)
         package_mock._pkg_id = "test_package"
-        package_mock._validate.return_value = {"test2_var": "error_string2"}
+        package_mock._validate.return_value = {
+            "test2_var": [ValidationError("error_string2")]
+        }
 
         sut["dis"] = discretization_mock
         sut["test_package"] = package_mock
