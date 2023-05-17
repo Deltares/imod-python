@@ -15,7 +15,8 @@ from jinja2 import Template
 import imod
 from imod.mf6 import qgs_util
 from imod.mf6.pkgbase import Package
-from imod.mf6.validation import validation_model_error_message
+from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
+from imod.mf6.validation import pkg_errors_to_status_info
 from imod.schemata import ValidationError
 
 
@@ -148,19 +149,25 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         self._check_for_required_packages(modelkey)
 
-    def _validate(self) -> None:
-        diskey = self.__get_diskey()
+    def _validate(self, model_name: str = "") -> StatusInfoBase:
+        try:
+            diskey = self.__get_diskey()
+        except Exception as e:
+            status_info = StatusInfo(f"{model_name} model")
+            status_info.add_error(str(e))
+            return status_info
+
         dis = self[diskey]
         # We'll use the idomain for checking dims, shape, nodata.
         idomain = dis["idomain"]
         bottom = dis["bottom"]
 
-        errors = {}
-        for pkgname, pkg in self.items():
+        model_status_info = NestedStatusInfo(f"{model_name} model")
+        for pkg_name, pkg in self.items():
             # Check for all schemata when writing. Types and dimensions
             # may have been changed after initialization...
 
-            if pkgname in ["adv"]:
+            if pkg_name in ["adv"]:
                 continue  # some packages can be skipped
 
             # Concatenate write and init schemata.
@@ -177,24 +184,25 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 bottom=bottom,
             )
             if len(pkg_errors) > 0:
-                errors[pkgname] = pkg_errors
+                model_status_info.add(pkg_errors_to_status_info(pkg_name, pkg_errors))
 
-        if len(errors) > 0:
-            message = validation_model_error_message(errors)
-            raise ValidationError(message)
+        return model_status_info
 
     def write(
         self, directory, modelname, globaltimes, binary=True, validate: bool = True
-    ) -> None:
+    ) -> StatusInfoBase:
         """
         Write model namefile
         Write packages
         """
+
         workdir = pathlib.Path(directory)
         modeldirectory = workdir / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
         if validate:
-            self._validate()
+            model_status_info = self._validate(modelname)
+            if model_status_info.has_errors():
+                return model_status_info
 
         # write model namefile
         namefile_content = self.render(modelname)
@@ -203,18 +211,18 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             f.write(namefile_content)
 
         # write package contents
-        for pkgname, pkg in self.items():
+        for pkg_name, pkg in self.items():
             try:
                 pkg.write(
                     directory=modeldirectory,
-                    pkgname=pkgname,
+                    pkgname=pkg_name,
                     globaltimes=globaltimes,
                     binary=binary,
                 )
             except Exception as e:
-                raise type(e)(f"{e}\nError occured while writing {pkgname}")
+                raise type(e)(f"{e}\nError occured while writing {pkg_name}")
 
-        return
+        return NestedStatusInfo(modelname)
 
     def dump(
         self, directory, modelname, validate: bool = True, mdal_compliant: bool = False
@@ -222,7 +230,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         modeldirectory = pathlib.Path(directory) / modelname
         modeldirectory.mkdir(exist_ok=True, parents=True)
         if validate:
-            self._validate()
+            statusinfo = self._validate()
+            if statusinfo.has_errors():
+                raise ValidationError(statusinfo.to_string())
 
         toml_content = collections.defaultdict(dict)
         for pkgname, pkg in self.items():
