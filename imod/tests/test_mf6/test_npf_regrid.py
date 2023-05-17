@@ -5,38 +5,29 @@ import numpy as np
 import xarray as xr
 import imod 
 
-@pytest.fixture(scope="function")
-def disk():
-    return xu.data.disk()["face_z"]
 
 
-def quads(dx):
-    xmin, ymin, xmax, ymax = xu.data.disk().ugrid.total_bounds
-    x = np.arange(xmin, xmax, dx) + 0.5 * dx
-    y = np.arange(ymin, ymax, dx) + 0.5 * dx
+def test_regrid(tmp_path):
 
-    da = xr.DataArray(
-        data=np.full((y.size, x.size), np.nan),
-        coords={"y": y, "x": x},
-        dims=[
-            "y",
-            "x",
-        ],
+    grid = imod.data.circle()
+    nlayer = 15
+
+    nface = grid.n_face
+    layer = np.arange(nlayer, dtype=int) + 1
+    k_value = 10.0
+    idomain = xu.UgridDataArray(
+        xr.DataArray(
+            np.ones((nlayer, nface), dtype=np.int32),
+            coords={"layer": layer},
+            dims=["layer", grid.face_dimension],
+        ),
+        grid=grid,
     )
-    return xu.UgridDataArray.from_structured(da)
-
-
-
-
-def test_regrid(disk):
-
-    k = disk
-
-    icelltype = disk
+    k = xu.full_like(idomain, k_value, dtype=float)
 
 
     npf = imod.mf6.NodePropertyFlow(
-        icelltype=icelltype,
+        icelltype=idomain,
         k=k,
         variable_vertical_conductance=True,
         dewatered=True,
@@ -45,4 +36,8 @@ def test_regrid(disk):
         alternative_cell_averaging="AMT-HMK",
     )
 
-    new_npf=npf.regrid_like(quads(1) ) 
+    new_npf=npf.regrid_like( k ) 
+    new_rendered = new_npf.render(tmp_path, "regridded", None,False)
+    original_rendered = npf.render(tmp_path, "original", None,False)
+
+    assert(new_rendered == original_rendered)

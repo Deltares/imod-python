@@ -287,7 +287,6 @@ class NodePropertyFlow(Package):
     _regrid_method = {
         "icelltype": "BarycentricInterpolator",
         "k":  "BarycentricInterpolator",
-        "rewet_layer":  "BarycentricInterpolator",
         "k22": "BarycentricInterpolator",
         "k33": "BarycentricInterpolator",
         "angle1": "BarycentricInterpolator",

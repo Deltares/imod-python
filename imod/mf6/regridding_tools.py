@@ -21,7 +21,7 @@ class RegridderInstancesCollection:
         return name in self.regridder_instances.keys()
     
     def _get_existing_regridder(self, name: str):
-        if self._has_regridder(self, name):
+        if self._has_regridder( name):
            return self.regridder_instances[name]
         raise ValueError("no existing regridder of type " + name)
     
@@ -34,6 +34,16 @@ class RegridderInstancesCollection:
             self._create_regridder(name, source, target)
 
         return self._get_existing_regridder(name)
+    
+def get_non_grid_data(package, grid_names):
+    result = {}
+    all_non_grid_data=list(package.dataset.keys())
+    for name in grid_names:
+        all_non_grid_data.remove(name)
+    for name in all_non_grid_data:
+        result[name]=package.dataset[name].values[()]
+    return result
+
             
 
        
