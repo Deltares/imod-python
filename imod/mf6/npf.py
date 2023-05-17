@@ -286,14 +286,13 @@ class NodePropertyFlow(Package):
 
     _regrid_method = {
         "icelltype": "BarycentricInterpolator",
-        "k":  "BarycentricInterpolator",
+        "k": "BarycentricInterpolator",
         "k22": "BarycentricInterpolator",
         "k33": "BarycentricInterpolator",
         "angle1": "BarycentricInterpolator",
         "angle2": "BarycentricInterpolator",
         "angle3": "BarycentricInterpolator",
     }
-
 
     def __init__(
         self,

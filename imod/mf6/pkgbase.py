@@ -1,4 +1,5 @@
 import abc
+import copy
 import numbers
 import pathlib
 from collections import defaultdict
@@ -11,10 +12,9 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.mf6.regridding_tools import RegridderInstancesCollection, get_non_grid_data
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
-import copy
-from imod.mf6.regridding_tools import RegridderInstancesCollection, get_non_grid_data
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
@@ -739,26 +739,29 @@ class Package(PackageBase, abc.ABC):
                 masked[var] = da
 
         return type(self)(**masked)
-    
+
     def regrid_like(self, targetgrid, regridder_types=None):
         regridder_collection = RegridderInstancesCollection()
         chosen_regridder_types = copy.deepcopy(self._regrid_method)
         if regridder_types is not None:
             chosen_regridder_types.update(regridder_types)
 
-        new_package_data =get_non_grid_data (self, chosen_regridder_types.keys())
+        new_package_data = get_non_grid_data(self, chosen_regridder_types.keys())
 
         for source_dataarray_name, regridder_typename in chosen_regridder_types.items():
-            regridder = regridder_collection.get_regridder(regridder_typename, self.dataset[source_dataarray_name], targetgrid)
+            regridder = regridder_collection.get_regridder(
+                regridder_typename, self.dataset[source_dataarray_name], targetgrid
+            )
             if not self._valid(self.dataset[source_dataarray_name].values[()]):
                 new_package_data[source_dataarray_name] = None
             else:
                 original_dtype = self.dataset[source_dataarray_name].dtype
                 regridded_array = regridder.regrid(self.dataset[source_dataarray_name])
-                new_package_data[source_dataarray_name]= regridded_array.astype(original_dtype) #xugrid converts to float
+                new_package_data[source_dataarray_name] = regridded_array.astype(
+                    original_dtype
+                )  # xugrid converts to float
         new_package = self.__class__(**new_package_data)
         return new_package
-
 
 
 class BoundaryCondition(Package, abc.ABC):

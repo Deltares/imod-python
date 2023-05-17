@@ -1,14 +1,12 @@
-
-import pytest
-import xugrid as xu
 import numpy as np
+import pytest
 import xarray as xr
-import imod 
+import xugrid as xu
 
+import imod
 
 
 def test_regrid(tmp_path):
-
     grid = imod.data.circle()
     nlayer = 15
 
@@ -25,7 +23,6 @@ def test_regrid(tmp_path):
     )
     k = xu.full_like(idomain, k_value, dtype=float)
 
-
     npf = imod.mf6.NodePropertyFlow(
         icelltype=idomain,
         k=k,
@@ -36,8 +33,8 @@ def test_regrid(tmp_path):
         alternative_cell_averaging="AMT-HMK",
     )
 
-    new_npf=npf.regrid_like( k ) 
-    new_rendered = new_npf.render(tmp_path, "regridded", None,False)
-    original_rendered = npf.render(tmp_path, "original", None,False)
+    new_npf = npf.regrid_like(k)
+    new_rendered = new_npf.render(tmp_path, "regridded", None, False)
+    original_rendered = npf.render(tmp_path, "original", None, False)
 
-    assert(new_rendered == original_rendered)
+    assert new_rendered == original_rendered
