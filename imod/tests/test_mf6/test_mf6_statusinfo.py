@@ -1,4 +1,4 @@
-from imod.mf6.statusinfo import StatusInfo, NestedStatusInfo
+from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 
 
 class TestStatusInfo:

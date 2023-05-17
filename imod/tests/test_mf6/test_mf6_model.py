@@ -65,7 +65,7 @@ def test_checks_required_pkgs(idomain_and_bottom):
     gwf_model.pop("dis")
 
     with pytest.raises(
-            ValueError, match="No dis/disv/disu package found in model GWF_1"
+        ValueError, match="No dis/disv/disu package found in model GWF_1"
     ):
         gwf_model._check_for_required_packages("GWF_1")
 

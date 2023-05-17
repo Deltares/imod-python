@@ -7,7 +7,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
-from imod.mf6.statusinfo import StatusInfo, NestedStatusInfo, StatusInfoBase
+from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.schemata import DimsSchema, NoDataComparisonSchema, ValidationError
 
 PKG_DIMS_SCHEMA = (

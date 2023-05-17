@@ -15,7 +15,7 @@ from jinja2 import Template
 import imod
 from imod.mf6 import qgs_util
 from imod.mf6.pkgbase import Package
-from imod.mf6.statusinfo import StatusInfo, StatusInfoBase, NestedStatusInfo
+from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.schemata import ValidationError
 
@@ -150,7 +150,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         self._check_for_required_packages(modelkey)
 
     def _validate(self, model_name: str = "") -> StatusInfoBase:
-
         try:
             diskey = self.__get_diskey()
         except Exception as e:
@@ -190,7 +189,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         return model_status_info
 
     def write(
-            self, directory, modelname, globaltimes, binary=True, validate: bool = True
+        self, directory, modelname, globaltimes, binary=True, validate: bool = True
     ) -> StatusInfoBase:
         """
         Write model namefile

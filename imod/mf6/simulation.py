@@ -15,7 +15,7 @@ from imod.mf6.model import (
     GroundwaterTransportModel,
     Modflow6Model,
 )
-from imod.mf6.statusinfo import StatusInfo, NestedStatusInfo
+from imod.mf6.statusinfo import NestedStatusInfo
 from imod.schemata import ValidationError
 
 
