@@ -14,6 +14,7 @@ from imod.mf6.pkgbase_mf6 import Mf6BoundaryCondition, remove_inactive
 from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
 from imod.select.points import points_indices
+from imod.util import values_within_range
 
 
 # FUTURE: There was an idea to autogenerate these object.
@@ -201,28 +202,16 @@ class Well(BoundaryCondition):
         sliced : Package
         """
 
-        def is_within_range(da, min, max):
-            """
-            Find which elements are within range.
-            Function checks which values are unaffected by the clip method, to
-            be able to deal with min and max values equal to None, which
-            should be ignored.
-            """
-            if min is None and max is None:
-                return True
-            else:
-                return da == da.clip(min=min, max=max)
-
         # The super method will select in the time dimension without issues.
         new = super().clip_box(time_min=time_min, time_max=time_max)
 
         ds = new.dataset
 
         # Select all variables along "index" dimension
-        in_bounds = is_within_range(ds["x"], x_min, x_max)
-        in_bounds &= is_within_range(ds["y"], y_min, y_max)
-        in_bounds &= is_within_range(ds["screen_top"], None, z_max)
-        in_bounds &= is_within_range(ds["screen_bottom"], z_min, None)
+        in_bounds = values_within_range(ds["x"], x_min, x_max)
+        in_bounds &= values_within_range(ds["y"], y_min, y_max)
+        in_bounds &= values_within_range(ds["screen_top"], None, z_max)
+        in_bounds &= values_within_range(ds["screen_bottom"], z_min, None)
         # Replace dataset with reduced dataset based on booleans
         new.dataset = ds.loc[{"index": in_bounds}]
 
