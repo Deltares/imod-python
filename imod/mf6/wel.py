@@ -643,14 +643,14 @@ def create_cellid(
 
     Parameters
     ----------
+    to_grid: {xr.DataArray, xu.UgridDataArray}
+        Grid to map the points to based on their x and y coordinates.
     x: {list, np.array}
         array-like with x-coordinates
     y: {list, np.array}
         array-like with y-coordinates
     layer: {list, np.array}
         array-like with layer-coordinates
-    to_grid: {xr.DataArray, xu.UgridDataArray}
-        Grid to map the points to based on their x and y coordinates.
 
     Returns
     -------
@@ -659,11 +659,11 @@ def create_cellid(
         on whether on a structured or unstructured grid."""
 
     # Find indices belonging to x, y coordinates
-    indices = points_indices(to_grid, out_of_bounds="ignore", x=x, y=y)
+    indices_cell2d = points_indices(to_grid, out_of_bounds="ignore", x=x, y=y)
     # Convert cell2d indices from 0-based to 1-based.
-    indices += 1
+    indices_cell2d += 1
     # Prepare layer indices, for later concatenation
-    indices_layer = xr.DataArray(layer, coords=indices["x"].coords)
+    indices_layer = xr.DataArray(layer, coords=indices_cell2d["x"].coords)
 
     if isinstance(to_grid, xu.UgridDataArray):
         face_dim = to_grid.ugrid.grid.face_dimension
@@ -674,7 +674,7 @@ def create_cellid(
         cell2d_coords = ["row", "column"]
 
     # Prepare cellid array of the right shape.
-    cellid_ls = [indices_layer] + [indices[dim] for dim in indices_cell2d_dims]
+    cellid_ls = [indices_layer] + [indices_cell2d[dim] for dim in indices_cell2d_dims]
     cellid = xr.concat(cellid_ls, dim="nmax_cellid")
     # Rename generic dimension name "index" to ncellid.
     cellid = cellid.rename(index="ncellid")
