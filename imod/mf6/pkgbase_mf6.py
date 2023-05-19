@@ -25,7 +25,7 @@ from imod.mf6.pkgbase import BoundaryCondition
 # TODO: Make Mf6BoundaryCondition inherit Mf6Package, not BoundaryCondition.
 # TODO: Move functions from BoundaryCondition or Package,
 # which are required to work with low-level data to either Mf6Bc or Mf6Pkg
-class Mf6BoundaryCondition(abc.ABC, BoundaryCondition):
+class Mf6BoundaryCondition(BoundaryCondition, abc.ABC):
     """
     Package resembling input for Modflow 6 List Input. This abstract base class
     methods for specific modflow 6 packages with time component.
