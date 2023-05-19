@@ -288,7 +288,7 @@ class Well(BoundaryCondition):
         df_for_cellid = wells_assigned.groupby("index").first()
         d_for_cellid = df_for_cellid[["x", "y", "layer"]].to_dict("list")
 
-        return create_cellid(like, **d_for_cellid)
+        return _create_cellid(like, **d_for_cellid)
 
     def to_mf6_pkg(
         self,
@@ -622,7 +622,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         return new
 
 
-def create_cellid(
+def _create_cellid(
     to_grid: Union[xr.DataArray, xu.UgridDataArray],
     x: List,
     y: List,
