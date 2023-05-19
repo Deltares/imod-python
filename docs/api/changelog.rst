@@ -16,6 +16,11 @@ Fixed
 - :meth:`imod.mf6.Simulation._validate` now print all validation errors for all
   models and packages in one message.
 
+Added
+~~~~~
+
+- :func:`imod.select.grid.active_grid_boundary_xy` & 
+  :func:`imod.select.grid.grid_boundary_xy` are added to find grid boundaries.
 
 [0.13.1] - 2023-05-05
 ---------------------
