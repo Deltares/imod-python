@@ -232,10 +232,10 @@ class Well(BoundaryCondition):
     def __create_assigned_wells(
         self,
         wells_df: pd.DataFrame,
-        active: xr.DataArray,
-        top: xr.DataArray,
-        bottom: xr.DataArray,
-        k: xr.DataArray,
+        active: Union[xr.DataArray, xu.UgridDataArray],
+        top: Union[xr.DataArray, xu.UgridDataArray],
+        bottom: Union[xr.DataArray, xu.UgridDataArray],
+        k: Union[xr.DataArray, xu.UgridDataArray],
     ):
         # Ensure top, bottom & k
         # are broadcasted to 3d grid
@@ -294,11 +294,42 @@ class Well(BoundaryCondition):
 
     def to_mf6_pkg(
         self,
-        active: xr.DataArray,
-        top: xr.DataArray,
-        bottom: xr.DataArray,
-        k: xr.DataArray,
+        active: Union[xr.DataArray, xu.UgridDataArray],
+        top: Union[xr.DataArray, xu.UgridDataArray],
+        bottom: Union[xr.DataArray, xu.UgridDataArray],
+        k: Union[xr.DataArray, xu.UgridDataArray],
     ) -> Mf6Wel:
+        """
+        Write package to Modflow 6 package.
+
+        Based on the model grid and top and bottoms, cellids are determined.
+        When well screens hit multiple layers, groundwater extractions are
+        distributed based on layer transmissivities. Wells located in inactive
+        cells are removed.
+
+        Note
+        ----
+        The well distribution based on transmissivities assumes confined
+        aquifers. If wells fall dry (and the rate distribution has to be
+        recomputed at runtime), it is better to use the Multi-Aquifer Well
+        package.
+
+        Parameters
+        ----------
+        active: {xarry.DataArray, xugrid.UgridDataArray}
+            Grid with active cells.
+        top: {xarry.DataArray, xugrid.UgridDataArray}
+            Grid with top of model layers.
+        bottom: {xarry.DataArray, xugrid.UgridDataArray}
+            Grid with bottom of model layers.
+        k: {xarry.DataArray, xugrid.UgridDataArray}
+            Grid with hydraulic conductivites.
+
+        Returns
+        -------
+        Mf6Wel
+            Object with wells as list based input.
+        """
         wells_df = self.__create_wells_df()
         wells_assigned = self.__create_assigned_wells(wells_df, active, top, bottom, k)
 
