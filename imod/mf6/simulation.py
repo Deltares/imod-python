@@ -15,6 +15,8 @@ from imod.mf6.model import (
     GroundwaterTransportModel,
     Modflow6Model,
 )
+from imod.mf6.statusinfo import NestedStatusInfo
+from imod.schemata import ValidationError
 
 
 class Modflow6Simulation(collections.UserDict):
@@ -190,16 +192,19 @@ class Modflow6Simulation(collections.UserDict):
         self["time_discretization"].write(directory, "time_discretization")
 
         # Write individual models
+        status_info = NestedStatusInfo("Simulation validation status")
         globaltimes = self["time_discretization"]["time"].values
         for key, value in self.items():
             # skip timedis, exchanges
             if isinstance(value, Modflow6Model):
-                value.write(
-                    directory=directory,
-                    modelname=key,
-                    globaltimes=globaltimes,
-                    binary=binary,
-                    validate=validate,
+                status_info.add(
+                    value.write(
+                        directory=directory,
+                        globaltimes=globaltimes,
+                        modelname=key,
+                        binary=binary,
+                        validate=validate,
+                    )
                 )
             elif value._pkg_id == "ims":
                 value.write(
@@ -208,6 +213,10 @@ class Modflow6Simulation(collections.UserDict):
                     globaltimes=globaltimes,
                     binary=binary,
                 )
+
+        if status_info.has_errors():
+            raise ValidationError("\n" + status_info.to_string())
+
         self.directory = directory
 
     def run(self, mf6path="mf6") -> None:
