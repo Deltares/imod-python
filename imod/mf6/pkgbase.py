@@ -650,8 +650,8 @@ class Package(PackageBase, abc.ABC):
         layer_min: optional, int
         layer_max: optional, int
         x_min: optional, float
-        x_min: optional, float
-        y_max: optional, float
+        x_max: optional, float
+        y_min: optional, float
         y_max: optional, float
 
         Returns
