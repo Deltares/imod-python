@@ -23,21 +23,21 @@ class RegridderInstancesCollection:
     def __init__(self) -> None:
         self.regridder_instances = {}
 
-    def _has_regridder(self, name: str):
-        return name in self.regridder_instances.keys()
+    def _has_regridder(self, name, method):
+        return (name, method) in self.regridder_instances.keys()
 
-    def _get_existing_regridder(self, name: str):
-        if self._has_regridder(name):
-            return self.regridder_instances[name]
+    def _get_existing_regridder(self, name, method):
+        if self._has_regridder(name, method):
+            return self.regridder_instances[(name, method)]
         raise ValueError("no existing regridder of type " + name)
 
-    def _create_regridder(self, name, source, target):
-        self.regridder_instances[name] = create_regridder_from_string(
-            name, source, target
+    def _create_regridder(self, name, method, source, target):
+        self.regridder_instances[(name, method)] = create_regridder_from_string(
+            name,method, source, target
         )
-        return self.regridder_instances[name]
+        return self.regridder_instances[(name,method)]
 
-    def get_regridder(self, name, source, target):
+    def get_regridder(self, name, method, source, target):
         if not self._has_regridder(name):
             self._create_regridder(name, source, target)
 
