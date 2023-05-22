@@ -43,7 +43,9 @@ def __check_point_shapes_consistency(shapes):
 
 
 def _check_points(points):
-    """Check whether points have the right and consistent shape"""
+    """
+    Check whether the array with points has the right and consistent shape.
+    """
 
     shapes = __check_and_get_points_shape(points)
     __check_point_shapes_consistency(shapes)
