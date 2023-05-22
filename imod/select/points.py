@@ -49,7 +49,7 @@ def _check_points(points):
     __check_point_shapes_consistency(shapes)
 
 
-def _arr_like_points(points, fill_value):
+def __arr_like_points(points, fill_value):
     """
     Return array with the same shape as the first array provided in points.
     """
@@ -97,7 +97,7 @@ def points_in_bounds(da, **points):
 
     _check_points(points)
 
-    in_bounds = _arr_like_points(points, True)
+    in_bounds = __arr_like_points(points, True)
 
     if isinstance(da, xu.UgridDataArray):
         index = get_unstructured_cell2d_from_xy(da, **points)
