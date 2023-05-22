@@ -754,13 +754,13 @@ class Package(PackageBase, abc.ABC):
         targetgrid: xr.DataArray or xugUgridDataArray
             a grid defined over the same discretization as the one we want to regrid the package to
         regridder_types: dictionary mapping arraynames (str) to a tuple of regrid method (str) and function name (str)
-            this dictionary can be used to override the default mapping method. 
+            this dictionary can be used to override the default mapping method.
 
         Returns
         -------
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
-        similar to the one used in input argument "targetgrid" 
-        """        
+        similar to the one used in input argument "targetgrid"
+        """
         regridder_collection = RegridderInstancesCollection()
         chosen_regridder_types = copy.deepcopy(self._regrid_method)
         if regridder_types is not None:
@@ -780,18 +780,21 @@ class Package(PackageBase, abc.ABC):
             if not self._valid(self.dataset[source_dataarray_name].values[()]):
                 new_package_data[source_dataarray_name] = None
             else:
-                #obtain an instance of a regridder for the chosen method
+                # obtain an instance of a regridder for the chosen method
                 regridder = regridder_collection.get_regridder(
-                    regridder_name, self.dataset[source_dataarray_name], targetgrid, regridder_function
+                    regridder_name,
+                    self.dataset[source_dataarray_name],
+                    targetgrid,
+                    regridder_function,
                 )
-                
-                #store original dtype of data
+
+                # store original dtype of data
                 original_dtype = self.dataset[source_dataarray_name].dtype
 
-                #regrid data array
+                # regrid data array
                 regridded_array = regridder.regrid(self.dataset[source_dataarray_name])
 
-                #reconvert the result to the same dtype as the original
+                # reconvert the result to the same dtype as the original
                 new_package_data[source_dataarray_name] = regridded_array.astype(
                     original_dtype
                 )

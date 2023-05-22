@@ -70,14 +70,14 @@ class RegridderInstancesCollection:
 
 
 def get_non_grid_data(package, grid_names):
-    '''
+    """
     This function copies the attributes of a dataset that are scalars, such as options.
 
     parameters
     ----------
     grid_names: list of str
         the names of the attribbutes of a dataset that are grids.
-    '''
+    """
     result = {}
     all_non_grid_data = list(package.dataset.keys())
     for name in grid_names:
