@@ -1,4 +1,4 @@
-from typing import Union
+from typing import List, Union
 
 import numpy as np
 import xarray as xr
@@ -9,12 +9,16 @@ from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import DTypeSchema
 
 
-def reduce_grid_except_dims(grid, preserve_dims):
+def reduce_grid_except_dims(
+    grid: Union[xr.DataArray, xu.UgridDataArray], preserve_dims: List[str]
+) -> Union[xr.DataArray, xu.UgridDataArray]:
     to_reduce = {dim: 0 for dim in grid.dims if dim not in preserve_dims}
     return grid.isel(**to_reduce)
 
 
-def grid_boundary_xy(grid: Union[xr.DataArray, xu.UgridDataArray]):
+def grid_boundary_xy(
+    grid: Union[xr.DataArray, xu.UgridDataArray]
+) -> Union[xr.DataArray, xu.UgridDataArray]:
     """
     Return grid boundary on the xy plane.
 
@@ -27,7 +31,8 @@ def grid_boundary_xy(grid: Union[xr.DataArray, xu.UgridDataArray]):
 
     Returns
     -------
-    2d grid with locations of grid boundaries
+    {xarray.DataArray, xugrid.UgridDataArray}
+        2d grid with locations of grid boundaries
     """
 
     # Validate if required dimensions are present
@@ -48,7 +53,9 @@ def grid_boundary_xy(grid: Union[xr.DataArray, xu.UgridDataArray]):
         raise TypeError("Grid should be of type DataArray or UgridDataArray.")
 
 
-def active_grid_boundary_xy(active: Union[xr.DataArray, xu.UgridDataArray]):
+def active_grid_boundary_xy(
+    active: Union[xr.DataArray, xu.UgridDataArray]
+) -> Union[xr.DataArray, xu.UgridDataArray]:
     """
     Return active boundary cells on the xy plane.
 
@@ -60,7 +67,8 @@ def active_grid_boundary_xy(active: Union[xr.DataArray, xu.UgridDataArray]):
 
     Returns
     -------
-    Locations of active grid boundaries
+    {xarray.DataArray, xugrid.UgridDataArray}
+        Locations of active grid boundaries
     """
 
     grid_boundary = grid_boundary_xy(active)
