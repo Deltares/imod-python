@@ -2,20 +2,31 @@ from xugrid.regrid.regridder import (
     BarycentricInterpolator,
     OverlapRegridder,
     RelativeOverlapRegridder,
+    CentroidLocatorRegridder,
 )
 
 
-def create_regridder_from_string(name: str, source, target):
+def create_regridder_from_string(name, source, target, method=None):
     regridder = None
+
+    # verify method is None for regridders that don't support methods
+    if name == "BarycentricInterpolator" or name == "CentroidLocatorRegridder":
+        if regridder is not None:
+            return regridder
+
     if name == "BarycentricInterpolator":
         regridder = BarycentricInterpolator(source, target)
+        if method is not None:
+            raise ValueError("BarycentricInterpolation does not support methods")
     elif name == "OverlapRegridder":
-        regridder = OverlapRegridder(source, target)
+        regridder = OverlapRegridder(source, target, method)
     elif name == "RelativeOverlapRegridder":
-        regridder = RelativeOverlapRegridder(source, target)
-
+        regridder = RelativeOverlapRegridder(source, target, method)
+    elif name == "CentroidLocatorRegridder":
+        regridder = CentroidLocatorRegridder(source, target)
     if regridder is not None:
         return regridder
+
     raise ValueError("unkwown regridder type " + name)
 
 
@@ -33,15 +44,15 @@ class RegridderInstancesCollection:
 
     def _create_regridder(self, name, method, source, target):
         self.regridder_instances[(name, method)] = create_regridder_from_string(
-            name,method, source, target
+            name, source, target, method
         )
-        return self.regridder_instances[(name,method)]
+        return self.regridder_instances[(name, method)]
 
-    def get_regridder(self, name, method, source, target):
-        if not self._has_regridder(name):
-            self._create_regridder(name, source, target)
+    def get_regridder(self, name, source, target, method=None):
+        if not self._has_regridder(name, method):
+            self._create_regridder(name, method, source, target)
 
-        return self._get_existing_regridder(name)
+        return self._get_existing_regridder(name, method)
 
 
 def get_non_grid_data(package, grid_names):
