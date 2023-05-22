@@ -226,10 +226,6 @@ class Well(BoundaryCondition):
                 "screen_bottom": "bottom",
             }
         )
-        # Unset multi-index, because assign_wells cannot deal with
-        # multi-indices which is returned by self.dataset.to_dataframe() in
-        # case of a "time" and "species" coordinate.
-        wells_df = wells_df.reset_index()
 
         return wells_df
 
@@ -248,9 +244,15 @@ class Well(BoundaryCondition):
         bottom = like * bottom
         k = like * k
 
+        index_names = wells_df.index.names
+
+        # Unset multi-index, because assign_wells cannot deal with
+        # multi-indices which is returned by self.dataset.to_dataframe() in
+        # case of a "time" and "species" coordinate.
+        wells_df = wells_df.reset_index()
+
         wells_assigned = assign_wells(wells_df, top, bottom, k)
         # Set multi-index again
-        index_names = wells_df.index.names
         wells_assigned = wells_assigned.set_index(index_names).sort_index()
 
         return wells_assigned
@@ -303,7 +305,7 @@ class Well(BoundaryCondition):
         ds = xr.Dataset()
         ds["cellid"] = self.__create_cellid(wells_assigned, active)
 
-        ds_vars = self.__create_dataset_vars(wells_assigned, wells_df)
+        ds_vars = self.__create_dataset_vars(wells_assigned, wells_df, ds["cellid"])
         ds = ds.assign(**dict(ds_vars.items()))
 
         ds = remove_inactive(ds, active)
@@ -661,7 +663,7 @@ def _create_cellid(
     # Find indices belonging to x, y coordinates
     indices_cell2d = points_indices(to_grid, out_of_bounds="ignore", x=x, y=y)
     # Convert cell2d indices from 0-based to 1-based.
-    indices_cell2d += 1
+    indices_cell2d = dict((dim, index + 1) for dim, index in indices_cell2d.items())
     # Prepare layer indices, for later concatenation
     indices_layer = xr.DataArray(layer, coords=indices_cell2d["x"].coords)
 
