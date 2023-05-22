@@ -3,7 +3,7 @@ import copy
 from imod.mf6.regridding_tools import RegridderInstancesCollection
 
 
-def test_instance_collection_returns_same_instance_when_nam_and_method_match(
+def test_instance_collection_returns_same_instance_when_name_and_method_match(
     basic_unstructured_dis,
 ):
     grid, _, _ = basic_unstructured_dis
@@ -21,7 +21,7 @@ def test_instance_collection_returns_same_instance_when_nam_and_method_match(
     assert first_instance == second_instance
 
 
-def test_instance_collection_returns_different_instance_when_method_does_not_match(
+def test_instance_collection_returns_different_instance_when_name_does_not_match(
     basic_unstructured_dis,
 ):
     grid, _, _ = basic_unstructured_dis
@@ -39,7 +39,7 @@ def test_instance_collection_returns_different_instance_when_method_does_not_mat
     assert first_instance != second_instance
 
 
-def test_instance_collection_returns_different_instance_when_name_does_not_match(
+def test_instance_collection_returns_different_instance_when_method_does_not_match(
     basic_unstructured_dis,
 ):
     grid, _, _ = basic_unstructured_dis
