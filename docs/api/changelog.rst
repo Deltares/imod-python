@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+
+[Unreleased]
+------------
+
+Fixed
+~~~~~
+
+- :meth:`imod.mf6.Simulation._validate` now print all validation errors for all
+  models and packages in one message.
+
+
 [0.13.1] - 2023-05-05
 ---------------------
 
