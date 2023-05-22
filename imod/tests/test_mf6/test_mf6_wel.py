@@ -207,7 +207,7 @@ def test_create_cellid(basic_dis, well_high_lvl_test_data_stationary):
     )
 
     # Act
-    cellid = imod.mf6.wel.create_cellid(ibound, x, y, layer)
+    cellid = imod.mf6.wel._create_cellid(ibound, x, y, layer)
 
     # Assert
     np.testing.assert_array_equal(cellid, cellid_expected)
