@@ -17,28 +17,31 @@ def create_regridder_from_string(name, source, target, method=None):
     target: (ugrid or xarray) data-array containing the discretization of the targetr-grid as coordinates
     method: optionally, method used for regridding ( for example, "geometric_mean").
 
+    Returns
+    -------
+    a regridder of the desired type and that uses the desired function
+
     """
     regridder = None
 
     # verify method is None for regridders that don't support methods
     if name == "BarycentricInterpolator" or name == "CentroidLocatorRegridder":
-        if regridder is not None:
-            return regridder
+        if method is not None:
+            raise ValueError(f"{name} does not support methods")
 
     if name == "BarycentricInterpolator":
         regridder = BarycentricInterpolator(source, target)
-        if method is not None:
-            raise ValueError("BarycentricInterpolation does not support methods")
     elif name == "OverlapRegridder":
         regridder = OverlapRegridder(source, target, method)
     elif name == "RelativeOverlapRegridder":
         regridder = RelativeOverlapRegridder(source, target, method)
     elif name == "CentroidLocatorRegridder":
         regridder = CentroidLocatorRegridder(source, target)
+
     if regridder is not None:
         return regridder
 
-    raise ValueError("unkwown regridder type " + name)
+    raise ValueError("unknown regridder type " + name)
 
 
 class RegridderInstancesCollection:
@@ -67,6 +70,14 @@ class RegridderInstancesCollection:
 
 
 def get_non_grid_data(package, grid_names):
+    '''
+    This function copies the attributes of a dataset that are scalars, such as options.
+
+    parameters
+    ----------
+    grid_names: list of str
+        the names of the attribbutes of a dataset that are grids.
+    '''
     result = {}
     all_non_grid_data = list(package.dataset.keys())
     for name in grid_names:
