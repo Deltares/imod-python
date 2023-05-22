@@ -194,8 +194,8 @@ class Well(BoundaryCondition):
         z_min: optional, float
         z_max: optional, float
         x_min: optional, float
-        x_min: optional, float
-        y_max: optional, float
+        x_max: optional, float
+        y_min: optional, float
         y_max: optional, float
 
         Returns
