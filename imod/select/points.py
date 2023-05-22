@@ -21,8 +21,8 @@ def get_unstructured_cell2d_from_xy(uda, **points):
     return uda.ugrid.grid.locate_points(xy)
 
 
-def _check_points(points):
-    """Check whether points have the right and consistent shape"""
+def __check_and_get_points_shape(points) -> dict:
+    """Check whether points have the right shape"""
     shapes = {}
     for coord, value in points.items():
         arr = np.atleast_1d(value)
@@ -33,9 +33,20 @@ def _check_points(points):
                 f"Coordinate {coord} is not one-dimensional, but has shape: {shape}"
             )
         shapes[coord] = shape
+    return shapes
+
+
+def __check_point_shapes_consistency(shapes):
     if not len(set(shapes.values())) == 1:
         msg = "\n".join([f"{coord}: {shape}" for coord, shape in shapes.items()])
         raise ValueError(f"Shapes of coordinates do match each other:\n{msg}")
+
+
+def _check_points(points):
+    """Check whether points have the right and consistent shape"""
+
+    shapes = __check_and_get_points_shape(points)
+    __check_point_shapes_consistency(shapes)
 
 
 def _arr_like_points(points, fill_value):
