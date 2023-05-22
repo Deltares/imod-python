@@ -34,7 +34,19 @@ def test_regrid(tmp_path):
     )
 
     new_npf = npf.regrid_like(k)
+
+    # check the rendered versions are the same, they contain the options
     new_rendered = new_npf.render(tmp_path, "regridded", None, False)
     original_rendered = npf.render(tmp_path, "original", None, False)
 
+    new_rendered = new_rendered.replace("regridded", "original")
     assert new_rendered == original_rendered
+
+    # check the arrays
+    k_new = new_npf.dataset["k"]
+    k_diff = k_new - k
+    max_diff = k_diff.max().values[()]
+    min_diff = k_diff.min().values[()]
+    abs_tol = 1e-13
+
+    assert abs(min_diff) < abs_tol and max_diff < abs_tol

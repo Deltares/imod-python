@@ -1,5 +1,6 @@
-from imod.mf6.regridding_tools import RegridderInstancesCollection
 import copy
+
+from imod.mf6.regridding_tools import RegridderInstancesCollection
 
 
 def test_instance_collection_returns_same_instance_when_nam_and_method_match(

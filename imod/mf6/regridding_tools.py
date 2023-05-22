@@ -1,12 +1,23 @@
 from xugrid.regrid.regridder import (
     BarycentricInterpolator,
+    CentroidLocatorRegridder,
     OverlapRegridder,
     RelativeOverlapRegridder,
-    CentroidLocatorRegridder,
 )
 
 
 def create_regridder_from_string(name, source, target, method=None):
+    """
+    This function creates a regridder.
+
+    Parameters
+    ----------
+    name:  name of the regridder (for example, CentroidLocatorRegridder)
+    source: (ugrid or xarray) data-array containing the discretization of the source grid as coordinates
+    target: (ugrid or xarray) data-array containing the discretization of the targetr-grid as coordinates
+    method: optionally, method used for regridding ( for example, "geometric_mean").
+
+    """
     regridder = None
 
     # verify method is None for regridders that don't support methods

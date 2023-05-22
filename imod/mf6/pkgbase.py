@@ -748,13 +748,21 @@ class Package(PackageBase, abc.ABC):
 
         new_package_data = get_non_grid_data(self, chosen_regridder_types.keys())
 
-        for source_dataarray_name, regridder_typename in chosen_regridder_types.items():
-            regridder = regridder_collection.get_regridder(
-                regridder_typename, self.dataset[source_dataarray_name], targetgrid
-            )
+        for (
+            source_dataarray_name,
+            regridder_type_and_method,
+        ) in chosen_regridder_types.items():
+            name = regridder_type_and_method[0]
+            method = None
+            if len(regridder_type_and_method) == 2:
+                method = regridder_type_and_method[1]
+
             if not self._valid(self.dataset[source_dataarray_name].values[()]):
                 new_package_data[source_dataarray_name] = None
             else:
+                regridder = regridder_collection.get_regridder(
+                    name, self.dataset[source_dataarray_name], targetgrid, method
+                )
                 original_dtype = self.dataset[source_dataarray_name].dtype
                 regridded_array = regridder.regrid(self.dataset[source_dataarray_name])
                 new_package_data[source_dataarray_name] = regridded_array.astype(
