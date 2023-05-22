@@ -7,8 +7,12 @@ import imod
 
 
 def test_regrid(tmp_path):
+    """
+    This test regrids an irregular grid. However, the new grid is the same as the source grid, so the values
+    of the data-arrays should not change.
+    """
     grid = imod.data.circle()
-    nlayer = 15
+    nlayer = 5
 
     nface = grid.n_face
     layer = np.arange(nlayer, dtype=int) + 1
@@ -49,4 +53,4 @@ def test_regrid(tmp_path):
     min_diff = k_diff.min().values[()]
     abs_tol = 1e-13
 
-    assert abs(min_diff) < abs_tol and max_diff < abs_tol
+    assert abs(min_diff) < abs_tol and abs(max_diff) < abs_tol

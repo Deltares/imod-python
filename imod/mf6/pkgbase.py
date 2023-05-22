@@ -761,10 +761,23 @@ class Package(PackageBase, abc.ABC):
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "targetgrid"
         """
-        regridder_collection = RegridderInstancesCollection()
+
+        regridder_collection = RegridderInstancesCollection(
+            self.dataset, target=targetgrid
+        )
+
         chosen_regridder_types = copy.deepcopy(self._regrid_method)
         if regridder_types is not None:
             chosen_regridder_types.update(regridder_types)
+
+        # check completeness of the input
+        grids_without_specified_regridding_method = [
+            k for k in self._grid_data if k not in chosen_regridder_types.keys()
+        ]
+        if len(grids_without_specified_regridding_method) > 0:
+            raise ValidationError(
+                f"a regridding method should be provided for grids: {grids_without_specified_regridding_method}"
+            )
 
         new_package_data = get_non_grid_data(self, chosen_regridder_types.keys())
 
@@ -783,8 +796,6 @@ class Package(PackageBase, abc.ABC):
                 # obtain an instance of a regridder for the chosen method
                 regridder = regridder_collection.get_regridder(
                     regridder_name,
-                    self.dataset[source_dataarray_name],
-                    targetgrid,
                     regridder_function,
                 )
 

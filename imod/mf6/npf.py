@@ -298,6 +298,7 @@ class NodePropertyFlow(Package):
         "angle1": ("OverlapRegridder", "mean"),
         "angle2": ("OverlapRegridder", "mean"),
         "angle3": ("OverlapRegridder", "mean"),
+        "rewet_layer": ("BarycentricInterpolator"),
     }
 
     def __init__(

@@ -12,7 +12,7 @@ def create_regridder_from_string(name, source, target, method=None):
 
     Parameters
     ----------
-    name:  name of the regridder (for example, CentroidLocatorRegridder)
+    name:  name of the regridder (for example, "CentroidLocatorRegridder")
     source: (ugrid or xarray) data-array containing the discretization of the source grid as coordinates
     target: (ugrid or xarray) data-array containing the discretization of the targetr-grid as coordinates
     method: optionally, method used for regridding ( for example, "geometric_mean").
@@ -45,8 +45,16 @@ def create_regridder_from_string(name, source, target, method=None):
 
 
 class RegridderInstancesCollection:
-    def __init__(self) -> None:
+    """
+    This class stores any number of regridders that can regrid a single source grid to a single target grid.
+    By storing the regridders, we make sure the regridders can be re-used for different arrays on the same grid.
+    This is important because computing the regridding weights is a costly affair.
+    """
+
+    def __init__(self, source, target) -> None:
         self.regridder_instances = {}
+        self._source = source
+        self._target = target
 
     def _has_regridder(self, name, method):
         return (name, method) in self.regridder_instances.keys()
@@ -56,15 +64,18 @@ class RegridderInstancesCollection:
             return self.regridder_instances[(name, method)]
         raise ValueError("no existing regridder of type " + name)
 
-    def _create_regridder(self, name, method, source, target):
+    def _create_regridder(self, name, method):
         self.regridder_instances[(name, method)] = create_regridder_from_string(
-            name, source, target, method
+            name, self._source, self._target, method
         )
         return self.regridder_instances[(name, method)]
 
-    def get_regridder(self, name, source, target, method=None):
+    def get_regridder(self, name, method=None):
+        """
+        returns a regridder of the specified type-name and with the specified method.
+        """
         if not self._has_regridder(name, method):
-            self._create_regridder(name, method, source, target)
+            self._create_regridder(name, method)
 
         return self._get_existing_regridder(name, method)
 
