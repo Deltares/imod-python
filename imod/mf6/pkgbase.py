@@ -772,15 +772,6 @@ class Package(PackageBase, abc.ABC):
         if regridder_types is not None:
             chosen_regridder_types.update(regridder_types)
 
-        # check completeness of the input
-        grids_without_specified_regridding_method = [
-            k for k in self._grid_data if k not in chosen_regridder_types.keys()
-        ]
-        if len(grids_without_specified_regridding_method) > 0:
-            raise ValidationError(
-                f"a regridding method should be provided for grids: {grids_without_specified_regridding_method}"
-            )
-
         new_package_data = get_non_grid_data(self, chosen_regridder_types.keys())
 
         for (
