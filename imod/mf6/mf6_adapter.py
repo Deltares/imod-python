@@ -1,5 +1,5 @@
 """
-Module to store (prototype) low-level modflow6 package base classes.
+Module to store (prototype) Modflow 6 adapter classes.
 
 These are closer to the Modflow 6 data model, with a cellid,
 instead of x, y coordinates.
