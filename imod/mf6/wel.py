@@ -656,7 +656,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
 
 
 def _create_cellid(
-    to_grid: Union[xr.DataArray, xu.UgridDataArray],
+    dst_grid: Union[xr.DataArray, xu.UgridDataArray],
     x: List,
     y: List,
     layer: List,
@@ -676,8 +676,8 @@ def _create_cellid(
 
     Parameters
     ----------
-    to_grid: {xr.DataArray, xu.UgridDataArray}
-        Grid to map the points to based on their x and y coordinates.
+    dst_grid: {xr.DataArray, xu.UgridDataArray}
+        Destination grid to map the points to based on their x and y coordinates.
     x: {list, np.array}
         array-like with x-coordinates
     y: {list, np.array}
@@ -692,14 +692,14 @@ def _create_cellid(
         on whether on a structured or unstructured grid."""
 
     # Find indices belonging to x, y coordinates
-    indices_cell2d = points_indices(to_grid, out_of_bounds="ignore", x=x, y=y)
+    indices_cell2d = points_indices(dst_grid, out_of_bounds="ignore", x=x, y=y)
     # Convert cell2d indices from 0-based to 1-based.
     indices_cell2d = dict((dim, index + 1) for dim, index in indices_cell2d.items())
     # Prepare layer indices, for later concatenation
     indices_layer = xr.DataArray(layer, coords=indices_cell2d["x"].coords)
 
-    if isinstance(to_grid, xu.UgridDataArray):
-        face_dim = to_grid.ugrid.grid.face_dimension
+    if isinstance(dst_grid, xu.UgridDataArray):
+        face_dim = dst_grid.ugrid.grid.face_dimension
         indices_cell2d_dims = [face_dim]
         cell2d_coords = ["cell2d"]
     else:
