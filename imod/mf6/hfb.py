@@ -171,11 +171,6 @@ class HorizontalFlowBarrierHydraulicCharacteristic(AbstractHorizontalFlowBarrier
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
-    _grid_data = {
-        "multiplier": np.float64,
-        "idomain": np.float64,
-    }
-
     _regrid_method = {
         "multiplier": ("OverlapRegridder", "mean"),
         "idomain": ("OverlapRegridder", "mean"),
@@ -245,11 +240,6 @@ class HorizontalFlowBarrierMultiplier(AbstractHorizontalFlowBarrier):
     _period_data = ("multiplier",)
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
-
-    _grid_data = {
-        "multiplier": np.float64,
-        "idomain": np.float64,
-    }
 
     _regrid_method = {
         "multiplier": ("OverlapRegridder", "mean"),
@@ -324,11 +314,6 @@ class HorizontalFlowBarrierResistance(AbstractHorizontalFlowBarrier):
     _period_data = ("resistance",)
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
-
-    _grid_data = {
-        "resistance": np.float64,
-        "idomain": np.float64,
-    }
 
     _regrid_method = {
         "resistance": ("OverlapRegridder", "mean"),

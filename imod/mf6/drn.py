@@ -94,12 +94,6 @@ class Drainage(BoundaryCondition):
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
 
-    _grid_data = {
-        "elevation": np.float64,
-        "conductance": np.float64,
-        "concentration": np.float64,
-    }
-
     _regrid_method = {
         "elevation": ("OverlapRegridder", "mean"),
         "conductance": ("OverlapRegridder", "mean"),
