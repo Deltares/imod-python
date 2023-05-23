@@ -56,7 +56,7 @@ def test_regrid(tmp_path):
     assert abs(min_diff) < abs_tol and abs(max_diff) < abs_tol
 
 
-def test_regrid_not_supported(tmp_path):
+def test_regrid_not_supported():
     """
     This tests that regridding a package for which it is not implemented does noty lead to a crash
     """
