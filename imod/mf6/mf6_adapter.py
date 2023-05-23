@@ -104,8 +104,8 @@ def remove_inactive(ds: xr.Dataset, active: xr.DataArray) -> xr.Dataset:
     if "ncellid" not in ds.dims:
         raise ValueError("Missing dimension 'ncellid' in dataset")
 
-    a = ds["cellid"].values - 1
-    cellid_indexes = unstack_columns(a)
+    cellid_zero_based = ds["cellid"].values - 1
+    cellid_indexes = unstack_columns(cellid_zero_based)
     valid = active.values[cellid_indexes]
 
     return ds.loc[{"ncellid": valid}]
