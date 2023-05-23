@@ -2,7 +2,7 @@ import copy
 
 import pytest
 
-from imod.mf6.regridding_tools import RegridderInstancesCollection
+from imod.mf6.regridding_utils import RegridderInstancesCollection
 
 
 def test_instance_collection_returns_same_instance_when_name_and_method_match(

@@ -12,7 +12,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.mf6.regridding_tools import RegridderInstancesCollection, get_non_grid_data
+from imod.mf6.regridding_utils import RegridderInstancesCollection, get_non_grid_data
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
 
@@ -740,7 +740,7 @@ class Package(PackageBase, abc.ABC):
 
         return type(self)(**masked)
 
-    def regrid_like(self, targetgrid, regridder_types=None):
+    def regrid_like(self, target_grid, regridder_types=None)->"Package":
         """
         Creates a package of the same type as this package, based on another discretization.
         It regrids all the arrays in this package to the desired  discretization, and leaves the options
@@ -751,7 +751,7 @@ class Package(PackageBase, abc.ABC):
 
         Parameters
         ----------
-        targetgrid: xr.DataArray or xugUgridDataArray
+        target_grid: xr.DataArray or xugUgridDataArray
             a grid defined over the same discretization as the one we want to regrid the package to
         regridder_types: dictionary mapping arraynames (str) to a tuple of regrid method (str) and function name (str)
             this dictionary can be used to override the default mapping method.
@@ -761,23 +761,23 @@ class Package(PackageBase, abc.ABC):
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "targetgrid"
         """
-
-        regridder_collection = RegridderInstancesCollection(
-            self.dataset, target=targetgrid
-        )
         if not hasattr(self, "_regrid_method"):
             raise NotImplementedError("this package does not support regridding")
+        
+        regridder_collection = RegridderInstancesCollection(
+            self.dataset, target_grid=target_grid
+        )
 
-        chosen_regridder_types = copy.deepcopy(self._regrid_method)
+        regridder_settings = copy.deepcopy(self._regrid_method)
         if regridder_types is not None:
-            chosen_regridder_types.update(regridder_types)
+            regridder_settings.update(regridder_types)
 
-        new_package_data = get_non_grid_data(self, chosen_regridder_types.keys())
+        new_package_data = get_non_grid_data(self, regridder_settings.keys())
 
         for (
             source_dataarray_name,
             regridder_type_and_function,
-        ) in chosen_regridder_types.items():
+        ) in regridder_settings.items():
             regridder_name = regridder_type_and_function[0]
             regridder_function = None
             if len(regridder_type_and_function) == 2:
