@@ -104,14 +104,12 @@ def create_lake_data_structured(
     lake_table=None,
 ):
     HORIZONTAL = 0
-    connection_type = xr.full_like(is_lake, HORIZONTAL, dtype=np.floating).where(
-        is_lake
-    )
-    bed_leak = xr.full_like(is_lake, 0.2, dtype=np.floating).where(is_lake)
-    top_elevation = xr.full_like(is_lake, 0.3, dtype=np.floating).where(is_lake)
-    bot_elevation = xr.full_like(is_lake, 0.4, dtype=np.floating).where(is_lake)
-    connection_length = xr.full_like(is_lake, 0.5, dtype=np.floating).where(is_lake)
-    connection_width = xr.full_like(is_lake, 0.6, dtype=np.floating).where(is_lake)
+    connection_type = xr.full_like(is_lake, HORIZONTAL, dtype=np.float64).where(is_lake)
+    bed_leak = xr.full_like(is_lake, 0.2, dtype=np.float64).where(is_lake)
+    top_elevation = xr.full_like(is_lake, 0.3, dtype=np.float64).where(is_lake)
+    bot_elevation = xr.full_like(is_lake, 0.4, dtype=np.float64).where(is_lake)
+    connection_length = xr.full_like(is_lake, 0.5, dtype=np.float64).where(is_lake)
+    connection_width = xr.full_like(is_lake, 0.6, dtype=np.float64).where(is_lake)
     return LakeData(
         starting_stage=starting_stage,
         boundname=name,
@@ -155,14 +153,12 @@ def create_lake_data_unstructured(
     lake_table=None,
 ):
     HORIZONTAL = 0
-    connection_type = xu.full_like(is_lake, HORIZONTAL, dtype=np.floating).where(
-        is_lake
-    )
-    bed_leak = xu.full_like(is_lake, 0.2, dtype=np.floating).where(is_lake)
-    top_elevation = xu.full_like(is_lake, 0.3, dtype=np.floating).where(is_lake)
-    bot_elevation = xu.full_like(is_lake, 0.4, dtype=np.floating).where(is_lake)
-    connection_length = xu.full_like(is_lake, 0.5, dtype=np.floating).where(is_lake)
-    connection_width = xu.full_like(is_lake, 0.6, dtype=np.floating).where(is_lake)
+    connection_type = xu.full_like(is_lake, HORIZONTAL, dtype=np.float64).where(is_lake)
+    bed_leak = xu.full_like(is_lake, 0.2, dtype=np.float64).where(is_lake)
+    top_elevation = xu.full_like(is_lake, 0.3, dtype=np.float64).where(is_lake)
+    bot_elevation = xu.full_like(is_lake, 0.4, dtype=np.float64).where(is_lake)
+    connection_length = xu.full_like(is_lake, 0.5, dtype=np.float64).where(is_lake)
+    connection_width = xu.full_like(is_lake, 0.6, dtype=np.float64).where(is_lake)
     return LakeData(
         starting_stage=starting_stage,
         boundname=name,

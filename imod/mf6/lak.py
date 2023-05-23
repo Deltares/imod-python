@@ -890,7 +890,7 @@ class Lake(BoundaryCondition):
 
         idx = np.where(x != x)
         x[idx[0][:]] = ""
-        return x.astype(np.str)
+        return x.astype(str)
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
@@ -934,9 +934,7 @@ class Lake(BoundaryCondition):
         return self._template.render(d)
 
     def _get_iconn(self, lake_numbers_per_connection):
-        iconn = np.full_like(
-            lake_numbers_per_connection, dtype=np.integer, fill_value=0
-        )
+        iconn = np.full_like(lake_numbers_per_connection, dtype=np.int64, fill_value=0)
         maxlake = lake_numbers_per_connection.max()
         connections_per_lake = np.zeros(maxlake + 1)
         for i in range(np.size(lake_numbers_per_connection)):
