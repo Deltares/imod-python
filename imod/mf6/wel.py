@@ -290,7 +290,78 @@ class Well(BoundaryCondition):
         df_for_cellid = wells_assigned.groupby("index").first()
         d_for_cellid = df_for_cellid[["x", "y", "layer"]].to_dict("list")
 
-        return _create_cellid(like, **d_for_cellid)
+        return self.__infer_cellid_from_points(like, **d_for_cellid)
+
+    @staticmethod
+    def __infer_cellid_from_points(
+        dst_grid: Union[xr.DataArray, xu.UgridDataArray],
+        x: List,
+        y: List,
+        layer: List,
+    ) -> xr.DataArray:
+        """
+        Create DataArray with Modflow6 cell identifiers based on x, y coordinates
+        in a dataframe. For structured grid this DataArray contains 3 columns:
+        ``layer, row, column``. For unstructured grids, this contains 2 columns:
+        ``layer, cell2d``.
+        See also: https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.4.0.pdf#page=35
+
+        Note
+        ----
+        The "layer" coordinate should already be provided in the dataframe.
+        To determine the layer coordinate based on screen depts, look at
+        :func:`imod.prepare.wells.assign_wells`.
+
+        Parameters
+        ----------
+        dst_grid: {xr.DataArray, xu.UgridDataArray}
+            Destination grid to map the points to based on their x and y coordinates.
+        x: {list, np.array}
+            array-like with x-coordinates
+        y: {list, np.array}
+            array-like with y-coordinates
+        layer: {list, np.array}
+            array-like with layer-coordinates
+
+        Returns
+        -------
+        cellid : xr.DataArray
+            2D DataArray with a ``ncellid`` rows and 3 to 2 columns, depending
+            on whether on a structured or unstructured grid."""
+
+        # Find indices belonging to x, y coordinates
+        indices_cell2d = points_indices(dst_grid, out_of_bounds="ignore", x=x, y=y)
+        # Convert cell2d indices from 0-based to 1-based.
+        indices_cell2d = dict((dim, index + 1) for dim, index in indices_cell2d.items())
+        # Prepare layer indices, for later concatenation
+        indices_layer = xr.DataArray(layer, coords=indices_cell2d["x"].coords)
+
+        if isinstance(dst_grid, xu.UgridDataArray):
+            face_dim = dst_grid.ugrid.grid.face_dimension
+            indices_cell2d_dims = [face_dim]
+            cell2d_coords = ["cell2d"]
+        else:
+            indices_cell2d_dims = ["y", "x"]
+            cell2d_coords = ["row", "column"]
+
+        # Prepare cellid array of the right shape.
+        cellid_ls = [indices_layer] + [
+            indices_cell2d[dim] for dim in indices_cell2d_dims
+        ]
+        cellid = xr.concat(cellid_ls, dim="nmax_cellid")
+        # Rename generic dimension name "index" to ncellid.
+        cellid = cellid.rename(index="ncellid")
+        # Put dimensions in right order after concatenation.
+        cellid = cellid.transpose("ncellid", "nmax_cellid")
+        # Assign extra coordinate names.
+        coords = {
+            "nmax_cellid": ["layer"] + cell2d_coords,
+            "x": ("ncellid", x),
+            "y": ("ncellid", y),
+        }
+        cellid = cellid.assign_coords(**coords)
+
+        return cellid
 
     def to_mf6_pkg(
         self,
@@ -653,72 +724,3 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         # The super method will select in the time dimension without issues.
         new = super().clip_box(time_min=time_min, time_max=time_max)
         return new
-
-
-def _create_cellid(
-    dst_grid: Union[xr.DataArray, xu.UgridDataArray],
-    x: List,
-    y: List,
-    layer: List,
-) -> xr.DataArray:
-    """
-    Create DataArray with Modflow6 cell identifiers based on x, y coordinates
-    in a dataframe. For structured grid this DataArray contains 3 columns:
-    ``layer, row, column``. For unstructured grids, this contains 2 columns:
-    ``layer, cell2d``.
-    See also: https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.4.0.pdf#page=35
-
-    Note
-    ----
-    The "layer" coordinate should already be provided in the dataframe.
-    To determine the layer coordinate based on screen depts, look at
-    :func:`imod.prepare.wells.assign_wells`.
-
-    Parameters
-    ----------
-    dst_grid: {xr.DataArray, xu.UgridDataArray}
-        Destination grid to map the points to based on their x and y coordinates.
-    x: {list, np.array}
-        array-like with x-coordinates
-    y: {list, np.array}
-        array-like with y-coordinates
-    layer: {list, np.array}
-        array-like with layer-coordinates
-
-    Returns
-    -------
-    cellid : xr.DataArray
-        2D DataArray with a ``ncellid`` rows and 3 to 2 columns, depending
-        on whether on a structured or unstructured grid."""
-
-    # Find indices belonging to x, y coordinates
-    indices_cell2d = points_indices(dst_grid, out_of_bounds="ignore", x=x, y=y)
-    # Convert cell2d indices from 0-based to 1-based.
-    indices_cell2d = dict((dim, index + 1) for dim, index in indices_cell2d.items())
-    # Prepare layer indices, for later concatenation
-    indices_layer = xr.DataArray(layer, coords=indices_cell2d["x"].coords)
-
-    if isinstance(dst_grid, xu.UgridDataArray):
-        face_dim = dst_grid.ugrid.grid.face_dimension
-        indices_cell2d_dims = [face_dim]
-        cell2d_coords = ["cell2d"]
-    else:
-        indices_cell2d_dims = ["y", "x"]
-        cell2d_coords = ["row", "column"]
-
-    # Prepare cellid array of the right shape.
-    cellid_ls = [indices_layer] + [indices_cell2d[dim] for dim in indices_cell2d_dims]
-    cellid = xr.concat(cellid_ls, dim="nmax_cellid")
-    # Rename generic dimension name "index" to ncellid.
-    cellid = cellid.rename(index="ncellid")
-    # Put dimensions in right order after concatenation.
-    cellid = cellid.transpose("ncellid", "nmax_cellid")
-    # Assign extra coordinate names.
-    coords = {
-        "nmax_cellid": ["layer"] + cell2d_coords,
-        "x": ("ncellid", x),
-        "y": ("ncellid", y),
-    }
-    cellid = cellid.assign_coords(**coords)
-
-    return cellid

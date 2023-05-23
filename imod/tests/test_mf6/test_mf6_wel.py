@@ -185,7 +185,7 @@ def test_clip_box__high_lvl_transient(well_high_lvl_test_data_transient):
     )
 
 
-def test_create_cellid(basic_dis, well_high_lvl_test_data_stationary):
+def test_infer_cellid_from_points(basic_dis, well_high_lvl_test_data_stationary):
     # Arrange
     ibound, _, _ = basic_dis
     _, _, y, x, _, _ = well_high_lvl_test_data_stationary
@@ -207,7 +207,7 @@ def test_create_cellid(basic_dis, well_high_lvl_test_data_stationary):
     )
 
     # Act
-    cellid = imod.mf6.wel._create_cellid(ibound, x, y, layer)
+    cellid = imod.mf6.wel.Well._Well__infer_cellid_from_points(ibound, x, y, layer)
 
     # Assert
     np.testing.assert_array_equal(cellid, cellid_expected)
