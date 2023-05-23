@@ -150,6 +150,12 @@ class SpecificStorage(StorageBase):
         ),
     }
 
+    _regrid_method = {
+        "convertible": ("OverlapRegridder", "mean"),
+        "specific_storage": ("OverlapRegridder", "mean"),
+        "specific_yield": ("OverlapRegridder", "mean"),
+    }
+
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(

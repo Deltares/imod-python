@@ -772,7 +772,6 @@ class Package(PackageBase, abc.ABC):
         if regridder_types is not None:
             regridder_settings.update(regridder_types)
 
-        new_package_data = get_non_grid_data(self, regridder_settings.keys())
 
         for (
             source_dataarray_name,
