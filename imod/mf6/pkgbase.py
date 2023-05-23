@@ -779,29 +779,28 @@ class Package(PackageBase, abc.ABC):
             regridder_type_and_function,
         ) in regridder_settings.items():
             regridder_name = regridder_type_and_function[0]
-            regridder_function = None
-            if len(regridder_type_and_function) == 2:
-                regridder_function = regridder_type_and_function[1]
+            regridder_function = regridder_type_and_function[1] if len(regridder_type_and_function) == 2 else None
 
             if not self._valid(self.dataset[source_dataarray_name].values[()]):
                 new_package_data[source_dataarray_name] = None
-            else:
-                # obtain an instance of a regridder for the chosen method
-                regridder = regridder_collection.get_regridder(
-                    regridder_name,
-                    regridder_function,
-                )
+                continue
+            
+            # obtain an instance of a regridder for the chosen method
+            regridder = regridder_collection.get_regridder(
+                regridder_name,
+                regridder_function,
+            )
 
-                # store original dtype of data
-                original_dtype = self.dataset[source_dataarray_name].dtype
+            # store original dtype of data
+            original_dtype = self.dataset[source_dataarray_name].dtype
 
-                # regrid data array
-                regridded_array = regridder.regrid(self.dataset[source_dataarray_name])
+            # regrid data array
+            regridded_array = regridder.regrid(self.dataset[source_dataarray_name])
 
-                # reconvert the result to the same dtype as the original
-                new_package_data[source_dataarray_name] = regridded_array.astype(
-                    original_dtype
-                )
+            # reconvert the result to the same dtype as the original
+            new_package_data[source_dataarray_name] = regridded_array.astype(
+                original_dtype
+            )
         new_package = self.__class__(**new_package_data)
         return new_package
 
