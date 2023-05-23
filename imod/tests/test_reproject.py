@@ -230,10 +230,15 @@ def test_reproject_resample(write_tif, tmp_path):
 
 def test_reproject_rotation__via_kwargs(write_tif, tmp_path):
     """Reprojection from EPSG:28992 to EPSG:32631, by specifying kwarg"""
+    # Arrange
     write_tif(tmp_path / "rotated.tif", epsg=28992, rotation_angle=45.0)
     dst_crs = "EPSG:32631"
     da = rioxarray.open_rasterio(tmp_path / "rotated.tif").squeeze("band")
-    src_transform = affine.Affine.scale(1.0, -1.0) * affine.Affine.rotation(45.0)
+    src_transform = (
+        affine.Affine.translation(155000.0, 463000.0)
+        * affine.Affine.scale(1.0, -1.0)
+        * affine.Affine.rotation(45.0)
+    )
     newda = imod.prepare.reproject(
         da, src_crs="EPSG:28992", dst_crs=dst_crs, src_transform=src_transform
     )
@@ -251,6 +256,7 @@ def test_reproject_rotation__via_kwargs(write_tif, tmp_path):
         src_crs, dst_crs, src_width, src_height, *bounds
     )
 
+    # Act
     newarr = np.empty((dst_height, dst_width))
 
     rasterio.warp.reproject(
@@ -263,7 +269,9 @@ def test_reproject_rotation__via_kwargs(write_tif, tmp_path):
         resampling=rasterio.enums.Resampling.nearest,
         src_nodata=np.nan,
     )
-    assert np.allclose(newda.values, newarr, equal_nan=True)
+
+    # Assert
+    np.testing.assert_allclose(newda.values, newarr, equal_nan=True)
 
 
 def test_reproject_rotation__use_src_attrs(write_tif, tmp_path):
