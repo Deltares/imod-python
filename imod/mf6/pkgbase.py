@@ -765,6 +765,8 @@ class Package(PackageBase, abc.ABC):
         regridder_collection = RegridderInstancesCollection(
             self.dataset, target=targetgrid
         )
+        if not hasattr(self, "_regrid_method"):
+            raise NotImplementedError("this package does not support regridding")
 
         chosen_regridder_types = copy.deepcopy(self._regrid_method)
         if regridder_types is not None:
