@@ -143,7 +143,7 @@ def test_lake_write_disv_three_lakes(tmp_path):
     5                        2     18,1     horizontal     None        -5              -0.2          0.6             0.7
     6                        3     23,1     embeddedv      None        -6              0             0.7             0.8
     """
-    lake_like = xr.DataArray(np.ones(3, dtype=np.floating), dims=LAKE_DIM)
+    lake_like = xr.DataArray(np.ones(3, dtype=np.float64), dims=LAKE_DIM)
     boundnames = lake_like.copy(
         data=["IJsselmeer", "Vinkeveense_plas", "Reeuwijkse_plas"]
     )
@@ -151,7 +151,7 @@ def test_lake_write_disv_three_lakes(tmp_path):
     lake_numbers = lake_like.copy(data=[1, 2, 3])
 
     connection_like = xr.DataArray(
-        data=np.ones(6, dtype=np.floating), dims=(CONNECTION_DIM,)
+        data=np.ones(6, dtype=np.float64), dims=(CONNECTION_DIM,)
     )
     connection_lake_number = connection_like.copy(data=[1, 1, 1, 2, 2, 3])
     connection_type = connection_like.copy(
