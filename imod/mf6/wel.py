@@ -290,10 +290,10 @@ class Well(BoundaryCondition):
         df_for_cellid = wells_assigned.groupby("index").first()
         d_for_cellid = df_for_cellid[["x", "y", "layer"]].to_dict("list")
 
-        return self.__infer_cellid_from_points(like, **d_for_cellid)
+        return self.__derive_cellid_from_points(like, **d_for_cellid)
 
     @staticmethod
-    def __infer_cellid_from_points(
+    def __derive_cellid_from_points(
         dst_grid: Union[xr.DataArray, xu.UgridDataArray],
         x: List,
         y: List,
