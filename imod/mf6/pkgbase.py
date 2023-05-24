@@ -740,7 +740,7 @@ class Package(PackageBase, abc.ABC):
 
         return type(self)(**masked)
 
-    def regrid_like(self, target_grid, regridder_types=None)->"Package":
+    def regrid_like(self, target_grid, regridder_types=None) -> "Package":
         """
         Creates a package of the same type as this package, based on another discretization.
         It regrids all the arrays in this package to the desired  discretization, and leaves the options
@@ -763,7 +763,7 @@ class Package(PackageBase, abc.ABC):
         """
         if not hasattr(self, "_regrid_method"):
             raise NotImplementedError("this package does not support regridding")
-        
+
         regridder_collection = RegridderInstancesCollection(
             self.dataset, target_grid=target_grid
         )
@@ -779,12 +779,16 @@ class Package(PackageBase, abc.ABC):
             regridder_type_and_function,
         ) in regridder_settings.items():
             regridder_name = regridder_type_and_function[0]
-            regridder_function = regridder_type_and_function[1] if len(regridder_type_and_function) == 2 else None
+            regridder_function = (
+                regridder_type_and_function[1]
+                if len(regridder_type_and_function) == 2
+                else None
+            )
 
             if not self._valid(self.dataset[source_dataarray_name].values[()]):
                 new_package_data[source_dataarray_name] = None
                 continue
-            
+
             # obtain an instance of a regridder for the chosen method
             regridder = regridder_collection.get_regridder(
                 regridder_name,

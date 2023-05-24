@@ -8,7 +8,9 @@ from xugrid.regrid.regridder import (
 )
 
 
-def create_regridder_from_string(name, source_grid, target_grid, method=None)->BaseRegridder:
+def create_regridder_from_string(
+    name, source_grid, target_grid, method=None
+) -> BaseRegridder:
     """
     This function creates a regridder.
 
@@ -58,21 +60,21 @@ class RegridderInstancesCollection:
         self._source_grid = source_grid
         self._target_grid = target_grid
 
-    def __has_regridder(self, name, method)->bool:
+    def __has_regridder(self, name, method) -> bool:
         return (name, method) in self.regridder_instances.keys()
 
-    def __get_existing_regridder(self, name, method)->BaseRegridder:
+    def __get_existing_regridder(self, name, method) -> BaseRegridder:
         if self.__has_regridder(name, method):
             return self.regridder_instances[(name, method)]
         raise ValueError("no existing regridder of type " + name)
 
-    def __create_regridder(self, name, method)->BaseRegridder:
+    def __create_regridder(self, name, method) -> BaseRegridder:
         self.regridder_instances[(name, method)] = create_regridder_from_string(
             name, self._source_grid, self._target_grid, method
         )
         return self.regridder_instances[(name, method)]
 
-    def get_regridder(self, name, method=None)->BaseRegridder:
+    def get_regridder(self, name, method=None) -> BaseRegridder:
         """
         returns a regridder of the specified type-name and with the specified method.
         """
@@ -82,7 +84,7 @@ class RegridderInstancesCollection:
         return self.__get_existing_regridder(name, method)
 
 
-def get_non_grid_data(package, grid_names)->Dict[str, any]:
+def get_non_grid_data(package, grid_names) -> Dict[str, any]:
     """
     This function copies the attributes of a dataset that are scalars, such as options.
 
