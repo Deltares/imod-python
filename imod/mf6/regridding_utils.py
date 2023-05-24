@@ -110,7 +110,8 @@ def get_non_grid_data(package, grid_names: List[str]) -> Dict[str, any]:
     result = {}
     all_non_grid_data = list(package.dataset.keys())
     for name in grid_names:
-        all_non_grid_data.remove(name)
+        if name in all_non_grid_data:
+            all_non_grid_data.remove(name)
     for name in all_non_grid_data:
         result[name] = package.dataset[name].values[()]
     return result
