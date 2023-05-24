@@ -25,22 +25,36 @@ def grid_structured(dtype, value, cellsize)-> xr.DataArray:
 
     return da
 
+structured_grid_packages = [
+    imod.mf6.NodePropertyFlow(        
+        icelltype = grid_structured(np.int_, 1, 5.0),
+        k = grid_structured(np.float64, 12, 5.0), 
+        k22 = 3.0,),
+    imod.mf6.SpecificStorage(specific_storage=grid_structured(np.float_, 1.0e-4, 5.0),
+        specific_yield= grid_structured(np.float_, 0.15, 5.0), 
+        convertible=0, 
+        transient=False),
+    imod.mf6.StorageCoefficient(storage_coefficient=grid_structured(np.float_, 1.0e-4, 5.0),
+        specific_yield= grid_structured(np.float_, 0.15, 5.0), 
+        convertible=0, 
+        transient=True)
+
+]
+
 def test_regrid_structured():
     """
     This test regrids a structured grid to another structured grid of the same size.
     Some of the arrays are entered as grids and others as scalars
     """
-    package = imod.mf6.NodePropertyFlow(        
-        icelltype = grid_structured(np.int_, 1, 5.0),
-        k = grid_structured(np.float64, 12, 5.0), 
-        k22 = 3.0,)
-
     new_grid = grid_structured(np.float64, 12, 2.5)
+    new_packages = []
+    for package in structured_grid_packages:
+        new_packages.append(package.regrid_like(new_grid))
 
-
-    new_package = package.regrid_like(new_grid)
-    errors = new_package._validate(imod.mf6.NodePropertyFlow._write_schemata,  idomain=new_package.dataset["icelltype"],)
-    assert len(errors) == 0
+    new_idomain = new_packages[0].dataset["icelltype"]
+    for new_package in structured_grid_packages:
+        errors = new_package._validate(new_package._write_schemata,  idomain=new_idomain,)
+        assert len(errors) == 0
 
 def test_regrid_structured_missing_dx_and_dy():
     '''

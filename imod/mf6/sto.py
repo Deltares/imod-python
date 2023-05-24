@@ -276,7 +276,7 @@ class StorageCoefficient(StorageBase):
 
     _regrid_method = {
         "convertible": ("OverlapRegridder", "mean"),
-        "specific_storage": ("OverlapRegridder", "mean"),
+        "storage_coefficient": ("OverlapRegridder", "mean"),
         "specific_yield": ("OverlapRegridder", "mean"),
     }
 

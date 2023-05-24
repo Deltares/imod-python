@@ -796,7 +796,7 @@ class Package(PackageBase, abc.ABC):
                 continue
 
             #the dataarray might be a scalar. If it is, then it does not need regridding. 
-            if type(self.dataset[source_dataarray_name].values[()]) is np.float64:
+            if type(self.dataset[source_dataarray_name].values[()]) is np.float64 or type(self.dataset[source_dataarray_name].values[()]) is np.int32 :
                 new_package_data[source_dataarray_name] = self.dataset[source_dataarray_name].values[()]
                 continue
 
