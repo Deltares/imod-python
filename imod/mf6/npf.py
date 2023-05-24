@@ -285,7 +285,7 @@ class NodePropertyFlow(Package):
     _template = Package._initialize_template(_pkg_id)
 
     _regrid_method = {
-        "icelltype": ("OverlapRegridder","mean"),
+        "icelltype": ("OverlapRegridder", "mean"),
         "k": ("OverlapRegridder", "geometric_mean"),  # horizontal if angle2 = 0
         "k22": (
             "OverlapRegridder",

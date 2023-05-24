@@ -83,8 +83,8 @@ class StructuredDiscretization(Package):
 
     _regrid_method = {
         "top": ("OverlapRegridder", "mean"),
-        "bottom":("OverlapRegridder", "mean"),
-        "idomain":("OverlapRegridder", "mean"),
+        "bottom": ("OverlapRegridder", "mean"),
+        "idomain": ("OverlapRegridder", "mean"),
     }
 
     def __init__(self, top, bottom, idomain, validate: bool = True):
