@@ -1,7 +1,8 @@
 from typing import Dict
+
 from xugrid.regrid.regridder import (
-    BaseRegridder,
     BarycentricInterpolator,
+    BaseRegridder,
     CentroidLocatorRegridder,
     OverlapRegridder,
     RelativeOverlapRegridder,
