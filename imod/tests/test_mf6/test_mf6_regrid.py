@@ -36,8 +36,15 @@ structured_grid_packages = [
         transient=False),
     imod.mf6.StorageCoefficient(storage_coefficient=grid_structured(np.float_, 1.0e-4, 5.0),
         specific_yield= grid_structured(np.float_, 0.15, 5.0), 
-        convertible=0, 
-        transient=True)
+        convertible=grid_structured(np.int32, 0, 5.0), 
+        transient=True),
+     imod.mf6.Drainage(
+        elevation=grid_structured(np.float_, 1.0e-4, 5.0),
+        conductance=grid_structured(np.float_, 1.0e-4, 5.0),
+        print_input=True,
+        print_flows=True,
+        save_flows=True,
+    )
 
 ]
 
