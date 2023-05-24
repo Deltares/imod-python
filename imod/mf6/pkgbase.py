@@ -748,12 +748,18 @@ class Package(PackageBase, abc.ABC):
                 masked[var] = da
 
         return type(self)(**masked)
-
+    
+    def is_support_regridding(self)->bool:
+        '''
+        returns true if package supports regridding.
+        '''
+        return hasattr(self, "_regrid_method")
     def regrid_like(
         self,
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
         regridder_types: Dict[str, Tuple[str, str]] = None,
     ) -> "Package":
+
         """
         Creates a package of the same type as this package, based on another discretization.
         It regrids all the arrays in this package to the desired discretization, and leaves the options
@@ -777,7 +783,7 @@ class Package(PackageBase, abc.ABC):
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        if not hasattr(self, "_regrid_method"):
+        if not self.is_support_regridding():
             raise NotImplementedError(
                 f"Package {type(self).__name__} does not support regridding"
             )
@@ -806,6 +812,17 @@ class Package(PackageBase, abc.ABC):
             if not self._valid(self.dataset[source_dataarray_name].values[()]):
                 new_package_data[source_dataarray_name] = None
                 continue
+
+            #the dataarray might be a scalar. If it is, then it does not need regridding. 
+            if type(self.dataset[source_dataarray_name].values[()]) is np.float64:
+                new_package_data[source_dataarray_name] = self.dataset[source_dataarray_name].values[()]
+                continue
+
+            #if it is an xr.DataArray it needs the dx, dy coordinates, which are otherwise not mandatory
+            if type(self.dataset[source_dataarray_name]) is xr.DataArray:
+                coords =  self.dataset[source_dataarray_name].coords
+                if not("dx" in coords and "dy" in coords):
+                    raise ValueError(f"DataArray {source_dataarray_name} does not have both a dx and dy coordinates")
 
             # obtain an instance of a regridder for the chosen method
             regridder = regridder_collection.get_regridder(
