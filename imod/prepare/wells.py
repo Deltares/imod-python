@@ -85,8 +85,9 @@ def assign_wells(
 ) -> pd.DataFrame:
     """
     Distribute well pumping rate according to filter length when ``k=None``, or
-    filter transmissivity. Minimum thickness and minimum k should be
-    set to avoid placing wells in clay layers.
+    to transmissivity of the sediments surrounding the filter. Minimum
+    thickness and minimum k should be set to avoid placing wells in clay
+    layers.
 
     Wells located outside of the grid are removed.
 
@@ -164,11 +165,13 @@ def assign_wells(
     wells_in_bounds["k"] = 1.0
     wells_in_bounds["transmissivity"] = 1.0
     columns = list(set(wells_in_bounds.columns).difference(df))
-    if "time" in wells_in_bounds:
-        indexes = ["id", "time"]
-        columns.remove("time")
-    else:
-        indexes = "id"
+
+    indexes = ["id"]
+    for dim in ["species", "time"]:
+        if dim in wells_in_bounds:
+            indexes.append(dim)
+            columns.remove(dim)
+
     df[columns] = 1  # N.B. integer!
 
     assigned = (
