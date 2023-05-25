@@ -800,7 +800,7 @@ class Package(PackageBase, abc.ABC):
                 else None
             )
 
-            if not source_dataarray_name in self.dataset.keys():
+            if source_dataarray_name not in self.dataset.keys():
                 continue
 
             if not self._valid(self.dataset[source_dataarray_name].values[()]):
