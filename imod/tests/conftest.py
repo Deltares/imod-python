@@ -42,6 +42,10 @@ from .fixtures.mf6_twri_fixture import (
     twri_result,
 )
 from .fixtures.mf6_welltest_fixture import (
+    mf6wel_test_data_stationary,
+    mf6wel_test_data_transient,
+    well_high_lvl_test_data_stationary,
+    well_high_lvl_test_data_transient,
     well_test_data_stationary,
     well_test_data_transient,
 )
