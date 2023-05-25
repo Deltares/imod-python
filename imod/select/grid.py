@@ -3,7 +3,7 @@ from typing import List, Union
 import numpy as np
 import xarray as xr
 import xugrid as xu
-from fastcore import typedispatch
+from fastcore.dispatch import typedispatch
 from scipy.ndimage import binary_dilation
 
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
