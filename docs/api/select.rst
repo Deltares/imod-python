@@ -15,3 +15,6 @@ Select points and cross sections
     points_indices
     
     upper_active_layer
+
+    grid_boundary_xy
+    active_grid_boundary_xy

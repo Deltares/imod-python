@@ -15,6 +15,7 @@ dependencies:
   - geopandas
   - graphviz
   - python-graphviz
+  - fastcore
   - flopy
   - hypothesis
   - jinja2
