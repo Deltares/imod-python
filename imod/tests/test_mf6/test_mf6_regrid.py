@@ -2,9 +2,8 @@ import numpy as np
 import pytest
 import xarray as xr
 import xugrid as xu
-
+import pandas as pd
 import imod
-
 
 def grid_data_structured(dtype, value, cellsize) -> xr.DataArray:
     """
@@ -112,6 +111,10 @@ def create_package_instances(is_structured):
             print_flows=True,
             save_flows=True,
         ),
+        imod.mf6.GeneralHeadBoundary(
+            head=grid_data_function(np.float_, 1.0e-4, 5.0),
+            conductance =grid_data_function(np.float_, 1.0e-4, 5.0),
+        )
     ]
     if is_structured:
         packages.append(
@@ -166,7 +169,7 @@ def test_regrid_unstructured():
     new_idomain = new_packages[0].dataset["icelltype"]
     for new_package in new_packages:
         # package write validation crashes for VerticesDiscretization so we skip that one
-        if type(new_package).__name__ is not "VerticesDiscretization":
+        if type(new_package).__name__ != "VerticesDiscretization":
             errors = new_package._validate(
                 new_package._write_schemata,
                 idomain=new_idomain,
