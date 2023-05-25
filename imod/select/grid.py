@@ -47,7 +47,9 @@ def grid_boundary_xy(
 
 @typedispatch
 def _grid_boundary_xy(grid: object) -> None:
-    raise TypeError("Grid should be of type DataArray or UgridDataArray.")
+    raise TypeError(
+        f"Grid should be of type DataArray or UgridDataArray, got type {type(grid)}"
+    )
 
 
 @typedispatch
