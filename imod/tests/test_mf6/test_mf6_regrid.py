@@ -5,6 +5,7 @@ import xugrid as xu
 import pandas as pd
 import imod
 
+
 def grid_data_structured(dtype, value, cellsize) -> xr.DataArray:
     """
     This function creates a dataarray with scalar values for a grid of configurable cell size.
@@ -113,8 +114,8 @@ def create_package_instances(is_structured):
         ),
         imod.mf6.GeneralHeadBoundary(
             head=grid_data_function(np.float_, 1.0e-4, 5.0),
-            conductance =grid_data_function(np.float_, 1.0e-4, 5.0),
-        )
+            conductance=grid_data_function(np.float_, 1.0e-4, 5.0),
+        ),
     ]
     if is_structured:
         packages.append(
