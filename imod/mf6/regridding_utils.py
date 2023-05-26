@@ -1,5 +1,7 @@
-from typing import Dict
+from typing import Dict, List, Union
 
+import xarray as xr
+import xugrid as xu
 from xugrid.regrid.regridder import (
     BarycentricInterpolator,
     BaseRegridder,
@@ -10,17 +12,24 @@ from xugrid.regrid.regridder import (
 
 
 def create_regridder_from_string(
-    name, source_grid, target_grid, method=None
+    name: str,
+    source_grid: Union[xr.DataArray, xu.UgridDataArray],
+    target_grid: Union[xr.DataArray, xu.UgridDataArray],
+    method: str = None,
 ) -> BaseRegridder:
     """
     This function creates a regridder.
 
     Parameters
     ----------
-    name:  name of the regridder (for example, "CentroidLocatorRegridder")
-    source_grid: (ugrid or xarray) data-array containing the discretization of the source grid as coordinates
-    target_grid: (ugrid or xarray) data-array containing the discretization of the targetr-grid as coordinates
-    method: optionally, method used for regridding ( for example, "geometric_mean").
+    name: str
+        name of the regridder (for example, "CentroidLocatorRegridder")
+    source_grid: xr.DataArray of  xu.UgridDataArray
+        data-array containing the discretization of the source grid as coordinates
+    target_grid:  xr.DataArray of  xu.UgridDataArray
+        data-array containing the discretization of the targetr-grid as coordinates
+    method: str
+        optionally, method used for regridding ( for example, "geometric_mean").
 
     Returns
     -------
@@ -56,26 +65,30 @@ class RegridderInstancesCollection:
     This is important because computing the regridding weights is a costly affair.
     """
 
-    def __init__(self, source_grid, target_grid) -> None:
+    def __init__(
+        self,
+        source_grid: Union[xr.DataArray, xu.UgridDataArray],
+        target_grid: Union[xr.DataArray, xu.UgridDataArray],
+    ) -> None:
         self.regridder_instances = {}
         self._source_grid = source_grid
         self._target_grid = target_grid
 
-    def __has_regridder(self, name, method) -> bool:
+    def __has_regridder(self, name: str, method: str) -> bool:
         return (name, method) in self.regridder_instances.keys()
 
-    def __get_existing_regridder(self, name, method) -> BaseRegridder:
+    def __get_existing_regridder(self, name: str, method: str) -> BaseRegridder:
         if self.__has_regridder(name, method):
             return self.regridder_instances[(name, method)]
         raise ValueError("no existing regridder of type " + name)
 
-    def __create_regridder(self, name, method) -> BaseRegridder:
+    def __create_regridder(self, name: str, method: str) -> BaseRegridder:
         self.regridder_instances[(name, method)] = create_regridder_from_string(
             name, self._source_grid, self._target_grid, method
         )
         return self.regridder_instances[(name, method)]
 
-    def get_regridder(self, name, method=None) -> BaseRegridder:
+    def get_regridder(self, name: str, method: str = None) -> BaseRegridder:
         """
         returns a regridder of the specified type-name and with the specified method.
         """
@@ -85,7 +98,7 @@ class RegridderInstancesCollection:
         return self.__get_existing_regridder(name, method)
 
 
-def get_non_grid_data(package, grid_names) -> Dict[str, any]:
+def get_non_grid_data(package, grid_names: List[str]) -> Dict[str, any]:
     """
     This function copies the attributes of a dataset that are scalars, such as options.
 

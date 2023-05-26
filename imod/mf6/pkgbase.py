@@ -3,7 +3,7 @@ import copy
 import numbers
 import pathlib
 from collections import defaultdict
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple, Union
 
 import cftime
 import jinja2
@@ -740,7 +740,11 @@ class Package(PackageBase, abc.ABC):
 
         return type(self)(**masked)
 
-    def regrid_like(self, target_grid: Union[xr.DataArray, xu.UgridDataArray], regridder_types=None) -> "Package":
+    def regrid_like(
+        self,
+        target_grid: Union[xr.DataArray, xu.UgridDataArray],
+        regridder_types: Dict[str, Tuple[str, str]] = None,
+    ) -> "Package":
         """
         Creates a package of the same type as this package, based on another discretization.
         It regrids all the arrays in this package to the desired discretization, and leaves the options
@@ -777,7 +781,7 @@ class Package(PackageBase, abc.ABC):
         if regridder_types is not None:
             regridder_settings.update(regridder_types)
 
-        new_package_data = get_non_grid_data(self, regridder_settings.keys())
+        new_package_data = get_non_grid_data(self, list(regridder_settings.keys()))
 
         for (
             source_dataarray_name,
