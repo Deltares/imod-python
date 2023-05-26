@@ -763,7 +763,7 @@ class Package(PackageBase, abc.ABC):
         similar to the one used in input argument "target_grid"
         """
         if not hasattr(self, "_regrid_method"):
-            raise NotImplementedError("this package does not support regridding")
+            raise NotImplementedError(f"Package {type(self).__name__} does not support regridding")
 
         regridder_collection = RegridderInstancesCollection(
             self.dataset, target_grid=target_grid
