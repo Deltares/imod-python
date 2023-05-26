@@ -598,7 +598,7 @@ class Package(PackageBase, abc.ABC):
 
         # If the first time matches exactly, xarray will have done thing we
         # wanted and our work with the time dimension is finished.
-        if time_start != first_time:
+        if (time_start is not None) and (time_start != first_time):
             # If the first time is before the original time, we need to
             # backfill; otherwise, we need to ffill the first timestamp.
             if time_start < time[0]:
@@ -612,6 +612,15 @@ class Package(PackageBase, abc.ABC):
             indexer = xr.concat([first, indexer], dim="time")
 
         return indexer
+
+    def __to_datetime(self, time, use_cftime):
+        """
+        Helper function that converts to datetime, except when None.
+        """
+        if time is None:
+            return time
+        else:
+            return imod.wq.timeutil.to_datetime(time, use_cftime)
 
     def clip_box(
         self,
@@ -643,8 +652,8 @@ class Package(PackageBase, abc.ABC):
         layer_min: optional, int
         layer_max: optional, int
         x_min: optional, float
-        x_min: optional, float
-        y_max: optional, float
+        x_max: optional, float
+        y_min: optional, float
         y_max: optional, float
 
         Returns
@@ -655,8 +664,8 @@ class Package(PackageBase, abc.ABC):
         if "time" in selection:
             time = selection["time"].values
             use_cftime = isinstance(time[0], cftime.datetime)
-            time_start = imod.wq.timeutil.to_datetime(time_min, use_cftime)
-            time_end = imod.wq.timeutil.to_datetime(time_max, use_cftime)
+            time_start = self.__to_datetime(time_min, use_cftime)
+            time_end = self.__to_datetime(time_max, use_cftime)
 
             indexer = self._clip_time_indexer(
                 time=time,

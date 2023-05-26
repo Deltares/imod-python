@@ -1143,6 +1143,34 @@ def replace(da: xr.DataArray, to_replace: Any, value: Any) -> xr.DataArray:
     )
 
 
+def values_within_range(da, min=None, max=None):
+    """
+    Find which values are within range.
+    Function checks which values are unaffected by the clip method, to
+    be able to deal with min and max values equal to None, which
+    should be ignored.
+    If both min and max are True, returns scalar True.
+
+    Parameters
+    ----------
+    da: xr.DataArray
+        DataArray to be checked
+    min: float
+        Minimum value, if None no minimum value is set
+    max: float
+        Maximum value, if None no maximum value is set
+
+    Returns
+    -------
+    {bool, xr.DataArray}
+        Boolean array with values which are within range as True.
+    """
+    if min is None and max is None:
+        return True
+    else:
+        return da == da.clip(min=min, max=max)
+
+
 class MissingOptionalModule:
     """
     Presents a clear error for optional modules.
