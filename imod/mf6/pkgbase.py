@@ -760,7 +760,7 @@ class Package(PackageBase, abc.ABC):
         Returns
         -------
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
-        similar to the one used in input argument "targetgrid"
+        similar to the one used in input argument "target_grid"
         """
         if not hasattr(self, "_regrid_method"):
             raise NotImplementedError("this package does not support regridding")
