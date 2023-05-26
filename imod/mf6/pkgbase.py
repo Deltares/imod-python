@@ -743,8 +743,10 @@ class Package(PackageBase, abc.ABC):
     def regrid_like(self, target_grid, regridder_types=None) -> "Package":
         """
         Creates a package of the same type as this package, based on another discretization.
-        It regrids all the arrays in this package to the desired  discretization, and leaves the options
-        unmodified.
+        It regrids all the arrays in this package to the desired discretization, and leaves the options
+        unmodified. At the moment only regridding to a different planar grid is supported, meaning 
+        ``target_grid`` has different ``"x"`` and ``"y"`` or different ``cell2d`` coords.
+
         The regridding methods can be specified in the _regrid_method attribute of the package. These are the defaults
         that specify how each array should be regridded. These defaults can be overridden using the input
         parameters of this function.
