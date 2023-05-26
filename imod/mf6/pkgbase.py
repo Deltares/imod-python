@@ -754,12 +754,12 @@ class Package(PackageBase, abc.ABC):
         returns true if package supports regridding.
         """
         return hasattr(self, "_regrid_method")
+
     def regrid_like(
         self,
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
         regridder_types: Dict[str, Tuple[str, str]] = None,
     ) -> "Package":
-
         """
         Creates a package of the same type as this package, based on another discretization.
         It regrids all the arrays in this package to the desired discretization, and leaves the options
