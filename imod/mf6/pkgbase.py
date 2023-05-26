@@ -744,7 +744,7 @@ class Package(PackageBase, abc.ABC):
         """
         Creates a package of the same type as this package, based on another discretization.
         It regrids all the arrays in this package to the desired discretization, and leaves the options
-        unmodified. At the moment only regridding to a different planar grid is supported, meaning 
+        unmodified. At the moment only regridding to a different planar grid is supported, meaning
         ``target_grid`` has different ``"x"`` and ``"y"`` or different ``cell2d`` coords.
 
         The regridding methods can be specified in the _regrid_method attribute of the package. These are the defaults
@@ -765,7 +765,9 @@ class Package(PackageBase, abc.ABC):
         similar to the one used in input argument "target_grid"
         """
         if not hasattr(self, "_regrid_method"):
-            raise NotImplementedError(f"Package {type(self).__name__} does not support regridding")
+            raise NotImplementedError(
+                f"Package {type(self).__name__} does not support regridding"
+            )
 
         regridder_collection = RegridderInstancesCollection(
             self.dataset, target_grid=target_grid
