@@ -416,6 +416,22 @@ def _parse_periodsblock(lines: _LineIterator) -> Dict[str, str]:
         _wrap_error_message(e, "periods data block", lines)
 
 
+def _parse_speciesblock(lines: _LineIterator):
+    try:
+        species = {}
+        while not lines.finished:
+            line = next(lines)
+            # Stop if we encounter an empty line.
+            if len(line) == 0:
+                break
+            name, nr = line
+            nr = int(nr)
+            species[nr] = name
+        return species
+    except Exception as e:
+        _wrap_error_message(e, "species entry", lines)
+
+
 def _parse_block(lines: _LineIterator, content: Dict[str, Any]) -> None:
     """
     Mutates content dict.
@@ -442,6 +458,8 @@ def _parse_block(lines: _LineIterator, content: Dict[str, Any]) -> None:
             blockcontent = _parse_pcgblock(lines)
         elif key == "periods":
             blockcontent = _parse_periodsblock(lines)
+        elif key == "species":
+            blockcontent = _parse_speciesblock(lines)
         elif key == "extra":
             blockcontent = _parse_extrablock(lines, n)
         else:
