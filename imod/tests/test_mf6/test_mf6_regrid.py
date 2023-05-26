@@ -78,6 +78,6 @@ def test_regrid_not_supported():
 
     disperion_package = imod.mf6.Dispersion(1e-4, disp, disp)
     with pytest.raises(
-        NotImplementedError, match="this package does not support regridding"
+        NotImplementedError, match="Package Dispersion does not support regridding"
     ):
         disperion_package.regrid_like(idomain)
