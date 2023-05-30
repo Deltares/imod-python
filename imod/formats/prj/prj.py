@@ -889,6 +889,10 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
             for key, time in periods_block.items()
         }
 
+    # Pop species block, at the moment we do not do much with,
+    # since most regional models are without solute transport
+    species_block = content.pop("species", None)
+
     has_topbot = "(top)" in content and "(bot)" in content
     prj_data = {}
     repeat_stress = {}
@@ -913,7 +917,7 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
                     block_content, variables, periods
                 )
             else:
-                raise ValueError("Unsupported key")
+                raise KeyError(f"Unsupported key: '{key}'")
         except Exception as e:
             raise type(e)(f"{e}. Errored while opening/reading data entries for: {key}")
 
