@@ -891,7 +891,7 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
 
     # Pop species block, at the moment we do not do much with,
     # since most regional models are without solute transport
-    species_block = content.pop("species", None)
+    content.pop("species", None)
 
     has_topbot = "(top)" in content and "(bot)" in content
     prj_data = {}
