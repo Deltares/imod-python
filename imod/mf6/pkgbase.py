@@ -827,7 +827,10 @@ class Package(PackageBase, abc.ABC):
                 continue
 
             # if it is an xr.DataArray it needs the dx, dy coordinates, which are otherwise not mandatory
-            if type(self.dataset[source_dataarray_name]) is xr.DataArray:
+            if (
+                type(self.dataset[source_dataarray_name]) is xr.DataArray
+                and type(self.dataset[source_dataarray_name]) is not xu.UgridDataArray
+            ):
                 coords = self.dataset[source_dataarray_name].coords
                 if not ("dx" in coords and "dy" in coords):
                     raise ValueError(
