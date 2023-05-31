@@ -214,6 +214,19 @@ def test_parse_notimeblock():
     assert actual["head"][0]["path"] == "head.idf"
 
 
+def test_parse_speciesblock():
+    lines = prj._LineIterator(
+        [
+            ["benzene", "1"],
+            ["chloride", "2"],
+        ]
+    )
+
+    actual = prj._parse_speciesblock(lines)
+    assert actual[1] == "benzene"
+    assert actual[2] == "chloride"
+
+
 def test_parse_capblock():
     lines = prj._LineIterator(
         [
@@ -439,6 +452,10 @@ class TestProjectFile:
             01-04-1900 00:00:00
             winter
             01-10-1900 00:00:00
+
+            Species
+            "benzene",1
+            "chloride",2
 
             """
         )
