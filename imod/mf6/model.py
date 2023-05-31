@@ -17,6 +17,7 @@ from imod.mf6 import qgs_util
 from imod.mf6.pkgbase import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
+from imod.mf6.hfb import AbstractHorizontalFlowBarrier
 from imod.schemata import ValidationError
 
 from typing import Union, Dict, Tuple
@@ -334,8 +335,16 @@ class Modflow6Model(collections.UserDict, abc.ABC):
     def regrid_like(
         self,
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
-        regridder_types: Dict[str, Tuple[str, str]] = None,
     ) -> "Modflow6Model":    
+        nonstandard_package_types = [imod.mf6.Well, AbstractHorizontalFlowBarrier, ]
+
+        for pkgname, pkg in self.items():
+            if type(pkg) in nonstandard_package_types:
+                continue
+            if pkg.is_support_regridding():
+                pkg.regrid_like(target_grid)
+             
+
         
 
 
