@@ -416,6 +416,22 @@ def _parse_periodsblock(lines: _LineIterator) -> Dict[str, str]:
         _wrap_error_message(e, "periods data block", lines)
 
 
+def _parse_speciesblock(lines: _LineIterator):
+    try:
+        species = {}
+        while not lines.finished:
+            line = next(lines)
+            # Stop if we encounter an empty line.
+            if len(line) == 0:
+                break
+            name, nr = line
+            nr = int(nr)
+            species[nr] = name
+        return species
+    except Exception as e:
+        _wrap_error_message(e, "species entry", lines)
+
+
 def _parse_block(lines: _LineIterator, content: Dict[str, Any]) -> None:
     """
     Mutates content dict.
@@ -442,6 +458,8 @@ def _parse_block(lines: _LineIterator, content: Dict[str, Any]) -> None:
             blockcontent = _parse_pcgblock(lines)
         elif key == "periods":
             blockcontent = _parse_periodsblock(lines)
+        elif key == "species":
+            blockcontent = _parse_speciesblock(lines)
         elif key == "extra":
             blockcontent = _parse_extrablock(lines, n)
         else:
@@ -871,6 +889,10 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
             for key, time in periods_block.items()
         }
 
+    # Pop species block, at the moment we do not do much with,
+    # since most regional models are without solute transport
+    content.pop("species", None)
+
     has_topbot = "(top)" in content and "(bot)" in content
     prj_data = {}
     repeat_stress = {}
@@ -895,7 +917,7 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
                     block_content, variables, periods
                 )
             else:
-                raise ValueError("Unsupported key")
+                raise KeyError(f"Unsupported key: '{key}'")
         except Exception as e:
             raise type(e)(f"{e}. Errored while opening/reading data entries for: {key}")
 
