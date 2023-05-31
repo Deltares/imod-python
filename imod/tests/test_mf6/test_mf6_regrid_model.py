@@ -5,27 +5,60 @@ import xugrid as xu
 import numpy as np
 
 
-def test_regrid_model():
         
-    grid = imod.data.circle()
+def grid_data_structured(dtype, value, cellsize) -> xr.DataArray:
+    """
+    This function creates a dataarray with scalar values for a grid of configurable cell size.
+    """
+    horizontal_range = 10
+    y = np.arange(horizontal_range, -cellsize, -cellsize)
+    x = np.arange(0, horizontal_range + cellsize, cellsize)
 
-    nface = grid.n_face
-    nlayer = 2
+    nlayer = 3
 
-    idomain = xu.UgridDataArray(
-        xr.DataArray(
-            np.ones((nlayer, nface), dtype=np.int32),
-            coords={"layer": [1, 2]},
-            dims=["layer", grid.face_dimension],
-        ),
-        grid=grid,
-    )
-    icelltype = xu.full_like(idomain, 0)
-    k = xu.full_like(idomain, 1.0, dtype=float)
+    shape = nlayer, len(x), len(y)
+    dims = ("layer", "y", "x")
+    layer = np.arange(1, nlayer + 1)
+
+    coords = {"layer": layer, "y": y, "x": x, "dx": cellsize, "dy": cellsize}
+
+    da = xr.DataArray(np.ones(shape, dtype=dtype) * value, coords=coords, dims=dims)
+
+    return da
+
+def grid_data_structured_layered(dtype, value, cellsize) -> xr.DataArray:
+    """
+    This function creates a dataarray with scalar values for a grid of configurable cell size. The values are
+    multiplied with the layer index.
+    """
+    horizontal_range = 10
+    y = np.arange(horizontal_range, -cellsize, -cellsize)
+    x = np.arange(0, horizontal_range + cellsize, cellsize)
+
+    nlayer = 3
+
+    shape = nlayer, len(x), len(y)
+    dims = ("layer", "y", "x")
+    layer = np.arange(1, nlayer + 1)
+
+    coords = {"layer": layer, "y": y, "x": x, "dx": cellsize, "dy": cellsize}
+
+    da = xr.DataArray(np.ones(shape, dtype=dtype), coords=coords, dims=dims)
+    for ilayer in range(1, nlayer + 1):
+        layer_value = ilayer * value
+        da.loc[dict(layer=ilayer)] = layer_value
+    return da
+
+def test_regrid_model():
+
+    idomain = grid_data_structured(np.int32, 1, 2)
+
+
+    icelltype = xr.full_like(idomain, 0)
+    k = xr.full_like(idomain, 1.0, dtype=float)
     k33 = k.copy()
-    rch_rate = xu.full_like(idomain.sel(layer=1), 0.001, dtype=float)
-    bottom = idomain * xr.DataArray([5.0, 0.0], dims=["layer"])
-
+    rch_rate = xr.full_like(idomain.sel(layer=1), 0.001, dtype=float)
+    bottom =grid_data_structured_layered(idomain, 1.0, dtype=float)
     # %%
     # All the data above have been constants over the grid. For the constant head
     # boundary, we'd like to only set values on the external border. We can
@@ -66,25 +99,7 @@ def test_regrid_model():
     )
     gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
     gwf_model["rch"] = imod.mf6.Recharge(rch_rate)
+
 #make new grid
-    cellsize = 10
-    value = 1
-    horizontal_range = 100
-    y = np.arange(horizontal_range, -cellsize, -cellsize)
-    x = np.arange(0, horizontal_range + cellsize, cellsize)
-
-    nlayer = 3
-
-    shape = nlayer, len(x), len(y)
-    dims = ("layer", "y", "x")
-    layer = np.arange(1, nlayer + 1)
-
-    coords = {"layer": layer, "y": y, "x": x, "dx": cellsize, "dy": cellsize}
-
-    new_grid = xr.DataArray(np.ones(shape, dtype=np.int32), coords=coords, dims=dims)
-    for ilayer in range(1, nlayer + 1):
-        layer_value = ilayer * value
-        new_grid.loc[dict(layer=ilayer)] = layer_value
-
-    gwf_model.regrid_like(new_grid)
-
+    finer_idomain = grid_data_structured(np.int32, 1, 0.4)
+    gwf_model.regrid_like(finer_idomain)
