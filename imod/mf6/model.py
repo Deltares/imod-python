@@ -19,6 +19,9 @@ from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.schemata import ValidationError
 
+from typing import Union, Dict, Tuple
+import xarray as xr
+
 
 def initialize_template(name: str) -> Template:
     loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -327,6 +330,13 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 y_max=y_max,
             )
         return clipped
+    
+    def regrid_like(
+        self,
+        target_grid: Union[xr.DataArray, xu.UgridDataArray],
+        regridder_types: Dict[str, Tuple[str, str]] = None,
+    ) -> "Modflow6Model":    
+        
 
 
 class GroundwaterFlowModel(Modflow6Model):
