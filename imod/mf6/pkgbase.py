@@ -818,8 +818,8 @@ class Package(PackageBase, abc.ABC):
 
             # the dataarray might be a scalar. If it is, then it does not need regridding.
             if (
-                type(self.dataset[source_dataarray_name].values[()]) is np.float64
-                or type(self.dataset[source_dataarray_name].values[()]) is np.int32
+                type(self.dataset[source_dataarray_name].values[()]) is np.float_
+                or type(self.dataset[source_dataarray_name].values[()]) is np.int_                     
             ):
                 new_package_data[source_dataarray_name] = self.dataset[
                     source_dataarray_name
@@ -834,7 +834,7 @@ class Package(PackageBase, abc.ABC):
                 coords = self.dataset[source_dataarray_name].coords
                 if not ("dx" in coords and "dy" in coords):
                     raise ValueError(
-                        f"DataArray {source_dataarray_name} does not have both a dx and dy coordinates"
+                        f"DataArray {source_dataarray_name} does not have both a dx and dy coordinates. It  has type {type( self.dataset[source_dataarray_name].values[()])}"
                     )
 
             # obtain an instance of a regridder for the chosen method
