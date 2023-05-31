@@ -819,7 +819,7 @@ class Package(PackageBase, abc.ABC):
             # the dataarray might be a scalar. If it is, then it does not need regridding.
             if (
                 type(self.dataset[source_dataarray_name].values[()]) is np.float_
-                or type(self.dataset[source_dataarray_name].values[()]) is np.int_                     
+                or type(self.dataset[source_dataarray_name].values[()]) is np.int_
             ):
                 new_package_data[source_dataarray_name] = self.dataset[
                     source_dataarray_name
