@@ -59,6 +59,10 @@ class InitialConditions(Package):
     _keyword_map = {"start": "strt"}
     _template = Package._initialize_template(_pkg_id)
 
+    _regrid_method = {
+        "start": ("OverlapRegridder", "mean"),
+    }
+
     def __init__(self, start=None, head=None, validate: bool = True):
         super().__init__(locals())
         if start is None:

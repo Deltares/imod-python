@@ -69,7 +69,8 @@ class OutputControl(Package):
     }
 
     _write_schemata = {}
-
+    _regrid_method = {}
+    
     def __init__(
         self,
         save_head=None,
