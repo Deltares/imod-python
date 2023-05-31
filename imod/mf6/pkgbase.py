@@ -1,8 +1,9 @@
 import abc
+import copy
 import numbers
 import pathlib
 from collections import defaultdict
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple, Union
 
 import cftime
 import jinja2
@@ -11,6 +12,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.mf6.regridding_utils import RegridderInstancesCollection, get_non_grid_data
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
 
@@ -746,6 +748,83 @@ class Package(PackageBase, abc.ABC):
                 masked[var] = da
 
         return type(self)(**masked)
+
+    def regrid_like(
+        self,
+        target_grid: Union[xr.DataArray, xu.UgridDataArray],
+        regridder_types: Dict[str, Tuple[str, str]] = None,
+    ) -> "Package":
+        """
+        Creates a package of the same type as this package, based on another discretization.
+        It regrids all the arrays in this package to the desired discretization, and leaves the options
+        unmodified. At the moment only regridding to a different planar grid is supported, meaning
+        ``target_grid`` has different ``"x"`` and ``"y"`` or different ``cell2d`` coords.
+
+        The regridding methods can be specified in the _regrid_method attribute of the package. These are the defaults
+        that specify how each array should be regridded. These defaults can be overridden using the input
+        parameters of this function.
+
+        Parameters
+        ----------
+        target_grid: xr.DataArray or xu.UgridDataArray
+            a grid defined over the same discretization as the one we want to regrid the package to
+        regridder_types: dict
+           dictionary mapping arraynames (str) to a tuple of regrid method (str) and function name (str)
+            this dictionary can be used to override the default mapping method.
+
+        Returns
+        -------
+        a package with the same options as this package, and with all the data-arrays regridded to another discretization,
+        similar to the one used in input argument "target_grid"
+        """
+        if not hasattr(self, "_regrid_method"):
+            raise NotImplementedError(
+                f"Package {type(self).__name__} does not support regridding"
+            )
+
+        regridder_collection = RegridderInstancesCollection(
+            self.dataset, target_grid=target_grid
+        )
+
+        regridder_settings = copy.deepcopy(self._regrid_method)
+        if regridder_types is not None:
+            regridder_settings.update(regridder_types)
+
+        new_package_data = get_non_grid_data(self, list(regridder_settings.keys()))
+
+        for (
+            source_dataarray_name,
+            regridder_type_and_function,
+        ) in regridder_settings.items():
+            regridder_name = regridder_type_and_function[0]
+            regridder_function = (
+                regridder_type_and_function[1]
+                if len(regridder_type_and_function) == 2
+                else None
+            )
+
+            if not self._valid(self.dataset[source_dataarray_name].values[()]):
+                new_package_data[source_dataarray_name] = None
+                continue
+
+            # obtain an instance of a regridder for the chosen method
+            regridder = regridder_collection.get_regridder(
+                regridder_name,
+                regridder_function,
+            )
+
+            # store original dtype of data
+            original_dtype = self.dataset[source_dataarray_name].dtype
+
+            # regrid data array
+            regridded_array = regridder.regrid(self.dataset[source_dataarray_name])
+
+            # reconvert the result to the same dtype as the original
+            new_package_data[source_dataarray_name] = regridded_array.astype(
+                original_dtype
+            )
+        new_package = self.__class__(**new_package_data)
+        return new_package
 
 
 class BoundaryCondition(Package, abc.ABC):

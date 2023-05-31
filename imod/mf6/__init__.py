@@ -32,6 +32,7 @@ from imod.mf6.npf import NodePropertyFlow
 from imod.mf6.oc import OutputControl
 from imod.mf6.out import open_cbc, open_hds, read_cbc_headers, read_grb
 from imod.mf6.rch import Recharge
+from imod.mf6.regridding_utils import RegridderInstancesCollection
 from imod.mf6.riv import River
 from imod.mf6.simulation import Modflow6Simulation
 from imod.mf6.src import MassSourceLoading

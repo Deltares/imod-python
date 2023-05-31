@@ -284,6 +284,23 @@ class NodePropertyFlow(Package):
     }
     _template = Package._initialize_template(_pkg_id)
 
+    _regrid_method = {
+        "icelltype": ("BarycentricInterpolator",),
+        "k": ("OverlapRegridder", "geometric_mean"),  # horizontal if angle2 = 0
+        "k22": (
+            "OverlapRegridder",
+            "geometric_mean",
+        ),  # horizontal if angle2 = 0 & angle3 = 0
+        "k33": (
+            "OverlapRegridder",
+            "harmonic_mean",
+        ),  # vertical if angle2 = 0 & angle3 = 0
+        "angle1": ("OverlapRegridder", "mean"),
+        "angle2": ("OverlapRegridder", "mean"),
+        "angle3": ("OverlapRegridder", "mean"),
+        "rewet_layer": ("BarycentricInterpolator"),
+    }
+
     def __init__(
         self,
         icelltype,
