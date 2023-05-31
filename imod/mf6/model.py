@@ -338,11 +338,15 @@ class Modflow6Model(collections.UserDict, abc.ABC):
     ) -> "Modflow6Model":    
         nonstandard_package_types = [imod.mf6.Well, AbstractHorizontalFlowBarrier, ]
 
-        for pkgname, pkg in self.items():
+        new_model =  self.__class__()
+
+        for pkg_name, pkg in self.items():
             if type(pkg) in nonstandard_package_types:
                 continue
             if pkg.is_support_regridding():
-                pkg.regrid_like(target_grid)
+                new_model[pkg_name]=pkg.regrid_like(target_grid)
+        
+        return new_model
              
 
         
