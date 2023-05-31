@@ -50,24 +50,23 @@ def grid_data_structured_layered(dtype, value, cellsize) -> xr.DataArray:
     return da
 
 def test_regrid_model():
+    cellsize = 2.0
 
-    idomain = grid_data_structured(np.int32, 1, 2)
+    idomain = grid_data_structured(np.int32, 1, cellsize)
 
 
     icelltype = xr.full_like(idomain, 0)
     k = xr.full_like(idomain, 1.0, dtype=float)
     k33 = k.copy()
     rch_rate = xr.full_like(idomain.sel(layer=1), 0.001, dtype=float)
-    bottom =grid_data_structured_layered(idomain, 1.0, dtype=float)
+    bottom =grid_data_structured_layered(np.float64, 1.0,cellsize)
     # %%
     # All the data above have been constants over the grid. For the constant head
     # boundary, we'd like to only set values on the external border. We can
     # `py:method:xugrid.UgridDataset.binary_dilation` to easily find these cells:
 
-    chd_location = xu.zeros_like(idomain.sel(layer=2), dtype=bool).ugrid.binary_dilation(
-        border_value=True
-    )
-    constant_head = xu.full_like(idomain.sel(layer=2), 1.0, dtype=float).where(chd_location)
+    chd_location = xr.zeros_like(idomain.sel(layer=2), dtype=bool)
+    constant_head = xr.full_like(idomain.sel(layer=2), 1.0, dtype=float).where(chd_location)
 
 
     # %%
@@ -78,7 +77,7 @@ def test_regrid_model():
     # conditions are added in the form of the familiar MODFLOW packages.
 
     gwf_model = imod.mf6.GroundwaterFlowModel()
-    gwf_model["disv"] = imod.mf6.VerticesDiscretization(
+    gwf_model["disv"] = imod.mf6.StructuredDiscretization(
         top=10.0, bottom=bottom, idomain=idomain
     )
     gwf_model["chd"] = imod.mf6.ConstantHead(
