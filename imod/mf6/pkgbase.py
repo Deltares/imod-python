@@ -749,7 +749,7 @@ class Package(PackageBase, abc.ABC):
 
         return type(self)(**masked)
 
-    def is_support_regridding(self) -> bool:
+    def is_regridding_supported(self) -> bool:
         """
         returns true if package supports regridding.
         """
@@ -783,7 +783,7 @@ class Package(PackageBase, abc.ABC):
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        if not self.is_support_regridding():
+        if not self.is_regridding_supported():
             raise NotImplementedError(
                 f"Package {type(self).__name__} does not support regridding"
             )

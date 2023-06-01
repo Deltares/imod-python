@@ -22,9 +22,11 @@ def grid_data_structured(dtype, value, cellsize) -> xr.DataArray:
 
     coords = {"layer": layer, "y": y, "x": x, "dx": cellsize, "dy": cellsize}
 
-    da = xr.DataArray(np.ones(shape, dtype=dtype) * value, coords=coords, dims=dims)
+    structured_grid_data = xr.DataArray(
+        np.ones(shape, dtype=dtype) * value, coords=coords, dims=dims
+    )
 
-    return da
+    return structured_grid_data
 
 
 def grid_data_structured_layered(dtype, value, cellsize) -> xr.DataArray:
@@ -44,11 +46,13 @@ def grid_data_structured_layered(dtype, value, cellsize) -> xr.DataArray:
 
     coords = {"layer": layer, "y": y, "x": x, "dx": cellsize, "dy": cellsize}
 
-    da = xr.DataArray(np.ones(shape, dtype=dtype), coords=coords, dims=dims)
+    unstructured_grid_data = xr.DataArray(
+        np.ones(shape, dtype=dtype), coords=coords, dims=dims
+    )
     for ilayer in range(1, nlayer + 1):
         layer_value = ilayer * value
-        da.loc[dict(layer=ilayer)] = layer_value
-    return da
+        unstructured_grid_data.loc[dict(layer=ilayer)] = layer_value
+    return unstructured_grid_data
 
 
 def grid_data_unstructured(dtype, value, cellsize) -> xu.UgridDataArray:
@@ -90,6 +94,12 @@ def create_package_instances(is_structured):
         imod.mf6.SpecificStorage(
             specific_storage=grid_data_function(np.float_, 1.0e-4, 5.0),
             specific_yield=grid_data_function(np.float_, 0.15, 5.0),
+            convertible=0,
+            transient=False,
+        ),
+        imod.mf6.SpecificStorage(
+            specific_storage=0.3,
+            specific_yield=0.4,
             convertible=0,
             transient=False,
         ),
