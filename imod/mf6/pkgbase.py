@@ -10,12 +10,12 @@ import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
+from xarray.core.utils import is_scalar
 
 import imod
 from imod.mf6.regridding_utils import RegridderInstancesCollection, get_non_grid_data
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
-from xarray.core.utils import is_scalar
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
@@ -803,7 +803,7 @@ class Package(PackageBase, abc.ABC):
             source_da_name,
             regridder_type_and_function,
         ) in regridder_settings.items():
-            regridder_name , regridder_function = regridder_type_and_function
+            regridder_name, regridder_function = regridder_type_and_function
 
             if source_da_name not in self.dataset.keys():
                 continue
@@ -814,9 +814,9 @@ class Package(PackageBase, abc.ABC):
 
             # the dataarray might be a scalar. If it is, then it does not need regridding.
             if is_scalar(self.dataset[source_da_name]):
-                new_package_data[source_da_name] = self.dataset[
-                    source_da_name
-                ].values[()]
+                new_package_data[source_da_name] = self.dataset[source_da_name].values[
+                    ()
+                ]
                 continue
 
             # if it is an xr.DataArray it needs the dx, dy coordinates, which are otherwise not mandatory
@@ -840,17 +840,15 @@ class Package(PackageBase, abc.ABC):
             regridded_array = regridder.regrid(self.dataset[source_da_name])
 
             # reconvert the result to the same dtype as the original
-            new_package_data[source_da_name] = regridded_array.astype(
-                original_dtype
-            )
+            new_package_data[source_da_name] = regridded_array.astype(original_dtype)
         new_package = self.__class__(**new_package_data)
 
-        #TODO gitlab-398: write validation fails for VerticesDiscretization
+        # TODO gitlab-398: write validation fails for VerticesDiscretization
         if type(new_package).__name__ != "VerticesDiscretization":
             errors = new_package._validate(
                 new_package._write_schemata,
                 idomain=target_grid,
-            )        
+            )
             if len(errors) > 0:
                 raise ValidationError(validation_pkg_error_message(errors))
         return new_package

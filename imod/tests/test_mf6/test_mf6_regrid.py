@@ -158,10 +158,12 @@ def test_regrid_structured():
         new_packages.append(package.regrid_like(new_grid))
 
     new_idomain = new_packages[0].dataset["icelltype"]
-    
 
-    is_valid = lambda pkg: len(pkg._validate(pkg._write_schemata, idomain=new_idomain)) == 0
+    is_valid = (
+        lambda pkg: len(pkg._validate(pkg._write_schemata, idomain=new_idomain)) == 0
+    )
     assert all(is_valid(new_package) for new_package in new_packages)
+
 
 def test_regrid_unstructured():
     """
@@ -176,7 +178,7 @@ def test_regrid_unstructured():
 
     new_idomain = new_packages[0].dataset["icelltype"]
     for new_package in new_packages:
-        #TODO gitlab-398: package write validation crashes for VerticesDiscretization so we skip that one
+        # TODO gitlab-398: package write validation crashes for VerticesDiscretization so we skip that one
         if type(new_package).__name__ != "VerticesDiscretization":
             errors = new_package._validate(
                 new_package._write_schemata,
