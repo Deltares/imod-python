@@ -14,7 +14,7 @@ end options
 
 begin dimensions
   maxbound {{maxbound}}
-  nseg{%- if nseg is defined %} {{nseg}}{% endif %}
+  {%- if nseg is defined %}  nseg {{nseg}}{% endif %}
 end dimensions
 
 {% for i, path in periods.items() %}
