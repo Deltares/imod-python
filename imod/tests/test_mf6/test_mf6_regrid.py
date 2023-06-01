@@ -4,7 +4,12 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.tests.fixtures.mf6_regridding_fixture import grid_data_structured, grid_data_unstructured, grid_data_structured_layered, grid_data_unstructured_layered
+from imod.tests.fixtures.mf6_regridding_fixture import (
+    grid_data_structured,
+    grid_data_unstructured,
+    grid_data_structured_layered,
+    grid_data_unstructured_layered,
+)
 
 
 def create_package_instances(is_structured):
@@ -52,6 +57,8 @@ def create_package_instances(is_structured):
             head=grid_data_function(np.float_, 1.0e-4, 5.0),
             conductance=grid_data_function(np.float_, 1.0e-4, 5.0),
         ),
+        imod.mf6.OutputControl(save_head="all", save_budget="all"),
+        imod.mf6.Recharge(grid_data_function(np.float64, 0.002, 5.0).sel(layer=[1])),
     ]
     if is_structured:
         packages.append(

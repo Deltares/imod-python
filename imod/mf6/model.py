@@ -331,24 +331,32 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 y_max=y_max,
             )
         return clipped
-    
+
     def regrid_like(
         self,
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
-    ) -> "Modflow6Model":    
-        nonstandard_package_types = [imod.mf6.Well, AbstractHorizontalFlowBarrier, ]
+    ) -> "Modflow6Model":
+        nonstandard_package_types = [
+            imod.mf6.Well,
+            AbstractHorizontalFlowBarrier,
+        ]
 
-        new_model =  self.__class__()
+        new_model = self.__class__()
 
         for pkg_name, pkg in self.items():
             if any([pkg is packagetype for packagetype in nonstandard_package_types]):
-                raise NotImplementedError(f"regridding is not implemented for package {pkg_name} of type {type(pkg)}")
+                raise NotImplementedError(
+                    f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
+                )
             if pkg.is_support_regridding():
-                new_model[pkg_name]=pkg.regrid_like(target_grid)
+                new_model[pkg_name] = pkg.regrid_like(target_grid)
             else:
-                raise NotImplementedError(f"regridding is not implemented for package {pkg_name} of type {type(pkg)}")
-            
+                raise NotImplementedError(
+                    f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
+                )
+
         return new_model
+
 
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")

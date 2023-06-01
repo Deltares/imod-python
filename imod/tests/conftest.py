@@ -51,4 +51,7 @@ from .fixtures.mf6_welltest_fixture import (
 )
 from .fixtures.msw_fixture import fixed_format_parser
 from .fixtures.msw_model_fixture import coupled_mf6_model, msw_model
-from .fixtures.mf6_regridding_fixture import structured_flow_model, unstructured_flow_model
+from .fixtures.mf6_regridding_fixture import (
+    structured_flow_model,
+    unstructured_flow_model,
+)

@@ -5,6 +5,7 @@ import imod
 import pytest
 from typing import Union
 
+
 def grid_data_structured(dtype, value, cellsize) -> xr.DataArray:
     """
     This function creates a dataarray with scalar values for a grid of configurable cell size.
@@ -24,6 +25,7 @@ def grid_data_structured(dtype, value, cellsize) -> xr.DataArray:
     da = xr.DataArray(np.ones(shape, dtype=dtype) * value, coords=coords, dims=dims)
 
     return da
+
 
 def grid_data_structured_layered(dtype, value, cellsize) -> xr.DataArray:
     """
@@ -68,6 +70,7 @@ def grid_data_unstructured_layered(dtype, value, cellsize) -> xu.UgridDataArray:
         grid_data_structured_layered(dtype, value, cellsize)
     )
 
+
 def make_model_from_idomain(grid_data_function, cellsize: float):
     gwf_model = imod.mf6.GroundwaterFlowModel()
 
@@ -95,23 +98,22 @@ def make_model_from_idomain(grid_data_function, cellsize: float):
         convertible=0,
     )
     gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
-    rch_rate_all =grid_data_function(np.float64, 0.002, cellsize)
+    rch_rate_all = grid_data_function(np.float64, 0.002, cellsize)
     rch_rate = rch_rate_all.sel(layer=[1])
 
-  
     gwf_model["rch"] = imod.mf6.Recharge(rch_rate)
 
     return gwf_model
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def structured_flow_model() -> imod.mf6.GroundwaterFlowModel:
     cellsize = 2.0
 
     idomain = grid_data_structured(np.int32, 1, cellsize)
     gwf_model = make_model_from_idomain(grid_data_structured, cellsize)
 
-    bottom =grid_data_structured_layered(np.float64, -1.0,cellsize)    
+    bottom = grid_data_structured_layered(np.float64, -1.0, cellsize)
 
     gwf_model["disv"] = imod.mf6.StructuredDiscretization(
         top=10.0, bottom=bottom, idomain=idomain
@@ -119,16 +121,15 @@ def structured_flow_model() -> imod.mf6.GroundwaterFlowModel:
     return gwf_model
 
 
-
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def unstructured_flow_model() -> imod.mf6.GroundwaterFlowModel:
     cellsize = 2.0
 
     idomain = grid_data_unstructured(np.int32, 1, cellsize)
     gwf_model = make_model_from_idomain(grid_data_unstructured, cellsize)
 
-    bottom =grid_data_unstructured_layered(np.float64, -1.0,cellsize)    
-    
+    bottom = grid_data_unstructured_layered(np.float64, -1.0, cellsize)
+
     gwf_model["disv"] = imod.mf6.VerticesDiscretization(
         top=10.0, bottom=bottom, idomain=idomain
     )
