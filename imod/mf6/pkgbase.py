@@ -803,12 +803,7 @@ class Package(PackageBase, abc.ABC):
             source_da_name,
             regridder_type_and_function,
         ) in regridder_settings.items():
-            regridder_name = regridder_type_and_function[0]
-            regridder_function = (
-                regridder_type_and_function[1]
-                if len(regridder_type_and_function) == 2
-                else None
-            )
+            regridder_name , regridder_function = regridder_type_and_function
 
             if source_da_name not in self.dataset.keys():
                 continue
