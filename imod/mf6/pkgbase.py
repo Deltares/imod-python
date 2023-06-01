@@ -819,9 +819,13 @@ class Package(PackageBase, abc.ABC):
                 ]
                 continue
 
-            # if it is an xr.DataArray it needs the dx, dy coordinates, which are otherwise not mandatory
             if isinstance(self.dataset[source_da_name], xr.DataArray):
                 coords = self.dataset[source_da_name].coords
+                # if it is an xr.DataArray it may be layer-based; then no regridding is needed
+                if not ("x" in coords and "y" in coords):
+                    new_package_data[source_da_name] = self.dataset[source_da_name]
+                    continue
+                # if it is an xr.DataArray it needs the dx, dy coordinates for regridding, which are otherwise not mandatory
                 if not ("dx" in coords and "dy" in coords):
                     raise ValueError(
                         f"DataArray {source_da_name} does not have both a dx and dy coordinates"
@@ -844,7 +848,7 @@ class Package(PackageBase, abc.ABC):
         new_package = self.__class__(**new_package_data)
 
         # TODO gitlab-398: write validation fails for VerticesDiscretization
-        if type(new_package).__name__ != "VerticesDiscretization":
+        if not isinstance(self, imod.mf6.VerticesDiscretization):
             errors = new_package._validate(
                 new_package._write_schemata,
                 idomain=target_grid,
