@@ -15,6 +15,7 @@ import imod
 from imod.mf6.regridding_utils import RegridderInstancesCollection, get_non_grid_data
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
+from xarray.core.utils import is_scalar
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
@@ -799,7 +800,7 @@ class Package(PackageBase, abc.ABC):
         new_package_data = get_non_grid_data(self, list(regridder_settings.keys()))
 
         for (
-            source_dataarray_name,
+            source_da_name,
             regridder_type_and_function,
         ) in regridder_settings.items():
             regridder_name = regridder_type_and_function[0]
@@ -809,29 +810,26 @@ class Package(PackageBase, abc.ABC):
                 else None
             )
 
-            if source_dataarray_name not in self.dataset.keys():
+            if source_da_name not in self.dataset.keys():
                 continue
 
-            if not self._valid(self.dataset[source_dataarray_name].values[()]):
-                new_package_data[source_dataarray_name] = None
+            if not self._valid(self.dataset[source_da_name].values[()]):
+                new_package_data[source_da_name] = None
                 continue
 
             # the dataarray might be a scalar. If it is, then it does not need regridding.
-            if (
-                type(self.dataset[source_dataarray_name].values[()]) is np.float_
-                or type(self.dataset[source_dataarray_name].values[()]) is np.int_
-            ):
-                new_package_data[source_dataarray_name] = self.dataset[
-                    source_dataarray_name
+            if is_scalar(self.dataset[source_da_name]):
+                new_package_data[source_da_name] = self.dataset[
+                    source_da_name
                 ].values[()]
                 continue
 
             # if it is an xr.DataArray it needs the dx, dy coordinates, which are otherwise not mandatory
-            if type(self.dataset[source_dataarray_name]) is xr.DataArray:
-                coords = self.dataset[source_dataarray_name].coords
+            if isinstance(self.dataset[source_da_name], xr.DataArray):
+                coords = self.dataset[source_da_name].coords
                 if not ("dx" in coords and "dy" in coords):
                     raise ValueError(
-                        f"DataArray {source_dataarray_name} does not have both a dx and dy coordinates"
+                        f"DataArray {source_da_name} does not have both a dx and dy coordinates"
                     )
 
             # obtain an instance of a regridder for the chosen method
@@ -841,13 +839,13 @@ class Package(PackageBase, abc.ABC):
             )
 
             # store original dtype of data
-            original_dtype = self.dataset[source_dataarray_name].dtype
+            original_dtype = self.dataset[source_da_name].dtype
 
             # regrid data array
-            regridded_array = regridder.regrid(self.dataset[source_dataarray_name])
+            regridded_array = regridder.regrid(self.dataset[source_da_name])
 
             # reconvert the result to the same dtype as the original
-            new_package_data[source_dataarray_name] = regridded_array.astype(
+            new_package_data[source_da_name] = regridded_array.astype(
                 original_dtype
             )
         new_package = self.__class__(**new_package_data)

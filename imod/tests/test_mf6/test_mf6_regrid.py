@@ -161,9 +161,7 @@ def test_regrid_structured():
     
 
     is_valid = lambda pkg: len(pkg._validate(pkg._write_schemata, idomain=new_idomain)) == 0
-    has_errors = any(not is_valid(new_package) for new_package in new_packages)
-    assert not has_errors
-
+    assert all(is_valid(new_package) for new_package in new_packages)
 
 def test_regrid_unstructured():
     """
