@@ -851,6 +851,15 @@ class Package(PackageBase, abc.ABC):
                 original_dtype
             )
         new_package = self.__class__(**new_package_data)
+
+        #TODO gitlab-398: write validation fails for VerticesDiscretization
+        if type(new_package).__name__ != "VerticesDiscretization":
+            errors = new_package._validate(
+                new_package._write_schemata,
+                idomain=target_grid,
+            )        
+            if len(errors) > 0:
+                raise ValidationError(validation_pkg_error_message(errors))
         return new_package
 
 
