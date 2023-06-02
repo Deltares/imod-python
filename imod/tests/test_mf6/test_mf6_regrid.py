@@ -9,7 +9,7 @@ from imod.tests.fixtures.mf6_regridding_fixture import (
     grid_data_unstructured,
     grid_data_structured_layered,
     grid_data_unstructured_layered,
-)
+    )
 
 
 def create_package_instances(is_structured):
@@ -28,9 +28,30 @@ def create_package_instances(is_structured):
             k=grid_data_function(np.float64, 12, 5.0),
             k22=3.0,
         ),
+        imod.mf6.NodePropertyFlow(  # test package with layer-based array as input
+            icelltype=grid_data_function(np.int_, 1, 5.0),
+            k=xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": [1, 2, 3]}, ("layer",)),
+            k22=3.0,
+        ),
         imod.mf6.SpecificStorage(
             specific_storage=grid_data_function(np.float_, 1.0e-4, 5.0),
             specific_yield=grid_data_function(np.float_, 0.15, 5.0),
+            convertible=0,
+            transient=False,
+        ),
+        imod.mf6.SpecificStorage(
+            specific_storage=xr.DataArray(
+                [1.0e-3, 1.0e-4, 2.0e-4], {"layer": [1, 2, 3]}, ("layer",)
+            ),
+            specific_yield=xr.DataArray(
+                [1.0e-3, 1.0e-4, 2.0e-4], {"layer": [1, 2, 3]}, ("layer",)
+            ),
+            convertible=0,
+            transient=False,
+        ),
+        imod.mf6.SpecificStorage(  # test package with only scalar input
+            specific_storage=0.3,
+            specific_yield=0.4,
             convertible=0,
             transient=False,
         ),
@@ -91,12 +112,11 @@ def test_regrid_structured():
         new_packages.append(package.regrid_like(new_grid))
 
     new_idomain = new_packages[0].dataset["icelltype"]
-    for new_package in new_packages:
-        errors = new_package._validate(
-            new_package._write_schemata,
-            idomain=new_idomain,
-        )
-        assert len(errors) == 0
+
+    is_valid = (
+        lambda pkg: len(pkg._validate(pkg._write_schemata, idomain=new_idomain)) == 0
+    )
+    assert all(is_valid(new_package) for new_package in new_packages)
 
 
 def test_regrid_unstructured():
@@ -112,8 +132,8 @@ def test_regrid_unstructured():
 
     new_idomain = new_packages[0].dataset["icelltype"]
     for new_package in new_packages:
-        # package write validation crashes for VerticesDiscretization so we skip that one
-        if type(new_package).__name__ != "VerticesDiscretization":
+        # TODO gitlab-398: package write validation crashes for VerticesDiscretization so we skip that one
+        if not isinstance(new_package, imod.mf6.VerticesDiscretization):
             errors = new_package._validate(
                 new_package._write_schemata,
                 idomain=new_idomain,

@@ -10,6 +10,7 @@ import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
+from xarray.core.utils import is_scalar
 
 import imod
 from imod.mf6.regridding_utils import RegridderInstancesCollection, get_non_grid_data
@@ -749,7 +750,7 @@ class Package(PackageBase, abc.ABC):
 
         return type(self)(**masked)
 
-    def is_support_regridding(self) -> bool:
+    def is_regridding_supported(self) -> bool:
         """
         returns true if package supports regridding.
         """
@@ -783,7 +784,7 @@ class Package(PackageBase, abc.ABC):
         a package with the same options as this package, and with all the data-arrays regridded to another discretization,
         similar to the one used in input argument "target_grid"
         """
-        if not self.is_support_regridding():
+        if not self.is_regridding_supported():
             raise NotImplementedError(
                 f"Package {type(self).__name__} does not support regridding"
             )
@@ -799,39 +800,33 @@ class Package(PackageBase, abc.ABC):
         new_package_data = get_non_grid_data(self, list(regridder_settings.keys()))
 
         for (
-            source_dataarray_name,
+            varname,
             regridder_type_and_function,
         ) in regridder_settings.items():
-            regridder_name = regridder_type_and_function[0]
-            regridder_function = (
-                regridder_type_and_function[1]
-                if len(regridder_type_and_function) == 2
-                else None
-            )
+            regridder_name, regridder_function = regridder_type_and_function
 
-            if source_dataarray_name not in self.dataset.keys():
+            if varname not in self.dataset.keys():
                 continue
 
-            if not self._valid(self.dataset[source_dataarray_name].values[()]):
-                new_package_data[source_dataarray_name] = None
+            if not self._valid(self.dataset[varname].values[()]):
+                new_package_data[varname] = None
                 continue
 
             # the dataarray might be a scalar. If it is, then it does not need regridding.
-            if (
-                type(self.dataset[source_dataarray_name].values[()]) is np.float_
-                or type(self.dataset[source_dataarray_name].values[()]) is np.int_
-            ):
-                new_package_data[source_dataarray_name] = self.dataset[
-                    source_dataarray_name
-                ].values[()]
+            if is_scalar(self.dataset[varname]):
+                new_package_data[varname] = self.dataset[varname].values[()]
                 continue
 
-            # if it is an xr.DataArray it needs the dx, dy coordinates, which are otherwise not mandatory
-            if type(self.dataset[source_dataarray_name]) is xr.DataArray:
-                coords = self.dataset[source_dataarray_name].coords
+            if isinstance(self.dataset[varname], xr.DataArray):
+                coords = self.dataset[varname].coords
+                # if it is an xr.DataArray it may be layer-based; then no regridding is needed
+                if not ("x" in coords and "y" in coords):
+                    new_package_data[varname] = self.dataset[varname]
+                    continue
+                # if it is an xr.DataArray it needs the dx, dy coordinates for regridding, which are otherwise not mandatory
                 if not ("dx" in coords and "dy" in coords):
                     raise ValueError(
-                        f"DataArray {source_dataarray_name} does not have both a dx and dy coordinates"
+                        f"DataArray {varname} does not have both a dx and dy coordinates"
                     )
 
             # obtain an instance of a regridder for the chosen method
@@ -841,16 +836,23 @@ class Package(PackageBase, abc.ABC):
             )
 
             # store original dtype of data
-            original_dtype = self.dataset[source_dataarray_name].dtype
+            original_dtype = self.dataset[varname].dtype
 
             # regrid data array
-            regridded_array = regridder.regrid(self.dataset[source_dataarray_name])
+            regridded_array = regridder.regrid(self.dataset[varname])
 
             # reconvert the result to the same dtype as the original
-            new_package_data[source_dataarray_name] = regridded_array.astype(
-                original_dtype
-            )
+            new_package_data[varname] = regridded_array.astype(original_dtype)
         new_package = self.__class__(**new_package_data)
+
+        # TODO gitlab-398: write validation fails for VerticesDiscretization
+        if not isinstance(self, imod.mf6.VerticesDiscretization):
+            errors = new_package._validate(
+                new_package._write_schemata,
+                idomain=target_grid,
+            )
+            if len(errors) > 0:
+                raise ValidationError(validation_pkg_error_message(errors))
         return new_package
 
 
