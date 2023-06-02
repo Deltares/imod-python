@@ -1,9 +1,13 @@
+from pathlib import Path
+from typing import List
+
 import numpy as np
 import pytest
 import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.mf6.pkgbase import Package
 from imod.tests.fixtures.mf6_regridding_fixture import (
     grid_data_structured,
     grid_data_structured_layered,
@@ -12,7 +16,7 @@ from imod.tests.fixtures.mf6_regridding_fixture import (
 )
 
 
-def create_package_instances(is_structured):
+def create_package_instances(is_structured) -> List[Package]:
     grid_data_function = (
         grid_data_structured if is_structured else grid_data_unstructured
     )
@@ -165,7 +169,7 @@ def test_regrid_structured_missing_dx_and_dy():
         _ = package.regrid_like(new_grid)
 
 
-def test_regrid(tmp_path):
+def test_regrid(tmp_path: Path):
     """
     This test regrids an irregular grid. However, the new grid is the same as the source grid, so the values
     of the data-arrays should not change.

@@ -1,3 +1,5 @@
+from typing import Callable, Union
+
 import numpy as np
 import pytest
 import xarray as xr
@@ -6,7 +8,9 @@ import xugrid as xu
 import imod
 
 
-def grid_data_structured(dtype, value, cellsize) -> xr.DataArray:
+def grid_data_structured(
+    dtype: type, value: Union[int, float], cellsize: float
+) -> xr.DataArray:
     """
     This function creates a dataarray with scalar values for a grid of configurable cell size.
     """
@@ -29,7 +33,9 @@ def grid_data_structured(dtype, value, cellsize) -> xr.DataArray:
     return structured_grid_data
 
 
-def grid_data_structured_layered(dtype, value, cellsize) -> xr.DataArray:
+def grid_data_structured_layered(
+    dtype: type, value: Union[int, float], cellsize: float
+) -> xr.DataArray:
     """
     This function creates a dataarray with scalar values for a grid of configurable cell size. The values are
     multiplied with the layer index.
@@ -55,7 +61,9 @@ def grid_data_structured_layered(dtype, value, cellsize) -> xr.DataArray:
     return unstructured_grid_data
 
 
-def grid_data_unstructured(dtype, value, cellsize) -> xu.UgridDataArray:
+def grid_data_unstructured(
+    dtype: type, value: Union[int, float], cellsize: float
+) -> xu.UgridDataArray:
     """
     This function creates a dataarray with scalar values for a grid of configurable cell size.
     First a regular grid is constructed and then this is converted to an ugrid dataarray.
@@ -65,7 +73,9 @@ def grid_data_unstructured(dtype, value, cellsize) -> xu.UgridDataArray:
     )
 
 
-def grid_data_unstructured_layered(dtype, value, cellsize) -> xu.UgridDataArray:
+def grid_data_unstructured_layered(
+    dtype: type, value: Union[int, float], cellsize: float
+) -> xu.UgridDataArray:
     """
     This function creates a dataarray with scalar values for a grid of configurable cell size. The values are
     multiplied with the layer index. First a regular grid is constructed and then this is converted to an ugrid dataarray.
@@ -75,7 +85,11 @@ def grid_data_unstructured_layered(dtype, value, cellsize) -> xu.UgridDataArray:
     )
 
 
-def make_model(grid_data_function, cellsize):
+def make_model(
+    grid_data_function: Callable[[type, Union[int, float], float], xr.DataArray]
+    | Callable[[type, Union[int, float], float], xu.UgridDataArray],
+    cellsize: float,
+) -> imod.mf6.GroundwaterFlowModel:
     gwf_model = imod.mf6.GroundwaterFlowModel()
 
     grid_data_function(np.float64, 1, cellsize)
