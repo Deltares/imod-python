@@ -3,7 +3,7 @@ import collections
 import inspect
 import pathlib
 from copy import deepcopy
-from typing import Dict, Tuple, Union
+from typing import Union
 
 import cftime
 import jinja2
@@ -16,7 +16,6 @@ from jinja2 import Template
 
 import imod
 from imod.mf6 import qgs_util
-from imod.mf6.hfb import AbstractHorizontalFlowBarrier
 from imod.mf6.pkgbase import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info

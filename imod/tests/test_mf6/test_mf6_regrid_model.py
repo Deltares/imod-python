@@ -1,7 +1,5 @@
 import numpy as np
 import pytest
-import xarray as xr
-import xugrid as xu
 
 import imod
 from imod.tests.fixtures.mf6_regridding_fixture import (
@@ -38,4 +36,4 @@ def test_regrid_model_with_unsupported_package(unstructured_flow_model):
         NotImplementedError,
         match="regridding is not implemented for package well of type <class 'imod.mf6.wel.Well'>",
     ):
-        new_gwf_model = unstructured_flow_model.regrid_like(finer_idomain)
+        _ = unstructured_flow_model.regrid_like(finer_idomain)
