@@ -814,9 +814,7 @@ class Package(PackageBase, abc.ABC):
 
             # the dataarray might be a scalar. If it is, then it does not need regridding.
             if is_scalar(self.dataset[varname]):
-                new_package_data[varname] = self.dataset[varname].values[
-                    ()
-                ]
+                new_package_data[varname] = self.dataset[varname].values[()]
                 continue
 
             if isinstance(self.dataset[varname], xr.DataArray):
