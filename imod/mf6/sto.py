@@ -150,6 +150,12 @@ class SpecificStorage(StorageBase):
         ),
     }
 
+    _regrid_method = {
+        "convertible": ("OverlapRegridder", "mean"),
+        "specific_storage": ("OverlapRegridder", "mean"),
+        "specific_yield": ("OverlapRegridder", "mean"),
+    }
+
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(
@@ -266,6 +272,12 @@ class StorageCoefficient(StorageBase):
             AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
+    }
+
+    _regrid_method = {
+        "convertible": ("OverlapRegridder", "mean"),
+        "storage_coefficient": ("OverlapRegridder", "mean"),
+        "specific_yield": ("OverlapRegridder", "mean"),
     }
 
     _template = Package._initialize_template(_pkg_id)

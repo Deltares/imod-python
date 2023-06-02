@@ -121,6 +121,12 @@ class River(BoundaryCondition):
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
 
+    _regrid_method = {
+        "conductance": ("OverlapRegridder", "geometric_mean"),
+        "bottom_elevation": ("OverlapRegridder", "mean"),
+        "concentration": ("OverlapRegridder", "mean"),
+    }
+
     def __init__(
         self,
         stage,
