@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from imod.mf6.pkgbase import Package
+from imod.mf6.regridding_utils import RegridderType as rt
 from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
     AllValueSchema,
@@ -13,7 +14,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
-from imod.mf6.regridding_utils import RegridderType as rt
+
 
 class VerticesDiscretization(Package):
     """

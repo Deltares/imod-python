@@ -13,10 +13,11 @@ import xugrid as xu
 from xarray.core.utils import is_scalar
 
 import imod
-from imod.mf6.regridding_utils import RegridderInstancesCollection, get_non_grid_data
+from imod.mf6.regridding_utils import RegridderInstancesCollection
+from imod.mf6.regridding_utils import RegridderType as rt
+from imod.mf6.regridding_utils import get_non_grid_data
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
-from imod.mf6.regridding_utils import RegridderType as rt
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 

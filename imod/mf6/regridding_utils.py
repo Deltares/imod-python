@@ -3,17 +3,20 @@ from typing import Dict, List, Union
 
 import xarray as xr
 import xugrid as xu
-from xugrid.regrid.regridder import (
-    BaseRegridder,
-)
+from xugrid.regrid.regridder import BaseRegridder
+
+
 class RegridderType(Enum):
     CENTROIDLOCATOR = xu.CentroidLocatorRegridder
     BARYCENTRIC = xu.BarycentricInterpolator
     OVERLAP = xu.OverlapRegridder
     RELATIVEOVERLAP = xu.RelativeOverlapRegridder
 
-
-    def create_regridder(self,  source_grid: Union[xr.Dataset, xr.DataArray, xu.UgridDataset, xu.UgridDataArray],
+    def create_regridder(
+        self,
+        source_grid: Union[
+            xr.Dataset, xr.DataArray, xu.UgridDataset, xu.UgridDataArray
+        ],
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
         method: str = None,
     ) -> BaseRegridder:
@@ -37,15 +40,17 @@ class RegridderType(Enum):
 
         """
         regridder = None
-        try:    
+        try:
             if method is None:
                 regridder = self.value(source_grid, target_grid)
             else:
                 regridder = self.value(source_grid, target_grid, method)
-        except:
-            raise ValueError(f"failed to create a regridder {self.value} with method {method}")
+        except (TypeError, ValueError):
+            raise ValueError(
+                f"failed to create a regridder {self.value} with method {method}"
+            )
         return regridder
-      
+
 
 class RegridderInstancesCollection:
     """
@@ -66,18 +71,26 @@ class RegridderInstancesCollection:
     def __has_regridder(self, regridder_type: RegridderType, method: str) -> bool:
         return (regridder_type, method) in self.regridder_instances.keys()
 
-    def __get_existing_regridder(self, regridder_type: RegridderType, method: str) -> BaseRegridder:
+    def __get_existing_regridder(
+        self, regridder_type: RegridderType, method: str
+    ) -> BaseRegridder:
         if self.__has_regridder(regridder_type, method):
             return self.regridder_instances[(regridder_type, method)]
         raise ValueError("no existing regridder of type " + str(regridder_type))
 
-    def __create_regridder(self, regridder_type: RegridderType, method: str) -> BaseRegridder:
-        self.regridder_instances[(regridder_type, method)] = regridder_type.create_regridder(
+    def __create_regridder(
+        self, regridder_type: RegridderType, method: str
+    ) -> BaseRegridder:
+        self.regridder_instances[
+            (regridder_type, method)
+        ] = regridder_type.create_regridder(
             self._source_grid, self._target_grid, method
         )
         return self.regridder_instances[(regridder_type, method)]
 
-    def get_regridder(self, regridder_type: RegridderType, method: str = None) -> BaseRegridder:
+    def get_regridder(
+        self, regridder_type: RegridderType, method: str = None
+    ) -> BaseRegridder:
         """
         returns a regridder of the specified type-name and with the specified method.
         """

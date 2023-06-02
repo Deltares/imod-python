@@ -1,6 +1,7 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.regridding_utils import RegridderType as rt
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -14,7 +15,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 
-from imod.mf6.regridding_utils import RegridderType as rt
+
 class Drainage(BoundaryCondition):
     """
     The Drain package is used to simulate head-dependent flux boundaries.

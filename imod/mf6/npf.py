@@ -3,6 +3,7 @@ import warnings
 import numpy as np
 
 from imod.mf6.pkgbase import Package
+from imod.mf6.regridding_utils import RegridderType as rt
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -10,7 +11,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
-from imod.mf6.regridding_utils import RegridderType as rt
+
 
 class NodePropertyFlow(Package):
     """
@@ -285,7 +286,7 @@ class NodePropertyFlow(Package):
     _template = Package._initialize_template(_pkg_id)
 
     _regrid_method = {
-        "icelltype": ( rt.OVERLAP, "mean"),
+        "icelltype": (rt.OVERLAP, "mean"),
         "k": (rt.OVERLAP, "geometric_mean"),  # horizontal if angle2 = 0
         "k22": (
             rt.OVERLAP,
