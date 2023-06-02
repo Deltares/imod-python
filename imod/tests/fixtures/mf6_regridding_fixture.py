@@ -1,5 +1,3 @@
-from typing import Union
-
 import numpy as np
 import pytest
 import xarray as xr
@@ -77,7 +75,7 @@ def grid_data_unstructured_layered(dtype, value, cellsize) -> xu.UgridDataArray:
     )
 
 
-def make_model(grid_data_function, cellsize: float):
+def make_model(grid_data_function, cellsize):
     gwf_model = imod.mf6.GroundwaterFlowModel()
 
     grid_data_function(np.float64, 1, cellsize)
