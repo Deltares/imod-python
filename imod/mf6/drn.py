@@ -14,7 +14,7 @@ from imod.schemata import (
     OtherCoordsSchema,
 )
 
-
+from imod.mf6.regridding_utils import RegridderType as rt
 class Drainage(BoundaryCondition):
     """
     The Drain package is used to simulate head-dependent flux boundaries.
@@ -95,9 +95,9 @@ class Drainage(BoundaryCondition):
     _auxiliary_data = {"concentration": "species"}
 
     _regrid_method = {
-        "elevation": ("OverlapRegridder", "mean"),
-        "conductance": ("OverlapRegridder", "mean"),
-        "concentration": ("OverlapRegridder", "mean"),
+        "elevation": (rt.OVERLAP, "mean"),
+        "conductance": (rt.OVERLAP, "mean"),
+        "concentration": (rt.OVERLAP, "mean"),
     }
 
     def __init__(

@@ -3,6 +3,7 @@ import copy
 import pytest
 
 from imod.mf6.regridding_utils import RegridderInstancesCollection
+from imod.mf6.regridding_utils import RegridderType as rt
 
 
 def test_instance_collection_returns_same_instance_when_name_and_method_match(
@@ -13,8 +14,8 @@ def test_instance_collection_returns_same_instance_when_name_and_method_match(
 
     collection = RegridderInstancesCollection(grid, new_grid)
 
-    first_instance = collection.get_regridder("OverlapRegridder", "harmonic_mean")
-    second_instance = collection.get_regridder("OverlapRegridder", "harmonic_mean")
+    first_instance = collection.get_regridder(rt.OVERLAP, "harmonic_mean")
+    second_instance = collection.get_regridder(rt.OVERLAP, "harmonic_mean")
 
     assert first_instance == second_instance
 
@@ -27,8 +28,8 @@ def test_instance_collection_returns_different_instance_when_name_does_not_match
 
     collection = RegridderInstancesCollection(grid, new_grid)
 
-    first_instance = collection.get_regridder("CentroidLocatorRegridder")
-    second_instance = collection.get_regridder("BarycentricInterpolator")
+    first_instance = collection.get_regridder(rt.CENTROIDLOCATOR)
+    second_instance = collection.get_regridder(rt.BARYCENTRIC)
 
     assert first_instance != second_instance
 
@@ -41,8 +42,8 @@ def test_instance_collection_returns_different_instance_when_method_does_not_mat
 
     collection = RegridderInstancesCollection(grid, new_grid)
 
-    first_instance = collection.get_regridder("OverlapRegridder", "geometric_mean")
-    second_instance = collection.get_regridder("OverlapRegridder", "harmonic_mean")
+    first_instance = collection.get_regridder(rt.OVERLAP, "geometric_mean")
+    second_instance = collection.get_regridder(rt.OVERLAP, "harmonic_mean")
 
     assert first_instance != second_instance
 
@@ -53,23 +54,15 @@ def test_error_messages(basic_unstructured_dis):
 
     collection = RegridderInstancesCollection(grid, new_grid)
     with pytest.raises(
-        ValueError, match="BarycentricInterpolator does not support methods"
+        ValueError, match="failed to create a regridder <class 'xugrid.regrid.regridder.BarycentricInterpolator'> with method geometric_mean"
     ):
         _ = collection.get_regridder(
-            "BarycentricInterpolator",
+            rt.BARYCENTRIC,
             method="geometric_mean",
         )
 
-    with pytest.raises(
-        ValueError, match="unknown regridder type Non-existing regridder"
-    ):
+    with pytest.raises(ValueError, match="failed to create a regridder <class 'xugrid.regrid.regridder.OverlapRegridder'> with method non-existing function"):
         _ = collection.get_regridder(
-            "Non-existing regridder",
-            method="geometric_mean",
-        )
-
-    with pytest.raises(ValueError, match="Invalid regridding method"):
-        _ = collection.get_regridder(
-            "RelativeOverlapRegridder",
+            rt.OVERLAP,
             method="non-existing function",
         )

@@ -12,7 +12,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
-
+from imod.mf6.regridding_utils import RegridderType as rt
 
 class Storage(Package):
     _pkg_id = "sto_deprecated"
@@ -151,9 +151,9 @@ class SpecificStorage(StorageBase):
     }
 
     _regrid_method = {
-        "convertible": ("OverlapRegridder", "mean"),
-        "specific_storage": ("OverlapRegridder", "mean"),
-        "specific_yield": ("OverlapRegridder", "mean"),
+        "convertible": (rt.OVERLAP, "mean"),
+        "specific_storage": (rt.OVERLAP, "mean"),
+        "specific_yield": (rt.OVERLAP, "mean"),
     }
 
     _template = Package._initialize_template(_pkg_id)
@@ -275,9 +275,9 @@ class StorageCoefficient(StorageBase):
     }
 
     _regrid_method = {
-        "convertible": ("OverlapRegridder", "mean"),
-        "storage_coefficient": ("OverlapRegridder", "mean"),
-        "specific_yield": ("OverlapRegridder", "mean"),
+        "convertible": (rt.OVERLAP, "mean"),
+        "storage_coefficient": (rt.OVERLAP, "mean"),
+        "specific_yield": (rt.OVERLAP, "mean"),
     }
 
     _template = Package._initialize_template(_pkg_id)

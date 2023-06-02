@@ -10,7 +10,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
-
+from imod.mf6.regridding_utils import RegridderType as rt
 
 class NodePropertyFlow(Package):
     """
@@ -285,20 +285,20 @@ class NodePropertyFlow(Package):
     _template = Package._initialize_template(_pkg_id)
 
     _regrid_method = {
-        "icelltype": ("OverlapRegridder", "mean"),
-        "k": ("OverlapRegridder", "geometric_mean"),  # horizontal if angle2 = 0
+        "icelltype": ( rt.OVERLAP, "mean"),
+        "k": (rt.OVERLAP, "geometric_mean"),  # horizontal if angle2 = 0
         "k22": (
-            "OverlapRegridder",
+            rt.OVERLAP,
             "geometric_mean",
         ),  # horizontal if angle2 = 0 & angle3 = 0
         "k33": (
-            "OverlapRegridder",
+            rt.OVERLAP,
             "harmonic_mean",
         ),  # vertical if angle2 = 0 & angle3 = 0
-        "angle1": ("OverlapRegridder", "mean"),
-        "angle2": ("OverlapRegridder", "mean"),
-        "angle3": ("OverlapRegridder", "mean"),
-        "rewet_layer": ("BarycentricInterpolator", None),
+        "angle1": (rt.OVERLAP, "mean"),
+        "angle2": (rt.OVERLAP, "mean"),
+        "angle3": (rt.OVERLAP, "mean"),
+        "rewet_layer": (rt.BARYCENTRIC, None),
     }
 
     def __init__(

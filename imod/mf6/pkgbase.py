@@ -16,6 +16,7 @@ import imod
 from imod.mf6.regridding_utils import RegridderInstancesCollection, get_non_grid_data
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
+from imod.mf6.regridding_utils import RegridderType as rt
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
@@ -759,7 +760,7 @@ class Package(PackageBase, abc.ABC):
     def regrid_like(
         self,
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
-        regridder_types: Dict[str, Tuple[str, str]] = None,
+        regridder_types: Dict[str, Tuple[rt, str]] = None,
     ) -> "Package":
         """
         Creates a package of the same type as this package, based on another discretization.

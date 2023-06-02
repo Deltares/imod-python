@@ -12,7 +12,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-
+from imod.mf6.regridding_utils import RegridderType as rt
 
 class ConstantHead(BoundaryCondition):
     """
@@ -105,8 +105,8 @@ class ConstantHead(BoundaryCondition):
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     _regrid_method = {
-        "head": ("OverlapRegridder", "mean"),
-        "concentration": ("OverlapRegridder", "mean"),
+        "head": (rt.OVERLAP, "mean"),
+        "concentration": (rt.OVERLAP, "mean"),
     }
 
     def __init__(

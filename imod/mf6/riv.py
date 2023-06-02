@@ -13,7 +13,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-
+from imod.mf6.regridding_utils import RegridderType as rt
 
 class River(BoundaryCondition):
     """
@@ -122,9 +122,9 @@ class River(BoundaryCondition):
     _auxiliary_data = {"concentration": "species"}
 
     _regrid_method = {
-        "conductance": ("OverlapRegridder", "geometric_mean"),
-        "bottom_elevation": ("OverlapRegridder", "mean"),
-        "concentration": ("OverlapRegridder", "mean"),
+        "conductance": (rt.OVERLAP, "geometric_mean"),
+        "bottom_elevation": (rt.OVERLAP, "mean"),
+        "concentration": (rt.OVERLAP, "mean"),
     }
 
     def __init__(

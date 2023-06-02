@@ -13,7 +13,7 @@ from imod.schemata import (
     IdentityNoDataSchema,
     IndexesSchema,
 )
-
+from imod.mf6.regridding_utils import RegridderType as rt
 
 class VerticesDiscretization(Package):
     """
@@ -64,9 +64,9 @@ class VerticesDiscretization(Package):
     _template = Package._initialize_template(_pkg_id)
 
     _regrid_method = {
-        "top": ("OverlapRegridder", "mean"),
-        "bottom": ("OverlapRegridder", "mean"),
-        "idomain": ("OverlapRegridder", "mean"),
+        "top": (rt.OVERLAP, "mean"),
+        "bottom": (rt.OVERLAP, "mean"),
+        "idomain": (rt.OVERLAP, "mean"),
     }
 
     def __init__(self, top, bottom, idomain, validate: bool = True):
