@@ -16,7 +16,7 @@ from imod.tests.fixtures.mf6_regridding_fixture import (
 )
 
 
-def create_package_instances(is_structured) -> List[Package]:
+def create_package_instances(is_structured: bool) -> List[Package]:
     grid_data_function = (
         grid_data_structured if is_structured else grid_data_unstructured
     )
@@ -84,6 +84,9 @@ def create_package_instances(is_structured) -> List[Package]:
         ),
         imod.mf6.OutputControl(save_head="all", save_budget="all"),
         imod.mf6.Recharge(grid_data_function(np.float64, 0.002, 5.0).sel(layer=[1])),
+        imod.mf6.InitialConditions(
+            start=grid_data_function(np.float64, 0.002, 5.0), validate=True
+        ),
     ]
     if is_structured:
         packages.append(
