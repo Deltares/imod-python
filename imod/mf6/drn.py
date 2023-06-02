@@ -94,6 +94,12 @@ class Drainage(BoundaryCondition):
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
 
+    _regrid_method = {
+        "elevation": ("OverlapRegridder", "mean"),
+        "conductance": ("OverlapRegridder", "mean"),
+        "concentration": ("OverlapRegridder", "mean"),
+    }
+
     def __init__(
         self,
         elevation,

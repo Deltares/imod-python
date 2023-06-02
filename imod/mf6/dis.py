@@ -81,6 +81,12 @@ class StructuredDiscretization(Package):
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
 
+    _regrid_method = {
+        "top": ("OverlapRegridder", "mean"),
+        "bottom": ("OverlapRegridder", "mean"),
+        "idomain": ("OverlapRegridder", "mean"),
+    }
+
     def __init__(self, top, bottom, idomain, validate: bool = True):
         super(__class__, self).__init__(locals())
         self.dataset["idomain"] = idomain

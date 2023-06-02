@@ -109,6 +109,12 @@ class GeneralHeadBoundary(BoundaryCondition):
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
 
+    _regrid_method = {
+        "head": ("OverlapRegridder", "mean"),
+        "conductance": ("OverlapRegridder", "geometric_mean"),
+        "concentration": ("OverlapRegridder", "mean"),
+    }
+
     def __init__(
         self,
         head,
