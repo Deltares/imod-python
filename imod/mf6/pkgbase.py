@@ -800,35 +800,35 @@ class Package(PackageBase, abc.ABC):
         new_package_data = get_non_grid_data(self, list(regridder_settings.keys()))
 
         for (
-            source_da_name,
+            varname,
             regridder_type_and_function,
         ) in regridder_settings.items():
             regridder_name, regridder_function = regridder_type_and_function
 
-            if source_da_name not in self.dataset.keys():
+            if varname not in self.dataset.keys():
                 continue
 
-            if not self._valid(self.dataset[source_da_name].values[()]):
-                new_package_data[source_da_name] = None
+            if not self._valid(self.dataset[varname].values[()]):
+                new_package_data[varname] = None
                 continue
 
             # the dataarray might be a scalar. If it is, then it does not need regridding.
-            if is_scalar(self.dataset[source_da_name]):
-                new_package_data[source_da_name] = self.dataset[source_da_name].values[
+            if is_scalar(self.dataset[varname]):
+                new_package_data[varname] = self.dataset[varname].values[
                     ()
                 ]
                 continue
 
-            if isinstance(self.dataset[source_da_name], xr.DataArray):
-                coords = self.dataset[source_da_name].coords
+            if isinstance(self.dataset[varname], xr.DataArray):
+                coords = self.dataset[varname].coords
                 # if it is an xr.DataArray it may be layer-based; then no regridding is needed
                 if not ("x" in coords and "y" in coords):
-                    new_package_data[source_da_name] = self.dataset[source_da_name]
+                    new_package_data[varname] = self.dataset[varname]
                     continue
                 # if it is an xr.DataArray it needs the dx, dy coordinates for regridding, which are otherwise not mandatory
                 if not ("dx" in coords and "dy" in coords):
                     raise ValueError(
-                        f"DataArray {source_da_name} does not have both a dx and dy coordinates"
+                        f"DataArray {varname} does not have both a dx and dy coordinates"
                     )
 
             # obtain an instance of a regridder for the chosen method
@@ -838,13 +838,13 @@ class Package(PackageBase, abc.ABC):
             )
 
             # store original dtype of data
-            original_dtype = self.dataset[source_da_name].dtype
+            original_dtype = self.dataset[varname].dtype
 
             # regrid data array
-            regridded_array = regridder.regrid(self.dataset[source_da_name])
+            regridded_array = regridder.regrid(self.dataset[varname])
 
             # reconvert the result to the same dtype as the original
-            new_package_data[source_da_name] = regridded_array.astype(original_dtype)
+            new_package_data[varname] = regridded_array.astype(original_dtype)
         new_package = self.__class__(**new_package_data)
 
         # TODO gitlab-398: write validation fails for VerticesDiscretization
