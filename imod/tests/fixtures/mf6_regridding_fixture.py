@@ -1,9 +1,11 @@
+from typing import Union
+
 import numpy as np
+import pytest
 import xarray as xr
 import xugrid as xu
+
 import imod
-import pytest
-from typing import Union
 
 
 def grid_data_structured(dtype, value, cellsize) -> xr.DataArray:
@@ -74,7 +76,8 @@ def grid_data_unstructured_layered(dtype, value, cellsize) -> xu.UgridDataArray:
         grid_data_structured_layered(dtype, value, cellsize)
     )
 
-def make_model_from_idomain(grid_data_function, cellsize: float):
+
+def make_model(grid_data_function, cellsize: float):
     gwf_model = imod.mf6.GroundwaterFlowModel()
 
     grid_data_function(np.float64, 1, cellsize)
@@ -113,11 +116,10 @@ def make_model_from_idomain(grid_data_function, cellsize: float):
 def structured_flow_model() -> imod.mf6.GroundwaterFlowModel:
     cellsize = 2.0
 
-    idomain = grid_data_structured(np.int32, 1, cellsize)
-    gwf_model = make_model_from_idomain(grid_data_structured, cellsize)
+    gwf_model = make_model(grid_data_structured, cellsize)
 
     bottom = grid_data_structured_layered(np.float64, -1.0, cellsize)
-
+    idomain = grid_data_structured(np.int32, 1, cellsize)
     gwf_model["disv"] = imod.mf6.StructuredDiscretization(
         top=10.0, bottom=bottom, idomain=idomain
     )
@@ -128,11 +130,10 @@ def structured_flow_model() -> imod.mf6.GroundwaterFlowModel:
 def unstructured_flow_model() -> imod.mf6.GroundwaterFlowModel:
     cellsize = 2.0
 
-    idomain = grid_data_unstructured(np.int32, 1, cellsize)
-    gwf_model = make_model_from_idomain(grid_data_unstructured, cellsize)
+    gwf_model = make_model(grid_data_unstructured, cellsize)
 
     bottom = grid_data_unstructured_layered(np.float64, -1.0, cellsize)
-
+    idomain = grid_data_unstructured(np.int32, 1, cellsize)
     gwf_model["disv"] = imod.mf6.VerticesDiscretization(
         top=10.0, bottom=bottom, idomain=idomain
     )

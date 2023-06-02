@@ -1,12 +1,13 @@
-import imod
+import numpy as np
+import pytest
 import xarray as xr
 import xugrid as xu
-import numpy as np
+
+import imod
 from imod.tests.fixtures.mf6_regridding_fixture import (
     grid_data_structured,
     grid_data_unstructured,
 )
-import pytest
 
 
 def test_regrid_structured_model_to_structured_model(structured_flow_model):

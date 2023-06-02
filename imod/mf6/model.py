@@ -3,25 +3,24 @@ import collections
 import inspect
 import pathlib
 from copy import deepcopy
+from typing import Dict, Tuple, Union
 
 import cftime
 import jinja2
 import numpy as np
 import tomli
 import tomli_w
+import xarray as xr
 import xugrid as xu
 from jinja2 import Template
 
 import imod
 from imod.mf6 import qgs_util
+from imod.mf6.hfb import AbstractHorizontalFlowBarrier
 from imod.mf6.pkgbase import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
-from imod.mf6.hfb import AbstractHorizontalFlowBarrier
 from imod.schemata import ValidationError
-
-from typing import Union, Dict, Tuple
-import xarray as xr
 
 
 def initialize_template(name: str) -> Template:
@@ -338,7 +337,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
     ) -> "Modflow6Model":
         """
         Creates a model by regridding the packages of this model to another discretization.
-        It regrids all the arrays in the package using the default regridding methods. 
+        It regrids all the arrays in the package using the default regridding methods.
         At the moment only regridding to a different planar grid is supported, meaning
         ``target_grid`` has different ``"x"`` and ``"y"`` or different ``cell2d`` coords.
 
