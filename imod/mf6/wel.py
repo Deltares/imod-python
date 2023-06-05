@@ -423,7 +423,7 @@ class Well(BoundaryCondition):
     ) -> Package:
         error_msg = textwrap.dedent(
             """\
-        The Well Package does not support regridding. 
+        The Well Package does not support regridding.
         Regridding can be achieved by passing the new discretization to the "to_mf6_pkg" function using the parameters "top", "bottom" and "active".
         """
         )
