@@ -247,6 +247,6 @@ def test_regrid_not_supported_custom_message(basic_unstructured_dis):
     well = imod.mf6.Well([1.0], [-100.0], [2.0], [2.0], [0.01])
     with pytest.raises(
         NotImplementedError,
-        match='The Well Package does not support regridding. \nRegridding can be achieved by passing the new discretization to the "to_mf6_pkg" function using the parameters "top", "bottom" and "active".\n',
+        match='The Well Package does not support regridding.\nRegridding can be achieved by passing the new discretization to the "to_mf6_pkg" function using the parameters "top", "bottom" and "active".\n',
     ):
         well.regrid_like(new_grid)
