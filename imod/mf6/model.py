@@ -14,10 +14,14 @@ from jinja2 import Template
 
 import imod
 from imod.mf6 import qgs_util
+from imod.mf6.clipped_boundary_condition_creator import (
+    ClippedBoundaryConditionCreator,
+)
 from imod.mf6.pkgbase import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.schemata import ValidationError
+from imod.select.grid import active_grid_boundary_xy
 
 
 def initialize_template(name: str) -> Template:
@@ -286,6 +290,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         x_max=None,
         y_min=None,
         y_max=None,
+        state_for_boundary=None,
     ):
         """
         Clip a model by a bounding box (time, layer, y, x).
@@ -306,8 +311,8 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         layer_min: optional, int
         layer_max: optional, int
         x_min: optional, float
-        x_min: optional, float
-        y_max: optional, float
+        x_max: optional, float
+        y_min: optional, float
         y_max: optional, float
 
         Returns
@@ -326,7 +331,12 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 y_min=y_min,
                 y_max=y_max,
             )
+
         return clipped
+
+    def get_domain(self):
+        dis = self.__get_diskey()
+        return self[dis]["idomain"]
 
 
 class GroundwaterFlowModel(Modflow6Model):
@@ -397,6 +407,41 @@ class GroundwaterFlowModel(Modflow6Model):
             self, pkgnames, data_paths, data_vars_ls, crs
         )
         qgs_util._write_qgis_projectfile(qgs_tree, directory / ("qgis_proj" + ext))
+
+    def clip_box(
+        self,
+        time_min=None,
+        time_max=None,
+        layer_min=None,
+        layer_max=None,
+        x_min=None,
+        x_max=None,
+        y_min=None,
+        y_max=None,
+        state_for_boundary=None,
+    ):
+        clipped = super().clip_box(
+            time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
+        )
+
+        if state_for_boundary is None:
+            return clipped
+
+        constant_head_packages = [
+            pkg
+            for name, pkg in clipped.items()
+            if isinstance(pkg, imod.mf6.ConstantHead)
+        ]
+
+        boundary_condition_creator = ClippedBoundaryConditionCreator(
+            clipped.get_domain()
+        )
+
+        clipped["chd_clipped"] = boundary_condition_creator.create(
+            state_for_boundary, constant_head_packages
+        )
+
+        return clipped
 
 
 class GroundwaterTransportModel(Modflow6Model):

@@ -321,7 +321,8 @@ class Modflow6Simulation(collections.UserDict):
         x_max=None,
         y_min=None,
         y_max=None,
-    ):
+        states_for_boundary=None,
+    ) -> "Modflow6Simulation":
         """
         Clip a simulation by a bounding box (time, layer, y, x).
 
@@ -341,8 +342,8 @@ class Modflow6Simulation(collections.UserDict):
         layer_min: optional, int
         layer_max: optional, int
         x_min: optional, float
-        x_min: optional, float
-        y_max: optional, float
+        x_max: optional, float
+        y_min: optional, float
         y_max: optional, float
 
         Returns
@@ -351,6 +352,8 @@ class Modflow6Simulation(collections.UserDict):
         """
         clipped = type(self)(name=self.name)
         for key, value in self.items():
+            state_for_boundary = states_for_boundary.get(key)
+
             clipped[key] = value.clip_box(
                 time_min=time_min,
                 time_max=time_max,
@@ -360,5 +363,6 @@ class Modflow6Simulation(collections.UserDict):
                 x_max=x_max,
                 y_min=y_min,
                 y_max=y_max,
+                state_for_boundary=state_for_boundary,
             )
         return clipped
