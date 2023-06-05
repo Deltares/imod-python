@@ -20,14 +20,12 @@ class ClippedBoundaryConditionCreator:
         self.__validate(boundary_conditions)
 
         active_grid_boundary = active_grid_boundary_xy(self.__idomain == 1)
+        unassigned_grid_boundaries = self.__find_unassigned_grid_boundaries(
+            active_grid_boundary, boundary_conditions
+        )
 
-        for boundary_condition in boundary_conditions:
-            active_grid_boundary = np.logical_and(
-                active_grid_boundary, boundary_condition["head"].isnull()
-            )
-
-        constant_head = state_for_boundary * active_grid_boundary.where(
-            active_grid_boundary != False
+        constant_head = state_for_boundary * unassigned_grid_boundaries.where(
+            unassigned_grid_boundaries
         )
 
         return imod.mf6.ConstantHead(
@@ -43,3 +41,15 @@ class ClippedBoundaryConditionCreator:
 
         if not are_boundary_conditions_constant_head:
             raise ValueError("Only ConstantHead boundary conditions are supported")
+
+    @staticmethod
+    def __find_unassigned_grid_boundaries(
+        active_grid_boundary: UgridDataArray, boundary_conditions: List[ConstantHead]
+    ) -> UgridDataArray:
+        unassigned_grid_boundaries = active_grid_boundary
+        for boundary_condition in boundary_conditions:
+            unassigned_grid_boundaries = np.logical_and(
+                unassigned_grid_boundaries, boundary_condition["head"].isnull()
+            )
+
+        return unassigned_grid_boundaries
