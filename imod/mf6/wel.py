@@ -1,5 +1,6 @@
+import textwrap
 import warnings
-from typing import List, Union
+from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -11,6 +12,7 @@ from imod.mf6.pkgbase import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
     DisVerticesBoundaryCondition,
+    Package,
 )
 from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
@@ -413,6 +415,19 @@ class Well(BoundaryCondition):
         ds = remove_inactive(ds, active)
 
         return Mf6Wel(**ds)
+
+    def regrid_like(
+        self,
+        target_grid: xr.DataArray | xu.UgridDataArray,
+        regridder_types: Dict[str, Tuple[str, str]] = None,
+    ) -> Package:
+        error_msg = textwrap.dedent(
+            """\
+        The Well Package does not support regridding. 
+        Regridding can be achieved by passing the new discretization to the "to_mf6_pkg" function using the parameters "top", "bottom" and "active".
+        """
+        )
+        raise NotImplementedError(error_msg)
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
