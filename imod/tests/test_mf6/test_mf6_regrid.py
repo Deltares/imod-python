@@ -1,81 +1,22 @@
+from pathlib import Path
+from typing import List
+
 import numpy as np
 import pytest
 import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.mf6.pkgbase import Package
+from imod.tests.fixtures.mf6_regridding_fixture import (
+    grid_data_structured,
+    grid_data_structured_layered,
+    grid_data_unstructured,
+    grid_data_unstructured_layered,
+)
 
 
-def grid_data_structured(dtype, value, cellsize) -> xr.DataArray:
-    """
-    This function creates a dataarray with scalar values for a grid of configurable cell size.
-    """
-    horizontal_range = 10
-    y = np.arange(horizontal_range, -cellsize, -cellsize)
-    x = np.arange(0, horizontal_range + cellsize, cellsize)
-
-    nlayer = 3
-
-    shape = nlayer, len(x), len(y)
-    dims = ("layer", "y", "x")
-    layer = np.arange(1, nlayer + 1)
-
-    coords = {"layer": layer, "y": y, "x": x, "dx": cellsize, "dy": cellsize}
-
-    structured_grid_data = xr.DataArray(
-        np.ones(shape, dtype=dtype) * value, coords=coords, dims=dims
-    )
-
-    return structured_grid_data
-
-
-def grid_data_structured_layered(dtype, value, cellsize) -> xr.DataArray:
-    """
-    This function creates a dataarray with scalar values for a grid of configurable cell size. The values are
-    multiplied with the layer index.
-    """
-    horizontal_range = 10
-    y = np.arange(horizontal_range, -cellsize, -cellsize)
-    x = np.arange(0, horizontal_range + cellsize, cellsize)
-
-    nlayer = 3
-
-    shape = nlayer, len(x), len(y)
-    dims = ("layer", "y", "x")
-    layer = np.arange(1, nlayer + 1)
-
-    coords = {"layer": layer, "y": y, "x": x, "dx": cellsize, "dy": cellsize}
-
-    unstructured_grid_data = xr.DataArray(
-        np.ones(shape, dtype=dtype), coords=coords, dims=dims
-    )
-    for ilayer in range(1, nlayer + 1):
-        layer_value = ilayer * value
-        unstructured_grid_data.loc[dict(layer=ilayer)] = layer_value
-    return unstructured_grid_data
-
-
-def grid_data_unstructured(dtype, value, cellsize) -> xu.UgridDataArray:
-    """
-    This function creates a dataarray with scalar values for a grid of configurable cell size.
-    First a regular grid is constructed and then this is converted to an ugrid dataarray.
-    """
-    return xu.UgridDataArray.from_structured(
-        grid_data_structured(dtype, value, cellsize)
-    )
-
-
-def grid_data_unstructured_layered(dtype, value, cellsize) -> xu.UgridDataArray:
-    """
-    This function creates a dataarray with scalar values for a grid of configurable cell size. The values are
-    multiplied with the layer index. First a regular grid is constructed and then this is converted to an ugrid dataarray.
-    """
-    return xu.UgridDataArray.from_structured(
-        grid_data_structured_layered(dtype, value, cellsize)
-    )
-
-
-def create_package_instances(is_structured):
+def create_package_instances(is_structured: bool) -> List[Package]:
     grid_data_function = (
         grid_data_structured if is_structured else grid_data_unstructured
     )
@@ -140,6 +81,11 @@ def create_package_instances(is_structured):
         imod.mf6.GeneralHeadBoundary(
             head=grid_data_function(np.float_, 1.0e-4, 5.0),
             conductance=grid_data_function(np.float_, 1.0e-4, 5.0),
+        ),
+        imod.mf6.OutputControl(save_head="all", save_budget="all"),
+        imod.mf6.Recharge(grid_data_function(np.float64, 0.002, 5.0).sel(layer=[1])),
+        imod.mf6.InitialConditions(
+            start=grid_data_function(np.float64, 0.002, 5.0), validate=True
         ),
     ]
     if is_structured:
@@ -226,7 +172,7 @@ def test_regrid_structured_missing_dx_and_dy():
         _ = package.regrid_like(new_grid)
 
 
-def test_regrid(tmp_path):
+def test_regrid(tmp_path: Path):
     """
     This test regrids an irregular grid. However, the new grid is the same as the source grid, so the values
     of the data-arrays should not change.

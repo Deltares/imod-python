@@ -102,6 +102,10 @@ class Recharge(BoundaryCondition):
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
 
+    _regrid_method = {
+        "rate": ("OverlapRegridder", "mean"),
+    }
+
     def __init__(
         self,
         rate,
