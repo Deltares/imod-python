@@ -30,7 +30,7 @@ class RegridderType(Enum):
         source_grid: xr.Dataset, xr.DataArray , xu.UgridDataset,   xu.UgridDataArray
             data-array or dataset containing the discretization of the source grid as coordinates
         target_grid:  xr.DataArray of  xu.UgridDataArray
-            data-array containing the discretization of the targetr-grid as coordinates
+            data-array containing the discretization of the target-grid as coordinates
         method: str
             optionally, method used for regridding ( for example, "geometric_mean").
 

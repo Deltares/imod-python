@@ -777,8 +777,8 @@ class Package(PackageBase, abc.ABC):
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray
             a grid defined over the same discretization as the one we want to regrid the package to
-        regridder_types: dict(str->(str,str))
-           dictionary mapping arraynames (str) to a tuple of regrid method (str) and function name (str)
+        regridder_types: dict(str->(regridder type,str))
+           dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
             this dictionary can be used to override the default mapping method.
 
         Returns
