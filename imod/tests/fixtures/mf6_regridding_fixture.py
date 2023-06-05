@@ -41,7 +41,7 @@ def grid_data_structured_layered(
     multiplied with the layer index.
     """
     unstructured_grid_data = grid_data_structured(dtype, value, cellsize)
-    nlayer = unstructured_grid_data.coords["layer"].max()
+    nlayer = unstructured_grid_data.coords["layer"].max().values[()]
     for ilayer in range(1, nlayer + 1):
         layer_value = ilayer * value
         unstructured_grid_data.loc[dict(layer=ilayer)] = layer_value
@@ -72,7 +72,7 @@ def grid_data_unstructured_layered(
     )
 
 
-def make_model(
+def _make_model(
     grid_data_function: Callable[[type, Union[int, float], float], xr.DataArray]
     | Callable[[type, Union[int, float], float], xu.UgridDataArray],
     cellsize: float,
@@ -115,7 +115,7 @@ def make_model(
 def structured_flow_model() -> imod.mf6.GroundwaterFlowModel:
     cellsize = 2.0
 
-    gwf_model = make_model(grid_data_structured, cellsize)
+    gwf_model = _make_model(grid_data_structured, cellsize)
 
     bottom = grid_data_structured_layered(np.float64, -1.0, cellsize)
     idomain = grid_data_structured(np.int32, 1, cellsize)
@@ -129,7 +129,7 @@ def structured_flow_model() -> imod.mf6.GroundwaterFlowModel:
 def unstructured_flow_model() -> imod.mf6.GroundwaterFlowModel:
     cellsize = 2.0
 
-    gwf_model = make_model(grid_data_unstructured, cellsize)
+    gwf_model = _make_model(grid_data_unstructured, cellsize)
 
     bottom = grid_data_unstructured_layered(np.float64, -1.0, cellsize)
     idomain = grid_data_unstructured(np.int32, 1, cellsize)
