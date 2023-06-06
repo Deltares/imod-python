@@ -15,15 +15,15 @@ what the previous sentence was about, you are *new*.
 New
 ^^^
 
-We recommend new users to install iMOD Python using the `Deltaforge_` Python
-distribution. 
+We recommend new users to install iMOD Python using the `Deltaforge`_ Python
+distribution. See :ref:`install_deltaforge`.
 
 Experienced
 ^^^^^^^^^^^
 
 For experienced users, who want to be in control of packages installed, we
 recommend using the `Mambaforge`_ Python distribution. This installs Python and
-the ``mamba`` package manager. `Miniforge`_ and `Miniconda`_ will install Python
+the ``mamba`` package manager. `Miniforge`_ and `Miniconda`_ will only install Python
 and the ``conda`` package manager. Differences to note, in a nutshell:
 
 * ``mamba`` is much faster than ``conda``, but has identical commands. 
@@ -80,18 +80,23 @@ Installing all these dependencies requires around 2.5 gigabyte of space;
 Installing only the required dependencies (via pip) requires around 0.5
 gigabyte.
 
+Ways to install iMOD Python
+---------------------------
+
+.. _install_deltaforge:
+
 Installing with Deltaforge
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Deltaforge is an installer of Deltares python packages, including iMOD Python,
 and their dependencies. This makes it possible to install iMOD Python without
 much knowledge about the Python package management system. The download links
-are listed `here. <https://deltares.github.io/deltaforge/index.html#where>`__ and
-instructions are located `here.
-<https://download.deltares.nl/en/download/imod-viewer/>`__
+are listed `here. <https://deltares.github.io/deltaforge/index.html#where>`__
+Users new to the python package ecosystem are recommended to install iMOD Python
+using Deltaforge.
 
 Installing with mamba
----------------------
+^^^^^^^^^^^^^^^^^^^^^
 
 You can install ``imod`` using the `mamba package manager`_ that comes with the
 Mambaforge distribution. We advice to install ``imod`` in a seperate ``conda``
@@ -113,7 +118,7 @@ environment::
   conda activate imodenv
 
 Installing with conda
----------------------
+^^^^^^^^^^^^^^^^^^^^^
 
 Alternatively, you can also use the `conda package manager`_. Like mamba, conda
 will also infer the appropriate versions of the dependencies and install them.
@@ -129,7 +134,7 @@ environment::
   conda activate imodenv
 
 Installing with pip
--------------------
+^^^^^^^^^^^^^^^^^^^
 
 Finally, you can also use the `pip package manager`_::
 
@@ -143,7 +148,7 @@ Refer to :doc:`../faq/python` in the FAQ section for background
 information on ``mamba``, ``conda``, and ``pip``.
 
 Installing the latest development version
------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You can use ``pip`` to install the latest source from Gitlab::
 
