@@ -8,6 +8,8 @@ Currently only :func:`imod.rasterio.write` is implemented.
 
 import pathlib
 import warnings
+from os import PathLike
+from typing import Dict, Union
 
 import numpy as np
 
@@ -20,6 +22,9 @@ try:
     import rasterio
 except ImportError:
     rasterio = util.MissingOptionalModule("rasterio")
+
+
+FilePath = Union[str, "PathLike[str]"]
 
 
 # Based on this comment
@@ -253,13 +258,67 @@ def open(path, use_cftime=False, pattern=None):
     return array_io.reading._open(path, use_cftime, pattern, header, _read)
 
 
+def write_aaigrid(path: FilePath, a: np.ndarray, profile: Dict) -> None:
+    """
+    Fall-back function to write ESRII ASCII grids even if rasterio is not
+    installed.
+
+    Parameters
+    ----------
+    path: str or Path
+        path to the output raster
+    a: np.ndarray
+        The raster data.
+    profile: dict
+        The rasterio profile metadata.
+    """
+    dtype = profile["dtype"]
+    nodata = profile["nodata"]
+    if np.issubdtype(dtype, np.integer):
+        fmt = " %d"
+        str_nodata = f"{int(nodata)}"
+        space = ""
+    elif np.issubdtype(dtype, np.floating):
+        precision = profile.get("decimal_precision")
+        digits = profile.get("significant_digits")
+        if precision is not None:
+            fmt = f" %.{precision}f"
+            str_nodata = f"{nodata:.{precision}f}"
+        elif digits is not None:
+            fmt = f" %.{digits}g"
+            str_nodata = f"{nodata:.{digits}g}"
+        else:
+            fmt = " %.20g"  # GDAL default
+            str_nodata = f"{nodata:.20g}"
+        space = " "
+    else:
+        raise TypeError(f"invalid dtype: {dtype}")
+
+    a = a.astype(dtype)
+    dx, _, xmin, _, dy, ymax = profile["transform"][:6]
+    ymin = ymax + profile["height"] * dy
+
+    # GDAL writes only a carriage return in the header
+    header = (
+        f'ncols        {profile["width"]}\r'
+        f'nrows        {profile["height"]}\r'
+        f"xllcorner    {xmin:.12f}\r"
+        f"yllcorner    {ymin:.12f}\r"
+        f"cellsize     {dx:.12f}\r"
+        f"NODATA_value {space}{str_nodata}"
+    )
+
+    np.savetxt(path, a, fmt=fmt, header=header, delimiter="", newline="\r", comments="")
+    return
+
+
 def write(path, da, driver=None, nodata=np.nan, dtype=None):
     """Write ``xarray.DataArray`` to GDAL supported geospatial rasters using ``rasterio``.
 
     Parameters
     ----------
     path: str or Path
-        path to the dstput raste
+        path to the output raster
     da: xarray DataArray
         The DataArray to be written. Should have only x and y dimensions.
     driver: str; optional
@@ -341,9 +400,16 @@ def write(path, da, driver=None, nodata=np.nan, dtype=None):
     profile["count"] = 1
     profile["dtype"] = da.dtype
     profile["nodata"] = nodata
-    with rasterio.Env():
-        with rasterio.open(path, "w", **profile) as ds:
-            ds.write(da.values, 1)
+
+    # Allow writing ASCII grids even if rasterio isn't installed. This is
+    # useful for e.g. MetaSWAP input.
+    if isinstance(rasterio, util.MissingOptionalModule) and driver == "AAIGrid":
+        write_aaigrid(path, da.values, profile)
+    else:
+        with rasterio.Env():
+            with rasterio.open(path, "w", **profile) as ds:
+                ds.write(da.values, 1)
+    return
 
 
 def save(path, a, driver=None, nodata=np.nan, pattern=None, dtype=None):
