@@ -7,49 +7,17 @@ from xugrid.regrid.regridder import BaseRegridder
 
 
 class RegridderType(Enum):
+    """
+    Enumerator referring to regridder types in ``xugrid``.
+    These can be used safely in scripts, remaining backwards compatible for
+    when it is decided to rename regridders in ``xugrid``. For an explanation
+    what each regridder type does, we refer to the `xugrid documentation <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_
+    """
+
     CENTROIDLOCATOR = xu.CentroidLocatorRegridder
     BARYCENTRIC = xu.BarycentricInterpolator
     OVERLAP = xu.OverlapRegridder
     RELATIVEOVERLAP = xu.RelativeOverlapRegridder
-
-    def create_regridder(
-        self,
-        source_grid: Union[
-            xr.Dataset, xr.DataArray, xu.UgridDataset, xu.UgridDataArray
-        ],
-        target_grid: Union[xr.DataArray, xu.UgridDataArray],
-        method: str = None,
-    ) -> BaseRegridder:
-        """
-        This function creates a regridder.
-
-        Parameters
-        ----------
-        regridder_type: RegridderType
-            enumerator for thet type of regridder
-        source_grid: xr.Dataset, xr.DataArray , xu.UgridDataset,   xu.UgridDataArray
-            data-array or dataset containing the discretization of the source grid as coordinates
-        target_grid:  xr.DataArray of  xu.UgridDataArray
-            data-array containing the discretization of the target-grid as coordinates
-        method: str
-            optionally, method used for regridding ( for example, "geometric_mean").
-
-        Returns
-        -------
-        a regridder of the desired type and that uses the desired function
-
-        """
-        regridder = None
-        try:
-            if method is None:
-                regridder = self.value(source_grid, target_grid)
-            else:
-                regridder = self.value(source_grid, target_grid, method)
-        except (TypeError, ValueError):
-            raise ValueError(
-                f"failed to create a regridder {self.value} with method {method}"
-            )
-        return regridder
 
 
 class RegridderInstancesCollection:
@@ -81,10 +49,13 @@ class RegridderInstancesCollection:
     def __create_regridder(
         self, regridder_type: RegridderType, method: str
     ) -> BaseRegridder:
-        self.regridder_instances[
-            (regridder_type, method)
-        ] = regridder_type.create_regridder(
-            self._source_grid, self._target_grid, method
+        if method is None:
+            method_args = ()
+        else:
+            method_args = (method,)
+
+        self.regridder_instances[(regridder_type, method)] = regridder_type.value(
+            self._source_grid, self._target_grid, *method_args
         )
         return self.regridder_instances[(regridder_type, method)]
 
