@@ -214,7 +214,7 @@ class TestGroundwaterFlowModel:
 
     @mock.patch("imod.mf6.model.ClippedBoundaryConditionCreator")
     def test_clip_box_with_state_for_boundary(
-        self, clipped_boundary_condition_creator_patch
+        self, clipped_boundary_condition_creator
     ):
         # Arrange.
         state_for_boundary = MagicMock(spec_set=UgridDataArray)
@@ -226,14 +226,11 @@ class TestGroundwaterFlowModel:
         constant_head_mock = MagicMock(spec_set=ConstantHead)
         constant_head_mock.clip_box.return_value = constant_head_mock
 
-        clipped_boundary_condition_creator_mock = MagicMock(
-            spec_set=ClippedBoundaryConditionCreator
-        )
-        clipped_boundary_condition_creator_mock.create.return_value = MagicMock(
+        clipped_boundary_condition_creator.create.return_value = MagicMock(
             spec_set=ConstantHead
         )
-        clipped_boundary_condition_creator_patch.return_value = (
-            clipped_boundary_condition_creator_mock
+        clipped_boundary_condition_creator.return_value = (
+            clipped_boundary_condition_creator
         )
 
         sut = GroundwaterFlowModel()
@@ -246,6 +243,6 @@ class TestGroundwaterFlowModel:
 
         # Assert.
         assert "chd_clipped" in clipped
-        clipped_boundary_condition_creator_mock.create.assert_called_once_with(
-            state_for_boundary, [constant_head_mock, constant_head_mock]
+        clipped_boundary_condition_creator.create.assert_called_once_with(
+            discretization_mock["idomain"], state_for_boundary, [constant_head_mock, constant_head_mock]
         )

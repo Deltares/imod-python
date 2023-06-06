@@ -430,12 +430,8 @@ class GroundwaterFlowModel(Modflow6Model):
             if isinstance(pkg, imod.mf6.ConstantHead)
         ]
 
-        boundary_condition_creator = ClippedBoundaryConditionCreator(
-            clipped.get_domain()
-        )
-
-        clipped["chd_clipped"] = boundary_condition_creator.create(
-            state_for_boundary, constant_head_packages
+        clipped["chd_clipped"] = ClippedBoundaryConditionCreator.create(
+            clipped.get_domain(), state_for_boundary, constant_head_packages
         )
 
         return clipped
