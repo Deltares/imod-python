@@ -352,7 +352,7 @@ class Modflow6Simulation(collections.UserDict):
         """
         clipped = type(self)(name=self.name)
         for key, value in self.items():
-            state_for_boundary = states_for_boundary.get(key)
+            state_for_boundary = None if states_for_boundary is None else states_for_boundary.get(key)
 
             clipped[key] = value.clip_box(
                 time_min=time_min,
