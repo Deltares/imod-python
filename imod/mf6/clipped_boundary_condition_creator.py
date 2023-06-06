@@ -9,38 +9,49 @@ from imod.select.grid import active_grid_boundary_xy
 
 
 class ClippedBoundaryConditionCreator:
-    def __init__(self, idomain: UgridDataArray) -> None:
-        self.__idomain = idomain
+    """
+    The ClippedBoundaryConditionCreator class is used to create a ConstantHead
+    package on boundary cells that don't have any assigned to them.
+    This is useful in combination with the clip_box method which can produce a
+    domain with missing boundary conditions.
+    """
 
+    @classmethod
     def create(
-        self,
-        state_for_boundary: UgridDataArray,
-        boundary_conditions: List[ConstantHead],
+        cls,
+        idomain: UgridDataArray,
+        state_for_clipped_boundary: UgridDataArray,
+        original_constant_head_boundaries: List[ConstantHead],
     ) -> ConstantHead:
-        self.__validate(boundary_conditions)
+        """
 
-        active_grid_boundary = active_grid_boundary_xy(self.__idomain == 1)
-        unassigned_grid_boundaries = self.__find_unassigned_grid_boundaries(
-            active_grid_boundary, boundary_conditions
+        Parameters
+        ----------
+        idomain:
+            The clipped domain
+        state_for_clipped_boundary :
+            The values to be assigned to the created ConstantHead package
+        original_constant_head_boundaries :
+            List of existing ConstantHead boundaries
+
+        Returns
+        -------
+            ConstantHead package providing values for boundary cells that are not
+            covered by other ConstantHead packages
+
+        """
+        active_grid_boundary = active_grid_boundary_xy(idomain == 1)
+        unassigned_grid_boundaries = cls.__find_unassigned_grid_boundaries(
+            active_grid_boundary, original_constant_head_boundaries
         )
 
-        constant_head = state_for_boundary * unassigned_grid_boundaries.where(
+        constant_head = state_for_clipped_boundary * unassigned_grid_boundaries.where(
             unassigned_grid_boundaries
         )
 
         return imod.mf6.ConstantHead(
             constant_head, print_input=True, print_flows=True, save_flows=True
         )
-
-    @staticmethod
-    def __validate(boundary_conditions: List[ConstantHead]) -> None:
-        are_boundary_conditions_constant_head = all(
-            isinstance(boundary_condition, imod.mf6.ConstantHead)
-            for boundary_condition in boundary_conditions
-        )
-
-        if not are_boundary_conditions_constant_head:
-            raise ValueError("Only ConstantHead boundary conditions are supported")
 
     @staticmethod
     def __find_unassigned_grid_boundaries(

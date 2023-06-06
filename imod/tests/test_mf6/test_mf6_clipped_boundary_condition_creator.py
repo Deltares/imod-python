@@ -44,30 +44,16 @@ class TestClippedBoundaryConditionCreator:
             idomain, head_value_clipped_domain, dtype=float
         )
 
-        sut = ClippedBoundaryConditionCreator(idomain)
-
         # Act.
-        constant_head_pkg_clipped_domain = sut.create(
-            clipped_boundary_values, [original_boundary_constant_head_pkg]
+        constant_head_pkg_clipped_domain = ClippedBoundaryConditionCreator.create(
+            idomain, clipped_boundary_values, [original_boundary_constant_head_pkg]
         )
 
         # Assert.
         result_clipped_head = constant_head_pkg_clipped_domain["head"]
-        number_clipped_head_locations = np.count_nonzero(
-            ~np.isnan(result_clipped_head.sel(layer=1))
-        )
-        assert number_clipped_head_locations is number_of_clipped_cells
 
-    def test_create_unsupported_boundary_type(self):
-        # Arrange.
-        idomain = MagicMock(spec_set=UgridDataArray)
-
-        clipped_boundary_values = MagicMock(spec_set=UgridDataArray)
-        existing_boundary_package = MagicMock(spec_set=ConstantConcentration)
-        sut = ClippedBoundaryConditionCreator(
-            idomain,
-        )
-
-        # Act/Assert.
-        with pytest.raises(ValueError):
-            sut.create(clipped_boundary_values, [existing_boundary_package])
+        for layer_index in range(1, 15):
+            number_clipped_head_locations = np.count_nonzero(
+                ~np.isnan(result_clipped_head.sel(layer=layer_index))
+            )
+            assert number_clipped_head_locations is number_of_clipped_cells
