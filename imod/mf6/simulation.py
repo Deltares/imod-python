@@ -1,13 +1,16 @@
 import collections
+import copy
 import pathlib
 import subprocess
 import warnings
+from typing import Union
 
 import jinja2
 import numpy as np
 import tomli
 import tomli_w
 import xarray as xr
+import xugrid as xu
 
 import imod
 from imod.mf6.model import (
@@ -362,3 +365,21 @@ class Modflow6Simulation(collections.UserDict):
                 y_max=y_max,
             )
         return clipped
+
+    def regrid_like(
+        self,
+        regridded_simulation_name: str,
+        target_grid: Union[xr.DataArray, xu.UgridDataArray],
+    ) -> "Modflow6Simulation":
+        result = self.__class__(regridded_simulation_name)
+        for key, item in self.items():
+            if isinstance(item, GroundwaterFlowModel):
+                result[key] = item.regrid_like(target_grid)
+            elif isinstance(item, imod.mf6.Solution) or isinstance(
+                item, imod.mf6.TimeDiscretization
+            ):
+                result[key] = copy.deepcopy(item)
+            else:
+                raise NotImplementedError(f"regridding not supported for {key}")
+
+        return result
