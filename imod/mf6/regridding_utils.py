@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 import xarray as xr
 import xugrid as xu
@@ -36,18 +36,20 @@ class RegridderInstancesCollection:
         self._source_grid = source_grid
         self._target_grid = target_grid
 
-    def __has_regridder(self, regridder_type: RegridderType, method: str) -> bool:
+    def __has_regridder(
+        self, regridder_type: RegridderType, method: Optional[str] = None
+    ) -> bool:
         return (regridder_type, method) in self.regridder_instances.keys()
 
     def __get_existing_regridder(
-        self, regridder_type: RegridderType, method: str
+        self, regridder_type: RegridderType, method: Optional[str]
     ) -> BaseRegridder:
         if self.__has_regridder(regridder_type, method):
             return self.regridder_instances[(regridder_type, method)]
         raise ValueError("no existing regridder of type " + str(regridder_type))
 
     def __create_regridder(
-        self, regridder_type: RegridderType, method: str
+        self, regridder_type: RegridderType, method: Optional[str]
     ) -> BaseRegridder:
         if method is None:
             method_args = ()
@@ -60,7 +62,7 @@ class RegridderInstancesCollection:
         return self.regridder_instances[(regridder_type, method)]
 
     def get_regridder(
-        self, regridder_type: RegridderType, method: str = None
+        self, regridder_type: RegridderType, method: Optional[str] = None
     ) -> BaseRegridder:
         """
         returns a regridder of the specified type-name and with the specified method.

@@ -4,6 +4,7 @@ import warnings
 import numpy as np
 
 from imod.mf6.pkgbase import Package
+from imod.mf6.regridding_utils import RegridderType as rt
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
 
@@ -60,7 +61,7 @@ class InitialConditions(Package):
     _template = Package._initialize_template(_pkg_id)
 
     _regrid_method = {
-        "start": ("OverlapRegridder", "mean"),
+        "start": (rt.OVERLAP, "mean"),
     }
 
     def __init__(self, start=None, head=None, validate: bool = True):
