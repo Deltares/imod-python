@@ -222,28 +222,19 @@ def test_regrid(tmp_path: Path):
     assert abs(min_diff) < abs_tol and abs(max_diff) < abs_tol
 
 
-def test_regrid_not_supported():
+def test_regrid_not_supported_exception(basic_unstructured_dis):
     """
-    This tests that regridding a package for which it is not implemented does noty lead to a crash
+    This tests that regridding a package for which it is not implented throws a NotImplementedError
     """
-    grid = imod.data.circle()
-    nlayer = 5
-
-    nface = grid.n_face
-    layer = np.arange(nlayer, dtype=int) + 1
+    new_grid, _, _ = basic_unstructured_dis
     dispersivity = 1
-    idomain = xu.UgridDataArray(
-        xr.DataArray(
-            np.ones((nlayer, nface), dtype=np.int32),
-            coords={"layer": layer},
-            dims=["layer", grid.face_dimension],
-        ),
-        grid=grid,
-    )
-    disp = xu.full_like(idomain, dispersivity, dtype=float)
+    disp = xu.full_like(new_grid, dispersivity, dtype=float)
 
     disperion_package = imod.mf6.Dispersion(1e-4, disp, disp)
-    with pytest.raises(
-        NotImplementedError, match="Package Dispersion does not support regridding"
-    ):
-        disperion_package.regrid_like(idomain)
+    with pytest.raises(NotImplementedError):
+        disperion_package.regrid_like(new_grid)
+
+    well = imod.mf6.Well([1.0], [-100.0], [2.0], [2.0], [0.01])
+
+    with pytest.raises(NotImplementedError):
+        well.regrid_like(new_grid)
