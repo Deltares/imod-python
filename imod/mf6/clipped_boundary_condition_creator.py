@@ -1,6 +1,5 @@
 from typing import List
 
-import numpy as np
 from xugrid.core.wrap import UgridDataArray
 
 import imod
@@ -45,9 +44,7 @@ class ClippedBoundaryConditionCreator:
             active_grid_boundary, original_constant_head_boundaries
         )
 
-        constant_head = state_for_clipped_boundary * unassigned_grid_boundaries.where(
-            unassigned_grid_boundaries
-        )
+        constant_head = state_for_clipped_boundary.where(unassigned_grid_boundaries)
 
         return imod.mf6.ConstantHead(
             constant_head, print_input=True, print_flows=True, save_flows=True
@@ -59,8 +56,8 @@ class ClippedBoundaryConditionCreator:
     ) -> UgridDataArray:
         unassigned_grid_boundaries = active_grid_boundary
         for boundary_condition in boundary_conditions:
-            unassigned_grid_boundaries = np.logical_and(
-                unassigned_grid_boundaries, boundary_condition["head"].isnull()
+            unassigned_grid_boundaries = (
+                unassigned_grid_boundaries & boundary_condition["head"].isnull()
             )
 
         return unassigned_grid_boundaries

@@ -1,11 +1,8 @@
-from unittest.mock import MagicMock
-
 import numpy as np
 import pytest
 import xugrid as xu
-from xugrid.core.wrap import UgridDataArray
 
-from imod.mf6 import ConstantConcentration, ConstantHead
+from imod.mf6 import ConstantHead
 from imod.mf6.clipped_boundary_condition_creator import ClippedBoundaryConditionCreator
 
 
@@ -16,8 +13,8 @@ def _get_boundaries(idomain):
 
 
 class TestClippedBoundaryConditionCreator:
-    @pytest.mark.parametrize("number_of_clipped_cells", [15, 0, 36])
-    def test_create(self, basic_unstructured_dis, number_of_clipped_cells):
+    @pytest.mark.parametrize("n_clipped_cells", [15, 0, 36])
+    def test_create(self, basic_unstructured_dis, n_clipped_cells):
         # Arrange.
         idomain, _, _ = basic_unstructured_dis
 
@@ -26,7 +23,7 @@ class TestClippedBoundaryConditionCreator:
 
         original_boundary_location = _get_boundaries(idomain)
         original_boundary_location[
-            original_boundary_location.size - number_of_clipped_cells :
+            original_boundary_location.size - n_clipped_cells :
         ] = False
 
         original_boundary_values = xu.full_like(
@@ -56,4 +53,4 @@ class TestClippedBoundaryConditionCreator:
             number_clipped_head_locations = np.count_nonzero(
                 ~np.isnan(result_clipped_head.sel(layer=layer_index))
             )
-            assert number_clipped_head_locations is number_of_clipped_cells
+            assert number_clipped_head_locations is n_clipped_cells
