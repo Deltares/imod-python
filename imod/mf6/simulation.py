@@ -371,6 +371,22 @@ class Modflow6Simulation(collections.UserDict):
         regridded_simulation_name: str,
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
     ) -> "Modflow6Simulation":
+        """
+        This method creates a new simulation object. The models contained in the new simulation are regridded versions
+        of the models in the input object (this).
+        Time discretization and solver settings are copied.
+
+        Parameters
+        ----------
+        regridded_simulation_name: str
+            name given to the output simulation
+        target_grid: xr.DataArray or  xu.UgridDataArray
+            discretization onto which the models  in this simulation will be regridded
+
+        Returns
+        -------
+        a new simulation object with regridded models
+        """
         result = self.__class__(regridded_simulation_name)
         for key, item in self.items():
             if isinstance(item, GroundwaterFlowModel):
