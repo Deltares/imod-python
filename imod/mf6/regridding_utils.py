@@ -1,3 +1,4 @@
+import abc
 from enum import Enum
 from typing import Dict, List, Optional, Union
 
@@ -37,40 +38,68 @@ class RegridderInstancesCollection:
         self._target_grid = target_grid
 
     def __has_regridder(
-        self, regridder_type: RegridderType, method: Optional[str] = None
+        self, regridder_type: abc.ABCMeta, method: Optional[str] = None
     ) -> bool:
         return (regridder_type, method) in self.regridder_instances.keys()
 
     def __get_existing_regridder(
-        self, regridder_type: RegridderType, method: Optional[str]
+        self, regridder_type: abc.ABCMeta, method: Optional[str]
     ) -> BaseRegridder:
         if self.__has_regridder(regridder_type, method):
             return self.regridder_instances[(regridder_type, method)]
         raise ValueError("no existing regridder of type " + str(regridder_type))
 
     def __create_regridder(
-        self, regridder_type: RegridderType, method: Optional[str]
+        self, regridder_type: abc.ABCMeta, method: Optional[str]
     ) -> BaseRegridder:
         if method is None:
             method_args = ()
         else:
             method_args = (method,)
 
-        self.regridder_instances[(regridder_type, method)] = regridder_type.value(
+        self.regridder_instances[(regridder_type, method)] = regridder_type(
             self._source_grid, self._target_grid, *method_args
         )
         return self.regridder_instances[(regridder_type, method)]
 
     def get_regridder(
-        self, regridder_type: RegridderType, method: Optional[str] = None
+        self,
+        regridder_type: Union[RegridderType, abc.ABCMeta],
+        method: Optional[str] = None,
     ) -> BaseRegridder:
         """
-        returns a regridder of the specified type-name and with the specified method.
-        """
-        if not self.__has_regridder(regridder_type, method):
-            self.__create_regridder(regridder_type, method)
+        returns a regridder of the specified type and with the specified method.
+        The desired type can be passed through  the argument "regridder_type" as an enumerator or
+        as a class.
+        The following two are equivalent:
+        instancesCollection.get_regridder(RegridderType.OVERLAP, "mean")
+        instancesCollection.get_regridder(xu.OverlapRegridder, "mean")
 
-        return self.__get_existing_regridder(regridder_type, method)
+
+        Parameters
+        ----------
+        regridder_type: RegridderType or regridder class
+            indicates the desired regridder type
+        method: str or None
+            indicates the method the regridder should apply
+
+        Returns
+        -------
+        a regridder of the specified characteristics
+        """
+        if isinstance(regridder_type, abc.ABCMeta):
+            if not issubclass(regridder_type, BaseRegridder):
+                raise ValueError(
+                    "only derived types of BaseRegridder can be instantiated"
+                )
+            regridder_class = regridder_type
+        if isinstance(regridder_type, RegridderType):
+            regridder_class = regridder_type.value
+
+        if not self.__has_regridder(regridder_class, method):
+            self.__create_regridder(regridder_class, method)
+
+        return self.__get_existing_regridder(regridder_class, method)
 
 
 def get_non_grid_data(package, grid_names: List[str]) -> Dict[str, any]:

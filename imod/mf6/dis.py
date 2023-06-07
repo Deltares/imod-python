@@ -4,7 +4,7 @@ import numpy as np
 
 import imod
 from imod.mf6.pkgbase import Package
-from imod.mf6.regridding_utils import RegridderType as rt
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
     ActiveCellsConnectedSchema,
@@ -83,9 +83,9 @@ class StructuredDiscretization(Package):
     _template = Package._initialize_template(_pkg_id)
 
     _regrid_method = {
-        "top": (rt.OVERLAP, "mean"),
-        "bottom": (rt.OVERLAP, "mean"),
-        "idomain": (rt.OVERLAP, "mean"),
+        "top": (RegridderType.OVERLAP, "mean"),
+        "bottom": (RegridderType.OVERLAP, "mean"),
+        "idomain": (RegridderType.OVERLAP, "mean"),
     }
 
     def __init__(self, top, bottom, idomain, validate: bool = True):

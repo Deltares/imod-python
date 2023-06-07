@@ -13,9 +13,11 @@ import xugrid as xu
 from xarray.core.utils import is_scalar
 
 import imod
-from imod.mf6.regridding_utils import RegridderInstancesCollection
-from imod.mf6.regridding_utils import RegridderType as rt
-from imod.mf6.regridding_utils import get_non_grid_data
+from imod.mf6.regridding_utils import (
+    RegridderInstancesCollection,
+    RegridderType,
+    get_non_grid_data,
+)
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
 
@@ -761,7 +763,7 @@ class Package(PackageBase, abc.ABC):
     def regrid_like(
         self,
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
-        regridder_types: Dict[str, Tuple[rt, str]] = None,
+        regridder_types: Dict[str, Tuple[RegridderType, str]] = None,
     ) -> "Package":
         """
         Creates a package of the same type as this package, based on another discretization.
