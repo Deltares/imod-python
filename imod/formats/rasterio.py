@@ -8,10 +8,10 @@ Currently only :func:`imod.rasterio.write` is implemented.
 
 import pathlib
 import warnings
-from os import PathLike
-from typing import Dict, Union
+from typing import Dict
 
 import numpy as np
+import pandas as pd
 
 from imod import util
 from imod.formats import array_io
@@ -23,8 +23,7 @@ try:
 except ImportError:
     rasterio = util.MissingOptionalModule("rasterio")
 
-
-FilePath = Union[str, "PathLike[str]"]
+f_open = open
 
 
 # Based on this comment
@@ -258,10 +257,12 @@ def open(path, use_cftime=False, pattern=None):
     return array_io.reading._open(path, use_cftime, pattern, header, _read)
 
 
-def write_aaigrid(path: FilePath, a: np.ndarray, profile: Dict) -> None:
+def write_aaigrid(path: pathlib.Path, a: np.ndarray, profile: Dict) -> None:
     """
     Fall-back function to write ESRII ASCII grids even if rasterio is not
     installed.
+
+    This function takes care to mimick the idiosyncracies of the GDAL driver.
 
     Parameters
     ----------
@@ -274,41 +275,63 @@ def write_aaigrid(path: FilePath, a: np.ndarray, profile: Dict) -> None:
     """
     dtype = profile["dtype"]
     nodata = profile["nodata"]
+    df = pd.DataFrame(a.astype(dtype))
+    df.index = np.full(len(df), np.nan)
     if np.issubdtype(dtype, np.integer):
-        fmt = " %d"
-        str_nodata = f"{int(nodata)}"
+        is_float = False
         space = ""
+        fmt = "%d"
+        str_nodata = f"{int(nodata)}"
     elif np.issubdtype(dtype, np.floating):
+        # For some reason, a space is inserted before the nodata value if dtype
+        # is a float.
+        is_float = True
+        space = " "
         precision = profile.get("decimal_precision")
         digits = profile.get("significant_digits")
         if precision is not None:
-            fmt = f" %.{precision}f"
+            fmt = f"%.{precision}f"
             str_nodata = f"{nodata:.{precision}f}"
         elif digits is not None:
-            fmt = f" %.{digits}g"
+            fmt = f"%.{digits}g"
             str_nodata = f"{nodata:.{digits}g}"
         else:
-            fmt = " %.20g"  # GDAL default
+            fmt = "%.20g"
             str_nodata = f"{nodata:.20g}"
-        space = " "
     else:
         raise TypeError(f"invalid dtype: {dtype}")
 
-    a = a.astype(dtype)
     dx, _, xmin, _, dy, ymax = profile["transform"][:6]
     ymin = ymax + profile["height"] * dy
 
-    # GDAL writes only a carriage return in the header
     header = (
-        f'ncols        {profile["width"]}\r'
-        f'nrows        {profile["height"]}\r'
-        f"xllcorner    {xmin:.12f}\r"
-        f"yllcorner    {ymin:.12f}\r"
-        f"cellsize     {dx:.12f}\r"
-        f"NODATA_value {space}{str_nodata}"
+        f'ncols        {profile["width"]}\n'
+        f'nrows        {profile["height"]}\n'
+        f"xllcorner    {xmin:.12f}\n"
+        f"yllcorner    {ymin:.12f}\n"
+        f"cellsize     {dx:.12f}\n"
+        f"NODATA_value {space}{str_nodata}\n"
     )
 
-    np.savetxt(path, a, fmt=fmt, header=header, delimiter="", newline="\r", comments="")
+    with f_open(path, "w", newline="") as f:
+        f.write(header)
+
+        first = df.iloc[0, 0]
+        if is_float and first.is_integer():
+            # GDAL uses the "general" format by default. However, if the first
+            # value is a float without decimals, it will write a single
+            # trailing 0 for the first value, presumably to aid type inference
+            # when reading values back in. All subsequent values are written
+            # without decimals, however.
+            precision = profile.get("decimal_precision", 1)
+            f.write(f" {first:.{precision}f} ")
+            df.iloc[[0], 1:].to_csv(
+                f, index=False, header=False, sep=" ", float_format=fmt
+            )
+            df.iloc[1:].to_csv(f, index=True, header=False, sep=" ", float_format=fmt)
+        else:
+            df.to_csv(f, index=True, header=False, sep=" ", float_format=fmt)
+
     return
 
 

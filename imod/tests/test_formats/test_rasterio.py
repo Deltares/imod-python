@@ -70,28 +70,25 @@ def test_saveopen__nodata_dtype(test_da, tmp_path):
     assert (daback == -1).all()
 
 
-# Note: GDAL is especially idiosyncratic when it comes to floats without a
-# decimal. It will write the first value as a float (e.g. 10.0), but all
-# subsequent values are written as integer, presumably to save space. Numpy
-# savetxt obviously does not replicate this behavior. Concretely, I've omitted
-# floats without a decimal in these test cases.
 @pytest.mark.parametrize(
     "value,nodata,dtype,precision,digits",
     [
         (1, -999, np.int32, None, None),
-        (1.1, -999.0, np.float32, None, None),
-        (1.1, np.nan, np.float32, None, None),
-        (1.1, -999.9, np.float32, None, None),
-        (1.1, -999.99, np.float32, None, None),
-        (1.11, -999.99, np.float32, None, None),
+        (1.0, -999.0, np.float32, None, None),
+        (1.0, np.nan, np.float32, None, None),
+        (1.0, -999.9, np.float32, None, None),
+        (1.0, -999.99, np.float32, None, None),
+        (1.01, -999.99, np.float32, None, None),
         # Decimal precision
         (1, -999, np.int32, 3, None),
-        (1.1, -999.99, np.float32, 2, None),
-        (1.1, np.nan, np.float32, 2, None),
+        (1.0, -999.99, np.float32, 2, None),
+        (1.0, np.nan, np.float32, 2, None),
+        (1.01, np.nan, np.float32, 2, None),
         # Significant digits
         (1, -999, np.int32, None, 3),
-        (1.1, -999.99, np.float32, None, 4),
-        (1.1, np.nan, np.float32, None, 5),
+        (1.0, -999.99, np.float32, None, 4),
+        (1.0, np.nan, np.float32, None, 5),
+        (1.01, np.nan, np.float32, None, 5),
     ],
 )
 def test_rasterio_ascii(test_da, tmp_path, value, nodata, dtype, precision, digits):
