@@ -70,6 +70,11 @@ def test_saveopen__nodata_dtype(test_da, tmp_path):
     assert (daback == -1).all()
 
 
+# Note: GDAL is especially idiosyncratic when it comes to floats without a
+# decimal. It will write the first value as a float (e.g. 10.0), but all
+# subsequent values are written as integer, presumably to save space. Numpy
+# savetxt obviously does not replicate this behavior. Concretely, I've omitted
+# floats without a decimal in these test cases.
 @pytest.mark.parametrize(
     "value,nodata,dtype,precision,digits",
     [
