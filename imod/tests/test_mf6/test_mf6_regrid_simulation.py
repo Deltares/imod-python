@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 
 import imod
 from imod.tests.fixtures.mf6_regridding_fixture import (
