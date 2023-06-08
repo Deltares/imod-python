@@ -62,6 +62,18 @@ class RegridderInstancesCollection:
         )
         return self.regridder_instances[(regridder_type, method)]
 
+    def __get_regridder_class(self, regridder_type: RegridderType) -> abc.ABCMeta:
+        if isinstance(regridder_type, abc.ABCMeta):
+            if not issubclass(regridder_type, BaseRegridder):
+                raise ValueError(
+                    "only derived types of BaseRegridder can be instantiated"
+                )
+            return regridder_type
+        elif isinstance(regridder_type, RegridderType):
+            return regridder_type.value
+
+        raise ValueError("invalid type for regridder")
+
     def get_regridder(
         self,
         regridder_type: Union[RegridderType, abc.ABCMeta],
@@ -87,14 +99,7 @@ class RegridderInstancesCollection:
         -------
         a regridder of the specified characteristics
         """
-        if isinstance(regridder_type, abc.ABCMeta):
-            if not issubclass(regridder_type, BaseRegridder):
-                raise ValueError(
-                    "only derived types of BaseRegridder can be instantiated"
-                )
-            regridder_class = regridder_type
-        if isinstance(regridder_type, RegridderType):
-            regridder_class = regridder_type.value
+        regridder_class = self.__get_regridder_class(regridder_type)
 
         if not self.__has_regridder(regridder_class, method):
             self.__create_regridder(regridder_class, method)
