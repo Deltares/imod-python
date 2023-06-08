@@ -276,6 +276,8 @@ def write_aaigrid(path: pathlib.Path, a: np.ndarray, profile: Dict) -> None:
     dtype = profile["dtype"]
     nodata = profile["nodata"]
     df = pd.DataFrame(a.astype(dtype))
+    # GDAL writes white space before every line. pandas doesn't support this,
+    # but it will write nodata values -- encoded as NaN -- as white space.
     df.index = np.full(len(df), np.nan)
     if np.issubdtype(dtype, np.integer):
         is_float = False
@@ -283,12 +285,13 @@ def write_aaigrid(path: pathlib.Path, a: np.ndarray, profile: Dict) -> None:
         fmt = "%d"
         str_nodata = f"{int(nodata)}"
     elif np.issubdtype(dtype, np.floating):
-        # For some reason, a space is inserted before the nodata value if dtype
-        # is a float.
+        # For some reason, GDAL inserts a space before the nodata value if
+        # dtype is float.
         is_float = True
         space = " "
         precision = profile.get("decimal_precision")
         digits = profile.get("significant_digits")
+        # See: https://docs.python.org/3/library/string.html#formatspec
         if precision is not None:
             fmt = f"%.{precision}f"
             str_nodata = f"{nodata:.{precision}f}"
@@ -313,21 +316,33 @@ def write_aaigrid(path: pathlib.Path, a: np.ndarray, profile: Dict) -> None:
         f"NODATA_value {space}{str_nodata}\n"
     )
 
+    # GDAL writes only a linefeed, not a carriage return. By default, Python
+    # adds a carriage return as well, on Windows. This is disabled by
+    # explicitly setting the newline argument.
     with f_open(path, "w", newline="") as f:
         f.write(header)
 
         first = df.iloc[0, 0]
+        # is_float is the result of a typecheck above.
+        # is_integer() checks whether a float has a decimal fraction:
+        # (1.0).is_integer() -> True
+        # (1.1).is_integer() -> False
         if is_float and first.is_integer():
-            # GDAL uses the "general" format by default. However, if the first
-            # value is a float without decimals, it will write a single
-            # trailing 0 for the first value, presumably to aid type inference
-            # when reading values back in. All subsequent values are written
-            # without decimals, however.
+            # GDAL uses the "general" float (g) format by default. However, if
+            # the first value is a float without decimals, it will write a
+            # single trailing 0 for the first value, presumably to aid type
+            # inference when reading values back in. All subsequent values are
+            # written without decimals, however.
             precision = profile.get("decimal_precision", 1)
+            # Write the first value, with trailing zero if needed.
             f.write(f" {first:.{precision}f} ")
+            # Write remainder of first row. Since we've already written the
+            # first value with a space in front of it, we skip writing the NaN
+            # index value here.
             df.iloc[[0], 1:].to_csv(
                 f, index=False, header=False, sep=" ", float_format=fmt
             )
+            # Write all other rows.
             df.iloc[1:].to_csv(f, index=True, header=False, sep=" ", float_format=fmt)
         else:
             df.to_csv(f, index=True, header=False, sep=" ", float_format=fmt)
