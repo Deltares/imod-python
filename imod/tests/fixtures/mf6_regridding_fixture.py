@@ -81,7 +81,7 @@ def _make_model(
 
     grid_data_function(np.float64, 1, cellsize)
 
-    # create a constant head field. Some cells should not be constant head in order to have a meaningfull simulation
+    # Create a constant head field. Some cells should not be constant head in order to have a meaningfull simulation
     constant_head = grid_data_function(np.float64, 1, cellsize)
     gwf_model["chd"] = imod.mf6.ConstantHead(
         constant_head, print_input=True, print_flows=True, save_flows=True
@@ -122,7 +122,7 @@ def structured_flow_model() -> imod.mf6.GroundwaterFlowModel:
     bottom = grid_data_structured_layered(np.float64, -1.0, cellsize)
     idomain = grid_data_structured(np.int32, 1, cellsize)
 
-    # unassign the constant-head package from some cells to have a more meaningful simulation
+    # Unassign the constant-head package from some cells to have a more meaningful simulation
     constant_head = gwf_model["chd"].dataset["head"]
     constant_head.loc[{"x": cellsize, "y": 2 * cellsize, "layer": 1}] = np.nan
     constant_head.loc[{"x": 2 * cellsize, "y": cellsize, "layer": 1}] = np.nan
@@ -141,7 +141,7 @@ def unstructured_flow_model() -> imod.mf6.GroundwaterFlowModel:
 
     gwf_model = _make_model(grid_data_unstructured, cellsize)
 
-    # unassign the constant-head package from some cells to have a more meaningful simulation
+    # Unassign the constant-head package from some cells to have a more meaningful simulation
     constant_head = gwf_model["chd"].dataset["head"]
     constant_head.loc[{"mesh2d_nFaces": 12, "layer": 1}] = np.nan
     constant_head.loc[{"mesh2d_nFaces": 13, "layer": 1}] = np.nan
