@@ -20,7 +20,7 @@ from imod.mf6.pkgbase import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.schemata import ValidationError
-
+import copy
 
 def initialize_template(name: str) -> Template:
     loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -354,6 +354,8 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for pkg_name, pkg in self.items():
             if pkg.is_regridding_supported():
                 new_model[pkg_name] = pkg.regrid_like(target_grid)
+            elif isinstance(pkg, imod.mf6.Well):
+                new_model[pkg_name] = copy.deepcopy(pkg)
             else:
                 raise NotImplementedError(
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
