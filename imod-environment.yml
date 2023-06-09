@@ -27,6 +27,7 @@ dependencies:
   - pip
   - pip:
       - pandamesh
+      - ribasim
   - pydata-sphinx-theme
   - pyproj
   - pytest

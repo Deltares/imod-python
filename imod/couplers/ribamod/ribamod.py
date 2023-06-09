@@ -8,12 +8,13 @@ from imod.couplers.metamod.rch_svat_mapping import RechargeSvatMapping
 from imod.couplers.metamod.wel_svat_mapping import WellSvatMapping
 from imod.mf6 import Modflow6Simulation
 from imod.mf6.model import Modflow6Model
-from imod.msw import GridData, MetaSwapModel, Sprinkling
+from imod.msw import GridData
+import ribasim
 
 
-class RibaMetaMod:
+class RibaMod:
     """
-    The RibaMetaMod class creates the necessary input files for coupling MetaSWAP to
+    The RibaMod class creates the necessary input files for coupling Ribasim to
     MODFLOW 6.
 
     Parameters
@@ -30,74 +31,28 @@ class RibaMetaMod:
     """
 
     _toml_name = "imod_coupler.toml"
+    _ribasim_model_dir = "Ribasim"
     _modflow6_model_dir = "Modflow6"
-    _metaswap_model_dir = "MetaSWAP"
 
     def __init__(
         self,
-        msw_model: MetaSwapModel,
+        ribasim_model: ribasim.Model,
         mf6_simulation: Modflow6Simulation,
-        mf6_rch_pkgkey: str,
-        mf6_wel_pkgkey: Optional[str] = None,
     ):
-        self.msw_model = msw_model
+        self.ribasim_model = ribasim_model
         self.mf6_simulation = mf6_simulation
-        self.mf6_rch_pkgkey = mf6_rch_pkgkey
-        self.mf6_wel_pkgkey = mf6_wel_pkgkey
-
-        self.is_sprinkling = self._check_coupler_and_sprinkling()
-
-    def _check_coupler_and_sprinkling(self):
-        mf6_rch_pkgkey = self.mf6_rch_pkgkey
-        mf6_wel_pkgkey = self.mf6_wel_pkgkey
-
-        gwf_names = self._get_gwf_modelnames()
-
-        # Assume only one groundwater flow model
-        # FUTURE: Support multiple groundwater flow models.
-        gwf_model = self.mf6_simulation[gwf_names[0]]
-
-        if mf6_rch_pkgkey not in gwf_model.keys():
-            raise ValueError(
-                f"No package named {mf6_rch_pkgkey} detected in Modflow 6 model. "
-                "iMOD_coupler requires a Recharge package."
-            )
-
-        sprinkling_key = self.msw_model._get_pkg_key(Sprinkling, optional_package=True)
-
-        sprinkling_in_msw = sprinkling_key is not None
-        sprinkling_in_mf6 = mf6_wel_pkgkey in gwf_model.keys()
-
-        if sprinkling_in_msw and not sprinkling_in_mf6:
-            raise ValueError(
-                f"No package named {mf6_wel_pkgkey} found in Modflow 6 model, "
-                "but Sprinkling package found in MetaSWAP. "
-                "iMOD Coupler requires a Well Package "
-                "to couple wells."
-            )
-        elif not sprinkling_in_msw and sprinkling_in_mf6:
-            raise ValueError(
-                f"Modflow 6 Well package {mf6_wel_pkgkey} specified for sprinkling, "
-                "but no Sprinkling package found in MetaSWAP model."
-            )
-        elif sprinkling_in_msw and sprinkling_in_mf6:
-            return True
-        else:
-            return False
 
     def write(
         self,
         directory: Union[str, Path],
         modflow6_dll: Union[str, Path],
-        metaswap_dll: Union[str, Path],
-        metaswap_dll_dependency: Union[str, Path],
         ribasim_dll: Union[str, Path],
         ribasim_dll_dependency: Union[str, Path],
         modflow6_write_kwargs: Optional[dict] = None,
     ):
         """
-        Write MetaSWAP and Modflow 6 model with exchange files, as well as a
-        ``.toml`` file which configures the imod coupler run.
+        Write Ribasim and Modflow 6 model with exchange files, as well as a
+        ``.toml`` file which configures the iMOD Coupler run.
 
         Parameters
         ----------
@@ -106,15 +61,6 @@ class RibaMetaMod:
         modflow6_dll: str or Path
             Path to modflow6 .dll. You can obtain this library by downloading
             `the last iMOD5 release
-            <https://oss.deltares.nl/web/imod/download-imod5>`_
-        metaswap_dll: str or Path
-            Path to metaswap .dll. You can obtain this library by downloading
-            `the last iMOD5 release
-            <https://oss.deltares.nl/web/imod/download-imod5>`_
-        metaswap_dll_dependency: str or Path
-            Directory with metaswap .dll dependencies. Directory should contain:
-            [fmpich2.dll, mpich2mpi.dll, mpich2nemesis.dll, TRANSOL.dll]. You
-            can obtain these by downloading `the last iMOD5 release
             <https://oss.deltares.nl/web/imod/download-imod5>`_
         ribasim_dll: str or Path
             Path to ribasim .dll.
@@ -132,29 +78,27 @@ class RibaMetaMod:
 
         # force to Path
         directory = Path(directory)
-        # For some reason the Modflow 6 model has to be written first, before
-        # writing the MetaSWAP model. Else we get an Access Violation Error when
-        # running the coupler.
         self.mf6_simulation.write(
             directory / self._modflow6_model_dir,
             **modflow6_write_kwargs,
         )
-        self.msw_model.write(directory / self._metaswap_model_dir)
+        self.ribasim_model.write(directory / self._ribasim_model_dir)
 
-        # Write exchange files
-        exchange_dir = directory / "exchanges"
-        exchange_dir.mkdir(mode=755, exist_ok=True)
-        self.write_exchanges(exchange_dir, self.mf6_rch_pkgkey, self.mf6_wel_pkgkey)
+        # TODO
+        coupling_dict = {}
 
-        coupling_dict = self._get_coupling_dict(
-            exchange_dir, self.mf6_rch_pkgkey, self.mf6_wel_pkgkey
-        )
+        # # Write exchange files
+        # exchange_dir = directory / "exchanges"
+        # exchange_dir.mkdir(mode=755, exist_ok=True)
+        # self.write_exchanges(exchange_dir, self.mf6_rch_pkgkey, self.mf6_wel_pkgkey)
+
+        # coupling_dict = self._get_coupling_dict(
+        #     exchange_dir, self.mf6_rch_pkgkey, self.mf6_wel_pkgkey
+        # )
 
         self.write_toml(
             directory,
             modflow6_dll,
-            metaswap_dll,
-            metaswap_dll_dependency,
             ribasim_dll,
             ribasim_dll_dependency,
             coupling_dict,
@@ -164,8 +108,6 @@ class RibaMetaMod:
         self,
         directory: Union[str, Path],
         modflow6_dll: Union[str, Path],
-        metaswap_dll: Union[str, Path],
-        metaswap_dll_dependency: Union[str, Path],
         ribasim_dll: Union[str, Path],
         ribasim_dll_dependency: Union[str, Path],
         coupling_dict: dict,
@@ -181,15 +123,6 @@ class RibaMetaMod:
             Path to modflow6 .dll. You can obtain this library by downloading
             `the last iMOD5 release
             <https://oss.deltares.nl/web/imod/download-imod5>`_
-        metaswap_dll: str or Path
-            Path to metaswap .dll. You can obtain this library by downloading
-            `the last iMOD5 release
-            <https://oss.deltares.nl/web/imod/download-imod5>`_
-        metaswap_dll_dependency: str or Path
-            Directory with metaswap .dll dependencies. Directory should contain:
-            [fmpich2.dll, mpich2mpi.dll, mpich2nemesis.dll, TRANSOL.dll]. You
-            can obtain these by downloading `the last iMOD5 release
-            <https://oss.deltares.nl/web/imod/download-imod5>`_
         ribasim_dll: str or Path
             Path to ribasim .dll.
         ribasim_dll_dependency: str or Path
@@ -204,21 +137,17 @@ class RibaMetaMod:
         coupler_toml = {
             "timing": False,
             "log_level": "INFO",
-            "driver_type": "ribametamod",
+            "driver_type": "ribamod",
             "driver": {
                 "kernels": {
                     "modflow6": {
                         "dll": str(modflow6_dll),
                         "work_dir": f".\\{self._modflow6_model_dir}",
                     },
-                    "metaswap": {
-                        "dll": str(metaswap_dll),
-                        "work_dir": f".\\{self._metaswap_model_dir}",
-                        "dll_dep_dir": str(metaswap_dll_dependency),
-                    },
                     "ribasim": {
                         "dll": str(ribasim_dll),
                         "dll_dep_dir": str(ribasim_dll_dependency),
+                        "toml": str(self._ribasim_model_dir / f"{self.ribasim_model.modelname}.toml")
                     },
                 },
                 "coupling": [coupling_dict],
@@ -238,6 +167,7 @@ class RibaMetaMod:
             if isinstance(value, Modflow6Model)
         ]
 
+    # TODO:
     def _get_coupling_dict(
         self,
         directory: Union[str, Path],
@@ -290,6 +220,7 @@ class RibaMetaMod:
 
         return coupling_dict
 
+    # TODO
     def write_exchanges(
         self,
         directory: Union[str, Path],
