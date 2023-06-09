@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Optional, Union
 
+import ribasim
 import tomli_w
 
 from imod.couplers.metamod.node_svat_mapping import NodeSvatMapping
@@ -9,7 +10,6 @@ from imod.couplers.metamod.wel_svat_mapping import WellSvatMapping
 from imod.mf6 import Modflow6Simulation
 from imod.mf6.model import Modflow6Model
 from imod.msw import GridData
-import ribasim
 
 
 class RibaMod:
@@ -147,7 +147,10 @@ class RibaMod:
                     "ribasim": {
                         "dll": str(ribasim_dll),
                         "dll_dep_dir": str(ribasim_dll_dependency),
-                        "toml": str(self._ribasim_model_dir / f"{self.ribasim_model.modelname}.toml")
+                        "toml": str(
+                            self._ribasim_model_dir
+                            / f"{self.ribasim_model.modelname}.toml"
+                        ),
                     },
                 },
                 "coupling": [coupling_dict],
