@@ -24,3 +24,5 @@ Prepare model input
     
     zonal_aggregate_polygons
     zonal_aggregate_raster
+
+    assign_wells
