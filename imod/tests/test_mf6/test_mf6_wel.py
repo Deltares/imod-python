@@ -480,3 +480,18 @@ def test_render__concentration_dis_vertices_transient(well_test_data_transient):
             assert (
                 data.count(" 246 135") == 15
             )  # check salinity and temperature was written to period data
+
+def test_render__well_from_model(circle_model):
+        circle_model["GWF_1"]["well"] =  imod.mf6.Well(
+            screen_top=[0.,0.],
+            screen_bottom=[-10., -10.],
+            x=[1.,2.],
+            y=[3.,4.],
+            rate= [1.2,3.4],
+            print_flows=True,
+            validate=True
+        )
+
+        
+        tempdir = imod.util.temporary_directory()
+        circle_model.write(tempdir, binary=False)
