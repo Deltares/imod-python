@@ -1,10 +1,13 @@
-from typing import List
+from typing import List, Union
 
-from xugrid.core.wrap import UgridDataArray
+import xarray as xr
+import xugrid as xu
 
 import imod
 from imod.mf6 import ConstantHead
 from imod.select.grid import active_grid_boundary_xy
+
+GridDataArray = Union[xr.DataArray, xu.UgridDataArray]
 
 
 class ClippedBoundaryConditionCreator:
@@ -18,8 +21,8 @@ class ClippedBoundaryConditionCreator:
     @classmethod
     def create(
         cls,
-        idomain: UgridDataArray,
-        state_for_clipped_boundary: UgridDataArray,
+        idomain: GridDataArray,
+        state_for_clipped_boundary: GridDataArray,
         original_constant_head_boundaries: List[ConstantHead],
     ) -> ConstantHead:
         """
@@ -52,8 +55,9 @@ class ClippedBoundaryConditionCreator:
 
     @staticmethod
     def __find_unassigned_grid_boundaries(
-        active_grid_boundary: UgridDataArray, boundary_conditions: List[ConstantHead]
-    ) -> UgridDataArray:
+        active_grid_boundary: GridDataArray,
+        boundary_conditions: List[ConstantHead],
+    ) -> GridDataArray:
         unassigned_grid_boundaries = active_grid_boundary
         for boundary_condition in boundary_conditions:
             unassigned_grid_boundaries = (
