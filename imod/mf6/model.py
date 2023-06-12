@@ -287,7 +287,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         x_max=None,
         y_min=None,
         y_max=None,
-        state_for_boundary=None,
     ):
         """
         Clip a model by a bounding box (time, layer, y, x).
