@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-
+import textwrap
 import imod
 
 
@@ -92,11 +92,12 @@ def test_mf6wel_write__stationary(
     np.testing.assert_array_equal(arr, sparse_data_expected)
 
 
-def test_mf6wel_write__transient(
-    tmp_path, mf6wel_test_data_transient, sparse_data_expected
+
+def test_mf6wel_textwrite__stationary(
+    tmp_path, mf6wel_test_data_stationary, sparse_data_expected
 ):
     # Arrange
-    cellid, rate = mf6wel_test_data_transient
+    cellid, rate = mf6wel_test_data_stationary
     mf6wel = imod.mf6.wel.Mf6Wel(cellid=cellid, rate=rate)
     globaltimes = pd.date_range("2000-01-01", "2000-01-06")
     pkgname = "wel"
@@ -107,11 +108,56 @@ def test_mf6wel_write__transient(
     mf6wel.write(directory, pkgname, globaltimes, True)
 
     # Assert
-    assert len(list(directory.glob("**/*"))) == 7
+    assert len(list(directory.glob("**/*"))) == 3
     arr = np.fromfile(
-        directory / pkgname / f"{pkgname}-0.bin", dtype=sparse_data_expected.dtype
+        directory / pkgname / f"{pkgname}.bin", dtype=sparse_data_expected.dtype
     )
     np.testing.assert_array_equal(arr, sparse_data_expected)
+
+
+
+
+def test_mf6wel_render__transient(
+    tmp_path, mf6wel_test_data_transient
+):
+    # Arrange
+    cellid, rate = mf6wel_test_data_transient
+    mf6wel = imod.mf6.wel.Mf6Wel(cellid=cellid, rate=rate)
+    globaltimes = pd.date_range("2000-01-01", "2000-01-06")
+    pkgname = "wel"
+    directory = Path(tmp_path) / "mf6wel"
+    directory.mkdir(exist_ok=True)
+
+    # Act
+    actual = mf6wel.render(directory, pkgname, globaltimes, False)
+    expected = textwrap.dedent(
+        """\
+    begin options
+    end options
+    
+    begin dimensions
+      maxbound 24
+    end dimensions
+
+    begin period 1
+      open/close mf6wel/wel/wel-0.dat
+    end period
+    begin period 2
+      open/close mf6wel/wel/wel-1.dat
+    end period
+    begin period 3
+      open/close mf6wel/wel/wel-2.dat
+    end period
+    begin period 4
+      open/close mf6wel/wel/wel-3.dat
+    end period
+    begin period 5
+      open/close mf6wel/wel/wel-4.dat
+    end period
+    """)
+    
+    # Assert    
+    assert actual == expected
 
 
 def test_remove_inactive__stationary(basic_dis, mf6wel_test_data_stationary):

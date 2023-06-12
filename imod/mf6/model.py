@@ -254,7 +254,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for pkg_name, pkg in self.items():
             try:
                 if isinstance(pkg, imod.mf6.Well):
-                    self.__write_well(directory,pkg,  modelname, globaltimes, binary, validate)
+                    self.__write_well(pkg, directory,  modelname, globaltimes, binary, validate)
                 else:
                     pkg.write(
                         directory=modeldirectory,
