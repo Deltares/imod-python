@@ -10,9 +10,20 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Changed
+~~~~~~~
+
+- :func:`imod.rasterio.save` will now write ESRII ASCII rasters, even if
+  rasterio is not installed. A fallback function has been added specifically
+  for ASCII rasters.
+
 Fixed
 ~~~~~
 
+- geopandas and rasterio were imported at the top of a module in some places.
+  This has been fixed so that both are not optional dependencies when
+  installing via pip (installing via conda or mamba will always pull all
+  dependencies and supports full functionality).
 - :meth:`imod.mf6.Simulation._validate` now print all validation errors for all
   models and packages in one message.
 
