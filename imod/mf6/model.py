@@ -222,9 +222,8 @@ class Modflow6Model(collections.UserDict, abc.ABC):
     def __write_well(self, wellpackage,  directory, modelname, globaltimes, binary=True, validate: bool = True):
         top, bottom, idomain = self.__get_domain_geometry()
         k = self.__get_k()
-        mf6_package = wellpackage.to_mf6_pkg(idomain, top, bottom, k)
+        wellpackage.write( directory, modelname, globaltimes, binary, validate, idomain, top, bottom, k)
 
-        mf6_package.write()
 
         
 
