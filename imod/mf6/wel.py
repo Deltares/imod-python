@@ -18,6 +18,7 @@ from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
 from imod.select.points import points_indices
 from imod.util import values_within_range
+from fastcore.dispatch import typedispatch
 
 
 # FUTURE: There was an idea to autogenerate these object.
@@ -44,6 +45,7 @@ class Mf6Wel(Mf6BoundaryCondition):
         rate,
         concentration=None,
         concentration_boundary_type="aux",
+        validate: bool = True,
     ):
         super().__init__()
         self.dataset["cellid"] = cellid
@@ -53,6 +55,7 @@ class Mf6Wel(Mf6BoundaryCondition):
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
             self.add_periodic_auxiliary_variable()
+        self._validate_init_schemata(validate)
 
 
 class Well(BoundaryCondition):
@@ -219,6 +222,11 @@ class Well(BoundaryCondition):
         new.dataset = ds.loc[{"index": in_bounds}]
 
         return new
+    
+    def write(self, directory, pkgname, globaltimes, binary, validate,idomain, top, bottom, k):
+        mf6_package = self.to_mf6_pkg(idomain, top, bottom, k)
+
+        mf6_package.write(directory, pkgname, globaltimes, binary)
 
     def __create_wells_df(self) -> pd.DataFrame:
         wells_df = self.dataset.to_dataframe()
