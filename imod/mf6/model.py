@@ -277,7 +277,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         return instance
 
-    @abc.abstractmethod
     def clip_box(
         self,
         time_min=None,
