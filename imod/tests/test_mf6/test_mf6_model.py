@@ -9,7 +9,6 @@ from xugrid.core.wrap import UgridDataArray
 
 import imod
 from imod.mf6 import ConstantHead
-from imod.mf6.clipped_boundary_condition_creator import ClippedBoundaryConditionCreator
 from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
 from imod.mf6.pkgbase import Package
 from imod.schemata import ValidationError
@@ -213,9 +212,7 @@ class TestGroundwaterFlowModel:
         assert "chd_clipped" not in clipped
 
     @mock.patch("imod.mf6.model.ClippedBoundaryConditionCreator")
-    def test_clip_box_with_state_for_boundary(
-        self, clipped_boundary_condition_creator
-    ):
+    def test_clip_box_with_state_for_boundary(self, clipped_boundary_condition_creator):
         # Arrange.
         state_for_boundary = MagicMock(spec_set=UgridDataArray)
 
@@ -244,5 +241,7 @@ class TestGroundwaterFlowModel:
         # Assert.
         assert "chd_clipped" in clipped
         clipped_boundary_condition_creator.create.assert_called_once_with(
-            discretization_mock["idomain"], state_for_boundary, [constant_head_mock, constant_head_mock]
+            discretization_mock["idomain"],
+            state_for_boundary,
+            [constant_head_mock, constant_head_mock],
         )

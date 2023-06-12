@@ -421,20 +421,24 @@ class GroundwaterFlowModel(Modflow6Model):
             time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
         )
 
-        if state_for_boundary is None:
-            return clipped
-
-        constant_head_packages = [
-            pkg
-            for name, pkg in clipped.items()
-            if isinstance(pkg, imod.mf6.ConstantHead)
-        ]
-
-        clipped["chd_clipped"] = ClippedBoundaryConditionCreator.create(
-            clipped.get_domain(), state_for_boundary, constant_head_packages
-        )
+        clipped_boundary_condition = self.__create_boundary_condition_unassigned_boundary(clipped, state_for_boundary)
+        if clipped_boundary_condition is not None:
+            clipped["chd_clipped"] = clipped_boundary_condition
 
         return clipped
+
+    @staticmethod
+    def __create_boundary_condition_unassigned_boundary(model, state_for_boundary):
+        if state_for_boundary is None:
+            return None
+
+        constant_head_packages = [
+            pkg for name, pkg in model.items() if isinstance(pkg, imod.mf6.ConstantHead)
+        ]
+
+        return ClippedBoundaryConditionCreator.create(
+            model.get_domain(), state_for_boundary, constant_head_packages
+        )
 
 
 class GroundwaterTransportModel(Modflow6Model):
