@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, TypeAlias
 
 import xarray as xr
 import xugrid as xu
@@ -7,7 +7,7 @@ import imod
 from imod.mf6 import ConstantHead
 from imod.select.grid import active_grid_boundary_xy
 
-GridDataArray = Union[xr.DataArray, xu.UgridDataArray]
+GridDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
 
 
 class ClippedBoundaryConditionCreator:
