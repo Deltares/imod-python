@@ -422,7 +422,7 @@ class GroundwaterFlowModel(Modflow6Model):
         )
 
         clipped_boundary_condition = (
-            self.__create_boundary_condition_unassigned_boundary(
+            self.__create_boundary_condition_for_unassigned_boundary(
                 clipped, state_for_boundary
             )
         )
@@ -432,7 +432,7 @@ class GroundwaterFlowModel(Modflow6Model):
         return clipped
 
     @staticmethod
-    def __create_boundary_condition_unassigned_boundary(model, state_for_boundary):
+    def __create_boundary_condition_for_unassigned_boundary(model, state_for_boundary):
         if state_for_boundary is None:
             return None
 
