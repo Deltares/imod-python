@@ -1,4 +1,4 @@
-from typing import List, Union, TypeAlias
+from typing import List, TypeAlias, Union
 
 import xarray as xr
 import xugrid as xu
