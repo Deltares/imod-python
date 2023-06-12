@@ -279,16 +279,16 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     @abc.abstractmethod
     def clip_box(
-            self,
-            time_min=None,
-            time_max=None,
-            layer_min=None,
-            layer_max=None,
-            x_min=None,
-            x_max=None,
-            y_min=None,
-            y_max=None,
-            state_for_boundary=None
+        self,
+        time_min=None,
+        time_max=None,
+        layer_min=None,
+        layer_max=None,
+        x_min=None,
+        x_max=None,
+        y_min=None,
+        y_max=None,
+        state_for_boundary=None,
     ):
         raise NotImplementedError
 
