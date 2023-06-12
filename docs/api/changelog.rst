@@ -60,6 +60,8 @@ Added
 - Added support for the Modflow 6 Lake package: :class:`imod.mf6.Lake`,
   :class:`imod.mf6.LakeData`, :class:`imod.mf6.OutletManning`, :class:`OutletSpecified`,
   :class:`OutletWeir`. See the examples for an application of the Lake package.
+- :meth:`imod.mf6.simulation.Modflow6Simulation.dump` now supports dumping to MDAL compliant
+  ugrids. These can be used to view and explore Modlfow 6 simulations in QGIS.
 
 Fixed
 ~~~~~
@@ -84,6 +86,9 @@ Added
 - :func:`imod.gen.read_ascii` to read the geometry stored in ASCII text .gen files.
 - :class:`imod.mf6.hfb.HorizontalFlowBarrier` to support Modflow6's HFB
   package, works well with `xugrid.snap_to_grid` function.
+- :meth:`imod.mf6.simulation.Modflow6Simulation.dump` to dump a simulation to a toml file
+  which acts as a definition file, pointing to packages written as netcdf files. This
+  can be used to intermediately store Modflow6 simulations.
 
 Fixed
 ~~~~~
