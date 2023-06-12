@@ -421,7 +421,11 @@ class GroundwaterFlowModel(Modflow6Model):
             time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
         )
 
-        clipped_boundary_condition = self.__create_boundary_condition_unassigned_boundary(clipped, state_for_boundary)
+        clipped_boundary_condition = (
+            self.__create_boundary_condition_unassigned_boundary(
+                clipped, state_for_boundary
+            )
+        )
         if clipped_boundary_condition is not None:
             clipped["chd_clipped"] = clipped_boundary_condition
 
