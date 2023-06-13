@@ -418,8 +418,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for pkg_name, pkg in self.items():
             if pkg.is_regridding_supported():
                 new_model[pkg_name] = pkg.regrid_like(target_grid)
-            elif isinstance(pkg, imod.mf6.Well):
-                new_model[pkg_name] = copy.deepcopy(pkg)
             else:
                 raise NotImplementedError(
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"

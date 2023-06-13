@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pytest
 import xarray as xr
 
 import imod
@@ -68,3 +69,24 @@ def test_render__well_from_model(
     assert pathlib.Path.exists(tmp_path / "GWF_1" / "well.wel")
     assert pathlib.Path.exists(tmp_path / "GWF_1" / "well" / "wel.dat")
     assert transient_twri_model.run() is None
+
+
+def test_render__wells_filtered_out(
+    tmp_path: Path, transient_twri_model: imod.mf6.Modflow6Simulation
+):
+    # for this test, we leave the low conductivity of the twri model as is, so all wells get filtered out
+
+    transient_twri_model["GWF_1"]["well"] = imod.mf6.Well(
+        screen_top=[0.0, 0.0],
+        screen_bottom=[-10.0, -10.0],
+        x=[1.0, 6002.0],
+        y=[3.0, 5004.0],
+        rate=[1.0, 3.0],
+        print_flows=True,
+        validate=True,
+    )
+    # remove old-style well
+    transient_twri_model["GWF_1"].pop("wel", None)
+
+    with pytest.raises(ValueError):
+        transient_twri_model.write(tmp_path, binary=False)
