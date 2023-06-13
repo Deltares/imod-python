@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 import xugrid as xu
-from fastcore.dispatch import typedispatch
 
 from imod.mf6.mf6_adapter import Mf6BoundaryCondition, remove_inactive
 from imod.mf6.pkgbase import (
