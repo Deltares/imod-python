@@ -146,6 +146,9 @@ def assign_wells(
             "transmissivity": overlap * k,
         },
     )
+    # remove entries
+    #   -in very thin layers or when the wellbore penetrates the layer very little
+    #   -in low conductivity layers
     df = df.loc[(df["overlap"] >= minimum_thickness) & (df["k"] >= minimum_k)]
     df["rate"] = df["transmissivity"] / df.groupby("id")["transmissivity"].transform(
         "sum"

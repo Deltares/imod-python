@@ -56,8 +56,8 @@ def test_render__well_from_model(tmp_path, transient_twri_model):
     # remove old-style well
     transient_twri_model["GWF_1"].pop("wel", None)
     # for this test, we increase the hydraulic conductivities a bit, because otherwise the wells will be filtered out as belonging to too impermeable layers
-    transient_twri_model["GWF_1"]["npf"]["k"] *= 1000
-    transient_twri_model["GWF_1"]["npf"]["k33"] *= 1000
+    transient_twri_model["GWF_1"]["npf"]["k"] *= 20000
+    transient_twri_model["GWF_1"]["npf"]["k33"] *= 20000
 
     transient_twri_model.write(tmp_path, binary=False)
     assert pathlib.Path.exists(tmp_path / "GWF_1" / "well.wel")
