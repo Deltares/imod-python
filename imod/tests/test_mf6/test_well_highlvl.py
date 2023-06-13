@@ -1,4 +1,5 @@
 import pathlib
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -11,7 +12,7 @@ from imod.tests.fixtures.mf6_regridding_fixture import (
 )
 
 
-def test_write_well(tmp_path):
+def test_write_well(tmp_path: Path):
     well = imod.mf6.Well(
         screen_top=[0.0, 0.0, 0.0],
         screen_bottom=[-1, -3.0, -5.0],
@@ -45,7 +46,9 @@ def test_write_well(tmp_path):
     assert (df.values == reference_output).all()
 
 
-def test_render__well_from_model(tmp_path, transient_twri_model):
+def test_render__well_from_model(
+    tmp_path: Path, transient_twri_model: imod.mf6.Modflow6Simulation
+):
     transient_twri_model["GWF_1"]["well"] = imod.mf6.Well(
         screen_top=[0.0, 0.0],
         screen_bottom=[-10.0, -10.0],

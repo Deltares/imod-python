@@ -1,5 +1,6 @@
 import textwrap
 from pathlib import Path
+from typing import Tuple
 
 import numpy as np
 import pandas as pd
@@ -115,7 +116,9 @@ def test_mf6wel_write__transient(
     np.testing.assert_array_equal(arr, sparse_data_expected)
 
 
-def test_mf6wel_render__transient(tmp_path, mf6wel_test_data_transient):
+def test_mf6wel_render__transient(
+    tmp_path: Path, mf6wel_test_data_transient: Tuple[xr.DataArray, xr.DataArray]
+):
     # Arrange
     cellid, rate = mf6wel_test_data_transient
     mf6wel = imod.mf6.wel.Mf6Wel(cellid=cellid, rate=rate)
