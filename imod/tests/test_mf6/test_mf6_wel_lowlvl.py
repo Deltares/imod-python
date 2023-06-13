@@ -1,10 +1,11 @@
+import textwrap
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-import textwrap
+
 import imod
 
 
@@ -92,7 +93,6 @@ def test_mf6wel_write__stationary(
     np.testing.assert_array_equal(arr, sparse_data_expected)
 
 
-
 def test_mf6wel_textwrite__stationary(
     tmp_path, mf6wel_test_data_stationary, sparse_data_expected
 ):
@@ -115,11 +115,7 @@ def test_mf6wel_textwrite__stationary(
     np.testing.assert_array_equal(arr, sparse_data_expected)
 
 
-
-
-def test_mf6wel_render__transient(
-    tmp_path, mf6wel_test_data_transient
-):
+def test_mf6wel_render__transient(tmp_path, mf6wel_test_data_transient):
     # Arrange
     cellid, rate = mf6wel_test_data_transient
     mf6wel = imod.mf6.wel.Mf6Wel(cellid=cellid, rate=rate)
@@ -154,9 +150,10 @@ def test_mf6wel_render__transient(
     begin period 5
       open/close mf6wel/wel/wel-4.dat
     end period
-    """)
-    
-    # Assert    
+    """
+    )
+
+    # Assert
     assert actual == expected
 
 

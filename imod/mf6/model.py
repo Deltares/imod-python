@@ -1,9 +1,10 @@
 import abc
 import collections
+import copy
 import inspect
 import pathlib
 from copy import deepcopy
-from typing import Union, Tuple, Optional
+from typing import Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -20,7 +21,7 @@ from imod.mf6.pkgbase import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.schemata import ValidationError
-import copy
+
 
 def initialize_template(name: str) -> Template:
     loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -151,33 +152,48 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         self._check_for_required_packages(modelkey)
 
-    def __get_single_package_by_type(self, package_type: abc.ABCMeta)->Optional[Package]:
-        candidates = [ item for _ , item in self.items() if isinstance(item, package_type)]
+    def __get_single_package_by_type(
+        self, package_type: abc.ABCMeta
+    ) -> Optional[Package]:
+        candidates = [
+            item for _, item in self.items() if isinstance(item, package_type)
+        ]
         nr_candidates = len(candidates)
         if nr_candidates == 0:
             return None
-        if nr_candidates >1 :   
-            raise RuntimeError(f"There are {len(candidates)} candidates for package {package_type}, but 1 was expected")
+        if nr_candidates > 1:
+            raise RuntimeError(
+                f"There are {len(candidates)} candidates for package {package_type}, but 1 was expected"
+            )
         return candidates[0]
 
-    def __get_domain_geometry(self) -> Tuple[Union[xr.DataArray, xu.UgridDataArray],   Union[xr.DataArray, xu.UgridDataArray],  Union[xr.DataArray, xu.UgridDataArray]] : 
-        discretization = self.__get_single_package_by_type(imod.mf6.StructuredDiscretization)
-        if   discretization is None:
-            discretization= self.__get_single_package_by_type(imod.mf6.VerticesDiscretization)
+    def __get_domain_geometry(
+        self,
+    ) -> Tuple[
+        Union[xr.DataArray, xu.UgridDataArray],
+        Union[xr.DataArray, xu.UgridDataArray],
+        Union[xr.DataArray, xu.UgridDataArray],
+    ]:
+        discretization = self.__get_single_package_by_type(
+            imod.mf6.StructuredDiscretization
+        )
+        if discretization is None:
+            discretization = self.__get_single_package_by_type(
+                imod.mf6.VerticesDiscretization
+            )
         if discretization is None:
             raise ValueError("Discretization not found")
         top = discretization["top"]
         bottom = discretization["bottom"]
         idomain = discretization["idomain"]
         return top, bottom, idomain
-    
+
     def __get_k(self):
         npf = self.__get_single_package_by_type(imod.mf6.NodePropertyFlow)
         if npf is None:
-             raise ValueError("NPF package not found")           
-        k= npf["k"]
+            raise ValueError("NPF package not found")
+        k = npf["k"]
         return k
-
 
     def _validate(self, model_name: str = "") -> StatusInfoBase:
         try:
@@ -217,15 +233,21 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 model_status_info.add(pkg_errors_to_status_info(pkg_name, pkg_errors))
 
         return model_status_info
-    
 
-    def __write_well(self, wellpackage,  directory, modelname, globaltimes, binary=True, validate: bool = True):
+    def __write_well(
+        self,
+        wellpackage,
+        directory,
+        modelname,
+        globaltimes,
+        binary=True,
+        validate: bool = True,
+    ):
         top, bottom, idomain = self.__get_domain_geometry()
         k = self.__get_k()
-        wellpackage.write( directory, modelname, globaltimes, binary, validate, idomain, top, bottom, k)
-
-
-        
+        wellpackage.write(
+            directory, modelname, globaltimes, binary, validate, idomain, top, bottom, k
+        )
 
     def write(
         self, directory, modelname, globaltimes, binary=True, validate: bool = True
@@ -253,7 +275,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for pkg_name, pkg in self.items():
             try:
                 if isinstance(pkg, imod.mf6.Well):
-                    self.__write_well(pkg, directory,  modelname, globaltimes, binary, validate)
+                    self.__write_well(
+                        pkg, modeldirectory, pkg_name, globaltimes, binary, validate
+                    )
                 else:
                     pkg.write(
                         directory=modeldirectory,

@@ -81,7 +81,7 @@ def assign_wells(
     bottom: Union[xr.DataArray, xu.UgridDataArray],
     k: Optional[Union[xr.DataArray, xu.UgridDataArray]] = None,
     minimum_thickness: Optional[float] = 0.05,
-    minimum_k: Optional[float] = 1.0,
+    minimum_k: Optional[float] = 1e-10,
 ) -> pd.DataFrame:
     """
     Distribute well pumping rate according to filter length when ``k=None``, or

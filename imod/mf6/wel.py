@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 import xugrid as xu
+from fastcore.dispatch import typedispatch
 
 from imod.mf6.mf6_adapter import Mf6BoundaryCondition, remove_inactive
 from imod.mf6.pkgbase import (
@@ -18,7 +19,6 @@ from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
 from imod.select.points import points_indices
 from imod.util import values_within_range
-from fastcore.dispatch import typedispatch
 
 
 # FUTURE: There was an idea to autogenerate these object.
@@ -222,8 +222,10 @@ class Well(BoundaryCondition):
         new.dataset = ds.loc[{"index": in_bounds}]
 
         return new
-    
-    def write(self, directory, pkgname, globaltimes, binary, validate,idomain, top, bottom, k):
+
+    def write(
+        self, directory, pkgname, globaltimes, binary, validate, idomain, top, bottom, k
+    ):
         mf6_package = self.to_mf6_pkg(idomain, top, bottom, k)
 
         mf6_package.write(directory, pkgname, globaltimes, binary)
@@ -250,8 +252,10 @@ class Well(BoundaryCondition):
         # Ensure top, bottom & k
         # are broadcasted to 3d grid
         like = xr.ones_like(active)
-        top = like * top
         bottom = like * bottom
+        top_2d = (like * top).sel(layer=1)
+        top_3d = bottom.shift(layer=1).fillna(top_2d)
+
         k = like * k
 
         index_names = wells_df.index.names
@@ -261,7 +265,7 @@ class Well(BoundaryCondition):
         # case of a "time" and "species" coordinate.
         wells_df = wells_df.reset_index()
 
-        wells_assigned = assign_wells(wells_df, top, bottom, k)
+        wells_assigned = assign_wells(wells_df, top_3d, bottom, k)
         # Set multi-index again
         wells_assigned = wells_assigned.set_index(index_names).sort_index()
 
