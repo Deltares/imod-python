@@ -416,6 +416,10 @@ class Well(BoundaryCondition):
         """
         wells_df = self.__create_wells_df()
         wells_assigned = self.__create_assigned_wells(wells_df, active, top, bottom, k)
+        if len(wells_assigned) == 0:
+            raise ValueError(
+                "no wells were assigned in package. Either none were present or they were filtered due to minimum conductivity and thickness constraints."
+            )
 
         ds = xr.Dataset()
         ds["cellid"] = self.__create_cellid(wells_assigned, active)
