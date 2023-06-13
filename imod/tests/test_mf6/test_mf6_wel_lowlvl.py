@@ -6,6 +6,7 @@ import pytest
 import xarray as xr
 
 import imod
+import textwrap
 
 
 @pytest.fixture()
@@ -129,7 +130,7 @@ def test_mf6wel_render__transient(tmp_path, mf6wel_test_data_transient):
         """\
     begin options
     end options
-    
+
     begin dimensions
       maxbound 24
     end dimensions

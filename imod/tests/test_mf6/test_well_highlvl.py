@@ -32,7 +32,7 @@ def test_write_well(tmp_path):
     )
     assert pathlib.Path.exists(tmp_path / "packagename.wel")
     assert pathlib.Path.exists(tmp_path / "packagename" / "wel.dat")
-    df = pd.read_csv(tmp_path / "packagename" / "wel.dat", sep=":-\s*", engine="python")
+    df = pd.read_csv(tmp_path / "packagename" / "wel.dat", sep=":-\\s*", engine="python")
 
     # TODO: The following output is wrong, but it is what the write function currently generates.
     # issue gitlab  #432 was created to fix this.
@@ -62,4 +62,4 @@ def test_render__well_from_model(tmp_path, transient_twri_model):
     transient_twri_model.write(tmp_path, binary=False)
     assert pathlib.Path.exists(tmp_path / "GWF_1" / "well.wel")
     assert pathlib.Path.exists(tmp_path / "GWF_1" / "well" / "wel.dat")
-    assert transient_twri_model.run() == None
+    assert transient_twri_model.run() is None
