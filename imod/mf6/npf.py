@@ -3,6 +3,7 @@ import warnings
 import numpy as np
 
 from imod.mf6.pkgbase import Package
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -285,20 +286,20 @@ class NodePropertyFlow(Package):
     _template = Package._initialize_template(_pkg_id)
 
     _regrid_method = {
-        "icelltype": ("OverlapRegridder", "mean"),
-        "k": ("OverlapRegridder", "geometric_mean"),  # horizontal if angle2 = 0
+        "icelltype": (RegridderType.OVERLAP, "mean"),
+        "k": (RegridderType.OVERLAP, "geometric_mean"),  # horizontal if angle2 = 0
         "k22": (
-            "OverlapRegridder",
+            RegridderType.OVERLAP,
             "geometric_mean",
         ),  # horizontal if angle2 = 0 & angle3 = 0
         "k33": (
-            "OverlapRegridder",
+            RegridderType.OVERLAP,
             "harmonic_mean",
         ),  # vertical if angle2 = 0 & angle3 = 0
-        "angle1": ("OverlapRegridder", "mean"),
-        "angle2": ("OverlapRegridder", "mean"),
-        "angle3": ("OverlapRegridder", "mean"),
-        "rewet_layer": ("BarycentricInterpolator", None),
+        "angle1": (RegridderType.OVERLAP, "mean"),
+        "angle2": (RegridderType.OVERLAP, "mean"),
+        "angle3": (RegridderType.OVERLAP, "mean"),
+        "rewet_layer": (RegridderType.BARYCENTRIC, None),
     }
 
     def __init__(

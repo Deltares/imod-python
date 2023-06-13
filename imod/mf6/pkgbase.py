@@ -13,7 +13,11 @@ import xugrid as xu
 from xarray.core.utils import is_scalar
 
 import imod
-from imod.mf6.regridding_utils import RegridderInstancesCollection, get_non_grid_data
+from imod.mf6.regridding_utils import (
+    RegridderInstancesCollection,
+    RegridderType,
+    get_non_grid_data,
+)
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
 
@@ -759,7 +763,7 @@ class Package(PackageBase, abc.ABC):
     def regrid_like(
         self,
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
-        regridder_types: Dict[str, Tuple[str, str]] = None,
+        regridder_types: Dict[str, Tuple[RegridderType, str]] = None,
     ) -> "Package":
         """
         Creates a package of the same type as this package, based on another discretization.
@@ -775,8 +779,8 @@ class Package(PackageBase, abc.ABC):
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray
             a grid defined over the same discretization as the one we want to regrid the package to
-        regridder_types: dict(str->(str,str))
-           dictionary mapping arraynames (str) to a tuple of regrid method (str) and function name (str)
+        regridder_types: dict(str->(regridder type,str))
+           dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
             this dictionary can be used to override the default mapping method.
 
         Returns
