@@ -484,7 +484,7 @@ def create_rch(
     rate = raise_on_layer(value, "rate") * 0.001
     disv_rate = cache.regrid(rate, original2d=original2d).where(active)
     # Find highest active layer
-    highest = active["layer"] == active["layer"].where(active).max()
+    highest = active["layer"] == active["layer"].where(active).min()
     location = highest.where(highest)
     disv_rate = finish(disv_rate * location)
 
@@ -514,7 +514,7 @@ def create_evt(
     depth = raise_on_layer(value, "depth")
 
     # Find highest active layer
-    highest = active["layer"] == active["layer"].where(active).max()
+    highest = active["layer"] == active["layer"].where(active).min()
     location = highest.where(highest)
 
     disv_surface = cache.regrid(surface, original2d=original2d).where(active)
