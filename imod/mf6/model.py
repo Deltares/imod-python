@@ -1,6 +1,5 @@
 import abc
 import collections
-import copy
 import inspect
 import pathlib
 from copy import deepcopy
