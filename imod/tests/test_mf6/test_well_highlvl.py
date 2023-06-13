@@ -32,7 +32,9 @@ def test_write_well(tmp_path):
     )
     assert pathlib.Path.exists(tmp_path / "packagename.wel")
     assert pathlib.Path.exists(tmp_path / "packagename" / "wel.dat")
-    df = pd.read_csv(tmp_path / "packagename" / "wel.dat", sep=":-\\s*", engine="python")
+    df = pd.read_csv(
+        tmp_path / "packagename" / "wel.dat", sep=":-\\s*", engine="python"
+    )
 
     # TODO: The following output is wrong, but it is what the write function currently generates.
     # issue gitlab  #432 was created to fix this.

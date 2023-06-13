@@ -1,3 +1,4 @@
+import textwrap
 from pathlib import Path
 
 import numpy as np
@@ -6,7 +7,6 @@ import pytest
 import xarray as xr
 
 import imod
-import textwrap
 
 
 @pytest.fixture()
