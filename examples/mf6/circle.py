@@ -256,15 +256,17 @@ head = imod.mf6.out.open_hds(
     modeldir / "GWF_1/disv.disv.grb",
 )
 
-fig, ax = plt.subplots()
 half_simulation_constant_head = half_simulation["GWF_1"]["chd"]["head"]
 
 clipped_half_simulation_constant_head = (
     half_simulation["GWF_1"]["chd_clipped"]["head"].sel(layer=2).isel(time=0)
 )
 
-half_simulation_constant_head.ugrid.plot(ax=ax)
-clipped_half_simulation_constant_head.ugrid.plot(ax=ax)
+all_boundaries_constant_head = half_simulation_constant_head.where(
+    ~np.isnan(half_simulation_constant_head), clipped_half_simulation_constant_head
+)
+fig, ax = plt.subplots()
+all_boundaries_constant_head.ugrid.plot(ax=ax)
 ax.set_aspect(1)
 
 fig, ax = plt.subplots()
