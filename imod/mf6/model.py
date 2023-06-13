@@ -1,14 +1,18 @@
+from __future__ import annotations
+
 import abc
 import collections
 import inspect
 import pathlib
 from copy import deepcopy
+from typing import List, TypeAlias, Union
 
 import cftime
 import jinja2
 import numpy as np
 import tomli
 import tomli_w
+import xarray as xr
 import xugrid as xu
 from jinja2 import Template
 
@@ -19,6 +23,8 @@ from imod.mf6.pkgbase import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.schemata import ValidationError
+
+GridDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
 
 
 def initialize_template(name: str) -> Template:
@@ -443,7 +449,10 @@ class GroundwaterFlowModel(Modflow6Model):
         return clipped
 
     def __create_boundary_condition_clipped_boundary(
-        self, original_model, clipped_model, state_for_boundary
+        self,
+        original_model: Modflow6Model,
+        clipped_model: Modflow6Model,
+        state_for_boundary: GridDataArray,
     ):
         unassigned_boundary_original_domain = (
             self.__create_boundary_condition_for_unassigned_boundary(
@@ -457,7 +466,9 @@ class GroundwaterFlowModel(Modflow6Model):
 
     @staticmethod
     def __create_boundary_condition_for_unassigned_boundary(
-        model, state_for_boundary, additional_boundaries=None
+        model: Modflow6Model,
+        state_for_boundary: GridDataArray,
+        additional_boundaries: List[imod.mf6.ConstantHead] = None,
     ):
         if state_for_boundary is None:
             return None
