@@ -31,7 +31,7 @@ def test_write_well(tmp_path: Path):
         validate=True,
     )
     globaltimes = [np.datetime64("2000-01-01")]
-    active = grid_data_structured(np.int, 1, 10)
+    active = grid_data_structured(int, 1, 10)
     k = 100.0
     top = xr.ones_like(active.sel(layer=1), dtype=np.float64)
     bottom = grid_data_structured_layered(np.float64, -2.0, 10)
