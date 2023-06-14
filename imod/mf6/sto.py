@@ -4,6 +4,7 @@ import pathlib
 import numpy as np
 
 from imod.mf6.pkgbase import Package
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -150,6 +151,12 @@ class SpecificStorage(StorageBase):
         ),
     }
 
+    _regrid_method = {
+        "convertible": (RegridderType.OVERLAP, "mean"),
+        "specific_storage": (RegridderType.OVERLAP, "mean"),
+        "specific_yield": (RegridderType.OVERLAP, "mean"),
+    }
+
     _template = Package._initialize_template(_pkg_id)
 
     def __init__(
@@ -266,6 +273,12 @@ class StorageCoefficient(StorageBase):
             AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
+    }
+
+    _regrid_method = {
+        "convertible": (RegridderType.OVERLAP, "mean"),
+        "storage_coefficient": (RegridderType.OVERLAP, "mean"),
+        "specific_yield": (RegridderType.OVERLAP, "mean"),
     }
 
     _template = Package._initialize_template(_pkg_id)

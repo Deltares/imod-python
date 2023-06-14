@@ -1,6 +1,7 @@
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -93,6 +94,12 @@ class Drainage(BoundaryCondition):
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
+
+    _regrid_method = {
+        "elevation": (RegridderType.OVERLAP, "mean"),
+        "conductance": (RegridderType.OVERLAP, "mean"),
+        "concentration": (RegridderType.OVERLAP, "mean"),
+    }
 
     def __init__(
         self,
