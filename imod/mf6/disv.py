@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from imod.mf6.pkgbase import Package
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
     AllValueSchema,
@@ -64,9 +65,9 @@ class VerticesDiscretization(Package):
     _template = Package._initialize_template(_pkg_id)
 
     _regrid_method = {
-        "top": ("OverlapRegridder", "mean"),
-        "bottom": ("OverlapRegridder", "mean"),
-        "idomain": ("OverlapRegridder", "mean"),
+        "top": (RegridderType.OVERLAP, "mean"),
+        "bottom": (RegridderType.OVERLAP, "mean"),
+        "idomain": (RegridderType.OVERLAP, "mean"),
     }
 
     def __init__(self, top, bottom, idomain, validate: bool = True):
