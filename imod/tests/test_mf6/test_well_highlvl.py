@@ -54,7 +54,7 @@ def test_write_well(tmp_path: Path):
     assert (df.values == reference_output).all()
 
 
-def test_render__well_from_model(
+def test_write_well_from_model(
     tmp_path: Path, twri_simulation: imod.mf6.Modflow6Simulation
 ):
     twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
@@ -77,7 +77,7 @@ def test_render__well_from_model(
     assert twri_simulation.run() is None
 
 
-def test_render__all_wells_filtered_out(
+def test_write_all_wells_filtered_out(
     tmp_path: Path, twri_simulation: imod.mf6.Modflow6Simulation
 ):
     # for this test, we leave the low conductivity of the twri model as is, so all wells get filtered out
@@ -95,7 +95,7 @@ def test_render__all_wells_filtered_out(
         twri_simulation.write(tmp_path, binary=False)
 
 
-def test_render__one_well_filtered_out(
+def test_write_one_well_filtered_out(
     tmp_path: Path, twri_simulation: imod.mf6.Modflow6Simulation
 ):
     # for this test, we increase the low conductivity of the twri model . But one of the wells violates the thickness constraint (the second one)
@@ -115,7 +115,7 @@ def test_render__one_well_filtered_out(
         twri_simulation.write(tmp_path, binary=False)
 
 
-def test_render__one_layer_filtered_out(
+def test_write_one_layer_filtered_out(
     tmp_path: Path, twri_simulation: imod.mf6.Modflow6Simulation
 ):
     # for this test, we assign a high conductivity to layer 1 and 3 and a low one to layer 2
