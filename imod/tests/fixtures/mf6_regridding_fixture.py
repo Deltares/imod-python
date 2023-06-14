@@ -80,6 +80,8 @@ def _make_model(
     gwf_model = imod.mf6.GroundwaterFlowModel()
 
     grid_data_function(np.float64, 1, cellsize)
+
+    # Create a constant head field. Some cells should not be constant head in order to have a meaningfull simulation
     constant_head = grid_data_function(np.float64, 1, cellsize)
     gwf_model["chd"] = imod.mf6.ConstantHead(
         constant_head, print_input=True, print_flows=True, save_flows=True
@@ -119,7 +121,15 @@ def structured_flow_model() -> imod.mf6.GroundwaterFlowModel:
 
     bottom = grid_data_structured_layered(np.float64, -1.0, cellsize)
     idomain = grid_data_structured(np.int32, 1, cellsize)
-    gwf_model["disv"] = imod.mf6.StructuredDiscretization(
+
+    # Unassign the constant-head package from some cells to have a more meaningful simulation
+    constant_head = gwf_model["chd"].dataset["head"]
+    constant_head.loc[{"x": cellsize, "y": 2 * cellsize, "layer": 1}] = np.nan
+    constant_head.loc[{"x": 2 * cellsize, "y": cellsize, "layer": 1}] = np.nan
+    constant_head.loc[{"x": cellsize, "y": 2 * cellsize, "layer": 1}] = np.nan
+    constant_head.loc[{"x": 2 * cellsize, "y": 2 * cellsize, "layer": 1}] = np.nan
+
+    gwf_model["dis"] = imod.mf6.StructuredDiscretization(
         top=10.0, bottom=bottom, idomain=idomain
     )
     return gwf_model
@@ -131,9 +141,64 @@ def unstructured_flow_model() -> imod.mf6.GroundwaterFlowModel:
 
     gwf_model = _make_model(grid_data_unstructured, cellsize)
 
+    # Unassign the constant-head package from some cells to have a more meaningful simulation
+    constant_head = gwf_model["chd"].dataset["head"]
+    constant_head.loc[{"mesh2d_nFaces": 12, "layer": 1}] = np.nan
+    constant_head.loc[{"mesh2d_nFaces": 13, "layer": 1}] = np.nan
+    constant_head.loc[{"mesh2d_nFaces": 12, "layer": 2}] = np.nan
+    constant_head.loc[{"mesh2d_nFaces": 13, "layer": 2}] = np.nan
+
     bottom = grid_data_unstructured_layered(np.float64, -1.0, cellsize)
     idomain = grid_data_unstructured(np.int32, 1, cellsize)
     gwf_model["disv"] = imod.mf6.VerticesDiscretization(
         top=10.0, bottom=bottom, idomain=idomain
     )
     return gwf_model
+
+
+@pytest.fixture(scope="function")
+def solution_settings() -> imod.mf6.Solution:
+    return imod.mf6.Solution(
+        modelnames=["flow"],
+        print_option="summary",
+        csv_output=False,
+        no_ptc=True,
+        outer_dvclose=1.0e-4,
+        outer_maximum=500,
+        under_relaxation=None,
+        inner_dvclose=1.0e-4,
+        inner_rclose=0.001,
+        inner_maximum=100,
+        linear_acceleration="cg",
+        scaling_method=None,
+        reordering_method=None,
+        relaxation_factor=0.97,
+    )
+
+
+@pytest.fixture(scope="function")
+def structured_flow_simulation(
+    structured_flow_model: imod.mf6.GroundwaterFlowModel,
+    solution_settings: imod.mf6.Solution,
+) -> imod.mf6.Modflow6Simulation:
+    simulation = imod.mf6.Modflow6Simulation("original_simulation")
+    simulation["flow"] = structured_flow_model
+    simulation["solution"] = solution_settings
+    simulation.create_time_discretization(
+        additional_times=["2000-01-01T00:00", "2020-01-02T00:00", "2020-01-03T00:00"]
+    )
+    return simulation
+
+
+@pytest.fixture(scope="function")
+def unstructured_flow_simulation(
+    unstructured_flow_model: imod.mf6.GroundwaterFlowModel,
+    solution_settings: imod.mf6.Solution,
+) -> imod.mf6.Modflow6Simulation:
+    simulation = imod.mf6.Modflow6Simulation("original_simulation")
+    simulation["flow"] = unstructured_flow_model
+    simulation["solution"] = solution_settings
+    simulation.create_time_discretization(
+        additional_times=["2000-01-01T00:00", "2020-01-02T00:00", "2020-01-03T00:00"]
+    )
+    return simulation
