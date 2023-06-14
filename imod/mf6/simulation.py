@@ -2,12 +2,14 @@ import collections
 import pathlib
 import subprocess
 import warnings
+from typing import Optional, TypeAlias, Union
 
 import jinja2
 import numpy as np
 import tomli
 import tomli_w
 import xarray as xr
+import xugrid as xu
 
 import imod
 from imod.mf6.model import (
@@ -17,6 +19,8 @@ from imod.mf6.model import (
 )
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.schemata import ValidationError
+
+GridDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
 
 
 class Modflow6Simulation(collections.UserDict):
@@ -313,15 +317,15 @@ class Modflow6Simulation(collections.UserDict):
 
     def clip_box(
         self,
-        time_min=None,
-        time_max=None,
-        layer_min=None,
-        layer_max=None,
-        x_min=None,
-        x_max=None,
-        y_min=None,
-        y_max=None,
-        states_for_boundary=None,
+        time_min: Optional[str] = None,
+        time_max: Optional[str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        states_for_boundary: Optional[dict[str, GridDataArray]] = None,
     ) -> "Modflow6Simulation":
         """
         Clip a simulation by a bounding box (time, layer, y, x).
