@@ -256,6 +256,9 @@ head = imod.mf6.out.open_hds(
     modeldir / "GWF_1/disv.disv.grb",
 )
 
+# %%
+# Let's add constant head boundaries together and plot them
+
 half_simulation_constant_head = half_simulation["GWF_1"]["chd"]["head"]
 
 clipped_half_simulation_constant_head = (
@@ -265,10 +268,14 @@ clipped_half_simulation_constant_head = (
 all_boundaries_constant_head = half_simulation_constant_head.where(
     ~np.isnan(half_simulation_constant_head), clipped_half_simulation_constant_head
 )
+
+# plot boundary conditions
 fig, ax = plt.subplots()
 all_boundaries_constant_head.ugrid.plot(ax=ax)
 ax.set_aspect(1)
 
+# %%
+# plot computed heads
 fig, ax = plt.subplots()
 head.isel(time=0, layer=0).compute().ugrid.plot(ax=ax)
 ax.set_aspect(1)
