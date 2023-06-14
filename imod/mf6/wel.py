@@ -1,5 +1,6 @@
 import textwrap
 import warnings
+from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
 import numpy as np
@@ -223,8 +224,19 @@ class Well(BoundaryCondition):
         return new
 
     def write(
-        self, directory, pkgname, globaltimes, binary, validate, idomain, top, bottom, k
-    ):
+        self,
+        directory: Path,
+        pkgname: str,
+        globaltimes: np.ndarray[np.datetime64],
+        binary: bool,
+        validate: bool,
+        idomain: Union[xr.DataArray, xu.UgridDataArray],
+        top: Union[xr.DataArray, xu.UgridDataArray],
+        bottom: Union[xr.DataArray, xu.UgridDataArray],
+        k: Union[xr.DataArray, xu.UgridDataArray],
+    ) -> None:
+        if validate:
+            self._validate(self._write_schemata)
         mf6_package = self.to_mf6_pkg(idomain, top, bottom, k)
 
         mf6_package.write(directory, pkgname, globaltimes, binary)

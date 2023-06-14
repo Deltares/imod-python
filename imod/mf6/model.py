@@ -3,6 +3,7 @@ import collections
 import inspect
 import pathlib
 from copy import deepcopy
+from pathlib import Path
 from typing import Optional, Tuple, Union
 
 import cftime
@@ -19,6 +20,7 @@ from imod.mf6 import qgs_util
 from imod.mf6.pkgbase import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
+from imod.mf6.wel import Well
 from imod.schemata import ValidationError
 
 
@@ -235,11 +237,11 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def __write_well(
         self,
-        wellpackage,
-        directory,
-        modelname,
-        globaltimes,
-        binary=True,
+        wellpackage: Well,
+        directory: Path,
+        modelname: str,
+        globaltimes: np.ndarray[np.datetime64],
+        binary: bool = True,
         validate: bool = True,
     ):
         top, bottom, idomain = self.__get_domain_geometry()
