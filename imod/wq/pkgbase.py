@@ -146,7 +146,7 @@ class Package(abc.ABC):
                 self._replace_keyword(d, key)
         return self._template.format(**d)
 
-    def _compose(self, d, pattern=None):
+    def _compose_path(self, d, pattern=None):
         # d : dict
         # pattern : string or re.pattern
         return util.compose(d, pattern).as_posix()
@@ -242,9 +242,9 @@ class Package(abc.ABC):
                 if hasattr(self, "_ssm_layers"):
                     for layer in self._ssm_layers:
                         d["layer"] = layer
-                        values[layer] = self._compose(d, pattern=pattern)
+                        values[layer] = self._compose_path(d, pattern=pattern)
                 else:
-                    values["?"] = self._compose(d, pattern=pattern)
+                    values["?"] = self._compose_path(d, pattern=pattern)
             else:
                 # Special case concentration
                 # Using "?" results in too many sinks and sources according to imod-wq.
@@ -260,7 +260,7 @@ class Package(abc.ABC):
             for layer in np.atleast_1d(da.coords["layer"].values):
                 if idf:
                     d["layer"] = layer
-                    values[layer] = self._compose(d, pattern=pattern)
+                    values[layer] = self._compose_path(d, pattern=pattern)
                 else:
                     if "layer" in da.dims:
                         values[layer] = da.sel(layer=layer).values[()]

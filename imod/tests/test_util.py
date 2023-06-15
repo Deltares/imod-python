@@ -9,8 +9,46 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+import xugrid as xu
 
 from imod import util
+
+
+@pytest.fixture(scope="function")
+def ugrid_ds():
+    vertices = np.array(
+        [
+            [0.0, 0.0],  # 0
+            [1.0, 0.0],  # 1
+            [2.0, 0.0],  # 2
+            [0.0, 1.0],  # 3
+            [1.0, 1.0],  # 4
+            [2.0, 1.0],  # 5
+            [1.0, 2.0],  # 6
+        ]
+    )
+    faces = np.array(
+        [
+            [0, 1, 4, 3],
+            [1, 2, 5, 4],
+            [3, 4, 6, -1],
+            [4, 5, 6, -1],
+        ]
+    )
+    grid = xu.Ugrid2d(
+        node_x=vertices[:, 0],
+        node_y=vertices[:, 1],
+        fill_value=-1,
+        face_node_connectivity=faces,
+    )
+    darray = xr.DataArray(
+        data=np.random.rand(5, 3, grid.n_face),
+        coords={"time": pd.date_range("2000-01-01", "2000-01-05"), "layer": [1, 2, 3]},
+        dims=["time", "layer", grid.face_dimension],
+    )
+    ds = grid.to_dataset()
+    ds["a"] = darray
+    return ds
 
 
 def test_compose():
@@ -458,41 +496,7 @@ def test_where():
         util.where(False, 1, 0)
 
 
-def test_compliant_ugrid2d(write=False):
-    import xugrid
-
-    vertices = np.array(
-        [
-            [0.0, 0.0],  # 0
-            [1.0, 0.0],  # 1
-            [2.0, 0.0],  # 2
-            [0.0, 1.0],  # 3
-            [1.0, 1.0],  # 4
-            [2.0, 1.0],  # 5
-            [1.0, 2.0],  # 6
-        ]
-    )
-    faces = np.array(
-        [
-            [0, 1, 4, 3],
-            [1, 2, 5, 4],
-            [3, 4, 6, -1],
-            [4, 5, 6, -1],
-        ]
-    )
-    grid = xugrid.Ugrid2d(
-        node_x=vertices[:, 0],
-        node_y=vertices[:, 1],
-        fill_value=-1,
-        face_node_connectivity=faces,
-    )
-    darray = xr.DataArray(
-        data=np.random.rand(5, 3, grid.n_face),
-        coords={"time": pd.date_range("2000-01-01", "2000-01-05"), "layer": [1, 2, 3]},
-        dims=["time", "layer", grid.face_dimension],
-    )
-    ugrid_ds = grid.to_dataset().copy()
-    ugrid_ds["a"] = darray
+def test_compliant_ugrid2d(ugrid_ds, write=False):
     uds = util.mdal_compliant_ugrid2d(ugrid_ds)
 
     assert isinstance(uds, xr.Dataset)
@@ -513,6 +517,19 @@ def test_compliant_ugrid2d(write=False):
 
     if write:
         uds.to_netcdf("ugrid-mixed.nc")
+
+
+def test_mdal_compliant_roundtrip(ugrid_ds):
+    uds = xu.UgridDataset(util.mdal_compliant_ugrid2d(ugrid_ds))
+    uds["b"] = (("time", "layer"), np.random.rand(5, 3))
+    uds["c"] = (("layer", "mesh2d_nFaces"), np.random.rand(3, 4))
+    back = util.from_mdal_compliant_ugrid2d(uds)
+
+    assert isinstance(back, xu.UgridDataset)
+    assert back["a"].dims == ("time", "layer", "mesh2d_nFaces")
+    assert back["b"].dims == ("time", "layer")
+    assert back["c"].dims == ("layer", "mesh2d_nFaces")
+    assert np.array_equal(back["layer"], [1, 2, 3])
 
 
 def test_to_ugrid2d(write=False):

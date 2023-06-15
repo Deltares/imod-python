@@ -1,4 +1,4 @@
-.. currentmodule:: imod
+.. currentmodule:: imod.formats
 
 Input/output
 ------------
@@ -24,6 +24,9 @@ Input/output
     
     gen.read
     gen.write
+    gen.read_ascii
     
     prj.read_projectfile
     prj.open_projectfile_data
+    prj.read_timfile
+    prj.convert_to_disv

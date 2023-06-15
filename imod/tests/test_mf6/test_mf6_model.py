@@ -1,8 +1,14 @@
+from unittest.mock import MagicMock
+
 import numpy as np
 import pytest
 import xarray as xr
+from jinja2 import Template
 
 import imod
+from imod.mf6.model import Modflow6Model
+from imod.mf6.pkgbase import Package
+from imod.schemata import ValidationError
 
 
 # Duplicate from test_mf6_dis.py
@@ -41,7 +47,7 @@ def test_checks_required_pkgs(idomain_and_bottom):
     gwf_model["dis"] = imod.mf6.StructuredDiscretization(
         top=200.0, bottom=bottom, idomain=idomain
     )
-    gwf_model["ic"] = imod.mf6.InitialConditions(head=0.0)
+    gwf_model["ic"] = imod.mf6.InitialConditions(start=0.0)
     gwf_model["npf"] = imod.mf6.NodePropertyFlow(0, 10.0)
     gwf_model["sto"] = imod.mf6.SpecificStorage(1e-5, 0.1, True, 0)
     gwf_model["oc"] = imod.mf6.OutputControl()
@@ -66,7 +72,124 @@ def test_checks_required_pkgs(idomain_and_bottom):
 
 def test_key_assign():
     gwf_model = imod.mf6.GroundwaterFlowModel()
-    gwf_model["ic"] = imod.mf6.InitialConditions(head=0.0)
+    gwf_model["ic"] = imod.mf6.InitialConditions(start=0.0)
 
     with pytest.raises(KeyError):
-        gwf_model["way-too-long-key-name"] = imod.mf6.InitialConditions(head=0.0)
+        gwf_model["way-too-long-key-name"] = imod.mf6.InitialConditions(start=0.0)
+
+
+def roundtrip(model, tmp_path):
+    model.dump(tmp_path, "test")
+    back = type(model).from_file(tmp_path / "test/test.toml")
+    assert isinstance(back, type(model))
+
+
+@pytest.mark.usefixtures("circle_model")
+def test_circle_roundtrip(circle_model, tmp_path):
+    roundtrip(circle_model["GWF_1"], tmp_path)
+
+
+class TestModel:
+    def test_write_valid_model_without_error(self, tmpdir_factory):
+        # Arrange.
+        tmp_path = tmpdir_factory.mktemp("TestSimulation")
+        model_name = "Test model"
+
+        sut = Modflow6Model()
+
+        discretization_mock = MagicMock(spec_set=Package)
+        discretization_mock._pkg_id = "dis"
+
+        sut["dis"] = discretization_mock
+
+        template_mock = MagicMock(spec_set=Template)
+        template_mock.render.return_value = ""
+        sut._template = template_mock
+
+        global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
+
+        # Act.
+        status = sut.write(tmp_path, model_name, global_times_mock)
+
+        # Assert.
+        assert not status.has_errors()
+
+    def test_write_without_dis_pkg_return_error(self, tmpdir_factory):
+        # Arrange.
+        tmp_path = tmpdir_factory.mktemp("TestSimulation")
+        model_name = "Test model"
+
+        sut = Modflow6Model()
+
+        template_mock = MagicMock(spec_set=Template)
+        template_mock.render.return_value = ""
+        sut._template = template_mock
+
+        global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
+
+        # Act.
+        status = sut.write(tmp_path, model_name, global_times_mock)
+
+        # Assert.
+        assert status.has_errors()
+
+    def test_write_with_invalid_pkg_returns_error(self, tmpdir_factory):
+        # Arrange.
+        tmp_path = tmpdir_factory.mktemp("TestSimulation")
+        model_name = "Test model"
+
+        sut = Modflow6Model()
+
+        discretization_mock = MagicMock(spec_set=Package)
+        discretization_mock._pkg_id = "dis"
+        discretization_mock._validate.return_value = {
+            "test_var": [ValidationError("error_string")]
+        }
+
+        sut["dis"] = discretization_mock
+
+        template_mock = MagicMock(spec_set=Template)
+        template_mock.render.return_value = ""
+        sut._template = template_mock
+
+        global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
+
+        # Act.
+        status = sut.write(tmp_path, model_name, global_times_mock)
+
+        # Assert.
+        assert status.has_errors()
+
+    def test_write_with_two_invalid_pkg_returns_two_errors(self, tmpdir_factory):
+        # Arrange.
+        tmp_path = tmpdir_factory.mktemp("TestSimulation")
+        model_name = "Test model"
+
+        sut = Modflow6Model()
+
+        discretization_mock = MagicMock(spec_set=Package)
+        discretization_mock._pkg_id = "dis"
+        discretization_mock._validate.return_value = {
+            "test1_var": [ValidationError("error_string1")]
+        }
+
+        package_mock = MagicMock(spec_set=Package)
+        package_mock._pkg_id = "test_package"
+        package_mock._validate.return_value = {
+            "test2_var": [ValidationError("error_string2")]
+        }
+
+        sut["dis"] = discretization_mock
+        sut["test_package"] = package_mock
+
+        template_mock = MagicMock(spec_set=Template)
+        template_mock.render.return_value = ""
+        sut._template = template_mock
+
+        global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
+
+        # Act.
+        status = sut.write(tmp_path, model_name, global_times_mock)
+
+        # Assert.
+        assert len(status.errors) == 2

@@ -334,7 +334,7 @@ def _coord(da, dim):
             dxs = dx
         _check_monotonic(dxs, dim)
 
-    else:  # undefined -> equidistant
+    else:  # not defined -> equidistant
         if da[dim].size == 1:
             raise ValueError(
                 f"DataArray has size 1 along {dim}, so cellsize must be provided"
@@ -501,22 +501,21 @@ def geometric_mean(values, weights):
     if normsum == 0:
         return np.nan
 
-    m = 0
     for i in range(values.size):
         w = weights[i] / normsum
         v = values[i]
-        if np.isnan(v):
-            continue
-        if w > 0:
+        # Skip if v == 0, v is NaN or w == 0 (no contribution)
+        if v > 0 and w > 0:
             v_agg += w * np.log(abs(v))
             w_sum += w
-            if v < 0:
-                m += 1
+        # Do not reduce over negative values: would require complex numbers.
+        elif v < 0:
+            return np.nan
 
     if w_sum == 0:
         return np.nan
     else:
-        return (-1.0) ** m * np.exp((1.0 / w_sum) * v_agg)
+        return np.exp((1.0 / w_sum) * v_agg)
 
 
 def sum(values, weights):

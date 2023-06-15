@@ -153,7 +153,10 @@ def test_plot_map_basemap():
     fig, ax = imod.visualize.spatial.plot_map(
         raster=xr.DataArray(
             np.random.randn(2, 3),
-            coords={"x": [0.5, 1.5], "y": [1.5, 0.5, -0.5]},
+            coords={
+                "x": [300_250.0, 300_750.0],
+                "y": [450_750.0, 450_500.0, 450_250.0],
+            },
             dims=("x", "y"),
         ),
         colors=["#ff0000", "#00ff00", "#0000ff"],

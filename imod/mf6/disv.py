@@ -45,7 +45,7 @@ class VerticesDiscretization(Package):
         ],
         "idomain": [
             DTypeSchema(np.integer),
-            DimsSchema("layer", "{face_dim}") | DimsSchema("layer"),
+            DimsSchema("layer", "{face_dim}"),
             IndexesSchema(),
         ],
     }
@@ -56,7 +56,7 @@ class VerticesDiscretization(Package):
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
             # No need to check coords: dataset ensures they align with idomain.
         ),
-        "bottom": (DisBottomSchema(other="idomain"),),
+        "bottom": (DisBottomSchema(other="idomain", is_other_notnull=(">", 0)),),
     }
 
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
@@ -71,7 +71,7 @@ class VerticesDiscretization(Package):
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, binary):
-        disdirectory = directory / pkgname
+        disdirectory = pathlib.Path(directory.stem) / pkgname
         d = {}
         grid = self.dataset.ugrid.grid
         d["xorigin"] = grid.node_x.min()
@@ -107,7 +107,7 @@ class VerticesDiscretization(Package):
         df[2] = (face_nodes != grid.fill_value).sum(axis=1)
         for i, column in enumerate(face_nodes.T):
             # Use extension array to write empty values
-            # Should be more effcient than mixed column?
+            # Should be more efficient than mixed column?
             df[3 + i] = pd.arrays.IntegerArray(
                 values=column + 1,
                 mask=(column == grid.fill_value),
@@ -124,13 +124,13 @@ class VerticesDiscretization(Package):
 
             f.write("begin vertices\n")
             self._verts_dataframe().to_csv(
-                f, header=False, sep=" ", line_terminator="\n"
+                f, header=False, sep=" ", lineterminator="\n"
             )
             f.write("end vertices\n\n")
 
             f.write("begin cell2d\n")
             self._cell2d_dataframe().to_csv(
-                f, header=False, sep=" ", line_terminator="\n"
+                f, header=False, sep=" ", lineterminator="\n"
             )
             f.write("end cell2d\n")
         return

@@ -557,6 +557,7 @@ class ImodflowModel(Model):
         `Download iMOD5 here <https://oss.deltares.nl/web/imod/download-imod5>`_
 
         """
+        directory = pathlib.Path(directory)
 
         allowed_conversion_settings = ["mf2005_namfile", "mf6_namfile", "runfile"]
         if convert_to not in allowed_conversion_settings:
@@ -656,9 +657,9 @@ class ImodflowModel(Model):
                 try:
                     pkg.save(directory=directory / pkgname)
                 except Exception as error:
-                    raise RuntimeError(
-                        f"An error occured during saving of package: {pkgname}."
-                    ) from error
+                    raise type(error)(
+                        f"{error}/nAn error occured during saving of package: {pkgname}."
+                    )
 
     def _check_top_bottom(self):
         """Check whether bottom of a layer does not exceed a top somewhere."""

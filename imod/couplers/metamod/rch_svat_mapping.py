@@ -41,7 +41,7 @@ class RechargeSvatMapping(MetaModMapping):
         self.dataset["layer"] = xr.full_like(svat, 1)
         if "layer" in recharge.dataset.coords:
             self.dataset["rch_active"] = (
-                recharge.dataset["rate"].drop("layer").notnull()
+                recharge.dataset["rate"].drop_vars("layer").notnull()
             )
         else:
             self.dataset["rch_active"] = recharge.dataset["rate"].notnull()

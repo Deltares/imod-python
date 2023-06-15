@@ -35,7 +35,7 @@ def rch_dict_transient():
     x = [5.0, 15.0, 25.0]
     y = [25.0, 15.0, 5.0]
     layer = [1]
-    time = [np.datetime64("2000-01-01"), np.datetime64("2000-01-02")]
+    time = np.array(["2000-01-01", "2000-01-02"], dtype="datetime64[ns]")
     dx = 10.0
     dy = -10.0
 
@@ -53,7 +53,7 @@ def rch_dict_transient():
 def test_render(rch_dict):
     rch = imod.mf6.Recharge(**rch_dict)
     directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     actual = rch.render(directory, "recharge", globaltimes, True)
     expected = textwrap.dedent(
         """\
@@ -75,11 +75,14 @@ def test_render(rch_dict):
 def test_render_transient(rch_dict_transient):
     rch = imod.mf6.Recharge(**rch_dict_transient)
     directory = pathlib.Path("mymodel")
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-01-02"),
-        np.datetime64("2000-01-03"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ],
+        dtype="datetime64[ns]",
+    )
     actual = rch.render(directory, "recharge", globaltimes, True)
     expected = textwrap.dedent(
         """\
@@ -111,7 +114,7 @@ def test_no_layer_dim(rch_dict):
     rch_dict["rate"] = rch_dict["rate"].sel(layer=1, drop=False)
     rch = imod.mf6.Recharge(**rch_dict)
     directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     actual = rch.render(directory, "recharge", globaltimes, True)
     expected = textwrap.dedent(
         """\
@@ -135,11 +138,14 @@ def test_transient_no_layer_dim(rch_dict_transient):
     rch = imod.mf6.Recharge(**rch_dict_transient)
 
     directory = pathlib.Path("mymodel")
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-01-02"),
-        np.datetime64("2000-01-03"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ],
+        dtype="datetime64[ns]",
+    )
 
     actual = rch.render(directory, "recharge", globaltimes, True)
     expected = textwrap.dedent(
@@ -172,11 +178,14 @@ def test_render_concentration(concentration_fc, rate_fc):
     )
 
     directory = pathlib.Path("mymodel")
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-01-02"),
-        np.datetime64("2000-01-03"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ],
+        dtype="datetime64[ns]",
+    )
 
     actual = rch.render(directory, "rch", globaltimes, False)
 
@@ -244,11 +253,14 @@ def test_validate_false():
 
 @pytest.mark.usefixtures("rate_fc", "concentration_fc")
 def test_write_concentration_period_data(rate_fc, concentration_fc):
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-01-02"),
-        np.datetime64("2000-01-03"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ],
+        dtype="datetime64",
+    )
     rate_fc[:] = 1
     concentration_fc[:] = 2
 
@@ -264,3 +276,22 @@ def test_write_concentration_period_data(rate_fc, concentration_fc):
             assert (
                 data.count("2") == 1755
             )  # the number 2 is in the concentration data, and in the cell indices.
+
+
+def test_clip_box(rch_dict):
+    rch = imod.mf6.Recharge(**rch_dict)
+
+    selection = rch.clip_box()
+    assert isinstance(selection, imod.mf6.Recharge)
+    assert selection.dataset.identical(rch.dataset)
+
+    selection = rch.clip_box(x_min=10.0, x_max=20.0, y_min=10.0, y_max=20.0)
+    assert selection["rate"].dims == ("layer", "y", "x")
+    assert selection["rate"].shape == (1, 1, 1)
+
+    # No layer dim
+    rch_dict["rate"] = rch_dict["rate"].sel(layer=1, drop=False)
+    rch = imod.mf6.Recharge(**rch_dict)
+    selection = rch.clip_box(x_min=10.0, x_max=20.0, y_min=10.0, y_max=20.0)
+    assert selection["rate"].dims == ("y", "x")
+    assert selection["rate"].shape == (1, 1)

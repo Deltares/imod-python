@@ -6,9 +6,9 @@ from collections import defaultdict
 from datetime import datetime
 from itertools import chain
 from os import PathLike
+from pathlib import Path
 from typing import Any, Dict, List, Sequence, Tuple, Union
 
-import geopandas as gpd
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -54,7 +54,7 @@ KEYS = {
 DATE_KEYS = {
     "(uzf)": (None,),
     "(rch)": ("rate",),
-    "(evt)": ("rate", "extinction_depth"),
+    "(evt)": ("rate", "surface", "depth"),
     "(drn)": ("conductance", "elevation"),
     "(olf)": ("elevation",),
     "(riv)": ("conductance", "stage", "bottom_elevation", "infiltration_factor"),
@@ -195,7 +195,7 @@ def _tokenize(line: str) -> List[str]:
     >> _tokenize("That,'s life'")
     >> ["That", "s life"]
     """
-    values = [v.strip() for v in line.split(",")]
+    values = [v.strip().replace("\\", "/") for v in line.split(",")]
     tokens = list(chain.from_iterable(shlex.split(v) for v in values))
     return tokens
 
@@ -241,15 +241,11 @@ def _parse_time(lines: _LineIterator) -> str:
     try:
         line = next(lines)
         date = line[0].lower()
-
-        if date == "steady-state":
-            return date
-
-        elif len(line) > 1:
+        if len(line) > 1:
             time = line[1]
+            return f"{date} {time}"
         else:
-            time = "00:00:00"
-        return f"{date} {time}"
+            return date
     except Exception as e:
         _wrap_error_message(e, "date time", lines)
 
@@ -497,25 +493,50 @@ def _merge_coords(headers: List[Dict[str, Any]]) -> Dict[str, np.ndarray]:
     return {k: np.unique(coords[k]) for k in coords}
 
 
+def _create_datarray_from_paths(paths: List[str], headers: List[Dict[str, Any]]):
+    da = imod.formats.array_io.reading._load(
+        paths, use_cftime=False, _read=imod.idf._read, headers=headers
+    )
+    return da
+
+
+def _create_dataarray_from_values(values: List[float], headers: List[Dict[str, Any]]):
+    coords = _merge_coords(headers)
+    firstdims = headers[0]["dims"]
+    shape = [len(coord) for coord in coords.values()]
+    da = xr.DataArray(np.reshape(values, shape), dims=firstdims, coords=coords)
+    return da
+
+
 def _create_dataarray(
     paths: List[str], headers: List[Dict[str, Any]], values: List[float]
 ) -> xr.DataArray:
     """
     Create a DataArray from a list of IDF paths, or from constant values.
     """
-    none_paths = [p is None for p in paths]
-    if all(none_paths):
-        coords = _merge_coords(headers)
-        da = xr.DataArray(values, dims=headers[0]["dims"], coords=coords)
-    elif any(none_paths):
-        raise NotImplementedError(
-            "Entries for a system should either all provide a constant, "
-            "or all provide a file path."
-        )
-    else:
-        da = imod.formats.array_io.reading._load(
-            paths, use_cftime=False, _read=imod.idf._read, headers=headers
-        )
+    values_valid = []
+    paths_valid = []
+    headers_paths = []
+    headers_values = []
+    for path, header, value in zip(paths, headers, values):
+        if path is None:
+            headers_values.append(header)
+            values_valid.append(value)
+        else:
+            headers_paths.append(header)
+            paths_valid.append(path)
+
+    if paths_valid and values_valid:
+        dap = _create_datarray_from_paths(paths_valid, headers_paths)
+        dav = _create_dataarray_from_values(values_valid, headers_values)
+        dap.name = "tmp"
+        dav.name = "tmp"
+        da = xr.merge((dap, dav), join="outer")["tmp"]
+    elif paths_valid:
+        da = _create_datarray_from_paths(paths_valid, headers_paths)
+    elif values_valid:
+        da = _create_dataarray_from_values(values_valid, headers_values)
+
     return da
 
 
@@ -542,24 +563,62 @@ def _open_package_idf(
     return [das]
 
 
-def _process_boundary_condition_entry(entry: Dict):
-    """
-    The iMOD project file supports constants in lieu of IDFs.
-    """
-    coords = {}
-    time = entry["time"]
+def _process_time(time: str, yearfirst: bool = True):
     if time == "steady-state":
         time = None
+    else:
+        if yearfirst:
+            if len(time) == 19:
+                time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
+            elif len(time) == 10:
+                time = datetime.strptime(time, "%Y-%m-%d")
+            else:
+                raise ValueError(
+                    f"time data {time} does not match format "
+                    '"%Y-%m-%d %H:%M:%S" or "%Y-%m-%d"'
+                )
+        else:
+            if len(time) == 19:
+                time = datetime.strptime(time, "%d-%m-%Y %H:%M:%S")
+            elif len(time) == 10:
+                time = datetime.strptime(time, "%d-%m-%Y")
+            else:
+                raise ValueError(
+                    f"time data {time} does not match format "
+                    '"%d-%m-%Y %H:%M:%S" or "%d-%m-%Y"'
+                )
+    return time
+
+
+def _process_boundary_condition_entry(entry: Dict, periods: Dict[str, datetime]):
+    """
+    The iMOD project file supports constants in lieu of IDFs.
+
+    Also process repeated stress periods (on a yearly basis): substitute the
+    original date here.
+    """
+    coords = {}
+    timestring = entry["time"]
+
+    # Resolve repeating periods first:
+    time = periods.get(timestring)
+    if time is not None:
+        repeat = time
+    else:
+        # this resolves e.g. "steady-state"
+        time = _process_time(timestring)
+        repeat = None
+
+    if time is None:
         dims = ()
     else:
-        time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
-        coords["time"] = time
         dims = ("time",)
+        coords["time"] = time
 
     # 0 signifies that the layer must be determined on the basis of
     # bottom elevation and stage.
     layer = entry["layer"]
-    if layer == 0:
+    if layer <= 0:
         layer is None
     else:
         coords["layer"] = layer
@@ -580,12 +639,12 @@ def _process_boundary_condition_entry(entry: Dict):
     if time is not None:
         header["time"] = time
 
-    return path, header, value
+    return path, header, value, repeat
 
 
 def _open_boundary_condition_idf(
-    block_content, variables
-) -> List[Dict[str, xr.DataArray]]:
+    block_content, variables, periods: Dict[str, datetime]
+) -> Tuple[List[Dict[str, xr.DataArray]], List[datetime]]:
     """
     Read the variables specified from block_content.
     """
@@ -593,7 +652,7 @@ def _open_boundary_condition_idf(
     n_time = len(block_content["time"])
     n_total = n_system * n_time
 
-    das = [{}] * n_system
+    das = [{} for _ in range(n_system)]
     for variable in variables:
         variable_content = block_content[variable]
 
@@ -608,13 +667,18 @@ def _open_boundary_condition_idf(
         system_paths = defaultdict(list)
         system_headers = defaultdict(list)
         system_values = defaultdict(list)
+        all_repeats = set()
         for i, entry in enumerate(variable_content):
-            path, header, value = _process_boundary_condition_entry(entry)
+            path, header, value, repeat = _process_boundary_condition_entry(
+                entry, periods
+            )
             header["name"] = variable
             key = i % n_system
             system_paths[key].append(path)
             system_headers[key].append(header)
             system_values[key].append(value)
+            if repeat:
+                all_repeats.add(repeat)
 
         # Concat one system at a time.
         for i, (paths, headers, values) in enumerate(
@@ -622,30 +686,79 @@ def _open_boundary_condition_idf(
         ):
             das[i][variable] = _create_dataarray(paths, headers, values)
 
-    return das
+    repeats = sorted(all_repeats)
+    return das, repeats
 
 
-def _read_package_gen(block_content: Dict[str, Any]) -> List[Dict[str, Any]]:
+def _read_package_gen(
+    block_content: Dict[str, Any], has_topbot: bool
+) -> List[Dict[str, Any]]:
     out = []
     for entry in block_content["gen"]:
+        gdf = imod.gen.read(entry["path"])
+        if has_topbot:
+            gdf["resistance"] = entry["factor"] * entry["addition"]
+        else:
+            gdf["multiplier"] = entry["factor"] * entry["addition"]
         d = {
-            "geodataframe": imod.gen.read(entry["path"]),
+            "geodataframe": gdf,
             "layer": entry["layer"],
         }
         out.append(d)
     return out
 
 
-def _read_package_ipf(block_content: Dict[str, Any]) -> List[Dict[str, Any]]:
+def _read_package_ipf(
+    block_content: Dict[str, Any], periods: Dict[str, datetime]
+) -> Tuple[List[Dict[str, Any]], List[datetime]]:
     out = []
+    repeats = []
     for entry in block_content["ipf"]:
+        timestring = entry["time"]
+        layer = entry["layer"]
+        time = periods.get(timestring)
+        if time is None:
+            time = _process_time(timestring)
+        else:
+            repeats.append(time)
+
+        # Ensure the columns are identifiable.
+        path = Path(entry["path"])
+        ipf_df, indexcol, ext = imod.ipf._read_ipf(path)
+        if indexcol == 0:
+            # No associated files
+            columns = ("x", "y", "rate")
+            if layer <= 0:
+                df = ipf_df.iloc[:, :5]
+                columns = columns + ("top", "bottom")
+            else:
+                df = ipf_df.iloc[:, :3]
+            df.columns = columns
+        else:
+            dfs = []
+            for row in ipf_df.itertuples():
+                filename = row[indexcol]
+                path_assoc = path.parent.joinpath(f"{filename}.{ext}")
+                df_assoc = imod.ipf.read_associated(path_assoc).iloc[:, :2]
+                df_assoc.columns = ["time", "rate"]
+                df_assoc["x"] = row[1]
+                df_assoc["y"] = row[2]
+                df_assoc["id"] = path_assoc.stem
+                if layer <= 0:
+                    df_assoc["top"] = row[4]
+                    df_assoc["bottom"] = row[5]
+                dfs.append(df_assoc)
+            df = pd.concat(dfs, ignore_index=True, sort=False)
+
         d = {
-            "dataframe": imod.ipf.read(entry["path"]),
-            "layer": entry["layer"],
-            "time": entry["time"],
+            "dataframe": df,
+            "layer": layer,
+            "time": time,
         }
         out.append(d)
-    return out
+
+    repeats = sorted(repeats)
+    return out, repeats
 
 
 def read_projectfile(path: FilePath) -> Dict[str, Any]:
@@ -730,6 +843,13 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
     * drn-1
     * drn-2
 
+    Xarray requires valid dates for the time coordinate. Aliases such as
+    "summer" and "winter" that are associated with dates in the project file
+    Periods block cannot be used in the time coordinate. Hence, this function
+    will instead insert the dates associated with the aliases, with the year
+    replaced by 1899; as the iMOD calendar starts at 1900, this ensures that
+    the repeats are always first and that no date collisions will occur.
+
     Parameters
     ----------
     path: pathlib.Path or str.
@@ -740,31 +860,40 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
     Keys are the iMOD project file "topics", without parentheses.
     """
     content = read_projectfile(path)
+    periods_block = content.pop("periods", None)
+    if periods_block is None:
+        periods = {}
+    else:
+        # Set the year of a repeat date to 1899: this ensures it falls outside
+        # of the iMOD calendar. Collisions are then always avoided.
+        periods = {
+            key: _process_time(time, yearfirst=False).replace(year=1899)
+            for key, time in periods_block.items()
+        }
+
+    has_topbot = "(top)" in content and "(bot)" in content
     prj_data = {}
+    repeat_stress = {}
     for key, block_content in content.items():
+        repeats = None
         try:
             if key == "(hfb)":
-                data = _read_package_gen(block_content)
+                data = _read_package_gen(block_content, has_topbot)
             elif key == "(wel)":
-                data = _read_package_ipf(block_content)
+                data, repeats = _read_package_ipf(block_content, periods)
             elif key == "(cap)":
                 variables = set(METASWAP_VARS).intersection(block_content.keys())
                 data = _open_package_idf(block_content, variables)
             elif key in ("extra", "(pcg)"):
                 data = [block_content]
-            elif key in ("periods"):
-                data = [
-                    {
-                        key: datetime.strptime(time, "%d-%m-%Y %H:%M:%S")
-                        for key, time in block_content.items()
-                    }
-                ]
             elif key in KEYS:
                 variables = KEYS[key]
                 data = _open_package_idf(block_content, variables)
             elif key in DATE_KEYS:
                 variables = DATE_KEYS[key]
-                data = _open_boundary_condition_idf(block_content, variables)
+                data, repeats = _open_boundary_condition_idf(
+                    block_content, variables, periods
+                )
             else:
                 raise ValueError("Unsupported key")
         except Exception as e:
@@ -773,8 +902,42 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
         strippedkey = key.strip("(").strip(")")
         if len(data) > 1:
             for i, da in enumerate(data):
-                prj_data[f"{strippedkey}-{i+1}"] = da
+                numbered_key = f"{strippedkey}-{i+1}"
+                prj_data[numbered_key] = da
+                repeat_stress[numbered_key] = repeats
         else:
             prj_data[strippedkey] = data[0]
+            repeat_stress[strippedkey] = repeats
 
-    return prj_data
+    repeat_stress = {k: v for k, v in repeat_stress.items() if v}
+    return prj_data, repeat_stress
+
+
+def read_timfile(path: FilePath) -> List[Dict]:
+    def parsetime(time: str) -> datetime:
+        # Check for steady-state:
+        if time == "00000000000000":
+            return None
+        return datetime.strptime(time, "%Y%m%d%H%M%S")
+
+    with open(path, "r") as f:
+        lines = f.readlines()
+
+    # A line contains 2, 3, or 4 values:
+    # time, isave, nstp, tmult
+    casters = {
+        "time": parsetime,
+        "save": lambda x: bool(int(x)),
+        "n_timestep": int,
+        "timestep_multiplier": float,
+    }
+    content = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped == "":
+            continue
+        parts = stripped.split(",")
+        entry = {k: cast(s.strip()) for s, (k, cast) in zip(parts, casters.items())}
+        content.append(entry)
+
+    return content

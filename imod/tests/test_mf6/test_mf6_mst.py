@@ -9,14 +9,13 @@ from imod.mf6.mst import MobileStorageTransfer
 
 def test_render_simple():
     directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     m = MobileStorageTransfer(0.3)
     actual = m.render(directory, "mst", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
         end options
-
 
         begin griddata
           porosity
@@ -38,7 +37,7 @@ def test_render_first_order_decay(
     porosity_fc, decay_fc, decay_sorbed_fc, bulk_density_fc, distcoef_fc, sp2_fc
 ):
     directory = pathlib.Path("mymodel")
-    globaltimes = [np.datetime64("2000-01-01")]
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
     m = MobileStorageTransfer(
         porosity_fc,
         decay=decay_fc,
@@ -46,16 +45,16 @@ def test_render_first_order_decay(
         bulk_density=bulk_density_fc,
         distcoef=distcoef_fc,
         sp2=sp2_fc,
-        sorption="Langmuir",
+        first_order_decay=True,
+        sorption="langmuir",
     )
     actual = m.render(directory, "mst", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
-            FIRST_ORDER_DECAY
-            SORPTION  Langmuir
+          first_order_decay
+          sorption langmuir
         end options
-
 
         begin griddata
           porosity
@@ -88,17 +87,16 @@ def test_render_zero_order_decay(
         bulk_density=bulk_density_fc,
         distcoef=distcoef_fc,
         sp2=sp2_fc,
-        sorption="Langmuir",
-        decay_order="zero",
+        sorption="langmuir",
+        zero_order_decay=True,
     )
     actual = m.render(directory, "mst", globaltimes, True)
     expected = textwrap.dedent(
         """\
         begin options
-            ZERO_ORDER_DECAY
-            SORPTION  Langmuir
+          zero_order_decay
+          sorption langmuir
         end options
-
 
         begin griddata
           porosity
@@ -130,6 +128,7 @@ def test_wrong_decay_order(
             bulk_density=bulk_density_fc,
             distcoef=distcoef_fc,
             sp2=sp2_fc,
-            sorption="Langmuir",
-            decay_order="second",
+            sorption="langmuir",
+            zero_order_decay=True,
+            first_order_decay=True,
         )

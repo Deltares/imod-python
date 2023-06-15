@@ -86,7 +86,7 @@ def model_no_output_control(model):
 @pytest.fixture(scope="module")
 def model_periodic_stress(model):
     m = deepcopy(model)
-    times = np.array([np.datetime64("2000-01-01"), np.datetime64("2000-01-02")])
+    times = np.array(["2000-01-01", "2000-01-02"], dtype="datetime64[ns]")
 
     head_periodic = xr.DataArray([2.0, 1.0], coords={"time": times}, dims=["time"])
 

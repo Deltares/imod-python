@@ -37,16 +37,16 @@ class River(BoundaryCondition):
         if this flow package is used in simulations also involving transport, then this keyword specifies
         how outflow over this boundary is computed.
     print_input: ({True, False}, optional)
-        keyword to indicate that the list of drain information will be written
+        keyword to indicate that the list of river information will be written
         to the listing file immediately after it is read. Default is False.
     print_flows: ({True, False}, optional)
-        Indicates that the list of drain flow rates will be printed to the
+        Indicates that the list of river flow rates will be printed to the
         listing file for every stress period time step in which "BUDGET PRINT"
         is specified in Output Control. If there is no Output Control option and
         PRINT FLOWS is specified, then flow rates are printed for the last time
         step of each stress period. Default is False.
     save_flows: ({True, False}, optional)
-        Indicates that drain flow terms will be written to the file specified
+        Indicates that river flow terms will be written to the file specified
         with "BUDGET FILEOUT" in Output Control. Default is False.
     observations: [Not yet supported.]
         Default is None.
@@ -54,6 +54,14 @@ class River(BoundaryCondition):
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
         provided in the wrong manner. Defaults to True.
+    repeat_stress: Optional[xr.DataArray] of datetimes
+        Used to repeat data for e.g. repeating stress periods such as
+        seasonality without duplicating the values. The DataArray should have
+        dimensions ``("repeat", "repeat_items")``. The ``repeat_items``
+        dimension should have size 2: the first value is the "key", the second
+        value is the "value". For the "key" datetime, the data of the "value"
+        datetime will be used. Can also be set with a dictionary using the
+        ``set_repeat_stress`` method.
     """
 
     _pkg_id = "riv"
@@ -125,6 +133,7 @@ class River(BoundaryCondition):
         save_flows=False,
         observations=None,
         validate: bool = True,
+        repeat_stress=None,
     ):
         super().__init__(locals())
         self.dataset["stage"] = stage
@@ -138,6 +147,7 @@ class River(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+        self.dataset["repeat_stress"] = repeat_stress
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):

@@ -18,11 +18,14 @@ def test_render(
     rate_fc, elevation_fc, concentration_fc, proportion_rate_fc, proportion_depth_fc
 ):
     directory = pathlib.Path("mymodel")
-    globaltimes = [
-        np.datetime64("2000-01-01"),
-        np.datetime64("2000-01-02"),
-        np.datetime64("2000-01-03"),
-    ]
+    globaltimes = np.array(
+        [
+            "2000-01-01",
+            "2000-01-02",
+            "2000-01-03",
+        ],
+        dtype="datetime64[ns]",
+    )
 
     evt = imod.mf6.Evapotranspiration(
         surface=elevation_fc,
@@ -44,7 +47,6 @@ def test_render(
 
         begin dimensions
           maxbound 0
-          nseg
         end dimensions
 
 
