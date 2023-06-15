@@ -4,12 +4,8 @@ from typing import Optional, Union
 import ribasim
 import tomli_w
 
-from imod.couplers.metamod.node_svat_mapping import NodeSvatMapping
-from imod.couplers.metamod.rch_svat_mapping import RechargeSvatMapping
-from imod.couplers.metamod.wel_svat_mapping import WellSvatMapping
 from imod.mf6 import Modflow6Simulation
 from imod.mf6.model import Modflow6Model
-from imod.msw import GridData
 
 
 class RibaMod:
@@ -19,20 +15,15 @@ class RibaMod:
 
     Parameters
     ----------
-    msw_model : MetaSwapModel
-        The MetaSWAP model that should be coupled.
+    ribasim_model : ribasim.model
+        The Ribasim model that should be coupled.
     mf6_simulation : Modflow6Simulation
         The Modflow6 simulation that should be coupled.
-    mf6_rch_pkgkey: str
-        Key of Modflow 6 recharge package to which MetaSWAP is coupled.
-    mf6_wel_pkgkey: str or None
-        Optional key of Modflow 6 well package to which MetaSWAP sprinkling is
-        coupled.
     """
 
     _toml_name = "imod_coupler.toml"
-    _ribasim_model_dir = "Ribasim"
-    _modflow6_model_dir = "Modflow6"
+    _ribasim_model_dir = "ribasim"
+    _modflow6_model_dir = "modflow6"
 
     def __init__(
         self,
@@ -132,6 +123,7 @@ class RibaMod:
         """
         # force to Path
         directory = Path(directory)
+        directory.mkdir(parents=True, exist_ok=True)
 
         toml_path = directory / self._toml_name
         coupler_toml = {
@@ -148,8 +140,7 @@ class RibaMod:
                         "dll": str(ribasim_dll),
                         "dll_dep_dir": str(ribasim_dll_dependency),
                         "config_file": str(
-                            self._ribasim_model_dir
-                            / f"{self.ribasim_model.modelname}.toml"
+                            f"{self._ribasim_model_dir}/{self.ribasim_model.modelname}.toml"
                         ),
                     },
                 },
@@ -210,8 +201,7 @@ class RibaMod:
     def write_exchanges(
         self,
         directory: Union[str, Path],
-        mf6_rch_pkgkey: str,
-        mf6_wel_pkgkey: Optional[str],
+        mf6_riv_pkgkey: str,
     ):
         """
         Write exchange files (.dxc) which map MetaSWAP's svats to Modflow 6 node
@@ -221,37 +211,16 @@ class RibaMod:
         ----------
         directory: str or Path
             Directory where .dxc files are written.
-        mf6_rch_pkgkey: str
-            Key of Modflow 6 recharge package to which MetaSWAP is coupled.
-        mf6_wel_pkgkey: str
-            Key of Modflow 6 well package to which MetaSWAP sprinkling is
-            coupled.
+        mf6_river_pkgkey: str
+            Key of Modflow 6 river package to which Ribasim is coupled.
         """
 
-        gwf_names = self._get_gwf_modelnames()
-
+        # TODO
+        # gwf_names = self._get_gwf_modelnames()
         # Assume only one groundwater flow model
         # FUTURE: Support multiple groundwater flow models.
-        gwf_model = self.mf6_simulation[gwf_names[0]]
+        # gwf_model = self.mf6_simulation[gwf_names[0]]
+        # dis = gwf_model[gwf_model._get_pkgkey("dis")]
+        # river = gwf_model[mf6_riv_pkgkey]
 
-        grid_data_key = [
-            pkgname
-            for pkgname, pkg in self.msw_model.items()
-            if isinstance(pkg, GridData)
-        ][0]
-
-        dis = gwf_model[gwf_model._get_pkgkey("dis")]
-
-        index, svat = self.msw_model[grid_data_key].generate_index_array()
-        grid_mapping = NodeSvatMapping(svat, dis)
-        grid_mapping.write(directory, index, svat)
-
-        recharge = gwf_model[mf6_rch_pkgkey]
-
-        rch_mapping = RechargeSvatMapping(svat, recharge)
-        rch_mapping.write(directory, index, svat)
-
-        if self.is_sprinkling:
-            well = gwf_model[mf6_wel_pkgkey]
-            well_mapping = WellSvatMapping(svat, well)
-            well_mapping.write(directory, index, svat)
+        return
