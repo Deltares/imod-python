@@ -6,6 +6,12 @@ from typing import Union, NamedTuple
 
 import numpy as np
 
+
+import shapely
+import shapely.geometry as sg
+
+
+
 # %%
 
 _WIDTHS = {
@@ -85,7 +91,7 @@ def read_isd2(path):
         dtype = _single_or_double(f, 5367, 9463)
         isd_dtype = np.dtype(
             [
-                ("date", np.int32),
+                ("time", np.int32),
                 ("stage", dtype),
                 ("bottom_elevation", dtype),
                 ("resistance", dtype),
@@ -101,7 +107,7 @@ def read_isd2_sfr(path):
         dtype = _single_or_double(f, 12535, 16631)
         isd_dtype = np.dtype(
             [
-                ("date", np.int32),
+                ("time", np.int32),
                 ("stage", dtype),
                 ("bottom_elevation", dtype),
                 ("width", dtype),
@@ -271,7 +277,7 @@ def read_ist2(path):
         dtype = _single_or_double(f, 3319, 5367)
         ist_dtype = np.dtype(
             [
-                ("date", np.int32),
+                ("time", np.int32),
                 ("upstream_water_level", dtype),
                 ("downstream_water_level", dtype),
             ]
@@ -295,12 +301,144 @@ def read_isq2(path):
     return data
 
 # %%
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import xarray as xr
+
+# %%
+path = "c:/tmp/imodformats/isg/RIVIEREN_MORIA_AMIGO_AZURE_19900101-20200401_dag_mediaan.ISG"
+
+
+def read_isg(path):
+    with open(path, "r") as f:
+        header = f.readline().strip()
+        columns = (
+            "label",
+            "pointer",
+            "n",
+            "calculation_pointer",
+            "calculation_n",
+            "cross_section_pointer",
+            "cross_section_n",
+            "weir_pointer",
+            "weir_n",
+            "n_discharge_relationships",
+            "discharge_pointer,"
+        )
+        isg = pd.read_csv(f, header=None, names=columns)
+    return isg
+
+
+def expand_index(pointer: IntArray, n: IntArray):
+    # Unused data may exist in the datasets!
+    # Therefore: re-order every element by its segment index, and point index;
+    # Discard values that aren't used.
+    increment = np.arange(n.sum()) - np.repeat(alt_cumsum(n), n)
+    index = np.repeat(pointer, n) + increment
+    return index
+
+
+def create_geometry(isg: pd.DataFrame, isp: np.ndarray):
+    order = np.argsort(isg["pointer"])
+    indices = np.repeat(np.arange(len(isg))[order], isg["n"][order])
+    lines = shapely.linestrings(isp, indices=indices)
+    return lines
+
+
+def convert_isd(
+    isg: pd.DataFrame,
+    isd1: np.ndarray,
+    isd2: np.ndarray,
+) -> xr.Dataset:
+    calc_index = expand_index(isg["calculation_pointer"].values - 1, isg["calculation_n"].values)
+    isd1 = isd1[calc_index]
+
+    calc_point_index = expand_index(isd1["pointer"] - 1, isd1["n"])
+    isd2 = isd2[calc_point_index]
+    point_index = np.repeat(np.arange(len(isd1)), isd1["n"])
+    isd2_df = pd.DataFrame(isd2)
+    isd2_df["time"] = pd.to_datetime(isd2_df["time"], format="%Y%m%d")
+    isd2_df["point_index"] = point_index
+    isd2_df = isd2_df.set_index(["time", "point_index"])
+
+    isd_ds = isd2_df.to_xarray()
+    isd_ds["distance"] = ("point_index", isd1["distance"])
+    isd_ds = isd_ds.assign_coords(
+        name=("point_index", isd1["name"]),
+        distance=("point_index", isd1["distance"]),
+    )
+    return isd_ds
+
+
+def gather_points(
+    isc1: np.ndarray,
+    isc2: Isc2Data,
+):
+    is_point_collection = isc1["n"] < 0
+    isc1 = isc1[is_point_collection]
+    index = expand_index(isc1["pointer"] - 1, isc1["n"])
+
+
+def convert_isc(
+    isg: pd.DataFrame,
+    isc1: np.ndarray,
+    isc2: Isc2Data,
+):
+    invalid = (isc1["n"] == 0)
+    if invalid.any():
+        raise ValueError(
+            "Values of the ISC1 N record should not be zero. "
+            f"Found invalid values at indices: {np.where(invalid)}"
+        )
+    cross_section_index = expand_index(isg["cross_section_pointer"].values - 1, isg["cross_section_n"].values)
+    isc1 = isc1[cross_section_index]
+    is_cross_section = ~is_point_collection
+
+
+
+isg = read_isg(path)
+isp = read_isp(r"c:\tmp\imodformats\isg\RIVIEREN_MORIA_AMIGO_AZURE_19900101-20200401_dag_mediaan.ISP")
 isc1 = read_isc1(r"c:\tmp\imodformats\isg\RIVIEREN_MORIA_AMIGO_AZURE_19900101-20200401_dag_mediaan.ISC1")
-# %%
 isc2 = read_isc2(r"c:\tmp\imodformats\isg\RIVIEREN_MORIA_AMIGO_AZURE_19900101-20200401_dag_mediaan.ISC2", isc1)
-# %%
 isd1 = read_isd1(r"c:\tmp\imodformats\isg\RIVIEREN_MORIA_AMIGO_AZURE_19900101-20200401_dag_mediaan.ISD1")
 isd2 = read_isd2(r"c:\tmp\imodformats\isg\RIVIEREN_MORIA_AMIGO_AZURE_19900101-20200401_dag_mediaan.ISD2")
+
+
+
+lines = create_geometry(isg, isp)
+isd_ds = convert_isd(isg, isd1, isd2)
+
+cross_section_index = expand_index(isg["cross_section_pointer"].values - 1, isg["cross_section_n"].values)
+isc1 = isc1[cross_section_index]
+
+# %%
+
+cross_section_index = expand_index(isg["cross_section_pointer"].values - 1, isg["cross_section_n"].values)
+isc1 = isc1[cross_section_index]
+is_point_collection = isc1["n"] < 0
+is_cross_section = ~is_point_collection
+
+is_point_collection = isc1["n"] < 0
+isc1 = isc1[is_point_collection]
+index = expand_index(isc1["pointer"] - 1, abs(isc1["n"]))
+
+# %%
+
+calc_segments = []
+for _, row in isg.iterrows():
+    start = row["calculation_pointer"] - 1
+    end = start + row["calculation_n"]
+    segment = isd1[start: end]
+    calc_segments.append(segment)
+
+
+
+# %%
+
+
+
+
 # %%
 #isg = read_isc1(r"c:\tmp\imodformats\isg\RIVIEREN_MORIA_AMIGO_AZURE_19900101-20200401_dag_mediaan.ISG")
 isp = read_isp(r"c:\tmp\imodformats\isg\RIVIEREN_MORIA_AMIGO_AZURE_19900101-20200401_dag_mediaan.ISP")
