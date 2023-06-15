@@ -4,7 +4,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Any, Callable, Tuple, Union
 
 import cftime
 import jinja2
@@ -22,6 +22,17 @@ from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.wel import Well
 from imod.schemata import ValidationError
+
+
+def single(dictionary: collections.UserDict, predicate: Callable[[Any], bool]):
+    """
+    returns a value in a dictionary for which the predicate is true. There should be only one such values; if there are more or none,
+    an exception is raised.
+    """
+    candidates = [item for _, item in dictionary.items() if predicate(item)]
+    if len(candidates) != 1:
+        raise RuntimeError()
+    return candidates[0]
 
 
 def initialize_template(name: str) -> Template:
@@ -153,21 +164,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         self._check_for_required_packages(modelkey)
 
-    def __get_single_package_by_type(
-        self, package_type: abc.ABCMeta
-    ) -> Optional[Package]:
-        candidates = [
-            item for _, item in self.items() if isinstance(item, package_type)
-        ]
-        nr_candidates = len(candidates)
-        if nr_candidates == 0:
-            return None
-        if nr_candidates > 1:
-            raise RuntimeError(
-                f"There are {len(candidates)} candidates for package {package_type}, but 1 was expected"
-            )
-        return candidates[0]
-
     def __get_domain_geometry(
         self,
     ) -> Tuple[
@@ -175,13 +171,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         Union[xr.DataArray, xu.UgridDataArray],
         Union[xr.DataArray, xu.UgridDataArray],
     ]:
-        discretization = self.__get_single_package_by_type(
-            imod.mf6.StructuredDiscretization
-        )
-        if discretization is None:
-            discretization = self.__get_single_package_by_type(
-                imod.mf6.VerticesDiscretization
-            )
+        discretization = self[self.__get_diskey()]
         if discretization is None:
             raise ValueError("Discretization not found")
         top = discretization["top"]
@@ -190,9 +180,11 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         return top, bottom, idomain
 
     def __get_k(self):
-        npf = self.__get_single_package_by_type(imod.mf6.NodePropertyFlow)
-        if npf is None:
-            raise ValueError("NPF package not found")
+        try:
+            npf = single(self, lambda item: isinstance(item, imod.mf6.NodePropertyFlow))
+        except RuntimeError:
+            raise RuntimeError("expected one package of type ModePropertyFlow")
+
         k = npf["k"]
         return k
 
