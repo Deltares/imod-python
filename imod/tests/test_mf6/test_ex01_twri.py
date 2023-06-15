@@ -1,6 +1,7 @@
 import re
 import sys
 import textwrap
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -20,7 +21,7 @@ def test_dis_render(twri_model, tmp_path):
         globaltimes=None,
         binary=True,
     )
-    path = tmp_path.as_posix()
+    path = Path(tmp_path.stem).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -73,7 +74,7 @@ def test_chd_render(twri_model, tmp_path):
         globaltimes=globaltimes,
         binary=True,
     )
-    path = tmp_path.as_posix()
+    path = Path(tmp_path.stem).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -114,7 +115,7 @@ def test_drn_render(twri_model, tmp_path):
         globaltimes=globaltimes,
         binary=True,
     )
-    path = tmp_path.as_posix()
+    path = Path(tmp_path.stem).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -216,26 +217,45 @@ def test_oc_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
     oc = simulation["GWF_1"]["oc"]
+
+    # An absolute path should be maintained in the fileout entries!
     path = tmp_path.as_posix()
     actual = oc.render(
         directory=tmp_path, pkgname="oc", globaltimes=globaltimes, binary=True
     )
     expected = textwrap.dedent(
         f"""\
-            begin options
-              budget fileout {path}/{tmp_path.stem}.cbc
-              head fileout {path}/{tmp_path.stem}.hds
-            end options
+          begin options
+            budget fileout {path}/{tmp_path.stem}.cbc
+            head fileout {path}/{tmp_path.stem}.hds
+          end options
 
-            begin period 1
-              save head all
-              save budget all
-            end period
-            """
+          begin period 1
+            save head all
+            save budget all
+          end period
+          """
     )
     assert actual == expected
-    oc.write(directory=tmp_path, pkgname="oc", globaltimes=globaltimes, binary=True)
-    assert (tmp_path / "oc.oc").is_file()
+
+    path = Path(tmp_path.stem)
+    actual = oc.render(
+        directory=path, pkgname="oc", globaltimes=globaltimes, binary=True
+    )
+    expected = textwrap.dedent(
+        f"""\
+          begin options
+            budget fileout {path}/{path}.cbc
+            head fileout {path}/{path}.hds
+          end options
+
+          begin period 1
+            save head all
+            save budget all
+          end period
+          """
+    )
+    assert actual == expected
 
 
 @pytest.mark.usefixtures("twri_model")
@@ -249,7 +269,7 @@ def test_rch_render(twri_model, tmp_path):
         globaltimes=globaltimes,
         binary=True,
     )
-    path = tmp_path.as_posix()
+    path = Path(tmp_path.stem).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -287,7 +307,7 @@ def test_wel_render(twri_model, tmp_path):
         globaltimes=globaltimes,
         binary=True,
     )
-    path = tmp_path.as_posix()
+    path = Path(tmp_path.stem).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -362,8 +382,8 @@ def test_gwfmodel_render(twri_model, tmp_path):
     simulation = twri_model
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
-    actual = gwfmodel.render(tmp_path)
-    path = tmp_path.as_posix()
+    path = Path(tmp_path.stem).as_posix()
+    actual = gwfmodel.render(path)
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -449,6 +469,22 @@ def test_simulation_write_storage(transient_twri_model, tmp_path):
     simulation.write(modeldir, binary=True)
     simulation.run()
 
+    cbc = imod.mf6.open_cbc(
+        modeldir / "GWF_1/GWF_1.cbc", modeldir / "GWF_1/dis.dis.grb"
+    )
+
+    # Test if storage fluxes properly read
+    assert "sto-ss" in cbc.keys()
+    sto_ss = cbc["sto-ss"]
+
+    assert isinstance(sto_ss, xr.DataArray)
+    assert sto_ss.dims == ("time", "layer", "y", "x")
+    assert sto_ss.shape == (30, 3, 15, 15)
+
+    meanflux_layer = sto_ss.groupby("layer").mean(dim=xr.ALL_DIMS).compute()
+    mean_answer = np.array([-1.993060e-05, -2.536776e-06, -3.110719e-06])
+    np.testing.assert_allclose(meanflux_layer.values, mean_answer, rtol=2e-7)
+
 
 @pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
@@ -491,3 +527,23 @@ def test_simulation_write_errors(twri_model, tmp_path):
     expected_message = "No sto package found in model GWF_1"
     with pytest.raises(ValueError, match=re.escape(expected_message)):
         simulation.write(modeldir, binary=True)
+
+
+@pytest.mark.usefixtures("transient_twri_model")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
+def test_slice_and_run(transient_twri_model, tmp_path):
+    # TODO: bring back well once slicing is implemented...
+    transient_twri_model["GWF_1"].pop("wel")
+    simulation = transient_twri_model.clip_box(
+        time_min="2000-01-10",
+        time_max="2000-01-20",
+        layer_min=1,
+        layer_max=2,
+        x_min=None,
+        x_max=65_000.0,
+        y_min=10_000.0,
+        y_max=65_000.0,
+    )
+    modeldir = tmp_path / "ex01-twri-transient-slice"
+    simulation.write(modeldir, binary=True)
+    simulation.run()

@@ -1,15 +1,16 @@
 import abc
-import math
 import numbers
 import pathlib
 from collections import defaultdict
-from typing import Dict, List
+from typing import Any, Dict, List
 
+import cftime
 import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
 
+import imod
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
 
@@ -45,7 +46,7 @@ def disv_recarr(arrdict, layer, notnull):
     nrow = notnull.sum()
     recarr = np.empty(nrow, dtype=sparse_dtype)
     # Fill in the indices
-    if layer.size == 1:
+    if notnull.ndim == 1 and layer.size == 1:
         recarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
         recarr["layer"] = layer
     else:
@@ -55,18 +56,26 @@ def disv_recarr(arrdict, layer, notnull):
     return recarr
 
 
-class Package(abc.ABC):
-    """
-    Package is used to share methods for specific packages with no time
-    component.
+class PackageBase(abc.ABC):
+    def __init__(self, allargs=None):
+        if allargs is not None:
+            for arg in allargs.values():
+                if isinstance(arg, xu.UgridDataArray):
+                    self.dataset = xu.UgridDataset(grids=arg.ugrid.grid)
+                    return
+        self.dataset = xr.Dataset()
 
-    It is not meant to be used directly, only to inherit from, to implement new
-    packages.
-
-    This class only supports `array input
-    <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=16>`_,
-    not the list input which is used in :class:`BoundaryCondition`.
     """
+    This class is used for storing a collection of Xarray dataArrays or ugrid-DataArrays
+    in a dataset. A load-from-file method is also provided. Storing to file is done by calling
+    object.dataset.to_netcdf(...)
+    """
+
+    def __getitem__(self, key):
+        return self.dataset.__getitem__(key)
+
+    def __setitem__(self, key, value):
+        self.dataset.__setitem__(key, value)
 
     @classmethod
     def from_file(cls, path, **kwargs):
@@ -104,43 +113,47 @@ class Package(abc.ABC):
 
         Refer to the xarray documentation for the possible keyword arguments.
         """
-
-        # Throw error if user tries to use old functionality
-        if "cache" in kwargs:
-            if kwargs["cache"] is not None:
-                raise NotImplementedError(
-                    "Caching functionality in pkg.from_file() is removed."
-                )
-
         path = pathlib.Path(path)
-
-        # See https://stackoverflow.com/a/2169191
-        # We expect the data in the netcdf has been saved a a package
-        # thus the checks run by __init__ and __setitem__ do not have
-        # to be called again.
-        return_cls = cls.__new__(cls)
-
         if path.suffix in (".zip", ".zarr"):
             # TODO: seems like a bug? Remove str() call if fixed in xarray/zarr
-            return_cls.dataset = xr.open_zarr(str(path), **kwargs)
+            dataset = xr.open_zarr(str(path), **kwargs)
         else:
-            return_cls.dataset = xr.open_dataset(path, **kwargs)
-        return_cls.remove_nans_from_dataset()
-        return return_cls
+            dataset = xr.open_dataset(path, **kwargs)
+
+        if dataset.ugrid_roles.topology:
+            dataset = xu.UgridDataset(dataset)
+            dataset = imod.util.from_mdal_compliant_ugrid2d(dataset)
+
+        # Replace NaNs by None
+        for key, value in dataset.items():
+            stripped_value = value.values[()]
+            if isinstance(stripped_value, numbers.Real) and np.isnan(stripped_value):
+                dataset[key] = None
+
+        instance = cls.__new__(cls)
+        instance.dataset = dataset
+        return instance
+
+
+class Package(PackageBase, abc.ABC):
+    """
+    Package is used to share methods for specific packages with no time
+    component.
+
+    It is not meant to be used directly, only to inherit from, to implement new
+    packages.
+
+    This class only supports `array input
+    <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=16>`_,
+    not the list input which is used in :class:`BoundaryCondition`.
+    """
+
+    _pkg_id = ""
+    _init_schemata = {}
+    _write_schemata = {}
 
     def __init__(self, allargs=None):
-        if allargs is not None:
-            for arg in allargs.values():
-                if isinstance(arg, xu.UgridDataArray):
-                    self.dataset = xu.UgridDataset(grids=arg.ugrid.grid)
-                    return
-        self.dataset = xr.Dataset()
-
-    def __getitem__(self, key):
-        return self.dataset.__getitem__(key)
-
-    def __setitem__(self, key, value):
-        self.dataset.__setitem__(key, value)
+        super().__init__(allargs)
 
     def isel(self):
         raise NotImplementedError(
@@ -202,9 +215,8 @@ class Package(abc.ABC):
         return env.get_template(fname)
 
     def write_blockfile(self, directory, pkgname, globaltimes, binary):
-        renderdir = pathlib.Path(directory.stem)
         content = self.render(
-            directory=renderdir,
+            directory=directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
             binary=binary,
@@ -315,7 +327,8 @@ class Package(abc.ABC):
         if directory is None:
             pkg_directory = pkgname
         else:
-            pkg_directory = directory / pkgname
+            pkg_directory = pathlib.Path(directory.stem) / pkgname
+
         for varname in self.dataset.data_vars:
             key = self._keyword_map.get(varname, varname)
 
@@ -517,23 +530,248 @@ class Package(abc.ABC):
             result.update(self._auxiliary_data)
         return result
 
-    def remove_nans_from_dataset(self):
-        for key, value in self.dataset.items():
-            if isinstance(value, xr.core.dataarray.DataArray):
-                if isinstance(value.values[()], numbers.Number):
-                    if math.isnan(value.values[()]):
-                        self.dataset[key] = None
+    def copy(self) -> Any:
+        # All state should be contained in the dataset.
+        return type(self)(**self.dataset.copy())
+
+    @staticmethod
+    def _clip_repeat_stress(
+        repeat_stress: xr.DataArray,
+        time,
+        time_start,
+        time_end,
+    ):
+        """
+        Selection may remove the original data which are repeated.
+        These should be re-inserted at the first occuring "key".
+        Next, remove these keys as they've been "promoted" to regular
+        timestamps with data.
+        """
+        # First, "pop" and filter.
+        keys, values = repeat_stress.values.T
+        keep = (keys >= time_start) & (keys <= time_end)
+        new_keys = keys[keep]
+        new_values = values[keep]
+        # Now detect which "value" entries have gone missing
+        insert_values, index = np.unique(new_values, return_index=True)
+        insert_keys = new_keys[index]
+        # Setup indexer
+        indexer = xr.DataArray(
+            data=np.arange(time.size),
+            coords={"time": time},
+            dims=("time",),
+        ).sel(time=insert_values)
+        indexer["time"] = insert_keys
+
+        # Update the key-value pairs. Discard keys that have been "promoted".
+        keep = np.in1d(new_keys, insert_keys, assume_unique=True, invert=True)
+        new_keys = new_keys[keep]
+        new_values = new_values[keep]
+        # Set the values to their new source.
+        new_values = insert_keys[np.searchsorted(insert_values, new_values)]
+        repeat_stress = xr.DataArray(
+            data=np.column_stack((new_keys, new_values)),
+            dims=("repeat", "repeat_items"),
+        )
+        return indexer, repeat_stress
+
+    @staticmethod
+    def _clip_time_indexer(
+        time,
+        time_start,
+        time_end,
+    ):
+        original = xr.DataArray(
+            data=np.arange(time.size),
+            coords={"time": time},
+            dims=("time",),
+        )
+        indexer = original.sel(time=slice(time_start, time_end))
+
+        # The selection might return a 0-sized dimension.
+        if indexer.size > 0:
+            first_time = indexer["time"].values[0]
+        else:
+            first_time = None
+
+        # If the first time matches exactly, xarray will have done thing we
+        # wanted and our work with the time dimension is finished.
+        if time_start != first_time:
+            # If the first time is before the original time, we need to
+            # backfill; otherwise, we need to ffill the first timestamp.
+            if time_start < time[0]:
+                method = "bfill"
+            else:
+                method = "ffill"
+            # Index with a list rather than a scalar to preserve the time
+            # dimension.
+            first = original.sel(time=[time_start], method=method)
+            first["time"] = [time_start]
+            indexer = xr.concat([first, indexer], dim="time")
+
+        return indexer
+
+    def clip_box(
+        self,
+        time_min=None,
+        time_max=None,
+        layer_min=None,
+        layer_max=None,
+        x_min=None,
+        x_max=None,
+        y_min=None,
+        y_max=None,
+    ) -> "Package":
+        """
+        Clip a package by a bounding box (time, layer, y, x).
+
+        Slicing intervals may be half-bounded, by providing None:
+
+        * To select 500.0 <= x <= 1000.0:
+          ``clip_box(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
+          or ``clip_box(x_max=1000.0)``.
+        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
+          or ``clip_box(x_min=1000.0)``.
+
+        Parameters
+        ----------
+        time_min: optional
+        time_max: optional
+        layer_min: optional, int
+        layer_max: optional, int
+        x_min: optional, float
+        x_min: optional, float
+        y_max: optional, float
+        y_max: optional, float
+
+        Returns
+        -------
+        clipped: Package
+        """
+        selection = self.dataset
+        if "time" in selection:
+            time = selection["time"].values
+            use_cftime = isinstance(time[0], cftime.datetime)
+            time_start = imod.wq.timeutil.to_datetime(time_min, use_cftime)
+            time_end = imod.wq.timeutil.to_datetime(time_max, use_cftime)
+
+            indexer = self._clip_time_indexer(
+                time=time,
+                time_start=time_start,
+                time_end=time_end,
+            )
+
+            if "repeat_stress" in selection.data_vars and self._valid(
+                selection["repeat_stress"].values[()]
+            ):
+                repeat_indexer, repeat_stress = self._clip_repeat_stress(
+                    repeat_stress=selection["repeat_stress"],
+                    time=time,
+                    time_start=time_start,
+                    time_end=time_end,
+                )
+                selection = selection.drop_vars("repeat_stress")
+                selection["repeat_stress"] = repeat_stress
+                indexer = repeat_indexer.combine_first(indexer).astype(int)
+
+            selection = selection.drop_vars("time").isel(time=indexer)
+
+        if "layer" in selection.coords:
+            layer_slice = slice(layer_min, layer_max)
+            # Cannot select if it's not a dimension!
+            if "layer" not in selection.dims:
+                selection = (
+                    selection.expand_dims("layer")
+                    .sel(layer=layer_slice)
+                    .squeeze("layer")
+                )
+            else:
+                selection = selection.sel(layer=layer_slice)
+
+        x_slice = slice(x_min, x_max)
+        y_slice = slice(y_min, y_max)
+        if isinstance(selection, xu.UgridDataset):
+            selection = selection.ugrid.sel(x=x_slice, y=y_slice)
+        elif ("x" in selection.coords) and ("y" in selection.coords):
+            if selection.indexes["y"].is_monotonic_decreasing:
+                y_slice = slice(y_max, y_min)
+            selection = selection.sel(x=x_slice, y=y_slice)
+
+        cls = type(self)
+        new = cls.__new__(cls)
+        new.dataset = selection
+        return new
+
+    def mask(self, domain: xr.DataArray) -> Any:
+        """
+        Mask values outside of domain.
+
+        Floating values outside of the condition are set to NaN (nodata).
+        Integer values outside of the condition are set to 0 (inactive in
+        MODFLOW terms).
+
+        Parameters
+        ----------
+        domain: xr.DataArray of bools
+            The condition. Preserve values where True, discard where False.
+
+        Returns
+        -------
+        masked: Package
+            The package with part masked.
+        """
+        masked = {}
+        for var, da in self.dataset.data_vars.items():
+            if set(domain.dims).issubset(da.dims):
+                # Check if this should be: np.issubdtype(da.dtype, np.floating)
+                if issubclass(da.dtype, numbers.Real):
+                    masked[var] = da.where(domain, other=np.nan)
+                elif issubclass(da.dtype, numbers.Integral):
+                    masked[var] = da.where(domain, other=0)
+                else:
+                    raise TypeError(
+                        f"Expected dtype float or integer. Received instead: {da.dtype}"
+                    )
+            else:
+                masked[var] = da
+
+        return type(self)(**masked)
 
 
 class BoundaryCondition(Package, abc.ABC):
     """
-    BoundaryCondition is used to share methods for specific stress packages with a time component.
+    BoundaryCondition is used to share methods for specific stress packages
+    with a time component.
 
-    It is not meant to be used directly, only to inherit from, to implement new packages.
+    It is not meant to be used directly, only to inherit from, to implement new
+    packages.
 
-    This class only supports `list input <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=19>`_,
+    This class only supports `list input
+    <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=19>`_,
     not the array input which is used in :class:`Package`.
     """
+
+    def set_repeat_stress(self, times) -> None:
+        """
+        Set repeat stresses: re-use data of earlier periods.
+
+        Parameters
+        ----------
+        times: Dict of datetime-like to datetime-like.
+            The data of the value datetime is used for the key datetime.
+        """
+        keys = [
+            imod.wq.timeutil.to_datetime(key, use_cftime=False) for key in times.keys()
+        ]
+        values = [
+            imod.wq.timeutil.to_datetime(value, use_cftime=False)
+            for value in times.values()
+        ]
+        self.dataset["repeat_stress"] = xr.DataArray(
+            data=np.column_stack((keys, values)),
+            dims=("repeat", "repeat_items"),
+        )
 
     def _max_active_n(self):
         """
@@ -572,6 +810,8 @@ class BoundaryCondition(Package, abc.ABC):
             self._write_textfile(outpath, sparse_data)
 
     def period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
+        pkg_directory = pathlib.Path(directory.stem) / pkgname
+
         if binary:
             ext = "bin"
         else:
@@ -581,12 +821,24 @@ class BoundaryCondition(Package, abc.ABC):
         if "time" in bin_ds:  # one of bin_ds has time
             package_times = bin_ds.coords["time"].values
             starts = np.searchsorted(globaltimes, package_times) + 1
-            for i, s in enumerate(starts):
-                path = directory / pkgname / f"{self._pkg_id}-{i}.{ext}"
-                periods[s] = path.as_posix()
+            for i, start in enumerate(starts):
+                path = pkg_directory / f"{self._pkg_id}-{i}.{ext}"
+                periods[start] = path.as_posix()
+
+            repeat_stress = self.dataset.get("repeat_stress")
+            if repeat_stress is not None and repeat_stress.values[()] is not None:
+                keys = repeat_stress.isel(repeat_items=0).values
+                values = repeat_stress.isel(repeat_items=1).values
+                repeat_starts = np.searchsorted(globaltimes, keys) + 1
+                values_index = np.searchsorted(globaltimes, values) + 1
+                for i, start in zip(values_index, repeat_starts):
+                    periods[start] = periods[i]
+                # Now make sure the periods are sorted by key.
+                periods = dict(sorted(periods.items()))
         else:
-            path = directory / pkgname / f"{self._pkg_id}.{ext}"
+            path = pkg_directory / f"{self._pkg_id}.{ext}"
             periods[1] = path.as_posix()
+
         return periods
 
     def get_options(self, d, not_options=None):

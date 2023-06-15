@@ -6,8 +6,73 @@ All notable changes to this project will be documented in this file.
 The format is based on `Keep a Changelog`_, and this project adheres to
 `Semantic Versioning`_.
 
+
 [Unreleased]
 ------------
+
+Fixed
+~~~~~
+
+- :meth:`imod.mf6.Simulation._validate` now print all validation errors for all
+  models and packages in one message.
+
+
+[0.13.1] - 2023-05-05
+---------------------
+
+Added
+~~~~~
+
+- :class:`imod.mf6.SpecificStorage` and :class:`imod.mf6.StorageCoefficient` 
+  now have a ``save_flow`` argument.
+
+Fixed
+~~~~~
+
+- :func:`imod.mf6.open_cbc` can now read storage fluxes without error.
+
+
+[0.13.0] - 2023-05-02
+---------------------
+
+Added
+~~~~~
+
+- :class:`imod.mf6.OutputControl` now takes parameters ``head_file``,
+  ``concentration_file``, and ``budget_file`` to specify where to store
+  MODFLOW6 output files.
+- :func:`imod.util.from_mdal_compliant_ugrid2d` to "restack" the variables that
+  have have been "unstacked" in :func:`imod.util.mdal_compliant_ugrid2d`.
+- Added support for the Modflow6 Lake package
+- :func:`imod.select.points_in_bounds`, :func:`imod.select.points_indices`,
+  :func:`imod.select.points_values` now support unstructured grids.
+- Added support for the Modflow 6 Lake package: :class:`imod.mf6.Lake`,
+  :class:`imod.mf6.LakeData`, :class:`imod.mf6.OutletManning`, :class:`OutletSpecified`,
+  :class:`OutletWeir`. See the examples for an application of the Lake package.
+
+Fixed
+~~~~~
+
+- :meth:`imod.wq.bas.BasicFlow.thickness` returns a DataArray with the correct
+  dimension order again. This confusingly resulted in an error when writing the
+  :class:`imod.wq.btn.BasicTransport` package.
+- Fixed bug in :class:`imod.mf6.dis.StructuredDiscretization` and
+  :class:`imod.mf6.dis.VerticesDiscretization` where 
+  ``inactive bottom above active cell`` was incorrectly raised.
+
+[0.12.0] - 2023-03-17
+---------------------
+
+Added
+~~~~~
+
+- :func:`imod.prj.read_projectfile` to read the contents of a project file into
+  a Python dictionary.
+- :func:`imod.prj.open_projectfile_data` to read/open the data that is pointed
+  to in a project file.
+- :func:`imod.gen.read_ascii` to read the geometry stored in ASCII text .gen files.
+- :class:`imod.mf6.hfb.HorizontalFlowBarrier` to support Modflow6's HFB
+  package, works well with `xugrid.snap_to_grid` function.
 
 Fixed
 ~~~~~
@@ -15,6 +80,19 @@ Fixed
 - :func:`imod.evaluate.budget.flow_velocity` now properly computes velocity by
   dividing by the porosity. Before, this function computed the Darcian velocity.
 
+Changed
+~~~~~~~
+
+- :func:`imod.ipf.save` will error on duplicate IDs for associated files if a
+  ``"layer"`` column is present. As a dataframe is automatically broken down
+  into a single IPF per layer, associated files for the first layer would be
+  overwritten by the second, and so forth.
+- :meth:`imod.wq.Well.save` will now write time varying data to associated
+  files for extration rate and concentration.
+- Choosing ``method="geometric_mean"`` in the Regridder will now result in NaN
+  values in the regridded result if a geometric mean is computed over negative
+  values; in general, a geometric mean should only be computed over physical
+  quantities with a "true zero" (e.g. conductivity, but not elevation).
 
 [0.11.6] - 2023-02-01
 ---------------------
@@ -26,7 +104,6 @@ Added
   :meth:`imod.couplers.metamod.MetaMod.write` named ``modflow6_write_kwargs``,
   which can be used to provide keyword arguments to the writing of the Modflow 6
   Simulation.
-
 
 Fixed
 ~~~~~
@@ -42,8 +119,8 @@ Fixed
 
 - :meth:`imod.mf6.Modflow6Simulation.write` with ``binary=False`` no longer
   results in invalid MODFLOW6 input for 2D grid data, such as DIS top.
-- :meth:`imod.flow.ImodflowModel.write` no longer writes incorrect projectfiles
-  for non-grid values with a time and layer dimension.
+- :meth:`imod.flow.ImodflowModel.write` no longer writes incorrect project
+  files for non-grid values with a time and layer dimension.
 - :func:`imod.evaluate.interpolate_value_boundaries`: Fix edge case when
   successive values in z direction are exactly equal to the boundary value.
 

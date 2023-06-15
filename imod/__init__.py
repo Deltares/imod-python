@@ -6,18 +6,16 @@ from imod import (
     data,
     evaluate,
     flow,
-    gen,
-    idf,
-    ipf,
     mf6,
     msw,
     prepare,
-    rasterio,
     select,
+    testing,
     util,
     visualize,
     wq,
 )
+from imod.formats import gen, idf, ipf, prj, rasterio
 
 # version
 try:

@@ -88,6 +88,6 @@ def circle() -> xu.Ugrid2d:
     fname_triangles = REGISTRY.fetch("circle-triangles.txt")
 
     nodes = np.loadtxt(fname_nodes)
-    triangles = np.loadtxt(fname_triangles, dtype=np.int32)
+    triangles = np.loadtxt(fname_triangles).astype(np.int32)
 
     return xu.Ugrid2d(*nodes.T, -1, triangles)

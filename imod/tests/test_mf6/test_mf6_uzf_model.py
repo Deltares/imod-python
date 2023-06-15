@@ -120,7 +120,7 @@ def uzf_model():
     # Create initial conditions
     shd = -2.0
 
-    gwf_model["ic"] = imod.mf6.InitialConditions(head=shd)
+    gwf_model["ic"] = imod.mf6.InitialConditions(start=shd)
 
     # Storage
     gwf_model["sto"] = imod.mf6.SpecificStorage(1e-5, 0.1, True, 0)

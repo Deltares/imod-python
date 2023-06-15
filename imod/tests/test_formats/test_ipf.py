@@ -3,6 +3,7 @@ import pandas as pd
 import pytest
 
 from imod import ipf
+from imod.testing import assert_frame_equal
 
 
 @pytest.fixture(scope="module")
@@ -180,7 +181,7 @@ def test_write_assoc_itype1(tmp_path):
     _, first_df = list(df.groupby("id"))[0]
     ipf.write_assoc(tmp_path / "A1.txt", first_df, itype=1, nodata=-999.0)
     df2 = ipf.read_associated(tmp_path / "A1.txt")
-    pd.testing.assert_frame_equal(first_df, df2, check_like=True)
+    assert_frame_equal(first_df, df2, check_like=True)
     # check quoting, to prevent imod separator confusion
     with open(tmp_path / "A1.txt") as io:
         lastline = io.readlines()[-1].rstrip()
@@ -201,7 +202,7 @@ def test_write_assoc_itype2(tmp_path):
     _, first_df = list(df.groupby("id"))[0]
     ipf.write_assoc(tmp_path / "A1.txt", first_df, itype=2, nodata=-999.0)
     df2 = ipf.read_associated(tmp_path / "A1.txt")
-    pd.testing.assert_frame_equal(first_df, df2, check_like=True)
+    assert_frame_equal(first_df, df2, check_like=True)
 
 
 def test_write(tmp_path):
@@ -215,7 +216,7 @@ def test_write(tmp_path):
     )
     ipf.write(tmp_path / "basic.ipf", df)
     df2 = ipf.read(tmp_path / "basic.ipf")
-    pd.testing.assert_frame_equal(df, df2, check_like=True)
+    assert_frame_equal(df, df2, check_like=True)
 
 
 def test_lower_dataframe_colnames():
@@ -267,7 +268,7 @@ def test_save__assoc_itype1(tmp_path):
     df = df.sort_values(by="x")
     df2.index = df.index
     df2 = df2.sort_values(by="x")
-    pd.testing.assert_frame_equal(df, df2, check_like=True)
+    assert_frame_equal(df, df2, check_like=True)
 
 
 def test_save__assoc_itype2_(tmp_path):
@@ -290,7 +291,7 @@ def test_save__assoc_itype2_(tmp_path):
     df = df.sort_values(by="x")
     df2 = df2.sort_values(by="x")
     df2.index = df.index
-    pd.testing.assert_frame_equal(df, df2, check_like=True)
+    assert_frame_equal(df, df2, check_like=True)
 
 
 def test_save__assoc_itype1__layers(tmp_path):
@@ -319,17 +320,17 @@ def test_save__assoc_itype1__layers(tmp_path):
     ipf.save(tmp_path / "save.ipf", df, itype=1, nodata=-999.0)
     assert (tmp_path / "save_l1.ipf").exists()
     assert (tmp_path / "save_l3.ipf").exists()
-    assert (tmp_path / "layer1" / "A1.txt").exists()
-    assert (tmp_path / "layer1" / "B2.txt").exists()
-    assert (tmp_path / "layer3" / "C3.txt").exists()
-    assert (tmp_path / "layer3" / "D4.txt").exists()
+    assert (tmp_path / "A1.txt").exists()
+    assert (tmp_path / "B2.txt").exists()
+    assert (tmp_path / "C3.txt").exists()
+    assert (tmp_path / "D4.txt").exists()
     df2 = ipf.read(tmp_path / "save_l*.ipf")
     df = df.sort_values(by="x")
     df2 = df2.sort_values(by="x")
     df2.index = df.index
     # Skip checking the ID column: the layer is inserted
     columns = [col for col in df.columns if col != "id"]
-    pd.testing.assert_frame_equal(df[columns], df2[columns], check_like=True)
+    assert_frame_equal(df[columns], df2[columns], check_like=True)
 
 
 def test_save__missing(nodata_ipf):
@@ -413,10 +414,36 @@ def test_save__assoc_itype1__layers__integerID(tmp_path):
     ipf.save(tmp_path / "save.ipf", df, itype=1, nodata=-999.0)
     assert (tmp_path / "save_l1.ipf").exists()
     assert (tmp_path / "save_l3.ipf").exists()
-    assert (tmp_path / "layer1" / "1.txt").exists()
-    assert (tmp_path / "layer1" / "2.txt").exists()
-    assert (tmp_path / "layer3" / "3.txt").exists()
-    assert (tmp_path / "layer3" / "4.txt").exists()
+    assert (tmp_path / "1.txt").exists()
+    assert (tmp_path / "2.txt").exists()
+    assert (tmp_path / "3.txt").exists()
+    assert (tmp_path / "4.txt").exists()
+
+
+def test_unique_ids_per_layer(tmp_path):
+    # Without time
+    df = pd.DataFrame.from_dict(
+        {
+            "x": [1, 1, 2, 2],
+            "y": [3, 3, 4, 4],
+            "id": [1, 1, 2, 2],
+            "level": [0.1, 0.2, 0.3, 0.4],
+            "layer": [1, 3, 1, 3],
+        }
+    )
+    with pytest.raises(
+        ValueError,
+        match="Multiple layer values for a single ID detected. Unique IDs are required for each layer.",
+    ):
+        ipf.save(tmp_path / "save.ipf", df, nodata=-999.0)
+
+    # With time
+    df["time"] = pd.to_datetime("2000-01-01")
+    with pytest.raises(
+        ValueError,
+        match="Multiple layer values for a single ID detected. Unique IDs are required for each layer.",
+    ):
+        ipf.save(tmp_path / "save.ipf", df, nodata=-999.0)
 
 
 def test_quoting(tmp_path):
@@ -471,4 +498,4 @@ def test_alternative_quotes_assoc(tmp_path):
     )
 
     assoc_df = ipf.read_associated(path, kwargs={"quotechar": "'"})
-    pd.testing.assert_frame_equal(assoc_df, expected, check_like=True)
+    assert_frame_equal(assoc_df, expected, check_like=True)

@@ -15,15 +15,15 @@ import inspect
 
 import numpy as np
 import pytest
-import xarray as xr
 
 import imod
 from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition, Package
+from imod.tests.fixtures.package_instance_creation import ALL_PACKAGE_INSTANCES
 
 ALL_PACKAGES = [
     item
-    for _, item in inspect.getmembers(imod.mf6)
-    if inspect.isclass(item) and issubclass(item, Package)
+    for _, item in inspect.getmembers(imod.mf6, inspect.isclass)
+    if issubclass(item, Package)
 ]
 PACKAGES = [x for x in ALL_PACKAGES if not issubclass(x, BoundaryCondition)]
 BOUNDARY_PACKAGES = [
@@ -35,71 +35,8 @@ ADV_BOUNDARY_PACKAGES = [
     x for x in ALL_PACKAGES if issubclass(x, AdvancedBoundaryCondition)
 ]
 
-PACKAGE_ATTRIBUTES = {
-    "_abc_impl",
-    "_pkg_id",
-    "_template",
-    "_keyword_map",
-    "_metadata_dict",
-    "_init_schemata",
-    "_write_schemata",
-    "_grid_data",
-    "dataset",
-}
-BOUNDARY_ATTRIBUTES = PACKAGE_ATTRIBUTES.union({"_period_data", "_auxiliary_data"})
-ADV_BOUNDARY_ATTRIBUTES = BOUNDARY_ATTRIBUTES.union({"_package_data"})
 
-
-def get_darray(dtype):
-    """
-    helper function for creating an xarray dataset of a given type
-    """
-    shape = nlay, nrow, ncol = 3, 9, 9
-    dx = 10.0
-    dy = -10.0
-    xmin = 0.0
-    xmax = dx * ncol
-    ymin = 0.0
-    ymax = abs(dy) * nrow
-    dims = ("layer", "y", "x")
-
-    layer = np.arange(1, nlay + 1)
-    y = np.arange(ymax, ymin, dy) + 0.5 * dy
-    x = np.arange(xmin, xmax, dx) + 0.5 * dx
-    coords = {"layer": layer, "y": y, "x": x}
-
-    da = xr.DataArray(np.ones(shape, dtype=dtype), coords=coords, dims=dims)
-    return da
-
-
-ALL_INSTANCES = [
-    imod.mf6.AdvectionUpstream(),
-    imod.mf6.AdvectionCentral(),
-    imod.mf6.AdvectionTVD(),
-    imod.mf6.Buoyancy(
-        reference_density=1000.0,
-        reference_concentration=[4.0, 25.0],
-        density_concentration_slope=[0.7, -0.375],
-        modelname=["gwt-1", "gwt-2"],
-        species=["salinity", "temperature"],
-    ),
-    imod.mf6.StructuredDiscretization(
-        2.0, get_darray(np.float32), get_darray(np.int32)
-    ),
-    # TODO: VerticesDiscretization(),
-    imod.mf6.Dispersion(1e-4, 10.0, 10.0, 5.0, 2.0, 4.0, False, True),
-    imod.mf6.InitialConditions(start=get_darray(np.float32)),
-    imod.mf6.SolutionPresetSimple(["gwf-1"]),
-    imod.mf6.MobileStorageTransfer(0.35, 0.01, 0.02, 1300.0, 0.1),
-    imod.mf6.NodePropertyFlow(get_darray(np.int32), 3.0, True, 32.0, 34.0, 7),
-    # TODO imod.mf6.OutputControl(),
-    imod.mf6.SpecificStorage(0.001, 0.1, True, get_darray(np.int32)),
-    imod.mf6.StorageCoefficient(0.001, 0.1, True, get_darray(np.int32)),
-    # TODO imod.mf6.TimeDiscretization(10.0, 23, 1.02),
-]
-
-
-def check_attributes(pkg_class, allowed_attributes):
+def check_attributes(pkg_class):
     class_attributes = set(
         [
             name
@@ -111,39 +48,43 @@ def check_attributes(pkg_class, allowed_attributes):
     assert "_pkg_id" in class_attributes
     # TODO: check for metadata/schema
 
-    difference = class_attributes.difference(allowed_attributes)
-    if len(difference) > 0:
-        print(
-            f"class {pkg_class.__name__} has a nonstandard class attributes: {difference}"
-        )
-        assert False
-
 
 @pytest.mark.parametrize("pkg_class", PACKAGES)
 def test_package_class_attributes(pkg_class):
-    check_attributes(pkg_class, PACKAGE_ATTRIBUTES)
+    check_attributes(pkg_class)
 
 
 @pytest.mark.parametrize("pkg_class", BOUNDARY_PACKAGES)
 def test_boundary_class_attributes(pkg_class):
-    check_attributes(pkg_class, BOUNDARY_ATTRIBUTES)
+    check_attributes(pkg_class)
 
 
 @pytest.mark.parametrize("pkg_class", ADV_BOUNDARY_PACKAGES)
 def test_adv_boundary_class_attributes(pkg_class):
-    check_attributes(pkg_class, ADV_BOUNDARY_ATTRIBUTES)
+    check_attributes(pkg_class)
 
 
-@pytest.mark.parametrize("instance", ALL_INSTANCES)
+@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
 def test_render_twice(instance, tmp_path):
     globaltimes = [np.datetime64("2000-01-01")]
     modeldir = tmp_path / "testdir"
-    text1 = instance.render(modeldir, "test", globaltimes, False)
-    text2 = instance.render(modeldir, "test", globaltimes, False)
+
+    sig = inspect.signature(instance.render)
+    if len(sig.parameters) == 0:
+        text1 = instance.render()
+        text2 = instance.render()
+    elif len(sig.parameters) == 3:
+        text1 = instance.render(modeldir, "test", False)
+        text2 = instance.render(modeldir, "test", False)
+    elif len(sig.parameters) == 4:
+        text1 = instance.render(modeldir, "test", globaltimes, False)
+        text2 = instance.render(modeldir, "test", globaltimes, False)
+    else:
+        assert False  # unexpected nr of arguments
     assert text1 == text2
 
 
-@pytest.mark.parametrize("instance", ALL_INSTANCES)
+@pytest.mark.parametrize("instance", ALL_PACKAGE_INSTANCES)
 def test_save_and_load(instance, tmp_path):
     pkg_class = type(instance)
     path = tmp_path / f"{instance._pkg_id}.nc"

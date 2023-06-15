@@ -105,7 +105,7 @@ gwf_model["sto"] = imod.mf6.SpecificStorage(
     transient=False,
     convertible=0,
 )
-gwf_model["ic"] = imod.mf6.InitialConditions(head=0.0)
+gwf_model["ic"] = imod.mf6.InitialConditions(start=0.0)
 gwf_model["oc"] = imod.mf6.OutputControl(save_head="last", save_budget="last")
 
 # %%

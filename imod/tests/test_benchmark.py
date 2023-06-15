@@ -150,7 +150,7 @@ def setup_mf6_basic_simulation_imod():
         top=0.0, bottom=bottom, idomain=idomain
     )
     gwf_model["chd"] = imod.mf6.ConstantHead(head, save_flows=True)
-    gwf_model["ic"] = imod.mf6.InitialConditions(head=100.0)
+    gwf_model["ic"] = imod.mf6.InitialConditions(start=100.0)
     gwf_model["npf"] = imod.mf6.NodePropertyFlow(icelltype=1, k=k, save_flows=True)
     gwf_model["oc"] = imod.mf6.OutputControl(save_head="last", save_budget="last")
     gwf_model["sto"] = imod.mf6.SpecificStorage(

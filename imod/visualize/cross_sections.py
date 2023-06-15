@@ -158,6 +158,7 @@ def cross_section(
     kwargs_pcolormesh : dict
         Other optional keyword arguments for matplotlib.pcolormesh.
     kwargs_colorbar : dict
+        If optional key ``plot_colorbar`` is set to False, no colorbar is drawn. Defaults to True.
         Optional keyword argument ``whiten_triangles`` whitens respective colorbar triangle if
         data is not larger/smaller than legend_levels-range. Defaults to True.
         Other arguments are forwarded to fig.colorbar()
@@ -230,8 +231,10 @@ def cross_section(
             pass
 
     whiten_triangles = True
+    plot_colorbar = True
     if kwargs_colorbar is not None:
         whiten_triangles = kwargs_colorbar.pop("whiten_triangles", True)
+        plot_colorbar = kwargs_colorbar.pop("plot_colorbar", True)
         settings_cbar.update(kwargs_colorbar)
 
     # pcmesh kwargs
@@ -265,9 +268,10 @@ def cross_section(
             ax1.cmap.set_under("#FFFFFF")
 
     # Add colorbar
-    divider = make_axes_locatable(ax)
-    cbar_ax = divider.append_axes("right", size="5%", pad="5%")
-    fig.colorbar(ax1, cax=cbar_ax, **settings_cbar)
+    if plot_colorbar:
+        divider = make_axes_locatable(ax)
+        cbar_ax = divider.append_axes("right", size="5%", pad="5%")
+        fig.colorbar(ax1, cax=cbar_ax, **settings_cbar)
 
     if not return_cmap_norm:
         return fig, ax

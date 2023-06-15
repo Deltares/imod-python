@@ -51,6 +51,14 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
         provided in the wrong manner. Defaults to True.
+    repeat_stress: Optional[xr.DataArray] of datetimes
+        Used to repeat data for e.g. repeating stress periods such as
+        seasonality without duplicating the values. The DataArray should have
+        dimensions ``("repeat", "repeat_items")``. The ``repeat_items``
+        dimension should have size 2: the first value is the "key", the second
+        value is the "value". For the "key" datetime, the data of the "value"
+        datetime will be used. Can also be set with a dictionary using the
+        ``set_repeat_stress`` method.
     """
 
     _pkg_id = "wel"
@@ -82,6 +90,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         save_flows=False,
         observations=None,
         validate: bool = True,
+        repeat_stress=None,
     ):
         super().__init__()
         self.dataset["layer"] = self.assign_dims(layer)
@@ -92,6 +101,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+        self.dataset["repeat_stress"] = repeat_stress
 
         if concentration is not None:
             self.dataset["concentration"] = concentration
@@ -99,6 +109,60 @@ class WellDisStructured(DisStructuredBoundaryCondition):
             self.add_periodic_auxiliary_variable()
 
         self._validate_init_schemata(validate)
+
+    def clip_box(
+        self,
+        time_min=None,
+        time_max=None,
+        layer_min=None,
+        layer_max=None,
+        x_min=None,
+        x_max=None,
+        y_min=None,
+        y_max=None,
+    ) -> "WellDisStructured":
+        """
+        Clip a package by a bounding box (time, layer, y, x).
+
+        Slicing intervals may be half-bounded, by providing None:
+
+        * To select 500.0 <= x <= 1000.0:
+          ``clip_box(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
+          or ``clip_box(x_max=1000.0)``.
+        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
+          or ``clip_box(x_min=1000.0)``.
+
+        Parameters
+        ----------
+        time_min: optional
+        time_max: optional
+        layer_min: optional, int
+        layer_max: optional, int
+        x_min: optional, float
+        x_min: optional, float
+        y_max: optional, float
+        y_max: optional, float
+
+        Returns
+        -------
+        sliced : Package
+        """
+        # TODO: include x and y values.
+        for arg in (
+            layer_min,
+            layer_max,
+            x_min,
+            x_max,
+            y_min,
+            y_max,
+        ):
+            if arg is not None:
+                raise NotImplementedError("Can only clip_box in time for Well packages")
+
+        # The super method will select in the time dimension without issues.
+        new = super().clip_box(time_min=time_min, time_max=time_max)
+        return new
 
 
 class WellDisVertices(DisVerticesBoundaryCondition):
@@ -186,3 +250,57 @@ class WellDisVertices(DisVerticesBoundaryCondition):
             self.add_periodic_auxiliary_variable()
 
         self._validate_init_schemata(validate)
+
+    def clip_box(
+        self,
+        time_min=None,
+        time_max=None,
+        layer_min=None,
+        layer_max=None,
+        x_min=None,
+        x_max=None,
+        y_min=None,
+        y_max=None,
+    ) -> "WellDisStructured":
+        """
+        Clip a package by a bounding box (time, layer, y, x).
+
+        Slicing intervals may be half-bounded, by providing None:
+
+        * To select 500.0 <= x <= 1000.0:
+          ``clip_box(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
+          or ``clip_box(x_max=1000.0)``.
+        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
+          or ``clip_box(x_min=1000.0)``.
+
+        Parameters
+        ----------
+        time_min: optional
+        time_max: optional
+        layer_min: optional, int
+        layer_max: optional, int
+        x_min: optional, float
+        x_min: optional, float
+        y_max: optional, float
+        y_max: optional, float
+
+        Returns
+        -------
+        clipped: Package
+        """
+        # TODO: include x and y values.
+        for arg in (
+            layer_min,
+            layer_max,
+            x_min,
+            x_max,
+            y_min,
+            y_max,
+        ):
+            if arg is not None:
+                raise NotImplementedError("Can only clip_box in time for Well packages")
+
+        # The super method will select in the time dimension without issues.
+        new = super().clip_box(time_min=time_min, time_max=time_max)
+        return new

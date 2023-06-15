@@ -51,6 +51,14 @@ class Drainage(BoundaryCondition):
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
         provided in the wrong manner. Defaults to True.
+    repeat_stress: Optional[xr.DataArray] of datetimes
+        Used to repeat data for e.g. repeating stress periods such as
+        seasonality without duplicating the values. The DataArray should have
+        dimensions ``("repeat", "repeat_items")``. The ``repeat_items``
+        dimension should have size 2: the first value is the "key", the second
+        value is the "value". For the "key" datetime, the data of the "value"
+        datetime will be used. Can also be set with a dictionary using the
+        ``set_repeat_stress`` method.
     """
 
     _pkg_id = "drn"
@@ -97,6 +105,7 @@ class Drainage(BoundaryCondition):
         save_flows=False,
         observations=None,
         validate: bool = True,
+        repeat_stress=None,
     ):
         super().__init__(locals())
         self.dataset["elevation"] = elevation
@@ -109,6 +118,7 @@ class Drainage(BoundaryCondition):
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
+        self.dataset["repeat_stress"] = repeat_stress
         self._validate_init_schemata(validate)
 
     def _validate(self, schemata, **kwargs):

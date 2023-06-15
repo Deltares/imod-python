@@ -1,9 +1,13 @@
+import abc
+import pathlib
+
 import numpy as np
 
 from imod.mf6.pkgbase import Package
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
+    DimsSchema,
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
@@ -19,7 +23,48 @@ class Storage(Package):
         )
 
 
-class SpecificStorage(Package):
+class StorageBase(Package, abc.ABC):
+    def get_options(self, d):
+        # Skip both variables in grid_data and "transient".
+        not_options = list(self._grid_data.keys())
+        not_options += "transient"
+
+        for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
+            if varname in not_options:
+                continue
+            v = self.dataset[varname].values[()]
+            if self._valid(v):  # skip None and False
+                d[varname] = v
+        return d
+
+    def _render_dict(self, directory, pkgname, globaltimes, binary):
+        d = {}
+        stodirectory = pathlib.Path(directory.stem) / pkgname
+        for varname in self._grid_data:
+            key = self._keyword_map.get(varname, varname)
+            layered, value = self._compose_values(
+                self[varname], stodirectory, key, binary=binary
+            )
+            if self._valid(value):  # skip False or None
+                d[f"{key}_layered"], d[key] = layered, value
+
+        periods = {}
+        if "time" in self.dataset["transient"].coords:
+            package_times = self.dataset["transient"].coords["time"].values
+            starts = np.searchsorted(globaltimes, package_times) + 1
+            for i, s in enumerate(starts):
+                periods[s] = self.dataset["transient"].isel(time=i).values[()]
+        else:
+            periods[1] = self.dataset["transient"].values[()]
+
+        d["periods"] = periods
+
+        d = self.get_options(d)
+
+        return d
+
+
+class SpecificStorage(StorageBase):
     """
     Storage Package with specific storage.
 
@@ -42,14 +87,21 @@ class SpecificStorage(Package):
         Is specific yield. Specific yield values must be greater than or
         equal to 0. Specific yield does not have to be specified if there are no
         convertible cells (convertible=0 in every cell). (sy)
+    transient: ({True, False})
+        Boolean to indicate if the model is transient or steady-state.
     convertible: array of int (xr.DataArray)
         Is a flag for each cell that specifies whether or not a cell is
         convertible for the storage calculation. 0 indicates confined storage is
         used. >0 indicates confined storage is used when head is above cell top
         and a mixed formulation of unconfined and confined storage is used when
         head is below cell top. (iconvert)
-    transient: ({True, False})
-        Boolean to indicate if the model is transient or steady-state.
+    save_flows: ({True, False}, optional)
+        Indicates that storage flow terms will be written to the file specified
+        with "BUDGET FILEOUT" in Output Control. Default is False.
+    validate: {True, False}
+        Flag to indicate whether the package should be validated upon
+        initialization. This raises a ValidationError if package input is
+        provided in the wrong manner. Defaults to True.
     """
 
     _pkg_id = "sto"
@@ -65,21 +117,22 @@ class SpecificStorage(Package):
     }
 
     _init_schemata = {
-        "convertible": [
+        "convertible": (
             DTypeSchema(np.integer),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
-        ],
-        "specific_storage": [
+        ),
+        "specific_storage": (
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
-        ],
-        "specific_yield": [
+        ),
+        "specific_yield": (
             DTypeSchema(np.floating),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
-        ],
+        ),
+        "save_flows": (DTypeSchema(np.bool_), DimsSchema()),
     }
 
     _write_schemata = {
@@ -105,6 +158,7 @@ class SpecificStorage(Package):
         specific_yield,
         transient,
         convertible,
+        save_flows: bool = False,
         validate: bool = True,
     ):
         super().__init__(locals())
@@ -112,35 +166,15 @@ class SpecificStorage(Package):
         self.dataset["specific_yield"] = specific_yield
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
-
+        self.dataset["save_flows"] = save_flows
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
-        stodirectory = directory / "sto"
-        for varname in ["specific_storage", "specific_yield", "convertible"]:
-            key = self._keyword_map.get(varname, varname)
-            layered, value = self._compose_values(
-                self[varname], stodirectory, key, binary=binary
-            )
-            if self._valid(value):  # skip False or None
-                d[f"{key}_layered"], d[key] = layered, value
-
-        periods = {}
-        if "time" in self.dataset["transient"].coords:
-            package_times = self.dataset["transient"].coords["time"].values
-            starts = np.searchsorted(globaltimes, package_times) + 1
-            for i, s in enumerate(starts):
-                periods[s] = self.dataset["transient"].isel(time=i).values[()]
-        else:
-            periods[1] = self.dataset["transient"].values[()]
-
-        d["periods"] = periods
-
+        d = self._render_dict(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
 
-class StorageCoefficient(Package):
+class StorageCoefficient(StorageBase):
     """
     Storage Package with a storage coefficient.  Be careful,
     this is not the same as the specific storage.
@@ -174,14 +208,17 @@ class StorageCoefficient(Package):
         Is specific yield. Specific yield values must be greater than or
         equal to 0. Specific yield does not have to be specified if there are no
         convertible cells (convertible=0 in every cell). (sy)
+    transient: ({True, False})
+        Boolean to indicate if the model is transient or steady-state.
     convertible: array of int (xr.DataArray)
         Is a flag for each cell that specifies whether or not a cell is
         convertible for the storage calculation. 0 indicates confined storage is
         used. >0 indicates confined storage is used when head is above cell top
         and a mixed formulation of unconfined and confined storage is used when
         head is below cell top. (iconvert)
-    transient: ({True, False})
-        Boolean to indicate if the model is transient or steady-state.
+    save_flows: ({True, False}, optional)
+        Indicates that storage flow terms will be written to the file specified
+        with "BUDGET FILEOUT" in Output Control. Default is False.
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
@@ -201,18 +238,19 @@ class StorageCoefficient(Package):
     }
 
     _init_schemata = {
-        "convertible": [
+        "convertible": (
             DTypeSchema(np.integer),
             PKG_DIMS_SCHEMA,
-        ],
-        "storage_coefficient": [
+        ),
+        "storage_coefficient": (
             DTypeSchema(np.floating),
             PKG_DIMS_SCHEMA,
-        ],
-        "specific_yield": [
+        ),
+        "specific_yield": (
             DTypeSchema(np.floating),
             PKG_DIMS_SCHEMA,
-        ],
+        ),
+        "save_flows": (DTypeSchema(np.bool_), DimsSchema()),
     }
 
     _write_schemata = {
@@ -238,6 +276,7 @@ class StorageCoefficient(Package):
         specific_yield,
         transient,
         convertible,
+        save_flows: bool = False,
         validate: bool = True,
     ):
         super().__init__(locals())
@@ -245,29 +284,10 @@ class StorageCoefficient(Package):
         self.dataset["specific_yield"] = specific_yield
         self.dataset["convertible"] = convertible
         self.dataset["transient"] = transient
+        self.dataset["save_flows"] = save_flows
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
-        stodirectory = directory / "sto"
-        for varname in ["storage_coefficient", "specific_yield", "convertible"]:
-            key = self._keyword_map.get(varname, varname)
-            layered, value = self._compose_values(
-                self[varname], stodirectory, key, binary=binary
-            )
-            if self._valid(value):  # skip False or None
-                d[f"{key}_layered"], d[key] = layered, value
-
-        periods = {}
-        if "time" in self.dataset["transient"].coords:
-            package_times = self.dataset["transient"].coords["time"].values
-            starts = np.searchsorted(globaltimes, package_times) + 1
-            for i, s in enumerate(starts):
-                periods[s] = self.dataset["transient"].isel(time=i).values[()]
-        else:
-            periods[1] = self.dataset["transient"].values[()]
-
-        d["periods"] = periods
+        d = self._render_dict(directory, pkgname, globaltimes, binary)
         d["storagecoefficient"] = True
-
         return self._template.render(d)

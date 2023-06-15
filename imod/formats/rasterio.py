@@ -6,15 +6,13 @@ raster formats.
 Currently only :func:`imod.rasterio.write` is implemented.
 """
 
-import glob
 import pathlib
 import warnings
 
 import numpy as np
 
 from imod import util
-
-from . import array_io
+from imod.formats import array_io
 
 # since rasterio is a big dependency that is sometimes hard to install
 # and not always required, we made this an optional dependency
@@ -119,11 +117,11 @@ def _get_driver(path):
 def _limitations(riods, path):
     if riods.count != 1:
         raise NotImplementedError(
-            f"Cannot open multi-band grid: {path}. Try xarray.open_rasterio() instead."
+            f"Cannot open multi-band grid: {path}. Try rioxarray instead."
         )
     if not riods.transform.is_rectilinear:
         raise NotImplementedError(
-            f"Cannot open non-rectilinear grid: {path}. Try xarray.open_rasterio() instead."
+            f"Cannot open non-rectilinear grid: {path}. Try rioxarray instead."
         )
 
 
@@ -132,7 +130,7 @@ def header(path, pattern):
 
     # TODO:
     # Check bands, rotation, etc.
-    # Raise NotImplementedErrors and point to xr.open_rasterio
+    # Raise NotImplementedErrors and point to rioxarray.open_rasterio
     with rasterio.open(path, "r") as riods:
         _limitations(riods, path)
         attrs["nrow"] = riods.height
@@ -252,17 +250,7 @@ def open(path, use_cftime=False, pattern=None):
     remember. The website https://regex101.com is a nice help. Alternatively,
     the most pragmatic solution may be to just rename your files.
     """
-
-    if isinstance(path, list):
-        return array_io.reading._load(path, use_cftime, pattern, _read, header)
-    elif isinstance(path, pathlib.Path):
-        path = str(path)
-
-    paths = [pathlib.Path(p) for p in glob.glob(path)]
-    n = len(paths)
-    if n == 0:
-        raise FileNotFoundError(f"Could not find any files matching {path}")
-    return array_io.reading._load(paths, use_cftime, pattern, _read, header)
+    return array_io.reading._open(path, use_cftime, pattern, header, _read)
 
 
 def write(path, da, driver=None, nodata=np.nan, dtype=None):
@@ -294,7 +282,7 @@ def write(path, da, driver=None, nodata=np.nan, dtype=None):
     >>> imod.rasterio.write("example.asc", da)
     """
     # Not directly related to iMOD, but provides a missing link, together
-    # with xarray.open_rasterio.
+    # with xioxarray.
     # Note that this function can quickly become dstdated as
     # the xarray rasterio connection matures, see for instance:
     # https://github.com/pydata/xarray/issues/1736

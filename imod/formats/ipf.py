@@ -11,6 +11,7 @@ import glob
 import io
 import pathlib
 import warnings
+from typing import Tuple
 
 import numpy as np
 import pandas as pd
@@ -31,30 +32,10 @@ def _infer_delimwhitespace(line, ncol):
         return False
 
 
-# Maybe look at dask dataframes, if we run into very large tabular datasets:
-# http://dask.pydata.org/en/latest/examples/dataframe-csv.html
-# the simple CSV format IPF cannot be read like this, it is best to use pandas.read_csv
-def _read(path, kwargs={}, assoc_kwargs={}):
-    """
-    Read one IPF file to a single pandas.DataFrame, including associated (TXT) files.
-
-    Parameters
-    ----------
-    path: pathlib.Path or str
-        globpath for IPF files to read.
-    kwargs : dict
-        Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        IPF files (e.g. `{"delim_whitespace": True}`)
-    assoc_kwargs: dict
-        Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
-        associated (TXT) files (e.g. `{"delim_whitespace": True}`)
-
-    Returns
-    -------
-    pandas.DataFrame
-    """
-
+def _read_ipf(path, kwargs=None) -> Tuple[pd.DataFrame, int, str]:
     path = pathlib.Path(path)
+    if kwargs is None:
+        kwargs = {}
 
     with open(path) as f:
         nrow = int(f.readline().strip())
@@ -83,32 +64,58 @@ def _read(path, kwargs={}, assoc_kwargs={}):
         ipf_kwargs.update(kwargs)
         df = pd.read_csv(f, **ipf_kwargs)
 
-        # See if reading associated files is necessary
-        indexcol = int(indexcol)
-        if indexcol > 1:
-            # df = pd.read_csv(f, header=None, names=colnames, nrows=nrow, **kwargs)
-            dfs = []
-            for row in df.itertuples():
-                filename = row[indexcol]
-                # associate paths are relative to the ipf
-                path_assoc = path.parent.joinpath(f"{filename}.{ext}")
-                # Note that these kwargs handle all associated files, which might differ
-                # within an IPF. If this happens we could consider supporting a dict
-                # or function that maps assoc filenames to different kwargs.
-                try:  # Capture the error and print the offending path
-                    df_assoc = read_associated(path_assoc, assoc_kwargs)
-                except Exception as e:
-                    raise type(e)(
-                        f'{e}\nWhile reading associated file "{path_assoc}" of IPF file "{path}"'
-                    ) from e
+    return df, int(indexcol), ext
 
-                # Include records of the "mother" ipf file.
-                for name, value in zip(colnames, row[1:]):  # ignores df.index in row
-                    df_assoc[name] = value
-                # Append to list
-                dfs.append(df_assoc)
-            # Merge into a single whole
-            df = pd.concat(dfs, ignore_index=True, sort=False)
+
+def _read(path, kwargs=None, assoc_kwargs=None):
+    """
+    Read one IPF file to a single pandas.DataFrame, including associated (TXT) files.
+
+    Parameters
+    ----------
+    path: pathlib.Path or str
+        globpath for IPF files to read.
+    kwargs : dict
+        Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
+        IPF files (e.g. `{"delim_whitespace": True}`)
+    assoc_kwargs: dict
+        Dictionary containing the ``pandas.read_csv()`` keyword arguments for the
+        associated (TXT) files (e.g. `{"delim_whitespace": True}`)
+
+    Returns
+    -------
+    pandas.DataFrame
+    """
+    df, indexcol, ext = _read_ipf(path, kwargs)
+    if assoc_kwargs is None:
+        assoc_kwargs = {}
+
+    # See if reading associated files is necessary
+    if indexcol > 1:
+        colnames = df.columns
+        # df = pd.read_csv(f, header=None, names=colnames, nrows=nrow, **kwargs)
+        dfs = []
+        for row in df.itertuples():
+            filename = row[indexcol]
+            # associate paths are relative to the ipf
+            path_assoc = path.parent.joinpath(f"{filename}.{ext}")
+            # Note that these kwargs handle all associated files, which might differ
+            # within an IPF. If this happens we could consider supporting a dict
+            # or function that maps assoc filenames to different kwargs.
+            try:  # Capture the error and print the offending path
+                df_assoc = read_associated(path_assoc, assoc_kwargs)
+            except Exception as e:
+                raise type(e)(
+                    f'{e}\nWhile reading associated file "{path_assoc}" of IPF file "{path}"'
+                ) from e
+
+            # Include records of the "mother" ipf file.
+            for name, value in zip(colnames, row[1:]):  # ignores df.index in row
+                df_assoc[name] = value
+            # Append to list
+            dfs.append(df_assoc)
+        # Merge into a single whole
+        df = pd.concat(dfs, ignore_index=True, sort=False)
 
     return df
 
@@ -606,9 +613,9 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=Non
     Saves the contents of a pandas DataFrame to one or more IPF files, and
     associated (TXT) files.
 
-    Can write multiple IPF files if one of the columns is named "layer".
-    In turn, multiple associated (TXT) files may written for each of these IPF
-    files.
+    Can write multiple IPF files if one of the columns is named "layer". In
+    turn, multiple associated (TXT) files may written for each of these IPF
+    files. Note that the ID must be unique for each layer. See the examples.
 
     Parameters
     ----------
@@ -641,6 +648,23 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=Non
     -------
     None
         Writes files.
+
+    Examples
+    --------
+    To write a single IPF without associated timeseries or boreholes:
+
+    >>> imod.ipf.save("static-data.ipf", df)
+
+    To write timeseries data:
+
+    >>> imod.ipf.save("transient-data.ipf", df, itype="timeseries")
+
+    If a ``"layer"`` column is present, make sure the ID is unique per layer:
+
+    >>> df["id"] = df["id"].str.cat(df["layer"], sep="_")
+    >>> imod.ipf.save("layered.ipf", df, itype="timeseries")
+
+    An error will be raised otherwise.
     """
 
     path = pathlib.Path(path)
@@ -659,15 +683,21 @@ def save(path, df, itype=None, assoc_ext="txt", nodata=1.0e20, assoc_columns=Non
 
     df.columns = colnames
     if "layer" in colnames:
+        if "time" in colnames:
+            groupcols = ["time", "id"]
+        else:
+            groupcols = "id"
+
+        n_layer_per_id = df.groupby(groupcols)["layer"].nunique()
+        if (n_layer_per_id > 1).any():
+            raise ValueError(
+                "Multiple layer values for a single ID detected. "
+                "Unique IDs are required for each layer."
+            )
+
         for layer, group in df.groupby("layer"):
             d["layer"] = layer
             fn = util.compose(d)
-
-            # If associated files are present, make sure the different
-            # layers do not overwrite each other!
-            if itype is not None:
-                group["id"] = f"layer{layer}/" + group["id"].astype(str)
-
             _compose_ipf(fn, group, itype, assoc_ext, nodata, assoc_columns)
     else:
         fn = util.compose(d)
