@@ -3,7 +3,7 @@ import copy
 import pathlib
 import subprocess
 import warnings
-from typing import Union
+from typing import Optional, TypeAlias, Union
 
 import jinja2
 import numpy as np
@@ -20,6 +20,8 @@ from imod.mf6.model import (
 )
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.schemata import ValidationError
+
+GridDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
 
 
 class Modflow6Simulation(collections.UserDict):
@@ -316,15 +318,16 @@ class Modflow6Simulation(collections.UserDict):
 
     def clip_box(
         self,
-        time_min=None,
-        time_max=None,
-        layer_min=None,
-        layer_max=None,
-        x_min=None,
-        x_max=None,
-        y_min=None,
-        y_max=None,
-    ):
+        time_min: Optional[str] = None,
+        time_max: Optional[str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        states_for_boundary: Optional[dict[str, GridDataArray]] = None,
+    ) -> "Modflow6Simulation":
         """
         Clip a simulation by a bounding box (time, layer, y, x).
 
@@ -344,9 +347,10 @@ class Modflow6Simulation(collections.UserDict):
         layer_min: optional, int
         layer_max: optional, int
         x_min: optional, float
-        x_min: optional, float
+        x_max: optional, float
+        y_min: optional, float
         y_max: optional, float
-        y_max: optional, float
+        states_for_boundary : optional, Dict[pkg_name:str, boundary_values:Union[xr.DataArray, xu.UgridDataArray]]
 
         Returns
         -------
@@ -354,6 +358,10 @@ class Modflow6Simulation(collections.UserDict):
         """
         clipped = type(self)(name=self.name)
         for key, value in self.items():
+            state_for_boundary = (
+                None if states_for_boundary is None else states_for_boundary.get(key)
+            )
+
             clipped[key] = value.clip_box(
                 time_min=time_min,
                 time_max=time_max,
@@ -363,6 +371,7 @@ class Modflow6Simulation(collections.UserDict):
                 x_max=x_max,
                 y_min=y_min,
                 y_max=y_max,
+                state_for_boundary=state_for_boundary,
             )
         return clipped
 
