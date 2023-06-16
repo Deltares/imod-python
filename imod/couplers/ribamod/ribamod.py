@@ -26,9 +26,7 @@ class RibaMod:
     _modflow6_model_dir = "modflow6"
 
     def __init__(
-        self,
-        ribasim_model: ribasim.Model,
-        mf6_simulation: Modflow6Simulation,
+        self, ribasim_model: ribasim.Model, mf6_simulation: Modflow6Simulation
     ):
         self.ribasim_model = ribasim_model
         self.mf6_simulation = mf6_simulation
@@ -75,17 +73,12 @@ class RibaMod:
         )
         self.ribasim_model.write(directory / self._ribasim_model_dir)
 
-        # TODO
-        coupling_dict = {}
-
         # # Write exchange files
         # exchange_dir = directory / "exchanges"
         # exchange_dir.mkdir(mode=755, exist_ok=True)
         # self.write_exchanges(exchange_dir, self.mf6_rch_pkgkey, self.mf6_wel_pkgkey)
 
-        # coupling_dict = self._get_coupling_dict(
-        #     exchange_dir, self.mf6_rch_pkgkey, self.mf6_wel_pkgkey
-        # )
+        coupling_dict = self._get_coupling_dict()
 
         self.write_toml(
             directory,
@@ -140,7 +133,7 @@ class RibaMod:
                         "dll": str(ribasim_dll),
                         "dll_dep_dir": str(ribasim_dll_dependency),
                         "config_file": str(
-                            f"{self._ribasim_model_dir}/{self.ribasim_model.modelname}.toml"
+                            directory / self._ribasim_model_dir / f"{self.ribasim_model.modelname}.toml"
                         ),
                     },
                 },
@@ -162,12 +155,7 @@ class RibaMod:
         ]
 
     # TODO:
-    def _get_coupling_dict(
-        self,
-        directory: Union[str, Path],
-        mf6_rch_pkgkey: str,
-        mf6_wel_pkgkey: Optional[str],
-    ) -> dict:
+    def _get_coupling_dict(self) -> dict:
         """
         Get dictionary with names of coupler packages and paths to mappings.
 
@@ -194,6 +182,7 @@ class RibaMod:
         # Assume only one groundwater flow model
         # FUTURE: Support multiple groundwater flow models.
         coupling_dict["mf6_model"] = gwf_names[0]
+        coupling_dict["mf6_river_pkg"] = "Oosterschelde"  # FIXME
 
         return coupling_dict
 
