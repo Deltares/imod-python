@@ -4,7 +4,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Tuple, Union
+from typing import Tuple, Union
 
 import cftime
 import jinja2
@@ -22,17 +22,6 @@ from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.wel import Well
 from imod.schemata import ValidationError
-
-
-def single(dictionary: collections.UserDict, predicate: Callable[[Any], bool]):
-    """
-    returns a value in a dictionary for which the predicate is true. There should be only one such values; if there are more or none,
-    an exception is raised.
-    """
-    candidates = [item for _, item in dictionary.items() if predicate(item)]
-    if len(candidates) != 1:
-        raise RuntimeError()
-    return candidates[0]
 
 
 def initialize_template(name: str) -> Template:
@@ -181,9 +170,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def __get_k(self):
         try:
-            npf = single(self, lambda item: isinstance(item, imod.mf6.NodePropertyFlow))
+            npf = self[imod.mf6.NodePropertyFlow._pkg_id]
         except RuntimeError:
-            raise RuntimeError("expected one package of type ModePropertyFlow")
+            raise ValidationError("expected one package of type ModePropertyFlow")
 
         k = npf["k"]
         return k
