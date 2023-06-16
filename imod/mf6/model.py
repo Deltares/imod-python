@@ -1,10 +1,13 @@
+from __future__ import annotations
+
 import abc
 import collections
 import inspect
 import pathlib
 from copy import deepcopy
+from typing import List, Optional, TypeAlias, Union
 from pathlib import Path
-from typing import Tuple, Union
+
 
 import cftime
 import jinja2
@@ -17,11 +20,14 @@ from jinja2 import Template
 
 import imod
 from imod.mf6 import qgs_util
+from imod.mf6.clipped_boundary_condition_creator import ClippedBoundaryConditionCreator
 from imod.mf6.pkgbase import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.wel import Well
 from imod.schemata import ValidationError
+
+GridDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
 
 
 def initialize_template(name: str) -> Template:
@@ -326,14 +332,28 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def clip_box(
         self,
-        time_min=None,
-        time_max=None,
-        layer_min=None,
-        layer_max=None,
-        x_min=None,
-        x_max=None,
-        y_min=None,
-        y_max=None,
+        time_min: Optional[str] = None,
+        time_max: Optional[str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        state_for_boundary: Optional[GridDataArray] = None,
+    ):
+        raise NotImplementedError
+
+    def _clip_box_packages(
+        self,
+        time_min: Optional[str] = None,
+        time_max: Optional[str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
     ):
         """
         Clip a model by a bounding box (time, layer, y, x).
@@ -354,8 +374,8 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         layer_min: optional, int
         layer_max: optional, int
         x_min: optional, float
-        x_min: optional, float
-        y_max: optional, float
+        x_max: optional, float
+        y_min: optional, float
         y_max: optional, float
 
         Returns
@@ -374,6 +394,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 y_min=y_min,
                 y_max=y_max,
             )
+
         return clipped
 
     def regrid_like(
@@ -406,6 +427,10 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 )
 
         return new_model
+
+    def get_domain(self):
+        dis = self.__get_diskey()
+        return self[dis]["idomain"]
 
 
 class GroundwaterFlowModel(Modflow6Model):
@@ -477,6 +502,69 @@ class GroundwaterFlowModel(Modflow6Model):
         )
         qgs_util._write_qgis_projectfile(qgs_tree, directory / ("qgis_proj" + ext))
 
+    def clip_box(
+        self,
+        time_min: Optional[str] = None,
+        time_max: Optional[str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        state_for_boundary: Optional[GridDataArray] = None,
+    ):
+        clipped = super()._clip_box_packages(
+            time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
+        )
+
+        clipped_boundary_condition = self.__create_boundary_condition_clipped_boundary(
+            self, clipped, state_for_boundary
+        )
+        if clipped_boundary_condition is not None:
+            clipped["chd_clipped"] = clipped_boundary_condition
+
+        return clipped
+
+    def __create_boundary_condition_clipped_boundary(
+        self,
+        original_model: Modflow6Model,
+        clipped_model: Modflow6Model,
+        state_for_boundary: Optional[GridDataArray],
+    ):
+        unassigned_boundary_original_domain = (
+            self.__create_boundary_condition_for_unassigned_boundary(
+                original_model, state_for_boundary
+            )
+        )
+
+        return self.__create_boundary_condition_for_unassigned_boundary(
+            clipped_model, state_for_boundary, [unassigned_boundary_original_domain]
+        )
+
+    @staticmethod
+    def __create_boundary_condition_for_unassigned_boundary(
+        model: Modflow6Model,
+        state_for_boundary: Optional[GridDataArray],
+        additional_boundaries: Optional[List[imod.mf6.ConstantHead]] = None,
+    ):
+        if state_for_boundary is None:
+            return None
+
+        constant_head_packages = [
+            pkg for name, pkg in model.items() if isinstance(pkg, imod.mf6.ConstantHead)
+        ]
+
+        additional_boundaries = [
+            item for item in additional_boundaries or [] if item is not None
+        ]
+
+        constant_head_packages.extend(additional_boundaries)
+
+        return ClippedBoundaryConditionCreator.create(
+            model.get_domain(), state_for_boundary, constant_head_packages
+        )
+
 
 class GroundwaterTransportModel(Modflow6Model):
     """
@@ -503,3 +591,21 @@ class GroundwaterTransportModel(Modflow6Model):
         }
 
         self._template = initialize_template("gwt-nam.j2")
+
+    def clip_box(
+        self,
+        time_min: str = None,
+        time_max: str = None,
+        layer_min: int = None,
+        layer_max: int = None,
+        x_min: float = None,
+        x_max: float = None,
+        y_min: float = None,
+        y_max: float = None,
+        state_for_boundary: GridDataArray = None,
+    ):
+        clipped = super()._clip_box_packages(
+            time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
+        )
+
+        return clipped
