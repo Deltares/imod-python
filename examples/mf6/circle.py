@@ -233,9 +233,17 @@ ax.set_aspect(1)
 # ----------------------
 #
 # We may also quickly setup a smaller model. We'll select half of the original
-# domain.
+# domain. To set up the boundary conditions on the clipped edges you can provide
+# a states_for_boundary dictionary. In this case we add the head values of the
+# computed full domain simulation as the clipped boundary values
 
-half_simulation = simulation.clip_box(x_max=0.0)
+states_for_boundary = {
+    "GWF_1": head,
+}
+
+half_simulation = simulation.clip_box(
+    x_max=0.0, states_for_boundary=states_for_boundary
+)
 
 # %%
 # Let's run the model, read the results, and visualize.
@@ -248,6 +256,26 @@ head = imod.mf6.out.open_hds(
     modeldir / "GWF_1/disv.disv.grb",
 )
 
+# %%
+# Let's add constant head boundaries together and plot them
+
+half_simulation_constant_head = half_simulation["GWF_1"]["chd"]["head"]
+
+clipped_half_simulation_constant_head = (
+    half_simulation["GWF_1"]["chd_clipped"]["head"].sel(layer=2).isel(time=0)
+)
+
+all_boundaries_constant_head = half_simulation_constant_head.where(
+    ~np.isnan(half_simulation_constant_head), clipped_half_simulation_constant_head
+)
+
+# plot boundary conditions
+fig, ax = plt.subplots()
+all_boundaries_constant_head.ugrid.plot(ax=ax)
+ax.set_aspect(1)
+
+# %%
+# plot computed heads
 fig, ax = plt.subplots()
 head.isel(time=0, layer=0).compute().ugrid.plot(ax=ax)
 ax.set_aspect(1)
