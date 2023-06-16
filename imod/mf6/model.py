@@ -170,7 +170,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def __get_k(self):
         try:
-            npf = self[imod.mf6.NodePropertyFlow._pkg_id]
+            npf = self[imod.mf6.NodePropertyFlow.get_pkg_id()]
         except RuntimeError:
             raise ValidationError("expected one package of type ModePropertyFlow")
 
