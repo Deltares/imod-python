@@ -182,7 +182,7 @@ class RibaMod:
         # Assume only one groundwater flow model
         # FUTURE: Support multiple groundwater flow models.
         coupling_dict["mf6_model"] = gwf_names[0]
-        coupling_dict["mf6_river_pkg"] = "Oosterschelde"  # FIXME
+        coupling_dict["mf6_river_pkg"] = "riv-1"  # FIXME
 
         return coupling_dict
 
