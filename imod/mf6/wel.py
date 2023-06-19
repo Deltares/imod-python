@@ -1,5 +1,6 @@
 import warnings
 from copy import deepcopy
+from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
 import numpy as np
@@ -44,6 +45,7 @@ class Mf6Wel(Mf6BoundaryCondition):
         rate,
         concentration=None,
         concentration_boundary_type="aux",
+        validate: bool = True,
     ):
         super().__init__()
         self.dataset["cellid"] = cellid
@@ -53,6 +55,7 @@ class Mf6Wel(Mf6BoundaryCondition):
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
             self.add_periodic_auxiliary_variable()
+        self._validate_init_schemata(validate)
 
 
 class Well(BoundaryCondition):
@@ -222,6 +225,24 @@ class Well(BoundaryCondition):
 
         return new
 
+    def write(
+        self,
+        directory: Path,
+        pkgname: str,
+        globaltimes: np.ndarray[np.datetime64],
+        binary: bool,
+        validate: bool,
+        idomain: Union[xr.DataArray, xu.UgridDataArray],
+        top: Union[xr.DataArray, xu.UgridDataArray],
+        bottom: Union[xr.DataArray, xu.UgridDataArray],
+        k: Union[xr.DataArray, xu.UgridDataArray],
+    ) -> None:
+        if validate:
+            self._validate(self._write_schemata)
+        mf6_package = self.to_mf6_pkg(idomain, top, bottom, k)
+
+        mf6_package.write(directory, pkgname, globaltimes, binary)
+
     def __create_wells_df(self) -> pd.DataFrame:
         wells_df = self.dataset.to_dataframe()
         wells_df = wells_df.rename(
@@ -244,8 +265,10 @@ class Well(BoundaryCondition):
         # Ensure top, bottom & k
         # are broadcasted to 3d grid
         like = xr.ones_like(active)
-        top = like * top
         bottom = like * bottom
+        top_2d = (like * top).sel(layer=1)
+        top_3d = bottom.shift(layer=1).fillna(top_2d)
+
         k = like * k
 
         index_names = wells_df.index.names
@@ -255,7 +278,7 @@ class Well(BoundaryCondition):
         # case of a "time" and "species" coordinate.
         wells_df = wells_df.reset_index()
 
-        wells_assigned = assign_wells(wells_df, top, bottom, k)
+        wells_assigned = assign_wells(wells_df, top_3d, bottom, k)
         # Set multi-index again
         wells_assigned = wells_assigned.set_index(index_names).sort_index()
 
@@ -407,6 +430,10 @@ class Well(BoundaryCondition):
         """
         wells_df = self.__create_wells_df()
         wells_assigned = self.__create_assigned_wells(wells_df, active, top, bottom, k)
+        if len(wells_assigned) == 0:
+            raise ValueError(
+                "no wells were assigned in package. Either none were present or they were filtered due to minimum conductivity and thickness constraints."
+            )
 
         ds = xr.Dataset()
         ds["cellid"] = self.__create_cellid(wells_assigned, active)
