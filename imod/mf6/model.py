@@ -5,7 +5,8 @@ import collections
 import inspect
 import pathlib
 from copy import deepcopy
-from typing import List, Optional, TypeAlias, Union
+from pathlib import Path
+from typing import List, Optional, Tuple, TypeAlias, Union
 
 import cftime
 import jinja2
@@ -22,6 +23,7 @@ from imod.mf6.clipped_boundary_condition_creator import ClippedBoundaryCondition
 from imod.mf6.pkgbase import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
+from imod.mf6.wel import Well
 from imod.schemata import ValidationError
 
 GridDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
@@ -156,6 +158,30 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         self._check_for_required_packages(modelkey)
 
+    def __get_domain_geometry(
+        self,
+    ) -> Tuple[
+        Union[xr.DataArray, xu.UgridDataArray],
+        Union[xr.DataArray, xu.UgridDataArray],
+        Union[xr.DataArray, xu.UgridDataArray],
+    ]:
+        discretization = self[self.__get_diskey()]
+        if discretization is None:
+            raise ValueError("Discretization not found")
+        top = discretization["top"]
+        bottom = discretization["bottom"]
+        idomain = discretization["idomain"]
+        return top, bottom, idomain
+
+    def __get_k(self):
+        try:
+            npf = self[imod.mf6.NodePropertyFlow.get_pkg_id()]
+        except RuntimeError:
+            raise ValidationError("expected one package of type ModePropertyFlow")
+
+        k = npf["k"]
+        return k
+
     def _validate(self, model_name: str = "") -> StatusInfoBase:
         try:
             diskey = self.__get_diskey()
@@ -195,6 +221,21 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         return model_status_info
 
+    def __write_well(
+        self,
+        wellpackage: Well,
+        directory: Path,
+        modelname: str,
+        globaltimes: np.ndarray[np.datetime64],
+        binary: bool = True,
+        validate: bool = True,
+    ):
+        top, bottom, idomain = self.__get_domain_geometry()
+        k = self.__get_k()
+        wellpackage.write(
+            directory, modelname, globaltimes, binary, validate, idomain, top, bottom, k
+        )
+
     def write(
         self, directory, modelname, globaltimes, binary=True, validate: bool = True
     ) -> StatusInfoBase:
@@ -220,12 +261,17 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         # write package contents
         for pkg_name, pkg in self.items():
             try:
-                pkg.write(
-                    directory=modeldirectory,
-                    pkgname=pkg_name,
-                    globaltimes=globaltimes,
-                    binary=binary,
-                )
+                if isinstance(pkg, imod.mf6.Well):
+                    self.__write_well(
+                        pkg, modeldirectory, pkg_name, globaltimes, binary, validate
+                    )
+                else:
+                    pkg.write(
+                        directory=modeldirectory,
+                        pkgname=pkg_name,
+                        globaltimes=globaltimes,
+                        binary=binary,
+                    )
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")
 

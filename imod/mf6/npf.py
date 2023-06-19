@@ -365,3 +365,10 @@ class NodePropertyFlow(Package):
         self.dataset["perched"] = perched
         self.dataset["save_specific_discharge"] = save_specific_discharge
         self._validate_init_schemata(validate)
+
+    @classmethod
+    def get_pkg_id(cls) -> str:
+        """
+        Returns the preferred package id for this class.
+        """
+        return cls._pkg_id
