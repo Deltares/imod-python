@@ -1,5 +1,5 @@
-import textwrap
 import warnings
+from copy import deepcopy
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
@@ -129,6 +129,8 @@ class Well(BoundaryCondition):
         "concentration": [DTypeSchema(np.floating)],
     }
     _write_schemata = {}
+
+    _regrid_method = {}
 
     def __init__(
         self,
@@ -449,8 +451,9 @@ class Well(BoundaryCondition):
         regridder_types: Dict[str, Tuple[str, str]] = None,
     ) -> Package:
         """
-        The regrid_like method is not implemented for this package as it is grid-agnostic.
-        Regridding can be achieved by passing the new discretization to the "to_mf6_pkg" function using the parameters "top", "bottom" and "active".
+        The regrid_like method is irrelevant for this package as it is grid-agnostic.
+        This method returns an (ungridded) copy of itself- the target grid is not applied in any way.
+        Gridding can be achieved by passing a discretization to the "to_mf6_pkg" function using the parameters "top", "bottom" and "active".
 
         Parameters
         ----------
@@ -461,13 +464,7 @@ class Well(BoundaryCondition):
             this dictionary can be used to override the default mapping method.
 
         """
-        error_msg = textwrap.dedent(
-            """\
-        The Well Package does not support regridding, as it is grid-agnostic.
-        Regridding can be achieved by passing the new discretization to the "to_mf6_pkg" function using the parameters "top", "bottom" and "active".
-        """
-        )
-        raise NotImplementedError(error_msg)
+        return deepcopy(self)
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
