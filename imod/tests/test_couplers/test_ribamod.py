@@ -1,4 +1,5 @@
 from dataclasses import asdict
+
 from imod.couplers.ribamod import RibaMod
 from imod.couplers.ribamod.ribamod import DriverCoupling
 from imod.mf6.model import GroundwaterFlowModel
