@@ -91,3 +91,53 @@ def circle_result(tmpdir_factory):
     simulation.write(modeldir)
     simulation.run()
     return modeldir
+
+
+def make_circle_model_evt():
+    simulation = make_circle_model()
+    gwf_model = simulation["GWF_1"]
+
+    idomain = gwf_model["disv"].dataset["idomain"]
+    like = idomain.sel(layer=1).astype(np.float64)
+    face_dim = idomain.ugrid.grid.face_dimension
+
+    rate = xu.full_like(like, 0.001)
+    # Lay surface on chd level
+    surface = xu.full_like(like, 1.0)
+    depth = xu.full_like(like, 2.0)
+
+    segments = xr.DataArray(
+        data=[1, 2, 3], coords={"segment": [1, 2, 3]}, dims=("segment",)
+    )
+    segments_reversed = segments.isel(segment=slice(None, None, -1))
+
+    proportion_depth = xu.full_like(like, 0.3) * segments
+    proportion_rate = xu.full_like(like, 0.3) * segments_reversed
+
+    proportion_depth = proportion_depth.transpose("segment", face_dim)
+    proportion_rate = proportion_rate.transpose("segment", face_dim)
+
+    gwf_model["evt"] = imod.mf6.Evapotranspiration(
+        surface, rate, depth, proportion_rate, proportion_depth
+    )
+
+    simulation["GWF_1"] = gwf_model
+
+    return simulation
+
+
+@pytest.fixture(scope="session")
+def circle_model_evt():
+    return make_circle_model_evt()
+
+
+@pytest.mark.usefixtures("circle_model_evt")
+@pytest.fixture(scope="session")
+def circle_result_evt(tmpdir_factory):
+    # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
+    # directory between different testing modules.
+    modeldir = tmpdir_factory.mktemp("circle_evt")
+    simulation = make_circle_model_evt()
+    simulation.write(modeldir)
+    simulation.run()
+    return modeldir
