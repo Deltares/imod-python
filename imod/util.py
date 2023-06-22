@@ -496,6 +496,27 @@ def ugrid2d_data(da: xr.DataArray, face_dim: str) -> xr.DataArray:
     )
 
 
+def unstack_dim_into_variable(
+    dataset: Union[xr.Dataset, xu.UgridDataset], dim: str
+) -> Union[xr.Dataset, xu.UgridDataset]:
+    """
+    Unstack each variable containing ``dim`` into separate variables.
+    """
+    ds = dataset.copy()
+
+    for variable in ds.data_vars:
+        if dim in ds[variable].dims:
+            stacked = ds[variable]
+            ds = ds.drop_vars(variable)
+            for index in stacked[dim].values:
+                ds[f"{variable}_{dim}_{index}"] = stacked.sel(
+                    indexers={dim: index}, drop=True
+                )
+    if dim in ds.coords:
+        ds = ds.drop_vars(dim)
+    return ds
+
+
 def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
     """
     Ensures the xarray Dataset will be written to a UGRID netCDF that will be
@@ -514,15 +535,7 @@ def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
     unstacked: xr.Dataset
 
     """
-    ds = dataset.copy()
-    for variable in ds.data_vars:
-        if "layer" in ds[variable].dims:
-            stacked = ds[variable]
-            ds = ds.drop_vars(variable)
-            for layer in stacked["layer"].values:
-                ds[f"{variable}_layer_{layer}"] = stacked.sel(layer=layer, drop=True)
-    if "layer" in ds.coords:
-        ds = ds.drop_vars("layer")
+    ds = unstack_dim_into_variable(dataset, "layer")
 
     # Find topology variables
     for variable in ds.data_vars:
