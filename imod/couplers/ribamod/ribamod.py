@@ -1,11 +1,19 @@
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 import ribasim
 import tomli_w
 
 from imod.mf6 import Modflow6Simulation
 from imod.mf6.model import Modflow6Model
+
+
+@dataclass
+class DriverCoupling:
+    mf6_model: str
+    mf6_river_packages: List[str]
+    mf6_drainage_packages: List[str]
 
 
 class RibaMod:
@@ -19,6 +27,8 @@ class RibaMod:
         The Ribasim model that should be coupled.
     mf6_simulation : Modflow6Simulation
         The Modflow6 simulation that should be coupled.
+    coupling_list: list of DriverCoupling
+        One entry per MODFLOW 6 model that should be coupled
     """
 
     _toml_name = "imod_coupler.toml"
@@ -26,10 +36,14 @@ class RibaMod:
     _modflow6_model_dir = "modflow6"
 
     def __init__(
-        self, ribasim_model: ribasim.Model, mf6_simulation: Modflow6Simulation
+        self,
+        ribasim_model: ribasim.Model,
+        mf6_simulation: Modflow6Simulation,
+        coupling_list: List[DriverCoupling],
     ):
         self.ribasim_model = ribasim_model
         self.mf6_simulation = mf6_simulation
+        self.coupling_list = coupling_list
 
     def write(
         self,
@@ -73,20 +87,7 @@ class RibaMod:
         )
         self.ribasim_model.write(directory / self._ribasim_model_dir)
 
-        # # Write exchange files
-        # exchange_dir = directory / "exchanges"
-        # exchange_dir.mkdir(mode=755, exist_ok=True)
-        # self.write_exchanges(exchange_dir, self.mf6_rch_pkgkey, self.mf6_wel_pkgkey)
-
-        coupling_dict = self._get_coupling_dict()
-
-        self.write_toml(
-            directory,
-            modflow6_dll,
-            ribasim_dll,
-            ribasim_dll_dependency,
-            coupling_dict,
-        )
+        self.write_toml(directory, modflow6_dll, ribasim_dll, ribasim_dll_dependency)
 
     def write_toml(
         self,
@@ -94,7 +95,6 @@ class RibaMod:
         modflow6_dll: Union[str, Path],
         ribasim_dll: Union[str, Path],
         ribasim_dll_dependency: Union[str, Path],
-        coupling_dict: dict,
     ):
         """
         Write .toml file which configures the imod coupler run.
@@ -111,8 +111,6 @@ class RibaMod:
             Path to ribasim .dll.
         ribasim_dll_dependency: str or Path
             Directory with ribasim .dll dependencies.
-        coupling_dict: dict
-            Dictionary with names of coupler packages and paths to mappings.
         """
         # force to Path
         directory = Path(directory)
@@ -133,83 +131,17 @@ class RibaMod:
                         "dll": str(ribasim_dll),
                         "dll_dep_dir": str(ribasim_dll_dependency),
                         "config_file": str(
-                            directory / self._ribasim_model_dir / f"{self.ribasim_model.modelname}.toml"
+                            directory
+                            / self._ribasim_model_dir
+                            / f"{self.ribasim_model.modelname}.toml"
                         ),
                     },
                 },
-                "coupling": [coupling_dict],
+                "coupling": [
+                    asdict(driver_coupling) for driver_coupling in self.coupling_list
+                ],
             },
         }
 
         with open(toml_path, "wb") as f:
             tomli_w.dump(coupler_toml, f)
-
-    def _get_gwf_modelnames(self):
-        """
-        Get names of gwf models in mf6 simulation
-        """
-        return [
-            key
-            for key, value in self.mf6_simulation.items()
-            if isinstance(value, Modflow6Model)
-        ]
-
-    # TODO:
-    def _get_coupling_dict(self) -> dict:
-        """
-        Get dictionary with names of coupler packages and paths to mappings.
-
-        Parameters
-        ----------
-        directory: str or Path
-            Directory where .dxc files are written.
-        mf6_rch_pkgkey: str
-            Key of Modflow 6 recharge package to which MetaSWAP is coupled.
-        mf6_wel_pkgkey: str
-            Key of Modflow 6 well package to which MetaSWAP sprinkling is
-            coupled.
-
-        Returns
-        -------
-        coupling_dict: dict
-            Dictionary with names of coupler packages and paths to mappings.
-        """
-
-        coupling_dict = {}
-
-        gwf_names = self._get_gwf_modelnames()
-
-        # Assume only one groundwater flow model
-        # FUTURE: Support multiple groundwater flow models.
-        coupling_dict["mf6_model"] = gwf_names[0]
-        coupling_dict["mf6_river_pkg"] = "riv-1"  # FIXME
-
-        return coupling_dict
-
-    # TODO
-    def write_exchanges(
-        self,
-        directory: Union[str, Path],
-        mf6_riv_pkgkey: str,
-    ):
-        """
-        Write exchange files (.dxc) which map MetaSWAP's svats to Modflow 6 node
-        numbers, recharge ids, and well ids.
-
-        Parameters
-        ----------
-        directory: str or Path
-            Directory where .dxc files are written.
-        mf6_river_pkgkey: str
-            Key of Modflow 6 river package to which Ribasim is coupled.
-        """
-
-        # TODO
-        # gwf_names = self._get_gwf_modelnames()
-        # Assume only one groundwater flow model
-        # FUTURE: Support multiple groundwater flow models.
-        # gwf_model = self.mf6_simulation[gwf_names[0]]
-        # dis = gwf_model[gwf_model._get_pkgkey("dis")]
-        # river = gwf_model[mf6_riv_pkgkey]
-
-        return

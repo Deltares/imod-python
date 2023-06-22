@@ -1,3 +1,3 @@
-from imod.couplers.ribamod.ribamod import RibaMod
+from imod.couplers.ribamod.ribamod import RibaMod, DriverCoupling
 
-__all__ = ["RibaMod"]
+__all__ = ["RibaMod", "DriverCoupling"]
