@@ -20,12 +20,13 @@ Changed
 Fixed
 ~~~~~
 
-- geopandas and rasterio were imported at the top of a module in some places.
+- Geopandas and rasterio were imported at the top of a module in some places.
   This has been fixed so that both are not optional dependencies when
   installing via pip (installing via conda or mamba will always pull all
   dependencies and supports full functionality).
 - :meth:`imod.mf6.Simulation._validate` now print all validation errors for all
   models and packages in one message.
+- The gen file reader can now handle feature id's that contain commas and spaces
 
 
 [0.13.1] - 2023-05-05
