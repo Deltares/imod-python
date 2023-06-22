@@ -6,7 +6,6 @@ import ribasim
 import tomli_w
 
 from imod.mf6 import Modflow6Simulation
-from imod.mf6.model import Modflow6Model
 
 
 @dataclass
