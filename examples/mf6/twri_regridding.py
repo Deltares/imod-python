@@ -30,10 +30,10 @@ In overview, we'll set the following steps:
 import numpy as np
 import xarray as xr
 import imod
-
+from imod.mf6.regridding_utils import RegridderType
 import matplotlib.pyplot as plt
 
-
+import copy
 def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
 
     nlay = 3
@@ -86,7 +86,7 @@ def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
     screen_layer =[2, 1, 1, 0, 0, 0, 0, 0,0, 0,0, 0, 0, 0,0]
     screen_bottom =bottom[screen_layer] + 0.1
     screen_top = screen_bottom + 10
-    well_y = np.array([5., 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13])*dy
+    well_y = np.array([5., 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13])*abs(dy)
     well_x = np.array([11., 6, 12, 8, 10, 12, 14, 8, 10, 12, 14, 8, 10, 12, 14])*dx
     well_rate = [-5.0] * 15
 
@@ -224,4 +224,18 @@ new_model = model.regrid_like(new_idomain)
 regridded_k_2 = new_model["npf"]["k"]
 fig, ax = plt.subplots()
 regridded_k_2.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
+
+
+# %%
+# finally, we can regrid package per package. This allows us to choose the regridding method as well.
+# in this example we'll regrid the npf package manually and the rest of the packages using default methods.
+npf_copy = copy.deepcopy(new_model["npf"])
+regridder_types ={     "k":( RegridderType.CENTROIDLOCATOR, None)}
+npf_copy.regrid_like(target_grid=new_idomain,regridder_types= regridder_types )
+new_model["npf"] = npf_copy
+
+
+regridded_k_3 = new_model["npf"]["k"]
+fig, ax = plt.subplots()
+regridded_k_3.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
 pass
