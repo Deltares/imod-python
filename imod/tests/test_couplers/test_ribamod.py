@@ -49,9 +49,9 @@ def test_ribamod_write_toml(ribasim_model, coupled_ribasim_mf6_model, tmp_path):
                 "ribasim": {
                     "dll": "./ribasim.dll",
                     "dll_dep_dir": "./ribasim-bin",
-                    "config_file": str(output_dir
-                    / coupled_models._ribasim_model_dir
-                    / "trivial.toml"),
+                    "config_file": str(
+                        output_dir / coupled_models._ribasim_model_dir / "trivial.toml"
+                    ),
                 },
             },
             "coupling": [asdict(driver_coupling)],
