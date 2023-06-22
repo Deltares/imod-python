@@ -109,7 +109,7 @@ def test_write_one_well_filtered_out(
         validate=True,
     )
 
-    with pytest.raises(KeyError):
+    with pytest.raises(ValueError):
         twri_simulation.write(tmp_path, binary=False)
 
 
