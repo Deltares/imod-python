@@ -33,7 +33,6 @@ import imod
 from imod.mf6.regridding_utils import RegridderType
 import matplotlib.pyplot as plt
 
-import copy
 def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
 
     nlay = 3
@@ -187,8 +186,8 @@ nrow = 45
 ncol = 20
 shape = (nlay, nrow, ncol)
 
-dx = 3751
-dy = -1667
+dx = 3751.0
+dy = -1667.0
 xmin = 0.0
 xmax = dx * ncol
 ymin = 0.0
@@ -229,10 +228,10 @@ regridded_k_2.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
 # %%
 # finally, we can regrid package per package. This allows us to choose the regridding method as well.
 # in this example we'll regrid the npf package manually and the rest of the packages using default methods.
-npf_copy = copy.deepcopy(new_model["npf"])
+
 regridder_types ={     "k":( RegridderType.CENTROIDLOCATOR, None)}
-npf_copy.regrid_like(target_grid=new_idomain,regridder_types= regridder_types )
-new_model["npf"] = npf_copy
+npf_regridded = model["npf"].regrid_like(target_grid = new_idomain, regridder_types = regridder_types )
+new_model["npf"] = npf_regridded
 
 
 regridded_k_3 = new_model["npf"]["k"]
