@@ -856,7 +856,7 @@ class BoundaryCondition(Package, abc.ABC):
     def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {"binary": binary}
-        bin_ds = self[self.period_data()]
+        bin_ds = self._get_bin_ds()
         d["periods"] = self.period_paths(
             directory, pkgname, globaltimes, bin_ds, binary
         )
@@ -885,10 +885,14 @@ class BoundaryCondition(Package, abc.ABC):
 
         return self._template.render(d)
 
+    def _get_bin_ds(self):
+        return self[self.period_data()]
+
     def write_perioddata(self, directory, pkgname, binary):
         if len(self.period_data()) == 0:
             return
-        bin_ds = self[self.period_data()]
+
+        bin_ds = self._get_bin_ds()
 
         if binary:
             ext = "bin"
