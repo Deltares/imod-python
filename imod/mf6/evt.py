@@ -201,8 +201,8 @@ class Evapotranspiration(BoundaryCondition):
         # Call parent method
         d = super().get_options(d, not_options=not_options)
         # Add amount of segments
-        if "segments" in self.dataset.dims:
-            d["nseg"] = self.dataset.dims["segments"]
+        if "segment" in self.dataset.dims:
+            d["nseg"] = self.dataset.dims["segment"] + 1
         else:
             d["nseg"] = 1
         return d
