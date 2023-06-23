@@ -4,7 +4,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-import xugrid as xu
 
 import imod
 from imod.select.grid import ones_like

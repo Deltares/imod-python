@@ -9,7 +9,6 @@ from scipy.ndimage import binary_dilation
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import DTypeSchema
 
-
 GridDataArray = Union[xr.DataArray, xu.UgridDataArray]
 
 
