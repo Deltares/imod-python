@@ -238,7 +238,7 @@ ax.set_aspect(1)
 # computed full domain simulation as the clipped boundary values
 
 states_for_boundary = {
-    "GWF_1": head,
+    "GWF_1": head.compute(),
 }
 
 half_simulation = simulation.clip_box(
