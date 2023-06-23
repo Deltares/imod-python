@@ -1,26 +1,18 @@
 """
-TWRI
-====
+TWRI regridding
+===============
 
-This example has been converted from the `MODFLOW6 Example problems`_.  See the
-`description`_ and the `notebook`_ which uses `FloPy`_ to setup the model.
-
-This example is a modified version of the original MODFLOW example
-("`Techniques of Water-Resources Investigation`_" (TWRI)) described in
-(`McDonald & Harbaugh, 1988`_) and duplicated in (`Harbaugh & McDonald, 1996`_).
-This problem is also is distributed with MODFLOW-2005 (`Harbaugh, 2005`_). The
-problem has been modified from a quasi-3D problem, where confining beds are not
-explicitly simulated, to an equivalent three-dimensional problem.
+This example focusses on regridding. It uses te TWRI model from modflow6 (`Harbaugh, 2005`_).
+More information about this model can be found in an example dedicated to building this model ( ex01_twri.py)
 
 In overview, we'll set the following steps:
-
-    * Create a structured grid for a rectangular geometry.
-    * Create the xarray DataArrays containg the MODFLOW6 parameters.
-    * Feed these arrays into the imod mf6 classes.
-    * Write to modflow6 files.
-    * Run the model.
-    * Open the results back into DataArrays.
-    * Visualize the results.
+* we build a new grid, onto which we want to regrid the twri model
+* we regrid the model then in 3 different ways
+* first by regridding the simulation itself. This automatically regrids the model and all the packages in the model using
+default regridding methods for each field in each package
+* then we show how a model within a simulation can be regridded, also using default regridding methods
+* finally we show how regridding can be done package per package. We illustrate that for one package, and we use a non-default
+regridding method for the horizontal conductivity field
 
 """
 # %%
@@ -51,8 +43,8 @@ heterogeneous_k.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
 
 # %%
 # now we create a new grid for this simulation. It has 3 layers,  45 rows and 20 columns.
-# The length of the domain is slightly different from the input grid. That was 15*5000 = 75000 long in x and y
-# but the new grid is 75015 long in x and  75020 long in y
+# The length of the domain is slightly different from the input grid. That had a coordinate difference between the first and last cellcentre on the
+# x axis and y axis of  15*5000 = 75000 on both axes, but the new grid that is  75020 on the x axis and  75015 on the y axis
 
 nlay = 3
 nrow = 45
