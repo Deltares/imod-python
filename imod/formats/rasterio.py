@@ -8,8 +8,10 @@ Currently only :func:`imod.rasterio.write` is implemented.
 
 import pathlib
 import warnings
+from typing import Dict
 
 import numpy as np
+import pandas as pd
 
 from imod import util
 from imod.formats import array_io
@@ -20,6 +22,8 @@ try:
     import rasterio
 except ImportError:
     rasterio = util.MissingOptionalModule("rasterio")
+
+f_open = open
 
 
 # Based on this comment
@@ -253,13 +257,106 @@ def open(path, use_cftime=False, pattern=None):
     return array_io.reading._open(path, use_cftime, pattern, header, _read)
 
 
+def write_aaigrid(path: pathlib.Path, a: np.ndarray, profile: Dict) -> None:
+    """
+    Fall-back function to write ESRII ASCII grids even if rasterio is not
+    installed.
+
+    This function takes care to mimick the idiosyncracies of the GDAL driver.
+
+    Parameters
+    ----------
+    path: str or Path
+        path to the output raster
+    a: np.ndarray
+        The raster data.
+    profile: dict
+        The rasterio profile metadata.
+    """
+    dtype = profile["dtype"]
+    nodata = profile["nodata"]
+    df = pd.DataFrame(a.astype(dtype))
+    # GDAL writes white space before every line. pandas doesn't support this,
+    # but it will write nodata values -- encoded as NaN -- as white space.
+    df.index = np.full(len(df), np.nan)
+    if np.issubdtype(dtype, np.integer):
+        is_float = False
+        space = ""
+        fmt = "%d"
+        str_nodata = f"{int(nodata)}"
+    elif np.issubdtype(dtype, np.floating):
+        # For some reason, GDAL inserts a space before the nodata value if
+        # dtype is float.
+        is_float = True
+        space = " "
+        precision = profile.get("decimal_precision")
+        digits = profile.get("significant_digits")
+        # See: https://docs.python.org/3/library/string.html#formatspec
+        if precision is not None:
+            fmt = f"%.{precision}f"
+            str_nodata = f"{nodata:.{precision}f}"
+        elif digits is not None:
+            fmt = f"%.{digits}g"
+            str_nodata = f"{nodata:.{digits}g}"
+        else:
+            fmt = "%.20g"
+            str_nodata = f"{nodata:.20g}"
+    else:
+        raise TypeError(f"invalid dtype: {dtype}")
+
+    dx, _, xmin, _, dy, ymax = profile["transform"][:6]
+    ymin = ymax + profile["height"] * dy
+
+    header = (
+        f'ncols        {profile["width"]}\n'
+        f'nrows        {profile["height"]}\n'
+        f"xllcorner    {xmin:.12f}\n"
+        f"yllcorner    {ymin:.12f}\n"
+        f"cellsize     {dx:.12f}\n"
+        f"NODATA_value {space}{str_nodata}\n"
+    )
+
+    # GDAL writes only a linefeed, not a carriage return. By default, Python
+    # adds a carriage return as well, on Windows. This is disabled by
+    # explicitly setting the newline argument.
+    with f_open(path, "w", newline="") as f:
+        f.write(header)
+
+        first = df.iloc[0, 0]
+        # is_float is the result of a typecheck above.
+        # is_integer() checks whether a float has a decimal fraction:
+        # (1.0).is_integer() -> True
+        # (1.1).is_integer() -> False
+        if is_float and first.is_integer():
+            # GDAL uses the "general" float (g) format by default. However, if
+            # the first value is a float without decimals, it will write a
+            # single trailing 0 for the first value, presumably to aid type
+            # inference when reading values back in. All subsequent values are
+            # written without decimals, however.
+            precision = profile.get("decimal_precision", 1)
+            # Write the first value, with trailing zero if needed.
+            f.write(f" {first:.{precision}f} ")
+            # Write remainder of first row. Since we've already written the
+            # first value with a space in front of it, we skip writing the NaN
+            # index value here.
+            df.iloc[[0], 1:].to_csv(
+                f, index=False, header=False, sep=" ", float_format=fmt
+            )
+            # Write all other rows.
+            df.iloc[1:].to_csv(f, index=True, header=False, sep=" ", float_format=fmt)
+        else:
+            df.to_csv(f, index=True, header=False, sep=" ", float_format=fmt)
+
+    return
+
+
 def write(path, da, driver=None, nodata=np.nan, dtype=None):
     """Write ``xarray.DataArray`` to GDAL supported geospatial rasters using ``rasterio``.
 
     Parameters
     ----------
     path: str or Path
-        path to the dstput raste
+        path to the output raster
     da: xarray DataArray
         The DataArray to be written. Should have only x and y dimensions.
     driver: str; optional
@@ -341,9 +438,16 @@ def write(path, da, driver=None, nodata=np.nan, dtype=None):
     profile["count"] = 1
     profile["dtype"] = da.dtype
     profile["nodata"] = nodata
-    with rasterio.Env():
-        with rasterio.open(path, "w", **profile) as ds:
-            ds.write(da.values, 1)
+
+    # Allow writing ASCII grids even if rasterio isn't installed. This is
+    # useful for e.g. MetaSWAP input.
+    if isinstance(rasterio, util.MissingOptionalModule) and driver == "AAIGrid":
+        write_aaigrid(path, da.values, profile)
+    else:
+        with rasterio.Env():
+            with rasterio.open(path, "w", **profile) as ds:
+                ds.write(da.values, 1)
+    return
 
 
 def save(path, a, driver=None, nodata=np.nan, pattern=None, dtype=None):

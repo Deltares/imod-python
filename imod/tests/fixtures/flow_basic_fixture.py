@@ -1,9 +1,7 @@
-import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
-from shapely.geometry import LineString
 
 
 @pytest.fixture(scope="module")
@@ -151,6 +149,9 @@ def metaswap_dict(basic_dis):
 @pytest.fixture(scope="module")
 def horizontal_flow_barrier_gdf(basic_dis):
     """GeoDataframe that can be used to initiate HorizontalFlowBarriers"""
+    import geopandas as gpd
+    from shapely.geometry import LineString
+
     ibound, _, _ = basic_dis
 
     x = ibound.x.values
