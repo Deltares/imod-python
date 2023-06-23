@@ -4,13 +4,15 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-import xarray as xr
 
 import imod
 from imod.tests.fixtures.mf6_regridding_fixture import (
     grid_data_structured,
     grid_data_structured_layered,
+    grid_data_unstructured,
+    grid_data_unstructured_layered,
 )
+from imod.typing.grid import ones_like
 
 
 @pytest.fixture(scope="function")
@@ -20,7 +22,44 @@ def twri_simulation(transient_twri_model):
     return transient_twri_model
 
 
-def test_write_well(tmp_path: Path):
+@pytest.mark.parametrize(
+    "grid_data, grid_data_layered, reference_output",
+    [
+        (
+            grid_data_unstructured,
+            grid_data_unstructured_layered,
+            np.array(
+                [
+                    # [layer, faceid, rate]
+                    ["1 3 1"],
+                    ["1 3 2"],
+                    ["1 4 2"],
+                    ["2 3 1"],
+                    ["2 4 2"],
+                    ["3 4 1"],
+                ],
+                dtype=object,
+            ),
+        ),
+        (
+            grid_data_structured,
+            grid_data_structured_layered,
+            np.array(
+                [
+                    # [layer, yind,, xind, rate]
+                    ["1 2 1 1"],
+                    ["1 2 1 2"],
+                    ["1 2 2 2"],
+                    ["2 2 1 1"],
+                    ["2 2 2 2"],
+                    ["3 2 2 1"],
+                ],
+                dtype=object,
+            ),
+        ),
+    ],
+)
+def test_write_well(tmp_path: Path, grid_data, grid_data_layered, reference_output):
     well = imod.mf6.Well(
         screen_top=[0.0, 0.0, 0.0],
         screen_bottom=[-1, -3.0, -5.0],
@@ -31,10 +70,10 @@ def test_write_well(tmp_path: Path):
         validate=True,
     )
     globaltimes = [np.datetime64("2000-01-01")]
-    active = grid_data_structured(int, 1, 10)
+    active = grid_data(int, 1, 10)
     k = 100.0
-    top = xr.ones_like(active.sel(layer=1), dtype=np.float64)
-    bottom = grid_data_structured_layered(np.float64, -2.0, 10)
+    top = ones_like(active.sel(layer=1), dtype=np.float64)
+    bottom = grid_data_layered(np.float64, -2.0, 10)
 
     well.write(
         tmp_path, "packagename", globaltimes, False, True, active, top, bottom, k
@@ -45,10 +84,6 @@ def test_write_well(tmp_path: Path):
         tmp_path / "packagename" / "wel.dat", sep=":-\\s*", engine="python"
     )
 
-    reference_output = np.array(
-        [["1 2 1 1"], ["1 2 1 2"], ["1 2 2 2"], ["2 2 1 1"], ["2 2 2 2"], ["3 2 2 1"]],
-        dtype=object,
-    )
     assert (df.values == reference_output).all()
 
 
