@@ -185,6 +185,7 @@ class MetaMod:
         """
         # force to Path
         directory = Path(directory)
+        directory.mkdir(parents=True, exist_ok=True)
 
         toml_path = directory / self._toml_name
 
