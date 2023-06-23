@@ -430,9 +430,18 @@ class Well(BoundaryCondition):
         """
         wells_df = self.__create_wells_df()
         wells_assigned = self.__create_assigned_wells(wells_df, active, top, bottom, k)
-        if len(wells_assigned) == 0:
+
+        nwells_df = len(wells_df["id"].unique())
+        nwells_assigned = (
+            0 if wells_assigned.empty else len(wells_assigned["id"].unique())
+        )
+
+        if nwells_df == 0:
+            raise ValueError("No wells were assigned in package. None were present.")
+
+        if nwells_df != nwells_assigned:
             raise ValueError(
-                "no wells were assigned in package. Either none were present or they were filtered due to minimum conductivity and thickness constraints."
+                "One or more well(s) are completely invalid due to minimum conductivity and thickness constraints."
             )
 
         ds = xr.Dataset()
