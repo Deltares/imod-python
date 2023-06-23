@@ -32,18 +32,12 @@ import numpy as np
 import xarray as xr
 from example_models import create_twri_simulation
 
-import imod
 from imod.mf6.regridding_utils import RegridderType
 
 # %%
 # now we create the twri simulation itself. It yields a simulation of a flow problem, with a grid of 3 layers and 15 cells in both x and y directions.
-# To better illustrate the regridding, we replace the K field with a normal random K field. The original k-field is a constant per layer.
+# To better illustrate the regridding, we replace the K field with a lognormal random K field. The original k-field is a constant per layer.
 simulation = create_twri_simulation()
-k = simulation["GWF_1"]["npf"]["k"]
-k *= 10000.0
-simulation["GWF_1"]["npf"]["k"] = k
-modeldir = imod.util.temporary_directory()
-simulation.write(modeldir, binary=False)
 
 idomain = simulation["GWF_1"]["dis"]["idomain"]
 heterogeneous_k = xr.zeros_like(idomain, dtype=np.double)
@@ -77,14 +71,14 @@ layer = np.array([1, 2, 3])
 y = np.arange(ymax, ymin, dy) + 0.5 * dy
 x = np.arange(xmin, xmax, dx) + 0.5 * dx
 coords = {"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy}
-new_idomain = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
+target_grid = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
 
 # %%
 # a first way to regrid the twri model is to regrid the whole simulation object. This is the most straightforward method,
 # and it uses default regridding methods for each input field. To see which ones are used, look at the _regrid_method
 # class attribute of the relevant package. For example the _regrid_method attribute  of the NodePropertyFlow package
 # specifies that field "k" uses an OVERLAP regridder in combination with the averaging function "geometric_mean".
-new_simulation = simulation.regrid_like("regridded_twri", target_grid=new_idomain)
+new_simulation = simulation.regrid_like("regridded_twri", target_grid=target_grid)
 
 # %%
 # Let's plot the k-field. This is the regridded output, and it should should somewhat resemble the original k-field plotted earlier.
@@ -97,7 +91,7 @@ regridded_k_1.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
 # a second way to regrid  twri  is to regrid the groundwater flow model.
 
 model = simulation["GWF_1"]
-new_model = model.regrid_like(new_idomain)
+new_model = model.regrid_like(target_grid)
 
 regridded_k_2 = new_model["npf"]["k"]
 fig, ax = plt.subplots()
@@ -110,7 +104,7 @@ regridded_k_2.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
 
 regridder_types = {"k": (RegridderType.CENTROIDLOCATOR, None)}
 npf_regridded = model["npf"].regrid_like(
-    target_grid=new_idomain, regridder_types=regridder_types
+    target_grid=target_grid, regridder_types=regridder_types
 )
 new_model["npf"] = npf_regridded
 
@@ -118,4 +112,4 @@ new_model["npf"] = npf_regridded
 regridded_k_3 = new_model["npf"]["k"]
 fig, ax = plt.subplots()
 regridded_k_3.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
-pass
+pass  # break here to see the plots
