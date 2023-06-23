@@ -109,7 +109,8 @@ def make_circle_model_evt():
     segments = xr.DataArray(
         data=[1, 2, 3], coords={"segment": [1, 2, 3]}, dims=("segment",)
     )
-    segments_reversed = segments.isel(segment=slice(None, None, -1))
+    segments_reversed = segments.copy()
+    segments_reversed.values = [3, 2, 1]
 
     proportion_depth = xu.full_like(like, 0.3) * segments
     proportion_rate = xu.full_like(like, 0.3) * segments_reversed
