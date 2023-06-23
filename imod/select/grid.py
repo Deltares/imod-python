@@ -10,6 +10,19 @@ from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import DTypeSchema
 
 
+GridDataArray = Union[xr.DataArray, xu.UgridDataArray]
+
+
+@typedispatch
+def ones_like(grid: xr.DataArray, *args, **kwargs):
+    return xr.ones_like(grid, *args, **kwargs)
+
+
+@typedispatch
+def ones_like(grid: xu.UgridDataArray, *args, **kwargs):
+    return xu.ones_like(grid, *args, **kwargs)
+
+
 def _reduce_grid_except_dims(
     grid: Union[xr.DataArray, xu.UgridDataArray], preserve_dims: List[str]
 ) -> Union[xr.DataArray, xu.UgridDataArray]:

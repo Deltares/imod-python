@@ -17,6 +17,7 @@ from imod.mf6.pkgbase import (
 )
 from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
+from imod.select.grid import ones_like, GridDataArray
 from imod.select.points import points_indices
 from imod.util import values_within_range
 
@@ -257,14 +258,14 @@ class Well(BoundaryCondition):
     def __create_assigned_wells(
         self,
         wells_df: pd.DataFrame,
-        active: Union[xr.DataArray, xu.UgridDataArray],
-        top: Union[xr.DataArray, xu.UgridDataArray],
-        bottom: Union[xr.DataArray, xu.UgridDataArray],
-        k: Union[xr.DataArray, xu.UgridDataArray],
+        active: GridDataArray,
+        top: GridDataArray,
+        bottom: GridDataArray,
+        k: GridDataArray,
     ):
         # Ensure top, bottom & k
         # are broadcasted to 3d grid
-        like = xr.ones_like(active)
+        like = ones_like(active)
         bottom = like * bottom
         top_2d = (like * top).sel(layer=1)
         top_3d = bottom.shift(layer=1).fillna(top_2d)
@@ -310,7 +311,7 @@ class Well(BoundaryCondition):
         return ds_vars
 
     def __create_cellid(self, wells_assigned: pd.DataFrame, active: xr.DataArray):
-        like = xr.ones_like(active)
+        like = ones_like(active)
 
         # Groupby index and select first, to unset any duplicate records
         # introduced by the multi-indexed "time" dimension.
@@ -321,11 +322,11 @@ class Well(BoundaryCondition):
 
     @staticmethod
     def __derive_cellid_from_points(
-        dst_grid: Union[xr.DataArray, xu.UgridDataArray],
+        dst_grid: GridDataArray,
         x: List,
         y: List,
         layer: List,
-    ) -> xr.DataArray:
+    ) -> GridDataArray:
         """
         Create DataArray with Modflow6 cell identifiers based on x, y coordinates
         in a dataframe. For structured grid this DataArray contains 3 columns:
@@ -361,13 +362,16 @@ class Well(BoundaryCondition):
         # Convert cell2d indices from 0-based to 1-based.
         indices_cell2d = dict((dim, index + 1) for dim, index in indices_cell2d.items())
         # Prepare layer indices, for later concatenation
-        indices_layer = xr.DataArray(layer, coords=indices_cell2d["x"].coords)
 
         if isinstance(dst_grid, xu.UgridDataArray):
+            indices_layer = xr.DataArray(
+                layer, coords=indices_cell2d["mesh2d_nFaces"].coords
+            )
             face_dim = dst_grid.ugrid.grid.face_dimension
             indices_cell2d_dims = [face_dim]
             cell2d_coords = ["cell2d"]
         else:
+            indices_layer = xr.DataArray(layer, coords=indices_cell2d["x"].coords)
             indices_cell2d_dims = ["y", "x"]
             cell2d_coords = ["row", "column"]
 
