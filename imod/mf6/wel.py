@@ -441,7 +441,7 @@ class Well(BoundaryCondition):
 
         if nwells_df != nwells_assigned:
             raise ValueError(
-                "One or more well(s) are invalid due to minimum conductivity and thickness constraints."
+                "One or more well(s) are completely invalid due to minimum conductivity and thickness constraints."
             )
 
         ds = xr.Dataset()
