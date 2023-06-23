@@ -27,6 +27,8 @@ dependencies:
   - pip
   - pip:
       - pandamesh
+      - "git+https://github.com/Deltares/Ribasim.git#egg=ribasim&subdirectory=python/ribasim"
+      - "git+https://github.com/Deltares/Ribasim.git#egg=ribasim_testmodels&subdirectory=python/ribasim_testmodels"
   - pydata-sphinx-theme
   - pyproj
   - pytest
