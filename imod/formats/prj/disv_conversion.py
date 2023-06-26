@@ -133,7 +133,7 @@ class SingularTargetRegridderWeightsCache:
             # Avoid creation of a UgridDataArray here
             dims = source.dims[:-2]
             coords = {k: source.coords[k] for k in dims}
-            facedim = "mesh2d_nFace"
+            facedim = self.target.face_dimension
             face_source = xr.DataArray(
                 source.data.reshape(*source.shape[:-2], -1),
                 coords=coords,
