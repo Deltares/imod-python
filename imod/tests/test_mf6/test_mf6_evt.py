@@ -3,6 +3,7 @@ import textwrap
 
 import numpy as np
 import pytest
+import xarray as xr
 
 import imod
 
@@ -17,6 +18,7 @@ import imod
 def test_render(
     rate_fc, elevation_fc, concentration_fc, proportion_rate_fc, proportion_depth_fc
 ):
+    # Arrange
     directory = pathlib.Path("mymodel")
     globaltimes = np.array(
         [
@@ -36,9 +38,10 @@ def test_render(
         concentration=concentration_fc,
         concentration_boundary_type="AUX",
     )
-
+    # Act
     actual = evt.render(directory, "evt", globaltimes, False)
 
+    # Assert
     expected = textwrap.dedent(
         """\
         begin options
@@ -46,7 +49,7 @@ def test_render(
         end options
 
         begin dimensions
-          maxbound 0
+          maxbound 2
           nseg 1
         end dimensions
 
@@ -62,3 +65,145 @@ def test_render(
         end period"""
     )
     assert actual == expected
+
+
+@pytest.mark.usefixtures(
+    "rate_fc",
+    "elevation_fc",
+    "proportion_rate_fc",
+    "proportion_depth_fc",
+)
+def test_get_options__no_segments(
+    rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
+):
+    # Arrange
+    evt = imod.mf6.Evapotranspiration(
+        surface=elevation_fc,
+        rate=rate_fc,
+        depth=elevation_fc,
+        proportion_rate=proportion_rate_fc,
+        proportion_depth=proportion_depth_fc,
+    )
+
+    # Act
+    options = evt.get_options({})
+
+    # Assert
+    assert options["nseg"] == 1
+
+
+@pytest.mark.usefixtures(
+    "rate_fc",
+    "elevation_fc",
+    "proportion_rate_fc",
+    "proportion_depth_fc",
+)
+def test_get_options__with_segments(
+    rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
+):
+    # Arrange
+    segments = xr.DataArray(
+        data=[1, 2, 3], coords={"segment": [1, 2, 3]}, dims=("segment",)
+    )
+
+    dim_order = "segment", "time", "layer", "y", "x"
+
+    proportion_depth_fc = (proportion_depth_fc * segments).transpose(*dim_order)
+    proportion_rate_fc = (proportion_rate_fc * segments).transpose(*dim_order)
+
+    evt = imod.mf6.Evapotranspiration(
+        surface=elevation_fc,
+        rate=rate_fc,
+        depth=elevation_fc,
+        proportion_rate=proportion_rate_fc,
+        proportion_depth=proportion_depth_fc,
+    )
+
+    # Act
+    options = evt.get_options({})
+
+    # Assert
+    assert options["nseg"] == 4
+
+
+@pytest.mark.usefixtures(
+    "rate_fc",
+    "elevation_fc",
+    "proportion_rate_fc",
+    "proportion_depth_fc",
+)
+def test_get_bin_ds__no_segments(
+    rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
+):
+    # Arrange
+    evt = imod.mf6.Evapotranspiration(
+        surface=elevation_fc,
+        rate=rate_fc,
+        depth=elevation_fc,
+        proportion_rate=proportion_rate_fc,
+        proportion_depth=proportion_depth_fc,
+    )
+
+    # Act
+    bin_ds = evt._get_bin_ds()
+
+    # Assert
+    expected_dims = {"time": 3, "layer": 3, "y": 15, "x": 15}
+    expected_variables = [
+        "surface",
+        "rate",
+        "depth",
+        "proportion_depth",
+        "proportion_rate",
+    ]
+
+    assert bin_ds.dims == expected_dims
+    assert list(bin_ds.keys()) == expected_variables
+
+
+@pytest.mark.usefixtures(
+    "rate_fc",
+    "elevation_fc",
+    "proportion_rate_fc",
+    "proportion_depth_fc",
+)
+def test_get_bin_ds__with_segments(
+    rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
+):
+    # Arrange
+    segments = xr.DataArray(
+        data=[1, 2, 3], coords={"segment": [1, 2, 3]}, dims=("segment",)
+    )
+
+    dim_order = "segment", "time", "layer", "y", "x"
+
+    proportion_depth_fc = (proportion_depth_fc * segments).transpose(*dim_order)
+    proportion_rate_fc = (proportion_rate_fc * segments).transpose(*dim_order)
+
+    evt = imod.mf6.Evapotranspiration(
+        surface=elevation_fc,
+        rate=rate_fc,
+        depth=elevation_fc,
+        proportion_rate=proportion_rate_fc,
+        proportion_depth=proportion_depth_fc,
+    )
+
+    # Act
+    bin_ds = evt._get_bin_ds()
+
+    # Assert
+    expected_dims = {"time": 3, "layer": 3, "y": 15, "x": 15}
+    expected_variables = [
+        "surface",
+        "rate",
+        "depth",
+        "proportion_depth_segment_1",
+        "proportion_depth_segment_2",
+        "proportion_depth_segment_3",
+        "proportion_rate_segment_1",
+        "proportion_rate_segment_2",
+        "proportion_rate_segment_3",
+    ]
+
+    assert bin_ds.dims == expected_dims
+    assert list(bin_ds.keys()) == expected_variables
