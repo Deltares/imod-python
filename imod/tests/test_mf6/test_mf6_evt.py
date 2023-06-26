@@ -6,6 +6,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.schemata import ValidationError
 
 
 @pytest.mark.usefixtures(
@@ -207,3 +208,30 @@ def test_get_bin_ds__with_segments(
 
     assert bin_ds.dims == expected_dims
     assert list(bin_ds.keys()) == expected_variables
+
+
+@pytest.mark.usefixtures(
+    "rate_fc",
+    "elevation_fc",
+    "proportion_rate_fc",
+    "proportion_depth_fc",
+)
+def test_wrong_dim_order(
+    rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
+):
+    # Arrange
+    segments = xr.DataArray(
+        data=[1, 2, 3], coords={"segment": [1, 2, 3]}, dims=("segment",)
+    )
+
+    proportion_depth_fc = proportion_depth_fc * segments
+    proportion_rate_fc = proportion_rate_fc * segments
+
+    with pytest.raises(ValidationError):
+        imod.mf6.Evapotranspiration(
+            surface=elevation_fc,
+            rate=rate_fc,
+            depth=elevation_fc,
+            proportion_rate=proportion_rate_fc,
+            proportion_depth=proportion_depth_fc,
+        )
