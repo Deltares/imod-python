@@ -166,7 +166,7 @@ def test_render_concentration(
         end options
 
         begin dimensions
-          maxbound 0
+          maxbound 2
         end dimensions
 
         begin period 1
@@ -214,7 +214,7 @@ def test_repeat_stress(
         end options
 
         begin dimensions
-          maxbound 0
+          maxbound 2
         end dimensions
 
         begin period 1
