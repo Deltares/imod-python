@@ -46,7 +46,8 @@ def parse_ascii_segments(lines: List[str]):
     n_feature = len(features)
     n_vertex = [len(f) - 1 for f in features]
 
-    fid = np.empty(n_feature, dtype=int)
+    # Process the feature id as a string. This adds support for id's containing commas and spaces
+    fid = np.full(n_feature, "", dtype=object)
     is_polygon = np.empty(n_feature, dtype=bool)
     indices = np.repeat(np.arange(n_feature), n_vertex)
 
