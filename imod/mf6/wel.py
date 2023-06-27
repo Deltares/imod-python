@@ -17,7 +17,7 @@ from imod.mf6.pkgbase import (
 )
 from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
-from imod.select.grid import GridDataArray, ones_like
+from imod.typing.grid import GridDataArray, ones_like
 from imod.select.points import points_indices
 from imod.util import values_within_range
 

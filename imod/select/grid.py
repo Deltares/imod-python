@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List
 
 import numpy as np
 import xarray as xr
@@ -8,23 +8,12 @@ from scipy.ndimage import binary_dilation
 
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import DTypeSchema
-
-GridDataArray = Union[xr.DataArray, xu.UgridDataArray]
-
-
-@typedispatch
-def ones_like(grid: xr.DataArray, *args, **kwargs):
-    return xr.ones_like(grid, *args, **kwargs)
-
-
-@typedispatch
-def ones_like(grid: xu.UgridDataArray, *args, **kwargs):
-    return xu.ones_like(grid, *args, **kwargs)
+from imod.typing.grid import GridDataArray
 
 
 def _reduce_grid_except_dims(
-    grid: Union[xr.DataArray, xu.UgridDataArray], preserve_dims: List[str]
-) -> Union[xr.DataArray, xu.UgridDataArray]:
+    grid: GridDataArray, preserve_dims: List[str]
+) -> GridDataArray:
     to_reduce = {dim: 0 for dim in grid.dims if dim not in preserve_dims}
     return grid.isel(**to_reduce)
 
@@ -36,9 +25,7 @@ def _validate_grid(grid):
         schema.validate(grid)
 
 
-def grid_boundary_xy(
-    grid: Union[xr.DataArray, xu.UgridDataArray]
-) -> Union[xr.DataArray, xu.UgridDataArray]:
+def grid_boundary_xy(grid: GridDataArray) -> GridDataArray:
     """
     Return grid boundary on the xy plane.
 
@@ -82,8 +69,8 @@ def _grid_boundary_xy(grid: xu.UgridDataArray) -> xu.UgridDataArray:
 
 
 def active_grid_boundary_xy(
-    active: Union[xr.DataArray, xu.UgridDataArray]
-) -> Union[xr.DataArray, xu.UgridDataArray]:
+    active: GridDataArray,
+) -> GridDataArray:
     """
     Return active boundary cells on the xy plane.
 

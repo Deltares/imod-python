@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 
 import imod
-from imod.select.grid import ones_like
+from imod.typing.grid import ones_like
 from imod.tests.fixtures.mf6_regridding_fixture import (
     grid_data_structured,
     grid_data_structured_layered,
