@@ -6,7 +6,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import List, Optional, Tuple, TypeAlias, Union
+from typing import List, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -25,8 +25,7 @@ from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.wel import Well
 from imod.schemata import ValidationError
-
-GridDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
+from imod.typing.grid import GridDataArray
 
 
 def initialize_template(name: str) -> Template:

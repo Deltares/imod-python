@@ -3,7 +3,7 @@ import copy
 import pathlib
 import subprocess
 import warnings
-from typing import Optional, TypeAlias, Union
+from typing import Optional, Union
 
 import jinja2
 import numpy as np
@@ -20,8 +20,7 @@ from imod.mf6.model import (
 )
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.schemata import ValidationError
-
-GridDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
+from imod.typing.grid import GridDataArray
 
 
 class Modflow6Simulation(collections.UserDict):
