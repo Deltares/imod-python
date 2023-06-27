@@ -6,13 +6,13 @@ import pandas as pd
 import pytest
 
 import imod
-from imod.typing.grid import ones_like
 from imod.tests.fixtures.mf6_regridding_fixture import (
     grid_data_structured,
     grid_data_structured_layered,
     grid_data_unstructured,
     grid_data_unstructured_layered,
 )
+from imod.typing.grid import ones_like
 
 
 @pytest.fixture(scope="function")
