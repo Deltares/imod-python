@@ -104,4 +104,4 @@ new_model["npf"] = npf_regridded
 regridded_k_3 = new_model["npf"]["k"]
 fig, ax = plt.subplots()
 regridded_k_3.sel(layer=1).plot(y="y", yincrease=False, ax=ax)
-pass  # Break here to see the plots
+# %%
