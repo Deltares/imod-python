@@ -16,7 +16,7 @@ but on doing something with it ( such as regridding)
 def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
     """
     This function creates the twri model. There is a separate example contained in ex01_twri.py that you should look at if
-    you are interested in the model building- this function is used to set the model up for other examples that do not focus on that.
+    you are interested in the model building. This function is used to set the model up for other examples that do not focus on that.
     """
 
     nlay = 3
@@ -25,17 +25,17 @@ def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
     shape = (nlay, nrow, ncol)
 
     dx = 5000.0
-    dy = -5000.0
+    dy = 5000.0
     xmin = 0.0
     xmax = dx * ncol
     ymin = 0.0
-    ymax = abs(dy) * nrow
+    ymax = dy * nrow
     dims = ("layer", "y", "x")
 
     layer = np.array([1, 2, 3])
-    y = np.arange(ymax, ymin, dy) + 0.5 * dy
+    y = np.arange(ymax, ymin, -dy) - 0.5 * dy
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
-    coords = {"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy}
+    coords = {"layer": layer, "y": y, "x": x, "dx": dx, "dy": -dy}
 
     # %%
     # Create DataArrays
@@ -75,8 +75,8 @@ def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
     # we compute the x and y cooordinates of the wells based on the row and column indices presented in the original twri model
     well_y = (
         ymax
-        - np.array([5.0, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13]) * abs(dy)
-        - dy / 2
+        - np.array([5.0, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13]) *dy
+        + dy / 2
     )
     well_x = (
         np.array([11.0, 6, 12, 8, 10, 12, 14, 8, 10, 12, 14, 8, 10, 12, 14]) * dx
