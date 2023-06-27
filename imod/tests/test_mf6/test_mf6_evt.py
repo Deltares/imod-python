@@ -47,7 +47,6 @@ def test_render(
 
         begin dimensions
           maxbound 0
-          nseg
         end dimensions
 
 

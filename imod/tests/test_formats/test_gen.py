@@ -210,7 +210,7 @@ def test_parse_ascii_segment_linestrings():
     from imod.formats.gen.gen import parse_ascii_segments
 
     lines = [
-        "1",
+        "1,TestFeatureName",
         "0.0, 0.0",
         "1.0, 1.0",
         "end",
@@ -225,7 +225,7 @@ def test_parse_ascii_segment_linestrings():
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert (gdf.geometry.geom_type == "LineString").all()
     assert not gdf.geometry.has_z.any()
-    assert np.array_equal(gdf["id"], [1, 2])
+    assert np.array_equal(gdf["id"], ["1,TestFeatureName", "2"])
 
 
 def test_parse_ascii_segment_polygon():
@@ -250,7 +250,7 @@ def test_parse_ascii_segment_polygon():
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert (gdf.geometry.geom_type == "Polygon").all()
     assert not gdf.geometry.has_z.any()
-    assert np.array_equal(gdf["id"], [1, 2])
+    assert np.array_equal(gdf["id"], ["1", "2"])
 
 
 def test_parse_ascii_segment_linestrings3d():
@@ -272,7 +272,7 @@ def test_parse_ascii_segment_linestrings3d():
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert (gdf.geometry.geom_type == "LineString").all()
     assert gdf.geometry.has_z.all()
-    assert np.array_equal(gdf["id"], [1, 2])
+    assert np.array_equal(gdf["id"], ["1", "2"])
 
 
 def test_parse_ascii_segment_mixed_topology_error():
@@ -336,4 +336,4 @@ def test_read_ascii(tmp_path):
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert (gdf.geometry.geom_type == "LineString").all()
     assert gdf.geometry.has_z.all()
-    assert np.array_equal(gdf["id"], [1, 2])
+    assert np.array_equal(gdf["id"], ["1", "2"])

@@ -786,39 +786,40 @@ def read_projectfile(path: FilePath) -> Dict[str, Any]:
     The top-level keys are the "topic" entries such "bnd" or "riv" in the
     project file. An example structure of the dictionaries is visualized below:
 
-    ```
-    content
-    ├── bnd
-    │   ├── active: bool
-    │   └── ibound: list of dictionaries for each layer
-    ├── riv
-    │   ├── active: bool
-    │   ├── conductance: list of dictionaries for each time and layer.
-    │   ├── stage: idem.
-    │   ├── bottom_elevation: idem.
-    │   └── infiltration_factor: idem.
-    etc.
-    ```
+    .. code-block::
+
+        content
+        ├── bnd
+        │   ├── active: bool
+        │   └── ibound: list of dictionaries for each layer
+        ├── riv
+        │   ├── active: bool
+        │   ├── conductance: list of dictionaries for each time and layer.
+        │   ├── stage: idem.
+        │   ├── bottom_elevation: idem.
+        │   └── infiltration_factor: idem.
+        etc.
 
     Time and layer are flattened into a single list and time is included in
     every dictionary:
 
-    ```
-    stage
-    ├── 0  # First entry in list
-    │   ├── active: bool
-    │   ├── is_constant: bool
-    │   ├── layer: int
-    │   ├── factor: float
-    │   ├── addition: float
-    │   ├── constant: float
-    │   ├── path: str
-    │   └── time: str
-    │
-    ├── 1  # Second entry in list
-    │   ├── etc.
-    etc.
-    ```
+    .. code-block::
+
+        stage
+        ├── 0  # First entry in list
+        │   ├── active: bool
+        │   ├── is_constant: bool
+        │   ├── layer: int
+        │   ├── factor: float
+        │   ├── addition: float
+        │   ├── constant: float
+        │   ├── path: str
+        │   └── time: str
+        │
+        ├── 1  # Second entry in list
+        │   ├── etc.
+        etc.
+
 
     Parameters
     ----------

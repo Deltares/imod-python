@@ -8,14 +8,22 @@ from collections import Counter
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
-import geopandas as gpd
 import numpy as np
 import pandas as pd
-import shapely
 import xarray as xr
 import xugrid as xu
 
 import imod
+
+try:
+    import geopandas as gpd
+except ImportError:
+    gpd = imod.util.MissingOptionalModule("geopandas")
+
+try:
+    import shapely
+except ImportError:
+    shapely = imod.util.MissingOptionalModule("shapely")
 
 
 def vectorized_overlap(bounds_a, bounds_b):
@@ -125,7 +133,7 @@ class SingularTargetRegridderWeightsCache:
             # Avoid creation of a UgridDataArray here
             dims = source.dims[:-2]
             coords = {k: source.coords[k] for k in dims}
-            facedim = "mesh2d_nFace"
+            facedim = self.target.face_dimension
             face_source = xr.DataArray(
                 source.data.reshape(*source.shape[:-2], -1),
                 coords=coords,
@@ -639,7 +647,7 @@ def create_ic(cache, model, key, value, active, **kwargs):
 
 def multi_layer_hfb(
     snapped: xu.UgridDataset,
-    dataframe: gpd.GeoDataFrame,
+    dataframe: "gpd.GeoDataFrame",
     top: xu.UgridDataArray,
     bottom: xu.UgridDataArray,
     k: xu.UgridDataArray,
