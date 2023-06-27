@@ -4,6 +4,10 @@ import xugrid as xu
 
 import imod
 
+# xugrid 0.5.0 introduced a bug which prevents disv_converter from functioning
+# properly. Skip if this one occurs.
+xu_version_to_skip = (xu.__version__ == "0.5.0") | (xu.__version__ < "0.4.0")
+
 
 def create_quadgrid(ibound):
     return xu.Ugrid2d.from_structured(ibound)
@@ -21,6 +25,7 @@ def create_trigrid(ibound):
     return grid
 
 
+@pytest.mark.skipif(xu_version_to_skip, reason="xugrid == 0.5.0 | xugrid < 0.4.0")
 @pytest.mark.usefixtures("imodflow_model")
 @pytest.mark.parametrize("create_grid", [create_quadgrid, create_trigrid])
 def test_convert_to_disv(imodflow_model, tmp_path, create_grid):
