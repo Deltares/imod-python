@@ -33,7 +33,7 @@ simulation = create_twri_simulation()
 
 idomain = simulation["GWF_1"]["dis"]["idomain"]
 heterogeneous_k = xr.zeros_like(idomain, dtype=np.double)
-heterogeneous_k.values = np.random.lognormal(4.0, 2.0, heterogeneous_k.shape)
+heterogeneous_k.values = np.random.lognormal(4.0, 1.0, heterogeneous_k.shape)
 simulation["GWF_1"]["npf"]["k"] = heterogeneous_k
 
 # %%

@@ -96,7 +96,7 @@ def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
             ]
         )
         * abs(dy)
-        - dy / 2
+        + dy / 2
     )
     well_x = (
         np.array(
