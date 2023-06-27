@@ -26,17 +26,17 @@ def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
     shape = (nlay, nrow, ncol)
 
     dx = 5000.0
-    dy = -5000.0
+    dy = 5000.0
     xmin = 0.0
     xmax = dx * ncol
     ymin = 0.0
-    ymax = abs(dy) * nrow
+    ymax = dy * nrow
     dims = ("layer", "y", "x")
 
     layer = np.array([1, 2, 3])
-    y = np.arange(ymax, ymin, dy) + 0.5 * dy
+    y = np.arange(ymax, ymin, -dy) - 0.5 * dy
     x = np.arange(xmin, xmax, dx) + 0.5 * dx
-    coords = {"layer": layer, "y": y, "x": x, "dx": dx, "dy": dy}
+    coords = {"layer": layer, "y": y, "x": x, "dx": dx, "dy": -dy}
 
     # %%
     # Create DataArrays
