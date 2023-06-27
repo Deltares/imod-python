@@ -75,7 +75,7 @@ def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
     # we compute the x and y cooordinates of the wells based on the row and column indices presented in the original twri model
     well_y = (
         ymax
-        - np.array([5.0, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13]) *dy
+        - np.array([5.0, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13]) * dy
         + dy / 2
     )
     well_x = (
