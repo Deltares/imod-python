@@ -15,9 +15,7 @@ but on doing something with it ( such as regridding)
 
 def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
     """
-    This function creates the twri model.
-    If you are interested in how the twri model is build an extensive example can be found in ex01_twri.py.
-    This function is used to set the model up for other examples that do not focus on that.
+    There is a separate example contained in `TWRI <https://deltares.gitlab.io/imod/imod-python/examples/mf6/ex01_twri.html#sphx-glr-examples-mf6-ex01-twri-py>`_ that you should look at if you are interested in the model building
     """
 
     nlay = 3
@@ -70,8 +68,11 @@ def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
     screen_layer = [2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     # we set the screen top and bottoms such that each well falls in one layer and is long enough not to be filtered out
-    screen_bottom = bottom[screen_layer] + 0.1
-    screen_top = screen_bottom + 50
+    perforation_length = 50
+    delta_z = 0.1
+
+    screen_bottom = bottom[screen_layer] + delta_z
+    screen_top = screen_bottom + delta_z + perforation_length
 
     # we compute the x and y cooordinates of the wells based on the row and column indices presented in the original twri model
     well_y = (
