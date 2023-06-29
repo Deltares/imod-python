@@ -6,12 +6,10 @@ This source file contains functions that create a simulation that can be used in
 but on doing something with it ( such as regridding)
 
 """
-
 import numpy as np
 import xarray as xr
 
 import imod
-
 
 
 def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
