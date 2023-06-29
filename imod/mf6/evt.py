@@ -1,3 +1,5 @@
+from typing import Dict, List
+
 import numpy as np
 
 from imod.mf6.pkgbase import BoundaryCondition
@@ -196,16 +198,14 @@ class Evapotranspiration(BoundaryCondition):
 
         return errors
 
-    def get_options(self, d, not_options=None):
-        # Use this method to intermediately
-        # Call parent method
-        d = super().get_options(d, not_options=not_options)
+    def get_options(self, predefined_options: Dict, not_options: List = None):
+        options = super().get_options(predefined_options, not_options=not_options)
         # Add amount of segments
         if "segment" in self.dataset.dims:
-            d["nseg"] = self.dataset.dims["segment"] + 1
+            options["nseg"] = self.dataset.dims["segment"] + 1
         else:
-            d["nseg"] = 1
-        return d
+            options["nseg"] = 1
+        return options
 
     def _get_bin_ds(self):
         bin_ds = super()._get_bin_ds()
