@@ -502,19 +502,22 @@ def unstack_dim_into_variable(
     """
     Unstack each variable containing ``dim`` into separate variables.
     """
-    ds = dataset.copy()
+    unstacked = dataset.copy()
 
-    for variable in ds.data_vars:
-        if dim in ds[variable].dims:
-            stacked = ds[variable]
-            ds = ds.drop_vars(variable)
-            for index in stacked[dim].values:
-                ds[f"{variable}_{dim}_{index}"] = stacked.sel(
-                    indexers={dim: index}, drop=True
-                )
-    if dim in ds.coords:
-        ds = ds.drop_vars(dim)
-    return ds
+    variables_containing_dim = [
+        dim for variable in dataset.data_vars if dim in dataset[variable].dims
+    ]
+
+    for variable in variables_containing_dim:
+        stacked = unstacked[variable]
+        unstacked = unstacked.drop_vars(variable)
+        for index in stacked[dim].values:
+            unstacked[f"{variable}_{dim}_{index}"] = stacked.sel(
+                indexers={dim: index}, drop=True
+            )
+    if dim in unstacked.coords:
+        unstacked = unstacked.drop_vars(dim)
+    return unstacked
 
 
 def mdal_compliant_ugrid2d(dataset: xr.Dataset) -> xr.Dataset:
