@@ -77,6 +77,9 @@ def test_render(
 def test_get_options__no_segments(
     rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
 ):
+    """Test with no segments specified, this means there implicitly is 1 segment
+    in the Modflow 6 input."""
+
     # Arrange
     evt = imod.mf6.Evapotranspiration(
         surface=elevation_fc,
@@ -102,6 +105,9 @@ def test_get_options__no_segments(
 def test_get_options__with_segments(
     rate_fc, elevation_fc, proportion_rate_fc, proportion_depth_fc
 ):
+    """Test with 3 segments specified, this means that Modflow6 counts a total
+    of 4 segments."""
+
     # Arrange
     segments = xr.DataArray(
         data=[1, 2, 3], coords={"segment": [1, 2, 3]}, dims=("segment",)
