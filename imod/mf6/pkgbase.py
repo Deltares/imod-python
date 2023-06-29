@@ -842,7 +842,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         return periods
 
-    def get_options(self, predefined_options: Dict, not_options: List =None):
+    def get_options(self, predefined_options: Dict, not_options: List = None):
         options = copy(predefined_options)
 
         if not_options is None:
