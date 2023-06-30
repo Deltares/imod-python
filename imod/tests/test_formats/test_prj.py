@@ -1,6 +1,7 @@
 import re
 import textwrap
 from datetime import datetime
+from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
@@ -149,6 +150,7 @@ def test_parse_blockline():
         ]
     )
     actual = prj._parse_blockline(lines)
+    wdir = Path(".").resolve()
     expected = {
         "active": True,
         "is_constant": 2,
@@ -156,8 +158,9 @@ def test_parse_blockline():
         "factor": 1.0,
         "addition": 0.0,
         "constant": -999.99,
-        "path": "ibound.idf",
+        "path": wdir / "ibound.idf",
     }
+
     assert actual == expected
 
     actual = prj._parse_blockline(lines, "2000-01-01 00:00:00")
@@ -208,10 +211,11 @@ def test_parse_notimeblock():
             ["1", "2", "001", "2.0", "3.0", "-999.99", "head.idf"],
         ]
     )
+    wdir = Path(".").resolve()
     actual = prj._parse_notimeblock(lines, fields)
     assert actual["n_system"] == 1
-    assert actual["conductance"][0]["path"] == "cond.idf"
-    assert actual["head"][0]["path"] == "head.idf"
+    assert actual["conductance"][0]["path"] == wdir / "cond.idf"
+    assert actual["head"][0]["path"] == wdir / "head.idf"
 
 
 def test_parse_speciesblock():
