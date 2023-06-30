@@ -6,7 +6,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Dict
 
 import cftime
 import jinja2
@@ -26,7 +26,7 @@ from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.wel import Well
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray
-
+from imod.mf6.regridding_utils import  RegridderType
 
 def initialize_template(name: str) -> Template:
     loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -429,6 +429,26 @@ class Modflow6Model(collections.UserDict, abc.ABC):
     def get_domain(self):
         dis = self.__get_diskey()
         return self[dis]["idomain"]
+    
+    def _get_regrid_methods(self)-> Dict[RegridderType, str]:
+        methods = {}
+        for pkg_name, pkg in self.items():
+            if pkg.is_regridding_supported():
+               pkg_methods = pkg.get_regrid_methods()
+               for variable in pkg_methods:
+                    regriddertype = pkg_methods[variable][0]
+                    if regriddertype not in methods.keys():
+                        functiontype = pkg_methods[variable][1]
+                        methods[regriddertype]= functiontype
+            else:
+                raise NotImplementedError(
+                    f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
+                )
+        return methods
+    
+    def _get_regridding_domain(self, methods:  Dict[RegridderType, str]):
+        idomain = self.get_domain()
+        
 
 
 class GroundwaterFlowModel(Modflow6Model):

@@ -12,6 +12,7 @@ from imod.tests.fixtures.mf6_regridding_fixture import (
 def test_regrid_structured_model_to_structured_model(
     structured_flow_model: imod.mf6.GroundwaterFlowModel,
 ):
+    m = structured_flow_model._get_regrid_methods()
     finer_idomain = grid_data_structured(np.int32, 1, 0.4)
 
     new_gwf_model = structured_flow_model.regrid_like(finer_idomain)

@@ -3,7 +3,7 @@ import copy
 import numbers
 import pathlib
 from collections import defaultdict
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union, Optional
 
 import cftime
 import jinja2
@@ -760,6 +760,11 @@ class Package(PackageBase, abc.ABC):
         returns true if package supports regridding.
         """
         return hasattr(self, "_regrid_method")
+    
+    def get_regrid_methods(self) ->  Optional[Dict[str, Tuple[RegridderType, str]]]:
+        if self.is_regridding_supported():
+            return self._regrid_method
+        return None
 
     def regrid_like(
         self,
