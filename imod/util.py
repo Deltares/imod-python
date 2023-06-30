@@ -505,7 +505,7 @@ def unstack_dim_into_variable(
     unstacked = dataset.copy()
 
     variables_containing_dim = [
-        dim for variable in dataset.data_vars if dim in dataset[variable].dims
+        variable for variable in dataset.data_vars if dim in dataset[variable].dims
     ]
 
     for variable in variables_containing_dim:
