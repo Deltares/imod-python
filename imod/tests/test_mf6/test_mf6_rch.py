@@ -196,7 +196,7 @@ def test_render_concentration(concentration_fc, rate_fc):
         end options
 
         begin dimensions
-          maxbound 0
+          maxbound 2
         end dimensions
 
         begin period 1

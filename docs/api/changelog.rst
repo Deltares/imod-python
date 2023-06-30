@@ -27,6 +27,11 @@ Fixed
 - :meth:`imod.mf6.Simulation._validate` now print all validation errors for all
   models and packages in one message.
 - The gen file reader can now handle feature id's that contain commas and spaces
+- :class:`imod.mf6.EvapoTranspiration` now supports segments, by adding a
+  ``segment`` dimension to the ``proportion_depth`` and ``proportion_rate``
+  variables.
+- :class:`imod.mf6.EvapoTranspiration` template for ``.evt`` file now properly 
+  formats ``nseg`` option.
 
 
 [0.13.1] - 2023-05-05

@@ -2,6 +2,7 @@ import abc
 import numbers
 import pathlib
 from collections import defaultdict
+from copy import copy
 from typing import Any, Dict, List
 
 import cftime
@@ -841,7 +842,9 @@ class BoundaryCondition(Package, abc.ABC):
 
         return periods
 
-    def get_options(self, d, not_options=None):
+    def get_options(self, predefined_options: Dict, not_options: List = None):
+        options = copy(predefined_options)
+
         if not_options is None:
             not_options = self.period_data()
 
@@ -850,13 +853,13 @@ class BoundaryCondition(Package, abc.ABC):
                 continue
             v = self.dataset[varname].values[()]
             if self._valid(v):  # skip None and False
-                d[varname] = v
-        return d
+                options[varname] = v
+        return options
 
     def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {"binary": binary}
-        bin_ds = self[self.period_data()]
+        bin_ds = self._get_bin_ds()
         d["periods"] = self.period_paths(
             directory, pkgname, globaltimes, bin_ds, binary
         )
@@ -885,10 +888,14 @@ class BoundaryCondition(Package, abc.ABC):
 
         return self._template.render(d)
 
+    def _get_bin_ds(self):
+        return self[self.period_data()]
+
     def write_perioddata(self, directory, pkgname, binary):
         if len(self.period_data()) == 0:
             return
-        bin_ds = self[self.period_data()]
+
+        bin_ds = self._get_bin_ds()
 
         if binary:
             ext = "bin"
