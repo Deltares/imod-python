@@ -60,8 +60,8 @@ def parse_ascii_segments(lines: List[str]):
     vertex_coords = []
     for i, feature in enumerate(features):
         fid[i] = feature[0]
-        feature_buffer = io.StringIO(initial_value='\n'.join(feature[1:]))
-        coords_df = pd.read_csv(feature_buffer, delimiter=delimiter, header = None)
+        feature_buffer = io.StringIO(initial_value="\n".join(feature[1:]))
+        coords_df = pd.read_csv(feature_buffer, delimiter=delimiter, header=None)
         coords = coords_df.values
         is_polygon[i] = (coords[0] == coords[-1]).all()
         vertex_coords.append(coords)
