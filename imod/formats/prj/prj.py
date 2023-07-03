@@ -262,7 +262,7 @@ def _parse_blockline(lines: _LineIterator, time: str = None) -> Dict[str, Any]:
             "constant": float(line[5]),
         }
         if content["is_constant"] == 2:
-            content["path"] = line[6]
+            content["path"] = Path(line[6]).resolve()
         if time is not None:
             content["time"] = time
         return content
@@ -829,6 +829,9 @@ def read_projectfile(path: FilePath) -> Dict[str, Any]:
     -------
     content: Dict[str, Any]
     """
+    # Force to Path
+    path = Path(path)
+
     with open(path) as f:
         lines = f.readlines()
 
@@ -841,8 +844,11 @@ def read_projectfile(path: FilePath) -> Dict[str, Any]:
 
     lines = _LineIterator(tokenized)
     content = {}
-    while not lines.finished:
-        _parse_block(lines, content)
+    wdir = path.parent
+    # Change dir temporarely to projectfile dir to resolve relative paths
+    with imod.util.cd(wdir):
+        while not lines.finished:
+            _parse_block(lines, content)
 
     return content
 
