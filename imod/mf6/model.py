@@ -416,8 +416,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         """
         new_model = self.__class__()
 
-        methods = self._get_regrid_methods()
-        output_domain = self._get_regridding_domain(target_grid, methods)
+
 
         for pkg_name, pkg in self.items():
             if pkg.is_regridding_supported():
@@ -427,10 +426,17 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
                 )
             
+        methods = self._get_regrid_methods()
+        output_domain = self._get_regridding_domain(target_grid, methods)
         new_model[self.__get_diskey()]["idomain"] = output_domain
-
-
+        new_model._mask_all_packages(output_domain)
         return new_model
+
+    def _mask_all_packages(self, domain: Union[xr.DataArray, xu.UgridDataArray],):
+
+        for pkgname, pkg in self.items():
+            self[pkgname] = pkg.mask(domain)
+
 
     def get_domain(self):
         dis = self.__get_diskey()
@@ -469,9 +475,12 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             if included_in_all is None:
                 included_in_all = regridded_idomain
             else:
-                included_in_all = included_in_all and regridded_idomain
+                included_in_all = included_in_all.where(regridded_idomain.isnull()==False)
+        new_idomain = included_in_all.where(included_in_all.isnull()==False, other =0)
+        new_idomain =new_idomain.astype(np.int32)
             
-        return included_in_all
+        return new_idomain
+
 
 
 

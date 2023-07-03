@@ -742,16 +742,19 @@ class Package(PackageBase, abc.ABC):
         for var, da in self.dataset.data_vars.items():
             if set(domain.dims).issubset(da.dims):
                 # Check if this should be: np.issubdtype(da.dtype, np.floating)
-                if issubclass(da.dtype, numbers.Real):
-                    masked[var] = da.where(domain, other=np.nan)
-                elif issubclass(da.dtype, numbers.Integral):
-                    masked[var] = da.where(domain, other=0)
+                if issubclass(da.dtype.type, numbers.Integral):
+                    masked[var] = da.where(domain != 0, other = 0)
+                elif issubclass(da.dtype.type, numbers.Real):
+                    masked[var] = da.where(domain != 0)
                 else:
                     raise TypeError(
                         f"Expected dtype float or integer. Received instead: {da.dtype}"
                     )
             else:
-                masked[var] = da
+                if da.values[()] is not None:
+                    masked[var] =  da.values[()]
+                else:
+                    masked[var] = None
 
         return type(self)(**masked)
 
