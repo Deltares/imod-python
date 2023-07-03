@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from scipy.io import FortranFile, FortranFormattingError
 
+from imod.formats.ipf import _infer_delimwhitespace
 from imod.util import MissingOptionalModule
 
 try:
@@ -24,8 +25,6 @@ except ImportError:
 
 # ASCII text format:
 # ------------------
-
-
 def parse_ascii_points(lines: List[str]) -> "geopandas.GeoDataFrame":  # type: ignore # noqa
     n = len(lines) - 1
     fid = np.empty(n, dtype=int)
@@ -51,10 +50,19 @@ def parse_ascii_segments(lines: List[str]):
     is_polygon = np.empty(n_feature, dtype=bool)
     indices = np.repeat(np.arange(n_feature), n_vertex)
 
+    first_coord = features[0][1:][0]
+    has_whitespace = _infer_delimwhitespace(first_coord, 2)
+    if has_whitespace:
+        delimiter = r"\s+"
+    else:
+        delimiter = ","
+
     vertex_coords = []
     for i, feature in enumerate(features):
         fid[i] = feature[0]
-        coords = np.loadtxt(feature[1:], delimiter=",")
+        feature_buffer = io.StringIO(initial_value='\n'.join(feature[1:]))
+        coords_df = pd.read_csv(feature_buffer, delimiter=delimiter, header = None)
+        coords = coords_df.values
         is_polygon[i] = (coords[0] == coords[-1]).all()
         vertex_coords.append(coords)
 
