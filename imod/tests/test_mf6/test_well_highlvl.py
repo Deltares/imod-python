@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
+from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.tests.fixtures.mf6_regridding_fixture import (
@@ -22,42 +23,40 @@ def twri_simulation(transient_twri_model):
     return transient_twri_model
 
 
-@pytest.mark.parametrize(
-    "grid_data, grid_data_layered, reference_output",
-    [
-        (
-            grid_data_unstructured,
-            grid_data_unstructured_layered,
-            np.array(
-                [
-                    # [layer, faceid, rate]
-                    ["1 3 1"],
-                    ["1 3 2"],
-                    ["1 4 2"],
-                    ["2 3 1"],
-                    ["2 4 2"],
-                    ["3 4 1"],
-                ],
-                dtype=object,
-            ),
-        ),
-        (
-            grid_data_structured,
-            grid_data_structured_layered,
-            np.array(
-                [
-                    # [layer, yind,, xind, rate]
-                    ["1 2 1 1"],
-                    ["1 2 1 2"],
-                    ["1 2 2 2"],
-                    ["2 2 1 1"],
-                    ["2 2 2 2"],
-                    ["3 2 2 1"],
-                ],
-                dtype=object,
-            ),
-        ),
-    ],
+class WriteWell:
+    @staticmethod
+    def case_write_wel_structured():
+        expected_output = np.array(
+            [
+                # [layer, yind,, xind, rate]
+                ["1 2 1 1"],
+                ["1 2 1 2"],
+                ["1 2 2 2"],
+                ["2 2 1 1"],
+                ["2 2 2 2"],
+                ["3 2 2 1"],
+            ]
+        )
+        return grid_data_structured, grid_data_structured_layered, expected_output
+
+    @staticmethod
+    def case_write_wel_unstructured():
+        expected_output = np.array(
+            [
+                # [layer, faceid, rate]
+                ["1 3 1"],
+                ["1 3 2"],
+                ["1 4 2"],
+                ["2 3 1"],
+                ["2 4 2"],
+                ["3 4 1"],
+            ]
+        )
+        return grid_data_unstructured, grid_data_unstructured_layered, expected_output
+
+
+@parametrize_with_cases(
+    "grid_data, grid_data_layered, reference_output", cases=WriteWell
 )
 def test_write_well(tmp_path: Path, grid_data, grid_data_layered, reference_output):
     well = imod.mf6.Well(
