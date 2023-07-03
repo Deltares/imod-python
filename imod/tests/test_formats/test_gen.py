@@ -206,7 +206,7 @@ def test_parse_ascii_points():
     assert np.array_equal(gdf["id"], [1, 2, 3, 10, 11])
 
 
-def test_parse_ascii_segment_linestrings():
+def test_parse_ascii_segment_linestrings__comma_delimited():
     from imod.formats.gen.gen import parse_ascii_segments
 
     lines = [
@@ -218,6 +218,28 @@ def test_parse_ascii_segment_linestrings():
         "0.0, 0.0",
         "1.0, 1.0",
         "2.0, 3.0",
+        "end",
+        "end",
+    ]
+    gdf = parse_ascii_segments(lines)
+    assert isinstance(gdf, gpd.GeoDataFrame)
+    assert (gdf.geometry.geom_type == "LineString").all()
+    assert not gdf.geometry.has_z.any()
+    assert np.array_equal(gdf["id"], ["1,TestFeatureName", "2"])
+
+
+def test_parse_ascii_segment_linestrings__whitespace_delimited():
+    from imod.formats.gen.gen import parse_ascii_segments
+
+    lines = [
+        "1,TestFeatureName",
+        "  0.0     0.0",
+        "  1.0     1.0",
+        "end",
+        "2",
+        "  0.0     0.0",
+        "  1.0     1.0",
+        "  2.0     3.0",
         "end",
         "end",
     ]
