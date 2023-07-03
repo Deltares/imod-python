@@ -26,7 +26,7 @@ from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.wel import Well
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray
-from imod.mf6.regridding_utils import  RegridderType
+from imod.mf6.regridding_utils import  RegridderInstancesCollection, RegridderType
 
 def initialize_template(name: str) -> Template:
     loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -416,6 +416,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         """
         new_model = self.__class__()
 
+        methods = self._get_regrid_methods()
+        output_domain = self._get_regridding_domain(target_grid, methods)
+
         for pkg_name, pkg in self.items():
             if pkg.is_regridding_supported():
                 new_model[pkg_name] = pkg.regrid_like(target_grid)
@@ -423,6 +426,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 raise NotImplementedError(
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
                 )
+            
+        new_model[self.__get_diskey()]["idomain"] = output_domain
+
 
         return new_model
 
@@ -446,9 +452,28 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 )
         return methods
     
-    def _get_regridding_domain(self, methods:  Dict[RegridderType, str]):
+    def _get_regridding_domain(self, target_grid: Union[xr.DataArray, xu.UgridDataArray], methods:  Dict[RegridderType, str]):
         idomain = self.get_domain()
-        
+        regridder_collection = RegridderInstancesCollection(
+            idomain, target_grid=target_grid
+        )   
+        included_in_all =None     
+        for regriddertype, function in methods.items():
+
+
+            regridder = regridder_collection.get_regridder(
+                regriddertype,
+                function,
+            )
+            regridded_idomain = regridder.regrid(idomain)
+            if included_in_all is None:
+                included_in_all = regridded_idomain
+            else:
+                included_in_all = included_in_all and regridded_idomain
+            
+        return included_in_all
+
+
 
 
 class GroundwaterFlowModel(Modflow6Model):
