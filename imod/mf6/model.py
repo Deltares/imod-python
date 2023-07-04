@@ -448,10 +448,11 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             if pkg.is_regridding_supported():
                pkg_methods = pkg.get_regrid_methods()
                for variable in pkg_methods:
-                    regriddertype = pkg_methods[variable][0]
-                    if regriddertype not in methods.keys():
-                        functiontype = pkg_methods[variable][1]
-                        methods[regriddertype]= functiontype
+                    if variable in pkg.dataset.data_vars and pkg.dataset[variable].values[()] is not None:
+                        regriddertype = pkg_methods[variable][0]
+                        if regriddertype not in methods.keys():
+                            functiontype = pkg_methods[variable][1]
+                            methods[regriddertype]= functiontype
             else:
                 raise NotImplementedError(
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
