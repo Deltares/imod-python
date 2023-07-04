@@ -739,10 +739,9 @@ class Package(PackageBase, abc.ABC):
             The package with part masked.
         """
         masked = {}
-        for var, _ in self.dataset.data_vars.items():
+        for var in self.dataset.data_vars.keys():
             da = self.dataset[var]
             if set(domain.dims).issubset(da.dims):
-                # Check if this should be: np.issubdtype(da.dtype, np.floating)
                 if issubclass(da.dtype.type, numbers.Integral):
                     masked[var] = da.where(domain != 0, other=0)
                 elif issubclass(da.dtype.type, numbers.Real):

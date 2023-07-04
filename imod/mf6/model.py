@@ -425,7 +425,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
                 )
 
-        methods = self._get_regrid_methods()
+        methods = self._get_unique_regridder_types()
         output_domain = self._get_regridding_domain(target_grid, methods)
         new_model[self.__get_diskey()]["idomain"] = output_domain
         new_model._mask_all_packages(output_domain)
@@ -435,6 +435,10 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         self,
         domain: Union[xr.DataArray, xu.UgridDataArray],
     ):
+        """
+        This function applies a mask to all packages in a model. The mask must be presented as an integer array
+        that has 0 in filtered cells and not-0 in active cells
+        """
         for pkgname, pkg in self.items():
             self[pkgname] = pkg.mask(domain)
 
@@ -442,7 +446,13 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         dis = self.__get_diskey()
         return self[dis]["idomain"]
 
-    def _get_regrid_methods(self) -> Dict[RegridderType, str]:
+    def _get_unique_regridder_types(self) -> Dict[RegridderType, str]:
+        """
+        This function loops over the packages and  collects all regridder-types that are in use.
+        Differences in associated functions are ignored. It focusses only on the types. So if a
+        model uses both Overlap(mean) and Overlap(harmonic_mean), this function will return just one
+        Overlap regridder:  the first one found, in this case Overlap(mean)
+        """
         methods = {}
         for pkg_name, pkg in self.items():
             if pkg.is_regridding_supported():
@@ -466,7 +476,12 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         self,
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
         methods: Dict[RegridderType, str],
-    ):
+    ) -> Union[xr.DataArray, xu.UgridDataArray]:
+        """
+        This function computes the output-domain for a regridding operation by regridding idomain with
+        all regridders. Each regridder may leave some cells inactive. The output domain for the model consists of those
+        cells that all regridders consider active.
+        """
         idomain = self.get_domain()
         regridder_collection = RegridderInstancesCollection(
             idomain, target_grid=target_grid
@@ -482,9 +497,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 included_in_all = regridded_idomain
             else:
                 included_in_all = included_in_all.where(
-                    regridded_idomain.isnull() is False
+                    regridded_idomain.isnull() == False
                 )
-        new_idomain = included_in_all.where(included_in_all.isnull() is False, other=0)
+        new_idomain = included_in_all.where(included_in_all.isnull() == False, other=0)
         new_idomain = new_idomain.astype(np.int32)
 
         return new_idomain
