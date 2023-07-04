@@ -3,7 +3,7 @@ import copy
 import numbers
 import pathlib
 from collections import defaultdict
-from typing import Any, Dict, List, Tuple, Union, Optional
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -744,7 +744,7 @@ class Package(PackageBase, abc.ABC):
             if set(domain.dims).issubset(da.dims):
                 # Check if this should be: np.issubdtype(da.dtype, np.floating)
                 if issubclass(da.dtype.type, numbers.Integral):
-                    masked[var] = da.where(domain != 0, other = 0)
+                    masked[var] = da.where(domain != 0, other=0)
                 elif issubclass(da.dtype.type, numbers.Real):
                     masked[var] = da.where(domain != 0)
                 else:
@@ -753,7 +753,7 @@ class Package(PackageBase, abc.ABC):
                     )
             else:
                 if da.values[()] is not None:
-                    masked[var] =  da.values[()]
+                    masked[var] = da.values[()]
                 else:
                     masked[var] = None
 
@@ -764,8 +764,8 @@ class Package(PackageBase, abc.ABC):
         returns true if package supports regridding.
         """
         return hasattr(self, "_regrid_method")
-    
-    def get_regrid_methods(self) ->  Optional[Dict[str, Tuple[RegridderType, str]]]:
+
+    def get_regrid_methods(self) -> Optional[Dict[str, Tuple[RegridderType, str]]]:
         if self.is_regridding_supported():
             return self._regrid_method
         return None

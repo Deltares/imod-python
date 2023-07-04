@@ -6,7 +6,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import List, Optional, Tuple, Union, Dict
+from typing import Dict, List, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -21,12 +21,13 @@ import imod
 from imod.mf6 import qgs_util
 from imod.mf6.clipped_boundary_condition_creator import ClippedBoundaryConditionCreator
 from imod.mf6.pkgbase import Package
+from imod.mf6.regridding_utils import RegridderInstancesCollection, RegridderType
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.wel import Well
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray
-from imod.mf6.regridding_utils import  RegridderInstancesCollection, RegridderType
+
 
 def initialize_template(name: str) -> Template:
     loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -416,8 +417,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         """
         new_model = self.__class__()
 
-
-
         for pkg_name, pkg in self.items():
             if pkg.is_regridding_supported():
                 new_model[pkg_name] = pkg.regrid_like(target_grid)
@@ -425,49 +424,55 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 raise NotImplementedError(
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
                 )
-            
+
         methods = self._get_regrid_methods()
         output_domain = self._get_regridding_domain(target_grid, methods)
         new_model[self.__get_diskey()]["idomain"] = output_domain
         new_model._mask_all_packages(output_domain)
         return new_model
 
-    def _mask_all_packages(self, domain: Union[xr.DataArray, xu.UgridDataArray],):
-
+    def _mask_all_packages(
+        self,
+        domain: Union[xr.DataArray, xu.UgridDataArray],
+    ):
         for pkgname, pkg in self.items():
             self[pkgname] = pkg.mask(domain)
-
 
     def get_domain(self):
         dis = self.__get_diskey()
         return self[dis]["idomain"]
-    
-    def _get_regrid_methods(self)-> Dict[RegridderType, str]:
+
+    def _get_regrid_methods(self) -> Dict[RegridderType, str]:
         methods = {}
         for pkg_name, pkg in self.items():
             if pkg.is_regridding_supported():
-               pkg_methods = pkg.get_regrid_methods()
-               for variable in pkg_methods:
-                    if variable in pkg.dataset.data_vars and pkg.dataset[variable].values[()] is not None:
+                pkg_methods = pkg.get_regrid_methods()
+                for variable in pkg_methods:
+                    if (
+                        variable in pkg.dataset.data_vars
+                        and pkg.dataset[variable].values[()] is not None
+                    ):
                         regriddertype = pkg_methods[variable][0]
                         if regriddertype not in methods.keys():
                             functiontype = pkg_methods[variable][1]
-                            methods[regriddertype]= functiontype
+                            methods[regriddertype] = functiontype
             else:
                 raise NotImplementedError(
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
                 )
         return methods
-    
-    def _get_regridding_domain(self, target_grid: Union[xr.DataArray, xu.UgridDataArray], methods:  Dict[RegridderType, str]):
+
+    def _get_regridding_domain(
+        self,
+        target_grid: Union[xr.DataArray, xu.UgridDataArray],
+        methods: Dict[RegridderType, str],
+    ):
         idomain = self.get_domain()
         regridder_collection = RegridderInstancesCollection(
             idomain, target_grid=target_grid
-        )   
-        included_in_all =None     
+        )
+        included_in_all = None
         for regriddertype, function in methods.items():
-
-
             regridder = regridder_collection.get_regridder(
                 regriddertype,
                 function,
@@ -476,14 +481,13 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             if included_in_all is None:
                 included_in_all = regridded_idomain
             else:
-                included_in_all = included_in_all.where(regridded_idomain.isnull()==False)
-        new_idomain = included_in_all.where(included_in_all.isnull()==False, other =0)
-        new_idomain =new_idomain.astype(np.int32)
-            
+                included_in_all = included_in_all.where(
+                    regridded_idomain.isnull() is False
+                )
+        new_idomain = included_in_all.where(included_in_all.isnull() is False, other=0)
+        new_idomain = new_idomain.astype(np.int32)
+
         return new_idomain
-
-
-
 
 
 class GroundwaterFlowModel(Modflow6Model):
