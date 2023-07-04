@@ -496,10 +496,8 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             if included_in_all is None:
                 included_in_all = regridded_idomain
             else:
-                included_in_all = included_in_all.where(
-                    regridded_idomain.isnull() == False
-                )
-        new_idomain = included_in_all.where(included_in_all.isnull() == False, other=0)
+                included_in_all = included_in_all.where(regridded_idomain.notnull())
+        new_idomain = included_in_all.where(included_in_all.notnull(), other=0)
         new_idomain = new_idomain.astype(np.int32)
 
         return new_idomain
