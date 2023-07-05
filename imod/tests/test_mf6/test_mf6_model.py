@@ -284,16 +284,30 @@ class TestGroundwaterFlowModel:
             [constant_head_mock, unassigned_boundary_constant_head_mock],
         )
 
+def test_model_invalidate_a_cell_without_masking(
+    tmp_path: Path, unstructured_flow_model: GroundwaterFlowModel
+    ):
+    # deactivate a cell by editing idomain
+    mask = unstructured_flow_model.get_domain()
+    #mask.loc[{"layer": 2, "mesh2d_nFaces": 12}] = 0
+    unstructured_flow_model["disv"]["idomain"] = mask
+
+    # test output validity
+    errors = unstructured_flow_model._validate("model")
+   # assert len(errors.errors) == 3
+    assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
+
+
 
 def test_masked_model_validation_inactive_cell_pillar(
     tmp_path: Path, unstructured_flow_model: GroundwaterFlowModel
 ):
     # create mask from idomain. Deactivate the same cell in all layers
     mask = unstructured_flow_model.get_domain()
-    """mask.loc[{"layer": 1, "mesh2d_nFaces": 23}] = 0
+    mask.loc[{"layer": 1, "mesh2d_nFaces": 23}] = 0
     mask.loc[{"layer": 2, "mesh2d_nFaces": 23}] = 0
     mask.loc[{"layer": 3, "mesh2d_nFaces": 23}] = 0
-    unstructured_flow_model["disv"]["idomain"] = mask"""
+    unstructured_flow_model["disv"]["idomain"] = mask
 
     # apply the mask to a model
     unstructured_flow_model._mask_all_packages(mask)

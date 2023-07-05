@@ -13,10 +13,11 @@ def assert_simulation_can_run(
     """
 
     # Run simulation
-    simulation.write(modeldir, binary=False)  # write into human readable files
     simulation.write(
         modeldir, binary=True
-    )  # write again, this time to the create disv.disv.grb file needed for postprocessing
+    )  # write binary to the create disv.disv.grb file needed for postprocessing
+    simulation.write(modeldir, binary=False)  # write into human readable files
+
     simulation.run()
 
     # get flowmodel name
