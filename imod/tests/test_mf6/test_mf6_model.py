@@ -1,3 +1,5 @@
+from pathlib import Path
+from typing import Tuple
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -12,6 +14,7 @@ from imod.mf6 import ConstantHead
 from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
 from imod.mf6.pkgbase import Package
 from imod.schemata import ValidationError
+from imod.tests.fixtures.mf6_modelrun_fixture import _assert_model_can_run
 
 
 # Duplicate from test_mf6_dis.py
@@ -281,32 +284,42 @@ class TestGroundwaterFlowModel:
             [constant_head_mock, unassigned_boundary_constant_head_mock],
         )
 
-def test_masked_model_validation_inactive_pillar( unstructured_flow_model: GroundwaterFlowModel): 
-    
+
+def test_masked_model_validation_inactive_cell_pillar(
+    tmp_path: Path, unstructured_flow_model: GroundwaterFlowModel
+):
+    # create mask from idomain. Deactivate the same cell in all layers
     mask = unstructured_flow_model.get_domain()
     mask.loc[{"layer": 1, "mesh2d_nFaces": 23}] = 0
     mask.loc[{"layer": 2, "mesh2d_nFaces": 23}] = 0
     mask.loc[{"layer": 3, "mesh2d_nFaces": 23}] = 0
-
     unstructured_flow_model["disv"]["idomain"] = mask
 
-
-
+    # apply the mask to a model
     unstructured_flow_model._mask_all_packages(mask)
 
-    errors =  unstructured_flow_model._validate("model")
-    assert len (errors.errors) == 0
+    # test output validity
+    errors = unstructured_flow_model._validate("model")
+    assert len(errors.errors) == 0
+    _assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
 
-def test_masked_model_validation_inactive_cell( unstructured_flow_model: GroundwaterFlowModel): 
-    
+
+@pytest.mark.parametrize("layer_and_face", [(1, 1), (1, 23), (2, 23), (3, 23)])
+def test_masked_model_validation_one_inactive_cell(
+    tmp_path: Path,
+    unstructured_flow_model: GroundwaterFlowModel,
+    layer_and_face: Tuple[int, int],
+):
+    # create mask from idomain. Deactivate the same cell in all layers
+    layer, face = layer_and_face
     mask = unstructured_flow_model.get_domain()
-    mask.loc[{"layer": 2, "mesh2d_nFaces": 23}] = 0
-
+    mask.loc[{"layer": layer, "mesh2d_nFaces": face}] = 0
     unstructured_flow_model["disv"]["idomain"] = mask
 
-
-
+    # apply the mask to a model
     unstructured_flow_model._mask_all_packages(mask)
 
-    errors =  unstructured_flow_model._validate("model")
-    assert len (errors.errors) == 0
+    # test output validity
+    errors = unstructured_flow_model._validate("model")
+    assert len(errors.errors) == 0
+    _assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
