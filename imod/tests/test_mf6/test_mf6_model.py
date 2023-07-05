@@ -280,3 +280,33 @@ class TestGroundwaterFlowModel:
             state_for_boundary,
             [constant_head_mock, unassigned_boundary_constant_head_mock],
         )
+
+def test_masked_model_validation_inactive_pillar( unstructured_flow_model: GroundwaterFlowModel): 
+    
+    mask = unstructured_flow_model.get_domain()
+    mask.loc[{"layer": 1, "mesh2d_nFaces": 23}] = 0
+    mask.loc[{"layer": 2, "mesh2d_nFaces": 23}] = 0
+    mask.loc[{"layer": 3, "mesh2d_nFaces": 23}] = 0
+
+    unstructured_flow_model["disv"]["idomain"] = mask
+
+
+
+    unstructured_flow_model._mask_all_packages(mask)
+
+    errors =  unstructured_flow_model._validate("model")
+    assert len (errors.errors) == 0
+
+def test_masked_model_validation_inactive_cell( unstructured_flow_model: GroundwaterFlowModel): 
+    
+    mask = unstructured_flow_model.get_domain()
+    mask.loc[{"layer": 2, "mesh2d_nFaces": 23}] = 0
+
+    unstructured_flow_model["disv"]["idomain"] = mask
+
+
+
+    unstructured_flow_model._mask_all_packages(mask)
+
+    errors =  unstructured_flow_model._validate("model")
+    assert len (errors.errors) == 0

@@ -5,6 +5,10 @@ import xarray as xr
 
 import imod
 from imod.mf6.pkgbase import Package
+from imod.tests.fixtures.mf6_regridding_fixture import (
+    grid_data_structured,
+    grid_data_unstructured,
+)
 
 
 @pytest.fixture(scope="function")
@@ -166,3 +170,37 @@ def test_clip_repeat_stress__some_repeats(dataset2):
     assert np.array_equal(keys.dt.year, np.repeat([2006, 2007, 2008], repeats=12))
     assert np.array_equal(keys.dt.month, values.dt.month)
     assert np.isin(values, actual["time"]).all()
+
+
+def test_mask_structured():
+    head = grid_data_structured(np.float64, 2.1, 2.0)
+    pkg = imod.mf6.ConstantHead(head=head)
+    mask = grid_data_structured(np.int32, 1, 2.0)
+    zero_location = {"layer": 1, "x": 2.0, "y": 4.0}
+    mask.loc[zero_location] = 0
+
+    masked_package = pkg.mask(mask)
+
+    masked_head = masked_package.dataset["head"]
+    assert type(masked_head) == type(head)
+    assert masked_head.dtype == head.dtype
+    assert np.isnan(masked_head.sel(zero_location).values[()])
+    masked_head.loc[zero_location] = 2.1
+    assert (masked_head == head).all().values[()]
+
+
+def test_mask_unstructured():
+    head = grid_data_unstructured(np.float64, 2.1, 2.0)
+    pkg = imod.mf6.ConstantHead(head=head)
+    mask = grid_data_unstructured(np.int32, 1, 2.0)
+    zero_location = {"layer": 1, "mesh2d_nFaces": 23}
+    mask.loc[zero_location] = 0
+
+    masked_package = pkg.mask(mask)
+
+    masked_head = masked_package.dataset["head"]
+    assert type(masked_head) == type(head)
+    assert masked_head.dtype == head.dtype
+    assert np.isnan(masked_head.sel(zero_location).values[()])
+    masked_head.loc[zero_location] = 2.1
+    assert (masked_head == head).all().values[()]
