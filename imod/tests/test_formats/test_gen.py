@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import shapely.geometry as sg
+from pytest_cases import parametrize_with_cases
 
 import imod
 
@@ -26,6 +27,55 @@ TEST_GEOMETRIES = {
     "circle": sg.Point(0.0, 0.0).buffer(1.0),
     "rectangle": sg.box(0.0, 0.0, 1.0, 1.0),
 }
+
+
+class Linestrings_ASCII:
+    """
+    Collection of linestring cases,
+    returns linestrings, has_z
+    """
+
+    def case_linestrings_comma_delimited(self):
+        return [
+            "1,TestFeatureName",
+            "0.0, 0.0",
+            "1.0, 1.0",
+            "end",
+            "2",
+            "0.0, 0.0",
+            "1.0, 1.0",
+            "2.0, 3.0",
+            "end",
+            "end",
+        ], False
+
+    def case_linestring_whitespace_delimited(self):
+        return [
+            "1,TestFeatureName",
+            "  0.0     0.0",
+            "  1.0     1.0",
+            "end",
+            "2",
+            "  0.0     0.0",
+            "  1.0     1.0",
+            "  2.0     3.0",
+            "end",
+            "end",
+        ], False
+
+    def case_linestring_3d(self):
+        return [
+            "1,TestFeatureName",
+            "0.0, 0.0, 10.0",
+            "1.0, 1.0, 10.0",
+            "end",
+            "2",
+            "0.0, 0.0, 10.0",
+            "1.0, 1.0, 10.0",
+            "2.0, 3.0, 10.0",
+            "end",
+            "end",
+        ], True
 
 
 def approximately_equal(a: sg.Polygon, b: sg.Polygon) -> bool:
@@ -206,25 +256,14 @@ def test_parse_ascii_points():
     assert np.array_equal(gdf["id"], [1, 2, 3, 10, 11])
 
 
-def test_parse_ascii_segment_linestrings():
+@parametrize_with_cases("lines, expected_has_z", cases=Linestrings_ASCII)
+def test_parse_ascii_segment_linestrings(lines, expected_has_z):
     from imod.formats.gen.gen import parse_ascii_segments
 
-    lines = [
-        "1,TestFeatureName",
-        "0.0, 0.0",
-        "1.0, 1.0",
-        "end",
-        "2",
-        "0.0, 0.0",
-        "1.0, 1.0",
-        "2.0, 3.0",
-        "end",
-        "end",
-    ]
     gdf = parse_ascii_segments(lines)
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert (gdf.geometry.geom_type == "LineString").all()
-    assert not gdf.geometry.has_z.any()
+    assert gdf.geometry.has_z.any() == expected_has_z
     assert np.array_equal(gdf["id"], ["1,TestFeatureName", "2"])
 
 
@@ -250,28 +289,6 @@ def test_parse_ascii_segment_polygon():
     assert isinstance(gdf, gpd.GeoDataFrame)
     assert (gdf.geometry.geom_type == "Polygon").all()
     assert not gdf.geometry.has_z.any()
-    assert np.array_equal(gdf["id"], ["1", "2"])
-
-
-def test_parse_ascii_segment_linestrings3d():
-    from imod.formats.gen.gen import parse_ascii_segments
-
-    lines = [
-        "1",
-        "0.0, 0.0, 10.0",
-        "1.0, 1.0, 10.0",
-        "end",
-        "2",
-        "0.0, 0.0, 10.0",
-        "1.0, 1.0, 10.0",
-        "2.0, 3.0, 10.0",
-        "end",
-        "end",
-    ]
-    gdf = parse_ascii_segments(lines)
-    assert isinstance(gdf, gpd.GeoDataFrame)
-    assert (gdf.geometry.geom_type == "LineString").all()
-    assert gdf.geometry.has_z.all()
     assert np.array_equal(gdf["id"], ["1", "2"])
 
 
