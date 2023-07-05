@@ -5,17 +5,33 @@ import numpy as np
 import imod
 
 
-def _assert_simulation_can_run(
+def assert_simulation_can_run(
     simulation: imod.mf6.Modflow6Simulation, discretization_name: str, modeldir: Path
 ):
+    """
+    Runs the simulation and asserts that computed heads are not NaN.
+    """
+
     # Run simulation
-    simulation.write(modeldir, binary=False)
+    simulation.write(modeldir, binary=False)  # write into human readable files
+    simulation.write(
+        modeldir, binary=True
+    )  # write again, this time to the create disv.disv.grb file needed for postprocessing
     simulation.run()
 
+    # get flowmodel name
+    flow_model_names = [
+        m for m in simulation if type(simulation[m]) is imod.mf6.GroundwaterFlowModel
+    ]
+    assert len(flow_model_names) == 1
+    flowmodel = flow_model_names[0]
+
     # Test that output was generated
-    dis_outputfile = modeldir / f"flow/{discretization_name}.{discretization_name}.grb"
+    dis_outputfile = (
+        modeldir / flowmodel / f"{discretization_name}.{discretization_name}.grb"
+    )
     head = imod.mf6.out.open_hds(
-        modeldir / "flow/flow.hds",
+        modeldir / flowmodel / f"{flowmodel}.hds",
         dis_outputfile,
     )
 
@@ -23,9 +39,14 @@ def _assert_simulation_can_run(
     assert not np.any(np.isnan(head.values))
 
 
-def _assert_model_can_run(
+def assert_model_can_run(
     model: imod.mf6.GroundwaterFlowModel, discretization_name: str, modeldir: Path
 ):
+    """
+    This function creates a simulation given a flow model, and tries to run the simulation.
+    solver parameters and time discretization are given default values that might not work for every model.
+    """
+
     simulation = imod.mf6.Modflow6Simulation("simulation_name")
     simulation["GWF_1"] = model
     # Define solver settings
@@ -50,4 +71,4 @@ def _assert_model_can_run(
         additional_times=["2000-01-01", "2000-01-02", "2000-01-03", "2000-01-04"]
     )
 
-    _assert_simulation_can_run(simulation, discretization_name, modeldir)
+    assert_simulation_can_run(simulation, discretization_name, modeldir)

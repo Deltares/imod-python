@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 import imod
-from imod.tests.fixtures.mf6_modelrun_fixture import _assert_simulation_can_run
+from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
 from imod.tests.fixtures.mf6_regridding_fixture import (
     grid_data_structured,
     grid_data_unstructured,
@@ -21,7 +21,7 @@ def test_regrid_structured_simulation_to_structured_simulation(
         "regridded_simulation", finer_idomain
     )
 
-    _assert_simulation_can_run(new_simulation, "dis", tmp_path)
+    assert_simulation_can_run(new_simulation, "dis", tmp_path)
 
 
 def test_regrid_unstructured_simulation_to_unstructured_simulation(
@@ -35,7 +35,7 @@ def test_regrid_unstructured_simulation_to_unstructured_simulation(
     )
 
     # Test that the newly regridded simulation can run
-    _assert_simulation_can_run(new_simulation, "disv", tmp_path)
+    assert_simulation_can_run(new_simulation, "disv", tmp_path)
 
 
 def test_regridded_simulation_has_required_packages(
