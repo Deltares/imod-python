@@ -52,16 +52,14 @@ def parse_ascii_segments(lines: List[str]):
 
     first_coord = features[0][1:][0]
     has_whitespace = _infer_delimwhitespace(first_coord, 2)
-    if has_whitespace:
-        delimiter = r"\s+"
-    else:
-        delimiter = ","
 
     vertex_coords = []
     for i, feature in enumerate(features):
         fid[i] = feature[0]
         feature_buffer = io.StringIO(initial_value="\n".join(feature[1:]))
-        coords_df = pd.read_csv(feature_buffer, delimiter=delimiter, header=None)
+        coords_df = pd.read_csv(
+            feature_buffer, delim_whitespace=has_whitespace, header=None
+        )
         coords = coords_df.values
         is_polygon[i] = (coords[0] == coords[-1]).all()
         vertex_coords.append(coords)
