@@ -720,7 +720,7 @@ class Package(PackageBase, abc.ABC):
         new.dataset = selection
         return new
 
-    def mask(self, domain: xr.DataArray) -> Any:
+    def mask(self, domain: Union[xr.DataArray, xu.UgridDataArray]) -> Any:
         """
         Mask values outside of domain.
 
@@ -756,11 +756,11 @@ class Package(PackageBase, abc.ABC):
             else:
                 if da.values[()] is not None:
                     if np.isscalar(da.values[()]):
-                        masked[var] = da.values[()]  # for scalars, such as options
+                        masked[var] = da.values[()]  # For scalars, such as options
                     else:
                         masked[
                             var
-                        ] = da  # for example for arrays with only a layer dimension
+                        ] = da  # For example for arrays with only a layer dimension
                 else:
                     masked[var] = None
 
