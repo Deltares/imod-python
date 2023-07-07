@@ -244,7 +244,6 @@ class NodePropertyFlow(Package):
     _write_schemata = {
         "k": (
             AllValueSchema(">", 0.0),
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
         "rewet_layer": (
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
@@ -256,7 +255,6 @@ class NodePropertyFlow(Package):
         ),
         "k33": (
             AllValueSchema(">", 0.0),
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
             # No need to check coords: dataset ensures they align with idomain.
         ),
         "angle1": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),

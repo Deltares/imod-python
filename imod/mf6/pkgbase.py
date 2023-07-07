@@ -741,12 +741,14 @@ class Package(PackageBase, abc.ABC):
         masked = {}
         for var in self.dataset.data_vars.keys():
             da = self.dataset[var]
-            # if var == "bottom" and "Discretization" in type(self).__name__:
-            #    masked[var] = da
-            #    continue
+            if var == "bottom" and "Discretization" in type(self).__name__:
+               masked[var] = da
+               continue
             if set(domain.dims).issubset(da.dims):
                 if issubclass(da.dtype.type, numbers.Integral):
                     masked[var] = da.where(domain != 0, other=0)
+                elif issubclass(da.dtype.type, numbers.Real) and var in ["k", "k33"]:
+                    masked[var] = da.where(domain != 0, other = 1e20)
                 elif issubclass(da.dtype.type, numbers.Real):
                     masked[var] = da.where(domain != 0)
                 else:
