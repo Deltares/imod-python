@@ -1,3 +1,6 @@
+from copy import deepcopy
+from pathlib import Path
+from typing import Tuple
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -12,6 +15,7 @@ from imod.mf6 import ConstantHead
 from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
 from imod.mf6.pkgbase import Package
 from imod.schemata import ValidationError
+from imod.tests.fixtures.mf6_modelrun_fixture import assert_model_can_run
 
 
 # Duplicate from test_mf6_dis.py
@@ -280,3 +284,84 @@ class TestGroundwaterFlowModel:
             state_for_boundary,
             [constant_head_mock, unassigned_boundary_constant_head_mock],
         )
+
+
+def test_masked_model_validation_inactive_cell_pillar(
+    tmp_path: Path, unstructured_flow_model: GroundwaterFlowModel
+):
+    # create mask from idomain. Deactivate the same cell in all layers
+    mask = unstructured_flow_model.get_domain()
+    mask.loc[{"layer": 1, "mesh2d_nFaces": 23}] = 0
+    mask.loc[{"layer": 2, "mesh2d_nFaces": 23}] = 0
+    mask.loc[{"layer": 3, "mesh2d_nFaces": 23}] = 0
+    unstructured_flow_model["disv"]["idomain"] = mask
+
+    # apply the mask to a model
+    unstructured_flow_model._mask_all_packages(mask)
+
+    # test output validity
+    errors = unstructured_flow_model._validate("model")
+    assert len(errors.errors) == 0
+    assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
+
+
+@pytest.mark.parametrize("layer_and_face", [(1, 23), (2, 23), (3, 23)])
+def test_masked_model_validation_one_inactive_cell(
+    tmp_path: Path,
+    unstructured_flow_model: GroundwaterFlowModel,
+    layer_and_face: Tuple[int, int],
+):
+    # create mask from idomain. a single cell
+    layer, face = layer_and_face
+    mask = unstructured_flow_model.get_domain()
+    mask.loc[{"layer": layer, "mesh2d_nFaces": face}] = 0
+    unstructured_flow_model["disv"]["idomain"] = mask
+
+    # apply the mask to a model
+    unstructured_flow_model._mask_all_packages(mask)
+
+    # test output validity
+    errors = unstructured_flow_model._validate("model")
+    assert len(errors.errors) == 0
+    assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
+
+
+@pytest.mark.parametrize("layer_and_face", [(1, 23), (2, 23), (3, 23)])
+def test_masked_model_layered_and_scalar_package_input(
+    tmp_path: Path,
+    unstructured_flow_model: GroundwaterFlowModel,
+    layer_and_face: Tuple[int, int],
+):
+    # Create mask from idomain. a single cell
+    layer, face = layer_and_face
+    mask = deepcopy(unstructured_flow_model.get_domain())
+    mask.loc[{"layer": layer, "mesh2d_nFaces": face}] = 0
+
+    # Make one package layer-based
+    model_layers = np.array([1, 2, 3])
+    k = xr.DataArray([1.0e-3, 1.0e-4, 2.0e-4], {"layer": model_layers}, ("layer",))
+    icelltype = xr.DataArray([1, 0, 0], {"layer": model_layers}, ("layer",))
+    unstructured_flow_model["npf"] = imod.mf6.NodePropertyFlow(
+        icelltype=icelltype,
+        k=k,
+        variable_vertical_conductance=True,
+        dewatered=True,
+        perched=False,
+        save_flows=True,
+    )
+
+    # Make one packages scalar-based
+    unstructured_flow_model["sto"] = imod.mf6.SpecificStorage(
+        specific_storage=1.0e-5,
+        specific_yield=0.15,
+        transient=False,
+        convertible=0,
+    )
+
+    # Apply the mask to a model
+    unstructured_flow_model._mask_all_packages(mask)
+
+    # Test output validity
+    errors = unstructured_flow_model._validate("model")
+    assert len(errors.errors) == 0
+    assert_model_can_run(unstructured_flow_model, "disv", tmp_path)
