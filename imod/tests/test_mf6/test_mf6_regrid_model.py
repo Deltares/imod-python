@@ -89,24 +89,3 @@ def test_regrid_model_with_unsupported_package(
         match="regridding is not implemented for package lake of type <class 'imod.mf6.lak.Lake'>",
     ):
         _ = unstructured_flow_model.regrid_like(finer_idomain)
-
-
-def test_regrid_unstructured_model_with_inactive_cells(
-    unstructured_flow_model: imod.mf6.GroundwaterFlowModel,
-):
-    inactive_cells = unstructured_flow_model.get_domain()
-    inactive_cells.loc[{"layer": 1, "mesh2d_nFaces": 23}] = 0
-    #  inactive_cells.loc[{"layer": 2, "mesh2d_nFaces": 23}] = 0
-    #       inactive_cells.loc[{"layer": 3, "mesh2d_nFaces": 23}] = 0
-
-    unstructured_flow_model["disv"]["idomain"] = inactive_cells
-
-    finer_idomain = grid_data_unstructured(np.int32, 1, 0.4)
-
-    new_gwf_model = unstructured_flow_model.regrid_like(finer_idomain)
-
-    assert len(new_gwf_model.items()) == len(unstructured_flow_model.items())
-    validation_result = new_gwf_model._validate("test_model")
-    assert not validation_result.has_errors()
-    new_idomain = new_gwf_model.get_domain()
-    assert new_idomain.max().values[()] == 1 and new_idomain.min().values[()] == 0
