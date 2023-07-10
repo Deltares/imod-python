@@ -96,7 +96,7 @@ def disv_recarr(arrdict, layer, notnull, idomain, grid):
 
 
 class AbstractHorizontalFlowBarrier(BoundaryCondition, abc.ABC):
-    def to_sparse(self, arrdict, layer):
+    def _to_sparse(self, arrdict, layer):
         data = next(iter(arrdict.values()))
         grid = self.dataset.ugrid.grid
         notnull = ~np.isnan(data)
@@ -249,10 +249,10 @@ class HorizontalFlowBarrierMultiplier(AbstractHorizontalFlowBarrier):
         self.dataset["idomain"] = idomain
         self.dataset["print_input"] = print_input
 
-    def to_sparse(self, arrdict, layer):
+    def _to_sparse(self, arrdict, layer):
         multiplier = arrdict.pop("multiplier")
         arrdict["hydraulic_characteristic"] = -1.0 * multiplier
-        return super().to_sparse(arrdict, layer)
+        return super()._to_sparse(arrdict, layer)
 
 
 class HorizontalFlowBarrierResistance(AbstractHorizontalFlowBarrier):
@@ -318,7 +318,7 @@ class HorizontalFlowBarrierResistance(AbstractHorizontalFlowBarrier):
         self.dataset["idomain"] = idomain
         self.dataset["print_input"] = print_input
 
-    def to_sparse(self, arrdict, layer):
+    def _to_sparse(self, arrdict, layer):
         resistance = arrdict.pop("resistance")
         arrdict["hydraulic_characteristic"] = 1.0 / resistance
-        return super().to_sparse(arrdict, layer)
+        return super()._to_sparse(arrdict, layer)

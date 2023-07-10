@@ -11,45 +11,6 @@ import imod
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
 
-def dis_recarr(arrdict, layer, notnull):
-    # Define the numpy structured array dtype
-    index_spec = [("layer", np.int32), ("row", np.int32), ("column", np.int32)]
-    field_spec = [(key, np.float64) for key in arrdict]
-    sparse_dtype = np.dtype(index_spec + field_spec)
-    # Initialize the structured array
-    nrow = notnull.sum()
-    recarr = np.empty(nrow, dtype=sparse_dtype)
-    # Fill in the indices
-    if notnull.ndim == 2:
-        recarr["row"], recarr["column"] = (np.argwhere(notnull) + 1).transpose()
-        recarr["layer"] = layer
-    else:
-        ilayer, irow, icolumn = np.argwhere(notnull).transpose()
-        recarr["row"] = irow + 1
-        recarr["column"] = icolumn + 1
-        recarr["layer"] = layer[ilayer]
-    return recarr
-
-
-def disv_recarr(arrdict, layer, notnull):
-    # Define the numpy structured array dtype
-    index_spec = [("layer", np.int32), ("cell2d", np.int32)]
-    field_spec = [(key, np.float64) for key in arrdict]
-    sparse_dtype = np.dtype(index_spec + field_spec)
-    # Initialize the structured array
-    nrow = notnull.sum()
-    recarr = np.empty(nrow, dtype=sparse_dtype)
-    # Fill in the indices
-    if notnull.ndim == 1 and layer.size == 1:
-        recarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
-        recarr["layer"] = layer
-    else:
-        ilayer, icell2d = np.argwhere(notnull).transpose()
-        recarr["cell2d"] = icell2d + 1
-        recarr["layer"] = layer[ilayer]
-    return recarr
-
-
 class PackageBase(abc.ABC):
     def __init__(self, allargs=None):
         if allargs is not None:

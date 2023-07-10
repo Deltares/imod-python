@@ -361,7 +361,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         layer = ds["layer"].values
         arrdict = self._ds_to_arrdict(ds)
-        recarr = super().to_sparse(arrdict, layer)
+        recarr = super()._to_sparse(arrdict, layer)
 
         field_spec = self._get_field_spec_from_dtype(recarr)
         field_names = [i[0] for i in field_spec]
@@ -395,7 +395,7 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
         d["nuzfcells"] = self._max_active_n()
         return self._template.render(d)
 
-    def to_sparse(self, arrdict, layer):
+    def _to_sparse(self, arrdict, layer):
         """Convert from dense arrays to list based input,
         since the perioddata does not require cellids but iuzno, we hgave to override"""
         # TODO add pkgcheck that period table aligns
