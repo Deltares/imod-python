@@ -8,7 +8,7 @@ because it can result in spurious oscillations in the simulated concentrations.
 Upstream weighting is a fast alternative, and TVD is a more expensive and more
 robust alternative.
 """
-from imod.mf6.pkgbase import Package
+from imod.mf6.package import Package
 
 
 class Advection(Package):

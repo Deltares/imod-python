@@ -7,7 +7,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.mf6.pkgbase import Package
+from imod.mf6.package import Package
 from imod.tests.fixtures.mf6_regridding_fixture import (
     grid_data_structured,
     grid_data_structured_layered,
