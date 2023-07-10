@@ -13,7 +13,7 @@ from imod.mf6.boundary_condition import (
     DisStructuredBoundaryCondition,
     DisVerticesBoundaryCondition,
 )
-from imod.mf6.mf6_adapter import Mf6BoundaryCondition, remove_inactive
+from imod.mf6.mf6_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
@@ -21,42 +21,9 @@ from imod.select.points import points_indices
 from imod.typing.grid import GridDataArray, ones_like
 from imod.util import values_within_range
 
-
 # FUTURE: There was an idea to autogenerate these object.
 # This was relevant:
 # https://github.com/Deltares/xugrid/blob/main/xugrid/core/wrap.py#L90
-class Mf6Wel(Mf6BoundaryCondition):
-    _pkg_id = "wel"
-
-    _period_data = ("cellid", "rate")
-    _keyword_map = {}
-    _template = Mf6BoundaryCondition._initialize_template(_pkg_id)
-    _auxiliary_data = {"concentration": "species"}
-
-    _init_schemata = {
-        "cellid": [DTypeSchema(np.integer)],
-        "rate": [DTypeSchema(np.floating)],
-        "concentration": [DTypeSchema(np.floating)],
-    }
-    _write_schemata = {}
-
-    def __init__(
-        self,
-        cellid,
-        rate,
-        concentration=None,
-        concentration_boundary_type="aux",
-        validate: bool = True,
-    ):
-        super().__init__()
-        self.dataset["cellid"] = cellid
-        self.dataset["rate"] = rate
-
-        if concentration is not None:
-            self.dataset["concentration"] = concentration
-            self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            self.add_periodic_auxiliary_variable()
-        self._validate_init_schemata(validate)
 
 
 class Well(BoundaryCondition):
@@ -454,7 +421,7 @@ class Well(BoundaryCondition):
         ds_vars = self.__create_dataset_vars(wells_assigned, wells_df, ds["cellid"])
         ds = ds.assign(**dict(ds_vars.items()))
 
-        ds = remove_inactive(ds, active)
+        ds = _remove_inactive(ds, active)
 
         return Mf6Wel(**ds)
 
@@ -789,3 +756,35 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         # The super method will select in the time dimension without issues.
         new = super().clip_box(time_min=time_min, time_max=time_max)
         return new
+
+
+def _remove_inactive(ds: xr.Dataset, active: xr.DataArray) -> xr.Dataset:
+    """
+    Drop list-based input cells in inactive cells.
+
+    Parameters
+    ----------
+    ds: xr.Dataset
+        Dataset with list-based input. Needs "cellid" variable.
+    active: xr.DataArray
+        Grid with active cells.
+    """
+
+    def unstack_columns(array):
+        # Unstack columns:
+        # https://stackoverflow.com/questions/64097426/is-there-unstack-in-numpy
+        # Make sure to use tuples, since these get the special treatment
+        # which we require for the indexing:
+        # https://numpy.org/doc/stable/user/basics.indexing.html#dealing-with-variable-numbers-of-indices-within-programs
+        return tuple(np.moveaxis(array, -1, 0))
+
+    if "cellid" not in ds.data_vars:
+        raise ValueError("Missing variable 'cellid' in dataset")
+    if "ncellid" not in ds.dims:
+        raise ValueError("Missing dimension 'ncellid' in dataset")
+
+    cellid_zero_based = ds["cellid"].values - 1
+    cellid_indexes = unstack_columns(cellid_zero_based)
+    valid = active.values[cellid_indexes].astype(bool)
+
+    return ds.loc[{"ncellid": valid}]

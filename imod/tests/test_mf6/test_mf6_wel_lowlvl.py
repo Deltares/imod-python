@@ -8,6 +8,8 @@ import pytest
 import xarray as xr
 
 import imod
+import imod.mf6.mf6_adapter
+import imod.mf6.wel
 
 
 @pytest.fixture()
@@ -32,10 +34,10 @@ def test_mf6wel_to_sparse__stationary(
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_stationary
-    mf6wel = imod.mf6.wel.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
 
     # Act
-    sparse_data = mf6wel.to_sparse(mf6wel.dataset)
+    sparse_data = mf6wel._to_sparse(mf6wel.dataset)
 
     # Assert
     np.testing.assert_array_equal(sparse_data, sparse_data_expected)
@@ -44,11 +46,11 @@ def test_mf6wel_to_sparse__stationary(
 def test_mf6wel_to_sparse__transient(mf6wel_test_data_transient, sparse_data_expected):
     # Arrange
     cellid, rate = mf6wel_test_data_transient
-    mf6wel = imod.mf6.wel.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
     ds = mf6wel.dataset.isel(time=0)
 
     # Act
-    sparse_data = mf6wel.to_sparse(ds)
+    sparse_data = mf6wel._to_sparse(ds)
 
     # Assert
     np.testing.assert_array_equal(sparse_data, sparse_data_expected)
@@ -59,7 +61,7 @@ def test_mf6wel_write_datafile__stationary(
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_stationary
-    mf6wel = imod.mf6.wel.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
 
     ds = mf6wel.dataset
     file_path = Path(tmp_path) / "mf6wel.bin"
@@ -77,7 +79,7 @@ def test_mf6wel_write__stationary(
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_stationary
-    mf6wel = imod.mf6.wel.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
     globaltimes = pd.date_range("2000-01-01", "2000-01-06")
     pkgname = "wel"
     directory = Path(tmp_path) / "mf6wel"
@@ -99,7 +101,7 @@ def test_mf6wel_write__transient(
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_transient
-    mf6wel = imod.mf6.wel.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
     globaltimes = pd.date_range("2000-01-01", "2000-01-06")
     pkgname = "wel"
     directory = Path(tmp_path) / "mf6wel"
@@ -121,7 +123,7 @@ def test_mf6wel_render__transient(
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_transient
-    mf6wel = imod.mf6.wel.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
     globaltimes = pd.date_range("2000-01-01", "2000-01-06")
     pkgname = "wel"
     directory = Path(tmp_path) / "mf6wel"
@@ -172,7 +174,7 @@ def test_remove_inactive__stationary(basic_dis, mf6wel_test_data_stationary):
     active[0, 0, :] = False
 
     # Act
-    ds_removed = imod.mf6.wel.remove_inactive(ds, active)
+    ds_removed = imod.mf6.wel._remove_inactive(ds, active)
 
     # Assert
     assert dict(ds_removed.dims) == {"ncellid": 6, "nmax_cellid": 3}
@@ -190,7 +192,7 @@ def test_remove_inactive__transient(basic_dis, mf6wel_test_data_transient):
     active[0, 0, :] = False
 
     # Act
-    ds_removed = imod.mf6.wel.remove_inactive(ds, active)
+    ds_removed = imod.mf6.wel._remove_inactive(ds, active)
 
     # Assert
     assert dict(ds_removed.dims) == {"ncellid": 6, "time": 5, "nmax_cellid": 3}

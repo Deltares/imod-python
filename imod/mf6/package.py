@@ -13,7 +13,7 @@ import xugrid as xu
 from xarray.core.utils import is_scalar
 
 import imod
-from imod.mf6.pkgbase import TRANSPORT_PACKAGES, PackageBase, dis_recarr, disv_recarr
+from imod.mf6.pkgbase import TRANSPORT_PACKAGES, PackageBase
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
     RegridderType,
@@ -112,54 +112,6 @@ class Package(PackageBase, abc.ABC):
         filename = directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
-
-    def to_sparse(self, arrdict, layer):
-        """Convert from dense arrays to list based input"""
-        # TODO stream the data per stress period
-        # TODO add pkgcheck that period table aligns
-        # Get the number of valid values
-        data = next(iter(arrdict.values()))
-        notnull = ~np.isnan(data)
-
-        if isinstance(self.dataset, xr.Dataset):
-            recarr = dis_recarr(arrdict, layer, notnull)
-        elif isinstance(self.dataset, xu.UgridDataset):
-            recarr = disv_recarr(arrdict, layer, notnull)
-        else:
-            raise TypeError(
-                "self.dataset should be xarray.Dataset or xugrid.UgridDataset,"
-                f" is {type(self.dataset)} instead"
-            )
-        # Fill in the data
-        for key, arr in arrdict.items():
-            values = arr[notnull].astype(np.float64)
-            recarr[key] = values
-
-        return recarr
-
-    def _ds_to_arrdict(self, ds):
-        arrdict = {}
-        for datavar in ds.data_vars:
-            if ds[datavar].shape == ():
-                raise ValueError(
-                    f"{datavar} in {self._pkg_id} package cannot be a scalar"
-                )
-            auxiliary_vars = (
-                self.get_auxiliary_variable_names()
-            )  # returns something like {"concentration": "species"}
-            if datavar in auxiliary_vars.keys():  # if datavar is concentration
-                if (
-                    auxiliary_vars[datavar] in ds[datavar].dims
-                ):  # if this concentration array has the species dimension
-                    for s in ds[datavar].values:  # loop over species
-                        arrdict[s] = (
-                            ds[datavar]
-                            .sel({auxiliary_vars[datavar]: s})
-                            .values  # store species array under its species name
-                        )
-            else:
-                arrdict[datavar] = ds[datavar].values
-        return arrdict
 
     def write_binary_griddata(self, outpath, da, dtype):
         # From the modflow6 source, the header is defined as:
