@@ -722,6 +722,26 @@ def multi_layer_hfb(
     return resistance_layered
 
 
+def __start_end_arr(arr):
+    """
+    Returns 2d array with starts and ends.
+
+    Input:
+    [1, 2, 3, 4]
+    Returns:
+    [
+        [1 ,2],
+        [2, 3],
+        [3, 4],
+    ]
+    """
+    shape = (len(arr) - 1, 2)
+    points = np.empty(shape)
+    points[:, 0] = arr[:-1]
+    points[:, 1] = arr[1:]
+    return points
+
+
 def create_hfb(cache, model, key, value, active, top, bottom, k, **kwargs):
     target = cache.target
     dataframe = value["geodataframe"]
@@ -730,14 +750,29 @@ def create_hfb(cache, model, key, value, active, top, bottom, k, **kwargs):
     coordinates, index = shapely.get_coordinates(dataframe.geometry, return_index=True)
     df = pd.DataFrame({"index": index, "x": coordinates[:, 0], "y": coordinates[:, 1]})
     df = df.drop_duplicates().reset_index(drop=True)
-    indices = np.repeat(np.arange(len(df) // 2), 2)
-    linestrings = shapely.linestrings(df["x"], y=df["y"], indices=indices)
+
+    # Work around issue with xu.snap_to_grid, where provided linestrings only
+    # work if individual segments are provided.
+    hfb_indices = __start_end_arr(df["index"])
+    # Only preserve connections between two points where start and end share
+    # the same hfb index.
+    to_preserve = hfb_indices[:, 0] == hfb_indices[:, 1]
+    hfb_indices = hfb_indices[to_preserve].ravel()
+
+    points_x = __start_end_arr(df["x"])
+    points_x = points_x[to_preserve].ravel()
+    points_y = __start_end_arr(df["y"])
+    points_y = points_y[to_preserve].ravel()
+
+    line_indices = np.repeat(np.arange(len(points_x) // 2), 2)
+
+    linestrings = shapely.linestrings(points_x, y=points_y, indices=line_indices)
     lines = gpd.GeoDataFrame(geometry=linestrings)
 
     if "resistance" in dataframe:
-        lines["resistance"] = dataframe["resistance"]
+        lines["resistance"] = dataframe["resistance"][hfb_indices[::2]].values
     elif "multiplier" in dataframe:
-        lines["resistance"] = -1.0 * dataframe["resistance"]
+        lines["resistance"] = -1.0 * dataframe["resistance"][hfb_indices[::2]].values
     else:
         raise ValueError(
             "Expected resistance or multiplier in HFB dataframe, "
