@@ -8,13 +8,13 @@ import pandas as pd
 import xarray as xr
 import xugrid as xu
 
-from imod.mf6.mf6_adapter import Mf6BoundaryCondition, remove_inactive
-from imod.mf6.pkgbase import (
+from imod.mf6.boundary_condition import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
     DisVerticesBoundaryCondition,
-    Package,
 )
+from imod.mf6.mf6_adapter import Mf6BoundaryCondition, remove_inactive
+from imod.mf6.pkgbase import Package
 from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
 from imod.select.points import points_indices
