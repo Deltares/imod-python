@@ -742,32 +742,39 @@ def __start_end_arr(arr):
     return points
 
 
-def create_hfb(cache, model, key, value, active, top, bottom, k, **kwargs):
-    target = cache.target
-    dataframe = value["geodataframe"]
-    layer = value["layer"]
-
+def __split_linestring_into_segments(dataframe):
     coordinates, index = shapely.get_coordinates(dataframe.geometry, return_index=True)
+    # Create DataFrame to drop duplicates
     df = pd.DataFrame({"index": index, "x": coordinates[:, 0], "y": coordinates[:, 1]})
     df = df.drop_duplicates().reset_index(drop=True)
 
     # Work around issue with xu.snap_to_grid, where provided linestrings only
     # work if individual segments are provided.
-    hfb_indices = __start_end_arr(df["index"])
+    linestring_indices = __start_end_arr(df["index"])
     # Only preserve connections between two points where start and end share
     # the same hfb index.
-    to_preserve = hfb_indices[:, 0] == hfb_indices[:, 1]
-    hfb_indices = hfb_indices[to_preserve].ravel()
+    to_preserve = linestring_indices[:, 0] == linestring_indices[:, 1]
+    linestring_indices = linestring_indices[to_preserve].ravel()
 
     points_x = __start_end_arr(df["x"])
     points_x = points_x[to_preserve].ravel()
     points_y = __start_end_arr(df["y"])
     points_y = points_y[to_preserve].ravel()
 
-    line_indices = np.repeat(np.arange(len(points_x) // 2), 2)
+    segment_indices = np.repeat(np.arange(len(points_x) // 2), 2)
 
-    linestrings = shapely.linestrings(points_x, y=points_y, indices=line_indices)
-    lines = gpd.GeoDataFrame(geometry=linestrings)
+    segments = shapely.linestrings(points_x, y=points_y, indices=segment_indices)
+    return gpd.GeoDataFrame(geometry=segments), linestring_indices
+
+
+def create_hfb(cache, model, key, value, active, top, bottom, k, **kwargs):
+    target = cache.target
+    dataframe = value["geodataframe"]
+    layer = value["layer"]
+
+    # Split line into segments, which is required to run xu.snap_to_grid
+    # FUTURE: Remove segmentation when xu.snap_to_grid updates.
+    lines, hfb_indices = __split_linestring_into_segments(dataframe)
 
     if "resistance" in dataframe:
         lines["resistance"] = dataframe["resistance"][hfb_indices[::2]].values
