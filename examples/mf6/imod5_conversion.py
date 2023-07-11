@@ -10,7 +10,7 @@ have to work around the following issues in the converter:
     introduced nans at the edges, whereas OverlapRegridder used to find the active
     cells, suffers from no such thing.
 3. CHDs are separated into different systems for each layer
-4. Due to some bug with broadcasting n_times too many wells are generated: 
+4. Due to some bug with broadcasting n_times too many wells are generated:
     94 times & 94 indices.
 5. The data in the hfb packages causes xu.snap_to_grid to throw errors.
 
