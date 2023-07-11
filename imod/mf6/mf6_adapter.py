@@ -18,7 +18,7 @@ from pathlib import Path
 import numpy as np
 import xarray as xr
 
-from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.boundary_condition import BoundaryCondition
 
 
 # FUTURE:

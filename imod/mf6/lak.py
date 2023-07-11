@@ -15,7 +15,8 @@ import pandas as pd
 import xarray as xr
 
 from imod import mf6
-from imod.mf6.pkgbase import BoundaryCondition, Package, PackageBase
+from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.pkgbase import Package, PackageBase
 from imod.schemata import AllValueSchema, DimsSchema, DTypeSchema
 
 CONNECTION_DIM = "connection_dim"

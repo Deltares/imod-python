@@ -1,4 +1,4 @@
-from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.boundary_condition import BoundaryCondition
 
 
 class StreamFlowRouting(BoundaryCondition):
