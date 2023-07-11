@@ -6,7 +6,7 @@ have to work around the following issues in the converter:
 
 1. It expects no layer to be assigned for the rch and riv package.
     In the example iMOD5 model, a layer is assigned to the rch and riv package.
-2. The BarycentricInterpolator, used to compute starting heads, 
+2. The BarycentricInterpolator, used to compute starting heads,
     introduced nans at the edges, whereas OverlapRegridder used to find the active
     cells, suffers from no such thing.
 3. CHDs are separated into different systems for each layer
