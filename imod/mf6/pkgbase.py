@@ -3,7 +3,7 @@ import copy
 import numbers
 import pathlib
 from collections import defaultdict
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -739,19 +739,22 @@ class Package(PackageBase, abc.ABC):
             The package with part masked.
         """
         masked = {}
-        for var, da in self.dataset.data_vars.items():
+        for var in self.dataset.data_vars.keys():
+            da = self.dataset[var]
             if set(domain.dims).issubset(da.dims):
-                # Check if this should be: np.issubdtype(da.dtype, np.floating)
-                if issubclass(da.dtype, numbers.Real):
-                    masked[var] = da.where(domain, other=np.nan)
-                elif issubclass(da.dtype, numbers.Integral):
-                    masked[var] = da.where(domain, other=0)
+                if issubclass(da.dtype.type, numbers.Integral):
+                    masked[var] = da.where(domain != 0, other=0)
+                elif issubclass(da.dtype.type, numbers.Real):
+                    masked[var] = da.where(domain != 0)
                 else:
                     raise TypeError(
                         f"Expected dtype float or integer. Received instead: {da.dtype}"
                     )
             else:
-                masked[var] = da
+                if da.values[()] is not None:
+                    masked[var] = da.values[()]
+                else:
+                    masked[var] = None
 
         return type(self)(**masked)
 
@@ -760,6 +763,11 @@ class Package(PackageBase, abc.ABC):
         returns true if package supports regridding.
         """
         return hasattr(self, "_regrid_method")
+
+    def get_regrid_methods(self) -> Optional[Dict[str, Tuple[RegridderType, str]]]:
+        if self.is_regridding_supported():
+            return self._regrid_method
+        return None
 
     def regrid_like(
         self,
