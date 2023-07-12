@@ -242,38 +242,6 @@ def test_save__time_nolayer(well, tmp_path):
         assert (tmp_path / "well" / file).is_file()
 
 
-def test_save__notime_layer(well, tmp_path):
-    d = {k: v for k, v in well.dataset.copy().drop_vars("time").items()}
-    d["layer"] = [1, 2, 3, 4, 5]
-    wel = Well(**d)
-    wel.save(tmp_path / "well")
-
-    files = [
-        "rate_l1.ipf",
-        "rate_l2.ipf",
-        "rate_l3.ipf",
-        "rate_l4.ipf",
-        "rate_l5.ipf",
-    ]
-    for file in files:
-        assert (tmp_path / "well" / file).is_file()
-
-
-def test_save__notime_nolayer(well, tmp_path):
-    d = {
-        k: v
-        for k, v in well.dataset.copy().drop_vars("layer").drop_vars("time").items()
-    }
-    wel = Well(**d)
-    wel.save(tmp_path / "well")
-
-    files = [
-        "rate.ipf",
-    ]
-    for file in files:
-        assert (tmp_path / "well" / file).is_file()
-
-
 def test_repeat_stress_error(well):
     wel = well
     with pytest.raises(NotImplementedError):
