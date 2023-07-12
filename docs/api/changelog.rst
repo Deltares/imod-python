@@ -32,6 +32,8 @@ Fixed
   variables.
 - :class:`imod.mf6.EvapoTranspiration` template for ``.evt`` file now properly 
   formats ``nseg`` option.
+- Fixed bug in :class:`imod.wq.Well` preventing saving wells without a time
+  dimension, but with a layer dimension.
 
 
 [0.13.1] - 2023-05-05
