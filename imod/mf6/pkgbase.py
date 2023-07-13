@@ -3,7 +3,7 @@ import copy
 import numbers
 import pathlib
 from collections import defaultdict
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -20,6 +20,7 @@ from imod.mf6.regridding_utils import (
 )
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
+from imod.typing.grid import GridDataArray
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
@@ -720,7 +721,7 @@ class Package(PackageBase, abc.ABC):
         new.dataset = selection
         return new
 
-    def mask(self, domain: xr.DataArray) -> Any:
+    def mask(self, domain: GridDataArray) -> Any:
         """
         Mask values outside of domain.
 
@@ -739,19 +740,30 @@ class Package(PackageBase, abc.ABC):
             The package with part masked.
         """
         masked = {}
-        for var, da in self.dataset.data_vars.items():
+        for var in self.dataset.data_vars.keys():
+            da = self.dataset[var]
+            if self.skip_masking_dataarray(var):
+                masked[var] = da
+                continue
             if set(domain.dims).issubset(da.dims):
-                # Check if this should be: np.issubdtype(da.dtype, np.floating)
-                if issubclass(da.dtype, numbers.Real):
-                    masked[var] = da.where(domain, other=np.nan)
-                elif issubclass(da.dtype, numbers.Integral):
-                    masked[var] = da.where(domain, other=0)
+                if issubclass(da.dtype.type, numbers.Integral):
+                    masked[var] = da.where(domain != 0, other=0)
+                elif issubclass(da.dtype.type, numbers.Real):
+                    masked[var] = da.where(domain != 0)
                 else:
                     raise TypeError(
                         f"Expected dtype float or integer. Received instead: {da.dtype}"
                     )
             else:
-                masked[var] = da
+                if da.values[()] is not None:
+                    if is_scalar(da.values[()]):
+                        masked[var] = da.values[()]  # For scalars, such as options
+                    else:
+                        masked[
+                            var
+                        ] = da  # For example for arrays with only a layer dimension
+                else:
+                    masked[var] = None
 
         return type(self)(**masked)
 
@@ -760,6 +772,11 @@ class Package(PackageBase, abc.ABC):
         returns true if package supports regridding.
         """
         return hasattr(self, "_regrid_method")
+
+    def get_regrid_methods(self) -> Optional[Dict[str, Tuple[RegridderType, str]]]:
+        if self.is_regridding_supported():
+            return self._regrid_method
+        return None
 
     def regrid_like(
         self,
@@ -846,6 +863,25 @@ class Package(PackageBase, abc.ABC):
             # regrid data array
             regridded_array = regridder.regrid(self.dataset[varname])
 
+            # the regridded array may have coordinates that are not exactly the same as those of the targetgrid
+            # due to rounding errors (coordinates are re-computed in xugrid based on dx, dy).
+            # we overwrite the regridded coordinates with the target grid coordinates.
+            if "dx" in regridded_array.coords:
+                regridded_array = regridded_array.assign_coords(
+                    {"dx": target_grid.coords["dx"].values[()]}
+                )
+            if "dy" in regridded_array.coords:
+                regridded_array = regridded_array.assign_coords(
+                    {"dy": target_grid.coords["dy"].values[()]}
+                )
+            if "x" in regridded_array.coords:
+                regridded_array = regridded_array.assign_coords(
+                    {"x": target_grid.coords["x"].values[()]}
+                )
+            if "y" in regridded_array.coords:
+                regridded_array = regridded_array.assign_coords(
+                    {"y": target_grid.coords["y"].values[()]}
+                )
             # reconvert the result to the same dtype as the original
             new_package_data[varname] = regridded_array.astype(original_dtype)
         new_package = self.__class__(**new_package_data)
@@ -859,6 +895,11 @@ class Package(PackageBase, abc.ABC):
             if len(errors) > 0:
                 raise ValidationError(validation_pkg_error_message(errors))
         return new_package
+
+    def skip_masking_dataarray(self, array_name: str) -> bool:
+        if hasattr(self, "_skip_mask_arrays"):
+            return array_name in self._skip_mask_arrays
+        return False
 
 
 class BoundaryCondition(Package, abc.ABC):
