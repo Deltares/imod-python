@@ -6,7 +6,7 @@ import numpy as np
 import xarray as xr
 
 import imod
-from imod.mf6.pkgbase import Package
+from imod.mf6.package import Package
 
 
 class BoundaryCondition(Package, abc.ABC):
