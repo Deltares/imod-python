@@ -38,6 +38,7 @@ def assert_simulation_can_run(
 
     # filter output on idomain
     idomain = simulation[flowmodel].get_domain()
+    head = head.reindex_like(idomain, "nearest", 1e-5)
     head = head.where(idomain == 1, other=0)
 
     # Test that heads are not nan

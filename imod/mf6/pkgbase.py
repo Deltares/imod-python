@@ -861,7 +861,22 @@ class Package(PackageBase, abc.ABC):
 
             # regrid data array
             regridded_array = regridder.regrid(self.dataset[varname])
-
+            if "dx" in regridded_array.coords:
+                regridded_array = regridded_array.assign_coords(
+                    {"dx": target_grid.coords["dx"].values[()]}
+                )
+            if "dy" in regridded_array.coords:
+                regridded_array = regridded_array.assign_coords(
+                    {"dy": target_grid.coords["dy"].values[()]}
+                )
+            if "x" in regridded_array.coords:
+                regridded_array = regridded_array.assign_coords(
+                    {"x": target_grid.coords["x"].values[()]}
+                )
+            if "y" in regridded_array.coords:
+                regridded_array = regridded_array.assign_coords(
+                    {"y": target_grid.coords["y"].values[()]}
+                )
             # reconvert the result to the same dtype as the original
             new_package_data[varname] = regridded_array.astype(original_dtype)
         new_package = self.__class__(**new_package_data)
