@@ -1,7 +1,7 @@
 """
 This is an example of how to convert an existing iMOD5 model into an
 unstructured Modflow 6 model. For this we'll use the ``convert_to_disv``
-function, which is still an experimental feature. Already in this example, we
+function, which is still an experimental feature. In this example, we
 have to work around the following issues in the converter:
 
 1. It expects no layer to be assigned for the rch and riv package.
@@ -10,7 +10,7 @@ have to work around the following issues in the converter:
     introduced nans at the edges, whereas OverlapRegridder used to find the active
     cells, suffers from no such thing.
 3. CHDs are separated into different systems for each layer
-4. Due to some bug with broadcasting n_times too many wells are generated:
+4. Due to a bug with broadcasting n_times too many wells are generated:
     94 times & 94 indices.
 5. The data in the hfb packages causes xu.snap_to_grid to throw errors.
 
