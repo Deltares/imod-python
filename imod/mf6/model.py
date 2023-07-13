@@ -428,7 +428,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def _mask_all_packages(
         self,
-        domain: Union[xr.DataArray, xu.UgridDataArray],
+        domain: GridDataArray,
     ):
         """
         This function applies a mask to all packages in a model. The mask must be presented as an integer array
