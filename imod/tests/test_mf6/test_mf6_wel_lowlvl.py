@@ -9,6 +9,7 @@ import xarray as xr
 
 import imod
 import imod.mf6.mf6_adapter
+import imod.mf6.utilities.dataset_utilities
 import imod.mf6.wel
 
 
@@ -174,7 +175,7 @@ def test_remove_inactive__stationary(basic_dis, mf6wel_test_data_stationary):
     active[0, 0, :] = False
 
     # Act
-    ds_removed = imod.mf6.wel._remove_inactive(ds, active)
+    ds_removed = imod.mf6.utilities.dataset_utilities.remove_inactive(ds, active)
 
     # Assert
     assert dict(ds_removed.dims) == {"ncellid": 6, "nmax_cellid": 3}
@@ -192,7 +193,7 @@ def test_remove_inactive__transient(basic_dis, mf6wel_test_data_transient):
     active[0, 0, :] = False
 
     # Act
-    ds_removed = imod.mf6.wel._remove_inactive(ds, active)
+    ds_removed = imod.mf6.utilities.dataset_utilities.remove_inactive(ds, active)
 
     # Assert
     assert dict(ds_removed.dims) == {"ncellid": 6, "time": 5, "nmax_cellid": 3}

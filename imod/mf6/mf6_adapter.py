@@ -22,6 +22,15 @@ from imod.schemata import DTypeSchema
 
 
 class Mf6Wel(BoundaryCondition):
+    """
+    Package resembling input for Modflow 6 List Input. This class has
+    methods for the modflow 6 wel packages with time component.
+
+    This class only supports `list input
+    <https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=19>`_,
+    not the array input which is used in :class:`Mf6Package`.
+    """
+
     _pkg_id = "wel"
 
     _period_data = ("cellid", "rate")
