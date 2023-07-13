@@ -4,9 +4,49 @@ from typing import Dict
 
 import numpy as np
 import xarray as xr
+import xugrid as xu
 
 import imod
 from imod.mf6.package import Package
+
+
+def _dis_recarr(arrdict, layer, notnull):
+    # Define the numpy structured array dtype
+    index_spec = [("layer", np.int32), ("row", np.int32), ("column", np.int32)]
+    field_spec = [(key, np.float64) for key in arrdict]
+    sparse_dtype = np.dtype(index_spec + field_spec)
+    # Initialize the structured array
+    nrow = notnull.sum()
+    recarr = np.empty(nrow, dtype=sparse_dtype)
+    # Fill in the indices
+    if notnull.ndim == 2:
+        recarr["row"], recarr["column"] = (np.argwhere(notnull) + 1).transpose()
+        recarr["layer"] = layer
+    else:
+        ilayer, irow, icolumn = np.argwhere(notnull).transpose()
+        recarr["row"] = irow + 1
+        recarr["column"] = icolumn + 1
+        recarr["layer"] = layer[ilayer]
+    return recarr
+
+
+def _disv_recarr(arrdict, layer, notnull):
+    # Define the numpy structured array dtype
+    index_spec = [("layer", np.int32), ("cell2d", np.int32)]
+    field_spec = [(key, np.float64) for key in arrdict]
+    sparse_dtype = np.dtype(index_spec + field_spec)
+    # Initialize the structured array
+    nrow = notnull.sum()
+    recarr = np.empty(nrow, dtype=sparse_dtype)
+    # Fill in the indices
+    if notnull.ndim == 1 and layer.size == 1:
+        recarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
+        recarr["layer"] = layer
+    else:
+        ilayer, icell2d = np.argwhere(notnull).transpose()
+        recarr["cell2d"] = icell2d + 1
+        recarr["layer"] = layer[ilayer]
+    return recarr
 
 
 class BoundaryCondition(Package, abc.ABC):
@@ -72,12 +112,60 @@ class BoundaryCondition(Package, abc.ABC):
         """
         layer = ds["layer"].values
         arrdict = self._ds_to_arrdict(ds)
-        sparse_data = self.to_sparse(arrdict, layer)
+        sparse_data = self._to_sparse(arrdict, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)
         if binary:
             self._write_binaryfile(outpath, sparse_data)
         else:
             self._write_textfile(outpath, sparse_data)
+
+    def _ds_to_arrdict(self, ds):
+        arrdict = {}
+        for datavar in ds.data_vars:
+            if ds[datavar].shape == ():
+                raise ValueError(
+                    f"{datavar} in {self._pkg_id} package cannot be a scalar"
+                )
+            auxiliary_vars = (
+                self.get_auxiliary_variable_names()
+            )  # returns something like {"concentration": "species"}
+            if datavar in auxiliary_vars.keys():  # if datavar is concentration
+                if (
+                    auxiliary_vars[datavar] in ds[datavar].dims
+                ):  # if this concentration array has the species dimension
+                    for s in ds[datavar].values:  # loop over species
+                        arrdict[s] = (
+                            ds[datavar]
+                            .sel({auxiliary_vars[datavar]: s})
+                            .values  # store species array under its species name
+                        )
+            else:
+                arrdict[datavar] = ds[datavar].values
+        return arrdict
+
+    def _to_sparse(self, arrdict, layer):
+        """Convert from dense arrays to list based input"""
+        # TODO stream the data per stress period
+        # TODO add pkgcheck that period table aligns
+        # Get the number of valid values
+        data = next(iter(arrdict.values()))
+        notnull = ~np.isnan(data)
+
+        if isinstance(self.dataset, xr.Dataset):
+            recarr = _dis_recarr(arrdict, layer, notnull)
+        elif isinstance(self.dataset, xu.UgridDataset):
+            recarr = _disv_recarr(arrdict, layer, notnull)
+        else:
+            raise TypeError(
+                "self.dataset should be xarray.Dataset or xugrid.UgridDataset,"
+                f" is {type(self.dataset)} instead"
+            )
+        # Fill in the data
+        for key, arr in arrdict.items():
+            values = arr[notnull].astype(np.float64)
+            recarr[key] = values
+
+        return recarr
 
     def period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
         pkg_directory = pathlib.Path(directory.stem) / pkgname
@@ -260,7 +348,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
 
 
 class DisStructuredBoundaryCondition(BoundaryCondition):
-    def to_sparse(self, arrdict, layer):
+    def _to_sparse(self, arrdict, layer):
         spec = []
         for key in arrdict:
             if key in ["layer", "row", "column"]:
@@ -277,7 +365,7 @@ class DisStructuredBoundaryCondition(BoundaryCondition):
 
 
 class DisVerticesBoundaryCondition(BoundaryCondition):
-    def to_sparse(self, arrdict, layer):
+    def _to_sparse(self, arrdict, layer):
         spec = []
         for key in arrdict:
             if key in ["layer", "cell2d"]:
