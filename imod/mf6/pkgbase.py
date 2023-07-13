@@ -755,7 +755,7 @@ class Package(PackageBase, abc.ABC):
                     )
             else:
                 if da.values[()] is not None:
-                    if np.isscalar(da.values[()]):
+                    if is_scalar(da.values[()]):
                         masked[var] = da.values[()]  # For scalars, such as options
                     else:
                         masked[
