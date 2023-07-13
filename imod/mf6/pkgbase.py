@@ -20,6 +20,7 @@ from imod.mf6.regridding_utils import (
 )
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
+from imod.typing.grid import GridDataArray
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
@@ -720,7 +721,7 @@ class Package(PackageBase, abc.ABC):
         new.dataset = selection
         return new
 
-    def mask(self, domain: Union[xr.DataArray, xu.UgridDataArray]) -> Any:
+    def mask(self, domain: GridDataArray) -> Any:
         """
         Mask values outside of domain.
 
