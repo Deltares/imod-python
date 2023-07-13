@@ -861,6 +861,10 @@ class Package(PackageBase, abc.ABC):
 
             # regrid data array
             regridded_array = regridder.regrid(self.dataset[varname])
+
+            # the regridded array may have coordinates that are not exactly the same as those of the targetgrid
+            # due to rounding errors (coordinates are re-computed in xugrid based on dx, dy).
+            # we overwrite the regridded coordinates with the target grid coordinates.
             if "dx" in regridded_array.coords:
                 regridded_array = regridded_array.assign_coords(
                     {"dx": target_grid.coords["dx"].values[()]}
