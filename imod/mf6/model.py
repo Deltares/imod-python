@@ -426,6 +426,17 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         return new_model
 
+    def _mask_all_packages(
+        self,
+        domain: GridDataArray,
+    ):
+        """
+        This function applies a mask to all packages in a model. The mask must be presented as an integer array
+        that has 0 in filtered cells and not-0 in active cells
+        """
+        for pkgname, pkg in self.items():
+            self[pkgname] = pkg.mask(domain)
+
     def get_domain(self):
         dis = self.__get_diskey()
         return self[dis]["idomain"]

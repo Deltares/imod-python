@@ -70,6 +70,8 @@ class VerticesDiscretization(Package):
         "idomain": (RegridderType.OVERLAP, "mean"),
     }
 
+    _skip_mask_arrays = ["bottom"]
+
     def __init__(self, top, bottom, idomain, validate: bool = True):
         super().__init__(locals())
         self.dataset["idomain"] = idomain
