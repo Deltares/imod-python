@@ -13,7 +13,7 @@ from xugrid.core.wrap import UgridDataArray
 import imod
 from imod.mf6 import ConstantHead
 from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
-from imod.mf6.pkgbase import Package
+from imod.mf6.package import Package
 from imod.schemata import ValidationError
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_model_can_run
 
