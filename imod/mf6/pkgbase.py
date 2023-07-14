@@ -16,6 +16,7 @@ import imod
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
     RegridderType,
+    align_grid_coordinates,
     get_non_grid_data,
 )
 from imod.mf6.validation import validation_pkg_error_message
@@ -863,25 +864,8 @@ class Package(PackageBase, abc.ABC):
             # regrid data array
             regridded_array = regridder.regrid(self.dataset[varname])
 
-            # the regridded array may have coordinates that are not exactly the same as those of the targetgrid
-            # due to rounding errors (coordinates are re-computed in xugrid based on dx, dy).
-            # we overwrite the regridded coordinates with the target grid coordinates.
-            if "dx" in regridded_array.coords:
-                regridded_array = regridded_array.assign_coords(
-                    {"dx": target_grid.coords["dx"].values[()]}
-                )
-            if "dy" in regridded_array.coords:
-                regridded_array = regridded_array.assign_coords(
-                    {"dy": target_grid.coords["dy"].values[()]}
-                )
-            if "x" in regridded_array.coords:
-                regridded_array = regridded_array.assign_coords(
-                    {"x": target_grid.coords["x"].values[()]}
-                )
-            if "y" in regridded_array.coords:
-                regridded_array = regridded_array.assign_coords(
-                    {"y": target_grid.coords["y"].values[()]}
-                )
+            regridded_array = align_grid_coordinates(regridded_array, target_grid)
+
             # reconvert the result to the same dtype as the original
             new_package_data[varname] = regridded_array.astype(original_dtype)
         new_package = self.__class__(**new_package_data)

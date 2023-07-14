@@ -6,6 +6,8 @@ import xarray as xr
 import xugrid as xu
 from xugrid.regrid.regridder import BaseRegridder
 
+from imod.typing.grid import GridDataArray
+
 
 class RegridderType(Enum):
     """
@@ -124,3 +126,28 @@ def get_non_grid_data(package, grid_names: List[str]) -> Dict[str, any]:
     for name in all_non_grid_data:
         result[name] = package.dataset[name].values[()]
     return result
+
+
+def align_grid_coordinates(
+    regridded_array: GridDataArray, target_grid: GridDataArray
+) -> GridDataArray:
+    # the regridded array may have coordinates that are not exactly the same as those of the targetgrid
+    # due to rounding errors (coordinates are re-computed in xugrid based on dx, dy).
+    # we overwrite the regridded coordinates with the target grid coordinates.
+    if "dx" in regridded_array.coords:
+        regridded_array = regridded_array.assign_coords(
+            {"dx": target_grid.coords["dx"].values[()]}
+        )
+    if "dy" in regridded_array.coords:
+        regridded_array = regridded_array.assign_coords(
+            {"dy": target_grid.coords["dy"].values[()]}
+        )
+    if "x" in regridded_array.coords:
+        regridded_array = regridded_array.assign_coords(
+            {"x": target_grid.coords["x"].values[()]}
+        )
+    if "y" in regridded_array.coords:
+        regridded_array = regridded_array.assign_coords(
+            {"y": target_grid.coords["y"].values[()]}
+        )
+    return regridded_array
