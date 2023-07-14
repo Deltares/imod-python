@@ -91,12 +91,18 @@ def test_regrid_model_with_unsupported_package(
         _ = unstructured_flow_model.regrid_like(finer_idomain)
 
 
+@pytest.mark.parametrize("inactivity_marker", [0, -1])
 def test_regrid_unstructured_model_with_inactive_cells(
+    inactivity_marker: int,
     unstructured_flow_model: imod.mf6.GroundwaterFlowModel,
 ):
+    """
+    inactivity_marker = 0  -> inactive cell
+    inactivity_marker = -1 -> vertical passthrough cell
+    """
     inactive_cells = unstructured_flow_model.get_domain()
-    inactive_cells.loc[{"layer": 1, "mesh2d_nFaces": 23}] = 0
-    inactive_cells.loc[{"layer": 3, "mesh2d_nFaces": 23}] = 0
+    inactive_cells.loc[{"layer": 1, "mesh2d_nFaces": 23}] = inactivity_marker
+    inactive_cells.loc[{"layer": 3, "mesh2d_nFaces": 23}] = inactivity_marker
 
     unstructured_flow_model["disv"]["idomain"] = inactive_cells
 

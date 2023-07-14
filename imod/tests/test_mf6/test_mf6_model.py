@@ -306,15 +306,17 @@ def test_masked_model_validation_inactive_cell_pillar(
 
 
 @pytest.mark.parametrize("layer_and_face", [(1, 23), (2, 23), (3, 23)])
+@pytest.mark.parametrize("inactivity_marker", [0, -1])
 def test_masked_model_validation_one_inactive_cell(
     tmp_path: Path,
     unstructured_flow_model: GroundwaterFlowModel,
     layer_and_face: Tuple[int, int],
+    inactivity_marker: int,
 ):
     # create mask from idomain. a single cell
     layer, face = layer_and_face
     mask = unstructured_flow_model.get_domain()
-    mask.loc[{"layer": layer, "mesh2d_nFaces": face}] = 0
+    mask.loc[{"layer": layer, "mesh2d_nFaces": face}] = inactivity_marker
     unstructured_flow_model["disv"]["idomain"] = mask
 
     # apply the mask to a model
