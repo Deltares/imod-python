@@ -38,7 +38,8 @@ def test_mf6wel_to_sparse__stationary(
     mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
 
     # Act
-    sparse_data = mf6wel._to_sparse(mf6wel.dataset)
+    arrdict = mf6wel._ds_to_arrdict(mf6wel.dataset)
+    sparse_data = mf6wel._to_sparse(arrdict, None)
 
     # Assert
     np.testing.assert_array_equal(sparse_data, sparse_data_expected)
@@ -51,7 +52,8 @@ def test_mf6wel_to_sparse__transient(mf6wel_test_data_transient, sparse_data_exp
     ds = mf6wel.dataset.isel(time=0)
 
     # Act
-    sparse_data = mf6wel._to_sparse(ds)
+    arrdict = mf6wel._ds_to_arrdict(ds)
+    sparse_data = mf6wel._to_sparse(arrdict, None)
 
     # Assert
     np.testing.assert_array_equal(sparse_data, sparse_data_expected)
