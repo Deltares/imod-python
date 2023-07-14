@@ -149,6 +149,6 @@ hds.load()
 # %%
 # Visualize
 
-hds.isel(time=0, layer=4).ugrid.plot()
+hds.isel(time=-1, layer=4).ugrid.plot()
 
 # %%
