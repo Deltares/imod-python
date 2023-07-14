@@ -110,7 +110,7 @@ class BoundaryCondition(Package, abc.ABC):
         """
         Writes a modflow6 binary data file
         """
-        layer = ds["layer"].values if "layer" in ds.keys() else None
+        layer = ds["layer"].values if "layer" in ds.coords else None
         arrdict = self._ds_to_arrdict(ds)
         sparse_data = self._to_sparse(arrdict, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)
