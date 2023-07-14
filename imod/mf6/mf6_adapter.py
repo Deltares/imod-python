@@ -12,10 +12,7 @@ GIS systems. The low-level classes contain a dataset based on cellid,
 consisting of layer, row, and column, closely resembling input for Modflow6.
 """
 
-from pathlib import Path
-
 import numpy as np
-import xarray as xr
 
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.schemata import DTypeSchema
@@ -63,37 +60,41 @@ class Mf6Wel(BoundaryCondition):
             self.add_periodic_auxiliary_variable()
         self._validate_init_schemata(validate)
 
-    # TODO: Method can be moved outside class.
-    # TODO: Rename to `to_struct_array`
-    # NOTE: This function should be part of Mf6Pkg, now defined here,
-    #   to ensure function is overrided.
-    def _to_sparse(self, ds: xr.Dataset):
-        data_vars = [var for var in ds.data_vars if var != "cellid"]
-        cellid_names = ds.coords["nmax_cellid"].values
-        nrow = ds.coords["ncellid"].size
+    def _ds_to_arrdict(self, ds):
+        """
+        Prepares a dictionary with values needed for the _to_sparse method.
+        """
+        arrdict = {}
 
-        index_spec = [(index, np.int32) for index in cellid_names]
-        field_spec = [(var, np.float64) for var in data_vars]
+        arrdict["data_vars"] = [
+            var_name for var_name in ds.data_vars if var_name != "cellid"
+        ]
+
+        dsvar = {}
+        for var in arrdict["data_vars"]:
+            dsvar[var] = ds[var]
+        arrdict["var_values"] = dsvar
+
+        arrdict["cellid_names"] = ds.coords["nmax_cellid"].values
+        arrdict["nrow"] = ds.coords["ncellid"].size
+        arrdict["cellid"] = ds["cellid"]
+
+        return arrdict
+
+    def _to_sparse(self, arrdict, _):
+        index_spec = [(index, np.int32) for index in arrdict["cellid_names"]]
+        field_spec = [(var, np.float64) for var in arrdict["data_vars"]]
         sparse_dtype = np.dtype(index_spec + field_spec)
 
         # Initialize the structured array
-        recarr = np.empty(nrow, dtype=sparse_dtype)
-        for cellid_name in cellid_names:
-            recarr[cellid_name] = ds["cellid"].sel(nmax_cellid=cellid_name).values
-        for var in data_vars:
-            recarr[var] = ds[var]
-        return recarr
+        recarr = np.empty(arrdict["nrow"], dtype=sparse_dtype)
+        for cellid_name in arrdict["cellid_names"]:
+            recarr[cellid_name] = arrdict["cellid"].sel(nmax_cellid=cellid_name).values
 
-    def write_datafile(self, outpath: Path, ds: xr.Dataset, binary: bool):
-        """
-        Writes a modflow6 binary data file
-        """
-        sparse_data = self._to_sparse(ds)
-        outpath.parent.mkdir(exist_ok=True, parents=True)
-        if binary:
-            self._write_binaryfile(outpath, sparse_data)
-        else:
-            self._write_textfile(outpath, sparse_data)
+        for var in arrdict["data_vars"]:
+            recarr[var] = arrdict["var_values"][var]
+
+        return recarr
 
     @classmethod
     def from_file(cls, path, **kwargs) -> "Mf6Wel":
