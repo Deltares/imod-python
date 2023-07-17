@@ -581,9 +581,9 @@ class Package(PackageBase, abc.ABC):
                 continue
             if set(domain.dims).issubset(da.dims):
                 if issubclass(da.dtype.type, numbers.Integral):
-                    masked[var] = da.where(domain != 0, other=0)
+                    masked[var] = da.where(domain >0, other=0)
                 elif issubclass(da.dtype.type, numbers.Real):
-                    masked[var] = da.where(domain != 0)
+                    masked[var] = da.where(domain >0)
                 else:
                     raise TypeError(
                         f"Expected dtype float or integer. Received instead: {da.dtype}"

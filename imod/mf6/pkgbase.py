@@ -7,7 +7,6 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-    align_grid_coordinates,
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
