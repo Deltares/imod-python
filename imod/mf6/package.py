@@ -16,8 +16,8 @@ import imod
 from imod.mf6.pkgbase import TRANSPORT_PACKAGES, PackageBase
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
-    align_grid_coordinates,
     RegridderType,
+    align_grid_coordinates,
     get_non_grid_data,
 )
 from imod.mf6.validation import validation_pkg_error_message
@@ -581,9 +581,9 @@ class Package(PackageBase, abc.ABC):
                 continue
             if set(domain.dims).issubset(da.dims):
                 if issubclass(da.dtype.type, numbers.Integral):
-                    masked[var] = da.where(domain >0, other=0)
+                    masked[var] = da.where(domain > 0, other=0)
                 elif issubclass(da.dtype.type, numbers.Real):
-                    masked[var] = da.where(domain >0)
+                    masked[var] = da.where(domain > 0)
                 else:
                     raise TypeError(
                         f"Expected dtype float or integer. Received instead: {da.dtype}"
