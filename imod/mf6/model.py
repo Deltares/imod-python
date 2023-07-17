@@ -20,7 +20,7 @@ from jinja2 import Template
 import imod
 from imod.mf6 import qgs_util
 from imod.mf6.clipped_boundary_condition_creator import ClippedBoundaryConditionCreator
-from imod.mf6.pkgbase import Package
+from imod.mf6.package import Package
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
     RegridderType,

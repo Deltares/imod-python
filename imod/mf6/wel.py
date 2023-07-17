@@ -8,55 +8,23 @@ import pandas as pd
 import xarray as xr
 import xugrid as xu
 
-from imod.mf6.mf6_adapter import Mf6BoundaryCondition, remove_inactive
-from imod.mf6.pkgbase import (
+from imod.mf6.boundary_condition import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
     DisVerticesBoundaryCondition,
-    Package,
 )
+from imod.mf6.mf6_adapter import Mf6Wel
+from imod.mf6.package import Package
+from imod.mf6.utilities.dataset_utilities import remove_inactive
 from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
 from imod.select.points import points_indices
 from imod.typing.grid import GridDataArray, ones_like
 from imod.util import values_within_range
 
-
 # FUTURE: There was an idea to autogenerate these object.
 # This was relevant:
 # https://github.com/Deltares/xugrid/blob/main/xugrid/core/wrap.py#L90
-class Mf6Wel(Mf6BoundaryCondition):
-    _pkg_id = "wel"
-
-    _period_data = ("cellid", "rate")
-    _keyword_map = {}
-    _template = Mf6BoundaryCondition._initialize_template(_pkg_id)
-    _auxiliary_data = {"concentration": "species"}
-
-    _init_schemata = {
-        "cellid": [DTypeSchema(np.integer)],
-        "rate": [DTypeSchema(np.floating)],
-        "concentration": [DTypeSchema(np.floating)],
-    }
-    _write_schemata = {}
-
-    def __init__(
-        self,
-        cellid,
-        rate,
-        concentration=None,
-        concentration_boundary_type="aux",
-        validate: bool = True,
-    ):
-        super().__init__()
-        self.dataset["cellid"] = cellid
-        self.dataset["rate"] = rate
-
-        if concentration is not None:
-            self.dataset["concentration"] = concentration
-            self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            self.add_periodic_auxiliary_variable()
-        self._validate_init_schemata(validate)
 
 
 class Well(BoundaryCondition):

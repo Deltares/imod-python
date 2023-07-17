@@ -91,7 +91,7 @@ def test_to_sparsedata(test_data):
     bin_data = uzf[list(uzf._period_data)]
     arrdict = uzf._ds_to_arrdict(bin_data.isel(time=0))
     layer = bin_data.isel(time=0)["layer"].values
-    sparse_data = uzf.to_sparse(arrdict, layer)
+    sparse_data = uzf._to_sparse(arrdict, layer)
     expected_iuzno = np.array([1, 2, 3, 4, 5, 6])
 
     assert sparse_data.dtype[0] == np.dtype(
