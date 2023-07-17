@@ -14,6 +14,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.mf6.mf6_hfb_adapter import BarrierType
 
 try:
     import geopandas as gpd
@@ -754,8 +755,9 @@ def create_hfb(cache, model, key, value, active, top, bottom, k, **kwargs):
     else:
         resistance = multi_layer_hfb(snapped, dataframe, top, bottom, k)
 
-    model[key] = imod.mf6.HorizontalFlowBarrierResistance(
-        resistance=resistance,
+    model[key] = imod.mf6.Mf6HorizontalFlowBarrier(
+        barrier_type=BarrierType.Resistance,
+        value=resistance,
         idomain=active.astype(int),
     )
     return
@@ -784,7 +786,9 @@ def merge_hfbs(hfbs, idomain):
         c_merged.where(c_merged > 0).dropna("layer", how="all"),
         grid,
     )
-    return imod.mf6.HorizontalFlowBarrierResistance(resistance=final_c, idomain=idomain)
+    return imod.mf6.Mf6HorizontalFlowBarrier(
+        barrier_type=BarrierType.Resistance, value=final_c, idomain=idomain
+    )
 
 
 PKG_CONVERSION = {
