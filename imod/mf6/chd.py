@@ -106,7 +106,7 @@ class ConstantHead(BoundaryCondition):
     _template = BoundaryCondition._initialize_template(_pkg_id)
 
     _regrid_method = {
-        "head": (RegridderType.OVERLAP, "mean"),
+        "head": (RegridderType.OVERLAP, "mean"),  #TODO: should be set to barycentric once supported
         "concentration": (RegridderType.OVERLAP, "mean"),
     }
 

@@ -291,7 +291,7 @@ class NodePropertyFlow(Package):
         "angle1": (RegridderType.OVERLAP, "mean"),
         "angle2": (RegridderType.OVERLAP, "mean"),
         "angle3": (RegridderType.OVERLAP, "mean"),
-        "rewet_layer": (RegridderType.BARYCENTRIC, None),
+        "rewet_layer": (RegridderType.OVERLAP, "mean"),
     }
     _skip_mask_arrays = ["k", "k22", "k33", "angle1", "angle2", "angle3"]
 

@@ -112,7 +112,7 @@ class GeneralHeadBoundary(BoundaryCondition):
 
     _regrid_method = {
         "head": (RegridderType.OVERLAP, "mean"),
-        "conductance": (RegridderType.OVERLAP, "geometric_mean"),
+        "conductance": (RegridderType.RELATIVEOVERLAP, "conductance"),
         "concentration": (RegridderType.OVERLAP, "mean"),
     }
 
