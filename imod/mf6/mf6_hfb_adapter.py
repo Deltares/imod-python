@@ -1,4 +1,6 @@
 from enum import Enum
+from pathlib import WindowsPath
+from typing import Dict
 
 import numpy as np
 import xarray as xr
@@ -20,7 +22,13 @@ class BarrierType(Enum):
     Resistance = 2
 
 
-def _edge_to_cell(notnull, arrdict, layer, idomain, grid):
+def _edge_to_cell(
+    notnull: np.ndarray,
+    arrdict: Dict,
+    layer: np.ndarray,
+    idomain: xu.UgridDataArray,
+    grid: xu.Ugrid2d,
+):
     nlayer = idomain["idomain_layer"].size
     idomain2d = idomain.values.reshape((nlayer, -1))
     no_layer_dim = notnull.ndim == 1
@@ -101,7 +109,9 @@ def _disv_recarr(arrdict, layer, notnull, idomain, grid):
     return recarr
 
 
-def _convert_to_hydraulic_characteristic(barrier_type: BarrierType, value):
+def _convert_to_hydraulic_characteristic(
+    barrier_type: BarrierType, value: xu.UgridDataArray
+):
     match barrier_type:
         case BarrierType.HydraulicCharacteristic:
             return value
@@ -202,6 +212,12 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
             )
         return recarr
 
-    def write(self, directory, pkgname, globaltimes, binary):
+    def write(
+        self,
+        directory: WindowsPath,
+        pkgname: str,
+        globaltimes: np.ndarray,
+        binary: bool,
+    ):
         # MODFLOW6 does not support binary HFB input.
         super().write(directory, pkgname, globaltimes, binary=False)
