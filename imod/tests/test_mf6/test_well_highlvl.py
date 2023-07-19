@@ -176,3 +176,38 @@ def test_write_one_layer_filtered_out(
         tmp_path / "GWF_1" / "well" / "wel.dat", sep=":-\\s*", engine="python"
     )
     assert len(df) == 4
+
+
+def test_constraints_are_configurable(
+    tmp_path: Path, twri_simulation: imod.mf6.Modflow6Simulation
+):
+    # define 2 wells penetrating all layers
+    twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
+        screen_top=[0.0, 0.0],
+        screen_bottom=[-400.0, -400],
+        x=[1.0, 6002.0],
+        y=[3.0, 5004.0],
+        rate=[1.0, 3.0],
+        print_flows=True,
+        validate=True,
+    )
+
+    # reset the constraints so that k-constraints are violated
+    twri_simulation["GWF_1"]["well"].set_minimum_k_thickness(
+        minimum_k=1.0, minimum_thickness=1.0
+    )
+    with pytest.raises(ValueError):
+        twri_simulation.write(tmp_path, binary=False)
+
+    # reset the constraints again so that all constraints are met
+    twri_simulation["GWF_1"]["well"].set_minimum_k_thickness(
+        minimum_k=1e-9, minimum_thickness=1.0
+    )
+    twri_simulation.write(tmp_path, binary=False)
+
+    # reset the constraints so that layer_thickness constraints are violated
+    twri_simulation["GWF_1"]["well"].set_minimum_k_thickness(
+        minimum_k=1e-9, minimum_thickness=700.0
+    )
+    with pytest.raises(ValueError):
+        twri_simulation.write(tmp_path, binary=False)

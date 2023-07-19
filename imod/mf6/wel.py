@@ -55,6 +55,10 @@ class Well(BoundaryCondition):
     concentration_boundary_type: ({"AUX", "AUXMIXED"}, optional)
         if this flow package is used in simulations also involving transport, then this keyword specifies
         how outflow over this boundary is computed.
+    minimum_k: float, optional
+        on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this
+    minimum_thickness: float, optional
+        on creating point wells, no point wells will be placed in cells with a lower thickness than this
     print_input: ({True, False}, optional)
         keyword to indicate that the list of well information will be written to
         the listing file immediately after it is read.
@@ -111,6 +115,8 @@ class Well(BoundaryCondition):
         concentration=None,
         concentration_boundary_type="aux",
         id=None,
+        minimum_k=0.1,
+        minimum_thickness=1.0,
         print_input=False,
         print_flows=False,
         save_flows=False,
@@ -127,18 +133,37 @@ class Well(BoundaryCondition):
         if id is None:
             id = np.arange(self.dataset["x"].size).astype(str)
         self.dataset["id"] = self.assign_dims(id)
+        self.set_minimum_k_thickness(minimum_k, minimum_thickness)
 
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
         self.dataset["repeat_stress"] = repeat_stress
-
+        self.dataset["repeat_stress"] = repeat_stress
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
 
         self._validate_init_schemata(validate)
+
+    def set_minimum_k_thickness(
+        self, minimum_k: float, minimum_thickness: float
+    ) -> None:
+        """
+        Set the minimum k and thickness for this package. No point wells will be placed
+        in cells with a lower thickness or horizontal conductivity than this.
+
+
+        Parameters
+        ----------
+        minimum_k: float, optional
+            on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this
+        minimum_thickness: float, optional
+            on creating point wells, no point wells will be placed in cells with a lower thickness than this
+        """
+        self.dataset["minimum_k"] = minimum_k
+        self.dataset["minimum_thickness"] = minimum_thickness
 
     def clip_box(
         self,
@@ -206,9 +231,13 @@ class Well(BoundaryCondition):
         bottom: Union[xr.DataArray, xu.UgridDataArray],
         k: Union[xr.DataArray, xu.UgridDataArray],
     ) -> None:
+        minimum_k = self.dataset["minimum_k"].values[()]
+        minimum_thickness = self.dataset["minimum_thickness"].values[()]
         if validate:
             self._validate(self._write_schemata)
-        mf6_package = self.to_mf6_pkg(idomain, top, bottom, k)
+        mf6_package = self.to_mf6_pkg(
+            idomain, top, bottom, k, minimum_k, minimum_thickness
+        )
 
         mf6_package.write(directory, pkgname, globaltimes, binary)
 
@@ -230,6 +259,8 @@ class Well(BoundaryCondition):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
+        minimum_k,
+        minimum_thickness,
     ):
         # Ensure top, bottom & k
         # are broadcasted to 3d grid
@@ -247,7 +278,9 @@ class Well(BoundaryCondition):
         # case of a "time" and "species" coordinate.
         wells_df = wells_df.reset_index()
 
-        wells_assigned = assign_wells(wells_df, top_3d, bottom, k)
+        wells_assigned = assign_wells(
+            wells_df, top_3d, bottom, k, minimum_thickness, minimum_k
+        )
         # Set multi-index again
         wells_assigned = wells_assigned.set_index(index_names).sort_index()
 
@@ -368,6 +401,8 @@ class Well(BoundaryCondition):
         top: Union[xr.DataArray, xu.UgridDataArray],
         bottom: Union[xr.DataArray, xu.UgridDataArray],
         k: Union[xr.DataArray, xu.UgridDataArray],
+        minimum_k: float,
+        minimum_thickness: float,
     ) -> Mf6Wel:
         """
         Write package to Modflow 6 package.
@@ -394,14 +429,19 @@ class Well(BoundaryCondition):
             Grid with bottom of model layers.
         k: {xarry.DataArray, xugrid.UgridDataArray}
             Grid with hydraulic conductivites.
-
+        minimum_k: float, optional
+            on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this
+        minimum_thickness: float, optional
+            on creating point wells, no point wells will be placed in cells with a lower thickness than this
         Returns
         -------
         Mf6Wel
             Object with wells as list based input.
         """
         wells_df = self.__create_wells_df()
-        wells_assigned = self.__create_assigned_wells(wells_df, active, top, bottom, k)
+        wells_assigned = self.__create_assigned_wells(
+            wells_df, active, top, bottom, k, minimum_k, minimum_thickness
+        )
 
         nwells_df = len(wells_df["id"].unique())
         nwells_assigned = (
