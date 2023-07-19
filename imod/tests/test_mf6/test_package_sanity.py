@@ -78,8 +78,11 @@ def test_render_twice(instance, tmp_path):
         text1 = instance.render(modeldir, "test", False)
         text2 = instance.render(modeldir, "test", False)
     elif len(sig.parameters) == 4:
-        text1 = instance.render(modeldir, "test", globaltimes, False)
-        text2 = instance.render(modeldir, "test", globaltimes, False)
+        try:
+            text1 = instance.render(modeldir, "test", globaltimes, False)
+            text2 = instance.render(modeldir, "test", globaltimes, False)
+        except NotImplementedError:
+            return
     else:
         assert False  # unexpected nr of arguments
     assert text1 == text2

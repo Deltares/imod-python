@@ -362,6 +362,9 @@ class Well(BoundaryCondition):
 
         return cellid
 
+    def render(self, directory, pkgname, globaltimes, binary):
+        raise NotImplementedError
+
     def to_mf6_pkg(
         self,
         active: Union[xr.DataArray, xu.UgridDataArray],
