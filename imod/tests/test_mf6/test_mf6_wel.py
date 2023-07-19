@@ -34,7 +34,7 @@ def test_to_mf6_pkg__high_lvl_stationary(basic_dis, well_high_lvl_test_data_stat
     rate_expected = np.array(np.ones((8,), dtype=np.float32))
 
     # Act
-    mf6_wel = wel.to_mf6_pkg(active, top, bottom, k)
+    mf6_wel = wel.to_mf6_pkg(active, top, bottom, k, 1.0, 1.0)
     mf6_ds = mf6_wel.dataset
 
     # Assert
@@ -83,7 +83,7 @@ def test_to_mf6_pkg__high_lvl_multilevel(basic_dis, well_high_lvl_test_data_stat
     rate_expected = np.array([0.25] * 4 + [0.75] * 4 + [1.0] * 4)
 
     # Act
-    mf6_wel = wel.to_mf6_pkg(active, top, bottom, k)
+    mf6_wel = wel.to_mf6_pkg(active, top, bottom, k, 1.0, 1.0)
     mf6_ds = mf6_wel.dataset
 
     # Assert
@@ -121,7 +121,7 @@ def test_to_mf6_pkg__high_lvl_transient(basic_dis, well_high_lvl_test_data_trans
     rate_expected = np.outer(np.ones((8,), dtype=np.float32), np.arange(5) + 1)
 
     # Act
-    mf6_wel = wel.to_mf6_pkg(active, top, bottom, k)
+    mf6_wel = wel.to_mf6_pkg(active, top, bottom, k, 1.0, 1.0)
     mf6_ds = mf6_wel.dataset
 
     # Assert
