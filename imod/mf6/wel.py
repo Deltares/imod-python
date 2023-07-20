@@ -363,7 +363,7 @@ class Well(BoundaryCondition):
         return cellid
 
     def render(self, directory, pkgname, globaltimes, binary):
-        raise NotImplementedError
+        raise NotImplementedError(f"{self.__name__} is a grid-agnostic package and does not have a render method. To render the package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()")
 
     def to_mf6_pkg(
         self,
