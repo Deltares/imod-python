@@ -8,7 +8,7 @@ import pytest
 import xarray as xr
 
 import imod
-import imod.mf6.mf6_adapter
+import imod.mf6.mf6_wel_adapter
 import imod.mf6.utilities.dataset_utilities
 import imod.mf6.wel
 
@@ -35,7 +35,7 @@ def test_mf6wel_to_sparse__stationary(
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_stationary
-    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_wel_adapter.Mf6Wel(cellid=cellid, rate=rate)
 
     # Act
     arrdict = mf6wel._ds_to_arrdict(mf6wel.dataset)
@@ -48,7 +48,7 @@ def test_mf6wel_to_sparse__stationary(
 def test_mf6wel_to_sparse__transient(mf6wel_test_data_transient, sparse_data_expected):
     # Arrange
     cellid, rate = mf6wel_test_data_transient
-    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_wel_adapter.Mf6Wel(cellid=cellid, rate=rate)
     ds = mf6wel.dataset.isel(time=0)
 
     # Act
@@ -64,7 +64,7 @@ def test_mf6wel_write_datafile__stationary(
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_stationary
-    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_wel_adapter.Mf6Wel(cellid=cellid, rate=rate)
 
     ds = mf6wel.dataset
     file_path = Path(tmp_path) / "mf6wel.bin"
@@ -82,7 +82,7 @@ def test_mf6wel_write__stationary(
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_stationary
-    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_wel_adapter.Mf6Wel(cellid=cellid, rate=rate)
     globaltimes = pd.date_range("2000-01-01", "2000-01-06")
     pkgname = "wel"
     directory = Path(tmp_path) / "mf6wel"
@@ -104,7 +104,7 @@ def test_mf6wel_write__transient(
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_transient
-    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_wel_adapter.Mf6Wel(cellid=cellid, rate=rate)
     globaltimes = pd.date_range("2000-01-01", "2000-01-06")
     pkgname = "wel"
     directory = Path(tmp_path) / "mf6wel"
@@ -126,7 +126,7 @@ def test_mf6wel_render__transient(
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_transient
-    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_wel_adapter.Mf6Wel(cellid=cellid, rate=rate)
     globaltimes = pd.date_range("2000-01-01", "2000-01-06")
     pkgname = "wel"
     directory = Path(tmp_path) / "mf6wel"
