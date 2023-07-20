@@ -44,10 +44,7 @@ def round_to_closest_integer_array(input_array: GridDataArray) -> GridDataArray:
     This function creates an array equal to the input array but with all values converted to integer.
     Values are converted with the np.rint() function which rounds to the closest integer.
     """
-    output_array = input_array.astype(np.int32)
-    output_array.values = np.rint(input_array.values).astype(np.int32)
-    return output_array
-
+    return np.rint(input_array).astype(np.int32)
 
 class Modflow6Model(collections.UserDict, abc.ABC):
     _mandatory_packages = None
