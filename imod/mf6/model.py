@@ -435,7 +435,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         for pkg_name, pkg in self.items():
             if pkg.is_regridding_supported():
-                new_model[pkg_name] = pkg.regrid_like(target_grid, validate)
+                new_model[pkg_name] = pkg.regrid_like(target_grid, validate=validate)
             else:
                 raise NotImplementedError(
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
