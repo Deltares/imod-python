@@ -398,6 +398,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
     def regrid_like(
         self,
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
+        validate: bool = True
     ) -> "Modflow6Model":
         """
         Creates a model by regridding the packages of this model to another discretization.
@@ -409,6 +410,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray
             a grid defined over the same discretization as the one we want to regrid the package to
+        validate: bool
+            set to true to validate the regridded packages
+                        
         Returns
         -------
         a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
@@ -418,7 +422,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         for pkg_name, pkg in self.items():
             if pkg.is_regridding_supported():
-                new_model[pkg_name] = pkg.regrid_like(target_grid)
+                new_model[pkg_name] = pkg.regrid_like(target_grid, validate)
             else:
                 raise NotImplementedError(
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"

@@ -430,6 +430,7 @@ class Well(BoundaryCondition):
         self,
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
         regridder_types: Dict[str, Tuple[str, str]] = None,
+        validate: bool = True
     ) -> Package:
         """
         The regrid_like method is irrelevant for this package as it is grid-agnostic.
@@ -443,6 +444,8 @@ class Well(BoundaryCondition):
         regridder_types: dict(str->(str,str))
            dictionary mapping arraynames (str) to a tuple of regrid method (str) and function name (str)
             this dictionary can be used to override the default mapping method.
+        validate: bool
+            set to true to validate the regridded packages            
 
         """
         return deepcopy(self)

@@ -615,6 +615,7 @@ class Package(PackageBase, abc.ABC):
         self,
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
         regridder_types: Dict[str, Tuple[RegridderType, str]] = None,
+        validate: bool = True
     ) -> "Package":
         """
         Creates a package of the same type as this package, based on another discretization.
@@ -720,7 +721,7 @@ class Package(PackageBase, abc.ABC):
         new_package = self.__class__(**new_package_data)
 
         # TODO gitlab-398: write validation fails for VerticesDiscretization
-        if not isinstance(self, imod.mf6.VerticesDiscretization):
+        if validate and not isinstance(self, imod.mf6.VerticesDiscretization):
             errors = new_package._validate(
                 new_package._write_schemata,
                 idomain=target_grid,
