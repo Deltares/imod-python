@@ -378,7 +378,7 @@ class Modflow6Simulation(collections.UserDict):
         self,
         regridded_simulation_name: str,
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
-        validate: bool = True
+        validate: bool = True,
     ) -> "Modflow6Simulation":
         """
         This method creates a new simulation object. The models contained in the new simulation are regridded versions
