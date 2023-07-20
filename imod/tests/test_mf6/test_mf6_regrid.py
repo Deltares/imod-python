@@ -220,3 +220,24 @@ def test_regrid(tmp_path: Path):
     abs_tol = 1e-13
 
     assert abs(min_diff) < abs_tol and abs(max_diff) < abs_tol
+    
+def test_regridding_can_skip_validation():
+    """
+    This tests if an invalid package can be regridded by turning off validation
+    """
+
+    #create a sto package with a negative storage coefficient. This would trigger a validation error if it were turned on. 
+    storage_coefficient = grid_data_structured(np.float64,-20, 0.25)
+    specific_yield = grid_data_structured(np.float64,-30, 0.25)
+    sto_package = imod.mf6.StorageCoefficient(storage_coefficient, specific_yield, transient=True, convertible=False, save_flows=True, validate=False)
+
+    #regrid the package to a finer domain
+    new_grid = grid_data_structured(np.float64,1, 0.025)
+    regridded_package = sto_package.regrid_like(new_grid, validate=False)
+
+    #check that write validation still fails for the regridded package
+    pkg_errors = regridded_package._validate(
+        schemata=imod.mf6.StorageCoefficient._write_schemata,
+        idomain=new_grid,
+        bottom=bottom,
+    )
