@@ -378,6 +378,7 @@ class Modflow6Simulation(collections.UserDict):
         self,
         regridded_simulation_name: str,
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
+        validate: bool = True
     ) -> "Modflow6Simulation":
         """
         This method creates a new simulation object. The models contained in the new simulation are regridded versions
@@ -390,6 +391,8 @@ class Modflow6Simulation(collections.UserDict):
             name given to the output simulation
         target_grid: xr.DataArray or  xu.UgridDataArray
             discretization onto which the models  in this simulation will be regridded
+        validate: bool
+            set to true to validate the regridded packages
 
         Returns
         -------
@@ -398,7 +401,7 @@ class Modflow6Simulation(collections.UserDict):
         result = self.__class__(regridded_simulation_name)
         for key, item in self.items():
             if isinstance(item, GroundwaterFlowModel):
-                result[key] = item.regrid_like(target_grid)
+                result[key] = item.regrid_like(target_grid, validate)
             elif isinstance(item, imod.mf6.Solution) or isinstance(
                 item, imod.mf6.TimeDiscretization
             ):
