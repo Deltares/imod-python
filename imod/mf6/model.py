@@ -466,7 +466,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         methods: Dict[RegridderType, str],
     ) -> GridDataArray:
         """
-        This function computes the output-domain for a regridding operation by regridding idomain with
+        This method computes the output-domain for a regridding operation by regridding idomain with
         all regridders. Each regridder may leave some cells inactive. The output domain for the model consists of those
         cells that all regridders consider active.
         """
