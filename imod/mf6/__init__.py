@@ -12,11 +12,6 @@ from imod.mf6.drn import Drainage
 from imod.mf6.dsp import Dispersion
 from imod.mf6.evt import Evapotranspiration
 from imod.mf6.ghb import GeneralHeadBoundary
-from imod.mf6.hfb import (
-    HorizontalFlowBarrierHydraulicCharacteristic,
-    HorizontalFlowBarrierMultiplier,
-    HorizontalFlowBarrierResistance,
-)
 from imod.mf6.ic import InitialConditions
 from imod.mf6.ims import (
     Solution,
@@ -26,6 +21,7 @@ from imod.mf6.ims import (
 )
 from imod.mf6.ist import ImmobileStorageTransfer
 from imod.mf6.lak import Lake, LakeData, OutletManning, OutletSpecified, OutletWeir
+from imod.mf6.mf6_hfb_adapter import BarrierType, Mf6HorizontalFlowBarrier
 from imod.mf6.model import GroundwaterFlowModel, GroundwaterTransportModel
 from imod.mf6.mst import MobileStorageTransfer
 from imod.mf6.npf import NodePropertyFlow

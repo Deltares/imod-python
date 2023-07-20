@@ -5,6 +5,7 @@ import xugrid as xu
 
 import imod
 import imod.tests.fixtures.mf6_lake_package_fixture as mf_lake
+from imod.mf6.mf6_hfb_adapter import BarrierType
 
 """
 This file is used to create instances of imod packages for testing purposes.
@@ -174,18 +175,21 @@ def create_instance_boundary_condition_packages(is_unstructured):
             head=get_grid_da(is_unstructured, np.float64, 3),
             conductance=get_grid_da(is_unstructured, np.float64, 0.33),
         ),
-        imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(
-            hydraulic_characteristic=get_grid_da(is_unstructured, np.float64, 0.33),
+        imod.mf6.Mf6HorizontalFlowBarrier(
+            barrier_type=BarrierType.HydraulicCharacteristic,
+            value=get_grid_da(is_unstructured, np.float64, 0.33),
             idomain=get_grid_da(is_unstructured, int, 1),
             print_input=True,
         ),
-        imod.mf6.HorizontalFlowBarrierMultiplier(
-            multiplier=get_grid_da(is_unstructured, np.float64, 0.33),
+        imod.mf6.Mf6HorizontalFlowBarrier(
+            barrier_type=BarrierType.Multiplier,
+            value=get_grid_da(is_unstructured, np.float64, 0.33),
             idomain=get_grid_da(is_unstructured, int, 1),
             print_input=True,
         ),
-        imod.mf6.HorizontalFlowBarrierResistance(
-            resistance=get_grid_da(is_unstructured, np.float64, 0.33),
+        imod.mf6.Mf6HorizontalFlowBarrier(
+            barrier_type=BarrierType.Resistance,
+            value=get_grid_da(is_unstructured, np.float64, 0.33),
             idomain=get_grid_da(is_unstructured, int, 1),
             print_input=True,
         ),
