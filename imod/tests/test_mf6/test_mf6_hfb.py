@@ -19,7 +19,7 @@ def test_hfb_writing_1layer(hfb_specialization, tmp_path, unstructured_flow_mode
     idomain = unstructured_flow_model["disv"]["idomain"]
 
     x = [0.0, 2.0, 2.0, 3.0, 3.0, 5.0]
-    y = [5.1, 51.0, 5.1, 5.1, 5.1, 5.1]
+    y = [5.1, 5.1, 5.1, 5.1, 5.1, 5.1]
     indices = np.repeat(np.arange(3), 2)
     linestrings = shapely.linestrings(x, y, indices=indices)
     lines = gpd.GeoDataFrame(geometry=linestrings)
