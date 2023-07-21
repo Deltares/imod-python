@@ -17,6 +17,7 @@ from imod.mf6.pkgbase import TRANSPORT_PACKAGES, PackageBase
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
     RegridderType,
+    align_grid_coordinates,
     get_non_grid_data,
 )
 from imod.mf6.validation import validation_pkg_error_message
@@ -564,8 +565,7 @@ class Package(PackageBase, abc.ABC):
 
         Parameters
         ----------
-        domain: xr.DataArray of bools
-            The condition. Preserve values where True, discard where False.
+        domain: xr.DataArray of integers. Preservers values where domain is larger than 0.
 
         Returns
         -------
@@ -580,9 +580,9 @@ class Package(PackageBase, abc.ABC):
                 continue
             if set(domain.dims).issubset(da.dims):
                 if issubclass(da.dtype.type, numbers.Integral):
-                    masked[var] = da.where(domain != 0, other=0)
+                    masked[var] = da.where(domain > 0, other=0)
                 elif issubclass(da.dtype.type, numbers.Real):
-                    masked[var] = da.where(domain != 0)
+                    masked[var] = da.where(domain > 0)
                 else:
                     raise TypeError(
                         f"Expected dtype float or integer. Received instead: {da.dtype}"
@@ -610,6 +610,61 @@ class Package(PackageBase, abc.ABC):
         if self.is_regridding_supported():
             return self._regrid_method
         return None
+
+    def _regrid_array(
+        self,
+        varname: str,
+        regridder_collection: RegridderInstancesCollection,
+        regridder_name: str,
+        regridder_function: str,
+        target_grid: GridDataArray,
+    ) -> Optional[GridDataArray]:
+        """
+        Regrids a data_array. The array is specified by its key in the dataset.
+        Each data-array can represent:
+        -a scalar value, valid for the whole grid
+        -an array of a different scalar per layer
+        -an array with a value per grid block
+        -None
+        """
+
+        # skip regridding for arrays with no valid values (such as "None")
+        if not self._valid(self.dataset[varname].values[()]):
+            return None
+
+        # the dataarray might be a scalar. If it is, then it does not need regridding.
+        if is_scalar(self.dataset[varname]):
+            return self.dataset[varname].values[()]
+
+        if isinstance(self.dataset[varname], xr.DataArray):
+            coords = self.dataset[varname].coords
+            # if it is an xr.DataArray it may be layer-based; then no regridding is needed
+            if not ("x" in coords and "y" in coords):
+                return self.dataset[varname]
+
+            # if it is an xr.DataArray it needs the dx, dy coordinates for regridding, which are otherwise not mandatory
+            if not ("dx" in coords and "dy" in coords):
+                raise ValueError(
+                    f"DataArray {varname} does not have both a dx and dy coordinates"
+                )
+
+        # obtain an instance of a regridder for the chosen method
+        regridder = regridder_collection.get_regridder(
+            regridder_name,
+            regridder_function,
+        )
+
+        # store original dtype of data
+        original_dtype = self.dataset[varname].dtype
+
+        # regrid data array
+        regridded_array = regridder.regrid(self.dataset[varname])
+
+        # set correct dx, dy variables and x, y coordinate axes
+        regridded_array = align_grid_coordinates(regridded_array, target_grid)
+
+        # reconvert the result to the same dtype as the original
+        return regridded_array.astype(original_dtype)
 
     def regrid_like(
         self,
@@ -660,63 +715,19 @@ class Package(PackageBase, abc.ABC):
         ) in regridder_settings.items():
             regridder_name, regridder_function = regridder_type_and_function
 
+            # skip variables that are not in this dataset
             if varname not in self.dataset.keys():
                 continue
 
-            if not self._valid(self.dataset[varname].values[()]):
-                new_package_data[varname] = None
-                continue
-
-            # the dataarray might be a scalar. If it is, then it does not need regridding.
-            if is_scalar(self.dataset[varname]):
-                new_package_data[varname] = self.dataset[varname].values[()]
-                continue
-
-            if isinstance(self.dataset[varname], xr.DataArray):
-                coords = self.dataset[varname].coords
-                # if it is an xr.DataArray it may be layer-based; then no regridding is needed
-                if not ("x" in coords and "y" in coords):
-                    new_package_data[varname] = self.dataset[varname]
-                    continue
-                # if it is an xr.DataArray it needs the dx, dy coordinates for regridding, which are otherwise not mandatory
-                if not ("dx" in coords and "dy" in coords):
-                    raise ValueError(
-                        f"DataArray {varname} does not have both a dx and dy coordinates"
-                    )
-
-            # obtain an instance of a regridder for the chosen method
-            regridder = regridder_collection.get_regridder(
+            # regrid the variable
+            new_package_data[varname] = self._regrid_array(
+                varname,
+                regridder_collection,
                 regridder_name,
                 regridder_function,
+                target_grid,
             )
 
-            # store original dtype of data
-            original_dtype = self.dataset[varname].dtype
-
-            # regrid data array
-            regridded_array = regridder.regrid(self.dataset[varname])
-
-            # the regridded array may have coordinates that are not exactly the same as those of the targetgrid
-            # due to rounding errors (coordinates are re-computed in xugrid based on dx, dy).
-            # we overwrite the regridded coordinates with the target grid coordinates.
-            if "dx" in regridded_array.coords:
-                regridded_array = regridded_array.assign_coords(
-                    {"dx": target_grid.coords["dx"].values[()]}
-                )
-            if "dy" in regridded_array.coords:
-                regridded_array = regridded_array.assign_coords(
-                    {"dy": target_grid.coords["dy"].values[()]}
-                )
-            if "x" in regridded_array.coords:
-                regridded_array = regridded_array.assign_coords(
-                    {"x": target_grid.coords["x"].values[()]}
-                )
-            if "y" in regridded_array.coords:
-                regridded_array = regridded_array.assign_coords(
-                    {"y": target_grid.coords["y"].values[()]}
-                )
-            # reconvert the result to the same dtype as the original
-            new_package_data[varname] = regridded_array.astype(original_dtype)
         new_package = self.__class__(**new_package_data)
 
         # TODO gitlab-398: write validation fails for VerticesDiscretization
