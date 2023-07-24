@@ -444,7 +444,8 @@ class Well(BoundaryCondition):
         Modflow 6 package. You can verify this by calling the ``to_mf6_pkg``
         method.
         """
-        message = textwrap.dedent(self.mask.__doc__)  # Use docstring from method
+        # Use docstring from method as message
+        message = textwrap.dedent(self.mask.__doc__)
         raise NotImplementedError(message)
 
 
