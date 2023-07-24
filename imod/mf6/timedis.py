@@ -1,7 +1,7 @@
 import cftime
 import numpy as np
 
-from imod.mf6.pkgbase import Package
+from imod.mf6.package import Package
 from imod.schemata import DimsSchema, DTypeSchema
 
 

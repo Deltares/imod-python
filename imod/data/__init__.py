@@ -9,6 +9,7 @@ from .sample_data import (
     hondsrug_layermodel,
     hondsrug_meteorology,
     hondsrug_river,
+    imod5_projectfile_data,
     lakes_shp,
     twri_output,
 )

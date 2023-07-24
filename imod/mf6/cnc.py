@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,

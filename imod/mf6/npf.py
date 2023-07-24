@@ -2,7 +2,7 @@ import warnings
 
 import numpy as np
 
-from imod.mf6.pkgbase import Package
+from imod.mf6.package import Package
 from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
@@ -242,26 +242,18 @@ class NodePropertyFlow(Package):
     }
 
     _write_schemata = {
-        "k": (
-            AllValueSchema(">", 0.0),
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
-        ),
+        "k": (AllValueSchema(">", 0.0),),
         "rewet_layer": (
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
         "k22": (
             AllValueSchema(">", 0.0),
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
             # No need to check coords: dataset ensures they align with idomain.
         ),
         "k33": (
             AllValueSchema(">", 0.0),
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
             # No need to check coords: dataset ensures they align with idomain.
         ),
-        "angle1": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
-        "angle2": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
-        "angle3": (IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),),
     }
 
     _grid_data = {
@@ -301,6 +293,7 @@ class NodePropertyFlow(Package):
         "angle3": (RegridderType.OVERLAP, "mean"),
         "rewet_layer": (RegridderType.BARYCENTRIC, None),
     }
+    _skip_mask_arrays = ["k", "k22", "k33", "angle1", "angle2", "angle3"]
 
     def __init__(
         self,

@@ -3,7 +3,7 @@ import pathlib
 import numpy as np
 import pandas as pd
 
-from imod.mf6.pkgbase import Package
+from imod.mf6.package import Package
 from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import DisBottomSchema
 from imod.schemata import (
@@ -69,6 +69,8 @@ class VerticesDiscretization(Package):
         "bottom": (RegridderType.OVERLAP, "mean"),
         "idomain": (RegridderType.OVERLAP, "mean"),
     }
+
+    _skip_mask_arrays = ["bottom"]
 
     def __init__(self, top, bottom, idomain, validate: bool = True):
         super().__init__(locals())
