@@ -1,10 +1,11 @@
+import pathlib
+import textwrap
+
 import geopandas as gpd
 import numpy as np
 import pytest
 import shapely
 import xugrid as xu
-import textwrap
-import pathlib
 
 import imod
 
@@ -39,7 +40,8 @@ def get_hfb_data_one_layer(grid_xy):
     ],
 )
 def test_hfb_render_one_layer(
-    hfb_class, unstructured_flow_model,
+    hfb_class,
+    unstructured_flow_model,
 ):
     # Arrange
     idomain = unstructured_flow_model["disv"]["idomain"]
@@ -78,7 +80,9 @@ def test_hfb_render_one_layer(
     ],
 )
 def test_hfb_writing_one_layer(
-    hfb_specialization, tmp_path, unstructured_flow_model,
+    hfb_specialization,
+    tmp_path,
+    unstructured_flow_model,
 ):
     hfb_class, expected_value = hfb_specialization
     # Arrange
