@@ -9,8 +9,7 @@ import pathlib
 import imod
 
 
-@pytest.fixture
-def hfb_data_one_layer():
+def get_hfb_data_one_layer(grid_xy):
     """
     Line at cell edges of unstructured flow model
     """
@@ -22,12 +21,9 @@ def hfb_data_one_layer():
     lines = gpd.GeoDataFrame(geometry=linestrings)
     lines["linedata"] = 10.0
 
-    # TODO: This doesn't work?
-    ugrid_1d = xu.UgridDataset.from_geodataframe(lines)
-    # But this does?
-    ugrid_1d, lines_snapped = xu.snap_to_grid(lines, idomain.sel(layer=1), 0.2)
+    uda, _ = xu.snap_to_grid(lines, grid_xy, 0.2)
 
-    line_as_dataarray = ugrid_1d["linedata"]
+    line_as_dataarray = uda["linedata"]
     line_as_dataarray = line_as_dataarray.expand_dims("layer")
     line_as_dataarray = line_as_dataarray.assign_coords(layer=[1])
 
@@ -35,7 +31,7 @@ def hfb_data_one_layer():
 
 
 @pytest.mark.parametrize(
-    "hfb_specialization",
+    "hfb_class",
     [
         imod.mf6.HorizontalFlowBarrierResistance,
         imod.mf6.HorizontalFlowBarrierMultiplier,
@@ -43,13 +39,12 @@ def hfb_data_one_layer():
     ],
 )
 def test_hfb_render_one_layer(
-    hfb_specialization, tmp_path, unstructured_flow_model, hfb_data_one_layer
+    hfb_class, unstructured_flow_model,
 ):
-    directory = pathlib.Path("mymodel")
-
     # Arrange
     idomain = unstructured_flow_model["disv"]["idomain"]
-    hfb = hfb_specialization(hfb_data_one_layer, idomain)
+    hfb_data_one_layer = get_hfb_data_one_layer(idomain.sel(layer=1))
+    hfb = hfb_class(hfb_data_one_layer, idomain)
 
     expected = textwrap.dedent(
         """\
@@ -58,16 +53,16 @@ def test_hfb_render_one_layer(
         end options
 
         begin dimensions
-        maxhfb 3
+          maxhfb 3
         end dimensions
 
         begin period 1
-        open/close mymodel/hfb/hfb.dat
-        end period
-        """
+          open/close mymodel/hfb/hfb.dat
+        end period"""
     )
 
     # Act
+    directory = pathlib.Path("mymodel")
     actual = hfb.render(directory, "hfb", None, False)
 
     # Assert
@@ -77,23 +72,25 @@ def test_hfb_render_one_layer(
 @pytest.mark.parametrize(
     "hfb_specialization",
     [
-        imod.mf6.HorizontalFlowBarrierResistance,
-        imod.mf6.HorizontalFlowBarrierMultiplier,
-        imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic,
+        (imod.mf6.HorizontalFlowBarrierResistance, 0.1),
+        (imod.mf6.HorizontalFlowBarrierMultiplier, -10.0),
+        (imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic, 10.0),
     ],
 )
 def test_hfb_writing_one_layer(
-    hfb_specialization, tmp_path, unstructured_flow_model, hfb_data_one_layer
+    hfb_specialization, tmp_path, unstructured_flow_model,
 ):
+    hfb_class, expected_value = hfb_specialization
     # Arrange
     idomain = unstructured_flow_model["disv"]["idomain"]
-    hfb = hfb_specialization(hfb_data_one_layer, idomain)
+    hfb_data_one_layer = get_hfb_data_one_layer(idomain.sel(layer=1))
+    hfb = hfb_class(hfb_data_one_layer, idomain)
 
     expected_hfb_data = np.array(
         [
-            [1.0, 13.0, 1.0, 19.0, 0.1],
-            [1.0, 14.0, 1.0, 20.0, 0.1],
-            [1.0, 15.0, 1.0, 21.0, 0.1],
+            [1.0, 13.0, 1.0, 19.0, expected_value],
+            [1.0, 14.0, 1.0, 20.0, expected_value],
+            [1.0, 15.0, 1.0, 21.0, expected_value],
         ]
     )
 
