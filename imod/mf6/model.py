@@ -27,7 +27,10 @@ from imod.mf6.regridding_utils import (
     align_grid_coordinates,
 )
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
-from imod.mf6.validation import pkg_errors_to_status_info
+from imod.mf6.validation import (
+    pkg_errors_to_status_info,
+    validation_model_error_message,
+)
 from imod.mf6.wel import Well
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray
@@ -409,7 +412,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         return clipped
 
     def regrid_like(
-        self, target_grid: Union[xr.DataArray, xu.UgridDataArray], validate: bool = True
+        self, target_grid: GridDataArray, validate: bool = True
     ) -> "Modflow6Model":
         """
         Creates a model by regridding the packages of this model to another discretization.
@@ -433,11 +436,16 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         for pkg_name, pkg in self.items():
             if pkg.is_regridding_supported():
-                new_model[pkg_name] = pkg.regrid_like(target_grid, validate=validate)
+                new_model[pkg_name] = pkg.regrid_like(target_grid)
             else:
                 raise NotImplementedError(
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
                 )
+
+        if validate:
+            errors = new_model._validate("regridded_model")
+            if len(errors.errors):
+                raise ValidationError(validation_model_error_message(errors))
 
         methods = self._get_unique_regridder_types()
         output_domain = self._get_regridding_domain(target_grid, methods)
