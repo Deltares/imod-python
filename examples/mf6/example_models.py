@@ -7,6 +7,7 @@ but on doing something with it ( such as regridding)
 
 """
 import numpy as np
+import scipy.ndimage
 import xarray as xr
 
 import imod
@@ -202,4 +203,284 @@ def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
     simulation.create_time_discretization(
         additional_times=["2000-01-01", "2000-01-02", "2000-01-03", "2000-01-04"]
     )
+    return simulation
+
+
+def create_hondsrug_simulation() -> imod.mf6.Modflow6Simulation:
+    """
+    There is a separate example contained in `hondsrug <https://deltares.gitlab.io/imod/imod-python/examples/mf6/hondsrug.html#sphx-glr-examples-mf6-hondsrug-py>`_ that you should look at if you are interested in the model building
+    """
+
+    # create model
+    gwf_model = imod.mf6.GroundwaterFlowModel()
+
+    # %%
+    # This package allows specifying a regular MODFLOW grid. This grid is assumed
+    # to be rectangular horizontally, but can be distorted vertically.
+    #
+    # Load data
+    # ---------
+    #
+    # We'll load the data from the examples that come with this package.
+
+    layermodel = imod.data.hondsrug_layermodel()
+
+    # Make sure that the idomain is provided as integers
+    idomain = layermodel["idomain"].astype(int)
+
+    # We only need to provide the data for the top as a 2D array. Modflow 6 will
+    # compare the top against the uppermost active bottom cell.
+    top = layermodel["top"].max(dim="layer")
+
+    bot = layermodel["bottom"]
+
+    # %%
+    # discretization package - DIS
+    # ===========================
+    #
+    gwf_model["dis"] = imod.mf6.StructuredDiscretization(
+        top=top, bottom=bot, idomain=idomain
+    )
+
+    # %%
+    # flow package - NPF
+    # ===========================
+    #
+
+    k = layermodel["k"]
+
+    gwf_model["npf"] = imod.mf6.NodePropertyFlow(
+        icelltype=0,
+        k=k,
+        k33=k,
+        variable_vertical_conductance=True,
+        dewatered=True,
+        perched=True,
+        save_flows=True,
+    )
+
+    # %%
+    # Initial conditions package - IC
+    # ================================
+    #
+
+    initial = imod.data.hondsrug_initial()
+    interpolated_head_larger = initial["head"]
+
+    xmin = 237_500.0
+    xmax = 250_000.0
+    ymin = 559_000.0
+    ymax = 564_000.0
+
+    interpolated_head = interpolated_head_larger.sel(
+        x=slice(xmin, xmax), y=slice(ymax, ymin)
+    )
+
+    like_3d = xr.full_like(idomain, np.nan, dtype=float)
+    starting_head = like_3d.combine_first(interpolated_head)
+    # Consequently ensure no data is specified in inactive cells:
+    starting_head = starting_head.where(idomain == 1)
+
+    gwf_model["ic"] = imod.mf6.InitialConditions(starting_head)
+
+    # %%
+    # Constant head package - CHD
+    # ===========================
+    #
+
+    def outer_edge(da):
+        data = da.copy()
+        from_edge = scipy.ndimage.binary_erosion(data)
+        is_edge = (data == 1) & (from_edge == 0)
+        return is_edge.astype(bool)
+
+    like_2d = xr.full_like(idomain.isel(layer=0), 1)
+    like_2d
+    edge = outer_edge(xr.full_like(like_2d.drop_vars("layer"), 1))
+
+    gwf_model["chd"] = imod.mf6.ConstantHead(
+        starting_head.where((idomain > 0) & edge),
+        print_input=False,
+        print_flows=True,
+        save_flows=True,
+    )
+
+    # %%
+    #
+    # Recharge
+    # ========
+
+    xmin = 230_000.0
+    xmax = 257_000.0
+    ymin = 550_000.0
+    ymax = 567_000.0
+
+    meteorology = imod.data.hondsrug_meteorology()
+    pp = meteorology["precipitation"]
+    evt = meteorology["evapotranspiration"]
+
+    pp = pp.sel(x=slice(xmin, xmax), y=slice(ymax, ymin)) / 1000.0  # from mm/d to m/d
+    evt = evt.sel(x=slice(xmin, xmax), y=slice(ymax, ymin)) / 1000.0  # from mm/d to m/d
+
+    # %%
+    # Recharge - Steady state
+    # -----------------------
+
+    pp_ss = pp.sel(time=slice("2000-01-01", "2009-12-31"))
+    pp_ss_mean = pp_ss.mean(dim="time")
+
+    # %%
+    # **Evapotranspiration**
+    evt_ss = evt.sel(time=slice("2000-01-01", "2009-12-31"))
+    evt_ss_mean = evt_ss.mean(dim="time")
+
+    # %%
+    # For the recharge calculation, a first estimate
+    # is the difference between the precipitation and evapotranspiration values.
+
+    rch_ss = pp_ss_mean - evt_ss_mean
+
+    # %%
+    # Recharge - Transient
+    # --------------------
+
+    pp_trans = pp.sel(time=slice("2010-01-01", "2015-12-31"))
+    evt_trans = evt.sel(time=slice("2010-01-01", "2015-12-31"))
+
+    rch_trans = pp_trans - evt_trans
+    rch_trans = rch_trans.where(rch_trans > 0, 0)  # check negative values
+
+    rch_trans_yr = rch_trans.resample(time="A", label="left").mean()
+    rch_trans_yr
+
+    starttime = "2009-12-31"
+
+    # Add first steady-state
+    timedelta = np.timedelta64(1, "s")  # 1 second duration for initial steady-state
+    starttime_steady = np.datetime64(starttime) - timedelta
+    rch_ss = rch_ss.assign_coords(time=starttime_steady)
+
+    rch_ss_trans = xr.concat([rch_ss, rch_trans_yr], dim="time")
+    rch_ss_trans
+
+    rch_ss_trans = imod.prepare.Regridder(method="mean").regrid(rch_ss_trans, like_2d)
+    rch_ss_trans
+
+    rch_total = rch_ss_trans.where(
+        idomain["layer"] == idomain["layer"].where(idomain > 0).min("layer")
+    )
+    rch_total
+
+    rch_total = rch_total.transpose("time", "layer", "y", "x")
+    rch_total
+
+    gwf_model["rch"] = imod.mf6.Recharge(rch_total)
+
+    # %%
+    # Drainage package - DRN
+    # =======================
+
+    drainage = imod.data.hondsrug_drainage()
+
+    pipe_cond = drainage["conductance"]
+    pipe_elev = drainage["elevation"]
+
+    pipe_cond
+
+    gwf_model["drn-pipe"] = imod.mf6.Drainage(
+        conductance=pipe_cond, elevation=pipe_elev
+    )
+
+    # %%
+    # River package - RIV
+    # ===================
+
+    river = imod.data.hondsrug_river()
+    riv_cond = river["conductance"]
+    riv_stage = river["stage"]
+    riv_bot = river["bottom"]
+
+    gwf_model["riv"] = imod.mf6.River(
+        conductance=riv_cond, stage=riv_stage, bottom_elevation=riv_bot
+    )
+
+    # %%
+    # Storage package - STO
+    # ======================
+
+    ss = 0.0003
+    layer = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
+    sy = xr.DataArray(
+        [0.16, 0.16, 0.16, 0.16, 0.15, 0.15, 0.15, 0.15, 0.14, 0.14, 0.14, 0.14, 0.14],
+        {"layer": layer},
+        ("layer",),
+    )
+    times_sto = np.array(
+        [
+            "2009-12-30T23:59:59.00",
+            "2009-12-31T00:00:00.00",
+            "2010-12-31T00:00:00.00",
+            "2011-12-31T00:00:00.00",
+            "2012-12-31T00:00:00.00",
+            "2013-12-31T00:00:00.00",
+            "2014-12-31T00:00:00.00",
+        ],
+        dtype="datetime64[ns]",
+    )
+
+    transient = xr.DataArray(
+        [False, True, True, True, True, True, True], {"time": times_sto}, ("time",)
+    )
+
+    gwf_model["sto"] = imod.mf6.SpecificStorage(
+        specific_storage=ss,
+        specific_yield=sy,
+        transient=transient,
+        convertible=0,
+        save_flows=True,
+    )
+
+    # %%
+    # Output Control package - OC
+    gwf_model["oc"] = imod.mf6.OutputControl(save_head="last", save_budget="last")
+
+    # %%
+    # Model simulation
+    # ================
+
+    simulation = imod.mf6.Modflow6Simulation("mf6-mipwa2-example")
+    simulation["GWF_1"] = gwf_model
+
+    # %%
+    # Solver settings
+    # ---------------
+
+    simulation["solver"] = imod.mf6.Solution(
+        modelnames=["GWF_1"],
+        print_option="summary",
+        csv_output=False,
+        no_ptc=True,
+        outer_dvclose=1.0e-4,
+        outer_maximum=500,
+        under_relaxation=None,
+        inner_dvclose=1.0e-4,
+        inner_rclose=0.001,
+        inner_maximum=100,
+        linear_acceleration="cg",
+        scaling_method=None,
+        reordering_method=None,
+        relaxation_factor=0.97,
+    )
+
+    # %%
+    # Assign time discretization
+    # --------------------------
+
+    simulation.create_time_discretization(
+        additional_times=[
+            "2009-12-30T23:59:59.000000000",
+            "2015-12-31T00:00:00.000000000",
+        ]
+    )
+
     return simulation
