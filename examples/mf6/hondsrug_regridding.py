@@ -87,4 +87,5 @@ hds_regridded = imod.mf6.open_hds(
 fig, ax = plt.subplots()
 hds_regridded.sel(layer=3).isel(time=3).plot(ax=ax)
 
-#%%
+pass
+# %%

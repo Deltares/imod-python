@@ -148,7 +148,7 @@ class StructuredDiscretization(Package):
         """
         After regridding, it is possible that some cells have a top at the same level as their bottom.
         THis is only allowed for inactive and vertical passthrough cells. This function updates the mask array to
-        remove these cells- they are marked as vertical passthrough cells. 
+        remove these cells- they are marked as vertical passthrough cells.
         """
 
         layers = idomain.coords["layer"].values
@@ -161,7 +161,9 @@ class StructuredDiscretization(Package):
             bot_layer = self.dataset["bottom"].sel({"layer": ilayer})
             disabled = xr.full_like(idomain_layer, -1)
             idomain_layer = xr.where(
-                (top_layer - bot_layer == 0) & (idomain_layer > 0), disabled, idomain_layer
+                (top_layer - bot_layer == 0) & (idomain_layer > 0),
+                disabled,
+                idomain_layer,
             )
             idomain.loc[{"layer": ilayer}] = idomain_layer
 
