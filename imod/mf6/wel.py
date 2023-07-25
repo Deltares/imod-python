@@ -435,18 +435,20 @@ class Well(BoundaryCondition):
         passing a discretization to the ``to_mf6_pkg`` function using the
         parameters ``top``, "bottom`` and ``active``.
         """
+        # TODO: Add docsting message to logger
+        # message = textwrap.dedent(self.mask.__doc__)
         return deepcopy(self)
 
-    def mask(self, _) -> NoReturn:
+    def mask(self, _) -> Package:
         """
         The Well package has no mask method implemented. Wells falling in
         inactive cells are automatically removed in the call to write to
         Modflow 6 package. You can verify this by calling the ``to_mf6_pkg``
         method.
         """
-        # Use docstring from method as message
-        message = textwrap.dedent(self.mask.__doc__)
-        raise NotImplementedError(message)
+        # TODO: Add docsting message to logger
+        # message = textwrap.dedent(self.mask.__doc__)
+        return deepcopy(self)
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
