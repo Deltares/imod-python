@@ -438,7 +438,6 @@ class Well(BoundaryCondition):
         # message = textwrap.dedent(self.mask.__doc__)
         return deepcopy(self)
 
-
     def mask(self, _) -> Package:
         """
         The Well package has no mask method implemented. Wells falling in

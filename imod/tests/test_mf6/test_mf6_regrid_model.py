@@ -118,6 +118,7 @@ def test_regrid_unstructured_model_with_inactive_cells(
     new_idomain = new_gwf_model.get_domain()
     assert new_idomain.max().values[()] == 1 and new_idomain.min().values[()] == 0
 
+
 def test_model_regridding_can_skip_validation(
     structured_flow_model: imod.mf6.GroundwaterFlowModel,
 ):
@@ -193,5 +194,3 @@ def test_model_regridding_can_validate(
     # Check that a validation error is thrown while regridding
     with pytest.raises(imod.schemata.ValidationError):
         _ = structured_flow_model.regrid_like(new_grid, validate=True)
-
-   
