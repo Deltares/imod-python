@@ -411,8 +411,8 @@ class Well(BoundaryCondition):
             Object with wells as list based input.
         """
 
-        minimum_k = self.dataset["minimum_k"].values[()]
-        minimum_thickness = self.dataset["minimum_thickness"].values[()]
+        minimum_k = self.dataset["minimum_k"].item()
+        minimum_thickness = self.dataset["minimum_thickness"].item()
 
         wells_df = self.__create_wells_df()
         wells_assigned = self.__create_assigned_wells(
