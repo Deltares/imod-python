@@ -237,8 +237,8 @@ class Well(BoundaryCondition):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
-        minimum_k,
-        minimum_thickness,
+        minimum_k: float,
+        minimum_thickness: float,
     ):
         # Ensure top, bottom & k
         # are broadcasted to 3d grid
