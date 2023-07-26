@@ -442,15 +442,16 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
                 )
 
-        if validate:
-            errors = new_model._validate("regridded_model")
-            if len(errors.errors):
-                raise ValidationError(validation_model_error_message(errors))
 
         methods = self._get_unique_regridder_types()
         output_domain = self._get_regridding_domain(target_grid, methods)
         new_model[self.__get_diskey()]["idomain"] = output_domain
         new_model._mask_all_packages(output_domain)
+        
+        if validate:
+            errors = new_model._validate("regridded_model")
+            if len(errors.errors):
+                raise ValidationError(validation_model_error_message(errors))
         return new_model
 
     def _mask_all_packages(

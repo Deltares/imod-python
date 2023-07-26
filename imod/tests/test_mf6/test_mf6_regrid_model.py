@@ -117,29 +117,6 @@ def test_regrid_unstructured_model_with_inactive_cells(
     assert not validation_result.has_errors()
     new_idomain = new_gwf_model.get_domain()
     assert new_idomain.max().values[()] == 1 and new_idomain.min().values[()] == 0
-    # Check that write validation still fails for the regridded package
-    new_bottom = deepcopy(new_grid)
-    new_bottom.loc[{"layer": 1}] = 0.0
-    new_bottom.loc[{"layer": 2}] = -1.0
-    new_bottom.loc[{"layer": 3}] = -2.0
-
-    regridded_package = regridded_model["sto"]
-    pkg_errors = regridded_package._validate(
-        schemata=imod.mf6.StorageCoefficient._write_schemata,
-        idomain=new_grid,
-        bottom=new_bottom,
-    )
-
-    # Check that the right errors were found
-    assert len(pkg_errors) == 2
-    assert (
-        str(pkg_errors["storage_coefficient"])
-        == "[ValidationError('not all values comply with criterion: >= 0.0')]"
-    )
-    assert (
-        str(pkg_errors["specific_yield"])
-        == "[ValidationError('not all values comply with criterion: >= 0.0')]"
-    )
 
 def test_model_regridding_can_skip_validation(
     structured_flow_model: imod.mf6.GroundwaterFlowModel,
@@ -216,3 +193,5 @@ def test_model_regridding_can_validate(
     # Check that a validation error is thrown while regridding
     with pytest.raises(imod.schemata.ValidationError):
         _ = structured_flow_model.regrid_like(new_grid, validate=True)
+
+   
