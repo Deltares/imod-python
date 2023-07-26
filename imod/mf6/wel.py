@@ -141,7 +141,6 @@ class Well(BoundaryCondition):
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
         self.dataset["repeat_stress"] = repeat_stress
-        self.dataset["repeat_stress"] = repeat_stress
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
@@ -214,13 +213,9 @@ class Well(BoundaryCondition):
         bottom: Union[xr.DataArray, xu.UgridDataArray],
         k: Union[xr.DataArray, xu.UgridDataArray],
     ) -> None:
-        minimum_k = self.dataset["minimum_k"].values[()]
-        minimum_thickness = self.dataset["minimum_thickness"].values[()]
         if validate:
             self._validate(self._write_schemata)
-        mf6_package = self.to_mf6_pkg(
-            idomain, top, bottom, k, minimum_k, minimum_thickness
-        )
+        mf6_package = self.to_mf6_pkg(idomain, top, bottom, k)
 
         mf6_package.write(directory, pkgname, globaltimes, binary)
 
@@ -384,8 +379,6 @@ class Well(BoundaryCondition):
         top: Union[xr.DataArray, xu.UgridDataArray],
         bottom: Union[xr.DataArray, xu.UgridDataArray],
         k: Union[xr.DataArray, xu.UgridDataArray],
-        minimum_k: float,
-        minimum_thickness: float,
     ) -> Mf6Wel:
         """
         Write package to Modflow 6 package.
@@ -412,15 +405,15 @@ class Well(BoundaryCondition):
             Grid with bottom of model layers.
         k: {xarry.DataArray, xugrid.UgridDataArray}
             Grid with hydraulic conductivites.
-        minimum_k: float, optional
-            on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this
-        minimum_thickness: float, optional
-            on creating point wells, no point wells will be placed in cells with a lower thickness than this
         Returns
         -------
         Mf6Wel
             Object with wells as list based input.
         """
+
+        minimum_k = self.dataset["minimum_k"].values[()]
+        minimum_thickness = self.dataset["minimum_thickness"].values[()]
+
         wells_df = self.__create_wells_df()
         wells_assigned = self.__create_assigned_wells(
             wells_df, active, top, bottom, k, minimum_k, minimum_thickness
