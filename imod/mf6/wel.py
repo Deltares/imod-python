@@ -133,7 +133,8 @@ class Well(BoundaryCondition):
         if id is None:
             id = np.arange(self.dataset["x"].size).astype(str)
         self.dataset["id"] = self.assign_dims(id)
-        self.set_minimum_k_thickness(minimum_k, minimum_thickness)
+        self.dataset["minimum_k"] = minimum_k
+        self.dataset["minimum_thickness"] = minimum_thickness
 
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
@@ -146,24 +147,6 @@ class Well(BoundaryCondition):
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
 
         self._validate_init_schemata(validate)
-
-    def set_minimum_k_thickness(
-        self, minimum_k: float, minimum_thickness: float
-    ) -> None:
-        """
-        Set the minimum k and thickness for this package. No point wells will be placed
-        in cells with a lower thickness or horizontal conductivity than this.
-
-
-        Parameters
-        ----------
-        minimum_k: float, optional
-            on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this
-        minimum_thickness: float, optional
-            on creating point wells, no point wells will be placed in cells with a lower thickness than this
-        """
-        self.dataset["minimum_k"] = minimum_k
-        self.dataset["minimum_thickness"] = minimum_thickness
 
     def clip_box(
         self,

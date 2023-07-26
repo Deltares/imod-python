@@ -193,21 +193,21 @@ def test_constraints_are_configurable(
     )
 
     # reset the constraints so that k-constraints are violated
-    twri_simulation["GWF_1"]["well"].set_minimum_k_thickness(
-        minimum_k=1.0, minimum_thickness=1.0
-    )
+    twri_simulation["GWF_1"]["well"]["minimum_k"] = 1.0
+    twri_simulation["GWF_1"]["well"]["minimum_thickness"] = 1.0
+
     with pytest.raises(ValueError):
         twri_simulation.write(tmp_path, binary=False)
 
     # reset the constraints again so that all constraints are met
-    twri_simulation["GWF_1"]["well"].set_minimum_k_thickness(
-        minimum_k=1e-9, minimum_thickness=1.0
-    )
+    twri_simulation["GWF_1"]["well"]["minimum_k"] = 1e-9
+    twri_simulation["GWF_1"]["well"]["minimum_thickness"] = 1.0
+
     twri_simulation.write(tmp_path, binary=False)
 
     # reset the constraints so that layer_thickness constraints are violated
-    twri_simulation["GWF_1"]["well"].set_minimum_k_thickness(
-        minimum_k=1e-9, minimum_thickness=700.0
-    )
+    twri_simulation["GWF_1"]["well"]["minimum_k"] = 1e-9
+    twri_simulation["GWF_1"]["well"]["minimum_thickness"] = 700.0
+
     with pytest.raises(ValueError):
         twri_simulation.write(tmp_path, binary=False)
