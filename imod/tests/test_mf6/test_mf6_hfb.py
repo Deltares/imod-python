@@ -10,7 +10,7 @@ import xugrid as xu
 import imod
 
 
-def get_hfb_data_one_layer(grid_xy):
+def get_hfb_data_one_layer(grid_xy: xu.UgridDataArray):
     """
     Line at cell edges of unstructured flow model
     """
@@ -39,13 +39,54 @@ def get_hfb_data_one_layer(grid_xy):
         imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic,
     ],
 )
-def test_hfb_render_one_layer(
+def test_hfb_render_one_layer__unstructured(
     hfb_class,
     unstructured_flow_model,
 ):
     # Arrange
     idomain = unstructured_flow_model["disv"]["idomain"]
     hfb_data_one_layer = get_hfb_data_one_layer(idomain.sel(layer=1))
+    hfb = hfb_class(hfb_data_one_layer, idomain)
+
+    expected = textwrap.dedent(
+        """\
+        begin options
+
+        end options
+
+        begin dimensions
+          maxhfb 3
+        end dimensions
+
+        begin period 1
+          open/close mymodel/hfb/hfb.dat
+        end period"""
+    )
+
+    # Act
+    directory = pathlib.Path("mymodel")
+    actual = hfb.render(directory, "hfb", None, False)
+
+    # Assert
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "hfb_class",
+    [
+        imod.mf6.HorizontalFlowBarrierResistance,
+        imod.mf6.HorizontalFlowBarrierMultiplier,
+        imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic,
+    ],
+)
+def test_hfb_render_one_layer__structured(
+    hfb_class,
+    structured_flow_model,
+):
+    # Arrange
+    idomain = structured_flow_model["dis"]["idomain"]
+    grid_xy = xu.UgridDataArray.from_structured(idomain.sel(layer=1))
+    hfb_data_one_layer = get_hfb_data_one_layer(grid_xy)
     hfb = hfb_class(hfb_data_one_layer, idomain)
 
     expected = textwrap.dedent(
@@ -79,7 +120,7 @@ def test_hfb_render_one_layer(
         (imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic, 10.0),
     ],
 )
-def test_hfb_writing_one_layer(
+def test_hfb_writing_one_layer__unstructured(
     hfb_specialization,
     tmp_path,
     unstructured_flow_model,
@@ -95,6 +136,42 @@ def test_hfb_writing_one_layer(
             [1.0, 13.0, 1.0, 19.0, expected_value],
             [1.0, 14.0, 1.0, 20.0, expected_value],
             [1.0, 15.0, 1.0, 21.0, expected_value],
+        ]
+    )
+
+    # Act
+    hfb.write(tmp_path, "hfb", None, False)
+
+    # Assert
+    data = np.loadtxt(tmp_path / "hfb" / "hfb.dat")
+    np.testing.assert_almost_equal(data, expected_hfb_data)
+
+
+@pytest.mark.parametrize(
+    "hfb_specialization",
+    [
+        (imod.mf6.HorizontalFlowBarrierResistance, 0.1),
+        (imod.mf6.HorizontalFlowBarrierMultiplier, -10.0),
+        (imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic, 10.0),
+    ],
+)
+def test_hfb_writing_one_layer__structured(
+    hfb_specialization,
+    tmp_path,
+    structured_flow_model,
+):
+    hfb_class, expected_value = hfb_specialization
+    # Arrange
+    idomain = structured_flow_model["dis"]["idomain"]
+    grid_xy = xu.UgridDataArray.from_structured(idomain.sel(layer=1))
+    hfb_data_one_layer = get_hfb_data_one_layer(grid_xy)
+    hfb = hfb_class(hfb_data_one_layer, idomain)
+
+    expected_hfb_data = np.array(
+        [
+            [1.0, 3.0, 1.0, 1.0, 4.0, 1.0, expected_value],
+            [1.0, 3.0, 2.0, 1.0, 4.0, 2.0, expected_value],
+            [1.0, 3.0, 3.0, 1.0, 4.0, 3.0, expected_value],
         ]
     )
 
