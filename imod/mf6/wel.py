@@ -427,7 +427,6 @@ class Well(BoundaryCondition):
         return Mf6Wel(**ds)
 
     def regrid_like(self, *_) -> Package:
-        validate: bool = True,
         """
         The regrid_like method is irrelevant for this package as it is
         grid-agnostic. This method returns an (ungridded) copy of itself- the
