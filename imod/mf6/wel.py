@@ -1,7 +1,7 @@
 import warnings
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
+from typing import List, Union
 
 import numpy as np
 import pandas as pd
@@ -429,25 +429,27 @@ class Well(BoundaryCondition):
 
         return Mf6Wel(**ds)
 
-    def regrid_like(
-        self,
-        target_grid: Union[xr.DataArray, xu.UgridDataArray],
-        regridder_types: Dict[str, Tuple[str, str]] = None,
-    ) -> Package:
+    def regrid_like(self, *_) -> Package:
         """
-        The regrid_like method is irrelevant for this package as it is grid-agnostic.
-        This method returns an (ungridded) copy of itself- the target grid is not applied in any way.
-        Gridding can be achieved by passing a discretization to the "to_mf6_pkg" function using the parameters "top", "bottom" and "active".
-
-        Parameters
-        ----------
-        target_grid: xr.DataArray or xu.UgridDataArray
-            a grid defined over the same discretization as the one we want to regrid the package to
-        regridder_types: dict(str->(str,str))
-           dictionary mapping arraynames (str) to a tuple of regrid method (str) and function name (str)
-            this dictionary can be used to override the default mapping method.
-
+        The regrid_like method is irrelevant for this package as it is
+        grid-agnostic. This method returns an (ungridded) copy of itself- the
+        target grid is not applied in any way. Gridding can be achieved by
+        passing a discretization to the ``to_mf6_pkg`` function using the
+        parameters ``top``, "bottom`` and ``active``.
         """
+        # TODO: Add docsting message to logger
+        # message = textwrap.dedent(self.mask.__doc__)
+        return deepcopy(self)
+
+    def mask(self, _) -> Package:
+        """
+        The Well package has no mask method implemented. Wells falling in
+        inactive cells are automatically removed in the call to write to
+        Modflow 6 package. You can verify this by calling the ``to_mf6_pkg``
+        method.
+        """
+        # TODO: Add docsting message to logger
+        # message = textwrap.dedent(self.mask.__doc__)
         return deepcopy(self)
 
 
