@@ -448,7 +448,7 @@ class Well(BoundaryCondition):
         return Mf6Wel(**ds)
 
     def regrid_like(self, *_) -> Package:
-        validate: bool = True,
+        validate: bool = (True,)
         """
         The regrid_like method is irrelevant for this package as it is
         grid-agnostic. This method returns an (ungridded) copy of itself- the
@@ -459,8 +459,6 @@ class Well(BoundaryCondition):
         # TODO: Add docsting message to logger
         # message = textwrap.dedent(self.mask.__doc__)
         return deepcopy(self)
-        validate: bool
-            set to true to validate the regridded packages
 
     def mask(self, _) -> Package:
         """
