@@ -12,6 +12,7 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
+from imod.mf6.regridding_utils import RegridderType
 
 
 class Evapotranspiration(BoundaryCondition):
@@ -129,6 +130,29 @@ class Evapotranspiration(BoundaryCondition):
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
+
+    _regrid_method = {
+        "surface": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),  # TODO set to barycentric once supported
+        "rate": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+        "depth": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+        "proportion_rate": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+        "proportion_depth": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+    }
 
     def __init__(
         self,
