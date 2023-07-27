@@ -580,7 +580,7 @@ class Package(PackageBase, abc.ABC):
                 continue
             if set(domain.dims).issubset(da.dims):
                 if issubclass(da.dtype.type, numbers.Integral):
-                    masked[var] = da
+                    masked[var] = da.where(domain > 0, other=0)
                 elif issubclass(da.dtype.type, numbers.Real):
                     masked[var] = da.where(domain > 0)
                 else:
@@ -731,14 +731,6 @@ class Package(PackageBase, abc.ABC):
 
         new_package = self.__class__(**new_package_data)
 
-        # TODO gitlab-398: write validation fails for VerticesDiscretization
-        if validate and not isinstance(self, imod.mf6.VerticesDiscretization):
-            errors = new_package._validate(
-                new_package._write_schemata,
-                idomain=target_grid,
-            )
-            if len(errors) > 0:
-                raise ValidationError(validation_pkg_error_message(errors))
         return new_package
 
     def skip_masking_dataarray(self, array_name: str) -> bool:
