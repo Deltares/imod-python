@@ -36,6 +36,10 @@ ADV_BOUNDARY_PACKAGES = [
     x for x in ALL_PACKAGES if issubclass(x, AdvancedBoundaryCondition)
 ]
 
+HIGH_LEVEL_PACKAGES = [
+    imod.mf6.Well
+]  # add HorizontalFlowBarrier after this one is refactored into being grid-agnostic.
+
 
 def check_attributes(pkg_class):
     class_attributes = set(
@@ -71,7 +75,11 @@ def test_render_twice(instance, tmp_path):
     modeldir = tmp_path / "testdir"
 
     sig = inspect.signature(instance.render)
-    if len(sig.parameters) == 0:
+    if any([isinstance(instance, pack) for pack in HIGH_LEVEL_PACKAGES]):
+        with pytest.raises(NotImplementedError):
+            instance.render(modeldir, "test", globaltimes, False)
+        return
+    elif len(sig.parameters) == 0:
         text1 = instance.render()
         text2 = instance.render()
     elif len(sig.parameters) == 3:

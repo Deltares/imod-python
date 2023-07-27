@@ -55,6 +55,10 @@ class Well(BoundaryCondition):
     concentration_boundary_type: ({"AUX", "AUXMIXED"}, optional)
         if this flow package is used in simulations also involving transport, then this keyword specifies
         how outflow over this boundary is computed.
+    minimum_k: float, optional
+        on creating point wells, no point wells will be placed in cells with a lower horizontal conductivity than this
+    minimum_thickness: float, optional
+        on creating point wells, no point wells will be placed in cells with a lower thickness than this
     print_input: ({True, False}, optional)
         keyword to indicate that the list of well information will be written to
         the listing file immediately after it is read.
@@ -111,6 +115,8 @@ class Well(BoundaryCondition):
         concentration=None,
         concentration_boundary_type="aux",
         id=None,
+        minimum_k=0.1,
+        minimum_thickness=1.0,
         print_input=False,
         print_flows=False,
         save_flows=False,
@@ -127,13 +133,14 @@ class Well(BoundaryCondition):
         if id is None:
             id = np.arange(self.dataset["x"].size).astype(str)
         self.dataset["id"] = self.assign_dims(id)
+        self.dataset["minimum_k"] = minimum_k
+        self.dataset["minimum_thickness"] = minimum_thickness
 
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["observations"] = observations
         self.dataset["repeat_stress"] = repeat_stress
-
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
@@ -230,6 +237,8 @@ class Well(BoundaryCondition):
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
+        minimum_k: float,
+        minimum_thickness: float,
     ):
         # Ensure top, bottom & k
         # are broadcasted to 3d grid
@@ -247,7 +256,9 @@ class Well(BoundaryCondition):
         # case of a "time" and "species" coordinate.
         wells_df = wells_df.reset_index()
 
-        wells_assigned = assign_wells(wells_df, top_3d, bottom, k)
+        wells_assigned = assign_wells(
+            wells_df, top_3d, bottom, k, minimum_thickness, minimum_k
+        )
         # Set multi-index again
         wells_assigned = wells_assigned.set_index(index_names).sort_index()
 
@@ -362,6 +373,11 @@ class Well(BoundaryCondition):
 
         return cellid
 
+    def render(self, directory, pkgname, globaltimes, binary):
+        raise NotImplementedError(
+            f"{self.__class__.__name__} is a grid-agnostic package and does not have a render method. To render the package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()"
+        )
+
     def to_mf6_pkg(
         self,
         active: Union[xr.DataArray, xu.UgridDataArray],
@@ -394,14 +410,19 @@ class Well(BoundaryCondition):
             Grid with bottom of model layers.
         k: {xarry.DataArray, xugrid.UgridDataArray}
             Grid with hydraulic conductivites.
-
         Returns
         -------
         Mf6Wel
             Object with wells as list based input.
         """
+
+        minimum_k = self.dataset["minimum_k"].item()
+        minimum_thickness = self.dataset["minimum_thickness"].item()
+
         wells_df = self.__create_wells_df()
-        wells_assigned = self.__create_assigned_wells(wells_df, active, top, bottom, k)
+        wells_assigned = self.__create_assigned_wells(
+            wells_df, active, top, bottom, k, minimum_k, minimum_thickness
+        )
 
         nwells_df = len(wells_df["id"].unique())
         nwells_assigned = (
