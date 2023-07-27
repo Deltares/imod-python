@@ -144,13 +144,3 @@ def align_grid_coordinates(
                 {coord: target_grid.coords[coord].values[()]}
             )
     return regridded_array
-        )
-    if "x" in regridded_array.coords:
-        regridded_array = regridded_array.assign_coords(
-            {"x": target_grid.coords["x"].values[()]}
-        )
-    if "y" in regridded_array.coords:
-        regridded_array = regridded_array.assign_coords(
-            {"y": target_grid.coords["y"].values[()]}
-        )
-    return regridded_array

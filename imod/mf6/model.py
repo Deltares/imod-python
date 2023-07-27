@@ -50,8 +50,6 @@ def round_to_closest_integer_array(input_array: GridDataArray) -> GridDataArray:
     return np.rint(input_array).astype(np.int32)
 
 
-
-
 class Modflow6Model(collections.UserDict, abc.ABC):
     _mandatory_packages = None
     _model_id = None

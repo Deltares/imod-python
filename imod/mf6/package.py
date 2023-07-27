@@ -728,8 +728,6 @@ class Package(PackageBase, abc.ABC):
                 target_grid,
             )
 
-            regridded_array = align_grid_coordinates(regridded_array, target_grid)
-
         new_package = self.__class__(**new_package_data)
 
         return new_package

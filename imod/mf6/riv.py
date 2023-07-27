@@ -123,6 +123,7 @@ class River(BoundaryCondition):
     _auxiliary_data = {"concentration": "species"}
 
     _regrid_method = {
+        "stage": (RegridderType.OVERLAP, "mean"),
         "conductance": (RegridderType.RELATIVEOVERLAP, "conductance"),
         "bottom_elevation": (RegridderType.OVERLAP, "mean"),
         "concentration": (RegridderType.OVERLAP, "mean"),
