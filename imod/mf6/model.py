@@ -27,7 +27,10 @@ from imod.mf6.regridding_utils import (
     align_grid_coordinates,
 )
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
-from imod.mf6.validation import pkg_errors_to_status_info
+from imod.mf6.validation import (
+    pkg_errors_to_status_info,
+    validation_model_error_message,
+)
 from imod.mf6.wel import Well
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray
@@ -39,14 +42,14 @@ def initialize_template(name: str) -> Template:
     return env.get_template(name)
 
 
-def round_to_integer_array(input_array: GridDataArray) -> GridDataArray:
+def round_to_closest_integer_array(input_array: GridDataArray) -> GridDataArray:
     """
     This function creates an array equal to the input array but with all values converted to integer.
     Values are converted with the np.rint() function which rounds to the closest integer.
     """
-    output_array = input_array.astype(np.int32)
-    output_array.values = np.rint(input_array.values).astype(np.int32)
-    return output_array
+    return np.rint(input_array).astype(np.int32)
+
+
 
 
 class Modflow6Model(collections.UserDict, abc.ABC):
@@ -411,8 +414,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         return clipped
 
     def regrid_like(
-        self,
-        target_grid: Union[xr.DataArray, xu.UgridDataArray],
+        self, target_grid: GridDataArray, validate: bool = True
     ) -> "Modflow6Model":
         """
         Creates a model by regridding the packages of this model to another discretization.
@@ -424,6 +426,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray
             a grid defined over the same discretization as the one we want to regrid the package to
+        validate: bool
+            set to true to validate the regridded packages
+
         Returns
         -------
         a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
@@ -443,6 +448,11 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         output_domain = self._get_regridding_domain(target_grid, methods)
         new_model[self.__get_diskey()]["idomain"] = output_domain
         new_model._mask_all_packages(output_domain)
+
+        if validate:
+            errors = new_model._validate("regridded_model")
+            if len(errors.errors):
+                raise ValidationError(validation_model_error_message(errors))
         return new_model
 
     def _mask_all_packages(
@@ -466,7 +476,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         methods: Dict[RegridderType, str],
     ) -> GridDataArray:
         """
-        This function computes the output-domain for a regridding operation by regridding idomain with
+        This method computes the output-domain for a regridding operation by regridding idomain with
         all regridders. Each regridder may leave some cells inactive. The output domain for the model consists of those
         cells that all regridders consider active.
         """
@@ -486,7 +496,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             else:
                 included_in_all = included_in_all.where(regridded_idomain.notnull())
         new_idomain = included_in_all.where(included_in_all.notnull(), other=0)
-        new_idomain = round_to_integer_array(new_idomain)
+        new_idomain = round_to_closest_integer_array(new_idomain)
 
         new_idomain = align_grid_coordinates(new_idomain, target_grid)
 

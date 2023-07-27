@@ -132,18 +132,18 @@ def align_grid_coordinates(
     regridded_array: GridDataArray, target_grid: GridDataArray
 ) -> GridDataArray:
     """'
-    The regridded array may have coordinates that are not exactly the same as those of the targetgrid
+    The regridded array may have coordinates that are not exactly the same as those of the target grid
     due to rounding errors (coordinates are re-computed in xugrid based on dx, dy).
     We overwrite the regridded coordinates with the target grid coordinates.
     This is not necessary for integer coordinates, such as layer and those of unstructured grids.
     """
-    if "dx" in regridded_array.coords:
-        regridded_array = regridded_array.assign_coords(
-            {"dx": target_grid.coords["dx"].values[()]}
-        )
-    if "dy" in regridded_array.coords:
-        regridded_array = regridded_array.assign_coords(
-            {"dy": target_grid.coords["dy"].values[()]}
+    expected_coordinates = ["dx", "dy", "x", "y"]
+    for coord in expected_coordinates:
+        if coord in regridded_array.coords:
+            regridded_array = regridded_array.assign_coords(
+                {coord: target_grid.coords[coord].values[()]}
+            )
+    return regridded_array
         )
     if "x" in regridded_array.coords:
         regridded_array = regridded_array.assign_coords(
