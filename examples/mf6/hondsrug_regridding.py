@@ -87,5 +87,26 @@ hds_regridded = imod.mf6.open_hds(
 fig, ax = plt.subplots()
 hds_regridded.sel(layer=3).isel(time=3).plot(ax=ax)
 
+# %%
+# compare heads 
+# =====================
+last_head_original = hds_original.isel(time=6)
+last_head_upscaled = hds_regridded.isel(time=6)
+
+# convert to 1d numoy array
+last_head_original_as_1d = last_head_original.values.ravel()
+last_head_upscaled_as_1d = last_head_upscaled.values.ravel()
+
+#get rid of the Nan's 
+original_filter =  ~np.i.snan(last_head_original_as_1d)
+last_head_original_as_1d = last_head_original_as_1d[original_filter]
+upscaled_filter= ~np.i.snan(last_head_upscaled_as_1d)
+last_head_upscaled_as_1d= last_head_upscaled_as_1d[upscaled_filter]
+
+#plot histograms side by side
+fig, axs = plt.subplots(1, 2, sharey=True, tight_layout=True)
+axs[0].hist(last_head_original_as_1d, bins=25)
+axs[1].hist(last_head_upscaled_as_1d, bins=25)
+
 pass
 # %%
