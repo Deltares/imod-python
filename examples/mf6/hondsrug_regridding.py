@@ -91,22 +91,40 @@ hds_regridded.sel(layer=3).isel(time=3).plot(ax=ax)
 # compare heads 
 # =====================
 last_head_original = hds_original.isel(time=6)
-last_head_upscaled = hds_regridded.isel(time=6)
+last_head_reridded = hds_regridded.isel(time=6)
 
 # convert to 1d numoy array
 last_head_original_as_1d = last_head_original.values.ravel()
-last_head_upscaled_as_1d = last_head_upscaled.values.ravel()
+last_head_regridded_as_1d = last_head_reridded.values.ravel()
 
 #get rid of the Nan's 
-original_filter =  ~np.i.snan(last_head_original_as_1d)
+original_filter =  ~np.isnan(last_head_original_as_1d)
 last_head_original_as_1d = last_head_original_as_1d[original_filter]
-upscaled_filter= ~np.i.snan(last_head_upscaled_as_1d)
-last_head_upscaled_as_1d= last_head_upscaled_as_1d[upscaled_filter]
+regridded_filter= ~np.isnan(last_head_regridded_as_1d)
+last_head_regridded_as_1d= last_head_regridded_as_1d[regridded_filter]
 
 #plot histograms side by side
 fig, axs = plt.subplots(1, 2, sharey=True, tight_layout=True)
 axs[0].hist(last_head_original_as_1d, bins=25)
-axs[1].hist(last_head_upscaled_as_1d, bins=25)
+axs[1].hist(last_head_regridded_as_1d, bins=25)
+
+#print some distribution parameters
+mean_orig = last_head_original_as_1d.mean()
+max_orig = last_head_original_as_1d.max()
+min_orig = last_head_original_as_1d.min()
+var_orig = last_head_original_as_1d.var()
+
+mean_regridded = last_head_regridded_as_1d.mean()
+max_regridded = last_head_regridded_as_1d.max()
+min_regridded = last_head_regridded_as_1d.min()
+var_regridded = last_head_regridded_as_1d.var()
+
+print("At the last timestep the head distribution has the following summary statistics:")
+print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+print(f"mean (original) = {mean_orig}          mean(regridded) = {mean_regridded}")
+print(f"max (original) = {max_orig}            max(regridded) = {max_regridded}")
+print(f"min (original) = {min_orig}            min(regridded) = {min_regridded}")
+print(f"variance (original) = {var_orig}       variance(regridded) = {var_regridded}")
 
 pass
 # %%
