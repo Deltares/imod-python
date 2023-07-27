@@ -11,6 +11,7 @@ import tomli
 import tomli_w
 import xarray as xr
 import xugrid as xu
+from validation import validation_model_error_message
 
 import imod
 from imod.mf6.model import (
@@ -21,7 +22,6 @@ from imod.mf6.model import (
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray
-from validation import validation_model_error_message
 
 
 class Modflow6Simulation(collections.UserDict):
