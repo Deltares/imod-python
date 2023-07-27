@@ -1,6 +1,7 @@
 import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -12,7 +13,6 @@ from imod.schemata import (
     IndexesSchema,
     OtherCoordsSchema,
 )
-from imod.mf6.regridding_utils import RegridderType
 
 
 class Evapotranspiration(BoundaryCondition):
