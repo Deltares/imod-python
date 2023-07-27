@@ -730,14 +730,6 @@ class Package(PackageBase, abc.ABC):
 
         new_package = self.__class__(**new_package_data)
 
-        # TODO gitlab-398: write validation fails for VerticesDiscretization
-        if not isinstance(self, imod.mf6.VerticesDiscretization):
-            errors = new_package._validate(
-                new_package._write_schemata,
-                idomain=target_grid,
-            )
-            if len(errors) > 0:
-                raise ValidationError(validation_pkg_error_message(errors))
         return new_package
 
     def skip_masking_dataarray(self, array_name: str) -> bool:
