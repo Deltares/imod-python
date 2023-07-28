@@ -10,6 +10,38 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+[0.14.0] - xxxx-xx-xx
+---------------------
+
+Changed
+~~~~~~~
+
+- :class:`imod.mf6.HorizontalFlowBarrier` is specified by providing a geopandas
+  `GeoDataFrame
+  <https://geopandas.org/en/stable/docs/reference/geodataframe.html>`_
+
+
+Added
+~~~~~
+
+- :meth:`imod.mf6.Simulation.regrid_like` to regrid a Modflow6 simulation to a
+  new grid (structured or unstructured), using `xugrid's regridding
+  functionality.
+  <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_
+  Variables are regridded with pre-selected methods. The regridding
+  functionality is useful for example to test the effect of different grid
+  sizes.
+- :meth:`imod.mf6.Package.regrid_like` to regrid packages. The user can
+  specify their own custom regridder types and methods for variables.
+- :meth:`imod.mf6.Simulation.clip_box` got an extra argument
+  ``states_for_boundary``, which takes a dictionary with modelname as key and
+  griddata as value. This data is specified as fixed state on the model
+  boundary. At present only `imod.mf6.GroundwaterFlowModel` is supported, grid
+  data is specified as a :class:`imod.mf6.ConstantHead` at the model boundary.
+- :class:`imod.mf6.Well`, a grid-agnostic well package, where wells can be
+  specified based on their x,y coordinates and filter top and bottom.
+
+
 [0.13.2] - 2023-07-26
 ---------------------
 
