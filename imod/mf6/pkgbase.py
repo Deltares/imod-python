@@ -12,6 +12,11 @@ TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
 
 class PackageBase(abc.ABC):
+    """
+    This class is used for storing a collection of Xarray dataArrays or ugrid-DataArrays
+    in a dataset. A load-from-file method is also provided. Storing to file is done by calling
+    object.dataset.to_netcdf(...)
+    """
     def __init__(self, allargs=None):
         if allargs is not None:
             for arg in allargs.values():
@@ -19,12 +24,6 @@ class PackageBase(abc.ABC):
                     self.dataset = xu.UgridDataset(grids=arg.ugrid.grid)
                     return
         self.dataset = xr.Dataset()
-
-    """
-    This class is used for storing a collection of Xarray dataArrays or ugrid-DataArrays
-    in a dataset. A load-from-file method is also provided. Storing to file is done by calling
-    object.dataset.to_netcdf(...)
-    """
 
     def __getitem__(self, key):
         return self.dataset.__getitem__(key)
