@@ -91,6 +91,8 @@ def elevation_fc():
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     elevation = xr.full_like(idomain, np.nan)
+    elevation[:, 0, 7, 7:9] = 1.0
+
     return elevation
 
 
@@ -98,8 +100,10 @@ def elevation_fc():
 def rate_fc():
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    elevation = xr.full_like(idomain, np.nan)
-    return elevation
+    rate = xr.full_like(idomain, np.nan)
+    rate[:, 0, 7, 7:9] = 0.001
+
+    return rate
 
 
 @pytest.fixture(scope="session")
@@ -107,6 +111,7 @@ def proportion_rate_fc():
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
     proportion_rate = xr.full_like(idomain, np.nan)
+    proportion_rate[:, 0, 7, 7:9] = 0.3
     return proportion_rate
 
 
@@ -114,8 +119,9 @@ def proportion_rate_fc():
 def proportion_depth_fc():
     idomain = get_data_array(grid_dimensions(), globaltimes)
 
-    proportion_rate = xr.full_like(idomain, np.nan)
-    return proportion_rate
+    proportion_depth = xr.full_like(idomain, np.nan)
+    proportion_depth[:, 0, 7, 7:9] = 0.4
+    return proportion_depth
 
 
 @pytest.fixture(scope="session")

@@ -143,3 +143,10 @@ class VerticesDiscretization(Package):
             )
             f.write("end cell2d\n")
         return
+
+    def _validate(self, schemata, **kwargs):
+        # Insert additional kwargs
+        kwargs["bottom"] = self["bottom"]
+        errors = super()._validate(schemata, **kwargs)
+
+        return errors
