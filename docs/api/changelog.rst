@@ -10,6 +10,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+[0.13.2] - 2023-07-26
+---------------------
+
 Changed
 ~~~~~~~
 
@@ -27,6 +30,15 @@ Fixed
 - :meth:`imod.mf6.Simulation._validate` now print all validation errors for all
   models and packages in one message.
 - The gen file reader can now handle feature id's that contain commas and spaces
+- :class:`imod.mf6.EvapoTranspiration` now supports segments, by adding a
+  ``segment`` dimension to the ``proportion_depth`` and ``proportion_rate``
+  variables.
+- :class:`imod.mf6.EvapoTranspiration` template for ``.evt`` file now properly 
+  formats ``nseg`` option.
+- Fixed bug in :class:`imod.wq.Well` preventing saving wells without a time
+  dimension, but with a layer dimension.
+- :class:`imod.mf6.DiscretizationVertices._validate` threw ``KeyError`` for
+  ``"bottom"`` when validating the package separately.
 
 Added
 ~~~~~
