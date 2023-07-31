@@ -54,14 +54,14 @@ def plot_histograms_side_by_side(
 
 
 def write_summary_statistics(
-    array_original: GridDataArray, array_regridded: GridDataArray
+    array_original: GridDataArray, array_regridded: GridDataArray, title: str
 ):
     # This function writes some statistics of the original and regridded arrays to screen
 
     original = convert_to_filtered_1d(array_original)
     regridded = convert_to_filtered_1d(array_regridded)
-    print("\nsummary statistics")
-    print("~~~~~~~~~~~~~~~~~~~~")
+    print(f"\nsummary statistics {title}")
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~")
     print(
         f"mean (original) {original.mean()}                    mean (regridded) {regridded.mean()}"
     )
@@ -134,7 +134,7 @@ hds_regridded = imod.mf6.open_hds(
 fig, ax = plt.subplots()
 hds_regridded.sel(layer=3).isel(time=6).plot(ax=ax)
 
-write_summary_statistics(hds_original.isel(time=6), hds_regridded.isel(time=6))
+write_summary_statistics(hds_original.isel(time=6), hds_regridded.isel(time=6), "head")
 
 # %%
 # plot histograms of input
