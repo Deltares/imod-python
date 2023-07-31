@@ -21,6 +21,13 @@ class NodePropertyFlow(Package):
     specified. A single NPF Package is required for each GWF model.
     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=51
 
+    A note about regridding: the fields k, k22, k33 define the principal components of an
+    anisotropic conductivity tensor. By default, k and k22 are in the horizontal plane and k33 is vertical.
+    Angle1, angle2 and angle3 define the rotation of this tensor.
+    The regridding methods associated by default are chosen based on the assumption that k and k22 are horizontal
+    and k33 is vertical. If this is not the case, it is up to the user to regrid the npf package using other regridding
+    methods. This may be recommended if for example the rotation is such that k has become vertical and k33 horizontal.
+
     Parameters
     ----------
     icelltype: array of int (xr.DataArray)
