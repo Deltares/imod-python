@@ -242,7 +242,7 @@ def test_regridding_can_skip_validation():
 
     # Regrid the package to a finer domain
     new_grid = grid_data_structured(np.float64, 1.0, 0.025)
-    regridded_package = sto_package.regrid_like(new_grid, validate=False)
+    regridded_package = sto_package.regrid_like(new_grid)
 
     # Check that write validation still fails for the regridded package
     new_bottom = deepcopy(new_grid)
@@ -265,28 +265,3 @@ def test_regridding_can_skip_validation():
         str(pkg_errors["specific_yield"])
         == "[ValidationError('not all values comply with criterion: >= 0.0')]"
     )
-
-
-def test_regridding_can_validate():
-    """
-    This tests if an invalid package can be regridded by turning off validation
-    """
-
-    # Create a storage package with a negative storage coefficient. This would trigger a validation error if it were turned on.
-    storage_coefficient = grid_data_structured(np.float64, -20, 0.25)
-    specific_yield = grid_data_structured(np.float64, -30, 0.25)
-    sto_package = imod.mf6.StorageCoefficient(
-        storage_coefficient,
-        specific_yield,
-        transient=True,
-        convertible=False,
-        save_flows=True,
-        validate=False,
-    )
-
-    # Create  a finer domain to regrid to
-    new_grid = grid_data_structured(np.float64, 1, 0.025)
-
-    # Check that a validation error is thrown while regridding
-    with pytest.raises(imod.schemata.ValidationError):
-        _ = sto_package.regrid_like(new_grid, validate=True)
