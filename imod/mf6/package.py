@@ -670,7 +670,6 @@ class Package(PackageBase, abc.ABC):
         self,
         target_grid: Union[xr.DataArray, xu.UgridDataArray],
         regridder_types: Dict[str, Tuple[RegridderType, str]] = None,
-        validate: bool = True,
     ) -> "Package":
         """
         Creates a package of the same type as this package, based on another discretization.
