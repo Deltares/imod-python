@@ -21,40 +21,63 @@ In overview, the model features:
 # %% Import packages
 # We'll start with the usual imports, and an import from scipy.
 
+from typing import Tuple
+
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 from example_models import create_hondsrug_simulation
-from typing import Tuple
+
 import imod
 from imod.typing.grid import GridDataArray
 
 
-
-def convert_to_filtered_1d( grid: GridDataArray)-> np.ndarray:
-    #This function receives an xarray DataArray and converts it to an 1d numpy array. All NaN's are filtered out.
+def convert_to_filtered_1d(grid: GridDataArray) -> np.ndarray:
+    # This function receives an xarray DataArray and converts it to an 1d numpy array. All NaN's are filtered out.
     grid_as_1d = grid.values.ravel()
-    filter =  ~np.isnan(grid_as_1d)
-    grid_as_1d = grid_as_1d[filter]    
+    filter = ~np.isnan(grid_as_1d)
+    grid_as_1d = grid_as_1d[filter]
     return grid_as_1d
 
 
-def plot_histograms_side_by_side(array_original: GridDataArray,array_regridded: GridDataArray, title: str):
-    #This function creates  a plot of normalized histograms of the 2 input DataArray. It plots a title above each histogram. 
-    array_original_as_1d = convert_to_filtered_1d (array_original)
+def plot_histograms_side_by_side(
+    array_original: GridDataArray, array_regridded: GridDataArray, title: str
+):
+    # This function creates  a plot of normalized histograms of the 2 input DataArray. It plots a title above each histogram.
+    array_original_as_1d = convert_to_filtered_1d(array_original)
     array_regridded_as_1d = convert_to_filtered_1d(array_regridded)
-    fig, axs = plt.subplots(1, 2, sharey=True, tight_layout=True)
+    _, axs = plt.subplots(1, 2, sharey=True, tight_layout=True)
     axs[0].hist(array_original_as_1d, bins=25, density=True)
     axs[1].hist(array_regridded_as_1d, bins=25, density=True)
-    axs[0].title.set_text( title + " (original)")
-    axs[1].title.set_text( title + " (regridded)")
+    axs[0].title.set_text(title + " (original)")
+    axs[1].title.set_text(title + " (regridded)")
+
+
+def write_summary_statistics(
+    array_original: GridDataArray, array_regridded: GridDataArray
+):
+    # This function writes some statistics of the original and regridded arrays to screen
+
+    original = convert_to_filtered_1d(array_original)
+    regridded = convert_to_filtered_1d(array_regridded)
+    print("\nsummary statistics")
+    print("~~~~~~~~~~~~~~~~~~~~")
+    print(
+        f"mean (original) {original.mean()}                    mean (regridded) {regridded.mean()}"
+    )
+    print(
+        f"min (original) {original.min()}                      min (regridded) {regridded.min()}"
+    )
+    print(
+        f"max (original) {original.max()}                      max (regridded) {regridded.max()}"
+    )
+    print(
+        f"variance (original) {original.var()}                 variance (regridded) {regridded.var()}"
+    )
 
 
 # obtain the simulation, write it, run it, and plot some heads
 gwf_simulation = create_hondsrug_simulation()
-#gwf_simulation["GWF_1"].pop("riv")
-#gwf_simulation["GWF_1"].pop("drn-pipe")
-#gwf_simulation["GWF_1"].pop("rch")
 
 original_modeldir = imod.util.temporary_directory() / "original"
 gwf_simulation.write(original_modeldir, False, False)
@@ -65,8 +88,7 @@ hds_original = imod.mf6.open_hds(
 )
 
 fig, ax = plt.subplots()
-hds_original.sel(layer=3).isel(time=3).plot(ax=ax)
-
+hds_original.sel(layer=3).isel(time=6).plot(ax=ax)
 
 # create the grid we will regrid to
 idomain = gwf_simulation["GWF_1"]["dis"]["idomain"]
@@ -110,46 +132,86 @@ hds_regridded = imod.mf6.open_hds(
 # Results visualization
 # =====================
 fig, ax = plt.subplots()
-hds_regridded.sel(layer=3).isel(time=3).plot(ax=ax)
-#hds_regridded.sel(layer=3).isel(time=6).plot(ax=ax)
+hds_regridded.sel(layer=3).isel(time=6).plot(ax=ax)
+
+write_summary_statistics(hds_original.isel(time=6), hds_regridded.isel(time=6))
 
 # %%
 # plot histograms of input
 # =====================
 
-plot_histograms_side_by_side(hds_original.isel(time=6), last_head_regridded, "head")
+plot_histograms_side_by_side(
+    hds_original.isel(time=6), hds_regridded.isel(time=6), "head"
+)
 
-#compare chd-arrays
-plot_histograms_side_by_side(gwf_simulation["GWF_1"]["chd"].dataset["head"], regridded_simulation["GWF_1"]["chd"].dataset["head"], "chd head")
+# compare chd-arrays
+plot_histograms_side_by_side(
+    gwf_simulation["GWF_1"]["chd"].dataset["head"],
+    regridded_simulation["GWF_1"]["chd"].dataset["head"],
+    "chd head",
+)
 
-#compare k-arrays
-plot_histograms_side_by_side(gwf_simulation["GWF_1"]["npf"].dataset["k"], regridded_simulation["GWF_1"]["npf"].dataset["k"], "npf k")
+# compare k-arrays
+plot_histograms_side_by_side(
+    gwf_simulation["GWF_1"]["npf"].dataset["k"],
+    regridded_simulation["GWF_1"]["npf"].dataset["k"],
+    "npf k",
+)
 
-plot_histograms_side_by_side(gwf_simulation["GWF_1"]["npf"].dataset["k33"], regridded_simulation["GWF_1"]["npf"].dataset["k33"], "npf k33")
-#compare initial conditions
-plot_histograms_side_by_side(gwf_simulation["GWF_1"]["ic"].dataset["start"], regridded_simulation["GWF_1"]["ic"].dataset["start"], "ic start")
+plot_histograms_side_by_side(
+    gwf_simulation["GWF_1"]["npf"].dataset["k33"],
+    regridded_simulation["GWF_1"]["npf"].dataset["k33"],
+    "npf k33",
+)
+# compare initial conditions
+plot_histograms_side_by_side(
+    gwf_simulation["GWF_1"]["ic"].dataset["start"],
+    regridded_simulation["GWF_1"]["ic"].dataset["start"],
+    "ic start",
+)
 
-#compare river stages
-plot_histograms_side_by_side(gwf_simulation["GWF_1"]["riv"].dataset["stage"],regridded_simulation["GWF_1"]["riv"].dataset["stage"], "riv stage")
+# compare river stages
+plot_histograms_side_by_side(
+    gwf_simulation["GWF_1"]["riv"].dataset["stage"],
+    regridded_simulation["GWF_1"]["riv"].dataset["stage"],
+    "riv stage",
+)
 
-#compare bottom elevations
-plot_histograms_side_by_side(gwf_simulation["GWF_1"]["riv"].dataset["bottom_elevation"],regridded_simulation["GWF_1"]["riv"].dataset["bottom_elevation"], "riv bottom elevation")
+# compare bottom elevations
+plot_histograms_side_by_side(
+    gwf_simulation["GWF_1"]["riv"].dataset["bottom_elevation"],
+    regridded_simulation["GWF_1"]["riv"].dataset["bottom_elevation"],
+    "riv bottom elevation",
+)
 
-#compare riverbed conductance
-plot_histograms_side_by_side(gwf_simulation["GWF_1"]["riv"].dataset["conductance"],regridded_simulation["GWF_1"]["riv"].dataset["conductance"], "riv conductance")
+# compare riverbed conductance
+plot_histograms_side_by_side(
+    gwf_simulation["GWF_1"]["riv"].dataset["conductance"],
+    regridded_simulation["GWF_1"]["riv"].dataset["conductance"],
+    "riv conductance",
+)
 
-#compare recharge
-plot_histograms_side_by_side(gwf_simulation["GWF_1"]["rch"].dataset["rate"],regridded_simulation["GWF_1"]["rch"].dataset["rate"], "rch rate")
+# compare recharge
+plot_histograms_side_by_side(
+    gwf_simulation["GWF_1"]["rch"].dataset["rate"],
+    regridded_simulation["GWF_1"]["rch"].dataset["rate"],
+    "rch rate",
+)
 
-#compare drainage
-plot_histograms_side_by_side(gwf_simulation["GWF_1"]["drn-pipe"].dataset["elevation"],regridded_simulation["GWF_1"]["drn-pipe"].dataset["elevation"], "drn-pipe elevation")
+# compare drainage
+plot_histograms_side_by_side(
+    gwf_simulation["GWF_1"]["drn-pipe"].dataset["elevation"],
+    regridded_simulation["GWF_1"]["drn-pipe"].dataset["elevation"],
+    "drn-pipe elevation",
+)
 
-#compute conductance
-plot_histograms_side_by_side(gwf_simulation["GWF_1"]["drn-pipe"].dataset["conductance"],regridded_simulation["GWF_1"]["drn-pipe"].dataset["conductance"], "drn-pipe conductance")
-
+# compute conductance
+plot_histograms_side_by_side(
+    gwf_simulation["GWF_1"]["drn-pipe"].dataset["conductance"],
+    regridded_simulation["GWF_1"]["drn-pipe"].dataset["conductance"],
+    "drn-pipe conductance",
+)
 
 
 pass
 # %%
-
-
