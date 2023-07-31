@@ -17,6 +17,7 @@ class PackageBase(abc.ABC):
     in a dataset. A load-from-file method is also provided. Storing to file is done by calling
     object.dataset.to_netcdf(...)
     """
+
     def __init__(self, allargs=None):
         if allargs is not None:
             for arg in allargs.values():
