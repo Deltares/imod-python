@@ -11,6 +11,7 @@ import scipy.ndimage
 import xarray as xr
 
 import imod
+from imod.typing.grid import nan_like
 
 
 def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
@@ -276,8 +277,7 @@ def create_hondsrug_simulation() -> imod.mf6.Modflow6Simulation:
         x=slice(xmin, xmax), y=slice(ymax, ymin)
     )
 
-    like_3d = xr.full_like(idomain, np.nan, dtype=float)
-    starting_head = like_3d.combine_first(interpolated_head)
+    starting_head = nan_like(idomain).combine_first(interpolated_head)
     # Consequently ensure no data is specified in inactive cells:
     starting_head = starting_head.where(idomain == 1)
 
