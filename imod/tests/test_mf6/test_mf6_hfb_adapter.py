@@ -8,6 +8,7 @@ import shapely
 import xugrid as xu
 
 import imod
+from imod.mf6 import Mf6HorizontalFlowBarrier
 
 
 def get_hfb_data_one_layer(grid_xy: xu.UgridDataArray):
@@ -32,21 +33,21 @@ def get_hfb_data_one_layer(grid_xy: xu.UgridDataArray):
 
 
 @pytest.mark.parametrize(
-    "hfb_class",
+    "barrier_type",
     [
-        imod.mf6.HorizontalFlowBarrierResistance,
-        imod.mf6.HorizontalFlowBarrierMultiplier,
-        imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic,
+        imod.mf6.BarrierType.Resistance,
+        imod.mf6.BarrierType.Multiplier,
+        imod.mf6.BarrierType.HydraulicCharacteristic,
     ],
 )
 def test_hfb_render_one_layer__unstructured(
-    hfb_class,
+    barrier_type,
     unstructured_flow_model,
 ):
     # Arrange
     idomain = unstructured_flow_model["disv"]["idomain"]
     hfb_data_one_layer = get_hfb_data_one_layer(idomain.sel(layer=1))
-    hfb = hfb_class(hfb_data_one_layer, idomain)
+    hfb = Mf6HorizontalFlowBarrier(barrier_type, hfb_data_one_layer, idomain)
 
     expected = textwrap.dedent(
         """\
@@ -72,22 +73,22 @@ def test_hfb_render_one_layer__unstructured(
 
 
 @pytest.mark.parametrize(
-    "hfb_class",
+    "barrier_type",
     [
-        imod.mf6.HorizontalFlowBarrierResistance,
-        imod.mf6.HorizontalFlowBarrierMultiplier,
-        imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic,
+        imod.mf6.BarrierType.Resistance,
+        imod.mf6.BarrierType.Multiplier,
+        imod.mf6.BarrierType.HydraulicCharacteristic,
     ],
 )
 def test_hfb_render_one_layer__structured(
-    hfb_class,
+    barrier_type,
     structured_flow_model,
 ):
     # Arrange
     idomain = structured_flow_model["dis"]["idomain"]
     grid_xy = xu.UgridDataArray.from_structured(idomain.sel(layer=1))
     hfb_data_one_layer = get_hfb_data_one_layer(grid_xy)
-    hfb = hfb_class(hfb_data_one_layer, idomain)
+    hfb = Mf6HorizontalFlowBarrier(barrier_type, hfb_data_one_layer, idomain)
 
     expected = textwrap.dedent(
         """\
@@ -115,9 +116,9 @@ def test_hfb_render_one_layer__structured(
 @pytest.mark.parametrize(
     "hfb_specialization",
     [
-        (imod.mf6.HorizontalFlowBarrierResistance, 0.1),
-        (imod.mf6.HorizontalFlowBarrierMultiplier, -10.0),
-        (imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic, 10.0),
+        (imod.mf6.BarrierType.Resistance, 0.1),
+        (imod.mf6.BarrierType.Multiplier, -10.0),
+        (imod.mf6.BarrierType.HydraulicCharacteristic, 10.0),
     ],
 )
 def test_hfb_writing_one_layer__unstructured(
@@ -125,11 +126,11 @@ def test_hfb_writing_one_layer__unstructured(
     tmp_path,
     unstructured_flow_model,
 ):
-    hfb_class, expected_value = hfb_specialization
+    barrier_type, expected_value = hfb_specialization
     # Arrange
     idomain = unstructured_flow_model["disv"]["idomain"]
     hfb_data_one_layer = get_hfb_data_one_layer(idomain.sel(layer=1))
-    hfb = hfb_class(hfb_data_one_layer, idomain)
+    hfb = Mf6HorizontalFlowBarrier(barrier_type, hfb_data_one_layer, idomain)
 
     expected_hfb_data = np.array(
         [
@@ -150,9 +151,9 @@ def test_hfb_writing_one_layer__unstructured(
 @pytest.mark.parametrize(
     "hfb_specialization",
     [
-        (imod.mf6.HorizontalFlowBarrierResistance, 0.1),
-        (imod.mf6.HorizontalFlowBarrierMultiplier, -10.0),
-        (imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic, 10.0),
+        (imod.mf6.BarrierType.Resistance, 0.1),
+        (imod.mf6.BarrierType.Multiplier, -10.0),
+        (imod.mf6.BarrierType.HydraulicCharacteristic, 10.0),
     ],
 )
 def test_hfb_writing_one_layer__structured(
@@ -160,12 +161,12 @@ def test_hfb_writing_one_layer__structured(
     tmp_path,
     structured_flow_model,
 ):
-    hfb_class, expected_value = hfb_specialization
+    barrier_type, expected_value = hfb_specialization
     # Arrange
     idomain = structured_flow_model["dis"]["idomain"]
     grid_xy = xu.UgridDataArray.from_structured(idomain.sel(layer=1))
     hfb_data_one_layer = get_hfb_data_one_layer(grid_xy)
-    hfb = hfb_class(hfb_data_one_layer, idomain)
+    hfb = Mf6HorizontalFlowBarrier(barrier_type, hfb_data_one_layer, idomain)
 
     expected_hfb_data = np.array(
         [
