@@ -2,10 +2,15 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import List, Optional, Union
 
-import ribasim
 import tomli_w
 
 from imod.mf6 import Modflow6Simulation
+from imod.util import MissingOptionalModule
+
+try:
+    import ribasim
+except ImportError:
+    ribasim = MissingOptionalModule("ribasim")
 
 
 @dataclass
@@ -36,7 +41,7 @@ class RibaMod:
 
     def __init__(
         self,
-        ribasim_model: ribasim.Model,
+        ribasim_model: "ribasim.Model",
         mf6_simulation: Modflow6Simulation,
         coupling_list: List[DriverCoupling],
     ):

@@ -39,7 +39,7 @@ class IniFile(collections.UserDict, abc.ABC):
         for timekey in ["sdate", "edate"]:
             if timekey in self.keys():
                 # If not string assume it is in some kind of datetime format
-                if type(self[timekey]) != str:
+                if type(self[timekey]) is not str:
                     self[timekey] = util._compose_timestring(self[timekey])
 
     def render(self):

@@ -20,9 +20,9 @@ def _column_order(df, variable):
     else:
         assoc_columns = None
         if "layer" in df:
-            columns = ["x", "y", variable, "layer"]
+            columns = ["x", "y", variable, "layer", "id"]
         else:
-            columns = ["x", "y", variable]
+            columns = ["x", "y", variable, "id"]
     return columns, assoc_columns
 
 
