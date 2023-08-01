@@ -182,7 +182,7 @@ def test_mask_structured():
     masked_package = pkg.mask(mask)
 
     masked_head = masked_package.dataset["head"]
-    assert type(masked_head) == type(head)
+    assert type(masked_head) is type(head)
     assert masked_head.dtype == head.dtype
     assert np.isnan(masked_head.sel(inactive_cell_location).values[()])
     masked_head.loc[inactive_cell_location] = 2.1
@@ -199,7 +199,7 @@ def test_mask_unstructured():
     masked_package = pkg.mask(mask)
 
     masked_head = masked_package.dataset["head"]
-    assert type(masked_head) == type(head)
+    assert type(masked_head) is type(head)
     assert masked_head.dtype == head.dtype
     assert np.isnan(masked_head.sel(inactive_cell_location).values[()])
     masked_head.loc[inactive_cell_location] = 2.1
