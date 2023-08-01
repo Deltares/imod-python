@@ -12,6 +12,7 @@ import pooch
 import xarray as xr
 import xugrid as xu
 
+from imod.formats.prj import open_projectfile_data
 from imod.util import MissingOptionalModule
 
 try:
@@ -91,3 +92,12 @@ def circle() -> xu.Ugrid2d:
     triangles = np.loadtxt(fname_triangles).astype(np.int32)
 
     return xu.Ugrid2d(*nodes.T, -1, triangles)
+
+
+def imod5_projectfile_data(path: Union[str, Path]) -> dict:
+    fname_model = REGISTRY.fetch("iMOD5_model.zip")
+
+    with ZipFile(fname_model) as archive:
+        archive.extractall(path)
+
+    return open_projectfile_data(Path(path) / "iMOD5_model_pooch" / "iMOD5_model.prj")

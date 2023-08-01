@@ -81,6 +81,13 @@ def validation_pkg_error_message(pkg_errors):
     return "\n" + "\n".join(messages)
 
 
+def validation_model_error_message(model_errors: NestedStatusInfo) -> str:
+    messages = []
+    for status_info in model_errors._NestedStatusInfo__children:
+        messages.append(f"{status_info.title} : {status_info.errors} ")
+    return str(messages)
+
+
 def pkg_errors_to_status_info(
     pkg_name: str, pkg_errors: Dict[str, List[ValidationError]]
 ) -> StatusInfoBase:

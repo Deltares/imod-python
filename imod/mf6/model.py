@@ -6,7 +6,7 @@ import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
-from typing import List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -21,8 +21,16 @@ import imod
 from imod.mf6 import qgs_util
 from imod.mf6.clipped_boundary_condition_creator import ClippedBoundaryConditionCreator
 from imod.mf6.package import Package
+from imod.mf6.regridding_utils import (
+    RegridderInstancesCollection,
+    RegridderType,
+    align_grid_coordinates,
+)
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
-from imod.mf6.validation import pkg_errors_to_status_info
+from imod.mf6.validation import (
+    pkg_errors_to_status_info,
+    validation_model_error_message,
+)
 from imod.mf6.wel import Well
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray
@@ -32,6 +40,14 @@ def initialize_template(name: str) -> Template:
     loader = jinja2.PackageLoader("imod", "templates/mf6")
     env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
     return env.get_template(name)
+
+
+def round_to_closest_integer_array(input_array: GridDataArray) -> GridDataArray:
+    """
+    This function creates an array equal to the input array but with all values converted to integer.
+    Values are converted with the np.rint() function which rounds to the closest integer.
+    """
+    return np.rint(input_array).astype(np.int32)
 
 
 class Modflow6Model(collections.UserDict, abc.ABC):
@@ -396,8 +412,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         return clipped
 
     def regrid_like(
-        self,
-        target_grid: Union[xr.DataArray, xu.UgridDataArray],
+        self, target_grid: GridDataArray, validate: bool = True
     ) -> "Modflow6Model":
         """
         Creates a model by regridding the packages of this model to another discretization.
@@ -409,6 +424,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray
             a grid defined over the same discretization as the one we want to regrid the package to
+        validate: bool
+            set to true to validate the regridded packages
+
         Returns
         -------
         a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
@@ -424,11 +442,63 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
                 )
 
+        methods = self._get_unique_regridder_types()
+        output_domain = self._get_regridding_domain(target_grid, methods)
+        new_model[self.__get_diskey()]["idomain"] = output_domain
+        new_model._mask_all_packages(output_domain)
+
+        if validate:
+            errors = new_model._validate("regridded_model")
+            if len(errors.errors):
+                raise ValidationError(validation_model_error_message(errors))
         return new_model
+
+    def _mask_all_packages(
+        self,
+        domain: GridDataArray,
+    ):
+        """
+        This function applies a mask to all packages in a model. The mask must be presented as an integer array
+        that has 0 in filtered cells and not-0 in active cells
+        """
+        for pkgname, pkg in self.items():
+            self[pkgname] = pkg.mask(domain)
 
     def get_domain(self):
         dis = self.__get_diskey()
         return self[dis]["idomain"]
+
+    def _get_regridding_domain(
+        self,
+        target_grid: GridDataArray,
+        methods: Dict[RegridderType, str],
+    ) -> GridDataArray:
+        """
+        This method computes the output-domain for a regridding operation by regridding idomain with
+        all regridders. Each regridder may leave some cells inactive. The output domain for the model consists of those
+        cells that all regridders consider active.
+        """
+        idomain = self.get_domain()
+        regridder_collection = RegridderInstancesCollection(
+            idomain, target_grid=target_grid
+        )
+        included_in_all = None
+        for regriddertype, function in methods.items():
+            regridder = regridder_collection.get_regridder(
+                regriddertype,
+                function,
+            )
+            regridded_idomain = regridder.regrid(idomain)
+            if included_in_all is None:
+                included_in_all = regridded_idomain
+            else:
+                included_in_all = included_in_all.where(regridded_idomain.notnull())
+        new_idomain = included_in_all.where(included_in_all.notnull(), other=0)
+        new_idomain = round_to_closest_integer_array(new_idomain)
+
+        new_idomain = align_grid_coordinates(new_idomain, target_grid)
+
+        return new_idomain
 
 
 class GroundwaterFlowModel(Modflow6Model):
@@ -454,6 +524,32 @@ class GroundwaterFlowModel(Modflow6Model):
             "under_relaxation": under_relaxation,
         }
         self._template = initialize_template("gwf-nam.j2")
+
+    def _get_unique_regridder_types(self) -> Dict[RegridderType, str]:
+        """
+        This function loops over the packages and  collects all regridder-types that are in use.
+        Differences in associated functions are ignored. It focusses only on the types. So if a
+        model uses both Overlap(mean) and Overlap(harmonic_mean), this function will return just one
+        Overlap regridder:  the first one found, in this case Overlap(mean)
+        """
+        methods = {}
+        for pkg_name, pkg in self.items():
+            if pkg.is_regridding_supported():
+                pkg_methods = pkg.get_regrid_methods()
+                for variable in pkg_methods:
+                    if (
+                        variable in pkg.dataset.data_vars
+                        and pkg.dataset[variable].values[()] is not None
+                    ):
+                        regriddertype = pkg_methods[variable][0]
+                        if regriddertype not in methods.keys():
+                            functiontype = pkg_methods[variable][1]
+                            methods[regriddertype] = functiontype
+            else:
+                raise NotImplementedError(
+                    f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
+                )
+        return methods
 
     def write_qgis_project(self, directory, crs, aggregate_layers=False):
         """

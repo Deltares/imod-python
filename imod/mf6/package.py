@@ -3,7 +3,7 @@ import copy
 import numbers
 import pathlib
 from collections import defaultdict
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import cftime
 import jinja2
@@ -17,10 +17,12 @@ from imod.mf6.pkgbase import TRANSPORT_PACKAGES, PackageBase
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
     RegridderType,
+    align_grid_coordinates,
     get_non_grid_data,
 )
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
+from imod.typing.grid import GridDataArray
 
 
 class Package(PackageBase, abc.ABC):
@@ -553,7 +555,7 @@ class Package(PackageBase, abc.ABC):
         new.dataset = selection
         return new
 
-    def mask(self, domain: xr.DataArray) -> Any:
+    def mask(self, domain: GridDataArray) -> Any:
         """
         Mask values outside of domain.
 
@@ -563,8 +565,7 @@ class Package(PackageBase, abc.ABC):
 
         Parameters
         ----------
-        domain: xr.DataArray of bools
-            The condition. Preserve values where True, discard where False.
+        domain: xr.DataArray of integers. Preservers values where domain is larger than 0.
 
         Returns
         -------
@@ -572,19 +573,30 @@ class Package(PackageBase, abc.ABC):
             The package with part masked.
         """
         masked = {}
-        for var, da in self.dataset.data_vars.items():
+        for var in self.dataset.data_vars.keys():
+            da = self.dataset[var]
+            if self.skip_masking_dataarray(var):
+                masked[var] = da
+                continue
             if set(domain.dims).issubset(da.dims):
-                # Check if this should be: np.issubdtype(da.dtype, np.floating)
-                if issubclass(da.dtype, numbers.Real):
-                    masked[var] = da.where(domain, other=np.nan)
-                elif issubclass(da.dtype, numbers.Integral):
-                    masked[var] = da.where(domain, other=0)
+                if issubclass(da.dtype.type, numbers.Integral):
+                    masked[var] = da.where(domain > 0, other=0)
+                elif issubclass(da.dtype.type, numbers.Real):
+                    masked[var] = da.where(domain > 0)
                 else:
                     raise TypeError(
                         f"Expected dtype float or integer. Received instead: {da.dtype}"
                     )
             else:
-                masked[var] = da
+                if da.values[()] is not None:
+                    if is_scalar(da.values[()]):
+                        masked[var] = da.values[()]  # For scalars, such as options
+                    else:
+                        masked[
+                            var
+                        ] = da  # For example for arrays with only a layer dimension
+                else:
+                    masked[var] = None
 
         return type(self)(**masked)
 
@@ -593,6 +605,66 @@ class Package(PackageBase, abc.ABC):
         returns true if package supports regridding.
         """
         return hasattr(self, "_regrid_method")
+
+    def get_regrid_methods(self) -> Optional[Dict[str, Tuple[RegridderType, str]]]:
+        if self.is_regridding_supported():
+            return self._regrid_method
+        return None
+
+    def _regrid_array(
+        self,
+        varname: str,
+        regridder_collection: RegridderInstancesCollection,
+        regridder_name: str,
+        regridder_function: str,
+        target_grid: GridDataArray,
+    ) -> Optional[GridDataArray]:
+        """
+        Regrids a data_array. The array is specified by its key in the dataset.
+        Each data-array can represent:
+        -a scalar value, valid for the whole grid
+        -an array of a different scalar per layer
+        -an array with a value per grid block
+        -None
+        """
+
+        # skip regridding for arrays with no valid values (such as "None")
+        if not self._valid(self.dataset[varname].values[()]):
+            return None
+
+        # the dataarray might be a scalar. If it is, then it does not need regridding.
+        if is_scalar(self.dataset[varname]):
+            return self.dataset[varname].values[()]
+
+        if isinstance(self.dataset[varname], xr.DataArray):
+            coords = self.dataset[varname].coords
+            # if it is an xr.DataArray it may be layer-based; then no regridding is needed
+            if not ("x" in coords and "y" in coords):
+                return self.dataset[varname]
+
+            # if it is an xr.DataArray it needs the dx, dy coordinates for regridding, which are otherwise not mandatory
+            if not ("dx" in coords and "dy" in coords):
+                raise ValueError(
+                    f"DataArray {varname} does not have both a dx and dy coordinates"
+                )
+
+        # obtain an instance of a regridder for the chosen method
+        regridder = regridder_collection.get_regridder(
+            regridder_name,
+            regridder_function,
+        )
+
+        # store original dtype of data
+        original_dtype = self.dataset[varname].dtype
+
+        # regrid data array
+        regridded_array = regridder.regrid(self.dataset[varname])
+
+        # set correct dx, dy variables and x, y coordinate axes
+        regridded_array = align_grid_coordinates(regridded_array, target_grid)
+
+        # reconvert the result to the same dtype as the original
+        return regridded_array.astype(original_dtype)
 
     def regrid_like(
         self,
@@ -643,52 +715,24 @@ class Package(PackageBase, abc.ABC):
         ) in regridder_settings.items():
             regridder_name, regridder_function = regridder_type_and_function
 
+            # skip variables that are not in this dataset
             if varname not in self.dataset.keys():
                 continue
 
-            if not self._valid(self.dataset[varname].values[()]):
-                new_package_data[varname] = None
-                continue
-
-            # the dataarray might be a scalar. If it is, then it does not need regridding.
-            if is_scalar(self.dataset[varname]):
-                new_package_data[varname] = self.dataset[varname].values[()]
-                continue
-
-            if isinstance(self.dataset[varname], xr.DataArray):
-                coords = self.dataset[varname].coords
-                # if it is an xr.DataArray it may be layer-based; then no regridding is needed
-                if not ("x" in coords and "y" in coords):
-                    new_package_data[varname] = self.dataset[varname]
-                    continue
-                # if it is an xr.DataArray it needs the dx, dy coordinates for regridding, which are otherwise not mandatory
-                if not ("dx" in coords and "dy" in coords):
-                    raise ValueError(
-                        f"DataArray {varname} does not have both a dx and dy coordinates"
-                    )
-
-            # obtain an instance of a regridder for the chosen method
-            regridder = regridder_collection.get_regridder(
+            # regrid the variable
+            new_package_data[varname] = self._regrid_array(
+                varname,
+                regridder_collection,
                 regridder_name,
                 regridder_function,
+                target_grid,
             )
 
-            # store original dtype of data
-            original_dtype = self.dataset[varname].dtype
-
-            # regrid data array
-            regridded_array = regridder.regrid(self.dataset[varname])
-
-            # reconvert the result to the same dtype as the original
-            new_package_data[varname] = regridded_array.astype(original_dtype)
         new_package = self.__class__(**new_package_data)
 
-        # TODO gitlab-398: write validation fails for VerticesDiscretization
-        if not isinstance(self, imod.mf6.VerticesDiscretization):
-            errors = new_package._validate(
-                new_package._write_schemata,
-                idomain=target_grid,
-            )
-            if len(errors) > 0:
-                raise ValidationError(validation_pkg_error_message(errors))
         return new_package
+
+    def skip_masking_dataarray(self, array_name: str) -> bool:
+        if hasattr(self, "_skip_mask_arrays"):
+            return array_name in self._skip_mask_arrays
+        return False

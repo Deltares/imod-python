@@ -378,7 +378,7 @@ def test_datetime_conversion__outofbounds():
     with pytest.warns(UserWarning):
         converted, use_cftime = util._convert_datetimes(times, use_cftime=False)
     assert use_cftime is True
-    assert all(type(t) == cftime.DatetimeProlepticGregorian for t in converted)
+    assert all(type(t) is cftime.DatetimeProlepticGregorian for t in converted)
     assert converted[0] == cftime.DatetimeProlepticGregorian(1670, 1, 1)
     assert converted[-1] == cftime.DatetimeProlepticGregorian(1679, 1, 1)
 
@@ -387,7 +387,7 @@ def test_datetime_conversion__withinbounds_cftime():
     times = [datetime.datetime(y, 1, 1) for y in range(2000, 2010)]
     converted, use_cftime = util._convert_datetimes(times, use_cftime=True)
     assert use_cftime is True
-    assert all(type(t) == cftime.DatetimeProlepticGregorian for t in converted)
+    assert all(type(t) is cftime.DatetimeProlepticGregorian for t in converted)
     assert converted[0] == cftime.DatetimeProlepticGregorian(2000, 1, 1)
     assert converted[-1] == cftime.DatetimeProlepticGregorian(2009, 1, 1)
 

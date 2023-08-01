@@ -1,6 +1,7 @@
 import abc
 import pathlib
-from typing import Dict
+from copy import copy
+from typing import Dict, List
 
 import numpy as np
 import xarray as xr
@@ -202,7 +203,9 @@ class BoundaryCondition(Package, abc.ABC):
 
         return periods
 
-    def get_options(self, d, not_options=None):
+    def get_options(self, predefined_options: Dict, not_options: List = None):
+        options = copy(predefined_options)
+
         if not_options is None:
             not_options = self.period_data()
 
@@ -211,13 +214,21 @@ class BoundaryCondition(Package, abc.ABC):
                 continue
             v = self.dataset[varname].values[()]
             if self._valid(v):  # skip None and False
-                d[varname] = v
-        return d
+                options[varname] = v
+        return options
+
+    def _get_bin_ds(self):
+        """
+        Get binary dataset data for stress periods, this data will be written to
+        datafiles. This method can be overrided to do some extra operations on
+        this dataset before writing.
+        """
+        return self[self.period_data()]
 
     def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {"binary": binary}
-        bin_ds = self[self.period_data()]
+        bin_ds = self._get_bin_ds()
         d["periods"] = self.period_paths(
             directory, pkgname, globaltimes, bin_ds, binary
         )
@@ -249,7 +260,7 @@ class BoundaryCondition(Package, abc.ABC):
     def write_perioddata(self, directory, pkgname, binary):
         if len(self.period_data()) == 0:
             return
-        bin_ds = self[self.period_data()]
+        bin_ds = self._get_bin_ds()
 
         if binary:
             ext = "bin"

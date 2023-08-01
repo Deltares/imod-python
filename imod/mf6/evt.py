@@ -1,3 +1,5 @@
+from typing import Dict, List
+
 import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
@@ -5,12 +7,27 @@ from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
     AllNoDataSchema,
+    AllValueSchema,
     CoordsSchema,
     DimsSchema,
     DTypeSchema,
     IdentityNoDataSchema,
     IndexesSchema,
     OtherCoordsSchema,
+)
+from imod.util import unstack_dim_into_variable
+
+SEGMENT_BOUNDARY_DIMS_SCHEMA = (
+    BOUNDARY_DIMS_SCHEMA
+    | DimsSchema("segment", "time", "layer", "y", "x")
+    | DimsSchema("segment", "layer", "y", "x")
+    | DimsSchema("segment", "time", "layer", "{face_dim}")
+    | DimsSchema("segment", "layer", "{face_dim}")
+    # Layer dim not necessary, as long as there is a layer coordinate present.
+    | DimsSchema("segment", "time", "y", "x")
+    | DimsSchema("segment", "y", "x")
+    | DimsSchema("segment", "time", "{face_dim}")
+    | DimsSchema("segment", "{face_dim}")
 )
 
 
@@ -102,13 +119,13 @@ class Evapotranspiration(BoundaryCondition):
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
-            BOUNDARY_DIMS_SCHEMA,
+            SEGMENT_BOUNDARY_DIMS_SCHEMA,
         ],
         "proportion_depth": [
             DTypeSchema(np.floating),
             IndexesSchema(),
             CoordsSchema(("layer",)),
-            BOUNDARY_DIMS_SCHEMA,
+            SEGMENT_BOUNDARY_DIMS_SCHEMA,
         ],
         "print_flows": [DTypeSchema(np.bool_), DimsSchema()],
         "save_flows": [DTypeSchema(np.bool_), DimsSchema()],
@@ -122,7 +139,11 @@ class Evapotranspiration(BoundaryCondition):
         "rate": [IdentityNoDataSchema("surface")],
         "depth": [IdentityNoDataSchema("surface")],
         "proportion_rate": [IdentityNoDataSchema("surface")],
-        "proportion_depth": [IdentityNoDataSchema("surface")],
+        "proportion_depth": [
+            IdentityNoDataSchema("surface"),
+            AllValueSchema(">=", 0.0),
+            AllValueSchema("<=", 1.0),
+        ],
     }
 
     _period_data = ("surface", "rate", "depth", "proportion_depth", "proportion_rate")
@@ -170,12 +191,26 @@ class Evapotranspiration(BoundaryCondition):
         self.dataset["repeat_stress"] = repeat_stress
         self._validate_init_schemata(validate)
 
-        # TODO: add write logic for transforming proportion rate and depth to
-        # the right shape in the binary file.
-
     def _validate(self, schemata, **kwargs):
         # Insert additional kwargs
         kwargs["surface"] = self["surface"]
         errors = super()._validate(schemata, **kwargs)
 
         return errors
+
+    def get_options(self, predefined_options: Dict, not_options: List = None):
+        options = super().get_options(predefined_options, not_options=not_options)
+        # Add amount of segments
+        if "segment" in self.dataset.dims:
+            options["nseg"] = self.dataset.dims["segment"] + 1
+        else:
+            options["nseg"] = 1
+        return options
+
+    def _get_bin_ds(self):
+        bin_ds = super()._get_bin_ds()
+
+        # Unstack "segment" dimension into different variables
+        bin_ds = unstack_dim_into_variable(bin_ds, "segment")
+
+        return bin_ds
