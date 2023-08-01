@@ -111,8 +111,11 @@ class GeneralHeadBoundary(BoundaryCondition):
     _auxiliary_data = {"concentration": "species"}
 
     _regrid_method = {
-        "head": (RegridderType.OVERLAP, "mean"),
-        "conductance": (RegridderType.OVERLAP, "geometric_mean"),
+        "head": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),  # TODO set to barycentric once supported
+        "conductance": (RegridderType.RELATIVEOVERLAP, "conductance"),
         "concentration": (RegridderType.OVERLAP, "mean"),
     }
 
