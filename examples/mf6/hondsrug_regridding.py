@@ -19,10 +19,6 @@ In overview, the model features:
 # sphinx_gallery_thumbnail_number = -1
 
 # %% Import packages
-# We'll start with the usual imports, and an import from scipy.
-
-from typing import Tuple
-
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
