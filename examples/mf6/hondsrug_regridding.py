@@ -214,7 +214,8 @@ plot_histograms_side_by_side(
     "rch rate",
 )
 
-# compare drainage
+# %% 
+# Compare drainage elevations.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["drn-pipe"].dataset["elevation"],
     regridded_simulation["GWF_1"]["drn-pipe"].dataset["elevation"],
