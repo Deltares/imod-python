@@ -198,7 +198,8 @@ plot_histograms_side_by_side(
     "riv bottom elevation",
 )
 
-# compare riverbed conductance
+# %%
+# Compare riverbed conductance.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["riv"].dataset["conductance"],
     regridded_simulation["GWF_1"]["riv"].dataset["conductance"],
