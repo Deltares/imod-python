@@ -167,7 +167,8 @@ plot_histograms_side_by_side(
     regridded_simulation["GWF_1"]["npf"].dataset["k"],
     "npf k",
 )
-
+# %%
+# Compare vertical hydraulic conductivities.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["npf"].dataset["k33"],
     regridded_simulation["GWF_1"]["npf"].dataset["k33"],
