@@ -157,7 +157,8 @@ plot_histograms_side_by_side(
     "chd head",
 )
 
-# compare k-arrays
+# %%
+# Compare horizontal hydraulic conductivities.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["npf"].dataset["k"],
     regridded_simulation["GWF_1"]["npf"].dataset["k"],
