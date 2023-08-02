@@ -206,7 +206,8 @@ plot_histograms_side_by_side(
     "riv conductance",
 )
 
-# compare recharge
+# %%
+# Compare recharge rates.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["rch"].dataset["rate"],
     regridded_simulation["GWF_1"]["rch"].dataset["rate"],
