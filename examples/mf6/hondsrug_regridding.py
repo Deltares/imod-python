@@ -167,55 +167,63 @@ plot_histograms_side_by_side(
     regridded_simulation["GWF_1"]["npf"].dataset["k"],
     "npf k",
 )
-
+# %%
+# Compare vertical hydraulic conductivities.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["npf"].dataset["k33"],
     regridded_simulation["GWF_1"]["npf"].dataset["k33"],
     "npf k33",
 )
-# compare initial conditions
+# %%
+# Compare starting heads.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["ic"].dataset["start"],
     regridded_simulation["GWF_1"]["ic"].dataset["start"],
     "ic start",
 )
 
-# compare river stages
+# %%
+# Compare river stages.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["riv"].dataset["stage"],
     regridded_simulation["GWF_1"]["riv"].dataset["stage"],
     "riv stage",
 )
 
-# compare bottom elevations
+# %% 
+# Compare river bottom elevations.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["riv"].dataset["bottom_elevation"],
     regridded_simulation["GWF_1"]["riv"].dataset["bottom_elevation"],
     "riv bottom elevation",
 )
 
-# compare riverbed conductance
+# %%
+# Compare riverbed conductance.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["riv"].dataset["conductance"],
     regridded_simulation["GWF_1"]["riv"].dataset["conductance"],
     "riv conductance",
 )
 
-# compare recharge
+# %%
+# Compare recharge rates.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["rch"].dataset["rate"],
     regridded_simulation["GWF_1"]["rch"].dataset["rate"],
     "rch rate",
 )
 
-# compare drainage
+# %% 
+# Compare drainage elevations.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["drn-pipe"].dataset["elevation"],
     regridded_simulation["GWF_1"]["drn-pipe"].dataset["elevation"],
     "drn-pipe elevation",
 )
 
-# compute conductance
+# %%
+# Compare drain conductances.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["drn-pipe"].dataset["conductance"],
     regridded_simulation["GWF_1"]["drn-pipe"].dataset["conductance"],
