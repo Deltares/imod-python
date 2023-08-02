@@ -3,7 +3,7 @@ Regridding a regional model
 ==============
 
 This example shows how a model can be regridded using default regridding
-methods. The example used in the Hondsrug model. It is regridded to a coarser
+methods. The example used is the Hondsrug model. It is regridded to a coarser
 grid. The simulated heads before and after the regridding are shown for
 comparison, and some statistics are plotted for the head distributions at the
 end of the simulation. Histograms of the input arrays before and after
