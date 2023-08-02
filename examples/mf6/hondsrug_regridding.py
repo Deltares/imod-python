@@ -182,7 +182,8 @@ plot_histograms_side_by_side(
     "ic start",
 )
 
-# compare river stages
+# %%
+# Compare river stages.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["riv"].dataset["stage"],
     regridded_simulation["GWF_1"]["riv"].dataset["stage"],
