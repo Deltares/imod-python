@@ -67,7 +67,11 @@ def write_summary_statistics(
     )
 
 
-# obtain the simulation, write it, run it, and plot some heads
+# %% 
+# Obtain the simulation, write it, run it, and plot some heads.
+# There is a separate example contained in 
+# `hondsrug <https://deltares.gitlab.io/imod/imod-python/examples/mf6/hondsrug.html#sphx-glr-examples-mf6-hondsrug-py>`_ 
+# that you should look at if you are interested in the model building
 gwf_simulation = create_hondsrug_simulation()
 
 original_modeldir = imod.util.temporary_directory() / "original"
