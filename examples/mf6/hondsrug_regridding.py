@@ -27,7 +27,8 @@ from example_models import create_hondsrug_simulation
 import imod
 from imod.typing.grid import GridDataArray
 
-
+# %% 
+# We define some helper functions here. These functions help plotting and printing summary statistics.
 def convert_to_filtered_1d(grid: GridDataArray) -> np.ndarray:
     # This function receives an xarray DataArray and converts it to an 1d numpy array. All NaN's are filtered out.
     grid_as_1d = grid.values.ravel()
