@@ -88,7 +88,8 @@ hds_original = imod.mf6.open_hds(
 fig, ax = plt.subplots()
 hds_original.sel(layer=3).isel(time=6).plot(ax=ax)
 
-# create the grid we will regrid to
+# %%
+# Create the target grid we will regrid to. 
 idomain = gwf_simulation["GWF_1"]["dis"]["idomain"]
 
 nlay = len(idomain.coords["layer"].values)
@@ -111,7 +112,11 @@ coords = {"layer": new_layer, "y": new_y, "x": new_x, "dx": delta_x, "dy": delta
 target_grid = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
 
 
-# regrid the simulation
+# %% 
+Regridding
+==========
+
+Regrid the simulation with the ``regrid_like`` method. Write, run, and plot the results. 
 regridded_simulation = gwf_simulation.regrid_like(
     "hondsrug-regridded", target_grid, validate=False
 )
@@ -135,21 +140,28 @@ hds_regridded.sel(layer=3).isel(time=6).plot(ax=ax)
 write_summary_statistics(hds_original.isel(time=6), hds_regridded.isel(time=6), "head")
 
 # %%
-# plot histograms of input
-# =====================
+# Comparison with histograms
+# ==========================
+#
+# In the next segment we will compare the input and output of the models on different grids. 
+# We advice to always check how your input is regridded. In this example we upscaled grid, 
+# many input parameters are regridded with a ``mean`` method. This means that their input 
+# range is reduced, which can be seen in tailings in the histograms becoming shorter.
 
 plot_histograms_side_by_side(
     hds_original.isel(time=6), hds_regridded.isel(time=6), "head"
 )
 
-# compare chd-arrays
+# %% 
+# Compare constant head arrays.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["chd"].dataset["head"],
     regridded_simulation["GWF_1"]["chd"].dataset["head"],
     "chd head",
 )
 
-# compare k-arrays
+# %%
+# Compare horizontal hydraulic conductivities.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["npf"].dataset["k"],
     regridded_simulation["GWF_1"]["npf"].dataset["k"],
