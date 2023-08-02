@@ -174,7 +174,8 @@ plot_histograms_side_by_side(
     regridded_simulation["GWF_1"]["npf"].dataset["k33"],
     "npf k33",
 )
-# compare initial conditions
+# %%
+# Compare starting heads.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["ic"].dataset["start"],
     regridded_simulation["GWF_1"]["ic"].dataset["start"],
