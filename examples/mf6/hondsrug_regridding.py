@@ -7,7 +7,7 @@ methods. The example used in the Hondsrug model. It is regridded to a coarser
 grid. The simulated heads before and after the regridding are shown for
 comparison, and some statistics are plotted for the head distributions at the
 end of the simulation. Histograms of the input arrays before and after
-regridding are shown next. 
+regridding are shown next.
 """
 
 # sphinx_gallery_thumbnail_number = 3
@@ -21,7 +21,8 @@ from example_models import create_hondsrug_simulation
 import imod
 from imod.typing.grid import GridDataArray
 
-# %% 
+
+# %%
 # We define some helper functions here. These functions help plotting and printing summary statistics.
 def convert_to_filtered_1d(grid: GridDataArray) -> np.ndarray:
     """This function receives an xarray DataArray and converts it to an 1d numpy
@@ -70,10 +71,10 @@ def write_summary_statistics(
     )
 
 
-# %% 
+# %%
 # Obtain the simulation, write it, run it, and plot some heads.
-# There is a separate example contained in 
-# `hondsrug <https://deltares.gitlab.io/imod/imod-python/examples/mf6/hondsrug.html#sphx-glr-examples-mf6-hondsrug-py>`_ 
+# There is a separate example contained in
+# `hondsrug <https://deltares.gitlab.io/imod/imod-python/examples/mf6/hondsrug.html#sphx-glr-examples-mf6-hondsrug-py>`_
 # that you should look at if you are interested in the model building
 gwf_simulation = create_hondsrug_simulation()
 
@@ -89,7 +90,7 @@ fig, ax = plt.subplots()
 hds_original.sel(layer=3).isel(time=6).plot(ax=ax)
 
 # %%
-# Create the target grid we will regrid to. 
+# Create the target grid we will regrid to.
 idomain = gwf_simulation["GWF_1"]["dis"]["idomain"]
 
 nlay = len(idomain.coords["layer"].values)
@@ -112,11 +113,11 @@ coords = {"layer": new_layer, "y": new_y, "x": new_x, "dx": delta_x, "dy": delta
 target_grid = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
 
 
-# %% 
-#Regridding
-#==========
+# %%
+# Regridding
+# ==========
 
-#Regrid the simulation with the ``regrid_like`` method. Write, run, and plot the results. 
+# Regrid the simulation with the ``regrid_like`` method. Write, run, and plot the results.
 regridded_simulation = gwf_simulation.regrid_like(
     "hondsrug-regridded", target_grid, validate=False
 )
@@ -143,16 +144,16 @@ write_summary_statistics(hds_original.isel(time=6), hds_regridded.isel(time=6), 
 # Comparison with histograms
 # ==========================
 #
-# In the next segment we will compare the input and output of the models on different grids. 
-# We advice to always check how your input is regridded. In this example we upscaled grid, 
-# many input parameters are regridded with a ``mean`` method. This means that their input 
+# In the next segment we will compare the input and output of the models on different grids.
+# We advice to always check how your input is regridded. In this example we upscaled grid,
+# many input parameters are regridded with a ``mean`` method. This means that their input
 # range is reduced, which can be seen in tailings in the histograms becoming shorter.
 
 plot_histograms_side_by_side(
     hds_original.isel(time=6), hds_regridded.isel(time=6), "head"
 )
 
-# %% 
+# %%
 # Compare constant head arrays.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["chd"].dataset["head"],
@@ -190,7 +191,7 @@ plot_histograms_side_by_side(
     "riv stage",
 )
 
-# %% 
+# %%
 # Compare river bottom elevations.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["riv"].dataset["bottom_elevation"],
@@ -214,7 +215,7 @@ plot_histograms_side_by_side(
     "rch rate",
 )
 
-# %% 
+# %%
 # Compare drainage elevations.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["drn-pipe"].dataset["elevation"],

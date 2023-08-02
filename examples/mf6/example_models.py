@@ -16,7 +16,7 @@ from imod.typing.grid import nan_like
 
 
 def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
-    """ There is a separate example contained in `TWRI
+    """There is a separate example contained in `TWRI
     <https://deltares.gitlab.io/imod/imod-python/examples/mf6/ex01_twri.html#sphx-glr-examples-mf6-ex01-twri-py>`_
     that you should look at if you are interested in the model building
     """
