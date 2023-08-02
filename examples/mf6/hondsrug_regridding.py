@@ -24,7 +24,8 @@ from imod.typing.grid import GridDataArray
 # %% 
 # We define some helper functions here. These functions help plotting and printing summary statistics.
 def convert_to_filtered_1d(grid: GridDataArray) -> np.ndarray:
-    """This function receives an xarray DataArray and converts it to an 1d numpy array. All NaN's are filtered out."""
+    """This function receives an xarray DataArray and converts it to an 1d numpy
+    array. All NaN's are filtered out."""
     grid_as_1d = grid.values.ravel()
     filter = ~np.isnan(grid_as_1d)
     grid_as_1d = grid_as_1d[filter]
@@ -34,7 +35,8 @@ def convert_to_filtered_1d(grid: GridDataArray) -> np.ndarray:
 def plot_histograms_side_by_side(
     array_original: GridDataArray, array_regridded: GridDataArray, title: str
 ):
-    """This function creates  a plot of normalized histograms of the 2 input DataArray. It plots a title above each histogram."""
+    """This function creates a plot of normalized histograms of the 2 input
+    DataArray. It plots a title above each histogram."""
     array_original_as_1d = convert_to_filtered_1d(array_original)
     array_regridded_as_1d = convert_to_filtered_1d(array_regridded)
     _, axs = plt.subplots(1, 2, sharey=True, tight_layout=True)
@@ -47,7 +49,8 @@ def plot_histograms_side_by_side(
 def write_summary_statistics(
     array_original: GridDataArray, array_regridded: GridDataArray, title: str
 ):
-    # This function writes some statistics of the original and regridded arrays to screen
+    """This function writes some statistics of the original and regridded arrays
+    to screen"""
 
     original = convert_to_filtered_1d(array_original)
     regridded = convert_to_filtered_1d(array_regridded)
