@@ -113,10 +113,10 @@ target_grid = xr.DataArray(np.ones(shape, dtype=int), coords=coords, dims=dims)
 
 
 # %% 
-Regridding
-==========
+#Regridding
+#==========
 
-Regrid the simulation with the ``regrid_like`` method. Write, run, and plot the results. 
+#Regrid the simulation with the ``regrid_like`` method. Write, run, and plot the results. 
 regridded_simulation = gwf_simulation.regrid_like(
     "hondsrug-regridded", target_grid, validate=False
 )
