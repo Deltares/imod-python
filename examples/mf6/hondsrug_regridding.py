@@ -85,7 +85,8 @@ hds_original = imod.mf6.open_hds(
 fig, ax = plt.subplots()
 hds_original.sel(layer=3).isel(time=6).plot(ax=ax)
 
-# create the grid we will regrid to
+# %%
+# Create the target grid we will regrid to. 
 idomain = gwf_simulation["GWF_1"]["dis"]["idomain"]
 
 nlay = len(idomain.coords["layer"].values)
