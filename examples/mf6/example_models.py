@@ -2,8 +2,9 @@
 Example models
 ==============
 
-This source file contains functions that create a simulation that can be used in examples that are not focussed on building a simulation,
-but on doing something with it ( such as regridding)
+This source file contains functions that create a simulation that can be used
+in examples that are not focussed on building a simulation, but on doing
+something with it ( such as regridding)
 
 """
 import numpy as np
@@ -15,8 +16,9 @@ from imod.typing.grid import nan_like
 
 
 def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
-    """
-    There is a separate example contained in `TWRI <https://deltares.gitlab.io/imod/imod-python/examples/mf6/ex01_twri.html#sphx-glr-examples-mf6-ex01-twri-py>`_ that you should look at if you are interested in the model building
+    """ There is a separate example contained in `TWRI
+    <https://deltares.gitlab.io/imod/imod-python/examples/mf6/ex01_twri.html#sphx-glr-examples-mf6-ex01-twri-py>`_
+    that you should look at if you are interested in the model building
     """
 
     nlay = 3
@@ -209,7 +211,9 @@ def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
 
 def create_hondsrug_simulation() -> imod.mf6.Modflow6Simulation:
     """
-    There is a separate example contained in `hondsrug <https://deltares.gitlab.io/imod/imod-python/examples/mf6/hondsrug.html#sphx-glr-examples-mf6-hondsrug-py>`_ that you should look at if you are interested in the model building
+    There is a separate example contained in `hondsrug
+    <https://deltares.gitlab.io/imod/imod-python/examples/mf6/hondsrug.html#sphx-glr-examples-mf6-hondsrug-py>`_
+    that you should look at if you are interested in the model building
     """
 
     # create model

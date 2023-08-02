@@ -2,21 +2,15 @@
 Regridding a regional model
 ==============
 
-This example shows a simplified script for building a groundwater model in the
-northeast of the Netherlands. A primary feature of this area is an ice-pushed
-ridge called the Hondsrug. This examples demonstrates modifying external data
-for use in a MODFLOW6 model.
-
-In overview, the model features:
-
-    * Thirteen layers: seven aquifers and six aquitards;
-    * A dense ditch network in the east;
-    * Pipe drainage for agriculture;
-    * Precipitation and evapotranspiration.
-
+This example shows how a model can be regridded using default regridding
+methods. The example used in the Hondsrug model. It is regridded to a coarser
+grid. The simulated heads before and after the regridding are shown for
+comparison, and some statistics are plotted for the head distributions at the
+end of the simulation. Histograms of the input arrays before and after
+regridding are shown next. 
 """
 
-# sphinx_gallery_thumbnail_number = -1
+# sphinx_gallery_thumbnail_number = 3
 
 # %% Import packages
 import matplotlib.pyplot as plt
