@@ -40,7 +40,7 @@ def convert_to_filtered_1d(grid: GridDataArray) -> np.ndarray:
 def plot_histograms_side_by_side(
     array_original: GridDataArray, array_regridded: GridDataArray, title: str
 ):
-    # This function creates  a plot of normalized histograms of the 2 input DataArray. It plots a title above each histogram.
+    """This function creates  a plot of normalized histograms of the 2 input DataArray. It plots a title above each histogram."""
     array_original_as_1d = convert_to_filtered_1d(array_original)
     array_regridded_as_1d = convert_to_filtered_1d(array_regridded)
     _, axs = plt.subplots(1, 2, sharey=True, tight_layout=True)
