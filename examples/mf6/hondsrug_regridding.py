@@ -137,8 +137,13 @@ hds_regridded.sel(layer=3).isel(time=6).plot(ax=ax)
 write_summary_statistics(hds_original.isel(time=6), hds_regridded.isel(time=6), "head")
 
 # %%
-# plot histograms of input
-# =====================
+# Comparison with histograms
+# ==========================
+#
+# In the next segment we will compare the input and output of the models on different grids. 
+# We advice to always check how your input is regridded. In this example we upscaled grid, 
+# many input parameters are regridded with a ``mean`` method. This means that their input 
+# range is reduced, which can be seen in tailings in the histograms becoming shorter.
 
 plot_histograms_side_by_side(
     hds_original.isel(time=6), hds_regridded.isel(time=6), "head"
