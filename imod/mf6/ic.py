@@ -61,7 +61,10 @@ class InitialConditions(Package):
     _template = Package._initialize_template(_pkg_id)
 
     _regrid_method = {
-        "start": (RegridderType.OVERLAP, "mean"),
+        "start": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),  # TODO set to barycentric once supported
     }
 
     def __init__(self, start=None, head=None, validate: bool = True):

@@ -97,7 +97,7 @@ class Drainage(BoundaryCondition):
 
     _regrid_method = {
         "elevation": (RegridderType.OVERLAP, "mean"),
-        "conductance": (RegridderType.OVERLAP, "mean"),
+        "conductance": (RegridderType.RELATIVEOVERLAP, "conductance"),
         "concentration": (RegridderType.OVERLAP, "mean"),
     }
 
