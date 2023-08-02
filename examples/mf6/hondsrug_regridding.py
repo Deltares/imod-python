@@ -190,7 +190,8 @@ plot_histograms_side_by_side(
     "riv stage",
 )
 
-# compare bottom elevations
+# %% 
+# Compare river bottom elevations.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["riv"].dataset["bottom_elevation"],
     regridded_simulation["GWF_1"]["riv"].dataset["bottom_elevation"],
