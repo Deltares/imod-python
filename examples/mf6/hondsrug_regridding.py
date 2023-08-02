@@ -222,7 +222,8 @@ plot_histograms_side_by_side(
     "drn-pipe elevation",
 )
 
-# compute conductance
+# %%
+# Compare drain conductances.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["drn-pipe"].dataset["conductance"],
     regridded_simulation["GWF_1"]["drn-pipe"].dataset["conductance"],
