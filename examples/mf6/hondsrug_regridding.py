@@ -149,7 +149,8 @@ plot_histograms_side_by_side(
     hds_original.isel(time=6), hds_regridded.isel(time=6), "head"
 )
 
-# compare chd-arrays
+# %% 
+# Compare constant head arrays.
 plot_histograms_side_by_side(
     gwf_simulation["GWF_1"]["chd"].dataset["head"],
     regridded_simulation["GWF_1"]["chd"].dataset["head"],
