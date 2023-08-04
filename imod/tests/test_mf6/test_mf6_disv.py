@@ -1,7 +1,7 @@
 import numpy as np
+import pytest
 import xarray as xr
 import xugrid as xu
-import pytest
 
 import imod
 from imod.schemata import ValidationError
