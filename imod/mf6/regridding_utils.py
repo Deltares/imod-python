@@ -124,7 +124,10 @@ def get_non_grid_data(package, grid_names: List[str]) -> Dict[str, any]:
         if name in all_non_grid_data:
             all_non_grid_data.remove(name)
     for name in all_non_grid_data:
-        result[name] = package.dataset[name].values[()]
+        if "time" in package.dataset[name].coords:
+            result[name] = package.dataset[name]
+        else:
+            result[name] = package.dataset[name].values[()]
     return result
 
 

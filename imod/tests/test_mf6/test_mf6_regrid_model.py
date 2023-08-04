@@ -116,7 +116,10 @@ def test_regrid_unstructured_model_with_inactive_cells(
     validation_result = new_gwf_model._validate("test_model")
     assert not validation_result.has_errors()
     new_idomain = new_gwf_model.get_domain()
-    assert new_idomain.max().values[()] == 1 and new_idomain.min().values[()] == 0
+    assert (
+        new_idomain.max().values[()] == 1
+        and new_idomain.min().values[()] == inactivity_marker
+    )
 
 
 def test_model_regridding_can_skip_validation(
