@@ -139,5 +139,4 @@ class VerticesDiscretization(Package):
         # Insert additional kwargs
         kwargs["bottom"] = self["bottom"]
         errors = super()._validate(schemata, **kwargs)
-
         return errors

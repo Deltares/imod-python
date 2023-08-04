@@ -56,15 +56,11 @@ class DisBottomSchema(NoDataComparisonSchema):
 
         # Only check for multi-layered models
         if bottom.coords["layer"].size > 1:
-            # UgridDataArray.where() cannot handle the layer removed by .diff.
-            # FUTURE: Remove instance check if this issue is resolved:
-            # https://github.com/Deltares/xugrid/issues/38
-            if not isinstance(active, xu.UgridDataArray):
-                # Check if zero thicknesses occur in active cells. The difference across
-                # layers is a "negative thickness"
-                thickness = bottom.diff(dim="layer") * -1.0
-                if (thickness.where(active) <= 0.0).any():
-                    raise ValidationError("found thickness <= 0.0")
+            # Check if zero thicknesses occur in active cells. The difference across
+            # layers is a "negative thickness"
+            thickness = bottom.diff(dim="layer") * -1.0
+            if (thickness.where(active) <= 0.0).any():
+                raise ValidationError("found thickness <= 0.0")
 
             # To compute thicknesses properly, Modflow 6 requires bottom data in the
             # layer above the active cell in question.
