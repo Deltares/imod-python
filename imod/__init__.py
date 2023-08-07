@@ -1,4 +1,4 @@
-from importlib.metadata import distribution, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, distribution
 
 # exports
 from imod import (

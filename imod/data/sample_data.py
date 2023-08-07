@@ -1,6 +1,7 @@
 """
 Functions to load sample data.
 """
+import importlib
 from pathlib import Path
 from typing import Union
 from zipfile import ZipFile
@@ -10,7 +11,7 @@ import pandas as pd
 import pooch
 import xarray as xr
 import xugrid as xu
-import importlib
+
 from imod.util import MissingOptionalModule
 
 try:
