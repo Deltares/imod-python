@@ -1,4 +1,4 @@
-import pkg_resources
+from importlib.metadata import PackageNotFoundError, distribution
 
 # exports
 from imod import (
@@ -19,7 +19,7 @@ from imod.formats import gen, idf, ipf, prj, rasterio
 
 # version
 try:
-    __version__ = pkg_resources.get_distribution(__name__).version
-except pkg_resources.DistributionNotFound:
+    __version__ = distribution(__name__).version
+except PackageNotFoundError:
     # package is not installed
     pass
