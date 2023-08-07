@@ -7,7 +7,6 @@ from zipfile import ZipFile
 
 import numpy as np
 import pandas as pd
-import pkg_resources
 import pooch
 import xarray as xr
 import xugrid as xu

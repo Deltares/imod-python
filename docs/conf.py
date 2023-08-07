@@ -8,14 +8,13 @@
 
 # -- Path setup --------------------------------------------------------------
 
-import pkg_resources
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 from sphinx_gallery.sorting import FileNameSortKey
-
+from importlib.metadata import distribution
 # -- Project information -----------------------------------------------------
 
 project = "iMOD Python"
@@ -23,7 +22,7 @@ copyright = "Deltares"
 author = "Martijn Visser, Huite Bootsma"
 
 # The full version, including alpha/beta/rc tags
-release = pkg_resources.get_distribution("imod").version
+release = distribution("imod").version
 # The short version which is displayed
 version = ".".join(release.split(".")[:3]) + ".dev"
 
