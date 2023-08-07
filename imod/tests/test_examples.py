@@ -23,7 +23,6 @@ def get_examples():
     return examples
 
 
-@pytest.mark.examples
 @pytest.mark.skipif(on_gitlab_ci(), reason="Examples are run during docs build")
 @pytest.mark.parametrize("example", get_examples())
 def test_example(example):
