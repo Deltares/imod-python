@@ -18,6 +18,9 @@ class PackageBase(abc.ABC):
     object.dataset.to_netcdf(...)
     """
 
+    def __new__(cls, *_, **__):
+        return super(PackageBase, cls).__new__(cls)
+
     def __init__(self, allargs=None):
         if allargs is not None:
             for arg in allargs.values():

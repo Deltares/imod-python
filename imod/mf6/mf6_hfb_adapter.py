@@ -186,7 +186,6 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
         validate: bool = True,
     ):
         super().__init__(locals())
-
         hydraulic_characteristic = _convert_to_hydraulic_characteristic(
             barrier_type, value
         )
@@ -198,7 +197,11 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
 
     def _to_sparse(self, arrdict, layer):
         data = next(iter(arrdict.values()))
-        grid = self.dataset.ugrid.grid
+        if isinstance(self.dataset["idomain"], xr.DataArray):
+            active = xu.UgridDataArray.from_structured(self.dataset["idomain"])
+            grid = active.ugrid.grid
+        else:
+            grid = self.dataset.ugrid.grid
         notnull = ~np.isnan(data)
         idomain = self.dataset["idomain"]
         if isinstance(idomain, xr.DataArray):
