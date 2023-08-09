@@ -39,4 +39,4 @@ from imod.mf6.ssm import SourceSinkMixing
 from imod.mf6.sto import SpecificStorage, Storage, StorageCoefficient
 from imod.mf6.timedis import TimeDiscretization
 from imod.mf6.uzf import UnsaturatedZoneFlow
-from imod.mf6.wel import WellDisStructured, WellDisVertices
+from imod.mf6.wel import Well, WellDisStructured, WellDisVertices

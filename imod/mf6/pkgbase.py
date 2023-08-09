@@ -226,54 +226,6 @@ class Package(PackageBase, abc.ABC):
         with open(filename, "w") as f:
             f.write(content)
 
-    def to_sparse(self, arrdict, layer):
-        """Convert from dense arrays to list based input"""
-        # TODO stream the data per stress period
-        # TODO add pkgcheck that period table aligns
-        # Get the number of valid values
-        data = next(iter(arrdict.values()))
-        notnull = ~np.isnan(data)
-
-        if isinstance(self.dataset, xr.Dataset):
-            recarr = dis_recarr(arrdict, layer, notnull)
-        elif isinstance(self.dataset, xu.UgridDataset):
-            recarr = disv_recarr(arrdict, layer, notnull)
-        else:
-            raise TypeError(
-                "self.dataset should be xarray.Dataset or xugrid.UgridDataset,"
-                f" is {type(self.dataset)} instead"
-            )
-        # Fill in the data
-        for key, arr in arrdict.items():
-            values = arr[notnull].astype(np.float64)
-            recarr[key] = values
-
-        return recarr
-
-    def _ds_to_arrdict(self, ds):
-        arrdict = {}
-        for datavar in ds.data_vars:
-            if ds[datavar].shape == ():
-                raise ValueError(
-                    f"{datavar} in {self._pkg_id} package cannot be a scalar"
-                )
-            auxiliary_vars = (
-                self.get_auxiliary_variable_names()
-            )  # returns something like {"concentration": "species"}
-            if datavar in auxiliary_vars.keys():  # if datavar is concentration
-                if (
-                    auxiliary_vars[datavar] in ds[datavar].dims
-                ):  # if this concentration array has the species dimension
-                    for s in ds[datavar].values:  # loop over species
-                        arrdict[s] = (
-                            ds[datavar]
-                            .sel({auxiliary_vars[datavar]: s})
-                            .values  # store species array under its species name
-                        )
-            else:
-                arrdict[datavar] = ds[datavar].values
-        return arrdict
-
     def write_binary_griddata(self, outpath, da, dtype):
         # From the modflow6 source, the header is defined as:
         # integer(I4B) :: kstp --> np.int32 : 1
@@ -485,45 +437,6 @@ class Package(PackageBase, abc.ABC):
 
         spatial_ds.to_netcdf(path)
         return has_dims
-
-    def _get_vars_to_check(self):
-        """
-        Helper function to get all variables which were not set to None
-        """
-        variables = []
-        for var in self._metadata_dict.keys():
-            if (  # Filter optional variables not filled in
-                self.dataset[var].size != 1
-            ) or (
-                self.dataset[var] != None  # noqa: E711
-            ):
-                variables.append(var)
-
-        return variables
-
-    def period_data(self):
-        result = []
-        if hasattr(self, "_period_data"):
-            result += self._period_data
-        if hasattr(self, "_auxiliary_data"):
-            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
-                if aux_var_name in self.dataset.keys():
-                    for s in (
-                        self.dataset[aux_var_name].coords[aux_var_dimensions].values
-                    ):
-                        result.append(s)
-        return result
-
-    def add_periodic_auxiliary_variable(self):
-        if hasattr(self, "_auxiliary_data"):
-            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
-                aux_coords = (
-                    self.dataset[aux_var_name].coords[aux_var_dimensions].values
-                )
-                for s in aux_coords:
-                    self.dataset[s] = self.dataset[aux_var_name].sel(
-                        {aux_var_dimensions: s}
-                    )
 
     def get_auxiliary_variable_names(self):
         result = {}
@@ -785,6 +698,78 @@ class BoundaryCondition(Package, abc.ABC):
         else:
             nmax = int(da.count())
         return nmax
+
+    def to_sparse(self, arrdict, layer):
+        """Convert from dense arrays to list based input"""
+        # TODO stream the data per stress period
+        # TODO add pkgcheck that period table aligns
+        # Get the number of valid values
+        data = next(iter(arrdict.values()))
+        notnull = ~np.isnan(data)
+
+        if isinstance(self.dataset, xr.Dataset):
+            recarr = dis_recarr(arrdict, layer, notnull)
+        elif isinstance(self.dataset, xu.UgridDataset):
+            recarr = disv_recarr(arrdict, layer, notnull)
+        else:
+            raise TypeError(
+                "self.dataset should be xarray.Dataset or xugrid.UgridDataset,"
+                f" is {type(self.dataset)} instead"
+            )
+        # Fill in the data
+        for key, arr in arrdict.items():
+            values = arr[notnull].astype(np.float64)
+            recarr[key] = values
+
+        return recarr
+
+    def period_data(self):
+        result = []
+        if hasattr(self, "_period_data"):
+            result += self._period_data
+        if hasattr(self, "_auxiliary_data"):
+            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
+                if aux_var_name in self.dataset.keys():
+                    for s in (
+                        self.dataset[aux_var_name].coords[aux_var_dimensions].values
+                    ):
+                        result.append(s)
+        return result
+
+    def add_periodic_auxiliary_variable(self):
+        if hasattr(self, "_auxiliary_data"):
+            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
+                aux_coords = (
+                    self.dataset[aux_var_name].coords[aux_var_dimensions].values
+                )
+                for s in aux_coords:
+                    self.dataset[s] = self.dataset[aux_var_name].sel(
+                        {aux_var_dimensions: s}
+                    )
+
+    def _ds_to_arrdict(self, ds):
+        arrdict = {}
+        for datavar in ds.data_vars:
+            if ds[datavar].shape == ():
+                raise ValueError(
+                    f"{datavar} in {self._pkg_id} package cannot be a scalar"
+                )
+            auxiliary_vars = (
+                self.get_auxiliary_variable_names()
+            )  # returns something like {"concentration": "species"}
+            if datavar in auxiliary_vars.keys():  # if datavar is concentration
+                if (
+                    auxiliary_vars[datavar] in ds[datavar].dims
+                ):  # if this concentration array has the species dimension
+                    for s in ds[datavar].values:  # loop over species
+                        arrdict[s] = (
+                            ds[datavar]
+                            .sel({auxiliary_vars[datavar]: s})
+                            .values  # store species array under its species name
+                        )
+            else:
+                arrdict[datavar] = ds[datavar].values
+        return arrdict
 
     def _write_binaryfile(self, outpath, sparse_data):
         with open(outpath, "w") as f:

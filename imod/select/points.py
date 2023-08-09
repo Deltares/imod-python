@@ -21,6 +21,33 @@ def get_unstructured_cell2d_from_xy(uda, **points):
     return uda.ugrid.grid.locate_points(xy)
 
 
+def _check_points(points):
+    """Check whether points have the right and consistent shape"""
+    shapes = {}
+    for coord, value in points.items():
+        arr = np.atleast_1d(value)
+        points[coord] = arr
+        shape = arr.shape
+        if not len(shape) == 1:
+            raise ValueError(
+                f"Coordinate {coord} is not one-dimensional, but has shape: {shape}"
+            )
+        shapes[coord] = shape
+    if not len(set(shapes.values())) == 1:
+        msg = "\n".join([f"{coord}: {shape}" for coord, shape in shapes.items()])
+        raise ValueError(f"Shapes of coordinates do match each other:\n{msg}")
+
+
+def _arr_like_points(points, fill_value):
+    """
+    Return array with the same shape as the first array provided in points.
+    """
+    first_value = next(iter(points.values()))
+    shape = np.atleast_1d(first_value).shape
+
+    return np.full(shape, fill_value)
+
+
 def points_in_bounds(da, **points):
     """
     Returns whether points specified by keyword arguments fall within the bounds
@@ -56,20 +83,10 @@ def points_in_bounds(da, **points):
     >>> points_in_bounds(da, x=x, y=y)
 
     """
-    # check sizes
-    shapes = {}
-    for coord, value in points.items():
-        arr = np.atleast_1d(value)
-        points[coord] = arr
-        shape = arr.shape
-        if not len(shape) == 1:
-            raise ValueError(
-                f"Coordinate {coord} is not one-dimensional, but has shape: {shape}"
-            )
-        shapes[coord] = shape
-    if not len(set(shapes.values())) == 1:
-        msg = "\n".join([f"{coord}: {shape}" for coord, shape in shapes.items()])
-        raise ValueError(f"Shapes of coordinates do match each other:\n{msg}")
+
+    _check_points(points)
+
+    in_bounds = _arr_like_points(points, True)
 
     if isinstance(da, xu.UgridDataArray):
         index = get_unstructured_cell2d_from_xy(da, **points)
@@ -77,9 +94,6 @@ def points_in_bounds(da, **points):
         in_bounds = index > 0
         points.pop("x")
         points.pop("y")
-    else:
-        # Re-use shape state from loop above
-        in_bounds = np.full(shape, True)
 
     for key, x in points.items():
         da_x = da.coords[key]
