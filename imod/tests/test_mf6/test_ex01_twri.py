@@ -8,6 +8,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
@@ -383,6 +384,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
     path = Path(tmp_path.stem).as_posix()
+    write_context = WriteContext(tmp_path)
     actual = gwfmodel.render(path)
     expected = textwrap.dedent(
         f"""\
@@ -403,7 +405,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    gwfmodel.write(tmp_path, "GWF_1", globaltimes)
+    gwfmodel.write("GWF_1", globaltimes, write_context)
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
     assert (tmp_path / "GWF_1").is_dir()
 
@@ -411,7 +413,9 @@ def test_gwfmodel_render(twri_model, tmp_path):
 @pytest.mark.usefixtures("twri_model")
 def test_simulation_render(twri_model):
     simulation = twri_model
-    actual = simulation.render()
+    write_context = WriteContext(".")
+    actual = simulation.render(write_context)
+
     expected = textwrap.dedent(
         """\
             begin options
@@ -447,7 +451,10 @@ def test_simulation_write_and_run(twri_model, tmp_path):
         twri_model.run()
 
     modeldir = tmp_path / "ex01-twri"
-    simulation.write(modeldir, binary=False)
+    simulation.write(
+        modeldir,
+        binary=False,
+    )
     simulation.run()
 
     head = imod.mf6.open_hds(
