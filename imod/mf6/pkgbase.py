@@ -394,14 +394,6 @@ class Package(PackageBase, abc.ABC):
 
         return layered, values
 
-    @typedispatch
-    def write(self, directory: Union[str, Path], pkgname: str, globaltimes: Union[List, np.ndarray] , binary: bool):
-        write_context = WriteContext(binary=binary)
-        write_context.set_model_directory(directory)
-        self.write(pkgname,globaltimes,  write_context)
-
-
-    @typedispatch
     def write(self, pkgname: str, globaltimes: Union[List, np.ndarray],write_context: WriteContext):
         directory = write_context.get_model_directory()
         binary = write_context.is_binary()
