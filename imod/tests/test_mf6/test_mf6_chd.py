@@ -8,7 +8,7 @@ import xarray as xr
 
 import imod
 from imod.schemata import ValidationError
-
+from imod.mf6.write_context import WriteContext
 
 @pytest.fixture()
 def head():
@@ -184,7 +184,9 @@ def test_write_concentration_period_data(head_fc, concentration_fc):
         save_flows=True,
     )
     with tempfile.TemporaryDirectory() as output_dir:
-        chd.write(output_dir, "chd", globaltimes, False)
+        write_context = WriteContext()
+        write_context.set_model_directory(output_dir)        
+        chd.write( "chd", globaltimes, write_context)
         with open(output_dir + "/chd/chd-0.dat", "r") as f:
             data = f.read()
             assert (

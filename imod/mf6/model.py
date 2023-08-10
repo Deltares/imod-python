@@ -213,13 +213,13 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             f.write(namefile_content)
 
         # write package contents
+        write_context.set_model_directory(modeldirectory)
         for pkg_name, pkg in self.items():
             try:
                 pkg.write(
-                    directory=modeldirectory,
                     pkgname=pkg_name,
                     globaltimes=globaltimes,
-                    binary=write_context.is_binary(),
+                    write_context=write_context
                 )
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")

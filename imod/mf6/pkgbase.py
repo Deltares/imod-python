@@ -14,7 +14,11 @@ import xugrid as xu
 import imod
 from imod.mf6.validation import validation_pkg_error_message
 from imod.schemata import ValidationError
+from imod.mf6.write_context import WriteContext
 
+from fastcore.dispatch import typedispatch
+from pathlib import Path
+from typing import Any, Union, List
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
 
@@ -215,14 +219,14 @@ class Package(PackageBase, abc.ABC):
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
 
-    def write_blockfile(self, directory, pkgname, globaltimes, binary):
+    def write_blockfile(self, pkg_directory, pkgname, globaltimes, binary):
         content = self.render(
-            directory=directory,
+            pkg_directory=pkg_directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
             binary=binary,
         )
-        filename = directory / f"{pkgname}.{self._pkg_id}"
+        filename = pkg_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
 
@@ -390,9 +394,18 @@ class Package(PackageBase, abc.ABC):
 
         return layered, values
 
-    def write(self, directory, pkgname, globaltimes, binary):
-        directory = pathlib.Path(directory)
-        self.write_blockfile(directory, pkgname, globaltimes, binary=binary)
+    @typedispatch
+    def write(self, directory: Union[str, Path], pkgname: str, globaltimes: Union[List, np.ndarray] , binary: bool):
+        write_context = WriteContext(binary=binary)
+        write_context.set_model_directory(directory)
+        self.write(pkgname,globaltimes,  write_context)
+
+
+    @typedispatch
+    def write(self, pkgname: str, globaltimes: Union[List, np.ndarray],write_context: WriteContext):
+        directory = write_context.get_model_directory()
+        binary = write_context.is_binary()
+        self.write_blockfile(directory, pkgname, globaltimes, binary)
 
         if hasattr(self, "_grid_data"):
             if self._is_xy_data(self.dataset):
@@ -856,12 +869,12 @@ class BoundaryCondition(Package, abc.ABC):
                 options[varname] = v
         return options
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def render(self, pkg_directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {"binary": binary}
         bin_ds = self._get_bin_ds()
         d["periods"] = self.period_paths(
-            directory, pkgname, globaltimes, bin_ds, binary
+            pkg_directory, pkgname, globaltimes, bin_ds, binary
         )
         # construct the rest (dict for render)
         d = self.get_options(d)
@@ -891,7 +904,7 @@ class BoundaryCondition(Package, abc.ABC):
     def _get_bin_ds(self):
         return self[self.period_data()]
 
-    def write_perioddata(self, directory, pkgname, binary):
+    def write_perioddata(self, pkg_directory, pkgname, binary):
         if len(self.period_data()) == 0:
             return
 
@@ -904,31 +917,38 @@ class BoundaryCondition(Package, abc.ABC):
 
         if "time" in bin_ds:  # one of bin_ds has time
             for i in range(len(self.dataset.time)):
-                path = directory / pkgname / f"{self._pkg_id}-{i}.{ext}"
+                path = pkg_directory / pkgname / f"{self._pkg_id}-{i}.{ext}"
                 self.write_datafile(
                     path, bin_ds.isel(time=i), binary=binary
                 )  # one timestep
         else:
-            path = directory / pkgname / f"{self._pkg_id}.{ext}"
+            path = pkg_directory / pkgname / f"{self._pkg_id}.{ext}"
             self.write_datafile(path, bin_ds, binary=binary)
 
-    def write(self, directory, pkgname, globaltimes, binary):
+    @typedispatch
+    def write(self, directory: str, pkgname: str, globaltimes: np.ndarray, binary: bool):    
+        write_context = WriteContext(binary=binary)
+        write_context.set_model_directory(directory)
+        self.write(pkgname,globaltimes,  write_context)            
+
+    @typedispatch
+    def write(self,  pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
         """
         writes the blockfile and binary data
 
         directory is modelname
         """
-        directory = pathlib.Path(directory)
+        pkg_directory = write_context.get_model_directory()
         self.write_blockfile(
-            directory=directory,
+            pkg_directory=pkg_directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
-            binary=binary,
+            binary=write_context.is_binary(),
         )
         self.write_perioddata(
-            directory=directory,
+            pkg_directory=pkg_directory,
             pkgname=pkgname,
-            binary=binary,
+            binary=write_context.is_binary(),
         )
 
     def assign_dims(self, arg) -> Dict:

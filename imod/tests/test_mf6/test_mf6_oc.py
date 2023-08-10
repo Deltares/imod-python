@@ -8,7 +8,7 @@ import xarray as xr
 
 import imod
 from imod.schemata import ValidationError
-
+from imod.mf6.write_context import WriteContext
 
 def test_render_string():
     oc = imod.mf6.OutputControl(save_head="first", save_budget="last")
@@ -280,7 +280,9 @@ def test_oc_write(tmp_path):
     with imod.util.cd(tmp_path):
         directory = tmp_path / "input/gwf"
         directory.mkdir(exist_ok=True, parents=True)
-        oc.write(directory, "outputcontrol", globaltimes, True)
+        write_context = WriteContext()
+        write_context.set_model_directory(directory)
+        oc.write( "outputcontrol", globaltimes, write_context)
 
         assert (directory / "outputcontrol.oc").is_file()
         assert (tmp_path / "output").exists()

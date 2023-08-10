@@ -4,7 +4,7 @@ from pathlib import Path
 class WriteContext:
     def __init__(
         self,
-        sim_directory: Path,
+        sim_directory: Path = ".",
         binary: bool = False,
         validate: bool = True,
         absolute_paths: bool = False,
@@ -25,3 +25,10 @@ class WriteContext:
 
     def is_validate(self) -> bool:
         return self.validate
+    
+
+    def set_model_directory(self, model_directory: Path) -> None:
+       self.model_directory = model_directory
+
+    def get_model_directory(self) -> Path:
+       return Path(self.model_directory)

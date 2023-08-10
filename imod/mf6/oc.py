@@ -6,7 +6,7 @@ import numpy as np
 
 from imod.mf6.pkgbase import Package
 from imod.schemata import DTypeSchema
-
+from imod.mf6.write_context import WriteContext
 
 class OutputControl(Package):
     """
@@ -154,10 +154,10 @@ class OutputControl(Package):
 
         return self._template.render(d)
 
-    def write(self, directory, pkgname, globaltimes, binary):
+    def write(self, pkgname, globaltimes, write_context):
         # We need to overload the write here to ensure the output directory is
         # created in advance for MODFLOW6.
-        super().write(directory, pkgname, globaltimes, binary)
+        super().write( pkgname, globaltimes, write_context)
 
         for datavar in ("head_file", "concentration_file", "budget_file"):
             path = self.dataset[datavar].values[()]
