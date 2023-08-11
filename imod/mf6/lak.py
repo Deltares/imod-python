@@ -978,15 +978,15 @@ class Lake(BoundaryCondition):
         df = self.dataset[outlet_vars].to_dataframe()
         return df
 
-    def write_blockfile(self, pkg_directory, pkgname, globaltimes, binary):
-        renderdir = pathlib.Path(pkg_directory.stem)
+    def write_blockfile(self, directory, pkgname, globaltimes, binary):
+        renderdir = pathlib.Path(directory.stem)
         content = self.render(
             directory=renderdir,
             pkgname=pkgname,
             globaltimes=globaltimes,
             binary=binary,
         )
-        filename = pkg_directory / f"{pkgname}.{self._pkg_id}"
+        filename = directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
             f.write("\n")
@@ -998,7 +998,7 @@ class Lake(BoundaryCondition):
             )
             if self._has_laketables():
                 lake_number_to_filename = self._write_laketable_filelist_section(f)
-                self._write_laketable_files(pkg_directory, lake_number_to_filename)
+                self._write_laketable_files(directory, lake_number_to_filename)
 
             if self._has_outlets():
                 f.write("\n")
@@ -1078,7 +1078,7 @@ class Lake(BoundaryCondition):
         # this function is called from packagebase and should do nothing in this context
         return
 
-    def write_perioddata(self, pkg_directory, pkgname, binary):
+    def write_perioddata(self, directory, pkgname, binary):
         # this function is called from packagebase and should do nothing in this context
         return
 

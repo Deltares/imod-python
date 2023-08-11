@@ -379,19 +379,19 @@ class UnsaturatedZoneFlow(AdvancedBoundaryCondition):
 
         return recarr_new
 
-    def render(self, pkg_directory, pkgname, globaltimes, binary):
+    def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {}
         bin_ds = self.dataset[list(self._period_data)]
         d["periods"] = self.period_paths(
-            pkg_directory, pkgname, globaltimes, bin_ds, binary=False
+            directory, pkgname, globaltimes, bin_ds, binary=False
         )
         not_options = (
             list(self._period_data) + list(self._package_data) + ["iuzno" + "ivertcon"]
         )
         d = self.get_options(d, not_options=not_options)
         path = (
-            pathlib.Path(pkg_directory.stem) / pkgname / f"{self._pkg_id}-pkgdata.dat"
+            pathlib.Path(directory.stem) / pkgname / f"{self._pkg_id}-pkgdata.dat"
         )
         d["packagedata"] = path.as_posix()
         d["nuzfcells"] = self._max_active_n()

@@ -218,14 +218,14 @@ class Package(PackageBase, abc.ABC):
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
 
-    def write_blockfile(self, pkg_directory, pkgname, globaltimes, binary):
+    def write_blockfile(self, directory, pkgname, globaltimes, binary):
         content = self.render(
-            pkg_directory=pkg_directory,
+            directory=directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
             binary=binary,
         )
-        filename = pkg_directory / f"{pkgname}.{self._pkg_id}"
+        filename = directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
 
@@ -326,19 +326,19 @@ class Package(PackageBase, abc.ABC):
             else:
                 np.savetxt(fname=f, X=da.values, fmt=fmt)
 
-    def render(self, pkg_directory, pkgname, globaltimes, binary):
+    def render(self, directory, pkgname, globaltimes, binary):
         d = {}
-        if pkg_directory is None:
-            pkg_directory = pkgname
+        if directory is None:
+            directory = pkgname
         else:
-            pkg_directory = pathlib.Path(pkg_directory.stem) / pkgname
+            directory = pathlib.Path(directory.stem) / pkgname
 
         for varname in self.dataset.data_vars:
             key = self._keyword_map.get(varname, varname)
 
             if hasattr(self, "_grid_data") and varname in self._grid_data:
                 layered, value = self._compose_values(
-                    self.dataset[varname], pkg_directory, key, binary=binary
+                    self.dataset[varname], directory, key, binary=binary
                 )
                 if self._valid(value):  # skip False or None
                     d[f"{key}_layered"], d[key] = layered, value
@@ -820,7 +820,7 @@ class BoundaryCondition(Package, abc.ABC):
             self._write_textfile(outpath, sparse_data)
 
     def period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
-        pkg_directory = pathlib.Path(directory.stem) / pkgname
+        directory = pathlib.Path(directory.stem) / pkgname
 
         if binary:
             ext = "bin"
@@ -832,7 +832,7 @@ class BoundaryCondition(Package, abc.ABC):
             package_times = bin_ds.coords["time"].values
             starts = np.searchsorted(globaltimes, package_times) + 1
             for i, start in enumerate(starts):
-                path = pkg_directory / f"{self._pkg_id}-{i}.{ext}"
+                path = directory / f"{self._pkg_id}-{i}.{ext}"
                 periods[start] = path.as_posix()
 
             repeat_stress = self.dataset.get("repeat_stress")
@@ -846,7 +846,7 @@ class BoundaryCondition(Package, abc.ABC):
                 # Now make sure the periods are sorted by key.
                 periods = dict(sorted(periods.items()))
         else:
-            path = pkg_directory / f"{self._pkg_id}.{ext}"
+            path = directory / f"{self._pkg_id}.{ext}"
             periods[1] = path.as_posix()
 
         return periods
@@ -865,12 +865,12 @@ class BoundaryCondition(Package, abc.ABC):
                 options[varname] = v
         return options
 
-    def render(self, pkg_directory, pkgname, globaltimes, binary):
+    def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {"binary": binary}
         bin_ds = self._get_bin_ds()
         d["periods"] = self.period_paths(
-            pkg_directory, pkgname, globaltimes, bin_ds, binary
+            directory, pkgname, globaltimes, bin_ds, binary
         )
         # construct the rest (dict for render)
         d = self.get_options(d)
@@ -900,7 +900,7 @@ class BoundaryCondition(Package, abc.ABC):
     def _get_bin_ds(self):
         return self[self.period_data()]
 
-    def write_perioddata(self, pkg_directory, pkgname, binary):
+    def write_perioddata(self, directory, pkgname, binary):
         if len(self.period_data()) == 0:
             return
 
@@ -913,12 +913,12 @@ class BoundaryCondition(Package, abc.ABC):
 
         if "time" in bin_ds:  # one of bin_ds has time
             for i in range(len(self.dataset.time)):
-                path = pkg_directory / pkgname / f"{self._pkg_id}-{i}.{ext}"
+                path = directory / pkgname / f"{self._pkg_id}-{i}.{ext}"
                 self.write_datafile(
                     path, bin_ds.isel(time=i), binary=binary
                 )  # one timestep
         else:
-            path = pkg_directory / pkgname / f"{self._pkg_id}.{ext}"
+            path = directory / pkgname / f"{self._pkg_id}.{ext}"
             self.write_datafile(path, bin_ds, binary=binary)
 
     def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
@@ -927,15 +927,15 @@ class BoundaryCondition(Package, abc.ABC):
 
         directory is modelname
         """
-        pkg_directory = write_context.get_output_directory()
+        directory = write_context.get_output_directory()
         self.write_blockfile(
-            pkg_directory=pkg_directory,
+            directory=directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
             binary=write_context.is_binary(),
         )
         self.write_perioddata(
-            pkg_directory=pkg_directory,
+            directory=directory,
             pkgname=pkgname,
             binary=write_context.is_binary(),
         )

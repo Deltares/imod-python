@@ -169,8 +169,8 @@ class SpecificStorage(StorageBase):
         self.dataset["save_flows"] = save_flows
         self._validate_init_schemata(validate)
 
-    def render(self, pkg_directory, pkgname, globaltimes, binary):
-        d = self._render_dict(pkg_directory, pkgname, globaltimes, binary)
+    def render(self, directory, pkgname, globaltimes, binary):
+        d = self._render_dict(directory, pkgname, globaltimes, binary)
         return self._template.render(d)
 
 
@@ -287,7 +287,7 @@ class StorageCoefficient(StorageBase):
         self.dataset["save_flows"] = save_flows
         self._validate_init_schemata(validate)
 
-    def render(self, pkg_directory, pkgname, globaltimes, binary):
-        d = self._render_dict(pkg_directory, pkgname, globaltimes, binary)
+    def render(self, directory, pkgname, globaltimes, binary):
+        d = self._render_dict(directory, pkgname, globaltimes, binary)
         d["storagecoefficient"] = True
         return self._template.render(d)

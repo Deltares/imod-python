@@ -109,9 +109,9 @@ class OutputControl(Package):
                 f"Output Control setting should be either integer or string in ['first', 'last', 'all'], instead got {setting}"
             )
 
-    def render(self, pkg_directory, pkgname, globaltimes, binary):
+    def render(self, directory, pkgname, globaltimes, binary):
         d = {}
-        modelname = pkg_directory.stem
+        modelname = directory.stem
 
         pairs = (
             ("head", "hds"),
@@ -124,7 +124,7 @@ class OutputControl(Package):
                 varname = f"{part}_file"
                 filepath = self.dataset[varname].values[()]
                 if filepath is None:
-                    filepath = pkg_directory / f"{modelname}.{ext}"
+                    filepath = directory / f"{modelname}.{ext}"
                 else:
                     filepath = Path(filepath)
 
@@ -132,7 +132,7 @@ class OutputControl(Package):
                     path = filepath
                 else:
                     # Get path relative to the simulation name file.
-                    sim_directory = pkg_directory.parent
+                    sim_directory = directory.parent
                     path = Path(os.path.relpath(filepath, sim_directory))
                 d[varname] = path.as_posix()
 

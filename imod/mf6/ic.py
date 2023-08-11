@@ -78,10 +78,10 @@ class InitialConditions(Package):
         self.dataset["start"] = start
         self._validate_init_schemata(validate)
 
-    def render(self, pkg_directory, pkgname, globaltimes, binary):
+    def render(self, directory, pkgname, globaltimes, binary):
         d = {}
 
-        icdirectory = pathlib.Path(pkg_directory.stem) / pkgname
+        icdirectory = pathlib.Path(directory.stem) / pkgname
         d["layered"], d["strt"] = self._compose_values(
             self["start"], icdirectory, "strt", binary=binary
         )
