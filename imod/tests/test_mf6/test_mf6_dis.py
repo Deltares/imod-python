@@ -6,8 +6,8 @@ import pytest
 import xarray as xr
 
 import imod
-from imod.schemata import ValidationError
 from imod.mf6.write_context import WriteContext
+from imod.schemata import ValidationError
 
 
 @pytest.fixture(scope="function")
@@ -168,11 +168,7 @@ def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
     directory.mkdir()
     write_context = WriteContext()
     write_context.set_output_directory(directory)
-    dis.write(
-        pkgname="dis",
-        globaltimes=[],
-        write_context=write_context
-    )
+    dis.write(pkgname="dis", globaltimes=[], write_context=write_context)
 
     with open(directory / "dis/top.dat") as f:
         top_content = f.readlines()

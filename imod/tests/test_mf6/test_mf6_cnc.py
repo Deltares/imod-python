@@ -9,6 +9,7 @@ import xarray as xr
 import imod
 from imod.mf6.write_context import WriteContext
 
+
 @pytest.fixture()
 def concentration_steadystate():
     nlay = 3
@@ -127,7 +128,7 @@ def test_write_period_data(concentration_transient):
     with tempfile.TemporaryDirectory() as output_dir:
         write_context = WriteContext()
         write_context.set_output_directory(output_dir)
-        cnc.write( "cnc", globaltimes, write_context)
+        cnc.write("cnc", globaltimes, write_context)
         with open(output_dir + "/cnc/cnc-0.dat", "r") as f:
             data = f.read()
             assert (

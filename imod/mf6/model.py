@@ -219,7 +219,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 pkg.write(
                     pkgname=pkg_name,
                     globaltimes=globaltimes,
-                    write_context=write_context
+                    write_context=write_context,
                 )
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")

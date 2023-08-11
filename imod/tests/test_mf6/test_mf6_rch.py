@@ -8,8 +8,9 @@ import pytest
 import xarray as xr
 
 import imod
-from imod.schemata import ValidationError
 from imod.mf6.write_context import WriteContext
+from imod.schemata import ValidationError
+
 
 @pytest.fixture(scope="function")
 def rch_dict():
@@ -272,11 +273,7 @@ def test_write_concentration_period_data(rate_fc, concentration_fc):
     with tempfile.TemporaryDirectory() as output_dir:
         write_context = WriteContext()
         write_context.set_output_directory(output_dir)
-        rch.write(
-            pkgname="rch",
-            globaltimes=globaltimes,
-            write_context= write_context
-        )   
+        rch.write(pkgname="rch", globaltimes=globaltimes, write_context=write_context)
 
         with open(output_dir + "/rch/rch-0.dat", "r") as f:
             data = f.read()

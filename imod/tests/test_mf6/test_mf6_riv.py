@@ -8,8 +8,8 @@ import pytest
 import xarray as xr
 
 import imod
-from imod.schemata import ValidationError
 from imod.mf6.write_context import WriteContext
+from imod.schemata import ValidationError
 
 
 @pytest.fixture(scope="function")
@@ -324,7 +324,6 @@ def test_write_concentration_period_data(concentration_fc):
         concentration_boundary_type="AUX",
     )
     with tempfile.TemporaryDirectory() as output_dir:
-
         write_context = WriteContext()
         write_context.set_output_directory(output_dir)
         riv.write("riv", globaltimes, write_context)

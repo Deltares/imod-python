@@ -3,22 +3,21 @@ import numbers
 import pathlib
 from collections import defaultdict
 from copy import copy
-from typing import Any, Dict, List
+from pathlib import Path
+from typing import Any, Dict, List, Union
 
 import cftime
 import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
+from fastcore.dispatch import typedispatch
 
 import imod
 from imod.mf6.validation import validation_pkg_error_message
-from imod.schemata import ValidationError
 from imod.mf6.write_context import WriteContext
+from imod.schemata import ValidationError
 
-from fastcore.dispatch import typedispatch
-from pathlib import Path
-from typing import Any, Union, List
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
 
@@ -394,7 +393,12 @@ class Package(PackageBase, abc.ABC):
 
         return layered, values
 
-    def write(self, pkgname: str, globaltimes: Union[List, np.ndarray],write_context: WriteContext):
+    def write(
+        self,
+        pkgname: str,
+        globaltimes: Union[List, np.ndarray],
+        write_context: WriteContext,
+    ):
         directory = write_context.get_output_directory()
         binary = write_context.is_binary()
         self.write_blockfile(directory, pkgname, globaltimes, binary)
@@ -915,9 +919,9 @@ class BoundaryCondition(Package, abc.ABC):
                 )  # one timestep
         else:
             path = pkg_directory / pkgname / f"{self._pkg_id}.{ext}"
-            self.write_datafile(path, bin_ds, binary=binary)         
+            self.write_datafile(path, bin_ds, binary=binary)
 
-    def write(self,  pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
+    def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
         """
         writes the blockfile and binary data
 
@@ -994,7 +998,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         package_data = self._package_data_to_sparse()
         self._write_file(outpath, package_data)
 
-    def write(self,  pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
+    def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
         self.fill_stress_perioddata()
         directory = write_context.get_output_directory()
         self.write_blockfile(directory, pkgname, globaltimes, binary=False)
