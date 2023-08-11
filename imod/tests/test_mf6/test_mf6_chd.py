@@ -185,7 +185,7 @@ def test_write_concentration_period_data(head_fc, concentration_fc):
     )
     with tempfile.TemporaryDirectory() as output_dir:
         write_context = WriteContext()
-        write_context.set_model_directory(output_dir)        
+        write_context.set_output_directory(output_dir)        
         chd.write( "chd", globaltimes, write_context)
         with open(output_dir + "/chd/chd-0.dat", "r") as f:
             data = f.read()

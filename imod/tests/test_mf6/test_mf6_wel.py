@@ -8,7 +8,7 @@ import xarray as xr
 
 import imod
 from imod.schemata import ValidationError
-
+from imod.mf6.write_context import WriteContext
 
 def test_render(well_test_data_stationary):
     layer, row, column, rate, _ = well_test_data_stationary
@@ -195,7 +195,7 @@ def test_render_concentration_dis_structured_constant_time(well_test_data_statio
         """
     )
     assert actual == expected
-
+    write_context = Wri
     with tempfile.TemporaryDirectory() as output_dir:
         wel.write(output_dir, "wel", globaltimes, False)
         with open(output_dir + "/wel/wel.dat", "r") as f:

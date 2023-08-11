@@ -100,8 +100,8 @@ class StructuredDiscretization(Package):
         else:
             raise ValueError(f"Unhandled type of {dx}")
 
-    def render(self, directory, pkgname, globaltimes, binary):
-        disdirectory = pathlib.Path(directory.stem) / pkgname
+    def render(self, pkg_directory, pkgname, globaltimes, binary):
+        disdirectory = pathlib.Path(pkg_directory.stem) / pkgname
         d = {}
         x = self.dataset["idomain"].coords["x"]
         y = self.dataset["idomain"].coords["y"]

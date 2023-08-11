@@ -7,6 +7,7 @@ import numpy as np
 from imod.mf6.pkgbase import Package
 from imod.schemata import DTypeSchema
 from imod.mf6.write_context import WriteContext
+from typing import List, Union
 
 class OutputControl(Package):
     """
@@ -107,9 +108,9 @@ class OutputControl(Package):
                 f"Output Control setting should be either integer or string in ['first', 'last', 'all'], instead got {setting}"
             )
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def render(self, pkg_directory, pkgname, globaltimes, binary):
         d = {}
-        modelname = directory.stem
+        modelname = pkg_directory.stem
 
         pairs = (
             ("head", "hds"),
@@ -122,7 +123,7 @@ class OutputControl(Package):
                 varname = f"{part}_file"
                 filepath = self.dataset[varname].values[()]
                 if filepath is None:
-                    filepath = directory / f"{modelname}.{ext}"
+                    filepath = pkg_directory / f"{modelname}.{ext}"
                 else:
                     filepath = Path(filepath)
 
@@ -130,7 +131,7 @@ class OutputControl(Package):
                     path = filepath
                 else:
                     # Get path relative to the simulation name file.
-                    sim_directory = directory.parent
+                    sim_directory = pkg_directory.parent
                     path = Path(os.path.relpath(filepath, sim_directory))
                 d[varname] = path.as_posix()
 
@@ -154,7 +155,7 @@ class OutputControl(Package):
 
         return self._template.render(d)
 
-    def write(self, pkgname, globaltimes, write_context):
+    def write(self, pkgname: str, globaltimes: Union[List, np.ndarray], write_context: WriteContext):
         # We need to overload the write here to ensure the output directory is
         # created in advance for MODFLOW6.
         super().write( pkgname, globaltimes, write_context)

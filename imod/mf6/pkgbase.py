@@ -327,12 +327,12 @@ class Package(PackageBase, abc.ABC):
             else:
                 np.savetxt(fname=f, X=da.values, fmt=fmt)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def render(self, pkg_directory, pkgname, globaltimes, binary):
         d = {}
-        if directory is None:
+        if pkg_directory is None:
             pkg_directory = pkgname
         else:
-            pkg_directory = pathlib.Path(directory.stem) / pkgname
+            pkg_directory = pathlib.Path(pkg_directory.stem) / pkgname
 
         for varname in self.dataset.data_vars:
             key = self._keyword_map.get(varname, varname)
@@ -395,7 +395,7 @@ class Package(PackageBase, abc.ABC):
         return layered, values
 
     def write(self, pkgname: str, globaltimes: Union[List, np.ndarray],write_context: WriteContext):
-        directory = write_context.get_model_directory()
+        directory = write_context.get_output_directory()
         binary = write_context.is_binary()
         self.write_blockfile(directory, pkgname, globaltimes, binary)
 
@@ -915,22 +915,15 @@ class BoundaryCondition(Package, abc.ABC):
                 )  # one timestep
         else:
             path = pkg_directory / pkgname / f"{self._pkg_id}.{ext}"
-            self.write_datafile(path, bin_ds, binary=binary)
+            self.write_datafile(path, bin_ds, binary=binary)         
 
-    @typedispatch
-    def write(self, directory: str, pkgname: str, globaltimes: np.ndarray, binary: bool):    
-        write_context = WriteContext(binary=binary)
-        write_context.set_model_directory(directory)
-        self.write(pkgname,globaltimes,  write_context)            
-
-    @typedispatch
     def write(self,  pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
         """
         writes the blockfile and binary data
 
         directory is modelname
         """
-        pkg_directory = write_context.get_model_directory()
+        pkg_directory = write_context.get_output_directory()
         self.write_blockfile(
             pkg_directory=pkg_directory,
             pkgname=pkgname,
@@ -1001,8 +994,9 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         package_data = self._package_data_to_sparse()
         self._write_file(outpath, package_data)
 
-    def write(self, directory, pkgname, globaltimes, binary):
+    def write(self,  pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
         self.fill_stress_perioddata()
+        directory = write_context.get_output_directory()
         self.write_blockfile(directory, pkgname, globaltimes, binary=False)
         self.write_perioddata(directory, pkgname, binary=False)
         self.write_packagedata(directory, pkgname, binary=False)

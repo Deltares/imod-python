@@ -6,7 +6,8 @@ import numpy as np
 from imod.mf6.pkgbase import Package
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
-
+from typing import Union, List
+from imod.mf6.write_context import WriteContext
 
 class InitialConditions(Package):
     """
@@ -76,9 +77,10 @@ class InitialConditions(Package):
         self.dataset["start"] = start
         self._validate_init_schemata(validate)
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def render(self, pkg_directory, pkgname, globaltimes, binary):
         d = {}
-        icdirectory = pathlib.Path(directory.stem) / pkgname
+
+        icdirectory = pathlib.Path(pkg_directory.stem) / pkgname
         d["layered"], d["strt"] = self._compose_values(
             self["start"], icdirectory, "strt", binary=binary
         )

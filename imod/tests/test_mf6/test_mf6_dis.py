@@ -7,6 +7,7 @@ import xarray as xr
 
 import imod
 from imod.schemata import ValidationError
+from imod.mf6.write_context import WriteContext
 
 
 @pytest.fixture(scope="function")
@@ -165,11 +166,12 @@ def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
     # https://gitlab.com/deltares/imod/imod-python/-/issues/270
     directory = tmp_path / "dis_griddata"
     directory.mkdir()
+    write_context = WriteContext()
+    write_context.set_output_directory(directory)
     dis.write(
-        directory=directory,
         pkgname="dis",
         globaltimes=[],
-        binary=False,
+        write_context=write_context
     )
 
     with open(directory / "dis/top.dat") as f:

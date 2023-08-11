@@ -214,11 +214,9 @@ class Modflow6Simulation(collections.UserDict):
                     )
                 )
             elif value._pkg_id == "ims":
+                write_context.set_output_directory(write_context.get_simulation_directory())
                 value.write(
-                    directory=directory,
-                    pkgname=key,
-                    globaltimes=globaltimes,
-                    binary=binary,
+                     key, globaltimes,write_context
                 )
 
         if status_info.has_errors():
