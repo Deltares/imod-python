@@ -26,7 +26,8 @@ def idomain_and_bottom():
 
 def test_zero_thickness_validation(idomain_and_bottom):
     idomain, bottom = idomain_and_bottom
-    # Create a bottom that has constant values of -1.0 so that thickness is 0.
+    # Create a bottom array that has constant value of -1 across all layers, so
+    # that layers 2 and 3 have thickness 0.
     bottom = (bottom * 0.0) - 1.0
     disv = imod.mf6.VerticesDiscretization(top=0.0, bottom=bottom, idomain=idomain)
 
