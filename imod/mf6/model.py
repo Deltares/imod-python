@@ -131,8 +131,13 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 modeltimes.append(repeat_stress.isel(repeat_items=0).values)
         return modeltimes
 
-    def render(self, modelname: str):
-        dir_for_render = pathlib.Path(modelname)
+    def render(self, modelname: str, write_context: WriteContext):
+        if write_context.absolute_paths:
+            sim_dir = write_context.simulation_directory
+            dir_for_render = pathlib.Path(sim_dir / modelname)
+        else:
+            dir_for_render = pathlib.Path(modelname)
+
         d = {k: v for k, v in self._options.items() if not (v is None or v is False)}
         packages = []
         for pkgname, pkg in self.items():
@@ -207,7 +212,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 return model_status_info
 
         # write model namefile
-        namefile_content = self.render(modelname)
+        namefile_content = self.render(modelname, write_context)
         namefile_path = modeldirectory / f"{modelname}.nam"
         with open(namefile_path, "w") as f:
             f.write(namefile_content)

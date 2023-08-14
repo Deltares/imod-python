@@ -366,7 +366,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
     gwfmodel = simulation["GWF_1"]
     path = Path(tmp_path.stem).as_posix()
     write_context = WriteContext(tmp_path)
-    actual = gwfmodel.render(path)
+    actual = gwfmodel.render(path, write_context)
     expected = textwrap.dedent(
         f"""\
             begin options

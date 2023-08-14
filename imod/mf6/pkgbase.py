@@ -216,12 +216,14 @@ class Package(PackageBase, abc.ABC):
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
 
-    def write_blockfile(self, directory, pkgname, globaltimes, binary):
+    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+        directory = write_context.output_directory
+
         content = self.render(
             directory=directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
-            binary=binary,
+            binary=write_context.binary,
         )
         filename = directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
@@ -399,7 +401,7 @@ class Package(PackageBase, abc.ABC):
     ):
         directory = write_context.output_directory
         binary = write_context.binary
-        self.write_blockfile(directory, pkgname, globaltimes, binary)
+        self.write_blockfile(pkgname, globaltimes, write_context)
 
         if hasattr(self, "_grid_data"):
             if self._is_xy_data(self.dataset):
@@ -927,10 +929,9 @@ class BoundaryCondition(Package, abc.ABC):
         """
         directory = write_context.output_directory
         self.write_blockfile(
-            directory=directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
-            binary=write_context.binary,
+            write_context=write_context,
         )
         self.write_perioddata(
             directory=directory,
@@ -999,7 +1000,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
     def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
         self.fill_stress_perioddata()
         directory = write_context.output_directory
-        self.write_blockfile(directory, pkgname, globaltimes, binary=False)
+        self.write_blockfile(pkgname, globaltimes, write_context)
         self.write_perioddata(directory, pkgname, binary=False)
         self.write_packagedata(directory, pkgname, binary=False)
 

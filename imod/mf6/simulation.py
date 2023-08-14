@@ -162,7 +162,9 @@ class Modflow6Simulation(collections.UserDict):
         d["solutiongroups"] = [solutiongroups]
         return self._template.render(d)
 
-    def write(self, directory=".", binary=True, validate: bool = True):
+    def write(
+        self, directory=".", binary=True, validate: bool = True, absolute_paths=False
+    ):
         """
         Write Modflow6 simulation, including assigned groundwater flow and
         transport models.
@@ -178,9 +180,12 @@ class Modflow6Simulation(collections.UserDict):
             Whether to validate the Modflow6 simulation, including models, at
             write. If True, erronous model input will throw a
             ``ValidationError``.
+        absolute_paths: ({True, False}, optional)
+            True if all paths written to the mf6 inputfiles should be absolute.
+            This is recommended if you intend to read the model with Flopy.
         """
         # create write context
-        write_context = WriteContext(directory, binary, validate, False)
+        write_context = WriteContext(directory, binary, validate, absolute_paths)
 
         # Check models for required content
         for key, model in self.items():
