@@ -1,18 +1,12 @@
 from pathlib import Path
+from dataclasses import dataclass
 
-
+@dataclass
 class WriteContext:
-    def __init__(
-        self,
-        sim_directory: Path = ".",
-        binary: bool = False,
-        validate: bool = True,
-        absolute_paths: bool = False,
-    ) -> None:
-        self.sim_directory = sim_directory
-        self.absolute_paths = absolute_paths
-        self.validate = validate
-        self.binary = binary
+    sim_directory: Path = "."
+    binary: bool = False
+    validate: bool = True
+    absolute_paths: bool = False
 
     def get_simulation_directory(self) -> Path:
         return self.sim_directory
