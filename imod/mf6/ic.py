@@ -1,12 +1,10 @@
 import pathlib
 import warnings
-from typing import List, Union
 
 import numpy as np
 
 from imod.mf6.pkgbase import Package
 from imod.mf6.validation import PKG_DIMS_SCHEMA
-from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
 
 

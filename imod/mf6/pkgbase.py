@@ -3,7 +3,6 @@ import numbers
 import pathlib
 from collections import defaultdict
 from copy import copy
-from pathlib import Path
 from typing import Any, Dict, List, Union
 
 import cftime
@@ -11,7 +10,6 @@ import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
-from fastcore.dispatch import typedispatch
 
 import imod
 from imod.mf6.validation import validation_pkg_error_message
