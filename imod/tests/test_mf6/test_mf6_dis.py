@@ -90,8 +90,7 @@ def test_bottom_exceeding_itself(idomain_and_bottom):
 
     errors = dis._validate(dis._write_schemata, idomain=idomain)
     assert len(errors) == 1
-    for var, var_errors in errors.items():
-        assert var == "bottom"
+    assert isinstance(errors["bottom"][0], ValidationError)
 
 
 def test_top_exceeding_bottom(idomain_and_bottom):
