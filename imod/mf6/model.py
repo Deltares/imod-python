@@ -213,7 +213,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             f.write(namefile_content)
 
         # write package contents
-        write_context.set_output_directory(modeldirectory)
+        write_context.output_directory = modeldirectory
         for pkg_name, pkg in self.items():
             try:
                 pkg.write(

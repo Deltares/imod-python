@@ -1,5 +1,7 @@
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Union
+
 
 @dataclass
 class WriteContext:
@@ -20,8 +22,10 @@ class WriteContext:
     def is_validate(self) -> bool:
         return self.validate
 
-    def set_output_directory(self, model_directory: Path) -> None:
-        self.model_directory = model_directory
+    @property
+    def output_directory(self) -> Path:
+        return self.model_directory
 
-    def get_output_directory(self) -> Path:
-        return Path(self.model_directory)
+    @output_directory.setter
+    def output_directory(self, model_directory: Union[Path, str]) -> None:
+        self.model_directory = Path(model_directory)

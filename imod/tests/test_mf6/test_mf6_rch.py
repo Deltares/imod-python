@@ -272,7 +272,7 @@ def test_write_concentration_period_data(rate_fc, concentration_fc):
     )
     with tempfile.TemporaryDirectory() as output_dir:
         write_context = WriteContext()
-        write_context.set_output_directory(output_dir)
+        write_context.output_directory = output_dir
         rch.write(pkgname="rch", globaltimes=globaltimes, write_context=write_context)
 
         with open(output_dir + "/rch/rch-0.dat", "r") as f:
