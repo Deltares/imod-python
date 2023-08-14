@@ -58,7 +58,7 @@ class DisBottomSchema(NoDataComparisonSchema):
             # Check if zero thicknesses occur in active cells. The difference across
             # layers is a "negative thickness"
             thickness = bottom.diff(dim="layer") * -1.0
-            if (thickness.where(active) <= 0.0).any():
+            if (thickness.where(active.isel(layer=slice(1, None))) <= 0.0).any():
                 raise ValidationError("found thickness <= 0.0")
 
             # To compute thicknesses properly, Modflow 6 requires bottom data in the
