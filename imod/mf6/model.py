@@ -198,7 +198,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         Write packages
         """
 
-        workdir = write_context.get_simulation_directory()
+        workdir = write_context.simulation_directory
         modeldirectory = workdir / modelname
         Path(modeldirectory).mkdir(exist_ok=True, parents=True)
         if validate:

@@ -134,8 +134,8 @@ class Modflow6Simulation(collections.UserDict):
 
         for key, value in self.items():
             if isinstance(value, Modflow6Model):
-                if write_context.is_absolute_paths():
-                    dir = write_context.get_simulation_directory()
+                if write_context.absolute_paths:
+                    dir = write_context.simulation_directory
                     models.append((value._model_id, f"{dir}/{key}/{key}.nam", key))
                 else:
                     models.append((value._model_id, f"{key}/{key}.nam", key))
@@ -215,9 +215,7 @@ class Modflow6Simulation(collections.UserDict):
                     )
                 )
             elif value._pkg_id == "ims":
-                write_context.output_directory = (
-                    write_context.get_simulation_directory()
-                )
+                write_context.output_directory = write_context.simulation_directory
                 value.write(key, globaltimes, write_context)
 
         if status_info.has_errors():
