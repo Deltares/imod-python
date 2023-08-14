@@ -1,13 +1,13 @@
 """
 Functions to load sample data.
 """
+import importlib
 from pathlib import Path
 from typing import Union
 from zipfile import ZipFile
 
 import numpy as np
 import pandas as pd
-import pkg_resources
 import pooch
 import xarray as xr
 import xugrid as xu
@@ -26,8 +26,8 @@ REGISTRY = pooch.create(
     version_dev="main",
     env="IMOD_DATA_DIR",
 )
-with pkg_resources.resource_stream("imod.data", "registry.txt") as registry_file:
-    REGISTRY.load_registry(registry_file)
+with importlib.resources.files("imod.data") as pkg_dir:
+    REGISTRY.load_registry(pkg_dir / "registry.txt")
 
 
 def twri_output(path: Union[str, Path]) -> None:

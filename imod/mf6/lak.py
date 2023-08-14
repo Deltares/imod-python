@@ -1167,7 +1167,7 @@ class Lake(BoundaryCondition):
                 header=False,
                 index=False,
                 sep=" ",
-                line_terminator="\n",
+                lineterminator="\n",
             )
 
             d["table"] = string_table
@@ -1188,7 +1188,7 @@ class Lake(BoundaryCondition):
             index=index,
             header=False,
             sep=" ",
-            line_terminator="\n",
+            lineterminator="\n",
         )
         trimmedlines = [line.strip() for line in block.splitlines()]
         trimmedblock = "\n".join(map(str, trimmedlines)) + "\n"
