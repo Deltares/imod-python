@@ -191,7 +191,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         return model_status_info
 
     def write(
-        self, modelname, globaltimes, write_context: WriteContext
+        self, modelname, globaltimes, validate: bool, write_context: WriteContext
     ) -> StatusInfoBase:
         """
         Write model namefile
@@ -201,7 +201,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         workdir = write_context.get_simulation_directory()
         modeldirectory = workdir / modelname
         Path(modeldirectory).mkdir(exist_ok=True, parents=True)
-        if write_context.is_validate():
+        if validate:
             model_status_info = self._validate(modelname)
             if model_status_info.has_errors():
                 return model_status_info

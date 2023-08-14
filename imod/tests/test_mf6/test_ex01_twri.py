@@ -386,7 +386,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    gwfmodel.write("GWF_1", globaltimes, write_context)
+    gwfmodel.write("GWF_1", globaltimes, True, write_context)
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
     assert (tmp_path / "GWF_1").is_dir()
 

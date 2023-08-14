@@ -55,7 +55,7 @@ def test_gwfmodel_render(circle_model, tmp_path):
     )
     assert actual == expected
     context = WriteContext(tmp_path)
-    gwfmodel.write("GWF_1", globaltimes, context)
+    gwfmodel.write("GWF_1", globaltimes, True, context)
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
     assert (tmp_path / "GWF_1").is_dir()
 
@@ -108,6 +108,6 @@ def test_gwfmodel_render_evt(circle_model_evt, tmp_path):
     )
     assert actual == expected
     context = WriteContext(tmp_path)
-    gwfmodel.write("GWF_1", globaltimes, context)
+    gwfmodel.write("GWF_1", globaltimes, True, context)
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
     assert (tmp_path / "GWF_1").is_dir()

@@ -210,6 +210,7 @@ class Modflow6Simulation(collections.UserDict):
                     value.write(
                         modelname=key,
                         globaltimes=globaltimes,
+                        validate=validate,
                         write_context=write_context,
                     )
                 )

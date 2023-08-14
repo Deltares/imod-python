@@ -19,9 +19,6 @@ class WriteContext:
     def is_binary(self) -> bool:
         return self.binary
 
-    def is_validate(self) -> bool:
-        return self.validate
-
     @property
     def output_directory(self) -> Path:
         return self.model_directory
