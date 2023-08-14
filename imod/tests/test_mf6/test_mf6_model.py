@@ -168,7 +168,7 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
-        write_context = WriteContext(sim_directory=tmp_path)
+        write_context = WriteContext(simulation_directory=tmp_path)
 
         sut = Modflow6Model()
 
