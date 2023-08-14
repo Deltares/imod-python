@@ -3,6 +3,7 @@ import collections
 import inspect
 import pathlib
 from copy import deepcopy
+from pathlib import Path
 
 import cftime
 import jinja2
@@ -17,6 +18,7 @@ from imod.mf6 import qgs_util
 from imod.mf6.pkgbase import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
@@ -189,16 +191,16 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         return model_status_info
 
     def write(
-        self, directory, modelname, globaltimes, binary=True, validate: bool = True
+        self, modelname, globaltimes, validate: bool, write_context: WriteContext
     ) -> StatusInfoBase:
         """
         Write model namefile
         Write packages
         """
 
-        workdir = pathlib.Path(directory)
+        workdir = write_context.simulation_directory
         modeldirectory = workdir / modelname
-        modeldirectory.mkdir(exist_ok=True, parents=True)
+        Path(modeldirectory).mkdir(exist_ok=True, parents=True)
         if validate:
             model_status_info = self._validate(modelname)
             if model_status_info.has_errors():
@@ -211,13 +213,13 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             f.write(namefile_content)
 
         # write package contents
+        write_context.output_directory = modeldirectory
         for pkg_name, pkg in self.items():
             try:
                 pkg.write(
-                    directory=modeldirectory,
                     pkgname=pkg_name,
                     globaltimes=globaltimes,
-                    binary=binary,
+                    write_context=write_context,
                 )
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")

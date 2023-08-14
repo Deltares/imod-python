@@ -8,6 +8,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
@@ -52,12 +53,9 @@ def test_dis_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    dis.write(
-        directory=tmp_path,
-        pkgname="dis",
-        globaltimes=None,
-        binary=True,
-    )
+    write_context = WriteContext(binary=True)
+    write_context.output_directory = tmp_path
+    dis.write(pkgname="dis", globaltimes=None, write_context=write_context)
     assert (tmp_path / "dis.dis").is_file()
     assert (tmp_path / "dis").is_dir()
     assert (tmp_path / "dis" / "idomain.bin").is_file()
@@ -93,12 +91,9 @@ def test_chd_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    chd.write(
-        directory=tmp_path,
-        pkgname="chd",
-        globaltimes=globaltimes,
-        binary=True,
-    )
+    write_context = WriteContext(binary=True)
+    write_context.output_directory = tmp_path
+    chd.write(pkgname="chd", globaltimes=None, write_context=write_context)
     assert (tmp_path / "chd.chd").is_file()
     assert (tmp_path / "chd").is_dir()
     assert (tmp_path / "chd" / "chd.bin").is_file()
@@ -134,12 +129,9 @@ def test_drn_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    drn.write(
-        directory=tmp_path,
-        pkgname="drn",
-        globaltimes=globaltimes,
-        binary=True,
-    )
+    write_context = WriteContext(binary=True)
+    write_context.output_directory = tmp_path
+    drn.write(pkgname="drn", globaltimes=None, write_context=write_context)
     assert (tmp_path / "drn.drn").is_file()
     assert (tmp_path / "drn").is_dir()
     assert (tmp_path / "drn" / "drn.bin").is_file()
@@ -167,12 +159,9 @@ def test_ic_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    ic.write(
-        directory=tmp_path,
-        pkgname="ic",
-        globaltimes=None,
-        binary=True,
-    )
+    write_context = WriteContext(binary=True)
+    write_context.output_directory = tmp_path
+    ic.write(pkgname="ic", globaltimes=None, write_context=write_context)
     assert (tmp_path / "ic.ic").is_file()
 
 
@@ -208,7 +197,9 @@ def test_npf_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    npf.write(directory=tmp_path, pkgname="npf", globaltimes=None, binary=True)
+    write_context = WriteContext(binary=True)
+    write_context.output_directory = tmp_path
+    npf.write(pkgname="npf", globaltimes=None, write_context=write_context)
     assert (tmp_path / "npf.npf").is_file()
 
 
@@ -285,12 +276,9 @@ def test_rch_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    rch.write(
-        directory=tmp_path,
-        pkgname="rch",
-        globaltimes=globaltimes,
-        binary=True,
-    )
+    write_context = WriteContext(binary=True)
+    write_context.output_directory = tmp_path
+    rch.write(pkgname="rch", globaltimes=None, write_context=write_context)
     assert (tmp_path / "rch.rch").is_file()
     assert (tmp_path / "rch").is_dir()
     assert (tmp_path / "rch" / "rch.bin").is_file()
@@ -326,12 +314,9 @@ def test_wel_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    wel.write(
-        directory=tmp_path,
-        pkgname="wel",
-        globaltimes=globaltimes,
-        binary=True,
-    )
+    write_context = WriteContext(binary=True)
+    write_context.output_directory = tmp_path
+    wel.write(pkgname="wel", globaltimes=None, write_context=write_context)
     assert (tmp_path / "wel.wel").is_file()
     assert (tmp_path / "wel").is_dir()
     assert (tmp_path / "wel" / "wel.bin").is_file()
@@ -368,12 +353,9 @@ def test_solver_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    solver.write(
-        directory=tmp_path,
-        pkgname="solver",
-        globaltimes=None,
-        binary=True,
-    )
+    write_context = WriteContext(binary=True)
+    write_context.output_directory = tmp_path
+    solver.write(pkgname="solver", globaltimes=None, write_context=write_context)
     assert (tmp_path / "solver.ims").is_file()
 
 
@@ -383,6 +365,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
     path = Path(tmp_path.stem).as_posix()
+    write_context = WriteContext(tmp_path)
     actual = gwfmodel.render(path)
     expected = textwrap.dedent(
         f"""\
@@ -403,7 +386,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    gwfmodel.write(tmp_path, "GWF_1", globaltimes)
+    gwfmodel.write("GWF_1", globaltimes, True, write_context)
     assert (tmp_path / "GWF_1" / "GWF_1.nam").is_file()
     assert (tmp_path / "GWF_1").is_dir()
 
@@ -411,7 +394,9 @@ def test_gwfmodel_render(twri_model, tmp_path):
 @pytest.mark.usefixtures("twri_model")
 def test_simulation_render(twri_model):
     simulation = twri_model
-    actual = simulation.render()
+    write_context = WriteContext(".")
+    actual = simulation.render(write_context)
+
     expected = textwrap.dedent(
         """\
             begin options
@@ -447,7 +432,10 @@ def test_simulation_write_and_run(twri_model, tmp_path):
         twri_model.run()
 
     modeldir = tmp_path / "ex01-twri"
-    simulation.write(modeldir, binary=False)
+    simulation.write(
+        modeldir,
+        binary=False,
+    )
     simulation.run()
 
     head = imod.mf6.open_hds(

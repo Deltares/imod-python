@@ -2,6 +2,7 @@ import collections
 import pathlib
 import subprocess
 import warnings
+from pathlib import Path
 
 import jinja2
 import numpy as np
@@ -16,6 +17,7 @@ from imod.mf6.model import (
     Modflow6Model,
 )
 from imod.mf6.statusinfo import NestedStatusInfo
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
@@ -124,7 +126,7 @@ class Modflow6Simulation(collections.UserDict):
             timestep_duration=timestep_duration, validate=validate
         )
 
-    def render(self):
+    def render(self, write_context: WriteContext):
         """Renders simulation namefile"""
         d = {}
         models = []
@@ -132,7 +134,11 @@ class Modflow6Simulation(collections.UserDict):
 
         for key, value in self.items():
             if isinstance(value, Modflow6Model):
-                models.append((value._model_id, f"{key}/{key}.nam", key))
+                if write_context.absolute_paths:
+                    dir = write_context.simulation_directory
+                    models.append((value._model_id, f"{dir}/{key}/{key}.nam", key))
+                else:
+                    models.append((value._model_id, f"{key}/{key}.nam", key))
             elif value._pkg_id == "tdis":
                 d["tdis6"] = f"{key}.tdis"
             elif value._pkg_id == "ims":
@@ -173,17 +179,20 @@ class Modflow6Simulation(collections.UserDict):
             write. If True, erronous model input will throw a
             ``ValidationError``.
         """
+        # create write context
+        write_context = WriteContext(directory, binary, validate, False)
+
         # Check models for required content
         for key, model in self.items():
             # skip timedis, exchanges
             if isinstance(model, Modflow6Model):
                 model._model_checks(key)
 
-        directory = pathlib.Path(directory)
+        directory = Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
 
         # Write simulation namefile
-        mfsim_content = self.render()
+        mfsim_content = self.render(write_context)
         mfsim_path = directory / "mfsim.nam"
         with open(mfsim_path, "w") as f:
             f.write(mfsim_content)
@@ -199,20 +208,15 @@ class Modflow6Simulation(collections.UserDict):
             if isinstance(value, Modflow6Model):
                 status_info.add(
                     value.write(
-                        directory=directory,
-                        globaltimes=globaltimes,
                         modelname=key,
-                        binary=binary,
+                        globaltimes=globaltimes,
                         validate=validate,
+                        write_context=write_context,
                     )
                 )
             elif value._pkg_id == "ims":
-                value.write(
-                    directory=directory,
-                    pkgname=key,
-                    globaltimes=globaltimes,
-                    binary=binary,
-                )
+                write_context.output_directory = write_context.simulation_directory
+                value.write(key, globaltimes, write_context)
 
         if status_info.has_errors():
             raise ValidationError("\n" + status_info.to_string())

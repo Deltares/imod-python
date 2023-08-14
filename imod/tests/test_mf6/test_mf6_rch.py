@@ -8,6 +8,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
@@ -270,7 +271,10 @@ def test_write_concentration_period_data(rate_fc, concentration_fc):
         concentration_boundary_type="AUX",
     )
     with tempfile.TemporaryDirectory() as output_dir:
-        rch.write(output_dir, "rch", globaltimes, False)
+        write_context = WriteContext()
+        write_context.output_directory = output_dir
+        rch.write(pkgname="rch", globaltimes=globaltimes, write_context=write_context)
+
         with open(output_dir + "/rch/rch-0.dat", "r") as f:
             data = f.read()
             assert (
