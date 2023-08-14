@@ -185,7 +185,7 @@ class Modflow6Simulation(collections.UserDict):
             This is recommended if you intend to read the model with Flopy.
         """
         # create write context
-        write_context = WriteContext(directory, binary, validate, absolute_paths)
+        write_context = WriteContext(directory, binary, absolute_paths)
 
         # Check models for required content
         for key, model in self.items():
