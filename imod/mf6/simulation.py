@@ -180,7 +180,7 @@ class Modflow6Simulation(collections.UserDict):
             ``ValidationError``.
         """
         # create write context
-        write_context = WriteContext(directory, binary, validate, False)
+        write_context = WriteContext(directory, binary, False)
 
         # Check models for required content
         for key, model in self.items():

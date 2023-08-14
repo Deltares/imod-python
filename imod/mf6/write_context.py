@@ -7,7 +7,6 @@ from typing import Union
 class WriteContext:
     simulation_directory: Path = "."
     binary: bool = False
-    validate: bool = True
     absolute_paths: bool = False
 
     @property
