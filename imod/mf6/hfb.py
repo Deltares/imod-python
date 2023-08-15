@@ -1,4 +1,5 @@
 import abc
+import copy
 import typing
 from typing import Tuple
 
@@ -276,12 +277,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
         -------
         sliced : Package
         """
-        new = typing.cast(
-            HorizontalFlowBarrierBase,
-            super().clip_box(time_min=time_min, time_max=time_max),
-        )
-
-        new.dataset = self.dataset
+        cls = type(self)
+        new = cls.__new__(cls)
+        new.dataset = copy.deepcopy(self.dataset)
         return new
 
     @staticmethod
