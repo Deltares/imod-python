@@ -12,7 +12,7 @@ from imod.mf6.mf6_hfb_adapter import BarrierType, Mf6HorizontalFlowBarrier
 from imod.typing.grid import GridDataArray, zeros_like
 
 
-class HorizontalFlowBarrier(BoundaryCondition, abc.ABC):
+class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
     _pkg_id = "hfb"
 
     _period_data = ()
@@ -37,36 +37,61 @@ class HorizontalFlowBarrier(BoundaryCondition, abc.ABC):
 
     def to_mf6_pkg(
         self,
-        active: GridDataArray,
+        idomain: GridDataArray,
         top: GridDataArray,
         bottom: GridDataArray,
         k: GridDataArray,
     ) -> Mf6HorizontalFlowBarrier:
-        top, bottom, k = self.__broadcast_to_full_domain(active, top, bottom, k)
+        """
+        Write package to Modflow 6 package.
+
+        Based on the model grid, top and bottoms, the layers in which the barrier belong are computed. If the
+        barrier only partially occupies a layer an effective resistance or hydraulic conductivity for that layer is
+        calculated. This calculation is skipped for the Multiplier type.
+
+        Parameters
+        ----------
+        idomain: GridDataArray
+             Grid with active cells.
+        top: GridDataArray
+            Grid with top of model layers.
+        bottom: GridDataArray
+            Grid with bottom of model layers.
+        k: GridDataArray
+            Grid with hydraulic conductivities.
+
+        Returns
+        -------
+
+        """
+        top, bottom, k = self.__broadcast_to_full_domain(idomain, top, bottom, k)
         top, bottom, k = (
             self.__to_unstructured(top, bottom, k)
-            if isinstance(active, xr.DataArray)
+            if isinstance(idomain, xr.DataArray)
             else [top, bottom, k]
         )
-        snapped_dataset, edge_index = self.snap_to_grid(active)
+        snapped_dataset, edge_index = self.__snap_to_grid(idomain)
 
-        effective_value = self.effective_value(
+        effective_value = self.__effective_value(
             snapped_dataset, edge_index, top, bottom, k
         )
 
         barrier_values = (
-            xr.ones_like(top["layer"]) * snapped_dataset[self._get_variable_name()]
+            xr.ones_like(top.coords["layer"])
+            * snapped_dataset[self._get_variable_name()]
         )
-        barrier_values.values[:, edge_index] = effective_value
+
+        if self._get_barrier_type() is not BarrierType.Multiplier:
+            barrier_values.values[:, edge_index] = effective_value
 
         return Mf6HorizontalFlowBarrier(
             self._get_barrier_type(),
             barrier_values,
-            active,
+            idomain,
             self.dataset["print_input"].values.item(),
         )
 
-    def effective_value(
+    def __effective_value(
         self,
         snapped_dataset: xu.UgridDataset,
         edge_index: np.ndarray,
@@ -74,10 +99,28 @@ class HorizontalFlowBarrier(BoundaryCondition, abc.ABC):
         bottom: xu.UgridDataArray,
         k: xu.UgridDataArray,
     ) -> xr.DataArray:
+        """ "
+        ......................................  ▲     ▲
+        .                @@@@                .  |     |
+        .                @Rb@                .  | Lb  |
+        .       C1       @@@@        C2      .  ▼     | H
+        .                :  :                .        |
+        .                :  :                .        |
+        .................:..:.................        ▼
+                k1                    k2
+
+        The effective value of a partially emerged barrier in a layer is computed by:
+        c_total=1.0/(fraction/Rb+ (1.0-fraction)/c_aquifer)
+        c_aquifer = 1.0/k_mean = 1.0/((k1+k2)/2.0)
+        fr = Lb/H
+
+        """
         left, right = snapped_dataset.ugrid.grid.edge_face_connectivity[edge_index].T
-        top_mean = HorizontalFlowBarrier.mean_left_and_right(top, left, right)
-        bottom_mean = HorizontalFlowBarrier.mean_left_and_right(bottom, left, right)
-        k_mean = HorizontalFlowBarrier.mean_left_and_right(k, left, right)
+        top_mean = HorizontalFlowBarrierBase.__mean_left_and_right(top, left, right)
+        bottom_mean = HorizontalFlowBarrierBase.__mean_left_and_right(
+            bottom, left, right
+        )
+        k_mean = HorizontalFlowBarrierBase.__mean_left_and_right(k, left, right)
 
         n_layer, n_edge = top_mean.shape
         layer_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
@@ -92,22 +135,24 @@ class HorizontalFlowBarrier(BoundaryCondition, abc.ABC):
             snapped_dataset["ztop"].values[edge_index].reshape(n_edge, 1)
         )
 
-        overlap = HorizontalFlowBarrier.vectorized_overlap(hfb_bounds, layer_bounds)
+        overlap = HorizontalFlowBarrierBase.__vectorized_overlap(
+            hfb_bounds, layer_bounds
+        )
         height = layer_bounds[..., 1] - layer_bounds[..., 0]
         # Avoid runtime warnings when diving by 0:
         height[height <= 0] = np.nan
         fraction = (overlap / height).T
 
-        resistance = self.to_resistance(
+        resistance = self.__to_resistance(
             snapped_dataset[self._get_variable_name()]
         ).values[edge_index]
         c_aquifer = 1.0 / k_mean
         inverse_c = (fraction / resistance) + ((1.0 - fraction) / c_aquifer)
         c_total = 1.0 / inverse_c
 
-        return self.from_resistance(c_total)
+        return self.__from_resistance(c_total)
 
-    def to_resistance(self, value: xu.UgridDataArray) -> xu.UgridDataArray:
+    def __to_resistance(self, value: xu.UgridDataArray) -> xu.UgridDataArray:
         match self._get_barrier_type():
             case BarrierType.HydraulicCharacteristic:
                 return 1.0 / value
@@ -118,7 +163,7 @@ class HorizontalFlowBarrier(BoundaryCondition, abc.ABC):
 
         raise ValueError(r"Unknown barrier type {barrier_type}")
 
-    def from_resistance(self, resistance: xr.DataArray) -> xr.DataArray:
+    def __from_resistance(self, resistance: xr.DataArray) -> xr.DataArray:
         match self._get_barrier_type():
             case BarrierType.HydraulicCharacteristic:
                 return 1.0 / resistance
@@ -130,18 +175,49 @@ class HorizontalFlowBarrier(BoundaryCondition, abc.ABC):
         raise ValueError(r"Unknown barrier type {barrier_type}")
 
     @staticmethod
-    def mean_left_and_right(
-        uda: xu.UgridDataArray, left: np.ndarray, right: np.ndarray
-    ) -> xr.DataArray:
-        facedim = uda.ugrid.grid.face_dimension
-        uda_left = uda.ugrid.obj.isel({facedim: left}).drop_vars(facedim)
-        uda_right = uda.ugrid.obj.isel({facedim: right}).drop_vars(facedim)
+    def __mean_left_and_right(
+        cell_values: xu.UgridDataArray, left: np.ndarray, right: np.ndarray
+    ) -> xr.Dataset:
+        """
+        This method computes the mean value of cell pairs. The left array specifies the first cell, the right array
+        the second cells. The mean is computed by (first_cell+second_cell/2.0)
+
+        Parameters
+        ----------
+        cell_values: xu.UgridDataArray
+            The array containing the data values of all the cells
+        left :
+            The array containing indices to the first cells
+        right :
+            The array containing indices to the second cells
+
+        Returns
+            The means of the cells
+        -------
+
+        """
+        facedim = cell_values.ugrid.grid.face_dimension
+        uda_left = cell_values.ugrid.obj.isel({facedim: left}).drop_vars(facedim)
+        uda_right = cell_values.ugrid.obj.isel({facedim: right}).drop_vars(facedim)
+
         return xr.concat((uda_left, uda_right), dim="two").mean("two")
 
     @staticmethod
-    def vectorized_overlap(bounds_a: np.ndarray, bounds_b: np.ndarray):
+    def __vectorized_overlap(bounds_a: np.ndarray, bounds_b: np.ndarray):
         """
-        Vectorized overlap computation.
+        Vectorized overlap computation. Returns the overlap of 2 vectors along the same axis.
+        If there is no overlap zero will be returned.
+
+                b1
+                ▲
+          a1    |
+          ▲     |
+          |     |
+          |     ▼
+          ▼     b0
+          a0
+
+        To compute the overlap of the 2 vectors the maximum of a0,b0, is subtracted from the minimum of a1,b1.
 
         Compare with:
 
@@ -172,9 +248,39 @@ class HorizontalFlowBarrier(BoundaryCondition, abc.ABC):
         y_min=None,
         y_max=None,
         state_for_boundary=None,
-    ) -> "HorizontalFlowBarrier":
-        cls = type(self)
-        new = cls.__new__(cls)
+    ) -> "HorizontalFlowBarrierBase":
+        """
+        Clip a package by a bounding box (time, layer, y, x).
+
+        Slicing intervals may be half-bounded, by providing None:
+
+        * To select 500.0 <= x <= 1000.0:
+          ``clip_box(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
+          or ``clip_box(x_max=1000.0)``.
+        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
+          or ``clip_box(x_min=1000.0)``.
+
+        Parameters
+        ----------
+        time_min: optional
+        time_max: optional
+        z_min: optional, float
+        z_max: optional, float
+        x_min: optional, float
+        x_max: optional, float
+        y_min: optional, float
+        y_max: optional, float
+
+        Returns
+        -------
+        sliced : Package
+        """
+        new = typing.cast(
+            HorizontalFlowBarrierBase,
+            super().clip_box(time_min=time_min, time_max=time_max),
+        )
+
         new.dataset = self.dataset
         return new
 
@@ -189,7 +295,7 @@ class HorizontalFlowBarrier(BoundaryCondition, abc.ABC):
         top = (
             idomain * top
             if hasattr(top, "coords") and "layer" in top.coords
-            else HorizontalFlowBarrier.__create_top(bottom, top)
+            else HorizontalFlowBarrierBase.__create_top(bottom, top)
         )
         k = idomain * k
 
@@ -213,7 +319,7 @@ class HorizontalFlowBarrier(BoundaryCondition, abc.ABC):
 
         return top, bottom, k
 
-    def snap_to_grid(
+    def __snap_to_grid(
         self, idomain: GridDataArray
     ) -> Tuple[xu.UgridDataset, np.ndarray]:
         barrier_dataframe = self.dataset[
@@ -230,7 +336,7 @@ class HorizontalFlowBarrier(BoundaryCondition, abc.ABC):
         return snapped_dataset, edge_index
 
 
-class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrier):
+class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     """
      Horizontal Flow Barrier (HFB) package
 
@@ -243,10 +349,10 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrier):
     ----------
     geometry: gpd.GeoDataFrame
         Dataframe that describes:
-         - the geometries of the barriers,
-         - the multiplier of the barriers
-         - the top z-value of the barriers
-         - the bottom z-value of the barriers
+         - geometry: the geometries of the barriers,
+         - hydraulic_characteristic: the hydraulic characteristic of the barriers
+         - ztop: the top z-value of the barriers
+         - zbottom: the bottom z-value of the barriers
     top: GridDataArray
         DataArray that specifies the top z-value of the top layer
     bottom: GridDataArray
@@ -287,7 +393,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrier):
         return "hydraulic_characteristic"
 
 
-class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrier):
+class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     """
      Horizontal Flow Barrier (HFB) package
 
@@ -296,14 +402,16 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrier):
     specified for a GWF model.
     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.2.2.pdf
 
+    If parts of the barrier overlap a layer the multiplier is applied to the entire layer.
+
     Parameters
     ----------
     geometry: gpd.GeoDataFrame
         Dataframe that describes:
-         - the geometries of the barriers,
-         - the multiplier of the barriers
-         - the top z-value of the barriers
-         - the bottom z-value of the barriers
+         - geometry: the geometries of the barriers,
+         - multiplier: the multiplier of the barriers
+         - ztop: the top z-value of the barriers
+         - zbottom: the bottom z-value of the barriers
     top: GridDataArray
         DataArray that specifies the top z-value of the top layer
     bottom: GridDataArray
@@ -344,7 +452,7 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrier):
         return "multiplier"
 
 
-class HorizontalFlowBarrierResistance(HorizontalFlowBarrier):
+class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     """
     Horizontal Flow Barrier (HFB) package
 
@@ -357,10 +465,10 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrier):
     ----------
     geometry: gpd.GeoDataFrame
         Dataframe that describes:
-         - the geometries of the barriers,
-         - the resistance of the barriers
-         - the top z-value of the barriers
-         - the bottom z-value of the barriers
+         - geometry: the geometries of the barriers,
+         - resistance: the resistance of the barriers
+         - ztop: the top z-value of the barriers
+         - zbottom: the bottom z-value of the barriers
     top: GridDataArray
         DataArray that specifies the top z-value of the top layer
     bottom: GridDataArray

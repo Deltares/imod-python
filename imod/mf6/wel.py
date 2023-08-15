@@ -409,7 +409,7 @@ class Well(BoundaryCondition):
         bottom: {xarry.DataArray, xugrid.UgridDataArray}
             Grid with bottom of model layers.
         k: {xarry.DataArray, xugrid.UgridDataArray}
-            Grid with hydraulic conductivites.
+            Grid with hydraulic conductivities.
         Returns
         -------
         Mf6Wel

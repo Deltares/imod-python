@@ -46,7 +46,7 @@ def test_to_mf6_creates_mf6_adapter(
     print_input = False
 
     barrier_y = [2.2, 2.2, 2.2]
-    barrier_x = [82.0, 40, 0.0]
+    barrier_x = [82.0, 40.0, 0.0]
 
     geometry = gpd.GeoDataFrame(
         geometry=[shapely.linestrings(barrier_x, barrier_y)],
@@ -124,4 +124,5 @@ def test_to_mf6_different_z_boundaries(
     # Assert.
     args, _ = mf6_flow_barrier_mock.call_args
     barrier_values = args[2]
-    assert_array_equal(barrier_values.max("mesh2d_nEdges").values, expected_values)
+    max_values_per_layer = barrier_values.max("mesh2d_nEdges").values
+    assert_array_equal(max_values_per_layer, expected_values)

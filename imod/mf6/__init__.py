@@ -13,7 +13,7 @@ from imod.mf6.dsp import Dispersion
 from imod.mf6.evt import Evapotranspiration
 from imod.mf6.ghb import GeneralHeadBoundary
 from imod.mf6.hfb import (
-    HorizontalFlowBarrier,
+    HorizontalFlowBarrierBase,
     HorizontalFlowBarrierHydraulicCharacteristic,
     HorizontalFlowBarrierMultiplier,
     HorizontalFlowBarrierResistance,
