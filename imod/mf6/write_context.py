@@ -29,9 +29,9 @@ class WriteContext:
     _output_directory: Optional[Path] = None
 
     @property
-    def output_directory(self) -> Optional[Path]:
+    def current_output_directory(self) -> Optional[Path]:
         return self._output_directory
 
-    @output_directory.setter
-    def output_directory(self, model_directory: Union[Path, str]) -> None:
+    @current_output_directory.setter
+    def current_output_directory(self, model_directory: Union[Path, str]) -> None:
         self._output_directory = Path(model_directory)

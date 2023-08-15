@@ -51,7 +51,7 @@ def transient_drainage():
 def test_write(drainage, tmp_path):
     drn = imod.mf6.Drainage(**drainage)
     write_context = WriteContext(binary=True)
-    write_context.output_directory = tmp_path
+    write_context.current_output_directory = tmp_path
     drn.write("mydrn", [1], write_context)
 
     dir_for_render = tmp_path.stem
