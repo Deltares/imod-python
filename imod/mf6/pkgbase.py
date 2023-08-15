@@ -18,6 +18,8 @@ class PackageBase(abc.ABC):
     object.dataset.to_netcdf(...)
     """
 
+    # This method has been added to allow mock.patch to mock created objects
+    # https://stackoverflow.com/questions/64737213/how-to-patch-the-new-method-of-a-class
     def __new__(cls, *_, **__):
         return super(PackageBase, cls).__new__(cls)
 
