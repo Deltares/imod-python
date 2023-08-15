@@ -8,7 +8,7 @@ import shapely
 import xugrid as xu
 
 import imod
-from imod.mf6 import Mf6HorizontalFlowBarrier
+from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 
 
 def get_hfb_data_one_layer(grid_xy: xu.UgridDataArray):
