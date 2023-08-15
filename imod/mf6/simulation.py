@@ -134,11 +134,15 @@ class Modflow6Simulation(collections.UserDict):
 
         for key, value in self.items():
             if isinstance(value, Modflow6Model):
-                if write_context.absolute_paths:
-                    dir = write_context.simulation_directory
-                    models.append((value._model_id, f"{dir}/{key}/{key}.nam", key))
-                else:
-                    models.append((value._model_id, f"{key}/{key}.nam", key))
+                rootdir = (
+                    write_context.simulation_directory
+                    if write_context.absolute_paths
+                    else ""
+                )
+                model_name_file = str(Path(rootdir) / Path(f"{key}", f"{key}.nam"))
+                model_name_file = model_name_file.replace("\\", "/")
+                models.append((value._model_id, model_name_file, key))
+
             elif value._pkg_id == "tdis":
                 d["tdis6"] = f"{key}.tdis"
             elif value._pkg_id == "ims":
