@@ -105,7 +105,7 @@ def test_to_mf6_different_z_boundaries(
     print_input = False
 
     barrier_y = [2.2, 2.2, 2.2]
-    barrier_x = [82.0, 40, 0.0]
+    barrier_x = [82.0, 40.0, 0.0]
 
     geometry = gpd.GeoDataFrame(
         geometry=[shapely.linestrings(barrier_x, barrier_y)],
