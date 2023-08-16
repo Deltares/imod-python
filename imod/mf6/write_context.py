@@ -20,7 +20,7 @@ class WriteContext:
         If True, paths in the modlfow inputfiles will be rendered as absoule paths on your system.
         This makes the modflow input files less portable to other systems but facilitates reading them by Flopy
     _output_directory: Optional[Path] = None
-        The path where the next outputfile will be written. Users do not need to set this parameter
+        The directory where the next outputfile will be written. Users do not need to set this parameter
     """
 
     simulation_directory: Path = "."
