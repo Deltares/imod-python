@@ -199,7 +199,7 @@ def test_render_concentration_dis_structured_constant_time(well_test_data_statio
 
     with tempfile.TemporaryDirectory() as output_dir:
         write_context = WriteContext(simulation_directory=output_dir)
-        write_context.output_directory = output_dir
+        write_context.current_output_directory = output_dir
         wel.write("wel", globaltimes, write_context)
         with open(output_dir + "/wel/wel.dat", "r") as f:
             data = f.read()
@@ -235,7 +235,7 @@ def test_render_concentration_dis_vertices_constant_time(well_test_data_stationa
 
     with tempfile.TemporaryDirectory() as output_dir:
         write_context = WriteContext(simulation_directory=output_dir)
-        write_context.output_directory = output_dir
+        write_context.current_output_directory = output_dir
         wel.write("wel", globaltimes, write_context)
         with open(output_dir + "/wel/wel.dat", "r") as f:
             data = f.read()
@@ -271,7 +271,7 @@ def test_render_concentration_dis_vertices_transient(well_test_data_transient):
 
     with tempfile.TemporaryDirectory() as output_dir:
         write_context = WriteContext(simulation_directory=output_dir)
-        write_context.output_directory = output_dir
+        write_context.current_output_directory = output_dir
         wel.write("wel", time, write_context)
         with open(output_dir + "/wel/wel-0.dat", "r") as f:
             data = f.read()

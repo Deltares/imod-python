@@ -225,7 +225,7 @@ class Package(PackageBase, abc.ABC):
             globaltimes=globaltimes,
             binary=write_context.binary,
         )
-        filename = write_context.output_directory / f"{pkgname}.{self._pkg_id}"
+        filename = write_context.current_output_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
 
@@ -399,7 +399,7 @@ class Package(PackageBase, abc.ABC):
         globaltimes: Union[List, np.ndarray],
         write_context: WriteContext,
     ):
-        directory = write_context.output_directory
+        directory = write_context.current_output_directory
         binary = write_context.binary
         self.write_blockfile(pkgname, globaltimes, write_context)
 
@@ -927,7 +927,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         directory is modelname
         """
-        directory = write_context.output_directory
+        directory = write_context.current_output_directory
         self.write_blockfile(
             pkgname=pkgname,
             globaltimes=globaltimes,
@@ -999,7 +999,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
 
     def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
         self.fill_stress_perioddata()
-        directory = write_context.output_directory
+        directory = write_context.current_output_directory
         self.write_blockfile(pkgname, globaltimes, write_context)
         self.write_perioddata(directory, pkgname, binary=False)
         self.write_packagedata(directory, pkgname, binary=False)
