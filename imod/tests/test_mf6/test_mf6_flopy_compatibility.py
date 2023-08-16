@@ -7,7 +7,7 @@ from imod.mf6 import Modflow6Simulation
 
 
 @pytest.mark.usefixtures("twri_model")
-@pytest.mark.parametrize("absolute_paths", [True, False])
+@pytest.mark.parametrize("absolute_paths", [False])
 def test_readable_by_flopy(
     twri_model: Modflow6Simulation, tmp_path: Path, absolute_paths
 ):

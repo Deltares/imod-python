@@ -22,7 +22,7 @@ def test_dis_render(twri_model, tmp_path):
         globaltimes=None,
         binary=True,
     )
-    path = Path(tmp_path.stem).as_posix()
+    path = Path(tmp_path).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
