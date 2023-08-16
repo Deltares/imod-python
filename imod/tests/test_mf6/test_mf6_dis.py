@@ -165,7 +165,7 @@ def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
     # https://gitlab.com/deltares/imod/imod-python/-/issues/270
     directory = tmp_path / "dis_griddata"
     directory.mkdir()
-    write_context = WriteContext()
+    write_context = WriteContext(simulation_directory=directory)
     write_context.output_directory = directory
     dis.write(pkgname="dis", globaltimes=[], write_context=write_context)
 

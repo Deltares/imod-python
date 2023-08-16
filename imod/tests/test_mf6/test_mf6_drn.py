@@ -50,13 +50,12 @@ def transient_drainage():
 
 def test_write(drainage, tmp_path):
     drn = imod.mf6.Drainage(**drainage)
-    write_context = WriteContext(binary=True)
+    write_context = WriteContext(simulation_directory=tmp_path, binary=True)
     write_context.output_directory = tmp_path
     drn.write("mydrn", [1], write_context)
 
-    dir_for_render = tmp_path.stem
     block_expected = textwrap.dedent(
-        f"""\
+        """\
         begin options
         end options
 
@@ -65,7 +64,7 @@ def test_write(drainage, tmp_path):
         end dimensions
 
         begin period 1
-          open/close {dir_for_render}/mydrn/drn.bin (binary)
+          open/close mydrn/drn.bin (binary)
         end period
         """
     )

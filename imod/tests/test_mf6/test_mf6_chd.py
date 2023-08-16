@@ -185,7 +185,7 @@ def test_write_concentration_period_data(head_fc, concentration_fc):
         save_flows=True,
     )
     with tempfile.TemporaryDirectory() as output_dir:
-        write_context = WriteContext()
+        write_context = WriteContext(simulation_directory=output_dir)
         write_context.output_directory = output_dir
         chd.write("chd", globaltimes, write_context)
         with open(output_dir + "/chd/chd-0.dat", "r") as f:

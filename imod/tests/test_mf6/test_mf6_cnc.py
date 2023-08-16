@@ -126,7 +126,7 @@ def test_write_period_data(concentration_transient):
         save_flows=True,
     )
     with tempfile.TemporaryDirectory() as output_dir:
-        write_context = WriteContext()
+        write_context = WriteContext(simulation_directory=output_dir)
         write_context.output_directory = output_dir
         cnc.write("cnc", globaltimes, write_context)
         with open(output_dir + "/cnc/cnc-0.dat", "r") as f:

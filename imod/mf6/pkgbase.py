@@ -217,7 +217,7 @@ class Package(PackageBase, abc.ABC):
         return env.get_template(fname)
 
     def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
-        directory = write_context.output_directory
+        directory = write_context.get_adjusted_output_directory()
 
         content = self.render(
             directory=directory,
@@ -225,7 +225,7 @@ class Package(PackageBase, abc.ABC):
             globaltimes=globaltimes,
             binary=write_context.binary,
         )
-        filename = directory / f"{pkgname}.{self._pkg_id}"
+        filename = write_context.output_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
 
@@ -331,7 +331,7 @@ class Package(PackageBase, abc.ABC):
         if directory is None:
             directory = pkgname
         else:
-            directory = pathlib.Path(directory.stem) / pkgname
+            directory = pathlib.Path(directory) / pkgname
 
         for varname in self.dataset.data_vars:
             key = self._keyword_map.get(varname, varname)
@@ -820,7 +820,7 @@ class BoundaryCondition(Package, abc.ABC):
             self._write_textfile(outpath, sparse_data)
 
     def period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
-        directory = pathlib.Path(directory.stem) / pkgname
+        directory = pathlib.Path(directory) / pkgname
 
         if binary:
             ext = "bin"
