@@ -27,6 +27,7 @@ def test_readable_by_flopy(
     assert "Normal termination of simulation." in flopy_sim_result[1][-1]
     assert len(flopy_sim_result) == 2
 
+
 @pytest.mark.usefixtures("twri_model")
 @pytest.mark.parametrize("absolute_paths", [True, False])
 def test_readable_by_mf6(
@@ -37,5 +38,5 @@ def test_readable_by_mf6(
         directory=tmp_path, binary=False, validate=True, absolute_paths=absolute_paths
     )
 
-    #the run method will raise an exception if the run does not succeed
+    # the run method will raise an exception if the run does not succeed
     twri_model.run()
