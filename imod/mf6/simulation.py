@@ -2,6 +2,7 @@ import collections
 import pathlib
 import subprocess
 import warnings
+from pathlib import Path
 
 import jinja2
 import numpy as np
@@ -16,6 +17,7 @@ from imod.mf6.model import (
     Modflow6Model,
 )
 from imod.mf6.statusinfo import NestedStatusInfo
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
@@ -124,7 +126,7 @@ class Modflow6Simulation(collections.UserDict):
             timestep_duration=timestep_duration, validate=validate
         )
 
-    def render(self):
+    def render(self, write_context: WriteContext):
         """Renders simulation namefile"""
         d = {}
         models = []
@@ -132,7 +134,15 @@ class Modflow6Simulation(collections.UserDict):
 
         for key, value in self.items():
             if isinstance(value, Modflow6Model):
-                models.append((value._model_id, f"{key}/{key}.nam", key))
+                rootdir = (
+                    write_context.simulation_directory
+                    if write_context.absolute_paths
+                    else ""
+                )
+                model_name_file = str(Path(rootdir) / Path(f"{key}", f"{key}.nam"))
+                model_name_file = model_name_file.replace("\\", "/")
+                models.append((value._model_id, model_name_file, key))
+
             elif value._pkg_id == "tdis":
                 d["tdis6"] = f"{key}.tdis"
             elif value._pkg_id == "ims":
@@ -156,7 +166,9 @@ class Modflow6Simulation(collections.UserDict):
         d["solutiongroups"] = [solutiongroups]
         return self._template.render(d)
 
-    def write(self, directory=".", binary=True, validate: bool = True):
+    def write(
+        self, directory=".", binary=True, validate: bool = True, absolute_paths=False
+    ):
         """
         Write Modflow6 simulation, including assigned groundwater flow and
         transport models.
@@ -172,18 +184,24 @@ class Modflow6Simulation(collections.UserDict):
             Whether to validate the Modflow6 simulation, including models, at
             write. If True, erronous model input will throw a
             ``ValidationError``.
+        absolute_paths: ({True, False}, optional)
+            True if all paths written to the mf6 inputfiles should be absolute.
+            This is recommended if you intend to read the model with Flopy.
         """
+        # create write context
+        write_context = WriteContext(directory, binary, absolute_paths)
+
         # Check models for required content
         for key, model in self.items():
             # skip timedis, exchanges
             if isinstance(model, Modflow6Model):
                 model._model_checks(key)
 
-        directory = pathlib.Path(directory)
+        directory = Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
 
         # Write simulation namefile
-        mfsim_content = self.render()
+        mfsim_content = self.render(write_context)
         mfsim_path = directory / "mfsim.nam"
         with open(mfsim_path, "w") as f:
             f.write(mfsim_content)
@@ -199,20 +217,17 @@ class Modflow6Simulation(collections.UserDict):
             if isinstance(value, Modflow6Model):
                 status_info.add(
                     value.write(
-                        directory=directory,
-                        globaltimes=globaltimes,
                         modelname=key,
-                        binary=binary,
+                        globaltimes=globaltimes,
                         validate=validate,
+                        write_context=write_context,
                     )
                 )
             elif value._pkg_id == "ims":
-                value.write(
-                    directory=directory,
-                    pkgname=key,
-                    globaltimes=globaltimes,
-                    binary=binary,
+                write_context.current_output_directory = (
+                    write_context.simulation_directory
                 )
+                value.write(key, globaltimes, write_context)
 
         if status_info.has_errors():
             raise ValidationError("\n" + status_info.to_string())

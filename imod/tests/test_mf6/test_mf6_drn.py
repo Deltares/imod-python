@@ -7,6 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
@@ -49,10 +50,12 @@ def transient_drainage():
 
 def test_write(drainage, tmp_path):
     drn = imod.mf6.Drainage(**drainage)
-    drn.write(tmp_path, "mydrn", [1], True)
-    dir_for_render = tmp_path.stem
+    write_context = WriteContext(simulation_directory=tmp_path, binary=True)
+    write_context.current_output_directory = tmp_path
+    drn.write("mydrn", [1], write_context)
+
     block_expected = textwrap.dedent(
-        f"""\
+        """\
         begin options
         end options
 
@@ -61,7 +64,7 @@ def test_write(drainage, tmp_path):
         end dimensions
 
         begin period 1
-          open/close {dir_for_render}/mydrn/drn.bin (binary)
+          open/close mydrn/drn.bin (binary)
         end period
         """
     )

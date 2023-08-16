@@ -3,6 +3,7 @@ import collections
 import inspect
 import pathlib
 from copy import deepcopy
+from pathlib import Path
 
 import cftime
 import jinja2
@@ -17,6 +18,7 @@ from imod.mf6 import qgs_util
 from imod.mf6.pkgbase import Package
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import pkg_errors_to_status_info
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
@@ -129,8 +131,13 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 modeltimes.append(repeat_stress.isel(repeat_items=0).values)
         return modeltimes
 
-    def render(self, modelname: str):
-        dir_for_render = pathlib.Path(modelname)
+    def render(self, modelname: str, write_context: WriteContext):
+        if write_context.absolute_paths:
+            sim_dir = write_context.simulation_directory
+            dir_for_render = pathlib.Path(sim_dir / modelname)
+        else:
+            dir_for_render = pathlib.Path(modelname)
+
         d = {k: v for k, v in self._options.items() if not (v is None or v is False)}
         packages = []
         for pkgname, pkg in self.items():
@@ -189,35 +196,35 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         return model_status_info
 
     def write(
-        self, directory, modelname, globaltimes, binary=True, validate: bool = True
+        self, modelname, globaltimes, validate: bool, write_context: WriteContext
     ) -> StatusInfoBase:
         """
         Write model namefile
         Write packages
         """
 
-        workdir = pathlib.Path(directory)
+        workdir = write_context.simulation_directory
         modeldirectory = workdir / modelname
-        modeldirectory.mkdir(exist_ok=True, parents=True)
+        Path(modeldirectory).mkdir(exist_ok=True, parents=True)
         if validate:
             model_status_info = self._validate(modelname)
             if model_status_info.has_errors():
                 return model_status_info
 
         # write model namefile
-        namefile_content = self.render(modelname)
+        namefile_content = self.render(modelname, write_context)
         namefile_path = modeldirectory / f"{modelname}.nam"
         with open(namefile_path, "w") as f:
             f.write(namefile_content)
 
         # write package contents
+        write_context.current_output_directory = modeldirectory
         for pkg_name, pkg in self.items():
             try:
                 pkg.write(
-                    directory=modeldirectory,
                     pkgname=pkg_name,
                     globaltimes=globaltimes,
-                    binary=binary,
+                    write_context=write_context,
                 )
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")
