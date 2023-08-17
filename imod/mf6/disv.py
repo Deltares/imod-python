@@ -1,5 +1,3 @@
-import pathlib
-
 import numpy as np
 import pandas as pd
 
@@ -72,7 +70,7 @@ class VerticesDiscretization(Package):
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, binary):
-        disdirectory = pathlib.Path(directory.stem) / pkgname
+        disdirectory = directory / pkgname
         d = {}
         grid = self.dataset.ugrid.grid
         d["xorigin"] = grid.node_x.min()
@@ -116,7 +114,7 @@ class VerticesDiscretization(Package):
         return df
 
     def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
-        dir_for_render = pathlib.Path(write_context.current_output_directory.stem)
+        dir_for_render = write_context.get_adjusted_output_directory()
         content = self.render(dir_for_render, pkgname, write_context.binary)
         filename = write_context.current_output_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
