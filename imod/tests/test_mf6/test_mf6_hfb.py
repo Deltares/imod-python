@@ -57,7 +57,7 @@ def test_to_mf6_creates_mf6_adapter(
         },
     )
 
-    hfb = barrier_class(geometry, top, bottom, print_input)
+    hfb = barrier_class(geometry, print_input)
 
     # Act.
     _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
@@ -116,7 +116,7 @@ def test_to_mf6_different_z_boundaries(
         },
     )
 
-    hfb = HorizontalFlowBarrierResistance(geometry, top, bottom, print_input)
+    hfb = HorizontalFlowBarrierResistance(geometry, print_input)
 
     # Act.
     _ = hfb.to_mf6_pkg(idomain, top, bottom, k)

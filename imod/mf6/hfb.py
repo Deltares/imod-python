@@ -3,6 +3,7 @@ import copy
 import typing
 from typing import Tuple
 
+import shapely.wkt
 import geopandas as gpd
 import numpy as np
 import xarray as xr
@@ -25,16 +26,27 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
     def __init__(
         self,
         geometry: gpd.GeoDataFrame,
-        top: GridDataArray,
-        bottom: GridDataArray,
         print_input: bool = False,
     ) -> None:
         super().__init__(locals())
-        self.dataset["top"] = top
-        self.dataset["bottom"] = bottom
         self.dataset["print_input"] = print_input
 
         self.dataset = self.dataset.merge(geometry.to_xarray())
+
+    def render(self, directory, pkgname, globaltimes, binary):
+        raise NotImplementedError(
+            f"{self.__class__.__name__} is a grid-agnostic package and does not have a render method. To render the package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()"
+        )
+
+    def _netcdf_encoding(self):
+        return {"geometry": {"dtype": "str"}}
+
+    @classmethod
+    def from_file(cls, path, **kwargs):
+        instance = super().from_file(path, **kwargs)
+        instance.dataset["geometry"] = shapely.wkt.loads(instance.dataset["geometry"])
+
+        return instance
 
     def to_mf6_pkg(
         self,
@@ -351,10 +363,6 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
          - hydraulic_characteristic: the hydraulic characteristic of the barriers
          - ztop: the top z-value of the barriers
          - zbottom: the bottom z-value of the barriers
-    top: GridDataArray
-        DataArray that specifies the top z-value of the top layer
-    bottom: GridDataArray
-        DataArray that specifies the bottom z-value of all layers
     print_input: bool
 
     Examples
@@ -371,18 +379,16 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     >>     },
     >> )
     >>
-    >> hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf, top, bottom)
+    >> hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)
 
     """
 
     def __init__(
         self,
         geometry: gpd.GeoDataFrame,
-        top: GridDataArray,
-        bottom: GridDataArray,
         print_input=False,
     ):
-        super().__init__(geometry, top, bottom, print_input)
+        super().__init__(geometry, print_input)
 
     def _get_barrier_type(self):
         return BarrierType.HydraulicCharacteristic
@@ -410,10 +416,6 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
          - multiplier: the multiplier of the barriers
          - ztop: the top z-value of the barriers
          - zbottom: the bottom z-value of the barriers
-    top: GridDataArray
-        DataArray that specifies the top z-value of the top layer
-    bottom: GridDataArray
-        DataArray that specifies the bottom z-value of all layers
     print_input: bool
 
     Examples
@@ -430,18 +432,16 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     >>     },
     >> )
     >>
-    >> hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf, top, bottom)
+    >> hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)
 
     """
 
     def __init__(
         self,
         geometry: gpd.GeoDataFrame,
-        top: GridDataArray,
-        bottom: GridDataArray,
         print_input=False,
     ):
-        super().__init__(geometry, top, bottom, print_input)
+        super().__init__(geometry, print_input)
 
     def _get_barrier_type(self):
         return BarrierType.Multiplier
@@ -467,10 +467,6 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
          - resistance: the resistance of the barriers
          - ztop: the top z-value of the barriers
          - zbottom: the bottom z-value of the barriers
-    top: GridDataArray
-        DataArray that specifies the top z-value of the top layer
-    bottom: GridDataArray
-        DataArray that specifies the bottom z-value of all layers
     print_input: bool
 
     Examples
@@ -487,7 +483,7 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     >>     },
     >> )
     >>
-    >> hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf, top, bottom)
+    >> hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)
 
 
     """
@@ -495,11 +491,9 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     def __init__(
         self,
         geometry: gpd.GeoDataFrame,
-        top: GridDataArray,
-        bottom: GridDataArray,
         print_input=False,
     ):
-        super().__init__(geometry, top, bottom, print_input)
+        super().__init__(geometry, print_input)
 
     def _get_barrier_type(self):
         return BarrierType.Resistance

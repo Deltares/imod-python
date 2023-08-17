@@ -1,11 +1,12 @@
+import geopandas as gpd
 import numpy as np
 import pandas as pd
+import shapely
 import xarray as xr
 import xugrid as xu
 
 import imod
 import imod.tests.fixtures.mf6_lake_package_fixture as mf_lake
-from imod.mf6.mf6_hfb_adapter import BarrierType
 
 """
 This file is used to create instances of imod packages for testing purposes.
@@ -175,24 +176,6 @@ def create_instance_boundary_condition_packages(is_unstructured):
             head=get_grid_da(is_unstructured, np.float64, 3),
             conductance=get_grid_da(is_unstructured, np.float64, 0.33),
         ),
-        imod.mf6.Mf6HorizontalFlowBarrier(
-            barrier_type=BarrierType.HydraulicCharacteristic,
-            value=get_grid_da(is_unstructured, np.float64, 0.33),
-            idomain=get_grid_da(is_unstructured, int, 1),
-            print_input=True,
-        ),
-        imod.mf6.Mf6HorizontalFlowBarrier(
-            barrier_type=BarrierType.Multiplier,
-            value=get_grid_da(is_unstructured, np.float64, 0.33),
-            idomain=get_grid_da(is_unstructured, int, 1),
-            print_input=True,
-        ),
-        imod.mf6.Mf6HorizontalFlowBarrier(
-            barrier_type=BarrierType.Resistance,
-            value=get_grid_da(is_unstructured, np.float64, 0.33),
-            idomain=get_grid_da(is_unstructured, int, 1),
-            print_input=True,
-        ),
         imod.mf6.Recharge(
             rate=get_grid_da(is_unstructured, np.float64, 0.33),
         ),
@@ -278,6 +261,42 @@ GRIDLESS_PACKAGES = [
         rate=[1.0, 3.0],
         print_flows=True,
         validate=True,
+    ),
+    imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(
+        geometry=gpd.GeoDataFrame(
+            geometry=[
+                shapely.linestrings([-1000.0, 1000.0], [500.0, 500.0]),
+            ],
+            data={
+                "hydraulic_characteristic": [1e-3],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        ),
+    ),
+    imod.mf6.HorizontalFlowBarrierMultiplier(
+        geometry=gpd.GeoDataFrame(
+            geometry=[
+                shapely.linestrings([-1000.0, 1000.0], [500.0, 500.0]),
+            ],
+            data={
+                "multiplier": [1.5],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        ),
+    ),
+    imod.mf6.HorizontalFlowBarrierResistance(
+        geometry=gpd.GeoDataFrame(
+            geometry=[
+                shapely.linestrings([-1000.0, 1000.0], [500.0, 500.0]),
+            ],
+            data={
+                "resistance": [1e3],
+                "ztop": [10.0],
+                "zbottom": [0.0],
+            },
+        ),
     ),
 ]
 

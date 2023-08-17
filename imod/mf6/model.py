@@ -325,7 +325,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 else:
                     pkg.dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
             else:
-                pkg.dataset.to_netcdf(modeldirectory / pkg_path)
+                pkg.to_netcdf(modeldirectory / pkg_path)
 
         toml_path = modeldirectory / f"{modelname}.toml"
         with open(toml_path, "wb") as f:
