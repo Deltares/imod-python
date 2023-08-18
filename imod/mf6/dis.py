@@ -85,7 +85,7 @@ class StructuredDiscretization(Package):
     _regrid_method = {
         "top": (RegridderType.OVERLAP, "mean"),
         "bottom": (RegridderType.OVERLAP, "mean"),
-        "idomain": (RegridderType.OVERLAP, "mean"),
+        "idomain": (RegridderType.OVERLAP, "mode"),
     }
 
     _skip_mask_arrays = ["bottom", "idomain"]

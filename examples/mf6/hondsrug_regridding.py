@@ -22,9 +22,6 @@ import imod
 from imod.typing.grid import GridDataArray
 
 
-
-
-
 # %%
 # Obtain the simulation, write it, run it, and plot some heads.
 # There is a separate example contained in
@@ -92,6 +89,7 @@ hds_regridded = imod.mf6.open_hds(
 fig, ax = plt.subplots()
 hds_regridded.sel(layer=3).isel(time=6).plot(ax=ax)
 
+
 def plot_histograms_side_by_side(
     array_original: GridDataArray, array_regridded: GridDataArray, title: str
 ):
@@ -131,6 +129,7 @@ def write_summary_statistics(
     print(
         f"variance (original) {original.var()}                 variance (regridded) {regridded.var()}"
     )
+
 
 write_summary_statistics(hds_original.isel(time=6), hds_regridded.isel(time=6), "head")
 

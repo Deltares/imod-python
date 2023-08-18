@@ -2,7 +2,7 @@
 TWRI regridding
 ===============
 
-This example focusses on regridding. It uses te TWRI model from modflow6 (`Harbaugh, 2005`_).
+This example focuses on regridding. It uses the TWRI model from modflow6 (`Harbaugh, 2005`_).
 More information about this model can be found in an example dedicated to building this model ( ex01_twri.py)
 
 In overview, we'll set the following steps:
