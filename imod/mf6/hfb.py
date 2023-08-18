@@ -1,6 +1,7 @@
 import abc
 import copy
 import typing
+from enum import Enum
 from typing import Tuple
 
 import geopandas as gpd
@@ -8,10 +9,131 @@ import numpy as np
 import shapely.wkt
 import xarray as xr
 import xugrid as xu
+from fastcore.dispatch import typedispatch
 
 from imod.mf6.boundary_condition import BoundaryCondition
-from imod.mf6.mf6_hfb_adapter import BarrierType, Mf6HorizontalFlowBarrier
+from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.typing.grid import GridDataArray, zeros_like
+
+
+@typedispatch
+def _derive_cell_ids(active: xr.DataArray, grid: xu.Ugrid2d, edge_index: np.ndarray):
+    edge_faces = grid.edge_face_connectivity
+    cell2d = edge_faces[edge_index]
+
+    shape = (active["y"].size, active["x"].size)
+    row_1, column_1 = np.unravel_index(cell2d[:, 0], shape)
+    row_2, column_2 = np.unravel_index(cell2d[:, 1], shape)
+
+    cell_ids = xr.Dataset()
+
+    cell_ids["cell_id1"] = xr.DataArray(
+        np.array([row_1 + 1, column_1 + 1]).T,
+        coords={
+            "edge_index": edge_index,
+            "cell_dims1": ["row_1", "column_1"],
+        },
+    )
+
+    cell_ids["cell_id2"] = xr.DataArray(
+        np.array([row_2 + 1, column_2 + 1]).T,
+        coords={
+            "edge_index": edge_index,
+            "cell_dims2": ["row_2", "column_2"],
+        },
+    )
+
+    return cell_ids
+
+
+@typedispatch
+def _derive_cell_ids(
+    active: xu.UgridDataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
+):
+    edge_faces = grid.edge_face_connectivity
+    cell2d = edge_faces[edge_index]
+
+    cell2d_1 = cell2d[:, 0]
+    cell2d_2 = cell2d[:, 1]
+
+    cell_ids = xr.Dataset()
+
+    cell_ids["cell_id1"] = xr.DataArray(
+        np.array([cell2d_1 + 1]).T,
+        coords={
+            "edge_index": edge_index,
+            "cell_dims1": ["cell2d_1"],
+        },
+    )
+
+    cell_ids["cell_id2"] = xr.DataArray(
+        np.array([cell2d_2 + 1]).T,
+        coords={
+            "edge_index": edge_index,
+            "cell_dims2": ["cell2d_2"],
+        },
+    )
+
+    return cell_ids
+
+
+def to_connected_cells_dataset(
+    idomain: GridDataArray,
+    grid: xu.Ugrid2d,
+    edge_index: np.ndarray,
+    edge_values: typing.Dict,
+) -> xr.Dataset:
+    """
+    Converts a cell edge grid with values defined on the edges to a dataset with the cell ids of the connected cells,
+    the layer of the cells and the value of the edge. The connected cells are returned in cellid notation e.g.(row,
+    column) for structured grid, (mesh2d_nFaces) for unstructured grids.
+
+    Parameters
+    ----------
+    idomain: GridDataArray
+        active domain
+    grid: xu.Ugrid2d,
+        unstructured grid containing the edge to cell array
+    edge_index: np.ndarray
+        indices of the edges for which the edge values will be converted to values in the connected cells
+    edge_values: typing.Dict
+        dictionary containing the value name and the edge values that are applied on the edges identified by the
+        edge_index
+
+    Returns
+        a dataset containing:
+            - cell_id1
+            - cell_id2
+            - layer
+            - value name
+    -------
+
+    """
+    barrier_dataset = _derive_cell_ids(idomain, grid, edge_index)
+
+    for name, values in edge_values.items():
+        barrier_dataset[name] = xr.DataArray(
+            values,
+            dims=["layer", "edge_index"],
+            coords={
+                "edge_index": edge_index,
+                "layer": values.coords["layer"],
+            },
+        )
+
+    barrier_dataset = (
+        barrier_dataset.stack(cell_id=("layer", "edge_index"), create_index=False)
+        .drop_vars("edge_index")
+        .reset_coords()
+    )
+
+    return barrier_dataset
+
+
+class BarrierType(Enum):
+    HydraulicCharacteristic = 0
+    Multiplier = 1
+    Resistance = 2
 
 
 class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
@@ -78,31 +200,43 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
 
         """
         top, bottom, k = self.__broadcast_to_full_domain(idomain, top, bottom, k)
-        top, bottom, k = (
-            self.__to_unstructured(top, bottom, k)
+        grid, top, bottom, k = (
+            self.__to_unstructured(idomain, top, bottom, k)
             if isinstance(idomain, xr.DataArray)
-            else [top, bottom, k]
+            else [idomain.ugrid.grid, top, bottom, k]
         )
         snapped_dataset, edge_index = self.__snap_to_grid(idomain)
 
-        effective_value = self.__effective_value(
-            snapped_dataset, edge_index, top, bottom, k
-        )
+        edge_index = self.__remove_invalid_edges(grid, edge_index)
 
-        barrier_values = (
-            xr.ones_like(top.coords["layer"])
-            * snapped_dataset[self._get_variable_name()]
-        )
+        if self._get_barrier_type() is BarrierType.Multiplier:
+            fraction = self.__compute_barrier_layer_overlap_fraction(
+                snapped_dataset, edge_index, top, bottom
+            )
 
-        if self._get_barrier_type() is not BarrierType.Multiplier:
-            barrier_values.values[:, edge_index] = effective_value
+            barrier_values = (
+                fraction.where(fraction)
+                * snapped_dataset[self._get_variable_name()].values[edge_index]
+            )
+        else:
+            barrier_values = self.__effective_value(
+                snapped_dataset, edge_index, top, bottom, k
+            )
 
-        return Mf6HorizontalFlowBarrier(
-            self._get_barrier_type(),
-            barrier_values,
+        barrier_dataset = to_connected_cells_dataset(
             idomain,
-            self.dataset["print_input"].values.item(),
+            grid,
+            edge_index,
+            {
+                "hydraulic_characteristic": self.__to_hydraulic_characteristic(
+                    barrier_values
+                )
+            },
         )
+
+        barrier_dataset["print_input"] = self.dataset["print_input"].values.item()
+
+        return Mf6HorizontalFlowBarrier(**barrier_dataset)
 
     def __effective_value(
         self,
@@ -112,28 +246,52 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
         bottom: xu.UgridDataArray,
         k: xu.UgridDataArray,
     ) -> xr.DataArray:
-        """ "
+        """
+                        Barrier
         ......................................  ▲     ▲
         .                @@@@                .  |     |
         .                @Rb@                .  | Lb  |
-        .       C1       @@@@        C2      .  ▼     | H
+        .    Cell1       @@@@     Cell2      .  ▼     | H
         .                :  :                .        |
         .                :  :                .        |
         .................:..:.................        ▼
                 k1                    k2
 
         The effective value of a partially emerged barrier in a layer is computed by:
-        c_total=1.0/(fraction/Rb+ (1.0-fraction)/c_aquifer)
-        c_aquifer = 1.0/k_mean = 1.0/((k1+k2)/2.0)
-        fr = Lb/H
+        c_total = 1.0 / (fraction / Rb + (1.0 - fraction) / c_aquifer)
+        c_aquifer = 1.0 / k_mean = 1.0 / ((k1 + k2) / 2.0)
+        fraction = Lb / H
 
         """
+        left, right = snapped_dataset.ugrid.grid.edge_face_connectivity[edge_index].T
+        k_mean = HorizontalFlowBarrierBase.__mean_left_and_right(k, left, right)
+
+        resistance = self.__to_resistance(
+            snapped_dataset[self._get_variable_name()]
+        ).values[edge_index]
+
+        fraction = self.__compute_barrier_layer_overlap_fraction(
+            snapped_dataset, edge_index, top, bottom
+        )
+
+        c_aquifer = 1.0 / k_mean
+        inverse_c = (fraction / resistance) + ((1.0 - fraction) / c_aquifer)
+        c_total = 1.0 / inverse_c
+
+        return self.__from_resistance(c_total)
+
+    def __compute_barrier_layer_overlap_fraction(
+        self,
+        snapped_dataset: xu.UgridDataset,
+        edge_index: np.ndarray,
+        top: xu.UgridDataArray,
+        bottom: xu.UgridDataArray,
+    ):
         left, right = snapped_dataset.ugrid.grid.edge_face_connectivity[edge_index].T
         top_mean = HorizontalFlowBarrierBase.__mean_left_and_right(top, left, right)
         bottom_mean = HorizontalFlowBarrierBase.__mean_left_and_right(
             bottom, left, right
         )
-        k_mean = HorizontalFlowBarrierBase.__mean_left_and_right(k, left, right)
 
         n_layer, n_edge = top_mean.shape
         layer_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
@@ -156,14 +314,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
         height[height <= 0] = np.nan
         fraction = (overlap / height).T
 
-        resistance = self.__to_resistance(
-            snapped_dataset[self._get_variable_name()]
-        ).values[edge_index]
-        c_aquifer = 1.0 / k_mean
-        inverse_c = (fraction / resistance) + ((1.0 - fraction) / c_aquifer)
-        c_total = 1.0 / inverse_c
-
-        return self.__from_resistance(c_total)
+        return xr.ones_like(top_mean) * fraction
 
     def __to_resistance(self, value: xu.UgridDataArray) -> xu.UgridDataArray:
         match self._get_barrier_type():
@@ -184,6 +335,17 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
                 return -1.0 / resistance
             case BarrierType.Resistance:
                 return resistance
+
+        raise ValueError(r"Unknown barrier type {barrier_type}")
+
+    def __to_hydraulic_characteristic(self, value: xr.DataArray) -> xr.DataArray:
+        match self._get_barrier_type():
+            case BarrierType.HydraulicCharacteristic:
+                return value
+            case BarrierType.Multiplier:
+                return -1.0 * value
+            case BarrierType.Resistance:
+                return 1.0 / value
 
         raise ValueError(r"Unknown barrier type {barrier_type}")
 
@@ -321,13 +483,16 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
 
     @staticmethod
     def __to_unstructured(
-        top: xr.DataArray, bottom: xr.DataArray, k: xr.DataArray
-    ) -> Tuple[xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray]:
+        idomain: xr.DataArray, top: xr.DataArray, bottom: xr.DataArray, k: xr.DataArray
+    ) -> Tuple[
+        xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray
+    ]:
+        grid = xu.UgridDataArray.from_structured(idomain).ugrid.grid
         top = xu.UgridDataArray.from_structured(top)
         bottom = xu.UgridDataArray.from_structured(bottom)
         k = xu.UgridDataArray.from_structured(k)
 
-        return top, bottom, k
+        return grid, top, bottom, k
 
     def __snap_to_grid(
         self, idomain: GridDataArray
@@ -344,6 +509,16 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
         ).ravel()
 
         return snapped_dataset, edge_index
+
+    def __remove_invalid_edges(
+        self, grid: xu.Ugrid2d, edge_index: np.ndarray
+    ) -> np.ndarray:
+        valid = (
+            (grid.edge_face_connectivity[edge_index] != grid.fill_value)
+            & (grid.edge_face_connectivity[edge_index] >= 0)
+        ).all(axis=1)
+
+        return edge_index[valid]
 
 
 class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):

@@ -1,10 +1,8 @@
-from enum import Enum
 from pathlib import WindowsPath
-from typing import Dict
+from typing import Union
 
 import numpy as np
 import xarray as xr
-import xugrid as xu
 
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.schemata import (
@@ -14,113 +12,6 @@ from imod.schemata import (
     DTypeSchema,
     IndexesSchema,
 )
-
-
-class BarrierType(Enum):
-    HydraulicCharacteristic = 0
-    Multiplier = 1
-    Resistance = 2
-
-
-def _edge_to_cell(
-    notnull: np.ndarray,
-    arrdict: Dict,
-    layer: np.ndarray,
-    idomain: xu.UgridDataArray,
-    grid: xu.Ugrid2d,
-):
-    nlayer = idomain["idomain_layer"].size
-    idomain2d = idomain.values.reshape((nlayer, -1))
-    no_layer_dim = notnull.ndim == 1
-    edge_faces = grid.edge_face_connectivity
-
-    # Fill in the indices
-    # For every edge, find the connected faces.
-    if no_layer_dim:
-        edge = np.argwhere(notnull).transpose()[0]
-        layer = layer - 1
-        cell2d = edge_faces[edge]
-        valid = ((cell2d != grid.fill_value) & (idomain2d[layer, cell2d] > 0)).all(
-            axis=1
-        )
-    else:
-        layer, edge = np.argwhere(notnull).transpose()
-        layer2d = np.repeat(layer, 2).reshape((-1, 2))
-        cell2d = edge_faces[edge]
-        valid = ((cell2d != grid.fill_value) & (idomain2d[layer2d, cell2d] > 0)).all(
-            axis=1
-        )
-        layer = layer[valid]
-
-    # Skip the exterior edges (marked with a fill value).
-    cell2d = cell2d[valid]
-    c = arrdict["hydraulic_characteristic"][notnull][valid]
-    return layer, cell2d, c
-
-
-def _dis_recarr(arrdict, layer, notnull, idomain, grid):
-    # Define the numpy structured array dtype
-    field_spec = [
-        ("layer_1", np.int32),
-        ("row_1", np.int32),
-        ("column_1", np.int32),
-        ("layer_2", np.int32),
-        ("row_2", np.int32),
-        ("column_2", np.int32),
-        ("hydraulic_characteristic", np.float64),
-    ]
-    sparse_dtype = np.dtype(field_spec)
-    # Find the indices
-    layer, cell2d, c = _edge_to_cell(notnull, arrdict, layer, idomain, grid)
-    shape = (idomain["y"].size, idomain["x"].size)
-    row_1, column_1 = np.unravel_index(cell2d[:, 0], shape)
-    row_2, column_2 = np.unravel_index(cell2d[:, 1], shape)
-    # Set the indices
-    recarr = np.empty(len(cell2d), dtype=sparse_dtype)
-    recarr["layer_1"] = layer + 1
-    recarr["layer_2"] = recarr["layer_1"]
-    recarr["row_1"] = row_1 + 1
-    recarr["column_1"] = column_1 + 1
-    recarr["row_2"] = row_2 + 1
-    recarr["column_2"] = column_2 + 1
-    recarr["hydraulic_characteristic"] = c
-    return recarr
-
-
-def _disv_recarr(arrdict, layer, notnull, idomain, grid):
-    # Define the numpy structured array dtype
-    field_spec = [
-        ("layer_1", np.int32),
-        ("cell2d_1", np.int32),
-        ("layer_2", np.int32),
-        ("cell2d_2", np.int32),
-        ("hydraulic_characteristic", np.float64),
-    ]
-    sparse_dtype = np.dtype(field_spec)
-    # Initialize the structured array
-    layer, cell2d, c = _edge_to_cell(notnull, arrdict, layer, idomain, grid)
-    # Set the indices
-    recarr = np.empty(len(cell2d), dtype=sparse_dtype)
-    recarr["layer_1"] = layer + 1
-    recarr["layer_2"] = recarr["layer_1"]
-    recarr["cell2d_1"] = cell2d[:, 0] + 1
-    recarr["cell2d_2"] = cell2d[:, 1] + 1
-    recarr["hydraulic_characteristic"] = c
-    return recarr
-
-
-def _convert_to_hydraulic_characteristic(
-    barrier_type: BarrierType, value: xu.UgridDataArray
-):
-    match barrier_type:
-        case BarrierType.HydraulicCharacteristic:
-            return value
-        case BarrierType.Multiplier:
-            return -1.0 * value
-        case BarrierType.Resistance:
-            return 1.0 / value
-
-    raise ValueError(r"Unknown barrier type {barrier_type}")
 
 
 class Mf6HorizontalFlowBarrier(BoundaryCondition):
@@ -137,21 +28,58 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
 
     Parameters
     ----------
-    hydraulic_characteristic: xugrid.UgridDataArray
+    cell_id1: xr.DataArray
+        the cell id on 1 side of the barrier. This is either in column, row format for structured grids or in cell2d
+         format for unstructured grids. The DataArray should contain a coordinate "cell_dims1" which specifies the
+          cell_id structure eg:
+            cell_dims1  (cell_dims1) <U8 'row_1' 'column_1' or cell_dims1  (cell_dims1) <U8 'cell2d_1' 'cell2d_1'
+    cell_id2: xr.DataArray
+        the cell id on the other side of the barrier. This is either in column, row format for structured grids or in
+        cell2d format for unstructured grids. The DataArray should contain a coordinate "cell_dims2" which specifies the
+          cell_id structure eg:
+            cell_dims2  (cell_dims2) <U8 'row_2' 'column_2' or cell_dims2  (cell_dims2) <U8 'cell2d_2' 'cell2d_2'
+    layer: xr.DataArray
+        the layers in which the barrier is active
+    hydraulic_characteristic: xr.DataArray
         hydraulic characteristic of the barrier: the inverse of the hydraulic
         resistance. Negative values are interpreted as a multiplier of the cell
         to cell conductance.
-    idomain: xugrid.UgridDataArray or xr.DataArray
 
     Examples
     --------
-    The easiest way to create a horizontal flow barrier is by using
-    ``xugrid.snap_to_grid``, which snaps to the line geometry of a ``geopandas.GeoDataFrame``
-    to a ``xugrid.Ugrid2d`` topology. Note that a layer coordinate is required.
-
-    >> snapped, snapped_gdf = xugrid.snap_to_grid(gdf, grid=idomain)
-    >> characteristic = snapped["characteristic"].assign_coords(layer=1)
-    >> hfb = imod.mf6.HorizontalFlowBarrier(characteristic, idomain=idomain)
+    >> # Structured grid:
+    >> row_1 = [1, 2]
+    >> column_1 = [1, 1]
+    >> row_2 = [1, 2]
+    >> column_2 = [2, 2]
+    >> layer = [1, 2, 3]
+    >>
+    >> cell_indices = np.arange(len(row_1)) + 1
+    >>
+    >> barrier = xr.Dataset()
+    >> barrier["cell_id1"] = xr.DataArray([row_1, column_1], coords={"cell_idx": cell_indices, "cell_dims1": ["row_1", "column_1"]})
+    >> barrier["cell_id2"] = xr.DataArray([row_2, column_2], coords={"cell_idx": cell_indices, "cell_dims2": ["row_2", "column_2"]})
+    >> barrier["hydraulic_characteristic"] = xr.DataArray(np.full((len(layer), len(cell_indices)), 1e-3), coords={"layer": layer, "cell_idx": cell_indices})
+    >> barrier = (barrier.stack(cell_id=("layer", "cell_idx"), create_index=False).drop_vars("cell_idx").reset_coords())
+    >>
+    >> Mf6HorizontalFlowBarrier(**ds)
+    >>
+    >>
+    >> # Unstructured grid
+    >> cell2d_id1 = [1, 2]
+    >> cell2d_id2 = [3, 4]
+    >> layer = [1, 2, 3]
+    >>
+    >> cell_indices = np.arange(len(cell2d_id1)) + 1
+    >>
+    >> barrier = xr.Dataset()
+    >> barrier["cell_id1"] = xr.DataArray(np.array([cell2d_id1]).T, coords={"cell_idx": cell_indices, "cell_dims1": ["cell2d_1"]})
+    >> barrier["cell_id2"] = xr.DataArray(np.array([cell2d_id2]).T, coords={"cell_idx": cell_indices, "cell_dims2": ["cell2d_2"]})
+    >> barrier["hydraulic_characteristic"] = xr.DataArray(np.full((len(layer), len(cell_indices)), 1e-3), coords={"layer": layer, "cell_idx": cell_indices})>>
+    >> barrier = (barrier.stack(cell_id=("layer", "cell_idx"), create_index=False).drop_vars("cell_idx").reset_coords())
+    >>
+    >> Mf6HorizontalFlowBarrier(**ds)
+    >>
 
     """
 
@@ -179,40 +107,54 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
 
     def __init__(
         self,
-        barrier_type: BarrierType,
-        value,
-        idomain,
-        print_input=False,
-        validate: bool = True,
+        cell_id1: xr.DataArray,
+        cell_id2: xr.DataArray,
+        layer: xr.DataArray,
+        hydraulic_characteristic: xr.DataArray,
+        print_input: Union[bool | xr.DataArray] = False,
+        validate: Union[bool | xr.DataArray] = True,
     ):
         super().__init__(locals())
-        hydraulic_characteristic = _convert_to_hydraulic_characteristic(
-            barrier_type, value
-        )
+        self.dataset["cell_id1"] = cell_id1
+        self.dataset["cell_id2"] = cell_id2
+        self.dataset["layer"] = layer
         self.dataset["hydraulic_characteristic"] = hydraulic_characteristic
-        if "layer" in idomain.dims:
-            idomain = idomain.rename({"layer": "idomain_layer"})
-        self.dataset["idomain"] = idomain
         self.dataset["print_input"] = print_input
 
+    def _get_bin_ds(self):
+        bin_ds = self.dataset[
+            ["cell_id1", "cell_id2", "layer", "hydraulic_characteristic"]
+        ]
+
+        return bin_ds
+
+    def _ds_to_arrdict(self, ds):
+        arrdict = super()._ds_to_arrdict(ds)
+        arrdict["cell_dims1"] = ds.coords["cell_dims1"].values
+        arrdict["cell_dims2"] = ds.coords["cell_dims2"].values
+
+        return arrdict
+
     def _to_sparse(self, arrdict, layer):
-        data = next(iter(arrdict.values()))
-        if isinstance(self.dataset["idomain"], xr.DataArray):
-            active = xu.UgridDataArray.from_structured(self.dataset["idomain"])
-            grid = active.ugrid.grid
-        else:
-            grid = self.dataset.ugrid.grid
-        notnull = ~np.isnan(data)
-        idomain = self.dataset["idomain"]
-        if isinstance(idomain, xr.DataArray):
-            recarr = _dis_recarr(arrdict, layer, notnull, idomain, grid)
-        elif isinstance(idomain, xu.UgridDataArray):
-            recarr = _disv_recarr(arrdict, layer, notnull, idomain, grid)
-        else:
-            raise TypeError(
-                "self.dataset should be xarray.Dataset or xugrid.UgridDataset,"
-                f" is {type(self.dataset)} instead"
-            )
+        field_spec = (
+            [("layer_1", np.int32)]
+            + [(dim, np.int32) for dim in arrdict["cell_dims1"]]
+            + [("layer_2", np.int32)]
+            + [(dim, np.int32) for dim in arrdict["cell_dims2"]]
+            + [("hydraulic_characteristic", np.float64)]
+        )
+
+        sparse_dtype = np.dtype(field_spec)
+
+        recarr = np.empty(len(arrdict["hydraulic_characteristic"]), dtype=sparse_dtype)
+        recarr["layer_1"] = arrdict["layer"]
+        for dim, value in dict(zip(arrdict["cell_dims1"], arrdict["cell_id1"])).items():
+            recarr[dim] = value
+        recarr["layer_2"] = arrdict["layer"]
+        for dim, value in dict(zip(arrdict["cell_dims2"], arrdict["cell_id2"])).items():
+            recarr[dim] = value
+        recarr["hydraulic_characteristic"] = arrdict["hydraulic_characteristic"]
+
         return recarr
 
     def write(

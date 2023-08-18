@@ -1,31 +1,33 @@
 from unittest.mock import patch
 
 import geopandas as gpd
+import numpy as np
 import pytest
 import shapely
+import xarray as xr
 import xugrid as xu
 from numpy.testing import assert_array_equal
 
 from imod.mf6 import (
-    BarrierType,
     HorizontalFlowBarrierHydraulicCharacteristic,
     HorizontalFlowBarrierMultiplier,
     HorizontalFlowBarrierResistance,
 )
+from imod.mf6.hfb import to_connected_cells_dataset
 from imod.typing.grid import ones_like
 
 
 @pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])
 @pytest.mark.parametrize(
-    "barrier_class, barrier_type, barrier_value_name, barrier_value",
+    "barrier_class, barrier_value_name, barrier_value, expected_hydraulic_characteristic",
     [
-        (HorizontalFlowBarrierResistance, BarrierType.Resistance, "resistance", 1e3),
-        (HorizontalFlowBarrierMultiplier, BarrierType.Multiplier, "multiplier", 1e-3),
+        (HorizontalFlowBarrierResistance, "resistance", 1e3, 1e-3),
+        (HorizontalFlowBarrierMultiplier, "multiplier", 1.5, -1.5),
         (
             HorizontalFlowBarrierHydraulicCharacteristic,
-            BarrierType.HydraulicCharacteristic,
             "hydraulic_characteristic",
-            1.0,
+            1e-3,
+            1e-3,
         ),
     ],
 )
@@ -34,9 +36,9 @@ def test_to_mf6_creates_mf6_adapter(
     mf6_flow_barrier_mock,
     dis,
     barrier_class,
-    barrier_type,
     barrier_value_name,
     barrier_value,
+    expected_hydraulic_characteristic,
     request,
 ):
     # Arrange.
@@ -45,7 +47,7 @@ def test_to_mf6_creates_mf6_adapter(
 
     print_input = False
 
-    barrier_y = [2.2, 2.2, 2.2]
+    barrier_y = [5.5, 5.5, 5.5]
     barrier_x = [82.0, 40.0, 0.0]
 
     geometry = gpd.GeoDataFrame(
@@ -64,33 +66,50 @@ def test_to_mf6_creates_mf6_adapter(
 
     # Assert.
     snapped, _ = xu.snap_to_grid(geometry, grid=idomain, max_snap_distance=0.5)
-    expected_barrier = snapped[barrier_value_name].broadcast_like(
-        idomain.coords["layer"]
+    edge_index = np.argwhere(snapped[barrier_value_name].notnull().values).ravel()
+
+    grid = (
+        idomain.ugrid.grid
+        if isinstance(idomain, xu.UgridDataArray)
+        else xu.UgridDataArray.from_structured(idomain).ugrid.grid
+    )
+
+    expected_barrier_values = xr.DataArray(
+        np.ones((idomain.coords["layer"].size, edge_index.size)) * barrier_value,
+        dims=("layer", "mesh2d_nFaces"),
+        coords={"layer": idomain.coords["layer"]},
+    )
+
+    expected_values = to_connected_cells_dataset(
+        idomain, grid, edge_index, {barrier_value_name: expected_barrier_values}
     )
 
     mf6_flow_barrier_mock.assert_called_once()
 
-    args, _ = mf6_flow_barrier_mock.call_args
-    assert args[1] is barrier_type
-    assert args[2].equals(expected_barrier)
-    assert args[3] is idomain
-    assert args[4] is print_input
+    _, args = mf6_flow_barrier_mock.call_args
+    assert args["cell_id1"].equals(expected_values["cell_id1"])
+    assert args["cell_id2"].equals(expected_values["cell_id2"])
+    assert args["layer"].equals(expected_values["layer"])
+    assert (
+        args["hydraulic_characteristic"].values.max()
+        == expected_hydraulic_characteristic
+    )
 
 
 @pytest.mark.parametrize(
     "ztop, zbottom, expected_values",
     [
-        (-5.0, -35.0, [1, 1e3, 1]),  # 2nd layer
-        (0.0, -35.0, [1e3, 1e3, 1]),  # 1st and 2nd layer
-        (-5.0, -135.0, [1, 1e3, 1e3]),  # 2nd and 3th layer
-        (-5.0, -135.0, [1, 1e3, 1e3]),  # 2nd and 3th layer
-        (100.0, -135.0, [1e3, 1e3, 1e3]),  # ztop out of bounds
-        (0.0, -200.0, [1e3, 1e3, 1e3]),  # zbottom out of bounds
-        (100.0, 50.0, [1, 1, 1]),  # z-range has no overlap with the domain
+        (-5.0, -35.0, np.array([1, 1e3, 1])),  # 2nd layer
+        (0.0, -35.0, np.array([1e3, 1e3, 1])),  # 1st and 2nd layer
+        (-5.0, -135.0, np.array([1, 1e3, 1e3])),  # 2nd and 3th layer
+        (-5.0, -135.0, np.array([1, 1e3, 1e3])),  # 2nd and 3th layer
+        (100.0, -135.0, np.array([1e3, 1e3, 1e3])),  # ztop out of bounds
+        (0.0, -200.0, np.array([1e3, 1e3, 1e3])),  # zbottom out of bounds
+        (100.0, 50.0, np.array([1, 1, 1])),  # z-range has no overlap with the domain
         (
             0.0,
             -2.5,
-            [1 / ((0.5 / 1e3) + ((1.0 - 0.5) / 1)), 1, 1],
+            np.array([1 / ((0.5 / 1e3) + ((1.0 - 0.5) / 1)), 1, 1]),
         ),  # test effective resistance: 1/((fraction / resistance) + ((1.0 - fraction) / c_aquifer))
     ],
 )
@@ -104,7 +123,7 @@ def test_to_mf6_different_z_boundaries(
 
     print_input = False
 
-    barrier_y = [2.2, 2.2, 2.2]
+    barrier_y = [5.5, 5.5, 5.5]
     barrier_x = [82.0, 40.0, 0.0]
 
     geometry = gpd.GeoDataFrame(
@@ -122,7 +141,7 @@ def test_to_mf6_different_z_boundaries(
     _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
 
     # Assert.
-    args, _ = mf6_flow_barrier_mock.call_args
-    barrier_values = args[2]
-    max_values_per_layer = barrier_values.max("mesh2d_nEdges").values
-    assert_array_equal(max_values_per_layer, expected_values)
+    _, args = mf6_flow_barrier_mock.call_args
+    barrier_values = args["hydraulic_characteristic"].values.reshape(3, 8)
+    max_values_per_layer = barrier_values.max(axis=1)
+    assert_array_equal(max_values_per_layer, 1.0 / expected_values)
