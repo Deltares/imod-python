@@ -37,6 +37,25 @@ class PackageBase(abc.ABC):
     def __setitem__(self, key, value):
         self.dataset.__setitem__(key, value)
 
+    def to_netcdf(self, *args, **kwargs):
+        """
+
+        Write dataset contents to a netCDF file.
+        Custom encoding rules can be provided on package level by overriding the _netcdf_encoding in the package
+
+        """
+        kwargs.update({"encoding": self._netcdf_encoding()})
+        self.dataset.to_netcdf(*args, **kwargs)
+
+    def _netcdf_encoding(self):
+        """
+
+        The encoding used in the to_netcdf method
+        Override this to provide custom encoding rules
+
+        """
+        return {}
+
     @classmethod
     def from_file(cls, path, **kwargs):
         """
