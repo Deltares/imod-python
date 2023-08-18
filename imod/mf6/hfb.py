@@ -3,9 +3,9 @@ import copy
 import typing
 from typing import Tuple
 
-import shapely.wkt
 import geopandas as gpd
 import numpy as np
+import shapely.wkt
 import xarray as xr
 import xugrid as xu
 
