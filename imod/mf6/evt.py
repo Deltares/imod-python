@@ -156,7 +156,7 @@ class Evapotranspiration(BoundaryCondition):
         "surface": (
             RegridderType.OVERLAP,
             "mean",
-        ),  # TODO set to barycentric once supported
+        ),
         "rate": (
             RegridderType.OVERLAP,
             "mean",
