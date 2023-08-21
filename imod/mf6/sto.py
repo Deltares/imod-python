@@ -152,7 +152,7 @@ class SpecificStorage(StorageBase):
     }
 
     _regrid_method = {
-        "convertible": (RegridderType.OVERLAP, "mean"),
+        "convertible": (RegridderType.OVERLAP, "mode"),
         "specific_storage": (RegridderType.OVERLAP, "mean"),
         "specific_yield": (RegridderType.OVERLAP, "mean"),
     }
@@ -276,7 +276,7 @@ class StorageCoefficient(StorageBase):
     }
 
     _regrid_method = {
-        "convertible": (RegridderType.OVERLAP, "mean"),
+        "convertible": (RegridderType.OVERLAP, "mode"),
         "storage_coefficient": (RegridderType.OVERLAP, "mean"),
         "specific_yield": (RegridderType.OVERLAP, "mean"),
     }

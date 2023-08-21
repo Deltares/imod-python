@@ -681,6 +681,13 @@ class Package(PackageBase, abc.ABC):
         that specify how each array should be regridded. These defaults can be overridden using the input
         parameters of this function.
 
+        Examples
+        --------
+        To regrid the npf package with a non-default method for the k-field, call regrid_like with these arguments:
+
+        >>> new_npf = npf.regrid_like(like, {"k": (imod.RegridderType.OVERLAP, "mean")})
+
+
         Parameters
         ----------
         target_grid: xr.DataArray or xu.UgridDataArray

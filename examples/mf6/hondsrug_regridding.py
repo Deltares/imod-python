@@ -21,7 +21,6 @@ from example_models import create_hondsrug_simulation
 import imod
 from imod.typing.grid import GridDataArray
 
-
 # %%
 # Obtain the simulation, write it, run it, and plot some heads.
 # There is a separate example contained in

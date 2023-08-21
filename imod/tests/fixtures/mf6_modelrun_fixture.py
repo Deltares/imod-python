@@ -15,7 +15,7 @@ def assert_simulation_can_run(
     # Run simulation
     simulation.write(
         modeldir, binary=True
-    )  # write binary to the create disv.disv.grb file needed for postprocessing
+    )  # write binary to create the disv.disv.grb file needed for postprocessing
     simulation.write(modeldir, binary=False)  # write into human readable files
 
     simulation.run()
@@ -42,7 +42,7 @@ def assert_simulation_can_run(
     head = head.where(idomain == 1, other=0)
 
     # Test that heads are not nan
-    assert not np.any(np.isnan(head.values))
+    assert not np.any(np.isnull(head.values))
 
 
 def assert_model_can_run(
