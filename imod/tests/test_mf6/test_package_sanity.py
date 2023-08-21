@@ -37,8 +37,11 @@ ADV_BOUNDARY_PACKAGES = [
 ]
 
 HIGH_LEVEL_PACKAGES = [
-    imod.mf6.Well
-]  # add HorizontalFlowBarrier after this one is refactored into being grid-agnostic.
+    imod.mf6.Well,
+    imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic,
+    imod.mf6.HorizontalFlowBarrierMultiplier,
+    imod.mf6.HorizontalFlowBarrierResistance,
+]
 
 
 def check_attributes(pkg_class):
@@ -97,6 +100,6 @@ def test_render_twice(instance, tmp_path):
 def test_save_and_load(instance, tmp_path):
     pkg_class = type(instance)
     path = tmp_path / f"{instance._pkg_id}.nc"
-    instance.dataset.to_netcdf(path)
+    instance.to_netcdf(path)
     back = pkg_class.from_file(path)
     assert instance.dataset.equals(back.dataset)
