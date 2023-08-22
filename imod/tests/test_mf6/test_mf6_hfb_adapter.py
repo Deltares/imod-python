@@ -1,53 +1,78 @@
 import pathlib
 import textwrap
 
-import geopandas as gpd
 import numpy as np
-import pytest
-import shapely
-import xugrid as xu
+import xarray as xr
+from pytest_cases import parametrize_with_cases
 
-import imod
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 
 
-def get_hfb_data_one_layer(grid_xy: xu.UgridDataArray):
-    """
-    Line at cell edges of unstructured flow model
-    """
+class GridBarriers:
+    def case_structured(self):
+        row_1 = [1, 2]
+        column_1 = [1, 1]
+        row_2 = [1, 2]
+        column_2 = [2, 2]
+        layer = [1, 2, 3]
 
-    x = [-1.0, 1.0, 1.0, 3.0, 3.0, 5.0]
-    y = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
-    indices = np.repeat(np.arange(3), 2)
-    linestrings = shapely.linestrings(x, y, indices=indices)
-    lines = gpd.GeoDataFrame(geometry=linestrings)
-    lines["linedata"] = 10.0
+        cell_indices = np.arange(len(row_1)) + 1
 
-    uda, _ = xu.snap_to_grid(lines, grid_xy, 0.2)
+        barrier = xr.Dataset()
+        barrier["cell_id1"] = xr.DataArray(
+            [row_1, column_1],
+            coords={"cell_idx": cell_indices, "cell_dims1": ["row_1", "column_1"]},
+        )
+        barrier["cell_id2"] = xr.DataArray(
+            [row_2, column_2],
+            coords={"cell_idx": cell_indices, "cell_dims2": ["row_2", "column_2"]},
+        )
+        barrier["hydraulic_characteristic"] = xr.DataArray(
+            np.full((len(layer), len(cell_indices)), 1e-3),
+            coords={"layer": layer, "cell_idx": cell_indices},
+        )
+        barrier = (
+            barrier.stack(cell_id=("layer", "cell_idx"), create_index=False)
+            .drop_vars("cell_idx")
+            .reset_coords()
+        )
 
-    line_as_dataarray = uda["linedata"]
-    line_as_dataarray = line_as_dataarray.expand_dims("layer")
-    line_as_dataarray = line_as_dataarray.assign_coords(layer=[1])
+        return barrier
 
-    return line_as_dataarray
+    def case_untructured(self):
+        cell2d_id1 = [1, 2]
+        cell2d_id2 = [3, 4]
+        layer = [1, 2, 3]
+
+        cell_indices = np.arange(len(cell2d_id1)) + 1
+
+        barrier = xr.Dataset()
+        barrier["cell_id1"] = xr.DataArray(
+            np.array([cell2d_id1]).T,
+            coords={"cell_idx": cell_indices, "cell_dims1": ["cell2d_1"]},
+        )
+        barrier["cell_id2"] = xr.DataArray(
+            np.array([cell2d_id2]).T,
+            coords={"cell_idx": cell_indices, "cell_dims2": ["cell2d_2"]},
+        )
+        barrier["hydraulic_characteristic"] = xr.DataArray(
+            np.full((len(layer), len(cell_indices)), 1e-3),
+            coords={"layer": layer, "cell_idx": cell_indices},
+        )
+
+        barrier = (
+            barrier.stack(cell_id=("layer", "cell_idx"), create_index=False)
+            .drop_vars("cell_idx")
+            .reset_coords()
+        )
+
+        return barrier
 
 
-@pytest.mark.parametrize(
-    "barrier_type",
-    [
-        imod.mf6.BarrierType.Resistance,
-        imod.mf6.BarrierType.Multiplier,
-        imod.mf6.BarrierType.HydraulicCharacteristic,
-    ],
-)
-def test_hfb_render_one_layer__unstructured(
-    barrier_type,
-    unstructured_flow_model,
-):
+@parametrize_with_cases("barrier", cases=GridBarriers)
+def test_hfb_render(barrier):
     # Arrange
-    idomain = unstructured_flow_model["disv"]["idomain"]
-    hfb_data_one_layer = get_hfb_data_one_layer(idomain.sel(layer=1))
-    hfb = Mf6HorizontalFlowBarrier(barrier_type, hfb_data_one_layer, idomain)
+    hfb = Mf6HorizontalFlowBarrier(**barrier)
 
     expected = textwrap.dedent(
         """\
@@ -56,7 +81,7 @@ def test_hfb_render_one_layer__unstructured(
         end options
 
         begin dimensions
-          maxhfb 3
+          maxhfb 6
         end dimensions
 
         begin period 1
@@ -72,109 +97,20 @@ def test_hfb_render_one_layer__unstructured(
     assert actual == expected
 
 
-@pytest.mark.parametrize(
-    "barrier_type",
-    [
-        imod.mf6.BarrierType.Resistance,
-        imod.mf6.BarrierType.Multiplier,
-        imod.mf6.BarrierType.HydraulicCharacteristic,
-    ],
-)
-def test_hfb_render_one_layer__structured(
-    barrier_type,
-    structured_flow_model,
-):
+@parametrize_with_cases("barrier", cases=GridBarriers)
+def test_hfb_writing_one_layer__unstructured(barrier, tmp_path):
     # Arrange
-    idomain = structured_flow_model["dis"]["idomain"]
-    grid_xy = xu.UgridDataArray.from_structured(idomain.sel(layer=1))
-    hfb_data_one_layer = get_hfb_data_one_layer(grid_xy)
-    hfb = Mf6HorizontalFlowBarrier(barrier_type, hfb_data_one_layer, idomain)
+    hfb = Mf6HorizontalFlowBarrier(**barrier)
 
-    expected = textwrap.dedent(
-        """\
-        begin options
-
-        end options
-
-        begin dimensions
-          maxhfb 3
-        end dimensions
-
-        begin period 1
-          open/close mymodel/hfb/hfb.dat
-        end period"""
-    )
-
-    # Act
-    directory = pathlib.Path("mymodel")
-    actual = hfb.render(directory, "hfb", None, False)
-
-    # Assert
-    assert actual == expected
-
-
-@pytest.mark.parametrize(
-    "hfb_specialization",
-    [
-        (imod.mf6.BarrierType.Resistance, 0.1),
-        (imod.mf6.BarrierType.Multiplier, -10.0),
-        (imod.mf6.BarrierType.HydraulicCharacteristic, 10.0),
-    ],
-)
-def test_hfb_writing_one_layer__unstructured(
-    hfb_specialization,
-    tmp_path,
-    unstructured_flow_model,
-):
-    barrier_type, expected_value = hfb_specialization
-    # Arrange
-    idomain = unstructured_flow_model["disv"]["idomain"]
-    hfb_data_one_layer = get_hfb_data_one_layer(idomain.sel(layer=1))
-    hfb = Mf6HorizontalFlowBarrier(barrier_type, hfb_data_one_layer, idomain)
-
-    expected_hfb_data = np.array(
-        [
-            [1.0, 13.0, 1.0, 19.0, expected_value],
-            [1.0, 14.0, 1.0, 20.0, expected_value],
-            [1.0, 15.0, 1.0, 21.0, expected_value],
-        ]
-    )
-
-    # Act
-    hfb.write(tmp_path, "hfb", None, False)
-
-    # Assert
-    data = np.loadtxt(tmp_path / "hfb" / "hfb.dat")
-    np.testing.assert_almost_equal(data, expected_hfb_data)
-
-
-@pytest.mark.parametrize(
-    "hfb_specialization",
-    [
-        (imod.mf6.BarrierType.Resistance, 0.1),
-        (imod.mf6.BarrierType.Multiplier, -10.0),
-        (imod.mf6.BarrierType.HydraulicCharacteristic, 10.0),
-    ],
-)
-def test_hfb_writing_one_layer__structured(
-    hfb_specialization,
-    tmp_path,
-    structured_flow_model,
-):
-    barrier_type, expected_value = hfb_specialization
-    # Arrange
-    idomain = structured_flow_model["dis"]["idomain"]
-    grid_xy = xu.UgridDataArray.from_structured(idomain.sel(layer=1))
-    hfb_data_one_layer = get_hfb_data_one_layer(grid_xy)
-    hfb = Mf6HorizontalFlowBarrier(barrier_type, hfb_data_one_layer, idomain)
-
-    expected_hfb_data = np.array(
-        [
-            [1.0, 3.0, 1.0, 1.0, 4.0, 1.0, expected_value],
-            [1.0, 3.0, 2.0, 1.0, 4.0, 2.0, expected_value],
-            [1.0, 3.0, 3.0, 1.0, 4.0, 3.0, expected_value],
-        ]
-    )
+    expected_hfb_data = np.row_stack(
+        (
+            barrier["layer"],
+            barrier["cell_id1"],
+            barrier["layer"],
+            barrier["cell_id2"],
+            barrier["hydraulic_characteristic"],
+        )
+    ).T
 
     # Act
     hfb.write(tmp_path, "hfb", None, False)

@@ -14,7 +14,6 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.mf6.mf6_hfb_adapter import BarrierType
 
 try:
     import geopandas as gpd
@@ -768,69 +767,72 @@ def __split_linestring_into_segments(dataframe):
     return gpd.GeoDataFrame(geometry=segments), linestring_indices[::2]
 
 
+# TODO 513: update the methods to use the new hfb package
 def create_hfb(cache, model, key, value, active, top, bottom, k, **kwargs):
-    target = cache.target
-    dataframe = value["geodataframe"]
-    layer = value["layer"]
-
-    # Split line into segments, which is required to run xu.snap_to_grid
-    # FUTURE: Remove segmentation when xu.snap_to_grid updates.
-    lines, hfb_indices = __split_linestring_into_segments(dataframe)
-
-    if "resistance" in dataframe:
-        lines["resistance"] = dataframe["resistance"][hfb_indices].values
-    elif "multiplier" in dataframe:
-        lines["resistance"] = -1.0 * dataframe["resistance"][hfb_indices].values
-    else:
-        raise ValueError(
-            "Expected resistance or multiplier in HFB dataframe, "
-            f"received instead: {list(dataframe.keys())}"
-        )
-    snapped, _ = xu.snap_to_grid(lines, grid=target, max_snap_distance=0.5)
-
-    resistance = snapped["resistance"]
-    if resistance.isnull().all():
-        return
-
-    if layer != 0:
-        resistance = resistance.assign_coords(layer=layer)
-    else:
-        resistance = multi_layer_hfb(snapped, dataframe, top, bottom, k)
-
-    model[key] = imod.mf6.Mf6HorizontalFlowBarrier(
-        barrier_type=BarrierType.Resistance,
-        value=resistance,
-        idomain=active.astype(int),
-    )
+    # target = cache.target
+    # dataframe = value["geodataframe"]
+    # layer = value["layer"]
+    #
+    # # Split line into segments, which is required to run xu.snap_to_grid
+    # # FUTURE: Remove segmentation when xu.snap_to_grid updates.
+    # lines, hfb_indices = __split_linestring_into_segments(dataframe)
+    #
+    # if "resistance" in dataframe:
+    #     lines["resistance"] = dataframe["resistance"][hfb_indices].values
+    # elif "multiplier" in dataframe:
+    #     lines["resistance"] = -1.0 * dataframe["resistance"][hfb_indices].values
+    # else:
+    #     raise ValueError(
+    #         "Expected resistance or multiplier in HFB dataframe, "
+    #         f"received instead: {list(dataframe.keys())}"
+    #     )
+    # snapped, _ = xu.snap_to_grid(lines, grid=target, max_snap_distance=0.5)
+    #
+    # resistance = snapped["resistance"]
+    # if resistance.isnull().all():
+    #     return
+    #
+    # if layer != 0:
+    #     resistance = resistance.assign_coords(layer=layer)
+    # else:
+    #     resistance = multi_layer_hfb(snapped, dataframe, top, bottom, k)
+    #
+    # model[key] = imod.mf6.Mf6HorizontalFlowBarrier(
+    #     barrier_type=BarrierType.Resistance,
+    #     value=resistance,
+    #     idomain=active.astype(int),
+    # )
     return
 
 
+# TODO 513: update the methods to use the new hfb package
 def merge_hfbs(hfbs, idomain):
-    first = hfbs[0]
-    grid = first.dataset.ugrid.grid
-    layer = idomain["layer"].values
-    n_layer = layer.size
-    n_edge = grid.n_edge
-    c_merged = xr.DataArray(
-        data=np.zeros((n_layer, n_edge), dtype=float),
-        dims=("layer", grid.edge_dimension),
-        coords={"layer": layer},
-    )
-
-    for hfb in hfbs:
-        resistance = hfb["resistance"].fillna(0.0)
-        if "layer" not in resistance.dims:
-            resistance = resistance.expand_dims("layer")
-        for layer, da in resistance.groupby("layer"):
-            c_merged.values[layer - 1, :] += da.values
-
-    final_c = xu.UgridDataArray(
-        c_merged.where(c_merged > 0).dropna("layer", how="all"),
-        grid,
-    )
-    return imod.mf6.Mf6HorizontalFlowBarrier(
-        barrier_type=BarrierType.Resistance, value=final_c, idomain=idomain
-    )
+    # first = hfbs[0]
+    # grid = first.dataset.ugrid.grid
+    # layer = idomain["layer"].values
+    # n_layer = layer.size
+    # n_edge = grid.n_edge
+    # c_merged = xr.DataArray(
+    #     data=np.zeros((n_layer, n_edge), dtype=float),
+    #     dims=("layer", grid.edge_dimension),
+    #     coords={"layer": layer},
+    # )
+    #
+    # for hfb in hfbs:
+    #     resistance = hfb["resistance"].fillna(0.0)
+    #     if "layer" not in resistance.dims:
+    #         resistance = resistance.expand_dims("layer")
+    #     for layer, da in resistance.groupby("layer"):
+    #         c_merged.values[layer - 1, :] += da.values
+    #
+    # final_c = xu.UgridDataArray(
+    #     c_merged.where(c_merged > 0).dropna("layer", how="all"),
+    #     grid,
+    # )
+    # return imod.mf6.Mf6HorizontalFlowBarrier(
+    #     barrier_type=BarrierType.Resistance, value=final_c, idomain=idomain
+    # )
+    return
 
 
 PKG_CONVERSION = {
