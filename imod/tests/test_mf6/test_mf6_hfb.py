@@ -145,3 +145,63 @@ def test_to_mf6_different_z_boundaries(
     barrier_values = args["hydraulic_characteristic"].values.reshape(3, 8)
     max_values_per_layer = barrier_values.max(axis=1)
     assert_array_equal(max_values_per_layer, 1.0 / expected_values)
+
+
+@pytest.mark.parametrize(
+    "barrier_x_loc, expected_number_barriers",
+    [
+        (0.0, 0),  # barrier lies on left boundary
+        (1.0, 1),  # barrier lies between active cells
+        (2.0, 0),  # barrier lies between an active and inactive cell
+    ],
+)
+@patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
+def test_to_mf6_remove_invalid_edges(
+    mf6_flow_barrier_mock, barrier_x_loc, expected_number_barriers
+):
+    # Arrange.
+    shape = nlay, nrow, ncol = 1, 1, 3
+
+    dx = dy = dz = 1
+
+    x = np.array([*range(0, ncol + 1, dx)])
+    y = np.array([*reversed(range(0, nrow + 1, dy))])
+    z = -np.array([*range(0, nlay + 1, dz)])
+
+    xc = (x[:-1] + x[1:]) / 2
+    yc = (y[:-1] + y[1:]) / 2
+
+    layers = np.arange(nlay) + 1
+
+    idomain = xr.DataArray(
+        np.ones(shape, dtype=np.int32), coords={"layer": layers, "y": yc, "x": xc}
+    )
+    idomain = idomain.assign_coords({"dy": dy})
+    idomain.loc[{"x": xc[-1]}] = -1
+
+    top = xr.DataArray([z[0]], coords={"layer": layers})
+    bottom = xr.DataArray(z[1:], coords={"layer": layers})
+    k = ones_like(top)
+
+    barrier_y = [0.0, 2.0]
+    barrier_x = [barrier_x_loc, barrier_x_loc]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [1e3],
+            "ztop": [0],
+            "zbottom": [-5],
+        },
+    )
+
+    hfb = HorizontalFlowBarrierResistance(geometry)
+
+    # Act.
+    _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
+
+    # Assert.
+    _, args = mf6_flow_barrier_mock.call_args
+    assert args["cell_id1"][0, :].size == expected_number_barriers
+    assert args["cell_id2"][0, :].size == expected_number_barriers
+    assert args["layer"].size == expected_number_barriers

@@ -17,11 +17,30 @@ from imod.typing.grid import GridDataArray, zeros_like
 
 
 @typedispatch
-def _derive_cell_ids(active: xr.DataArray, grid: xu.Ugrid2d, edge_index: np.ndarray):
+def _derive_connected_cell_ids(
+    idomain: xr.DataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
+):
+    """
+    Derive the cell ids of the connected cells of an edge on a structured grid.
+
+    Parameters
+    ----------
+    idomain: xr.DataArray
+        The active domain
+    grid :
+        The unstructured grid of the domain
+    edge_index :
+        The indices of the edges from which the connected cell ids are computed
+
+    Returns A dataset containing the cell_id1 and cell_id2 data variables. The  cell dimensions are stored in the
+    cell_dims coordinates.
+    -------
+
+    """
     edge_faces = grid.edge_face_connectivity
     cell2d = edge_faces[edge_index]
 
-    shape = (active["y"].size, active["x"].size)
+    shape = (idomain["y"].size, idomain["x"].size)
     row_1, column_1 = np.unravel_index(cell2d[:, 0], shape)
     row_2, column_2 = np.unravel_index(cell2d[:, 1], shape)
 
@@ -47,9 +66,26 @@ def _derive_cell_ids(active: xr.DataArray, grid: xu.Ugrid2d, edge_index: np.ndar
 
 
 @typedispatch
-def _derive_cell_ids(
-    active: xu.UgridDataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
+def _derive_connected_cell_ids(
+    idomain: xu.UgridDataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
 ):
+    """
+    Derive the cell ids of the connected cells of an edge on an unstructured grid.
+
+    Parameters
+    ----------
+    idomain: xr.DataArray
+        The active domain
+    grid :
+        The unstructured grid of the domain
+    edge_index :
+        The indices of the edges from which the connected cell ids are computed
+
+    Returns A dataset containing the cell_id1 and cell_id2 data variables. The  cell dimensions are stored in the
+    cell_dims coordinates.
+    -------
+
+    """
     edge_faces = grid.edge_face_connectivity
     cell2d = edge_faces[edge_index]
 
@@ -109,7 +145,7 @@ def to_connected_cells_dataset(
     -------
 
     """
-    barrier_dataset = _derive_cell_ids(idomain, grid, edge_index)
+    barrier_dataset = _derive_connected_cell_ids(idomain, grid, edge_index)
 
     for name, values in edge_values.items():
         barrier_dataset[name] = xr.DataArray(
@@ -200,14 +236,14 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
 
         """
         top, bottom, k = self.__broadcast_to_full_domain(idomain, top, bottom, k)
-        grid, top, bottom, k = (
+        unstruct, top, bottom, k = (
             self.__to_unstructured(idomain, top, bottom, k)
             if isinstance(idomain, xr.DataArray)
-            else [idomain.ugrid.grid, top, bottom, k]
+            else [idomain, top, bottom, k]
         )
         snapped_dataset, edge_index = self.__snap_to_grid(idomain)
 
-        edge_index = self.__remove_invalid_edges(grid, edge_index)
+        edge_index = self.__remove_invalid_edges(unstruct, edge_index)
 
         if self._get_barrier_type() is BarrierType.Multiplier:
             fraction = self.__compute_barrier_layer_overlap_fraction(
@@ -225,7 +261,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
 
         barrier_dataset = to_connected_cells_dataset(
             idomain,
-            grid,
+            unstruct.ugrid.grid,
             edge_index,
             {
                 "hydraulic_characteristic": self.__to_hydraulic_characteristic(
@@ -247,6 +283,10 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
         k: xu.UgridDataArray,
     ) -> xr.DataArray:
         """
+        Computes the effective value of a barrier that partially overlaps a cell in the z direction.
+        A barrier always lies on an edge in the xy-plane, however in doesn't have to fully extend in the z-direction to
+        cover the entire layer. This method computes the effective resistance in that case.
+
                         Barrier
         ......................................  ▲     ▲
         .                @@@@                .  |     |
@@ -487,12 +527,12 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
     ) -> Tuple[
         xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray, xu.UgridDataArray
     ]:
-        grid = xu.UgridDataArray.from_structured(idomain).ugrid.grid
+        unstruct = xu.UgridDataArray.from_structured(idomain)
         top = xu.UgridDataArray.from_structured(top)
         bottom = xu.UgridDataArray.from_structured(bottom)
         k = xu.UgridDataArray.from_structured(k)
 
-        return grid, top, bottom, k
+        return unstruct, top, bottom, k
 
     def __snap_to_grid(
         self, idomain: GridDataArray
@@ -511,12 +551,32 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
         return snapped_dataset, edge_index
 
     def __remove_invalid_edges(
-        self, grid: xu.Ugrid2d, edge_index: np.ndarray
+        self, unstructured_grid: xu.UgridDataArray, edge_index: np.ndarray
     ) -> np.ndarray:
-        valid = (
-            (grid.edge_face_connectivity[edge_index] != grid.fill_value)
-            & (grid.edge_face_connectivity[edge_index] >= 0)
-        ).all(axis=1)
+        """
+        Remove invalid edges indices. An edge is considered invalid when:
+        - it lies on an exterior boundary (face_connectivity equals the grid fill value)
+        - The corresponding connected cells are inactive
+        """
+        grid = unstructured_grid.ugrid.grid
+        face_dimension = unstructured_grid.ugrid.grid.face_dimension
+        face_connectivity = grid.edge_face_connectivity[edge_index]
+
+        valid_edges = (face_connectivity != grid.fill_value).all(axis=1)
+
+        connected_cells = -np.ones((len(edge_index), 2))
+        connected_cells[valid_edges, 0] = (
+            unstructured_grid.sel(layer=1)
+            .loc[{face_dimension: face_connectivity[valid_edges, 0]}]
+            .values
+        )
+        connected_cells[valid_edges, 1] = (
+            unstructured_grid.sel(layer=1)
+            .loc[{face_dimension: face_connectivity[valid_edges, 1]}]
+            .values
+        )
+
+        valid = (connected_cells > 0).all(axis=1)
 
         return edge_index[valid]
 
