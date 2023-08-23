@@ -37,7 +37,7 @@ class WriteContext:
     def current_write_directory(self, model_directory: Union[Path, str]) -> None:
         self._output_directory = Path(model_directory)
 
-    def get_adjusted_output_directory(self) -> Path:
+    def get_formatted_output_directory(self) -> Path:
         if self.absolute_paths:
             return self.current_write_directory
         return Path(relpath(self.current_write_directory, self.simulation_directory))

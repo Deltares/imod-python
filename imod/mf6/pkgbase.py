@@ -217,7 +217,7 @@ class Package(PackageBase, abc.ABC):
         return env.get_template(fname)
 
     def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
-        directory = write_context.get_adjusted_output_directory()
+        directory = write_context.get_formatted_output_directory()
 
         content = self.render(
             directory=directory,
