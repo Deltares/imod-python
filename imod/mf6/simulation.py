@@ -139,8 +139,7 @@ class Modflow6Simulation(collections.UserDict):
                     if write_context.absolute_paths
                     else ""
                 )
-                model_name_file = str(Path(rootdir) / Path(f"{key}", f"{key}.nam"))
-                model_name_file = model_name_file.replace("\\", "/")
+                model_name_file =Path(Path(rootdir) / Path(f"{key}", f"{key}.nam")).as_posix()
                 models.append((value._model_id, model_name_file, key))
 
             elif value._pkg_id == "tdis":

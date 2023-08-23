@@ -995,14 +995,22 @@ def zonal_aggregate_raster(
     >>> import imod
     >>> surface_level = imod.rasterio.open("surface_level.tif")
     >>> df = imod.prepare.spatial.zonal_aggregate_raster(
-    >>>    "water-bodies.shp", "id", 1.0, surface_level, "mean"
+    >>>    path="water-bodies.shp",
+    >>>    column="id",
+    >>>    raster=surface_level,
+    >>>    resolution=1.0,
+    >>>    method="mean",
     >>> )
 
     For some functions, like the mode, a function should be passed instead:
 
     >>> import pandas as pd
     >>> df = imod.prepare.spatial.zonal_aggregate_raster(
-    >>>    "water-bodies.shp", "id", 1.0, surface_level, pd.Series.mode
+    >>>    path="water-bodies.shp",
+    >>>    column="id",
+    >>>    raster=surface_level,
+    >>>    resolution=1.0,
+    >>>    method=pd.Series.mode,
     >>> )
     """
     dx, _, _, dy, _, _ = imod.util.spatial_reference(raster)
