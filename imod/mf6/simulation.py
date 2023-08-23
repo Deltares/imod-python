@@ -187,7 +187,6 @@ class Modflow6Simulation(collections.UserDict):
             ``ValidationError``.
         absolute_paths: ({True, False}, optional)
             True if all paths written to the mf6 inputfiles should be absolute.
-            This is recommended if you intend to read the model with Flopy.
         """
         # create write context
         write_context = WriteContext(directory, binary, absolute_paths)
@@ -225,7 +224,7 @@ class Modflow6Simulation(collections.UserDict):
                     )
                 )
             elif value._pkg_id == "ims":
-                write_context.current_output_directory = (
+                write_context.current_write_directory = (
                     write_context.simulation_directory
                 )
                 value.write(key, globaltimes, write_context)

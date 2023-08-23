@@ -980,14 +980,14 @@ class Lake(BoundaryCondition):
         return df
 
     def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
-        renderdir = pathlib.Path(write_context.current_output_directory.stem)
+        renderdir = pathlib.Path(write_context.current_write_directory.stem)
         content = self.render(
             directory=renderdir,
             pkgname=pkgname,
             globaltimes=globaltimes,
             binary=write_context.binary,
         )
-        filename = write_context.current_output_directory / f"{pkgname}.{self._pkg_id}"
+        filename = write_context.current_write_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
             f.write("\n")
@@ -1000,7 +1000,7 @@ class Lake(BoundaryCondition):
             if self._has_laketables():
                 lake_number_to_filename = self._write_laketable_filelist_section(f)
                 self._write_laketable_files(
-                    write_context.current_output_directory, lake_number_to_filename
+                    write_context.current_write_directory, lake_number_to_filename
                 )
 
             if self._has_outlets():

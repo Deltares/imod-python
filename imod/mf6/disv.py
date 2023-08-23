@@ -116,7 +116,7 @@ class VerticesDiscretization(Package):
     def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
         dir_for_render = write_context.get_adjusted_output_directory()
         content = self.render(dir_for_render, pkgname, write_context.binary)
-        filename = write_context.current_output_directory / f"{pkgname}.{self._pkg_id}"
+        filename = write_context.current_write_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
             f.write("\n\n")

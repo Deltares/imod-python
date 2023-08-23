@@ -30,16 +30,16 @@ class WriteContext:
     _output_directory: Optional[Path] = None
 
     @property
-    def current_output_directory(self) -> Optional[Path]:
+    def current_write_directory(self) -> Optional[Path]:
         return self._output_directory
 
-    @current_output_directory.setter
-    def current_output_directory(self, model_directory: Union[Path, str]) -> None:
+    @current_write_directory.setter
+    def current_write_directory(self, model_directory: Union[Path, str]) -> None:
         self._output_directory = Path(model_directory)
 
     def get_adjusted_output_directory(self) -> Path:
-        if not self.absolute_paths:
-            return Path(
-                relpath(self.current_output_directory, self.simulation_directory)
-            )
-        return self.current_output_directory
+        if self.absolute_paths:
+            return self.current_write_directory
+        return Path(
+            relpath(self.current_write_directory, self.simulation_directory)
+        )

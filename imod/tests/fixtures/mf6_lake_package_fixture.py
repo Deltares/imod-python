@@ -134,7 +134,7 @@ def create_lake_data_structured(
 
 def write_and_read(package, path, filename, globaltimes=None) -> str:
     write_context = WriteContext()
-    write_context.current_output_directory = path
+    write_context.current_write_directory = path
     package.write(filename, globaltimes, write_context)
     with open(path / f"{filename}.lak") as f:
         actual = f.read()

@@ -133,10 +133,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def render(self, modelname: str, write_context: WriteContext):
         if write_context.absolute_paths:
-            sim_dir = write_context.simulation_directory
-            dir_for_render = pathlib.Path(sim_dir / modelname)
+            dir_for_render = Path(write_context.simulation_directory / modelname)
         else:
-            dir_for_render = pathlib.Path(modelname)
+            dir_for_render = Path(modelname)
 
         d = {k: v for k, v in self._options.items() if not (v is None or v is False)}
         packages = []
@@ -218,7 +217,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             f.write(namefile_content)
 
         # write package contents
-        write_context.current_output_directory = modeldirectory
+        write_context.current_write_directory = modeldirectory
         for pkg_name, pkg in self.items():
             try:
                 pkg.write(
