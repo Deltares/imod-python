@@ -40,6 +40,4 @@ class WriteContext:
     def get_adjusted_output_directory(self) -> Path:
         if self.absolute_paths:
             return self.current_write_directory
-        return Path(
-            relpath(self.current_write_directory, self.simulation_directory)
-        )
+        return Path(relpath(self.current_write_directory, self.simulation_directory))
