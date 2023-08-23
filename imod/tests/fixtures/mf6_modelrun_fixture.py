@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import numpy as np
+from pandas import isnull
 
 import imod
 
@@ -42,7 +43,7 @@ def assert_simulation_can_run(
     head = head.where(idomain == 1, other=0)
 
     # Test that heads are not nan
-    assert not np.any(np.isnull(head.values))
+    assert not np.any(isnull(head.values))
 
 
 def assert_model_can_run(
