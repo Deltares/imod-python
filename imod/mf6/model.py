@@ -133,7 +133,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def render(self, modelname: str, write_context: WriteContext):
         if write_context.absolute_paths:
-            dir_for_render = Path(write_context.simulation_directory / modelname)
+            dir_for_render = Path(write_context.root_directory / modelname)
         else:
             dir_for_render = Path(modelname)
 
