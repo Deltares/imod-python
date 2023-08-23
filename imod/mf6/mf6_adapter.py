@@ -4,8 +4,8 @@ Module to store (prototype) Modflow 6 adapter classes.
 These are closer to the Modflow 6 data model, with a cellid,
 instead of x, y coordinates.
 
-We plan to split up the present attributes of the classes in pkgbase.py
-(Package and BoundaryCondition) into low-level and high-level classes.
+We plan to split up the present attributes of the classes in Package.py and BoundaryCondition.py into low-level and
+high-level classes.
 
 The high-level class contains grids with x, y, z coordinates, closely linked to
 GIS systems. The low-level classes contain a dataset based on cellid,

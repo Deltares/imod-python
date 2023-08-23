@@ -78,7 +78,7 @@ def well_high_lvl_test_data_stationary():
 
     concentration = da_species * rate_wel
 
-    return screen_top, screen_bottom, y, x, rate_wel, concentration
+    return x, y, screen_top, screen_bottom, rate_wel, concentration
 
 
 @pytest.fixture(scope="session")
@@ -108,7 +108,7 @@ def well_high_lvl_test_data_transient():
 
     concentration = da_species * rate_wel
 
-    return screen_top, screen_bottom, y, x, rate_wel, concentration
+    return x, y, screen_top, screen_bottom, rate_wel, concentration
 
 
 @pytest.fixture(scope="session")

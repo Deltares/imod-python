@@ -102,21 +102,21 @@ class TestModel:
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
 
-        sut = Modflow6Model()
+        model = Modflow6Model()
 
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
 
-        sut["dis"] = discretization_mock
+        model["dis"] = discretization_mock
 
         template_mock = MagicMock(spec_set=Template)
         template_mock.render.return_value = ""
-        sut._template = template_mock
+        model._template = template_mock
 
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = sut.write(tmp_path, model_name, global_times_mock)
+        status = model.write(tmp_path, model_name, global_times_mock)
 
         # Assert.
         assert not status.has_errors()
@@ -126,16 +126,16 @@ class TestModel:
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
 
-        sut = Modflow6Model()
+        model = Modflow6Model()
 
         template_mock = MagicMock(spec_set=Template)
         template_mock.render.return_value = ""
-        sut._template = template_mock
+        model._template = template_mock
 
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = sut.write(tmp_path, model_name, global_times_mock)
+        status = model.write(tmp_path, model_name, global_times_mock)
 
         # Assert.
         assert status.has_errors()
@@ -145,7 +145,7 @@ class TestModel:
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
 
-        sut = Modflow6Model()
+        model = Modflow6Model()
 
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
@@ -153,16 +153,16 @@ class TestModel:
             "test_var": [ValidationError("error_string")]
         }
 
-        sut["dis"] = discretization_mock
+        model["dis"] = discretization_mock
 
         template_mock = MagicMock(spec_set=Template)
         template_mock.render.return_value = ""
-        sut._template = template_mock
+        model._template = template_mock
 
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = sut.write(tmp_path, model_name, global_times_mock)
+        status = model.write(tmp_path, model_name, global_times_mock)
 
         # Assert.
         assert status.has_errors()
@@ -172,7 +172,7 @@ class TestModel:
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
 
-        sut = Modflow6Model()
+        model = Modflow6Model()
 
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
@@ -186,17 +186,17 @@ class TestModel:
             "test2_var": [ValidationError("error_string2")]
         }
 
-        sut["dis"] = discretization_mock
-        sut["test_package"] = package_mock
+        model["dis"] = discretization_mock
+        model["test_package"] = package_mock
 
         template_mock = MagicMock(spec_set=Template)
         template_mock.render.return_value = ""
-        sut._template = template_mock
+        model._template = template_mock
 
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = sut.write(tmp_path, model_name, global_times_mock)
+        status = model.write(tmp_path, model_name, global_times_mock)
 
         # Assert.
         assert len(status.errors) == 2
@@ -207,16 +207,16 @@ class TestGroundwaterFlowModel:
         # Arrange.
         state_for_boundary = None
 
-        sut = GroundwaterFlowModel()
+        model = GroundwaterFlowModel()
 
         # Act.
-        clipped = sut.clip_box(state_for_boundary=state_for_boundary)
+        clipped = model.clip_box(state_for_boundary=state_for_boundary)
 
         # Assert.
         assert "chd_clipped" not in clipped
 
-    @mock.patch("imod.mf6.model.ClippedBoundaryConditionCreator")
-    def test_clip_box_with_state_for_boundary(self, clipped_boundary_condition_creator):
+    @mock.patch("imod.mf6.model.create_clipped_boundary")
+    def test_clip_box_with_state_for_boundary(self, create_clipped_boundary_mock):
         # Arrange.
         state_for_boundary = MagicMock(spec_set=UgridDataArray)
 
@@ -224,31 +224,28 @@ class TestGroundwaterFlowModel:
         discretization_mock._pkg_id = "dis"
         discretization_mock.clip_box.return_value = discretization_mock
 
-        clipped_boundary_condition_creator.create.side_effect = [
+        create_clipped_boundary_mock.side_effect = [
             None,
             MagicMock(spec_set=ConstantHead),
         ]
-        clipped_boundary_condition_creator.return_value = (
-            clipped_boundary_condition_creator
-        )
 
-        sut = GroundwaterFlowModel()
-        sut["dis"] = discretization_mock
+        model = GroundwaterFlowModel()
+        model["dis"] = discretization_mock
 
         # Act.
-        clipped = sut.clip_box(state_for_boundary=state_for_boundary)
+        clipped = model.clip_box(state_for_boundary=state_for_boundary)
 
         # Assert.
         assert "chd_clipped" in clipped
-        clipped_boundary_condition_creator.create.assert_called_with(
+        create_clipped_boundary_mock.assert_called_with(
             discretization_mock["idomain"],
             state_for_boundary,
             [],
         )
 
-    @mock.patch("imod.mf6.model.ClippedBoundaryConditionCreator")
+    @mock.patch("imod.mf6.model.create_clipped_boundary")
     def test_clip_box_with_unassigned_boundaries_in_original_model(
-        self, clipped_boundary_condition_creator
+        self, create_clipped_boundary_mock
     ):
         # Arrange.
         state_for_boundary = MagicMock(spec_set=UgridDataArray)
@@ -262,24 +259,21 @@ class TestGroundwaterFlowModel:
 
         unassigned_boundary_constant_head_mock = MagicMock(spec_set=ConstantHead)
 
-        clipped_boundary_condition_creator.create.side_effect = [
+        create_clipped_boundary_mock.side_effect = [
             unassigned_boundary_constant_head_mock,
             MagicMock(spec_set=ConstantHead),
         ]
-        clipped_boundary_condition_creator.return_value = (
-            clipped_boundary_condition_creator
-        )
 
-        sut = GroundwaterFlowModel()
-        sut["dis"] = discretization_mock
-        sut["chd"] = constant_head_mock
+        model = GroundwaterFlowModel()
+        model["dis"] = discretization_mock
+        model["chd"] = constant_head_mock
 
         # Act.
-        clipped = sut.clip_box(state_for_boundary=state_for_boundary)
+        clipped = model.clip_box(state_for_boundary=state_for_boundary)
 
         # Assert.
         assert "chd_clipped" in clipped
-        clipped_boundary_condition_creator.create.assert_called_with(
+        create_clipped_boundary_mock.assert_called_with(
             discretization_mock["idomain"],
             state_for_boundary,
             [constant_head_mock, unassigned_boundary_constant_head_mock],

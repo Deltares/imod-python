@@ -27,10 +27,10 @@ def test_regrid_structured_model_with_wells_to_structured_model(
     structured_flow_model: imod.mf6.GroundwaterFlowModel,
 ):
     well_package = imod.mf6.Well(
+        x=[2.0, 3.0],
+        y=[1.0, 5.0],
         screen_top=[0.0, 1],
         screen_bottom=[-5.0, -6.0],
-        y=[1.0, 5.0],
-        x=[2.0, 3.0],
         rate=[1.0, 3.0],
     )
     structured_flow_model["well"] = well_package
@@ -48,10 +48,10 @@ def test_regrid_unstructured_model_with_wells_to_unstructured_model(
     unstructured_flow_model: imod.mf6.GroundwaterFlowModel,
 ):
     well_package = imod.mf6.Well(
+        x=[2.0, 3.0],
+        y=[1.0, 5.0],
         screen_top=[0.0, 1],
         screen_bottom=[-5.0, -6.0],
-        y=[1.0, 5.0],
-        x=[2.0, 3.0],
         rate=[1.0, 3.0],
     )
     unstructured_flow_model["well"] = well_package

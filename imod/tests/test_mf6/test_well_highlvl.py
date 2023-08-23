@@ -60,10 +60,10 @@ class WriteWell:
 )
 def test_write_well(tmp_path: Path, grid_data, grid_data_layered, reference_output):
     well = imod.mf6.Well(
-        screen_top=[0.0, 0.0, 0.0],
-        screen_bottom=[-1, -3.0, -5.0],
         x=[1.0, 3.0, 6.0],
         y=[3.0, 3.0, 3.0],
+        screen_top=[0.0, 0.0, 0.0],
+        screen_bottom=[-1, -3.0, -5.0],
         rate=[1.0, 3.0, 5.0],
         print_flows=True,
         validate=True,
@@ -90,10 +90,10 @@ def test_write_well_from_model(
     tmp_path: Path, twri_simulation: imod.mf6.Modflow6Simulation
 ):
     twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
-        screen_top=[0.0, 0.0],
-        screen_bottom=[-10.0, -10.0],
         x=[1.0, 6002.0],
         y=[3.0, 5004.0],
+        screen_top=[0.0, 0.0],
+        screen_bottom=[-10.0, -10.0],
         rate=[1.0, 3.0],
         print_flows=True,
         validate=True,
@@ -114,10 +114,10 @@ def test_write_all_wells_filtered_out(
 ):
     # for this test, we leave the low conductivity of the twri model as is, so all wells get filtered out
     twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
-        screen_top=[0.0, 0.0],
-        screen_bottom=[-10.0, -10.0],
         x=[1.0, 6002.0],
         y=[3.0, 5004.0],
+        screen_top=[0.0, 0.0],
+        screen_bottom=[-10.0, -10.0],
         rate=[1.0, 3.0],
         print_flows=True,
         validate=True,
@@ -134,10 +134,10 @@ def test_write_one_well_filtered_out(
     # and gets filtered out alltogether
     twri_simulation["GWF_1"]["npf"]["k"] *= 20000
     twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
-        screen_top=[0.0, 0.0],
-        screen_bottom=[-10.0, -0.01],
         x=[1.0, 6002.0],
         y=[3.0, 5004.0],
+        screen_top=[0.0, 0.0],
+        screen_bottom=[-10.0, -0.01],
         rate=[1.0, 3.0],
         print_flows=True,
         validate=True,
@@ -158,10 +158,10 @@ def test_write_one_layer_filtered_out(
 
     # define 2 wells penetrating all layers
     twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
-        screen_top=[0.0, 0.0],
-        screen_bottom=[-400.0, -400],
         x=[1.0, 6002.0],
         y=[3.0, 5004.0],
+        screen_top=[0.0, 0.0],
+        screen_bottom=[-400.0, -400],
         rate=[1.0, 3.0],
         print_flows=True,
         validate=True,
@@ -183,10 +183,10 @@ def test_constraints_are_configurable(
 ):
     # define 2 wells penetrating all layers
     twri_simulation["GWF_1"]["well"] = imod.mf6.Well(
-        screen_top=[0.0, 0.0],
-        screen_bottom=[-400.0, -400],
         x=[1.0, 6002.0],
         y=[3.0, 5004.0],
+        screen_top=[0.0, 0.0],
+        screen_bottom=[-400.0, -400],
         rate=[1.0, 3.0],
         print_flows=True,
         validate=True,
