@@ -1,3 +1,4 @@
+from __future__ import annotations
 from copy import deepcopy
 from dataclasses import dataclass
 from os.path import relpath
@@ -47,13 +48,13 @@ class WriteContext:
             return self.write_directory
         return Path(relpath(self.write_directory, self.simulation_directory))
 
-    def copy_with_new_write_directory(self, new_write_directory: Path) -> Path:
+    def copy_with_new_write_directory(self, new_write_directory: Path) -> WriteContext:
         new_context = deepcopy(self)
-        new_context.write_directory = new_write_directory
+        new_context.write_directory = Path(new_write_directory)
         return new_context
 
     @property
-    def root_directory(self):
+    def root_directory(self) -> Path:
         """
         returns the simulation directory, or nothing, depending on use_absolute_paths; use this to compose paths
         that are in agreement with the use_absolute_paths setting.

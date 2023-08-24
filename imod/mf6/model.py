@@ -132,7 +132,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         return modeltimes
 
     def render(self, modelname: str, write_context: WriteContext):
-        dir_for_render = Path(write_context.root_directory / modelname)
+        dir_for_render = write_context.root_directory / modelname
 
         d = {k: v for k, v in self._options.items() if not (v is None or v is False)}
         packages = []

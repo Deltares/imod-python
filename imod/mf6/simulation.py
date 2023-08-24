@@ -131,11 +131,10 @@ class Modflow6Simulation(collections.UserDict):
         d = {}
         models = []
         solutiongroups = []
-
         for key, value in self.items():
             if isinstance(value, Modflow6Model):
                 model_name_file = Path(
-                    Path(write_context.root_directory) / Path(f"{key}", f"{key}.nam")
+                    write_context.root_directory / Path(f"{key}", f"{key}.nam")
                 ).as_posix()
                 models.append((value._model_id, model_name_file, key))
 
