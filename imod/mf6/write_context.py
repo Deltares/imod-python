@@ -25,7 +25,7 @@ class WriteContext:
     """
 
     simulation_directory: Path = "."
-    binary: bool = False
+    use_binary: bool = False
     use_absolute_paths: bool = False
     _output_directory: Optional[Path] = None
 

@@ -6,7 +6,7 @@ def test_simulation_writes_full_paths_if_requested(circle_model, tmp_path):
     simulation = circle_model
     sim_dir = tmp_path / "circle"
 
-    simulation.write(sim_dir, binary=False, absolute_paths=True)
+    simulation.write(sim_dir, binary=False, use_absolute_paths=True)
 
     simdir_separator_count = str(sim_dir.as_posix()).count("/")
     modeldir_separator_count = simdir_separator_count + 2

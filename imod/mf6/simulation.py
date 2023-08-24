@@ -163,7 +163,11 @@ class Modflow6Simulation(collections.UserDict):
         return self._template.render(d)
 
     def write(
-        self, directory=".", binary=True, validate: bool = True, use_absolute_paths=False
+        self,
+        directory=".",
+        binary=True,
+        validate: bool = True,
+        use_absolute_paths=False,
     ):
         """
         Write Modflow6 simulation, including assigned groundwater flow and

@@ -985,7 +985,7 @@ class Lake(BoundaryCondition):
             directory=renderdir,
             pkgname=pkgname,
             globaltimes=globaltimes,
-            binary=write_context.binary,
+            binary=write_context.use_binary,
         )
         filename = write_context.current_write_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:

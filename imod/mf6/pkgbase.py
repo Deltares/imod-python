@@ -223,7 +223,7 @@ class Package(PackageBase, abc.ABC):
             directory=directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
-            binary=write_context.binary,
+            binary=write_context.use_binary,
         )
         filename = write_context.current_write_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
@@ -400,7 +400,7 @@ class Package(PackageBase, abc.ABC):
         write_context: WriteContext,
     ):
         directory = write_context.current_write_directory
-        binary = write_context.binary
+        binary = write_context.use_binary
         self.write_blockfile(pkgname, globaltimes, write_context)
 
         if hasattr(self, "_grid_data"):
@@ -936,7 +936,7 @@ class BoundaryCondition(Package, abc.ABC):
         self.write_perioddata(
             directory=directory,
             pkgname=pkgname,
-            binary=write_context.binary,
+            binary=write_context.use_binary,
         )
 
     def assign_dims(self, arg) -> Dict:

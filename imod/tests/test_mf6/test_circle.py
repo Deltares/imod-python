@@ -19,7 +19,7 @@ def test_simulation_write_and_run(circle_model, tmp_path):
         circle_model.run()
 
     modeldir = tmp_path / "circle"
-    simulation.write(modeldir, binary=False, absolute_paths=True)
+    simulation.write(modeldir, binary=False, use_absolute_paths=True)
     simulation.run()
 
     head = imod.mf6.open_hds(
