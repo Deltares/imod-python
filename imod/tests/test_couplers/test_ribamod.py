@@ -1,7 +1,6 @@
-from dataclasses import asdict
-
 import geopandas as gpd
 import pandas as pd
+import pytest
 from shapely.geometry import Polygon
 
 import imod
@@ -18,10 +17,9 @@ except ModuleNotFoundError:
     import tomli as tomllib
 
 
-def test_ribamod_write_toml(ribasim_model, coupled_ribasim_mf6_model, tmp_path):
-    mf6_modelname, mf6_model = get_mf6_gwf_modelnames(coupled_ribasim_mf6_model)[0]
-    mf6_river_packages = get_mf6_river_packagenames(mf6_model)
-
+@pytest.fixture
+def basin_definition(coupled_ribasim_mf6_model, ribasim_model) -> gpd.GeoDataFrame:
+    _, mf6_model = get_mf6_gwf_modelnames(coupled_ribasim_mf6_model)[0]
     _, xmin, xmax, _, ymin, ymax = imod.util.spatial_reference(
         mf6_model["dis"]["idomain"]
     )
@@ -34,7 +32,44 @@ def test_ribamod_write_toml(ribasim_model, coupled_ribasim_mf6_model, tmp_path):
             [xmin, ymax],
         ]
     )
-    basin_definition = gpd.GeoDataFrame(data={"basin_id": node_id}, geometry=[polygon])
+    return gpd.GeoDataFrame(data={"basin_id": node_id}, geometry=[polygon])
+
+
+def test_ribamod_write(
+    ribasim_model, coupled_ribasim_mf6_model, basin_definition, tmp_path
+):
+    mf6_modelname, mf6_model = get_mf6_gwf_modelnames(coupled_ribasim_mf6_model)[0]
+    mf6_river_packages = get_mf6_river_packagenames(mf6_model)
+
+    driver_coupling = DriverCoupling(
+        mf6_model=mf6_modelname,
+        mf6_active_river_packages=mf6_river_packages,
+    )
+
+    coupled_models = RibaMod(
+        ribasim_model,
+        coupled_ribasim_mf6_model,
+        coupling_list=[driver_coupling],
+        basin_definition=basin_definition,
+    )
+    output_dir = tmp_path / "ribamod"
+    coupling_dict = coupled_models.write_exchanges(output_dir)
+
+    exchange_path = output_dir / "exchanges" / "riv-1.tsv"
+    expected_dict = {"mf6_active_river_packages": {"riv-1": exchange_path.as_posix()}}
+    assert coupling_dict == expected_dict
+
+    assert exchange_path.exists()
+    exchange_df = pd.read_csv(exchange_path, sep="\t")
+    expected_df = pd.DataFrame(data={"basin_id": [1], "bound_id": [8]})
+    assert exchange_df.equals(expected_df)
+
+
+def test_ribamod_write_toml(
+    ribasim_model, coupled_ribasim_mf6_model, basin_definition, tmp_path
+):
+    mf6_modelname, mf6_model = get_mf6_gwf_modelnames(coupled_ribasim_mf6_model)[0]
+    mf6_river_packages = get_mf6_river_packagenames(mf6_model)
 
     driver_coupling = DriverCoupling(
         mf6_model=mf6_modelname,
@@ -57,12 +92,6 @@ def test_ribamod_write_toml(ribasim_model, coupled_ribasim_mf6_model, tmp_path):
 
     with open(output_dir / "imod_coupler.toml", mode="rb") as f:
         toml_dict = tomllib.load(f)
-
-    exchange_path = output_dir / "exchanges" / "riv-1.tsv"
-    assert exchange_path.exists()
-    exchange_df = pd.read_csv(exchange_path, sep="\t")
-    expected_df = pd.DataFrame(data={"basin_id": [1], "bound_id": [8]})
-    assert exchange_df.equals(expected_df)
 
     # This contains empty tupled, which are removed in the TOML
     dict_coupling_expected = {k: v for k, v in coupling_dict.items() if v}
