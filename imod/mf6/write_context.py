@@ -14,7 +14,7 @@ class WriteContext:
     ----------
     simulation_directory: Path
         The directory where the .nam file for the modflow simulation will be written
-    binary: bool
+    use_binary: bool
         If True, bulk data will be written in a binary format readable by modflow. Regular package input files
         will still be rendered as text.
     use_absolute_paths: bool
