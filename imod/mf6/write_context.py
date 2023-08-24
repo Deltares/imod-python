@@ -45,6 +45,11 @@ class WriteContext:
         )
 
     def get_formatted_write_directory(self) -> Path:
+        """
+        This method returns a path that is absolute or relative in agreement with the use_absolute_paths setting.
+        This is usefull when the path will be written to a modflow input file. If it is not absolute, it will
+        be relative to the simulation directory, which makes it usable by MF6.
+        """
         if self.use_absolute_paths:
             return self.__write_directory
         return Path(relpath(self.write_directory, self.__simulation_directory))
