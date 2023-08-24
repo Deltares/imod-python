@@ -1,7 +1,7 @@
 from collections import defaultdict
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 import numpy as np
 import pandas as pd
@@ -9,7 +9,7 @@ import tomli_w
 import imod
 import xarray as xr
 
-from imod.mf6 import Modflow6Simulation, River, Drainage
+from imod.mf6 import GroundwaterFlowModel, Modflow6Simulation, River, Drainage
 from imod.util import MissingOptionalModule
 
 try:
@@ -168,13 +168,18 @@ class RibaMod:
             tomli_w.dump(coupler_toml, f)
 
     @staticmethod
-    def validate_keys(gwf_model, active_keys, passive_keys, expected_type):
+    def validate_keys(
+        gwf_model: GroundwaterFlowModel,
+        active_keys: List[str],
+        passive_keys: List[str],
+        expected_type: Union[Type[River], Type[Drainage]],
+    ):
         active_keys = set(active_keys)
         passive_keys = set(passive_keys)
         intersection = active_keys.intersection(passive_keys)
         if intersection:
             raise ValueError(
-                f"active and passive keys contain common keys: {intersection}"
+                f"active and passive keys share members: {intersection}"
             )
         present = [k for k, v in gwf_model.items() if isinstance(v, expected_type)]
         missing = (active_keys | passive_keys).difference(present)
@@ -202,7 +207,7 @@ class RibaMod:
     def write_exchanges(
         self,
         directory: Union[str, Path],
-    ) -> Dict:
+    ) -> Dict[str, Dict[str, str]]:
         gwf_names = self._get_gwf_modelnames()
         coupling = self.coupling_list
 
