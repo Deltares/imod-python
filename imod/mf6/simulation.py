@@ -131,15 +131,11 @@ class Modflow6Simulation(collections.UserDict):
         d = {}
         models = []
         solutiongroups = []
-
         for key, value in self.items():
             if isinstance(value, Modflow6Model):
-                rootdir = (
-                    write_context.simulation_directory
-                    if write_context.absolute_paths
-                    else ""
-                )
-                model_name_file =Path(Path(rootdir) / Path(f"{key}", f"{key}.nam")).as_posix()
+                model_name_file = Path(
+                    write_context.root_directory / Path(f"{key}", f"{key}.nam")
+                ).as_posix()
                 models.append((value._model_id, model_name_file, key))
 
             elif value._pkg_id == "tdis":
@@ -165,7 +161,13 @@ class Modflow6Simulation(collections.UserDict):
         d["solutiongroups"] = [solutiongroups]
         return self._template.render(d)
 
-    def write(self, directory=".", binary=True, validate: bool = True):
+    def write(
+        self,
+        directory=".",
+        binary=True,
+        validate: bool = True,
+        use_absolute_paths=False,
+    ):
         """
         Write Modflow6 simulation, including assigned groundwater flow and
         transport models.
@@ -181,9 +183,11 @@ class Modflow6Simulation(collections.UserDict):
             Whether to validate the Modflow6 simulation, including models, at
             write. If True, erronous model input will throw a
             ``ValidationError``.
+        absolute_paths: ({True, False}, optional)
+            True if all paths written to the mf6 inputfiles should be absolute.
         """
         # create write context
-        write_context = WriteContext(directory, binary, False)
+        write_context = WriteContext(directory, binary, use_absolute_paths)
 
         # Check models for required content
         for key, model in self.items():
@@ -207,6 +211,9 @@ class Modflow6Simulation(collections.UserDict):
         status_info = NestedStatusInfo("Simulation validation status")
         globaltimes = self["time_discretization"]["time"].values
         for key, value in self.items():
+            model_write_context = write_context.copy_with_new_write_directory(
+                write_context.simulation_directory
+            )
             # skip timedis, exchanges
             if isinstance(value, Modflow6Model):
                 status_info.add(
@@ -214,14 +221,14 @@ class Modflow6Simulation(collections.UserDict):
                         modelname=key,
                         globaltimes=globaltimes,
                         validate=validate,
-                        write_context=write_context,
+                        write_context=model_write_context,
                     )
                 )
             elif value._pkg_id == "ims":
-                write_context.current_output_directory = (
+                ims_write_context = write_context.copy_with_new_write_directory(
                     write_context.simulation_directory
                 )
-                value.write(key, globaltimes, write_context)
+                value.write(key, globaltimes, ims_write_context)
 
         if status_info.has_errors():
             raise ValidationError("\n" + status_info.to_string())

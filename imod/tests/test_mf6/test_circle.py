@@ -19,7 +19,7 @@ def test_simulation_write_and_run(circle_model, tmp_path):
         circle_model.run()
 
     modeldir = tmp_path / "circle"
-    simulation.write(modeldir, binary=False)
+    simulation.write(modeldir, binary=False, use_absolute_paths=True)
     simulation.run()
 
     head = imod.mf6.open_hds(
@@ -35,8 +35,9 @@ def test_gwfmodel_render(circle_model, tmp_path):
     simulation = circle_model
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
-    actual = gwfmodel.render(tmp_path)
-    path = tmp_path.as_posix()
+    write_context = WriteContext()
+    actual = gwfmodel.render("GWF_1", write_context)
+    path = "GWF_1"
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -87,8 +88,9 @@ def test_gwfmodel_render_evt(circle_model_evt, tmp_path):
     simulation = circle_model_evt
     globaltimes = simulation["time_discretization"]["time"].values
     gwfmodel = simulation["GWF_1"]
-    actual = gwfmodel.render(tmp_path)
-    path = tmp_path.as_posix()
+    write_context = WriteContext()
+    actual = gwfmodel.render("GWF_1", write_context)
+    path = "GWF_1"
     expected = textwrap.dedent(
         f"""\
             begin options

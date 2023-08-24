@@ -5,6 +5,7 @@ import pytest
 
 import imod
 from imod.mf6.adv import AdvectionCentral
+from imod.mf6.write_context import WriteContext
 
 
 def test_long_package_name():
@@ -22,7 +23,10 @@ def test_transport_model_rendering():
     m = imod.mf6.GroundwaterTransportModel(print_input=True, save_flows=True)
     m["dsp"] = disp
     m["adv"] = adv
-    actual = m.render("transport")
+    write_context = WriteContext()
+    actual = m.render("GWF_1", write_context)
+
+    actual = m.render("transport", write_context)
     expected = textwrap.dedent(
         """\
       begin options

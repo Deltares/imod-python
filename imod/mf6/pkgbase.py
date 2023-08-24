@@ -216,14 +216,16 @@ class Package(PackageBase, abc.ABC):
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
 
-    def write_blockfile(self, directory, pkgname, globaltimes, binary):
+    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+        directory = write_context.get_formatted_write_directory()
+
         content = self.render(
             directory=directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
-            binary=binary,
+            binary=write_context.use_binary,
         )
-        filename = directory / f"{pkgname}.{self._pkg_id}"
+        filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
 
@@ -329,7 +331,7 @@ class Package(PackageBase, abc.ABC):
         if directory is None:
             directory = pkgname
         else:
-            directory = pathlib.Path(directory.stem) / pkgname
+            directory = pathlib.Path(directory) / pkgname
 
         for varname in self.dataset.data_vars:
             key = self._keyword_map.get(varname, varname)
@@ -397,9 +399,9 @@ class Package(PackageBase, abc.ABC):
         globaltimes: Union[List, np.ndarray],
         write_context: WriteContext,
     ):
-        directory = write_context.current_output_directory
-        binary = write_context.binary
-        self.write_blockfile(directory, pkgname, globaltimes, binary)
+        directory = write_context.write_directory
+        binary = write_context.use_binary
+        self.write_blockfile(pkgname, globaltimes, write_context)
 
         if hasattr(self, "_grid_data"):
             if self._is_xy_data(self.dataset):
@@ -818,7 +820,7 @@ class BoundaryCondition(Package, abc.ABC):
             self._write_textfile(outpath, sparse_data)
 
     def period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
-        directory = pathlib.Path(directory.stem) / pkgname
+        directory = pathlib.Path(directory) / pkgname
 
         if binary:
             ext = "bin"
@@ -925,17 +927,16 @@ class BoundaryCondition(Package, abc.ABC):
 
         directory is modelname
         """
-        directory = write_context.current_output_directory
+        directory = write_context.write_directory
         self.write_blockfile(
-            directory=directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
-            binary=write_context.binary,
+            write_context=write_context,
         )
         self.write_perioddata(
             directory=directory,
             pkgname=pkgname,
-            binary=write_context.binary,
+            binary=write_context.use_binary,
         )
 
     def assign_dims(self, arg) -> Dict:
@@ -998,8 +999,8 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
 
     def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
         self.fill_stress_perioddata()
-        directory = write_context.current_output_directory
-        self.write_blockfile(directory, pkgname, globaltimes, binary=False)
+        directory = write_context.write_directory
+        self.write_blockfile(pkgname, globaltimes, write_context)
         self.write_perioddata(directory, pkgname, binary=False)
         self.write_packagedata(directory, pkgname, binary=False)
 
