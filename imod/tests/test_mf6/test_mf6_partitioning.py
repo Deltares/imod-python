@@ -10,24 +10,45 @@ import imod
 def test_partition_structured(twri_model, tmp_path):
 
     labels = copy.deepcopy(twri_model["GWF_1"]["dis"]["idomain"].sel({"layer": 1}))
-
+    number_of_subdomains = 2
     #fill the first half of the array- in the x direction-  with 0's and the second half with 1
 
     ny,  nx = labels.shape
-    for ix in range(nx):
-        for iy in range(ny):
-            if ix < round( nx/2): 
-                label = 0
-            else:
-                label = 1
-            labels.values[iy, ix] = label
+    
+    for isub in range(1, number_of_subdomains+1):
+        from_index =  round(ny/number_of_subdomains)*(isub  - 1) 
+        to_index = round(ny/number_of_subdomains)*(isub) 
+        for ix in range(nx):
+            for iy in range(ny):
+                if iy >= from_index and iy < to_index:
+                    labels.values[iy, ix] = isub
     
     new_models = split_model_packages( labels, twri_model["GWF_1"])
-
-    for submodel in new_models:
+    
+    for isub in range(number_of_subdomains):
+        submodel = new_models[isub ]
         new_simulation = imod.mf6.Modflow6Simulation("*")
-        new_simulation["partial_GWF_1"] = submodel
-        new_simulation.create_time_discretization(additional_times=["2000-01-01T00:00"])
+        new_model_name = f"partial_GWF_{isub}"
+        new_simulation[new_model_name] = submodel
+        new_simulation[new_model_name].pop("wel")
+        # Define solver settings
+        new_simulation["solver"] = imod.mf6.Solution(
+            modelnames=[new_model_name],
+            print_option="summary",
+            csv_output=False,
+            no_ptc=True,
+            outer_dvclose=1.0e-4,
+            outer_maximum=500,
+            under_relaxation=None,
+            inner_dvclose=1.0e-4,
+            inner_rclose=0.001,
+            inner_maximum=100,
+            linear_acceleration="cg",
+            scaling_method=None,
+            reordering_method=None,
+            relaxation_factor=0.97,
+        )        
+        new_simulation.create_time_discretization(additional_times=["2000-01-01T00:00", "2000-01-01T06:00"])
         new_simulation.write(tmp_path, False, False)
         new_simulation.run()
  
