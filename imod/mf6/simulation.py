@@ -212,6 +212,9 @@ class Modflow6Simulation(collections.UserDict):
         status_info = NestedStatusInfo("Simulation validation status")
         globaltimes = self["time_discretization"]["time"].values
         for key, value in self.items():
+            model_write_context = write_context.copy_with_new_write_directory(
+                write_context.simulation_directory
+            )
             # skip timedis, exchanges
             if isinstance(value, Modflow6Model):
                 status_info.add(
@@ -219,14 +222,14 @@ class Modflow6Simulation(collections.UserDict):
                         modelname=key,
                         globaltimes=globaltimes,
                         validate=validate,
-                        write_context=write_context,
+                        write_context=model_write_context,
                     )
                 )
             elif value._pkg_id == "ims":
-                write_context.current_write_directory = (
-                    write_context.get_simulation_directory()
+                ims_write_context = write_context.copy_with_new_write_directory(
+                    write_context.simulation_directory
                 )
-                value.write(key, globaltimes, write_context)
+                value.write(key, globaltimes, ims_write_context)
 
         if status_info.has_errors():
             raise ValidationError("\n" + status_info.to_string())

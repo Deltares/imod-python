@@ -199,7 +199,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         Write packages
         """
 
-        workdir = write_context.get_simulation_directory()
+        workdir = write_context.simulation_directory
         modeldirectory = workdir / modelname
         Path(modeldirectory).mkdir(exist_ok=True, parents=True)
         if validate:
@@ -214,13 +214,15 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             f.write(namefile_content)
 
         # write package contents
-        write_context.current_write_directory = modeldirectory
+        pkg_write_context = write_context.copy_with_new_write_directory(
+            new_write_directory=modeldirectory
+        )
         for pkg_name, pkg in self.items():
             try:
                 pkg.write(
                     pkgname=pkg_name,
                     globaltimes=globaltimes,
-                    write_context=write_context,
+                    write_context=pkg_write_context,
                 )
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")

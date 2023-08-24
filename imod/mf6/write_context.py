@@ -1,3 +1,4 @@
+from copy import deepcopy
 from dataclasses import dataclass
 from os.path import relpath
 from pathlib import Path
@@ -20,32 +21,36 @@ class WriteContext:
     use_absolute_paths: bool
         If True, paths in the modlfow inputfiles will be rendered as absoule paths on your system.
         This makes the modflow input files less portable to other systems but facilitates reading them by Flopy
-    _output_directory: Optional[Path] = None
-        The directory where the next outputfile will be written. Users do not need to set this parameter
+   write_directory: Optional[Path] = None
+        The directory where the next outputfile will be written. Users do not need to set this parameter. If not provided
+        it will be set to the simulation_directrory.
     """
 
-    simulation_directory: Path = "."
-    use_binary: bool = False
-    use_absolute_paths: bool = False
-    _output_directory: Optional[Path] = None
-
-    @property
-    def current_write_directory(self) -> Optional[Path]:
-        return self._output_directory
-
-    @current_write_directory.setter
-    def current_write_directory(self, model_directory: Union[Path, str]) -> None:
-        self._output_directory = Path(model_directory)
+    def __init__(
+        self,
+        simulation_directory: Path = ".",
+        use_binary: bool = False,
+        use_absolute_paths: bool = False,
+        write_directory: Optional[Union[str, Path]] = None,
+    ):
+        self.simulation_directory = Path(simulation_directory)
+        self.use_binary = use_binary
+        self.use_absolute_paths = use_absolute_paths
+        self.write_directory = (
+            Path(write_directory)
+            if write_directory is not None
+            else self.simulation_directory
+        )
 
     def get_formatted_write_directory(self) -> Path:
         if self.use_absolute_paths:
-            return self.current_write_directory
-        return Path(
-            relpath(self.current_write_directory, self.get_simulation_directory())
-        )
+            return self.write_directory
+        return Path(relpath(self.write_directory, self.simulation_directory))
 
-    def get_simulation_directory(self) -> Path:
-        return Path(self.simulation_directory)
+    def copy_with_new_write_directory(self, new_write_directory: Path) -> Path:
+        new_context = deepcopy(self)
+        new_context.write_directory = new_write_directory
+        return new_context
 
     @property
     def root_directory(self):
@@ -54,6 +59,6 @@ class WriteContext:
         that are in agreement with the use_absolute_paths setting.
         """
         if self.use_absolute_paths:
-            return self.get_simulation_directory()
+            return self.simulation_directory
         else:
             return Path("")
