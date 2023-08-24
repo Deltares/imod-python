@@ -246,7 +246,7 @@ class RibaMod:
         )
 
         exchange_dir = directory / "exchanges"
-        exchange_dir.mkdir(mode=755, exist_ok=True, parents=True)
+        exchange_dir.mkdir(exist_ok=True, parents=True)
 
         packages = asdict(coupling)
         packages.pop("mf6_model")
