@@ -13,7 +13,7 @@ def test_readable_by_flopy(
 ):
     # write model to files using imod-python
     twri_model.write(
-        directory=tmp_path, binary=False, validate=True, absolute_paths=absolute_paths
+        directory=tmp_path, binary=False, validate=True, use_absolute_paths=absolute_paths
     )
 
     # import the model using flopy
@@ -35,7 +35,7 @@ def test_readable_by_mf6(
 ):
     # write model to files using imod-python
     twri_model.write(
-        directory=tmp_path, binary=False, validate=True, absolute_paths=absolute_paths
+        directory=tmp_path, binary=False, validate=True, use_absolute_paths=absolute_paths
     )
 
     # the run method will raise an exception if the run does not succeed

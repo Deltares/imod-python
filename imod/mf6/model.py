@@ -132,10 +132,8 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         return modeltimes
 
     def render(self, modelname: str, write_context: WriteContext):
-        if write_context.absolute_paths:
-            dir_for_render = Path(write_context.root_directory / modelname)
-        else:
-            dir_for_render = Path(modelname)
+
+        dir_for_render = Path(write_context.root_directory / modelname)
 
         d = {k: v for k, v in self._options.items() if not (v is None or v is False)}
         packages = []
@@ -202,7 +200,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         Write packages
         """
 
-        workdir = write_context.simulation_directory
+        workdir = write_context.get_simulation_directory()
         modeldirectory = workdir / modelname
         Path(modeldirectory).mkdir(exist_ok=True, parents=True)
         if validate:

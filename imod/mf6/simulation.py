@@ -163,7 +163,7 @@ class Modflow6Simulation(collections.UserDict):
         return self._template.render(d)
 
     def write(
-        self, directory=".", binary=True, validate: bool = True, absolute_paths=False
+        self, directory=".", binary=True, validate: bool = True, use_absolute_paths=False
     ):
         """
         Write Modflow6 simulation, including assigned groundwater flow and
@@ -184,7 +184,7 @@ class Modflow6Simulation(collections.UserDict):
             True if all paths written to the mf6 inputfiles should be absolute.
         """
         # create write context
-        write_context = WriteContext(directory, binary, absolute_paths)
+        write_context = WriteContext(directory, binary, use_absolute_paths)
 
         # Check models for required content
         for key, model in self.items():
@@ -220,7 +220,7 @@ class Modflow6Simulation(collections.UserDict):
                 )
             elif value._pkg_id == "ims":
                 write_context.current_write_directory = (
-                    write_context.simulation_directory
+                    write_context.get_simulation_directory()
                 )
                 value.write(key, globaltimes, write_context)
 

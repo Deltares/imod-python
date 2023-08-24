@@ -17,7 +17,7 @@ class WriteContext:
     binary: bool
         If True, bulk data will be written in a binary format readable by modflow. Regular package input files
         will still be rendered as text.
-    absolute_paths: bool
+    use_absolute_paths: bool
         If True, paths in the modlfow inputfiles will be rendered as absoule paths on your system.
         This makes the modflow input files less portable to other systems but facilitates reading them by Flopy
     _output_directory: Optional[Path] = None
@@ -26,7 +26,7 @@ class WriteContext:
 
     simulation_directory: Path = "."
     binary: bool = False
-    absolute_paths: bool = False
+    use_absolute_paths: bool = False
     _output_directory: Optional[Path] = None
 
     @property
@@ -38,17 +38,22 @@ class WriteContext:
         self._output_directory = Path(model_directory)
 
     def get_formatted_write_directory(self) -> Path:
-        if self.absolute_paths:
+        if self.use_absolute_paths:
             return self.current_write_directory
-        return Path(relpath(self.current_write_directory, self.simulation_directory))
+        return Path(
+            relpath(self.current_write_directory, self.get_simulation_directory())
+        )
+
+    def get_simulation_directory(self) -> Path:
+        return Path(self.simulation_directory)
 
     @property
     def root_directory(self):
         """
-        returns the simulation directory, or nothing, depending on absolute_paths; use this to compose paths
-        that are in agreement with the absolute_paths setting.
+        returns the simulation directory, or nothing, depending on use_absolute_paths; use this to compose paths
+        that are in agreement with the use_absolute_paths setting.
         """
-        if self.absolute_paths:
-            return self.simulation_directory
+        if self.use_absolute_paths:
+            return self.get_simulation_directory()
         else:
             return Path("")
