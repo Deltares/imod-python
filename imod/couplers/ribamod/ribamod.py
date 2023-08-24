@@ -65,6 +65,16 @@ class RibaMod:
             raise ValueError('Basin definition must contain "basin_id" column')
         self.basin_definition = basin_definition
 
+    def _get_gwf_modelnames(self) -> List[str]:
+        """
+        Get names of gwf models in mf6 simulation
+        """
+        return [
+            key
+            for key, value in self.mf6_simulation.items()
+            if isinstance(value, GroundwaterFlowModel)
+        ]
+
     def write(
         self,
         directory: Union[str, Path],
@@ -178,9 +188,7 @@ class RibaMod:
         passive_keys = set(passive_keys)
         intersection = active_keys.intersection(passive_keys)
         if intersection:
-            raise ValueError(
-                f"active and passive keys share members: {intersection}"
-            )
+            raise ValueError(f"active and passive keys share members: {intersection}")
         present = [k for k, v in gwf_model.items() if isinstance(v, expected_type)]
         missing = (active_keys | passive_keys).difference(present)
         if missing:
@@ -198,18 +206,21 @@ class RibaMod:
         # and drainage.
         # FUTURE: check for time dimension?
         conductance = package.dataset["conductance"]
-        basin_id = gridded_basin.where(conductance.notnull(), drop=True)
-        include = basin_id.notnull()
-        basin_id = basin_id.to_numpy[include]
-        boundary_id = np.arange(basin_id.size)[include]
-        return pd.DataFrame(data={"basin_id": basin_id, "bound_id": boundary_id})
+        basin_id = gridded_basin.where(conductance.notnull())
+        include = basin_id.notnull().to_numpy()
+        basin_id_values = basin_id.to_numpy()[include].astype(int)
+        boundary_id_values = np.arange(basin_id.size)[include.ravel()]
+        return pd.DataFrame(
+            data={"basin_id": basin_id_values, "bound_id": boundary_id_values}
+        )
 
     def write_exchanges(
         self,
         directory: Union[str, Path],
     ) -> Dict[str, Dict[str, str]]:
         gwf_names = self._get_gwf_modelnames()
-        coupling = self.coupling_list
+        # #FUTURE: multiple couplings
+        coupling = self.coupling_list[0]
 
         # Assume only one groundwater flow model
         # FUTURE: Support multiple groundwater flow models.
@@ -227,14 +238,15 @@ class RibaMod:
             River,
         )
 
-        diskey = gwf_model.__get_diskey()
-        dis = gwf_model[diskey]
+        dis = gwf_model[gwf_model._get_pkgkey("dis")]
         gridded_basin = imod.prepare.rasterize(
-            self.basin_definition, like=dis["idomain"], column="basin_id"
+            self.basin_definition,
+            like=dis["idomain"].isel(layer=0, drop=True),
+            column="basin_id",
         )
 
         exchange_dir = directory / "exchanges"
-        exchange_dir.mkdir(mode=755, exist_ok=True)
+        exchange_dir.mkdir(mode=755, exist_ok=True, parents=True)
 
         packages = asdict(coupling)
         packages.pop("mf6_model")
@@ -244,7 +256,7 @@ class RibaMod:
                 package = gwf_model[key]
                 table = self.derive_river_drainage_coupling(gridded_basin, package)
                 path = exchange_dir / f"{key}.tsv"
-                table.to_csv(path, sep="\t")
-                coupling_dict[destination][key] = path
+                table.to_csv(path, sep="\t", index=False)
+                coupling_dict[destination][key] = path.as_posix()
 
         return coupling_dict
