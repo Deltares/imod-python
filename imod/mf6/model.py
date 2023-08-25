@@ -131,8 +131,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 modeltimes.append(repeat_stress.isel(repeat_items=0).values)
         return modeltimes
 
-    def render(self, modelname: str):
-        dir_for_render = pathlib.Path(modelname)
+    def render(self, modelname: str, write_context: WriteContext):
+        dir_for_render = write_context.root_directory / modelname
+
         d = {k: v for k, v in self._options.items() if not (v is None or v is False)}
         packages = []
         for pkgname, pkg in self.items():
@@ -207,19 +208,21 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 return model_status_info
 
         # write model namefile
-        namefile_content = self.render(modelname)
+        namefile_content = self.render(modelname, write_context)
         namefile_path = modeldirectory / f"{modelname}.nam"
         with open(namefile_path, "w") as f:
             f.write(namefile_content)
 
         # write package contents
-        write_context.current_output_directory = modeldirectory
+        pkg_write_context = write_context.copy_with_new_write_directory(
+            new_write_directory=modeldirectory
+        )
         for pkg_name, pkg in self.items():
             try:
                 pkg.write(
                     pkgname=pkg_name,
                     globaltimes=globaltimes,
-                    write_context=write_context,
+                    write_context=pkg_write_context,
                 )
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")

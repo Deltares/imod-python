@@ -22,7 +22,7 @@ def test_dis_render(twri_model, tmp_path):
         globaltimes=None,
         binary=True,
     )
-    path = Path(tmp_path.stem).as_posix()
+    path = Path(tmp_path).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -53,8 +53,8 @@ def test_dis_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    write_context = WriteContext(binary=True)
-    write_context.current_output_directory = tmp_path
+    write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
+
     dis.write(pkgname="dis", globaltimes=None, write_context=write_context)
     assert (tmp_path / "dis.dis").is_file()
     assert (tmp_path / "dis").is_dir()
@@ -72,7 +72,7 @@ def test_chd_render(twri_model, tmp_path):
         globaltimes=globaltimes,
         binary=True,
     )
-    path = Path(tmp_path.stem).as_posix()
+    path = Path(tmp_path).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -91,8 +91,7 @@ def test_chd_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    write_context = WriteContext(binary=True)
-    write_context.current_output_directory = tmp_path
+    write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
     chd.write(pkgname="chd", globaltimes=None, write_context=write_context)
     assert (tmp_path / "chd.chd").is_file()
     assert (tmp_path / "chd").is_dir()
@@ -110,7 +109,7 @@ def test_drn_render(twri_model, tmp_path):
         globaltimes=globaltimes,
         binary=True,
     )
-    path = Path(tmp_path.stem).as_posix()
+    path = Path(tmp_path).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -129,8 +128,7 @@ def test_drn_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    write_context = WriteContext(binary=True)
-    write_context.current_output_directory = tmp_path
+    write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
     drn.write(pkgname="drn", globaltimes=None, write_context=write_context)
     assert (tmp_path / "drn.drn").is_file()
     assert (tmp_path / "drn").is_dir()
@@ -159,8 +157,7 @@ def test_ic_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    write_context = WriteContext(binary=True)
-    write_context.current_output_directory = tmp_path
+    write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
     ic.write(pkgname="ic", globaltimes=None, write_context=write_context)
     assert (tmp_path / "ic.ic").is_file()
 
@@ -197,8 +194,7 @@ def test_npf_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    write_context = WriteContext(binary=True)
-    write_context.current_output_directory = tmp_path
+    write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
     npf.write(pkgname="npf", globaltimes=None, write_context=write_context)
     assert (tmp_path / "npf.npf").is_file()
 
@@ -260,7 +256,7 @@ def test_rch_render(twri_model, tmp_path):
         globaltimes=globaltimes,
         binary=True,
     )
-    path = Path(tmp_path.stem).as_posix()
+    path = Path(tmp_path).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -276,8 +272,7 @@ def test_rch_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    write_context = WriteContext(binary=True)
-    write_context.current_output_directory = tmp_path
+    write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
     rch.write(pkgname="rch", globaltimes=None, write_context=write_context)
     assert (tmp_path / "rch.rch").is_file()
     assert (tmp_path / "rch").is_dir()
@@ -295,7 +290,7 @@ def test_wel_render(twri_model, tmp_path):
         globaltimes=globaltimes,
         binary=True,
     )
-    path = Path(tmp_path.stem).as_posix()
+    path = Path(tmp_path).as_posix()
     expected = textwrap.dedent(
         f"""\
             begin options
@@ -314,8 +309,7 @@ def test_wel_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    write_context = WriteContext(binary=True)
-    write_context.current_output_directory = tmp_path
+    write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
     wel.write(pkgname="wel", globaltimes=None, write_context=write_context)
     assert (tmp_path / "wel.wel").is_file()
     assert (tmp_path / "wel").is_dir()
@@ -353,8 +347,7 @@ def test_solver_render(twri_model, tmp_path):
             """
     )
     assert actual == expected
-    write_context = WriteContext(binary=True)
-    write_context.current_output_directory = tmp_path
+    write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
     solver.write(pkgname="solver", globaltimes=None, write_context=write_context)
     assert (tmp_path / "solver.ims").is_file()
 
@@ -366,7 +359,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
     gwfmodel = simulation["GWF_1"]
     path = Path(tmp_path.stem).as_posix()
     write_context = WriteContext(tmp_path)
-    actual = gwfmodel.render(path)
+    actual = gwfmodel.render(path, write_context)
     expected = textwrap.dedent(
         f"""\
             begin options
