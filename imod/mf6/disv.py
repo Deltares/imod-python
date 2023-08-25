@@ -1,10 +1,9 @@
-import pathlib
-
 import numpy as np
 import pandas as pd
 
 from imod.mf6.pkgbase import Package
 from imod.mf6.validation import DisBottomSchema
+from imod.mf6.write_context import WriteContext
 from imod.schemata import (
     AllValueSchema,
     AnyValueSchema,
@@ -71,7 +70,7 @@ class VerticesDiscretization(Package):
         self._validate_init_schemata(validate)
 
     def render(self, directory, pkgname, binary):
-        disdirectory = pathlib.Path(directory.stem) / pkgname
+        disdirectory = directory / pkgname
         d = {}
         grid = self.dataset.ugrid.grid
         d["xorigin"] = grid.node_x.min()
@@ -114,10 +113,10 @@ class VerticesDiscretization(Package):
             )
         return df
 
-    def write_blockfile(self, directory, pkgname, globaltimes, binary):
-        dir_for_render = pathlib.Path(directory.stem)
-        content = self.render(dir_for_render, pkgname, binary)
-        filename = directory / f"{pkgname}.{self._pkg_id}"
+    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+        dir_for_render = write_context.get_formatted_write_directory()
+        content = self.render(dir_for_render, pkgname, write_context.use_binary)
+        filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
             f.write("\n\n")

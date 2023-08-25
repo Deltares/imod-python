@@ -3,7 +3,7 @@ import numbers
 import pathlib
 from collections import defaultdict
 from copy import copy
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import cftime
 import jinja2
@@ -13,6 +13,7 @@ import xugrid as xu
 
 import imod
 from imod.mf6.validation import validation_pkg_error_message
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
@@ -215,14 +216,16 @@ class Package(PackageBase, abc.ABC):
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
 
-    def write_blockfile(self, directory, pkgname, globaltimes, binary):
+    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+        directory = write_context.get_formatted_write_directory()
+
         content = self.render(
             directory=directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
-            binary=binary,
+            binary=write_context.use_binary,
         )
-        filename = directory / f"{pkgname}.{self._pkg_id}"
+        filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
 
@@ -326,16 +329,16 @@ class Package(PackageBase, abc.ABC):
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         if directory is None:
-            pkg_directory = pkgname
+            directory = pkgname
         else:
-            pkg_directory = pathlib.Path(directory.stem) / pkgname
+            directory = pathlib.Path(directory) / pkgname
 
         for varname in self.dataset.data_vars:
             key = self._keyword_map.get(varname, varname)
 
             if hasattr(self, "_grid_data") and varname in self._grid_data:
                 layered, value = self._compose_values(
-                    self.dataset[varname], pkg_directory, key, binary=binary
+                    self.dataset[varname], directory, key, binary=binary
                 )
                 if self._valid(value):  # skip False or None
                     d[f"{key}_layered"], d[key] = layered, value
@@ -390,9 +393,15 @@ class Package(PackageBase, abc.ABC):
 
         return layered, values
 
-    def write(self, directory, pkgname, globaltimes, binary):
-        directory = pathlib.Path(directory)
-        self.write_blockfile(directory, pkgname, globaltimes, binary=binary)
+    def write(
+        self,
+        pkgname: str,
+        globaltimes: Union[List, np.ndarray],
+        write_context: WriteContext,
+    ):
+        directory = write_context.write_directory
+        binary = write_context.use_binary
+        self.write_blockfile(pkgname, globaltimes, write_context)
 
         if hasattr(self, "_grid_data"):
             if self._is_xy_data(self.dataset):
@@ -811,7 +820,7 @@ class BoundaryCondition(Package, abc.ABC):
             self._write_textfile(outpath, sparse_data)
 
     def period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
-        pkg_directory = pathlib.Path(directory.stem) / pkgname
+        directory = pathlib.Path(directory) / pkgname
 
         if binary:
             ext = "bin"
@@ -823,7 +832,7 @@ class BoundaryCondition(Package, abc.ABC):
             package_times = bin_ds.coords["time"].values
             starts = np.searchsorted(globaltimes, package_times) + 1
             for i, start in enumerate(starts):
-                path = pkg_directory / f"{self._pkg_id}-{i}.{ext}"
+                path = directory / f"{self._pkg_id}-{i}.{ext}"
                 periods[start] = path.as_posix()
 
             repeat_stress = self.dataset.get("repeat_stress")
@@ -837,7 +846,7 @@ class BoundaryCondition(Package, abc.ABC):
                 # Now make sure the periods are sorted by key.
                 periods = dict(sorted(periods.items()))
         else:
-            path = pkg_directory / f"{self._pkg_id}.{ext}"
+            path = directory / f"{self._pkg_id}.{ext}"
             periods[1] = path.as_posix()
 
         return periods
@@ -912,23 +921,22 @@ class BoundaryCondition(Package, abc.ABC):
             path = directory / pkgname / f"{self._pkg_id}.{ext}"
             self.write_datafile(path, bin_ds, binary=binary)
 
-    def write(self, directory, pkgname, globaltimes, binary):
+    def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
         """
         writes the blockfile and binary data
 
         directory is modelname
         """
-        directory = pathlib.Path(directory)
+        directory = write_context.write_directory
         self.write_blockfile(
-            directory=directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
-            binary=binary,
+            write_context=write_context,
         )
         self.write_perioddata(
             directory=directory,
             pkgname=pkgname,
-            binary=binary,
+            binary=write_context.use_binary,
         )
 
     def assign_dims(self, arg) -> Dict:
@@ -989,9 +997,10 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         package_data = self._package_data_to_sparse()
         self._write_file(outpath, package_data)
 
-    def write(self, directory, pkgname, globaltimes, binary):
+    def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
         self.fill_stress_perioddata()
-        self.write_blockfile(directory, pkgname, globaltimes, binary=False)
+        directory = write_context.write_directory
+        self.write_blockfile(pkgname, globaltimes, write_context)
         self.write_perioddata(directory, pkgname, binary=False)
         self.write_packagedata(directory, pkgname, binary=False)
 
