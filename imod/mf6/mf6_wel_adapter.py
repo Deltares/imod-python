@@ -81,7 +81,7 @@ class Mf6Wel(BoundaryCondition):
 
         return arrdict
 
-    def _to_sparse(self, arrdict, _):
+    def _to_struct_array(self, arrdict, _):
         index_spec = [(index, np.int32) for index in arrdict["cellid_names"]]
         field_spec = [(var, np.float64) for var in arrdict["data_vars"]]
         sparse_dtype = np.dtype(index_spec + field_spec)
