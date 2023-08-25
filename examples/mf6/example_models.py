@@ -2,9 +2,9 @@
 Example models
 ==============
 
-This source file contains functions that create a simulation that can be used
-in examples that are not focussed on building a simulation, but on doing
-something with it ( such as regridding)
+This source file contains functions that create a simulation that can be used in
+examples that are not focused on building a simulation, but on doing something
+with it (such as regridding).
 
 """
 import numpy as np
@@ -18,7 +18,11 @@ from imod.typing.grid import nan_like
 def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
     """There is a separate example contained in `TWRI
     <https://deltares.gitlab.io/imod/imod-python/examples/mf6/ex01_twri.html#sphx-glr-examples-mf6-ex01-twri-py>`_
-    that you should look at if you are interested in the model building
+    that you should look at if you are interested in the model building. The
+    TWRI model has 3 layers and contains wells, a drain and recharge.
+    Geometrically it is rectangular with prescribed head on some of the
+    boundaries. Conductivity is highly anisotropic but constant in each layer.
+    Simulation is steady state.
     """
 
     nlay = 3
@@ -213,7 +217,12 @@ def create_hondsrug_simulation() -> imod.mf6.Modflow6Simulation:
     """
     There is a separate example contained in `hondsrug
     <https://deltares.gitlab.io/imod/imod-python/examples/mf6/hondsrug.html#sphx-glr-examples-mf6-hondsrug-py>`_
-    that you should look at if you are interested in the model building
+    that you should look at if you are interested in the model building. The
+    Hondsrug model uses a structured grid with constant cell size. It has 13
+    layers whose thickness varies in space. In conductivity, it is isotropic,
+    but heterogeneous across and within layers. Boundary conditions include
+    recharge, constant head, evapotranspiration, river and drains. It is a
+    transient simulation.
     """
 
     # create model
