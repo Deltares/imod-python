@@ -14,6 +14,8 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.mf6.model import Modflow6Model
+from imod.typing.grid import GridDataArray
 
 try:
     import geopandas as gpd
@@ -630,7 +632,14 @@ def create_ic(cache, model, key, value, active, **kwargs):
     return
 
 
-def create_hfb(cache, model, key, value, active, top, bottom, k, **kwargs):
+def create_hfb(
+    model: Modflow6Model,
+    key: str,
+    value: Dict,
+    top: GridDataArray,
+    bottom: GridDataArray,
+    **kwargs,
+) -> None:
     dataframe = value["geodataframe"]
 
     barrier_gdf = gpd.GeoDataFrame(
@@ -645,10 +654,12 @@ def create_hfb(cache, model, key, value, active, top, bottom, k, **kwargs):
     model[key] = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)
 
 
-def merge_hfbs(hfbs, idomain):
+def merge_hfbs(
+    horizontal_flow_barriers: List[imod.mf6.HorizontalFlowBarrierResistance],
+):
     datasets = []
-    for hfb in hfbs:
-        datasets.append(hfb.dataset)
+    for horizontal_flow_barrier in horizontal_flow_barriers:
+        datasets.append(horizontal_flow_barrier.dataset)
 
     combined_dataset = xr.concat(datasets, "index")
     combined_dataset.coords["index"] = np.arange(combined_dataset.sizes["index"])
@@ -812,7 +823,7 @@ def convert_to_disv(
     hfb_keys = [key for key in model.keys() if key.split("-")[0] == "hfb"]
     hfbs = [model.pop(key) for key in hfb_keys]
     if hfbs:
-        model["hfb"] = merge_hfbs(hfbs, idomain)
+        model["hfb"] = merge_hfbs(hfbs)
 
     transient = any("time" in pkg.dataset.dims for pkg in model.values())
     if transient and (time_min is not None or time_max is not None):
