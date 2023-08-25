@@ -162,11 +162,11 @@ def test_to_mf6_remove_invalid_edges(
     # Arrange.
     shape = nlay, nrow, ncol = 1, 1, 3
 
-    dx = dy = dz = 1
+    dx = dy = dz = 1.0
 
-    x = np.array([*range(0, ncol + 1, dx)])
-    y = np.array([*reversed(range(0, nrow + 1, dy))])
-    z = -np.array([*range(0, nlay + 1, dz)])
+    x = np.arange(0, ncol + 1) * dx
+    y = np.arange(0, nrow + 1)[::-1] * dy
+    z = -np.arange(0, nlay + 1) * dz
 
     xc = (x[:-1] + x[1:]) / 2
     yc = (y[:-1] + y[1:]) / 2
@@ -176,7 +176,7 @@ def test_to_mf6_remove_invalid_edges(
     idomain = xr.DataArray(
         np.ones(shape, dtype=np.int32), coords={"layer": layers, "y": yc, "x": xc}
     )
-    idomain = idomain.assign_coords({"dy": dy})
+    idomain = idomain.assign_coords({"dy": -dy})
     idomain.loc[{"x": xc[-1]}] = -1  # make cells inactive
 
     top = xr.DataArray([z[0]], coords={"layer": layers})
@@ -223,11 +223,11 @@ def test_to_mf6_remove_barrier_parts_adjacent_to_inactive_cells(
     # Arrange.
     shape = nlay, nrow, ncol = 2, 1, 3
 
-    dx = dy = dz = 1
+    dx = dy = dz = 1.0
 
-    x = np.array([*range(0, ncol + 1, dx)])
-    y = np.array([*reversed(range(0, nrow + 1, dy))])
-    z = -np.array([*range(0, nlay + 1, dz)])
+    x = np.arange(0, ncol + 1) * dx
+    y = np.arange(0, nrow + 1)[::-1] * dy
+    z = -np.arange(0, nlay + 1) * dz
 
     xc = (x[:-1] + x[1:]) / 2
     yc = (y[:-1] + y[1:]) / 2
@@ -237,7 +237,7 @@ def test_to_mf6_remove_barrier_parts_adjacent_to_inactive_cells(
     idomain = xr.DataArray(
         np.ones(shape, dtype=np.int32), coords={"layer": layers, "y": yc, "x": xc}
     )
-    idomain = idomain.assign_coords({"dy": dy})
+    idomain = idomain.assign_coords({"dy": -dy})
     idomain.loc[{"x": xc[-1], "layer": layers[-1]}] = -1  # make cell inactive
 
     top = xr.DataArray(z[:-1], coords={"layer": layers})
