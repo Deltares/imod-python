@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 import xugrid as xu
+import shapely.geometry as sg
 
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
@@ -20,7 +21,7 @@ from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
 from imod.select.points import points_indices
 from imod.typing.grid import GridDataArray, ones_like
-from imod.util import values_within_range
+from imod.util import values_within_range, spatial_reference
 
 # FUTURE: There was an idea to autogenerate these object.
 # This was relevant:
@@ -146,6 +147,33 @@ class Well(BoundaryCondition):
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
 
         self._validate_init_schemata(validate)
+
+    def clip_outside_grid(self, grid: GridDataArray):
+        if isinstance(grid, xr.DataArray):
+            _, xmin, xmax, _, ymin, ymax = spatial_reference(grid)
+            return self.clip_box(x_min=xmin, x_max=xmax, y_min=ymin, y_max=ymax)
+        elif isinstance(grid, xu.Ugrid2d):
+            exterior = grid.bounding_polygon()
+        elif isinstance(grid, xu.UgridDataArray):
+            exterior = grid.grid.bounding_polygon()
+        else:
+            raise TypeError(
+                f"'grid' should be of type xr.DataArray, xu.Ugrid2d or xu.UgridDataArray, got {type(grid)}"
+            )
+
+        # TODO: consider using numba_celltree for this
+        # https://deltares.github.io/numba_celltree/examples/spatial_indexing.html#locating-points
+        points = [
+            sg.Point(x, y)
+            for x, y in zip(self.dataset["x"].values, self.dataset["y"].values)
+        ]
+        is_inside_exterior = exterior.contains(points)
+        selection = self.dataset.loc[{"index": is_inside_exterior}]
+
+        cls = type(self)
+        new = cls.__new__(cls)
+        new.dataset = selection
+        return new
 
     def clip_box(
         self,
