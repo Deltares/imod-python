@@ -29,8 +29,9 @@ Added
   functionality.
   <https://deltares.github.io/xugrid/examples/regridder_overview.html>`_
   Variables are regridded with pre-selected methods. The regridding
-  functionality is useful for example to test the effect of different grid
-  sizes.
+  functionality is useful for a variety of applications, for example to test the
+  effect of different grid sizes, to add detail to a simulation (by refining the
+  grid) or to speed up a simulation (by coarsening the grid) to name a few
 - :meth:`imod.mf6.Package.regrid_like` to regrid packages. The user can
   specify their own custom regridder types and methods for variables.
 - :meth:`imod.mf6.Simulation.clip_box` got an extra argument

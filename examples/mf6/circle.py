@@ -266,7 +266,7 @@ clipped_half_simulation_constant_head = (
 )
 
 all_boundaries_constant_head = half_simulation_constant_head.where(
-    ~np.isnan(half_simulation_constant_head), clipped_half_simulation_constant_head
+    ~np.isnull(half_simulation_constant_head), clipped_half_simulation_constant_head
 )
 
 # plot boundary conditions

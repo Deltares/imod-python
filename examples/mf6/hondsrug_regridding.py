@@ -1,6 +1,6 @@
 """
 Regridding a regional model
-==============
+===========================
 
 This example shows how a model can be regridded using default regridding
 methods. The example used is the Hondsrug model. It is regridded to a coarser
