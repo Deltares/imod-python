@@ -163,7 +163,7 @@ def to_connected_cells_dataset(
         .reset_coords()
     )
 
-    return barrier_dataset
+    return barrier_dataset.dropna("cell_id")
 
 
 class BarrierType(Enum):
@@ -193,7 +193,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
 
     def render(self, directory, pkgname, globaltimes, binary):
         raise NotImplementedError(
-            f"{self.__class__.__name__} is a grid-agnostic package and does not have a render method. To render the package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()"
+            f"""{self.__class__.__name__} is a grid-agnostic package and does not have a render method. To render the
+            package, first convert to a Modflow6 package by calling pkg.to_mf6_pkg()"""
         )
 
     def _netcdf_encoding(self):
@@ -236,14 +237,14 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
 
         """
         top, bottom, k = self.__broadcast_to_full_domain(idomain, top, bottom, k)
-        unstruct, top, bottom, k = (
+        unstructured_grid, top, bottom, k = (
             self.__to_unstructured(idomain, top, bottom, k)
             if isinstance(idomain, xr.DataArray)
             else [idomain, top, bottom, k]
         )
         snapped_dataset, edge_index = self.__snap_to_grid(idomain)
 
-        edge_index = self.__remove_invalid_edges(unstruct, edge_index)
+        edge_index = self.__remove_invalid_edges(unstructured_grid, edge_index)
 
         if self._get_barrier_type() is BarrierType.Multiplier:
             fraction = self.__compute_barrier_layer_overlap_fraction(
@@ -259,9 +260,13 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
                 snapped_dataset, edge_index, top, bottom, k
             )
 
+        barrier_values = barrier_values.where(
+            self.__inactive_cells_mask(unstructured_grid, edge_index)
+        )
+
         barrier_dataset = to_connected_cells_dataset(
             idomain,
-            unstruct.ugrid.grid,
+            unstructured_grid.ugrid.grid,
             edge_index,
             {
                 "hydraulic_characteristic": self.__to_hydraulic_characteristic(
@@ -320,8 +325,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
 
         return self.__from_resistance(c_total)
 
+    @staticmethod
     def __compute_barrier_layer_overlap_fraction(
-        self,
         snapped_dataset: xu.UgridDataset,
         edge_index: np.ndarray,
         top: xu.UgridDataArray,
@@ -550,8 +555,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
 
         return snapped_dataset, edge_index
 
+    @staticmethod
     def __remove_invalid_edges(
-        self, unstructured_grid: xu.UgridDataArray, edge_index: np.ndarray
+        unstructured_grid: xu.UgridDataArray, edge_index: np.ndarray
     ) -> np.ndarray:
         """
         Remove invalid edges indices. An edge is considered invalid when:
@@ -579,6 +585,26 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
         valid = (connected_cells > 0).all(axis=1)
 
         return edge_index[valid]
+
+    @staticmethod
+    def __inactive_cells_mask(
+        unstructured_grid: xu.UgridDataArray, edge_index: np.ndarray
+    ):
+        face_dimension = unstructured_grid.ugrid.grid.face_dimension
+
+        face_connectivity = unstructured_grid.ugrid.grid.edge_face_connectivity[
+            edge_index
+        ]
+        connected_cells_left = unstructured_grid.loc[
+            {face_dimension: face_connectivity[:, 0]}
+        ]
+        connected_cells_right = unstructured_grid.loc[
+            {face_dimension: face_connectivity[:, 1]}
+        ]
+
+        return (connected_cells_left.drop(face_dimension) > 0) & (
+            connected_cells_right.drop(face_dimension) > 0
+        )
 
 
 class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
