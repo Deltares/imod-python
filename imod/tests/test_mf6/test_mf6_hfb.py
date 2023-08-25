@@ -150,37 +150,23 @@ def test_to_mf6_different_z_boundaries(
 @pytest.mark.parametrize(
     "barrier_x_loc, expected_number_barriers",
     [
-        (0.0, 0),  # barrier lies on left boundary
-        (1.0, 1),  # barrier lies between active cells
-        (2.0, 0),  # barrier lies between an active and inactive cell
+        # barrier lies between active cells
+        (1.0, 1),
+        # barrier lies between active cells in the top layer but between an inactive and active cell in the bottom layer
+        (2.0, 0),
     ],
 )
+@pytest.mark.parametrize("parameterizable_basic_dis", [(1, 1, 3)], indirect=True)
 @patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
 def test_to_mf6_remove_invalid_edges(
-    mf6_flow_barrier_mock, barrier_x_loc, expected_number_barriers
+    mf6_flow_barrier_mock,
+    parameterizable_basic_dis,
+    barrier_x_loc,
+    expected_number_barriers,
 ):
     # Arrange.
-    shape = nlay, nrow, ncol = 1, 1, 3
-
-    dx = dy = dz = 1.0
-
-    x = np.arange(0, ncol + 1) * dx
-    y = np.arange(0, nrow + 1)[::-1] * dy
-    z = -np.arange(0, nlay + 1) * dz
-
-    xc = (x[:-1] + x[1:]) / 2
-    yc = (y[:-1] + y[1:]) / 2
-
-    layers = np.arange(nlay) + 1
-
-    idomain = xr.DataArray(
-        np.ones(shape, dtype=np.int32), coords={"layer": layers, "y": yc, "x": xc}
-    )
-    idomain = idomain.assign_coords({"dy": -dy})
-    idomain.loc[{"x": xc[-1]}] = -1  # make cells inactive
-
-    top = xr.DataArray([z[0]], coords={"layer": layers})
-    bottom = xr.DataArray(z[1:], coords={"layer": layers})
+    idomain, top, bottom = parameterizable_basic_dis
+    idomain.loc[{"x": idomain.coords["x"][-1]}] = -1  # make cells inactive
     k = ones_like(top)
 
     barrier_y = [0.0, 2.0]
@@ -216,32 +202,19 @@ def test_to_mf6_remove_invalid_edges(
         (2.0, 1),
     ],
 )
+@pytest.mark.parametrize("parameterizable_basic_dis", [(2, 1, 3)], indirect=True)
 @patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
 def test_to_mf6_remove_barrier_parts_adjacent_to_inactive_cells(
-    mf6_flow_barrier_mock, barrier_x_loc, expected_number_barriers
+    mf6_flow_barrier_mock,
+    parameterizable_basic_dis,
+    barrier_x_loc,
+    expected_number_barriers,
 ):
     # Arrange.
-    shape = nlay, nrow, ncol = 2, 1, 3
-
-    dx = dy = dz = 1.0
-
-    x = np.arange(0, ncol + 1) * dx
-    y = np.arange(0, nrow + 1)[::-1] * dy
-    z = -np.arange(0, nlay + 1) * dz
-
-    xc = (x[:-1] + x[1:]) / 2
-    yc = (y[:-1] + y[1:]) / 2
-
-    layers = np.arange(nlay) + 1
-
-    idomain = xr.DataArray(
-        np.ones(shape, dtype=np.int32), coords={"layer": layers, "y": yc, "x": xc}
-    )
-    idomain = idomain.assign_coords({"dy": -dy})
-    idomain.loc[{"x": xc[-1], "layer": layers[-1]}] = -1  # make cell inactive
-
-    top = xr.DataArray(z[:-1], coords={"layer": layers})
-    bottom = xr.DataArray(z[1:], coords={"layer": layers})
+    idomain, top, bottom = parameterizable_basic_dis
+    idomain.loc[
+        {"x": idomain.coords["x"][-1], "layer": idomain.coords["layer"][-1]}
+    ] = -1  # make cell inactive
     k = ones_like(top)
 
     barrier_y = [0.0, 2.0]

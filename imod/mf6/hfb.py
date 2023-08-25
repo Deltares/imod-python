@@ -260,8 +260,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
                 snapped_dataset, edge_index, top, bottom, k
             )
 
-        barrier_values = barrier_values.where(
-            ~self.__is_edge_connected_to_inactive_cell(unstructured_grid, edge_index)
+        barrier_values = self.__remove_edge_values_connected_to_inactive_cells(
+            barrier_values, unstructured_grid, edge_index
         )
 
         barrier_dataset = to_connected_cells_dataset(
@@ -587,8 +587,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
         return edge_index[valid]
 
     @staticmethod
-    def __is_edge_connected_to_inactive_cell(
-        unstructured_grid: xu.UgridDataArray, edge_index: np.ndarray
+    def __remove_edge_values_connected_to_inactive_cells(
+        values, unstructured_grid: xu.UgridDataArray, edge_index: np.ndarray
     ):
         face_dimension = unstructured_grid.ugrid.grid.face_dimension
 
@@ -602,8 +602,9 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
             {face_dimension: face_connectivity[:, 1]}
         ]
 
-        return (connected_cells_left.drop(face_dimension) <= 0) | (
-            connected_cells_right.drop(face_dimension) <= 0
+        return values.where(
+            (connected_cells_left.drop(face_dimension) > 0)
+            & (connected_cells_right.drop(face_dimension) > 0)
         )
 
 

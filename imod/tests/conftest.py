@@ -2,6 +2,7 @@ import pytest
 
 from .fixtures.flow_basic_fixture import (
     basic_dis,
+    parameterizable_basic_dis,
     get_render_dict,
     horizontal_flow_barrier_gdf,
     metaswap_dict,
