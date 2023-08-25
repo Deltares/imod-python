@@ -135,7 +135,7 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
 
         return arrdict
 
-    def _to_sparse(self, arrdict, layer):
+    def _to_struct_array(self, arrdict, layer):
         field_spec = (
             [("layer_1", np.int32)]
             + [(dim, np.int32) for dim in arrdict["cell_dims1"]]

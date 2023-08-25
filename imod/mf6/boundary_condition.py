@@ -96,16 +96,16 @@ class BoundaryCondition(Package, abc.ABC):
             nmax = int(da.count())
         return nmax
 
-    def _write_binaryfile(self, outpath, sparse_data):
+    def _write_binaryfile(self, outpath, struct_array):
         with open(outpath, "w") as f:
-            sparse_data.tofile(f)
+            struct_array.tofile(f)
 
-    def _write_textfile(self, outpath, sparse_data):
-        fields = sparse_data.dtype.fields
+    def _write_textfile(self, outpath, struct_array):
+        fields = struct_array.dtype.fields
         fmt = [self._number_format(field[0]) for field in fields.values()]
         header = " ".join(list(fields.keys()))
         with open(outpath, "w") as f:
-            np.savetxt(fname=f, X=sparse_data, fmt=fmt, header=header)
+            np.savetxt(fname=f, X=struct_array, fmt=fmt, header=header)
 
     def write_datafile(self, outpath, ds, binary):
         """
@@ -113,12 +113,12 @@ class BoundaryCondition(Package, abc.ABC):
         """
         layer = ds["layer"].values if "layer" in ds.coords else None
         arrdict = self._ds_to_arrdict(ds)
-        sparse_data = self._to_sparse(arrdict, layer)
+        struct_array = self._to_struct_array(arrdict, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)
         if binary:
-            self._write_binaryfile(outpath, sparse_data)
+            self._write_binaryfile(outpath, struct_array)
         else:
-            self._write_textfile(outpath, sparse_data)
+            self._write_textfile(outpath, struct_array)
 
     def _ds_to_arrdict(self, ds):
         arrdict = {}
@@ -144,7 +144,7 @@ class BoundaryCondition(Package, abc.ABC):
                 arrdict[datavar] = ds[datavar].values
         return arrdict
 
-    def _to_sparse(self, arrdict, layer):
+    def _to_struct_array(self, arrdict, layer):
         """Convert from dense arrays to list based input"""
         # TODO stream the data per stress period
         # TODO add pkgcheck that period table aligns
@@ -362,7 +362,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
 
 
 class DisStructuredBoundaryCondition(BoundaryCondition):
-    def _to_sparse(self, arrdict, layer):
+    def _to_struct_array(self, arrdict, layer):
         spec = []
         for key in arrdict:
             if key in ["layer", "row", "column"]:
@@ -379,7 +379,7 @@ class DisStructuredBoundaryCondition(BoundaryCondition):
 
 
 class DisVerticesBoundaryCondition(BoundaryCondition):
-    def _to_sparse(self, arrdict, layer):
+    def _to_struct_array(self, arrdict, layer):
         spec = []
         for key in arrdict:
             if key in ["layer", "cell2d"]:
