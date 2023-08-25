@@ -4,9 +4,9 @@ from typing import List, Union
 
 import numpy as np
 import pandas as pd
+import shapely.geometry as sg
 import xarray as xr
 import xugrid as xu
-import shapely.geometry as sg
 
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
@@ -21,7 +21,7 @@ from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
 from imod.select.points import points_indices
 from imod.typing.grid import GridDataArray, ones_like
-from imod.util import values_within_range, spatial_reference
+from imod.util import spatial_reference, values_within_range
 
 # FUTURE: There was an idea to autogenerate these object.
 # This was relevant:
