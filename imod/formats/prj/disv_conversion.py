@@ -781,7 +781,6 @@ def convert_to_disv(
     model["oc"] = imod.mf6.OutputControl(save_head="all")
 
     # Used in other package construction:
-    idomain = disv["idomain"].compute()
     k = npf["k"].compute()
     new_ibound = weights_cache.regrid(source=ibound, method="minimum").compute()
 
