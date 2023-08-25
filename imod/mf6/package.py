@@ -47,8 +47,8 @@ class Package(PackageBase, abc.ABC):
 
     def isel(self):
         raise NotImplementedError(
-            f"""Selection on packages not yet supported. To make a selection on the package either call the 
-            :func:`~imod.mf6.package.Package.clip_box` method or call {self._pkg_id}.dataset.isel instead. You can 
+            f"""Selection on packages not yet supported. To make a selection on the package either call the
+            :func:`~imod.mf6.package.Package.clip_box` method or call {self._pkg_id}.dataset.isel instead. You can
             create a new package with a selection by calling {__class__.__name__}(**{self._pkg_id}.dataset.isel(
             **selection))"""
         )
