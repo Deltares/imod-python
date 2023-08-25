@@ -8,6 +8,7 @@ from jinja2 import Template
 import imod
 from imod.mf6.model import Modflow6Model
 from imod.mf6.pkgbase import Package
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
@@ -94,7 +95,8 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
-
+        # create write context
+        write_context = WriteContext(tmp_path)
         sut = Modflow6Model()
 
         discretization_mock = MagicMock(spec_set=Package)
@@ -109,7 +111,7 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = sut.write(tmp_path, model_name, global_times_mock)
+        status = sut.write(model_name, global_times_mock, True, write_context)
 
         # Assert.
         assert not status.has_errors()
@@ -118,7 +120,8 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
-
+        # create write context
+        write_context = WriteContext(tmp_path)
         sut = Modflow6Model()
 
         template_mock = MagicMock(spec_set=Template)
@@ -128,7 +131,7 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = sut.write(tmp_path, model_name, global_times_mock)
+        status = sut.write(model_name, global_times_mock, True, write_context)
 
         # Assert.
         assert status.has_errors()
@@ -137,7 +140,8 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
-
+        # create write context
+        write_context = WriteContext(tmp_path)
         sut = Modflow6Model()
 
         discretization_mock = MagicMock(spec_set=Package)
@@ -155,7 +159,7 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = sut.write(tmp_path, model_name, global_times_mock)
+        status = sut.write(model_name, global_times_mock, True, write_context)
 
         # Assert.
         assert status.has_errors()
@@ -164,6 +168,7 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
+        write_context = WriteContext(simulation_directory=tmp_path)
 
         sut = Modflow6Model()
 
@@ -189,7 +194,7 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = sut.write(tmp_path, model_name, global_times_mock)
+        status = sut.write(model_name, global_times_mock, True, write_context)
 
         # Assert.
         assert len(status.errors) == 2
