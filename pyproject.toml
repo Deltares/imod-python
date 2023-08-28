@@ -12,7 +12,7 @@ exclude_lines = [
 
 [tool.mypy]
 files = "imod/mf6/**.py"
-follow_imports = "skip"
+follow_imports = "silent"
 
 [[tool.mypy.overrides]]
 module = [
