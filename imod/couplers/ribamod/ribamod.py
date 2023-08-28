@@ -209,7 +209,8 @@ class RibaMod:
         basin_id = gridded_basin.where(conductance.notnull())
         include = basin_id.notnull().to_numpy()
         basin_id_values = basin_id.to_numpy()[include].astype(int)
-        boundary_id_values = np.arange(basin_id.size)[include.ravel()]
+        boundary_id_values = np.cumsum(conductance.notnull().to_numpy().ravel()) - 1
+        boundary_id_values = boundary_id_values[include.ravel()]
         return pd.DataFrame(
             data={"basin_id": basin_id_values, "bound_id": boundary_id_values}
         )
