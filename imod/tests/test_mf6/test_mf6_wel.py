@@ -5,10 +5,77 @@ import textwrap
 import numpy as np
 import pytest
 import xarray as xr
+import xugrid as xu
 
 import imod
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
+
+
+def test_clip_outside_grid__structured_grid_full(
+    basic_dis, well_high_lvl_test_data_stationary
+):
+    # Arrange
+    ibound, _, _ = basic_dis
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
+
+    # Act
+    wel_clipped = wel.clip_outside_grid(ibound)
+
+    # Assert
+    assert isinstance(wel_clipped, imod.mf6.Well)
+    assert wel_clipped.dataset["rate"].shape == wel.dataset["rate"].shape
+
+
+def test_clip_outside_grid__structured_grid_clipped(
+    basic_dis, well_high_lvl_test_data_stationary
+):
+    # Arrange
+    ibound, _, _ = basic_dis
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
+    # Clip grid so that xmax is set to 70.0 instead of 90.0
+    ibound_selected = ibound.sel(x=slice(None, 70.0))
+
+    # Act
+    wel_clipped = wel.clip_outside_grid(ibound_selected)
+
+    # Assert
+    assert isinstance(wel_clipped, imod.mf6.Well)
+    assert wel_clipped.dataset["rate"].shape == (5,)
+
+
+def test_clip_outside_grid__unstructured_grid_full(
+    basic_dis, well_high_lvl_test_data_stationary
+):
+    # Arrange
+    ibound, _, _ = basic_dis
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
+    ibound_ugrid = xu.UgridDataArray.from_structured(ibound)
+
+    # Act
+    wel_clipped = wel.clip_outside_grid(ibound_ugrid)
+
+    # Assert
+    assert isinstance(wel_clipped, imod.mf6.Well)
+    assert wel_clipped.dataset["rate"].shape == wel.dataset["rate"].shape
+
+
+def test_clip_outside_grid__unstructured_grid_clipped(
+    basic_dis, well_high_lvl_test_data_stationary
+):
+    # Arrange
+    ibound, _, _ = basic_dis
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
+    # Clip grid so that xmax is set to 70.0 instead of 90.0
+    ibound_selected = ibound.sel(x=slice(None, 70.0))
+    ibound_ugrid = xu.UgridDataArray.from_structured(ibound_selected)
+
+    # Act
+    wel_clipped = wel.clip_outside_grid(ibound_ugrid)
+
+    # Assert
+    assert isinstance(wel_clipped, imod.mf6.Well)
+    assert wel_clipped.dataset["rate"].shape == (5,)
 
 
 def test_to_mf6_pkg__high_lvl_stationary(basic_dis, well_high_lvl_test_data_stationary):
