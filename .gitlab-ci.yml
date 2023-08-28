@@ -19,9 +19,10 @@ lint:
 mypy:
   stage: mypy
   script:
+    - export PYTHONHASHSEED=0
     - mamba install mypy mypy-gitlab-code-quality
     - mypy --no-error-summary > mypy-out.txt
-    - PYTHONHASHSEED=0 mypy-gitlab-code-quality < mypy-out.txt > codequality.json
+    - mypy-gitlab-code-quality < mypy-out.txt > codequality.json
   artifacts:
     when: always
     reports:
