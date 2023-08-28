@@ -7,6 +7,7 @@ import pandas as pd
 import shapely.geometry as sg
 import xarray as xr
 import xugrid as xu
+from fastcore.dispatch import typedispatch
 
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
@@ -23,9 +24,47 @@ from imod.select.points import points_indices
 from imod.typing.grid import GridDataArray, ones_like
 from imod.util import spatial_reference, values_within_range
 
-# FUTURE: There was an idea to autogenerate these object.
-# This was relevant:
-# https://github.com/Deltares/xugrid/blob/main/xugrid/core/wrap.py#L90
+
+@typedispatch
+def _clip_outside_grid(well_pkg: "Well", grid: object) -> None:
+    raise TypeError(
+        f"'grid' should be of type xr.DataArray, xu.Ugrid2d or xu.UgridDataArray, got {type(grid)}"
+    )
+
+
+@typedispatch
+def _clip_outside_grid(well_pkg: "Well", grid: xr.DataArray) -> "Well":
+    _, xmin, xmax, _, ymin, ymax = spatial_reference(grid)
+    return well_pkg.clip_box(x_min=xmin, x_max=xmax, y_min=ymin, y_max=ymax)
+
+
+@typedispatch
+def _clip_outside_grid(well_pkg: "Well", grid: xu.Ugrid2d) -> "Well":
+    return _clip_outside_unstructured_grid(well_pkg, grid)
+
+
+@typedispatch
+def _clip_outside_grid(well_pkg: "Well", grid: xu.UgridDataArray) -> "Well":
+    return _clip_outside_unstructured_grid(well_pkg, grid.grid)
+
+
+def _clip_outside_unstructured_grid(well_pkg: "Well", unstructured_grid: xu.Ugrid2d):
+    """Clip wells outside unstructured grid."""
+    exterior = unstructured_grid.bounding_polygon()
+
+    # TODO: consider using numba_celltree for this when performance becomes a problem
+    # https://deltares.github.io/numba_celltree/examples/spatial_indexing.html#locating-points
+    points = [
+        sg.Point(x, y)
+        for x, y in zip(well_pkg.dataset["x"].values, well_pkg.dataset["y"].values)
+    ]
+    is_inside_exterior = exterior.contains(points)
+    selection = well_pkg.dataset.loc[{"index": is_inside_exterior}]
+
+    cls = type(well_pkg)
+    new = cls.__new__(cls)
+    new.dataset = selection
+    return new
 
 
 class Well(BoundaryCondition):
@@ -149,31 +188,7 @@ class Well(BoundaryCondition):
         self._validate_init_schemata(validate)
 
     def clip_outside_grid(self, grid: GridDataArray):
-        if isinstance(grid, xr.DataArray):
-            _, xmin, xmax, _, ymin, ymax = spatial_reference(grid)
-            return self.clip_box(x_min=xmin, x_max=xmax, y_min=ymin, y_max=ymax)
-        elif isinstance(grid, xu.Ugrid2d):
-            exterior = grid.bounding_polygon()
-        elif isinstance(grid, xu.UgridDataArray):
-            exterior = grid.grid.bounding_polygon()
-        else:
-            raise TypeError(
-                f"'grid' should be of type xr.DataArray, xu.Ugrid2d or xu.UgridDataArray, got {type(grid)}"
-            )
-
-        # TODO: consider using numba_celltree for this when performance becomes a problem
-        # https://deltares.github.io/numba_celltree/examples/spatial_indexing.html#locating-points
-        points = [
-            sg.Point(x, y)
-            for x, y in zip(self.dataset["x"].values, self.dataset["y"].values)
-        ]
-        is_inside_exterior = exterior.contains(points)
-        selection = self.dataset.loc[{"index": is_inside_exterior}]
-
-        cls = type(self)
-        new = cls.__new__(cls)
-        new.dataset = selection
-        return new
+        return _clip_outside_grid(self, grid)
 
     def clip_box(
         self,
