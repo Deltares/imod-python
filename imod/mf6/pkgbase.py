@@ -14,6 +14,7 @@ import xugrid as xu
 import imod
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
+from imod.schemata import ValidationError
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 

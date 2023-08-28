@@ -45,7 +45,7 @@ def test_partition_structured(twri_model):
 
 
 @pytest.mark.usefixtures("circle_model")
-def test_partition_unstructured(circle_model, tmp_path):
+def test_partition_unstructured(circle_model):
     partitioning_array = copy.deepcopy(
         circle_model["GWF_1"]["disv"]["idomain"].sel({"layer": 1})
     )
