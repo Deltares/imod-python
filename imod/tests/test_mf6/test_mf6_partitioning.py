@@ -3,7 +3,6 @@ import copy
 import numpy as np
 import pytest
 
-import imod
 from imod.mf6.modelsplitter import split_model_packages
 
 

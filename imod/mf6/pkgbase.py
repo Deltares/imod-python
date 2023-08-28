@@ -2,7 +2,7 @@ import abc
 import numbers
 import pathlib
 from collections import defaultdict
-from copy import copy, deepcopy
+from copy import copy
 from typing import Any, Dict, List, Union
 
 import cftime

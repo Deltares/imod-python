@@ -32,13 +32,15 @@ def partition_structured_slices(labels: xr.DataArray) -> List[Dict[str, slice]]:
 
 
 @typedispatch
-def split_model_packages(label_array: xr.DataArray, model: Modflow6Model):
+def split_model_packages(
+    label_array: xr.DataArray, model: Modflow6Model
+) -> List[Modflow6Model]:
     """
     This function splits a structured Model into a number of submodels. The
     label_array provided as input should have the same shape as the model grid,
     and contains an integer value in each cell. Each cell in the model grid will
     end up in the submodel with the index specified by the corresponding label
-    of that cell. The labels should be numbers between 0 and the number] of
+    of that cell. The labels should be numbers between 0 and the number of
     submodels.
     """
     slices = partition_structured_slices(label_array)
@@ -56,7 +58,9 @@ def split_model_packages(label_array: xr.DataArray, model: Modflow6Model):
 
 
 @typedispatch
-def split_model_packages(label_array: xu.UgridDataArray, model: Modflow6Model):
+def split_model_packages(  # noqa: F811
+    label_array: xu.UgridDataArray, model: Modflow6Model
+) -> List[Modflow6Model]:
     """
     This function splits an unstructured Model into a number of submodels. The
     label_array provided as input should have the same shape as the model grid,
