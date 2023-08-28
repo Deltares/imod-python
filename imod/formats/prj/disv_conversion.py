@@ -6,7 +6,7 @@ import itertools
 import pickle
 from collections import Counter
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, cast
 
 import numpy as np
 import pandas as pd
@@ -14,6 +14,8 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.mf6.model import Modflow6Model
+from imod.typing.grid import GridDataArray
 
 try:
     import geopandas as gpd
@@ -24,21 +26,6 @@ try:
     import shapely
 except ImportError:
     shapely = imod.util.MissingOptionalModule("shapely")
-
-
-def vectorized_overlap(bounds_a, bounds_b):
-    """
-    Vectorized overlap computation.
-
-    Compare with:
-
-    overlap = max(0, min(a[1], b[1]) - max(a[0], b[0]))
-    """
-    return np.maximum(
-        0.0,
-        np.minimum(bounds_a[..., 1], bounds_b[..., 1])
-        - np.maximum(bounds_a[..., 0], bounds_b[..., 0]),
-    )
 
 
 def hash_xy(da: xr.DataArray) -> Tuple[int]:
@@ -645,194 +632,42 @@ def create_ic(cache, model, key, value, active, **kwargs):
     return
 
 
-def multi_layer_hfb(
-    snapped: xu.UgridDataset,
-    dataframe: "gpd.GeoDataFrame",
-    top: xu.UgridDataArray,
-    bottom: xu.UgridDataArray,
-    k: xu.UgridDataArray,
-) -> xu.UgridDataArray:
-    """
-    Assign horizontal flow barriers to layers.
+def create_hfb(
+    model: Modflow6Model,
+    key: str,
+    value: Dict,
+    top: GridDataArray,
+    bottom: GridDataArray,
+    **kwargs,
+) -> None:
+    dataframe = value["geodataframe"]
 
-    Reduce the effective resistance by fraction of overlap with the layer
-    thickness.
-    """
+    barrier_gdf = gpd.GeoDataFrame(
+        geometry=dataframe["geometry"].values,
+        data={
+            "resistance": dataframe["resistance"].values,
+            "ztop": np.ones_like(dataframe["geometry"].values) * top.max().values,
+            "zbottom": np.ones_like(dataframe["geometry"].values) * bottom.min().values,
+        },
+    )
 
-    def mean_left_and_right(uda, left, right):
-        facedim = uda.ugrid.grid.face_dimension
-        uda_left = uda.ugrid.obj.isel({facedim: left}).drop_vars(facedim)
-        uda_right = uda.ugrid.obj.isel({facedim: right}).drop_vars(facedim)
-        return xr.concat((uda_left, uda_right), dim="two").mean("two")
-
-    def extract_dataframe_data(snapped, dataframe):
-        line_index = snapped["line_index"].values
-        line_index = line_index[~np.isnan(line_index)].astype(int)
-        sample = dataframe.iloc[line_index]
-        coordinates, index = shapely.get_coordinates(
-            sample.geometry, include_z=True, return_index=True
-        )
-        grouped = pd.DataFrame({"index": index, "z": coordinates[:, 2]}).groupby(
-            "index"
-        )
-        zmin = grouped["z"].min().values
-        zmax = grouped["z"].max().values
-        return zmin, zmax, sample["resistance"].values
-
-    def effective_resistance(snapped, dataframe, top, bottom, k):
-        left, right = snapped.ugrid.grid.edge_face_connectivity[edge_index].T
-        top_mean = mean_left_and_right(top, left, right)
-        bottom_mean = mean_left_and_right(bottom, left, right)
-        k_mean = mean_left_and_right(k, left, right)
-
-        n_layer, n_edge = top_mean.shape
-        layer_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
-        layer_bounds[..., 0] = bottom_mean.values.T
-        layer_bounds[..., 1] = top_mean.values.T
-
-        zmin, zmax, resistance = extract_dataframe_data(snapped, dataframe)
-        hfb_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
-        hfb_bounds[..., 0] = zmin[:, np.newaxis]
-        hfb_bounds[..., 1] = zmax[:, np.newaxis]
-
-        overlap = vectorized_overlap(hfb_bounds, layer_bounds)
-        height = layer_bounds[..., 1] - layer_bounds[..., 0]
-        # Avoid runtime warnings when diving by 0:
-        height[height <= 0] = np.nan
-        fraction = (overlap / height).T
-
-        resistance = resistance[np.newaxis, :]
-        c_aquifer = 1.0 / k_mean
-        inverse_c = (fraction / resistance) + ((1.0 - fraction) / c_aquifer)
-        c_total = 1.0 / inverse_c
-        return c_total
-
-    edge_index = np.argwhere(snapped["resistance"].notnull().values).ravel()
-    c_total = effective_resistance(snapped, dataframe, top, bottom, k)
-
-    notnull = c_total.notnull().values
-    layer, edge_subset = np.nonzero(notnull)
-    edge_subset_index = edge_index[edge_subset]
-    resistance_layered = (
-        xr.ones_like(top["layer"]) * xu.full_like(snapped["resistance"], np.nan)
-    ).compute()
-    resistance_layered.values[layer, edge_subset_index] = c_total.values[notnull]
-    resistance_layered = resistance_layered.dropna("layer", how="all")
-
-    return resistance_layered
+    model[key] = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)
 
 
-def __start_end_pairs_segments(arr):
-    """
-    Returns 2d array with starts and ends of each segment.
+def merge_hfbs(
+    horizontal_flow_barriers: List[imod.mf6.HorizontalFlowBarrierResistance],
+):
+    datasets = []
+    for horizontal_flow_barrier in horizontal_flow_barriers:
+        datasets.append(horizontal_flow_barrier.dataset)
 
-    Input:
-    [1, 2, 3, 4]
-    Returns:
-    [
-        [1 ,2],
-        [2, 3],
-        [3, 4],
-    ]
-    """
-    shape = (len(arr) - 1, 2)
-    points = np.empty(shape)
-    points[:, 0] = arr[:-1]
-    points[:, 1] = arr[1:]
-    return points
+    combined_dataset = xr.concat(datasets, "index")
+    combined_dataset.coords["index"] = np.arange(combined_dataset.sizes["index"])
 
+    combined_dataframe = cast(gpd.GeoDataFrame, combined_dataset.to_dataframe())
+    combined_dataframe.drop("print_input", axis=1, inplace=True)
 
-def __split_linestring_into_segments(dataframe):
-    coordinates, index = shapely.get_coordinates(dataframe.geometry, return_index=True)
-    # Create DataFrame to drop duplicates
-    df = pd.DataFrame({"index": index, "x": coordinates[:, 0], "y": coordinates[:, 1]})
-    df = df.drop_duplicates().reset_index(drop=True)
-
-    # Work around issue with xu.snap_to_grid, where provided linestrings only
-    # work if individual segments are provided.
-    linestring_indices = __start_end_pairs_segments(df["index"])
-    # Only preserve connections between two points where start and end share
-    # the same hfb index.
-    to_preserve = linestring_indices[:, 0] == linestring_indices[:, 1]
-    linestring_indices = linestring_indices[to_preserve].ravel()
-
-    points_x = __start_end_pairs_segments(df["x"])
-    points_x = points_x[to_preserve].ravel()
-    points_y = __start_end_pairs_segments(df["y"])
-    points_y = points_y[to_preserve].ravel()
-
-    segment_indices = np.repeat(np.arange(len(points_x) // 2), 2)
-
-    segments = shapely.linestrings(points_x, y=points_y, indices=segment_indices)
-    return gpd.GeoDataFrame(geometry=segments), linestring_indices[::2]
-
-
-# TODO 513: update the methods to use the new hfb package
-def create_hfb(cache, model, key, value, active, top, bottom, k, **kwargs):
-    # target = cache.target
-    # dataframe = value["geodataframe"]
-    # layer = value["layer"]
-    #
-    # # Split line into segments, which is required to run xu.snap_to_grid
-    # # FUTURE: Remove segmentation when xu.snap_to_grid updates.
-    # lines, hfb_indices = __split_linestring_into_segments(dataframe)
-    #
-    # if "resistance" in dataframe:
-    #     lines["resistance"] = dataframe["resistance"][hfb_indices].values
-    # elif "multiplier" in dataframe:
-    #     lines["resistance"] = -1.0 * dataframe["resistance"][hfb_indices].values
-    # else:
-    #     raise ValueError(
-    #         "Expected resistance or multiplier in HFB dataframe, "
-    #         f"received instead: {list(dataframe.keys())}"
-    #     )
-    # snapped, _ = xu.snap_to_grid(lines, grid=target, max_snap_distance=0.5)
-    #
-    # resistance = snapped["resistance"]
-    # if resistance.isnull().all():
-    #     return
-    #
-    # if layer != 0:
-    #     resistance = resistance.assign_coords(layer=layer)
-    # else:
-    #     resistance = multi_layer_hfb(snapped, dataframe, top, bottom, k)
-    #
-    # model[key] = imod.mf6.Mf6HorizontalFlowBarrier(
-    #     barrier_type=BarrierType.Resistance,
-    #     value=resistance,
-    #     idomain=active.astype(int),
-    # )
-    return
-
-
-# TODO 513: update the methods to use the new hfb package
-def merge_hfbs(hfbs, idomain):
-    # first = hfbs[0]
-    # grid = first.dataset.ugrid.grid
-    # layer = idomain["layer"].values
-    # n_layer = layer.size
-    # n_edge = grid.n_edge
-    # c_merged = xr.DataArray(
-    #     data=np.zeros((n_layer, n_edge), dtype=float),
-    #     dims=("layer", grid.edge_dimension),
-    #     coords={"layer": layer},
-    # )
-    #
-    # for hfb in hfbs:
-    #     resistance = hfb["resistance"].fillna(0.0)
-    #     if "layer" not in resistance.dims:
-    #         resistance = resistance.expand_dims("layer")
-    #     for layer, da in resistance.groupby("layer"):
-    #         c_merged.values[layer - 1, :] += da.values
-    #
-    # final_c = xu.UgridDataArray(
-    #     c_merged.where(c_merged > 0).dropna("layer", how="all"),
-    #     grid,
-    # )
-    # return imod.mf6.Mf6HorizontalFlowBarrier(
-    #     barrier_type=BarrierType.Resistance, value=final_c, idomain=idomain
-    # )
-    return
+    return imod.mf6.HorizontalFlowBarrierResistance(combined_dataframe)
 
 
 PKG_CONVERSION = {
@@ -946,7 +781,6 @@ def convert_to_disv(
     model["oc"] = imod.mf6.OutputControl(save_head="all")
 
     # Used in other package construction:
-    idomain = disv["idomain"].compute()
     k = npf["k"].compute()
     new_ibound = weights_cache.regrid(source=ibound, method="minimum").compute()
 
@@ -988,7 +822,7 @@ def convert_to_disv(
     hfb_keys = [key for key in model.keys() if key.split("-")[0] == "hfb"]
     hfbs = [model.pop(key) for key in hfb_keys]
     if hfbs:
-        model["hfb"] = merge_hfbs(hfbs, idomain)
+        model["hfb"] = merge_hfbs(hfbs)
 
     transient = any("time" in pkg.dataset.dims for pkg in model.values())
     if transient and (time_min is not None or time_max is not None):

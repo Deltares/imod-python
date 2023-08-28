@@ -12,7 +12,6 @@ have to work around the following issues in the converter:
 3. CHDs are separated into different systems for each layer
 4. Due to a bug with broadcasting n_times too many wells are generated:
     94 times & 94 indices.
-5. The data in the hfb packages causes xu.snap_to_grid to throw errors.
 
 """
 
@@ -47,11 +46,6 @@ data_prj
 data_prj["rch"]["rate"] = data_prj["rch"]["rate"].sel(layer=1)
 data_prj["drn-1"]["conductance"] = data_prj["drn-1"]["conductance"].sel(layer=1)
 data_prj["drn-1"]["elevation"] = data_prj["drn-1"]["elevation"].sel(layer=1)
-
-# For some reason the data in the hfb packages in this example cause
-# xu.snap_to_grid to fail. So remove for now.
-for i in range(1, 27):
-    data_prj.pop(f"hfb-{i}")
 
 # %%
 # Target grid
