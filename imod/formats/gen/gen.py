@@ -45,7 +45,8 @@ def parse_ascii_segments(lines: List[str]):
     n_feature = len(features)
     n_vertex = [len(f) - 1 for f in features]
 
-    # Process the feature id as a string. This adds support for id's containing commas and spaces
+    # Process the feature id as a string. This adds support for id's containing
+    # commas and spaces
     fid = np.full(n_feature, "", dtype=object)
     is_polygon = np.empty(n_feature, dtype=bool)
     indices = np.repeat(np.arange(n_feature), n_vertex)
@@ -56,6 +57,8 @@ def parse_ascii_segments(lines: List[str]):
     vertex_coords = []
     for i, feature in enumerate(features):
         fid[i] = feature[0]
+        # Use pd.read_csv instead of np.loadtxt, since it supports files
+        # delimited with multiple whitespace characters.
         feature_buffer = io.StringIO(initial_value="\n".join(feature[1:]))
         coords_df = pd.read_csv(
             feature_buffer, delim_whitespace=has_whitespace, header=None

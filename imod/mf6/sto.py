@@ -88,7 +88,7 @@ class SpecificStorage(StorageBase):
         Is specific yield. Specific yield values must be greater than or
         equal to 0. Specific yield does not have to be specified if there are no
         convertible cells (convertible=0 in every cell). (sy)
-    transient: ({True, False})
+    transient: ({True, False}), or a DataArray with a time coordinate and dtype Bool
         Boolean to indicate if the model is transient or steady-state.
     convertible: array of int (xr.DataArray)
         Is a flag for each cell that specifies whether or not a cell is
@@ -152,7 +152,7 @@ class SpecificStorage(StorageBase):
     }
 
     _regrid_method = {
-        "convertible": (RegridderType.OVERLAP, "mean"),
+        "convertible": (RegridderType.OVERLAP, "mode"),
         "specific_storage": (RegridderType.OVERLAP, "mean"),
         "specific_yield": (RegridderType.OVERLAP, "mean"),
     }
@@ -276,7 +276,7 @@ class StorageCoefficient(StorageBase):
     }
 
     _regrid_method = {
-        "convertible": (RegridderType.OVERLAP, "mean"),
+        "convertible": (RegridderType.OVERLAP, "mode"),
         "storage_coefficient": (RegridderType.OVERLAP, "mean"),
         "specific_yield": (RegridderType.OVERLAP, "mean"),
     }

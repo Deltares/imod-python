@@ -47,10 +47,10 @@ class Package(PackageBase, abc.ABC):
 
     def isel(self):
         raise NotImplementedError(
-            "Selection on packages not yet supported. To make a selection on "
-            f"the xr.Dataset, call {self._pkg_id}.dataset.isel instead."
-            "You can create a new package with a selection by calling "
-            f"{__class__.__name__}(**{self._pkg_id}.dataset.isel(**selection))"
+            f"""Selection on packages not yet supported. To make a selection on the package either call the
+            :func:`~imod.mf6.package.Package.clip_box` method or call {self._pkg_id}.dataset.isel instead. You can
+            create a new package with a selection by calling {__class__.__name__}(**{self._pkg_id}.dataset.isel(
+            **selection))"""
         )
 
     def sel(self):
@@ -680,6 +680,13 @@ class Package(PackageBase, abc.ABC):
         The regridding methods can be specified in the _regrid_method attribute of the package. These are the defaults
         that specify how each array should be regridded. These defaults can be overridden using the input
         parameters of this function.
+
+        Examples
+        --------
+        To regrid the npf package with a non-default method for the k-field, call regrid_like with these arguments:
+
+        >>> new_npf = npf.regrid_like(like, {"k": (imod.RegridderType.OVERLAP, "mean")})
+
 
         Parameters
         ----------

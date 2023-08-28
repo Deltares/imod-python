@@ -107,10 +107,10 @@ class Well(BoundaryCondition):
 
     def __init__(
         self,
+        x,
+        y,
         screen_top,
         screen_bottom,
-        y,
-        x,
         rate,
         concentration=None,
         concentration_boundary_type="aux",

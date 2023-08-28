@@ -19,6 +19,7 @@ from imod.mf6.model import (
     Modflow6Model,
 )
 from imod.mf6.statusinfo import NestedStatusInfo
+from imod.mf6.validation import validation_model_error_message
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray
 
@@ -219,7 +220,7 @@ class Modflow6Simulation(collections.UserDict):
                 )
 
         if status_info.has_errors():
-            raise ValidationError("\n" + status_info.to_string())
+            raise ValidationError("\n" + validation_model_error_message(status_info))
 
         self.directory = directory
 

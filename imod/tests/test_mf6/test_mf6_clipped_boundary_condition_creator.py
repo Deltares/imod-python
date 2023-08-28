@@ -4,7 +4,7 @@ import xarray as xr
 import xugrid as xu
 
 from imod.mf6 import ConstantHead
-from imod.mf6.clipped_boundary_condition_creator import ClippedBoundaryConditionCreator
+from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.select.grid import grid_boundary_xy
 
 
@@ -55,7 +55,7 @@ class TestClippedBoundaryConditionCreator:
         )
 
         # Act.
-        constant_head_pkg_clipped_domain = ClippedBoundaryConditionCreator.create(
+        constant_head_pkg_clipped_domain = create_clipped_boundary(
             idomain, clipped_boundary_values, [reduced_boundary_constant_head_pkg]
         )
 
@@ -101,7 +101,7 @@ class TestClippedBoundaryConditionCreator:
         )
 
         # Act.
-        constant_head_pkg_clipped_domain = ClippedBoundaryConditionCreator.create(
+        constant_head_pkg_clipped_domain = create_clipped_boundary(
             idomain, clipped_boundary_values, [reduced_boundary_constant_head_pkg]
         )
 

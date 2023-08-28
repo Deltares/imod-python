@@ -1,5 +1,6 @@
 from typing import TypeAlias, Union
 
+import numpy as np
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
@@ -25,3 +26,13 @@ def ones_like(grid: xr.DataArray, *args, **kwargs):
 @typedispatch
 def ones_like(grid: xu.UgridDataArray, *args, **kwargs):
     return xu.ones_like(grid, *args, **kwargs)
+
+
+@typedispatch
+def nan_like(grid: xr.DataArray, *args, **kwargs):
+    return xr.full_like(grid, fill_value=np.nan, dtype=np.float32, *args, **kwargs)
+
+
+@typedispatch
+def nan_like(grid: xu.UgridDataArray, *args, **kwargs):
+    return xu.full_like(grid, fill_value=np.nan, dtype=np.float32, *args, **kwargs)

@@ -220,7 +220,7 @@ class BoundaryCondition(Package, abc.ABC):
     def _get_bin_ds(self):
         """
         Get binary dataset data for stress periods, this data will be written to
-        datafiles. This method can be overrided to do some extra operations on
+        datafiles. This method can be overriden to do some extra operations on
         this dataset before writing.
         """
         return self[self.period_data()]

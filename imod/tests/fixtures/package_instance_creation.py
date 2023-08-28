@@ -254,10 +254,10 @@ GRIDLESS_PACKAGES = [
         1.02,
     ),
     imod.mf6.Well(
-        screen_top=[0.0, 0.0],
-        screen_bottom=[-10.0, -10.0],
         x=[1.0, 6002.0],
         y=[3.0, 5004.0],
+        screen_top=[0.0, 0.0],
+        screen_bottom=[-10.0, -10.0],
         rate=[1.0, 3.0],
         print_flows=True,
         validate=True,

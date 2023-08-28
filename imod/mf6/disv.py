@@ -67,10 +67,10 @@ class VerticesDiscretization(Package):
     _regrid_method = {
         "top": (RegridderType.OVERLAP, "mean"),
         "bottom": (RegridderType.OVERLAP, "mean"),
-        "idomain": (RegridderType.OVERLAP, "mean"),
+        "idomain": (RegridderType.OVERLAP, "mode"),
     }
 
-    _skip_mask_arrays = ["bottom"]
+    _skip_mask_arrays = ["bottom", "idomain"]
 
     def __init__(self, top, bottom, idomain, validate: bool = True):
         super().__init__(locals())

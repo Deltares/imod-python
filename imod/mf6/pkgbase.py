@@ -13,7 +13,7 @@ TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
 class PackageBase(abc.ABC):
     """
-    This class is used for storing a collection of Xarray dataArrays or ugrid-DataArrays
+    This class is used for storing a collection of Xarray DataArrays or UgridDataArrays
     in a dataset. A load-from-file method is also provided. Storing to file is done by calling
     object.dataset.to_netcdf(...)
     """

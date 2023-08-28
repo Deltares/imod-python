@@ -19,7 +19,7 @@ from jinja2 import Template
 
 import imod
 from imod.mf6 import qgs_util
-from imod.mf6.clipped_boundary_condition_creator import ClippedBoundaryConditionCreator
+from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.package import Package
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
@@ -665,7 +665,7 @@ class GroundwaterFlowModel(Modflow6Model):
 
         constant_head_packages.extend(additional_boundaries)
 
-        return ClippedBoundaryConditionCreator.create(
+        return create_clipped_boundary(
             model.get_domain(), state_for_boundary, constant_head_packages
         )
 
