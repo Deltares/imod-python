@@ -7,6 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
@@ -197,7 +198,8 @@ def test_render_concentration_dis_structured_constant_time(well_test_data_statio
     assert actual == expected
 
     with tempfile.TemporaryDirectory() as output_dir:
-        wel.write(output_dir, "wel", globaltimes, False)
+        write_context = WriteContext(simulation_directory=output_dir)
+        wel.write("wel", globaltimes, write_context)
         with open(output_dir + "/wel/wel.dat", "r") as f:
             data = f.read()
             assert (
@@ -231,7 +233,8 @@ def test_render_concentration_dis_vertices_constant_time(well_test_data_stationa
     globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
 
     with tempfile.TemporaryDirectory() as output_dir:
-        wel.write(output_dir, "wel", globaltimes, False)
+        write_context = WriteContext(simulation_directory=output_dir)
+        wel.write("wel", globaltimes, write_context)
         with open(output_dir + "/wel/wel.dat", "r") as f:
             data = f.read()
             assert (
@@ -265,7 +268,9 @@ def test_render_concentration_dis_vertices_transient(well_test_data_transient):
     )
 
     with tempfile.TemporaryDirectory() as output_dir:
-        wel.write(output_dir, "wel", time, False)
+        write_context = WriteContext(simulation_directory=output_dir)
+
+        wel.write("wel", time, write_context)
         with open(output_dir + "/wel/wel-0.dat", "r") as f:
             data = f.read()
             assert (
