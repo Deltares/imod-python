@@ -164,8 +164,7 @@ class RibaMod:
                         "dll": str(ribasim_dll),
                         "dll_dep_dir": str(ribasim_dll_dependency),
                         "config_file": str(
-                            directory
-                            / self._ribasim_model_dir
+                            Path(self._ribasim_model_dir)
                             / f"{self.ribasim_model.modelname}.toml"
                         ),
                     },
@@ -250,14 +249,13 @@ class RibaMod:
         exchange_dir.mkdir(exist_ok=True, parents=True)
 
         packages = asdict(coupling)
-        packages.pop("mf6_model")
-        coupling_dict = defaultdict(dict)
+        coupling_dict = {destination: {} for destination in packages}
+        coupling_dict["mf6_model"] = packages.pop("mf6_model")
         for destination, keys in packages.items():
             for key in keys:
                 package = gwf_model[key]
                 table = self.derive_river_drainage_coupling(gridded_basin, package)
-                path = exchange_dir / f"{key}.tsv"
-                table.to_csv(path, sep="\t", index=False)
-                coupling_dict[destination][key] = path.as_posix()
+                table.to_csv(exchange_dir / f"{key}.tsv", sep="\t", index=False)
+                coupling_dict[destination][key] = f"exchanges/{key}.tsv"
 
         return coupling_dict
