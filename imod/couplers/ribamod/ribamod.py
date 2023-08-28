@@ -199,7 +199,9 @@ class RibaMod:
 
     @staticmethod
     def derive_river_drainage_coupling(
-        gridded_basin: xr.DataArray, package: Union[River, Drainage]
+        gridded_basin: xr.DataArray,
+        basin_ids: np.ndarray,
+        package: Union[River, Drainage],
     ) -> pd.DataFrame:
         # Conductance is leading parameter to define location, for both river
         # and drainage.
@@ -208,10 +210,13 @@ class RibaMod:
         basin_id = gridded_basin.where(conductance.notnull())
         include = basin_id.notnull().to_numpy()
         basin_id_values = basin_id.to_numpy()[include].astype(int)
-        boundary_id_values = np.cumsum(conductance.notnull().to_numpy().ravel()) - 1
-        boundary_id_values = boundary_id_values[include.ravel()]
+        # Ribasim internally sorts the basin, which determines the order of the
+        # Ribasim level array.
+        basin_index = np.searchsorted(basin_ids, basin_id_values)
+        boundary_index_values = np.cumsum(conductance.notnull().to_numpy().ravel()) - 1
+        boundary_index_values = boundary_index_values[include.ravel()]
         return pd.DataFrame(
-            data={"basin_id": basin_id_values, "bound_id": boundary_id_values}
+            data={"basin_index": basin_index, "bound_index": boundary_index_values}
         )
 
     def write_exchanges(
@@ -244,6 +249,7 @@ class RibaMod:
             like=dis["idomain"].isel(layer=0, drop=True),
             column="basin_id",
         )
+        basin_ids = np.unique(self.ribasim_model.basin.profile["node_id"])
 
         exchange_dir = directory / "exchanges"
         exchange_dir.mkdir(exist_ok=True, parents=True)
@@ -254,7 +260,9 @@ class RibaMod:
         for destination, keys in packages.items():
             for key in keys:
                 package = gwf_model[key]
-                table = self.derive_river_drainage_coupling(gridded_basin, package)
+                table = self.derive_river_drainage_coupling(
+                    gridded_basin, basin_ids, package
+                )
                 table.to_csv(exchange_dir / f"{key}.tsv", sep="\t", index=False)
                 coupling_dict[destination][key] = f"exchanges/{key}.tsv"
 
