@@ -161,7 +161,7 @@ class Well(BoundaryCondition):
                 f"'grid' should be of type xr.DataArray, xu.Ugrid2d or xu.UgridDataArray, got {type(grid)}"
             )
 
-        # TODO: consider using numba_celltree for this
+        # TODO: consider using numba_celltree for this when performance becomes a problem
         # https://deltares.github.io/numba_celltree/examples/spatial_indexing.html#locating-points
         points = [
             sg.Point(x, y)
