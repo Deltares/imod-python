@@ -29,6 +29,7 @@ module = [
     "osgeo.*",
     "pandas.*",
     "pooch.*",
+    "pyproj.*",
     "rasterio.*",
     "ribasim.*",
     "ribasim_testmodels.*",

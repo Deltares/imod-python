@@ -20,6 +20,10 @@ mypy:
   stage: mypy
   script:
     - tox -e mypy
+  artifacts:
+    when: always
+    reports:
+      junit: mypy-report.xml
   allow_failure: true
 
 # Run tests and create docs in the same stage. The docker image cannot (easily)
