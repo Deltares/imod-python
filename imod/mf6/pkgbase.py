@@ -619,27 +619,6 @@ class Package(PackageBase, abc.ABC):
             indexer = xr.concat([first, indexer], dim="time")
 
         return indexer
-    
-    def is_void(self)->bool:
-        """
-        Returns true if this package does not contain any features.
-        Think about a River package that contains zero rivers; a Lake package without lakes, etc.
-        The presence of such packages can cause problems for MF6.
-        """
-
-        try:
-
-            # collect the nodata schemata applicable to this package.
-            schemata = {}
-            for key, value in self._write_schemata.items():
-                if isinstance(value, AllNoDataSchema):
-                    schemata[key] = value
-            if len(schemata) > 0:
-                result = self._validate(schemata)
-                if len(result) > 0:
-                    
-        except:
-            pass
 
     def clip_box(
         self,

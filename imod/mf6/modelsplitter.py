@@ -4,8 +4,15 @@ import numpy as np
 from imod.mf6.model import Modflow6Model, GroundwaterFlowModel
 from copy import deepcopy
 import xugrid as xu
+from fastcore.dispatch import typedispatch
 
 def partition_structured_slices(labels: xr.DataArray) -> List[Dict[str, slice]]:
+    '''
+    This function creates "slices" (tuples of start index, stop index and step
+    size as a built-in python class for array slicing) that describe areas in a
+    2d array that have the same label. the labels are given as input in a 2d
+    data grid. 
+    '''
     shape = labels.shape
     nrow, ncol = shape
     ds = xr.Dataset({"labels": labels})
@@ -20,26 +27,39 @@ def partition_structured_slices(labels: xr.DataArray) -> List[Dict[str, slice]]:
 
     return slices
 
-
-def split_model_packages( label_array, model: Modflow6Model ):
+@typedispatch
+def split_model_packages(label_array: xr.DataArray, model: Modflow6Model):
+    '''
+    This function splits a structured Model into a number of submodels. The
+    label_array provided as input should have the same shape as the model grid,
+    and contains an integer value in each cell. Each cell in the model grid will
+    end up in the submodel with the index specified by the corresponding label
+    of that cell. The labels should be numbers between 0 and the number] of
+    submodels. 
+    '''    
     slices = partition_structured_slices(label_array)
     new_models = []
     for slice in slices:
         new_model = GroundwaterFlowModel(**model._options)
         for pack_name, package in model.items():
-           
-            new_package_dataset = package.dataset.isel(slice, missing_dims = "ignore")
+            new_package_dataset = package.dataset.isel(slice, missing_dims="ignore")
             new_package = deepcopy(package)
             new_package.dataset = new_package_dataset
 
             new_model[pack_name] = new_package
-        new_models.append( new_model)
+        new_models.append(new_model)
     return new_models
 
-
-
-def split_model_unstructured_packages( label_array, model: Modflow6Model ):
-
+@typedispatch
+def split_model_packages(label_array: xu.UgridDataArray, model: Modflow6Model):
+    '''
+    This function splits an unstructured Model into a number of submodels. The
+    label_array provided as input should have the same shape as the model grid,
+    and contains an integer value in each cell. Each cell in the model grid will
+    end up in the submodel with the index specified by the corresponding label
+    of that cell. The labels should be numbers between 0 and the number of
+    submodels. 
+    '''     
     indices = xu.ugrid.partitioning.labels_to_indices(label_array.values)
     indexes = [(label_array.ugrid.grid.face_dimension, index) for index in indices]
 
@@ -48,39 +68,8 @@ def split_model_unstructured_packages( label_array, model: Modflow6Model ):
         new_model = GroundwaterFlowModel(**model._options)
 
         for pack_name, package in model.items():
-           
-            new_package = package.dataset.isel({dimname: index}, missing_dims = "ignore")
+            new_package = package.dataset.isel({dimname: index}, missing_dims="ignore")
 
             new_model[pack_name] = new_package
-        new_models.append( new_model)
+        new_models.append(new_model)
     return new_models
-
-    '''new_models = []
-    nr_new_models = label_array.values.max() + 1
-    for imodel in range (nr_new_models+1):
-        new_models.append(GroundwaterFlowModel(**model._options))
-
-    for pack_name, package in model.items():
-
-
-
-
-        if "mesh2d_nFaces" in model[pack_name].dataset.coords :
-            new_packages = package.dataset.ugrid.partition_by_label(label_array)
-            for imodel in range (nr_new_models):
-                new_models[imodel][pack_name] =  model[pack_name].__class__(**new_packages[imodel])            
-        else:
-            for imodel in range (nr_new_models):
-                new_models[imodel][pack_name] =  deepcopy( package)      
-    return new_models
-    '''
-
-
-
-
-
-
-
-
-    
-
