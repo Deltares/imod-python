@@ -21,7 +21,7 @@ mypy:
   script:
     - export PYTHONHASHSEED=0
     - mamba install mypy mypy-gitlab-code-quality
-    - mypy --no-error-summary | mypy-gitlab-code-quality > codequality.json
+    - mypy --config-file pyproject.toml --no-error-summary | mypy-gitlab-code-quality > codequality.json
   artifacts:
     when: always
     reports:
