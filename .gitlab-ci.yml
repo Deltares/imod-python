@@ -2,6 +2,7 @@ image: condaforge/miniforge3
 
 stages:
   - lint
+  - mypy
   - build
   - publish
 
@@ -14,6 +15,12 @@ lint:
   stage: lint
   script:
     - tox -e lint
+
+mypy:
+  stage: mypy
+  script:
+    - tox -e mypy
+  allow_failure: true
 
 # Run tests and create docs in the same stage. The docker image cannot (easily)
 # be shared between stages, this avoids double setup of the environment.
