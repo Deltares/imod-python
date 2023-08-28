@@ -19,11 +19,13 @@ lint:
 mypy:
   stage: mypy
   script:
-    - tox -e mypy
+    - mamba install mypy mypy-gitlab-code-quality
+    - mypy --no-error-summary > mypy-out.txt
+    - PYTHONHASHSEED=0 mypy-gitlab-code-quality < mypy-out.txt > codequality.json
   artifacts:
     when: always
     reports:
-      junit: mypy-report.xml
+      codequality: codequality.json
   allow_failure: true
 
 # Run tests and create docs in the same stage. The docker image cannot (easily)
