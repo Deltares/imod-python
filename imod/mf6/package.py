@@ -17,7 +17,6 @@ from imod.mf6.pkgbase import TRANSPORT_PACKAGES, PackageBase
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
     RegridderType,
-    align_grid_coordinates,
     get_non_grid_data,
 )
 from imod.mf6.validation import validation_pkg_error_message
@@ -659,9 +658,6 @@ class Package(PackageBase, abc.ABC):
 
         # regrid data array
         regridded_array = regridder.regrid(self.dataset[varname])
-
-        # set correct dx, dy variables and x, y coordinate axes
-        regridded_array = align_grid_coordinates(regridded_array, target_grid)
 
         # reconvert the result to the same dtype as the original
         return regridded_array.astype(original_dtype)

@@ -24,7 +24,6 @@ from imod.mf6.package import Package
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
     RegridderType,
-    align_grid_coordinates,
 )
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
 from imod.mf6.validation import (
@@ -450,8 +449,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         domain: GridDataArray,
     ):
         """
-        This function applies a mask to all packages in a model. The mask must be presented as an integer array
-        that has 0 in filtered cells and not-0 in active cells
+        This function applies a mask to all packages in a model. The mask must
+        be presented as an idomain-like integer array that has 0 or negative
+        values in filtered cells and positive values in active cells
         """
         for pkgname, pkg in self.items():
             self[pkgname] = pkg.mask(domain)
@@ -487,8 +487,6 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 included_in_all = included_in_all.where(regridded_idomain.notnull())
         new_idomain = included_in_all.where(included_in_all.notnull(), other=0)
         new_idomain = new_idomain.astype(int)
-
-        new_idomain = align_grid_coordinates(new_idomain, target_grid)
 
         return new_idomain
 
