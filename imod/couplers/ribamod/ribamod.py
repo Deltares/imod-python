@@ -61,8 +61,8 @@ class RibaMod:
         self.ribasim_model = ribasim_model
         self.mf6_simulation = mf6_simulation
         self.coupling_list = coupling_list
-        if "basin_id" not in basin_definition.columns:
-            raise ValueError('Basin definition must contain "basin_id" column')
+        if "node_id" not in basin_definition.columns:
+            raise ValueError('Basin definition must contain "node_id" column')
         self.basin_definition = basin_definition
 
     def _get_gwf_modelnames(self) -> List[str]:
@@ -247,9 +247,17 @@ class RibaMod:
         gridded_basin = imod.prepare.rasterize(
             self.basin_definition,
             like=dis["idomain"].isel(layer=0, drop=True),
-            column="basin_id",
+            column="node_id",
         )
+
         basin_ids = np.unique(self.ribasim_model.basin.profile["node_id"])
+        missing = ~np.isin(self.basin_definition["node_id"], basin_ids)
+        if missing.any():
+            missing_basins = self.basin_definition["node_id"].to_numpy()[missing]
+            raise ValueError(
+                "The node IDs of these basins in the basin definition do not "
+                f"occur in the Ribasim model: {missing_basins}"
+            )
 
         exchange_dir = directory / "exchanges"
         exchange_dir.mkdir(exist_ok=True, parents=True)
