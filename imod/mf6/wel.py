@@ -145,7 +145,19 @@ class Well(BoundaryCondition):
 
         self._validate_init_schemata(validate)
 
-    def clip_outside_grid(self, grid: GridDataArray):
+    def clip_outside_grid(self, grid: GridDataArray) -> "Well":
+        """
+        Clip wells falling outside of a provided grid.
+
+        Parameters
+        ----------
+        grid: xr.DataArray, xu.Ugrid2d, xu.UgridDataArray
+            Grid of which the exterior will be used to clip wells.
+
+        Returns
+        -------
+        clipped wells: Well
+        """
         return _clip_outside_grid(self, grid)
 
     def clip_box(
