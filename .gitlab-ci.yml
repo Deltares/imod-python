@@ -20,6 +20,8 @@ mypy:
   stage: mypy
   script:
     - export PYTHONHASHSEED=0
+    - mamba env create -f imod-environment.yml
+    - source activate imod
     - mamba install mypy mypy-gitlab-code-quality
     - mypy --no-error-summary | mypy-gitlab-code-quality > codequality.json
   artifacts:
