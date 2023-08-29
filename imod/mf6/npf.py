@@ -255,7 +255,6 @@ class NodePropertyFlow(Package):
             AllValueSchema(">", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
-        "k": (AllValueSchema(">", 0.0),),
         "rewet_layer": (
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),

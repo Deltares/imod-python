@@ -6,8 +6,6 @@ import xarray as xr
 import xugrid as xu
 from xugrid.regrid.regridder import BaseRegridder
 
-from imod.typing.grid import GridDataArray
-
 
 class RegridderType(Enum):
     """
