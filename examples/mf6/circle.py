@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 import xugrid as xu
+from pandas import isnull
 
 import imod
 
@@ -266,7 +267,7 @@ clipped_half_simulation_constant_head = (
 )
 
 all_boundaries_constant_head = half_simulation_constant_head.where(
-    ~np.isnull(half_simulation_constant_head), clipped_half_simulation_constant_head
+    ~isnull(half_simulation_constant_head), clipped_half_simulation_constant_head
 )
 
 # plot boundary conditions

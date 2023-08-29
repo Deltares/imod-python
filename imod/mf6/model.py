@@ -42,14 +42,6 @@ def initialize_template(name: str) -> Template:
     return env.get_template(name)
 
 
-def round_to_closest_integer_array(input_array: GridDataArray) -> GridDataArray:
-    """
-    This function creates an array equal to the input array but with all values converted to integer.
-    Values are converted with the np.rint() function which rounds to the closest integer.
-    """
-    return np.rint(input_array).astype(np.int32)
-
-
 class Modflow6Model(collections.UserDict, abc.ABC):
     _mandatory_packages = None
     _model_id = None
@@ -504,7 +496,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             else:
                 included_in_all = included_in_all.where(regridded_idomain.notnull())
         new_idomain = included_in_all.where(included_in_all.notnull(), other=0)
-        new_idomain = round_to_closest_integer_array(new_idomain)
+        new_idomain = new_idomain.astype(int)
 
         new_idomain = align_grid_coordinates(new_idomain, target_grid)
 
