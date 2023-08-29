@@ -36,7 +36,7 @@ dependencies:
   - pytest-benchmark
   - pytest-cases
   - pytest-cov
-  - python>=3.7,<3.11
+  - python=3.10
   - pyvista
   - rasterio>=1.0
   - rioxarray

@@ -18,6 +18,11 @@ class PackageBase(abc.ABC):
     object.dataset.to_netcdf(...)
     """
 
+    # This method has been added to allow mock.patch to mock created objects
+    # https://stackoverflow.com/questions/64737213/how-to-patch-the-new-method-of-a-class
+    def __new__(cls, *_, **__):
+        return super(PackageBase, cls).__new__(cls)
+
     def __init__(self, allargs=None):
         if allargs is not None:
             for arg in allargs.values():
@@ -31,6 +36,25 @@ class PackageBase(abc.ABC):
 
     def __setitem__(self, key, value):
         self.dataset.__setitem__(key, value)
+
+    def to_netcdf(self, *args, **kwargs):
+        """
+
+        Write dataset contents to a netCDF file.
+        Custom encoding rules can be provided on package level by overriding the _netcdf_encoding in the package
+
+        """
+        kwargs.update({"encoding": self._netcdf_encoding()})
+        self.dataset.to_netcdf(*args, **kwargs)
+
+    def _netcdf_encoding(self):
+        """
+
+        The encoding used in the to_netcdf method
+        Override this to provide custom encoding rules
+
+        """
+        return {}
 
     @classmethod
     def from_file(cls, path, **kwargs):

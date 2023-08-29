@@ -110,8 +110,8 @@ def test_discontinuous_layer(drainage):
     bin_ds = drn[list(drn._period_data)]
     layer = bin_ds["layer"].values
     arrdict = drn._ds_to_arrdict(bin_ds)
-    sparse_data = drn._to_sparse(arrdict, layer)
-    assert np.array_equal(np.unique(sparse_data["layer"]), [1, 3, 5])
+    struct_array = drn._to_struct_array(arrdict, layer)
+    assert np.array_equal(np.unique(struct_array["layer"]), [1, 3, 5])
 
 
 def test_3d_singelayer():
@@ -130,8 +130,8 @@ def test_3d_singelayer():
     bin_ds = drn[list(drn._period_data)]
     layer = bin_ds["layer"].values
     arrdict = drn._ds_to_arrdict(bin_ds)
-    sparse_data = drn._to_sparse(arrdict, layer)
-    assert isinstance(sparse_data, np.ndarray)
+    struct_array = drn._to_struct_array(arrdict, layer)
+    assert isinstance(struct_array, np.ndarray)
 
 
 @pytest.mark.usefixtures("concentration_fc", "elevation_fc", "conductance_fc")
