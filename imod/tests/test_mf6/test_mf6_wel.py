@@ -15,6 +15,7 @@ from imod.schemata import ValidationError
 def test_clip_outside_grid__structured_grid_full(
     basic_dis, well_high_lvl_test_data_stationary
 ):
+    """All wells are included within the structured grid bounds"""
     # Arrange
     ibound, _, _ = basic_dis
     wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
@@ -30,6 +31,7 @@ def test_clip_outside_grid__structured_grid_full(
 def test_clip_outside_grid__structured_grid_clipped(
     basic_dis, well_high_lvl_test_data_stationary
 ):
+    """Half of the wells are included within the structured grid bounds"""
     # Arrange
     ibound, _, _ = basic_dis
     wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
@@ -47,6 +49,7 @@ def test_clip_outside_grid__structured_grid_clipped(
 def test_clip_outside_grid__unstructured_grid_full(
     basic_dis, well_high_lvl_test_data_stationary
 ):
+    """All the wells are included within the unstructured grid bounds"""
     # Arrange
     ibound, _, _ = basic_dis
     wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
@@ -63,6 +66,7 @@ def test_clip_outside_grid__unstructured_grid_full(
 def test_clip_outside_grid__unstructured_grid_clipped(
     basic_dis, well_high_lvl_test_data_stationary
 ):
+    """Half of the wells are included within the unstructured grid bounds"""
     # Arrange
     ibound, _, _ = basic_dis
     wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
