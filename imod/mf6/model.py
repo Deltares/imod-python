@@ -268,6 +268,16 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                     self.__write_well(
                         pkg, modeldirectory, pkg_name, globaltimes, binary, validate
                     )
+                elif isinstance(pkg, imod.mf6.HorizontalFlowBarrierBase):
+                    top, bottom, idomain = self.__get_domain_geometry()
+                    k = self.__get_k()
+                    mf6_pkg = pkg.to_mf6_pkg(idomain, top, bottom, k)
+                    mf6_pkg.write(
+                        directory=modeldirectory,
+                        pkgname=pkg_name,
+                        globaltimes=globaltimes,
+                        binary=binary,
+                    )
                 else:
                     pkg.write(
                         directory=modeldirectory,
@@ -303,7 +313,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 else:
                     pkg.dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
             else:
-                pkg.dataset.to_netcdf(modeldirectory / pkg_path)
+                pkg.to_netcdf(modeldirectory / pkg_path)
 
         toml_path = modeldirectory / f"{modelname}.toml"
         with open(toml_path, "wb") as f:
