@@ -2,9 +2,9 @@ import warnings
 from copy import deepcopy
 from typing import List, Union
 
+import geopandas as gpd
 import numpy as np
 import pandas as pd
-import shapely.geometry as sg
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
@@ -811,12 +811,12 @@ def _clip_outside_unstructured_grid(
     """Clip wells outside unstructured grid."""
     exterior = unstructured_grid.bounding_polygon()
 
-    # TODO: consider using numba_celltree for this when performance becomes a problem
-    # https://deltares.github.io/numba_celltree/examples/spatial_indexing.html#locating-points
-    points = [
-        sg.Point(x, y)
-        for x, y in zip(well_pkg.dataset["x"].values, well_pkg.dataset["y"].values)
-    ]
+    # TODO: benchmark to compare if Ugrid2d.locate_points(points) == -1 isn't
+    # faster.
+    # https://deltares.github.io/xugrid/api/xugrid.Ugrid2d.locate_points.html#xugrid.Ugrid2d.locate_points
+    points = gpd.points_from_xy(
+        x=well_pkg.dataset["x"].values, y=well_pkg.dataset["y"].values
+    )
     is_inside_exterior = exterior.contains(points)
     selection = well_pkg.dataset.loc[{"index": is_inside_exterior}]
 
