@@ -41,7 +41,7 @@ def test_clip_outside_grid__structured_grid_clipped(
 
     # Assert
     assert isinstance(wel_clipped, imod.mf6.Well)
-    assert wel_clipped.dataset["rate"].shape == (5,)
+    assert wel_clipped.dataset["rate"].shape == (4,)
 
 
 def test_clip_outside_grid__unstructured_grid_full(
@@ -75,7 +75,7 @@ def test_clip_outside_grid__unstructured_grid_clipped(
 
     # Assert
     assert isinstance(wel_clipped, imod.mf6.Well)
-    assert wel_clipped.dataset["rate"].shape == (5,)
+    assert wel_clipped.dataset["rate"].shape == (4,)
 
 
 def test_to_mf6_pkg__high_lvl_stationary(basic_dis, well_high_lvl_test_data_stationary):
