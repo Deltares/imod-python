@@ -7,6 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.mf6.write_context import WriteContext
 
 
 @pytest.fixture()
@@ -125,7 +126,8 @@ def test_write_period_data(concentration_transient):
         save_flows=True,
     )
     with tempfile.TemporaryDirectory() as output_dir:
-        cnc.write(output_dir, "cnc", globaltimes, False)
+        write_context = WriteContext(simulation_directory=output_dir)
+        cnc.write("cnc", globaltimes, write_context)
         with open(output_dir + "/cnc/cnc-0.dat", "r") as f:
             data = f.read()
             assert (

@@ -14,6 +14,7 @@ import imod
 from imod.mf6 import ConstantHead
 from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
 from imod.mf6.package import Package
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_model_can_run
 
@@ -101,8 +102,9 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
-
         model = Modflow6Model()
+        # create write context
+        write_context = WriteContext(tmp_path)
 
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
@@ -116,7 +118,7 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = model.write(tmp_path, model_name, global_times_mock)
+        status = model.write( model_name, global_times_mock, True, write_context)
 
         # Assert.
         assert not status.has_errors()
@@ -125,8 +127,9 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
-
         model = Modflow6Model()
+        # create write context
+        write_context = WriteContext(tmp_path)
 
         template_mock = MagicMock(spec_set=Template)
         template_mock.render.return_value = ""
@@ -135,7 +138,7 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = model.write(tmp_path, model_name, global_times_mock)
+        status = model.write(model_name, global_times_mock, True, write_context)
 
         # Assert.
         assert status.has_errors()
@@ -144,8 +147,9 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
-
         model = Modflow6Model()
+        # create write context
+        write_context = WriteContext(tmp_path)
 
         discretization_mock = MagicMock(spec_set=Package)
         discretization_mock._pkg_id = "dis"
@@ -162,7 +166,7 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = model.write(tmp_path, model_name, global_times_mock)
+        status = model.write(model_name, global_times_mock, True, write_context=write_context)
 
         # Assert.
         assert status.has_errors()
@@ -171,6 +175,7 @@ class TestModel:
         # Arrange.
         tmp_path = tmpdir_factory.mktemp("TestSimulation")
         model_name = "Test model"
+        write_context = WriteContext(simulation_directory=tmp_path)
 
         model = Modflow6Model()
 
@@ -196,7 +201,8 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = model.write(tmp_path, model_name, global_times_mock)
+        write_context = WriteContext(tmp_path)
+        status = model.write(model_name, global_times_mock,True, write_context)
 
         # Assert.
         assert len(status.errors) == 2

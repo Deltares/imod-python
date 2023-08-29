@@ -18,6 +18,7 @@ from imod import mf6
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.package import Package
 from imod.mf6.pkgbase import PackageBase
+from imod.mf6.write_context import WriteContext
 from imod.schemata import AllValueSchema, DimsSchema, DTypeSchema
 
 CONNECTION_DIM = "connection_dim"
@@ -980,15 +981,15 @@ class Lake(BoundaryCondition):
         df = self.dataset[outlet_vars].to_dataframe()
         return df
 
-    def write_blockfile(self, directory, pkgname, globaltimes, binary):
-        renderdir = pathlib.Path(directory.stem)
+    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+        renderdir = pathlib.Path(write_context.write_directory.stem)
         content = self.render(
             directory=renderdir,
             pkgname=pkgname,
             globaltimes=globaltimes,
-            binary=binary,
+            binary=write_context.use_binary,
         )
-        filename = directory / f"{pkgname}.{self._pkg_id}"
+        filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
             f.write("\n")
@@ -1000,7 +1001,9 @@ class Lake(BoundaryCondition):
             )
             if self._has_laketables():
                 lake_number_to_filename = self._write_laketable_filelist_section(f)
-                self._write_laketable_files(directory, lake_number_to_filename)
+                self._write_laketable_files(
+                    write_context.write_directory, lake_number_to_filename
+                )
 
             if self._has_outlets():
                 f.write("\n")
@@ -1169,7 +1172,7 @@ class Lake(BoundaryCondition):
                 header=False,
                 index=False,
                 sep=" ",
-                line_terminator="\n",
+                lineterminator="\n",
             )
 
             d["table"] = string_table
@@ -1190,7 +1193,7 @@ class Lake(BoundaryCondition):
             index=index,
             header=False,
             sep=" ",
-            line_terminator="\n",
+            lineterminator="\n",
         )
         trimmedlines = [line.strip() for line in block.splitlines()]
         trimmedblock = "\n".join(map(str, trimmedlines)) + "\n"

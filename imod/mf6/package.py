@@ -20,6 +20,7 @@ from imod.mf6.regridding_utils import (
     get_non_grid_data,
 )
 from imod.mf6.validation import validation_pkg_error_message
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray
 
@@ -46,10 +47,10 @@ class Package(PackageBase, abc.ABC):
 
     def isel(self):
         raise NotImplementedError(
-            f"""Selection on packages not yet supported. To make a selection on the package either call the
-            :func:`~imod.mf6.package.Package.clip_box` method or call {self._pkg_id}.dataset.isel instead. You can
-            create a new package with a selection by calling {__class__.__name__}(**{self._pkg_id}.dataset.isel(
-            **selection))"""
+            "Selection on packages not yet supported. To make a selection on "
+            f"the xr.Dataset, call {self._pkg_id}.dataset.isel instead."
+            "You can create a new package with a selection by calling "
+            f"{__class__.__name__}(**{self._pkg_id}.dataset.isel(**selection))"
         )
 
     def sel(self):
@@ -103,14 +104,16 @@ class Package(PackageBase, abc.ABC):
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
 
-    def write_blockfile(self, directory, pkgname, globaltimes, binary):
+    def write_blockfile(self, pkgname, globaltimes, write_context: WriteContext):
+        directory = write_context.get_formatted_write_directory()
+
         content = self.render(
             directory=directory,
             pkgname=pkgname,
             globaltimes=globaltimes,
-            binary=binary,
+            binary=write_context.use_binary,
         )
-        filename = directory / f"{pkgname}.{self._pkg_id}"
+        filename = write_context.write_directory / f"{pkgname}.{self._pkg_id}"
         with open(filename, "w") as f:
             f.write(content)
 
@@ -168,7 +171,7 @@ class Package(PackageBase, abc.ABC):
         if directory is None:
             pkg_directory = pkgname
         else:
-            pkg_directory = pathlib.Path(directory.stem) / pkgname
+            pkg_directory = pathlib.Path(directory) / pkgname
 
         for varname in self.dataset.data_vars:
             key = self._keyword_map.get(varname, varname)
@@ -230,9 +233,15 @@ class Package(PackageBase, abc.ABC):
 
         return layered, values
 
-    def write(self, directory, pkgname, globaltimes, binary):
-        directory = pathlib.Path(directory)
-        self.write_blockfile(directory, pkgname, globaltimes, binary=binary)
+    def write(
+        self,
+        pkgname: str,
+        globaltimes: Union[List, np.ndarray],
+        write_context: WriteContext,
+    ):
+        directory = write_context.write_directory
+        binary = write_context.use_binary
+        self.write_blockfile(pkgname, globaltimes, write_context)
 
         if hasattr(self, "_grid_data"):
             if self._is_xy_data(self.dataset):

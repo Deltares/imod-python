@@ -30,7 +30,7 @@ from imod.mf6.validation import (
 from imod.mf6.wel import Well
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray
-
+from imod.mf6.write_context import WriteContext
 
 def initialize_template(name: str) -> Template:
     loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -141,8 +141,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 modeltimes.append(repeat_stress.isel(repeat_items=0).values)
         return modeltimes
 
-    def render(self, modelname: str):
-        dir_for_render = pathlib.Path(modelname)
+    def render(self, modelname: str, write_context: WriteContext):
+        dir_for_render = write_context.root_directory / modelname
+
         d = {k: v for k, v in self._options.items() if not (v is None or v is False)}
         packages = []
         for pkgname, pkg in self.items():
@@ -240,33 +241,36 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         )
 
     def write(
-        self, directory, modelname, globaltimes, binary=True, validate: bool = True
+        self, modelname, globaltimes, validate: bool, write_context: WriteContext
     ) -> StatusInfoBase:
         """
         Write model namefile
         Write packages
         """
 
-        workdir = pathlib.Path(directory)
+        workdir = write_context.simulation_directory
         modeldirectory = workdir / modelname
-        modeldirectory.mkdir(exist_ok=True, parents=True)
+        Path(modeldirectory).mkdir(exist_ok=True, parents=True)
         if validate:
             model_status_info = self._validate(modelname)
             if model_status_info.has_errors():
                 return model_status_info
 
         # write model namefile
-        namefile_content = self.render(modelname)
+        namefile_content = self.render(modelname, write_context)
         namefile_path = modeldirectory / f"{modelname}.nam"
         with open(namefile_path, "w") as f:
             f.write(namefile_content)
 
         # write package contents
+        pkg_write_context = write_context.copy_with_new_write_directory(
+            new_write_directory=modeldirectory
+        )
         for pkg_name, pkg in self.items():
             try:
                 if isinstance(pkg, imod.mf6.Well):
                     self.__write_well(
-                        pkg, modeldirectory, pkg_name, globaltimes, binary, validate
+                        pkg, modeldirectory, pkg_name, globaltimes, write_context.use_binary, validate
                     )
                 elif isinstance(pkg, imod.mf6.HorizontalFlowBarrierBase):
                     top, bottom, idomain = self.__get_domain_geometry()
@@ -276,14 +280,13 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                         directory=modeldirectory,
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
-                        binary=binary,
+                        binary=write_context.use_binary,
                     )
                 else:
                     pkg.write(
-                        directory=modeldirectory,
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
-                        binary=binary,
+                        write_context=pkg_write_context,
                     )
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")

@@ -4,6 +4,7 @@ import xarray as xr
 import xugrid as xu
 
 from imod.mf6.lak import Lake, LakeData, OutletManning
+from imod.mf6.write_context import WriteContext
 
 
 def create_lake_table(
@@ -132,7 +133,8 @@ def create_lake_data_structured(
 
 
 def write_and_read(package, path, filename, globaltimes=None) -> str:
-    package.write(path, filename, globaltimes, False)
+    write_context = WriteContext(write_directory=path)
+    package.write(filename, globaltimes, write_context)
     with open(path / f"{filename}.lak") as f:
         actual = f.read()
     return actual

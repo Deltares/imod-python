@@ -19,8 +19,9 @@ from imod.mf6.model import (
     Modflow6Model,
 )
 from imod.mf6.statusinfo import NestedStatusInfo
-from imod.mf6.validation import validation_model_error_message
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
+from imod.mf6.validation import validation_model_error_message
 from imod.typing.grid import GridDataArray
 
 
@@ -129,15 +130,18 @@ class Modflow6Simulation(collections.UserDict):
             timestep_duration=timestep_duration, validate=validate
         )
 
-    def render(self):
+    def render(self, write_context: WriteContext):
         """Renders simulation namefile"""
         d = {}
         models = []
         solutiongroups = []
-
         for key, value in self.items():
             if isinstance(value, Modflow6Model):
-                models.append((value._model_id, f"{key}/{key}.nam", key))
+                model_name_file = pathlib.Path(
+                    write_context.root_directory / pathlib.Path(f"{key}", f"{key}.nam")
+                ).as_posix()
+                models.append((value._model_id, model_name_file, key))
+
             elif value._pkg_id == "tdis":
                 d["tdis6"] = f"{key}.tdis"
             elif value._pkg_id == "ims":
@@ -161,7 +165,13 @@ class Modflow6Simulation(collections.UserDict):
         d["solutiongroups"] = [solutiongroups]
         return self._template.render(d)
 
-    def write(self, directory=".", binary=True, validate: bool = True):
+    def write(
+        self,
+        directory=".",
+        binary=True,
+        validate: bool = True,
+        use_absolute_paths=False,
+    ):
         """
         Write Modflow6 simulation, including assigned groundwater flow and
         transport models.
@@ -177,7 +187,12 @@ class Modflow6Simulation(collections.UserDict):
             Whether to validate the Modflow6 simulation, including models, at
             write. If True, erronous model input will throw a
             ``ValidationError``.
+        absolute_paths: ({True, False}, optional)
+            True if all paths written to the mf6 inputfiles should be absolute.
         """
+        # create write context
+        write_context = WriteContext(directory, binary, use_absolute_paths)
+
         # Check models for required content
         for key, model in self.items():
             # skip timedis, exchanges
@@ -188,7 +203,7 @@ class Modflow6Simulation(collections.UserDict):
         directory.mkdir(exist_ok=True, parents=True)
 
         # Write simulation namefile
-        mfsim_content = self.render()
+        mfsim_content = self.render(write_context)
         mfsim_path = directory / "mfsim.nam"
         with open(mfsim_path, "w") as f:
             f.write(mfsim_content)
@@ -200,24 +215,24 @@ class Modflow6Simulation(collections.UserDict):
         status_info = NestedStatusInfo("Simulation validation status")
         globaltimes = self["time_discretization"]["time"].values
         for key, value in self.items():
+            model_write_context = write_context.copy_with_new_write_directory(
+                write_context.simulation_directory
+            )
             # skip timedis, exchanges
             if isinstance(value, Modflow6Model):
                 status_info.add(
                     value.write(
-                        directory=directory,
-                        globaltimes=globaltimes,
                         modelname=key,
-                        binary=binary,
+                        globaltimes=globaltimes,
                         validate=validate,
+                        write_context=model_write_context,
                     )
                 )
             elif value._pkg_id == "ims":
-                value.write(
-                    directory=directory,
-                    pkgname=key,
-                    globaltimes=globaltimes,
-                    binary=binary,
+                ims_write_context = write_context.copy_with_new_write_directory(
+                    write_context.simulation_directory
                 )
+                value.write(key, globaltimes, ims_write_context)
 
         if status_info.has_errors():
             raise ValidationError("\n" + validation_model_error_message(status_info))

@@ -6,6 +6,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
@@ -90,8 +91,7 @@ def test_bottom_exceeding_itself(idomain_and_bottom):
 
     errors = dis._validate(dis._write_schemata, idomain=idomain)
     assert len(errors) == 1
-    for var, var_errors in errors.items():
-        assert var == "bottom"
+    assert isinstance(errors["bottom"][0], ValidationError)
 
 
 def test_top_exceeding_bottom(idomain_and_bottom):
@@ -165,12 +165,9 @@ def test_write_ascii_griddata_2d_3d(idomain_and_bottom, tmp_path):
     # https://gitlab.com/deltares/imod/imod-python/-/issues/270
     directory = tmp_path / "dis_griddata"
     directory.mkdir()
-    dis.write(
-        directory=directory,
-        pkgname="dis",
-        globaltimes=[],
-        binary=False,
-    )
+    write_context = WriteContext(simulation_directory=directory)
+
+    dis.write(pkgname="dis", globaltimes=[], write_context=write_context)
 
     with open(directory / "dis/top.dat") as f:
         top_content = f.readlines()
