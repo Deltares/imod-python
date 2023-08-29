@@ -35,6 +35,33 @@ def basic_dis():
     return ibound, top, bottom
 
 
+@pytest.fixture
+def parameterizable_basic_dis(request):
+    shape = nlay, nrow, ncol = request.param
+
+    dx = dy = dz = 1.0
+
+    x = np.arange(0, ncol + 1) * dx
+    y = np.arange(0, nrow + 1)[::-1] * dy
+    z = -np.arange(0, nlay + 1) * dz
+
+    xc = (x[:-1] + x[1:]) / 2
+    yc = (y[:-1] + y[1:]) / 2
+
+    layers = np.arange(nlay) + 1
+
+    idomain = xr.DataArray(
+        np.ones(shape, dtype=np.int32), coords={"layer": layers, "y": yc, "x": xc}
+    )
+
+    idomain = idomain.assign_coords({"dy": -dy})
+
+    top = xr.DataArray(z[:-1], coords={"layer": layers})
+    bottom = xr.DataArray(z[1:], coords={"layer": layers})
+
+    return idomain, top, bottom
+
+
 @pytest.fixture(scope="module")
 def three_days():
     """Simple time discretization of three days"""

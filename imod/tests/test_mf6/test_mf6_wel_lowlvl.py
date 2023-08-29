@@ -8,13 +8,13 @@ import pytest
 import xarray as xr
 
 import imod
-import imod.mf6.mf6_adapter
+import imod.mf6.mf6_wel_adapter
 import imod.mf6.utilities.dataset_utilities
 import imod.mf6.wel
 
 
 @pytest.fixture()
-def sparse_data_expected():
+def struct_array_expected():
     return np.array(
         [
             (1, 1, 9, 1.0),
@@ -30,59 +30,61 @@ def sparse_data_expected():
     )
 
 
-def test_mf6wel_to_sparse__stationary(
-    mf6wel_test_data_stationary, sparse_data_expected
+def test_mf6wel_to_struct_array__stationary(
+    mf6wel_test_data_stationary, struct_array_expected
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_stationary
-    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_wel_adapter.Mf6Wel(cellid=cellid, rate=rate)
 
     # Act
     arrdict = mf6wel._ds_to_arrdict(mf6wel.dataset)
-    sparse_data = mf6wel._to_sparse(arrdict, None)
+    struct_array = mf6wel._to_struct_array(arrdict, None)
 
     # Assert
-    np.testing.assert_array_equal(sparse_data, sparse_data_expected)
+    np.testing.assert_array_equal(struct_array, struct_array_expected)
 
 
-def test_mf6wel_to_sparse__transient(mf6wel_test_data_transient, sparse_data_expected):
+def test_mf6wel_to_struct_array__transient(
+    mf6wel_test_data_transient, struct_array_expected
+):
     # Arrange
     cellid, rate = mf6wel_test_data_transient
-    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_wel_adapter.Mf6Wel(cellid=cellid, rate=rate)
     ds = mf6wel.dataset.isel(time=0)
 
     # Act
     arrdict = mf6wel._ds_to_arrdict(ds)
-    sparse_data = mf6wel._to_sparse(arrdict, None)
+    struct_array = mf6wel._to_struct_array(arrdict, None)
 
     # Assert
-    np.testing.assert_array_equal(sparse_data, sparse_data_expected)
+    np.testing.assert_array_equal(struct_array, struct_array_expected)
 
 
 def test_mf6wel_write_datafile__stationary(
-    tmp_path, mf6wel_test_data_stationary, sparse_data_expected
+    tmp_path, mf6wel_test_data_stationary, struct_array_expected
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_stationary
-    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_wel_adapter.Mf6Wel(cellid=cellid, rate=rate)
 
     ds = mf6wel.dataset
     file_path = Path(tmp_path) / "mf6wel.bin"
 
     # Act
     mf6wel.write_datafile(file_path, ds, True)
-    arr = np.fromfile(file_path, dtype=sparse_data_expected.dtype)
+    arr = np.fromfile(file_path, dtype=struct_array_expected.dtype)
 
     # Assert
-    np.testing.assert_array_equal(arr, sparse_data_expected)
+    np.testing.assert_array_equal(arr, struct_array_expected)
 
 
 def test_mf6wel_write__stationary(
-    tmp_path, mf6wel_test_data_stationary, sparse_data_expected
+    tmp_path, mf6wel_test_data_stationary, struct_array_expected
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_stationary
-    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_wel_adapter.Mf6Wel(cellid=cellid, rate=rate)
     globaltimes = pd.date_range("2000-01-01", "2000-01-06")
     pkgname = "wel"
     directory = Path(tmp_path) / "mf6wel"
@@ -94,17 +96,17 @@ def test_mf6wel_write__stationary(
     # Assert
     assert len(list(directory.glob("**/*"))) == 3
     arr = np.fromfile(
-        directory / pkgname / f"{pkgname}.bin", dtype=sparse_data_expected.dtype
+        directory / pkgname / f"{pkgname}.bin", dtype=struct_array_expected.dtype
     )
-    np.testing.assert_array_equal(arr, sparse_data_expected)
+    np.testing.assert_array_equal(arr, struct_array_expected)
 
 
 def test_mf6wel_write__transient(
-    tmp_path, mf6wel_test_data_transient, sparse_data_expected
+    tmp_path, mf6wel_test_data_transient, struct_array_expected
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_transient
-    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_wel_adapter.Mf6Wel(cellid=cellid, rate=rate)
     globaltimes = pd.date_range("2000-01-01", "2000-01-06")
     pkgname = "wel"
     directory = Path(tmp_path) / "mf6wel"
@@ -116,9 +118,9 @@ def test_mf6wel_write__transient(
     # Assert
     assert len(list(directory.glob("**/*"))) == 7
     arr = np.fromfile(
-        directory / pkgname / f"{pkgname}-0.bin", dtype=sparse_data_expected.dtype
+        directory / pkgname / f"{pkgname}-0.bin", dtype=struct_array_expected.dtype
     )
-    np.testing.assert_array_equal(arr, sparse_data_expected)
+    np.testing.assert_array_equal(arr, struct_array_expected)
 
 
 def test_mf6wel_render__transient(
@@ -126,7 +128,7 @@ def test_mf6wel_render__transient(
 ):
     # Arrange
     cellid, rate = mf6wel_test_data_transient
-    mf6wel = imod.mf6.mf6_adapter.Mf6Wel(cellid=cellid, rate=rate)
+    mf6wel = imod.mf6.mf6_wel_adapter.Mf6Wel(cellid=cellid, rate=rate)
     globaltimes = pd.date_range("2000-01-01", "2000-01-06")
     pkgname = "wel"
     directory = Path(tmp_path) / "mf6wel"

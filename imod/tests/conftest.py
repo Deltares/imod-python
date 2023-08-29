@@ -5,6 +5,7 @@ from .fixtures.flow_basic_fixture import (
     get_render_dict,
     horizontal_flow_barrier_gdf,
     metaswap_dict,
+    parameterizable_basic_dis,
     three_days,
     two_days,
     well_df,

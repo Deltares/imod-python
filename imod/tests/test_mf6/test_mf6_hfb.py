@@ -1,183 +1,247 @@
-import pathlib
-import textwrap
+from unittest.mock import patch
 
 import geopandas as gpd
 import numpy as np
 import pytest
 import shapely
+import xarray as xr
 import xugrid as xu
+from numpy.testing import assert_array_equal
 
-import imod
+from imod.mf6 import (
+    HorizontalFlowBarrierHydraulicCharacteristic,
+    HorizontalFlowBarrierMultiplier,
+    HorizontalFlowBarrierResistance,
+)
+from imod.mf6.hfb import to_connected_cells_dataset
+from imod.typing.grid import ones_like
 
 
-def get_hfb_data_one_layer(grid_xy: xu.UgridDataArray):
-    """
-    Line at cell edges of unstructured flow model
-    """
+@pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])
+@pytest.mark.parametrize(
+    "barrier_class, barrier_value_name, barrier_value, expected_hydraulic_characteristic",
+    [
+        (HorizontalFlowBarrierResistance, "resistance", 1e3, 1e-3),
+        (HorizontalFlowBarrierMultiplier, "multiplier", 1.5, -1.5),
+        (
+            HorizontalFlowBarrierHydraulicCharacteristic,
+            "hydraulic_characteristic",
+            1e-3,
+            1e-3,
+        ),
+    ],
+)
+@patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
+def test_to_mf6_creates_mf6_adapter(
+    mf6_flow_barrier_mock,
+    dis,
+    barrier_class,
+    barrier_value_name,
+    barrier_value,
+    expected_hydraulic_characteristic,
+    request,
+):
+    # Arrange.
+    idomain, top, bottom = request.getfixturevalue(dis)
+    k = ones_like(top)
 
-    x = [-1.0, 1.0, 1.0, 3.0, 3.0, 5.0]
-    y = [5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
-    indices = np.repeat(np.arange(3), 2)
-    linestrings = shapely.linestrings(x, y, indices=indices)
-    lines = gpd.GeoDataFrame(geometry=linestrings)
-    lines["linedata"] = 10.0
+    print_input = False
 
-    uda, _ = xu.snap_to_grid(lines, grid_xy, 0.2)
+    barrier_y = [5.5, 5.5, 5.5]
+    barrier_x = [82.0, 40.0, 0.0]
 
-    line_as_dataarray = uda["linedata"]
-    line_as_dataarray = line_as_dataarray.expand_dims("layer")
-    line_as_dataarray = line_as_dataarray.assign_coords(layer=[1])
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        data={
+            barrier_value_name: [barrier_value],
+            "ztop": [0.0],
+            "zbottom": [min(bottom.values)],
+        },
+    )
 
-    return line_as_dataarray
+    hfb = barrier_class(geometry, print_input)
+
+    # Act.
+    _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
+
+    # Assert.
+    snapped, _ = xu.snap_to_grid(geometry, grid=idomain, max_snap_distance=0.5)
+    edge_index = np.argwhere(snapped[barrier_value_name].notnull().values).ravel()
+
+    grid = (
+        idomain.ugrid.grid
+        if isinstance(idomain, xu.UgridDataArray)
+        else xu.UgridDataArray.from_structured(idomain).ugrid.grid
+    )
+
+    expected_barrier_values = xr.DataArray(
+        np.ones((idomain.coords["layer"].size, edge_index.size)) * barrier_value,
+        dims=("layer", "mesh2d_nFaces"),
+        coords={"layer": idomain.coords["layer"]},
+    )
+
+    expected_values = to_connected_cells_dataset(
+        idomain, grid, edge_index, {barrier_value_name: expected_barrier_values}
+    )
+
+    mf6_flow_barrier_mock.assert_called_once()
+
+    _, args = mf6_flow_barrier_mock.call_args
+    assert args["cell_id1"].equals(expected_values["cell_id1"])
+    assert args["cell_id2"].equals(expected_values["cell_id2"])
+    assert args["layer"].equals(expected_values["layer"])
+    assert (
+        args["hydraulic_characteristic"].values.max()
+        == expected_hydraulic_characteristic
+    )
 
 
 @pytest.mark.parametrize(
-    "hfb_class",
+    "ztop, zbottom, expected_values",
     [
-        imod.mf6.HorizontalFlowBarrierResistance,
-        imod.mf6.HorizontalFlowBarrierMultiplier,
-        imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic,
+        (-5.0, -35.0, np.array([1, 1e3, 1])),  # 2nd layer
+        (0.0, -35.0, np.array([1e3, 1e3, 1])),  # 1st and 2nd layer
+        (-5.0, -135.0, np.array([1, 1e3, 1e3])),  # 2nd and 3th layer
+        (-5.0, -135.0, np.array([1, 1e3, 1e3])),  # 2nd and 3th layer
+        (100.0, -135.0, np.array([1e3, 1e3, 1e3])),  # ztop out of bounds
+        (0.0, -200.0, np.array([1e3, 1e3, 1e3])),  # zbottom out of bounds
+        (100.0, 50.0, np.array([1, 1, 1])),  # z-range has no overlap with the domain
+        (
+            0.0,
+            -2.5,
+            np.array([1 / ((0.5 / 1e3) + ((1.0 - 0.5) / 1)), 1, 1]),
+        ),  # test effective resistance: 1/((fraction / resistance) + ((1.0 - fraction) / c_aquifer))
     ],
 )
-def test_hfb_render_one_layer__unstructured(
-    hfb_class,
-    unstructured_flow_model,
+@patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
+def test_to_mf6_different_z_boundaries(
+    mf6_flow_barrier_mock, basic_dis, ztop, zbottom, expected_values
 ):
-    # Arrange
-    idomain = unstructured_flow_model["disv"]["idomain"]
-    hfb_data_one_layer = get_hfb_data_one_layer(idomain.sel(layer=1))
-    hfb = hfb_class(hfb_data_one_layer, idomain)
+    # Arrange.
+    idomain, top, bottom = basic_dis
+    k = ones_like(top)
 
-    expected = textwrap.dedent(
-        """\
-        begin options
+    print_input = False
 
-        end options
+    barrier_y = [5.5, 5.5, 5.5]
+    barrier_x = [82.0, 40.0, 0.0]
 
-        begin dimensions
-          maxhfb 3
-        end dimensions
-
-        begin period 1
-          open/close mymodel/hfb/hfb.dat
-        end period"""
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [1e3],
+            "ztop": [ztop],
+            "zbottom": [zbottom],
+        },
     )
 
-    # Act
-    directory = pathlib.Path("mymodel")
-    actual = hfb.render(directory, "hfb", None, False)
+    hfb = HorizontalFlowBarrierResistance(geometry, print_input)
 
-    # Assert
-    assert actual == expected
+    # Act.
+    _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
+
+    # Assert.
+    _, args = mf6_flow_barrier_mock.call_args
+    barrier_values = args["hydraulic_characteristic"].values.reshape(3, 8)
+    max_values_per_layer = barrier_values.max(axis=1)
+    assert_array_equal(max_values_per_layer, 1.0 / expected_values)
 
 
 @pytest.mark.parametrize(
-    "hfb_class",
+    "barrier_x_loc, expected_number_barriers",
     [
-        imod.mf6.HorizontalFlowBarrierResistance,
-        imod.mf6.HorizontalFlowBarrierMultiplier,
-        imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic,
+        # barrier lies between active cells
+        (1.0, 1),
+        # barrier lies between active cells in the top layer but between an inactive and active cell in the bottom layer
+        (2.0, 0),
     ],
 )
-def test_hfb_render_one_layer__structured(
-    hfb_class,
-    structured_flow_model,
+@pytest.mark.parametrize("parameterizable_basic_dis", [(1, 1, 3)], indirect=True)
+@pytest.mark.parametrize("inactivity_marker", [0, -1])
+@patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
+def test_to_mf6_remove_invalid_edges(
+    mf6_flow_barrier_mock,
+    parameterizable_basic_dis,
+    inactivity_marker,
+    barrier_x_loc,
+    expected_number_barriers,
 ):
-    # Arrange
-    idomain = structured_flow_model["dis"]["idomain"]
-    grid_xy = xu.UgridDataArray.from_structured(idomain.sel(layer=1))
-    hfb_data_one_layer = get_hfb_data_one_layer(grid_xy)
-    hfb = hfb_class(hfb_data_one_layer, idomain)
+    # Arrange.
+    idomain, top, bottom = parameterizable_basic_dis
+    idomain.loc[
+        {"x": idomain.coords["x"][-1]}
+    ] = inactivity_marker  # make cells inactive
+    k = ones_like(top)
 
-    expected = textwrap.dedent(
-        """\
-        begin options
+    barrier_y = [0.0, 2.0]
+    barrier_x = [barrier_x_loc, barrier_x_loc]
 
-        end options
-
-        begin dimensions
-          maxhfb 3
-        end dimensions
-
-        begin period 1
-          open/close mymodel/hfb/hfb.dat
-        end period"""
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [1e3],
+            "ztop": [0],
+            "zbottom": [-5],
+        },
     )
 
-    # Act
-    directory = pathlib.Path("mymodel")
-    actual = hfb.render(directory, "hfb", None, False)
+    hfb = HorizontalFlowBarrierResistance(geometry)
 
-    # Assert
-    assert actual == expected
+    # Act.
+    _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
+
+    # Assert.
+    _, args = mf6_flow_barrier_mock.call_args
+    assert args["cell_id1"][0, :].size == expected_number_barriers
+    assert args["cell_id2"][0, :].size == expected_number_barriers
+    assert args["layer"].size == expected_number_barriers
 
 
 @pytest.mark.parametrize(
-    "hfb_specialization",
+    "barrier_x_loc, expected_number_barriers",
     [
-        (imod.mf6.HorizontalFlowBarrierResistance, 0.1),
-        (imod.mf6.HorizontalFlowBarrierMultiplier, -10.0),
-        (imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic, 10.0),
+        # barrier lies between active cells
+        (1.0, 2),
+        # barrier lies between active cells in the top layer but between an inactive and active cell in the bottom layer
+        (2.0, 1),
     ],
 )
-def test_hfb_writing_one_layer__unstructured(
-    hfb_specialization,
-    tmp_path,
-    unstructured_flow_model,
+@pytest.mark.parametrize("inactivity_marker", [0, -1])
+@pytest.mark.parametrize("parameterizable_basic_dis", [(2, 1, 3)], indirect=True)
+@patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
+def test_to_mf6_remove_barrier_parts_adjacent_to_inactive_cells(
+    mf6_flow_barrier_mock,
+    parameterizable_basic_dis,
+    inactivity_marker,
+    barrier_x_loc,
+    expected_number_barriers,
 ):
-    hfb_class, expected_value = hfb_specialization
-    # Arrange
-    idomain = unstructured_flow_model["disv"]["idomain"]
-    hfb_data_one_layer = get_hfb_data_one_layer(idomain.sel(layer=1))
-    hfb = hfb_class(hfb_data_one_layer, idomain)
+    # Arrange.
+    idomain, top, bottom = parameterizable_basic_dis
+    idomain.loc[
+        {"x": idomain.coords["x"][-1], "layer": idomain.coords["layer"][-1]}
+    ] = inactivity_marker  # make cell inactive
+    k = ones_like(top)
 
-    expected_hfb_data = np.array(
-        [
-            [1.0, 13.0, 1.0, 19.0, expected_value],
-            [1.0, 14.0, 1.0, 20.0, expected_value],
-            [1.0, 15.0, 1.0, 21.0, expected_value],
-        ]
+    barrier_y = [0.0, 2.0]
+    barrier_x = [barrier_x_loc, barrier_x_loc]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [1e3],
+            "ztop": [0],
+            "zbottom": [-5],
+        },
     )
 
-    # Act
-    hfb.write(tmp_path, "hfb", None, False)
+    hfb = HorizontalFlowBarrierResistance(geometry)
 
-    # Assert
-    data = np.loadtxt(tmp_path / "hfb" / "hfb.dat")
-    np.testing.assert_almost_equal(data, expected_hfb_data)
+    # Act.
+    _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
 
-
-@pytest.mark.parametrize(
-    "hfb_specialization",
-    [
-        (imod.mf6.HorizontalFlowBarrierResistance, 0.1),
-        (imod.mf6.HorizontalFlowBarrierMultiplier, -10.0),
-        (imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic, 10.0),
-    ],
-)
-def test_hfb_writing_one_layer__structured(
-    hfb_specialization,
-    tmp_path,
-    structured_flow_model,
-):
-    hfb_class, expected_value = hfb_specialization
-    # Arrange
-    idomain = structured_flow_model["dis"]["idomain"]
-    grid_xy = xu.UgridDataArray.from_structured(idomain.sel(layer=1))
-    hfb_data_one_layer = get_hfb_data_one_layer(grid_xy)
-    hfb = hfb_class(hfb_data_one_layer, idomain)
-
-    expected_hfb_data = np.array(
-        [
-            [1.0, 3.0, 1.0, 1.0, 4.0, 1.0, expected_value],
-            [1.0, 3.0, 2.0, 1.0, 4.0, 2.0, expected_value],
-            [1.0, 3.0, 3.0, 1.0, 4.0, 3.0, expected_value],
-        ]
-    )
-
-    # Act
-    hfb.write(tmp_path, "hfb", None, False)
-
-    # Assert
-    data = np.loadtxt(tmp_path / "hfb" / "hfb.dat")
-    np.testing.assert_almost_equal(data, expected_hfb_data)
+    # Assert.
+    _, args = mf6_flow_barrier_mock.call_args
+    assert args["cell_id1"][0, :].size == expected_number_barriers
+    assert args["cell_id2"][0, :].size == expected_number_barriers
+    assert args["layer"].size == expected_number_barriers
