@@ -1,7 +1,7 @@
 import numpy as np
 
 from imod.mf6 import GroundwaterFlowModel
-from imod.mf6.pkgbase import BoundaryCondition
+from imod.mf6.boundary_condition import BoundaryCondition
 from imod.schemata import DTypeSchema
 
 

@@ -3,7 +3,7 @@ from typing import Sequence
 import numpy as np
 import xarray as xr
 
-from imod.mf6.pkgbase import Package
+from imod.mf6.package import Package
 from imod.schemata import DTypeSchema
 
 

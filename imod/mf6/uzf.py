@@ -3,7 +3,7 @@ import pathlib
 import numpy as np
 import xarray as xr
 
-from imod.mf6.pkgbase import AdvancedBoundaryCondition, BoundaryCondition
+from imod.mf6.boundary_condition import AdvancedBoundaryCondition, BoundaryCondition
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,

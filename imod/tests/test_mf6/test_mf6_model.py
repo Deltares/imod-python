@@ -7,7 +7,7 @@ from jinja2 import Template
 
 import imod
 from imod.mf6.model import Modflow6Model
-from imod.mf6.pkgbase import Package
+from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
