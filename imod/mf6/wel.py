@@ -1,6 +1,6 @@
 import numpy as np
 
-from imod.mf6.pkgbase import (
+from imod.mf6.boundary_condition import (
     DisStructuredBoundaryCondition,
     DisVerticesBoundaryCondition,
 )
