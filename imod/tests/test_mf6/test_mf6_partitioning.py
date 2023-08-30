@@ -9,7 +9,7 @@ from imod.mf6.modelsplitter import split_model_packages
 @pytest.mark.usefixtures("twri_model")
 def test_partition_structured(twri_model):
     # create a partitioning array for the twri model.
-    # Fill the first half of the array- in the y direction-  with 0's and the second half with 1
+    # Fill the first half of the array- in the y direction-  with 0's and the second half with 1's
     partitioning_array = copy.deepcopy(
         twri_model["GWF_1"]["dis"]["idomain"].sel({"layer": 1})
     )
