@@ -5,6 +5,7 @@ from .fixtures.flow_basic_fixture import (
     get_render_dict,
     horizontal_flow_barrier_gdf,
     metaswap_dict,
+    parameterizable_basic_dis,
     three_days,
     two_days,
     well_df,
@@ -39,6 +40,13 @@ from .fixtures.mf6_lake_package_fixture import (
     lake_table,
     naardermeer,
 )
+from .fixtures.mf6_regridding_fixture import (
+    solution_settings,
+    structured_flow_model,
+    structured_flow_simulation,
+    unstructured_flow_model,
+    unstructured_flow_simulation,
+)
 from .fixtures.mf6_twri_disv_fixture import twri_disv_model
 from .fixtures.mf6_twri_fixture import (
     transient_twri_model,
@@ -47,6 +55,10 @@ from .fixtures.mf6_twri_fixture import (
     twri_result,
 )
 from .fixtures.mf6_welltest_fixture import (
+    mf6wel_test_data_stationary,
+    mf6wel_test_data_transient,
+    well_high_lvl_test_data_stationary,
+    well_high_lvl_test_data_transient,
     well_test_data_stationary,
     well_test_data_transient,
 )

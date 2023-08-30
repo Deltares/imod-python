@@ -1,14 +1,16 @@
 import collections
+import copy
 import pathlib
 import subprocess
 import warnings
-from pathlib import Path
+from typing import Optional, Union
 
 import jinja2
 import numpy as np
 import tomli
 import tomli_w
 import xarray as xr
+import xugrid as xu
 
 import imod
 from imod.mf6.model import (
@@ -17,8 +19,10 @@ from imod.mf6.model import (
     Modflow6Model,
 )
 from imod.mf6.statusinfo import NestedStatusInfo
+from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
+from imod.typing.grid import GridDataArray
 
 
 class Modflow6Simulation(collections.UserDict):
@@ -133,8 +137,8 @@ class Modflow6Simulation(collections.UserDict):
         solutiongroups = []
         for key, value in self.items():
             if isinstance(value, Modflow6Model):
-                model_name_file = Path(
-                    write_context.root_directory / Path(f"{key}", f"{key}.nam")
+                model_name_file = pathlib.Path(
+                    write_context.root_directory / pathlib.Path(f"{key}", f"{key}.nam")
                 ).as_posix()
                 models.append((value._model_id, model_name_file, key))
 
@@ -195,7 +199,7 @@ class Modflow6Simulation(collections.UserDict):
             if isinstance(model, Modflow6Model):
                 model._model_checks(key)
 
-        directory = Path(directory)
+        directory = pathlib.Path(directory)
         directory.mkdir(exist_ok=True, parents=True)
 
         # Write simulation namefile
@@ -231,7 +235,7 @@ class Modflow6Simulation(collections.UserDict):
                 value.write(key, globaltimes, ims_write_context)
 
         if status_info.has_errors():
-            raise ValidationError("\n" + status_info.to_string())
+            raise ValidationError("\n" + validation_model_error_message(status_info))
 
         self.directory = directory
 
@@ -329,15 +333,16 @@ class Modflow6Simulation(collections.UserDict):
 
     def clip_box(
         self,
-        time_min=None,
-        time_max=None,
-        layer_min=None,
-        layer_max=None,
-        x_min=None,
-        x_max=None,
-        y_min=None,
-        y_max=None,
-    ):
+        time_min: Optional[str] = None,
+        time_max: Optional[str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        states_for_boundary: Optional[dict[str, GridDataArray]] = None,
+    ) -> "Modflow6Simulation":
         """
         Clip a simulation by a bounding box (time, layer, y, x).
 
@@ -357,9 +362,10 @@ class Modflow6Simulation(collections.UserDict):
         layer_min: optional, int
         layer_max: optional, int
         x_min: optional, float
-        x_min: optional, float
+        x_max: optional, float
+        y_min: optional, float
         y_max: optional, float
-        y_max: optional, float
+        states_for_boundary : optional, Dict[pkg_name:str, boundary_values:Union[xr.DataArray, xu.UgridDataArray]]
 
         Returns
         -------
@@ -367,6 +373,10 @@ class Modflow6Simulation(collections.UserDict):
         """
         clipped = type(self)(name=self.name)
         for key, value in self.items():
+            state_for_boundary = (
+                None if states_for_boundary is None else states_for_boundary.get(key)
+            )
+
             clipped[key] = value.clip_box(
                 time_min=time_min,
                 time_max=time_max,
@@ -376,5 +386,43 @@ class Modflow6Simulation(collections.UserDict):
                 x_max=x_max,
                 y_min=y_min,
                 y_max=y_max,
+                state_for_boundary=state_for_boundary,
             )
         return clipped
+
+    def regrid_like(
+        self,
+        regridded_simulation_name: str,
+        target_grid: Union[xr.DataArray, xu.UgridDataArray],
+        validate: bool = True,
+    ) -> "Modflow6Simulation":
+        """
+        This method creates a new simulation object. The models contained in the new simulation are regridded versions
+        of the models in the input object (this).
+        Time discretization and solver settings are copied.
+
+        Parameters
+        ----------
+        regridded_simulation_name: str
+            name given to the output simulation
+        target_grid: xr.DataArray or  xu.UgridDataArray
+            discretization onto which the models  in this simulation will be regridded
+        validate: bool
+            set to true to validate the regridded packages
+
+        Returns
+        -------
+        a new simulation object with regridded models
+        """
+        result = self.__class__(regridded_simulation_name)
+        for key, item in self.items():
+            if isinstance(item, GroundwaterFlowModel):
+                result[key] = item.regrid_like(target_grid, validate)
+            elif isinstance(item, imod.mf6.Solution) or isinstance(
+                item, imod.mf6.TimeDiscretization
+            ):
+                result[key] = copy.deepcopy(item)
+            else:
+                raise NotImplementedError(f"regridding not supported for {key}")
+
+        return result

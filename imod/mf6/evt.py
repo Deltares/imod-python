@@ -3,6 +3,7 @@ from typing import Dict, List
 import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -150,6 +151,29 @@ class Evapotranspiration(BoundaryCondition):
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
+
+    _regrid_method = {
+        "surface": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+        "rate": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+        "depth": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+        "proportion_rate": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+        "proportion_depth": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),
+    }
 
     def __init__(
         self,
