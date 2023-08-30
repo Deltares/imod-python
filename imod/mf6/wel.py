@@ -21,6 +21,7 @@ from imod.schemata import DTypeSchema
 from imod.select.points import points_indices
 from imod.typing.grid import GridDataArray, ones_like
 from imod.util import values_within_range
+from imod.mf6.write_context import WriteContext
 
 # FUTURE: There was an idea to autogenerate these object.
 # This was relevant:
@@ -203,11 +204,10 @@ class Well(BoundaryCondition):
 
     def write(
         self,
-        directory: Path,
         pkgname: str,
         globaltimes: np.ndarray[np.datetime64],
-        binary: bool,
         validate: bool,
+        write_context: WriteContext,
         idomain: Union[xr.DataArray, xu.UgridDataArray],
         top: Union[xr.DataArray, xu.UgridDataArray],
         bottom: Union[xr.DataArray, xu.UgridDataArray],
@@ -217,7 +217,7 @@ class Well(BoundaryCondition):
             self._validate(self._write_schemata)
         mf6_package = self.to_mf6_pkg(idomain, top, bottom, k)
 
-        mf6_package.write(directory, pkgname, globaltimes, binary)
+        mf6_package.write(pkgname, globaltimes, write_context)
 
     def __create_wells_df(self) -> pd.DataFrame:
         wells_df = self.dataset.to_dataframe()

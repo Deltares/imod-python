@@ -6,7 +6,7 @@ import xarray as xr
 from pytest_cases import parametrize_with_cases
 
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
-
+from imod.mf6.write_context import WriteContext
 
 class GridBarriers:
     def case_structured(self):
@@ -101,6 +101,7 @@ def test_hfb_render(barrier):
 def test_hfb_writing_one_layer__unstructured(barrier, tmp_path):
     # Arrange
     hfb = Mf6HorizontalFlowBarrier(**barrier)
+    write_context = WriteContext(tmp_path)
 
     expected_hfb_data = np.row_stack(
         (
@@ -113,7 +114,7 @@ def test_hfb_writing_one_layer__unstructured(barrier, tmp_path):
     ).T
 
     # Act
-    hfb.write(tmp_path, "hfb", None, False)
+    hfb.write( "hfb", None, write_context)
 
     # Assert
     data = np.loadtxt(tmp_path / "hfb" / "hfb.dat")

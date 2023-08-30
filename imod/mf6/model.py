@@ -228,16 +228,15 @@ class Modflow6Model(collections.UserDict, abc.ABC):
     def __write_well(
         self,
         wellpackage: Well,
-        directory: Path,
-        modelname: str,
+        pkg_name: str,
         globaltimes: np.ndarray[np.datetime64],
-        binary: bool = True,
+        write_context: WriteContext,
         validate: bool = True,
     ):
         top, bottom, idomain = self.__get_domain_geometry()
         k = self.__get_k()
         wellpackage.write(
-            directory, modelname, globaltimes, binary, validate, idomain, top, bottom, k
+            pkg_name, globaltimes, validate,write_context,  idomain, top, bottom, k
         )
 
     def write(
@@ -270,7 +269,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             try:
                 if isinstance(pkg, imod.mf6.Well):
                     self.__write_well(
-                        pkg, modeldirectory, pkg_name, globaltimes, write_context.use_binary, validate
+                        pkg, pkg_name, globaltimes, pkg_write_context, validate
                     )
                 elif isinstance(pkg, imod.mf6.HorizontalFlowBarrierBase):
                     top, bottom, idomain = self.__get_domain_geometry()

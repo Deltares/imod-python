@@ -12,6 +12,7 @@ from imod.schemata import (
     DTypeSchema,
     IndexesSchema,
 )
+from imod.mf6.write_context import WriteContext
 
 
 class Mf6HorizontalFlowBarrier(BoundaryCondition):
@@ -159,10 +160,9 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
 
     def write(
         self,
-        directory: WindowsPath,
         pkgname: str,
         globaltimes: np.ndarray,
-        binary: bool,
+        write_context: WriteContext,
     ):
         # MODFLOW6 does not support binary HFB input.
-        super().write(directory, pkgname, globaltimes, binary=False)
+        super().write( pkgname, globaltimes, write_context)

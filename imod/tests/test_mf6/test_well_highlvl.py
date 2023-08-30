@@ -14,7 +14,7 @@ from imod.tests.fixtures.mf6_regridding_fixture import (
     grid_data_unstructured_layered,
 )
 from imod.typing.grid import ones_like
-
+from imod.mf6.write_context import WriteContext
 
 @pytest.fixture(scope="function")
 def twri_simulation(transient_twri_model):
@@ -73,9 +73,9 @@ def test_write_well(tmp_path: Path, grid_data, grid_data_layered, reference_outp
     k = 100.0
     top = ones_like(active.sel(layer=1), dtype=np.float64)
     bottom = grid_data_layered(np.float64, -2.0, 10)
-
+    write_context= WriteContext(tmp_path)
     well.write(
-        tmp_path, "packagename", globaltimes, False, True, active, top, bottom, k
+        "packagename", globaltimes, False, write_context, active, top, bottom, k
     )
     assert pathlib.Path.exists(tmp_path / "packagename.wel")
     assert pathlib.Path.exists(tmp_path / "packagename" / "wel.dat")
