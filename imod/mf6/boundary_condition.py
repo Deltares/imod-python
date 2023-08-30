@@ -5,7 +5,6 @@ from typing import Dict, List
 
 import numpy as np
 import xarray as xr
-import xugrid as xu
 
 import imod
 from imod.mf6.package import Package

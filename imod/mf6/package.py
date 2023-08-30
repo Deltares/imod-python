@@ -1,16 +1,14 @@
 import abc
-import copy
 import numbers
 import pathlib
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Union
 
 import cftime
 import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
-from xarray.core.utils import is_scalar
 
 import imod
 from imod.mf6.pkgbase import TRANSPORT_PACKAGES, PackageBase

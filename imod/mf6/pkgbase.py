@@ -1,8 +1,6 @@
 import abc
 import numbers
 import pathlib
-from copy import copy
-from typing import Any, Dict, List, Union
 
 import numpy as np
 import xarray as xr
