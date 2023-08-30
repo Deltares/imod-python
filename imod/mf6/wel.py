@@ -1,6 +1,5 @@
 import warnings
 from copy import deepcopy
-from pathlib import Path
 from typing import List, Union
 
 import numpy as np
@@ -16,12 +15,12 @@ from imod.mf6.boundary_condition import (
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset_utilities import remove_inactive
+from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
 from imod.select.points import points_indices
 from imod.typing.grid import GridDataArray, ones_like
 from imod.util import values_within_range
-from imod.mf6.write_context import WriteContext
 
 # FUTURE: There was an idea to autogenerate these object.
 # This was relevant:

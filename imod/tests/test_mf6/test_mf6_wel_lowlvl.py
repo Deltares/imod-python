@@ -13,6 +13,7 @@ import imod.mf6.utilities.dataset_utilities
 import imod.mf6.wel
 from imod.mf6.write_context import WriteContext
 
+
 @pytest.fixture()
 def struct_array_expected():
     return np.array(
@@ -92,7 +93,7 @@ def test_mf6wel_write__stationary(
     write_context = WriteContext(directory, use_binary=True)
 
     # Act
-    mf6wel.write( pkgname, globaltimes, write_context)
+    mf6wel.write(pkgname, globaltimes, write_context)
 
     # Assert
     assert len(list(directory.glob("**/*"))) == 3
@@ -114,8 +115,7 @@ def test_mf6wel_write__transient(
     directory.mkdir(exist_ok=True)
     write_context = WriteContext(directory, use_binary=True)
     # Act
-    mf6wel.write( pkgname, globaltimes, write_context)
-
+    mf6wel.write(pkgname, globaltimes, write_context)
 
     # Assert
     assert len(list(directory.glob("**/*"))) == 7

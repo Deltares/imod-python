@@ -1,10 +1,10 @@
-from pathlib import WindowsPath
 from typing import Union
 
 import numpy as np
 import xarray as xr
 
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.write_context import WriteContext
 from imod.schemata import (
     AnyValueSchema,
     CoordsSchema,
@@ -12,7 +12,6 @@ from imod.schemata import (
     DTypeSchema,
     IndexesSchema,
 )
-from imod.mf6.write_context import WriteContext
 
 
 class Mf6HorizontalFlowBarrier(BoundaryCondition):
@@ -112,8 +111,8 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
         cell_id2: xr.DataArray,
         layer: xr.DataArray,
         hydraulic_characteristic: xr.DataArray,
-        print_input: Union[bool | xr.DataArray] = False,
-        validate: Union[bool | xr.DataArray] = True,
+        print_input: Union[bool, xr.DataArray] = False,
+        validate: Union[bool, xr.DataArray] = True,
     ):
         super().__init__(locals())
         self.dataset["cell_id1"] = cell_id1
@@ -165,4 +164,4 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
         write_context: WriteContext,
     ):
         # MODFLOW6 does not support binary HFB input.
-        super().write( pkgname, globaltimes, write_context)
+        super().write(pkgname, globaltimes, write_context)

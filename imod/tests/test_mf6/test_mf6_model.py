@@ -118,7 +118,7 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = model.write( model_name, global_times_mock, True, write_context)
+        status = model.write(model_name, global_times_mock, True, write_context)
 
         # Assert.
         assert not status.has_errors()
@@ -166,7 +166,9 @@ class TestModel:
         global_times_mock = MagicMock(spec_set=imod.mf6.TimeDiscretization)
 
         # Act.
-        status = model.write(model_name, global_times_mock, True, write_context=write_context)
+        status = model.write(
+            model_name, global_times_mock, True, write_context=write_context
+        )
 
         # Assert.
         assert status.has_errors()
@@ -202,7 +204,7 @@ class TestModel:
 
         # Act.
         write_context = WriteContext(tmp_path)
-        status = model.write(model_name, global_times_mock,True, write_context)
+        status = model.write(model_name, global_times_mock, True, write_context)
 
         # Assert.
         assert len(status.errors) == 2

@@ -19,9 +19,9 @@ from imod.mf6.model import (
     Modflow6Model,
 )
 from imod.mf6.statusinfo import NestedStatusInfo
+from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
-from imod.mf6.validation import validation_model_error_message
 from imod.typing.grid import GridDataArray
 
 

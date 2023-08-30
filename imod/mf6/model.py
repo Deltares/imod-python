@@ -28,9 +28,10 @@ from imod.mf6.validation import (
     validation_model_error_message,
 )
 from imod.mf6.wel import Well
+from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray
-from imod.mf6.write_context import WriteContext
+
 
 def initialize_template(name: str) -> Template:
     loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -236,7 +237,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         top, bottom, idomain = self.__get_domain_geometry()
         k = self.__get_k()
         wellpackage.write(
-            pkg_name, globaltimes, validate,write_context,  idomain, top, bottom, k
+            pkg_name, globaltimes, validate, write_context, idomain, top, bottom, k
         )
 
     def write(
