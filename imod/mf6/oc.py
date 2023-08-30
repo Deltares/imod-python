@@ -5,7 +5,7 @@ from typing import List, Union
 
 import numpy as np
 
-from imod.mf6.pkgbase import Package
+from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema
 

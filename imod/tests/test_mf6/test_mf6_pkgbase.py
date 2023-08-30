@@ -4,7 +4,7 @@ import pytest
 import xarray as xr
 
 import imod
-from imod.mf6.pkgbase import Package
+from imod.mf6.package import Package
 
 
 @pytest.fixture(scope="function")
