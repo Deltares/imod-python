@@ -5,10 +5,50 @@ from typing import Dict, List
 
 import numpy as np
 import xarray as xr
+import xugrid as xu
 
 import imod
 from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
+
+
+def _dis_recarr(arrdict, layer, notnull):
+    # Define the numpy structured array dtype
+    index_spec = [("layer", np.int32), ("row", np.int32), ("column", np.int32)]
+    field_spec = [(key, np.float64) for key in arrdict]
+    sparse_dtype = np.dtype(index_spec + field_spec)
+    # Initialize the structured array
+    nrow = notnull.sum()
+    recarr = np.empty(nrow, dtype=sparse_dtype)
+    # Fill in the indices
+    if notnull.ndim == 2:
+        recarr["row"], recarr["column"] = (np.argwhere(notnull) + 1).transpose()
+        recarr["layer"] = layer
+    else:
+        ilayer, irow, icolumn = np.argwhere(notnull).transpose()
+        recarr["row"] = irow + 1
+        recarr["column"] = icolumn + 1
+        recarr["layer"] = layer[ilayer]
+    return recarr
+
+
+def _disv_recarr(arrdict, layer, notnull):
+    # Define the numpy structured array dtype
+    index_spec = [("layer", np.int32), ("cell2d", np.int32)]
+    field_spec = [(key, np.float64) for key in arrdict]
+    sparse_dtype = np.dtype(index_spec + field_spec)
+    # Initialize the structured array
+    nrow = notnull.sum()
+    recarr = np.empty(nrow, dtype=sparse_dtype)
+    # Fill in the indices
+    if notnull.ndim == 1 and layer.size == 1:
+        recarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
+        recarr["layer"] = layer
+    else:
+        ilayer, icell2d = np.argwhere(notnull).transpose()
+        recarr["cell2d"] = icell2d + 1
+        recarr["layer"] = layer[ilayer]
+    return recarr
 
 
 class BoundaryCondition(Package, abc.ABC):
@@ -57,29 +97,80 @@ class BoundaryCondition(Package, abc.ABC):
             nmax = int(da.count())
         return nmax
 
-    def _write_binaryfile(self, outpath, sparse_data):
+    def _write_binaryfile(self, outpath, struct_array):
         with open(outpath, "w") as f:
-            sparse_data.tofile(f)
+            struct_array.tofile(f)
 
-    def _write_textfile(self, outpath, sparse_data):
-        fields = sparse_data.dtype.fields
+    def _write_textfile(self, outpath, struct_array):
+        fields = struct_array.dtype.fields
         fmt = [self._number_format(field[0]) for field in fields.values()]
         header = " ".join(list(fields.keys()))
         with open(outpath, "w") as f:
-            np.savetxt(fname=f, X=sparse_data, fmt=fmt, header=header)
+            np.savetxt(fname=f, X=struct_array, fmt=fmt, header=header)
 
     def write_datafile(self, outpath, ds, binary):
         """
         Writes a modflow6 binary data file
         """
-        layer = ds["layer"].values
+        layer = ds["layer"].values if "layer" in ds.coords else None
         arrdict = self._ds_to_arrdict(ds)
-        sparse_data = self.to_sparse(arrdict, layer)
+        struct_array = self._to_struct_array(arrdict, layer)
         outpath.parent.mkdir(exist_ok=True, parents=True)
         if binary:
-            self._write_binaryfile(outpath, sparse_data)
+            self._write_binaryfile(outpath, struct_array)
         else:
-            self._write_textfile(outpath, sparse_data)
+            self._write_textfile(outpath, struct_array)
+
+    def _ds_to_arrdict(self, ds):
+        arrdict = {}
+        for datavar in ds.data_vars:
+            if ds[datavar].shape == ():
+                raise ValueError(
+                    f"{datavar} in {self._pkg_id} package cannot be a scalar"
+                )
+            auxiliary_vars = (
+                self.get_auxiliary_variable_names()
+            )  # returns something like {"concentration": "species"}
+            if datavar in auxiliary_vars.keys():  # if datavar is concentration
+                if (
+                    auxiliary_vars[datavar] in ds[datavar].dims
+                ):  # if this concentration array has the species dimension
+                    for s in ds[datavar].values:  # loop over species
+                        arrdict[s] = (
+                            ds[datavar]
+                            .sel({auxiliary_vars[datavar]: s})
+                            .values  # store species array under its species name
+                        )
+            else:
+                arrdict[datavar] = ds[datavar].values
+        return arrdict
+
+    def _to_struct_array(self, arrdict, layer):
+        """Convert from dense arrays to list based input"""
+        # TODO stream the data per stress period
+        # TODO add pkgcheck that period table aligns
+        # Get the number of valid values
+        if layer is None:
+            raise ValueError("Layer should be provided")
+
+        data = next(iter(arrdict.values()))
+        notnull = ~np.isnan(data)
+
+        if isinstance(self.dataset, xr.Dataset):
+            recarr = _dis_recarr(arrdict, layer, notnull)
+        elif isinstance(self.dataset, xu.UgridDataset):
+            recarr = _disv_recarr(arrdict, layer, notnull)
+        else:
+            raise TypeError(
+                "self.dataset should be xarray.Dataset or xugrid.UgridDataset,"
+                f" is {type(self.dataset)} instead"
+            )
+        # Fill in the data
+        for key, arr in arrdict.items():
+            values = arr[notnull].astype(np.float64)
+            recarr[key] = values
+
+        return recarr
 
     def period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
         directory = pathlib.Path(directory) / pkgname
@@ -127,6 +218,14 @@ class BoundaryCondition(Package, abc.ABC):
                 options[varname] = v
         return options
 
+    def _get_bin_ds(self):
+        """
+        Get binary dataset data for stress periods, this data will be written to
+        datafiles. This method can be overriden to do some extra operations on
+        this dataset before writing.
+        """
+        return self[self.period_data()]
+
     def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {"binary": binary}
@@ -159,13 +258,9 @@ class BoundaryCondition(Package, abc.ABC):
 
         return self._template.render(d)
 
-    def _get_bin_ds(self):
-        return self[self.period_data()]
-
     def write_perioddata(self, directory, pkgname, binary):
         if len(self.period_data()) == 0:
             return
-
         bin_ds = self._get_bin_ds()
 
         if binary:
@@ -268,7 +363,7 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
 
 
 class DisStructuredBoundaryCondition(BoundaryCondition):
-    def to_sparse(self, arrdict, layer):
+    def _to_struct_array(self, arrdict, layer):
         spec = []
         for key in arrdict:
             if key in ["layer", "row", "column"]:
@@ -285,7 +380,7 @@ class DisStructuredBoundaryCondition(BoundaryCondition):
 
 
 class DisVerticesBoundaryCondition(BoundaryCondition):
-    def to_sparse(self, arrdict, layer):
+    def _to_struct_array(self, arrdict, layer):
         spec = []
         for key in arrdict:
             if key in ["layer", "cell2d"]:

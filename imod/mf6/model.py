@@ -1,25 +1,36 @@
+from __future__ import annotations
+
 import abc
 import collections
 import inspect
 import pathlib
 from copy import deepcopy
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Union
 
 import cftime
 import jinja2
 import numpy as np
 import tomli
 import tomli_w
+import xarray as xr
 import xugrid as xu
 from jinja2 import Template
 
 import imod
 from imod.mf6 import qgs_util
+from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.package import Package
+from imod.mf6.regridding_utils import RegridderInstancesCollection, RegridderType
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
-from imod.mf6.validation import pkg_errors_to_status_info
+from imod.mf6.validation import (
+    pkg_errors_to_status_info,
+    validation_model_error_message,
+)
+from imod.mf6.wel import Well
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
+from imod.typing.grid import GridDataArray
 
 
 def initialize_template(name: str) -> Template:
@@ -152,6 +163,30 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         self._check_for_required_packages(modelkey)
 
+    def __get_domain_geometry(
+        self,
+    ) -> Tuple[
+        Union[xr.DataArray, xu.UgridDataArray],
+        Union[xr.DataArray, xu.UgridDataArray],
+        Union[xr.DataArray, xu.UgridDataArray],
+    ]:
+        discretization = self[self.__get_diskey()]
+        if discretization is None:
+            raise ValueError("Discretization not found")
+        top = discretization["top"]
+        bottom = discretization["bottom"]
+        idomain = discretization["idomain"]
+        return top, bottom, idomain
+
+    def __get_k(self):
+        try:
+            npf = self[imod.mf6.NodePropertyFlow.get_pkg_id()]
+        except RuntimeError:
+            raise ValidationError("expected one package of type ModePropertyFlow")
+
+        k = npf["k"]
+        return k
+
     def _validate(self, model_name: str = "") -> StatusInfoBase:
         try:
             diskey = self.__get_diskey()
@@ -191,6 +226,20 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         return model_status_info
 
+    def __write_well(
+        self,
+        wellpackage: Well,
+        pkg_name: str,
+        globaltimes: np.ndarray[np.datetime64],
+        write_context: WriteContext,
+        validate: bool = True,
+    ):
+        top, bottom, idomain = self.__get_domain_geometry()
+        k = self.__get_k()
+        wellpackage.write(
+            pkg_name, globaltimes, validate, write_context, idomain, top, bottom, k
+        )
+
     def write(
         self, modelname, globaltimes, validate: bool, write_context: WriteContext
     ) -> StatusInfoBase:
@@ -219,11 +268,26 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         )
         for pkg_name, pkg in self.items():
             try:
-                pkg.write(
-                    pkgname=pkg_name,
-                    globaltimes=globaltimes,
-                    write_context=pkg_write_context,
-                )
+                if isinstance(pkg, imod.mf6.Well):
+                    self.__write_well(
+                        pkg, pkg_name, globaltimes, pkg_write_context, validate
+                    )
+                elif isinstance(pkg, imod.mf6.HorizontalFlowBarrierBase):
+                    top, bottom, idomain = self.__get_domain_geometry()
+                    k = self.__get_k()
+                    mf6_pkg = pkg.to_mf6_pkg(idomain, top, bottom, k)
+                    mf6_pkg.write(
+                        directory=modeldirectory,
+                        pkgname=pkg_name,
+                        globaltimes=globaltimes,
+                        binary=write_context.use_binary,
+                    )
+                else:
+                    pkg.write(
+                        pkgname=pkg_name,
+                        globaltimes=globaltimes,
+                        write_context=pkg_write_context,
+                    )
             except Exception as e:
                 raise type(e)(f"{e}\nError occured while writing {pkg_name}")
 
@@ -252,7 +316,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 else:
                     pkg.dataset.ugrid.to_netcdf(modeldirectory / pkg_path)
             else:
-                pkg.dataset.to_netcdf(modeldirectory / pkg_path)
+                pkg.to_netcdf(modeldirectory / pkg_path)
 
         toml_path = modeldirectory / f"{modelname}.toml"
         with open(toml_path, "wb") as f:
@@ -283,14 +347,28 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def clip_box(
         self,
-        time_min=None,
-        time_max=None,
-        layer_min=None,
-        layer_max=None,
-        x_min=None,
-        x_max=None,
-        y_min=None,
-        y_max=None,
+        time_min: Optional[str] = None,
+        time_max: Optional[str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        state_for_boundary: Optional[GridDataArray] = None,
+    ):
+        raise NotImplementedError
+
+    def _clip_box_packages(
+        self,
+        time_min: Optional[str] = None,
+        time_max: Optional[str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
     ):
         """
         Clip a model by a bounding box (time, layer, y, x).
@@ -311,8 +389,8 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         layer_min: optional, int
         layer_max: optional, int
         x_min: optional, float
-        x_min: optional, float
-        y_max: optional, float
+        x_max: optional, float
+        y_min: optional, float
         y_max: optional, float
 
         Returns
@@ -331,7 +409,96 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 y_min=y_min,
                 y_max=y_max,
             )
+
         return clipped
+
+    def regrid_like(
+        self, target_grid: GridDataArray, validate: bool = True
+    ) -> "Modflow6Model":
+        """
+        Creates a model by regridding the packages of this model to another discretization.
+        It regrids all the arrays in the package using the default regridding methods.
+        At the moment only regridding to a different planar grid is supported, meaning
+        ``target_grid`` has different ``"x"`` and ``"y"`` or different ``cell2d`` coords.
+
+        Parameters
+        ----------
+        target_grid: xr.DataArray or xu.UgridDataArray
+            a grid defined over the same discretization as the one we want to regrid the package to
+        validate: bool
+            set to true to validate the regridded packages
+
+        Returns
+        -------
+        a model with similar packages to the input model, and with all the data-arrays regridded to another discretization,
+        similar to the one used in input argument "target_grid"
+        """
+        new_model = self.__class__()
+
+        for pkg_name, pkg in self.items():
+            if pkg.is_regridding_supported():
+                new_model[pkg_name] = pkg.regrid_like(target_grid)
+            else:
+                raise NotImplementedError(
+                    f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
+                )
+
+        methods = self._get_unique_regridder_types()
+        output_domain = self._get_regridding_domain(target_grid, methods)
+        new_model[self.__get_diskey()]["idomain"] = output_domain
+        new_model._mask_all_packages(output_domain)
+
+        if validate:
+            errors = new_model._validate("regridded_model")
+            if len(errors.errors):
+                raise ValidationError(validation_model_error_message(errors))
+        return new_model
+
+    def _mask_all_packages(
+        self,
+        domain: GridDataArray,
+    ):
+        """
+        This function applies a mask to all packages in a model. The mask must
+        be presented as an idomain-like integer array that has 0 or negative
+        values in filtered cells and positive values in active cells
+        """
+        for pkgname, pkg in self.items():
+            self[pkgname] = pkg.mask(domain)
+
+    def get_domain(self):
+        dis = self.__get_diskey()
+        return self[dis]["idomain"]
+
+    def _get_regridding_domain(
+        self,
+        target_grid: GridDataArray,
+        methods: Dict[RegridderType, str],
+    ) -> GridDataArray:
+        """
+        This method computes the output-domain for a regridding operation by regridding idomain with
+        all regridders. Each regridder may leave some cells inactive. The output domain for the model consists of those
+        cells that all regridders consider active.
+        """
+        idomain = self.get_domain()
+        regridder_collection = RegridderInstancesCollection(
+            idomain, target_grid=target_grid
+        )
+        included_in_all = None
+        for regriddertype, function in methods.items():
+            regridder = regridder_collection.get_regridder(
+                regriddertype,
+                function,
+            )
+            regridded_idomain = regridder.regrid(idomain)
+            if included_in_all is None:
+                included_in_all = regridded_idomain
+            else:
+                included_in_all = included_in_all.where(regridded_idomain.notnull())
+        new_idomain = included_in_all.where(included_in_all.notnull(), other=0)
+        new_idomain = new_idomain.astype(int)
+
+        return new_idomain
 
 
 class GroundwaterFlowModel(Modflow6Model):
@@ -357,6 +524,32 @@ class GroundwaterFlowModel(Modflow6Model):
             "under_relaxation": under_relaxation,
         }
         self._template = initialize_template("gwf-nam.j2")
+
+    def _get_unique_regridder_types(self) -> Dict[RegridderType, str]:
+        """
+        This function loops over the packages and  collects all regridder-types that are in use.
+        Differences in associated functions are ignored. It focusses only on the types. So if a
+        model uses both Overlap(mean) and Overlap(harmonic_mean), this function will return just one
+        Overlap regridder:  the first one found, in this case Overlap(mean)
+        """
+        methods = {}
+        for pkg_name, pkg in self.items():
+            if pkg.is_regridding_supported():
+                pkg_methods = pkg.get_regrid_methods()
+                for variable in pkg_methods:
+                    if (
+                        variable in pkg.dataset.data_vars
+                        and pkg.dataset[variable].values[()] is not None
+                    ):
+                        regriddertype = pkg_methods[variable][0]
+                        if regriddertype not in methods.keys():
+                            functiontype = pkg_methods[variable][1]
+                            methods[regriddertype] = functiontype
+            else:
+                raise NotImplementedError(
+                    f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
+                )
+        return methods
 
     def write_qgis_project(self, directory, crs, aggregate_layers=False):
         """
@@ -403,6 +596,69 @@ class GroundwaterFlowModel(Modflow6Model):
         )
         qgs_util._write_qgis_projectfile(qgs_tree, directory / ("qgis_proj" + ext))
 
+    def clip_box(
+        self,
+        time_min: Optional[str] = None,
+        time_max: Optional[str] = None,
+        layer_min: Optional[int] = None,
+        layer_max: Optional[int] = None,
+        x_min: Optional[float] = None,
+        x_max: Optional[float] = None,
+        y_min: Optional[float] = None,
+        y_max: Optional[float] = None,
+        state_for_boundary: Optional[GridDataArray] = None,
+    ):
+        clipped = super()._clip_box_packages(
+            time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
+        )
+
+        clipped_boundary_condition = self.__create_boundary_condition_clipped_boundary(
+            self, clipped, state_for_boundary
+        )
+        if clipped_boundary_condition is not None:
+            clipped["chd_clipped"] = clipped_boundary_condition
+
+        return clipped
+
+    def __create_boundary_condition_clipped_boundary(
+        self,
+        original_model: Modflow6Model,
+        clipped_model: Modflow6Model,
+        state_for_boundary: Optional[GridDataArray],
+    ):
+        unassigned_boundary_original_domain = (
+            self.__create_boundary_condition_for_unassigned_boundary(
+                original_model, state_for_boundary
+            )
+        )
+
+        return self.__create_boundary_condition_for_unassigned_boundary(
+            clipped_model, state_for_boundary, [unassigned_boundary_original_domain]
+        )
+
+    @staticmethod
+    def __create_boundary_condition_for_unassigned_boundary(
+        model: Modflow6Model,
+        state_for_boundary: Optional[GridDataArray],
+        additional_boundaries: Optional[List[imod.mf6.ConstantHead]] = None,
+    ):
+        if state_for_boundary is None:
+            return None
+
+        constant_head_packages = [
+            pkg for name, pkg in model.items() if isinstance(pkg, imod.mf6.ConstantHead)
+        ]
+
+        additional_boundaries = [
+            item for item in additional_boundaries or [] if item is not None
+        ]
+
+        constant_head_packages.extend(additional_boundaries)
+
+        return create_clipped_boundary(
+            model.get_domain(), state_for_boundary, constant_head_packages
+        )
+
 
 class GroundwaterTransportModel(Modflow6Model):
     """
@@ -429,3 +685,21 @@ class GroundwaterTransportModel(Modflow6Model):
         }
 
         self._template = initialize_template("gwt-nam.j2")
+
+    def clip_box(
+        self,
+        time_min: str = None,
+        time_max: str = None,
+        layer_min: int = None,
+        layer_max: int = None,
+        x_min: float = None,
+        x_max: float = None,
+        y_min: float = None,
+        y_max: float = None,
+        state_for_boundary: GridDataArray = None,
+    ):
+        clipped = super()._clip_box_packages(
+            time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
+        )
+
+        return clipped

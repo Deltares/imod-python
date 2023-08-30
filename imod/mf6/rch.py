@@ -1,6 +1,7 @@
 import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -101,6 +102,10 @@ class Recharge(BoundaryCondition):
 
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
+
+    _regrid_method = {
+        "rate": (RegridderType.OVERLAP, "mean"),
+    }
 
     def __init__(
         self,

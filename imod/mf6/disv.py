@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 from imod.mf6.package import Package
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import DisBottomSchema
 from imod.mf6.write_context import WriteContext
 from imod.schemata import (
@@ -61,6 +62,14 @@ class VerticesDiscretization(Package):
     _grid_data = {"top": np.float64, "bottom": np.float64, "idomain": np.int32}
     _keyword_map = {"bottom": "botm"}
     _template = Package._initialize_template(_pkg_id)
+
+    _regrid_method = {
+        "top": (RegridderType.OVERLAP, "mean"),
+        "bottom": (RegridderType.OVERLAP, "mean"),
+        "idomain": (RegridderType.OVERLAP, "mode"),
+    }
+
+    _skip_mask_arrays = ["bottom", "idomain"]
 
     def __init__(self, top, bottom, idomain, validate: bool = True):
         super().__init__(locals())

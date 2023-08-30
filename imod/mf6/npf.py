@@ -3,6 +3,7 @@ import warnings
 import numpy as np
 
 from imod.mf6.package import Package
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -19,6 +20,15 @@ class NodePropertyFlow(Package):
     In this package the hydraulic conductivity and rewetting in the model is
     specified. A single NPF Package is required for each GWF model.
     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=51
+
+    A note about regridding: the fields k, k22, k33 define the principal
+    components of an anisotropic conductivity tensor. By default, k and k22 are
+    in the horizontal plane and k33 is vertical. Angle1, angle2 and angle3
+    define the rotation of this tensor. The regridding methods associated by
+    default are chosen based on the assumption that k and k22 are horizontal and
+    k33 is vertical. If this is not the case, it is up to the user to regrid the
+    npf package using other regridding methods. This may be recommended if for
+    example the rotation is such that k has become vertical and k33 horizontal.
 
     Parameters
     ----------
@@ -284,6 +294,23 @@ class NodePropertyFlow(Package):
     }
     _template = Package._initialize_template(_pkg_id)
 
+    _regrid_method = {
+        "icelltype": (RegridderType.OVERLAP, "mean"),
+        "k": (RegridderType.OVERLAP, "geometric_mean"),  # horizontal if angle2 = 0
+        "k22": (
+            RegridderType.OVERLAP,
+            "geometric_mean",
+        ),  # horizontal if angle2 = 0 & angle3 = 0
+        "k33": (
+            RegridderType.OVERLAP,
+            "harmonic_mean",
+        ),  # vertical if angle2 = 0 & angle3 = 0
+        "angle1": (RegridderType.OVERLAP, "mean"),
+        "angle2": (RegridderType.OVERLAP, "mean"),
+        "angle3": (RegridderType.OVERLAP, "mean"),
+        "rewet_layer": (RegridderType.OVERLAP, "mean"),
+    }
+
     def __init__(
         self,
         icelltype,
@@ -347,3 +374,10 @@ class NodePropertyFlow(Package):
         self.dataset["perched"] = perched
         self.dataset["save_specific_discharge"] = save_specific_discharge
         self._validate_init_schemata(validate)
+
+    @classmethod
+    def get_pkg_id(cls) -> str:
+        """
+        Returns the preferred package id for this class.
+        """
+        return cls._pkg_id
