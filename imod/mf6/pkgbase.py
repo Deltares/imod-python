@@ -12,6 +12,17 @@ TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
 
 class PackageBase(abc.ABC):
+    """
+    This class is used for storing a collection of Xarray DataArrays or UgridDataArrays
+    in a dataset. A load-from-file method is also provided. Storing to file is done by calling
+    object.dataset.to_netcdf(...)
+    """
+
+    # This method has been added to allow mock.patch to mock created objects
+    # https://stackoverflow.com/questions/64737213/how-to-patch-the-new-method-of-a-class
+    def __new__(cls, *_, **__):
+        return super(PackageBase, cls).__new__(cls)
+
     def __init__(self, allargs=None):
         if allargs is not None:
             for arg in allargs.values():
@@ -20,17 +31,30 @@ class PackageBase(abc.ABC):
                     return
         self.dataset = xr.Dataset()
 
-    """
-    This class is used for storing a collection of Xarray dataArrays or ugrid-DataArrays
-    in a dataset. A load-from-file method is also provided. Storing to file is done by calling
-    object.dataset.to_netcdf(...)
-    """
-
     def __getitem__(self, key):
         return self.dataset.__getitem__(key)
 
     def __setitem__(self, key, value):
         self.dataset.__setitem__(key, value)
+
+    def to_netcdf(self, *args, **kwargs):
+        """
+
+        Write dataset contents to a netCDF file.
+        Custom encoding rules can be provided on package level by overriding the _netcdf_encoding in the package
+
+        """
+        kwargs.update({"encoding": self._netcdf_encoding()})
+        self.dataset.to_netcdf(*args, **kwargs)
+
+    def _netcdf_encoding(self):
+        """
+
+        The encoding used in the to_netcdf method
+        Override this to provide custom encoding rules
+
+        """
+        return {}
 
     @classmethod
     def from_file(cls, path, **kwargs):

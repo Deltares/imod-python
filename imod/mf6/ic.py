@@ -4,6 +4,7 @@ import warnings
 import numpy as np
 
 from imod.mf6.package import Package
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import DTypeSchema, IdentityNoDataSchema, IndexesSchema
 
@@ -58,6 +59,13 @@ class InitialConditions(Package):
     _grid_data = {"start": np.float64}
     _keyword_map = {"start": "strt"}
     _template = Package._initialize_template(_pkg_id)
+
+    _regrid_method = {
+        "start": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),  # TODO set to barycentric once supported
+    }
 
     def __init__(self, start=None, head=None, validate: bool = True):
         super().__init__(locals())

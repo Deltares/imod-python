@@ -4,6 +4,7 @@ import pathlib
 import numpy as np
 
 from imod.mf6.package import Package
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import PKG_DIMS_SCHEMA
 from imod.schemata import (
     AllValueSchema,
@@ -87,7 +88,7 @@ class SpecificStorage(StorageBase):
         Is specific yield. Specific yield values must be greater than or
         equal to 0. Specific yield does not have to be specified if there are no
         convertible cells (convertible=0 in every cell). (sy)
-    transient: ({True, False})
+    transient: ({True, False}), or a DataArray with a time coordinate and dtype Bool
         Boolean to indicate if the model is transient or steady-state.
     convertible: array of int (xr.DataArray)
         Is a flag for each cell that specifies whether or not a cell is
@@ -148,6 +149,12 @@ class SpecificStorage(StorageBase):
             AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
+    }
+
+    _regrid_method = {
+        "convertible": (RegridderType.OVERLAP, "mode"),
+        "specific_storage": (RegridderType.OVERLAP, "mean"),
+        "specific_yield": (RegridderType.OVERLAP, "mean"),
     }
 
     _template = Package._initialize_template(_pkg_id)
@@ -266,6 +273,12 @@ class StorageCoefficient(StorageBase):
             AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
+    }
+
+    _regrid_method = {
+        "convertible": (RegridderType.OVERLAP, "mode"),
+        "storage_coefficient": (RegridderType.OVERLAP, "mean"),
+        "specific_yield": (RegridderType.OVERLAP, "mean"),
     }
 
     _template = Package._initialize_template(_pkg_id)

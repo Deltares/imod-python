@@ -36,6 +36,13 @@ ADV_BOUNDARY_PACKAGES = [
     x for x in ALL_PACKAGES if issubclass(x, AdvancedBoundaryCondition)
 ]
 
+HIGH_LEVEL_PACKAGES = [
+    imod.mf6.Well,
+    imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic,
+    imod.mf6.HorizontalFlowBarrierMultiplier,
+    imod.mf6.HorizontalFlowBarrierResistance,
+]
+
 
 def check_attributes(pkg_class):
     class_attributes = set(
@@ -71,7 +78,11 @@ def test_render_twice(instance, tmp_path):
     modeldir = tmp_path / "testdir"
 
     sig = inspect.signature(instance.render)
-    if len(sig.parameters) == 0:
+    if any([isinstance(instance, pack) for pack in HIGH_LEVEL_PACKAGES]):
+        with pytest.raises(NotImplementedError):
+            instance.render(modeldir, "test", globaltimes, False)
+        return
+    elif len(sig.parameters) == 0:
         text1 = instance.render()
         text2 = instance.render()
     elif len(sig.parameters) == 3:
@@ -89,6 +100,6 @@ def test_render_twice(instance, tmp_path):
 def test_save_and_load(instance, tmp_path):
     pkg_class = type(instance)
     path = tmp_path / f"{instance._pkg_id}.nc"
-    instance.dataset.to_netcdf(path)
+    instance.to_netcdf(path)
     back = pkg_class.from_file(path)
     assert instance.dataset.equals(back.dataset)

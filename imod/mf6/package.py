@@ -1,59 +1,28 @@
 import abc
+import copy
 import numbers
 import pathlib
 from collections import defaultdict
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import cftime
 import jinja2
 import numpy as np
 import xarray as xr
 import xugrid as xu
+from xarray.core.utils import is_scalar
 
 import imod
 from imod.mf6.pkgbase import TRANSPORT_PACKAGES, PackageBase
+from imod.mf6.regridding_utils import (
+    RegridderInstancesCollection,
+    RegridderType,
+    get_non_grid_data,
+)
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
-
-
-def dis_recarr(arrdict, layer, notnull):
-    # Define the numpy structured array dtype
-    index_spec = [("layer", np.int32), ("row", np.int32), ("column", np.int32)]
-    field_spec = [(key, np.float64) for key in arrdict]
-    sparse_dtype = np.dtype(index_spec + field_spec)
-    # Initialize the structured array
-    nrow = notnull.sum()
-    recarr = np.empty(nrow, dtype=sparse_dtype)
-    # Fill in the indices
-    if notnull.ndim == 2:
-        recarr["row"], recarr["column"] = (np.argwhere(notnull) + 1).transpose()
-        recarr["layer"] = layer
-    else:
-        ilayer, irow, icolumn = np.argwhere(notnull).transpose()
-        recarr["row"] = irow + 1
-        recarr["column"] = icolumn + 1
-        recarr["layer"] = layer[ilayer]
-    return recarr
-
-
-def disv_recarr(arrdict, layer, notnull):
-    # Define the numpy structured array dtype
-    index_spec = [("layer", np.int32), ("cell2d", np.int32)]
-    field_spec = [(key, np.float64) for key in arrdict]
-    sparse_dtype = np.dtype(index_spec + field_spec)
-    # Initialize the structured array
-    nrow = notnull.sum()
-    recarr = np.empty(nrow, dtype=sparse_dtype)
-    # Fill in the indices
-    if notnull.ndim == 1 and layer.size == 1:
-        recarr["cell2d"] = (np.argwhere(notnull) + 1).transpose()
-        recarr["layer"] = layer
-    else:
-        ilayer, icell2d = np.argwhere(notnull).transpose()
-        recarr["cell2d"] = icell2d + 1
-        recarr["layer"] = layer[ilayer]
-    return recarr
+from imod.typing.grid import GridDataArray
 
 
 class Package(PackageBase, abc.ABC):
@@ -148,54 +117,6 @@ class Package(PackageBase, abc.ABC):
         with open(filename, "w") as f:
             f.write(content)
 
-    def to_sparse(self, arrdict, layer):
-        """Convert from dense arrays to list based input"""
-        # TODO stream the data per stress period
-        # TODO add pkgcheck that period table aligns
-        # Get the number of valid values
-        data = next(iter(arrdict.values()))
-        notnull = ~np.isnan(data)
-
-        if isinstance(self.dataset, xr.Dataset):
-            recarr = dis_recarr(arrdict, layer, notnull)
-        elif isinstance(self.dataset, xu.UgridDataset):
-            recarr = disv_recarr(arrdict, layer, notnull)
-        else:
-            raise TypeError(
-                "self.dataset should be xarray.Dataset or xugrid.UgridDataset,"
-                f" is {type(self.dataset)} instead"
-            )
-        # Fill in the data
-        for key, arr in arrdict.items():
-            values = arr[notnull].astype(np.float64)
-            recarr[key] = values
-
-        return recarr
-
-    def _ds_to_arrdict(self, ds):
-        arrdict = {}
-        for datavar in ds.data_vars:
-            if ds[datavar].shape == ():
-                raise ValueError(
-                    f"{datavar} in {self._pkg_id} package cannot be a scalar"
-                )
-            auxiliary_vars = (
-                self.get_auxiliary_variable_names()
-            )  # returns something like {"concentration": "species"}
-            if datavar in auxiliary_vars.keys():  # if datavar is concentration
-                if (
-                    auxiliary_vars[datavar] in ds[datavar].dims
-                ):  # if this concentration array has the species dimension
-                    for s in ds[datavar].values:  # loop over species
-                        arrdict[s] = (
-                            ds[datavar]
-                            .sel({auxiliary_vars[datavar]: s})
-                            .values  # store species array under its species name
-                        )
-            else:
-                arrdict[datavar] = ds[datavar].values
-        return arrdict
-
     def write_binary_griddata(self, outpath, da, dtype):
         # From the modflow6 source, the header is defined as:
         # integer(I4B) :: kstp --> np.int32 : 1
@@ -248,16 +169,16 @@ class Package(PackageBase, abc.ABC):
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
         if directory is None:
-            directory = pkgname
+            pkg_directory = pkgname
         else:
-            directory = pathlib.Path(directory) / pkgname
+            pkg_directory = pathlib.Path(directory) / pkgname
 
         for varname in self.dataset.data_vars:
             key = self._keyword_map.get(varname, varname)
 
             if hasattr(self, "_grid_data") and varname in self._grid_data:
                 layered, value = self._compose_values(
-                    self.dataset[varname], directory, key, binary=binary
+                    self.dataset[varname], pkg_directory, key, binary=binary
                 )
                 if self._valid(value):  # skip False or None
                     d[f"{key}_layered"], d[key] = layered, value
@@ -525,7 +446,7 @@ class Package(PackageBase, abc.ABC):
 
         # If the first time matches exactly, xarray will have done thing we
         # wanted and our work with the time dimension is finished.
-        if time_start != first_time:
+        if (time_start is not None) and (time_start != first_time):
             # If the first time is before the original time, we need to
             # backfill; otherwise, we need to ffill the first timestamp.
             if time_start < time[0]:
@@ -540,6 +461,15 @@ class Package(PackageBase, abc.ABC):
 
         return indexer
 
+    def __to_datetime(self, time, use_cftime):
+        """
+        Helper function that converts to datetime, except when None.
+        """
+        if time is None:
+            return time
+        else:
+            return imod.wq.timeutil.to_datetime(time, use_cftime)
+
     def clip_box(
         self,
         time_min=None,
@@ -550,6 +480,7 @@ class Package(PackageBase, abc.ABC):
         x_max=None,
         y_min=None,
         y_max=None,
+        state_for_boundary=None,
     ) -> "Package":
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -570,8 +501,8 @@ class Package(PackageBase, abc.ABC):
         layer_min: optional, int
         layer_max: optional, int
         x_min: optional, float
-        x_min: optional, float
-        y_max: optional, float
+        x_max: optional, float
+        y_min: optional, float
         y_max: optional, float
 
         Returns
@@ -582,8 +513,8 @@ class Package(PackageBase, abc.ABC):
         if "time" in selection:
             time = selection["time"].values
             use_cftime = isinstance(time[0], cftime.datetime)
-            time_start = imod.wq.timeutil.to_datetime(time_min, use_cftime)
-            time_end = imod.wq.timeutil.to_datetime(time_max, use_cftime)
+            time_start = self.__to_datetime(time_min, use_cftime)
+            time_end = self.__to_datetime(time_max, use_cftime)
 
             indexer = self._clip_time_indexer(
                 time=time,
@@ -632,7 +563,7 @@ class Package(PackageBase, abc.ABC):
         new.dataset = selection
         return new
 
-    def mask(self, domain: xr.DataArray) -> Any:
+    def mask(self, domain: GridDataArray) -> Any:
         """
         Mask values outside of domain.
 
@@ -642,8 +573,7 @@ class Package(PackageBase, abc.ABC):
 
         Parameters
         ----------
-        domain: xr.DataArray of bools
-            The condition. Preserve values where True, discard where False.
+        domain: xr.DataArray of integers. Preservers values where domain is larger than 0.
 
         Returns
         -------
@@ -651,18 +581,170 @@ class Package(PackageBase, abc.ABC):
             The package with part masked.
         """
         masked = {}
-        for var, da in self.dataset.data_vars.items():
+        for var in self.dataset.data_vars.keys():
+            da = self.dataset[var]
+            if self.skip_masking_dataarray(var):
+                masked[var] = da
+                continue
             if set(domain.dims).issubset(da.dims):
-                # Check if this should be: np.issubdtype(da.dtype, np.floating)
-                if issubclass(da.dtype, numbers.Real):
-                    masked[var] = da.where(domain, other=np.nan)
-                elif issubclass(da.dtype, numbers.Integral):
-                    masked[var] = da.where(domain, other=0)
+                if issubclass(da.dtype.type, numbers.Integral):
+                    masked[var] = da.where(domain > 0, other=0)
+                elif issubclass(da.dtype.type, numbers.Real):
+                    masked[var] = da.where(domain > 0)
                 else:
                     raise TypeError(
                         f"Expected dtype float or integer. Received instead: {da.dtype}"
                     )
             else:
-                masked[var] = da
+                if da.values[()] is not None:
+                    if is_scalar(da.values[()]):
+                        masked[var] = da.values[()]  # For scalars, such as options
+                    else:
+                        masked[
+                            var
+                        ] = da  # For example for arrays with only a layer dimension
+                else:
+                    masked[var] = None
 
         return type(self)(**masked)
+
+    def is_regridding_supported(self) -> bool:
+        """
+        returns true if package supports regridding.
+        """
+        return hasattr(self, "_regrid_method")
+
+    def get_regrid_methods(self) -> Optional[Dict[str, Tuple[RegridderType, str]]]:
+        if self.is_regridding_supported():
+            return self._regrid_method
+        return None
+
+    def _regrid_array(
+        self,
+        varname: str,
+        regridder_collection: RegridderInstancesCollection,
+        regridder_name: str,
+        regridder_function: str,
+        target_grid: GridDataArray,
+    ) -> Optional[GridDataArray]:
+        """
+        Regrids a data_array. The array is specified by its key in the dataset.
+        Each data-array can represent:
+        -a scalar value, valid for the whole grid
+        -an array of a different scalar per layer
+        -an array with a value per grid block
+        -None
+        """
+
+        # skip regridding for arrays with no valid values (such as "None")
+        if not self._valid(self.dataset[varname].values[()]):
+            return None
+
+        # the dataarray might be a scalar. If it is, then it does not need regridding.
+        if is_scalar(self.dataset[varname]):
+            return self.dataset[varname].values[()]
+
+        if isinstance(self.dataset[varname], xr.DataArray):
+            coords = self.dataset[varname].coords
+            # if it is an xr.DataArray it may be layer-based; then no regridding is needed
+            if not ("x" in coords and "y" in coords):
+                return self.dataset[varname]
+
+            # if it is an xr.DataArray it needs the dx, dy coordinates for regridding, which are otherwise not mandatory
+            if not ("dx" in coords and "dy" in coords):
+                raise ValueError(
+                    f"DataArray {varname} does not have both a dx and dy coordinates"
+                )
+
+        # obtain an instance of a regridder for the chosen method
+        regridder = regridder_collection.get_regridder(
+            regridder_name,
+            regridder_function,
+        )
+
+        # store original dtype of data
+        original_dtype = self.dataset[varname].dtype
+
+        # regrid data array
+        regridded_array = regridder.regrid(self.dataset[varname])
+
+        # reconvert the result to the same dtype as the original
+        return regridded_array.astype(original_dtype)
+
+    def regrid_like(
+        self,
+        target_grid: Union[xr.DataArray, xu.UgridDataArray],
+        regridder_types: Dict[str, Tuple[RegridderType, str]] = None,
+    ) -> "Package":
+        """
+        Creates a package of the same type as this package, based on another discretization.
+        It regrids all the arrays in this package to the desired discretization, and leaves the options
+        unmodified. At the moment only regridding to a different planar grid is supported, meaning
+        ``target_grid`` has different ``"x"`` and ``"y"`` or different ``cell2d`` coords.
+
+        The regridding methods can be specified in the _regrid_method attribute of the package. These are the defaults
+        that specify how each array should be regridded. These defaults can be overridden using the input
+        parameters of this function.
+
+        Examples
+        --------
+        To regrid the npf package with a non-default method for the k-field, call regrid_like with these arguments:
+
+        >>> new_npf = npf.regrid_like(like, {"k": (imod.RegridderType.OVERLAP, "mean")})
+
+
+        Parameters
+        ----------
+        target_grid: xr.DataArray or xu.UgridDataArray
+            a grid defined over the same discretization as the one we want to regrid the package to
+        regridder_types: dict(str->(regridder type,str))
+           dictionary mapping arraynames (str) to a tuple of regrid type (a specialization class of BaseRegridder) and function name (str)
+            this dictionary can be used to override the default mapping method.
+
+        Returns
+        -------
+        a package with the same options as this package, and with all the data-arrays regridded to another discretization,
+        similar to the one used in input argument "target_grid"
+        """
+        if not self.is_regridding_supported():
+            raise NotImplementedError(
+                f"Package {type(self).__name__} does not support regridding"
+            )
+
+        regridder_collection = RegridderInstancesCollection(
+            self.dataset, target_grid=target_grid
+        )
+
+        regridder_settings = copy.deepcopy(self._regrid_method)
+        if regridder_types is not None:
+            regridder_settings.update(regridder_types)
+
+        new_package_data = get_non_grid_data(self, list(regridder_settings.keys()))
+
+        for (
+            varname,
+            regridder_type_and_function,
+        ) in regridder_settings.items():
+            regridder_name, regridder_function = regridder_type_and_function
+
+            # skip variables that are not in this dataset
+            if varname not in self.dataset.keys():
+                continue
+
+            # regrid the variable
+            new_package_data[varname] = self._regrid_array(
+                varname,
+                regridder_collection,
+                regridder_name,
+                regridder_function,
+                target_grid,
+            )
+
+        new_package = self.__class__(**new_package_data)
+
+        return new_package
+
+    def skip_masking_dataarray(self, array_name: str) -> bool:
+        if hasattr(self, "_skip_mask_arrays"):
+            return array_name in self._skip_mask_arrays
+        return False

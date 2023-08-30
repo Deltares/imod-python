@@ -1,6 +1,7 @@
 import numpy as np
 
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.regridding_utils import RegridderType
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA, CONC_DIMS_SCHEMA
 from imod.schemata import (
     AllInsideNoDataSchema,
@@ -108,6 +109,15 @@ class GeneralHeadBoundary(BoundaryCondition):
     _keyword_map = {}
     _template = BoundaryCondition._initialize_template(_pkg_id)
     _auxiliary_data = {"concentration": "species"}
+
+    _regrid_method = {
+        "head": (
+            RegridderType.OVERLAP,
+            "mean",
+        ),  # TODO set to barycentric once supported
+        "conductance": (RegridderType.RELATIVEOVERLAP, "conductance"),
+        "concentration": (RegridderType.OVERLAP, "mean"),
+    }
 
     def __init__(
         self,
