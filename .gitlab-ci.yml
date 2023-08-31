@@ -1,13 +1,10 @@
-image: condaforge/miniforge3
+image: condaforge/mambaforge
 
 stages:
   - static code analysis
   - build
   - publish
 
-before_script:
-  - conda install mamba
-  
 lint:
   stage: static code analysis
   script:
@@ -22,7 +19,7 @@ mypy:
   script:
     - mamba env create -f imod-environment.yml
     - source activate imod
-    - mamba install mypy mypy-gitlab-code-quality
+    - mamba install -y mypy mypy-gitlab-code-quality
     - mypy --no-error-summary | mypy-gitlab-code-quality > codequality.json
   artifacts:
     when: always
