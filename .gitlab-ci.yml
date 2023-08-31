@@ -1,25 +1,25 @@
 image: condaforge/miniforge3
 
 stages:
-  - lint
-  - mypy
+  - static code analysis
   - build
   - publish
 
 before_script:
   - conda install mamba
-  # Avoid tox version with broken tox-conda.
-  - mamba install "tox>=3.8.1, <4"
   
 lint:
-  stage: lint
+  stage: static code analysis
   script:
+    # Avoid tox version with broken tox-conda.
+    - mamba install "tox>=3.8.1, <4"
     - tox -e lint
 
 mypy:
-  stage: mypy
+  stage: static code analysis
+  variables:
+    PYTHONHASHSEED: "0"
   script:
-    - export PYTHONHASHSEED=0
     - mamba env create -f imod-environment.yml
     - source activate imod
     - mamba install mypy mypy-gitlab-code-quality
