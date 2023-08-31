@@ -8,6 +8,7 @@ from fastcore.dispatch import typedispatch
 
 from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
 
+
 @typedispatch
 def _partition(submodel_labels: xr.DataArray) -> List[Dict[str, slice]]:
     shape = submodel_labels.shape
@@ -31,20 +32,24 @@ def _partition(submodel_labels: xu.UgridDataArray) -> List[Dict[str, np.ndarray]
     slices = [{submodel_labels.ugrid.grid.face_dimension: index} for index in indices]
     return slices
 
-def _validate_label_array( label_array: xr.DataArray)-> None:
-    unique_labels = np.unique(
-        label_array.values
-    )
 
-    if  len(unique_labels) == unique_labels.max()+ 1 and unique_labels.min()==0 and np.issubdtype(label_array.dtype, np.integer):
+def _validate_submodel_label_array(submodel_labels: xr.DataArray) -> None:
+    unique_labels = np.unique(submodel_labels.values)
+
+    if (
+        len(unique_labels) == unique_labels.max() + 1
+        and unique_labels.min() == 0
+        and np.issubdtype(submodel_labels.dtype, np.integer)
+    ):
         return
-    raise ValueError("The label array should be integer and contain all the numbers between 0 and the number of partitions minus 1.")
+    raise ValueError(
+        "The submodel_label  array should be integer and contain all the numbers between 0 and the number of partitions minus 1."
+    )
 
 
 def split_model_packages(  # noqa: F811
-        submodel_labels: xu.UgridDataArray, model: Modflow6Model
+    submodel_labels: xu.UgridDataArray, model: Modflow6Model
 ) -> List[Modflow6Model]:
-
     """
     This function splits a Model into a number of submodels. The label_array
     provided as input should have the same shape as a single layer of the model
@@ -52,8 +57,8 @@ def split_model_packages(  # noqa: F811
     each cell. Each cell in the model grid will end up in the submodel with the
     index specified by the corresponding label of that cell. The labels should
     be numbers between 0 and the number of submodels.
-    """ 
-    _validate_label_array(submodel_labels)  
+    """
+    _validate_submodel_label_array(submodel_labels)
     slices = _partition(submodel_labels)
 
     new_models = []
