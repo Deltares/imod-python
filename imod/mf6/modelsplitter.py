@@ -51,7 +51,7 @@ def split_model_packages(  # noqa: F811
     submodel_labels: xu.UgridDataArray, model: Modflow6Model
 ) -> List[Modflow6Model]:
     """
-    This function splits a Model into a number of submodels. The label_array
+    This function splits a Model into a number of submodels. The submodel_labels
     provided as input should have the same shape as a single layer of the model
     grid (all layers are split the same way), and contains an integer value in
     each cell. Each cell in the model grid will end up in the submodel with the
