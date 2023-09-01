@@ -26,9 +26,9 @@ def _partition(submodel_labels: xr.DataArray) -> List[Dict[str, slice]]:
 
 
 @typedispatch
-def _partition(
+def _partition(  # noqa: F811
     submodel_labels: xu.UgridDataArray,
-) -> List[Dict[str, np.ndarray]]:  # noqa F811
+) -> List[Dict[str, np.ndarray]]:
     indices = xu.ugrid.partitioning.labels_to_indices(submodel_labels.values)
     slices = [{submodel_labels.ugrid.grid.face_dimension: index} for index in indices]
     return slices
@@ -48,7 +48,7 @@ def _validate_submodel_label_array(submodel_labels: xr.DataArray) -> None:
     )
 
 
-def split_model_packages(  # noqa: F811
+def split_model_packages(
     submodel_labels: xu.UgridDataArray, model: Modflow6Model
 ) -> List[Modflow6Model]:
     """
