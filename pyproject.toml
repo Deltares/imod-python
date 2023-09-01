@@ -9,3 +9,35 @@ profile = "black"
 exclude_lines = [
   "pragma: no cover",
 ]
+
+[tool.mypy]
+files = "imod/mf6/**.py"
+follow_imports = "skip"
+
+[[tool.mypy.overrides]]
+module = [
+    "affine.*",
+    "bottleneck.*",
+    "cftime.*",
+    "contextily.*",
+    "dateutil.*",
+    "flopy.*",
+    "geopandas.*",
+    "matplotlib.*",
+    "mpl_toolkits.*",
+    "numba.*",
+    "osgeo.*",
+    "pandas.*",
+    "pooch.*",
+    "pyproj.*",
+    "rasterio.*",
+    "ribasim.*",
+    "ribasim_testmodels.*",
+    "scipy.*",
+    "shapely.*",
+    "tomllib.*",
+    "tqdm.*",
+    "vtk.*",
+    "xugrid.*",
+]
+ignore_missing_imports = true

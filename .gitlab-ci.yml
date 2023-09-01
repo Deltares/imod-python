@@ -1,19 +1,31 @@
-image: condaforge/miniforge3
+image: condaforge/mambaforge
 
 stages:
-  - lint
+  - static code analysis
   - build
   - publish
 
-before_script:
-  - conda install mamba
-  # Avoid tox version with broken tox-conda.
-  - mamba install "tox>=3.8.1, <4"
-  
 lint:
-  stage: lint
+  stage: static code analysis
   script:
+    # Avoid tox version with broken tox-conda.
+    - mamba install "tox>=3.8.1, <4"
     - tox -e lint
+
+mypy:
+  stage: static code analysis
+  variables:
+    PYTHONHASHSEED: "0"
+  script:
+    - mamba env create -f imod-environment.yml
+    - source activate imod
+    - mamba install -y mypy mypy-gitlab-code-quality
+    - mypy --no-error-summary | mypy-gitlab-code-quality > codequality.json
+  artifacts:
+    when: always
+    reports:
+      codequality: codequality.json
+  allow_failure: true
 
 # Run tests and create docs in the same stage. The docker image cannot (easily)
 # be shared between stages, this avoids double setup of the environment.
