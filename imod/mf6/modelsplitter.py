@@ -26,7 +26,9 @@ def _partition(submodel_labels: xr.DataArray) -> List[Dict[str, slice]]:
 
 
 @typedispatch
-def _partition(submodel_labels: xu.UgridDataArray) -> List[Dict[str, np.ndarray]]: # noqa F811
+def _partition(
+    submodel_labels: xu.UgridDataArray,
+) -> List[Dict[str, np.ndarray]]:  # noqa F811
     indices = xu.ugrid.partitioning.labels_to_indices(submodel_labels.values)
     slices = [{submodel_labels.ugrid.grid.face_dimension: index} for index in indices]
     return slices
