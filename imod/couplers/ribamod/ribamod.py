@@ -201,13 +201,14 @@ class RibaMod:
     def derive_river_drainage_coupling(
         gridded_basin: xr.DataArray,
         basin_ids: np.ndarray,
-        package: Union[River, Drainage],
+        conductance: xr.DataArray,
     ) -> pd.DataFrame:
         # Conductance is leading parameter to define location, for both river
         # and drainage.
-        # FUTURE: check for time dimension?
-        conductance = package.dataset["conductance"]
-        basin_id = gridded_basin.where(conductance.notnull())
+        # FUTURE: check for time dimension? Also order and inclusion of layer
+        # in conductance.
+        # Use xarray where to force the dimension order of conductance.
+        basin_id = xr.where(conductance.notnull(), gridded_basin, np.nan)
         include = basin_id.notnull().to_numpy()
         basin_id_values = basin_id.to_numpy()[include].astype(int)
         # Ribasim internally sorts the basin, which determines the order of the
@@ -269,7 +270,7 @@ class RibaMod:
             for key in keys:
                 package = gwf_model[key]
                 table = self.derive_river_drainage_coupling(
-                    gridded_basin, basin_ids, package
+                    gridded_basin, basin_ids, package["conductance"]
                 )
                 table.to_csv(exchange_dir / f"{key}.tsv", sep="\t", index=False)
                 coupling_dict[destination][key] = f"exchanges/{key}.tsv"
