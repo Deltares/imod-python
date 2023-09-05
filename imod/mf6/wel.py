@@ -2,7 +2,6 @@ import warnings
 from copy import deepcopy
 from typing import List, Union
 
-import geopandas as gpd
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -808,28 +807,14 @@ def _clip_by_grid(well_pkg: Well, grid: xr.DataArray) -> Well:
 
 
 @typedispatch
-def _clip_by_grid(well_pkg: Well, grid: xu.Ugrid2d) -> Well:
-    return _clip_outside_unstructured_grid(well_pkg, grid)
-
-
-@typedispatch
-def _clip_by_grid(well_pkg: Well, grid: xu.UgridDataArray) -> Well:
-    return _clip_outside_unstructured_grid(well_pkg, grid.grid)
-
-
-def _clip_outside_unstructured_grid(
-    well_pkg: Well, unstructured_grid: xu.Ugrid2d
-) -> Well:
+def _clip_by_grid(well_pkg: Well, grid: Union[xu.Ugrid2d, xu.UgridDataArray]) -> Well:
     """Clip wells outside unstructured grid."""
-    exterior = unstructured_grid.bounding_polygon()
+    unstructured_grid = grid if isinstance(grid, xu.Ugrid2d) else grid.grid
 
-    # TODO: benchmark to compare if Ugrid2d.locate_points(points) == -1 isn't
-    # faster.
-    # https://deltares.github.io/xugrid/api/xugrid.Ugrid2d.locate_points.html#xugrid.Ugrid2d.locate_points
-    points = gpd.points_from_xy(
-        x=well_pkg.dataset["x"].values, y=well_pkg.dataset["y"].values
-    )
-    is_inside_exterior = exterior.contains(points)
+    x, y = well_pkg.dataset["x"].values, well_pkg.dataset["y"].values
+    points = np.vstack((x, y)).T
+
+    is_inside_exterior = unstructured_grid.locate_points(points) != -1
     selection = well_pkg.dataset.loc[{"index": is_inside_exterior}]
 
     cls = type(well_pkg)
