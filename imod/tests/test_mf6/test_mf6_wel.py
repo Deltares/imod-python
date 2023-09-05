@@ -18,7 +18,7 @@ def test_clip_by_grid__structured_grid_full(
     """All wells are included within the structured grid bounds"""
     # Arrange
     ibound, _, _ = basic_dis
-    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary, print_flows=True)
 
     # Act
     wel_clipped = wel.clip_by_grid(ibound)
@@ -26,6 +26,8 @@ def test_clip_by_grid__structured_grid_full(
     # Assert
     assert isinstance(wel_clipped, imod.mf6.Well)
     assert wel_clipped.dataset["rate"].shape == wel.dataset["rate"].shape
+    # Test if options are copied
+    assert wel_clipped.dataset["print_flows"] == wel.dataset["print_flows"]
 
 
 def test_clip_by_grid__structured_grid_clipped(
@@ -34,7 +36,7 @@ def test_clip_by_grid__structured_grid_clipped(
     """Half of the wells are included within the structured grid bounds"""
     # Arrange
     ibound, _, _ = basic_dis
-    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary, print_flows=True)
     # Clip grid so that xmax is set to 70.0 instead of 90.0
     ibound_selected = ibound.sel(x=slice(None, 70.0))
 
@@ -44,6 +46,8 @@ def test_clip_by_grid__structured_grid_clipped(
     # Assert
     assert isinstance(wel_clipped, imod.mf6.Well)
     assert wel_clipped.dataset["rate"].shape == (4,)
+    # Test if options are copied
+    assert wel_clipped.dataset["print_flows"] == wel.dataset["print_flows"]
 
 
 def test_clip_by_grid__unstructured_grid_full(
@@ -52,7 +56,7 @@ def test_clip_by_grid__unstructured_grid_full(
     """All the wells are included within the unstructured grid bounds"""
     # Arrange
     ibound, _, _ = basic_dis
-    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary, print_flows=True)
     ibound_ugrid = xu.UgridDataArray.from_structured(ibound)
 
     # Act
@@ -61,6 +65,8 @@ def test_clip_by_grid__unstructured_grid_full(
     # Assert
     assert isinstance(wel_clipped, imod.mf6.Well)
     assert wel_clipped.dataset["rate"].shape == wel.dataset["rate"].shape
+    # Test if options are copied
+    assert wel_clipped.dataset["print_flows"] == wel.dataset["print_flows"]
 
 
 def test_clip_by_grid__unstructured_grid_clipped(
@@ -69,7 +75,7 @@ def test_clip_by_grid__unstructured_grid_clipped(
     """Half of the wells are included within the unstructured grid bounds"""
     # Arrange
     ibound, _, _ = basic_dis
-    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary, print_flows=True)
     # Clip grid so that xmax is set to 70.0 instead of 90.0
     ibound_selected = ibound.sel(x=slice(None, 70.0))
     ibound_ugrid = xu.UgridDataArray.from_structured(ibound_selected)
@@ -80,7 +86,8 @@ def test_clip_by_grid__unstructured_grid_clipped(
     # Assert
     assert isinstance(wel_clipped, imod.mf6.Well)
     assert wel_clipped.dataset["rate"].shape == (4,)
-
+    # Test if options are copied
+    assert wel_clipped.dataset["print_flows"] == wel.dataset["print_flows"]
 
 def test_to_mf6_pkg__high_lvl_stationary(basic_dis, well_high_lvl_test_data_stationary):
     # Arrange
