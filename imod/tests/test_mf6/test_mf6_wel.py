@@ -5,18 +5,97 @@ import textwrap
 import numpy as np
 import pytest
 import xarray as xr
+import xugrid as xu
 
 import imod
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
 
+def test_clip_by_grid__structured_grid_full(
+    basic_dis, well_high_lvl_test_data_stationary
+):
+    """All wells are included within the structured grid bounds"""
+    # Arrange
+    idomain, _, _ = basic_dis
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary, print_flows=True)
+
+    # Act
+    wel_clipped = wel.clip_by_grid(idomain)
+
+    # Assert
+    assert isinstance(wel_clipped, imod.mf6.Well)
+    assert wel_clipped.dataset["rate"].shape == wel.dataset["rate"].shape
+    # Test if options are copied
+    assert wel_clipped.dataset["print_flows"] == wel.dataset["print_flows"]
+
+
+def test_clip_by_grid__structured_grid_clipped(
+    basic_dis, well_high_lvl_test_data_stationary
+):
+    """Half of the wells are included within the structured grid bounds"""
+    # Arrange
+    idomain, _, _ = basic_dis
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary, print_flows=True)
+    # Clip grid so that xmax is set to 70.0 instead of 90.0
+    idomain_selected = idomain.sel(x=slice(None, 70.0))
+
+    # Act
+    wel_clipped = wel.clip_by_grid(idomain_selected)
+
+    # Assert
+    assert isinstance(wel_clipped, imod.mf6.Well)
+    assert wel_clipped.dataset["rate"].shape == (4,)
+    # Test if options are copied
+    assert wel_clipped.dataset["print_flows"] == wel.dataset["print_flows"]
+
+
+def test_clip_by_grid__unstructured_grid_full(
+    basic_dis, well_high_lvl_test_data_stationary
+):
+    """All the wells are included within the unstructured grid bounds"""
+    # Arrange
+    idomain, _, _ = basic_dis
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary, print_flows=True)
+    idomain_ugrid = xu.UgridDataArray.from_structured(idomain)
+
+    # Act
+    wel_clipped = wel.clip_by_grid(idomain_ugrid)
+
+    # Assert
+    assert isinstance(wel_clipped, imod.mf6.Well)
+    assert wel_clipped.dataset["rate"].shape == wel.dataset["rate"].shape
+    # Test if options are copied
+    assert wel_clipped.dataset["print_flows"] == wel.dataset["print_flows"]
+
+
+def test_clip_by_grid__unstructured_grid_clipped(
+    basic_dis, well_high_lvl_test_data_stationary
+):
+    """Half of the wells are included within the unstructured grid bounds"""
+    # Arrange
+    idomain, _, _ = basic_dis
+    wel = imod.mf6.Well(*well_high_lvl_test_data_stationary, print_flows=True)
+    # Clip grid so that xmax is set to 70.0 instead of 90.0
+    idomain_selected = idomain.sel(x=slice(None, 70.0))
+    idomain_ugrid = xu.UgridDataArray.from_structured(idomain_selected)
+
+    # Act
+    wel_clipped = wel.clip_by_grid(idomain_ugrid)
+
+    # Assert
+    assert isinstance(wel_clipped, imod.mf6.Well)
+    assert wel_clipped.dataset["rate"].shape == (4,)
+    # Test if options are copied
+    assert wel_clipped.dataset["print_flows"] == wel.dataset["print_flows"]
+
+
 def test_to_mf6_pkg__high_lvl_stationary(basic_dis, well_high_lvl_test_data_stationary):
     # Arrange
-    ibound, top, bottom = basic_dis
+    idomain, top, bottom = basic_dis
     wel = imod.mf6.Well(*well_high_lvl_test_data_stationary)
-    active = ibound == 1
-    k = xr.ones_like(ibound)
+    active = idomain == 1
+    k = xr.ones_like(idomain)
 
     nmax_cellid_expected = np.array(["layer", "row", "column"])
     cellid_expected = np.array(
@@ -56,12 +135,12 @@ def test_to_mf6_pkg__high_lvl_multilevel(basic_dis, well_high_lvl_test_data_stat
     In this case: The first layer should get 0.25, the second 0.75.
     """
     # Arrange
-    ibound, top, bottom = basic_dis
+    idomain, top, bottom = basic_dis
     x, y, screen_top, _, rate_wel, concentration = well_high_lvl_test_data_stationary
     screen_bottom = [-20.0] * 8
     wel = imod.mf6.Well(x, y, screen_top, screen_bottom, rate_wel, concentration)
-    active = ibound == 1
-    k = xr.ones_like(ibound)
+    active = idomain == 1
+    k = xr.ones_like(idomain)
 
     nmax_cellid_expected = np.array(["layer", "row", "column"])
     cellid_expected = np.array(
@@ -100,10 +179,10 @@ def test_to_mf6_pkg__high_lvl_multilevel(basic_dis, well_high_lvl_test_data_stat
 
 def test_to_mf6_pkg__high_lvl_transient(basic_dis, well_high_lvl_test_data_transient):
     # Arrange
-    ibound, top, bottom = basic_dis
+    idomain, top, bottom = basic_dis
     wel = imod.mf6.Well(*well_high_lvl_test_data_transient)
-    active = ibound == 1
-    k = xr.ones_like(ibound)
+    active = idomain == 1
+    k = xr.ones_like(idomain)
 
     nmax_cellid_expected = np.array(["layer", "row", "column"])
     cellid_expected = np.array(
@@ -188,7 +267,7 @@ def test_clip_box__high_lvl_transient(well_high_lvl_test_data_transient):
 
 def test_derive_cellid_from_points(basic_dis, well_high_lvl_test_data_stationary):
     # Arrange
-    ibound, _, _ = basic_dis
+    idomain, _, _ = basic_dis
     x, y, _, _, _, _ = well_high_lvl_test_data_stationary
     layer = [1, 1, 1, 1, 2, 2, 2, 2]
 
@@ -208,7 +287,7 @@ def test_derive_cellid_from_points(basic_dis, well_high_lvl_test_data_stationary
     )
 
     # Act
-    cellid = imod.mf6.wel.Well._Well__derive_cellid_from_points(ibound, x, y, layer)
+    cellid = imod.mf6.wel.Well._Well__derive_cellid_from_points(idomain, x, y, layer)
 
     # Assert
     np.testing.assert_array_equal(cellid, cellid_expected)
