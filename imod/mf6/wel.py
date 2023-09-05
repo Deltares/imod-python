@@ -145,7 +145,7 @@ class Well(BoundaryCondition):
 
         self._validate_init_schemata(validate)
 
-    def clip_outside_grid(self, grid: GridDataArray) -> "Well":
+    def clip_by_grid(self, grid: GridDataArray) -> "Well":
         """
         Clip wells falling outside of a provided grid.
 
@@ -158,7 +158,7 @@ class Well(BoundaryCondition):
         -------
         clipped wells: Well
         """
-        return _clip_outside_grid(self, grid)
+        return _clip_by_grid(self, grid)
 
     def clip_box(
         self,
@@ -795,25 +795,25 @@ class WellDisVertices(DisVerticesBoundaryCondition):
 
 
 @typedispatch
-def _clip_outside_grid(well_pkg: Well, grid: object) -> None:
+def _clip_by_grid(well_pkg: Well, grid: object) -> None:
     raise TypeError(
         f"'grid' should be of type xr.DataArray, xu.Ugrid2d or xu.UgridDataArray, got {type(grid)}"
     )
 
 
 @typedispatch
-def _clip_outside_grid(well_pkg: Well, grid: xr.DataArray) -> Well:
+def _clip_by_grid(well_pkg: Well, grid: xr.DataArray) -> Well:
     _, xmin, xmax, _, ymin, ymax = spatial_reference(grid)
     return well_pkg.clip_box(x_min=xmin, x_max=xmax, y_min=ymin, y_max=ymax)
 
 
 @typedispatch
-def _clip_outside_grid(well_pkg: Well, grid: xu.Ugrid2d) -> Well:
+def _clip_by_grid(well_pkg: Well, grid: xu.Ugrid2d) -> Well:
     return _clip_outside_unstructured_grid(well_pkg, grid)
 
 
 @typedispatch
-def _clip_outside_grid(well_pkg: Well, grid: xu.UgridDataArray) -> Well:
+def _clip_by_grid(well_pkg: Well, grid: xu.UgridDataArray) -> Well:
     return _clip_outside_unstructured_grid(well_pkg, grid.grid)
 
 
