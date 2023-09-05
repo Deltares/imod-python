@@ -17,7 +17,7 @@ import numpy as np
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.schemata import DTypeSchema
 
-# FUTURE: There was an idea to autogenerate these object.
+# FUTURE: There was an idea to autogenerate modflow 6 adapters.
 # This was relevant:
 # https://github.com/Deltares/xugrid/blob/main/xugrid/core/wrap.py#L90
 
