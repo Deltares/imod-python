@@ -89,6 +89,7 @@ def test_clip_by_grid__unstructured_grid_clipped(
     # Test if options are copied
     assert wel_clipped.dataset["print_flows"] == wel.dataset["print_flows"]
 
+
 def test_to_mf6_pkg__high_lvl_stationary(basic_dis, well_high_lvl_test_data_stationary):
     # Arrange
     idomain, top, bottom = basic_dis
