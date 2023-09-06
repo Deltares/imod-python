@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Union
 
 import numpy as np
@@ -164,4 +165,6 @@ class Mf6HorizontalFlowBarrier(BoundaryCondition):
         write_context: WriteContext,
     ):
         # MODFLOW6 does not support binary HFB input.
-        super().write(pkgname, globaltimes, write_context)
+        hfb_write_context = deepcopy(write_context)
+        hfb_write_context.use_binary = False
+        super().write(pkgname, globaltimes, hfb_write_context)
