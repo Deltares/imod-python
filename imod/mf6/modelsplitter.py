@@ -7,6 +7,7 @@ from fastcore.dispatch import typedispatch
 
 from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
 from imod.mf6.package import Package
+from imod.typing.grid import GridDataArray
 
 DomainSlice = Dict[str, slice]
 
@@ -41,7 +42,7 @@ def create_domain_slices(
     return slices
 
 
-def _validate_submodel_label_array(submodel_labels: xr.DataArray) -> None:
+def _validate_submodel_label_array(submodel_labels: GridDataArray) -> None:
     unique_labels = np.unique(submodel_labels.values)
 
     if (
@@ -73,6 +74,6 @@ def split_model(domain_slice: DomainSlice, model: Modflow6Model) -> Modflow6Mode
     return new_model
 
 
-def split_package(domain_slice: DomainSlice, package: Package):
+def split_package(domain_slice: DomainSlice, package: Package) -> Package:
     sliced_dataset = package.dataset.isel(domain_slice, missing_dims="ignore")
     return type(package)(**sliced_dataset)

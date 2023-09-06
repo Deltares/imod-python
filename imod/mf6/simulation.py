@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections
 import copy
 import pathlib
@@ -392,7 +394,7 @@ class Modflow6Simulation(collections.UserDict):
             )
         return clipped
 
-    def split(self, submodel_labels: xr.DataArray) -> "Modflow6Simulation":
+    def split(self, submodel_labels: xr.DataArray) -> Modflow6Simulation:
         models = get_models(self)
         packages = get_packages(self)
 
