@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections
 import copy
 import pathlib
@@ -18,7 +20,9 @@ from imod.mf6.model import (
     GroundwaterTransportModel,
     Modflow6Model,
 )
+from imod.mf6.modelsplitter import create_domain_slices, slice_model
 from imod.mf6.statusinfo import NestedStatusInfo
+from imod.mf6.utilities.simulation_utilities import get_models, get_packages
 from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
@@ -389,6 +393,23 @@ class Modflow6Simulation(collections.UserDict):
                 state_for_boundary=state_for_boundary,
             )
         return clipped
+
+    def split(self, submodel_labels: xr.DataArray) -> Modflow6Simulation:
+        models = get_models(self)
+        packages = get_packages(self)
+
+        new_simulation = imod.mf6.Modflow6Simulation(f"{self.name}_partioned")
+        for package_name, package in {**packages}.items():
+            new_simulation[package_name] = package
+
+        model_slices = create_domain_slices(submodel_labels)
+        for idx, model_slice in enumerate(model_slices):
+            for model_name, model in models.items():
+                model_name = f"{model_name}_{idx}"
+                new_simulation[model_name] = slice_model(model_slice, model)
+                new_simulation["solver"]["modelnames"].append(model_name)
+
+        return new_simulation
 
     def regrid_like(
         self,

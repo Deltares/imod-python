@@ -469,6 +469,10 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         dis = self.__get_diskey()
         return self[dis]["idomain"]
 
+    def get_bottom(self):
+        dis = self.__get_diskey()
+        return self[dis]["bottom"]
+
     def _get_regridding_domain(
         self,
         target_grid: GridDataArray,
