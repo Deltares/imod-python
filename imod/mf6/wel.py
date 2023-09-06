@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 import xugrid as xu
+from fastcore.dispatch import typedispatch
 
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
@@ -20,11 +21,7 @@ from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
 from imod.select.points import points_indices
 from imod.typing.grid import GridDataArray, ones_like
-from imod.util import values_within_range
-
-# FUTURE: There was an idea to autogenerate these object.
-# This was relevant:
-# https://github.com/Deltares/xugrid/blob/main/xugrid/core/wrap.py#L90
+from imod.util import spatial_reference, values_within_range
 
 
 class Well(BoundaryCondition):
@@ -146,6 +143,21 @@ class Well(BoundaryCondition):
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
 
         self._validate_init_schemata(validate)
+
+    def clip_by_grid(self, grid: GridDataArray) -> "Well":
+        """
+        Clip wells falling outside of a provided grid.
+
+        Parameters
+        ----------
+        grid: xr.DataArray, xu.Ugrid2d, xu.UgridDataArray
+            Grid of which the exterior will be used to clip wells.
+
+        Returns
+        -------
+        clipped wells: Well
+        """
+        return _clip_by_grid(self, grid)
 
     def clip_box(
         self,
@@ -779,3 +791,33 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         # The super method will select in the time dimension without issues.
         new = super().clip_box(time_min=time_min, time_max=time_max)
         return new
+
+
+@typedispatch
+def _clip_by_grid(well_pkg: Well, grid: object) -> None:
+    raise TypeError(
+        f"'grid' should be of type xr.DataArray, xu.Ugrid2d or xu.UgridDataArray, got {type(grid)}"
+    )
+
+
+@typedispatch
+def _clip_by_grid(well_pkg: Well, grid: xr.DataArray) -> Well:
+    _, xmin, xmax, _, ymin, ymax = spatial_reference(grid)
+    return well_pkg.clip_box(x_min=xmin, x_max=xmax, y_min=ymin, y_max=ymax)
+
+
+@typedispatch
+def _clip_by_grid(well_pkg: Well, grid: Union[xu.Ugrid2d, xu.UgridDataArray]) -> Well:
+    """Clip wells outside unstructured grid."""
+    unstructured_grid = grid if isinstance(grid, xu.Ugrid2d) else grid.grid
+
+    x, y = well_pkg.dataset["x"].values, well_pkg.dataset["y"].values
+    points = np.vstack((x, y)).T
+
+    is_inside_exterior = unstructured_grid.locate_points(points) != -1
+    selection = well_pkg.dataset.loc[{"index": is_inside_exterior}]
+
+    cls = type(well_pkg)
+    new = cls.__new__(cls)
+    new.dataset = selection
+    return new
