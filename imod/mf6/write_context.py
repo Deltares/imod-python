@@ -67,6 +67,10 @@ class WriteContext:
     def use_binary(self) -> bool:
         return self.__use_binary
 
+    @use_binary.setter
+    def use_binary(self, value) -> None:
+        self.__use_binary = value
+
     @property
     def use_absolute_paths(self) -> bool:
         return self.__use_absolute_paths
