@@ -10,10 +10,9 @@ from shapely.geometry import Polygon
 import imod
 from imod.couplers.ribamod import RibaMod
 from imod.couplers.ribamod.ribamod import DriverCoupling
-from imod.mf6.model import GroundwaterFlowModel
 from imod.mf6 import Drainage, River
+from imod.mf6.model import GroundwaterFlowModel
 from imod.mf6.simulation import Modflow6Simulation
-
 
 # tomllib part of Python 3.11, else use tomli
 try:

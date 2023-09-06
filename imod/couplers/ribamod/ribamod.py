@@ -1,4 +1,3 @@
-from collections import defaultdict
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
@@ -6,10 +5,10 @@ from typing import Any, Dict, List, Optional, Tuple, Type, Union
 import numpy as np
 import pandas as pd
 import tomli_w
-import imod
 import xarray as xr
 
-from imod.mf6 import GroundwaterFlowModel, Modflow6Simulation, River, Drainage
+import imod
+from imod.mf6 import Drainage, GroundwaterFlowModel, Modflow6Simulation, River
 from imod.util import MissingOptionalModule
 
 try:
