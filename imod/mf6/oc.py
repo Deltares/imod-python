@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List, Union
 
 import numpy as np
+import xarray as xr
 
 from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
@@ -84,8 +85,16 @@ class OutputControl(Package):
         validate: bool = True,
     ):
         super().__init__()
+
+        if (
+            isinstance(save_concentration, xr.DataArray)
+            and save_concentration.isnull().values.all()
+        ):
+            save_concentration = None
+
         if save_head is not None and save_concentration is not None:
             raise ValueError("save_head and save_concentration cannot both be defined.")
+
         self.dataset["save_head"] = save_head
         self.dataset["save_concentration"] = save_concentration
         self.dataset["save_budget"] = save_budget
