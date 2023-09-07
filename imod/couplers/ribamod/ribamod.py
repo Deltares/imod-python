@@ -157,7 +157,7 @@ class RibaMod:
                 "kernels": {
                     "modflow6": {
                         "dll": str(modflow6_dll),
-                        "work_dir": f".\\{self._modflow6_model_dir}",
+                        "work_dir": self._modflow6_model_dir,
                     },
                     "ribasim": {
                         "dll": str(ribasim_dll),

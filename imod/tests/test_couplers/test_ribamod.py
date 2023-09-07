@@ -159,12 +159,12 @@ def test_ribamod_write_toml(
             "kernels": {
                 "modflow6": {
                     "dll": "./modflow6.dll",
-                    "work_dir": f".\\{coupled_models._modflow6_model_dir}",
+                    "work_dir": coupled_models._modflow6_model_dir,
                 },
                 "ribasim": {
                     "dll": "./ribasim.dll",
                     "dll_dep_dir": "./ribasim-bin",
-                    "config_file": "ribasim\\trivial.toml",
+                    "config_file": str(Path("ribasim") / "trivial.toml"),
                 },
             },
             "coupling": [dict_coupling_expected],
