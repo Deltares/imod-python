@@ -86,10 +86,18 @@ conductance[7, 1:10] = 1.0
 rch_rate = xr.full_like(idomain.sel(layer=1), 3.0e-8, dtype=float)
 
 # Well
-well_layer = [3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-well_row = [5, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13]
-well_column = [11, 6, 12, 8, 10, 12, 14, 8, 10, 12, 14, 8, 10, 12, 14]
-well_rate = [-5.0] * 15
+# fmt: off
+wells_x = [52500.0, 27500.0, 57500.0, 37500.0, 47500.0, 57500.0, 67500.0, 37500.0,
+           47500.0, 57500.0, 67500.0, 37500.0, 47500.0, 57500.0, 67500.0, ]
+wells_y = [52500.0, 57500.0, 47500.0, 32500.0, 32500.0, 32500.0, 32500.0, 22500.0,
+           22500.0, 22500.0, 22500.0, 12500.0, 12500.0, 12500.0, 12500.0, ]
+screen_top = [-300.0, -200.0, -200.0, 200.0, 200.0, 200.0, 200.0, 200.0,
+              200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 200.0, ]
+screen_bottom = [-450.0, -300.0, -300.0, -200.0, -200.0, -200.0, -200.0, -200.0,
+                 -200.0, -200.0, -200.0, -200.0, -200.0, -200.0, -200.0, ]
+rate_wel = [-5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0,
+            -5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0, ]
+# fmt: on
 
 # Node properties
 icelltype = xr.DataArray([1, 0, 0], {"layer": layer}, ("layer",))
@@ -135,14 +143,14 @@ gwf_model["sto"] = imod.mf6.SpecificStorage(
 )
 gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
 gwf_model["rch"] = imod.mf6.Recharge(rch_rate)
-gwf_model["wel"] = imod.mf6.WellDisStructured(
-    layer=well_layer,
-    row=well_row,
-    column=well_column,
-    rate=well_rate,
-    print_input=True,
-    print_flows=True,
-    save_flows=True,
+
+gwf_model["wel"] = imod.mf6.Well(
+    x=wells_x,
+    y=wells_y,
+    screen_top=screen_top,
+    screen_bottom=screen_bottom,
+    rate=rate_wel,
+    minimum_k=0.0001,
 )
 
 # Attach it to a simulation

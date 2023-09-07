@@ -277,10 +277,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                     k = self.__get_k()
                     mf6_pkg = pkg.to_mf6_pkg(idomain, top, bottom, k)
                     mf6_pkg.write(
-                        directory=modeldirectory,
                         pkgname=pkg_name,
                         globaltimes=globaltimes,
-                        binary=write_context.use_binary,
+                        write_context=pkg_write_context,
                     )
                 else:
                     pkg.write(

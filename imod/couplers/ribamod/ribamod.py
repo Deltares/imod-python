@@ -1,11 +1,20 @@
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
+import numpy as np
+import pandas as pd
 import tomli_w
+import xarray as xr
 
-from imod.mf6 import Modflow6Simulation
+import imod
+from imod.mf6 import Drainage, GroundwaterFlowModel, Modflow6Simulation, River
 from imod.util import MissingOptionalModule
+
+try:
+    import geopandas as gpd
+except ImportError:
+    gpd = MissingOptionalModule("geopandas")
 
 try:
     import ribasim
@@ -16,8 +25,10 @@ except ImportError:
 @dataclass
 class DriverCoupling:
     mf6_model: str
-    mf6_river_packages: List[str]
-    mf6_drainage_packages: List[str]
+    mf6_active_river_packages: Tuple[str] = ()
+    mf6_passive_river_packages: Tuple[str] = ()
+    mf6_active_drainage_packages: Tuple[str] = ()
+    mf6_passive_drainage_packages: Tuple[str] = ()
 
 
 class RibaMod:
@@ -44,10 +55,24 @@ class RibaMod:
         ribasim_model: "ribasim.Model",
         mf6_simulation: Modflow6Simulation,
         coupling_list: List[DriverCoupling],
+        basin_definition: gpd.GeoDataFrame,
     ):
         self.ribasim_model = ribasim_model
         self.mf6_simulation = mf6_simulation
         self.coupling_list = coupling_list
+        if "node_id" not in basin_definition.columns:
+            raise ValueError('Basin definition must contain "node_id" column')
+        self.basin_definition = basin_definition
+
+    def _get_gwf_modelnames(self) -> List[str]:
+        """
+        Get names of gwf models in mf6 simulation
+        """
+        return [
+            key
+            for key, value in self.mf6_simulation.items()
+            if isinstance(value, GroundwaterFlowModel)
+        ]
 
     def write(
         self,
@@ -90,12 +115,15 @@ class RibaMod:
             **modflow6_write_kwargs,
         )
         self.ribasim_model.write(directory / self._ribasim_model_dir)
-
-        self.write_toml(directory, modflow6_dll, ribasim_dll, ribasim_dll_dependency)
+        coupling_dict = self.write_exchanges(directory)
+        self.write_toml(
+            directory, coupling_dict, modflow6_dll, ribasim_dll, ribasim_dll_dependency
+        )
 
     def write_toml(
         self,
         directory: Union[str, Path],
+        coupling_dict: Dict[str, Any],
         modflow6_dll: Union[str, Path],
         ribasim_dll: Union[str, Path],
         ribasim_dll_dependency: Union[str, Path],
@@ -129,23 +157,121 @@ class RibaMod:
                 "kernels": {
                     "modflow6": {
                         "dll": str(modflow6_dll),
-                        "work_dir": f".\\{self._modflow6_model_dir}",
+                        "work_dir": self._modflow6_model_dir,
                     },
                     "ribasim": {
                         "dll": str(ribasim_dll),
                         "dll_dep_dir": str(ribasim_dll_dependency),
                         "config_file": str(
-                            directory
-                            / self._ribasim_model_dir
+                            Path(self._ribasim_model_dir)
                             / f"{self.ribasim_model.modelname}.toml"
                         ),
                     },
                 },
-                "coupling": [
-                    asdict(driver_coupling) for driver_coupling in self.coupling_list
-                ],
+                "coupling": [coupling_dict],
             },
         }
 
         with open(toml_path, "wb") as f:
             tomli_w.dump(coupler_toml, f)
+
+    @staticmethod
+    def validate_keys(
+        gwf_model: GroundwaterFlowModel,
+        active_keys: List[str],
+        passive_keys: List[str],
+        expected_type: Union[Type[River], Type[Drainage]],
+    ):
+        active_keys = set(active_keys)
+        passive_keys = set(passive_keys)
+        intersection = active_keys.intersection(passive_keys)
+        if intersection:
+            raise ValueError(f"active and passive keys share members: {intersection}")
+        present = [k for k, v in gwf_model.items() if isinstance(v, expected_type)]
+        missing = (active_keys | passive_keys).difference(present)
+        if missing:
+            raise ValueError(
+                f"keys with expected type {expected_type.__name__} are not "
+                f"present in the model: {missing}"
+            )
+        return
+
+    @staticmethod
+    def derive_river_drainage_coupling(
+        gridded_basin: xr.DataArray,
+        basin_ids: np.ndarray,
+        conductance: xr.DataArray,
+    ) -> pd.DataFrame:
+        # Conductance is leading parameter to define location, for both river
+        # and drainage.
+        # FUTURE: check for time dimension? Also order and inclusion of layer
+        # in conductance.
+        # Use xarray where to force the dimension order of conductance.
+        basin_id = xr.where(conductance.notnull(), gridded_basin, np.nan)
+        include = basin_id.notnull().to_numpy()
+        basin_id_values = basin_id.to_numpy()[include].astype(int)
+        # Ribasim internally sorts the basin, which determines the order of the
+        # Ribasim level array.
+        basin_index = np.searchsorted(basin_ids, basin_id_values)
+        boundary_index_values = np.cumsum(conductance.notnull().to_numpy().ravel()) - 1
+        boundary_index_values = boundary_index_values[include.ravel()]
+        return pd.DataFrame(
+            data={"basin_index": basin_index, "bound_index": boundary_index_values}
+        )
+
+    def write_exchanges(
+        self,
+        directory: Union[str, Path],
+    ) -> Dict[str, Dict[str, str]]:
+        gwf_names = self._get_gwf_modelnames()
+        # #FUTURE: multiple couplings
+        coupling = self.coupling_list[0]
+
+        # Assume only one groundwater flow model
+        # FUTURE: Support multiple groundwater flow models.
+        gwf_model = self.mf6_simulation[gwf_names[0]]
+        self.validate_keys(
+            gwf_model,
+            coupling.mf6_active_river_packages,
+            coupling.mf6_passive_river_packages,
+            River,
+        )
+        self.validate_keys(
+            gwf_model,
+            coupling.mf6_active_drainage_packages,
+            coupling.mf6_passive_drainage_packages,
+            River,
+        )
+
+        dis = gwf_model[gwf_model._get_pkgkey("dis")]
+        gridded_basin = imod.prepare.rasterize(
+            self.basin_definition,
+            like=dis["idomain"].isel(layer=0, drop=True),
+            column="node_id",
+        )
+
+        basin_ids = np.unique(self.ribasim_model.basin.profile["node_id"])
+        missing = ~np.isin(self.basin_definition["node_id"], basin_ids)
+        if missing.any():
+            missing_basins = self.basin_definition["node_id"].to_numpy()[missing]
+            raise ValueError(
+                "The node IDs of these basins in the basin definition do not "
+                f"occur in the Ribasim model: {missing_basins}"
+            )
+
+        exchange_dir = directory / "exchanges"
+        exchange_dir.mkdir(exist_ok=True, parents=True)
+
+        packages = asdict(coupling)
+        coupling_dict = {destination: {} for destination in packages}
+        coupling_dict["mf6_model"] = packages.pop("mf6_model")
+        for destination, keys in packages.items():
+            for key in keys:
+                package = gwf_model[key]
+                table = self.derive_river_drainage_coupling(
+                    gridded_basin, basin_ids, package["conductance"]
+                )
+                table.to_csv(exchange_dir / f"{key}.tsv", sep="\t", index=False)
+                coupling_dict[destination][key] = f"exchanges/{key}.tsv"
+
+        return coupling_dict
