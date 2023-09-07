@@ -13,6 +13,12 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [0.14.1] - 2023-09-07
 ---------------------
 
+Changed
+~~~~~~~
+
+- TWRI Modflow 6 example uses the grid-agnostic :class:`imod.mf6.Well`
+  package instead of the :class:`imod.mf6.WellDisStructured` package.
+
 Fixed
 ~~~~~
 
