@@ -10,6 +10,17 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+[0.14.1] - 2023-09-07
+---------------------
+
+Fixed
+~~~~~
+
+- :class:`imod.mf6.HorizontalFlowBarrier` would write to a binary file by
+  default. However, the current version of Modflow 6 does not support this.
+  Therefore, this class now always writes to text file.
+
+
 [0.14.0] - 2023-09-06
 ---------------------
 
