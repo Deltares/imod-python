@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import xarray as xr
+from numpy.testing import assert_equal
 from shapely.geometry import Polygon
 
 import imod
@@ -81,8 +82,8 @@ def test_derive_river_drainage_coupling():
     actual = RibaMod.derive_river_drainage_coupling(
         gridded_basin, basin_ids, conductance
     )
-    assert np.array_equal(actual["basin_index"], [0, 2, 3, 5, 0, 2, 3, 5])
-    assert np.array_equal(actual["bound_index"], [0, 1, 2, 3, 4, 5, 6, 7])
+    assert_equal(actual["basin_index"].to_numpy(), [0, 2, 3, 5, 0, 2, 3, 5])
+    assert_equal(actual["bound_index"].to_numpy(), [0, 1, 2, 3, 4, 5, 6, 7])
 
 
 def test_ribamod_write(
