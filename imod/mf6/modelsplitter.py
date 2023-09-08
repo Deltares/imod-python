@@ -6,10 +6,23 @@ import xugrid as xu
 from fastcore.dispatch import typedispatch
 
 from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
+from imod.mf6.package import Package
+from imod.typing.grid import GridDataArray
+
+DomainSlice = Dict[str, slice]
 
 
 @typedispatch
-def _partition(submodel_labels: xr.DataArray) -> List[Dict[str, slice]]:
+def create_domain_slices(submodel_labels: xr.DataArray) -> List[DomainSlice]:
+    """
+    A DomainSlice is used to partition a model or package. The domain slices are created using a submodel_labels
+    array. The submodel_labels provided as input should have the same shape as a single layer of the model grid (all
+    layers are split the same way), and contains an integer value in each cell. Each cell in the model grid will end
+    up in the submodel with the index specified by the corresponding label of that cell. The labels should be numbers
+    between 0 and the number of submodels.
+    """
+    _validate_submodel_label_array(submodel_labels)
+
     shape = submodel_labels.shape
     nrow, ncol = shape
     ds = xr.Dataset({"labels": submodel_labels})
@@ -26,15 +39,24 @@ def _partition(submodel_labels: xr.DataArray) -> List[Dict[str, slice]]:
 
 
 @typedispatch
-def _partition(  # noqa: F811
+def create_domain_slices(
     submodel_labels: xu.UgridDataArray,
-) -> List[Dict[str, np.ndarray]]:
+) -> List[DomainSlice]:
+    """
+    A DomainSlice is used to partition a model or package. The domain slices are created using a submodel_labels
+    array. The submodel_labels provided as input should have the same shape as a single layer of the model grid (all
+    layers are split the same way), and contains an integer value in each cell. Each cell in the model grid will end
+    up in the submodel with the index specified by the corresponding label of that cell. The labels should be numbers
+    between 0 and the number of submodels.
+    """
+    _validate_submodel_label_array(submodel_labels)
+
     indices = xu.ugrid.partitioning.labels_to_indices(submodel_labels.values)
     slices = [{submodel_labels.ugrid.grid.face_dimension: index} for index in indices]
     return slices
 
 
-def _validate_submodel_label_array(submodel_labels: xr.DataArray) -> None:
+def _validate_submodel_label_array(submodel_labels: GridDataArray) -> None:
     unique_labels = np.unique(submodel_labels.values)
 
     if (
@@ -44,31 +66,25 @@ def _validate_submodel_label_array(submodel_labels: xr.DataArray) -> None:
     ):
         return
     raise ValueError(
-        "The submodel_label  array should be integer and contain all the numbers between 0 and the number of partitions minus 1."
+        "The submodel_label  array should be integer and contain all the numbers between 0 and the number of "
+        "partitions minus 1."
     )
 
 
-def split_model_packages(
-    submodel_labels: xu.UgridDataArray, model: Modflow6Model
-) -> List[Modflow6Model]:
+def slice_model(domain_slice: DomainSlice, model: Modflow6Model) -> Modflow6Model:
     """
-    This function splits a Model into a number of submodels. The submodel_labels
-    provided as input should have the same shape as a single layer of the model
-    grid (all layers are split the same way), and contains an integer value in
-    each cell. Each cell in the model grid will end up in the submodel with the
-    index specified by the corresponding label of that cell. The labels should
-    be numbers between 0 and the number of submodels.
+    This function slices a Modflow6Model.  A sliced model is a model that consists of packages of the original model
+    that are sliced using the domain_slice. A domain_slice can be created using the
+    :func:`imod.mf6.modelsplitter.create_domain_slices` function.
     """
-    _validate_submodel_label_array(submodel_labels)
-    slices = _partition(submodel_labels)
+    new_model = GroundwaterFlowModel(**model._options)
 
-    new_models = []
-    for slice in slices:
-        new_model = GroundwaterFlowModel(**model._options)
+    for pkg_name, package in model.items():
+        new_model[pkg_name] = _slice_package(domain_slice, package)
 
-        for pkg_name, package in model.items():
-            new_package = package.dataset.isel(slice, missing_dims="ignore")
+    return new_model
 
-            new_model[pkg_name] = new_package
-        new_models.append(new_model)
-    return new_models
+
+def _slice_package(domain_slice: DomainSlice, package: Package) -> Package:
+    sliced_dataset = package.dataset.isel(domain_slice, missing_dims="ignore")
+    return type(package)(**sliced_dataset)
