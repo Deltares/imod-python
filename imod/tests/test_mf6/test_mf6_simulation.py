@@ -8,9 +8,11 @@ import xugrid as xu
 
 import imod
 from imod.mf6.model import Modflow6Model
+from imod.mf6.modelsplitter import SubmodelPartitionInfo
 from imod.mf6.statusinfo import StatusInfo
 from imod.mf6.utilities.simulation_utilities import get_models, get_packages
 from imod.schemata import ValidationError
+from imod.typing.grid import ones_like
 
 
 def roundtrip(simulation, tmpdir_factory, name):
@@ -57,7 +59,7 @@ def setup_simulation():
 
 class TestModflow6Simulation:
     def test_write_with_default_arguments_writes_expected_files(
-        self, tmp_path, setup_simulation
+            self, tmp_path, setup_simulation
     ):
         # Arrange.
         simulation = setup_simulation
@@ -69,7 +71,7 @@ class TestModflow6Simulation:
         assert os.path.exists(os.path.join(tmp_path, "mfsim.nam"))
 
     def test_write_modflow6model_has_errors_raises_exception(
-        self, tmp_path, setup_simulation
+            self, tmp_path, setup_simulation
     ):
         # Arrange.
         simulation = setup_simulation
@@ -88,7 +90,7 @@ class TestModflow6Simulation:
             simulation.write(tmp_path)
 
     def test_split_simulation_only_has_packages(
-        self, basic_unstructured_dis, setup_simulation
+            self, basic_unstructured_dis, setup_simulation
     ):
         # Arrange.
         idomain, top, bottom = basic_unstructured_dis
@@ -110,13 +112,13 @@ class TestModflow6Simulation:
         assert len(get_packages(new_simulation)) == 3
         assert new_simulation["solver"] is simulation["solver"]
         assert (
-            new_simulation["time_discretization"] is simulation["time_discretization"]
+                new_simulation["time_discretization"] is simulation["time_discretization"]
         )
         assert new_simulation["disv"] is simulation["disv"]
 
     @mock.patch("imod.mf6.simulation.slice_model", autospec=True)
     def test_split_multiple_models(
-        self, slice_model_mock, basic_unstructured_dis, setup_simulation
+            self, slice_model_mock, basic_unstructured_dis, setup_simulation
     ):
         # Arrange.
         idomain, top, bottom = basic_unstructured_dis
@@ -154,15 +156,31 @@ class TestModflow6Simulation:
         domain1 = submodel_labels.coords['mesh2d_nFaces'].where(submodel_labels == 0).dropna('mesh2d_nFaces')
         domain2 = submodel_labels.coords['mesh2d_nFaces'].where(submodel_labels == 1).dropna('mesh2d_nFaces')
 
-        expected_slice_model_calls = [({'mesh2d_nFaces': domain1.values}, model_mock1),
-                                      ({'mesh2d_nFaces': domain1.values}, model_mock2),
-                                      ({'mesh2d_nFaces': domain2.values}, model_mock1),
-                                      ({'mesh2d_nFaces': domain2.values}, model_mock2)]
+        expected_slice_model_calls = [(SubmodelPartitionInfo(label_id=0, slice={'mesh2d_nFaces': domain1.values},
+                                                             active_domain=ones_like(domain1)), model_mock1),
+                                      (SubmodelPartitionInfo(label_id=0, slice={'mesh2d_nFaces': domain1.values},
+                                                             active_domain=ones_like(domain1)), model_mock2),
+                                      (SubmodelPartitionInfo(label_id=1, slice={'mesh2d_nFaces': domain2.values},
+                                                             active_domain=ones_like(domain2)), model_mock1),
+                                      (SubmodelPartitionInfo(label_id=1, slice={'mesh2d_nFaces': domain2.values},
+                                                             active_domain=ones_like(domain2)), model_mock2)]
 
         for expected_call in expected_slice_model_calls:
             assert any(
-                np.array_equal(expected_call[0]['mesh2d_nFaces'], call_args[0][0]['mesh2d_nFaces'])
+                compare_submodel_partition_info(expected_call[0], call_args[0][0])
                 and (expected_call[1] is call_args[0][1])
                 for call_args in slice_model_mock.call_args_list
             )
         # fmt: on
+
+
+def compare_submodel_partition_info(first: SubmodelPartitionInfo, second: SubmodelPartitionInfo):
+    return ((first.label_id == second.label_id)
+            and compare_dict_with_array(first.slice, second.slice)
+            and np.array_equal(first.active_domain, second.active_domain))
+
+
+def compare_dict_with_array(first, second):
+    if first.keys() != second.keys():
+        return False
+    return all(np.array_equal(first[key], second[key]) for key in first)
