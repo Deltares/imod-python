@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from imod.mf6.modelsplitter import create_domain_slices, split_model
+from imod.mf6.modelsplitter import create_domain_slices, slice_model
 from imod.typing.grid import zeros_like
 
 
@@ -17,7 +17,7 @@ def test_partition_structured(twri_model):
 
     # split the model using the partitioning array
     model_slices = create_domain_slices(submodel_labels)
-    new_models = [split_model(model_slice, model) for model_slice in model_slices]
+    new_models = [slice_model(model_slice, model) for model_slice in model_slices]
 
     # verify result
     assert len(new_models) == 2
@@ -43,7 +43,7 @@ def test_partition_unstructured(circle_model):
     submodel_labels = zeros_like(active).where(active.grid.face_y > domain_center_y, 1)
 
     model_slices = create_domain_slices(submodel_labels)
-    new_models = [split_model(model_slice, model) for model_slice in model_slices]
+    new_models = [slice_model(model_slice, model) for model_slice in model_slices]
 
     # verify result
     assert len(new_models) == 2

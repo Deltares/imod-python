@@ -14,6 +14,13 @@ DomainSlice = Dict[str, slice]
 
 @typedispatch
 def create_domain_slices(submodel_labels: xr.DataArray) -> List[DomainSlice]:
+    """
+    A DomainSlice is used to partition a model or package. The domain slices are created using a submodel_labels
+    array. The submodel_labels provided as input should have the same shape as a single layer of the model grid (all
+    layers are split the same way), and contains an integer value in each cell. Each cell in the model grid will end
+    up in the submodel with the index specified by the corresponding label of that cell. The labels should be numbers
+    between 0 and the number of submodels.
+    """
     _validate_submodel_label_array(submodel_labels)
 
     shape = submodel_labels.shape
@@ -35,6 +42,13 @@ def create_domain_slices(submodel_labels: xr.DataArray) -> List[DomainSlice]:
 def create_domain_slices(
     submodel_labels: xu.UgridDataArray,
 ) -> List[DomainSlice]:
+    """
+    A DomainSlice is used to partition a model or package. The domain slices are created using a submodel_labels
+    array. The submodel_labels provided as input should have the same shape as a single layer of the model grid (all
+    layers are split the same way), and contains an integer value in each cell. Each cell in the model grid will end
+    up in the submodel with the index specified by the corresponding label of that cell. The labels should be numbers
+    between 0 and the number of submodels.
+    """
     _validate_submodel_label_array(submodel_labels)
 
     indices = xu.ugrid.partitioning.labels_to_indices(submodel_labels.values)
@@ -57,23 +71,20 @@ def _validate_submodel_label_array(submodel_labels: GridDataArray) -> None:
     )
 
 
-def split_model(domain_slice: DomainSlice, model: Modflow6Model) -> Modflow6Model:
+def slice_model(domain_slice: DomainSlice, model: Modflow6Model) -> Modflow6Model:
     """
-    This function splits a Model into a number of submodels. The submodel_labels
-    provided as input should have the same shape as a single layer of the model
-    grid (all layers are split the same way), and contains an integer value in
-    each cell. Each cell in the model grid will end up in the submodel with the
-    index specified by the corresponding label of that cell. The labels should
-    be numbers between 0 and the number of submodels.
+    This function slices a Modflow6Model.  A sliced model is a model that consists of packages of the original model
+    that are sliced using the domain_slice. A domain_slice can be created using the
+    :func:`imod.mf6.modelsplitter.create_domain_slices` function.
     """
     new_model = GroundwaterFlowModel(**model._options)
 
     for pkg_name, package in model.items():
-        new_model[pkg_name] = split_package(domain_slice, package)
+        new_model[pkg_name] = _slice_package(domain_slice, package)
 
     return new_model
 
 
-def split_package(domain_slice: DomainSlice, package: Package) -> Package:
+def _slice_package(domain_slice: DomainSlice, package: Package) -> Package:
     sliced_dataset = package.dataset.isel(domain_slice, missing_dims="ignore")
     return type(package)(**sliced_dataset)

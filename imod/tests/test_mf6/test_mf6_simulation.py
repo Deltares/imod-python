@@ -114,9 +114,9 @@ class TestModflow6Simulation:
         )
         assert new_simulation["disv"] is simulation["disv"]
 
-    @mock.patch("imod.mf6.simulation.split_model", autospec=True)
+    @mock.patch("imod.mf6.simulation.slice_model", autospec=True)
     def test_split_multiple_models(
-        self, split_model_mock, basic_unstructured_dis, setup_simulation
+        self, slice_model_mock, basic_unstructured_dis, setup_simulation
     ):
         # Arrange.
         idomain, top, bottom = basic_unstructured_dis
@@ -134,7 +134,7 @@ class TestModflow6Simulation:
 
         simulation["solver"]["modelnames"] = ["test_model1", "test_model2"]
 
-        split_model_mock.return_value = MagicMock(spec_set=Modflow6Model)
+        slice_model_mock.return_value = MagicMock(spec_set=Modflow6Model)
 
         active = idomain.sel(layer=1)
         submodel_labels = xu.zeros_like(active).where(active.grid.face_y > 0.0, 1)
@@ -144,7 +144,7 @@ class TestModflow6Simulation:
 
         # Assert.
         new_models = get_models(new_simulation)
-        assert split_model_mock.call_count == 4
+        assert slice_model_mock.call_count == 4
         assert len(new_models) == 4
 
         # fmt: off
@@ -154,15 +154,15 @@ class TestModflow6Simulation:
         domain1 = submodel_labels.coords['mesh2d_nFaces'].where(submodel_labels == 0).dropna('mesh2d_nFaces')
         domain2 = submodel_labels.coords['mesh2d_nFaces'].where(submodel_labels == 1).dropna('mesh2d_nFaces')
 
-        expected_split_model_calls = [({'mesh2d_nFaces': domain1.values}, model_mock1),
+        expected_slice_model_calls = [({'mesh2d_nFaces': domain1.values}, model_mock1),
                                       ({'mesh2d_nFaces': domain1.values}, model_mock2),
                                       ({'mesh2d_nFaces': domain2.values}, model_mock1),
                                       ({'mesh2d_nFaces': domain2.values}, model_mock2)]
 
-        for expected_call in expected_split_model_calls:
+        for expected_call in expected_slice_model_calls:
             assert any(
                 np.array_equal(expected_call[0]['mesh2d_nFaces'], call_args[0][0]['mesh2d_nFaces'])
                 and (expected_call[1] is call_args[0][1])
-                for call_args in split_model_mock.call_args_list
+                for call_args in slice_model_mock.call_args_list
             )
         # fmt: on

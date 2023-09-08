@@ -1,3 +1,5 @@
+from typing import Any
+
 import numpy as np
 import xarray as xr
 
@@ -32,3 +34,7 @@ def remove_inactive(ds: xr.Dataset, active: xr.DataArray) -> xr.Dataset:
     valid = active.values[cellid_indexes].astype(bool)
 
     return ds.loc[{"ncellid": valid}]
+
+
+def is_dataarray_none(datarray: Any) -> bool:
+    return isinstance(datarray, xr.DataArray) and datarray.isnull().values.all()
