@@ -46,7 +46,9 @@ def create_partition_info(submodel_labels: xr.DataArray) -> List[SubmodelPartiti
         active_domain = submodel_labels.where(submodel_labels.values == label_id).isel(
             partition_slice
         )
-        active_domain = xr.where(active_domain.notnull(),1,-1).astype(submodel_labels.dtype)
+        active_domain = xr.where(active_domain.notnull(), 1, -1).astype(
+            submodel_labels.dtype
+        )
 
         submodel_partition_info = SubmodelPartitionInfo(
             label_id=label_id, slice=partition_slice, active_domain=active_domain
@@ -79,7 +81,9 @@ def create_partition_info(
         active_domain = submodel_labels.where(submodel_labels.values == label_id).isel(
             partition_slice
         )
-        active_domain = xr.where(active_domain.notnull(), 1, -1).astype(submodel_labels.dtype)
+        active_domain = xr.where(active_domain.notnull(), 1, -1).astype(
+            submodel_labels.dtype
+        )
 
         submodel_partition_info = SubmodelPartitionInfo(
             label_id=label_id, slice=partition_slice, active_domain=active_domain

@@ -407,9 +407,7 @@ class Modflow6Simulation(collections.UserDict):
         for submodel_partition_info in partition_info:
             for model_name, model in models.items():
                 model_name = f"{model_name}_{submodel_partition_info.label_id}"
-                new_simulation[model_name] = slice_model(
-                    submodel_partition_info, model
-                )
+                new_simulation[model_name] = slice_model(submodel_partition_info, model)
                 model_names.append(model_name)
 
         new_simulation["solver"]["modelnames"] = xr.DataArray(model_names)

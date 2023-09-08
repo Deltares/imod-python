@@ -59,7 +59,7 @@ def setup_simulation():
 
 class TestModflow6Simulation:
     def test_write_with_default_arguments_writes_expected_files(
-            self, tmp_path, setup_simulation
+        self, tmp_path, setup_simulation
     ):
         # Arrange.
         simulation = setup_simulation
@@ -71,7 +71,7 @@ class TestModflow6Simulation:
         assert os.path.exists(os.path.join(tmp_path, "mfsim.nam"))
 
     def test_write_modflow6model_has_errors_raises_exception(
-            self, tmp_path, setup_simulation
+        self, tmp_path, setup_simulation
     ):
         # Arrange.
         simulation = setup_simulation
@@ -90,7 +90,7 @@ class TestModflow6Simulation:
             simulation.write(tmp_path)
 
     def test_split_simulation_only_has_packages(
-            self, basic_unstructured_dis, setup_simulation
+        self, basic_unstructured_dis, setup_simulation
     ):
         # Arrange.
         idomain, top, bottom = basic_unstructured_dis
@@ -112,13 +112,13 @@ class TestModflow6Simulation:
         assert len(get_packages(new_simulation)) == 3
         assert new_simulation["solver"] is simulation["solver"]
         assert (
-                new_simulation["time_discretization"] is simulation["time_discretization"]
+            new_simulation["time_discretization"] is simulation["time_discretization"]
         )
         assert new_simulation["disv"] is simulation["disv"]
 
     @mock.patch("imod.mf6.simulation.slice_model", autospec=True)
     def test_split_multiple_models(
-            self, slice_model_mock, basic_unstructured_dis, setup_simulation
+        self, slice_model_mock, basic_unstructured_dis, setup_simulation
     ):
         # Arrange.
         idomain, top, bottom = basic_unstructured_dis
@@ -174,10 +174,14 @@ class TestModflow6Simulation:
         # fmt: on
 
 
-def compare_submodel_partition_info(first: SubmodelPartitionInfo, second: SubmodelPartitionInfo):
-    return ((first.label_id == second.label_id)
-            and compare_dict_with_array(first.slice, second.slice)
-            and np.array_equal(first.active_domain, second.active_domain))
+def compare_submodel_partition_info(
+    first: SubmodelPartitionInfo, second: SubmodelPartitionInfo
+):
+    return (
+        (first.label_id == second.label_id)
+        and compare_dict_with_array(first.slice, second.slice)
+        and np.array_equal(first.active_domain, second.active_domain)
+    )
 
 
 def compare_dict_with_array(first, second):
