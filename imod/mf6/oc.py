@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import List, Union
 
 import numpy as np
-import xarray as xr
 
 from imod.mf6.package import Package
 from imod.mf6.utilities.dataset_utilities import is_dataarray_none
