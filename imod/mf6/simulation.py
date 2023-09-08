@@ -20,7 +20,7 @@ from imod.mf6.model import (
     GroundwaterTransportModel,
     Modflow6Model,
 )
-from imod.mf6.modelsplitter import create_domain_slices, slice_model
+from imod.mf6.modelsplitter import create_partition_info, slice_model
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.utilities.simulation_utilities import get_models, get_packages
 from imod.mf6.validation import validation_model_error_message
@@ -402,12 +402,15 @@ class Modflow6Simulation(collections.UserDict):
         for package_name, package in {**packages}.items():
             new_simulation[package_name] = package
 
-        model_slices = create_domain_slices(submodel_labels)
-        for idx, model_slice in enumerate(model_slices):
+        model_names = []
+        partition_info = create_partition_info(submodel_labels)
+        for submodel_partition_info in partition_info:
             for model_name, model in models.items():
-                model_name = f"{model_name}_{idx}"
-                new_simulation[model_name] = slice_model(model_slice, model)
-                new_simulation["solver"]["modelnames"].append(model_name)
+                model_name = f"{model_name}_{submodel_partition_info.label_id}"
+                new_simulation[model_name] = slice_model(submodel_partition_info, model)
+                model_names.append(model_name)
+
+        new_simulation["solver"]["modelnames"] = xr.DataArray(model_names)
 
         return new_simulation
 
