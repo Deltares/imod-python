@@ -6,7 +6,6 @@ import numpy as np
 import pytest
 import xarray as xr
 
-
 import imod
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError

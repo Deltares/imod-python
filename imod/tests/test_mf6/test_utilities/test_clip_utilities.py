@@ -1,11 +1,11 @@
 from unittest.mock import MagicMock
 
+import geopandas as gpd
 import pytest
 import xugrid as xu
 
 import imod
 from imod.mf6 import HorizontalFlowBarrierResistance
-import geopandas as gpd
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.utilities.clip_utilities import clip_by_grid
