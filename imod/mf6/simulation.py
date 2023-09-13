@@ -406,7 +406,7 @@ class Modflow6Simulation(collections.UserDict):
         partition_info = create_partition_info(submodel_labels)
         for submodel_partition_info in partition_info:
             for model_name, model in models.items():
-                model_name = f"{model_name}_{submodel_partition_info.label_id}"
+                model_name = f"{model_name}_{submodel_partition_info.id}"
                 new_simulation[model_name] = slice_model(submodel_partition_info, model)
                 model_names.append(model_name)
 

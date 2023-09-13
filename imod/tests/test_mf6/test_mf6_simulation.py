@@ -8,11 +8,10 @@ import xugrid as xu
 
 import imod
 from imod.mf6.model import Modflow6Model
-from imod.mf6.modelsplitter import SubmodelPartitionInfo
+from imod.mf6.modelsplitter import PartitionInfo
 from imod.mf6.statusinfo import StatusInfo
 from imod.mf6.utilities.simulation_utilities import get_models, get_packages
 from imod.schemata import ValidationError
-from imod.typing.grid import ones_like
 
 
 def roundtrip(simulation, tmpdir_factory, name):
@@ -153,17 +152,16 @@ class TestModflow6Simulation:
         assert len([model_name for model_name in new_models.keys() if "test_model1" in model_name]) == 2
         assert len([model_name for model_name in new_models.keys() if "test_model2" in model_name]) == 2
 
-        domain1 = submodel_labels.coords['mesh2d_nFaces'].where(submodel_labels == 0).dropna('mesh2d_nFaces')
-        domain2 = submodel_labels.coords['mesh2d_nFaces'].where(submodel_labels == 1).dropna('mesh2d_nFaces')
+        active_domain1 = submodel_labels.where(submodel_labels == 0, -1).where(submodel_labels != 0, 1)
+        active_domain2 = submodel_labels.where(submodel_labels == 1, -1).where(submodel_labels != 1, 1)
+        # fmt: on
 
-        expected_slice_model_calls = [(SubmodelPartitionInfo(label_id=0, slice={'mesh2d_nFaces': domain1.values},
-                                                             active_domain=ones_like(domain1)), model_mock1),
-                                      (SubmodelPartitionInfo(label_id=0, slice={'mesh2d_nFaces': domain1.values},
-                                                             active_domain=ones_like(domain1)), model_mock2),
-                                      (SubmodelPartitionInfo(label_id=1, slice={'mesh2d_nFaces': domain2.values},
-                                                             active_domain=ones_like(domain2)), model_mock1),
-                                      (SubmodelPartitionInfo(label_id=1, slice={'mesh2d_nFaces': domain2.values},
-                                                             active_domain=ones_like(domain2)), model_mock2)]
+        expected_slice_model_calls = [
+            (PartitionInfo(id=0, active_domain=active_domain1), model_mock1),
+            (PartitionInfo(id=0, active_domain=active_domain1), model_mock2),
+            (PartitionInfo(id=1, active_domain=active_domain2), model_mock1),
+            (PartitionInfo(id=1, active_domain=active_domain2), model_mock2),
+        ]
 
         for expected_call in expected_slice_model_calls:
             assert any(
@@ -171,20 +169,9 @@ class TestModflow6Simulation:
                 and (expected_call[1] is call_args[0][1])
                 for call_args in slice_model_mock.call_args_list
             )
-        # fmt: on
 
 
-def compare_submodel_partition_info(
-    first: SubmodelPartitionInfo, second: SubmodelPartitionInfo
-):
-    return (
-        (first.label_id == second.label_id)
-        and compare_dict_with_array(first.slice, second.slice)
-        and np.array_equal(first.active_domain, second.active_domain)
+def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo):
+    return (first.id == second.id) and np.array_equal(
+        first.active_domain, second.active_domain
     )
-
-
-def compare_dict_with_array(first, second):
-    if first.keys() != second.keys():
-        return False
-    return all(np.array_equal(first[key], second[key]) for key in first)

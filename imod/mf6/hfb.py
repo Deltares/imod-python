@@ -12,8 +12,10 @@ import xugrid as xu
 from fastcore.dispatch import typedispatch
 
 from imod.mf6.boundary_condition import BoundaryCondition
+from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
-from imod.typing.grid import GridDataArray, zeros_like
+from imod.mf6.utilities.grid_utilities import broadcast_to_full_domain
+from imod.typing.grid import GridDataArray
 
 
 @typedispatch
@@ -172,7 +174,7 @@ class BarrierType(Enum):
     Resistance = 2
 
 
-class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
+class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     _pkg_id = "hfb"
 
     _period_data = ()
@@ -190,6 +192,10 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
         self.dataset["print_input"] = print_input
 
         self.dataset = self.dataset.merge(geometry.to_xarray())
+
+    @property
+    def geometry(self) -> np.ndarray[object]:
+        return self.dataset["geometry"].values
 
     def render(self, directory, pkgname, globaltimes, binary):
         raise NotImplementedError(
@@ -236,7 +242,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
         -------
 
         """
-        top, bottom, k = self.__broadcast_to_full_domain(idomain, top, bottom, k)
+        top, bottom = broadcast_to_full_domain(idomain, top, bottom)
+        k = idomain * k
         unstructured_grid, top, bottom, k = (
             self.__to_unstructured(idomain, top, bottom, k)
             if isinstance(idomain, xr.DataArray)
@@ -500,31 +507,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, abc.ABC):
         new = cls.__new__(cls)
         new.dataset = copy.deepcopy(self.dataset)
         return new
-
-    @staticmethod
-    def __broadcast_to_full_domain(
-        idomain: GridDataArray,
-        top: GridDataArray,
-        bottom: GridDataArray,
-        k: GridDataArray,
-    ) -> typing.Tuple[GridDataArray, GridDataArray, GridDataArray]:
-        bottom = idomain * bottom
-        top = (
-            idomain * top
-            if hasattr(top, "coords") and "layer" in top.coords
-            else HorizontalFlowBarrierBase.__create_top(bottom, top)
-        )
-        k = idomain * k
-
-        return top, bottom, k
-
-    @staticmethod
-    def __create_top(bottom: GridDataArray, top: GridDataArray) -> GridDataArray:
-        new_top = zeros_like(bottom)
-        new_top[0] = top
-        new_top[1:] = bottom[0:-1].values
-
-        return new_top
 
     @staticmethod
     def __to_unstructured(
