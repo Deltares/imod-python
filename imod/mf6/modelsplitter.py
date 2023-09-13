@@ -1,97 +1,44 @@
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import List
 
 import numpy as np
-import xarray as xr
-import xugrid as xu
-from fastcore.dispatch import typedispatch
 
 from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
-from imod.mf6.package import Package
-from imod.typing.grid import GridDataArray
-
-DomainSlice = Dict[str, slice]
+from imod.mf6.utilities.clip_utilities import clip_by_grid
+from imod.mf6.utilities.grid_utilities import get_active_domain_slice
+from imod.typing.grid import GridDataArray, ones_like
 
 
 @dataclass
-class SubmodelPartitionInfo:
+class PartitionInfo:
     active_domain: GridDataArray
-    label_id: int = -1
-    slice: DomainSlice = None
+    id: int = -1
 
 
-@typedispatch
-def create_partition_info(submodel_labels: xr.DataArray) -> List[SubmodelPartitionInfo]:
+def create_partition_info(submodel_labels: GridDataArray) -> List[PartitionInfo]:
     """
-    A DomainSlice is used to partition a model or package. The domain slices are created using a submodel_labels
-    array. The submodel_labels provided as input should have the same shape as a single layer of the model grid (all
-    layers are split the same way), and contains an integer value in each cell. Each cell in the model grid will end
-    up in the submodel with the index specified by the corresponding label of that cell. The labels should be numbers
-    between 0 and the number of submodels.
+    A PartitionInfo is used to partition a model or package. The partition info's of a domain are created using a
+    submodel_labels array. The submodel_labels provided as input should have the same shape as a single layer of the
+    model grid (all layers are split the same way), and contains an integer value in each cell. Each cell in the
+    model grid will end up in the submodel with the index specified by the corresponding label of that cell. The
+    labels should be numbers between 0 and the number of partitions.
     """
     _validate_submodel_label_array(submodel_labels)
 
-    shape = submodel_labels.shape
-    nrow, ncol = shape
-    ds = xr.Dataset({"labels": submodel_labels})
-    ds["column"] = (("y", "x"), np.broadcast_to(np.arange(ncol), shape))
-    ds["row"] = (("y", "x"), np.broadcast_to(np.arange(nrow)[:, np.newaxis], shape))
+    unique_labels = np.unique(submodel_labels.values)
 
-    submodel_partition_infos = []
-    for label_id, group in ds.groupby("labels"):
-        y_slice = slice(int(group["row"].min()), int(group["row"].max()) + 1)
-        x_slice = slice(int(group["column"].min()), int(group["column"].max()) + 1)
-        partition_slice = {"y": y_slice, "x": x_slice}
+    partition_infos = []
+    for label_id in unique_labels:
+        active_domain = submodel_labels.where(submodel_labels.values == label_id)
+        active_domain = ones_like(active_domain).where(active_domain.notnull(), -1)
+        active_domain = active_domain.astype(submodel_labels.dtype)
 
-        active_domain = submodel_labels.where(submodel_labels.values == label_id).isel(
-            partition_slice
+        submodel_partition_info = PartitionInfo(
+            id=label_id, active_domain=active_domain
         )
-        active_domain = xr.where(active_domain.notnull(), 1, -1).astype(
-            submodel_labels.dtype
-        )
+        partition_infos.append(submodel_partition_info)
 
-        submodel_partition_info = SubmodelPartitionInfo(
-            label_id=label_id, slice=partition_slice, active_domain=active_domain
-        )
-
-        submodel_partition_infos.append(submodel_partition_info)
-
-    return submodel_partition_infos
-
-
-@typedispatch
-def create_partition_info(
-    submodel_labels: xu.UgridDataArray,
-) -> List[SubmodelPartitionInfo]:
-    """
-    A DomainSlice is used to partition a model or package. The domain slices are created using a submodel_labels
-    array. The submodel_labels provided as input should have the same shape as a single layer of the model grid (all
-    layers are split the same way), and contains an integer value in each cell. Each cell in the model grid will end
-    up in the submodel with the index specified by the corresponding label of that cell. The labels should be numbers
-    between 0 and the number of submodels.
-    """
-    _validate_submodel_label_array(submodel_labels)
-
-    unique_labels, label_counts = np.unique(submodel_labels.values, return_counts=True)
-    indices = xu.ugrid.partitioning.labels_to_indices(submodel_labels.values)
-
-    submodel_partition_infos = []
-    for label_id, index in zip(unique_labels, indices):
-        partition_slice = {submodel_labels.ugrid.grid.face_dimension: index}
-        active_domain = submodel_labels.where(submodel_labels.values == label_id).isel(
-            partition_slice
-        )
-        active_domain = xr.where(active_domain.notnull(), 1, -1).astype(
-            submodel_labels.dtype
-        )
-
-        submodel_partition_info = SubmodelPartitionInfo(
-            label_id=label_id, slice=partition_slice, active_domain=active_domain
-        )
-
-        submodel_partition_infos.append(submodel_partition_info)
-
-    return submodel_partition_infos
+    return partition_infos
 
 
 def _validate_submodel_label_array(submodel_labels: GridDataArray) -> None:
@@ -109,9 +56,7 @@ def _validate_submodel_label_array(submodel_labels: GridDataArray) -> None:
     )
 
 
-def slice_model(
-    partition_info: SubmodelPartitionInfo, model: Modflow6Model
-) -> Modflow6Model:
+def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6Model:
     """
     This function slices a Modflow6Model.  A sliced model is a model that consists of packages of the original model
     that are sliced using the domain_slice. A domain_slice can be created using the
@@ -119,22 +64,17 @@ def slice_model(
     """
     new_model = GroundwaterFlowModel(**model._options)
 
+    domain_slice = get_active_domain_slice(partition_info.active_domain)
+    sliced_domain = model.get_domain().isel(domain_slice)
+    sliced_bottom = model.get_bottom()
+
     for pkg_name, package in model.items():
-        new_model[pkg_name] = _slice_package(partition_info, package)
-
-    return new_model
-
-
-def _slice_package(partition_info: SubmodelPartitionInfo, package: Package) -> Package:
-    sliced_dataset = package.dataset.isel(partition_info.slice, missing_dims="ignore")
-
-    if "idomain" in package.dataset:
-        idomain = package.dataset["idomain"]
-        idomain_type = idomain.dtype
-        sliced_dataset["idomain"] = (
-            idomain.isel(partition_info.slice, missing_dims="ignore")
-            .where(partition_info.active_domain > 0, -1)
-            .astype(idomain_type)
+        sliced_package = clip_by_grid(package, partition_info.active_domain)
+        errors = sliced_package._validate(
+            package._write_schemata, idomain=sliced_domain, bottom=sliced_bottom
         )
 
-    return type(package)(**sliced_dataset)
+        if not errors:
+            new_model[pkg_name] = sliced_package
+
+    return new_model

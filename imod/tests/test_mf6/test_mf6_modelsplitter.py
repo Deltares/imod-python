@@ -15,6 +15,9 @@ def test_slice_model_structured(twri_model):
     # Arrange.
     model = twri_model["GWF_1"]
 
+    # WellDisStructured doesn't support clipping and therefor is not compatible with the slice_model method
+    model.pop("wel")
+
     active = model.get_domain().sel(layer=1)
     domain_center_x = active.coords["x"].mean()
     domain_center_y = active.coords["y"].mean()

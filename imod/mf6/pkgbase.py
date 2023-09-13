@@ -7,11 +7,12 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.mf6.interfaces.ipackagebase import IPackageBase
 
 TRANSPORT_PACKAGES = ("adv", "dsp", "ssm", "mst", "ist", "src")
 
 
-class PackageBase(abc.ABC):
+class PackageBase(IPackageBase, abc.ABC):
     """
     This class is used for storing a collection of Xarray DataArrays or UgridDataArrays
     in a dataset. A load-from-file method is also provided. Storing to file is done by calling
@@ -27,9 +28,17 @@ class PackageBase(abc.ABC):
         if allargs is not None:
             for arg in allargs.values():
                 if isinstance(arg, xu.UgridDataArray):
-                    self.dataset = xu.UgridDataset(grids=arg.ugrid.grid)
+                    self.__dataset = xu.UgridDataset(grids=arg.ugrid.grid)
                     return
-        self.dataset = xr.Dataset()
+        self.__dataset = xr.Dataset()
+
+    @property
+    def dataset(self) -> xr.Dataset:
+        return self.__dataset
+
+    @dataset.setter
+    def dataset(self, value: xr.Dataset) -> None:
+        self.__dataset = value
 
     def __getitem__(self, key):
         return self.dataset.__getitem__(key)
