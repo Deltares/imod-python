@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Type
+
 import numpy as np
 import xarray as xr
 import xugrid as xu
@@ -56,8 +58,7 @@ def clip_by_grid(
     package: IPointDataPackage, active: xu.UgridDataArray
 ) -> IPointDataPackage:
     """Clip PointDataPackage outside unstructured grid."""
-    x, y = package.x, package.y
-    points = np.vstack((x, y)).T
+    points = np.column_stack((package.x, package.y))
 
     is_inside_exterior = active.grid.locate_points(points) != -1
     selection = package.dataset.loc[{"index": is_inside_exterior}]

@@ -1,5 +1,4 @@
-from dataclasses import dataclass
-from typing import List
+from typing import List, NamedTuple
 
 import numpy as np
 
@@ -9,10 +8,9 @@ from imod.mf6.utilities.grid_utilities import get_active_domain_slice
 from imod.typing.grid import GridDataArray, ones_like
 
 
-@dataclass
-class PartitionInfo:
+class PartitionInfo(NamedTuple):
     active_domain: GridDataArray
-    id: int = -1
+    id: int
 
 
 def create_partition_info(submodel_labels: GridDataArray) -> List[PartitionInfo]:
@@ -44,29 +42,28 @@ def create_partition_info(submodel_labels: GridDataArray) -> List[PartitionInfo]
 def _validate_submodel_label_array(submodel_labels: GridDataArray) -> None:
     unique_labels = np.unique(submodel_labels.values)
 
-    if (
+    if not (
         len(unique_labels) == unique_labels.max() + 1
         and unique_labels.min() == 0
         and np.issubdtype(submodel_labels.dtype, np.integer)
     ):
-        return
-    raise ValueError(
-        "The submodel_label  array should be integer and contain all the numbers between 0 and the number of "
-        "partitions minus 1."
-    )
+        raise ValueError(
+            "The submodel_label  array should be integer and contain all the numbers between 0 and the number of "
+            "partitions minus 1."
+        )
 
 
 def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6Model:
     """
-    This function slices a Modflow6Model.  A sliced model is a model that consists of packages of the original model
+    This function slices a Modflow6Model. A sliced model is a model that consists of packages of the original model
     that are sliced using the domain_slice. A domain_slice can be created using the
     :func:`imod.mf6.modelsplitter.create_domain_slices` function.
     """
     new_model = GroundwaterFlowModel(**model._options)
 
     domain_slice = get_active_domain_slice(partition_info.active_domain)
-    sliced_domain = model.get_domain().isel(domain_slice)
-    sliced_bottom = model.get_bottom()
+    sliced_domain = model.domain.isel(domain_slice)
+    sliced_bottom = model.bottom
 
     for pkg_name, package in model.items():
         sliced_package = clip_by_grid(package, partition_info.active_domain)

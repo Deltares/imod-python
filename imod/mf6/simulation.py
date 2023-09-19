@@ -5,7 +5,7 @@ import copy
 import pathlib
 import subprocess
 import warnings
-from typing import Optional, Union
+from typing import Dict, Optional, Union
 
 import jinja2
 import numpy as np
@@ -21,12 +21,28 @@ from imod.mf6.model import (
     Modflow6Model,
 )
 from imod.mf6.modelsplitter import create_partition_info, slice_model
+from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo
-from imod.mf6.utilities.simulation_utilities import get_models, get_packages
 from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray
+
+
+def get_models(simulation: Modflow6Simulation) -> Dict[str, Modflow6Model]:
+    return {
+        model_name: model
+        for model_name, model in simulation.items()
+        if isinstance(model, Modflow6Model)
+    }
+
+
+def get_packages(simulation: Modflow6Simulation) -> Dict[str, Package]:
+    return {
+        pkg_name: pkg
+        for pkg_name, pkg in simulation.items()
+        if isinstance(pkg, Package)
+    }
 
 
 class Modflow6Simulation(collections.UserDict):
@@ -395,6 +411,15 @@ class Modflow6Simulation(collections.UserDict):
         return clipped
 
     def split(self, submodel_labels: xr.DataArray) -> Modflow6Simulation:
+        """
+        Split a simulation in different partitions using a submodel_labels array.
+
+        The submodel_labels array defines how a simulation will be split. The array should have the same topology as
+        the domain being split i.e. similar shape as a layer in the domain. The values in the array indicate to
+        which partition a cell belongs. The values should be zero or greater.
+
+        The method return a new simulation containing all the split models and packages
+        """
         models = get_models(self)
         packages = get_packages(self)
 

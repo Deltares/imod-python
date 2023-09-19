@@ -102,7 +102,7 @@ def test_regrid_unstructured_model_with_inactive_cells(
     inactivity_marker = 0  -> inactive cell
     inactivity_marker = -1 -> vertical passthrough cell
     """
-    inactive_cells = unstructured_flow_model.get_domain()
+    inactive_cells = unstructured_flow_model.domain
     inactive_cells.loc[{"layer": 1, "mesh2d_nFaces": 23}] = inactivity_marker
     inactive_cells.loc[{"layer": 3, "mesh2d_nFaces": 23}] = inactivity_marker
 
@@ -115,7 +115,7 @@ def test_regrid_unstructured_model_with_inactive_cells(
     assert len(new_gwf_model.items()) == len(unstructured_flow_model.items())
     validation_result = new_gwf_model._validate("test_model")
     assert not validation_result.has_errors()
-    new_idomain = new_gwf_model.get_domain()
+    new_idomain = new_gwf_model.domain
     assert (
         new_idomain.max().values[()] == 1
         and new_idomain.min().values[()] == inactivity_marker

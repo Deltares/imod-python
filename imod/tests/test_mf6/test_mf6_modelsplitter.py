@@ -18,7 +18,7 @@ def test_slice_model_structured(twri_model):
     # WellDisStructured doesn't support clipping and therefor is not compatible with the slice_model method
     model.pop("wel")
 
-    active = model.get_domain().sel(layer=1)
+    active = model.domain.sel(layer=1)
     domain_center_x = active.coords["x"].mean()
     domain_center_y = active.coords["y"].mean()
     submodel_labels = zeros_like(active).where(
@@ -39,7 +39,7 @@ def test_slice_model_structured(twri_model):
     # verify that the number of active cells in each submodel is the same as the number of labels
     unique_labels, label_counts = np.unique(submodel_labels.values, return_counts=True)
     for submodel_label in unique_labels:
-        active = new_models[submodel_label].get_domain().sel({"layer": 1})
+        active = new_models[submodel_label].domain.sel({"layer": 1})
         active_count = active.where(active > 0).count()
         assert label_counts[submodel_label] == active_count.values
 
@@ -54,8 +54,8 @@ def test_slice_model_unstructured(circle_model):
     # Arrange.
     model = circle_model["GWF_1"]
 
-    active = model.get_domain().sel(layer=1)
-    x_bounds, y_bounds = np.array(active.grid.bounds).reshape(2, 2).T
+    active = model.domain.sel(layer=1)
+    _, y_bounds = np.array(active.grid.bounds).reshape(2, 2).T
     domain_center_y = y_bounds.mean()
     submodel_labels = zeros_like(active).where(active.grid.face_y > domain_center_y, 1)
 
@@ -72,5 +72,5 @@ def test_slice_model_unstructured(circle_model):
     # verify that the number of active cells in each submodel is the same as the number of labels
     unique_labels, label_counts = np.unique(submodel_labels.values, return_counts=True)
     for submodel_label in unique_labels:
-        active_count = new_models[submodel_label].get_domain().sel({"layer": 1}).count()
+        active_count = new_models[submodel_label].domain.sel({"layer": 1}).count()
         assert label_counts[submodel_label] == active_count.values

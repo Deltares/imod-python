@@ -292,7 +292,7 @@ def test_masked_model_validation_inactive_cell_pillar(
     tmp_path: Path, unstructured_flow_model: GroundwaterFlowModel
 ):
     # create mask from idomain. Deactivate the same cell in all layers
-    mask = unstructured_flow_model.get_domain()
+    mask = unstructured_flow_model.domain
     mask.loc[{"layer": 1, "mesh2d_nFaces": 23}] = 0
     mask.loc[{"layer": 2, "mesh2d_nFaces": 23}] = 0
     mask.loc[{"layer": 3, "mesh2d_nFaces": 23}] = 0
@@ -317,7 +317,7 @@ def test_masked_model_validation_one_inactive_cell(
 ):
     # create mask from idomain. a single cell
     layer, face = layer_and_face
-    mask = unstructured_flow_model.get_domain()
+    mask = unstructured_flow_model.domain
     mask.loc[{"layer": layer, "mesh2d_nFaces": face}] = inactivity_marker
     unstructured_flow_model["disv"]["idomain"] = mask
 
@@ -338,7 +338,7 @@ def test_masked_model_layered_and_scalar_package_input(
 ):
     # Create mask from idomain. a single cell
     layer, face = layer_and_face
-    mask = deepcopy(unstructured_flow_model.get_domain())
+    mask = deepcopy(unstructured_flow_model.domain)
     mask.loc[{"layer": layer, "mesh2d_nFaces": face}] = 0
 
     # Make one package layer-based

@@ -23,7 +23,7 @@ def get_active_domain_slice(active: GridDataArray) -> DomainSlice:
         active_indices = np.where(active > 0)[0]
         return {f"{active.ugrid.grid.face_dimension}": active_indices}
 
-    raise ValueError(f"Unknown grid type {active}")
+    raise TypeError(f"Unknown grid type {active}")
 
 
 def broadcast_to_full_domain(
@@ -38,13 +38,13 @@ def broadcast_to_full_domain(
     top = (
         idomain * top
         if hasattr(top, "coords") and "layer" in top.coords
-        else create_top(bottom, top)
+        else create_layered_top(bottom, top)
     )
 
     return top, bottom
 
 
-def create_top(bottom: GridDataArray, top: GridDataArray) -> GridDataArray:
+def create_layered_top(bottom: GridDataArray, top: GridDataArray) -> GridDataArray:
     """
     Create a top array with layers from a single top array and a full bottom array
     """

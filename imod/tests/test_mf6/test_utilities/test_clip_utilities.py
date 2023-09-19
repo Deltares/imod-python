@@ -2,6 +2,7 @@ from unittest.mock import MagicMock
 
 import geopandas as gpd
 import pytest
+import xarray as xr
 import xugrid as xu
 
 import imod
@@ -95,7 +96,7 @@ def test_clip_by_grid_wrong_grid_type():
 
 def test_clip_by_grid_with_line_data_package(basic_dis):
     # Arrange
-    idomain, top, bottom = basic_dis
+    idomain, _, _ = basic_dis
     pkg = HorizontalFlowBarrierResistance(gpd.GeoDataFrame())
 
     active = idomain.sel(layer=1, drop=True)
@@ -181,3 +182,37 @@ def test_clip_by_grid__unstructured_grid_clipped(
     assert wel_clipped.dataset["rate"].shape == (4,)
     # Test if options are copied
     assert wel_clipped.dataset["print_flows"] == wel.dataset["print_flows"]
+
+
+def test_clip_by_grid_contains_non_grid_data_variables(basic_dis):
+    # Arrange
+    x_min = 35.0
+    y_min = 55.0
+
+    idomain, _, _ = basic_dis
+    k = xr.full_like(idomain, 1.0, dtype=float)
+
+    pkg = imod.mf6.NodePropertyFlow(
+        k=k,
+        icelltype=0,
+        variable_vertical_conductance=True,
+        dewatered=True,
+        perched=True,
+        save_flows=True,
+    )
+
+    active = idomain.sel(layer=1, drop=True)
+    active = active.where((active.x > x_min) & (active.y > y_min), -1)
+
+    # Act
+    clipped_pkg = clip_by_grid(pkg, active)
+
+    # Assert
+    assert pkg.dataset["icelltype"] == clipped_pkg.dataset["icelltype"]
+    assert (
+        pkg.dataset["variable_vertical_conductance"]
+        == clipped_pkg.dataset["variable_vertical_conductance"]
+    )
+    assert pkg.dataset["dewatered"] == clipped_pkg.dataset["dewatered"]
+    assert pkg.dataset["perched"] == clipped_pkg.dataset["perched"]
+    assert pkg.dataset["save_flows"] == clipped_pkg.dataset["save_flows"]
