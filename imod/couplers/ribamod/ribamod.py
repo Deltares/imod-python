@@ -240,7 +240,7 @@ class RibaMod:
             gwf_model,
             coupling.mf6_active_drainage_packages,
             coupling.mf6_passive_drainage_packages,
-            River,
+            Drainage,
         )
 
         dis = gwf_model[gwf_model._get_pkgkey("dis")]
