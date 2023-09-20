@@ -29,8 +29,12 @@ In overview, we'll set the following steps:
 
 import numpy as np
 import xarray as xr
+from matplotlib import pyplot as plt
 
 import imod
+from imod.typing.grid import zeros_like
+import geopandas as gpd
+import shapely
 
 # %%
 # Create grid coordinates
@@ -181,8 +185,21 @@ simulation.create_time_discretization(
 # %%
 # We'll create a new directory in which we will write and run the model.
 
+active = gwf_model.get_domain().sel(layer=1)
+number_partitions = 3
+split_location = np.linspace(active.y.min(), active.y.max(), number_partitions + 1)
+
+coords = active.coords
+submodel_labels = zeros_like(active)
+for id in np.arange(1, number_partitions):
+    submodel_labels.loc[
+        (coords["y"] > split_location[id]) & (coords["y"] <= split_location[id + 1])
+    ] = id
+
+simulation = simulation.split(submodel_labels)
+
 modeldir = imod.util.temporary_directory()
-simulation.write(modeldir)
+simulation.write(modeldir, binary=False)
 
 # %%
 # Run the model
@@ -202,16 +219,29 @@ simulation.run()
 #
 # We'll open the heads (.hds) file.
 
-head = imod.mf6.open_hds(
-    modeldir / "GWF_1/GWF_1.hds",
-    modeldir / "GWF_1/dis.dis.grb",
-)
+# head = imod.mf6.open_hds(
+#     modeldir / "GWF_1/GWF_1.hds",
+#     modeldir / "GWF_1/dis.dis.grb",
+# )
+# head.isel(layer=0, time=0).plot.contourf()
+
+
+heads = []
+for id in np.arange(0, number_partitions):
+    head = imod.mf6.open_hds(
+        modeldir / f"GWF_1_{id}/GWF_1_{id}.hds",
+        modeldir / f"GWF_1_{id}/dis.dis.grb",
+    )
+    heads.append(head)
+
+head = xr.merge(heads)
+head["head"].isel(layer=0, time=0).plot.contourf()
+
 
 # %%
 # Visualize the results
 # ---------------------
 
-head.isel(layer=0, time=0).plot.contourf()
 
 # %%
 # .. _MODFLOW6 example problems: https://github.com/MODFLOW-USGS/modflow6-examples
@@ -224,3 +254,4 @@ head.isel(layer=0, time=0).plot.contourf()
 # .. _FloPy: https://github.com/modflowpy/flopy
 
 # %%
+plt.show(block=True)

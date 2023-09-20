@@ -1,5 +1,5 @@
 begin options
-{%- if auxiliary is defined -%}  auxiliary {{auxiliary}}
+{% if auxiliary is defined -%}  auxiliary {{auxiliary}}
 {% endif -%}
 {%- if print_input is defined -%}  print_input
 {% endif -%}
@@ -26,5 +26,5 @@ begin dimensions
 end dimensions
 
 begin exchangedata
-  open/close {{path}} (binary)
+  {{exchangesblock}}
 end exchangedata
