@@ -465,9 +465,15 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for pkgname, pkg in self.items():
             self[pkgname] = pkg.mask(domain)
 
-    def get_domain(self):
+    @property
+    def domain(self):
         dis = self.__get_diskey()
         return self[dis]["idomain"]
+
+    @property
+    def bottom(self):
+        dis = self.__get_diskey()
+        return self[dis]["bottom"]
 
     def _get_regridding_domain(
         self,
@@ -479,7 +485,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         all regridders. Each regridder may leave some cells inactive. The output domain for the model consists of those
         cells that all regridders consider active.
         """
-        idomain = self.get_domain()
+        idomain = self.domain
         regridder_collection = RegridderInstancesCollection(
             idomain, target_grid=target_grid
         )
@@ -655,7 +661,7 @@ class GroundwaterFlowModel(Modflow6Model):
         constant_head_packages.extend(additional_boundaries)
 
         return create_clipped_boundary(
-            model.get_domain(), state_for_boundary, constant_head_packages
+            model.domain, state_for_boundary, constant_head_packages
         )
 
 

@@ -6,6 +6,7 @@ from typing import List, Union
 import numpy as np
 
 from imod.mf6.package import Package
+from imod.mf6.utilities.dataset_utilities import is_dataarray_none
 from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema
 
@@ -84,8 +85,16 @@ class OutputControl(Package):
         validate: bool = True,
     ):
         super().__init__()
+
+        save_concentration = (
+            None if is_dataarray_none(save_concentration) else save_concentration
+        )
+        save_head = None if is_dataarray_none(save_head) else save_head
+        save_budget = None if is_dataarray_none(save_budget) else save_budget
+
         if save_head is not None and save_concentration is not None:
             raise ValueError("save_head and save_concentration cannot both be defined.")
+
         self.dataset["save_head"] = save_head
         self.dataset["save_concentration"] = save_concentration
         self.dataset["save_budget"] = save_budget
