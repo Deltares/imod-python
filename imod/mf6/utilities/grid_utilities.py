@@ -14,10 +14,8 @@ DomainSlice = Dict[str, slice | np.ndarray]
 def get_active_domain_slice(active: GridDataArray) -> DomainSlice:
     if isinstance(active, xr.DataArray):
         grid = active.where(active > 0, drop=True)
-        xmin = grid.coords['x'].min()
-        xmax = grid.coords['x'].max()
-        ymin = grid.coords['y'].min()
-        ymax = grid.coords['y'].max()
+
+        _, xmin, xmax, _, ymin, ymax = spatial_reference(grid)
         x_slice = slice(int(xmin), int(xmax))
         y_slice = slice(int(ymax), int(ymin))
         return {"y": y_slice, "x": x_slice}

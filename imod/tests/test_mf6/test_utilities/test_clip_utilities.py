@@ -132,7 +132,7 @@ def test_clip_by_grid__structured_grid_clipped(
     idomain, _, _ = basic_dis
     wel = imod.mf6.Well(*well_high_lvl_test_data_stationary, print_flows=True)
     # Clip grid so that xmax is set to 70.0 instead of 90.0
-    idomain_selected = idomain.sel(x=slice(None, 70.0))
+    idomain_selected = idomain.where(idomain.x < 70.0, -1)
 
     # Act
     wel_clipped = clip_by_grid(wel, idomain_selected)
