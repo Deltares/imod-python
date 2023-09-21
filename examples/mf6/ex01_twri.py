@@ -185,7 +185,7 @@ simulation.create_time_discretization(
 # %%
 # We'll create a new directory in which we will write and run the model.
 
-active = gwf_model.get_domain().sel(layer=1)
+active = gwf_model.domain.sel(layer=1)
 number_partitions = 3
 split_location = np.linspace(active.y.min(), active.y.max(), number_partitions + 1)
 

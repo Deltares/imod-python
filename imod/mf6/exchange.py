@@ -17,6 +17,8 @@ class exchanges ( Package):
     def __init__(self, exchanges: GWFGWF, print_input: bool, print_flows: bool,save_flows: bool, cell_averaging: bool, variablecv: bool,newton: bool ):
         
         self.dataset = exchanges._cell_id1.to_dataset()
+        self.dataset["cell_id2"] = exchanges._cell_id2
+        self.dataset["layer"] = exchanges._layer
         self.dataset["model_name_1"] = exchanges._model_name1
         self.dataset["model_name_2"] = exchanges._model_name2        
         self.dataset["print_input"] = print_input
@@ -35,7 +37,7 @@ class exchanges ( Package):
         _template =  env.get_template("exg-gwfgwf.j2")
 
         d = {}
-        d["exg"]
+        d["nexg"] = len(self.dataset["cell_id1"].values[0])
         for varname in self.dataset.data_vars:
             key = self._keyword_map.get(varname, varname)
 
@@ -43,6 +45,14 @@ class exchanges ( Package):
             value = self[varname].values[()]
             if self._valid(value):  # skip False or None
                 d[key] = value
+
+        exchangeblock = {"layer1" : self.dataset["layer"].transpose(), 
+                        "row1": self.dataset["cell_id1"].values.transpose()[:,0]  ,
+                        "col1": self.dataset["cell_id1"].values.transpose()[:,1],
+                        "layer2" : self.dataset["layer"].transpose(),
+                        "row2":   self.dataset["cell_id2"].values.transpose()[:,0]  ,
+                        "col2":   self.dataset["cell_id2"].values.transpose()[:,1] }
+        d["exchangesblock"] = pd.DataFrame(exchangeblock).to_csv(sep=" ", header=False, index=False, line_terminator = '\r')
         
         return _template.render(d)
     
