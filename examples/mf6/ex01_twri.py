@@ -30,11 +30,8 @@ In overview, we'll set the following steps:
 import numpy as np
 import xarray as xr
 from matplotlib import pyplot as plt
-
 import imod
 from imod.typing.grid import zeros_like
-import geopandas as gpd
-import shapely
 
 # %%
 # Create grid coordinates

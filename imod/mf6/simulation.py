@@ -5,7 +5,7 @@ import copy
 import pathlib
 import subprocess
 import warnings
-from typing import Dict, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import jinja2
 import numpy as np
@@ -13,12 +13,10 @@ import tomli
 import tomli_w
 import xarray as xr
 import xugrid as xu
-from imod.mf6.gwfgwf import GWFGWF
-from typing import List
-from imod.mf6.pkgbase import PackageBase
 
 import imod
 from imod.mf6.exchange_creator import ExchangeCreator
+from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.model import (
     GroundwaterFlowModel,
     GroundwaterTransportModel,
@@ -26,12 +24,13 @@ from imod.mf6.model import (
 )
 from imod.mf6.modelsplitter import create_partition_info, slice_model
 from imod.mf6.package import Package
+from imod.mf6.pkgbase import PackageBase
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray
-from imod.mf6.exchange import exchanges
+
 
 def first(container, predicate):
     for key, value in container.items():
@@ -359,16 +358,11 @@ class Modflow6Simulation(collections.UserDict):
                 filename = f"simulation{counter}.exg"
                 modelname_b = key
                 result.append((exchange_type, filename, modelname_a, modelname_b))
-        if "gwf6-gwf6" in  self.keys():
+        if "gwf6-gwf6" in self.keys():
             exchange_type = "GWF6-GWF6"
             for exchange in self["gwf6-gwf6"]:
-                modelname_a = exchange.model_name_1()
-                modelname_b = exchange.model_name_2()
-                result.append((exchange_type, exchange.filename(), modelname_a, modelname_b))
+                result.append(exchange.get_specification())
 
-
-
-                                 
         return result
 
     def get_models_of_type(self, modeltype):
@@ -514,13 +508,11 @@ class Modflow6Simulation(collections.UserDict):
                 raise NotImplementedError(f"regridding not supported for {key}")
 
         return result
-    
-    def _add_exchanges(self, exchanges_list: List[GWFGWF])->None:
+
+    def _add_exchanges(self, exchanges_list: List[GWFGWF]) -> None:
         if "gwf6-gwf6" not in self.keys():
             self["gwf6-gwf6"] = []
         exchange_packages = []
         for ex in exchanges_list:
-            ex_pack = exchanges(ex,True, True, True, False, False, True)
-            exchange_packages.append(ex_pack)
-        self["gwf6-gwf6"].extend( exchange_packages)
-
+            exchange_packages.append(ex)
+        self["gwf6-gwf6"].extend(exchange_packages)

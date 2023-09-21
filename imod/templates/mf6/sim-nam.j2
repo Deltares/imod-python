@@ -17,7 +17,7 @@ begin models
 end models
 
 begin exchanges
-{% for exgtype, exgfile, exgmnamea, exgmnameb in exchanges %}
+{%- for exgtype, exgfile, exgmnamea, exgmnameb in exchanges %}
   {{exgtype}} {{exgfile}} {{exgmnamea}} {{exgmnameb}}
 {% endfor -%}
 end exchanges
