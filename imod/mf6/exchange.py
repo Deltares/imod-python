@@ -45,13 +45,20 @@ class exchanges ( Package):
             value = self[varname].values[()]
             if self._valid(value):  # skip False or None
                 d[key] = value
-
-        exchangeblock = {"layer1" : self.dataset["layer"].transpose(), 
-                        "row1": self.dataset["cell_id1"].values.transpose()[:,0]  ,
-                        "col1": self.dataset["cell_id1"].values.transpose()[:,1],
-                        "layer2" : self.dataset["layer"].transpose(),
-                        "row2":   self.dataset["cell_id2"].values.transpose()[:,0]  ,
-                        "col2":   self.dataset["cell_id2"].values.transpose()[:,1] }
+        #check dimensionality of cell_1d - it has 2 columns for structured grids and 1 column for unstructured grids
+        if (self.dataset["cell_id1"].shape[0]==2):
+            exchangeblock = {"layer1" : self.dataset["layer"].transpose(), 
+                            "row1": self.dataset["cell_id1"].values.transpose()[:,0]  ,
+                            "col1": self.dataset["cell_id1"].values.transpose()[:,1],
+                            "layer2" : self.dataset["layer"].transpose(),
+                            "row2":   self.dataset["cell_id2"].values.transpose()[:,0]  ,
+                            "col2":   self.dataset["cell_id2"].values.transpose()[:,1] }
+        elif (self.dataset["cell_id2"].shape[0]==1):
+            exchangeblock = {"layer1" : self.dataset["layer"].transpose(), 
+                            "cellindex1": self.dataset["cell_id1"].values.transpose()[:,0]  ,
+                            "layer2" : self.dataset["layer"].transpose(),
+                            "cellindex2":   self.dataset["cell_id2"].values.transpose()[:,0] }
+      
         d["exchangesblock"] = pd.DataFrame(exchangeblock).to_csv(sep=" ", header=False, index=False, line_terminator = '\r')
         
         return _template.render(d)
