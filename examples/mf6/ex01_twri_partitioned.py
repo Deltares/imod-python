@@ -29,9 +29,9 @@ In overview, we'll set the following steps:
 
 import numpy as np
 import xarray as xr
+from example_models import create_twri_simulation
 
 import imod
-from example_models import create_twri_simulation
 from imod.typing.grid import zeros_like
 
 simulation = create_twri_simulation()
