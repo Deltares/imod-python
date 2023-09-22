@@ -72,19 +72,11 @@ class ExchangeCreator:
         diff1 = self._submodel_labels.diff(f"{axis_label}", label="lower")
         diff2 = self._submodel_labels.diff(f"{axis_label}", label="upper")
 
-        connected_cells_idx1 = self._global_cell_indices.where(
-            diff1 != 0, drop=True
-        ).astype(int)
-        connected_cells_idx2 = self._global_cell_indices.where(
-            diff2 != 0, drop=True
-        ).astype(int)
+        connected_cells_idx1 = self._global_cell_indices.where(diff1 != 0, drop=True).astype(int)
+        connected_cells_idx2 = self._global_cell_indices.where(diff2 != 0, drop=True).astype(int)
 
-        connected_model_label1 = self._submodel_labels.where(
-            diff1 != 0, drop=True
-        ).astype(int)
-        connected_model_label2 = self._submodel_labels.where(
-            diff2 != 0, drop=True
-        ).astype(int)
+        connected_model_label1 = self._submodel_labels.where(diff1 != 0, drop=True).astype(int)
+        connected_model_label2 = self._submodel_labels.where(diff2 != 0, drop=True).astype(int)
 
         connected_cell_info = pd.DataFrame(
             {
