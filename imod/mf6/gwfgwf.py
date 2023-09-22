@@ -25,7 +25,8 @@ class GWFGWF(Package):
         cell_id2: xr.DataArray,
         layer: xr.DataArray,
     ):
-        self.dataset = cell_id1.to_dataset()
+        self.dataset = xr.Dataset()
+        self.dataset ["cell_id1"] =cell_id1
         self.dataset["cell_id2"] = cell_id2
         self.dataset["layer"] = layer
         self.dataset["model_name_1"] = model_id1
@@ -67,26 +68,22 @@ class GWFGWF(Package):
             if self._valid(value):  # skip False or None
                 d[key] = value
         # check dimensionality of cell_1d - it has 2 columns for structured grids and 1 column for unstructured grids
-        if self.dataset["cell_id1"].shape[0] == 2:
-            exchangeblock = {
-                "layer1": self.dataset["layer"].transpose(),
-                "row1": self.dataset["cell_id1"].values.transpose()[:, 0],
-                "col1": self.dataset["cell_id1"].values.transpose()[:, 1],
-                "layer2": self.dataset["layer"].transpose(),
-                "row2": self.dataset["cell_id2"].values.transpose()[:, 0],
-                "col2": self.dataset["cell_id2"].values.transpose()[:, 1],
-            }
-        elif self.dataset["cell_id2"].shape[0] == 1:
-            exchangeblock = {
-                "layer1": self.dataset["layer"].transpose(),
-                "cellindex1": self.dataset["cell_id1"].values.transpose()[:, 0],
-                "layer2": self.dataset["layer"].transpose(),
-                "cellindex2": self.dataset["cell_id2"].values.transpose()[:, 0],
-            }
 
-        d["exchangesblock"] = pd.DataFrame(exchangeblock).to_csv(
+        exchangeblock = {
+            "layer1": self.dataset["layer"].values, 
+            "cellid": self.dataset["cell_id1"].values, 
+            "layer2": self.dataset["layer"].values,
+            "cellid2": self.dataset["cell_id2"].values
+        }
+
+        exchangeblock_str =pd.DataFrame(exchangeblock).to_csv(
             sep=" ", header=False, index=False, line_terminator="\r"
         )
+        exchangeblock_str = exchangeblock_str.replace('"','')
+        exchangeblock_str = exchangeblock_str.replace("(", "")
+        exchangeblock_str = exchangeblock_str.replace(")", "")
+        exchangeblock_str = exchangeblock_str.replace(",", "")
+        d["exchangesblock"] = exchangeblock_str
 
         return _template.render(d)
 

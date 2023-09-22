@@ -351,6 +351,7 @@ class Modflow6Simulation(collections.UserDict):
         result = []
         flowmodels = self.get_models_of_type("gwf6")
         transportmodels = self.get_models_of_type("gwt6")
+        # exchange for flow and transport
         if len(flowmodels) == 1 and len(transportmodels) > 0:
             exchange_type = "GWF6-GWT6"
             modelname_a = list(flowmodels.keys())[0]
@@ -358,9 +359,10 @@ class Modflow6Simulation(collections.UserDict):
                 filename = f"simulation{counter}.exg"
                 modelname_b = key
                 result.append((exchange_type, filename, modelname_a, modelname_b))
-        if "gwf6-gwf6" in self.keys():
-            exchange_type = "GWF6-GWF6"
-            for exchange in self["gwf6-gwf6"]:
+
+        # exchange for splitting models             
+        if "split_exchanges" in self.keys():
+            for exchange in self["split_exchanges"]:
                 result.append(exchange.get_specification())
 
         return result
@@ -468,7 +470,7 @@ class Modflow6Simulation(collections.UserDict):
         new_simulation["solver"]["modelnames"] = xr.DataArray(
             list(get_models(new_simulation).keys())
         )
-        new_simulation._add_exchanges(exchanges)
+        new_simulation._add_modelsplit_exchanges(exchanges)
 
         return new_simulation
 
@@ -509,10 +511,7 @@ class Modflow6Simulation(collections.UserDict):
 
         return result
 
-    def _add_exchanges(self, exchanges_list: List[GWFGWF]) -> None:
-        if "gwf6-gwf6" not in self.keys():
-            self["gwf6-gwf6"] = []
-        exchange_packages = []
-        for ex in exchanges_list:
-            exchange_packages.append(ex)
-        self["gwf6-gwf6"].extend(exchange_packages)
+    def _add_modelsplit_exchanges(self, exchanges_list: List[GWFGWF]) -> None:
+        if "split_exchanges" not in self.keys():
+            self["split_exchanges"] = []
+        self["split_exchanges"].extend(exchanges_list)
