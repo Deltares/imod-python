@@ -21,7 +21,7 @@ from imod.mf6.package import Package
 from imod.mf6.utilities.dataset_utilities import remove_inactive
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
-from imod.schemata import DTypeSchema
+from imod.schemata import AllNoDataSchema, DTypeSchema
 from imod.select.points import points_indices
 from imod.typing.grid import GridDataArray, ones_like
 from imod.util import values_within_range
@@ -109,7 +109,10 @@ class Well(BoundaryCondition, IPointDataPackage):
         "rate": [DTypeSchema(np.floating)],
         "concentration": [DTypeSchema(np.floating)],
     }
-    _write_schemata = {}
+    _write_schemata = {
+        "y": [AllNoDataSchema()],
+        "x": [AllNoDataSchema()],
+    }
 
     _regrid_method = {}
 

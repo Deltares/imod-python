@@ -181,6 +181,7 @@ def create_twri_simulation() -> imod.mf6.Modflow6Simulation:
         screen_top=screen_top,
         screen_bottom=screen_bottom,
         rate=well_rate,
+        minimum_k=0.0001,
     )
 
     # %%
