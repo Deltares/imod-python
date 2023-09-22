@@ -60,14 +60,6 @@ class ExchangeCreator:
         return exchanges
 
 
-def _to_cell_idx(idomain):
-    index = np.arange(idomain.size).reshape(idomain.shape)
-    domain_index = xr.zeros_like(idomain)
-    domain_index.values = index
-
-    return domain_index
-
-
 def _find_connected_cells(submodel_labels):
     cell_indices = _to_cell_idx(submodel_labels)
 
@@ -95,7 +87,9 @@ def _find_connected_cells(submodel_labels):
 def _create_global_cellidx_to_local_cellid_mapping(partition_info):
     global_cell_indices = _to_cell_idx(partition_info[0].active_domain)
 
-    global_to_local_idx = _create_global_to_local_idx(partition_info, global_cell_indices)
+    global_to_local_idx = _create_global_to_local_idx(
+        partition_info, global_cell_indices
+    )
     local_cell_idx_to_id = _local_cell_idx_to_id(partition_info)
 
     mapping = {}
@@ -111,11 +105,7 @@ def _create_global_cellidx_to_local_cellid_mapping(partition_info):
 def _create_global_to_local_idx(partition_info, global_cell_indices):
     global_to_local_idx = {}
     for submodel_partition_info in partition_info:
-        model_id = submodel_partition_info.id
-        domain_slice = get_active_domain_slice(submodel_partition_info.active_domain)
-        local_domain = submodel_partition_info.active_domain.sel(domain_slice)
-
-        local_cell_indices = _to_cell_idx(local_domain)
+        local_cell_indices = _get_local_cell_indices(submodel_partition_info)
         overlap = xr.merge(
             (global_cell_indices, local_cell_indices),
             join="inner",
@@ -123,6 +113,7 @@ def _create_global_to_local_idx(partition_info, global_cell_indices):
             compat="override",
         )["idomain"]
 
+        model_id = submodel_partition_info.id
         global_to_local_idx[model_id] = pd.DataFrame(
             {
                 "global_idx": overlap.values.flatten(),
@@ -136,15 +127,12 @@ def _create_global_to_local_idx(partition_info, global_cell_indices):
 def _local_cell_idx_to_id(partition_info):
     local_cell_idx_to_id = {}
     for submodel_partition_info in partition_info:
-        model_id = submodel_partition_info.id
-        domain_slice = get_active_domain_slice(submodel_partition_info.active_domain)
-        local_domain = submodel_partition_info.active_domain.sel(domain_slice)
-
-        local_cell_indices = _to_cell_idx(local_domain)
+        local_cell_indices = _get_local_cell_indices(submodel_partition_info)
         local_row, local_column = np.unravel_index(
             local_cell_indices, local_cell_indices.shape
         )
 
+        model_id = submodel_partition_info.id
         local_cell_idx_to_id[model_id] = pd.DataFrame(
             {
                 "local_idx": local_cell_indices.values.flatten(),
@@ -155,3 +143,18 @@ def _local_cell_idx_to_id(partition_info):
         )
 
     return local_cell_idx_to_id
+
+
+def _get_local_cell_indices(submodel_partition_info):
+    domain_slice = get_active_domain_slice(submodel_partition_info.active_domain)
+    local_domain = submodel_partition_info.active_domain.sel(domain_slice)
+
+    return _to_cell_idx(local_domain)
+
+
+def _to_cell_idx(idomain):
+    index = np.arange(idomain.size).reshape(idomain.shape)
+    domain_index = xr.zeros_like(idomain)
+    domain_index.values = index
+
+    return domain_index
