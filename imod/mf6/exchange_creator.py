@@ -8,9 +8,12 @@ from imod.mf6.utilities.grid_utilities import get_active_domain_slice
 
 class ExchangeCreator:
     def __init__(self, submodel_labels, partition_info):
-        self._connected_cells = _find_connected_cells(submodel_labels)
-        self._global_to_local_mapping = _create_global_cellidx_to_local_cellid_mapping(
-            partition_info
+        self._submodel_labels = submodel_labels
+
+        self._global_cell_indices = _to_cell_idx(submodel_labels)
+        self._connected_cells = self._find_connected_cells()
+        self._global_to_local_mapping = (
+            self._create_global_cellidx_to_local_cellid_mapping(partition_info)
         )
 
     def create_exchanges(self, model_name, layers):
@@ -59,47 +62,55 @@ class ExchangeCreator:
 
         return exchanges
 
+    def _find_connected_cells(self):
+        connected_cells_along_x = self._find_connected_cells_along_axis("x")
+        connected_cells_along_y = self._find_connected_cells_along_axis("y")
 
-def _find_connected_cells(submodel_labels):
-    cell_indices = _to_cell_idx(submodel_labels)
+        return pd.merge(connected_cells_along_x, connected_cells_along_y, how="outer")
 
-    diff_y1 = submodel_labels.diff("y", label="lower")
-    diff_y2 = submodel_labels.diff("y", label="upper")
+    def _find_connected_cells_along_axis(self, axis_label):
+        diff1 = self._submodel_labels.diff(f"{axis_label}", label="lower")
+        diff2 = self._submodel_labels.diff(f"{axis_label}", label="upper")
 
-    connected_cells_idx_y1 = cell_indices.where(diff_y1 != 0, drop=True).astype(int)
-    connected_cells_idx_y2 = cell_indices.where(diff_y2 != 0, drop=True).astype(int)
+        connected_cells_idx1 = self._global_cell_indices.where(
+            diff1 != 0, drop=True
+        ).astype(int)
+        connected_cells_idx2 = self._global_cell_indices.where(
+            diff2 != 0, drop=True
+        ).astype(int)
 
-    connected_model_label1 = submodel_labels.where(diff_y1 != 0, drop=True).astype(int)
-    connected_model_label2 = submodel_labels.where(diff_y2 != 0, drop=True).astype(int)
+        connected_model_label1 = self._submodel_labels.where(
+            diff1 != 0, drop=True
+        ).astype(int)
+        connected_model_label2 = self._submodel_labels.where(
+            diff2 != 0, drop=True
+        ).astype(int)
 
-    connected_cell_info = pd.DataFrame(
-        {
-            "cell_idx1": connected_cells_idx_y1.values.flatten(),
-            "cell_idx2": connected_cells_idx_y2.values.flatten(),
-            "cell_label1": connected_model_label1.values.flatten(),
-            "cell_label2": connected_model_label2.values.flatten(),
-        }
-    )
-
-    return connected_cell_info
-
-
-def _create_global_cellidx_to_local_cellid_mapping(partition_info):
-    global_cell_indices = _to_cell_idx(partition_info[0].active_domain)
-
-    global_to_local_idx = _create_global_to_local_idx(
-        partition_info, global_cell_indices
-    )
-    local_cell_idx_to_id = _local_cell_idx_to_id(partition_info)
-
-    mapping = {}
-    for submodel_partition_info in partition_info:
-        model_id = submodel_partition_info.id
-        mapping[model_id] = pd.merge(
-            global_to_local_idx[model_id], local_cell_idx_to_id[model_id]
+        connected_cell_info = pd.DataFrame(
+            {
+                "cell_idx1": connected_cells_idx1.values.flatten(),
+                "cell_idx2": connected_cells_idx2.values.flatten(),
+                "cell_label1": connected_model_label1.values.flatten(),
+                "cell_label2": connected_model_label2.values.flatten(),
+            }
         )
 
-    return mapping
+        return connected_cell_info
+
+    def _create_global_cellidx_to_local_cellid_mapping(self, partition_info):
+        global_to_local_idx = _create_global_to_local_idx(
+            partition_info, self._global_cell_indices
+        )
+        local_cell_idx_to_id = _local_cell_idx_to_id(partition_info)
+
+        mapping = {}
+        for submodel_partition_info in partition_info:
+            model_id = submodel_partition_info.id
+            mapping[model_id] = pd.merge(
+                global_to_local_idx[model_id], local_cell_idx_to_id[model_id]
+            )
+
+        return mapping
 
 
 def _create_global_to_local_idx(partition_info, global_cell_indices):
