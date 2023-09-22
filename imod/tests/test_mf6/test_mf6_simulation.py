@@ -200,7 +200,8 @@ class TestModflow6Simulation:
         split_simulation.write(tmp_path, False, True, False)
 
         expected_exchanges_block = "exchanges\n  GWF6-GWF6 GWF_1_1_GWF_1_0.gwfgwf GWF_1_1 GWF_1_0\n  GWF6-GWF6 GWF_1_2_GWF_1_1.gwfgwf GWF_1_2 GWF_1_1\n\nend exchanges"
-        namfile_content = open(tmp_path/"mfsim.nam", mode= "r").read()
+        with open(tmp_path/"mfsim.nam", mode= "r") as mfsim_nam:
+           namfile_content =  mfsim_nam.read()
         assert expected_exchanges_block in namfile_content
         
 

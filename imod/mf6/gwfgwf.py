@@ -1,11 +1,13 @@
-from typing import Tuple
+from typing import Dict, Tuple, Union
 
 import jinja2
 import pandas as pd
 import xarray as xr
-
+import numpy as np
+import xugrid as xu
 from imod.mf6.package import Package
-
+from imod.mf6.regridding_utils import RegridderType
+from imod.typing.grid import GridDataArray
 
 class GWFGWF(Package):
     """
@@ -21,9 +23,9 @@ class GWFGWF(Package):
         self,
         model_id1: str,
         model_id2: str,
-        cell_id1: xr.DataArray,
-        cell_id2: xr.DataArray,
-        layer: xr.DataArray,
+        cell_id1: np.ndarray,
+        cell_id2:  np.ndarray,
+        layer: np.ndarray,
     ):
         self.dataset = xr.Dataset()
         self.dataset ["cell_id1"] =cell_id1
@@ -60,7 +62,7 @@ class GWFGWF(Package):
         _template = env.get_template("exg-gwfgwf.j2")
 
         d = {}
-        d["nexg"] = len(self.dataset["cell_id1"].values[0])
+        d["nexg"] = len(self.dataset["layer"].values)
         for varname in self.dataset.data_vars:
             key = self._keyword_map.get(varname, varname)
 
@@ -76,8 +78,8 @@ class GWFGWF(Package):
             "cellid2": self.dataset["cell_id2"].values
         }
 
-        exchangeblock_str =pd.DataFrame(exchangeblock).to_csv(
-            sep=" ", header=False, index=False, line_terminator="\r"
+        exchangeblock_str =pd.DataFrame(exchangeblock).astype('O').to_csv(
+            sep=" ", header=False, index=False, line_terminator="\n"
         )
         exchangeblock_str = exchangeblock_str.replace('"','')
         exchangeblock_str = exchangeblock_str.replace("(", "")
@@ -94,3 +96,9 @@ class GWFGWF(Package):
             self.dataset["model_name_1"].values[()],
             self.dataset["model_name_2"].values[()],
         )
+    
+    def regrid_like(self, target_grid: GridDataArray, regridder_types: Dict[str, Tuple[RegridderType, str]] = None) -> Package:
+        raise Exception("this package cannot be regridded")
+        
+    def clip_box(self, time_min=None, time_max=None, layer_min=None, layer_max=None, x_min=None, x_max=None, y_min=None, y_max=None, state_for_boundary=None) -> Package:
+        raise Exception("this package cannot be clipped")
