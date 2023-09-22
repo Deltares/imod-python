@@ -31,7 +31,7 @@ import numpy as np
 import xarray as xr
 
 import imod
-from examples.mf6.example_models import create_twri_simulation
+from example_models import create_twri_simulation
 from imod.typing.grid import zeros_like
 
 simulation = create_twri_simulation()
