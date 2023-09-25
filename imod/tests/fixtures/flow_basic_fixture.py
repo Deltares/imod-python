@@ -51,7 +51,9 @@ def parameterizable_basic_dis(request):
     layers = np.arange(nlay) + 1
 
     idomain = xr.DataArray(
-        np.ones(shape, dtype=np.int32), coords={"layer": layers, "y": yc, "x": xc}, name="idomain"
+        np.ones(shape, dtype=np.int32),
+        coords={"layer": layers, "y": yc, "x": xc},
+        name="idomain",
     )
 
     idomain = idomain.assign_coords({"dy": -dy, "dx": dx})

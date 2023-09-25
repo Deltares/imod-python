@@ -30,14 +30,6 @@ from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray
 
 
-def first(container, predicate):
-    for key, value in container.items():
-        if predicate(key, value):
-            return value
-
-    raise ValueError("Item not found")
-
-
 def get_models(simulation: Modflow6Simulation) -> Dict[str, Modflow6Model]:
     return {
         model_name: model

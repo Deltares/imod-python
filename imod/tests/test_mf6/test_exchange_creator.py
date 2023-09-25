@@ -43,7 +43,7 @@ class TestExchangeCreator:
     )
     @pytest.mark.parametrize("parameterizable_basic_dis", [(1, 3, 3)], indirect=True)
     def test_create_exchanges_validate_number_of_exchanges(
-            self, x_number_partitions, y_number_partitions, parameterizable_basic_dis
+        self, x_number_partitions, y_number_partitions, parameterizable_basic_dis
     ):
         # Arrange.
         idomain, _, _ = parameterizable_basic_dis
@@ -66,7 +66,6 @@ class TestExchangeCreator:
         assert len(exchanges) == num_exchanges_x_direction + num_exchanges_y_direction
 
     class ExpectedCellIds:
-
         @staticmethod
         def case_split_along_x_axis():
             """
@@ -86,7 +85,7 @@ class TestExchangeCreator:
             return (
                 x_number_partitions,
                 y_number_partitions,
-                [ExpectedExchanges(expected_cell_id1, expected_cell_id2)]
+                [ExpectedExchanges(expected_cell_id1, expected_cell_id2)],
             )
 
         @staticmethod
@@ -108,7 +107,7 @@ class TestExchangeCreator:
             return (
                 x_number_partitions,
                 y_number_partitions,
-                [ExpectedExchanges(expected_cell_id1, expected_cell_id2)]
+                [ExpectedExchanges(expected_cell_id1, expected_cell_id2)],
             )
 
         @staticmethod
@@ -143,11 +142,19 @@ class TestExchangeCreator:
                 x_number_partitions,
                 y_number_partitions,
                 [
-                    ExpectedExchanges(exchange1_expected_cell_id1, exchange1_expected_cell_id2),
-                    ExpectedExchanges(exchange2_expected_cell_id1, exchange2_expected_cell_id2),
-                    ExpectedExchanges(exchange3_expected_cell_id1, exchange3_expected_cell_id2),
-                    ExpectedExchanges(exchange4_expected_cell_id1, exchange4_expected_cell_id2),
-                ]
+                    ExpectedExchanges(
+                        exchange1_expected_cell_id1, exchange1_expected_cell_id2
+                    ),
+                    ExpectedExchanges(
+                        exchange2_expected_cell_id1, exchange2_expected_cell_id2
+                    ),
+                    ExpectedExchanges(
+                        exchange3_expected_cell_id1, exchange3_expected_cell_id2
+                    ),
+                    ExpectedExchanges(
+                        exchange4_expected_cell_id1, exchange4_expected_cell_id2
+                    ),
+                ],
             )
 
     @parametrize_with_cases(
@@ -156,11 +163,11 @@ class TestExchangeCreator:
     )
     @pytest.mark.parametrize("parameterizable_basic_dis", [(1, 4, 4)], indirect=True)
     def test_create_exchanges_validate_local_cell_ids(
-            self,
-            parameterizable_basic_dis,
-            x_number_partitions,
-            y_number_partitions,
-            expected_exchanges,
+        self,
+        parameterizable_basic_dis,
+        x_number_partitions,
+        y_number_partitions,
+        expected_exchanges,
     ):
         # Arrange.
         idomain, _, _ = parameterizable_basic_dis
