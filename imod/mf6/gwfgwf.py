@@ -1,4 +1,5 @@
-from typing import Dict, Tuple
+from pathlib import Path
+from typing import List, Tuple, Union
 
 import jinja2
 import numpy as np
@@ -6,8 +7,6 @@ import pandas as pd
 import xarray as xr
 
 from imod.mf6.package import Package
-from imod.mf6.regridding_utils import RegridderType
-from imod.typing.grid import GridDataArray
 
 
 class GWFGWF(Package):
@@ -57,7 +56,13 @@ class GWFGWF(Package):
     def packagename(self) -> str:
         return f"{self.dataset['model_name_1'].values[()]}_{self.dataset['model_name_2'].values[()] }"
 
-    def render(self, directory, pkgname, globaltimes, binary):
+    def render(
+        self,
+        directory: Path,
+        pkgname: str,
+        globaltimes: Union[List, np.ndarray],
+        binary: bool,
+    ):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
         env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
         _template = env.get_template("exg-gwfgwf.j2")
@@ -93,19 +98,16 @@ class GWFGWF(Package):
         return _template.render(d)
 
     def get_specification(self) -> Tuple[str, str, str, str]:
+        """
+        Returns a tuple containing the exchange type, the exchange file name, and the model names. This can be used
+        to write the exchange information in the simulation .nam input file
+        """
         return (
             "GWF6-GWF6",
             self.filename(),
             self.dataset["model_name_1"].values[()],
             self.dataset["model_name_2"].values[()],
         )
-
-    def regrid_like(
-        self,
-        target_grid: GridDataArray,
-        regridder_types: Dict[str, Tuple[RegridderType, str]] = None,
-    ) -> Package:
-        raise Exception("this package cannot be regridded")
 
     def clip_box(
         self,
@@ -119,4 +121,4 @@ class GWFGWF(Package):
         y_max=None,
         state_for_boundary=None,
     ) -> Package:
-        raise Exception("this package cannot be clipped")
+        raise NotImplementedError("this package cannot be clipped")
