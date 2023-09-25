@@ -12,6 +12,7 @@ from imod.mf6.drn import Drainage
 from imod.mf6.dsp import Dispersion
 from imod.mf6.evt import Evapotranspiration
 from imod.mf6.ghb import GeneralHeadBoundary
+from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.hfb import (
     HorizontalFlowBarrierBase,
     HorizontalFlowBarrierHydraulicCharacteristic,
@@ -43,4 +44,3 @@ from imod.mf6.timedis import TimeDiscretization
 from imod.mf6.uzf import UnsaturatedZoneFlow
 from imod.mf6.wel import Well, WellDisStructured, WellDisVertices
 from imod.mf6.write_context import WriteContext
-from imod.mf6.gwfgwf import GWFGWF

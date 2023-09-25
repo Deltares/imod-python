@@ -95,7 +95,9 @@ def _find_connected_cells(submodel_labels):
 def _create_global_cellidx_to_local_cellid_mapping(partition_info):
     global_cell_indices = _to_cell_idx(partition_info[0].active_domain)
 
-    global_to_local_idx = _create_global_to_local_idx(partition_info, global_cell_indices)
+    global_to_local_idx = _create_global_to_local_idx(
+        partition_info, global_cell_indices
+    )
     local_cell_idx_to_id = _local_cell_idx_to_id(partition_info)
 
     mapping = {}

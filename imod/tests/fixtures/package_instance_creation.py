@@ -140,7 +140,6 @@ def create_instance_packages(is_unstructured):
         imod.mf6.StorageCoefficient(
             0.001, 0.1, True, get_grid_da(is_unstructured, np.int32)
         ),
- 
     ]
 
 
@@ -301,13 +300,26 @@ GRIDLESS_PACKAGES = [
     ),
 ]
 
-def create_exchange_package()->imod.mf6.GWFGWF:
-    cell_id1 = xr.DataArray([[1,1,1],[1,2,3]],  dims=["cell_dims1", "cell_dims2"],name="cell_id1")
-    cell_id2 = xr.DataArray([[1,1,1],[4,5,6]], dims=["cell_dims1", "cell_dims2"],name="cell_id2")
-    layer = xr.DataArray([2,2,2 ], name= "layer")
-    return [imod.mf6.GWFGWF("submodel_1", "submodel_2", cell_id1=cell_id1, cell_id2= cell_id2, layer=layer)]
+
+def create_exchange_package() -> imod.mf6.GWFGWF:
+    cell_id1 = np.array([(1, 1), (2, 1), (3, 1)], dtype="i,i")
+    cell_id2 = np.array([(1, 2), (2, 2), (3, 2)], dtype="i,i")
+    layer = np.array([12, 13, 14])
+
+    return [
+        imod.mf6.GWFGWF(
+            "submodel_1",
+            "submodel_2",
+            cell_id1=cell_id1,
+            cell_id2=cell_id2,
+            layer=layer,
+        )
+    ]
 
 
 ALL_PACKAGE_INSTANCES = (
-    GRIDLESS_PACKAGES + STRUCTURED_GRID_PACKAGES + UNSTRUCTURED_GRID_PACKAGES + create_exchange_package()
+    GRIDLESS_PACKAGES
+    + STRUCTURED_GRID_PACKAGES
+    + UNSTRUCTURED_GRID_PACKAGES
+    + create_exchange_package()
 )

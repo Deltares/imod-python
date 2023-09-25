@@ -14,6 +14,7 @@ from imod.mf6.statusinfo import StatusInfo
 from imod.schemata import ValidationError
 from imod.typing.grid import zeros_like
 
+
 def roundtrip(simulation, tmpdir_factory, name):
     # TODO: look at the values?
     tmp_path = tmpdir_factory.mktemp(name)
@@ -175,36 +176,36 @@ class TestModflow6Simulation:
                 and (expected_call[1] is call_args[0][1])
                 for call_args in slice_model_mock.call_args_list
             )
-        assert new_simulation["split_exchnages"]
 
     @pytest.mark.usefixtures("transient_twri_model")
     def test_exchanges_in_simulation_file(self, transient_twri_model, tmp_path):
-        #arrange
+        # arrange
         active = transient_twri_model["GWF_1"].domain.sel(layer=1)
         transient_twri_model["GWF_1"].pop("wel")
         number_partitions = 3
-        split_location = np.linspace(active.y.min(), active.y.max(), number_partitions + 1)
+        split_location = np.linspace(
+            active.y.min(), active.y.max(), number_partitions + 1
+        )
 
         coords = active.coords
         submodel_labels = zeros_like(active)
         for id in np.arange(1, number_partitions):
             submodel_labels.loc[
-                (coords["y"] > split_location[id]) & (coords["y"] <= split_location[id + 1])
+                (coords["y"] > split_location[id])
+                & (coords["y"] <= split_location[id + 1])
             ] = id
 
-        #act
+        # act
         split_simulation = transient_twri_model.split(submodel_labels)
 
-        #assert
+        # assert
         assert len(split_simulation["split_exchanges"]) == 2
         split_simulation.write(tmp_path, False, True, False)
 
         expected_exchanges_block = "exchanges\n  GWF6-GWF6 GWF_1_1_GWF_1_0.gwfgwf GWF_1_1 GWF_1_0\n  GWF6-GWF6 GWF_1_2_GWF_1_1.gwfgwf GWF_1_2 GWF_1_1\n\nend exchanges"
-        with open(tmp_path/"mfsim.nam", mode= "r") as mfsim_nam:
-           namfile_content =  mfsim_nam.read()
+        with open(tmp_path / "mfsim.nam", mode="r") as mfsim_nam:
+            namfile_content = mfsim_nam.read()
         assert expected_exchanges_block in namfile_content
-        
-
 
 
 def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo):

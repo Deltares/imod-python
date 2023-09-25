@@ -360,7 +360,7 @@ class Modflow6Simulation(collections.UserDict):
                 modelname_b = key
                 result.append((exchange_type, filename, modelname_a, modelname_b))
 
-        # exchange for splitting models             
+        # exchange for splitting models
         if "split_exchanges" in self.keys():
             for exchange in self["split_exchanges"]:
                 result.append(exchange.get_specification())

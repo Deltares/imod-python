@@ -1,13 +1,14 @@
-from typing import Dict, Tuple, Union
+from typing import Dict, Tuple
 
 import jinja2
+import numpy as np
 import pandas as pd
 import xarray as xr
-import numpy as np
-import xugrid as xu
+
 from imod.mf6.package import Package
 from imod.mf6.regridding_utils import RegridderType
 from imod.typing.grid import GridDataArray
+
 
 class GWFGWF(Package):
     """
@@ -24,11 +25,11 @@ class GWFGWF(Package):
         model_id1: str,
         model_id2: str,
         cell_id1: np.ndarray,
-        cell_id2:  np.ndarray,
+        cell_id2: np.ndarray,
         layer: np.ndarray,
     ):
         self.dataset = xr.Dataset()
-        self.dataset ["cell_id1"] =cell_id1
+        self.dataset["cell_id1"] = cell_id1
         self.dataset["cell_id2"] = cell_id2
         self.dataset["layer"] = layer
         self.dataset["model_name_1"] = model_id1
@@ -72,16 +73,18 @@ class GWFGWF(Package):
         # check dimensionality of cell_1d - it has 2 columns for structured grids and 1 column for unstructured grids
 
         exchangeblock = {
-            "layer1": self.dataset["layer"].values, 
-            "cellid": self.dataset["cell_id1"].values, 
+            "layer1": self.dataset["layer"].values,
+            "cellid": self.dataset["cell_id1"].values,
             "layer2": self.dataset["layer"].values,
-            "cellid2": self.dataset["cell_id2"].values
+            "cellid2": self.dataset["cell_id2"].values,
         }
 
-        exchangeblock_str =pd.DataFrame(exchangeblock).astype('O').to_csv(
-            sep=" ", header=False, index=False, line_terminator="\n"
+        exchangeblock_str = (
+            pd.DataFrame(exchangeblock)
+            .astype("O")
+            .to_csv(sep=" ", header=False, index=False, line_terminator="\n")
         )
-        exchangeblock_str = exchangeblock_str.replace('"','')
+        exchangeblock_str = exchangeblock_str.replace('"', "")
         exchangeblock_str = exchangeblock_str.replace("(", "")
         exchangeblock_str = exchangeblock_str.replace(")", "")
         exchangeblock_str = exchangeblock_str.replace(",", "")
@@ -96,9 +99,24 @@ class GWFGWF(Package):
             self.dataset["model_name_1"].values[()],
             self.dataset["model_name_2"].values[()],
         )
-    
-    def regrid_like(self, target_grid: GridDataArray, regridder_types: Dict[str, Tuple[RegridderType, str]] = None) -> Package:
+
+    def regrid_like(
+        self,
+        target_grid: GridDataArray,
+        regridder_types: Dict[str, Tuple[RegridderType, str]] = None,
+    ) -> Package:
         raise Exception("this package cannot be regridded")
-        
-    def clip_box(self, time_min=None, time_max=None, layer_min=None, layer_max=None, x_min=None, x_max=None, y_min=None, y_max=None, state_for_boundary=None) -> Package:
+
+    def clip_box(
+        self,
+        time_min=None,
+        time_max=None,
+        layer_min=None,
+        layer_max=None,
+        x_min=None,
+        x_max=None,
+        y_min=None,
+        y_max=None,
+        state_for_boundary=None,
+    ) -> Package:
         raise Exception("this package cannot be clipped")
