@@ -1,22 +1,34 @@
 import textwrap
+from pathlib import Path
 
 import numpy as np
 import pytest
-import xarray as xr
 
 import imod
 
 
-@pytest.mark.usefixtures("transient_twri_model")
-def test_render_exchange_file(tmp_path):
-    # arrange
+@pytest.fixture(scope="function")
+def sample_gwfgwf_structured():
     cell_id1 = np.array([(1, 1), (2, 1), (3, 1)], dtype="i,i")
     cell_id2 = np.array([(1, 2), (2, 2), (3, 2)], dtype="i,i")
     layer = np.array([12, 13, 14])
-    gwfgwf = imod.mf6.GWFGWF("name1", "name2", cell_id1, cell_id2, layer)
+    return imod.mf6.GWFGWF("name1", "name2", cell_id1, cell_id2, layer)
 
+
+@pytest.fixture(scope="function")
+def sample_gwfgwf_unstructured():
+    cell_id1 = np.array([(1), (2), (31)], dtype="i")
+    cell_id2 = np.array([(2), (2), (4)], dtype="i")
+    layer = np.array([12, 13, 14])
+    return imod.mf6.GWFGWF("name1", "name2", cell_id1, cell_id2, layer)
+
+
+@pytest.mark.usefixtures("sample_gwfgwf_structured")
+def test_render_exchange_file_structured(
+    sample_gwfgwf_structured: imod.mf6.GWFGWF, tmp_path: Path
+):
     # act
-    actual = gwfgwf.render(tmp_path, "gwfgwf", [], False)
+    actual = sample_gwfgwf_structured.render(tmp_path, "gwfgwf", [], False)
 
     # assert
 
@@ -41,30 +53,43 @@ def test_render_exchange_file(tmp_path):
     assert actual == expected
 
 
-def test_error_clip():
-    # arrange
-    cell_id1 = np.array([(1, 1), (2, 1), (3, 1)], dtype="i,i")
-    cell_id2 = np.array([(1, 2), (2, 2), (3, 2)], dtype="i,i")
-    layer = np.array([12, 13, 14])
-    gwfgwf = imod.mf6.GWFGWF("name1", "name2", cell_id1, cell_id2, layer)
+@pytest.mark.usefixtures("sample_gwfgwf_unstructured")
+def test_render_exchange_file_unstructured(
+    sample_gwfgwf_unstructured: imod.mf6.GWFGWF, tmp_path: Path
+):
+    # act
+    actual = sample_gwfgwf_unstructured.render(tmp_path, "gwfgwf", [], False)
 
+    # assert
+
+    expected = textwrap.dedent(
+        """\
+    begin options
+    end options
+
+    begin dimensions
+      nexg 3
+    end dimensions
+
+    begin exchangedata
+    12 1 12 2
+    13 2 13 2
+    14 31 14 4
+
+    end exchangedata
+    """
+    )
+
+    assert actual == expected
+
+
+@pytest.mark.usefixtures("sample_gwfgwf_structured")
+def test_error_clip(sample_gwfgwf_structured: imod.mf6.GWFGWF):
     # test error
     with pytest.raises(NotImplementedError):
-        gwfgwf.clip_box(0, 100, 1, 12, 0, 100, 0, 100)
+        sample_gwfgwf_structured.clip_box(0, 100, 1, 12, 0, 100, 0, 100)
 
 
-def test_error_regrid():
-    # arrange
-    cell_id1 = np.array([(1, 1), (2, 1), (3, 1)], dtype="i,i")
-    cell_id2 = np.array([(1, 2), (2, 2), (3, 2)], dtype="i,i")
-    layer = np.array([12, 13, 14])
-    gwfgwf = imod.mf6.GWFGWF("name1", "name2", cell_id1, cell_id2, layer)
-
-    dims = ("layer", "y", "x")
-    coords = {"layer": [1, 2, 3], "y": [109, 11], "x": [12, 13], "dx": 1, "dy": 1}
-    target_grid = xr.DataArray(np.ones((3, 2, 2), dtype=int), coords=coords, dims=dims)
-
-    # test error
-    assert not gwfgwf.is_regridding_supported()
-    with pytest.raises(NotImplementedError):
-        gwfgwf.regrid_like(target_grid)
+@pytest.mark.usefixtures("sample_gwfgwf_structured")
+def test_error_regrid(sample_gwfgwf_structured: imod.mf6.GWFGWF):
+    assert not sample_gwfgwf_structured.is_regridding_supported()
