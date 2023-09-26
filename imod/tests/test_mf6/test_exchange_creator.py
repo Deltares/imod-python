@@ -188,8 +188,8 @@ class TestExchangeCreator:
         assert len(exchanges) == len(expected_exchanges)
         for idx in range(len(exchanges)):
             np.testing.assert_array_equal(
-                exchanges[idx]._cell_id1.tolist(), expected_exchanges[idx].cell_id1
+                exchanges[idx].dataset["cell_id1"].values, expected_exchanges[idx][0]
             )
             np.testing.assert_array_equal(
-                exchanges[idx]._cell_id2.tolist(), expected_exchanges[idx].cell_id2
+                exchanges[idx].dataset["cell_id2"].values, expected_exchanges[idx][1]
             )

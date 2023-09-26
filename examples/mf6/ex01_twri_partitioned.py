@@ -91,7 +91,6 @@ for id in np.arange(0, number_partitions):
 head = xr.merge(heads)
 head["head"].isel(layer=0, time=0).plot.contourf()
 
-
 # %%
 # Visualize the results
 # ---------------------
