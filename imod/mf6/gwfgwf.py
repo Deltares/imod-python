@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Dict
 
 import jinja2
 import numpy as np
@@ -13,7 +13,7 @@ def convert_tuples_to_columns(tuple_array: np.ndarray) -> xr.DataArray:
     # TODO: task gitlab 550
     # this conversion will not be necessary anymore if we give the gwfgwf package 2d arrays for structured grids and 1d arrays for unstructured grids.
     if not isinstance(tuple_array[0], (int, np.integer)):
-        array2d = np.ndarray((len(tuple_array), 2), dtype=int)
+        array2d: np.ndarray = np.ndarray((len(tuple_array), 2), dtype=int)
 
         for index in range(len(tuple_array)):
             array2d[index, 0] = tuple_array[index][0]
@@ -30,7 +30,7 @@ class GWFGWF(Package):
     is not instantiated by users, but created by the "split" method of the
     simulation class."""
 
-    _keyword_map = {}
+    _keyword_map: Dict[str,str] = {}
     _pkg_id = "gwfgwf"
 
     def __init__(

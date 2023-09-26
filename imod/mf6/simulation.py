@@ -5,7 +5,7 @@ import copy
 import pathlib
 import subprocess
 import warnings
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Any
 
 import jinja2
 import numpy as np
@@ -163,7 +163,7 @@ class Modflow6Simulation(collections.UserDict):
 
     def render(self, write_context: WriteContext):
         """Renders simulation namefile"""
-        d = {}
+        d: Dict[str, Any] = {}
         models = []
         solutiongroups = []
         for key, value in self.items():
