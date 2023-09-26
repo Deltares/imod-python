@@ -305,6 +305,9 @@ def create_exchange_package() -> imod.mf6.GWFGWF:
     cell_id1 = np.array([(1, 1), (2, 1), (3, 1)], dtype="i,i")
     cell_id2 = np.array([(1, 2), (2, 2), (3, 2)], dtype="i,i")
     layer = np.array([12, 13, 14])
+    cl1 = np.ones(len(cell_id1))
+    cl2 = np.ones(len(cell_id1))
+    hwva = cl1 + cl2
 
     return [
         imod.mf6.GWFGWF(
@@ -313,6 +316,9 @@ def create_exchange_package() -> imod.mf6.GWFGWF:
             cell_id1=cell_id1,
             cell_id2=cell_id2,
             layer=layer,
+            cl1=cl1,
+            cl2=cl2,
+            hwva=hwva
         )
     ]
 

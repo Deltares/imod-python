@@ -62,7 +62,9 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
     new_model = GroundwaterFlowModel(**model._options)
 
     domain_slice = get_active_domain_slice(partition_info.active_domain)
-    sliced_domain = model.domain.isel(domain_slice)
+    sliced_domain = partition_info.active_domain.sel(domain_slice).broadcast_like(
+        model.domain.layer
+    )
     sliced_bottom = model.bottom
 
     for pkg_name, package in model.items():

@@ -1,3 +1,5 @@
+from typing import Callable, NamedTuple
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -35,20 +37,53 @@ def basic_dis():
     return ibound, top, bottom
 
 
+class BasicDisSettings(NamedTuple):
+    nlay: int = 1
+    nrow: int = 1
+    ncol: int = 1
+    zstart: float = 0.0
+    zstop: float = -1.0
+    ystart: float = 0.0
+    ystop: float = 1.0
+    xstart: float = 0.0
+    xstop: float = 1.0
+    dx: float = 1.0
+    dy: float = 1.0
+    dz: float = 1.0
+    space_generator: Callable = np.linspace
+
+
 @pytest.fixture
 def parameterizable_basic_dis(request):
-    shape = nlay, nrow, ncol = request.param
+    settings = request.param
+    shape = (settings.nlay, settings.nrow, settings.ncol)
 
-    dx = dy = dz = 1.0
-
-    x = np.arange(0, ncol + 1) * dx
-    y = np.arange(0, nrow + 1)[::-1] * dy
-    z = -np.arange(0, nlay + 1) * dz
+    x = (
+        settings.space_generator(
+            settings.xstart + 1, settings.xstop + 1, settings.ncol + 1, endpoint=True
+        )
+        - 1
+    )
+    y = (
+        settings.space_generator(
+            settings.ystop + 1, settings.ystart + 1, settings.nrow + 1, endpoint=True
+        )
+        - 1
+    )
+    z = (
+        settings.space_generator(
+            settings.zstart - 1, settings.zstop - 1, settings.nlay + 1, endpoint=True
+        )
+        + 1
+    )
 
     xc = (x[:-1] + x[1:]) / 2
     yc = (y[:-1] + y[1:]) / 2
 
-    layers = np.arange(nlay) + 1
+    dx = x[1:] - x[:-1]
+    dy = y[1:] - y[:-1]
+
+    layers = np.arange(settings.nlay) + 1
 
     idomain = xr.DataArray(
         np.ones(shape, dtype=np.int32),
@@ -56,7 +91,14 @@ def parameterizable_basic_dis(request):
         name="idomain",
     )
 
-    idomain = idomain.assign_coords({"dy": -dy, "dx": dx})
+    if np.all(np.isclose(dx, dx[0])):
+        idomain = idomain.assign_coords({"dx": dx[0]})
+    else:
+        idomain = idomain.assign_coords({"dx": ("x", dx)})
+    if np.all(np.isclose(dy, dy[0])):
+        idomain = idomain.assign_coords({"dy": dy[0]})
+    else:
+        idomain = idomain.assign_coords({"dy": ("y", dy)})
 
     top = xr.DataArray(z[:-1], coords={"layer": layers})
     bottom = xr.DataArray(z[1:], coords={"layer": layers})
