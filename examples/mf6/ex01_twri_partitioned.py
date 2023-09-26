@@ -27,6 +27,8 @@ In overview, we'll set the following steps:
 # We'll start with the usual imports. As this is an simple (synthetic)
 # structured model, we can make due with few packages.
 
+import sys
+
 import numpy as np
 import xarray as xr
 from example_models import create_twri_simulation
@@ -64,6 +66,9 @@ simulation.write(modeldir, binary=False)
 #   The following lines assume the ``mf6`` executable is available on your PATH.
 #   :ref:`The Modflow 6 examples introduction <mf6-introduction>` shortly
 #   describes how to add it to yours.
+
+# TODO: re-enable the running of this example when geometric information is added to the exchange files (gilab 538/ 325)
+sys.exit()
 
 simulation.run()
 
