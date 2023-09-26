@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -14,7 +15,7 @@ from imod.mf6.simulation import get_models, get_packages
 from imod.mf6.statusinfo import StatusInfo
 from imod.schemata import ValidationError
 from imod.typing.grid import zeros_like
-from pathlib import Path
+
 
 def roundtrip(simulation, tmpdir_factory, name):
     # TODO: look at the values?
@@ -43,12 +44,14 @@ def test_twri_disv_roundtrip(twri_disv_model, tmpdir_factory):
 def test_circle_roundtrip(circle_model, tmpdir_factory):
     roundtrip(circle_model, tmpdir_factory, "circle")
 
+
 @pytest.fixture(scope="function")
 def sample_gwfgwf_structured():
     cell_id1 = np.array([(1, 1), (2, 1), (3, 1)], dtype="i,i")
     cell_id2 = np.array([(1, 2), (2, 2), (3, 2)], dtype="i,i")
     layer = np.array([12, 13, 14])
     return imod.mf6.GWFGWF("name1", "name2", cell_id1, cell_id2, layer)
+
 
 @pytest.fixture(scope="function")
 def setup_simulation():
@@ -271,15 +274,17 @@ class TestModflow6Simulation:
         assert expected_exchanges_block in namfile_content
 
     @pytest.mark.usefixtures("transient_twri_model")
-    def test_write_exchanges(self, transient_twri_model, sample_gwfgwf_structured, tmp_path):
+    def test_write_exchanges(
+        self, transient_twri_model, sample_gwfgwf_structured, tmp_path
+    ):
         # arrange
 
-        transient_twri_model["split_exchanges"] = [sample_gwfgwf_structured]            
+        transient_twri_model["split_exchanges"] = [sample_gwfgwf_structured]
         # act
-        transient_twri_model.write (tmp_path, True, True, True)
+        transient_twri_model.write(tmp_path, True, True, True)
 
         # assert
-        assert Path.exists( tmp_path/ sample_gwfgwf_structured.filename())
+        assert Path.exists(tmp_path / sample_gwfgwf_structured.filename())
 
 
 def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo):

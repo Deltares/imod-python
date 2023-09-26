@@ -23,73 +23,71 @@ def sample_gwfgwf_unstructured():
     return imod.mf6.GWFGWF("name1", "name2", cell_id1, cell_id2, layer)
 
 
-@pytest.mark.usefixtures("sample_gwfgwf_structured")
-def test_render_exchange_file_structured(
-    sample_gwfgwf_structured: imod.mf6.GWFGWF, tmp_path: Path
-):
-    # act
-    actual = sample_gwfgwf_structured.render(tmp_path, "gwfgwf", [], False)
+class testGwfgwf:
+    @pytest.mark.usefixtures("sample_gwfgwf_structured")
+    def test_render_exchange_file_structured(
+        sample_gwfgwf_structured: imod.mf6.GWFGWF, tmp_path: Path
+    ):
+        # act
+        actual = sample_gwfgwf_structured.render(tmp_path, "gwfgwf", [], False)
 
-    # assert
+        # assert
 
-    expected = textwrap.dedent(
-        """\
-    begin options
-    end options
+        expected = textwrap.dedent(
+            """\
+        begin options
+        end options
 
-    begin dimensions
-      nexg 3
-    end dimensions
+        begin dimensions
+        nexg 3
+        end dimensions
 
-    begin exchangedata
-    12 1 1 12 1 2 1.0 1.0 1.0 1.0
-    13 2 1 13 2 2 1.0 1.0 1.0 1.0
-    14 3 1 14 3 2 1.0 1.0 1.0 1.0
+        begin exchangedata
+        12 1 1 12 1 2 1.0 1.0 1.0 1.0
+        13 2 1 13 2 2 1.0 1.0 1.0 1.0
+        14 3 1 14 3 2 1.0 1.0 1.0 1.0
 
-    end exchangedata
-    """
-    )
+        end exchangedata
+        """
+        )
 
-    assert actual == expected
+        assert actual == expected
 
+    @pytest.mark.usefixtures("sample_gwfgwf_unstructured")
+    def test_render_exchange_file_unstructured(
+        sample_gwfgwf_unstructured: imod.mf6.GWFGWF, tmp_path: Path
+    ):
+        # act
+        actual = sample_gwfgwf_unstructured.render(tmp_path, "gwfgwf", [], False)
 
-@pytest.mark.usefixtures("sample_gwfgwf_unstructured")
-def test_render_exchange_file_unstructured(
-    sample_gwfgwf_unstructured: imod.mf6.GWFGWF, tmp_path: Path
-):
-    # act
-    actual = sample_gwfgwf_unstructured.render(tmp_path, "gwfgwf", [], False)
+        # assert
 
-    # assert
+        expected = textwrap.dedent(
+            """\
+        begin options
+        end options
 
-    expected = textwrap.dedent(
-        """\
-    begin options
-    end options
+        begin dimensions
+        nexg 3
+        end dimensions
 
-    begin dimensions
-      nexg 3
-    end dimensions
+        begin exchangedata
+        12 1 12 2 1.0 1.0 1.0 1.0
+        13 2 13 2 1.0 1.0 1.0 1.0
+        14 31 14 4 1.0 1.0 1.0 1.0
 
-    begin exchangedata
-    12 1 12 2 1.0 1.0 1.0 1.0
-    13 2 13 2 1.0 1.0 1.0 1.0
-    14 31 14 4 1.0 1.0 1.0 1.0
+        end exchangedata
+        """
+        )
 
-    end exchangedata
-    """
-    )
+        assert actual == expected
 
-    assert actual == expected
+    @pytest.mark.usefixtures("sample_gwfgwf_structured")
+    def test_error_clip(sample_gwfgwf_structured: imod.mf6.GWFGWF):
+        # test error
+        with pytest.raises(NotImplementedError):
+            sample_gwfgwf_structured.clip_box(0, 100, 1, 12, 0, 100, 0, 100)
 
-
-@pytest.mark.usefixtures("sample_gwfgwf_structured")
-def test_error_clip(sample_gwfgwf_structured: imod.mf6.GWFGWF):
-    # test error
-    with pytest.raises(NotImplementedError):
-        sample_gwfgwf_structured.clip_box(0, 100, 1, 12, 0, 100, 0, 100)
-
-
-@pytest.mark.usefixtures("sample_gwfgwf_structured")
-def test_error_regrid(sample_gwfgwf_structured: imod.mf6.GWFGWF):
-    assert not sample_gwfgwf_structured.is_regridding_supported()
+    @pytest.mark.usefixtures("sample_gwfgwf_structured")
+    def test_error_regrid(sample_gwfgwf_structured: imod.mf6.GWFGWF):
+        assert not sample_gwfgwf_structured.is_regridding_supported()

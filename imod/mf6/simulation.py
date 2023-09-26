@@ -261,7 +261,9 @@ class Modflow6Simulation(collections.UserDict):
             elif isinstance(value, list):
                 for exchange in value:
                     if isinstance(exchange, imod.mf6.GWFGWF):
-                        exchange.write(exchange.packagename(), globaltimes, write_context)
+                        exchange.write(
+                            exchange.packagename(), globaltimes, write_context
+                        )
 
         if status_info.has_errors():
             raise ValidationError("\n" + validation_model_error_message(status_info))
