@@ -48,6 +48,14 @@ class GWFGWF(Package):
         self.dataset["model_name_1"] = model_id1
         self.dataset["model_name_2"] = model_id2
 
+
+        number_rows = self.dataset["cell_id1"].shape[0]
+        ones_vector = xr.DataArray(   [1 for i in range(number_rows)])
+        self.dataset["ihc"] = ones_vector
+        self.dataset["cl1"]=  ones_vector
+        self.dataset["cl2"]=  ones_vector
+        self.dataset["hwva"]= ones_vector
+
     def set_options(
         self,
         print_input: bool,
@@ -98,6 +106,10 @@ class GWFGWF(Package):
                 "cellid": self.dataset["cell_id1"].values[:],
                 "layer2": self.dataset["layer"].values,
                 "cellid2": self.dataset["cell_id2"].values[:],
+                "ihc":  self.dataset["ihc"] ,
+                "cl1": self.dataset["cl1"], 
+                "cl2": self.dataset["cl2"] , 
+                "hwva": self.dataset["hwva"] ,         
             }
         elif cellid_shape_dimension == 2:
             exchangeblock = {
@@ -107,6 +119,10 @@ class GWFGWF(Package):
                 "layer2": self.dataset["layer"].values,
                 "cellid2_d1": self.dataset["cell_id2"].values[:, 0],
                 "cellid2_d2": self.dataset["cell_id2"].values[:, 1],
+                "ihc":  self.dataset["ihc"] ,
+                "cl1": self.dataset["cl1"], 
+                "cl2": self.dataset["cl2"] , 
+                "hwva": self.dataset["hwva"] ,                         
             }
         else:
             raise ValueError("unexpected dimension in cell_id1")

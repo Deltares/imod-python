@@ -42,9 +42,9 @@ def test_render_exchange_file_structured(
     end dimensions
 
     begin exchangedata
-    12 1 1 12 1 2
-    13 2 1 13 2 2
-    14 3 1 14 3 2
+    12 1 1 12 1 2 1.0 1.0 1.0 1.0
+    13 2 1 13 2 2 1.0 1.0 1.0 1.0
+    14 3 1 14 3 2 1.0 1.0 1.0 1.0
 
     end exchangedata
     """
@@ -72,9 +72,9 @@ def test_render_exchange_file_unstructured(
     end dimensions
 
     begin exchangedata
-    12 1 12 2
-    13 2 13 2
-    14 31 14 4
+    12 1 12 2 1.0 1.0 1.0 1.0
+    13 2 13 2 1.0 1.0 1.0 1.0
+    14 31 14 4 1.0 1.0 1.0 1.0
 
     end exchangedata
     """

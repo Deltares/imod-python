@@ -32,14 +32,6 @@ from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray
 
 
-def first(container, predicate):
-    for key, value in container.items():
-        if predicate(key, value):
-            return value
-
-    raise ValueError("Item not found")
-
-
 def get_models(simulation: Modflow6Simulation) -> Dict[str, Modflow6Model]:
     return {
         model_name: model
@@ -268,7 +260,8 @@ class Modflow6Simulation(collections.UserDict):
                     value.write(key, globaltimes, ims_write_context)
             elif isinstance(value, list):
                 for exchange in value:
-                    exchange.write(exchange.packagename(), globaltimes, write_context)
+                    if isinstance(exchange, imod.mf6.GWFGWF):
+                        exchange.write(exchange.packagename(), globaltimes, write_context)
 
         if status_info.has_errors():
             raise ValidationError("\n" + validation_model_error_message(status_info))

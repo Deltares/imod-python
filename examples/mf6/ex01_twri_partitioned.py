@@ -67,9 +67,6 @@ simulation.write(modeldir, binary=False)
 #   :ref:`The Modflow 6 examples introduction <mf6-introduction>` shortly
 #   describes how to add it to yours.
 
-# TODO: re-enable the running of this example when geometric information is added to the exchange files (gilab 538/ 325)
-sys.exit()
-
 simulation.run()
 
 # %%
@@ -95,7 +92,6 @@ for id in np.arange(0, number_partitions):
 
 head = xr.merge(heads)
 head["head"].isel(layer=0, time=0).plot.contourf()
-
 
 # %%
 # Visualize the results
