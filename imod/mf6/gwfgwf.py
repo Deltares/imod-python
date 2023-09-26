@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Tuple, Union, Dict
+from typing import Dict, List, Tuple, Union
 
 import jinja2
 import numpy as np
@@ -30,7 +30,7 @@ class GWFGWF(Package):
     is not instantiated by users, but created by the "split" method of the
     simulation class."""
 
-    _keyword_map: Dict[str,str] = {}
+    _keyword_map: Dict[str, str] = {}
     _pkg_id = "gwfgwf"
 
     def __init__(
