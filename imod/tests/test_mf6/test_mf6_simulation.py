@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
+import xarray as xr
 import xugrid as xu
 
 import imod
@@ -88,8 +89,9 @@ class TestModflow6Simulation:
         with pytest.raises(ValidationError):
             simulation.write(tmp_path)
 
+    @mock.patch("imod.mf6.simulation.ExchangeCreator")
     def test_split_simulation_only_has_packages(
-        self, basic_unstructured_dis, setup_simulation
+        self, exchange_creator_mock, basic_unstructured_dis, setup_simulation
     ):
         # Arrange.
         idomain, top, bottom = basic_unstructured_dis
@@ -116,8 +118,13 @@ class TestModflow6Simulation:
         assert new_simulation["disv"] is simulation["disv"]
 
     @mock.patch("imod.mf6.simulation.slice_model", autospec=True)
+    @mock.patch("imod.mf6.simulation.ExchangeCreator")
     def test_split_multiple_models(
-        self, slice_model_mock, basic_unstructured_dis, setup_simulation
+        self,
+        exchange_creator_mock,
+        slice_model_mock,
+        basic_unstructured_dis,
+        setup_simulation,
     ):
         # Arrange.
         idomain, top, bottom = basic_unstructured_dis
@@ -169,6 +176,62 @@ class TestModflow6Simulation:
                 and (expected_call[1] is call_args[0][1])
                 for call_args in slice_model_mock.call_args_list
             )
+
+    @mock.patch("imod.mf6.simulation.slice_model", autospec=True)
+    @mock.patch("imod.mf6.simulation.ExchangeCreator", autospec=True)
+    @mock.patch("imod.mf6.simulation.create_partition_info")
+    def test_split_multiple_models_creates_expected_number_of_exchanges(
+        self,
+        create_partition_info_mock,
+        exchange_creator_mock,
+        slice_model_mock,
+        basic_dis,
+        setup_simulation,
+    ):
+        # Arrange.
+        idomain, top, bottom = basic_dis
+
+        simulation = setup_simulation
+
+        model_mock1 = MagicMock(spec_set=Modflow6Model)
+        model_mock1._model_id = "test_model_id1"
+        model_mock1.domain = idomain
+
+        model_mock2 = MagicMock(spec_set=Modflow6Model)
+        model_mock2._model_id = "test_model_id2"
+        model_mock2.domain = idomain
+
+        simulation["test_model1"] = model_mock1
+        simulation["test_model2"] = model_mock2
+
+        simulation["solver"]["modelnames"] = ["test_model1", "test_model2"]
+
+        slice_model_mock.return_value = MagicMock(spec_set=Modflow6Model)
+
+        active = idomain.sel(layer=1)
+        submodel_labels = xr.zeros_like(active).where(active.y > 50, 1)
+
+        create_partition_info_mock.return_value = [
+            PartitionInfo(id=0, active_domain=xr.DataArray(0)),
+            PartitionInfo(id=1, active_domain=xr.DataArray(1)),
+        ]
+        # Act.
+        _ = simulation.split(submodel_labels)
+
+        # Assert.
+        exchange_creator_mock.assert_called_with(
+            submodel_labels, create_partition_info_mock()
+        )
+
+        assert exchange_creator_mock.return_value.create_exchanges.call_count == 2
+        call1 = exchange_creator_mock.return_value.create_exchanges.call_args_list[0][0]
+        call2 = exchange_creator_mock.return_value.create_exchanges.call_args_list[1][0]
+
+        assert call1[0] == "test_model1"
+        xr.testing.assert_equal(call1[1], idomain.layer)
+
+        assert call2[0] == "test_model2"
+        xr.testing.assert_equal(call2[1], idomain.layer)
 
 
 def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo):

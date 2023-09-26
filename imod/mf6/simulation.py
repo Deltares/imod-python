@@ -15,6 +15,7 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.mf6.exchange_creator import ExchangeCreator
 from imod.mf6.model import (
     GroundwaterFlowModel,
     GroundwaterTransportModel,
@@ -420,22 +421,33 @@ class Modflow6Simulation(collections.UserDict):
 
         The method return a new simulation containing all the split models and packages
         """
-        models = get_models(self)
-        packages = get_packages(self)
+
+        original_models = get_models(self)
+        original_packages = get_packages(self)
+
+        partition_info = create_partition_info(submodel_labels)
+        exchange_creator = ExchangeCreator(submodel_labels, partition_info)
 
         new_simulation = imod.mf6.Modflow6Simulation(f"{self.name}_partioned")
-        for package_name, package in {**packages}.items():
+        for package_name, package in {**original_packages}.items():
             new_simulation[package_name] = package
 
-        model_names = []
-        partition_info = create_partition_info(submodel_labels)
-        for submodel_partition_info in partition_info:
-            for model_name, model in models.items():
-                model_name = f"{model_name}_{submodel_partition_info.id}"
-                new_simulation[model_name] = slice_model(submodel_partition_info, model)
-                model_names.append(model_name)
+        for model_name, model in original_models.items():
+            for submodel_partition_info in partition_info:
+                new_model_name = f"{model_name}_{submodel_partition_info.id}"
+                new_simulation[new_model_name] = slice_model(
+                    submodel_partition_info, model
+                )
 
-        new_simulation["solver"]["modelnames"] = xr.DataArray(model_names)
+        exchanges = []
+        for model_name, model in original_models.items():
+            exchanges += exchange_creator.create_exchanges(
+                model_name, model.domain.layer
+            )
+
+        new_simulation["solver"]["modelnames"] = xr.DataArray(
+            list(get_models(new_simulation).keys())
+        )
 
         return new_simulation
 
