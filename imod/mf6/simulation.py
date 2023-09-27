@@ -5,7 +5,7 @@ import copy
 import pathlib
 import subprocess
 import warnings
-from typing import Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import jinja2
 import numpy as np
@@ -16,6 +16,7 @@ import xugrid as xu
 
 import imod
 from imod.mf6.exchange_creator import ExchangeCreator
+from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.model import (
     GroundwaterFlowModel,
     GroundwaterTransportModel,
@@ -23,6 +24,7 @@ from imod.mf6.model import (
 )
 from imod.mf6.modelsplitter import create_partition_info, slice_model
 from imod.mf6.package import Package
+from imod.mf6.pkgbase import PackageBase
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
@@ -153,7 +155,7 @@ class Modflow6Simulation(collections.UserDict):
 
     def render(self, write_context: WriteContext):
         """Renders simulation namefile"""
-        d = {}
+        d: Dict[str, Any] = {}
         models = []
         solutiongroups = []
         for key, value in self.items():
@@ -162,22 +164,23 @@ class Modflow6Simulation(collections.UserDict):
                     write_context.root_directory / pathlib.Path(f"{key}", f"{key}.nam")
                 ).as_posix()
                 models.append((value._model_id, model_name_file, key))
+            elif isinstance(value, PackageBase):
+                if value._pkg_id == "tdis":
+                    d["tdis6"] = f"{key}.tdis"
+                elif value._pkg_id == "ims":
+                    slnnames = value["modelnames"].values
+                    modeltypes = set()
+                    for name in slnnames:
+                        try:
+                            modeltypes.add(type(self[name]))
+                        except KeyError:
+                            raise KeyError(f"model {name} of {key} not found")
 
-            elif value._pkg_id == "tdis":
-                d["tdis6"] = f"{key}.tdis"
-            elif value._pkg_id == "ims":
-                slnnames = value["modelnames"].values
-                modeltypes = set()
-                for name in slnnames:
-                    try:
-                        modeltypes.add(type(self[name]))
-                    except KeyError:
-                        raise KeyError(f"model {name} of {key} not found")
-                if len(modeltypes) > 1:
-                    raise ValueError(
-                        "Only a single type of model allowed in a solution"
-                    )
-                solutiongroups.append(("ims6", f"{key}.ims", slnnames))
+                    if len(modeltypes) > 1:
+                        raise ValueError(
+                            "Only a single type of model allowed in a solution"
+                        )
+                    solutiongroups.append(("ims6", f"{key}.ims", slnnames))
 
         d["models"] = models
         if len(models) > 1:
@@ -249,11 +252,18 @@ class Modflow6Simulation(collections.UserDict):
                         write_context=model_write_context,
                     )
                 )
-            elif value._pkg_id == "ims":
-                ims_write_context = write_context.copy_with_new_write_directory(
-                    write_context.simulation_directory
-                )
-                value.write(key, globaltimes, ims_write_context)
+            elif isinstance(value, PackageBase):
+                if value._pkg_id == "ims":
+                    ims_write_context = write_context.copy_with_new_write_directory(
+                        write_context.simulation_directory
+                    )
+                    value.write(key, globaltimes, ims_write_context)
+            elif isinstance(value, list):
+                for exchange in value:
+                    if isinstance(exchange, imod.mf6.GWFGWF):
+                        exchange.write(
+                            exchange.packagename(), globaltimes, write_context
+                        )
 
         if status_info.has_errors():
             raise ValidationError("\n" + validation_model_error_message(status_info))
@@ -336,6 +346,7 @@ class Modflow6Simulation(collections.UserDict):
         result = []
         flowmodels = self.get_models_of_type("gwf6")
         transportmodels = self.get_models_of_type("gwt6")
+        # exchange for flow and transport
         if len(flowmodels) == 1 and len(transportmodels) > 0:
             exchange_type = "GWF6-GWT6"
             modelname_a = list(flowmodels.keys())[0]
@@ -343,6 +354,12 @@ class Modflow6Simulation(collections.UserDict):
                 filename = f"simulation{counter}.exg"
                 modelname_b = key
                 result.append((exchange_type, filename, modelname_a, modelname_b))
+
+        # exchange for splitting models
+        if "split_exchanges" in self.keys():
+            for exchange in self["split_exchanges"]:
+                result.append(exchange.get_specification())
+
         return result
 
     def get_models_of_type(self, modeltype):
@@ -448,6 +465,7 @@ class Modflow6Simulation(collections.UserDict):
         new_simulation["solver"]["modelnames"] = xr.DataArray(
             list(get_models(new_simulation).keys())
         )
+        new_simulation._add_modelsplit_exchanges(exchanges)
 
         return new_simulation
 
@@ -487,3 +505,8 @@ class Modflow6Simulation(collections.UserDict):
                 raise NotImplementedError(f"regridding not supported for {key}")
 
         return result
+
+    def _add_modelsplit_exchanges(self, exchanges_list: List[GWFGWF]) -> None:
+        if "split_exchanges" not in self.keys():
+            self["split_exchanges"] = []
+        self["split_exchanges"].extend(exchanges_list)

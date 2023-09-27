@@ -31,7 +31,7 @@ class ExchangeCreator:
             self._create_global_cellidx_to_local_cellid_mapping(partition_info)
         )
 
-    def create_exchanges(self, model_name: str, layers: GridDataArray):
+    def create_exchanges(self, model_name: str, layers: GridDataArray) -> List[GWFGWF]:
         """
         Create GroundWaterFlow-GroundWaterFlow exchanges based on the submodel_labels array provided in the class
         constructor. The layer parameter is used to extrude the cell connection through all the layers. An exchange
