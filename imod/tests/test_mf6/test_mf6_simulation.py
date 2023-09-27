@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -13,6 +14,7 @@ from imod.mf6.modelsplitter import PartitionInfo
 from imod.mf6.simulation import get_models, get_packages
 from imod.mf6.statusinfo import StatusInfo
 from imod.schemata import ValidationError
+from imod.typing.grid import zeros_like
 
 
 def roundtrip(simulation, tmpdir_factory, name):
@@ -41,6 +43,14 @@ def test_twri_disv_roundtrip(twri_disv_model, tmpdir_factory):
 @pytest.mark.usefixtures("circle_model")
 def test_circle_roundtrip(circle_model, tmpdir_factory):
     roundtrip(circle_model, tmpdir_factory, "circle")
+
+
+@pytest.fixture(scope="function")
+def sample_gwfgwf_structured():
+    cell_id1 = np.array([(1, 1), (2, 1), (3, 1)], dtype="i,i")
+    cell_id2 = np.array([(1, 2), (2, 2), (3, 2)], dtype="i,i")
+    layer = np.array([12, 13, 14])
+    return imod.mf6.GWFGWF("name1", "name2", cell_id1, cell_id2, layer)
 
 
 @pytest.fixture(scope="function")
@@ -232,6 +242,49 @@ class TestModflow6Simulation:
 
         assert call2[0] == "test_model2"
         xr.testing.assert_equal(call2[1], idomain.layer)
+
+    @pytest.mark.usefixtures("transient_twri_model")
+    def test_exchanges_in_simulation_file(self, transient_twri_model, tmp_path):
+        # arrange
+        active = transient_twri_model["GWF_1"].domain.sel(layer=1)
+        transient_twri_model["GWF_1"].pop("wel")
+        number_partitions = 3
+        split_location = np.linspace(
+            active.y.min(), active.y.max(), number_partitions + 1
+        )
+
+        coords = active.coords
+        submodel_labels = zeros_like(active)
+        for id in np.arange(1, number_partitions):
+            submodel_labels.loc[
+                (coords["y"] > split_location[id])
+                & (coords["y"] <= split_location[id + 1])
+            ] = id
+
+        # act
+        split_simulation = transient_twri_model.split(submodel_labels)
+
+        # assert
+        assert len(split_simulation["split_exchanges"]) == 2
+        split_simulation.write(tmp_path, False, True, False)
+
+        expected_exchanges_block = "exchanges\n  GWF6-GWF6 GWF_1_1_GWF_1_0.gwfgwf GWF_1_1 GWF_1_0\n  GWF6-GWF6 GWF_1_2_GWF_1_1.gwfgwf GWF_1_2 GWF_1_1\n\nend exchanges"
+        with open(tmp_path / "mfsim.nam", mode="r") as mfsim_nam:
+            namfile_content = mfsim_nam.read()
+        assert expected_exchanges_block in namfile_content
+
+    @pytest.mark.usefixtures("transient_twri_model")
+    def test_write_exchanges(
+        self, transient_twri_model, sample_gwfgwf_structured, tmp_path
+    ):
+        # arrange
+
+        transient_twri_model["split_exchanges"] = [sample_gwfgwf_structured]
+        # act
+        transient_twri_model.write(tmp_path, True, True, True)
+
+        # assert
+        assert Path.exists(tmp_path / sample_gwfgwf_structured.filename())
 
 
 def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo):
