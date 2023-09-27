@@ -404,6 +404,7 @@ def test_simulation_render(twri_model):
             end models
 
             begin exchanges
+
             end exchanges
 
             begin solutiongroup 1
