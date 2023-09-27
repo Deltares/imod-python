@@ -7,8 +7,8 @@ import xarray as xr
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.modelsplitter import PartitionInfo
 from imod.mf6.utilities.grid_utilities import get_active_domain_slice
-from imod.typing.grid import GridDataArray
-
+from imod.typing.grid import GridDataArray, zeros_like
+import copy
 
 class ExchangeCreator:
     """
@@ -24,9 +24,14 @@ class ExchangeCreator:
         self, submodel_labels: GridDataArray, partition_info: List[PartitionInfo]
     ):
         self._submodel_labels = submodel_labels
+        is_unstructured = hasattr( submodel_labels, "ugrid")
 
         self._global_cell_indices = _to_cell_idx(submodel_labels)
-        self._connected_cells = self._find_connected_cells()
+        if is_unstructured:
+            self._connected_cells = self._find_connected_cells_unstructured()
+        else:
+            self._connected_cells = self._find_connected_cells_structured()
+
         self._global_to_local_mapping = (
             self._create_global_cellidx_to_local_cellid_mapping(partition_info)
         )
@@ -97,11 +102,37 @@ class ExchangeCreator:
 
         return exchanges
 
-    def _find_connected_cells(self):
+    def _find_connected_cells_structured(self):
         connected_cells_along_x = self._find_connected_cells_along_axis("x")
         connected_cells_along_y = self._find_connected_cells_along_axis("y")
 
         return pd.merge(connected_cells_along_x, connected_cells_along_y, how="outer")
+    
+    def _find_connected_cells_unstructured(self):
+        edge_face = copy.deepcopy(self._submodel_labels.ugrid.grid.edge_face_connectivity)
+        edge_index = [ i for i in range(len(edge_face))]
+
+        f1 = edge_face[:,0]
+        f2 = edge_face[:,1]
+        f1 = np.where( f2 >= 0, f1, -1)
+        f2 = np.where( f1 >= 0, f2, -1)
+        label_of_edge1 = self._submodel_labels.values[f1]
+        label_of_edge2 = self._submodel_labels.values[f2]
+        edge_indices_internal_boundary = np.where( label_of_edge1  - label_of_edge2!= 0, edge_index, -1)
+        edge_indices_internal_boundary = np.setdiff1d(edge_indices_internal_boundary, [-1])
+        internal_boundary = edge_face[edge_indices_internal_boundary]
+
+        connected_cell_info = pd.DataFrame(
+            {
+                "cell_idx1": internal_boundary[:,0],
+                "cell_idx2": internal_boundary[:,1],
+                "cell_label1": label_of_edge1[edge_indices_internal_boundary],
+                "cell_label2":label_of_edge2[edge_indices_internal_boundary],
+            })
+
+        return         connected_cell_info 
+
+    
 
     def _find_connected_cells_along_axis(self, axis_label: str):
         diff1 = self._submodel_labels.diff(f"{axis_label}", label="lower")
@@ -204,7 +235,7 @@ def _get_local_cell_indices(submodel_partition_info: PartitionInfo):
 
 def _to_cell_idx(idomain: GridDataArray):
     index = np.arange(idomain.size).reshape(idomain.shape)
-    domain_index = xr.zeros_like(idomain)
+    domain_index = zeros_like(idomain)
     domain_index.values = index
 
     return domain_index
