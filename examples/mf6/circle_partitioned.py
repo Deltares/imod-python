@@ -13,4 +13,9 @@ submodel_labels = idomain.sel({"layer": 1})
 submodel_labels.values[:101] = 0
 submodel_labels.values[101:] = 1
 
-simulation.split(submodel_labels)
+new_sim = simulation.split(submodel_labels)
+
+tmp_path  = imod.util.temporary_directory()
+
+new_sim.write(tmp_path, False)
+pass

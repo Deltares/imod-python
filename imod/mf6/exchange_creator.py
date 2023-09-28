@@ -4,10 +4,11 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+from typing import Dict
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.modelsplitter import PartitionInfo
 from imod.mf6.utilities.grid_utilities import get_active_domain_slice
-from imod.typing.grid import GridDataArray, zeros_like
+from imod.typing.grid import GridDataArray, zeros_like, is_unstructured
 import copy
 
 class ExchangeCreator:
@@ -24,10 +25,9 @@ class ExchangeCreator:
         self, submodel_labels: GridDataArray, partition_info: List[PartitionInfo]
     ):
         self._submodel_labels = submodel_labels
-        is_unstructured = hasattr( submodel_labels, "ugrid")
 
         self._global_cell_indices = _to_cell_idx(submodel_labels)
-        if is_unstructured:
+        if is_unstructured(submodel_labels):
             self._connected_cells = self._find_connected_cells_unstructured()
         else:
             self._connected_cells = self._find_connected_cells_structured()
@@ -130,7 +130,7 @@ class ExchangeCreator:
                 "cell_label2":label_of_edge2[edge_indices_internal_boundary],
             })
 
-        return         connected_cell_info 
+        return  connected_cell_info 
 
     
 
@@ -183,12 +183,22 @@ class ExchangeCreator:
 
 def _create_global_to_local_idx(
     partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
-):
+)->Dict[str, pd.DataFrame]:
     global_to_local_idx = {}
     for submodel_partition_info in partition_info:
         local_cell_indices = _get_local_cell_indices(submodel_partition_info)
+
+        if  is_unstructured( global_cell_indices):
+            local_cell_indices_df = local_cell_indices.to_dataframe()
+            global_cell_indices_df = global_cell_indices.to_dataframe(  )
+            local_cell_indices_da = xr.Dataset.from_dataframe( local_cell_indices_df)
+            global_cell_indices_da = xr.Dataset.from_dataframe( global_cell_indices_df)
+        else:
+            local_cell_indices_da = local_cell_indices
+            global_cell_indices_da = global_cell_indices           
+
         overlap = xr.merge(
-            (global_cell_indices, local_cell_indices),
+            (global_cell_indices_da, local_cell_indices_da),
             join="inner",
             fill_value=np.nan,
             compat="override",
@@ -209,19 +219,32 @@ def _local_cell_idx_to_id(partition_info):
     local_cell_idx_to_id = {}
     for submodel_partition_info in partition_info:
         local_cell_indices = _get_local_cell_indices(submodel_partition_info)
-        local_row, local_column = np.unravel_index(
-            local_cell_indices, local_cell_indices.shape
-        )
 
-        model_id = submodel_partition_info.id
-        local_cell_idx_to_id[model_id] = pd.DataFrame(
-            {
-                "local_idx": local_cell_indices.values.flatten(),
-                "local_cell_id": zip(
-                    local_row.flatten() + 1, local_column.flatten() + 1
-                ),
-            }
-        )
+        if is_unstructured(local_cell_indices):
+            local_idx= np.unravel_index(
+                local_cell_indices, local_cell_indices.shape
+            )
+            model_id = submodel_partition_info.id
+            local_cell_idx_to_id[model_id] = pd.DataFrame(
+                {
+                    "local_idx": local_idx[0],
+                    "local_cell_id": local_idx[0]
+                }
+            )
+        else:
+            local_row, local_column = np.unravel_index(
+                local_cell_indices, local_cell_indices.shape
+            )
+
+            model_id = submodel_partition_info.id
+            local_cell_idx_to_id[model_id] = pd.DataFrame(
+                {
+                    "local_idx": local_cell_indices.values.flatten(),
+                    "local_cell_id": zip(
+                        local_row.flatten() + 1, local_column.flatten() + 1
+                    ),
+                }
+            )
 
     return local_cell_idx_to_id
 

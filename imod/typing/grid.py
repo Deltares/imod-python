@@ -36,3 +36,6 @@ def nan_like(grid: xr.DataArray, *args, **kwargs):
 @typedispatch
 def nan_like(grid: xu.UgridDataArray, *args, **kwargs):
     return xu.full_like(grid, fill_value=np.nan, dtype=np.float32, *args, **kwargs)
+
+def is_unstructured( grid: GridDataArray) -> bool:
+    return hasattr( grid, "ugrid")
