@@ -1,15 +1,15 @@
-from typing import List
+import copy
+from typing import Dict, List
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
-from typing import Dict
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.modelsplitter import PartitionInfo
 from imod.mf6.utilities.grid_utilities import get_active_domain_slice
-from imod.typing.grid import GridDataArray, zeros_like, is_unstructured
-import copy
+from imod.typing.grid import GridDataArray, is_unstructured, zeros_like
+
 
 class ExchangeCreator:
     """
@@ -107,32 +107,37 @@ class ExchangeCreator:
         connected_cells_along_y = self._find_connected_cells_along_axis("y")
 
         return pd.merge(connected_cells_along_x, connected_cells_along_y, how="outer")
-    
-    def _find_connected_cells_unstructured(self):
-        edge_face = copy.deepcopy(self._submodel_labels.ugrid.grid.edge_face_connectivity)
-        edge_index = [ i for i in range(len(edge_face))]
 
-        f1 = edge_face[:,0]
-        f2 = edge_face[:,1]
-        f1 = np.where( f2 >= 0, f1, -1)
-        f2 = np.where( f1 >= 0, f2, -1)
+    def _find_connected_cells_unstructured(self):
+        edge_face = copy.deepcopy(
+            self._submodel_labels.ugrid.grid.edge_face_connectivity
+        )
+        edge_index = [i for i in range(len(edge_face))]
+
+        f1 = edge_face[:, 0]
+        f2 = edge_face[:, 1]
+        f1 = np.where(f2 >= 0, f1, -1)
+        f2 = np.where(f1 >= 0, f2, -1)
         label_of_edge1 = self._submodel_labels.values[f1]
         label_of_edge2 = self._submodel_labels.values[f2]
-        edge_indices_internal_boundary = np.where( label_of_edge1  - label_of_edge2!= 0, edge_index, -1)
-        edge_indices_internal_boundary = np.setdiff1d(edge_indices_internal_boundary, [-1])
+        edge_indices_internal_boundary = np.where(
+            label_of_edge1 - label_of_edge2 != 0, edge_index, -1
+        )
+        edge_indices_internal_boundary = np.setdiff1d(
+            edge_indices_internal_boundary, [-1]
+        )
         internal_boundary = edge_face[edge_indices_internal_boundary]
 
         connected_cell_info = pd.DataFrame(
             {
-                "cell_idx1": internal_boundary[:,0]+1,
-                "cell_idx2": internal_boundary[:,1]+1,
+                "cell_idx1": internal_boundary[:, 0] + 1,
+                "cell_idx2": internal_boundary[:, 1] + 1,
                 "cell_label1": label_of_edge1[edge_indices_internal_boundary],
-                "cell_label2":label_of_edge2[edge_indices_internal_boundary],
-            })
+                "cell_label2": label_of_edge2[edge_indices_internal_boundary],
+            }
+        )
 
-        return  connected_cell_info 
-
-    
+        return connected_cell_info
 
     def _find_connected_cells_along_axis(self, axis_label: str):
         diff1 = self._submodel_labels.diff(f"{axis_label}", label="lower")
@@ -183,22 +188,26 @@ class ExchangeCreator:
 
 def _create_global_to_local_idx(
     partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
-)->Dict[str, pd.DataFrame]:
+) -> Dict[str, pd.DataFrame]:
     global_to_local_idx = {}
     for submodel_partition_info in partition_info:
         local_cell_indices = _get_local_cell_indices(submodel_partition_info)
 
-        if  is_unstructured( global_cell_indices):
-            global_cell_indices_partition =  global_cell_indices.where( submodel_partition_info.active_domain ==  1 )
-            global_cell_indices_partition = global_cell_indices_partition.dropna("mesh2d_nFaces", how= "all")
+        if is_unstructured(global_cell_indices):
+            global_cell_indices_partition = global_cell_indices.where(
+                submodel_partition_info.active_domain == 1
+            )
+            global_cell_indices_partition = global_cell_indices_partition.dropna(
+                "mesh2d_nFaces", how="all"
+            )
 
             local_cell_indices_df = local_cell_indices.to_dataframe()
-            global_cell_indices_df = global_cell_indices_partition.to_dataframe(  )
-            local_cell_indices_da = xr.Dataset.from_dataframe( local_cell_indices_df)
-            global_cell_indices_da = xr.Dataset.from_dataframe( global_cell_indices_df)
+            global_cell_indices_df = global_cell_indices_partition.to_dataframe()
+            local_cell_indices_da = xr.Dataset.from_dataframe(local_cell_indices_df)
+            global_cell_indices_da = xr.Dataset.from_dataframe(global_cell_indices_df)
         else:
             local_cell_indices_da = local_cell_indices
-            global_cell_indices_da = global_cell_indices           
+            global_cell_indices_da = global_cell_indices
 
         overlap = xr.merge(
             (global_cell_indices_da, local_cell_indices_da),
@@ -224,15 +233,10 @@ def _local_cell_idx_to_id(partition_info):
         local_cell_indices = _get_local_cell_indices(submodel_partition_info)
 
         if is_unstructured(local_cell_indices):
-            local_idx= np.unravel_index(
-                local_cell_indices, local_cell_indices.shape
-            )
+            local_idx = np.unravel_index(local_cell_indices, local_cell_indices.shape)
             model_id = submodel_partition_info.id
             local_cell_idx_to_id[model_id] = pd.DataFrame(
-                {
-                    "local_idx": local_idx[0],
-                    "local_cell_id": local_idx[0]
-                }
+                {"local_idx": local_idx[0], "local_cell_id": local_idx[0]}
             )
         else:
             local_row, local_column = np.unravel_index(

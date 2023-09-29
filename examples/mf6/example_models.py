@@ -11,6 +11,7 @@ import numpy as np
 import scipy.ndimage
 import xarray as xr
 import xugrid as xu
+
 import imod
 from imod.typing.grid import nan_like
 
@@ -499,6 +500,7 @@ def create_hondsrug_simulation() -> imod.mf6.Modflow6Simulation:
 
     return simulation
 
+
 def create_circle_simulation():
     """
     There is a separate example contained in `circle
@@ -510,9 +512,9 @@ def create_circle_simulation():
     simulation.
     """
 
-# %%
-# Create a mesh
-# -------------
+    # %%
+    # Create a mesh
+    # -------------
 
     grid = imod.data.circle()
 
@@ -535,11 +537,12 @@ def create_circle_simulation():
     rch_rate = xu.full_like(idomain.sel(layer=1), 0.001, dtype=float)
     bottom = idomain * xr.DataArray([5.0, 0.0], dims=["layer"])
 
-
-    chd_location = xu.zeros_like(idomain.sel(layer=2), dtype=bool).ugrid.binary_dilation(
-        border_value=True
+    chd_location = xu.zeros_like(
+        idomain.sel(layer=2), dtype=bool
+    ).ugrid.binary_dilation(border_value=True)
+    constant_head = xu.full_like(idomain.sel(layer=2), 1.0, dtype=float).where(
+        chd_location
     )
-    constant_head = xu.full_like(idomain.sel(layer=2), 1.0, dtype=float).where(chd_location)
 
     gwf_model = imod.mf6.GroundwaterFlowModel()
     gwf_model["disv"] = imod.mf6.VerticesDiscretization(
@@ -584,6 +587,5 @@ def create_circle_simulation():
         relaxation_factor=0.97,
     )
     simulation.create_time_discretization(additional_times=["2000-01-01", "2000-01-02"])
-
 
     return simulation
