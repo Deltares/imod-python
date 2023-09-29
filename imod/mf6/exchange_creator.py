@@ -124,8 +124,8 @@ class ExchangeCreator:
 
         connected_cell_info = pd.DataFrame(
             {
-                "cell_idx1": internal_boundary[:,0],
-                "cell_idx2": internal_boundary[:,1],
+                "cell_idx1": internal_boundary[:,0]+1,
+                "cell_idx2": internal_boundary[:,1]+1,
                 "cell_label1": label_of_edge1[edge_indices_internal_boundary],
                 "cell_label2":label_of_edge2[edge_indices_internal_boundary],
             })
@@ -189,8 +189,11 @@ def _create_global_to_local_idx(
         local_cell_indices = _get_local_cell_indices(submodel_partition_info)
 
         if  is_unstructured( global_cell_indices):
+            global_cell_indices_partition =  global_cell_indices.where( submodel_partition_info.active_domain ==  1 )
+            global_cell_indices_partition = global_cell_indices_partition.dropna("mesh2d_nFaces", how= "all")
+
             local_cell_indices_df = local_cell_indices.to_dataframe()
-            global_cell_indices_df = global_cell_indices.to_dataframe(  )
+            global_cell_indices_df = global_cell_indices_partition.to_dataframe(  )
             local_cell_indices_da = xr.Dataset.from_dataframe( local_cell_indices_df)
             global_cell_indices_da = xr.Dataset.from_dataframe( global_cell_indices_df)
         else:
