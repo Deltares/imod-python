@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from example_models import create_circle_simulation
 
 import imod
-from imod.typing.grid import zeros_like
 
 simulation = create_circle_simulation()
 tmp_path = imod.util.temporary_directory()

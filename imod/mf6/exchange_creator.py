@@ -108,7 +108,7 @@ class ExchangeCreator:
 
         return pd.merge(connected_cells_along_x, connected_cells_along_y, how="outer")
 
-    def _find_connected_cells_unstructured(self)->pd.DataFrame:
+    def _find_connected_cells_unstructured(self) -> pd.DataFrame:
         # make a deepcopy to avoid changing the original
         edge_face = copy.deepcopy(
             self._submodel_labels.ugrid.grid.edge_face_connectivity
@@ -117,9 +117,9 @@ class ExchangeCreator:
 
         f1 = edge_face[:, 0]
         f2 = edge_face[:, 1]
-        
+
         # edges at the external boundary have one -1 for the external "gridblock"
-        # we set both entries to -1 here so that en exteral edge will have [-1, -1] 
+        # we set both entries to -1 here so that en exteral edge will have [-1, -1]
         f1 = np.where(f2 >= 0, f1, -1)
         f2 = np.where(f1 >= 0, f2, -1)
         label_of_edge1 = self._submodel_labels.values[f1]
@@ -146,7 +146,7 @@ class ExchangeCreator:
 
         return connected_cell_info
 
-    def _find_connected_cells_along_axis(self, axis_label: str)-> pd.DataFrame:
+    def _find_connected_cells_along_axis(self, axis_label: str) -> pd.DataFrame:
         diff1 = self._submodel_labels.diff(f"{axis_label}", label="lower")
         diff2 = self._submodel_labels.diff(f"{axis_label}", label="upper")
 
