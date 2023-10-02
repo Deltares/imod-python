@@ -23,24 +23,14 @@ new_sim.write(tmp_path, False)
 
 new_sim.run()
 
-sim_head_sub1 = imod.mf6.out.open_hds(
-    tmp_path / "GWF_1_0/GWF_1_0.hds",
-    tmp_path / "GWF_1_0/disv.disv.grb",
-).compute()
+for iplot in range(3):
+    sim_head_sub = imod.mf6.out.open_hds(
+        tmp_path / f"GWF_1_{iplot}/GWF_1_{iplot}.hds",
+        tmp_path / f"GWF_1_{iplot}/disv.disv.grb",
+        ).compute()
+    fig, ax = plt.subplots()
+    sim_head_sub.isel(time=-1, layer=0).ugrid.plot(ax=ax)
+    ax.set_aspect(1)
 
 
-sim_head_sub2 = imod.mf6.out.open_hds(
-    tmp_path / "GWF_1_1/GWF_1_1.hds",
-    tmp_path / "GWF_1_1/disv.disv.grb",
-).compute()
-
-
-fig, ax = plt.subplots()
-sim_head_sub1.isel(time=-1, layer=0).ugrid.plot(ax=ax)
-ax.set_aspect(1)
-
-
-fig, ax = plt.subplots()
-sim_head_sub2.isel(time=-1, layer=0).ugrid.plot(ax=ax)
-ax.set_aspect(1)
 pass
