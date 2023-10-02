@@ -4,9 +4,10 @@ import numpy as np
 import pytest
 import xarray as xr
 from pytest_cases import parametrize_with_cases
-
+import imod
 from imod.mf6.exchange_creator import ExchangeCreator
 from imod.mf6.modelsplitter import create_partition_info
+from imod.typing.grid import zeros_like
 
 ExpectedExchanges = namedtuple("ExpectedExchanges", "cell_id1 cell_id2")
 
@@ -21,7 +22,7 @@ def _create_submodel_labels(active, x_number_partitions, y_number_partitions):
 
     coords = active.coords
 
-    submodel_labels = xr.zeros_like(active.sel(layer=1))
+    submodel_labels = zeros_like(active.sel(layer=1))
     for id_x in np.arange(0, x_number_partitions):
         for id_y in np.arange(0, y_number_partitions):
             label_id = np.ravel_multi_index(
@@ -35,6 +36,22 @@ def _create_submodel_labels(active, x_number_partitions, y_number_partitions):
             ] = label_id
 
     return submodel_labels
+
+def create_submodel_labels_unstructured(idomain, number_partitions):
+    
+    submodel_labels = zeros_like(idomain.sel(layer=1))
+    dimension = len(submodel_labels)
+    switch_index = int(dimension / number_partitions)
+
+    submodel_labels[:] = number_partitions -1
+    for ipartition in range(number_partitions):
+        start = ipartition*switch_index
+        end = (ipartition+1) * switch_index
+        submodel_labels[start: end] = ipartition
+
+    return submodel_labels
+
+
 
 
 class TestExchangeCreator:
@@ -64,6 +81,22 @@ class TestExchangeCreator:
         num_exchanges_x_direction = y_number_partitions * (x_number_partitions - 1)
         num_exchanges_y_direction = x_number_partitions * (y_number_partitions - 1)
         assert len(exchanges) == num_exchanges_x_direction + num_exchanges_y_direction
+
+    @pytest.mark.parametrize("number_partitions", [2 ,3, 5])
+    def test_find_connected_cells_unstructured( self, unstructured_flow_simulation: imod.mf6.Modflow6Simulation, number_partitions: int):
+        idomain = unstructured_flow_simulation["flow"]["disv"]["idomain"]
+        submodel_labels = create_submodel_labels_unstructured(idomain, number_partitions)
+        partition_info = create_partition_info(submodel_labels)
+        exchange_creator = ExchangeCreator(submodel_labels, partition_info)
+
+        exchange_creator._find_connected_cells_unstructured()
+
+        # Act.
+        exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
+
+        # assert
+        assert len(exchanges) == number_partitions -1
+
 
     class ExpectedCellIds:
         @staticmethod
