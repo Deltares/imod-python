@@ -254,18 +254,26 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         edge_index = self.__remove_invalid_edges(unstructured_grid, edge_index)
 
         if self._get_barrier_type() is BarrierType.Multiplier:
-            fraction = self.__compute_barrier_layer_overlap_fraction(
-                snapped_dataset, edge_index, top, bottom
-            )
+            if 'layer' in snapped_dataset:
+                barrier_values = self.__multiplier_layer(snapped_dataset, edge_index, idomain)
+            else:
+                fraction = self.__fraction_layer_overlap(
+                    snapped_dataset, edge_index, top, bottom
+                )
+                barrier_values = (
+                    fraction.where(fraction)
+                    * snapped_dataset[self._get_variable_name()].values[edge_index]
+                )
 
-            barrier_values = (
-                fraction.where(fraction)
-                * snapped_dataset[self._get_variable_name()].values[edge_index]
-            )
         else:
-            barrier_values = self.__effective_value(
-                snapped_dataset, edge_index, top, bottom, k
-            )
+            if "layer" in snapped_dataset:
+                barrier_values = self.__resistance_layer(
+                    snapped_dataset, edge_index, idomain,
+                )
+            else: 
+                barrier_values = self.__resistance_layer_overlap(
+                    snapped_dataset, edge_index, top, bottom, k
+                )
 
         barrier_values = self.__remove_edge_values_connected_to_inactive_cells(
             barrier_values, unstructured_grid, edge_index
@@ -285,8 +293,56 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         barrier_dataset["print_input"] = self.dataset["print_input"].values.item()
 
         return Mf6HorizontalFlowBarrier(**barrier_dataset)
+    
+    def __multiplier_layer(        
+        self,
+        snapped_dataset: xu.UgridDataset,
+        edge_index: np.ndarray,
+        idomain: str,
+    ) -> xr.DataArray:
+        """
+        Returns layered xarray with barrier multiplier distrubuted over layers
+        """
+        hfb_multiplier = snapped_dataset[self._get_variable_name()].values[edge_index]
+        hfb_layer = snapped_dataset["layer"].values[edge_index]
+        nlay = idomain.layer.shape[0]
+        model_layer = np.repeat(idomain.layer.values, hfb_multiplier.shape[0]).reshape(
+            (nlay, hfb_multiplier.shape[0])
+        )
+        data = np.where(model_layer == hfb_layer, hfb_multiplier, np.nan)
+        return xr.DataArray(
+            data=data,
+            coords={
+                "layer": np.arange(nlay) + 1,
+            },
+            dims=["layer", "mesh2d_nFaces"],
+        )
 
-    def __effective_value(
+    def __resistance_layer(
+        self,
+        snapped_dataset: xu.UgridDataset,
+        edge_index: np.ndarray,
+        idomain: str,
+    ) -> xr.DataArray:
+        """
+        Returns layered xarray with barrier resistance distrubuted over layers
+        """
+        hfb_resistance = snapped_dataset[self._get_variable_name()].values[edge_index]
+        hfb_layer = snapped_dataset["layer"].values[edge_index]
+        nlay = idomain.layer.shape[0]
+        model_layer = np.repeat(idomain.layer.values, hfb_resistance.shape[0]).reshape(
+            (nlay, hfb_resistance.shape[0])
+        )
+        data = np.where(model_layer == hfb_layer, hfb_resistance, np.nan)
+        return xr.DataArray(
+            data=data,
+            coords={
+                "layer": np.arange(nlay) + 1,
+            },
+            dims=["layer", "mesh2d_nFaces"],
+        )
+
+    def __resistance_layer_overlap(
         self,
         snapped_dataset: xu.UgridDataset,
         edge_index: np.ndarray,
@@ -322,7 +378,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             snapped_dataset[self._get_variable_name()]
         ).values[edge_index]
 
-        fraction = self.__compute_barrier_layer_overlap_fraction(
+        fraction = self.__fraction_layer_overlap(
             snapped_dataset, edge_index, top, bottom
         )
 
@@ -333,7 +389,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         return self.__from_resistance(c_total)
 
     @staticmethod
-    def __compute_barrier_layer_overlap_fraction(
+    def __fraction_layer_overlap(
         snapped_dataset: xu.UgridDataset,
         edge_index: np.ndarray,
         top: xu.UgridDataArray,
@@ -524,9 +580,11 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     def __snap_to_grid(
         self, idomain: GridDataArray
     ) -> Tuple[xu.UgridDataset, np.ndarray]:
-        barrier_dataframe = self.dataset[
-            [self._get_variable_name(), "geometry", "ztop", "zbottom"]
-        ].to_dataframe()
+        if "layer" in self.dataset:
+            vars = [self._get_variable_name(), "geometry", "layer"]
+        else:
+            vars = [self._get_variable_name(), "geometry", "ztop", "zbottom"]
+        barrier_dataframe = self.dataset[vars].to_dataframe()
 
         snapped_dataset, _ = xu.snap_to_grid(
             barrier_dataframe, grid=idomain, max_snap_distance=0.5
@@ -623,7 +681,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     >>     },
     >> )
     >>
-    >> hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)
+    >> hfb = imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
 
     """
 
@@ -640,7 +698,55 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "hydraulic_characteristic"
 
+class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
+    """
+     Horizontal Flow Barrier (HFB) package
 
+    Input to the Horizontal Flow Barrier (HFB) Package is read from the file
+    that has type "HFB6" in the Name File. Only one HFB Package can be
+    specified for a GWF model.
+    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.2.2.pdf
+
+    Parameters
+    ----------
+    geometry: gpd.GeoDataFrame
+        Dataframe that describes:
+         - geometry: the geometries of the barriers,
+         - hydraulic_characteristic: the hydraulic characteristic of the barriers
+         - layer: model layer for the barrier
+    print_input: bool
+
+    Examples
+    --------
+
+    >> barrier_x = [-1000.0, 0.0, 1000.0]
+    >> barrier_y = [500.0, 250.0, 500.0]
+    >> barrier_gdf = gpd.GeoDataFrame(
+    >>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>     data={
+    >>         "hydraulic_characteristic": [1e-3,],
+    >>         "layer": [1,]
+    >>     },
+    >> )
+    >>
+    >> hfb = imod.mf6.LayeredHorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
+
+    """
+
+    def __init__(
+        self,
+        geometry: gpd.GeoDataFrame,
+        print_input=False,
+    ):
+        super().__init__(geometry, print_input)
+
+    def _get_barrier_type(self):
+        return BarrierType.HydraulicCharacteristic
+
+    def _get_variable_name(self) -> str:
+        return "hydraulic_characteristic"
+    
+    
 class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     """
      Horizontal Flow Barrier (HFB) package
@@ -676,7 +782,7 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     >>     },
     >> )
     >>
-    >> hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)
+    >> hfb = imod.mf6.HorizontalFlowBarrierMultiplier(barrier_gdf)
 
     """
 
@@ -693,7 +799,57 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "multiplier"
 
+class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
+    """
+     Horizontal Flow Barrier (HFB) package
 
+    Input to the Horizontal Flow Barrier (HFB) Package is read from the file
+    that has type "HFB6" in the Name File. Only one HFB Package can be
+    specified for a GWF model.
+    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.2.2.pdf
+
+    If parts of the barrier overlap a layer the multiplier is applied to the entire layer.
+
+    Parameters
+    ----------
+    geometry: gpd.GeoDataFrame
+        Dataframe that describes:
+         - geometry: the geometries of the barriers,
+         - multiplier: the multiplier of the barriers
+         - layer: model layer for the barrier
+    print_input: bool
+
+    Examples
+    --------
+
+    >> barrier_x = [-1000.0, 0.0, 1000.0]
+    >> barrier_y = [500.0, 250.0, 500.0]
+    >> barrier_gdf = gpd.GeoDataFrame(
+    >>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>     data={
+    >>         "multiplier": [1.5,],
+    >>         "layer": [1,],
+
+    >>     },
+    >> )
+    >>
+    >> hfb = imod.mf6.LayeredHorizontalFlowBarrierMultiplier(barrier_gdf)
+
+    """
+
+    def __init__(
+        self,
+        geometry: gpd.GeoDataFrame,
+        print_input=False,
+    ):
+        super().__init__(geometry, print_input)
+
+    def _get_barrier_type(self):
+        return BarrierType.Multiplier
+
+    def _get_variable_name(self) -> str:
+        return "multiplier"
+    
 class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     """
     Horizontal Flow Barrier (HFB) package
@@ -728,6 +884,56 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     >> )
     >>
     >> hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)
+
+
+    """
+
+    def __init__(
+        self,
+        geometry: gpd.GeoDataFrame,
+        print_input=False,
+    ):
+        super().__init__(geometry, print_input)
+
+    def _get_barrier_type(self):
+        return BarrierType.Resistance
+
+    def _get_variable_name(self) -> str:
+        return "resistance"
+
+
+class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
+    """
+    Horizontal Flow Barrier (HFB) package
+
+    Input to the Horizontal Flow Barrier (HFB) Package is read from the file
+    that has type "HFB6" in the Name File. Only one HFB Package can be
+    specified for a GWF model.
+    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.2.2.pdf
+
+    Parameters
+    ----------
+    geometry: gpd.GeoDataFrame
+        Dataframe that describes:
+         - geometry: the geometries of the barriers,
+         - resistance: the resistance of the barriers
+         - layer: model layer for the barrier
+    print_input: bool
+
+    Examples
+    --------
+
+    >> barrier_x = [-1000.0, 0.0, 1000.0]
+    >> barrier_y = [500.0, 250.0, 500.0]
+    >> barrier_gdf = gpd.GeoDataFrame(
+    >>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>     data={
+    >>         "resistance": [1e3,],
+    >>         "layer": [2,],
+    >>     },
+    >> )
+    >>
+    >> hfb = imod.mf6.LayeredHorizontalFlowBarrierResistance(barrier_gdf)
 
 
     """
