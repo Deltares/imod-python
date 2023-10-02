@@ -81,7 +81,7 @@ class TestExchangeCreator:
         assert len(exchanges) == num_exchanges_x_direction + num_exchanges_y_direction
 
     @pytest.mark.parametrize("number_partitions", [2, 3, 5])
-    def test_find_connected_cells_unstructured(
+    def test_create_exchanges_unstructured_validate_number_of_exchanges(
         self,
         unstructured_flow_simulation: imod.mf6.Modflow6Simulation,
         number_partitions: int,
@@ -101,6 +101,26 @@ class TestExchangeCreator:
         # assert
         assert len(exchanges) == number_partitions - 1
 
+
+    def test_create_exchanges_unstructured_validate_exchanging_cells(
+        self,
+        unstructured_flow_simulation: imod.mf6.Modflow6Simulation,
+    ):
+        number_partitions=2 
+        idomain = unstructured_flow_simulation["flow"]["disv"]["idomain"]
+        submodel_labels = create_submodel_labels_unstructured(
+            idomain, number_partitions
+        )
+        partition_info = create_partition_info(submodel_labels)
+        exchange_creator = ExchangeCreator(submodel_labels, partition_info)
+
+        exchange_creator._find_connected_cells_unstructured()
+
+        # Act.
+        exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
+
+        # assert
+        assert len(exchanges) == number_partitions - 1
     class ExpectedCellIds:
         @staticmethod
         def case_split_along_x_axis():
