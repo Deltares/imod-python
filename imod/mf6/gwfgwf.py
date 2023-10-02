@@ -50,10 +50,7 @@ class GWFGWF(Package):
         self.dataset["layer"] = layer
         self.dataset["model_name_1"] = model_id1
         self.dataset["model_name_2"] = model_id2
-
-        number_rows = self.dataset["cell_id1"].shape[0]
-        ones_vector = xr.DataArray([1 for i in range(number_rows)])
-        self.dataset["ihc"] = ones_vector
+        self.dataset["ihc"] = np.ones_like(cl1, dtype=int)
         self.dataset["cl1"] = cl1
         self.dataset["cl2"] = cl2
         self.dataset["hwva"] = hwva

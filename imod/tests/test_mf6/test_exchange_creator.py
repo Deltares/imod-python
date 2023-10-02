@@ -311,7 +311,7 @@ class TestExchangeCreator:
         [BasicDisSettings(nlay=1, nrow=4, ncol=4, space_generator=np.geomspace)],
         indirect=True,
     )
-    def test_create_exchanges_validate_geometric_information(
+    def test_exchange_geometric_information(
         self,
         parameterizable_basic_dis,
         x_number_partitions,

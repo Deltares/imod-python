@@ -91,6 +91,7 @@ def parameterizable_basic_dis(request):
         name="idomain",
     )
 
+    # Assign dx and dy coordinates. They are needed for certain methods like 'coord_reference'
     if np.all(np.isclose(dx, dx[0])):
         idomain = idomain.assign_coords({"dx": dx[0]})
     else:

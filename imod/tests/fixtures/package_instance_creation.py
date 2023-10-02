@@ -318,7 +318,7 @@ def create_exchange_package() -> imod.mf6.GWFGWF:
             layer=layer,
             cl1=cl1,
             cl2=cl2,
-            hwva=hwva
+            hwva=hwva,
         )
     ]
 
