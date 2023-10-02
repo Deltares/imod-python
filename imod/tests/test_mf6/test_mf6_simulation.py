@@ -50,6 +50,10 @@ def test_circle_roundtrip(circle_model, tmpdir_factory):
 def sample_gwfgwf_structured():
     cell_id1 = np.array([(1, 1), (2, 1), (3, 1)], dtype="i,i")
     cell_id2 = np.array([(1, 2), (2, 2), (3, 2)], dtype="i,i")
+    cl1 = np.ones(cell_id1.size)
+    cl2 = np.ones(cell_id2.size)
+    hwva = cl1 + cl2
+
     layer = np.array([12, 13, 14])
     cl1 = np.ones(cell_id1.size)
     cl2 = np.ones(cell_id2.size)

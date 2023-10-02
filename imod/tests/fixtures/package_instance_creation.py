@@ -7,6 +7,7 @@ import xugrid as xu
 
 import imod
 import imod.tests.fixtures.mf6_lake_package_fixture as mf_lake
+from imod.mf6 import GWFGWF
 
 """
 This file is used to create instances of imod packages for testing purposes.
@@ -301,9 +302,9 @@ GRIDLESS_PACKAGES = [
 ]
 
 
-def create_exchange_package() -> imod.mf6.GWFGWF:
-    cell_id1 = np.array([(1, 1), (2, 1), (3, 1)], dtype="i,i")
-    cell_id2 = np.array([(1, 2), (2, 2), (3, 2)], dtype="i,i")
+def create_exchange_package() -> list[GWFGWF]:
+    cell_id1 = xr.DataArray([[1, 1], [2, 1], [3, 1]])
+    cell_id2 = xr.DataArray([[1, 2], [2, 2], [3, 2]])
     layer = np.array([12, 13, 14])
     cl1 = np.ones(len(cell_id1))
     cl2 = np.ones(len(cell_id1))
