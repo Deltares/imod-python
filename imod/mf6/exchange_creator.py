@@ -200,7 +200,7 @@ class ExchangeCreator:
 
 def _create_global_to_local_idx(
     partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
-) -> Dict[str, pd.DataFrame]:
+) -> Dict[int, pd.DataFrame]:
     global_to_local_idx = {}
     for submodel_partition_info in partition_info:
         local_cell_indices = _get_local_cell_indices(submodel_partition_info)
