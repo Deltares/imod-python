@@ -7,8 +7,10 @@ from pytest_cases import parametrize_with_cases
 
 from imod.mf6.exchange_creator import ExchangeCreator
 from imod.mf6.modelsplitter import create_partition_info
+from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
+from imod.util import spatial_reference
 
-ExpectedExchanges = namedtuple("ExpectedExchanges", "cell_id1 cell_id2")
+ExpectedExchanges = namedtuple("ExpectedExchanges", "cell_id1 cell_id2 cl1 cl2 hwva")
 
 
 def _create_submodel_labels(active, x_number_partitions, y_number_partitions):
@@ -41,7 +43,11 @@ class TestExchangeCreator:
     @pytest.mark.parametrize(
         "x_number_partitions, y_number_partitions", [(1, 1), (3, 1), (1, 3), (3, 3)]
     )
-    @pytest.mark.parametrize("parameterizable_basic_dis", [(1, 3, 3)], indirect=True)
+    @pytest.mark.parametrize(
+        "parameterizable_basic_dis",
+        [BasicDisSettings(nlay=1, nrow=3, ncol=3)],
+        indirect=True,
+    )
     def test_create_exchanges_validate_number_of_exchanges(
         self, x_number_partitions, y_number_partitions, parameterizable_basic_dis
     ):
@@ -66,8 +72,36 @@ class TestExchangeCreator:
         assert len(exchanges) == num_exchanges_x_direction + num_exchanges_y_direction
 
     class ExpectedCellIds:
+        """
+        Grid info
+
+        x-coordinates:
+        [[0.09460356, 0.30171034, 0.5480032 , 0.84089642],
+         [0.09460356, 0.30171034, 0.5480032 , 0.84089642],
+         [0.09460356, 0.30171034, 0.5480032 , 0.84089642],
+         [0.09460356, 0.30171034, 0.5480032 , 0.84089642]])
+
+        y-coordinates:
+        [[0.84089642, 0.84089642, 0.84089642, 0.84089642],
+         [0.5480032 , 0.5480032 , 0.5480032 , 0.5480032 ],
+         [0.30171034, 0.30171034, 0.30171034, 0.30171034],
+         [0.09460356, 0.09460356, 0.09460356, 0.09460356]]
+
+        dx:
+        [[0.18920712, 0.22500645, 0.26757927, 0.31820717],
+         [0.18920712, 0.22500645, 0.26757927, 0.31820717],
+         [0.18920712, 0.22500645, 0.26757927, 0.31820717],
+         [0.18920712, 0.22500645, 0.26757927, 0.31820717]])
+
+        dy:
+        [[0.31820717, 0.31820717, 0.31820717, 0.31820717],
+         [0.26757927, 0.26757927, 0.26757927, 0.26757927],
+         [0.22500645, 0.22500645, 0.22500645, 0.22500645],
+         [0.18920712, 0.18920712, 0.18920712, 0.18920712]])
+        """
+
         @staticmethod
-        def case_split_along_x_axis():
+        def case_split_along_x_axis(parameterizable_basic_dis):
             """
             submodel_labels
             [[1, 1, 1, 1],
@@ -82,14 +116,30 @@ class TestExchangeCreator:
             expected_cell_id1 = np.array([(2, 1), (2, 2), (2, 3), (2, 4)])
             expected_cell_id2 = np.array([(1, 1), (1, 2), (1, 3), (1, 4)])
 
+            idomain, _, _ = parameterizable_basic_dis
+            dx, xmin, xmax, dy, ymin, ymax = spatial_reference(idomain)
+
+            dy = np.broadcast_to(np.array(dy), (1, 4)).flatten()
+            expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(4)
+            expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(4)
+            expected_hwva = expected_cl1 + expected_cl2
+
             return (
                 x_number_partitions,
                 y_number_partitions,
-                [ExpectedExchanges(expected_cell_id1, expected_cell_id2)],
+                [
+                    ExpectedExchanges(
+                        expected_cell_id1,
+                        expected_cell_id2,
+                        expected_cl1,
+                        expected_cl2,
+                        expected_hwva,
+                    )
+                ],
             )
 
         @staticmethod
-        def case_split_along_y_axis():
+        def case_split_along_y_axis(parameterizable_basic_dis):
             """
             submodel_labels
             [[0, 0, 1, 1],
@@ -104,14 +154,30 @@ class TestExchangeCreator:
             expected_cell_id1 = np.array([(1, 2), (2, 2), (3, 2), (4, 2)])
             expected_cell_id2 = np.array([(1, 1), (2, 1), (3, 1), (4, 1)])
 
+            idomain, _, _ = parameterizable_basic_dis
+            dx, xmin, xmax, dy, ymin, ymax = spatial_reference(idomain)
+
+            dx = np.broadcast_to(np.array(dx), (1, 4)).flatten()
+            expected_cl1 = 0.5 * np.abs(dx[1]) * np.ones(len(dx))
+            expected_cl2 = 0.5 * np.abs(dx[2]) * np.ones(len(dx))
+            expected_hwva = expected_cl1 + expected_cl2
+
             return (
                 x_number_partitions,
                 y_number_partitions,
-                [ExpectedExchanges(expected_cell_id1, expected_cell_id2)],
+                [
+                    ExpectedExchanges(
+                        expected_cell_id1,
+                        expected_cell_id2,
+                        expected_cl1,
+                        expected_cl2,
+                        expected_hwva,
+                    )
+                ],
             )
 
         @staticmethod
-        def case_split_along_both_axis():
+        def case_split_along_both_axis(parameterizable_basic_dis):
             """
             submodel_labels
             [[1, 1, 3, 3],
@@ -122,37 +188,75 @@ class TestExchangeCreator:
             x_number_partitions = 2
             y_number_partitions = 2
 
+            idomain, _, _ = parameterizable_basic_dis
+            dx, xmin, xmax, dy, ymin, ymax = spatial_reference(idomain)
+
+            dx = np.broadcast_to(np.array(dx), (1, 4)).flatten()
+            dy = np.broadcast_to(np.array(dy), (1, 4)).flatten()
+
             # test_model_0 <-> test_model_2
             exchange1_expected_cell_id1 = np.array([(1, 2), (2, 2)])
             exchange1_expected_cell_id2 = np.array([(1, 1), (2, 1)])
+
+            exchange1_expected_cl1 = 0.5 * np.abs(dx[1]) * np.ones(2)
+            exchange1_expected_cl2 = 0.5 * np.abs(dx[2]) * np.ones(2)
+            exchange1_expected_hwva = exchange1_expected_cl1 + exchange1_expected_cl2
 
             # test_model_1 <-> test_model_0
             exchange2_expected_cell_id1 = np.array([(2, 1), (2, 2)])
             exchange2_expected_cell_id2 = np.array([(1, 1), (1, 2)])
 
+            exchange2_expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(2)
+            exchange2_expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(2)
+            exchange2_expected_hwva = exchange2_expected_cl1 + exchange2_expected_cl2
+
             # test_model_1 <-> test_model_3
             exchange3_expected_cell_id1 = np.array([(1, 2), (2, 2)])
             exchange3_expected_cell_id2 = np.array([(1, 1), (2, 1)])
 
-            # test_model_1 <-> test_model_2
+            exchange3_expected_cl1 = 0.5 * np.abs(dx[1]) * np.ones(2)
+            exchange3_expected_cl2 = 0.5 * np.abs(dx[2]) * np.ones(2)
+            exchange3_expected_hwva = exchange3_expected_cl1 + exchange3_expected_cl2
+
+            # test_model_3 <-> test_model_2
             exchange4_expected_cell_id1 = np.array([(2, 1), (2, 2)])
             exchange4_expected_cell_id2 = np.array([(1, 1), (1, 2)])
+
+            exchange4_expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(2)
+            exchange4_expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(2)
+            exchange4_expected_hwva = exchange4_expected_cl1 + exchange4_expected_cl2
 
             return (
                 x_number_partitions,
                 y_number_partitions,
                 [
                     ExpectedExchanges(
-                        exchange1_expected_cell_id1, exchange1_expected_cell_id2
+                        exchange1_expected_cell_id1,
+                        exchange1_expected_cell_id2,
+                        exchange1_expected_cl1,
+                        exchange1_expected_cl2,
+                        exchange1_expected_hwva,
                     ),
                     ExpectedExchanges(
-                        exchange2_expected_cell_id1, exchange2_expected_cell_id2
+                        exchange2_expected_cell_id1,
+                        exchange2_expected_cell_id2,
+                        exchange2_expected_cl1,
+                        exchange2_expected_cl2,
+                        exchange2_expected_hwva,
                     ),
                     ExpectedExchanges(
-                        exchange3_expected_cell_id1, exchange3_expected_cell_id2
+                        exchange3_expected_cell_id1,
+                        exchange3_expected_cell_id2,
+                        exchange3_expected_cl1,
+                        exchange3_expected_cl2,
+                        exchange3_expected_hwva,
                     ),
                     ExpectedExchanges(
-                        exchange4_expected_cell_id1, exchange4_expected_cell_id2
+                        exchange4_expected_cell_id1,
+                        exchange4_expected_cell_id2,
+                        exchange4_expected_cl1,
+                        exchange4_expected_cl2,
+                        exchange4_expected_hwva,
                     ),
                 ],
             )
@@ -161,7 +265,11 @@ class TestExchangeCreator:
         "x_number_partitions,y_number_partitions,expected_exchanges",
         cases=ExpectedCellIds,
     )
-    @pytest.mark.parametrize("parameterizable_basic_dis", [(1, 4, 4)], indirect=True)
+    @pytest.mark.parametrize(
+        "parameterizable_basic_dis",
+        [BasicDisSettings(nlay=1, nrow=4, ncol=4)],
+        indirect=True,
+    )
     def test_create_exchanges_validate_local_cell_ids(
         self,
         parameterizable_basic_dis,
@@ -192,4 +300,49 @@ class TestExchangeCreator:
             )
             np.testing.assert_array_equal(
                 exchanges[idx].dataset["cell_id2"].values, expected_exchanges[idx][1]
+            )
+
+    @parametrize_with_cases(
+        "x_number_partitions,y_number_partitions,expected_exchanges",
+        cases=ExpectedCellIds,
+    )
+    @pytest.mark.parametrize(
+        "parameterizable_basic_dis",
+        [BasicDisSettings(nlay=1, nrow=4, ncol=4, space_generator=np.geomspace)],
+        indirect=True,
+    )
+    def test_exchange_geometric_information(
+        self,
+        parameterizable_basic_dis,
+        x_number_partitions,
+        y_number_partitions,
+        expected_exchanges,
+    ):
+        # Arrange.
+        idomain, _, _ = parameterizable_basic_dis
+        submodel_labels = _create_submodel_labels(
+            idomain, x_number_partitions, y_number_partitions
+        )
+        partition_info = create_partition_info(submodel_labels)
+
+        exchange_creator = ExchangeCreator(submodel_labels, partition_info)
+
+        model_name = "test_model"
+        layer = idomain.layer
+
+        # Act.
+        exchanges = exchange_creator.create_exchanges(model_name, layer)
+
+        # Assert.
+        assert len(exchanges) == len(expected_exchanges)
+        for idx in range(len(exchanges)):
+            np.testing.assert_array_equal(
+                exchanges[idx].dataset["cl1"].values, expected_exchanges[idx].cl1
+            )
+            np.testing.assert_array_equal(
+                exchanges[idx].dataset["cl2"].values,
+                expected_exchanges[idx].cl2,
+            )
+            np.testing.assert_array_equal(
+                exchanges[idx].dataset["hwva"].values, expected_exchanges[idx].hwva
             )
