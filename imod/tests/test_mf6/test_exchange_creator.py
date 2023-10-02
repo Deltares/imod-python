@@ -99,14 +99,18 @@ class TestExchangeCreator:
         exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
 
         # assert
+        nlayer = 3
         assert len(exchanges) == number_partitions - 1
+        cell_id1, counts = np.unique(exchanges[0].dataset["cell_id1"].values, return_counts=True)
+        cell_id1_dict =  dict(zip(cell_id1, counts))
+        for icell in range (13, 19,1):
+            assert cell_id1_dict[icell] == nlayer
 
-
-    def test_create_exchanges_unstructured_validate_exchanging_cells(
+    def test_create_exchanges_unstructured_validate_exchange_locations(
         self,
         unstructured_flow_simulation: imod.mf6.Modflow6Simulation,
     ):
-        number_partitions=2 
+        number_partitions = 2
         idomain = unstructured_flow_simulation["flow"]["disv"]["idomain"]
         submodel_labels = create_submodel_labels_unstructured(
             idomain, number_partitions
@@ -120,7 +124,17 @@ class TestExchangeCreator:
         exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
 
         # assert
-        assert len(exchanges) == number_partitions - 1
+        nlayer = 3
+        cell_id1, counts = np.unique(exchanges[0].dataset["cell_id1"].values, return_counts=True)
+        cell_id1_dict =  dict(zip(cell_id1, counts))
+        for icell in range (13, 19,1):
+            assert cell_id1_dict[icell] == nlayer
+
+        cell_id2, counts = np.unique(exchanges[0].dataset["cell_id2"].values, return_counts=True)
+        cell_id2_dict =  dict(zip(cell_id2, counts))
+        for icell in range (1, 6,1):
+            assert cell_id2_dict[icell] == nlayer            
+
     class ExpectedCellIds:
         @staticmethod
         def case_split_along_x_axis():
