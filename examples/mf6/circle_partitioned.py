@@ -37,3 +37,4 @@ for iplot in range(3):
     fig, ax = plt.subplots()
     sim_head_sub.isel(time=-1, layer=0).ugrid.plot(ax=ax)
     ax.set_aspect(1)
+# %%
