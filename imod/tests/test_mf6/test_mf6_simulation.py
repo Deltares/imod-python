@@ -1,3 +1,4 @@
+import itertools
 import os
 from pathlib import Path
 from unittest import mock
@@ -50,7 +51,26 @@ def sample_gwfgwf_structured():
     cell_id1 = np.array([(1, 1), (2, 1), (3, 1)], dtype="i,i")
     cell_id2 = np.array([(1, 2), (2, 2), (3, 2)], dtype="i,i")
     layer = np.array([12, 13, 14])
-    return imod.mf6.GWFGWF("name1", "name2", cell_id1, cell_id2, layer)
+    cl1 = np.ones(cell_id1.size)
+    cl2 = np.ones(cell_id2.size)
+    hwva = cl1 + cl2
+
+    _, cell_id1 = zip(*list(itertools.product(layer, cell_id1)))
+    _, cell_id2 = zip(*list(itertools.product(layer, cell_id2)))
+    _, cl1 = zip(*list(itertools.product(layer, cl1)))
+    _, cl2 = zip(*list(itertools.product(layer, cl2)))
+    layer, hwva = zip(*list(itertools.product(layer, hwva)))
+
+    return imod.mf6.GWFGWF(
+        "name1",
+        "name2",
+        np.array(cell_id1),
+        np.array(cell_id2),
+        np.array(layer),
+        np.array(cl1),
+        np.array(cl2),
+        np.array(hwva),
+    )
 
 
 @pytest.fixture(scope="function")

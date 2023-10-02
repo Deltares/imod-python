@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 import numpy as np
 import pandas as pd
@@ -6,7 +6,11 @@ import xarray as xr
 
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.modelsplitter import PartitionInfo
-from imod.mf6.utilities.grid_utilities import get_active_domain_slice
+from imod.mf6.utilities.grid_utilities import (
+    create_geometric_grid_info,
+    get_active_domain_slice,
+    to_cell_idx,
+)
 from imod.typing.grid import GridDataArray
 
 
@@ -25,11 +29,12 @@ class ExchangeCreator:
     ):
         self._submodel_labels = submodel_labels
 
-        self._global_cell_indices = _to_cell_idx(submodel_labels)
+        self._global_cell_indices = to_cell_idx(submodel_labels)
         self._connected_cells = self._find_connected_cells()
         self._global_to_local_mapping = (
             self._create_global_cellidx_to_local_cellid_mapping(partition_info)
         )
+        self._geometric_information = self._compute_geometric_information()
 
     def create_exchanges(self, model_name: str, layers: GridDataArray) -> List[GWFGWF]:
         """
@@ -54,10 +59,15 @@ class ExchangeCreator:
         """
         layers = layers.to_dataframe()
 
+        connected_cells_with_geometric_info = pd.merge(
+            self._connected_cells, self._geometric_information
+        )
+
         exchanges = []
-        for model_id1, grouped_connected_models in self._connected_cells.groupby(
-            "cell_label1"
-        ):
+        for (
+            model_id1,
+            grouped_connected_models,
+        ) in connected_cells_with_geometric_info.groupby("cell_label1"):
             for model_id2, connected_domain_pair in grouped_connected_models.groupby(
                 "cell_label2"
             ):
@@ -80,7 +90,7 @@ class ExchangeCreator:
                 connected_cells = (
                     connected_domain_pair.merge(mapping1)
                     .merge(mapping2)
-                    .filter(["cell_id1", "cell_id2"])
+                    .filter(["cell_id1", "cell_id2", "cl1", "cl2", "hwva"])
                 )
 
                 connected_cells = pd.merge(layers, connected_cells, how="cross")
@@ -92,18 +102,21 @@ class ExchangeCreator:
                         connected_cells["cell_id1"].values,
                         connected_cells["cell_id2"].values,
                         connected_cells["layer"].values,
+                        connected_cells["cl1"].values,
+                        connected_cells["cl2"].values,
+                        connected_cells["hwva"].values,
                     )
                 )
 
         return exchanges
 
-    def _find_connected_cells(self):
+    def _find_connected_cells(self) -> pd.DataFrame:
         connected_cells_along_x = self._find_connected_cells_along_axis("x")
         connected_cells_along_y = self._find_connected_cells_along_axis("y")
 
         return pd.merge(connected_cells_along_x, connected_cells_along_y, how="outer")
 
-    def _find_connected_cells_along_axis(self, axis_label: str):
+    def _find_connected_cells_along_axis(self, axis_label: str) -> pd.DataFrame:
         diff1 = self._submodel_labels.diff(f"{axis_label}", label="lower")
         diff2 = self._submodel_labels.diff(f"{axis_label}", label="upper")
 
@@ -134,7 +147,7 @@ class ExchangeCreator:
 
     def _create_global_cellidx_to_local_cellid_mapping(
         self, partition_info: List[PartitionInfo]
-    ):
+    ) -> Dict[int, pd.DataFrame]:
         global_to_local_idx = _create_global_to_local_idx(
             partition_info, self._global_cell_indices
         )
@@ -149,10 +162,39 @@ class ExchangeCreator:
 
         return mapping
 
+    def _compute_geometric_information(self) -> pd.DataFrame:
+        geometric_grid_info = create_geometric_grid_info(self._global_cell_indices)
+
+        cell1_df = geometric_grid_info.take(self._connected_cells["cell_idx1"])
+        cell2_df = geometric_grid_info.take(self._connected_cells["cell_idx2"])
+
+        distance_x = np.abs(cell1_df["x"].values - cell2_df["x"].values)
+        distance_y = np.abs(cell1_df["y"].values - cell2_df["y"].values)
+        distance = np.sqrt(distance_x**2 + distance_y**2)
+
+        cl1 = 0.5 * np.where(
+            distance_x > distance_y, cell1_df["dx"].values, cell1_df["dy"].values
+        )
+        cl2 = 0.5 * np.where(
+            distance_x > distance_y, cell2_df["dx"].values, cell2_df["dy"].values
+        )
+
+        df = pd.DataFrame(
+            {
+                "cell_idx1": self._connected_cells["cell_idx1"].values,
+                "cell_idx2": self._connected_cells["cell_idx2"].values,
+                "cl1": cl1,
+                "cl2": cl2,
+                "hwva": distance.flatten(),
+            }
+        )
+
+        return df
+
 
 def _create_global_to_local_idx(
     partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
-):
+) -> Dict[int, pd.DataFrame]:
     global_to_local_idx = {}
     for submodel_partition_info in partition_info:
         local_cell_indices = _get_local_cell_indices(submodel_partition_info)
@@ -174,7 +216,7 @@ def _create_global_to_local_idx(
     return global_to_local_idx
 
 
-def _local_cell_idx_to_id(partition_info):
+def _local_cell_idx_to_id(partition_info) -> Dict[int, pd.DataFrame]:
     local_cell_idx_to_id = {}
     for submodel_partition_info in partition_info:
         local_cell_indices = _get_local_cell_indices(submodel_partition_info)
@@ -195,16 +237,8 @@ def _local_cell_idx_to_id(partition_info):
     return local_cell_idx_to_id
 
 
-def _get_local_cell_indices(submodel_partition_info: PartitionInfo):
+def _get_local_cell_indices(submodel_partition_info: PartitionInfo) -> xr.DataArray:
     domain_slice = get_active_domain_slice(submodel_partition_info.active_domain)
     local_domain = submodel_partition_info.active_domain.sel(domain_slice)
 
-    return _to_cell_idx(local_domain)
-
-
-def _to_cell_idx(idomain: GridDataArray):
-    index = np.arange(idomain.size).reshape(idomain.shape)
-    domain_index = xr.zeros_like(idomain)
-    domain_index.values = index
-
-    return domain_index
+    return to_cell_idx(local_domain)
