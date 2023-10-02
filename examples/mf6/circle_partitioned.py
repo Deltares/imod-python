@@ -1,17 +1,15 @@
-'''
+"""
 This example illustrates a circular model that is split into 3 subnodels.
 The split method retturns a simulation object that can be run as is. In this
 case the 3 submodels are 3 roughly equal sized partitions that have the shape
 of pie pieces.
-'''
+"""
 import copy
 
 import matplotlib.pyplot as plt
 from example_models import create_circle_simulation
 
 import imod
-
-
 
 simulation = create_circle_simulation()
 tmp_path = imod.util.temporary_directory()
@@ -39,6 +37,3 @@ for iplot in range(3):
     fig, ax = plt.subplots()
     sim_head_sub.isel(time=-1, layer=0).ugrid.plot(ax=ax)
     ax.set_aspect(1)
-
-
-pass
