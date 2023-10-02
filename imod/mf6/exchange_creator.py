@@ -90,12 +90,17 @@ class ExchangeCreator:
 
                 connected_cells = pd.merge(layers, connected_cells, how="cross")
 
+                connected_cells_id1 = connected_cells["cell_id1"].values
+                connected_cells_id2 = connected_cells["cell_id2"].values
+                if is_unstructured(self._submodel_labels):
+                    connected_cells_id1 = connected_cells["cell_id1"].values + 1
+                    connected_cells_id2 = connected_cells["cell_id2"].values + 1
                 exchanges.append(
                     GWFGWF(
                         f"{model_name}_{model_id1}",
                         f"{model_name}_{model_id2}",
-                        connected_cells["cell_id1"].values +1,
-                        connected_cells["cell_id2"].values + 1,
+                        connected_cells_id1,
+                        connected_cells_id2,
                         connected_cells["layer"].values,
                     )
                 )
@@ -137,7 +142,7 @@ class ExchangeCreator:
 
         connected_cell_info = pd.DataFrame(
             {
-                "cell_idx1": internal_boundary[:, 0] ,
+                "cell_idx1": internal_boundary[:, 0],
                 "cell_idx2": internal_boundary[:, 1],
                 "cell_label1": label_of_edge1[edge_indices_internal_boundary],
                 "cell_label2": label_of_edge2[edge_indices_internal_boundary],

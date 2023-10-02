@@ -27,7 +27,7 @@ for iplot in range(3):
     sim_head_sub = imod.mf6.out.open_hds(
         tmp_path / f"GWF_1_{iplot}/GWF_1_{iplot}.hds",
         tmp_path / f"GWF_1_{iplot}/disv.disv.grb",
-        ).compute()
+    ).compute()
     fig, ax = plt.subplots()
     sim_head_sub.isel(time=-1, layer=0).ugrid.plot(ax=ax)
     ax.set_aspect(1)
