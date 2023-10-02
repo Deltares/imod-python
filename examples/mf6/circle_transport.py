@@ -347,7 +347,7 @@ ax.set_aspect(1)
 
 fig, ax = plt.subplots()
 sim_concentration.isel(time=-1).ugrid.sel(y=0).plot.contourf(
-    ax=ax, x="x", y="z", cmap="RdYlBu_r"
+    ax=ax, x="mesh2d_x", y="z", cmap="RdYlBu_r"
 )
 
 # %%
