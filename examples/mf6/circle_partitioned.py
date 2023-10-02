@@ -5,6 +5,10 @@ from example_models import create_circle_simulation
 
 import imod
 
+# %% This example illustrates a circular model that is split into 3 subnodels.
+# The split method retturns a simulation object that can be run as is. In this
+# case the 3 submodels are 3 roughly equal sized partitions that have the shape
+# of pie pieces
 simulation = create_circle_simulation()
 tmp_path = imod.util.temporary_directory()
 simulation.write(tmp_path / "original", False)
