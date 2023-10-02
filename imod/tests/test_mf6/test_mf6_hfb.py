@@ -15,7 +15,6 @@ from imod.mf6 import (
     LayeredHorizontalFlowBarrierHydraulicCharacteristic,
     LayeredHorizontalFlowBarrierMultiplier,
     LayeredHorizontalFlowBarrierResistance,
-    
 )
 from imod.mf6.hfb import to_connected_cells_dataset
 from imod.typing.grid import ones_like
@@ -99,6 +98,7 @@ def test_to_mf6_creates_mf6_adapter(
         == expected_hydraulic_characteristic
     )
 
+
 @pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])
 @pytest.mark.parametrize(
     "barrier_class, barrier_value_name, barrier_value, expected_hydraulic_characteristic",
@@ -131,14 +131,14 @@ def test_to_mf6_creates_mf6_adapter_layered(
 
     barrier_y = [5.5, 5.5, 5.5]
     barrier_x = [82.0, 40.0, 0.0]
-    
+
     geometry = gpd.GeoDataFrame(
         geometry=[
             shapely.linestrings(barrier_x, barrier_y),
         ],
         data={
             barrier_value_name: [barrier_value],
-            "layer": [1], #, 2
+            "layer": [1],  # , 2
         },
     )
 
@@ -157,8 +157,8 @@ def test_to_mf6_creates_mf6_adapter_layered(
         else xu.UgridDataArray.from_structured(idomain).ugrid.grid
     )
 
-    data = np.full((idomain.coords["layer"].size, edge_index.size),fill_value=np.nan) 
-    data[0,:] = barrier_value
+    data = np.full((idomain.coords["layer"].size, edge_index.size), fill_value=np.nan)
+    data[0, :] = barrier_value
     expected_barrier_values = xr.DataArray(
         data=data,
         dims=("layer", "mesh2d_nFaces"),
@@ -179,6 +179,8 @@ def test_to_mf6_creates_mf6_adapter_layered(
         args["hydraulic_characteristic"].values.min()
         == expected_hydraulic_characteristic
     )
+
+
 @pytest.mark.parametrize(
     "ztop, zbottom, expected_values",
     [
