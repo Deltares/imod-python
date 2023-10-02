@@ -254,8 +254,10 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         edge_index = self.__remove_invalid_edges(unstructured_grid, edge_index)
 
         if self._get_barrier_type() is BarrierType.Multiplier:
-            if 'layer' in snapped_dataset:
-                barrier_values = self.__multiplier_layer(snapped_dataset, edge_index, idomain)
+            if "layer" in snapped_dataset:
+                barrier_values = self.__multiplier_layer(
+                    snapped_dataset, edge_index, idomain
+                )
             else:
                 fraction = self.__fraction_layer_overlap(
                     snapped_dataset, edge_index, top, bottom
@@ -268,9 +270,11 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         else:
             if "layer" in snapped_dataset:
                 barrier_values = self.__resistance_layer(
-                    snapped_dataset, edge_index, idomain,
+                    snapped_dataset,
+                    edge_index,
+                    idomain,
                 )
-            else: 
+            else:
                 barrier_values = self.__resistance_layer_overlap(
                     snapped_dataset, edge_index, top, bottom, k
                 )
@@ -293,8 +297,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         barrier_dataset["print_input"] = self.dataset["print_input"].values.item()
 
         return Mf6HorizontalFlowBarrier(**barrier_dataset)
-    
-    def __multiplier_layer(        
+
+    def __multiplier_layer(
         self,
         snapped_dataset: xu.UgridDataset,
         edge_index: np.ndarray,
@@ -698,6 +702,7 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "hydraulic_characteristic"
 
+
 class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     """
      Horizontal Flow Barrier (HFB) package
@@ -745,8 +750,8 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
 
     def _get_variable_name(self) -> str:
         return "hydraulic_characteristic"
-    
-    
+
+
 class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     """
      Horizontal Flow Barrier (HFB) package
@@ -799,6 +804,7 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "multiplier"
 
+
 class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     """
      Horizontal Flow Barrier (HFB) package
@@ -849,7 +855,8 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
 
     def _get_variable_name(self) -> str:
         return "multiplier"
-    
+
+
 class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     """
     Horizontal Flow Barrier (HFB) package
