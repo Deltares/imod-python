@@ -84,10 +84,6 @@ class ExchangeCreator:
             self._connected_cells, self._geometric_information
         )
 
-        connected_cells_with_geometric_info = pd.merge(
-            self._connected_cells, self._geometric_information
-        )
-
         exchanges = []
         for (
             model_id1,
