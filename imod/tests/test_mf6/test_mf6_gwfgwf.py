@@ -64,12 +64,11 @@ class TestGwfgwf:
             """\
         begin options
         end options
-        
-        
+
         begin dimensions
           nexg 9
         end dimensions
-        
+
         begin exchangedata
         12 1 1 12 1 2 1 1.0 1.0 2.0
         12 2 1 12 2 2 1 1.0 1.0 2.0
@@ -99,12 +98,11 @@ class TestGwfgwf:
             """\
         begin options
         end options
-        
-        
+
         begin dimensions
           nexg 9
         end dimensions
-        
+
         begin exchangedata
         12 1 12 2 1 1.0 1.0 2.0
         12 2 12 2 1 1.0 1.0 2.0
