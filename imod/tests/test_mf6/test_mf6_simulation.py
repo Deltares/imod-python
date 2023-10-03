@@ -1,4 +1,3 @@
-import itertools
 import os
 from pathlib import Path
 from unittest import mock
