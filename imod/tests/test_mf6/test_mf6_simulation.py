@@ -1,4 +1,3 @@
-import itertools
 import os
 from pathlib import Path
 from unittest import mock
@@ -48,29 +47,27 @@ def test_circle_roundtrip(circle_model, tmpdir_factory):
 
 @pytest.fixture(scope="function")
 def sample_gwfgwf_structured():
-    cell_id1 = np.array([(1, 1), (2, 1), (3, 1)], dtype="i,i")
-    cell_id2 = np.array([(1, 2), (2, 2), (3, 2)], dtype="i,i")
-    layer = np.array([12, 13, 14])
-    cl1 = np.ones(cell_id1.size)
-    cl2 = np.ones(cell_id2.size)
-    hwva = cl1 + cl2
-
-    _, cell_id1 = zip(*list(itertools.product(layer, cell_id1)))
-    _, cell_id2 = zip(*list(itertools.product(layer, cell_id2)))
-    _, cl1 = zip(*list(itertools.product(layer, cl1)))
-    _, cl2 = zip(*list(itertools.product(layer, cl2)))
-    layer, hwva = zip(*list(itertools.product(layer, hwva)))
-
-    return imod.mf6.GWFGWF(
-        "name1",
-        "name2",
-        np.array(cell_id1),
-        np.array(cell_id2),
-        np.array(layer),
-        np.array(cl1),
-        np.array(cl2),
-        np.array(hwva),
+    ds = xr.Dataset()
+    ds["cell_id1"] = xr.DataArray(
+        [[1, 1], [2, 1], [3, 1]],
+        dims=("index", "cell_dims1"),
+        coords={"cell_dims1": ["row_1", "column_1"]},
     )
+    ds["cell_id2"] = xr.DataArray(
+        [[1, 2], [2, 2], [3, 2]],
+        dims=("index", "cell_dims2"),
+        coords={"cell_dims2": ["row_2", "column_2"]},
+    )
+    ds["layer"] = xr.DataArray([12, 13, 14], dims="layer")
+    ds["cl1"] = xr.DataArray(np.ones(3), dims="index")
+    ds["cl2"] = xr.DataArray(np.ones(3), dims="index")
+    ds["hwva"] = ds["cl1"] + ds["cl2"]
+
+    ds = ds.stack(cell_id=("layer", "index"), create_index=False).reset_coords()
+    ds["cell_id1"] = ds["cell_id1"].T
+    ds["cell_id2"] = ds["cell_id2"].T
+
+    return imod.mf6.GWFGWF("name1", "name2", **ds)
 
 
 @pytest.fixture(scope="function")

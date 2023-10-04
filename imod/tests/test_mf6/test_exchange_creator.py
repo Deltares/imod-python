@@ -189,8 +189,16 @@ class TestExchangeCreator:
             y_number_partitions = 2
 
             # test_model_0 <-> test_model_1
-            expected_cell_id1 = np.array([(2, 1), (2, 2), (2, 3), (2, 4)])
-            expected_cell_id2 = np.array([(1, 1), (1, 2), (1, 3), (1, 4)])
+            expected_cell_id1 = np.array([[2, 1], [2, 2], [2, 3], [2, 4]])
+            expected_cell_id2 = np.array([[1, 1], [1, 2], [1, 3], [1, 4]])
+
+            idomain, _, _ = parameterizable_basic_dis
+            dx, xmin, xmax, dy, ymin, ymax = spatial_reference(idomain)
+
+            dy = np.broadcast_to(np.array(dy), (1, 4)).flatten()
+            expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(4)
+            expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(4)
+            expected_hwva = expected_cl1 + expected_cl2
 
             idomain, _, _ = parameterizable_basic_dis
             dx, xmin, xmax, dy, ymin, ymax = spatial_reference(idomain)
@@ -227,8 +235,16 @@ class TestExchangeCreator:
             y_number_partitions = 1
 
             # test_model_0 <-> test_model_1
-            expected_cell_id1 = np.array([(1, 2), (2, 2), (3, 2), (4, 2)])
-            expected_cell_id2 = np.array([(1, 1), (2, 1), (3, 1), (4, 1)])
+            expected_cell_id1 = np.array([[1, 2], [2, 2], [3, 2], [4, 2]])
+            expected_cell_id2 = np.array([[1, 1], [2, 1], [3, 1], [4, 1]])
+
+            idomain, _, _ = parameterizable_basic_dis
+            dx, xmin, xmax, dy, ymin, ymax = spatial_reference(idomain)
+
+            dx = np.broadcast_to(np.array(dx), (1, 4)).flatten()
+            expected_cl1 = 0.5 * np.abs(dx[1]) * np.ones(len(dx))
+            expected_cl2 = 0.5 * np.abs(dx[2]) * np.ones(len(dx))
+            expected_hwva = expected_cl1 + expected_cl2
 
             idomain, _, _ = parameterizable_basic_dis
             dx, xmin, xmax, dy, ymin, ymax = spatial_reference(idomain)
@@ -271,32 +287,44 @@ class TestExchangeCreator:
             dy = np.broadcast_to(np.array(dy), (1, 4)).flatten()
 
             # test_model_0 <-> test_model_2
-            exchange1_expected_cell_id1 = np.array([(1, 2), (2, 2)])
-            exchange1_expected_cell_id2 = np.array([(1, 1), (2, 1)])
+            exchange1_expected_cell_id1 = np.array([[1, 2], [2, 2]])
+            exchange1_expected_cell_id2 = np.array([[1, 1], [2, 1]])
+
+            exchange1_expected_cl1 = 0.5 * np.abs(dx[1]) * np.ones(2)
+            exchange1_expected_cl2 = 0.5 * np.abs(dx[2]) * np.ones(2)
+            exchange1_expected_hwva = exchange1_expected_cl1 + exchange1_expected_cl2
 
             exchange1_expected_cl1 = 0.5 * np.abs(dx[1]) * np.ones(2)
             exchange1_expected_cl2 = 0.5 * np.abs(dx[2]) * np.ones(2)
             exchange1_expected_hwva = exchange1_expected_cl1 + exchange1_expected_cl2
 
             # test_model_1 <-> test_model_0
-            exchange2_expected_cell_id1 = np.array([(2, 1), (2, 2)])
-            exchange2_expected_cell_id2 = np.array([(1, 1), (1, 2)])
+            exchange2_expected_cell_id1 = np.array([[2, 1], [2, 2]])
+            exchange2_expected_cell_id2 = np.array([[1, 1], [1, 2]])
+
+            exchange2_expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(2)
+            exchange2_expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(2)
+            exchange2_expected_hwva = exchange2_expected_cl1 + exchange2_expected_cl2
 
             exchange2_expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(2)
             exchange2_expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(2)
             exchange2_expected_hwva = exchange2_expected_cl1 + exchange2_expected_cl2
 
             # test_model_1 <-> test_model_3
-            exchange3_expected_cell_id1 = np.array([(1, 2), (2, 2)])
-            exchange3_expected_cell_id2 = np.array([(1, 1), (2, 1)])
+            exchange3_expected_cell_id1 = np.array([[1, 2], [2, 2]])
+            exchange3_expected_cell_id2 = np.array([[1, 1], [2, 1]])
 
             exchange3_expected_cl1 = 0.5 * np.abs(dx[1]) * np.ones(2)
             exchange3_expected_cl2 = 0.5 * np.abs(dx[2]) * np.ones(2)
             exchange3_expected_hwva = exchange3_expected_cl1 + exchange3_expected_cl2
 
             # test_model_3 <-> test_model_2
-            exchange4_expected_cell_id1 = np.array([(2, 1), (2, 2)])
-            exchange4_expected_cell_id2 = np.array([(1, 1), (1, 2)])
+            exchange4_expected_cell_id1 = np.array([[2, 1], [2, 2]])
+            exchange4_expected_cell_id2 = np.array([[1, 1], [1, 2]])
+
+            exchange4_expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(2)
+            exchange4_expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(2)
+            exchange4_expected_hwva = exchange4_expected_cl1 + exchange4_expected_cl2
 
             exchange4_expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(2)
             exchange4_expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(2)

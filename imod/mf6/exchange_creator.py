@@ -15,6 +15,45 @@ from imod.mf6.utilities.grid_utilities import (
 from imod.typing.grid import GridDataArray, is_unstructured
 
 
+def to_xarray(connected_cells: pd.DataFrame) -> xr.Dataset:
+    dataset = connected_cells.to_xarray()
+
+    if (
+        connected_cells["cell_id1"].any()
+        and not np.isscalar(connected_cells["cell_id1"].values[0])
+    ):
+        dataset["cell_id1"] = xr.DataArray(
+            np.array(list(zip(*connected_cells["cell_id1"]))).T,
+            dims=("index", "cell_dims1"),
+            coords={"cell_dims1": ["row_1", "column_1"]},
+        )
+        dataset["cell_id2"] = xr.DataArray(
+            np.array(list(zip(*connected_cells["cell_id2"]))).T,
+            dims=("index", "cell_dims2"),
+            coords={"cell_dims2": ["row_2", "column_2"]},
+        )
+    else:
+        size = connected_cells.shape[0]
+        cell_id1 =  np.array(connected_cells["cell_id1"]) 
+        cell_id1_2d = cell_id1.reshape(size, 1)
+
+        dataset["cell_id1"] = xr.DataArray(
+            cell_id1_2d,
+            dims=("index", "cell_dims1"),
+            coords={"cell_dims1": ["cellindex1"]},
+        )
+
+        cell_id2 =  np.array(connected_cells["cell_id2"]) 
+        cell_id2_2d = cell_id2.reshape(size, 1)        
+        dataset["cell_id2"] = xr.DataArray(
+            cell_id2_2d,
+            dims=("index", "cell_dims2"),
+            coords={"cell_dims2": ["cellindex2"]},
+        )
+
+    return dataset
+
+
 class ExchangeCreator:
     """
     Creates the GroundWaterFlow to GroundWaterFlow exchange package (gwfgwf) as a function of a submodel label array and a
@@ -65,7 +104,7 @@ class ExchangeCreator:
         a list of GWFGWF-exchanges
 
         """
-        layers = layers.to_dataframe()
+        layers = layers.to_dataframe().filter(["layer"])
 
         connected_cells_with_geometric_info = pd.merge(
             self._connected_cells, self._geometric_information
@@ -103,21 +142,16 @@ class ExchangeCreator:
 
                 connected_cells = pd.merge(layers, connected_cells, how="cross")
 
-                connected_cells_id1 = connected_cells["cell_id1"].values
-                connected_cells_id2 = connected_cells["cell_id2"].values
+                connected_cells_dataset = to_xarray(connected_cells)
+
                 if is_unstructured(self._submodel_labels):
-                    connected_cells_id1 = connected_cells["cell_id1"].values + 1
-                    connected_cells_id2 = connected_cells["cell_id2"].values + 1
+                    connected_cells_dataset["cell_id1"].values = connected_cells_dataset["cell_id1"].values + 1
+                    connected_cells_dataset["cell_id2"].values = connected_cells_dataset["cell_id2"].values + 1
                 exchanges.append(
                     GWFGWF(
                         f"{model_name}_{model_id1}",
                         f"{model_name}_{model_id2}",
-                        connected_cells_id1,
-                        connected_cells_id2,
-                        connected_cells["layer"].values,
-                        connected_cells["cl1"].values,
-                        connected_cells["cl2"].values,
-                        connected_cells["hwva"].values,
+                        **connected_cells_dataset,
                     )
                 )
 
