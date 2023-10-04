@@ -40,6 +40,9 @@ class GWFGWF(Package):
         cell_id1: np.ndarray,
         cell_id2: np.ndarray,
         layer: np.ndarray,
+        cl1: np.ndarray,
+        cl2: np.ndarray,
+        hwva: np.ndarray,
     ):
         self.dataset = xr.Dataset()
         self.dataset["cell_id1"] = convert_tuples_to_columns(cell_id1)
@@ -47,13 +50,10 @@ class GWFGWF(Package):
         self.dataset["layer"] = layer
         self.dataset["model_name_1"] = model_id1
         self.dataset["model_name_2"] = model_id2
-
-        number_rows = self.dataset["cell_id1"].shape[0]
-        ones_vector = xr.DataArray([1 for i in range(number_rows)])
-        self.dataset["ihc"] = ones_vector
-        self.dataset["cl1"] = ones_vector
-        self.dataset["cl2"] = ones_vector
-        self.dataset["hwva"] = ones_vector
+        self.dataset["ihc"] = np.ones_like(cl1, dtype=int)
+        self.dataset["cl1"] = cl1
+        self.dataset["cl2"] = cl2
+        self.dataset["hwva"] = hwva
 
     def set_options(
         self,
