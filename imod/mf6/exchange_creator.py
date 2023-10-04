@@ -18,9 +18,8 @@ from imod.typing.grid import GridDataArray, is_unstructured
 def to_xarray(connected_cells: pd.DataFrame) -> xr.Dataset:
     dataset = connected_cells.to_xarray()
 
-    if (
-        connected_cells["cell_id1"].any()
-        and not np.isscalar(connected_cells["cell_id1"].values[0])
+    if connected_cells["cell_id1"].any() and not np.isscalar(
+        connected_cells["cell_id1"].values[0]
     ):
         dataset["cell_id1"] = xr.DataArray(
             np.array(list(zip(*connected_cells["cell_id1"]))).T,
@@ -34,7 +33,7 @@ def to_xarray(connected_cells: pd.DataFrame) -> xr.Dataset:
         )
     else:
         size = connected_cells.shape[0]
-        cell_id1 =  np.array(connected_cells["cell_id1"]) 
+        cell_id1 = np.array(connected_cells["cell_id1"])
         cell_id1_2d = cell_id1.reshape(size, 1)
 
         dataset["cell_id1"] = xr.DataArray(
@@ -43,8 +42,8 @@ def to_xarray(connected_cells: pd.DataFrame) -> xr.Dataset:
             coords={"cell_dims1": ["cellindex1"]},
         )
 
-        cell_id2 =  np.array(connected_cells["cell_id2"]) 
-        cell_id2_2d = cell_id2.reshape(size, 1)        
+        cell_id2 = np.array(connected_cells["cell_id2"])
+        cell_id2_2d = cell_id2.reshape(size, 1)
         dataset["cell_id2"] = xr.DataArray(
             cell_id2_2d,
             dims=("index", "cell_dims2"),
@@ -57,9 +56,9 @@ def to_xarray(connected_cells: pd.DataFrame) -> xr.Dataset:
 class ExchangeCreator:
     """
     Creates the GroundWaterFlow to GroundWaterFlow exchange package (gwfgwf) as a function of a submodel label array and a
-    PartitionInfo object. This file contains the cell indices of coupled cells. With coupled cells we mean cells that are adjacent but 
-    that are located in different subdomains.  At the moment only structured grids are supported, for unstructured grids the geometric information 
-    is still set to default values. 
+    PartitionInfo object. This file contains the cell indices of coupled cells. With coupled cells we mean cells that are adjacent but
+    that are located in different subdomains.  At the moment only structured grids are supported, for unstructured grids the geometric information
+    is still set to default values.
 
     The submodel_labels array should have the same topology as the domain being partitioned. The array will be used
     to determine the connectivity of the submodels after the split operation has been performed.
@@ -145,8 +144,12 @@ class ExchangeCreator:
                 connected_cells_dataset = to_xarray(connected_cells)
 
                 if is_unstructured(self._submodel_labels):
-                    connected_cells_dataset["cell_id1"].values = connected_cells_dataset["cell_id1"].values + 1
-                    connected_cells_dataset["cell_id2"].values = connected_cells_dataset["cell_id2"].values + 1
+                    connected_cells_dataset["cell_id1"].values = (
+                        connected_cells_dataset["cell_id1"].values + 1
+                    )
+                    connected_cells_dataset["cell_id2"].values = (
+                        connected_cells_dataset["cell_id2"].values + 1
+                    )
                 exchanges.append(
                     GWFGWF(
                         f"{model_name}_{model_id1}",
