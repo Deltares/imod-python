@@ -20,11 +20,13 @@ begin options
 {%- if obs is defined -%}  obs6 filein {{obs}}
 {% endif -%}
 end options
-
+{% set nexg = layer | length %}
 begin dimensions
   nexg {{nexg}}
 end dimensions
 
 begin exchangedata
-{{exchangesblock}}
+{% for i in range(nexg) -%}
+  {{layer[i]}} {{cell_id1[i]|join(" ")}} {{layer[i]}} {{cell_id2[i]|join(" ")}} {{ihc[i]}} {{cl1[i]}} {{cl2[i]}} {{hwva[i]}}
+{% endfor -%}
 end exchangedata
