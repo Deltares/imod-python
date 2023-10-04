@@ -17,8 +17,10 @@ from imod.typing.grid import GridDataArray, is_unstructured
 
 class ExchangeCreator:
     """
-    Creates the GroundWaterFlow to GroundWaterFlow exchange definitions as a function of a submodel label array and a
-    PartitionInfo object. At the moment only structured grids are supported
+    Creates the GroundWaterFlow to GroundWaterFlow exchange package (gwfgwf) as a function of a submodel label array and a
+    PartitionInfo object. This file contains the cell indices of coupled cells. With coupled cells we mean cells that are adjacent but 
+    that are located in different subdomains.  At the moment only structured grids are supported, for unstructured grids the geometric information 
+    is still set to default values. 
 
     The submodel_labels array should have the same topology as the domain being partitioned. The array will be used
     to determine the connectivity of the submodels after the split operation has been performed.
