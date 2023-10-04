@@ -328,11 +328,3 @@ def _get_local_cell_indices(submodel_partition_info: PartitionInfo) -> xr.DataAr
     local_domain = submodel_partition_info.active_domain.sel(domain_slice)
 
     return to_cell_idx(local_domain)
-
-
-def _to_cell_idx(idomain: GridDataArray):
-    index = np.arange(idomain.size).reshape(idomain.shape)
-    domain_index = zeros_like(idomain)
-    domain_index.values = index
-
-    return domain_index
