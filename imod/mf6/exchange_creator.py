@@ -12,7 +12,7 @@ from imod.mf6.utilities.grid_utilities import (
     get_active_domain_slice,
     to_cell_idx,
 )
-from imod.typing.grid import GridDataArray, is_unstructured, zeros_like
+from imod.typing.grid import GridDataArray, is_unstructured
 
 
 class ExchangeCreator:
