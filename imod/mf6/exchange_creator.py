@@ -14,7 +14,7 @@ from imod.mf6.utilities.grid_utilities import (
 from imod.typing.grid import GridDataArray
 
 
-def to_xarray(connected_cells):
+def to_xarray(connected_cells: pd.DataFrame) -> xr.Dataset:
     dataset = connected_cells.to_xarray()
 
     if (
