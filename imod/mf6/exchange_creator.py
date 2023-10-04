@@ -301,10 +301,9 @@ def _local_cell_idx_to_id(partition_info) -> Dict[int, pd.DataFrame]:
         local_cell_indices = _get_local_cell_indices(submodel_partition_info)
 
         if is_unstructured(local_cell_indices):
-            local_idx = np.unravel_index(local_cell_indices, local_cell_indices.shape)
             model_id = submodel_partition_info.id
             local_cell_idx_to_id[model_id] = pd.DataFrame(
-                {"local_idx": local_idx[0], "local_cell_id": local_idx[0]}
+                {"local_idx": local_cell_indices, "local_cell_id": local_cell_indices}
             )
         else:
             local_row, local_column = np.unravel_index(
