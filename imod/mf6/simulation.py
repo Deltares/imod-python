@@ -410,6 +410,12 @@ class Modflow6Simulation(collections.UserDict):
         -------
         clipped : Simulation
         """
+
+        if "split_exchanges" in self.keys():
+            raise RuntimeError(
+                "Unable to clip simulation. Clipping can only be done on simulations that haven't been split."
+            )
+
         clipped = type(self)(name=self.name)
         for key, value in self.items():
             state_for_boundary = (
@@ -439,6 +445,10 @@ class Modflow6Simulation(collections.UserDict):
 
         The method return a new simulation containing all the split models and packages
         """
+        if "split_exchanges" in self.keys():
+            raise RuntimeError(
+                "Unable to split simulation. Splitting can only be done on simulations that haven't been split."
+            )
 
         original_models = get_models(self)
         original_packages = get_packages(self)
@@ -502,6 +512,12 @@ class Modflow6Simulation(collections.UserDict):
         -------
         a new simulation object with regridded models
         """
+
+        if "split_exchanges" in self.keys():
+            raise RuntimeError(
+                "Unable to regrid simulation. Regridding can only be done on simulations that haven't been split."
+            )
+
         result = self.__class__(regridded_simulation_name)
         for key, item in self.items():
             if isinstance(item, GroundwaterFlowModel):

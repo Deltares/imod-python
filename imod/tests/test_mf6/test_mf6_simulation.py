@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import Dict
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -11,7 +12,7 @@ import xugrid as xu
 import imod
 from imod.mf6.model import Modflow6Model
 from imod.mf6.modelsplitter import PartitionInfo
-from imod.mf6.simulation import get_models, get_packages
+from imod.mf6.simulation import Modflow6Simulation, get_models, get_packages
 from imod.mf6.statusinfo import StatusInfo
 from imod.schemata import ValidationError
 from imod.typing.grid import zeros_like
@@ -262,7 +263,7 @@ class TestModflow6Simulation:
 
     @pytest.mark.usefixtures("transient_twri_model")
     def test_exchanges_in_simulation_file(self, transient_twri_model, tmp_path):
-        # arrange
+        # Arrange
         active = transient_twri_model["GWF_1"].domain.sel(layer=1)
         transient_twri_model["GWF_1"].pop("wel")
         number_partitions = 3
@@ -278,10 +279,10 @@ class TestModflow6Simulation:
                 & (coords["y"] <= split_location[id + 1])
             ] = id
 
-        # act
+        # Act
         split_simulation = transient_twri_model.split(submodel_labels)
 
-        # assert
+        # Assert
         assert len(split_simulation["split_exchanges"]) == 2
         split_simulation.write(tmp_path, False, True, False)
 
@@ -294,14 +295,56 @@ class TestModflow6Simulation:
     def test_write_exchanges(
         self, transient_twri_model, sample_gwfgwf_structured, tmp_path
     ):
-        # arrange
-
+        # Arrange
         transient_twri_model["split_exchanges"] = [sample_gwfgwf_structured]
-        # act
+
+        # Act
         transient_twri_model.write(tmp_path, True, True, True)
 
-        # assert
+        # Assert
         assert Path.exists(tmp_path / sample_gwfgwf_structured.filename())
+
+    @pytest.mark.usefixtures("transient_twri_model")
+    @pytest.mark.parametrize(
+        "method_name, method_args",
+        [
+            [Modflow6Simulation.split.__name__, {"submodel_labels": None}],
+            [Modflow6Simulation.clip_box.__name__, {}],
+            [
+                Modflow6Simulation.regrid_like.__name__,
+                {"regridded_simulation_name": None, "target_grid": None},
+            ],
+        ],
+    )
+    def test_prevent_method_after_split(
+        self,
+        transient_twri_model: Modflow6Simulation,
+        tmp_path: Path,
+        method_name: str,
+        method_args: Dict,
+    ):
+        # Arrange
+        active = transient_twri_model["GWF_1"].domain.sel(layer=1)
+        transient_twri_model["GWF_1"].pop("wel")
+        number_partitions = 3
+        split_location = np.linspace(
+            active.y.min(), active.y.max(), number_partitions + 1
+        )
+
+        coords = active.coords
+        submodel_labels = zeros_like(active)
+        for id in np.arange(1, number_partitions):
+            submodel_labels.loc[
+                (coords["y"] > split_location[id])
+                & (coords["y"] <= split_location[id + 1])
+            ] = id
+
+        split_simulation = transient_twri_model.split(submodel_labels)
+
+        # Act/Assert
+        method = getattr(split_simulation, method_name)
+        with pytest.raises(RuntimeError):
+            _ = method(**method_args)
 
 
 def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo):
