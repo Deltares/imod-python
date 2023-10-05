@@ -1,3 +1,4 @@
+import abc
 import copy
 from typing import Dict, List
 
@@ -15,45 +16,7 @@ from imod.mf6.utilities.grid_utilities import (
 from imod.typing.grid import GridDataArray, is_unstructured
 
 
-def to_xarray(connected_cells: pd.DataFrame) -> xr.Dataset:
-    dataset = connected_cells.to_xarray()
-
-    if connected_cells["cell_id1"].any() and not np.isscalar(
-        connected_cells["cell_id1"].values[0]
-    ):
-        dataset["cell_id1"] = xr.DataArray(
-            np.array(list(zip(*connected_cells["cell_id1"]))).T,
-            dims=("index", "cell_dims1"),
-            coords={"cell_dims1": ["row_1", "column_1"]},
-        )
-        dataset["cell_id2"] = xr.DataArray(
-            np.array(list(zip(*connected_cells["cell_id2"]))).T,
-            dims=("index", "cell_dims2"),
-            coords={"cell_dims2": ["row_2", "column_2"]},
-        )
-    else:
-        size = connected_cells.shape[0]
-        cell_id1 = np.array(connected_cells["cell_id1"])
-        cell_id1_2d = cell_id1.reshape(size, 1)
-
-        dataset["cell_id1"] = xr.DataArray(
-            cell_id1_2d,
-            dims=("index", "cell_dims1"),
-            coords={"cell_dims1": ["cellindex1"]},
-        )
-
-        cell_id2 = np.array(connected_cells["cell_id2"])
-        cell_id2_2d = cell_id2.reshape(size, 1)
-        dataset["cell_id2"] = xr.DataArray(
-            cell_id2_2d,
-            dims=("index", "cell_dims2"),
-            coords={"cell_dims2": ["cellindex2"]},
-        )
-
-    return dataset
-
-
-class ExchangeCreator:
+class ExchangeCreator(abc.ABC):
     """
     Creates the GroundWaterFlow to GroundWaterFlow exchange package (gwfgwf) as a function of a submodel label array and a
     PartitionInfo object. This file contains the cell indices of coupled cells. With coupled cells we mean cells that are adjacent but
@@ -65,16 +28,27 @@ class ExchangeCreator:
 
     """
 
+    @classmethod
+    def to_xarray(cls, connected_cells: pd.DataFrame) -> xr.Dataset:
+        raise NotImplementedError
+
+    def _find_connected_cells(self) -> pd.DataFrame:
+        raise NotImplementedError
+
+    def _adjust_gridblock_indexing(self, connected_cells: xr.Dataset) -> xr.Dataset:
+        return connected_cells
+
+    def _compute_geometric_information(self) -> pd.DataFrame:
+        raise NotImplementedError
+
     def __init__(
         self, submodel_labels: GridDataArray, partition_info: List[PartitionInfo]
     ):
         self._submodel_labels = submodel_labels
 
         self._global_cell_indices = to_cell_idx(submodel_labels)
-        if is_unstructured(submodel_labels):
-            self._connected_cells = self._find_connected_cells_unstructured()
-        else:
-            self._connected_cells = self._find_connected_cells_structured()
+
+        self._connected_cells = self._find_connected_cells()
 
         self._global_to_local_mapping = (
             self._create_global_cellidx_to_local_cellid_mapping(partition_info)
@@ -141,15 +115,10 @@ class ExchangeCreator:
 
                 connected_cells = pd.merge(layers, connected_cells, how="cross")
 
-                connected_cells_dataset = to_xarray(connected_cells)
+                connected_cells_dataset = self.to_xarray(connected_cells)
 
-                if is_unstructured(self._submodel_labels):
-                    connected_cells_dataset["cell_id1"].values = (
-                        connected_cells_dataset["cell_id1"].values + 1
-                    )
-                    connected_cells_dataset["cell_id2"].values = (
-                        connected_cells_dataset["cell_id2"].values + 1
-                    )
+                self._adjust_gridblock_indexing(connected_cells_dataset)
+
                 exchanges.append(
                     GWFGWF(
                         f"{model_name}_{model_id1}",
@@ -159,50 +128,6 @@ class ExchangeCreator:
                 )
 
         return exchanges
-
-    def _find_connected_cells_structured(self) -> pd.DataFrame:
-        connected_cells_along_x = self._find_connected_cells_along_axis("x")
-        connected_cells_along_y = self._find_connected_cells_along_axis("y")
-
-        return pd.merge(connected_cells_along_x, connected_cells_along_y, how="outer")
-
-    def _find_connected_cells_unstructured(self) -> pd.DataFrame:
-        # make a deepcopy to avoid changing the original
-        edge_face = copy.deepcopy(
-            self._submodel_labels.ugrid.grid.edge_face_connectivity
-        )
-        edge_index = [i for i in range(len(edge_face))]
-
-        f1 = edge_face[:, 0]
-        f2 = edge_face[:, 1]
-
-        # edges at the external boundary have one -1 for the external "gridblock"
-        # we set both entries to -1 here so that en exteral edge will have [-1, -1]
-        f1 = np.where(f2 >= 0, f1, -1)
-        f2 = np.where(f1 >= 0, f2, -1)
-        label_of_edge1 = self._submodel_labels.values[f1]
-        label_of_edge2 = self._submodel_labels.values[f2]
-
-        # only keep the edge indces where the labels are different. The others will be -1
-        edge_indices_internal_boundary = np.where(
-            label_of_edge1 - label_of_edge2 != 0, edge_index, -1
-        )
-        # only keep the edge indces hat are not -1
-        edge_indices_internal_boundary = np.setdiff1d(
-            edge_indices_internal_boundary, [-1]
-        )
-        internal_boundary = edge_face[edge_indices_internal_boundary]
-
-        connected_cell_info = pd.DataFrame(
-            {
-                "cell_idx1": internal_boundary[:, 0],
-                "cell_idx2": internal_boundary[:, 1],
-                "cell_label1": label_of_edge1[edge_indices_internal_boundary],
-                "cell_label2": label_of_edge2[edge_indices_internal_boundary],
-            }
-        )
-
-        return connected_cell_info
 
     def _find_connected_cells_along_axis(self, axis_label: str) -> pd.DataFrame:
         diff1 = self._submodel_labels.diff(f"{axis_label}", label="lower")
@@ -249,48 +174,6 @@ class ExchangeCreator:
             )
 
         return mapping
-
-    def _compute_geometric_information(self) -> pd.DataFrame:
-        if is_unstructured(self._submodel_labels):
-            ones = np.ones_like(self._connected_cells["cell_idx1"].values, dtype=int)
-
-            df = pd.DataFrame(
-                {
-                    "cell_idx1": self._connected_cells["cell_idx1"].values,
-                    "cell_idx2": self._connected_cells["cell_idx2"].values,
-                    "cl1": ones,
-                    "cl2": ones,
-                    "hwva": ones,
-                }
-            )
-            return df
-        geometric_grid_info = create_geometric_grid_info(self._global_cell_indices)
-
-        cell1_df = geometric_grid_info.take(self._connected_cells["cell_idx1"])
-        cell2_df = geometric_grid_info.take(self._connected_cells["cell_idx2"])
-
-        distance_x = np.abs(cell1_df["x"].values - cell2_df["x"].values)
-        distance_y = np.abs(cell1_df["y"].values - cell2_df["y"].values)
-        distance = np.sqrt(distance_x**2 + distance_y**2)
-
-        cl1 = 0.5 * np.where(
-            distance_x > distance_y, cell1_df["dx"].values, cell1_df["dy"].values
-        )
-        cl2 = 0.5 * np.where(
-            distance_x > distance_y, cell2_df["dx"].values, cell2_df["dy"].values
-        )
-
-        df = pd.DataFrame(
-            {
-                "cell_idx1": self._connected_cells["cell_idx1"].values,
-                "cell_idx2": self._connected_cells["cell_idx2"].values,
-                "cl1": cl1,
-                "cl2": cl2,
-                "hwva": distance.flatten(),
-            }
-        )
-
-        return df
 
 
 def _create_global_to_local_idx(
