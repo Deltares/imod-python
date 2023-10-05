@@ -28,7 +28,7 @@ class TestExchangeCreator_Unstructured:
         unstructured_flow_simulation: imod.mf6.Modflow6Simulation,
         number_partitions: int,
     ):
-        idomain = unstructured_flow_simulation["flow"]["disv"]["idomain"]
+        idomain = unstructured_flow_simulation["flow"].domain
         submodel_labels = create_submodel_labels_unstructured(
             idomain, number_partitions
         )
@@ -55,14 +55,12 @@ class TestExchangeCreator_Unstructured:
         # the 3. On the second domain, the exchanges should be located on cells
         # 1 to 6
         number_partitions = 2
-        idomain = unstructured_flow_simulation["flow"]["disv"]["idomain"]
+        idomain = unstructured_flow_simulation["flow"].domain
         submodel_labels = create_submodel_labels_unstructured(
             idomain, number_partitions
         )
         partition_info = create_partition_info(submodel_labels)
         exchange_creator = ExchangeCreator_Unstructured(submodel_labels, partition_info)
-
-        exchange_creator._find_connected_cells()
 
         # Act.
         exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
