@@ -116,7 +116,7 @@ class TestModflow6Simulation:
         with pytest.raises(ValidationError):
             simulation.write(tmp_path)
 
-    @mock.patch("imod.mf6.simulation.ExchangeCreator")
+    @mock.patch("imod.mf6.simulation.ExchangeCreator_Unstructured")
     def test_split_simulation_only_has_packages(
         self, exchange_creator_mock, basic_unstructured_dis, setup_simulation
     ):
@@ -145,10 +145,10 @@ class TestModflow6Simulation:
         assert new_simulation["disv"] is simulation["disv"]
 
     @mock.patch("imod.mf6.simulation.slice_model", autospec=True)
-    @mock.patch("imod.mf6.simulation.ExchangeCreator")
+    @mock.patch("imod.mf6.simulation.ExchangeCreator_Unstructured")
     def test_split_multiple_models(
         self,
-        exchange_creator_mock,
+        exchange_creator_unstructured_mock,
         slice_model_mock,
         basic_unstructured_dis,
         setup_simulation,
@@ -205,7 +205,7 @@ class TestModflow6Simulation:
             )
 
     @mock.patch("imod.mf6.simulation.slice_model", autospec=True)
-    @mock.patch("imod.mf6.simulation.ExchangeCreator", autospec=True)
+    @mock.patch("imod.mf6.simulation.ExchangeCreator_Structured", autospec=True)
     @mock.patch("imod.mf6.simulation.create_partition_info")
     def test_split_multiple_models_creates_expected_number_of_exchanges(
         self,
