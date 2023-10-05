@@ -72,7 +72,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         edge_face = copy.deepcopy(
             self._submodel_labels.ugrid.grid.edge_face_connectivity
         )
-        edge_index = [i for i in range(len(edge_face))]
+        edge_index = np.arange(len(edge_face))
 
         f1 = edge_face[:, 0]
         f2 = edge_face[:, 1]
