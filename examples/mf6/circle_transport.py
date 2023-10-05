@@ -349,5 +349,4 @@ fig, ax = plt.subplots()
 sim_concentration.isel(time=-1).ugrid.sel(y=0).plot.contourf(
     ax=ax, x="mesh2d_x", y="z", cmap="RdYlBu_r"
 )
-
 # %%
