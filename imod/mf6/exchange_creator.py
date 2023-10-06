@@ -24,7 +24,7 @@ class ExchangeCreator(abc.ABC):
     """
 
     @classmethod
-    def to_xarray(cls, connected_cells: pd.DataFrame) -> xr.Dataset:
+    def _to_xarray(cls, connected_cells: pd.DataFrame) -> xr.Dataset:
         raise NotImplementedError
 
     def _find_connected_cells(self) -> pd.DataFrame:
@@ -110,7 +110,7 @@ class ExchangeCreator(abc.ABC):
 
                 connected_cells = pd.merge(layers, connected_cells, how="cross")
 
-                connected_cells_dataset = self.to_xarray(connected_cells)
+                connected_cells_dataset = self._to_xarray(connected_cells)
 
                 self._adjust_gridblock_indexing(connected_cells_dataset)
 

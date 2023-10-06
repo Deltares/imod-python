@@ -28,7 +28,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         super().__init__(submodel_labels, partition_info)
 
     @classmethod
-    def to_xarray(cls, connected_cells: pd.DataFrame) -> xr.Dataset:
+    def _to_xarray(cls, connected_cells: pd.DataFrame) -> xr.Dataset:
         dataset = connected_cells.to_xarray()
 
         size = connected_cells.shape[0]
