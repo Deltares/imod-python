@@ -29,14 +29,19 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
 
     @classmethod
     def _to_xarray(cls, connected_cells: pd.DataFrame) -> xr.Dataset:
+        '''
+        converts a panda dataframe with exchange data to an xarray dataset. The
+        dataframe must have columns called cell_id1 and cell_id2: indices of
+        cells that are part of the exchange boundary (the subdomain boundary, on
+        both sides of the boundary)
+        '''
         dataset = connected_cells.to_xarray()
 
         size = connected_cells.shape[0]
         cell_id1 = np.array(connected_cells["cell_id1"])
-        cell_id1_2d = cell_id1.reshape(size, 1)
 
         dataset["cell_id1"] = xr.DataArray(
-            cell_id1_2d,
+            cell_id1.reshape(size, 1),
             dims=("index", "cell_dims1"),
             coords={"cell_dims1": ["cellindex1"]},
         )

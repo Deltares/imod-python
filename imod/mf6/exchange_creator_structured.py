@@ -12,10 +12,12 @@ from imod.typing.grid import GridDataArray
 
 class ExchangeCreator_Structured(ExchangeCreator):
     """
-    Creates the GroundWaterFlow to GroundWaterFlow exchange package (gwfgwf) as a function of a submodel label array and a
-    PartitionInfo object. This file contains the cell indices of coupled cells. With coupled cells we mean cells that are adjacent but
-    that are located in different subdomains.  At the moment only structured grids are supported, for unstructured grids the geometric information
-    is still set to default values.
+    Creates the GroundWaterFlow to GroundWaterFlow exchange package (gwfgwf) as
+    a function of a submodel label array and a PartitionInfo object. This file
+    contains the cell indices of coupled cells. With coupled cells we mean cells
+    that are adjacent but that are located in different subdomains. At the
+    moment only structured grids are supported, for unstructured grids the
+    geometric information is still set to default values.
 
     The submodel_labels array should have the same topology as the domain being partitioned. The array will be used
     to determine the connectivity of the submodels after the split operation has been performed.
@@ -29,6 +31,13 @@ class ExchangeCreator_Structured(ExchangeCreator):
 
     @classmethod
     def _to_xarray(cls, connected_cells: pd.DataFrame) -> xr.Dataset:
+        '''
+        converts a panda dataframe with exchange data to an xarray dataset. The
+        dataframe must have columns called cell_id1, row_1, column_1, cell_id2,
+        row_2 and col_2 containing the cell_id, row and column indices of cells
+        that are part of the exchange boundary (the subdomain boundary, on both
+        sides of the boundary)
+        '''
         dataset = connected_cells.to_xarray()
 
         dataset["cell_id1"] = xr.DataArray(
