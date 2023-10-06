@@ -1,5 +1,9 @@
 image: condaforge/mambaforge
 
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+
 stages:
   - static code analysis
   - tests
@@ -79,5 +83,6 @@ publish documentation:
   artifacts:
     paths:
     - public
-  only:
-  - master
+  rules:
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "master"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
