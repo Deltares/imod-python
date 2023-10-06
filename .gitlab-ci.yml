@@ -2,6 +2,7 @@ image: condaforge/mambaforge
 
 stages:
   - static code analysis
+  - tests
   - build
   - publish
 
@@ -27,43 +28,49 @@ mypy:
       codequality: codequality.json
   allow_failure: true
 
-# Run tests and create docs in the same stage. The docker image cannot (easily)
-# be shared between stages, this avoids double setup of the environment.
-build:
+unit tests and coverage:
+  stage: tests
+  variables:
+    NUMBA_DISABLE_JIT: "1"
+  script:
+    - apt-get update -q -y
+    - apt-get install -y build-essential curl
+    - apt-get install libgl1-mesa-glx -y
+    - mamba env create -f imod-environment.yml
+    - mamba env update -f imod-environment-dev.yml --prefix /opt/conda/envs/imod
+    - source activate imod
+    # Do editable install as pytest expects that
+    # https://github.com/scikit-hep/pyhf/issues/1456
+    - pip install -e .
+    # Run tests
+    - cd imod/tests
+    - python -m pytest --cache-clear --verbose --cov=imod --cov-config=.coveragerc
+  coverage: '/TOTAL.*\s+(\d+\%)/'
+  artifacts:
+    paths:
+      - imod/tests/coverage.xml
+    expire_in: 1 week
+
+build documentation:
   stage: build
   script:
     - apt-get update -q -y
     - apt-get install -y build-essential curl
     - apt-get install libgl1-mesa-glx -y
     - mamba env create -f imod-environment.yml
+    - mamba env update -f imod-environment-dev.yml --prefix /opt/conda/envs/imod
     - source activate imod
-    # Do editable install as pytest expects that
-    # https://github.com/scikit-hep/pyhf/issues/1456
     - pip install -e .
-    # download mf6 binary and move it to the env's bin which is in the path
-    # see https://gitlab.com/deltares/imod/imod-python/snippets/1893049
-    - curl -O -L https://gitlab.com/deltares/imod/imod-python/uploads/a8ed27675150689c6acd425239531a5e/mf6.gz
-    - gunzip mf6.gz
-    - chmod +x mf6
-    - mv mf6 /opt/conda/envs/imod/bin
-    # Run tests
-    - cd imod/tests
-    - python -m pytest --cache-clear
-    - python -m pytest --verbose test_regrid.py
-    - python -m pytest --verbose test_visualize/test_visualize_pyvista.py
-    - export NUMBA_DISABLE_JIT=1
-    - python -m pytest --verbose --cov=imod --cov-config=.coveragerc
-    - cd ../../docs
+    - cd docs
     - make html
-    - cd ..
-  coverage: '/TOTAL.*\s+(\d+\%)/'
   artifacts:
     paths:
       - docs/_build/html/
-      - imod/tests/coverage.xml 
     expire_in: 1 week
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
 
-pages:
+publish documentation:
   stage: publish
   dependencies:
     - build

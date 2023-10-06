@@ -6,7 +6,6 @@ channels:
 
 dependencies:
   - affine
-  - black
   - bottleneck
   - cftime>=1
   - contextily>=1
@@ -17,9 +16,9 @@ dependencies:
   - python-graphviz
   - fastcore
   - flopy
-  - hypothesis
   - jinja2
   - matplotlib
+  - modflow6
   - netcdf4
   - numba>=0.50
   - numpy
@@ -32,10 +31,6 @@ dependencies:
       - "git+https://github.com/Deltares/Ribasim.git#egg=ribasim_testmodels&subdirectory=python/ribasim_testmodels"
   - pydata-sphinx-theme
   - pyproj
-  - pytest
-  - pytest-benchmark
-  - pytest-cases
-  - pytest-cov
   - python=3.10
   - pyvista
   - rasterio>=1.0
@@ -44,8 +39,6 @@ dependencies:
   - setuptools_scm
   - scooby
   - shapely>=2.0
-  - sphinx=5
-  - sphinx-gallery
   - toolz
   - tomli>=1.1.0
   - tomli-w
