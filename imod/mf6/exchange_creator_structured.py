@@ -1,19 +1,13 @@
-import copy
-from typing import Dict, List
+from typing import List
 
 import numpy as np
 import pandas as pd
 import xarray as xr
 
 from imod.mf6.exchange_creator import ExchangeCreator
-from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.modelsplitter import PartitionInfo
-from imod.mf6.utilities.grid_utilities import (
-    create_geometric_grid_info,
-    get_active_domain_slice,
-    to_cell_idx,
-)
-from imod.typing.grid import GridDataArray, is_unstructured
+from imod.mf6.utilities.grid_utilities import create_geometric_grid_info
+from imod.typing.grid import GridDataArray
 
 
 class ExchangeCreator_Structured(ExchangeCreator):

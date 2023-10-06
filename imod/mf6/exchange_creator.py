@@ -1,5 +1,4 @@
 import abc
-import copy
 from typing import Dict, List
 
 import numpy as np
@@ -8,11 +7,7 @@ import xarray as xr
 
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.modelsplitter import PartitionInfo
-from imod.mf6.utilities.grid_utilities import (
-    create_geometric_grid_info,
-    get_active_domain_slice,
-    to_cell_idx,
-)
+from imod.mf6.utilities.grid_utilities import get_active_domain_slice, to_cell_idx
 from imod.typing.grid import GridDataArray, is_unstructured
 
 
