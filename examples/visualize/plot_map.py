@@ -51,7 +51,7 @@ imod.visualize.plot_map(
 # And to include a basemap:
 import contextily as ctx
 
-src = ctx.providers.Stamen.TonerLite
+src = ctx.providers.OpenStreetMap.Mapnik
 imod.visualize.plot_map(
     surface_level,
     colors,
