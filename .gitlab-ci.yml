@@ -73,7 +73,7 @@ build documentation:
 publish documentation:
   stage: publish
   dependencies:
-    - build
+    - build documentation
   script:
     - mv docs/_build/html/ public/
   artifacts:
