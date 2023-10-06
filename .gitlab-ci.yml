@@ -1,9 +1,5 @@
 image: condaforge/mambaforge
 
-workflow:
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
-
 stages:
   - static code analysis
   - tests
@@ -31,6 +27,8 @@ mypy:
     reports:
       codequality: codequality.json
   allow_failure: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
 
 unit tests and coverage:
   stage: tests
@@ -54,6 +52,8 @@ unit tests and coverage:
     paths:
       - imod/tests/coverage.xml
     expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
 
 build documentation:
   stage: build
@@ -72,7 +72,8 @@ build documentation:
       - docs/_build/html/
     expire_in: 1 week
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
 
 publish documentation:
   stage: publish
@@ -84,5 +85,6 @@ publish documentation:
     paths:
     - public
   rules:
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "master"'
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "master"
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
