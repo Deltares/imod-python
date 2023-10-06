@@ -7,7 +7,7 @@ from imod.mf6.modelsplitter import create_partition_info
 from imod.typing.grid import zeros_like
 
 
-def create_submodel_labels_unstructured(idomain, number_partitions):
+def _create_submodel_labels_unstructured(idomain, number_partitions):
     submodel_labels = zeros_like(idomain.sel(layer=1))
     dimension = len(submodel_labels)
     switch_index = int(dimension / number_partitions)
@@ -29,7 +29,7 @@ class TestExchangeCreator_Unstructured:
         number_partitions: int,
     ):
         idomain = unstructured_flow_simulation["flow"].domain
-        submodel_labels = create_submodel_labels_unstructured(
+        submodel_labels = _create_submodel_labels_unstructured(
             idomain, number_partitions
         )
         partition_info = create_partition_info(submodel_labels)
@@ -56,7 +56,7 @@ class TestExchangeCreator_Unstructured:
         # 1 to 6
         number_partitions = 2
         idomain = unstructured_flow_simulation["flow"].domain
-        submodel_labels = create_submodel_labels_unstructured(
+        submodel_labels = _create_submodel_labels_unstructured(
             idomain, number_partitions
         )
         partition_info = create_partition_info(submodel_labels)
