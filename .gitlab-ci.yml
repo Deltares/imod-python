@@ -12,7 +12,8 @@ lint:
     # Avoid tox version with broken tox-conda.
     - mamba install "tox>=3.8.1, <4"
     - tox -e lint
-  when: always
+  rules:
+    - when: always
 
 mypy:
   stage: static code analysis
@@ -28,7 +29,8 @@ mypy:
     reports:
       codequality: codequality.json
   allow_failure: true
-  when: always
+  rules:
+    - when: always
 
 unit tests and coverage:
   stage: tests
@@ -52,7 +54,8 @@ unit tests and coverage:
     paths:
       - imod/tests/coverage.xml
     expire_in: 1 week
-  when: always
+  rules:
+    - when: always
 
 build documentation:
   stage: build
