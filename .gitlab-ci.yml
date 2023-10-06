@@ -12,6 +12,7 @@ lint:
     # Avoid tox version with broken tox-conda.
     - mamba install "tox>=3.8.1, <4"
     - tox -e lint
+  when: always
 
 mypy:
   stage: static code analysis
@@ -27,8 +28,7 @@ mypy:
     reports:
       codequality: codequality.json
   allow_failure: true
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
+  when: always
 
 unit tests and coverage:
   stage: tests
@@ -52,8 +52,7 @@ unit tests and coverage:
     paths:
       - imod/tests/coverage.xml
     expire_in: 1 week
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
+  when: always
 
 build documentation:
   stage: build
@@ -72,7 +71,6 @@ build documentation:
       - docs/_build/html/
     expire_in: 1 week
   rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
 
 publish documentation:
@@ -85,6 +83,4 @@ publish documentation:
     paths:
     - public
   rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
-    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "master"
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
+    - if: $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "master" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
