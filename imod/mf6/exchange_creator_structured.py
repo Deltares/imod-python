@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 import numpy as np
 import pandas as pd
@@ -107,3 +107,31 @@ class ExchangeCreator_Structured(ExchangeCreator):
         )
 
         return df
+
+    @classmethod
+    def _create_global_to_local_idx(
+        cls, partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
+    ) -> Dict[int, pd.DataFrame]:
+        global_to_local_idx = {}
+        for submodel_partition_info in partition_info:
+            local_cell_indices = cls._get_local_cell_indices(submodel_partition_info)
+
+            local_cell_indices_da = local_cell_indices
+            global_cell_indices_da = global_cell_indices
+
+            overlap = xr.merge(
+                (global_cell_indices_da, local_cell_indices_da),
+                join="inner",
+                fill_value=np.nan,
+                compat="override",
+            )["idomain"]
+
+            model_id = submodel_partition_info.id
+            global_to_local_idx[model_id] = pd.DataFrame(
+                {
+                    "global_idx": overlap.values.flatten(),
+                    "local_idx": local_cell_indices.values.flatten(),
+                }
+            )
+
+        return global_to_local_idx

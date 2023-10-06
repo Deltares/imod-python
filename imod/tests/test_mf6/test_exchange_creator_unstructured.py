@@ -35,8 +35,6 @@ class TestExchangeCreator_Unstructured:
         partition_info = create_partition_info(submodel_labels)
         exchange_creator = ExchangeCreator_Unstructured(submodel_labels, partition_info)
 
-        exchange_creator._find_connected_cells()
-
         # Act.
         exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
 
