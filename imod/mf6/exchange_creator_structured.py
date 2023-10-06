@@ -125,11 +125,8 @@ class ExchangeCreator_Structured(ExchangeCreator):
         for submodel_partition_info in partition_info:
             local_cell_indices = cls._get_local_cell_indices(submodel_partition_info)
 
-            local_cell_indices_da = local_cell_indices
-            global_cell_indices_da = global_cell_indices
-
             overlap = xr.merge(
-                (global_cell_indices_da, local_cell_indices_da),
+                (global_cell_indices, local_cell_indices),
                 join="inner",
                 fill_value=np.nan,
                 compat="override",
