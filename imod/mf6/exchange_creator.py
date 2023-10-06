@@ -28,12 +28,24 @@ class ExchangeCreator(abc.ABC):
         raise NotImplementedError
 
     def _find_connected_cells(self) -> pd.DataFrame:
+        """
+        abstract method that creates a dataframe with the cell indices and subdomain indices of cells that are on the
+        boundary of subdomains. The cell index is a number assigned to each cell on the unpartitioned domain
+        For structured grids it replaces the row and column index which are usually used to identify a cell.
+        """
         raise NotImplementedError
 
     def _adjust_gridblock_indexing(self, connected_cells: xr.Dataset) -> xr.Dataset:
+        """
+        adjusts the gridblock numbering from 0-based to 1-based.
+        """
         return connected_cells
 
     def _compute_geometric_information(self) -> pd.DataFrame:
+        """
+        abstract method that computes the geometric information needed for the gwfgwf files such as
+        ihc, cl1, cl2, hwva ( see modflow documentation )
+        """
         raise NotImplementedError
 
     def _find_connected_cells_along_axis(self, axis_label: str) -> pd.DataFrame:

@@ -31,13 +31,13 @@ class ExchangeCreator_Structured(ExchangeCreator):
 
     @classmethod
     def _to_xarray(cls, connected_cells: pd.DataFrame) -> xr.Dataset:
-        '''
+        """
         converts a panda dataframe with exchange data to an xarray dataset. The
         dataframe must have columns called cell_id1, row_1, column_1, cell_id2,
         row_2 and col_2 containing the cell_id, row and column indices of cells
         that are part of the exchange boundary (the subdomain boundary, on both
         sides of the boundary)
-        '''
+        """
         dataset = connected_cells.to_xarray()
 
         dataset["cell_id1"] = xr.DataArray(
