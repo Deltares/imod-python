@@ -48,8 +48,9 @@ class ExchangeCreator(abc.ABC):
         """
         raise NotImplementedError
 
+    @classmethod
     def _create_global_to_local_idx(
-        partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
+        cls, partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
     ) -> Dict[int, pd.DataFrame]:
         """
         abstract method that creates for each partition a maping from global cell indices to local cells in that partition.
