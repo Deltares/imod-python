@@ -37,7 +37,7 @@ class ExchangeCreator(abc.ABC):
 
     def _adjust_gridblock_indexing(self, connected_cells: xr.Dataset) -> xr.Dataset:
         """
-        adjusts the gridblock numbering from 0-based to 1-based.
+        abstract method that adjusts the gridblock numbering from 0-based to 1-based.
         """
         return connected_cells
 
@@ -48,12 +48,12 @@ class ExchangeCreator(abc.ABC):
         """
         raise NotImplementedError
 
-    def _find_connected_cells_along_axis(self, axis_label: str) -> pd.DataFrame:
-        raise NotImplementedError
-
     def _create_global_to_local_idx(
         partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
     ) -> Dict[int, pd.DataFrame]:
+        """
+        abstract method that creates for each partition a maping from global cell indices to local cells in that partition.
+        """
         raise NotImplementedError
 
     def __init__(
