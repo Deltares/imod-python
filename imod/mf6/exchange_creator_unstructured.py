@@ -162,13 +162,11 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
                 "mesh2d_nFaces", how="all"
             )
 
-            local_cell_indices_df = local_cell_indices.to_dataframe()
             global_cell_indices_df = global_cell_indices_partition.to_dataframe()
-            local_cell_indices_da = xr.Dataset.from_dataframe(local_cell_indices_df)
             global_cell_indices_da = xr.Dataset.from_dataframe(global_cell_indices_df)
 
             overlap = xr.merge(
-                (global_cell_indices_da, local_cell_indices_da),
+                (global_cell_indices_da, xr.DataArray(local_cell_indices)),
                 join="inner",
                 fill_value=np.nan,
                 compat="override",
