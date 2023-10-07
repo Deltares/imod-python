@@ -8,7 +8,7 @@ from pytest_cases import parametrize_with_cases
 
 import imod
 from imod.mf6.write_context import WriteContext
-from imod.tests.fixtures.mf6_regridding_fixture import (
+from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_structured,
     grid_data_structured_layered,
     grid_data_unstructured,
