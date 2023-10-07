@@ -1,3 +1,4 @@
+import abc
 from typing import Dict, List
 
 import numpy as np
@@ -6,44 +7,55 @@ import xarray as xr
 
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.modelsplitter import PartitionInfo
-from imod.mf6.utilities.grid_utilities import (
-    create_geometric_grid_info,
-    get_active_domain_slice,
-    to_cell_idx,
-)
-from imod.typing.grid import GridDataArray
+from imod.mf6.utilities.grid_utilities import get_active_domain_slice, to_cell_idx
+from imod.typing.grid import GridDataArray, is_unstructured
 
 
-def to_xarray(connected_cells: pd.DataFrame) -> xr.Dataset:
-    dataset = connected_cells.to_xarray()
-
-    if (
-        connected_cells["cell_id1"].any()
-        and len(connected_cells["cell_id1"].values[0]) == 2
-    ):
-        dataset["cell_id1"] = xr.DataArray(
-            np.array(list(zip(*connected_cells["cell_id1"]))).T,
-            dims=("index", "cell_dims1"),
-            coords={"cell_dims1": ["row_1", "column_1"]},
-        )
-        dataset["cell_id2"] = xr.DataArray(
-            np.array(list(zip(*connected_cells["cell_id2"]))).T,
-            dims=("index", "cell_dims2"),
-            coords={"cell_dims2": ["row_2", "column_2"]},
-        )
-
-    return dataset
-
-
-class ExchangeCreator:
+class ExchangeCreator(abc.ABC):
     """
-    Creates the GroundWaterFlow to GroundWaterFlow exchange definitions as a function of a submodel label array and a
-    PartitionInfo object. At the moment only structured grids are supported
+    Creates the GroundWaterFlow to GroundWaterFlow exchange package (gwfgwf) as a function of a submodel label array and a
+    PartitionInfo object. This file contains the cell indices of coupled cells. With coupled cells we mean cells that are adjacent but
+    that are located in different subdomains.  At the moment only structured grids are supported, for unstructured grids the geometric information
+    is still set to default values.
 
     The submodel_labels array should have the same topology as the domain being partitioned. The array will be used
     to determine the connectivity of the submodels after the split operation has been performed.
 
     """
+
+    @classmethod
+    def _to_xarray(cls, connected_cells: pd.DataFrame) -> xr.Dataset:
+        raise NotImplementedError
+
+    def _find_connected_cells(self) -> pd.DataFrame:
+        """
+        abstract method that creates a dataframe with the cell indices and subdomain indices of cells that are on the
+        boundary of subdomains. The cell index is a number assigned to each cell on the unpartitioned domain
+        For structured grids it replaces the row and column index which are usually used to identify a cell.
+        """
+        raise NotImplementedError
+
+    def _adjust_gridblock_indexing(self, connected_cells: xr.Dataset) -> xr.Dataset:
+        """
+        abstract method that adjusts the gridblock numbering from 0-based to 1-based.
+        """
+        return connected_cells
+
+    def _compute_geometric_information(self) -> pd.DataFrame:
+        """
+        abstract method that computes the geometric information needed for the gwfgwf files such as
+        ihc, cl1, cl2, hwva ( see modflow documentation )
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def _create_global_to_local_idx(
+        cls, partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
+    ) -> Dict[int, pd.DataFrame]:
+        """
+        abstract method that creates for each partition a maping from global cell indices to local cells in that partition.
+        """
+        raise NotImplementedError
 
     def __init__(
         self, submodel_labels: GridDataArray, partition_info: List[PartitionInfo]
@@ -51,10 +63,13 @@ class ExchangeCreator:
         self._submodel_labels = submodel_labels
 
         self._global_cell_indices = to_cell_idx(submodel_labels)
+
         self._connected_cells = self._find_connected_cells()
+
         self._global_to_local_mapping = (
             self._create_global_cellidx_to_local_cellid_mapping(partition_info)
         )
+
         self._geometric_information = self._compute_geometric_information()
 
     def create_exchanges(self, model_name: str, layers: GridDataArray) -> List[GWFGWF]:
@@ -116,7 +131,9 @@ class ExchangeCreator:
 
                 connected_cells = pd.merge(layers, connected_cells, how="cross")
 
-                connected_cells_dataset = to_xarray(connected_cells)
+                connected_cells_dataset = self._to_xarray(connected_cells)
+
+                self._adjust_gridblock_indexing(connected_cells_dataset)
 
                 exchanges.append(
                     GWFGWF(
@@ -128,48 +145,13 @@ class ExchangeCreator:
 
         return exchanges
 
-    def _find_connected_cells(self) -> pd.DataFrame:
-        connected_cells_along_x = self._find_connected_cells_along_axis("x")
-        connected_cells_along_y = self._find_connected_cells_along_axis("y")
-
-        return pd.merge(connected_cells_along_x, connected_cells_along_y, how="outer")
-
-    def _find_connected_cells_along_axis(self, axis_label: str) -> pd.DataFrame:
-        diff1 = self._submodel_labels.diff(f"{axis_label}", label="lower")
-        diff2 = self._submodel_labels.diff(f"{axis_label}", label="upper")
-
-        connected_cells_idx1 = self._global_cell_indices.where(
-            diff1 != 0, drop=True
-        ).astype(int)
-        connected_cells_idx2 = self._global_cell_indices.where(
-            diff2 != 0, drop=True
-        ).astype(int)
-
-        connected_model_label1 = self._submodel_labels.where(
-            diff1 != 0, drop=True
-        ).astype(int)
-        connected_model_label2 = self._submodel_labels.where(
-            diff2 != 0, drop=True
-        ).astype(int)
-
-        connected_cell_info = pd.DataFrame(
-            {
-                "cell_idx1": connected_cells_idx1.values.flatten(),
-                "cell_idx2": connected_cells_idx2.values.flatten(),
-                "cell_label1": connected_model_label1.values.flatten(),
-                "cell_label2": connected_model_label2.values.flatten(),
-            }
-        )
-
-        return connected_cell_info
-
     def _create_global_cellidx_to_local_cellid_mapping(
         self, partition_info: List[PartitionInfo]
     ) -> Dict[int, pd.DataFrame]:
-        global_to_local_idx = _create_global_to_local_idx(
+        global_to_local_idx = self._create_global_to_local_idx(
             partition_info, self._global_cell_indices
         )
-        local_cell_idx_to_id = _local_cell_idx_to_id(partition_info)
+        local_cell_idx_to_id = self._local_cell_idx_to_id(partition_info)
 
         mapping = {}
         for submodel_partition_info in partition_info:
@@ -180,83 +162,42 @@ class ExchangeCreator:
 
         return mapping
 
-    def _compute_geometric_information(self) -> pd.DataFrame:
-        geometric_grid_info = create_geometric_grid_info(self._global_cell_indices)
+    @classmethod
+    def _get_local_cell_indices(
+        cls, submodel_partition_info: PartitionInfo
+    ) -> xr.DataArray:
+        domain_slice = get_active_domain_slice(submodel_partition_info.active_domain)
+        local_domain = submodel_partition_info.active_domain.sel(domain_slice)
 
-        cell1_df = geometric_grid_info.take(self._connected_cells["cell_idx1"])
-        cell2_df = geometric_grid_info.take(self._connected_cells["cell_idx2"])
+        return to_cell_idx(local_domain)
 
-        distance_x = np.abs(cell1_df["x"].values - cell2_df["x"].values)
-        distance_y = np.abs(cell1_df["y"].values - cell2_df["y"].values)
-        distance = np.sqrt(distance_x**2 + distance_y**2)
+    @classmethod
+    def _local_cell_idx_to_id(cls, partition_info) -> Dict[int, pd.DataFrame]:
+        local_cell_idx_to_id = {}
+        for submodel_partition_info in partition_info:
+            local_cell_indices = cls._get_local_cell_indices(submodel_partition_info)
 
-        cl1 = 0.5 * np.where(
-            distance_x > distance_y, cell1_df["dx"].values, cell1_df["dy"].values
-        )
-        cl2 = 0.5 * np.where(
-            distance_x > distance_y, cell2_df["dx"].values, cell2_df["dy"].values
-        )
+            if is_unstructured(local_cell_indices):
+                model_id = submodel_partition_info.id
+                local_cell_idx_to_id[model_id] = pd.DataFrame(
+                    {
+                        "local_idx": local_cell_indices,
+                        "local_cell_id": local_cell_indices,
+                    }
+                )
+            else:
+                local_row, local_column = np.unravel_index(
+                    local_cell_indices, local_cell_indices.shape
+                )
 
-        df = pd.DataFrame(
-            {
-                "cell_idx1": self._connected_cells["cell_idx1"].values,
-                "cell_idx2": self._connected_cells["cell_idx2"].values,
-                "cl1": cl1,
-                "cl2": cl2,
-                "hwva": distance.flatten(),
-            }
-        )
+                model_id = submodel_partition_info.id
+                local_cell_idx_to_id[model_id] = pd.DataFrame(
+                    {
+                        "local_idx": local_cell_indices.values.flatten(),
+                        "local_cell_id": zip(
+                            local_row.flatten() + 1, local_column.flatten() + 1
+                        ),
+                    }
+                )
 
-        return df
-
-
-def _create_global_to_local_idx(
-    partition_info: List[PartitionInfo], global_cell_indices: GridDataArray
-) -> Dict[int, pd.DataFrame]:
-    global_to_local_idx = {}
-    for submodel_partition_info in partition_info:
-        local_cell_indices = _get_local_cell_indices(submodel_partition_info)
-        overlap = xr.merge(
-            (global_cell_indices, local_cell_indices),
-            join="inner",
-            fill_value=np.nan,
-            compat="override",
-        )["idomain"]
-
-        model_id = submodel_partition_info.id
-        global_to_local_idx[model_id] = pd.DataFrame(
-            {
-                "global_idx": overlap.values.flatten(),
-                "local_idx": local_cell_indices.values.flatten(),
-            }
-        )
-
-    return global_to_local_idx
-
-
-def _local_cell_idx_to_id(partition_info) -> Dict[int, pd.DataFrame]:
-    local_cell_idx_to_id = {}
-    for submodel_partition_info in partition_info:
-        local_cell_indices = _get_local_cell_indices(submodel_partition_info)
-        local_row, local_column = np.unravel_index(
-            local_cell_indices, local_cell_indices.shape
-        )
-
-        model_id = submodel_partition_info.id
-        local_cell_idx_to_id[model_id] = pd.DataFrame(
-            {
-                "local_idx": local_cell_indices.values.flatten(),
-                "local_cell_id": zip(
-                    local_row.flatten() + 1, local_column.flatten() + 1
-                ),
-            }
-        )
-
-    return local_cell_idx_to_id
-
-
-def _get_local_cell_indices(submodel_partition_info: PartitionInfo) -> xr.DataArray:
-    domain_slice = get_active_domain_slice(submodel_partition_info.active_domain)
-    local_domain = submodel_partition_info.active_domain.sel(domain_slice)
-
-    return to_cell_idx(local_domain)
+        return local_cell_idx_to_id
