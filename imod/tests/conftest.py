@@ -40,7 +40,7 @@ from .fixtures.mf6_lake_package_fixture import (
     lake_table,
     naardermeer,
 )
-from .fixtures.mf6_regridding_fixture import (
+from .fixtures.mf6_small_models_fixture import (
     solution_settings,
     structured_flow_model,
     structured_flow_simulation,

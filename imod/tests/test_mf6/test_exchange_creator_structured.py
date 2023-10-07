@@ -2,12 +2,12 @@ from collections import namedtuple
 
 import numpy as np
 import pytest
-import xarray as xr
 from pytest_cases import parametrize_with_cases
 
-from imod.mf6.exchange_creator import ExchangeCreator
+from imod.mf6.exchange_creator_structured import ExchangeCreator_Structured
 from imod.mf6.modelsplitter import create_partition_info
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
+from imod.typing.grid import zeros_like
 from imod.util import spatial_reference
 
 ExpectedExchanges = namedtuple("ExpectedExchanges", "cell_id1 cell_id2 cl1 cl2 hwva")
@@ -23,7 +23,7 @@ def _create_submodel_labels(active, x_number_partitions, y_number_partitions):
 
     coords = active.coords
 
-    submodel_labels = xr.zeros_like(active.sel(layer=1))
+    submodel_labels = zeros_like(active.sel(layer=1))
     for id_x in np.arange(0, x_number_partitions):
         for id_y in np.arange(0, y_number_partitions):
             label_id = np.ravel_multi_index(
@@ -39,7 +39,7 @@ def _create_submodel_labels(active, x_number_partitions, y_number_partitions):
     return submodel_labels
 
 
-class TestExchangeCreator:
+class TestExchangeCreator_Structured:
     @pytest.mark.parametrize(
         "x_number_partitions, y_number_partitions", [(1, 1), (3, 1), (1, 3), (3, 3)]
     )
@@ -58,7 +58,7 @@ class TestExchangeCreator:
         )
         partition_info = create_partition_info(submodel_labels)
 
-        exchange_creator = ExchangeCreator(submodel_labels, partition_info)
+        exchange_creator = ExchangeCreator_Structured(submodel_labels, partition_info)
 
         model_name = "test_model"
         layer = idomain.layer
@@ -312,7 +312,7 @@ class TestExchangeCreator:
         )
         partition_info = create_partition_info(submodel_labels)
 
-        exchange_creator = ExchangeCreator(submodel_labels, partition_info)
+        exchange_creator = ExchangeCreator_Structured(submodel_labels, partition_info)
 
         model_name = "test_model"
         layer = idomain.layer
@@ -353,7 +353,7 @@ class TestExchangeCreator:
         )
         partition_info = create_partition_info(submodel_labels)
 
-        exchange_creator = ExchangeCreator(submodel_labels, partition_info)
+        exchange_creator = ExchangeCreator_Structured(submodel_labels, partition_info)
 
         model_name = "test_model"
         layer = idomain.layer

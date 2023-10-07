@@ -90,20 +90,3 @@ for id in np.arange(0, number_partitions):
 
 head = xr.merge(heads)
 head["head"].isel(layer=0, time=0).plot.contourf()
-
-# %%
-# Visualize the results
-# ---------------------
-
-
-# %%
-# .. _MODFLOW6 example problems: https://github.com/MODFLOW-USGS/modflow6-examples
-# .. _description: https://modflow6-examples.readthedocs.io/en/master/_examples/ex-gwf-twri.html
-# .. _notebook: https://github.com/MODFLOW-USGS/modflow6-examples/tree/master/notebooks/ex-gwf-twri.ipynb
-# .. _Techniques of Water-Resources Investigation: https://pubs.usgs.gov/twri/twri7-c1/
-# .. _McDonald & Harbaugh, 1988: https://pubs.er.usgs.gov/publication/twri06A1
-# .. _Harbaugh & McDonald, 1996: https://pubs.er.usgs.gov/publication/ofr96485
-# .. _Harbaugh, 2005: https://pubs.er.usgs.gov/publication/tm6A16
-# .. _FloPy: https://github.com/modflowpy/flopy
-
-# %%

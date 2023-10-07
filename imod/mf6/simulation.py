@@ -15,7 +15,8 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.mf6.exchange_creator import ExchangeCreator
+from imod.mf6.exchange_creator_structured import ExchangeCreator_Structured
+from imod.mf6.exchange_creator_unstructured import ExchangeCreator_Unstructured
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.model import (
     GroundwaterFlowModel,
@@ -29,7 +30,7 @@ from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
-from imod.typing.grid import GridDataArray
+from imod.typing.grid import GridDataArray, is_unstructured
 
 
 def get_models(simulation: Modflow6Simulation) -> Dict[str, Modflow6Model]:
@@ -443,7 +444,15 @@ class Modflow6Simulation(collections.UserDict):
         original_packages = get_packages(self)
 
         partition_info = create_partition_info(submodel_labels)
-        exchange_creator = ExchangeCreator(submodel_labels, partition_info)
+
+        if is_unstructured(submodel_labels):
+            exchange_creator = ExchangeCreator_Unstructured(
+                submodel_labels, partition_info
+            )
+        else:
+            exchange_creator = ExchangeCreator_Structured(
+                submodel_labels, partition_info
+            )
 
         new_simulation = imod.mf6.Modflow6Simulation(f"{self.name}_partioned")
         for package_name, package in {**original_packages}.items():
