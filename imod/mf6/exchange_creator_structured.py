@@ -96,26 +96,27 @@ class ExchangeCreator_Structured(ExchangeCreator):
 
         distance_x = np.abs(cell1_df["x"].values - cell2_df["x"].values)
         distance_y = np.abs(cell1_df["y"].values - cell2_df["y"].values)
-        distance = np.sqrt(distance_x**2 + distance_y**2)
 
+        is_x_connection = distance_x > distance_y
         cl1 = 0.5 * np.where(
-            distance_x > distance_y, cell1_df["dx"].values, cell1_df["dy"].values
+            is_x_connection, cell1_df["dx"].values, cell1_df["dy"].values
         )
         cl2 = 0.5 * np.where(
-            distance_x > distance_y, cell2_df["dx"].values, cell2_df["dy"].values
+            is_x_connection, cell2_df["dx"].values, cell2_df["dy"].values
         )
+        hwva = np.where(is_x_connection, cell2_df["dy"].values, cell2_df["dx"].values)
 
-        df = pd.DataFrame(
+        geometric_information = pd.DataFrame(
             {
                 "cell_idx1": self._connected_cells["cell_idx1"].values,
                 "cell_idx2": self._connected_cells["cell_idx2"].values,
                 "cl1": cl1,
                 "cl2": cl2,
-                "hwva": distance.flatten(),
+                "hwva": hwva,
             }
         )
 
-        return df
+        return geometric_information
 
     @classmethod
     def _create_global_to_local_idx(
