@@ -9,9 +9,11 @@ stages:
 lint:
   stage: static code analysis
   script:
-    # Avoid tox version with broken tox-conda.
-    - mamba install "tox>=3.8.1, <4"
-    - tox -e lint
+    - mamba create -n lint-env black flake8 isort
+    - source activate lint-env
+    - isort --check .
+    - black --check .
+    - flake8 .
   rules:
     - when: always
 
