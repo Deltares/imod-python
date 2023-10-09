@@ -84,6 +84,26 @@ def setup_simulation():
     return simulation
 
 
+@pytest.mark.usefixtures("transient_twri_model")
+@pytest.fixture(scope="function")
+def setup_split_simulation(transient_twri_model):
+    active = transient_twri_model["GWF_1"].domain.sel(layer=1)
+    transient_twri_model["GWF_1"].pop("wel")
+    number_partitions = 3
+    split_location = np.linspace(active.y.min(), active.y.max(), number_partitions + 1)
+
+    coords = active.coords
+    submodel_labels = zeros_like(active)
+    for id in np.arange(1, number_partitions):
+        submodel_labels.loc[
+            (coords["y"] > split_location[id]) & (coords["y"] <= split_location[id + 1])
+        ] = id
+
+    split_simulation = transient_twri_model.split(submodel_labels)
+
+    return split_simulation
+
+
 class TestModflow6Simulation:
     def test_write_with_default_arguments_writes_expected_files(
         self, tmp_path, setup_simulation
@@ -262,7 +282,7 @@ class TestModflow6Simulation:
 
     @pytest.mark.usefixtures("transient_twri_model")
     def test_exchanges_in_simulation_file(self, transient_twri_model, tmp_path):
-        # arrange
+        # Arrange
         active = transient_twri_model["GWF_1"].domain.sel(layer=1)
         transient_twri_model["GWF_1"].pop("wel")
         number_partitions = 3
@@ -278,10 +298,10 @@ class TestModflow6Simulation:
                 & (coords["y"] <= split_location[id + 1])
             ] = id
 
-        # act
+        # Act
         split_simulation = transient_twri_model.split(submodel_labels)
 
-        # assert
+        # Assert
         assert len(split_simulation["split_exchanges"]) == 2
         split_simulation.write(tmp_path, False, True, False)
 
@@ -294,14 +314,50 @@ class TestModflow6Simulation:
     def test_write_exchanges(
         self, transient_twri_model, sample_gwfgwf_structured, tmp_path
     ):
-        # arrange
-
+        # Arrange
         transient_twri_model["split_exchanges"] = [sample_gwfgwf_structured]
-        # act
+
+        # Act
         transient_twri_model.write(tmp_path, True, True, True)
 
-        # assert
+        # Assert
         assert Path.exists(tmp_path / sample_gwfgwf_structured.filename())
+
+    @pytest.mark.usefixtures("setup_split_simulation")
+    def test_prevent_split_after_split(
+        self,
+        setup_split_simulation,
+    ):
+        # Arrange.
+        split_simulation = setup_split_simulation
+
+        # Act/Assert
+        with pytest.raises(RuntimeError):
+            _ = split_simulation.split(None)
+
+    @pytest.mark.usefixtures("setup_split_simulation")
+    def test_prevent_clip_box_after_split(
+        self,
+        setup_split_simulation,
+    ):
+        # Arrange.
+        split_simulation = setup_split_simulation
+
+        # Act/Assert
+        with pytest.raises(RuntimeError):
+            _ = split_simulation.clip_box()
+
+    @pytest.mark.usefixtures("setup_split_simulation")
+    def test_prevent_regrid_like_after_split(
+        self,
+        setup_split_simulation,
+    ):
+        # Arrange.
+        split_simulation = setup_split_simulation
+
+        # Act/Assert
+        with pytest.raises(RuntimeError):
+            _ = split_simulation.regrid_like(None, None)
 
 
 def compare_submodel_partition_info(first: PartitionInfo, second: PartitionInfo):

@@ -49,6 +49,10 @@ def get_packages(simulation: Modflow6Simulation) -> Dict[str, Package]:
     }
 
 
+def is_split(simulation: Modflow6Simulation) -> bool:
+    return "split_exchanges" in simulation.keys()
+
+
 class Modflow6Simulation(collections.UserDict):
     def _initialize_template(self):
         loader = jinja2.PackageLoader("imod", "templates/mf6")
@@ -357,7 +361,7 @@ class Modflow6Simulation(collections.UserDict):
                 result.append((exchange_type, filename, modelname_a, modelname_b))
 
         # exchange for splitting models
-        if "split_exchanges" in self.keys():
+        if is_split(self):
             for exchange in self["split_exchanges"]:
                 result.append(exchange.get_specification())
 
@@ -410,6 +414,12 @@ class Modflow6Simulation(collections.UserDict):
         -------
         clipped : Simulation
         """
+
+        if is_split(self):
+            raise RuntimeError(
+                "Unable to clip simulation. Clipping can only be done on simulations that haven't been split."
+            )
+
         clipped = type(self)(name=self.name)
         for key, value in self.items():
             state_for_boundary = (
@@ -439,6 +449,10 @@ class Modflow6Simulation(collections.UserDict):
 
         The method return a new simulation containing all the split models and packages
         """
+        if is_split(self):
+            raise RuntimeError(
+                "Unable to split simulation. Splitting can only be done on simulations that haven't been split."
+            )
 
         original_models = get_models(self)
         original_packages = get_packages(self)
@@ -502,6 +516,12 @@ class Modflow6Simulation(collections.UserDict):
         -------
         a new simulation object with regridded models
         """
+
+        if is_split(self):
+            raise RuntimeError(
+                "Unable to regrid simulation. Regridding can only be done on simulations that haven't been split."
+            )
+
         result = self.__class__(regridded_simulation_name)
         for key, item in self.items():
             if isinstance(item, GroundwaterFlowModel):
@@ -516,6 +536,6 @@ class Modflow6Simulation(collections.UserDict):
         return result
 
     def _add_modelsplit_exchanges(self, exchanges_list: List[GWFGWF]) -> None:
-        if "split_exchanges" not in self.keys():
+        if not is_split(self):
             self["split_exchanges"] = []
         self["split_exchanges"].extend(exchanges_list)
