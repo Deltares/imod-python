@@ -67,38 +67,24 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         return connected_cells_dataset
 
     def _find_connected_cells(self) -> pd.DataFrame:
-        # make a deepcopy to avoid changing the original
-        edge_face = copy.deepcopy(
-            self._submodel_labels.ugrid.grid.edge_face_connectivity
-        )
-        edge_index = np.arange(len(edge_face))
+        edge_face_connectivity = self._submodel_labels.ugrid.grid.edge_face_connectivity
 
-        f1 = edge_face[:, 0]
-        f2 = edge_face[:, 1]
+        face1 = edge_face_connectivity[:, 0]
+        face2 = edge_face_connectivity[:, 1]
 
-        # edges at the external boundary have one -1 for the external "gridblock"
-        # we set both entries to -1 here so that en exteral edge will have [-1, -1]
-        f1 = np.where(f2 >= 0, f1, -1)
-        f2 = np.where(f1 >= 0, f2, -1)
-        label_of_edge1 = self._submodel_labels.values[f1]
-        label_of_edge2 = self._submodel_labels.values[f2]
+        label_of_face1 = self._submodel_labels.values[face1]
+        label_of_face2 = self._submodel_labels.values[face2]
 
-        # only keep the edge indces where the labels are different. The others will be -1
-        edge_indices_internal_boundary = np.where(
-            label_of_edge1 - label_of_edge2 != 0, edge_index, -1
-        )
-        # only keep the edge indces hat are not -1
-        edge_indices_internal_boundary = np.setdiff1d(
-            edge_indices_internal_boundary, [-1]
-        )
-        internal_boundary = edge_face[edge_indices_internal_boundary]
+        is_internal_edge = label_of_face1 - label_of_face2 == 0
+        is_external_boundary_edge = np.any((face1 == -1, face2 == -1), axis=0)
+        is_inter_domain_edge = ~is_internal_edge & ~is_external_boundary_edge
 
         connected_cell_info = pd.DataFrame(
             {
-                "cell_idx1": internal_boundary[:, 0],
-                "cell_idx2": internal_boundary[:, 1],
-                "cell_label1": label_of_edge1[edge_indices_internal_boundary],
-                "cell_label2": label_of_edge2[edge_indices_internal_boundary],
+                "cell_idx1": face1[is_inter_domain_edge],
+                "cell_idx2": face2[is_inter_domain_edge],
+                "cell_label1": label_of_face1[is_inter_domain_edge],
+                "cell_label2": label_of_face2[is_inter_domain_edge],
             }
         )
 
