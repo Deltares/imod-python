@@ -48,12 +48,18 @@ unit tests and coverage:
     - pip install -e .
     # Run tests
     - cd imod/tests
-    - python -m pytest --cache-clear --verbose --cov=imod --cov-config=.coveragerc
-  coverage: '/TOTAL.*\s+(\d+\%)/'
+    - python -m pytest --cache-clear --verbose --junitxml=report.xml --cov=imod --cov-report term --cov-report xml:coverage.xml --cov-config=.coveragerc
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
+    when: always
     paths:
       - imod/tests/coverage.xml
     expire_in: 1 week
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: imod/tests/coverage.xml
+      junit: imod/tests/report.xml
   rules:
     - when: always
 
