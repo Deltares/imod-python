@@ -26,44 +26,9 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
     ):
         super().__init__(submodel_labels, partition_info)
 
-    @classmethod
-    def _to_xarray(cls, connected_cells: pd.DataFrame) -> xr.Dataset:
-        """
-        converts a panda dataframe with exchange data to an xarray dataset. The
-        dataframe must have columns called cell_id1 and cell_id2: indices of
-        cells that are part of the exchange boundary (the subdomain boundary, on
-        both sides of the boundary)
-        """
-        dataset = connected_cells.to_xarray()
-
-        size = connected_cells.shape[0]
-        cell_id1 = np.array(connected_cells["cell_id1"])
-
-        dataset["cell_id1"] = xr.DataArray(
-            cell_id1.reshape(size, 1),
-            dims=("index", "cell_dims1"),
-            coords={"cell_dims1": ["cellindex1"]},
-        )
-
-        cell_id2 = np.array(connected_cells["cell_id2"])
-
-        dataset["cell_id2"] = xr.DataArray(
-            cell_id2.reshape(size, 1),
-            dims=("index", "cell_dims2"),
-            coords={"cell_dims2": ["cellindex2"]},
-        )
-        return dataset
-
-    def _adjust_gridblock_indexing(
-        self, connected_cells_dataset: xr.Dataset
-    ) -> xr.Dataset:
-        connected_cells_dataset["cell_id1"].values = (
-            connected_cells_dataset["cell_id1"].values + 1
-        )
-        connected_cells_dataset["cell_id2"].values = (
-            connected_cells_dataset["cell_id2"].values + 1
-        )
-        return connected_cells_dataset
+    @property
+    def _coordinate_names(self):
+        return ["cell_index"]
 
     def _find_connected_cells(self) -> pd.DataFrame:
         edge_face_connectivity = self._submodel_labels.ugrid.grid.edge_face_connectivity
@@ -84,35 +49,6 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
                 "cell_idx2": face2[is_inter_domain_edge],
                 "cell_label1": label_of_face1[is_inter_domain_edge],
                 "cell_label2": label_of_face2[is_inter_domain_edge],
-            }
-        )
-
-        return connected_cell_info
-
-    def _find_connected_cells_along_axis(self, axis_label: str) -> pd.DataFrame:
-        diff1 = self._submodel_labels.diff(f"{axis_label}", label="lower")
-        diff2 = self._submodel_labels.diff(f"{axis_label}", label="upper")
-
-        connected_cells_idx1 = self._global_cell_indices.where(
-            diff1 != 0, drop=True
-        ).astype(int)
-        connected_cells_idx2 = self._global_cell_indices.where(
-            diff2 != 0, drop=True
-        ).astype(int)
-
-        connected_model_label1 = self._submodel_labels.where(
-            diff1 != 0, drop=True
-        ).astype(int)
-        connected_model_label2 = self._submodel_labels.where(
-            diff2 != 0, drop=True
-        ).astype(int)
-
-        connected_cell_info = pd.DataFrame(
-            {
-                "cell_idx1": connected_cells_idx1.values.flatten(),
-                "cell_idx2": connected_cells_idx2.values.flatten(),
-                "cell_label1": connected_model_label1.values.flatten(),
-                "cell_label2": connected_model_label2.values.flatten(),
             }
         )
 

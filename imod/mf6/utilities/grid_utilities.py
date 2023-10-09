@@ -59,6 +59,9 @@ def create_layered_top(bottom: GridDataArray, top: GridDataArray) -> GridDataArr
 
 
 def to_cell_idx(idomain: xr.DataArray) -> xr.DataArray:
+    """
+    Assigns an unique index to each cell in the domain
+    """
     index = np.arange(idomain.size).reshape(idomain.shape)
     domain_index = zeros_like(idomain)
     domain_index.values = index
