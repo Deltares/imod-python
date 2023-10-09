@@ -29,29 +29,9 @@ class ExchangeCreator_Structured(ExchangeCreator):
     ):
         super().__init__(submodel_labels, partition_info)
 
-    @classmethod
-    def _to_xarray(cls, connected_cells: pd.DataFrame) -> xr.Dataset:
-        """
-        converts a panda dataframe with exchange data to an xarray dataset. The
-        dataframe must have columns called cell_id1, row_1, column_1, cell_id2,
-        row_2 and col_2 containing the cell_id, row and column indices of cells
-        that are part of the exchange boundary (the subdomain boundary, on both
-        sides of the boundary)
-        """
-        dataset = connected_cells.to_xarray()
-
-        dataset["cell_id1"] = xr.DataArray(
-            np.array(list(zip(*connected_cells["cell_id1"]))).T,
-            dims=("index", "cell_dims1"),
-            coords={"cell_dims1": ["row_1", "column_1"]},
-        )
-        dataset["cell_id2"] = xr.DataArray(
-            np.array(list(zip(*connected_cells["cell_id2"]))).T,
-            dims=("index", "cell_dims2"),
-            coords={"cell_dims2": ["row_2", "column_2"]},
-        )
-
-        return dataset
+    @property
+    def _coordinate_names(self):
+        return ["row", "column"]
 
     def _find_connected_cells(self) -> pd.DataFrame:
         connected_cells_along_x = self._find_connected_cells_along_axis("x")
