@@ -122,15 +122,7 @@ class TestExchangeCreator_Structured:
             dy = np.broadcast_to(np.array(dy), (1, 4)).flatten()
             expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(4)
             expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(4)
-            expected_hwva = expected_cl1 + expected_cl2
-
-            idomain, _, _ = parameterizable_basic_dis
-            dx, xmin, xmax, dy, ymin, ymax = spatial_reference(idomain)
-
-            dy = np.broadcast_to(np.array(dy), (1, 4)).flatten()
-            expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(4)
-            expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(4)
-            expected_hwva = expected_cl1 + expected_cl2
+            expected_hwva = dx
 
             return (
                 x_number_partitions,
@@ -168,15 +160,7 @@ class TestExchangeCreator_Structured:
             dx = np.broadcast_to(np.array(dx), (1, 4)).flatten()
             expected_cl1 = 0.5 * np.abs(dx[1]) * np.ones(len(dx))
             expected_cl2 = 0.5 * np.abs(dx[2]) * np.ones(len(dx))
-            expected_hwva = expected_cl1 + expected_cl2
-
-            idomain, _, _ = parameterizable_basic_dis
-            dx, xmin, xmax, dy, ymin, ymax = spatial_reference(idomain)
-
-            dx = np.broadcast_to(np.array(dx), (1, 4)).flatten()
-            expected_cl1 = 0.5 * np.abs(dx[1]) * np.ones(len(dx))
-            expected_cl2 = 0.5 * np.abs(dx[2]) * np.ones(len(dx))
-            expected_hwva = expected_cl1 + expected_cl2
+            expected_hwva = -dy
 
             return (
                 x_number_partitions,
@@ -216,11 +200,7 @@ class TestExchangeCreator_Structured:
 
             exchange1_expected_cl1 = 0.5 * np.abs(dx[1]) * np.ones(2)
             exchange1_expected_cl2 = 0.5 * np.abs(dx[2]) * np.ones(2)
-            exchange1_expected_hwva = exchange1_expected_cl1 + exchange1_expected_cl2
-
-            exchange1_expected_cl1 = 0.5 * np.abs(dx[1]) * np.ones(2)
-            exchange1_expected_cl2 = 0.5 * np.abs(dx[2]) * np.ones(2)
-            exchange1_expected_hwva = exchange1_expected_cl1 + exchange1_expected_cl2
+            exchange1_expected_hwva = -dy[2:4]
 
             # test_model_1 <-> test_model_0
             exchange2_expected_cell_id1 = np.array([[2, 1], [2, 2]])
@@ -228,11 +208,7 @@ class TestExchangeCreator_Structured:
 
             exchange2_expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(2)
             exchange2_expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(2)
-            exchange2_expected_hwva = exchange2_expected_cl1 + exchange2_expected_cl2
-
-            exchange2_expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(2)
-            exchange2_expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(2)
-            exchange2_expected_hwva = exchange2_expected_cl1 + exchange2_expected_cl2
+            exchange2_expected_hwva = dx[0:2]
 
             # test_model_1 <-> test_model_3
             exchange3_expected_cell_id1 = np.array([[1, 2], [2, 2]])
@@ -240,7 +216,7 @@ class TestExchangeCreator_Structured:
 
             exchange3_expected_cl1 = 0.5 * np.abs(dx[1]) * np.ones(2)
             exchange3_expected_cl2 = 0.5 * np.abs(dx[2]) * np.ones(2)
-            exchange3_expected_hwva = exchange3_expected_cl1 + exchange3_expected_cl2
+            exchange3_expected_hwva = -dy[0:2]
 
             # test_model_3 <-> test_model_2
             exchange4_expected_cell_id1 = np.array([[2, 1], [2, 2]])
@@ -248,11 +224,7 @@ class TestExchangeCreator_Structured:
 
             exchange4_expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(2)
             exchange4_expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(2)
-            exchange4_expected_hwva = exchange4_expected_cl1 + exchange4_expected_cl2
-
-            exchange4_expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(2)
-            exchange4_expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(2)
-            exchange4_expected_hwva = exchange4_expected_cl1 + exchange4_expected_cl2
+            exchange4_expected_hwva = dx[2:4]
 
             return (
                 x_number_partitions,
