@@ -28,6 +28,7 @@ class TestExchangeCreator_Unstructured:
         unstructured_flow_simulation: imod.mf6.Modflow6Simulation,
         number_partitions: int,
     ):
+        # Arrange.
         idomain = unstructured_flow_simulation["flow"].domain
         submodel_labels = _create_submodel_labels_unstructured(
             idomain, number_partitions
@@ -38,7 +39,7 @@ class TestExchangeCreator_Unstructured:
         # Act.
         exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
 
-        # assert
+        # Assert.
         assert len(exchanges) == number_partitions - 1
 
     def test_create_exchanges_unstructured_validate_exchange_locations(
@@ -52,6 +53,8 @@ class TestExchangeCreator_Unstructured:
         # 18 ( the third row). and these indices should occur for every layer of
         # the 3. On the second domain, the exchanges should be located on cells
         # 1 to 6
+
+        # Arrange.
         number_partitions = 2
         idomain = unstructured_flow_simulation["flow"].domain
         submodel_labels = _create_submodel_labels_unstructured(
@@ -63,7 +66,7 @@ class TestExchangeCreator_Unstructured:
         # Act.
         exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
 
-        # assert
+        # Assert.
         nlayer = 3
         cell_id1, counts = np.unique(
             exchanges[0].dataset["cell_id1"].values, return_counts=True
@@ -78,3 +81,25 @@ class TestExchangeCreator_Unstructured:
         cell_id2_dict = dict(zip(cell_id2, counts))
         for icell in range(1, 6, 1):
             assert cell_id2_dict[icell] == nlayer
+
+    def test_create_exchanges_unstructured_validate_geometric_coefficients(
+        self,
+        unstructured_flow_simulation: imod.mf6.Modflow6Simulation,
+    ):
+        # Arrange.
+        number_partitions = 2
+        idomain = unstructured_flow_simulation["flow"].domain
+
+        submodel_labels = _create_submodel_labels_unstructured(
+            idomain, number_partitions
+        )
+        partition_info = create_partition_info(submodel_labels)
+        exchange_creator = ExchangeCreator_Unstructured(submodel_labels, partition_info)
+
+        # Act.
+        exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
+
+        # Assert.
+        assert np.allclose(exchanges[0].dataset["cl1"], 1.0)
+        assert np.allclose(exchanges[0].dataset["cl2"], 1.0)
+        assert np.allclose(exchanges[0].dataset["hwva"], 2.0)
