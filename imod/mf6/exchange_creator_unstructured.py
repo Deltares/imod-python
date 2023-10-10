@@ -54,22 +54,24 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         return connected_cell_info
 
     def _compute_geometric_information(self) -> pd.DataFrame:
-        edge_face_connectivity = self._submodel_labels.ugrid.grid.edge_face_connectivity
+        grid = self._submodel_labels.ugrid.grid
+        edge_face_connectivity = grid.edge_face_connectivity
+
         face1 = edge_face_connectivity[self._connected_cell_edge_indices, 0]
         face2 = edge_face_connectivity[self._connected_cell_edge_indices, 1]
 
-        face1_coordinate = self._submodel_labels.ugrid.grid.face_coordinates[face1]
-        face2_coordinate = self._submodel_labels.ugrid.grid.face_coordinates[face2]
+        face1_coordinate = grid.face_coordinates[face1]
+        face2_coordinate = grid.face_coordinates[face2]
 
-        edge_centroid_coordinate = self._submodel_labels.ugrid.grid.edge_coordinates[
+        edge_centroid_coordinate = grid.edge_coordinates[
             self._connected_cell_edge_indices
         ]
 
-        edge_node_coordinate1 = self._submodel_labels.ugrid.grid.edge_node_coordinates[
+        edge_node_coordinate1 = grid.edge_node_coordinates[
             self._connected_cell_edge_indices, 0, :
         ]
 
-        edge_node_coordinate2 = self._submodel_labels.ugrid.grid.edge_node_coordinates[
+        edge_node_coordinate2 = grid.edge_node_coordinates[
             self._connected_cell_edge_indices, 1, :
         ]
 
