@@ -189,8 +189,8 @@ Pull the CI image (at the time of writing), and run it interactively:
 
 .. code-block:: console
 
-  docker pull condaforge/miniforge3:latest
-  docker run -it condaforge/miniforge3
+  docker pull condaforge/mambaforge:latest
+  docker run -it condaforge/mambaforge
 
 This should land you in the docker image. Next, we reproduce the CI setup steps.
 Some changes are required, such as installing git and cloning the repository,
@@ -198,20 +198,17 @@ which happens automatically within CI.
 
 .. code-block:: console
 
-  conda install mamba
   apt-get update -q -y
   apt-get install -y build-essential
-  conda install git
+  mamba install git
   cd /usr/src
   git clone https://gitlab.com/deltares/imod/imod-python.git
   cd imod-python
-  conda env create -f imod-environment.yml
+  mamba env create -f imod-environment.yml --name imod
+  mamba env update -f imod-environment-dev.yml --name imod
   source activate imod
   pip install -e .
-  curl -O -L https://gitlab.com/deltares/imod/imod-python/uploads/a8ed27675150689c6acd425239531a5e/mf6.gz
-  gunzip mf6.gz
-  chmod +x mf6
-  mv mf6 /opt/conda/envs/imod/bin
+
 
 At this point, everything should be ready to run the tests on the Docker image.
 
