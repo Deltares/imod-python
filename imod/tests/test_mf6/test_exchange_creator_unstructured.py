@@ -1,13 +1,12 @@
 import numpy as np
 import pytest
+import xugrid as xu
 
 import imod
 from imod.mf6.exchange_creator_unstructured import ExchangeCreator_Unstructured
 from imod.mf6.modelsplitter import create_partition_info
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import zeros_like
-import xugrid as xu
-import xarray as xr
 
 
 def _create_submodel_labels_unstructured(idomain, number_partitions):
@@ -98,14 +97,14 @@ class TestExchangeCreator_Unstructured:
         indirect=True,
     )
     def test_create_exchanges_unstructured_validate_geometric_coefficients(
-        self,
-        parameterizable_basic_dis):
+        self, parameterizable_basic_dis
+    ):
         # Arrange.
         number_partitions = 2
 
         idomain, _, _ = parameterizable_basic_dis
-        expected_cl1 = abs(idomain.dy/2)[1].values
-        expected_cl2 = abs(idomain.dy/2)[2].values
+        expected_cl1 = abs(idomain.dy / 2)[1].values
+        expected_cl2 = abs(idomain.dy / 2)[2].values
         expected_hwva = idomain.dx.values
 
         idomain = to_unstruct_domain(idomain)
