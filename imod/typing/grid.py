@@ -1,4 +1,4 @@
-from typing import TypeAlias, Union
+from typing import List, TypeAlias, Union
 
 import numpy as np
 import xarray as xr
@@ -46,3 +46,13 @@ def is_unstructured(grid: xu.UgridDataArray) -> bool:
 @typedispatch
 def is_unstructured(grid: xr.DataArray) -> bool:
     return False
+
+
+@typedispatch
+def merge(arrays: List[xr.DataArray]) -> xr.DataArray:
+    return xr.merge(arrays)
+
+
+@typedispatch
+def merge(arrays: List[xu.UgridDataArray]) -> xu.UgridDataArray:
+    return xu.merge(arrays)

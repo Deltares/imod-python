@@ -84,26 +84,6 @@ def setup_simulation():
     return simulation
 
 
-@pytest.mark.usefixtures("transient_twri_model")
-@pytest.fixture(scope="function")
-def setup_split_simulation(transient_twri_model):
-    active = transient_twri_model["GWF_1"].domain.sel(layer=1)
-    transient_twri_model["GWF_1"].pop("wel")
-    number_partitions = 3
-    split_location = np.linspace(active.y.min(), active.y.max(), number_partitions + 1)
-
-    coords = active.coords
-    submodel_labels = zeros_like(active)
-    for id in np.arange(1, number_partitions):
-        submodel_labels.loc[
-            (coords["y"] > split_location[id]) & (coords["y"] <= split_location[id + 1])
-        ] = id
-
-    split_simulation = transient_twri_model.split(submodel_labels)
-
-    return split_simulation
-
-
 class TestModflow6Simulation:
     def test_write_with_default_arguments_writes_expected_files(
         self, tmp_path, setup_simulation

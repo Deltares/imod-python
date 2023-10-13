@@ -17,6 +17,7 @@ from .fixtures.mf6_circle_fixture import (
     circle_model_evt,
     circle_result,
     circle_result_evt,
+    make_circle_partitioned,
 )
 from .fixtures.mf6_flow_with_transport_fixture import (
     bulk_density_fc,
@@ -49,6 +50,7 @@ from .fixtures.mf6_small_models_fixture import (
 )
 from .fixtures.mf6_twri_disv_fixture import twri_disv_model
 from .fixtures.mf6_twri_fixture import (
+    setup_split_simulation,
     transient_twri_model,
     transient_twri_result,
     twri_model,
