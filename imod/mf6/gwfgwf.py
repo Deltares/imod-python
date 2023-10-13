@@ -27,6 +27,7 @@ class GWFGWF(Package):
         cl1: np.ndarray,
         cl2: np.ndarray,
         hwva: np.ndarray,
+        **kwargs,
     ):
         super().__init__(locals())
         self.dataset["cell_id1"] = cell_id1
