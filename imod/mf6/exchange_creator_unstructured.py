@@ -24,6 +24,9 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
     def __init__(
         self, submodel_labels: GridDataArray, partition_info: List[PartitionInfo]
     ):
+        self._connected_cell_edge_indices = (
+            self._find_subdomain_connection_edge_indices(submodel_labels)
+        )
         super().__init__(submodel_labels, partition_info)
 
     @property
@@ -33,37 +36,61 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
     def _find_connected_cells(self) -> pd.DataFrame:
         edge_face_connectivity = self._submodel_labels.ugrid.grid.edge_face_connectivity
 
-        face1 = edge_face_connectivity[:, 0]
-        face2 = edge_face_connectivity[:, 1]
+        face1 = edge_face_connectivity[self._connected_cell_edge_indices, 0]
+        face2 = edge_face_connectivity[self._connected_cell_edge_indices, 1]
 
         label_of_face1 = self._submodel_labels.values[face1]
         label_of_face2 = self._submodel_labels.values[face2]
 
-        is_internal_edge = label_of_face1 - label_of_face2 == 0
-        is_external_boundary_edge = np.any((face1 == -1, face2 == -1), axis=0)
-        is_inter_domain_edge = ~is_internal_edge & ~is_external_boundary_edge
-
         connected_cell_info = pd.DataFrame(
             {
-                "cell_idx1": face1[is_inter_domain_edge],
-                "cell_idx2": face2[is_inter_domain_edge],
-                "cell_label1": label_of_face1[is_inter_domain_edge],
-                "cell_label2": label_of_face2[is_inter_domain_edge],
+                "cell_idx1": face1,
+                "cell_idx2": face2,
+                "cell_label1": label_of_face1,
+                "cell_label2": label_of_face2,
             }
         )
 
         return connected_cell_info
 
     def _compute_geometric_information(self) -> pd.DataFrame:
-        ones = np.ones_like(self._connected_cells["cell_idx1"].values, dtype=int)
+        grid = self._submodel_labels.ugrid.grid
+        edge_face_connectivity = grid.edge_face_connectivity
 
+        face1 = edge_face_connectivity[self._connected_cell_edge_indices, 0]
+        face2 = edge_face_connectivity[self._connected_cell_edge_indices, 1]
+
+        face1_coordinate = grid.face_coordinates[face1]
+        face2_coordinate = grid.face_coordinates[face2]
+
+        edge_centroid_coordinate = grid.edge_coordinates[
+            self._connected_cell_edge_indices
+        ]
+
+        edge_node_coordinate1 = grid.edge_node_coordinates[
+            self._connected_cell_edge_indices, 0, :
+        ]
+
+        edge_node_coordinate2 = grid.edge_node_coordinates[
+            self._connected_cell_edge_indices, 1, :
+        ]
+
+        edge_vector = edge_node_coordinate2 - edge_node_coordinate1
+
+        cl1 = np.linalg.norm(face1_coordinate - edge_centroid_coordinate, axis=1)
+        cl2 = np.linalg.norm(face2_coordinate - edge_centroid_coordinate, axis=1)
+        hwva = np.linalg.norm(edge_vector, axis=1)
+
+        anglex = np.arctan2(edge_vector[:, 1], edge_vector[:, 0])
+        angledegx = np.degrees(anglex) % 360
         df = pd.DataFrame(
             {
                 "cell_idx1": self._connected_cells["cell_idx1"].values,
                 "cell_idx2": self._connected_cells["cell_idx2"].values,
-                "cl1": ones,
-                "cl2": ones,
-                "hwva": ones,
+                "cl1": cl1,
+                "cl2": cl2,
+                "hwva": hwva,
+                "angledegx": angledegx,
             }
         )
         return df
@@ -102,3 +129,19 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
             )
 
         return global_to_local_idx
+
+    @staticmethod
+    def _find_subdomain_connection_edge_indices(submodel_labels):
+        edge_face_connectivity = submodel_labels.ugrid.grid.edge_face_connectivity
+
+        face1 = edge_face_connectivity[:, 0]
+        face2 = edge_face_connectivity[:, 1]
+
+        label_of_face1 = submodel_labels.values[face1]
+        label_of_face2 = submodel_labels.values[face2]
+
+        is_internal_edge = label_of_face1 - label_of_face2 == 0
+        is_external_boundary_edge = np.any((face1 == -1, face2 == -1), axis=0)
+        is_inter_domain_edge = ~is_internal_edge & ~is_external_boundary_edge
+
+        return is_inter_domain_edge
