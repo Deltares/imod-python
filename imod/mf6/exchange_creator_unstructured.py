@@ -24,7 +24,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
     def __init__(
         self, submodel_labels: GridDataArray, partition_info: List[PartitionInfo]
     ):
-        self._connected_cell_edge_indices = self._find_connected_cell_edge_indices(
+        self._connected_cell_edge_indices = self._find_subdomain_connection_edge_indices(
             submodel_labels
         )
         super().__init__(submodel_labels, partition_info)
@@ -131,7 +131,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         return global_to_local_idx
 
     @staticmethod
-    def _find_connected_cell_edge_indices(submodel_labels):
+    def _find_subdomain_connection_edge_indices(submodel_labels):
         edge_face_connectivity = submodel_labels.ugrid.grid.edge_face_connectivity
 
         face1 = edge_face_connectivity[:, 0]

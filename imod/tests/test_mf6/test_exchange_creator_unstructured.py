@@ -4,7 +4,10 @@ import pytest
 import imod
 from imod.mf6.exchange_creator_unstructured import ExchangeCreator_Unstructured
 from imod.mf6.modelsplitter import create_partition_info
+from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import zeros_like
+import xugrid as xu
+import xarray as xr
 
 
 def _create_submodel_labels_unstructured(idomain, number_partitions):
@@ -19,6 +22,13 @@ def _create_submodel_labels_unstructured(idomain, number_partitions):
         submodel_labels[start:end] = ipartition
 
     return submodel_labels
+
+
+def to_unstruct_domain(idomain):
+    grid = xu.Ugrid2d.from_structured(idomain)
+
+    domain_data = imod.util.ugrid2d_data(idomain, grid.face_dimension)
+    return xu.UgridDataArray(domain_data, grid)
 
 
 class TestExchangeCreator_Unstructured:
@@ -82,13 +92,23 @@ class TestExchangeCreator_Unstructured:
         for icell in range(1, 6, 1):
             assert cell_id2_dict[icell] == nlayer
 
+    @pytest.mark.parametrize(
+        "parameterizable_basic_dis",
+        [BasicDisSettings(nlay=1, nrow=4, ncol=4, space_generator=np.geomspace)],
+        indirect=True,
+    )
     def test_create_exchanges_unstructured_validate_geometric_coefficients(
         self,
-        unstructured_flow_simulation: imod.mf6.Modflow6Simulation,
-    ):
+        parameterizable_basic_dis):
         # Arrange.
         number_partitions = 2
-        idomain = unstructured_flow_simulation["flow"].domain
+
+        idomain, _, _ = parameterizable_basic_dis
+        expected_cl1 = abs(idomain.dy/2)[1].values
+        expected_cl2 = abs(idomain.dy/2)[2].values
+        expected_hwva = idomain.dx.values
+
+        idomain = to_unstruct_domain(idomain)
 
         submodel_labels = _create_submodel_labels_unstructured(
             idomain, number_partitions
@@ -100,6 +120,6 @@ class TestExchangeCreator_Unstructured:
         exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
 
         # Assert.
-        assert np.allclose(exchanges[0].dataset["cl1"], 1.0)
-        assert np.allclose(exchanges[0].dataset["cl2"], 1.0)
-        assert np.allclose(exchanges[0].dataset["hwva"], 2.0)
+        assert np.allclose(exchanges[0].dataset["cl1"], expected_cl1)
+        assert np.allclose(exchanges[0].dataset["cl2"], expected_cl2)
+        assert np.allclose(exchanges[0].dataset["hwva"], expected_hwva)
