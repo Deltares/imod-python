@@ -209,6 +209,23 @@ class TestModel:
         # Assert.
         assert len(status.errors) == 2
 
+    @pytest.mark.parametrize("use_newton", [False, True])
+    @pytest.mark.parametrize("use_under_relaxation", [False, True])
+    def test_render_newton(self, use_newton, use_under_relaxation):
+        # Arrange.
+        model = GroundwaterFlowModel(
+            newton=use_newton, under_relaxation=use_under_relaxation
+        )
+        write_context_mock = MagicMock(spec_set=WriteContext)
+
+        # Act.
+        output = model.render("TestModel", write_context_mock)
+
+        # Assert.
+        assert ("newton" in output) == use_newton and (
+            "under_relaxation" in output
+        ) == (use_newton and use_under_relaxation)
+
 
 class TestGroundwaterFlowModel:
     def test_clip_box_without_state_for_boundary(self):
