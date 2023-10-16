@@ -61,14 +61,16 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
     """
     new_model = GroundwaterFlowModel(**model._options)
 
-    domain_slice = get_active_domain_slice(partition_info.active_domain)
-    sliced_domain = model.domain.isel(domain_slice)
+    domain_slice2d = get_active_domain_slice(partition_info.active_domain)
+    sliced_domain_layered = partition_info.active_domain.sel(
+        domain_slice2d
+    ).broadcast_like(model.domain.layer)
     sliced_bottom = model.bottom
 
     for pkg_name, package in model.items():
         sliced_package = clip_by_grid(package, partition_info.active_domain)
         errors = sliced_package._validate(
-            package._write_schemata, idomain=sliced_domain, bottom=sliced_bottom
+            package._write_schemata, idomain=sliced_domain_layered, bottom=sliced_bottom
         )
 
         if not errors:

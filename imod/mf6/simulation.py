@@ -5,7 +5,7 @@ import copy
 import pathlib
 import subprocess
 import warnings
-from typing import Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import jinja2
 import numpy as np
@@ -15,6 +15,9 @@ import xarray as xr
 import xugrid as xu
 
 import imod
+from imod.mf6.exchange_creator_structured import ExchangeCreator_Structured
+from imod.mf6.exchange_creator_unstructured import ExchangeCreator_Unstructured
+from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.model import (
     GroundwaterFlowModel,
     GroundwaterTransportModel,
@@ -22,11 +25,12 @@ from imod.mf6.model import (
 )
 from imod.mf6.modelsplitter import create_partition_info, slice_model
 from imod.mf6.package import Package
+from imod.mf6.pkgbase import PackageBase
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
-from imod.typing.grid import GridDataArray
+from imod.typing.grid import GridDataArray, is_unstructured
 
 
 def get_models(simulation: Modflow6Simulation) -> Dict[str, Modflow6Model]:
@@ -43,6 +47,10 @@ def get_packages(simulation: Modflow6Simulation) -> Dict[str, Package]:
         for pkg_name, pkg in simulation.items()
         if isinstance(pkg, Package)
     }
+
+
+def is_split(simulation: Modflow6Simulation) -> bool:
+    return "split_exchanges" in simulation.keys()
 
 
 class Modflow6Simulation(collections.UserDict):
@@ -152,7 +160,7 @@ class Modflow6Simulation(collections.UserDict):
 
     def render(self, write_context: WriteContext):
         """Renders simulation namefile"""
-        d = {}
+        d: Dict[str, Any] = {}
         models = []
         solutiongroups = []
         for key, value in self.items():
@@ -161,22 +169,23 @@ class Modflow6Simulation(collections.UserDict):
                     write_context.root_directory / pathlib.Path(f"{key}", f"{key}.nam")
                 ).as_posix()
                 models.append((value._model_id, model_name_file, key))
+            elif isinstance(value, PackageBase):
+                if value._pkg_id == "tdis":
+                    d["tdis6"] = f"{key}.tdis"
+                elif value._pkg_id == "ims":
+                    slnnames = value["modelnames"].values
+                    modeltypes = set()
+                    for name in slnnames:
+                        try:
+                            modeltypes.add(type(self[name]))
+                        except KeyError:
+                            raise KeyError(f"model {name} of {key} not found")
 
-            elif value._pkg_id == "tdis":
-                d["tdis6"] = f"{key}.tdis"
-            elif value._pkg_id == "ims":
-                slnnames = value["modelnames"].values
-                modeltypes = set()
-                for name in slnnames:
-                    try:
-                        modeltypes.add(type(self[name]))
-                    except KeyError:
-                        raise KeyError(f"model {name} of {key} not found")
-                if len(modeltypes) > 1:
-                    raise ValueError(
-                        "Only a single type of model allowed in a solution"
-                    )
-                solutiongroups.append(("ims6", f"{key}.ims", slnnames))
+                    if len(modeltypes) > 1:
+                        raise ValueError(
+                            "Only a single type of model allowed in a solution"
+                        )
+                    solutiongroups.append(("ims6", f"{key}.ims", slnnames))
 
         d["models"] = models
         if len(models) > 1:
@@ -248,11 +257,18 @@ class Modflow6Simulation(collections.UserDict):
                         write_context=model_write_context,
                     )
                 )
-            elif value._pkg_id == "ims":
-                ims_write_context = write_context.copy_with_new_write_directory(
-                    write_context.simulation_directory
-                )
-                value.write(key, globaltimes, ims_write_context)
+            elif isinstance(value, PackageBase):
+                if value._pkg_id == "ims":
+                    ims_write_context = write_context.copy_with_new_write_directory(
+                        write_context.simulation_directory
+                    )
+                    value.write(key, globaltimes, ims_write_context)
+            elif isinstance(value, list):
+                for exchange in value:
+                    if isinstance(exchange, imod.mf6.GWFGWF):
+                        exchange.write(
+                            exchange.packagename(), globaltimes, write_context
+                        )
 
         if status_info.has_errors():
             raise ValidationError("\n" + validation_model_error_message(status_info))
@@ -335,6 +351,7 @@ class Modflow6Simulation(collections.UserDict):
         result = []
         flowmodels = self.get_models_of_type("gwf6")
         transportmodels = self.get_models_of_type("gwt6")
+        # exchange for flow and transport
         if len(flowmodels) == 1 and len(transportmodels) > 0:
             exchange_type = "GWF6-GWT6"
             modelname_a = list(flowmodels.keys())[0]
@@ -342,6 +359,12 @@ class Modflow6Simulation(collections.UserDict):
                 filename = f"simulation{counter}.exg"
                 modelname_b = key
                 result.append((exchange_type, filename, modelname_a, modelname_b))
+
+        # exchange for splitting models
+        if is_split(self):
+            for exchange in self["split_exchanges"]:
+                result.append(exchange.get_specification())
+
         return result
 
     def get_models_of_type(self, modeltype):
@@ -391,6 +414,12 @@ class Modflow6Simulation(collections.UserDict):
         -------
         clipped : Simulation
         """
+
+        if is_split(self):
+            raise RuntimeError(
+                "Unable to clip simulation. Clipping can only be done on simulations that haven't been split."
+            )
+
         clipped = type(self)(name=self.name)
         for key, value in self.items():
             state_for_boundary = (
@@ -420,22 +449,46 @@ class Modflow6Simulation(collections.UserDict):
 
         The method return a new simulation containing all the split models and packages
         """
-        models = get_models(self)
-        packages = get_packages(self)
+        if is_split(self):
+            raise RuntimeError(
+                "Unable to split simulation. Splitting can only be done on simulations that haven't been split."
+            )
+
+        original_models = get_models(self)
+        original_packages = get_packages(self)
+
+        partition_info = create_partition_info(submodel_labels)
+
+        if is_unstructured(submodel_labels):
+            exchange_creator = ExchangeCreator_Unstructured(
+                submodel_labels, partition_info
+            )
+        else:
+            exchange_creator = ExchangeCreator_Structured(
+                submodel_labels, partition_info
+            )
 
         new_simulation = imod.mf6.Modflow6Simulation(f"{self.name}_partioned")
-        for package_name, package in {**packages}.items():
+        for package_name, package in {**original_packages}.items():
             new_simulation[package_name] = package
 
-        model_names = []
-        partition_info = create_partition_info(submodel_labels)
-        for submodel_partition_info in partition_info:
-            for model_name, model in models.items():
-                model_name = f"{model_name}_{submodel_partition_info.id}"
-                new_simulation[model_name] = slice_model(submodel_partition_info, model)
-                model_names.append(model_name)
+        for model_name, model in original_models.items():
+            for submodel_partition_info in partition_info:
+                new_model_name = f"{model_name}_{submodel_partition_info.id}"
+                new_simulation[new_model_name] = slice_model(
+                    submodel_partition_info, model
+                )
 
-        new_simulation["solver"]["modelnames"] = xr.DataArray(model_names)
+        exchanges = []
+        for model_name, model in original_models.items():
+            exchanges += exchange_creator.create_exchanges(
+                model_name, model.domain.layer
+            )
+
+        new_simulation["solver"]["modelnames"] = xr.DataArray(
+            list(get_models(new_simulation).keys())
+        )
+        new_simulation._add_modelsplit_exchanges(exchanges)
 
         return new_simulation
 
@@ -463,6 +516,12 @@ class Modflow6Simulation(collections.UserDict):
         -------
         a new simulation object with regridded models
         """
+
+        if is_split(self):
+            raise RuntimeError(
+                "Unable to regrid simulation. Regridding can only be done on simulations that haven't been split."
+            )
+
         result = self.__class__(regridded_simulation_name)
         for key, item in self.items():
             if isinstance(item, GroundwaterFlowModel):
@@ -475,3 +534,8 @@ class Modflow6Simulation(collections.UserDict):
                 raise NotImplementedError(f"regridding not supported for {key}")
 
         return result
+
+    def _add_modelsplit_exchanges(self, exchanges_list: List[GWFGWF]) -> None:
+        if not is_split(self):
+            self["split_exchanges"] = []
+        self["split_exchanges"].extend(exchanges_list)

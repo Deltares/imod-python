@@ -5,7 +5,7 @@ import xarray as xr
 
 import imod
 from imod.mf6.package import Package
-from imod.tests.fixtures.mf6_regridding_fixture import (
+from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_structured,
     grid_data_unstructured,
 )

@@ -13,7 +13,7 @@ import xugrid as xu
 from xarray.core.utils import is_scalar
 
 import imod
-from imod.mf6.pkgbase import TRANSPORT_PACKAGES, PackageBase
+from imod.mf6.pkgbase import EXCHANGE_PACKAGES, TRANSPORT_PACKAGES, PackageBase
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
     RegridderType,
@@ -100,6 +100,8 @@ class Package(PackageBase, abc.ABC):
             fname = "sim-tdis.j2"
         elif pkg_id in TRANSPORT_PACKAGES:
             fname = f"gwt-{pkg_id}.j2"
+        elif pkg_id in EXCHANGE_PACKAGES:
+            fname = f"exg-{pkg_id}.j2"
         else:
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
