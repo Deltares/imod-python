@@ -57,10 +57,10 @@ class GWFGWF(Package):
         self.dataset["newton"] = newton
 
     def filename(self) -> str:
-        return f"{self.packagename() }.{self._pkg_id}"
+        return f"{self.packagename()}.{self._pkg_id}"
 
     def packagename(self) -> str:
-        return f"{self.dataset['model_name_1'].values[()]}_{self.dataset['model_name_2'].values[()] }"
+        return f"{self.dataset['model_name_1'].values[()]}_{self.dataset['model_name_2'].values[()]}"
 
     def get_specification(self) -> Tuple[str, str, str, str]:
         """
