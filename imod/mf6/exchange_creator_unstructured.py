@@ -81,8 +81,12 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         cl2 = np.linalg.norm(face2_coordinate - edge_centroid_coordinate, axis=1)
         hwva = np.linalg.norm(edge_vector, axis=1)
 
-        anglex = np.arctan2(edge_vector[:, 1], edge_vector[:, 0])
+        outward_vector = np.cross(edge_vector, np.array([0, 0, -1]))
+        anglex = np.arctan2(outward_vector[:, 1], outward_vector[:, 0])
         angledegx = np.degrees(anglex) % 360
+
+        cdist = np.linalg.norm(face1_coordinate - face2_coordinate, axis=1)
+
         df = pd.DataFrame(
             {
                 "cell_idx1": self._connected_cells["cell_idx1"].values,
@@ -91,6 +95,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
                 "cl2": cl2,
                 "hwva": hwva,
                 "angledegx": angledegx,
+                "cdist": cdist,
             }
         )
         return df

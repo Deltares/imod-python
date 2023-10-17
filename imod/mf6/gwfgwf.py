@@ -40,6 +40,11 @@ class GWFGWF(Package):
         self.dataset["cl2"] = cl2
         self.dataset["hwva"] = hwva
 
+        if any(kwargs):
+            self.dataset["auxiliary"] = xr.merge(kwargs.values()).to_array(
+                name="auxiliary"
+            )
+
     def set_options(
         self,
         print_input: bool,
