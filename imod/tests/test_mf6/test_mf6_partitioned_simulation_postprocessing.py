@@ -137,14 +137,14 @@ def test_import_heads_structured(
     )
 
 
-@pytest.mark.usefixtures("make_circle_partitioned")
-def test_import_heads_unstructured(tmp_path, make_circle_partitioned):
+@pytest.mark.usefixtures("circle_partitioned")
+def test_import_heads_unstructured(tmp_path, circle_partitioned):
     # Arrange
-    split_simulation = make_circle_partitioned
-    split_simulation.write(tmp_path, binary=False)
-    split_simulation.run()
 
-    submodel_names = list(get_models(split_simulation).keys())
+    circle_partitioned.write(tmp_path, binary=False)
+    circle_partitioned.run()
+
+    submodel_names = list(get_models(circle_partitioned).keys())
 
     # Act
     merged_heads = merge_heads(tmp_path, submodel_names)

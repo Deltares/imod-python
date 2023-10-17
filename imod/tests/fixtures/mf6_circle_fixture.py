@@ -148,7 +148,7 @@ def circle_result_evt(tmpdir_factory):
 
 @pytest.mark.usefixtures("circle_model_evt")
 @pytest.fixture(scope="function")
-def make_circle_partitioned():
+def circle_partitioned():
     simulation = make_circle_model_evt()
 
     idomain = simulation["GWF_1"]["disv"].dataset["idomain"]

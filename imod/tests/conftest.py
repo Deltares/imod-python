@@ -15,9 +15,9 @@ from .fixtures.flow_example_fixture import imodflow_model
 from .fixtures.mf6_circle_fixture import (
     circle_model,
     circle_model_evt,
+    circle_partitioned,
     circle_result,
     circle_result_evt,
-    make_circle_partitioned,
 )
 from .fixtures.mf6_flow_with_transport_fixture import (
     bulk_density_fc,
