@@ -49,10 +49,11 @@ def is_unstructured(grid: xr.DataArray) -> bool:
 
 
 @typedispatch
-def merge(arrays: List[xr.DataArray]) -> xr.DataArray:
-    return xr.merge(arrays)
+def merge(*args: xr.DataArray) -> xr.DataArray:
+    return xr.merge(list(args))
 
 
 @typedispatch
-def merge(arrays: List[xu.UgridDataArray]) -> xu.UgridDataArray:
-    return xu.merge(arrays)
+def merge(*args: xu.UgridDataArray) -> xu.UgridDataArray:
+    xu.Ugrid2d.merge_partitions(list(args))
+    return xu.merge(list(args),  compat = "override")

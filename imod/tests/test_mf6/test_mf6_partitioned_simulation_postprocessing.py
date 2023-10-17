@@ -7,8 +7,8 @@ from imod.mf6.partitioned_simulation_postprocessing import (
     merge_heads,
 )
 from imod.mf6.simulation import Modflow6Simulation, get_models
-
-
+import imod
+import numpy as np
 def test_find_grb_file(tmp_path: Path):
     # Arrange
     grb_path = tmp_path / "modelname.grb"
@@ -53,11 +53,20 @@ def test_import_heads_structured(
     split_simulation.run()
 
     submodel_names = list(get_models(split_simulation).keys())
+
     # Act
     merged_heads = merge_heads(tmp_path, submodel_names)
-    assert merged_heads is not None
 
-
+    #assert
+    assert np.allclose(merged_heads.coords["x"].values , [ 2500.,  7500., 12500., 17500., 22500., 27500., 32500., 37500.,
+       42500., 47500., 52500., 57500., 62500., 67500., 72500.])
+    assert np.allclose(merged_heads.coords["y"].values , [ 2500.,  7500., 12500., 17500., 22500., 27500., 32500., 37500.,
+       42500., 47500., 52500., 57500., 62500., 67500., 72500.])
+    assert np.allclose(merged_heads.coords["layer"].values ,[1, 2, 3])
+    assert np.allclose(merged_heads.coords["time"].values ,[ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11., 12., 13.,
+       14., 15., 16., 17., 18., 19., 20., 21., 22., 23., 24., 25., 26.,
+       27., 28., 29., 30.])
+    
 @pytest.mark.usefixtures("make_circle_partitioned")
 def test_import_heads_unstructured(tmp_path, make_circle_partitioned):
     # Arrange
@@ -66,6 +75,16 @@ def test_import_heads_unstructured(tmp_path, make_circle_partitioned):
     split_simulation.run()
 
     submodel_names = list(get_models(split_simulation).keys())
+
     # Act
     merged_heads = merge_heads(tmp_path, submodel_names)
-    assert merged_heads is not None
+
+    #Assert
+    assert np.allclose(merged_heads.coords["x"].values , [ 2500.,  7500., 12500., 17500., 22500., 27500., 32500., 37500.,
+       42500., 47500., 52500., 57500., 62500., 67500., 72500.])
+    assert np.allclose(merged_heads.coords["y"].values , [ 2500.,  7500., 12500., 17500., 22500., 27500., 32500., 37500.,
+       42500., 47500., 52500., 57500., 62500., 67500., 72500.])
+    assert np.allclose(merged_heads.coords["layer"].values ,[1, 2, 3])
+    assert np.allclose(merged_heads.coords["time"].values ,[ 1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11., 12., 13.,
+       14., 15., 16., 17., 18., 19., 20., 21., 22., 23., 24., 25., 26.,
+       27., 28., 29., 30.])
