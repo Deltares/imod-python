@@ -162,7 +162,7 @@ class ExchangeCreator(abc.ABC):
                 connected_cells = (
                     connected_domain_pair.merge(mapping1)
                     .merge(mapping2)
-                    .filter(["cell_id1", "cell_id2", "cl1", "cl2", "hwva"])
+                    .filter(["cell_id1", "cell_id2", "cl1", "cl2", "hwva", "angledegx"])
                 )
 
                 connected_cells = pd.merge(layers, connected_cells, how="cross")

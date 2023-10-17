@@ -86,3 +86,4 @@ class GWFGWF(Package):
         state_for_boundary=None,
     ) -> Package:
         raise NotImplementedError("this package cannot be clipped")
+        raise NotImplementedError("this package cannot be clipped")

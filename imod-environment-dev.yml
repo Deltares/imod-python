@@ -4,7 +4,10 @@ channels:
 
 dependencies:
     - black
+    - flake8
     - hypothesis
+    - isort
+    - mypy
     - pytest
     - pytest-benchmark
     - pytest-cases

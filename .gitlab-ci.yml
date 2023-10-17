@@ -9,9 +9,11 @@ stages:
 lint:
   stage: static code analysis
   script:
-    # Avoid tox version with broken tox-conda.
-    - mamba install "tox>=3.8.1, <4"
-    - tox -e lint
+    - mamba create -n lint-env black flake8 isort
+    - source activate lint-env
+    - isort --check .
+    - black --check .
+    - flake8 .
   rules:
     - when: always
 
@@ -69,8 +71,8 @@ build documentation:
     - apt-get update -q -y
     - apt-get install -y build-essential curl
     - apt-get install libgl1-mesa-glx -y
-    - mamba env create -f imod-environment.yml
-    - mamba env update -f imod-environment-dev.yml --prefix /opt/conda/envs/imod
+    - mamba env create -f imod-environment.yml --name imod
+    - mamba env update -f imod-environment-dev.yml --name imod
     - source activate imod
     - pip install -e .
     - cd docs

@@ -931,7 +931,7 @@ def open_projectfile_data(path: FilePath) -> Dict[str, Any]:
         strippedkey = key.strip("(").strip(")")
         if len(data) > 1:
             for i, da in enumerate(data):
-                numbered_key = f"{strippedkey}-{i+1}"
+                numbered_key = f"{strippedkey}-{i + 1}"
                 prj_data[numbered_key] = da
                 repeat_stress[numbered_key] = repeats
         else:
