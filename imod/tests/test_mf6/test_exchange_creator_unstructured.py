@@ -134,7 +134,7 @@ class TestExchangeCreator_Unstructured:
     ):
         # Arrange.
         idomain, _, _ = parameterizable_basic_dis
-        expected_angledegx = 0.0 if partition_axis is "x" else 90.0
+        expected_angledegx = 0.0 if partition_axis == "x" else 90.0
         expected_cdist = abs(
             idomain.coords[partition_axis][1] - idomain.coords[partition_axis][2]
         ).values
@@ -142,7 +142,7 @@ class TestExchangeCreator_Unstructured:
         idomain = to_unstruct_domain(idomain)
 
         submodel_labels = zeros_like(idomain.sel(layer=1))
-        if partition_axis is "x":
+        if partition_axis == "x":
             submodel_labels = submodel_labels.where(
                 submodel_labels.grid.face_x < 0.5, 1, 0
             )
