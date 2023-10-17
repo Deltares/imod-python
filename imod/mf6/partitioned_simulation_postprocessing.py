@@ -2,10 +2,14 @@ from pathlib import Path
 from typing import List
 
 import imod
-from imod.typing.grid import merge
+from imod.typing.grid import GridDataArray, merge
 
 
-def merge_heads(simulation_dir: Path, model_names: List[str]):
+def merge_heads(simulation_dir: Path, model_names: List[str]) -> GridDataArray:
+    """
+    This function merges the head output of a split simulation into a single
+    head file. Both structured and unstructured grids are supported.
+    """
     heads = []
     for modelname in model_names:
         modelDirectory = simulation_dir / modelname
@@ -22,8 +26,10 @@ def merge_heads(simulation_dir: Path, model_names: List[str]):
 
 def get_grb_file_path(model_directory: Path) -> Path:
     """
-    Returns the path of the grb file.
+    Given a directory path, returns the path of the grb file in it. Raises an
+    exception if there is not exactly 1 grb file in it.
     """
+
     grb_files = list(model_directory.glob("**/*.grb"))
     if len(grb_files) != 1:
         raise RuntimeError(

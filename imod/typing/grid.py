@@ -1,4 +1,4 @@
-from typing import List, TypeAlias, Union
+from typing import TypeAlias, Union
 
 import numpy as np
 import xarray as xr
@@ -55,5 +55,4 @@ def merge(*args: xr.DataArray) -> xr.DataArray:
 
 @typedispatch
 def merge(*args: xu.UgridDataArray) -> xu.UgridDataArray:
-    xu.Ugrid2d.merge_partitions(list(args))
-    return xu.merge(list(args),  compat = "override")
+    return xu.merge_partitions(list(args))
