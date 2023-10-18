@@ -12,7 +12,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 
 Fixed
 ~~~~~
-- The Newton option for a GroundwaterFlowModel was being ignored. This has been
+- The Newton option for a :class:`imod.mf6.GroundwaterFlowModel` was being ignored. This has been
   corrected.
 - The Contextily packages started throwing errors. This was caused because the
   default tile provider being used was Stamen. However Stamen is no longer free
@@ -24,8 +24,6 @@ Changed
 - The imod-environment.yml file has been split in an imod-environment.yml
   (containing all packages required to run imod-python) and a
   imod-environment-dev.yml file (containing additional packages for developers).
-- The pipeline has been altered to only run expensive stages (i.e. building the
-  documentation) on the master branch or branches merging to master.
 
 Added
 ~~~~~
