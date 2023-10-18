@@ -46,3 +46,13 @@ def is_unstructured(grid: xu.UgridDataArray) -> bool:
 @typedispatch
 def is_unstructured(grid: xr.DataArray) -> bool:
     return False
+
+
+@typedispatch
+def merge(*args: xr.DataArray) -> xr.DataArray:
+    return xr.merge(list(args))
+
+
+@typedispatch
+def merge(*args: xu.UgridDataArray) -> xu.UgridDataArray:
+    return xu.merge_partitions(list(args))
