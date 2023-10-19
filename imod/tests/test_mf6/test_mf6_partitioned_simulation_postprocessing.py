@@ -44,12 +44,12 @@ def test_find_multiple_grb_files(tmp_path: Path):
         _ = get_grb_file_path(tmp_path)
 
 
-@pytest.mark.usefixtures("setup_split_simulation")
+@pytest.mark.usefixtures("split_transient_twri_model")
 def test_import_heads_structured(
-    tmp_path: Path, setup_split_simulation: Modflow6Simulation
+    tmp_path: Path, split_transient_twri_model: Modflow6Simulation
 ):
     # Arrange
-    split_simulation = setup_split_simulation
+    split_simulation = split_transient_twri_model
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
@@ -58,7 +58,7 @@ def test_import_heads_structured(
     # Act
     merged_heads = merge_heads(tmp_path, submodel_names)
 
-    # assert
+    # Assert
     assert np.allclose(
         merged_heads.coords["x"].values,
         [
