@@ -1,15 +1,19 @@
 from pathlib import Path
-from typing import List
 
 import imod
+from imod.mf6.model import GroundwaterFlowModel
+from imod.mf6.simulation import Modflow6Simulation
 from imod.typing.grid import GridDataArray, merge
 
 
-def merge_heads(simulation_dir: Path, model_names: List[str]) -> GridDataArray:
+def merge_heads(simulation_dir: Path, simulation: Modflow6Simulation) -> GridDataArray:
     """
     This function merges the head output of a split simulation into a single
     head file. Both structured and unstructured grids are supported.
     """
+    model_names = list(
+        simulation.get_models_of_type(GroundwaterFlowModel._model_id).keys()
+    )
     heads = []
     for modelname in model_names:
         modelDirectory = simulation_dir / modelname

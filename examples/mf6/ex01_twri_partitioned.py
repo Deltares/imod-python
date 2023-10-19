@@ -32,9 +32,7 @@ import numpy as np
 from example_models import create_twri_simulation
 
 import imod
-from imod.mf6.model import GroundwaterFlowModel
 from imod.mf6.partitioned_simulation_postprocessing import merge_heads
-from imod.mf6.simulation import get_models_of_type
 from imod.typing.grid import zeros_like
 
 simulation = create_twri_simulation()
@@ -76,6 +74,5 @@ simulation.run()
 #
 # We'll merge the heads (.hds) file.
 fig, ax = plt.subplots()
-submodel_names = list(get_models_of_type(simulation, GroundwaterFlowModel).keys())
-head = merge_heads(modeldir, submodel_names)
+head = merge_heads(modeldir, simulation)
 head.isel(layer=0, time=0).plot.contourf()

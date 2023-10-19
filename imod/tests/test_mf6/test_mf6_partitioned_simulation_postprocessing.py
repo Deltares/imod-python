@@ -7,7 +7,7 @@ from imod.mf6.partitioned_simulation_postprocessing import (
     _get_grb_file_path,
     merge_heads,
 )
-from imod.mf6.simulation import Modflow6Simulation, get_models
+from imod.mf6.simulation import Modflow6Simulation
 
 
 def test_find_grb_file(tmp_path: Path):
@@ -53,10 +53,8 @@ def test_import_heads_structured(
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
-    submodel_names = list(get_models(split_simulation).keys())
-
     # Act
-    merged_heads = merge_heads(tmp_path, submodel_names)
+    merged_heads = merge_heads(tmp_path, split_simulation)
 
     # Assert
     assert np.allclose(
@@ -144,10 +142,8 @@ def test_import_heads_unstructured(tmp_path, circle_partitioned):
     circle_partitioned.write(tmp_path, binary=False)
     circle_partitioned.run()
 
-    submodel_names = list(get_models(circle_partitioned).keys())
-
     # Act
-    merged_heads = merge_heads(tmp_path, submodel_names)
+    merged_heads = merge_heads(tmp_path, circle_partitioned)
 
     # Assert
     assert np.allclose(merged_heads.coords["layer"].values, [1, 2])
