@@ -13,7 +13,7 @@ def merge_heads(simulation_dir: Path, model_names: List[str]) -> GridDataArray:
     heads = []
     for modelname in model_names:
         modelDirectory = simulation_dir / modelname
-        grb_path = get_grb_file_path(modelDirectory)
+        grb_path = _get_grb_file_path(modelDirectory)
         head = imod.mf6.open_hds(
             modelDirectory / f"{modelname}.hds",
             grb_path,
@@ -21,10 +21,10 @@ def merge_heads(simulation_dir: Path, model_names: List[str]) -> GridDataArray:
         heads.append(head)
 
     head = merge(*heads)
-    return head
+    return head["head"]
 
 
-def get_grb_file_path(model_directory: Path) -> Path:
+def _get_grb_file_path(model_directory: Path) -> Path:
     """
     Given a directory path, returns the path of the grb file in it. Raises an
     exception if there is not exactly 1 grb file in it.

@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from imod.mf6.partitioned_simulation_postprocessing import (
-    get_grb_file_path,
+    _get_grb_file_path,
     merge_heads,
 )
 from imod.mf6.simulation import Modflow6Simulation, get_models
@@ -17,7 +17,7 @@ def test_find_grb_file(tmp_path: Path):
         file.write("grb file content")
 
     # Act
-    grb_file = get_grb_file_path(tmp_path)
+    grb_file = _get_grb_file_path(tmp_path)
 
     # Assert
     assert grb_file.name == "modelname.grb"
@@ -26,7 +26,7 @@ def test_find_grb_file(tmp_path: Path):
 def test_find_no_grb_file(tmp_path: Path):
     # Act, Assert
     with pytest.raises(RuntimeError):
-        _ = get_grb_file_path(tmp_path)
+        _ = _get_grb_file_path(tmp_path)
 
 
 def test_find_multiple_grb_files(tmp_path: Path):
@@ -41,7 +41,7 @@ def test_find_multiple_grb_files(tmp_path: Path):
 
     # Act, Assert
     with pytest.raises(RuntimeError):
-        _ = get_grb_file_path(tmp_path)
+        _ = _get_grb_file_path(tmp_path)
 
 
 @pytest.mark.usefixtures("split_transient_twri_model")

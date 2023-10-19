@@ -10,8 +10,9 @@ import matplotlib.pyplot as plt
 from example_models import create_circle_simulation
 
 import imod
+from imod.mf6.model import GroundwaterFlowModel
 from imod.mf6.partitioned_simulation_postprocessing import merge_heads
-from imod.mf6.simulation import get_models
+from imod.mf6.simulation import get_models_of_type
 
 simulation = create_circle_simulation()
 tmp_path = imod.util.temporary_directory()
@@ -33,7 +34,7 @@ new_sim.run()
 
 
 fig, ax = plt.subplots()
-submodel_names = list(get_models(new_sim).keys())
+submodel_names = list(get_models_of_type(new_sim, GroundwaterFlowModel).keys())
 head = merge_heads(tmp_path, submodel_names)
-head["head"].isel(layer=0, time=-1).ugrid.plot.contourf(ax=ax)
+head.isel(layer=0, time=-1).ugrid.plot.contourf(ax=ax)
 # %%

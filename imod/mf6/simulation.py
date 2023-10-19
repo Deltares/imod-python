@@ -5,7 +5,7 @@ import copy
 import pathlib
 import subprocess
 import warnings
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, TypeVar, Union
 
 import jinja2
 import numpy as np
@@ -32,12 +32,20 @@ from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing.grid import GridDataArray, is_unstructured
 
+modelType = TypeVar("modelType", bound=Modflow6Model)
+
 
 def get_models(simulation: Modflow6Simulation) -> Dict[str, Modflow6Model]:
+    return get_models_of_type(simulation, Modflow6Model)
+
+
+def get_models_of_type(
+    simulation: Modflow6Simulation, model_type: modelType
+) -> Dict[str, Modflow6Model]:
     return {
         model_name: model
         for model_name, model in simulation.items()
-        if isinstance(model, Modflow6Model)
+        if isinstance(model, model_type)
     }
 
 
