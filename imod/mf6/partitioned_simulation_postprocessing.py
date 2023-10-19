@@ -30,7 +30,7 @@ def get_grb_file_path(model_directory: Path) -> Path:
     exception if there is not exactly 1 grb file in it.
     """
 
-    grb_files = list(model_directory.glob("**/*.grb"))
+    grb_files = list(model_directory.glob("*.grb"))
     if len(grb_files) != 1:
         raise RuntimeError(
             f"there should be exactly one grb file in directory {model_directory}."
