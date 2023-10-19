@@ -5,7 +5,7 @@ import pytest
 
 from imod.mf6.partitioned_simulation_postprocessing import (
     get_grb_file_path,
-    merge_heads,
+    merge_heads, merge_balances
 )
 from imod.mf6.simulation import Modflow6Simulation, get_models
 
@@ -153,3 +153,20 @@ def test_import_heads_unstructured(tmp_path, circle_partitioned):
     assert np.allclose(merged_heads.coords["layer"].values, [1, 2])
     assert np.allclose(merged_heads.coords["time"].values, [1.0])
     assert np.allclose(merged_heads.coords["mesh2d_nFaces"].values, list(range(216)))
+
+
+@pytest.mark.usefixtures("setup_split_simulation")
+def test_import_balances_structured(
+    tmp_path: Path, setup_split_simulation: Modflow6Simulation
+):
+    # Arrange
+    split_simulation = setup_split_simulation
+    split_simulation.write(tmp_path, binary=False)
+    split_simulation.run()
+
+    submodel_names = list(get_models(split_simulation).keys())
+
+   # Act
+    merged_balances = merge_balances(tmp_path, submodel_names)
+
+    pass

@@ -50,7 +50,10 @@ def is_unstructured(grid: xr.DataArray) -> bool:
 
 @typedispatch
 def merge(*args: xr.DataArray) -> xr.DataArray:
-    return xr.merge(list(args))
+    x=xr.merge(list(args), compat="no_conflicts") 
+    varname = list(x.keys())[0]
+
+    return x[varname]
 
 
 @typedispatch

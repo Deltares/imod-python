@@ -32,7 +32,7 @@ import numpy as np
 from example_models import create_twri_simulation
 
 import imod
-from imod.mf6.partitioned_simulation_postprocessing import merge_heads
+from imod.mf6.partitioned_simulation_postprocessing import merge_heads, merge_balances
 from imod.mf6.simulation import get_models
 from imod.typing.grid import zeros_like
 
@@ -51,6 +51,11 @@ for id in np.arange(1, number_partitions):
     submodel_labels.loc[
         (coords["y"] > split_location[id]) & (coords["y"] <= split_location[id + 1])
     ] = id
+
+
+
+fig, ax = plt.subplots()
+submodel_labels.plot.contourf(ax=ax)
 
 simulation = simulation.split(submodel_labels)
 
@@ -77,4 +82,12 @@ simulation.run()
 fig, ax = plt.subplots()
 submodel_names = list(get_models(simulation).keys())
 head = merge_heads(modeldir, submodel_names)
-head["head"].isel(layer=0, time=0).plot.contourf()
+head.isel(layer=0, time=0).plot.contourf()
+
+
+fig, ax = plt.subplots()
+balances = merge_balances(modeldir, submodel_names)
+balances["flow-front-face"].isel(layer=0, time=-1).plot.contourf(ax=ax)
+balances["gwf-gwf_1"].isel(layer=0, time=-1).plot.contourf(ax=ax)
+balances["gwf-gwf_2"].isel(layer=0, time=-1).plot.contourf(ax=ax)
+pass
