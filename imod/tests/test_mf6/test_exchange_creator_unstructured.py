@@ -134,7 +134,7 @@ class TestExchangeCreator_Unstructured:
     ):
         # Arrange.
         idomain, _, _ = parameterizable_basic_dis
-        expected_angledegx = 0.0 if partition_axis == "x" else 90.0
+        expected_angldegx = 0.0 if partition_axis == "x" else 270.0
         expected_cdist = abs(
             idomain.coords[partition_axis][1] - idomain.coords[partition_axis][2]
         ).values
@@ -159,8 +159,8 @@ class TestExchangeCreator_Unstructured:
 
         # Assert.
         assert np.allclose(
-            exchanges[0].dataset["auxiliary"].sel(variable="angledegx"),
-            expected_angledegx,
+            exchanges[0].dataset["auxiliary"].sel(variable="angldegx"),
+            expected_angldegx,
         )
         assert np.allclose(
             exchanges[0].dataset["auxiliary"].sel(variable="cdist"), expected_cdist

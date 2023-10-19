@@ -169,7 +169,7 @@ class ExchangeCreator(abc.ABC):
                             "cl1",
                             "cl2",
                             "hwva",
-                            "angledegx",
+                            "angldegx",
                             "cdist",
                         ]
                     )
