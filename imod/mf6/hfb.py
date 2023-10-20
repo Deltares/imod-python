@@ -69,15 +69,13 @@ def _derive_connected_cell_ids(
 
 @typedispatch
 def _derive_connected_cell_ids(
-    idomain: xu.UgridDataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
+    _: xu.UgridDataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
 ):
     """
     Derive the cell ids of the connected cells of an edge on an unstructured grid.
 
     Parameters
     ----------
-    idomain: xr.DataArray
-        The active domain
     grid :
         The unstructured grid of the domain
     edge_index :
@@ -139,12 +137,12 @@ def to_connected_cells_dataset(
         edge_index
 
     Returns
+    ----------
         a dataset containing:
             - cell_id1
             - cell_id2
             - layer
             - value name
-    -------
 
     """
     barrier_dataset = _derive_connected_cell_ids(idomain, grid, edge_index)
@@ -166,6 +164,94 @@ def to_connected_cells_dataset(
     )
 
     return barrier_dataset.dropna("cell_id")
+
+
+def _fraction_layer_overlap(
+    snapped_dataset: xu.UgridDataset,
+    edge_index: np.ndarray,
+    top: xu.UgridDataArray,
+    bottom: xu.UgridDataArray,
+):
+    """
+    Computes the fraction a barrier occupies inside a layer.
+    """
+    left, right = snapped_dataset.ugrid.grid.edge_face_connectivity[edge_index].T
+    top_mean = _mean_left_and_right(top, left, right)
+    bottom_mean = _mean_left_and_right(bottom, left, right)
+
+    n_layer, n_edge = top_mean.shape
+    layer_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
+    layer_bounds[..., 0] = typing.cast(np.ndarray, bottom_mean.values).T
+    layer_bounds[..., 1] = typing.cast(np.ndarray, top_mean.values).T
+
+    hfb_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
+    hfb_bounds[..., 0] = (
+        snapped_dataset["zbottom"].values[edge_index].reshape(n_edge, 1)
+    )
+    hfb_bounds[..., 1] = snapped_dataset["ztop"].values[edge_index].reshape(n_edge, 1)
+
+    overlap = _vectorized_overlap(hfb_bounds, layer_bounds)
+    height = layer_bounds[..., 1] - layer_bounds[..., 0]
+    # Avoid runtime warnings when diving by 0:
+    height[height <= 0] = np.nan
+    fraction = (overlap / height).T
+
+    return xr.ones_like(top_mean) * fraction
+
+
+def _mean_left_and_right(
+    cell_values: xu.UgridDataArray, left: np.ndarray, right: np.ndarray
+) -> xr.Dataset:
+    """
+    This method computes the mean value of cell pairs. The left array specifies the first cell, the right array
+    the second cells. The mean is computed by (first_cell+second_cell/2.0)
+
+    Parameters
+    ----------
+    cell_values: xu.UgridDataArray
+        The array containing the data values of all the cells
+    left :
+        The array containing indices to the first cells
+    right :
+        The array containing indices to the second cells
+
+    Returns
+    -------
+        The means of the cells
+
+    """
+    facedim = cell_values.ugrid.grid.face_dimension
+    uda_left = cell_values.ugrid.obj.isel({facedim: left}).drop_vars(facedim)
+    uda_right = cell_values.ugrid.obj.isel({facedim: right}).drop_vars(facedim)
+
+    return xr.concat((uda_left, uda_right), dim="two").mean("two")
+
+
+def _vectorized_overlap(bounds_a: np.ndarray, bounds_b: np.ndarray):
+    """
+    Vectorized overlap computation. Returns the overlap of 2 vectors along the same axis.
+    If there is no overlap zero will be returned.
+
+            b1
+            ▲
+      a1    |
+      ▲     |
+      |     |
+      |     ▼
+      ▼     b0
+      a0
+
+    To compute the overlap of the 2 vectors the maximum of a0,b0, is subtracted from the minimum of a1,b1.
+
+    Compare with:
+
+    overlap = max(0, min(a[1], b[1]) - max(a[0], b[0]))
+    """
+    return np.maximum(
+        0.0,
+        np.minimum(bounds_a[..., 1], bounds_b[..., 1])
+        - np.maximum(bounds_a[..., 0], bounds_b[..., 0]),
+    )
 
 
 class BarrierType(Enum):
@@ -213,6 +299,11 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         return instance
 
+    def _compute_barrier_values(
+        self, snapped_dataset, edge_index, idomain, top, bottom, k
+    ):
+        raise NotImplementedError()
+
     def to_mf6_pkg(
         self,
         idomain: GridDataArray,
@@ -250,92 +341,47 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             else [idomain, top, bottom, k]
         )
         snapped_dataset, edge_index = self.__snap_to_grid(idomain)
-
         edge_index = self.__remove_invalid_edges(unstructured_grid, edge_index)
 
-        if self._get_barrier_type() is BarrierType.Multiplier:
-            if "layer" in snapped_dataset:
-                barrier_values = self.__multiplier_layer(
-                    snapped_dataset, edge_index, idomain
-                )
-            else:
-                fraction = self.__fraction_layer_overlap(
-                    snapped_dataset, edge_index, top, bottom
-                )
-                barrier_values = (
-                    fraction.where(fraction)
-                    * snapped_dataset[self._get_variable_name()].values[edge_index]
-                )
-
-        else:
-            if "layer" in snapped_dataset:
-                barrier_values = self.__resistance_layer(
-                    snapped_dataset,
-                    edge_index,
-                    idomain,
-                )
-            else:
-                barrier_values = self.__resistance_layer_overlap(
-                    snapped_dataset, edge_index, top, bottom, k
-                )
-
+        barrier_values = self._compute_barrier_values(
+            snapped_dataset, edge_index, idomain, top, bottom, k
+        )
         barrier_values = self.__remove_edge_values_connected_to_inactive_cells(
             barrier_values, unstructured_grid, edge_index
         )
 
-        barrier_dataset = to_connected_cells_dataset(
-            idomain,
-            unstructured_grid.ugrid.grid,
-            edge_index,
-            {
-                "hydraulic_characteristic": self.__to_hydraulic_characteristic(
-                    barrier_values
-                )
-            },
+        barrier_dataset = typing.cast(
+            xr.Dataset,
+            to_connected_cells_dataset(
+                idomain,
+                unstructured_grid.ugrid.grid,
+                edge_index,
+                {
+                    "hydraulic_characteristic": self.__to_hydraulic_characteristic(
+                        barrier_values
+                    )
+                },
+            ),
         )
 
-        barrier_dataset["print_input"] = self.dataset["print_input"].values.item()
+        barrier_dataset["print_input"] = self.dataset["print_input"]
 
         return Mf6HorizontalFlowBarrier(**barrier_dataset)
 
-    def __multiplier_layer(
+    def _resistance_layer(
         self,
         snapped_dataset: xu.UgridDataset,
         edge_index: np.ndarray,
-        idomain: str,
+        idomain: xu.UgridDataArray,
     ) -> xr.DataArray:
         """
-        Returns layered xarray with barrier multiplier distrubuted over layers
-        """
-        hfb_multiplier = snapped_dataset[self._get_variable_name()].values[edge_index]
-        hfb_layer = snapped_dataset["layer"].values[edge_index]
-        nlay = idomain.layer.shape[0]
-        model_layer = np.repeat(idomain.layer.values, hfb_multiplier.shape[0]).reshape(
-            (nlay, hfb_multiplier.shape[0])
-        )
-        data = np.where(model_layer == hfb_layer, hfb_multiplier, np.nan)
-        return xr.DataArray(
-            data=data,
-            coords={
-                "layer": np.arange(nlay) + 1,
-            },
-            dims=["layer", "mesh2d_nFaces"],
-        )
-
-    def __resistance_layer(
-        self,
-        snapped_dataset: xu.UgridDataset,
-        edge_index: np.ndarray,
-        idomain: str,
-    ) -> xr.DataArray:
-        """
-        Returns layered xarray with barrier resistance distrubuted over layers
+        Returns layered xarray with barrier resistance distributed over layers
         """
         hfb_resistance = snapped_dataset[self._get_variable_name()].values[edge_index]
         hfb_layer = snapped_dataset["layer"].values[edge_index]
-        nlay = idomain.layer.shape[0]
-        model_layer = np.repeat(idomain.layer.values, hfb_resistance.shape[0]).reshape(
-            (nlay, hfb_resistance.shape[0])
+        nlay = idomain.layer.size
+        model_layer = np.repeat(idomain.layer.values, hfb_resistance.size).reshape(
+            (nlay, hfb_resistance.size)
         )
         data = np.where(model_layer == hfb_layer, hfb_resistance, np.nan)
         return xr.DataArray(
@@ -346,7 +392,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
             dims=["layer", "mesh2d_nFaces"],
         )
 
-    def __resistance_layer_overlap(
+    def _resistance_layer_overlap(
         self,
         snapped_dataset: xu.UgridDataset,
         edge_index: np.ndarray,
@@ -376,15 +422,13 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         """
         left, right = snapped_dataset.ugrid.grid.edge_face_connectivity[edge_index].T
-        k_mean = HorizontalFlowBarrierBase.__mean_left_and_right(k, left, right)
+        k_mean = _mean_left_and_right(k, left, right)
 
         resistance = self.__to_resistance(
             snapped_dataset[self._get_variable_name()]
         ).values[edge_index]
 
-        fraction = self.__fraction_layer_overlap(
-            snapped_dataset, edge_index, top, bottom
-        )
+        fraction = _fraction_layer_overlap(snapped_dataset, edge_index, top, bottom)
 
         c_aquifer = 1.0 / k_mean
         inverse_c = (fraction / resistance) + ((1.0 - fraction) / c_aquifer)
@@ -392,48 +436,12 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         return self.__from_resistance(c_total)
 
-    @staticmethod
-    def __fraction_layer_overlap(
-        snapped_dataset: xu.UgridDataset,
-        edge_index: np.ndarray,
-        top: xu.UgridDataArray,
-        bottom: xu.UgridDataArray,
-    ):
-        left, right = snapped_dataset.ugrid.grid.edge_face_connectivity[edge_index].T
-        top_mean = HorizontalFlowBarrierBase.__mean_left_and_right(top, left, right)
-        bottom_mean = HorizontalFlowBarrierBase.__mean_left_and_right(
-            bottom, left, right
-        )
-
-        n_layer, n_edge = top_mean.shape
-        layer_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
-        layer_bounds[..., 0] = bottom_mean.values.T
-        layer_bounds[..., 1] = top_mean.values.T
-
-        hfb_bounds = np.empty((n_edge, n_layer, 2), dtype=float)
-        hfb_bounds[..., 0] = (
-            snapped_dataset["zbottom"].values[edge_index].reshape(n_edge, 1)
-        )
-        hfb_bounds[..., 1] = (
-            snapped_dataset["ztop"].values[edge_index].reshape(n_edge, 1)
-        )
-
-        overlap = HorizontalFlowBarrierBase.__vectorized_overlap(
-            hfb_bounds, layer_bounds
-        )
-        height = layer_bounds[..., 1] - layer_bounds[..., 0]
-        # Avoid runtime warnings when diving by 0:
-        height[height <= 0] = np.nan
-        fraction = (overlap / height).T
-
-        return xr.ones_like(top_mean) * fraction
-
     def __to_resistance(self, value: xu.UgridDataArray) -> xu.UgridDataArray:
         match self._get_barrier_type():
             case BarrierType.HydraulicCharacteristic:
-                return 1.0 / value
+                return 1.0 / value  # type: ignore
             case BarrierType.Multiplier:
-                return -1.0 / value
+                return -1.0 / value  # type: ignore
             case BarrierType.Resistance:
                 return value
 
@@ -461,61 +469,6 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
 
         raise ValueError(r"Unknown barrier type {barrier_type}")
 
-    @staticmethod
-    def __mean_left_and_right(
-        cell_values: xu.UgridDataArray, left: np.ndarray, right: np.ndarray
-    ) -> xr.Dataset:
-        """
-        This method computes the mean value of cell pairs. The left array specifies the first cell, the right array
-        the second cells. The mean is computed by (first_cell+second_cell/2.0)
-
-        Parameters
-        ----------
-        cell_values: xu.UgridDataArray
-            The array containing the data values of all the cells
-        left :
-            The array containing indices to the first cells
-        right :
-            The array containing indices to the second cells
-
-        Returns
-            The means of the cells
-        -------
-
-        """
-        facedim = cell_values.ugrid.grid.face_dimension
-        uda_left = cell_values.ugrid.obj.isel({facedim: left}).drop_vars(facedim)
-        uda_right = cell_values.ugrid.obj.isel({facedim: right}).drop_vars(facedim)
-
-        return xr.concat((uda_left, uda_right), dim="two").mean("two")
-
-    @staticmethod
-    def __vectorized_overlap(bounds_a: np.ndarray, bounds_b: np.ndarray):
-        """
-        Vectorized overlap computation. Returns the overlap of 2 vectors along the same axis.
-        If there is no overlap zero will be returned.
-
-                b1
-                ▲
-          a1    |
-          ▲     |
-          |     |
-          |     ▼
-          ▼     b0
-          a0
-
-        To compute the overlap of the 2 vectors the maximum of a0,b0, is subtracted from the minimum of a1,b1.
-
-        Compare with:
-
-        overlap = max(0, min(a[1], b[1]) - max(a[0], b[0]))
-        """
-        return np.maximum(
-            0.0,
-            np.minimum(bounds_a[..., 1], bounds_b[..., 1])
-            - np.maximum(bounds_a[..., 0], bounds_b[..., 0]),
-        )
-
     @abc.abstractmethod
     def _get_barrier_type(self) -> BarrierType:
         raise NotImplementedError
@@ -534,7 +487,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         x_max=None,
         y_min=None,
         y_max=None,
-        state_for_boundary=None,
+        *args,
     ) -> "HorizontalFlowBarrierBase":
         """
         Clip a package by a bounding box (time, layer, y, x).
@@ -552,8 +505,8 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         ----------
         time_min: optional
         time_max: optional
-        z_min: optional, float
-        z_max: optional, float
+        layer_min: optional, int
+        layer_max: optional, int
         x_min: optional, float
         x_max: optional, float
         y_min: optional, float
@@ -585,13 +538,14 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         self, idomain: GridDataArray
     ) -> Tuple[xu.UgridDataset, np.ndarray]:
         if "layer" in self.dataset:
-            vars = [self._get_variable_name(), "geometry", "layer"]
+            variable_names = [self._get_variable_name(), "geometry", "layer"]
         else:
-            vars = [self._get_variable_name(), "geometry", "ztop", "zbottom"]
-        barrier_dataframe = self.dataset[vars].to_dataframe()
+            variable_names = [self._get_variable_name(), "geometry", "ztop", "zbottom"]
+        barrier_dataframe = self.dataset[variable_names].to_dataframe()
 
-        snapped_dataset, _ = xu.snap_to_grid(
-            barrier_dataframe, grid=idomain, max_snap_distance=0.5
+        snapped_dataset, _ = typing.cast(
+            xu.UgridDataset,
+            xu.snap_to_grid(barrier_dataframe, grid=idomain, max_snap_distance=0.5),
         )
         edge_index = np.argwhere(
             snapped_dataset[self._get_variable_name()].notnull().values
@@ -612,7 +566,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         face_dimension = unstructured_grid.ugrid.grid.face_dimension
         face_connectivity = grid.edge_face_connectivity[edge_index]
 
-        valid_edges = (face_connectivity != grid.fill_value).all(axis=1)
+        valid_edges = np.all(face_connectivity != grid.fill_value, axis=1)
 
         connected_cells = -np.ones((len(edge_index), 2))
         connected_cells[valid_edges, 0] = (
@@ -702,6 +656,15 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "hydraulic_characteristic"
 
+    def _compute_barrier_values(
+        self, snapped_dataset, edge_index, idomain, top, bottom, k
+    ):
+        barrier_values = self._resistance_layer_overlap(
+            snapped_dataset, edge_index, top, bottom, k
+        )
+
+        return barrier_values
+
 
 class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     """
@@ -750,6 +713,17 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
 
     def _get_variable_name(self) -> str:
         return "hydraulic_characteristic"
+
+    def _compute_barrier_values(
+        self, snapped_dataset, edge_index, idomain, top, bottom, k
+    ):
+        barrier_values = self._resistance_layer(
+            snapped_dataset,
+            edge_index,
+            idomain,
+        )
+
+        return barrier_values
 
 
 class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
@@ -804,6 +778,18 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "multiplier"
 
+    def _compute_barrier_values(
+        self, snapped_dataset, edge_index, idomain, top, bottom, k
+    ):
+        fraction = _fraction_layer_overlap(snapped_dataset, edge_index, top, bottom)
+
+        barrier_values = (
+            fraction.where(fraction)
+            * snapped_dataset[self._get_variable_name()].values[edge_index]
+        )
+
+        return barrier_values
+
 
 class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     """
@@ -855,6 +841,37 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
 
     def _get_variable_name(self) -> str:
         return "multiplier"
+
+    def _compute_barrier_values(
+        self, snapped_dataset, edge_index, idomain, top, bottom, k
+    ):
+        barrier_values = self.__multiplier_layer(snapped_dataset, edge_index, idomain)
+
+        return barrier_values
+
+    def __multiplier_layer(
+        self,
+        snapped_dataset: xu.UgridDataset,
+        edge_index: np.ndarray,
+        idomain: xu.UgridDataArray,
+    ) -> xr.DataArray:
+        """
+        Returns layered xarray with barrier multiplier distrubuted over layers
+        """
+        hfb_multiplier = snapped_dataset[self._get_variable_name()].values[edge_index]
+        hfb_layer = snapped_dataset["layer"].values[edge_index]
+        nlay = idomain.layer.size
+        model_layer = np.repeat(idomain.layer.values, hfb_multiplier.shape[0]).reshape(
+            (nlay, hfb_multiplier.shape[0])
+        )
+        data = np.where(model_layer == hfb_layer, hfb_multiplier, np.nan)
+        return xr.DataArray(
+            data=data,
+            coords={
+                "layer": np.arange(nlay) + 1,
+            },
+            dims=["layer", "mesh2d_nFaces"],
+        )
 
 
 class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
@@ -908,6 +925,15 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "resistance"
 
+    def _compute_barrier_values(
+        self, snapped_dataset, edge_index, idomain, top, bottom, k
+    ):
+        barrier_values = self._resistance_layer_overlap(
+            snapped_dataset, edge_index, top, bottom, k
+        )
+
+        return barrier_values
+
 
 class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     """
@@ -957,3 +983,14 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
     def _get_variable_name(self) -> str:
         return "resistance"
+
+    def _compute_barrier_values(
+        self, snapped_dataset, edge_index, idomain, top, bottom, k
+    ):
+        barrier_values = self._resistance_layer(
+            snapped_dataset,
+            edge_index,
+            idomain,
+        )
+
+        return barrier_values
