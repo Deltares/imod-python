@@ -57,4 +57,4 @@ def merge(objects: Sequence[xr.DataArray], *args, **kwargs) -> xr.DataArray:
         return xr.merge(objects, *args, **kwargs)
     if isinstance(objects[0], xu.UgridDataArray):
         return xu.merge_partitions(objects, *args, **kwargs)
-    raise NotImplementedError(f"merging not supported for type { type(objects[0])}")
+    raise NotImplementedError(f"merging not supported for type {type(objects[0])}")
