@@ -1,0 +1,16 @@
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+    - black
+    - flake8
+    - hypothesis
+    - isort
+    - mypy
+    - pytest
+    - pytest-benchmark
+    - pytest-cases
+    - pytest-cov
+    - sphinx=5
+    - sphinx-gallery
