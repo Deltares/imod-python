@@ -12,6 +12,9 @@ from imod.mf6 import (
     HorizontalFlowBarrierHydraulicCharacteristic,
     HorizontalFlowBarrierMultiplier,
     HorizontalFlowBarrierResistance,
+    LayeredHorizontalFlowBarrierHydraulicCharacteristic,
+    LayeredHorizontalFlowBarrierMultiplier,
+    LayeredHorizontalFlowBarrierResistance,
 )
 from imod.mf6.hfb import to_connected_cells_dataset
 from imod.typing.grid import ones_like
@@ -92,6 +95,88 @@ def test_to_mf6_creates_mf6_adapter(
     assert args["layer"].equals(expected_values["layer"])
     assert (
         args["hydraulic_characteristic"].values.max()
+        == expected_hydraulic_characteristic
+    )
+
+
+@pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])
+@pytest.mark.parametrize(
+    "barrier_class, barrier_value_name, barrier_value, expected_hydraulic_characteristic",
+    [
+        (LayeredHorizontalFlowBarrierResistance, "resistance", 1e3, 1e-3),
+        (LayeredHorizontalFlowBarrierMultiplier, "multiplier", 1.5, -1.5),
+        (
+            LayeredHorizontalFlowBarrierHydraulicCharacteristic,
+            "hydraulic_characteristic",
+            1e-3,
+            1e-3,
+        ),
+    ],
+)
+@patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
+def test_to_mf6_creates_mf6_adapter_layered(
+    mf6_flow_barrier_mock,
+    dis,
+    barrier_class,
+    barrier_value_name,
+    barrier_value,
+    expected_hydraulic_characteristic,
+    request,
+):
+    # Arrange.
+    idomain, top, bottom = request.getfixturevalue(dis)
+    k = ones_like(top)
+
+    print_input = False
+
+    barrier_y = [5.5, 5.5, 5.5]
+    barrier_x = [82.0, 40.0, 0.0]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[
+            shapely.linestrings(barrier_x, barrier_y),
+        ],
+        data={
+            barrier_value_name: [barrier_value],
+            "layer": [1],  # , 2
+        },
+    )
+
+    hfb = barrier_class(geometry, print_input)
+
+    # Act.
+    _ = hfb.to_mf6_pkg(idomain, top, bottom, k)
+
+    # Assert.
+    snapped, _ = xu.snap_to_grid(geometry, grid=idomain, max_snap_distance=0.5)
+    edge_index = np.argwhere(snapped[barrier_value_name].notnull().values).ravel()
+
+    grid = (
+        idomain.ugrid.grid
+        if isinstance(idomain, xu.UgridDataArray)
+        else xu.UgridDataArray.from_structured(idomain).ugrid.grid
+    )
+
+    data = np.full((idomain.coords["layer"].size, edge_index.size), fill_value=np.nan)
+    data[0, :] = barrier_value
+    expected_barrier_values = xr.DataArray(
+        data=data,
+        dims=("layer", "mesh2d_nFaces"),
+        coords={"layer": idomain.coords["layer"]},
+    )
+
+    expected_values = to_connected_cells_dataset(
+        idomain, grid, edge_index, {barrier_value_name: expected_barrier_values}
+    )
+
+    mf6_flow_barrier_mock.assert_called_once()
+
+    _, args = mf6_flow_barrier_mock.call_args
+    assert args["cell_id1"].equals(expected_values["cell_id1"])
+    assert args["cell_id2"].equals(expected_values["cell_id2"])
+    assert args["layer"].equals(expected_values["layer"])
+    assert (
+        args["hydraulic_characteristic"].values.min()
         == expected_hydraulic_characteristic
     )
 
