@@ -34,11 +34,7 @@ from imod.typing.grid import GridDataArray, is_unstructured
 
 
 def get_models(simulation: Modflow6Simulation) -> Dict[str, Modflow6Model]:
-    return {
-        model_name: model
-        for model_name, model in simulation.items()
-        if isinstance(model, Modflow6Model)
-    }
+    return {k: v for k, v in simulation.items() if isinstance(v, Modflow6Model)}
 
 
 def get_packages(simulation: Modflow6Simulation) -> Dict[str, Package]:

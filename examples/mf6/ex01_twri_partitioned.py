@@ -27,11 +27,12 @@ In overview, we'll set the following steps:
 # We'll start with the usual imports. As this is an simple (synthetic)
 # structured model, we can make due with few packages.
 
+import matplotlib.pyplot as plt
 import numpy as np
-import xarray as xr
 from example_models import create_twri_simulation
 
 import imod
+from imod.mf6.partitioned_simulation_postprocessing import merge_heads
 from imod.typing.grid import zeros_like
 
 simulation = create_twri_simulation()
@@ -71,22 +72,7 @@ simulation.run()
 # Open the results
 # ----------------
 #
-# We'll open the heads (.hds) file.
-
-# head = imod.mf6.open_hds(
-#     modeldir / "GWF_1/GWF_1.hds",
-#     modeldir / "GWF_1/dis.dis.grb",
-# )
-# head.isel(layer=0, time=0).plot.contourf()
-
-
-heads = []
-for id in np.arange(0, number_partitions):
-    head = imod.mf6.open_hds(
-        modeldir / f"GWF_1_{id}/GWF_1_{id}.hds",
-        modeldir / f"GWF_1_{id}/dis.dis.grb",
-    )
-    heads.append(head)
-
-head = xr.merge(heads)
-head["head"].isel(layer=0, time=0).plot.contourf()
+# We'll merge the heads (.hds) file.
+fig, ax = plt.subplots()
+head = merge_heads(modeldir, simulation)
+head.isel(layer=0, time=0).plot.contourf()
