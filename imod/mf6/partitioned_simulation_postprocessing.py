@@ -24,7 +24,7 @@ def merge_heads(simulation_dir: Path, simulation: Modflow6Simulation) -> GridDat
         )
         heads.append(head)
 
-    head = merge(*heads)
+    head = merge(heads)
     return head["head"]
 
 

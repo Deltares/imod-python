@@ -1,4 +1,4 @@
-from typing import TypeAlias, Union
+from typing import Sequence, TypeAlias, Union
 
 import numpy as np
 import xarray as xr
@@ -48,11 +48,13 @@ def is_unstructured(grid: xr.DataArray) -> bool:
     return False
 
 
-@typedispatch
-def merge(*args: xr.DataArray) -> xr.DataArray:
-    return xr.merge(list(args))
-
-
-@typedispatch
-def merge(*args: xu.UgridDataArray) -> xu.UgridDataArray:
-    return xu.merge_partitions(list(args))
+def merge(objects: Sequence[xr.DataArray], *args, **kwargs) -> xr.DataArray:
+    start_type = type(objects[0])
+    homogeneous = all([isinstance(o, start_type) for o in objects])
+    if not homogeneous:
+        raise RuntimeError("only hommogeneous sequences can be merged")
+    if isinstance(objects[0], xr.DataArray):
+        return xr.merge(objects, *args, **kwargs)
+    if isinstance(objects[0], xu.UgridDataArray):
+        return xu.merge_partitions(objects, *args, **kwargs)
+    raise NotImplementedError(f"merging not supported for type { type(objects[0])}")
