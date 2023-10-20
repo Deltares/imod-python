@@ -31,8 +31,6 @@ module = [
     "pooch.*",
     "pyproj.*",
     "rasterio.*",
-    "ribasim.*",
-    "ribasim_testmodels.*",
     "scipy.*",
     "shapely.*",
     "tomllib.*",
