@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from imod.mf6.partitioned_simulation_postprocessing import (
-    get_grb_file_path,
+    _get_grb_file_path,
     merge_heads, merge_balances
 )
 from imod.mf6.simulation import Modflow6Simulation
@@ -155,18 +155,34 @@ def test_import_heads_unstructured(tmp_path, circle_partitioned):
     assert np.allclose(merged_heads.coords["mesh2d_nFaces"].values, list(range(216)))
 
 
-@pytest.mark.usefixtures("setup_split_simulation")
+@pytest.mark.usefixtures("split_transient_twri_model")
 def test_import_balances_structured(
-    tmp_path: Path, setup_split_simulation: Modflow6Simulation
+    tmp_path: Path, split_transient_twri_model: Modflow6Simulation
 ):
     # Arrange
-    split_simulation = setup_split_simulation
+    split_simulation = split_transient_twri_model
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
-    submodel_names = list(get_models(split_simulation).keys())
+   # Act
+    merged_balances = merge_balances(tmp_path, split_simulation)
+
+    
+
+    pass
+
+@pytest.mark.usefixtures("circle_partitioned")
+def test_import_balances_unstructured(
+    tmp_path: Path,  circle_partitioned: Modflow6Simulation
+):
+    # Arrange
+    split_simulation =  circle_partitioned
+    split_simulation.write(tmp_path, binary=False)
+    split_simulation.run()
 
    # Act
-    merged_balances = merge_balances(tmp_path, submodel_names)
+    merged_balances = merge_balances(tmp_path, split_simulation)
+
+    
 
     pass
