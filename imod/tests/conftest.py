@@ -50,7 +50,7 @@ from .fixtures.mf6_small_models_fixture import (
 )
 from .fixtures.mf6_twri_disv_fixture import twri_disv_model
 from .fixtures.mf6_twri_fixture import (
-    setup_split_simulation,
+    split_transient_twri_model,
     transient_twri_model,
     transient_twri_result,
     twri_model,

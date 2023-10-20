@@ -188,9 +188,11 @@ def transient_twri_result(tmpdir_factory, transient_twri_model):
 
 @pytest.mark.usefixtures("transient_twri_model")
 @pytest.fixture(scope="function")
-def setup_split_simulation(transient_twri_model):
+def split_transient_twri_model(transient_twri_model):
     active = transient_twri_model["GWF_1"].domain.sel(layer=1)
-    transient_twri_model["GWF_1"].pop("wel")
+    transient_twri_model["GWF_1"].pop(
+        "wel"
+    )  # TODO issue gitlab 495, if well were grid-agnostic we wouldn't need to pop it
     number_partitions = 3
     split_location = np.linspace(active.y.min(), active.y.max(), number_partitions + 1)
 

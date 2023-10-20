@@ -7,7 +7,7 @@ from imod.mf6.partitioned_simulation_postprocessing import (
     get_grb_file_path,
     merge_heads, merge_balances
 )
-from imod.mf6.simulation import Modflow6Simulation, get_models
+from imod.mf6.simulation import Modflow6Simulation
 
 
 def test_find_grb_file(tmp_path: Path):
@@ -17,7 +17,7 @@ def test_find_grb_file(tmp_path: Path):
         file.write("grb file content")
 
     # Act
-    grb_file = get_grb_file_path(tmp_path)
+    grb_file = _get_grb_file_path(tmp_path)
 
     # Assert
     assert grb_file.name == "modelname.grb"
@@ -26,7 +26,7 @@ def test_find_grb_file(tmp_path: Path):
 def test_find_no_grb_file(tmp_path: Path):
     # Act, Assert
     with pytest.raises(RuntimeError):
-        _ = get_grb_file_path(tmp_path)
+        _ = _get_grb_file_path(tmp_path)
 
 
 def test_find_multiple_grb_files(tmp_path: Path):
@@ -41,24 +41,22 @@ def test_find_multiple_grb_files(tmp_path: Path):
 
     # Act, Assert
     with pytest.raises(RuntimeError):
-        _ = get_grb_file_path(tmp_path)
+        _ = _get_grb_file_path(tmp_path)
 
 
-@pytest.mark.usefixtures("setup_split_simulation")
+@pytest.mark.usefixtures("split_transient_twri_model")
 def test_import_heads_structured(
-    tmp_path: Path, setup_split_simulation: Modflow6Simulation
+    tmp_path: Path, split_transient_twri_model: Modflow6Simulation
 ):
     # Arrange
-    split_simulation = setup_split_simulation
+    split_simulation = split_transient_twri_model
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
-    submodel_names = list(get_models(split_simulation).keys())
-
     # Act
-    merged_heads = merge_heads(tmp_path, submodel_names)
+    merged_heads = merge_heads(tmp_path, split_simulation)
 
-    # assert
+    # Assert
     assert np.allclose(
         merged_heads.coords["x"].values,
         [
@@ -144,11 +142,13 @@ def test_import_heads_unstructured(tmp_path, circle_partitioned):
     circle_partitioned.write(tmp_path, binary=False)
     circle_partitioned.run()
 
-    submodel_names = list(get_models(circle_partitioned).keys())
-
     # Act
-    merged_heads = merge_heads(tmp_path, submodel_names)
+    merged_heads = merge_heads(tmp_path, circle_partitioned)
 
+    # Assert
+    assert np.allclose(merged_heads.coords["layer"].values, [1, 2])
+    assert np.allclose(merged_heads.coords["time"].values, [1.0])
+    assert np.allclose(merged_heads.coords["mesh2d_nFaces"].values, list(range(216)))
     # Assert
     assert np.allclose(merged_heads.coords["layer"].values, [1, 2])
     assert np.allclose(merged_heads.coords["time"].values, [1.0])
