@@ -84,7 +84,6 @@ head = merge_heads(modeldir, simulation)
 head.isel(layer=0, time=0).plot.contourf()
 fig, ax = plt.subplots()
 balances = merge_balances(modeldir, simulation)
-balances = balances.sel({ "variable": 0})
-balances["flow-front-face"].isel(layer=0, time=-1).plot.contourf(ax=ax)
+balances["flow-right-face"].isel(layer=0, time=-1).plot.contourf(ax=ax)
 
 pass

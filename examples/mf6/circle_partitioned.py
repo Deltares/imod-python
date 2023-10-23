@@ -39,10 +39,7 @@ head.isel(layer=0, time=-1).ugrid.plot.contourf(ax=ax)
 fig, ax = plt.subplots()
 balances = merge_balances(tmp_path, new_sim)
 
-#balances = balances.drop_dims("variable")
-balances = balances.sel({"variable": 0})
-balances["flow-horizontal-face"].isel(layer=0, time=-1).ugrid.plot.contourf(ax=ax)
-balances["gwf-gwf_2"].isel(layer=0, time=-1).ugrid.plot.contourf(ax=ax)
+balances["flow-horizontal-face-x"].isel(layer=0, time=-1).ugrid.plot()
 pass
 
 # %%

@@ -76,7 +76,7 @@ def merge_balances(simulation_dir: Path, simulation:Modflow6Simulation) -> GridD
         cbc_per_partition.append(cbc)
     allKeys = list(allKeys)
 
-    merged_keys =[]
+    merged_keys ={}
     for key in allKeys:
         balances_of_keys = []
         for balance in cbc_per_partition:
@@ -84,14 +84,6 @@ def merge_balances(simulation_dir: Path, simulation:Modflow6Simulation) -> GridD
                 balance[key] = balance[key].rename(key)
                 balances_of_keys.append(balance[key])
         x = merge(balances_of_keys)
-        if not is_unstructured(x): 
-            x.rename(key)
-        merged_keys.append(x) 
-    data_arrays = [dataset.to_array() for dataset in merged_keys]
-    for ikey in range(len(allKeys)):
-        data_arrays[ikey] = data_arrays[ikey].rename(allKeys[ikey])
-        data_arrays[ikey] =data_arrays[ikey].drop_vars("variable")
-
-    balances =merge_to_dataset(data_arrays)
-
-    return balances
+        darray =  x.to_array(key).drop_vars(key)
+        merged_keys[key] =darray.sel({key:0})
+    return merged_keys
