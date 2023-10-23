@@ -10,8 +10,7 @@ import matplotlib.pyplot as plt
 from example_models import create_circle_simulation
 
 import imod
-from imod.mf6.partitioned_simulation_postprocessing import merge_heads
-from imod.mf6.simulation import get_models
+from imod.mf6.partitioned_simulation_postprocessing import merge_heads, merge_balances
 
 simulation = create_circle_simulation()
 tmp_path = imod.util.temporary_directory()
@@ -38,8 +37,11 @@ head = merge_heads(tmp_path, new_sim)
 head.isel(layer=0, time=-1).ugrid.plot.contourf(ax=ax)
 
 fig, ax = plt.subplots()
-balances = merge_balances(tmp_path, submodel_names)
-balances["gwf-gwf_1"].isel(layer=0, time=-1).ugrid.plot.contourf(ax=ax)
+balances = merge_balances(tmp_path, new_sim)
+
+#balances = balances.drop_dims("variable")
+balances = balances.sel({"variable": 0})
+balances["flow-horizontal-face"].isel(layer=0, time=-1).ugrid.plot.contourf(ax=ax)
 balances["gwf-gwf_2"].isel(layer=0, time=-1).ugrid.plot.contourf(ax=ax)
 pass
 

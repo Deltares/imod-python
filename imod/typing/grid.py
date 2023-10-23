@@ -58,3 +58,15 @@ def merge(objects: Sequence[xr.DataArray], *args, **kwargs) -> xr.Dataset:
     if isinstance(objects[0], xu.UgridDataArray):
         return xu.merge_partitions(objects, *args, **kwargs)
     raise NotImplementedError(f"merging not supported for type {type(objects[0])}")
+
+
+def merge_to_dataset(objects: Sequence[xr.DataArray], *args, **kwargs) -> xr.Dataset:
+    start_type = type(objects[0])
+    homogeneous = all([isinstance(o, start_type) for o in objects])
+    if not homogeneous:
+        raise RuntimeError("only hommogeneous sequences can be merged")
+    if isinstance(objects[0], xr.DataArray):
+        return xr.merge(objects, *args, **kwargs)
+    if isinstance(objects[0], xu.UgridDataArray):
+        return xu.merge(objects, *args, **kwargs)
+    raise NotImplementedError(f"merging not supported for type {type(objects[0])}")

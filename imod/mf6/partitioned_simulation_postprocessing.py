@@ -3,7 +3,7 @@ from pathlib import Path
 import imod
 from imod.mf6.model import GroundwaterFlowModel
 from imod.mf6.simulation import Modflow6Simulation
-from imod.typing.grid import GridDataArray, merge, is_unstructured
+from imod.typing.grid import GridDataArray, merge, is_unstructured, merge_to_dataset
 from typing import List
 
 
@@ -90,6 +90,8 @@ def merge_balances(simulation_dir: Path, simulation:Modflow6Simulation) -> GridD
     data_arrays = [dataset.to_array() for dataset in merged_keys]
     for ikey in range(len(allKeys)):
         data_arrays[ikey] = data_arrays[ikey].rename(allKeys[ikey])
-    balances =merge(data_arrays)
+        data_arrays[ikey] =data_arrays[ikey].drop_vars("variable")
+
+    balances =merge_to_dataset(data_arrays)
 
     return balances
