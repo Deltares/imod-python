@@ -47,7 +47,7 @@ def _get_cbc_file_path(model_directory: Path) -> Path:
 
 def _get_single_file(model_directory: Path, extension: str) -> Path:
     """
-    Given a directory path, and an exttension, it returns a single file in that directory with that extension.
+    Given a directory path, and an extension, it returns a single file in that directory with that extension.
     It raises an exception if there are multiple files with the same extension.
     """
     candidate_files = list(model_directory.glob(f"*.{extension}"))
@@ -62,8 +62,10 @@ def merge_balances(
     simulation_dir: Path, simulation: Modflow6Simulation
 ) -> Dict[str, GridDataArray]:
     """
-    This function merges the head output of a split simulation into a single
-    head file. Both structured and unstructured grids are supported.
+    This function merges the balance output of a split simulation into a single
+    balance dictionary. The keys in this dictionary are the package names
+    that contribute to the balance, like "drn" (drainage) or "sto"(storage).
+    The npf package results in different keys referring to the flow direction.
     """
 
     model_names = list(
