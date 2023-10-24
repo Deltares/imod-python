@@ -7,7 +7,7 @@ begin options
 {% endif %}
 {%- if save_flows is defined %}  save_flows
 {% endif %}
-{%- if newtonoptions is defined %}  newton {% if under_relaxation is defined %}under_relaxation{% endif %}
+{%- if newton is defined %}  newton {% if under_relaxation is defined %}under_relaxation{% endif %}
 {% endif -%}
 end options
 
