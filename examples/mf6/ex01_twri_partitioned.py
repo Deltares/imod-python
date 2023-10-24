@@ -32,7 +32,7 @@ import numpy as np
 from example_models import create_twri_simulation
 
 import imod
-from imod.mf6.partitioned_simulation_postprocessing import merge_heads
+from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
 from imod.typing.grid import zeros_like
 
 simulation = create_twri_simulation()
@@ -50,6 +50,10 @@ for id in np.arange(1, number_partitions):
     submodel_labels.loc[
         (coords["y"] > split_location[id]) & (coords["y"] <= split_location[id + 1])
     ] = id
+
+
+fig, ax = plt.subplots()
+submodel_labels.plot.contourf(ax=ax)
 
 simulation = simulation.split(submodel_labels)
 
@@ -69,10 +73,21 @@ simulation.write(modeldir, binary=False)
 simulation.run()
 
 # %%
-# Open the results
-# ----------------
+# Open the results (head)
+# -----------------------
 #
-# We'll merge the heads (.hds) file.
 fig, ax = plt.subplots()
 head = merge_heads(modeldir, simulation)
 head.isel(layer=0, time=0).plot.contourf()
+ax.title.set_text("head")
+
+# %%
+# Open the results (balance)
+# --------------------------
+#
+balances = merge_balances(modeldir, simulation)
+for key in balances:
+    fig, ax = plt.subplots()
+    balances[key].isel(layer=0, time=-1).plot.contourf(ax=ax)
+    ax.title.set_text(key)
+pass

@@ -5,6 +5,7 @@ import pytest
 
 from imod.mf6.partitioned_simulation_postprocessing import (
     _get_grb_file_path,
+    merge_balances,
     merge_heads,
 )
 from imod.mf6.simulation import Modflow6Simulation
@@ -149,3 +150,83 @@ def test_import_heads_unstructured(tmp_path, circle_partitioned):
     assert np.allclose(merged_heads.coords["layer"].values, [1, 2])
     assert np.allclose(merged_heads.coords["time"].values, [1.0])
     assert np.allclose(merged_heads.coords["mesh2d_nFaces"].values, list(range(216)))
+    # Assert
+    assert np.allclose(merged_heads.coords["layer"].values, [1, 2])
+    assert np.allclose(merged_heads.coords["time"].values, [1.0])
+    assert np.allclose(merged_heads.coords["mesh2d_nFaces"].values, list(range(216)))
+
+
+@pytest.mark.usefixtures("split_transient_twri_model")
+def test_import_balances_structured(
+    tmp_path: Path, split_transient_twri_model: Modflow6Simulation
+):
+    # Arrange
+    split_simulation = split_transient_twri_model
+    split_simulation.write(tmp_path, binary=False)
+    split_simulation.run()
+
+    # Act
+    merged_balances = merge_balances(tmp_path, split_simulation)
+
+    # Assert
+    expected_keys = [
+        "gwf-gwf_1",
+        "chd",
+        "flow-right-face",
+        "sto-ss",
+        "flow-lower-face",
+        "gwf-gwf_2",
+        "drn",
+        "flow-front-face",
+    ]
+    expected_coords = ["x", "y", "layer", "time", "dx", "dy"]
+    expected_dims = ["time", "layer", "y", "x"]
+
+    for key in expected_keys:
+        assert key in merged_balances.keys()
+        assert len(expected_coords) == len(merged_balances[key].coords)
+        assert len(expected_dims) == len(merged_balances[key].dims)
+        for coord in expected_coords:
+            assert coord in merged_balances[key].coords
+        for dim in expected_dims:
+            assert dim in merged_balances[key].dims
+
+
+@pytest.mark.usefixtures("circle_partitioned")
+def test_import_balances_unstructured(
+    tmp_path: Path, circle_partitioned: Modflow6Simulation
+):
+    # Arrange
+    split_simulation = circle_partitioned
+    split_simulation.write(tmp_path, binary=False)
+    split_simulation.run()
+
+    # Act
+    merged_balances = merge_balances(tmp_path, split_simulation)
+
+    # Assert
+    expected_keys = [
+        "chd",
+        "flow-horizontal-face",
+        "gwf-gwf_1",
+        "gwf-gwf_2",
+        "flow-horizontal-face-y",
+        "gwf-gwf_3",
+        "flow-lower-face",
+        "flow-horizontal-face-x",
+    ]
+    expected_dims_coords_faces = ["layer", "time", "mesh2d_nFaces"]
+    expected_dims_coords_edges = ["layer", "time", "mesh2d_nEdges"]
+
+    for key in expected_keys:
+        expected_dims_coords = expected_dims_coords_faces
+        if "flow-horizontal-face" in key:
+            expected_dims_coords = expected_dims_coords_edges
+
+        assert key in merged_balances.keys()
+        assert len(expected_dims_coords) == len(merged_balances[key].coords)
+        assert len(expected_dims_coords) == len(merged_balances[key].dims)
+
+        for coord in expected_dims_coords:
+            assert coord in merged_balances[key].coords
+            assert coord in merged_balances[key].dims
