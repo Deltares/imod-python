@@ -75,14 +75,14 @@ def __get_settings(package):
     return package[scalar_variables]
 
 
-def __get_variables_for_gdf(package: ILineDataPackage):
+def __get_variables_for_gdf(package: ILineDataPackage) -> list[str]:
     return [
         package._get_variable_name(),
         "geometry",
     ] + package._get_vertical_variables()
 
 
-def __line_package_to_gdf(package: ILineDataPackage):
+def __line_package_to_gdf(package: ILineDataPackage) -> gpd.GeoDataFrame:
     variables_for_gdf = __get_variables_for_gdf(package)
     return gpd.GeoDataFrame(
         package.dataset[variables_for_gdf].to_dataframe(),
