@@ -10,6 +10,35 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Fixed
+~~~~~
+- The Newton option for a :class:`imod.mf6.GroundwaterFlowModel` was being ignored. This has been
+  corrected.
+- The Contextily packages started throwing errors. This was caused because the
+  default tile provider being used was Stamen. However Stamen is no longer free
+  which caused Contextily to fail. The default tile provider has been changed to
+  OpenStreeMap to resolve this issue.
+
+Changed
+~~~~~~~
+- The imod-environment.yml file has been split in an imod-environment.yml
+  (containing all packages required to run imod-python) and a
+  imod-environment-dev.yml file (containing additional packages for developers).
+
+Added
+~~~~~
+- The unit tests results are now published on GitLab
+- The :meth:`imod.mf6.Simulation.split` method has been added. This method makes
+  it possible for a user to create a Multi-Model simulation. A user needs to
+  provide  a submodel label array in which they specify to which submodel a cell
+  belongs. The method will then create the submodels and split the nested packages.
+  At the moment the split method will not create the gwfgwf exchanges required to
+  connect the submodels
+
+Removed
+~~~~~~~
+- Tox has been removed from the project.
+
 [0.14.1] - 2023-09-07
 ---------------------
 
