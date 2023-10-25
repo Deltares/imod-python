@@ -4,6 +4,8 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
+from imod.prepare import polygonize
+
 
 GridDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
 
@@ -36,3 +38,17 @@ def nan_like(grid: xr.DataArray, *args, **kwargs):
 @typedispatch
 def nan_like(grid: xu.UgridDataArray, *args, **kwargs):
     return xu.full_like(grid, fill_value=np.nan, dtype=np.float32, *args, **kwargs)
+
+
+@typedispatch
+def bounding_polygon(active: xr.DataArray):
+    """Return bounding polygon of active cells"""
+    # Force inactive cells to NaN.
+    to_polygonize = active.where(active, other=np.nan)
+    return polygonize(to_polygonize)
+
+
+@typedispatch
+def bounding_polygon(active: xu.UgridDataArray):
+    """Return bounding polygon of active cells"""
+    return active.ugrid.grid.bounding_polygon()
