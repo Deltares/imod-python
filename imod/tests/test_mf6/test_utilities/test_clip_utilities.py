@@ -123,7 +123,7 @@ def test_clip_by_grid_with_line_data_package__structured(
     idomain, _, _ = basic_dis
     active = idomain.sel(layer=1, drop=True)
 
-    # Act/Assert
+    # Act
     hfb_clipped = clip_by_grid(horizontal_flow_barrier, active)
 
     # Assert
@@ -145,7 +145,7 @@ def test_clip_by_grid_with_line_data_package__unstructured(
     active = idomain.sel(layer=1, drop=True)
     active_uda = xu.UgridDataArray.from_structured(active)
 
-    # Act/Assert
+    # Act
     hfb_clipped = clip_by_grid(horizontal_flow_barrier, active_uda)
 
     # Assert
