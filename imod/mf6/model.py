@@ -343,7 +343,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 instance[pkgname] = pkg_cls.from_file(parentdir / path)
 
         return instance
-    
+
     @classmethod
     def model_id(cls):
         return cls._model_id
