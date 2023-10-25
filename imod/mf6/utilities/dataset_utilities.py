@@ -2,7 +2,6 @@ from typing import Any
 
 import numpy as np
 import xarray as xr
-import xugrid as xu
 from xarray.core.utils import is_scalar
 
 from imod.typing.grid import GridDataArray
