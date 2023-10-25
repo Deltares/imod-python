@@ -79,7 +79,6 @@ def merge_balances(
         cbc = imod.mf6.open_cbc(cbc_path, grb_path)
         unique_balance_keys.update(list(cbc.keys()))
         cbc_per_partition.append(cbc)
-    unique_balance_keys = list(unique_balance_keys)
 
     merged_keys = {}
     for key in unique_balance_keys:
@@ -90,5 +89,6 @@ def merge_balances(
                 balances_of_keys.append(balance[key])
         merged_balance_of_key = merge(balances_of_keys)
         darray = merged_balance_of_key.to_array(key).drop_vars(key)
+        # remove a dimension without coordinates (the balance type)
         merged_keys[key] = darray.sel({key: 0})
     return merged_keys
