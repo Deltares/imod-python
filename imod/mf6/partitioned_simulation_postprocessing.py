@@ -39,7 +39,7 @@ def _get_grb_file_path(model_directory: Path) -> Path:
 
 def _get_cbc_file_path(model_directory: Path) -> Path:
     """
-    Given a directory path, returns the path of the grb file in it. Raises an
+    Given a directory path, returns the path of the cbc file in it. Raises an
     exception if there is not exactly 1 grb file in it.
     """
     return _get_single_file(model_directory, "cbc")
