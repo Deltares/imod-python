@@ -6,7 +6,7 @@ import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
 
-from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
+from imod.mf6.hfb import HorizontalFlowBarrierBase
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.dataset_utilities import get_scalar_variables
@@ -76,14 +76,14 @@ def _get_settings(package):
     return package[scalar_variables]
 
 
-def _get_variables_for_gdf(package: ILineDataPackage) -> list[str]:
+def _get_variables_for_gdf(package: HorizontalFlowBarrierBase) -> list[str]:
     return [
         package._get_variable_name(),
         "geometry",
     ] + package._get_vertical_variables()
 
 
-def _line_package_to_gdf(package: ILineDataPackage) -> gpd.GeoDataFrame:
+def _line_package_to_gdf(package: HorizontalFlowBarrierBase) -> gpd.GeoDataFrame:
     variables_for_gdf = _get_variables_for_gdf(package)
     return gpd.GeoDataFrame(
         package.dataset[variables_for_gdf].to_dataframe(),
@@ -92,7 +92,9 @@ def _line_package_to_gdf(package: ILineDataPackage) -> gpd.GeoDataFrame:
 
 
 @typedispatch
-def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataPackage:
+def clip_by_grid(
+    package: HorizontalFlowBarrierBase, active: GridDataArray
+) -> HorizontalFlowBarrierBase:
     """Clip LineDataPackage outside unstructured/structured grid."""
 
     # Convert package to Geopandas' GeoDataFrame
