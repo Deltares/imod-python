@@ -4,6 +4,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 from xarray.core.utils import is_scalar
+from imod.typing.grid import GridDataArray
 
 
 def remove_inactive(ds: xr.Dataset, active: xr.DataArray) -> xr.Dataset:
@@ -42,6 +43,6 @@ def is_dataarray_none(datarray: Any) -> bool:
     return isinstance(datarray, xr.DataArray) and datarray.isnull().values.all()
 
 
-def get_scalar_variables(ds: xr.Dataset | xu.UgridDataset) -> list[str]:
+def get_scalar_variables(ds: GridDataArray) -> list[str]:
     """Returns scalar variables in a dataset."""
     return [var for var, arr in ds.variables.items() if is_scalar(arr)]
