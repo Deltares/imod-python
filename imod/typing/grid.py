@@ -4,8 +4,8 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
-from imod.prepare import polygonize
 
+from imod.prepare import polygonize
 
 GridDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
 
