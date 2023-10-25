@@ -6,13 +6,13 @@ import pytest
 import shapely
 import xarray as xr
 import xugrid as xu
+from shapely.testing import assert_geometries_equal
 
 import imod
 from imod.mf6 import HorizontalFlowBarrierResistance
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.utilities.clip_utilities import clip_by_grid
 from imod.mf6.utilities.grid_utilities import broadcast_to_full_domain
-from shapely.testing import assert_geometries_equal
 
 
 @pytest.fixture(scope="function")
