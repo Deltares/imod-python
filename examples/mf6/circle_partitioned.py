@@ -26,7 +26,7 @@ submodel_labels.values[118:] = 2
 # create a simulation that is split in subdomains according to the label array
 new_sim = simulation.split(submodel_labels)
 # %%
-# write the simulation input files for the new simeulation
+# write the simulation input files for the new simulation
 new_sim.write(tmp_path, False)
 
 # run the split simulation

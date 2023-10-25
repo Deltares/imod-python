@@ -13,14 +13,14 @@ def merge_heads(simulation_dir: Path, simulation: Modflow6Simulation) -> GridDat
     head file. Both structured and unstructured grids are supported.
     """
     model_names = list(
-        simulation.get_models_of_type(GroundwaterFlowModel._model_id).keys()
+        simulation.get_models_of_type(GroundwaterFlowModel.model_id()).keys()
     )
     heads = []
-    for modelname in model_names:
-        modelDirectory = simulation_dir / modelname
-        grb_path = _get_grb_file_path(modelDirectory)
+    for name in model_names:
+        model_directory = simulation_dir / name
+        grb_path = _get_grb_file_path(model_directory)
         head = imod.mf6.open_hds(
-            modelDirectory / f"{modelname}.hds",
+            model_directory / f"{name}.hds",
             grb_path,
         )
         heads.append(head)
@@ -68,15 +68,14 @@ def merge_balances(
     The npf package results in different keys referring to the flow direction.
     """
 
-    model_names = list(
-        simulation.get_models_of_type(GroundwaterFlowModel._model_id).keys()
-    )
+    model_names = simulation.get_models_of_type(GroundwaterFlowModel.model_id()).keys()
+
     unique_balance_keys = set()
     cbc_per_partition = []
-    for modelname in model_names:
-        modelDirectory = simulation_dir / modelname
-        cbc_path = _get_cbc_file_path(modelDirectory)
-        grb_path = _get_grb_file_path(modelDirectory)
+    for name in model_names:
+        model_directory = simulation_dir / name
+        cbc_path = _get_cbc_file_path(model_directory)
+        grb_path = _get_grb_file_path(model_directory)
         cbc = imod.mf6.open_cbc(cbc_path, grb_path)
         unique_balance_keys.update(list(cbc.keys()))
         cbc_per_partition.append(cbc)

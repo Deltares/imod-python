@@ -83,11 +83,11 @@ ax.title.set_text("head")
 
 # %%
 # Open the results (balance)
-# --------------------------
+# -------------------------
 #
 balances = merge_balances(modeldir, simulation)
-for key in balances:
-    fig, ax = plt.subplots()
-    balances[key].isel(layer=0, time=-1).plot.contourf(ax=ax)
-    ax.title.set_text(key)
-pass
+
+fig, ax = plt.subplots()
+balances["flow-front-face"].isel(layer=0, time=-1).plot.contourf(ax=ax)
+ax.title.set_text("flow-front-face")
+
