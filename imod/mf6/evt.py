@@ -206,7 +206,7 @@ class Evapotranspiration(BoundaryCondition):
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            self.add_periodic_auxiliary_variable()
+            self._add_periodic_auxiliary_variable()
         self.dataset["fixed_cell"] = fixed_cell
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
@@ -222,8 +222,8 @@ class Evapotranspiration(BoundaryCondition):
 
         return errors
 
-    def get_options(self, predefined_options: Dict, not_options: List = None):
-        options = super().get_options(predefined_options, not_options=not_options)
+    def _get_options(self, predefined_options: Dict, not_options: List = None):
+        options = super()._get_options(predefined_options, not_options=not_options)
         # Add amount of segments
         if "segment" in self.dataset.dims:
             options["nseg"] = self.dataset.dims["segment"] + 1
