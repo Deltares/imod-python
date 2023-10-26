@@ -61,7 +61,7 @@ class Mf6Wel(BoundaryCondition):
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            self.add_periodic_auxiliary_variable()
+            self._add_periodic_auxiliary_variable()
         self._validate_init_schemata(validate)
 
     def _ds_to_arrdict(self, ds):

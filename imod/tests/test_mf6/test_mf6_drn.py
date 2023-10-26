@@ -7,6 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.mf6.utilities.package_utils import set_repeat_stress
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 
@@ -249,11 +250,12 @@ def test_repeat_stress(
         elevation=elevation_fc,
         conductance=conductance_fc,
     )
-    drn.set_repeat_stress(
+    set_repeat_stress(
+        drn,
         times={
             globaltimes[3]: globaltimes[0],
             globaltimes[4]: globaltimes[1],
-        }
+        },
     )
     actual = drn.render(directory, "drn", globaltimes, False)
     assert actual == expected
