@@ -345,13 +345,13 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         self._write_file(outpath, package_data)
 
     def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
-        write_context = deepcopy(write_context)
-        write_context.use_binary = False
+        boundary_condition_write_context = deepcopy(write_context)
+        boundary_condition_write_context.use_binary = False
 
         self.fill_stress_perioddata()
-        super().write(pkgname, globaltimes, write_context)
+        super().write(pkgname, globaltimes, boundary_condition_write_context)
 
-        directory = write_context.write_directory
+        directory = boundary_condition_write_context.write_directory
         self.write_packagedata(directory, pkgname, binary=False)
 
     @abc.abstractmethod
