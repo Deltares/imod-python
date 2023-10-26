@@ -10,6 +10,7 @@ import xarray as xr
 import xugrid as xu
 from numpy import ndarray
 
+from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
@@ -597,7 +598,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            self._add_periodic_auxiliary_variable()
+            add_periodic_auxiliary_variable(self)
 
         self._validate_init_schemata(validate)
 
@@ -744,7 +745,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            self._add_periodic_auxiliary_variable()
+            add_periodic_auxiliary_variable(self)
 
         self._validate_init_schemata(validate)
 
