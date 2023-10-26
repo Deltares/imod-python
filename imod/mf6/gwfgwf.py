@@ -41,8 +41,8 @@ class GWFGWF(Package):
         self.dataset["hwva"] = hwva
 
         if any(kwargs):
-            self.dataset["auxiliary"] = xr.merge(kwargs.values()).to_array(
-                name="auxiliary"
+            self.dataset["concentration"] = xr.merge(kwargs.values()).to_array(
+                name="concentration"
             )
 
     def set_options(

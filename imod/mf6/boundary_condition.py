@@ -1,13 +1,12 @@
 import abc
 import pathlib
-from copy import copy
+from copy import copy, deepcopy
 from typing import Dict, List
 
 import numpy as np
 import xarray as xr
 import xugrid as xu
 
-import imod
 from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
 
@@ -64,33 +63,12 @@ class BoundaryCondition(Package, abc.ABC):
     not the array input which is used in :class:`Package`.
     """
 
-    def set_repeat_stress(self, times) -> None:
-        """
-        Set repeat stresses: re-use data of earlier periods.
-
-        Parameters
-        ----------
-        times: Dict of datetime-like to datetime-like.
-            The data of the value datetime is used for the key datetime.
-        """
-        keys = [
-            imod.wq.timeutil.to_datetime(key, use_cftime=False) for key in times.keys()
-        ]
-        values = [
-            imod.wq.timeutil.to_datetime(value, use_cftime=False)
-            for value in times.values()
-        ]
-        self.dataset["repeat_stress"] = xr.DataArray(
-            data=np.column_stack((keys, values)),
-            dims=("repeat", "repeat_items"),
-        )
-
     def _max_active_n(self):
         """
         Determine the maximum active number of cells that are active
         during a stress period.
         """
-        da = self.dataset[self.period_data()[0]]
+        da = self.dataset[self.get_period_varnames()[0]]
         if "time" in da.coords:
             nmax = int(da.groupby("time").count(xr.ALL_DIMS).max())
         else:
@@ -108,7 +86,7 @@ class BoundaryCondition(Package, abc.ABC):
         with open(outpath, "w") as f:
             np.savetxt(fname=f, X=struct_array, fmt=fmt, header=header)
 
-    def write_datafile(self, outpath, ds, binary):
+    def _write_datafile(self, outpath, ds, binary):
         """
         Writes a modflow6 binary data file
         """
@@ -129,7 +107,7 @@ class BoundaryCondition(Package, abc.ABC):
                     f"{datavar} in {self._pkg_id} package cannot be a scalar"
                 )
             auxiliary_vars = (
-                self.get_auxiliary_variable_names()
+                self._get_auxiliary_variable_dict()
             )  # returns something like {"concentration": "species"}
             if datavar in auxiliary_vars.keys():  # if datavar is concentration
                 if (
@@ -172,7 +150,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         return recarr
 
-    def period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
+    def _period_paths(self, directory, pkgname, globaltimes, bin_ds, binary):
         directory = pathlib.Path(directory) / pkgname
 
         if binary:
@@ -204,11 +182,11 @@ class BoundaryCondition(Package, abc.ABC):
 
         return periods
 
-    def get_options(self, predefined_options: Dict, not_options: List = None):
+    def _get_options(self, predefined_options: Dict, not_options: List = None):
         options = copy(predefined_options)
 
         if not_options is None:
-            not_options = self.period_data()
+            not_options = self.get_period_varnames()
 
         for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
@@ -224,22 +202,22 @@ class BoundaryCondition(Package, abc.ABC):
         datafiles. This method can be overriden to do some extra operations on
         this dataset before writing.
         """
-        return self[self.period_data()]
+        return self[self.get_period_varnames()]
 
     def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
         d = {"binary": binary}
         bin_ds = self._get_bin_ds()
-        d["periods"] = self.period_paths(
+        d["periods"] = self._period_paths(
             directory, pkgname, globaltimes, bin_ds, binary
         )
         # construct the rest (dict for render)
-        d = self.get_options(d)
+        d = self._get_options(d)
         d["maxbound"] = self._max_active_n()
 
         # now we should add the auxiliary variable names to d
         auxiliaries = (
-            self.get_auxiliary_variable_names()
+            self._get_auxiliary_variable_dict()
         )  # returns someting like {"concentration": "species"}
 
         # loop over the types of auxiliary variables (for example concentration)
@@ -258,8 +236,8 @@ class BoundaryCondition(Package, abc.ABC):
 
         return self._template.render(d)
 
-    def write_perioddata(self, directory, pkgname, binary):
-        if len(self.period_data()) == 0:
+    def _write_perioddata(self, directory, pkgname, binary):
+        if len(self.get_period_varnames()) == 0:
             return
         bin_ds = self._get_bin_ds()
 
@@ -271,12 +249,12 @@ class BoundaryCondition(Package, abc.ABC):
         if "time" in bin_ds:  # one of bin_ds has time
             for i in range(len(self.dataset.time)):
                 path = directory / pkgname / f"{self._pkg_id}-{i}.{ext}"
-                self.write_datafile(
+                self._write_datafile(
                     path, bin_ds.isel(time=i), binary=binary
                 )  # one timestep
         else:
             path = directory / pkgname / f"{self._pkg_id}.{ext}"
-            self.write_datafile(path, bin_ds, binary=binary)
+            self._write_datafile(path, bin_ds, binary=binary)
 
     def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
         """
@@ -284,33 +262,45 @@ class BoundaryCondition(Package, abc.ABC):
 
         directory is modelname
         """
+
+        super().write(pkgname, globaltimes, write_context)
         directory = write_context.write_directory
-        self.write_blockfile(
-            pkgname=pkgname,
-            globaltimes=globaltimes,
-            write_context=write_context,
-        )
-        self.write_perioddata(
+
+        self._write_perioddata(
             directory=directory,
             pkgname=pkgname,
             binary=write_context.use_binary,
         )
 
-    def assign_dims(self, arg) -> Dict:
-        is_da = isinstance(arg, xr.DataArray)
-        if is_da and "time" in arg.coords:
-            if arg.ndim != 2:
-                raise ValueError("time varying variable: must be 2d")
-            if arg.dims[0] != "time":
-                arg = arg.transpose()
-            da = xr.DataArray(
-                data=arg.values, coords={"time": arg["time"]}, dims=["time", "index"]
-            )
-            return da
-        elif is_da:
-            return ("index", arg.values)
-        else:
-            return ("index", arg)
+    def get_period_varnames(self):
+        result = []
+        if hasattr(self, "_period_data"):
+            result += self._period_data
+        if hasattr(self, "_auxiliary_data"):
+            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
+                if aux_var_name in self.dataset.keys():
+                    for s in (
+                        self.dataset[aux_var_name].coords[aux_var_dimensions].values
+                    ):
+                        result.append(s)
+        return result
+
+    def _add_periodic_auxiliary_variable(self):
+        if hasattr(self, "_auxiliary_data"):
+            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
+                aux_coords = (
+                    self.dataset[aux_var_name].coords[aux_var_dimensions].values
+                )
+                for s in aux_coords:
+                    self.dataset[s] = self.dataset[aux_var_name].sel(
+                        {aux_var_dimensions: s}
+                    )
+
+    def _get_auxiliary_variable_dict(self):
+        result = {}
+        if hasattr(self, "_auxiliary_data"):
+            result.update(self._auxiliary_data)
+        return result
 
 
 class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
@@ -355,11 +345,18 @@ class AdvancedBoundaryCondition(BoundaryCondition, abc.ABC):
         self._write_file(outpath, package_data)
 
     def write(self, pkgname: str, globaltimes: np.ndarray, write_context: WriteContext):
+        boundary_condition_write_context = deepcopy(write_context)
+        boundary_condition_write_context.use_binary = False
+
         self.fill_stress_perioddata()
-        directory = write_context.write_directory
-        self.write_blockfile(pkgname, globaltimes, write_context)
-        self.write_perioddata(directory, pkgname, binary=False)
+        super().write(pkgname, globaltimes, boundary_condition_write_context)
+
+        directory = boundary_condition_write_context.write_directory
         self.write_packagedata(directory, pkgname, binary=False)
+
+    @abc.abstractmethod
+    def fill_stress_perioddata(self):
+        raise NotImplementedError
 
 
 class DisStructuredBoundaryCondition(BoundaryCondition):

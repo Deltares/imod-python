@@ -352,36 +352,6 @@ class Package(PackageBase, abc.ABC):
 
         return variables
 
-    def period_data(self):
-        result = []
-        if hasattr(self, "_period_data"):
-            result += self._period_data
-        if hasattr(self, "_auxiliary_data"):
-            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
-                if aux_var_name in self.dataset.keys():
-                    for s in (
-                        self.dataset[aux_var_name].coords[aux_var_dimensions].values
-                    ):
-                        result.append(s)
-        return result
-
-    def add_periodic_auxiliary_variable(self):
-        if hasattr(self, "_auxiliary_data"):
-            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
-                aux_coords = (
-                    self.dataset[aux_var_name].coords[aux_var_dimensions].values
-                )
-                for s in aux_coords:
-                    self.dataset[s] = self.dataset[aux_var_name].sel(
-                        {aux_var_dimensions: s}
-                    )
-
-    def get_auxiliary_variable_names(self):
-        result = {}
-        if hasattr(self, "_auxiliary_data"):
-            result.update(self._auxiliary_data)
-        return result
-
     def copy(self) -> Any:
         # All state should be contained in the dataset.
         return type(self)(**self.dataset.copy())

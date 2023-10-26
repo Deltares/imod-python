@@ -1083,7 +1083,7 @@ class Lake(BoundaryCondition):
         # this function is called from packagebase and should do nothing in this context
         return
 
-    def write_perioddata(self, directory, pkgname, binary):
+    def _write_perioddata(self, directory, pkgname, binary):
         # this function is called from packagebase and should do nothing in this context
         return
 

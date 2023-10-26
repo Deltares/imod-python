@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from copy import deepcopy
-from typing import List, Union
+from typing import Dict, List, Union
 
 import numpy as np
 import pandas as pd
@@ -25,6 +25,23 @@ from imod.schemata import AllNoDataSchema, DTypeSchema
 from imod.select.points import points_indices
 from imod.typing.grid import GridDataArray, ones_like
 from imod.util import values_within_range
+
+
+def _assign_dims(arg) -> Dict:
+    is_da = isinstance(arg, xr.DataArray)
+    if is_da and "time" in arg.coords:
+        if arg.ndim != 2:
+            raise ValueError("time varying variable: must be 2d")
+        if arg.dims[0] != "time":
+            arg = arg.transpose()
+        da = xr.DataArray(
+            data=arg.values, coords={"time": arg["time"]}, dims=["time", "index"]
+        )
+        return da
+    elif is_da:
+        return ("index", arg.values)
+    else:
+        return ("index", arg)
 
 
 class Well(BoundaryCondition, IPointDataPackage):
@@ -136,14 +153,14 @@ class Well(BoundaryCondition, IPointDataPackage):
         repeat_stress=None,
     ):
         super().__init__()
-        self.dataset["screen_top"] = self.assign_dims(screen_top)
-        self.dataset["screen_bottom"] = self.assign_dims(screen_bottom)
-        self.dataset["y"] = self.assign_dims(y)
-        self.dataset["x"] = self.assign_dims(x)
-        self.dataset["rate"] = self.assign_dims(rate)
+        self.dataset["screen_top"] = _assign_dims(screen_top)
+        self.dataset["screen_bottom"] = _assign_dims(screen_bottom)
+        self.dataset["y"] = _assign_dims(y)
+        self.dataset["x"] = _assign_dims(x)
+        self.dataset["rate"] = _assign_dims(rate)
         if id is None:
             id = np.arange(self.dataset["x"].size).astype(str)
-        self.dataset["id"] = self.assign_dims(id)
+        self.dataset["id"] = _assign_dims(id)
         self.dataset["minimum_k"] = minimum_k
         self.dataset["minimum_thickness"] = minimum_thickness
 
@@ -567,10 +584,10 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         repeat_stress=None,
     ):
         super().__init__()
-        self.dataset["layer"] = self.assign_dims(layer)
-        self.dataset["row"] = self.assign_dims(row)
-        self.dataset["column"] = self.assign_dims(column)
-        self.dataset["rate"] = self.assign_dims(rate)
+        self.dataset["layer"] = _assign_dims(layer)
+        self.dataset["row"] = _assign_dims(row)
+        self.dataset["column"] = _assign_dims(column)
+        self.dataset["rate"] = _assign_dims(rate)
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
@@ -580,7 +597,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            self.add_periodic_auxiliary_variable()
+            self._add_periodic_auxiliary_variable()
 
         self._validate_init_schemata(validate)
 
@@ -716,9 +733,9 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         validate: bool = True,
     ):
         super().__init__()
-        self.dataset["layer"] = self.assign_dims(layer)
-        self.dataset["cell2d"] = self.assign_dims(cell2d)
-        self.dataset["rate"] = self.assign_dims(rate)
+        self.dataset["layer"] = _assign_dims(layer)
+        self.dataset["cell2d"] = _assign_dims(cell2d)
+        self.dataset["rate"] = _assign_dims(rate)
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
@@ -727,7 +744,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            self.add_periodic_auxiliary_variable()
+            self._add_periodic_auxiliary_variable()
 
         self._validate_init_schemata(validate)
 
