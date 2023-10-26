@@ -15,7 +15,7 @@ import xugrid as xu
 
 import imod
 from imod.mf6.model import Modflow6Model
-from imod.mf6.utilities.package_utils import set_repeat_stress
+from imod.mf6.utilities.package_utils import get_repeat_stress
 from imod.typing.grid import GridDataArray
 
 try:
@@ -259,7 +259,7 @@ def create_chd(
 
     chd = imod.mf6.ConstantHead(head=disv_head.where(valid))
     if repeat is not None:
-        set_repeat_stress(chd, repeat)
+        chd.dataset["repeat_stress"] = get_repeat_stress(repeat)
     model[key] = chd
     return
 
@@ -299,7 +299,7 @@ def create_drn(
         conductance=disv_cond,
     )
     if repeat is not None:
-        set_repeat_stress(drn, repeat)
+        drn.dataset["repeat_stress"] = get_repeat_stress(repeat)
     model[key] = drn
     return
 
@@ -334,7 +334,7 @@ def create_ghb(
         head=disv_head.where(valid),
     )
     if repeat is not None:
-        set_repeat_stress(ghb, repeat)
+        ghb.dataset["repeat_stress"] = get_repeat_stress(repeat)
     model[key] = ghb
     return
 
@@ -439,7 +439,7 @@ def create_riv(
         elevation=disv_stage,
     )
     if repeat is not None:
-        set_repeat_stress(drn, repeat)
+        drn.dataset["repeat_stress"] = get_repeat_stress(repeat)
     model[f"{key}-drn"] = drn
 
     riv_cond = disv_cond * disv_inff
@@ -453,7 +453,7 @@ def create_riv(
         bottom_elevation=disv_elev.where(riv_valid),
     )
     if repeat is not None:
-        set_repeat_stress(riv, repeat)
+        riv.dataset["repeat_stress"] = get_repeat_stress(repeat)
     model[key] = riv
 
     return
@@ -482,7 +482,7 @@ def create_rch(
 
     rch = imod.mf6.Recharge(rate=disv_rate)
     if repeat is not None:
-        set_repeat_stress(rch, repeat)
+        rch.dataset["repeat_stress"] = get_repeat_stress(repeat)
     model[key] = rch
     return
 
@@ -526,7 +526,7 @@ def create_evt(
         proportion_depth=proportion_depth,
     )
     if repeat is not None:
-        set_repeat_stress(evt, repeat)
+        evt.dataset["repeat_stress"] = get_repeat_stress(repeat)
     model[key] = evt
     return
 
@@ -620,7 +620,7 @@ def create_wel(
         rate=rate,
     )
     if repeat is not None:
-        set_repeat_stress(wel, repeat)
+        wel.dataset["repeat_stress"] = get_repeat_stress(repeat)
 
     model[key] = wel
     return

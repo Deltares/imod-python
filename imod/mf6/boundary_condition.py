@@ -68,7 +68,7 @@ class BoundaryCondition(Package, abc.ABC):
         Determine the maximum active number of cells that are active
         during a stress period.
         """
-        da = self.dataset[self.period_data()[0]]
+        da = self.dataset[self.get_period_varnames()[0]]
         if "time" in da.coords:
             nmax = int(da.groupby("time").count(xr.ALL_DIMS).max())
         else:
@@ -107,7 +107,7 @@ class BoundaryCondition(Package, abc.ABC):
                     f"{datavar} in {self._pkg_id} package cannot be a scalar"
                 )
             auxiliary_vars = (
-                self._get_auxiliary_variable_names()
+                self._get_auxiliary_variable_dict()
             )  # returns something like {"concentration": "species"}
             if datavar in auxiliary_vars.keys():  # if datavar is concentration
                 if (
@@ -186,7 +186,7 @@ class BoundaryCondition(Package, abc.ABC):
         options = copy(predefined_options)
 
         if not_options is None:
-            not_options = self.period_data()
+            not_options = self.get_period_varnames()
 
         for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
             if varname in not_options:
@@ -202,7 +202,7 @@ class BoundaryCondition(Package, abc.ABC):
         datafiles. This method can be overriden to do some extra operations on
         this dataset before writing.
         """
-        return self[self.period_data()]
+        return self[self.get_period_varnames()]
 
     def render(self, directory, pkgname, globaltimes, binary):
         """Render fills in the template only, doesn't write binary data"""
@@ -217,7 +217,7 @@ class BoundaryCondition(Package, abc.ABC):
 
         # now we should add the auxiliary variable names to d
         auxiliaries = (
-            self._get_auxiliary_variable_names()
+            self._get_auxiliary_variable_dict()
         )  # returns someting like {"concentration": "species"}
 
         # loop over the types of auxiliary variables (for example concentration)
@@ -237,7 +237,7 @@ class BoundaryCondition(Package, abc.ABC):
         return self._template.render(d)
 
     def _write_perioddata(self, directory, pkgname, binary):
-        if len(self.period_data()) == 0:
+        if len(self.get_period_varnames()) == 0:
             return
         bin_ds = self._get_bin_ds()
 
@@ -272,7 +272,7 @@ class BoundaryCondition(Package, abc.ABC):
             binary=write_context.use_binary,
         )
 
-    def period_data(self):
+    def get_period_varnames(self):
         result = []
         if hasattr(self, "_period_data"):
             result += self._period_data
@@ -296,7 +296,7 @@ class BoundaryCondition(Package, abc.ABC):
                         {aux_var_dimensions: s}
                     )
 
-    def _get_auxiliary_variable_names(self):
+    def _get_auxiliary_variable_dict(self):
         result = {}
         if hasattr(self, "_auxiliary_data"):
             result.update(self._auxiliary_data)
