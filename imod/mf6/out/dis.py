@@ -209,8 +209,13 @@ def open_imeth6_budgets(
     time = np.empty(len(header_list), dtype=np.float64)
     for i, header in enumerate(header_list):
         time[i] = header.totim
+        # for node saturation use auxiliary variable as return value
+        if header.text == 'data-sat':
+            return_variable = header.auxtxt
+        else:
+            return_variable = "budget"
         a = dask.delayed(cbc.read_imeth6_budgets_dense)(
-            cbc_path, header.nlist, dtype, header.pos, size, shape
+            cbc_path, header.nlist, dtype, header.pos, size, shape, return_variable
         )
         x = dask.array.from_delayed(a, shape=shape, dtype=np.float64)
         dask_list.append(x)
