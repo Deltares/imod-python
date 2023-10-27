@@ -7,6 +7,7 @@ import numpy as np
 import xarray as xr
 import xugrid as xu
 
+from imod.mf6.auxiliary_variables import get_variable_names
 from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
 
@@ -100,27 +101,16 @@ class BoundaryCondition(Package, abc.ABC):
             self._write_textfile(outpath, struct_array)
 
     def _ds_to_arrdict(self, ds):
-        arrdict = {}
         for datavar in ds.data_vars:
             if ds[datavar].shape == ():
                 raise ValueError(
                     f"{datavar} in {self._pkg_id} package cannot be a scalar"
                 )
-            auxiliary_vars = (
-                self._get_auxiliary_variable_dict()
-            )  # returns something like {"concentration": "species"}
-            if datavar in auxiliary_vars.keys():  # if datavar is concentration
-                if (
-                    auxiliary_vars[datavar] in ds[datavar].dims
-                ):  # if this concentration array has the species dimension
-                    for s in ds[datavar].values:  # loop over species
-                        arrdict[s] = (
-                            ds[datavar]
-                            .sel({auxiliary_vars[datavar]: s})
-                            .values  # store species array under its species name
-                        )
-            else:
-                arrdict[datavar] = ds[datavar].values
+
+        arrdict = {}
+        for datavar in ds.data_vars:
+            arrdict[datavar] = ds[datavar].values
+
         return arrdict
 
     def _to_struct_array(self, arrdict, layer):
@@ -215,24 +205,8 @@ class BoundaryCondition(Package, abc.ABC):
         d = self._get_options(d)
         d["maxbound"] = self._max_active_n()
 
-        # now we should add the auxiliary variable names to d
-        auxiliaries = (
-            self._get_auxiliary_variable_dict()
-        )  # returns someting like {"concentration": "species"}
-
-        # loop over the types of auxiliary variables (for example concentration)
-        for auxvar in auxiliaries.keys():
-            # if "concentration" is a variable of this dataset
-            if auxvar in self.dataset.data_vars:
-                # if our concentration dataset has the species coordinate
-                if auxiliaries[auxvar] in self.dataset[auxvar].coords:
-                    # assign the species names list to d
-                    d["auxiliary"] = self.dataset[auxiliaries[auxvar]].values
-                else:
-                    # the error message is more specific than the code at this point.
-                    raise ValueError(
-                        f"{auxvar} requires a {auxiliaries[auxvar]} coordinate."
-                    )
+        if (hasattr(self, "_auxiliary_data")) and (names := get_variable_names(self)):
+            d["auxiliary"] = names
 
         return self._template.render(d)
 
@@ -275,31 +249,10 @@ class BoundaryCondition(Package, abc.ABC):
     def get_period_varnames(self):
         result = []
         if hasattr(self, "_period_data"):
-            result += self._period_data
+            result.extend(self._period_data)
         if hasattr(self, "_auxiliary_data"):
-            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
-                if aux_var_name in self.dataset.keys():
-                    for s in (
-                        self.dataset[aux_var_name].coords[aux_var_dimensions].values
-                    ):
-                        result.append(s)
-        return result
+            result.extend(get_variable_names(self))
 
-    def _add_periodic_auxiliary_variable(self):
-        if hasattr(self, "_auxiliary_data"):
-            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
-                aux_coords = (
-                    self.dataset[aux_var_name].coords[aux_var_dimensions].values
-                )
-                for s in aux_coords:
-                    self.dataset[s] = self.dataset[aux_var_name].sel(
-                        {aux_var_dimensions: s}
-                    )
-
-    def _get_auxiliary_variable_dict(self):
-        result = {}
-        if hasattr(self, "_auxiliary_data"):
-            result.update(self._auxiliary_data)
         return result
 
 
