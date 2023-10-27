@@ -67,11 +67,11 @@ class StructuredDiscretization(Package):
     }
     _write_schemata = {
         "idomain": (
-            ActiveCellsConnectedSchema(is_notnull=(">", 0)),
+            ActiveCellsConnectedSchema(is_notnull=("!=", 0)),
             AnyValueSchema(">", 0),
         ),
         "top": (
-            AllValueSchema(">", "bottom"),
+            AllValueSchema(">=", "bottom"),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
             # No need to check coords: dataset ensures they align with idomain.
         ),
