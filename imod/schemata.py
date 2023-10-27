@@ -34,7 +34,7 @@ validation xarray library becomes.
 import abc
 import operator
 from functools import partial
-from typing import Any, Callable, Dict, Tuple, Union
+from typing import Any, Callable, Dict, Tuple, Union, Optional
 
 import numpy as np
 import scipy
@@ -329,10 +329,27 @@ class ValueSchema(BaseSchema, abc.ABC):
         self,
         operator: str,
         other: Any,
+        ignore: Optional[Tuple[str, str, Any]] = None,
     ):
         self.operator = OPERATORS[operator]
         self.operator_str = operator
         self.other = other
+        self.to_ignore = None
+        self.ignore_varname = None
+
+        if ignore:
+            self.ignore_varname = ignore[0]
+            self.to_ignore = partial_operator(ignore[1], ignore[2])
+
+    def get_explicitly_ignored(self, kwargs: Dict) -> Any:
+        """
+        Get cells that should be explicitly ignored by the schema
+        """
+        if self.to_ignore:
+            ignore_obj = kwargs[self.ignore_varname]
+            return self.to_ignore(ignore_obj)
+        else:
+            return False
 
 
 class AllValueSchema(ValueSchema):
@@ -353,7 +370,11 @@ class AllValueSchema(ValueSchema):
         if scalar_None(obj) or scalar_None(other_obj):
             return
 
-        ignore = np.isnan(obj) | np.isnan(other_obj)  # ignore nan by setting to True
+        explicitly_ignored = self.get_explicitly_ignored(kwargs)
+
+        ignore = (
+            np.isnan(obj) | np.isnan(other_obj) | explicitly_ignored
+        )  # ignore nan by setting to True
 
         condition = self.operator(obj, other_obj)
         condition = condition | ignore
@@ -381,7 +402,11 @@ class AnyValueSchema(ValueSchema):
         if scalar_None(obj) or scalar_None(other_obj):
             return
 
-        ignore = ~np.isnan(obj) | ~np.isnan(other_obj)  # ignore nan by setting to False
+        explicitly_ignored = self.get_explicitly_ignored(kwargs)
+
+        ignore = (
+            ~np.isnan(obj) | ~np.isnan(other_obj) | explicitly_ignored
+        )  # ignore nan by setting to False
 
         condition = self.operator(obj, other_obj)
         condition = condition | ignore
