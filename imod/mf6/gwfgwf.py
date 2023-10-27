@@ -1,8 +1,9 @@
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 import xarray as xr
 
+from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.package import Package
 
 
@@ -14,6 +15,7 @@ class GWFGWF(Package):
     simulation class."""
 
     _keyword_map: Dict[str, str] = {}
+    _auxiliary_data = {"auxiliary_data": "variable"}
     _pkg_id = "gwfgwf"
     _template = Package._initialize_template(_pkg_id)
 
@@ -21,13 +23,14 @@ class GWFGWF(Package):
         self,
         model_id1: str,
         model_id2: str,
-        cell_id1: np.ndarray,
-        cell_id2: np.ndarray,
-        layer: np.ndarray,
-        cl1: np.ndarray,
-        cl2: np.ndarray,
-        hwva: np.ndarray,
-        **kwargs,
+        cell_id1: xr.DataArray,
+        cell_id2: xr.DataArray,
+        layer: xr.DataArray,
+        cl1: xr.DataArray,
+        cl2: xr.DataArray,
+        hwva: xr.DataArray,
+        angldegx: Optional[xr.DataArray] = None,
+        cdist: Optional[xr.DataArray] = None,
     ):
         super().__init__(locals())
         self.dataset["cell_id1"] = cell_id1
@@ -39,6 +42,13 @@ class GWFGWF(Package):
         self.dataset["cl1"] = cl1
         self.dataset["cl2"] = cl2
         self.dataset["hwva"] = hwva
+
+        auxiliary_variables = [var for var in [angldegx, cdist] if var is not None]
+        if auxiliary_variables:
+            self.dataset["auxiliary_data"] = xr.merge(auxiliary_variables).to_array(
+                name="auxiliary_data"
+            )
+            add_periodic_auxiliary_variable(self)
 
     def set_options(
         self,

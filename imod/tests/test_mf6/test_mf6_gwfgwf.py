@@ -43,6 +43,9 @@ def sample_gwfgwf_unstructured():
     ds["cl2"] = xr.DataArray(np.ones(3), dims="index")
     ds["hwva"] = ds["cl1"] + ds["cl2"]
 
+    ds["angldegx"] = xr.DataArray(np.ones(3), dims="index") * 90.0
+    ds["cdist"] = xr.DataArray(np.ones(3), dims="index") * 2.0
+
     ds = ds.stack(cell_id=("layer", "index"), create_index=False).reset_coords()
     ds["cell_id1"] = ds["cell_id1"].T
     ds["cell_id2"] = ds["cell_id2"].T
@@ -70,15 +73,15 @@ class TestGwfgwf:
         end dimensions
 
         begin exchangedata
-        12 1 1 12 1 2 1 1.0 1.0 2.0
-        12 2 1 12 2 2 1 1.0 1.0 2.0
-        12 3 1 12 3 2 1 1.0 1.0 2.0
-        13 1 1 13 1 2 1 1.0 1.0 2.0
-        13 2 1 13 2 2 1 1.0 1.0 2.0
-        13 3 1 13 3 2 1 1.0 1.0 2.0
-        14 1 1 14 1 2 1 1.0 1.0 2.0
-        14 2 1 14 2 2 1 1.0 1.0 2.0
-        14 3 1 14 3 2 1 1.0 1.0 2.0
+          12 1 1 12 1 2 1 1.0 1.0 2.0
+          12 2 1 12 2 2 1 1.0 1.0 2.0
+          12 3 1 12 3 2 1 1.0 1.0 2.0
+          13 1 1 13 1 2 1 1.0 1.0 2.0
+          13 2 1 13 2 2 1 1.0 1.0 2.0
+          13 3 1 13 3 2 1 1.0 1.0 2.0
+          14 1 1 14 1 2 1 1.0 1.0 2.0
+          14 2 1 14 2 2 1 1.0 1.0 2.0
+          14 3 1 14 3 2 1 1.0 1.0 2.0
         end exchangedata
         """
         )
@@ -97,6 +100,7 @@ class TestGwfgwf:
         expected = textwrap.dedent(
             """\
         begin options
+          auxiliary angldegx cdist
         end options
 
         begin dimensions
@@ -104,15 +108,15 @@ class TestGwfgwf:
         end dimensions
 
         begin exchangedata
-        12 1 12 2 1 1.0 1.0 2.0
-        12 2 12 2 1 1.0 1.0 2.0
-        12 3 12 4 1 1.0 1.0 2.0
-        13 1 13 2 1 1.0 1.0 2.0
-        13 2 13 2 1 1.0 1.0 2.0
-        13 3 13 4 1 1.0 1.0 2.0
-        14 1 14 2 1 1.0 1.0 2.0
-        14 2 14 2 1 1.0 1.0 2.0
-        14 3 14 4 1 1.0 1.0 2.0
+          12 1 12 2 1 1.0 1.0 2.0 90.0 2.0
+          12 2 12 2 1 1.0 1.0 2.0 90.0 2.0
+          12 3 12 4 1 1.0 1.0 2.0 90.0 2.0
+          13 1 13 2 1 1.0 1.0 2.0 90.0 2.0
+          13 2 13 2 1 1.0 1.0 2.0 90.0 2.0
+          13 3 13 4 1 1.0 1.0 2.0 90.0 2.0
+          14 1 14 2 1 1.0 1.0 2.0 90.0 2.0
+          14 2 14 2 1 1.0 1.0 2.0 90.0 2.0
+          14 3 14 4 1 1.0 1.0 2.0 90.0 2.0
         end exchangedata
         """
         )
