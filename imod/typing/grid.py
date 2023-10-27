@@ -8,6 +8,8 @@ from fastcore.dispatch import typedispatch
 from imod.prepare import polygonize
 
 GridDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
+GridDataset: TypeAlias = Union[xr.Dataset, xu.UgridDataset]
+ScalarDataset: TypeAlias = Union[xr.Dataset, xu.UgridDataset]
 
 
 @typedispatch
