@@ -71,7 +71,7 @@ class StructuredDiscretization(Package):
             AnyValueSchema(">", 0),
         ),
         "top": (
-            AllValueSchema(">=", "bottom"),
+            AllValueSchema(">", "bottom", ignore=("idomain", "==", -1)),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
             # No need to check coords: dataset ensures they align with idomain.
         ),
