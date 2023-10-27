@@ -210,7 +210,7 @@ def open_imeth6_budgets(
     for i, header in enumerate(header_list):
         time[i] = header.totim
         # for node saturation use auxiliary variable as return value
-        if header.text == 'data-sat':
+        if header.text == "data-sat":
             return_variable = header.auxtxt
         else:
             return_variable = "budget"
