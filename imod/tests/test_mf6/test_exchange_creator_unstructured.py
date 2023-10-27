@@ -122,3 +122,46 @@ class TestExchangeCreator_Unstructured:
         assert np.allclose(exchanges[0].dataset["cl1"], expected_cl1)
         assert np.allclose(exchanges[0].dataset["cl2"], expected_cl2)
         assert np.allclose(exchanges[0].dataset["hwva"], expected_hwva)
+
+    @pytest.mark.parametrize(
+        "parameterizable_basic_dis",
+        [BasicDisSettings(nlay=1, nrow=4, ncol=4, space_generator=np.linspace)],
+        indirect=True,
+    )
+    @pytest.mark.parametrize("partition_axis", ["x", "y"])
+    def test_create_exchanges_unstructured_validate_auxiliary_coefficients(
+        self, parameterizable_basic_dis, partition_axis
+    ):
+        # Arrange.
+        idomain, _, _ = parameterizable_basic_dis
+        expected_angldegx = 0.0 if partition_axis == "x" else 270.0
+        expected_cdist = abs(
+            idomain.coords[partition_axis][1] - idomain.coords[partition_axis][2]
+        ).values
+
+        idomain = to_unstruct_domain(idomain)
+
+        submodel_labels = zeros_like(idomain.sel(layer=1))
+        if partition_axis == "x":
+            submodel_labels = submodel_labels.where(
+                submodel_labels.grid.face_x < 0.5, 1, 0
+            )
+        else:
+            submodel_labels = submodel_labels.where(
+                submodel_labels.grid.face_y < 0.5, 1, 0
+            )
+
+        partition_info = create_partition_info(submodel_labels)
+        exchange_creator = ExchangeCreator_Unstructured(submodel_labels, partition_info)
+
+        # Act.
+        exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
+
+        # Assert.
+        assert np.allclose(
+            exchanges[0].dataset["auxiliary_data"].sel(variable="angldegx"),
+            expected_angldegx,
+        )
+        assert np.allclose(
+            exchanges[0].dataset["auxiliary_data"].sel(variable="cdist"), expected_cdist
+        )
