@@ -9,7 +9,7 @@ from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.grid_utilities import get_active_domain_slice
-
+import imod
 
 @typedispatch
 def clip_by_grid(_: object, grid: object) -> None:
@@ -27,7 +27,12 @@ def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:
     clipped_package = package.clip_box(
         x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max
     )
-
+    if isinstance(package, imod.mf6.Recharge):
+        clipped_package.dataset["rate"] = clipped_package.dataset["rate"].where(active)
+    if isinstance(package, imod.mf6.Drainage):
+        clipped_package.dataset["elevation"] = clipped_package.dataset["elevation"].where(active)
+        clipped_package.dataset["conductance"] = clipped_package.dataset["conductance"].where(active)        
+        
     if "idomain" in package.dataset:
         clipped_package.dataset["idomain"] = xr.ones_like(
             clipped_package.dataset["idomain"]
