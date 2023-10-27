@@ -478,6 +478,10 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     def _get_variable_name(self) -> str:
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def _get_vertical_variables(self) -> list:
+        raise NotImplementedError
+
     def clip_box(
         self,
         time_min=None,
@@ -667,6 +671,9 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "hydraulic_characteristic"
 
+    def _get_vertical_variables(self) -> list:
+        return ["ztop", "zbottom"]
+
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):
@@ -724,6 +731,9 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
 
     def _get_variable_name(self) -> str:
         return "hydraulic_characteristic"
+
+    def _get_vertical_variables(self) -> list:
+        return ["layer"]
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
@@ -789,6 +799,9 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "multiplier"
 
+    def _get_vertical_variables(self) -> list:
+        return ["ztop", "zbottom"]
+
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):
@@ -852,6 +865,9 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
 
     def _get_variable_name(self) -> str:
         return "multiplier"
+
+    def _get_vertical_variables(self) -> list:
+        return ["layer"]
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
@@ -936,6 +952,9 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "resistance"
 
+    def _get_vertical_variables(self) -> list:
+        return ["ztop", "zbottom"]
+
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):
@@ -994,6 +1013,9 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
     def _get_variable_name(self) -> str:
         return "resistance"
+
+    def _get_vertical_variables(self) -> list:
+        return ["layer"]
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
