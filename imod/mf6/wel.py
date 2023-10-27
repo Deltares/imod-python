@@ -18,6 +18,7 @@ from imod.mf6.boundary_condition import (
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
+from imod.mf6.utilities.clip_utilities import clip_by_grid
 from imod.mf6.utilities.dataset_utilities import remove_inactive
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
@@ -454,17 +455,13 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         return Mf6Wel(**ds)
 
-    def regrid_like(self, *_) -> Package:
+    def regrid_like(self, target_grid: GridDataArray, *_) -> "Well":
         """
         The regrid_like method is irrelevant for this package as it is
-        grid-agnostic. This method returns an (ungridded) copy of itself- the
-        target grid is not applied in any way. Gridding can be achieved by
-        passing a discretization to the ``to_mf6_pkg`` function using the
-        parameters ``top``, "bottom`` and ``active``.
+        grid-agnostic, instead this method clips the package based on the grid
+        exterior.
         """
-        # TODO: Add docsting message to logger
-        # message = textwrap.dedent(self.mask.__doc__)
-        return deepcopy(self)
+        return clip_by_grid(self, target_grid)
 
     def mask(self, _) -> Package:
         """
