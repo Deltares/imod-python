@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from example_models import create_circle_simulation
 
 import imod
-from imod.mf6.partitioned_simulation_postprocessing import merge_heads
+from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
 
 simulation = create_circle_simulation()
 tmp_path = imod.util.temporary_directory()
@@ -23,16 +23,26 @@ submodel_labels.values[:67] = 0
 submodel_labels.values[67:118] = 1
 submodel_labels.values[118:] = 2
 
+# Create a simulation that is split in subdomains according to the label array.
 new_sim = simulation.split(submodel_labels)
-
-
+# %%
+# Write the simulation input files for the new simulation.
 new_sim.write(tmp_path, False)
 
+# run the split simulation
 new_sim.run()
-
-
+# %%
+# Visualize the computed heads in the top layer.
 fig, ax = plt.subplots()
 head = merge_heads(tmp_path, new_sim)
 
 head.isel(layer=0, time=-1).ugrid.plot.contourf(ax=ax)
+# %%
+# Visualize the flow-horizontal-face-x componenty of the balances.
+fig, ax = plt.subplots()
+balances = merge_balances(tmp_path, new_sim)
+
+balances["flow-horizontal-face-x"].isel(layer=0, time=-1).ugrid.plot()
+pass
+
 # %%

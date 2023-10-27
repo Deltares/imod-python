@@ -1,11 +1,10 @@
 begin options
+  save_flows
 {% if auxiliary is defined -%}  auxiliary {{auxiliary}}
 {% endif -%}
 {%- if print_input is defined -%}  print_input
 {% endif -%}
 {%- if print_flows is defined -%}  print_flows
-{% endif -%}
-{%- if save_flows is defined -%}  save_flows
 {% endif -%}
 {%- if cell_averaging is defined -%}  cell_averaging {{cell_averaging}}
 {% endif -%}

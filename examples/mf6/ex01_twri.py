@@ -213,6 +213,7 @@ head = imod.mf6.open_hds(
 
 head.isel(layer=0, time=0).plot.contourf()
 
+
 # %%
 # .. _MODFLOW6 example problems: https://github.com/MODFLOW-USGS/modflow6-examples
 # .. _description: https://modflow6-examples.readthedocs.io/en/master/_examples/ex-gwf-twri.html

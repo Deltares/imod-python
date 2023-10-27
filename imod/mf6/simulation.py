@@ -164,7 +164,7 @@ class Modflow6Simulation(collections.UserDict):
                 model_name_file = pathlib.Path(
                     write_context.root_directory / pathlib.Path(f"{key}", f"{key}.nam")
                 ).as_posix()
-                models.append((value._model_id, model_name_file, key))
+                models.append((value.model_id(), model_name_file, key))
             elif isinstance(value, PackageBase):
                 if value._pkg_id == "tdis":
                     d["tdis6"] = f"{key}.tdis"
@@ -367,7 +367,7 @@ class Modflow6Simulation(collections.UserDict):
         return {
             k: v
             for k, v in self.items()
-            if isinstance(v, Modflow6Model) and (v._model_id == modeltype)
+            if isinstance(v, Modflow6Model) and (v.model_id() == modeltype)
         }
 
     def clip_box(

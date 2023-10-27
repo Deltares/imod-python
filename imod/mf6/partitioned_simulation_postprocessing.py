@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Dict
 
 import imod
 from imod.mf6.model import GroundwaterFlowModel
@@ -12,14 +13,14 @@ def merge_heads(simulation_dir: Path, simulation: Modflow6Simulation) -> GridDat
     head file. Both structured and unstructured grids are supported.
     """
     model_names = list(
-        simulation.get_models_of_type(GroundwaterFlowModel._model_id).keys()
+        simulation.get_models_of_type(GroundwaterFlowModel.model_id()).keys()
     )
     heads = []
-    for modelname in model_names:
-        modelDirectory = simulation_dir / modelname
-        grb_path = _get_grb_file_path(modelDirectory)
+    for name in model_names:
+        model_directory = simulation_dir / name
+        grb_path = _get_grb_file_path(model_directory)
         head = imod.mf6.open_hds(
-            modelDirectory / f"{modelname}.hds",
+            model_directory / f"{name}.hds",
             grb_path,
         )
         heads.append(head)
@@ -33,10 +34,61 @@ def _get_grb_file_path(model_directory: Path) -> Path:
     Given a directory path, returns the path of the grb file in it. Raises an
     exception if there is not exactly 1 grb file in it.
     """
+    return _get_single_file(model_directory, "grb")
 
-    grb_files = list(model_directory.glob("*.grb"))
-    if len(grb_files) != 1:
+
+def _get_cbc_file_path(model_directory: Path) -> Path:
+    """
+    Given a directory path, returns the path of the cbc file in it. Raises an
+    exception if there is not exactly 1 grb file in it.
+    """
+    return _get_single_file(model_directory, "cbc")
+
+
+def _get_single_file(model_directory: Path, extension: str) -> Path:
+    """
+    Given a directory path, and an extension, it returns a single file in that directory with that extension.
+    It raises an exception if there are multiple files with the same extension.
+    """
+    candidate_files = list(model_directory.glob(f"*.{extension}"))
+    if len(candidate_files) != 1:
         raise RuntimeError(
-            f"there should be exactly one grb file in directory {model_directory}."
+            f"there should be exactly one {extension} file in directory {model_directory}."
         )
-    return grb_files[0]
+    return candidate_files[0]
+
+
+def merge_balances(
+    simulation_dir: Path, simulation: Modflow6Simulation
+) -> Dict[str, GridDataArray]:
+    """
+    This function merges the balance output of a split simulation into a single
+    balance dictionary. The keys in this dictionary are the package names
+    that contribute to the balance, like "drn" (drainage) or "sto"(storage).
+    The npf package results in different keys referring to the flow direction.
+    """
+
+    model_names = simulation.get_models_of_type(GroundwaterFlowModel.model_id()).keys()
+
+    unique_balance_keys = set()
+    cbc_per_partition = []
+    for name in model_names:
+        model_directory = simulation_dir / name
+        cbc_path = _get_cbc_file_path(model_directory)
+        grb_path = _get_grb_file_path(model_directory)
+        cbc = imod.mf6.open_cbc(cbc_path, grb_path)
+        unique_balance_keys.update(list(cbc.keys()))
+        cbc_per_partition.append(cbc)
+
+    merged_keys = {}
+    for key in unique_balance_keys:
+        balances_of_keys = []
+        for balance in cbc_per_partition:
+            if key in balance.keys():
+                balance[key] = balance[key].rename(key)
+                balances_of_keys.append(balance[key])
+        merged_balance_of_key = merge(balances_of_keys)
+        darray = merged_balance_of_key.to_array(key).drop_vars(key)
+        # remove a dimension without coordinates (the balance type)
+        merged_keys[key] = darray.sel({key: 0})
+    return merged_keys

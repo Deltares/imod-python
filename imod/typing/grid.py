@@ -48,7 +48,7 @@ def is_unstructured(grid: xr.DataArray) -> bool:
     return False
 
 
-def merge(objects: Sequence[xr.DataArray], *args, **kwargs) -> xr.DataArray:
+def merge(objects: Sequence[xr.DataArray], *args, **kwargs) -> xr.Dataset:
     start_type = type(objects[0])
     homogeneous = all([isinstance(o, start_type) for o in objects])
     if not homogeneous:
