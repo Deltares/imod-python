@@ -11,7 +11,7 @@ from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.dataset_utilities import get_scalar_variables
 from imod.mf6.utilities.grid_utilities import get_active_domain_slice
-from imod.typing.grid import GridDataArray, bounding_polygon
+from imod.typing.grid import GridDataArray, ScalarDataset, bounding_polygon
 
 
 @typedispatch
@@ -70,12 +70,12 @@ def clip_by_grid(
     return new
 
 
-def _get_settings(package):
+def _get_settings(package: IPackageBase) -> ScalarDataset:
     scalar_variables = get_scalar_variables(package.dataset)
-    return package[scalar_variables]
+    return package.dataset[scalar_variables]
 
 
-def _get_variables_for_gdf(package: HorizontalFlowBarrierBase) -> list[str]:
+def _get_variable_names_for_gdf(package: HorizontalFlowBarrierBase) -> list[str]:
     return [
         package._get_variable_name(),
         "geometry",
@@ -83,7 +83,7 @@ def _get_variables_for_gdf(package: HorizontalFlowBarrierBase) -> list[str]:
 
 
 def _line_package_to_gdf(package: HorizontalFlowBarrierBase) -> gpd.GeoDataFrame:
-    variables_for_gdf = _get_variables_for_gdf(package)
+    variables_for_gdf = _get_variable_names_for_gdf(package)
     return gpd.GeoDataFrame(
         package.dataset[variables_for_gdf].to_dataframe(),
         geometry="geometry",
