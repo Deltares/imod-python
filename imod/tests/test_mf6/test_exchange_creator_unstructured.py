@@ -159,9 +159,9 @@ class TestExchangeCreator_Unstructured:
 
         # Assert.
         assert np.allclose(
-            exchanges[0].dataset["concentration"].sel(variable="angldegx"),
+            exchanges[0].dataset["auxiliary_data"].sel(variable="angldegx"),
             expected_angldegx,
         )
         assert np.allclose(
-            exchanges[0].dataset["concentration"].sel(variable="cdist"), expected_cdist
+            exchanges[0].dataset["auxiliary_data"].sel(variable="cdist"), expected_cdist
         )

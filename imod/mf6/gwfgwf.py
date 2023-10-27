@@ -3,6 +3,7 @@ from typing import Dict, Tuple
 import numpy as np
 import xarray as xr
 
+from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.package import Package
 
 
@@ -14,6 +15,7 @@ class GWFGWF(Package):
     simulation class."""
 
     _keyword_map: Dict[str, str] = {}
+    _auxiliary_data = {"auxiliary_data": "variable"}
     _pkg_id = "gwfgwf"
     _template = Package._initialize_template(_pkg_id)
 
@@ -41,9 +43,10 @@ class GWFGWF(Package):
         self.dataset["hwva"] = hwva
 
         if any(kwargs):
-            self.dataset["concentration"] = xr.merge(kwargs.values()).to_array(
-                name="concentration"
+            self.dataset["auxiliary_data"] = xr.merge(kwargs.values()).to_array(
+                name="auxiliary_data"
             )
+            add_periodic_auxiliary_variable(self)
 
     def set_options(
         self,

@@ -13,6 +13,7 @@ import xugrid as xu
 from xarray.core.utils import is_scalar
 
 import imod
+from imod.mf6.auxiliary_variables import get_variable_names
 from imod.mf6.pkgbase import EXCHANGE_PACKAGES, TRANSPORT_PACKAGES, PackageBase
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
@@ -188,6 +189,10 @@ class Package(PackageBase, abc.ABC):
                 value = self[varname].values[()]
                 if self._valid(value):  # skip False or None
                     d[key] = value
+
+        if (hasattr(self, "_auxiliary_data")) and (names := get_variable_names(self)):
+            d["auxiliary"] = names
+
         return self._template.render(d)
 
     @staticmethod

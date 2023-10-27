@@ -1,5 +1,5 @@
 begin options
-{% if auxiliary is defined -%}  auxiliary {{auxiliary}}
+{% if auxiliary is defined %}  auxiliary {{auxiliary|join(" ")}}
 {% endif -%}
 {%- if print_input is defined -%}  print_input
 {% endif -%}
@@ -26,7 +26,7 @@ begin dimensions
 end dimensions
 
 begin exchangedata
-{% for i in range(nexg) -%}
-  {{layer[i]}} {{cell_id1[i]|join(" ")}} {{layer[i]}} {{cell_id2[i]|join(" ")}} {{ihc[i]}} {{cl1[i]}} {{cl2[i]}} {{hwva[i]}}
-{% endfor -%}
+{%- for i in range(nexg) %}
+  {{layer[i]}} {{cell_id1[i]|join(" ")}} {{layer[i]}} {{cell_id2[i]|join(" ")}} {{ihc[i]}} {{cl1[i]}} {{cl2[i]}} {{hwva[i]}} {%- if auxiliary_data is defined %} {{auxiliary_data.T[i]|join(" ")}}{% endif %}
+{%- endfor %}
 end exchangedata
