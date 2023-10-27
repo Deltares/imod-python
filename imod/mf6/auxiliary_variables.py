@@ -1,5 +1,4 @@
 def get_variable_names(package):
-    # now we should add the auxiliary variable names to d
     auxiliaries = _get_auxiliary_data_variable_names_mapping(
         package
     )  # returns something like {"concentration": "species"}
@@ -13,7 +12,6 @@ def get_variable_names(package):
                 # assign the species names list to d
                 return package.dataset[auxiliaries[auxvar]].values.tolist()
             else:
-                # the error message is more specific than the code at this point.
                 raise ValueError(
                     f"{auxvar} requires a {auxiliaries[auxvar]} coordinate."
                 )
