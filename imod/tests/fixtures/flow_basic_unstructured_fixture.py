@@ -6,8 +6,17 @@ import xugrid as xu
 import imod
 
 
+@pytest.fixture(scope="function")
+def basic_unstructured_dis(basic_dis):
+    idomain, top, bottom = basic_dis
+    idomain_ugrid = xu.UgridDataArray.from_structured(idomain)
+    top_mf6 = top.sel(layer=1)  # Top for modlfow 6 shouldn't contain layer dim
+
+    return idomain_ugrid, top_mf6, bottom
+
+
 @pytest.fixture(scope="module")
-def basic_unstructured_dis():
+def circle_dis():
     """Basic model discretization"""
 
     grid_triangles = imod.data.circle()
