@@ -230,6 +230,32 @@ def test_open_cbc__dis_transient(transient_twri_result):
             array.load()
 
 
+@pytest.mark.usefixtures("transient_unconfined_twri_result")
+def test_open_cbc__dis_transient_unconfined(transient_unconfined_twri_result):
+    modeldir = transient_unconfined_twri_result
+    with imod.util.cd(modeldir):
+        cbc = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/dis.dis.grb")
+        assert isinstance(cbc, dict)
+        assert sorted(cbc.keys()) == [
+            "chd",
+            "drn",
+            "flow-front-face",
+            "flow-lower-face",
+            "flow-right-face",
+            "npf",
+            "sto-ss",
+            "sto-sy",
+            "wel",
+        ]
+        for array in cbc.values():
+            assert array.shape == (30, 3, 15, 15)
+            assert isinstance(array, xr.DataArray)
+            assert isinstance(array.data, dask.array.Array)
+
+            # Test if no errors are thrown if the array is loaded into memory
+            array.load()
+
+
 @pytest.mark.usefixtures("circle_result")
 def test_open_cbc__disv(circle_result):
     modeldir = circle_result
