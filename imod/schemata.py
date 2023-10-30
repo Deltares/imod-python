@@ -34,7 +34,7 @@ validation xarray library becomes.
 import abc
 import operator
 from functools import partial
-from typing import Any, Callable, Dict, Tuple, Union, Optional
+from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 import numpy as np
 import scipy
