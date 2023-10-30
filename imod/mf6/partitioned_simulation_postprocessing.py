@@ -6,7 +6,7 @@ import numpy as np
 import imod
 from imod.mf6.model import GroundwaterFlowModel
 from imod.mf6.simulation import Modflow6Simulation
-from imod.typing.grid import GridDataArray, merge
+from imod.typing.grid import GridDataArray, merge, is_unstructured
 
 
 def merge_heads(simulation_dir: Path, simulation: Modflow6Simulation) -> GridDataArray:
@@ -83,7 +83,8 @@ def merge_balances(
         grb_path = _get_grb_file_path(modelDirectory)
         cbc = imod.mf6.open_cbc(cbc_path, grb_path)
         for key in cbc.keys():
-            cbc[key] = cbc[key].where(partition_domain, other=np.nan)
+            if not is_unstructured( cbc[key]):
+                cbc[key] = cbc[key].where(partition_domain, other=np.nan)
         unique_balance_keys.update(list(cbc.keys()))
         cbc_per_partition.append(cbc)
     unique_balance_keys = list(unique_balance_keys)

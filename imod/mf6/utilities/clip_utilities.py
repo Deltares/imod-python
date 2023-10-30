@@ -83,6 +83,10 @@ def clip_by_grid(
 
 
 def _filter_inactive_cells(package, active):
+
+    if package.is_gridless_package():
+        return
+        
     package_vars = package.dataset.data_vars
     for var in package_vars:
         if package_vars[var].shape != ():

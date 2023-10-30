@@ -11,9 +11,8 @@ from imod.typing.grid import zeros_like
 
 
 def setup_partitioning_arrays(idomain_top):
+    
     diagonal_submodel_labels = zeros_like(idomain_top)
-
-    three_way = zeros_like(idomain_top)
     for i in range(15):
         for j in range(i):
             diagonal_submodel_labels.values[i, j] = 1
