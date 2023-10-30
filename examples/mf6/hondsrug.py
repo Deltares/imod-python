@@ -616,7 +616,7 @@ simulation.create_time_discretization(
 #   describes how to add it to yours.
 
 modeldir = imod.util.temporary_directory()
-simulation.write(modeldir, binary=False, validate=False)
+simulation.write(modeldir, binary=False)
 simulation.run()
 
 # %%
