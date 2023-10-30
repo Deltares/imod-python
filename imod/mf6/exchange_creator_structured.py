@@ -65,6 +65,15 @@ class ExchangeCreator_Structured(ExchangeCreator):
                 "cell_label2": connected_model_label2.values.flatten(),
             }
         )
+        label_increasing = (
+            connected_cell_info["cell_label1"] < connected_cell_info["cell_label2"]
+        )
+
+        connected_cell_info.loc[
+            label_increasing, ["cell_idx1", "cell_idx2", "cell_label1", "cell_label2"]
+        ] = connected_cell_info.loc[
+            label_increasing, ["cell_idx2", "cell_idx1", "cell_label2", "cell_label1"]
+        ].values
 
         return connected_cell_info
 
