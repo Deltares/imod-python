@@ -117,10 +117,10 @@ class TestModflow6Simulation:
 
     @mock.patch("imod.mf6.simulation.slice_model", autospec=True)
     def test_split_multiple_models(
-        self, slice_model_mock, basic_unstructured_dis, setup_simulation
+        self, slice_model_mock, circle_dis, setup_simulation
     ):
         # Arrange.
-        idomain, top, bottom = basic_unstructured_dis
+        idomain, _, _ = circle_dis
 
         simulation = setup_simulation
 

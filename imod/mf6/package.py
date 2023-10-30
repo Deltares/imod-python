@@ -673,7 +673,7 @@ class Package(PackageBase, abc.ABC):
 
     def regrid_like(
         self,
-        target_grid: Union[xr.DataArray, xu.UgridDataArray],
+        target_grid: GridDataArray,
         regridder_types: Dict[str, Tuple[RegridderType, str]] = None,
     ) -> "Package":
         """
