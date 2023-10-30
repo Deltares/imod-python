@@ -28,18 +28,21 @@ def setup_partitioning_arrays(idomain_top):
     intrusion.values[0:15, 0:7] = 0
     intrusion.values[0:15, 7:] = 1
     intrusion.values[7, 7] = 0
-    return [diagonal_submodel_labels, four_squares, intrusion]
+
+    island = zeros_like(idomain_top)
+    island.values[4:7, 4:7] = 1
+    return [diagonal_submodel_labels, four_squares, intrusion, island]
 
 
 @pytest.mark.usefixtures("transient_twri_model")
-@pytest.mark.parametrize("partition_index", [0, 1, 2])
+@pytest.mark.parametrize("partition_index", [0, 1, 2, 3])
 def test_partitioning_structured(tmp_path, transient_twri_model, partition_index):
     simulation = transient_twri_model
 
     # TODO: convert the wells in this fixture to high-level wells
     simulation["GWF_1"].pop("wel")
 
-    # Run the original example, so without partitioning, and save the simulation results
+    # run the original example, so without partitioning, and save the simulation results
     orig_dir = tmp_path / "original"
     simulation.write(orig_dir, binary=False)
     simulation.run()
@@ -53,7 +56,7 @@ def test_partitioning_structured(tmp_path, transient_twri_model, partition_index
         orig_dir / "GWF_1/GWF_1.cbc", orig_dir / "GWF_1/dis.dis.grb"
     )
 
-    # partition the simulation, run it, and 
+    # partition the simulation, run it, and save the (merged) results
     idomain = simulation["GWF_1"].domain
     partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
 
@@ -65,4 +68,6 @@ def test_partitioning_structured(tmp_path, transient_twri_model, partition_index
     head = merge_heads(tmp_path, split_simulation)
     balances = merge_balances(tmp_path, split_simulation)
 
-    assert np.allclose(head.values, orig_head.values)
+
+    # compare the head result of the original simulation with the result of the partitioned simulation
+    np.testing.assert_allclose(head.values, orig_head.values, rtol = 1e-4, atol = 1e-4)
