@@ -9,7 +9,7 @@ from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.grid_utilities import get_active_domain_slice
-import imod
+from imod.typing.grid import is_unstructured
 
 @typedispatch
 def clip_by_grid(_: object, grid: object) -> None:
@@ -27,12 +27,11 @@ def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:
     clipped_package = package.clip_box(
         x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max
     )
-    if isinstance(package, imod.mf6.Recharge):
-        clipped_package.dataset["rate"] = clipped_package.dataset["rate"].where(active)
-    if isinstance(package, imod.mf6.Drainage):
-        clipped_package.dataset["elevation"] = clipped_package.dataset["elevation"].where(active)
-        clipped_package.dataset["conductance"] = clipped_package.dataset["conductance"].where(active)        
-        
+
+    # structured partitions may be partially inactive
+    if not is_unstructured(active):
+        _filter_inactive_cells( clipped_package, active.sel(domain_slice))
+
     if "idomain" in package.dataset:
         clipped_package.dataset["idomain"] = xr.ones_like(
             clipped_package.dataset["idomain"]
@@ -80,3 +79,18 @@ def clip_by_grid(
     raise NotImplementedError(
         "Clipping of line data packages ,e.g. hfb, is not supported"
     )
+
+
+def _filter_inactive_cells(package, active):
+    package_vars = package.dataset.data_vars
+    for var in package_vars:
+        if package_vars[var].shape != ():
+            datatype =  package_vars[var].dtype
+            if var != "idomain":
+                package.dataset[var] = package.dataset[var].where(active >0, other = np.nan)
+            else:
+                package.dataset[var] = package.dataset[var].where(active >0, other = 0)              
+            package.dataset[var] =package.dataset[var].astype(datatype)
+            
+
+
