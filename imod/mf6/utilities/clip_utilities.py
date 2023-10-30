@@ -11,6 +11,7 @@ from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.grid_utilities import get_active_domain_slice
 from imod.typing.grid import is_unstructured
 
+
 @typedispatch
 def clip_by_grid(_: object, grid: object) -> None:
     raise TypeError(
@@ -30,7 +31,7 @@ def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:
 
     # structured partitions may be partially inactive
     if not is_unstructured(active):
-        _filter_inactive_cells( clipped_package, active.sel(domain_slice))
+        _filter_inactive_cells(clipped_package, active.sel(domain_slice))
 
     if "idomain" in package.dataset:
         clipped_package.dataset["idomain"] = xr.ones_like(
@@ -85,12 +86,11 @@ def _filter_inactive_cells(package, active):
     package_vars = package.dataset.data_vars
     for var in package_vars:
         if package_vars[var].shape != ():
-            datatype =  package_vars[var].dtype
+            datatype = package_vars[var].dtype
             if var != "idomain":
-                package.dataset[var] = package.dataset[var].where(active >0, other = np.nan)
+                package.dataset[var] = package.dataset[var].where(
+                    active > 0, other=np.nan
+                )
             else:
-                package.dataset[var] = package.dataset[var].where(active >0, other = 0)              
-            package.dataset[var] =package.dataset[var].astype(datatype)
-            
-
-
+                package.dataset[var] = package.dataset[var].where(active > 0, other=0)
+            package.dataset[var] = package.dataset[var].astype(datatype)

@@ -27,6 +27,8 @@ In overview, we'll set the following steps:
 # We'll start with the usual imports. As this is an simple (synthetic)
 # structured model, we can make due with few packages.
 
+import copy
+
 import matplotlib.pyplot as plt
 import numpy as np
 from example_models import create_twri_simulation
@@ -34,10 +36,9 @@ from example_models import create_twri_simulation
 import imod
 from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
 from imod.typing.grid import zeros_like
-import copy
 
 simulation = create_twri_simulation()
-original_simulation  = create_twri_simulation()
+original_simulation = create_twri_simulation()
 # %%
 # We'll create a new directory in which we will write and run the model.
 gwf_model = simulation["GWF_1"]
@@ -51,7 +52,7 @@ active = gwf_model.domain.sel(layer=1)
 coords = active.coords
 submodel_labels = zeros_like(active)
 
-'''
+"""
 submodel_labels.values[0:7, 0:7] = 0
 submodel_labels.values[0:7, 7:] = 1
 submodel_labels.values[7:, 0:7] = 2
@@ -60,11 +61,10 @@ submodel_labels.values[7:, 7:]  = 3
 submodel_labels.values[0:7,:] = 0
 submodel_labels.values[7:,:] = 1
 submodel_labels.values[0:8,5] = 0
-'''
-for i in range (15):
+"""
+for i in range(15):
     for j in range(i):
-        submodel_labels.values[i,j] = 1
-    
+        submodel_labels.values[i, j] = 1
 
 
 fig, ax = plt.subplots()
@@ -74,7 +74,7 @@ simulation = simulation.split(submodel_labels)
 
 modeldir = imod.util.temporary_directory()
 
-original_simulation_dir = modeldir /"original"
+original_simulation_dir = modeldir / "original"
 original_simulation.write(original_simulation_dir, binary=False)
 original_simulation.run()
 original_balance = imod.mf6.open_cbc(
@@ -118,26 +118,14 @@ ax.title.set_text("head")
 # --------------------------
 #
 balances = merge_balances(modeldir, simulation)
-'''
-for key in balances:
-    if   not "gwf-gwf" in key:
-        orig = original_balance[key]
-        new = balances[key]
-        diff = orig - new
-        fig, ax = plt.subplots()    
-        
-        diff.isel(layer=0, time=-1).plot.contourf(ax=ax)
-        ax.title.set_text(key)
-        print (key)
-        print( diff.isel(layer=1, time=-1).values)
-'''
+
 for key in balances:
     if "gwf-gwf" in key:
         new = balances[key]
-        fig, ax = plt.subplots()    
-        
+        fig, ax = plt.subplots()
+
         new.isel(layer=0, time=-1).plot.contourf(ax=ax)
         ax.title.set_text(key)
-        print (key)
-        print( new.isel(layer=1, time=-1).values)
+        print(key)
+        print(new.isel(layer=1, time=-1).values)
 pass

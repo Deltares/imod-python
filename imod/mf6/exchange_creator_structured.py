@@ -45,10 +45,10 @@ class ExchangeCreator_Structured(ExchangeCreator):
 
         not_connected_value = -999
         connected_cells_idx1 = self._global_cell_indices.where(
-            diff1 != 0, drop=True, other = not_connected_value
+            diff1 != 0, drop=True, other=not_connected_value
         ).astype(int)
         connected_cells_idx2 = self._global_cell_indices.where(
-            diff2 != 0, drop=True, other = not_connected_value
+            diff2 != 0, drop=True, other=not_connected_value
         ).astype(int)
 
         connected_model_label1 = self._submodel_labels.where(
@@ -66,12 +66,18 @@ class ExchangeCreator_Structured(ExchangeCreator):
                 "cell_label2": connected_model_label2.values.flatten(),
             }
         )
-        connected_cell_info = connected_cell_info.loc[connected_cell_info.cell_idx1 != not_connected_value]
-        label_increasing = connected_cell_info["cell_label1"] < connected_cell_info["cell_label2"]
+        connected_cell_info = connected_cell_info.loc[
+            connected_cell_info.cell_idx1 != not_connected_value
+        ]
+        label_increasing = (
+            connected_cell_info["cell_label1"] < connected_cell_info["cell_label2"]
+        )
 
-        connected_cell_info.loc[label_increasing, ['cell_idx1', 'cell_idx2', 'cell_label1', 'cell_label2']] = (
-            connected_cell_info.loc[label_increasing, ['cell_idx2', 'cell_idx1', 'cell_label2', 'cell_label1']].values)
-
+        connected_cell_info.loc[
+            label_increasing, ["cell_idx1", "cell_idx2", "cell_label1", "cell_label2"]
+        ] = connected_cell_info.loc[
+            label_increasing, ["cell_idx2", "cell_idx1", "cell_label2", "cell_label1"]
+        ].values
 
         return connected_cell_info
 

@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Dict
+
 import numpy as np
 
 import imod
@@ -82,7 +83,7 @@ def merge_balances(
         grb_path = _get_grb_file_path(modelDirectory)
         cbc = imod.mf6.open_cbc(cbc_path, grb_path)
         for key in cbc.keys():
-            cbc[key] = cbc[key].where(partition_domain, other = np.nan)
+            cbc[key] = cbc[key].where(partition_domain, other=np.nan)
         unique_balance_keys.update(list(cbc.keys()))
         cbc_per_partition.append(cbc)
     unique_balance_keys = list(unique_balance_keys)
