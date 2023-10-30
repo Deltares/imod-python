@@ -20,8 +20,8 @@ def inactive_idomain(basic_dis):
 
 
 @pytest.fixture()
-def unstructured_idomain(basic_unstructured_dis):
-    idomain, _, _ = basic_unstructured_dis
+def unstructured_idomain(circle_dis):
+    idomain, _, _ = circle_dis
     return idomain == 1
 
 

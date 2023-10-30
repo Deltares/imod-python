@@ -17,9 +17,7 @@ def _remove_boundary_locations(boundary_locations, n_locations_to_remove):
 
 class TestClippedBoundaryConditionCreator:
     @pytest.mark.parametrize("n_clipped_cells", [15, 0, 36])
-    def test_create_different_n_clipped_cells(
-        self, basic_unstructured_dis, n_clipped_cells
-    ):
+    def test_create_different_n_clipped_cells(self, circle_dis, n_clipped_cells):
         """
         This test validates that the number of assigned boundary cells in the ConstantHead package produced by the
         ClippedBoundaryConditionCreator class is as expected. The parameterized values are:
@@ -31,7 +29,7 @@ class TestClippedBoundaryConditionCreator:
         head_value_original_domain = 1.0
         head_value_clipped_domain = 2.0
 
-        idomain, _, _ = basic_unstructured_dis
+        idomain, _, _ = circle_dis
 
         original_boundary_locations = grid_boundary_xy(idomain == 1)
 

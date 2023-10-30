@@ -10,7 +10,7 @@ from .fixtures.flow_basic_fixture import (
     two_days,
     well_df,
 )
-from .fixtures.flow_basic_unstructured_fixture import basic_unstructured_dis
+from .fixtures.flow_basic_unstructured_fixture import basic_unstructured_dis, circle_dis
 from .fixtures.flow_example_fixture import imodflow_model
 from .fixtures.mf6_circle_fixture import (
     circle_model,
