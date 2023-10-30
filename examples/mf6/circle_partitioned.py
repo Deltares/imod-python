@@ -23,22 +23,22 @@ submodel_labels.values[:67] = 0
 submodel_labels.values[67:118] = 1
 submodel_labels.values[118:] = 2
 
-# create a simulation that is split in subdomains according to the label array
+# Create a simulation that is split in subdomains according to the label array.
 new_sim = simulation.split(submodel_labels)
 # %%
-# write the simulation input files for the new simeulation
+# Write the simulation input files for the new simulation.
 new_sim.write(tmp_path, False)
 
 # run the split simulation
 new_sim.run()
 # %%
-# visualize the computed heads in the top layer
+# Visualize the computed heads in the top layer.
 fig, ax = plt.subplots()
 head = merge_heads(tmp_path, new_sim)
 
 head.isel(layer=0, time=-1).ugrid.plot.contourf(ax=ax)
 # %%
-# visualize the flow-horizontal-face-x componenty of the balances
+# Visualize the flow-horizontal-face-x componenty of the balances.
 fig, ax = plt.subplots()
 balances = merge_balances(tmp_path, new_sim)
 

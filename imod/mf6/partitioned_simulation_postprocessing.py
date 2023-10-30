@@ -14,14 +14,14 @@ def merge_heads(simulation_dir: Path, simulation: Modflow6Simulation) -> GridDat
     head file. Both structured and unstructured grids are supported.
     """
     model_names = list(
-        simulation.get_models_of_type(GroundwaterFlowModel._model_id).keys()
+        simulation.get_models_of_type(GroundwaterFlowModel.model_id()).keys()
     )
     heads = []
-    for modelname in model_names:
-        modelDirectory = simulation_dir / modelname
-        grb_path = _get_grb_file_path(modelDirectory)
+    for name in model_names:
+        model_directory = simulation_dir / name
+        grb_path = _get_grb_file_path(model_directory)
         head = imod.mf6.open_hds(
-            modelDirectory / f"{modelname}.hds",
+            model_directory / f"{name}.hds",
             grb_path,
         )
         heads.append(head)
@@ -40,7 +40,7 @@ def _get_grb_file_path(model_directory: Path) -> Path:
 
 def _get_cbc_file_path(model_directory: Path) -> Path:
     """
-    Given a directory path, returns the path of the grb file in it. Raises an
+    Given a directory path, returns the path of the cbc file in it. Raises an
     exception if there is not exactly 1 grb file in it.
     """
     return _get_single_file(model_directory, "cbc")

@@ -150,7 +150,6 @@ def test_import_heads_unstructured(tmp_path, circle_partitioned):
     assert np.allclose(merged_heads.coords["layer"].values, [1, 2])
     assert np.allclose(merged_heads.coords["time"].values, [1.0])
     assert np.allclose(merged_heads.coords["mesh2d_nFaces"].values, list(range(216)))
-    # Assert
     assert np.allclose(merged_heads.coords["layer"].values, [1, 2])
     assert np.allclose(merged_heads.coords["time"].values, [1.0])
     assert np.allclose(merged_heads.coords["mesh2d_nFaces"].values, list(range(216)))
@@ -229,4 +228,5 @@ def test_import_balances_unstructured(
 
         for coord in expected_dims_coords:
             assert coord in merged_balances[key].coords
+            assert coord in merged_balances[key].dims
             assert coord in merged_balances[key].dims

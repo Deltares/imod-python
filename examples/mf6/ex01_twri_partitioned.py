@@ -61,8 +61,8 @@ modeldir = imod.util.temporary_directory()
 simulation.write(modeldir, binary=False)
 
 # %%
-# Run the model
-# -------------
+# Run the model.
+# --------------
 #
 # .. note::
 #
@@ -73,8 +73,8 @@ simulation.write(modeldir, binary=False)
 simulation.run()
 
 # %%
-# Open the results (head)
-# -----------------------
+# Open the results (head).
+# ------------------------
 #
 fig, ax = plt.subplots()
 head = merge_heads(modeldir, simulation)
@@ -82,12 +82,12 @@ head.isel(layer=0, time=0).plot.contourf()
 ax.title.set_text("head")
 
 # %%
-# Open the results (balance)
+# Open the results (balance).
 # --------------------------
 #
 balances = merge_balances(modeldir, simulation)
-for key in balances:
-    fig, ax = plt.subplots()
-    balances[key].isel(layer=0, time=-1).plot.contourf(ax=ax)
-    ax.title.set_text(key)
+
+fig, ax = plt.subplots()
+balances["flow-front-face"].isel(layer=0, time=-1).plot.contourf(ax=ax)
+ax.title.set_text("flow-front-face")
 pass

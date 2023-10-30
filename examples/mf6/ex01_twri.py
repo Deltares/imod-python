@@ -213,13 +213,6 @@ head = imod.mf6.open_hds(
 
 head.isel(layer=0, time=0).plot.contourf()
 
-balance = imod.mf6.open_cbc(
-    modeldir / "GWF_1/GWF_1.cbc",
-    modeldir / "GWF_1/dis.dis.grb",
-)
-
-balance["flow-front-face"].isel(layer=0, time=0).plot.contourf()
-pass
 
 # %%
 # .. _MODFLOW6 example problems: https://github.com/MODFLOW-USGS/modflow6-examples
