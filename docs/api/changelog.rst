@@ -18,6 +18,7 @@ Fixed
   default tile provider being used was Stamen. However Stamen is no longer free
   which caused Contextily to fail. The default tile provider has been changed to
   OpenStreeMap to resolve this issue.
+- :function:`imod.mf6.out.read_cbc` now reads saved cell saturations
 
 Changed
 ~~~~~~~
@@ -34,6 +35,8 @@ Added
   belongs. The method will then create the submodels and split the nested packages.
   At the moment the split method will not create the gwfgwf exchanges required to
   connect the submodels
+- A ``save_saturation`` option to :class:`imod.mf6.NodePropertyFlow` which saves
+  cell saturations for unconfined flow.
 
 Removed
 ~~~~~~~
