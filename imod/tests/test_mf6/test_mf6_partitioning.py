@@ -6,8 +6,8 @@ import pytest
 import xarray as xr
 
 import imod
-from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
 from imod.mf6 import Modflow6Simulation
+from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
 from imod.typing.grid import zeros_like
 
 
