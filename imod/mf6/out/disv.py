@@ -214,7 +214,10 @@ def open_imeth1_budgets(
 
 
 def open_imeth6_budgets(
-    cbc_path: FilePath, grb_content: dict, header_list: List[cbc.Imeth6Header]
+    cbc_path: FilePath,
+    grb_content: dict,
+    header_list: List[cbc.Imeth6Header],
+    return_variable: str = "budget",
 ) -> xu.UgridDataArray:
     """
     Open the data for an imeth==6 budget section.
@@ -244,11 +247,6 @@ def open_imeth6_budgets(
     time = np.empty(len(header_list), dtype=np.float64)
     for i, header in enumerate(header_list):
         time[i] = header.totim
-        # for node saturation use auxiliary variable as return value
-        if header.text == "data-sat":
-            return_variable = header.auxtxt
-        else:
-            return_variable = "budget"
         a = dask.delayed(cbc.read_imeth6_budgets_dense)(
             cbc_path, header.nlist, dtype, header.pos, size, shape, return_variable
         )
@@ -472,8 +470,16 @@ def open_cbc(
         elif isinstance(header_list[0], cbc.Imeth1Header):
             cbc_content[key] = open_imeth1_budgets(cbc_path, grb_content, header_list)
         elif isinstance(header_list[0], cbc.Imeth6Header):
-            cbc_content[key] = open_imeth6_budgets(cbc_path, grb_content, header_list)
-
+            # for non cell flow budget terms, use auxiliary variables as return value
+            if header_list[0].text.startswith("data-"):
+                for return_variable in header_list[0].auxtxt:
+                    cbc_content[key + "-" + return_variable] = open_imeth6_budgets(
+                        cbc_path, grb_content, header_list, return_variable
+                    )
+            else:
+                cbc_content[key] = open_imeth6_budgets(
+                    cbc_path, grb_content, header_list
+                )
     return cbc_content
 
 
