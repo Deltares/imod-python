@@ -79,6 +79,7 @@ def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArr
     island = zeros_like(idomain_top)
     island.values[4:7, 4:7] = 1
     result["island"] = island
+
     return result
 
 
