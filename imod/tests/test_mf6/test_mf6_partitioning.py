@@ -1,9 +1,5 @@
-import copy
-
 import numpy as np
-import pandas as pd
 import pytest
-import xarray as xr
 
 import imod
 from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
@@ -50,10 +46,6 @@ def test_partitioning_structured(tmp_path, transient_twri_model, partition_index
         orig_dir / "GWF_1/dis.dis.grb",
     )
 
-    orig_balances = imod.mf6.open_cbc(
-        orig_dir / "GWF_1/GWF_1.cbc", orig_dir / "GWF_1/dis.dis.grb"
-    )
-
     # partition the simulation, run it, and save the (merged) results
     idomain = simulation["GWF_1"].domain
     partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
@@ -64,7 +56,7 @@ def test_partitioning_structured(tmp_path, transient_twri_model, partition_index
     split_simulation.run()
 
     head = merge_heads(tmp_path, split_simulation)
-    balances = merge_balances(tmp_path, split_simulation)
+    _ = merge_balances(tmp_path, split_simulation)
 
     # compare the head result of the original simulation with the result of the partitioned simulation
     np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-4, atol=1e-4)

@@ -6,7 +6,7 @@ import numpy as np
 import imod
 from imod.mf6.model import GroundwaterFlowModel
 from imod.mf6.simulation import Modflow6Simulation
-from imod.typing.grid import GridDataArray, merge, is_unstructured
+from imod.typing.grid import GridDataArray, is_unstructured, merge
 
 
 def merge_heads(simulation_dir: Path, simulation: Modflow6Simulation) -> GridDataArray:

@@ -27,10 +27,7 @@ In overview, we'll set the following steps:
 # We'll start with the usual imports. As this is an simple (synthetic)
 # structured model, we can make due with few packages.
 
-import copy
-
 import matplotlib.pyplot as plt
-import numpy as np
 from example_models import create_twri_simulation
 
 import imod
