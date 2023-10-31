@@ -90,4 +90,3 @@ balances = merge_balances(modeldir, simulation)
 fig, ax = plt.subplots()
 balances["flow-front-face"].isel(layer=0, time=-1).plot.contourf(ax=ax)
 ax.title.set_text("flow-front-face")
-pass
