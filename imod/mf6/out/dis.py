@@ -418,7 +418,9 @@ def open_cbc(
                 # for non cell flow budget terms, use auxiliary variables as return value
                 if header_list[0].text.startswith("data-"):
                     for return_variable in header_list[0].auxtxt:
-                        cbc_content[header_list[0].txt2id1 + "-" + return_variable] = open_imeth6_budgets(
+                        cbc_content[
+                            header_list[0].txt2id1 + "-" + return_variable
+                        ] = open_imeth6_budgets(
                             cbc_path, grb_content, header_list, return_variable
                         )
                 else:
