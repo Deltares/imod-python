@@ -14,17 +14,40 @@ from imod.typing.grid import zeros_like
 def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArray]:
     result = {}
     diagonal_submodel_labels_1 = zeros_like(idomain_top)
+
+    """
+    a diagonal partition boundary
+    [0, 0, 0, 0],
+    [1, 0, 0, 0],
+    [1, 1, 0, 0],
+    [1, 1, 1, 0],
+    [1, 1, 1, 1],
+    """
     for i in range(15):
         for j in range(i):
             diagonal_submodel_labels_1.values[i, j] = 1
     result["diagonal_1"] = diagonal_submodel_labels_1
 
+    """
+    another diagonal boundary
+    [1, 1, 1, 1],
+    [1, 1, 1, 0],
+    [1, 1, 0, 0],
+    [1, 0, 0, 0],
+    """
     diagonal_submodel_labels_2 = zeros_like(idomain_top)
     for i in range(15):
         for j in range(15 - i):
             diagonal_submodel_labels_2.values[i, j] = 1
     result["diagonal_2"] = diagonal_submodel_labels_2
 
+    """
+    4 square domains
+    [0, 0, 1, 1],
+    [0, 0, 1, 1],
+    [2, 2, 3, 3],
+    [2, 2, 3, 3],
+    """
     four_squares = zeros_like(idomain_top)
     four_squares.values[0:7, 0:7] = 0
     four_squares.values[0:7, 7:] = 1
@@ -32,12 +55,27 @@ def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArr
     four_squares.values[7:, 7:] = 3
     result["four_squares"] = four_squares
 
+    """
+    contains a single cell with 3 neighbors in another partitions
+    [0, 0, 1, 1],
+    [0, 0, 1, 1],
+    [0, 0, 0, 1],
+    [0, 0, 1, 1],
+    """
+
     intrusion = zeros_like(idomain_top)
     intrusion.values[0:15, 0:7] = 0
     intrusion.values[0:15, 7:] = 1
     intrusion.values[7, 7] = 0
     result["intrusion"] = intrusion
 
+    """
+    partition forms an island in another partition
+    [0, 0, 0, 0],
+    [0, 1, 1, 0],
+    [0, 1, 1, 0],
+    [0, 0, 0, 0],
+    """
     island = zeros_like(idomain_top)
     island.values[4:7, 4:7] = 1
     result["island"] = island
