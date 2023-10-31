@@ -14,6 +14,10 @@ ExpectedExchanges = namedtuple("ExpectedExchanges", "cell_id1 cell_id2 cl1 cl2 h
 
 
 def _create_submodel_labels(active, x_number_partitions, y_number_partitions):
+    """
+    Creates a partition array. The x axis and y axis are split in equally long partitions
+    based on the number of partitions in both
+    """
     x_split_location = np.linspace(
         active.x.min(), active.x.max(), x_number_partitions + 1
     )
@@ -73,6 +77,8 @@ class TestExchangeCreator_Structured:
 
     class ExpectedCellIds:
         """
+        This class contains member functions to compute the expected results of the connected cells
+        and the geometric constants for different partition methods.
         Grid info
 
         x-coordinates:
