@@ -727,5 +727,5 @@ class Package(PackageBase, abc.ABC):
         return False
 
     @classmethod
-    def is_gridless_package(cls)-> bool:
+    def is_gridless_package(cls) -> bool:
         return False

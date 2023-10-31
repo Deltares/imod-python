@@ -28,7 +28,7 @@ def create_partition_info(submodel_labels: GridDataArray) -> List[PartitionInfo]
     partition_infos = []
     for label_id in unique_labels:
         active_domain = submodel_labels.where(submodel_labels.values == label_id)
-        active_domain = ones_like(active_domain).where(active_domain.notnull(), 0)
+        active_domain = ones_like(active_domain).where(active_domain.notnull(), -1)
         active_domain = active_domain.astype(submodel_labels.dtype)
 
         submodel_partition_info = PartitionInfo(

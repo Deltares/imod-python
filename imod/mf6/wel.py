@@ -177,7 +177,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         self._validate_init_schemata(validate)
 
     @classmethod
-    def is_gridless_package(cls)-> bool:
+    def is_gridless_package(cls) -> bool:
         return True
 
     def clip_box(

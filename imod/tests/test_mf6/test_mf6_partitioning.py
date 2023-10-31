@@ -11,7 +11,6 @@ from imod.typing.grid import zeros_like
 
 
 def setup_partitioning_arrays(idomain_top):
-    
     diagonal_submodel_labels = zeros_like(idomain_top)
     for i in range(15):
         for j in range(i):
@@ -67,6 +66,5 @@ def test_partitioning_structured(tmp_path, transient_twri_model, partition_index
     head = merge_heads(tmp_path, split_simulation)
     balances = merge_balances(tmp_path, split_simulation)
 
-
     # compare the head result of the original simulation with the result of the partitioned simulation
-    np.testing.assert_allclose(head.values, orig_head.values, rtol = 1e-4, atol = 1e-4)
+    np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-4, atol=1e-4)
