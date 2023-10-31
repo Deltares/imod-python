@@ -89,11 +89,8 @@ def _filter_inactive_cells(package, active):
     package_vars = package.dataset.data_vars
     for var in package_vars:
         if package_vars[var].shape != ():
-            datatype = package_vars[var].dtype
-            if var != "idomain":
-                package.dataset[var] = package.dataset[var].where(
-                    active > 0, other=np.nan
-                )
+            if package.dataset[var].dtype.name[:3] == "int":
+                other = 0
             else:
-                package.dataset[var] = package.dataset[var].where(active > 0, other=0)
-            package.dataset[var] = package.dataset[var].astype(datatype)
+                other = np.nan
+            package.dataset[var] = package.dataset[var].where(active > 0, other=other)
