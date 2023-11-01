@@ -9,7 +9,7 @@ from imod.mf6.modelsplitter import PartitionInfo
 from imod.mf6.utilities.grid_utilities import create_geometric_grid_info
 from imod.typing.grid import GridDataArray
 
-
+NOT_CONNECTED_VALUE = -999
 class ExchangeCreator_Structured(ExchangeCreator):
     """
     Creates the GroundWaterFlow to GroundWaterFlow exchange package (gwfgwf) as
