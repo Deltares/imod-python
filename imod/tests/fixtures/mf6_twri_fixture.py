@@ -50,29 +50,28 @@ def make_twri_model():
     rch_rate = xr.full_like(like.sel(layer=1), 3.0e-8)
 
     # Well
-    layer = [3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    row = [5, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13]
-    column = [11, 6, 12, 8, 10, 12, 14, 8, 10, 12, 14, 8, 10, 12, 14]
-    rate = [
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-        -5.0,
-    ]
+    wells_x = [52500.0, 27500.0, 57500.0, 37500.0, 47500.0, 57500.0, 67500.0, 37500.0,
+            47500.0, 57500.0, 67500.0, 37500.0, 47500.0, 57500.0, 67500.0, ]
+    wells_y = [52500.0, 57500.0, 47500.0, 32500.0, 32500.0, 32500.0, 32500.0, 22500.0,
+            22500.0, 22500.0, 22500.0, 12500.0, 12500.0, 12500.0, 12500.0, ]
+    screen_top = [-300.0, -200.0, -200.0, 200.0, 200.0, 200.0, 200.0, 200.0,
+                200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 200.0, ]
+    screen_bottom = [-450.0, -300.0, -300.0, -200.0, -200.0, -200.0, -200.0, -200.0,
+                    -200.0, -200.0, -200.0, -200.0, -200.0, -200.0, -200.0, ]
+    rate_wel = [-5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0,
+                -5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0, ]
+
 
     # Create and fill the groundwater model.
     gwf_model = imod.mf6.GroundwaterFlowModel()
+    gwf_model["wel"] = imod.mf6.Well(
+        x=wells_x,
+        y=wells_y,
+        screen_top=screen_top,
+        screen_bottom=screen_bottom,
+        rate=rate_wel,
+        minimum_k=1e-19,
+    )    
     gwf_model["dis"] = imod.mf6.StructuredDiscretization(
         top=200.0, bottom=bottom, idomain=idomain
     )
@@ -98,15 +97,7 @@ def make_twri_model():
     )
     gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
     gwf_model["rch"] = imod.mf6.Recharge(rch_rate)
-    gwf_model["wel"] = imod.mf6.WellDisStructured(
-        layer=layer,
-        row=row,
-        column=column,
-        rate=rate,
-        print_input=True,
-        print_flows=True,
-        save_flows=True,
-    )
+
     gwf_model["sto"] = imod.mf6.SpecificStorage(
         specific_storage=1.0e-15,
         specific_yield=0.15,
