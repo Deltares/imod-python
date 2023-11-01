@@ -18,7 +18,7 @@ Fixed
   default tile provider being used was Stamen. However Stamen is no longer free
   which caused Contextily to fail. The default tile provider has been changed to
   OpenStreeMap to resolve this issue.
-- :function:`imod.mf6.out.read_cbc` now reads saved cell saturations
+- :function:`imod.mf6.out.read_cbc` now reads saved cell saturations and specific discharges.
 
 Changed
 ~~~~~~~
