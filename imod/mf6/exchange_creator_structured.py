@@ -9,6 +9,8 @@ from imod.mf6.modelsplitter import PartitionInfo
 from imod.mf6.utilities.grid_utilities import create_geometric_grid_info
 from imod.typing.grid import GridDataArray
 
+NOT_CONNECTED_VALUE = -999
+
 
 class ExchangeCreator_Structured(ExchangeCreator):
     """
@@ -44,10 +46,10 @@ class ExchangeCreator_Structured(ExchangeCreator):
         diff2 = self._submodel_labels.diff(f"{axis_label}", label="upper")
 
         connected_cells_idx1 = self._global_cell_indices.where(
-            diff1 != 0, drop=True
+            diff1 != 0, drop=True, other=NOT_CONNECTED_VALUE
         ).astype(int)
         connected_cells_idx2 = self._global_cell_indices.where(
-            diff2 != 0, drop=True
+            diff2 != 0, drop=True, other=NOT_CONNECTED_VALUE
         ).astype(int)
 
         connected_model_label1 = self._submodel_labels.where(
@@ -65,6 +67,18 @@ class ExchangeCreator_Structured(ExchangeCreator):
                 "cell_label2": connected_model_label2.values.flatten(),
             }
         )
+        connected_cell_info = connected_cell_info.loc[
+            connected_cell_info.cell_idx1 != NOT_CONNECTED_VALUE
+        ]
+        label_increasing = (
+            connected_cell_info["cell_label1"] < connected_cell_info["cell_label2"]
+        )
+
+        connected_cell_info.loc[
+            label_increasing, ["cell_idx1", "cell_idx2", "cell_label1", "cell_label2"]
+        ] = connected_cell_info.loc[
+            label_increasing, ["cell_idx2", "cell_idx1", "cell_label2", "cell_label1"]
+        ].values
 
         return connected_cell_info
 
