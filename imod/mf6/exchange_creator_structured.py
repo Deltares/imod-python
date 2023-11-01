@@ -44,10 +44,10 @@ class ExchangeCreator_Structured(ExchangeCreator):
         diff2 = self._submodel_labels.diff(f"{axis_label}", label="upper")
 
         connected_cells_idx1 = self._global_cell_indices.where(
-            diff1 != 0, drop=True, other=not_connected_value
+            diff1 != 0, drop=True, other=NOT_CONNECTED_VALUE
         ).astype(int)
         connected_cells_idx2 = self._global_cell_indices.where(
-            diff2 != 0, drop=True, other=not_connected_value
+            diff2 != 0, drop=True, other=NOT_CONNECTED_VALUE
         ).astype(int)
 
         connected_model_label1 = self._submodel_labels.where(
