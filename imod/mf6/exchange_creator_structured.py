@@ -43,7 +43,6 @@ class ExchangeCreator_Structured(ExchangeCreator):
         diff1 = self._submodel_labels.diff(f"{axis_label}", label="lower")
         diff2 = self._submodel_labels.diff(f"{axis_label}", label="upper")
 
-        not_connected_value = -999
         connected_cells_idx1 = self._global_cell_indices.where(
             diff1 != 0, drop=True, other=not_connected_value
         ).astype(int)
