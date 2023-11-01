@@ -78,9 +78,9 @@ def merge_balances(
     for modelname in model_names:
         partition_model = simulation[modelname]
         partition_domain = partition_model.domain
-        modelDirectory = simulation_dir / modelname
-        cbc_path = _get_cbc_file_path(modelDirectory)
-        grb_path = _get_grb_file_path(modelDirectory)
+        model_directory = simulation_dir / modelname
+        cbc_path = _get_cbc_file_path(model_directory)
+        grb_path = _get_grb_file_path(model_directory)
         cbc = imod.mf6.open_cbc(cbc_path, grb_path)
         for key in cbc.keys():
             if not is_unstructured(cbc[key]):
