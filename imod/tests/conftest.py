@@ -51,6 +51,8 @@ from .fixtures.mf6_twri_disv_fixture import twri_disv_model
 from .fixtures.mf6_twri_fixture import (
     transient_twri_model,
     transient_twri_result,
+    transient_unconfined_twri_model,
+    transient_unconfined_twri_result,
     twri_model,
     twri_result,
 )

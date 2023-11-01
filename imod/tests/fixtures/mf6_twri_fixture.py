@@ -140,11 +140,13 @@ def make_twri_model():
 
 @pytest.fixture(scope="function")
 def twri_model():
+    """Returns steady-state confined model."""
     return make_twri_model()
 
 
 @pytest.fixture(scope="function")
 def transient_twri_model():
+    """Returns transient confined model."""
     simulation = make_twri_model()
     gwf_model = simulation["GWF_1"]
     like = gwf_model["dis"]["idomain"].astype(float)
@@ -155,6 +157,34 @@ def transient_twri_model():
         transient=True,
         save_flows=True,
     )
+    simulation.create_time_discretization(
+        additional_times=pd.date_range("2000-01-01", " 2000-01-31")
+    )
+    return simulation
+
+
+@pytest.fixture(scope="function")
+def transient_unconfined_twri_model():
+    """Returns transient unconfined model, also saves specific discharges."""
+    simulation = make_twri_model()
+    gwf_model = simulation["GWF_1"]
+    like = gwf_model["dis"]["idomain"].astype(float)
+    # Force storage to unconfined
+    gwf_model["sto"] = imod.mf6.SpecificStorage(
+        specific_storage=xr.full_like(like, 1.0e-15),
+        specific_yield=xr.full_like(like, 0.15),
+        convertible=1,
+        transient=True,
+        save_flows=True,
+    )
+    # Force npf to unconfined
+    layer = np.array([1, 2, 3])
+    icelltype = xr.DataArray([1, 1, 1], {"layer": layer}, ("layer",))
+    gwf_model["npf"]["icelltype"] = icelltype
+    # Store save cell saturation
+    gwf_model["npf"]["save_saturation"] = True
+    # Write specific discharges
+    gwf_model["npf"]["save_specific_discharge"] = True
     simulation.create_time_discretization(
         additional_times=pd.date_range("2000-01-01", " 2000-01-31")
     )
@@ -180,6 +210,18 @@ def transient_twri_result(tmpdir_factory, transient_twri_model):
     # directory between different testing modules.
     modeldir = tmpdir_factory.mktemp("ex01-twri-transient")
     simulation = transient_twri_model
+    simulation.write(modeldir)
+    simulation.run()
+    return modeldir
+
+
+@pytest.mark.usefixtures("transient_unconfined_twri_model")
+@pytest.fixture(scope="function")
+def transient_unconfined_twri_result(tmpdir_factory, transient_unconfined_twri_model):
+    # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
+    # directory between different testing modules.
+    modeldir = tmpdir_factory.mktemp("ex01-twri-transient-unconfined")
+    simulation = transient_unconfined_twri_model
     simulation.write(modeldir)
     simulation.run()
     return modeldir
