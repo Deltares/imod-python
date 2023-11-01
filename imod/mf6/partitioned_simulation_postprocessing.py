@@ -71,7 +71,7 @@ def merge_balances(
     """
 
     model_names = list(
-        simulation.get_models_of_type(GroundwaterFlowModel._model_id).keys()
+        simulation.get_models_of_type(GroundwaterFlowModel.model_id()).keys()
     )
     unique_balance_keys = set()
     cbc_per_partition = []
@@ -87,7 +87,6 @@ def merge_balances(
                 cbc[key] = cbc[key].where(partition_domain, other=np.nan)
         unique_balance_keys.update(list(cbc.keys()))
         cbc_per_partition.append(cbc)
-    unique_balance_keys = list(unique_balance_keys)
 
     merged_keys = {}
     for key in unique_balance_keys:
