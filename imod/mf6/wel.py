@@ -176,6 +176,10 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         self._validate_init_schemata(validate)
 
+    @classmethod
+    def is_grid_agnostic_package(cls) -> bool:
+        return True
+
     def clip_box(
         self,
         time_min=None,
