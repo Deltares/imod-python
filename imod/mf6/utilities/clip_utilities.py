@@ -28,6 +28,8 @@ def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:
         x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max
     )
 
+    _filter_inactive_cells(clipped_package, active.sel(domain_slice))
+
     if "idomain" in package.dataset:
         clipped_package.dataset["idomain"] = xr.ones_like(
             clipped_package.dataset["idomain"]
@@ -75,3 +77,17 @@ def clip_by_grid(
     raise NotImplementedError(
         "Clipping of line data packages ,e.g. hfb, is not supported"
     )
+
+
+def _filter_inactive_cells(package, active):
+    if package.is_grid_agnostic_package():
+        return
+
+    package_vars = package.dataset.data_vars
+    for var in package_vars:
+        if package_vars[var].shape != ():
+            if np.issubdtype(package.dataset[var].dtype, np.integer):
+                other = 0
+            else:
+                other = np.nan
+            package.dataset[var] = package.dataset[var].where(active > 0, other=other)
