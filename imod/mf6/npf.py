@@ -192,6 +192,14 @@ class NodePropertyFlow(Package):
         specified for the GWF Exchange as an auxiliary variable. disu package
         has not been implemented yet.
         Default is False.
+    save_saturation: ({True, False}, optional)
+        keyword to indicate that cell saturation will be written to the budget
+        file, which is specified with “BUDGET SAVE FILE” in Output Control.
+        Saturation will be saved to the budget file as an auxiliary variable
+        saved with the DATA-SAT text label. Saturation is a cell variable that
+        ranges from zero to one and can be used by post processing programs to
+        determine how much of a cell volume is saturated. If ICELLTYPE is 0,
+        then saturation is always one.
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
@@ -333,6 +341,7 @@ class NodePropertyFlow(Package):
         dewatered=False,
         perched=False,
         save_specific_discharge=False,
+        save_saturation=False,
         validate: bool = True,
     ):
         super().__init__(locals())
@@ -373,6 +382,7 @@ class NodePropertyFlow(Package):
         self.dataset["dewatered"] = dewatered
         self.dataset["perched"] = perched
         self.dataset["save_specific_discharge"] = save_specific_discharge
+        self.dataset["save_saturation"] = save_saturation
         self._validate_init_schemata(validate)
 
     @classmethod
