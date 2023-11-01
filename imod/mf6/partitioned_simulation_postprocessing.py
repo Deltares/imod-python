@@ -98,5 +98,6 @@ def merge_balances(
                 balances_of_keys.append(balance[key])
         merged_balance_of_key = merge(balances_of_keys)
         darray = merged_balance_of_key.to_array(key).drop_vars(key)
+        # remove a dimension without coordinates (the balance type)
         merged_keys[key] = darray.sel({key: 0})
     return merged_keys

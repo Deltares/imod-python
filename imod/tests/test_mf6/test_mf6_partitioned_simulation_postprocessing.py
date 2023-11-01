@@ -229,4 +229,3 @@ def test_import_balances_unstructured(
         for coord in expected_dims_coords:
             assert coord in merged_balances[key].coords
             assert coord in merged_balances[key].dims
-            assert coord in merged_balances[key].dims

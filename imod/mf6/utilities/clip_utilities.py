@@ -9,7 +9,6 @@ from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.grid_utilities import get_active_domain_slice
-from imod.typing.grid import is_unstructured
 
 
 @typedispatch
@@ -81,7 +80,7 @@ def clip_by_grid(
 
 
 def _filter_inactive_cells(package, active):
-    if package.is_gridless_package():
+    if package.is_grid_agnostic_package():
         return
 
     package_vars = package.dataset.data_vars

@@ -10,6 +10,8 @@ from imod.mf6.utilities.grid_utilities import create_geometric_grid_info
 from imod.typing.grid import GridDataArray
 
 NOT_CONNECTED_VALUE = -999
+
+
 class ExchangeCreator_Structured(ExchangeCreator):
     """
     Creates the GroundWaterFlow to GroundWaterFlow exchange package (gwfgwf) as
@@ -66,7 +68,7 @@ class ExchangeCreator_Structured(ExchangeCreator):
             }
         )
         connected_cell_info = connected_cell_info.loc[
-            connected_cell_info.cell_idx1 != not_connected_value
+            connected_cell_info.cell_idx1 != NOT_CONNECTED_VALUE
         ]
         label_increasing = (
             connected_cell_info["cell_label1"] < connected_cell_info["cell_label2"]
