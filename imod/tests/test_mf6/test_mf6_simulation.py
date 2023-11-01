@@ -206,8 +206,8 @@ class TestModflow6Simulation:
         assert len([model_name for model_name in new_models.keys() if "test_model1" in model_name]) == 2
         assert len([model_name for model_name in new_models.keys() if "test_model2" in model_name]) == 2
 
-        active_domain1 = submodel_labels.where(submodel_labels == 0, -1).where(submodel_labels != 0, 1)
-        active_domain2 = submodel_labels.where(submodel_labels == 1, -1).where(submodel_labels != 1, 1)
+        active_domain1 = submodel_labels.where(submodel_labels == 0, 0).where(submodel_labels != 0, 1)
+        active_domain2 = submodel_labels.where(submodel_labels == 1, 0).where(submodel_labels != 1, 1)
         # fmt: on
 
         expected_slice_model_calls = [

@@ -1,10 +1,12 @@
 from pathlib import Path
 from typing import Dict
 
+import numpy as np
+
 import imod
 from imod.mf6.model import GroundwaterFlowModel
 from imod.mf6.simulation import Modflow6Simulation
-from imod.typing.grid import GridDataArray, merge
+from imod.typing.grid import GridDataArray, is_unstructured, merge
 
 
 def merge_heads(simulation_dir: Path, simulation: Modflow6Simulation) -> GridDataArray:
@@ -68,15 +70,21 @@ def merge_balances(
     The npf package results in different keys referring to the flow direction.
     """
 
-    model_names = simulation.get_models_of_type(GroundwaterFlowModel.model_id()).keys()
-
+    model_names = list(
+        simulation.get_models_of_type(GroundwaterFlowModel.model_id()).keys()
+    )
     unique_balance_keys = set()
     cbc_per_partition = []
-    for name in model_names:
-        model_directory = simulation_dir / name
+    for modelname in model_names:
+        partition_model = simulation[modelname]
+        partition_domain = partition_model.domain
+        model_directory = simulation_dir / modelname
         cbc_path = _get_cbc_file_path(model_directory)
         grb_path = _get_grb_file_path(model_directory)
         cbc = imod.mf6.open_cbc(cbc_path, grb_path)
+        for key in cbc.keys():
+            if not is_unstructured(cbc[key]):
+                cbc[key] = cbc[key].where(partition_domain, other=np.nan)
         unique_balance_keys.update(list(cbc.keys()))
         cbc_per_partition.append(cbc)
 
