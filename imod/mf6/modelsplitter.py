@@ -3,8 +3,8 @@ from typing import List, NamedTuple
 import numpy as np
 
 from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
-from imod.mf6.utilities.clip_utilities import clip_by_grid
-from imod.mf6.utilities.grid_utilities import get_active_domain_slice
+from imod.mf6.utilities.clip import clip_by_grid
+from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.typing.grid import GridDataArray, ones_like
 
 
