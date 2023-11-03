@@ -1,5 +1,5 @@
 """
-This module contains all kinds of utilities to work with voxel models.
+This module contains all kinds of utilities to work with layers.
 """
 
 from imod.typing import GridDataArray
