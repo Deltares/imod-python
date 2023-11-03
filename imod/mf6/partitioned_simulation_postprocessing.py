@@ -31,11 +31,10 @@ def merge_heads(simulation_dir: Path, simulation: Modflow6Simulation) -> GridDat
 
     # now fix the y coordinates of the array
     if not is_unstructured(head["head"]):
-        y_coords_diff = np.diff(head.coords["y"].values)
-        if np.all(y_coords_diff > 0):
-            reverse_y = list(reversed(head.coords["y"].values))
-            head = head.reindex(y=reverse_y)
-        elif np.any(y_coords_diff > 0):
+        flip = slice(None, None, -1)
+        if not head.indexes["y"].is_monotonic_decreasing:
+            head = head.isel(y=flip)
+        elif not head.indexes["y"].is_monotonic_increasing:
             raise RuntimeError(
                 "merging head results resulted in an array with non-monotonous coordinates."
             )
