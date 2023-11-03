@@ -86,7 +86,7 @@ def setup_simulation():
 
 @pytest.mark.usefixtures("transient_twri_model")
 @pytest.fixture(scope="function")
-def setup_split_simulation(transient_twri_model):
+def split_transient_twri_model(transient_twri_model):
     active = transient_twri_model["GWF_1"].domain.sel(layer=1)
     transient_twri_model["GWF_1"].pop("wel")
     number_partitions = 3
@@ -206,8 +206,8 @@ class TestModflow6Simulation:
         assert len([model_name for model_name in new_models.keys() if "test_model1" in model_name]) == 2
         assert len([model_name for model_name in new_models.keys() if "test_model2" in model_name]) == 2
 
-        active_domain1 = submodel_labels.where(submodel_labels == 0, -1).where(submodel_labels != 0, 1)
-        active_domain2 = submodel_labels.where(submodel_labels == 1, -1).where(submodel_labels != 1, 1)
+        active_domain1 = submodel_labels.where(submodel_labels == 0, 0).where(submodel_labels != 0, 1)
+        active_domain2 = submodel_labels.where(submodel_labels == 1, 0).where(submodel_labels != 1, 1)
         # fmt: on
 
         expected_slice_model_calls = [
@@ -323,37 +323,37 @@ class TestModflow6Simulation:
         # Assert
         assert Path.exists(tmp_path / sample_gwfgwf_structured.filename())
 
-    @pytest.mark.usefixtures("setup_split_simulation")
+    @pytest.mark.usefixtures("split_transient_twri_model")
     def test_prevent_split_after_split(
         self,
-        setup_split_simulation,
+        split_transient_twri_model,
     ):
         # Arrange.
-        split_simulation = setup_split_simulation
+        split_simulation = split_transient_twri_model
 
         # Act/Assert
         with pytest.raises(RuntimeError):
             _ = split_simulation.split(None)
 
-    @pytest.mark.usefixtures("setup_split_simulation")
+    @pytest.mark.usefixtures("split_transient_twri_model")
     def test_prevent_clip_box_after_split(
         self,
-        setup_split_simulation,
+        split_transient_twri_model,
     ):
         # Arrange.
-        split_simulation = setup_split_simulation
+        split_simulation = split_transient_twri_model
 
         # Act/Assert
         with pytest.raises(RuntimeError):
             _ = split_simulation.clip_box()
 
-    @pytest.mark.usefixtures("setup_split_simulation")
+    @pytest.mark.usefixtures("split_transient_twri_model")
     def test_prevent_regrid_like_after_split(
         self,
-        setup_split_simulation,
+        split_transient_twri_model,
     ):
         # Arrange.
-        split_simulation = setup_split_simulation
+        split_simulation = split_transient_twri_model
 
         # Act/Assert
         with pytest.raises(RuntimeError):

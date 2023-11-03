@@ -66,6 +66,7 @@ class TestGwfgwf:
         expected = textwrap.dedent(
             """\
         begin options
+          save_flows
         end options
 
         begin dimensions
@@ -100,6 +101,7 @@ class TestGwfgwf:
         expected = textwrap.dedent(
             """\
         begin options
+          save_flows
           auxiliary angldegx cdist
         end options
 

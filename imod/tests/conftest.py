@@ -15,6 +15,7 @@ from .fixtures.flow_example_fixture import imodflow_model
 from .fixtures.mf6_circle_fixture import (
     circle_model,
     circle_model_evt,
+    circle_partitioned,
     circle_result,
     circle_result_evt,
 )
@@ -49,6 +50,7 @@ from .fixtures.mf6_small_models_fixture import (
 )
 from .fixtures.mf6_twri_disv_fixture import twri_disv_model
 from .fixtures.mf6_twri_fixture import (
+    split_transient_twri_model,
     transient_twri_model,
     transient_twri_result,
     twri_model,

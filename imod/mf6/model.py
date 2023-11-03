@@ -344,6 +344,10 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         return instance
 
+    @classmethod
+    def model_id(cls) -> str:
+        return cls._model_id
+
     def clip_box(
         self,
         time_min: Optional[str] = None,

@@ -27,11 +27,12 @@ In overview, we'll set the following steps:
 # We'll start with the usual imports. As this is an simple (synthetic)
 # structured model, we can make due with few packages.
 
+import matplotlib.pyplot as plt
 import numpy as np
-import xarray as xr
 from example_models import create_twri_simulation
 
 import imod
+from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
 from imod.typing.grid import zeros_like
 
 simulation = create_twri_simulation()
@@ -50,14 +51,18 @@ for id in np.arange(1, number_partitions):
         (coords["y"] > split_location[id]) & (coords["y"] <= split_location[id + 1])
     ] = id
 
+
+fig, ax = plt.subplots()
+submodel_labels.plot.contourf(ax=ax)
+
 simulation = simulation.split(submodel_labels)
 
 modeldir = imod.util.temporary_directory()
 simulation.write(modeldir, binary=False)
 
 # %%
-# Run the model
-# -------------
+# Run the model.
+# --------------
 #
 # .. note::
 #
@@ -68,25 +73,20 @@ simulation.write(modeldir, binary=False)
 simulation.run()
 
 # %%
-# Open the results
-# ----------------
+# Open the results (head).
+# ------------------------
 #
-# We'll open the heads (.hds) file.
+fig, ax = plt.subplots()
+head = merge_heads(modeldir, simulation)
+head.isel(layer=0, time=0).plot.contourf()
+ax.title.set_text("head")
 
-# head = imod.mf6.open_hds(
-#     modeldir / "GWF_1/GWF_1.hds",
-#     modeldir / "GWF_1/dis.dis.grb",
-# )
-# head.isel(layer=0, time=0).plot.contourf()
+# %%
+# Open the results (balance).
+# --------------------------
+#
+balances = merge_balances(modeldir, simulation)
 
-
-heads = []
-for id in np.arange(0, number_partitions):
-    head = imod.mf6.open_hds(
-        modeldir / f"GWF_1_{id}/GWF_1_{id}.hds",
-        modeldir / f"GWF_1_{id}/dis.dis.grb",
-    )
-    heads.append(head)
-
-head = xr.merge(heads)
-head["head"].isel(layer=0, time=0).plot.contourf()
+fig, ax = plt.subplots()
+balances["flow-front-face"].isel(layer=0, time=-1).plot.contourf(ax=ax)
+ax.title.set_text("flow-front-face")

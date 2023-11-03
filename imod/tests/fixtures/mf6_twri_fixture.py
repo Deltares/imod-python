@@ -4,6 +4,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.typing.grid import zeros_like
 
 
 def make_twri_model():
@@ -183,3 +184,25 @@ def transient_twri_result(tmpdir_factory, transient_twri_model):
     simulation.write(modeldir)
     simulation.run()
     return modeldir
+
+
+@pytest.mark.usefixtures("transient_twri_model")
+@pytest.fixture(scope="function")
+def split_transient_twri_model(transient_twri_model):
+    active = transient_twri_model["GWF_1"].domain.sel(layer=1)
+    transient_twri_model["GWF_1"].pop(
+        "wel"
+    )  # TODO issue gitlab 495, if well were grid-agnostic we wouldn't need to pop it
+    number_partitions = 3
+    split_location = np.linspace(active.y.min(), active.y.max(), number_partitions + 1)
+
+    coords = active.coords
+    submodel_labels = zeros_like(active)
+    for id in np.arange(1, number_partitions):
+        submodel_labels.loc[
+            (coords["y"] > split_location[id]) & (coords["y"] <= split_location[id + 1])
+        ] = id
+
+    split_simulation = transient_twri_model.split(submodel_labels)
+
+    return split_simulation

@@ -725,3 +725,7 @@ class Package(PackageBase, abc.ABC):
         if hasattr(self, "_skip_mask_arrays"):
             return array_name in self._skip_mask_arrays
         return False
+
+    @classmethod
+    def is_grid_agnostic_package(cls) -> bool:
+        return False

@@ -34,11 +34,7 @@ from imod.typing.grid import GridDataArray, is_unstructured
 
 
 def get_models(simulation: Modflow6Simulation) -> Dict[str, Modflow6Model]:
-    return {
-        model_name: model
-        for model_name, model in simulation.items()
-        if isinstance(model, Modflow6Model)
-    }
+    return {k: v for k, v in simulation.items() if isinstance(v, Modflow6Model)}
 
 
 def get_packages(simulation: Modflow6Simulation) -> Dict[str, Package]:
@@ -168,7 +164,7 @@ class Modflow6Simulation(collections.UserDict):
                 model_name_file = pathlib.Path(
                     write_context.root_directory / pathlib.Path(f"{key}", f"{key}.nam")
                 ).as_posix()
-                models.append((value._model_id, model_name_file, key))
+                models.append((value.model_id(), model_name_file, key))
             elif isinstance(value, PackageBase):
                 if value._pkg_id == "tdis":
                     d["tdis6"] = f"{key}.tdis"
@@ -371,7 +367,7 @@ class Modflow6Simulation(collections.UserDict):
         return {
             k: v
             for k, v in self.items()
-            if isinstance(v, Modflow6Model) and (v._model_id == modeltype)
+            if isinstance(v, Modflow6Model) and (v.model_id() == modeltype)
         }
 
     def clip_box(
