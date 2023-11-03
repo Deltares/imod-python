@@ -286,11 +286,12 @@ def test_wel_render(twri_model, tmp_path):
     )
     wel_path = tmp_path / "GWF_1/wel.wel"
     with open(wel_path, "r") as wel_file:
-       actual = wel_file.read()
+        actual = wel_file.read()
 
     expected = textwrap.dedent(
-        f"""\
+        """\
             begin options
+              save_flows
             end options
 
             begin dimensions

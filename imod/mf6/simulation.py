@@ -217,6 +217,8 @@ class Modflow6Simulation(collections.UserDict):
         """
         # create write context
         write_context = WriteContext(directory, binary, use_absolute_paths)
+        if is_split(self):
+            write_context.is_partitioned = True
 
         # Check models for required content
         for key, model in self.items():
