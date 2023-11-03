@@ -92,7 +92,7 @@ class WriteContext:
             return Path("")
 
     @property
-    def is_partitioned(self) -> Path:
+    def is_partitioned(self) -> bool:
         return self.__is_partitioned
 
     @is_partitioned.setter
