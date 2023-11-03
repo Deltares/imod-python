@@ -1,15 +1,9 @@
-from typing import TypeAlias, Union
-
 import numpy as np
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
 
 from imod.prepare import polygonize
-
-GridDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
-GridDataset: TypeAlias = Union[xr.Dataset, xu.UgridDataset]
-ScalarDataset: TypeAlias = Union[xr.Dataset, xu.UgridDataset]
 
 
 @typedispatch

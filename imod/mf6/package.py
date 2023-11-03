@@ -22,7 +22,7 @@ from imod.mf6.regridding_utils import (
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
-from imod.typing.grid import GridDataArray
+from imod.typing import GridDataArray
 
 
 class Package(PackageBase, abc.ABC):

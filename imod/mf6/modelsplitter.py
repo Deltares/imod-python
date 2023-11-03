@@ -5,7 +5,8 @@ import numpy as np
 from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import get_active_domain_slice
-from imod.typing.grid import GridDataArray, ones_like
+from imod.typing import GridDataArray
+from imod.typing.grid import ones_like
 
 
 class PartitionInfo(NamedTuple):

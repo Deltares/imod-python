@@ -15,7 +15,7 @@ import xugrid as xu
 
 import imod
 from imod.mf6.model import Modflow6Model
-from imod.typing.grid import GridDataArray
+from imod.typing import GridDataArray
 
 try:
     import geopandas as gpd
