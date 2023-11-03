@@ -28,5 +28,11 @@ from imod.prepare.spatial import (
     zonal_aggregate_polygons,
     zonal_aggregate_raster,
 )
+from imod.prepare.voxel import (
+    get_lower_active_grid_cells,
+    get_lower_active_layer_number,
+    get_upper_active_grid_cells,
+    get_upper_active_layer_number,
+)
 from imod.prepare.voxelize import Voxelizer
 from imod.prepare.wells import assign_wells
