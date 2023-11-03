@@ -35,8 +35,7 @@ def merge_heads(simulation_dir: Path, simulation: Modflow6Simulation) -> GridDat
         if np.all(y_coords_diff > 0):
             reverse_y = list(reversed(head.coords["y"].values))
             head = head.reindex(y=reverse_y)
-        y_coords_diff = np.diff(head.coords["y"].values)
-        if np.any(y_coords_diff > 0):
+        elif np.any(y_coords_diff > 0):
             raise RuntimeError(
                 "merging head results resulted in an array with non-monotonous coordinates."
             )
