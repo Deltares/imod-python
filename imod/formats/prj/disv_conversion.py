@@ -15,6 +15,7 @@ import xugrid as xu
 
 import imod
 from imod.mf6.model import Modflow6Model
+from imod.prepare.layer import get_upper_active_grid_cells
 from imod.typing import GridDataArray
 
 try:
@@ -471,9 +472,8 @@ def create_rch(
     rate = raise_on_layer(value, "rate") * 0.001
     disv_rate = cache.regrid(rate, original2d=original2d).where(active)
     # Find highest active layer
-    highest = active["layer"] == active["layer"].where(active).min()
-    location = highest.where(highest)
-    disv_rate = finish(disv_rate * location)
+    location = get_upper_active_grid_cells(active)
+    disv_rate = finish(disv_rate.where(location))
 
     # Skip if there's no data
     if disv_rate.isnull().all():
