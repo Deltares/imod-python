@@ -182,7 +182,7 @@ simulation.create_time_discretization(
 # We'll create a new directory in which we will write and run the model.
 
 modeldir = imod.util.temporary_directory()
-simulation.write(modeldir, binary=False)
+simulation.write(modeldir)
 
 # %%
 # Run the model
