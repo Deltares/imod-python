@@ -26,3 +26,8 @@ Prepare model input
     zonal_aggregate_raster
 
     assign_wells
+
+    get_lower_active_grid_cells,
+    get_lower_active_layer_number,
+    get_upper_active_grid_cells,
+    get_upper_active_layer_number,

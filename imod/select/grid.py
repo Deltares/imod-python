@@ -8,7 +8,7 @@ from scipy.ndimage import binary_dilation
 
 from imod.mf6.validation import BOUNDARY_DIMS_SCHEMA
 from imod.schemata import DTypeSchema
-from imod.typing.grid import GridDataArray
+from imod.typing import GridDataArray
 
 
 def _reduce_grid_except_dims(

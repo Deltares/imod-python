@@ -4,7 +4,7 @@ import numpy as np
 import xarray as xr
 from xarray.core.utils import is_scalar
 
-from imod.typing.grid import GridDataArray
+from imod.typing import GridDataArray
 
 
 def remove_inactive(ds: xr.Dataset, active: xr.DataArray) -> xr.Dataset:
