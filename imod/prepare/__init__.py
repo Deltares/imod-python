@@ -14,6 +14,12 @@ speed by making use of the Numba compiler, to be able to regrid large datasets.
 """
 
 from imod.prepare import spatial, subsoil, surface_water
+from imod.prepare.layer import (
+    get_lower_active_grid_cells,
+    get_lower_active_layer_number,
+    get_upper_active_grid_cells,
+    get_upper_active_layer_number,
+)
 from imod.prepare.layerregrid import LayerRegridder
 from imod.prepare.regrid import Regridder
 from imod.prepare.reproject import reproject
@@ -27,12 +33,6 @@ from imod.prepare.spatial import (
     rasterize_celltable,
     zonal_aggregate_polygons,
     zonal_aggregate_raster,
-)
-from imod.prepare.voxel import (
-    get_lower_active_grid_cells,
-    get_lower_active_layer_number,
-    get_upper_active_grid_cells,
-    get_upper_active_layer_number,
 )
 from imod.prepare.voxelize import Voxelizer
 from imod.prepare.wells import assign_wells
