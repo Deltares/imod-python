@@ -537,3 +537,36 @@ class Modflow6Simulation(collections.UserDict):
         if not is_split(self):
             self["split_exchanges"] = []
         self["split_exchanges"].extend(exchanges_list)
+
+        for ex in self["split_exchanges"]:
+            filter = []
+            modelname_1 = ex["model_name_1"].values[()]
+            modelname_2 = ex["model_name_2"].values[()]  
+            domain_1 = self[modelname_1].domain
+            domain_2 = self[modelname_2].domain
+            if is_unstructured(domain_1):
+               return
+            layer = ex.dataset["layer"]
+            id_1 = ex.dataset["cell_id1"]
+            for l in range ( len(layer.values)):
+                lay = layer[l].values[()] -1
+                row = id_1[l].values[0] -1
+                col = id_1[l].values[1] -1
+                if domain_1.isel(layer=lay,y= row, x=col).values[()] > 0:
+                    filter.append(ex.dataset["index"][l].values[()])
+            ex.dataset =  ex.dataset.sel(index=filter)
+            filter=[]
+            layer = ex.dataset["layer"]            
+            id_2 = ex.dataset["cell_id2"]            
+            for l in range ( len(layer.values)):
+                lay = layer[l].values[()] -1
+                row = id_2[l].values[0] -1
+                col = id_2[l].values[1] -1
+                if domain_2.isel(layer=lay,y= row, x=col).values[()] > 0:
+                    filter.append(ex.dataset["index"][l].values[()])
+                else:
+                    print(f"dropped {l}")
+            ex.dataset =  ex.dataset.sel(index=filter)            
+            pass
+
+

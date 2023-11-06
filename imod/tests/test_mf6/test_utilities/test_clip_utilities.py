@@ -32,7 +32,7 @@ def test_clip_by_grid_convex_grid(basic_dis):
     assert clipped_pkg.dataset.x.min() > x_min
     assert clipped_pkg.dataset.y.min() > y_min
 
-    expected_idomain_shape = active.where(active > 0, -1, drop=True).shape
+    expected_idomain_shape = active.where(active > 0, 0, drop=True).shape
     assert clipped_pkg.dataset["idomain"].sel(layer=1).shape == expected_idomain_shape
 
 
@@ -48,6 +48,7 @@ def test_clip_by_grid_concave_grid(basic_dis):
     active = idomain.sel(layer=1, drop=True)
     active = active.where((active.x > x_start_cut) & (active.y > y_start_cut), -1)
     active = active * -1
+    active = active.where(active > 0, 0) 
 
     # Act
     clipped_pkg = clip_by_grid(pkg, active)
@@ -55,7 +56,7 @@ def test_clip_by_grid_concave_grid(basic_dis):
     # Assert
     assert pkg.dataset.data_vars.keys() == clipped_pkg.dataset.data_vars.keys()
 
-    expected_idomain = active.where(active > 0, -1, drop=True)
+    expected_idomain = active.where(active > 0, 0, drop=True)
     expected_idomain_shape = expected_idomain.shape
     assert clipped_pkg.dataset["idomain"].sel(layer=1).shape == expected_idomain_shape
     assert (

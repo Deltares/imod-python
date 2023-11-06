@@ -30,11 +30,6 @@ def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:
 
     _filter_inactive_cells(clipped_package, active.sel(domain_slice))
 
-    if "idomain" in package.dataset:
-        clipped_package.dataset["idomain"] = xr.ones_like(
-            clipped_package.dataset["idomain"]
-        ) * active.sel(domain_slice)
-
     return clipped_package
 
 
