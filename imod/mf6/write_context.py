@@ -43,6 +43,7 @@ class WriteContext:
             if write_directory is not None
             else self.__simulation_directory
         )
+        self.__is_partitioned = False
 
     def get_formatted_write_directory(self) -> Path:
         """
@@ -89,3 +90,11 @@ class WriteContext:
             return self.__simulation_directory
         else:
             return Path("")
+
+    @property
+    def is_partitioned(self) -> bool:
+        return self.__is_partitioned
+
+    @is_partitioned.setter
+    def is_partitioned(self, value: bool) -> None:
+        self.__is_partitioned = value
