@@ -93,9 +93,6 @@ def test_partitioning_structured(
 ):
     simulation = transient_twri_model
 
-    # TODO: convert the wells in this fixture to high-level wells
-    simulation["GWF_1"].pop("wel")
-
     # run the original example, so without partitioning, and save the simulation results
     orig_dir = tmp_path / "original"
     simulation.write(orig_dir, binary=False)
