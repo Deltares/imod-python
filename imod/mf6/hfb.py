@@ -3,6 +3,7 @@ import copy
 import typing
 from enum import Enum
 from typing import Tuple
+from copy import deepcopy
 
 import geopandas as gpd
 import numpy as np
@@ -17,7 +18,7 @@ from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.utilities.clip_utilities import clip_by_grid
 from imod.mf6.utilities.grid_utilities import broadcast_to_full_domain
 from imod.typing.grid import GridDataArray
-
+from imod.mf6.package import Package
 
 @typedispatch
 def _derive_connected_cell_ids(
@@ -535,6 +536,15 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         exterior.
         """
         return clip_by_grid(self, target_grid)
+        
+        
+    def mask(self, _) -> Package:
+        """
+        The mask method is irrelevant for this package as it is
+        grid-agnostic, instead this method retuns a copy of itself.
+        """
+        return deepcopy(self)
+    
 
     @staticmethod
     def __to_unstructured(
