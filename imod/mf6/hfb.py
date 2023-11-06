@@ -20,6 +20,7 @@ from imod.mf6.utilities.grid_utilities import broadcast_to_full_domain
 from imod.typing.grid import GridDataArray
 from imod.mf6.package import Package
 
+
 @typedispatch
 def _derive_connected_cell_ids(
     idomain: xr.DataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
@@ -536,15 +537,13 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         exterior.
         """
         return clip_by_grid(self, target_grid)
-        
-        
+
     def mask(self, _) -> Package:
         """
         The mask method is irrelevant for this package as it is
         grid-agnostic, instead this method retuns a copy of itself.
         """
         return deepcopy(self)
-    
 
     @staticmethod
     def __to_unstructured(
