@@ -16,7 +16,7 @@ from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import broadcast_to_full_domain
-from imod.typing.grid import GridDataArray
+from imod.typing import GridDataArray
 
 
 @typedispatch

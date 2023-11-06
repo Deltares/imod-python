@@ -17,7 +17,7 @@ Fixed
 - The Contextily packages started throwing errors. This was caused because the
   default tile provider being used was Stamen. However Stamen is no longer free
   which caused Contextily to fail. The default tile provider has been changed to
-  OpenStreeMap to resolve this issue.
+  OpenStreetMap to resolve this issue.
 - :function:`imod.mf6.out.read_cbc` now reads saved cell saturations and specific discharges.
 
 Changed
@@ -37,6 +37,12 @@ Added
   connect the submodels
 - A ``save_saturation`` option to :class:`imod.mf6.NodePropertyFlow` which saves
   cell saturations for unconfined flow.
+- Functions :function:`imod.prepare.get_upper_active_layer_number` and
+  :function:`get_lower_active_layer_number` to return planar grids with numbers
+  of the highest and lowest active cells respectively.
+- Functions :function:`get_upper_active_grid_cells` and
+  :function:`get_lower_active_grid_cells` to return boolean grids designating
+  respectively the highest and lowest active cells in a grid.
 
 Removed
 ~~~~~~~
