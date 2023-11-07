@@ -21,12 +21,19 @@ from imod.mf6.model import (
     Modflow6Model,
 )
 from imod.mf6.modelsplitter import create_partition_info, slice_model
+from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
-from imod.typing import GridDataArray
+from imod.typing import GridDataArray, GridDataset
+
+OUTPUT_FUNC_MAPPING = {
+    "head": (open_hds, GroundwaterFlowModel),
+    "concentration": (open_conc, GroundwaterTransportModel),
+    "budget": (open_cbc, GroundwaterFlowModel),
+}
 
 
 def get_models(simulation: Modflow6Simulation) -> Dict[str, Modflow6Model]:
@@ -269,6 +276,66 @@ class Modflow6Simulation(collections.UserDict):
                     f"Simulation {self.name}: {mf6path} failed to run with returncode "
                     f"{result.returncode}, and error message:\n\n{result.stdout.decode()} "
                 )
+
+    def open_head(self, modelname) -> GridDataArray:
+        """
+        Open heads of a groundwater flow model in this simulation
+
+        Parameters
+        ----------
+        modelname: str
+            Name of groundwater model from which heads should be read.
+        """
+        return self._open_output(modelname, "head")
+
+    def open_budget(self, modelname) -> GridDataset:
+        """
+        Open budgets of a groundwater flow model in this simulation
+
+        Parameters
+        ----------
+        modelname: str
+            Name of groundwater model from which budgets should be read.
+        """
+        return self._open_output(modelname, "budget")
+
+    def open_concentration(self, modelname) -> GridDataArray:
+        """
+        Open concentration of a groundwater transport model in this simulation
+
+        Parameters
+        ----------
+        modelname: str
+            Name of groundwater model from which concentration should be read.
+        """
+        return self._open_output(modelname, "concentration")
+
+    def _open_output(self, modelname, output, **kwargs) -> GridDataArray:
+        open_func, expected_modeltype = OUTPUT_FUNC_MAPPING[output]
+
+        if self.directory is None:
+            raise RuntimeError(f"Simulation {self.name} has not been written yet.")
+        # Get model
+        gwf_model = self[modelname]
+        if not isinstance(gwf_model, expected_modeltype):
+            raise TypeError(
+                f"{modelname} not a {expected_modeltype}, instead got {type(gwf_model)}"
+            )
+        # Get head file path
+        oc_key = gwf_model._get_pkgkey["oc"]
+        oc_pkg = gwf_model[oc_key]
+        output_path = oc_pkg._get_output_filepath(self.directory, "head")
+        # Get grb path
+        diskey = gwf_model.__get_diskey()
+        dis_id = gwf_model[diskey]._pkg_id
+        grb_path = self.directory / modelname / f"{diskey}.{dis_id}.grb"
+
+        if not output_path.exists():
+            raise RuntimeError(
+                f"Could not find output in {output_path}, check if you already ran simulation {self.name}"
+            )
+
+        return open_func(output_path, grb_path, **kwargs)
 
     def dump(
         self, directory=".", validate: bool = True, mdal_compliant: bool = False
