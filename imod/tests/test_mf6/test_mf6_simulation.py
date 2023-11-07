@@ -170,11 +170,11 @@ class TestModflow6Simulation:
         self,
         exchange_creator_unstructured_mock,
         slice_model_mock,
-        basic_unstructured_dis,
+        circle_dis,
         setup_simulation,
     ):
         # Arrange.
-        idomain, top, bottom = basic_unstructured_dis
+        idomain, _, _ = circle_dis
 
         simulation = setup_simulation
 

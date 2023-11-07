@@ -14,8 +14,9 @@ from fastcore.dispatch import typedispatch
 from imod.mf6.boundary_condition import BoundaryCondition
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.mf6_hfb_adapter import Mf6HorizontalFlowBarrier
-from imod.mf6.utilities.grid_utilities import broadcast_to_full_domain
-from imod.typing.grid import GridDataArray
+from imod.mf6.utilities.clip import clip_by_grid
+from imod.mf6.utilities.grid import broadcast_to_full_domain
+from imod.typing import GridDataArray
 
 
 @typedispatch
@@ -477,6 +478,10 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
     def _get_variable_name(self) -> str:
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def _get_vertical_variables(self) -> list:
+        raise NotImplementedError
+
     def clip_box(
         self,
         time_min=None,
@@ -520,6 +525,16 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         new = cls.__new__(cls)
         new.dataset = copy.deepcopy(self.dataset)
         return new
+
+    def regrid_like(
+        self, target_grid: GridDataArray, *_
+    ) -> "HorizontalFlowBarrierBase":
+        """
+        The regrid_like method is irrelevant for this package as it is
+        grid-agnostic, instead this method clips the package based on the grid
+        exterior.
+        """
+        return clip_by_grid(self, target_grid)
 
     @staticmethod
     def __to_unstructured(
@@ -656,6 +671,9 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "hydraulic_characteristic"
 
+    def _get_vertical_variables(self) -> list:
+        return ["ztop", "zbottom"]
+
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):
@@ -713,6 +731,9 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
 
     def _get_variable_name(self) -> str:
         return "hydraulic_characteristic"
+
+    def _get_vertical_variables(self) -> list:
+        return ["layer"]
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
@@ -778,6 +799,9 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "multiplier"
 
+    def _get_vertical_variables(self) -> list:
+        return ["ztop", "zbottom"]
+
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):
@@ -841,6 +865,9 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
 
     def _get_variable_name(self) -> str:
         return "multiplier"
+
+    def _get_vertical_variables(self) -> list:
+        return ["layer"]
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
@@ -925,6 +952,9 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     def _get_variable_name(self) -> str:
         return "resistance"
 
+    def _get_vertical_variables(self) -> list:
+        return ["ztop", "zbottom"]
+
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k
     ):
@@ -983,6 +1013,9 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
 
     def _get_variable_name(self) -> str:
         return "resistance"
+
+    def _get_vertical_variables(self) -> list:
+        return ["layer"]
 
     def _compute_barrier_values(
         self, snapped_dataset, edge_index, idomain, top, bottom, k

@@ -3,7 +3,7 @@ from typing import List
 import imod
 from imod.mf6 import ConstantHead
 from imod.select.grid import active_grid_boundary_xy
-from imod.typing.grid import GridDataArray
+from imod.typing import GridDataArray
 
 
 def create_clipped_boundary(

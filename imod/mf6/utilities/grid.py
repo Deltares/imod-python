@@ -7,7 +7,8 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.typing.grid import GridDataArray, zeros_like
+from imod.typing import GridDataArray
+from imod.typing.grid import zeros_like
 from imod.util import spatial_reference
 
 DomainSlice = Dict[str, slice | np.ndarray]

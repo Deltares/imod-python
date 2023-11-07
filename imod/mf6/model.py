@@ -30,7 +30,7 @@ from imod.mf6.validation import (
 from imod.mf6.wel import Well
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
-from imod.typing.grid import GridDataArray
+from imod.typing import GridDataArray
 
 
 def initialize_template(name: str) -> Template:

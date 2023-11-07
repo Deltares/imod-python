@@ -6,7 +6,7 @@ from typing import List, Union
 import numpy as np
 
 from imod.mf6.package import Package
-from imod.mf6.utilities.dataset_utilities import is_dataarray_none
+from imod.mf6.utilities.dataset import is_dataarray_none
 from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema
 
