@@ -5,7 +5,7 @@ import xarray as xr
 from example_models import create_hondsrug_simulation
 
 import imod
-from imod.typing.grid import GridDataArray
+from imod.typing import GridDataArray
 
 # %%
 # Obtain the simulation, write it, run it, and plot some heads.
@@ -16,8 +16,9 @@ gwf_simulation = create_hondsrug_simulation()
 
 modeldir =  imod.util.temporary_directory()
 original_modeldir = modeldir / "original"
+
+gwf_simulation.write(original_modeldir, False, False)
 if False:
-    gwf_simulation.write(original_modeldir, False, False)
     gwf_simulation.run()
     hds_original = imod.mf6.open_hds(
         original_modeldir / "GWF_1" / "GWF_1.hds",
