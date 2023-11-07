@@ -250,26 +250,30 @@ class StorageCoefficient(StorageBase):
     }
 
     _init_schemata = {
-        "convertible": (
-            DTypeSchema(np.integer),
-            PKG_DIMS_SCHEMA,
-        ),
         "storage_coefficient": (
             DTypeSchema(np.floating),
+            IndexesSchema(),
             PKG_DIMS_SCHEMA,
         ),
         "specific_yield": (
             DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ),
+        "transient": (
+            DTypeSchema(np.bool_),
+            IndexesSchema(),
+            DimsSchema("time") | DimsSchema(),
+        ),
+        "convertible": (
+            DTypeSchema(np.integer),
+            IndexesSchema(),
             PKG_DIMS_SCHEMA,
         ),
         "save_flows": (DTypeSchema(np.bool_), DimsSchema()),
     }
 
     _write_schemata = {
-        "convertible": (
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
-            # No need to check coords: dataset ensures they align with idomain.
-        ),
         "storage_coefficient": (
             AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
@@ -277,6 +281,10 @@ class StorageCoefficient(StorageBase):
         "specific_yield": (
             AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+        "convertible": (
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            # No need to check coords: dataset ensures they align with idomain.
         ),
     }
 
