@@ -103,6 +103,13 @@ def test_top_exceeding_bottom(idomain_and_bottom):
     for var, var_errors in errors.items():
         assert var == "top"
 
+    # No error should be thrown if zero to negative thickness in vertical
+    # passthrough
+    idomain[0:2, :, :] = -1
+    dis = imod.mf6.StructuredDiscretization(top=-400.0, bottom=bottom, idomain=idomain)
+    errors = dis._validate(dis._write_schemata, idomain=idomain)
+    assert len(errors) == 0
+
 
 def test_overlaying_bottom_inactive(idomain_and_bottom):
     """
@@ -142,6 +149,12 @@ def test_disconnected_idomain(idomain_and_bottom):
 
     # Inactive edge, no error
     idomain[:, 0, :] = 0
+    dis = imod.mf6.StructuredDiscretization(top=200.0, bottom=bottom, idomain=idomain)
+    errors = dis._validate(dis._write_schemata, idomain=idomain)
+    assert len(errors) == 0
+
+    # Middle layer vertical passthrough, no error
+    idomain[1, :, :] = -1
     dis = imod.mf6.StructuredDiscretization(top=200.0, bottom=bottom, idomain=idomain)
     errors = dis._validate(dis._write_schemata, idomain=idomain)
     assert len(errors) == 0

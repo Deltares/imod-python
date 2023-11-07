@@ -30,7 +30,8 @@ from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
-from imod.typing.grid import GridDataArray, is_unstructured
+from imod.typing import GridDataArray
+from imod.typing.grid import is_unstructured
 
 
 def get_models(simulation: Modflow6Simulation) -> Dict[str, Modflow6Model]:

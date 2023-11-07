@@ -6,7 +6,7 @@ import xarray as xr
 
 from imod.mf6.exchange_creator import ExchangeCreator
 from imod.mf6.modelsplitter import PartitionInfo
-from imod.typing.grid import GridDataArray
+from imod.typing import GridDataArray
 
 
 class ExchangeCreator_Unstructured(ExchangeCreator):

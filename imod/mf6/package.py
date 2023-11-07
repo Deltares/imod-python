@@ -23,7 +23,7 @@ from imod.mf6.regridding_utils import (
 from imod.mf6.validation import validation_pkg_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
-from imod.typing.grid import GridDataArray
+from imod.typing import GridDataArray
 
 
 class Package(PackageBase, abc.ABC):
@@ -650,7 +650,7 @@ class Package(PackageBase, abc.ABC):
 
     def regrid_like(
         self,
-        target_grid: Union[xr.DataArray, xu.UgridDataArray],
+        target_grid: GridDataArray,
         regridder_types: Dict[str, Tuple[RegridderType, str]] = None,
     ) -> "Package":
         """
