@@ -18,14 +18,13 @@ from imod.mf6.boundary_condition import (
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
-from imod.mf6.utilities.clip import clip_by_grid
-from imod.mf6.utilities.dataset import remove_inactive
+from imod.mf6.utilities.clip_utilities import clip_by_grid
+from imod.mf6.utilities.dataset_utilities import remove_inactive
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
 from imod.select.points import points_indices
-from imod.typing import GridDataArray
-from imod.typing.grid import ones_like
+from imod.typing.grid import GridDataArray, ones_like
 from imod.util import values_within_range
 
 
@@ -202,7 +201,8 @@ class Well(BoundaryCondition, IPointDataPackage):
         ds = new.dataset
 
         # Select all variables along "index" dimension
-        in_bounds = values_within_range(ds["x"], x_min, x_max)
+        in_bounds = np.array([True] * ds.index.size)
+        in_bounds &= values_within_range(ds["x"], x_min, x_max)
         in_bounds &= values_within_range(ds["y"], y_min, y_max)
         in_bounds &= values_within_range(ds["screen_top"], None, z_max)
         in_bounds &= values_within_range(ds["screen_bottom"], z_min, None)
