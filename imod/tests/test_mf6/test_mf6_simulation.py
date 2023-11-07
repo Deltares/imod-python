@@ -165,9 +165,13 @@ class TestModflow6Simulation:
         assert new_simulation["disv"] is simulation["disv"]
 
     @mock.patch("imod.mf6.simulation.slice_model", autospec=True)
+    @mock.patch("imod.mf6.simulation.ExchangeCreator_Unstructured")
     def test_split_multiple_models(
-        self, slice_model_mock, circle_dis, setup_simulation
-
+        self,
+        exchange_creator_unstructured_mock,
+        slice_model_mock,
+        circle_dis,
+        setup_simulation,
     ):
         # Arrange.
         idomain, _, _ = circle_dis
@@ -195,7 +199,7 @@ class TestModflow6Simulation:
 
         # Assert.
         new_models = get_models(new_simulation)
-        assert slice_model_mock.call_count == 2
+        assert slice_model_mock.call_count == 4
         assert len(new_models) == 4
 
         # fmt: off

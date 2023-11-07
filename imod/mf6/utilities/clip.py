@@ -106,6 +106,7 @@ def _filter_inactive_cells(package, active):
                 other = np.nan
             package.dataset[var] = package.dataset[var].where(active > 0, other=other)
 
+
 @typedispatch
 def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataPackage:
     """Clip LineDataPackage outside unstructured/structured grid."""
@@ -120,4 +121,3 @@ def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataP
     # Create new instance
     cls = type(package)
     return cls(package_gdf_clipped, **settings)
-

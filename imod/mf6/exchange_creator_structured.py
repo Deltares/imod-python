@@ -8,7 +8,7 @@ from imod.mf6.exchange_creator import ExchangeCreator
 from imod.mf6.modelsplitter import PartitionInfo
 from imod.mf6.utilities.grid import create_geometric_grid_info
 from imod.typing import GridDataArray
-import imod
+
 NOT_CONNECTED_VALUE = -999
 
 

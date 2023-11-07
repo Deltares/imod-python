@@ -1,4 +1,5 @@
-from typing import Sequence, TypeAlias, Union
+from typing import Sequence
+
 import numpy as np
 import xarray as xr
 import xugrid as xu
@@ -57,7 +58,8 @@ def merge(objects: Sequence[xr.DataArray], *args, **kwargs) -> xr.Dataset:
     if isinstance(objects[0], xu.UgridDataArray):
         return xu.merge_partitions(objects, *args, **kwargs)
     raise NotImplementedError(f"merging not supported for type {type(objects[0])}")
-    
+
+
 @typedispatch
 def bounding_polygon(active: xr.DataArray):
     """Return bounding polygon of active cells"""

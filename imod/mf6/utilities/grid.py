@@ -6,10 +6,10 @@ import pandas as pd
 import xarray as xr
 import xugrid as xu
 
+import imod
 from imod.typing import GridDataArray
 from imod.typing.grid import zeros_like
 from imod.util import spatial_reference
-import imod
 
 DomainSlice = Dict[str, slice | np.ndarray]
 
