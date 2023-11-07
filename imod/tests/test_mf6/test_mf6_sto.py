@@ -303,6 +303,39 @@ def test_validate_false(sy_layered, convertible):
     )
 
 
+def test_validate_transient_wrong_dtype(sy_layered, convertible):
+    # Wrong dtype for transient
+    times = np.array(["2000-01-01", "2000-01-03"], dtype="datetime64[ns]")
+    transient = xr.DataArray(["False", "True"], {"time": times}, ("time",))
+
+    with pytest.raises(ValidationError):
+        imod.mf6.SpecificStorage(
+            specific_storage=0.0003,
+            specific_yield=sy_layered,
+            transient=transient,
+            convertible=convertible,
+        )
+
+
+def test_validate_transient_wrong_dim(sy_layered, convertible):
+    # Wrong shape for transient
+    times = np.array(["2000-01-01", "2000-01-03"], dtype="datetime64[ns]")
+    transient = xr.DataArray([False, True], {"time": times}, ("time",))
+    # Create boolean DataArray with layer coordinate for broadcasting
+    layer = sy_layered.coords["layer"]
+    boolean_shape = layer == layer
+    # Broadcast
+    transient = transient & boolean_shape
+
+    with pytest.raises(ValidationError):
+        imod.mf6.SpecificStorage(
+            specific_storage=0.0003,
+            specific_yield=sy_layered,
+            transient=transient,
+            convertible=convertible,
+        )
+
+
 def test_wrong_value_ss(sy_layered, convertible, dis):
     sto = imod.mf6.SpecificStorage(
         specific_storage=-0.1,
