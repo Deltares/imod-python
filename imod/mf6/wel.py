@@ -18,13 +18,14 @@ from imod.mf6.boundary_condition import (
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
 from imod.mf6.package import Package
-from imod.mf6.utilities.clip_utilities import clip_by_grid
-from imod.mf6.utilities.dataset_utilities import remove_inactive
+from imod.mf6.utilities.clip import clip_by_grid
+from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
 from imod.schemata import DTypeSchema
 from imod.select.points import points_indices
-from imod.typing.grid import GridDataArray, ones_like
+from imod.typing import GridDataArray
+from imod.typing.grid import ones_like
 from imod.util import values_within_range
 
 
