@@ -304,7 +304,7 @@ def test_validate_false(sy_layered, convertible):
 
 
 def test_validate_transient_wrong_dtype(sy_layered, convertible):
-    # Wrong dtype for transient
+    # Wrong dtype for transient (string instead of bool)
     times = np.array(["2000-01-01", "2000-01-03"], dtype="datetime64[ns]")
     transient = xr.DataArray(["False", "True"], {"time": times}, ("time",))
 
@@ -318,7 +318,7 @@ def test_validate_transient_wrong_dtype(sy_layered, convertible):
 
 
 def test_validate_transient_wrong_dim(sy_layered, convertible):
-    # Wrong shape for transient
+    # Wrong shape for transient {"time", "layer"} instead of {"time",}
     times = np.array(["2000-01-01", "2000-01-03"], dtype="datetime64[ns]")
     transient = xr.DataArray([False, True], {"time": times}, ("time",))
     # Create boolean DataArray with layer coordinate for broadcasting
