@@ -9,9 +9,10 @@ from fastcore.dispatch import typedispatch
 from imod.mf6.interfaces.ilinedatapackage import ILineDataPackage
 from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
-from imod.mf6.utilities.dataset_utilities import get_scalar_variables
-from imod.mf6.utilities.grid_utilities import get_active_domain_slice
-from imod.typing.grid import GridDataArray, ScalarDataset, bounding_polygon
+from imod.mf6.utilities.dataset import get_scalar_variables
+from imod.mf6.utilities.grid import get_active_domain_slice
+from imod.typing import GridDataArray, ScalarDataset
+from imod.typing.grid import bounding_polygon
 
 
 @typedispatch
