@@ -1,11 +1,11 @@
-from typing import Sequence, TypeAlias, Union
+from typing import Sequence
 
 import numpy as np
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
 
-GridDataArray: TypeAlias = Union[xr.DataArray, xu.UgridDataArray]
+from imod.prepare import polygonize
 
 
 @typedispatch
@@ -58,3 +58,17 @@ def merge(objects: Sequence[xr.DataArray], *args, **kwargs) -> xr.Dataset:
     if isinstance(objects[0], xu.UgridDataArray):
         return xu.merge_partitions(objects, *args, **kwargs)
     raise NotImplementedError(f"merging not supported for type {type(objects[0])}")
+
+
+@typedispatch
+def bounding_polygon(active: xr.DataArray):
+    """Return bounding polygon of active cells"""
+    # Force inactive cells to NaN.
+    to_polygonize = active.where(active, other=np.nan)
+    return polygonize(to_polygonize)
+
+
+@typedispatch
+def bounding_polygon(active: xu.UgridDataArray):
+    """Return bounding polygon of active cells"""
+    return active.ugrid.grid.bounding_polygon()

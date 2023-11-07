@@ -101,6 +101,50 @@ def test_to_mf6_creates_mf6_adapter(
 
 
 @pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])
+def test_to_mf6_creates_mf6_adapter(
+    dis,
+    request,
+):
+    barrier_class, barrier_value_name, barrier_value = (
+        HorizontalFlowBarrierResistance,
+        "resistance",
+        1e3,
+    )
+
+    # Arrange
+    idomain, _, _ = request.getfixturevalue(dis)
+
+    print_input = False
+
+    barrier_y = [5.5, 5.5, 5.5]
+    barrier_x = [82.0, 40.0, 0.0]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        data={
+            barrier_value_name: [barrier_value],
+            "ztop": [0.0],
+            "zbottom": [-100.0],
+        },
+    )
+
+    hfb = barrier_class(geometry, print_input)
+
+    # Act
+    if isinstance(idomain, xu.UgridDataArray):
+        idomain_clipped = idomain.ugrid.sel(x=slice(None, 54.0))
+    else:
+        idomain_clipped = idomain.sel(x=slice(None, 54.0))
+
+    hfb_clipped = hfb.regrid_like(idomain_clipped.sel(layer=1))
+
+    # Assert
+    x, y = hfb_clipped.dataset["geometry"].values[0].xy
+    np.testing.assert_allclose(x, [50.0, 40.0, 0.0])
+    np.testing.assert_allclose(y, [5.5, 5.5, 5.5])
+
+
+@pytest.mark.parametrize("dis", ["basic_unstructured_dis", "basic_dis"])
 @pytest.mark.parametrize(
     "barrier_class, barrier_value_name, barrier_value, expected_hydraulic_characteristic",
     [

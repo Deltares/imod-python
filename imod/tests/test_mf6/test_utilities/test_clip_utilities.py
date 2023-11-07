@@ -1,15 +1,37 @@
 from unittest.mock import MagicMock
 
 import geopandas as gpd
+import numpy as np
 import pytest
+import shapely
 import xarray as xr
 import xugrid as xu
+from shapely.testing import assert_geometries_equal
 
 import imod
 from imod.mf6 import HorizontalFlowBarrierResistance
 from imod.mf6.interfaces.ipackagebase import IPackageBase
-from imod.mf6.utilities.clip_utilities import clip_by_grid
-from imod.mf6.utilities.grid_utilities import broadcast_to_full_domain
+from imod.mf6.utilities.clip import clip_by_grid
+from imod.mf6.utilities.grid import broadcast_to_full_domain
+
+
+@pytest.fixture(scope="function")
+def horizontal_flow_barrier():
+    ztop = -5.0
+    zbottom = -135.0
+
+    barrier_y = [70.0, 40.0, 0.0]
+    barrier_x = [120.0, 40.0, 0.0]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [1e3],
+            "ztop": [ztop],
+            "zbottom": [zbottom],
+        },
+    )
+    return HorizontalFlowBarrierResistance(geometry)
 
 
 def test_clip_by_grid_convex_grid(basic_dis):
@@ -95,16 +117,47 @@ def test_clip_by_grid_wrong_grid_type():
         _ = clip_by_grid(pkg, active)
 
 
-def test_clip_by_grid_with_line_data_package(basic_dis):
+def test_clip_by_grid_with_line_data_package__structured(
+    basic_dis, horizontal_flow_barrier
+):
     # Arrange
     idomain, _, _ = basic_dis
-    pkg = HorizontalFlowBarrierResistance(gpd.GeoDataFrame())
-
     active = idomain.sel(layer=1, drop=True)
 
-    # Act/Assert
-    with pytest.raises(NotImplementedError):
-        _ = clip_by_grid(pkg, active)
+    # Act
+    hfb_clipped = clip_by_grid(horizontal_flow_barrier, active)
+
+    # Assert
+    with pytest.raises(AssertionError):
+        assert_geometries_equal(
+            hfb_clipped["geometry"].item(), horizontal_flow_barrier["geometry"].item()
+        )
+
+    x, y = hfb_clipped["geometry"].item().xy
+    np.testing.assert_allclose(x, np.array([90.0, 40.0, 0.0]))
+    np.testing.assert_allclose(y, np.array([58.75, 40.0, 0.0]))
+
+
+def test_clip_by_grid_with_line_data_package__unstructured(
+    basic_dis, horizontal_flow_barrier
+):
+    # Arrange
+    idomain, _, _ = basic_dis
+    active = idomain.sel(layer=1, drop=True)
+    active_uda = xu.UgridDataArray.from_structured(active)
+
+    # Act
+    hfb_clipped = clip_by_grid(horizontal_flow_barrier, active_uda)
+
+    # Assert
+    with pytest.raises(AssertionError):
+        assert_geometries_equal(
+            hfb_clipped["geometry"].item(), horizontal_flow_barrier["geometry"].item()
+        )
+
+    x, y = hfb_clipped["geometry"].item().xy
+    np.testing.assert_allclose(x, np.array([90.0, 40.0, 0.0]))
+    np.testing.assert_allclose(y, np.array([58.75, 40.0, 0.0]))
 
 
 def test_clip_by_grid__structured_grid_full(

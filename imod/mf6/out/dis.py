@@ -179,7 +179,10 @@ def open_imeth1_budgets(
 
 
 def open_imeth6_budgets(
-    cbc_path: FilePath, grb_content: dict, header_list: List[cbc.Imeth6Header]
+    cbc_path: FilePath,
+    grb_content: dict,
+    header_list: List[cbc.Imeth6Header],
+    return_variable: str = "budget",
 ) -> xr.DataArray:
     """
     Open the data for an imeth==6 budget section.
@@ -210,7 +213,7 @@ def open_imeth6_budgets(
     for i, header in enumerate(header_list):
         time[i] = header.totim
         a = dask.delayed(cbc.read_imeth6_budgets_dense)(
-            cbc_path, header.nlist, dtype, header.pos, size, shape
+            cbc_path, header.nlist, dtype, header.pos, size, shape, return_variable
         )
         x = dask.array.from_delayed(a, shape=shape, dtype=np.float64)
         dask_list.append(x)
@@ -412,9 +415,17 @@ def open_cbc(
                     cbc_path, grb_content, header_list
                 )
             elif isinstance(header_list[0], cbc.Imeth6Header):
-                cbc_content[key] = open_imeth6_budgets(
-                    cbc_path, grb_content, header_list
-                )
+                # for non cell flow budget terms, use auxiliary variables as return value
+                if header_list[0].text.startswith("data-"):
+                    for return_variable in header_list[0].auxtxt:
+                        key_aux = header_list[0].txt2id1 + "-" + return_variable
+                        cbc_content[key_aux] = open_imeth6_budgets(
+                            cbc_path, grb_content, header_list, return_variable
+                        )
+                else:
+                    cbc_content[key] = open_imeth6_budgets(
+                        cbc_path, grb_content, header_list
+                    )
 
     return cbc_content
 

@@ -19,7 +19,7 @@ import xarray as xr
 from example_models import create_hondsrug_simulation
 
 import imod
-from imod.typing.grid import GridDataArray
+from imod.typing import GridDataArray
 
 # %%
 # Obtain the simulation, write it, run it, and plot some heads.
