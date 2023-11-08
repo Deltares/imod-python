@@ -12,7 +12,7 @@ from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.dataset import get_scalar_variables
 from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.typing import GridDataArray, ScalarDataset
-from imod.typing.grid import bounding_polygon
+from imod.typing.grid import bounding_polygon, is_spatial_2D
 
 
 @typedispatch
@@ -95,11 +95,12 @@ def _filter_inactive_cells(package, active):
     package_vars = package.dataset.data_vars
     for var in package_vars:
         if package_vars[var].shape != ():
-            if np.issubdtype(package.dataset[var].dtype, np.integer):
-                other = 0
-            else:
-                other = np.nan
-            package.dataset[var] = package.dataset[var].where(active > 0, other=other)
+            if is_spatial_2D(package.dataset[var]):
+                if np.issubdtype(package.dataset[var].dtype, np.integer):
+                    other = 0
+                else:
+                    other = np.nan
+                package.dataset[var] = package.dataset[var].where(active > 0, other=other)
 
 
 @typedispatch

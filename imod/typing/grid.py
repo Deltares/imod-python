@@ -72,3 +72,16 @@ def bounding_polygon(active: xr.DataArray):
 def bounding_polygon(active: xu.UgridDataArray):
     """Return bounding polygon of active cells"""
     return active.ugrid.grid.bounding_polygon()
+
+@typedispatch
+def is_spatial_2D(array: xr.DataArray)-> bool:
+    """Return True if the array contains data in at least 2 spatial dimensions"""    
+    coords = array.coords
+    return "x" in coords and "y" in coords
+ 
+
+@typedispatch
+def is_spatial_2D(array: xu.UgridDataArray)-> bool:
+    """Return True if the array contains data associated to cell faces"""     
+    coords = array.coords
+    return "mesh2d_nFaces"  in coords

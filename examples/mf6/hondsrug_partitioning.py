@@ -7,6 +7,10 @@ from example_models import create_hondsrug_simulation
 import imod
 from imod.typing import GridDataArray
 
+from imod.mf6.partitioned_simulation_postprocessing import (
+    merge_balances,
+    merge_heads,
+)
 # %%
 # Obtain the simulation, write it, run it, and plot some heads.
 # There is a separate example contained in
@@ -18,16 +22,16 @@ modeldir =  imod.util.temporary_directory()
 original_modeldir = modeldir / "original"
 
 gwf_simulation.write(original_modeldir, False, False)
-if False:
-    gwf_simulation.run()
-    hds_original = imod.mf6.open_hds(
-        original_modeldir / "GWF_1" / "GWF_1.hds",
-        original_modeldir / "GWF_1" / "dis.dis.grb",
-    )
 
-    fig, ax = plt.subplots()
-    hds_original.sel(layer=3).isel(time=6).plot(ax=ax)
+gwf_simulation.run()
+hds_original = imod.mf6.open_hds(
+    original_modeldir / "GWF_1" / "GWF_1.hds",
+    original_modeldir / "GWF_1" / "dis.dis.grb",
+)
 
+fig, ax = plt.subplots()
+hds_original.sel(layer=3).isel(time=6).plot(ax=ax)
+ax.set_title("hondsrug original ")
 # %%
 # Create the target grid we will regrid to.
 idomain = gwf_simulation["GWF_1"]["dis"]["idomain"]
@@ -43,13 +47,25 @@ split_simulation =gwf_simulation.split(submodel_labels)
 split_simulation.write(modeldir, False, False)
 split_simulation.run()
 
-hds_split = imod.mf6.open_hds(
-    modeldir / "GWF_1" / "GWF_1.hds",
-    modeldir / "GWF_1" / "dis.dis.grb",
-)
+hds_split = merge_heads(modeldir, split_simulation)
+
 fig, ax = plt.subplots()
 hds_split.sel(layer=3).isel(time=6).plot(ax=ax)
+ax.set_title("hondsrug partitioned ")
 
+diff = hds_split - hds_original
+fig, ax = plt.subplots()
+diff.sel(layer=3).isel(time=6).plot(ax=ax)
+ax.set_title("hondsrug diff ")
 
+diff_for_plot = diff.max(dim= ["time", "layer"])
+fig, ax = plt.subplots()
+diff_for_plot.plot(ax=ax)
+ax.set_title("hondsrug diff ")
+
+maxdiff = diff.max()
+print("_---------------------_")
+print(maxdiff)
+pass
 
 
