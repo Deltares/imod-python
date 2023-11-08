@@ -547,7 +547,7 @@ class Modflow6Simulation(collections.UserDict):
             domain_2 = self[modelname_2].domain
 
             layer = ex.dataset["layer"] - 1
-            id_1 = ex.dataset["cell_id1"] - 1            
+            id_1 = ex.dataset["cell_id1"] - 1
             if is_unstructured(domain_1):
                 exchange_cells_1 = {
                     "layer": layer,
@@ -568,7 +568,7 @@ class Modflow6Simulation(collections.UserDict):
 
             layer = ex.dataset["layer"] - 1
             id_2 = ex.dataset["cell_id2"] - 1
-            if is_unstructured(domain_1):            
+            if is_unstructured(domain_1):
                 exchange_cells_2 = {
                     "layer": layer,
                     "mesh2d_nFaces": id_2,
@@ -579,8 +579,8 @@ class Modflow6Simulation(collections.UserDict):
                     "y": id_2.sel({"cell_dims2": "row_2"}),
                     "x": id_2.sel({"cell_dims2": "column_2"}),
                 }
-            exchange_domain_2 = domain_2.isel(exchange_cells_2)       
-                     
+            exchange_domain_2 = domain_2.isel(exchange_cells_2)
+
             active_exchange_domain_2 = exchange_domain_2.where(
                 exchange_domain_2.values > 0
             )
