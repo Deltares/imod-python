@@ -135,7 +135,7 @@ def test_partitioning_structured_with_inactive_cells(
         if not isinstance(package, Well):
             for arrayname in package.dataset.keys():
                 if "x" in package[arrayname].coords:
-                    if np.issubdtype(package[arrayname].dtype, np.float):
+                    if np.issubdtype(package[arrayname].dtype, float):
                         package[arrayname].loc[
                             {"x": 32500, "y": slice(67500, 7500)}
                         ] = np.nan
@@ -185,7 +185,7 @@ def test_partitioning_structured_with_vpt_cells(
         if not isinstance(package, Well):
             for arrayname in package.dataset.keys():
                 if "x" in package[arrayname].coords:
-                    if np.issubdtype(package[arrayname].dtype, np.float):
+                    if np.issubdtype(package[arrayname].dtype, float):
                         package[arrayname].loc[
                             {"x": 32500, "y": slice(67500, 7500)}
                         ] = np.nan
