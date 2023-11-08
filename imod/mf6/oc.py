@@ -10,11 +10,11 @@ from imod.mf6.utilities.dataset import is_dataarray_none
 from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema
 
-OUTPUT_EXT_MAPPING = dict(
-    ("head", "hds"),
-    ("concentration", "ucn"),
-    ("budget", "cbc"),
-)
+OUTPUT_EXT_MAPPING = {
+    "head": "hds",
+    "concentration": "ucn",
+    "budget": "cbc",
+}
 
 
 class OutputControl(Package):
