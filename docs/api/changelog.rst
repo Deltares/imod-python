@@ -43,6 +43,9 @@ Added
 - Functions :function:`get_upper_active_grid_cells` and
   :function:`get_lower_active_grid_cells` to return boolean grids designating
   respectively the highest and lowest active cells in a grid.
+- validation of ``transient`` argument in :class:`imod.mf6.StorageCoefficient`
+  and :class:`imod.mf6.SpecificStorage`.
+
 
 Removed
 ~~~~~~~
