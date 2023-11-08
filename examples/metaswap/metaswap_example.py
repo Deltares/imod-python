@@ -205,7 +205,7 @@ times
 # path to MetaSWAP's soil physical database, which contains the lookup table
 # with the soil physical relationships. Without access to this database MetaSWAP
 # cannot function. `The full database can be downloaded here.
-# <http://www.nhi.nu/nl/index.php/data/nhi-lhm/invoer/onverzadigde-zone/>`_
+# <https://download.deltares.nl/metaswap>`_
 
 msw_model = msw.MetaSwapModel(unsaturated_database="./path/to/unsaturated/database")
 
@@ -284,7 +284,7 @@ landuse
 # Define soil type classes. These will be looked up in MetaSWAP's giant lookup
 # table for the national Staring series describing Dutch soils. `The full
 # database can be downloaded here.
-# <http://www.nhi.nu/nl/index.php/data/nhi-lhm/invoer/onverzadigde-zone/>` In
+# <https://download.deltares.nl/metaswap>` In
 # previous examples we set values in our DataArray using numpy indexing. But we
 # can also use xarray's ``where()`` method to set values.
 
