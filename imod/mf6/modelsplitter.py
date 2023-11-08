@@ -6,7 +6,7 @@ from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.typing import GridDataArray
-from imod.typing.grid import ones_like
+from imod.typing.grid import ones_like, is_unstructured
 
 
 class PartitionInfo(NamedTuple):
@@ -61,19 +61,27 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
     :func:`imod.mf6.modelsplitter.create_domain_slices` function.
     """
     new_model = GroundwaterFlowModel(**model._options)
+    if is_unstructured(model.domain):
+        sliced_domain_layered = partition_info.active_domain.sel(        
+            domain_slice2d
+        ).broadcast_like(model.domain.layer)  
+    else:
+        domain_slice2d = get_active_domain_slice(partition_info.active_domain)
+        sliced_domain_layered = partition_info.active_domain.sel(
+            domain_slice2d
+        ).broadcast_like(model.domain.layer)
 
-    domain_slice2d = get_active_domain_slice(partition_info.active_domain)
-    sliced_domain_layered = partition_info.active_domain.sel(
-        domain_slice2d
-    ).broadcast_like(model.domain.layer)
     sliced_bottom = model.bottom
     if "dx" in sliced_domain_layered.coords:
         sliced_domain_layered = sliced_domain_layered.drop_vars("dx")
     if "dy" in sliced_domain_layered.coords:
         sliced_domain_layered = sliced_domain_layered.drop_vars("dy")
-    new_idomain = model.domain.sel(sliced_domain_layered.coords).where(
-        sliced_domain_layered, other=0
-    )
+    if is_unstructured(model.domain):
+        new_idomain = sliced_domain_layered
+    else:
+        new_idomain = model.domain.sel(sliced_domain_layered.coords).where(
+            sliced_domain_layered, other=0
+        )
 
     for pkg_name, package in model.items():
         sliced_package = clip_by_grid(package, partition_info.active_domain)
