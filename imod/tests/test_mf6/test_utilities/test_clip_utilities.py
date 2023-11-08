@@ -70,7 +70,7 @@ def test_clip_by_grid_concave_grid(basic_dis):
     active = idomain.sel(layer=1, drop=True)
     active = active.where((active.x > x_start_cut) & (active.y > y_start_cut), -1)
     active = active * -1
-    active = active.where(active > 0, 0) 
+    active = active.where(active > 0, 0)
 
     # Act
     clipped_pkg = clip_by_grid(pkg, active)

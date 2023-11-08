@@ -71,7 +71,9 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
         sliced_domain_layered = sliced_domain_layered.drop_vars("dx")
     if "dy" in sliced_domain_layered.coords:
         sliced_domain_layered = sliced_domain_layered.drop_vars("dy")
-    new_idomain = model.domain.sel(sliced_domain_layered.coords).where(sliced_domain_layered, other = 0)
+    new_idomain = model.domain.sel(sliced_domain_layered.coords).where(
+        sliced_domain_layered, other=0
+    )
 
     for pkg_name, package in model.items():
         sliced_package = clip_by_grid(package, partition_info.active_domain)

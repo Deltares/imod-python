@@ -11,6 +11,7 @@ from imod.mf6.partitioned_simulation_postprocessing import (
     merge_balances,
     merge_heads,
 )
+
 # %%
 # Obtain the simulation, write it, run it, and plot some heads.
 # There is a separate example contained in
@@ -18,7 +19,7 @@ from imod.mf6.partitioned_simulation_postprocessing import (
 # that you should look at if you are interested in the model building
 gwf_simulation = create_hondsrug_simulation()
 
-modeldir =  imod.util.temporary_directory()
+modeldir = imod.util.temporary_directory()
 original_modeldir = modeldir / "original"
 
 gwf_simulation.write(original_modeldir, False, False)
@@ -37,13 +38,13 @@ ax.set_title("hondsrug original ")
 idomain = gwf_simulation["GWF_1"]["dis"]["idomain"]
 
 
-#create label array
+# create label array
 submodel_labels = xr.zeros_like(idomain.isel(layer=0))
-submodel_labels[100:,:] = 1
-submodel_labels[:,250:] = 2
-submodel_labels[100:,250:] = 3
+submodel_labels[100:, :] = 1
+submodel_labels[:, 250:] = 2
+submodel_labels[100:, 250:] = 3
 
-split_simulation =gwf_simulation.split(submodel_labels)
+split_simulation = gwf_simulation.split(submodel_labels)
 split_simulation.write(modeldir, False, False)
 split_simulation.run()
 
@@ -58,7 +59,7 @@ fig, ax = plt.subplots()
 diff.sel(layer=3).isel(time=6).plot(ax=ax)
 ax.set_title("hondsrug diff ")
 
-diff_for_plot = diff.max(dim= ["time", "layer"])
+diff_for_plot = diff.max(dim=["time", "layer"])
 fig, ax = plt.subplots()
 diff_for_plot.plot(ax=ax)
 ax.set_title("hondsrug diff ")
@@ -67,5 +68,3 @@ maxdiff = diff.max()
 print("_---------------------_")
 print(maxdiff)
 pass
-
-

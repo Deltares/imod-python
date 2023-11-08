@@ -488,7 +488,7 @@ class Modflow6Simulation(collections.UserDict):
             list(get_models(new_simulation).keys())
         )
         new_simulation._add_modelsplit_exchanges(exchanges)
-
+        new_simulation._filter_inactive_cells_from_exchanges()
         return new_simulation
 
     def regrid_like(
@@ -539,35 +539,39 @@ class Modflow6Simulation(collections.UserDict):
             self["split_exchanges"] = []
         self["split_exchanges"].extend(exchanges_list)
 
+    def _filter_inactive_cells_from_exchanges(self):
         for ex in self["split_exchanges"]:
-            filter = []
             modelname_1 = ex["model_name_1"].values[()]
-            modelname_2 = ex["model_name_2"].values[()]  
+            modelname_2 = ex["model_name_2"].values[()]
             domain_1 = self[modelname_1].domain
             domain_2 = self[modelname_2].domain
+
             if is_unstructured(domain_1):
-               return
-            layer = ex.dataset["layer"]
-            id_1 = ex.dataset["cell_id1"]
-            for l in range ( len(layer.values)):
-                lay = layer[l].values[()] -1
-                row = id_1[l].values[0] -1
-                col = id_1[l].values[1] -1
-                if domain_1.isel(layer=lay,y= row, x=col).values[()] > 0:
-                    filter.append(ex.dataset["index"][l].values[()])
-            ex.dataset =  ex.dataset.sel(index=filter)
-            filter=[]
-            layer = ex.dataset["layer"]            
-            id_2 = ex.dataset["cell_id2"]            
-            for l in range ( len(layer.values)):
-                lay = layer[l].values[()] -1
-                row = id_2[l].values[0] -1
-                col = id_2[l].values[1] -1
-                if domain_2.isel(layer=lay,y= row, x=col).values[()] > 0:
-                    filter.append(ex.dataset["index"][l].values[()])
-                else:
-                    print(f"dropped {l}")
-            ex.dataset =  ex.dataset.sel(index=filter)            
-            pass
+                return
+            layer = ex.dataset["layer"] - 1
+            id_1 = ex.dataset["cell_id1"] - 1
+            indexing = {
+                "layer": layer,
+                "y": id_1.sel({"cell_dims1": "row_1"}),
+                "x": id_1.sel({"cell_dims1": "column_1"}),
+            }
+            exchange_domain_1 = domain_1.isel(indexing)
+            active_exchange_domain_1 = exchange_domain_1.where(
+                exchange_domain_1.values > 0
+            )
+            active_exchange_domain_1 = active_exchange_domain_1.dropna("index")
+            ex.dataset = ex.dataset.sel(index=active_exchange_domain_1["index"])
 
-
+            layer = ex.dataset["layer"] - 1
+            id_2 = ex.dataset["cell_id2"] - 1
+            indexing = {
+                "layer": layer,
+                "y": id_2.sel({"cell_dims2": "row_2"}),
+                "x": id_2.sel({"cell_dims2": "column_2"}),
+            }
+            exchange_domain_2 = domain_2.isel(indexing)
+            active_exchange_domain_2 = exchange_domain_2.where(
+                exchange_domain_2.values > 0
+            )
+            active_exchange_domain_2 = active_exchange_domain_2.dropna("index")
+            ex.dataset = ex.dataset.sel(index=active_exchange_domain_2["index"])

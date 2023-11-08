@@ -100,7 +100,9 @@ def _filter_inactive_cells(package, active):
                     other = 0
                 else:
                     other = np.nan
-                package.dataset[var] = package.dataset[var].where(active > 0, other=other)
+                package.dataset[var] = package.dataset[var].where(
+                    active > 0, other=other
+                )
 
 
 @typedispatch

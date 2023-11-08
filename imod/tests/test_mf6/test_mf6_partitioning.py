@@ -12,6 +12,7 @@ from imod.typing.grid import zeros_like
 
 from imod.mf6.wel import Well
 
+
 def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArray]:
     result = {}
     diagonal_submodel_labels_1 = zeros_like(idomain_top)
@@ -130,19 +131,23 @@ def test_partitioning_structured_with_inactive_cells(
 ):
     simulation = transient_twri_model
     idomain = simulation["GWF_1"].domain
-    idomain.loc[{"x":32500 ,"y": slice(67500,7500)}] = 0  
+    idomain.loc[{"x": 32500, "y": slice(67500, 7500)}] = 0
     for name, package in simulation["GWF_1"].items():
         if not isinstance(package, Well):
             for arrayname in package.dataset.keys():
                 if "x" in package[arrayname].coords:
-                    if np.issubdtype(package[arrayname].dtype,  np.float):
-                        package[arrayname].loc[{"x":32500 ,"y": slice(67500,7500)}] =np.nan  
+                    if np.issubdtype(package[arrayname].dtype, np.float):
+                        package[arrayname].loc[
+                            {"x": 32500, "y": slice(67500, 7500)}
+                        ] = np.nan
                     else:
-                        package[arrayname].loc[{"x":32500 ,"y": slice(67500,7500)}] =0
+                        package[arrayname].loc[
+                            {"x": 32500, "y": slice(67500, 7500)}
+                        ] = 0
     # run the original example, so without partitioning, and save the simulation results
     orig_dir = tmp_path / "original"
-    simulation.write(orig_dir, binary=False)   
-   
+    simulation.write(orig_dir, binary=False)
+
     simulation.run()
 
     orig_head = imod.mf6.open_hds(
@@ -165,7 +170,6 @@ def test_partitioning_structured_with_inactive_cells(
     np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-4, atol=1e-4)
 
 
-
 @pytest.mark.usefixtures("transient_twri_model")
 @pytest.mark.parametrize(
     "partition_name",
@@ -176,21 +180,25 @@ def test_partitioning_structured_with_vpt_cells(
 ):
     simulation = transient_twri_model
     idomain = simulation["GWF_1"].domain
-    idomain.loc[{"x":32500 ,"y": slice(67500,7500)}] = -1  
+    idomain.loc[{"x": 32500, "y": slice(67500, 7500)}] = -1
 
     for name, package in simulation["GWF_1"].items():
         if not isinstance(package, Well):
             for arrayname in package.dataset.keys():
                 if "x" in package[arrayname].coords:
-                    if np.issubdtype(package[arrayname].dtype,  np.float):
-                        package[arrayname].loc[{"x":32500 ,"y": slice(67500,7500)}] =np.nan  
+                    if np.issubdtype(package[arrayname].dtype, np.float):
+                        package[arrayname].loc[
+                            {"x": 32500, "y": slice(67500, 7500)}
+                        ] = np.nan
                     else:
-                        package[arrayname].loc[{"x":32500 ,"y": slice(67500,7500)}] =-1
-              
+                        package[arrayname].loc[
+                            {"x": 32500, "y": slice(67500, 7500)}
+                        ] = -1
+
     # run the original example, so without partitioning, and save the simulation results
     orig_dir = tmp_path / "original"
-    simulation.write(orig_dir, binary=False)   
-   
+    simulation.write(orig_dir, binary=False)
+
     simulation.run()
 
     orig_head = imod.mf6.open_hds(
