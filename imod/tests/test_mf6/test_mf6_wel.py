@@ -170,6 +170,11 @@ def test_clip_box__high_lvl_transient(well_high_lvl_test_data_transient):
 
     # Test clipping with specified time
     timestr = "2000-01-03"
+    ds = wel.clip_box(time_min=timestr).dataset
+    assert dict(ds.dims) == {"index": 8, "time": 3, "species": 2}
+
+    # Test clipping with specified time and spatial dimensions
+    timestr = "2000-01-03"
     ds = wel.clip_box(x_min=52.0, x_max=76.0, y_max=67.0, time_min=timestr).dataset
     assert dict(ds.dims) == {"index": 3, "time": 3, "species": 2}
 
