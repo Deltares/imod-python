@@ -201,8 +201,10 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         ds = new.dataset
 
+        # Initiate array of True with right shape to deal with case no spatial
+        # selection needs to be done.
+        in_bounds = np.full(ds.dims["index"], True)
         # Select all variables along "index" dimension
-        in_bounds = np.array([True] * ds.index.size)
         in_bounds &= values_within_range(ds["x"], x_min, x_max)
         in_bounds &= values_within_range(ds["y"], y_min, y_max)
         in_bounds &= values_within_range(ds["screen_top"], None, z_max)
