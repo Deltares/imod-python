@@ -17,6 +17,7 @@ from .fixtures.mf6_circle_fixture import (
     circle_model_evt,
     circle_result,
     circle_result_evt,
+    circle_result_sto,
 )
 from .fixtures.mf6_flow_with_transport_fixture import (
     bulk_density_fc,
