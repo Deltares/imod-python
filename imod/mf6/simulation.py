@@ -277,26 +277,44 @@ class Modflow6Simulation(collections.UserDict):
                     f"{result.returncode}, and error message:\n\n{result.stdout.decode()} "
                 )
 
-    def open_head(self) -> GridDataArray:
+    def open_head(self, dry_nan: bool = False) -> GridDataArray:
         """
-        Open heads of finished simulation, requires that the ``run`` method
-        has been called.
-        """
-        return self._open_output("head")
+        Open heads of finished simulation, requires that the ``run`` method has
+        been called.
 
-    def open_budget(self) -> GridDataset:
-        """Open budgets of finished simulation, requires that the ``run`` method
-        has been called.
+        Parameters
+        ----------
+        dry_nan: bool, default value: False.
+            Whether to convert dry values to NaN.
         """
-        return self._open_output("budget")
+        return self._open_output("head", dry_nan=dry_nan)
 
-    def open_concentration(self) -> GridDataArray:
-        """Open concentration of finished simulation, requires that the ``run`` method
-        has been called.
+    def open_budget(self, flowja: bool = False) -> GridDataset:
         """
-        return self._open_output("concentration")
+        Open budgets of finished simulation, requires that the ``run`` method
+        has been called.
 
-    def _open_output(self, output: str, **kwargs) -> GridDataArray | GridDataset:
+        Parameters
+        ----------
+        flowja: bool, default value: False
+            Whether to return the flow-ja-face values "as is" (``True``) or in a
+            grid form (``False``).
+        """
+        return self._open_output("budget", flowja=flowja)
+
+    def open_concentration(self, dry_nan: bool = False) -> GridDataArray:
+        """
+        Open concentration of finished simulation, requires that the ``run``
+        method has been called.
+
+        Parameters
+        ----------
+        dry_nan: bool, default value: False.
+            Whether to convert dry values to NaN.
+        """
+        return self._open_output("concentration", dry_nan=dry_nan)
+
+    def _open_output(self, output: str, **settings) -> GridDataArray | GridDataset:
         """
         Opens output of one or multiple models.
 
@@ -304,19 +322,27 @@ class Modflow6Simulation(collections.UserDict):
         ----------
         output: str
             Output variable name to open
+        **settings:
+            Extra settings that need to be passed through to the respective
+            output function.
         """
         _, modeltype = OUTPUT_FUNC_MAPPING[output]
         modelnames = self.get_models_of_type(modeltype.model_id())
-        if len(modelnames) > 1:
-            # This is
+        if len(modelnames) == 0:
+            raise ValueError(
+                f"Could not find any models of appropriate type for {output}, "
+                f"make sure a model of type {modeltype} is assigned to simulation."
+            )
+        elif len(modelnames) == 1:
+            return self._open_output_single_model(modelnames[0], output, **settings)
+        else:
+            # TODO: This is the place where merging of partioned heads can be implemented.
             raise NotImplementedError(
                 "Reading output from partioned models not yet supported by this method."
             )
-        else:
-            return self._open_output_single_model(modelnames[0], output, **kwargs)
 
     def _open_output_single_model(
-        self, modelname: str, output: str, **kwargs
+        self, modelname: str, output: str, **settings
     ) -> GridDataArray | GridDataset:
         """
         Opens output of single model
@@ -326,7 +352,10 @@ class Modflow6Simulation(collections.UserDict):
         modelname: str
             Name of groundwater model from which output should be read.
         output: str
-            Output variable name to open
+            Output variable name to open.
+        **settings:
+            Extra settings that need to be passed through to the respective
+            output function.
         """
         open_func, expected_modeltype = OUTPUT_FUNC_MAPPING[output]
 
@@ -352,7 +381,7 @@ class Modflow6Simulation(collections.UserDict):
                 f"Could not find output in {output_path}, check if you already ran simulation {self.name}"
             )
 
-        return open_func(output_path, grb_path, **kwargs)
+        return open_func(output_path, grb_path, **settings)
 
     def dump(
         self, directory=".", validate: bool = True, mdal_compliant: bool = False
