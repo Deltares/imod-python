@@ -362,18 +362,18 @@ class Modflow6Simulation(collections.UserDict):
         if self.directory is None:
             raise RuntimeError(f"Simulation {self.name} has not been written yet.")
         # Get model
-        gwf_model = self[modelname]
-        if not isinstance(gwf_model, expected_modeltype):
+        model = self[modelname]
+        if not isinstance(model, expected_modeltype):
             raise TypeError(
-                f"{modelname} not a {expected_modeltype}, instead got {type(gwf_model)}"
+                f"{modelname} not a {expected_modeltype}, instead got {type(model)}"
             )
         # Get output file path
-        oc_key = gwf_model._get_pkgkey["oc"]
-        oc_pkg = gwf_model[oc_key]
+        oc_key = model._get_pkgkey["oc"]
+        oc_pkg = model[oc_key]
         output_path = oc_pkg._get_output_filepath(self.directory, "head")
         # Get grb path
-        diskey = gwf_model.__get_diskey()
-        dis_id = gwf_model[diskey]._pkg_id
+        diskey = model.__get_diskey()
+        dis_id = model[diskey]._pkg_id
         grb_path = self.directory / modelname / f"{diskey}.{dis_id}.grb"
 
         if not output_path.exists():
