@@ -6,7 +6,7 @@ from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.typing import GridDataArray
-from imod.typing.grid import ones_like, is_unstructured
+from imod.typing.grid import is_unstructured, ones_like
 
 
 class PartitionInfo(NamedTuple):
@@ -61,10 +61,11 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
     :func:`imod.mf6.modelsplitter.create_domain_slices` function.
     """
     new_model = GroundwaterFlowModel(**model._options)
+    domain_slice2d = get_active_domain_slice(partition_info.active_domain)
     if is_unstructured(model.domain):
-        sliced_domain_layered = partition_info.active_domain.sel(        
-            domain_slice2d
-        ).broadcast_like(model.domain.layer)  
+        sliced_domain_layered = model.domain.sel(domain_slice2d).broadcast_like(
+            model.domain.layer
+        )
     else:
         domain_slice2d = get_active_domain_slice(partition_info.active_domain)
         sliced_domain_layered = partition_info.active_domain.sel(
