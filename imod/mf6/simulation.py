@@ -277,40 +277,57 @@ class Modflow6Simulation(collections.UserDict):
                     f"{result.returncode}, and error message:\n\n{result.stdout.decode()} "
                 )
 
-    def open_head(self, modelname) -> GridDataArray:
+    def open_head(self) -> GridDataArray:
         """
-        Open heads of a groundwater flow model in this simulation
+        Open heads of finished simulation, requires that the ``run`` method
+        has been called.
+        """
+        return self._open_output("head")
+
+    def open_budget(self) -> GridDataset:
+        """Open budgets of finished simulation, requires that the ``run`` method
+        has been called.
+        """
+        return self._open_output("budget")
+
+    def open_concentration(self) -> GridDataArray:
+        """Open concentration of finished simulation, requires that the ``run`` method
+        has been called.
+        """
+        return self._open_output("concentration")
+
+    def _open_output(self, output: str, **kwargs) -> GridDataArray | GridDataset:
+        """
+        Opens output of one or multiple models.
+
+        Parameters
+        ----------
+        output: str
+            Output variable name to open
+        """
+        _, modeltype = OUTPUT_FUNC_MAPPING[output]
+        modelnames = self.get_models_of_type(modeltype.model_id())
+        if len(modelnames) > 1:
+            # This is
+            raise NotImplementedError(
+                "Reading output from partioned models not yet supported by this method."
+            )
+        else:
+            return self._open_output_single_model(modelnames[0], output, **kwargs)
+
+    def _open_output_single_model(
+        self, modelname: str, output: str, **kwargs
+    ) -> GridDataArray | GridDataset:
+        """
+        Opens output of single model
 
         Parameters
         ----------
         modelname: str
-            Name of groundwater model from which heads should be read.
+            Name of groundwater model from which output should be read.
+        output: str
+            Output variable name to open
         """
-        return self._open_output(modelname, "head")
-
-    def open_budget(self, modelname) -> GridDataset:
-        """
-        Open budgets of a groundwater flow model in this simulation
-
-        Parameters
-        ----------
-        modelname: str
-            Name of groundwater model from which budgets should be read.
-        """
-        return self._open_output(modelname, "budget")
-
-    def open_concentration(self, modelname) -> GridDataArray:
-        """
-        Open concentration of a groundwater transport model in this simulation
-
-        Parameters
-        ----------
-        modelname: str
-            Name of groundwater model from which concentration should be read.
-        """
-        return self._open_output(modelname, "concentration")
-
-    def _open_output(self, modelname, output, **kwargs) -> GridDataArray:
         open_func, expected_modeltype = OUTPUT_FUNC_MAPPING[output]
 
         if self.directory is None:
@@ -321,7 +338,7 @@ class Modflow6Simulation(collections.UserDict):
             raise TypeError(
                 f"{modelname} not a {expected_modeltype}, instead got {type(gwf_model)}"
             )
-        # Get head file path
+        # Get output file path
         oc_key = gwf_model._get_pkgkey["oc"]
         oc_pkg = gwf_model[oc_key]
         output_path = oc_pkg._get_output_filepath(self.directory, "head")
