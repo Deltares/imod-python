@@ -48,10 +48,14 @@ Added
 - validation of ``transient`` argument in :class:`imod.mf6.StorageCoefficient`
   and :class:`imod.mf6.SpecificStorage`.
 
-
 Removed
 ~~~~~~~
 - Tox has been removed from the project.
+- Dropped support for writing .qgs files directly for QGIS, as this was hard to
+  maintain and rarely used. To export your model to QGIS readable files, call
+  the ``dump`` method :class:`imod.mf6.Simulation` with ``mdal_compliant=True``.
+  These writes UGRID NetCDFs which can read as meshes in QGIS.
+- Removed ``declxml`` from repository.
 
 [0.14.1] - 2023-09-07
 ---------------------
