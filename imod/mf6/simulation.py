@@ -389,7 +389,9 @@ class Modflow6Simulation(collections.UserDict):
         """
         return self._open_output("budget", flowja=flowja)
 
-    def open_concentration(self, dry_nan: bool = False) -> GridDataArray:
+    def open_concentration(
+        self, species_ls=None, dry_nan: bool = False
+    ) -> GridDataArray:
         """
         Open concentration of finished simulation, requires that the ``run``
         method has been called.
@@ -401,6 +403,11 @@ class Modflow6Simulation(collections.UserDict):
 
         Parameters
         ----------
+        species_ls: list, default value: None.
+            List of species, which will be used to concatenate the
+            concentrations along the ``"species"`` dimension, in case the
+            simulation has multiple species and thus multiple transport models.
+            If None, transport model names will be used as species names.
         dry_nan: bool, default value: False.
             Whether to convert dry values to NaN.
 
@@ -419,7 +426,9 @@ class Modflow6Simulation(collections.UserDict):
 
         >>> concentration = simulation.open_concentration()
         """
-        return self._open_output("concentration", dry_nan=dry_nan)
+        return self._open_output(
+            "concentration", species_ls=species_ls, dry_nan=dry_nan
+        )
 
     def _open_output(self, output: str, **settings) -> GridDataArray | GridDataset:
         """
@@ -443,6 +452,18 @@ class Modflow6Simulation(collections.UserDict):
         elif len(modelnames) == 1:
             modelname = next(iter(modelnames))
             return self._open_output_single_model(modelname, output, **settings)
+        elif output == "concentration":
+            # Multiple models are possible
+            species_ls = settings.pop("species_ls", None)
+            if species_ls is None:
+                species_ls = modelnames
+            concentrations = []
+            for modelname, species in zip(modelnames, species_ls):
+                conc = self._open_output_single_model(modelname, output, **settings)
+                conc = conc.assign_coords(species=species)
+                concentrations.append(conc)
+            return xr.concat(concentrations, dim="species")
+
         else:
             # TODO: This is the place where merging of partioned heads can be implemented.
             raise NotImplementedError(

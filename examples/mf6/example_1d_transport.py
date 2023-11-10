@@ -212,14 +212,7 @@ simulation.run()
 # %%
 # Open the concentration results and store them in a single DataArray.
 
-concentrations = []
-for species in ["a", "b", "c", "d"]:
-    conc = imod.mf6.out.open_conc(
-        modeldir / f"tpt_{species}/tpt_{species}.ucn",
-        modeldir / "flow/dis.dis.grb",
-    ).assign_coords(species=species)
-    concentrations.append(conc)
-concentration = xr.concat(concentrations, dim="species")
+concentration = simulation.open_concentration(species_ls=["a", "b", "c", "d"])
 
 # %%
 # Visualize the last concentration profiles of the model run for the different
