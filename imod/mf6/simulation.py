@@ -5,6 +5,7 @@ import copy
 import pathlib
 import subprocess
 import warnings
+from pathlib import Path
 from typing import Dict, Optional, Union
 
 import jinja2
@@ -327,14 +328,15 @@ class Modflow6Simulation(collections.UserDict):
             output function.
         """
         _, modeltype = OUTPUT_FUNC_MAPPING[output]
-        modelnames = self.get_models_of_type(modeltype.model_id())
+        modelnames = self.get_models_of_type(modeltype._model_id).keys()
         if len(modelnames) == 0:
             raise ValueError(
                 f"Could not find any models of appropriate type for {output}, "
                 f"make sure a model of type {modeltype} is assigned to simulation."
             )
         elif len(modelnames) == 1:
-            return self._open_output_single_model(modelnames[0], output, **settings)
+            modelname = next(iter(modelnames))
+            return self._open_output_single_model(modelname, output, **settings)
         else:
             # TODO: This is the place where merging of partioned heads can be implemented.
             raise NotImplementedError(
@@ -361,6 +363,8 @@ class Modflow6Simulation(collections.UserDict):
 
         if self.directory is None:
             raise RuntimeError(f"Simulation {self.name} has not been written yet.")
+        model_path = self.directory / modelname
+
         # Get model
         model = self[modelname]
         if not isinstance(model, expected_modeltype):
@@ -368,13 +372,13 @@ class Modflow6Simulation(collections.UserDict):
                 f"{modelname} not a {expected_modeltype}, instead got {type(model)}"
             )
         # Get output file path
-        oc_key = model._get_pkgkey["oc"]
+        oc_key = model._get_pkgkey("oc")
         oc_pkg = model[oc_key]
-        output_path = oc_pkg._get_output_filepath(self.directory, "head")
+        output_path = Path(oc_pkg._get_output_filepath(model_path, output))
         # Get grb path
-        diskey = model.__get_diskey()
+        diskey = model._get_diskey()
         dis_id = model[diskey]._pkg_id
-        grb_path = self.directory / modelname / f"{diskey}.{dis_id}.grb"
+        grb_path = model_path / f"{diskey}.{dis_id}.grb"
 
         if not output_path.exists():
             raise RuntimeError(
