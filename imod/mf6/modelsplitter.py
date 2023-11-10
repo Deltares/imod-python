@@ -73,10 +73,9 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
         ).broadcast_like(model.domain.layer)
 
     sliced_bottom = model.bottom
-    if "dx" in sliced_domain_layered.coords:
-        sliced_domain_layered = sliced_domain_layered.drop_vars("dx")
-    if "dy" in sliced_domain_layered.coords:
-        sliced_domain_layered = sliced_domain_layered.drop_vars("dy")
+    sliced_domain_layered = sliced_domain_layered.drop_vars(
+        ["dx", "dy"], errors="ignore"
+    )
     if is_unstructured(model.domain):
         new_idomain = sliced_domain_layered
     else:
