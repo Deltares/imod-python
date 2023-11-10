@@ -63,25 +63,21 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
     new_model = GroundwaterFlowModel(**model._options)
     domain_slice2d = get_active_domain_slice(partition_info.active_domain)
     if is_unstructured(model.domain):
-        sliced_domain_layered = model.domain.sel(domain_slice2d).broadcast_like(
+        new_idomain = model.domain.sel(domain_slice2d).broadcast_like(
             model.domain.layer
         )
     else:
-        domain_slice2d = get_active_domain_slice(partition_info.active_domain)
         sliced_domain_layered = partition_info.active_domain.sel(
             domain_slice2d
         ).broadcast_like(model.domain.layer)
+        new_idomain = model.domain.sel(sliced_domain_layered.coords).where(
+            sliced_domain_layered, other=0
+        )
 
     sliced_bottom = model.bottom
     sliced_domain_layered = sliced_domain_layered.drop_vars(
         ["dx", "dy"], errors="ignore"
     )
-    if is_unstructured(model.domain):
-        new_idomain = sliced_domain_layered
-    else:
-        new_idomain = model.domain.sel(sliced_domain_layered.coords).where(
-            sliced_domain_layered, other=0
-        )
 
     for pkg_name, package in model.items():
         sliced_package = clip_by_grid(package, partition_info.active_domain)

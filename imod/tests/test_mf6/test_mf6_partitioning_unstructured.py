@@ -11,6 +11,7 @@ from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge
 from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
 
+
 def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArray]:
     result = {}
     two_parts = zeros_like(idomain_top)
@@ -39,9 +40,9 @@ def test_partitioning_unstructured(
     tmp_path: Path, circle_model: Modflow6Simulation, partition_name: str
 ):
     simulation = circle_model
-    #increase the recharge to make the head gradient more pronounced
+    # increase the recharge to make the head gradient more pronounced
     simulation["GWF_1"]["rch"]["rate"] *= 100
-    
+
     # run the original example, so without partitioning, and save the simulation results
     orig_dir = tmp_path / "original"
     simulation.write(orig_dir, binary=False)
@@ -78,7 +79,7 @@ def test_partitioning_unstructured_with_inactive_cells(
 ):
     simulation = circle_model
 
-    #increase the recharge to make the head gradient more pronounced
+    # increase the recharge to make the head gradient more pronounced
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
     idomain = simulation["GWF_1"].domain
@@ -90,7 +91,7 @@ def test_partitioning_unstructured_with_inactive_cells(
                 if "mesh2d_nFaces" in package[arrayname].coords:
                     if np.issubdtype(package[arrayname].dtype, float):
                         package[arrayname].loc[
-                            {"mesh2d_nFaces":inactive_cells}
+                            {"mesh2d_nFaces": inactive_cells}
                         ] = np.nan
                     else:
                         package[arrayname].loc[{"mesh2d_nFaces": inactive_cells}] = 0
@@ -129,7 +130,7 @@ def test_partitioning_unstructured_with_vpt_cells(
 ):
     simulation = circle_model
 
-    #increase the recharge to make the head gradient more pronounced
+    # increase the recharge to make the head gradient more pronounced
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
     idomain = simulation["GWF_1"].domain
