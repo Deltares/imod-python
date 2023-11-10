@@ -83,18 +83,18 @@ def test_partitioning_unstructured_with_inactive_cells(
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
     idomain = simulation["GWF_1"].domain
-    inactive_cells = slice(93, 97)
-    idomain.loc[{"mesh2d_nFaces": inactive_cells}] = 0
+    deactivated_cells = slice(93, 97)
+    idomain.loc[{"mesh2d_nFaces": deactivated_cells}] = 0
     for name, package in simulation["GWF_1"].items():
         if not isinstance(package, Well):
             for arrayname in package.dataset.keys():
                 if "mesh2d_nFaces" in package[arrayname].coords:
                     if np.issubdtype(package[arrayname].dtype, float):
                         package[arrayname].loc[
-                            {"mesh2d_nFaces": inactive_cells}
+                            {"mesh2d_nFaces": deactivated_cells}
                         ] = np.nan
                     else:
-                        package[arrayname].loc[{"mesh2d_nFaces": inactive_cells}] = 0
+                        package[arrayname].loc[{"mesh2d_nFaces": deactivated_cells}] = 0
     # run the original example, so without partitioning, and save the simulation results
     orig_dir = tmp_path / "original"
     simulation.write(orig_dir, binary=False)
