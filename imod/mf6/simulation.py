@@ -442,6 +442,9 @@ class Modflow6Simulation(collections.UserDict):
             Extra settings that need to be passed through to the respective
             output function.
         """
+        # Pop species_ls, set to None in case not found
+        species_ls = settings.pop("species_ls", None)
+
         _, modeltype = OUTPUT_FUNC_MAPPING[output]
         modelnames = self.get_models_of_type(modeltype._model_id).keys()
         if len(modelnames) == 0:
@@ -454,7 +457,6 @@ class Modflow6Simulation(collections.UserDict):
             return self._open_output_single_model(modelname, output, **settings)
         elif output == "concentration":
             # Multiple models are possible
-            species_ls = settings.pop("species_ls", None)
             if species_ls is None:
                 species_ls = modelnames
             concentrations = []
