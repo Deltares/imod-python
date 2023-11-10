@@ -87,5 +87,9 @@ def is_spatial_2D(array: xr.DataArray) -> bool:
 @typedispatch
 def is_spatial_2D(array: xu.UgridDataArray) -> bool:
     """Return True if the array contains data associated to cell faces"""
+    face_dim = array.ugrid.grid.face_dimension
+    dims = array.dims
     coords = array.coords
-    return "mesh2d_nFaces" in coords
+    has_spatial_coords = face_dim in coords
+    has_spatial_dims = face_dim in dims
+    return has_spatial_dims & has_spatial_coords
