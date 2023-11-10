@@ -481,10 +481,8 @@ class Modflow6Simulation(collections.UserDict):
         oc_key = model._get_pkgkey("oc")
         oc_pkg = model[oc_key]
         output_path = Path(oc_pkg._get_output_filepath(model_path, output))
-        # Get grb path
-        diskey = model._get_diskey()
-        dis_id = model[diskey]._pkg_id
-        grb_path = model_path / f"{diskey}.{dis_id}.grb"
+
+        grb_path = self._get_grb_path(modelname)
 
         if not output_path.exists():
             raise RuntimeError(
@@ -492,6 +490,32 @@ class Modflow6Simulation(collections.UserDict):
             )
 
         return open_func(output_path, grb_path, **settings)
+
+    def _get_grb_path(self, modelname):
+        """
+        Finds appropriate grb path belonging to modelname. Grb files are not
+        written for transport models, so this method always returns a path to a
+        flowmodel. In case of a transport model, it finds .
+        """
+        model = self[modelname]
+        # Get grb path
+        if isinstance(model, GroundwaterTransportModel):
+            exchanges = self.get_exchange_relationships()
+            coupled_flow_models = [
+                i[2] for i in exchanges if (i[3] == modelname) & (i[0] == "GWF6-GWT6")
+            ]
+            if len(coupled_flow_models) != 1:
+                raise ValueError(
+                    f"Exactly one flow model must be coupled to transport model {modelname}, got: {coupled_flow_models}"
+                )
+            flow_model_name = coupled_flow_models[0]
+            flow_model_path = self.directory / flow_model_name
+        else:
+            flow_model_path = self.directory / modelname
+
+        diskey = model._get_diskey()
+        dis_id = model[diskey]._pkg_id
+        return flow_model_path / f"{diskey}.{dis_id}.grb"
 
     def dump(
         self, directory=".", validate: bool = True, mdal_compliant: bool = False
