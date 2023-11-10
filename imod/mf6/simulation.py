@@ -319,18 +319,6 @@ class Modflow6Simulation(collections.UserDict):
 
         return simulation
 
-    def write_qgis_project(self, crs, directory=".", aggregate_layers=False):
-        directory = pathlib.Path(directory)
-        directory.mkdir(exist_ok=True, parents=True)
-
-        with imod.util.cd(directory):
-            for key, value in self.items():
-                # skip timedis, exchanges
-                if isinstance(value, Modflow6Model):
-                    value.write_qgis_project(
-                        key, crs, aggregate_layers=aggregate_layers
-                    )
-
     def get_exchange_relationships(self):
         result = []
         flowmodels = self.get_models_of_type("gwf6")
