@@ -77,7 +77,7 @@ def make_circle_model():
     return simulation
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def circle_model():
     return make_circle_model()
 
