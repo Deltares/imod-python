@@ -132,6 +132,9 @@ Fixed
   dimension, but with a layer dimension.
 - :class:`imod.mf6.DiscretizationVertices._validate` threw ``KeyError`` for
   ``"bottom"`` when validating the package separately.
+- Bug in :class:`imod.mf6.SourceSinkMixing` where, in case of multiple active
+  boundary conditions with assigned concentrations, it would write a ``.ssm``
+  file with all sources/sinks on one single row.
 
 Added
 ~~~~~
