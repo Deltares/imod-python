@@ -172,7 +172,7 @@ def sp2_fc():
     return sp2_fc
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 @pytest.mark.usefixtures("concentration_fc")
 def flow_model_with_concentration(concentration_fc):
     idomain = get_data_array(grid_dimensions(), globaltimes)
