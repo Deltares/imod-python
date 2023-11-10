@@ -539,33 +539,30 @@ class Modflow6Simulation(collections.UserDict):
             self["split_exchanges"] = []
         self["split_exchanges"].extend(exchanges_list)
 
-
     def _filter_inactive_cells_from_exchanges(self) -> None:
         for ex in self["split_exchanges"]:
-            for i in [1,2]:
+            for i in [1, 2]:
                 self._filter_inactive_cells_exchange_domain(ex, i)
 
     def _filter_inactive_cells_exchange_domain(self, ex, i: int) -> None:
-            """Filters inactive cells from one exchange domain inplace"""
-            modelname = ex[f"model_name_{i}"].values[()]
-            domain = self[modelname].domain
+        """Filters inactive cells from one exchange domain inplace"""
+        modelname = ex[f"model_name_{i}"].values[()]
+        domain = self[modelname].domain
 
-            layer = ex.dataset["layer"] - 1
-            id = ex.dataset[f"cell_id{i}"] - 1
-            if is_unstructured(domain):
-                exchange_cells = {
-                    "layer": layer,
-                    "mesh2d_nFaces": id,
-                }
-            else:
-                exchange_cells = {
-                    "layer": layer,
-                    "y": id.sel({f"cell_dims{i}": f"row_{i}"}),
-                    "x": id.sel({f"cell_dims{i}": f"column_{i}"}),
-                }
-            exchange_domain = domain.isel(exchange_cells)
-            active_exchange_domain = exchange_domain.where(
-                exchange_domain.values > 0
-            )
-            active_exchange_domain = active_exchange_domain.dropna("index")
-            ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
+        layer = ex.dataset["layer"] - 1
+        id = ex.dataset[f"cell_id{i}"] - 1
+        if is_unstructured(domain):
+            exchange_cells = {
+                "layer": layer,
+                "mesh2d_nFaces": id,
+            }
+        else:
+            exchange_cells = {
+                "layer": layer,
+                "y": id.sel({f"cell_dims{i}": f"row_{i}"}),
+                "x": id.sel({f"cell_dims{i}": f"column_{i}"}),
+            }
+        exchange_domain = domain.isel(exchange_cells)
+        active_exchange_domain = exchange_domain.where(exchange_domain.values > 0)
+        active_exchange_domain = active_exchange_domain.dropna("index")
+        ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
