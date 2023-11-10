@@ -78,7 +78,10 @@ def bounding_polygon(active: xu.UgridDataArray):
 def is_spatial_2D(array: xr.DataArray) -> bool:
     """Return True if the array contains data in at least 2 spatial dimensions"""
     coords = array.coords
-    return "x" in coords and "y" in coords
+    dims = array.dims
+    has_spatial_coords = "x" in coords and "y" in coords
+    has_spatial_dims = "x" in dims and "y" in dims
+    return has_spatial_coords & has_spatial_dims
 
 
 @typedispatch
