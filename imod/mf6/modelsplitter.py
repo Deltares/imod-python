@@ -67,14 +67,23 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
         domain_slice2d
     ).broadcast_like(model.domain.layer)
     sliced_bottom = model.bottom
+    sliced_domain_layered = sliced_domain_layered.drop_vars(
+        ["dx", "dy"], errors="ignore"
+    )
+    new_idomain = model.domain.sel(sliced_domain_layered.coords).where(
+        sliced_domain_layered, other=0
+    )
 
     for pkg_name, package in model.items():
         sliced_package = clip_by_grid(package, partition_info.active_domain)
-        errors = sliced_package._validate(
-            package._write_schemata, idomain=sliced_domain_layered, bottom=sliced_bottom
-        )
 
+        sliced_package = sliced_package.mask(new_idomain)
+        errors = sliced_package._validate(
+            package._write_schemata, idomain=new_idomain, bottom=sliced_bottom
+        )
         if not errors:
             new_model[pkg_name] = sliced_package
+        else:
+            print(f"package {pkg_name} removed")
 
     return new_model
