@@ -1,4 +1,5 @@
 import os
+import sys
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -40,6 +41,66 @@ def test_twri_disv_roundtrip(twri_disv_model, tmpdir_factory):
 @pytest.mark.usefixtures("circle_model")
 def test_circle_roundtrip(circle_model, tmpdir_factory):
     roundtrip(circle_model, tmpdir_factory, "circle")
+
+
+@pytest.mark.usefixtures("circle_model")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
+def test_simulation_open_head(circle_model, tmp_path):
+    simulation = circle_model
+
+    # Should throw error when model not run yet.
+    with pytest.raises(RuntimeError):
+        simulation.open_head()
+
+    modeldir = tmp_path / "circle"
+    simulation.write(modeldir)
+    simulation.run()
+
+    head = simulation.open_head()
+
+    assert isinstance(head, xu.UgridDataArray)
+    assert head.dims == ("time", "layer", "mesh2d_nFaces")
+    assert head.shape == (1, 2, 216)
+
+
+@pytest.mark.usefixtures("circle_model")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
+def test_simulation_open_budget(circle_model, tmp_path):
+    simulation = circle_model
+
+    # Should throw error when model not run yet.
+    with pytest.raises(RuntimeError):
+        simulation.open_budget()
+
+    modeldir = tmp_path / "circle"
+    simulation.write(modeldir, binary=False, use_absolute_paths=True)
+    simulation.run()
+
+    budget = simulation.open_budget()
+
+    assert isinstance(budget, dict)
+    assert sorted(budget.keys()) == [
+        "chd",
+        "flow-horizontal-face",
+        "flow-horizontal-face-x",
+        "flow-horizontal-face-y",
+        "flow-lower-face",
+    ]
+    assert isinstance(budget["chd"], xu.UgridDataArray)
+
+
+@pytest.mark.usefixtures("circle_model")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
+def test_simulation_open_concentration_fail(circle_model, tmp_path):
+    """No transport model is assigned, so should throw error when opening concentrations"""
+    simulation = circle_model
+
+    modeldir = tmp_path / "circle"
+    simulation.write(modeldir, binary=False, use_absolute_paths=True)
+    simulation.run()
+
+    with pytest.raises(ValueError):
+        simulation.open_concentration()
 
 
 @pytest.fixture(scope="function")
