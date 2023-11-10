@@ -67,7 +67,7 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
         domain_slice2d
     ).broadcast_like(model.domain.layer)
     sliced_bottom = model.bottom
-    slice_domain_layered = sliced_domain_layered.drop_indexes(["dx", "dy"], errors="ignore")
+    sliced_domain_layered = sliced_domain_layered.drop_vars(["dx", "dy"], errors="ignore")
     new_idomain = model.domain.sel(sliced_domain_layered.coords).where(
         sliced_domain_layered, other=0
     )

@@ -539,8 +539,7 @@ class Modflow6Simulation(collections.UserDict):
             self["split_exchanges"] = []
         self["split_exchanges"].extend(exchanges_list)
 
-    def _filter_inactive_cells_from_exchanges(self):
-        for ex in self["split_exchanges"]:
+
     def _filter_inactive_cells_from_exchanges(self) -> None:
         for ex in self["split_exchanges"]:
             for i in [1,2]:
@@ -561,8 +560,8 @@ class Modflow6Simulation(collections.UserDict):
             else:
                 exchange_cells = {
                     "layer": layer,
-                    "y": id.sel({f"cell_dims{i}": "row"}),
-                    "x": id.sel({f"cell_dims{i}": "column"}),
+                    "y": id.sel({f"cell_dims{i}": f"row_{i}"}),
+                    "x": id.sel({f"cell_dims{i}": f"column_{i}"}),
                 }
             exchange_domain = domain.isel(exchange_cells)
             active_exchange_domain = exchange_domain.where(
