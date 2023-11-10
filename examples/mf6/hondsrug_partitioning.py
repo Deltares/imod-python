@@ -47,7 +47,7 @@ submodel_labels[100:, 250:] = 3
 # plot the partitioning array. It shows how the model will be partitioned.
 fig, ax = plt.subplots()
 submodel_labels.plot(ax=ax)
-ax.set_title("hondsrug diff ")
+ax.set_title("hondsrug partitioning geometry")
 
 split_simulation = gwf_simulation.split(submodel_labels)
 
