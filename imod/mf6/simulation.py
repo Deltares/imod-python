@@ -267,7 +267,29 @@ class Modflow6Simulation(collections.UserDict):
 
         self.directory = directory
 
-    def run(self, mf6path="mf6") -> None:
+    def run(self, mf6path: Union[str, Path] = "mf6") -> None:
+        """
+        Run Modflow 6 simulation. This method runs a subprocess calling
+        ``mf6path``. This argument is set to ``mf6``, which means the Modflow 6
+        executable is expected to be added to your PATH environment variable.
+        `See this writeup how to add Modflow 6 to your PATH on Windows
+        <https://deltares.gitlab.io/imod/imod-python/examples/mf6/index.html>`_
+
+        Note that the ``write`` method needs to be called before this method is
+        called.
+
+        Parameters
+        ----------
+        mf6path: Union[str, Path]
+            Path to the Modflow 6 executable. Defaults to calling ``mf6``.
+
+        Examples
+        --------
+        Make sure you write your model first
+
+        >>> simulation.write(path/to/model)
+        >>> simulation.run()
+        """
         if self.directory is None:
             raise RuntimeError(f"Simulation {self.name} has not been written yet.")
         with imod.util.cd(self.directory):
@@ -283,23 +305,87 @@ class Modflow6Simulation(collections.UserDict):
         Open heads of finished simulation, requires that the ``run`` method has
         been called.
 
+        The data is lazily read per timestep and automatically converted into
+        (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV
+        respectively. The conversion is done via the information stored in the
+        Binary Grid file (GRB).
+
         Parameters
         ----------
         dry_nan: bool, default value: False.
             Whether to convert dry values to NaN.
+
+        Returns
+        -------
+        head: Union[xr.DataArray, xu.UgridDataArray]
+
+        Examples
+        --------
+        Make sure you write and run your model first
+
+        >>> simulation.write(path/to/model)
+        >>> simulation.run()
+
+        Then open heads:
+
+        >>> head = simulation.open_head()
         """
         return self._open_output("head", dry_nan=dry_nan)
 
-    def open_budget(self, flowja: bool = False) -> GridDataset:
+    def open_budget(self, flowja: bool = False) -> dict[str, GridDataArray]:
         """
         Open budgets of finished simulation, requires that the ``run`` method
         has been called.
+
+        The data is lazily read per timestep and automatically converted into
+        (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV
+        respectively. The conversion is done via the information stored in the
+        Binary Grid file (GRB).
+
+        The ``flowja`` argument controls whether the flow-ja-face array (if
+        present) is returned in grid form as "as is". "Grid from" means:
+
+            * DIS: in right, front, and lower face flow. All flows are placed in
+            the cell.
+            * DISV: in horizontal and lower face flow.the horizontal flows are
+            placed on the edges and the lower face flow is placed on the faces.
+
+        When ``flowja=True``, the flow-ja-face array is returned as it is found in
+        the CBC file, with a flow for every cell to cell connection. Additionally,
+        a ``connectivity`` DataArray is returned describing for every cell (n) its
+        connected cells (m).
 
         Parameters
         ----------
         flowja: bool, default value: False
             Whether to return the flow-ja-face values "as is" (``True``) or in a
             grid form (``False``).
+
+        Returns
+        -------
+        budget: Dict[str, xr.DataArray|xu.UgridDataArray]
+            DataArray contains float64 data of the budgets, with dimensions ("time",
+            "layer", "y", "x").
+
+        Examples
+        --------
+        Make sure you write and run your model first
+
+        >>> simulation.write(path/to/model)
+        >>> simulation.run()
+
+        Then open budgets:
+
+        >>> budget = simulation.open_budget()
+
+        Check the contents:
+
+        >>> print(budget.keys())
+
+        Get the drainage budget, compute a time mean for the first layer:
+
+        >>> drn_budget = budget["drn]
+        >>> mean = drn_budget.sel(layer=1).mean("time")
         """
         return self._open_output("budget", flowja=flowja)
 
@@ -308,10 +394,30 @@ class Modflow6Simulation(collections.UserDict):
         Open concentration of finished simulation, requires that the ``run``
         method has been called.
 
+        The data is lazily read per timestep and automatically converted into
+        (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV
+        respectively. The conversion is done via the information stored in the
+        Binary Grid file (GRB).
+
         Parameters
         ----------
         dry_nan: bool, default value: False.
             Whether to convert dry values to NaN.
+
+        Returns
+        -------
+        concentration: Union[xr.DataArray, xu.UgridDataArray]
+
+        Examples
+        --------
+        Make sure you write and run your model first
+
+        >>> simulation.write(path/to/model)
+        >>> simulation.run()
+
+        Then open concentrations:
+
+        >>> concentration = simulation.open_concentration()
         """
         return self._open_output("concentration", dry_nan=dry_nan)
 
