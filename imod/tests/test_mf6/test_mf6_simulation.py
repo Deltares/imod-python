@@ -118,6 +118,21 @@ def setup_simulation():
 
 
 class TestModflow6Simulation:
+    def test_write_sets_directory(self, tmp_path, setup_simulation):
+        # Arrange.
+        simulation = setup_simulation
+
+        # Assert
+        # Should be None upon initialization
+        assert simulation.directory is None
+
+        # Act.
+        simulation.write(tmp_path)
+
+        # Assert.
+        assert simulation.directory is not None
+        assert simulation.directory == tmp_path
+
     def test_write_with_default_arguments_writes_expected_files(
         self, tmp_path, setup_simulation
     ):
