@@ -82,9 +82,12 @@ def test_partitioning_unstructured_with_inactive_cells(
     # increase the recharge to make the head gradient more pronounced
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
+    # deactivate some cells on idomain
     idomain = simulation["GWF_1"].domain
     deactivated_cells = slice(93, 97)
     idomain.loc[{"mesh2d_nFaces": deactivated_cells}] = 0
+
+    # The cells we just deactivated on idomain must be deactivated on package inputs too.    
     for name, package in simulation["GWF_1"].items():
         if not isinstance(package, Well):
             for arrayname in package.dataset.keys():
@@ -94,6 +97,7 @@ def test_partitioning_unstructured_with_inactive_cells(
                     else:
                         mask_value = 0
                     package[arrayname].loc[{"mesh2d_nFaces": deactivated_cells}] = mask_value
+
     # run the original example, so without partitioning, and save the simulation results
     orig_dir = tmp_path / "original"
     simulation.write(orig_dir, binary=False)
@@ -132,20 +136,22 @@ def test_partitioning_unstructured_with_vpt_cells(
     # increase the recharge to make the head gradient more pronounced
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
+
+    # deactivate some cells on idomain
     idomain = simulation["GWF_1"].domain
     deactivated_cells = slice(93, 101)
     idomain.loc[{"mesh2d_nFaces": deactivated_cells}] = 0
 
+    # The cells we just deactivated on idomain must be deactivated on package inputs too.    
     for name, package in simulation["GWF_1"].items():
         if not isinstance(package, Well):
             for arrayname in package.dataset.keys():
                 if "mesh2d_nFaces" in package[arrayname].coords:
                     if np.issubdtype(package[arrayname].dtype, float):
-                        package[arrayname].loc[
-                            {"mesh2d_nFaces": deactivated_cells}
-                        ] = np.nan
+                        mask_value = np.nan
                     else:
-                        package[arrayname].loc[{"mesh2d_nFaces": deactivated_cells}] = 0
+                        mask_value = 0
+                    package[arrayname].loc[{"mesh2d_nFaces": deactivated_cells}] = mask_value
 
     # run the original example, so without partitioning, and save the simulation results
     orig_dir = tmp_path / "original"
