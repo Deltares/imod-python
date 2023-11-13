@@ -90,11 +90,10 @@ def test_partitioning_unstructured_with_inactive_cells(
             for arrayname in package.dataset.keys():
                 if "mesh2d_nFaces" in package[arrayname].coords:
                     if np.issubdtype(package[arrayname].dtype, float):
-                        package[arrayname].loc[
-                            {"mesh2d_nFaces": deactivated_cells}
-                        ] = np.nan
+                        mask_value = np.nan
                     else:
-                        package[arrayname].loc[{"mesh2d_nFaces": deactivated_cells}] = 0
+                        mask_value = 0
+                    package[arrayname].loc[{"mesh2d_nFaces": deactivated_cells}] = mask_value
     # run the original example, so without partitioning, and save the simulation results
     orig_dir = tmp_path / "original"
     simulation.write(orig_dir, binary=False)
