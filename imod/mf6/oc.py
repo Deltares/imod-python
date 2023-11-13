@@ -126,7 +126,7 @@ class OutputControl(Package):
                 f"Output Control setting should be either integer or string in ['first', 'last', 'all'], instead got {setting}"
             )
 
-    def _get_output_filepath(self, directory, output_variable):
+    def _get_output_filepath(self, directory: Path, output_variable: str):
         varname = f"{output_variable}_file"
         ext = OUTPUT_EXT_MAPPING[output_variable]
         modelname = directory.stem
