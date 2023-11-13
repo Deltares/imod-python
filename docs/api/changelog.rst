@@ -21,6 +21,7 @@ Fixed
 - :function:`imod.mf6.out.open_cbc` now reads saved cell saturations and specific discharges.
 - :function:`imod.mf6.out.open_cbc` failed to read unstructured budgets stored
   following IMETH1, most importantly the storage fluxes.
+- Fixed support of Python 3.11 by dropping the obsolete ``qgs`` module.
 
 Changed
 ~~~~~~~
@@ -54,7 +55,7 @@ Removed
 - Dropped support for writing .qgs files directly for QGIS, as this was hard to
   maintain and rarely used. To export your model to QGIS readable files, call
   the ``dump`` method :class:`imod.mf6.Simulation` with ``mdal_compliant=True``.
-  These writes UGRID NetCDFs which can read as meshes in QGIS.
+  This writes UGRID NetCDFs which can read as meshes in QGIS.
 - Removed ``declxml`` from repository.
 
 [0.14.1] - 2023-09-07
