@@ -21,6 +21,7 @@ Fixed
 - :function:`imod.mf6.out.open_cbc` now reads saved cell saturations and specific discharges.
 - :function:`imod.mf6.out.open_cbc` failed to read unstructured budgets stored
   following IMETH1, most importantly the storage fluxes.
+- Fixed support of Python 3.11 by dropping the obsolete ``qgs`` module.
 - Bug in :class:`imod.mf6.SourceSinkMixing` where, in case of multiple active
   boundary conditions with assigned concentrations, it would write a ``.ssm``
   file with all sources/sinks on one single row.
@@ -51,10 +52,14 @@ Added
 - validation of ``transient`` argument in :class:`imod.mf6.StorageCoefficient`
   and :class:`imod.mf6.SpecificStorage`.
 
-
 Removed
 ~~~~~~~
 - Tox has been removed from the project.
+- Dropped support for writing .qgs files directly for QGIS, as this was hard to
+  maintain and rarely used. To export your model to QGIS readable files, call
+  the ``dump`` method :class:`imod.mf6.Simulation` with ``mdal_compliant=True``.
+  This writes UGRID NetCDFs which can read as meshes in QGIS.
+- Removed ``declxml`` from repository.
 
 [0.14.1] - 2023-09-07
 ---------------------
