@@ -343,7 +343,8 @@ class Modflow6Simulation(collections.UserDict):
         Binary Grid file (GRB).
 
         The ``flowja`` argument controls whether the flow-ja-face array (if
-        present) is returned in grid form as "as is". "Grid from" means:
+        present) is returned in grid form as "as is". By default
+        ``flowja=False`` and the array is returned in "grid form", meaning:
 
             * DIS: in right, front, and lower face flow. All flows are placed in
             the cell.
@@ -390,7 +391,7 @@ class Modflow6Simulation(collections.UserDict):
         return self._open_output("budget", flowja=flowja)
 
     def open_concentration(
-        self, species_ls=None, dry_nan: bool = False
+        self, species_ls: list[str] = None, dry_nan: bool = False
     ) -> GridDataArray:
         """
         Open concentration of finished simulation, requires that the ``run``
@@ -403,8 +404,8 @@ class Modflow6Simulation(collections.UserDict):
 
         Parameters
         ----------
-        species_ls: list, default value: None.
-            List of species, which will be used to concatenate the
+        species_ls: list of strings, default value: None.
+            List of species names, which will be used to concatenate the
             concentrations along the ``"species"`` dimension, in case the
             simulation has multiple species and thus multiple transport models.
             If None, transport model names will be used as species names.
@@ -514,24 +515,38 @@ class Modflow6Simulation(collections.UserDict):
 
         return open_func(output_path, grb_path, **settings)
 
-    def _get_grb_path(self, modelname):
+    def _get_flow_modelname_coupled_to_transport_model(
+        self, transport_modelname: str
+    ) -> str:
+        """
+        Get name of flow model coupled to transport model, throws error if
+        multiple flow models are couple to 1 transport model.
+        """
+        exchanges = self.get_exchange_relationships()
+        coupled_flow_models = [
+            i[2]
+            for i in exchanges
+            if (i[3] == transport_modelname) & (i[0] == "GWF6-GWT6")
+        ]
+        if len(coupled_flow_models) != 1:
+            raise ValueError(
+                f"Exactly one flow model must be coupled to transport model {transport_modelname}, got: {coupled_flow_models}"
+            )
+        return coupled_flow_models[0]
+
+    def _get_grb_path(self, modelname: str) -> Path:
         """
         Finds appropriate grb path belonging to modelname. Grb files are not
         written for transport models, so this method always returns a path to a
-        flowmodel. In case of a transport model, it finds .
+        flowmodel. In case of a transport model, it returns the path to the grb
+        file its coupled flow model.
         """
         model = self[modelname]
         # Get grb path
         if isinstance(model, GroundwaterTransportModel):
-            exchanges = self.get_exchange_relationships()
-            coupled_flow_models = [
-                i[2] for i in exchanges if (i[3] == modelname) & (i[0] == "GWF6-GWT6")
-            ]
-            if len(coupled_flow_models) != 1:
-                raise ValueError(
-                    f"Exactly one flow model must be coupled to transport model {modelname}, got: {coupled_flow_models}"
-                )
-            flow_model_name = coupled_flow_models[0]
+            flow_model_name = self._get_flow_modelname_coupled_to_transport_model(
+                modelname
+            )
             flow_model_path = self.directory / flow_model_name
         else:
             flow_model_path = self.directory / modelname
