@@ -42,9 +42,6 @@ def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBa
     domain_slice = get_active_domain_slice(active)
 
     clipped_dataset = package.dataset.isel(domain_slice, missing_dims="ignore")
-    if "idomain" in package.dataset:
-        idomain = package.dataset["idomain"]
-        clipped_dataset["idomain"] = idomain.sel(clipped_dataset["idomain"].indexes)
 
     cls = type(package)
     new = cls.__new__(cls)
