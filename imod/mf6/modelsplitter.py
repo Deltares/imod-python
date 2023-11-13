@@ -63,21 +63,22 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
     new_model = GroundwaterFlowModel(**model._options)
     domain_slice2d = get_active_domain_slice(partition_info.active_domain)
     if is_unstructured(model.domain):
-        new_idomain = model.domain.sel(domain_slice2d).broadcast_like(
-            model.domain.layer
-        )
+        new_idomain = model.domain.sel(domain_slice2d)
     else:
+        # store the original layer dimension
         layer = model.domain.layer
-        sliced_domain = partition_info.active_domain.sel(
-            domain_slice2d
+
+        sliced_domain_2D = partition_info.active_domain.sel(domain_slice2d)
+        # drop the dimensions we don't need from the 2D domain slice. It may have a single
+        # layer so we drop that as well
+        sliced_domain_2D = sliced_domain_2D.drop_vars(
+            ["dx", "dy", "layer"], errors="ignore"
         )
-        sliced_domain = sliced_domain.drop_vars(
-            ["dx", "dy"], errors="ignore"
-        )
-        coords = dict(layer=layer, **sliced_domain.coords)
-        new_idomain = model.domain.sel(coords).where(
-            sliced_domain, other=0
-        )
+        # create the desired coodinates: the original layer dimension,and the x/y coordinates of the slice.
+        coords = dict(layer=layer, **sliced_domain_2D.coords)
+
+        # the new idomain is the selection on our coodinates and only the part active in sliced_domain_2D
+        new_idomain = model.domain.sel(coords).where(sliced_domain_2D, other=0)
 
     sliced_bottom = model.bottom
 
