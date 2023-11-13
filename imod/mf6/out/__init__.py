@@ -206,8 +206,9 @@ def open_cbc(
     The conversion is done via the information stored in the Binary Grid file
     (GRB).
 
-    The ``flowja`` argument controls whether the flow-ja-face array (if
-    present) is returned in grid form as "as is". "Grid from" means:
+    The ``flowja`` argument controls whether the flow-ja-face array (if present)
+    is returned in grid form as "as is". By default ``flowja=False`` and the
+    array is returned in "grid form", meaning:
 
         * DIS: in right, front, and lower face flow. All flows are placed in
           the cell.
