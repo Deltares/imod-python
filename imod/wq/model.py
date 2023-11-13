@@ -11,7 +11,6 @@ import xarray as xr
 from scipy.ndimage import binary_dilation
 
 import imod
-from imod.mf6 import qgs_util
 from imod.wq import timeutil
 from imod.wq.pkggroup import PackageGroups
 
@@ -118,14 +117,6 @@ class Model(collections.UserDict):
                 selmodel[pkgname].dataset = pkg.dataset[sel_dims]
         return selmodel
 
-    def _yield_times(self):
-        """required by qgis_util"""
-        modeltimes = []
-        for pkg in self.values():
-            if "time" in pkg.dataset.coords:
-                modeltimes.append(pkg.dataset["time"].values)
-        return modeltimes
-
     def to_netcdf(self, directory=".", pattern="{pkgname}.nc", **kwargs):
         """Convenience function to write all model packages
         to netcdf files.
@@ -151,56 +142,6 @@ class Model(collections.UserDict):
                 )
             except Exception as e:
                 raise type(e)("{e}\nPackage {pkgname} can not be written to NetCDF")
-
-    def write_qgis_project(self, directory, crs, filename=None, aggregate_layers=False):
-        """
-        Write qgis projectfile and accompanying netcdf files that can be read in qgis.
-
-        Parameters
-        ----------
-        directory : Path
-            directory of qgis project
-
-        crs : str, int,
-            anything that can be converted to a pyproj.crs.CRS
-
-        filename : Optional, str
-            name of qgis projectfile.
-
-        aggregate_layers : Optional, bool
-            If True, aggregate layers by taking the mean, i.e. ds.mean(dim="layer")
-
-        """
-        ext = ".qgs"
-        if filename is None:
-            filename = self.modelname
-
-        directory = pathlib.Path(directory)
-        directory.mkdir(exist_ok=True, parents=True)
-
-        pkgnames = [
-            pkgname
-            for pkgname, pkg in self.items()
-            if all(i in pkg.dataset.dims for i in ["x", "y"])
-        ]
-
-        data_paths = []
-        data_vars_ls = []
-        for pkgname in pkgnames:
-            pkg = self[pkgname].rio.write_crs(crs)
-            data_path = pkg._netcdf_path(directory, pkgname)
-            data_path = "./" + data_path.relative_to(directory).as_posix()
-            data_paths.append(data_path)
-            # FUTURE: MDAL has matured enough that we do not necessarily
-            #           have to write seperate netcdfs anymore
-            data_vars_ls.append(
-                pkg.write_netcdf(directory, pkgname, aggregate_layers=aggregate_layers)
-            )
-
-        qgs_tree = qgs_util._create_qgis_tree(
-            self, pkgnames, data_paths, data_vars_ls, crs
-        )
-        qgs_util._write_qgis_projectfile(qgs_tree, directory / (filename + ext))
 
     def _delete_empty_packages(self, verbose=False):
         to_del = []
