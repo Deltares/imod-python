@@ -6,7 +6,7 @@ from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.typing import GridDataArray
-from imod.typing.grid import ones_like
+from imod.typing.grid import is_unstructured, ones_like
 
 
 class PartitionInfo(NamedTuple):
@@ -61,18 +61,26 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
     :func:`imod.mf6.modelsplitter.create_domain_slices` function.
     """
     new_model = GroundwaterFlowModel(**model._options)
-
     domain_slice2d = get_active_domain_slice(partition_info.active_domain)
-    sliced_domain_layered = partition_info.active_domain.sel(
-        domain_slice2d
-    ).broadcast_like(model.domain.layer)
+    if is_unstructured(model.domain):
+        new_idomain = model.domain.sel(domain_slice2d)
+    else:
+        # store the original layer dimension
+        layer = model.domain.layer
+
+        sliced_domain_2D = partition_info.active_domain.sel(domain_slice2d)
+        # drop the dimensions we don't need from the 2D domain slice. It may have a single
+        # layer so we drop that as well
+        sliced_domain_2D = sliced_domain_2D.drop_vars(
+            ["dx", "dy", "layer"], errors="ignore"
+        )
+        # create the desired coodinates: the original layer dimension,and the x/y coordinates of the slice.
+        coords = dict(layer=layer, **sliced_domain_2D.coords)
+
+        # the new idomain is the selection on our coodinates and only the part active in sliced_domain_2D
+        new_idomain = model.domain.sel(coords).where(sliced_domain_2D, other=0)
+
     sliced_bottom = model.bottom
-    sliced_domain_layered = sliced_domain_layered.drop_vars(
-        ["dx", "dy"], errors="ignore"
-    )
-    new_idomain = model.domain.sel(sliced_domain_layered.coords).where(
-        sliced_domain_layered, other=0
-    )
 
     for pkg_name, package in model.items():
         sliced_package = clip_by_grid(package, partition_info.active_domain)

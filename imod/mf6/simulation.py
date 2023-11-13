@@ -544,7 +544,7 @@ class Modflow6Simulation(collections.UserDict):
             for i in [1, 2]:
                 self._filter_inactive_cells_exchange_domain(ex, i)
 
-    def _filter_inactive_cells_exchange_domain(self, ex, i: int) -> None:
+    def _filter_inactive_cells_exchange_domain(self, ex: GWFGWF, i: int) -> None:
         """Filters inactive cells from one exchange domain inplace"""
         modelname = ex[f"model_name_{i}"].values[()]
         domain = self[modelname].domain
