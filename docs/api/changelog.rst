@@ -21,6 +21,9 @@ Fixed
 - :function:`imod.mf6.out.open_cbc` now reads saved cell saturations and specific discharges.
 - :function:`imod.mf6.out.open_cbc` failed to read unstructured budgets stored
   following IMETH1, most importantly the storage fluxes.
+- Bug in :class:`imod.mf6.SourceSinkMixing` where, in case of multiple active
+  boundary conditions with assigned concentrations, it would write a ``.ssm``
+  file with all sources/sinks on one single row.
 
 Changed
 ~~~~~~~
