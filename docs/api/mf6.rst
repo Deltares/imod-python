@@ -22,7 +22,16 @@ Model objects & methods
     Modflow6Simulation
     Modflow6Simulation.create_time_discretization
     Modflow6Simulation.write
+    Modflow6Simulation.run
+    Modflow6Simulation.open_flow_budget
+    Modflow6Simulation.open_transport_budget
+    Modflow6Simulation.open_head
+    Modflow6Simulation.open_concentration
+    Modflow6Simulation.clip_box
+    Modflow6Simulation.split
+    Modflow6Simulation.regrid_like
     GroundwaterFlowModel
+    GroundwaterTransportModel
 
 Discretization
 --------------
