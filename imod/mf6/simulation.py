@@ -5,6 +5,7 @@ import copy
 import pathlib
 import subprocess
 import warnings
+from collections import defaultdict
 from pathlib import Path
 from typing import Dict, Optional, Union
 
@@ -29,11 +30,13 @@ from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
+from imod.typing.grid import concat
 
 OUTPUT_FUNC_MAPPING = {
     "head": (open_hds, GroundwaterFlowModel),
     "concentration": (open_conc, GroundwaterTransportModel),
-    "budget": (open_cbc, GroundwaterFlowModel),
+    "budget-flow": (open_cbc, GroundwaterFlowModel),
+    "budget-transport": (open_cbc, GroundwaterTransportModel),
 }
 
 
@@ -332,10 +335,29 @@ class Modflow6Simulation(collections.UserDict):
         """
         return self._open_output("head", dry_nan=dry_nan)
 
-    def open_budget(self, flowja: bool = False) -> dict[str, GridDataArray]:
+    def open_transport_budget(self) -> dict[str, GridDataArray]:
         """
-        Open budgets of finished simulation, requires that the ``run`` method
-        has been called.
+        Open transport budgets of finished simulation, requires that the ``run``
+        method has been called.
+
+        The data is lazily read per timestep and automatically converted into
+        (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV
+        respectively. The conversion is done via the information stored in the
+        Binary Grid file (GRB).
+
+        Returns
+        -------
+        budget: Dict[str, xr.DataArray|xu.UgridDataArray]
+            DataArray contains float64 data of the budgets, with dimensions ("time",
+            "layer", "y", "x").
+
+        """
+        return self._open_output("budget-transport")
+
+    def open_flow_budget(self, flowja: bool = False) -> dict[str, GridDataArray]:
+        """
+        Open flow budgets of finished simulation, requires that the ``run``
+        method has been called.
 
         The data is lazily read per timestep and automatically converted into
         (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV
@@ -377,7 +399,7 @@ class Modflow6Simulation(collections.UserDict):
 
         Then open budgets:
 
-        >>> budget = simulation.open_budget()
+        >>> budget = simulation.open_flow_budget()
 
         Check the contents:
 
@@ -388,7 +410,7 @@ class Modflow6Simulation(collections.UserDict):
         >>> drn_budget = budget["drn]
         >>> mean = drn_budget.sel(layer=1).mean("time")
         """
-        return self._open_output("budget", flowja=flowja)
+        return self._open_output("budget-flow", flowja=flowja)
 
     def open_concentration(
         self, species_ls: list[str] = None, dry_nan: bool = False
@@ -443,11 +465,10 @@ class Modflow6Simulation(collections.UserDict):
             Extra settings that need to be passed through to the respective
             output function.
         """
-        # Pop species_ls, set to None in case not found
-        species_ls = settings.pop("species_ls", None)
-
         _, modeltype = OUTPUT_FUNC_MAPPING[output]
         modelnames = self.get_models_of_type(modeltype._model_id).keys()
+        # Pop species_ls, set to modelnames in case not found
+        species_ls = settings.pop("species_ls", modelnames)
         if len(modelnames) == 0:
             raise ValueError(
                 f"Could not find any models of appropriate type for {output}, "
@@ -458,24 +479,44 @@ class Modflow6Simulation(collections.UserDict):
             return self._open_output_single_model(modelname, output, **settings)
         elif output == "concentration":
             # Multiple models are possible
-            if species_ls is None:
-                species_ls = modelnames
-            concentrations = []
-            for modelname, species in zip(modelnames, species_ls):
-                conc = self._open_output_single_model(modelname, output, **settings)
-                conc = conc.assign_coords(species=species)
-                concentrations.append(conc)
-            return xr.concat(concentrations, dim="species")
-
+            return self._concat_concentrations(
+                modelnames, species_ls, output, **settings
+            )
+        elif output == "budget-transport":
+            # Multiple models are possible
+            return self._concat_transport_budgets(
+                modelnames, species_ls, output, **settings
+            )
         else:
             # TODO: This is the place where merging of partioned heads can be implemented.
             raise NotImplementedError(
                 "Reading output from partioned models not yet supported by this method."
             )
 
+    def _concat_concentrations(
+        self, modelnames: list[str], species_ls: list[str], output: str, **settings
+    ):
+        concentrations = []
+        for modelname, species in zip(modelnames, species_ls):
+            conc = self._open_output_single_model(modelname, output, **settings)
+            conc = conc.assign_coords(species=species)
+            concentrations.append(conc)
+        return concat(concentrations, dim="species")
+
+    def _concat_transport_budgets(
+        self, modelnames: list[str], species_ls: list[str], output: str, **settings
+    ):
+        budgets = defaultdict(list)
+        for modelname, species in zip(modelnames, species_ls):
+            d_budget = self._open_output_single_model(modelname, output, **settings)
+            for key, da in d_budget.items():
+                da = da.assign_coords(species=species)
+                budgets[key].append(da)
+        return {key: concat(da_ls, dim="species") for key, da_ls in budgets.items()}
+
     def _open_output_single_model(
         self, modelname: str, output: str, **settings
-    ) -> GridDataArray | GridDataset:
+    ) -> GridDataArray | dict[str, GridDataArray]:
         """
         Opens output of single model
 

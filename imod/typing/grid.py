@@ -48,3 +48,13 @@ def bounding_polygon(active: xr.DataArray):
 def bounding_polygon(active: xu.UgridDataArray):
     """Return bounding polygon of active cells"""
     return active.ugrid.grid.bounding_polygon()
+
+
+@typedispatch
+def concat(grid: list[xr.DataArray], *args, **kwargs):
+    return xr.concat(grid, *args, **kwargs)
+
+
+@typedispatch
+def concat(grid: list[xu.UgridDataArray], *args, **kwargs):
+    return xu.concat(grid, *args, **kwargs)
