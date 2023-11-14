@@ -186,7 +186,7 @@ head
 #
 # We may also open the cell-by-cell flows (.cbc) file.
 
-cbc = simulation.open_budget()
+cbc = simulation.open_flow_budget()
 
 print(cbc.keys())
 

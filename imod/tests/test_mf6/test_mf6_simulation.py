@@ -65,18 +65,18 @@ def test_simulation_open_head(circle_model, tmp_path):
 
 @pytest.mark.usefixtures("circle_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
-def test_simulation_open_budget(circle_model, tmp_path):
+def test_simulation_open_flow_budget(circle_model, tmp_path):
     simulation = circle_model
 
     # Should throw error when model not run yet.
     with pytest.raises(RuntimeError):
-        simulation.open_budget()
+        simulation.open_flow_budget()
 
     modeldir = tmp_path / "circle"
     simulation.write(modeldir, binary=False, use_absolute_paths=True)
     simulation.run()
 
-    budget = simulation.open_budget()
+    budget = simulation.open_flow_budget()
 
     assert isinstance(budget, dict)
     assert sorted(budget.keys()) == [
