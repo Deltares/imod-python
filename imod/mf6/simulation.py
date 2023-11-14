@@ -362,7 +362,7 @@ class Modflow6Simulation(collections.UserDict):
             "layer", "y", "x").
 
         """
-        return self._open_output("budget-transport", species_ls)
+        return self._open_output("budget-transport", species_ls=species_ls)
 
     def open_flow_budget(self, flowja: bool = False) -> dict[str, GridDataArray]:
         """
@@ -555,7 +555,9 @@ class Modflow6Simulation(collections.UserDict):
         # Get output file path
         oc_key = model._get_pkgkey("oc")
         oc_pkg = model[oc_key]
-        output_path = Path(oc_pkg._get_output_filepath(model_path, output))
+        # Ensure "-transport" and "-flow" are stripped from "budget"
+        oc_output = output.split("-")[0]
+        output_path = Path(oc_pkg._get_output_filepath(model_path, oc_output))
 
         grb_path = self._get_grb_path(modelname)
 
