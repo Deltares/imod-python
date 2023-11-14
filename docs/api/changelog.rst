@@ -52,9 +52,10 @@ Added
 - validation of ``transient`` argument in :class:`imod.mf6.StorageCoefficient`
   and :class:`imod.mf6.SpecificStorage`.
 - :method:`imod.mf6.Simulation.open_concentration`,
-  :method:`imod.mf6.Simulation.open_head`, and
-  :method:`imod.mf6.Simulation.open_flow_budget`, were added as convenience methods
-  to open simulation output easier (without having to specify paths).
+  :method:`imod.mf6.Simulation.open_head`,
+  :method:`imod.mf6.Simulation.open_transport_budget`, and
+  :method:`imod.mf6.Simulation.open_flow_budget`, were added as convenience
+  methods to open simulation output easier (without having to specify paths).
 
 Removed
 ~~~~~~~
