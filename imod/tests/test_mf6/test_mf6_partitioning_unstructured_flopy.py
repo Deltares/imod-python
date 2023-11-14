@@ -87,4 +87,30 @@ def test_partitioning_unstructured_flopy(
     flopy_split_sim.set_sim_path(flopy_split_dir)
     flopy_split_sim.write_simulation(silent=False)
     flopy_split_sim.run_simulation(silent=False)
+
+@pytest.mark.usefixtures("twri_model")
+def  test_partitioning_structured_flopy(tmp_path, twri_model): 
+
+    idomain = twri_model["GWF_1"].domain
+    diagonal_submodel_labels_1 = zeros_like(idomain.sel(layer=1))
+
+    for i in range(15):
+        for j in range(i):
+            diagonal_submodel_labels_1.values[i, j] = 1
+    
+
+ # run the original example, so without partitioning, and save the simulation results
+    orig_dir = tmp_path / "original"
+    twri_model.write(orig_dir, binary=False, use_absolute_paths=True)
+
+    split_ip_dir = tmp_path / "split_ip"    
+    split_simulation_ip = twri_model.split(diagonal_submodel_labels_1)
+    split_simulation_ip.write(split_ip_dir, binary=False)
+
+    flopy_sim =flopy.mf6.MFSimulation.load( sim_ws=orig_dir, verbosity_level=1,)
+    flopy_dir = tmp_path / "flopy"
+    flopy_sim.set_sim_path(flopy_dir)
+    flopy_sim.write_simulation(silent=False)
+    flopy_sim.run_simulation(silent=True)
+    
     
