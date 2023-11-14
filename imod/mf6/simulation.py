@@ -335,7 +335,9 @@ class Modflow6Simulation(collections.UserDict):
         """
         return self._open_output("head", dry_nan=dry_nan)
 
-    def open_transport_budget(self) -> dict[str, GridDataArray]:
+    def open_transport_budget(
+        self, species_ls: list[str] = None
+    ) -> dict[str, GridDataArray]:
         """
         Open transport budgets of finished simulation, requires that the ``run``
         method has been called.
@@ -345,6 +347,14 @@ class Modflow6Simulation(collections.UserDict):
         respectively. The conversion is done via the information stored in the
         Binary Grid file (GRB).
 
+        Parameters
+        ----------
+        species_ls: list of strings, default value: None.
+            List of species names, which will be used to concatenate the
+            concentrations along the ``"species"`` dimension, in case the
+            simulation has multiple species and thus multiple transport models.
+            If None, transport model names will be used as species names.
+
         Returns
         -------
         budget: Dict[str, xr.DataArray|xu.UgridDataArray]
@@ -352,7 +362,7 @@ class Modflow6Simulation(collections.UserDict):
             "layer", "y", "x").
 
         """
-        return self._open_output("budget-transport")
+        return self._open_output("budget-transport", species_ls)
 
     def open_flow_budget(self, flowja: bool = False) -> dict[str, GridDataArray]:
         """
