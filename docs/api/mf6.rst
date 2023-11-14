@@ -93,3 +93,5 @@ Transport Packages
     ImmobileStorageTransfer
     MobileStorageTransfer
     MassSourceLoading
+    SourceSinkMixing
+    SourceSinkMixing.from_flow_model
