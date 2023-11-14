@@ -56,6 +56,8 @@ Added
   :method:`imod.mf6.Simulation.open_transport_budget`, and
   :method:`imod.mf6.Simulation.open_flow_budget`, were added as convenience
   methods to open simulation output easier (without having to specify paths).
+- Settings such as ``save_flows`` can be passed through
+  :method:`imod.mf6.SourceSinkMixing.from_flow_model`
 
 Removed
 ~~~~~~~
