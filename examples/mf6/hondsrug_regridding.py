@@ -31,10 +31,7 @@ gwf_simulation = create_hondsrug_simulation()
 original_modeldir = imod.util.temporary_directory() / "original"
 gwf_simulation.write(original_modeldir, False, False)
 gwf_simulation.run()
-hds_original = imod.mf6.open_hds(
-    original_modeldir / "GWF_1" / "GWF_1.hds",
-    original_modeldir / "GWF_1" / "dis.dis.grb",
-)
+hds_original = gwf_simulation.open_head()
 
 fig, ax = plt.subplots()
 hds_original.sel(layer=3).isel(time=6).plot(ax=ax)
@@ -77,11 +74,8 @@ regridded_simulation.write(regridded_modeldir, False, False)
 
 regridded_simulation.run()
 
+hds_regridded = regridded_simulation.open_head()
 
-hds_regridded = imod.mf6.open_hds(
-    regridded_modeldir / "GWF_1" / "GWF_1.hds",
-    regridded_modeldir / "GWF_1" / "dis.dis.grb",
-)
 # %%
 # Results visualization
 # =====================

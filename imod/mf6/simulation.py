@@ -5,6 +5,8 @@ import copy
 import pathlib
 import subprocess
 import warnings
+from collections import defaultdict
+from pathlib import Path
 from typing import Dict, Optional, Union
 
 import jinja2
@@ -21,12 +23,21 @@ from imod.mf6.model import (
     Modflow6Model,
 )
 from imod.mf6.modelsplitter import create_partition_info, slice_model
+from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.statusinfo import NestedStatusInfo
 from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
-from imod.typing import GridDataArray
+from imod.typing import GridDataArray, GridDataset
+from imod.typing.grid import concat
+
+OUTPUT_FUNC_MAPPING = {
+    "head": (open_hds, GroundwaterFlowModel),
+    "concentration": (open_conc, GroundwaterTransportModel),
+    "budget-flow": (open_cbc, GroundwaterFlowModel),
+    "budget-transport": (open_cbc, GroundwaterTransportModel),
+}
 
 
 def get_models(simulation: Modflow6Simulation) -> Dict[str, Modflow6Model]:
@@ -259,7 +270,29 @@ class Modflow6Simulation(collections.UserDict):
 
         self.directory = directory
 
-    def run(self, mf6path="mf6") -> None:
+    def run(self, mf6path: Union[str, Path] = "mf6") -> None:
+        """
+        Run Modflow 6 simulation. This method runs a subprocess calling
+        ``mf6path``. This argument is set to ``mf6``, which means the Modflow 6
+        executable is expected to be added to your PATH environment variable.
+        `See this writeup how to add Modflow 6 to your PATH on Windows
+        <https://deltares.gitlab.io/imod/imod-python/examples/mf6/index.html>`_
+
+        Note that the ``write`` method needs to be called before this method is
+        called.
+
+        Parameters
+        ----------
+        mf6path: Union[str, Path]
+            Path to the Modflow 6 executable. Defaults to calling ``mf6``.
+
+        Examples
+        --------
+        Make sure you write your model first
+
+        >>> simulation.write(path/to/model)
+        >>> simulation.run()
+        """
         if self.directory is None:
             raise RuntimeError(f"Simulation {self.name} has not been written yet.")
         with imod.util.cd(self.directory):
@@ -269,6 +302,311 @@ class Modflow6Simulation(collections.UserDict):
                     f"Simulation {self.name}: {mf6path} failed to run with returncode "
                     f"{result.returncode}, and error message:\n\n{result.stdout.decode()} "
                 )
+
+    def open_head(self, dry_nan: bool = False) -> GridDataArray:
+        """
+        Open heads of finished simulation, requires that the ``run`` method has
+        been called.
+
+        The data is lazily read per timestep and automatically converted into
+        (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV
+        respectively. The conversion is done via the information stored in the
+        Binary Grid file (GRB).
+
+        Parameters
+        ----------
+        dry_nan: bool, default value: False.
+            Whether to convert dry values to NaN.
+
+        Returns
+        -------
+        head: Union[xr.DataArray, xu.UgridDataArray]
+
+        Examples
+        --------
+        Make sure you write and run your model first
+
+        >>> simulation.write(path/to/model)
+        >>> simulation.run()
+
+        Then open heads:
+
+        >>> head = simulation.open_head()
+        """
+        return self._open_output("head", dry_nan=dry_nan)
+
+    def open_transport_budget(
+        self, species_ls: list[str] = None
+    ) -> dict[str, GridDataArray]:
+        """
+        Open transport budgets of finished simulation, requires that the ``run``
+        method has been called.
+
+        The data is lazily read per timestep and automatically converted into
+        (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV
+        respectively. The conversion is done via the information stored in the
+        Binary Grid file (GRB).
+
+        Parameters
+        ----------
+        species_ls: list of strings, default value: None.
+            List of species names, which will be used to concatenate the
+            concentrations along the ``"species"`` dimension, in case the
+            simulation has multiple species and thus multiple transport models.
+            If None, transport model names will be used as species names.
+
+        Returns
+        -------
+        budget: Dict[str, xr.DataArray|xu.UgridDataArray]
+            DataArray contains float64 data of the budgets, with dimensions ("time",
+            "layer", "y", "x").
+
+        """
+        return self._open_output("budget-transport", species_ls=species_ls)
+
+    def open_flow_budget(self, flowja: bool = False) -> dict[str, GridDataArray]:
+        """
+        Open flow budgets of finished simulation, requires that the ``run``
+        method has been called.
+
+        The data is lazily read per timestep and automatically converted into
+        (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV
+        respectively. The conversion is done via the information stored in the
+        Binary Grid file (GRB).
+
+        The ``flowja`` argument controls whether the flow-ja-face array (if
+        present) is returned in grid form as "as is". By default
+        ``flowja=False`` and the array is returned in "grid form", meaning:
+
+            * DIS: in right, front, and lower face flow. All flows are placed in
+            the cell.
+            * DISV: in horizontal and lower face flow.the horizontal flows are
+            placed on the edges and the lower face flow is placed on the faces.
+
+        When ``flowja=True``, the flow-ja-face array is returned as it is found in
+        the CBC file, with a flow for every cell to cell connection. Additionally,
+        a ``connectivity`` DataArray is returned describing for every cell (n) its
+        connected cells (m).
+
+        Parameters
+        ----------
+        flowja: bool, default value: False
+            Whether to return the flow-ja-face values "as is" (``True``) or in a
+            grid form (``False``).
+
+        Returns
+        -------
+        budget: Dict[str, xr.DataArray|xu.UgridDataArray]
+            DataArray contains float64 data of the budgets, with dimensions ("time",
+            "layer", "y", "x").
+
+        Examples
+        --------
+        Make sure you write and run your model first
+
+        >>> simulation.write(path/to/model)
+        >>> simulation.run()
+
+        Then open budgets:
+
+        >>> budget = simulation.open_flow_budget()
+
+        Check the contents:
+
+        >>> print(budget.keys())
+
+        Get the drainage budget, compute a time mean for the first layer:
+
+        >>> drn_budget = budget["drn]
+        >>> mean = drn_budget.sel(layer=1).mean("time")
+        """
+        return self._open_output("budget-flow", flowja=flowja)
+
+    def open_concentration(
+        self, species_ls: list[str] = None, dry_nan: bool = False
+    ) -> GridDataArray:
+        """
+        Open concentration of finished simulation, requires that the ``run``
+        method has been called.
+
+        The data is lazily read per timestep and automatically converted into
+        (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV
+        respectively. The conversion is done via the information stored in the
+        Binary Grid file (GRB).
+
+        Parameters
+        ----------
+        species_ls: list of strings, default value: None.
+            List of species names, which will be used to concatenate the
+            concentrations along the ``"species"`` dimension, in case the
+            simulation has multiple species and thus multiple transport models.
+            If None, transport model names will be used as species names.
+        dry_nan: bool, default value: False.
+            Whether to convert dry values to NaN.
+
+        Returns
+        -------
+        concentration: Union[xr.DataArray, xu.UgridDataArray]
+
+        Examples
+        --------
+        Make sure you write and run your model first
+
+        >>> simulation.write(path/to/model)
+        >>> simulation.run()
+
+        Then open concentrations:
+
+        >>> concentration = simulation.open_concentration()
+        """
+        return self._open_output(
+            "concentration", species_ls=species_ls, dry_nan=dry_nan
+        )
+
+    def _open_output(self, output: str, **settings) -> GridDataArray | GridDataset:
+        """
+        Opens output of one or multiple models.
+
+        Parameters
+        ----------
+        output: str
+            Output variable name to open
+        **settings:
+            Extra settings that need to be passed through to the respective
+            output function.
+        """
+        _, modeltype = OUTPUT_FUNC_MAPPING[output]
+        modelnames = self.get_models_of_type(modeltype._model_id).keys()
+        # Pop species_ls, set to modelnames in case not found
+        species_ls = settings.pop("species_ls", modelnames)
+        if len(modelnames) == 0:
+            raise ValueError(
+                f"Could not find any models of appropriate type for {output}, "
+                f"make sure a model of type {modeltype} is assigned to simulation."
+            )
+        elif len(modelnames) == 1:
+            modelname = next(iter(modelnames))
+            return self._open_output_single_model(modelname, output, **settings)
+        elif output == "concentration":
+            # Multiple models are possible
+            return self._concat_concentrations(
+                modelnames, species_ls, output, **settings
+            )
+        elif output == "budget-transport":
+            # Multiple models are possible
+            return self._concat_transport_budgets(
+                modelnames, species_ls, output, **settings
+            )
+        else:
+            # TODO: This is the place where merging of partioned heads can be implemented.
+            raise NotImplementedError(
+                "Reading output from partioned models not yet supported by this method."
+            )
+
+    def _concat_concentrations(
+        self, modelnames: list[str], species_ls: list[str], output: str, **settings
+    ):
+        concentrations = []
+        for modelname, species in zip(modelnames, species_ls):
+            conc = self._open_output_single_model(modelname, output, **settings)
+            conc = conc.assign_coords(species=species)
+            concentrations.append(conc)
+        return concat(concentrations, dim="species")
+
+    def _concat_transport_budgets(
+        self, modelnames: list[str], species_ls: list[str], output: str, **settings
+    ):
+        budgets = defaultdict(list)
+        for modelname, species in zip(modelnames, species_ls):
+            d_budget = self._open_output_single_model(modelname, output, **settings)
+            for key, da in d_budget.items():
+                da = da.assign_coords(species=species)
+                budgets[key].append(da)
+        return {key: concat(da_ls, dim="species") for key, da_ls in budgets.items()}
+
+    def _open_output_single_model(
+        self, modelname: str, output: str, **settings
+    ) -> GridDataArray | dict[str, GridDataArray]:
+        """
+        Opens output of single model
+
+        Parameters
+        ----------
+        modelname: str
+            Name of groundwater model from which output should be read.
+        output: str
+            Output variable name to open.
+        **settings:
+            Extra settings that need to be passed through to the respective
+            output function.
+        """
+        open_func, expected_modeltype = OUTPUT_FUNC_MAPPING[output]
+
+        if self.directory is None:
+            raise RuntimeError(f"Simulation {self.name} has not been written yet.")
+        model_path = self.directory / modelname
+
+        # Get model
+        model = self[modelname]
+        if not isinstance(model, expected_modeltype):
+            raise TypeError(
+                f"{modelname} not a {expected_modeltype}, instead got {type(model)}"
+            )
+        # Get output file path
+        oc_key = model._get_pkgkey("oc")
+        oc_pkg = model[oc_key]
+        # Ensure "-transport" and "-flow" are stripped from "budget"
+        oc_output = output.split("-")[0]
+        output_path = Path(oc_pkg._get_output_filepath(model_path, oc_output))
+
+        grb_path = self._get_grb_path(modelname)
+
+        if not output_path.exists():
+            raise RuntimeError(
+                f"Could not find output in {output_path}, check if you already ran simulation {self.name}"
+            )
+
+        return open_func(output_path, grb_path, **settings)
+
+    def _get_flow_modelname_coupled_to_transport_model(
+        self, transport_modelname: str
+    ) -> str:
+        """
+        Get name of flow model coupled to transport model, throws error if
+        multiple flow models are couple to 1 transport model.
+        """
+        exchanges = self.get_exchange_relationships()
+        coupled_flow_models = [
+            i[2]
+            for i in exchanges
+            if (i[3] == transport_modelname) & (i[0] == "GWF6-GWT6")
+        ]
+        if len(coupled_flow_models) != 1:
+            raise ValueError(
+                f"Exactly one flow model must be coupled to transport model {transport_modelname}, got: {coupled_flow_models}"
+            )
+        return coupled_flow_models[0]
+
+    def _get_grb_path(self, modelname: str) -> Path:
+        """
+        Finds appropriate grb path belonging to modelname. Grb files are not
+        written for transport models, so this method always returns a path to a
+        flowmodel. In case of a transport model, it returns the path to the grb
+        file its coupled flow model.
+        """
+        model = self[modelname]
+        # Get grb path
+        if isinstance(model, GroundwaterTransportModel):
+            flow_model_name = self._get_flow_modelname_coupled_to_transport_model(
+                modelname
+            )
+            flow_model_path = self.directory / flow_model_name
+        else:
+            flow_model_path = self.directory / modelname
+
+        diskey = model._get_diskey()
+        dis_id = model[diskey]._pkg_id
+        return flow_model_path / f"{diskey}.{dis_id}.grb"
 
     def dump(
         self, directory=".", validate: bool = True, mdal_compliant: bool = False

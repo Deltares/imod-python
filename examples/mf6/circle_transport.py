@@ -298,15 +298,8 @@ simulation.run()
 # Open the results
 # ----------------
 
-sim_concentration = imod.mf6.out.open_conc(
-    modeldir / "transport/transport.ucn",
-    modeldir / "flow/disv.disv.grb",
-).compute()
-
-sim_head = imod.mf6.out.open_hds(
-    modeldir / "flow/flow.hds",
-    modeldir / "flow/disv.disv.grb",
-).compute()
+sim_concentration = simulation.open_concentration().compute()
+sim_head = simulation.open_head().compute()
 
 # %%
 # Assign coordinates to output
