@@ -40,7 +40,7 @@ class StorageBase(Package, abc.ABC):
 
     def _render_dict(self, directory, pkgname, globaltimes, binary):
         d = {}
-        stodirectory = pathlib.Path(directory.stem) / pkgname
+        stodirectory = directory / pkgname
         for varname in self._grid_data:
             key = self._keyword_map.get(varname, varname)
             layered, value = self._compose_values(
