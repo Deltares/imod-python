@@ -52,6 +52,7 @@ def make_circle_model():
         specific_yield=0.15,
         transient=False,
         convertible=0,
+        save_flows=False,
     )
     gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
     gwf_model["rch"] = imod.mf6.Recharge(rch_rate)
@@ -159,3 +160,25 @@ def circle_partitioned():
     submodel_labels.values[118:] = 2
 
     return simulation.split(submodel_labels)
+
+
+def make_circle_model_save_sto():
+    simulation = make_circle_model()
+    gwf_model = simulation["GWF_1"]
+
+    gwf_model["sto"].dataset["save_flows"] = True
+    return simulation
+
+
+@pytest.fixture(scope="session")
+def circle_result_sto(tmpdir_factory):
+    """
+    Circle result with storage fluxes, which are saved as METH1 instead of METH6
+    """
+    # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
+    # directory between different testing modules.
+    modeldir = tmpdir_factory.mktemp("circle_sto")
+    simulation = make_circle_model_save_sto()
+    simulation.write(modeldir)
+    simulation.run()
+    return modeldir

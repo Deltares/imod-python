@@ -18,7 +18,6 @@ import xugrid as xu
 from jinja2 import Template
 
 import imod
-from imod.mf6 import qgs_util
 from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.package import Package
 from imod.mf6.regridding_utils import RegridderInstancesCollection, RegridderType
@@ -64,7 +63,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         for k, v in dict(*args, **kwargs).items():
             self[k] = v
 
-    def __get_diskey(self):
+    def _get_diskey(self):
         dis_pkg_ids = ["dis", "disv", "disu"]
 
         diskeys = [
@@ -170,7 +169,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         Union[xr.DataArray, xu.UgridDataArray],
         Union[xr.DataArray, xu.UgridDataArray],
     ]:
-        discretization = self[self.__get_diskey()]
+        discretization = self[self._get_diskey()]
         if discretization is None:
             raise ValueError("Discretization not found")
         top = discretization["top"]
@@ -189,7 +188,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def _validate(self, model_name: str = "") -> StatusInfoBase:
         try:
-            diskey = self.__get_diskey()
+            diskey = self._get_diskey()
         except Exception as e:
             status_info = StatusInfo(f"{model_name} model")
             status_info.add_error(str(e))
@@ -448,7 +447,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         methods = self._get_unique_regridder_types()
         output_domain = self._get_regridding_domain(target_grid, methods)
-        new_model[self.__get_diskey()]["idomain"] = output_domain
+        new_model[self._get_diskey()]["idomain"] = output_domain
         new_model._mask_all_packages(output_domain)
 
         if validate:
@@ -471,12 +470,12 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     @property
     def domain(self):
-        dis = self.__get_diskey()
+        dis = self._get_diskey()
         return self[dis]["idomain"]
 
     @property
     def bottom(self):
-        dis = self.__get_diskey()
+        dis = self._get_diskey()
         return self[dis]["bottom"]
 
     def _get_regridding_domain(
@@ -559,51 +558,6 @@ class GroundwaterFlowModel(Modflow6Model):
                     f"regridding is not implemented for package {pkg_name} of type {type(pkg)}"
                 )
         return methods
-
-    def write_qgis_project(self, directory, crs, aggregate_layers=False):
-        """
-        Write qgis projectfile and accompanying netcdf files that can be read in qgis.
-
-        Parameters
-        ----------
-        directory : Path
-            directory of qgis project
-
-        crs : str, int,
-            anything that can be converted to a pyproj.crs.CRS
-
-        aggregate_layers : Optional, bool
-            If True, aggregate layers by taking the mean, i.e. ds.mean(dim="layer")
-
-        """
-        ext = ".qgs"
-
-        directory = pathlib.Path(directory)
-        directory.mkdir(exist_ok=True, parents=True)
-
-        pkgnames = [
-            pkgname
-            for pkgname, pkg in self.items()
-            if all(i in pkg.dataset.dims for i in ["x", "y"])
-        ]
-
-        data_paths = []
-        data_vars_ls = []
-        for pkgname in pkgnames:
-            pkg = self[pkgname].rio.write_crs(crs)
-            data_path = pkg._netcdf_path(directory, pkgname)
-            data_path = "./" + data_path.relative_to(directory).as_posix()
-            data_paths.append(data_path)
-            # FUTURE: MDAL has matured enough that we do not necessarily
-            #           have to write seperate netcdfs anymore
-            data_vars_ls.append(
-                pkg.write_netcdf(directory, pkgname, aggregate_layers=aggregate_layers)
-            )
-
-        qgs_tree = qgs_util._create_qgis_tree(
-            self, pkgnames, data_paths, data_vars_ls, crs
-        )
-        qgs_util._write_qgis_projectfile(qgs_tree, directory / ("qgis_proj" + ext))
 
     def clip_box(
         self,
