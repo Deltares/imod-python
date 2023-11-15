@@ -1,11 +1,11 @@
 # keep track of performance using pytest-benchmark
 # https://pytest-benchmark.readthedocs.io/en/stable/
 
+import flopy
 import numpy as np
 import pytest
 import xarray as xr
 
-import flopy
 import imod
 
 
