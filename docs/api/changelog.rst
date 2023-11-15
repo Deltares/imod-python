@@ -18,7 +18,13 @@ Fixed
   default tile provider being used was Stamen. However Stamen is no longer free
   which caused Contextily to fail. The default tile provider has been changed to
   OpenStreetMap to resolve this issue.
-- :function:`imod.mf6.out.read_cbc` now reads saved cell saturations and specific discharges.
+- :function:`imod.mf6.out.open_cbc` now reads saved cell saturations and specific discharges.
+- :function:`imod.mf6.out.open_cbc` failed to read unstructured budgets stored
+  following IMETH1, most importantly the storage fluxes.
+- Fixed support of Python 3.11 by dropping the obsolete ``qgs`` module.
+- Bug in :class:`imod.mf6.SourceSinkMixing` where, in case of multiple active
+  boundary conditions with assigned concentrations, it would write a ``.ssm``
+  file with all sources/sinks on one single row.
 
 Changed
 ~~~~~~~
@@ -43,10 +49,24 @@ Added
 - Functions :function:`get_upper_active_grid_cells` and
   :function:`get_lower_active_grid_cells` to return boolean grids designating
   respectively the highest and lowest active cells in a grid.
+- validation of ``transient`` argument in :class:`imod.mf6.StorageCoefficient`
+  and :class:`imod.mf6.SpecificStorage`.
+- :method:`imod.mf6.Simulation.open_concentration`,
+  :method:`imod.mf6.Simulation.open_head`,
+  :method:`imod.mf6.Simulation.open_transport_budget`, and
+  :method:`imod.mf6.Simulation.open_flow_budget`, were added as convenience
+  methods to open simulation output easier (without having to specify paths).
+- Settings such as ``save_flows`` can be passed through
+  :method:`imod.mf6.SourceSinkMixing.from_flow_model`
 
 Removed
 ~~~~~~~
 - Tox has been removed from the project.
+- Dropped support for writing .qgs files directly for QGIS, as this was hard to
+  maintain and rarely used. To export your model to QGIS readable files, call
+  the ``dump`` method :class:`imod.mf6.Simulation` with ``mdal_compliant=True``.
+  This writes UGRID NetCDFs which can read as meshes in QGIS.
+- Removed ``declxml`` from repository.
 
 [0.14.1] - 2023-09-07
 ---------------------

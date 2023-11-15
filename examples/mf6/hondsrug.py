@@ -630,12 +630,9 @@ simulation.run()
 #
 # The heads results are imported using
 # `imod.mf6.open_hds <https://deltares.gitlab.io/imod/imod-python/api/mf6.html?highlight=imod%20mf6%20open_hds#imod.mf6.open_hds>`_
-# and indicating the location of the heads, as well as the DIS file.
+# on the background.
 
-hds = imod.mf6.open_hds(
-    modeldir / "GWF_1" / "GWF_1.hds", modeldir / "GWF_1" / "dis.dis.grb"
-)
-hds
+hds = simulation.open_head()
 
 # %%
 # We can plot the data of an individual layer as follows

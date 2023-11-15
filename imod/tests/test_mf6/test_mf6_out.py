@@ -284,3 +284,32 @@ def test_open_cbc__disv(circle_result):
 
             # Test if no errors are thrown if the array is loaded into memory
             array.load()
+
+
+@pytest.mark.usefixtures("circle_result_sto")
+def test_open_cbc__disv_sto(circle_result_sto):
+    """With saved storage fluxes, which are saved as METH1"""
+    modeldir = circle_result_sto
+    with imod.util.cd(modeldir):
+        cbc = imod.mf6.open_cbc("GWF_1/GWF_1.cbc", "GWF_1/disv.disv.grb")
+        assert isinstance(cbc, dict)
+        assert sorted(cbc.keys()) == [
+            "chd",
+            "flow-horizontal-face",
+            "flow-horizontal-face-x",
+            "flow-horizontal-face-y",
+            "flow-lower-face",
+            "sto-ss",
+        ]
+        for key, array in cbc.items():
+            if key in ("chd", "flow-lower-face", "sto-ss"):
+                assert array.shape == (1, 2, 216)
+                assert array.dims[-1] == array.ugrid.grid.face_dimension
+            else:
+                assert array.shape == (1, 2, 342)
+                assert array.dims[-1] == array.ugrid.grid.edge_dimension
+            assert isinstance(array, xu.UgridDataArray)
+            assert isinstance(array.data, dask.array.Array)
+
+            # Test if no errors are thrown if the array is loaded into memory
+            array.load()

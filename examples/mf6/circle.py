@@ -175,10 +175,8 @@ simulation.run()
 #
 # First, we'll open the heads (.hds) file.
 
-head = imod.mf6.out.open_hds(
-    modeldir / "GWF_1/GWF_1.hds",
-    modeldir / "GWF_1/disv.disv.grb",
-)
+head = simulation.open_head()
+
 head
 
 # %%
@@ -188,10 +186,8 @@ head
 #
 # We may also open the cell-by-cell flows (.cbc) file.
 
-cbc = imod.mf6.open_cbc(
-    modeldir / "GWF_1/GWF_1.cbc",
-    modeldir / "GWF_1/disv.disv.grb",
-)
+cbc = simulation.open_flow_budget()
+
 print(cbc.keys())
 
 # %%
@@ -252,10 +248,7 @@ half_simulation = simulation.clip_box(
 modeldir = imod.util.temporary_directory()
 half_simulation.write(modeldir)
 half_simulation.run()
-head = imod.mf6.out.open_hds(
-    modeldir / "GWF_1/GWF_1.hds",
-    modeldir / "GWF_1/disv.disv.grb",
-)
+head = half_simulation.open_head()
 
 # %%
 # Let's add constant head boundaries together and plot them
