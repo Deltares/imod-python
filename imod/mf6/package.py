@@ -293,55 +293,6 @@ class Package(PackageBase, abc.ABC):
             raise ValidationError(message)
         return
 
-    def _netcdf_path(self, directory, pkgname):
-        """create path for netcdf, this function is also used to create paths to use inside the qgis projectfiles"""
-        return directory / pkgname / f"{self._pkg_id}.nc"
-
-    def write_netcdf(self, directory, pkgname, aggregate_layers=False):
-        """Write to netcdf. Useful for generating .qgs projectfiles to view model input.
-        These files cannot be used to run a modflow model.
-
-        Parameters
-        ----------
-        directory : Path
-            directory of qgis project
-
-        pkgname : str
-            package name
-
-        aggregate_layers : bool
-            If True, aggregate layers by taking the mean, i.e. ds.mean(dim="layer")
-
-        Returns
-        -------
-        has_dims : list of str
-            list of variables that have an x and y dimension.
-
-        """
-
-        has_dims = []
-        for varname in self.dataset.data_vars.keys():  # pylint:disable=no-member
-            if all(i in self.dataset[varname].dims for i in ["x", "y"]):
-                has_dims.append(varname)
-
-        spatial_ds = self.dataset[has_dims]
-
-        if aggregate_layers and ("layer" in spatial_ds.dims):
-            spatial_ds = spatial_ds.mean(dim="layer")
-
-        if "time" not in spatial_ds:
-            # Hack to circumvent this issue:
-            # https://github.com/lutraconsulting/MDAL/issues/300
-            spatial_ds = spatial_ds.assign_coords(
-                time=np.array("1970-01-01", dtype=np.datetime64)
-            ).expand_dims(dim="time")
-
-        path = self._netcdf_path(directory, pkgname)
-        path.parent.mkdir(exist_ok=True, parents=True)
-
-        spatial_ds.to_netcdf(path)
-        return has_dims
-
     def _get_vars_to_check(self):
         """
         Helper function to get all variables which were not set to None

@@ -10,12 +10,19 @@ from imod.mf6.utilities.dataset import is_dataarray_none
 from imod.mf6.write_context import WriteContext
 from imod.schemata import DTypeSchema
 
+OUTPUT_EXT_MAPPING = {
+    "head": "hds",
+    "concentration": "ucn",
+    "budget": "cbc",
+}
+
 
 class OutputControl(Package):
     """
-    The Output Control Option determines how and when heads are printed to the
-    listing file and/or written to a separate binary output file.
-    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=47
+    The Output Control Option determines how and when heads, budgets and/or
+    concentrations are printed to the listing file and/or written to a separate
+    binary output file.
+    https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.4.2.pdf#page=53
 
     Currently the settings "first", "last", "all", and "frequency"
     are supported, the "steps" setting is not supported, because of
@@ -119,32 +126,34 @@ class OutputControl(Package):
                 f"Output Control setting should be either integer or string in ['first', 'last', 'all'], instead got {setting}"
             )
 
-    def render(self, directory, pkgname, globaltimes, binary):
-        d = {}
+    def _get_output_filepath(self, directory: Path, output_variable: str):
+        varname = f"{output_variable}_file"
+        ext = OUTPUT_EXT_MAPPING[output_variable]
         modelname = directory.stem
 
-        pairs = (
-            ("head", "hds"),
-            ("concentration", "ucn"),
-            ("budget", "cbc"),
-        )
-        for part, ext in pairs:
-            save = self.dataset[f"save_{part}"].values[()]
-            if save is not None:
-                varname = f"{part}_file"
-                filepath = self.dataset[varname].values[()]
-                if filepath is None:
-                    filepath = directory / f"{modelname}.{ext}"
-                else:
-                    filepath = Path(filepath)
+        filepath = self.dataset[varname].values[()]
+        if filepath is None:
+            filepath = directory / f"{modelname}.{ext}"
+        else:
+            filepath = Path(filepath)
 
-                if filepath.is_absolute():
-                    path = filepath
-                else:
-                    # Get path relative to the simulation name file.
-                    sim_directory = directory.parent
-                    path = Path(os.path.relpath(filepath, sim_directory))
-                d[varname] = path.as_posix()
+        if filepath.is_absolute():
+            path = filepath
+        else:
+            # Get path relative to the simulation name file.
+            sim_directory = directory.parent
+            path = Path(os.path.relpath(filepath, sim_directory))
+
+        return path.as_posix()
+
+    def render(self, directory, pkgname, globaltimes, binary):
+        d = {}
+
+        for output_variable in OUTPUT_EXT_MAPPING.keys():
+            save = self.dataset[f"save_{output_variable}"].values[()]
+            if save is not None:
+                varname = f"{output_variable}_file"
+                d[varname] = self._get_output_filepath(directory, output_variable)
 
         periods = collections.defaultdict(dict)
         for datavar in ("save_head", "save_concentration", "save_budget"):

@@ -6,6 +6,7 @@ import xugrid as xu
 from fastcore.dispatch import typedispatch
 
 from imod.prepare import polygonize
+from imod.typing import GridDataArray, GridDataset
 
 
 @typedispatch
@@ -93,3 +94,16 @@ def is_spatial_2D(array: xu.UgridDataArray) -> bool:
     has_spatial_coords = face_dim in coords
     has_spatial_dims = face_dim in dims
     return has_spatial_dims & has_spatial_coords
+
+
+# Typedispatching doesn't work based on types of list elements, therefore to
+# isinstance testing
+def concat(grid_ls: list[GridDataArray | GridDataset], *args, **kwargs):
+    if isinstance(grid_ls[0], (xu.UgridDataArray, xu.UgridDataset)):
+        return xu.concat(grid_ls, *args, **kwargs)
+    elif isinstance(grid_ls[0], (xr.DataArray, xr.Dataset)):
+        return xr.concat(grid_ls, *args, **kwargs)
+    else:
+        raise TypeError(
+            f"Expected type UgridDataArray or DataArray, received {type(grid_ls[0])}"
+        )

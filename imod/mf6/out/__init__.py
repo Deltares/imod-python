@@ -105,8 +105,10 @@ def open_hds(
     Open modflow6 heads (.hds) file.
 
     The data is lazily read per timestep and automatically converted into
-    DataArrays. The conversion is done via the information stored in the Binary
-    Grid file (GRB).
+    (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV respectively.
+    The conversion is done via the information stored in the Binary Grid file
+    (GRB).
+
 
     Parameters
     ----------
@@ -133,8 +135,9 @@ def open_conc(
     Open Modflow6 "Unformatted Concentration" (.ucn) file.
 
     The data is lazily read per timestep and automatically converted into
-    DataArrays. The conversion is done via the information stored in the Binary
-    Grid file (GRB).
+    (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV respectively.
+    The conversion is done via the information stored in the Binary Grid file
+    (GRB).
 
     Parameters
     ----------
@@ -199,11 +202,13 @@ def open_cbc(
     Open modflow6 cell-by-cell (.cbc) file.
 
     The data is lazily read per timestep and automatically converted into
-    (dense) xr.DataArrays. The conversion is done via the information stored in
-    the Binary Grid file (GRB).
+    (dense) xr.DataArrays or xu.UgridDataArrays, for DIS and DISV respectively.
+    The conversion is done via the information stored in the Binary Grid file
+    (GRB).
 
-    The ``flowja`` argument controls whether the flow-ja-face array (if
-    present) is returned in grid form as "as is". "Grid from" means:
+    The ``flowja`` argument controls whether the flow-ja-face array (if present)
+    is returned in grid form as "as is". By default ``flowja=False`` and the
+    array is returned in "grid form", meaning:
 
         * DIS: in right, front, and lower face flow. All flows are placed in
           the cell.
