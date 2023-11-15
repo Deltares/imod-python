@@ -1,4 +1,7 @@
 import pytest
+import xugrid as xu
+
+import imod
 
 
 @pytest.mark.usefixtures("circle_model")
@@ -6,6 +9,15 @@ def test_simulation_writes_full_paths_if_requested(circle_model, tmp_path):
     simulation = circle_model
     sim_dir = tmp_path / "circle"
 
+    # add grid-data to the storage package to increase test sensitivity
+    idomain = simulation["GWF_1"].domain
+    specific_storage = xu.full_like(idomain, dtype=float, fill_value=1e-5)
+    simulation["GWF_1"]["sto"] = imod.mf6.SpecificStorage(
+        specific_storage=specific_storage,
+        specific_yield=0.15,
+        transient=False,
+        convertible=0,
+    )
     simulation.write(sim_dir, binary=False, use_absolute_paths=True)
 
     simdir_separator_count = str(sim_dir.as_posix()).count("/")
@@ -20,7 +32,7 @@ def test_simulation_writes_full_paths_if_requested(circle_model, tmp_path):
         "npf.npf": 3 * pkgdir_separator_count + 3,
         "oc.oc": 2 * modeldir_separator_count,
         "rch.rch": pkgdir_separator_count + 1,
-        "sto.sto": 0,
+        "sto.sto": pkgdir_separator_count + 1,
     }
 
     for fname, expected_separator_count in toplevel_files.items():

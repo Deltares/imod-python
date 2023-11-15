@@ -1,8 +1,8 @@
 from pathlib import Path
 
-import flopy
 import pytest
 
+import flopy
 from imod.mf6 import Modflow6Simulation
 
 
