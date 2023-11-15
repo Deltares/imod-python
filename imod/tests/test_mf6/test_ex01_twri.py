@@ -279,41 +279,33 @@ def test_rch_render(twri_model, tmp_path):
     assert (tmp_path / "rch" / "rch.bin").is_file()
 
 
-@pytest.mark.usefixtures("twri_model")
 def test_wel_render(twri_model, tmp_path):
     simulation = twri_model
-    globaltimes = simulation["time_discretization"]["time"].values
-    wel = simulation["GWF_1"]["wel"]
-    actual = wel.render(
-        directory=tmp_path,
-        pkgname="wel",
-        globaltimes=globaltimes,
-        binary=True,
+    simulation.write(
+        tmp_path,
     )
-    path = Path(tmp_path).as_posix()
+    wel_path = tmp_path / "GWF_1/wel.wel"
+    with open(wel_path, "r") as wel_file:
+        actual = wel_file.read()
+
     expected = textwrap.dedent(
-        f"""\
+        """\
             begin options
-              print_input
-              print_flows
               save_flows
             end options
 
             begin dimensions
-              maxbound 15
+              maxbound 45
             end dimensions
 
             begin period 1
-              open/close {path}/wel/wel.bin (binary)
+              open/close GWF_1/wel/wel.bin (binary)
             end period
             """
     )
     assert actual == expected
-    write_context = WriteContext(simulation_directory=tmp_path, use_binary=True)
-    wel.write(pkgname="wel", globaltimes=None, write_context=write_context)
-    assert (tmp_path / "wel.wel").is_file()
-    assert (tmp_path / "wel").is_dir()
-    assert (tmp_path / "wel" / "wel.bin").is_file()
+    assert (tmp_path / "GWF_1/wel").is_dir()
+    assert (tmp_path / "GWF_1/wel" / "wel.bin").is_file()
 
 
 @pytest.mark.usefixtures("twri_model")
@@ -366,6 +358,7 @@ def test_gwfmodel_render(twri_model, tmp_path):
             end options
 
             begin packages
+              wel6 {path}/wel.wel wel
               dis6 {path}/dis.dis dis
               chd6 {path}/chd.chd chd
               drn6 {path}/drn.drn drn
@@ -373,7 +366,6 @@ def test_gwfmodel_render(twri_model, tmp_path):
               npf6 {path}/npf.npf npf
               oc6 {path}/oc.oc oc
               rch6 {path}/rch.rch rch
-              wel6 {path}/wel.wel wel
               sto6 {path}/sto.sto sto
             end packages
             """

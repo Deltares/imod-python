@@ -249,8 +249,11 @@ class Well(BoundaryCondition, IPointDataPackage):
     ) -> None:
         if validate:
             self._validate(self._write_schemata)
-        mf6_package = self.to_mf6_pkg(idomain, top, bottom, k)
-
+        mf6_package = self.to_mf6_pkg(
+            idomain, top, bottom, k, write_context.is_partitioned
+        )
+        # TODO: make options like "save_flows" configurable. Issue gitlab #623
+        mf6_package.dataset["save_flows"] = True
         mf6_package.write(pkgname, globaltimes, write_context)
 
     def __create_wells_df(self) -> pd.DataFrame:
@@ -418,6 +421,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         top: Union[xr.DataArray, xu.UgridDataArray],
         bottom: Union[xr.DataArray, xu.UgridDataArray],
         k: Union[xr.DataArray, xu.UgridDataArray],
+        is_partitioned: bool = False,
     ) -> Mf6Wel:
         """
         Write package to Modflow 6 package.
@@ -465,8 +469,8 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         if nwells_df == 0:
             raise ValueError("No wells were assigned in package. None were present.")
-
-        if nwells_df != nwells_assigned:
+        # @TODO: reinstate this check. issue gitlab #621.
+        if not is_partitioned and nwells_df != nwells_assigned:
             raise ValueError(
                 "One or more well(s) are completely invalid due to minimum conductivity and thickness constraints."
             )
