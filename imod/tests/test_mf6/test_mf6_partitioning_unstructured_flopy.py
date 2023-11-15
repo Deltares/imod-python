@@ -114,3 +114,11 @@ def  test_partitioning_structured_flopy(tmp_path, twri_model):
     flopy_sim.run_simulation(silent=True)
     
     
+    mf_splitter = Mf6Splitter(flopy_sim)
+   
+    
+    flopy_split_sim =  mf_splitter.split_model(diagonal_submodel_labels_1)
+    flopy_split_dir = tmp_path / "flopy_split"   
+    flopy_split_sim.set_sim_path(flopy_split_dir)
+    flopy_split_sim.write_simulation(silent=False)
+    flopy_split_sim.run_simulation(silent=False)
