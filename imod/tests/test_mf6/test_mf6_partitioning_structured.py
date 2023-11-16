@@ -4,13 +4,13 @@ from typing import Dict
 import numpy as np
 import pytest
 import xarray as xr
+from numpy.testing import assert_almost_equal
 
 import imod
 from imod.mf6 import Modflow6Simulation
 from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
 from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
-from numpy.testing import assert_almost_equal
 
 
 def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArray]:
