@@ -69,7 +69,7 @@ def test_simulation_writes_full_paths_if_requested(circle_model, tmp_path):
         simulation.write(sim_dir, binary=False, use_absolute_paths=path_setting)
 
         # Define some counters of the expected number of slashes in the output file
-        # This includes slashes in paths, but they also include slashes in keywords
+        # This includes slashes in paths, but also slashes in keywords
         # such as "open/close" found in mf6 input.
         if path_setting:
             simdir_separator_count = str(sim_dir.as_posix()).count("/")
