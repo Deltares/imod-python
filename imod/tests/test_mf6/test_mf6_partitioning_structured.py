@@ -10,9 +10,7 @@ from imod.mf6 import Modflow6Simulation
 from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
 from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
-
-import flopy
-from flopy.mf6.utils import Mf6Splitter
+from numpy.testing import assert_almost_equal
 
 def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArray]:
     result = {}
@@ -69,7 +67,7 @@ def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArr
     intrusion = zeros_like(idomain_top)
     intrusion.values[0:15, 0:8] = 0
     intrusion.values[0:15, 8:] = 1
-    intrusion.values[7, 7] = 0
+    intrusion.values[8, 8] = 0
     result["intrusion"] = intrusion
 
     """
@@ -222,53 +220,29 @@ def test_partitioning_structured_with_vpt_cells(
     np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-4, atol=1e-4)
 
 
-
 @pytest.mark.usefixtures("transient_twri_model")
-@pytest.mark.parametrize(
-    "partition_name",
-    ["diagonal_1", "diagonal_2", "four_squares", "intrusion", "island"],
-)
-def test_partitioning_strong_k_anisotropy(
-    tmp_path: Path, transient_twri_model: Modflow6Simulation, partition_name: str
+def test_partitioning_structured_geometry_auxiliary_variables(
+    tmp_path: Path, transient_twri_model: Modflow6Simulation,
 ):
+
     simulation = transient_twri_model
-    idomain = simulation["GWF_1"].domain
-    k = transient_twri_model["GWF_1"]["npf"].dataset["k"]
-    transient_twri_model["GWF_1"]["npf"].dataset["k22"]= k *100
-
-    partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
-    # run the original example, so without partitioning, and save the simulation results
-    orig_dir = tmp_path / "original"
-    simulation.write(orig_dir, binary=False, use_absolute_paths=True)
-    #-----------------------------
-    flopy_sim =flopy.mf6.MFSimulation.load( sim_ws=orig_dir, verbosity_level=1,)    
-
-    mf_splitter = Mf6Splitter(flopy_sim)
-    flopy_split_sim =  mf_splitter.split_model(partitioning_arrays[partition_name])
-    flopy_split_dir = tmp_path / "flopy_split"   
-    flopy_split_sim.set_sim_path(flopy_split_dir)
-    flopy_split_sim.write_simulation(silent=False)
-    flopy_split_sim.run_simulation(silent=False)    
-    #-----------------------------
-    simulation.run()
-
-    orig_head = imod.mf6.open_hds(
-        orig_dir / "GWF_1/GWF_1.hds",
-        orig_dir / "GWF_1/dis.dis.grb",
-    )
 
     # partition the simulation, run it, and save the (merged) results
-
-
+    idomain = simulation["GWF_1"].domain
+    partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
+    partition_name = "intrusion"
     split_simulation = simulation.split(partitioning_arrays[partition_name])
 
-    split_simulation.write(tmp_path, binary=False)
-    split_simulation.run()
-
-    head = merge_heads(tmp_path, split_simulation)
-    _ = merge_balances(tmp_path, split_simulation)
-
-
-
-    # compare the head result of the original simulation with the result of the partitioned simulation
-    np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-4, atol=1e-4)
+    assert_almost_equal( split_simulation["split_exchanges"][0].dataset["cdist"].values , 
+       np.array([5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000.,
+       5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000.,
+       5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000.,
+       5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000.,
+       5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000.,
+       5000., 5000., 5000., 5000., 5000., 5000.]))
+    
+    assert_almost_equal(split_simulation["split_exchanges"][0].dataset["angldegx"], np.array([180., 180., 180., 180., 180., 180., 180., 180., 270., 180.,  90.,
+       180., 180., 180., 180., 180., 180., 180., 180., 180., 180., 180.,
+       180., 180., 180., 270., 180.,  90., 180., 180., 180., 180., 180.,
+       180., 180., 180., 180., 180., 180., 180., 180., 180., 270., 180.,
+        90., 180., 180., 180., 180., 180., 180.]))
