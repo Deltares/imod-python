@@ -86,7 +86,7 @@ class ExchangeCreator_Structured(ExchangeCreator):
         geometric_grid_info = create_geometric_grid_info(self._global_cell_indices)
 
         cell1_df = geometric_grid_info.take(self._connected_cells["cell_idx1"])
-        cell2_df = geometric_grid_info.take(self._connected_cells["cell_idx2"])     
+        cell2_df = geometric_grid_info.take(self._connected_cells["cell_idx2"])
 
         distance_x = np.abs(cell1_df["x"].values - cell2_df["x"].values)
         distance_y = np.abs(cell1_df["y"].values - cell2_df["y"].values)
@@ -100,15 +100,13 @@ class ExchangeCreator_Structured(ExchangeCreator):
         )
         hwva = np.where(is_x_connection, cell2_df["dy"].values, cell2_df["dx"].values)
 
-        cdist = np.where(
-            is_x_connection, distance_x, distance_y
-        )
+        cdist = np.where(is_x_connection, distance_x, distance_y)
 
         outward_vector = np.zeros((len(is_x_connection), 2))
-        outward_vector[:,0 ] = cell2_df["x"].values - cell1_df["x"].values 
-        outward_vector[:,1 ] = cell2_df["y"].values - cell1_df["y"].values 
+        outward_vector[:, 0] = cell2_df["x"].values - cell1_df["x"].values
+        outward_vector[:, 1] = cell2_df["y"].values - cell1_df["y"].values
         anglex = np.arctan2(outward_vector[:, 1], outward_vector[:, 0])
-        angledegx = np.degrees(anglex) % 360        
+        angledegx = np.degrees(anglex) % 360
 
         geometric_information = pd.DataFrame(
             {
@@ -118,7 +116,7 @@ class ExchangeCreator_Structured(ExchangeCreator):
                 "cl2": cl2,
                 "hwva": hwva,
                 "angldegx": angledegx,
-                "cdist" : cdist
+                "cdist": cdist,
             }
         )
 

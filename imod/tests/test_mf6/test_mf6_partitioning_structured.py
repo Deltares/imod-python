@@ -12,6 +12,7 @@ from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
 from numpy.testing import assert_almost_equal
 
+
 def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArray]:
     result = {}
     diagonal_submodel_labels_1 = zeros_like(idomain_top)
@@ -222,9 +223,8 @@ def test_partitioning_structured_with_vpt_cells(
 
 @pytest.mark.usefixtures("transient_twri_model")
 def test_partitioning_structured_geometry_auxiliary_variables(
-    tmp_path: Path, transient_twri_model: Modflow6Simulation,
+    transient_twri_model: Modflow6Simulation,
 ):
-
     simulation = transient_twri_model
 
     # partition the simulation, run it, and save the (merged) results
@@ -233,16 +233,120 @@ def test_partitioning_structured_geometry_auxiliary_variables(
     partition_name = "intrusion"
     split_simulation = simulation.split(partitioning_arrays[partition_name])
 
-    assert_almost_equal( split_simulation["split_exchanges"][0].dataset["cdist"].values , 
-       np.array([5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000.,
-       5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000.,
-       5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000.,
-       5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000.,
-       5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000., 5000.,
-       5000., 5000., 5000., 5000., 5000., 5000.]))
-    
-    assert_almost_equal(split_simulation["split_exchanges"][0].dataset["angldegx"], np.array([180., 180., 180., 180., 180., 180., 180., 180., 270., 180.,  90.,
-       180., 180., 180., 180., 180., 180., 180., 180., 180., 180., 180.,
-       180., 180., 180., 270., 180.,  90., 180., 180., 180., 180., 180.,
-       180., 180., 180., 180., 180., 180., 180., 180., 180., 270., 180.,
-        90., 180., 180., 180., 180., 180., 180.]))
+    assert_almost_equal(
+        split_simulation["split_exchanges"][0].dataset["cdist"].values,
+        np.array(
+            [
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+                5000.0,
+            ]
+        ),
+    )
+
+    assert_almost_equal(
+        split_simulation["split_exchanges"][0].dataset["angldegx"],
+        np.array(
+            [
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                270.0,
+                180.0,
+                90.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                270.0,
+                180.0,
+                90.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                270.0,
+                180.0,
+                90.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+            ]
+        ),
+    )

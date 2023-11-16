@@ -12,6 +12,8 @@ from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
 import flopy
 from flopy.mf6.utils import Mf6Splitter
+
+
 def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArray]:
     result = {}
     two_parts = zeros_like(idomain_top)
@@ -29,6 +31,8 @@ def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArr
     result["three_parts"] = three_parts
 
     return result
+
+
 def setup_partitioning_flopy(idomain_top: xr.DataArray) -> Dict[str, xr.DataArray]:
     result = {}
     two_parts = zeros_like(idomain_top)
@@ -46,6 +50,7 @@ def setup_partitioning_flopy(idomain_top: xr.DataArray) -> Dict[str, xr.DataArra
     result["three_parts"] = three_parts
 
     return result
+
 
 @pytest.mark.usefixtures("circle_model")
 @pytest.mark.parametrize(
@@ -65,60 +70,60 @@ def test_partitioning_unstructured_flopy(
     orig_dir = tmp_path / "original"
     simulation.write(orig_dir, binary=False, use_absolute_paths=True)
 
-    split_ip_dir = tmp_path / "split_ip"    
+    split_ip_dir = tmp_path / "split_ip"
     split_simulation_ip = simulation.split(partitioning_arrays[partition_name])
     split_simulation_ip.write(split_ip_dir, binary=False)
 
-    flopy_sim =flopy.mf6.MFSimulation.load( sim_ws=orig_dir, verbosity_level=1,)
+    flopy_sim = flopy.mf6.MFSimulation.load(
+        sim_ws=orig_dir,
+        verbosity_level=1,
+    )
     flopy_dir = tmp_path / "flopy"
     flopy_sim.set_sim_path(flopy_dir)
     flopy_sim.write_simulation(silent=False)
     flopy_sim.run_simulation(silent=True)
 
-
     gwf = flopy_sim.get_model()
 
-
     mf_splitter = Mf6Splitter(flopy_sim)
-   
-    
-    flopy_split_sim =  mf_splitter.split_model(partitioning_array)
-    flopy_split_dir = tmp_path / "flopy_split"   
+
+    flopy_split_sim = mf_splitter.split_model(partitioning_array)
+    flopy_split_dir = tmp_path / "flopy_split"
     flopy_split_sim.set_sim_path(flopy_split_dir)
     flopy_split_sim.write_simulation(silent=False)
     flopy_split_sim.run_simulation(silent=False)
 
-@pytest.mark.usefixtures("twri_model")
-def  test_partitioning_structured_flopy(tmp_path, twri_model): 
 
+@pytest.mark.usefixtures("twri_model")
+def test_partitioning_structured_flopy(tmp_path, twri_model):
     idomain = twri_model["GWF_1"].domain
     diagonal_submodel_labels_1 = zeros_like(idomain.sel(layer=1))
 
     for i in range(15):
         for j in range(i):
             diagonal_submodel_labels_1.values[i, j] = 1
-    
 
- # run the original example, so without partitioning, and save the simulation results
+    # run the original example, so without partitioning, and save the simulation results
     orig_dir = tmp_path / "original"
     twri_model.write(orig_dir, binary=False, use_absolute_paths=True)
 
-    split_ip_dir = tmp_path / "split_ip"    
+    split_ip_dir = tmp_path / "split_ip"
     split_simulation_ip = twri_model.split(diagonal_submodel_labels_1)
     split_simulation_ip.write(split_ip_dir, binary=False)
 
-    flopy_sim =flopy.mf6.MFSimulation.load( sim_ws=orig_dir, verbosity_level=1,)
+    flopy_sim = flopy.mf6.MFSimulation.load(
+        sim_ws=orig_dir,
+        verbosity_level=1,
+    )
     flopy_dir = tmp_path / "flopy"
     flopy_sim.set_sim_path(flopy_dir)
     flopy_sim.write_simulation(silent=False)
     flopy_sim.run_simulation(silent=True)
-    
-    
+
     mf_splitter = Mf6Splitter(flopy_sim)
-   
-    
-    flopy_split_sim =  mf_splitter.split_model(diagonal_submodel_labels_1)
-    flopy_split_dir = tmp_path / "flopy_split"   
+
+    flopy_split_sim = mf_splitter.split_model(diagonal_submodel_labels_1)
+    flopy_split_dir = tmp_path / "flopy_split"
     flopy_split_sim.set_sim_path(flopy_split_dir)
     flopy_split_sim.write_simulation(silent=False)
     flopy_split_sim.run_simulation(silent=False)
