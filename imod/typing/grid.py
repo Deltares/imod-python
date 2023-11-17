@@ -75,15 +75,6 @@ def bounding_polygon(active: xu.UgridDataArray):
     return active.ugrid.grid.bounding_polygon()
 
 
-@typedispatch
-def is_spatial_2D(array: xr.DataArray) -> bool:
-    """Return True if the array contains data in at least 2 spatial dimensions"""
-    coords = array.coords
-    dims = array.dims
-    has_spatial_coords = "x" in coords and "y" in coords
-    has_spatial_dims = "x" in dims and "y" in dims
-    return has_spatial_coords & has_spatial_dims
-
 # Typedispatching doesn't work based on types of list elements, therefore to
 # isinstance testing
 def concat(grid_ls: list[GridDataArray | GridDataset], *args, **kwargs):
@@ -95,6 +86,19 @@ def concat(grid_ls: list[GridDataArray | GridDataset], *args, **kwargs):
         raise TypeError(
             f"Expected type UgridDataArray or DataArray, received {type(grid_ls[0])}"
         )
+
+
+@typedispatch
+def is_spatial_2D(array: xr.DataArray) -> bool:
+    """Return True if the array contains data in at least 2 spatial dimensions"""
+    coords = array.coords
+    dims = array.dims
+    has_spatial_coords = "x" in coords and "y" in coords
+    has_spatial_dims = "x" in dims and "y" in dims
+    return has_spatial_coords & has_spatial_dims
+
+
+@typedispatch
 def is_spatial_2D(array: xu.UgridDataArray) -> bool:
     """Return True if the array contains data associated to cell faces"""
     face_dim = array.ugrid.grid.face_dimension
