@@ -160,18 +160,6 @@ def circle_result_sto(tmpdir_factory):
     """
     Circle result with storage fluxes, which are saved as METH1 instead of METH6
     """
-    simulation = make_circle_model_save_sto()
-    gwf_model = simulation["GWF_1"]
-
-    gwf_model["sto"].dataset["save_flows"] = True
-    return simulation
-
-
-@pytest.fixture(scope="session")
-def circle_result_sto(tmpdir_factory):
-    """
-    Circle result with storage fluxes, which are saved as METH1 instead of METH6
-    """
     # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
     # directory between different testing modules.
     modeldir = tmpdir_factory.mktemp("circle_sto")
