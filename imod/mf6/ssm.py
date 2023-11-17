@@ -79,9 +79,42 @@ class SourceSinkMixing(BoundaryCondition):
         return self._template.render(d)
 
     @staticmethod
-    def from_flow_model(model: GroundwaterFlowModel, species: str):
+    def from_flow_model(
+        model: GroundwaterFlowModel,
+        species: str,
+        print_flows: bool = False,
+        save_flows: bool = False,
+        validate: bool = True,
+    ):
         """
-        Derive a Source and Sink Mixing package from a Groundwater Flow model.
+        Derive a Source and Sink Mixing package from a Groundwater Flow model's
+        boundary conditions (e.g. GeneralHeadBoundary). Boundary condition
+        packages which have the ``concentration`` variable set are included.
+
+        Parameters
+        ----------
+        model: GroundwaterFlowModel
+            Groundwater flow model from which sources & sinks have to be
+            inferred.
+        species: str
+            Name of species to create a transport model for. This name will be
+            looked for in the ``species`` dimensions of the ``concentration``
+            argument.
+        print_flows: ({True, False}, optional)
+            Indicates that the list of general head boundary flow rates will be
+            printed to the listing file for every stress period time step in which
+            "BUDGET PRINT" is specified in Output Control. If there is no Output
+            Control option and PRINT FLOWS is specified, then flow rates are printed
+            for the last time step of each stress period.
+            Default is False.
+        save_flows: ({True, False}, optional)
+            Indicates that general head boundary flow terms will be written to the
+            file specified with "BUDGET FILEOUT" in Output Control.
+            Default is False.
+        validate: ({True, False}, optional)
+            Flag to indicate whether the package should be validated upon
+            initialization. This raises a ValidationError if package input is
+            provided in the wrong manner. Defaults to True.
         """
         if not isinstance(model, GroundwaterFlowModel):
             raise TypeError(
@@ -117,4 +150,11 @@ class SourceSinkMixing(BoundaryCondition):
         if len(names) == 0:
             raise ValueError("flow model does not contain boundary conditions")
 
-        return SourceSinkMixing(names, boundary_types, aux_var_names)
+        return SourceSinkMixing(
+            names,
+            boundary_types,
+            aux_var_names,
+            print_flows=print_flows,
+            save_flows=save_flows,
+            validate=validate,
+        )

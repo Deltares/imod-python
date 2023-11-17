@@ -4,6 +4,7 @@ import xugrid as xu
 from fastcore.dispatch import typedispatch
 
 from imod.prepare import polygonize
+from imod.typing import GridDataArray, GridDataset
 
 
 @typedispatch
@@ -48,3 +49,16 @@ def bounding_polygon(active: xr.DataArray):
 def bounding_polygon(active: xu.UgridDataArray):
     """Return bounding polygon of active cells"""
     return active.ugrid.grid.bounding_polygon()
+
+
+# Typedispatching doesn't work based on types of list elements, therefore to
+# isinstance testing
+def concat(grid_ls: list[GridDataArray | GridDataset], *args, **kwargs):
+    if isinstance(grid_ls[0], (xu.UgridDataArray, xu.UgridDataset)):
+        return xu.concat(grid_ls, *args, **kwargs)
+    elif isinstance(grid_ls[0], (xr.DataArray, xr.Dataset)):
+        return xr.concat(grid_ls, *args, **kwargs)
+    else:
+        raise TypeError(
+            f"Expected type UgridDataArray or DataArray, received {type(grid_ls[0])}"
+        )
