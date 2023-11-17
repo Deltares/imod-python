@@ -267,14 +267,9 @@ simulation.run()
 #
 # We'll open the head and concentration files.
 
-head = imod.mf6.out.open_hds(
-    modeldir / "flow/flow.hds",
-    modeldir / "flow/dis.dis.grb",
-)
-conc = imod.mf6.out.open_conc(
-    modeldir / "transport/transport.ucn",
-    modeldir / "flow/dis.dis.grb",
-)
+head = simulation.open_head()
+
+conc = simulation.open_concentration()
 
 # %%
 # Visualize the results

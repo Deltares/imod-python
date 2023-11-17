@@ -54,7 +54,9 @@ def create_transport_model(flowmodel, speciesname, dispersivity, retardation, de
     porosity = 0.25
 
     tpt_model = imod.mf6.GroundwaterTransportModel()
-    tpt_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(flowmodel, speciesname)
+    tpt_model["ssm"] = imod.mf6.SourceSinkMixing.from_flow_model(
+        flowmodel, speciesname, save_flows=True
+    )
     tpt_model["adv"] = imod.mf6.AdvectionUpstream()
     tpt_model["dsp"] = imod.mf6.Dispersion(
         diffusion_coefficient=0.0,
@@ -212,14 +214,8 @@ simulation.run()
 # %%
 # Open the concentration results and store them in a single DataArray.
 
-concentrations = []
-for species in ["a", "b", "c", "d"]:
-    conc = imod.mf6.out.open_conc(
-        modeldir / f"tpt_{species}/tpt_{species}.ucn",
-        modeldir / "flow/dis.dis.grb",
-    ).assign_coords(species=species)
-    concentrations.append(conc)
-concentration = xr.concat(concentrations, dim="species")
+concentration = simulation.open_concentration(species_ls=["a", "b", "c", "d"])
+mass_budgets = simulation.open_transport_budget(species_ls=["a", "b", "c", "d"])
 
 # %%
 # Visualize the last concentration profiles of the model run for the different

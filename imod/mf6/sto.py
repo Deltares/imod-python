@@ -1,5 +1,4 @@
 import abc
-import pathlib
 
 import numpy as np
 
@@ -40,7 +39,7 @@ class StorageBase(Package, abc.ABC):
 
     def _render_dict(self, directory, pkgname, globaltimes, binary):
         d = {}
-        stodirectory = pathlib.Path(directory.stem) / pkgname
+        stodirectory = directory / pkgname
         for varname in self._grid_data:
             key = self._keyword_map.get(varname, varname)
             layered, value = self._compose_values(
@@ -118,11 +117,6 @@ class SpecificStorage(StorageBase):
     }
 
     _init_schemata = {
-        "convertible": (
-            DTypeSchema(np.integer),
-            IndexesSchema(),
-            PKG_DIMS_SCHEMA,
-        ),
         "specific_storage": (
             DTypeSchema(np.floating),
             IndexesSchema(),
@@ -130,6 +124,16 @@ class SpecificStorage(StorageBase):
         ),
         "specific_yield": (
             DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ),
+        "transient": (
+            DTypeSchema(np.bool_),
+            IndexesSchema(),
+            DimsSchema("time") | DimsSchema(),
+        ),
+        "convertible": (
+            DTypeSchema(np.integer),
             IndexesSchema(),
             PKG_DIMS_SCHEMA,
         ),
@@ -137,16 +141,16 @@ class SpecificStorage(StorageBase):
     }
 
     _write_schemata = {
-        "convertible": (
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
-            # No need to check coords: dataset ensures they align with idomain.
-        ),
         "specific_storage": (
             AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            # No need to check coords: dataset ensures they align with idomain.
         ),
         "specific_yield": (
             AllValueSchema(">=", 0.0),
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+        "convertible": (
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
         ),
     }
@@ -245,26 +249,30 @@ class StorageCoefficient(StorageBase):
     }
 
     _init_schemata = {
-        "convertible": (
-            DTypeSchema(np.integer),
-            PKG_DIMS_SCHEMA,
-        ),
         "storage_coefficient": (
             DTypeSchema(np.floating),
+            IndexesSchema(),
             PKG_DIMS_SCHEMA,
         ),
         "specific_yield": (
             DTypeSchema(np.floating),
+            IndexesSchema(),
+            PKG_DIMS_SCHEMA,
+        ),
+        "transient": (
+            DTypeSchema(np.bool_),
+            IndexesSchema(),
+            DimsSchema("time") | DimsSchema(),
+        ),
+        "convertible": (
+            DTypeSchema(np.integer),
+            IndexesSchema(),
             PKG_DIMS_SCHEMA,
         ),
         "save_flows": (DTypeSchema(np.bool_), DimsSchema()),
     }
 
     _write_schemata = {
-        "convertible": (
-            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
-            # No need to check coords: dataset ensures they align with idomain.
-        ),
         "storage_coefficient": (
             AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
@@ -272,6 +280,10 @@ class StorageCoefficient(StorageBase):
         "specific_yield": (
             AllValueSchema(">=", 0.0),
             IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+        ),
+        "convertible": (
+            IdentityNoDataSchema(other="idomain", is_other_notnull=(">", 0)),
+            # No need to check coords: dataset ensures they align with idomain.
         ),
     }
 
