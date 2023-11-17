@@ -147,23 +147,23 @@ def circle_result_evt(tmpdir_factory):
     return modeldir
 
 
-@pytest.mark.usefixtures("circle_model_evt")
-@pytest.fixture(scope="function")
-def circle_partitioned():
-    simulation = make_circle_model_evt()
-
-    idomain = simulation["GWF_1"]["disv"].dataset["idomain"]
-    submodel_labels = copy.deepcopy(idomain.sel({"layer": 1}))
-
-    submodel_labels.values[:67] = 0
-    submodel_labels.values[67:118] = 1
-    submodel_labels.values[118:] = 2
-
-    return simulation.split(submodel_labels)
-
-
 def make_circle_model_save_sto():
     simulation = make_circle_model()
+    gwf_model = simulation["GWF_1"]
+
+    gwf_model["sto"].dataset["save_flows"] = True
+    return simulation
+
+
+@pytest.fixture(scope="session")
+def circle_result_sto(tmpdir_factory):
+    """
+    Circle result with storage fluxes, which are saved as METH1 instead of METH6
+    """
+    # Using a tmpdir_factory is the canonical way of sharing a tempory pytest
+    # directory between different testing modules.
+    modeldir = tmpdir_factory.mktemp("circle_sto")
+    simulation = make_circle_model_save_sto()
     gwf_model = simulation["GWF_1"]
 
     gwf_model["sto"].dataset["save_flows"] = True
@@ -182,3 +182,18 @@ def circle_result_sto(tmpdir_factory):
     simulation.write(modeldir)
     simulation.run()
     return modeldir
+
+
+@pytest.mark.usefixtures("circle_model_evt")
+@pytest.fixture(scope="function")
+def circle_partitioned():
+    simulation = make_circle_model_evt()
+
+    idomain = simulation["GWF_1"]["disv"].dataset["idomain"]
+    submodel_labels = copy.deepcopy(idomain.sel({"layer": 1}))
+
+    submodel_labels.values[:67] = 0
+    submodel_labels.values[67:118] = 1
+    submodel_labels.values[118:] = 2
+
+    return simulation.split(submodel_labels)

@@ -84,8 +84,17 @@ def is_spatial_2D(array: xr.DataArray) -> bool:
     has_spatial_dims = "x" in dims and "y" in dims
     return has_spatial_coords & has_spatial_dims
 
-
-@typedispatch
+# Typedispatching doesn't work based on types of list elements, therefore to
+# isinstance testing
+def concat(grid_ls: list[GridDataArray | GridDataset], *args, **kwargs):
+    if isinstance(grid_ls[0], (xu.UgridDataArray, xu.UgridDataset)):
+        return xu.concat(grid_ls, *args, **kwargs)
+    elif isinstance(grid_ls[0], (xr.DataArray, xr.Dataset)):
+        return xr.concat(grid_ls, *args, **kwargs)
+    else:
+        raise TypeError(
+            f"Expected type UgridDataArray or DataArray, received {type(grid_ls[0])}"
+        )
 def is_spatial_2D(array: xu.UgridDataArray) -> bool:
     """Return True if the array contains data associated to cell faces"""
     face_dim = array.ugrid.grid.face_dimension

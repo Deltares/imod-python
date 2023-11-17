@@ -1,4 +1,3 @@
-import pathlib
 import warnings
 
 import numpy as np
@@ -87,7 +86,7 @@ class InitialConditions(Package):
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
 
-        icdirectory = pathlib.Path(directory.stem) / pkgname
+        icdirectory = directory / pkgname
         d["layered"], d["strt"] = self._compose_values(
             self["start"], icdirectory, "strt", binary=binary
         )
