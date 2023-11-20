@@ -119,7 +119,7 @@ class TestExchangeCreator_Structured:
             y_number_partitions = 2
 
             # test_model_0 <-> test_model_1
-            expected_cell_id1 =  np.array([[1, 1], [1, 2], [1, 3], [1, 4]])
+            expected_cell_id1 = np.array([[1, 1], [1, 2], [1, 3], [1, 4]])
             expected_cell_id2 = np.array([[2, 1], [2, 2], [2, 3], [2, 4]])
 
             idomain, _, _ = parameterizable_basic_dis
