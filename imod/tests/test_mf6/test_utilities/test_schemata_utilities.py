@@ -44,4 +44,11 @@ def test_filter_schemata_dict(schemata, arg, expected):
     filtered_dict = filter_schemata_dict(schemata, arg)
 
     # Assert
-    filtered_dict == expected
+    # Test if same variable names present in dicts
+    assert filtered_dict.keys() == expected.keys()
+
+    # Test if scheme types in list equal.
+    for key in filtered_dict.keys():
+        schema_types = [type(s) for s in filtered_dict[key]]
+        expected_types = [type(s) for s in expected[key]]
+        assert schema_types == expected_types
