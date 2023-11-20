@@ -2,11 +2,17 @@ from typing import List, NamedTuple
 
 import numpy as np
 
+from imod.mf6.hfb import HorizontalFlowBarrierBase
 from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import get_active_domain_slice
+from imod.mf6.utilities.schemata import filter_schemata_dict
+from imod.mf6.wel import Well
+from imod.schemata import AllNoDataSchema
 from imod.typing import GridDataArray
 from imod.typing.grid import is_unstructured, ones_like
+
+HIGH_LEVEL_PKGS = (HorizontalFlowBarrierBase, Well)
 
 
 class PartitionInfo(NamedTuple):
@@ -80,18 +86,25 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
         # the new idomain is the selection on our coodinates and only the part active in sliced_domain_2D
         new_idomain = model.domain.sel(coords).where(sliced_domain_2D, other=0)
 
-    sliced_bottom = model.bottom
-
     for pkg_name, package in model.items():
         sliced_package = clip_by_grid(package, partition_info.active_domain)
 
         sliced_package = sliced_package.mask(new_idomain)
-        errors = sliced_package._validate(
-            package._write_schemata, idomain=new_idomain, bottom=sliced_bottom
+        # The masking can result in packages with AllNoData.Therefore we'll have
+        # to drop these packages. Create schemata dict only containing the
+        # variables with a AllNoDataSchema.
+        allnodata_schemata = filter_schemata_dict(
+            package._write_schemata, (AllNoDataSchema)
         )
-        if not errors:
+        # Find if packages throws ValidationError for AllNoDataSchema.
+        allnodata_errors = sliced_package._validate(allnodata_schemata)
+        # Drop if allnodata error thrown
+        if not allnodata_errors:
             new_model[pkg_name] = sliced_package
         else:
-            print(f"package {pkg_name} removed")
+            # TODO: Add this to logger
+            print(
+                f"package {pkg_name} removed in partition {partition_info.id}, because all empty"
+            )
 
     return new_model
