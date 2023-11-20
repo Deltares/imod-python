@@ -149,7 +149,7 @@ def setup_simulation():
 @pytest.fixture(scope="function")
 def split_transient_twri_model(transient_twri_model):
     active = transient_twri_model["GWF_1"].domain.sel(layer=1)
-    transient_twri_model["GWF_1"].pop("wel")
+
     number_partitions = 3
     split_location = np.linspace(active.y.min(), active.y.max(), number_partitions + 1)
 
@@ -360,7 +360,6 @@ class TestModflow6Simulation:
     def test_exchanges_in_simulation_file(self, transient_twri_model, tmp_path):
         # Arrange
         active = transient_twri_model["GWF_1"].domain.sel(layer=1)
-        transient_twri_model["GWF_1"].pop("wel")
         number_partitions = 3
         split_location = np.linspace(
             active.y.min(), active.y.max(), number_partitions + 1
