@@ -350,3 +350,55 @@ def test_partitioning_structured_geometry_auxiliary_variables(
             ]
         ),
     )
+
+
+@pytest.mark.usefixtures("transient_twri_model")
+@pytest.mark.parametrize(
+    "partition_name",
+    ["diagonal_1", "diagonal_2", "four_squares", "intrusion", "island"],
+)
+def test_partitioning_structured_high_level_well(
+    tmp_path: Path, transient_twri_model: Modflow6Simulation, partition_name: str
+):
+    """
+    In this test we include a high-level well package with 1 well in it to the
+    simulation. The well will be in active in 1 partition and should therefore
+    be inactive or non-present in the other partitions This should not give
+    validation errors.
+    """
+    simulation = transient_twri_model
+
+    # Create and fill the groundwater model.
+    simulation["GWF_1"]["wel"] = imod.mf6.Well(
+        x=[52500.0],
+        y=[52500.0],
+        screen_top=[-300.0],
+        screen_bottom=[-450.0],
+        rate=[-5.0],
+        minimum_k=1e-19,
+    )
+
+    # run the original example, so without partitioning, and save the simulation results
+    orig_dir = tmp_path / "original"
+    simulation.write(orig_dir, binary=False)
+    simulation.run()
+
+    orig_head = imod.mf6.open_hds(
+        orig_dir / "GWF_1/GWF_1.hds",
+        orig_dir / "GWF_1/dis.dis.grb",
+    )
+
+    # partition the simulation, run it, and save the (merged) results
+    idomain = simulation["GWF_1"].domain
+    partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
+
+    split_simulation = simulation.split(partitioning_arrays[partition_name])
+
+    split_simulation.write(tmp_path, binary=False)
+    split_simulation.run()
+
+    head = merge_heads(tmp_path, split_simulation)
+    _ = merge_balances(tmp_path, split_simulation)
+
+    # compare the head result of the original simulation with the result of the partitioned simulation
+    np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-4, atol=1e-4)
