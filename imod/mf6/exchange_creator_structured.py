@@ -71,7 +71,6 @@ class ExchangeCreator_Structured(ExchangeCreator):
             connected_cell_info.cell_idx1 != NOT_CONNECTED_VALUE
         ]
 
-
         return connected_cell_info
 
     def _compute_geometric_information(self) -> pd.DataFrame:

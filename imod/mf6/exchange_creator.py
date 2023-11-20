@@ -236,17 +236,24 @@ class ExchangeCreator(abc.ABC):
             )
 
         return local_cell_idx_to_id
-    
+
     def rearrange_connected_cells(self):
         """
         connections will be shuffled so that the lowest partition number comes first.
         """
         label_decreasing = (
-            self._connected_cells["cell_label1"] >  self._connected_cells["cell_label2"]
+            self._connected_cells["cell_label1"] > self._connected_cells["cell_label2"]
         )
 
         self._connected_cells.loc[
             label_decreasing, ["cell_idx1", "cell_idx2", "cell_label1", "cell_label2"]
-        ] =  self._connected_cells.loc[
+        ] = self._connected_cells.loc[
             label_decreasing, ["cell_idx2", "cell_idx1", "cell_label2", "cell_label1"]
-        ].values       
+        ].values
+
+        self._connected_cells["cell_label1"] = self._connected_cells[
+            "cell_label1"
+        ].astype(int)
+        self._connected_cells["cell_label2"] = self._connected_cells[
+            "cell_label2"
+        ].astype(int)
