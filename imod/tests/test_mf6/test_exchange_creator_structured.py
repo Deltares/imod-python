@@ -204,32 +204,32 @@ class TestExchangeCreator_Structured:
             exchange1_expected_cell_id1 = np.array([[1, 1], [1, 2]])
             exchange1_expected_cell_id2 = np.array([[2, 1], [2, 2]])
 
-            exchange1_expected_cl1 = 0.5 * np.abs(dx[2]) * np.ones(2)
-            exchange1_expected_cl2 = 0.5 * np.abs(dx[1]) * np.ones(2)
+            exchange1_expected_cl1 = 0.5 * np.abs(dx[1]) * np.ones(2)
+            exchange1_expected_cl2 = 0.5 * np.abs(dx[2]) * np.ones(2)
             exchange1_expected_hwva = dx[0:2]
 
             # test_model_0 <-> test_model_2
             exchange2_expected_cell_id1 = np.array([[1, 2], [2, 2]])
             exchange2_expected_cell_id2 = np.array([[1, 1], [2, 1]])
 
-            exchange2_expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(2)
-            exchange2_expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(2)
+            exchange2_expected_cl1 = 0.5 * np.abs(dy[2]) * np.ones(2)
+            exchange2_expected_cl2 = 0.5 * np.abs(dy[1]) * np.ones(2)
             exchange2_expected_hwva = -dy[2:4]
 
             # test_model_1 <-> test_model_3
             exchange3_expected_cell_id1 = np.array([[1, 2], [2, 2]])
             exchange3_expected_cell_id2 = np.array([[1, 1], [2, 1]])
 
-            exchange3_expected_cl1 = 0.5 * np.abs(dx[2]) * np.ones(2)
-            exchange3_expected_cl2 = 0.5 * np.abs(dx[1]) * np.ones(2)
+            exchange3_expected_cl1 = 0.5 * np.abs(dx[1]) * np.ones(2)
+            exchange3_expected_cl2 = 0.5 * np.abs(dx[2]) * np.ones(2)
             exchange3_expected_hwva = -dy[0:2]
 
             # test_model_2 <-> test_model_3
             exchange4_expected_cell_id1 = np.array([[1, 1], [1, 2]])
             exchange4_expected_cell_id2 = np.array([[2, 1], [2, 2]])
 
-            exchange4_expected_cl1 = 0.5 * np.abs(dy[1]) * np.ones(2)
-            exchange4_expected_cl2 = 0.5 * np.abs(dy[2]) * np.ones(2)
+            exchange4_expected_cl1 = 0.5 * np.abs(dy[2]) * np.ones(2)
+            exchange4_expected_cl2 = 0.5 * np.abs(dy[1]) * np.ones(2)
             exchange4_expected_hwva = dx[2:4]
 
             return (
