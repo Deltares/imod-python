@@ -34,7 +34,7 @@ from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
-from imod.typing.grid import concat, is_unstructured
+from imod.typing.grid import concat, is_unstructured, merge
 
 OUTPUT_FUNC_MAPPING = {
     "head": (open_hds, GroundwaterFlowModel),
@@ -511,11 +511,33 @@ class Modflow6Simulation(collections.UserDict):
             return self._concat_transport_budgets(
                 modelnames, species_ls, output, **settings
             )
+        elif output == "":
+            pass
         else:
             # TODO: This is the place where merging of partioned heads can be implemented.
             raise NotImplementedError(
                 "Reading output from partioned models not yet supported by this method."
             )
+
+    def _merge_states(self, modelnames: list[str], output: str, **settings):
+        state_partitions = []
+        for modelname in modelnames:
+            state_partitions.append(
+                self._open_output_single_model(modelname, output, **settings)
+            )
+        return merge(state_partitions)
+
+    def _merge_fluxes(self, modelnames: list[str], output: str, **settings):
+        unique_balance_keys = set()
+        cbc_per_partition = []
+        for modelname in modelnames:
+            partition_model = self[modelname]
+            partition_domain = partition_model.domain
+            cbc = self._open_output_single_model(modelname, output, **settings)
+            unique_balance_keys.update(list(cbc.keys()))
+            cbc_per_partition.append(cbc.where(partition_domain, other=np.nan))
+
+            # TODO: FINISH THIS
 
     def _concat_concentrations(
         self, modelnames: list[str], species_ls: list[str], output: str, **settings
