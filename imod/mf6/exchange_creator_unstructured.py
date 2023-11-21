@@ -59,41 +59,30 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
 
         face1 = edge_face_connectivity[self._connected_cell_edge_indices, 0]
         face2 = edge_face_connectivity[self._connected_cell_edge_indices, 1]
+        centroid_1 = grid.centroids[face1]
+        centroid_2 = grid.centroids[face2]    
 
-        face1_coordinate = grid.face_coordinates[face1]
-        face2_coordinate = grid.face_coordinates[face2]
+        edge_coordinates = grid.edge_node_coordinates[self._connected_cell_edge_indices]
 
-        edge_centroid_coordinate = grid.edge_coordinates[
-            self._connected_cell_edge_indices
-        ]
 
-        edge_node_coordinate1 = grid.edge_node_coordinates[
-            self._connected_cell_edge_indices, 0, :
-        ]
 
-        edge_node_coordinate2 = grid.edge_node_coordinates[
-            self._connected_cell_edge_indices, 1, :
-        ]
+        U = np.diff(edge_coordinates, axis=1)[:, 0]
+        # Compute vector of first cell centroid to first edge vertex
+        Vi = centroid_1 - edge_coordinates[:, 0]
+        # Compute vector of second cell centroid to first edge vertex
+        Vj = centroid_2 - edge_coordinates[:, 0]
+        length = np.linalg.norm(U, axis=1)
 
-        cl1 = np.linalg.norm(face1_coordinate - edge_centroid_coordinate, axis=1)
-        cl2 = np.linalg.norm(face2_coordinate - edge_centroid_coordinate, axis=1)
-        hwva = np.linalg.norm(edge_node_coordinate2 - edge_node_coordinate1, axis=1)
-
-        outward_vector = edge_centroid_coordinate - face1_coordinate
-        anglex = np.arctan2(outward_vector[:, 1], outward_vector[:, 0])
-        angledegx = np.degrees(anglex) % 360
-
-        cdist = np.linalg.norm(face1_coordinate - face2_coordinate, axis=1)
+        # The cross product of U and V equals the area of the parallellogram, 
+        # dividing by length (the base of the parallellogram) gives the orthogonal distance.
 
         df = pd.DataFrame(
             {
                 "cell_idx1": self._connected_cells["cell_idx1"].values,
                 "cell_idx2": self._connected_cells["cell_idx2"].values,
-                "cl1": cl1,
-                "cl2": cl2,
-                "hwva": hwva,
-                "angldegx": angledegx,
-                "cdist": cdist,
+                "cl1": np.abs(np.cross(U, Vi)) / length,
+                "cl2": np.abs(np.cross(U, Vj)) / length,
+                "hwva": length,
             }
         )
         return df
