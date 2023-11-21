@@ -60,11 +60,9 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         face1 = edge_face_connectivity[self._connected_cell_edge_indices, 0]
         face2 = edge_face_connectivity[self._connected_cell_edge_indices, 1]
         centroid_1 = grid.centroids[face1]
-        centroid_2 = grid.centroids[face2]    
+        centroid_2 = grid.centroids[face2]
 
         edge_coordinates = grid.edge_node_coordinates[self._connected_cell_edge_indices]
-
-
 
         U = np.diff(edge_coordinates, axis=1)[:, 0]
         # Compute vector of first cell centroid to first edge vertex
@@ -73,7 +71,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         Vj = centroid_2 - edge_coordinates[:, 0]
         length = np.linalg.norm(U, axis=1)
 
-        # The cross product of U and V equals the area of the parallellogram, 
+        # The cross product of U and V equals the area of the parallellogram,
         # dividing by length (the base of the parallellogram) gives the orthogonal distance.
 
         df = pd.DataFrame(
