@@ -241,19 +241,15 @@ class ExchangeCreator(abc.ABC):
         """
         connections will be shuffled so that the lowest partition number comes first.
         """
-        label_decreasing = (
-            self._connected_cells["cell_label1"] > self._connected_cells["cell_label2"]
-        )
+        df = self._connected_cells
 
-        self._connected_cells.loc[
-            label_decreasing, ["cell_idx1", "cell_idx2", "cell_label1", "cell_label2"]
-        ] = self._connected_cells.loc[
-            label_decreasing, ["cell_idx2", "cell_idx1", "cell_label2", "cell_label1"]
-        ].values
+        label_decreasing = df["cell_label1"] > df["cell_label2"]
 
-        self._connected_cells["cell_label1"] = self._connected_cells[
-            "cell_label1"
-        ].astype(int)
-        self._connected_cells["cell_label2"] = self._connected_cells[
-            "cell_label2"
-        ].astype(int)
+        colnames = ["cell_idx1", "cell_idx2", "cell_label1", "cell_label2"]
+        colnames_reversed = ["cell_idx2", "cell_idx1", "cell_label2", "cell_label1"]
+
+        decreasing_connections = df.loc[label_decreasing, colnames].values.astype(int)
+
+        df.loc[label_decreasing, colnames_reversed] = decreasing_connections
+
+        self._connected_cells = df
