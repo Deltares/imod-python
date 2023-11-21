@@ -22,7 +22,10 @@ begin options
 end options
 
 begin dimensions
-  maxbound {{maxbound+1}}
+{% if maxbound == 0 %}
+  maxbound 1
+{% else %}
+  maxbound {{maxbound}}
 end dimensions
 
 {% for i, path in periods.items() %}begin period {{i}}
