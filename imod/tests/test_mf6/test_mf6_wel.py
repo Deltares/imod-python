@@ -240,7 +240,7 @@ def test_render__stationary(well_test_data_stationary):
         end options
 
         begin dimensions
-          maxbound 16
+          maxbound 15
         end dimensions
 
         begin period 1
@@ -301,7 +301,7 @@ def test_render__transient(well_test_data_transient):
         end options
 
         begin dimensions
-          maxbound 16
+          maxbound 15
         end dimensions
 
         begin period 1
@@ -396,7 +396,7 @@ def test_render__concentration_dis_structured_constant_time(well_test_data_stati
         end options
 
         begin dimensions
-          maxbound 16
+          maxbound 15
         end dimensions
 
         begin period 1

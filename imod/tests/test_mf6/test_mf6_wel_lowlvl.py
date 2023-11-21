@@ -144,7 +144,7 @@ def test_mf6wel_render__transient(
     end options
 
     begin dimensions
-      maxbound 25
+      maxbound 24
     end dimensions
 
     begin period 1
