@@ -557,7 +557,7 @@ class Modflow6Simulation(collections.UserDict):
         oc_pkg = model[oc_key]
         # Ensure "-transport" and "-flow" are stripped from "budget"
         oc_output = output.split("-")[0]
-        output_path = Path(oc_pkg._get_output_filepath(model_path, oc_output))
+        output_path = oc_pkg._get_output_filepath(model_path, oc_output)
         # Force path to always include simulation directory.
         output_path = self.directory / output_path
 
