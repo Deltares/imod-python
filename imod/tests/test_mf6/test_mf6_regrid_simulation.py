@@ -5,7 +5,7 @@ import pytest
 
 import imod
 from imod.tests.fixtures.mf6_modelrun_fixture import assert_simulation_can_run
-from imod.tests.fixtures.mf6_regridding_fixture import (
+from imod.tests.fixtures.mf6_small_models_fixture import (
     grid_data_structured,
     grid_data_unstructured,
 )

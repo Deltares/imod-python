@@ -4,6 +4,7 @@ import pytest
 import xarray as xr
 
 import imod
+from imod.typing.grid import zeros_like
 
 
 def make_twri_model():
@@ -49,10 +50,75 @@ def make_twri_model():
     rch_rate = xr.full_like(like.sel(layer=1), 3.0e-8)
 
     # Well
-    layer = [3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    row = [5, 4, 6, 9, 9, 9, 9, 11, 11, 11, 11, 13, 13, 13, 13]
-    column = [11, 6, 12, 8, 10, 12, 14, 8, 10, 12, 14, 8, 10, 12, 14]
-    rate = [
+    wells_x = [
+        52500.0,
+        27500.0,
+        57500.0,
+        37500.0,
+        47500.0,
+        57500.0,
+        67500.0,
+        37500.0,
+        47500.0,
+        57500.0,
+        67500.0,
+        37500.0,
+        47500.0,
+        57500.0,
+        67500.0,
+    ]
+    wells_y = [
+        52500.0,
+        57500.0,
+        47500.0,
+        32500.0,
+        32500.0,
+        32500.0,
+        32500.0,
+        22500.0,
+        22500.0,
+        22500.0,
+        22500.0,
+        12500.0,
+        12500.0,
+        12500.0,
+        12500.0,
+    ]
+    screen_top = [
+        -300.0,
+        -200.0,
+        -200.0,
+        200.0,
+        200.0,
+        200.0,
+        200.0,
+        200.0,
+        200.0,
+        200.0,
+        200.0,
+        200.0,
+        200.0,
+        200.0,
+        200.0,
+    ]
+    screen_bottom = [
+        -450.0,
+        -300.0,
+        -300.0,
+        -200.0,
+        -200.0,
+        -200.0,
+        -200.0,
+        -200.0,
+        -200.0,
+        -200.0,
+        -200.0,
+        -200.0,
+        -200.0,
+        -200.0,
+        -200.0,
+    ]
+    rate_wel = [
         -5.0,
         -5.0,
         -5.0,
@@ -72,6 +138,14 @@ def make_twri_model():
 
     # Create and fill the groundwater model.
     gwf_model = imod.mf6.GroundwaterFlowModel()
+    gwf_model["wel"] = imod.mf6.Well(
+        x=wells_x,
+        y=wells_y,
+        screen_top=screen_top,
+        screen_bottom=screen_bottom,
+        rate=rate_wel,
+        minimum_k=1e-19,
+    )
     gwf_model["dis"] = imod.mf6.StructuredDiscretization(
         top=200.0, bottom=bottom, idomain=idomain
     )
@@ -97,15 +171,7 @@ def make_twri_model():
     )
     gwf_model["oc"] = imod.mf6.OutputControl(save_head="all", save_budget="all")
     gwf_model["rch"] = imod.mf6.Recharge(rch_rate)
-    gwf_model["wel"] = imod.mf6.WellDisStructured(
-        layer=layer,
-        row=row,
-        column=column,
-        rate=rate,
-        print_input=True,
-        print_flows=True,
-        save_flows=True,
-    )
+
     gwf_model["sto"] = imod.mf6.SpecificStorage(
         specific_storage=1.0e-15,
         specific_yield=0.15,
@@ -225,3 +291,22 @@ def transient_unconfined_twri_result(tmpdir_factory, transient_unconfined_twri_m
     simulation.write(modeldir)
     simulation.run()
     return modeldir
+
+
+@pytest.mark.usefixtures("transient_twri_model")
+@pytest.fixture(scope="function")
+def split_transient_twri_model(transient_twri_model):
+    active = transient_twri_model["GWF_1"].domain.sel(layer=1)
+    number_partitions = 3
+    split_location = np.linspace(active.y.min(), active.y.max(), number_partitions + 1)
+
+    coords = active.coords
+    submodel_labels = zeros_like(active)
+    for id in np.arange(1, number_partitions):
+        submodel_labels.loc[
+            (coords["y"] > split_location[id]) & (coords["y"] <= split_location[id + 1])
+        ] = id
+
+    split_simulation = transient_twri_model.split(submodel_labels)
+
+    return split_simulation

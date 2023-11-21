@@ -12,7 +12,7 @@ from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.dataset import get_scalar_variables
 from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.typing import GridDataArray, ScalarDataset
-from imod.typing.grid import bounding_polygon
+from imod.typing.grid import bounding_polygon, is_spatial_2D
 
 
 @typedispatch
@@ -32,10 +32,7 @@ def clip_by_grid(package: IPackageBase, active: xr.DataArray) -> IPackageBase:
         x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max
     )
 
-    if "idomain" in package.dataset:
-        clipped_package.dataset["idomain"] = xr.ones_like(
-            clipped_package.dataset["idomain"]
-        ) * active.sel(domain_slice)
+    _filter_inactive_cells(clipped_package, active.sel(domain_slice))
 
     return clipped_package
 
@@ -45,9 +42,6 @@ def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBa
     domain_slice = get_active_domain_slice(active)
 
     clipped_dataset = package.dataset.isel(domain_slice, missing_dims="ignore")
-    if "idomain" in package.dataset:
-        idomain = package.dataset["idomain"]
-        clipped_dataset["idomain"] = idomain.sel(clipped_dataset["idomain"].indexes)
 
     cls = type(package)
     new = cls.__new__(cls)
@@ -89,6 +83,23 @@ def _line_package_to_gdf(package: ILineDataPackage) -> gpd.GeoDataFrame:
         package.dataset[variables_for_gdf].to_dataframe(),
         geometry="geometry",
     )
+
+
+def _filter_inactive_cells(package, active):
+    if package.is_grid_agnostic_package():
+        return
+
+    package_vars = package.dataset.data_vars
+    for var in package_vars:
+        if package_vars[var].shape != ():
+            if is_spatial_2D(package.dataset[var]):
+                if np.issubdtype(package.dataset[var].dtype, np.integer):
+                    other = 0
+                else:
+                    other = np.nan
+                package.dataset[var] = package.dataset[var].where(
+                    active > 0, other=other
+                )
 
 
 @typedispatch

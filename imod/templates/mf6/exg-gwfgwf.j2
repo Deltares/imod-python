@@ -1,6 +1,7 @@
 begin options
-{%- if auxiliary is defined -%}  auxiliary {{auxiliary}}
-{% endif -%}
+  save_flows
+{% if auxiliary is defined %}  auxiliary {{auxiliary|join(" ")}}
+{% endif -%}  
 {%- if print_input is defined -%}  print_input
 {% endif -%}
 {%- if print_flows is defined -%}  print_flows
@@ -20,11 +21,13 @@ begin options
 {%- if obs is defined -%}  obs6 filein {{obs}}
 {% endif -%}
 end options
-
+{% set nexg = layer | length %}
 begin dimensions
   nexg {{nexg}}
 end dimensions
 
 begin exchangedata
-  open/close {{path}} (binary)
+{%- for i in range(nexg) %}
+  {{layer[i]}} {{cell_id1[i]|join(" ")}} {{layer[i]}} {{cell_id2[i]|join(" ")}} {{ihc[i]}} {{cl1[i]}} {{cl2[i]}} {{hwva[i]}} {%- if auxiliary_data is defined %} {{auxiliary_data.T[i]|join(" ")}}{% endif %}
+{%- endfor %}
 end exchangedata

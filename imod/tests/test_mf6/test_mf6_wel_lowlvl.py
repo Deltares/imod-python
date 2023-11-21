@@ -73,7 +73,7 @@ def test_mf6wel_write_datafile__stationary(
     file_path = Path(tmp_path) / "mf6wel.bin"
 
     # Act
-    mf6wel.write_datafile(file_path, ds, True)
+    mf6wel._write_datafile(file_path, ds, True)
     arr = np.fromfile(file_path, dtype=struct_array_expected.dtype)
 
     # Assert

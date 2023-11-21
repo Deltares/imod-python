@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import warnings
 from copy import deepcopy
-from typing import List, Union
+from typing import Dict, List, Union
 
 import numpy as np
 import pandas as pd
@@ -10,6 +10,7 @@ import xarray as xr
 import xugrid as xu
 from numpy import ndarray
 
+from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.boundary_condition import (
     BoundaryCondition,
     DisStructuredBoundaryCondition,
@@ -22,11 +23,28 @@ from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
-from imod.schemata import DTypeSchema
+from imod.schemata import AllNoDataSchema, DTypeSchema
 from imod.select.points import points_indices
 from imod.typing import GridDataArray
 from imod.typing.grid import ones_like
 from imod.util import values_within_range
+
+
+def _assign_dims(arg) -> Dict:
+    is_da = isinstance(arg, xr.DataArray)
+    if is_da and "time" in arg.coords:
+        if arg.ndim != 2:
+            raise ValueError("time varying variable: must be 2d")
+        if arg.dims[0] != "time":
+            arg = arg.transpose()
+        da = xr.DataArray(
+            data=arg.values, coords={"time": arg["time"]}, dims=["time", "index"]
+        )
+        return da
+    elif is_da:
+        return ("index", arg.values)
+    else:
+        return ("index", arg)
 
 
 class Well(BoundaryCondition, IPointDataPackage):
@@ -111,7 +129,10 @@ class Well(BoundaryCondition, IPointDataPackage):
         "rate": [DTypeSchema(np.floating)],
         "concentration": [DTypeSchema(np.floating)],
     }
-    _write_schemata = {}
+    _write_schemata = {
+        "y": [AllNoDataSchema()],
+        "x": [AllNoDataSchema()],
+    }
 
     _regrid_method = {}
 
@@ -135,14 +156,14 @@ class Well(BoundaryCondition, IPointDataPackage):
         repeat_stress=None,
     ):
         super().__init__()
-        self.dataset["screen_top"] = self.assign_dims(screen_top)
-        self.dataset["screen_bottom"] = self.assign_dims(screen_bottom)
-        self.dataset["y"] = self.assign_dims(y)
-        self.dataset["x"] = self.assign_dims(x)
-        self.dataset["rate"] = self.assign_dims(rate)
+        self.dataset["screen_top"] = _assign_dims(screen_top)
+        self.dataset["screen_bottom"] = _assign_dims(screen_bottom)
+        self.dataset["y"] = _assign_dims(y)
+        self.dataset["x"] = _assign_dims(x)
+        self.dataset["rate"] = _assign_dims(rate)
         if id is None:
             id = np.arange(self.dataset["x"].size).astype(str)
-        self.dataset["id"] = self.assign_dims(id)
+        self.dataset["id"] = _assign_dims(id)
         self.dataset["minimum_k"] = minimum_k
         self.dataset["minimum_thickness"] = minimum_thickness
 
@@ -156,6 +177,10 @@ class Well(BoundaryCondition, IPointDataPackage):
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
 
         self._validate_init_schemata(validate)
+
+    @classmethod
+    def is_grid_agnostic_package(cls) -> bool:
+        return True
 
     def clip_box(
         self,
@@ -227,8 +252,11 @@ class Well(BoundaryCondition, IPointDataPackage):
     ) -> None:
         if validate:
             self._validate(self._write_schemata)
-        mf6_package = self.to_mf6_pkg(idomain, top, bottom, k)
-
+        mf6_package = self.to_mf6_pkg(
+            idomain, top, bottom, k, write_context.is_partitioned
+        )
+        # TODO: make options like "save_flows" configurable. Issue gitlab #623
+        mf6_package.dataset["save_flows"] = True
         mf6_package.write(pkgname, globaltimes, write_context)
 
     def __create_wells_df(self) -> pd.DataFrame:
@@ -396,6 +424,7 @@ class Well(BoundaryCondition, IPointDataPackage):
         top: Union[xr.DataArray, xu.UgridDataArray],
         bottom: Union[xr.DataArray, xu.UgridDataArray],
         k: Union[xr.DataArray, xu.UgridDataArray],
+        is_partitioned: bool = False,
     ) -> Mf6Wel:
         """
         Write package to Modflow 6 package.
@@ -443,8 +472,8 @@ class Well(BoundaryCondition, IPointDataPackage):
 
         if nwells_df == 0:
             raise ValueError("No wells were assigned in package. None were present.")
-
-        if nwells_df != nwells_assigned:
+        # @TODO: reinstate this check. issue gitlab #621.
+        if not is_partitioned and nwells_df != nwells_assigned:
             raise ValueError(
                 "One or more well(s) are completely invalid due to minimum conductivity and thickness constraints."
             )
@@ -565,10 +594,10 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         repeat_stress=None,
     ):
         super().__init__()
-        self.dataset["layer"] = self.assign_dims(layer)
-        self.dataset["row"] = self.assign_dims(row)
-        self.dataset["column"] = self.assign_dims(column)
-        self.dataset["rate"] = self.assign_dims(rate)
+        self.dataset["layer"] = _assign_dims(layer)
+        self.dataset["row"] = _assign_dims(row)
+        self.dataset["column"] = _assign_dims(column)
+        self.dataset["rate"] = _assign_dims(rate)
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
@@ -578,7 +607,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            self.add_periodic_auxiliary_variable()
+            add_periodic_auxiliary_variable(self)
 
         self._validate_init_schemata(validate)
 
@@ -714,9 +743,9 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         validate: bool = True,
     ):
         super().__init__()
-        self.dataset["layer"] = self.assign_dims(layer)
-        self.dataset["cell2d"] = self.assign_dims(cell2d)
-        self.dataset["rate"] = self.assign_dims(rate)
+        self.dataset["layer"] = _assign_dims(layer)
+        self.dataset["cell2d"] = _assign_dims(cell2d)
+        self.dataset["rate"] = _assign_dims(rate)
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
@@ -725,7 +754,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         if concentration is not None:
             self.dataset["concentration"] = concentration
             self.dataset["concentration_boundary_type"] = concentration_boundary_type
-            self.add_periodic_auxiliary_variable()
+            add_periodic_auxiliary_variable(self)
 
         self._validate_init_schemata(validate)
 
