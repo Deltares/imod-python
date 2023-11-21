@@ -102,6 +102,8 @@ class ExchangeCreator(abc.ABC):
 
         self._connected_cells = self._find_connected_cells()
 
+        self.rearrange_connected_cells()
+
         self._global_to_local_mapping = (
             self._create_global_cellidx_to_local_cellid_mapping(partition_info)
         )
@@ -143,6 +145,8 @@ class ExchangeCreator(abc.ABC):
             for model_id2, connected_domain_pair in grouped_connected_models.groupby(
                 "cell_label2"
             ):
+                model_id1 = int(model_id1)
+                model_id2 = int(model_id2)
                 mapping1 = (
                     self._global_to_local_mapping[model_id1]
                     .drop(columns=["local_idx"])
@@ -234,3 +238,20 @@ class ExchangeCreator(abc.ABC):
             )
 
         return local_cell_idx_to_id
+
+    def rearrange_connected_cells(self):
+        """
+        connections will be shuffled so that the lowest partition number comes first.
+        """
+        df = self._connected_cells
+
+        label_decreasing = df["cell_label1"] > df["cell_label2"]
+
+        colnames = ["cell_idx1", "cell_idx2", "cell_label1", "cell_label2"]
+        colnames_reversed = ["cell_idx2", "cell_idx1", "cell_label2", "cell_label1"]
+
+        decreasing_connections = df.loc[label_decreasing, colnames].values.astype(int)
+
+        df.loc[label_decreasing, colnames_reversed] = decreasing_connections
+
+        self._connected_cells = df
