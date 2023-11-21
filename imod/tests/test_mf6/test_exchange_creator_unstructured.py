@@ -158,10 +158,14 @@ class TestExchangeCreator_Unstructured:
         exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
 
         # Assert.
-        assert np.allclose(
+        # TODO: resinstate these asserts when the auxiliary variable computation
+        #   (cdist and angldegx) for unstructured grids 
+        # is implemented. The previous implementation was found to be different from what flopy computes
+        # and therefore the auxilary variables were temporarily removed from imod-python's output
+        '''assert np.allclose(
             exchanges[0].dataset["auxiliary_data"].sel(variable="angldegx"),
             expected_angldegx,
         )
         assert np.allclose(
             exchanges[0].dataset["auxiliary_data"].sel(variable="cdist"), expected_cdist
-        )
+        )'''
