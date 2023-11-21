@@ -145,6 +145,8 @@ class ExchangeCreator(abc.ABC):
             for model_id2, connected_domain_pair in grouped_connected_models.groupby(
                 "cell_label2"
             ):
+                model_id1 = int(model_id1)
+                model_id2 = int(model_id2)
                 mapping1 = (
                     self._global_to_local_mapping[model_id1]
                     .drop(columns=["local_idx"])
