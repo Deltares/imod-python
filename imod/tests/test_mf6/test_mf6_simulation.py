@@ -381,7 +381,15 @@ class TestModflow6Simulation:
         assert len(split_simulation["split_exchanges"]) == 2
         split_simulation.write(tmp_path, False, True, False)
 
-        expected_exchanges_block = "exchanges\n  GWF6-GWF6 GWF_1_0_GWF_1_1.gwfgwf GWF_1_0 GWF_1_1\n  GWF6-GWF6 GWF_1_1_GWF_1_2.gwfgwf GWF_1_1 GWF_1_2\n\nend exchanges"
+        expected_exchanges_block = textwrap.dedent(
+            """\
+            exchanges
+              GWF6-GWF6 GWF_1_0_GWF_1_1.gwfgwf GWF_1_0 GWF_1_1
+              GWF6-GWF6 GWF_1_1_GWF_1_2.gwfgwf GWF_1_1 GWF_1_2
+
+            end exchanges
+            """
+        )
         with open(tmp_path / "mfsim.nam", mode="r") as mfsim_nam:
             namfile_content = mfsim_nam.read()
         assert expected_exchanges_block in namfile_content
