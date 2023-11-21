@@ -126,7 +126,7 @@ class OutputControl(Package):
                 f"Output Control setting should be either integer or string in ['first', 'last', 'all'], instead got {setting}"
             )
 
-    def _get_output_filepath(self, directory: Path, output_variable: str):
+    def _get_output_filepath(self, directory: Path, output_variable: str) -> Path:
         varname = f"{output_variable}_file"
         ext = OUTPUT_EXT_MAPPING[output_variable]
         modelname = directory.stem
@@ -144,7 +144,7 @@ class OutputControl(Package):
             sim_directory = directory.parent
             path = Path(os.path.relpath(filepath, sim_directory))
 
-        return path.as_posix()
+        return path
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = {}
@@ -153,7 +153,8 @@ class OutputControl(Package):
             save = self.dataset[f"save_{output_variable}"].values[()]
             if save is not None:
                 varname = f"{output_variable}_file"
-                d[varname] = self._get_output_filepath(directory, output_variable)
+                output_path = self._get_output_filepath(directory, output_variable)
+                d[varname] = output_path.as_posix()
 
         periods = collections.defaultdict(dict)
         for datavar in ("save_head", "save_concentration", "save_budget"):
