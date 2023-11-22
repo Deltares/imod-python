@@ -5,7 +5,6 @@ import copy
 import pathlib
 import subprocess
 import warnings
-from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -34,7 +33,7 @@ from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
-from imod.typing.grid import concat, is_unstructured, merge
+from imod.typing.grid import concat, is_unstructured, merge, merge_partitions
 
 OUTPUT_FUNC_MAPPING = {
     "head": (open_hds, GroundwaterFlowModel),
@@ -501,22 +500,22 @@ class Modflow6Simulation(collections.UserDict):
         elif len(modelnames) == 1:
             modelname = next(iter(modelnames))
             return self._open_output_single_model(modelname, output, **settings)
+        elif is_split(self):
+            if "budget" in output:
+                return self._merge_fluxes(modelnames, output, **settings)
+            else:
+                return self._merge_states(modelnames, output, **settings)
         elif output == "concentration":
-            # Multiple models are possible
             return self._concat_concentrations(
                 modelnames, species_ls, output, **settings
             )
         elif output == "budget-transport":
-            # Multiple models are possible
             return self._concat_transport_budgets(
                 modelnames, species_ls, output, **settings
             )
-        elif output == "":
-            pass
         else:
-            # TODO: This is the place where merging of partioned heads can be implemented.
-            raise NotImplementedError(
-                "Reading output from partioned models not yet supported by this method."
+            raise RuntimeError(
+                f"Unexpected error when opening {output} for {modelnames}"
             )
 
     def _merge_states(self, modelnames: list[str], output: str, **settings):
@@ -525,19 +524,20 @@ class Modflow6Simulation(collections.UserDict):
             state_partitions.append(
                 self._open_output_single_model(modelname, output, **settings)
             )
-        return merge(state_partitions)
+        return merge_partitions(state_partitions)
 
     def _merge_fluxes(self, modelnames: list[str], output: str, **settings):
-        unique_balance_keys = set()
+        if settings["flowja"] is True:
+            raise ValueError("``flowja`` cannot be set to True when merging fluxes.")
+
         cbc_per_partition = []
         for modelname in modelnames:
             partition_model = self[modelname]
             partition_domain = partition_model.domain
-            cbc = self._open_output_single_model(modelname, output, **settings)
-            unique_balance_keys.update(list(cbc.keys()))
+            cbc = merge(self._open_output_single_model(modelname, output, **settings))
             cbc_per_partition.append(cbc.where(partition_domain, other=np.nan))
 
-            # TODO: FINISH THIS
+        return merge_partitions(cbc_per_partition)
 
     def _concat_concentrations(
         self, modelnames: list[str], species_ls: list[str], output: str, **settings
@@ -552,13 +552,15 @@ class Modflow6Simulation(collections.UserDict):
     def _concat_transport_budgets(
         self, modelnames: list[str], species_ls: list[str], output: str, **settings
     ):
-        budgets = defaultdict(list)
+        budgets = []
         for modelname, species in zip(modelnames, species_ls):
-            d_budget = self._open_output_single_model(modelname, output, **settings)
-            for key, da in d_budget.items():
-                da = da.assign_coords(species=species)
-                budgets[key].append(da)
-        return {key: concat(da_ls, dim="species") for key, da_ls in budgets.items()}
+            budget = merge(
+                self._open_output_single_model(modelname, output, **settings)
+            )
+            budget = budget.assign_coords(species=species)
+            budgets.append(budget)
+
+        return concat(budgets, dim="species")
 
     def _open_output_single_model(
         self, modelname: str, output: str, **settings
