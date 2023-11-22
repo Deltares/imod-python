@@ -17,6 +17,7 @@ from imod.mf6 import (
     LayeredHorizontalFlowBarrierResistance,
 )
 from imod.mf6.hfb import to_connected_cells_dataset
+from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import ones_like
 
 
@@ -285,7 +286,11 @@ def test_to_mf6_different_z_boundaries(
         (2.0, 0),
     ],
 )
-@pytest.mark.parametrize("parameterizable_basic_dis", [(1, 1, 3)], indirect=True)
+@pytest.mark.parametrize(
+    "parameterizable_basic_dis",
+    [BasicDisSettings(nlay=1, nrow=1, ncol=3, xstart=0, xstop=3)],
+    indirect=True,
+)
 @pytest.mark.parametrize("inactivity_marker", [0, -1])
 @patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
 def test_to_mf6_remove_invalid_edges(
@@ -336,7 +341,11 @@ def test_to_mf6_remove_invalid_edges(
     ],
 )
 @pytest.mark.parametrize("inactivity_marker", [0, -1])
-@pytest.mark.parametrize("parameterizable_basic_dis", [(2, 1, 3)], indirect=True)
+@pytest.mark.parametrize(
+    "parameterizable_basic_dis",
+    [BasicDisSettings(nlay=2, nrow=1, ncol=3, xstart=0, xstop=3)],
+    indirect=True,
+)
 @patch("imod.mf6.mf6_hfb_adapter.Mf6HorizontalFlowBarrier.__new__", autospec=True)
 def test_to_mf6_remove_barrier_parts_adjacent_to_inactive_cells(
     mf6_flow_barrier_mock,

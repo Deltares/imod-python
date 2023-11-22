@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 import pytest
 import xarray as xr
@@ -165,3 +167,18 @@ def circle_result_sto(tmpdir_factory):
     simulation.write(modeldir)
     simulation.run()
     return modeldir
+
+
+@pytest.mark.usefixtures("circle_model_evt")
+@pytest.fixture(scope="function")
+def circle_partitioned():
+    simulation = make_circle_model_evt()
+
+    idomain = simulation["GWF_1"]["disv"].dataset["idomain"]
+    submodel_labels = copy.deepcopy(idomain.sel({"layer": 1}))
+
+    submodel_labels.values[:67] = 0
+    submodel_labels.values[67:118] = 1
+    submodel_labels.values[118:] = 2
+
+    return simulation.split(submodel_labels)

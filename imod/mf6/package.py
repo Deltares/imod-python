@@ -13,7 +13,8 @@ import xugrid as xu
 from xarray.core.utils import is_scalar
 
 import imod
-from imod.mf6.pkgbase import TRANSPORT_PACKAGES, PackageBase
+from imod.mf6.auxiliary_variables import get_variable_names
+from imod.mf6.pkgbase import EXCHANGE_PACKAGES, TRANSPORT_PACKAGES, PackageBase
 from imod.mf6.regridding_utils import (
     RegridderInstancesCollection,
     RegridderType,
@@ -100,6 +101,8 @@ class Package(PackageBase, abc.ABC):
             fname = "sim-tdis.j2"
         elif pkg_id in TRANSPORT_PACKAGES:
             fname = f"gwt-{pkg_id}.j2"
+        elif pkg_id in EXCHANGE_PACKAGES:
+            fname = f"exg-{pkg_id}.j2"
         else:
             fname = f"gwf-{pkg_id}.j2"
         return env.get_template(fname)
@@ -186,6 +189,10 @@ class Package(PackageBase, abc.ABC):
                 value = self[varname].values[()]
                 if self._valid(value):  # skip False or None
                     d[key] = value
+
+        if (hasattr(self, "_auxiliary_data")) and (names := get_variable_names(self)):
+            d["auxiliary"] = names
+
         return self._template.render(d)
 
     @staticmethod
@@ -300,36 +307,6 @@ class Package(PackageBase, abc.ABC):
                 variables.append(var)
 
         return variables
-
-    def period_data(self):
-        result = []
-        if hasattr(self, "_period_data"):
-            result += self._period_data
-        if hasattr(self, "_auxiliary_data"):
-            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
-                if aux_var_name in self.dataset.keys():
-                    for s in (
-                        self.dataset[aux_var_name].coords[aux_var_dimensions].values
-                    ):
-                        result.append(s)
-        return result
-
-    def add_periodic_auxiliary_variable(self):
-        if hasattr(self, "_auxiliary_data"):
-            for aux_var_name, aux_var_dimensions in self._auxiliary_data.items():
-                aux_coords = (
-                    self.dataset[aux_var_name].coords[aux_var_dimensions].values
-                )
-                for s in aux_coords:
-                    self.dataset[s] = self.dataset[aux_var_name].sel(
-                        {aux_var_dimensions: s}
-                    )
-
-    def get_auxiliary_variable_names(self):
-        result = {}
-        if hasattr(self, "_auxiliary_data"):
-            result.update(self._auxiliary_data)
-        return result
 
     def copy(self) -> Any:
         # All state should be contained in the dataset.
@@ -698,4 +675,8 @@ class Package(PackageBase, abc.ABC):
     def skip_masking_dataarray(self, array_name: str) -> bool:
         if hasattr(self, "_skip_mask_arrays"):
             return array_name in self._skip_mask_arrays
+        return False
+
+    @classmethod
+    def is_grid_agnostic_package(cls) -> bool:
         return False

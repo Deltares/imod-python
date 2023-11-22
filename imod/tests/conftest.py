@@ -15,6 +15,7 @@ from .fixtures.flow_example_fixture import imodflow_model
 from .fixtures.mf6_circle_fixture import (
     circle_model,
     circle_model_evt,
+    circle_partitioned,
     circle_result,
     circle_result_evt,
     circle_result_sto,
@@ -41,7 +42,7 @@ from .fixtures.mf6_lake_package_fixture import (
     lake_table,
     naardermeer,
 )
-from .fixtures.mf6_regridding_fixture import (
+from .fixtures.mf6_small_models_fixture import (
     solution_settings,
     structured_flow_model,
     structured_flow_simulation,
@@ -50,6 +51,7 @@ from .fixtures.mf6_regridding_fixture import (
 )
 from .fixtures.mf6_twri_disv_fixture import twri_disv_model
 from .fixtures.mf6_twri_fixture import (
+    split_transient_twri_model,
     transient_twri_model,
     transient_twri_result,
     transient_unconfined_twri_model,
