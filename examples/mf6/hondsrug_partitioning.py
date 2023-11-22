@@ -1,3 +1,17 @@
+"""
+Partitioning a regional model
+===========================
+
+This example shows how a model can be partitioned into submodels. This will
+allow parallelization when solving the model. The example used is the Hondsrug
+model. It is partitioned into 3 rectangular parts. In the example we first run
+the original, unpartitioned model. Then we partition the model and run the
+resulting simulation. Finally we merge the head output of the submodels into a
+head array for the whole grid. we print both the heads obtained without
+partitioning, and the merged heads of the partitioned simulation, ' for
+comparison.
+"""
+
 # %% Import packages
 import matplotlib.pyplot as plt
 import xarray as xr
