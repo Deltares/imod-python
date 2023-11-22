@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Callable, Sequence
 
 import numpy as np
 import xarray as xr
@@ -49,16 +49,56 @@ def is_unstructured(grid: xr.DataArray) -> bool:
     return False
 
 
-def merge(objects: Sequence[xr.DataArray], *args, **kwargs) -> xr.Dataset:
+# Typedispatching doesn't work based on types of list elements, therefore resort to
+# isinstance testing
+def _type_dispatch_functions_on_grid_sequence(
+    objects: Sequence[GridDataArray | GridDataset],
+    unstructured_func: Callable,
+    structured_func: Callable,
+    *args,
+    **kwargs,
+) -> GridDataArray | GridDataset:
+    """
+    Type dispatch functions on sequence of grids. Functions like merging or concatenating.
+    """
     start_type = type(objects[0])
     homogeneous = all([isinstance(o, start_type) for o in objects])
     if not homogeneous:
-        raise RuntimeError("only hommogeneous sequences can be merged")
-    if isinstance(objects[0], xr.DataArray):
-        return xr.merge(objects, *args, **kwargs)
-    if isinstance(objects[0], xu.UgridDataArray):
-        return xu.merge_partitions(objects, *args, **kwargs)
-    raise NotImplementedError(f"merging not supported for type {type(objects[0])}")
+        unique_types = set([type(o) for o in objects])
+        raise TypeError(
+            f"Only homogeneous sequences can be reduced, received sequence of {unique_types}"
+        )
+    if isinstance(objects[0], (xu.UgridDataArray, xu.UgridDataset)):
+        return unstructured_func(objects, *args, **kwargs)
+    elif isinstance(objects[0], (xr.DataArray, xr.Dataset)):
+        return structured_func(objects, *args, **kwargs)
+    raise TypeError(
+        f"'{unstructured_func.__name__}' not supported for type {type(objects[0])}"
+    )
+
+
+def merge(
+    objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
+) -> GridDataArray | GridDataset:
+    return _type_dispatch_functions_on_grid_sequence(
+        objects, xu.merge, xr.merge, *args, **kwargs
+    )
+
+
+def merge_partitions(
+    objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
+) -> GridDataArray | GridDataset:
+    return _type_dispatch_functions_on_grid_sequence(
+        objects, xu.merge_partitions, xr.merge, *args, **kwargs
+    )
+
+
+def concat(
+    objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
+) -> GridDataArray | GridDataset:
+    return _type_dispatch_functions_on_grid_sequence(
+        objects, xu.concat, xr.concat, *args, **kwargs
+    )
 
 
 @typedispatch
@@ -73,19 +113,6 @@ def bounding_polygon(active: xr.DataArray):
 def bounding_polygon(active: xu.UgridDataArray):
     """Return bounding polygon of active cells"""
     return active.ugrid.grid.bounding_polygon()
-
-
-# Typedispatching doesn't work based on types of list elements, therefore to
-# isinstance testing
-def concat(grid_ls: list[GridDataArray | GridDataset], *args, **kwargs):
-    if isinstance(grid_ls[0], (xu.UgridDataArray, xu.UgridDataset)):
-        return xu.concat(grid_ls, *args, **kwargs)
-    elif isinstance(grid_ls[0], (xr.DataArray, xr.Dataset)):
-        return xr.concat(grid_ls, *args, **kwargs)
-    else:
-        raise TypeError(
-            f"Expected type UgridDataArray or DataArray, received {type(grid_ls[0])}"
-        )
 
 
 @typedispatch
@@ -107,16 +134,3 @@ def is_spatial_2D(array: xu.UgridDataArray) -> bool:
     has_spatial_coords = face_dim in coords
     has_spatial_dims = face_dim in dims
     return has_spatial_dims & has_spatial_coords
-
-
-# Typedispatching doesn't work based on types of list elements, therefore to
-# isinstance testing
-def concat(grid_ls: list[GridDataArray | GridDataset], *args, **kwargs):
-    if isinstance(grid_ls[0], (xu.UgridDataArray, xu.UgridDataset)):
-        return xu.concat(grid_ls, *args, **kwargs)
-    elif isinstance(grid_ls[0], (xr.DataArray, xr.Dataset)):
-        return xr.concat(grid_ls, *args, **kwargs)
-    else:
-        raise TypeError(
-            f"Expected type UgridDataArray or DataArray, received {type(grid_ls[0])}"
-        )
