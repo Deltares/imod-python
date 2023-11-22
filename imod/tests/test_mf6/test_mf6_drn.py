@@ -333,12 +333,12 @@ def test_clip_box_transient(transient_drainage):
 
 
 def test_repr(drainage):
-    repr_string = drainage.__repr__()
+    repr_string = imod.Mf6.Drainage(**drainage).__repr__()
     assert isinstance(repr_string, str)
     assert repr_string.split("\n")[0] == "Drainage"
 
 
 def test_html_repr(drainage):
-    html_string = drainage._html_repr_()
+    html_string = imod.mf6.Drainage(**drainage)._html_repr_()
     assert isinstance(html_string, str)
     assert html_string.split("</div>")[0] == "<div>Drainage"
