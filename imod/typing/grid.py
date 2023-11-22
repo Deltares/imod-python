@@ -79,7 +79,7 @@ def _type_dispatch_functions_on_grid_sequence(
 
 def merge(
     objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
-) -> GridDataArray | GridDataset:
+) -> GridDataset:
     return _type_dispatch_functions_on_grid_sequence(
         objects, xu.merge, xr.merge, *args, **kwargs
     )
