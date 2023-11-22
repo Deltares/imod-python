@@ -39,8 +39,9 @@ Added
   it possible for a user to create a Multi-Model simulation. A user needs to
   provide  a submodel label array in which they specify to which submodel a cell
   belongs. The method will then create the submodels and split the nested packages.
-  At the moment the split method will not create the gwfgwf exchanges required to
-  connect the submodels
+  The split method will create the gwfgwf exchanges required to
+  connect the submodels. At the moment auxiliary variables ``cdist`` and  ``angldegx``
+  are only computed for structured grids. 
 - A ``save_saturation`` option to :class:`imod.mf6.NodePropertyFlow` which saves
   cell saturations for unconfined flow.
 - Functions :function:`imod.prepare.get_upper_active_layer_number` and
