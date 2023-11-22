@@ -69,6 +69,27 @@ def test_simulation_open_head(circle_model, tmp_path):
 
 @pytest.mark.usefixtures("circle_model")
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
+def test_simulation_open_head_relative_path(circle_model, tmp_path):
+    simulation = circle_model
+
+    # Should throw error when model not run yet.
+    with pytest.raises(RuntimeError):
+        simulation.open_head()
+
+    # Temporarily change directory to tmp_path
+    with imod.util.cd(tmp_path):
+        modeldir = Path(".") / "circle"
+        simulation.write(modeldir)
+        simulation.run()
+        head = simulation.open_head()
+
+    assert isinstance(head, xu.UgridDataArray)
+    assert head.dims == ("time", "layer", "mesh2d_nFaces")
+    assert head.shape == (1, 2, 216)
+
+
+@pytest.mark.usefixtures("circle_model")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="capture_output added in 3.7")
 def test_simulation_open_flow_budget(circle_model, tmp_path):
     simulation = circle_model
 
