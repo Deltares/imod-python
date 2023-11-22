@@ -134,10 +134,12 @@ class TestExchangeCreator_Unstructured:
     ):
         # Arrange.
         idomain, _, _ = parameterizable_basic_dis
+        """
         expected_angldegx = 0.0 if partition_axis == "x" else 270.0
         expected_cdist = abs(
             idomain.coords[partition_axis][1] - idomain.coords[partition_axis][2]
         ).values
+        """
 
         idomain = to_unstruct_domain(idomain)
 
@@ -155,7 +157,10 @@ class TestExchangeCreator_Unstructured:
         exchange_creator = ExchangeCreator_Unstructured(submodel_labels, partition_info)
 
         # Act.
+        _ = exchange_creator.create_exchanges("flow", idomain.layer)
+        """
         exchanges = exchange_creator.create_exchanges("flow", idomain.layer)
+        """
 
         # Assert.
         # TODO: resinstate these asserts when the auxiliary variable computation
