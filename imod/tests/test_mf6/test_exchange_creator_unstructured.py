@@ -164,6 +164,7 @@ class TestExchangeCreator_Unstructured:
 
         # Assert.
         # TODO: resinstate these asserts when the auxiliary variable computation
+        # See gitlab issue 662: Properly compute aux vars cdist and anglex for unstructured grids
         #   (cdist and angldegx) for unstructured grids
         # is implemented. The previous implementation was found to be different from what flopy computes
         # and therefore the auxilary variables were temporarily removed from imod-python's output
