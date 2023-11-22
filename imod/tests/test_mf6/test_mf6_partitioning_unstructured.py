@@ -66,7 +66,7 @@ def test_partitioning_unstructured(
     _ = merge_balances(tmp_path, split_simulation)
 
     # compare the head result of the original simulation with the result of the partitioned simulation
-    np.testing.assert_allclose(head.values, orig_head.values, rtol=9e-2, atol=1e-4)
+    np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-5, atol=1e-3)
 
 
 @pytest.mark.usefixtures("circle_model")
@@ -122,7 +122,7 @@ def test_partitioning_unstructured_with_inactive_cells(
     head = merge_heads(tmp_path, split_simulation)
 
     # compare the head result of the original simulation with the result of the partitioned simulation
-    np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-1, atol=1e-2)
+    np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-5, atol=1e-3)
 
 
 @pytest.mark.usefixtures("circle_model")
@@ -178,4 +178,4 @@ def test_partitioning_unstructured_with_vpt_cells(
     head = merge_heads(tmp_path, split_simulation)
 
     # compare the head result of the original simulation with the result of the partitioned simulation
-    np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-1, atol=1e-2)
+    np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-5, atol=1e-3)
