@@ -57,8 +57,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         grid = self._submodel_labels.ugrid.grid
         edge_face_connectivity = grid.edge_face_connectivity
 
-        face1 = edge_face_connectivity[self._connected_cell_edge_indices, 0]
-        face2 = edge_face_connectivity[self._connected_cell_edge_indices, 1]
+        face1, face2 = edge_face_connectivity[self._connected_cell_edge_indices].T
         centroid_1 = grid.centroids[face1]
         centroid_2 = grid.centroids[face2]
 
@@ -72,7 +71,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         length = np.linalg.norm(U, axis=1)
 
         # The cross product of U and V equals the area of the parallellogram,
-        # dividing by length (the base of the parallellogram) gives the orthogonal distance.
+        # dividing by length (the base of the parallellogram) gives the orthogonal distances cl1 & cl2.
 
         df = pd.DataFrame(
             {
