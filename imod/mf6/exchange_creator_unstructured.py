@@ -71,7 +71,7 @@ class ExchangeCreator_Unstructured(ExchangeCreator):
         length = np.linalg.norm(U, axis=1)
 
         # The cross product of U and V equals the area of the parallellogram,
-        # dividing by length (the base of the parallellogram) gives the orthogonal distance.
+        # dividing by length (the base of the parallellogram) gives the orthogonal distances cl1 & cl2.
 
         df = pd.DataFrame(
             {
