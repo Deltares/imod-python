@@ -26,6 +26,7 @@ def get_label_array(simulation: Modflow6Simulation, npartitions: int) -> GridDat
 @typedispatch
 def partition_idomain(idomain_grid: xu.UgridDataArray, npartitions: int) -> GridDataArray:
     labels = idomain_grid.ugrid.grid.label_partitions(n_part=npartitions)
+    labels = labels.rename("idomain")
     return labels
 
 
