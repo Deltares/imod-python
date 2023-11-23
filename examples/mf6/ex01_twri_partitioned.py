@@ -34,23 +34,15 @@ from example_models import create_twri_simulation
 import imod
 from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
 from imod.typing.grid import zeros_like
-
+from imod.mf6.partition_generator import get_label_array
 simulation = create_twri_simulation()
 
 # %%
 # We'll create a new directory in which we will write and run the model.
 gwf_model = simulation["GWF_1"]
 active = gwf_model.domain.sel(layer=1)
-number_partitions = 3
-split_location = np.geomspace(active.y.min(), active.y.max(), number_partitions + 1)
-
-coords = active.coords
-submodel_labels = zeros_like(active)
-for id in np.arange(1, number_partitions):
-    submodel_labels.loc[
-        (coords["y"] > split_location[id]) & (coords["y"] <= split_location[id + 1])
-    ] = id
-
+number_partitions = 9
+submodel_labels = get_label_array(simulation, number_partitions)
 
 fig, ax = plt.subplots()
 submodel_labels.plot.contourf(ax=ax)
