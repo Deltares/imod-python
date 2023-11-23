@@ -31,6 +31,10 @@ Changed
 - The imod-environment.yml file has been split in an imod-environment.yml
   (containing all packages required to run imod-python) and a
   imod-environment-dev.yml file (containing additional packages for developers).
+- Changed the way :class:`imod.mf6.Modflow6Simulation`,
+  :class:`imod.mf6.GroundwaterFlowModel`,
+  :class:`imod.mf6.GroundwaterTransportModel`, and Modflow 6 packages are
+  represented while printing.
 
 Added
 ~~~~~
