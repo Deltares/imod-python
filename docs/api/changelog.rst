@@ -37,10 +37,19 @@ Added
 - The unit tests results are now published on GitLab
 - The :meth:`imod.mf6.Simulation.split` method has been added. This method makes
   it possible for a user to create a Multi-Model simulation. A user needs to
-  provide  a submodel label array in which they specify to which submodel a cell
-  belongs. The method will then create the submodels and split the nested packages.
-  At the moment the split method will not create the gwfgwf exchanges required to
-  connect the submodels
+  provide a submodel label array in which they specify to which submodel a cell
+  belongs. The method will then create the submodels and split the nested
+  packages. The split method will create the gwfgwf exchanges required to
+  connect the submodels. At the moment auxiliary variables ``cdist`` and
+  ``angldegx`` are only computed for structured grids. 
+- Once a split simulation has been executed by MF6, we find head and balance
+  results in each of the partition models. These can now be merged into head and
+  balance datasets for the original domain using
+  :function:`imod.imod.mf6.partitioned_simulation_postprocessing.merge_heads`
+  and
+  :function:`imod.imod.mf6.partitioned_simulation_postprocessing.merge_balances`.
+  In the case of balances, the exchanges through the partition boundary are not
+  yet added to this merged balance. 
 - A ``save_saturation`` option to :class:`imod.mf6.NodePropertyFlow` which saves
   cell saturations for unconfined flow.
 - Functions :function:`imod.prepare.get_upper_active_layer_number` and
