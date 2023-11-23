@@ -18,8 +18,8 @@ Fixed
   default tile provider being used was Stamen. However Stamen is no longer free
   which caused Contextily to fail. The default tile provider has been changed to
   OpenStreetMap to resolve this issue.
-- :function:`imod.mf6.out.open_cbc` now reads saved cell saturations and specific discharges.
-- :function:`imod.mf6.out.open_cbc` failed to read unstructured budgets stored
+- :function:`imod.mf6.open_cbc` now reads saved cell saturations and specific discharges.
+- :function:`imod.mf6.open_cbc` failed to read unstructured budgets stored
   following IMETH1, most importantly the storage fluxes.
 - Fixed support of Python 3.11 by dropping the obsolete ``qgs`` module.
 - Bug in :class:`imod.mf6.SourceSinkMixing` where, in case of multiple active
@@ -52,21 +52,21 @@ Added
   yet added to this merged balance. 
 - A ``save_saturation`` option to :class:`imod.mf6.NodePropertyFlow` which saves
   cell saturations for unconfined flow.
-- Functions :function:`imod.prepare.get_upper_active_layer_number` and
-  :function:`get_lower_active_layer_number` to return planar grids with numbers
-  of the highest and lowest active cells respectively.
-- Functions :function:`get_upper_active_grid_cells` and
-  :function:`get_lower_active_grid_cells` to return boolean grids designating
-  respectively the highest and lowest active cells in a grid.
+- Functions :function:`imod.prepare.layer.get_upper_active_layer_number` and
+  :function:`imod.prepare.layer.get_lower_active_layer_number` to return planar
+  grids with numbers of the highest and lowest active cells respectively.
+- Functions :function:`imod.prepare.layer.get_upper_active_grid_cells` and
+  :function:`imod.prepare.layer.get_lower_active_grid_cells` to return boolean
+  grids designating respectively the highest and lowest active cells in a grid.
 - validation of ``transient`` argument in :class:`imod.mf6.StorageCoefficient`
   and :class:`imod.mf6.SpecificStorage`.
-- :method:`imod.mf6.Simulation.open_concentration`,
-  :method:`imod.mf6.Simulation.open_head`,
-  :method:`imod.mf6.Simulation.open_transport_budget`, and
-  :method:`imod.mf6.Simulation.open_flow_budget`, were added as convenience
+- :meth:`imod.mf6.Simulation.open_concentration`,
+  :meth:`imod.mf6.Simulation.open_head`,
+  :meth:`imod.mf6.Simulation.open_transport_budget`, and
+  :meth:`imod.mf6.Simulation.open_flow_budget`, were added as convenience
   methods to open simulation output easier (without having to specify paths).
 - Settings such as ``save_flows`` can be passed through
-  :method:`imod.mf6.SourceSinkMixing.from_flow_model`
+  :meth:`imod.mf6.SourceSinkMixing.from_flow_model`
 
 Removed
 ~~~~~~~
