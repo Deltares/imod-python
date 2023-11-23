@@ -680,3 +680,11 @@ class Package(PackageBase, abc.ABC):
     @classmethod
     def is_grid_agnostic_package(cls) -> bool:
         return False
+
+    def __repr__(self) -> str:
+        typename = type(self).__name__
+        return f"{typename}\n{self.dataset.__repr__()}"
+
+    def _repr_html_(self) -> str:
+        typename = type(self).__name__
+        return f"<div>{typename}</div>{self.dataset._repr_html_()}"
