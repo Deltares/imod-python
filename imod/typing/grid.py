@@ -49,6 +49,13 @@ def is_unstructured(grid: xr.DataArray) -> bool:
     return False
 
 
+def _get_first_item(objects: Sequence | dict):
+    if isinstance(objects, dict):
+        return next(iter(objects.values))
+    else:
+        next(iter(objects))
+
+
 # Typedispatching doesn't work based on types of list elements, therefore resort to
 # isinstance testing
 def _type_dispatch_functions_on_grid_sequence(
@@ -61,16 +68,17 @@ def _type_dispatch_functions_on_grid_sequence(
     """
     Type dispatch functions on sequence of grids. Functions like merging or concatenating.
     """
-    start_type = type(objects[0])
+    first_object = _get_first_item(objects)
+    start_type = type(first_object)
     homogeneous = all([isinstance(o, start_type) for o in objects])
     if not homogeneous:
         unique_types = set([type(o) for o in objects])
         raise TypeError(
             f"Only homogeneous sequences can be reduced, received sequence of {unique_types}"
         )
-    if isinstance(objects[0], (xu.UgridDataArray, xu.UgridDataset)):
+    if isinstance(first_object, (xu.UgridDataArray, xu.UgridDataset)):
         return unstructured_func(objects, *args, **kwargs)
-    elif isinstance(objects[0], (xr.DataArray, xr.Dataset)):
+    elif isinstance(first_object, (xr.DataArray, xr.Dataset)):
         return structured_func(objects, *args, **kwargs)
     raise TypeError(
         f"'{unstructured_func.__name__}' not supported for type {type(objects[0])}"
@@ -78,7 +86,7 @@ def _type_dispatch_functions_on_grid_sequence(
 
 
 def merge(
-    objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
+    objects: dict[str, GridDataArray | GridDataset], *args, **kwargs
 ) -> GridDataset:
     return _type_dispatch_functions_on_grid_sequence(
         objects, xu.merge, xr.merge, *args, **kwargs
