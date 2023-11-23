@@ -330,3 +330,15 @@ def test_clip_box_transient(transient_drainage):
     assert np.array_equal(selection.dataset["time"].values, expected)
     assert (selection["conductance"].sel(time="1990-06-01") == 1.0).all()
     assert (selection["conductance"].sel(time="2000-01-01") == 1.0).all()
+
+
+def test_repr(drainage):
+    repr_string = imod.mf6.Drainage(**drainage).__repr__()
+    assert isinstance(repr_string, str)
+    assert repr_string.split("\n")[0] == "Drainage"
+
+
+def test_html_repr(drainage):
+    html_string = imod.mf6.Drainage(**drainage)._repr_html_()
+    assert isinstance(html_string, str)
+    assert html_string.split("</div>")[0] == "<div>Drainage"
