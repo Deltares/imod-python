@@ -76,17 +76,11 @@ def _partition_idomain(idomain_grid: xa.DataArray, npartitions: int) -> GridData
 
 def _partition_1d(nr_partitions: int, axis_size: int) -> List[Tuple]:
     """
-    returns tuples with start and stop positions of partitions when partitioning an axis of length nr_indices
+    Returns tuples with start and stop positions of partitions when partitioning an axis of length nr_indices
     into nr_partitions. Partitions need to be at least 3 gridblocks in size. If this cannot be done, it throws an error.
-
-
-    input                           output
-    -----                          -------
-    nr_partitions    nr_indices     result
-    -------------   ------------   --------
-      3               25            ( 0, 8)(8, 16)(16, 25)
-
-
+    When the number of gridblocks on the axis is not divisible by the number of partitions, then any
+    leftover cells are added in the last partition. For example if we partition an axis of 25 cells into 3 
+    partitions, then the number of cells per partition will be 8 for the first 2 partitions,but the last partition will contain 9 cells. 
     """
 
     # validate input
