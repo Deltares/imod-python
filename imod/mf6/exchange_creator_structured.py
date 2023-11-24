@@ -70,15 +70,6 @@ class ExchangeCreator_Structured(ExchangeCreator):
         connected_cell_info = connected_cell_info.loc[
             connected_cell_info.cell_idx1 != NOT_CONNECTED_VALUE
         ]
-        label_increasing = (
-            connected_cell_info["cell_label1"] < connected_cell_info["cell_label2"]
-        )
-
-        connected_cell_info.loc[
-            label_increasing, ["cell_idx1", "cell_idx2", "cell_label1", "cell_label2"]
-        ] = connected_cell_info.loc[
-            label_increasing, ["cell_idx2", "cell_idx1", "cell_label2", "cell_label1"]
-        ].values
 
         return connected_cell_info
 
@@ -100,6 +91,14 @@ class ExchangeCreator_Structured(ExchangeCreator):
         )
         hwva = np.where(is_x_connection, cell2_df["dy"].values, cell2_df["dx"].values)
 
+        cdist = np.where(is_x_connection, distance_x, distance_y)
+
+        outward_vector = np.zeros((len(is_x_connection), 2))
+        outward_vector[:, 0] = cell2_df["x"].values - cell1_df["x"].values
+        outward_vector[:, 1] = cell2_df["y"].values - cell1_df["y"].values
+        anglex = np.arctan2(outward_vector[:, 1], outward_vector[:, 0])
+        angledegx = np.degrees(anglex) % 360
+
         geometric_information = pd.DataFrame(
             {
                 "cell_idx1": self._connected_cells["cell_idx1"].values,
@@ -107,6 +106,8 @@ class ExchangeCreator_Structured(ExchangeCreator):
                 "cl1": cl1,
                 "cl2": cl2,
                 "hwva": hwva,
+                "angldegx": angledegx,
+                "cdist": cdist,
             }
         )
 

@@ -7,7 +7,6 @@ import xarray as xr
 
 import imod
 from imod.mf6 import Modflow6Simulation
-from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
 from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
 
@@ -67,7 +66,7 @@ def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArr
     intrusion = zeros_like(idomain_top)
     intrusion.values[0:15, 0:8] = 0
     intrusion.values[0:15, 8:] = 1
-    intrusion.values[7, 7] = 0
+    intrusion.values[8, 8] = 0
     result["intrusion"] = intrusion
 
     """

@@ -948,3 +948,22 @@ class Modflow6Simulation(collections.UserDict):
         active_exchange_domain = exchange_domain.where(exchange_domain.values > 0)
         active_exchange_domain = active_exchange_domain.dropna("index")
         ex.dataset = ex.dataset.sel(index=active_exchange_domain["index"])
+
+    def __repr__(self) -> str:
+        typename = type(self).__name__
+        INDENT = "    "
+        attrs = [
+            f"{typename}(",
+            f"{INDENT}name={repr(self.name)},",
+            f"{INDENT}directory={repr(self.directory)}",
+        ]
+        items = [
+            f"{INDENT}{repr(key)}: {type(value).__name__},"
+            for key, value in self.items()
+        ]
+        # Place the emtpy dict on the same line. Looks silly otherwise.
+        if items:
+            content = attrs + ["){"] + items + ["}"]
+        else:
+            content = attrs + ["){}"]
+        return "\n".join(content)

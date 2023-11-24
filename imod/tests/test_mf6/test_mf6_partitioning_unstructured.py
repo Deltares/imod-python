@@ -67,7 +67,7 @@ def test_partitioning_unstructured(
 
     # compare the head result of the original simulation with the result of the partitioned simulation
     np.testing.assert_allclose(
-        head["head"].values, orig_head.values, rtol=9e-2, atol=1e-4
+        head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
     )
 
 
@@ -126,7 +126,7 @@ def test_partitioning_unstructured_with_inactive_cells(
 
     # compare the head result of the original simulation with the result of the partitioned simulation
     np.testing.assert_allclose(
-        head["head"].values, orig_head.values, rtol=1e-1, atol=1e-2
+        head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
     )
 
 
@@ -185,5 +185,5 @@ def test_partitioning_unstructured_with_vpt_cells(
 
     # compare the head result of the original simulation with the result of the partitioned simulation
     np.testing.assert_allclose(
-        head["head"].values, orig_head.values, rtol=1e-1, atol=1e-2
+        head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
     )

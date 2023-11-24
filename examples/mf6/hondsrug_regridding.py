@@ -29,7 +29,7 @@ from imod.typing import GridDataArray
 gwf_simulation = create_hondsrug_simulation()
 
 original_modeldir = imod.util.temporary_directory() / "original"
-gwf_simulation.write(original_modeldir, False, False)
+gwf_simulation.write(original_modeldir)
 gwf_simulation.run()
 hds_original = gwf_simulation.open_head()
 
@@ -41,8 +41,8 @@ hds_original.sel(layer=3).isel(time=6).plot(ax=ax)
 idomain = gwf_simulation["GWF_1"]["dis"]["idomain"]
 
 nlay = len(idomain.coords["layer"].values)
-nrow = 100
-ncol = 250
+nrow = 50
+ncol = 125
 shape = (nlay, nrow, ncol)
 
 xmin = idomain.coords["x"].min().values[()]
@@ -70,7 +70,7 @@ regridded_simulation = gwf_simulation.regrid_like(
 )
 
 regridded_modeldir = original_modeldir / ".." / "regridded"
-regridded_simulation.write(regridded_modeldir, False, False)
+regridded_simulation.write(regridded_modeldir, validate=False)
 
 regridded_simulation.run()
 
