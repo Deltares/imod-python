@@ -113,11 +113,13 @@ def test_partitioning_structured(
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
-    head = merge_heads(tmp_path, split_simulation)
-    _ = merge_balances(tmp_path, split_simulation)
+    head = split_simulation.open_head()
+    _ = split_simulation.open_flow_budget()
 
     # compare the head result of the original simulation with the result of the partitioned simulation
-    np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-4, atol=1e-4)
+    np.testing.assert_allclose(
+        head["head"].values, orig_head.values, rtol=1e-4, atol=1e-4
+    )
 
 
 @pytest.mark.usefixtures("transient_twri_model")
@@ -162,11 +164,13 @@ def test_partitioning_structured_with_inactive_cells(
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
-    head = merge_heads(tmp_path, split_simulation)
-    _ = merge_balances(tmp_path, split_simulation)
+    head = split_simulation.open_head()
+    _ = split_simulation.open_flow_budget()
 
     # compare the head result of the original simulation with the result of the partitioned simulation
-    np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-4, atol=1e-4)
+    np.testing.assert_allclose(
+        head["head"].values, orig_head.values, rtol=1e-4, atol=1e-4
+    )
 
 
 @pytest.mark.usefixtures("transient_twri_model")
@@ -213,8 +217,10 @@ def test_partitioning_structured_with_vpt_cells(
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
-    head = merge_heads(tmp_path, split_simulation)
-    _ = merge_balances(tmp_path, split_simulation)
+    head = split_simulation.open_head()
+    _ = split_simulation.open_flow_budget()
 
     # compare the head result of the original simulation with the result of the partitioned simulation
-    np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-4, atol=1e-4)
+    np.testing.assert_allclose(
+        head["head"].values, orig_head.values, rtol=1e-4, atol=1e-4
+    )

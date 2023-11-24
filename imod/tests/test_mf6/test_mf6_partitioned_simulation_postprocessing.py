@@ -3,11 +3,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from imod.mf6.partitioned_simulation_postprocessing import (
-    _get_grb_file_path,
-    merge_balances,
-    merge_heads,
-)
+from imod.mf6.partitioned_simulation_postprocessing import _get_grb_file_path
 from imod.mf6.simulation import Modflow6Simulation
 
 
@@ -55,7 +51,7 @@ def test_import_heads_structured(
     split_simulation.run()
 
     # Act
-    merged_heads = merge_heads(tmp_path, split_simulation)
+    merged_heads = split_simulation.open_head()
 
     # Assert
     assert np.allclose(
@@ -144,7 +140,7 @@ def test_import_heads_unstructured(tmp_path, circle_partitioned):
     circle_partitioned.run()
 
     # Act
-    merged_heads = merge_heads(tmp_path, circle_partitioned)
+    merged_heads = circle_partitioned.open_head()
 
     # Assert
     assert np.allclose(merged_heads.coords["layer"].values, [1, 2])
@@ -165,16 +161,15 @@ def test_import_balances_structured(
     split_simulation.run()
 
     # Act
-    merged_balances = merge_balances(tmp_path, split_simulation)
+    merged_balances = split_simulation.open_flow_budget()
 
     # Assert
     expected_keys = [
-        "gwf-gwf_1",
+        "gwf-gwf",
         "chd",
         "flow-right-face",
         "sto-ss",
         "flow-lower-face",
-        "gwf-gwf_2",
         "drn",
         "flow-front-face",
     ]
@@ -201,16 +196,14 @@ def test_import_balances_unstructured(
     split_simulation.run()
 
     # Act
-    merged_balances = merge_balances(tmp_path, split_simulation)
+    merged_balances = split_simulation.open_flow_budget()
 
     # Assert
     expected_keys = [
         "chd",
         "flow-horizontal-face",
-        "gwf-gwf_1",
-        "gwf-gwf_2",
+        "gwf-gwf",
         "flow-horizontal-face-y",
-        "gwf-gwf_3",
         "flow-lower-face",
         "flow-horizontal-face-x",
     ]
