@@ -11,6 +11,11 @@ from imod.typing import GridDataArray
 
 
 def get_label_array(simulation: Modflow6Simulation, npartitions: int) -> GridDataArray:
+    '''
+    Returns a label array: a 2d array with a similar size to the top layer of idomain.
+    Every array element is the partition number to which the column of gridblocks of idomain at
+    that location belong.
+    '''
     gwf_models = simulation.get_models_of_type("gwf6")
     if len(gwf_models) != 1:
         raise ValueError(
