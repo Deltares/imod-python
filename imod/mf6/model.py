@@ -508,6 +508,23 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
         return new_idomain
 
+    def __repr__(self) -> str:
+        INDENT = "    "
+        typename = type(self).__name__
+        options = [
+            f"{INDENT}{key}={repr(value)}," for key, value in self._options.items()
+        ]
+        packages = [
+            f"{INDENT}{repr(key)}: {type(value).__name__},"
+            for key, value in self.items()
+        ]
+        # Place the emtpy dict on the same line. Looks silly otherwise.
+        if packages:
+            content = [f"{typename}("] + options + ["){"] + packages + ["}"]
+        else:
+            content = [f"{typename}("] + options + ["){}"]
+        return "\n".join(content)
+
 
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
