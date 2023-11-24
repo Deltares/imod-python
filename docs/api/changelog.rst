@@ -54,6 +54,8 @@ Added
   :function:`imod.imod.mf6.partitioned_simulation_postprocessing.merge_balances`.
   In the case of balances, the exchanges through the partition boundary are not
   yet added to this merged balance. 
+- A label-array that can be used as input for the new ``split`` function can be 
+  generated through a convenience function :function:`imod.mf6.partition_generator.get_label_array`
 - A ``save_saturation`` option to :class:`imod.mf6.NodePropertyFlow` which saves
   cell saturations for unconfined flow.
 - Functions :function:`imod.prepare.layer.get_upper_active_layer_number` and
