@@ -518,7 +518,9 @@ class Modflow6Simulation(collections.UserDict):
                 f"Unexpected error when opening {output} for {modelnames}"
             )
 
-    def _merge_states(self, modelnames: list[str], output: str, **settings):
+    def _merge_states(
+        self, modelnames: list[str], output: str, **settings
+    ) -> GridDataArray:
         state_partitions = []
         for modelname in modelnames:
             state_partitions.append(
@@ -526,7 +528,24 @@ class Modflow6Simulation(collections.UserDict):
             )
         return merge_partitions(state_partitions)
 
-    def _merge_fluxes(self, modelnames: list[str], output: str, **settings):
+    def _merge_and_assign_exchange_fluxes(self, cbc: GridDataset) -> GridDataset:
+        """
+        Merge and assign exchange fluxes to cell by cell budgets:
+        cbc[[gwf-gwf_1, gwf-gwf_3]] to cbc[gwf-gwf]
+        """
+        exchange_names = [
+            key for key in cbc.keys() if ("gwf-gwf" in key) or ("gwt-gwt" in key)
+        ]
+        exchange_flux = cbc[exchange_names].to_array().sum(dim="variable")
+        cbc = cbc.drop_vars(exchange_names)
+        # "gwf-gwf" or "gwt-gwt"
+        exchange_key = exchange_names[0].split("_")[0]
+        cbc[exchange_key] = exchange_flux
+        return cbc
+
+    def _merge_fluxes(
+        self, modelnames: list[str], output: str, **settings
+    ) -> GridDataset:
         if settings["flowja"] is True:
             raise ValueError("``flowja`` cannot be set to True when merging fluxes.")
 
@@ -534,14 +553,24 @@ class Modflow6Simulation(collections.UserDict):
         for modelname in modelnames:
             partition_model = self[modelname]
             partition_domain = partition_model.domain
-            cbc = merge(self._open_output_single_model(modelname, output, **settings))
-            cbc_per_partition.append(cbc.where(partition_domain, other=np.nan))
+            cbc_dict = self._open_output_single_model(modelname, output, **settings)
+            # Force list of dicts to list of DataArrays to work around:
+            # https://github.com/Deltares/xugrid/issues/179
+            cbc_list = [da.rename(key) for key, da in cbc_dict.items()]
+            cbc = merge(cbc_list)
+            # Merge and assign exchange fluxes to dataset
+            # FUTURE: Refactor to insert these exchange fluxes in horizontal
+            # flows.
+            cbc = self._merge_and_assign_exchange_fluxes(cbc)
+            if not is_unstructured(cbc):
+                cbc = cbc.where(partition_domain, other=np.nan)
+            cbc_per_partition.append(cbc)
 
         return merge_partitions(cbc_per_partition)
 
     def _concat_concentrations(
         self, modelnames: list[str], species_ls: list[str], output: str, **settings
-    ):
+    ) -> GridDataArray:
         concentrations = []
         for modelname, species in zip(modelnames, species_ls):
             conc = self._open_output_single_model(modelname, output, **settings)
@@ -551,12 +580,14 @@ class Modflow6Simulation(collections.UserDict):
 
     def _concat_transport_budgets(
         self, modelnames: list[str], species_ls: list[str], output: str, **settings
-    ):
+    ) -> GridDataset:
         budgets = []
         for modelname, species in zip(modelnames, species_ls):
-            budget = merge(
-                self._open_output_single_model(modelname, output, **settings)
-            )
+            budget_dict = self._open_output_single_model(modelname, output, **settings)
+            # Force list of dicts to list of DataArrays to work around:
+            # https://github.com/Deltares/xugrid/issues/179
+            budget_list = [da.rename(key) for key, da in budget_dict.items()]
+            budget = merge(budget_list)
             budget = budget.assign_coords(species=species)
             budgets.append(budget)
 
