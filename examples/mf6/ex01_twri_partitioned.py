@@ -28,13 +28,12 @@ In overview, we'll set the following steps:
 # structured model, we can make due with few packages.
 
 import matplotlib.pyplot as plt
-import numpy as np
 from example_models import create_twri_simulation
 
 import imod
-from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
-from imod.typing.grid import zeros_like
 from imod.mf6.partition_generator import get_label_array
+from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
+
 simulation = create_twri_simulation()
 
 # %%

@@ -1,11 +1,11 @@
 # %% Import packages
 import matplotlib.pyplot as plt
-import xarray as xr
 from example_models import create_hondsrug_simulation
 
 import imod
-from imod.mf6.partitioned_simulation_postprocessing import merge_heads
 from imod.mf6.partition_generator import get_label_array
+from imod.mf6.partitioned_simulation_postprocessing import merge_heads
+
 # %%
 # Obtain the simulation, write it, run it, and plot some heads.
 # There is a separate example contained in

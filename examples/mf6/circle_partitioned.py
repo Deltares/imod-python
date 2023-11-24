@@ -4,14 +4,12 @@ The split method returns a simulation object that can be run as is. In this
 case the 3 submodels are roughly equal sized partitions that have the shape
 of pie pieces.
 """
-import copy
-
 import matplotlib.pyplot as plt
 from example_models import create_circle_simulation
 
 import imod
-from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
 from imod.mf6.partition_generator import get_label_array
+from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
 
 simulation = create_circle_simulation()
 tmp_path = imod.util.temporary_directory()
