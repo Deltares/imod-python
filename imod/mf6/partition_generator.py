@@ -11,11 +11,11 @@ from imod.typing import GridDataArray
 
 
 def get_label_array(simulation: Modflow6Simulation, npartitions: int) -> GridDataArray:
-    '''
+    """
     Returns a label array: a 2d array with a similar size to the top layer of idomain.
     Every array element is the partition number to which the column of gridblocks of idomain at
     that location belong.
-    '''
+    """
     gwf_models = simulation.get_models_of_type("gwf6")
     if len(gwf_models) != 1:
         raise ValueError(
@@ -79,8 +79,8 @@ def _partition_1d(nr_partitions: int, axis_size: int) -> List[Tuple]:
     Returns tuples with start and stop positions of partitions when partitioning an axis of length nr_indices
     into nr_partitions. Partitions need to be at least 3 gridblocks in size. If this cannot be done, it throws an error.
     When the number of gridblocks on the axis is not divisible by the number of partitions, then any
-    leftover cells are added in the last partition. For example if we partition an axis of 25 cells into 3 
-    partitions, then the number of cells per partition will be 8 for the first 2 partitions,but the last partition will contain 9 cells. 
+    leftover cells are added in the last partition. For example if we partition an axis of 25 cells into 3
+    partitions, then the number of cells per partition will be 8 for the first 2 partitions,but the last partition will contain 9 cells.
     """
 
     # validate input
