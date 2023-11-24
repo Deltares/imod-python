@@ -266,8 +266,6 @@ class Modflow6Simulation(collections.UserDict):
                         write_context=model_write_context,
                     )
                 )
-                if status_info.has_errors():
-                    print("fout!")
             elif isinstance(value, PackageBase):
                 if value._pkg_id == "ims":
                     ims_write_context = write_context.copy_with_new_write_directory(
