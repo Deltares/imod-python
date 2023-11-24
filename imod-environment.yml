@@ -29,6 +29,7 @@ dependencies:
       - pandamesh
   - pydata-sphinx-theme
   - pyproj
+  - pymetis
   - python=3.10
   - pyvista
   - rasterio>=1.0
