@@ -40,20 +40,35 @@ def nan_like(grid: xu.UgridDataArray, *args, **kwargs):
 
 
 @typedispatch
-def is_unstructured(grid: xu.UgridDataArray) -> bool:
+def is_unstructured(grid: xu.UgridDataArray | xu.UgridDataset) -> bool:
     return True
 
 
 @typedispatch
-def is_unstructured(grid: xr.DataArray) -> bool:
+def is_unstructured(grid: xr.DataArray | xr.Dataset) -> bool:
     return False
 
 
-def _get_first_item(objects: Sequence | dict):
-    if isinstance(objects, dict):
-        return next(iter(objects.values))
+def _force_decreasing_y(structured_grid: xr.DataArray | xr.Dataset):
+    flip = slice(None, None, -1)
+    if structured_grid.indexes["y"].is_monotonic_increasing:
+        structured_grid = structured_grid.isel(y=flip)
+    elif not structured_grid.indexes["y"].is_monotonic_decreasing:
+        raise RuntimeError(
+            f"Non-monotonous y-coordinates for grid: {structured_grid.name}."
+        )
+    return structured_grid
+
+
+def _force_object_sequence(objects: Sequence | dict):
+    if isinstance(objects[0], dict):
+        return objects[0].values()
     else:
-        next(iter(objects))
+        return objects
+
+
+def _get_first_item(objects: Sequence):
+    return next(iter(objects))
 
 
 # Typedispatching doesn't work based on types of list elements, therefore resort to
@@ -68,25 +83,26 @@ def _type_dispatch_functions_on_grid_sequence(
     """
     Type dispatch functions on sequence of grids. Functions like merging or concatenating.
     """
-    first_object = _get_first_item(objects)
+    object_sequence = _force_object_sequence(objects)
+    first_object = _get_first_item(object_sequence)
     start_type = type(first_object)
-    homogeneous = all([isinstance(o, start_type) for o in objects])
+    homogeneous = all([isinstance(o, start_type) for o in object_sequence])
     if not homogeneous:
-        unique_types = set([type(o) for o in objects])
+        unique_types = set([type(o) for o in object_sequence])
         raise TypeError(
             f"Only homogeneous sequences can be reduced, received sequence of {unique_types}"
         )
     if isinstance(first_object, (xu.UgridDataArray, xu.UgridDataset)):
         return unstructured_func(objects, *args, **kwargs)
     elif isinstance(first_object, (xr.DataArray, xr.Dataset)):
-        return structured_func(objects, *args, **kwargs)
+        return _force_decreasing_y(structured_func(objects, *args, **kwargs))
     raise TypeError(
         f"'{unstructured_func.__name__}' not supported for type {type(objects[0])}"
     )
 
 
 def merge(
-    objects: dict[str, GridDataArray | GridDataset], *args, **kwargs
+    objects: Sequence[GridDataArray | GridDataset | dict], *args, **kwargs
 ) -> GridDataset:
     return _type_dispatch_functions_on_grid_sequence(
         objects, xu.merge, xr.merge, *args, **kwargs
