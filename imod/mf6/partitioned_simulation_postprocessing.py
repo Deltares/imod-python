@@ -7,7 +7,7 @@ import imod
 from imod.mf6.model import GroundwaterFlowModel
 from imod.mf6.simulation import Modflow6Simulation
 from imod.typing import GridDataArray
-from imod.typing.grid import is_unstructured, merge
+from imod.typing.grid import is_unstructured, merge_partitions
 
 
 def merge_heads(simulation_dir: Path, simulation: Modflow6Simulation) -> GridDataArray:
@@ -28,7 +28,7 @@ def merge_heads(simulation_dir: Path, simulation: Modflow6Simulation) -> GridDat
         )
         heads.append(head)
 
-    head = merge(heads)
+    head = merge_partitions(heads)
 
     # now fix the y coordinates of the array
     if not is_unstructured(head["head"]):
@@ -106,7 +106,7 @@ def merge_balances(
             if key in balance.keys():
                 balance[key] = balance[key].rename(key)
                 balances_of_keys.append(balance[key])
-        merged_balance_of_key = merge(balances_of_keys)
+        merged_balance_of_key = merge_partitions(balances_of_keys)
         darray = merged_balance_of_key.to_array(key).drop_vars(key)
         # remove a dimension without coordinates (the balance type)
         merged_keys[key] = darray.sel({key: 0})
