@@ -33,6 +33,8 @@ Fixed
   :meth:`imod.mf6.HorizontalFlowBarrier.mask`.
 - Fixed bug where calling :meth:`imod.mf6.Well.clip_box` over only the time
   dimension would remove the index coordinate.
+- Validation errors are rendered properly when writing a simulation object or
+  regridding a model object.
 
 Changed
 ~~~~~~~

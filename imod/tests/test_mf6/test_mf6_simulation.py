@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import textwrap
 from pathlib import Path
@@ -14,7 +15,7 @@ import imod
 from imod.mf6.model import Modflow6Model
 from imod.mf6.modelsplitter import PartitionInfo
 from imod.mf6.simulation import get_models, get_packages
-from imod.mf6.statusinfo import StatusInfo
+from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.schemata import ValidationError
 from imod.typing.grid import zeros_like
 
@@ -221,8 +222,19 @@ class TestModflow6Simulation:
         # Arrange.
         simulation = setup_simulation
 
-        model_status_info = StatusInfo()
-        model_status_info.add_error("Test error")
+        expected_text = textwrap.dedent(
+            """
+            Simulation validation status:
+            \t* Model 1:
+            \t\t* Package 1:
+            \t\t\t* Some error"""
+        )
+
+        pkg_status_info = StatusInfo("Package 1")
+        pkg_status_info.add_error("Some error")
+
+        model_status_info = NestedStatusInfo("Model 1")
+        model_status_info.add(pkg_status_info)
 
         model_mock = MagicMock(spec_set=Modflow6Model)
         model_mock._model_id = "test_model_id"
@@ -231,7 +243,7 @@ class TestModflow6Simulation:
         simulation["test_model"] = model_mock
 
         # Act/Assert.
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError, match=re.escape(expected_text)):
             simulation.write(tmp_path)
 
     @mock.patch("imod.mf6.simulation.ExchangeCreator_Unstructured")
