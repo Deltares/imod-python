@@ -29,7 +29,6 @@ from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.pkgbase import PackageBase
 from imod.mf6.statusinfo import NestedStatusInfo
-from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
@@ -279,7 +278,7 @@ class Modflow6Simulation(collections.UserDict):
                         )
 
         if status_info.has_errors():
-            raise ValidationError("\n" + validation_model_error_message(status_info))
+            raise ValidationError("\n" + status_info.to_string())
 
         self.directory = directory
 
