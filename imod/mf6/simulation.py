@@ -5,7 +5,6 @@ import copy
 import pathlib
 import subprocess
 import warnings
-from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
@@ -34,7 +33,7 @@ from imod.mf6.validation import validation_model_error_message
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
 from imod.typing import GridDataArray, GridDataset
-from imod.typing.grid import concat, is_unstructured
+from imod.typing.grid import concat, is_unstructured, merge, merge_partitions
 
 OUTPUT_FUNC_MAPPING = {
     "head": (open_hds, GroundwaterFlowModel),
@@ -501,25 +500,77 @@ class Modflow6Simulation(collections.UserDict):
         elif len(modelnames) == 1:
             modelname = next(iter(modelnames))
             return self._open_output_single_model(modelname, output, **settings)
+        elif is_split(self):
+            if "budget" in output:
+                return self._merge_fluxes(modelnames, output, **settings)
+            else:
+                return self._merge_states(modelnames, output, **settings)
         elif output == "concentration":
-            # Multiple models are possible
             return self._concat_concentrations(
                 modelnames, species_ls, output, **settings
             )
         elif output == "budget-transport":
-            # Multiple models are possible
             return self._concat_transport_budgets(
                 modelnames, species_ls, output, **settings
             )
         else:
-            # TODO: This is the place where merging of partioned heads can be implemented.
-            raise NotImplementedError(
-                "Reading output from partioned models not yet supported by this method."
+            raise RuntimeError(
+                f"Unexpected error when opening {output} for {modelnames}"
             )
+
+    def _merge_states(
+        self, modelnames: list[str], output: str, **settings
+    ) -> GridDataArray:
+        state_partitions = []
+        for modelname in modelnames:
+            state_partitions.append(
+                self._open_output_single_model(modelname, output, **settings)
+            )
+        return merge_partitions(state_partitions)
+
+    def _merge_and_assign_exchange_fluxes(self, cbc: GridDataset) -> GridDataset:
+        """
+        Merge and assign exchange fluxes to cell by cell budgets:
+        cbc[[gwf-gwf_1, gwf-gwf_3]] to cbc[gwf-gwf]
+        """
+        exchange_names = [
+            key for key in cbc.keys() if ("gwf-gwf" in key) or ("gwt-gwt" in key)
+        ]
+        exchange_flux = cbc[exchange_names].to_array().sum(dim="variable")
+        cbc = cbc.drop_vars(exchange_names)
+        # "gwf-gwf" or "gwt-gwt"
+        exchange_key = exchange_names[0].split("_")[0]
+        cbc[exchange_key] = exchange_flux
+        return cbc
+
+    def _merge_fluxes(
+        self, modelnames: list[str], output: str, **settings
+    ) -> GridDataset:
+        if settings["flowja"] is True:
+            raise ValueError("``flowja`` cannot be set to True when merging fluxes.")
+
+        cbc_per_partition = []
+        for modelname in modelnames:
+            partition_model = self[modelname]
+            partition_domain = partition_model.domain
+            cbc_dict = self._open_output_single_model(modelname, output, **settings)
+            # Force list of dicts to list of DataArrays to work around:
+            # https://github.com/Deltares/xugrid/issues/179
+            cbc_list = [da.rename(key) for key, da in cbc_dict.items()]
+            cbc = merge(cbc_list)
+            # Merge and assign exchange fluxes to dataset
+            # FUTURE: Refactor to insert these exchange fluxes in horizontal
+            # flows.
+            cbc = self._merge_and_assign_exchange_fluxes(cbc)
+            if not is_unstructured(cbc):
+                cbc = cbc.where(partition_domain, other=np.nan)
+            cbc_per_partition.append(cbc)
+
+        return merge_partitions(cbc_per_partition)
 
     def _concat_concentrations(
         self, modelnames: list[str], species_ls: list[str], output: str, **settings
-    ):
+    ) -> GridDataArray:
         concentrations = []
         for modelname, species in zip(modelnames, species_ls):
             conc = self._open_output_single_model(modelname, output, **settings)
@@ -529,14 +580,18 @@ class Modflow6Simulation(collections.UserDict):
 
     def _concat_transport_budgets(
         self, modelnames: list[str], species_ls: list[str], output: str, **settings
-    ):
-        budgets = defaultdict(list)
+    ) -> GridDataset:
+        budgets = []
         for modelname, species in zip(modelnames, species_ls):
-            d_budget = self._open_output_single_model(modelname, output, **settings)
-            for key, da in d_budget.items():
-                da = da.assign_coords(species=species)
-                budgets[key].append(da)
-        return {key: concat(da_ls, dim="species") for key, da_ls in budgets.items()}
+            budget_dict = self._open_output_single_model(modelname, output, **settings)
+            # Force list of dicts to list of DataArrays to work around:
+            # https://github.com/Deltares/xugrid/issues/179
+            budget_list = [da.rename(key) for key, da in budget_dict.items()]
+            budget = merge(budget_list)
+            budget = budget.assign_coords(species=species)
+            budgets.append(budget)
+
+        return concat(budgets, dim="species")
 
     def _open_output_single_model(
         self, modelname: str, output: str, **settings

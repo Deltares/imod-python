@@ -7,7 +7,6 @@ import xarray as xr
 
 import imod
 from imod.mf6 import Modflow6Simulation
-from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
 from imod.mf6.wel import Well
 from imod.typing.grid import zeros_like
 
@@ -16,16 +15,16 @@ def setup_partitioning_arrays(idomain_top: xr.DataArray) -> Dict[str, xr.DataArr
     result = {}
     two_parts = zeros_like(idomain_top)
 
-    two_parts.values[:97] = 0
-    two_parts.values[97:] = 1
+    two_parts.values[:108] = 0
+    two_parts.values[108:] = 1
 
     result["two_parts"] = two_parts
 
     three_parts = zeros_like(idomain_top)
 
-    three_parts.values[:37] = 0
-    three_parts.values[37:97] = 1
-    three_parts.values[97:] = 2
+    three_parts.values[:72] = 0
+    three_parts.values[72:144] = 1
+    three_parts.values[144:] = 2
     result["three_parts"] = three_parts
 
     return result
@@ -53,6 +52,11 @@ def test_partitioning_unstructured(
         orig_dir / "GWF_1/disv.disv.grb",
     )
 
+    orig_cbc = imod.mf6.open_cbc(
+        orig_dir / "GWF_1/GWF_1.cbc",
+        orig_dir / "GWF_1/disv.disv.grb",
+    )
+
     # partition the simulation, run it, and save the (merged) results
     idomain = simulation["GWF_1"].domain
     partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
@@ -62,11 +66,16 @@ def test_partitioning_unstructured(
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
-    head = merge_heads(tmp_path, split_simulation)
-    _ = merge_balances(tmp_path, split_simulation)
+    head = split_simulation.open_head()
+    cbc = split_simulation.open_flow_budget()
 
     # compare the head result of the original simulation with the result of the partitioned simulation
-    np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-5, atol=1e-3)
+    np.testing.assert_allclose(
+        head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
+    )
+    np.testing.assert_allclose(
+        cbc["chd"].values, orig_cbc["chd"].values, rtol=1e-5, atol=1e-3
+    )
 
 
 @pytest.mark.usefixtures("circle_model")
@@ -111,6 +120,12 @@ def test_partitioning_unstructured_with_inactive_cells(
         orig_dir / "GWF_1/disv.disv.grb",
     )
 
+    # TODO: Fix issue 669
+    #    orig_cbc = imod.mf6.open_cbc(
+    #        orig_dir / "GWF_1/GWF_1.cbc",
+    #        orig_dir / "GWF_1/disv.disv.grb",
+    #    )
+
     # partition the simulation, run it, and save the (merged) results
     partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
 
@@ -119,10 +134,13 @@ def test_partitioning_unstructured_with_inactive_cells(
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
-    head = merge_heads(tmp_path, split_simulation)
+    head = split_simulation.open_head()
+    # _ = split_simulation.open_flow_budget()
 
     # compare the head result of the original simulation with the result of the partitioned simulation
-    np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-5, atol=1e-3)
+    np.testing.assert_allclose(
+        head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
+    )
 
 
 @pytest.mark.usefixtures("circle_model")
@@ -167,6 +185,12 @@ def test_partitioning_unstructured_with_vpt_cells(
         orig_dir / "GWF_1/disv.disv.grb",
     )
 
+    # TODO: Fix issue 669
+    #    orig_cbc = imod.mf6.open_cbc(
+    #        orig_dir / "GWF_1/GWF_1.cbc",
+    #        orig_dir / "GWF_1/disv.disv.grb",
+    #    )
+
     # partition the simulation, run it, and save the (merged) results
     partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
 
@@ -175,7 +199,10 @@ def test_partitioning_unstructured_with_vpt_cells(
     split_simulation.write(tmp_path, binary=False)
     split_simulation.run()
 
-    head = merge_heads(tmp_path, split_simulation)
+    head = split_simulation.open_head()
+    # _ = split_simulation.open_flow_budget()
 
     # compare the head result of the original simulation with the result of the partitioned simulation
-    np.testing.assert_allclose(head.values, orig_head.values, rtol=1e-5, atol=1e-3)
+    np.testing.assert_allclose(
+        head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
+    )

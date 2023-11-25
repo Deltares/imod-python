@@ -3,46 +3,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from imod.mf6.partitioned_simulation_postprocessing import (
-    _get_grb_file_path,
-    merge_balances,
-    merge_heads,
-)
 from imod.mf6.simulation import Modflow6Simulation
-
-
-def test_find_grb_file(tmp_path: Path):
-    # Arrange
-    grb_path = tmp_path / "modelname.grb"
-    with open(grb_path, "a") as file:
-        file.write("grb file content")
-
-    # Act
-    grb_file = _get_grb_file_path(tmp_path)
-
-    # Assert
-    assert grb_file.name == "modelname.grb"
-
-
-def test_find_no_grb_file(tmp_path: Path):
-    # Act, Assert
-    with pytest.raises(RuntimeError):
-        _ = _get_grb_file_path(tmp_path)
-
-
-def test_find_multiple_grb_files(tmp_path: Path):
-    # Arrange
-    grb_path1 = tmp_path / "modelname1.grb"
-    with open(grb_path1, "a") as file:
-        file.write("grb file content")
-
-    grb_path2 = tmp_path / "modelname2.grb"
-    with open(grb_path2, "a") as file:
-        file.write("grb file content")
-
-    # Act, Assert
-    with pytest.raises(RuntimeError):
-        _ = _get_grb_file_path(tmp_path)
 
 
 @pytest.mark.usefixtures("split_transient_twri_model")
@@ -55,7 +16,7 @@ def test_import_heads_structured(
     split_simulation.run()
 
     # Act
-    merged_heads = merge_heads(tmp_path, split_simulation)
+    merged_heads = split_simulation.open_head()
 
     # Assert
     assert np.allclose(
@@ -144,7 +105,7 @@ def test_import_heads_unstructured(tmp_path, circle_partitioned):
     circle_partitioned.run()
 
     # Act
-    merged_heads = merge_heads(tmp_path, circle_partitioned)
+    merged_heads = circle_partitioned.open_head()
 
     # Assert
     assert np.allclose(merged_heads.coords["layer"].values, [1, 2])
@@ -165,16 +126,15 @@ def test_import_balances_structured(
     split_simulation.run()
 
     # Act
-    merged_balances = merge_balances(tmp_path, split_simulation)
+    merged_balances = split_simulation.open_flow_budget()
 
     # Assert
     expected_keys = [
-        "gwf-gwf_1",
+        "gwf-gwf",
         "chd",
         "flow-right-face",
         "sto-ss",
         "flow-lower-face",
-        "gwf-gwf_2",
         "drn",
         "flow-front-face",
     ]
@@ -201,16 +161,14 @@ def test_import_balances_unstructured(
     split_simulation.run()
 
     # Act
-    merged_balances = merge_balances(tmp_path, split_simulation)
+    merged_balances = split_simulation.open_flow_budget()
 
     # Assert
     expected_keys = [
         "chd",
         "flow-horizontal-face",
-        "gwf-gwf_1",
-        "gwf-gwf_2",
+        "gwf-gwf",
         "flow-horizontal-face-y",
-        "gwf-gwf_3",
         "flow-lower-face",
         "flow-horizontal-face-x",
     ]
