@@ -60,13 +60,6 @@ def _force_decreasing_y(structured_grid: xr.DataArray | xr.Dataset):
     return structured_grid
 
 
-def _force_object_sequence(objects: Sequence | dict):
-    if isinstance(objects[0], dict):
-        return objects[0].values()
-    else:
-        return objects
-
-
 def _get_first_item(objects: Sequence):
     return next(iter(objects))
 
@@ -83,12 +76,11 @@ def _type_dispatch_functions_on_grid_sequence(
     """
     Type dispatch functions on sequence of grids. Functions like merging or concatenating.
     """
-    object_sequence = _force_object_sequence(objects)
-    first_object = _get_first_item(object_sequence)
+    first_object = _get_first_item(objects)
     start_type = type(first_object)
-    homogeneous = all([isinstance(o, start_type) for o in object_sequence])
+    homogeneous = all([isinstance(o, start_type) for o in objects])
     if not homogeneous:
-        unique_types = set([type(o) for o in object_sequence])
+        unique_types = set([type(o) for o in objects])
         raise TypeError(
             f"Only homogeneous sequences can be reduced, received sequence of {unique_types}"
         )
@@ -102,7 +94,7 @@ def _type_dispatch_functions_on_grid_sequence(
 
 
 def merge(
-    objects: Sequence[GridDataArray | GridDataset | dict], *args, **kwargs
+    objects: Sequence[GridDataArray | GridDataset], *args, **kwargs
 ) -> GridDataset:
     return _type_dispatch_functions_on_grid_sequence(
         objects, xu.merge, xr.merge, *args, **kwargs
