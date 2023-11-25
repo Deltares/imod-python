@@ -61,6 +61,8 @@ Added
   packages. The split method will create the gwfgwf exchanges required to
   connect the submodels. At the moment auxiliary variables ``cdist`` and
   ``angldegx`` are only computed for structured grids. 
+- The label array can be generated through a convenience function
+  :function:`imod.mf6.partition_generator.get_label_array`
 - Once a split simulation has been executed by MF6, we find head and balance
   results in each of the partition models. These can now be merged into head and
   balance datasets for the original domain using
