@@ -10,6 +10,9 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+[0.15.0] - 2023-11-25
+---------------------
+
 Fixed
 ~~~~~
 - The Newton option for a :class:`imod.mf6.GroundwaterFlowModel` was being ignored. This has been
@@ -25,6 +28,11 @@ Fixed
 - Bug in :class:`imod.mf6.SourceSinkMixing` where, in case of multiple active
   boundary conditions with assigned concentrations, it would write a ``.ssm``
   file with all sources/sinks on one single row.
+- Fixed bug where TypeError was thrown upond calling
+  :meth:`imod.mf6.HorizontalFlowBarrier.regrid_like` and
+  :meth:`imod.mf6.HorizontalFlowBarrier.mask`.
+- Fixed bug where calling :meth:`imod.mf6.Well.clip_box` over only the time
+  dimension would remove the index coordinate.
 
 Changed
 ~~~~~~~
@@ -35,6 +43,9 @@ Changed
   :class:`imod.mf6.GroundwaterFlowModel`,
   :class:`imod.mf6.GroundwaterTransportModel`, and Modflow 6 packages are
   represented while printing.
+- The grid-agnostic packages :meth:`imod.mf6.Well.regrid_like` and
+  :meth:`imod.mf6.HorizontalFlowBarrier.regrid_like` now return a clip with the
+  grid exterior of the target grid
 
 Added
 ~~~~~
@@ -74,6 +85,11 @@ Added
   yet added to this merged balance. 
 - Settings such as ``save_flows`` can be passed through
   :meth:`imod.mf6.SourceSinkMixing.from_flow_model`
+- Added :class:`imod.mf6.LayeredHorizontalFlowBarrierHydraulicCharacteristic`,
+  :class:`imod.mf6.LayeredHorizontalFlowBarrierMultiplier`,
+  :class:`imod.mf6.LayeredHorizontalFlowBarrierResistance`, for horizontal flow
+  barriers with a specified layer number.
+
 
 Removed
 ~~~~~~~
