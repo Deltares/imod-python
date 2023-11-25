@@ -9,7 +9,6 @@ from example_models import create_circle_simulation
 
 import imod
 from imod.mf6.partition_generator import get_label_array
-from imod.mf6.partitioned_simulation_postprocessing import merge_balances, merge_heads
 
 simulation = create_circle_simulation()
 tmp_path = imod.util.temporary_directory()
@@ -31,13 +30,13 @@ new_sim.run()
 # %%
 # Visualize the computed heads in the top layer.
 fig, ax = plt.subplots()
-head = merge_heads(tmp_path, new_sim)
+head = new_sim.open_head()
 
-head.isel(layer=0, time=-1).ugrid.plot.contourf(ax=ax)
+head["head"].isel(layer=0, time=-1).ugrid.plot.contourf(ax=ax)
 # %%
 # Visualize the flow-horizontal-face-x componenty of the balances.
 fig, ax = plt.subplots()
-balances = merge_balances(tmp_path, new_sim)
+balances = new_sim.open_flow_budget()
 
 balances["flow-horizontal-face-x"].isel(layer=0, time=-1).ugrid.plot()
 pass
