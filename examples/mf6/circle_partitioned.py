@@ -35,7 +35,7 @@ new_sim.run()
 fig, ax = plt.subplots()
 head = new_sim.open_head()
 
-head.isel(layer=0, time=-1).ugrid.plot.contourf(ax=ax)
+head["head"].isel(layer=0, time=-1).ugrid.plot.contourf(ax=ax)
 # %%
 # Visualize the flow-horizontal-face-x componenty of the balances.
 fig, ax = plt.subplots()

@@ -72,7 +72,7 @@ split_simulation.run()
 
 # %%
 # Load and plot the simulation results. Also plot the differences with the original model
-hds_split = split_simulation.open_head(modeldir, split_simulation)
+hds_split = split_simulation.open_head()["head"]
 fig, ax = plt.subplots()
 hds_split.sel(layer=3).isel(time=6).plot(ax=ax)
 ax.set_title("hondsrug partitioned ")
@@ -82,3 +82,5 @@ diff_for_plot = diff.max(dim=["time", "layer"])
 fig, ax = plt.subplots()
 diff_for_plot.plot(ax=ax)
 ax.set_title("hondsrug diff ")
+
+# %%
