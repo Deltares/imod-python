@@ -14,10 +14,10 @@ comparison.
 
 # %% Import packages
 import matplotlib.pyplot as plt
-import xarray as xr
 from example_models import create_hondsrug_simulation
 
 import imod
+from imod.mf6.partition_generator import get_label_array
 
 # %%
 # Obtain the simulation, write it, run it, and plot some heads.
@@ -50,11 +50,8 @@ ax.set_title("hondsrug original ")
 # %%
 # Now we partition the Hondsrug model
 idomain = gwf_simulation["GWF_1"].domain
-
-submodel_labels = xr.zeros_like(idomain.isel(layer=0))
-submodel_labels[100:, :] = 1
-submodel_labels[:, 250:] = 2
-submodel_labels[100:, 250:] = 3
+number_partitions = 16
+submodel_labels = get_label_array(gwf_simulation, number_partitions)
 
 # %%
 # plot the partitioning array. It shows how the model will be partitioned.

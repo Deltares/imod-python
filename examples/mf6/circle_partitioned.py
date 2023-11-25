@@ -4,23 +4,20 @@ The split method returns a simulation object that can be run as is. In this
 case the 3 submodels are roughly equal sized partitions that have the shape
 of pie pieces.
 """
-import copy
-
 import matplotlib.pyplot as plt
 from example_models import create_circle_simulation
 
 import imod
+from imod.mf6.partition_generator import get_label_array
 
 simulation = create_circle_simulation()
 tmp_path = imod.util.temporary_directory()
 simulation.write(tmp_path / "original", False)
 
 idomain = simulation["GWF_1"]["disv"].dataset["idomain"]
-submodel_labels = copy.deepcopy(idomain.sel({"layer": 1}))
 
-submodel_labels.values[:67] = 0
-submodel_labels.values[67:118] = 1
-submodel_labels.values[118:] = 2
+number_partitions = 5
+submodel_labels = get_label_array(simulation, number_partitions)
 
 # Create a simulation that is split in subdomains according to the label array.
 new_sim = simulation.split(submodel_labels)
