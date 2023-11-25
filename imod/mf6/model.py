@@ -22,10 +22,7 @@ from imod.mf6.clipped_boundary_condition_creator import create_clipped_boundary
 from imod.mf6.package import Package
 from imod.mf6.regridding_utils import RegridderInstancesCollection, RegridderType
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo, StatusInfoBase
-from imod.mf6.validation import (
-    pkg_errors_to_status_info,
-    validation_model_error_message,
-)
+from imod.mf6.validation import pkg_errors_to_status_info
 from imod.mf6.wel import Well
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
@@ -451,9 +448,10 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         new_model._mask_all_packages(output_domain)
 
         if validate:
-            errors = new_model._validate("regridded_model")
-            if len(errors.errors):
-                raise ValidationError(validation_model_error_message(errors))
+            status_info = NestedStatusInfo("Model validation status")
+            status_info.add(new_model._validate("Regridded model"))
+            if status_info.has_errors():
+                raise ValidationError("\n" + status_info.to_string())
         return new_model
 
     def _mask_all_packages(

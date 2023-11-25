@@ -25,6 +25,8 @@ Fixed
 - Bug in :class:`imod.mf6.SourceSinkMixing` where, in case of multiple active
   boundary conditions with assigned concentrations, it would write a ``.ssm``
   file with all sources/sinks on one single row.
+- Validation errors are rendered properly when writing a simulation object or
+  regridding a model object.
 
 Changed
 ~~~~~~~
