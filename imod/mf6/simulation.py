@@ -16,15 +16,15 @@ import xarray as xr
 import xugrid as xu
 
 import imod
-from imod.mf6.exchange_creator_structured import ExchangeCreator_Structured
-from imod.mf6.exchange_creator_unstructured import ExchangeCreator_Unstructured
+from imod.mf6.multimodel.exchange_creator_structured import ExchangeCreator_Structured
+from imod.mf6.multimodel.exchange_creator_unstructured import ExchangeCreator_Unstructured
 from imod.mf6.gwfgwf import GWFGWF
 from imod.mf6.model import (
     GroundwaterFlowModel,
     GroundwaterTransportModel,
     Modflow6Model,
 )
-from imod.mf6.modelsplitter import create_partition_info, slice_model
+from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
 from imod.mf6.out import open_cbc, open_conc, open_hds
 from imod.mf6.package import Package
 from imod.mf6.pkgbase import PackageBase
