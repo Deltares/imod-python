@@ -8,6 +8,10 @@ import xarray as xr
 import imod
 
 def remove_comment_lines( textblock: str )-> str:
+    '''
+    Removes the comment lines from the gwfgwf file content, we don't want the tests to be sensitive to the 
+    comments. 
+    '''
     result = ""
     lines = textblock.splitlines()
     firstline = True
