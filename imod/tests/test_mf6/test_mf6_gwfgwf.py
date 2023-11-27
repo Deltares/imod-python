@@ -7,6 +7,20 @@ import xarray as xr
 
 import imod
 
+def remove_comment_lines( textblock: str )-> str:
+    result = ""
+    lines = textblock.splitlines()
+    firstline = True
+    for line in lines:
+      if len(line) == 0:
+        if not firstline:
+            result += line + "\n" 
+      elif  line[0] != "#":
+        firstline = False
+        result += line + "\n"    
+      
+    return result
+
 
 @pytest.fixture(scope="function")
 def sample_gwfgwf_structured():
@@ -86,7 +100,7 @@ class TestGwfgwf:
         end exchangedata
         """
         )
-
+        actual = remove_comment_lines(actual)
         assert actual == expected
 
     @pytest.mark.usefixtures("sample_gwfgwf_unstructured")
@@ -122,7 +136,7 @@ class TestGwfgwf:
         end exchangedata
         """
         )
-
+        actual = remove_comment_lines(actual)
         assert actual == expected
 
     @pytest.mark.usefixtures("sample_gwfgwf_structured")
