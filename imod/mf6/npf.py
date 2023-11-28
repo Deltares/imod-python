@@ -300,7 +300,7 @@ class NodePropertyFlow(Package):
         "starting_head_as_confined_thickness": "thickstrt",
         "rewet_iterations": "iwetit",
         "xt3d_option": "xt3doptions",
-        "rhs_option": "rhs"        
+        "rhs_option": "rhs",
     }
     _template = Package._initialize_template(_pkg_id)
 
