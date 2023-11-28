@@ -78,7 +78,7 @@ class GWFGWF(Package):
         if newton is not None:
             self._toggle_options("newton", newton)
 
-    def _toggle_options(self, option_name, option_value: Union[bool, str]):
+    def _toggle_options(self, option_name: str, option_value: Union[bool, str]):
         if option_value:
             self.dataset[option_name] = option_value
         else:
