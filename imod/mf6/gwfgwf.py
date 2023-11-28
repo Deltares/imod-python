@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, Union
 
 import numpy as np
 import xarray as xr
@@ -52,25 +52,37 @@ class GWFGWF(Package):
 
     def set_options(
         self,
-        print_input: bool = True,
-        print_flows: bool = False,
-        save_flows: bool = False,
-        cell_averaging: bool = False,
-        dewatered: bool = False,
-        variablecv: bool = False,
-        xt3d: bool = False,
-        newton: bool = False,
+        print_input: Optional[bool] = None,
+        print_flows: Optional[bool] = None,
+        save_flows: Optional[bool] = None,
+        cell_averaging: Optional[bool] = None,
+        dewatered: Optional[bool] = None,
+        variablecv: Optional[bool] = None,
+        xt3d: Optional[bool] = None,
+        newton: Optional[bool] = None,
     ):
-        self.dataset["print_input"] = print_input
-        self.dataset["print_flows"] = print_flows
-        self.dataset["save_flows"] = save_flows
-        self.dataset["cell_averaging"] = cell_averaging
-        self.dataset["dewatered"] = dewatered
-        self.dataset["variable_cv"] = variablecv
-        if xt3d:
-            self.dataset["xt3d"] = xt3d
-        if newton:
-            self.dataset["newton"] = newton
+        if print_input is not None:
+            self._toggle_options("print_input",  print_input)
+        if print_flows is not None:
+            self._toggle_options("print_flows",  print_flows)            
+        if save_flows is not None:
+            self._toggle_options("save_flows",  save_flows)
+        if cell_averaging is not None:
+           self._toggle_options("cell_averaging", cell_averaging)
+        if dewatered is not None:
+           self._toggle_options("dewatered", dewatered)
+        if variablecv is not None:
+           self._toggle_options("variable_cv",variablecv )
+        if xt3d is not None:
+           self._toggle_options("xt3d", xt3d)
+        if newton is not None:
+           self._toggle_options("newton", newton)
+
+    def _toggle_options(self, option_name, option_value: Union[bool, str] ):
+        if option_value:     
+              self.dataset[option_name] = option_value
+        else:
+            self.dataset.drop_vars(option_name, errors="ignore")
 
     def filename(self) -> str:
         return f"{self.packagename()}.{self._pkg_id}"
