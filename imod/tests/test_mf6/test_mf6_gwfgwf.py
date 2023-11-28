@@ -207,3 +207,20 @@ def test_option_dewatered_propagated(circle_model, dewatered_option: bool, tmp_p
         assert ("dewatered" in exchange.dataset.variables) == dewatered_option
         textrep = exchange.render(tmp_path, "gwfgwf", [], False)
         assert ("dewatered" in textrep) == dewatered_option
+
+
+@pytest.mark.parametrize("budget_option", [False, True])
+def test_save_flows_propagated(circle_model, budget_option: bool, tmp_path):
+    # set budget option on original model
+    if not budget_option:
+        circle_model["GWF_1"]["oc"].dataset["save_budget"] = None
+
+    # split original model
+    label_array = get_label_array(circle_model, 3)
+    split_simulation = circle_model.split(label_array)
+
+    # check that the created exchagnes have the same dewatered option
+    for exchange in split_simulation["split_exchanges"]:
+        assert ("save_flows" in exchange.dataset.variables) == budget_option
+        textrep = exchange.render(tmp_path, "gwfgwf", [], False)
+        assert ("save_flows" in textrep) == budget_option

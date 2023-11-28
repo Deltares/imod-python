@@ -194,4 +194,4 @@ class OutputControl(Package):
         return
 
     def is_budget_output(self) -> bool:
-        return self.dataset["save_budget"] is not None
+        return self.dataset["save_budget"].values[()] is not None
