@@ -190,3 +190,20 @@ def test_option_variablecv_propagated(circle_model, variablecv_option: bool, tmp
         assert ("variablecv" in exchange.dataset.variables) == variablecv_option
         textrep = exchange.render(tmp_path, "gwfgwf", [], False)
         assert ("variablecv" in textrep) == variablecv_option
+
+
+@pytest.mark.parametrize("dewatered_option", [False, True])
+def test_option_dewatered_propagated(circle_model, dewatered_option: bool, tmp_path):
+    # set dewatered option on original model
+    circle_model["GWF_1"]["npf"]["variable_vertical_conductance"] = True
+    circle_model["GWF_1"]["npf"]["dewatered"] = dewatered_option
+
+    # split original model
+    label_array = get_label_array(circle_model, 3)
+    split_simulation = circle_model.split(label_array)
+
+    # check that the created exchagnes have the same dewatered option
+    for exchange in split_simulation["split_exchanges"]:
+        assert ("dewatered" in exchange.dataset.variables) == dewatered_option
+        textrep = exchange.render(tmp_path, "gwfgwf", [], False)
+        assert ("dewatered" in textrep) == dewatered_option

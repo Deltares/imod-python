@@ -11,7 +11,7 @@ begin options
 {% endif -%}
 {%- if cell_averaging is defined -%}  cell_averaging {{cell_averaging}}
 {% endif -%}
-{%- if variablecv is defined -%}  variablecv {%- if dewatered is defined -%}dewatered{%- endif -%}
+{%- if variablecv is defined -%}  variablecv  {% if dewatered is defined %} dewatered {% endif%}
 {% endif -%}
 {%- if newton is defined -%}  newton
 {% endif -%}
