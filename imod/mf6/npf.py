@@ -200,6 +200,12 @@ class NodePropertyFlow(Package):
         ranges from zero to one and can be used by post processing programs to
         determine how much of a cell volume is saturated. If ICELLTYPE is 0,
         then saturation is always one.
+    xt3d_option:  ({True, False}, optional)
+        If True, the XT3D formulation will be used. By default False.
+    rhs_option: ({True, False}, optional)
+        If True, then the XT3D additional terms will be added to the right-hand
+        side. If False, then the XT3D terms will be put into the coefficient
+        matrix. By default False.
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
@@ -344,9 +350,9 @@ class NodePropertyFlow(Package):
         perched=False,
         save_specific_discharge=False,
         save_saturation=False,
-        validate: bool = True,
         xt3d_option=False,
         rhs_option=False,
+        validate: bool = True,
     ):
         super().__init__(locals())
         # check rewetting
