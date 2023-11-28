@@ -299,6 +299,8 @@ class NodePropertyFlow(Package):
         "variable_vertical_conductance": "variablecv",
         "starting_head_as_confined_thickness": "thickstrt",
         "rewet_iterations": "iwetit",
+        "xt3d_option": "xt3doptions",
+        "rhs_option": "rhs"        
     }
     _template = Package._initialize_template(_pkg_id)
 
@@ -343,8 +345,8 @@ class NodePropertyFlow(Package):
         save_specific_discharge=False,
         save_saturation=False,
         validate: bool = True,
-        xt3doptions=False,
-        rhs=False,
+        xt3d_option=False,
+        rhs_option=False,
     ):
         super().__init__(locals())
         # check rewetting
@@ -385,10 +387,8 @@ class NodePropertyFlow(Package):
         self.dataset["perched"] = perched
         self.dataset["save_specific_discharge"] = save_specific_discharge
         self.dataset["save_saturation"] = save_saturation
-        if xt3doptions:
-            self.dataset["xt3doptions"] = xt3doptions
-        if rhs:
-            self.dataset["rhs"] = rhs
+        self.dataset["xt3d_option"] = xt3d_option
+        self.dataset["rhs_option"] = rhs_option
         self._validate_init_schemata(validate)
 
     @classmethod
@@ -402,25 +402,14 @@ class NodePropertyFlow(Package):
         """
         Returns the xt3d option value for this object.
         """
-        return "xt3doptions" in self.dataset.variables
+        return self.dataset["xt3d_option"].values[()]
 
     def set_xt3d_option(self, is_xt3d: bool, is_rhs: bool) -> bool:
         """
         Returns the xt3d option value for this object.
         """
-        if "rhs" in self.dataset.variables:
-            if not is_rhs:
-                self.dataset = self.dataset.drop_vars("rhs")
-        else:
-            if is_rhs:
-                self.dataset["rhs"] = True
-
-        if "xt3doptions" in self.dataset.variables:
-            if not is_xt3d:
-                self.dataset = self.dataset.drop_vars("xt3doptions")
-        else:
-            if is_xt3d:
-                self.dataset["xt3doptions"] = True
+        self.dataset["rhs_option"] = is_rhs
+        self.dataset["xt3d_option"] = is_xt3d
 
     def get_is_variable_vertical_conductance(self) -> bool:
         """
