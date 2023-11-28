@@ -343,6 +343,8 @@ class NodePropertyFlow(Package):
         save_specific_discharge=False,
         save_saturation=False,
         validate: bool = True,
+        xt3doptions=False,
+        rhs=False,
     ):
         super().__init__(locals())
         # check rewetting
@@ -383,11 +385,51 @@ class NodePropertyFlow(Package):
         self.dataset["perched"] = perched
         self.dataset["save_specific_discharge"] = save_specific_discharge
         self.dataset["save_saturation"] = save_saturation
+        if xt3doptions:
+            self.dataset["xt3doptions"] = xt3doptions
+        if rhs:
+            self.dataset["rhs"] = rhs
         self._validate_init_schemata(validate)
 
     @classmethod
     def get_pkg_id(cls) -> str:
-        """
+        """s
         Returns the preferred package id for this class.
         """
         return cls._pkg_id
+
+    def get_xt3d_option(self) -> bool:
+        """
+        Returns the xt3d option value for this object.
+        """
+        return "xt3doptions" in self.dataset.variables
+
+    def set_xt3d_option(self, is_xt3d: bool, is_rhs: bool) -> bool:
+        """
+        Returns the xt3d option value for this object.
+        """
+        if "rhs" in self.dataset.variables:
+            if not is_rhs:
+                self.dataset = self.dataset.drop_vars("rhs")
+        else:
+            if is_rhs:
+                self.dataset["rhs"] = True
+
+        if "xt3doptions" in self.dataset.variables:
+            if not is_xt3d:
+                self.dataset = self.dataset.drop_vars("xt3doptions")
+        else:
+            if is_xt3d:
+                self.dataset["xt3doptions"] = True
+
+    def get_is_variable_vertical_conductance(self) -> bool:
+        """
+        Returns the VariableCV option value for this object.
+        """
+        return self.dataset["variable_vertical_conductance"].values[()]
+
+    def get_is_dewatered(self) -> bool:
+        """
+        Returns the "dewatered" option value for this object. Used only when variable_vertical_conductance is true
+        """
+        return self.dataset["dewatered"].values[()]

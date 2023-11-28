@@ -870,7 +870,10 @@ class Modflow6Simulation(collections.UserDict):
         new_simulation["solver"]["modelnames"] = xr.DataArray(
             list(get_models(new_simulation).keys())
         )
+
         new_simulation._add_modelsplit_exchanges(exchanges)
+        new_simulation._set_exchange_options()
+
         new_simulation._filter_inactive_cells_from_exchanges()
         return new_simulation
 
@@ -921,6 +924,33 @@ class Modflow6Simulation(collections.UserDict):
         if not is_split(self):
             self["split_exchanges"] = []
         self["split_exchanges"].extend(exchanges_list)
+
+    def _set_exchange_options(self):
+        # collect some options that we will auto-set
+        for exchange in self["split_exchanges"]:
+            model_name_1 = exchange.dataset["model_name_1"].values[()]
+            model_name_2 = exchange.dataset["model_name_2"].values[()]
+            model_1 = self[model_name_1]
+            model_2 = self[model_name_2]
+            xt3d = model_1["npf"].get_xt3d_option() or model_2["npf"].get_xt3d_option()
+            newton = model_1.is_use_newton() or model_2.is_use_newton()
+            is_variable_vertical_conductance = (
+                model_1["npf"].get_is_variable_vertical_conductance()
+                or model_2["npf"].get_is_variable_vertical_conductance()
+            )
+            is_dewatered = (
+                model_1["npf"].get_is_dewatered() or model_2["npf"].get_is_dewatered()
+            )
+            is_budget = (
+                model_1["oc"].is_budget_output() or model_2["oc"].is_budget_output()
+            )
+            exchange.set_options(
+                save_flows=is_budget,
+                dewatered=is_dewatered,
+                variablecv=is_variable_vertical_conductance,
+                xt3d=xt3d,
+                newton=newton,
+            )
 
     def _filter_inactive_cells_from_exchanges(self) -> None:
         for ex in self["split_exchanges"]:

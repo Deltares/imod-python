@@ -1,7 +1,6 @@
 # this file contains the exchanges from model {{model_name_1}} to model {{model_name_2}}
 
 begin options
-  save_flows
 {% if auxiliary is defined %}  auxiliary {{auxiliary|join(" ")}}
 {% endif -%}  
 {%- if print_input is defined -%}  print_input
@@ -17,6 +16,8 @@ begin options
 {%- if newton is defined -%}  newton
 {% endif -%}
 {%- if gnc is defined -%}  gnc6 filein {{gnc}}
+{% endif -%}
+{%- if xt3d is defined -%}  xt3d
 {% endif -%}
 {%- if mvr is defined -%}  mvr6 filein {{mvr}}
 {% endif -%}

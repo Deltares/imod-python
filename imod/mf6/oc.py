@@ -192,3 +192,6 @@ class OutputControl(Package):
                 filepath = Path(path)
                 filepath.parent.mkdir(parents=True, exist_ok=True)
         return
+
+    def is_budget_output(self) -> bool:
+        return self.dataset["save_budget"] is not None
