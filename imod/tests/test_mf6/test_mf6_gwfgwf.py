@@ -145,7 +145,7 @@ class TestGwfgwf:
 
 
 @pytest.mark.parametrize("newton_option", [False, True])
-def test_set_option_newton(circle_model, newton_option, tmp_path):
+def test_option_newton_propagated(circle_model, newton_option, tmp_path):
     # set newton option on original model
     circle_model["GWF_1"].set_newton(newton_option)
 
@@ -161,7 +161,7 @@ def test_set_option_newton(circle_model, newton_option, tmp_path):
 
 
 @pytest.mark.parametrize("xt3d_option", [False, True])
-def test_set_option_xt3d(circle_model, xt3d_option, tmp_path):
+def test_option_xt3d_propagated(circle_model, xt3d_option, tmp_path):
     # set newton option on original model
     circle_model["GWF_1"]["npf"].set_xt3d_option(xt3d_option, is_rhs=xt3d_option)
 
@@ -174,3 +174,19 @@ def test_set_option_xt3d(circle_model, xt3d_option, tmp_path):
         assert ("xt3d" in exchange.dataset.variables) == xt3d_option
         textrep = exchange.render(tmp_path, "gwfgwf", [], False)
         assert ("xt3d" in textrep) == xt3d_option
+
+
+@pytest.mark.parametrize("variablecv_option", [False, True])
+def test_option_variablecv_propagated(circle_model, variablecv_option: bool, tmp_path):
+    # set variablecv option on original model
+    circle_model["GWF_1"]["npf"]["variable_vertical_conductance"] = variablecv_option
+
+    # split original model
+    label_array = get_label_array(circle_model, 3)
+    split_simulation = circle_model.split(label_array)
+
+    # check that the created exchagnes have the same variablecv option
+    for exchange in split_simulation["split_exchanges"]:
+        assert ("variablecv" in exchange.dataset.variables) == variablecv_option
+        textrep = exchange.render(tmp_path, "gwfgwf", [], False)
+        assert ("variablecv" in textrep) == variablecv_option
