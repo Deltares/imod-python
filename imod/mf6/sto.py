@@ -182,6 +182,7 @@ class SpecificStorage(StorageBase):
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
+        d["sy_present"] = self.dataset["specific_yield"].values[()] is not None
         return self._template.render(d)
 
 
@@ -314,5 +315,6 @@ class StorageCoefficient(StorageBase):
 
     def render(self, directory, pkgname, globaltimes, binary):
         d = self._render_dict(directory, pkgname, globaltimes, binary)
+        d["sy_present"] = self.dataset["specific_yield"].values[()] is not None
         d["storagecoefficient"] = True
         return self._template.render(d)
