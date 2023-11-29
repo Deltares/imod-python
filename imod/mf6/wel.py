@@ -514,6 +514,10 @@ class WellDisStructured(DisStructuredBoundaryCondition):
     Any number of WEL Packages can be specified for a single groundwater flow model.
     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=63
 
+    .. warning::
+        This class is deprecated and will be deleted in a future release.
+        Consider changing your code to use the ``imod.mf6.Well`` package.
+
     Parameters
     ----------
     layer: list of int
@@ -677,6 +681,10 @@ class WellDisVertices(DisVerticesBoundaryCondition):
     WEL package for discretization by vertices (DISV) models. Any number of WEL
     Packages can be specified for a single groundwater flow model.
     https://water.usgs.gov/water-resources/software/MODFLOW-6/mf6io_6.0.4.pdf#page=63
+
+    .. warning::
+        This class is deprecated and will be deleted in a future release.
+        Consider changing your code to use the ``imod.mf6.Well`` package.
 
     Parameters
     ----------
