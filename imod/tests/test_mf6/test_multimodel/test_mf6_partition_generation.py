@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from imod.mf6.partition_generator import _partition_1d, get_label_array
+from imod.mf6.multimodel.partition_generator import _partition_1d, get_label_array
 
 
 def test_partition_1d_errors():
