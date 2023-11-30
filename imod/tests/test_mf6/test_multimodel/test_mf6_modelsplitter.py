@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from imod.mf6.modelsplitter import create_partition_info, slice_model
+from imod.mf6.multimodel.modelsplitter import create_partition_info, slice_model
 from imod.typing.grid import zeros_like
 
 

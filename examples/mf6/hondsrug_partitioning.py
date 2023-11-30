@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 from example_models import create_hondsrug_simulation
 
 import imod
-from imod.mf6.partition_generator import get_label_array
+from imod.mf6.multimodel.partition_generator import get_label_array
 
 # %%
 # Obtain the simulation, write it, run it, and plot some heads.
