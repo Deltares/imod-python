@@ -56,7 +56,7 @@ def dis(idomain):
     )
 
 
-def test_render_specific_storage(sy_layered, convertible):
+def test_render_specific_storage_with_specific_yield(sy_layered, convertible):
     # for better coverage, use full (conv) layered (sy) and constant (ss)
     sto = imod.mf6.SpecificStorage(
         specific_storage=0.0003,
@@ -82,6 +82,37 @@ def test_render_specific_storage(sy_layered, convertible):
             constant 0.16
             constant 0.15
             constant 0.14
+        end griddata
+
+        begin period 1
+          transient
+        end period
+        """
+    )
+    assert actual == expected
+
+
+def test_render_specific_storage_without_specific_yield(convertible):
+    sto = imod.mf6.SpecificStorage(
+        specific_storage=0.0003,
+        specific_yield=None,
+        transient=True,
+        convertible=convertible,
+    )
+
+    directory = pathlib.Path("mymodel")
+    globaltimes = np.array(["2000-01-01"], dtype="datetime64[ns]")
+    actual = sto.render(directory, "sto", globaltimes, True)
+    expected = textwrap.dedent(
+        """\
+        begin options
+        end options
+
+        begin griddata
+          iconvert
+            open/close mymodel/sto/iconvert.bin (binary)
+          ss
+            constant 0.0003
         end griddata
 
         begin period 1

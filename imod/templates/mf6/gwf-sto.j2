@@ -10,9 +10,12 @@ begin griddata
 {% for x in iconvert %}    {{x}}
 {% endfor %}  ss{% if ss_layered %} layered{% endif %}
 {% for x in ss %}    {{x}}
-{% endfor %}  sy{% if sy_layered %} layered{% endif %}
+{% endfor %} 
+{%- if sy is defined %}  sy{% if sy_layered %} layered{% endif %}
 {% for x in sy %}    {{x}}
 {% endfor -%}
+{% endif -%}
+
 end griddata
 
 {% for i, value in periods.items() %}begin period {{i}}
