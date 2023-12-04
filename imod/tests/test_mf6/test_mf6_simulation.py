@@ -13,7 +13,7 @@ import xugrid as xu
 
 import imod
 from imod.mf6.model import Modflow6Model
-from imod.mf6.modelsplitter import PartitionInfo
+from imod.mf6.multimodel.modelsplitter import PartitionInfo
 from imod.mf6.simulation import get_models, get_packages
 from imod.mf6.statusinfo import NestedStatusInfo, StatusInfo
 from imod.schemata import ValidationError

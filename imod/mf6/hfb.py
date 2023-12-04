@@ -652,18 +652,17 @@ class HorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierBase):
     Examples
     --------
 
-    >> barrier_x = [-1000.0, 0.0, 1000.0]
-    >> barrier_y = [500.0, 250.0, 500.0]
-    >> barrier_gdf = gpd.GeoDataFrame(
-    >>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
-    >>     data={
-    >>         "hydraulic_characteristic": [1e-3,],
-    >>         "ztop": [10.0,],
-    >>         "zbottom": [0.0,],
-    >>     },
-    >> )
-    >>
-    >> hfb = imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
+    >>> barrier_x = [-1000.0, 0.0, 1000.0]
+    >>> barrier_y = [500.0, 250.0, 500.0]
+    >>> barrier_gdf = gpd.GeoDataFrame(
+    >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>>     data={
+    >>>         "hydraulic_characteristic": [1e-3,],
+    >>>         "ztop": [10.0,],
+    >>>         "zbottom": [0.0,],
+    >>>     },
+    >>> )
+    >>> hfb = imod.mf6.HorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
 
     """
 
@@ -714,17 +713,16 @@ class LayeredHorizontalFlowBarrierHydraulicCharacteristic(HorizontalFlowBarrierB
     Examples
     --------
 
-    >> barrier_x = [-1000.0, 0.0, 1000.0]
-    >> barrier_y = [500.0, 250.0, 500.0]
-    >> barrier_gdf = gpd.GeoDataFrame(
-    >>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
-    >>     data={
-    >>         "hydraulic_characteristic": [1e-3,],
-    >>         "layer": [1,]
-    >>     },
-    >> )
-    >>
-    >> hfb = imod.mf6.LayeredHorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
+    >>> barrier_x = [-1000.0, 0.0, 1000.0]
+    >>> barrier_y = [500.0, 250.0, 500.0]
+    >>> barrier_gdf = gpd.GeoDataFrame(
+    >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>>     data={
+    >>>         "hydraulic_characteristic": [1e-3,],
+    >>>         "layer": [1,]
+    >>>     },
+    >>> )
+    >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierHydraulicCharacteristic(barrier_gdf)
 
     """
 
@@ -780,18 +778,17 @@ class HorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     Examples
     --------
 
-    >> barrier_x = [-1000.0, 0.0, 1000.0]
-    >> barrier_y = [500.0, 250.0, 500.0]
-    >> barrier_gdf = gpd.GeoDataFrame(
-    >>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
-    >>     data={
-    >>         "multiplier": [1.5,],
-    >>         "ztop": [10.0,],
-    >>         "zbottom": [0.0,],
-    >>     },
-    >> )
-    >>
-    >> hfb = imod.mf6.HorizontalFlowBarrierMultiplier(barrier_gdf)
+    >>> barrier_x = [-1000.0, 0.0, 1000.0]
+    >>> barrier_y = [500.0, 250.0, 500.0]
+    >>> barrier_gdf = gpd.GeoDataFrame(
+    >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>>     data={
+    >>>         "multiplier": [1.5,],
+    >>>         "ztop": [10.0,],
+    >>>         "zbottom": [0.0,],
+    >>>     },
+    >>> )
+    >>> hfb = imod.mf6.HorizontalFlowBarrierMultiplier(barrier_gdf)
 
     """
 
@@ -847,18 +844,16 @@ class LayeredHorizontalFlowBarrierMultiplier(HorizontalFlowBarrierBase):
     Examples
     --------
 
-    >> barrier_x = [-1000.0, 0.0, 1000.0]
-    >> barrier_y = [500.0, 250.0, 500.0]
-    >> barrier_gdf = gpd.GeoDataFrame(
-    >>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
-    >>     data={
-    >>         "multiplier": [1.5,],
-    >>         "layer": [1,],
-
-    >>     },
-    >> )
-    >>
-    >> hfb = imod.mf6.LayeredHorizontalFlowBarrierMultiplier(barrier_gdf)
+    >>> barrier_x = [-1000.0, 0.0, 1000.0]
+    >>> barrier_y = [500.0, 250.0, 500.0]
+    >>> barrier_gdf = gpd.GeoDataFrame(
+    >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>>     data={
+    >>>         "multiplier": [1.5,],
+    >>>         "layer": [1,],
+    >>>     },
+    >>> )
+    >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierMultiplier(barrier_gdf)
 
     """
 
@@ -932,18 +927,17 @@ class HorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     Examples
     --------
 
-    >> barrier_x = [-1000.0, 0.0, 1000.0]
-    >> barrier_y = [500.0, 250.0, 500.0]
-    >> barrier_gdf = gpd.GeoDataFrame(
-    >>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
-    >>     data={
-    >>         "resistance": [1e3,],
-    >>         "ztop": [10.0,],
-    >>         "zbottom": [0.0,],
-    >>     },
-    >> )
-    >>
-    >> hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)
+    >>> barrier_x = [-1000.0, 0.0, 1000.0]
+    >>> barrier_y = [500.0, 250.0, 500.0]
+    >>> barrier_gdf = gpd.GeoDataFrame(
+    >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>>     data={
+    >>>         "resistance": [1e3,],
+    >>>         "ztop": [10.0,],
+    >>>         "zbottom": [0.0,],
+    >>>     },
+    >>> )
+    >>> hfb = imod.mf6.HorizontalFlowBarrierResistance(barrier_gdf)
 
 
     """
@@ -995,17 +989,16 @@ class LayeredHorizontalFlowBarrierResistance(HorizontalFlowBarrierBase):
     Examples
     --------
 
-    >> barrier_x = [-1000.0, 0.0, 1000.0]
-    >> barrier_y = [500.0, 250.0, 500.0]
-    >> barrier_gdf = gpd.GeoDataFrame(
-    >>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
-    >>     data={
-    >>         "resistance": [1e3,],
-    >>         "layer": [2,],
-    >>     },
-    >> )
-    >>
-    >> hfb = imod.mf6.LayeredHorizontalFlowBarrierResistance(barrier_gdf)
+    >>> barrier_x = [-1000.0, 0.0, 1000.0]
+    >>> barrier_y = [500.0, 250.0, 500.0]
+    >>> barrier_gdf = gpd.GeoDataFrame(
+    >>>     geometry=[shapely.linestrings(barrier_x, barrier_y),],
+    >>>     data={
+    >>>         "resistance": [1e3,],
+    >>>         "layer": [2,],
+    >>>     },
+    >>> )
+    >>> hfb = imod.mf6.LayeredHorizontalFlowBarrierResistance(barrier_gdf)
 
 
     """

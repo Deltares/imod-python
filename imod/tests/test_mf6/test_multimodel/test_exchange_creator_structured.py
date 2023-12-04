@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 from pytest_cases import parametrize_with_cases
 
-from imod.mf6.exchange_creator_structured import ExchangeCreator_Structured
-from imod.mf6.modelsplitter import create_partition_info
+from imod.mf6.multimodel.exchange_creator_structured import ExchangeCreator_Structured
+from imod.mf6.multimodel.modelsplitter import create_partition_info
 from imod.tests.fixtures.flow_basic_fixture import BasicDisSettings
 from imod.typing.grid import zeros_like
 from imod.util import spatial_reference
