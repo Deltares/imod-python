@@ -7,7 +7,7 @@ import pytest
 import xarray as xr
 
 import imod
-from imod.mf6.partition_generator import get_label_array
+from imod.mf6.multimodel.partition_generator import get_label_array
 
 
 def remove_comment_lines(textblock: str) -> str:

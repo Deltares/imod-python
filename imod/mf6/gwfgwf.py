@@ -61,24 +61,16 @@ class GWFGWF(Package):
         xt3d: Optional[bool] = None,
         newton: Optional[bool] = None,
     ):
-        if print_input is not None:
-            self._toggle_options("print_input", print_input)
-        if print_flows is not None:
-            self._toggle_options("print_flows", print_flows)
-        if save_flows is not None:
-            self._toggle_options("save_flows", save_flows)
-        if cell_averaging is not None:
-            self._toggle_options("cell_averaging", cell_averaging)
-        if dewatered is not None:
-            self._toggle_options("dewatered", dewatered)
-        if variablecv is not None:
-            self._toggle_options("variablecv", variablecv)
-        if xt3d is not None:
-            self._toggle_options("xt3d", xt3d)
-        if newton is not None:
-            self._toggle_options("newton", newton)
+        self._toggle_options("print_input", print_input)
+        self._toggle_options("print_flows", print_flows)
+        self._toggle_options("save_flows", save_flows)
+        self._toggle_options("cell_averaging", cell_averaging)
+        self._toggle_options("dewatered", dewatered)
+        self._toggle_options("variablecv", variablecv)
+        self._toggle_options("xt3d", xt3d)
+        self._toggle_options("newton", newton)
 
-    def _toggle_options(self, option_name: str, option_value: Union[bool, str]):
+    def _toggle_options(self, option_name: str, option_value: Optional[Union[bool, str]]):
         if option_value:
             self.dataset[option_name] = option_value
         else:
