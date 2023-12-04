@@ -30,7 +30,7 @@ dependencies:
   - pydata-sphinx-theme
   - pyproj
   - pymetis
-  - python=3.10
+  - python=3.11
   - pyvista
   - rasterio>=1.0
   - rioxarray
