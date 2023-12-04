@@ -193,5 +193,6 @@ class OutputControl(Package):
                 filepath.parent.mkdir(parents=True, exist_ok=True)
         return
 
+    @property
     def is_budget_output(self) -> bool:
         return self.dataset["save_budget"].values[()] is not None
