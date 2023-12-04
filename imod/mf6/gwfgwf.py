@@ -55,7 +55,7 @@ class GWFGWF(Package):
         print_input: Optional[bool] = None,
         print_flows: Optional[bool] = None,
         save_flows: Optional[bool] = None,
-        cell_averaging: Optional[bool] = None,
+        cell_averaging: Optional[str] = None,
         dewatered: Optional[bool] = None,
         variablecv: Optional[bool] = None,
         xt3d: Optional[bool] = None,
@@ -70,7 +70,9 @@ class GWFGWF(Package):
         self._toggle_options("xt3d", xt3d)
         self._toggle_options("newton", newton)
 
-    def _toggle_options(self, option_name: str, option_value: Optional[Union[bool, str]]):
+    def _toggle_options(
+        self, option_name: str, option_value: Optional[Union[bool, str]]
+    ):
         if option_value:
             self.dataset[option_name] = option_value
         else:

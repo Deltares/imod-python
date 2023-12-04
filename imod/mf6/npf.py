@@ -397,33 +397,28 @@ class NodePropertyFlow(Package):
         self.dataset["rhs_option"] = rhs_option
         self._validate_init_schemata(validate)
 
-    @classmethod
-    def get_pkg_id(cls) -> str:
-        """s
-        Returns the preferred package id for this class.
-        """
-        return cls._pkg_id
-
     def get_xt3d_option(self) -> bool:
         """
         Returns the xt3d option value for this object.
         """
         return self.dataset["xt3d_option"].values[()]
 
-    def set_xt3d_option(self, is_xt3d: bool, is_rhs: bool) -> bool:
+    def set_xt3d_option(self, is_xt3d_used: bool, is_rhs: bool) -> None:
         """
         Returns the xt3d option value for this object.
         """
         self.dataset["rhs_option"] = is_rhs
-        self.dataset["xt3d_option"] = is_xt3d
+        self.dataset["xt3d_option"] = is_xt3d_used
 
-    def get_is_variable_vertical_conductance(self) -> bool:
+    @property
+    def is_variable_vertical_conductance(self) -> bool:
         """
         Returns the VariableCV option value for this object.
         """
         return self.dataset["variable_vertical_conductance"].values[()]
 
-    def get_is_dewatered(self) -> bool:
+    @property
+    def is_dewatered(self) -> bool:
         """
         Returns the "dewatered" option value for this object. Used only when variable_vertical_conductance is true
         """
