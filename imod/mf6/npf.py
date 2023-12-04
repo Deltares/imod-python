@@ -194,7 +194,7 @@ class NodePropertyFlow(Package):
         Default is False.
     save_saturation: ({True, False}, optional)
         keyword to indicate that cell saturation will be written to the budget
-        file, which is specified with “BUDGET SAVE FILE” in Output Control.
+        file, which is specified with "BUDGET SAVE FILE" in Output Control.
         Saturation will be saved to the budget file as an auxiliary variable
         saved with the DATA-SAT text label. Saturation is a cell variable that
         ranges from zero to one and can be used by post processing programs to
