@@ -6,25 +6,15 @@ import pytest
 import xarray as xr
 
 import imod
-
+import re
 
 def remove_comment_lines(textblock: str) -> str:
     """
     Removes the comment lines from the gwfgwf file content, we don't want the tests to be sensitive to the
     comments.
     """
-    result = ""
-    lines = textblock.splitlines()
-    firstline = True
-    for line in lines:
-        if len(line) == 0:
-            if not firstline:
-                result += line + "\n"
-        elif line[0] != "#":
-            firstline = False
-            result += line + "\n"
+    return re.sub(r'^#.*\n?', '', textblock, flags=re.MULTILINE)
 
-    return result
 
 
 @pytest.fixture(scope="function")
@@ -83,7 +73,7 @@ class TestGwfgwf:
         # assert
 
         expected = textwrap.dedent(
-            """\
+            """
         begin options
           save_flows
         end options
@@ -118,7 +108,7 @@ class TestGwfgwf:
         # assert
 
         expected = textwrap.dedent(
-            """\
+            """
         begin options
           save_flows
           auxiliary angldegx cdist
