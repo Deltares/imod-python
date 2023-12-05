@@ -61,22 +61,14 @@ class GWFGWF(Package):
         xt3d: Optional[bool] = None,
         newton: Optional[bool] = None,
     ):
-        self._toggle_options("print_input", print_input)
-        self._toggle_options("print_flows", print_flows)
-        self._toggle_options("save_flows", save_flows)
-        self._toggle_options("cell_averaging", cell_averaging)
-        self._toggle_options("dewatered", dewatered)
-        self._toggle_options("variablecv", variablecv)
-        self._toggle_options("xt3d", xt3d)
-        self._toggle_options("newton", newton)
-
-    def _toggle_options(
-        self, option_name: str, option_value: Optional[Union[bool, str]]
-    ):
-        if option_value:
-            self.dataset[option_name] = option_value
-        else:
-            self.dataset.drop_vars(option_name, errors="ignore")
+        self.dataset["print_input"] = print_input
+        self.dataset["print_flows"] = print_flows
+        self.dataset["save_flows"] = save_flows
+        self.dataset["cell_averaging"] = cell_averaging
+        self.dataset["dewatered"] = dewatered
+        self.dataset["variablecv"] = variablecv
+        self.dataset["xt3d"] = xt3d
+        self.dataset["newton"] = newton
 
     def filename(self) -> str:
         return f"{self.packagename()}.{self._pkg_id}"
