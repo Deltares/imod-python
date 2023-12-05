@@ -1,3 +1,4 @@
+import re
 import textwrap
 from pathlib import Path
 
@@ -6,6 +7,14 @@ import pytest
 import xarray as xr
 
 import imod
+
+
+def remove_comment_lines(textblock: str) -> str:
+    """
+    Removes the comment lines from the gwfgwf file content, we don't want the tests to be sensitive to the
+    comments.
+    """
+    return re.sub(r"^#.*\n?", "", textblock, flags=re.MULTILINE)
 
 
 @pytest.fixture(scope="function")
@@ -64,7 +73,7 @@ class TestGwfgwf:
         # assert
 
         expected = textwrap.dedent(
-            """\
+            """
         begin options
           save_flows
         end options
@@ -86,7 +95,7 @@ class TestGwfgwf:
         end exchangedata
         """
         )
-
+        actual = remove_comment_lines(actual)
         assert actual == expected
 
     @pytest.mark.usefixtures("sample_gwfgwf_unstructured")
@@ -99,7 +108,7 @@ class TestGwfgwf:
         # assert
 
         expected = textwrap.dedent(
-            """\
+            """
         begin options
           save_flows
           auxiliary angldegx cdist
@@ -122,7 +131,7 @@ class TestGwfgwf:
         end exchangedata
         """
         )
-
+        actual = remove_comment_lines(actual)
         assert actual == expected
 
     @pytest.mark.usefixtures("sample_gwfgwf_structured")

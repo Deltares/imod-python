@@ -1,3 +1,5 @@
+# this file contains the exchanges from model {{model_name_1}} to model {{model_name_2}}
+
 begin options
   save_flows
 {% if auxiliary is defined %}  auxiliary {{auxiliary|join(" ")}}
@@ -27,6 +29,9 @@ begin dimensions
 end dimensions
 
 begin exchangedata
+# first 3 (structured) or 2 (unstructured) columns are the exchange boundary cell indices in the numbering local to {{model_name_1}}
+# second 3 (structured) or 2 (unstructured) columns are the exchange boundary cell indices in the numbering local to {{model_name_2}}
+# followed by columns ihc, cl1, cl2, hwva and auxiliary variables, if any
 {%- for i in range(nexg) %}
   {{layer[i]}} {{cell_id1[i]|join(" ")}} {{layer[i]}} {{cell_id2[i]|join(" ")}} {{ihc[i]}} {{cl1[i]}} {{cl2[i]}} {{hwva[i]}} {%- if auxiliary_data is defined %} {{auxiliary_data.T[i]|join(" ")}}{% endif %}
 {%- endfor %}
