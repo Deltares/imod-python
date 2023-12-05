@@ -10,6 +10,15 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 [Unreleased]
 ------------
 
+Fixed
+~~~~~
+- Made ``specific_yield`` optional argument in
+  :class:`imod.mf6.SpecificStorage`, :class:`imod.mf6.StorageCoefficient`.
+
+Added
+~~~~~
+- Added comment in Modflow6 exchanges file (GWFGWF) denoting column header.
+
 [0.15.0] - 2023-11-25
 ---------------------
 
