@@ -1,3 +1,4 @@
+import re
 import textwrap
 from pathlib import Path
 
@@ -6,15 +7,14 @@ import pytest
 import xarray as xr
 
 import imod
-import re
+
 
 def remove_comment_lines(textblock: str) -> str:
     """
     Removes the comment lines from the gwfgwf file content, we don't want the tests to be sensitive to the
     comments.
     """
-    return re.sub(r'^#.*\n?', '', textblock, flags=re.MULTILINE)
-
+    return re.sub(r"^#.*\n?", "", textblock, flags=re.MULTILINE)
 
 
 @pytest.fixture(scope="function")
