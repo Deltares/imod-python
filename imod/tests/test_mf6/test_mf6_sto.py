@@ -134,12 +134,14 @@ def test_render_specific_storage_three_periods(sy_layered, convertible):
     # again but starting with two steady-state periods, followed by a transient stress period
     times = np.array(["2000-01-01", "2000-01-03"], dtype="datetime64[ns]")
     transient = xr.DataArray([False, True], {"time": times}, ("time",))
+    
+    convertible_missing_layer = convertible.sel(layer = [1,2])
 
     sto = imod.mf6.SpecificStorage(
         specific_storage=0.0003,
         specific_yield=sy_layered,
         transient=transient,
-        convertible=convertible,
+        convertible=convertible_missing_layer,
     )
 
     directory = pathlib.Path("mymodel")
