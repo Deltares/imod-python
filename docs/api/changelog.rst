@@ -14,6 +14,8 @@ Fixed
 ~~~~~
 - Made ``specific_yield`` optional argument in
   :class:`imod.mf6.SpecificStorage`, :class:`imod.mf6.StorageCoefficient`.
+- Fixed bug where simulations with :class:`imod.mf6.Well` were not partitioned
+  into multiple models.
 
 Added
 ~~~~~
