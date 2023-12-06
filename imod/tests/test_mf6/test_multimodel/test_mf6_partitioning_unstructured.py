@@ -206,3 +206,55 @@ def test_partitioning_unstructured_with_vpt_cells(
     np.testing.assert_allclose(
         head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
     )
+
+
+@pytest.mark.usefixtures("circle_model")
+@pytest.mark.parametrize(
+    "partition_name",
+    ["two_parts", "three_parts"],
+)
+def test_partitioning_unstructured_with_well(
+    tmp_path: Path, circle_model: Modflow6Simulation, partition_name: str
+):
+    simulation = circle_model
+    # increase the recharge to make the head gradient more pronounced
+    simulation["GWF_1"]["rch"]["rate"] *= 100
+
+    # Add well
+    well = imod.mf6.Well(x=500.0, y=0.0, screen_top=3.0, screen_bottom=2.0, rate=1.0)
+    simulation["GWF_1"]["well"] = well
+
+    # run the original example, so without partitioning, and save the simulation results
+    orig_dir = tmp_path / "original"
+    simulation.write(orig_dir, binary=False)
+    simulation.run()
+
+    orig_head = imod.mf6.open_hds(
+        orig_dir / "GWF_1/GWF_1.hds",
+        orig_dir / "GWF_1/disv.disv.grb",
+    )
+
+    orig_cbc = imod.mf6.open_cbc(
+        orig_dir / "GWF_1/GWF_1.cbc",
+        orig_dir / "GWF_1/disv.disv.grb",
+    )
+
+    # partition the simulation, run it, and save the (merged) results
+    idomain = simulation["GWF_1"].domain
+    partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
+
+    split_simulation = simulation.split(partitioning_arrays[partition_name])
+
+    split_simulation.write(tmp_path, binary=False)
+    split_simulation.run()
+
+    head = split_simulation.open_head()
+    cbc = split_simulation.open_flow_budget()
+
+    # compare the head result of the original simulation with the result of the partitioned simulation
+    np.testing.assert_allclose(
+        head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
+    )
+    np.testing.assert_allclose(
+        cbc["chd"].values, orig_cbc["chd"].values, rtol=1e-5, atol=1e-3
+    )
