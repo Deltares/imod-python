@@ -11,6 +11,7 @@ from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.dataset import get_scalar_variables
 from imod.mf6.utilities.grid import get_active_domain_slice
+from imod.select.points import points_values
 from imod.typing import GridDataArray, ScalarDataset
 from imod.typing.grid import bounding_polygon, is_spatial_2D
 
@@ -51,12 +52,13 @@ def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBa
 
 @typedispatch
 def clip_by_grid(
-    package: IPointDataPackage, active: xu.UgridDataArray
+    package: IPointDataPackage, active: GridDataArray
 ) -> IPointDataPackage:
-    """Clip PointDataPackage outside unstructured grid."""
-    points = np.column_stack((package.x, package.y))
+    """Clip PointDataPackage outside grid."""
 
-    is_inside_exterior = active.grid.locate_points(points) != -1
+    point_active = points_values(active, x=package.x, y=package.y)
+
+    is_inside_exterior = point_active == 1
     selection = package.dataset.loc[{"index": is_inside_exterior}]
 
     cls = type(package)
