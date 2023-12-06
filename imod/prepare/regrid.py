@@ -346,6 +346,11 @@ class Regridder(object):
 
     >>> result = imod.prepare.Regridder(method="mean").regrid(source, like)
 
+    If the like grid has a dimension 'layer' regridding will not work. To remove 
+    dimension 'layer' from the grid use:
+    
+    >>> like = like.squeeze(drop=True)
+
     It's possible to provide your own methods to the ``Regridder``, provided that
     numba can compile them. They need to take the arguments ``values`` and
     ``weights``. Make sure they deal with ``nan`` values gracefully!
