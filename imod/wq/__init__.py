@@ -14,6 +14,7 @@ from imod.wq.adv import (
     AdvectionModifiedMOC,
     AdvectionTVD,
 )
+from imod.wq.ani import HorizontalAnisotropy, HorizontalAnisotropyFile
 from imod.wq.bas import BasicFlow
 from imod.wq.btn import BasicTransport
 from imod.wq.chd import ConstantHead
@@ -26,6 +27,7 @@ from imod.wq.evt import (
     EvapotranspirationTopLayer,
 )
 from imod.wq.ghb import GeneralHeadBoundary
+from imod.wq.hfb import HorizontalFlowBarrier
 from imod.wq.lpf import LayerPropertyFlow
 from imod.wq.mal import MassLoading
 from imod.wq.model import SeawatModel
