@@ -56,6 +56,10 @@ def clip_by_grid(
 ) -> IPointDataPackage:
     """Clip PointDataPackage outside grid."""
 
+    # Drop layer coordinate if present, otherwise a layer coordinate is assigned
+    # which causes conflicts downstream when assigning wells and deriving
+    # cellids.
+    active = active.drop("layer", errors="ignore")
     point_active = points_values(active, x=package.x, y=package.y)
 
     is_inside_exterior = point_active == 1
