@@ -35,8 +35,8 @@ def initialize_template(name: str) -> Template:
 
 
 class Modflow6Model(collections.UserDict, abc.ABC):
-    _mandatory_packages = None
-    _model_id = None
+    _mandatory_packages: Optional[Tuple[str, ...]] = None
+    _model_id: Optional[str] = None
 
     def __init__(self, **kwargs):
         collections.UserDict.__init__(self)
