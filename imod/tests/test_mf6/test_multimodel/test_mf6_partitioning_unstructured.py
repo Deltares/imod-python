@@ -221,7 +221,9 @@ def test_partitioning_unstructured_with_well(
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
     # Add well
-    well = imod.mf6.Well(x=500.0, y=0.0, screen_top=3.0, screen_bottom=2.0, rate=1.0)
+    well = imod.mf6.Well(
+        x=[500.0], y=[0.0], screen_top=[3.0], screen_bottom=[2.0], rate=[1.0]
+    )
     simulation["GWF_1"]["well"] = well
 
     # run the original example, so without partitioning, and save the simulation results
