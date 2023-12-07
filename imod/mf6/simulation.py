@@ -17,11 +17,9 @@ import xugrid as xu
 
 import imod
 from imod.mf6.gwfgwf import GWFGWF
-from imod.mf6.model import (
-    GroundwaterFlowModel,
-    GroundwaterTransportModel,
-    Modflow6Model,
-)
+from imod.mf6.model import Modflow6Model
+from imod.mf6.model_gwf import GroundwaterFlowModel
+from imod.mf6.model_gwt import GroundwaterTransportModel
 from imod.mf6.multimodel.exchange_creator_structured import ExchangeCreator_Structured
 from imod.mf6.multimodel.exchange_creator_unstructured import (
     ExchangeCreator_Unstructured,
