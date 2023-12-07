@@ -11,6 +11,7 @@ from typing import Dict, Optional, Tuple, Union
 import cftime
 import jinja2
 import numpy as np
+import numpy.typing as npt
 import tomli
 import tomli_w
 import xarray as xr
@@ -35,7 +36,7 @@ def initialize_template(name: str) -> Template:
 
 
 class Modflow6Model(collections.UserDict, abc.ABC):
-    _mandatory_packages: Optional[Tuple[str, ...]] = None
+    _mandatory_packages: Tuple[str, ...] = ()
     _model_id: Optional[str] = None
 
     def __init__(self, **kwargs):
@@ -225,7 +226,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         self,
         wellpackage: Well,
         pkg_name: str,
-        globaltimes: np.ndarray[np.datetime64],
+        globaltimes: npt.NDArray[np.datetime64],
         write_context: WriteContext,
         validate: bool = True,
     ):
@@ -297,7 +298,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             if statusinfo.has_errors():
                 raise ValidationError(statusinfo.to_string())
 
-        toml_content = collections.defaultdict(dict)
+        toml_content: Dict = collections.defaultdict(dict)
         for pkgname, pkg in self.items():
             pkg_path = f"{pkgname}.nc"
             toml_content[type(pkg).__name__][pkgname] = pkg_path
@@ -340,7 +341,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         return instance
 
     @classmethod
-    def model_id(cls) -> str:
+    def model_id(cls) -> Optional[str]:
         return cls._model_id
 
     def clip_box(
@@ -528,6 +529,10 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 included_in_all = regridded_idomain
             else:
                 included_in_all = included_in_all.where(regridded_idomain.notnull())
+
+        if included_in_all is None:
+            raise ValueError(f"Unable to regrid")
+
         new_idomain = included_in_all.where(included_in_all.notnull(), other=0)
         new_idomain = new_idomain.astype(int)
 
