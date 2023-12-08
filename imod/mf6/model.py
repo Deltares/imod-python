@@ -531,7 +531,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
                 included_in_all = included_in_all.where(regridded_idomain.notnull())
 
         if included_in_all is None:
-            raise ValueError(f"Unable to regrid")
+            raise ValueError("Unable to regrid")
 
         new_idomain = included_in_all.where(included_in_all.notnull(), other=0)
         new_idomain = new_idomain.astype(int)
