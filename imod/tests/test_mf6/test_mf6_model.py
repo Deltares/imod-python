@@ -12,7 +12,8 @@ from xugrid.core.wrap import UgridDataArray
 
 import imod
 from imod.mf6 import ConstantHead
-from imod.mf6.model import GroundwaterFlowModel, Modflow6Model
+from imod.mf6.model import Modflow6Model
+from imod.mf6.model_gwf import GroundwaterFlowModel
 from imod.mf6.package import Package
 from imod.mf6.write_context import WriteContext
 from imod.schemata import ValidationError
@@ -240,7 +241,7 @@ class TestGroundwaterFlowModel:
         # Assert.
         assert "chd_clipped" not in clipped
 
-    @mock.patch("imod.mf6.model.create_clipped_boundary")
+    @mock.patch("imod.mf6.model_gwf.create_clipped_boundary")
     def test_clip_box_with_state_for_boundary(self, create_clipped_boundary_mock):
         # Arrange.
         state_for_boundary = MagicMock(spec_set=UgridDataArray)
@@ -268,7 +269,7 @@ class TestGroundwaterFlowModel:
             [],
         )
 
-    @mock.patch("imod.mf6.model.create_clipped_boundary")
+    @mock.patch("imod.mf6.model_gwf.create_clipped_boundary")
     def test_clip_box_with_unassigned_boundaries_in_original_model(
         self, create_clipped_boundary_mock
     ):
