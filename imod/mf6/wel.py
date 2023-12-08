@@ -1,13 +1,14 @@
 from __future__ import annotations
 
+import typing
 import warnings
-from typing import Dict, List, Union
+from typing import Any, List, Optional, Tuple, Union
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 import xarray as xr
 import xugrid as xu
-from numpy import ndarray
 
 from imod.mf6.auxiliary_variables import add_periodic_auxiliary_variable
 from imod.mf6.boundary_condition import (
@@ -17,6 +18,7 @@ from imod.mf6.boundary_condition import (
 )
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
+from imod.mf6.package import Package
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.write_context import WriteContext
@@ -28,7 +30,7 @@ from imod.typing.grid import ones_like
 from imod.util import values_within_range
 
 
-def _assign_dims(arg) -> Dict:
+def _assign_dims(arg: Any) -> Tuple | xr.DataArray:
     is_da = isinstance(arg, xr.DataArray)
     if is_da and "time" in arg.coords:
         if arg.ndim != 2:
@@ -40,9 +42,9 @@ def _assign_dims(arg) -> Dict:
         )
         return da
     elif is_da:
-        return ("index", arg.values)
+        return "index", arg.values
     else:
-        return ("index", arg)
+        return "index", arg
 
 
 def mask_2D(package: Well, domain_2d: GridDataArray) -> Well:
@@ -121,11 +123,11 @@ class Well(BoundaryCondition, IPointDataPackage):
     """
 
     @property
-    def x(self) -> ndarray[float]:
+    def x(self) -> npt.NDArray[float]:
         return self.dataset["x"].values
 
     @property
-    def y(self) -> ndarray[float]:
+    def y(self) -> npt.NDArray[float]:
         return self.dataset["y"].values
 
     _pkg_id = "wel"
@@ -148,22 +150,22 @@ class Well(BoundaryCondition, IPointDataPackage):
 
     def __init__(
         self,
-        x,
-        y,
-        screen_top,
-        screen_bottom,
-        rate,
-        concentration=None,
+        x: List[float],
+        y: List[float],
+        screen_top: List[float],
+        screen_bottom: List[float],
+        rate: List[float],
+        concentration: Optional[List[float] | xr.DataArray] = None,
         concentration_boundary_type="aux",
-        id=None,
-        minimum_k=0.1,
-        minimum_thickness=1.0,
-        print_input=False,
-        print_flows=False,
-        save_flows=False,
+        id: Optional[List[int]] = None,
+        minimum_k: float = 0.1,
+        minimum_thickness: float = 1.0,
+        print_input: bool = False,
+        print_flows: bool = False,
+        save_flows: bool = False,
         observations=None,
         validate: bool = True,
-        repeat_stress=None,
+        repeat_stress: Optional[xr.DataArray] = None,
     ):
         super().__init__()
         self.dataset["screen_top"] = _assign_dims(screen_top)
@@ -252,7 +254,7 @@ class Well(BoundaryCondition, IPointDataPackage):
     def write(
         self,
         pkgname: str,
-        globaltimes: np.ndarray[np.datetime64],
+        globaltimes: npt.NDArray[np.datetime64],
         validate: bool,
         write_context: WriteContext,
         idomain: Union[xr.DataArray, xu.UgridDataArray],
@@ -316,7 +318,7 @@ class Well(BoundaryCondition, IPointDataPackage):
 
     def __create_dataset_vars(
         self, wells_assigned: pd.DataFrame, wells_df: pd.DataFrame, cellid: xr.DataArray
-    ) -> list:
+    ) -> xr.Dataset:
         """
         Create dataset with all variables (rate, concentration), with a similar shape as the cellids.
         """
@@ -647,7 +649,7 @@ class WellDisStructured(DisStructuredBoundaryCondition):
         x_max=None,
         y_min=None,
         y_max=None,
-    ) -> "WellDisStructured":
+    ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
 
@@ -798,7 +800,7 @@ class WellDisVertices(DisVerticesBoundaryCondition):
         x_max=None,
         y_min=None,
         y_max=None,
-    ) -> "WellDisStructured":
+    ) -> Package:
         """
         Clip a package by a bounding box (time, layer, y, x).
 

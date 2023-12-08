@@ -8,6 +8,7 @@ from typing import Tuple
 
 import geopandas as gpd
 import numpy as np
+import numpy.typing as npt
 import shapely.wkt
 import xarray as xr
 import xugrid as xu
@@ -23,7 +24,7 @@ from imod.schemata import EmptyIndexesSchema
 from imod.typing import GridDataArray
 
 
-@typedispatch
+@typedispatch  # type: ignore[no-redef]
 def _derive_connected_cell_ids(
     idomain: xr.DataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
 ):
@@ -72,7 +73,7 @@ def _derive_connected_cell_ids(
     return cell_ids
 
 
-@typedispatch
+@typedispatch  # type: ignore[no-redef]
 def _derive_connected_cell_ids(
     _: xu.UgridDataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
 ):

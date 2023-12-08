@@ -74,6 +74,7 @@ class GroundwaterFlowModel(Modflow6Model):
         clipped = super().clip_box(
             time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
         )
+
         clipped_boundary_condition = self.__create_boundary_condition_clipped_boundary(
             self, clipped, state_for_boundary
         )
