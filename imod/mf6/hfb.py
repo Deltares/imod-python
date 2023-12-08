@@ -7,6 +7,7 @@ from typing import Tuple
 
 import geopandas as gpd
 import numpy as np
+import numpy.typing as npt
 import shapely.wkt
 import xarray as xr
 import xugrid as xu
@@ -21,7 +22,7 @@ from imod.mf6.utilities.grid import broadcast_to_full_domain
 from imod.typing import GridDataArray
 
 
-@typedispatch
+@typedispatch  # type: ignore[no-redef]
 def _derive_connected_cell_ids(
     idomain: xr.DataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
 ):
@@ -70,7 +71,7 @@ def _derive_connected_cell_ids(
     return cell_ids
 
 
-@typedispatch
+@typedispatch  # type: ignore[no-redef]
 def _derive_connected_cell_ids(
     _: xu.UgridDataArray, grid: xu.Ugrid2d, edge_index: np.ndarray
 ):
@@ -283,7 +284,7 @@ class HorizontalFlowBarrierBase(BoundaryCondition, ILineDataPackage):
         self.dataset = self.dataset.merge(geometry.to_xarray())
 
     @property
-    def geometry(self) -> np.ndarray[object]:
+    def geometry(self) -> npt.NDArray[object]:
         return self.dataset["geometry"].values
 
     def render(self, directory, pkgname, globaltimes, binary):

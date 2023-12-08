@@ -20,7 +20,7 @@ import pathlib
 import re
 import tempfile
 import warnings
-from typing import Any, Dict, List, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import affine
 import cftime
@@ -1159,7 +1159,7 @@ def replace(da: xr.DataArray, to_replace: Any, value: Any) -> xr.DataArray:
     )
 
 
-def values_within_range(da, min=None, max=None):
+def values_within_range(da, min: Optional[float] = None, max: Optional[float] = None):
     """
     Find which values are within range.
     Function checks which values are unaffected by the clip method, to
