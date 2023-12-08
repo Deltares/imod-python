@@ -355,7 +355,35 @@ class Modflow6Model(collections.UserDict, abc.ABC):
         y_max: Optional[float] = None,
         state_for_boundary: Optional[GridDataArray] = None,
     ):
-        raise NotImplementedError
+        """
+        Clip a model by a bounding box (time, layer, y, x).
+
+        Slicing intervals may be half-bounded, by providing None:
+
+        * To select 500.0 <= x <= 1000.0:
+          ``clip_box(x_min=500.0, x_max=1000.0)``.
+        * To select x <= 1000.0: ``clip_box(x_min=None, x_max=1000.0)``
+          or ``clip_box(x_max=1000.0)``.
+        * To select x >= 500.0: ``clip_box(x_min = 500.0, x_max=None.0)``
+          or ``clip_box(x_min=1000.0)``.
+
+        Parameters
+        ----------
+        time_min: optional
+        time_max: optional
+        layer_min: optional, int
+        layer_max: optional, int
+        x_min: optional, float
+        x_max: optional, float
+        y_min: optional, float
+        y_max: optional, float
+        state_for_boundary :
+        """
+        clipped = self._clip_box_packages(
+            time_min, time_max, layer_min, layer_max, x_min, x_max, y_min, y_max
+        )
+
+        return clipped
 
     def _clip_box_packages(
         self,
