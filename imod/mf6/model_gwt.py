@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Optional
+
 from imod.mf6.model import Modflow6Model, initialize_template
 
 
@@ -14,7 +16,7 @@ class GroundwaterTransportModel(Modflow6Model):
 
     def __init__(
         self,
-        listing_file: str = None,
+        listing_file: Optional[str] = None,
         print_input: bool = False,
         print_flows: bool = False,
         save_flows: bool = False,
