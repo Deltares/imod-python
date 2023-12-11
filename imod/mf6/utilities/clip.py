@@ -11,7 +11,6 @@ from imod.mf6.interfaces.ipackagebase import IPackageBase
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.utilities.dataset import get_scalar_variables
 from imod.mf6.utilities.grid import get_active_domain_slice
-from imod.select.points import points_values
 from imod.typing import GridDataArray, ScalarDataset
 from imod.typing.grid import bounding_polygon, is_spatial_2D
 
@@ -52,21 +51,16 @@ def clip_by_grid(package: IPackageBase, active: xu.UgridDataArray) -> IPackageBa
 
 @typedispatch
 def clip_by_grid(
-    package: IPointDataPackage, active: GridDataArray
+    package: IPointDataPackage, active: xu.UgridDataArray
 ) -> IPointDataPackage:
-    """Clip PointDataPackage outside grid."""
+    """Clip PointDataPackage outside unstructured grid."""
 
-    # Drop layer coordinate if present, otherwise a layer coordinate is assigned
-    # which causes conflicts downstream when assigning wells and deriving
-    # cellids.
-    active = active.isel(layer=0, drop=True, missing_dims="ignore").drop(
-        "layer", errors="ignore"
-    )
-    point_active = points_values(
-        active, x=package.x, y=package.y, out_of_bounds="ignore"
-    )
+    domain_slice = get_active_domain_slice(active)
+    active_clipped = active.isel(domain_slice, missing_dims="ignore")
 
-    is_inside_exterior = point_active == 1
+    points = np.column_stack((package.x, package.y))
+
+    is_inside_exterior = active_clipped.grid.locate_points(points) != -1
     selection = package.dataset.loc[{"index": is_inside_exterior}]
 
     cls = type(package)
