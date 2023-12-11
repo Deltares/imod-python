@@ -243,7 +243,7 @@ def points_indices(da, out_of_bounds="raise", **points):
     return indices
 
 
-def points_values(da, out_of_bounds="error", **points):
+def points_values(da, out_of_bounds="raise", **points):
     """
     Get values from specified points.
 
