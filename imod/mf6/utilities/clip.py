@@ -59,8 +59,12 @@ def clip_by_grid(
     # Drop layer coordinate if present, otherwise a layer coordinate is assigned
     # which causes conflicts downstream when assigning wells and deriving
     # cellids.
-    active = active.drop("layer", errors="ignore")
-    point_active = points_values(active, x=package.x, y=package.y)
+    active = active.isel(layer=0, drop=True, missing_dims="ignore").drop(
+        "layer", errors="ignore"
+    )
+    point_active = points_values(
+        active, x=package.x, y=package.y, out_of_bounds="ignore"
+    )
 
     is_inside_exterior = point_active == 1
     selection = package.dataset.loc[{"index": is_inside_exterior}]
