@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import warnings
-from copy import deepcopy
 from typing import Dict, List, Union
 
 import numpy as np
@@ -18,7 +17,6 @@ from imod.mf6.boundary_condition import (
 )
 from imod.mf6.interfaces.ipointdatapackage import IPointDataPackage
 from imod.mf6.mf6_wel_adapter import Mf6Wel
-from imod.mf6.package import Package
 from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.write_context import WriteContext
