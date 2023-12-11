@@ -498,10 +498,10 @@ class Well(BoundaryCondition, IPointDataPackage):
 
     def mask(self, domain: GridDataArray) -> "Well":
         """
-        The Well package has no mask method implemented. Wells falling in
-        inactive cells are automatically removed in the call to write to
-        Modflow 6 package. You can verify this by calling the ``to_mf6_pkg``
-        method.
+        Mask wells based on two-dimensional domain. For three-dimensional
+        masking: Wells falling in inactive cells are automatically removed in
+        the call to write to Modflow 6 package. You can verify this by calling
+        the ``to_mf6_pkg`` method.
         """
 
         # Drop layer coordinate if present, otherwise a layer coordinate is assigned
