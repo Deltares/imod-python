@@ -492,7 +492,8 @@ class Well(BoundaryCondition, IPointDataPackage):
         grid-agnostic, instead this method clips the package based on the grid
         exterior.
         """
-        return clip_by_grid(self, target_grid)
+        target_grid_2d = target_grid.isel(layer=0, drop=True, missing_dims="ignore")
+        return clip_by_grid(self, target_grid_2d)
 
     def mask(self, domain: GridDataArray) -> "Well":
         """
