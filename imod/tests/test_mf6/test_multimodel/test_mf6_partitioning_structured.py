@@ -93,6 +93,35 @@ class PartitionArrayCases:
         return island
 
 
+class WellCases:
+    def case_one_well(self):
+        return imod.mf6.Well(
+            x=[52500.0],
+            y=[52500.0],
+            screen_top=[-300.0],
+            screen_bottom=[-450.0],
+            rate=[-5.0],
+            minimum_k=1e-19,
+        )
+
+    def case_all_well(self, idomain_top):
+        x = idomain_top.coords["x"].values
+        y = idomain_top.coords["y"].values
+        x_mesh, y_mesh = np.meshgrid(x, y)
+        x_list = x_mesh.ravel()
+        y_list = y_mesh.ravel()
+        size = len(x_list)
+
+        return imod.mf6.Well(
+            x=x_list,
+            y=y_list,
+            screen_top=size * [-300.0],
+            screen_bottom=size * [-450.0],
+            rate=size * [-5.0],
+            minimum_k=1e-19,
+        )
+
+
 @pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
 def test_partitioning_structured(
@@ -302,10 +331,12 @@ def test_partitioning_structured_geometry_auxiliary_variables(
 
 @pytest.mark.usefixtures("transient_twri_model")
 @parametrize_with_cases("partition_array", cases=PartitionArrayCases)
+@parametrize_with_cases("well", cases=WellCases)
 def test_partitioning_structured_one_high_level_well(
     tmp_path: Path,
     transient_twri_model: Modflow6Simulation,
     partition_array: xr.DataArray,
+    well: imod.mf6.Well,
 ):
     """
     In this test we include a high-level well package with 1 well in it to the
@@ -316,14 +347,7 @@ def test_partitioning_structured_one_high_level_well(
     simulation = transient_twri_model
 
     # Create and fill the groundwater model.
-    simulation["GWF_1"]["wel"] = imod.mf6.Well(
-        x=[52500.0],
-        y=[52500.0],
-        screen_top=[-300.0],
-        screen_bottom=[-450.0],
-        rate=[-5.0],
-        minimum_k=1e-19,
-    )
+    simulation["GWF_1"]["wel"] = well
 
     # run the original example, so without partitioning, and save the simulation results
     orig_dir = tmp_path / "original"
