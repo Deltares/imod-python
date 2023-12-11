@@ -24,7 +24,7 @@ from imod.mf6.utilities.dataset import remove_inactive
 from imod.mf6.write_context import WriteContext
 from imod.prepare import assign_wells
 from imod.schemata import AllNoDataSchema, DTypeSchema
-from imod.select.points import points_indices
+from imod.select.points import points_indices, points_values
 from imod.typing import GridDataArray
 from imod.typing.grid import ones_like
 from imod.util import values_within_range
@@ -496,16 +496,29 @@ class Well(BoundaryCondition, IPointDataPackage):
         """
         return clip_by_grid(self, target_grid)
 
-    def mask(self, _) -> Package:
+    def mask(self, domain: GridDataArray) -> "Well":
         """
         The Well package has no mask method implemented. Wells falling in
         inactive cells are automatically removed in the call to write to
         Modflow 6 package. You can verify this by calling the ``to_mf6_pkg``
         method.
         """
-        # TODO: Add docsting message to logger
-        # message = textwrap.dedent(self.mask.__doc__)
-        return deepcopy(self)
+
+        # Drop layer coordinate if present, otherwise a layer coordinate is assigned
+        # which causes conflicts downstream when assigning wells and deriving
+        # cellids.
+        domain = domain.isel(layer=0, drop=True, missing_dims="ignore").drop(
+            "layer", errors="ignore"
+        )
+        point_active = points_values(domain, x=self.x, y=self.y)
+
+        is_inside_exterior = point_active == 1
+        selection = self.dataset.loc[{"index": is_inside_exterior}]
+
+        cls = type(self)
+        new = cls.__new__(cls)
+        new.dataset = selection
+        return new
 
 
 class WellDisStructured(DisStructuredBoundaryCondition):
