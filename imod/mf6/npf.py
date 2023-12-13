@@ -200,6 +200,12 @@ class NodePropertyFlow(Package):
         ranges from zero to one and can be used by post processing programs to
         determine how much of a cell volume is saturated. If ICELLTYPE is 0,
         then saturation is always one.
+    xt3d_option:  ({True, False}, optional)
+        If True, the XT3D formulation will be used. By default False.
+    rhs_option: ({True, False}, optional)
+        If True, then the XT3D additional terms will be added to the right-hand
+        side. If False, then the XT3D terms will be put into the coefficient
+        matrix. By default False.
     validate: {True, False}
         Flag to indicate whether the package should be validated upon
         initialization. This raises a ValidationError if package input is
@@ -299,6 +305,8 @@ class NodePropertyFlow(Package):
         "variable_vertical_conductance": "variablecv",
         "starting_head_as_confined_thickness": "thickstrt",
         "rewet_iterations": "iwetit",
+        "xt3d_option": "xt3doptions",
+        "rhs_option": "rhs",
     }
     _template = Package._initialize_template(_pkg_id)
 
@@ -342,6 +350,8 @@ class NodePropertyFlow(Package):
         perched=False,
         save_specific_discharge=False,
         save_saturation=False,
+        xt3d_option=False,
+        rhs_option=False,
         validate: bool = True,
     ):
         super().__init__(locals())
@@ -383,11 +393,33 @@ class NodePropertyFlow(Package):
         self.dataset["perched"] = perched
         self.dataset["save_specific_discharge"] = save_specific_discharge
         self.dataset["save_saturation"] = save_saturation
+        self.dataset["xt3d_option"] = xt3d_option
+        self.dataset["rhs_option"] = rhs_option
         self._validate_init_schemata(validate)
 
-    @classmethod
-    def get_pkg_id(cls) -> str:
+    def get_xt3d_option(self) -> bool:
         """
-        Returns the preferred package id for this class.
+        Returns the xt3d option value for this object.
         """
-        return cls._pkg_id
+        return self.dataset["xt3d_option"].values[()]
+
+    def set_xt3d_option(self, is_xt3d_used: bool, is_rhs: bool) -> None:
+        """
+        Returns the xt3d option value for this object.
+        """
+        self.dataset["rhs_option"] = is_rhs
+        self.dataset["xt3d_option"] = is_xt3d_used
+
+    @property
+    def is_variable_vertical_conductance(self) -> bool:
+        """
+        Returns the VariableCV option value for this object.
+        """
+        return self.dataset["variable_vertical_conductance"].values[()]
+
+    @property
+    def is_dewatered(self) -> bool:
+        """
+        Returns the "dewatered" option value for this object. Used only when variable_vertical_conductance is true
+        """
+        return self.dataset["dewatered"].values[()]

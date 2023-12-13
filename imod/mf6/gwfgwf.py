@@ -52,18 +52,22 @@ class GWFGWF(Package):
 
     def set_options(
         self,
-        print_input: bool,
-        print_flows: bool,
-        save_flows: bool,
-        cell_averaging: bool,
-        variablecv: bool,
-        newton: bool,
+        print_input: Optional[bool] = None,
+        print_flows: Optional[bool] = None,
+        save_flows: Optional[bool] = None,
+        cell_averaging: Optional[str] = None,
+        dewatered: Optional[bool] = None,
+        variablecv: Optional[bool] = None,
+        xt3d: Optional[bool] = None,
+        newton: Optional[bool] = None,
     ):
         self.dataset["print_input"] = print_input
         self.dataset["print_flows"] = print_flows
         self.dataset["save_flows"] = save_flows
         self.dataset["cell_averaging"] = cell_averaging
-        self.dataset["variable_cv"] = variablecv
+        self.dataset["dewatered"] = dewatered
+        self.dataset["variablecv"] = variablecv
+        self.dataset["xt3d"] = xt3d
         self.dataset["newton"] = newton
 
     def filename(self) -> str:

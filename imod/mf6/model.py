@@ -176,7 +176,7 @@ class Modflow6Model(collections.UserDict, abc.ABC):
 
     def __get_k(self):
         try:
-            npf = self[imod.mf6.NodePropertyFlow.get_pkg_id()]
+            npf = self[imod.mf6.NodePropertyFlow._pkg_id]
         except RuntimeError:
             raise ValidationError("expected one package of type ModePropertyFlow")
 
@@ -523,6 +523,9 @@ class Modflow6Model(collections.UserDict, abc.ABC):
             content = [f"{typename}("] + options + ["){}"]
         return "\n".join(content)
 
+    def is_use_newton(self):
+        return False
+
 
 class GroundwaterFlowModel(Modflow6Model):
     _mandatory_packages = ("npf", "ic", "oc", "sto")
@@ -636,6 +639,12 @@ class GroundwaterFlowModel(Modflow6Model):
         return create_clipped_boundary(
             model.domain, state_for_boundary, constant_head_packages
         )
+
+    def is_use_newton(self):
+        return self._options["newton"]
+
+    def set_newton(self, is_newton: bool) -> None:
+        self._options["newton"] = is_newton
 
 
 class GroundwaterTransportModel(Modflow6Model):
