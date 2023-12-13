@@ -1,8 +1,10 @@
 from pathlib import Path
 from typing import Dict
 
+import geopandas as gpd
 import numpy as np
 import pytest
+import shapely
 import xarray as xr
 
 import imod
@@ -205,4 +207,68 @@ def test_partitioning_unstructured_with_vpt_cells(
     # compare the head result of the original simulation with the result of the partitioned simulation
     np.testing.assert_allclose(
         head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
+    )
+
+
+@pytest.mark.usefixtures("circle_model")
+@pytest.mark.parametrize(
+    "partition_name",
+    ["two_parts", "three_parts"],
+)
+def test_partitioning_unstructured_hfb(
+    tmp_path: Path, circle_model: Modflow6Simulation, partition_name: str
+):
+    simulation = circle_model
+    # increase the recharge to make the head gradient more pronounced
+    simulation["GWF_1"]["rch"]["rate"] *= 100
+
+    # add horizontal flow barrier
+    barrier_y = [250.0, -250.0]
+    barrier_x = [-990.0, 990.0]
+
+    geometry = gpd.GeoDataFrame(
+        geometry=[shapely.linestrings(barrier_x, barrier_y)],
+        data={
+            "resistance": [10.0],
+            "ztop": [10.0],
+            "zbottom": [0.0],
+        },
+    )
+    simulation["GWF_1"]["hfb"] = imod.mf6.HorizontalFlowBarrierResistance(
+        geometry=geometry
+    )
+
+    # run the original example, so without partitioning, and save the simulation results
+    orig_dir = tmp_path / "original"
+    simulation.write(orig_dir, binary=False)
+    simulation.run()
+
+    orig_head = imod.mf6.open_hds(
+        orig_dir / "GWF_1/GWF_1.hds",
+        orig_dir / "GWF_1/disv.disv.grb",
+    )
+
+    orig_cbc = imod.mf6.open_cbc(
+        orig_dir / "GWF_1/GWF_1.cbc",
+        orig_dir / "GWF_1/disv.disv.grb",
+    )
+
+    # partition the simulation, run it, and save the (merged) results
+    idomain = simulation["GWF_1"].domain
+    partitioning_arrays = setup_partitioning_arrays(idomain.isel(layer=0))
+
+    split_simulation = simulation.split(partitioning_arrays[partition_name])
+
+    split_simulation.write(tmp_path, binary=False)
+    split_simulation.run()
+
+    head = split_simulation.open_head()
+    cbc = split_simulation.open_flow_budget()
+
+    # compare the head result of the original simulation with the result of the partitioned simulation
+    np.testing.assert_allclose(
+        head["head"].values, orig_head.values, rtol=1e-5, atol=1e-3
+    )
+    np.testing.assert_allclose(
+        cbc["chd"].values, orig_cbc["chd"].values, rtol=1e-5, atol=1e-3
     )
