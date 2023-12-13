@@ -223,8 +223,8 @@ def test_partitioning_unstructured_hfb(
     simulation["GWF_1"]["rch"]["rate"] *= 100
 
     # add horizontal flow barrier
-    barrier_y = [250.0, -250.0]
-    barrier_x = [-990.0, 990.0]
+    barrier_y = [-990.0, 990.0]
+    barrier_x = [-100.0, -100.0]
 
     geometry = gpd.GeoDataFrame(
         geometry=[shapely.linestrings(barrier_x, barrier_y)],
