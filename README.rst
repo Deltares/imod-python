@@ -59,3 +59,4 @@ Issues: https://gitlab.com/deltares/imod/imod-python/-/issues/
 .. _USGS MODFLOW 6: https://www.usgs.gov/software/modflow-6-usgs-modular-hydrologic-model
 .. _iMODFLOW: https://oss.deltares.nl/web/imod
 .. _iMOD-WQ: https://oss.deltares.nl/web/imod
+
