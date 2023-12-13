@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import geopandas as gpd
 import numpy as np
+import shapely
 import xarray as xr
 import xugrid as xu
 from fastcore.dispatch import typedispatch
@@ -111,6 +112,10 @@ def clip_by_grid(package: ILineDataPackage, active: GridDataArray) -> ILineDataP
     # Clip line with polygon
     bounding_gdf = bounding_polygon(active)
     package_gdf_clipped = package_gdf.clip(bounding_gdf)
+    # Catch edge case: when line crosses only vertex of polygon, a point
+    # (type_id == 0) is returned. Drop these.
+    is_points = shapely.get_type_id(package_gdf_clipped.geometry) == 0
+    package_gdf_clipped = package_gdf_clipped[~is_points]
     # Get settings
     settings = _get_settings(package)
     # Create new instance
