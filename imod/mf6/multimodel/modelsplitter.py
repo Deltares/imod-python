@@ -8,7 +8,7 @@ from imod.mf6.utilities.clip import clip_by_grid
 from imod.mf6.utilities.grid import get_active_domain_slice
 from imod.mf6.utilities.schemata import filter_schemata_dict
 from imod.mf6.wel import Well
-from imod.schemata import AllNoDataSchema
+from imod.schemata import AllNoDataSchema, IndexesSchema
 from imod.typing import GridDataArray
 from imod.typing.grid import is_unstructured, ones_like
 
@@ -94,7 +94,7 @@ def slice_model(partition_info: PartitionInfo, model: Modflow6Model) -> Modflow6
         # to drop these packages. Create schemata dict only containing the
         # variables with a AllNoDataSchema.
         allnodata_schemata = filter_schemata_dict(
-            package._write_schemata, (AllNoDataSchema)
+            package._write_schemata, (AllNoDataSchema, IndexesSchema)
         )
         # Find if packages throws ValidationError for AllNoDataSchema.
         allnodata_errors = sliced_package._validate(allnodata_schemata)
